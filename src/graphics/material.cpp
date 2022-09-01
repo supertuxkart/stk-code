@@ -43,6 +43,11 @@
 
 #include <IMaterialRendererServices.h>
 #include <ISceneNode.h>
+#include <mini_glm.hpp>
+
+#ifndef SERVER_ONLY
+#include <ge_spm_buffer.hpp>
+#endif
 
 using namespace irr::video;
 
@@ -788,15 +793,40 @@ void  Material::setMaterialProperties(video::SMaterial *m, scene::IMeshBuffer* m
         if (m_mirrorred_mesh_buffers.find((void*)mb) == m_mirrorred_mesh_buffers.end())
         {
             m_mirrorred_mesh_buffers[(void*)mb] = true;
-            //irr::video::S3DVertex* mbVertices = (video::S3DVertex*)mb->getVertices();
+            video::S3DVertexSkinnedMesh* mbVertices = (video::S3DVertexSkinnedMesh*)mb->getVertices();
             for (unsigned int i = 0; i < mb->getVertexCount(); i++)
             {
-                core::vector2df &tc = mb->getTCoords(i);
-                if (m_mirror_axis_when_reverse == 'V')
-                    tc.Y = 1 - tc.Y;
+                if (mb->getVertexType() == video::EVT_SKINNED_MESH)
+                {
+                    using namespace MiniGLM;
+                    if (m_mirror_axis_when_reverse == 'V')
+                    {
+                        mbVertices[i].m_all_uvs[1] =
+                            toFloat16(1.0f - toFloat32(mbVertices[i].m_all_uvs[1]));
+                    }
+                    else
+                    {
+                        mbVertices[i].m_all_uvs[0] =
+                            toFloat16(1.0f - toFloat32(mbVertices[i].m_all_uvs[0]));
+                    }
+                }
                 else
-                    tc.X = 1 - tc.X;
+                {
+                    core::vector2df &tc = mb->getTCoords(i);
+                    if (m_mirror_axis_when_reverse == 'V')
+                        tc.Y = 1 - tc.Y;
+                    else
+                        tc.X = 1 - tc.X;
+                }
             }
+#ifndef SERVER_ONLY
+            if (is_vk)
+            {
+                GE::GESPMBuffer* spmb = static_cast<GE::GESPMBuffer*>(mb);
+                spmb->destroyVertexIndexBuffer();
+                spmb->createVertexIndexBuffer();
+            }
+#endif
         }
     }   // reverse track and texture needs mirroring
 
