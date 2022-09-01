@@ -42,6 +42,7 @@
 #include <ge_main.hpp>
 #include <ge_vulkan_driver.hpp>
 #include "graphics/stk_tex_manager.hpp"
+#include "utils/stk_process.hpp"
 #endif
 
 KartPropertiesManager *kart_properties_manager=0;
@@ -623,7 +624,7 @@ void KartPropertiesManager::onDemandLoadKartTextures(
                                                             bool unload_unused)
 {
 #ifndef SERVER_ONLY
-    if (kart_list.empty())
+    if (STKProcess::getType() != PT_MAIN || kart_list.empty())
         return;
 
     GE::GEVulkanDriver* gevd = GE::getVKDriver();
