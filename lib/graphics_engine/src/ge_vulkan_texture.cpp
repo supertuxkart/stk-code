@@ -561,7 +561,7 @@ void* GEVulkanTexture::lock(video::E_TEXTURE_LOCK_MODE mode, u32 mipmap_level)
 // ----------------------------------------------------------------------------
 uint8_t* GEVulkanTexture::getTextureData()
 {
-    if (m_internal_format != VK_FORMAT_R8G8B8A8_UNORM ||
+    if (m_internal_format != VK_FORMAT_R8G8B8A8_UNORM &&
         m_internal_format != VK_FORMAT_R8_UNORM)
     {
         if (m_full_path.empty())
