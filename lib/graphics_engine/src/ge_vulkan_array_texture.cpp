@@ -181,6 +181,8 @@ void GEVulkanArrayTexture::reloadInternal(const std::vector<io::path>& list,
         }
         else
         {
+            if (i == 0)
+                m_internal_format = VK_FORMAT_R8G8B8A8_UNORM;
             mipmap_generator = new GEMipmapGenerator(texture_data, 4, m_size,
                 normal_map);
         }

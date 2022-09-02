@@ -180,6 +180,8 @@ bool GEVulkanTexture::createTextureImage(uint8_t* texture_data,
         }
         else
         {
+            m_internal_format = (isSingleChannel() ?
+                VK_FORMAT_R8_UNORM : VK_FORMAT_R8G8B8A8_UNORM);
             mipmap_generator = new GEMipmapGenerator(texture_data, channels,
                 m_size, normal_map);
         }
