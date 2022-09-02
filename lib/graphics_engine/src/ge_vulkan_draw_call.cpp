@@ -25,7 +25,7 @@ namespace GE
 {
 // ============================================================================
 ObjectData::ObjectData(irr::scene::ISceneNode* node, int material_id,
-                       int skinning_offset)
+                       int skinning_offset, int irrlicht_material_id)
 {
     using namespace MiniGLM;
     const irr::core::matrix4& model_mat = node->getAbsoluteTransformation();
@@ -53,8 +53,10 @@ ObjectData::ObjectData(irr::scene::ISceneNode* node, int material_id,
     memcpy(m_scale, &scale, sizeof(irr::core::vector3df));
     m_skinning_offset = skinning_offset;
     m_material_id = material_id;
-    m_texture_trans[0] = 0.0f;
-    m_texture_trans[1] = 0.0f;
+    const irr::core::matrix4& texture_matrix =
+        node->getMaterial(irrlicht_material_id).getTextureMatrix(0);
+    m_texture_trans[0] = texture_matrix[8];
+    m_texture_trans[1] = texture_matrix[9];
 }   // ObjectData
 
 // ----------------------------------------------------------------------------
@@ -243,7 +245,7 @@ void GEVulkanDrawCall::generate()
                 if (it != skinning_offets.end())
                     skinning_offset = it->second;
                 m_visible_objects.emplace_back(node, material_id,
-                    skinning_offset);
+                    skinning_offset, r.second);
             }
             VkDrawIndexedIndirectCommand cmd;
             cmd.indexCount = p.first->getIndexCount();

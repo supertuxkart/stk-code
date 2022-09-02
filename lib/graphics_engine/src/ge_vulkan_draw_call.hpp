@@ -36,7 +36,7 @@ struct ObjectData
     float m_texture_trans[2];
     // ------------------------------------------------------------------------
     ObjectData(irr::scene::ISceneNode* node, int material_id,
-               int skinning_offset);
+               int skinning_offset, int irrlicht_material_id);
 };
 
 struct PipelineSettings
