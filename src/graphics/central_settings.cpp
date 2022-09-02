@@ -78,6 +78,7 @@ void CentralVideoSettings::init()
             if (GE::getDriver()->getDriverType() == video::EDT_VULKAN)
             {
                 hasTextureCompression = GEVulkanFeatures::supportsS3TCBC3() ||
+                    GEVulkanFeatures::supportsBPTCBC7() ||
                     GEVulkanFeatures::supportsASTC4x4();
             }
             return;
