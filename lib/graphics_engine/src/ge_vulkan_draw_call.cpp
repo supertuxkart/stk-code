@@ -1054,6 +1054,12 @@ void GEVulkanDrawCall::render(GEVulkanDriver* vk, GEVulkanCameraSceneNode* cam,
                         1, &m_texture_descriptor->getDescriptorSet()[cur_mid],
                         0, NULL);
                 }
+                else
+                {
+                    vkCmdBindDescriptorSets(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS,
+                        m_pipeline_layout, 0, 1,
+                        m_texture_descriptor->getDescriptorSet(), 0, NULL);
+                }
                 if (use_base_vertex)
                 {
                     vkCmdBindDescriptorSets(cmd,
