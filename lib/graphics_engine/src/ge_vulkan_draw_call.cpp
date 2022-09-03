@@ -193,7 +193,7 @@ void GEVulkanDrawCall::generate()
             break;
         }
     }
-    std::sort(visible_nodes.begin(), visible_nodes.end(),
+    std::stable_sort(visible_nodes.begin(), visible_nodes.end(),
         [&nodes_area](const Nodes& a, const Nodes& b)
         {
             return nodes_area.at(a.first) < nodes_area.at(b.first) ;
