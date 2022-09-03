@@ -48,6 +48,11 @@
 #include <IGUIEnvironment.h>
 #include <IGUIButton.h>
 
+#ifndef SERVER_ONLY
+#include <ge_main.hpp>
+#include <ge_vulkan_driver.hpp>
+#endif
+
 using namespace GUIEngine;
 using irr::core::stringw;
 
@@ -335,6 +340,9 @@ void KartSelectionScreen::beforeAddingWidget()
 
 void KartSelectionScreen::init()
 {
+#ifndef SERVER_ONLY
+    GE::getGEConfig()->m_enable_draw_call_cache = true;
+#endif
     m_instance_ptr = this;
     Screen::init();
     m_must_delete_on_back = false;
@@ -441,6 +449,12 @@ void KartSelectionScreen::init()
 
 void KartSelectionScreen::tearDown()
 {
+#ifndef SERVER_ONLY
+    GE::getGEConfig()->m_enable_draw_call_cache = false;
+    GE::GEVulkanDriver* gevk = GE::getVKDriver();
+    if (gevk)
+        gevk->clearDrawCallsCache();
+#endif
 #ifdef MOBILE_STK
     if (m_multiplayer)
         MessageQueue::discardStatic();

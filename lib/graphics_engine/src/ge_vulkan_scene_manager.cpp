@@ -286,12 +286,18 @@ irr::u32 GEVulkanSceneManager::registerNodeForRendering(
 // ----------------------------------------------------------------------------
 void GEVulkanSceneManager::addDrawCall(GEVulkanCameraSceneNode* cam)
 {
-    m_draw_calls[cam] = std::unique_ptr<GEVulkanDrawCall>(new GEVulkanDrawCall);
+    GEVulkanDriver* gevk = static_cast<GEVulkanDriver*>(getVideoDriver());
+    m_draw_calls[cam] = gevk->getDrawCallFromCache();
 }   // addDrawCall
 
 // ----------------------------------------------------------------------------
 void GEVulkanSceneManager::removeDrawCall(GEVulkanCameraSceneNode* cam)
 {
+    if (m_draw_calls.find(cam) == m_draw_calls.end())
+        return;
+    GEVulkanDriver* gevk = static_cast<GEVulkanDriver*>(getVideoDriver());
+    auto& dc = m_draw_calls.at(cam);
+    gevk->addDrawCallToCache(dc);
     m_draw_calls.erase(cam);
 }   // removeDrawCall
 

@@ -23,8 +23,9 @@ using namespace video;
 
 namespace GE
 {
-    class GEVulkanFBOTexture;
     class GEVulkanDepthTexture;
+    class GEVulkanDrawCall;
+    class GEVulkanFBOTexture;
     class GEVulkanMeshCache;
     class GEVulkanTextureDescriptor;
     enum GEVulkanSampler : unsigned
@@ -359,6 +360,9 @@ namespace GE
         void handleDeletedTextures();
         void addRTTPolyCount(unsigned count)       { m_rtt_polycount += count; }
         SDL_Window* getSDLWindow() const                    { return m_window; }
+        void clearDrawCallsCache();
+        void addDrawCallToCache(std::unique_ptr<GEVulkanDrawCall>& dc);
+        std::unique_ptr<GEVulkanDrawCall> getDrawCallFromCache();
     private:
         struct SwapChainSupportDetails
         {
@@ -500,6 +504,8 @@ namespace GE
         GEVulkanFBOTexture* m_prev_rtt_texture;
         GEVulkanFBOTexture* m_separate_rtt_texture;
         u32 m_rtt_polycount;
+
+        std::vector<std::unique_ptr<GEVulkanDrawCall> > m_draw_calls_cache;
 
         void createInstance(SDL_Window* window);
         void findPhysicalDevice();

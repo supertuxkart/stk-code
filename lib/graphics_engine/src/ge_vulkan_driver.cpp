@@ -2430,6 +2430,7 @@ void GEVulkanDriver::updateRenderScale(float value)
         return;
     waitIdle();
     setDisableWaitIdle(true);
+    clearDrawCallsCache();
     destroySwapChainRelated(false/*handle_surface*/);
     getGEConfig()->m_render_scale = value;
     createSwapChainRelated(false/*handle_surface*/);
@@ -2441,6 +2442,29 @@ void GEVulkanDriver::updateRenderScale(float value)
     GEVulkan2dRenderer::init(this);
     setDisableWaitIdle(false);
 }   // updateRenderScale
+
+// ----------------------------------------------------------------------------
+void GEVulkanDriver::clearDrawCallsCache()
+{
+    m_draw_calls_cache.clear();
+}   // clearDrawCallsCache
+
+// ----------------------------------------------------------------------------
+void GEVulkanDriver::addDrawCallToCache(std::unique_ptr<GEVulkanDrawCall>& dc)
+{
+    if (getGEConfig()->m_enable_draw_call_cache)
+        m_draw_calls_cache.push_back(std::move(dc));
+}   // addDrawCallToCache
+
+// ----------------------------------------------------------------------------
+std::unique_ptr<GEVulkanDrawCall> GEVulkanDriver::getDrawCallFromCache()
+{
+    if (!getGEConfig()->m_enable_draw_call_cache || m_draw_calls_cache.empty())
+        return std::unique_ptr<GEVulkanDrawCall>(new GEVulkanDrawCall);
+    auto dc = std::move(m_draw_calls_cache.back());
+    m_draw_calls_cache.pop_back();
+    return dc;
+}   // getDrawCallFromCache
 
 }
 

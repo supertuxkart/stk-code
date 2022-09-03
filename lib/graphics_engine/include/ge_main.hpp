@@ -17,6 +17,7 @@ bool m_disable_npot_texture;
 bool m_convert_irrlicht_mesh;
 bool m_texture_compression;
 bool m_vulkan_fullscreen_desktop;
+bool m_enable_draw_call_cache;
 std::unordered_set<std::string> m_ondemand_load_texture_paths;
 float m_render_scale;
 };
