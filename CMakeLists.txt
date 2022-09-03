@@ -304,12 +304,6 @@ if (NOT SERVER_ONLY)
         include_directories("${SDL2_INCLUDEDIR}")
         MESSAGE(STATUS "Use system SDL2: ${SDL2_LIBRARY}")
     endif()
-    # DirectFB. Necessary if system SDL2 is built with DirectFB support.
-    find_path(DIRECTFB_INCLUDEDIR NAMES directfb.h directfb++.h PATH_SUFFIXES directfb include/directfb include PATHS)
-    if (DIRECTFB_INCLUDEDIR)
-        include_directories("${DIRECTFB_INCLUDEDIR}")
-        message(STATUS "Adding DirectFB include directories for DirectFB support in SDL2")
-    endif()
 endif()
 
 # Build the irrlicht library
