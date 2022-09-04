@@ -56,6 +56,8 @@ private:
     static std::mt19937 m_random_engine;
 
     static uint32_t m_random_seed;
+
+    static void preloadIcon(const std::string& name);
 public:
     static void loadDefaultItemMeshes();
     static void removeTextures();

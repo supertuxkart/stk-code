@@ -21,6 +21,8 @@
 #include "config/stk_config.hpp"
 #include "config/user_config.hpp"
 #include "graphics/irr_driver.hpp"
+#include "graphics/material.hpp"
+#include "graphics/material_manager.hpp"
 #include "graphics/sp/sp_base.hpp"
 #include "io/file_manager.hpp"
 #include "karts/abstract_kart.hpp"
@@ -117,9 +119,24 @@ void ItemManager::loadDefaultItemMeshes()
             m_item_lowres_mesh[i]->grab();
         }
         m_icon[i] = "icon-" + item_names[(ItemState::ItemType)i] + ".png";
+        preloadIcon(m_icon[i]);
     }   // for i
     delete root;
+    preloadIcon("item_spark.png");
 }   // loadDefaultItemMeshes
+
+//-----------------------------------------------------------------------------
+/** Preload icon materials to avoid hangs when firstly insert item
+ */
+void ItemManager::preloadIcon(const std::string& name)
+{
+    // From IrrDriver::addBillboard
+    Material* m = material_manager->getMaterial(name, false/*full_path*/,
+        /*make_permanent*/true, /*complain_if_not_found*/true,
+        /*strip_path*/false, /*install*/false);
+    m->getTexture(true/*srgb*/, m->getShaderName() == "additive" ||
+        m->getShaderName() == "alphablend" ? true : false/*premul_alpha*/);
+}   // preloadIcon
 
 //-----------------------------------------------------------------------------
 /** Clean up all textures. This is necessary when switching resolution etc.
