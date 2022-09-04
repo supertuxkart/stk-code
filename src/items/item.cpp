@@ -280,17 +280,6 @@ Item::Item(ItemType type, const Vec3& xyz, const Vec3& normal,
 
         m_spark_nodes.push_back(billboard);
     }
-
-    if (!icon.empty())
-    {
-        m_icon_node = irr_driver->addBillboard(core::dimension2df(1.0f, 1.0f),
-                                        icon, m_node);
-
-        m_icon_node->setPosition(core::vector3df(0.0f, 0.5f, 0.0f));
-        m_icon_node->setVisible(false);
-        ((scene::IBillboardSceneNode*)m_icon_node)
-            ->setColor(ItemManager::getGlowColor(type).toSColor());
-    }
 }   // Item(type, xyz, normal, mesh, lowres_mesh)
 
 //-----------------------------------------------------------------------------
@@ -420,8 +409,9 @@ void Item::handleNewMesh(ItemType type)
 
     if (m_icon_node)
         m_node->removeChild(m_icon_node);
+    m_icon_node = NULL;
     auto icon = ItemManager::getIcon(type);
-    
+
     if (!icon.empty())
     {
         m_icon_node = irr_driver->addBillboard(core::dimension2df(1.0f, 1.0f),
