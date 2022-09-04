@@ -139,6 +139,7 @@ void GEVulkanFeatures::init(GEVulkanDriver* vk)
     g_supports_partially_bound = (descriptor_indexing_features
         .descriptorBindingPartiallyBound == VK_TRUE);
 
+#if defined(__APPLE__)
     bool missing_vkGetPhysicalDeviceProperties2 =
         !vkGetPhysicalDeviceProperties2;
     if (!missing_vkGetPhysicalDeviceProperties2 &&
@@ -167,7 +168,6 @@ void GEVulkanFeatures::init(GEVulkanDriver* vk)
         }
     }
 
-#if defined(__APPLE__)
     MVKPhysicalDeviceMetalFeatures mvk_features = {};
     size_t mvk_features_size = sizeof(MVKPhysicalDeviceMetalFeatures);
     vkGetPhysicalDeviceMetalFeaturesMVK(vk->getPhysicalDevice(), &mvk_features,
