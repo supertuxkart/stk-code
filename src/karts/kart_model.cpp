@@ -318,7 +318,7 @@ KartModel::~KartModel()
  *  It is also marked not to be a master copy, so attachModel can be called
  *  for this instance.
  */
-KartModel* KartModel::makeCopy(std::shared_ptr<RenderInfo> ri)
+KartModel* KartModel::makeCopy(std::shared_ptr<GE::GERenderInfo> ri)
 {
     // Make sure that we are copying from a master objects, and
     // that there is indeed no animated node defined here ...
@@ -1257,7 +1257,7 @@ void KartModel::resetVisualWheelPosition()
 }   // resetVisualSuspension
 
 //-----------------------------------------------------------------------------
-std::shared_ptr<RenderInfo> KartModel::getRenderInfo()
+std::shared_ptr<GE::GERenderInfo> KartModel::getRenderInfo()
 {
     return m_support_colorization ? m_render_info : NULL;
 }   // getRenderInfo

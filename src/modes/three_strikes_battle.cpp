@@ -22,7 +22,7 @@
 #include "config/user_config.hpp"
 #include "graphics/camera.hpp"
 #include "graphics/irr_driver.hpp"
-#include "graphics/render_info.hpp"
+#include <ge_render_info.hpp>
 #include "io/file_manager.hpp"
 #include "karts/kart.hpp"
 #include "karts/controller/spare_tire_ai.hpp"
@@ -739,7 +739,7 @@ void ThreeStrikesBattle::loadCustomModels()
             {
                 auto sta = std::make_shared<Kart>(sta_list[i], (int)m_karts.size(),
                     (int)m_karts.size() + 1, pos[i], HANDICAP_NONE,
-                    std::make_shared<RenderInfo>(1.0f));
+                    std::make_shared<GE::GERenderInfo>(1.0f));
                 sta->init(RaceManager::KartType::KT_SPARE_TIRE);
                 sta->setController(new SpareTireAI(sta.get()));
 

@@ -17,7 +17,7 @@
 
 #include "modes/ctf_flag.hpp"
 #include "graphics/irr_driver.hpp"
-#include "graphics/render_info.hpp"
+#include <ge_render_info.hpp>
 #include "graphics/sp/sp_mesh_node.hpp"
 #include "karts/abstract_kart.hpp"
 #include "modes/world.hpp"
@@ -147,7 +147,7 @@ void CTFFlag::initFlagRenderInfo(irr::scene::IAnimatedMeshSceneNode* flag_node)
     SP::SPMeshNode* spmn = dynamic_cast<SP::SPMeshNode*>(flag_node);
     if (!spmn)
         return;
-    m_flag_render_info = std::make_shared<RenderInfo>(0.0f, true);
+    m_flag_render_info = std::make_shared<GE::GERenderInfo>(0.0f, true);
     spmn->resetFirstRenderInfo(m_flag_render_info);
 }   // initFlagRenderInfo
 

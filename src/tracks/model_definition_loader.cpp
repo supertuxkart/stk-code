@@ -57,7 +57,7 @@ void ModelDefinitionLoader::addModelDefinition(const XMLNode* xml)
 
 // ----------------------------------------------------------------------------
 
-LODNode* ModelDefinitionLoader::instanciateAsLOD(const XMLNode* node, scene::ISceneNode* parent, std::shared_ptr<RenderInfo> ri)
+LODNode* ModelDefinitionLoader::instanciateAsLOD(const XMLNode* node, scene::ISceneNode* parent, std::shared_ptr<GE::GERenderInfo> ri)
 {
     scene::ISceneManager* sm = irr_driver->getSceneManager();
 

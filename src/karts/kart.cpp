@@ -112,7 +112,7 @@
  */
 Kart::Kart (const std::string& ident, unsigned int world_kart_id,
             int position, const btTransform& init_transform,
-            HandicapLevel handicap, std::shared_ptr<RenderInfo> ri)
+            HandicapLevel handicap, std::shared_ptr<GE::GERenderInfo> ri)
      : AbstractKart(ident, world_kart_id, position, init_transform,
              handicap, ri)
 
@@ -223,7 +223,7 @@ void Kart::initSound()
 // ----------------------------------------------------------------------------
 void Kart::changeKart(const std::string& new_ident,
                       HandicapLevel handicap,
-                      std::shared_ptr<RenderInfo> ri)
+                      std::shared_ptr<GE::GERenderInfo> ri)
 {
     AbstractKart::changeKart(new_ident, handicap, ri);
     m_kart_model->setKart(this);

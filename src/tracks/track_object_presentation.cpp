@@ -355,7 +355,7 @@ void TrackObjectPresentationLibraryNode::move(const core::vector3df& xyz, const 
 TrackObjectPresentationLOD::TrackObjectPresentationLOD(const XMLNode& xml_node,
                                        scene::ISceneNode* parent,
                                        ModelDefinitionLoader& model_def_loader,
-                                       std::shared_ptr<RenderInfo> ri)
+                                       std::shared_ptr<GE::GERenderInfo> ri)
                           : TrackObjectPresentationSceneNode(xml_node)
 {
     m_node = model_def_loader.instanciateAsLOD(&xml_node, parent, ri);
@@ -401,7 +401,7 @@ TrackObjectPresentationMesh::TrackObjectPresentationMesh(
                                                      const XMLNode& xml_node,
                                                      bool enabled,
                                                      scene::ISceneNode* parent,
-                                                     std::shared_ptr<RenderInfo> render_info)
+                                                     std::shared_ptr<GE::GERenderInfo> render_info)
                            : TrackObjectPresentationSceneNode(xml_node)
 {
     m_is_looped  = false;

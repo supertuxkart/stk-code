@@ -24,7 +24,7 @@
 #include "graphics/graphics_restrictions.hpp"
 #include "graphics/irr_driver.hpp"
 #include "graphics/material.hpp"
-#include "graphics/render_info.hpp"
+#include <ge_render_info.hpp>
 
 #include "../../../lib/irrlicht/source/Irrlicht/CBoneSceneNode.h"
 #include <algorithm>
@@ -39,7 +39,7 @@ SPMeshNode::SPMeshNode(IAnimatedMesh* mesh, ISceneNode* parent,
                        const core::vector3df& position,
                        const core::vector3df& rotation,
                        const core::vector3df& scale,
-                       std::shared_ptr<RenderInfo> render_info)
+                       std::shared_ptr<GE::GERenderInfo> render_info)
           : CAnimatedMeshSceneNode(mesh, parent, mgr, id, position, rotation,
                                    scale)
 {

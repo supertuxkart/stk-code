@@ -28,7 +28,7 @@
 #include "utils/leak_check.hpp"
 #include "utils/ptr_vector.hpp"
 
-class RenderInfo;
+namespace GE { class GERenderInfo; }
 
 namespace GUIEngine
 {
@@ -63,7 +63,7 @@ namespace GUIEngine
 
         scene::ISceneNode          *m_light;
 
-        std::shared_ptr<RenderInfo> m_render_info;
+        std::shared_ptr<GE::GERenderInfo> m_render_info;
 
         unsigned m_rtt_size;
 
@@ -107,7 +107,7 @@ namespace GUIEngine
 
         void drawRTTScene(const irr::core::rect<s32>& dest_rect) const;
 
-        std::shared_ptr<RenderInfo> getModelViewRenderInfo() { return m_render_info; }
+        std::shared_ptr<GE::GERenderInfo> getModelViewRenderInfo() { return m_render_info; }
     };
 
 }

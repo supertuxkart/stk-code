@@ -294,7 +294,7 @@ public:
                    Kart(const std::string& ident, unsigned int world_kart_id,
                         int position, const btTransform& init_transform,
                         HandicapLevel handicap,
-                        std::shared_ptr<RenderInfo> ri);
+                        std::shared_ptr<GE::GERenderInfo> ri);
     virtual       ~Kart();
     virtual void   init(RaceManager::KartType type) OVERRIDE;
     virtual void   kartIsInRestNow() OVERRIDE;
@@ -338,7 +338,7 @@ public:
     virtual void   setXYZ(const Vec3& a) OVERRIDE;
     virtual void changeKart(const std::string& new_ident,
                             HandicapLevel handicap,
-                            std::shared_ptr<RenderInfo> ri) OVERRIDE;
+                            std::shared_ptr<GE::GERenderInfo> ri) OVERRIDE;
 
     // ========================================================================================
     // SPEED and speed-boost related functions

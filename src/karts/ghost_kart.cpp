@@ -23,7 +23,7 @@
 #include "karts/kart_gfx.hpp"
 #include "karts/kart_model.hpp"
 #include "graphics/irr_driver.hpp"
-#include "graphics/render_info.hpp"
+#include <ge_render_info.hpp>
 #include "modes/easter_egg_hunt.hpp"
 #include "modes/linear_world.hpp"
 #include "modes/world.hpp"
@@ -38,7 +38,7 @@ GhostKart::GhostKart(const std::string& ident, unsigned int world_kart_id,
           : Kart(ident, world_kart_id,
                  position, btTransform(btQuaternion(0, 0, 0, 1)),
                  HANDICAP_NONE,
-                 std::make_shared<RenderInfo>(color_hue, true/*transparent*/)),
+                 std::make_shared<GE::GERenderInfo>(color_hue, true/*transparent*/)),
                  m_replay_data(rd)
 {
 }   // GhostKart

@@ -42,7 +42,7 @@ AbstractKart::AbstractKart(const std::string& ident,
                            int world_kart_id, int position,
                            const btTransform& init_transform,
                            HandicapLevel handicap,
-                           std::shared_ptr<RenderInfo> ri)
+                           std::shared_ptr<GE::GERenderInfo> ri)
              : Moveable()
 {
     m_world_kart_id   = world_kart_id;
@@ -78,7 +78,7 @@ void AbstractKart::reset()
 // ----------------------------------------------------------------------------
 void AbstractKart::loadKartProperties(const std::string& new_ident,
                                       HandicapLevel handicap,
-                                      std::shared_ptr<RenderInfo> ri)
+                                      std::shared_ptr<GE::GERenderInfo> ri)
 {
     m_kart_properties.reset(new KartProperties());
     const KartProperties* kp = kart_properties_manager->getKart(new_ident);
@@ -149,7 +149,7 @@ void AbstractKart::loadKartProperties(const std::string& new_ident,
 // ----------------------------------------------------------------------------
 void AbstractKart::changeKart(const std::string& new_ident,
                               HandicapLevel handicap,
-                              std::shared_ptr<RenderInfo> ri)
+                              std::shared_ptr<GE::GERenderInfo> ri)
 {
     // Reset previous kart (including delete old animation above)
     reset();

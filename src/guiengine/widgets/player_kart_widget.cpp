@@ -21,7 +21,7 @@
 #include "audio/sfx_manager.hpp"
 #include "config/player_manager.hpp"
 #include "config/user_config.hpp"
-#include "graphics/render_info.hpp"
+#include <ge_render_info.hpp>
 #include "guiengine/widgets/kart_stats_widget.hpp"
 #include "guiengine/widgets/model_view_widget.hpp"
 #include "guiengine/widgets/player_name_spinner.hpp"

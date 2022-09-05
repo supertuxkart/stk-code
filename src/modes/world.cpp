@@ -29,7 +29,7 @@
 #include "graphics/irr_driver.hpp"
 #include "graphics/material.hpp"
 #include "graphics/material_manager.hpp"
-#include "graphics/render_info.hpp"
+#include <ge_render_info.hpp>
 #include "guiengine/modaldialog.hpp"
 #include "guiengine/screen_keyboard.hpp"
 #include "io/file_manager.hpp"
@@ -463,7 +463,7 @@ std::shared_ptr<AbstractKart> World::createKart
     if (RaceManager::get()->hasGhostKarts())
         gk = ReplayPlay::get()->getNumGhostKart();
 
-    std::shared_ptr<RenderInfo> ri = std::make_shared<RenderInfo>();
+    std::shared_ptr<GE::GERenderInfo> ri = std::make_shared<GE::GERenderInfo>();
     core::stringw online_name;
     if (global_player_id > -1)
     {
@@ -1596,9 +1596,9 @@ std::shared_ptr<AbstractKart> World::createKartWithTeam
     btTransform init_pos = getStartTransform(pos_index - 1);
     m_kart_position_map[index] = (unsigned)(pos_index - 1);
 
-    std::shared_ptr<RenderInfo> ri = std::make_shared<RenderInfo>();
-    ri = (team == KART_TEAM_BLUE ? std::make_shared<RenderInfo>(0.66f) :
-        std::make_shared<RenderInfo>(1.0f));
+    std::shared_ptr<GE::GERenderInfo> ri = std::make_shared<GE::GERenderInfo>();
+    ri = (team == KART_TEAM_BLUE ? std::make_shared<GE::GERenderInfo>(0.66f) :
+        std::make_shared<GE::GERenderInfo>(1.0f));
 
     std::shared_ptr<AbstractKart> new_kart;
     if (RewindManager::get()->isEnabled())

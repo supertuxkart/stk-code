@@ -31,7 +31,7 @@ enum FlagColor : unsigned int
     FC_BLUE = 1
 };
 
-class RenderInfo;
+namespace GE { class GERenderInfo; }
 
 namespace irr
 {
@@ -65,7 +65,7 @@ private:
     int m_off_base_compressed[4];
 
     /* Determine if the flag should be drawn translucently */
-    std::shared_ptr<RenderInfo> m_flag_render_info;
+    std::shared_ptr<GE::GERenderInfo> m_flag_render_info;
 
     uint16_t m_deactivated_ticks;
 public:

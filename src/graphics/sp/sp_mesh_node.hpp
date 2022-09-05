@@ -28,7 +28,7 @@
 
 using namespace irr;
 using namespace scene;
-class RenderInfo;
+namespace GE { class GERenderInfo; }
 
 namespace SP
 {
@@ -38,9 +38,9 @@ class SPShader;
 class SPMeshNode : public irr::scene::CAnimatedMeshSceneNode
 {
 private:
-    std::vector<std::shared_ptr<RenderInfo> > m_render_info;
+    std::vector<std::shared_ptr<GE::GERenderInfo> > m_render_info;
 
-    std::shared_ptr<RenderInfo> m_first_render_info;
+    std::shared_ptr<GE::GERenderInfo> m_first_render_info;
 
     std::unordered_map<std::string, IBoneSceneNode*> m_joint_nodes;
 
@@ -80,7 +80,7 @@ public:
                const core::vector3df& position = core::vector3df(),
                const core::vector3df& rotation = core::vector3df(),
                const core::vector3df& scale = core::vector3df(1, 1, 1),
-               std::shared_ptr<RenderInfo> render_info = nullptr);
+               std::shared_ptr<GE::GERenderInfo> render_info = nullptr);
     // ------------------------------------------------------------------------
     ~SPMeshNode();
     // ------------------------------------------------------------------------
@@ -131,7 +131,7 @@ public:
     const core::matrix4* getSkinningMatrices() const 
                                          { return m_skinning_matrices.data(); }
     // ------------------------------------------------------------------------
-    RenderInfo* getRenderInfo(unsigned mb_id) const
+    GE::GERenderInfo* getRenderInfo(unsigned mb_id) const
     {
         if (m_render_info.size() > mb_id && m_render_info[mb_id].get())
         {
@@ -140,7 +140,7 @@ public:
         return NULL;
     }
     // ------------------------------------------------------------------------
-    void resetFirstRenderInfo(std::shared_ptr<RenderInfo> ri)
+    void resetFirstRenderInfo(std::shared_ptr<GE::GERenderInfo> ri)
     {
         m_render_info.clear();
         m_first_render_info = ri;

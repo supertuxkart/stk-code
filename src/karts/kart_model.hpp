@@ -37,7 +37,7 @@ using namespace irr;
 
 class AbstractKart;
 class KartProperties;
-class RenderInfo;
+namespace GE { class GERenderInfo; }
 class XMLNode;
 
 /** A speed-weighted object is an object whose characteristics are influenced by the kart's speed */
@@ -307,7 +307,7 @@ private:
     AbstractKart* m_kart;
 
     /** For our engine to get the desired hue for colorization. */
-    std::shared_ptr<RenderInfo> m_render_info;
+    std::shared_ptr<GE::GERenderInfo> m_render_info;
 
     /** True if this kart model can be colorization in red / blue (now only
      *  used in soccer mode). */
@@ -342,7 +342,7 @@ private:
 public:
                   KartModel(bool is_master);
                  ~KartModel();
-    KartModel*    makeCopy(std::shared_ptr<RenderInfo> ri);
+    KartModel*    makeCopy(std::shared_ptr<GE::GERenderInfo> ri);
     void          reset();
     void          loadInfo(const XMLNode &node);
     bool          loadModels(const KartProperties &kart_properties);
@@ -440,7 +440,7 @@ public:
     // ------------------------------------------------------------------------
     scene::IAnimatedMeshSceneNode* getAnimatedNode(){ return m_animated_node; }
     // ------------------------------------------------------------------------
-    std::shared_ptr<RenderInfo> getRenderInfo();
+    std::shared_ptr<GE::GERenderInfo> getRenderInfo();
     // ------------------------------------------------------------------------
     bool supportColorization() const         { return m_support_colorization; }
     // ------------------------------------------------------------------------

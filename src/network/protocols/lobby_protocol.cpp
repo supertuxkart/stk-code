@@ -24,7 +24,7 @@
 #include "guiengine/engine.hpp"
 #include "guiengine/message_queue.hpp"
 #include "guiengine/screen_keyboard.hpp"
-#include "graphics/render_info.hpp"
+#include <ge_render_info.hpp>
 #include "karts/abstract_kart.hpp"
 #include "karts/controller/controller.hpp"
 #include "modes/world.hpp"
@@ -233,10 +233,10 @@ void LobbyProtocol::addLiveJoiningKart(int kart_id, const RemoteKartInfo& rki,
     AbstractKart* k = World::getWorld()->getKart(kart_id);
     k->changeKart(rki.getKartName(), rki.getHandicap(),
         rki.getKartTeam() == KART_TEAM_RED ?
-        std::make_shared<RenderInfo>(1.0f) :
+        std::make_shared<GE::GERenderInfo>(1.0f) :
         rki.getKartTeam() == KART_TEAM_BLUE ?
-        std::make_shared<RenderInfo>(0.66f) :
-        std::make_shared<RenderInfo>(rki.getDefaultKartColor()));
+        std::make_shared<GE::GERenderInfo>(0.66f) :
+        std::make_shared<GE::GERenderInfo>(rki.getDefaultKartColor()));
     k->setLiveJoinKart(live_join_util_ticks);
     World::getWorld()->initTeamArrows(k);
     if (!k->getController()->isLocalPlayerController())

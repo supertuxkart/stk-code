@@ -389,7 +389,7 @@ void KartProperties::load(const std::string &filename, const std::string &node)
  *  \param krt The KartRenderType, like default, red, blue or transparent.
  *  see the RenderInfo include for details
  */
-KartModel* KartProperties::getKartModelCopy(std::shared_ptr<RenderInfo> ri) const
+KartModel* KartProperties::getKartModelCopy(std::shared_ptr<GE::GERenderInfo> ri) const
 {
     return m_kart_model->makeCopy(ri);
 }  // getKartModelCopy

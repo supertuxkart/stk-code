@@ -24,7 +24,7 @@
 #include "graphics/lod_node.hpp"
 #include "graphics/material.hpp"
 #include "graphics/material_manager.hpp"
-#include "graphics/render_info.hpp"
+#include <ge_render_info.hpp>
 #include "graphics/sp/sp_mesh_buffer.hpp"
 #include "graphics/sp/sp_mesh_node.hpp"
 #include "io/file_manager.hpp"
@@ -261,7 +261,7 @@ void TrackObject::init(const XMLNode &xml_node, scene::ISceneNode* parent,
                 const float hue = colorized->getRandomHue();
                 if (hue > 0.0f)
                 {
-                    m_render_info = std::make_shared<RenderInfo>(hue);
+                    m_render_info = std::make_shared<GE::GERenderInfo>(hue);
                 }
             }
         }

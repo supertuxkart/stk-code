@@ -26,7 +26,7 @@
 #include "config/user_config.hpp"
 #include "graphics/explosion.hpp"
 #include "graphics/irr_driver.hpp"
-#include "graphics/render_info.hpp"
+#include <ge_render_info.hpp>
 #include "guiengine/engine.hpp"
 #include "items/attachment_manager.hpp"
 #include "items/item_manager.hpp"
@@ -68,7 +68,7 @@ Attachment::Attachment(AbstractKart* kart)
     if (kart->isGhostKart())
         m_node = irr_driver->addAnimatedMesh(
             attachment_manager->getMesh(Attachment::ATTACH_BOMB), "bomb",
-            NULL, std::make_shared<RenderInfo>(0.0f, true));
+            NULL, std::make_shared<GE::GERenderInfo>(0.0f, true));
     else
         m_node = irr_driver->addAnimatedMesh(
             attachment_manager->getMesh(Attachment::ATTACH_BOMB), "bomb");

@@ -47,7 +47,7 @@ KartRewinder::KartRewinder(const std::string& ident,
                            unsigned int world_kart_id, int position,
                            const btTransform& init_transform,
                            HandicapLevel handicap,
-                           std::shared_ptr<RenderInfo> ri)
+                           std::shared_ptr<GE::GERenderInfo> ri)
             : Rewinder(
               {
                   RN_KART,

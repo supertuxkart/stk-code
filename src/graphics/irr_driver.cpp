@@ -1399,7 +1399,7 @@ scene::IParticleSystemSceneNode *IrrDriver::addParticleNode(bool default_emitter
 scene::ISceneNode *IrrDriver::addMesh(scene::IMesh *mesh,
                                       const std::string& debug_name,
                                       scene::ISceneNode *parent,
-                                      std::shared_ptr<RenderInfo> render_info)
+                                      std::shared_ptr<GE::GERenderInfo> render_info)
 {
 #ifdef SERVER_ONLY
     return m_scene_manager->addMeshSceneNode(mesh, parent);
@@ -1616,7 +1616,7 @@ void IrrDriver::removeTexture(video::ITexture *t)
  */
 scene::IAnimatedMeshSceneNode *IrrDriver::addAnimatedMesh(scene::IAnimatedMesh *mesh,
     const std::string& debug_name, scene::ISceneNode* parent,
-    std::shared_ptr<RenderInfo> render_info)
+    std::shared_ptr<GE::GERenderInfo> render_info)
 {
     scene::IAnimatedMeshSceneNode* node;
 #ifndef SERVER_ONLY

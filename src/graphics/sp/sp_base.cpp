@@ -28,7 +28,7 @@
 #include "graphics/shared_gpu_objects.hpp"
 #include "graphics/shader_based_renderer.hpp"
 #include "graphics/post_processing.hpp"
-#include "graphics/render_info.hpp"
+#include <ge_render_info.hpp>
 #include "graphics/rtts.hpp"
 #include "graphics/shaders.hpp"
 #include "graphics/sp/sp_dynamic_draw_call.hpp"

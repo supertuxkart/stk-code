@@ -21,7 +21,7 @@
 
 class LODNode;
 class STKInstancedSceneNode;
-class RenderInfo;
+namespace GE { class GERenderInfo; }
 class Track;
 
 #include <cassert>
@@ -92,7 +92,7 @@ public:
     void addModelDefinition(const XMLNode* xml);
     LODNode* instanciateAsLOD(const XMLNode* xml_node,
                               scene::ISceneNode* parent,
-                              std::shared_ptr<RenderInfo> ri);
+                              std::shared_ptr<GE::GERenderInfo> ri);
 
     void clear();
 

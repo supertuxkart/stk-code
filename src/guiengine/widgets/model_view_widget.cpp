@@ -17,7 +17,7 @@
 
 #include "config/user_config.hpp"
 #include "graphics/central_settings.hpp"
-#include "graphics/render_info.hpp"
+#include <ge_render_info.hpp>
 #include "guiengine/engine.hpp"
 #include "guiengine/widgets/model_view_widget.hpp"
 #include "graphics/irr_driver.hpp"
@@ -49,7 +49,7 @@ m_rtt_size(rtt_size)
     m_type = WTYPE_MODEL_VIEW;
     m_render_target = NULL;
     m_rotation_mode = ROTATE_OFF;
-    m_render_info = std::make_shared<RenderInfo>();
+    m_render_info = std::make_shared<GE::GERenderInfo>();
     m_angle = 0;
 
     // so that the base class doesn't complain there is no icon defined
