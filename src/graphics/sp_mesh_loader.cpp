@@ -40,7 +40,6 @@ const uint8_t VERSION_NOW = 1;
 #include <ge_main.hpp>
 #include <ge_spm_buffer.hpp>
 #include <ge_spm.hpp>
-#include <ge_texture.hpp>
 #endif
 
 // ----------------------------------------------------------------------------
@@ -170,47 +169,14 @@ scene::IAnimatedMesh* SPMeshLoader::createMesh(io::IReadFile* f)
                 }
                 std::function<void(irr::video::IImage*)> image_mani;
 #ifndef SERVER_ONLY
-                std::string mask_full_path;
                 Material* m = material_manager->getMaterial(tex_name_1,
                     /*is_full_path*/false,
                     /*make_permanent*/false,
                     /*complain_if_not_found*/true,
                     /*strip_path*/true, /*install*/true,
                     /*create_if_not_found*/false);
-                if (m && !m->getAlphaMask().empty())
-                {
-                    mask_full_path =
-                        StringUtils::getPath(m->getSamplerPath(0)) +
-                        "/" + m->getAlphaMask();
-                }
-                if (!mask_full_path.empty())
-                {
-                    core::dimension2du max_size = irr_driver->getVideoDriver()
-                        ->getDriverAttributes().getAttributeAsDimension2d("MAX_TEXTURE_SIZE");
-                    image_mani = [mask_full_path, max_size](video::IImage* img)->void
-                    {
-                        video::IImage* converted_mask =
-                            GE::getResizedImage(mask_full_path, max_size);
-                        if (converted_mask == NULL)
-                        {
-                            Log::warn("SPMeshLoader", "Applying mask failed for '%s'!",
-                                mask_full_path.c_str());
-                            return;
-                        }
-                        const core::dimension2du& dim = img->getDimension();
-                        for (unsigned int x = 0; x < dim.Width; x++)
-                        {
-                            for (unsigned int y = 0; y < dim.Height; y++)
-                            {
-                                video::SColor col = img->getPixel(x, y);
-                                video::SColor alpha = converted_mask->getPixel(x, y);
-                                col.setAlpha(alpha.getRed());
-                                img->setPixel(x, y, col, false);
-                            }   // for y
-                        }   // for x
-                        converted_mask->drop();
-                    };
-                }
+                if (m)
+                    image_mani = m->getMaskImageMani();
 #endif
                 video::ITexture* tex = STKTexManager::getInstance()
                     ->getTexture(tex_name_1, image_mani);

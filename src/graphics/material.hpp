@@ -285,6 +285,13 @@ public:
     }
 
     // ------------------------------------------------------------------------
+    bool  useAlphaChannel    () const
+    {
+        return isTransparent() || m_shader_name == "alphatest" ||
+               m_shader_name == "unlit" || m_shader_name == "grass";
+    }
+
+    // ------------------------------------------------------------------------
     /** Returns the fraction of maximum speed on this material. */
     float getMaxSpeedFraction() const { return m_max_speed_fraction; }
     // ------------------------------------------------------------------------
@@ -382,6 +389,8 @@ public:
             return empty;
         return m_container_id;
     }
+    // ------------------------------------------------------------------------
+    std::function<void(irr::video::IImage*)> getMaskImageMani() const;
 };
 
 

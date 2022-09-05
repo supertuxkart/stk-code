@@ -47,6 +47,7 @@
 
 #ifndef SERVER_ONLY
 #include <ge_spm_buffer.hpp>
+#include <ge_texture.hpp>
 #endif
 
 using namespace irr::video;
@@ -958,3 +959,121 @@ void  Material::setMaterialProperties(video::SMaterial *m, scene::IMeshBuffer* m
 #endif
 
 } // setMaterialProperties
+
+//-----------------------------------------------------------------------------
+std::function<void(irr::video::IImage*)> Material::getMaskImageMani() const
+{
+#ifndef SERVER_ONLY
+    std::function<void(irr::video::IImage*)> image_mani;
+    core::dimension2du max_size = irr_driver->getVideoDriver()
+        ->getDriverAttributes().getAttributeAsDimension2d("MAX_TEXTURE_SIZE");
+
+    // Material using alpha channel will be colorized as a whole
+    if (irr_driver->getVideoDriver()->getDriverType() == EDT_VULKAN &&
+        !useAlphaChannel() && (!m_colorization_mask.empty() ||
+        m_colorization_factor > 0.0f || m_colorizable))
+    {
+        std::string colorization_mask;
+        if (!m_colorization_mask.empty())
+        {
+            colorization_mask = StringUtils::getPath(m_sampler_path[0]) + "/" +
+                m_colorization_mask;
+        }
+        float colorization_factor = m_colorization_factor;
+        image_mani = [colorization_mask, colorization_factor, max_size]
+            (video::IImage* img)->void
+        {
+            video::IImage* mask = NULL;
+            core::dimension2du img_size = img->getDimension();
+            const unsigned total_size = img_size.Width * img_size.Height;
+            std::vector<uint8_t> empty_mask;
+            uint8_t* mask_data = NULL;
+            if (!colorization_mask.empty())
+            {
+                mask = GE::getResizedImage(colorization_mask, max_size);
+                if (!mask)
+                {
+                    Log::warn("Material",
+                        "Applying colorization mask failed for '%s'!",
+                        colorization_mask.c_str());
+                    return;
+                }
+                core::dimension2du mask_size = mask->getDimension();
+                if (mask->getColorFormat() != video::ECF_A8R8G8B8 ||
+                    img_size != mask_size)
+                {
+                    video::IImage* new_mask = irr_driver
+                        ->getVideoDriver()->createImage(video::ECF_A8R8G8B8,
+                        img_size);
+                    if (img_size != mask_size)
+                    {
+                        mask->copyToScaling(new_mask);
+                    }
+                    else
+                    {
+                        mask->copyTo(new_mask);
+                    }
+                    mask->drop();
+                    mask = new_mask;
+                }
+                mask_data = (uint8_t*)mask->lock();
+            }
+            else
+            {
+                empty_mask.resize(total_size * 4, 0);
+                mask_data = empty_mask.data();
+            }
+            uint8_t colorization_factor_encoded = uint8_t
+                (irr::core::clamp(
+                int(colorization_factor * 0.4f * 255.0f), 0, 255));
+            for (unsigned int i = 0; i < total_size; i++)
+            {
+                if (!colorization_mask.empty() && mask_data[i * 4 + 3] > 127)
+                    continue;
+                mask_data[i * 4 + 3] = colorization_factor_encoded;
+            }
+            uint8_t* img_data = (uint8_t*)img->lock();
+            for (unsigned int i = 0; i < total_size; i++)
+                img_data[i * 4 + 3] = mask_data[i * 4 + 3];
+            if (mask)
+                mask->drop();
+        };
+        return image_mani;
+    }
+
+    std::string mask_full_path;
+    if (!m_mask.empty())
+    {
+        mask_full_path = StringUtils::getPath(m_sampler_path[0]) + "/" +
+            m_mask;
+    }
+    if (!mask_full_path.empty())
+    {
+        image_mani = [mask_full_path, max_size](video::IImage* img)->void
+        {
+            video::IImage* converted_mask =
+                GE::getResizedImage(mask_full_path, max_size);
+            if (converted_mask == NULL)
+            {
+                Log::warn("Material", "Applying alpha mask failed for '%s'!",
+                    mask_full_path.c_str());
+                return;
+            }
+            const core::dimension2du& dim = img->getDimension();
+            for (unsigned int x = 0; x < dim.Width; x++)
+            {
+                for (unsigned int y = 0; y < dim.Height; y++)
+                {
+                    video::SColor col = img->getPixel(x, y);
+                    video::SColor alpha = converted_mask->getPixel(x, y);
+                    col.setAlpha(alpha.getRed());
+                    img->setPixel(x, y, col, false);
+                }   // for y
+            }   // for x
+            converted_mask->drop();
+        };
+        return image_mani;
+    }
+#endif
+    return nullptr;
+} // getMaskImageMani

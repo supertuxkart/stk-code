@@ -1346,6 +1346,25 @@ void B3DMeshLoader::loadTextures(SB3dMaterial& material, scene::IMeshBuffer* mb)
                 full_path = fs->getFileBasename(B3dTexture->TextureName);
 
 #ifndef SERVER_ONLY
+            std::function<void(irr::video::IImage*)> image_mani;
+            if (!CVS->isGLSL())
+            {
+                Material* m = material_manager->getMaterial(B3dTexture->TextureName.c_str(),
+                    /*is_full_path*/false,
+                    /*make_permanent*/false,
+                    /*complain_if_not_found*/true,
+                    /*strip_path*/true, /*install*/true,
+                    /*create_if_not_found*/false);
+                if (m)
+                {
+                    image_mani = m->getMaskImageMani();
+                    if (image_mani)
+                        STKTexManager::getInstance()->getTexture(full_path.c_str(), image_mani);
+                }
+            }
+#endif
+
+#ifndef SERVER_ONLY
             bool convert_spm = CVS->isGLSL() || GE::getVKDriver() != NULL;
             if (convert_spm)
             {
