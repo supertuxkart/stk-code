@@ -48,6 +48,7 @@
 #include "IMeshManipulator.h"
 #include <algorithm>
 #include <ge_animation.hpp>
+#include <ge_render_info.hpp>
 #include <ge_spm.hpp>
 
 #define SKELETON_DEBUG 0
@@ -1259,7 +1260,9 @@ void KartModel::resetVisualWheelPosition()
 //-----------------------------------------------------------------------------
 std::shared_ptr<GE::GERenderInfo> KartModel::getRenderInfo()
 {
-    return m_support_colorization ? m_render_info : NULL;
+    return m_support_colorization ||
+        (m_render_info && m_render_info->isTransparent()) ?
+        m_render_info : NULL;
 }   // getRenderInfo
 
 //-----------------------------------------------------------------------------
