@@ -140,7 +140,7 @@ public:
         return NULL;
     }
     // ------------------------------------------------------------------------
-    void resetFirstRenderInfo(std::shared_ptr<GE::GERenderInfo> ri)
+    virtual void resetFirstRenderInfo(std::shared_ptr<GE::GERenderInfo> ri)
     {
         m_render_info.clear();
         m_first_render_info = ri;

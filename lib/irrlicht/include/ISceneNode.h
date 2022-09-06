@@ -18,6 +18,12 @@
 #include "irrList.h"
 #include "IAttributes.h"
 
+#include <memory>
+namespace GE
+{
+	class GERenderInfo;
+}
+
 namespace irr
 {
 namespace scene
@@ -786,6 +792,7 @@ namespace scene
 		bool getUpdatedAbsTrans() const { return UpdatedAbsTrans; }
 		void setNeedsUpdateAbsTrans(bool val) { NeedsUpdateAbsTrans = val; }
 		void setUpdatedAbsTrans(bool val) { UpdatedAbsTrans = val; }
+		virtual void resetFirstRenderInfo(std::shared_ptr<GE::GERenderInfo> ri) {}
 
 	protected:
 

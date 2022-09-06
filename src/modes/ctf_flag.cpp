@@ -17,14 +17,14 @@
 
 #include "modes/ctf_flag.hpp"
 #include "graphics/irr_driver.hpp"
-#include <ge_render_info.hpp>
-#include "graphics/sp/sp_mesh_node.hpp"
 #include "karts/abstract_kart.hpp"
 #include "modes/world.hpp"
 #include "network/network_string.hpp"
 #include "mini_glm.hpp"
 
 #include "LinearMath/btQuaternion.h"
+
+#include <ge_render_info.hpp>
 
 // ============================================================================
 // Position offset to attach in kart model
@@ -144,11 +144,8 @@ void CTFFlag::updateFlagGraphics(irr::scene::IAnimatedMeshSceneNode* flag_node)
 // ----------------------------------------------------------------------------
 void CTFFlag::initFlagRenderInfo(irr::scene::IAnimatedMeshSceneNode* flag_node)
 {
-    SP::SPMeshNode* spmn = dynamic_cast<SP::SPMeshNode*>(flag_node);
-    if (!spmn)
-        return;
     m_flag_render_info = std::make_shared<GE::GERenderInfo>(0.0f, true);
-    spmn->resetFirstRenderInfo(m_flag_render_info);
+    flag_node->resetFirstRenderInfo(m_flag_render_info);
 }   // initFlagRenderInfo
 
 // ----------------------------------------------------------------------------

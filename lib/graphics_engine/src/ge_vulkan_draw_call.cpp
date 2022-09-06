@@ -2,6 +2,7 @@
 
 #include "ge_culling_tool.hpp"
 #include "ge_main.hpp"
+#include "ge_render_info.hpp"
 #include "ge_spm.hpp"
 #include "ge_spm_buffer.hpp"
 #include "ge_vulkan_animated_mesh_scene_node.hpp"
@@ -302,6 +303,9 @@ std::string GEVulkanDrawCall::getShader(irr::scene::ISceneNode* node,
                                         int material_id)
 {
     irr::video::SMaterial& m = node->getMaterial(material_id);
+    auto& ri = m.getRenderInfo();
+    if (ri && ri->isTransparent())
+        return "ghost";
     switch (m.MaterialType)
     {
     case irr::video::EMT_TRANSPARENT_ADD_COLOR: return "additive";
@@ -309,7 +313,6 @@ std::string GEVulkanDrawCall::getShader(irr::scene::ISceneNode* node,
     case irr::video::EMT_ONETEXTURE_BLEND: return "alphablend";
     case irr::video::EMT_SOLID_2_LAYER: return "decal";
     case irr::video::EMT_STK_GRASS: return "grass";
-    case irr::video::EMT_STK_GHOST: return "ghost";
     default: return "solid";
     }
 }   // getShader

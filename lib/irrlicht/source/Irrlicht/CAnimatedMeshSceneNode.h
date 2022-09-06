@@ -10,6 +10,11 @@
 
 #include "matrix4.h"
 
+#include <memory>
+namespace GE
+{
+	class GERenderInfo;
+}
 
 namespace irr
 {
@@ -21,6 +26,7 @@ namespace scene
 	{
 	private:
 		core::array<u32> m_animation_set;
+		std::shared_ptr<GE::GERenderInfo> m_first_render_info;
 	public:
 
 		//! constructor
@@ -171,6 +177,7 @@ namespace scene
 		virtual void useAnimationSet(u32 set_num);
 		virtual void setFrameLoopOnce(s32 begin, s32 end);
 		virtual core::array<u32>& getAnimationSetFrames() { return m_animation_set; }
+		virtual void resetFirstRenderInfo(std::shared_ptr<GE::GERenderInfo> ri);
 	protected:
 
 		//! Get a static mesh for the current frame of this animated mesh

@@ -17,6 +17,7 @@
 #include "quaternion.h"
 #include "IFileSystem.h"
 
+#include <ge_render_info.hpp>
 
 namespace irr
 {
@@ -784,6 +785,8 @@ void CAnimatedMeshSceneNode::setMesh(IAnimatedMesh* mesh)
 	// get start and begin time
 //	setAnimationSpeed(Mesh->getAnimationSpeed());
 	setFrameLoop(0, Mesh->getFrameCount());
+	if (m_first_render_info)
+		resetFirstRenderInfo(m_first_render_info);
 }
 
 //! updates the absolute position based on the relative and the parents position
@@ -1065,6 +1068,17 @@ s32 CAnimatedMeshSceneNode::getAnimationSet() const
 	return -1;
 }
 
+void CAnimatedMeshSceneNode::resetFirstRenderInfo(std::shared_ptr<GE::GERenderInfo> ri)
+{
+	m_first_render_info = ri;
+	for (u32 i = 0; i < Materials.size(); i++)
+		Materials[i].setRenderInfo(nullptr);
+	for (u32 i = 0; i < Materials.size(); i++)
+	{
+		if (Materials[i].isColorizable() || (ri && ri->isTransparent()))
+			Materials[i].setRenderInfo(ri);
+	}
+}
 
 } // end namespace scene
 } // end namespace irr

@@ -1405,7 +1405,11 @@ scene::ISceneNode *IrrDriver::addMesh(scene::IMesh *mesh,
     return m_scene_manager->addMeshSceneNode(mesh, parent);
 #else
     if (!CVS->isGLSL())
-        return m_scene_manager->addMeshSceneNode(mesh, parent);
+    {
+        scene::ISceneNode* node = m_scene_manager->addMeshSceneNode(mesh, parent);
+        node->resetFirstRenderInfo(render_info);
+        return node;
+    }
 
     if (!parent)
       parent = m_scene_manager->getRootSceneNode();
@@ -1642,6 +1646,7 @@ scene::IAnimatedMeshSceneNode *IrrDriver::addAnimatedMesh(scene::IAnimatedMesh *
             core::vector3df(0, 0, 0),
             core::vector3df(1, 1, 1),
             /*addIfMeshIsZero*/true);
+        node->resetFirstRenderInfo(render_info);
     }
     return node;
 

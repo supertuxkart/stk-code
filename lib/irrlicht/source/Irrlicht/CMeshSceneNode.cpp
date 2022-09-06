@@ -12,6 +12,8 @@
 #include "IMaterialRenderer.h"
 #include "IFileSystem.h"
 
+#include <ge_render_info.hpp>
+
 namespace irr
 {
 namespace scene
@@ -278,6 +280,8 @@ void CMeshSceneNode::setMesh(IMesh* mesh)
 
 		Mesh = mesh;
 		copyMaterials();
+		if (m_first_render_info)
+			resetFirstRenderInfo(m_first_render_info);
 	}
 }
 
@@ -405,6 +409,19 @@ ISceneNode* CMeshSceneNode::clone(ISceneNode* newParent, ISceneManager* newManag
 	if (newParent)
 		nb->drop();
 	return nb;
+}
+
+
+void CMeshSceneNode::resetFirstRenderInfo(std::shared_ptr<GE::GERenderInfo> ri)
+{
+	m_first_render_info = ri;
+	for (u32 i = 0; i < Materials.size(); i++)
+		Materials[i].setRenderInfo(nullptr);
+	for (u32 i = 0; i < Materials.size(); i++)
+	{
+		if (Materials[i].isColorizable() || (ri && ri->isTransparent()))
+			Materials[i].setRenderInfo(ri);
+	}
 }
 
 

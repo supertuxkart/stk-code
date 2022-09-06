@@ -13,6 +13,12 @@
 #include "EMaterialFlags.h"
 #include "SMaterialLayer.h"
 
+#include <memory>
+namespace GE
+{
+	class GERenderInfo;
+}
+
 namespace irr
 {
 namespace video
@@ -236,7 +242,7 @@ namespace video
 			PolygonOffsetFactor(0), PolygonOffsetDirection(EPO_FRONT),
 			Wireframe(false), PointCloud(false), GouraudShading(true),
 			Lighting(true), ZWriteEnable(true), BackfaceCulling(true), FrontfaceCulling(false),
-			FogEnable(false), NormalizeNormals(false), UseMipMaps(true)
+			FogEnable(false), NormalizeNormals(false), UseMipMaps(true), m_colorizable(false)
 		{ }
 
 		//! Copy constructor
@@ -289,6 +295,8 @@ namespace video
 			PolygonOffsetFactor = other.PolygonOffsetFactor;
 			PolygonOffsetDirection = other.PolygonOffsetDirection;
 			UseMipMaps = other.UseMipMaps;
+			m_colorizable = other.m_colorizable;
+			m_render_info = other.m_render_info;
 
 			return *this;
 		}
@@ -437,6 +445,30 @@ namespace video
 		//! Shall mipmaps be used if available
 		/** Sometimes, disabling mipmap usage can be useful. Default: true */
 		bool UseMipMaps:1;
+
+		bool m_colorizable:1;
+
+		std::shared_ptr<GE::GERenderInfo> m_render_info;
+
+		bool isColorizable() const
+		{
+			return m_colorizable;
+		}
+
+		void setColorizable(bool val)
+		{
+			m_colorizable = val;
+		}
+
+		std::shared_ptr<GE::GERenderInfo>& getRenderInfo()
+		{
+			return m_render_info;
+		}
+
+		void setRenderInfo(std::shared_ptr<GE::GERenderInfo> ri)
+		{
+			m_render_info = ri;
+		}
 
 		//! Gets the texture transformation matrix for level i
 		/** \param i The desired level. Must not be larger than MATERIAL_MAX_TEXTURES.
@@ -655,7 +687,9 @@ namespace video
 				BlendOperation != b.BlendOperation ||
 				PolygonOffsetFactor != b.PolygonOffsetFactor ||
 				PolygonOffsetDirection != b.PolygonOffsetDirection ||
-				UseMipMaps != b.UseMipMaps;
+				UseMipMaps != b.UseMipMaps ||
+				m_colorizable != b.m_colorizable ||
+				m_render_info != b.m_render_info;
 			for (u32 i=0; (i<MATERIAL_MAX_TEXTURES) && !different; ++i)
 			{
 				different |= (TextureLayer[i] != b.TextureLayer[i]);

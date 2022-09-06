@@ -8,6 +8,12 @@
 #include "IMeshSceneNode.h"
 #include "IMesh.h"
 
+#include <memory>
+namespace GE
+{
+	class GERenderInfo;
+}
+
 namespace irr
 {
 namespace scene
@@ -15,8 +21,9 @@ namespace scene
 
 	class CMeshSceneNode : public IMeshSceneNode
 	{
+	private:
+		std::shared_ptr<GE::GERenderInfo> m_first_render_info;
 	public:
-
 		//! constructor
 		CMeshSceneNode(IMesh* mesh, ISceneNode* parent, ISceneManager* mgr,	s32 id,
 			const core::vector3df& position = core::vector3df(0,0,0),
@@ -76,6 +83,7 @@ namespace scene
 		//! or to remove attached childs.
 		virtual bool removeChild(ISceneNode* child);
 
+		virtual void resetFirstRenderInfo(std::shared_ptr<GE::GERenderInfo> ri);
 	protected:
 
 		void copyMaterials();

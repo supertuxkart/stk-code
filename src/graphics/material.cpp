@@ -785,6 +785,7 @@ void  Material::setMaterialProperties(video::SMaterial *m, scene::IMeshBuffer* m
                   m_texname.c_str());
     }
 
+    m->setColorizable(m_colorizable);
     bool is_vk = irr_driver->getVideoDriver()->getDriverType() == EDT_VULKAN;
     // Default solid
     m->MaterialType = video::EMT_SOLID;

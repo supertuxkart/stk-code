@@ -452,7 +452,6 @@ scene::ISceneNode* KartModel::attachModel(bool animated_models, bool human_playe
         m_wheel_graphics_radius[i] = 0.5f*(wheel_max.getY() - wheel_min.getY());
 
         m_wheel_node[i]->grab();
-        ((scene::IMeshSceneNode *) m_wheel_node[i])->setReadOnlyMaterials(true);
 #ifdef DEBUG
         std::string debug_name = m_wheel_filename[i]+" (wheel)";
         m_wheel_node[i]->setName(debug_name.c_str());

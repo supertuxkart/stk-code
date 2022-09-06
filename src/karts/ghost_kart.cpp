@@ -22,8 +22,6 @@
 #include "karts/controller/ghost_controller.hpp"
 #include "karts/kart_gfx.hpp"
 #include "karts/kart_model.hpp"
-#include "graphics/irr_driver.hpp"
-#include <ge_render_info.hpp>
 #include "modes/easter_egg_hunt.hpp"
 #include "modes/linear_world.hpp"
 #include "modes/world.hpp"
@@ -32,6 +30,8 @@
 
 #include "LinearMath/btQuaternion.h"
 
+#include <ge_render_info.hpp>
+
 GhostKart::GhostKart(const std::string& ident, unsigned int world_kart_id,
                      int position, float color_hue,
                      const ReplayPlay::ReplayData& rd)
@@ -39,14 +39,13 @@ GhostKart::GhostKart(const std::string& ident, unsigned int world_kart_id,
                  position, btTransform(btQuaternion(0, 0, 0, 1)),
                  HANDICAP_NONE,
                  std::make_shared<GE::GERenderInfo>(color_hue, true/*transparent*/)),
-                 m_replay_data(rd)
+                 m_replay_data(rd), m_last_egg_idx(0)
 {
 }   // GhostKart
 
 // ----------------------------------------------------------------------------
 void GhostKart::reset()
 {
-    m_current_attachment = -1;
     m_graphical_y_offset = 0;
     m_node->setVisible(true);
     Kart::reset();
@@ -84,44 +83,6 @@ void GhostKart::addReplayEvent(float time,
 }   // addReplayEvent
 
 // ----------------------------------------------------------------------------
-void GhostKart::setGhostKartMaterial()
-{
-    if (irr_driver->getVideoDriver()->getDriverType() != video::EDT_VULKAN ||
-        m_current_attachment == (int)m_attachment->getType())
-        return;
-
-    m_current_attachment = (int)m_attachment->getType();
-    std::function<void(core::array<scene::ISceneNode*>&)> set_ghost =
-    [&](core::array<scene::ISceneNode*>& child)
-    {
-        for (unsigned i = 0; i < child.size(); i++)
-        {
-            scene::ISceneNode* node = child[i];
-            if (node->getType() != irr::scene::ESNT_ANIMATED_MESH &&
-                node->getType() != irr::scene::ESNT_MESH)
-                continue;
-            if (node->getType() == scene::ESNT_ANIMATED_MESH)
-            {
-                scene::IAnimatedMeshSceneNode* anode = static_cast<
-                    scene::IAnimatedMeshSceneNode*>(node);
-                anode->setReadOnlyMaterials(false);
-                for (unsigned j = 0; j < anode->getJointCount(); j++)
-                    set_ghost(anode->getJointNode(j)->getChildren());
-            }
-            else if (node->getType() == scene::ESNT_MESH)
-            {
-                static_cast<scene::IMeshSceneNode*>(node)
-                    ->setReadOnlyMaterials(false);
-            }
-            for (unsigned j = 0; j < node->getMaterialCount(); j++)
-                node->getMaterial(j).MaterialType = video::EMT_STK_GHOST;
-            set_ghost(node->getChildren());
-        }
-    };
-    set_ghost(m_node->getChildren());
-}   // setGhostKartMaterial
-
-// ----------------------------------------------------------------------------
 /** Called once per rendered frame. It is used to only update any graphical
  *  effects.
  *  \param dt Time step size (since last call).
@@ -137,7 +98,6 @@ void GhostKart::updateGraphics(float dt)
     Moveable::updateGraphics(center_shift, btQuaternion(0, 0, 0, 1));
     // Also update attachment's graphics
     m_attachment->updateGraphics(dt);
-    setGhostKartMaterial();
 }   // updateGraphics
 
 // ----------------------------------------------------------------------------
