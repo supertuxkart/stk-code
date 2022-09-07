@@ -91,6 +91,7 @@
 #include <ISceneManager.h>
 #include <SMeshBuffer.h>
 
+#include <algorithm>
 #include <iostream>
 #include <stdexcept>
 #include <sstream>
@@ -139,6 +140,7 @@ Track::Track(const std::string &filename)
     m_screenshot            = "";
     m_version               = 0;
     m_track_mesh            = NULL;
+    m_height_map_mesh       = NULL;
     m_gfx_effect_mesh       = NULL;
     m_internal              = false;
     m_enable_auto_rescue    = true;  // Below set to false in arenas
@@ -378,6 +380,9 @@ void Track::cleanup()
 #endif
     delete m_track_mesh;
     m_track_mesh = NULL;
+
+    delete m_height_map_mesh;
+    m_height_map_mesh = NULL;
 
     delete m_gfx_effect_mesh;
     m_gfx_effect_mesh = NULL;
@@ -864,8 +869,11 @@ void Track::mapPoint2MiniMap(const Vec3 &xyz, Vec3 *draw_at) const
  *  \param main_track_count The number of meshes that are already converted
  *         when the main track was converted. Only the additional meshes
  *         added later still need to be converted.
+ *  \param for_height_map Ignore physics only objects which can affect
+ *         height map calculation.
  */
-void Track::createPhysicsModel(unsigned int main_track_count)
+void Track::createPhysicsModel(unsigned int main_track_count,
+                               bool for_height_map)
 {
     // Remove the temporary track rigid body, and then convert all objects
     // (i.e. the track and all additional objects) into a new rigid body
@@ -885,44 +893,48 @@ void Track::createPhysicsModel(unsigned int main_track_count)
 
     // Now convert all objects that are only used for the physics
     // (like invisible walls).
-    for (unsigned int i = 0; i<m_static_physics_only_nodes.size(); i++)
+    if (!for_height_map)
     {
-        main_loop->renderGUI(5550, i, m_static_physics_only_nodes.size());
-
-        convertTrackToBullet(m_static_physics_only_nodes[i]);
-        if (UserConfigParams::m_physics_debug &&
-            m_static_physics_only_nodes[i]->getType() == scene::ESNT_MESH)
+        for (unsigned int i = 0; i<m_static_physics_only_nodes.size(); i++)
         {
-            const video::SColor color(255, 255, 105, 180);
+            main_loop->renderGUI(5550, i, m_static_physics_only_nodes.size());
 
-            scene::IMesh *mesh = ((scene::IMeshSceneNode*)m_static_physics_only_nodes[i])->getMesh();
-            scene::IMeshBuffer *mb = mesh->getMeshBuffer(0);
-            mb->getMaterial().BackfaceCulling = false;
-            video::S3DVertex * const verts = (video::S3DVertex *) mb->getVertices();
-            const u32 max = mb->getVertexCount();
-            for (i = 0; i < max; i++)
+            convertTrackToBullet(m_static_physics_only_nodes[i]);
+            if (UserConfigParams::m_physics_debug &&
+                m_static_physics_only_nodes[i]->getType() == scene::ESNT_MESH)
             {
-                verts[i].Color = color;
-            }
-        }
-        else
-            irr_driver->removeNode(m_static_physics_only_nodes[i]);
-    }
-    main_loop->renderGUI(5560);
-    if (!UserConfigParams::m_physics_debug)
-        m_static_physics_only_nodes.clear();
+                const video::SColor color(255, 255, 105, 180);
 
-    for (unsigned int i = 0; i<m_object_physics_only_nodes.size(); i++)
-    {
-        main_loop->renderGUI(5565, i, m_static_physics_only_nodes.size());
-        convertTrackToBullet(m_object_physics_only_nodes[i]);
-        m_object_physics_only_nodes[i]->setVisible(false);
-        m_object_physics_only_nodes[i]->grab();
-        irr_driver->removeNode(m_object_physics_only_nodes[i]);
+                scene::IMesh *mesh = ((scene::IMeshSceneNode*)m_static_physics_only_nodes[i])->getMesh();
+                scene::IMeshBuffer *mb = mesh->getMeshBuffer(0);
+                mb->getMaterial().BackfaceCulling = false;
+                video::S3DVertex * const verts = (video::S3DVertex *) mb->getVertices();
+                const u32 max = mb->getVertexCount();
+                for (i = 0; i < max; i++)
+                {
+                    verts[i].Color = color;
+                }
+            }
+            else
+                irr_driver->removeNode(m_static_physics_only_nodes[i]);
+        }
+        main_loop->renderGUI(5560);
+        if (!UserConfigParams::m_physics_debug)
+            m_static_physics_only_nodes.clear();
+
+        for (unsigned int i = 0; i<m_object_physics_only_nodes.size(); i++)
+        {
+            main_loop->renderGUI(5565, i, m_static_physics_only_nodes.size());
+            convertTrackToBullet(m_object_physics_only_nodes[i]);
+            m_object_physics_only_nodes[i]->setVisible(false);
+            m_object_physics_only_nodes[i]->grab();
+            irr_driver->removeNode(m_object_physics_only_nodes[i]);
+        }
     }
 
     m_track_mesh->removeAll();
-    m_gfx_effect_mesh->removeAll();
+    if (m_gfx_effect_mesh)
+        m_gfx_effect_mesh->removeAll();
     for(unsigned int i=main_track_count; i<m_all_nodes.size(); i++)
     {
         main_loop->renderGUI(5570, i, m_all_nodes.size());
@@ -930,9 +942,13 @@ void Track::createPhysicsModel(unsigned int main_track_count)
         uploadNodeVertexBuffer(m_all_nodes[i]);
     }
     main_loop->renderGUI(5580);
-    m_track_mesh->createPhysicalBody(m_friction);
+    if (for_height_map)
+        m_track_mesh->createCollisionShape();
+    else
+        m_track_mesh->createPhysicalBody(m_friction);
     main_loop->renderGUI(5585);
-    m_gfx_effect_mesh->createCollisionShape();
+    if (m_gfx_effect_mesh)
+        m_gfx_effect_mesh->createCollisionShape();
     main_loop->renderGUI(5590);
 
 }   // createPhysicsModel
@@ -1246,8 +1262,8 @@ void Track::updateMiniMapScale()
 bool Track::loadMainTrack(const XMLNode &root)
 {
     assert(m_track_mesh==NULL);
+    assert(m_height_map_mesh==NULL);
     assert(m_gfx_effect_mesh==NULL);
-
     m_challenges.clear();
 
     m_track_mesh      = new TriangleMesh(/*can_be_transformed*/false);
@@ -2228,7 +2244,20 @@ void Track::loadTrackModel(bool reverse_track, unsigned int mode_id)
     for (auto* obj : objs_removing)
         m_track_object_manager->removeObject(obj);
 
-    createPhysicsModel(main_track_count);
+    if (!GUIEngine::isNoGraphics())
+    {
+        m_height_map_mesh = new TriangleMesh(/*can_be_transformed*/false);
+        m_height_map_mesh->copyFrom(*m_track_mesh);
+        TriangleMesh* gfx_effect_mesh = m_gfx_effect_mesh;
+        std::swap(m_track_mesh, m_height_map_mesh);
+        m_gfx_effect_mesh = NULL;
+        createPhysicsModel(main_track_count, true/*for_height_map*/);
+
+        std::swap(m_track_mesh, m_height_map_mesh);
+        std::swap(m_gfx_effect_mesh, gfx_effect_mesh);
+    }
+    createPhysicsModel(main_track_count, false/*for_height_map*/);
+
     main_loop->renderGUI(5600);
 
     freeCachedMeshVertexBuffer();
@@ -2746,6 +2775,7 @@ void Track::itemCommand(const XMLNode *node)
 
 std::vector< std::vector<float> > Track::buildHeightMap()
 {
+    assert(m_height_map_mesh != NULL);
     std::vector< std::vector<float> > out(HEIGHT_MAP_RESOLUTION);
 
     float x = m_aabb_min.getX();
@@ -2770,7 +2800,7 @@ std::vector< std::vector<float> > Track::buildHeightMap()
             btVector3 to = pos;
             to.setY(-100000.f);
 
-            m_track_mesh->castRay(pos, to, &hitpoint, &material, &normal);
+            m_height_map_mesh->castRay(pos, to, &hitpoint, &material, &normal);
             z += z_step;
 
             out[i][j] = hitpoint.getY();
@@ -2958,6 +2988,7 @@ void Track::copyFromMainProcess()
     }
 
     m_track_mesh = new TriangleMesh(/*can_be_transformed*/false);
+    m_height_map_mesh = NULL;
     m_gfx_effect_mesh = new TriangleMesh(/*can_be_transformed*/false);
     m_track_mesh->copyFrom(*main_track->m_track_mesh);
     m_gfx_effect_mesh->copyFrom(*main_track->m_gfx_effect_mesh);
