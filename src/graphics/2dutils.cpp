@@ -27,14 +27,14 @@
 #include "utils/cpp2011.hpp"
 
 // ============================================================================
-class Primitive2DList : public TextureShader<Primitive2DList, 1, float, core::vector2df>
+class Primitive2DList : public TextureShader<Primitive2DList, 1, core::vector2df>
 {
 public:
     Primitive2DList()
     {
         loadProgram(OBJECT, GL_VERTEX_SHADER, "primitive2dlist.vert",
                             GL_FRAGMENT_SHADER, "transparent.frag");
-        assignUniforms("custom_alpha", "fullscreen");
+        assignUniforms("fullscreen");
         assignSamplerNames(0, "tex", ST_BILINEAR_FILTERED);
     }   // Primitive2DList
 };   //Primitive2DList
@@ -503,7 +503,7 @@ void draw2DVertexPrimitiveList(video::ITexture *tex, const void* vertices,
     VertexUtils::bindVertexArrayAttrib(vType);
 
     Primitive2DList::getInstance()->use();
-    Primitive2DList::getInstance()->setUniforms(1.0f,
+    Primitive2DList::getInstance()->setUniforms(
         core::vector2df(float(irr_driver->getActualScreenSize().Width),
         float(irr_driver->getActualScreenSize().Height)));
     Primitive2DList::getInstance()->setTextureUnits(tex->getTextureHandler());
