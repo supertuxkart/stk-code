@@ -167,7 +167,7 @@ void KartGFX::addEffect(KartGFXType type, const std::string &file_name,
                         const Vec3 &position, bool important)
 {
 #ifndef SERVER_ONLY
-    if (((UserConfigParams::m_particles_effects < 2 || !CVS->isGLSL()) &&
+    if ((UserConfigParams::m_particles_effects < 2 &&
         (!important || m_kart->getType() == RaceManager::KT_AI ||
         m_kart->getType() == RaceManager::KT_SPARE_TIRE)) ||
         UserConfigParams::m_particles_effects < 1 ||
