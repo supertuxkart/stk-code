@@ -36,15 +36,10 @@ void main(void)
         return;
     }
 
-    float lifetime = color_lifetime.w;
-    float alpha = mix(smoothstep(1.0, 0.8, lifetime), lifetime, billboard);
-    vec4 particle_color = vec4(color_lifetime.zyx, 1.0) * alpha;
+    float lifetime = size.y;
+    vec2 particle_size = mix(size.xx, size, billboard);
     tc = Texcoord;
-
-#if !defined(Advanced_Lighting_Enabled)
-    particle_color.rgb = pow(particle_color.rgb, vec3(1.0 / 2.2));
-#endif
-    pc = particle_color;
+    pc = color_lifetime.zyxw;
 
     vec4 viewpos = vec4(0.);
     if (flips == 1)
@@ -53,7 +48,7 @@ void main(void)
         float sin_a = sin(mod(angle / 2.0, 6.283185307179586));
         float cos_a = cos(mod(angle / 2.0, 6.283185307179586));
         vec4 quat = normalize(vec4(vec3(0.0, 1.0, 0.0) * sin_a, cos_a));
-        vec3 newquadcorner = vec3(size * quadcorner, 0.0);
+        vec3 newquadcorner = vec3(particle_size * quadcorner, 0.0);
         newquadcorner = newquadcorner + 2.0 * cross(cross(newquadcorner,
             quat.xyz) + quat.w * newquadcorner, quat.xyz);
         viewpos = u_view_matrix * vec4(Position + newquadcorner, 1.0);
@@ -61,7 +56,7 @@ void main(void)
     else
     {
         viewpos = u_view_matrix * vec4(Position, 1.0);
-        viewpos += vec4(size * quadcorner, 0.0, 0.0);
+        viewpos += vec4(particle_size * quadcorner, 0.0, 0.0);
     }
     gl_Position = u_projection_matrix * viewpos;
 }

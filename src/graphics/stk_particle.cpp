@@ -523,10 +523,12 @@ void STKParticle::OnRegisterSceneNode()
             m_particles_generating[i].m_size);
         core::vector3df ret = m_color_from + (m_color_to - m_color_from) *
             m_particles_generating[i].m_lifetime;
+        float alpha = 1.0f - m_particles_generating[i].m_lifetime;
+        alpha = glslSmoothstep(0.0f, 0.35f, alpha);
         p.color.setRed(core::clamp((int)(ret.X * 255.0f), 0, 255));
-        p.color.setBlue(core::clamp((int)(ret.Y * 255.0f), 0, 255));
-        p.color.setGreen(core::clamp((int)(ret.Z * 255.0f), 0, 255));
-        p.color.setAlpha(255);
+        p.color.setGreen(core::clamp((int)(ret.Y * 255.0f), 0, 255));
+        p.color.setBlue(core::clamp((int)(ret.Z * 255.0f), 0, 255));
+        p.color.setAlpha(core::clamp((int)(alpha * 255.0f), 0, 255));
         Particles.push_back(p);
     }
     core::matrix4 inv(AbsoluteTransformation, core::matrix4::EM4CONST_INVERSE);

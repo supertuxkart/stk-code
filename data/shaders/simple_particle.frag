@@ -10,8 +10,7 @@ out vec4 FragColor;
 
 void main(void)
 {
-    float billboard_alpha = mix(1.0, texture(tex, tc).a, billboard);
-    vec4 color = texture(tex, tc);
+    vec4 color = texture(tex, tc) * pc;
 #if defined(Advanced_Lighting_Enabled)
     vec2 xy = gl_FragCoord.xy / u_screen;
     float FragZ = gl_FragCoord.z;
@@ -19,9 +18,11 @@ void main(void)
     float EnvZ = texture(dtex, xy).x;
     vec4 EnvPos = getPosFromUVDepth(vec3(xy, EnvZ), u_inverse_projection_matrix);
     float alpha = clamp((EnvPos.z - FragmentPos.z) * 0.3, 0., 1.);
+    // TODO remove this later if possible when implementing GE
+    alpha = mix(alpha, texture(tex, tc).a, billboard);
 #else
     float alpha = 1.0;
 #endif
-    color = vec4(color.rgb * color.a, color.a);
-    FragColor = color * billboard_alpha * pc * alpha;
+    color = vec4(color.rgb * color.a * alpha, color.a * alpha);
+    FragColor = color;
 }

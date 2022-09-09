@@ -48,26 +48,9 @@ struct CPUParticle
     // ------------------------------------------------------------------------
     CPUParticle(const core::vector3df& position,
                 const core::vector3df& color_from,
-                const core::vector3df& color_to, float lf_time, float size)
-         : m_position(position)
-    {
-        core::vector3df ret = color_from + (color_to - color_from) * lf_time;
-        m_color_lifetime.setRed(core::clamp((int)(ret.X * 255.0f), 0, 255));
-        m_color_lifetime.setBlue(core::clamp((int)(ret.Y * 255.0f), 0, 255));
-        m_color_lifetime.setGreen(core::clamp((int)(ret.Z * 255.0f), 0, 255));
-        m_color_lifetime.setAlpha(core::clamp((int)(lf_time * 255.0f), 0, 255));
-        m_size[0] = MiniGLM::toFloat16(size);
-        m_size[1] = m_size[0];
-    }
+                const core::vector3df& color_to, float lf_time, float size);
     // ------------------------------------------------------------------------
-    CPUParticle(scene::IBillboardSceneNode* node)
-    {
-        m_position = node->getAbsolutePosition();
-        video::SColor unused_bottom;
-        node->getColor(m_color_lifetime, unused_bottom);
-        m_size[0] = MiniGLM::toFloat16(node->getSize().Width);
-        m_size[1] = MiniGLM::toFloat16(node->getSize().Height);
-    }
+    CPUParticle(scene::IBillboardSceneNode* node);
 };
 
 

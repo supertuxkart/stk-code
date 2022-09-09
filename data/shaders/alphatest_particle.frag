@@ -6,10 +6,10 @@ out vec4 FragColor;
 
 void main(void)
 {
-    vec4 color = texture(tex, tc);
+    vec4 color = texture(tex, tc) * pc;
     if (color.a < 0.5)
     {
         discard;
     }
-    FragColor = color * pc;
+    FragColor = color;
 }

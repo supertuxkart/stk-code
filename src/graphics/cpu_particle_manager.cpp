@@ -17,6 +17,7 @@
 
 
 #include "graphics/cpu_particle_manager.hpp"
+#include "graphics/sp/sp_base.hpp"
 #include "graphics/stk_particle.hpp"
 #include "graphics/irr_driver.hpp"
 #include "graphics/material.hpp"
@@ -49,7 +50,7 @@ public:
 /** A Shader to render alpha-test particles.
 */
 class AlphaTestParticleRenderer : public TextureShader
-    <AlphaTestParticleRenderer, 1, int>
+    <AlphaTestParticleRenderer, 1, int, float>
 {
 public:
     AlphaTestParticleRenderer()
@@ -57,7 +58,7 @@ public:
         loadProgram(PARTICLES_RENDERING,
                     GL_VERTEX_SHADER,   "alphatest_particle.vert",
                     GL_FRAGMENT_SHADER, "alphatest_particle.frag");
-        assignUniforms("flips");
+        assignUniforms("flips", "billboard");
         assignSamplerNames(0, "tex",  ST_TRILINEAR_ANISOTROPIC_FILTERED);
     }   // AlphaTestParticleRenderer
 };   // AlphaTestParticleRenderer
@@ -94,6 +95,56 @@ void CPUParticleManager::addParticleNode(STKParticle* node)
     }
     m_particles_queue[tex_name].push_back(node);
 }   // addParticleNode
+
+// ============================================================================
+CPUParticle::CPUParticle(const core::vector3df& position,
+                         const core::vector3df& color_from,
+                         const core::vector3df& color_to, float lf_time,
+                         float size)
+           : m_position(position)
+{
+    core::vector3df ret = color_from + (color_to - color_from) * lf_time;
+    float alpha = 1.0f - lf_time;
+    alpha = glslSmoothstep(0.0f, 0.35f, alpha);
+    int r = core::clamp((int)(ret.X * 255.0f), 0, 255);
+    int g = core::clamp((int)(ret.Y * 255.0f), 0, 255);
+    int b = core::clamp((int)(ret.Z * 255.0f), 0, 255);
+    if (CVS->isDeferredEnabled() && CVS->isGLSL())
+    {
+        using namespace SP;
+        r = srgb255ToLinear(r);
+        g = srgb255ToLinear(g);
+        b = srgb255ToLinear(b);
+    }
+    m_color_lifetime.setRed(r);
+    m_color_lifetime.setGreen(g);
+    m_color_lifetime.setBlue(b);
+    m_color_lifetime.setAlpha(core::clamp((int)(alpha * 255.0f), 0, 255));
+    if (size != 0.0f)
+    {
+        m_size[0] = MiniGLM::toFloat16(size);
+        m_size[1] = MiniGLM::toFloat16(lf_time);
+    }
+    else
+        memset(m_size, 0, sizeof(m_size));
+}   // CPUParticle
+
+// ============================================================================
+CPUParticle::CPUParticle(scene::IBillboardSceneNode* node)
+{
+    m_position = node->getAbsolutePosition();
+    video::SColor unused_bottom;
+    node->getColor(m_color_lifetime, unused_bottom);
+    if (CVS->isDeferredEnabled() && CVS->isGLSL())
+    {
+        using namespace SP;
+        m_color_lifetime.setRed(srgb255ToLinear(m_color_lifetime.getRed()));
+        m_color_lifetime.setGreen(srgb255ToLinear(m_color_lifetime.getGreen()));
+        m_color_lifetime.setBlue(srgb255ToLinear(m_color_lifetime.getBlue()));
+    }
+    m_size[0] = MiniGLM::toFloat16(node->getSize().Width);
+    m_size[1] = MiniGLM::toFloat16(node->getSize().Height);
+}   // CPUParticle
 
 // ============================================================================
 GLuint CPUParticleManager::m_particle_quad = 0;
@@ -327,7 +378,8 @@ void CPUParticleManager::drawAll()
         {
             AlphaTestParticleRenderer::getInstance()->setTextureUnits
                 (cur_mat->getTexture()->getTextureHandler());
-            AlphaTestParticleRenderer::getInstance()->setUniforms(flips);
+            AlphaTestParticleRenderer::getInstance()->setUniforms(flips,
+                billboard);
         }
         glBindVertexArray(m_gl_particles.at(p.second)->m_vao);
         glDrawArraysInstanced(GL_TRIANGLE_STRIP, 0, 4,
