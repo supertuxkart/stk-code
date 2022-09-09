@@ -24,7 +24,7 @@
                y-increase-factor="5"
                />
     
-    <color     min="255 255 255"
-               max="0 0 0"  />
+    <color     min="0 0 0"
+               max="255 255 255"  />
 
 </particles>

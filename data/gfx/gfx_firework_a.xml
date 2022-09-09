@@ -23,7 +23,7 @@
     <size      min="0.2"
                max="0.3"          />
     
-    <color     min="40 40 255"
+    <color     min="40 255 40"
                max="255 255 255"   />
 
 </particles>

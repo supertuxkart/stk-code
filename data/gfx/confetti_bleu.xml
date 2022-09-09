@@ -23,7 +23,7 @@
     <size      min="0.10"
                max="0.30"          />
     
-    <color     min="40 40 255"
+    <color     min="40 255 40"
                max="255 255 255"   />
 
     <wind      flips="Y"           />
