@@ -93,8 +93,12 @@ void RewindInfoState::restore()
         }
         if (!r)
         {
-            Log::error("RewindInfoState", "Missing rewinder %s",
-                name.c_str());
+            if (!RewindManager::get()->hasMissingRewinder(name))
+            {
+                Log::error("RewindInfoState", "Missing rewinder %s",
+                    name.c_str());
+                RewindManager::get()->addMissingRewinder(name);
+            }
             m_buffer->skip(data_size);
             continue;
         }

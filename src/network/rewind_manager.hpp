@@ -117,6 +117,8 @@ private:
 
     bool m_schedule_reset_network_body;
 
+    std::set<std::string> m_missing_rewinders;
+
     RewindManager();
    ~RewindManager();
     // ------------------------------------------------------------------------
@@ -220,6 +222,12 @@ public:
     void resetSmoothNetworkBody()     { m_schedule_reset_network_body = true; }
     // ------------------------------------------------------------------------
     void handleResetSmoothNetworkBody();
+    // ------------------------------------------------------------------------
+    void addMissingRewinder(const std::string& name)
+                                          { m_missing_rewinders.insert(name); }
+    // ------------------------------------------------------------------------
+    bool hasMissingRewinder(const std::string& name) const
+        { return m_missing_rewinders.find(name) != m_missing_rewinders.end(); }
 
 };   // RewindManager
 

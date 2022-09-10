@@ -94,6 +94,7 @@ void RewindManager::reset()
 
     clearExpiredRewinder();
     m_rewind_queue.reset();
+    m_missing_rewinders.clear();
 }   // reset
 
 // ----------------------------------------------------------------------------    
