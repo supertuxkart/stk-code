@@ -580,5 +580,6 @@
       <capabilities name="report_player"/>
       <capabilities name="soccer_fixes"/>
       <capabilities name="ranking_changes"/>
+      <capabilities name="real_addon_karts"/>
   </network-capabilities>
 </config>

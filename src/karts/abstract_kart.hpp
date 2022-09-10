@@ -81,7 +81,8 @@ private:
     // ------------------------------------------------------------------------
     void loadKartProperties(const std::string& new_ident,
                             HandicapLevel handicap,
-                            std::shared_ptr<GE::GERenderInfo> ri);
+                            std::shared_ptr<GE::GERenderInfo> ri,
+                            const KartData& kart_data);
 protected:
     btTransform m_starting_transform;
 
@@ -144,7 +145,8 @@ public:
     /** Change to new kart instancely (used in network live join). */
     virtual void changeKart(const std::string& new_ident,
                             HandicapLevel handicap,
-                            std::shared_ptr<GE::GERenderInfo> ri);
+                            std::shared_ptr<GE::GERenderInfo> ri,
+                            const KartData& kart_data = KartData());
     // ========================================================================
     // Access to the handicap.
     // ------------------------------------------------------------------------

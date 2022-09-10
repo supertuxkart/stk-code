@@ -273,6 +273,13 @@ namespace ServerConfig
         "will be made 1.0. If false addon karts will use their original "
         "hitbox other than tux, all players having it restriction applies."));
 
+    SERVER_CFG_PREFIX BoolServerConfigParam m_real_addon_karts
+        SERVER_CFG_DEFAULT(BoolServerConfigParam(true, "real-addon-karts",
+        "If true, server will send its addon karts real phyics (kart size, "
+        "length, type, etc) to client. If false or client chooses an addon "
+        "kart which server is missing, tux's kart physics and kart type of "
+        "the original addon is sent."));
+
     SERVER_CFG_PREFIX FloatServerConfigParam m_flag_return_timeout
         SERVER_CFG_DEFAULT(FloatServerConfigParam(20.0f, "flag-return-timeout",
         "Time in seconds when a flag is dropped a by player in CTF "

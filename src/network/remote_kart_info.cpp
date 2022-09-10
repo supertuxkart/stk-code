@@ -30,5 +30,6 @@ void RemoteKartInfo::copyFrom(std::shared_ptr<NetworkPlayerProfile> p,
     m_default_kart_color = p->getDefaultKartColor();
     m_online_id          = p->getOnlineId();
     m_country_code       = p->getCountryCode();
+    m_kart_data          = p->getKartData();
     m_profile            = p;
 }   // copyFrom

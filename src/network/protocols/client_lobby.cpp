@@ -253,6 +253,22 @@ bool ClientLobby::notifyEventAsynchronous(Event* event)
 }   // notifyEventAsynchronous
 
 //-----------------------------------------------------------------------------
+void ClientLobby::getPlayersAddonKartType(const BareNetworkString& data,
+    std::vector<std::shared_ptr<NetworkPlayerProfile> >& players) const
+{
+    if (NetworkConfig::get()->getServerCapabilities().find(
+        "real_addon_karts") ==
+        NetworkConfig::get()->getServerCapabilities().end() ||
+        data.size() == 0)
+        return;
+    for (unsigned i = 0; i < players.size(); i++)
+    {
+        KartData kart_data(data);
+        players[i]->setKartData(kart_data);
+    }
+}   // getPlayersAddonKartType
+
+//-----------------------------------------------------------------------------
 void ClientLobby::addAllPlayers(Event* event)
 {
     if (World::getWorld())
@@ -316,6 +332,7 @@ void ClientLobby::addAllPlayers(Event* event)
         unsigned flag_deactivated_time = data.getUInt16();
         RaceManager::get()->setFlagDeactivatedTicks(flag_deactivated_time);
     }
+    getPlayersAddonKartType(data, players);
     configRemoteKart(players, isSpectator() ? 1 :
         (int)NetworkConfig::get()->getNetworkPlayers().size());
     loadWorld();
@@ -1307,6 +1324,7 @@ void ClientLobby::liveJoinAcknowledged(Event* event)
         // player connection or disconnection
         std::vector<std::shared_ptr<NetworkPlayerProfile> > players =
             decodePlayers(data);
+        getPlayersAddonKartType(data, players);
         w->resetElimination();
         for (unsigned i = 0; i < players.size(); i++)
         {
@@ -1389,6 +1407,12 @@ void ClientLobby::handleKartInfo(Event* event)
     data.decodeString(&kart_name);
     std::string country_code;
     data.decodeString(&country_code);
+    KartData kart_data;
+    if (NetworkConfig::get()->getServerCapabilities().find(
+        "real_addon_karts") !=
+        NetworkConfig::get()->getServerCapabilities().end() &&
+        data.size() > 0)
+        kart_data = KartData(data);
 
     RemoteKartInfo& rki = RaceManager::get()->getKartInfo(kart_id);
     rki.setPlayerName(player_name);
@@ -1399,6 +1423,7 @@ void ClientLobby::handleKartInfo(Event* event)
     rki.setLocalPlayerId(local_id);
     rki.setKartName(kart_name);
     rki.setCountryCode(country_code);
+    rki.setKartData(kart_data);
     addLiveJoiningKart(kart_id, rki, live_join_util_ticks);
 
     core::stringw msg;

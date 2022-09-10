@@ -19,6 +19,8 @@
 
 #include "config/user_config.hpp"
 #include "guiengine/widgets/progress_bar_widget.hpp"
+#include "karts/kart_properties.hpp"
+#include "karts/kart_properties_manager.hpp"
 #include "input/device_manager.hpp"
 #include "network/network_config.hpp"
 #include "network/network_string.hpp"
@@ -136,6 +138,22 @@ void NetworkKartSelectionScreen::allPlayersDone()
         // If server recieve an invalid name, it will auto correct to a random
         // kart
         kart.encodeString(m_kart_widgets[n].m_kart_internal_name);
+    }
+
+    NetworkConfig* nc = NetworkConfig::get();
+    if (nc->useTuxHitboxAddon() &&
+        nc->getServerCapabilities().find(
+        "real_addon_karts") != nc->getServerCapabilities().end())
+    {
+        for (unsigned n = 0; n < kart_count; n++)
+        {
+            KartData kart_data;
+            const KartProperties* kp = kart_properties_manager
+                ->getKart(m_kart_widgets[n].m_kart_internal_name);
+            if (kp && kp->isAddon())
+                kart_data = KartData(kp);
+            kart_data.encode(&kart);
+        }
     }
     STKHost::get()->sendToServer(&kart, true);
 

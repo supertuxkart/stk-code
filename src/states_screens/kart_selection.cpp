@@ -882,9 +882,11 @@ void KartSelectionScreen::updateKartStats(uint8_t widget_id,
 
     const KartProperties *kp =
                     kart_properties_manager->getKart(selection);
+    NetworkConfig* nc = NetworkConfig::get();
     // Adjust for online addon karts
-    if (kp && kp->isAddon() && NetworkConfig::get()->isNetworking() &&
-        NetworkConfig::get()->useTuxHitboxAddon())
+    if (kp && kp->isAddon() && nc->isNetworking() && nc->useTuxHitboxAddon() &&
+        nc->getServerCapabilities().find(
+        "real_addon_karts") == nc->getServerCapabilities().end())
         kp = kart_properties_manager->getKart("tux");
     if (kp != NULL)
     {

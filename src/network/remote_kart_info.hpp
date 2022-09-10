@@ -22,6 +22,8 @@
 #ifndef HEADER_REMOTE_KART_INFO_HPP
 #define HEADER_REMOTE_KART_INFO_HPP
 
+#include "network/kart_data.hpp"
+
 #include <limits>
 #include <memory>
 #include <string>
@@ -59,6 +61,7 @@ class RemoteKartInfo
         uint32_t            m_online_id;
         std::string         m_country_code;
         std::weak_ptr<NetworkPlayerProfile> m_profile;
+        KartData            m_kart_data;
 public:
      RemoteKartInfo(int player_id, const std::string& kart_name,
                     const irr::core::stringw& user_name, uint32_t host_id,
@@ -107,6 +110,8 @@ public:
     uint32_t getOnlineId() const           { return m_online_id;          }
     void setCountryCode(const std::string& id) { m_country_code = id;     }
     const std::string& getCountryCode() const { return m_country_code;    }
+    void setKartData(const KartData& data)          { m_kart_data = data; }
+    const KartData& getKartData() const             { return m_kart_data; }
     void setNetworkPlayerProfile(
         std::weak_ptr<NetworkPlayerProfile> npp)       { m_profile = npp; }
     std::weak_ptr<NetworkPlayerProfile> getNetworkPlayerProfile() const

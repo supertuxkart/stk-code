@@ -153,6 +153,7 @@ void LobbyProtocol::configRemoteKart(
         if (RaceManager::get()->teamEnabled())
             rki.setKartTeam(profile->getTeam());
         rki.setCountryCode(profile->getCountryCode());
+        rki.setKartData(profile->getKartData());
         rki.setNetworkPlayerProfile(profile);
         // Inform the race manager about the data for this kart.
         RaceManager::get()->setPlayerKart(i, rki);
@@ -236,7 +237,8 @@ void LobbyProtocol::addLiveJoiningKart(int kart_id, const RemoteKartInfo& rki,
         std::make_shared<GE::GERenderInfo>(1.0f) :
         rki.getKartTeam() == KART_TEAM_BLUE ?
         std::make_shared<GE::GERenderInfo>(0.66f) :
-        std::make_shared<GE::GERenderInfo>(rki.getDefaultKartColor()));
+        std::make_shared<GE::GERenderInfo>(rki.getDefaultKartColor()),
+        rki.getKartData());
     k->setLiveJoinKart(live_join_util_ticks);
     World::getWorld()->initTeamArrows(k);
     if (!k->getController()->isLocalPlayerController())

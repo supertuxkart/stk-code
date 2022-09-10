@@ -148,6 +148,8 @@ private:
          decodePlayers(const BareNetworkString& data,
          std::shared_ptr<STKPeer> peer = nullptr,
          bool* is_spectator = NULL) const;
+    void getPlayersAddonKartType(const BareNetworkString& data,
+        std::vector<std::shared_ptr<NetworkPlayerProfile> >& players) const;
     void getKartsTracksNetworkString(BareNetworkString* ns);
     void doInstallAddonsPack();
 public:

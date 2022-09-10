@@ -46,7 +46,8 @@ AbstractKart::AbstractKart(const std::string& ident,
              : Moveable()
 {
     m_world_kart_id   = world_kart_id;
-    loadKartProperties(ident, handicap, ri);
+    const RemoteKartInfo& rki = RaceManager::get()->getKartInfo(m_world_kart_id);
+    loadKartProperties(ident, handicap, ri, rki.getKartData());
 }   // AbstractKart
 
 // ----------------------------------------------------------------------------
@@ -78,12 +79,14 @@ void AbstractKart::reset()
 // ----------------------------------------------------------------------------
 void AbstractKart::loadKartProperties(const std::string& new_ident,
                                       HandicapLevel handicap,
-                                      std::shared_ptr<GE::GERenderInfo> ri)
+                                      std::shared_ptr<GE::GERenderInfo> ri,
+                                      const KartData& kart_data)
 {
     m_kart_properties.reset(new KartProperties());
+    KartProperties* tmp_kp = NULL;
     const KartProperties* kp = kart_properties_manager->getKart(new_ident);
     const KartProperties* kp_addon = NULL;
-    const KartProperties* official_kp = NULL;
+    bool new_hitbox = false;
     Vec3 gravity_shift;
     if (NetworkConfig::get()->isNetworking() &&
         NetworkConfig::get()->useTuxHitboxAddon() && kp && kp->isAddon())
@@ -106,16 +109,38 @@ void AbstractKart::loadKartProperties(const std::string& new_ident,
         kp = kart_properties_manager->getKart(std::string("tux"));
         if (NetworkConfig::get()->isNetworking() && official_kart)
         {
-            official_kp = OfficialKarts::getKartByIdent(new_ident,
-                &m_kart_width, &m_kart_height, &m_kart_length, &gravity_shift);
+            const KartProperties* official_kp = OfficialKarts::getKartByIdent(
+                new_ident, &m_kart_width, &m_kart_height, &m_kart_length,
+                &gravity_shift);
             if (official_kp)
+            {
                 kp = official_kp;
+                new_hitbox = true;
+            }
         }
     }
+
+    if (NetworkConfig::get()->isNetworking() &&
+        !kart_data.m_kart_type.empty() &&
+        kart_properties_manager->hasKartTypeCharacteristic(
+        kart_data.m_kart_type))
+    {
+        tmp_kp = new KartProperties();
+        tmp_kp->copyFrom(kp);
+        tmp_kp->initKartWithDifferentType(kart_data.m_kart_type);
+        kp = tmp_kp;
+        m_kart_width = kart_data.m_width;
+        m_kart_height = kart_data.m_height;
+        m_kart_length = kart_data.m_length;
+        gravity_shift = kart_data.m_gravity_shift;
+        new_hitbox = true;
+    }
+
     m_kart_properties->copyForPlayer(kp, handicap);
     if (kp_addon)
         m_kart_properties->adjustForOnlineAddonKart(kp_addon);
-    if (official_kp)
+
+    if (new_hitbox)
     {
         m_kart_properties->updateForOnlineKart(new_ident, gravity_shift,
             m_kart_length);
@@ -136,7 +161,7 @@ void AbstractKart::loadKartProperties(const std::string& new_ident,
         m_kart_model.reset(kp_addon->getKartModelCopy(ri));
     else
         m_kart_model.reset(m_kart_properties->getKartModelCopy(ri));
-    if (official_kp == NULL)
+    if (!new_hitbox)
     {
         m_kart_width  = kp->getMasterKartModel().getWidth();
         m_kart_height = kp->getMasterKartModel().getHeight();
@@ -144,18 +169,20 @@ void AbstractKart::loadKartProperties(const std::string& new_ident,
     }
     m_kart_highest_point = m_kart_model->getHighestPoint();
     m_wheel_graphics_position = m_kart_model->getWheelsGraphicsPosition();
+    delete tmp_kp;
 }   // loadKartProperties
 
 // ----------------------------------------------------------------------------
 void AbstractKart::changeKart(const std::string& new_ident,
                               HandicapLevel handicap,
-                              std::shared_ptr<GE::GERenderInfo> ri)
+                              std::shared_ptr<GE::GERenderInfo> ri,
+                              const KartData& kart_data)
 {
     // Reset previous kart (including delete old animation above)
     reset();
     // Remove kart body
     Physics::get()->removeKart(this);
-    loadKartProperties(new_ident, handicap, ri);
+    loadKartProperties(new_ident, handicap, ri, kart_data);
 }   // changeKart
 
 // ----------------------------------------------------------------------------

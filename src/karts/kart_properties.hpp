@@ -234,6 +234,12 @@ public:
     bool operator<(const KartProperties &other) const;
 
     // ------------------------------------------------------------------------
+    void initKartWithDifferentType(const std::string& type)
+    {
+        m_kart_type = type;
+        combineCharacteristics(HANDICAP_NONE);
+    }
+    // ------------------------------------------------------------------------
     /** Returns the characteristics for this kart. */
     const AbstractCharacteristic* getCharacteristic() const;
     // ------------------------------------------------------------------------

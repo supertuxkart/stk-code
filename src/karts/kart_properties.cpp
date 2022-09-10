@@ -416,6 +416,7 @@ void KartProperties::adjustForOnlineAddonKart(const KartProperties* source)
     m_icon_material = source->m_icon_material;
     m_minimap_icon = source->m_minimap_icon;
     m_engine_sfx_type = source->m_engine_sfx_type;
+    m_skid_sound = source->m_skid_sound;
     m_color = source->m_color;
 }  // adjustForOnlineAddonKart
 
@@ -430,6 +431,14 @@ void KartProperties::combineCharacteristics(HandicapLevel handicap)
             RaceManager::get()->getDifficulty())));
 
     // Try to get the kart type
+    if (!kart_properties_manager->hasKartTypeCharacteristic(m_kart_type))
+    {
+        Log::warn("KartProperties",
+            "Can't find kart type '%s' for kart '%s', defaulting to '%s'.",
+            m_kart_type.c_str(), m_name.c_str(),
+            kart_properties_manager->getDefaultKartType().c_str());
+        m_kart_type = kart_properties_manager->getDefaultKartType();
+    }
     const AbstractCharacteristic *characteristic = kart_properties_manager->
         getKartTypeCharacteristic(m_kart_type, m_name);
 

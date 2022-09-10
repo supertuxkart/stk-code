@@ -223,9 +223,10 @@ void Kart::initSound()
 // ----------------------------------------------------------------------------
 void Kart::changeKart(const std::string& new_ident,
                       HandicapLevel handicap,
-                      std::shared_ptr<GE::GERenderInfo> ri)
+                      std::shared_ptr<GE::GERenderInfo> ri,
+                      const KartData& kart_data)
 {
-    AbstractKart::changeKart(new_ident, handicap, ri);
+    AbstractKart::changeKart(new_ident, handicap, ri, kart_data);
     m_kart_model->setKart(this);
 
     scene::ISceneNode* old_node = m_node;
