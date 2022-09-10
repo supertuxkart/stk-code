@@ -141,17 +141,19 @@ void NetworkKartSelectionScreen::allPlayersDone()
     }
 
     NetworkConfig* nc = NetworkConfig::get();
-    if (nc->useTuxHitboxAddon() &&
-        nc->getServerCapabilities().find(
+    if (nc->getServerCapabilities().find(
         "real_addon_karts") != nc->getServerCapabilities().end())
     {
         for (unsigned n = 0; n < kart_count; n++)
         {
             KartData kart_data;
-            const KartProperties* kp = kart_properties_manager
-                ->getKart(m_kart_widgets[n].m_kart_internal_name);
-            if (kp && kp->isAddon())
-                kart_data = KartData(kp);
+            if (nc->useTuxHitboxAddon())
+            {
+                const KartProperties* kp = kart_properties_manager
+                    ->getKart(m_kart_widgets[n].m_kart_internal_name);
+                if (kp && kp->isAddon())
+                    kart_data = KartData(kp);
+            }
             kart_data.encode(&kart);
         }
     }
