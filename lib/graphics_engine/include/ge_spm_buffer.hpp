@@ -9,18 +9,10 @@
 #include "ge_vma.hpp"
 #include "vulkan_wrapper.h"
 
-class B3DMeshLoader;
-class SPMeshLoader;
-
 namespace GE
 {
-class GEVulkanSceneManager;
-
 class GESPMBuffer : public irr::scene::IMeshBuffer
 {
-friend class GEVulkanSceneManager;
-friend class ::B3DMeshLoader;
-friend class ::SPMeshLoader;
 private:
     irr::video::SMaterial m_material;
 
@@ -59,10 +51,8 @@ public:
                                                          { return m_material; }
     // ------------------------------------------------------------------------
     virtual irr::video::SMaterial& getMaterial()         { return m_material; }
-
     // ------------------------------------------------------------------------
-    virtual const void* getVertices() const
-                                                  { return m_vertices.data(); }
+    virtual const void* getVertices() const       { return m_vertices.data(); }
     // ------------------------------------------------------------------------
     virtual void* getVertices()                   { return m_vertices.data(); }
     // ------------------------------------------------------------------------
@@ -181,6 +171,8 @@ public:
     // ------------------------------------------------------------------------
     bool hasSkinning() const                         { return m_has_skinning; }
     // ------------------------------------------------------------------------
+    void setHasSkinning(bool val)                     { m_has_skinning = val; }
+    // ------------------------------------------------------------------------
     void bindVertexIndexBuffer(VkCommandBuffer cmd)
     {
         std::array<VkBuffer, 2> vertex_buffer =
@@ -202,6 +194,11 @@ public:
     void createVertexIndexBuffer();
     // ------------------------------------------------------------------------
     void destroyVertexIndexBuffer();
+    // ------------------------------------------------------------------------
+    std::vector<irr::video::S3DVertexSkinnedMesh>& getVerticesVector()
+                                                         { return m_vertices; }
+    // ------------------------------------------------------------------------
+    std::vector<irr::u16>& getIndicesVector()             { return m_indices; }
 };
 
 } // end namespace irr

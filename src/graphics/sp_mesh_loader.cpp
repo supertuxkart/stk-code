@@ -453,8 +453,7 @@ void SPMeshLoader::decompressGESPM(irr::io::IReadFile* spm,
     assert(indices_count != 0);
 
     GE::GESPMBuffer* mb = new GE::GESPMBuffer();
-    static_cast<GE::GESPM*>(m_mesh)->m_buffer.push_back(mb);
-    std::vector<video::S3DVertexSkinnedMesh> vertices;
+    static_cast<GE::GESPM*>(m_mesh)->addMeshBuffer(mb);
     const unsigned idx_size = vertices_count > 255 ? 2 : 1;
     for (unsigned i = 0; i < vertices_count; i++)
     {
@@ -522,12 +521,12 @@ void SPMeshLoader::decompressGESPM(irr::io::IReadFile* spm,
                 // 1.0 in half float (16bit)
                 vertex.m_weight[0] = 15360;
             }
-            mb->m_has_skinning = true;
+            mb->setHasSkinning(true);
         }
-        vertices.push_back(vertex);
+        mb->getVerticesVector().push_back(vertex);
     }
 
-    std::vector<uint16_t> indices;
+    std::vector<uint16_t>& indices = mb->getIndicesVector();
     indices.resize(indices_count);
     if (idx_size == 2)
     {
@@ -543,11 +542,9 @@ void SPMeshLoader::decompressGESPM(irr::io::IReadFile* spm,
             indices[i] = tmp_idx[i];
         }
     }
-    std::swap(mb->m_vertices, vertices);
-    std::swap(mb->m_indices, indices);
     if (m.TextureLayer[0].Texture != NULL)
     {
-        mb->m_material = m;
+        mb->getMaterial() = m;
     }
     mb->recalculateBoundingBox();
 #endif

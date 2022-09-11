@@ -155,14 +155,14 @@ irr::scene::IMeshSceneNode* GEVulkanSceneManager::addMeshSceneNode(
                 sp.m_color = orig.toSColor();
                 sp.m_all_uvs[0] = MiniGLM::toFloat16(v_ptr[j].TCoords.X);
                 sp.m_all_uvs[1] = MiniGLM::toFloat16(v_ptr[j].TCoords.Y);
-                spm_mb->m_vertices.push_back(sp);
+                spm_mb->getVerticesVector().push_back(sp);
             }
             uint16_t* idx_ptr = mb->getIndices();
             std::vector<uint16_t> indices(idx_ptr, idx_ptr + mb->getIndexCount());
-            std::swap(spm_mb->m_indices, indices);
-            spm_mb->m_material = mb->getMaterial();
+            std::swap(spm_mb->getIndicesVector(), indices);
+            spm_mb->getMaterial() = mb->getMaterial();
             spm_mb->recalculateBoundingBox();
-            spm->m_buffer.push_back(spm_mb);
+            spm->addMeshBuffer(spm_mb);
         }
         spm->finalize();
         std::stringstream oss;

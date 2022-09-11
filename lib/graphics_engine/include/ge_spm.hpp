@@ -16,11 +16,9 @@ namespace GE
 {
 struct Armature;
 class GESPMBuffer;
-class GEVulkanSceneManager;
 
 class GESPM : public IAnimatedMesh
 {
-friend class GEVulkanSceneManager;
 friend class ::B3DMeshLoader;
 friend class ::SPMeshLoader;
 private:
@@ -83,6 +81,8 @@ public:
     bool isStatic() const                   { return m_all_armatures.empty(); }
     // ------------------------------------------------------------------------
     unsigned getJointCount() const                    { return m_joint_using; }
+    // ------------------------------------------------------------------------
+    void addMeshBuffer(GESPMBuffer* mb)             { m_buffer.push_back(mb); }
 
 };
 
