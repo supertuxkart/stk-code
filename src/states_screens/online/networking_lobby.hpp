@@ -84,7 +84,7 @@ private:
 
     bool m_has_auto_start_in_server,
         m_server_configurable, m_client_live_joinable,
-        m_reload_server_info;
+        m_reload_server_info, m_assigned_players;
 
     Addon* m_addon_install;
     video::ITexture* m_config_texture;
@@ -148,6 +148,7 @@ public:
     void toggleServerConfigButton(bool val)    { m_server_configurable = val; }
     void reloadServerInfos()                   { m_reload_server_info = true; }
     void setHeader(const core::stringw& header)     { m_header_text = header; }
+    void setAssignedPlayers(bool val)             { m_assigned_players = val; }
 };   // class NetworkingLobby
 
 #endif

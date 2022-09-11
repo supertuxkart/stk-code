@@ -1092,8 +1092,9 @@ void ClientLobby::startSelection(Event* event)
     }
     // In case of auto-connect or continue a grand prix, use random karts
     // (or previous kart) from server and go to track selection
-    if ((NetworkConfig::get()->isAutoConnect() || skip_kart_screen) &&
-        m_server_enabled_track_voting)
+    if (NetworkConfig::get()->isAutoConnect())
+        skip_kart_screen = true;
+    if (skip_kart_screen)
     {
         input_manager->setMasterPlayerOnly(true);
         for (auto& p : NetworkConfig::get()->getNetworkPlayers())
@@ -1102,23 +1103,24 @@ void ClientLobby::startSelection(Event* event)
                 ->createActivePlayer(std::get<1>(p), std::get<0>(p));
         }
         input_manager->getDeviceManager()->setAssignMode(ASSIGN);
-        if (!GUIEngine::isNoGraphics())
+        NetworkingLobby::getInstance()->setAssignedPlayers(true);
+    }
+    if (!GUIEngine::isNoGraphics())
+    {
+        if (skip_kart_screen && m_server_enabled_track_voting)
         {
             TracksScreen::getInstance()->setQuitServer();
             TracksScreen::getInstance()->setNetworkTracks();
             TracksScreen::getInstance()->push();
         }
-    }
-    else if (!GUIEngine::isNoGraphics())
-    {
-        NetworkKartSelectionScreen::getInstance()->push();
-    }
-
-    if (!GUIEngine::isNoGraphics())
-    {
+        else if (!skip_kart_screen)
+        {
+            NetworkKartSelectionScreen::getInstance()->push();
+        }
         TracksScreen *ts = TracksScreen::getInstance();
         ts->resetVote();
     }
+
     m_state.store(SELECTING_ASSETS);
     Log::info("ClientLobby", "Selection starts now");
 }   // startSelection

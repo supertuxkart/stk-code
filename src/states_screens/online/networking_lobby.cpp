@@ -179,6 +179,7 @@ void NetworkingLobby::init()
     m_player_names.clear();
     m_has_auto_start_in_server = false;
     m_client_live_joinable = false;
+    m_assigned_players = false;
     m_addon_install = NULL;
     m_ping_update_timer = 0;
     m_start_timeout = std::numeric_limits<float>::max();
@@ -883,7 +884,8 @@ void NetworkingLobby::tearDown()
     if (!NetworkConfig::get()->isClient())
         return;
     input_manager->getDeviceManager()->mapFireToSelect(false);
-    input_manager->getDeviceManager()->setAssignMode(NO_ASSIGN);
+    if (!m_assigned_players)
+        input_manager->getDeviceManager()->setAssignMode(NO_ASSIGN);
 }   // tearDown
 
 // ----------------------------------------------------------------------------
