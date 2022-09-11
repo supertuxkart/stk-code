@@ -10,7 +10,8 @@ layout(std140, set = 1, binding = 0) uniform CameraBuffer
 
 struct ObjectData
 {
-    vec4 m_position;
+    vec3 m_translation;
+    float m_hue_change;
     vec4 m_rotation;
     vec4 m_scale;
     int m_skinning_offest;
@@ -41,3 +42,4 @@ layout(location = 0) out vec4 f_vertex_color;
 layout(location = 1) out vec2 f_uv;
 layout(location = 2) out vec2 f_uv_two;
 layout(location = 3) flat out int f_material_id;
+layout(location = 4) out float f_hue_change;

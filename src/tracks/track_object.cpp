@@ -24,7 +24,6 @@
 #include "graphics/lod_node.hpp"
 #include "graphics/material.hpp"
 #include "graphics/material_manager.hpp"
-#include <ge_render_info.hpp>
 #include "graphics/sp/sp_mesh_buffer.hpp"
 #include "graphics/sp/sp_mesh_node.hpp"
 #include "io/file_manager.hpp"
@@ -41,6 +40,7 @@
 
 #include <IAnimatedMeshSceneNode.h>
 #include <ISceneManager.h>
+#include <ge_render_info.hpp>
 
 /** A track object: any additional object on the track. This object implements
  *  a graphics-only representation, i.e. there is no physical representation.
@@ -196,75 +196,64 @@ void TrackObject::init(const XMLNode &xml_node, scene::ISceneNode* parent,
         std::string model_name;
         xml_node.get("model", &model_name);
 #ifndef SERVER_ONLY
-        if (CVS->isGLSL())
+        scene::IMesh* mesh = NULL;
+        if (model_name.size() > 0)
         {
-            scene::IMesh* mesh = NULL;
-            // Use the first material in mesh to determine hue
-            Material* colorized = NULL;
-            if (model_name.size() > 0)
-            {
-                mesh = irr_driver->getMesh(model_name);
-                if (mesh != NULL)
-                {
-                    for (u32 j = 0; j < mesh->getMeshBufferCount(); j++)
-                    {
-                        SP::SPMeshBuffer* mb = static_cast<SP::SPMeshBuffer*>
-                            (mesh->getMeshBuffer(j));
-                        std::vector<Material*> mbs = mb->getAllSTKMaterials();
-                        for (Material* m : mbs)
-                        {
-                            if (m->isColorizable() && m->hasRandomHue())
-                            {
-                                colorized = m;
-                                break;
-                            }
-                        }
-                        if (colorized != NULL)
-                        {
-                            break;
-                        }
-                    }
-                }
-            }
-            else
-            {
-                std::string group_name = "";
-                xml_node.get("lod_group", &group_name);
-                // Try to get the first mesh from lod groups
-                mesh = model_def_loader.getFirstMeshFor(group_name);
-                if (mesh != NULL)
-                {
-                    for (u32 j = 0; j < mesh->getMeshBufferCount(); j++)
-                    {
-                        SP::SPMeshBuffer* mb = static_cast<SP::SPMeshBuffer*>
-                            (mesh->getMeshBuffer(j));
-                        std::vector<Material*> mbs = mb->getAllSTKMaterials();
-                        for (Material* m : mbs)
-                        {
-                            if (m->isColorizable() && m->hasRandomHue())
-                            {
-                                colorized = m;
-                                break;
-                            }
-                        }
-                        if (colorized != NULL)
-                        {
-                            break;
-                        }
-                    }
-                }
-            }
+            mesh = irr_driver->getMesh(model_name);
+        }
+        else
+        {
+            std::string group_name = "";
+            xml_node.get("lod_group", &group_name);
+            // Try to get the first mesh from lod groups
+            mesh = model_def_loader.getFirstMeshFor(group_name);
+        }
 
-            // If at least one material is colorizable, add RenderInfo for it
-            if (colorized != NULL)
+        // Use the first material in mesh to determine hue
+        Material* colorized = NULL;
+        if (mesh != NULL)
+        {
+            for (u32 j = 0; j < mesh->getMeshBufferCount(); j++)
             {
-                const float hue = colorized->getRandomHue();
-                if (hue > 0.0f)
+                scene::IMeshBuffer* buf = mesh->getMeshBuffer(j);
+                SP::SPMeshBuffer* mb = dynamic_cast<SP::SPMeshBuffer*>(buf);
+                if (!mb)
                 {
-                    m_render_info = std::make_shared<GE::GERenderInfo>(hue);
+                    Material* m = material_manager->getMaterialFor(buf
+                        ->getMaterial().getTexture(0), buf);
+                    if (m->isColorizable() && m->hasRandomHue())
+                    {
+                        colorized = m;
+                        break;
+                    }
+                    continue;
+                }
+                std::vector<Material*> mbs = mb->getAllSTKMaterials();
+                for (Material* m : mbs)
+                {
+                    if (m->isColorizable() && m->hasRandomHue())
+                    {
+                        colorized = m;
+                        break;
+                    }
+                }
+                if (colorized != NULL)
+                {
+                    break;
                 }
             }
         }
+
+        // If at least one material is colorizable, add RenderInfo for it
+        if (colorized != NULL)
+        {
+            const float hue = colorized->getRandomHue();
+            if (hue > 0.0f)
+            {
+                m_render_info = std::make_shared<GE::GERenderInfo>(hue);
+            }
+        }
+
 #endif
         scene::ISceneNode *glownode = NULL;
         bool is_movable = false;

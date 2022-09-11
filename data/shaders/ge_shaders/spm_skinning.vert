@@ -9,9 +9,9 @@ void main()
         v_weight[1] * u_skinning_matrices.m_mat[max(v_joint[1] + offset, 0)] +
         v_weight[2] * u_skinning_matrices.m_mat[max(v_joint[2] + offset, 0)] +
         v_weight[3] * u_skinning_matrices.m_mat[max(v_joint[3] + offset, 0)];
-    vec4 v_skinning_position = joint_matrix * vec4(v_position.xyz, 1.0);
+    vec4 v_skinning_position = joint_matrix * vec4(v_position, 1.0);
     vec4 v_world_position = getWorldPosition(
-        u_object_buffer.m_objects[gl_InstanceIndex].m_position.xyz,
+        u_object_buffer.m_objects[gl_InstanceIndex].m_translation,
         u_object_buffer.m_objects[gl_InstanceIndex].m_rotation,
         u_object_buffer.m_objects[gl_InstanceIndex].m_scale.xyz,
         v_skinning_position.xyz);
@@ -20,4 +20,5 @@ void main()
     f_uv = v_uv + u_object_buffer.m_objects[gl_InstanceIndex].m_texture_trans;
     f_uv_two = v_uv_two;
     f_material_id = u_object_buffer.m_objects[gl_InstanceIndex].m_material_id;
+    f_hue_change = u_object_buffer.m_objects[gl_InstanceIndex].m_hue_change;
 }

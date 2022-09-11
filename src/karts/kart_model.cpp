@@ -593,20 +593,23 @@ bool KartModel::loadModels(const KartProperties &kart_properties)
     Vec3 kart_max = m_mesh->getMax();
 #ifndef SERVER_ONLY
     // Test if kart model support colorization
-    if (CVS->isGLSL())
+    for (u32 i = 0; i < m_mesh->getMeshBufferCount(); i++)
     {
-        for (u32 i = 0; i < m_mesh->getMeshBufferCount(); i++)
+        SP::SPMeshBuffer* spmb =
+            dynamic_cast<SP::SPMeshBuffer*>(m_mesh->getMeshBuffer(i));
+        if (!spmb)
         {
-            SP::SPMeshBuffer* mb =
-                static_cast<SP::SPMeshBuffer*>(m_mesh->getMeshBuffer(i));
-            // Pre-upload gl meshes and textures for kart screen
-            mb->uploadGLMesh();
-            std::vector<Material*> mbs = mb->getAllSTKMaterials();
-            for (Material* m : mbs)
-            {
-                m_support_colorization =
-                    m_support_colorization || m->isColorizable();
-            }
+            m_support_colorization = m_support_colorization ||
+                m_mesh->getMeshBuffer(i)->getMaterial().isColorizable();
+            continue;
+        }
+        // Pre-upload gl meshes and textures for kart screen
+        spmb->uploadGLMesh();
+        std::vector<Material*> mbs = spmb->getAllSTKMaterials();
+        for (Material* m : mbs)
+        {
+            m_support_colorization =
+                m_support_colorization || m->isColorizable();
         }
     }
 #endif

@@ -322,7 +322,7 @@ void World::initTeamArrows(AbstractKart* k)
 
     KartModel* km = k->getKartModel();
     // Color of karts can be changed using shaders if the model supports
-    if (km->supportColorization() && CVS->isGLSL())
+    if (km->supportColorization() && CVS->supportsColorization())
         return;
 
     float arrow_pos_height = km->getHeight() + 0.5f;

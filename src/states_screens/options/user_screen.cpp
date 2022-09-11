@@ -113,7 +113,7 @@ void BaseUserScreen::init()
 {
 #ifndef SERVER_ONLY
     getWidget<IconButtonWidget>("default_kart_color")
-        ->setVisible(CVS->isGLSL());
+        ->setVisible(CVS->supportsColorization());
 #endif
 
     m_password_tb->setPasswordBox(true, L'*');

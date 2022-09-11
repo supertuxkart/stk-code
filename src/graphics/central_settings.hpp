@@ -93,6 +93,7 @@ public:
     bool isShadowEnabled() const;
     bool isTextureCompressionEnabled() const;
     bool isDeferredEnabled() const;
+    bool supportsColorization() const;
 };
 
 extern CentralVideoSettings* CVS;

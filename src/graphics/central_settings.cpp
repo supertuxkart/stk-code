@@ -500,4 +500,9 @@ bool CentralVideoSettings::isARBTextureBufferObjectUsable() const
     return hasTextureBufferObject;
 }
 
+bool CentralVideoSettings::supportsColorization() const
+{
+    return isGLSL() || GE::getDriver()->getDriverType() == video::EDT_VULKAN;
+}
+
 #endif   // !SERVER_ONLY

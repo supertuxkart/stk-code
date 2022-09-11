@@ -12,7 +12,7 @@ void main()
     offset += vec3(cos(u_push_constants.m_wind_direction) * 0.7);
 
     vec4 v_world_position = getWorldPosition(
-        u_object_buffer.m_objects[gl_InstanceIndex].m_position.xyz + offset *
+        u_object_buffer.m_objects[gl_InstanceIndex].m_translation + offset *
         v_color.r,
         u_object_buffer.m_objects[gl_InstanceIndex].m_rotation,
         u_object_buffer.m_objects[gl_InstanceIndex].m_scale.xyz, v_position);
@@ -21,4 +21,5 @@ void main()
     f_uv = v_uv;
     f_uv_two = v_uv_two;
     f_material_id = u_object_buffer.m_objects[gl_InstanceIndex].m_material_id;
+    f_hue_change = u_object_buffer.m_objects[gl_InstanceIndex].m_hue_change;
 }

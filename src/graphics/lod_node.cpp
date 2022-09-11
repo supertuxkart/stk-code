@@ -259,11 +259,6 @@ void LODNode::add(int level, scene::ISceneNode* node, bool reparent)
     m_nodes_set.insert(node);
     node->setParent(this);
 
-    if (node->getType() == scene::ESNT_ANIMATED_MESH)
-        ((scene::IAnimatedMeshSceneNode *) node)->setReadOnlyMaterials(true);
-    if (node->getType() == scene::ESNT_MESH)
-        ((scene::IMeshSceneNode *) node)->setReadOnlyMaterials(true);
-
     node->drop();
 
     node->updateAbsolutePosition();

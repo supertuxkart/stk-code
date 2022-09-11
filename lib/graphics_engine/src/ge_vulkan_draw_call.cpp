@@ -30,7 +30,7 @@ ObjectData::ObjectData(irr::scene::ISceneNode* node, int material_id,
 {
     using namespace MiniGLM;
     const irr::core::matrix4& model_mat = node->getAbsoluteTransformation();
-    float position[3] = { model_mat[12], model_mat[13], model_mat[14] };
+    float translation[3] = { model_mat[12], model_mat[13], model_mat[14] };
     irr::core::quaternion rotation(0.0f, 0.0f, 0.0f, 1.0f);
     irr::core::vector3df scale = model_mat.getScale();
     if (scale.X != 0.0f && scale.Y != 0.0f && scale.Z != 0.0f)
@@ -49,7 +49,7 @@ ObjectData::ObjectData(irr::scene::ISceneNode* node, int material_id,
         // Conjugated quaternion in glsl
         rotation.W = -rotation.W;
     }
-    memcpy(m_position, position, sizeof(position));
+    memcpy(&m_translation_x, translation, sizeof(translation));
     memcpy(m_rotation, &rotation, sizeof(irr::core::quaternion));
     memcpy(m_scale, &scale, sizeof(irr::core::vector3df));
     m_skinning_offset = skinning_offset;
@@ -58,6 +58,11 @@ ObjectData::ObjectData(irr::scene::ISceneNode* node, int material_id,
         node->getMaterial(irrlicht_material_id).getTextureMatrix(0);
     m_texture_trans[0] = texture_matrix[8];
     m_texture_trans[1] = texture_matrix[9];
+    auto& ri = node->getMaterial(irrlicht_material_id).getRenderInfo();
+    if (ri && ri->getHue() > 0.0f)
+        m_hue_change = ri->getHue();
+    else
+        m_hue_change = 0.0f;
 }   // ObjectData
 
 // ----------------------------------------------------------------------------
