@@ -10,6 +10,7 @@
 #include "vulkan_wrapper.h"
 
 #include "matrix4.h"
+#include "SColor.h"
 
 namespace irr
 {
@@ -33,7 +34,10 @@ struct ObjectData
     float m_translation_z;
     float m_hue_change;
     float m_rotation[4];
-    float m_scale[4];
+    float m_scale_x;
+    float m_scale_y;
+    float m_scale_z;
+    irr::video::SColor m_custom_vertex_color;
     int m_skinning_offset;
     int m_material_id;
     float m_texture_trans[2];

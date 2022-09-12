@@ -51,7 +51,7 @@ ObjectData::ObjectData(irr::scene::ISceneNode* node, int material_id,
     }
     memcpy(&m_translation_x, translation, sizeof(translation));
     memcpy(m_rotation, &rotation, sizeof(irr::core::quaternion));
-    memcpy(m_scale, &scale, sizeof(irr::core::vector3df));
+    memcpy(&m_scale_x, &scale, sizeof(irr::core::vector3df));
     m_skinning_offset = skinning_offset;
     m_material_id = material_id;
     const irr::core::matrix4& texture_matrix =
@@ -63,6 +63,7 @@ ObjectData::ObjectData(irr::scene::ISceneNode* node, int material_id,
         m_hue_change = ri->getHue();
     else
         m_hue_change = 0.0f;
+    m_custom_vertex_color = irr::video::SColor((uint32_t)-1);
 }   // ObjectData
 
 // ----------------------------------------------------------------------------
