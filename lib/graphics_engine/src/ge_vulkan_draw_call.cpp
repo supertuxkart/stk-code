@@ -373,6 +373,7 @@ void GEVulkanDrawCall::createAllPipelines(GEVulkanDriver* vk)
     settings.m_additive = true;
     settings.m_fragment_shader = "transparent.frag";
     settings.m_shader_name = "additive";
+    settings.m_drawing_priority = (char)11;
     createPipeline(vk, settings);
 }   // createAllPipelines
 
