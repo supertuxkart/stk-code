@@ -31,6 +31,14 @@
 using namespace irr;
 using namespace scene;
 
+namespace irr
+{
+    namespace scene
+    {
+        class IMeshSceneNode;
+    }
+}
+
 class STKTextBillboard : public ISceneNode, public NoCopy,
                          FontWithFace::FontCharCollector
 {
@@ -87,8 +95,12 @@ private:
 
     core::stringw m_text;
 
+    IMeshSceneNode* m_ge_node;
+
     // ------------------------------------------------------------------------
     float getDefaultScale(FontWithFace* face);
+    // ------------------------------------------------------------------------
+    void removeGENode();
 public:
     // ------------------------------------------------------------------------
     STKTextBillboard(const video::SColor& color_top,
@@ -99,6 +111,7 @@ public:
     // ------------------------------------------------------------------------
     ~STKTextBillboard()
     {
+        removeGENode();
         clearBuffer();
     }
     // ------------------------------------------------------------------------

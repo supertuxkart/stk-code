@@ -23,6 +23,10 @@
 #include "graphics/irr_driver.hpp"
 #include "graphics/graphics_restrictions.hpp"
 
+#include <ge_spm.hpp>
+#include <ge_spm_buffer.hpp>
+#include <sstream>
+
 // ----------------------------------------------------------------------------
 STKTextBillboard::STKTextBillboard(const video::SColor& color_top,
                                    const video::SColor& color_bottom,
@@ -50,6 +54,7 @@ STKTextBillboard::STKTextBillboard(const video::SColor& color_top,
         m_color_bottom.setBlue(srgb255ToLinear(m_color_bottom.getBlue()));
     }
     static_assert(sizeof(GLTB) == 20, "Wrong compiler padding");
+    m_ge_node = NULL;
 }   // STKTextBillboard
 
 // ----------------------------------------------------------------------------
@@ -83,7 +88,13 @@ void STKTextBillboard::updateAbsolutePosition()
     core::matrix4 m;
     m.setScale(RelativeScale);
     AbsoluteTransformation *= m;
-    if (CVS->isGLSL())
+    if (m_ge_node)
+    {
+        m_ge_node->setPosition(AbsoluteTransformation.getTranslation());
+        m_ge_node->setRotation(AbsoluteTransformation.getRotationDegrees());
+        m_ge_node->setScale(AbsoluteTransformation.getScale());
+    }
+    else if (CVS->isGLSL())
     {
         m_instanced_data =
             SP::SPInstancedData(AbsoluteTransformation, 0, 0, 0, 0);
@@ -265,6 +276,7 @@ void STKTextBillboard::init(const core::stringw& text, FontWithFace* face)
 // ----------------------------------------------------------------------------
 void STKTextBillboard::initLegacy(const core::stringw& text, FontWithFace* face)
 {
+    removeGENode();
     m_face = face;
     m_text = text;
     m_chars = new std::vector<STKTextBillboardChar>();
@@ -366,50 +378,94 @@ void STKTextBillboard::initLegacy(const core::stringw& text, FontWithFace* face)
         irr_tbs[(*m_chars)[i].m_texture].push_back(triangle);
     }
 
-    for (auto& p : irr_tbs)
+    if (SceneManager->getVideoDriver()->getDriverType() == video::EDT_VULKAN)
     {
-        scene::SMeshBuffer* buffer = new scene::SMeshBuffer();
-        buffer->getMaterial().setTexture(0, p.first);
-        buffer->getMaterial().MaterialType =
-            video::EMT_TRANSPARENT_ALPHA_CHANNEL_REF;
-        buffer->getMaterial().Lighting = false;
-
-        std::vector<uint16_t> indices;
-        for (unsigned i = 0; i < p.second.size(); i++)
+        GE::GESPM* spm = new GE::GESPM();
+        for (auto& p : irr_tbs)
         {
-            indices.push_back(4 * i + 2);
-            indices.push_back(4 * i + 1);
-            indices.push_back(4 * i + 0);
-            indices.push_back(4 * i + 3);
-            indices.push_back(4 * i + 2);
-            indices.push_back(4 * i + 0);
-        }
-        buffer->append(p.second.data(), p.second.size() * 4,
-            indices.data(), indices.size());
-        buffer->recalculateBoundingBox();
-        m_gl_mb[p.first] = buffer;
-    }
-
-    Vec3 min = Vec3( 999999.9f);
-    Vec3 max = Vec3(-999999.9f);
-    for (auto& p : irr_tbs)
-    {
-        for (auto& q : p.second)
-        {
-            for (auto& r : q)
+            GE::GESPMBuffer* spm_mb = new GE::GESPMBuffer();
+            spm_mb->getMaterial().setTexture(0, p.first);
+            spm_mb->getMaterial().MaterialType =
+                video::EMT_TRANSPARENT_ALPHA_CHANNEL_REF;
+            spm_mb->getMaterial().Lighting = false;
+            for (auto& q : p.second)
             {
-                Vec3 c(r.Pos.X, r.Pos.Y, r.Pos.Z);
-                min.min(c);
-                max.max(c);
+                for (irr::video::S3DVertex& v : q)
+                {
+                    video::S3DVertexSkinnedMesh sp;
+                    sp.m_position = v.Pos;
+                    sp.m_normal = MiniGLM::compressVector3(v.Normal);
+                    sp.m_color = v.Color;
+                    sp.m_all_uvs[0] = MiniGLM::toFloat16(v.TCoords.X);
+                    sp.m_all_uvs[1] = MiniGLM::toFloat16(v.TCoords.Y);
+                    spm_mb->getVerticesVector().push_back(sp);
+                }
+            }
+            for (unsigned i = 0; i < p.second.size(); i++)
+            {
+                spm_mb->getIndicesVector().push_back(4 * i + 2);
+                spm_mb->getIndicesVector().push_back(4 * i + 1);
+                spm_mb->getIndicesVector().push_back(4 * i + 0);
+                spm_mb->getIndicesVector().push_back(4 * i + 3);
+                spm_mb->getIndicesVector().push_back(4 * i + 2);
+                spm_mb->getIndicesVector().push_back(4 * i + 0);
+            }
+            spm_mb->recalculateBoundingBox();
+            spm->addMeshBuffer(spm_mb);
+        }
+        spm->finalize();
+        std::stringstream oss;
+        oss << (uint64_t)spm;
+        SceneManager->getMeshCache()->addMesh(oss.str().c_str(), spm);
+        spm->drop();
+        m_ge_node = SceneManager->addMeshSceneNode(spm);
+    }
+    else
+    {
+        for (auto& p : irr_tbs)
+        {
+            scene::SMeshBuffer* buffer = new scene::SMeshBuffer();
+            buffer->getMaterial().setTexture(0, p.first);
+            buffer->getMaterial().MaterialType =
+                video::EMT_TRANSPARENT_ALPHA_CHANNEL_REF;
+            buffer->getMaterial().Lighting = false;
+
+            std::vector<uint16_t> indices;
+            for (unsigned i = 0; i < p.second.size(); i++)
+            {
+                indices.push_back(4 * i + 2);
+                indices.push_back(4 * i + 1);
+                indices.push_back(4 * i + 0);
+                indices.push_back(4 * i + 3);
+                indices.push_back(4 * i + 2);
+                indices.push_back(4 * i + 0);
+            }
+            buffer->append(p.second.data(), p.second.size() * 4,
+                indices.data(), indices.size());
+            buffer->recalculateBoundingBox();
+            m_gl_mb[p.first] = buffer;
+        }
+
+        Vec3 min = Vec3( 999999.9f);
+        Vec3 max = Vec3(-999999.9f);
+        for (auto& p : irr_tbs)
+        {
+            for (auto& q : p.second)
+            {
+                for (auto& r : q)
+                {
+                    Vec3 c(r.Pos.X, r.Pos.Y, r.Pos.Z);
+                    min.min(c);
+                    max.max(c);
+                }
             }
         }
+        m_bbox.MinEdge = min.toIrrVector();
+        m_bbox.MaxEdge = max.toIrrVector();
     }
-    m_bbox.MinEdge = min.toIrrVector();
-    m_bbox.MaxEdge = max.toIrrVector();
 
     delete m_chars;
     updateAbsolutePosition();
-
 }   // initLegacy
 
 // ----------------------------------------------------------------------------
@@ -469,6 +525,17 @@ void STKTextBillboard::updateAllTextBillboards()
     updateTextBillboard(
         irr_driver->getSceneManager()->getRootSceneNode()->getChildren());
 }   // updateAllTextBillboards
+
+// ----------------------------------------------------------------------------
+void STKTextBillboard::removeGENode()
+{
+    if (m_ge_node)
+    {
+        SceneManager->getMeshCache()->removeMesh(m_ge_node->getMesh());
+        m_ge_node->remove();
+        m_ge_node = NULL;
+    }
+}   // removeGENode
 
 #endif   // !SERVER_ONLY
 
