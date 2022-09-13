@@ -478,6 +478,8 @@ void FileManager::addAssetsSearchPath()
     // since this also adds a file archive to the file system - and
     // m_file_system is deleted (in irr_driver)
     pushTextureSearchPath(m_subdir_name[TEXTURE], "textures");
+    pushTextureSearchPath(m_subdir_name[TEXTURE]+"skybox/", "skybox");
+
     if (fileExists(m_subdir_name[TEXTURE]+"deprecated/"))
         pushTextureSearchPath(m_subdir_name[TEXTURE]+"deprecated/", "deprecatedtex");
 
