@@ -82,7 +82,7 @@ private:
     void loadKartProperties(const std::string& new_ident,
                             HandicapLevel handicap,
                             std::shared_ptr<GE::GERenderInfo> ri,
-                            const KartData& kart_data);
+                            const KartData& kart_data = KartData());
 protected:
     btTransform m_starting_transform;
 

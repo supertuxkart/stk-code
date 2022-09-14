@@ -46,8 +46,14 @@ AbstractKart::AbstractKart(const std::string& ident,
              : Moveable()
 {
     m_world_kart_id   = world_kart_id;
-    const RemoteKartInfo& rki = RaceManager::get()->getKartInfo(m_world_kart_id);
-    loadKartProperties(ident, handicap, ri, rki.getKartData());
+    if (RaceManager::get()->getKartGlobalPlayerId(m_world_kart_id) > -1)
+    {
+        const RemoteKartInfo& rki = RaceManager::get()->getKartInfo(
+            m_world_kart_id);
+        loadKartProperties(ident, handicap, ri, rki.getKartData());
+    }
+    else
+        loadKartProperties(ident, handicap, ri);
 }   // AbstractKart
 
 // ----------------------------------------------------------------------------
