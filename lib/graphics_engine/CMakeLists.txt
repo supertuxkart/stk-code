@@ -74,6 +74,7 @@ set(GE_SOURCES
     src/ge_vulkan_2d_renderer.cpp
     src/ge_vulkan_array_texture.cpp
     src/ge_vulkan_animated_mesh_scene_node.cpp
+    src/ge_vulkan_billboard_buffer.cpp
     src/ge_vulkan_camera_scene_node.cpp
     src/ge_vulkan_command_loader.cpp
     src/ge_vulkan_depth_texture.cpp

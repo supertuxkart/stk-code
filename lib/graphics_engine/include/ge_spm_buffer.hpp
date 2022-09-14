@@ -13,9 +13,10 @@ namespace GE
 {
 class GESPMBuffer : public irr::scene::IMeshBuffer
 {
-private:
+protected:
     irr::video::SMaterial m_material;
 
+private:
     std::vector<irr::video::S3DVertexSkinnedMesh> m_vertices;
 
     std::vector<irr::u16> m_indices;
@@ -163,11 +164,11 @@ public:
     // ------------------------------------------------------------------------
     void setVBOOffset(size_t offset)                 { m_vbo_offset = offset; }
     // ------------------------------------------------------------------------
-    size_t getVBOOffset() const                        { return m_vbo_offset; }
+    virtual size_t getVBOOffset() const                { return m_vbo_offset; }
     // ------------------------------------------------------------------------
     void setIBOOffset(size_t offset)                 { m_ibo_offset = offset; }
     // ------------------------------------------------------------------------
-    size_t getIBOOffset() const                        { return m_ibo_offset; }
+    virtual size_t getIBOOffset() const                { return m_ibo_offset; }
     // ------------------------------------------------------------------------
     bool hasSkinning() const                         { return m_has_skinning; }
     // ------------------------------------------------------------------------
@@ -175,10 +176,11 @@ public:
     // ------------------------------------------------------------------------
     void bindVertexIndexBuffer(VkCommandBuffer cmd)
     {
+        VkBuffer buffer = getVkBuffer();
         std::array<VkBuffer, 2> vertex_buffer =
         {{
-            m_buffer,
-            m_buffer
+            buffer,
+            buffer
         }};
         std::array<VkDeviceSize, 2> offsets =
         {{
@@ -187,7 +189,7 @@ public:
         }};
         vkCmdBindVertexBuffers(cmd, 0, vertex_buffer.size(),
             vertex_buffer.data(), offsets.data());
-        vkCmdBindIndexBuffer(cmd, m_buffer, m_ibo_offset,
+        vkCmdBindIndexBuffer(cmd, buffer, getIBOOffset(),
             VK_INDEX_TYPE_UINT16);
     }
     // ------------------------------------------------------------------------
@@ -199,9 +201,11 @@ public:
                                                          { return m_vertices; }
     // ------------------------------------------------------------------------
     std::vector<irr::u16>& getIndicesVector()             { return m_indices; }
+    // ------------------------------------------------------------------------
+    virtual VkBuffer getVkBuffer() const                   { return m_buffer; }
 };
 
-} // end namespace irr
+} // end namespace GE
 
 #endif
 

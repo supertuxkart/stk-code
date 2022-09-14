@@ -2,6 +2,7 @@
 #define HEADER_GE_VULKAN_DRAW_CALL_HPP
 
 #include <functional>
+#include <map>
 #include <string>
 #include <unordered_map>
 #include <unordered_set>
@@ -10,11 +11,16 @@
 #include "vulkan_wrapper.h"
 
 #include "matrix4.h"
+#include "quaternion.h"
 #include "SColor.h"
+#include "SMaterial.h"
 
 namespace irr
 {
-    namespace scene { class ISceneNode; }
+    namespace scene
+    {
+        class ISceneNode; class IBillboardSceneNode; struct SParticle;
+    }
 }
 
 namespace GE
@@ -44,6 +50,9 @@ struct ObjectData
     // ------------------------------------------------------------------------
     ObjectData(irr::scene::ISceneNode* node, int material_id,
                int skinning_offset, int irrlicht_material_id);
+    // ------------------------------------------------------------------------
+    ObjectData(irr::scene::IBillboardSceneNode* node, int material_id,
+               const irr::core::quaternion& rotation);
 };
 
 struct PipelineSettings
@@ -75,8 +84,15 @@ struct DrawCallData
 class GEVulkanDrawCall
 {
 private:
+    const int BILLBOARD_NODE = -1;
+
+    std::map<std::array<const irr::video::ITexture*, 8>, GESPMBuffer*>
+        m_billboard_buffers;
+
+    irr::core::quaternion m_billboard_rotation;
+
     std::unordered_map<GESPMBuffer*, std::unordered_map<std::string,
-        std::vector<std::pair<irr::scene::ISceneNode*, unsigned> > > >
+        std::vector<std::pair<irr::scene::ISceneNode*, int> > > >
         m_visible_nodes;
 
     GECullingTool* m_culling_tool;
@@ -143,6 +159,8 @@ public:
     ~GEVulkanDrawCall();
     // ------------------------------------------------------------------------
     void addNode(irr::scene::ISceneNode* node);
+    // ------------------------------------------------------------------------
+    void addBillboardNode(irr::scene::IBillboardSceneNode* node);
     // ------------------------------------------------------------------------
     void prepare(GEVulkanCameraSceneNode* cam);
     // ------------------------------------------------------------------------

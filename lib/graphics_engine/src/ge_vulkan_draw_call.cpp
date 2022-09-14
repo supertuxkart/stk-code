@@ -6,6 +6,7 @@
 #include "ge_spm.hpp"
 #include "ge_spm_buffer.hpp"
 #include "ge_vulkan_animated_mesh_scene_node.hpp"
+#include "ge_vulkan_billboard_buffer.hpp"
 #include "ge_vulkan_camera_scene_node.hpp"
 #include "ge_vulkan_driver.hpp"
 #include "ge_vulkan_dynamic_buffer.hpp"
@@ -18,6 +19,7 @@
 #include "ge_vulkan_texture_descriptor.hpp"
 
 #include "mini_glm.hpp"
+#include "IBillboardSceneNode.h"
 
 #include <algorithm>
 #include <limits>
@@ -66,6 +68,32 @@ ObjectData::ObjectData(irr::scene::ISceneNode* node, int material_id,
     m_custom_vertex_color = irr::video::SColor((uint32_t)-1);
 }   // ObjectData
 
+// ============================================================================
+ObjectData::ObjectData(irr::scene::IBillboardSceneNode* node, int material_id,
+                       const irr::core::quaternion& rotation)
+{
+    const irr::core::matrix4& model_mat = node->getAbsoluteTransformation();
+    float translation[3] = { model_mat[12], model_mat[13], model_mat[14] };
+    irr::core::vector2df billboard_size = node->getSize();
+    irr::core::vector3df scale(billboard_size.X / 2.0f,
+        billboard_size.Y / 2.0f, 0);
+    memcpy(&m_translation_x, translation, sizeof(translation));
+    memcpy(m_rotation, &rotation, sizeof(irr::core::quaternion));
+    memcpy(&m_scale_x, &scale, sizeof(irr::core::vector3df));
+    m_skinning_offset = 0;
+    m_material_id = material_id;
+    m_texture_trans[0] = 0.0f;
+    m_texture_trans[1] = 0.0f;
+    m_hue_change = 0.0f;
+    // Only support average of them at the moment
+    irr::video::SColor top, bottom;
+    node->getColor(top, bottom);
+    m_custom_vertex_color.setAlpha((top.getAlpha() + bottom.getAlpha()) / 2);
+    m_custom_vertex_color.setRed((top.getRed() + bottom.getRed()) / 2);
+    m_custom_vertex_color.setGreen((top.getGreen() + bottom.getGreen()) / 2);
+    m_custom_vertex_color.setBlue((top.getBlue() + bottom.getBlue()) / 2);
+}   // ObjectData
+
 // ----------------------------------------------------------------------------
 GEVulkanDrawCall::GEVulkanDrawCall()
 {
@@ -97,6 +125,8 @@ GEVulkanDrawCall::~GEVulkanDrawCall()
     delete [] m_data_padding;
     delete m_culling_tool;
     delete m_dynamic_data;
+    for (auto& p : m_billboard_buffers)
+       p.second->drop();
     if (m_data_layout != VK_NULL_HANDLE)
     {
         GEVulkanDriver* vk = getVKDriver();
@@ -151,6 +181,31 @@ void GEVulkanDrawCall::addNode(irr::scene::ISceneNode* node)
 }   // addNode
 
 // ----------------------------------------------------------------------------
+void GEVulkanDrawCall::addBillboardNode(irr::scene::IBillboardSceneNode* node)
+{
+    irr::core::aabbox3df bb = node->getTransformedBoundingBox();
+    if (m_culling_tool->isCulled(bb))
+        return;
+    irr::video::SMaterial m = node->getMaterial(0);
+    std::array<const irr::video::ITexture*, 8> textures =
+    {{
+        m.TextureLayer[0].Texture,
+        m.TextureLayer[1].Texture,
+        m.TextureLayer[2].Texture,
+        m.TextureLayer[3].Texture,
+        m.TextureLayer[4].Texture,
+        m.TextureLayer[5].Texture,
+        m.TextureLayer[6].Texture,
+        m.TextureLayer[7].Texture
+    }};
+    if (m_billboard_buffers.find(textures) == m_billboard_buffers.end())
+        m_billboard_buffers[textures] = new GEVulkanBillboardBuffer(m);
+    GESPMBuffer* buffer = m_billboard_buffers.at(textures);
+    const std::string& shader = getShader(node, 0);
+    m_visible_nodes[buffer][shader].emplace_back(node, BILLBOARD_NODE);
+}   // addBillboardNode
+
+// ----------------------------------------------------------------------------
 void GEVulkanDrawCall::generate()
 {
     if (!m_visible_nodes.empty() && m_data_layout == VK_NULL_HANDLE)
@@ -173,7 +228,7 @@ void GEVulkanDrawCall::generate()
     }
 
     using Nodes = std::pair<GESPMBuffer*, std::unordered_map<
-        std::string, std::vector<std::pair<irr::scene::ISceneNode*, unsigned
+        std::string, std::vector<std::pair<irr::scene::ISceneNode*, int
         > > > >;
     std::vector<Nodes> visible_nodes;
 
@@ -242,12 +297,21 @@ void GEVulkanDrawCall::generate()
             for (auto& r : q.second)
             {
                 irr::scene::ISceneNode* node = r.first;
-                int skinning_offset = -1000;
-                auto it = skinning_offets.find(node);
-                if (it != skinning_offets.end())
-                    skinning_offset = it->second;
-                m_visible_objects.emplace_back(node, material_id,
-                    skinning_offset, r.second);
+                if (r.second == BILLBOARD_NODE)
+                {
+                    m_visible_objects.emplace_back(
+                        static_cast<irr::scene::IBillboardSceneNode*>(
+                        node), material_id, m_billboard_rotation);
+                }
+                else
+                {
+                    int skinning_offset = -1000;
+                    auto it = skinning_offets.find(node);
+                    if (it != skinning_offets.end())
+                        skinning_offset = it->second;
+                    m_visible_objects.emplace_back(node, material_id,
+                        skinning_offset, r.second);
+                }
             }
             VkDrawIndexedIndirectCommand cmd;
             cmd.indexCount = p.first->getIndexCount();
@@ -310,6 +374,7 @@ void GEVulkanDrawCall::prepare(GEVulkanCameraSceneNode* cam)
 {
     reset();
     m_culling_tool->init(cam);
+    m_billboard_rotation = MiniGLM::getQuaternion(cam->getViewMatrix());
 }   // prepare
 
 // ----------------------------------------------------------------------------

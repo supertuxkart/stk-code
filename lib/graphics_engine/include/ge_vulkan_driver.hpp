@@ -23,6 +23,7 @@ using namespace video;
 
 namespace GE
 {
+    class GESPM;
     class GEVulkanDepthTexture;
     class GEVulkanDrawCall;
     class GEVulkanFBOTexture;
@@ -363,6 +364,7 @@ namespace GE
         void clearDrawCallsCache();
         void addDrawCallToCache(std::unique_ptr<GEVulkanDrawCall>& dc);
         std::unique_ptr<GEVulkanDrawCall> getDrawCallFromCache();
+        GESPM* getBillboardQuad() const             { return m_billboard_quad; }
     private:
         struct SwapChainSupportDetails
         {
@@ -506,6 +508,7 @@ namespace GE
         u32 m_rtt_polycount;
 
         std::vector<std::unique_ptr<GEVulkanDrawCall> > m_draw_calls_cache;
+        GESPM* m_billboard_quad;
 
         void createInstance(SDL_Window* window);
         void findPhysicalDevice();
@@ -529,6 +532,7 @@ namespace GE
         void destroySwapChainRelated(bool handle_surface);
         void createSwapChainRelated(bool handle_surface);
         void buildCommandBuffers();
+        void createBillboardQuad();
     };
 
 }

@@ -16,17 +16,13 @@ void GECullingTool::init(GEVulkanCameraSceneNode* cam)
 }   // init
 
 // ----------------------------------------------------------------------------
-bool GECullingTool::isCulled(GESPMBuffer* buffer,
-                                   irr::scene::ISceneNode* node)
+bool GECullingTool::isCulled(irr::core::aabbox3df& bb)
 {
-    using namespace irr;
-    using namespace core;
-    aabbox3df bb = buffer->getBoundingBox();
-    node->getAbsoluteTransformation().transformBoxEx(bb);
-
     if (!m_cam_bbox.intersectsWithBox(bb))
         return true;
 
+    using namespace irr;
+    using namespace core;
     quaternion edges[8] =
     {
         quaternion(bb.MinEdge.X, bb.MinEdge.Y, bb.MinEdge.Z, 1.0f),
@@ -54,6 +50,14 @@ bool GECullingTool::isCulled(GESPMBuffer* buffer,
             return true;
     }
     return false;
+}   // isCulled
+
+// ----------------------------------------------------------------------------
+bool GECullingTool::isCulled(GESPMBuffer* buffer, irr::scene::ISceneNode* node)
+{
+    irr::core::aabbox3df bb = buffer->getBoundingBox();
+    node->getAbsoluteTransformation().transformBoxEx(bb);
+    return isCulled(bb);
 }   // isCulled
 
 }

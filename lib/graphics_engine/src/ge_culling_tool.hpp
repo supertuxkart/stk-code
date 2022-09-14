@@ -25,6 +25,8 @@ public:
     // ------------------------------------------------------------------------
     void init(GEVulkanCameraSceneNode* cam);
     // ------------------------------------------------------------------------
+    bool isCulled(irr::core::aabbox3df& bb);
+    // ------------------------------------------------------------------------
     bool isCulled(GESPMBuffer* buffer, irr::scene::ISceneNode* node);
 };   // GECullingTool
 

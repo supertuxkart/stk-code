@@ -17,6 +17,7 @@
 #include "ge_vulkan_texture_descriptor.hpp"
 
 #include "mini_glm.hpp"
+#include "IBillboardSceneNode.h"
 #include <sstream>
 
 namespace GE
@@ -270,6 +271,13 @@ irr::u32 GEVulkanSceneManager::registerNodeForRendering(
     if (node->getType() == irr::scene::ESNT_SKY_BOX)
     {
         GEVulkanSkyBoxRenderer::addSkyBox(cam, node);
+        return 1;
+    }
+
+    if (node->getType() == irr::scene::ESNT_BILLBOARD)
+    {
+        m_draw_calls.at(cam)->addBillboardNode(
+            static_cast<irr::scene::IBillboardSceneNode*>(node));
         return 1;
     }
 

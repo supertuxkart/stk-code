@@ -3,6 +3,8 @@
 #include "ge_compressor_astc_4x4.hpp"
 #include "ge_compressor_bptc_bc7.hpp"
 #include "ge_main.hpp"
+#include "ge_spm.hpp"
+#include "ge_spm_buffer.hpp"
 
 #include "ge_vulkan_2d_renderer.hpp"
 #include "ge_vulkan_camera_scene_node.hpp"
@@ -16,6 +18,8 @@
 #include "ge_vulkan_shader_manager.hpp"
 #include "ge_vulkan_skybox_renderer.hpp"
 #include "ge_vulkan_texture_descriptor.hpp"
+
+#include "mini_glm.hpp"
 
 #include "ISceneManager.h"
 #include "IrrlichtDevice.h"
@@ -499,7 +503,8 @@ GEVulkanDriver::GEVulkanDriver(const SIrrlichtCreationParameters& params,
                 m_params(params), m_irrlicht_device(device),
                 m_depth_texture(NULL), m_mesh_texture_descriptor(NULL),
                 m_rtt_texture(NULL), m_prev_rtt_texture(NULL),
-                m_separate_rtt_texture(NULL), m_rtt_polycount(0)
+                m_separate_rtt_texture(NULL), m_rtt_polycount(0),
+                m_billboard_quad(NULL)
 {
     m_vk.reset(new VK());
     m_physical_device = VK_NULL_HANDLE;
@@ -678,6 +683,11 @@ void GEVulkanDriver::destroyVulkan()
     {
         m_transparent_texture->drop();
         m_transparent_texture = NULL;
+    }
+    if (m_billboard_quad)
+    {
+        getVulkanMeshCache()->removeMesh(m_billboard_quad);
+        m_billboard_quad = NULL;
     }
 
     if (m_irrlicht_device->getSceneManager() &&
@@ -1610,6 +1620,10 @@ bool GEVulkanDriver::beginScene(bool backBuffer, bool zBuffer, SColor color,
                                 const SExposedVideoData& videoData,
                                 core::rect<s32>* sourceRect)
 {
+    if (m_billboard_quad == NULL && m_irrlicht_device->getSceneManager() &&
+        m_irrlicht_device->getSceneManager()->getMeshCache())
+        createBillboardQuad();
+
     if (g_schedule_pausing_rendering.load())
     {
         pauseRendering();
@@ -2465,6 +2479,57 @@ std::unique_ptr<GEVulkanDrawCall> GEVulkanDriver::getDrawCallFromCache()
     m_draw_calls_cache.pop_back();
     return dc;
 }   // getDrawCallFromCache
+
+// ----------------------------------------------------------------------------
+void GEVulkanDriver::createBillboardQuad()
+{
+    m_billboard_quad = new GESPM();
+    GESPMBuffer* buffer = new GESPMBuffer();
+    /* Vertices are:
+    (-1, 1, 0) 2--1 (1, 1, 0)
+               |\ |
+               | \|
+   (-1, -1, 0) 3--0 (1, -1, 0)
+               */
+    short one_hf = 15360;
+    video::S3DVertexSkinnedMesh sp;
+    sp.m_position = core::vector3df(1, -1, 0);
+    sp.m_normal = MiniGLM::compressVector3(core::vector3df(0, 0, 1));
+    sp.m_color = video::SColor((uint32_t)-1);
+    sp.m_all_uvs[0] = 15360;
+    sp.m_all_uvs[1] = 15360;
+    buffer->getVerticesVector().push_back(sp);
+
+    sp.m_position = core::vector3df(1, 1, 0);
+    sp.m_all_uvs[0] = one_hf;
+    sp.m_all_uvs[1] = 0;
+    buffer->getVerticesVector().push_back(sp);
+
+    sp.m_position = core::vector3df(-1, 1, 0);
+    sp.m_all_uvs[0] = 0;
+    sp.m_all_uvs[1] = 0;
+    buffer->getVerticesVector().push_back(sp);
+
+    sp.m_position = core::vector3df(-1, -1, 0);
+    sp.m_all_uvs[0] = 0;
+    sp.m_all_uvs[1] = one_hf;
+    buffer->getVerticesVector().push_back(sp);
+
+    buffer->getIndicesVector().push_back(2);
+    buffer->getIndicesVector().push_back(1);
+    buffer->getIndicesVector().push_back(0);
+    buffer->getIndicesVector().push_back(2);
+    buffer->getIndicesVector().push_back(0);
+    buffer->getIndicesVector().push_back(3);
+    buffer->recalculateBoundingBox();
+    m_billboard_quad->addMeshBuffer(buffer);
+    m_billboard_quad->finalize();
+
+    std::stringstream oss;
+    oss << (uint64_t)m_billboard_quad;
+    getVulkanMeshCache()->addMesh(oss.str().c_str(), m_billboard_quad);
+    m_billboard_quad->drop();
+}   // createBillboardQuad
 
 }
 
