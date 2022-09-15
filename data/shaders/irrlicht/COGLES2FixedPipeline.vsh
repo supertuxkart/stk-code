@@ -10,7 +10,7 @@ attribute vec2 inTexCoord0;
 
 uniform mat4 uMvpMatrix;
 
-uniform mat4 uTextureMatrix0;
+uniform vec2 uTextureTrans0;
 //uniform mat4 uTextureMatrix1;
 
 /* Varyings */
@@ -24,8 +24,7 @@ void main(void)
 {
 	gl_Position = uMvpMatrix * vec4(inVertexPosition,1.0);
 
-	vec4 TexCoord0 = vec4(inTexCoord0.x, inTexCoord0.y, 0.0, 0.0);
-	varTexCoord0 = vec4(uTextureMatrix0 * TexCoord0).xy;
+	varTexCoord0 = inTexCoord0 + uTextureTrans0;
 
 	//vec4 TexCoord1 = vec4(inTexCoord1.x, inTexCoord1.y, 0.0, 0.0);
 	//varTexCoord1 = vec4(uTextureMatrix1 * TexCoord1).xy;
