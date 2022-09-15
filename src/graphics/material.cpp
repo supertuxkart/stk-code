@@ -970,7 +970,7 @@ std::function<void(irr::video::IImage*)> Material::getMaskImageMani() const
         ->getDriverAttributes().getAttributeAsDimension2d("MAX_TEXTURE_SIZE");
 
     // Material using alpha channel will be colorized as a whole
-    if (irr_driver->getVideoDriver()->getDriverType() == EDT_VULKAN &&
+    if (CVS->supportsColorization() &&
         !useAlphaChannel() && (!m_colorization_mask.empty() ||
         m_colorization_factor > 0.0f || m_colorizable))
     {

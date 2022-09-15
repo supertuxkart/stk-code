@@ -14,6 +14,8 @@
 #include "os.h"
 #include "COGLES2Driver.h"
 
+#include "ge_render_info.hpp"
+
 namespace irr
 {
 namespace video
@@ -132,9 +134,17 @@ bool COGLES2FixedPipelineRenderer::OnRender(IMaterialRendererServices* service, 
 		case EMT_STK_GRASS:
 			materialType = 10;
 			break;
+		case EMT_ONETEXTURE_BLEND:
+			materialType = 11;
+			break;
 		default:
 			break;
 		}
+
+		float hue_change = 0.0f;
+		if (Driver->getCurrentMaterial().getRenderInfo())
+			hue_change = Driver->getCurrentMaterial().getRenderInfo()->getHue();
+		IMaterialRendererServices::setPixelShaderConstant("uHueChange", &hue_change, 1);
 
 		IMaterialRendererServices::setPixelShaderConstant("uMaterialType", &materialType, 1);
 

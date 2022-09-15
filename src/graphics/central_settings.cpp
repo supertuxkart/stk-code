@@ -502,7 +502,8 @@ bool CentralVideoSettings::isARBTextureBufferObjectUsable() const
 
 bool CentralVideoSettings::supportsColorization() const
 {
-    return isGLSL() || GE::getDriver()->getDriverType() == video::EDT_VULKAN;
+    return isGLSL() || GE::getDriver()->getDriverType() == video::EDT_VULKAN ||
+        GE::getDriver()->getDriverType() == video::EDT_OGLES2;
 }
 
 #endif   // !SERVER_ONLY

@@ -465,6 +465,11 @@ namespace video
 			return m_render_info;
 		}
 
+		const std::shared_ptr<GE::GERenderInfo>& getRenderInfo() const
+		{
+			return m_render_info;
+		}
+
 		void setRenderInfo(std::shared_ptr<GE::GERenderInfo> ri)
 		{
 			m_render_info = ri;
