@@ -357,11 +357,23 @@ void draw2DImage(const video::ITexture* texture,
                  bool use_alpha_channel_of_texture,
                  bool draw_translucently, float rotation)
 {
+    video::SColor translucence[4] =
+    {
+        (unsigned)-1, (unsigned)-1, (unsigned)-1, (unsigned)-1
+    };
+    for (unsigned i = 0; i < 4; i++)
+    {
+        if (colors)
+            translucence[i] = colors[i];
+        if (draw_translucently)
+            translucence[i].setAlpha(128);
+    }
+
     if (!CVS->isGLSL())
     {
         irr_driver->getVideoDriver()->draw2DImage(texture, destRect, sourceRect,
-                                                  clip_rect, colors,
-                                                  use_alpha_channel_of_texture);
+            clip_rect, draw_translucently ? translucence : colors,
+            use_alpha_channel_of_texture);
         return;
     }
 
@@ -373,12 +385,7 @@ void draw2DImage(const video::ITexture* texture,
             center_pos_x, center_pos_y, tex_width, tex_height,
             tex_center_pos_x, tex_center_pos_y);
 
-    if (draw_translucently)
-    {
-        glEnable(GL_BLEND);
-        glBlendFunc(GL_SRC_ALPHA, GL_ONE);
-    }
-    else if (use_alpha_channel_of_texture)
+    if (use_alpha_channel_of_texture)
     {
         glEnable(GL_BLEND);
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -399,9 +406,10 @@ void draw2DImage(const video::ITexture* texture,
                   (s32)render_target_size.Height - clip_rect->LowerRightCorner.Y,
                   clip_rect->getWidth(), clip_rect->getHeight());
     }
-    if (colors)
+    if (draw_translucently || colors)
     {
-        drawTexColoredQuad(texture, colors, width, height, center_pos_x,
+        drawTexColoredQuad(texture, draw_translucently ? translucence : colors,
+                           width, height, center_pos_x,
                            center_pos_y, tex_center_pos_x, tex_center_pos_y,
                            tex_width, tex_height, rotation);
     }
