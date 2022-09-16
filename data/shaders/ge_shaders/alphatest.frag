@@ -13,7 +13,6 @@ void main()
     vec4 tex_color = sampleMeshTexture0(f_material_id, f_uv);
     if (tex_color.a * f_vertex_color.a < 0.5)
         discard;
-    tex_color.xyz *= f_vertex_color.xyz;
 
     if (f_hue_change > 0.0)
     {
@@ -23,5 +22,6 @@ void main()
         tex_color = vec4(new_color.r, new_color.g, new_color.b, tex_color.a);
     }
 
+    tex_color.xyz *= f_vertex_color.xyz;
     o_color = vec4(tex_color.xyz, 1.0);
 }

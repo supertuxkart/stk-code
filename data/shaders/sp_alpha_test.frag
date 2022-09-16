@@ -18,7 +18,6 @@ void main(void)
     {
         discard;
     }
-    col.xyz *= color.xyz;
 
     if (hue_change > 0.0)
     {
@@ -27,6 +26,7 @@ void main(void)
         vec3 new_color = hsvToRgb(vec3(new_xy.x, new_xy.y, old_hsv.z));
         col = vec4(new_color.r, new_color.g, new_color.b, col.a);
     }
+    col.xyz *= color.xyz;
 
 #if defined(Advanced_Lighting_Enabled)
     vec4 layer_2 = sampleTextureLayer2(uv);

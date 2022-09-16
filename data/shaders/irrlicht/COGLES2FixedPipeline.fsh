@@ -69,6 +69,7 @@ vec4 renderSolid()
 				max(old_hsv.y, saturation)), vec2(mask_step, mask_step));
 			Color.rgb = hsvToRgb(vec3(new_xy.x, new_xy.y, old_hsv.z));
 		}
+		Color.rgb *= varVertexColor.rgb;
 		Color.a = 1.0;
 	}
 	else
@@ -76,7 +77,6 @@ vec4 renderSolid()
 		Color = varVertexColor;
 		Color.a = 1.0;
 	}
-		
 	return Color;
 }
 
@@ -150,8 +150,7 @@ vec4 renderTransparent()
 
 vec4 renderTransparentVertexColor()
 {
-	vec4 Color = varVertexColor;
-
+	vec4 Color = vec4(1.0, 1.0, 1.0, 1.0);
 	if(uTextureUsage0)
 	{
 		Color *= texture2D(uTextureUnit0, varTexCoord0);
@@ -162,6 +161,7 @@ vec4 renderTransparentVertexColor()
 			vec3 new_color = hsvToRgb(vec3(new_xy.x, new_xy.y, old_hsv.z));
 			Color.rgb = vec3(new_color.r, new_color.g, new_color.b);
 		}
+		Color *= varVertexColor;
 	}
 
 	return Color;
