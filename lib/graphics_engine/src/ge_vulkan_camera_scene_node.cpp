@@ -30,11 +30,13 @@ void GEVulkanCameraSceneNode::render()
 
     m_ubo_data.m_view_matrix = ViewArea.getTransform(irr::video::ETS_VIEW);
     m_ubo_data.m_projection_matrix = ViewArea.getTransform(irr::video::ETS_PROJECTION);
-    // Irrlicht matrix4 was originally designed for OpenGL,
-    // where the Y coordinate of the clip coordinates is inverted.
-    // The easiest way to compensate for that is to flip the sign on the
-    // scaling factor of the Y axis in the projection matrix.
-    m_ubo_data.m_projection_matrix(1, 1) *= -1.0f;
+    // https://matthewwellings.com/blog/the-new-vulkan-coordinate-system/
+    // Vulkan clip space has inverted Y and half Z
+    irr::core::matrix4 clip;
+    clip[5] = -1.0f;
+    clip[10] = 0.5f;
+    clip[14] = 0.5f;
+    m_ubo_data.m_projection_matrix = clip * m_ubo_data.m_projection_matrix;
     GEVulkanDriver* vk = getVKDriver();
     if (!vk->getRTTTexture())
     {
