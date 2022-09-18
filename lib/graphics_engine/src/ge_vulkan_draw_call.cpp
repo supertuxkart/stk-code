@@ -355,18 +355,35 @@ std::string GEVulkanDrawCall::getShader(irr::scene::ISceneNode* node,
                                         int material_id)
 {
     irr::video::SMaterial& m = node->getMaterial(material_id);
-    auto& ri = m.getRenderInfo();
-    if (ri && ri->isTransparent())
-        return "ghost";
+    std::string shader;
     switch (m.MaterialType)
     {
-    case irr::video::EMT_TRANSPARENT_ADD_COLOR: return "additive";
-    case irr::video::EMT_TRANSPARENT_ALPHA_CHANNEL_REF: return "alphatest";
-    case irr::video::EMT_ONETEXTURE_BLEND: return "alphablend";
-    case irr::video::EMT_SOLID_2_LAYER: return "decal";
-    case irr::video::EMT_STK_GRASS: return "grass";
-    default: return "solid";
+    case irr::video::EMT_TRANSPARENT_ADD_COLOR:
+        shader = "additive";
+        break;
+    case irr::video::EMT_TRANSPARENT_ALPHA_CHANNEL_REF:
+        shader = "alphatest";
+        break;
+    case irr::video::EMT_ONETEXTURE_BLEND:
+        shader = "alphablend";
+        break;
+    case irr::video::EMT_SOLID_2_LAYER:
+        shader = "decal";
+        break;
+    case irr::video::EMT_STK_GRASS:
+        shader = "grass";
+        break;
+    default:
+        shader = "solid";
+        break;
     }
+    auto& ri = m.getRenderInfo();
+    // Use real transparent shader first
+    if (m.MaterialType != irr::video::EMT_TRANSPARENT_ADD_COLOR &&
+        m.MaterialType != irr::video::EMT_ONETEXTURE_BLEND &&
+        ri && ri->isTransparent())
+        return "ghost";
+    return shader;
 }   // getShader
 
 // ----------------------------------------------------------------------------
