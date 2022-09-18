@@ -13,6 +13,7 @@
 
 #include "matrix4.h"
 #include "quaternion.h"
+#include "ESceneNodeTypes.h"
 #include "SColor.h"
 #include "SMaterial.h"
 
@@ -54,6 +55,9 @@ struct ObjectData
     // ------------------------------------------------------------------------
     ObjectData(irr::scene::IBillboardSceneNode* node, int material_id,
                const irr::core::quaternion& rotation);
+    // ------------------------------------------------------------------------
+    ObjectData(const irr::scene::SParticle& particle, int material_id,
+               const irr::core::quaternion& rotation);
 };
 
 struct PipelineSettings
@@ -89,6 +93,8 @@ private:
         _IRR_MATERIAL_MAX_TEXTURES_> TexturesList;
 
     const int BILLBOARD_NODE = -1;
+
+    const int PARTICLE_NODE = -2;
 
     std::map<TexturesList, GESPMBuffer*> m_billboard_buffers;
 
@@ -171,7 +177,8 @@ public:
     // ------------------------------------------------------------------------
     void addNode(irr::scene::ISceneNode* node);
     // ------------------------------------------------------------------------
-    void addBillboardNode(irr::scene::IBillboardSceneNode* node);
+    void addBillboardNode(irr::scene::ISceneNode* node,
+                          irr::scene::ESCENE_NODE_TYPE node_type);
     // ------------------------------------------------------------------------
     void prepare(GEVulkanCameraSceneNode* cam);
     // ------------------------------------------------------------------------

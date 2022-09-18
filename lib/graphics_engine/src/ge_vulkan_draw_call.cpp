@@ -20,6 +20,7 @@
 
 #include "mini_glm.hpp"
 #include "IBillboardSceneNode.h"
+#include "IParticleSystemSceneNode.h"
 
 #include <algorithm>
 #include <limits>
@@ -92,6 +93,24 @@ ObjectData::ObjectData(irr::scene::IBillboardSceneNode* node, int material_id,
     m_custom_vertex_color.setRed((top.getRed() + bottom.getRed()) / 2);
     m_custom_vertex_color.setGreen((top.getGreen() + bottom.getGreen()) / 2);
     m_custom_vertex_color.setBlue((top.getBlue() + bottom.getBlue()) / 2);
+}   // ObjectData
+
+// ============================================================================
+ObjectData::ObjectData(const irr::scene::SParticle& particle, int material_id,
+                       const irr::core::quaternion& rotation)
+{
+    using namespace MiniGLM;
+    memcpy(&m_translation_x, &particle.pos, sizeof(float) * 3);
+    memcpy(m_rotation, &rotation, sizeof(irr::core::quaternion));
+    irr::core::vector3df scale(particle.size.Width / 2.0f,
+        particle.size.Height / 2.0f, 0);
+    memcpy(&m_scale_x, &scale, sizeof(irr::core::vector3df));
+    m_skinning_offset = 0;
+    m_material_id = material_id;
+    m_texture_trans[0] = 0.0f;
+    m_texture_trans[1] = 0.0f;
+    m_hue_change = 0.0f;
+    m_custom_vertex_color = particle.color;
 }   // ObjectData
 
 // ----------------------------------------------------------------------------
@@ -181,7 +200,8 @@ void GEVulkanDrawCall::addNode(irr::scene::ISceneNode* node)
 }   // addNode
 
 // ----------------------------------------------------------------------------
-void GEVulkanDrawCall::addBillboardNode(irr::scene::IBillboardSceneNode* node)
+void GEVulkanDrawCall::addBillboardNode(irr::scene::ISceneNode* node,
+                                        irr::scene::ESCENE_NODE_TYPE node_type)
 {
     irr::core::aabbox3df bb = node->getTransformedBoundingBox();
     if (m_culling_tool->isCulled(bb))
@@ -194,7 +214,9 @@ void GEVulkanDrawCall::addBillboardNode(irr::scene::IBillboardSceneNode* node)
         m_billboard_buffers[textures] = new GEVulkanBillboardBuffer(m);
     GESPMBuffer* buffer = m_billboard_buffers.at(textures);
     const std::string& shader = getShader(node, 0);
-    m_visible_nodes[buffer][shader].emplace_back(node, BILLBOARD_NODE);
+    m_visible_nodes[buffer][shader].emplace_back(node,
+        node_type == irr::scene::ESNT_BILLBOARD ? BILLBOARD_NODE :
+        PARTICLE_NODE);
 }   // addBillboardNode
 
 // ----------------------------------------------------------------------------
@@ -278,7 +300,7 @@ void GEVulkanDrawCall::generate()
             for (auto& r : q.second)
             {
                 irr::scene::ISceneNode* node = r.first;
-                if (r.second == BILLBOARD_NODE)
+                if (r.second == BILLBOARD_NODE || r.second == PARTICLE_NODE)
                 {
                     if (GEVulkanFeatures::supportsDifferentTexturePerDraw())
                     {
@@ -287,9 +309,27 @@ void GEVulkanDrawCall::generate()
                         const irr::video::ITexture** list = &textures[0];
                         material_id = m_texture_descriptor->getTextureID(list);
                     }
-                    m_visible_objects.emplace_back(
-                        static_cast<irr::scene::IBillboardSceneNode*>(
-                        node), material_id, m_billboard_rotation);
+                    if (r.second == BILLBOARD_NODE)
+                    {
+                        m_visible_objects.emplace_back(
+                            static_cast<irr::scene::IBillboardSceneNode*>(
+                            node), material_id, m_billboard_rotation);
+                    }
+                    else
+                    {
+                        irr::scene::IParticleSystemSceneNode* pn =
+                            static_cast<irr::scene::IParticleSystemSceneNode*>(
+                            node);
+                        const core::array<SParticle>& particles =
+                            pn->getParticles();
+                        unsigned ps = particles.size();
+                        visible_count += ps - 1;
+                        for (unsigned i = 0; i < ps; i++)
+                        {
+                            m_visible_objects.emplace_back(particles[i],
+                                material_id, m_billboard_rotation);
+                        }
+                    }
                 }
                 else
                 {

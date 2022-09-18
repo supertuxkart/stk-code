@@ -274,10 +274,10 @@ irr::u32 GEVulkanSceneManager::registerNodeForRendering(
         return 1;
     }
 
-    if (node->getType() == irr::scene::ESNT_BILLBOARD)
+    if (node->getType() == irr::scene::ESNT_BILLBOARD ||
+        node->getType() == irr::scene::ESNT_PARTICLE_SYSTEM)
     {
-        m_draw_calls.at(cam)->addBillboardNode(
-            static_cast<irr::scene::IBillboardSceneNode*>(node));
+        m_draw_calls.at(cam)->addBillboardNode(node, node->getType());
         return 1;
     }
 
