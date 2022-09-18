@@ -3,42 +3,50 @@ layout(binding = 0) uniform sampler2D f_mesh_textures[SAMPLER_SIZE * TOTAL_MESH_
 
 vec4 sampleMeshTexture0(int material_id, vec2 uv)
 {
-    return texture(f_mesh_textures[(TOTAL_MESH_TEXTURE_LAYER * material_id) + 0], uv);
+    int id = (TOTAL_MESH_TEXTURE_LAYER * material_id) + 0;
+    return texture(f_mesh_textures[GE_SAMPLE_TEX_INDEX(id)], uv);
 }
 
 vec4 sampleMeshTexture1(int material_id, vec2 uv)
 {
-    return texture(f_mesh_textures[(TOTAL_MESH_TEXTURE_LAYER * material_id) + 1], uv);
+    int id = (TOTAL_MESH_TEXTURE_LAYER * material_id) + 1;
+    return texture(f_mesh_textures[GE_SAMPLE_TEX_INDEX(id)], uv);
 }
 
 vec4 sampleMeshTexture2(int material_id, vec2 uv)
 {
-    return texture(f_mesh_textures[(TOTAL_MESH_TEXTURE_LAYER * material_id) + 2], uv);
+    int id = (TOTAL_MESH_TEXTURE_LAYER * material_id) + 2;
+    return texture(f_mesh_textures[GE_SAMPLE_TEX_INDEX(id)], uv);
 }
 
 vec4 sampleMeshTexture3(int material_id, vec2 uv)
 {
-    return texture(f_mesh_textures[(TOTAL_MESH_TEXTURE_LAYER * material_id) + 3], uv);
+    int id = (TOTAL_MESH_TEXTURE_LAYER * material_id) + 3;
+    return texture(f_mesh_textures[GE_SAMPLE_TEX_INDEX(id)], uv);
 }
 
 vec4 sampleMeshTexture4(int material_id, vec2 uv)
 {
-    return texture(f_mesh_textures[(TOTAL_MESH_TEXTURE_LAYER * material_id) + 4], uv);
+    int id = (TOTAL_MESH_TEXTURE_LAYER * material_id) + 4;
+    return texture(f_mesh_textures[GE_SAMPLE_TEX_INDEX(id)], uv);
 }
 
 vec4 sampleMeshTexture5(int material_id, vec2 uv)
 {
-    return texture(f_mesh_textures[(TOTAL_MESH_TEXTURE_LAYER * material_id) + 5], uv);
+    int id = (TOTAL_MESH_TEXTURE_LAYER * material_id) + 5;
+    return texture(f_mesh_textures[GE_SAMPLE_TEX_INDEX(id)], uv);
 }
 
 vec4 sampleMeshTexture6(int material_id, vec2 uv)
 {
-    return texture(f_mesh_textures[(TOTAL_MESH_TEXTURE_LAYER * material_id) + 6], uv);
+    int id = (TOTAL_MESH_TEXTURE_LAYER * material_id) + 6;
+    return texture(f_mesh_textures[GE_SAMPLE_TEX_INDEX(id)], uv);
 }
 
 vec4 sampleMeshTexture7(int material_id, vec2 uv)
 {
-    return texture(f_mesh_textures[(TOTAL_MESH_TEXTURE_LAYER * material_id) + 7], uv);
+    int id = (TOTAL_MESH_TEXTURE_LAYER * material_id) + 7;
+    return texture(f_mesh_textures[GE_SAMPLE_TEX_INDEX(id)], uv);
 }
 #else
 layout(binding = 0) uniform sampler2D f_mesh_texture_0;

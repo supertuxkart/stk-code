@@ -187,17 +187,9 @@ void GEVulkanDrawCall::addBillboardNode(irr::scene::IBillboardSceneNode* node)
     if (m_culling_tool->isCulled(bb))
         return;
     irr::video::SMaterial m = node->getMaterial(0);
-    std::array<const irr::video::ITexture*, 8> textures =
-    {{
-        m.TextureLayer[0].Texture,
-        m.TextureLayer[1].Texture,
-        m.TextureLayer[2].Texture,
-        m.TextureLayer[3].Texture,
-        m.TextureLayer[4].Texture,
-        m.TextureLayer[5].Texture,
-        m.TextureLayer[6].Texture,
-        m.TextureLayer[7].Texture
-    }};
+    TexturesList textures = {};
+    if (!GEVulkanFeatures::supportsDifferentTexturePerDraw())
+        textures = getTexturesList(m);
     if (m_billboard_buffers.find(textures) == m_billboard_buffers.end())
         m_billboard_buffers[textures] = new GEVulkanBillboardBuffer(m);
     GESPMBuffer* buffer = m_billboard_buffers.at(textures);
@@ -265,20 +257,9 @@ void GEVulkanDrawCall::generate()
     unsigned accumulated_instance = 0;
     for (auto& p : visible_nodes)
     {
-        irr::video::SMaterial& m = p.first->getMaterial();
-        std::array<const irr::video::ITexture*, 8> textures =
-        {{
-            m.TextureLayer[0].Texture,
-            m.TextureLayer[1].Texture,
-            m.TextureLayer[2].Texture,
-            m.TextureLayer[3].Texture,
-            m.TextureLayer[4].Texture,
-            m.TextureLayer[5].Texture,
-            m.TextureLayer[6].Texture,
-            m.TextureLayer[7].Texture
-        }};
+        TexturesList textures = getTexturesList(p.first->getMaterial());
         const irr::video::ITexture** list = &textures[0];
-        const int material_id = m_texture_descriptor->getTextureID(list);
+        int material_id = m_texture_descriptor->getTextureID(list);
         if (!GEVulkanFeatures::supportsBindMeshTexturesAtOnce())
             m_materials[p.first] = material_id;
 
@@ -299,6 +280,13 @@ void GEVulkanDrawCall::generate()
                 irr::scene::ISceneNode* node = r.first;
                 if (r.second == BILLBOARD_NODE)
                 {
+                    if (GEVulkanFeatures::supportsDifferentTexturePerDraw())
+                    {
+                        const irr::video::SMaterial& m = node->getMaterial(0);
+                        TexturesList textures = getTexturesList(m);
+                        const irr::video::ITexture** list = &textures[0];
+                        material_id = m_texture_descriptor->getTextureID(list);
+                    }
                     m_visible_objects.emplace_back(
                         static_cast<irr::scene::IBillboardSceneNode*>(
                         node), material_id, m_billboard_rotation);

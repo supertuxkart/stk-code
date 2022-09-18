@@ -1,6 +1,7 @@
 #ifndef HEADER_GE_VULKAN_DRAW_CALL_HPP
 #define HEADER_GE_VULKAN_DRAW_CALL_HPP
 
+#include <array>
 #include <functional>
 #include <map>
 #include <string>
@@ -84,10 +85,12 @@ struct DrawCallData
 class GEVulkanDrawCall
 {
 private:
+    typedef std::array<const irr::video::ITexture*,
+        _IRR_MATERIAL_MAX_TEXTURES_> TexturesList;
+
     const int BILLBOARD_NODE = -1;
 
-    std::map<std::array<const irr::video::ITexture*, 8>, GESPMBuffer*>
-        m_billboard_buffers;
+    std::map<TexturesList, GESPMBuffer*> m_billboard_buffers;
 
     irr::core::quaternion m_billboard_rotation;
 
@@ -151,6 +154,14 @@ private:
             vkCmdPushConstants(cmd, m_pipeline_layout,
                 VK_SHADER_STAGE_ALL_GRAPHICS, 0, size, data);
         }
+    }
+    // ------------------------------------------------------------------------
+    TexturesList getTexturesList(const irr::video::SMaterial& m)
+    {
+        TexturesList textures;
+        for (unsigned i = 0; i < textures.size(); i++)
+            textures[i] = m.TextureLayer[i].Texture;
+        return textures;
     }
 public:
     // ------------------------------------------------------------------------
