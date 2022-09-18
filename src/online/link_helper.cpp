@@ -26,6 +26,9 @@
 #ifdef _WIN32
 #include <windows.h>
 #include <shellapi.h>
+#ifdef _MSC_VER
+#pragma comment (lib, "Shell32.lib")
+#endif
 #endif
 
 #ifndef SERVER_ONLY

@@ -240,7 +240,12 @@
                 stackframe.AddrPC.Mode      = AddrModeFlat;
                 stackframe.AddrStack.Mode   = AddrModeFlat;
                 stackframe.AddrFrame.Mode   = AddrModeFlat;
-#if defined(_M_ARM64)
+#if defined(_M_ARM)
+                stackframe.AddrPC.Offset    = pContext->Pc;
+                stackframe.AddrStack.Offset = pContext->Sp;
+                stackframe.AddrFrame.Offset = pContext->R11;
+                const DWORD machine_type    = IMAGE_FILE_MACHINE_ARM;
+#elif defined(_M_ARM64)
                 stackframe.AddrPC.Offset    = pContext->Pc;
                 stackframe.AddrStack.Offset = pContext->Sp;
                 stackframe.AddrFrame.Offset = pContext->Fp;

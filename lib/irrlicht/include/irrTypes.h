@@ -163,7 +163,7 @@ strings
 
 //! define a break macro for debugging.
 #if defined(_DEBUG)
-#if defined(_IRR_WINDOWS_API_) && defined(_MSC_VER) && !defined (_WIN32_WCE)
+#if defined(_IRR_WINDOWS_API_) && defined(_MSC_VER) && !defined (_WIN32_WCE) && !defined (_M_ARM)
   #if defined(WIN64) || defined(_WIN64) // using portable common solution for x64 configuration
   #include <crtdbg.h>
   #define _IRR_DEBUG_BREAK_IF( _CONDITION_ ) if (_CONDITION_) {_CrtDbgBreak();}

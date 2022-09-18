@@ -208,6 +208,10 @@ void determineOSVersion()
 #endif
 
 #ifdef WIN32
+#ifdef _MSC_VER
+#pragma comment (lib, "Advapi32.lib")
+#endif
+
     //  (C) 2014-2015 Wildfire Games (0 A.D.), ported by Joerg Henrichs.
 
     HKEY hKey;
