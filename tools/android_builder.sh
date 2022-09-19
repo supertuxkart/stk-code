@@ -188,3 +188,10 @@ cp ./android/build/outputs/apk/release/android-release.apk \
 
 cp ./android/build/outputs/bundle/release/android-release.aab \
    ./android-output/SuperTuxKart-$PROJECT_VERSION.aab
+
+for arch in $(ls ./android/build/intermediates/ndkBuild/release/obj/local); do
+    cp ./android/build/intermediates/ndkBuild/release/obj/local/$arch/libmain.so \
+    ./android-output/SuperTuxKart-$PROJECT_VERSION-$arch-libmain.so
+    cp ./android/build/intermediates/ndkBuild/release/obj/local/$arch/libSDL2.so \
+    ./android-output/SuperTuxKart-$PROJECT_VERSION-$arch-libSDL2.so
+done
