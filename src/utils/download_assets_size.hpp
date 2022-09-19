@@ -23,7 +23,7 @@
 inline unsigned getDownloadAssetsSize()
 {
     // Todo: generated from some sed script
-    unsigned stk_assets_size = 208963430;
+    unsigned stk_assets_size = 213457215;
     return stk_assets_size;
 }
 #endif
