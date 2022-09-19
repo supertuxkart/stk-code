@@ -17,6 +17,7 @@ extern "C"
 }
 
 #include <cassert>
+#include <cstdio>
 #include <IAttributes.h>
 #include <IImageLoader.h>
 #include <limits>
@@ -489,8 +490,13 @@ void GEVulkanTexture::reloadInternal()
             NULL, &m_size);
         if (texture_image == NULL)
         {
-            throw std::runtime_error(
-                "Missing texture_image in getResizedImageFullPath");
+            printf("Missing texture_image in getResizedImageFullPath when "
+                "reloadInternal during ondemand loading for %s\n",
+                m_full_path.c_str());
+            m_size_lock.unlock();
+            m_image_view_lock.unlock();
+            m_thread_loading_lock.unlock();
+            return;
         }
     }
     else
