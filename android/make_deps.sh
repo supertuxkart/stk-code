@@ -294,6 +294,7 @@ build_deps()
         cmake . -DCMAKE_TOOLCHAIN_FILE=../../../cmake/Toolchain-android.cmake  \
                 -DHOST=$HOST -DARCH=$ARCH -DCMAKE_C_FLAGS="-fpic -O3"          \
                 -DCMAKE_CXX_FLAGS="-fpic -O3" -DSHADERC_SKIP_INSTALL=1         \
+                -DCMAKE_BUILD_TYPE=Release                                     \
                 -DSHADERC_SKIP_TESTS=1 -DSHADERC_SKIP_EXAMPLES=1               \
                 -DSPIRV_HEADERS_SKIP_INSTALL=1 -DSPIRV_HEADERS_SKIP_EXAMPLES=1 \
                 -DSKIP_SPIRV_TOOLS_INSTALL=1 -DSPIRV_SKIP_TESTS=1              \
@@ -323,7 +324,7 @@ build_deps()
                     -DHOST=$HOST -DARCH=$ARCH -DCMAKE_C_FLAGS="-fpic -O3 -g"      \
                     -DCMAKE_CXX_FLAGS="-fpic -O3 -g"
         fi
-        make -j $(($(nproc) + 1)) VERBOSE=1
+        make -j $(($(nproc) + 1))
         check_error
         touch "$DIRNAME/deps-$ARCH_OPTION/libsquish.stamp"
     fi
