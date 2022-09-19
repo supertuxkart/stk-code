@@ -4,7 +4,7 @@
 # 
 # Translators:
 # Adzka - <4dzka.m.ivi@gmail.com>, 2021
-# Ai_ZAQraven <ishaqalasyja@gmail.com>, 2021
+# Ai_ZAQraven <ishaqalasyja@gmail.com>, 2021-2022
 # liimee <alt3753.7@gmail.com>, 2021
 # Christian Elbrianno, 2017
 # Christian Elbrianno, 2017
@@ -22,9 +22,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: SuperTuxKart\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-05-25 09:02+0800\n"
+"POT-Creation-Date: 2022-08-24 11:55+0800\n"
 "PO-Revision-Date: 2015-02-15 01:58+0000\n"
-"Last-Translator: Ai_ZAQraven <ishaqalasyja@gmail.com>, 2021\n"
+"Last-Translator: Ai_ZAQraven <ishaqalasyja@gmail.com>, 2021-2022\n"
 "Language-Team: Indonesian (http://www.transifex.com/supertuxkart/supertuxkart/language/id/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -5541,7 +5541,7 @@ msgstr "Surel tidak cocok!"
 msgid ""
 "Online username can only contain alphanumeric (ASCII) characters, periods, "
 "dashes and underscores!"
-msgstr ""
+msgstr "Nama pengguna untuk online hanya boleh menggunakan alpha numerik (ASCII) huruf, titik, tanda hubung, dan garis bawah."
 
 #: src/states_screens/online/register_screen.cpp:374
 msgid "Online username has to be between 3 and 30 characters long!"

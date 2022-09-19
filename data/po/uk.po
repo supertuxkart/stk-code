@@ -7,6 +7,7 @@
 # Boden <Bodenchuk@bigmir.net>, 2021
 # d4708, 2022
 # fedik <fedikw@gmail.com>, 2015-2017,2019
+# KotoWhiskas, 2022
 # Max Lyashuk <m_lyashuk@ukr.net>, 2015-2016
 # Olexandr Nesterenko <nolexndr@gmail.com>, 2020
 # Sergey Sergey <regensv@gmail.com>, 2020
@@ -17,9 +18,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: SuperTuxKart\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-05-25 09:02+0800\n"
+"POT-Creation-Date: 2022-08-24 11:55+0800\n"
 "PO-Revision-Date: 2015-02-15 01:58+0000\n"
-"Last-Translator: Суспільне Надбання, 2022\n"
+"Last-Translator: KotoWhiskas, 2022\n"
 "Language-Team: Ukrainian (http://www.transifex.com/supertuxkart/supertuxkart/language/uk/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -399,7 +400,7 @@ msgstr "Камера гравця"
 #. I18N: ./data/gui/dialogs/custom_camera_settings.stkgui
 #. I18N: In the ui/camera screen
 msgid "FOV"
-msgstr ""
+msgstr "Поле зору"
 
 #. I18N: ./data/gui/dialogs/custom_camera_settings.stkgui
 #. I18N: In the ui/camera screen
@@ -1717,12 +1718,12 @@ msgstr "Оберіть карт"
 #. I18N: ./data/gui/screens/main_menu.stkgui
 #. I18N: Main menu button
 msgid "Singleplayer"
-msgstr "Самітна гра"
+msgstr "Одиночна гра"
 
 #. I18N: ./data/gui/screens/main_menu.stkgui
 #. I18N: Main menu button
 msgid "Splitscreen Multiplayer"
-msgstr ""
+msgstr "Гра з розділенням екрану"
 
 #. I18N: ./data/gui/screens/main_menu.stkgui
 #. I18N: Main menu button
@@ -1840,7 +1841,7 @@ msgstr "Налаштування"
 #. I18N: ./data/gui/screens/online/online.stkgui
 #. I18N: In the networking menu
 msgid "Enable splitscreen or player handicaps"
-msgstr ""
+msgstr "Увімкнути обмеження для звичайних гравців або гравців з розділенням екрану"
 
 #. I18N: ./data/gui/screens/online/online.stkgui
 #. I18N: Networking menu button
@@ -1855,7 +1856,7 @@ msgstr "Глобальна мережа"
 #. I18N: ./data/gui/screens/online/online.stkgui
 #. I18N: Networking menu button
 msgid "Enter server address"
-msgstr "Вкажи адресу сервера"
+msgstr "Вказати адресу серверу"
 
 #. I18N: ./data/gui/screens/online/online.stkgui
 #. I18N: Networking menu button
@@ -2164,7 +2165,7 @@ msgstr "Перейменувати налаштування"
 #. I18N: ./data/gui/screens/options_device.stkgui
 #. I18N: In the input configuration screen, for gamepad
 msgid "Enable force feedback (if supported)"
-msgstr ""
+msgstr "Увімкнути силовий зворотній зв'язок (якщо підтримується)"
 
 #. I18N: ./data/gui/screens/options_general.stkgui
 #. I18N: In the general settings
@@ -2228,7 +2229,7 @@ msgstr "* Які налаштування буде застосовано зал
 #. I18N: ./data/gui/screens/options_ui.stkgui
 #. I18N: In the ui settings
 msgid "Skin"
-msgstr "Жупан"
+msgstr "Тема оформлення"
 
 #. I18N: ./data/gui/screens/options_ui.stkgui
 #. I18N: In the ui settings
@@ -2238,7 +2239,7 @@ msgstr "Міні мапа"
 #. I18N: ./data/gui/screens/options_ui.stkgui
 #. I18N: In the ui settings
 msgid "Splitscreen Multiplayer layout"
-msgstr ""
+msgstr "Розкладка гри з розділенням екрану"
 
 #. I18N: ./data/gui/screens/options_ui.stkgui
 #. I18N: In the ui settings
@@ -2263,7 +2264,7 @@ msgstr "Показувати кадр./сек. "
 #. I18N: ./data/gui/screens/options_ui.stkgui
 #. I18N: In the ui settings
 msgid "Show other karts' held powerups"
-msgstr "Показувати, які бонуси мають інші карти"
+msgstr "Показувати бонуси інших карт"
 
 #. I18N: ./data/gui/screens/options_ui.stkgui
 #. I18N: In the ui settings
@@ -2397,7 +2398,7 @@ msgstr "Колір карту"
 
 #. I18N: ./data/tips.xml
 msgid "The UI skin can be changed in the UI options."
-msgstr ""
+msgstr "Тема оформлення може бути змінена з Налаштувань Інтерфейсу"
 
 #. I18N: ./data/tips.xml
 msgid "You can see other karts' powerups by enabling it in the UI options."
@@ -2405,7 +2406,7 @@ msgstr "Щоб бачити, які бонуси мають інші карти,
 
 #. I18N: ./data/tips.xml
 msgid "The font size can be changed in the UI options."
-msgstr ""
+msgstr "Розмір шрифту може бути змінений з Налаштувань Інтерфейсу"
 
 #. I18N: ./data/tips.xml
 msgid "The help menu has lots of useful information."
@@ -3851,12 +3852,12 @@ msgstr ""
 
 #: src/network/protocols/client_lobby.cpp:1239
 msgid "Server owner quit the game."
-msgstr ""
+msgstr "Власник сервера покинув гру"
 
 #. I18N: Status shown to player when he will be spectating the next game
 #: src/network/protocols/client_lobby.cpp:1243
 msgid "You will be spectating the next game."
-msgstr ""
+msgstr "Ви будете спостерігати за наступною грою"
 
 #. I18N: Show when player join red team of the started game in
 #. network
@@ -3915,7 +3916,7 @@ msgstr "Неможливо з'єднатися з сервером %s."
 #: src/network/protocols/connect_to_server.cpp:883
 #, c-format
 msgid "Failed to detect port number for server %s."
-msgstr ""
+msgstr "Не вдалося під'єднатися до сервера %s."
 
 #: src/network/protocols/lobby_protocol.cpp:292
 msgid "Network grand prix has been finished."
@@ -4125,7 +4126,7 @@ msgid_plural "%d arenas unavailable in single player."
 msgstr[0] "%d арена не доступна в самотній грі."
 msgstr[1] "%d арени не доступні в самотній грі."
 msgstr[2] "%d арен не доступно в самотній грі."
-msgstr[3] "%d арен не доступно в самотній грі."
+msgstr[3] "%d арен не доступно в одиночній грі."
 
 #: src/states_screens/credits.cpp:184
 msgid "translator-credits"
@@ -5283,7 +5284,7 @@ msgstr "Точно вилучити всі рекорди?"
 
 #: src/states_screens/kart_selection.cpp:434
 msgid "Connect a keyboard or gamepad to play splitscreen multiplayer"
-msgstr ""
+msgstr "Підключіть клавіатуру або геймпад для гри з розділенням екрану"
 
 #: src/states_screens/kart_selection.cpp:912
 #: src/states_screens/kart_selection.cpp:1595

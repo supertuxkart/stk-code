@@ -3,7 +3,7 @@
 # This file is distributed under the same license as the supertuxkart package.
 # 
 # Translators:
-# Jaakoppi Horila <supermariojaska5@gmail.com>, 2018-2019
+# Jaakoppi Horila <supermariojaska5@gmail.com>, 2018-2019,2022
 # Jiri Grönroos <jiri.gronroos@iki.fi>, 2015-2022
 # Kristian Laakkonen, 2018-2019,2021
 # Markus Mikkonen <markus.mikkonen@outlook.com>, 2021
@@ -12,9 +12,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: SuperTuxKart\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-05-25 09:02+0800\n"
+"POT-Creation-Date: 2022-08-24 11:55+0800\n"
 "PO-Revision-Date: 2015-02-15 01:58+0000\n"
-"Last-Translator: Jiri Grönroos <jiri.gronroos@iki.fi>, 2015-2022\n"
+"Last-Translator: Jaakoppi Horila <supermariojaska5@gmail.com>, 2018-2019,2022\n"
 "Language-Team: Finnish (http://www.transifex.com/supertuxkart/supertuxkart/language/fi/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -2602,7 +2602,7 @@ msgstr "Taistelusaari"
 
 #. I18N: ../stk-assets/tracks/black_forest/track.xml
 msgid "Black Forest"
-msgstr "Synkkä metsä"
+msgstr "Schwarzwald"
 
 #. I18N: ../stk-assets/tracks/cave/track.xml
 msgid "Cave X"
@@ -5177,7 +5177,7 @@ msgstr "Suoritit SuperTux-haasteen! Tässä tasossa ansaittuja pisteitä: %i/%i"
 #: src/states_screens/feature_unlocked.cpp:311
 #, c-format
 msgid "You unlocked %s!"
-msgstr "Onnea, avasit %s!"
+msgstr "Onnea, avasit hahmon %s!"
 
 #: src/states_screens/feature_unlocked.cpp:630
 msgid "Challenge Completed"

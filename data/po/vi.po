@@ -4,13 +4,14 @@
 # 
 # Translators:
 # FIRST AUTHOR <EMAIL@ADDRESS>, 2011
+# Thanh Bách 6/1, 2022
 msgid ""
 msgstr ""
 "Project-Id-Version: SuperTuxKart\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-05-25 09:02+0800\n"
+"POT-Creation-Date: 2022-08-24 11:55+0800\n"
 "PO-Revision-Date: 2015-02-15 01:58+0000\n"
-"Last-Translator: FIRST AUTHOR <EMAIL@ADDRESS>, 2011\n"
+"Last-Translator: Thanh Bách 6/1, 2022\n"
 "Language-Team: Vietnamese (http://www.transifex.com/supertuxkart/supertuxkart/language/vi/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -20,11 +21,11 @@ msgstr ""
 
 #. I18N: In Android UI, po_extract_game_data
 msgid "Extracting game data..."
-msgstr ""
+msgstr "Đang giải nén dữ liệu trò chơi"
 
 #. I18N: In Android UI, po_extract_error
 msgid "Game data extraction error"
-msgstr ""
+msgstr "Đã xảy ra lỗi khi giải nén dữ liệu"
 
 #. I18N: In Android UI, po_extract_error_msg
 msgid "Check remaining device space or reinstall SuperTuxKart."
@@ -760,7 +761,7 @@ msgstr ""
 #. I18N: ./data/gui/screens/online/create_server.stkgui
 #. I18N: In the server creation screen
 msgid "Difficulty"
-msgstr ""
+msgstr "Độ khó"
 
 #. I18N: ./data/gui/dialogs/online/server_configuration_dialog.stkgui
 #. I18N: Difficulty
@@ -870,7 +871,7 @@ msgstr "Đá banh"
 #. I18N: ./data/gui/screens/user_screen_tab.stkgui
 #. I18N: In the user screen
 msgid "Password"
-msgstr ""
+msgstr "Mật khẩu"
 
 #. I18N: ./data/gui/dialogs/online/server_info_dialog.stkgui
 #. I18N: In the server info dialog

@@ -6,7 +6,7 @@
 # adrien vigneron <adrienvigneron@ml1.net>, 2015
 # Alayan <alayan.feh@gmail.com>, 2018-2019
 # Anard0 <anard@free.fr>, 2020
-# Anard0 <anard@free.fr>, 2021
+# Anard0 <anard@free.fr>, 2021-2022
 # Auria <auria.mg@gmail.com>, 2015-2021
 # Benau, 2020-2021
 # devnoname120 <devnoname120+gh@gmail.com>, 2015
@@ -27,9 +27,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: SuperTuxKart\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-05-25 09:02+0800\n"
+"POT-Creation-Date: 2022-08-24 11:55+0800\n"
 "PO-Revision-Date: 2015-02-15 01:58+0000\n"
-"Last-Translator: Anard0 <anard@free.fr>, 2021\n"
+"Last-Translator: Anard0 <anard@free.fr>, 2021-2022\n"
 "Language-Team: French (http://www.transifex.com/supertuxkart/supertuxkart/language/fr/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -4801,7 +4801,7 @@ msgstr "Nombre de karts : %d"
 #: src/states_screens/dialogs/high_score_info_dialog.cpp:137
 #, c-format
 msgid "Time target: %s"
-msgstr ""
+msgstr "Temps à battre: %s"
 
 #: src/states_screens/dialogs/high_score_info_dialog.cpp:139
 #, c-format
@@ -4832,7 +4832,7 @@ msgstr "Choisir une couleur avec la barre de sélection"
 
 #: src/states_screens/dialogs/message_dialog.cpp:145
 msgid "Don't show again"
-msgstr ""
+msgstr "Ne plus afficher"
 
 #. I18N: In the network player dialog
 #: src/states_screens/dialogs/network_player_dialog.cpp:50
@@ -5552,7 +5552,7 @@ msgstr "Le nom d'utilisateur ne peut pas être vide."
 
 #: src/states_screens/online/register_screen.cpp:362
 msgid "Online username and password must not be the same!"
-msgstr ""
+msgstr "Le pseudo en ligne et le mot de passe ne doivent pas être identiques !"
 
 #: src/states_screens/online/register_screen.cpp:366
 msgid "Emails don't match!"
@@ -5562,7 +5562,7 @@ msgstr "Les courriels saisis ne correspondent pas !"
 msgid ""
 "Online username can only contain alphanumeric (ASCII) characters, periods, "
 "dashes and underscores!"
-msgstr ""
+msgstr "Le pseudo en ligne ne doit contenir que des caractères alphanumériques (ASCII), des points, des tirets et des tirets bas !"
 
 #: src/states_screens/online/register_screen.cpp:374
 msgid "Online username has to be between 3 and 30 characters long!"
@@ -6258,7 +6258,7 @@ msgstr "Fais la course contre un kart fantôme et tente de le dépasser !"
 
 #: src/states_screens/race_setup_screen.cpp:143
 msgid "Complete as many laps as possible in a given amount of time."
-msgstr ""
+msgstr "Fais autant de tours que tu pourras dans le temps imparti."
 
 #. I18N: In soccer setup screen
 #: src/states_screens/soccer_setup_screen.cpp:118

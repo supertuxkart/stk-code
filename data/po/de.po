@@ -22,6 +22,7 @@
 # Maximilian Wagenbach <foaly@posteo.de>, 2016
 # Maximilian Wagenbach <foaly@posteo.de>, 2016
 # FabianF, 2020
+# Tim, 2022
 # Tobias Markus <tobbi@supertuxproject.org>, 2015-2016
 # Wasilis Mandratzis-Walz, 2015
 # 79353a696ad19dc202b261b3067b7640_bec941e, 2015
@@ -30,9 +31,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: SuperTuxKart\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-05-25 09:02+0800\n"
+"POT-Creation-Date: 2022-08-24 11:55+0800\n"
 "PO-Revision-Date: 2015-02-15 01:58+0000\n"
-"Last-Translator: Juli X, 2022\n"
+"Last-Translator: Tim, 2022\n"
 "Language-Team: German (http://www.transifex.com/supertuxkart/supertuxkart/language/de/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -42,11 +43,11 @@ msgstr ""
 
 #. I18N: In Android UI, po_extract_game_data
 msgid "Extracting game data..."
-msgstr "Spieldaten extrahieren ..."
+msgstr "Entpacke Spieldaten..."
 
 #. I18N: In Android UI, po_extract_error
 msgid "Game data extraction error"
-msgstr "Fehler beim Extrahieren der Spieldaten"
+msgstr "Fehler beim Entpacken der Spieldaten"
 
 #. I18N: In Android UI, po_extract_error_msg
 msgid "Check remaining device space or reinstall SuperTuxKart."
@@ -451,7 +452,7 @@ msgstr "Grafikeinstellungen"
 #. I18N: ./data/gui/dialogs/custom_video_settings.stkgui
 #. I18N: Video settings
 msgid "Advanced pipeline (lights, etc.)"
-msgstr "Verbesserte Grafik (Lichteffekte, etc.)"
+msgstr "Verbesserte Grafik (Lichteffekte etc.)"
 
 #. I18N: ./data/gui/dialogs/custom_video_settings.stkgui
 #. I18N: Video settings
@@ -736,13 +737,13 @@ msgstr "Konten-Wiederherstellung"
 msgid ""
 "You will receive an email with further instructions on how to reset your "
 "password. Please be patient and be sure to check your spam folder."
-msgstr "Du wirst eine E-Mail mit weiteren Anweisungen, darüber, wie du dein Passwort zurücksetzt, erhalten. Bitte sei geduldig und stell sicher, im Spam-Verzeichnis nachzusehen."
+msgstr "Du wirst eine E-Mail erhalten mit weiteren Anweisungen darüber, wie du dein Passwort zurücksetzt. Bitte hab etwas Geduld und sieh auch im Spam-Ordner nach."
 
 #. I18N: ./data/gui/dialogs/online/recovery_input.stkgui
 msgid ""
 "Fill in the username and email address you supplied at registration to be "
 "able to reset your password."
-msgstr "Gib den Benutzernamen und die E-Mail-Adresse von der Registration ein, um dein Passwort zurücksetzen zu können."
+msgstr "Gib den Benutzernamen und die E-Mail-Adresse von der Registrierung ein, um dein Passwort zurückzusetzen."
 
 #. I18N: ./data/gui/dialogs/online/recovery_input.stkgui
 #. I18N: In the recovery dialog
@@ -1708,7 +1709,7 @@ msgstr "Rekordzeit-Auswahl"
 #. time.
 #: src/race/race_manager.cpp:1270 src/states_screens/race_setup_screen.cpp:142
 msgid "Lap Trial"
-msgstr ""
+msgstr "Rundenversuch"
 
 #. I18N: ./data/gui/screens/high_score_selection.stkgui
 #. I18N: In the high score selection screen
@@ -4798,7 +4799,7 @@ msgstr "Anzahl der Karts: %d"
 #: src/states_screens/dialogs/high_score_info_dialog.cpp:137
 #, c-format
 msgid "Time target: %s"
-msgstr ""
+msgstr "Ziel-Zeit: %s"
 
 #: src/states_screens/dialogs/high_score_info_dialog.cpp:139
 #, c-format
@@ -5557,7 +5558,7 @@ msgstr "E-Mail-Adressen passen nicht zusammen!"
 msgid ""
 "Online username can only contain alphanumeric (ASCII) characters, periods, "
 "dashes and underscores!"
-msgstr ""
+msgstr "Online-Benutzernamen dürfen nur aus alphanumerischen (ASCII-) Werten, Punkten, Bindestrichen und Unterstrichen bestehen."
 
 #: src/states_screens/online/register_screen.cpp:374
 msgid "Online username has to be between 3 and 30 characters long!"
@@ -6253,7 +6254,7 @@ msgstr "Fahr ein Rennen gegen Geisterkarts und versuch, sie zu schlagen!"
 
 #: src/states_screens/race_setup_screen.cpp:143
 msgid "Complete as many laps as possible in a given amount of time."
-msgstr ""
+msgstr "Fahre so viele Runden wie möglich innerhalb der vorgegebenen Zeit."
 
 #. I18N: In soccer setup screen
 #: src/states_screens/soccer_setup_screen.cpp:118
