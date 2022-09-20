@@ -78,7 +78,7 @@ void GEVulkanArrayTexture::reloadInternal(const std::vector<io::path>& list,
     std::vector<video::IImage*> images;
     std::vector<GEMipmapGenerator*> mipmaps;
 
-    VkBuffer staging_buffer = NULL;
+    VkBuffer staging_buffer = VK_NULL_HANDLE;
     VmaAllocation staging_buffer_allocation = NULL;
     VmaAllocationCreateInfo staging_buffer_create_info = {};
     staging_buffer_create_info.usage = VMA_MEMORY_USAGE_AUTO;

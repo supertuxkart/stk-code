@@ -437,7 +437,7 @@ bool GEVulkanTexture::createImageView(VkImageAspectFlags aspect_flags)
     }
 
     auto image_view = std::make_shared<std::atomic<VkImageView> >();
-    VkImageView view_ptr = NULL;
+    VkImageView view_ptr = VK_NULL_HANDLE;
     VkResult result = vkCreateImageView(m_vulkan_device, &view_info, NULL,
         &view_ptr);
     if (result == VK_SUCCESS)
