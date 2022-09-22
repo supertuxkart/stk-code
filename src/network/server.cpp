@@ -44,6 +44,7 @@ Server::Server(const XMLNode& server_info) : m_supports_encrytion(true)
     m_name = "";
     m_server_id = 0;
     m_current_players = 0;
+    m_current_ai = 0;
     m_max_players = 0;
     m_distance = 0.0f;
     m_server_mode = 0;
