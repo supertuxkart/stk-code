@@ -230,24 +230,42 @@ void ServerSelection::loadList()
             switch (m_current_column)
             {
             case 0:
+            {
                 return c->getLowerCaseName() > d->getLowerCaseName();
                 break;
+            }
             case 1:
+            {
                 return c->getServerMode() > d->getServerMode();
                 break;
+            }
             case 2:
-                return c->getCurrentPlayers() > d->getCurrentPlayers();
+            {
+                int c_players = c->getCurrentPlayers() - c->getCurrentAI();
+                if (c_players < 0)
+                    c_players = 0;
+                int d_players = d->getCurrentPlayers() - d->getCurrentAI();
+                if (d_players < 0)
+                    d_players = 0;
+                return c_players > d_players;
                 break;
+            }
             case 3:
+            {
                 return c->getDifficulty() > d->getDifficulty();
                 break;
+            }
             case 4:
+            {
                 return c->getServerOwnerLowerCaseName() >
                     d->getServerOwnerLowerCaseName();
                 break;
+            }
             case 5:
+            {
                 return c->getDistance() > d->getDistance();
                 break;
+            }
             }   // switch
             assert(false);
             return false;
@@ -259,7 +277,18 @@ void ServerSelection::loadList()
         if (t)
             icon = track_manager->getTrackIndexByIdent(t->getIdent()) + 2;
         core::stringw num_players;
-        num_players.append(StringUtils::toWString(server->getCurrentPlayers()));
+        int current_players = server->getCurrentPlayers();
+        int current_ai = server->getCurrentAI();
+        current_players -= current_ai;
+        if (current_players < 0)
+            current_players = 0;
+        num_players.append(StringUtils::toWString(current_players));
+        if (current_ai > 0)
+        {
+            num_players.append("(");
+            num_players.append(StringUtils::toWString(current_ai));
+            num_players.append(")");
+        }
         num_players.append("/");
         num_players.append(StringUtils::toWString(server->getMaxPlayers()));
         std::vector<GUIEngine::ListWidget::ListCell> row;

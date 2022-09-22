@@ -70,6 +70,8 @@ protected:
     /** The number of players currently on the server */
     int m_current_players;
 
+    int m_current_ai;
+
     /** The public ip address and port of this server. */
     std::unique_ptr<SocketAddress> m_address;
 
@@ -210,6 +212,8 @@ public:
                                          { m_reconnect_when_quit_lobby = val; }
     // ------------------------------------------------------------------------
     std::string getBookmarkKey() const;
+    // ------------------------------------------------------------------------
+    const int getCurrentAI() const { return m_current_ai; }
 };   // Server
 
 class UserDefinedServer : public Server

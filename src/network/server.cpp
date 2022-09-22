@@ -61,6 +61,7 @@ Server::Server(const XMLNode& server_info) : m_supports_encrytion(true)
     xml.get("host_id", &m_server_owner);
     xml.get("max_players", &m_max_players);
     xml.get("current_players", &m_current_players);
+    xml.get("current_ai", &m_current_ai);
     xml.get("current_track", &m_current_track);
     uint32_t ip;
     xml.get("ip", &ip);
@@ -198,6 +199,7 @@ Server::Server(unsigned server_id, const core::stringw &name, int max_players,
     m_official = false;
     m_game_started = game_started;
     m_current_track = current_track;
+    m_current_ai = 0;
 }   // server(server_id, ...)
 
 // ----------------------------------------------------------------------------
