@@ -482,14 +482,15 @@ void IrrDriver::initDevice()
         m_device->run();
         m_device->drop();
         m_device  = NULL;
-#if !defined(SERVER_ONLY)
-        GE::setVideoDriver(NULL);
-#endif
 
         params.ForceLegacyDevice = (UserConfigParams::m_force_legacy_device ||
             UserConfigParams::m_gamepad_visualisation);
 
 begin:
+#if !defined(SERVER_ONLY)
+        GE::setVideoDriver(NULL);
+#endif
+
         video::E_DRIVER_TYPE driver_created = video::EDT_NULL;
         if (std::string(UserConfigParams::m_render_driver) == "gl")
         {
