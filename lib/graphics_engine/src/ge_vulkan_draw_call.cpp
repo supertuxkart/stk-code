@@ -323,6 +323,11 @@ void GEVulkanDrawCall::generate()
                         const core::array<SParticle>& particles =
                             pn->getParticles();
                         unsigned ps = particles.size();
+                        if (ps == 0)
+                        {
+                            visible_count--;
+                            continue;
+                        }
                         visible_count += ps - 1;
                         for (unsigned i = 0; i < ps; i++)
                         {
