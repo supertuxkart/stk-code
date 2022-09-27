@@ -4,7 +4,7 @@
 
 void main()
 {
-    int offset = u_object_buffer.m_objects[gl_InstanceIndex].m_skinning_offest;
+    int offset = u_object_buffer.m_objects[gl_InstanceIndex].m_skinning_offset;
     mat4 joint_matrix =
         v_weight[0] * u_skinning_matrices.m_mat[max(v_joint[0] + offset, 0)] +
         v_weight[1] * u_skinning_matrices.m_mat[max(v_joint[1] + offset, 0)] +

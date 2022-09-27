@@ -15,7 +15,7 @@ struct ObjectData
     vec4 m_rotation;
     vec3 m_scale;
     uint m_custom_vertex_color;
-    int m_skinning_offest;
+    int m_skinning_offset;
     int m_material_id;
     vec2 m_texture_trans;
 };
