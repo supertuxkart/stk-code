@@ -51,12 +51,14 @@ vec4 sampleMeshTexture7(int material_id, vec2 uv)
 #else
 layout(binding = 0) uniform sampler2D f_mesh_texture_0;
 layout(binding = 1) uniform sampler2D f_mesh_texture_1;
+#ifdef PBR_ENABLED
 layout(binding = 2) uniform sampler2D f_mesh_texture_2;
 layout(binding = 3) uniform sampler2D f_mesh_texture_3;
 layout(binding = 4) uniform sampler2D f_mesh_texture_4;
 layout(binding = 5) uniform sampler2D f_mesh_texture_5;
 layout(binding = 6) uniform sampler2D f_mesh_texture_6;
 layout(binding = 7) uniform sampler2D f_mesh_texture_7;
+#endif
 
 vec4 sampleMeshTexture0(int material_id, vec2 uv)
 {
@@ -68,6 +70,7 @@ vec4 sampleMeshTexture1(int material_id, vec2 uv)
     return texture(f_mesh_texture_1, uv);
 }
 
+#ifdef PBR_ENABLED
 vec4 sampleMeshTexture2(int material_id, vec2 uv)
 {
     return texture(f_mesh_texture_2, uv);
@@ -97,4 +100,5 @@ vec4 sampleMeshTexture7(int material_id, vec2 uv)
 {
     return texture(f_mesh_texture_7, uv);
 }
+#endif
 #endif
