@@ -98,7 +98,8 @@ void GEVulkanFeatures::init(GEVulkanDriver* vk)
 
     for (VkExtensionProperties& prop : extensions)
     {
-        if (std::string(prop.extensionName) == "VK_EXT_descriptor_indexing")
+        if (strcmp(prop.extensionName,
+            VK_EXT_DESCRIPTOR_INDEXING_EXTENSION_NAME) == 0)
             g_supports_descriptor_indexing = true;
     }
 
@@ -126,10 +127,16 @@ void GEVulkanFeatures::init(GEVulkanDriver* vk)
         VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_DESCRIPTOR_INDEXING_FEATURES;
     supported_features.pNext = &descriptor_indexing_features;
 
+    PFN_vkGetPhysicalDeviceFeatures2 get_features = vkGetPhysicalDeviceFeatures2;
     if (vk->getPhysicalDeviceProperties().apiVersion < VK_API_VERSION_1_1 ||
-        !vkGetPhysicalDeviceFeatures2)
+        !get_features)
+    {
+        get_features = (PFN_vkGetPhysicalDeviceFeatures2)
+            vkGetPhysicalDeviceFeatures2KHR;
+    }
+    if (!get_features)
         return;
-    vkGetPhysicalDeviceFeatures2(vk->getPhysicalDevice(), &supported_features);
+    get_features(vk->getPhysicalDevice(), &supported_features);
     if (supported_features.sType !=
         VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2)
         return;
