@@ -487,6 +487,8 @@ void SoccerWorld::onCheckGoalTriggered(bool first_goal)
         NetworkConfig::get()->isClient()))
         return;
 
+    if (getTicksSinceStart() < m_ticks_back_to_own_goal)
+        return;
     m_ticks_back_to_own_goal = getTicksSinceStart() +
         stk_config->time2Ticks(3.0f);
     m_goal_sound->play();
