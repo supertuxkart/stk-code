@@ -28,6 +28,7 @@ uint32_t g_max_sampler_supported = 0;
 bool g_supports_multi_draw_indirect = false;
 bool g_supports_base_vertex_rendering = true;
 bool g_supports_compute_in_main_queue = false;
+bool g_supports_shader_draw_parameters = false;
 bool g_supports_s3tc_bc3 = false;
 bool g_supports_bptc_bc7 = false;
 bool g_supports_astc_4x4 = false;
@@ -127,6 +128,11 @@ void GEVulkanFeatures::init(GEVulkanDriver* vk)
         VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_DESCRIPTOR_INDEXING_FEATURES;
     supported_features.pNext = &descriptor_indexing_features;
 
+    VkPhysicalDeviceShaderDrawParametersFeatures shader_draw = {};
+    shader_draw.sType =
+        VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SHADER_DRAW_PARAMETERS_FEATURES;
+    descriptor_indexing_features.pNext = &shader_draw;
+
     PFN_vkGetPhysicalDeviceFeatures2 get_features = vkGetPhysicalDeviceFeatures2;
     if (vk->getPhysicalDeviceProperties().apiVersion < VK_API_VERSION_1_1 ||
         !get_features)
@@ -145,6 +151,8 @@ void GEVulkanFeatures::init(GEVulkanDriver* vk)
         .shaderSampledImageArrayNonUniformIndexing == VK_TRUE);
     g_supports_partially_bound = (descriptor_indexing_features
         .descriptorBindingPartiallyBound == VK_TRUE);
+    g_supports_shader_draw_parameters = (shader_draw
+        .shaderDrawParameters == VK_TRUE);
 
 #if defined(__APPLE__)
     bool missing_vkGetPhysicalDeviceProperties2 =
@@ -212,6 +220,9 @@ void GEVulkanFeatures::printStats()
     os::Printer::log(
         "Vulkan supports compute in main queue",
         g_supports_compute_in_main_queue ? "true" : "false");
+    os::Printer::log(
+        "Vulkan supports shader draw parameters",
+        g_supports_shader_draw_parameters ? "true" : "false");
     os::Printer::log(
         "Vulkan supports s3 texture compression (bc3, dxt5)",
         g_supports_s3tc_bc3 ? "true" : "false");
@@ -299,6 +310,12 @@ bool GEVulkanFeatures::supportsComputeInMainQueue()
 {
     return g_supports_compute_in_main_queue;
 }   // supportsComputeInMainQueue
+
+// ----------------------------------------------------------------------------
+bool GEVulkanFeatures::supportsShaderDrawParameters()
+{
+    return g_supports_shader_draw_parameters;
+}   // supportsShaderDrawParameters
 
 // ----------------------------------------------------------------------------
 bool GEVulkanFeatures::supportsS3TCBC3()
