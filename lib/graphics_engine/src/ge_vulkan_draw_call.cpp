@@ -115,16 +115,16 @@ ObjectData::ObjectData(const irr::scene::SParticle& particle, int material_id,
 
 // ----------------------------------------------------------------------------
 GEVulkanDrawCall::GEVulkanDrawCall()
+                : m_limits(getVKDriver()->getPhysicalDeviceProperties().limits)
 {
     m_culling_tool = new GECullingTool;
     m_dynamic_data = NULL;
+    m_sbo_data = NULL;
     m_object_data_padded_size = 0;
     m_skinning_data_padded_size = 0;
     m_data_padding = NULL;
-    const VkPhysicalDeviceLimits& limit =
-         getVKDriver()->getPhysicalDeviceProperties().limits;
-    const size_t ubo_padding = limit.minUniformBufferOffsetAlignment;
-    const size_t sbo_padding = limit.minStorageBufferOffsetAlignment;
+    const size_t ubo_padding = m_limits.minUniformBufferOffsetAlignment;
+    const size_t sbo_padding = m_limits.minStorageBufferOffsetAlignment;
     size_t padding = std::max(
     {
         ubo_padding, sbo_padding, sizeof(irr::core::matrix4)
@@ -144,6 +144,7 @@ GEVulkanDrawCall::~GEVulkanDrawCall()
     delete [] m_data_padding;
     delete m_culling_tool;
     delete m_dynamic_data;
+    delete m_sbo_data;
     for (auto& p : m_billboard_buffers)
        p.second->drop();
     if (m_data_layout != VK_NULL_HANDLE)
@@ -239,6 +240,14 @@ void GEVulkanDrawCall::generate()
         skinning_offets[node] = added_joint;
         added_joint += bone_count;
         m_skinning_data_padded_size += bone_size;
+    }
+    size_t sbo_alignment = m_limits.minStorageBufferOffsetAlignment;
+    size_t padding = getPadding(m_skinning_data_padded_size, sbo_alignment);
+    if (padding > 0)
+    {
+        m_skinning_data_padded_size += padding;
+        m_data_uploading.emplace_back((void*)m_data_padding,
+            padding);
     }
 
     using Nodes = std::pair<GESPMBuffer*, std::unordered_map<
@@ -381,6 +390,37 @@ void GEVulkanDrawCall::generate()
         {
             return !a.m_transparent;
         });
+
+    if (use_base_vertex)
+    {
+        const size_t object_data_size =
+            sizeof(ObjectData) * m_visible_objects.size();
+        m_data_uploading.emplace_back((void*)m_visible_objects.data(),
+            object_data_size);
+        m_object_data_padded_size = object_data_size;
+    }
+    else
+    {
+        m_object_data_padded_size = 0;
+        for (unsigned i = 0; i < m_cmds.size(); i++)
+        {
+            auto& cmd = m_cmds[i];
+            size_t instance_size =
+                cmd.m_cmd.instanceCount * sizeof(ObjectData);
+            m_data_uploading.emplace_back(
+                &m_visible_objects[cmd.m_cmd.firstInstance], instance_size);
+            size_t cur_padding = getPadding(m_object_data_padded_size +
+                instance_size, sbo_alignment);
+            if (cur_padding > 0)
+            {
+                instance_size += cur_padding;
+                m_data_uploading.emplace_back((void*)m_data_padding,
+                    cur_padding);
+            }
+            m_sbo_data_offset.push_back(m_object_data_padded_size);
+            m_object_data_padded_size += instance_size;
+        }
+    }
 }   // generate
 
 // ----------------------------------------------------------------------------
@@ -836,20 +876,21 @@ void GEVulkanDrawCall::createVulkanData()
 
     createAllPipelines(vk);
 
-    size_t size = m_visible_objects.size();
-    if (m_visible_objects.empty())
-        size = 100;
-
+    size_t extra_size = 0;
     const bool use_multidraw = GEVulkanFeatures::supportsMultiDrawIndirect() &&
         GEVulkanFeatures::supportsBindMeshTexturesAtOnce();
-    VkBufferUsageFlags flags = VK_BUFFER_USAGE_STORAGE_BUFFER_BIT |
-        VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT;
+    VkBufferUsageFlags flags = VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT;
     if (use_multidraw)
+    {
         flags |= VK_BUFFER_USAGE_INDIRECT_BUFFER_BIT;
-
+        extra_size = 200 * sizeof(VkDrawIndexedIndirectCommand);
+    }
     m_dynamic_data = new GEVulkanDynamicBuffer(GVDBT_GPU_RAM, flags,
-        m_skinning_data_padded_size + (sizeof(ObjectData) * size) +
-        sizeof(GEVulkanCameraUBO));
+        extra_size + sizeof(GEVulkanCameraUBO));
+
+    flags = VK_BUFFER_USAGE_STORAGE_BUFFER_BIT;
+    m_sbo_data = new GEVulkanDynamicBuffer(GVDBT_GPU_RAM, flags,
+        getInitialSBOSize());
 }   // createVulkanData
 
 // ----------------------------------------------------------------------------
@@ -868,82 +909,9 @@ void GEVulkanDrawCall::uploadDynamicData(GEVulkanDriver* vk,
     VkPipelineStageFlags dst_stage = VK_PIPELINE_STAGE_VERTEX_SHADER_BIT |
         VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT;
 
-    std::vector<std::pair<void*, size_t> > object_data_uploading;
-    const VkPhysicalDeviceLimits& limit =
-        vk->getPhysicalDeviceProperties().limits;
-    size_t sbo_alignment = limit.minStorageBufferOffsetAlignment;
-    size_t sbo_padding = 0;
-    const bool use_base_vertex = GEVulkanFeatures::supportsBaseVertexRendering();
-    if (use_base_vertex)
-    {
-        const size_t object_data_size =
-            sizeof(ObjectData) * m_visible_objects.size();
-        object_data_uploading.emplace_back((void*)m_visible_objects.data(),
-            object_data_size);
-        sbo_padding = getPadding(object_data_size, sbo_alignment);
-        if (sbo_padding > 0)
-            object_data_uploading.emplace_back((void*)m_data_padding, sbo_padding);
-        m_object_data_padded_size = object_data_size + sbo_padding;
-    }
-    else
-    {
-        m_object_data_padded_size = 0;
-        for (unsigned i = 0; i < m_cmds.size(); i++)
-        {
-            auto& cmd = m_cmds[i];
-            size_t instance_size =
-                cmd.m_cmd.instanceCount * sizeof(ObjectData);
-            object_data_uploading.emplace_back(
-                &m_visible_objects[cmd.m_cmd.firstInstance], instance_size);
-            size_t cur_padding = getPadding(m_object_data_padded_size +
-                instance_size, sbo_alignment);
-            if (cur_padding > 0)
-            {
-                instance_size += cur_padding;
-                object_data_uploading.emplace_back((void*)m_data_padding,
-                    cur_padding);
-            }
-            m_sbo_data_offset.push_back(m_object_data_padded_size);
-            m_object_data_padded_size += instance_size;
-        }
-    }
-    if (!use_base_vertex)
-    {
-        sbo_padding = getPadding(m_object_data_padded_size, sbo_alignment);
-        if (sbo_padding > 0)
-        {
-            object_data_uploading.emplace_back((void*)m_data_padding,
-                sbo_padding);
-            m_object_data_padded_size += sbo_padding;
-        }
-    }
-
-    size_t ubo_alignment = limit.minUniformBufferOffsetAlignment;
-    size_t ubo_padding = getPadding(m_object_data_padded_size +
-        m_skinning_data_padded_size, ubo_alignment);
-    if (ubo_padding != 0)
-    {
-        m_skinning_data_padded_size += ubo_padding;
-        m_data_uploading.emplace_back((void*)m_data_padding, ubo_padding);
-    }
-
-    if (!use_base_vertex)
-    {
-        // Make sure dynamic offset won't become invaild
-        size_t remain = m_skinning_data_padded_size + sizeof(GEVulkanCameraUBO);
-        if (m_object_data_padded_size > remain)
-        {
-            m_dynamic_data->resizeIfNeeded(m_skinning_data_padded_size +
-                m_object_data_padded_size + sizeof(GEVulkanCameraUBO) +
-                (m_object_data_padded_size - remain));
-        }
-    }
-
-    m_data_uploading.emplace_back((void*)cam->getUBOData(),
+    std::vector<std::pair<void*, size_t> > data_uploading;
+    data_uploading.emplace_back((void*)cam->getUBOData(),
         sizeof(GEVulkanCameraUBO));
-    object_data_uploading.insert(object_data_uploading.end(),
-        m_data_uploading.begin(), m_data_uploading.end());
-    std::swap(m_data_uploading, object_data_uploading);
 
     const bool use_multidraw = GEVulkanFeatures::supportsMultiDrawIndirect() &&
         GEVulkanFeatures::supportsBindMeshTexturesAtOnce();
@@ -951,12 +919,22 @@ void GEVulkanDrawCall::uploadDynamicData(GEVulkanDriver* vk,
     {
         for (auto& cmd : m_cmds)
         {
-            m_data_uploading.emplace_back(
+            data_uploading.emplace_back(
                 (void*)&cmd.m_cmd, sizeof(VkDrawIndexedIndirectCommand));
         }
         dst_stage |= VK_PIPELINE_STAGE_DRAW_INDIRECT_BIT;
     }
-    m_dynamic_data->setCurrentData(m_data_uploading, cmd);
+    m_dynamic_data->setCurrentData(data_uploading, cmd);
+
+    const bool use_base_vertex = GEVulkanFeatures::supportsBaseVertexRendering();
+    if (!use_base_vertex)
+    {
+        // Make sure dynamic offset won't become invaild
+        size_t min_size = m_skinning_data_padded_size +
+             (m_object_data_padded_size * 2);
+        m_sbo_data->resizeIfNeeded(min_size);
+    }
+    m_sbo_data->setCurrentData(m_data_uploading, cmd);
 
     VkBufferMemoryBarrier barrier = {};
     barrier.sType = VK_STRUCTURE_TYPE_BUFFER_MEMORY_BARRIER;
@@ -969,6 +947,12 @@ void GEVulkanDrawCall::uploadDynamicData(GEVulkanDriver* vk,
     barrier.buffer = m_dynamic_data->getCurrentBuffer();
     barrier.size = m_dynamic_data->getRealSize();
 
+    vkCmdPipelineBarrier(cmd, VK_PIPELINE_STAGE_TRANSFER_BIT, dst_stage, 0, 0,
+        NULL, 1, &barrier, 0, NULL);
+
+    barrier.dstAccessMask = VK_ACCESS_SHADER_READ_BIT;
+    barrier.buffer = m_sbo_data->getCurrentBuffer();
+    barrier.size = m_skinning_data_padded_size + m_object_data_padded_size;
     vkCmdPipelineBarrier(cmd, VK_PIPELINE_STAGE_TRANSFER_BIT, dst_stage, 0, 0,
         NULL, 1, &barrier, 0, NULL);
 }   // uploadDynamicData
@@ -987,7 +971,7 @@ void GEVulkanDrawCall::render(GEVulkanDriver* vk, GEVulkanCameraSceneNode* cam,
     const bool use_base_vertex = GEVulkanFeatures::supportsBaseVertexRendering();
     VkDescriptorBufferInfo ubo_info;
     ubo_info.buffer = m_dynamic_data->getCurrentBuffer();
-    ubo_info.offset = m_skinning_data_padded_size + m_object_data_padded_size;
+    ubo_info.offset = 0;
     ubo_info.range = sizeof(GEVulkanCameraUBO);
 
     std::array<VkWriteDescriptorSet, 3> data_set = {};
@@ -1002,8 +986,8 @@ void GEVulkanDrawCall::render(GEVulkanDriver* vk, GEVulkanCameraSceneNode* cam,
     data_set[0].pBufferInfo = &ubo_info;
 
     VkDescriptorBufferInfo sbo_info_objects;
-    sbo_info_objects.buffer = m_dynamic_data->getCurrentBuffer();
-    sbo_info_objects.offset = 0;
+    sbo_info_objects.buffer = m_sbo_data->getCurrentBuffer();
+    sbo_info_objects.offset = m_skinning_data_padded_size;
     sbo_info_objects.range = m_object_data_padded_size;
 
     data_set[1].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
@@ -1017,8 +1001,8 @@ void GEVulkanDrawCall::render(GEVulkanDriver* vk, GEVulkanCameraSceneNode* cam,
     data_set[1].pBufferInfo = &sbo_info_objects;
 
     VkDescriptorBufferInfo sbo_info_skinning;
-    sbo_info_skinning.buffer = m_dynamic_data->getCurrentBuffer();
-    sbo_info_skinning.offset = m_object_data_padded_size;
+    sbo_info_skinning.buffer = m_sbo_data->getCurrentBuffer();
+    sbo_info_skinning.offset = 0;
     sbo_info_skinning.range = m_skinning_data_padded_size;
 
     data_set[2].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
@@ -1094,8 +1078,7 @@ void GEVulkanDrawCall::render(GEVulkanDriver* vk, GEVulkanCameraSceneNode* cam,
     bool drawn_skybox = false;
     if (use_multidraw)
     {
-        size_t indirect_offset = m_skinning_data_padded_size +
-            m_object_data_padded_size + sizeof(GEVulkanCameraUBO);
+        size_t indirect_offset = sizeof(GEVulkanCameraUBO);
         const size_t indirect_size = sizeof(VkDrawIndexedIndirectCommand);
         unsigned draw_count = 0;
         for (unsigned i = 0; i < m_cmds.size(); i++)
@@ -1207,5 +1190,45 @@ void GEVulkanDrawCall::render(GEVulkanDriver* vk, GEVulkanCameraSceneNode* cam,
     if (!drawn_skybox)
         GEVulkanSkyBoxRenderer::render(cmd, cam);
 }   // render
+
+// ----------------------------------------------------------------------------
+size_t GEVulkanDrawCall::getInitialSBOSize() const
+{
+    // Assume 50 bones per node
+    size_t ret = m_skinning_nodes.size() * 50 * sizeof(irr::core::matrix4);
+    const bool use_base_vertex =
+        GEVulkanFeatures::supportsBaseVertexRendering();
+    for (auto& p : m_visible_nodes)
+    {
+        for (auto& q : p.second)
+        {
+            unsigned visible_count = q.second.size();
+            if (visible_count == 0)
+                continue;
+            for (auto& r : q.second)
+            {
+                if (r.second == PARTICLE_NODE)
+                {
+                    irr::scene::IParticleSystemSceneNode* pn =
+                        static_cast<irr::scene::IParticleSystemSceneNode*>(
+                        r.first);
+                    const core::array<SParticle>& particles =
+                        pn->getParticles();
+                    unsigned ps = particles.size();
+                    if (ps == 0)
+                    {
+                        visible_count--;
+                        continue;
+                    }
+                    visible_count += ps - 1;
+                }
+            }
+            if (!use_base_vertex)
+                visible_count *= 2;
+            ret += visible_count * sizeof(ObjectData);
+        }
+    }
+    return ret * 2;
+}   // getInitialSBOSize
 
 }

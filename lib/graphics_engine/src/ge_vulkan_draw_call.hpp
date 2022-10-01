@@ -112,6 +112,10 @@ private:
 
     GEVulkanDynamicBuffer* m_dynamic_data;
 
+    GEVulkanDynamicBuffer* m_sbo_data;
+
+    const VkPhysicalDeviceLimits& m_limits;
+
     size_t m_object_data_padded_size;
 
     size_t m_skinning_data_padded_size;
@@ -169,6 +173,8 @@ private:
             textures[i] = m.TextureLayer[i].Texture;
         return textures;
     }
+    // ------------------------------------------------------------------------
+    size_t getInitialSBOSize() const;
 public:
     // ------------------------------------------------------------------------
     GEVulkanDrawCall();
