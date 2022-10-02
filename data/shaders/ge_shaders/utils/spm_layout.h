@@ -1,3 +1,7 @@
+#ifdef BIND_MESH_TEXTURES_AT_ONCE
+#extension GL_ARB_shader_draw_parameters : enable
+#endif
+
 layout(std140, set = 1, binding = 0) uniform CameraBuffer
 {
     mat4 m_view_matrix;
@@ -29,6 +33,13 @@ layout(std140, set = 1, binding = 2) readonly buffer SkinningMatrices
 {
     mat4 m_mat[];
 } u_skinning_matrices;
+
+#ifdef BIND_MESH_TEXTURES_AT_ONCE
+layout(std430, set = 1, binding = 3) readonly buffer MaterialIDs
+{
+    int m_material_id[];
+} u_material_ids;
+#endif
 
 layout(location = 0) in vec3 v_position;
 layout(location = 1) in vec4 v_normal;

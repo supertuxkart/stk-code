@@ -122,6 +122,7 @@ GEVulkanDrawCall::GEVulkanDrawCall()
     m_sbo_data = NULL;
     m_object_data_padded_size = 0;
     m_skinning_data_padded_size = 0;
+    m_materials_padded_size = 0;
     m_data_padding = NULL;
     const size_t ubo_padding = m_limits.minUniformBufferOffsetAlignment;
     const size_t sbo_padding = m_limits.minStorageBufferOffsetAlignment;
@@ -190,6 +191,7 @@ void GEVulkanDrawCall::addNode(irr::scene::ISceneNode* node)
             continue;
         const std::string& shader = getShader(node, i);
         m_visible_nodes[buffer][shader].emplace_back(node, i);
+        m_mb_map[buffer] = mesh;
         if (anode && !added_skinning &&
             !anode->getSkinningMatrices().empty() &&
             m_skinning_nodes.find(anode) == m_skinning_nodes.end())
@@ -209,7 +211,8 @@ void GEVulkanDrawCall::addBillboardNode(irr::scene::ISceneNode* node,
         return;
     irr::video::SMaterial m = node->getMaterial(0);
     TexturesList textures = {};
-    if (!GEVulkanFeatures::supportsDifferentTexturePerDraw())
+    if (!GEVulkanFeatures::supportsDifferentTexturePerDraw() ||
+        !GEVulkanFeatures::supportsBindMeshTexturesAtOnce())
         textures = getTexturesList(m);
     if (m_billboard_buffers.find(textures) == m_billboard_buffers.end())
         m_billboard_buffers[textures] = new GEVulkanBillboardBuffer(m);
@@ -226,16 +229,17 @@ void GEVulkanDrawCall::generate()
     if (!m_visible_nodes.empty() && m_data_layout == VK_NULL_HANDLE)
         createVulkanData();
 
+    std::vector<std::pair<void*, size_t> > data_uploading;
     std::unordered_map<irr::scene::ISceneNode*, int> skinning_offets;
     int added_joint = 1;
     m_skinning_data_padded_size = sizeof(irr::core::matrix4);
-    m_data_uploading.emplace_back((void*)m_data_padding,
+    data_uploading.emplace_back((void*)m_data_padding,
         sizeof(irr::core::matrix4));
     for (GEVulkanAnimatedMeshSceneNode* node : m_skinning_nodes)
     {
         int bone_count = node->getSPM()->getJointCount();
         size_t bone_size = sizeof(irr::core::matrix4) * bone_count;
-        m_data_uploading.emplace_back(
+        data_uploading.emplace_back(
             (void*)node->getSkinningMatrices().data(), bone_size);
         skinning_offets[node] = added_joint;
         added_joint += bone_count;
@@ -246,7 +250,7 @@ void GEVulkanDrawCall::generate()
     if (padding > 0)
     {
         m_skinning_data_padded_size += padding;
-        m_data_uploading.emplace_back((void*)m_data_padding,
+        data_uploading.emplace_back((void*)m_data_padding,
             padding);
     }
 
@@ -285,14 +289,25 @@ void GEVulkanDrawCall::generate()
         });
 
     const bool use_base_vertex = GEVulkanFeatures::supportsBaseVertexRendering();
+    const bool bind_mesh_textures =
+        GEVulkanFeatures::supportsBindMeshTexturesAtOnce();
     unsigned accumulated_instance = 0;
+
+    struct InstanceKey
+    {
+        std::vector<irr::scene::ISceneNode*> m_nodes;
+        unsigned m_instance_count;
+        unsigned m_first_instance;
+        bool m_hue_change;
+    };
+    std::unordered_map<irr::scene::IMesh*, std::vector<InstanceKey> >
+        instance_keys;
     for (auto& p : visible_nodes)
     {
         TexturesList textures = getTexturesList(p.first->getMaterial());
         const irr::video::ITexture** list = &textures[0];
         int material_id = m_texture_descriptor->getTextureID(list);
-        if (!GEVulkanFeatures::supportsBindMeshTexturesAtOnce())
-            m_materials[p.first] = material_id;
+        m_materials[p.first] = material_id;
 
         const bool skinning = p.first->hasSkinning();
         for (auto& q : p.second)
@@ -306,6 +321,48 @@ void GEVulkanDrawCall::generate()
             if (m_graphics_pipelines.find(cur_shader) ==
                 m_graphics_pipelines.end())
                 continue;
+            InstanceKey key;
+            key.m_nodes.reserve(q.second.size());
+            key.m_instance_count = visible_count;
+            key.m_first_instance = accumulated_instance;
+            key.m_hue_change = false;
+            bool skip_instance_key = false;
+            for (auto& r : q.second)
+            {
+                if (r.second == BILLBOARD_NODE || r.second == PARTICLE_NODE)
+                {
+                    skip_instance_key = true;
+                    break;
+                }
+                irr::scene::ISceneNode* node = r.first;
+                const irr::core::matrix4& texture_matrix =
+                    node->getMaterial(r.second).getTextureMatrix(0);
+                if (texture_matrix[8] != 0.0f || texture_matrix[9] != 0.0f)
+                {
+                    skip_instance_key = true;
+                    break;
+                }
+                auto& ri = node->getMaterial(r.second).getRenderInfo();
+                if (ri && ri->getHue() > 0.0f)
+                {
+                    key.m_hue_change = true;
+                    break;
+                }
+                key.m_nodes.push_back(node);
+            }
+            irr::scene::IMesh* m = m_mb_map[p.first];
+            auto& cur_key = instance_keys[m];
+            auto it = cur_key.end();
+            if (!skip_instance_key)
+            {
+                it = std::find_if(cur_key.begin(), cur_key.end(),
+                    [key](const InstanceKey& k)
+                    {
+                        return k.m_nodes == key.m_nodes &&
+                            k.m_instance_count == key.m_instance_count &&
+                            k.m_hue_change == key.m_hue_change;
+                    });
+            }
             for (auto& r : q.second)
             {
                 irr::scene::ISceneNode* node = r.first;
@@ -345,14 +402,15 @@ void GEVulkanDrawCall::generate()
                         }
                     }
                 }
-                else
+                else if (skip_instance_key || it == cur_key.end())
                 {
                     int skinning_offset = -1000;
                     auto it = skinning_offets.find(node);
                     if (it != skinning_offets.end())
                         skinning_offset = it->second;
-                    m_visible_objects.emplace_back(node, material_id,
-                        skinning_offset, r.second);
+                    m_visible_objects.emplace_back(node,
+                        bind_mesh_textures ? -1 : material_id, skinning_offset,
+                        r.second);
                 }
             }
             VkDrawIndexedIndirectCommand cmd;
@@ -360,17 +418,24 @@ void GEVulkanDrawCall::generate()
             cmd.instanceCount = visible_count;
             cmd.firstIndex = use_base_vertex ? p.first->getIBOOffset() : 0;
             cmd.vertexOffset = use_base_vertex ? p.first->getVBOOffset() : 0;
-            cmd.firstInstance = accumulated_instance;
-            accumulated_instance += visible_count;
+            if (skip_instance_key || it == cur_key.end())
+            {
+                cmd.firstInstance = accumulated_instance;
+                accumulated_instance += visible_count;
+            }
+            else
+                cmd.firstInstance = it->m_first_instance;
             const PipelineSettings& settings =
                 m_graphics_pipelines[cur_shader].second;
             std::string sorting_key =
                 std::string(1, settings.m_drawing_priority) + cur_shader;
             m_cmds.push_back({ cmd, cur_shader, sorting_key, p.first,
                 settings.isTransparent() });
+            if (!skip_instance_key && it == cur_key.end())
+                 cur_key.push_back(key);
         }
     }
-    if (!GEVulkanFeatures::supportsBindMeshTexturesAtOnce())
+    if (!bind_mesh_textures)
     {
         std::stable_sort(m_cmds.begin(), m_cmds.end(),
             [this](const DrawCallData& a, const DrawCallData& b)
@@ -395,32 +460,91 @@ void GEVulkanDrawCall::generate()
     {
         const size_t object_data_size =
             sizeof(ObjectData) * m_visible_objects.size();
-        m_data_uploading.emplace_back((void*)m_visible_objects.data(),
+        data_uploading.emplace_back((void*)m_visible_objects.data(),
             object_data_size);
         m_object_data_padded_size = object_data_size;
     }
     else
     {
         m_object_data_padded_size = 0;
+        std::unordered_map<uint32_t, size_t> offset_map;
         for (unsigned i = 0; i < m_cmds.size(); i++)
         {
             auto& cmd = m_cmds[i];
-            size_t instance_size =
-                cmd.m_cmd.instanceCount * sizeof(ObjectData);
-            m_data_uploading.emplace_back(
-                &m_visible_objects[cmd.m_cmd.firstInstance], instance_size);
-            size_t cur_padding = getPadding(m_object_data_padded_size +
-                instance_size, sbo_alignment);
-            if (cur_padding > 0)
+            uint32_t first_instance = cmd.m_cmd.firstInstance;
+            if (offset_map.find(first_instance) == offset_map.end())
             {
-                instance_size += cur_padding;
-                m_data_uploading.emplace_back((void*)m_data_padding,
-                    cur_padding);
+                size_t instance_size =
+                    cmd.m_cmd.instanceCount * sizeof(ObjectData);
+                data_uploading.emplace_back(
+                    &m_visible_objects[first_instance], instance_size);
+                size_t cur_padding = getPadding(m_object_data_padded_size +
+                    instance_size, sbo_alignment);
+                if (cur_padding > 0)
+                {
+                    instance_size += cur_padding;
+                    data_uploading.emplace_back((void*)m_data_padding,
+                        cur_padding);
+                }
+                m_sbo_data_offset.push_back(m_object_data_padded_size);
+                offset_map[cmd.m_cmd.firstInstance] = m_object_data_padded_size;
+                m_object_data_padded_size += instance_size;
             }
-            m_sbo_data_offset.push_back(m_object_data_padded_size);
-            m_object_data_padded_size += instance_size;
+            else
+            {
+                m_sbo_data_offset.push_back(offset_map.at(first_instance));
+            }
         }
     }
+
+    m_materials_padded_size = 0;
+    if (bind_mesh_textures && !m_cmds.empty())
+    {
+        std::string cur_shader = m_cmds[0].m_shader;
+        for (unsigned i = 0; i < m_cmds.size(); i++)
+        {
+            auto& cmd = m_cmds[i];
+            auto& material = m_materials_data[cur_shader];
+            if (cmd.m_shader != cur_shader)
+            {
+                size_t material_size = material.second.size() * sizeof(int);
+                m_data_uploading.emplace_back(
+                    material.second.data(), material_size);
+                size_t cur_padding = getPadding(m_materials_padded_size +
+                    material_size, sbo_alignment);
+                if (cur_padding > 0)
+                {
+                    material_size += cur_padding;
+                    m_data_uploading.emplace_back((void*)m_data_padding,
+                        cur_padding);
+                }
+                material.first = m_materials_padded_size;
+                m_materials_padded_size += material_size;
+                cur_shader = cmd.m_shader;
+            }
+            m_materials_data[cmd.m_shader].second
+                .push_back(m_materials[cmd.m_mb]);
+        }
+
+        auto& material = m_materials_data[m_cmds.back().m_shader];
+        size_t material_size = material.second.size() * sizeof(int);
+        m_data_uploading.emplace_back(
+            material.second.data(), material_size);
+        size_t cur_padding = getPadding(m_materials_padded_size +
+            material_size, sbo_alignment);
+        if (cur_padding > 0)
+        {
+            material_size += cur_padding;
+            m_data_uploading.emplace_back((void*)m_data_padding,
+                cur_padding);
+        }
+        material.first = m_materials_padded_size;
+        m_materials_padded_size += material_size;
+        m_data_uploading.insert(m_data_uploading.end(), data_uploading.begin(),
+            data_uploading.end());
+    }
+    else
+        std::swap(m_data_uploading, data_uploading);
 }   // generate
 
 // ----------------------------------------------------------------------------
@@ -748,42 +872,55 @@ start:
 void GEVulkanDrawCall::createVulkanData()
 {
     GEVulkanDriver* vk = getVKDriver();
-    const bool use_base_vertex = GEVulkanFeatures::supportsBaseVertexRendering();
+    const bool use_dynamic =
+        !GEVulkanFeatures::supportsBaseVertexRendering() ||
+        GEVulkanFeatures::supportsBindMeshTexturesAtOnce();
 
     // m_data_layout
     VkDescriptorSetLayoutBinding camera_layout_binding = {};
     camera_layout_binding.binding = 0;
     camera_layout_binding.descriptorCount = 1;
-    camera_layout_binding.descriptorType = use_base_vertex ?
-        VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER :
-        VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER_DYNAMIC;
+    camera_layout_binding.descriptorType = use_dynamic ?
+        VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER_DYNAMIC :
+        VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
     camera_layout_binding.pImmutableSamplers = NULL;
     camera_layout_binding.stageFlags = VK_SHADER_STAGE_VERTEX_BIT;
 
     VkDescriptorSetLayoutBinding object_data_layout_binding = {};
     object_data_layout_binding.binding = 1;
     object_data_layout_binding.descriptorCount = 1;
-    object_data_layout_binding.descriptorType = use_base_vertex ?
-        VK_DESCRIPTOR_TYPE_STORAGE_BUFFER :
-        VK_DESCRIPTOR_TYPE_STORAGE_BUFFER_DYNAMIC;
+    object_data_layout_binding.descriptorType = use_dynamic ?
+        VK_DESCRIPTOR_TYPE_STORAGE_BUFFER_DYNAMIC :
+        VK_DESCRIPTOR_TYPE_STORAGE_BUFFER;
     object_data_layout_binding.pImmutableSamplers = NULL;
     object_data_layout_binding.stageFlags = VK_SHADER_STAGE_VERTEX_BIT;
 
     VkDescriptorSetLayoutBinding skinning_layout_binding = {};
     skinning_layout_binding.binding = 2;
     skinning_layout_binding.descriptorCount = 1;
-    skinning_layout_binding.descriptorType =  use_base_vertex ?
-        VK_DESCRIPTOR_TYPE_STORAGE_BUFFER :
-        VK_DESCRIPTOR_TYPE_STORAGE_BUFFER_DYNAMIC;
+    skinning_layout_binding.descriptorType = use_dynamic ?
+        VK_DESCRIPTOR_TYPE_STORAGE_BUFFER_DYNAMIC :
+        VK_DESCRIPTOR_TYPE_STORAGE_BUFFER;
     skinning_layout_binding.pImmutableSamplers = NULL;
     skinning_layout_binding.stageFlags = VK_SHADER_STAGE_VERTEX_BIT;
 
-    std::array<VkDescriptorSetLayoutBinding, 3> bindings =
-    {{
+    std::vector<VkDescriptorSetLayoutBinding> bindings =
+    {
          camera_layout_binding,
          object_data_layout_binding,
          skinning_layout_binding
-    }};
+    };
+    if (GEVulkanFeatures::supportsBindMeshTexturesAtOnce())
+    {
+        VkDescriptorSetLayoutBinding material_binding = {};
+        material_binding.binding = 3;
+        material_binding.descriptorCount = 1;
+        material_binding.descriptorType =
+            VK_DESCRIPTOR_TYPE_STORAGE_BUFFER_DYNAMIC;
+        material_binding.pImmutableSamplers = NULL;
+        material_binding.stageFlags = VK_SHADER_STAGE_VERTEX_BIT;
+        bindings.push_back(material_binding);
+    }
 
     VkDescriptorSetLayoutCreateInfo setinfo = {};
     setinfo.flags = 0;
@@ -801,21 +938,23 @@ void GEVulkanDrawCall::createVulkanData()
     }
 
     // m_descriptor_pool
-    std::array<VkDescriptorPoolSize, 2> sizes =
-    {{
+    std::vector<VkDescriptorPoolSize> sizes =
+    {
         {
-            use_base_vertex ?
-            VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER :
-            VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER_DYNAMIC,
+            use_dynamic ?
+            VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER_DYNAMIC :
+            VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER,
             vk->getMaxFrameInFlight()
         },
         {
-            use_base_vertex ?
-            VK_DESCRIPTOR_TYPE_STORAGE_BUFFER :
-            VK_DESCRIPTOR_TYPE_STORAGE_BUFFER_DYNAMIC,
+            use_dynamic ?
+            VK_DESCRIPTOR_TYPE_STORAGE_BUFFER_DYNAMIC :
+            VK_DESCRIPTOR_TYPE_STORAGE_BUFFER,
             vk->getMaxFrameInFlight() * 2
         }
-    }};
+    };
+    if (GEVulkanFeatures::supportsBindMeshTexturesAtOnce())
+        sizes.push_back(sizes.back());
 
     VkDescriptorPoolCreateInfo pool_info = {};
     pool_info.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO;
@@ -877,7 +1016,7 @@ void GEVulkanDrawCall::createVulkanData()
     createAllPipelines(vk);
 
     size_t extra_size = 0;
-    const bool use_multidraw = GEVulkanFeatures::supportsMultiDrawIndirect() &&
+    const bool use_multidraw =
         GEVulkanFeatures::supportsBindMeshTexturesAtOnce();
     VkBufferUsageFlags flags = VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT;
     if (use_multidraw)
@@ -913,7 +1052,7 @@ void GEVulkanDrawCall::uploadDynamicData(GEVulkanDriver* vk,
     data_uploading.emplace_back((void*)cam->getUBOData(),
         sizeof(GEVulkanCameraUBO));
 
-    const bool use_multidraw = GEVulkanFeatures::supportsMultiDrawIndirect() &&
+    const bool use_multidraw =
         GEVulkanFeatures::supportsBindMeshTexturesAtOnce();
     if (use_multidraw)
     {
@@ -927,34 +1066,30 @@ void GEVulkanDrawCall::uploadDynamicData(GEVulkanDriver* vk,
     m_dynamic_data->setCurrentData(data_uploading, cmd);
 
     const bool use_base_vertex = GEVulkanFeatures::supportsBaseVertexRendering();
+    size_t min_size = 0;
     if (!use_base_vertex)
     {
         // Make sure dynamic offset won't become invaild
-        size_t min_size = m_skinning_data_padded_size +
+        min_size = m_skinning_data_padded_size +
              (m_object_data_padded_size * 2);
-        m_sbo_data->resizeIfNeeded(min_size);
     }
+    else if (use_multidraw)
+    {
+        min_size = (m_materials_padded_size * 2) +
+            m_skinning_data_padded_size + m_object_data_padded_size;
+    }
+    m_sbo_data->resizeIfNeeded(min_size);
     m_sbo_data->setCurrentData(m_data_uploading, cmd);
 
-    VkBufferMemoryBarrier barrier = {};
-    barrier.sType = VK_STRUCTURE_TYPE_BUFFER_MEMORY_BARRIER;
+    VkMemoryBarrier barrier = {};
+    barrier.sType = VK_STRUCTURE_TYPE_MEMORY_BARRIER;
     barrier.srcAccessMask = VK_ACCESS_TRANSFER_WRITE_BIT;
     barrier.dstAccessMask = VK_ACCESS_SHADER_READ_BIT;
     if (use_multidraw)
         barrier.dstAccessMask |= VK_ACCESS_INDIRECT_COMMAND_READ_BIT;
-    barrier.srcQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
-    barrier.dstQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
-    barrier.buffer = m_dynamic_data->getCurrentBuffer();
-    barrier.size = m_dynamic_data->getRealSize();
 
-    vkCmdPipelineBarrier(cmd, VK_PIPELINE_STAGE_TRANSFER_BIT, dst_stage, 0, 0,
-        NULL, 1, &barrier, 0, NULL);
-
-    barrier.dstAccessMask = VK_ACCESS_SHADER_READ_BIT;
-    barrier.buffer = m_sbo_data->getCurrentBuffer();
-    barrier.size = m_skinning_data_padded_size + m_object_data_padded_size;
-    vkCmdPipelineBarrier(cmd, VK_PIPELINE_STAGE_TRANSFER_BIT, dst_stage, 0, 0,
-        NULL, 1, &barrier, 0, NULL);
+    vkCmdPipelineBarrier(cmd, VK_PIPELINE_STAGE_TRANSFER_BIT, dst_stage, 0, 1,
+        &barrier, 0, NULL, 0, NULL);
 }   // uploadDynamicData
 
 // ----------------------------------------------------------------------------
@@ -969,70 +1104,78 @@ void GEVulkanDrawCall::render(GEVulkanDriver* vk, GEVulkanCameraSceneNode* cam,
     const unsigned cur_frame = vk->getCurrentFrame();
 
     const bool use_base_vertex = GEVulkanFeatures::supportsBaseVertexRendering();
+    const bool bind_mesh_textures = GEVulkanFeatures::supportsBindMeshTexturesAtOnce();
+    const bool use_dynamic = !use_base_vertex || bind_mesh_textures;
     VkDescriptorBufferInfo ubo_info;
     ubo_info.buffer = m_dynamic_data->getCurrentBuffer();
     ubo_info.offset = 0;
     ubo_info.range = sizeof(GEVulkanCameraUBO);
 
-    std::array<VkWriteDescriptorSet, 3> data_set = {};
+    std::vector<VkWriteDescriptorSet> data_set;
+    data_set.resize(3, {});
     data_set[0].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
     data_set[0].dstSet = m_data_descriptor_sets[cur_frame];
     data_set[0].dstBinding = 0;
     data_set[0].dstArrayElement = 0;
-    data_set[0].descriptorType = use_base_vertex ?
-        VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER :
-        VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER_DYNAMIC;
+    data_set[0].descriptorType = use_dynamic ?
+        VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER_DYNAMIC :
+        VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
     data_set[0].descriptorCount = 1;
     data_set[0].pBufferInfo = &ubo_info;
 
     VkDescriptorBufferInfo sbo_info_objects;
     sbo_info_objects.buffer = m_sbo_data->getCurrentBuffer();
-    sbo_info_objects.offset = m_skinning_data_padded_size;
+    sbo_info_objects.offset =
+        m_materials_padded_size + m_skinning_data_padded_size;
     sbo_info_objects.range = m_object_data_padded_size;
 
     data_set[1].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
     data_set[1].dstSet = m_data_descriptor_sets[cur_frame];
     data_set[1].dstBinding = 1;
     data_set[1].dstArrayElement = 0;
-    data_set[1].descriptorType = use_base_vertex ?
-        VK_DESCRIPTOR_TYPE_STORAGE_BUFFER :
-        VK_DESCRIPTOR_TYPE_STORAGE_BUFFER_DYNAMIC;
+    data_set[1].descriptorType = use_dynamic ?
+        VK_DESCRIPTOR_TYPE_STORAGE_BUFFER_DYNAMIC :
+        VK_DESCRIPTOR_TYPE_STORAGE_BUFFER;
     data_set[1].descriptorCount = 1;
     data_set[1].pBufferInfo = &sbo_info_objects;
 
     VkDescriptorBufferInfo sbo_info_skinning;
     sbo_info_skinning.buffer = m_sbo_data->getCurrentBuffer();
-    sbo_info_skinning.offset = 0;
+    sbo_info_skinning.offset = m_materials_padded_size;
     sbo_info_skinning.range = m_skinning_data_padded_size;
 
     data_set[2].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
     data_set[2].dstSet = m_data_descriptor_sets[cur_frame];
     data_set[2].dstBinding = 2;
     data_set[2].dstArrayElement = 0;
-    data_set[2].descriptorType = use_base_vertex ?
-        VK_DESCRIPTOR_TYPE_STORAGE_BUFFER :
-        VK_DESCRIPTOR_TYPE_STORAGE_BUFFER_DYNAMIC; ;
+    data_set[2].descriptorType = use_dynamic ?
+        VK_DESCRIPTOR_TYPE_STORAGE_BUFFER_DYNAMIC :
+        VK_DESCRIPTOR_TYPE_STORAGE_BUFFER; ;
     data_set[2].descriptorCount = 1;
     data_set[2].pBufferInfo = &sbo_info_skinning;
+
+    VkDescriptorBufferInfo sbo_info_material;
+    sbo_info_material.buffer = m_sbo_data->getCurrentBuffer();
+    sbo_info_material.offset = 0;
+    sbo_info_material.range = m_materials_padded_size;
+    if (bind_mesh_textures)
+    {
+        data_set.resize(4, {});
+        data_set[3].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+        data_set[3].dstSet = m_data_descriptor_sets[cur_frame];
+        data_set[3].dstBinding = 3;
+        data_set[3].dstArrayElement = 0;
+        data_set[3].descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER_DYNAMIC;
+        data_set[3].descriptorCount = 1;
+        data_set[3].pBufferInfo = &sbo_info_material;
+    }
 
     vkUpdateDescriptorSets(vk->getDevice(), data_set.size(), data_set.data(),
         0, NULL);
 
     m_texture_descriptor->updateDescriptor();
-
-    if (GEVulkanFeatures::supportsBindMeshTexturesAtOnce())
-    {
-        vkCmdBindDescriptorSets(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS,
-            m_pipeline_layout, 0, 1, m_texture_descriptor->getDescriptorSet(),
-            0, NULL);
-    }
-
     if (use_base_vertex)
     {
-        vkCmdBindDescriptorSets(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS,
-            m_pipeline_layout, 1, 1, &m_data_descriptor_sets[cur_frame], 0,
-            NULL);
-
         GEVulkanMeshCache* mc = vk->getVulkanMeshCache();
         std::array<VkBuffer, 2> vertex_buffer =
         {{
@@ -1071,13 +1214,21 @@ void GEVulkanDrawCall::render(GEVulkanDriver* vk, GEVulkanCameraSceneNode* cam,
     scissor.extent.height = vp.height;
     vkCmdSetScissor(cmd, 0, 1, &scissor);
 
-    const bool use_multidraw = GEVulkanFeatures::supportsMultiDrawIndirect() &&
-        GEVulkanFeatures::supportsBindMeshTexturesAtOnce();
-
     std::string cur_pipeline = m_cmds[0].m_shader;
     bool drawn_skybox = false;
-    if (use_multidraw)
+    if (bind_mesh_textures)
     {
+        vkCmdBindDescriptorSets(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS,
+            m_pipeline_layout, 0, 1, m_texture_descriptor->getDescriptorSet(),
+            0, NULL);
+
+        std::array<uint32_t, 4> material_offsets =
+        {{
+            0u,
+            0u,
+            0u,
+            0u,
+        }};
         size_t indirect_offset = sizeof(GEVulkanCameraUBO);
         const size_t indirect_size = sizeof(VkDrawIndexedIndirectCommand);
         unsigned draw_count = 0;
@@ -1086,6 +1237,11 @@ void GEVulkanDrawCall::render(GEVulkanDriver* vk, GEVulkanCameraSceneNode* cam,
             if (m_cmds[i].m_shader != cur_pipeline)
             {
                 bindPipeline(cmd, cur_pipeline);
+                material_offsets[3] = m_materials_data[cur_pipeline].first;
+                vkCmdBindDescriptorSets(cmd,
+                    VK_PIPELINE_BIND_POINT_GRAPHICS, m_pipeline_layout, 1, 1,
+                    &m_data_descriptor_sets[cur_frame], material_offsets.size(),
+                    material_offsets.data());
                 vkCmdDrawIndexedIndirect(cmd,
                     m_dynamic_data->getCurrentBuffer(), indirect_offset,
                     draw_count, indirect_size);
@@ -1101,16 +1257,17 @@ void GEVulkanDrawCall::render(GEVulkanDriver* vk, GEVulkanCameraSceneNode* cam,
                     vkCmdBindDescriptorSets(cmd,
                         VK_PIPELINE_BIND_POINT_GRAPHICS, m_pipeline_layout, 0,
                         1, m_texture_descriptor->getDescriptorSet(), 0, NULL);
-
-                    vkCmdBindDescriptorSets(cmd,
-                    VK_PIPELINE_BIND_POINT_GRAPHICS, m_pipeline_layout, 1, 1,
-                    &m_data_descriptor_sets[cur_frame], 0, NULL);
                 }
                 continue;
             }
             draw_count++;
         }
         bindPipeline(cmd, m_cmds.back().m_shader);
+        material_offsets[3] = m_materials_data[m_cmds.back().m_shader].first;
+        vkCmdBindDescriptorSets(cmd,
+            VK_PIPELINE_BIND_POINT_GRAPHICS, m_pipeline_layout, 1, 1,
+            &m_data_descriptor_sets[cur_frame], material_offsets.size(),
+            material_offsets.data());
         vkCmdDrawIndexedIndirect(cmd,
             m_dynamic_data->getCurrentBuffer(), indirect_offset,
             draw_count, indirect_size);
@@ -1119,11 +1276,14 @@ void GEVulkanDrawCall::render(GEVulkanDriver* vk, GEVulkanCameraSceneNode* cam,
     {
         int cur_mid = m_materials[m_cmds[0].m_mb];
         bindPipeline(cmd, cur_pipeline);
-        if (!GEVulkanFeatures::supportsBindMeshTexturesAtOnce())
+        vkCmdBindDescriptorSets(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS,
+            m_pipeline_layout, 0, 1,
+            &m_texture_descriptor->getDescriptorSet()[cur_mid], 0, NULL);
+        if (use_base_vertex)
         {
-            vkCmdBindDescriptorSets(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS,
-                m_pipeline_layout, 0, 1,
-                &m_texture_descriptor->getDescriptorSet()[cur_mid], 0, NULL);
+            vkCmdBindDescriptorSets(cmd,
+                VK_PIPELINE_BIND_POINT_GRAPHICS, m_pipeline_layout, 1, 1,
+                    &m_data_descriptor_sets[cur_frame], 0, NULL);
         }
         for (unsigned i = 0; i < m_cmds.size(); i++)
         {
@@ -1133,19 +1293,10 @@ void GEVulkanDrawCall::render(GEVulkanDriver* vk, GEVulkanCameraSceneNode* cam,
                 drawn_skybox = true;
                 GEVulkanSkyBoxRenderer::render(cmd, cam);
 
-                if (!GEVulkanFeatures::supportsBindMeshTexturesAtOnce())
-                {
-                    vkCmdBindDescriptorSets(cmd,
-                        VK_PIPELINE_BIND_POINT_GRAPHICS, m_pipeline_layout, 0,
-                        1, &m_texture_descriptor->getDescriptorSet()[cur_mid],
-                        0, NULL);
-                }
-                else
-                {
-                    vkCmdBindDescriptorSets(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS,
-                        m_pipeline_layout, 0, 1,
-                        m_texture_descriptor->getDescriptorSet(), 0, NULL);
-                }
+                vkCmdBindDescriptorSets(cmd,
+                    VK_PIPELINE_BIND_POINT_GRAPHICS, m_pipeline_layout, 0, 1,
+                    &m_texture_descriptor->getDescriptorSet()[cur_mid], 0,
+                    NULL);
                 if (use_base_vertex)
                 {
                     vkCmdBindDescriptorSets(cmd,
@@ -1155,8 +1306,7 @@ void GEVulkanDrawCall::render(GEVulkanDriver* vk, GEVulkanCameraSceneNode* cam,
             }
 
             int mid = m_materials[m_cmds[i].m_mb];
-            if (!GEVulkanFeatures::supportsBindMeshTexturesAtOnce() &&
-                cur_mid != mid)
+            if (cur_mid != mid)
             {
                 cur_mid = mid;
                 vkCmdBindDescriptorSets(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS,

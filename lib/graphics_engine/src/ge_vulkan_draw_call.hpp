@@ -22,6 +22,7 @@ namespace irr
     namespace scene
     {
         class ISceneNode; class IBillboardSceneNode; struct SParticle;
+        class IMesh;
     }
 }
 
@@ -104,6 +105,8 @@ private:
         std::vector<std::pair<irr::scene::ISceneNode*, int> > > >
         m_visible_nodes;
 
+    std::unordered_map<GESPMBuffer*, irr::scene::IMesh*> m_mb_map;
+
     GECullingTool* m_culling_tool;
 
     std::vector<DrawCallData> m_cmds;
@@ -119,6 +122,8 @@ private:
     size_t m_object_data_padded_size;
 
     size_t m_skinning_data_padded_size;
+
+    size_t m_materials_padded_size;
 
     char* m_data_padding;
 
@@ -142,6 +147,9 @@ private:
     std::vector<std::pair<void*, size_t> > m_data_uploading;
 
     std::vector<size_t> m_sbo_data_offset;
+
+    std::unordered_map<std::string, std::pair<uint32_t, std::vector<int> > >
+        m_materials_data;
 
     // ------------------------------------------------------------------------
     void createAllPipelines(GEVulkanDriver* vk);
@@ -207,12 +215,14 @@ public:
     void reset()
     {
         m_visible_nodes.clear();
+        m_mb_map.clear();
         m_cmds.clear();
         m_visible_objects.clear();
         m_materials.clear();
         m_skinning_nodes.clear();
         m_data_uploading.clear();
         m_sbo_data_offset.clear();
+        m_materials_data.clear();
     }
 };   // GEVulkanDrawCall
 

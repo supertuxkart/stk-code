@@ -190,6 +190,9 @@ void GEVulkanFeatures::init(GEVulkanDriver* vk)
     g_supports_base_vertex_rendering = mvk_features.baseVertexInstanceDrawing;
     if (!g_supports_base_vertex_rendering)
         g_supports_multi_draw_indirect = false;
+
+    // https://github.com/KhronosGroup/MoltenVK/issues/1743
+    g_supports_shader_draw_parameters = false;
 #endif
 }   // init
 
@@ -286,7 +289,8 @@ bool GEVulkanFeatures::supportsPartiallyBound()
 // ----------------------------------------------------------------------------
 bool GEVulkanFeatures::supportsBindMeshTexturesAtOnce()
 {
-    if (!g_supports_bind_textures_at_once)
+    if (!g_supports_bind_textures_at_once || !g_supports_multi_draw_indirect ||
+        !g_supports_shader_draw_parameters)
         return false;
     const unsigned sampler_count = GEVulkanShaderManager::getSamplerSize() *
         GEVulkanShaderManager::getMeshTextureLayer();

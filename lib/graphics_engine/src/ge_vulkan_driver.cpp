@@ -890,17 +890,21 @@ bool GEVulkanDriver::checkDeviceExtensions(VkPhysicalDevice device)
 
     VkPhysicalDeviceProperties properties = {};
     vkGetPhysicalDeviceProperties(device, &properties);
-    if (properties.apiVersion < VK_API_VERSION_1_2)
+    for (auto& ext : extensions)
     {
-        for (auto& ext : extensions)
+        if (properties.apiVersion < VK_API_VERSION_1_2 &&
+            strcmp(ext.extensionName,
+            VK_EXT_DESCRIPTOR_INDEXING_EXTENSION_NAME) == 0)
         {
-            if (strcmp(ext.extensionName,
-                VK_EXT_DESCRIPTOR_INDEXING_EXTENSION_NAME) == 0)
-            {
-                m_device_extensions.push_back(
-                    VK_EXT_DESCRIPTOR_INDEXING_EXTENSION_NAME);
-                break;
-            }
+            m_device_extensions.push_back(
+                VK_EXT_DESCRIPTOR_INDEXING_EXTENSION_NAME);
+        }
+        else if (properties.apiVersion < VK_API_VERSION_1_1 &&
+            strcmp(ext.extensionName,
+            VK_KHR_SHADER_DRAW_PARAMETERS_EXTENSION_NAME) == 0)
+        {
+            m_device_extensions.push_back(
+                VK_KHR_SHADER_DRAW_PARAMETERS_EXTENSION_NAME);
         }
     }
 
@@ -1026,6 +1030,13 @@ void GEVulkanDriver::createDevice()
         GEVulkanFeatures::supportsNonUniformIndexing();
     descriptor_indexing_features.descriptorBindingPartiallyBound =
         GEVulkanFeatures::supportsPartiallyBound();
+
+    VkPhysicalDeviceShaderDrawParametersFeatures shader_draw = {};
+    shader_draw.sType =
+        VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SHADER_DRAW_PARAMETERS_FEATURES;
+    shader_draw.shaderDrawParameters =
+        GEVulkanFeatures::supportsShaderDrawParameters();
+    descriptor_indexing_features.pNext = &shader_draw;
 
     if (m_features.samplerAnisotropy == VK_TRUE)
         device_features.samplerAnisotropy = VK_TRUE;
