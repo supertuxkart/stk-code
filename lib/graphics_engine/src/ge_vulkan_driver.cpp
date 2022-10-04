@@ -1703,8 +1703,8 @@ bool GEVulkanDriver::endScene()
         return false;
     }
 
-    VkFence fence = m_vk->in_flight_fences[m_current_frame];
-    if (vkWaitForFences(m_vk->device, 1, &fence, VK_TRUE, 2000000000) ==
+    if (m_vk->in_flight_fences.empty() || vkWaitForFences(m_vk->device, 1,
+        &m_vk->in_flight_fences[m_current_frame], VK_TRUE, 2000000000) ==
         VK_TIMEOUT)
     {
         // Attempt to restore after out focus in gnome fullscreen
@@ -1712,10 +1712,20 @@ bool GEVulkanDriver::endScene()
         GEVulkan2dRenderer::clear();
         handleDeletedTextures();
         destroySwapChainRelated(false/*handle_surface*/);
-        createSwapChainRelated(false/*handle_surface*/);
+        try
+        {
+            createSwapChainRelated(false/*handle_surface*/);
+        }
+        catch (std::exception& e)
+        {
+            // When minimized in Windows swapchain depth buffer will fail to
+            // create
+            destroySwapChainRelated(false/*handle_surface*/);
+        }
         return true;
     }
 
+    VkFence fence = m_vk->in_flight_fences[m_current_frame];
     vkResetFences(m_vk->device, 1, &fence);
     vkResetCommandPool(m_vk->device, m_vk->command_pools[m_current_frame], 0);
 

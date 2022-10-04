@@ -2086,16 +2086,17 @@ void IrrDriver::handleWindowResize()
     new_orientation = (int)SDL_GetDisplayOrientation(0);
     screen_orientation_changed = m_screen_orientation != new_orientation;
 #endif
-    if (m_actual_screen_size != m_video_driver->getCurrentRenderTargetSize() ||
-        current_screen_size != m_video_driver->getCurrentRenderTargetSize() ||
+    const core::dimension2du& new_size = m_video_driver->getCurrentRenderTargetSize();
+    if (m_actual_screen_size != new_size ||
+        current_screen_size != new_size ||
         screen_orientation_changed)
     {
-        // Don't update when dialog is opened
-        if (dialog_exists)
+        // Don't update when dialog is opened or minimized
+        if (dialog_exists || new_size.getArea() == 0)
             return;
 
         m_screen_orientation = new_orientation;
-        m_actual_screen_size = m_video_driver->getCurrentRenderTargetSize();
+        m_actual_screen_size = new_size;
         UserConfigParams::m_width = m_actual_screen_size.Width;
         UserConfigParams::m_height = m_actual_screen_size.Height;
         UserConfigParams::m_real_width = (unsigned)((float)m_actual_screen_size.Width / m_device->getNativeScaleX());
