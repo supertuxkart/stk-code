@@ -10,42 +10,31 @@
 namespace GE
 {
 
-enum GEVulkanDynamicBufferType : unsigned
-{
-    GVDBT_GPU_RAM,
-    GVDBT_SYSTEM_RAM
-};
-
 class GEVulkanDynamicBuffer
 {
 private:
-    VkBuffer* m_buffer;
+    std::vector<VkBuffer> m_host_buffer, m_local_buffer;
 
-    VmaAllocation* m_memory;
+    std::vector<VmaAllocation> m_host_memory, m_local_memory;
 
-    VkBuffer* m_staging_buffer;
-
-    VmaAllocation* m_staging_memory;
-
-    void** m_mapped_addr;
+    std::vector<void*> m_mapped_addr;
 
     VkBufferUsageFlags m_usage;
-
-    GEVulkanDynamicBufferType m_type;
 
     size_t m_size, m_real_size;
 
     static int m_supports_host_transfer;
     // ------------------------------------------------------------------------
-    void initPerFrame(unsigned frame);
+    void initHostBuffer(unsigned frame, bool with_transfer);
     // ------------------------------------------------------------------------
-    void destroyPerFrame(unsigned frame);
+    void initLocalBuffer(unsigned frame);
     // ------------------------------------------------------------------------
     void destroy();
 public:
     // ------------------------------------------------------------------------
-    GEVulkanDynamicBuffer(GEVulkanDynamicBufferType t,
-                          VkBufferUsageFlags usage, size_t initial_size);
+    GEVulkanDynamicBuffer(VkBufferUsageFlags usage, size_t initial_size,
+                          unsigned host_buffer_size,
+                          unsigned local_buffer_size);
     // ------------------------------------------------------------------------
     ~GEVulkanDynamicBuffer();
     // ------------------------------------------------------------------------
@@ -61,6 +50,17 @@ public:
     void resizeIfNeeded(size_t new_size);
     // ------------------------------------------------------------------------
     size_t getRealSize() const                          { return m_real_size; }
+    // ------------------------------------------------------------------------
+    std::vector<VkBuffer>& getHostBuffer()            { return m_host_buffer; }
+    // ------------------------------------------------------------------------
+    std::vector<VkBuffer>& getLocalBuffer()          { return m_local_buffer; }
+    // ------------------------------------------------------------------------
+    std::vector<VmaAllocation>& getHostMemory()       { return m_host_memory; }
+    // ------------------------------------------------------------------------
+    std::vector<VmaAllocation>& getLocalMemory()     { return m_local_memory; }
+    // ------------------------------------------------------------------------
+    std::vector<void*>& getMappedAddr()               { return m_mapped_addr; }
+
 };   // GEVulkanDynamicBuffer
 
 }

@@ -1024,12 +1024,15 @@ void GEVulkanDrawCall::createVulkanData()
         flags |= VK_BUFFER_USAGE_INDIRECT_BUFFER_BIT;
         extra_size = 200 * sizeof(VkDrawIndexedIndirectCommand);
     }
-    m_dynamic_data = new GEVulkanDynamicBuffer(GVDBT_GPU_RAM, flags,
-        extra_size + sizeof(GEVulkanCameraUBO));
+    m_dynamic_data = new GEVulkanDynamicBuffer(flags,
+        extra_size + sizeof(GEVulkanCameraUBO),
+        GEVulkanDriver::getMaxFrameInFlight(),
+        GEVulkanDriver::getMaxFrameInFlight());
 
     flags = VK_BUFFER_USAGE_STORAGE_BUFFER_BIT;
-    m_sbo_data = new GEVulkanDynamicBuffer(GVDBT_GPU_RAM, flags,
-        getInitialSBOSize());
+    m_sbo_data = new GEVulkanDynamicBuffer(flags, getInitialSBOSize(),
+        GEVulkanDriver::getMaxFrameInFlight(),
+        GEVulkanDriver::getMaxFrameInFlight());
 }   // createVulkanData
 
 // ----------------------------------------------------------------------------
