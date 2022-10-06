@@ -47,7 +47,7 @@ start:
     VkBuffer host_buffer = VK_NULL_HANDLE;
     VmaAllocation host_memory = VK_NULL_HANDLE;
     VmaAllocationCreateInfo host_info = {};
-    host_info.usage = VMA_MEMORY_USAGE_AUTO;
+    host_info.usage = VMA_MEMORY_USAGE_AUTO_PREFER_HOST;
     host_info.flags = VMA_ALLOCATION_CREATE_HOST_ACCESS_SEQUENTIAL_WRITE_BIT |
         VMA_ALLOCATION_CREATE_MAPPED_BIT;
     host_info.preferredFlags = VK_MEMORY_PROPERTY_HOST_COHERENT_BIT;
@@ -56,6 +56,7 @@ start:
     {
         host_info.flags |=
             VMA_ALLOCATION_CREATE_HOST_ACCESS_ALLOW_TRANSFER_INSTEAD_BIT;
+        host_info.usage = VMA_MEMORY_USAGE_AUTO;
     }
 
     if (!vk->createBuffer(m_size, m_usage | VK_BUFFER_USAGE_TRANSFER_SRC_BIT,
@@ -94,7 +95,7 @@ void GEVulkanDynamicBuffer::initLocalBuffer(unsigned frame)
     VkBuffer local_buffer = VK_NULL_HANDLE;
     VmaAllocation local_memory = VK_NULL_HANDLE;
     VmaAllocationCreateInfo local_info = {};
-    local_info.usage = VMA_MEMORY_USAGE_AUTO;
+    local_info.usage = VMA_MEMORY_USAGE_AUTO_PREFER_DEVICE;
 
     VkBufferUsageFlags flags = m_usage;
     if (!m_host_buffer.empty())
