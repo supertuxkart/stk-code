@@ -1024,15 +1024,20 @@ void GEVulkanDrawCall::createVulkanData()
         flags |= VK_BUFFER_USAGE_INDIRECT_BUFFER_BIT;
         extra_size = 200 * sizeof(VkDrawIndexedIndirectCommand);
     }
+    // Use VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT | VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT
+    // or a staging buffer when buffer is small
     m_dynamic_data = new GEVulkanDynamicBuffer(flags,
         extra_size + sizeof(GEVulkanCameraUBO),
         GEVulkanDriver::getMaxFrameInFlight(),
+        GEVulkanDynamicBuffer::supportsHostTransfer() ? 0 :
         GEVulkanDriver::getMaxFrameInFlight());
 
     flags = VK_BUFFER_USAGE_STORAGE_BUFFER_BIT;
+    // Using VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT | VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT
+    // will be a lot slower when there are many objects (like particles)
     m_sbo_data = new GEVulkanDynamicBuffer(flags, getInitialSBOSize(),
-        GEVulkanDriver::getMaxFrameInFlight(),
-        GEVulkanDriver::getMaxFrameInFlight());
+        GEVulkanDriver::getMaxFrameInFlight(), 0,
+        false/*enable_host_transfer*/);
 }   // createVulkanData
 
 // ----------------------------------------------------------------------------

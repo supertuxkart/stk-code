@@ -19,9 +19,11 @@ private:
 
     std::vector<void*> m_mapped_addr;
 
-    VkBufferUsageFlags m_usage;
-
     size_t m_size, m_real_size;
+
+    const VkBufferUsageFlags m_usage;
+
+    const bool m_enable_host_transfer;
 
     static int m_supports_host_transfer;
     // ------------------------------------------------------------------------
@@ -34,7 +36,8 @@ public:
     // ------------------------------------------------------------------------
     GEVulkanDynamicBuffer(VkBufferUsageFlags usage, size_t initial_size,
                           unsigned host_buffer_size,
-                          unsigned local_buffer_size);
+                          unsigned local_buffer_size,
+                          bool enable_host_transfer = true);
     // ------------------------------------------------------------------------
     ~GEVulkanDynamicBuffer();
     // ------------------------------------------------------------------------
@@ -60,6 +63,12 @@ public:
     std::vector<VmaAllocation>& getLocalMemory()     { return m_local_memory; }
     // ------------------------------------------------------------------------
     std::vector<void*>& getMappedAddr()               { return m_mapped_addr; }
+    // ------------------------------------------------------------------------
+    /** This can only be called after creating an instance with
+     *  local_buffer_size == 0 first, which is always done in
+     *  GEVulkan2dRenderer::createTrisBuffers. */
+    static bool supportsHostTransfer()
+                                      { return m_supports_host_transfer == 1; }
 
 };   // GEVulkanDynamicBuffer
 

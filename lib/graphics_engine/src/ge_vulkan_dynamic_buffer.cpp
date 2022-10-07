@@ -14,9 +14,11 @@ int GEVulkanDynamicBuffer::m_supports_host_transfer = -1;
 GEVulkanDynamicBuffer::GEVulkanDynamicBuffer(VkBufferUsageFlags usage,
                                              size_t initial_size,
                                              unsigned host_buffer_size,
-                                             unsigned local_buffer_size)
+                                             unsigned local_buffer_size,
+                                             bool enable_host_transfer)
+                     : m_usage(usage),
+                       m_enable_host_transfer(enable_host_transfer)
 {
-    m_usage = usage;
     m_size = m_real_size = initial_size;
 
     m_host_buffer.resize(host_buffer_size, VK_NULL_HANDLE);
@@ -51,8 +53,9 @@ start:
     host_info.flags = VMA_ALLOCATION_CREATE_HOST_ACCESS_SEQUENTIAL_WRITE_BIT |
         VMA_ALLOCATION_CREATE_MAPPED_BIT;
     host_info.preferredFlags = VK_MEMORY_PROPERTY_HOST_COHERENT_BIT;
-    if ((with_transfer && m_supports_host_transfer == 1) ||
-        (with_transfer && m_supports_host_transfer == -1))
+    if (((with_transfer && m_supports_host_transfer == 1) ||
+        (with_transfer && m_supports_host_transfer == -1)) &&
+        m_enable_host_transfer)
     {
         host_info.flags |=
             VMA_ALLOCATION_CREATE_HOST_ACCESS_ALLOW_TRANSFER_INSTEAD_BIT;
@@ -66,7 +69,8 @@ start:
         return;
     }
 
-    if (with_transfer && m_supports_host_transfer == -1)
+    if (with_transfer && m_enable_host_transfer &&
+        m_supports_host_transfer == -1)
     {
         vmaGetAllocationMemoryProperties(vk->getVmaAllocator(), host_memory,
             &prop);
