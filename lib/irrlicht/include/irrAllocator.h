@@ -62,7 +62,16 @@ protected:
 
 	virtual void internal_delete(void* ptr)
 	{
+#if defined(__GNUC__) && !defined(__clang__)
+// gcc noisily warns about possible misusage
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wuse-after-free"
+#endif
 		operator delete(ptr);
+		ptr = nullptr;
+#if defined(__GNUC__) && !defined(__clang__)
+#pragma GCC diagnostic pop
+#endif
 	}
 
 };
