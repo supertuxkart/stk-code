@@ -51,14 +51,14 @@ struct ObjectData
     int m_material_id;
     float m_texture_trans[2];
     // ------------------------------------------------------------------------
-    ObjectData(irr::scene::ISceneNode* node, int material_id,
-               int skinning_offset, int irrlicht_material_id);
+    void init(irr::scene::ISceneNode* node, int material_id,
+              int skinning_offset, int irrlicht_material_id);
     // ------------------------------------------------------------------------
-    ObjectData(irr::scene::IBillboardSceneNode* node, int material_id,
-               const irr::core::quaternion& rotation);
+    void init(irr::scene::IBillboardSceneNode* node, int material_id,
+              const irr::core::quaternion& rotation);
     // ------------------------------------------------------------------------
-    ObjectData(const irr::scene::SParticle& particle, int material_id,
-               const irr::core::quaternion& rotation);
+    void init(const irr::scene::SParticle& particle, int material_id,
+              const irr::core::quaternion& rotation);
 };
 
 struct PipelineSettings
@@ -85,6 +85,7 @@ struct DrawCallData
     std::string m_sorting_key;
     GESPMBuffer* m_mb;
     bool m_transparent;
+    uint32_t m_dynamic_offset;
 };
 
 class GEVulkanDrawCall
@@ -125,7 +126,7 @@ private:
 
     size_t m_materials_padded_size;
 
-    char* m_data_padding;
+    int m_current_sbo_host_idx;
 
     VkDescriptorSetLayout m_data_layout;
 
@@ -143,10 +144,6 @@ private:
     GEVulkanTextureDescriptor* m_texture_descriptor;
 
     std::unordered_set<GEVulkanAnimatedMeshSceneNode*> m_skinning_nodes;
-
-    std::vector<std::pair<void*, size_t> > m_data_uploading;
-
-    std::vector<size_t> m_sbo_data_offset;
 
     std::unordered_map<std::string, std::pair<uint32_t, std::vector<int> > >
         m_materials_data;
@@ -220,8 +217,6 @@ public:
         m_visible_objects.clear();
         m_materials.clear();
         m_skinning_nodes.clear();
-        m_data_uploading.clear();
-        m_sbo_data_offset.clear();
         m_materials_data.clear();
     }
 };   // GEVulkanDrawCall
