@@ -77,7 +77,7 @@ void GEVulkanMeshCache::updateCache()
     VkBuffer staging_buffer = VK_NULL_HANDLE;
     VmaAllocation staging_memory = VK_NULL_HANDLE;
     VmaAllocationCreateInfo staging_buffer_create_info = {};
-    staging_buffer_create_info.usage = VMA_MEMORY_USAGE_AUTO;
+    staging_buffer_create_info.usage = VMA_MEMORY_USAGE_AUTO_PREFER_HOST;
     staging_buffer_create_info.flags =
         VMA_ALLOCATION_CREATE_HOST_ACCESS_SEQUENTIAL_WRITE_BIT |
         VMA_ALLOCATION_CREATE_DEDICATED_MEMORY_BIT;
@@ -150,7 +150,7 @@ void GEVulkanMeshCache::updateCache()
     vmaFlushAllocation(m_vk->getVmaAllocator(), staging_memory, 0, offset);
 
     VmaAllocationCreateInfo local_create_info = {};
-    local_create_info.usage = VMA_MEMORY_USAGE_AUTO;
+    local_create_info.usage = VMA_MEMORY_USAGE_AUTO_PREFER_DEVICE;
     local_create_info.flags = VMA_ALLOCATION_CREATE_DEDICATED_MEMORY_BIT;
     if (!m_vk->createBuffer(vbo_size + ibo_size,
         VK_BUFFER_USAGE_VERTEX_BUFFER_BIT | VK_BUFFER_USAGE_INDEX_BUFFER_BIT |
