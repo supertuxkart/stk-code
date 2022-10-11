@@ -139,7 +139,8 @@ void GEVulkanDynamicBuffer::destroy()
 // ----------------------------------------------------------------------------
 bool GEVulkanDynamicBuffer::setCurrentData(const std::vector<
                                            std::pair<void*, size_t> >& data,
-                                           VkCommandBuffer custom_cmd)
+                                           VkCommandBuffer custom_cmd,
+                                           unsigned cur_frame)
 {
     GEVulkanDriver* vk = getVKDriver();
 
@@ -149,7 +150,12 @@ bool GEVulkanDynamicBuffer::setCurrentData(const std::vector<
     bool ret = resizeIfNeeded(size);
 
     m_real_size = size;
-    unsigned cur_frame = getVKDriver()->getCurrentFrame();
+    bool forced_frame = true;
+    if (cur_frame == (unsigned)-1)
+    {
+        cur_frame = vk->getCurrentFrame();
+        forced_frame = false;
+    }
     if (cur_frame >= m_mapped_addr.size())
         cur_frame = 0;
 
@@ -167,7 +173,9 @@ bool GEVulkanDynamicBuffer::setCurrentData(const std::vector<
 
     if (!m_local_buffer.empty())
     {
-        unsigned cur_local_frame = getVKDriver()->getCurrentFrame();
+        unsigned cur_local_frame = vk->getCurrentFrame();
+        if (forced_frame)
+            cur_local_frame = cur_frame;
         if (cur_local_frame >= m_local_buffer.size())
             cur_local_frame = 0;
         VkBufferCopy copy_region = {};
