@@ -126,7 +126,9 @@ private:
 
     size_t m_materials_padded_size;
 
-    int m_current_sbo_host_idx;
+    int m_current_buffer_idx;
+
+    bool m_update_data_descriptor_sets;
 
     VkDescriptorSetLayout m_data_layout;
 
@@ -180,6 +182,8 @@ private:
     }
     // ------------------------------------------------------------------------
     size_t getInitialSBOSize() const;
+    // ------------------------------------------------------------------------
+    void updateDataDescriptorSets(GEVulkanDriver* vk);
 public:
     // ------------------------------------------------------------------------
     GEVulkanDrawCall();
