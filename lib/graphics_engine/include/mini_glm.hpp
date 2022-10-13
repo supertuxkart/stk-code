@@ -509,13 +509,13 @@ namespace MiniGLM
         return ret.normalize();
     }   // decompressbtQuaternion
     // ------------------------------------------------------------------------
-    inline core::quaternion getQuaternion(const core::matrix4& m)
+    inline std::array<float, 4> getQuaternionInternal(const core::matrix4& m)
     {
         btVector3 row[3];
         memcpy(&row[0][0], &m[0], 12);
         memcpy(&row[1][0], &m[4], 12);
         memcpy(&row[2][0], &m[8], 12);
-        btVector3 q;
+        std::array<float, 4> q;
         float root = row[0].x() + row[1].y() + row[2].z();
         const float trace = root;
         if (trace > 0.0f)
@@ -551,9 +551,22 @@ namespace MiniGLM
             q[k] = root * (row[i][k] + row[k][i]);
             q[3] = root * (row[j][k] - row[k][j]);
         }
+        return q;
+    }
+    // ------------------------------------------------------------------------
+    inline core::quaternion getQuaternion(const core::matrix4& m)
+    {
+        std::array<float, 4> q = getQuaternionInternal(m);
         return core::quaternion(q[0], q[1], q[2], q[3]).normalize();
     }
     // ------------------------------------------------------------------------
+    inline btQuaternion getBulletQuaternion(const core::matrix4& m)
+    {
+        std::array<float, 4> q = getQuaternionInternal(m);
+        return btQuaternion(q[0], q[1], q[2], q[3]).normalize();
+    }
+    // ------------------------------------------------------------------------
+
     inline uint32_t quickTangent(uint32_t packed_normal)
     {
         core::vector3df normal = decompressVector3(packed_normal);
