@@ -505,6 +505,7 @@ public:
 		const core::vector3df& pivotPoint = core::vector3df(0.0f,0.0f,0.0f) ) = 0;
 
 	virtual core::array<SParticle>& getParticles() = 0;
+	virtual bool getFlips() const { return false; }
 };
 
 } // end namespace scene

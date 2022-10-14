@@ -23,7 +23,11 @@
 #include "IParticleSystemSceneNode.h"
 
 #include <algorithm>
+#include <cmath>
 #include <limits>
+
+#include "../source/Irrlicht/os.h"
+#include "quaternion.h"
 
 namespace GE
 {
@@ -71,11 +75,11 @@ void ObjectData::init(irr::scene::ISceneNode* node, int material_id,
 
 // ============================================================================
 void ObjectData::init(irr::scene::IBillboardSceneNode* node, int material_id,
-                      const irr::core::quaternion& rotation)
+                      const btQuaternion& rotation)
 {
     memcpy(&m_translation_x, &node->getAbsoluteTransformation()[12],
         sizeof(float) * 3);
-    memcpy(m_rotation, &rotation, sizeof(irr::core::quaternion));
+    memcpy(m_rotation, &rotation[0], sizeof(btQuaternion));
     irr::core::vector2df billboard_size = node->getSize();
     m_scale_x = billboard_size.X / 2.0f;
     m_scale_y = billboard_size.Y / 2.0f;
@@ -96,12 +100,61 @@ void ObjectData::init(irr::scene::IBillboardSceneNode* node, int material_id,
 }   // init
 
 // ============================================================================
+std::vector<float> g_flips_data;
+// ============================================================================
 void ObjectData::init(const irr::scene::SParticle& particle, int material_id,
-                      const irr::core::quaternion& rotation)
+                      const btQuaternion& rotation,
+                      const irr::core::vector3df& view_position, bool flips,
+                      bool backface_culling)
 {
     memcpy(&m_translation_x, &particle.pos, sizeof(float) * 3);
-    memcpy(m_rotation, &rotation, sizeof(irr::core::quaternion));
-    m_scale_x = particle.size.Width / 2.0f;
+    float scale_x = particle.size.Width / 2.0f;
+    if (flips)
+    {
+        // Following stk_particle.cpp
+        const unsigned particle_index = particle.startTime;
+        const float lifetime = particle.startSize.Width;
+        const float pi = 3.14159265358979323846f;
+        while (particle_index + 1 > g_flips_data.size())
+        {
+            // Maximum 3 rotation around axis (0, 1, 0) during lifetime
+            g_flips_data.push_back(pi * 2.0f * 3.0f * os::Randomizer::frand() *
+                (g_flips_data.size() % 2 == 0 ? 1.0f : -1.0f));
+        }
+        float angle = fmodf(lifetime * g_flips_data[particle_index],
+            pi * 2.0f);
+        btQuaternion rotated(btVector3(0.0f, 1.0f, 0.0f), angle);
+        rotated = btQuaternion(rotation[0], rotation[1], rotation[2],
+            -rotation[3]) * rotated;
+        rotated.normalize();
+        // Conjugated quaternion in glsl
+        rotated[3] = -rotated[3];
+        memcpy(m_rotation, &rotated[0], sizeof(btQuaternion));
+        if (backface_culling)
+        {
+            irr::core::quaternion q(rotated[0], rotated[1], rotated[2],
+                -rotated[3]);
+            irr::core::matrix4 m;
+            q.getMatrix(m, particle.pos);
+            irr::core::vector3df tri[3] =
+            {
+                irr::core::vector3df( 1.0f, -1.0f, 0.0f),
+                irr::core::vector3df( 1.0f,  1.0f, 0.0f),
+                irr::core::vector3df(-1.0f,  1.0f, 0.0f)
+            };
+            m.transformVect(tri[0]);
+            m.transformVect(tri[1]);
+            m.transformVect(tri[2]);
+            irr::core::vector3df normal = (tri[1] - tri[0])
+                .crossProduct(tri[2] - tri[0]);
+            float dot_product = (tri[0] - view_position).dotProduct(normal);
+            if (dot_product < 0.0f)
+                scale_x = -scale_x;
+        }
+    }
+    else
+        memcpy(m_rotation, &rotation[0], sizeof(btQuaternion));
+    m_scale_x = scale_x;
     m_scale_y = particle.size.Height / 2.0f;
     m_scale_z = 0.0f;
     m_skinning_offset = 0;
@@ -400,6 +453,8 @@ start:
                             k.m_hue_change == key.m_hue_change;
                     });
             }
+            const PipelineSettings& settings =
+                m_graphics_pipelines[cur_shader].second;
             for (auto& r : q.second)
             {
                 irr::scene::ISceneNode* node = r.first;
@@ -449,10 +504,12 @@ start:
                             goto start;
                         }
                         ObjectData* obj = (ObjectData*)mapped_addr;
+                        bool flips = pn->getFlips();
                         for (unsigned i = 0; i < ps; i++)
                         {
                             obj[i].init(particles[i], material_id,
-                                m_billboard_rotation);
+                                m_billboard_rotation, m_view_position, flips,
+                                settings.m_backface_culling);
                             written_size += sizeof(ObjectData);
                             mapped_addr += sizeof(ObjectData);
                         }
@@ -507,8 +564,6 @@ start:
             }
             else
                 cmd.firstInstance = it->m_first_instance;
-            const PipelineSettings& settings =
-                m_graphics_pipelines[cur_shader].second;
             std::string sorting_key =
                 std::string(1, settings.m_drawing_priority) + cur_shader;
             m_cmds.push_back({ cmd, cur_shader, sorting_key, p.first,
@@ -699,7 +754,8 @@ void GEVulkanDrawCall::prepare(GEVulkanCameraSceneNode* cam)
 {
     reset();
     m_culling_tool->init(cam);
-    m_billboard_rotation = MiniGLM::getQuaternion(cam->getViewMatrix());
+    m_view_position = cam->getPosition();
+    m_billboard_rotation = MiniGLM::getBulletQuaternion(cam->getViewMatrix());
 }   // prepare
 
 // ----------------------------------------------------------------------------

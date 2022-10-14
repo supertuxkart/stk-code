@@ -12,10 +12,12 @@
 #include "vulkan_wrapper.h"
 
 #include "matrix4.h"
-#include "quaternion.h"
+#include "vector3d.h"
 #include "ESceneNodeTypes.h"
 #include "SColor.h"
 #include "SMaterial.h"
+
+#include "LinearMath/btQuaternion.h"
 
 namespace irr
 {
@@ -55,10 +57,12 @@ struct ObjectData
               int skinning_offset, int irrlicht_material_id);
     // ------------------------------------------------------------------------
     void init(irr::scene::IBillboardSceneNode* node, int material_id,
-              const irr::core::quaternion& rotation);
+              const btQuaternion& rotation);
     // ------------------------------------------------------------------------
     void init(const irr::scene::SParticle& particle, int material_id,
-              const irr::core::quaternion& rotation);
+              const btQuaternion& rotation,
+              const irr::core::vector3df& view_position, bool flips,
+              bool backface_culling);
 };
 
 struct PipelineSettings
@@ -100,7 +104,9 @@ private:
 
     std::map<TexturesList, GESPMBuffer*> m_billboard_buffers;
 
-    irr::core::quaternion m_billboard_rotation;
+    irr::core::vector3df m_view_position;
+
+    btQuaternion m_billboard_rotation;
 
     std::unordered_map<GESPMBuffer*, std::unordered_map<std::string,
         std::vector<std::pair<irr::scene::ISceneNode*, int> > > >

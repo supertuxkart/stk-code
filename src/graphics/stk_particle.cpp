@@ -508,7 +508,10 @@ void STKParticle::OnRegisterSceneNode()
     Buffer->BoundingBox.reset(AbsoluteTransformation.getTranslation());
     for (unsigned i = 0; i < m_particles_generating.size(); i++)
     {
-        if (m_particles_generating[i].m_size == 0.0f)
+        if (m_particles_generating[i].m_size == 0.0f ||
+            std::isnan(m_particles_generating[i].m_position.X) ||
+            std::isnan(m_particles_generating[i].m_position.Y) ||
+            std::isnan(m_particles_generating[i].m_position.Z))
         {
             continue;
         }
@@ -529,6 +532,12 @@ void STKParticle::OnRegisterSceneNode()
         p.color.setGreen(core::clamp((int)(ret.Y * 255.0f), 0, 255));
         p.color.setBlue(core::clamp((int)(ret.Z * 255.0f), 0, 255));
         p.color.setAlpha(core::clamp((int)(alpha * 255.0f), 0, 255));
+        if (irr_driver->getVideoDriver()->getDriverType() == video::EDT_VULKAN)
+        {
+            // Only used in ge_vulkan_draw_call.cpp
+            p.startTime = i;
+            p.startSize.Width = m_particles_generating[i].m_lifetime;
+        }
         Particles.push_back(p);
     }
     core::matrix4 inv(AbsoluteTransformation, core::matrix4::EM4CONST_INVERSE);
