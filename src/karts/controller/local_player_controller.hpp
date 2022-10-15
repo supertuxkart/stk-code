@@ -28,6 +28,7 @@ class AbstractKart;
 class ParticleEmitter;
 class SFXBase;
 class SFXBuffer;
+class btTransform;
 
 /** PlayerKart manages control events from the player and moves
   * them to the Kart
@@ -68,6 +69,7 @@ private:
     void         nitroNotFullSound();
 
     void doCrashHaptics();
+    void setParticleEmitterPosition(const btTransform& t);
 
 public:
                  LocalPlayerController(AbstractKart *kart,
