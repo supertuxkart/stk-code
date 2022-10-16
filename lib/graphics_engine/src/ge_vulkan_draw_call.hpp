@@ -62,7 +62,7 @@ struct ObjectData
     void init(const irr::scene::SParticle& particle, int material_id,
               const btQuaternion& rotation,
               const irr::core::vector3df& view_position, bool flips,
-              bool backface_culling);
+              bool sky_particle, bool backface_culling);
 };
 
 struct PipelineSettings

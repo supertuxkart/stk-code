@@ -506,6 +506,7 @@ public:
 
 	virtual core::array<SParticle>& getParticles() = 0;
 	virtual bool getFlips() const { return false; }
+	virtual bool isSkyParticle() const { return false; }
 };
 
 } // end namespace scene

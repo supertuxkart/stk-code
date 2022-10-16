@@ -105,7 +105,7 @@ std::vector<float> g_flips_data;
 void ObjectData::init(const irr::scene::SParticle& particle, int material_id,
                       const btQuaternion& rotation,
                       const irr::core::vector3df& view_position, bool flips,
-                      bool backface_culling)
+                      bool sky_particle, bool backface_culling)
 {
     memcpy(&m_translation_x, &particle.pos, sizeof(float) * 3);
     float scale_x = particle.size.Width / 2.0f;
@@ -151,6 +151,16 @@ void ObjectData::init(const irr::scene::SParticle& particle, int material_id,
             if (dot_product < 0.0f)
                 scale_x = -scale_x;
         }
+    }
+    else if (sky_particle)
+    {
+        irr::core::vector3df diff = particle.pos - view_position;
+        float angle = atan2f(diff.X, diff.Z);
+        btQuaternion rotated(btVector3(0.0f, 1.0f, 0.0f), angle);
+        rotated.normalize();
+        // Conjugated quaternion in glsl
+        rotated[3] = -rotated[3];
+        memcpy(m_rotation, &rotated[0], sizeof(btQuaternion));
     }
     else
         memcpy(m_rotation, &rotation[0], sizeof(btQuaternion));
@@ -505,11 +515,12 @@ start:
                         }
                         ObjectData* obj = (ObjectData*)mapped_addr;
                         bool flips = pn->getFlips();
+                        bool sky_particle = pn->isSkyParticle();
                         for (unsigned i = 0; i < ps; i++)
                         {
                             obj[i].init(particles[i], material_id,
                                 m_billboard_rotation, m_view_position, flips,
-                                settings.m_backface_culling);
+                                sky_particle, settings.m_backface_culling);
                             written_size += sizeof(ObjectData);
                             mapped_addr += sizeof(ObjectData);
                         }

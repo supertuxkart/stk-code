@@ -160,6 +160,8 @@ public:
         assert(m_flips_buffer != 0);
         return m_flips_buffer;
     }
+    // ------------------------------------------------------------------------
+    virtual bool isSkyParticle() const                 { return m_hm != NULL; }
 };
 
 #endif
