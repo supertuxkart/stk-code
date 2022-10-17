@@ -32,7 +32,8 @@
 // ============================================================================
 /** A Shader to render particles.
 */
-class ParticleRenderer : public TextureShader<ParticleRenderer, 2, int, float>
+class ParticleRenderer : public TextureShader
+    <ParticleRenderer, 2, int, int, core::vector3df, float>
 {
 public:
     ParticleRenderer()
@@ -40,7 +41,7 @@ public:
         loadProgram(PARTICLES_RENDERING,
                     GL_VERTEX_SHADER,   "simple_particle.vert",
                     GL_FRAGMENT_SHADER, "simple_particle.frag");
-        assignUniforms("flips", "billboard");
+        assignUniforms("flips", "sky", "view_position", "billboard");
         assignSamplerNames(0, "tex",  ST_TRILINEAR_ANISOTROPIC_FILTERED,
                            1, "dtex", ST_NEAREST_FILTERED);
     }   // ParticleRenderer
@@ -50,7 +51,7 @@ public:
 /** A Shader to render alpha-test particles.
 */
 class AlphaTestParticleRenderer : public TextureShader
-    <AlphaTestParticleRenderer, 1, int, float>
+    <AlphaTestParticleRenderer, 1, int, int, core::vector3df, float>
 {
 public:
     AlphaTestParticleRenderer()
@@ -58,7 +59,7 @@ public:
         loadProgram(PARTICLES_RENDERING,
                     GL_VERTEX_SHADER,   "alphatest_particle.vert",
                     GL_FRAGMENT_SHADER, "alphatest_particle.frag");
-        assignUniforms("flips", "billboard");
+        assignUniforms("flips", "sky", "view_position", "billboard");
         assignSamplerNames(0, "tex",  ST_TRILINEAR_ANISOTROPIC_FILTERED);
     }   // AlphaTestParticleRenderer
 };   // AlphaTestParticleRenderer
@@ -92,6 +93,10 @@ void CPUParticleManager::addParticleNode(STKParticle* node)
     if (node->getFlips())
     {
         m_flips_material.insert(tex_name);
+    }
+    else if (node->isSkyParticle())
+    {
+        m_sky_material.insert(tex_name);
     }
     m_particles_queue[tex_name].push_back(node);
 }   // addParticleNode
@@ -324,9 +329,15 @@ void CPUParticleManager::drawAll()
         });
 
     std::string shader_name;
+    core::vector3df view_position;
+    scene::ICameraSceneNode* cam = irr_driver->getSceneManager()
+        ->getActiveCamera();
+    if (cam)
+        view_position = cam->getPosition();
     for (auto& p : particle_drawn)
     {
         const bool flips = isFlipsMaterial(p.second);
+        const bool sky = m_sky_material.find(p.second) != m_sky_material.end();
         const float billboard = p.second.substr(0, 4) == "_bb_" ? 1.0f : 0.0f;
         Material* cur_mat = p.first;
         if (cur_mat->getShaderName() != shader_name)
@@ -372,14 +383,15 @@ void CPUParticleManager::drawAll()
                 (cur_mat->getTexture()->getTextureHandler(),
                 CVS->isDeferredEnabled() ?
                 irr_driver->getDepthStencilTexture() : 0);
-            ParticleRenderer::getInstance()->setUniforms(flips, billboard);
+            ParticleRenderer::getInstance()->setUniforms(flips, sky,
+                view_position, billboard);
         }
         else
         {
             AlphaTestParticleRenderer::getInstance()->setTextureUnits
                 (cur_mat->getTexture()->getTextureHandler());
-            AlphaTestParticleRenderer::getInstance()->setUniforms(flips,
-                billboard);
+            AlphaTestParticleRenderer::getInstance()->setUniforms(flips, sky,
+                view_position, billboard);
         }
         glBindVertexArray(m_gl_particles.at(p.second)->m_vao);
         glDrawArraysInstanced(GL_TRIANGLE_STRIP, 0, 4,

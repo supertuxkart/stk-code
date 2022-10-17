@@ -89,7 +89,7 @@ private:
 
     std::unordered_map<std::string, Material*> m_material_map;
 
-    std::unordered_set<std::string> m_flips_material;
+    std::unordered_set<std::string> m_flips_material, m_sky_material;
 
     static GLuint m_particle_quad;
 
@@ -137,6 +137,7 @@ public:
     {
         m_material_map.clear();
         m_flips_material.clear();
+        m_sky_material.clear();
     }
 
 };
