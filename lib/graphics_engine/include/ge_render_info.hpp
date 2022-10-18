@@ -25,6 +25,8 @@
 #ifndef HEADER_GE_RENDER_INFO_HPP
 #define HEADER_GE_RENDER_INFO_HPP
 
+#include "SColor.h"
+
 namespace GE
 {
 
@@ -35,12 +37,14 @@ private:
 
     bool m_transparent;
 
+    irr::video::SColor m_vertex_color;
 public:
     // ------------------------------------------------------------------------
     GERenderInfo(float hue = 0.0f, bool transparent = false)
     {
         m_hue = hue;
         m_transparent = transparent;
+        m_vertex_color = (irr::video::SColor)-1;
     }
     // ------------------------------------------------------------------------
     void setHue(float hue)                                    { m_hue = hue; }
@@ -50,6 +54,8 @@ public:
     float getHue() const                                     { return m_hue; }
     // ------------------------------------------------------------------------
     bool isTransparent() const                       { return m_transparent; }
+    // ------------------------------------------------------------------------
+    irr::video::SColor& getVertexColor()            { return m_vertex_color; }
 
 };   // GERenderInfo
 

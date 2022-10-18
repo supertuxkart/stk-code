@@ -70,7 +70,10 @@ void ObjectData::init(irr::scene::ISceneNode* node, int material_id,
         m_hue_change = ri->getHue();
     else
         m_hue_change = 0.0f;
-    m_custom_vertex_color = irr::video::SColor((uint32_t)-1);
+    if (ri)
+        m_custom_vertex_color = ri->getVertexColor();
+    else
+        m_custom_vertex_color = irr::video::SColor((uint32_t)-1);
 }   // init
 
 // ============================================================================
