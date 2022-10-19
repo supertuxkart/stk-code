@@ -141,10 +141,15 @@ bool COGLES2FixedPipelineRenderer::OnRender(IMaterialRendererServices* service, 
 			break;
 		}
 
+		video::SColorf vertex_color(SColor(-1));
 		float hue_change = 0.0f;
 		if (Driver->getCurrentMaterial().getRenderInfo())
+		{
 			hue_change = Driver->getCurrentMaterial().getRenderInfo()->getHue();
+			vertex_color = video::SColorf(Driver->getCurrentMaterial().getRenderInfo()->getVertexColor());
+		}
 		IMaterialRendererServices::setPixelShaderConstant("uHueChange", &hue_change, 1);
+		IMaterialRendererServices::setPixelShaderConstant("uVertexColor", &vertex_color.r, 4);
 
 		IMaterialRendererServices::setPixelShaderConstant("uMaterialType", &materialType, 1);
 

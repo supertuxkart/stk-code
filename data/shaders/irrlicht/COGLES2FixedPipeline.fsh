@@ -20,6 +20,7 @@ precision mediump float;
 uniform int uMaterialType;
 
 uniform float uHueChange;
+uniform vec4 uVertexColor;
 
 uniform bool uTextureUsage0;
 //uniform bool uTextureUsage1;
@@ -69,12 +70,13 @@ vec4 renderSolid()
 				max(old_hsv.y, saturation)), vec2(mask_step, mask_step));
 			Color.rgb = hsvToRgb(vec3(new_xy.x, new_xy.y, old_hsv.z));
 		}
-		Color.rgb *= varVertexColor.rgb;
+		vec3 mixed_color = varVertexColor.rgb * uVertexColor.rgb;
+		Color.rgb *= mixed_color;
 		Color.a = 1.0;
 	}
 	else
 	{
-		Color = varVertexColor;
+		Color = varVertexColor * uVertexColor;
 		Color.a = 1.0;
 	}
 	return Color;
@@ -161,7 +163,8 @@ vec4 renderTransparentVertexColor()
 			vec3 new_color = hsvToRgb(vec3(new_xy.x, new_xy.y, old_hsv.z));
 			Color.rgb = vec3(new_color.r, new_color.g, new_color.b);
 		}
-		Color *= varVertexColor;
+		vec4 mixed_color = varVertexColor * uVertexColor;
+		Color *= mixed_color;
 	}
 
 	return Color;
@@ -206,7 +209,7 @@ void main ()
 		vec4 Color = renderTransparent();
 		Color.a = varVertexColor.a;
 		
-		gl_FragColor = Color;
+		gl_FragColor = Color * uVertexColor;
 	}
 	else if(uMaterialType == TransparentReflection2Layer)
 	{
