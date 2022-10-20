@@ -23,7 +23,7 @@
 namespace irr
 {
     namespace video { class SMaterial; class SColor; }
-    namespace scene { class ISceneNode; }
+    namespace scene { class ISceneNode; class IMesh; }
 }
 using namespace irr;
 
@@ -115,7 +115,9 @@ private:
      ** overtake the right kart. */
     AbstractKart* m_target_kart;
 
-    SP::SPMesh*  createMesh(Material* material, bool bonus_mesh);
+    SP::SPMesh*  createMeshSP(Material* material, bool bonus_mesh);
+    scene::IMesh*  createMesh(Material* material, bool bonus_mesh);
+
     void         setDebugColor(const video::SColor &color, bool inner);
     void         updateQuad();
     void         updateSlipstreamingTextures(float f, const AbstractKart* kart);
