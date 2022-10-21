@@ -8,6 +8,14 @@
 #include <string>
 #include <unordered_set>
 
+namespace irr
+{
+    namespace scene
+    {
+        class IMesh; class IAnimatedMesh;
+    }
+}
+
 namespace GE
 {
 class GEVulkanDriver;
@@ -47,6 +55,7 @@ inline int get4x4CompressedTextureSize(int width, int height)
     int blocksize = 4 * 4;
     return blockcount * blocksize;
 }
+irr::scene::IAnimatedMesh* convertIrrlichtMeshToSPM(irr::scene::IMesh* mesh);
 
 }
 #endif
