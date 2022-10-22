@@ -5,7 +5,7 @@
 #ifndef __S_MESH_H_INCLUDED__
 #define __S_MESH_H_INCLUDED__
 
-#include "IMesh.h"
+#include "IAnimatedMesh.h"
 #include "IMeshBuffer.h"
 #include "aabbox3d.h"
 #include "irrArray.h"
@@ -15,7 +15,7 @@ namespace irr
 namespace scene
 {
 	//! Simple implementation of the IMesh interface.
-	struct SMesh : public IMesh
+	struct SMesh : public IAnimatedMesh
 	{
 		//! constructor
 		SMesh()
@@ -124,6 +124,13 @@ namespace scene
 			for (u32 i=0; i<MeshBuffers.size(); ++i)
 				MeshBuffers[i]->setDirty(buffer);
 		}
+
+		//! Unused, added so that SMesh can be added to irrlicht mesh cache
+		virtual u32 getFrameCount() const { return 0; }
+		virtual f32 getAnimationSpeed() const { return 0.0f; }
+		virtual void setAnimationSpeed(f32 fps) {}
+		virtual IMesh* getMesh(s32 frame, s32 detailLevel=255, s32 startFrameLoop=-1, s32 endFrameLoop=-1) { return this; }
+		virtual void finalize() {}
 
 		//! The meshbuffers of this mesh
 		core::array<IMeshBuffer*> MeshBuffers;
