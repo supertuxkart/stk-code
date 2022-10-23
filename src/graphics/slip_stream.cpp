@@ -44,6 +44,12 @@
 #include <ge_render_info.hpp>
 #endif
 
+//-----------------------------------------------------------------------------
+const char* g_slipstream_textures[3] =
+{
+    "slipstream.png", "slipstream2.png", "slipstream_bonus.png"
+};
+//-----------------------------------------------------------------------------
 /** Creates the slip stream object
  *  \param kart Pointer to the kart to which the slip stream
  *              belongs to.
@@ -63,20 +69,13 @@ SlipStream::SlipStream(AbstractKart* kart)
 #ifndef SERVER_ONLY
     if (!GUIEngine::isNoGraphics())
     {
-#ifndef SERVER_ONLY
-        bool vk = (GE::getDriver()->getDriverType() == video::EDT_VULKAN);
-        if (vk)
-            GE::getGEConfig()->m_convert_irrlicht_mesh = true;
-#endif
         m_moving = new MovingTexture(0.0f, 0.0f);
 
-        Material* material =
-            material_manager->getMaterialSPM("slipstream.png", "");
-        scene::IMesh* mesh = NULL;
+        scene::IAnimatedMesh* mesh = NULL;
         if (CVS->isGLSL())
-            mesh = createMeshSP(material, false);
+            mesh = createMeshSP(0, false);
         else
-            mesh = createMesh(material, false);
+            mesh = createMesh(0, false);
         m_node = irr_driver->addMesh(mesh, "slipstream");
         mesh->drop();
         std::string debug_name = m_kart->getIdent()+" (slip-stream)";
@@ -97,11 +96,10 @@ SlipStream::SlipStream(AbstractKart* kart)
 
         m_moving_fast = new MovingTexture(0.0f, 0.0f);
 
-        material = material_manager->getMaterialSPM("slipstream2.png", "");
         if (CVS->isGLSL())
-            mesh = createMeshSP(material, false);
+            mesh = createMeshSP(1, false);
         else
-            mesh = createMesh(material, false);
+            mesh = createMesh(1, false);
         m_node_fast = irr_driver->addMesh(mesh, "slipstream2");
         mesh->drop();
         debug_name = m_kart->getIdent()+" (slip-stream2)";
@@ -122,11 +120,10 @@ SlipStream::SlipStream(AbstractKart* kart)
 
         m_moving_bonus = new MovingTexture(0.0f, 0.0f);
 
-        material = material_manager->getMaterialSPM("slipstream_bonus.png", "");
         if (CVS->isGLSL())
-            mesh = createMeshSP(material, true);
+            mesh = createMeshSP(2, true);
         else
-            mesh = createMesh(material, true);
+            mesh = createMesh(2, true);
         m_bonus_node = irr_driver->addMesh(mesh, "slipstream-bonus");
         mesh->drop();
         debug_name = m_kart->getIdent()+" (slip-stream-bonus)";
@@ -144,10 +141,6 @@ SlipStream::SlipStream(AbstractKart* kart)
             m_bonus_node->getMaterial(0).getRenderInfo() =
                 std::make_shared<GE::GERenderInfo>();
         }
-#ifndef SERVER_ONLY
-        if (vk)
-            GE::getGEConfig()->m_convert_irrlicht_mesh = false;
-#endif
     }
 #endif
 
@@ -248,6 +241,18 @@ SlipStream::~SlipStream()
     delete m_moving;
     delete m_moving_fast;
     delete m_moving_bonus;
+#ifndef SERVER_ONLY
+    if (!GUIEngine::isNoGraphics() && !CVS->isGLSL())
+    {
+        scene::IMeshCache* mc = irr_driver->getSceneManager()->getMeshCache();
+        for (const char* texture : g_slipstream_textures)
+        {
+            scene::IAnimatedMesh* amesh = mc->getMeshByName(texture);
+            if (amesh && amesh->getReferenceCount() == 1)
+                mc->removeMesh(amesh);
+        }
+    }
+#endif
 }   // ~SlipStream
 
 //-----------------------------------------------------------------------------
@@ -267,9 +272,10 @@ void SlipStream::reset()
  *  first a series of circles (with a certain number of vertices each and
  *  distance from each other. Then it will create the triangles and add
  *  texture coordniates.
- *  \param material  The material to use.
+ *  \param material_id  The material to use.
  */
-scene::IMesh* SlipStream::createMesh(Material* material, bool bonus_mesh)
+scene::IAnimatedMesh* SlipStream::createMesh(unsigned material_id,
+                                             bool bonus_mesh)
 {
     // All radius, starting with the one closest to the kart (and
     // widest) to the one furthest away. A 0 indicates the end of the list
@@ -320,6 +326,15 @@ scene::IMesh* SlipStream::createMesh(Material* material, bool bonus_mesh)
     if (!bonus_mesh)
         m_length = length;
 
+    const io::path cache_key = g_slipstream_textures[material_id];
+    scene::IMeshCache* mc = irr_driver->getSceneManager()->getMeshCache();
+    scene::IAnimatedMesh* amesh = mc->getMeshByName(cache_key);
+    if (amesh)
+    {
+        amesh->grab();
+        return amesh;
+    }
+
     // The number of points for each circle. Since part of the slip stream
     // might be under the ground (esp. first and last segment), specify
     // which one is the first and last to be actually drawn.
@@ -328,6 +343,8 @@ scene::IMesh* SlipStream::createMesh(Material* material, bool bonus_mesh)
     const unsigned int  last_segment   = 14;
     const float         f              = 2*M_PI/float(num_segments);
     scene::SMeshBuffer* buffer         = new scene::SMeshBuffer();
+    Material* material                 = material_manager->getMaterialSPM(
+                                         cache_key.c_str(), "");
     buffer->getMaterial().TextureLayer[0].Texture = material->getTexture();
     for(unsigned int j=0; j<num_circles; j++)
     {
@@ -376,6 +393,18 @@ scene::IMesh* SlipStream::createMesh(Material* material, bool bonus_mesh)
     mesh->recalculateBoundingBox();
 
     buffer->drop();
+#ifndef SERVER_ONLY
+    if (GE::getDriver()->getDriverType() == video::EDT_VULKAN)
+    {
+        amesh = GE::convertIrrlichtMeshToSPM(mesh);
+        mesh->drop();
+        mc->addMesh(cache_key, amesh);
+        return amesh;
+    }
+    else
+#endif
+        mc->addMesh(cache_key, mesh);
+
     return mesh;
 }   // createMesh
 
@@ -384,9 +413,9 @@ scene::IMesh* SlipStream::createMesh(Material* material, bool bonus_mesh)
  *  first a series of circles (with a certain number of vertices each and
  *  distance from each other. Then it will create the triangles and add
  *  texture coordniates.
- *  \param material  The material to use.
+ *  \param material_id  The material to use.
  */
-SP::SPMesh* SlipStream::createMeshSP(Material* material, bool bonus_mesh)
+SP::SPMesh* SlipStream::createMeshSP(unsigned material_id, bool bonus_mesh)
 {
     SP::SPMesh* spm = NULL;
 #ifndef SERVER_ONLY
@@ -509,6 +538,8 @@ SP::SPMesh* SlipStream::createMeshSP(Material* material, bool bonus_mesh)
     }   // for j<num_circles-1
     buffer->setSPMVertices(vertices);
     buffer->setIndices(indices);
+    Material* material = material_manager->getMaterialSPM(
+        g_slipstream_textures[material_id], "");
     buffer->setSTKMaterial(material);
     buffer->uploadGLMesh();
 
