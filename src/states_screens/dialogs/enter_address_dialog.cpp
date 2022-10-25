@@ -77,7 +77,7 @@ void EnterAddressDialog::onEnterPressedInternal()
     {
         m_self_destroy = true;
         UserConfigParams::m_address_history[
-            StringUtils::wideToUtf8(m_text_field->getText())] = (uint32_t)StkTime::getTimeSinceEpoch();
+            StringUtils::wideToUtf8(m_text_field->getText().trim())] = (uint32_t)StkTime::getTimeSinceEpoch();
     }
 }   // onEnterPressedInternal
 
@@ -101,7 +101,7 @@ GUIEngine::EventPropagation EnterAddressDialog::processEvent(const std::string& 
             {
                 m_self_destroy = true;
                 UserConfigParams::m_address_history[
-                    StringUtils::wideToUtf8(m_text_field->getText())] = (uint32_t)StkTime::getTimeSinceEpoch();
+                    StringUtils::wideToUtf8(m_text_field->getText().trim())] = (uint32_t)StkTime::getTimeSinceEpoch();
             }
             return GUIEngine::EVENT_BLOCK;
         }
@@ -117,7 +117,7 @@ GUIEngine::EventPropagation EnterAddressDialog::processEvent(const std::string& 
 bool EnterAddressDialog::validate()
 {
     core::stringw addr_w = m_text_field->getText();
-    std::string addr_u = StringUtils::wideToUtf8(addr_w);
+    std::string addr_u = StringUtils::wideToUtf8(addr_w.trim());
     SocketAddress server_addr(addr_u);
     if (server_addr.getIP() == 0 && !server_addr.isIPv6())
     {
