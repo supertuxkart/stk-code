@@ -41,12 +41,12 @@ GhostKart::GhostKart(const std::string& ident, unsigned int world_kart_id,
                  std::make_shared<GE::GERenderInfo>(color_hue, true/*transparent*/)),
                  m_replay_data(rd), m_last_egg_idx(0)
 {
+    m_graphical_y_offset = 0;
 }   // GhostKart
 
 // ----------------------------------------------------------------------------
 void GhostKart::reset()
 {
-    m_graphical_y_offset = 0;
     m_node->setVisible(true);
     Kart::reset();
     // This will set the correct start position
