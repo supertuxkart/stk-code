@@ -400,7 +400,9 @@ void STKParticle::stimulateNormal(float dt, unsigned int active_count,
             {
                 float dt_from_last_frame =
                     glslFract(updated_lifetime) * lifetime_initial;
-                float coeff = dt_from_last_frame / dt;
+                float coeff = 0.0f;
+                if (dt > 0.0f)
+                    coeff = dt_from_last_frame / dt;
 
                 m_previous_frame_matrix.transformVect(previous_frame_position,
                     particle_position_initial);
