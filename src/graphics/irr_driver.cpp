@@ -2445,9 +2445,9 @@ void IrrDriver::resizeWindow()
 {
 #ifndef SERVER_ONLY
     // Reload fonts
+    font_manager->getFont<RegularFace>()->init();
     font_manager->getFont<BoldFace>()->init();
     font_manager->getFont<DigitFace>()->init();
-    font_manager->getFont<RegularFace>()->init();
     // Reload GUIEngine
     GUIEngine::reloadForNewSize();
     if (World::getWorld())
