@@ -16,11 +16,6 @@ else()
   set(CLANG_ARCH ${CCTOOLS_ARCH})
 endif()
 
-if (NOT CCTOOLS_PLATFORM MATCHES MacOSX)
-  set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fembed-bitcode")
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fembed-bitcode")
-endif()
-
 SET(CMAKE_C_COMPILER ${CCTOOLS_PREFIX}/bin/${CCTOOLS_ARCH}-${platform_lower}-clang)
 SET(CMAKE_CXX_COMPILER ${CCTOOLS_PREFIX}/bin/${CCTOOLS_ARCH}-${platform_lower}-clang++)
 SET(CMAKE_RANLIB ${CCTOOLS_PREFIX}/bin/${CLANG_ARCH}-apple-darwin11-ranlib)
