@@ -184,9 +184,7 @@ IrrDriver::IrrDriver()
     p.DriverType    = video::EDT_OPENGL;
     p.Bits          = 24U;
     p.WindowSize    = core::dimension2d<u32>(1280,720);
-#ifdef FORCE_LEGACY
-    p.ForceLegacyDevice = true;
-#endif
+    p.ForceLegacyDevice = UserConfigParams::m_force_legacy_device;
 #else
     p.DriverType    = video::EDT_NULL;
     p.Bits          = 16U;
