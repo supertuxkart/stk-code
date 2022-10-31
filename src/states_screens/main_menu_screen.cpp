@@ -158,9 +158,9 @@ void MainMenuScreen::init()
         w->setBadge(LOADING_BADGE);
     }
 
+    m_news_text = L"";
     LabelWidget* w = getWidget<LabelWidget>("info_addons");
-    const core::stringw &news_text = NewsManager::get()->getNextNewsMessage();
-    w->setText(news_text, true);
+    w->setText(m_news_text, true);
     w->update(0.01f);
 #endif
 
@@ -217,11 +217,15 @@ void MainMenuScreen::onUpdate(float delta)
     }
 
     LabelWidget* w = getWidget<LabelWidget>("info_addons");
-    w->update(delta);
-    if(w->scrolledOff())
+    if (m_news_text.empty())
+        m_news_text = NewsManager::get()->getNextNewsMessage();
+    if (!m_news_text.empty())
     {
-        const core::stringw &news_text = NewsManager::get()->getNextNewsMessage();
-        w->setText(news_text, true);
+        if (w->getText().empty())
+            w->setText(m_news_text, true);
+        w->update(delta);
+        if (w->scrolledOff())
+            w->setText(m_news_text, true);
     }
 
     PlayerProfile *player = PlayerManager::getCurrentPlayer();
