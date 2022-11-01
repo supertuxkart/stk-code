@@ -314,7 +314,7 @@ float MainLoop::getLimitedDt()
         // For iOS devices most at locked at 60, for new iPad Pro supports 120
         // which is currently m_max_fps
         const int max_fps =
-            UserConfigParams::m_swap_interval == 2 ? UserConfigParams::m_max_fps :
+            UserConfigParams::m_swap_interval == 2 ? 120 :
             UserConfigParams::m_swap_interval == 1 ? 60 :
             30;
 #else

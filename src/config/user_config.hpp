@@ -657,8 +657,8 @@ namespace UserConfigParams
             PARAM_DEFAULT(  BoolUserConfigParam(false, "show_speedrun_timer",
                             &m_video_group, "Display the speedrun timer") );
     PARAM_PREFIX IntUserConfigParam         m_max_fps
-            PARAM_DEFAULT(  IntUserConfigParam(120, "max_fps",
-                       &m_video_group, "Maximum fps, should be at least 60") );
+            PARAM_DEFAULT(  IntUserConfigParam(167, "max_fps",
+                       &m_video_group, "Maximum frames per second rendered, should be at least 60") );
     PARAM_PREFIX BoolUserConfigParam        m_force_legacy_device
         PARAM_DEFAULT(BoolUserConfigParam(false, "force_legacy_device",
         &m_video_group, "Force OpenGL 2 context, even if OpenGL 3 is available."));
