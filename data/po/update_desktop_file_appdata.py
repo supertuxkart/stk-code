@@ -129,6 +129,9 @@ STK_APPDATA_FILE_5 = """  </description>
     <content_attribute id=\"social-chat\">intense</content_attribute>
   </content_rating>
   <releases>
+    <release version="1.4" date="2022-10-31">
+      <url>https://blog.supertuxkart.net/2022/11/supertuxkart-14-release.html</url>
+    </release>
     <release version="1.3" date="2021-09-28">
       <url>https://blog.supertuxkart.net/2021/09/supertuxkart-13-release.html</url>
     </release>
