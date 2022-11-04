@@ -265,6 +265,7 @@ void SlipStream::reset()
     m_speed_increase_ticks = m_speed_increase_duration = -1;
     // Reset a potential max speed increase
     m_kart->increaseMaxSpeed(MaxSpeed::MS_INCREASE_SLIPSTREAM, 0, 0, 0, 0);
+    hideAllNodes();
 }   // reset
 
 //-----------------------------------------------------------------------------
@@ -822,7 +823,23 @@ void SlipStream::updateQuad()
     }
 #endif
 
-} //updateQuad
+}   // updateQuad
+
+//-----------------------------------------------------------------------------
+void SlipStream::hideAllNodes()
+{
+#ifndef SERVER_ONLY
+    if (!GUIEngine::isNoGraphics())
+    {
+        if (m_node && m_node->isVisible())
+            m_node->setVisible(false);
+        if (m_node_fast && m_node_fast->isVisible())
+            m_node_fast->setVisible(false);
+        if (m_bonus_node && m_bonus_node->isVisible())
+            m_bonus_node->setVisible(false);
+    }
+#endif
+}   // hideAllNodes
 
 //-----------------------------------------------------------------------------
 /** Update, called once per timestep.
@@ -836,17 +853,7 @@ void SlipStream::update(int ticks)
     if (m_kart->getController()->disableSlipstreamBonus()
         || m_kart->isGhostKart())
     {
-#ifndef SERVER_ONLY
-        if (!GUIEngine::isNoGraphics())
-        {
-            if (m_node && m_node->isVisible())
-                m_node->setVisible(false);
-            if (m_node_fast && m_node_fast->isVisible())
-                m_node_fast->setVisible(false);
-            if (m_bonus_node && m_bonus_node->isVisible())
-                m_bonus_node->setVisible(false);
-        }
-#endif
+        hideAllNodes();
         return;
     }
 
