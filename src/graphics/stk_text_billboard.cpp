@@ -88,13 +88,7 @@ void STKTextBillboard::updateAbsolutePosition()
     core::matrix4 m;
     m.setScale(RelativeScale);
     AbsoluteTransformation *= m;
-    if (m_ge_node)
-    {
-        m_ge_node->setPosition(AbsoluteTransformation.getTranslation());
-        m_ge_node->setRotation(AbsoluteTransformation.getRotationDegrees());
-        m_ge_node->setScale(AbsoluteTransformation.getScale());
-    }
-    else if (CVS->isGLSL())
+    if (CVS->isGLSL())
     {
         m_instanced_data =
             SP::SPInstancedData(AbsoluteTransformation, 0, 0, 0, 0);
@@ -418,7 +412,7 @@ void STKTextBillboard::initLegacy(const core::stringw& text, FontWithFace* face)
         oss << (uint64_t)spm;
         SceneManager->getMeshCache()->addMesh(oss.str().c_str(), spm);
         spm->drop();
-        m_ge_node = SceneManager->addMeshSceneNode(spm);
+        m_ge_node = SceneManager->addMeshSceneNode(spm, this);
     }
     else
     {
