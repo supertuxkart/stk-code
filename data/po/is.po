@@ -4,6 +4,7 @@
 # 
 # Translators:
 # FIRST AUTHOR <EMAIL@ADDRESS>, 2010
+# IAN RODRÍGUEZ Lorenzo, 2022
 msgid ""
 msgstr ""
 "Project-Id-Version: SuperTuxKart\n"

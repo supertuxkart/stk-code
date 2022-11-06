@@ -2513,7 +2513,7 @@ msgstr "Аманда"
 
 #. I18N: ../stk-assets/karts/beastie/kart.xml
 msgid "Godette"
-msgstr ""
+msgstr "Годет"
 
 #. I18N: ../stk-assets/karts/emule/kart.xml
 msgid "Emule"

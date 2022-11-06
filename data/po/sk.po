@@ -2509,7 +2509,7 @@ msgstr "Nikdy nepoužívajte tri bowlingové gule naraz."
 msgid ""
 "Don't get in the way of a teammate carrying the ball, though you can try to "
 "hit opponents attempting to stop them from scoring."
-msgstr "Nenechajte sa prekážať tomu, aby tímový kolega niesol loptu, aj keď sa môžete pokúsiť zasiahnuť súpera, ktorý sa ich snaží zastaviť v bodovaní."
+msgstr ""
 
 #. I18N: ../stk-assets/karts/adiumy/kart.xml
 msgid "Adiumy"
@@ -2521,7 +2521,7 @@ msgstr "Amanda"
 
 #. I18N: ../stk-assets/karts/beastie/kart.xml
 msgid "Godette"
-msgstr "Godette"
+msgstr ""
 
 #. I18N: ../stk-assets/karts/emule/kart.xml
 msgid "Emule"
@@ -2821,7 +2821,7 @@ msgid ""
 "Closing the game before the story mode's completion invalidates the timer.\n"
 "\n"
 "To use the speedrun mode, please use a new profile."
-msgstr "Režim Speedrun je možné povoliť iba vtedy, ak hra nebola od spustenia režimu príbehu zatvorená.\n\nUzatvorenie hry pred dokončením režimu príbehu zneplatní časovač.\n\nAk chcete použiť režim speedrun, použite nový profil."
+msgstr ""
 
 #. I18N: Name of first guest player (without number)
 #: src/config/player_manager.cpp:396
@@ -3420,22 +3420,22 @@ msgstr "Start"
 #. I18N: name of buttons on gamepads
 #: src/input/gamepad_config.cpp:163
 msgid "Left thumbstick press"
-msgstr "Ľavé stlačenie palca"
+msgstr ""
 
 #. I18N: name of buttons on gamepads
 #: src/input/gamepad_config.cpp:165
 msgid "Right thumbstick press"
-msgstr "Pravý palec stlačte"
+msgstr ""
 
 #. I18N: name of buttons on gamepads
 #: src/input/gamepad_config.cpp:167
 msgid "Left shoulder"
-msgstr "Ľavé rameno"
+msgstr ""
 
 #. I18N: name of buttons on gamepads
 #: src/input/gamepad_config.cpp:169
 msgid "Right shoulder"
-msgstr "Pravé rameno"
+msgstr ""
 
 #. I18N: name of buttons on gamepads
 #: src/input/gamepad_config.cpp:171
@@ -3460,42 +3460,42 @@ msgstr "Smer. ovl. doprava"
 #. I18N: name of buttons on gamepads
 #: src/input/gamepad_config.cpp:181
 msgid "Left thumbstick right"
-msgstr "Ľavá palica vpravo"
+msgstr ""
 
 #. I18N: name of buttons on gamepads
 #: src/input/gamepad_config.cpp:183
 msgid "Left thumbstick left"
-msgstr "Ľavá palička vľavo"
+msgstr ""
 
 #. I18N: name of buttons on gamepads
 #: src/input/gamepad_config.cpp:185
 msgid "Left thumbstick down"
-msgstr "Ľavá palica dole"
+msgstr ""
 
 #. I18N: name of buttons on gamepads
 #: src/input/gamepad_config.cpp:187
 msgid "Left thumbstick up"
-msgstr "Ľavá palička hore"
+msgstr ""
 
 #. I18N: name of buttons on gamepads
 #: src/input/gamepad_config.cpp:189
 msgid "Right thumbstick right"
-msgstr "Pravá palička vpravo"
+msgstr ""
 
 #. I18N: name of buttons on gamepads
 #: src/input/gamepad_config.cpp:191
 msgid "Right thumbstick left"
-msgstr "Pravá palička vľavo"
+msgstr ""
 
 #. I18N: name of buttons on gamepads
 #: src/input/gamepad_config.cpp:193
 msgid "Right thumbstick down"
-msgstr "Pravá palička dole"
+msgstr ""
 
 #. I18N: name of buttons on gamepads
 #: src/input/gamepad_config.cpp:195
 msgid "Right thumbstick up"
-msgstr "Pravá palička hore"
+msgstr ""
 
 #. I18N: name of buttons on gamepads
 #: src/input/gamepad_config.cpp:197
@@ -3525,14 +3525,14 @@ msgstr "%s má nízku úroveň batérie."
 msgid ""
 "Connect your wiimote to the Bluetooth manager, then click on Ok. Detailed "
 "instructions at https://supertuxkart.net/Wiimote"
-msgstr "Pripojte svoj wiimote k Bluetooth managerovi a potom kliknite na Ok. Podrobné pokyny na https://supertuxkart.net/Wiimote"
+msgstr ""
 
 #: src/input/wiimote_manager.cpp:382
 msgid ""
 "Press the buttons 1+2 simultaneously on your wiimote to put it in discovery "
 "mode, then click on Ok. Detailed instructions at "
 "https://supertuxkart.net/Wiimote"
-msgstr "Stlačením tlačidiel 1 + 2 súčasne na wiimote ho umiestnite do režimu objavovania a potom kliknite na Ok. Podrobné pokyny na https://supertuxkart.net/Wiimote"
+msgstr ""
 
 #: src/input/wiimote_manager.cpp:405
 #, c-format
@@ -3593,7 +3593,7 @@ msgid ""
 " Would you like this feature to be enabled? (To change this setting at a "
 "later time, go to options, select tab 'General', and edit \"Connect to the "
 "Internet\")."
-msgstr "SuperTuxKart sa môže pripojiť k serveru, aby si stiahol doplnky a upozornil vás na aktualizácie. Prečítajte si naše zásady ochrany osobných údajov na https://supertuxkart.net/Privacy. Chcete, aby bola táto funkcia povolená? ( Ak chcete toto nastavenie zmeniť neskôr, prejdite na možnosti, vyberte kartu „Všeobecné“ a upravte „Pripojiť sa k internetu“ )."
+msgstr ""
 
 #: src/main.cpp:2381
 msgid "Your screen resolution is too low to run STK."
@@ -3899,7 +3899,7 @@ msgstr "Hráč %s bol úspešne nahlásený."
 msgid ""
 "Failed to download assets, check your storage space or internet connection "
 "and try again later."
-msgstr "Nepodarilo sa stiahnuť aktíva, skontrolovať úložný priestor alebo pripojenie na internet a skúsiť to znova neskôr."
+msgstr ""
 
 #: src/network/protocols/connect_to_server.cpp:230
 msgid "No quick play server available."
@@ -4514,7 +4514,7 @@ msgstr "Dokončené honby za vajíčkami"
 #: src/states_screens/dialogs/achievement_progress_dialog.cpp:313
 #: src/states_screens/dialogs/achievement_progress_dialog.cpp:319
 msgid " (official tracks matching the goal)"
-msgstr "(oficiálne skladby zodpovedajúce cieľu)"
+msgstr ""
 
 #: src/states_screens/dialogs/add_device_dialog.cpp:64
 msgid ""
@@ -4633,7 +4633,7 @@ msgstr "Rozlíšenia menšie ako 1024x768 alebo 1280x720 nie sú podporované. N
 #: src/states_screens/dialogs/custom_camera_settings.cpp:86
 #: src/states_screens/options/options_screen_ui.cpp:164
 msgid "Drone chase"
-msgstr "Honička"
+msgstr ""
 
 #. I18N: In the UI options, Camera setting: Custom
 #. I18N: custom video settings
@@ -4704,7 +4704,7 @@ msgstr "Pre lepší herný zážitok spustí SuperTuxKart preberanie kompletnýc
 msgid ""
 "SuperTuxKart will download full assets (including high quality textures and "
 "music) for better gaming experience."
-msgstr "SuperTuxKart stiahne plné aktíva ( vrátane vysoko kvalitných textúr a hudby ) pre lepší herný zážitok."
+msgstr ""
 
 #: src/states_screens/dialogs/enter_address_dialog.cpp:42
 msgid ""
@@ -5064,7 +5064,7 @@ msgstr "Vstupné zariadenie už existuje."
 
 #: src/states_screens/dialogs/splitscreen_player_dialog.cpp:147
 msgid "No player available for connecting to server."
-msgstr "Nie je k dispozícii žiadny prehrávač na pripojenie k serveru."
+msgstr ""
 
 #. I18N: In the user info dialog
 #: src/states_screens/dialogs/user_info_dialog.cpp:56
@@ -5549,7 +5549,7 @@ msgstr "Používateľské meno nemôže byť prázdne."
 
 #: src/states_screens/online/register_screen.cpp:362
 msgid "Online username and password must not be the same!"
-msgstr "Používateľské meno a heslo online nesmú byť rovnaké!"
+msgstr ""
 
 #: src/states_screens/online/register_screen.cpp:366
 msgid "Emails don't match!"
@@ -5559,7 +5559,7 @@ msgstr "Emaily sa nezhodujú!"
 msgid ""
 "Online username can only contain alphanumeric (ASCII) characters, periods, "
 "dashes and underscores!"
-msgstr "Používateľské meno online môže obsahovať iba alfanumerické znaky ( ASCII ), periódy, pomlčky a podčiarknutia!"
+msgstr ""
 
 #: src/states_screens/online/register_screen.cpp:374
 msgid "Online username has to be between 3 and 30 characters long!"
@@ -5816,11 +5816,11 @@ msgstr "V režime viacerých hráčov si na obrazovke výberu motokáry\nmôžu 
 #. will download from stk server
 #: src/states_screens/options/options_screen_general.cpp:117
 msgid "Install full game assets"
-msgstr "Nainštalujte si plné herné aktíva"
+msgstr ""
 
 #: src/states_screens/options/options_screen_general.cpp:236
 msgid "Are you sure to uninstall full game assets?"
-msgstr "Naozaj odinštalujete plné herné prostriedky?"
+msgstr ""
 
 #: src/states_screens/options/options_screen_input.cpp:117
 #, c-format
@@ -5903,7 +5903,7 @@ msgid ""
 "Closing the game before the story mode's completion invalidates the timer.\n"
 "\n"
 "To use the speedrun mode, please use a new profile."
-msgstr "Režim Speedrun je možné povoliť iba vtedy, ak hra nebola od spustenia režimu príbehu zatvorená.\n\nUzatvorenie hry pred dokončením režimu príbehu zneplatní časovač.\n\nAk chcete použiť režim speedrun, použite nový profil."
+msgstr ""
 
 #. I18N: In the video options, maximum frame per second
 #: src/states_screens/options/options_screen_video.cpp:257
@@ -5921,17 +5921,17 @@ msgstr "Celá"
 msgid ""
 "Vsync forces the graphics card to supply a new frame\n"
 "only when the monitor is ready to display it."
-msgstr "Vsync núti grafickú kartu dodávať nový rám\niba ak je monitor pripravený na jeho zobrazenie."
+msgstr ""
 
 #. I18N: in graphical options.
 #: src/states_screens/options/options_screen_video.cpp:274
 msgid "Full: one frame per monitor refresh"
-msgstr "Plný: jeden rám na obnovenie monitora"
+msgstr ""
 
 #. I18N: in graphical options.
 #: src/states_screens/options/options_screen_video.cpp:276
 msgid "Vsync will not work if your drivers don't support it."
-msgstr "Vsync will not work if your drivers don't support it."
+msgstr ""
 
 #. I18N: in graphical options
 #: src/states_screens/options/options_screen_video.cpp:676
@@ -6255,7 +6255,7 @@ msgstr "Pretekajte proti motokáram duchov a skúste ich poraziť!"
 
 #: src/states_screens/race_setup_screen.cpp:143
 msgid "Complete as many laps as possible in a given amount of time."
-msgstr "Dokončite čo najviac kôl v danom čase."
+msgstr ""
 
 #. I18N: In soccer setup screen
 #: src/states_screens/soccer_setup_screen.cpp:118
@@ -6332,19 +6332,19 @@ msgstr "Zrýchľujete pomocou <%s> a riadite pomocou <%s> a <%s>."
 msgid ""
 "Accelerate by touching the upper part of the wheel, and steer by moving left"
 " or right."
-msgstr "Zrýchlite dotykom hornej časti kolesa a nasmerujte pohybom doľava alebo doprava."
+msgstr ""
 
 #: ../stk-assets/tracks/tutorial/scripting.as:22
 msgid ""
 "Accelerate by moving the accelerator upwards, and steer by tilting your "
 "device."
-msgstr "Zrýchlite pohybom akcelerátora nahor a nasmerujte nakláňaním zariadenia."
+msgstr ""
 
 #: ../stk-assets/tracks/tutorial/scripting.as:27
 msgid ""
 "Accelerate by moving the accelerator upwards, and steer by rotating your "
 "device."
-msgstr "Zrýchlite pohybom akcelerátora nahor a nasmerujte otáčaním zariadenia."
+msgstr ""
 
 #: ../stk-assets/tracks/tutorial/scripting.as:59
 #, c-format
@@ -6369,7 +6369,7 @@ msgstr "Obzrite sa stlačením <%s>.\nStreľte dozadu stlačením <%s> počas s�
 msgid ""
 "Press the mirror icon to look behind.\n"
 "Fire the weapon behind by holding the mirror icon and then swiping to the bowling icon!"
-msgstr "Stlačením ikony zrkadla sa môžete pozrieť za.\nVystreľte zbraň za držaním zrkadlovej ikony a potom potiahnutím na bowlingovú ikonu!"
+msgstr ""
 
 #: ../stk-assets/tracks/tutorial/scripting.as:98
 #, c-format
@@ -6404,7 +6404,7 @@ msgstr "Zrýchlite a stlačte <%s> a začnete šmykovať.\nŠmykovanie na krátk
 msgid ""
 "Accelerate and press the skid icon while turning to skid.\n"
 "Skidding for a short while can help you turn faster to take sharp turns."
-msgstr "Zrýchlite a stlačte ikonu šmyku a súčasne ju otočte na šmyk.\nSkidding na chvíľu vám môže pomôcť rýchlejšie sa otáčať."
+msgstr ""
 
 #: ../stk-assets/tracks/tutorial/scripting.as:156
 msgid ""
@@ -6443,7 +6443,7 @@ msgid ""
 " while avoiding other karts as they may overtake you, but don't eat the "
 "bananas! Watch for bowling balls, plungers, bubble gum, and cakes thrown by "
 "your opponents."
-msgstr "Máme niekoľko skladieb s rôznymi témami, ktoré si hráči môžu užiť, od jazdy pod vodou, vidieckych poľnohospodárskych pozemkov, džunglí alebo dokonca vo vesmíre! Snažte sa čo najlepšie a vyhýbajte sa iným motokáram, pretože vás môžu predbehnúť, ale nejedzte banány! Dajte si pozor na bowlingové gule, piesty, žuvačky a koláče hodené vašimi súpermi."
+msgstr ""
 
 #: supertuxkart.appdata.xml:14
 msgid ""

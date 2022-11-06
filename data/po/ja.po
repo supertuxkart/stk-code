@@ -29,7 +29,7 @@ msgstr ""
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-09-20 11:30+0800\n"
 "PO-Revision-Date: 2015-02-15 01:58+0000\n"
-"Last-Translator: Otsubo Kazma, 2022\n"
+"Last-Translator: Happymc! <isena200536@gmail.com>, 2019-2020,2022\n"
 "Language-Team: Japanese (http://www.transifex.com/supertuxkart/supertuxkart/language/ja/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -234,7 +234,7 @@ msgstr "ハンドル"
 #. I18N: ./data/gui/dialogs/android/multitouch_settings.stkgui
 #. I18N: In the multitouch settings screen
 msgid "Auto acceleration"
-msgstr ""
+msgstr "自動加速"
 
 #. I18N: ./data/gui/dialogs/android/init_android.stkgui
 msgid "You can change it later in touch device settings."
@@ -2174,7 +2174,7 @@ msgstr "設定の名前を変更する"
 #. I18N: ./data/gui/screens/options_device.stkgui
 #. I18N: In the input configuration screen, for gamepad
 msgid "Enable force feedback (if supported)"
-msgstr ""
+msgstr "強制的なフィードバックを有効にする(サポートされている場合)"
 
 #. I18N: ./data/gui/screens/options_general.stkgui
 #. I18N: In the general settings
@@ -3033,7 +3033,7 @@ msgstr "ジャンジャ"
 #: src/input/binding.cpp:127
 msgctxt "input_key"
 msgid "Final"
-msgstr ""
+msgstr "ファイナル"
 
 #. I18N: input configuration screen: keyboard key
 #: src/input/binding.cpp:129
@@ -3351,7 +3351,7 @@ msgstr "プレイ"
 #: src/input/binding.cpp:299
 msgctxt "input_key"
 msgid "Zoom"
-msgstr ""
+msgstr "拡大"
 
 #. I18N: input configuration screen: keyboard key
 #: src/input/binding.cpp:301
@@ -3511,12 +3511,12 @@ msgstr ""
 #. I18N: name of buttons on gamepads
 #: src/input/gamepad_config.cpp:197
 msgid "Left trigger"
-msgstr ""
+msgstr "左トリガー"
 
 #. I18N: name of buttons on gamepads
 #: src/input/gamepad_config.cpp:199
 msgid "Right trigger"
-msgstr ""
+msgstr "右トリガー"
 
 #: src/input/input_manager.cpp:865
 #, c-format
@@ -3557,7 +3557,7 @@ msgstr "Wiiリモコンは見つかりませんでした。"
 
 #: src/io/rich_presence.cpp:477
 msgid "Getting ready to race"
-msgstr ""
+msgstr "レースの準備中"
 
 #: src/karts/controller/local_player_controller.cpp:313
 msgid "Penalty time!!"
@@ -4774,12 +4774,12 @@ msgstr "コース"
 #: src/states_screens/dialogs/high_score_info_dialog.cpp:110
 #, c-format
 msgid "Top %d High Scores"
-msgstr ""
+msgstr "トップ %d のハイスコア"
 
 #: src/states_screens/dialogs/high_score_info_dialog.cpp:112
 #, c-format
 msgid "%s: %s"
-msgstr ""
+msgstr "%s : %s"
 
 #: src/states_screens/dialogs/high_score_info_dialog.cpp:125
 #, c-format
@@ -4789,7 +4789,7 @@ msgstr "カートの数：%d"
 #: src/states_screens/dialogs/high_score_info_dialog.cpp:137
 #, c-format
 msgid "Time target: %s"
-msgstr ""
+msgstr "目標時間: %s"
 
 #: src/states_screens/dialogs/high_score_info_dialog.cpp:139
 #, c-format
@@ -5457,7 +5457,7 @@ msgstr "%sさんのプロフィール"
 
 #: src/states_screens/online/online_profile_friends.cpp:75
 msgid "Since"
-msgstr ""
+msgstr "から"
 
 #: src/states_screens/online/online_profile_friends.cpp:76
 msgid "Status"
@@ -5900,7 +5900,7 @@ msgstr "最大FPS"
 #. I18N: In the video options, full vertical sync (usually 60fps)
 #: src/states_screens/options/options_screen_video.cpp:265
 msgid "Full"
-msgstr ""
+msgstr "いっぱい"
 
 #. I18N: in graphical options. The \n is a newline character, place it where
 #. appropriate, two can be used if required.
@@ -5970,13 +5970,13 @@ msgstr "影: %i"
 #: src/states_screens/options/options_screen_video.cpp:703
 #, c-format
 msgid "Bloom: %s"
-msgstr ""
+msgstr "ブルーム: %s"
 
 #. I18N: in graphical options
 #: src/states_screens/options/options_screen_video.cpp:707
 #, c-format
 msgid "Glow (outlines): %s"
-msgstr ""
+msgstr "グロー (アウトライン): %s"
 
 #. I18N: in graphical options
 #: src/states_screens/options/options_screen_video.cpp:711

@@ -9,6 +9,7 @@
 # Anard0 <anard@free.fr>, 2021-2022
 # Auria <auria.mg@gmail.com>, 2015-2021
 # Benau, 2020-2021
+# Clément Escude--Cotinat, 2022
 # devnoname120 <devnoname120+gh@gmail.com>, 2015
 # Alayan <alayan.feh@gmail.com>, 2018
 # Éfrit, 2015
@@ -30,7 +31,7 @@ msgstr ""
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-09-20 11:30+0800\n"
 "PO-Revision-Date: 2015-02-15 01:58+0000\n"
-"Last-Translator: PoorPockets McNewHold <g.k@e.email>, 2022\n"
+"Last-Translator: Clément Escude--Cotinat, 2022\n"
 "Language-Team: French (http://www.transifex.com/supertuxkart/supertuxkart/language/fr/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -104,7 +105,7 @@ msgstr "Un vrai pilote de Formule 1 !"
 msgid ""
 "Win against at least 3 AIs in normal race, time-trial, and follow the "
 "leader."
-msgstr "Gagne contre au moins 3 IAs dans une Course normale, Course contre la montre et Suit le chef."
+msgstr "Gagne contre au moins 3 IAs dans une Course normale, Course contre la montre et Suis le meneur."
 
 #. I18N: ./data/achievements.xml
 msgid "Powerup Love"
@@ -1461,7 +1462,7 @@ msgid ""
 "player who hits others the most will win in a given hit or time limit. In "
 "Capture The Flag, your team needs to bring the flag of the other team to "
 "your own flag base, as long as your flag is not captured by the other team."
-msgstr "Il y a trois types de modes de bataille : Dans Bataille en 3 coups, vous aurez besoin de toucher les autres avec des armes avant qu'ils ne perdent toutes leurs vies. Dans Chacun pour soi, le joueur qui touche les autres le plus gagnera suivant un certain objectif de coups ou dans le temps impartit. Dans Capture le drapeau, votre équipe à besoin de ramener le drapeau de l'autre équipe à votre propre base, tant que votre drapeau n'est pas capturé par l'autre équipe."
+msgstr "Il y a trois types de modes de bataille : Dans Bataille en 3 coups, vous aurez besoin de toucher les autres avec des armes avant qu'ils ne perdent toutes leurs vies. Dans Chacun pour soi, le joueur qui touche les autres le plus gagnera suivant un certain objectif de coups ou dans le temps imparti. Dans Capture le drapeau, votre équipe à besoin de ramener le drapeau de l'autre équipe à votre propre base, tant que votre drapeau n'est pas capturé par l'autre équipe."
 
 #. I18N: ./data/gui/screens/help2.stkgui
 #. I18N: In the help menu
@@ -1471,7 +1472,7 @@ msgstr "Football : Utilise ton kart pour pousser le ballon dans le but."
 #. I18N: ./data/gui/screens/help2.stkgui
 #. I18N: In the help menu
 msgid "Egg hunt: Explore tracks to find all hidden eggs."
-msgstr "Chasse aux œufs : explore les pistes afin de trouver tous les œufs cachés."
+msgstr "Chasse aux œufs : Explore les pistes afin de trouver tous les œufs cachés."
 
 #. I18N: ./data/gui/screens/help2.stkgui
 #. I18N: In the help menu
@@ -1647,7 +1648,7 @@ msgstr "Si vous suivez de près un autre kart pendant quelques seconds, vous obt
 #. I18N: ./data/gui/screens/help7.stkgui
 #. I18N: In the help menu
 msgid "SuperTuxKart can be played in multiplayer mode online...:"
-msgstr "Il est possible de jouer à SuperTuxKart en multijoueur en réseau...:"
+msgstr "Il est possible de jouer à SuperTuxKart en multijoueur en réseau... :"
 
 #. I18N: ./data/gui/screens/help7.stkgui
 #. I18N: In the help menu
@@ -2309,7 +2310,7 @@ msgstr "Syncronisation verticale"
 #. I18N: ./data/gui/screens/options_video.stkgui
 #. I18N: In the video settings
 msgid "Custom settings..."
-msgstr "Paramètres personnalisés …"
+msgstr "Paramètres personnalisés…"
 
 #. I18N: ./data/gui/screens/options_video.stkgui
 #. I18N: In the video settings
@@ -2457,7 +2458,7 @@ msgstr "La tapette à mouche peut servir à retirer les bombes et les parachutes
 msgid ""
 "You can't stop turning while skidding. Good kart orientation at the skid's "
 "start is paramount."
-msgstr "Lors d'un dérapage, impossible d'aller en ligne droite! Bien orienter le kart avant de commencer le dérapage est crucial."
+msgstr "Lors d'un dérapage, impossible d'aller en ligne droite ! Bien orienter le kart avant de commencer le dérapage est crucial."
 
 #. I18N: ./data/tips.xml
 msgid "You get a startup boost if you start accelerating during \"Set\"."
@@ -3589,7 +3590,7 @@ msgstr "Tu as gagné la course !"
 #: src/karts/kart.cpp:1025
 #, c-format
 msgid "You finished the race in rank %d!"
-msgstr "Vous avez fini la course au rang %d!"
+msgstr "Vous avez fini la course au rang %d !"
 
 #. I18N: Message shown in game to tell player left the game in network
 #: src/karts/kart_rewinder.cpp:126 src/network/protocols/client_lobby.cpp:1175
@@ -3604,7 +3605,7 @@ msgid ""
 " Would you like this feature to be enabled? (To change this setting at a "
 "later time, go to options, select tab 'General', and edit \"Connect to the "
 "Internet\")."
-msgstr "SuperTuxKart peut se connecter à un serveur pour télécharger des extensions et t’avertir des mises à jour. Notre politique de confidentialité est disponible sur https://supertuxkart.net/Privacy. Souhaites-tu que ces fonctionnalités soient activées ? (Pour modifier ton choix plus tard, va dans les options, sélectionne l’onglet «Général », et modifie « Se connecter à Internet » et « Envoyer des statistiques anonymes sur la configuration matérielle »)."
+msgstr "SuperTuxKart peut se connecter à un serveur pour télécharger des extensions et t’avertir des mises à jour. Notre politique de confidentialité est disponible sur https://supertuxkart.net/Privacy. Souhaites-tu que ces fonctionnalités soient activées ? (Pour modifier ton choix plus tard, va dans les options, sélectionne l’onglet « Général », et modifie « Se connecter à Internet » et « Envoyer des statistiques anonymes sur la configuration matérielle »)."
 
 #: src/main.cpp:2381
 msgid "Your screen resolution is too low to run STK."
@@ -5280,11 +5281,11 @@ msgstr "Nombre de karts"
 
 #: src/states_screens/high_score_selection.cpp:352
 msgid "Are you sure you want to remove this high score entry?"
-msgstr "Voulez-vous vraiment retirer ce score?"
+msgstr "Voulez-vous vraiment retirer ce score ?"
 
 #: src/states_screens/high_score_selection.cpp:360
 msgid "Are you sure you want to remove all of your high scores?"
-msgstr "Voulez-vous vraiment retirer tous vos scores?"
+msgstr "Voulez-vous vraiment retirer tous vos scores ?"
 
 #: src/states_screens/kart_selection.cpp:442
 msgid "Connect a keyboard or gamepad to play splitscreen multiplayer"
@@ -5339,7 +5340,7 @@ msgstr "Veuillez patienter durant le chargement des extensions"
 
 #: src/states_screens/main_menu_screen.cpp:654
 msgid "Are you sure you want to quit STK?"
-msgstr "Voulez-vous vraiment quitter STK?"
+msgstr "Voulez-vous vraiment quitter STK ?"
 
 #: src/states_screens/online/create_server_screen.cpp:100
 msgid "Create LAN Server"
@@ -6378,7 +6379,7 @@ msgstr "Appuie sur l'icône miroir pour regarder vers l'arrière.\nPour faire fe
 #: ../stk-assets/tracks/tutorial/scripting.as:98
 #, c-format
 msgid "Use the nitro you collected by pressing <%s>!"
-msgstr "Utilise la nitro que tu as récoltée en appuyant sur <%s> !"
+msgstr "Utilise la nitro que tu as récoltée en appuyant sur <%s>  !"
 
 #: ../stk-assets/tracks/tutorial/scripting.as:104
 msgid "Use the nitro you collected by pressing the nitro icon"
