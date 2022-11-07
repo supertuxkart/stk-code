@@ -2270,6 +2270,10 @@ void GEVulkanDriver::unpauseRendering()
 
     createSwapChainRelated(true/*handle_surface*/);
     g_paused_rendering.store(false);
+
+    // Remove any previous scheduled pause to fix sometimes android black
+    // screen after resuming
+    g_schedule_pausing_rendering.store(false);
 }   // unpauseRendering
 
 // ----------------------------------------------------------------------------
