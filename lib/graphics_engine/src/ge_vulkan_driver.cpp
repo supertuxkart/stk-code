@@ -2416,6 +2416,8 @@ void GEVulkanDriver::buildCommandBuffers()
     if (m_rtt_texture)
     {
         vkCmdEndRenderPass(getCurrentCommandBuffer());
+        // No depth buffer in main framebuffer if RTT is used
+        render_pass_info.clearValueCount = 1;
         render_pass_info.renderPass = getRenderPass();
         render_pass_info.framebuffer =
             getSwapChainFramebuffers()[getCurrentImageIndex()];
