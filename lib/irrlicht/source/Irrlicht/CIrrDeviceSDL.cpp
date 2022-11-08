@@ -127,9 +127,14 @@ CIrrDeviceSDL::CIrrDeviceSDL(const SIrrlichtCreationParameters& param)
 		{
 			SDL_VERSION(&Info.version);
 
+#if (defined(IOS_STK) || defined(_IRR_COMPILE_WITH_DIRECT3D_9_)) && !defined(__SWITCH__)
+			// Only iOS or DirectX9 build uses the Info structure
 			// Switch doesn't support GetWindowWMInfo
-#ifndef __SWITCH__
+#ifdef IOS_STK
 			if (!SDL_GetWindowWMInfo(Window, &Info))
+#else
+			if (CreationParams.DriverType == video::EDT_DIRECT3D9 && !SDL_GetWindowWMInfo(Window, &Info))
+#endif
 				return;
 #endif
 #ifdef IOS_STK
@@ -138,7 +143,7 @@ CIrrDeviceSDL::CIrrDeviceSDL(const SIrrlichtCreationParameters& param)
 #ifdef ANDROID
 			Android_initDisplayCutout(&TopPadding, &BottomPadding, &LeftPadding, &RightPadding, &InitialOrientation);
 #endif
-			core::stringc sdlversion = "SDL Version ";
+			core::stringc sdlversion = "Compiled SDL Version ";
 			sdlversion += Info.version.major;
 			sdlversion += ".";
 			sdlversion += Info.version.minor;
@@ -147,6 +152,17 @@ CIrrDeviceSDL::CIrrDeviceSDL(const SIrrlichtCreationParameters& param)
 
 			Operator = new COSOperator(sdlversion);
 			os::Printer::log(sdlversion.c_str(), ELL_INFORMATION);
+
+			core::stringc cur_sdlversion = "Current SDL Version ";
+			SDL_version version = {};
+			SDL_GetVersion(&version);
+			cur_sdlversion += version.major;
+			cur_sdlversion += ".";
+			cur_sdlversion += version.minor;
+			cur_sdlversion += ".";
+			cur_sdlversion += version.patch;
+
+			os::Printer::log(cur_sdlversion.c_str(), ELL_INFORMATION);
 #if SDL_VERSION_ATLEAST(2, 0, 9)
 			for (int i = 0; i < SDL_NumSensors(); i++)
 			{

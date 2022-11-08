@@ -114,7 +114,9 @@ class MoltenVK;
 
 		SDL_Window* getWindow() const { return Window; }
 
+#ifdef IOS_STK
 		const SDL_SysWMinfo& getWMInfo() const { return Info; }
+#endif
 
 		virtual s32 getTopPadding();
 
