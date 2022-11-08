@@ -732,6 +732,10 @@ namespace UserConfigParams
         &m_video_group, "Use SDL_WINDOW_FULLSCREEN_DESKTOP for vulkan device"));
 #endif
 
+    PARAM_PREFIX BoolUserConfigParam        m_non_ge_fullscreen_desktop
+        PARAM_DEFAULT(BoolUserConfigParam(false, "non_ge_fullscreen_desktop",
+        &m_video_group, "Use SDL_WINDOW_FULLSCREEN_DESKTOP for non-ge device"));
+
     // ---- Recording
     PARAM_PREFIX GroupUserConfigParam        m_recording_group
         PARAM_DEFAULT(GroupUserConfigParam("Recording",

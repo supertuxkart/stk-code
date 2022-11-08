@@ -510,8 +510,6 @@ begin:
                 UserConfigParams::m_texture_compression;
             GE::getGEConfig()->m_render_scale =
                 UserConfigParams::m_scale_rtts_factor;
-            GE::getGEConfig()->m_vulkan_fullscreen_desktop =
-                UserConfigParams::m_vulkan_fullscreen_desktop;
 #endif
         }
         else
@@ -525,6 +523,13 @@ begin:
             driver_created = video::EDT_OPENGL;
 #endif
         }
+
+#ifndef SERVER_ONLY
+        GE::getGEConfig()->m_fullscreen_desktop =
+            (driver_created == video::EDT_VULKAN &&
+            UserConfigParams::m_vulkan_fullscreen_desktop) ||
+            UserConfigParams::m_non_ge_fullscreen_desktop;
+#endif
 
         // Try 32 and, upon failure, 24 then 16 bit per pixels
         for (int bits=32; bits>15; bits -=8)
