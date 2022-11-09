@@ -23,12 +23,14 @@
 #include "utils/synchronised.hpp"
 #include "utils/types.hpp"
 #include <atomic>
+#include <chrono>
 
 /** Management class for the whole gameflow, this is where the
     main-loop is */
 class MainLoop
 {
 private:
+    using TimePoint = std::chrono::steady_clock::time_point;
     /** True if the main loop should exit. */
     std::atomic_bool m_abort;
 
@@ -48,11 +50,18 @@ private:
 
     Synchronised<int> m_ticks_adjustment;
 
-    uint64_t m_curr_time;
-    uint64_t m_prev_time;
+    TimePoint m_curr_time;
+    TimePoint m_prev_time;
     unsigned m_parent_pid;
-    float    getLimitedDt();
+    double   getLimitedDt();
     void     updateRace(int ticks, bool fast_forward);
+    double   convertToTime(const TimePoint& cur, const TimePoint& prev) const
+    {
+        auto duration = cur - prev;
+        auto value =
+            std::chrono::duration_cast<std::chrono::nanoseconds>(duration);
+        return value.count() / (1000.0 * 1000.0);
+    }
 public:
          MainLoop(unsigned parent_pid, bool download_assets = false);
         ~MainLoop();
