@@ -530,6 +530,8 @@ begin:
             UserConfigParams::m_vulkan_fullscreen_desktop) ||
             UserConfigParams::m_non_ge_fullscreen_desktop;
 #endif
+        if (UserConfigParams::m_swap_interval > 1)
+            UserConfigParams::m_swap_interval = 1;
 
         // Try 32 and, upon failure, 24 then 16 bit per pixels
         for (int bits=32; bits>15; bits -=8)

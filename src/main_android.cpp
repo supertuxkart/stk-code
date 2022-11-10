@@ -311,6 +311,8 @@ void getConfigForDevice(const char* dev)
             }
         }
     }
+    // TODO remove when vulkan is used as it uses less power than gles3
+    UserConfigParams::m_max_fps = 30;
 }
 
 #endif

@@ -75,12 +75,12 @@
                         <spinner id="vsync" width="100%" align="center" />
                     </div>
                     <div layout="vertical-row" proportion="1" height="100%">
-                        <label id="vsync_label" height="100%" I18N="In the video settings" text="Vertical Sync" align="left"/>
+                        <label id="vsync_label" height="100%" I18N="In the video options, maximum frame per second" text="Maximum FPS" align="left"/>
                     </div>
                 </div>
 
                 <spacer width="5" height="1%"/>
-				
+
                 <!-- ************ CUSTOM SETTINGS ************ -->
                 <div width="100%" height="fit" layout="horizontal-row" id="outer_box" >
                     <spacer width="5%" height="100%" />
