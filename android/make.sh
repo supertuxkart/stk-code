@@ -313,7 +313,7 @@ create_translation()
     CUR_LANG=$(basename -- "$PO" | cut -f 1 -d '.')
     # Skip english po file
     if [ "$CUR_LANG" = "en" ]; then
-        continue
+        return
     fi
     # Fix some difference in language code
     if [ "$CUR_LANG" = "he" ]; then
@@ -358,7 +358,7 @@ create_translation()
     fi
 }
 
-find "$DIRNAME/assets/data/po" -type f -name '*.po' | while read f; do create_translation "$f"; done
+find "$DIRNAME/assets/data/po" -type f -name '*.po' | while read -r f; do create_translation "$f"; done
 
 ADAPTIVE_ICON_FILE="$DIRNAME/res/drawable-anydpi-v26/icon.xml"
 
