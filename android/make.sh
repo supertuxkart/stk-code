@@ -20,7 +20,7 @@ if [ -z "$STK_MIN_ANDROID_SDK" ]; then
 fi
 
 if [ -z "$STK_TARGET_ANDROID_SDK" ]; then
-    export STK_TARGET_ANDROID_SDK=30
+    export STK_TARGET_ANDROID_SDK=33
 fi
 
 if [ -z "$STK_NDK_VERSION" ]; then
@@ -369,9 +369,6 @@ echo "    <background android:drawable=\"@drawable/icon_bg\" />"       >> "$ADAP
 echo "    <foreground android:drawable=\"@drawable/icon_fg\" />"       >> "$ADAPTIVE_ICON_FILE"
 echo "</adaptive-icon>"                                                >> "$ADAPTIVE_ICON_FILE"
 
-sed -i "s/package=\".*\"/package=\"$PACKAGE_NAME\"/g" \
-       "$DIRNAME/AndroidManifest.xml"
-
 sed -i "s/package org.supertuxkart.*/package $PACKAGE_NAME;/g" \
        "$DIRNAME/src/main/java/STKEditText.java"
 
@@ -389,12 +386,6 @@ sed -i "s/package org.supertuxkart.*/package $PACKAGE_NAME;/g" \
 
 sed -i "s/import org.supertuxkart.*/import $PACKAGE_NAME.STKEditText;/g" \
        "$DIRNAME/src/main/java/SuperTuxKartActivity.java"
-
-sed -i "s/versionName=\".*\"/versionName=\"$PROJECT_VERSION\"/g" \
-       "$DIRNAME/AndroidManifest.xml"
-       
-sed -i "s/versionCode=\".*\"/versionCode=\"$PROJECT_CODE\"/g" \
-       "$DIRNAME/AndroidManifest.xml"
 
 cp -f "$DIRNAME/../lib/sdl2/android-project/app/src/main/java/org/libsdl/app/HIDDevice.java" \
        "$DIRNAME/src/main/java/"
@@ -454,6 +445,9 @@ export ANDROID_HOME="$SDK_PATH"
           -Pndk_version="$STK_NDK_VERSION"               \
           -Pcompile_arch="$COMPILE_ARCH"                 \
           -Pcpu_core="$CPU_CORE"                         \
+          -Ppackage_name="$PACKAGE_NAME"                 \
+          -Pversion_name="$PROJECT_VERSION"              \
+          -Pversion_code="$PROJECT_CODE"                 \
           $GRADLE_BUILD_TYPE
 
 if [ "$GRADLE_BUILD_TYPE" = "assembleRelease" ]; then
@@ -466,6 +460,9 @@ if [ "$GRADLE_BUILD_TYPE" = "assembleRelease" ]; then
           -Pndk_version="$STK_NDK_VERSION"               \
           -Pcompile_arch="$COMPILE_ARCH"                 \
           -Pcpu_core="$CPU_CORE"                         \
+          -Ppackage_name="$PACKAGE_NAME"                 \
+          -Pversion_name="$PROJECT_VERSION"              \
+          -Pversion_code="$PROJECT_CODE"                 \
           "bundleRelease"
 fi
 
