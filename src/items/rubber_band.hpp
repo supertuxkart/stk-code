@@ -30,6 +30,14 @@ namespace SP
     class SPDynamicDrawCall;
 }
 
+namespace irr
+{
+    namespace scene
+    {
+        class IMeshSceneNode;
+    }
+}
+
 class AbstractKart;
 class Plunger;
 
@@ -58,6 +66,8 @@ private:
 
     /** The dynamic draw call of the rubber band. */
     std::shared_ptr<SP::SPDynamicDrawCall> m_dy_dc;
+
+    irr::scene::IMeshSceneNode* m_node;
 
     /** The kart a plunger might have hit. */
     AbstractKart       *m_hit_kart;

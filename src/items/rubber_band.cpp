@@ -35,6 +35,10 @@
 #include "mini_glm.hpp"
 #include "utils/string_utils.hpp"
 
+#include <array>
+#include <SMesh.h>
+#include <SMeshBuffer.h>
+
 /** RubberBand constructor. It creates a simple quad and attaches it to the
  *  root(!) of the graph. It's easier this way to get the right coordinates
  *  than attaching it to the plunger or kart, and trying to find the other
@@ -44,33 +48,60 @@
  *  \param kart    Reference to the kart.
  */
 RubberBand::RubberBand(Plunger *plunger, AbstractKart *kart)
-          : m_plunger(plunger), m_owner(kart)
+          : m_plunger(plunger), m_owner(kart), m_node(NULL)
 {
     m_hit_kart = NULL;
     m_attached_state = RB_TO_PLUNGER;
+
 #ifndef SERVER_ONLY
-    if (GUIEngine::isNoGraphics() || !CVS->isGLSL())
-    {
+    if (GUIEngine::isNoGraphics())
         return;
-    }
+
     video::SColor color(255, 179, 0, 0);
-    if (CVS->isDeferredEnabled())
+    if (CVS->isGLSL())
     {
-        color.setRed(SP::srgb255ToLinear(color.getRed()));
-        color.setGreen(SP::srgb255ToLinear(color.getGreen()));
-        color.setBlue(SP::srgb255ToLinear(color.getBlue()));
+        if (CVS->isDeferredEnabled())
+        {
+            color.setRed(SP::srgb255ToLinear(color.getRed()));
+            color.setGreen(SP::srgb255ToLinear(color.getGreen()));
+            color.setBlue(SP::srgb255ToLinear(color.getBlue()));
+        }
+        m_dy_dc = std::make_shared<SP::SPDynamicDrawCall>
+            (scene::EPT_TRIANGLE_STRIP, SP::SPShaderManager::get()->getSPShader
+            ("unlit"), material_manager->getDefaultSPMaterial("unlit"));
+        m_dy_dc->getVerticesVector().resize(4);
+        // Set the vertex colors properly, as the new pipeline doesn't use the
+        // old light values
+        for (unsigned i = 0; i < 4; i++)
+        {
+            m_dy_dc->getSPMVertex()[i].m_color = color;
+        }
+        SP::addDynamicDrawCall(m_dy_dc);
     }
-    m_dy_dc = std::make_shared<SP::SPDynamicDrawCall>
-        (scene::EPT_TRIANGLE_STRIP, SP::SPShaderManager::get()->getSPShader
-        ("unlit"), material_manager->getDefaultSPMaterial("unlit"));
-    m_dy_dc->getVerticesVector().resize(4);
-    // Set the vertex colors properly, as the new pipeline doesn't use the old
-    // light values
-    for (unsigned i = 0; i < 4; i++)
+    else
     {
-        m_dy_dc->getSPMVertex()[i].m_color = color;
+        video::S3DVertex v;
+        v.Normal = core::vector3df(0, 1, 0);
+        v.Color = color;
+        std::array<video::S3DVertex, 4> vertices = {{ v, v, v, v }};
+        std::array<uint16_t, 6> indices = {{ 0, 1, 2, 0, 2, 3 }};
+        scene::SMeshBuffer* buffer = new scene::SMeshBuffer();
+        buffer->append(vertices.data(), vertices.size(), indices.data(),
+            indices.size());
+        buffer->getMaterial().AmbientColor = color;
+        buffer->getMaterial().DiffuseColor = color;
+        buffer->getMaterial().EmissiveColor = color;
+        buffer->setHardwareMappingHint(scene::EHM_STREAM);
+        buffer->recalculateBoundingBox();
+        scene::SMesh* mesh = new scene::SMesh();
+        mesh->addMeshBuffer(buffer);
+        mesh->setBoundingBox(buffer->getBoundingBox());
+        buffer->drop();
+        std::string debug_name = m_owner->getIdent() + " (rubber-band)";
+        m_node = static_cast<scene::IMeshSceneNode*>(
+            irr_driver->addMesh(mesh, debug_name));
+        mesh->drop();
     }
-    SP::addDynamicDrawCall(m_dy_dc);
 #endif
 }   // RubberBand
 
@@ -112,40 +143,83 @@ void RubberBand::updatePosition()
 void RubberBand::updateGraphics(float dt)
 {
 #ifndef SERVER_ONLY
-    if (!m_dy_dc)
+    if (m_node)
     {
-        return;
+        scene::IMesh* mesh = m_node->getMesh();
+        scene::IMeshBuffer* buffer = mesh->getMeshBuffer(0);
+        // Update the rubber band positions
+        // --------------------------------
+        // Todo: make height dependent on length (i.e. rubber band gets
+        // thinner). And call explosion if the band is too long.
+        const Vec3& k = m_owner->getXYZ();
+        const float hh = .1f;  // half height of the band
+        const Vec3& p = m_end_position;  // for shorter typing
+        core::vector3df& v0 = buffer->getPosition(0);
+        core::vector3df& v1 = buffer->getPosition(1);
+        core::vector3df& v2 = buffer->getPosition(2);
+        core::vector3df& v3 = buffer->getPosition(3);
+        v0.X = p.getX() - hh; v0.Y = p.getY(); v0.Z = p.getZ() - hh;
+        v1.X = p.getX() + hh; v1.Y = p.getY(); v1.Z = p.getZ() + hh;
+        v2.X = k.getX() + hh; v2.Y = k.getY(); v2.Z = k.getZ() + hh;
+        v3.X = k.getX() - hh; v3.Y = k.getY(); v3.Z = k.getZ() - hh;
+        core::vector3df normal = (v1 - v0).crossProduct(v2 - v0);
+        core::vector3df kart_pos = Vec3(m_owner->getTrans()(
+            Vec3(0, 5.0f, -2.0f))).toIrrVector();
+        float dot_product = (v0 - kart_pos).dotProduct(normal);
+        // For avoiding cull face
+        if (dot_product >= 0.0f)
+        {
+            buffer->getIndices()[0] = 2;
+            buffer->getIndices()[1] = 1;
+            buffer->getIndices()[2] = 0;
+            buffer->getIndices()[3] = 3;
+            buffer->getIndices()[4] = 2;
+            buffer->getIndices()[5] = 0;
+        }
+        else
+        {
+            buffer->getIndices()[0] = 0;
+            buffer->getIndices()[1] = 1;
+            buffer->getIndices()[2] = 2;
+            buffer->getIndices()[3] = 0;
+            buffer->getIndices()[4] = 2;
+            buffer->getIndices()[5] = 3;
+        }
+        buffer->recalculateBoundingBox();
+        mesh->setBoundingBox(buffer->getBoundingBox());
     }
-
-    // Update the rubber band positions
-    // --------------------------------
-    // Todo: make height dependent on length (i.e. rubber band gets
-    // thinner). And call explosion if the band is too long.
-    const Vec3 &k = m_owner->getXYZ();
-    const float hh=.1f;  // half height of the band
-    const Vec3 &p=m_end_position;  // for shorter typing
-    auto& v = m_dy_dc->getVerticesVector();
-    v[0].m_position.X = p.getX()-hh; v[0].m_position.Y=p.getY(); v[0].m_position.Z = p.getZ()-hh;
-    v[1].m_position.X = p.getX()+hh; v[1].m_position.Y=p.getY(); v[1].m_position.Z = p.getZ()+hh;
-    v[2].m_position.X = k.getX()-hh; v[2].m_position.Y=k.getY(); v[2].m_position.Z = k.getZ()-hh;
-    v[3].m_position.X = k.getX()+hh; v[3].m_position.Y=k.getY(); v[3].m_position.Z = k.getZ()+hh;
-    v[0].m_normal = 0x1FF << 10;
-    v[1].m_normal = 0x1FF << 10;
-    v[2].m_normal = 0x1FF << 10;
-    v[3].m_normal = 0x1FF << 10;
-    core::vector3df normal = (v[1].m_position - v[0].m_position)
-        .crossProduct(v[2].m_position - v[0].m_position);
-    core::vector3df kart_pos = Vec3(m_owner->getTrans()(Vec3(0, 5.0f, -2.0f))).toIrrVector();
-    float dot_product = (v[0].m_position - kart_pos).dotProduct(normal);
-    // For avoiding cull face
-    if (dot_product >= 0.0f)
+    else if (m_dy_dc)
     {
-        video::S3DVertexSkinnedMesh tmp = v[1];
-        v[1] = v[2];
-        v[2] = tmp;
+        // Update the rubber band positions
+        // --------------------------------
+        // Todo: make height dependent on length (i.e. rubber band gets
+        // thinner). And call explosion if the band is too long.
+        const Vec3 &k = m_owner->getXYZ();
+        const float hh=.1f;  // half height of the band
+        const Vec3 &p=m_end_position;  // for shorter typing
+        auto& v = m_dy_dc->getVerticesVector();
+        v[0].m_position.X = p.getX()-hh; v[0].m_position.Y=p.getY(); v[0].m_position.Z = p.getZ()-hh;
+        v[1].m_position.X = p.getX()+hh; v[1].m_position.Y=p.getY(); v[1].m_position.Z = p.getZ()+hh;
+        v[2].m_position.X = k.getX()-hh; v[2].m_position.Y=k.getY(); v[2].m_position.Z = k.getZ()-hh;
+        v[3].m_position.X = k.getX()+hh; v[3].m_position.Y=k.getY(); v[3].m_position.Z = k.getZ()+hh;
+        v[0].m_normal = 0x1FF << 10;
+        v[1].m_normal = 0x1FF << 10;
+        v[2].m_normal = 0x1FF << 10;
+        v[3].m_normal = 0x1FF << 10;
+        core::vector3df normal = (v[1].m_position - v[0].m_position)
+            .crossProduct(v[2].m_position - v[0].m_position);
+        core::vector3df kart_pos = Vec3(m_owner->getTrans()(Vec3(0, 5.0f, -2.0f))).toIrrVector();
+        float dot_product = (v[0].m_position - kart_pos).dotProduct(normal);
+        // For avoiding cull face
+        if (dot_product >= 0.0f)
+        {
+            video::S3DVertexSkinnedMesh tmp = v[1];
+            v[1] = v[2];
+            v[2] = tmp;
+        }
+        m_dy_dc->setUpdateOffset(0);
+        m_dy_dc->recalculateBoundingBox();
     }
-    m_dy_dc->setUpdateOffset(0);
-    m_dy_dc->recalculateBoundingBox();
 #endif
 }   // updateGraphics
 
@@ -296,6 +370,11 @@ void RubberBand::remove()
     {
         m_dy_dc->removeFromSP();
         m_dy_dc = nullptr;
+    }
+    else if (m_node)
+    {
+        irr_driver->removeNode(m_node);
+        m_node = NULL;
     }
 #endif
 }   // remove
