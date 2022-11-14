@@ -3012,7 +3012,7 @@ void Kart::loadData(RaceManager::KartType type, bool is_animated_model)
     }
 
     if (!GUIEngine::isNoGraphics() &&
-        CVS->isGLSL() && !CVS->isShadowEnabled() && m_kart_properties
+        (!CVS->isGLSL() || !CVS->isShadowEnabled()) && m_kart_properties
         ->getShadowMaterial()->getSamplerPath(0) != "unicolor_white")
     {
         m_shadow.reset(new Shadow(m_kart_properties->getShadowMaterial(),

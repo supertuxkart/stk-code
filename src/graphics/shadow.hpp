@@ -30,6 +30,14 @@ namespace SP
     class SPDynamicDrawCall;
 }
 
+namespace irr
+{
+    namespace scene
+    {
+        class IMeshSceneNode;
+    }
+}
+
 /**
  * \brief This class is used to enable a shadow for a kart.
  * For now it uses a simple texture to simulate the shadow, real time shadows might
@@ -41,6 +49,8 @@ class Shadow : public NoCopy
 private:
     /** The dynamic draw call of the shadow. */
     std::shared_ptr<SP::SPDynamicDrawCall> m_dy_dc;
+
+    irr::scene::IMeshSceneNode* m_node;
 
     /** If a kart is flying, the shadow is disabled (since it is
      *  stuck to the kart, i.e. the shadow would be flying, too). */
