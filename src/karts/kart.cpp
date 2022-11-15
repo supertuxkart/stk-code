@@ -3006,7 +3006,7 @@ void Kart::loadData(RaceManager::KartType type, bool is_animated_model)
     m_skidmarks = nullptr;
     m_shadow = nullptr;
     if (!GUIEngine::isNoGraphics() &&
-        m_kart_properties->getSkidEnabled() && CVS->isGLSL())
+        m_kart_properties->getSkidEnabled())
     {
         m_skidmarks.reset(new SkidMarks(*this));
     }
