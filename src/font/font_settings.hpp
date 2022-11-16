@@ -21,7 +21,7 @@
 
 #include "utils/leak_check.hpp"
 
-#include <irrlicht.h>
+#include "SColor.h"
 
 using namespace irr;
 

@@ -26,6 +26,8 @@
 #include <ge_spm.hpp>
 #include <ge_spm_buffer.hpp>
 #include <sstream>
+#include <IMeshBuffer.h>
+#include <ITexture.h>
 
 // ----------------------------------------------------------------------------
 STKTextBillboard::STKTextBillboard(const video::SColor& color_top,
@@ -530,6 +532,27 @@ void STKTextBillboard::removeGENode()
         m_ge_node = NULL;
     }
 }   // removeGENode
+
+// ----------------------------------------------------------------------------
+void STKTextBillboard::clearBuffer()
+{
+    if (m_instanced_array != 0)
+    {
+        glDeleteBuffers(1, &m_instanced_array);
+    }
+    for (auto& p : m_vao_vbos)
+    {
+        glDeleteVertexArrays(1, &p.second.first);
+        glDeleteBuffers(1, &p.second.second);
+    }
+    m_vao_vbos.clear();
+    for (auto& p : m_gl_mb)
+    {
+        p.second->drop();
+    }
+    m_gl_mb.clear();
+    m_gl_tbs.clear();
+}   // clearBuffer
 
 #endif   // !SERVER_ONLY
 

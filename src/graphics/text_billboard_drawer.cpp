@@ -21,6 +21,7 @@
 #include "graphics/texture_shader.hpp"
 
 #include <unordered_set>
+#include <ITexture.h>
 
 namespace TextBillboardDrawer
 {
