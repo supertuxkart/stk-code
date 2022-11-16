@@ -23,6 +23,11 @@
 using namespace irr;
 
 #ifdef DEBUG
+#include <IAnimatedMeshSceneNode.h>
+#include <ISceneCollisionManager.h>
+#include <ISceneManager.h>
+#include <ISkinnedMesh.h>
+
 void AbstractRenderer::drawDebugMeshes() const
 {
     std::vector<irr::scene::IAnimatedMeshSceneNode*> debug_meshes = irr_driver->getDebugMeshes();
@@ -74,15 +79,16 @@ void AbstractRenderer::drawDebugMeshes() const
 /** Draws a joint for debugging skeletons.
  *  \param drawline If true draw a line to the parent.
  *  \param drawname If true draw the name of the joint.
- *  \param joint The joint to draw.
+ *  \param sjoint The joint to draw.
  *  \param mesh The mesh whose skeleton is drawn (only used to get
  *         all joints to find the parent).
  *  \param id Index, which (%4) determines the color to use.
  */
 void AbstractRenderer::drawJoint(bool drawline, bool drawname,
-                                 scene::ISkinnedMesh::SJoint* joint,
+                                 void* sjoint,
                                  scene::ISkinnedMesh* mesh, int id) const
 {
+    scene::ISkinnedMesh::SJoint* joint = (scene::ISkinnedMesh::SJoint*)sjoint;
     scene::ISkinnedMesh::SJoint* parent = NULL;
     const core::array< scene::ISkinnedMesh::SJoint * >& joints
         = mesh->getAllJoints();

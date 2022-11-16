@@ -65,7 +65,7 @@ protected:
     void drawDebugMeshes() const;
 
     void drawJoint(bool drawline, bool drawname,
-                   irr::scene::ISkinnedMesh::SJoint* joint,
+                   void* sjoint,
                    irr::scene::ISkinnedMesh* mesh, int id) const;
 #endif
 
