@@ -54,6 +54,7 @@
 #include <algorithm>
 #include <iostream>
 #include <sstream>
+#include <IGUIScrollBar.h>
 
 using namespace GUIEngine;
 using namespace Online;

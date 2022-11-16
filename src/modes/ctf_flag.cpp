@@ -25,6 +25,8 @@
 #include "LinearMath/btQuaternion.h"
 
 #include <ge_render_info.hpp>
+#include <IAnimatedMeshSceneNode.h>
+#include <ISceneManager.h>
 
 // ============================================================================
 // Position offset to attach in kart model

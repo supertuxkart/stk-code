@@ -39,6 +39,11 @@
 #include "utils/constants.hpp"
 #include "mini_glm.hpp"
 
+#include <IMeshCache.h>
+#include <ISceneManager.h>
+#include <SMeshBuffer.h>
+#include <SMesh.h>
+
 #ifndef SERVER_ONLY
 #include <ge_main.hpp>
 #include <ge_render_info.hpp>

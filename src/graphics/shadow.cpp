@@ -31,6 +31,7 @@
 #ifndef SERVER_ONLY
 
 #include <array>
+#include <IMeshSceneNode.h>
 #include <SMesh.h>
 #include <SMeshBuffer.h>
 

@@ -31,6 +31,7 @@
 #include <IGUIImage.h>
 
 #include "../../../lib/irrlicht/source/Irrlicht/CGUIButton.h"
+#include <IGUIStaticText.h>
 
 using namespace GUIEngine;
 using namespace irr::core;

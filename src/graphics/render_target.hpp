@@ -18,12 +18,25 @@
 #ifndef HEADER_RENDER_TARGET_HPP
 #define HEADER_RENDER_TARGET_HPP
 
-#include <irrlicht.h>
+#include <dimension2d.h>
+#include <rect.h>
 #include <string>
 
 class FrameBuffer;
 class RTT;
 class ShaderBasedRenderer;
+
+namespace irr
+{
+    namespace scene
+    {
+        class ICameraSceneNode; class ISceneNode;
+    }
+    namespace video
+    {
+        class ITexture; class SColor;
+    }
+}
 
 class RenderTarget
 {

@@ -37,6 +37,14 @@ class Skybox;
 class SphericalHarmonics;
 class PostProcessing;
 
+namespace irr
+{
+    namespace video
+    {
+        class IImage;
+    }
+}
+
 class ShaderBasedRenderer: public AbstractRenderer
 {
 private:

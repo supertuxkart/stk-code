@@ -36,6 +36,7 @@
 #include "utils/constants.hpp"
 #include "utils/string_utils.hpp"
 
+#include <IBillboardSceneNode.h>
 #include <IMeshSceneNode.h>
 #include <ISceneManager.h>
 

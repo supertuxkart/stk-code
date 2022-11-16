@@ -29,6 +29,9 @@
 #include "utils/log.hpp"
 #include "utils/string_utils.hpp"
 
+#include <IImageLoader.h>
+#include <IWriteFile.h>
+
 #if !(defined(SERVER_ONLY) || defined(MOBILE_STK))
 #include <squish.h>
 static_assert(squish::kColourClusterFit == (1 << 5), "Wrong header");

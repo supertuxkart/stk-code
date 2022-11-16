@@ -36,6 +36,7 @@
 #include "utils/string_utils.hpp"
 
 #include <array>
+#include <IMeshSceneNode.h>
 #include <SMesh.h>
 #include <SMeshBuffer.h>
 

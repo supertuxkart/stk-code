@@ -29,10 +29,10 @@ namespace irr
 }
 using namespace irr;
 
-#include <irrlicht.h>
 #include <string>
 #include <vector>
 #include <map>
+#include <EMaterialTypes.h>
 
 class Material;
 class XMLReader;

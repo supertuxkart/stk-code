@@ -19,7 +19,6 @@
 #include "utils/log.hpp"
 #include "utils/vec3.hpp"
 
-#include <irrlicht.h>
 #include <IMesh.h>
 #include <IMeshBuffer.h>
 #include <SSkinMeshBuffer.h>

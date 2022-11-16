@@ -20,10 +20,21 @@
 
 #ifndef SERVER_ONLY
 #include "graphics/gl_headers.hpp"
-#include <irrlicht.h>
 #include <vector>
 
+#include <irrArray.h>
+#include <plane3d.h>
+#include <vector3d.h>
+
 using namespace irr;
+
+namespace irr
+{
+    namespace scene
+    {
+        class ISceneNode; class ICameraSceneNode;
+    }
+}
 
 class ShadowMatrices;
 

@@ -38,6 +38,8 @@
 #include "utils/translation.hpp"
 
 #include <algorithm>
+#include <IAnimatedMeshSceneNode.h>
+#include <ISceneManager.h>
 
 const float g_capture_length = 2.0f;
 const int g_captured_score = 10;

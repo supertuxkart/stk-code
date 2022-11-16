@@ -26,7 +26,6 @@
 
 #include <algorithm> 
 #include <cassert>
-#include <irrlicht.h>
 
 #if __SSE2__ || _M_X64 || _M_IX86_FP >= 2
  #include <emmintrin.h>

@@ -31,6 +31,7 @@
 
 #include <algorithm>
 #include <string>
+#include <IGUIEnvironment.h>
 
 using namespace GUIEngine;
 // ============================================================================

@@ -38,6 +38,7 @@
 
 #ifndef SERVER_ONLY
 
+#include <IMeshSceneNode.h>
 #include <SMesh.h>
 #include <SMeshBuffer.h>
 #include <ge_render_info.hpp>

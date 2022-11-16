@@ -26,8 +26,12 @@
 #include <ge_spm.hpp>
 #include <ge_spm_buffer.hpp>
 #include <sstream>
-#include <IMeshBuffer.h>
+#include <ICameraSceneNode.h>
+#include <IMeshCache.h>
+#include <IMeshSceneNode.h>
+#include <ISceneManager.h>
 #include <ITexture.h>
+#include <SMeshBuffer.h>
 
 // ----------------------------------------------------------------------------
 STKTextBillboard::STKTextBillboard(const video::SColor& color_top,

@@ -19,7 +19,19 @@
 #define HEADER_LIGHTING_PASSES_HPP
 
 #include "graphics/gl_headers.hpp"
-#include <irrlicht.h>
+#include <vector3d.h>
+
+namespace irr
+{
+    namespace scene
+    {
+        class ICameraSceneNode;
+    }
+    namespace video
+    {
+        class SColorf;
+    }
+}
 
 class FrameBuffer;
 class PostProcessing;
