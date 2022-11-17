@@ -68,6 +68,7 @@
 
 #include <string>
 
+#include <IrrlichtDevice.h>
 
 using namespace GUIEngine;
 using namespace Online;

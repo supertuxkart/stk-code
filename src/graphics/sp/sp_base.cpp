@@ -58,6 +58,9 @@
 #include <vector>
 
 #include <ge_main.hpp>
+
+#include <IrrlichtDevice.h>
+
 using namespace GE;
 
 namespace SP

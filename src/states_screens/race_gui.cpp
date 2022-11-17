@@ -64,6 +64,8 @@ using namespace irr;
 
 #include <algorithm>
 
+#include <IrrlichtDevice.h>
+
 /** The constructor is called before anything is attached to the scene node.
  *  So rendering to a texture can be done here. But world is not yet fully
  *  created, so only the race manager can be accessed safely.

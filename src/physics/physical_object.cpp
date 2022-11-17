@@ -42,6 +42,7 @@
 #include <IMeshManipulator.h>
 #include <IMeshSceneNode.h>
 #include <ITexture.h>
+#include <IVideoDriver.h>
 using namespace irr;
 
 #include <algorithm>

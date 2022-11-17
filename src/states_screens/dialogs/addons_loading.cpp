@@ -39,6 +39,8 @@
 #include "utils/string_utils.hpp"
 #include "utils/translation.hpp"
 
+#include <ITexture.h>
+
 using namespace GUIEngine;
 using namespace Online;
 using namespace irr::gui;

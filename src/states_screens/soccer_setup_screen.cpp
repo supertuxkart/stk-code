@@ -37,6 +37,8 @@
 #include "utils/string_utils.hpp"
 #include "utils/translation.hpp"
 
+#include <IrrlichtDevice.h>
+
 using namespace GUIEngine;
 
 #define KART_CONTINUOUS_ROTATION_SPEED      35.f

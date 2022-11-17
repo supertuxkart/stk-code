@@ -21,8 +21,14 @@
 #include <irrString.h>
 #include <rect.h>
 #include <vector2d.h>
-#include <IVideoDriver.h>
 
+namespace irr
+{
+    namespace video
+    {
+        class ITexture;
+    }
+}
 using namespace irr;
 
 class AbstractKart;

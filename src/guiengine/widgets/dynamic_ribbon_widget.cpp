@@ -26,6 +26,7 @@
 #include "states_screens/state_manager.hpp"
 #include "utils/vs.hpp"
 
+#include <IrrlichtDevice.h>
 #include <IGUIEnvironment.h>
 #include <iostream>
 #include <algorithm>

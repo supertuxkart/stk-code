@@ -29,6 +29,9 @@
 #include <stdexcept>
 #include <stdio.h>
 
+#include <ITexture.h>
+#include <IVideoDriver.h>
+
 TrackManager* track_manager = 0;
 std::vector<std::string>  TrackManager::m_track_search_path;
 

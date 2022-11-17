@@ -27,12 +27,6 @@
  * management, etc...)
  */
 
-#include <IVideoDriver.h>
-#include <vector2d.h>
-#include <dimension2d.h>
-#include <SColor.h>
-#include "IrrlichtDevice.h"
-#include "ISkinnedMesh.h"
 #include "graphics/abstract_renderer.hpp"
 #include "graphics/gl_headers.hpp"
 #include "graphics/wind.hpp"
@@ -45,6 +39,13 @@
 #include <string>
 #include <vector>
 
+#include <irrArray.h>
+#include <dimension2d.h>
+#include <position2d.h>
+#include <matrix4.h>
+#include <vector2d.h>
+#include <IEventReceiver.h>
+#include <SColor.h>
 
 namespace SP
 {
@@ -58,6 +59,9 @@ namespace irr
         class IMeshSceneNode; class IParticleSystemSceneNode; class ICameraSceneNode; class ILightSceneNode;
         class CLensFlareSceneNode; }
     namespace gui   { class IGUIEnvironment; class IGUIFont; }
+    namespace video { struct IRenderTarget; class ITexture; class IVideoDriver;
+                      class SMaterial; }
+    class IrrlichtDevice;
 }
 using namespace irr;
 
@@ -299,8 +303,7 @@ public:
     const std::vector<VideoMode>& getVideoModes() const { return m_modes; }
     // ------------------------------------------------------------------------
     /** Returns the frame size. */
-    const core::dimension2d<u32>& getFrameSize() const
-                       { return m_video_driver->getCurrentRenderTargetSize(); }
+    const core::dimension2d<u32>& getFrameSize() const;
     // ------------------------------------------------------------------------
     /** Returns the irrlicht device. */
     IrrlichtDevice       *getDevice()       const { return m_device;        }
@@ -316,7 +319,7 @@ public:
     // ------------------------------------------------------------------------
     /** Returns the current real time, which might not be 0 at start of the
      *  application. Value in msec. */
-    unsigned int getRealTime() {return m_device->getTimer()->getRealTime(); }
+    unsigned int getRealTime();
     // ------------------------------------------------------------------------
     /** Use motion blur for a short time */
     void giveBoost(unsigned int cam_index) { m_renderer->giveBoost(cam_index);}
@@ -521,8 +524,7 @@ public:
     void uploadLightingData();
     void sameRestart()             { m_resolution_changing = RES_CHANGE_SAME; }
     // ------------------------------------------------------------------------
-    u32 getDefaultFramebuffer() const
-                            { return m_video_driver->getDefaultFramebuffer(); }
+    u32 getDefaultFramebuffer() const;
     // ------------------------------------------------------------------------
     void handleWindowResize();
 };   // IrrDriver

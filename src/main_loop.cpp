@@ -60,6 +60,8 @@
 
 #include <thread>
 
+#include <IrrlichtDevice.h>
+
 #ifndef WIN32
 #include <unistd.h>
 #endif

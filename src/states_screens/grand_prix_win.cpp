@@ -25,7 +25,6 @@
 #include "config/stk_config.hpp"
 #include "graphics/irr_driver.hpp"
 #include "graphics/lod_node.hpp"
-#include <ge_render_info.hpp>
 #include "guiengine/engine.hpp"
 #include "guiengine/scalable_font.hpp"
 #include "guiengine/widgets/button_widget.hpp"
@@ -45,12 +44,15 @@
 #include "utils/string_utils.hpp"
 #include "utils/translation.hpp"
 
+#include <ge_render_info.hpp>
+
 #include <ICameraSceneNode.h>
 #include <IGUIEnvironment.h>
 #include <IGUIImage.h>
 #include <ILightSceneNode.h>
 #include <IMeshSceneNode.h>
 #include <ISceneManager.h>
+#include <IVideoDriver.h>
 #include <SColor.h>
 
 #include <iostream>

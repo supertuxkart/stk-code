@@ -35,6 +35,8 @@
 #include "utils/string_utils.hpp"
 #include "utils/translation.hpp"
 
+#include <IrrlichtDevice.h>
+
 #define INPUT_MODE_DEBUG 0
 
 static const char  INPUT_FILE_NAME[]  = "input.xml";

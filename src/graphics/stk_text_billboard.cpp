@@ -31,6 +31,7 @@
 #include <IMeshSceneNode.h>
 #include <ISceneManager.h>
 #include <ITexture.h>
+#include <IVideoDriver.h>
 #include <SMeshBuffer.h>
 
 // ----------------------------------------------------------------------------

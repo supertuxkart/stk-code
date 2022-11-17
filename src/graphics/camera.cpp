@@ -40,6 +40,7 @@
 #include "utils/vs.hpp"
 
 #include "ISceneManager.h"
+#include "IVideoDriver.h"
 #include <algorithm>
 #include <cmath>
 

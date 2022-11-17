@@ -19,6 +19,7 @@
 
 #include <iostream>
 
+#include <IrrlichtDevice.h>
 #include <IGUIFont.h>
 #include <ITexture.h>
 

@@ -26,6 +26,7 @@
 #include <cmath>
 #include "../../lib/irrlicht/source/Irrlicht/os.h"
 #include <ISceneManager.h>
+#include <IVideoDriver.h>
 
 // ----------------------------------------------------------------------------
 std::vector<float> STKParticle::m_flips_data;

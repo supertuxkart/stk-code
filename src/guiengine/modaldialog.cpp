@@ -26,8 +26,10 @@
 #include "io/file_manager.hpp"
 #include "utils/log.hpp"
 
+#include <IrrlichtDevice.h>
 #include <IGUIEnvironment.h>
 #include <IGUIButton.h>
+#include <IVideoDriver.h>
 
 using namespace irr;
 using namespace core;

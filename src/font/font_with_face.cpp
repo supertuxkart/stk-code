@@ -33,6 +33,7 @@
 #include "utils/utf8.h"
 
 #include "GlyphLayout.h"
+#include "IVideoDriver.h"
 #include <array>
 #ifndef SERVER_ONLY
 #include <ge_texture.hpp>

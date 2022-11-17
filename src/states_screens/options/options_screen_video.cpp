@@ -49,6 +49,8 @@
 #include "../../lib/irrlicht/source/Irrlicht/CIrrDeviceSDL.h"
 #endif
 
+#include <IrrlichtDevice.h>
+
 #include <functional>
 #include <iostream>
 #include <iterator>

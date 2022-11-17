@@ -23,6 +23,7 @@
 #include "utils/translation.hpp"
 
 #include <ctime>
+#include <IrrlichtDevice.h>
 
 irr::ITimer *StkTime::m_timer = NULL;
 std::chrono::steady_clock::time_point

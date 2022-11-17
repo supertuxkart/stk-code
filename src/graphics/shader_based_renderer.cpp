@@ -48,6 +48,7 @@
 
 #include "../../lib/irrlicht/source/Irrlicht/CSceneManager.h"
 #include "../../lib/irrlicht/source/Irrlicht/os.h"
+#include <IVideoDriver.h>
 #include <algorithm> 
 
 // ----------------------------------------------------------------------------

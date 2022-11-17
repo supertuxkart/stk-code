@@ -66,6 +66,7 @@
 #include "utils/profiler.hpp"
 #include "utils/string_utils.hpp"
 
+#include <IrrlichtDevice.h>
 #include <IGUIEnvironment.h>
 #include <IGUIContextMenu.h>
 

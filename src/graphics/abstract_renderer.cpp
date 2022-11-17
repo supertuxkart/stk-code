@@ -27,6 +27,7 @@ using namespace irr;
 #include <ISceneCollisionManager.h>
 #include <ISceneManager.h>
 #include <ISkinnedMesh.h>
+#include <IVideoDriver.h>
 
 void AbstractRenderer::drawDebugMeshes() const
 {

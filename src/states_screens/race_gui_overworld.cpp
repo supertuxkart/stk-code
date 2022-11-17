@@ -55,6 +55,7 @@
 #include "utils/string_utils.hpp"
 #include "utils/translation.hpp"
 
+#include <IrrlichtDevice.h>
 #include <ISceneCollisionManager.h>
 #include <ISceneManager.h>
 using namespace irr;

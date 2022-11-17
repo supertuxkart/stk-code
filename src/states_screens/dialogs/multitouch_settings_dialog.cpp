@@ -28,8 +28,8 @@
 #include "states_screens/race_gui_multitouch.hpp"
 #include "utils/translation.hpp"
 
+#include <IrrlichtDevice.h>
 #include <IGUIEnvironment.h>
-
 
 using namespace GUIEngine;
 using namespace irr;

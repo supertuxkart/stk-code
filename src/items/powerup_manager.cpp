@@ -39,6 +39,8 @@
 #include "utils/constants.hpp"
 #include "utils/string_utils.hpp"
 
+#include <IMesh.h>
+
 PowerupManager* powerup_manager=0;
 
 //-----------------------------------------------------------------------------

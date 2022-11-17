@@ -2494,3 +2494,21 @@ void IrrDriver::resizeWindow()
 #endif
 #endif
 }
+
+// ----------------------------------------------------------------------------
+const core::dimension2d<u32>& IrrDriver::getFrameSize() const
+{
+    return m_video_driver->getCurrentRenderTargetSize();
+}
+
+// ----------------------------------------------------------------------------
+unsigned int IrrDriver::getRealTime()
+{
+    return m_device->getTimer()->getRealTime();
+}
+
+// ----------------------------------------------------------------------------
+u32 IrrDriver::getDefaultFramebuffer() const
+{
+    return m_video_driver->getDefaultFramebuffer();
+}

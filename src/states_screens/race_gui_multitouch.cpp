@@ -37,6 +37,7 @@ using namespace irr;
 #include "network/protocols/client_lobby.hpp"
 #include "states_screens/race_gui_base.hpp"
 
+#include <IrrlichtDevice.h>
 
 //-----------------------------------------------------------------------------
 /** The multitouch GUI constructor

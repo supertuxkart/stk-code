@@ -43,6 +43,7 @@
 
 #include <IMaterialRendererServices.h>
 #include <ISceneNode.h>
+#include <IVideoDriver.h>
 #include <mini_glm.hpp>
 
 #ifndef SERVER_ONLY

@@ -37,6 +37,8 @@
 #include <stack>
 #include <sstream>
 
+#include <IVideoDriver.h>
+
 Profiler profiler;
 
 // Unit is in pencentage of the screen dimensions

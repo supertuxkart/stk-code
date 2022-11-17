@@ -25,6 +25,8 @@
 #include <algorithm>
 #include <cassert>
 
+#include <IImage.h>
+
 using namespace irr;
 
 

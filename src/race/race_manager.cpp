@@ -66,6 +66,8 @@
 #include "utils/translation.hpp"
 #include "io/rich_presence.hpp"
 
+#include <IrrlichtDevice.h>
+
 #ifdef __SWITCH__
 extern "C" {
   #define u64 uint64_t

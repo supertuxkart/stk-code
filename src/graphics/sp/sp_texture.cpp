@@ -30,6 +30,7 @@
 #include "utils/string_utils.hpp"
 
 #include <IImageLoader.h>
+#include <IVideoDriver.h>
 #include <IWriteFile.h>
 
 #if !(defined(SERVER_ONLY) || defined(MOBILE_STK))

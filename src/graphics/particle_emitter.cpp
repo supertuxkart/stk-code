@@ -33,6 +33,8 @@
 
 #include <algorithm>
 
+#include <ITexture.h>
+
 //-----------------------------------------------------------------------------
 ParticleEmitter::ParticleEmitter(const ParticleKind* type,
                                  const Vec3 &position,

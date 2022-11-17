@@ -33,6 +33,8 @@
 #include "utils/log.hpp"
 #include "utils/string_utils.hpp"
 
+#include <ITexture.h>
+
 int                   Referee::m_st_first_start_frame  = 1;
 int                   Referee::m_st_last_start_frame   = 1;
 int                   Referee::m_st_first_rescue_frame = 1;

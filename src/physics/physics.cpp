@@ -45,6 +45,8 @@
 #include "utils/profiler.hpp"
 #include "utils/stk_process.hpp"
 
+#include <IVideoDriver.h>
+
 //=============================================================================
 Physics* g_physics[PT_COUNT];
 // ----------------------------------------------------------------------------

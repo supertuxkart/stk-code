@@ -57,9 +57,11 @@
 #include "utils/string_utils.hpp"
 #include "utils/translation.hpp"
 
+#include <IrrlichtDevice.h>
 #include <ISceneManager.h>
 #include <ICameraSceneNode.h>
 #include <ISceneNode.h>
+#include <ITexture.h>
 
 #include <map>
 #include <vector>

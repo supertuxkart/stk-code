@@ -51,6 +51,8 @@
 #include "utils/string_utils.hpp"
 #include "utils/translation.hpp"
 
+#include <IrrlichtDevice.h>
+
 using namespace GUIEngine;
 using namespace irr::core;
 using namespace irr::gui;

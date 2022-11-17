@@ -26,6 +26,8 @@
 #include "guiengine/skin.hpp"
 #include "io/file_manager.hpp"
 
+#include <IAnimatedMesh.h>
+
 AttachmentManager *attachment_manager = 0;
 
 struct  initAttachmentType {Attachment::AttachmentType attachment;

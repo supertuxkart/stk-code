@@ -30,6 +30,7 @@
 #include <IGUIEnvironment.h>
 #include <IGUIButton.h>
 #include <IGUIStaticText.h>
+#include <IVideoDriver.h>
 #include <algorithm>
 #ifndef SERVER_ONLY
 #include <ge_texture.hpp>

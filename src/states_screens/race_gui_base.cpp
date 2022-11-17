@@ -53,6 +53,7 @@
 #include "utils/translation.hpp"
 
 #include <GlyphLayout.h>
+#include <IrrlichtDevice.h>
 #include <ICameraSceneNode.h>
 
 namespace irr

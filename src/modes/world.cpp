@@ -88,6 +88,7 @@
 #include <sstream>
 #include <stdexcept>
 
+#include <IrrlichtDevice.h>
 #include <ISceneManager.h>
 
 World* World::m_world[PT_COUNT];

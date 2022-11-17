@@ -47,6 +47,8 @@
 #include <set>
 #include <algorithm>
 
+#include <IrrlichtDevice.h>
+
 using namespace GUIEngine;
 
 // -----------------------------------------------------------------------------

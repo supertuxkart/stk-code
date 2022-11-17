@@ -62,6 +62,8 @@
 #include <iostream>
 #include <sstream>
 
+#include <IrrlichtDevice.h>
+
 using namespace GUIEngine;
 using namespace Online;
 

@@ -20,10 +20,19 @@
 #define HEADER_SKYBOX_HPP
 
 #include "graphics/gl_headers.hpp"
-#include <ICameraSceneNode.h>
-#include <ITexture.h>
-#include <IVideoDriver.h>
 #include <vector>
+
+namespace irr
+{
+    namespace scene
+    {
+        class ISceneNode; class ICameraSceneNode;
+    }
+    namespace video
+    {
+        class IImage; class ITexture;
+    }
+}
 
 class Skybox
 {

@@ -34,6 +34,7 @@
 #include <IGUIElement.h>
 #include <IGUIEnvironment.h>
 #include <IGUIButton.h>
+#include <ITexture.h>
 
 using namespace GUIEngine;
 using namespace irr::core;

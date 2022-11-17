@@ -34,6 +34,8 @@
 #include <sstream>
 #include <ge_gl_utils.hpp>
 
+#include <IVideoDriver.h>
+
 #ifdef DEBUG
 #if !defined(__APPLE__) && !defined(ANDROID)
 #define ARB_DEBUG_OUTPUT

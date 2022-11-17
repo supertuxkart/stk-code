@@ -24,6 +24,7 @@
 
 #include "../../../lib/irrlicht/include/IrrCompileConfig.h"
 #include "../../../lib/irrlicht/source/Irrlicht/CIrrDeviceLinux.h"
+#include <IrrlichtDevice.h>
 
 #include <algorithm>
 #include <cstdlib>

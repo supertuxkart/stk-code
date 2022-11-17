@@ -25,6 +25,7 @@
 #include "graphics/shader_based_renderer.hpp"
 
 #include <ISceneManager.h>
+#include <IVideoDriver.h>
 
 //-----------------------------------------------------------------------------
 GL1RenderTarget::GL1RenderTarget(const irr::core::dimension2du &dimension,

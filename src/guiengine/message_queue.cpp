@@ -24,6 +24,7 @@
 #include "utils/synchronised.hpp"
 
 #include "GlyphLayout.h"
+#include <IrrlichtDevice.h>
 #include <atomic>
 #include <memory>
 

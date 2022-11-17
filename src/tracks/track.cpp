@@ -89,6 +89,7 @@
 #include <IMeshManipulator.h>
 #include <IMeshSceneNode.h>
 #include <ISceneManager.h>
+#include <IVideoDriver.h>
 #include <SMeshBuffer.h>
 
 #include <algorithm>

@@ -27,6 +27,8 @@
 #include "guiengine/modaldialog.hpp"
 #include "guiengine/screen_keyboard.hpp"
 
+#include <IrrlichtDevice.h>
+
 // ----------------------------------------------------------------------------
 /** The multitouch device constructor
  */

@@ -26,6 +26,8 @@
 #include "graphics/texture_shader.hpp"
 #include "utils/cpp2011.hpp"
 
+#include <IVideoDriver.h>
+
 // ============================================================================
 class Primitive2DList : public TextureShader<Primitive2DList, 1, core::vector2df>
 {

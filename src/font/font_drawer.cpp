@@ -25,7 +25,9 @@
 #include "graphics/glwrap.hpp"
 #include "graphics/texture_shader.hpp"
 
+#include <IVideoDriver.h>
 #include <S3DVertex.h>
+#include <SMaterial.h>
 #include <irrArray.h>
 #include <map>
 #include <memory>

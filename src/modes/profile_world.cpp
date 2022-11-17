@@ -26,6 +26,7 @@
 #include "tracks/track.hpp"
 
 #include <ISceneManager.h>
+#include <IVideoDriver.h>
 
 #include <iomanip>
 #include <iostream>

@@ -27,8 +27,8 @@
 #include "input/multitouch_device.hpp"
 #include "utils/translation.hpp"
 
+#include <IrrlichtDevice.h>
 #include <IGUIEnvironment.h>
-
 
 using namespace GUIEngine;
 using namespace irr;
