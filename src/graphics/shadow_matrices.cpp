@@ -33,6 +33,7 @@
 
 #include <limits>
 #include <ICameraSceneNode.h>
+#include <ISceneManager.h>
 #include <SViewFrustum.h>
 
 #define MAX2(a, b) ((a) > (b) ? (a) : (b))

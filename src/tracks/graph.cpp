@@ -33,6 +33,9 @@
 #include "tracks/track.hpp"
 #include "utils/log.hpp"
 
+#include <ICameraSceneNode.h>
+#include <ISceneManager.h>
+
 #ifndef SERVER_ONLY
 #include <ge_main.hpp>
 #endif

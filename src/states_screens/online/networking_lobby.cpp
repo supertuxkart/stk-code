@@ -58,6 +58,8 @@
 #include "utils/string_utils.hpp"
 #include "utils/translation.hpp"
 
+#include <IGUIEnvironment.h>
+
 using namespace Online;
 using namespace GUIEngine;
 

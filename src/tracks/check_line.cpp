@@ -32,8 +32,6 @@
 #include "tracks/graph.hpp"
 #include "tracks/quad.hpp"
 
-#include "irrlicht.h"
-
 #include <algorithm>
 #include <cstdint>
 #include <string>

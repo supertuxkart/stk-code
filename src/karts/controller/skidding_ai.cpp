@@ -47,6 +47,8 @@
 #include "utils/log.hpp"
 #include "utils/vs.hpp"
 
+#include <line2d.h>
+
 #ifdef AI_DEBUG
 #  include "irrlicht.h"
    using namespace irr;

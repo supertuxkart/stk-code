@@ -29,7 +29,6 @@ class Track;
 #include <vector>
 #include <string>
 #include <memory>
-#include <irrlicht.h>
 #include "io/xml_node.hpp"
 
 namespace irr

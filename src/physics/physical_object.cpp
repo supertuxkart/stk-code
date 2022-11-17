@@ -39,6 +39,7 @@
 #include "utils/string_utils.hpp"
 
 #include <ISceneManager.h>
+#include <IMeshManipulator.h>
 #include <IMeshSceneNode.h>
 #include <ITexture.h>
 using namespace irr;

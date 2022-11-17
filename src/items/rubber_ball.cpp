@@ -41,6 +41,8 @@
 
 #include "utils/log.hpp" //TODO: remove after debugging is done
 
+#include <ISceneNode.h>
+
 float RubberBall::m_st_interval;
 float RubberBall::m_st_min_interpolation_distance;
 float RubberBall::m_st_squash_duration;

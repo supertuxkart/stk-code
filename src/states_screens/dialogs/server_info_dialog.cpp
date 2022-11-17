@@ -37,6 +37,7 @@
 #include "utils/translation.hpp"
 
 #include <IGUIEnvironment.h>
+#include <IGUIScrollBar.h>
 
 using namespace GUIEngine;
 using namespace irr;

@@ -32,7 +32,21 @@
 #include <string>
 #include <vector>
 
-#include <irrlicht.h>
+#include <irrString.h>
+#include <rect.h>
+#include <SColor.h>
+
+namespace irr
+{
+    namespace scene
+    {
+        class IMesh; class ISceneNode;
+    }
+    namespace video
+    {
+        class IImage; class ITexture;
+    }
+}
 
 using namespace irr;
 
