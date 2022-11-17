@@ -21,8 +21,6 @@
 #include <cinttypes>
 #include <stdexcept>
 
-#include <irrlicht.h>
-
 #include "config/stk_config.hpp"
 #include "graphics/irr_driver.hpp"
 #include "graphics/sp/sp_base.hpp"

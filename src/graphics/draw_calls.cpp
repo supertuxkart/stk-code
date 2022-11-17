@@ -34,6 +34,10 @@
 
 #include <numeric>
 
+#include <ICameraSceneNode.h>
+#include <ISceneManager.h>
+#include <SViewFrustum.h>
+
 // ----------------------------------------------------------------------------
 bool DrawCalls::isCulledPrecise(const scene::ICameraSceneNode *cam,
                                 const scene::ISceneNode* node,

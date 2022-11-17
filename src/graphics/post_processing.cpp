@@ -46,6 +46,7 @@
 #include "utils/profiler.hpp"
 #include "utils/cpp2011.hpp"
 
+#include <ISceneManager.h>
 #include <SViewFrustum.h>
 #include <ge_texture.hpp>
 

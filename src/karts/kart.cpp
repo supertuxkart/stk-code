@@ -91,6 +91,7 @@
 #include "utils/vs.hpp"
 
 #include <ICameraSceneNode.h>
+#include <IDummyTransformationSceneNode.h>
 #include <ISceneManager.h>
 
 #include <algorithm> // for min and max

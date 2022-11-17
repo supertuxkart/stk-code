@@ -701,8 +701,9 @@ namespace GUIEngine
 #include <algorithm>
 #include <iostream>
 #include <assert.h>
-#include <irrlicht.h>
 #include <mutex>
+
+#include <IGUIEnvironment.h>
 
 using namespace irr::gui;
 using namespace irr::video;

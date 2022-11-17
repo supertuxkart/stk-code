@@ -32,6 +32,8 @@
 #include "tracks/track.hpp"
 #include "utils/profiler.hpp"
 
+#include <ICameraSceneNode.h>
+
 class LightBaseClass
 {
 public:

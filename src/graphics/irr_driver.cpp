@@ -88,6 +88,8 @@
 #include "utils/translation.hpp"
 #include "utils/vs.hpp"
 
+#include <irrlicht.h>
+
 #if !defined(SERVER_ONLY) && defined(ANDROID)
 #include <SDL.h>
 #if SDL_VERSION_ATLEAST(2, 0, 9)

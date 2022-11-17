@@ -20,8 +20,6 @@
 
 #include "utils/synchronised.hpp"
 
-#include <irrlicht.h>
-
 #include <assert.h>
 #include <atomic>
 #include <iostream>
@@ -32,6 +30,10 @@
 #include <streambuf>
 #include <string>
 #include <vector>
+
+#include <vector2d.h>
+#include <SColor.h>
+using namespace irr;
 
 enum QueryPerf
 {

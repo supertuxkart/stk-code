@@ -25,8 +25,8 @@
 #include "physics/physics.hpp"
 #include "utils/profiler.hpp"
 
+#include <ISceneManager.h>
 
-    
 void FixedPipelineRenderer::onLoadWorld()
 {
     

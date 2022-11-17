@@ -28,8 +28,6 @@
 #include "network/network_config.hpp"
 #include "states_screens/state_manager.hpp"
 
-#include <irrlicht.h>
-
 using namespace irr;
 using namespace core;
 using namespace scene;

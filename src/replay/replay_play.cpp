@@ -30,7 +30,6 @@
 #include "utils/mem_utils.hpp"
 #include "utils/string_utils.hpp"
 
-#include <irrlicht.h>
 #include <stdio.h>
 #include <string>
 #include <cinttypes>

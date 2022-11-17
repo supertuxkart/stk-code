@@ -43,8 +43,6 @@
 #include <FindDirectory.h>
 #endif
 
-#include <irrlicht.h>
-
 #include <stdio.h>
 #include <stdexcept>
 #include <sstream>

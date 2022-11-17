@@ -25,7 +25,6 @@
 #include <string>
 #include "utils/ptr_vector.hpp"
 
-#include "irrlicht.h"
 class GrandPrixData;
 
 /**
