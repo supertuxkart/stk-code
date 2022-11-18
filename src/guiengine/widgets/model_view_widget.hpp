@@ -20,8 +20,6 @@
 #ifndef HEADER_MODELVIEW_HPP
 #define HEADER_MODELVIEW_HPP
 
-#include <IMesh.h>
-
 #include "graphics/irr_driver.hpp"
 #include "guiengine/widgets/icon_button_widget.hpp"
 #include "utils/aligned_array.hpp"

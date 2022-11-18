@@ -24,8 +24,6 @@
 #include "tracks/track_object.hpp"
 #include "states_screens/race_gui_base.hpp"
 
-#include <IMesh.h>
-
 #include <string>
 
 class PhysicalObject;
