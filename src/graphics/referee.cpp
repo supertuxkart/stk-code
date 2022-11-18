@@ -33,6 +33,7 @@
 #include "utils/log.hpp"
 #include "utils/string_utils.hpp"
 
+#include <ISceneManager.h>
 #include <ITexture.h>
 
 int                   Referee::m_st_first_start_frame  = 1;
@@ -298,3 +299,25 @@ void Referee::setAnimationFrameWithCreatedTicks(int created_ticks)
     frame += (float)m_st_first_rescue_frame;
     m_scene_node->setCurrentFrame(frame);
 }   // setAnimationFrameWithCreatedTicks
+
+// ----------------------------------------------------------------------------
+/** Moves the referee to the specified position. */
+void Referee::setPosition(const Vec3 &xyz)
+{
+    m_scene_node->setPosition(xyz.toIrrVector());
+}   // setPosition
+
+// ----------------------------------------------------------------------------
+/** Sets the rotation of the scene node (in degrees).
+ *  \param hpr Rotation in degrees. */
+void Referee::setRotation(const Vec3 &hpr)
+{
+    m_scene_node->setRotation(hpr.toIrrVector());
+}   // setRotation
+
+// ----------------------------------------------------------------------------
+/** Returns true if this referee is attached to the scene graph. */
+bool Referee::isAttached() const
+{
+    return m_scene_node->getParent() != NULL;
+}   // isAttached

@@ -19,10 +19,18 @@
 #ifndef HEADER_REFEREE_HPP
 #define HEADER_REFEREE_HPP
 
-#include <ISceneNode.h>
-#include <IAnimatedMeshSceneNode.h>
-#include <ISceneManager.h>
-#include <IMeshManipulator.h>
+namespace irr
+{
+    namespace scene
+    {
+        class IAnimatedMesh; class IAnimatedMeshSceneNode; class ISceneNode;
+    }
+    namespace video
+    {
+        class ITexture;
+    }
+}
+
 using namespace irr;
 
 #include "utils/vec3.hpp"
@@ -96,17 +104,11 @@ public:
     /** Returns the scene node of this referee. */
     scene::IAnimatedMeshSceneNode* getSceneNode() { return m_scene_node; }
     // ------------------------------------------------------------------------
-    /** Moves the referee to the specified position. */
-    void        setPosition(const Vec3 &xyz)
-                {m_scene_node->setPosition(xyz.toIrrVector()); }
+    void        setPosition(const Vec3 &xyz);
     // ------------------------------------------------------------------------
-    /** Sets the rotation of the scene node (in degrees).
-     *  \param hpr Rotation in degrees. */
-    void        setRotation(const Vec3 &hpr)
-                { m_scene_node->setRotation(hpr.toIrrVector()); }
+    void        setRotation(const Vec3 &hpr);
     // ------------------------------------------------------------------------
-    /** Returns true if this referee is attached to the scene graph. */
-    bool        isAttached() const {return m_scene_node->getParent()!=NULL;}
+    bool        isAttached() const;
     // ------------------------------------------------------------------------
     void        setAnimationFrameWithCreatedTicks(int created_ticks);
     // ------------------------------------------------------------------------
