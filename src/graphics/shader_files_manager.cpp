@@ -31,6 +31,8 @@
 #include <fstream>
 #include <sstream>
 
+#include <IFileSystem.h>
+
 // ----------------------------------------------------------------------------
 /** Returns a string with the content of header.txt (which contains basic
  *  shader defines).

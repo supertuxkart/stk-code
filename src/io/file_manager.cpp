@@ -50,6 +50,8 @@
 #include <iostream>
 #include <string>
 
+#include <IFileSystem.h>
+
 namespace irr {
     namespace io
     {

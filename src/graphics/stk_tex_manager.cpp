@@ -32,6 +32,8 @@
 #include <ge_texture.hpp>
 #endif
 
+#include <IFileSystem.h>
+
 // ----------------------------------------------------------------------------
 STKTexManager::~STKTexManager()
 {

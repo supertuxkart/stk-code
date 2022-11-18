@@ -41,6 +41,7 @@
 #include "utils/log.hpp"
 #include "utils/vs.hpp"
 
+#include <IFileSystem.h>
 #include <IMaterialRendererServices.h>
 #include <ISceneNode.h>
 #include <IVideoDriver.h>

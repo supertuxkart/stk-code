@@ -33,6 +33,7 @@
 #include "tracks/track.hpp"
 #include "utils/string_utils.hpp"
 
+#include <IFileSystem.h>
 #include <ITexture.h>
 #include <SMaterial.h>
 #include <IMeshBuffer.h>

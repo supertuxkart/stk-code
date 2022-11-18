@@ -47,6 +47,7 @@
 #include <stdexcept>
 #include <string>
 
+#include <IFileSystem.h>
 #ifndef SERVER_ONLY
 #include <ge_main.hpp>
 #endif

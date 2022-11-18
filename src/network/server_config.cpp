@@ -47,6 +47,8 @@ static std::vector<UserConfigParam*> g_server_params;
 
 #include <fstream>
 
+#include <IFileSystem.h>
+
 namespace ServerConfig
 {
 // ============================================================================

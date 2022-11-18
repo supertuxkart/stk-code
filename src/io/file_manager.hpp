@@ -30,8 +30,11 @@
 #include <set>
 
 #include <irrString.h>
-#include <IFileSystem.h>
-namespace irr { class IrrlichtDevice; }
+namespace irr
+{
+    class IrrlichtDevice;
+    namespace io { class IFileSystem; }
+}
 using namespace irr;
 
 #include "io/xml_node.hpp"

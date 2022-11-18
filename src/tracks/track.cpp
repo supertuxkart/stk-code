@@ -84,6 +84,7 @@
 #include "utils/translation.hpp"
 
 #include <IBillboardTextSceneNode.h>
+#include <IFileSystem.h>
 #include <ILightSceneNode.h>
 #include <IMeshCache.h>
 #include <IMeshManipulator.h>

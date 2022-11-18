@@ -30,6 +30,7 @@
 #include "utils/string_utils.hpp"
 
 #include <IImageLoader.h>
+#include <IReadFile.h>
 #include <IVideoDriver.h>
 #include <IWriteFile.h>
 

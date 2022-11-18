@@ -37,6 +37,7 @@
 #include "utils/string_utils.hpp"
 
 #include <IrrlichtDevice.h>
+#include <IFileSystem.h>
 #include <IVideoDriver.h>
 
 using namespace GUIEngine;
