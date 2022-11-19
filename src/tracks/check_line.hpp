@@ -19,7 +19,7 @@
 #ifndef HEADER_CHECK_LINE_HPP
 #define HEADER_CHECK_LINE_HPP
 
-#include <ISceneNode.h>
+#include <triangle3d.h>
 #include <memory>
 
 using namespace irr;
