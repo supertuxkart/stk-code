@@ -27,7 +27,14 @@
 #include <limits>
 #include <set>
 #include <vector3d.h>
-#include <IAnimatedMeshSceneNode.h>
+
+namespace irr
+{
+    namespace scene
+    {
+        class IAnimatedMeshSceneNode;
+    }
+}
 
 using namespace irr;
 

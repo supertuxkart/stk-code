@@ -43,6 +43,8 @@
 #include "network/network_string.hpp"
 #include "network/rewind_manager.hpp"
 
+#include <IAnimatedMeshSceneNode.h>
+
 #define SWAT_POS_OFFSET        core::vector3df(0.0, 0.2f, -0.4f)
 #define SWAT_ANGLE_MIN  45
 #define SWAT_ANGLE_MAX  135

@@ -36,6 +36,16 @@ namespace GE { class GERenderInfo; }
 class ThreeDAnimation;
 class XMLNode;
 
+namespace irr
+{
+    namespace scene
+    {
+        class IAnimatedMeshSceneNode;
+    }
+}
+
+using namespace irr;
+
 /**
  * \ingroup tracks
  *  This is a base object for any separate object on the track, which

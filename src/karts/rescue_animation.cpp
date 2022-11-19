@@ -28,7 +28,7 @@
 #include "network/network_string.hpp"
 #include "mini_glm.hpp"
 
-#include "ISceneNode.h"
+#include <IAnimatedMeshSceneNode.h>
 
 #include <algorithm>
 #include <cmath>

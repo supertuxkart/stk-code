@@ -38,6 +38,7 @@
 #include "mini_glm.hpp"
 #include "utils/string_utils.hpp"
 
+#include <IAnimatedMeshSceneNode.h>
 #include <IFileSystem.h>
 #include <ISceneManager.h>
 #include <IMeshManipulator.h>

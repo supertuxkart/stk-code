@@ -40,6 +40,7 @@
 #include "tracks/track_object_manager.hpp"
 #include "utils/string_utils.hpp"
 
+#include <IAnimatedMeshSceneNode.h>
 #include <IBillboardTextSceneNode.h>
 #include <angelscript.h>
 #include <assert.h>

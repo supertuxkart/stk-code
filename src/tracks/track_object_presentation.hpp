@@ -29,7 +29,6 @@
 #include "utils/vec3.hpp"
 
 #include <vector3d.h>
-#include <IAnimatedMeshSceneNode.h>
 
 #include <memory>
 #include <limits>
@@ -47,7 +46,7 @@ class TrackObject;
 
 namespace irr
 {
-    namespace scene { class IAnimatedMesh; class IMeshSceneNode; class ISceneNode; }
+    namespace scene { class IAnimatedMesh; class IMesh; class IMeshSceneNode; class ISceneNode; }
 }
 using namespace irr;
 
