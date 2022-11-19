@@ -34,14 +34,14 @@
 #include <IVideoDriver.h>
 #include <IWriteFile.h>
 
-#if !(defined(SERVER_ONLY) || defined(MOBILE_STK))
+#if !defined(SERVER_ONLY)
 #include <squish.h>
 static_assert(squish::kColourClusterFit == (1 << 5), "Wrong header");
 static_assert(squish::kColourRangeFit == (1 << 6), "Wrong header");
 static_assert(squish::kColourIterativeClusterFit == (1 << 8), "Wrong header");
 #endif
 
-#if !(defined(SERVER_ONLY) || defined(MOBILE_STK))
+#if !defined(SERVER_ONLY)
 extern "C"
 {
     #include <mipmap/img.h>
@@ -51,9 +51,7 @@ extern "C"
 
 #include <numeric>
 
-#if !defined(MOBILE_STK)
 static const uint8_t CACHE_VERSION = 2;
-#endif
 
 namespace SP
 {
@@ -238,7 +236,7 @@ bool SPTexture::compressedTexImage2d(std::shared_ptr<video::IImage> texture,
                                      <core::dimension2du, unsigned> >&
                                      mipmap_sizes)
 {
-#if !defined(SERVER_ONLY) && !defined(MOBILE_STK)
+#if !defined(SERVER_ONLY)
     unsigned format = GL_COMPRESSED_RGBA_S3TC_DXT5_EXT;
     if (m_undo_srgb && CVS->isEXTTextureCompressionS3TCSRGBUsable())
     {
@@ -336,7 +334,7 @@ bool SPTexture::saveCompressedTexture(std::shared_ptr<video::IImage> texture,
                                       <core::dimension2du, unsigned> >& sizes,
                                       const std::string& cache_location)
 {
-#if !defined(SERVER_ONLY) && !defined(MOBILE_STK)
+#if !defined(SERVER_ONLY)
     const unsigned total_size = std::accumulate(sizes.begin(), sizes.end(), 0,
         [] (const unsigned int previous, const std::pair
         <core::dimension2du, unsigned>& cur_sizes)
@@ -401,7 +399,7 @@ std::shared_ptr<video::IImage> SPTexture::getTextureCache(const std::string& p,
     std::vector<std::pair<core::dimension2du, unsigned> >* sizes)
 {
     std::shared_ptr<video::IImage> cache;
-#if !(defined(SERVER_ONLY) || defined(MOBILE_STK))
+#if !defined(SERVER_ONLY)
     io::IReadFile* file = irr::io::createReadFile(p.c_str());
     if (file == NULL)
     {
@@ -491,7 +489,6 @@ bool SPTexture::threadedLoad()
     }
     else
     {
-#ifndef MOBILE_STK
         if (UserConfigParams::m_hq_mipmap && image->getDimension().Width > 1 &&
             image->getDimension().Height > 1)
         {
@@ -517,7 +514,6 @@ bool SPTexture::threadedLoad()
             generateHQMipmap(image->lock(), mipmap_sizes,
                 (uint8_t*)mipmaps->lock());
         }
-#endif
         SPTextureManager::get()->increaseGLCommandFunctionCount(1);
         SPTextureManager::get()->addGLCommandFunction(
             [this, image, mipmaps]()->bool
@@ -689,7 +685,7 @@ void SPTexture::generateHQMipmap(void* in,
                                  <core::dimension2du, unsigned> >& mms,
                                  uint8_t* out)
 {
-#if !(defined(SERVER_ONLY) || defined(MOBILE_STK))
+#if !defined(SERVER_ONLY)
     imMipmapCascade cascade;
     imReduceOptions options;
     imReduceSetOptions(&options,
@@ -726,7 +722,7 @@ std::vector<std::pair<core::dimension2du, unsigned> >
 {
     std::vector<std::pair<core::dimension2du, unsigned> > mipmap_sizes;
 
-#if !(defined(SERVER_ONLY) || defined(MOBILE_STK))
+#if !defined(SERVER_ONLY)
     unsigned width = image->getDimension().Width;
     unsigned height = image->getDimension().Height;
     mipmap_sizes.emplace_back(core::dimension2du(width, height), 0);

@@ -343,6 +343,7 @@ LOCAL_CFLAGS       := -I../lib/angelscript/include      \
                       -I../lib/mcpp                     \
                       -I../lib/sdl2/include             \
                       -I../lib/tinygettext/include      \
+                      -I../lib/libsquish                \
                       -I../src                          \
                       -Ideps-$(TARGET_ARCH_ABI)/curl/include      \
                       -Ideps-$(TARGET_ARCH_ABI)/freetype/include  \
