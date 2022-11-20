@@ -85,6 +85,8 @@ jobs:
           sudo wget https://github.com/supertuxkart/dependencies/releases/download/preview/mxe_static_mingw.zip
           sudo unzip mxe_static_mingw.zip
           sudo rm mxe_static_mingw.zip
+          # For libfl.so.2
+          sudo apt install -y libfl-dev
       - name: Install MinGW for armv7 or aarch64
         if: ${{ matrix.os == 'ubuntu-latest' && ( matrix.arch == 'armv7' || matrix.arch == 'aarch64' ) }}
         run: |

@@ -34,6 +34,8 @@ jobs:
           cd /opt
           wget https://github.com/supertuxkart/dependencies/releases/download/preview/cctools.tar.xz
           tar xf cctools.tar.xz
+          # For libtinfo.so.5
+          sudo apt install -y libtinfo5
       - name: Restore timestamps
         run: |
           wget https://github.com/MestreLion/git-tools/archive/refs/heads/main.zip
