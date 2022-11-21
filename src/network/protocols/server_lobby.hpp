@@ -413,6 +413,7 @@ public:
     }
     uint32_t getServerIdOnline() const           { return m_server_id_online; }
     void setClientServerHostId(uint32_t id)   { m_client_server_host_id = id; }
+    static int m_fixed_laps;
 };   // class ServerLobby
 
 #endif // SERVER_LOBBY_HPP

@@ -568,7 +568,7 @@ void cmdLineHelp()
     "       --kart=NAME        Use kart NAME.\n"
     "       --ai=a,b,...       Use the karts a, b, ... for the AI, and additional player kart.\n"
     "       --aiNP=a,b,...     Use the karts a, b, ... for the AI, no additional player kart.\n"
-    "       --laps=N           Define number of laps to N.\n"
+    "       --laps=N           Define number of laps to N, if used in a server all races will use this value.\n"
     "       --mode=N           N=0 Normal, N=1 Time trial, N=2 Battle, N=3 Soccer,\n"
     "                          N=4 Follow The Leader, N=5 Capture The Flag. In configure server use --battle-mode=n\n"
     "                          for battle server and --soccer-timed / goals for soccer server\n"
@@ -1685,7 +1685,10 @@ int handleCmdLine(bool has_server_config, bool has_parent_process)
         else
         {
             Log::verbose("main", "You chose to have %d laps.", laps);
-            RaceManager::get()->setNumLaps(laps);
+            if (NetworkConfig::get()->isServer())
+                ServerLobby::m_fixed_laps = laps;
+            else
+                RaceManager::get()->setNumLaps(laps);
         }
     }   // --laps
 

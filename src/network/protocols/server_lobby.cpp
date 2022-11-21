@@ -64,7 +64,7 @@
 #include <iostream>
 #include <iterator>
 
-
+int ServerLobby::m_fixed_laps = -1;
 // ========================================================================
 class SubmitRankingRequest : public Online::XMLRequest
 {
@@ -2618,6 +2618,14 @@ void ServerLobby::startSelection(const Event *event)
             Track* t = track_manager->getTrack(*it);
             assert(t);
             m_default_vote->m_num_laps = t->getDefaultNumberOfLaps();
+            if (ServerConfig::m_auto_game_time_ratio > 0.0f)
+            {
+                m_default_vote->m_num_laps =
+                    (uint8_t)(fmaxf(1.0f, (float)t->getDefaultNumberOfLaps() *
+                    ServerConfig::m_auto_game_time_ratio));
+            }
+            else if (m_fixed_laps != -1)
+                m_default_vote->m_num_laps = m_fixed_laps;
             m_default_vote->m_reverse = rg.get(2) == 0;
             break;
         }
@@ -2675,7 +2683,8 @@ void ServerLobby::startSelection(const Event *event)
     ns->addUInt8(LE_START_SELECTION)
        .addFloat(ServerConfig::m_voting_timeout)
        .addUInt8(m_game_setup->isGrandPrixStarted() ? 1 : 0)
-       .addUInt8(ServerConfig::m_auto_game_time_ratio > 0.0f ? 1 : 0)
+       .addUInt8((ServerConfig::m_auto_game_time_ratio > 0.0f ||
+        m_fixed_laps != -1) ? 1 : 0)
        .addUInt8(ServerConfig::m_track_voting ? 1 : 0);
 
     const auto& all_k = m_available_kts.first;
@@ -4185,6 +4194,8 @@ void ServerLobby::handlePlayerVote(Event* event)
                 (uint8_t)(fmaxf(1.0f, (float)t->getDefaultNumberOfLaps() *
                 ServerConfig::m_auto_game_time_ratio));
         }
+        else if (m_fixed_laps != -1)
+            vote.m_num_laps = m_fixed_laps;
         else if (vote.m_num_laps == 0 || vote.m_num_laps > 20)
             vote.m_num_laps = (uint8_t)3;
         if (!t->reverseAvailable() && vote.m_reverse)
