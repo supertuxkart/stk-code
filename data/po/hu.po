@@ -12,6 +12,7 @@
 # Bangó Máté <matepenpals@hotmail.com>, 2016
 # FIRST AUTHOR <EMAIL@ADDRESS>, 2010
 # Guih48, 2022
+# Guih48, 2022
 # Viktor Busanszki <viktorbusanszki@gmail.com>, 2015
 msgid ""
 msgstr ""
@@ -19,7 +20,7 @@ msgstr ""
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-09-20 11:30+0800\n"
 "PO-Revision-Date: 2015-02-15 01:58+0000\n"
-"Last-Translator: Balázs Úr, 2019-2022\n"
+"Last-Translator: Viktor Busanszki <viktorbusanszki@gmail.com>, 2015\n"
 "Language-Team: Hungarian (http://www.transifex.com/supertuxkart/supertuxkart/language/hu/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -4119,7 +4120,7 @@ msgstr[1] "%d aréna nem érhető el egyszemélyes módban."
 
 #: src/states_screens/credits.cpp:184
 msgid "translator-credits"
-msgstr "Launchpad Contributions:\nBangó Máté, 2016\nBusanszki Viktor, 2015\nGyönki Bendegúz\nMeskó Balázs, 2019-2022\nMolditz György\nPapp Bence\nÚr Balázs, 2016-2022"
+msgstr "Launchpad Contributions:\nBalázs Meskó, 2019\nBalázs Meskó, 2019,2021\nBalázs Úr, 2019\nBalázs Úr, 2019-2022\nBalázs Úr, 2018-2019\nBalázs Úr, 2016-2018\nBangó Máté, 2016\nGuih48, 2022\nViktor Busanszki, 2015\nBusanszki Viktor, 2015\nGyönki Bendegúz\nMeskó Balázs, 2019-2022\nMolditz György\nPapp Bence\nÚr Balázs, 2016-2022"
 
 #: src/states_screens/dialogs/achievement_progress_dialog.cpp:65
 msgctxt "achievement_info"

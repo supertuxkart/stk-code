@@ -3,6 +3,7 @@
 # This file is distributed under the same license as the supertuxkart package.
 # 
 # Translators:
+# Edvin Nilsson <edvinn.nilsson@gmail.com>, 2015
 # efef6ec5b435a041fce803c7f8af77d2_2341d43, 2020
 # Edvin Nilsson <edvinn.nilsson@gmail.com>, 2015
 # Johan R. <jreinhed@protonmail.com>, 2017
@@ -26,7 +27,7 @@ msgstr ""
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-09-20 11:30+0800\n"
 "PO-Revision-Date: 2015-02-15 01:58+0000\n"
-"Last-Translator: Jonatan Nyberg <jonatan@autistici.org>, 2021-2022\n"
+"Last-Translator: Ubuntu Jackson <santenichiyonitchigo@gmail.com>, 2018\n"
 "Language-Team: Swedish (http://www.transifex.com/supertuxkart/supertuxkart/language/sv/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -4126,7 +4127,7 @@ msgstr[1] "%d arenor är inte tillgängliga i enspelarläge."
 
 #: src/states_screens/credits.cpp:184
 msgid "translator-credits"
-msgstr "Launchpad Contributions:\nFroppe123, 2015\nJohan R., 2017\nJohan R., 2018\nefef6ec5b435a041fce803c7f8af77d2_2341d43, 2020\nJonatan Nyberg, 2021\nJonatan Nyberg, 2020-2021\nKjell Rilbe, 2016\nKristoffer Grundström, 2016\nLuna Jernberg, 2020\nMarcus Larborg, 2017\nMikael Elm, 2021\ntheschitz, 2016,2018\nUbuntu Jackson, 2018\nAnders Carlsson\nArve Eriksson\nDaniel Nylander\nDawid Gan\nMDxm\nMathias Tillman\nMikael Mildén\nPhoenix\nRikard Edgren\nRikard Johansson\nSTK-team\nTransifex-bidragsgivare\nJohan R., 2017, 2018\nJonatan Nyberg, 2020, 2021\ntheschitz, 2016, 2018"
+msgstr "Launchpad Contributions:\nefef6ec5b435a041fce803c7f8af77d2_2341d43, 2020\nEdvin Nilsson, 2015\nJohan R., 2017\nJohan R., 2017-2018\nJonatan Nyberg, 2021-2022\nJonatan Nyberg, 2020-2021\nKjell Rilbe, 2016\nKristoffer Grundström, 2016\nKristoffer Grundström, 2016,2022\nLuna Jernberg, 2020\nMarcus Larborg, 2017\nMikael Elm, 2021\ntheschitz, 2016,2018\nUbuntu Jackson, 2018\nFroppe123, 2015\nJohan R., 2018\nJonatan Nyberg, 2021\nAnders Carlsson\nArve Eriksson\nDaniel Nylander\nDawid Gan\nMDxm\nMathias Tillman\nMikael Mildén\nPhoenix\nRikard Edgren\nRikard Johansson\nSTK-team\nTransifex-bidragsgivare\nJohan R., 2017, 2018\nJonatan Nyberg, 2020, 2021\ntheschitz, 2016, 2018"
 
 #: src/states_screens/dialogs/achievement_progress_dialog.cpp:65
 msgctxt "achievement_info"

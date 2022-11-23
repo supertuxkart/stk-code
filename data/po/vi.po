@@ -5,6 +5,7 @@
 # Translators:
 # FIRST AUTHOR <EMAIL@ADDRESS>, 2011
 # Thanh Bách 6/1, 2022
+# Thanh Bách 6/1, 2022
 msgid ""
 msgstr ""
 "Project-Id-Version: SuperTuxKart\n"
@@ -4106,7 +4107,7 @@ msgstr[0] ""
 
 #: src/states_screens/credits.cpp:184
 msgid "translator-credits"
-msgstr "Launchpad Contributions:\nDawid Gan\nHuynh Yen Loc\nSTK-team\nVo Xuan Tien\nVõ Xuân Tiến\nZombifier"
+msgstr "Launchpad Contributions:\nThanh Bách 6/1, 2022\nDawid Gan\nHuynh Yen Loc\nSTK-team\nVo Xuan Tien\nVõ Xuân Tiến\nZombifier"
 
 #: src/states_screens/dialogs/achievement_progress_dialog.cpp:65
 msgctxt "achievement_info"

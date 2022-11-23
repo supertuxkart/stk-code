@@ -7,6 +7,7 @@
 # Benau, 2018
 # Marc Coll Carrillo <marc.coll.carrillo@gmail.com>, 2015-2022
 # MxtApps <mxtapps@gmail.com>, 2022
+# MxtApps <mxtapps@gmail.com>, 2022
 # Tagomago <tagomago@disroot.org>, 2020-2021
 # Verónica Clémençon, 2017
 # Verónica Clémençon, 2017
@@ -18,7 +19,7 @@ msgstr ""
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-09-20 11:30+0800\n"
 "PO-Revision-Date: 2015-02-15 01:58+0000\n"
-"Last-Translator: Marc Coll Carrillo <marc.coll.carrillo@gmail.com>, 2015-2022\n"
+"Last-Translator: William Beltrán <wbeltranc@gmail.com>, 2016-2017\n"
 "Language-Team: Spanish (http://www.transifex.com/supertuxkart/supertuxkart/language/es/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -4123,7 +4124,7 @@ msgstr[2] "%d arenas no disponibles en modo de un jugador"
 
 #: src/states_screens/credits.cpp:184
 msgid "translator-credits"
-msgstr "Launchpad Contributions:\nBenau, 2018\nMarc Coll Carrillo, 2015-2021\nTagomago, 2020-2021\nVerónica Clémençon, 2017\nWilliam Beltrán, 2016\nWilliam Beltrán, 2017\nAdolfo Jayme\nAlejandro Pérez\nAlvaro Ortiz\nCaArRi\nDavid Ballesteros Mayo\nDawid Gan\nDiegoJ\nEduardo Battaglia\nEugenio M. Vigo\nFelipe Hommen\nJonay\nJose\nJosé Luis Bandala Pérez\nLeo Juszkiewicz\nLinuxNerdo\nLouis DC\nMarc Coll Carrillo\nMariano Agüero\nMorgan w c.\nSTK-team\nSimón Roca\nTae-Wong SEO\nVPablo\nelhoir\njuanman\nraven2286\nsimon\nzer berros\nÁngel"
+msgstr "Launchpad Contributions:\nBenau, 2018\nMarc Coll Carrillo, 2015-2022\nMxtApps, 2022\nTagomago, 2020-2021\nVerónica Clémençon, 2017\nWilliam Beltrán, 2016\nWilliam Beltrán, 2016-2017\nMarc Coll Carrillo, 2015-2021\nWilliam Beltrán, 2017\nAdolfo Jayme\nAlejandro Pérez\nAlvaro Ortiz\nCaArRi\nDavid Ballesteros Mayo\nDawid Gan\nDiegoJ\nEduardo Battaglia\nEugenio M. Vigo\nFelipe Hommen\nJonay\nJose\nJosé Luis Bandala Pérez\nLeo Juszkiewicz\nLinuxNerdo\nLouis DC\nMarc Coll Carrillo\nMariano Agüero\nMorgan w c.\nSTK-team\nSimón Roca\nTae-Wong SEO\nVPablo\nelhoir\njuanman\nraven2286\nsimon\nzer berros\nÁngel"
 
 #: src/states_screens/dialogs/achievement_progress_dialog.cpp:65
 msgctxt "achievement_info"

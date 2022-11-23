@@ -15,7 +15,7 @@ msgstr ""
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-09-20 11:30+0800\n"
 "PO-Revision-Date: 2015-02-15 01:58+0000\n"
-"Last-Translator: ToMáš Marný, 2015-2016,2022\n"
+"Last-Translator: Tomáš Pártl <tomaspartl@centrum.cz>, 2019\n"
 "Language-Team: Czech (http://www.transifex.com/supertuxkart/supertuxkart/language/cs/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -4125,7 +4125,7 @@ msgstr[3] "%d arén není k dispozici v režimu hry jednoho hráče."
 
 #: src/states_screens/credits.cpp:184
 msgid "translator-credits"
-msgstr "Launchpad Contributions:\nGamingasCZ, 2021\nJakub Vaněk, 2015-2016\nPavel Borecki, 2015-2019\nToMáš Marný, 2015-2022\nTomáš Pártl, 2019\nAri Green\nDavid Kolibáč\nDawid Gan\ndonny\ndtfjgk\nFrantišek Zatloukal\nH0ff1\nJakub Talich\nJan Srb\nJirka Folta\nLukáš Machyán\nMichal Kundrát\nMightyPork\nOndřej Holý\nPavel Borecki, 2015\nPetr Wudi\nSTK-team\nTadeáš Pařík\nTomáš Velecký"
+msgstr "Launchpad Contributions:\nGamingasCZ, 2021\nJakub Vaněk, 2015-2016\nPavel Borecki, 2015-2019\nToMáš Marný, 2015\nToMáš Marný, 2015-2016,2022\nTomáš Pártl, 2019\nToMáš Marný, 2015-2022\nAri Green\nDavid Kolibáč\nDawid Gan\ndonny\ndtfjgk\nFrantišek Zatloukal\nH0ff1\nJakub Talich\nJan Srb\nJirka Folta\nLukáš Machyán\nMichal Kundrát\nMightyPork\nOndřej Holý\nPavel Borecki, 2015\nPetr Wudi\nSTK-team\nTadeáš Pařík\nTomáš Velecký"
 
 #: src/states_screens/dialogs/achievement_progress_dialog.cpp:65
 msgctxt "achievement_info"

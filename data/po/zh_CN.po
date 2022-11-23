@@ -8,6 +8,7 @@
 # Benau, 2015-2016
 # CodingJellyfish <dumaosen_main01@outlook.com>, 2018,2021-2022
 # Jiawei Sun, 2022
+# Jiawei Sun, 2022
 # Jin Zhang <zhangxjin@gmail.com>, 2015,2019-2021
 # Jz Pan <acme.pjz@gmail.com>, 2017
 # CodingJellyfish <dumaosen_main01@outlook.com>, 2018-2019
@@ -4113,7 +4114,7 @@ msgstr[0] "%d 个竞技场在单人游戏中不适用。"
 
 #: src/states_screens/credits.cpp:184
 msgid "translator-credits"
-msgstr "Launchpad Contributions:\nBen Au, 2015\nBenau, 2016,2019-2020\nBenau, 2015-2016\nCodingJellyfish, 2021\nJin Zhang, 2015,2019-2021\nJz Pan, 2017\nCodingJellyfish, 2018-2019\nCodingJellyfish, 2018\nDawid Gan\nSTK-team\nSizhuang Liu\nXhacker Liu\nacme_pjz\njin\nlks\nluojie-dune\nsohey\ndumaosen"
+msgstr "Launchpad Contributions:\nBen Au, 2015\nBenau, 2016,2019-2020\nBenau, 2015-2016\nCodingJellyfish, 2018,2021-2022\nJiawei Sun, 2022\nJin Zhang, 2015,2019-2021\nJz Pan, 2017\nCodingJellyfish, 2018-2019\nCodingJellyfish, 2018\nCodingJellyfish, 2021\nDawid Gan\nSTK-team\nSizhuang Liu\nXhacker Liu\nacme_pjz\njin\nlks\nluojie-dune\nsohey\ndumaosen"
 
 #: src/states_screens/dialogs/achievement_progress_dialog.cpp:65
 msgctxt "achievement_info"

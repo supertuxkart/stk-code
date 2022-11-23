@@ -4130,7 +4130,7 @@ msgstr[4] "%d arena zo dihegerz gant ar mod c'hoarier eeun."
 
 #: src/states_screens/credits.cpp:184
 msgid "translator-credits"
-msgstr "Launchpad Contributions:\nAlan Monfort, 2015-2016\nGwenn M, 2015,2019\nIrriep Nala Novram, 2017-2018\nIrriep Nala Novram, 2016\nAlan\nDawid Gan\nSTK-team"
+msgstr "Launchpad Contributions:\nAlan Monfort, 2015-2016\nGwenn M, 2015,2019\nIrriep Nala Novram, 2016-2018\nIrriep Nala Novram, 2016\nIrriep Nala Novram, 2017-2018\nAlan\nDawid Gan\nSTK-team"
 
 #: src/states_screens/dialogs/achievement_progress_dialog.cpp:65
 msgctxt "achievement_info"

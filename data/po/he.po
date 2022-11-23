@@ -19,13 +19,14 @@
 # עומר רוזנר, 2018
 # עומר רוזנר, 2018-2019
 # רואי לוי <roei1234567@gmail.com>, 2016
+# רואי לוי <roei1234567@gmail.com>, 2016
 msgid ""
 msgstr ""
 "Project-Id-Version: SuperTuxKart\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-09-20 11:30+0800\n"
 "PO-Revision-Date: 2015-02-15 01:58+0000\n"
-"Last-Translator: Omer I.S. <omeritzicschwartz@gmail.com>, 2020-2022\n"
+"Last-Translator: רואי לוי <roei1234567@gmail.com>, 2016\n"
 "Language-Team: Hebrew (http://www.transifex.com/supertuxkart/supertuxkart/language/he/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -4135,7 +4136,7 @@ msgstr[3] "%d זירות אינן זמינות במשחק לבד."
 
 #: src/states_screens/credits.cpp:184
 msgid "translator-credits"
-msgstr "Launchpad Contributions:\nNiv Baehr, 2016-2017\nCapri, 2015\nGenghisKhan, 2015-2016\nLiran, 2016-2017\nOmer I.S., 2020-2022\nעומר רוזנר, 2018\nYaroslav Serhieiev, 2018\nYevgney Sliosarenko, 2015\nעומר רוזנר, 2018-2019\n‫רואי לוי‬‎, 2016\nAsael\nAuria\nDdorda\nGenghisKhan\nJorge Mariano\nLeo Juszkiewicz\nNiv Baehr\nReuma Mordechai\nSTK-team\nShai Shapira\nShimi Chen\nYaron"
+msgstr "Launchpad Contributions:\nNiv Baehr, 2016-2017\nCapri, 2015\ngk, 2015-2016\nLiran, 2016-2017\nOmer I.S., 2020-2022\nOmer I.S., 2020-2021\nOmer I.S., 2020\nעומר רוזנר, 2018\nYaroslav Serhieiev, 2018\nYevgney Sliosarenko, 2015\nעומר רוזנר, 2018-2019\nרואי לוי, 2016\nGenghisKhan, 2015-2016\n‫רואי לוי‬‎, 2016\nAsael\nAuria\nDdorda\nGenghisKhan\nJorge Mariano\nLeo Juszkiewicz\nNiv Baehr\nReuma Mordechai\nSTK-team\nShai Shapira\nShimi Chen\nYaron"
 
 #: src/states_screens/dialogs/achievement_progress_dialog.cpp:65
 msgctxt "achievement_info"

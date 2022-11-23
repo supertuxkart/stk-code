@@ -9,19 +9,23 @@
 # Benau, 2018-2020
 # bonifarz <bonifarz@gmx.ch>, 2015
 # Ettore Atalan <atalanttore@googlemail.com>, 2015-2017,2019-2020
+# FabianF, 2020
 # FabianF, 2020-2022
 # Flakebi, 2015
 # Flakebi, 2015
 # hiker <joerg@chiu-henrichs.id.au>, 2015
 # hiker <joerg@chiu-henrichs.id.au>, 2015
 # Juli X, 2022
+# Juli X, 2022
 # konstin <konsti.schuetze@t-online.de>, 2015
 # Link_Mario <Link-Mario@gmx.de>, 2019
 # Link_Mario <Link-Mario@gmx.de>, 2019
 # Markus Enzenberger <enz@users.sourceforge.net>, 2019
+# Markus Enzenberger <enz@users.sourceforge.net>, 2019
 # Maximilian Wagenbach <foaly@posteo.de>, 2016
 # Maximilian Wagenbach <foaly@posteo.de>, 2016
 # FabianF, 2020
+# Tim, 2022
 # Tim, 2022
 # Tobias Markus <tobbi@supertuxproject.org>, 2015-2016
 # Wasilis Mandratzis-Walz, 2015
@@ -33,7 +37,7 @@ msgstr ""
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-09-20 11:30+0800\n"
 "PO-Revision-Date: 2015-02-15 01:58+0000\n"
-"Last-Translator: FabianF, 2020-2022\n"
+"Last-Translator: wesen <yannick.lapp@web.de>, 2016\n"
 "Language-Team: German (http://www.transifex.com/supertuxkart/supertuxkart/language/de/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -4133,7 +4137,7 @@ msgstr[1] "%d Arenen im Einzelspielermodus nicht verfügbar."
 
 #: src/states_screens/credits.cpp:184
 msgid "translator-credits"
-msgstr "Launchpad Contributions:\n79353a696ad19dc202b261b3067b7640_bec941e, 2015\nWuzzy, 2015-2018\nBenau, 2018\nBenau, 2018-2020\nbonifarz, 2015\nEttore Atalan, 2015-2017,2019-2020\nFabianF, 2020-2021\nFlakebi, 2015\nhiker, 2015\nkonstin, 2015\nLink_Mario, 2019\nMarkus Enzenberger, 2019\nMaximilian Wagenbach, 2016\nFabianF, 2020\nTobias Markus, 2015-2016\nWasilis Mandratzis-Walz, 2015\nwesen, 2016\nAuria\nBendetto\nDHermit\nDaBASCHT\nDavid Roth\nDawid Gan\nDennis\nEvolution\nFelix\nGerjet Kleine-Weischede\nGregor Santner\nH0ff1\nJohn Doe\nMatthias Lange\nRobert Kurz\nSTK-team\nSalesome\nSimeon\nTobias Bannert\nWolfs\nWuzzy\ncmdrhenner\ne\nenz\nhiker\nkonstin\npert7"
+msgstr "Launchpad Contributions:\n79353a696ad19dc202b261b3067b7640_bec941e, 2015\nWuzzy, 2015-2018\nBenau, 2018\nBenau, 2018-2020\nbonifarz, 2015\nEttore Atalan, 2015-2017,2019-2020\nFabianF, 2020-2022\nFlakebi, 2015\nhiker, 2015\nJuli X, 2022\nkonstin, 2015\nLink_Mario, 2019\nMarkus Enzenberger, 2019\nMaximilian Wagenbach, 2016\nFabianF, 2020\nTim, 2022\nTobias Markus, 2015-2016\nWasilis Mandratzis-Walz, 2015\nwesen, 2016\nFabianF, 2020-2021\nAuria\nBendetto\nDHermit\nDaBASCHT\nDavid Roth\nDawid Gan\nDennis\nEvolution\nFelix\nGerjet Kleine-Weischede\nGregor Santner\nH0ff1\nJohn Doe\nMatthias Lange\nRobert Kurz\nSTK-team\nSalesome\nSimeon\nTobias Bannert\nWolfs\nWuzzy\ncmdrhenner\ne\nenz\nhiker\nkonstin\npert7"
 
 #: src/states_screens/dialogs/achievement_progress_dialog.cpp:65
 msgctxt "achievement_info"

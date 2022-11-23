@@ -3,15 +3,16 @@
 # This file is distributed under the same license as the supertuxkart package.
 # 
 # Translators:
+# 111more1, 2022
 # FIRST AUTHOR <EMAIL@ADDRESS>, 2010
-# IAN RODRÍGUEZ Lorenzo, 2022
+# 111more1, 2022
 msgid ""
 msgstr ""
 "Project-Id-Version: SuperTuxKart\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-09-20 11:30+0800\n"
 "PO-Revision-Date: 2015-02-15 01:58+0000\n"
-"Last-Translator: FIRST AUTHOR <EMAIL@ADDRESS>, 2010\n"
+"Last-Translator: 111more1, 2022\n"
 "Language-Team: Icelandic (http://www.transifex.com/supertuxkart/supertuxkart/language/is/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -4111,7 +4112,7 @@ msgstr[1] ""
 
 #: src/states_screens/credits.cpp:184
 msgid "translator-credits"
-msgstr "Launchpad Contributions:\nBenedikt Scheving-Thorsteinsson\nOlafur Skorrdal\nSTK-team"
+msgstr "Launchpad Contributions:\n111more1, 2022\nBenedikt Scheving-Thorsteinsson\nOlafur Skorrdal\nSTK-team"
 
 #: src/states_screens/dialogs/achievement_progress_dialog.cpp:65
 msgctxt "achievement_info"

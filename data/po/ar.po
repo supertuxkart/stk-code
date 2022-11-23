@@ -6,7 +6,7 @@
 # A.Karim S., 2018
 # Benamara Mohamed <mohamedsdev@gmail.com>, 2015
 # FIRST AUTHOR <EMAIL@ADDRESS>, 2011
-# Hasan Nahleh <hasanznahleh@mailfence.com>, 2022
+# Hasan Nahleh <hasanznahleh@mailfence.com>, 2019,2022
 # Hasan Nahleh <hasanznahleh@mailfence.com>, 2019
 # Ibrahim Al-Darra <achtenacht88@gmail.com>, 2017
 # A.Karim S., 2018
@@ -22,7 +22,7 @@ msgstr ""
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-09-20 11:30+0800\n"
 "PO-Revision-Date: 2015-02-15 01:58+0000\n"
-"Last-Translator: Hasan Nahleh <hasanznahleh@mailfence.com>, 2022\n"
+"Last-Translator: Hasan Nahleh <hasanznahleh@mailfence.com>, 2019,2022\n"
 "Language-Team: Arabic (http://www.transifex.com/supertuxkart/supertuxkart/language/ar/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -4142,7 +4142,7 @@ msgstr[5] "%d حلبة غير متوفرة عند اللعب الإنفرادي.
 
 #: src/states_screens/credits.cpp:184
 msgid "translator-credits"
-msgstr "Launchpad Contributions:\nBenamara Mohamed, 2015\nIbrahim Al-Darra, 2017\nA.Karim S., 2018\nmahmoudtark25, 2020\nMoaaz Mohamed, 2017\nخليل مراطلة, 2021\nصفا الفليج, 2015,2019\nHasan Nahleh, 2019\nصفا الفليج, \nالمترجمون السابقون (منصّة لنشباد):\nBenjamin Kerensa - Dawid Gan - Hichem Razgallah - Majid Al-Dharrab\nSAKOUM Yassine - STK-team - abdXelrhman - محمد الحرقان"
+msgstr "Launchpad Contributions:\nA.Karim S., 2018\nBenamara Mohamed, 2015\nHasan Nahleh, 2022\nHasan Nahleh, 2019\nIbrahim Al-Darra, 2017\nmahmoudtark25, 2020\nMoaaz Mohamed, 2017\nخليل مراطلة, 2021\nصفا الفليج, 2015,2019\nHasan Nahleh, 2019,2022\nصفا الفليج,\nالمترجمون السابقون (منصّة لنشباد):\nBenjamin Kerensa - Dawid Gan - Hichem Razgallah - Majid Al-Dharrab\nSAKOUM Yassine - STK-team - abdXelrhman - محمد الحرقان"
 
 #: src/states_screens/dialogs/achievement_progress_dialog.cpp:65
 msgctxt "achievement_info"

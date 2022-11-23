@@ -6,9 +6,11 @@
 # adrien vigneron <adrienvigneron@ml1.net>, 2015
 # Alayan <alayan.feh@gmail.com>, 2018-2019
 # Anard0 <anard@free.fr>, 2020
+# Anard0 <anard@free.fr>, 2020
 # Anard0 <anard@free.fr>, 2021-2022
 # Auria <auria.mg@gmail.com>, 2015-2021
 # Benau, 2020-2021
+# Clément Escude--Cotinat, 2022
 # Clément Escude--Cotinat, 2022
 # devnoname120 <devnoname120+gh@gmail.com>, 2015
 # Alayan <alayan.feh@gmail.com>, 2018
@@ -16,6 +18,8 @@
 # Éfrit, 2015
 # Éfrit, 2015
 # florian mesnier, 2021
+# florian mesnier, 2021
+# Loïs Doyenard, 2021
 # Loïs Doyenard, 2021
 # nad0, 2015
 # nad0, 2015
@@ -31,7 +35,7 @@ msgstr ""
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-09-20 11:30+0800\n"
 "PO-Revision-Date: 2015-02-15 01:58+0000\n"
-"Last-Translator: Clément Escude--Cotinat, 2022\n"
+"Last-Translator: Sylvain St-Amand, 2018-2019\n"
 "Language-Team: French (http://www.transifex.com/supertuxkart/supertuxkart/language/fr/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -3803,7 +3807,7 @@ msgstr "Type de jeu de Soccer : %s"
 #: src/network/protocols/client_lobby.cpp:787
 #, c-format
 msgid "Grand prix progress: %d / %d"
-msgstr "Progression du grand prix : %d / %d"
+msgstr "Progression du Grand Prix : %d / %d"
 
 #. I18N: Display when all players are in red or blue team, which the race
 #. will not be allowed to start
@@ -4136,7 +4140,7 @@ msgstr[2] "%d arènes non disponibles pour le jeu solo."
 
 #: src/states_screens/credits.cpp:184
 msgid "translator-credits"
-msgstr "Launchpad Contributions:\nadrien vigneron, 2015\nAlayan, 2018-2019\nAnard, 2020\nAuria, 2015-2021\nBenau, 2020-2021\ndevnoname120, 2015\nAlayan, 2018\nÉfrit, 2015\nnad0, 2015\nPoorPockets McNewHold, 2019-2020\nSylvain St-Amand, 2019\nSylvain St-Amand, 2018\n51251df01484cc547f4d59bd93cd7512, 2016-2018\nAlexis Lavaud\nAudiger Jeremy\nAuria\nBaptiste Fontaine\nFlorent (LSc)\nJuju Croco\nKalsan\nLouis-Philippe Breton\nMCMic\nMarwane K.\nMax Perkins\nNicolas Delvaux\nOtourly\nSTK-team\nSyl\nThomas P T\nlondumas\nmath07\nnoname120\ntipiak\nxapantu\nxemard.nicolas\nÉfrit"
+msgstr "Launchpad Contributions:\nadrien vigneron, 2015\nAlayan, 2018-2019\nAnard0, 2020\nAnard0, 2021-2022\nAuria, 2015-2021\nBenau, 2020-2021\nClément Escude--Cotinat, 2022\ndevnoname120, 2015\nAlayan, 2018\nÉfrit, 2015\nflorian mesnier, 2021\nLoïs Doyenard, 2021\nnad0, 2015\nPoorPockets McNewHold, 2022\nPoorPockets McNewHold, 2019-2020\nSylvain St-Amand, 2018-2019\nSylvain St-Amand, 2019\nSylvain St-Amand, 2018\n51251df01484cc547f4d59bd93cd7512, 2016-2018\nAnard, 2020\nAlexis Lavaud\nAudiger Jeremy\nAuria\nBaptiste Fontaine\nFlorent (LSc)\nJuju Croco\nKalsan\nLouis-Philippe Breton\nMCMic\nMarwane K.\nMax Perkins\nNicolas Delvaux\nOtourly\nSTK-team\nSyl\nThomas P T\nlondumas\nmath07\nnoname120\ntipiak\nxapantu\nxemard.nicolas\nÉfrit"
 
 #: src/states_screens/dialogs/achievement_progress_dialog.cpp:65
 msgctxt "achievement_info"
@@ -5238,7 +5242,7 @@ msgstr "Veuillez saisir le nom du Grand Prix"
 
 #: src/states_screens/grand_prix_editor_screen.cpp:168
 msgid "Please select a Grand Prix"
-msgstr "Veuillez sélectionnez un Grand Prix"
+msgstr "Veuillez sélectionner un Grand Prix"
 
 #: src/states_screens/grand_prix_editor_screen.cpp:336
 msgid "User defined"
@@ -6288,7 +6292,7 @@ msgstr "Nombre de karts IA équipe rouge"
 msgid ""
 "You cannot play this Grand Prix because it contains tracks that aren't "
 "unlocked!"
-msgstr "Vous ne pouvez pas jouer à ce grand prix car il contient des pistes verrouillées!"
+msgstr "Vous ne pouvez pas jouer à ce Grand Prix car il contient des pistes verrouillées!"
 
 #. I18N: track group name
 #: src/states_screens/tracks_and_gp_screen.cpp:157
@@ -6457,7 +6461,7 @@ msgid ""
 "battle mode against the computer or your friends, and more! For a greater "
 "challenge, join online and meet players from all over the world and prove "
 "your racing skills!"
-msgstr "Vous pouvez faire une simple course contre d'autres karts, compétitionner dans un de nos grand prix, tenter de battre le score au contre la montre, faire la bataille contre l'ordinateur ou vous amis, et plus! Plus un plus grand défi, rejoignez le jeu en ligne et rencontrez des joueurs des quatre coins du monde et prouvez vos talents de conducteur!"
+msgstr "Vous pouvez faire une simple course contre d'autres karts, compétitionner dans un de nos Grands Prix, tenter de battre le score au contre la montre, faire la bataille contre l'ordinateur ou vous amis, et plus ! Pour un plus grand défi, rejoignez le jeu en ligne et rencontrez des joueurs des quatre coins du monde et prouvez vos talents de conducteur !"
 
 #: supertuxkart.appdata.xml:17
 msgid "This game has no ads."

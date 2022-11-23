@@ -4110,7 +4110,7 @@ msgstr[1] "%d arenaar ikkje tilgjengelege i éinspelarmodus."
 
 #: src/states_screens/credits.cpp:184
 msgid "translator-credits"
-msgstr "Karl Ove Hufthammer"
+msgstr "Launchpad Contributions:\nKarl Ove Hufthammer, 2011,2015-2016,2018-2022"
 
 #: src/states_screens/dialogs/achievement_progress_dialog.cpp:65
 msgctxt "achievement_info"

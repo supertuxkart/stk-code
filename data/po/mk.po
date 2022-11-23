@@ -4,6 +4,7 @@
 # 
 # Translators:
 # Marija Jovanovic, 2022
+# Marija Jovanovic, 2022
 msgid ""
 msgstr ""
 "Project-Id-Version: SuperTuxKart\n"
@@ -4110,7 +4111,7 @@ msgstr[1] "%d арени недостапни во самостоен играч
 
 #: src/states_screens/credits.cpp:184
 msgid "translator-credits"
-msgstr "преведувач-заслуги"
+msgstr "Launchpad Contributions:\nMarija Jovanovic, 2022"
 
 #: src/states_screens/dialogs/achievement_progress_dialog.cpp:65
 msgctxt "achievement_info"

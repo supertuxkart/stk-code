@@ -4,6 +4,7 @@
 # 
 # Translators:
 # Aleksandra Kurda, 2022
+# Aleksandra Kurda, 2022
 # Ivan Putnik <iputnik@msn.com>, 2010
 # vjeran fistric <vjeran@canelio.com>, 2020
 msgid ""
@@ -12,7 +13,7 @@ msgstr ""
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-09-20 11:30+0800\n"
 "PO-Revision-Date: 2015-02-15 01:58+0000\n"
-"Last-Translator: Aleksandra Kurda, 2022\n"
+"Last-Translator: vjeran fistric <vjeran@canelio.com>, 2020\n"
 "Language-Team: Croatian (http://www.transifex.com/supertuxkart/supertuxkart/language/hr/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -4117,7 +4118,7 @@ msgstr[2] ""
 
 #: src/states_screens/credits.cpp:184
 msgid "translator-credits"
-msgstr "Launchpad Contributions:\nIvan Putnik, 2010\nvjeran fistric, 2020\nDavor Buday\nDawid Gan\nSTK-team\ndboki89\nstudent4"
+msgstr "Launchpad Contributions:\nAleksandra Kurda, 2022\nIvan Putnik, 2010\nvjeran fistric, 2020\nDavor Buday\nDawid Gan\nSTK-team\ndboki89\nstudent4"
 
 #: src/states_screens/dialogs/achievement_progress_dialog.cpp:65
 msgctxt "achievement_info"

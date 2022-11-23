@@ -6,6 +6,7 @@
 # Гондрош Руснак, 2022
 # Ондрош Руснак, 2022
 # Ондрош Руснак, 2022
+# Ондрош Руснак, 2022
 msgid ""
 msgstr ""
 "Project-Id-Version: SuperTuxKart\n"
@@ -378,7 +379,7 @@ msgstr "Прияти"
 #. I18N: In the 'confirm resolution' dialog, that's shown when switching
 #. resoluton
 msgid "Revert"
-msgstr "Вертати ся"
+msgstr "Вернути"
 
 #. I18N: ./data/gui/dialogs/custom_camera_settings.stkgui
 msgid "Camera Settings"
@@ -670,7 +671,7 @@ msgstr "Здати ся"
 #. I18N: ./data/gui/screens/main_menu.stkgui
 #. I18N: In the main screen
 msgid "Options"
-msgstr "Опції"
+msgstr "Штімованя"
 
 #. I18N: ./data/gui/dialogs/online/network_ingame_dialog.stkgui
 #. I18N: Race paused button
@@ -2047,7 +2048,7 @@ msgstr "Звук"
 #. I18N: ./data/gui/screens/user_screen_tab.stkgui
 #. I18N: Section in the settings menu
 msgid "Interface"
-msgstr "Інтерфейс"
+msgstr "Хосновательськый Інтерфейс"
 
 #. I18N: ./data/gui/screens/options_audio.stkgui
 #. I18N: Section in the settings menu
@@ -2261,7 +2262,7 @@ msgstr "Указовати посиленя другых возикув"
 #. I18N: ./data/gui/screens/options_ui.stkgui
 #. I18N: In the ui settings
 msgid "Enable the story mode timer"
-msgstr "Уключити стопер у режимі історії"
+msgstr "Уключити стопер у режімі історії"
 
 #. I18N: ./data/gui/screens/options_ui.stkgui
 #. I18N: In the ui settings
@@ -2390,11 +2391,11 @@ msgstr "Цвіт возика"
 
 #. I18N: ./data/tips.xml
 msgid "The UI skin can be changed in the UI options."
-msgstr "Мотив оформеня можете перемінити у штімованях хосновательского інтерфейса."
+msgstr "Мотив оформеня можете перемінити у штімованях хосновательського інтерфейса."
 
 #. I18N: ./data/tips.xml
 msgid "You can see other karts' powerups by enabling it in the UI options."
-msgstr "Вы можете відїти посиленя другых возикув, уключивши тото у штімованях хоснователського інтерфейса."
+msgstr "Вы можете відїти посиленя другых возикув, уключивши тото у штімованях хосновательського інтерфейса."
 
 #. I18N: ./data/tips.xml
 msgid "The font size can be changed in the UI options."
@@ -3675,7 +3676,7 @@ msgstr "НЕ ТУДЫ!"
 #: src/modes/soccer_world.cpp:531 src/modes/soccer_world.cpp:658
 #, c-format
 msgid "%s scored a goal!"
-msgstr "%sзабиват лобду!"
+msgstr "%s забиват лобду!"
 
 #: src/modes/soccer_world.cpp:533 src/modes/soccer_world.cpp:660
 #, c-format
@@ -4112,7 +4113,7 @@ msgstr[1] "%d арен неприступно у осамілув бавцї."
 
 #: src/states_screens/credits.cpp:184
 msgid "translator-credits"
-msgstr "туй не є никого"
+msgstr "Launchpad Contributions:\nГондрош Руснак, 2022\nОндрош Руснак, 2022"
 
 #: src/states_screens/dialogs/achievement_progress_dialog.cpp:65
 msgctxt "achievement_info"

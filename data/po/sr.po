@@ -4127,7 +4127,7 @@ msgstr[2] "%d борилишта је доступно за самосталну
 
 #: src/states_screens/credits.cpp:184
 msgid "translator-credits"
-msgstr "Launchpad Contributions:\nCYBER FIGHTER, 2019-2020\nSiddhartha Gautama, 2016,2018\nSiddhartha Gautama, 2016,2018-2019\nSUABNINISAN alalalala, 2020\nМирослав Николић, 2011\nСаша Петровић, 2012-2014,2016,2018,2020-2021\nСаша Петровић, 2015-2016\nСаша Петровић, 2016\nСаша Петровић, 2016-2017\nСаша Петровић, 2018\nСаша Петровић, 2018-2019\nSTK-team\ndboki89\nМирослав Николић\nСаша Петровић"
+msgstr "Launchpad Contributions:\nCYBER FIGHTER, 2019-2020\nSiddhartha Gautama, 2016,2018\nSiddhartha Gautama, 2016,2018-2019\nSUABNINISAN alalalala, 2020\nМирослав Николић, 2011\nСаша Петровић, 2012-2014,2016,2018,2020-2022\nСаша Петровић, 2015-2016\nСаша Петровић, 2016\nСаша Петровић, 2016-2017\nСаша Петровић, 2018\nСаша Петровић, 2018-2019\nСаша Петровић, 2012-2014,2016,2018,2020-2021\nSTK-team\ndboki89\nМирослав Николић\nСаша Петровић"
 
 #: src/states_screens/dialogs/achievement_progress_dialog.cpp:65
 msgctxt "achievement_info"

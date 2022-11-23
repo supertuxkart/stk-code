@@ -5,6 +5,7 @@
 # Translators:
 # Andrei Stepanov, 2015-2022
 # Benau, 2018-2020
+# cda3b49fcd26cff178434c994782573e_67b0153 <f126a7d8ac866d9b5ea61e063f1eaf74_660325>, 2018
 # Dmitry Dubrov <dimprogpro@hotmail.ru>, 2015
 # Lev Belousov <lev.blsv@yandex.kz>, 2020
 # Mazur Bogdan <mazurbogd@yandex.ru>, 2018-2019
@@ -20,7 +21,7 @@ msgstr ""
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-09-20 11:30+0800\n"
 "PO-Revision-Date: 2015-02-15 01:58+0000\n"
-"Last-Translator: Andrei Stepanov, 2015-2022\n"
+"Last-Translator: Олег Лазарев <laoltomsk@gmail.com>, 2017,2019\n"
 "Language-Team: Russian (http://www.transifex.com/supertuxkart/supertuxkart/language/ru/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -4130,7 +4131,7 @@ msgstr[3] "%d арены недоступны в одиночном режиме
 
 #: src/states_screens/credits.cpp:184
 msgid "translator-credits"
-msgstr "Launchpad Contributions:\nAndrei Stepanov, 2015-2021\nBenau, 2018-2020\nDmitry Dubrov, 2015\nLev Belousov, 2020\nMazur Bogdan, 2018-2019\nMIKHAIL DOMCHENKOV, 2020\nOleg, 2015\nValeri, 2016,2018\nVladislav Tananaev, 2018\nОлег Лазарев, 2017,2019\nAleXoundOS\nAlexander 'FONTER' Zinin\nAndrey Olykainen\nDenis Deryabin\nDmitriy Koshel\nDmitry\nDmitry Dubrov\nHelen Antonova\nIgor Shtompel\nKirill Babeev\nKroArtem\nMaxim Kalinin\nSTK-team\nTae-Wong SEO\nadem\npingvin\nДмитрий\nОлег\nJay ZDLin"
+msgstr "Launchpad Contributions:\nAndrei Stepanov, 2015-2022\nBenau, 2018-2020\nDmitry Dubrov, 2015\nLev Belousov, 2020\nMazur Bogdan, 2018-2019\nMIKHAIL DOMCHENKOV, 2020\nOleg, 2015\nValeri, 2016,2018\ncda3b49fcd26cff178434c994782573e_67b0153 <f126a7d8ac866d9b5ea61e063f1eaf74_660325>, 2018\nОлег Лазарев, 2017,2019\nAndrei Stepanov, 2015-2021\nVladislav Tananaev, 2018\nAleXoundOS\nAlexander 'FONTER' Zinin\nAndrey Olykainen\nDenis Deryabin\nDmitriy Koshel\nDmitry\nDmitry Dubrov\nHelen Antonova\nIgor Shtompel\nKirill Babeev\nKroArtem\nMaxim Kalinin\nSTK-team\nTae-Wong SEO\nadem\npingvin\nДмитрий\nОлег\nJay ZDLin"
 
 #: src/states_screens/dialogs/achievement_progress_dialog.cpp:65
 msgctxt "achievement_info"

@@ -14,7 +14,7 @@ msgstr ""
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-09-20 11:30+0800\n"
 "PO-Revision-Date: 2015-02-15 01:58+0000\n"
-"Last-Translator: abloosy Freksy Woopy, 2021-2022\n"
+"Last-Translator: Adrián Chaves Fernández <adriyetichaves@gmail.com>, 2010,2015\n"
 "Language-Team: Galician (http://www.transifex.com/supertuxkart/supertuxkart/language/gl/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -4114,7 +4114,7 @@ msgstr[1] "%d arenas non dispoñíbel para modo individual."
 
 #: src/states_screens/credits.cpp:184
 msgid "translator-credits"
-msgstr "Launchpad Contributions:\nAdrián Chaves Fernández, 2010,2015\nAdrián Chaves Fernández, 2015-2016\nAdrián Chaves Fernández, 2010\nAdrián Chaves Fernández, 2010-2011,2013\nAdrián Chaves Fernández\nAuria\nMiguel Anxo Bouzada\nTrutxo64"
+msgstr "Launchpad Contributions:\nabloosy Freksy Woopy, 2021-2022\nAdrián Chaves Fernández, 2010,2015\nAdrián Chaves Fernández, 2015-2016\nAdrián Chaves Fernández, 2010\nAdrián Chaves Fernández, 2010-2011,2013\nAdrián Chaves Fernández\nAuria\nMiguel Anxo Bouzada\nTrutxo64"
 
 #: src/states_screens/dialogs/achievement_progress_dialog.cpp:65
 msgctxt "achievement_info"

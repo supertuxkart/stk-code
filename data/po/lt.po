@@ -4128,7 +4128,7 @@ msgstr[3] ""
 
 #: src/states_screens/credits.cpp:184
 msgid "translator-credits"
-msgstr "Launchpad Contributions:\nAlgimantas Margevičius, 2011\nJonas Kr, 2015\nJonas Kr, 2018-2019\nMantas Kriaučiūnas Baltix, 2015-2016\nMoo, 2020-2021\nVytautas Butenas, 2019\nZygimantus, 2017\nAlgimantas Margevičius\nJonas Kriaučiūnas, "
+msgstr "Launchpad Contributions:\nAlgimantas Margevičius, 2011\nJonas Kr, 2015\nJonas Kr, 2015,2018-2019\nMantas Kriaučiūnas Baltix, 2015-2016\nMoo, 2020-2021\nVytautas Butenas, 2019\nZygimantus, 2017\nJonas Kr, 2018-2019\nAlgimantas Margevičius\nJonas Kriaučiūnas,"
 
 #: src/states_screens/dialogs/achievement_progress_dialog.cpp:65
 msgctxt "achievement_info"

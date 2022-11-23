@@ -6,6 +6,7 @@
 # Benau, 2020
 # Benau, 2020
 # Bobby Youstra, 2022
+# Bobby Youstra, 2022
 # David Blaszyk <david@sudomail.ne.jp>, 2017
 # Happymc! <isena200536@gmail.com>, 2019-2020,2022
 # lindwurm, 2015
@@ -15,6 +16,7 @@
 # lip_of_cygnus <Shinya1248@gmail.com>, 2015
 # Masayuki Sugahara <brindflontia@gmail.com>, 2015
 # ミスターK <kazma.otsubo@gmail.com>, 2020
+# Otsubo Kazma, 2022
 # Otsubo Kazma, 2022
 # paontv <paonntv@gmail.com>, 2020
 # paontv <paonntv@gmail.com>, 2020
@@ -29,7 +31,7 @@ msgstr ""
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-09-20 11:30+0800\n"
 "PO-Revision-Date: 2015-02-15 01:58+0000\n"
-"Last-Translator: Happymc! <isena200536@gmail.com>, 2019-2020,2022\n"
+"Last-Translator: David Blaszyk <david@sudomail.ne.jp>, 2017\n"
 "Language-Team: Japanese (http://www.transifex.com/supertuxkart/supertuxkart/language/ja/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -4124,7 +4126,7 @@ msgstr[0] "%dのアリーナは一人プレイで入手不可能です。"
 
 #: src/states_screens/credits.cpp:184
 msgid "translator-credits"
-msgstr "Launchpad Contributions:\nBenau, 2020\nDavid Blaszyk, 2017\nHappymc!, 2019-2020\nlindwurm, 2015\nKidokoro Kosuke, 2019-2020\nミスターK, 2021\nSugahara Masayuki, 2015\nミスターK, 2020\npaontv, 2020\nlip_of_cygnus, 2015\nUbuntu Jackson, 2018-2020\nUbuntu Jackson, 2020\nAuria\nDawid Gan\nSTK-team\nTae-Wong SEO\nYuki Shira\nlindwurm\ntkbd\nxapantu"
+msgstr "Launchpad Contributions:\nBenau, 2020\nBobby Youstra, 2022\nDavid Blaszyk, 2017\nHappymc!, 2019-2020,2022\nlindwurm, 2015\n5605c392824fda3ac2df0bdbd59ff35b_058bab5 <4437a8e713388fd5aa2ba28f526ee201_779197>, 2019-2020\nミスターK, 2020-2021\nlip_of_cygnus, 2015\nMasayuki Sugahara, 2015\nミスターK, 2020\nOtsubo Kazma, 2022\npaontv, 2020\nUbuntu Jackson, 2018-2020\nUbuntu Jackson, 2020\nHappymc!, 2019-2020\nKidokoro Kosuke, 2019-2020\nミスターK, 2021\nSugahara Masayuki, 2015\nAuria\nDawid Gan\nSTK-team\nTae-Wong SEO\nYuki Shira\nlindwurm\ntkbd\nxapantu"
 
 #: src/states_screens/dialogs/achievement_progress_dialog.cpp:65
 msgctxt "achievement_info"

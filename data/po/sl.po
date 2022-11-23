@@ -7,6 +7,7 @@
 # Gorzy Gorup <gorupgorazd@gmail.com>, 2018
 # Sasa Batistic <sasa.batistic@gmail.com>, 2018
 # veverica c, 2022
+# veverica c, 2022
 msgid ""
 msgstr ""
 "Project-Id-Version: SuperTuxKart\n"
@@ -4123,7 +4124,7 @@ msgstr[3] "%d aren ni na voljo v enoigralskem načinu."
 
 #: src/states_screens/credits.cpp:184
 msgid "translator-credits"
-msgstr "Launchpad Contributions:\nAndrej Znidarsic, 2015-2016\nGorzy Gorup, 2018\nSasa Batistic, 2018\nAndrej Znidarsic\nAuria\nDenis_Ubuntu\nDomen Knez\nMatic Gradišer\nSTK-team\nSasa Batistic"
+msgstr "Launchpad Contributions:\nAndrej Znidarsic, 2015-2016,2021\nGorzy Gorup, 2018\nSasa Batistic, 2018\nveverica c, 2022\nAndrej Znidarsic, 2015-2016\nAndrej Znidarsic\nAuria\nDenis_Ubuntu\nDomen Knez\nMatic Gradišer\nSTK-team\nSasa Batistic"
 
 #: src/states_screens/dialogs/achievement_progress_dialog.cpp:65
 msgctxt "achievement_info"

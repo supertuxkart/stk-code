@@ -129,6 +129,7 @@ static const LanguageSpec languages[] = {
   { "fa", "IR", 0, "Persian (Iran)"              },
   { "fi", 0,    0, "Finnish"                     },
   { "fi", "FI", 0, "Finnish (Finland)"           },
+  { "fil", 0,   0, "Filipino"                    },
   { "fo", 0,    0, "Faroese"                     },
   { "fo", "FO", 0, "Faeroese (Faroe Islands)"    },
   { "fr", 0,    0, "French"                      },
