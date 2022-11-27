@@ -106,11 +106,17 @@ namespace scene
 		//! returns normal of vertex i
 		virtual core::vector3df& getNormal(u32 i) = 0;
 
+		//! set normal of vertex i
+		virtual void setNormal(u32 i, const core::vector3df& normal) { getNormal(i) = normal; }
+
 		//! returns texture coord of vertex i
 		virtual const core::vector2df& getTCoords(u32 i) const = 0;
 
 		//! returns texture coord of vertex i
 		virtual core::vector2df& getTCoords(u32 i) = 0;
+
+		//! set texture coord of vertex i
+		virtual void setTCoords(u32 i, const core::vector2df& tcoords) { getTCoords(i) = tcoords; }
 
 		//! Returns the primitive type of this buffer
 		virtual scene::E_PRIMITIVE_TYPE getPrimitiveType() const = 0;

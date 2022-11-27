@@ -67,10 +67,10 @@ Shadow::Shadow(Material* shadow_mat, const AbstractKart& kart)
         scene::SMeshBuffer* buffer = new scene::SMeshBuffer();
         buffer->append(vertices.data(), vertices.size(), indices.data(),
             indices.size());
-        buffer->getTCoords(0) = core::vector2df(0.0f, 0.0f);
-        buffer->getTCoords(1) = core::vector2df(1.0f, 0.0f);
-        buffer->getTCoords(2) = core::vector2df(1.0f, 1.0f);
-        buffer->getTCoords(3) = core::vector2df(0.0f, 1.0f);
+        buffer->setTCoords(0, core::vector2df(0.0f, 0.0f));
+        buffer->setTCoords(1, core::vector2df(1.0f, 0.0f));
+        buffer->setTCoords(2, core::vector2df(1.0f, 1.0f));
+        buffer->setTCoords(3, core::vector2df(0.0f, 1.0f));
         shadow_mat->setMaterialProperties(&buffer->getMaterial(), buffer);
         buffer->getMaterial().setTexture(0, shadow_mat->getTexture());
         buffer->setHardwareMappingHint(scene::EHM_STREAM);
@@ -168,8 +168,8 @@ void Shadow::update(bool enabled)
             up_vector = up_vector * (wi.m_raycastInfo.m_suspensionLength - 0.02f);
             Vec3 pos = kart_trans(position[i]) - up_vector;
             buffer->getPosition(i) = pos.toIrrVector();
-            buffer->getNormal(i) = Vec3(wi.m_raycastInfo.m_contactNormalWS)
-                .toIrrVector();
+            buffer->setNormal(i, Vec3(wi.m_raycastInfo.m_contactNormalWS)
+                .toIrrVector());
         }
         buffer->recalculateBoundingBox();
         mesh->setBoundingBox(buffer->getBoundingBox());

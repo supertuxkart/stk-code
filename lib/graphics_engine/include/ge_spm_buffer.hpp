@@ -107,6 +107,8 @@ public:
         return unused;
     }
     // ------------------------------------------------------------------------
+    virtual void setNormal(irr::u32 i, const irr::core::vector3df& normal);
+    // ------------------------------------------------------------------------
     virtual const irr::core::vector2df& getTCoords(irr::u32 i) const
     {
         static irr::core::vector2df unused;
@@ -118,6 +120,8 @@ public:
         static irr::core::vector2df unused;
         return unused;
     }
+    // ------------------------------------------------------------------------
+    virtual void setTCoords(irr::u32 i, const irr::core::vector2df& tcoords);
     // ------------------------------------------------------------------------
     virtual irr::scene::E_PRIMITIVE_TYPE getPrimitiveType() const
                                           { return irr::scene::EPT_TRIANGLES; }

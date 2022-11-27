@@ -6,6 +6,8 @@
 
 #include <algorithm>
 
+#include "mini_glm.hpp"
+
 namespace GE
 {
 // ----------------------------------------------------------------------------
@@ -99,5 +101,18 @@ void GESPMBuffer::destroyVertexIndexBuffer()
     m_buffer = VK_NULL_HANDLE;
     m_memory = VK_NULL_HANDLE;
 }   // destroyVertexIndexBuffer
+
+// ----------------------------------------------------------------------------
+void GESPMBuffer::setNormal(u32 i, const core::vector3df& normal)
+{
+    m_vertices[i].m_normal = MiniGLM::compressVector3(normal);
+}   // setNormal
+
+// ----------------------------------------------------------------------------
+void GESPMBuffer::setTCoords(u32 i, const core::vector2df& tcoords)
+{
+    m_vertices[i].m_all_uvs[0] = MiniGLM::toFloat16(tcoords.X);
+    m_vertices[i].m_all_uvs[1] = MiniGLM::toFloat16(tcoords.Y);
+}   // setTCoords
 
 }
