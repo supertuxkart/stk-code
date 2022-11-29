@@ -38,7 +38,9 @@
 
 #ifndef SERVER_ONLY
 
+#include <ge_vulkan_dynamic_spm_buffer.hpp>
 #include <IMeshSceneNode.h>
+#include <IVideoDriver.h>
 #include <SMesh.h>
 #include <SMeshBuffer.h>
 #include <ge_render_info.hpp>
@@ -250,7 +252,11 @@ SkidMarks::SkidMarkQuads::SkidMarkQuads(const Vec3 &left,
     }
     else
     {
-        scene::SMeshBuffer* buffer = new scene::SMeshBuffer();
+        scene::IMeshBuffer* buffer = NULL;
+        if (irr_driver->getVideoDriver()->getDriverType() == video::EDT_VULKAN)
+            buffer = new GE::GEVulkanDynamicSPMBuffer();
+        else
+            buffer = new scene::SMeshBuffer();
         material->setMaterialProperties(&buffer->getMaterial(), buffer);
         buffer->getMaterial().setTexture(0, material->getTexture());
         buffer->setHardwareMappingHint(scene::EHM_STREAM);
@@ -338,28 +344,58 @@ void SkidMarks::SkidMarkQuads::addLegacy(const Vec3& left,
     // too much with the track.
     int n = buffer->getVertexCount();
 
-    std::array<video::S3DVertex, 2> v;
-    v[0].Color = m_start_color;
-    v[0].Color.setAlpha(0); // initially create all vertices at alpha=0...
-    v[1] = v[0];
-
-    // then when adding a new set of vertices, make the previous 2 opaque.
-    // this ensures that the last two vertices are always at alpha=0,
-    // producing a fade-out effect
-    video::S3DVertex* vertices = (video::S3DVertex*)buffer->getVertices();
-    if (n > 4)
+    if (irr_driver->getVideoDriver()->getDriverType() == video::EDT_VULKAN)
     {
-        vertices[n - 1].Color.setAlpha(m_start_alpha);
-        vertices[n - 2].Color.setAlpha(m_start_alpha);
+        std::array<video::S3DVertexSkinnedMesh, 2> v = {{ }};
+        v[0].m_color = m_start_color;
+        v[0].m_color.setAlpha(0); // initially create all vertices at alpha=0...
+        v[1] = v[0];
+
+        // then when adding a new set of vertices, make the previous 2 opaque.
+        // this ensures that the last two vertices are always at alpha=0,
+        // producing a fade-out effect
+        video::S3DVertexSkinnedMesh* vertices = (video::S3DVertexSkinnedMesh*)
+            buffer->getVertices();
+        if (n > 4)
+        {
+            vertices[n - 1].m_color.setAlpha(m_start_alpha);
+            vertices[n - 2].m_color.setAlpha(m_start_alpha);
+        }
+
+        v[0].m_position = Vec3(left + normal * m_z_offset).toIrrVector();
+        v[0].m_normal = MiniGLM::compressVector3(normal.toIrrVector());
+        short half_distance = MiniGLM::toFloat16(distance * 0.5f);
+        v[0].m_all_uvs[1] = half_distance;
+        v[1].m_position = Vec3(right + normal * m_z_offset).toIrrVector();
+        v[1].m_normal = MiniGLM::compressVector3(normal.toIrrVector());
+        short half_float_1 = 15360;
+        v[1].m_all_uvs[0] = half_float_1;
+        v[1].m_all_uvs[1] = half_distance;
+        buffer->append(v.data(), v.size(), NULL, 0);
+    }
+    else
+    {
+        std::array<video::S3DVertex, 2> v;
+        v[0].Color = m_start_color;
+        v[0].Color.setAlpha(0);
+        v[1] = v[0];
+
+        video::S3DVertex* vertices = (video::S3DVertex*)buffer->getVertices();
+        if (n > 4)
+        {
+            vertices[n - 1].Color.setAlpha(m_start_alpha);
+            vertices[n - 2].Color.setAlpha(m_start_alpha);
+        }
+
+        v[0].Pos = Vec3(left + normal * m_z_offset).toIrrVector();
+        v[0].Normal = normal.toIrrVector();
+        v[0].TCoords = core::vector2df(0.0f, distance * 0.5f);
+        v[1].Pos = Vec3(right + normal * m_z_offset).toIrrVector();
+        v[1].Normal = normal.toIrrVector();
+        v[1].TCoords = core::vector2df(1.0f, distance * 0.5f);
+        buffer->append(v.data(), v.size(), NULL, 0);
     }
 
-    v[0].Pos = Vec3(left + normal * m_z_offset).toIrrVector();
-    v[0].Normal = normal.toIrrVector();
-    v[0].TCoords = core::vector2df(0.0f, distance * 0.5f);
-    v[1].Pos = Vec3(right + normal * m_z_offset).toIrrVector();
-    v[1].Normal = normal.toIrrVector();
-    v[1].TCoords = core::vector2df(1.0f, distance * 0.5f);
-    buffer->append(v.data(), v.size(), NULL, 0);
     // Out of the box Irrlicht only supports triangle meshes and not
     // triangle strips. Since this is a strip it would be more efficient
     // to use a special triangle strip scene node.

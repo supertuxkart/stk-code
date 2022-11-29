@@ -18,6 +18,18 @@ public:
     GEVulkanDynamicSPMBuffer();
     // ------------------------------------------------------------------------
     ~GEVulkanDynamicSPMBuffer();
+    // ------------------------------------------------------------------------
+    virtual irr::scene::E_HARDWARE_MAPPING getHardwareMappingHint_Vertex() const
+                                             { return irr::scene::EHM_STREAM; }
+    // ------------------------------------------------------------------------
+    virtual irr::scene::E_HARDWARE_MAPPING getHardwareMappingHint_Index() const
+                                             { return irr::scene::EHM_STREAM; }
+    // ------------------------------------------------------------------------
+    virtual void bindVertexIndexBuffer(VkCommandBuffer cmd)                  {}
+    // ------------------------------------------------------------------------
+    virtual void createVertexIndexBuffer()                                   {}
+    // ------------------------------------------------------------------------
+    virtual void destroyVertexIndexBuffer()                                  {}
 };
 
 } // end namespace GE

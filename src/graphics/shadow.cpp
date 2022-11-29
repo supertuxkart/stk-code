@@ -31,7 +31,9 @@
 #ifndef SERVER_ONLY
 
 #include <array>
+#include <ge_vulkan_dynamic_spm_buffer.hpp>
 #include <IMeshSceneNode.h>
+#include <IVideoDriver.h>
 #include <SMesh.h>
 #include <SMeshBuffer.h>
 
@@ -60,13 +62,27 @@ Shadow::Shadow(Material* shadow_mat, const AbstractKart& kart)
     }
     else
     {
-        video::S3DVertex v;
-        v.Color = (video::SColor)-1;
-        std::array<video::S3DVertex, 4> vertices = {{ v, v, v, v }};
         std::array<uint16_t, 6> indices = {{ 0, 1, 2, 0, 2, 3 }};
-        scene::SMeshBuffer* buffer = new scene::SMeshBuffer();
-        buffer->append(vertices.data(), vertices.size(), indices.data(),
-            indices.size());
+        scene::IMeshBuffer* buffer = NULL;
+        if (irr_driver->getVideoDriver()->getDriverType() == video::EDT_VULKAN)
+        {
+            buffer = new GE::GEVulkanDynamicSPMBuffer();
+            video::S3DVertexSkinnedMesh v;
+            v.m_color = (video::SColor)-1;
+            std::array<video::S3DVertexSkinnedMesh, 4> vertices =
+                {{ v, v, v, v }};
+            buffer->append(vertices.data(), vertices.size(), indices.data(),
+                indices.size());
+        }
+        else
+        {
+            buffer = new scene::SMeshBuffer();
+            video::S3DVertex v;
+            v.Color = (video::SColor)-1;
+            std::array<video::S3DVertex, 4> vertices = {{ v, v, v, v }};
+            buffer->append(vertices.data(), vertices.size(), indices.data(),
+                indices.size());
+        }
         buffer->setTCoords(0, core::vector2df(0.0f, 0.0f));
         buffer->setTCoords(1, core::vector2df(1.0f, 0.0f));
         buffer->setTCoords(2, core::vector2df(1.0f, 1.0f));

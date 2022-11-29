@@ -246,6 +246,9 @@ void GEVulkanDrawCall::addNode(irr::scene::ISceneNode* node)
         if (m_culling_tool->isCulled(buffer, node))
             continue;
         const std::string& shader = getShader(node, i);
+        if (buffer->getHardwareMappingHint_Vertex() == irr::scene::EHM_STREAM ||
+            buffer->getHardwareMappingHint_Index() == irr::scene::EHM_STREAM)
+            continue;
         m_visible_nodes[buffer][shader].emplace_back(node, i);
         m_mb_map[buffer] = mesh;
         if (anode && !added_skinning &&

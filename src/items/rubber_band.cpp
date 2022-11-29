@@ -32,11 +32,12 @@
 #include "modes/world.hpp"
 #include "physics/physics.hpp"
 #include "race/race_manager.hpp"
-#include "mini_glm.hpp"
 #include "utils/string_utils.hpp"
 
 #include <array>
+#include <ge_vulkan_dynamic_spm_buffer.hpp>
 #include <IMeshSceneNode.h>
+#include <IVideoDriver.h>
 #include <SMesh.h>
 #include <SMeshBuffer.h>
 
@@ -81,14 +82,29 @@ RubberBand::RubberBand(Plunger *plunger, AbstractKart *kart)
     }
     else
     {
-        video::S3DVertex v;
-        v.Normal = core::vector3df(0, 1, 0);
-        v.Color = color;
-        std::array<video::S3DVertex, 4> vertices = {{ v, v, v, v }};
         std::array<uint16_t, 6> indices = {{ 0, 1, 2, 0, 2, 3 }};
-        scene::SMeshBuffer* buffer = new scene::SMeshBuffer();
-        buffer->append(vertices.data(), vertices.size(), indices.data(),
-            indices.size());
+        scene::IMeshBuffer* buffer = NULL;
+        if (irr_driver->getVideoDriver()->getDriverType() == video::EDT_VULKAN)
+        {
+            buffer = new GE::GEVulkanDynamicSPMBuffer();
+            video::S3DVertexSkinnedMesh v;
+            v.m_normal = 0x1FF << 10;
+            v.m_color = color;
+            std::array<video::S3DVertexSkinnedMesh, 4> vertices =
+                {{ v, v, v, v }};
+            buffer->append(vertices.data(), vertices.size(), indices.data(),
+                indices.size());
+        }
+        else
+        {
+            buffer = new scene::SMeshBuffer();
+            video::S3DVertex v;
+            v.Normal = core::vector3df(0, 1, 0);
+            v.Color = color;
+            std::array<video::S3DVertex, 4> vertices = {{ v, v, v, v }};
+            buffer->append(vertices.data(), vertices.size(), indices.data(),
+                indices.size());
+        }
         buffer->getMaterial().AmbientColor = color;
         buffer->getMaterial().DiffuseColor = color;
         buffer->getMaterial().EmissiveColor = color;
