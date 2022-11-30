@@ -504,7 +504,7 @@ GEVulkanDriver::GEVulkanDriver(const SIrrlichtCreationParameters& params,
                 m_depth_texture(NULL), m_mesh_texture_descriptor(NULL),
                 m_rtt_texture(NULL), m_prev_rtt_texture(NULL),
                 m_separate_rtt_texture(NULL), m_rtt_polycount(0),
-                m_billboard_quad(NULL)
+                m_billboard_quad(NULL), m_current_buffer_idx(0)
 {
     m_vk.reset(new VK());
     m_physical_device = VK_NULL_HANDLE;
@@ -1785,6 +1785,8 @@ bool GEVulkanDriver::endScene()
     present_info.pImageIndices = &m_image_index;
 
     m_current_frame = (m_current_frame + 1) % getMaxFrameInFlight();
+    m_current_buffer_idx =
+        (m_current_buffer_idx + 1) % (getMaxFrameInFlight() + 1);
 
     if (m_present_queue)
         result = vkQueuePresentKHR(m_present_queue, &present_info);

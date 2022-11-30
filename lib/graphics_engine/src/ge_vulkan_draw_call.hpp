@@ -132,8 +132,6 @@ private:
 
     size_t m_materials_padded_size;
 
-    int m_current_buffer_idx;
-
     bool m_update_data_descriptor_sets;
 
     VkDescriptorSetLayout m_data_layout;
@@ -203,7 +201,7 @@ public:
     // ------------------------------------------------------------------------
     void prepare(GEVulkanCameraSceneNode* cam);
     // ------------------------------------------------------------------------
-    void generate();
+    void generate(GEVulkanDriver* vk);
     // ------------------------------------------------------------------------
     void uploadDynamicData(GEVulkanDriver* vk, GEVulkanCameraSceneNode* cam,
                            VkCommandBuffer custom_cmd = VK_NULL_HANDLE);

@@ -365,6 +365,7 @@ namespace GE
         void addDrawCallToCache(std::unique_ptr<GEVulkanDrawCall>& dc);
         std::unique_ptr<GEVulkanDrawCall> getDrawCallFromCache();
         GESPM* getBillboardQuad() const             { return m_billboard_quad; }
+        int getCurrentBufferIdx() const         { return m_current_buffer_idx; }
     private:
         struct SwapChainSupportDetails
         {
@@ -509,6 +510,7 @@ namespace GE
 
         std::vector<std::unique_ptr<GEVulkanDrawCall> > m_draw_calls_cache;
         GESPM* m_billboard_quad;
+        int m_current_buffer_idx;
 
         void createInstance(SDL_Window* window);
         void findPhysicalDevice();

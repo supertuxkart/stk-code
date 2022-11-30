@@ -170,7 +170,7 @@ void GEVulkanSceneManager::drawAllInternal()
 
         it->second->prepare(cam);
         OnRegisterSceneNode();
-        it->second->generate();
+        it->second->generate(static_cast<GEVulkanDriver*>(getVideoDriver()));
     }
 }   // drawAllInternal
 
