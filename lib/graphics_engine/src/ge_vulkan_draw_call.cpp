@@ -4,12 +4,12 @@
 #include "ge_main.hpp"
 #include "ge_render_info.hpp"
 #include "ge_spm.hpp"
-#include "ge_spm_buffer.hpp"
 #include "ge_vulkan_animated_mesh_scene_node.hpp"
 #include "ge_vulkan_billboard_buffer.hpp"
 #include "ge_vulkan_camera_scene_node.hpp"
 #include "ge_vulkan_driver.hpp"
 #include "ge_vulkan_dynamic_buffer.hpp"
+#include "ge_vulkan_dynamic_spm_buffer.hpp"
 #include "ge_vulkan_fbo_texture.hpp"
 #include "ge_vulkan_features.hpp"
 #include "ge_vulkan_mesh_cache.hpp"
@@ -188,6 +188,7 @@ GEVulkanDrawCall::GEVulkanDrawCall()
     m_object_data_padded_size = 0;
     m_skinning_data_padded_size = 0;
     m_materials_padded_size = 0;
+    m_dynamic_spm_padded_size = 0;
     m_update_data_descriptor_sets = true;
     m_data_layout = VK_NULL_HANDLE;
     m_descriptor_pool = VK_NULL_HANDLE;
@@ -247,7 +248,12 @@ void GEVulkanDrawCall::addNode(irr::scene::ISceneNode* node)
         const std::string& shader = getShader(node, i);
         if (buffer->getHardwareMappingHint_Vertex() == irr::scene::EHM_STREAM ||
             buffer->getHardwareMappingHint_Index() == irr::scene::EHM_STREAM)
+        {
+            GEVulkanDynamicSPMBuffer* dbuffer = static_cast<
+                GEVulkanDynamicSPMBuffer*>(buffer);
+            m_dynamic_spm_buffers[shader].emplace_back(dbuffer, node);
             continue;
+        }
         m_visible_nodes[buffer][shader].emplace_back(node, i);
         m_mb_map[buffer] = mesh;
         if (anode && !added_skinning &&
@@ -390,6 +396,31 @@ start:
         written_size += extra;
         mapped_addr += extra;
     }
+
+    for (auto& p : m_dynamic_spm_buffers)
+    {
+        for (auto& q : p.second)
+        {
+            const size_t dynamic_spm_size = sizeof(ObjectData) +
+                getPadding(sizeof(ObjectData), sbo_alignment);
+            if (written_size + dynamic_spm_size > m_sbo_data->getSize())
+            {
+                min_size = (written_size + dynamic_spm_size) * 2;
+                goto start;
+            }
+            irr::scene::ISceneNode* node = q.second;
+            const irr::video::SMaterial& m = node->getMaterial(0);
+            TexturesList textures = getTexturesList(m);
+            const irr::video::ITexture** list = &textures[0];
+            int material_id = m_texture_descriptor->getTextureID(list);
+            ObjectData* data = (ObjectData*)mapped_addr;
+            data->init(node, material_id, -1, 0);
+            m_materials[q.first] = material_id;
+            written_size += dynamic_spm_size;
+            mapped_addr += dynamic_spm_size;
+        }
+    }
+    m_dynamic_spm_padded_size = written_size - skinning_data_padded_size;
 
     const bool use_base_vertex = GEVulkanFeatures::supportsBaseVertexRendering();
     const bool bind_mesh_textures =
@@ -710,14 +741,16 @@ start:
             m_materials_padded_size = materials_padded_size;
         }
 
-        // Make sure dynamic offsets of materials won't become invalid
-        if (written_size + materials_padded_size > m_sbo_data->getSize())
+        // Make sure dynamic offsets won't become invalid
+        if (skinning_data_padded_size + (object_data_padded_size * 2) +
+            (materials_padded_size * 2) > m_sbo_data->getSize())
         {
-            min_size = written_size + materials_padded_size;
+            min_size = skinning_data_padded_size +
+                (object_data_padded_size * 2) + (materials_padded_size * 2);
             goto start;
         }
     }
-    else if (!use_base_vertex)
+    else
     {
         // Make sure dynamic offset of objects won't become invalid
         if (skinning_data_padded_size + (object_data_padded_size * 2) >
@@ -1056,35 +1089,29 @@ start:
 void GEVulkanDrawCall::createVulkanData()
 {
     GEVulkanDriver* vk = getVKDriver();
-    const bool use_dynamic =
-        !GEVulkanFeatures::supportsBaseVertexRendering() ||
-        GEVulkanFeatures::supportsBindMeshTexturesAtOnce();
 
     // m_data_layout
     VkDescriptorSetLayoutBinding camera_layout_binding = {};
     camera_layout_binding.binding = 0;
     camera_layout_binding.descriptorCount = 1;
-    camera_layout_binding.descriptorType = use_dynamic ?
-        VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER_DYNAMIC :
-        VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+    camera_layout_binding.descriptorType =
+        VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER_DYNAMIC;
     camera_layout_binding.pImmutableSamplers = NULL;
     camera_layout_binding.stageFlags = VK_SHADER_STAGE_VERTEX_BIT;
 
     VkDescriptorSetLayoutBinding object_data_layout_binding = {};
     object_data_layout_binding.binding = 1;
     object_data_layout_binding.descriptorCount = 1;
-    object_data_layout_binding.descriptorType = use_dynamic ?
-        VK_DESCRIPTOR_TYPE_STORAGE_BUFFER_DYNAMIC :
-        VK_DESCRIPTOR_TYPE_STORAGE_BUFFER;
+    object_data_layout_binding.descriptorType =
+        VK_DESCRIPTOR_TYPE_STORAGE_BUFFER_DYNAMIC;
     object_data_layout_binding.pImmutableSamplers = NULL;
     object_data_layout_binding.stageFlags = VK_SHADER_STAGE_VERTEX_BIT;
 
     VkDescriptorSetLayoutBinding skinning_layout_binding = {};
     skinning_layout_binding.binding = 2;
     skinning_layout_binding.descriptorCount = 1;
-    skinning_layout_binding.descriptorType = use_dynamic ?
-        VK_DESCRIPTOR_TYPE_STORAGE_BUFFER_DYNAMIC :
-        VK_DESCRIPTOR_TYPE_STORAGE_BUFFER;
+    skinning_layout_binding.descriptorType =
+        VK_DESCRIPTOR_TYPE_STORAGE_BUFFER_DYNAMIC;
     skinning_layout_binding.pImmutableSamplers = NULL;
     skinning_layout_binding.stageFlags = VK_SHADER_STAGE_VERTEX_BIT;
 
@@ -1125,15 +1152,11 @@ void GEVulkanDrawCall::createVulkanData()
     std::vector<VkDescriptorPoolSize> sizes =
     {
         {
-            use_dynamic ?
-            VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER_DYNAMIC :
-            VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER,
+            VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER_DYNAMIC,
             vk->getMaxFrameInFlight() + 1
         },
         {
-            use_dynamic ?
-            VK_DESCRIPTOR_TYPE_STORAGE_BUFFER_DYNAMIC :
-            VK_DESCRIPTOR_TYPE_STORAGE_BUFFER,
+            VK_DESCRIPTOR_TYPE_STORAGE_BUFFER_DYNAMIC,
             (vk->getMaxFrameInFlight() + 1) * 2
         }
     };
@@ -1281,6 +1304,27 @@ void GEVulkanDrawCall::uploadDynamicData(GEVulkanDriver* vk,
 }   // uploadDynamicData
 
 // ----------------------------------------------------------------------------
+void GEVulkanDrawCall::bindBaseVertex(GEVulkanDriver* vk, VkCommandBuffer cmd)
+{
+    GEVulkanMeshCache* mc = vk->getVulkanMeshCache();
+    std::array<VkBuffer, 2> vertex_buffer =
+    {{
+        mc->getBuffer(),
+        mc->getBuffer()
+    }};
+    std::array<VkDeviceSize, 2> offsets =
+    {{
+        0,
+        mc->getSkinningVBOOffset()
+    }};
+    vkCmdBindVertexBuffers(cmd, 0, vertex_buffer.size(),
+        vertex_buffer.data(), offsets.data());
+
+    vkCmdBindIndexBuffer(cmd, mc->getBuffer(), mc->getIBOOffset(),
+        VK_INDEX_TYPE_UINT16);
+}   // bindBaseVertex
+
+// ----------------------------------------------------------------------------
 void GEVulkanDrawCall::render(GEVulkanDriver* vk, GEVulkanCameraSceneNode* cam,
                               VkCommandBuffer custom_cmd)
 {
@@ -1296,25 +1340,6 @@ void GEVulkanDrawCall::render(GEVulkanDriver* vk, GEVulkanCameraSceneNode* cam,
 
     updateDataDescriptorSets(vk);
     m_texture_descriptor->updateDescriptor();
-    if (use_base_vertex)
-    {
-        GEVulkanMeshCache* mc = vk->getVulkanMeshCache();
-        std::array<VkBuffer, 2> vertex_buffer =
-        {{
-            mc->getBuffer(),
-            mc->getBuffer()
-        }};
-        std::array<VkDeviceSize, 2> offsets =
-        {{
-            0,
-            mc->getSkinningVBOOffset()
-        }};
-        vkCmdBindVertexBuffers(cmd, 0, vertex_buffer.size(),
-            vertex_buffer.data(), offsets.data());
-
-        vkCmdBindIndexBuffer(cmd, mc->getBuffer(), mc->getIBOOffset(),
-            VK_INDEX_TYPE_UINT16);
-    }
 
     VkViewport vp;
     float scale = getGEConfig()->m_render_scale;
@@ -1338,13 +1363,17 @@ void GEVulkanDrawCall::render(GEVulkanDriver* vk, GEVulkanCameraSceneNode* cam,
 
     std::string cur_pipeline = m_cmds[0].m_shader;
     bool drawn_skybox = false;
+    size_t sbo_alignment = m_limits.minStorageBufferOffsetAlignment;
+    const size_t dynamic_spm_size = sizeof(ObjectData) + getPadding(
+        sizeof(ObjectData), sbo_alignment);
+    size_t dynamic_spm_offset = 0;
     if (bind_mesh_textures)
     {
         vkCmdBindDescriptorSets(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS,
             m_pipeline_layout, 0, 1, m_texture_descriptor->getDescriptorSet(),
             0, NULL);
 
-        std::array<uint32_t, 4> material_offsets =
+        std::array<uint32_t, 4> dynamic_offsets =
         {{
             0u,
             0u,
@@ -1358,16 +1387,39 @@ void GEVulkanDrawCall::render(GEVulkanDriver* vk, GEVulkanCameraSceneNode* cam,
             GEVulkanDynamicBuffer::supportsHostTransfer() ?
             m_dynamic_data->getHostBuffer()[current_buffer_idx] :
             m_dynamic_data->getLocalBuffer()[current_buffer_idx];
+        bool rebind_base_vertex = true;
         for (unsigned i = 0; i < m_cmds.size(); i++)
         {
             if (m_cmds[i].m_shader != cur_pipeline)
             {
                 bindPipeline(cmd, cur_pipeline);
-                material_offsets[3] = m_materials_data[cur_pipeline].first;
+                auto it = m_dynamic_spm_buffers.find(cur_pipeline);
+                if (it != m_dynamic_spm_buffers.end() && !it->second.empty())
+                {
+                    rebind_base_vertex = true;
+                    for (auto& buf : it->second)
+                    {
+                        dynamic_offsets[1] = dynamic_spm_offset;
+                        vkCmdBindDescriptorSets(cmd,
+                            VK_PIPELINE_BIND_POINT_GRAPHICS, m_pipeline_layout,
+                            1, 1, &m_data_descriptor_sets[current_buffer_idx],
+                            dynamic_offsets.size(), dynamic_offsets.data());
+                        buf.first->drawDynamicVertexIndexBuffer(cmd,
+                            current_buffer_idx);
+                        dynamic_spm_offset += dynamic_spm_size;
+                    }
+                }
+                if (rebind_base_vertex)
+                {
+                    bindBaseVertex(vk, cmd);
+                    rebind_base_vertex = false;
+                }
+                dynamic_offsets[1] = m_dynamic_spm_padded_size;
+                dynamic_offsets[3] = m_materials_data[cur_pipeline].first;
                 vkCmdBindDescriptorSets(cmd,
                     VK_PIPELINE_BIND_POINT_GRAPHICS, m_pipeline_layout, 1, 1,
                     &m_data_descriptor_sets[current_buffer_idx],
-                    material_offsets.size(), material_offsets.data());
+                    dynamic_offsets.size(), dynamic_offsets.data());
                 vkCmdDrawIndexedIndirect(cmd, indirect_buffer, indirect_offset,
                     draw_count, indirect_size);
                 indirect_offset += draw_count * indirect_size;
@@ -1388,26 +1440,76 @@ void GEVulkanDrawCall::render(GEVulkanDriver* vk, GEVulkanCameraSceneNode* cam,
             draw_count++;
         }
         bindPipeline(cmd, m_cmds.back().m_shader);
-        material_offsets[3] = m_materials_data[m_cmds.back().m_shader].first;
+        auto it = m_dynamic_spm_buffers.find(m_cmds.back().m_shader);
+        if (it != m_dynamic_spm_buffers.end() && !it->second.empty())
+        {
+            rebind_base_vertex = true;
+            for (auto& buf : it->second)
+            {
+                dynamic_offsets[1] = dynamic_spm_offset;
+                vkCmdBindDescriptorSets(cmd,
+                    VK_PIPELINE_BIND_POINT_GRAPHICS, m_pipeline_layout, 1, 1,
+                    &m_data_descriptor_sets[current_buffer_idx],
+                    dynamic_offsets.size(), dynamic_offsets.data());
+                buf.first->drawDynamicVertexIndexBuffer(cmd,
+                    current_buffer_idx);
+                dynamic_spm_offset += dynamic_spm_size;
+            }
+        }
+        if (rebind_base_vertex)
+            bindBaseVertex(vk, cmd);
+        dynamic_offsets[1] = m_dynamic_spm_padded_size;
+        dynamic_offsets[3] = m_materials_data[m_cmds.back().m_shader].first;
         vkCmdBindDescriptorSets(cmd,
             VK_PIPELINE_BIND_POINT_GRAPHICS, m_pipeline_layout, 1, 1,
             &m_data_descriptor_sets[current_buffer_idx],
-            material_offsets.size(), material_offsets.data());
+            dynamic_offsets.size(), dynamic_offsets.data());
         vkCmdDrawIndexedIndirect(cmd, indirect_buffer, indirect_offset,
             draw_count, indirect_size);
     }
     else
     {
-        int cur_mid = m_materials[m_cmds[0].m_mb];
+        std::array<uint32_t, 3> dynamic_offsets =
+        {{
+            0u,
+            0u,
+            0u,
+        }};
+        bool rebind_base_vertex = true;
+        int cur_mid = -1;
         bindPipeline(cmd, cur_pipeline);
-        vkCmdBindDescriptorSets(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS,
-            m_pipeline_layout, 0, 1,
-            &m_texture_descriptor->getDescriptorSet()[cur_mid], 0, NULL);
-        if (use_base_vertex)
+        auto it = m_dynamic_spm_buffers.find(cur_pipeline);
+        if (it != m_dynamic_spm_buffers.end() && !it->second.empty())
         {
-            vkCmdBindDescriptorSets(cmd,
-                VK_PIPELINE_BIND_POINT_GRAPHICS, m_pipeline_layout, 1, 1,
-                    &m_data_descriptor_sets[current_buffer_idx], 0, NULL);
+            rebind_base_vertex = true;
+            for (auto& buf : it->second)
+            {
+                dynamic_offsets[1] = dynamic_spm_offset;
+                vkCmdBindDescriptorSets(cmd,
+                    VK_PIPELINE_BIND_POINT_GRAPHICS, m_pipeline_layout,
+                    1, 1, &m_data_descriptor_sets[current_buffer_idx],
+                    dynamic_offsets.size(), dynamic_offsets.data());
+                int dy_mat = m_materials[buf.first];
+                if (dy_mat != cur_mid)
+                {
+                    cur_mid = dy_mat;
+                    vkCmdBindDescriptorSets(cmd,
+                        VK_PIPELINE_BIND_POINT_GRAPHICS,
+                        m_pipeline_layout, 0, 1,
+                        &m_texture_descriptor->getDescriptorSet()[cur_mid], 0,
+                        NULL);
+                }
+                buf.first->drawDynamicVertexIndexBuffer(cmd,
+                    current_buffer_idx);
+                dynamic_spm_offset += dynamic_spm_size;
+            }
+        }
+        if (cur_mid != m_materials[m_cmds[0].m_mb])
+        {
+            cur_mid = m_materials[m_cmds[0].m_mb];
+            vkCmdBindDescriptorSets(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS,
+                m_pipeline_layout, 0, 1,
+                &m_texture_descriptor->getDescriptorSet()[cur_mid], 0, NULL);
         }
         for (unsigned i = 0; i < m_cmds.size(); i++)
         {
@@ -1422,14 +1524,39 @@ void GEVulkanDrawCall::render(GEVulkanDriver* vk, GEVulkanCameraSceneNode* cam,
                     &m_texture_descriptor->getDescriptorSet()[cur_mid], 0,
                     NULL);
                 if (use_base_vertex)
+                    rebind_base_vertex = true;
+            }
+            if (m_cmds[i].m_shader != cur_pipeline)
+            {
+                cur_pipeline = m_cmds[i].m_shader;
+                bindPipeline(cmd, cur_pipeline);
+                auto it = m_dynamic_spm_buffers.find(cur_pipeline);
+                if (it != m_dynamic_spm_buffers.end() && !it->second.empty())
                 {
-                    vkCmdBindDescriptorSets(cmd,
-                        VK_PIPELINE_BIND_POINT_GRAPHICS, m_pipeline_layout, 1,
-                        1, &m_data_descriptor_sets[current_buffer_idx], 0,
-                        NULL);
+                    rebind_base_vertex = true;
+                    for (auto& buf : it->second)
+                    {
+                        dynamic_offsets[1] = dynamic_spm_offset;
+                        vkCmdBindDescriptorSets(cmd,
+                            VK_PIPELINE_BIND_POINT_GRAPHICS, m_pipeline_layout,
+                            1, 1, &m_data_descriptor_sets[current_buffer_idx],
+                            dynamic_offsets.size(), dynamic_offsets.data());
+                        int dy_mat = m_materials[buf.first];
+                        if (dy_mat != cur_mid)
+                        {
+                            cur_mid = dy_mat;
+                            vkCmdBindDescriptorSets(cmd,
+                                VK_PIPELINE_BIND_POINT_GRAPHICS,
+                                m_pipeline_layout, 0, 1,
+                                &m_texture_descriptor->getDescriptorSet()
+                                [cur_mid], 0, NULL);
+                        }
+                        buf.first->drawDynamicVertexIndexBuffer(cmd,
+                            current_buffer_idx);
+                        dynamic_spm_offset += dynamic_spm_size;
+                    }
                 }
             }
-
             int mid = m_materials[m_cmds[i].m_mb];
             if (cur_mid != mid)
             {
@@ -1439,19 +1566,20 @@ void GEVulkanDrawCall::render(GEVulkanDriver* vk, GEVulkanCameraSceneNode* cam,
                     &m_texture_descriptor->getDescriptorSet()[cur_mid], 0,
                     NULL);
             }
-            if (m_cmds[i].m_shader != cur_pipeline)
+            if (use_base_vertex && rebind_base_vertex)
             {
-                cur_pipeline = m_cmds[i].m_shader;
-                bindPipeline(cmd, cur_pipeline);
+                bindBaseVertex(vk, cmd);
+                rebind_base_vertex = false;
+                dynamic_offsets[1] = m_dynamic_spm_padded_size;
+                vkCmdBindDescriptorSets(cmd,
+                    VK_PIPELINE_BIND_POINT_GRAPHICS, m_pipeline_layout, 1, 1,
+                    &m_data_descriptor_sets[current_buffer_idx],
+                    dynamic_offsets.size(), dynamic_offsets.data());
             }
             if (!use_base_vertex)
             {
-                std::array<uint32_t, 3> dynamic_offsets =
-                {{
-                    0u,
-                    m_cmds[i].m_dynamic_offset,
-                    0u
-                }};
+                dynamic_offsets[1] = m_dynamic_spm_padded_size +
+                    m_cmds[i].m_dynamic_offset;
                 vkCmdBindDescriptorSets(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS,
                     m_pipeline_layout, 1, 1,
                     &m_data_descriptor_sets[current_buffer_idx],
@@ -1521,7 +1649,6 @@ void GEVulkanDrawCall::updateDataDescriptorSets(GEVulkanDriver* vk)
         GEVulkanFeatures::supportsBaseVertexRendering();
     const bool bind_mesh_textures =
         GEVulkanFeatures::supportsBindMeshTexturesAtOnce();
-    const bool use_dynamic = !use_base_vertex || bind_mesh_textures;
     for (unsigned i = 0; i < m_data_descriptor_sets.size(); i++)
     {
         VkDescriptorBufferInfo ubo_info;
@@ -1537,9 +1664,7 @@ void GEVulkanDrawCall::updateDataDescriptorSets(GEVulkanDriver* vk)
         data_set[0].dstSet = m_data_descriptor_sets[i];
         data_set[0].dstBinding = 0;
         data_set[0].dstArrayElement = 0;
-        data_set[0].descriptorType = use_dynamic ?
-            VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER_DYNAMIC :
-            VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+        data_set[0].descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER_DYNAMIC;
         data_set[0].descriptorCount = 1;
         data_set[0].pBufferInfo = &ubo_info;
 
@@ -1552,9 +1677,7 @@ void GEVulkanDrawCall::updateDataDescriptorSets(GEVulkanDriver* vk)
         data_set[1].dstSet = m_data_descriptor_sets[i];
         data_set[1].dstBinding = 1;
         data_set[1].dstArrayElement = 0;
-        data_set[1].descriptorType = use_dynamic ?
-            VK_DESCRIPTOR_TYPE_STORAGE_BUFFER_DYNAMIC :
-            VK_DESCRIPTOR_TYPE_STORAGE_BUFFER;
+        data_set[1].descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER_DYNAMIC;
         data_set[1].descriptorCount = 1;
         data_set[1].pBufferInfo = &sbo_info_objects;
 
@@ -1568,9 +1691,7 @@ void GEVulkanDrawCall::updateDataDescriptorSets(GEVulkanDriver* vk)
         data_set[2].dstSet = m_data_descriptor_sets[i];
         data_set[2].dstBinding = 2;
         data_set[2].dstArrayElement = 0;
-        data_set[2].descriptorType = use_dynamic ?
-            VK_DESCRIPTOR_TYPE_STORAGE_BUFFER_DYNAMIC :
-            VK_DESCRIPTOR_TYPE_STORAGE_BUFFER; ;
+        data_set[2].descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER_DYNAMIC;
         data_set[2].descriptorCount = 1;
         data_set[2].pBufferInfo = &sbo_info_skinning;
 

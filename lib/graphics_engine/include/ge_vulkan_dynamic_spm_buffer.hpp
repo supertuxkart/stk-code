@@ -30,6 +30,10 @@ public:
     virtual void createVertexIndexBuffer()                                   {}
     // ------------------------------------------------------------------------
     virtual void destroyVertexIndexBuffer()                                  {}
+    // ------------------------------------------------------------------------
+    void updateVertexIndexBuffer(int buffer_index);
+    // ------------------------------------------------------------------------
+    void drawDynamicVertexIndexBuffer(VkCommandBuffer cmd, int buffer_index);
 };
 
 } // end namespace GE

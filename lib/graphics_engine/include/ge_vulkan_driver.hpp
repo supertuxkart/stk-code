@@ -15,6 +15,7 @@
 #include <array>
 #include <memory>
 #include <mutex>
+#include <set>
 #include <string>
 #include <vector>
 
@@ -26,6 +27,7 @@ namespace GE
     class GESPM;
     class GEVulkanDepthTexture;
     class GEVulkanDrawCall;
+    class GEVulkanDynamicSPMBuffer;
     class GEVulkanFBOTexture;
     class GEVulkanMeshCache;
     class GEVulkanTextureDescriptor;
@@ -366,6 +368,10 @@ namespace GE
         std::unique_ptr<GEVulkanDrawCall> getDrawCallFromCache();
         GESPM* getBillboardQuad() const             { return m_billboard_quad; }
         int getCurrentBufferIdx() const         { return m_current_buffer_idx; }
+        void addDynamicSPMBuffer(GEVulkanDynamicSPMBuffer* buffer)
+                                       { m_dynamic_spm_buffers.insert(buffer); }
+        void removeDynamicSPMBuffer(GEVulkanDynamicSPMBuffer* buffer)
+                                        { m_dynamic_spm_buffers.erase(buffer); }
     private:
         struct SwapChainSupportDetails
         {
@@ -511,6 +517,7 @@ namespace GE
         std::vector<std::unique_ptr<GEVulkanDrawCall> > m_draw_calls_cache;
         GESPM* m_billboard_quad;
         int m_current_buffer_idx;
+        std::set<GEVulkanDynamicSPMBuffer*> m_dynamic_spm_buffers;
 
         void createInstance(SDL_Window* window);
         void findPhysicalDevice();

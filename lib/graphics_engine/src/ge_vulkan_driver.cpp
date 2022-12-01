@@ -11,6 +11,7 @@
 #include "ge_vulkan_command_loader.hpp"
 #include "ge_vulkan_depth_texture.hpp"
 #include "ge_vulkan_draw_call.hpp"
+#include "ge_vulkan_dynamic_spm_buffer.hpp"
 #include "ge_vulkan_fbo_texture.hpp"
 #include "ge_vulkan_features.hpp"
 #include "ge_vulkan_mesh_cache.hpp"
@@ -1679,6 +1680,9 @@ bool GEVulkanDriver::beginScene(bool backBuffer, bool zBuffer, SColor color,
         !video::CNullDriver::beginScene(backBuffer, zBuffer, color, videoData,
         sourceRect))
         return false;
+
+    for (GEVulkanDynamicSPMBuffer* buffer : m_dynamic_spm_buffers)
+        buffer->updateVertexIndexBuffer(m_current_buffer_idx);
 
     m_clear_color = color;
     PrimitivesDrawn = m_rtt_polycount;

@@ -36,6 +36,7 @@ class GEVulkanAnimatedMeshSceneNode;
 class GEVulkanCameraSceneNode;
 class GEVulkanDriver;
 class GEVulkanDynamicBuffer;
+class GEVulkanDynamicSPMBuffer;
 class GEVulkanTextureDescriptor;
 
 struct ObjectData
@@ -114,6 +115,10 @@ private:
 
     std::unordered_map<GESPMBuffer*, irr::scene::IMesh*> m_mb_map;
 
+    std::unordered_map<std::string, std::vector<
+        std::pair<GEVulkanDynamicSPMBuffer*, irr::scene::ISceneNode*> > >
+        m_dynamic_spm_buffers;
+
     GECullingTool* m_culling_tool;
 
     std::vector<DrawCallData> m_cmds;
@@ -131,6 +136,8 @@ private:
     size_t m_skinning_data_padded_size;
 
     size_t m_materials_padded_size;
+
+    size_t m_dynamic_spm_padded_size;
 
     bool m_update_data_descriptor_sets;
 
@@ -188,6 +195,8 @@ private:
     size_t getInitialSBOSize() const;
     // ------------------------------------------------------------------------
     void updateDataDescriptorSets(GEVulkanDriver* vk);
+    // ------------------------------------------------------------------------
+    void bindBaseVertex(GEVulkanDriver* vk, VkCommandBuffer cmd);
 public:
     // ------------------------------------------------------------------------
     GEVulkanDrawCall();
@@ -226,6 +235,7 @@ public:
         m_materials.clear();
         m_skinning_nodes.clear();
         m_materials_data.clear();
+        m_dynamic_spm_buffers.clear();
     }
 };   // GEVulkanDrawCall
 
