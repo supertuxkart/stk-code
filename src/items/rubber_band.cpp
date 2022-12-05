@@ -203,6 +203,7 @@ void RubberBand::updateGraphics(float dt)
             buffer->getIndices()[5] = 3;
         }
         buffer->recalculateBoundingBox();
+        buffer->setDirtyOffset(0, irr::scene::EBT_VERTEX_AND_INDEX);
         mesh->setBoundingBox(buffer->getBoundingBox());
     }
     else if (m_dy_dc)

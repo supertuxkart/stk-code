@@ -5,6 +5,7 @@
 
 namespace GE
 {
+class GEVulkanDriver;
 class GEVulkanDynamicBuffer;
 
 class GEVulkanDynamicSPMBuffer : public GESPMBuffer
@@ -13,6 +14,12 @@ private:
     GEVulkanDynamicBuffer* m_vertex_buffer;
 
     GEVulkanDynamicBuffer* m_index_buffer;
+
+    GEVulkanDriver* m_vk;
+
+    uint32_t* m_vertex_update_offsets;
+
+    uint32_t* m_index_update_offsets;
 public:
     // ------------------------------------------------------------------------
     GEVulkanDynamicSPMBuffer();
@@ -34,6 +41,9 @@ public:
     void updateVertexIndexBuffer(int buffer_index);
     // ------------------------------------------------------------------------
     void drawDynamicVertexIndexBuffer(VkCommandBuffer cmd, int buffer_index);
+    // ------------------------------------------------------------------------
+    void setDirtyOffset(irr::u32 offset,
+          irr::scene::E_BUFFER_TYPE buffer = irr::scene::EBT_VERTEX_AND_INDEX);
 };
 
 } // end namespace GE

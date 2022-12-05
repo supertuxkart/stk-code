@@ -188,6 +188,7 @@ void Shadow::update(bool enabled)
                 .toIrrVector());
         }
         buffer->recalculateBoundingBox();
+        buffer->setDirtyOffset(0, irr::scene::EBT_VERTEX);
         mesh->setBoundingBox(buffer->getBoundingBox());
     }
 }   // update

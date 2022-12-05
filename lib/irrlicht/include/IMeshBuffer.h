@@ -146,6 +146,10 @@ namespace scene
 		//! flags the meshbuffer as changed, reloads hardware buffers
 		virtual void setDirty(E_BUFFER_TYPE buffer=EBT_VERTEX_AND_INDEX) = 0;
 
+		//! flags the meshbuffer as changed with offset, reloads hardware buffers
+		virtual void setDirtyOffset(u32 offset,
+									E_BUFFER_TYPE buffer=EBT_VERTEX_AND_INDEX) {}
+
 		//! Get the currently used ID for identification of changes.
 		/** This shouldn't be used for anything outside the VideoDriver. */
 		virtual u32 getChangedID_Vertex() const = 0;

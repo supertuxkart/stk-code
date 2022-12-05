@@ -372,6 +372,11 @@ void SkidMarks::SkidMarkQuads::addLegacy(const Vec3& left,
         v[1].m_all_uvs[0] = half_float_1;
         v[1].m_all_uvs[1] = half_distance;
         buffer->append(v.data(), v.size(), NULL, 0);
+        int vertex_update_offset = buffer->getVertexCount();
+        vertex_update_offset -= 4;
+        if (vertex_update_offset < 0)
+            vertex_update_offset = 0;
+        buffer->setDirtyOffset(vertex_update_offset, irr::scene::EBT_VERTEX);
     }
     else
     {
@@ -405,6 +410,8 @@ void SkidMarks::SkidMarkQuads::addLegacy(const Vec3& left,
             m_node->setVisible(true);
         std::array<uint16_t, 6> indices = {{ }};
         buffer->append(NULL, 0, indices.data(), indices.size());
+        buffer->setDirtyOffset(buffer->getIndexCount() - 6,
+            irr::scene::EBT_INDEX);
         unsigned idx = buffer->getIndexCount() - indices.size();
         buffer->getIndices()[idx + 0] = n - 2;
         buffer->getIndices()[idx + 1] = n - 1;
