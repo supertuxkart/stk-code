@@ -81,7 +81,7 @@ private:
         /** Tests if two collision pairs involve the same objects. This test
          *  is simplified (i.e. no test if p.b==a and p.a==b) since the
          *  elements are sorted. */
-        bool operator==(const CollisionPair &p)
+        bool operator==(const CollisionPair &p) const
         {
             return (p.m_up[0]==m_up[0] && p.m_up[1]==m_up[1]);
         }   // operator==
