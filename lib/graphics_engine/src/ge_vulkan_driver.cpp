@@ -534,7 +534,7 @@ GEVulkanDriver::GEVulkanDriver(const SIrrlichtCreationParameters& params,
     size_t cfg_size = sizeof(MVKConfiguration);
     vkGetMoltenVKConfigurationMVK(VK_NULL_HANDLE, &cfg, &cfg_size);
     // Enable to allow binding all textures at once
-    cfg.useMetalArgumentBuffers = VK_TRUE;
+    cfg.useMetalArgumentBuffers = MVK_CONFIG_USE_METAL_ARGUMENT_BUFFERS_ALWAYS;
     vkSetMoltenVKConfigurationMVK(VK_NULL_HANDLE, &cfg, &cfg_size);
 #endif
 

@@ -32,6 +32,7 @@ extern "C" {
 #import <Metal/Metal.h>
 #else
 typedef unsigned long MTLLanguageVersion;
+typedef unsigned long MTLArgumentBuffersTier;
 #endif
 
 
@@ -48,13 +49,13 @@ typedef unsigned long MTLLanguageVersion;
  *   - 401215    (version 4.12.15)
  */
 #define MVK_VERSION_MAJOR   1
-#define MVK_VERSION_MINOR   1
-#define MVK_VERSION_PATCH   10
+#define MVK_VERSION_MINOR   2
+#define MVK_VERSION_PATCH   1
 
 #define MVK_MAKE_VERSION(major, minor, patch)    (((major) * 10000) + ((minor) * 100) + (patch))
 #define MVK_VERSION     MVK_MAKE_VERSION(MVK_VERSION_MAJOR, MVK_VERSION_MINOR, MVK_VERSION_PATCH)
 
-#define VK_MVK_MOLTENVK_SPEC_VERSION            34
+#define VK_MVK_MOLTENVK_SPEC_VERSION            36
 #define VK_MVK_MOLTENVK_EXTENSION_NAME          "VK_MVK_moltenvk"
 
 /** Identifies the level of logging MoltenVK should be limited to outputting. */
@@ -93,6 +94,40 @@ typedef enum MVKConfigAdvertiseExtensionBits {
 	MVK_CONFIG_ADVERTISE_EXTENSIONS_MAX_ENUM    = 0x7FFFFFFF
 } MVKConfigAdvertiseExtensionBits;
 typedef VkFlags MVKConfigAdvertiseExtensions;
+
+/** Identifies the use of Metal Argument Buffers. */
+typedef enum MVKUseMetalArgumentBuffers {
+	MVK_CONFIG_USE_METAL_ARGUMENT_BUFFERS_NEVER               = 0,	/**< Don't use Metal Argument Buffers. */
+	MVK_CONFIG_USE_METAL_ARGUMENT_BUFFERS_ALWAYS              = 1,	/**< Use Metal Argument Buffers for all pipelines. */
+	MVK_CONFIG_USE_METAL_ARGUMENT_BUFFERS_DESCRIPTOR_INDEXING = 2,	/**< Use Metal Argument Buffers only if VK_EXT_descriptor_indexing extension is enabled. */
+	MVK_CONFIG_USE_METAL_ARGUMENT_BUFFERS_MAX_ENUM            = 0x7FFFFFFF
+} MVKUseMetalArgumentBuffers;
+
+/** Identifies the Metal functionality used to support Vulkan semaphore functionality (VkSemaphore). */
+typedef enum MVKVkSemaphoreSupportStyle {
+	MVK_CONFIG_VK_SEMAPHORE_SUPPORT_STYLE_SINGLE_QUEUE            = 0,	/**< Limit Vulkan to a single queue, with no explicit semaphore synchronization, and use Metal's implicit guarantees that all operations submitted to a queue will give the same result as if they had been run in submission order. */
+	MVK_CONFIG_VK_SEMAPHORE_SUPPORT_STYLE_METAL_EVENTS_WHERE_SAFE = 1,	/**< Use Metal events (MTLEvent) when available on the platform, and where safe. This will revert to same as MVK_CONFIG_VK_SEMAPHORE_USE_SINGLE_QUEUE on some NVIDIA GPUs and Rosetta2, due to potential challenges with MTLEvents on those platforms, or in older environments where MTLEvents are not supported. */
+	MVK_CONFIG_VK_SEMAPHORE_SUPPORT_STYLE_METAL_EVENTS            = 2,	/**< Always use Metal events (MTLEvent) when available on the platform. This will revert to same as MVK_CONFIG_VK_SEMAPHORE_USE_SINGLE_QUEUE in older environments where MTLEvents are not supported. */
+	MVK_CONFIG_VK_SEMAPHORE_SUPPORT_STYLE_CALLBACK                = 3,	/**< Use CPU callbacks upon GPU submission completion. This is the slowest technique, but allows multiple queues, compared to MVK_CONFIG_VK_SEMAPHORE_USE_SINGLE_QUEUE. */
+	MVK_CONFIG_VK_SEMAPHORE_SUPPORT_STYLE_MAX_ENUM                = 0x7FFFFFFF
+} MVKVkSemaphoreSupportStyle;
+
+/** Identifies the style of Metal command buffer pre-filling to be used. */
+typedef enum MVKPrefillMetalCommandBuffersStyle {
+	MVK_CONFIG_PREFILL_METAL_COMMAND_BUFFERS_STYLE_NO_PREFILL                        = 0,	/**< During Vulkan command buffer filling, do not prefill a Metal command buffer for each Vulkan command buffer. A single Metal command buffer is created and encoded for all the Vulkan command buffers included when vkQueueSubmit() is called. MoltenVK automatically creates and drains a single Metal object autorelease pool when vkQueueSubmit() is called. This is the fastest option, but potentially has the largest memory footprint. */
+	MVK_CONFIG_PREFILL_METAL_COMMAND_BUFFERS_STYLE_DEFERRED_ENCODING                 = 1,	/**< During Vulkan command buffer filling, encode to the Metal command buffer when vkEndCommandBuffer() is called. MoltenVK automatically creates and drains a single Metal object autorelease pool when vkEndCommandBuffer() is called. This option has the fastest performance, and the largest memory footprint, of the prefilling options using autorelease pools. */
+	MVK_CONFIG_PREFILL_METAL_COMMAND_BUFFERS_STYLE_IMMEDIATE_ENCODING                = 2,	/**< During Vulkan command buffer filling, immediately encode to the Metal command buffer, as each command is submitted to the Vulkan command buffer, and do not retain any command content in the Vulkan command buffer. MoltenVK automatically creates and drains a Metal object autorelease pool for each and every command added to the Vulkan command buffer. This option has the smallest memory footprint, and the slowest performance, of the prefilling options using autorelease pools. */
+	MVK_CONFIG_PREFILL_METAL_COMMAND_BUFFERS_STYLE_IMMEDIATE_ENCODING_NO_AUTORELEASE = 3,	/**< During Vulkan command buffer filling, immediately encode to the Metal command buffer, as each command is submitted to the Vulkan command buffer, do not retain any command content in the Vulkan command buffer, and assume the app will ensure that each thread that fills commands into a Vulkan command buffer has a Metal autorelease pool. MoltenVK will not create and drain any autorelease pools during encoding. This is the fastest prefilling option, and generally has a small memory footprint, depending on when the app-provided autorelease pool drains. */
+	MVK_CONFIG_PREFILL_METAL_COMMAND_BUFFERS_STYLE_MAX_ENUM                          = 0x7FFFFFFF
+} MVKPrefillMetalCommandBuffersStyle;
+
+/** Identifies when Metal shaders will be compiled with the fast math option. */
+typedef enum MVKConfigFastMath {
+	MVK_CONFIG_FAST_MATH_NEVER     = 0,  /**< Metal shaders will never be compiled with the fast math option. */
+	MVK_CONFIG_FAST_MATH_ALWAYS    = 1,  /**< Metal shaders will always be compiled with the fast math option. */
+	MVK_CONFIG_FAST_MATH_ON_DEMAND = 2,  /**< Metal shaders will be compiled with the fast math option, unless the shader includes execution modes that require it to be compiled without fast math. */
+	MVK_CONFIG_FAST_MATH_MAX_ENUM  = 0x7FFFFFFF
+} MVKConfigFastMath;
 
 /**
  * MoltenVK configuration settings.
@@ -187,24 +222,30 @@ typedef struct {
 	VkBool32 synchronousQueueSubmits;
 
 	/**
-	 * If enabled, where possible, a Metal command buffer will be created and filled when each
-	 * Vulkan command buffer is filled. For applications that parallelize the filling of Vulkan
+	 * If set to MVK_CONFIG_PREFILL_METAL_COMMAND_BUFFERS_STYLE_NO_PREFILL, a single Metal
+	 * command buffer will be created and filled when the Vulkan command buffers are submitted
+	 * to the Vulkan queue. This allows a single Metal command buffer to be used for all of the
+	 * Vulkan command buffers in a queue submission. The Metal command buffer is filled on the
+	 * thread that processes the command queue submission.
+	 *
+	 * If set to any value other than MVK_CONFIG_PREFILL_METAL_COMMAND_BUFFERS_STYLE_NO_PREFILL,
+	 * where possible, a Metal command buffer will be created and filled when each Vulkan
+	 * command buffer is filled. For applications that parallelize the filling of Vulkan
 	 * commmand buffers across multiple threads, this allows the Metal command buffers to also
 	 * be filled on the same parallel thread. Because each command buffer is filled separately,
-	 * this requires that each Vulkan command buffer requires a dedicated Metal command buffer.
+	 * this requires that each Vulkan command buffer have a dedicated Metal command buffer.
 	 *
-	 * If disabled, a single Metal command buffer will be created and filled when the Vulkan
-	 * command buffers are submitted to the Vulkan queue. This allows a single Metal command
-	 * buffer to be used for all of the Vulkan command buffers in a queue submission. The
-	 * Metal command buffer is filled on the thread that processes the command queue submission.
+	 * See the definition of the MVKPrefillMetalCommandBuffersStyle enumeration above for
+	 * descriptions of the various values that can be used for this setting. The differences
+	 * are primarily distinguished by how memory recovery is handled for autoreleased Metal
+	 * objects that are created under the covers as the commands added to the Vulkan command
+	 * buffer are encoded into the corresponding Metal command buffer. You can decide whether
+	 * your app will recover all autoreleased Metal objects, or how agressively MoltenVK should
+	 * recover autoreleased Metal objects, based on your approach to command buffer filling.
 	 *
 	 * Depending on the nature of your application, you may find performance is improved by filling
 	 * the Metal command buffers on parallel threads, or you may find that performance is improved by
 	 * consolidating all Vulkan command buffers onto a single Metal command buffer during queue submission.
-	 *
-	 * Prefilling of a Metal command buffer will not occur during the filling of secondary command
-	 * buffers (VK_COMMAND_BUFFER_LEVEL_SECONDARY), or for primary command buffers that are intended
-	 * to be submitted to multiple queues concurrently (VK_COMMAND_BUFFER_USAGE_SIMULTANEOUS_USE_BIT).
 	 *
 	 * When enabling this feature, be aware that one Metal command buffer is required for each Vulkan
 	 * command buffer. Depending on the number of command buffers that you use, you may also need to
@@ -216,22 +257,27 @@ typedef struct {
 	 * the concept of being reset after being filled. Depending on when and how often you do this,
 	 * it may cause unexpected visual artifacts and unnecessary GPU load.
 	 *
+	 * Prefilling of a Metal command buffer will not occur during the filling of secondary command
+	 * buffers (VK_COMMAND_BUFFER_LEVEL_SECONDARY), or for primary command buffers that are intended
+	 * to be submitted to multiple queues concurrently (VK_COMMAND_BUFFER_USAGE_SIMULTANEOUS_USE_BIT).
+	 *
 	 * This feature is incompatible with updating descriptors after binding. If any of the
-	 * *UpdateAfterBind feature flags of VkPhysicalDeviceDescriptorIndexingFeaturesEXT or
-	 * VkPhysicalDeviceInlineUniformBlockFeaturesEXT have been enabled, the value of this
+	 * *UpdateAfterBind feature flags of VkPhysicalDeviceDescriptorIndexingFeatures or
+	 * VkPhysicalDeviceInlineUniformBlockFeatures have been enabled, the value of this
 	 * setting will be ignored and treated as if it is false.
 	 *
 	 * The value of this parameter may be changed at any time during application runtime,
 	 * and the changed value will immediately effect subsequent MoltenVK behaviour.
 	 * Specifically, this parameter can be enabled when filling some command buffers,
-	 * and disabled when filling others.
+	 * and disabled when later filling others.
 	 *
 	 * The initial value or this parameter is set by the
 	 * MVK_CONFIG_PREFILL_METAL_COMMAND_BUFFERS
 	 * runtime environment variable or MoltenVK compile-time build setting.
-	 * If neither is set, the value of this parameter defaults to false.
+	 * If neither is set, the value of this parameter defaults to
+	 * MVK_CONFIG_PREFILL_METAL_COMMAND_BUFFERS_STYLE_NO_PREFILL.
 	 */
-	VkBool32 prefillMetalCommandBuffers;
+	MVKPrefillMetalCommandBuffersStyle prefillMetalCommandBuffers;
 
 	/**
 	 * The maximum number of Metal command buffers that can be concurrently active per Vulkan queue.
@@ -501,18 +547,30 @@ typedef struct {
 	uint32_t defaultGPUCaptureScopeQueueIndex;
 
 	/**
-	 * Corresponds to the fastMathEnabled property of MTLCompileOptions.
-	 * Setting it may cause the Metal Compiler to optimize floating point operations
-	 * in ways that may violate the IEEE 754 standard.
+	 * Identifies when Metal shaders will be compiled with the Metal fastMathEnabled property
+	 * enabled. For shaders compiled with the Metal fastMathEnabled property enabled, shader
+	 * floating point math is significantly faster, but it may cause the Metal Compiler to
+	 * optimize floating point operations in ways that may violate the IEEE 754 standard.
 	 *
-	 * Must be changed before creating a VkDevice, for the change to take effect.
+	 * Enabling Metal fast math can dramatically improve shader performance, and has little
+	 * practical effect on the numerical accuracy of most shaders. As such, disabling fast
+	 * math should be done carefully and deliberately. For most applications, always enabling
+	 * fast math, by setting the value of this property to MVK_CONFIG_FAST_MATH_ALWAYS,
+	 * is the preferred choice.
+	 *
+	 * Apps that have specific accuracy and handling needs for particular shaders, may elect to
+	 * set the value of this property to MVK_CONFIG_FAST_MATH_ON_DEMAND, so that fast math will
+	 * be disabled when compiling shaders that request capabilities such as SignedZeroInfNanPreserve.
+	 *
+	 * The value of this parameter may be changed at any time during application runtime,
+	 * and the changed value will be applied to future Metal shader compilations.
 	 *
 	 * The initial value or this parameter is set by the
 	 * MVK_CONFIG_FAST_MATH_ENABLED
 	 * runtime environment variable or MoltenVK compile-time build setting.
-	 * If neither is set, the value of this parameter defaults to true.
+	 * If neither is set, the value of this parameter defaults to MVK_CONFIG_FAST_MATH_ALWAYS.
 	 */
-	VkBool32 fastMathEnabled;
+	MVKConfigFastMath fastMathEnabled;
 
 	/**
 	 * Controls the level of logging performned by MoltenVK.
@@ -555,52 +613,39 @@ typedef struct {
 	 */
 	VkBool32 forceLowPowerGPU;
 
-	/**
-	 * Use MTLFence, if it is available on the device, for VkSemaphore synchronization behaviour.
-	 *
-	 * This parameter interacts with semaphoreUseMTLEvent. If both are enabled, on GPUs other than
-	 * NVIDIA, semaphoreUseMTLEvent takes priority and MTLEvent will be used if it is available,
-	 * otherwise MTLFence will be used if it is available. On NVIDIA GPUs, MTLEvent is disabled
-	 * for VkSemaphores, so CPU-based synchronization will be used unless semaphoreUseMTLFence
-	 * is enabled and MTLFence is available.
-	 *
-	 * In the special case of VK_SEMAPHORE_TYPE_TIMELINE semaphores, MoltenVK will always
-	 * use MTLSharedEvent if it is available on the platform, regardless of the values of
-	 * semaphoreUseMTLEvent or semaphoreUseMTLFence.
-	 *
-	 * The value of this parameter must be changed before creating a VkDevice,
-	 * for the change to take effect.
-	 *
-	 * The initial value or this parameter is set by the
-	 * MVK_ALLOW_METAL_FENCES
-	 * runtime environment variable or MoltenVK compile-time build setting.
-	 * If neither is set, this setting is disabled by default, and VkSemaphore will not use MTLFence.
-	 */
+	/** Deprecated. Vulkan sempphores using MTLFence are no longer supported. Use semaphoreSupportStyle instead. */
 	VkBool32 semaphoreUseMTLFence;
 
 	/**
-	 * Use MTLEvent, if it is available on the device, for VkSemaphore synchronization behaviour.
+	 * Determines the style used to implement Vulkan semaphore (VkSemaphore) functionality in Metal.
+	 * See the documentation of the MVKVkSemaphoreSupportStyle for the options.
 	 *
-	 * This parameter interacts with semaphoreUseMTLFence. If both are enabled, on GPUs other than
-	 * NVIDIA, semaphoreUseMTLEvent takes priority and MTLEvent will be used if it is available,
-	 * otherwise MTLFence will be used if it is available. On NVIDIA GPUs, MTLEvent is disabled
-	 * for VkSemaphores, so CPU-based synchronization will be used unless semaphoreUseMTLFence
-	 * is enabled and MTLFence is available.
+	 * In the special case of VK_SEMAPHORE_TYPE_TIMELINE semaphores, MoltenVK will always use
+	 * MTLSharedEvent if it is available on the platform, regardless of the value of this parameter.
 	 *
-	 * In the special case of VK_SEMAPHORE_TYPE_TIMELINE semaphores, MoltenVK will always
-	 * use MTLSharedEvent if it is available on the platform, regardless of the values of
-	 * semaphoreUseMTLEvent or semaphoreUseMTLFence.
-	 *
-	 * The value of this parameter must be changed before creating a VkDevice,
+	 * The value of this parameter must be changed before creating a VkInstance,
 	 * for the change to take effect.
 	 *
 	 * The initial value or this parameter is set by the
-	 * MVK_ALLOW_METAL_EVENTS
+	 * MVK_CONFIG_VK_SEMAPHORE_SUPPORT_STYLE
 	 * runtime environment variable or MoltenVK compile-time build setting.
-	 * If neither is set, this setting is enabled by default, and VkSemaphore will use MTLEvent,
-	 * if it is available, except on NVIDIA GPUs.
+	 * If neither is set, this setting is set to
+	 * MVK_CONFIG_VK_SEMAPHORE_SUPPORT_STYLE_METAL_EVENTS_WHERE_SAFE by default,
+	 * and MoltenVK will use MTLEvent, except on NVIDIA GPU and Rosetta2 environments,
+	 * or where MTLEvents are not supported, where it will use a single queue with
+	 * implicit synchronization (as if this parameter was set to
+	 * MVK_CONFIG_VK_SEMAPHORE_SUPPORT_STYLE_SINGLE_QUEUE).
+	 *
+	 * This parameter interacts with the deprecated legacy parameters semaphoreUseMTLEvent
+	 * and semaphoreUseMTLFence. If semaphoreUseMTLEvent is enabled, this parameter will be
+	 * set to MVK_CONFIG_VK_SEMAPHORE_SUPPORT_STYLE_METAL_EVENTS_WHERE_SAFE.
+	 * If semaphoreUseMTLEvent is disabled, this parameter will be set to
+	 * MVK_CONFIG_VK_SEMAPHORE_SUPPORT_STYLE_SINGLE_QUEUE if semaphoreUseMTLFence is enabled,
+	 * or MVK_CONFIG_VK_SEMAPHORE_SUPPORT_STYLE_CALLBACK if semaphoreUseMTLFence is disabled.
+	 * Structurally, this parameter replaces, and is aliased by, semaphoreUseMTLEvent.
 	 */
-	VkBool32 semaphoreUseMTLEvent;
+	MVKVkSemaphoreSupportStyle semaphoreSupportStyle;
+#define semaphoreUseMTLEvent semaphoreSupportStyle
 
 	/**
 	 * Controls whether Metal should run an automatic GPU capture without the user having to
@@ -743,6 +788,7 @@ typedef struct {
 	 * When reading this value, it will be one of the VK_API_VERSION_1_* values, including the latest
 	 * VK_HEADER_VERSION component. When setting this value, it should be set to one of:
 	 *
+	 *   VK_API_VERSION_1_2  (equivalent decimal number 4202496)
 	 *   VK_API_VERSION_1_1  (equivalent decimal number 4198400)
 	 *   VK_API_VERSION_1_0  (equivalent decimal number 4194304)
 	 *
@@ -807,25 +853,26 @@ typedef struct {
 	 * Controls whether MoltenVK should use Metal argument buffers for resources defined in
 	 * descriptor sets, if Metal argument buffers are supported on the platform. Using Metal
 	 * argument buffers dramatically increases the number of buffers, textures and samplers
-	 * that can be bound to a pipeline shader, and in most cases improves performance. If this
-	 * setting is enabled, MoltenVK will use Metal argument buffers to bind resources to the
-	 * shaders. If this setting is disabled, MoltenVK will bind resources to shaders discretely.
+	 * that can be bound to a pipeline shader, and in most cases improves performance.
+	 * This setting is an enumeration that specifies the conditions under which MoltenVK
+	 * will use Metal argument buffers.
 	 *
 	 * NOTE: Currently, Metal argument buffer support is in beta stage, and is only supported
 	 * on macOS 11.0 (Big Sur) or later, or on older versions of macOS using an Intel GPU.
 	 * Metal argument buffers support is not available on iOS. Development to support iOS
 	 * and a wider combination of GPU's on older macOS versions is under way.
 	 *
-	 * The value of this parameter must be changed before creating a VkInstance,
+	 * The value of this parameter must be changed before creating a VkDevice,
 	 * for the change to take effect.
 	 *
 	 * The initial value or this parameter is set by the
 	 * MVK_CONFIG_USE_METAL_ARGUMENT_BUFFERS
 	 * runtime environment variable or MoltenVK compile-time build setting.
-	 * If neither is set, this setting is enabled by default, and MoltenVK will not
-	 * use Metal argument buffers, and will bind resources to shaders discretely.
+	 * If neither is set, this setting is set to
+	 * MVK_CONFIG_USE_METAL_ARGUMENT_BUFFERS_NEVER by default,
+	 * and MoltenVK will not use Metal argument buffers.
 	 */
-	VkBool32 useMetalArgumentBuffers;
+	MVKUseMetalArgumentBuffers useMetalArgumentBuffers;
 
 } MVKConfiguration;
 
@@ -929,6 +976,8 @@ typedef struct {
 	MVKFloatRounding clearColorFloatRounding;		/**< Identifies the type of rounding Metal uses for MTLClearColor float to integer conversions. */
 	MVKCounterSamplingFlags counterSamplingPoints;	/**< Identifies the points where pipeline GPU counter sampling may occur. */
 	VkBool32 programmableSamplePositions;			/**< If true, programmable MSAA sample positions are supported. */
+	VkBool32 shaderBarycentricCoordinates;			/**< If true, fragment shader barycentric coordinates are supported. */
+	MTLArgumentBuffersTier argumentBuffersTier;		/**< The argument buffer tier available on this device, as a Metal enumeration. */
 } MVKPhysicalDeviceMetalFeatures;
 
 /** MoltenVK performance of a particular type of activity. */

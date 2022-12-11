@@ -32,10 +32,9 @@ jobs:
       - name: Download cctools
         run: |
           cd /opt
-          wget https://github.com/supertuxkart/dependencies/releases/download/preview/cctools.tar.xz
-          tar xf cctools.tar.xz
-          # For libtinfo.so.5
-          sudo apt install -y libtinfo5
+          wget https://github.com/supertuxkart/dependencies/releases/download/cctools/cctools-14.1.tar.xz
+          tar xf cctools-14.1.tar.xz
+          rm cctools-14.1.tar.xz
       - name: Restore timestamps
         run: |
           wget https://github.com/MestreLion/git-tools/archive/refs/heads/main.zip
