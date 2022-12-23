@@ -308,27 +308,31 @@ void KartSelectionScreen::beforeAddingWidget()
         kart_properties_manager->getAllGroups();
     const int group_amount = (int)groups.size();
 
-    // add all group first
+    // Add "All" group first
     if (group_amount > 1)
     {
-        //I18N: name of the tab that will show tracks from all groups
+        //I18N: name of the tab that will show karts from all groups
         tabs->addTextChild( _("All") , ALL_KART_GROUPS_ID);
     }
 
     // Make group names being picked up by gettext
 #define FOR_GETTEXT_ONLY(x)
     //I18N: kart group name
-    FOR_GETTEXT_ONLY( _("standard") )
+    FOR_GETTEXT_ONLY( _("All") )
+    //I18N: kart group name
+    FOR_GETTEXT_ONLY( _("Standard") )
     //I18N: kart group name
     FOR_GETTEXT_ONLY( _("Add-Ons") )
 
 
-    // add others after
+    // Add other groups after
     for (int n=0; n<group_amount; n++)
     {
-        // try to translate group names
-        tabs->addTextChild( _(groups[n].c_str()) , groups[n]);
-    }   // for n<group_amount
+        if (groups[n] == "standard") // Fix capitalization (#4622)
+            tabs->addTextChild( _("Standard") , groups[n]);
+        else // Try to translate group names
+            tabs->addTextChild( _(groups[n].c_str()) , groups[n]);
+    } // for n<group_amount
 
 
     DynamicRibbonWidget* w = getWidget<DynamicRibbonWidget>("karts");

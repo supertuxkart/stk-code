@@ -154,15 +154,20 @@ void TracksAndGPScreen::beforeAddingWidget()
     // Make group names being picked up by gettext
 #define FOR_GETTEXT_ONLY(x)
     //I18N: track group name
-    FOR_GETTEXT_ONLY( _("all") )
+    FOR_GETTEXT_ONLY( _("All") )
     //I18N: track group name
-    FOR_GETTEXT_ONLY( _("standard") )
+    FOR_GETTEXT_ONLY( _("Standard") )
     //I18N: track group name
     FOR_GETTEXT_ONLY( _("Add-Ons") )
 
-    // add behind the other categories
+    // Add other groups after
     for (int n=0; n<group_amount; n++)
-        tabs->addTextChild( _(groups[n].c_str()), groups[n] );
+    {
+        if (groups[n] == "standard") // Fix capitalization (#4622)
+            tabs->addTextChild( _("Standard") , groups[n]);
+        else // Try to translate group names
+            tabs->addTextChild( _(groups[n].c_str()) , groups[n]);
+    } // for n<group_amount
 
     DynamicRibbonWidget* tracks_widget = getWidget<DynamicRibbonWidget>("tracks");
     tracks_widget->setItemCountHint( (int)track_manager->getNumberOfTracks()+1 );
