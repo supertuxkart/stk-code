@@ -61,7 +61,7 @@ private:
      * than once. */
     std::vector<int>         m_selected_karts;
 
-    /** Contains a flag for each kart indicating wether it is available on
+    /** Contains a flag for each kart indicating whether it is available on
      *  all clients or not. */
     std::vector<bool>        m_kart_available;
 

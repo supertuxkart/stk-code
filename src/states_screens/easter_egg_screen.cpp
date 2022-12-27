@@ -140,16 +140,20 @@ void EasterEggScreen::beforeAddingWidget()
     // Make group names being picked up by gettext
 #define FOR_GETTEXT_ONLY(x)
     //I18N: track group name
-    FOR_GETTEXT_ONLY( _("standard") )
+    FOR_GETTEXT_ONLY( _("All") )
+    //I18N: track group name
+    FOR_GETTEXT_ONLY( _("Standard") )
     //I18N: track group name
     FOR_GETTEXT_ONLY( _("Add-Ons") )
 
-    // add others after
+    // Add other groups after
     for (int n=0; n<group_amount; n++)
     {
-        // try to translate the group name
-        tabs->addTextChild( _(groups[n].c_str()), groups[n] );
-    }
+        if (groups[n] == "standard") // Fix capitalization (#4622)
+            tabs->addTextChild( _("Standard") , groups[n]);
+        else // Try to translate group names
+            tabs->addTextChild( _(groups[n].c_str()) , groups[n]);
+    } // for n<group_amount
     
     int num_of_arenas=0;
     for (unsigned int n=0; n<track_manager->getNumberOfTracks(); n++) //iterate through tracks to find how many are arenas
