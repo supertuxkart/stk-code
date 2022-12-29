@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: supertuxkart\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-12-18 09:23+0800\n"
+"POT-Creation-Date: 2022-12-29 15:13+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -1030,10 +1030,25 @@ msgstr ""
 #. I18N: track group
 #. I18N: ./data/gui/screens/easter_egg.stkgui
 #. I18N: track group
+#. I18N: track group name
+#. I18N: kart group name
+#. I18N: track group name
 #. I18N: In the UI options, Camera setting: Standard
+#. I18N: track group name
+#: src/states_screens/arenas_screen.cpp:82
+#: src/states_screens/arenas_screen.cpp:90
 #: src/states_screens/dialogs/custom_camera_settings.cpp:69
+#: src/states_screens/easter_egg_screen.cpp:145
+#: src/states_screens/easter_egg_screen.cpp:153
+#: src/states_screens/gp_info_screen.cpp:256
 #: src/states_screens/grand_prix_editor_screen.cpp:335
+#: src/states_screens/kart_selection.cpp:323
+#: src/states_screens/kart_selection.cpp:332
+#: src/states_screens/online/tracks_screen.cpp:363
+#: src/states_screens/online/tracks_screen.cpp:371
 #: src/states_screens/options/options_screen_ui.cpp:164
+#: src/states_screens/tracks_and_gp_screen.cpp:159
+#: src/states_screens/tracks_and_gp_screen.cpp:167
 msgid "Standard"
 msgstr ""
 
@@ -1041,14 +1056,14 @@ msgstr ""
 #. I18N: track group
 #. I18N: ./data/gui/screens/easter_egg.stkgui
 #. I18N: track group
-#. I18N: arena group name
 #. I18N: track group name
 #. I18N: kart group name
 #. I18N: track group name
-#: src/states_screens/arenas_screen.cpp:82
-#: src/states_screens/easter_egg_screen.cpp:145
+#: src/states_screens/arenas_screen.cpp:84
+#: src/states_screens/easter_egg_screen.cpp:147
 #: src/states_screens/grand_prix_editor_screen.cpp:337
-#: src/states_screens/kart_selection.cpp:323
+#: src/states_screens/kart_selection.cpp:325
+#: src/states_screens/online/tracks_screen.cpp:365
 #: src/states_screens/tracks_and_gp_screen.cpp:161
 msgid "Add-Ons"
 msgstr ""
@@ -1059,17 +1074,31 @@ msgstr ""
 #. I18N: track group
 #. I18N: Time filters for add-ons
 #. I18N: name of the tab that will show arenas from all groups
+#. I18N: track group name
 #. I18N: name of the tab that will show tracks from all groups
+#. I18N: track group name
+#. I18N: name of the tab that will show karts from all groups
+#. I18N: kart group name
+#. I18N: name of the tab that will show tracks from all groups
+#. I18N: track group name
+#. I18N: name of the tab that will show tracks from all groups
+#. I18N: track group name
 #: src/race/grand_prix_data.cpp:643 src/states_screens/addons_screen.cpp:48
 #: src/states_screens/addons_screen.cpp:135
 #: src/states_screens/arenas_screen.cpp:74
+#: src/states_screens/arenas_screen.cpp:80
 #: src/states_screens/easter_egg_screen.cpp:137
+#: src/states_screens/easter_egg_screen.cpp:143
 #: src/states_screens/edit_track_screen.cpp:111
 #: src/states_screens/gp_info_screen.cpp:79
+#: src/states_screens/gp_info_screen.cpp:249
 #: src/states_screens/grand_prix_editor_screen.cpp:334
 #: src/states_screens/kart_selection.cpp:315
+#: src/states_screens/kart_selection.cpp:321
 #: src/states_screens/online/tracks_screen.cpp:355
+#: src/states_screens/online/tracks_screen.cpp:361
 #: src/states_screens/tracks_and_gp_screen.cpp:151
+#: src/states_screens/tracks_and_gp_screen.cpp:157
 msgid "All"
 msgstr ""
 
@@ -1190,7 +1219,7 @@ msgstr ""
 #. I18N: ./data/gui/screens/gp_info.stkgui
 #. I18N: In the grand prix info screen
 #. I18N: In track screen
-#: src/states_screens/online/tracks_screen.cpp:495
+#: src/states_screens/online/tracks_screen.cpp:509
 #: src/states_screens/track_info_screen.cpp:255
 #: src/states_screens/track_info_screen.cpp:284
 #: src/states_screens/track_info_screen.cpp:450
@@ -2329,7 +2358,7 @@ msgstr ""
 
 #. I18N: ./data/gui/screens/track_info.stkgui
 #. I18N: In the track info screen
-#: src/states_screens/online/tracks_screen.cpp:524
+#: src/states_screens/online/tracks_screen.cpp:538
 #: src/states_screens/track_info_screen.cpp:276
 msgid "Number of laps"
 msgstr ""
@@ -2670,6 +2699,10 @@ msgstr ""
 
 #. I18N: ../stk-assets/tracks/minigolf/track.xml
 msgid "Minigolf"
+msgstr ""
+
+#. I18N: ../stk-assets/tracks/oasis/track.xml
+msgid "Oasis"
 msgstr ""
 
 #. I18N: ../stk-assets/tracks/olivermath/track.xml
@@ -4071,32 +4104,21 @@ msgid ""
 "firewall"
 msgstr ""
 
-#. I18N: arena group name
-#. I18N: track group name
-#. I18N: kart group name
-#. I18N: track group name
-#: src/states_screens/arenas_screen.cpp:80
-#: src/states_screens/easter_egg_screen.cpp:143
-#: src/states_screens/kart_selection.cpp:321
-#: src/states_screens/tracks_and_gp_screen.cpp:159
-msgid "standard"
-msgstr ""
-
-#: src/states_screens/arenas_screen.cpp:274
-#: src/states_screens/arenas_screen.cpp:326
-#: src/states_screens/easter_egg_screen.cpp:225
-#: src/states_screens/easter_egg_screen.cpp:256
-#: src/states_screens/kart_selection.cpp:953
-#: src/states_screens/kart_selection.cpp:1594
+#: src/states_screens/arenas_screen.cpp:278
+#: src/states_screens/arenas_screen.cpp:330
+#: src/states_screens/easter_egg_screen.cpp:229
+#: src/states_screens/easter_egg_screen.cpp:260
+#: src/states_screens/kart_selection.cpp:957
+#: src/states_screens/kart_selection.cpp:1598
 #: src/states_screens/race_setup_screen.cpp:101
 msgid "Locked : solve active challenges to gain access to more!"
 msgstr ""
 
-#: src/states_screens/arenas_screen.cpp:338
+#: src/states_screens/arenas_screen.cpp:342
 msgid "Random Arena"
 msgstr ""
 
-#: src/states_screens/arenas_screen.cpp:342
+#: src/states_screens/arenas_screen.cpp:346
 #, c-format
 msgid "%d arena unavailable in single player."
 msgid_plural "%d arenas unavailable in single player."
@@ -4736,7 +4758,7 @@ msgstr ""
 
 #. I18N: for empty highscores entries
 #: src/states_screens/dialogs/high_score_info_dialog.cpp:226
-#: src/states_screens/gp_info_screen.cpp:533
+#: src/states_screens/gp_info_screen.cpp:549
 #: src/states_screens/track_info_screen.cpp:539
 msgid "(Empty)"
 msgstr ""
@@ -5053,9 +5075,9 @@ msgstr ""
 msgid "Performing vote"
 msgstr ""
 
-#: src/states_screens/easter_egg_screen.cpp:270
-#: src/states_screens/online/tracks_screen.cpp:623
-#: src/states_screens/tracks_and_gp_screen.cpp:305
+#: src/states_screens/easter_egg_screen.cpp:274
+#: src/states_screens/online/tracks_screen.cpp:637
+#: src/states_screens/tracks_and_gp_screen.cpp:310
 msgid "Random Track"
 msgstr ""
 
@@ -5206,20 +5228,20 @@ msgstr ""
 msgid "Are you sure you want to remove all of your high scores?"
 msgstr ""
 
-#: src/states_screens/kart_selection.cpp:443
+#: src/states_screens/kart_selection.cpp:447
 msgid "Connect a keyboard or gamepad to play splitscreen multiplayer"
 msgstr ""
 
-#: src/states_screens/kart_selection.cpp:929
-#: src/states_screens/kart_selection.cpp:1612
+#: src/states_screens/kart_selection.cpp:933
+#: src/states_screens/kart_selection.cpp:1616
 msgid "Random Kart"
 msgstr ""
 
-#: src/states_screens/kart_selection.cpp:948
+#: src/states_screens/kart_selection.cpp:952
 msgid "Locked"
 msgstr ""
 
-#: src/states_screens/kart_selection.cpp:1049
+#: src/states_screens/kart_selection.cpp:1053
 #: src/states_screens/online/networking_lobby.cpp:678
 msgid ""
 "Everyone:\n"
@@ -5371,7 +5393,7 @@ msgstr ""
 
 #. I18N: In kart screen, show before the voting period in network ends.
 #: src/states_screens/online/network_kart_selection.cpp:218
-#: src/states_screens/online/tracks_screen.cpp:879
+#: src/states_screens/online/tracks_screen.cpp:893
 #, c-format
 msgid "Remaining time: %d"
 msgstr ""
@@ -5569,26 +5591,26 @@ msgstr ""
 
 #. I18N: In track screen
 #. I18N: In the track info screen
-#: src/states_screens/online/tracks_screen.cpp:457
-#: src/states_screens/online/tracks_screen.cpp:505
+#: src/states_screens/online/tracks_screen.cpp:471
+#: src/states_screens/online/tracks_screen.cpp:519
 #: src/states_screens/track_info_screen.cpp:303
 msgid "Random item location"
 msgstr ""
 
 #. I18N: In track screen
-#: src/states_screens/online/tracks_screen.cpp:487
+#: src/states_screens/online/tracks_screen.cpp:501
 #: src/states_screens/track_info_screen.cpp:455
 msgid "Number of goals to win"
 msgstr ""
 
 #. I18N: In the track info screen
-#: src/states_screens/online/tracks_screen.cpp:535
+#: src/states_screens/online/tracks_screen.cpp:549
 #: src/states_screens/track_info_screen.cpp:298
 msgid "Drive in reverse"
 msgstr ""
 
-#: src/states_screens/online/tracks_screen.cpp:609
-#: src/states_screens/tracks_and_gp_screen.cpp:291
+#: src/states_screens/online/tracks_screen.cpp:623
+#: src/states_screens/tracks_and_gp_screen.cpp:296
 msgid "Locked: solve active challenges to gain access to more!"
 msgstr ""
 
@@ -6195,12 +6217,7 @@ msgid ""
 "unlocked!"
 msgstr ""
 
-#. I18N: track group name
-#: src/states_screens/tracks_and_gp_screen.cpp:157
-msgid "all"
-msgstr ""
-
-#: src/states_screens/tracks_and_gp_screen.cpp:212
+#: src/states_screens/tracks_and_gp_screen.cpp:217
 msgid "Locked!"
 msgstr ""
 
