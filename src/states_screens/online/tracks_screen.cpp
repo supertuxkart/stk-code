@@ -384,12 +384,15 @@ void TracksScreen::init()
     if (m_network_tracks)
     {
         m_search_track = getWidget<TextBoxWidget>("search_track");
+        m_search_track->setVisible(true);
         m_search_track->setText(L"");
         // Add listener for incremental update when search text is changed
         m_search_track->clearListeners();
         m_search_track->addListener(this);
         updateProgressBarText();
     }
+    else
+        getWidget("search_track")->setVisible(false);
 
     // change the back button image (because it makes the game quit)
     if (m_quit_server)
