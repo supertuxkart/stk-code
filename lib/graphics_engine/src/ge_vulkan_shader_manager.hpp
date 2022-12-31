@@ -3,7 +3,7 @@
 
 #include "vulkan_wrapper.h"
 #include <string>
-#include <shaderc/shaderc.hpp>
+#include <shaderc/shaderc.h>
 
 namespace GE
 {

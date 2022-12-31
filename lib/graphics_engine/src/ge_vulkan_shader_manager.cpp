@@ -43,68 +43,6 @@ shaderc_include_result* showError(const char* message)
 }   // showError
 
 // ============================================================================
-class FileIncluder : public shaderc::CompileOptions::IncluderInterface
-{
-private:
-    std::vector<std::string> m_shader_fullpath;
-
-    std::vector<std::string> m_shader_data;
-public:
-    // ------------------------------------------------------------------------
-    shaderc_include_result* GetInclude(const char* requested_source,
-                                       shaderc_include_type type,
-                                       const char* requesting_source,
-                                       size_t include_depth)
-    {
-        if (type != shaderc_include_type_relative)
-            return showError("Only relateive included supported");
-
-        std::string path = requesting_source;
-        size_t pos = path.find_last_of('/');
-        if (pos == std::string::npos)
-            pos = path.find_last_of('\\');
-        if (pos == std::string::npos)
-            throw std::runtime_error(std::string("Invalid path: ") + path);
-
-        m_shader_fullpath.push_back(std::string());
-        std::string& shader_fullpath = m_shader_fullpath.back();
-        shader_fullpath = path.substr(0, pos) + '/' + requested_source;
-        irr::io::IReadFile* r = GEVulkanShaderManager::
-            g_file_system->createAndOpenFile(shader_fullpath.c_str());
-        if (!r)
-        {
-            throw std::runtime_error(std::string("File ") + shader_fullpath +
-                " is missing");
-        }
-
-        m_shader_data.push_back(std::string());
-        std::string& shader_data = m_shader_data.back();
-        shader_data.resize(r->getSize());
-        int nb_read = 0;
-        if ((nb_read = r->read(&shader_data[0], r->getSize())) != r->getSize())
-        {
-            r->drop();
-            throw std::runtime_error(std::string("File ") +
-                requested_source + " failed to be read");
-        }
-        r->drop();
-
-        shaderc_include_result* result = new shaderc_include_result;
-        result->source_name = shader_fullpath.c_str();
-        result->source_name_length = shader_fullpath.size();
-        result->content = shader_data.c_str();
-        result->content_length = shader_data.size();
-        result->user_data = NULL;
-        return result;
-    }
-    // ------------------------------------------------------------------------
-    void ReleaseInclude(shaderc_include_result* include_result)
-    {
-        delete include_result;
-    }
-};   // FileIncluder
-
-// ============================================================================
 void GEVulkanShaderManager::init(GEVulkanDriver* vk)
 {
     g_vk = vk;
@@ -195,23 +133,85 @@ VkShaderModule GEVulkanShaderManager::loadShader(shaderc_shader_kind kind,
     r->drop();
     shader_data = g_predefines + shader_data;
 
-    shaderc::Compiler compiler;
-    FileIncluder* fi = new FileIncluder;
-    shaderc::CompileOptions options;
-    options.SetIncluder(std::unique_ptr<
-        shaderc::CompileOptions::IncluderInterface>(fi));
+    shaderc_compiler_t compiler = shaderc_compiler_initialize();
+    shaderc_compile_options_t options = shaderc_compile_options_initialize();
 
-    shaderc::SpvCompilationResult module = compiler.CompileGlslToSpv(
-        shader_data, kind, shader_fullpath.c_str(), options);
-    if (module.GetCompilationStatus() != shaderc_compilation_status_success)
-        throw std::runtime_error(module.GetErrorMessage());
+    struct FileIncluder
+    {
+        std::vector<std::string> m_shader_fullpath;
+        std::vector<std::string> m_shader_data;
+    };
+    FileIncluder includer;
+    shaderc_compile_options_set_include_callbacks(options,
+        [](void* user_data, const char* requested_source, int type,
+           const char* requesting_source, size_t include_depth)
+           ->shaderc_include_result*
+        {
+            if (type != shaderc_include_type_relative)
+                return showError("Only relateive included supported");
 
-    std::vector<uint32_t> shader_bytecode(module.cbegin(), module.cend());
+            std::string path = requesting_source;
+            size_t pos = path.find_last_of('/');
+            if (pos == std::string::npos)
+                pos = path.find_last_of('\\');
+            if (pos == std::string::npos)
+                throw std::runtime_error(std::string("Invalid path: ") + path);
+
+            FileIncluder* includer = (FileIncluder*)user_data;
+            includer->m_shader_fullpath.push_back(std::string());
+            std::string& shader_fullpath = includer->m_shader_fullpath.back();
+            shader_fullpath = path.substr(0, pos) + '/' + requested_source;
+            irr::io::IReadFile* r = GEVulkanShaderManager::
+                g_file_system->createAndOpenFile(shader_fullpath.c_str());
+            if (!r)
+            {
+                throw std::runtime_error(std::string("File ") + shader_fullpath
+                    + " is missing");
+            }
+
+            includer->m_shader_data.push_back(std::string());
+            std::string& shader_data = includer->m_shader_data.back();
+            shader_data.resize(r->getSize());
+            int nb_read = 0;
+            if ((nb_read = r->read(&shader_data[0], r->getSize())) !=
+                r->getSize())
+            {
+                r->drop();
+                throw std::runtime_error(std::string("File ") +
+                    requested_source + " failed to be read");
+            }
+            r->drop();
+
+            shaderc_include_result* result = new shaderc_include_result;
+            result->source_name = shader_fullpath.c_str();
+            result->source_name_length = shader_fullpath.size();
+            result->content = shader_data.c_str();
+            result->content_length = shader_data.size();
+            result->user_data = NULL;
+
+            return result;
+        },
+        [](void* user_data, shaderc_include_result* include_result)
+        {
+            delete include_result;
+        }, &includer);
+
+    shaderc_compilation_result_t result = shaderc_compile_into_spv(compiler,
+        shader_data.c_str(), shader_data.size(), kind, shader_fullpath.c_str(),
+        "main", options);
+    shaderc_compile_options_release(options);
+    shaderc_compilation_status status =
+        shaderc_result_get_compilation_status(result);
+    if (status != shaderc_compilation_status_success)
+        throw std::runtime_error(shaderc_result_get_error_message(result));
+
     VkShaderModuleCreateInfo create_info = {};
     create_info.sType = VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO;
     create_info.pNext = NULL;
-    create_info.codeSize = shader_bytecode.size() * sizeof(uint32_t);
-    create_info.pCode = shader_bytecode.data();
+    uint32_t* byte_code = (uint32_t*)shaderc_result_get_bytes(result);
+    size_t byte_code_size = shaderc_result_get_length(result);
+    create_info.codeSize = byte_code_size;
+    create_info.pCode = byte_code;
 
     VkShaderModule shader_module;
     if (vkCreateShaderModule(g_vk->getDevice(), &create_info, NULL,
@@ -220,6 +220,8 @@ VkShaderModule GEVulkanShaderManager::loadShader(shaderc_shader_kind kind,
         throw std::runtime_error(
             std::string("vkCreateShaderModule failed for ") + name);
     }
+    shaderc_result_release(result);
+    shaderc_compiler_release(compiler);
     return shader_module;
 }   // loadShader
 
