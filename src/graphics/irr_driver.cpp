@@ -391,7 +391,9 @@ void IrrDriver::createListOfVideoModes()
 void IrrDriver::initDevice()
 {
 #if !defined(SERVER_ONLY)
-    GE::setShaderFolder(file_manager->getShadersDir());
+    std::string abs_shader_dir = file_manager->getFileSystem()
+        ->getAbsolutePath(file_manager->getShadersDir().c_str()).c_str();
+    GE::setShaderFolder(abs_shader_dir);
 #endif
     SIrrlichtCreationParameters params;
     core::stringw display_msg;

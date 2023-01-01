@@ -1,6 +1,8 @@
 #include "ge_vulkan_shader_manager.hpp"
 
+#include "ge_vulkan_command_loader.hpp"
 #include "ge_main.hpp"
+#include "ge_spin_lock.hpp"
 #include "ge_vulkan_driver.hpp"
 #include "ge_vulkan_features.hpp"
 
@@ -9,6 +11,7 @@
 #include <sstream>
 #include <string>
 #include <stdexcept>
+#include <utility>
 
 #include "IFileSystem.h"
 
@@ -27,7 +30,7 @@ uint32_t g_mesh_texture_layer = 2;
 
 uint32_t g_sampler_size = 512;
 
-std::map<std::string, VkShaderModule> g_shaders;
+std::map<std::string, std::pair<GESpinLock, VkShaderModule>* > g_shaders;
 }   // GEVulkanShaderManager
 
 // ============================================================================
@@ -75,7 +78,12 @@ void GEVulkanShaderManager::destroy()
     if (!g_vk)
         return;
     for (auto& p : g_shaders)
-        vkDestroyShaderModule(g_vk->getDevice(), p.second, NULL);
+    {
+        p.second->first.lock();
+        p.second->first.unlock();
+        vkDestroyShaderModule(g_vk->getDevice(), p.second->second, NULL);
+        delete p.second;
+    }
     g_shaders.clear();
 }   // destroy
 
@@ -103,7 +111,15 @@ void GEVulkanShaderManager::loadAllShaders()
             kind = shaderc_tess_evaluation_shader;
         else
             continue;
-        g_shaders[filename] = loadShader(kind, filename);
+        auto pair = new std::pair<GESpinLock, VkShaderModule>();
+        g_shaders[filename] = pair;
+        pair->first.lock();
+        GEVulkanCommandLoader::addMultiThreadingCommand(
+            [pair, kind, filename]()
+            {
+                pair->second = loadShader(kind, filename);
+                pair->first.unlock();
+            });
     }
     files->drop();
 }   // loadAllShaders
@@ -113,8 +129,7 @@ VkShaderModule GEVulkanShaderManager::loadShader(shaderc_shader_kind kind,
                                                  const std::string& name)
 {
     std::string shader_fullpath = getShaderFolder() + name;
-    irr::io::IReadFile* r =
-        g_file_system->createAndOpenFile(shader_fullpath.c_str());
+    irr::io::IReadFile* r = irr::io::createReadFile(shader_fullpath.c_str());
     if (!r)
     {
         throw std::runtime_error(std::string("File ") + shader_fullpath +
@@ -161,8 +176,8 @@ VkShaderModule GEVulkanShaderManager::loadShader(shaderc_shader_kind kind,
             includer->m_shader_fullpath.push_back(std::string());
             std::string& shader_fullpath = includer->m_shader_fullpath.back();
             shader_fullpath = path.substr(0, pos) + '/' + requested_source;
-            irr::io::IReadFile* r = GEVulkanShaderManager::
-                g_file_system->createAndOpenFile(shader_fullpath.c_str());
+            irr::io::IReadFile* r =
+                irr::io::createReadFile(shader_fullpath.c_str());
             if (!r)
             {
                 throw std::runtime_error(std::string("File ") + shader_fullpath
@@ -240,7 +255,10 @@ unsigned GEVulkanShaderManager::getMeshTextureLayer()
 // ----------------------------------------------------------------------------
 VkShaderModule GEVulkanShaderManager::getShader(const std::string& filename)
 {
-    return g_shaders.at(filename);
+    auto it = g_shaders.at(filename);
+    it->first.lock();
+    it->first.unlock();
+    return it->second;
 }   // getShader
 
 }
