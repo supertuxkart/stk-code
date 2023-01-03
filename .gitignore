@@ -90,5 +90,6 @@ lib/harfbuzz
 lib/sdl2
 lib/mbedtls
 lib/astc-encoder
+lib/shaderc
 
 .DS_Store

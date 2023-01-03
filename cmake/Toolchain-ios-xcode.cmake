@@ -61,6 +61,8 @@ set(MOLTENVK_LIBRARY ${PROJECT_SOURCE_DIR}/dependencies\${EFFECTIVE_PLATFORM_NAM
 set(VULKAN_INCLUDEDIR ${PROJECT_SOURCE_DIR}/dependencies-iphoneos/include CACHE STRING "")
 set(LIBASTCENC_LIBRARY ${PROJECT_SOURCE_DIR}/dependencies\${EFFECTIVE_PLATFORM_NAME}/lib/libastcenc.a CACHE STRING "")
 set(LIBASTCENC_INCLUDEDIR ${PROJECT_SOURCE_DIR}/dependencies-iphoneos/include CACHE STRING "")
+set(SHADERC_LIBRARY ${PROJECT_SOURCE_DIR}/dependencies\${EFFECTIVE_PLATFORM_NAME}/lib/libshaderc_combined.a CACHE STRING "")
+set(SHADERC_INCLUDEDIR ${PROJECT_SOURCE_DIR}/dependencies-iphoneos/include CACHE STRING "")
 
 # For universal iOS and simulator
 set(LIBRESOLV_LIBRARY -lresolv CACHE STRING "")

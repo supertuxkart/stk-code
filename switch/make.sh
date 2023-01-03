@@ -13,7 +13,7 @@ fi
 cd "${STK_DIR}/cmake_build"
 
 "${DEVKITPRO}/portlibs/switch/bin/aarch64-none-elf-cmake" -G"Unix Makefiles" \
-    -DCMAKE_INSTALL_PREFIX=/  \
+    -DCMAKE_INSTALL_PREFIX=/ -DNO_SHADERC=on \
     ../
 
 make -j$(nproc) || exit 1
