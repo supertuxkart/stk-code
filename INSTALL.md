@@ -79,6 +79,10 @@ To build the in-game recorder for STK, you have to install
 libopenglrecorder from your distribution, or compile it yourself from [here](https://github.com/Benau/libopenglrecorder).
 Compilation instruction is explained there. If you don't need this feature, pass `-DBUILD_RECORDER=off` to cmake.
 
+### Shaderc for Vulkan support
+
+You need to compile [Shaderc](https://github.com/google/shaderc) for vulkan support in SuperTuxKart if you are not building for Windows or macOS, If you don't need this feature, pass `-DNO_SHADERC=on` to cmake.
+
 ### Compiling
 
 To compile SuperTuxKart, run the following commands inside `stk-code` directory
@@ -137,7 +141,7 @@ location, specify `CMAKE_INSTALL_PREFIX` when running cmake, e.g.:
 
 ## Building SuperTuxKart on Windows
 
-To Build SuperTuxKart on Windows, first you need to install [Python](https://www.python.org/downloads/windows/) for [shaderc](https://github.com/google/shaderc) used by SuperTuxKart, after installing Python (if needed) follow these instructions:
+To Build SuperTuxKart on Windows follow these instructions:
 
 1. Download and install Visual Studio from here: [Visual Studio - Download](https://www.visualstudio.com/downloads/). The free Visual Studio Community edition works fine. Remember to select "Desktop development with C++" in the installer.
 

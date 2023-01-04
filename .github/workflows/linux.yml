@@ -126,7 +126,7 @@ jobs:
           $CXX --version
           mkdir "build"
           cd "build"
-          cmake .. -DCMAKE_BUILD_TYPE=$BUILD_TYPE -DSERVER_ONLY=$SERVER_ONLY -DCHECK_ASSETS=off -DBUILD_RECORDER=off;
+          cmake .. -DCMAKE_BUILD_TYPE=$BUILD_TYPE -DSERVER_ONLY=$SERVER_ONLY -DCHECK_ASSETS=off -DBUILD_RECORDER=off -DNO_SHADERC=on;
       - name: Configure bulid (macos)
         if: ${{ matrix.os == 'macos-latest' }}
         env:
