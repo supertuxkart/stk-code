@@ -28,6 +28,7 @@
 
 #include <vector>
 #include <algorithm>
+#include <cassert>
 #include <string>
 
 #include "network/remote_kart_info.hpp"
@@ -644,11 +645,14 @@ public:
     // ----------------------------------------------------------------------------------------
     int getKartLocalPlayerId(int k) const
     {
+        assert(k < (int)m_kart_status.size());
         return m_kart_status[k].m_local_player_id;
     }   // getKartLocalPlayerId
     // ----------------------------------------------------------------------------------------
     int getKartGlobalPlayerId(int k) const
     {
+        if (k >= (int)m_kart_status.size())
+            return -1;
         return m_kart_status[k].m_global_player_id;
     }   // getKartGlobalPlayerId
     // ----------------------------------------------------------------------------------------
