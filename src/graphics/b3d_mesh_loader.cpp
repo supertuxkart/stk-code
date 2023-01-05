@@ -142,13 +142,20 @@ SP::SPMesh* B3DMeshLoader::toSPM(scene::CSkinnedMesh* mesh)
             wi[b].push_back(core::array<JointInfluence>());
 	}
 
-    const bool skinned_mesh = !mesh->RootJoints.empty() &&
+    bool skinned_mesh = !mesh->RootJoints.empty() &&
         mesh->getFrameCount() > 0;
+    unsigned idx = 0;
     if (skinned_mesh)
     {
-        unsigned idx = 0;
         for (unsigned i = 0; i < mesh->RootJoints.size(); i++)
             computeWeightInfluence(mesh->RootJoints[i], idx, wi);
+    }
+    // Some b3d models has incorrect animation data, remove it and treat them
+    // as static mesh
+    if (idx == 0)
+        skinned_mesh = false;
+    if (skinned_mesh)
+    {
         spm->m_total_joints = idx;
         spm->m_joint_using = idx;
         spm->m_bind_frame = m_straight_frame;
