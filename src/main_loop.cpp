@@ -51,6 +51,7 @@
 #include "race/race_manager.hpp"
 #include "states_screens/dialogs/server_info_dialog.hpp"
 #include "states_screens/online/server_selection.hpp"
+#include "states_screens/main_menu_screen.hpp"
 #include "states_screens/state_manager.hpp"
 #include "utils/profiler.hpp"
 #include "utils/string_utils.hpp"
@@ -515,6 +516,15 @@ void MainLoop::run()
             {
                 RaceManager::get()->clearNetworkGrandPrixResult();
                 RaceManager::get()->exitRace();
+            }
+            else if (!exist_host && !GUIEngine::isNoGraphics())
+            {
+                // Avoid leaking widgets (model view especially) when closing
+                // STK, it crashes when vulkan validation is on if closing
+                // during kart selection screen
+                MainMenuScreen* mms = MainMenuScreen::getInstance();
+                if (GUIEngine::getCurrentScreen() != mms)
+                    StateManager::get()->resetAndGoToScreen(mms);
             }
 
             if (exist_host == true)
