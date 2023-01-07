@@ -27,6 +27,7 @@
 #include "utils/cpp2011.hpp"
 
 #include <IVideoDriver.h>
+#include <cmath>
 
 // ============================================================================
 class Primitive2DList : public TextureShader<Primitive2DList, 1, core::vector2df>
@@ -429,58 +430,82 @@ void draw2DImage(const video::ITexture* texture,
 }   // draw2DImage
 
 // ----------------------------------------------------------------------------
-void draw2DImageCustomAlpha(const irr::video::ITexture* texture,
+void draw2DImageCustomAlpha(video::ITexture* texture,
                             const irr::core::rect<irr::s32>& destRect,
                             const irr::core::rect<irr::s32>& sourceRect,
                             const irr::core::rect<irr::s32>* clipRect,
                             float rotation, float custom_alpha)
 {
-    if (!CVS->isGLSL())
-        return;
+    video::SColor color((unsigned)-1);
+    color.setAlpha(core::clamp((int)(custom_alpha * 255.0f), 0, 255));
 
-    float width, height, center_pos_x, center_pos_y, tex_width, tex_height;
-    float tex_center_pos_x, tex_center_pos_y;
+    const core::dimension2d<u32>& ss = texture->getSize();
+    core::rect<f32> tcoords;
+    tcoords.UpperLeftCorner.X = (f32)sourceRect.UpperLeftCorner.X / (f32)ss.Width;
+    tcoords.UpperLeftCorner.Y = (f32)sourceRect.UpperLeftCorner.Y / (f32)ss.Height;
+    tcoords.LowerRightCorner.X = (f32)sourceRect.LowerRightCorner.X / (f32)ss.Width;
+    tcoords.LowerRightCorner.Y = (f32)sourceRect.LowerRightCorner.Y / (f32)ss.Height;
 
-    getSize(texture->getSize().Width, texture->getSize().Height,
-            texture->isRenderTarget(), destRect, sourceRect, width, height,
-            center_pos_x, center_pos_y, tex_width, tex_height,
-            tex_center_pos_x, tex_center_pos_y);
+    video::S3DVertex vtx[4];
+    vtx[0] = video::S3DVertex((f32)destRect.UpperLeftCorner.X, (f32)destRect.UpperLeftCorner.Y, 0.0f,
+        0.0f, 0.0f, 0.0f, color,
+        tcoords.UpperLeftCorner.X, tcoords.UpperLeftCorner.Y);
+    vtx[1] = video::S3DVertex((f32)destRect.LowerRightCorner.X, (f32)destRect.UpperLeftCorner.Y, 0.0f,
+        0.0f, 0.0f, 0.0f, color,
+        tcoords.LowerRightCorner.X, tcoords.UpperLeftCorner.Y);
+    vtx[2] = video::S3DVertex((f32)destRect.LowerRightCorner.X, (f32)destRect.LowerRightCorner.Y, 0.0f,
+        0.0f, 0.0f, 0.0f, color,
+        tcoords.LowerRightCorner.X, tcoords.LowerRightCorner.Y);
+    vtx[3] = video::S3DVertex((f32)destRect.UpperLeftCorner.X, (f32)destRect.LowerRightCorner.Y, 0.0f,
+        0.0f, 0.0f, 0.0f, color,
+        tcoords.UpperLeftCorner.X, tcoords.LowerRightCorner.Y);
 
-    glEnable(GL_BLEND);
-    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-    if (clipRect)
+    core::vector2df center(
+        (vtx[0].Pos.X + vtx[1].Pos.X + vtx[2].Pos.X + vtx[3].Pos.X) / 4.0f,
+        (vtx[0].Pos.Y + vtx[1].Pos.Y + vtx[2].Pos.Y + vtx[3].Pos.Y) / 4.0f);
+
+    float cos_rotation = cos(rotation);
+    float sin_rotation = sin(rotation);
+    for (int i = 0; i < 4; i++)
     {
-        if (!clipRect->isValid())
-            return;
-
-        glEnable(GL_SCISSOR_TEST);
-        const core::dimension2d<u32>& render_target_size =
-                            irr_driver->getActualScreenSize();
-        glScissor(clipRect->UpperLeftCorner.X,
-                  (s32)render_target_size.Height - clipRect->LowerRightCorner.Y,
-                  clipRect->getWidth(), clipRect->getHeight());
+        core::vector2df orig_pos(vtx[i].Pos.X, vtx[i].Pos.Y);
+        vtx[i].Pos.X = center.X + (orig_pos.X - center.X) * cos_rotation - (orig_pos.Y - center.Y) * sin_rotation;
+        vtx[i].Pos.Y = center.Y + (orig_pos.X - center.X) * sin_rotation + (orig_pos.Y - center.Y) * cos_rotation;
     }
 
-    TextureRectCustomAlphaShader::getInstance()->use();
-    glBindVertexArray(SharedGPUObjects::getUI_VAO());
-
-    TextureRectCustomAlphaShader::getInstance()->setTextureUnits(texture->getTextureHandler());
-    TextureRectCustomAlphaShader::getInstance()->setUniforms(
-                    core::vector2df(center_pos_x, center_pos_y),
-                    core::vector2df(width, height),
-                    core::vector2df(tex_center_pos_x, tex_center_pos_y),
-                    core::vector2df(tex_width, tex_height), rotation, custom_alpha);
-
-    glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
-    glBindVertexArray(0);
-    glBindBuffer(GL_ARRAY_BUFFER, 0);
-
-    if (clipRect)
-        glDisable(GL_SCISSOR_TEST);
-    glUseProgram(0);
-
-    glGetError();
-}   // draw2DImage
+    u16 indices[6] = { 0, 1, 2, 0, 2, 3 };
+    if (!CVS->isGLSL())
+    {
+        video::SMaterial m;
+        m.setTexture(0, texture);
+        if (irr_driver->getVideoDriver()->getDriverType() == video::EDT_OGLES2)
+        {
+            m.MaterialType = video::EMT_TRANSPARENT_ALPHA_CHANNEL;
+        }
+        else
+        {
+            // For vertex color
+            m.MaterialType = video::EMT_ONETEXTURE_BLEND;
+            m.MaterialTypeParam =
+                pack_textureBlendFunc(video::EBF_SRC_ALPHA,
+                video::EBF_ONE_MINUS_SRC_ALPHA,
+                video::EMFN_MODULATE_1X,
+                video::EAS_TEXTURE | video::EAS_VERTEX_COLOR);
+        }
+        irr_driver->getVideoDriver()->setMaterial(m);
+    }
+    else
+    {
+        indices[0] = 2;
+        indices[2] = 0;
+        indices[3] = 3;
+        indices[5] = 0;
+        glEnable(GL_BLEND);
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    }
+    draw2DVertexPrimitiveList(texture, vtx, 4, indices, 2, video::EVT_STANDARD,
+        scene::EPT_TRIANGLES, video::EIT_16BIT);
+}   // draw2DImageCustomAlpha
 
 // ----------------------------------------------------------------------------
 void draw2DVertexPrimitiveList(video::ITexture *tex, const void* vertices,

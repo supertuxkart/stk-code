@@ -52,7 +52,7 @@ void draw2DImage(const irr::video::ITexture* texture,
                  bool useAlphaChannelOfTexture, bool draw_translucently = false,
                  float rotation = 0.0f);
 
-void draw2DImageCustomAlpha(const irr::video::ITexture* texture,
+void draw2DImageCustomAlpha(irr::video::ITexture* texture,
                  const irr::core::rect<irr::s32>& destRect,
                  const irr::core::rect<irr::s32>& sourceRect,
                  const irr::core::rect<irr::s32>* clipRect,

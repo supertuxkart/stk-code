@@ -24,7 +24,6 @@ using namespace irr;
 #include "config/user_config.hpp"
 #include "graphics/camera.hpp"
 #include "graphics/camera_debug.hpp"
-#include "graphics/central_settings.hpp"
 #include "graphics/2dutils.hpp"
 #include "graphics/irr_driver.hpp"
 #include "graphics/material.hpp"
@@ -159,15 +158,11 @@ void RaceGUIMultitouch::init()
     m_up_tex = irr_driver->getTexture(FileManager::GUI_ICON, "up.png");
     m_down_tex = irr_driver->getTexture(FileManager::GUI_ICON, "down.png");
     m_screen_tex = irr_driver->getTexture(FileManager::GUI_ICON, "screen_other.png");
-#ifndef SERVER_ONLY
-    if (CVS->isGLSL())
-    {
-        m_steering_wheel_tex_mask_up = irr_driver->getTexture(FileManager::GUI_ICON,
-                                            "android/steering_wheel_mask_up.png");
-        m_steering_wheel_tex_mask_down = irr_driver->getTexture(FileManager::GUI_ICON,
-                                            "android/steering_wheel_mask_down.png");
-    }
-#endif
+    m_steering_wheel_tex_mask_up = irr_driver->getTexture(FileManager::GUI_ICON,
+                                        "android/steering_wheel_mask_up.png");
+    m_steering_wheel_tex_mask_down = irr_driver->getTexture(FileManager::GUI_ICON,
+                                        "android/steering_wheel_mask_down.png");
+
     auto cl = LobbyProtocol::get<ClientLobby>();
     
     if (cl && cl->isSpectator())
@@ -392,7 +387,7 @@ void RaceGUIMultitouch::draw(const AbstractKart* kart,
             Camera* c = Camera::getActiveCamera();
             if (c)
                 k = c->getKart();
-            if (CVS->isGLSL() && k)
+            if (k)
             {
                 float accel = k->getControls().getAccel();
                 core::rect<s32> mask_coords(pos_zero, m_steering_wheel_tex_mask_up->getSize());
