@@ -717,7 +717,7 @@ void RaceGUI::drawGlobalMiniMap()
                     rotation = rotation + M_PI;
                 }
                 rotation = -1.0f * rotation + 0.25f * M_PI; // icons-frame_arrow.png was rotated by 45 degrees
-                draw2DImage(m_icons_frame, position, rect, NULL, colors, true, false, rotation);
+                draw2DImageRotationColor(m_icons_frame, position, rect, NULL, rotation, color);
             }
             else
             {

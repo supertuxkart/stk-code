@@ -63,37 +63,18 @@ public:
 // ============================================================================
 class TextureRectShader : public TextureShader<TextureRectShader, 1,
                                              core::vector2df, core::vector2df,
-                                             core::vector2df, core::vector2df,
-                                             float>
+                                             core::vector2df, core::vector2df>
 {
 public:
     TextureRectShader()
     {
         loadProgram(OBJECT, GL_VERTEX_SHADER, "texturedquad.vert",
                             GL_FRAGMENT_SHADER, "texturedquad.frag");
-        assignUniforms("center", "size", "texcenter", "texsize", "rotation");
+        assignUniforms("center", "size", "texcenter", "texsize");
 
         assignSamplerNames(0, "tex", ST_BILINEAR_CLAMPED_FILTERED);
     }   // TextureRectShader
 };   // TextureRectShader
-
-// ============================================================================
-class TextureRectCustomAlphaShader : public TextureShader<TextureRectCustomAlphaShader, 1,
-                                             core::vector2df, core::vector2df,
-                                             core::vector2df, core::vector2df,
-                                             float, float>
-{
-public:
-    TextureRectCustomAlphaShader()
-    {
-        loadProgram(OBJECT, GL_VERTEX_SHADER, "texturedquad.vert",
-                            GL_FRAGMENT_SHADER, "texturedquad_custom_alpha.frag");
-        assignUniforms("center", "size", "texcenter", "texsize", "rotation",
-            "custom_alpha");
-
-        assignSamplerNames(0, "tex", ST_BILINEAR_CLAMPED_FILTERED);
-    }   // TextureRectCustomAlphaShader
-};   // TextureRectCustomAlphaShader
 
 // ============================================================================
 class ColoredRectShader : public Shader<ColoredRectShader, core::vector2df,
@@ -112,7 +93,7 @@ public:
 
 class ColoredTextureRectShader : public TextureShader<ColoredTextureRectShader, 1,
                                                core::vector2df, core::vector2df,
-                                               core::vector2df, core::vector2df, float>
+                                               core::vector2df, core::vector2df>
 {
 public:
     GLuint m_color_vbo;
@@ -122,7 +103,7 @@ public:
     {
         loadProgram(OBJECT, GL_VERTEX_SHADER, "colortexturedquad.vert",
                             GL_FRAGMENT_SHADER, "colortexturedquad.frag");
-        assignUniforms("center", "size", "texcenter", "texsize", "rotation");
+        assignUniforms("center", "size", "texcenter", "texsize");
 
         assignSamplerNames(0, "tex", ST_BILINEAR_FILTERED);
 
@@ -153,7 +134,7 @@ static void drawTexColoredQuad(const video::ITexture *texture,
                                float height, float center_pos_x,
                                float center_pos_y, float tex_center_pos_x,
                                float tex_center_pos_y, float tex_width,
-                               float tex_height, float rotation)
+                               float tex_height)
 {
     glBindVertexArray(ColoredTextureRectShader::getInstance()->m_vao);
     glBindBuffer(GL_ARRAY_BUFFER,
@@ -169,7 +150,7 @@ static void drawTexColoredQuad(const video::ITexture *texture,
         ->setUniforms(core::vector2df(center_pos_x, center_pos_y),
                       core::vector2df(width, height),
                       core::vector2df(tex_center_pos_x, tex_center_pos_y),
-                      core::vector2df(tex_width, tex_height), rotation);
+                      core::vector2df(tex_width, tex_height));
 
     glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
     glBindBuffer(GL_ARRAY_BUFFER, 0);
@@ -183,7 +164,7 @@ static void drawTexColoredQuad(const video::ITexture *texture,
 static void drawTexQuad(GLuint texture, float width, float height,
                         float center_pos_x, float center_pos_y, 
                         float tex_center_pos_x, float tex_center_pos_y,
-                        float tex_width, float tex_height, float rotation)
+                        float tex_width, float tex_height)
 {
     TextureRectShader::getInstance()->use();
     glBindVertexArray(SharedGPUObjects::getUI_VAO());
@@ -193,7 +174,7 @@ static void drawTexQuad(GLuint texture, float width, float height,
                     core::vector2df(center_pos_x, center_pos_y), 
                     core::vector2df(width, height),
                     core::vector2df(tex_center_pos_x, tex_center_pos_y),
-                    core::vector2df(tex_width, tex_height), rotation);
+                    core::vector2df(tex_width, tex_height));
 
     glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
     glBindVertexArray(0);
@@ -358,7 +339,7 @@ void draw2DImage(const video::ITexture* texture,
                  const core::rect<s32>* clip_rect,
                  const video::SColor* const colors,
                  bool use_alpha_channel_of_texture,
-                 bool draw_translucently, float rotation)
+                 bool draw_translucently)
 {
     video::SColor translucence[4] =
     {
@@ -414,13 +395,13 @@ void draw2DImage(const video::ITexture* texture,
         drawTexColoredQuad(texture, draw_translucently ? translucence : colors,
                            width, height, center_pos_x,
                            center_pos_y, tex_center_pos_x, tex_center_pos_y,
-                           tex_width, tex_height, rotation);
+                           tex_width, tex_height);
     }
     else
     {
         drawTexQuad(texture->getTextureHandler(), width, height,
                     center_pos_x, center_pos_y, tex_center_pos_x,
-                    tex_center_pos_y, tex_width, tex_height, rotation);
+                    tex_center_pos_y, tex_width, tex_height);
     }
     if (clip_rect)
         glDisable(GL_SCISSOR_TEST);
@@ -430,15 +411,12 @@ void draw2DImage(const video::ITexture* texture,
 }   // draw2DImage
 
 // ----------------------------------------------------------------------------
-void draw2DImageCustomAlpha(video::ITexture* texture,
-                            const irr::core::rect<irr::s32>& destRect,
-                            const irr::core::rect<irr::s32>& sourceRect,
-                            const irr::core::rect<irr::s32>* clipRect,
-                            float rotation, float custom_alpha)
+void draw2DImageRotationColor(video::ITexture* texture,
+                              const irr::core::rect<irr::s32>& destRect,
+                              const irr::core::rect<irr::s32>& sourceRect,
+                              const irr::core::rect<irr::s32>* clipRect,
+                              float rotation, const irr::video::SColor& color)
 {
-    video::SColor color((unsigned)-1);
-    color.setAlpha(core::clamp((int)(custom_alpha * 255.0f), 0, 255));
-
     const core::dimension2d<u32>& ss = texture->getSize();
     core::rect<f32> tcoords;
     tcoords.UpperLeftCorner.X = (f32)sourceRect.UpperLeftCorner.X / (f32)ss.Width;
@@ -505,7 +483,7 @@ void draw2DImageCustomAlpha(video::ITexture* texture,
     }
     draw2DVertexPrimitiveList(texture, vtx, 4, indices, 2, video::EVT_STANDARD,
         scene::EPT_TRIANGLES, video::EIT_16BIT);
-}   // draw2DImageCustomAlpha
+}   // draw2DImageRotationColor
 
 // ----------------------------------------------------------------------------
 void draw2DVertexPrimitiveList(video::ITexture *tex, const void* vertices,

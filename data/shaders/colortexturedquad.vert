@@ -19,10 +19,7 @@ out vec4 color;
 
 void main()
 {
-    float s = sin(rotation);
-    float c = cos(rotation);
-    mat2 m = mat2(c, -s, s, c);
     color = Color.zyxw;
     uv = Texcoord * texsize + texcenter;
-    gl_Position = vec4(m * Position * size + center, 0., 1.);
+    gl_Position = vec4(Position * size + center, 0., 1.);
 }

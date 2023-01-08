@@ -378,11 +378,11 @@ void RaceGUIMultitouch::draw(const AbstractKart* kart,
 
         if (button->type == MultitouchButtonType::BUTTON_STEERING)
         {
+            video::SColor color((unsigned)-1);
             video::ITexture* btn_texture = m_steering_wheel_tex;
             core::rect<s32> coords(pos_zero, btn_texture->getSize());
-            draw2DImage(btn_texture, btn_pos, coords, NULL, NULL, true, false/*draw_translucently*/,
-                (button->axis_y >= 0 ? -1 : 1) * button->axis_x);
-#ifndef SERVER_ONLY
+            draw2DImageRotationColor(btn_texture, btn_pos, coords, NULL,
+                (button->axis_y >= 0 ? -1 : 1) * button->axis_x, color);
             AbstractKart* k = NULL;
             Camera* c = Camera::getActiveCamera();
             if (c)
@@ -391,12 +391,13 @@ void RaceGUIMultitouch::draw(const AbstractKart* kart,
             {
                 float accel = k->getControls().getAccel();
                 core::rect<s32> mask_coords(pos_zero, m_steering_wheel_tex_mask_up->getSize());
-                draw2DImageCustomAlpha(m_steering_wheel_tex_mask_up, btn_pos, mask_coords, NULL,
-                    (button->axis_y >= 0 ? -1 : 1) * button->axis_x, accel >= 0.0f ? accel * 0.5f : 0.0f);
-                draw2DImageCustomAlpha(m_steering_wheel_tex_mask_down, btn_pos, mask_coords, NULL,
-                    (button->axis_y >= 0 ? -1 : 1) * button->axis_x, k->getControls().getBrake() ? 0.5f : 0.0f);
+                color.setAlpha(core::clamp((int)(accel >= 0.0f ? accel * 128.0f : 0), 0, 255));
+                draw2DImageRotationColor(m_steering_wheel_tex_mask_up, btn_pos, mask_coords, NULL,
+                    (button->axis_y >= 0 ? -1 : 1) * button->axis_x, color);
+                color.setAlpha(k->getControls().getBrake() ? 128 : 0);
+                draw2DImageRotationColor(m_steering_wheel_tex_mask_down, btn_pos, mask_coords, NULL,
+                    (button->axis_y >= 0 ? -1 : 1) * button->axis_x, color);
             }
-#endif
             // float x = (float)(button->x) + (float)(button->width) / 2.0f *
             //                                          (button->axis_x + 1.0f);
             // float y = (float)(button->y) + (float)(button->height) / 2.0f *
