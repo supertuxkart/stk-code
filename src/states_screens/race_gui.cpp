@@ -579,6 +579,8 @@ void RaceGUI::drawGlobalMiniMap()
     if (ctf_world)
     {
         Vec3 draw_at;
+        video::SColor translucence((unsigned)-1);
+        translucence.setAlpha(128);
         if (!ctf_world->isRedFlagInBase())
         {
             track->mapPoint2MiniMap(Track::getCurrentTrack()->getRedFlag().getOrigin(),
@@ -588,7 +590,7 @@ void RaceGUI::drawGlobalMiniMap()
                 lower_y   -(int)(draw_at.getY()+(m_minimap_player_size/2.2f)),
                 m_map_left+(int)(draw_at.getX()+(m_minimap_player_size/1.4f)),
                 lower_y   -(int)(draw_at.getY()-(m_minimap_player_size/2.2f)));
-            draw2DImage(m_red_flag, rp, rs, NULL, NULL, true, true);
+            draw2DImage(m_red_flag, rp, rs, NULL, translucence, true);
         }
         Vec3 pos = ctf_world->getRedHolder() == -1 ? ctf_world->getRedFlag() :
             ctf_world->getKart(ctf_world->getRedHolder())->getSmoothedTrans().getOrigin();
@@ -610,7 +612,7 @@ void RaceGUI::drawGlobalMiniMap()
                 lower_y   -(int)(draw_at.getY()+(m_minimap_player_size/2.2f)),
                 m_map_left+(int)(draw_at.getX()+(m_minimap_player_size/1.4f)),
                 lower_y   -(int)(draw_at.getY()-(m_minimap_player_size/2.2f)));
-            draw2DImage(m_blue_flag, rp, rs, NULL, NULL, true, true);
+            draw2DImage(m_blue_flag, rp, rs, NULL, translucence, true);
         }
 
         pos = ctf_world->getBlueHolder() == -1 ? ctf_world->getBlueFlag() :

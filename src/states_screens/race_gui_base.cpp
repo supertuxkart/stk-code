@@ -1129,7 +1129,12 @@ void RaceGUIBase::drawPlayerIcon(AbstractKart *kart, int x, int y, int w,
     {
         const core::rect<s32> rect(core::position2d<s32>(0,0),
                                    icon->getSize());
-        draw2DImage(icon, pos, rect, NULL, NULL, true, kart->isGhostKart());
+        video::SColor translucence((unsigned)-1);
+        translucence.setAlpha(128);
+        if (kart->isGhostKart())
+            draw2DImage(icon, pos, rect, NULL, translucence, true);
+        else
+            draw2DImage(icon, pos, rect, NULL, NULL, true);
     }
 
     //draw status info - icon fade out in case of rescue/explode

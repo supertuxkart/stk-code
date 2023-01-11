@@ -338,26 +338,12 @@ void draw2DImage(const video::ITexture* texture,
                  const core::rect<s32>& sourceRect,
                  const core::rect<s32>* clip_rect,
                  const video::SColor* const colors,
-                 bool use_alpha_channel_of_texture,
-                 bool draw_translucently)
+                 bool use_alpha_channel_of_texture)
 {
-    video::SColor translucence[4] =
-    {
-        (unsigned)-1, (unsigned)-1, (unsigned)-1, (unsigned)-1
-    };
-    for (unsigned i = 0; i < 4; i++)
-    {
-        if (colors)
-            translucence[i] = colors[i];
-        if (draw_translucently)
-            translucence[i].setAlpha(128);
-    }
-
     if (!CVS->isGLSL())
     {
         irr_driver->getVideoDriver()->draw2DImage(texture, destRect, sourceRect,
-            clip_rect, draw_translucently ? translucence : colors,
-            use_alpha_channel_of_texture);
+            clip_rect, colors, use_alpha_channel_of_texture);
         return;
     }
 
@@ -390,10 +376,9 @@ void draw2DImage(const video::ITexture* texture,
                   (s32)render_target_size.Height - clip_rect->LowerRightCorner.Y,
                   clip_rect->getWidth(), clip_rect->getHeight());
     }
-    if (draw_translucently || colors)
+    if (colors)
     {
-        drawTexColoredQuad(texture, draw_translucently ? translucence : colors,
-                           width, height, center_pos_x,
+        drawTexColoredQuad(texture, colors, width, height, center_pos_x,
                            center_pos_y, tex_center_pos_x, tex_center_pos_y,
                            tex_width, tex_height);
     }
