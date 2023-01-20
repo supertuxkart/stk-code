@@ -462,10 +462,7 @@ void ClientLobby::update(int ticks)
 #else
                 name = _("Bot");
 #endif
-                if (i > 0)
-                {
-                    name += core::stringw(" ") + StringUtils::toWString(i);
-                }
+                name += core::stringw(" ") + StringUtils::toWString(i + 1);
             }
             rest->encodeString(name).
                 addFloat(player->getDefaultKartColor());
