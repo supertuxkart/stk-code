@@ -19,6 +19,7 @@
 #include "script_track.hpp"
 
 #include "animations/three_d_animation.hpp"
+#include "config/user_config.hpp"
 #include "font/digit_face.hpp"
 #include "font/font_manager.hpp"
 #include "graphics/central_settings.hpp"
@@ -198,6 +199,11 @@ namespace Scripting
         int getMinorRaceMode()
         {
             return RaceManager::get()->getMinorMode();
+        }
+
+        int getGeometryLevel()
+        {
+            return UserConfigParams::m_geometry_level;
         }
 
         bool isDuringDay()
@@ -597,7 +603,11 @@ namespace Scripting
             r = engine->RegisterGlobalFunction("int getMinorRaceMode()", 
                                                mp ? WRAP_FN(getMinorRaceMode) : asFUNCTION(getMinorRaceMode), 
                                                call_conv); assert(r >= 0);
-                                               
+
+            r = engine->RegisterGlobalFunction("int getGeometryLevel()",
+                                               mp ? WRAP_FN(getGeometryLevel) : asFUNCTION(getGeometryLevel),
+                                               call_conv); assert(r >= 0);
+
             r = engine->RegisterGlobalFunction("bool isDuringDay()", 
                                                mp ? WRAP_FN(isDuringDay) : asFUNCTION(isDuringDay), 
                                                call_conv); assert(r >= 0);
