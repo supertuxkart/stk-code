@@ -72,7 +72,7 @@ void CustomVideoSettingsDialog::beforeAddingWidgets()
 
     SpinnerWidget* geometry_level = getWidget<SpinnerWidget>("geometry_detail");
     //I18N: Geometry level disabled : lowest level, no details
-    geometry_level->addLabel(_("Disabled"));
+    geometry_level->addLabel(_("Very Low"));
     //I18N: Geometry level low : few details are displayed
     geometry_level->addLabel(_("Low"));
     //I18N: Geometry level high : everything is displayed
