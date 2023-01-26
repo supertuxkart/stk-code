@@ -3,6 +3,8 @@
 #include "ge_main.hpp"
 #include "ge_vulkan_driver.hpp"
 
+#include <stdexcept>
+
 namespace GE
 {
 GEVulkanDepthTexture::GEVulkanDepthTexture(GEVulkanDriver* vk,

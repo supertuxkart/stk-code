@@ -8,6 +8,7 @@
 #include <deque>
 #include <memory>
 #include <mutex>
+#include <stdexcept>
 #include <thread>
 
 #include "../source/Irrlicht/os.h"

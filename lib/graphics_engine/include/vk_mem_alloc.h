@@ -2563,6 +2563,7 @@ VMA_CALL_PRE void VMA_CALL_POST vmaFreeStatsString(
 #undef VMA_IMPLEMENTATION
 
 #include <cstdint>
+#include <cstdio>
 #include <cstdlib>
 #include <cstring>
 #include <utility>

@@ -21,6 +21,7 @@ extern "C"
 #include <IAttributes.h>
 #include <IImageLoader.h>
 #include <limits>
+#include <stdexcept>
 
 namespace GE
 {

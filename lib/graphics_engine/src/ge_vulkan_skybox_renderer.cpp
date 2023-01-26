@@ -11,6 +11,7 @@
 
 #include <array>
 #include <cstdint>
+#include <stdexcept>
 #include <unordered_map>
 
 namespace GE

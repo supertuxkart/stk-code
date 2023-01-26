@@ -12,6 +12,7 @@
 
 #include <IImageLoader.h>
 #include <cassert>
+#include <stdexcept>
 
 namespace GE
 {

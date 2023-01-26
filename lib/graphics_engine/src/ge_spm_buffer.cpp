@@ -5,6 +5,7 @@
 #include "ge_vulkan_features.hpp"
 
 #include <algorithm>
+#include <stdexcept>
 
 #include "mini_glm.hpp"
 

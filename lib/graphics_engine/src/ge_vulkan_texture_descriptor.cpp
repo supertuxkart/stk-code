@@ -6,6 +6,7 @@
 
 #include <algorithm>
 #include <exception>
+#include <stdexcept>
 
 namespace GE
 {

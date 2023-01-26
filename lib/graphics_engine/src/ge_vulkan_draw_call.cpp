@@ -25,6 +25,7 @@
 #include <algorithm>
 #include <cmath>
 #include <limits>
+#include <stdexcept>
 
 #include "../source/Irrlicht/os.h"
 #include "quaternion.h"
