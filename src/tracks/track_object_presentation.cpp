@@ -871,6 +871,14 @@ TrackObjectPresentationParticles::TrackObjectPresentationParticles(
                                                      scene::ISceneNode* parent)
                                 : TrackObjectPresentationSceneNode(xml_node)
 {
+    float heading = 0;
+    if (xml_node.get("h", &heading))
+    {
+        m_init_hpr.X = 0;
+        m_init_hpr.Y = heading;
+        m_init_hpr.Z = 0;
+    }
+
     m_emitter = NULL;
     m_lod_emitter_node = NULL;
     std::string path;
