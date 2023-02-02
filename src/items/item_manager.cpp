@@ -118,8 +118,9 @@ void ItemManager::loadDefaultItemMeshes()
 #endif
             m_item_lowres_mesh[i]->grab();
         }
-        m_icon[i] = "icon-" + item_names[(ItemState::ItemType)i] + ".png";
-        preloadIcon(m_icon[i]);
+        std::string icon = "icon-" + item_names[(ItemState::ItemType)i] + ".png";
+        if (preloadIcon(icon))
+            m_icon[i] = icon;
     }   // for i
     delete root;
     preloadIcon("item_spark.png");
@@ -128,14 +129,15 @@ void ItemManager::loadDefaultItemMeshes()
 //-----------------------------------------------------------------------------
 /** Preload icon materials to avoid hangs when firstly insert item
  */
-void ItemManager::preloadIcon(const std::string& name)
+bool ItemManager::preloadIcon(const std::string& name)
 {
     // From IrrDriver::addBillboard
     Material* m = material_manager->getMaterial(name, false/*full_path*/,
         /*make_permanent*/true, /*complain_if_not_found*/true,
         /*strip_path*/false, /*install*/false);
-    m->getTexture(true/*srgb*/, m->getShaderName() == "additive" ||
-        m->getShaderName() == "alphablend" ? true : false/*premul_alpha*/);
+    return m->getTexture(true/*srgb*/, m->getShaderName() == "additive" ||
+        m->getShaderName() == "alphablend" ? true : false/*premul_alpha*/) !=
+        NULL;
 }   // preloadIcon
 
 //-----------------------------------------------------------------------------
