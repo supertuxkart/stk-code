@@ -66,13 +66,15 @@ void OptionsScreenAudio::init()
     // ---- sfx volume
     SpinnerWidget* gauge = this->getWidget<SpinnerWidget>("sfx_volume");
     assert(gauge != NULL);
-
-    gauge->setValue( (int)(SFXManager::get()->getMasterSFXVolume()*10.0f) );
-
+    gauge->setMax(UserConfigParams::m_volume_denominator);
+    gauge->setValue((int)(SFXManager::get()->getMasterSFXVolume() *
+        float(UserConfigParams::m_volume_denominator)));
 
     gauge = this->getWidget<SpinnerWidget>("music_volume");
     assert(gauge != NULL);
-    gauge->setValue( (int)(music_manager->getMasterMusicVolume()*10.f) );
+    gauge->setMax(UserConfigParams::m_volume_denominator);
+    gauge->setValue((int)(music_manager->getMasterMusicVolume() *
+        float(UserConfigParams::m_volume_denominator)));
 
     // ---- music volume
     CheckBoxWidget* sfx = this->getWidget<CheckBoxWidget>("sfx_enabled");
@@ -134,7 +136,8 @@ void OptionsScreenAudio::eventCallback(Widget* widget, const std::string& name, 
         SpinnerWidget* w = dynamic_cast<SpinnerWidget*>(widget);
         assert(w != NULL);
 
-        music_manager->setMasterMusicVolume( w->getValue()/10.0f );
+        music_manager->setMasterMusicVolume(w->getValue() /
+            float(UserConfigParams::m_volume_denominator));
     }
     else if(name == "sfx_volume")
     {
@@ -146,8 +149,10 @@ void OptionsScreenAudio::eventCallback(Widget* widget, const std::string& name, 
         if (sample_sound == NULL) sample_sound = SFXManager::get()->createSoundSource( "pre_start_race" );
         sample_sound->setVolume(1);
 
-        SFXManager::get()->setMasterSFXVolume( w->getValue()/10.0f );
-        UserConfigParams::m_sfx_volume = w->getValue()/10.0f;
+        float new_vol = w->getValue() /
+            float(UserConfigParams::m_volume_denominator);
+        SFXManager::get()->setMasterSFXVolume(new_vol);
+        UserConfigParams::m_sfx_volume = new_vol;
 
         // play a sample sound to show the user what this volume is like
         sample_sound->play();

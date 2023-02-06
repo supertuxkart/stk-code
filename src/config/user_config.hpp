@@ -422,6 +422,11 @@ namespace UserConfigParams
             PARAM_DEFAULT(  FloatUserConfigParam(0.5f, "music_volume",
             &m_audio_group, "Music volume from 0.0 to 1.0") );
 
+    PARAM_PREFIX IntUserConfigParam          m_volume_denominator
+            PARAM_DEFAULT(  IntUserConfigParam(10, "volume_denominator",
+                            &m_audio_group,
+                            "Number of steps for volume adjustment") );
+
     // ---- Race setup
     PARAM_PREFIX GroupUserConfigParam        m_race_setup_group
         PARAM_DEFAULT( GroupUserConfigParam("RaceSetup",
