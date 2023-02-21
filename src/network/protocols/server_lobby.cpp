@@ -208,6 +208,7 @@ ServerLobby::ServerLobby() : LobbyProtocol()
 {
     m_client_server_host_id.store(0);
     m_lobby_players.store(0);
+    m_current_ai_count.store(0);
     std::vector<int> all_t =
         track_manager->getTracksInGroup("standard");
     std::vector<int> all_arenas =
@@ -2854,6 +2855,7 @@ void ServerLobby::checkIncomingConnectionRequests()
     request->addParameter("address", addr.getIP()  );
     request->addParameter("port",    addr.getPort());
     request->addParameter("current-players", getLobbyPlayers());
+    request->addParameter("current-ai", m_current_ai_count.load());
     request->addParameter("game-started",
         m_state.load() == WAITING_FOR_START_GAME ? 0 : 1);
     std::string current_track = getPlayingTrackIdent();
@@ -4005,13 +4007,18 @@ void ServerLobby::updatePlayerList(bool update_when_reset_server)
             }
             all_profiles.insert(all_profiles.end(), ai_profiles.begin(),
                 ai_profiles.end());
+            m_current_ai_count.store((int)ai_profiles.size());
         }
         else if (!m_ai_profiles.empty())
         {
             all_profiles.insert(all_profiles.end(), m_ai_profiles.begin(),
                 m_ai_profiles.end());
+            m_current_ai_count.store((int)m_ai_profiles.size());
         }
     }
+    else
+        m_current_ai_count.store(0);
+
     m_lobby_players.store((int)all_profiles.size());
 
     // No need to update player list (for started grand prix currently)

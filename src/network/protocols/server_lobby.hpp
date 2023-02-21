@@ -234,6 +234,8 @@ private:
 
     std::atomic<int> m_lobby_players;
 
+    std::atomic<int> m_current_ai_count;
+
     std::atomic<uint64_t> m_last_success_poll_time;
 
     uint64_t m_last_unsuccess_poll_time, m_server_started_at, m_server_delay;
