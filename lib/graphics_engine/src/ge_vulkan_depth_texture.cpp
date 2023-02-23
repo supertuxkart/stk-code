@@ -1,3 +1,5 @@
+#include <stdexcept>
+
 #include "ge_vulkan_depth_texture.hpp"
 
 #include "ge_main.hpp"

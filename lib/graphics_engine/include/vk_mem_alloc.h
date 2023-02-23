@@ -20,6 +20,8 @@
 // THE SOFTWARE.
 //
 
+#include <cstdio>
+
 #ifndef AMD_VULKAN_MEMORY_ALLOCATOR_H
 #define AMD_VULKAN_MEMORY_ALLOCATOR_H
 

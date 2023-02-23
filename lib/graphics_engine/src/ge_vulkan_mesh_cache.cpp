@@ -12,6 +12,7 @@
 #include <cassert>
 #include <stdexcept>
 #include <vector>
+#include <stdexcept>
 
 namespace GE
 {
