@@ -25,6 +25,7 @@
 #include "font/regular_face.hpp"
 #include "graphics/camera_debug.hpp"
 #include "graphics/camera_fps.hpp"
+#include "graphics/central_settings.hpp"
 #include "graphics/shader_based_renderer.hpp"
 #include "graphics/sp/sp_base.hpp"
 #include "graphics/stk_text_billboard.hpp"
@@ -1001,7 +1002,14 @@ bool handleContextMenuAction(s32 cmd_id)
                 SP::SPTextureManager* sptm = SP::SPTextureManager::get();
                 if (t == "tus;")
                 {
-                    sptm->dumpAllTextures();
+                    if (CVS->isGLSL())
+                        sptm->dumpAllTextures();
+                    else
+                    {
+                        for (auto& p : STKTexManager::getInstance()->getAllTextures())
+                            Log::info("STKTexManager", "%s", p.first.c_str());
+                        STKTexManager::getInstance()->dumpTextureUsage();
+                    }
                     return false;
                 }
                 if (t.empty())
