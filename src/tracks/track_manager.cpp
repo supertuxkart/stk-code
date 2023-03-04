@@ -29,8 +29,13 @@
 #include <stdexcept>
 #include <stdio.h>
 
+#include <IFileSystem.h>
 #include <ITexture.h>
 #include <IVideoDriver.h>
+
+#ifndef SERVER_ONLY
+#include <ge_main.hpp>
+#endif
 
 TrackManager* track_manager = 0;
 std::vector<std::string>  TrackManager::m_track_search_path;
@@ -178,6 +183,7 @@ void TrackManager::loadTrackList()
             loadTrack(dir+*subdir+"/");
         }   // for dir in dirs
     }   // for i <m_track_search_path.size()
+    updateScreenshotCache();
     onDemandLoadTrackScreenshots();
 }  // loadTrackList
 
@@ -221,12 +227,6 @@ bool TrackManager::loadTrack(const std::string& dirname)
     m_tracks.push_back(track);
     m_track_avail.push_back(true);
     updateGroups(track);
-
-    // Populate the texture cache with track screenshots
-    // (internal tracks like end cutscene don't have screenshots)
-    if (!track->isInternal())
-        irr_driver->getTexture(track->getScreenshotFile());
-
     return true;
 }   // loadTrack
 
@@ -361,3 +361,25 @@ void TrackManager::onDemandLoadTrackScreenshots()
             screenshot->getTextureHandler();
     }
 }   // onDemandLoadTrackScreenshots
+
+// ----------------------------------------------------------------------------
+void TrackManager::updateScreenshotCache()
+{
+    for (unsigned i = 0; i < m_tracks.size(); i++)
+    {
+        // Populate the texture cache with track screenshots
+        // (internal tracks like end cutscene don't have screenshots)
+        Track* t = m_tracks[i];
+        if (t->isInternal() || t->getScreenshotFile().empty())
+            continue;
+        std::string full_path = file_manager->getFileSystem()
+            ->getAbsolutePath(t->getScreenshotFile().c_str()).c_str();
+        if (!file_manager->fileExists(full_path))
+            continue;
+#ifndef SERVER_ONLY
+        if (GE::getDriver()->getDriverType() == video::EDT_VULKAN)
+            GE::getGEConfig()->m_ondemand_load_texture_paths.insert(full_path);
+#endif
+        irr_driver->getTexture(t->getScreenshotFile());
+    }
+}   // updateScreenshotCache

@@ -194,11 +194,6 @@ Track::Track(const std::string &filename)
 /** Destructor, removes quad data structures etc. */
 Track::~Track()
 {
-#ifndef SERVER_ONLY
-    if (GE::getDriver()->getDriverType() == video::EDT_VULKAN)
-        GE::getGEConfig()->m_ondemand_load_texture_paths.erase(m_screenshot);
-#endif
-
     // Note that the music information in m_music is globally managed
     // by the music_manager, and is freed there. So no need to free it
     // here (esp. since various track might share the same music).
@@ -432,13 +427,6 @@ void Track::cleanup()
     for(unsigned int i=0; i<m_sky_textures.size(); i++)
     {
         video::ITexture* tex = (video::ITexture*)m_sky_textures[i];
-#ifndef SERVER_ONLY
-        if (GE::getDriver()->getDriverType() == video::EDT_VULKAN)
-        {
-            std::string fullpath = tex->getFullPath().c_str();
-            GE::getGEConfig()->m_ondemand_load_texture_paths.erase(fullpath);
-        }
-#endif
         tex->drop();
         if (tex->getReferenceCount() == 1)
             irr_driver->removeTexture(tex);
@@ -631,17 +619,7 @@ void Track::loadTrackInfo()
 
     // Set the correct paths
     if (m_screenshot.length() > 0)
-    {
         m_screenshot = m_root+m_screenshot;
-#ifndef SERVER_ONLY
-        if (GE::getDriver()->getDriverType() == video::EDT_VULKAN)
-        {
-            m_screenshot = file_manager->getFileSystem()
-                ->getAbsolutePath(m_screenshot.c_str()).c_str();
-            GE::getGEConfig()->m_ondemand_load_texture_paths.insert(m_screenshot);
-        }
-#endif
-    }
     delete root;
 
     std::string dir = StringUtils::getPath(m_filename);

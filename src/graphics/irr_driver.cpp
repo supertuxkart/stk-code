@@ -1173,6 +1173,7 @@ void IrrDriver::applyResolutionSettings(bool recreate_device)
     GUIEngine::addLoadingIcon(irr_driver->getTexture(banana) );
     // No need to reload cached track data (track_manager->cleanAllCachedData
     // above) - this happens dynamically when the tracks are loaded.
+    track_manager->updateScreenshotCache();
     GUIEngine::reshowCurrentScreen();
     MessageQueue::updatePosition();
     // Preload the explosion effects (explode.png)

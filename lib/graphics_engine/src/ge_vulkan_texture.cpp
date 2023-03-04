@@ -48,9 +48,11 @@ GEVulkanTexture::GEVulkanTexture(const std::string& path,
     }
 
     auto& paths = getGEConfig()->m_ondemand_load_texture_paths;
-    m_ondemand_load = (paths.find(m_full_path.c_str()) != paths.end());
+    auto path_itr = paths.find(m_full_path.c_str());
+    m_ondemand_load = (path_itr != paths.end());
     if (m_ondemand_load)
     {
+        paths.erase(path_itr);
         video::IImageLoader* loader = NULL;
         io::IReadFile* file = io::createReadFile(m_full_path);
         getDriver()->createImageFromFile(file, &loader);

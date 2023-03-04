@@ -129,18 +129,6 @@ KartProperties::~KartProperties()
             ShaderFilesManager::getInstance()->removeUnusedShaderFiles();
             SP::SPTextureManager::get()->removeUnusedTextures();
         }
-
-        if (GE::getDriver()->getDriverType() != video::EDT_VULKAN)
-            return;
-        auto& paths = GE::getGEConfig()->m_ondemand_load_texture_paths;
-        auto it = paths.begin();
-        while (it != paths.end())
-        {
-            if (StringUtils::startsWith(*it, m_root_absolute_path))
-                it = paths.erase(it);
-            else
-                it++;
-        }
     }
 #endif
 }   // ~KartProperties
@@ -383,6 +371,10 @@ void KartProperties::load(const std::string &filename, const std::string &node)
     file_manager->popTextureSearchPath();
     file_manager->popModelSearchPath();
 
+#ifndef SERVER_ONLY
+    if (GE::getDriver()->getDriverType() == video::EDT_VULKAN)
+        GE::getGEConfig()->m_ondemand_load_texture_paths.clear();
+#endif
 }   // load
 
 // ----------------------------------------------------------------------------

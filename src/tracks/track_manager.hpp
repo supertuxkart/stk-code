@@ -138,7 +138,8 @@ public:
     }   // getArenasInGroup
     // ------------------------------------------------------------------------
     void onDemandLoadTrackScreenshots();
-
+    // ------------------------------------------------------------------------
+    void updateScreenshotCache();
 };   // TrackManager
 
 extern TrackManager* track_manager;
