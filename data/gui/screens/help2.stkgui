@@ -78,12 +78,21 @@
                             I18N="In the help menu"
                             text="Egg hunt: Explore tracks to find all hidden eggs."/>
                 </div>
+                
                 <div width="100%" proportion="2" layout="horizontal-row">
                     <icon align="center" width="8%" height="100%" icon="gui/icons/mode_ghost.png"/>
                     <spacer width="3%" height="100%"/>
                     <bubble proportion="1" height="100%"
                             I18N="In the help menu"
                             text="Ghost replay: Race against ghost replays in time-trial or egg hunt mode, and record your own!"/>
+                </div>
+                
+                <div width="100%" proportion="2" layout="horizontal-row">
+                    <icon align="center" width="8%" height="100%" icon="gui/icons/mode_normal.png"/>
+                    <spacer width="3%" height="100%"/>
+                    <bubble proportion="1" height="100%"
+                            I18N="In the help menu"
+                            text="Lap Trial: Complete as many laps as possible in a given amount of time."/>
                 </div>
 
                <bubble proportion="4" width="100%" I18N="In the help menu"
