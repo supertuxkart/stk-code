@@ -795,6 +795,10 @@ if(${CMAKE_SYSTEM_NAME} MATCHES "FreeBSD")
     SET(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -L/usr/local/lib")
 endif()
 
+if(HAIKU)
+    target_link_libraries(supertuxkart -lbe -lnetwork)
+endif()
+
 # Wiiuse
 # ------
 if(USE_WIIUSE)
