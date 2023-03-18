@@ -48,6 +48,7 @@
 #include <mini_glm.hpp>
 
 #ifndef SERVER_ONLY
+#include <ge_main.hpp>
 #include <ge_spm_buffer.hpp>
 #include <ge_texture.hpp>
 #endif
@@ -64,6 +65,7 @@ const unsigned int VCLAMP = 2;
 Material::Material(const XMLNode *node, bool deprecated)
 {
     m_shader_name = "solid";
+    m_sampler_path = {{ }};
     m_deprecated = deprecated;
     m_installed = false;
 
@@ -318,14 +320,14 @@ Material::Material(const XMLNode *node, bool deprecated)
     {
         m_sampler_path[3] = normal_map_tex;
     }
-    for (int i = 2; i < 6; i++)
+    for (int i = 2; i < m_sampler_path.size(); i++)
     {
         const std::string key =
             std::string("tex-layer-") + StringUtils::toString(i);
         node->get(key, &m_sampler_path[i]);
     }
     // Convert to full path
-    for (int i = 1; i < 6; i++)
+    for (int i = 1; i < m_sampler_path.size(); i++)
     {
         if (m_sampler_path[i].empty())
         {
@@ -447,6 +449,7 @@ Material::Material(const std::string& fname, bool is_full_path,
                    const std::string& shader_name)
 {
     m_shader_name = shader_name;
+    m_sampler_path = {{ }};
     m_deprecated = false;
     m_installed = false;
     init();
@@ -534,10 +537,12 @@ void Material::init()
     {
         m_particles_effects[n] = NULL;
     }
+    m_vk_textures               = {{ }};
 }   // init
 
 //-----------------------------------------------------------------------------
-void Material::install(std::function<void(video::IImage*)> image_mani)
+void Material::install(std::function<void(video::IImage*)> image_mani,
+                       video::SMaterial* m)
 {
     // Don't load a texture that are not supposed to be loaded automatically
     if (m_installed) return;
@@ -569,6 +574,27 @@ void Material::install(std::function<void(video::IImage*)> image_mani)
     m_texname = texfname.c_str();
 
     m_texture->grab();
+
+#ifndef SERVER_ONLY
+    if (!m && irr_driver->getVideoDriver()->getDriverType() != EDT_VULKAN)
+        return;
+
+    for (unsigned i = 2; i < m_sampler_path.size(); i++)
+    {
+        if (m_sampler_path[i].empty())
+            continue;
+        GE::getGEConfig()->m_ondemand_load_texture_paths.insert(
+            m_sampler_path[i]);
+        m_vk_textures[i - 2] = STKTexManager::getInstance()->getTexture(
+            m_sampler_path[i]);
+        GE::getGEConfig()->m_ondemand_load_texture_paths.clear();
+        if (m_vk_textures[i - 2])
+        {
+            m_vk_textures[i - 2]->grab();
+            m->setTexture(i, m_vk_textures[i - 2]);
+        }
+    }
+#endif
 }   // install
 
 //-----------------------------------------------------------------------------
@@ -599,6 +625,21 @@ void Material::unloadTexture()
         m_texture = NULL;
         m_installed = false;
     }
+
+#ifndef SERVER_ONLY
+    if (irr_driver->getVideoDriver()->getDriverType() == EDT_VULKAN)
+    {
+        for (unsigned i = 2; i < m_sampler_path.size(); i++)
+        {
+            if (!m_vk_textures[i - 2])
+                continue;
+            m_vk_textures[i - 2]->drop();
+            if (m_vk_textures[i - 2]->getReferenceCount() == 1)
+                irr_driver->removeTexture(m_vk_textures[i - 2]);
+            m_vk_textures[i - 2] = NULL;
+        }
+    }
+#endif
 }
 
 //-----------------------------------------------------------------------------
@@ -776,7 +817,7 @@ void  Material::setMaterialProperties(video::SMaterial *m, scene::IMeshBuffer* m
 {
     if (!m_installed)
     {
-        install();
+        install(nullptr, m);
     }
 
     if (m_deprecated ||

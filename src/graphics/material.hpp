@@ -68,6 +68,8 @@ private:
     /** Pointer to the texture. */
     video::ITexture *m_texture;
 
+    std::array<video::ITexture*, 4> m_vk_textures;
+
     /** Name of the texture. */
     std::string      m_texname;
 
@@ -202,7 +204,8 @@ private:
     std::string      m_colorization_mask;
 
     void  init    ();
-    void  install (std::function<void(video::IImage*)> image_mani = nullptr);
+    void  install (std::function<void(video::IImage*)> image_mani = nullptr,
+                   video::SMaterial* m = NULL);
     void  initCustomSFX(const XMLNode *sfx);
     void  initParticlesEffect(const XMLNode *node);
 
@@ -210,7 +213,7 @@ private:
     std::string      m_shader_name;
     std::string      m_uv_two_tex;
     // Full path for textures in sp shader
-    std::string      m_sampler_path[6];
+    std::array<std::string, 6> m_sampler_path;
     std::string      m_container_id;
     void loadContainerId();
 
