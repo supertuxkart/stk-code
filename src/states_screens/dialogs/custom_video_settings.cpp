@@ -32,6 +32,7 @@
 #include <IGUIEnvironment.h>
 #ifndef SERVER_ONLY
 #include <ge_main.hpp>
+#include <ge_vulkan_driver.hpp>
 #endif
 
 using namespace GUIEngine;
@@ -128,6 +129,12 @@ GUIEngine::EventPropagation CustomVideoSettingsDialog::processEvent(const std::s
         if (selection == "apply")
         {
             bool advanced_pipeline = getWidget<CheckBoxWidget>("dynamiclight")->getState();
+            bool update_needed = false;
+            if (UserConfigParams::m_dynamic_lights != advanced_pipeline)
+            {
+                update_needed = true;
+                GE::getGEConfig()->m_pbr = advanced_pipeline;
+            }
             UserConfigParams::m_dynamic_lights = advanced_pipeline;
 
             UserConfigParams::m_dof =
@@ -182,15 +189,18 @@ GUIEngine::EventPropagation CustomVideoSettingsDialog::processEvent(const std::s
             const int val =
                 getWidget<SpinnerWidget>("geometry_detail")->getValue();
             UserConfigParams::m_geometry_level = val == 2 ? 0 : val == 0 ? 2 : 1;
-
-            OptionsScreenVideo::setImageQuality(getWidget<SpinnerWidget>
-                ("image_quality")->getValue());
+            int quality = getWidget<SpinnerWidget>("image_quality")->getValue();
 
             user_config->saveConfig();
 
             ModalDialog::dismiss();
             OptionsScreenVideo::getInstance()->updateGfxSlider();
             OptionsScreenVideo::getInstance()->updateBlurSlider();
+#ifndef SERVER_ONLY
+            if (update_needed && GE::getDriver()->getDriverType() == video::EDT_VULKAN)
+                GE::getVKDriver()->updateDriver(true);
+#endif
+            OptionsScreenVideo::setImageQuality(quality);
             return GUIEngine::EVENT_BLOCK;
         }
         else if (selection == "cancel")
@@ -218,6 +228,8 @@ void CustomVideoSettingsDialog::updateActivation()
         getWidget<CheckBoxWidget>("dynamiclight")->setActive(false);
         light = false;
     }
+    if (GE::getDriver()->getDriverType() == video::EDT_VULKAN)
+        getWidget<CheckBoxWidget>("dynamiclight")->setActive(true);
     getWidget<CheckBoxWidget>("motionblur")->setActive(light);
     getWidget<CheckBoxWidget>("dof")->setActive(light);
     getWidget<SpinnerWidget>("shadows")->setActive(light);

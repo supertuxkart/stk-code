@@ -25,7 +25,6 @@ irr::io::IFileSystem* g_file_system = NULL;
 
 std::string g_predefines = "";
 
-// More when PBR is used later
 uint32_t g_mesh_texture_layer = 2;
 
 uint32_t g_sampler_size = 512;
@@ -55,6 +54,13 @@ void GEVulkanShaderManager::init(GEVulkanDriver* vk)
 
     std::ostringstream oss;
     oss << "#version 450\n";
+    if (getGEConfig()->m_pbr)
+    {
+        oss << "#define PBR_ENABLED 1\n";
+        g_mesh_texture_layer = 8;
+    }
+    else
+        g_mesh_texture_layer = 2;
     oss << "#define SAMPLER_SIZE " << g_sampler_size << "\n";
     oss << "#define TOTAL_MESH_TEXTURE_LAYER " << g_mesh_texture_layer << "\n";
     if (GEVulkanFeatures::supportsBindTexturesAtOnce())

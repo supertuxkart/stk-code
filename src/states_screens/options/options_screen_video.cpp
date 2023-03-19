@@ -897,8 +897,12 @@ void OptionsScreenVideo::eventCallback(Widget* widget, const std::string& name,
 
         UserConfigParams::m_scale_rtts_factor = m_scale_rtts_custom_presets[level].value;
 #ifndef SERVER_ONLY
-        if (GE::getVKDriver())
-            GE::getVKDriver()->updateRenderScale(UserConfigParams::m_scale_rtts_factor);
+        GE::GEVulkanDriver* gevk = GE::getVKDriver();
+        if (gevk && GE::getGEConfig()->m_render_scale != UserConfigParams::m_scale_rtts_factor)
+        {
+            GE::getGEConfig()->m_render_scale = UserConfigParams::m_scale_rtts_factor;
+            gevk->updateDriver();
+        }
 #endif
         updateScaleRTTsSlider();
     }

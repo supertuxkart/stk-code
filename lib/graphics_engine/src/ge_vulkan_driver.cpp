@@ -2505,15 +2505,22 @@ bool GEVulkanDriver::setRenderTarget(video::ITexture* texture,
 }   // setRenderTarget
 
 // ----------------------------------------------------------------------------
-void GEVulkanDriver::updateRenderScale(float value)
+void GEVulkanDriver::updateDriver(bool reload_shaders)
 {
-    if (getGEConfig()->m_render_scale == value)
-        return;
     waitIdle();
     setDisableWaitIdle(true);
     clearDrawCallsCache();
     destroySwapChainRelated(false/*handle_surface*/);
-    getGEConfig()->m_render_scale = value;
+    if (reload_shaders)
+    {
+        GEVulkanShaderManager::destroy();
+        GEVulkanShaderManager::init(this);
+        delete m_mesh_texture_descriptor;
+        m_mesh_texture_descriptor = new GEVulkanTextureDescriptor(
+            GEVulkanShaderManager::getSamplerSize(),
+            GEVulkanShaderManager::getMeshTextureLayer(),
+            GEVulkanFeatures::supportsBindMeshTexturesAtOnce());
+    }
     createSwapChainRelated(false/*handle_surface*/);
     for (auto& dc : static_cast<GEVulkanSceneManager*>(
         m_irrlicht_device->getSceneManager())->getDrawCalls())
@@ -2522,7 +2529,7 @@ void GEVulkanDriver::updateRenderScale(float value)
     GEVulkan2dRenderer::destroy();
     GEVulkan2dRenderer::init(this);
     setDisableWaitIdle(false);
-}   // updateRenderScale
+}   // updateDriver
 
 // ----------------------------------------------------------------------------
 void GEVulkanDriver::clearDrawCallsCache()

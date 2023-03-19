@@ -21,6 +21,7 @@ GEConfig g_config =
     false,
     true,
     false,
+    false,
     {},
     1.0f
 };

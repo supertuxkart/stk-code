@@ -512,6 +512,8 @@ begin:
                 UserConfigParams::m_texture_compression;
             GE::getGEConfig()->m_render_scale =
                 UserConfigParams::m_scale_rtts_factor;
+            GE::getGEConfig()->m_pbr =
+                UserConfigParams::m_dynamic_lights;
 #endif
         }
         else
