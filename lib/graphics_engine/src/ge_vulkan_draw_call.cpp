@@ -413,7 +413,8 @@ start:
             const irr::video::SMaterial& m = node->getMaterial(0);
             TexturesList textures = getTexturesList(m);
             const irr::video::ITexture** list = &textures[0];
-            int material_id = m_texture_descriptor->getTextureID(list);
+            int material_id = m_texture_descriptor->getTextureID(list,
+                getShader(m));
             ObjectData* data = (ObjectData*)mapped_addr;
             data->init(node, material_id, -1, 0);
             m_materials[q.first] = material_id;
@@ -442,9 +443,11 @@ start:
     std::unordered_map<uint32_t, uint32_t> offset_map;
     for (auto& p : visible_nodes)
     {
-        TexturesList textures = getTexturesList(p.first->getMaterial());
+        const irr::video::SMaterial& m = p.first->getMaterial();
+        TexturesList textures = getTexturesList(m);
         const irr::video::ITexture** list = &textures[0];
-        int material_id = m_texture_descriptor->getTextureID(list);
+        int material_id = m_texture_descriptor->getTextureID(list,
+            getShader(m));
         m_materials[p.first] = material_id;
 
         const bool skinning = p.first->hasSkinning();
@@ -513,7 +516,8 @@ start:
                         const irr::video::SMaterial& m = node->getMaterial(0);
                         TexturesList textures = getTexturesList(m);
                         const irr::video::ITexture** list = &textures[0];
-                        material_id = m_texture_descriptor->getTextureID(list);
+                        material_id = m_texture_descriptor->getTextureID(list,
+                            getShader(m));
                     }
                     if (r.second == BILLBOARD_NODE)
                     {
@@ -769,6 +773,12 @@ std::string GEVulkanDrawCall::getShader(irr::scene::ISceneNode* node,
                                         int material_id)
 {
     irr::video::SMaterial& m = node->getMaterial(material_id);
+    return getShader(m);
+}   // getShader
+
+// ----------------------------------------------------------------------------
+std::string GEVulkanDrawCall::getShader(const irr::video::SMaterial& m)
+{
     std::string shader;
     switch (m.MaterialType)
     {

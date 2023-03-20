@@ -13,6 +13,7 @@ namespace irr
 #include <atomic>
 #include <map>
 #include <memory>
+#include <string>
 #include <vector>
 
 namespace GE
@@ -82,7 +83,8 @@ public:
             clear();
     }
     // ------------------------------------------------------------------------
-    int getTextureID(const irr::video::ITexture** list);
+    int getTextureID(const irr::video::ITexture** list,
+                     const std::string& shader = std::string());
     // ------------------------------------------------------------------------
     void setSamplerUse(GEVulkanSampler sampler)
     {

@@ -190,7 +190,8 @@ void GEVulkanTextureDescriptor::updateDescriptor()
 }   // updateDescriptor
 
 // ----------------------------------------------------------------------------
-int GEVulkanTextureDescriptor::getTextureID(const irr::video::ITexture** list)
+int GEVulkanTextureDescriptor::getTextureID(const irr::video::ITexture** list,
+                                            const std::string& shader)
 {
     TextureList key =
     {{
@@ -205,10 +206,12 @@ int GEVulkanTextureDescriptor::getTextureID(const irr::video::ITexture** list)
     }};
     for (unsigned i = 0; i < m_max_layer; i++)
     {
+        // Assume 0, 1 layer is srgb for pbr enabled currently
         if (list[i])
         {
             key[i] = static_cast<const GEVulkanTexture*>(
-                list[i])->getImageView();
+                list[i])->getImageView(getGEConfig()->m_pbr &&
+                !shader.empty() && i <= 1 ? true : false);
         }
     }
     auto it = m_texture_list.find(key);

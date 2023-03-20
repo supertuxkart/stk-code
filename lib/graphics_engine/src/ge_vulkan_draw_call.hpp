@@ -168,6 +168,8 @@ private:
     // ------------------------------------------------------------------------
     void createVulkanData();
     // ------------------------------------------------------------------------
+    std::string getShader(const irr::video::SMaterial& m);
+    // ------------------------------------------------------------------------
     std::string getShader(irr::scene::ISceneNode* node, int material_id);
     // ------------------------------------------------------------------------
     void bindPipeline(VkCommandBuffer cmd, const std::string& name) const

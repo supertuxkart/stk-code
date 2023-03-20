@@ -46,7 +46,8 @@ public:
     virtual void updateTexture(void* data, irr::video::ECOLOR_FORMAT format,
                                u32 w, u32 h, u32 x, u32 y)                   {}
     // ------------------------------------------------------------------------
-    virtual std::shared_ptr<std::atomic<VkImageView> > getImageView() const
+    virtual std::shared_ptr<std::atomic<VkImageView> > getImageView(
+                                                       bool srgb = false) const
                                                        { return m_image_view; }
 };   // GEVulkanDepthTexture
 
