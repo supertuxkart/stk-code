@@ -390,38 +390,6 @@ build_stk()
         touch "$DEPENDENCIES_DIR/libvorbis.stamp"
     fi
     
-    # Shaderc
-    if [ ! -f "$DEPENDENCIES_DIR/shaderc.stamp" ]; then
-        echo "Compiling shaderc"
-        
-        "$DEPENDENCIES_DIR/../lib/shaderc/utils/git-sync-deps"
-        
-        mkdir -p "$DEPENDENCIES_DIR/shaderc"
-        cp -a -f "$DEPENDENCIES_DIR/../lib/shaderc/"* "$DEPENDENCIES_DIR/shaderc"
-
-        cd "$DEPENDENCIES_DIR/shaderc"
-        cmake . -DCMAKE_FIND_ROOT_PATH="$INSTALL_DIR" \
-                -DCMAKE_INSTALL_PREFIX="$INSTALL_DIR" \
-                -DCMAKE_C_FLAGS="-fpic -O3"           \
-                -DCMAKE_CXX_FLAGS="-fpic -O3"         \
-                -DSHADERC_SKIP_INSTALL=1              \
-                -DCMAKE_BUILD_TYPE=Release            \
-                -DSHADERC_SKIP_TESTS=1                \
-                -DSHADERC_SKIP_EXAMPLES=1             \
-                -DSPIRV_HEADERS_SKIP_INSTALL=1        \
-                -DSPIRV_HEADERS_SKIP_EXAMPLES=1       \
-                -DSKIP_SPIRV_TOOLS_INSTALL=1          \
-                -DSPIRV_SKIP_TESTS=1                  \
-                -DSPIRV_SKIP_EXECUTABLES=1            \
-                -DENABLE_GLSLANG_BINARIES=0           \
-                -DENABLE_CTEST=0 &&
-        make -j$THREADS_NUMBER &&
-        cp "$DEPENDENCIES_DIR/shaderc/libshaderc/libshaderc"* "$INSTALL_DIR/lib/" &&
-        cp -a -f "$DEPENDENCIES_DIR/shaderc/libshaderc/include/"* "$INSTALL_DIR/include/"
-        check_error
-        touch "$DEPENDENCIES_DIR/shaderc.stamp"
-    fi
-    
     # ASTC-encoder
     if [ ! -f "$DEPENDENCIES_DIR/astc-encoder.stamp" ]; then
         echo "Compiling astc-encoder"
