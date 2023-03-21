@@ -3,11 +3,7 @@
 
 #include "vulkan_wrapper.h"
 #include <string>
-#ifdef DISABLE_SHADERC
-  #define shaderc_shader_kind int
-#else
-  #include <shaderc/shaderc.h>
-#endif
+#include <shaderc/shaderc.h>
 
 namespace GE
 {

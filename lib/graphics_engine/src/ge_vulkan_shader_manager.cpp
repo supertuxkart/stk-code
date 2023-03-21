@@ -33,7 +33,6 @@ std::map<std::string, std::pair<GESpinLock, VkShaderModule>* > g_shaders;
 }   // GEVulkanShaderManager
 
 // ============================================================================
-#ifndef DISABLE_SHADERC
 shaderc_include_result* showError(const char* message)
 {
     shaderc_include_result* err = new shaderc_include_result;
@@ -44,7 +43,6 @@ shaderc_include_result* showError(const char* message)
     err->user_data = NULL;
     return err;
 }   // showError
-#endif
 
 // ============================================================================
 void GEVulkanShaderManager::init(GEVulkanDriver* vk)
@@ -98,7 +96,6 @@ void GEVulkanShaderManager::destroy()
 // ----------------------------------------------------------------------------
 void GEVulkanShaderManager::loadAllShaders()
 {
-#ifndef DISABLE_SHADERC
     irr::io::IFileList* files = g_file_system->createFileList(
         getShaderFolder().c_str());
     for (unsigned i = 0; i < files->getFileCount(); i++)
@@ -131,16 +128,12 @@ void GEVulkanShaderManager::loadAllShaders()
             });
     }
     files->drop();
-#endif
 }   // loadAllShaders
 
 // ----------------------------------------------------------------------------
 VkShaderModule GEVulkanShaderManager::loadShader(shaderc_shader_kind kind,
                                                  const std::string& name)
 {
-#ifdef DISABLE_SHADERC
-    return VK_NULL_HANDLE;
-#else
     std::string shader_fullpath = getShaderFolder() + name;
     irr::io::IReadFile* r = irr::io::createReadFile(shader_fullpath.c_str());
     if (!r)
@@ -251,7 +244,6 @@ VkShaderModule GEVulkanShaderManager::loadShader(shaderc_shader_kind kind,
     shaderc_result_release(result);
     shaderc_compiler_release(compiler);
     return shader_module;
-#endif
 }   // loadShader
 
 // ----------------------------------------------------------------------------

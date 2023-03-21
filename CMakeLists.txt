@@ -260,22 +260,31 @@ if(NOT SERVER_ONLY)
 endif()
 
 if(NOT SERVER_ONLY)
-    if (IOS)
-        find_library(SHADERC_LIBRARY NAMES shaderc_combined libshaderc_combined)
-    else()
-        find_library(SHADERC_LIBRARY NAMES shaderc_shared libshaderc_shared)
-    endif()
+    find_library(SHADERC_LIBRARY NAMES shaderc_shared libshaderc_shared)
     find_path(SHADERC_INCLUDEDIR NAMES shaderc/shaderc.hpp PATHS)
     if (NOT SHADERC_LIBRARY OR NOT SHADERC_INCLUDEDIR)
-        if (NOT NO_SHADERC)
-            message(FATAL_ERROR "Please install shaderc from your distribution or disable vulkan support with -DNO_SHADERC=on")
-        endif()
+        set(SHADERC_SKIP_INSTALL ON CACHE INTERNAL "Skip installation" FORCE)
+        set(SHADERC_SKIP_TESTS ON CACHE INTERNAL "Skip building tests" FORCE)
+        set(SHADERC_SKIP_EXAMPLES ON CACHE INTERNAL "Skip building examples" FORCE)
+        set(SHADERC_SKIP_COPYRIGHT_CHECK ON CACHE INTERNAL "Skip copyright check" FORCE)
+
+        set(SPIRV_HEADERS_SKIP_INSTALL ON CACHE INTERNAL "Skip install" FORCE)
+        set(SPIRV_HEADERS_SKIP_EXAMPLES ON CACHE INTERNAL "Skip building examples" FORCE)
+
+        set(SKIP_SPIRV_TOOLS_INSTALL ON CACHE INTERNAL "Skip installation" FORCE)
+        set(SPIRV_SKIP_TESTS ON CACHE INTERNAL "Skip tests" FORCE)
+        set(SPIRV_SKIP_EXECUTABLES ON CACHE INTERNAL "Skip executables" FORCE)
+
+        set(ENABLE_GLSLANG_BINARIES OFF CACHE INTERNAL "Builds glslangValidator and spirv-remap" FORCE)
+        set(ENABLE_CTEST OFF CACHE INTERNAL "Enable ctest" FORCE)
+
+        add_subdirectory("${PROJECT_SOURCE_DIR}/lib/shaderc")
+        include_directories(BEFORE "${PROJECT_SOURCE_DIR}/lib/shaderc/libshaderc/include")
+        SET(SHADERC_LIBRARY shaderc)
+        message(STATUS "System shaderc not found, use the bundled one.")
     else()
         include_directories("${SHADERC_INCLUDEDIR}")
         MESSAGE(STATUS "Use system shaderc: ${SHADERC_LIBRARY}")
-    endif()
-    if (NO_SHADERC)
-        add_definitions(-DDISABLE_SHADERC)
     endif()
 
     add_subdirectory("${PROJECT_SOURCE_DIR}/lib/graphics_engine")
@@ -765,10 +774,8 @@ if(NOT SERVER_ONLY)
         graphics_utils
         graphics_engine
         ${SDL2_LIBRARY}
-        tinygettext)
-    if (NOT NO_SHADERC)
-        target_link_libraries(supertuxkart ${SHADERC_LIBRARY})
-    endif()
+        tinygettext
+        ${SHADERC_LIBRARY})
 endif()
 
 if(UNIX AND NOT APPLE)
