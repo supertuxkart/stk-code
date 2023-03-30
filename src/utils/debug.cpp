@@ -1065,7 +1065,7 @@ bool handleContextMenuAction(s32 cmd_id)
                             "* <End> - Last kart\n"
                             "* <Page Up> - Previous kart\n"
                             "* <Page Down> - Next kart"
-                            , true);
+                            , World::getWorld() && World::getWorld()->isNetworkWorld() ? false : true);
         break;
     }
     return false;
