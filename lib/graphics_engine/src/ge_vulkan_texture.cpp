@@ -291,7 +291,7 @@ bool GEVulkanTexture::createImage(VkImageUsageFlags usage)
     if (m_image_view_type == VK_IMAGE_VIEW_TYPE_CUBE ||
         m_image_view_type == VK_IMAGE_VIEW_TYPE_CUBE_ARRAY)
         image_info.flags = VK_IMAGE_CREATE_CUBE_COMPATIBLE_BIT;
-    if (m_internal_format == VK_FORMAT_R8G8B8A8_UNORM)
+    if (m_internal_format != getSRGBformat(m_internal_format))
         image_info.flags |= VK_IMAGE_CREATE_MUTABLE_FORMAT_BIT;
 
     m_vma_info = {};
@@ -449,10 +449,11 @@ bool GEVulkanTexture::createImageView(VkImageAspectFlags aspect_flags)
     {
         image_view.get()->store(view_ptr);
         m_image_view = image_view;
-        if (m_internal_format == VK_FORMAT_R8G8B8A8_UNORM)
+        VkFormat srgb_format = getSRGBformat(m_internal_format);
+        if (m_internal_format != srgb_format)
         {
             image_view = std::make_shared<std::atomic<VkImageView> >();
-            view_info.format = VK_FORMAT_R8G8B8A8_SRGB;
+            view_info.format = srgb_format;
             view_ptr = VK_NULL_HANDLE;
             if (vkCreateImageView(m_vulkan_device, &view_info,
                 NULL, &view_ptr) == VK_SUCCESS)

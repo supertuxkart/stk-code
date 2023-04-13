@@ -68,6 +68,19 @@ protected:
     GEVulkanDriver* m_vk;
 
     // ------------------------------------------------------------------------
+    VkFormat getSRGBformat(VkFormat format)
+    {
+        if (format == VK_FORMAT_R8G8B8A8_UNORM)
+            return VK_FORMAT_R8G8B8A8_SRGB;
+        else if (format == VK_FORMAT_ASTC_4x4_UNORM_BLOCK)
+            return VK_FORMAT_ASTC_4x4_SRGB_BLOCK;
+        else if (format == VK_FORMAT_BC7_UNORM_BLOCK)
+            return VK_FORMAT_BC7_SRGB_BLOCK;
+        else if (format == VK_FORMAT_BC3_UNORM_BLOCK)
+            return VK_FORMAT_BC3_SRGB_BLOCK;
+        return format;
+    }
+    // ------------------------------------------------------------------------
     bool createTextureImage(uint8_t* texture_data, bool generate_hq_mipmap);
     // ------------------------------------------------------------------------
     bool createImage(VkImageUsageFlags usage);
