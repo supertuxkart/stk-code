@@ -126,7 +126,14 @@ void GEVulkanShaderManager::loadAllShaders()
         GEVulkanCommandLoader::addMultiThreadingCommand(
             [pair, kind, filename]()
             {
-                pair->second = loadShader(kind, filename);
+                try
+                {
+                    pair->second = loadShader(kind, filename);
+                }
+                catch (std::exception& e)
+                {
+                    printf("%s", e.what());
+                }
                 pair->first.unlock();
             });
     }
@@ -272,6 +279,8 @@ VkShaderModule GEVulkanShaderManager::getShader(const std::string& filename)
     auto it = g_shaders.at(filename);
     it->first.lock();
     it->first.unlock();
+    if (it->second == VK_NULL_HANDLE)
+        throw std::runtime_error(std::string("Missing shader ") + filename);
     return it->second;
 }   // getShader
 
