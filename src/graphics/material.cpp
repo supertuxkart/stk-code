@@ -320,14 +320,14 @@ Material::Material(const XMLNode *node, bool deprecated)
     {
         m_sampler_path[3] = normal_map_tex;
     }
-    for (int i = 2; i < m_sampler_path.size(); i++)
+    for (unsigned i = 2; i < m_sampler_path.size(); i++)
     {
         const std::string key =
             std::string("tex-layer-") + StringUtils::toString(i);
         node->get(key, &m_sampler_path[i]);
     }
     // Convert to full path
-    for (int i = 1; i < m_sampler_path.size(); i++)
+    for (unsigned i = 1; i < m_sampler_path.size(); i++)
     {
         if (m_sampler_path[i].empty())
         {
