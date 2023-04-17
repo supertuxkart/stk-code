@@ -26,7 +26,7 @@ void main(void)
 {
     vec2 uv = gl_FragCoord.xy / u_screen;
     float lineardepth = textureLod(dtex, uv, 0.).x;
-    int x = int(gl_FragCoord.x), y = int(gl_FragCoord.y);
+    highp int x = int(gl_FragCoord.x), y = int(gl_FragCoord.y);
     vec3 FragPos = getXcYcZc(x, y, lineardepth);
 
     // get the normal of current fragment
