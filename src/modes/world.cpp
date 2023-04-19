@@ -91,6 +91,9 @@
 #include <IrrlichtDevice.h>
 #include <ISceneManager.h>
 
+/** Hide the cursor after this many ticks without movement */
+#define HIDE_CURSOR_STARTINGAT 100
+
 World* World::m_world[PT_COUNT];
 
 /** The main world class is used to handle the track and the karts.
@@ -161,6 +164,8 @@ void World::init()
 {
     m_ended_early         = false;
     m_faster_music_active = false;
+    m_ticks_since_last_mouse_movement = HIDE_CURSOR_STARTINGAT;
+    m_force_show_cursor   = false;
     m_fastest_kart        = 0;
     m_eliminated_karts    = 0;
     m_eliminated_players  = 0;
@@ -419,6 +424,11 @@ void World::reset(bool restart)
     // Start music from beginning
     music_manager->stopMusic();
 
+    m_force_show_cursor = false;
+    m_ticks_since_last_mouse_movement = HIDE_CURSOR_STARTINGAT;
+    SDL_GetMouseState(&m_last_mouse_pos_x, &m_last_mouse_pos_y);
+    SDL_ShowCursor(SDL_DISABLE);
+
     // Enable SFX again
     SFXManager::get()->resumeAll();
 
@@ -607,6 +617,9 @@ Controller* World::loadAIController(AbstractKart* kart)
 //-----------------------------------------------------------------------------
 World::~World()
 {
+    // This shouldn't be necessary, but just to be sure
+    SDL_ShowCursor(SDL_ENABLE);
+
     if (m_process_type == PT_MAIN)
     {
         GUIEngine::getDevice()->setResizable(false);
@@ -727,6 +740,8 @@ void World::onGo()
  */
 void World::terminateRace()
 {
+    m_force_show_cursor = true;
+
     // In case the user opened paused dialog in network
     if (!GUIEngine::isNoGraphics())
     {
@@ -1006,6 +1021,17 @@ void World::updateWorld(int ticks)
     assert(m_magic_number == 0xB01D6543);
 #endif
 
+    int x, y;
+    SDL_GetMouseState(&x, &y);
+    if (m_last_mouse_pos_x != x || m_last_mouse_pos_y != y)
+    {
+        m_ticks_since_last_mouse_movement = 0;
+        m_last_mouse_pos_x = x;
+        m_last_mouse_pos_y = y;
+    }
+
+    SDL_ShowCursor((m_ticks_since_last_mouse_movement++ < HIDE_CURSOR_STARTINGAT
+                    || m_force_show_cursor) ? SDL_ENABLE : SDL_DISABLE);
 
     if (m_schedule_pause)
     {
@@ -1479,6 +1505,8 @@ void World::getDefaultCollectibles(int *collectible_type, int *amount )
  */
 void World::pause(Phase phase)
 {
+    m_force_show_cursor = true;
+
     if (m_stop_music_when_dialog_open)
         music_manager->pauseMusic();
     SFXManager::get()->pauseAll();
@@ -1489,6 +1517,9 @@ void World::pause(Phase phase)
 //-----------------------------------------------------------------------------
 void World::unpause()
 {
+    m_force_show_cursor = false;
+    m_ticks_since_last_mouse_movement = HIDE_CURSOR_STARTINGAT;
+
     if (m_stop_music_when_dialog_open)
         music_manager->resumeMusic();
     SFXManager::get()->resumeAll();
