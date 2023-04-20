@@ -274,15 +274,18 @@ void RaceResultGUI::enableAllButtons()
 
     // If something was unlocked
     // -------------------------
+
+    // Note: Only returns greater than 0 for regular races, despite GPs
+    // showing feature unlocked cutscene.  GPs have their own logic.
     int n = (int)PlayerManager::getCurrentPlayer()
         ->getRecentlyCompletedChallenges().size();
+
     if (n > 0 &&
          (RaceManager::get()->getMajorMode() != RaceManager::MAJOR_MODE_GRAND_PRIX ||
           RaceManager::get()->getTrackNumber() + 1 == RaceManager::get()->getNumOfTracks() ) )
     {
-        middle->setLabel(n == 1 ? _("You completed a challenge!")
-            : _("You completed challenges!"));
-        middle->setImage("gui/icons/cup_gold.png");
+        middle->setLabel(_("Continue"));
+        middle->setImage("gui/icons/green_check.png");
         middle->setVisible(true);
         operations->select("middle", PLAYER_ID_GAME_MASTER);
     }
@@ -419,17 +422,18 @@ void RaceResultGUI::eventCallback(GUIEngine::Widget* widget,
             return;
         }
 
-        // If something was unlocked, the 'continue' button was
-        // actually used to display "Show unlocked feature(s)" text.
+        // If something was unlocked, the 'continue' button is
+        // used to trigger the unlocked feature(s) cutscene.
         // ---------------------------------------------------------
         PlayerProfile *player = PlayerManager::getCurrentPlayer();
 
+        // Note: Only returns greater than 0 for regular races, despite GPs
+        // showing feature unlocked cutscene.  GPs have their own logic.
         int n = (int)player->getRecentlyCompletedChallenges().size();
 
         if (n > 0 &&
              (RaceManager::get()->getMajorMode() != RaceManager::MAJOR_MODE_GRAND_PRIX ||
               RaceManager::get()->getTrackNumber() + 1 == RaceManager::get()->getNumOfTracks() ) )
-
         {
             if (action == "middle")
             {
