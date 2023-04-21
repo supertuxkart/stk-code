@@ -186,7 +186,7 @@ protected:
 
     int m_last_mouse_pos_x;
     int m_last_mouse_pos_y;
-    int m_ticks_since_last_mouse_movement;
+    float m_time_since_last_mouse_mvmt;
     bool m_force_show_cursor;
 
     virtual void  onGo() OVERRIDE;

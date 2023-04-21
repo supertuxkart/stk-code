@@ -91,8 +91,8 @@
 #include <IrrlichtDevice.h>
 #include <ISceneManager.h>
 
-/** Hide the cursor after this many ticks without movement */
-#define HIDE_CURSOR_STARTINGAT 100
+/** Hide the cursor after this many seconds without movement */
+#define HIDE_CURSOR_STARTINGAT 1.0f
 
 World* World::m_world[PT_COUNT];
 
@@ -164,7 +164,7 @@ void World::init()
 {
     m_ended_early         = false;
     m_faster_music_active = false;
-    m_ticks_since_last_mouse_movement = HIDE_CURSOR_STARTINGAT;
+    m_time_since_last_mouse_mvmt = HIDE_CURSOR_STARTINGAT;
     m_force_show_cursor   = false;
     m_fastest_kart        = 0;
     m_eliminated_karts    = 0;
@@ -427,7 +427,7 @@ void World::reset(bool restart)
     if (m_process_type == PT_MAIN)
     {
         m_force_show_cursor = false;
-        m_ticks_since_last_mouse_movement = HIDE_CURSOR_STARTINGAT;
+        m_time_since_last_mouse_mvmt = HIDE_CURSOR_STARTINGAT;
         SDL_GetMouseState(&m_last_mouse_pos_x, &m_last_mouse_pos_y);
         SDL_ShowCursor(SDL_DISABLE);
     }
@@ -1027,22 +1027,6 @@ void World::updateWorld(int ticks)
     assert(m_magic_number == 0xB01D6543);
 #endif
 
-    if (m_process_type == PT_MAIN)
-    {
-        int x, y;
-        SDL_GetMouseState(&x, &y);
-        if (m_last_mouse_pos_x != x || m_last_mouse_pos_y != y)
-        {
-            m_ticks_since_last_mouse_movement = 0;
-            m_last_mouse_pos_x = x;
-            m_last_mouse_pos_y = y;
-        }
-
-        SDL_ShowCursor((m_ticks_since_last_mouse_movement++ <
-                        HIDE_CURSOR_STARTINGAT || m_force_show_cursor) ?
-                        SDL_ENABLE : SDL_DISABLE);
-    }
-
     if (m_schedule_pause)
     {
         pause(m_scheduled_pause_phase);
@@ -1158,6 +1142,25 @@ void World::scheduleTutorial()
  */
 void World::updateGraphics(float dt)
 {
+    if (m_process_type == PT_MAIN)
+    {
+        int x, y;
+        SDL_GetMouseState(&x, &y);
+        if (m_last_mouse_pos_x != x || m_last_mouse_pos_y != y)
+        {
+            m_time_since_last_mouse_mvmt = 0;
+            m_last_mouse_pos_x = x;
+            m_last_mouse_pos_y = y;
+        }
+        else
+        {
+            m_time_since_last_mouse_mvmt += dt;
+        }
+
+        SDL_ShowCursor((m_time_since_last_mouse_mvmt < HIDE_CURSOR_STARTINGAT
+                        || m_force_show_cursor) ? SDL_ENABLE : SDL_DISABLE);
+    }
+
     if (auto cl = LobbyProtocol::get<ClientLobby>())
     {
         // Reset all smooth network body of rewinders so the rubber band effect
@@ -1528,7 +1531,7 @@ void World::pause(Phase phase)
 void World::unpause()
 {
     m_force_show_cursor = false;
-    m_ticks_since_last_mouse_movement = HIDE_CURSOR_STARTINGAT;
+    m_time_since_last_mouse_mvmt = HIDE_CURSOR_STARTINGAT;
 
     if (m_stop_music_when_dialog_open)
         music_manager->resumeMusic();
