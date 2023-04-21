@@ -424,10 +424,13 @@ void World::reset(bool restart)
     // Start music from beginning
     music_manager->stopMusic();
 
-    m_force_show_cursor = false;
-    m_ticks_since_last_mouse_movement = HIDE_CURSOR_STARTINGAT;
-    SDL_GetMouseState(&m_last_mouse_pos_x, &m_last_mouse_pos_y);
-    SDL_ShowCursor(SDL_DISABLE);
+    if (m_process_type == PT_MAIN)
+    {
+        m_force_show_cursor = false;
+        m_ticks_since_last_mouse_movement = HIDE_CURSOR_STARTINGAT;
+        SDL_GetMouseState(&m_last_mouse_pos_x, &m_last_mouse_pos_y);
+        SDL_ShowCursor(SDL_DISABLE);
+    }
 
     // Enable SFX again
     SFXManager::get()->resumeAll();
@@ -617,8 +620,11 @@ Controller* World::loadAIController(AbstractKart* kart)
 //-----------------------------------------------------------------------------
 World::~World()
 {
-    // This shouldn't be necessary, but just to be sure
-    SDL_ShowCursor(SDL_ENABLE);
+    if (m_process_type == PT_MAIN)
+    {
+        // This shouldn't be necessary, but just to be sure
+        SDL_ShowCursor(SDL_ENABLE);
+    }
 
     if (m_process_type == PT_MAIN)
     {
@@ -1021,17 +1027,21 @@ void World::updateWorld(int ticks)
     assert(m_magic_number == 0xB01D6543);
 #endif
 
-    int x, y;
-    SDL_GetMouseState(&x, &y);
-    if (m_last_mouse_pos_x != x || m_last_mouse_pos_y != y)
+    if (m_process_type == PT_MAIN)
     {
-        m_ticks_since_last_mouse_movement = 0;
-        m_last_mouse_pos_x = x;
-        m_last_mouse_pos_y = y;
-    }
+        int x, y;
+        SDL_GetMouseState(&x, &y);
+        if (m_last_mouse_pos_x != x || m_last_mouse_pos_y != y)
+        {
+            m_ticks_since_last_mouse_movement = 0;
+            m_last_mouse_pos_x = x;
+            m_last_mouse_pos_y = y;
+        }
 
-    SDL_ShowCursor((m_ticks_since_last_mouse_movement++ < HIDE_CURSOR_STARTINGAT
-                    || m_force_show_cursor) ? SDL_ENABLE : SDL_DISABLE);
+        SDL_ShowCursor((m_ticks_since_last_mouse_movement++ <
+                        HIDE_CURSOR_STARTINGAT || m_force_show_cursor) ?
+                        SDL_ENABLE : SDL_DISABLE);
+    }
 
     if (m_schedule_pause)
     {
