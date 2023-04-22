@@ -424,6 +424,7 @@ void World::reset(bool restart)
     // Start music from beginning
     music_manager->stopMusic();
 
+#ifndef SERVER_ONLY
     if (m_process_type == PT_MAIN)
     {
         m_force_show_cursor = false;
@@ -431,6 +432,7 @@ void World::reset(bool restart)
         SDL_GetMouseState(&m_last_mouse_pos_x, &m_last_mouse_pos_y);
         SDL_ShowCursor(SDL_DISABLE);
     }
+#endif
 
     // Enable SFX again
     SFXManager::get()->resumeAll();
@@ -622,12 +624,11 @@ World::~World()
 {
     if (m_process_type == PT_MAIN)
     {
+#ifndef SERVER_ONLY
         // This shouldn't be necessary, but just to be sure
         SDL_ShowCursor(SDL_ENABLE);
-    }
+#endif
 
-    if (m_process_type == PT_MAIN)
-    {
         GUIEngine::getDevice()->setResizable(false);
         material_manager->unloadAllTextures();
     }
@@ -1142,6 +1143,7 @@ void World::scheduleTutorial()
  */
 void World::updateGraphics(float dt)
 {
+#ifndef SERVER_ONLY
     if (m_process_type == PT_MAIN)
     {
         int x, y;
@@ -1160,6 +1162,7 @@ void World::updateGraphics(float dt)
         SDL_ShowCursor((m_time_since_last_mouse_mvmt < HIDE_CURSOR_STARTINGAT
                         || m_force_show_cursor) ? SDL_ENABLE : SDL_DISABLE);
     }
+#endif
 
     if (auto cl = LobbyProtocol::get<ClientLobby>())
     {
