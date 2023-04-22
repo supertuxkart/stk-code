@@ -14,6 +14,5 @@
                 I18N="In a 'are you sure?' dialog" text="Cancel" align="center"/>
 
         </buttonbar>
-        <spacer width="20" height="1f" />
     </div>
 </stkgui>

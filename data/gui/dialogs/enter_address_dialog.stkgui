@@ -18,6 +18,5 @@
                 I18N="In the enter address dialog" text="Cancel" align="center"/>
 
         </buttonbar>
-        <spacer height="1f" width="20" />
     </div>
 </stkgui>

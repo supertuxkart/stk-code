@@ -5,7 +5,7 @@
 
         <spacer height="7%" width="10" />
         <textbox id="textfield" width="75%"  align="center"/>
-        <spacer height="9%" width="10" />
+        <spacer proportion="1" width="10" />
 
         <buttonbar id="buttons" height="36%" width="30%" align="center">
 
@@ -16,6 +16,5 @@
                 I18N="In the general textfield dialog" text="Cancel" align="center"/>
 
         </buttonbar>
-        <spacer height="1f" width="20" />
     </div>
 </stkgui>
