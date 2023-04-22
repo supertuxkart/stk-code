@@ -33,7 +33,7 @@
 
 // ------------------------------------------------------------------------
 EnterAddressDialog::EnterAddressDialog(std::shared_ptr<Server>* entered_server)
-    : ModalDialog(0.95f, 0.8f, GUIEngine::MODAL_DIALOG_LOCATION_BOTTOM),
+    : ModalDialog(0.8f, 0.8f, GUIEngine::MODAL_DIALOG_LOCATION_CENTER),
     m_self_destroy(false)
 {
     loadFromFile("enter_address_dialog.stkgui");
