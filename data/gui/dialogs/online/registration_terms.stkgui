@@ -23,10 +23,10 @@
         <spacer height="2%" width="50"/>
 
         <buttonbar id="options" width="45%" height="14%" align="center">
-            <icon-button id="accept" width="64" height="64" icon="gui/icons/green_check.png"
-                I18N="In the registration dialog" text="Accept" label_location="bottom"/>
             <icon-button id="cancel" width="64" height="64" icon="gui/icons/main_quit.png"
                 I18N="In the registration dialog" text="Cancel" label_location="bottom"/>
+            <icon-button id="accept" width="64" height="64" icon="gui/icons/green_check.png"
+                I18N="In the registration dialog" text="Accept" label_location="bottom"/>
         </buttonbar>
         <spacer height="1f" width="5"/>
     </div>

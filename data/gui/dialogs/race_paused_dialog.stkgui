@@ -16,6 +16,9 @@
 
         <buttonbar id="choiceribbon" proportion="4" width="100%" align="center">
 
+            <icon-button id="exit" width="128" height="128" icon="gui/icons/main_quit.png"
+                         I18N="Race paused button" raw_text="Text" word_wrap="true"/>
+
             <icon-button id="newrace" width="128" height="128" icon="gui/icons/main_race.png"
                     I18N="Race paused button" raw_text="Text" word_wrap="true"/>
 
@@ -30,9 +33,6 @@
 
             <icon-button id="help" width="128" height="128" icon="gui/icons/main_help.png"
                     I18N="Race paused button" text="Help" word_wrap="true"/>
-
-            <icon-button id="exit" width="128" height="128" icon="gui/icons/main_quit.png"
-                         I18N="Race paused button" raw_text="Text" word_wrap="true"/>
 
         </buttonbar>
 

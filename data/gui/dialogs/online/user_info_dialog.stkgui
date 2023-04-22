@@ -19,6 +19,8 @@
         <spacer height="3%" width="50"/>
 
         <buttonbar id="options" width="90%" height="20%" align="center">
+            <icon-button id="cancel" width="64" height="64" icon="gui/icons/main_quit.png"
+                         I18N="User info dialog" text="Close" label_location="bottom"/>
             <icon-button id="remove" width="64" height="64" icon="gui/icons/package-uninstall.png"
                          I18N="User info dialog"  text="Remove" label_location="bottom"/>
             <icon-button id="friend" width="64" height="64" icon="gui/icons/blue_plus.png"
@@ -29,8 +31,6 @@
                          I18N="User info dialog"  text="Decline" label_location="bottom"/>
             <icon-button id="enter" width="64" height="64" icon="gui/icons/difficulty_medium.png"
                          I18N="User info dialog"  text="View" label_location="bottom"/>
-            <icon-button id="cancel" width="64" height="64" icon="gui/icons/main_quit.png"
-                         I18N="User info dialog" text="Close" label_location="bottom"/>
         </buttonbar>
         <spacer height="1f" width="20"/>
     </div>

@@ -79,8 +79,6 @@
 
                 <div width="100%" align="center" layout="vertical-row" height="13%">
                     <buttonbar id="options" width="100%" height="100%" align="center">
-                        <icon-button id="ok" width="128" height="128" icon="gui/icons/green_check.png"
-                                     I18N="In the user screen" text="OK" label_location="bottom"/>
                         <icon-button id="new_user" width="128" height="128" icon="gui/icons/blue_plus.png"
                                      I18N="In the user screen" text="Add" label_location="bottom"/>
                         <icon-button id="delete" width="128" height="128" icon="gui/icons/remove.png"
@@ -91,6 +89,8 @@
                                      I18N="In the user screen" text="Kart color" label_location="bottom"/>
                         <icon-button id="cancel" width="128" height="128" icon="gui/icons/main_quit.png"
                                      I18N="In the user screen" text="Cancel" label_location="bottom"/>
+                        <icon-button id="ok" width="128" height="128" icon="gui/icons/green_check.png"
+                                     I18N="In the user screen" text="OK" label_location="bottom"/>
                     </buttonbar>
                 </div>
                 <spacer width="20" height="5%"/>

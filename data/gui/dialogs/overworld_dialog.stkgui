@@ -16,6 +16,9 @@
 
         <buttonbar id="choiceribbon" proportion="4" width="100%" align="center">
 
+            <icon-button id="exit" width="128" height="128" icon="gui/icons/main_quit.png"
+                         I18N="In the in-game dialog" text="Back to menu" word_wrap="true"/>
+
             <icon-button id="selectkart" width="128" height="128" icon="gui/icons/random_kart.png"
                     I18N="In the in-game dialog" text="Select kart" word_wrap="true"/>
 
@@ -24,9 +27,6 @@
 
             <icon-button id="help" width="128" height="128" icon="gui/icons/main_help.png"
                     I18N="In the in-game dialog" text="Help" word_wrap="true"/>
-
-            <icon-button id="exit" width="128" height="128" icon="gui/icons/main_quit.png"
-                         I18N="In the in-game dialog" text="Back to menu" word_wrap="true"/>
 
         </buttonbar>
 

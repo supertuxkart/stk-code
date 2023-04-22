@@ -70,10 +70,10 @@
             <label id="info" proportion="1" width="100%" align="center" text_align="center" word_wrap="true" text=""/>
 
             <buttonbar id="options" x="0" y="0" width="40%" height="15%" align="center">
-                <icon-button id="create" width="64" height="64" icon="gui/icons/green_check.png"
-                             I18N="In the server creation screen" text="Create" label_location="bottom"/>
                 <icon-button id="cancel" width="64" height="64" icon="gui/icons/main_quit.png"
                              I18N="In the server creation screen" text="Cancel" label_location="bottom"/>
+                <icon-button id="create" width="64" height="64" icon="gui/icons/green_check.png"
+                             I18N="In the server creation screen" text="Create" label_location="bottom"/>
             </buttonbar>
             
             <spacer width="10" height="1f"/>

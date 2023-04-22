@@ -71,11 +71,11 @@
 
         <spacer width="1" height="1%"/>
         <buttonbar id="buttons" height="17%" width="100%" align="center">
-            <icon-button id="start" width="64" height="64" icon="gui/icons/green_check.png"
-                    I18N="In the grand prix info screen" text="Start Race"/>
-
             <icon-button id="continue" width="64" height="64" icon="gui/icons/green_check.png"
                     I18N="In the grand prix info screen" text="Continue saved GP"/>
+
+            <icon-button id="start" width="64" height="64" icon="gui/icons/green_check.png"
+                    I18N="In the grand prix info screen" text="Start Race"/>
         </buttonbar>
 
     </div>

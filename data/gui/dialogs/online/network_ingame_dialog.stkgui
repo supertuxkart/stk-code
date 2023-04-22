@@ -24,6 +24,9 @@
 
         <buttonbar id="choiceribbon" proportion="4" width="100%" align="center">
 
+            <icon-button id="exit" width="128" height="128" icon="gui/icons/main_quit.png"
+                         I18N="Race paused button" text="Quit Server" word_wrap="true"/>
+
             <icon-button id="newrace" width="128" height="128" icon="gui/icons/main_race.png"
                     I18N="Show in network ingame dialog to allow user to go back to lobby to end spectating (for example)"
                     text="Back to lobby" word_wrap="true"/>
@@ -39,9 +42,6 @@
 
             <icon-button id="help" width="128" height="128" icon="gui/icons/main_help.png"
                     I18N="Race paused button" text="Help" word_wrap="true"/>
-
-            <icon-button id="exit" width="128" height="128" icon="gui/icons/main_quit.png"
-                         I18N="Race paused button" text="Quit Server" word_wrap="true"/>
 
         </buttonbar>
 

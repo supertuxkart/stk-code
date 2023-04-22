@@ -39,15 +39,15 @@
                 <spacer width="5" height="45%"/>
                 <div width="95%" height="100%" align="center">
                     <buttonbar id="actions" x="0" y="0" height="100%" width="100%" align="center">
-                        <icon-button id="start" width="128" height="128"
-                                     icon="gui/icons/green_check.png"
-                                     I18N="High score info screen action" text="Start Race" word_wrap="true" />
-                        <icon-button id="remove" width="128" height="128"
-                                     icon="gui/icons/remove.png"
-                                     I18N="High score info screen action" text="Remove" word_wrap="true" />
                         <icon-button id="back" width="128" height="128"
                                      icon="gui/icons/back.png"
                                      I18N="High score info screen action" text="Back" word_wrap="true" />
+                        <icon-button id="remove" width="128" height="128"
+                                     icon="gui/icons/remove.png"
+                                     I18N="High score info screen action" text="Remove" word_wrap="true" />
+                        <icon-button id="start" width="128" height="128"
+                                     icon="gui/icons/green_check.png"
+                                     I18N="High score info screen action" text="Start Race" word_wrap="true" />
                     </buttonbar>
                 </div>
                 <spacer width="10" height="10%"/>

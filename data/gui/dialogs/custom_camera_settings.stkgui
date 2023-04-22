@@ -75,12 +75,12 @@
             <spacer height="2%" width="100%" />
 
             <buttonbar id="buttons" height="20%" width="90%" align="center">
-                <icon-button id="apply" width="128" height="128" icon="gui/icons/green_check.png"
-                    I18N="In the ui/camera screen" text="Apply" align="center"/>
                 <icon-button id="reset" width="128" height="128" icon="gui/icons/restart.png"
                     I18N="In the ui/camera screen" text="Reset" align="center"/>
                 <icon-button id="cancel" width="128" height="128" icon="gui/icons/main_quit.png"
                     I18N="In the ui/camera screen" text="Cancel" align="center"/>
+                <icon-button id="apply" width="128" height="128" icon="gui/icons/green_check.png"
+                    I18N="In the ui/camera screen" text="Apply" align="center"/>
             </buttonbar>
         </div>
     </div>

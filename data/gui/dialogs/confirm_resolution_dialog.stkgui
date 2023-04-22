@@ -7,11 +7,11 @@
 
         <buttonbar id="buttons" height="30%" width="30%" align="center">
 
-            <icon-button id="accept" width="128" height="128" icon="gui/icons/green_check.png"
-                I18N="In the 'confirm resolution' dialog, that's shown when switching resoluton" text="Accept" align="center"/>
-
             <icon-button id="cancel" width="128" height="128" icon="gui/icons/restart.png"
                 I18N="In the 'confirm resolution' dialog, that's shown when switching resoluton" text="Revert" align="center"/>
+
+            <icon-button id="accept" width="128" height="128" icon="gui/icons/green_check.png"
+                I18N="In the 'confirm resolution' dialog, that's shown when switching resoluton" text="Accept" align="center"/>
 
         </buttonbar>
     </div>

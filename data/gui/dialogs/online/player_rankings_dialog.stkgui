@@ -18,12 +18,12 @@
         <spacer height="1%" width="20" />
 
         <buttonbar id="options" width="90%" height="14%" align="center">
-            <icon-button id="ok" width="128" height="128"
-                         icon="gui/icons/green_check.png" text="OK"
-                         label_location="bottom"/>
             <icon-button id="refresh" width="128" height="128"
                          icon="gui/icons/restart.png"
                          text="Refresh" label_location="bottom"/>
+            <icon-button id="ok" width="128" height="128"
+                         icon="gui/icons/green_check.png" text="OK"
+                         label_location="bottom"/>
         </buttonbar>
         <spacer height="1f" width="20"/>
     </div>

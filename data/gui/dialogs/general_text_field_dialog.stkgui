@@ -9,11 +9,11 @@
 
         <buttonbar id="buttons" height="36%" width="30%" align="center">
 
-            <icon-button id="ok" width="128" height="128" icon="gui/icons/green_check.png"
-                I18N="In the general textfield dialog" text="OK" align="center"/>
-
             <icon-button id="cancel" width="128" height="128" icon="gui/icons/remove.png"
                 I18N="In the general textfield dialog" text="Cancel" align="center"/>
+
+            <icon-button id="ok" width="128" height="128" icon="gui/icons/green_check.png"
+                I18N="In the general textfield dialog" text="OK" align="center"/>
 
         </buttonbar>
     </div>

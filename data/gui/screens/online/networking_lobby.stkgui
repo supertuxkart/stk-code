@@ -31,10 +31,10 @@
             <div proportion="1" height="100%" layout="vertical-row">
                 <spacer height="20%" width="10"/>
                 <div width="100%" proportion="1" layout="horizontal-row">
-                    <icon-button id="start" proportion="1" height="60%" icon="gui/icons/green_check.png" align="top"
-                        I18N="In the network lobby" text="Start race"/>
                     <icon-button id="config" proportion="1" height="60%" icon="gui/icons/main_options.png" align="top"
                         I18N="In the network lobby" text="Configuration"/>
+                    <icon-button id="start" proportion="1" height="60%" icon="gui/icons/green_check.png" align="top"
+                        I18N="In the network lobby" text="Start race"/>
                 </div>
             </div>
         </div>

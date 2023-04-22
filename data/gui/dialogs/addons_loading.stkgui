@@ -29,15 +29,15 @@
 
         <div width="80%" proportion="4" align="center">
             <buttonbar id="actions" x="0" y="0" height="100%" width="100%" align="center">
+                <icon-button id="back" width="128" height="128"
+                             icon="gui/icons/back.png"
+                             I18N="Add-on screen action" text="Back" />
                 <icon-button id="install" width="128" height="128"
                              icon="gui/icons/package-update.png"
                              I18N="Add-on screen action"  text="Install" />
                 <icon-button id="uninstall" width="128" height="128"
                              icon="gui/icons/package-uninstall.png"
                              I18N="Add-on screen action" text="Uninstall" />
-                <icon-button id="back" width="128" height="128"
-                             icon="gui/icons/back.png"
-                             I18N="Add-on screen action" text="Back" />
             </buttonbar>
         </div>
     </div>

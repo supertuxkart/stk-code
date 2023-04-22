@@ -9,10 +9,10 @@
                 <spacer height="2%" width="100%"/>
                     <!-- The actual button texts will vary depending on what type of race
                          was being run, and if something was unlocked etc. So we don't
-                         specify a text here, and label the buttons :
-                         top   : 'See unlocked feature(s)', 'Continue', 'Setup new race'
-                         middle: 'Restart' (or invisible)
-                         bottom: 'Abort GP', 'Back to the menu' (or invisible)
+                         specify a text here, and label the buttons:
+                         right: 'Continue', 'Setup new race' (or invisible)
+                         middle: 'Restart', 'Continue' (or invisible)
+                         left: 'Abort GP', 'Back to the menu' (or invisible)
                          Setting text=" " is important, otherwise the height of the
                          widget is incorrect.                             -->
                 <buttonbar id="operations" width="65%" height="18%" align="center">
