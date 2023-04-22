@@ -83,6 +83,8 @@ void CreateServerScreen::loadedFromFile()
     assert(m_create_widget != NULL);
     m_cancel_widget = getWidget<IconButtonWidget>("cancel");
     assert(m_cancel_widget != NULL);
+    m_back_widget = getWidget<IconButtonWidget>("back");
+    assert(m_back_widget != NULL);
 }   // loadedFromFile
 
 // ----------------------------------------------------------------------------
@@ -170,6 +172,11 @@ void CreateServerScreen::eventCallback(Widget* widget, const std::string& name,
         const int selection =
             m_game_mode_widget->getSelection(PLAYER_ID_GAME_MASTER);
         updateMoreOption(selection);
+    }
+    else if (name == m_back_widget->m_properties[PROP_ID])
+    {
+        NetworkConfig::get()->unsetNetworking();
+        StateManager::get()->escapePressed();
     }
 }   // eventCallback
 
