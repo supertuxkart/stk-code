@@ -384,10 +384,12 @@ void RaceResultGUI::eventCallback(GUIEngine::Widget* widget,
     {
         const std::string& action =
             getWidget<GUIEngine::RibbonWidget>("operations")->getSelectionIDString(PLAYER_ID_GAME_MASTER);
-        if (m_animation_state == RR_WAITING_GP_RESULT && action == "left")
+
+        // User pressed "Continue" button, go from race results to overall GP results
+        if (m_animation_state == RR_WAITING_GP_RESULT && action == "middle")
         {
-            GUIEngine::IconButtonWidget *left = getWidget<GUIEngine::IconButtonWidget>("left");
-            left->setVisible(false);
+            GUIEngine::IconButtonWidget *middle = getWidget<GUIEngine::IconButtonWidget>("middle");
+            middle->setVisible(false);
             getWidget("operations")->setActive(false);
             m_all_row_infos = m_all_row_info_waiting;
             m_animation_state = RR_OLD_GP_RESULTS;
@@ -1133,14 +1135,14 @@ void RaceResultGUI::unload()
                 determineGPLayout();
                 m_all_row_info_waiting = m_all_row_infos;
                 m_all_row_infos = prev_infos;
-                GUIEngine::IconButtonWidget *left = getWidget<GUIEngine::IconButtonWidget>("left");
+                GUIEngine::IconButtonWidget *middle = getWidget<GUIEngine::IconButtonWidget>("middle");
                 GUIEngine::RibbonWidget *operations = getWidget<GUIEngine::RibbonWidget>("operations");
                 operations->setActive(true);
                 operations->setFocusForPlayer(PLAYER_ID_GAME_MASTER);
-                left->setLabel(_("Continue"));
-                left->setImage("gui/icons/green_check.png");
-                left->setVisible(true);
-                operations->select("left", PLAYER_ID_GAME_MASTER);
+                middle->setLabel(_("Continue"));
+                middle->setImage("gui/icons/green_check.png");
+                middle->setVisible(true);
+                operations->select("middle", PLAYER_ID_GAME_MASTER);
             }
             break;
         case RR_WAITING_GP_RESULT:
