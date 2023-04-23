@@ -174,7 +174,7 @@
         <spacer height="4" width="10"/>
 
         <buttonbar id="buttons" height="15%" width="30%" align="center">
-            <icon-button id="cancel" width="128" height="128" icon="gui/icons/main_quit.png"
+            <icon-button id="cancel" width="128" height="128" icon="gui/icons/red_x.png"
                 I18N="Video settings" text="Cancel" align="center"/>
             <icon-button id="apply" width="128" height="128" icon="gui/icons/green_check.png"
                 I18N="Video settings" text="Apply" align="center"/>

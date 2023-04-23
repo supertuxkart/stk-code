@@ -44,7 +44,7 @@
         <spacer proportion="3" width="10"/>
 
         <buttonbar id="options" width="90%" height="20%" align="center">
-            <icon-button id="cancel" width="64" height="64" icon="gui/icons/main_quit.png"
+            <icon-button id="cancel" width="64" height="64" icon="gui/icons/red_x.png"
                          I18N="Splitscreen player in network" text="Cancel" label_location="bottom"/>
             <icon-button id="reset" width="64" height="64" icon="gui/icons/remove.png"
                          I18N="Splitscreen player in network" text="Clear players" label_location="bottom"/>

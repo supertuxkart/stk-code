@@ -61,7 +61,7 @@
             </div>
 
             <buttonbar id="options" width="40%" height="15%" align="center">
-                <icon-button id="cancel" width="50%" height="90%" icon="gui/icons/main_quit.png"
+                <icon-button id="cancel" width="50%" height="90%" icon="gui/icons/red_x.png"
                     I18N="In the registration dialog"  text="Cancel" label_location="none"/>
                 <icon-button id="next" width="50%" height="90%" icon="gui/icons/green_check.png"
                     I18N="In the registration dialog" text="OK" label_location="none"/>

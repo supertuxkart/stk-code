@@ -41,7 +41,7 @@
             <spacer height="1%" width="20"/>
 
             <buttonbar id="options" x="0" y="0" width="40%" height="18%" align="center">
-                <icon-button id="cancel" width="64" height="64" icon="gui/icons/main_quit.png"
+                <icon-button id="cancel" width="64" height="64" icon="gui/icons/red_x.png"
                              I18N="In the server configuration screen" text="Cancel" label_location="bottom"/>
                 <icon-button id="ok" width="64" height="64" icon="gui/icons/green_check.png"
                              I18N="In the server configuration screen" text="OK" label_location="bottom"/>

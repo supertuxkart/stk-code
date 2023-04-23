@@ -7,7 +7,7 @@
 
         <buttonbar id="buttons" height="30%" width="70%" align="center">
 
-            <icon-button id="cancel" width="128" height="128" icon="gui/icons/remove.png"
+            <icon-button id="cancel" width="128" height="128" icon="gui/icons/red_x.png"
                 I18N="In a 'are you sure?' dialog" text="Cancel" align="center"/>
 
             <icon-button id="confirm" width="128" height="128" icon="gui/icons/green_check.png"

@@ -115,3 +115,15 @@ Copyright: Benau
 License: CC0
 Comment:
  source: https://publicdomainvectors.org/en/free-clipart/Outlined-robot-image/74151.html
+
+Files:
+ green_check.png
+Copyright: GNOME Project
+License: GPL-2+
+Comment: From the Gnome icon set. Source: https://github.com/GNOME/adwaita-icon-theme/blob/gnome-2-30/src/emblem-default.svg  License: https://github.com/GNOME/adwaita-icon-theme/blob/gnome-2-30/COPYING
+
+Files:
+ red_x.png
+Copyright: Tango Desktop Project
+License: CC0
+Comment: An error X symbol icon as emblem. A combination of two icons of project Tango. Source: https://commons.wikimedia.org/wiki/File:Dialog-error-round.svg
