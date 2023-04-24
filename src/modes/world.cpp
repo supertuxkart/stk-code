@@ -91,9 +91,6 @@
 #include <IrrlichtDevice.h>
 #include <ISceneManager.h>
 
-/** Hide the cursor after this many seconds without movement */
-#define HIDE_CURSOR_STARTINGAT 1.0f
-
 World* World::m_world[PT_COUNT];
 
 /** The main world class is used to handle the track and the karts.
@@ -164,8 +161,6 @@ void World::init()
 {
     m_ended_early         = false;
     m_faster_music_active = false;
-    m_time_since_last_mouse_mvmt = HIDE_CURSOR_STARTINGAT;
-    m_force_show_cursor   = false;
     m_fastest_kart        = 0;
     m_eliminated_karts    = 0;
     m_eliminated_players  = 0;
@@ -424,16 +419,6 @@ void World::reset(bool restart)
     // Start music from beginning
     music_manager->stopMusic();
 
-#ifndef SERVER_ONLY
-    if (m_process_type == PT_MAIN)
-    {
-        m_force_show_cursor = false;
-        m_time_since_last_mouse_mvmt = HIDE_CURSOR_STARTINGAT;
-        SDL_GetMouseState(&m_last_mouse_pos_x, &m_last_mouse_pos_y);
-        SDL_ShowCursor(SDL_DISABLE);
-    }
-#endif
-
     // Enable SFX again
     SFXManager::get()->resumeAll();
 
@@ -624,11 +609,6 @@ World::~World()
 {
     if (m_process_type == PT_MAIN)
     {
-#ifndef SERVER_ONLY
-        // This shouldn't be necessary, but just to be sure
-        SDL_ShowCursor(SDL_ENABLE);
-#endif
-
         GUIEngine::getDevice()->setResizable(false);
         material_manager->unloadAllTextures();
     }
@@ -747,8 +727,6 @@ void World::onGo()
  */
 void World::terminateRace()
 {
-    m_force_show_cursor = true;
-
     // In case the user opened paused dialog in network
     if (!GUIEngine::isNoGraphics())
     {
@@ -1028,6 +1006,7 @@ void World::updateWorld(int ticks)
     assert(m_magic_number == 0xB01D6543);
 #endif
 
+
     if (m_schedule_pause)
     {
         pause(m_scheduled_pause_phase);
@@ -1143,27 +1122,6 @@ void World::scheduleTutorial()
  */
 void World::updateGraphics(float dt)
 {
-#ifndef SERVER_ONLY
-    if (m_process_type == PT_MAIN)
-    {
-        int x, y;
-        SDL_GetMouseState(&x, &y);
-        if (m_last_mouse_pos_x != x || m_last_mouse_pos_y != y)
-        {
-            m_time_since_last_mouse_mvmt = 0;
-            m_last_mouse_pos_x = x;
-            m_last_mouse_pos_y = y;
-        }
-        else
-        {
-            m_time_since_last_mouse_mvmt += dt;
-        }
-
-        SDL_ShowCursor((m_time_since_last_mouse_mvmt < HIDE_CURSOR_STARTINGAT
-                        || m_force_show_cursor) ? SDL_ENABLE : SDL_DISABLE);
-    }
-#endif
-
     if (auto cl = LobbyProtocol::get<ClientLobby>())
     {
         // Reset all smooth network body of rewinders so the rubber band effect
@@ -1521,8 +1479,6 @@ void World::getDefaultCollectibles(int *collectible_type, int *amount )
  */
 void World::pause(Phase phase)
 {
-    m_force_show_cursor = true;
-
     if (m_stop_music_when_dialog_open)
         music_manager->pauseMusic();
     SFXManager::get()->pauseAll();
@@ -1533,9 +1489,6 @@ void World::pause(Phase phase)
 //-----------------------------------------------------------------------------
 void World::unpause()
 {
-    m_force_show_cursor = false;
-    m_time_since_last_mouse_mvmt = HIDE_CURSOR_STARTINGAT;
-
     if (m_stop_music_when_dialog_open)
         music_manager->resumeMusic();
     SFXManager::get()->resumeAll();
