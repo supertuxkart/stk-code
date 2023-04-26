@@ -2,6 +2,6 @@
 <stkgui>
     <div x="2%" y="2%" width="96%" height="96%" layout="vertical-row">
         <spacer width="10" proportion="1"/>
-        <button id="continue" x="20" align="left" text="Continue"/>
+        <button id="continue" align="right" height="fit" width="8f" text="Skip"/>
     </div>
 </stkgui>
