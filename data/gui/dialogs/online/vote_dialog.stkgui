@@ -15,8 +15,8 @@
         <spacer height="4%" width="50"/>
 
         <buttonbar id="options" width="25%" height="20%" align="center">
-            <icon-button id="cancel" width="64" height="64" icon="gui/icons/main_quit.png"
-                I18N="Vote dialog" text="Close" label_location="none"/>
+            <icon-button id="cancel" width="64" height="64" icon="gui/icons/green_check.png"
+                I18N="Vote dialog" text="OK" label_location="none"/>
         </buttonbar>
         <spacer height="1f" width="10"/>
     </div>
