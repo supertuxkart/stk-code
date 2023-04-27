@@ -15,7 +15,7 @@
                 I18N="In the enter address dialog" text="Cancel" align="center"/>
 
             <icon-button id="ok" width="128" height="128" icon="gui/icons/green_check.png"
-                I18N="In the enter address dialog" text="OK" align="center"/>
+                I18N="In the enter address dialog" text="Join" align="center"/>
 
         </buttonbar>
     </div>

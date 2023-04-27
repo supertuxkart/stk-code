@@ -21,7 +21,7 @@
         <buttonbar id="options" width="90%" height="20%" align="center">
             <icon-button id="cancel" width="64" height="64" icon="gui/icons/back.png"
                          I18N="User info dialog" text="Close" label_location="bottom"/>
-            <icon-button id="remove" width="64" height="64" icon="gui/icons/package-uninstall.png"
+            <icon-button id="remove" width="64" height="64" icon="gui/icons/remove.png"
                          I18N="User info dialog"  text="Remove" label_location="bottom"/>
             <icon-button id="friend" width="64" height="64" icon="gui/icons/blue_plus.png"
                          I18N="User info dialog"  text="Add Friend" label_location="bottom"/>

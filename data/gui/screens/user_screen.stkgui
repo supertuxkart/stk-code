@@ -65,7 +65,7 @@
 								 I18N="In the user screen" text="Rename" label_location="bottom"/>
 					<icon-button id="default_kart_color" width="128" height="128" icon="gui/icons/edit.png"
 								 I18N="In the user screen" text="Kart color" label_location="bottom"/>
-					<icon-button id="cancel" width="128" height="128" icon="gui/icons/main_quit.png"
+					<icon-button id="cancel" width="128" height="128" icon="gui/icons/back.png"
 								 I18N="In the user screen" text="Cancel" label_location="bottom"/>
 					<icon-button id="ok" width="128" height="128" icon="gui/icons/green_check.png"
 								 I18N="In the user screen" text="OK" label_location="bottom"/>
