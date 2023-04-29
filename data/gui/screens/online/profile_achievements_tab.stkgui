@@ -11,7 +11,7 @@
         <tabs id="profile_tabs" height="2f" x="2%" width="98%" align="center">
             <icon-button id="tab_achievements" width="128" height="128" icon="gui/icons/gp_copy.png"
                 I18N="Section in the profile screen" text="Achievements"/>
-            <icon-button id="tab_friends" width="128" height="128" icon="gui/icons/options_players.png"/>
+            <icon-button id="tab_friends" width="128" height="128" icon="gui/icons/player.png"/>
             <icon-button id="tab_settings" width="128" height="128" icon="gui/icons/main_options.png"/>
         </tabs>
 

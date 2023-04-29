@@ -10,7 +10,7 @@
                      I18N="Section in the register screen" text="New Online Account"/>
         <icon-button id="tab_existing_online" width="128" height="128" icon="gui/icons/main_network.png"
                      I18N="Section in the register screen" text="Existing Online Account"/>
-        <icon-button id="tab_offline" width="128" height="128" icon="gui/icons/options_players.png"
+        <icon-button id="tab_offline" width="128" height="128" icon="gui/icons/player_add.png"
                      I18N="Section in the register screen" text="Offline Account"/>
       </tabs>
 

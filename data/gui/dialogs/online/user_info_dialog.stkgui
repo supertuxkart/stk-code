@@ -22,15 +22,15 @@
             <icon-button id="cancel" width="64" height="64" icon="gui/icons/back.png"
                          I18N="User info dialog" text="Close" label_location="bottom"/>
             <icon-button id="remove" width="64" height="64" icon="gui/icons/remove.png"
-                         I18N="User info dialog"  text="Remove" label_location="bottom"/>
-            <icon-button id="friend" width="64" height="64" icon="gui/icons/blue_plus.png"
+                         I18N="User info dialog"  text="Remove Friend" label_location="bottom"/>
+            <icon-button id="friend" width="64" height="64" icon="gui/icons/player_add.png"
                          I18N="User info dialog"  text="Add Friend" label_location="bottom"/>
             <icon-button id="accept" width="64" height="64" icon="gui/icons/green_check.png"
-                         I18N="User info dialog"  text="Accept" label_location="bottom"/>
+                         I18N="User info dialog"  text="Accept Invite" label_location="bottom"/>
             <icon-button id="decline" width="64" height="64" icon="gui/icons/red_x.png"
-                         I18N="User info dialog"  text="Decline" label_location="bottom"/>
-            <icon-button id="enter" width="64" height="64" icon="gui/icons/difficulty_medium.png"
-                         I18N="User info dialog"  text="View" label_location="bottom"/>
+                         I18N="User info dialog"  text="Decline Invite" label_location="bottom"/>
+            <icon-button id="enter" width="64" height="64" icon="gui/icons/player_view.png"
+                         I18N="User info dialog"  text="View Profile" label_location="bottom"/>
         </buttonbar>
         <spacer height="1f" width="20"/>
     </div>
