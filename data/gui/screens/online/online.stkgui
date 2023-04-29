@@ -29,7 +29,7 @@
                          icon="gui/icons/online/menu_quick_play.png" focus_icon="gui/icons/online/menu_quick_play_hover.png"
                          I18N="Networking menu button" text="Enter server address" word_wrap="true"/>
             <icon-button id="online" width="128" height="128"
-                         icon="gui/icons/menu_online.png" focus_icon="gui/icons/menu_online_focus.png"
+                         icon="gui/icons/online/menu_online_player.png" focus_icon="gui/icons/online/menu_online_player_focus.png"
                          I18N="Networking menu button" text="Your profile" word_wrap="true"/>
         </buttonbar>
 

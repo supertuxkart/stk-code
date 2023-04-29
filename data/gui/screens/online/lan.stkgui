@@ -17,11 +17,6 @@
             <icon-button id="create_lan_server" width="128" height="128"
                          icon="gui/icons/online/menu_create_server.png" focus_icon="gui/icons/online/menu_create_server_hover.png"
                          I18N="In the online multiplayer screen" text="Create Server"/>
-                         <!--
-            <icon-button id="manage_user" width="128" height="128"
-                         icon="gui/icons/options_players.png"
-                         I18N="In the online multiplayer screen" text="Users"/>
-                         -->
         </buttonbar>
 
         <spacer height="5%" width="10"/>

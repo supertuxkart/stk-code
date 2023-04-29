@@ -92,9 +92,37 @@ License: CC-BY-SA 3.0
 Comment:
  with elements by Totoplus62
 
-Files: menu_story.png
-Copyright: tavariz91
-License: CC0
+Files:
+ menu_addons*
+ menu_multi*
+ menu_race*
+Copyright: Dakal, SuperTuxKart dev team
+License: CC-BY-SA 3.0
+Comment:
+ Background by Dakal, from https://forum.freegamedev.net/viewtopic.php?f=18&t=585
+ Statement of license of background: https://forum.freegamedev.net/viewtopic.php?f=18&t=585&start=50#p8792
+ Icons come from set made by onyum.com (see above)
+
+Files:
+ online/menu_online_player*
+Copyright: Dakal, yeKcim, SuperTuxKart dev team
+License: CC-BY-SA 3.0
+Comment:
+ Background by Dakal, from https://forum.freegamedev.net/viewtopic.php?f=18&t=585
+ Statement of license of background: https://forum.freegamedev.net/viewtopic.php?f=18&t=585&start=50#p8792
+ Player icon from set made by onyum.com (see above)
+ Globe icon by yeKcim
+
+Files:
+ menu_story*
+ menu_online*
+Copyright: tavariz91, Dakal
+License: CC-BY-SA 3.0
+Comment:
+ Background by Dakal, from https://forum.freegamedev.net/viewtopic.php?f=18&t=585
+ Statement of license of background: https://forum.freegamedev.net/viewtopic.php?f=18&t=585&start=50#p8792
+ Earth icon based on https://openclipart.org/detail/3320/earth (CC0), edited by tavariz91
+ Story book icon by tavariz91 from https://forum.freegamedev.net/viewtopic.php?f=18&t=4401&start=25#p45564 (CC0)
 
 Files:
  crown.png
