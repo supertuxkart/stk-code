@@ -6,7 +6,7 @@
         <spacer height="1%" width="10"/>
 
       <tabs id="mode_tabs" height="2f" x="2%" width="98%" align="center">
-        <icon-button id="tab_new_online" width="128" height="128" icon="gui/icons/main_network.png"
+        <icon-button id="tab_new_online" width="128" height="128" icon="gui/icons/main_network_add.png"
                      I18N="Section in the register screen" text="New Online Account"/>
         <icon-button id="tab_existing_online" width="128" height="128" icon="gui/icons/main_network.png"
                      I18N="Section in the register screen" text="Existing Online Account"/>

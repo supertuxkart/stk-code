@@ -46,6 +46,12 @@ Copyright: yeKcim (Anthony Carré)
 License: CC-BY-SA 3.0
 
 Files:
+ main_network_add.png
+Copyright: yeKcim (Anthony Carré), SuperTuxKart dev team
+License: CC-BY-SA 3.0
+Comment: combination of main_network.png and blue_plus.png
+
+Files:
  mode_*.png
  race_giveup.png
  tutorial.png
