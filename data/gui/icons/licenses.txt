@@ -14,6 +14,8 @@ Files:
  *.png
  back.png
  player.png
+ mode_3strikes.png
+ mode_weapons.png
 Copyright: SuperTuxKart dev team
 License: CC-BY-SA 3.0+
 Comment:
@@ -52,8 +54,59 @@ License: CC-BY-SA 3.0
 Comment: combination of main_network.png and blue_plus.png
 
 Files:
- mode_*.png
+ mode_ftl.png
+ mode_ghost.png
+ mode_normal.png
+ mode_soccer.png
  race_giveup.png
+Copyright: Totoplus62, SuperTuxKart dev team, ???
+License: CC-BY-SA 3.0
+Comment:
+ Original backgrounds come from set made by onyum.com (see above)
+ Backgrounds edited by Totoplus62
+ TODO: Source of ghost icon unknown
+ TODO: Check license of gift box model
+ TODO: Source of flag icon unknown
+
+Files:
+ mode_normal.png
+Copyright: Totoplus62, MiniBjorn, Marianne "Auria" Gagnon, SuperTuxKart dev team
+License: CC-BY-SA 3.0
+Comment:
+ Original backgrounds come from set made by onyum.com (see above)
+ Backgrounds edited by Totoplus62
+ Gift box model by MiniBjorn, with slight modifications by Marianne Gagnon
+
+Files:
+ mode_tt.png
+Copyright: Totoplus62, yeKcim, SuperTuxKart dev team
+License: CC-BY-SA 3.0
+Comment:
+ Original backgrounds come from set made by onyum.com (see above)
+ Backgrounds edited by Totoplus62
+ Clock icon from set by yeKcim
+
+Files:
+ mode_easter.png
+Copyright: Totoplus62, fraang, SuperTuxKart dev team
+License: CC-BY-SA 3.0
+Comment:
+ Original backgrounds come from set made by onyum.com (see above)
+ Backgrounds edited by Totoplus62
+ Eggs by fraang from https://opengameart.org/content/easter-egg
+ Rabbit and other bits by Totoplus62
+
+Files:
+ mode_laptrial.png
+Copyright: Totoplus62, yeKcim, Alina Oleynik, SuperTuxKart dev team
+License: CC-BY-SA 3.0
+Comment:
+ Original backgrounds come from set made by onyum.com (see above)
+ Backgrounds edited by Totoplus62
+ Clock icon from set by yeKcim
+ Flag is lap_flag.png by Alina Oleynik
+
+Files:
  tutorial.png
 Copyright: Totoplus62
 License: CC-BY-SA 3.0
@@ -158,10 +211,11 @@ License: CC-BY-SA 4
 
 Files:
  lap_flag.png
-Copyright: Alayan
-License: CC-BY-SA 3
+Copyright: Alina Oleynik
+License: CC BY 3.0
 Comment:
- original by Alina Oleynik from The Noun Project
+ "racing flag" icon by Alina Oleynik, from thenounproject.com
+ Source: https://thenounproject.com/icon/racing-flag-1298802/
 
 Files:
  robot.png

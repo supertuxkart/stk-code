@@ -22,7 +22,7 @@
                          I18N="In the high score selection screen" text="Time Trial"/>
             <icon-button id="tab_egg_hunt" width="128" height="128" icon="gui/icons/mode_easter.png"
                          I18N="In the high score selection screen" text="Egg Hunt"/>
-            <icon-button id="tab_lap_trial" width="128" height="128" icon="gui/icons/mode_normal.png"
+            <icon-button id="tab_lap_trial" width="128" height="128" icon="gui/icons/mode_laptrial.png"
                          I18N="In the high score selection screen" text="Lap Trial"/>
             <icon-button id="tab_grand_prix" width="128" height="128" icon="gui/icons/gp_new.png"
                          I18N="In the high score selection screen" text="Grand Prix"/>

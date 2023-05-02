@@ -88,7 +88,7 @@
                 </div>
                 
                 <div width="100%" proportion="2" layout="horizontal-row">
-                    <icon align="center" width="8%" height="100%" icon="gui/icons/mode_normal.png"/>
+                    <icon align="center" width="8%" height="100%" icon="gui/icons/mode_laptrial.png"/>
                     <spacer width="3%" height="100%"/>
                     <bubble proportion="1" height="100%"
                             I18N="In the help menu"
