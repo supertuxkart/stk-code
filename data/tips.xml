@@ -21,7 +21,7 @@
         <tip text="The rescue key (button) is very useful."/>
         <tip text="Be careful when close to other karts, they may attack you!"/>
         <tip text="Basketballs can be destroyed using precise backward shots with a bowling ball, cake, or plunger."/>
-        <tip text="Try to avoid crashing into other the backs of other karts, as it will slow you down."/>
+        <tip text="Try to avoid crashing into the backs of other karts as this will slow you down."/>
     </tipset>
     <tipset id="soccer">
         <tip text="You can use bowling balls to push and block the ball."/>

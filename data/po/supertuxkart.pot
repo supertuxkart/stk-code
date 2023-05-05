@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: supertuxkart\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-03-09 08:03+0800\n"
+"POT-Creation-Date: 2023-05-05 12:01+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -2140,7 +2140,7 @@ msgstr ""
 #. I18N: In the audio options screen
 #. I18N: in the graphical options tooltip;
 #. indicates a graphical feature is enabled
-#: src/states_screens/dialogs/custom_video_settings.cpp:70
+#: src/states_screens/dialogs/custom_video_settings.cpp:71
 #: src/states_screens/options/options_screen_video.cpp:663
 #: src/states_screens/options/options_screen_video.cpp:736
 msgid "Enabled"
@@ -2494,8 +2494,8 @@ msgstr ""
 
 #. I18N: ./data/tips.xml
 msgid ""
-"Try to avoid crashing into other the backs of other karts, as it will slow "
-"you down."
+"Try to avoid crashing into the backs of other karts as this will slow you "
+"down."
 msgstr ""
 
 #. I18N: ./data/tips.xml
@@ -2873,21 +2873,21 @@ msgid ""
 "created."
 msgstr ""
 
-#: src/graphics/irr_driver.cpp:728
+#: src/graphics/irr_driver.cpp:730
 msgid "Video recording started."
 msgstr ""
 
-#: src/graphics/irr_driver.cpp:735
+#: src/graphics/irr_driver.cpp:737
 #, c-format
 msgid "Video saved in \"%s\"."
 msgstr ""
 
-#: src/graphics/irr_driver.cpp:739
+#: src/graphics/irr_driver.cpp:741
 msgid "Encoding progress:"
 msgstr ""
 
-#: src/graphics/irr_driver.cpp:1911 src/graphics/irr_driver.cpp:1954
-#: src/graphics/irr_driver.cpp:1959
+#: src/graphics/irr_driver.cpp:1913 src/graphics/irr_driver.cpp:1956
+#: src/graphics/irr_driver.cpp:1961
 #, c-format
 msgid "FPS: %d/%d/%d - %d KTris, Ping: %dms"
 msgstr ""
@@ -4601,8 +4601,8 @@ msgstr ""
 
 #. I18N: in the graphical options tooltip;
 #. indicates a graphical feature is disabled
-#: src/states_screens/dialogs/custom_video_settings.cpp:68
-#: src/states_screens/dialogs/custom_video_settings.cpp:91
+#: src/states_screens/dialogs/custom_video_settings.cpp:69
+#: src/states_screens/dialogs/custom_video_settings.cpp:92
 #: src/states_screens/online/create_server_screen.cpp:210
 #: src/states_screens/options/options_screen_video.cpp:666
 #: src/states_screens/options/options_screen_video.cpp:737
@@ -4610,7 +4610,7 @@ msgid "Disabled"
 msgstr ""
 
 #. I18N: if only important particles effects is enabled
-#: src/states_screens/dialogs/custom_video_settings.cpp:69
+#: src/states_screens/dialogs/custom_video_settings.cpp:70
 #: src/states_screens/options/options_screen_video.cpp:668
 msgid "Important only"
 msgstr ""
@@ -4618,8 +4618,8 @@ msgstr ""
 #. I18N: Geometry level disabled : lowest level, no details
 #. I18N: in the graphical options tooltip;
 #. indicates the rendered image quality is very low
-#: src/states_screens/dialogs/custom_video_settings.cpp:75
-#: src/states_screens/dialogs/custom_video_settings.cpp:85
+#: src/states_screens/dialogs/custom_video_settings.cpp:76
+#: src/states_screens/dialogs/custom_video_settings.cpp:86
 #: src/states_screens/options/options_screen_video.cpp:672
 msgid "Very Low"
 msgstr ""
@@ -4627,9 +4627,9 @@ msgstr ""
 #. I18N: Geometry level low : few details are displayed
 #. I18N: in the graphical options tooltip;
 #. indicates the rendered image quality is low
-#: src/states_screens/dialogs/custom_video_settings.cpp:77
-#: src/states_screens/dialogs/custom_video_settings.cpp:86
-#: src/states_screens/dialogs/custom_video_settings.cpp:92
+#: src/states_screens/dialogs/custom_video_settings.cpp:78
+#: src/states_screens/dialogs/custom_video_settings.cpp:87
+#: src/states_screens/dialogs/custom_video_settings.cpp:93
 #: src/states_screens/options/options_screen_video.cpp:675
 msgid "Low"
 msgstr ""
@@ -4637,9 +4637,9 @@ msgstr ""
 #. I18N: Geometry level high : everything is displayed
 #. I18N: in the graphical options tooltip;
 #. indicates the rendered image quality is high
-#: src/states_screens/dialogs/custom_video_settings.cpp:79
-#: src/states_screens/dialogs/custom_video_settings.cpp:87
-#: src/states_screens/dialogs/custom_video_settings.cpp:93
+#: src/states_screens/dialogs/custom_video_settings.cpp:80
+#: src/states_screens/dialogs/custom_video_settings.cpp:88
+#: src/states_screens/dialogs/custom_video_settings.cpp:94
 #: src/states_screens/options/options_screen_video.cpp:678
 msgid "High"
 msgstr ""
