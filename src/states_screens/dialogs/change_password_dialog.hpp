@@ -56,6 +56,7 @@ public:
 private:
 
     bool m_self_destroy;
+    bool m_show_success_dialog;
     bool m_success;
 
     GUIEngine::TextBoxWidget * m_current_password_widget;
