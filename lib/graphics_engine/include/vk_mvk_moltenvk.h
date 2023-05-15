@@ -26,13 +26,12 @@
 extern "C" {
 #endif	//  __cplusplus
 	
-#include <IOSurface/IOSurfaceRef.h>
-
 #ifdef __OBJC__
 #import <Metal/Metal.h>
 #else
 typedef unsigned long MTLLanguageVersion;
 typedef unsigned long MTLArgumentBuffersTier;
+typedef void *IOSurfaceRef;
 #endif
 
 
