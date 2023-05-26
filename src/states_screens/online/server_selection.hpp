@@ -75,6 +75,8 @@ private:
     /** \brief To check (and set) if sort order is descending **/
     bool m_sort_desc;
 
+    bool m_sort_default;
+
     int m_current_column;
 
     bool m_refreshing_server;

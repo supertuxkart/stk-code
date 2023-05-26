@@ -261,12 +261,23 @@ void ServerInfoDialog::updateBookmarkStatus(bool change_bookmark)
     const std::string& key = m_server->getBookmarkKey();
     std::map<std::string, uint32_t>& bookmarks =
         UserConfigParams::m_server_bookmarks;
+    std::map<std::string, uint32_t>& bookmarks_order =
+        UserConfigParams::m_server_bookmarks_order;
     auto it = bookmarks.find(key);
     if (it == bookmarks.end())
     {
         if (change_bookmark)
         {
             bookmarks[key] = StkTime::getTimeSinceEpoch();
+            uint32_t max_id = 0;
+            for (auto& order : bookmarks_order)
+            {
+                if (order.second > max_id)
+                    max_id = order.second;
+            }
+            max_id += 1;
+            bookmarks_order[key] = max_id;
+            m_server->setBookmarkID(max_id);
             m_bookmark_widget->setLabel(_("Remove from bookmarks"));
             m_bookmark_widget->setImage(m_remove_icon);
         }
@@ -276,6 +287,7 @@ void ServerInfoDialog::updateBookmarkStatus(bool change_bookmark)
         if (change_bookmark)
         {
             bookmarks.erase(key);
+            bookmarks_order.erase(key);
             m_bookmark_widget->setLabel(_("Bookmark this server"));
             m_bookmark_widget->setImage(m_bookmark_icon);
         }

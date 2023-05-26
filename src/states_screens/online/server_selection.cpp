@@ -154,6 +154,7 @@ void ServerSelection::init()
     Screen::init();
 
     m_last_load_time = -5000;
+    m_sort_default = true;
     updateHeader();
 
 #ifndef ENABLE_IPV6
@@ -227,6 +228,8 @@ void ServerSelection::loadList()
         {
             std::shared_ptr<Server> c = m_sort_desc ? a : b;
             std::shared_ptr<Server> d = m_sort_desc ? b : a;
+            if (g_bookmarks_next && m_sort_default)
+                return c->getBookmarkID() > d->getBookmarkID();
             switch (m_current_column)
             {
             case 0:
@@ -338,12 +341,14 @@ void ServerSelection::onColumnClicked(int column_id, bool sort_desc, bool sort_d
     if (sort_default)
     {
         m_sort_desc = false;
+        m_sort_default = true;
         m_current_column = 5/*distance*/;
         loadList();
     }
     else
     {
         m_sort_desc = sort_desc;
+        m_sort_default = false;
         m_current_column = column_id;
         loadList();
     }
@@ -458,6 +463,8 @@ void ServerSelection::onUpdate(float dt)
                     all_possible_keys.insert(server->getBookmarkKey());
                 std::map<std::string, uint32_t>& bookmarks =
                     UserConfigParams::m_server_bookmarks;
+                std::map<std::string, uint32_t>& bookmarks_order =
+                    UserConfigParams::m_server_bookmarks_order;
                 auto it = bookmarks.begin();
                 while (it != bookmarks.end())
                 {
@@ -467,7 +474,10 @@ void ServerSelection::onUpdate(float dt)
                         all_possible_keys.end())
                     {
                         if (it->second < limit)
+                        {
                             it = bookmarks.erase(it);
+                            bookmarks_order.erase(it->first);
+                        }
                         else
                             it++;
                     }

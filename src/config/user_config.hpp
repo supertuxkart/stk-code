@@ -849,6 +849,11 @@ namespace UserConfigParams
         "Wan server bookmarks",
         {{ "server-bookmarks", "server-name", "last-online" }}, {}));
 
+    PARAM_PREFIX StringToUIntUserConfigParam    m_server_bookmarks_order
+        PARAM_DEFAULT(StringToUIntUserConfigParam("server-bookmarks-order",
+        "Wan server bookmarks order",
+        {{ "server-bookmarks", "server-name", "id" }}, {}));
+
     PARAM_PREFIX StringToUIntUserConfigParam    m_address_history
         PARAM_DEFAULT(StringToUIntUserConfigParam("address-history",
         "Last 5 IP addresses that user entered",
