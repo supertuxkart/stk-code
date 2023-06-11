@@ -266,6 +266,7 @@ void Log::writeLine(const char *line, int level)
             CIrrDeviceiOS::debugPrint(line);
 #else
             printf("%s", line);
+            fflush(stdout);
 #endif
         }
         resetTerminalColor();  // this prints a \n
