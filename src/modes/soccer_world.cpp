@@ -982,8 +982,10 @@ btTransform SoccerWorld::getRescueTransform(unsigned int rescue_pos) const
     // Create a quaternion representing the rotation around the Y axis
     btQuaternion q2(btVector3(0.0f, 1.0f, 0.0f), angle);
 
-    // Combine the two rotations
-    pos.setRotation(q1 * q2);
+    // Combine the two rotations and normalize the result
+    btQuaternion combined_rotation = q1 * q2;
+    combined_rotation.normalize();
+    pos.setRotation(combined_rotation);
 
     return pos;
 }   // getRescueTransform
