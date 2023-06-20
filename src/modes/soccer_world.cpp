@@ -963,6 +963,30 @@ btTransform SoccerWorld::getRescueTransform(unsigned int rescue_pos) const
     pos.setOrigin(xyz);
     btQuaternion q1 = shortestArcQuat(Vec3(0.0f, 1.0f, 0.0f), normal);
     pos.setRotation(q1);
+
+    // Get the ball initial position (at the moment of hitting the rescue button)
+    Vec3 ball_position_0 = getBallPosition();
+
+    // Get the ball Linear Velocity
+    Vec3 ball_velocity = m_ball_body->getLinearVelocity();
+
+    // Calculate the new ball position after 1.1 s (after the rescue animation is over) assuming the ball to be moving in URM
+    Vec3 ball_position = ball_velocity*1.1 + ball_position_0;
+
+    // Calculate the direction vector from the kart to the ball
+    Vec3 direction = (ball_position - xyz).normalized();
+
+    // Calculate the angle between the kart's forward direction and the direction vector
+    float angle = atan2f(direction.getX(), direction.getZ());
+
+    // Create a quaternion representing the rotation around the Y axis
+    btQuaternion q2(btVector3(0.0f, 1.0f, 0.0f), angle);
+
+    // Combine the two rotations and normalize the result
+    btQuaternion combined_rotation = q1 * q2;
+    combined_rotation.normalize();
+    pos.setRotation(combined_rotation);
+
     return pos;
 }   // getRescueTransform
 
