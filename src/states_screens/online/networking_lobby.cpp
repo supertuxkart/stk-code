@@ -875,6 +875,16 @@ void NetworkingLobby::unloaded()
 // ----------------------------------------------------------------------------
 void NetworkingLobby::tearDown()
 {
+    if (m_state == LS_ADD_PLAYERS)
+    {
+        UserConfigParams::m_enable_network_splitscreen = false;
+        NetworkConfig::get()->cleanNetworkPlayers();
+        NetworkConfig::get()->addNetworkPlayer(
+            input_manager->getDeviceManager()->getLatestUsedDevice(),
+            PlayerManager::getCurrentPlayer(), HANDICAP_NONE);
+        NetworkConfig::get()->doneAddingNetworkPlayers();
+    }
+
     gui::IGUIStaticText* st =
         m_text_bubble->getIrrlichtElement<gui::IGUIStaticText>();
     st->setMouseCallback(nullptr);
