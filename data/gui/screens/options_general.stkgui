@@ -65,7 +65,7 @@
                     <div layout="horizontal-row" width="100%" height="fit">
                         <checkbox id="enable-lobby-chat"/>
                         <spacer width="1%" height="100%" />
-                        <label height="100%" id="label-lobby-chat" I18N="In the general settings" text="Enable chatting online" word_wrap="true"/>
+                        <label height="100%" id="label-lobby-chat" I18N="In the general settings" text="Enable chatting in online lobbies" word_wrap="true"/>
                     </div>
 
                     <spacer width="5" height="3%"/>
@@ -73,7 +73,7 @@
                     <div layout="horizontal-row" width="100%" height="fit">
                         <checkbox id="enable-race-chat"/>
                         <spacer width="1%" height="100%" />
-                        <label height="100%" id="label-race-chat" I18N="In the general settings" text="Enable chatting in online games" word_wrap="true"/>
+                        <label height="100%" id="label-race-chat" I18N="In the general settings" text="Enable chatting in online matches" word_wrap="true"/>
                     </div>
 
                     <spacer width="5" height="4%"/>
