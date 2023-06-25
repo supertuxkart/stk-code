@@ -1,7 +1,7 @@
 /*
- * vk_mvk_moltenvk.h
+ * mvk_config.h
  *
- * Copyright (c) 2015-2022 The Brenwill Workshop Ltd. (http://www.brenwill.com)
+ * Copyright (c) 2015-2023 The Brenwill Workshop Ltd. (http://www.brenwill.com)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,23 +17,16 @@
  */
 
 
-/** Vulkan extension VK_MVK_moltenvk. */
 
-#ifndef __vk_mvk_moltenvk_h_
-#define __vk_mvk_moltenvk_h_ 1
+#ifndef __mvk_config_h_
+#define __mvk_config_h_ 1
 
 #ifdef __cplusplus
 extern "C" {
 #endif	//  __cplusplus
 	
-#include <IOSurface/IOSurfaceRef.h>
 
-#ifdef __OBJC__
-#import <Metal/Metal.h>
-#else
-typedef unsigned long MTLLanguageVersion;
-typedef unsigned long MTLArgumentBuffersTier;
-#endif
+/** This header contains the public configuration API for MoltenVK. */
 
 
 /**
@@ -50,13 +43,13 @@ typedef unsigned long MTLArgumentBuffersTier;
  */
 #define MVK_VERSION_MAJOR   1
 #define MVK_VERSION_MINOR   2
-#define MVK_VERSION_PATCH   1
+#define MVK_VERSION_PATCH   4
 
 #define MVK_MAKE_VERSION(major, minor, patch)    (((major) * 10000) + ((minor) * 100) + (patch))
 #define MVK_VERSION     MVK_MAKE_VERSION(MVK_VERSION_MAJOR, MVK_VERSION_MINOR, MVK_VERSION_PATCH)
 
-#define VK_MVK_MOLTENVK_SPEC_VERSION            36
-#define VK_MVK_MOLTENVK_EXTENSION_NAME          "VK_MVK_moltenvk"
+
+#define MVK_CONFIGURATION_API_VERSION   37
 
 /** Identifies the level of logging MoltenVK should be limited to outputting. */
 typedef enum MVKConfigLogLevel {
@@ -70,11 +63,14 @@ typedef enum MVKConfigLogLevel {
 
 /** Identifies the level of Vulkan call trace logging MoltenVK should perform. */
 typedef enum MVKConfigTraceVulkanCalls {
-	MVK_CONFIG_TRACE_VULKAN_CALLS_NONE       = 0,	/**< No Vulkan call logging. */
-	MVK_CONFIG_TRACE_VULKAN_CALLS_ENTER      = 1,	/**< Log the name of each Vulkan call when the call is entered. */
-	MVK_CONFIG_TRACE_VULKAN_CALLS_ENTER_EXIT = 2,	/**< Log the name of each Vulkan call when the call is entered and exited. This effectively brackets any other logging activity within the scope of the Vulkan call. */
-	MVK_CONFIG_TRACE_VULKAN_CALLS_DURATION   = 3,	/**< Same as MVK_CONFIG_TRACE_VULKAN_CALLS_ENTER_EXIT, plus logs the time spent inside the Vulkan function. */
-	MVK_CONFIG_TRACE_VULKAN_CALLS_MAX_ENUM   = 0x7FFFFFFF
+	MVK_CONFIG_TRACE_VULKAN_CALLS_NONE                 = 0,	/**< No Vulkan call logging. */
+	MVK_CONFIG_TRACE_VULKAN_CALLS_ENTER                = 1,	/**< Log the name of each Vulkan call when the call is entered. */
+	MVK_CONFIG_TRACE_VULKAN_CALLS_ENTER_THREAD_ID      = 2,	/**< Log the name and thread ID of each Vulkan call when the call is entered. */
+	MVK_CONFIG_TRACE_VULKAN_CALLS_ENTER_EXIT           = 3,	/**< Log the name of each Vulkan call when the call is entered and exited. This effectively brackets any other logging activity within the scope of the Vulkan call. */
+	MVK_CONFIG_TRACE_VULKAN_CALLS_ENTER_EXIT_THREAD_ID = 4,	/**< Log the name and thread ID of each Vulkan call when the call is entered and name when exited. This effectively brackets any other logging activity within the scope of the Vulkan call. */
+	MVK_CONFIG_TRACE_VULKAN_CALLS_DURATION             = 5,	/**< Same as MVK_CONFIG_TRACE_VULKAN_CALLS_ENTER_EXIT, plus logs the time spent inside the Vulkan function. */
+	MVK_CONFIG_TRACE_VULKAN_CALLS_DURATION_THREAD_ID   = 6,	/**< Same as MVK_CONFIG_TRACE_VULKAN_CALLS_ENTER_EXIT_THREAD_ID, plus logs the time spent inside the Vulkan function. */
+	MVK_CONFIG_TRACE_VULKAN_CALLS_MAX_ENUM             = 0x7FFFFFFF
 } MVKConfigTraceVulkanCalls;
 
 /** Identifies the scope for Metal to run an automatic GPU capture for diagnostic debugging purposes. */
@@ -88,9 +84,8 @@ typedef enum MVKConfigAutoGPUCaptureScope {
 /** Identifies extensions to advertise as part of MoltenVK configuration. */
 typedef enum MVKConfigAdvertiseExtensionBits {
 	MVK_CONFIG_ADVERTISE_EXTENSIONS_ALL         = 0x00000001,	/**< All supported extensions. */
-	MVK_CONFIG_ADVERTISE_EXTENSIONS_MOLTENVK    = 0x00000002,	/**< This VK_MVK_moltenvk extension. */
-	MVK_CONFIG_ADVERTISE_EXTENSIONS_WSI         = 0x00000004,	/**< WSI extensions supported on the platform. */
-	MVK_CONFIG_ADVERTISE_EXTENSIONS_PORTABILITY = 0x00000008,	/**< Vulkan Portability Subset extensions. */
+	MVK_CONFIG_ADVERTISE_EXTENSIONS_WSI         = 0x00000002,	/**< WSI extensions supported on the platform. */
+	MVK_CONFIG_ADVERTISE_EXTENSIONS_PORTABILITY = 0x00000004,	/**< Vulkan Portability Subset extensions. */
 	MVK_CONFIG_ADVERTISE_EXTENSIONS_MAX_ENUM    = 0x7FFFFFFF
 } MVKConfigAdvertiseExtensionBits;
 typedef VkFlags MVKConfigAdvertiseExtensions;
@@ -129,6 +124,24 @@ typedef enum MVKConfigFastMath {
 	MVK_CONFIG_FAST_MATH_MAX_ENUM  = 0x7FFFFFFF
 } MVKConfigFastMath;
 
+/** Identifies available system data compression algorithms. */
+typedef enum MVKConfigCompressionAlgorithm {
+	MVK_CONFIG_COMPRESSION_ALGORITHM_NONE     = 0,	/**< No compression. */
+	MVK_CONFIG_COMPRESSION_ALGORITHM_LZFSE    = 1,	/**< Apple proprietary. Good balance of high performance and small compression size, particularly for larger data content. */
+	MVK_CONFIG_COMPRESSION_ALGORITHM_ZLIB     = 2,	/**< Open cross-platform ZLib format. For smaller data content, has better performance and smaller size than LZFSE. */
+	MVK_CONFIG_COMPRESSION_ALGORITHM_LZ4      = 3,	/**< Fastest performance. Largest compression size. */
+	MVK_CONFIG_COMPRESSION_ALGORITHM_LZMA     = 4,	/**< Slowest performance. Smallest compression size, particular with larger content. */
+	MVK_CONFIG_COMPRESSION_ALGORITHM_MAX_ENUM = 0x7FFFFFFF,
+} MVKConfigCompressionAlgorithm;
+
+/** Identifies the style of activity performance logging to use. */
+typedef enum MVKConfigActivityPerformanceLoggingStyle {
+	MVK_CONFIG_ACTIVITY_PERFORMANCE_LOGGING_STYLE_FRAME_COUNT     = 0,	/**< Repeatedly log performance after a configured number of frames. */
+	MVK_CONFIG_ACTIVITY_PERFORMANCE_LOGGING_STYLE_IMMEDIATE       = 1,	/**< Log immediately after each performance measurement. */
+	MVK_CONFIG_ACTIVITY_PERFORMANCE_LOGGING_STYLE_DEVICE_LIFETIME = 2,	/**< Log at the end of the VkDevice lifetime. This is useful for one-shot apps such as testing frameworks. */
+	MVK_CONFIG_ACTIVITY_PERFORMANCE_LOGGING_STYLE_MAX_ENUM        = 0x7FFFFFFF,
+} MVKConfigActivityPerformanceLoggingStyle;
+
 /**
  * MoltenVK configuration settings.
  *
@@ -156,7 +169,7 @@ typedef enum MVKConfigFastMath {
  * MVK_CONFIG_SHADER_CONVERSION_FLIP_VERTEX_Y build setting when MoltenVK is compiled.
  *
  * This structure may be extended as new features are added to MoltenVK. If you are linking to
- * an implementation of MoltenVK that was compiled from a different VK_MVK_MOLTENVK_SPEC_VERSION
+ * an implementation of MoltenVK that was compiled from a different MVK_CONFIGURATION_API_VERSION
  * than your app was, the size of this structure in your app may be larger or smaller than the
  * struct in MoltenVK. See the description of the vkGetMoltenVKConfigurationMVK() and
  * vkSetMoltenVKConfigurationMVK() functions for information about how to handle this.
@@ -298,12 +311,13 @@ typedef struct {
 	uint32_t maxActiveMetalCommandBuffersPerQueue;
 
 	/**
-	 * Metal allows only 8192 occlusion queries per MTLBuffer. If enabled, MoltenVK
-	 * allocates a MTLBuffer for each query pool, allowing each query pool to support
-	 * 8192 queries, which may slow performance or cause unexpected behaviour if the query
-	 * pool is not established prior to a Metal renderpass, or if the query pool is changed
-	 * within a renderpass. If disabled, one MTLBuffer will be shared by all query pools,
-	 * which improves performance, but limits the total device queries to 8192.
+	 * Depending on the GPU, Metal allows 8192 or 32768 occlusion queries per MTLBuffer.
+	 * If enabled, MoltenVK allocates a MTLBuffer for each query pool, allowing each query
+	 * pool to support that permitted number of queries. This may slow performance or cause
+	 * unexpected behaviour if the query pool is not established prior to a Metal renderpass,
+	 * or if the query pool is changed within a renderpass. If disabled, one MTLBuffer will
+	 * be shared by all query pools, which improves performance, but limits the total device
+	 * queries to the permitted number.
 	 *
 	 * The value of this parameter may be changed at any time during application runtime,
 	 * and the changed value will immediately effect subsequent MoltenVK behaviour.
@@ -321,22 +335,23 @@ typedef struct {
 	VkBool32 presentWithCommandBuffer;
 
 	/**
-	 * If enabled, swapchain images will use simple Nearest sampling when magnifying the
-	 * swapchain image to fit a physical display surface. If disabled, swapchain images will
+	 * If enabled, swapchain images will use simple Nearest sampling when minifying or magnifying
+	 * the swapchain image to fit a physical display surface. If disabled, swapchain images will
 	 * use Linear sampling when magnifying the swapchain image to fit a physical display surface.
 	 * Enabling this setting avoids smearing effects when swapchain images are simple interger
 	 * multiples of display pixels (eg- macOS Retina, and typical of graphics apps and games),
 	 * but may cause aliasing effects when using non-integer display scaling.
 	 *
-	 * The value of this parameter may be changed before creating a VkSwapchain,
+	 * The value of this parameter must be changed before creating a VkSwapchain,
 	 * for the change to take effect.
 	 *
 	 * The initial value or this parameter is set by the
-	 * MVK_CONFIG_SWAPCHAIN_MAG_FILTER_USE_NEAREST
+	 * MVK_CONFIG_SWAPCHAIN_MIN_MAG_FILTER_USE_NEAREST
 	 * runtime environment variable or MoltenVK compile-time build setting.
 	 * If neither is set, the value of this parameter defaults to true.
 	 */
-	VkBool32 swapchainMagFilterUseNearest;
+	VkBool32 swapchainMinMagFilterUseNearest;
+#define swapchainMagFilterUseNearest swapchainMinMagFilterUseNearest
 
 	/**
 	 * The maximum amount of time, in nanoseconds, to wait for a Metal library, function, or
@@ -358,8 +373,8 @@ typedef struct {
 	 * If enabled, performance statistics, as defined by the MVKPerformanceStatistics structure,
 	 * are collected, and can be retrieved via the vkGetPerformanceStatisticsMVK() function.
 	 *
-	 * You can also use the performanceLoggingFrameCount or logActivityPerformanceInline
-	 * parameters to automatically log the performance statistics collected by this parameter.
+	 * You can also use the activityPerformanceLoggingStyle and performanceLoggingFrameCount
+	 * parameters to configure when to log the performance statistics collected by this parameter.
 	 *
 	 * The value of this parameter must be changed before creating a VkDevice,
 	 * for the change to take effect.
@@ -767,21 +782,20 @@ typedef struct {
 	VkBool32 useMTLHeap;
 
 	/**
-	 * Controls whether MoltenVK should log the performance of individual activities as they happen.
-	 * If this setting is enabled, activity performance will be logged when each activity happens.
-	 * If this setting is disabled, activity performance will be logged when frame peformance is
-	 * logged as determined by the performanceLoggingFrameCount value.
+	 * Controls when MoltenVK should log activity performance events.
 	 *
 	 * The value of this parameter must be changed before creating a VkDevice,
 	 * for the change to take effect.
 	 *
 	 * The initial value or this parameter is set by the
-	 * MVK_CONFIG_PERFORMANCE_LOGGING_INLINE
+	 * MVK_CONFIG_ACTIVITY_PERFORMANCE_LOGGING_STYLE
 	 * runtime environment variable or MoltenVK compile-time build setting.
-	 * If neither is set, this setting is disabled by default, and activity
-	 * performance will be logged only when frame activity is logged.
+	 * If neither is set, this setting is set to
+	 * MVK_CONFIG_ACTIVITY_PERFORMANCE_LOGGING_STYLE_FRAME_COUNT by default,
+	 * and activity performance will be logged when frame activity is logged.
 	 */
-	VkBool32 logActivityPerformanceInline;
+	MVKConfigActivityPerformanceLoggingStyle activityPerformanceLoggingStyle;
+#define logActivityPerformanceInline activityPerformanceLoggingStyle
 
 	/**
 	 * Controls the Vulkan API version that MoltenVK should advertise in vkEnumerateInstanceVersion().
@@ -874,188 +888,38 @@ typedef struct {
 	 */
 	MVKUseMetalArgumentBuffers useMetalArgumentBuffers;
 
+	/**
+	 * Controls the type of compression to use on the MSL source code that is stored in memory
+	 * for use in a pipeline cache. After being converted from SPIR-V, or loaded directly into
+	 * a VkShaderModule, and then compiled into a MTLLibrary, the MSL source code is no longer
+	 * needed for operation, but it is retained so it can be written out as part of a pipeline
+	 * cache export. When a large number of shaders are loaded, this can consume significant
+	 * memory. In such a case, this parameter can be used to compress the MSL source code that
+	 * is awaiting export as part of a pipeline cache.
+	 *
+	 * Pipeline cache compression is available for macOS 10.15 and above, and iOS/tvOS 13.0 and above.
+	 *
+	 * The value of this parameter can be changed at any time, and will affect the size of
+	 * the cached MSL from subsequent shader compilations.
+	 *
+	 * The initial value or this parameter is set by the
+	 * MVK_CONFIG_SHADER_COMPRESSION_ALGORITHM
+	 * runtime environment variable or MoltenVK compile-time build setting.
+	 * If neither is set, this setting is set to
+	 * MVK_CONFIG_COMPRESSION_ALGORITHM_NONE by default,
+	 * and MoltenVK will not compress the MSL source code after compilation into a MTLLibrary.
+	 */
+	MVKConfigCompressionAlgorithm shaderSourceCompressionAlgorithm;
+
 } MVKConfiguration;
 
-/** Identifies the type of rounding Metal uses for float to integer conversions in particular calculatons. */
-typedef enum MVKFloatRounding {
-	MVK_FLOAT_ROUNDING_NEAREST     = 0,	 /**< Metal rounds to nearest. */
-	MVK_FLOAT_ROUNDING_UP          = 1,	 /**< Metal rounds towards positive infinity. */
-	MVK_FLOAT_ROUNDING_DOWN        = 2,	 /**< Metal rounds towards negative infinity. */
-	MVK_FLOAT_ROUNDING_UP_MAX_ENUM = 0x7FFFFFFF
-} MVKFloatRounding;
-
-/** Identifies the pipeline points where GPU counter sampling can occur. Maps to MTLCounterSamplingPoint. */
-typedef enum MVKCounterSamplingBits {
-	MVK_COUNTER_SAMPLING_AT_DRAW           = 0x00000001,
-	MVK_COUNTER_SAMPLING_AT_DISPATCH       = 0x00000002,
-	MVK_COUNTER_SAMPLING_AT_BLIT           = 0x00000004,
-	MVK_COUNTER_SAMPLING_AT_PIPELINE_STAGE = 0x00000008,
-	MVK_COUNTER_SAMPLING_MAX_ENUM          = 0X7FFFFFFF
-} MVKCounterSamplingBits;
-typedef VkFlags MVKCounterSamplingFlags;
-
-/**
- * Features provided by the current implementation of Metal on the current device. You can
- * retrieve a copy of this structure using the vkGetPhysicalDeviceMetalFeaturesMVK() function.
- *
- * This structure may be extended as new features are added to MoltenVK. If you are linking to
- * an implementation of MoltenVK that was compiled from a different VK_MVK_MOLTENVK_SPEC_VERSION
- * than your app was, the size of this structure in your app may be larger or smaller than the
- * struct in MoltenVK. See the description of the vkGetPhysicalDeviceMetalFeaturesMVK() function
- * for information about how to handle this.
- *
- * TO SUPPORT DYNAMIC LINKING TO THIS STRUCTURE AS DESCRIBED ABOVE, THIS STRUCTURE SHOULD NOT
- * BE CHANGED EXCEPT TO ADD ADDITIONAL MEMBERS ON THE END. EXISTING MEMBERS, AND THEIR ORDER,
- * SHOULD NOT BE CHANGED.
- */
-typedef struct {
-    uint32_t mslVersion;                        	/**< The version of the Metal Shading Language available on this device. The format of the integer is MMmmpp, with two decimal digts each for Major, minor, and patch version values (eg. MSL 1.2 would appear as 010200). */
-	VkBool32 indirectDrawing;                   	/**< If true, draw calls support parameters held in a GPU buffer. */
-	VkBool32 baseVertexInstanceDrawing;         	/**< If true, draw calls support specifiying the base vertex and instance. */
-    uint32_t dynamicMTLBufferSize;              	/**< If greater than zero, dynamic MTLBuffers for setting vertex, fragment, and compute bytes are supported, and their content must be below this value. */
-    VkBool32 shaderSpecialization;              	/**< If true, shader specialization (aka Metal function constants) is supported. */
-    VkBool32 ioSurfaces;                        	/**< If true, VkImages can be underlaid by IOSurfaces via the vkUseIOSurfaceMVK() function, to support inter-process image transfers. */
-    VkBool32 texelBuffers;                      	/**< If true, texel buffers are supported, allowing the contents of a buffer to be interpreted as an image via a VkBufferView. */
-	VkBool32 layeredRendering;                  	/**< If true, layered rendering to multiple cube or texture array layers is supported. */
-	VkBool32 presentModeImmediate;              	/**< If true, immediate surface present mode (VK_PRESENT_MODE_IMMEDIATE_KHR), allowing a swapchain image to be presented immediately, without waiting for the vertical sync period of the display, is supported. */
-	VkBool32 stencilViews;                      	/**< If true, stencil aspect views are supported through the MTLPixelFormatX24_Stencil8 and MTLPixelFormatX32_Stencil8 formats. */
-	VkBool32 multisampleArrayTextures;          	/**< If true, MTLTextureType2DMultisampleArray is supported. */
-	VkBool32 samplerClampToBorder;              	/**< If true, the border color set when creating a sampler will be respected. */
-	uint32_t maxTextureDimension; 	     	  		/**< The maximum size of each texture dimension (width, height, or depth). */
-	uint32_t maxPerStageBufferCount;            	/**< The total number of per-stage Metal buffers available for shader uniform content and attributes. */
-    uint32_t maxPerStageTextureCount;           	/**< The total number of per-stage Metal textures available for shader uniform content. */
-    uint32_t maxPerStageSamplerCount;           	/**< The total number of per-stage Metal samplers available for shader uniform content. */
-    VkDeviceSize maxMTLBufferSize;              	/**< The max size of a MTLBuffer (in bytes). */
-    VkDeviceSize mtlBufferAlignment;            	/**< The alignment used when allocating memory for MTLBuffers. Must be PoT. */
-    VkDeviceSize maxQueryBufferSize;            	/**< The maximum size of an occlusion query buffer (in bytes). */
-	VkDeviceSize mtlCopyBufferAlignment;        	/**< The alignment required during buffer copy operations (in bytes). */
-    VkSampleCountFlags supportedSampleCounts;   	/**< A bitmask identifying the sample counts supported by the device. */
-	uint32_t minSwapchainImageCount;	 	  		/**< The minimum number of swapchain images that can be supported by a surface. */
-	uint32_t maxSwapchainImageCount;	 	  		/**< The maximum number of swapchain images that can be supported by a surface. */
-	VkBool32 combinedStoreResolveAction;			/**< If true, the device supports VK_ATTACHMENT_STORE_OP_STORE with a simultaneous resolve attachment. */
-	VkBool32 arrayOfTextures;			 	  		/**< If true, arrays of textures is supported. */
-	VkBool32 arrayOfSamplers;			 	  		/**< If true, arrays of texture samplers is supported. */
-	MTLLanguageVersion mslVersionEnum;				/**< The version of the Metal Shading Language available on this device, as a Metal enumeration. */
-	VkBool32 depthSampleCompare;					/**< If true, depth texture samplers support the comparison of the pixel value against a reference value. */
-	VkBool32 events;								/**< If true, Metal synchronization events (MTLEvent) are supported. */
-	VkBool32 memoryBarriers;						/**< If true, full memory barriers within Metal render passes are supported. */
-	VkBool32 multisampleLayeredRendering;       	/**< If true, layered rendering to multiple multi-sampled cube or texture array layers is supported. */
-	VkBool32 stencilFeedback;						/**< If true, fragment shaders that write to [[stencil]] outputs are supported. */
-	VkBool32 textureBuffers;						/**< If true, textures of type MTLTextureTypeBuffer are supported. */
-	VkBool32 postDepthCoverage;						/**< If true, coverage masks in fragment shaders post-depth-test are supported. */
-	VkBool32 fences;								/**< If true, Metal synchronization fences (MTLFence) are supported. */
-	VkBool32 rasterOrderGroups;						/**< If true, Raster order groups in fragment shaders are supported. */
-	VkBool32 native3DCompressedTextures;			/**< If true, 3D compressed images are supported natively, without manual decompression. */
-	VkBool32 nativeTextureSwizzle;					/**< If true, component swizzle is supported natively, without manual swizzling in shaders. */
-	VkBool32 placementHeaps;						/**< If true, MTLHeap objects support placement of resources. */
-	VkDeviceSize pushConstantSizeAlignment;			/**< The alignment used internally when allocating memory for push constants. Must be PoT. */
-	uint32_t maxTextureLayers;						/**< The maximum number of layers in an array texture. */
-    uint32_t maxSubgroupSize;			        	/**< The maximum number of threads in a SIMD-group. */
-	VkDeviceSize vertexStrideAlignment;         	/**< The alignment used for the stride of vertex attribute bindings. */
-	VkBool32 indirectTessellationDrawing;			/**< If true, tessellation draw calls support parameters held in a GPU buffer. */
-	VkBool32 nonUniformThreadgroups;				/**< If true, the device supports arbitrary-sized grids in compute workloads. */
-	VkBool32 renderWithoutAttachments;          	/**< If true, we don't have to create a dummy attachment for a render pass if there isn't one. */
-	VkBool32 deferredStoreActions;					/**< If true, render pass store actions can be specified after the render encoder is created. */
-	VkBool32 sharedLinearTextures;					/**< If true, linear textures and texture buffers can be created from buffers in Shared storage. */
-	VkBool32 depthResolve;							/**< If true, resolving depth textures with filters other than Sample0 is supported. */
-	VkBool32 stencilResolve;						/**< If true, resolving stencil textures with filters other than Sample0 is supported. */
-	uint32_t maxPerStageDynamicMTLBufferCount;		/**< The maximum number of inline buffers that can be set on a command buffer. */
-	uint32_t maxPerStageStorageTextureCount;    	/**< The total number of per-stage Metal textures with read-write access available for writing to from a shader. */
-	VkBool32 astcHDRTextures;						/**< If true, ASTC HDR pixel formats are supported. */
-	VkBool32 renderLinearTextures;					/**< If true, linear textures are renderable. */
-	VkBool32 pullModelInterpolation;				/**< If true, explicit interpolation functions are supported. */
-	VkBool32 samplerMirrorClampToEdge;				/**< If true, the mirrored clamp to edge address mode is supported in samplers. */
-	VkBool32 quadPermute;							/**< If true, quadgroup permutation functions (vote, ballot, shuffle) are supported in shaders. */
-	VkBool32 simdPermute;							/**< If true, SIMD-group permutation functions (vote, ballot, shuffle) are supported in shaders. */
-	VkBool32 simdReduction;							/**< If true, SIMD-group reduction functions (arithmetic) are supported in shaders. */
-    uint32_t minSubgroupSize;			        	/**< The minimum number of threads in a SIMD-group. */
-    VkBool32 textureBarriers;                   	/**< If true, texture barriers are supported within Metal render passes. */
-    VkBool32 tileBasedDeferredRendering;        	/**< If true, this device uses tile-based deferred rendering. */
-	VkBool32 argumentBuffers;						/**< If true, Metal argument buffers are supported. */
-	VkBool32 descriptorSetArgumentBuffers;			/**< If true, a Metal argument buffer can be assigned to a descriptor set, and used on any pipeline and pipeline stage. If false, a different Metal argument buffer must be used for each pipeline-stage/descriptor-set combination. */
-	MVKFloatRounding clearColorFloatRounding;		/**< Identifies the type of rounding Metal uses for MTLClearColor float to integer conversions. */
-	MVKCounterSamplingFlags counterSamplingPoints;	/**< Identifies the points where pipeline GPU counter sampling may occur. */
-	VkBool32 programmableSamplePositions;			/**< If true, programmable MSAA sample positions are supported. */
-	VkBool32 shaderBarycentricCoordinates;			/**< If true, fragment shader barycentric coordinates are supported. */
-	MTLArgumentBuffersTier argumentBuffersTier;		/**< The argument buffer tier available on this device, as a Metal enumeration. */
-} MVKPhysicalDeviceMetalFeatures;
-
-/** MoltenVK performance of a particular type of activity. */
-typedef struct {
-    uint32_t count;             /**< The number of activities of this type. */
-	double latestDuration;      /**< The latest (most recent) duration of the activity, in milliseconds. */
-    double averageDuration;     /**< The average duration of the activity, in milliseconds. */
-    double minimumDuration;     /**< The minimum duration of the activity, in milliseconds. */
-    double maximumDuration;     /**< The maximum duration of the activity, in milliseconds. */
-} MVKPerformanceTracker;
-
-/** MoltenVK performance of shader compilation activities. */
-typedef struct {
-	MVKPerformanceTracker hashShaderCode;				/** Create a hash from the incoming shader code. */
-    MVKPerformanceTracker spirvToMSL;					/** Convert SPIR-V to MSL source code. */
-    MVKPerformanceTracker mslCompile;					/** Compile MSL source code into a MTLLibrary. */
-    MVKPerformanceTracker mslLoad;						/** Load pre-compiled MSL code into a MTLLibrary. */
-	MVKPerformanceTracker shaderLibraryFromCache;		/** Retrieve a shader library from the cache, lazily creating it if needed. */
-    MVKPerformanceTracker functionRetrieval;			/** Retrieve a MTLFunction from a MTLLibrary. */
-    MVKPerformanceTracker functionSpecialization;		/** Specialize a retrieved MTLFunction. */
-    MVKPerformanceTracker pipelineCompile;				/** Compile MTLFunctions into a pipeline. */
-	MVKPerformanceTracker glslToSPRIV;					/** Convert GLSL to SPIR-V code. */
-} MVKShaderCompilationPerformance;
-
-/** MoltenVK performance of pipeline cache activities. */
-typedef struct {
-	MVKPerformanceTracker sizePipelineCache;			/** Calculate the size of cache data required to write MSL to pipeline cache data stream. */
-	MVKPerformanceTracker writePipelineCache;			/** Write MSL to pipeline cache data stream. */
-	MVKPerformanceTracker readPipelineCache;			/** Read MSL from pipeline cache data stream. */
-} MVKPipelineCachePerformance;
-
-/** MoltenVK performance of queue activities. */
-typedef struct {
-	MVKPerformanceTracker mtlQueueAccess;               /** Create an MTLCommandQueue or access an existing cached instance. */
-	MVKPerformanceTracker mtlCommandBufferCompletion;   /** Completion of a MTLCommandBuffer on the GPU, from commit to completion callback. */
-	MVKPerformanceTracker nextCAMetalDrawable;			/** Retrieve next CAMetalDrawable from CAMetalLayer during presentation. */
-	MVKPerformanceTracker frameInterval;				/** Frame presentation interval (1000/FPS). */
-} MVKQueuePerformance;
-
-/**
- * MoltenVK performance. You can retrieve a copy of this structure using the vkGetPerformanceStatisticsMVK() function.
- *
- * This structure may be extended as new features are added to MoltenVK. If you are linking to
- * an implementation of MoltenVK that was compiled from a different VK_MVK_MOLTENVK_SPEC_VERSION
- * than your app was, the size of this structure in your app may be larger or smaller than the
- * struct in MoltenVK. See the description of the vkGetPerformanceStatisticsMVK() function for
- * information about how to handle this.
- *
- * TO SUPPORT DYNAMIC LINKING TO THIS STRUCTURE AS DESCRIBED ABOVE, THIS STRUCTURE SHOULD NOT
- * BE CHANGED EXCEPT TO ADD ADDITIONAL MEMBERS ON THE END. EXISTING MEMBERS, AND THEIR ORDER,
- * SHOULD NOT BE CHANGED.
- */
-typedef struct {
-	MVKShaderCompilationPerformance shaderCompilation;	/** Shader compilations activities. */
-	MVKPipelineCachePerformance pipelineCache;			/** Pipeline cache activities. */
-	MVKQueuePerformance queue;          				/** Queue activities. */
-} MVKPerformanceStatistics;
 
 
 #pragma mark -
 #pragma mark Function types
 
-typedef VkResult (VKAPI_PTR *PFN_vkGetMoltenVKConfigurationMVK)(VkInstance ignored, MVKConfiguration* pConfiguration, size_t* pConfigurationSize);
-typedef VkResult (VKAPI_PTR *PFN_vkSetMoltenVKConfigurationMVK)(VkInstance ignored, const MVKConfiguration* pConfiguration, size_t* pConfigurationSize);
-typedef VkResult (VKAPI_PTR *PFN_vkGetPhysicalDeviceMetalFeaturesMVK)(VkPhysicalDevice physicalDevice, MVKPhysicalDeviceMetalFeatures* pMetalFeatures, size_t* pMetalFeaturesSize);
-typedef VkResult (VKAPI_PTR *PFN_vkGetPerformanceStatisticsMVK)(VkDevice device, MVKPerformanceStatistics* pPerf, size_t* pPerfSize);
-typedef void (VKAPI_PTR *PFN_vkGetVersionStringsMVK)(char* pMoltenVersionStringBuffer, uint32_t moltenVersionStringBufferLength, char* pVulkanVersionStringBuffer, uint32_t vulkanVersionStringBufferLength);
-typedef void (VKAPI_PTR *PFN_vkSetWorkgroupSizeMVK)(VkShaderModule shaderModule, uint32_t x, uint32_t y, uint32_t z);
-typedef VkResult (VKAPI_PTR *PFN_vkUseIOSurfaceMVK)(VkImage image, IOSurfaceRef ioSurface);
-typedef void (VKAPI_PTR *PFN_vkGetIOSurfaceMVK)(VkImage image, IOSurfaceRef* pIOSurface);
-
-#ifdef __OBJC__
-typedef void (VKAPI_PTR *PFN_vkGetMTLDeviceMVK)(VkPhysicalDevice physicalDevice, id<MTLDevice>* pMTLDevice);
-typedef VkResult (VKAPI_PTR *PFN_vkSetMTLTextureMVK)(VkImage image, id<MTLTexture> mtlTexture);
-typedef void (VKAPI_PTR *PFN_vkGetMTLTextureMVK)(VkImage image, id<MTLTexture>* pMTLTexture);
-typedef void (VKAPI_PTR *PFN_vkGetMTLBufferMVK)(VkBuffer buffer, id<MTLBuffer>* pMTLBuffer);
-typedef void (VKAPI_PTR *PFN_vkGetMTLCommandQueueMVK)(VkQueue queue, id<MTLCommandQueue>* pMTLCommandQueue);
-#endif // __OBJC__
+	typedef VkResult (VKAPI_PTR *PFN_vkGetMoltenVKConfigurationMVK)(VkInstance ignored, MVKConfiguration* pConfiguration, size_t* pConfigurationSize);
+	typedef VkResult (VKAPI_PTR *PFN_vkSetMoltenVKConfigurationMVK)(VkInstance ignored, const MVKConfiguration* pConfiguration, size_t* pConfigurationSize);
 
 
 #pragma mark -
@@ -1063,7 +927,7 @@ typedef void (VKAPI_PTR *PFN_vkGetMTLCommandQueueMVK)(VkQueue queue, id<MTLComma
 
 #ifndef VK_NO_PROTOTYPES
 
-/** 
+/**
  * Populates the pConfiguration structure with the current MoltenVK configuration settings.
  *
  * To change a specific configuration value, call vkGetMoltenVKConfigurationMVK() to retrieve
@@ -1078,7 +942,7 @@ typedef void (VKAPI_PTR *PFN_vkGetMTLCommandQueueMVK)(VkQueue queue, id<MTLComma
  * is created. See the description of the MVKConfiguration members for more information.
  *
  * If you are linking to an implementation of MoltenVK that was compiled from a different
- * VK_MVK_MOLTENVK_SPEC_VERSION than your app was, the size of the MVKConfiguration structure
+ * MVK_CONFIGURATION_API_VERSION than your app was, the size of the MVKConfiguration structure
  * in your app may be larger or smaller than the same struct as expected by MoltenVK.
  *
  * When calling this function, set the value of *pConfigurationSize to sizeof(MVKConfiguration),
@@ -1101,7 +965,7 @@ VKAPI_ATTR VkResult VKAPI_CALL vkGetMoltenVKConfigurationMVK(
 	MVKConfiguration*                           pConfiguration,
 	size_t*                                     pConfigurationSize);
 
-/** 
+/**
  * Sets the MoltenVK configuration settings to those found in the pConfiguration structure.
  *
  * To change a specific configuration value, call vkGetMoltenVKConfigurationMVK()
@@ -1116,7 +980,7 @@ VKAPI_ATTR VkResult VKAPI_CALL vkGetMoltenVKConfigurationMVK(
  * is created. See the description of the MVKConfiguration members for more information.
  *
  * If you are linking to an implementation of MoltenVK that was compiled from a different
- * VK_MVK_MOLTENVK_SPEC_VERSION than your app was, the size of the MVKConfiguration structure
+ * MVK_CONFIGURATION_API_VERSION than your app was, the size of the MVKConfiguration structure
  * in your app may be larger or smaller than the same struct as expected by MoltenVK.
  *
  * When calling this function, set the value of *pConfigurationSize to sizeof(MVKConfiguration),
@@ -1139,249 +1003,54 @@ VKAPI_ATTR VkResult VKAPI_CALL vkSetMoltenVKConfigurationMVK(
 	const MVKConfiguration*                     pConfiguration,
 	size_t*                                     pConfigurationSize);
 
-/** 
- * Populates the pMetalFeatures structure with the Metal-specific features
- * supported by the specified physical device. 
- *
- * If you are linking to an implementation of MoltenVK that was compiled from a different
- * VK_MVK_MOLTENVK_SPEC_VERSION than your app was, the size of the MVKPhysicalDeviceMetalFeatures
- * structure in your app may be larger or smaller than the same struct as expected by MoltenVK.
- *
- * When calling this function, set the value of *pMetalFeaturesSize to sizeof(MVKPhysicalDeviceMetalFeatures),
- * to tell MoltenVK the limit of the size of your MVKPhysicalDeviceMetalFeatures structure. Upon return from
- * this function, the value of *pMetalFeaturesSize will hold the actual number of bytes copied into your
- * passed MVKPhysicalDeviceMetalFeatures structure, which will be the smaller of what your app thinks is the
- * size of MVKPhysicalDeviceMetalFeatures, and what MoltenVK thinks it is. This represents the safe access
- * area within the structure for both MoltenVK and your app.
- *
- * If the size that MoltenVK expects for MVKPhysicalDeviceMetalFeatures is different than the value passed in
- * *pMetalFeaturesSize, this function will return VK_INCOMPLETE, otherwise it will return VK_SUCCESS.
- *
- * Although it is not necessary, you can use this function to determine in advance the value that MoltenVK
- * expects the size of MVKPhysicalDeviceMetalFeatures to be by setting the value of pMetalFeatures to NULL.
- * In that case, this function will set *pMetalFeaturesSize to the size that MoltenVK expects
- * MVKPhysicalDeviceMetalFeatures to be.
- *
- * This function is not supported by the Vulkan SDK Loader and Layers framework
- * and is unavailable when using the Vulkan SDK Loader and Layers framework.
- */
-VKAPI_ATTR VkResult VKAPI_CALL vkGetPhysicalDeviceMetalFeaturesMVK(
-	VkPhysicalDevice                            physicalDevice,
-	MVKPhysicalDeviceMetalFeatures*             pMetalFeatures,
-	size_t*                                     pMetalFeaturesSize);
-
-/**
- * Populates the pPerf structure with the current performance statistics for the device.
- *
- * If you are linking to an implementation of MoltenVK that was compiled from a different
- * VK_MVK_MOLTENVK_SPEC_VERSION than your app was, the size of the MVKPerformanceStatistics
- * structure in your app may be larger or smaller than the same struct as expected by MoltenVK.
- *
- * When calling this function, set the value of *pPerfSize to sizeof(MVKPerformanceStatistics),
- * to tell MoltenVK the limit of the size of your MVKPerformanceStatistics structure. Upon return
- * from this function, the value of *pPerfSize will hold the actual number of bytes copied into
- * your passed MVKPerformanceStatistics structure, which will be the smaller of what your app
- * thinks is the size of MVKPerformanceStatistics, and what MoltenVK thinks it is. This
- * represents the safe access area within the structure for both MoltenVK and your app.
- *
- * If the size that MoltenVK expects for MVKPerformanceStatistics is different than the value passed
- * in *pPerfSize, this function will return VK_INCOMPLETE, otherwise it will return VK_SUCCESS.
- *
- * Although it is not necessary, you can use this function to determine in advance the value
- * that MoltenVK expects the size of MVKPerformanceStatistics to be by setting the value of
- * pPerf to NULL. In that case, this function will set *pPerfSize to the size that MoltenVK
- * expects MVKPerformanceStatistics to be.
- *
- * This function is not supported by the Vulkan SDK Loader and Layers framework
- * and is unavailable when using the Vulkan SDK Loader and Layers framework.
- */
-VKAPI_ATTR VkResult VKAPI_CALL vkGetPerformanceStatisticsMVK(
-	VkDevice                                    device,
-	MVKPerformanceStatistics*            		pPerf,
-	size_t*                                     pPerfSize);
-
-/**
- * Returns a human readable version of the MoltenVK and Vulkan versions.
- *
- * This function is provided as a convenience for reporting. Use the MVK_VERSION, 
- * VK_API_VERSION_1_0, and VK_HEADER_VERSION macros for programmatically accessing
- * the corresponding version numbers.
- */
-VKAPI_ATTR void VKAPI_CALL vkGetVersionStringsMVK(
-    char*                                       pMoltenVersionStringBuffer,
-    uint32_t                                    moltenVersionStringBufferLength,
-    char*                                       pVulkanVersionStringBuffer,
-    uint32_t                                    vulkanVersionStringBufferLength);
-
-/**
- * Sets the number of threads in a workgroup for a compute kernel.
- *
- * This needs to be called if you are creating compute shader modules from MSL
- * source code or MSL compiled code. Workgroup size is determined automatically
- * if you're using SPIR-V.
- *
- * This function is not supported by the Vulkan SDK Loader and Layers framework
- * and is unavailable when using the Vulkan SDK Loader and Layers framework.
- */
-VKAPI_ATTR void VKAPI_CALL vkSetWorkgroupSizeMVK(
-    VkShaderModule                              shaderModule,
-    uint32_t                                    x,
-    uint32_t                                    y,
-    uint32_t                                    z);
-
-#ifdef __OBJC__
-
-/**
- * Returns, in the pMTLDevice pointer, the MTLDevice used by the VkPhysicalDevice.
- *
- * This function is not supported by the Vulkan SDK Loader and Layers framework
- * and is unavailable when using the Vulkan SDK Loader and Layers framework.
- */
-VKAPI_ATTR void VKAPI_CALL vkGetMTLDeviceMVK(
-    VkPhysicalDevice                           physicalDevice,
-    id<MTLDevice>*                             pMTLDevice);
-
-/**
- * Sets the VkImage to use the specified MTLTexture.
- *
- * Any differences in the properties of mtlTexture and this image will modify the
- * properties of this image.
- *
- * If a MTLTexture has already been created for this image, it will be destroyed.
- *
- * Returns VK_SUCCESS.
- *
- * This function is not supported by the Vulkan SDK Loader and Layers framework
- * and is unavailable when using the Vulkan SDK Loader and Layers framework.
- */
-VKAPI_ATTR VkResult VKAPI_CALL vkSetMTLTextureMVK(
-    VkImage                                     image,
-    id<MTLTexture>                              mtlTexture);
-
-/**
- * Returns, in the pMTLTexture pointer, the MTLTexture currently underlaying the VkImage.
- *
- * This function is not supported by the Vulkan SDK Loader and Layers framework
- * and is unavailable when using the Vulkan SDK Loader and Layers framework.
- */
-VKAPI_ATTR void VKAPI_CALL vkGetMTLTextureMVK(
-    VkImage                                     image,
-    id<MTLTexture>*                             pMTLTexture);
-
-/**
-* Returns, in the pMTLBuffer pointer, the MTLBuffer currently underlaying the VkBuffer.
-*
- * This function is not supported by the Vulkan SDK Loader and Layers framework
- * and is unavailable when using the Vulkan SDK Loader and Layers framework.
-*/
-VKAPI_ATTR void VKAPI_CALL vkGetMTLBufferMVK(
-    VkBuffer                                    buffer,
-    id<MTLBuffer>*                              pMTLBuffer);
-
-/**
-* Returns, in the pMTLCommandQueue pointer, the MTLCommandQueue currently underlaying the VkQueue.
-*
- * This function is not supported by the Vulkan SDK Loader and Layers framework
- * and is unavailable when using the Vulkan SDK Loader and Layers framework.
-*/
-VKAPI_ATTR void VKAPI_CALL vkGetMTLCommandQueueMVK(
-    VkQueue                                     queue,
-    id<MTLCommandQueue>*                        pMTLCommandQueue);
-
-#endif // __OBJC__
-
-/**
- * Indicates that a VkImage should use an IOSurface to underlay the Metal texture.
- *
- * If ioSurface is not null, it will be used as the IOSurface, and any differences
- * in the properties of that IOSurface will modify the properties of this image.
- *
- * If ioSurface is null, this image will create and use an IOSurface
- * whose properties are compatible with the properties of this image.
- *
- * If a MTLTexture has already been created for this image, it will be destroyed.
- *
- * IOSurfaces are supported on the following platforms:
- *   -  macOS 10.11 and above
- *   -  iOS 11.0 and above
- *
- * To enable IOSurface support, ensure the Deployment Target build setting
- * (MACOSX_DEPLOYMENT_TARGET or IPHONEOS_DEPLOYMENT_TARGET) is set to at least
- * one of the values above when compiling MoltenVK, and any app that uses MoltenVK.
- *
- * Returns:
- *   - VK_SUCCESS.
- *   - VK_ERROR_FEATURE_NOT_PRESENT if IOSurfaces are not supported on the platform.
- *   - VK_ERROR_INITIALIZATION_FAILED if ioSurface is specified and is not compatible with this VkImage.
- *
- * This function is not supported by the Vulkan SDK Loader and Layers framework
- * and is unavailable when using the Vulkan SDK Loader and Layers framework.
- */
-VKAPI_ATTR VkResult VKAPI_CALL vkUseIOSurfaceMVK(
-    VkImage                                     image,
-    IOSurfaceRef                                ioSurface);
-
-/**
- * Returns, in the pIOSurface pointer, the IOSurface currently underlaying the VkImage,
- * as set by the useIOSurfaceMVK() function, or returns null if the VkImage is not using
- * an IOSurface, or if the platform does not support IOSurfaces.
- *
- * This function is not supported by the Vulkan SDK Loader and Layers framework
- * and is unavailable when using the Vulkan SDK Loader and Layers framework.
- */
-VKAPI_ATTR void VKAPI_CALL vkGetIOSurfaceMVK(
-    VkImage                                     image,
-    IOSurfaceRef*                               pIOSurface);
-
 
 #pragma mark -
 #pragma mark Shaders
 
-/**
- * NOTE: Shader code should be submitted as SPIR-V. Although some simple direct MSL shaders may work,
- * direct loading of MSL source code or compiled MSL code is not officially supported at this time.
- * Future versions of MoltenVK may support direct MSL submission again.
- *
- * Enumerates the magic number values to set in the MVKMSLSPIRVHeader when
- * submitting a SPIR-V stream that contains either Metal Shading Language source
- * code or Metal Shading Language compiled binary code in place of SPIR-V code.
- */
-typedef enum {
-    kMVKMagicNumberSPIRVCode        = 0x07230203,    /**< SPIR-V stream contains standard SPIR-V code. */
-    kMVKMagicNumberMSLSourceCode    = 0x19960412,    /**< SPIR-V stream contains Metal Shading Language source code. */
-    kMVKMagicNumberMSLCompiledCode  = 0x19981215,    /**< SPIR-V stream contains Metal Shading Language compiled binary code. */
-} MVKMSLMagicNumber;
+	/**
+	 * NOTE: Shader code should be submitted as SPIR-V. Although some simple direct MSL shaders may work,
+	 * direct loading of MSL source code or compiled MSL code is not officially supported at this time.
+	 * Future versions of MoltenVK may support direct MSL submission again.
+	 *
+	 * Enumerates the magic number values to set in the MVKMSLSPIRVHeader when
+	 * submitting a SPIR-V stream that contains either Metal Shading Language source
+	 * code or Metal Shading Language compiled binary code in place of SPIR-V code.
+	 */
+	typedef enum {
+		kMVKMagicNumberSPIRVCode        = 0x07230203,    /**< SPIR-V stream contains standard SPIR-V code. */
+		kMVKMagicNumberMSLSourceCode    = 0x19960412,    /**< SPIR-V stream contains Metal Shading Language source code. */
+		kMVKMagicNumberMSLCompiledCode  = 0x19981215,    /**< SPIR-V stream contains Metal Shading Language compiled binary code. */
+	} MVKMSLMagicNumber;
 
-/**
- * NOTE: Shader code should be submitted as SPIR-V. Although some simple direct MSL shaders may work,
- * direct loading of MSL source code or compiled MSL code is not officially supported at this time.
- * Future versions of MoltenVK may support direct MSL submission again.
- *
- * Describes the header at the start of an SPIR-V stream, when it contains either
- * Metal Shading Language source code or Metal Shading Language compiled binary code.
- *
- * To submit MSL source code to the vkCreateShaderModule() function in place of SPIR-V
- * code, prepend a MVKMSLSPIRVHeader containing the kMVKMagicNumberMSLSourceCode magic
- * number to the MSL source code. The MSL source code must be null-terminated.
- *
- * To submit MSL compiled binary code to the vkCreateShaderModule() function in place of
- * SPIR-V code, prepend a MVKMSLSPIRVHeader containing the kMVKMagicNumberMSLCompiledCode
- * magic number to the MSL compiled binary code.
- *
- * In both cases, the pCode element of VkShaderModuleCreateInfo should pointer to the
- * location of the MVKMSLSPIRVHeader, and the MSL code should start at the byte immediately
- * after the MVKMSLSPIRVHeader.
- *
- * The codeSize element of VkShaderModuleCreateInfo should be set to the entire size of
- * the submitted code memory, including the additional sizeof(MVKMSLSPIRVHeader) bytes
- * taken up by the MVKMSLSPIRVHeader, and, in the case of MSL source code, including
- * the null-terminator byte.
- */
-typedef uint32_t MVKMSLSPIRVHeader;
+	/**
+	 * NOTE: Shader code should be submitted as SPIR-V. Although some simple direct MSL shaders may work,
+	 * direct loading of MSL source code or compiled MSL code is not officially supported at this time.
+	 * Future versions of MoltenVK may support direct MSL submission again.
+	 *
+	 * Describes the header at the start of an SPIR-V stream, when it contains either
+	 * Metal Shading Language source code or Metal Shading Language compiled binary code.
+	 *
+	 * To submit MSL source code to the vkCreateShaderModule() function in place of SPIR-V
+	 * code, prepend a MVKMSLSPIRVHeader containing the kMVKMagicNumberMSLSourceCode magic
+	 * number to the MSL source code. The MSL source code must be null-terminated.
+	 *
+	 * To submit MSL compiled binary code to the vkCreateShaderModule() function in place of
+	 * SPIR-V code, prepend a MVKMSLSPIRVHeader containing the kMVKMagicNumberMSLCompiledCode
+	 * magic number to the MSL compiled binary code.
+	 *
+	 * In both cases, the pCode element of VkShaderModuleCreateInfo should pointer to the
+	 * location of the MVKMSLSPIRVHeader, and the MSL code should start at the byte immediately
+	 * after the MVKMSLSPIRVHeader.
+	 *
+	 * The codeSize element of VkShaderModuleCreateInfo should be set to the entire size of
+	 * the submitted code memory, including the additional sizeof(MVKMSLSPIRVHeader) bytes
+	 * taken up by the MVKMSLSPIRVHeader, and, in the case of MSL source code, including
+	 * the null-terminator byte.
+	 */
+	typedef uint32_t MVKMSLSPIRVHeader;
 
 
 #endif // VK_NO_PROTOTYPES
-
 
 #ifdef __cplusplus
 }

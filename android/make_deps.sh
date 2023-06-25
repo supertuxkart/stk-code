@@ -337,28 +337,26 @@ build_deps()
 
         cd "$DIRNAME/deps-$ARCH_OPTION/astc-encoder"
         sed -i '/-Werror/d' Source/cmake_core.cmake
-        sed -i 's|${ASTC_TARGET}-static|astcenc|g' Source/cmake_core.cmake
+        sed -i 's|${ASTCENC_TARGET}-static|astcenc|g' Source/cmake_core.cmake
         if [ "$ARCH_OPTION" = "armeabi-v7a" ]; then
             cmake . -DCMAKE_TOOLCHAIN_FILE=../../../cmake/Toolchain-android.cmake \
                     -DHOST=$HOST -DARCH=$ARCH -DSTK_ARM_NEON=ON                   \
                     -DCMAKE_C_FLAGS="-fpic -O3 -g -mfpu=neon"                     \
                     -DCMAKE_CXX_FLAGS="-fpic -O3 -g -mfpu=neon"                   \
-                    -DNO_INVARIANCE=ON -DCLI=OFF
+                    -DASTCENC_INVARIANCE=OFF -DASTCENC_CLI=OFF
         elif [ "$ARCH_OPTION" = "arm64-v8a" ]; then
             cmake . -DCMAKE_TOOLCHAIN_FILE=../../../cmake/Toolchain-android.cmake \
                     -DHOST=$HOST -DARCH=$ARCH -DCMAKE_C_FLAGS="-fpic -O3 -g"      \
                     -DCMAKE_CXX_FLAGS="-fpic -O3 -g"                              \
-                    -DISA_NEON=ON -DNO_INVARIANCE=ON -DCLI=OFF
-        elif [ "$ARCH_OPTION" = "x86" ]; then
-            cmake . -DCMAKE_TOOLCHAIN_FILE=../../../cmake/Toolchain-android.cmake \
-                    -DHOST=$HOST -DARCH=$ARCH -DCMAKE_C_FLAGS="-fpic -O3 -g"      \
-                    -DCMAKE_CXX_FLAGS="-fpic -O3 -g"                              \
-                    -DISA_SSE2=ON -DNO_INVARIANCE=ON -DCLI=OFF
+                    -DASTCENC_ISA_NEON=ON -DASTCENC_INVARIANCE=OFF -DASTCENC_CLI=OFF
         else
+            if [ "$ARCH_OPTION" = "x86" ]; then
+                sed -i 's/_mm_popcnt_u64/__builtin_popcountll/g' Source/astcenc_vecmathlib_sse_4.h
+            fi
             cmake . -DCMAKE_TOOLCHAIN_FILE=../../../cmake/Toolchain-android.cmake \
                     -DHOST=$HOST -DARCH=$ARCH -DCMAKE_C_FLAGS="-fpic -O3 -g"      \
                     -DCMAKE_CXX_FLAGS="-fpic -O3 -g"                              \
-                    -DISA_SSE41=ON -DNO_INVARIANCE=ON -DCLI=OFF
+                    -DASTCENC_ISA_SSE41=ON -DASTCENC_INVARIANCE=OFF -DASTCENC_CLI=OFF
         fi
         make -j $(($(nproc) + 1))
         check_error

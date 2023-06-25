@@ -10,7 +10,10 @@
 
 #ifdef DLOPEN_MOLTENVK
 #define VK_NO_PROTOTYPES 1
-#include <vk_mvk_moltenvk.h>
+// We copy mvk_config.h and mvk_private_api.h with #include <vulkan/vulkan.h>
+// removed
+#include <mvk_config.h>
+#include <mvk_private_api.h>
 extern PFN_vkGetMoltenVKConfigurationMVK vkGetMoltenVKConfigurationMVK;
 extern PFN_vkSetMoltenVKConfigurationMVK vkSetMoltenVKConfigurationMVK;
 extern PFN_vkGetPhysicalDeviceMetalFeaturesMVK vkGetPhysicalDeviceMetalFeaturesMVK;
@@ -20,7 +23,8 @@ extern PFN_vkGetPhysicalDeviceMetalFeaturesMVK vkGetPhysicalDeviceMetalFeaturesM
 #include <vulkan/vulkan.h>
 
 #if defined(__APPLE__)
-#include <MoltenVK/vk_mvk_moltenvk.h>
+#include <MoltenVK/mvk_config.h>
+#include <MoltenVK/mvk_private_api.h>
 #endif
 
 #endif

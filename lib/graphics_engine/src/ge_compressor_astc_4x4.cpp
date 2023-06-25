@@ -33,9 +33,11 @@ void GECompressorASTC4x4::init()
         return;
 
     // Check for neon existence because libastcenc doesn't do that
-    // x86 will exit in astcenc_context_alloc if sse2 / sse4.1 is not supported
 #if defined(__arm__) || defined(__aarch64__) || defined(_M_ARM) || defined (_M_ARM64)
     if (SDL_HasNEON() == SDL_FALSE)
+        return;
+#else
+    if (SDL_HasSSE41() == SDL_FALSE)
         return;
 #endif
 
