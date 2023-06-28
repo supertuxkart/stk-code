@@ -411,6 +411,12 @@ void DriveGraph::setDefaultStartPositions(AlignedArray<btTransform>
     int current_node = getNode(getStartNode())->getPredecessor(0);
 
     float distance_from_start = 0.75f+forwards_distance;
+    float multiplier = 1.0f;
+    if (sidewards_distance < 0)
+    {
+        sidewards_distance = -sidewards_distance;
+        multiplier = -1.0f;
+    }
 
     // Maximum distance to left (or right) of centre line
     const float max_x_dist    = 0.5f*(karts_per_row-0.5f)*sidewards_distance;
@@ -444,7 +450,7 @@ void DriveGraph::setDefaultStartPositions(AlignedArray<btTransform>
 
             Vec3 start = dn->getUpperCenter()
                        + center_line     * distance_from_start
-                       + horizontal_line * x_pos;
+                       + horizontal_line * x_pos * multiplier;
             // Add a certain epsilon to the height in case that the
             // drivelines are beneath the track.
             (*start_transforms)[i].setOrigin(start+Vec3(0,upwards_distance,0));
