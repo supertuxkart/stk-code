@@ -2451,7 +2451,7 @@ msgstr "Colore del kart"
 
 #. I18N: ./data/tips.xml
 msgid "The UI skin can be changed in the UI options."
-msgstr "Il tema dell'interfaccia può essere cambiata nelle opzioni IU."
+msgstr "Il tema dell'interfaccia può essere cambiato nelle opzioni IU."
 
 #. I18N: ./data/tips.xml
 msgid "You can see other karts' powerups by enabling it in the UI options."
