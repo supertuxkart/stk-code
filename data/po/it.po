@@ -50,7 +50,7 @@ msgstr "Errore nell'estrazione"
 
 #. I18N: In Android UI, po_extract_error_msg
 msgid "Check remaining device space or reinstall SuperTuxKart."
-msgstr "Controlla lo spazio rimanente oppure reinstalla SuperTuxKart"
+msgstr "Controlla lo spazio rimanente oppure reinstalla SuperTuxKart."
 
 #. I18N: In Android UI, po_quit
 #. I18N: ./data/gui/screens/main_menu.stkgui
@@ -132,7 +132,7 @@ msgstr "Amante delle banane"
 
 #. I18N: ./data/achievements.xml
 msgid "Collect at least 5 bananas in one race."
-msgstr "Raccogli almeno 5 banane in una gara"
+msgstr "Raccogli almeno 5 banane in una gara."
 
 #. I18N: ./data/achievements.xml
 msgid "It's secret"
@@ -140,7 +140,7 @@ msgstr "È un segreto"
 
 #. I18N: ./data/achievements.xml
 msgid "Really ... a secret."
-msgstr "Davvero... un segreto"
+msgstr "Davvero... un segreto."
 
 #. I18N: ./data/achievements.xml
 msgid "Mosquito Hunter"
@@ -150,7 +150,7 @@ msgstr "Cacciatore di zanzare"
 msgid ""
 "Take your opponents for mosquitos! With the swatter, squash them at least 5 "
 "times in a race."
-msgstr "I tuoi avversari sono zanzare! Schiaccia almeno 5 avversari in una gara con l'acchiappamosche. "
+msgstr "I tuoi avversari sono zanzare! Schiaccia almeno 5 avversari in una gara con l'acchiappamosche."
 
 #. I18N: ./data/achievements.xml
 msgid "Beyond Luck"
@@ -670,7 +670,7 @@ msgstr "Esci dal server"
 #. I18N: Show in network ingame dialog to allow user to go back to lobby to
 #. end spectating (for example)
 msgid "Back to lobby"
-msgstr "Torna alla sala d'attesa."
+msgstr "Torna alla sala d'attesa"
 
 #. I18N: ./data/gui/dialogs/online/network_ingame_dialog.stkgui
 #. I18N: Race paused button
