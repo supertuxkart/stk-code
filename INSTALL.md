@@ -81,7 +81,7 @@ Compilation instruction is explained there. If you don't need this feature, pass
 
 ### Shaderc for Vulkan support
 
-You need to compile [Shaderc](https://github.com/google/shaderc) for vulkan support in SuperTuxKart if you are not building for Windows or macOS, If you don't need this feature, pass `-DNO_SHADERC=on` to cmake.
+You need to compile [Shaderc](https://github.com/google/shaderc) for vulkan support in SuperTuxKart if you are not building for Windows or macOS. If you don't need this feature, pass `-DNO_SHADERC=on` to cmake.
 
 ### Compiling
 
