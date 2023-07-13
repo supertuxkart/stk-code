@@ -176,6 +176,8 @@ namespace GUIEngine
 
         short m_skin_r, m_skin_g, m_skin_b;
 
+        SkinWidgetContainer *m_next;
+
         SkinWidgetContainer()
         {
             m_skin_dest_areas_inited = false;
@@ -187,7 +189,16 @@ namespace GUIEngine
             m_skin_r = -1;
             m_skin_g = -1;
             m_skin_b = -1;
+            m_next = nullptr;
         }   // SkinWidgetContainer
+
+        ~SkinWidgetContainer()
+        {
+            if (m_next != nullptr)
+            {
+                delete m_next;
+            }
+        }
     };   // class SkinWidgetContainer
 
     // ========================================================================

@@ -1119,7 +1119,7 @@ void Skin::drawProgressBarInScreen(SkinWidgetContainer* swc,
     core::recti rect2 = rect;
     rect2.LowerRightCorner.X -= (rect.getWidth())
                               - int(progress * rect.getWidth());
-    drawBoxFromStretchableTexture(swc, rect2,
+    drawBoxFromStretchableTexture(swc->m_next, rect2,
         SkinConfig::m_render_params["progress::fill"], deactivated);
 }   // drawProgress
 
@@ -1180,10 +1180,10 @@ void Skin::drawRatingBar(Widget *w, const core::recti &rect,
                                       texture_w * (step + 1), texture_h);
 
         draw2DImage(texture,
-                                            star_rect, source_area,
-                                            0 /* no clipping */,
-                                           (w->m_deactivated || ID_DEBUG) ? colors : 0,
-                                            true /* alpha */);
+                    star_rect, source_area,
+                    0 /* no clipping */,
+                    (w->m_deactivated || ID_DEBUG) ? colors : 0,
+                    true /* alpha */);
     }
 #endif
 }   // drawRatingBar
