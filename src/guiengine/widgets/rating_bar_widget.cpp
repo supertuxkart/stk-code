@@ -34,6 +34,7 @@ using namespace irr;
 // -----------------------------------------------------------------------------
 RatingBarWidget::RatingBarWidget() : Widget(WTYPE_RATINGBAR)
 {
+    //m_event_handler = this;
     m_allow_voting = false;
     m_rating = 0.0f;
     m_hover_rating = 0.0f;
@@ -48,7 +49,7 @@ RatingBarWidget::RatingBarWidget() : Widget(WTYPE_RATINGBAR)
 void RatingBarWidget::add()
 {
     const irr::core::recti widget_size = rect<s32>(m_x, m_y, m_x + m_w, m_y + m_h);
-    m_element = GUIEngine::getGUIEnv()->addButton(widget_size, m_parent, getNewNoFocusID(), NULL, L"");
+    m_element = GUIEngine::getGUIEnv()->addButton(widget_size, m_parent, getNewID(), NULL, L"");
     m_id = m_element->getID();
     m_element->setTabStop(false);
     m_element->setTabGroup(false);
@@ -88,7 +89,7 @@ void RatingBarWidget::setStepValues(float float_rating)
 
 void RatingBarWidget::setRating(float rating)
 {
-    m_rating = rating;
+    m_hover_rating = m_rating = rating;
     setStepValues(m_rating);
 }
 
@@ -104,21 +105,44 @@ void RatingBarWidget::setStepValuesByMouse(const core::position2di & mouse_posit
             m_hover_rating = roundf(exact_hover * (m_steps-1)) / (m_steps-1);
             setStepValues(m_hover_rating);
         }
-        else if(m_hovering)
-        {
-            setStepValues(m_rating);
-            m_hovering = false;
-        }
     }
 }
 
-EventPropagation RatingBarWidget::onClick()
+// -----------------------------------------------------------------------------
+
+EventPropagation RatingBarWidget::leftPressed(const int playerID)
 {
-    if(m_allow_voting)
-        m_rating = m_hover_rating;
-        
-    return EVENT_LET;
+    if(m_allow_voting && m_hover_rating > 0.0f)
+    {
+        m_hover_rating -= 1.0f / (m_steps - 1);
+        setStepValues(m_hover_rating);
+    }
+    return EVENT_BLOCK;
 }
 
+EventPropagation RatingBarWidget::rightPressed(const int playerID)
+{
+    if(m_allow_voting && m_hover_rating < m_stars)
+    {
+        m_hover_rating += 1.0f / (m_steps - 1);
+        setStepValues(m_hover_rating);
+    }
+    return EVENT_BLOCK;
+}
 
-
+bool RatingBarWidget::updateRating()
+{
+    if(m_allow_voting)
+    {
+        if (m_hover_rating <= 0.0f || m_hover_rating > m_stars)
+        {
+            return false;
+        }
+        else
+        {
+            m_rating = m_hover_rating;
+            return true;
+        }
+    }
+    return false;
+}

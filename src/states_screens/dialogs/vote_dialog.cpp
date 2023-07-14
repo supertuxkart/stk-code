@@ -135,7 +135,10 @@ GUIEngine::EventPropagation VoteDialog::processEvent(const std::string& event)
 
     if (event == m_rating_widget->m_properties[PROP_ID])
     {
-        sendVote();
+        if (m_rating_widget->updateRating())
+        {
+            sendVote();
+        }
         return GUIEngine::EVENT_BLOCK;
     }
 
@@ -227,6 +230,7 @@ void VoteDialog::onUpdate(float dt)
                 m_info_widget->setText(_("Vote successful! You can now close "
                                          "the window."),                false);
                 m_cancel_widget->setActive(true);
+                m_cancel_widget->setFocusForPlayer(PLAYER_ID_GAME_MASTER);
             }   // isSuccess
             else
             {
