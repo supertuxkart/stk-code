@@ -840,7 +840,7 @@ bool CIrrDeviceSDL::run()
 			irrevent.MouseInput.X = MouseX;
 			irrevent.MouseInput.Y = MouseY;
 			irrevent.MouseInput.ButtonStates = MouseButtonStates;
-			irrevent.MouseInput.Wheel = SDL_event.wheel.y > 0 ? 1.0f : -1.0f;
+			irrevent.MouseInput.Wheel =  core::clamp<irr::f32>(SDL_event.wheel.y, -1, 1);
 			postEventFromUser(irrevent);
 			break;
 

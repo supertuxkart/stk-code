@@ -363,7 +363,8 @@ bool CGUISTKListBox::OnEvent(const SEvent& event)
                 switch(event.MouseInput.Event)
                 {
                 case EMIE_MOUSE_WHEEL:
-                    ScrollBar->setPos(ScrollBar->getPos() + (event.MouseInput.Wheel < 0 ? -1 : 1)*-ItemHeight/2);
+                    ScrollBar->setPos(ScrollBar->getPos()
+                         + irr::core::clamp<irr::f32>(event.MouseInput.Wheel, -1, 1) * -ItemHeight / 2);
                     return true;
 
                 case EMIE_LMOUSE_PRESSED_DOWN:
