@@ -2142,15 +2142,7 @@ void RaceResultGUI::unload()
                                        y + GUIEngine::getSmallFontHeight()), text_color, false, false, nullptr, true);
             }
 
-            position_passed = (kart->getPosition() <= c_data->getMaxPosition(RaceManager::DIFFICULTY_BEST) && lose_all == false)
-                                || c_data->getMaxPosition(RaceManager::DIFFICULTY_BEST) == -1;
-            time_passed = (kart->getFinishTime() <= c_data->getTimeRequirement(RaceManager::DIFFICULTY_BEST) && lose_all == false)
-                                || c_data->getTimeRequirement(RaceManager::DIFFICULTY_BEST) <= 0.0f;
-            energy_passed = (kart->getEnergy() >= c_data->getEnergy(RaceManager::DIFFICULTY_BEST) && lose_all == false)
-                                || c_data->getEnergy(RaceManager::DIFFICULTY_BEST) <= 0;
-            bool best_while_slower = position_passed && time_passed && energy_passed && RaceManager::get()->getDifficulty() != RaceManager::DIFFICULTY_BEST;
-
-            if(best_while_slower)
+            if (c_data->isChallengeFulfilled(true) && RaceManager::get()->getDifficulty() != RaceManager::DIFFICULTY_BEST)
             {
                 text_string = _("Reached Requirements of SuperTux");
                 text_color = special_color;
