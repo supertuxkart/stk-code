@@ -1157,6 +1157,38 @@ void Skin::drawRatingBar(Widget *w, const core::recti &rect,
 
     core::recti stars_rect(x_from, y_from, x_from + (star_number * star_w), y_from + star_h);
 
+    if (focused)
+    {
+        static float glow_effect = 0;
+
+        const float dt = GUIEngine::getLatestDt();
+        glow_effect += dt*3;
+        if (glow_effect > 6.2832f /* 2*PI */) glow_effect -= 6.2832f;
+        float grow = 10*sinf(glow_effect);
+
+        const int glow_center_x = stars_rect.UpperLeftCorner.X + stars_rect.getWidth() / 2;
+        const int glow_center_y = stars_rect.LowerRightCorner.Y + stars_rect.getHeight() / 2;
+
+        ITexture* tex_ficonhighlight =
+            SkinConfig::m_render_params["focusHalo::neutral"].getImage();
+        const int texture_w = tex_ficonhighlight->getSize().Width;
+        const int texture_h = tex_ficonhighlight->getSize().Height;
+
+        core::recti source_area = core::recti(0, 0, texture_w, texture_h);
+
+        float scale = (float)irr_driver->getActualScreenSize().Height / 1080.0f;
+        int size = (int)((90.0f + grow) * scale);
+        const core::recti rect2(glow_center_x - size,
+                                glow_center_y - size / 2,
+                                glow_center_x + size,
+                                glow_center_y + size / 2);
+
+        draw2DImage(tex_ficonhighlight, rect2,
+                    source_area,
+                    0 /* no clipping */, 0,
+                    true /* alpha */);
+    }
+
     if(!w->m_deactivated)
         ratingBar->setStepValuesByMouse(irr_driver->getDevice()->getCursorControl()->getPosition(), stars_rect);
 

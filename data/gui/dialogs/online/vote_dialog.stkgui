@@ -12,7 +12,7 @@
 
         <ratingbar id="rating" align="center" height="1f" width="3f"/>
 
-        <spacer height="4%" width="50"/>
+        <spacer height="8%" width="50"/>
 
         <buttonbar id="options" width="25%" height="20%" align="center">
             <icon-button id="cancel" width="64" height="64" icon="gui/icons/green_check.png"
