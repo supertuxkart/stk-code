@@ -31,6 +31,7 @@
 #include "graphics/material.hpp"
 #include "graphics/material_manager.hpp"
 #include "graphics/mesh_tools.hpp"
+#include "graphics/moving_texture.hpp"
 #include "graphics/sp/sp_mesh.hpp"
 #include "graphics/sp/sp_mesh_buffer.hpp"
 #include "graphics/sp/sp_mesh_node.hpp"
@@ -62,17 +63,32 @@ SpeedWeightedObject::Properties::Properties()
 {
     m_strength_factor = -1.0f;
     m_speed_factor    = 0.0f;
-    m_texture_speed.X = 0.0f;
-    m_texture_speed.Y = 0.0f;
+    m_moving_texture  = NULL;
 }   // SpeedWeightedObject::Properties::Properties
+
+// ----------------------------------------------------------------------------
+SpeedWeightedObject::Properties::~Properties()
+{
+    delete m_moving_texture;
+}   // SpeedWeightedObject::Properties::~Properties
+
+// ----------------------------------------------------------------------------
+SpeedWeightedObject::Properties& SpeedWeightedObject::Properties::
+           operator=(const SpeedWeightedObject::Properties& other)
+{
+    m_strength_factor = other.m_strength_factor;
+    m_speed_factor = other.m_speed_factor;
+    m_moving_texture = NULL;
+    if (other.m_moving_texture)
+        m_moving_texture = new MovingTexture(*other.m_moving_texture);
+    return *this;
+}   // SpeedWeightedObject::Properties::Properties& operator=
 
 // ----------------------------------------------------------------------------
 void SpeedWeightedObject::Properties::loadFromXMLNode(const XMLNode* xml_node)
 {
     xml_node->get("strength-factor", &m_strength_factor);
     xml_node->get("speed-factor",    &m_speed_factor);
-    xml_node->get("texture-speed-x", &m_texture_speed.X);
-    xml_node->get("texture-speed-y", &m_texture_speed.Y);
 }   // SpeedWeightedObject::Properties::loadFromXMLNode
 
 // ============================================================================
@@ -658,8 +674,7 @@ bool KartModel::loadModels(const KartProperties &kart_properties)
                     (obj.m_model->getMeshBuffer(j));
                 // Pre-upload gl meshes and textures for kart screen
                 mb->uploadGLMesh();
-                if (obj.m_properties.m_texture_speed !=
-                    core::vector2df(0.0f, 0.0f))
+                if (obj.m_properties.m_moving_texture)
                 {
                     for (unsigned k = 0; k < mb->getAllSTKMaterials().size();
                         k++)
@@ -810,8 +825,21 @@ void KartModel::loadSpeedWeightedInfo(const XMLNode* speed_weighted_node)
     if (!obj.m_name.empty())
     {
         m_speed_weighted_objects.push_back(obj);
+        float dx = 0.0f;
+        float dy = 0.0f;
+        float dt = 0.0f;
+        bool step = false;
+        speed_weighted_node->get("texture-speed-x", &dx);
+        speed_weighted_node->get("texture-speed-y", &dy);
+        speed_weighted_node->get("texture-speed-dt", &dt);
+        speed_weighted_node->get("animated-by-step", &step);
+        if (dx != 0.0f || dy != 0.0f)
+        {
+            m_speed_weighted_objects.back().m_properties.m_moving_texture =
+                new MovingTexture(dx, dy, dt, step);
+        }
     }
-}
+}   // loadSpeedWeightedInfo
 
 // ----------------------------------------------------------------------------
 /** Loads a single wheel node. Currently this is the name of the wheel model
@@ -1171,24 +1199,17 @@ void KartModel::update(float dt, float distance, float steer, float speed,
                 obj.m_node->setAnimationSpeed(anim_speed);
             }
 
-            // Texture animation
-            core::vector2df tex_speed;
-            tex_speed.X = obj.m_properties.m_texture_speed.X;
-            tex_speed.Y = obj.m_properties.m_texture_speed.Y;
-            if (tex_speed != core::vector2df(0.0f, 0.0f))
+            if (obj.m_properties.m_moving_texture)
             {
-                obj.m_texture_cur_offset += speed * tex_speed * dt;
-                if (obj.m_texture_cur_offset.X > 1.0f) obj.m_texture_cur_offset.X = fmod(obj.m_texture_cur_offset.X, 1.0f);
-                if (obj.m_texture_cur_offset.Y > 1.0f) obj.m_texture_cur_offset.Y = fmod(obj.m_texture_cur_offset.Y, 1.0f);
-
+                obj.m_properties.m_moving_texture->update(speed * dt);
                 SP::SPMeshNode* spmn = dynamic_cast<SP::SPMeshNode*>(obj.m_node);
                 if (spmn)
                 {
                     for (unsigned i = 0; i < spmn->getSPM()->getMeshBufferCount(); i++)
                     {
                         auto& ret = spmn->getTextureMatrix(i);
-                        ret[0] = obj.m_texture_cur_offset.X;
-                        ret[1] = obj.m_texture_cur_offset.Y;
+                        ret[0] = obj.m_properties.m_moving_texture->getCurrentX();
+                        ret[1] = obj.m_properties.m_moving_texture->getCurrentY();
                     }
                 }
                 else
@@ -1205,11 +1226,13 @@ void KartModel::update(float dt, float distance, float steer, float speed,
                             if (!t) continue;
                             core::matrix4 *m =
                                 &irrMaterial.getTextureMatrix(j);
-                            m->setTextureTranslate(obj.m_texture_cur_offset.X,
-                                obj.m_texture_cur_offset.Y);
+                            m->setTextureTranslate(
+                                obj.m_properties.m_moving_texture->getCurrentX(),
+                                obj.m_properties.m_moving_texture->getCurrentY());
                         }   // for j<MATERIAL_MAX_TEXTURES
                     }   // for i<getMaterialCount
                 }
+
             }
         }
     }

@@ -30,7 +30,7 @@ class XMLNode;
   * \brief Handles animated textures (textures that move)
   * \ingroup graphics
   */
-class MovingTexture : public NoCopy
+class MovingTexture
 {
 private:
     /** Translation increment per second. */
@@ -52,7 +52,8 @@ private:
 public:
                  MovingTexture(core::matrix4 *matrix, const XMLNode &node);
                  MovingTexture(core::matrix4 *matrix, float dx, float dy);
-                 MovingTexture(float dx, float dy);
+                 MovingTexture(float dx, float dy, float dt = 0.0f,
+                               bool animated_by_step = false);
     virtual     ~MovingTexture();
 
     /** Sets the speed of the animation. */
@@ -62,6 +63,8 @@ public:
     void setSPTM(float* sp_tm) { m_sp_tm = sp_tm; }
     virtual void update  (float dt);
     virtual void reset   ();
+    float        getCurrentX() const { return m_x; }
+    float        getCurrentY() const { return m_y; }
 }
 ;   // MovingTexture
 
