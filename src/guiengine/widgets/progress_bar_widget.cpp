@@ -33,8 +33,8 @@ using namespace irr;
 ProgressBarWidget::ProgressBarWidget(bool show_label) : Widget(WTYPE_PROGRESS)
 {
     // A progress bar consists of two parts, so need two containers
-    m_next = new SkinWidgetContainer; 
-    
+    m_next = new SkinWidgetContainer;
+
     m_value = 0;
     m_target_value = 0;
     m_previous_value = 0;
