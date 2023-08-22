@@ -1594,7 +1594,15 @@ void ServerLobby::asynchronousUpdate()
         m_winner_peer_id = std::numeric_limits<uint32_t>::max();
         bool go_on_race = false;
         if (ServerConfig::m_track_voting)
-            go_on_race = handleAllVotes(&winner_vote, &m_winner_peer_id);
+        {
+            if (player_in_game == 1 && !m_peers_votes.empty())
+            {
+                winner_vote =  m_peers_votes.begin()->second;
+                go_on_race = true;  // Race starts immediately
+            }
+            else
+                go_on_race = handleAllVotes(&winner_vote, &m_winner_peer_id);
+        }
         else if (m_game_setup->isGrandPrixStarted() || isVotingOver())
         {
             winner_vote = *m_default_vote;
