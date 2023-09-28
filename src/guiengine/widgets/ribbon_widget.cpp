@@ -380,6 +380,10 @@ void RibbonWidget::resize()
                     // hyphen, make the font smaller
                     m_labels[i].setOverrideFont(GUIEngine::getSmallFont());
                 }
+                else
+                {
+                    m_labels[i].setOverrideFont(NULL);
+                }
 
                 m_button_background[i].setRelativePosition(tab_rect_abs);
             }
@@ -459,6 +463,10 @@ void RibbonWidget::resize()
                     // if message is too long and contains no space and no soft
                     // hyphen, or too tall, make the font smaller
                     m_labels[i].setOverrideFont(GUIEngine::getSmallFont());
+                }
+                else
+                {
+                    m_labels[i].setOverrideFont(NULL);
                 }
             }
             else
