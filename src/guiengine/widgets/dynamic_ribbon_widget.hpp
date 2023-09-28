@@ -312,6 +312,8 @@ namespace GUIEngine
 
         virtual void setText(const irr::core::stringw& text);
 
+        virtual void resize();
+
         virtual void update(float delta);
 
         /** Set approximately how many items are expected to be in this ribbon; will help the layout

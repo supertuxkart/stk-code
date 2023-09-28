@@ -87,8 +87,8 @@ namespace GUIEngine
         /** Add the widgets to the current screen */
         virtual void add();
 
-        /** Move the widget and its children */
-        virtual void move(const int x, const int y, const int w, const int h);
+        /** Resize the widget */
+        virtual void resize();
 
         // -------------------------------------------------------------------------
         /** Updates the animation (moving/shrinking/etc.) */

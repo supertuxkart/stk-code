@@ -36,6 +36,8 @@
 
 #include <iostream>
 
+#include <IrrlichtDevice.h>
+
 using namespace Online;
 // ----------------------------------------------------------------------------
 
@@ -63,6 +65,8 @@ AddonsScreen::AddonsScreen() : Screen("addons_screen.stkgui")
     m_date_filters.push_back(filter_9m);
     m_date_filters.push_back(filter_1y);
     m_date_filters.push_back(filter_2y);
+
+    m_resizable = true;
 }   // AddonsScreen
 
 // ----------------------------------------------------------------------------
@@ -141,6 +145,7 @@ void AddonsScreen::beforeAddingWidget()
 
 void AddonsScreen::init()
 {
+    GUIEngine::getDevice()->setResizable(true);
     Screen::init();
 
     m_sort_desc = false;

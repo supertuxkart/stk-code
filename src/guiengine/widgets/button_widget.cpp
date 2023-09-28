@@ -34,9 +34,10 @@ ButtonWidget::ButtonWidget() : Widget(WTYPE_BUTTON)
 
 void ButtonWidget::add()
 {
-    rect<s32> widget_size = rect<s32>(m_x, m_y, m_x + m_w, m_y + m_h);
+    // Meaningless size. Will be resized later.
+    rect<s32> init_rect = rect<s32>(0, 0, 1, 1); 
     const stringw&  message = getText();
-    m_element = GUIEngine::getGUIEnv()->addButton(widget_size, m_parent,
+    m_element = GUIEngine::getGUIEnv()->addButton(init_rect, m_parent,
                                                   (m_reserved_id == -1 ? getNewID() : m_reserved_id),
                                                   message.c_str(), L"");
 
@@ -45,6 +46,8 @@ void ButtonWidget::add()
     m_element->setTabGroup(false);
     if (!m_is_visible)
         m_element->setVisible(false);
+    
+    resize();
 }
 
 // -----------------------------------------------------------------------------

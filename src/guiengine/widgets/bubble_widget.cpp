@@ -43,13 +43,13 @@ BubbleWidget::BubbleWidget() : Widget(WTYPE_BUBBLE)
 
 void BubbleWidget::add()
 {
-    m_shrinked_size = rect<s32>(m_x, m_y, m_x + m_w - BUBBLE_MARGIN_ON_RIGHT, m_y + m_h);
+    // Meaningless size. Will be resized later.
+    rect<s32> init_rect = rect<s32>(0, 0, 1, 1); 
+
     stringw message = getText();
 
-    m_shrinked_size.LowerRightCorner.Y -= BOTTOM_MARGIN;
-
     IGUIStaticText* irrwidget;
-    irrwidget = GUIEngine::getGUIEnv()->addStaticText(message.c_str(), m_shrinked_size,
+    irrwidget = GUIEngine::getGUIEnv()->addStaticText(message.c_str(), init_rect,
                                                       false, true /* word wrap */, m_parent,
                                                       (m_focusable ? getNewID() : getNewNoFocusID()));
     irrwidget->setTextRestrainedInside(false);
@@ -72,6 +72,8 @@ void BubbleWidget::add()
     m_element->setTabStop(true);
 
     m_element->setNotClipped(true);
+
+    resize();
 }
 
 void BubbleWidget::replaceText()
@@ -112,6 +114,15 @@ void BubbleWidget::replaceText()
     }
     m_shrinked_text = message;
     irrwidget->setTextAlignment( align, valign );
+}
+
+void BubbleWidget::resize()
+{
+    m_shrinked_size = rect<s32>(m_x, m_y, m_x + m_w - BUBBLE_MARGIN_ON_RIGHT, m_y + m_h - BOTTOM_MARGIN);
+
+    m_element->setRelativePosition(m_shrinked_size);
+
+    replaceText();
 }
 
 void BubbleWidget::setText(const irr::core::stringw &s)

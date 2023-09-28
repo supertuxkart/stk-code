@@ -161,6 +161,10 @@ namespace GUIEngine
         // --------------------------------------------------------------------
         /** \brief override from base class */
         virtual void unfocused(const int playerID, Widget* new_focus) OVERRIDE;
+
+        // --------------------------------------------------------------------
+        /** \brief override from base class */
+        virtual void resize() OVERRIDE;
         // --------------------------------------------------------------------
         /** Returns the texture of this button. */
         const video::ITexture* getTexture();

@@ -338,13 +338,5 @@ void AbstractStateManager::onResize()
         !m_menu_stack.back().second->isResizable())
         return;
 
-    std::vector<std::function<Screen*()> > screen_function;
-    for (auto& p : m_menu_stack)
-        screen_function.push_back(p.second->getNewScreenPointer());
-    clearScreenCache();
-    std::vector<Screen*> new_screen;
-    for (auto& screen : screen_function)
-        new_screen.push_back(screen());
-    new_screen.push_back(NULL);
-    resetAndSetStack(new_screen.data());
+    m_menu_stack.back().second->resize();
 }   // onResize

@@ -247,6 +247,7 @@ KartSelectionScreen::KartSelectionScreen(const char* filename) : Screen(filename
     m_multiplayer_message  = NULL;
     m_from_overworld       = false;
     m_go_to_overworld_next = false;
+    m_resizable            = true;
 }   // KartSelectionScreen
 
 // ============================================================================
@@ -345,6 +346,7 @@ void KartSelectionScreen::beforeAddingWidget()
 
 void KartSelectionScreen::init()
 {
+    GUIEngine::getDevice()->setResizable(true);
 #ifndef SERVER_ONLY
     GE::getGEConfig()->m_enable_draw_call_cache = true;
 #endif

@@ -231,6 +231,16 @@ void Screen::manualRemoveWidget(Widget* w)
 
 // -----------------------------------------------------------------------------
 
+void Screen::resize()
+{
+    m_width = irr_driver->getActualScreenSize().Width;
+    m_height = irr_driver->getActualScreenSize().Height;
+
+    calculateLayout();
+    
+    resizeWidgetsRecursively(m_widgets);
+}
+
 #if 0
 #pragma mark -
 #pragma mark Getters

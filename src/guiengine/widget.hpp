@@ -405,7 +405,12 @@ namespace GUIEngine
         virtual EventPropagation onActivationInput(const int playerID) { return EVENT_LET; }
 
         /**
-         * Call to resize/move the widget. Not all widgets can resize gracefully.
+         * Call to resize the widget when its coordinations are updated.
+         */
+        virtual void resize();
+
+        /**
+         * Move the widget to the given position.
          */
         virtual void move(const int x, const int y, const int w, const int h);
 

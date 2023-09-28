@@ -410,6 +410,14 @@ StateManager::ActivePlayer* PlayerKartWidget::getAssociatedPlayer()
 }   // getAssociatedPlayer
 
 // ------------------------------------------------------------------------
+void PlayerKartWidget::resize()
+{
+    setSize(m_x, m_y, m_w, m_h);
+}
+
+// ------------------------------------------------------------------------
+/** Resize the widget*/
+// ------------------------------------------------------------------------
 /** Starts a 'move/resize' animation, by simply passing destination coords.
  *  The animation will then occur on each call to 'onUpdate'. */
 void PlayerKartWidget::move(const int x, const int y, const int w, const int h)

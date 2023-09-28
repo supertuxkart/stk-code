@@ -116,6 +116,9 @@ void DynamicRibbonWidget::add()
             m_properties[PROP_LABELS_LOCATION] == "each" ||
             m_properties[PROP_LABELS_LOCATION] == "none" ||
             m_properties[PROP_LABELS_LOCATION] == "");
+    
+    // Meaningless size. Will be resized later.
+    rect<s32> max_rect = rect<s32>(m_x, m_y, m_x+m_w, m_y+m_h); 
 
     if (m_has_label)
     {
@@ -1059,6 +1062,13 @@ void DynamicRibbonWidget::updateItemDisplay()
             }
         } // next column
     } // next row
+}
+
+// -----------------------------------------------------------------------------
+
+void DynamicRibbonWidget::resize()
+{
+    
 }
 
 // -----------------------------------------------------------------------------

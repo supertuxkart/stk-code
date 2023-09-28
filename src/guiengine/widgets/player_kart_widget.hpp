@@ -119,6 +119,11 @@ namespace GUIEngine
         StateManager::ActivePlayer* getAssociatedPlayer();
 
         // ------------------------------------------------------------------------
+        // ------------------------------------------------------------------------
+        /** Resize the widget */
+        void resize();
+
+        // ------------------------------------------------------------------------
         /** Starts a 'move/resize' animation, by simply passing destination coords.
          *  The animation will then occur on each call to 'onUpdate'. */
         void move(const int x, const int y, const int w, const int h);

@@ -64,6 +64,8 @@ namespace GUIEngine
         virtual void add();
         
         virtual EventPropagation focused(const int playerID);
+
+        virtual void resize();
         
         void updateSize();
 

@@ -36,17 +36,20 @@ CheckBoxWidget::CheckBoxWidget() : Widget(WTYPE_CHECKBOX)
 
 void CheckBoxWidget::add()
 {
-    rect<s32> widget_size = rect<s32>(m_x, m_y, m_x + m_w, m_y + m_h);
+    // Meaningless size. Will be resized later.
+    rect<s32> init_rect = rect<s32>(0, 0, 1, 1); 
     //stringw& message = m_text;
     //m_element = GUIEngine::getGUIEnv()->addCheckBox(true /* checked */, widget_size, NULL, ++id_counter, message.c_str());
 
-    m_element = GUIEngine::getGUIEnv()->addButton(widget_size, m_parent, getNewID(), L"");
+    m_element = GUIEngine::getGUIEnv()->addButton(init_rect, m_parent, getNewID(), L"");
     m_id = m_element->getID();
     m_element->setTabOrder(m_id);
     m_element->setTabGroup(false);
 
     if (!m_is_visible)
         m_element->setVisible(false);
+
+    resize();
 }
 // -----------------------------------------------------------------------------
 EventPropagation CheckBoxWidget::transmitEvent(Widget* w,

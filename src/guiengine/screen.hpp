@@ -34,6 +34,7 @@ namespace irr
 using namespace irr;
 
 #include "config/stk_config.hpp"
+#include "graphics/irr_driver.hpp"
 #include "guiengine/abstract_top_level_container.hpp"
 #include "guiengine/engine.hpp"
 #include "guiengine/event_handler.hpp"
@@ -302,6 +303,8 @@ protected:
         virtual int getWidth() { return m_width; }
 
         virtual int getHeight() { return m_height; }
+
+        void resize();
 
         virtual bool isResizable() const { return m_resizable; }
         /**
