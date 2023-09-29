@@ -301,6 +301,7 @@ void AbstractStateManager::resetAndSetStack(Screen* screens[])
 
     for (int n=0; screens[n] != NULL; n++)
     {
+        if (!screens[n]->isLoaded()) screens[n]->loadFromFile();
         m_menu_stack.emplace_back(screens[n]->getName(), screens[n]);
     }
 

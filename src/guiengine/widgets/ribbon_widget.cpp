@@ -68,6 +68,7 @@ RibbonWidget::RibbonWidget(const RibbonType type) : Widget(WTYPE_RIBBON)
 RibbonWidget::~RibbonWidget()
 {
     m_active_children.clearWithoutDeleting();
+    m_button_background.clearWithoutDeleting();
 }   // ~RibbonWidget
 
 // ----------------------------------------------------------------------------
@@ -216,8 +217,7 @@ void RibbonWidget::resize()
 {
     rect<s32> widget_size = rect<s32>(m_x, m_y, m_x + m_w, m_y + m_h);
 
-    IGUIButton * btn = static_cast<IGUIButton*>(m_element);
-    if (btn) btn->setRelativePosition(widget_size);
+    m_element->setRelativePosition(widget_size);
 
     const int subbuttons_amount = m_active_children.size();
 
