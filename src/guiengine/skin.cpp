@@ -2662,27 +2662,7 @@ void Skin::draw3DSunkenPane (IGUIElement *element, video::SColor bgcolor,
     {
         BubbleWidget* bubble = (BubbleWidget*)widget;
 
-        // zoom in/out effect
-        if (bubble->isFocusedForPlayer(PLAYER_ID_GAME_MASTER))
-        {
-            if (bubble->m_zoom < 1.0f)
-            {
-                bubble->m_zoom += GUIEngine::getLatestDt()*10.0f;
-                if (bubble->m_zoom > 1.0f) bubble->m_zoom = 1.0f;
-
-                bubble->updateSize();
-            }
-        }
-        else
-        {
-            if (bubble->m_zoom > 0.0f)
-            {
-                bubble->m_zoom -= GUIEngine::getLatestDt()*10.0f;
-                if (bubble->m_zoom < 0.0f) bubble->m_zoom = 0.0f;
-
-                bubble->updateSize();
-            }
-        }
+        bubble->update(GUIEngine::getLatestDt());
 
         core::recti rect2 = rect;
 

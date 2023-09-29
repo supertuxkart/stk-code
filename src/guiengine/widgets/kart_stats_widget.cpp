@@ -36,12 +36,19 @@ using namespace irr::core;
 using namespace irr;
 
 // -----------------------------------------------------------------------------
-KartStatsWidget::KartStatsWidget(core::recti area, const int player_id,
-                                 std::string kart_group, bool multiplayer,
-                                 bool display_icons) : Widget(WTYPE_DIV)
+KartStatsWidget::KartStatsWidget(const int player_id, std::string kart_group,\
+                                 bool multiplayer, bool display_icons) : Widget(WTYPE_DIV)
 {
     m_title_font = !multiplayer;
     m_player_id = player_id;
+
+    for (int i = 0; i < SKILL_COUNT; ++i)
+    {
+        SkillLevelWidget* skill_bar = new SkillLevelWidget(m_player_id, display_icons);
+
+        m_skills.push_back(skill_bar);
+        m_children.push_back(skill_bar);  
+    }
 
     const std::string default_kart = UserConfigParams::m_default_kart;
     const KartProperties* props =
@@ -63,23 +70,7 @@ KartStatsWidget::KartStatsWidget(core::recti area, const int player_id,
                        "kart '%s' nor any other kart.",
                        default_kart.c_str());
     }
-                                                                                                                                    
-    for (int i = 0; i < SKILL_COUNT; ++i)
-    {
-        irr::core::recti skillArea(0, 0, 1, 1);
-
-        SkillLevelWidget* skill_bar = NULL;
-
-        skill_bar = new SkillLevelWidget(skillArea, m_player_id, multiplayer, display_icons);       
-
-        m_skills.push_back(skill_bar);
-        m_children.push_back(skill_bar);
-    }
-
 	setValues(props, HANDICAP_NONE);
-
-    move(area.UpperLeftCorner.X, area.UpperLeftCorner.Y,
-         area.getWidth(), area.getHeight());
 }   // KartStatsWidget
 
 // -----------------------------------------------------------------------------
@@ -148,8 +139,9 @@ void KartStatsWidget::add()
 {
     for (int i = 0; i < SKILL_COUNT; ++i)
     {
-        m_skills[i]->add();
+        m_skills[i]->add();     
     }
+    resize();
 }   // add
 
 // -----------------------------------------------------------------------------
@@ -157,20 +149,15 @@ void KartStatsWidget::resize()
 {
     Widget::resize();
 
-    m_skill_bar_w = m_w - m_w / 16; // make sure the bars can't be out of screen 
-    m_skill_bar_h = m_h / SKILL_COUNT / 4;
-
-    m_skill_bar_x = m_x;
-
     int margin = m_h / SKILL_COUNT * 0.6f;
     int offset = m_h / 5;
     
     for (int i = 0; i < SKILL_COUNT; ++i)
     {
-        m_skills[i]->move(m_skill_bar_x,
+        m_skills[i]->move(m_x,
                           m_y + offset + margin * i,
-                          m_skill_bar_w,
-                          m_skill_bar_h);
+                          m_w - m_w / 16, // make sure the bars can't be out of screen 
+                          m_h / SKILL_COUNT / 4);
     }
 }   // move
 

@@ -118,7 +118,7 @@ void DynamicRibbonWidget::add()
             m_properties[PROP_LABELS_LOCATION] == "");
     
     // Meaningless size. Will be resized later.
-    rect<s32> max_rect = rect<s32>(m_x, m_y, m_x+m_w, m_y+m_h); 
+    rect<s32> init_rect = rect<s32>(0, 0, 1, 1); 
 
     if (m_has_label)
     {
@@ -133,12 +133,7 @@ void DynamicRibbonWidget::add()
     // ----- add dynamic label at bottom
     if (m_has_label)
     {
-        // leave room for many lines, just in case
-        rect<s32> label_size = rect<s32>(m_x,
-                                         m_y + m_h - m_label_height,
-                                         m_x + m_w,
-                                         m_y + m_h + m_label_height*5);
-        m_label = GUIEngine::getGUIEnv()->addStaticText(L" ", label_size, false, true /* word wrap */, NULL, -1);
+        m_label = GUIEngine::getGUIEnv()->addStaticText(L" ", init_rect, false, true /* word wrap */, NULL, -1);
         m_label->setTextAlignment( EGUIA_CENTER, EGUIA_UPPERLEFT );
         m_label->setWordWrap(true);
     }
@@ -154,22 +149,6 @@ void DynamicRibbonWidget::add()
     m_left_widget  = new IconButtonWidget(IconButtonWidget::SCALE_MODE_KEEP_TEXTURE_ASPECT_RATIO, false);
     m_right_widget = new IconButtonWidget(IconButtonWidget::SCALE_MODE_KEEP_TEXTURE_ASPECT_RATIO, false);
 
-    const int average_y = m_y + (m_h - m_label_height)/2;
-
-    m_arrows_w = GUIEngine::getFontHeight() * 2;
-    m_arrows_w = std::max(m_arrows_w, 40);
-
-    const int button_h = m_arrows_w;
-
-    // right arrow
-    rect<s32> right_arrow_location = rect<s32>(m_x + m_w - m_arrows_w,
-                                               average_y - button_h/2,
-                                               m_x + m_w,
-                                               average_y + button_h/2);
-    m_right_widget->m_x = right_arrow_location.UpperLeftCorner.X;
-    m_right_widget->m_y = right_arrow_location.UpperLeftCorner.Y;
-    m_right_widget->m_w = right_arrow_location.getWidth();
-    m_right_widget->m_h = right_arrow_location.getHeight();
     m_right_widget->m_event_handler = this;
     m_right_widget->m_focusable = false;
     m_right_widget->m_properties[PROP_ID] = "right";
@@ -180,15 +159,6 @@ void DynamicRibbonWidget::add()
     m_children.push_back( m_right_widget );
 
     // left arrow
-    rect<s32> left_arrow_location = rect<s32>(m_x,
-                                              average_y - button_h/2,
-                                              m_x + m_arrows_w,
-                                              average_y + button_h/2);
-    stringw  lmessage = "<<";
-    m_left_widget->m_x = left_arrow_location.UpperLeftCorner.X;
-    m_left_widget->m_y = left_arrow_location.UpperLeftCorner.Y;
-    m_left_widget->m_w = left_arrow_location.getWidth();
-    m_left_widget->m_h = left_arrow_location.getHeight();
     m_left_widget->m_event_handler = this;
     m_left_widget->m_focusable = false;
     m_left_widget->m_properties[PROP_ID] = "left";
@@ -202,123 +172,7 @@ void DynamicRibbonWidget::add()
     assert( m_right_widget->ok() );
     m_left_widget->m_element->setVisible(true);
 
-    // ---- Determine number of rows
-
-    // Find children size (and ratio)
-    m_child_width  = atoi(m_properties[PROP_CHILD_WIDTH].c_str());
-    m_child_height = atoi(m_properties[PROP_CHILD_HEIGHT].c_str());
-
-    if (m_child_width <= 0 || m_child_height <= 0)
-    {
-        Log::warn("DynamicRibbonWidget", "Ribbon grid widgets require 'child_width' and 'child_height' arguments");
-        m_child_width = 256;
-        m_child_height = 256;
-    }
-
-
-    if (m_multi_row)
-    {
-        // determine row amount
-        const float aspect_ratio = (float)m_child_width / (float)m_child_height;
-        // const int count = m_items.size();
-
-        m_row_amount = -1;
-
-        if (m_h - m_label_height < 0)
-        {
-            Log::warn("DynamicRibbonWidget", "The widget is too small for anything to fit in it!!");
-            m_row_amount = 1;
-        }
-        else
-        {
-            float max_score_so_far = -1;
-            for (int row_count = 1; row_count < 10; row_count++)
-            {
-                int visible_items;
-                int taken_area;
-                int item_height;
-
-                int item_count = m_item_count_hint;
-
-                if (item_count < 1)
-                {
-                    item_count = (int) m_items.size();
-                }
-
-                if (item_count < 1)
-                {
-                    // No idea so make assumptions
-                    item_count = 20;
-                }
-
-                estimateIconAreaFor(row_count, m_child_width, m_w, m_h - m_label_height,
-                                    aspect_ratio, item_count, &visible_items, &taken_area, &item_height);
-
-                // FIXME: this system to determine the best number of columns is really complicated!
-                // the score is computed from taken screen area AND visible item count.
-                // A number of rows that allows for the screen space to be used a lot will
-                // get a better score. A number of rows that allows showing very few items
-                // will be penalized. A configuration that makes items much smaller than
-                // requested in the XML file will also be penalized.
-                float ratio = (float)item_height / (float)m_child_height;
-
-                // huge icons not so good either
-                if (ratio > 1.0f)
-                {
-                    ratio = 1.0f - ratio/5.0f;
-                    if (ratio < 0.0f) ratio = 0.0f;
-                }
-
-                float total_area = (float)(m_w * m_h);
-                const float score = log(2.0f*visible_items) *
-                                      std::min(ratio, 1.0f) * std::min(taken_area/total_area, 1.0f);
-
-                //Log::info("DynamicRibbonWidget", "%d rown: %d visible items; area = %f; "
-                //    "size penalty = %f; score = %f", row_count, visible_items, taken_area,
-                //    std::min((float)item_height / (float)m_child_height, 1.0f), score);
-
-                if (score > max_score_so_far)
-                {
-                    m_row_amount = row_count;
-                    max_score_so_far = score;
-                }
-            }
-            assert(m_row_amount != -1);
-        }
-
-        if (m_properties[PROP_MAX_ROWS].size() > 0)
-        {
-            const int max_rows = atoi(m_properties[PROP_MAX_ROWS].c_str());
-            if (max_rows < 1)
-            {
-                Log::warn("DynamicRibbonWidget", "The 'max_rows' property must be an integer greater than zero; "
-                    "Ignoring current value '%s'", m_properties[PROP_MAX_ROWS].c_str());
-            }
-            else
-            {
-                if (m_row_amount > max_rows) m_row_amount = max_rows;
-            }
-        }
-    }
-    else
-    {
-        m_row_amount = 1;
-    }
-
-    assert( m_left_widget->ok() );
-    assert( m_right_widget->ok() );
-    m_left_widget->m_element->setVisible(true);
-
-    // get and build a list of IDs (by now we may not yet know everything about items,
-    // but we need to get IDs *now* in order for tabbing to work.
-    m_ids.resize(m_row_amount);
-    for (int i=0; i<m_row_amount; i++)
-    {
-        m_ids[i] = getNewID();
-        //Log::info("DynamicRibbonWidget", "getNewID returns %d", m_ids[i]);
-    }
-
-    buildInternalStructure();
+    resize();
 }
 // -----------------------------------------------------------------------------
 void DynamicRibbonWidget::buildInternalStructure()
@@ -463,6 +317,174 @@ void DynamicRibbonWidget::buildInternalStructure()
         assert(childrenCount == (int)m_items.size());
     }
 #endif
+}
+// -----------------------------------------------------------------------------
+void DynamicRibbonWidget::resize()
+{
+    m_has_label = (m_properties[PROP_LABELS_LOCATION] == "bottom");
+
+    if (m_has_label)
+    {
+        // m_label_height contains the height of ONE text line
+        m_label_height = GUIEngine::getFontHeight();
+    }
+    else
+    {
+        m_label_height = 0;
+    }
+
+    // ----- add dynamic label at bottom
+    if (m_has_label)
+    {
+        // leave room for many lines, just in case
+        rect<s32> label_size = rect<s32>(m_x,
+                                         m_y + m_h - m_label_height,
+                                         m_x + m_w,
+                                         m_y + m_h + m_label_height*5);
+        m_label->setRelativePosition(label_size);
+    }
+
+    const int average_y = m_y + (m_h - m_label_height)/2;
+
+    m_arrows_w = GUIEngine::getFontHeight() * 2;
+    m_arrows_w = std::max(m_arrows_w, 40);
+
+    const int button_h = m_arrows_w;
+
+    // right arrow
+    rect<s32> right_arrow_location = rect<s32>(m_x + m_w - m_arrows_w,
+                                               average_y - button_h/2,
+                                               m_x + m_w,
+                                               average_y + button_h/2);
+    m_right_widget->m_x = right_arrow_location.UpperLeftCorner.X;
+    m_right_widget->m_y = right_arrow_location.UpperLeftCorner.Y;
+    m_right_widget->m_w = right_arrow_location.getWidth();
+    m_right_widget->m_h = right_arrow_location.getHeight();
+    m_right_widget->resize();
+
+    // left arrow
+    rect<s32> left_arrow_location = rect<s32>(m_x,
+                                              average_y - button_h/2,
+                                              m_x + m_arrows_w,
+                                              average_y + button_h/2);
+    stringw  lmessage = "<<";
+    m_left_widget->m_x = left_arrow_location.UpperLeftCorner.X;
+    m_left_widget->m_y = left_arrow_location.UpperLeftCorner.Y;
+    m_left_widget->m_w = left_arrow_location.getWidth();
+    m_left_widget->m_h = left_arrow_location.getHeight();
+    m_left_widget->resize();
+
+    // ---- Determine number of rows
+
+    // Find children size (and ratio)
+    m_child_width  = atoi(m_properties[PROP_CHILD_WIDTH].c_str());
+    m_child_height = atoi(m_properties[PROP_CHILD_HEIGHT].c_str());
+
+    if (m_child_width <= 0 || m_child_height <= 0)
+    {
+        Log::warn("DynamicRibbonWidget", "Ribbon grid widgets require 'child_width' and 'child_height' arguments");
+        m_child_width = 256;
+        m_child_height = 256;
+    }
+
+    if (m_multi_row)
+    {
+        // determine row amount
+        const float aspect_ratio = (float)m_child_width / (float)m_child_height;
+        // const int count = m_items.size();
+
+        m_row_amount = -1;
+
+        if (m_h - m_label_height < 0)
+        {
+            Log::warn("DynamicRibbonWidget", "The widget is too small for anything to fit in it!!");
+            m_row_amount = 1;
+        }
+        else
+        {
+            float max_score_so_far = -1;
+            for (int row_count = 1; row_count < 10; row_count++)
+            {
+                int visible_items;
+                int taken_area;
+                int item_height;
+
+                int item_count = m_item_count_hint;
+
+                if (item_count < 1)
+                {
+                    item_count = (int) m_items.size();
+                }
+
+                if (item_count < 1)
+                {
+                    // No idea so make assumptions
+                    item_count = 20;
+                }
+
+                estimateIconAreaFor(row_count, m_child_width, m_w, m_h - m_label_height,
+                                    aspect_ratio, item_count, &visible_items, &taken_area, &item_height);
+
+                // FIXME: this system to determine the best number of columns is really complicated!
+                // the score is computed from taken screen area AND visible item count.
+                // A number of rows that allows for the screen space to be used a lot will
+                // get a better score. A number of rows that allows showing very few items
+                // will be penalized. A configuration that makes items much smaller than
+                // requested in the XML file will also be penalized.
+                float ratio = (float)item_height / (float)m_child_height;
+
+                // huge icons not so good either
+                if (ratio > 1.0f)
+                {
+                    ratio = 1.0f - ratio/5.0f;
+                    if (ratio < 0.0f) ratio = 0.0f;
+                }
+
+                float total_area = (float)(m_w * m_h);
+                const float score = log(2.0f*visible_items) *
+                                      std::min(ratio, 1.0f) * std::min(taken_area/total_area, 1.0f);
+
+                //Log::info("DynamicRibbonWidget", "%d rown: %d visible items; area = %f; "
+                //    "size penalty = %f; score = %f", row_count, visible_items, taken_area,
+                //    std::min((float)item_height / (float)m_child_height, 1.0f), score);
+
+                if (score > max_score_so_far)
+                {
+                    m_row_amount = row_count;
+                    max_score_so_far = score;
+                }
+            }
+            assert(m_row_amount != -1);
+        }
+
+        if (m_properties[PROP_MAX_ROWS].size() > 0)
+        {
+            const int max_rows = atoi(m_properties[PROP_MAX_ROWS].c_str());
+            if (max_rows < 1)
+            {
+                Log::warn("DynamicRibbonWidget", "The 'max_rows' property must be an integer greater than zero; "
+                    "Ignoring current value '%s'", m_properties[PROP_MAX_ROWS].c_str());
+            }
+            else
+            {
+                if (m_row_amount > max_rows) m_row_amount = max_rows;
+            }
+        }
+    }
+    else
+    {
+        m_row_amount = 1;
+    }
+
+    // get and build a list of IDs (by now we may not yet know everything about items,
+    // but we need to get IDs *now* in order for tabbing to work.
+    while (m_row_amount > m_ids.size()) {
+        m_ids.push_back(getNewID());
+    }
+
+    buildInternalStructure();
+
+    updateItemDisplay();
 }
 // -----------------------------------------------------------------------------
 void DynamicRibbonWidget::addItem( const irr::core::stringw& user_name, const std::string& code_name,
@@ -1062,13 +1084,6 @@ void DynamicRibbonWidget::updateItemDisplay()
             }
         } // next column
     } // next row
-}
-
-// -----------------------------------------------------------------------------
-
-void DynamicRibbonWidget::resize()
-{
-    
 }
 
 // -----------------------------------------------------------------------------

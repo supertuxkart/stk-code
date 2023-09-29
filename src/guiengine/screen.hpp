@@ -291,6 +291,11 @@ protected:
         virtual void onDraw(float dt) { };
 
         /**
+         * \brief optional callback you can override to be notified at every resize.
+         */
+        virtual void onResize();
+
+        /**
          * \return which music to play at this screen
          */
         virtual MusicInformation* getMusic() const { return stk_config->m_title_music; }
@@ -303,8 +308,6 @@ protected:
         virtual int getWidth() { return m_width; }
 
         virtual int getHeight() { return m_height; }
-
-        void resize();
 
         virtual bool isResizable() const { return m_resizable; }
         /**

@@ -45,18 +45,12 @@ namespace GUIEngine
         /** If the player is handicapped. */
         HandicapLevel m_handicap;
 
-        /** widget coordinates */
-        int player_name_x, player_name_y, player_name_w, player_name_h;
-        int model_x, model_y, model_w, model_h;
-        int kart_name_x, kart_name_y, kart_name_w, kart_name_h;
-        int m_kart_stats_x, m_kart_stats_y, m_kart_stats_w, m_kart_stats_h;
-
         /** A reserved ID for this widget if any, -1 otherwise.  (If no ID is
          *  reserved, widget will not be in the regular tabbing order */
         int m_irrlicht_widget_id;
 
-        /** For animation purposes (see method 'move') */
-        int target_x, target_y, target_w, target_h;
+        /** For animation purposes (see method 'moveAnimated') */
+        int m_target_x, m_target_y, m_target_w, m_target_h;
         float x_speed, y_speed, w_speed, h_speed;
 
         /** Object representing this player */
@@ -66,7 +60,7 @@ namespace GUIEngine
 
         /** Internal name of the spinner; useful to interpret spinner events,
          *  which contain the name of the activated object */
-        std::string spinnerID;
+        std::string m_spinner_id;
 
 #ifdef DEBUG
         long m_magic_number;
@@ -93,7 +87,7 @@ namespace GUIEngine
 
         PlayerKartWidget(KartSelectionScreen* parent,
                          StateManager::ActivePlayer* associated_player,
-                         core::recti area, const int player_id,
+                         const int player_id,
                          std::string kart_group,
                          const int irrlicht_idget_id=-1);
         // ------------------------------------------------------------------------
@@ -124,9 +118,9 @@ namespace GUIEngine
         void resize();
 
         // ------------------------------------------------------------------------
-        /** Starts a 'move/resize' animation, by simply passing destination coords.
+        /** Starts a move animation, by simply passing destination coords.
          *  The animation will then occur on each call to 'onUpdate'. */
-        void move(const int x, const int y, const int w, const int h);
+        void moveAnimated(const int x, const int y, const int w, const int h);
 
         // ------------------------------------------------------------------------
         /** Call when player confirmed his identity and kart */
@@ -142,7 +136,7 @@ namespace GUIEngine
 
         // -------------------------------------------------------------------------
         /** Updates the animation (moving/shrinking/etc.) */
-        void onUpdate(float delta);
+        virtual void update(float delta);
 
         // -------------------------------------------------------------------------
         /** Event callback */
@@ -150,11 +144,6 @@ namespace GUIEngine
             GUIEngine::Widget* w,
             const std::string& originator,
             const int m_player_id);
-
-        // -------------------------------------------------------------------------
-        /** Sets the size of the widget as a whole, and placed children widgets
-         * inside itself */
-        void setSize(const int x, const int y, const int w, const int h);
 
         // -------------------------------------------------------------------------
 

@@ -339,5 +339,5 @@ void AbstractStateManager::onResize()
         !m_menu_stack.back().second->isResizable())
         return;
 
-    m_menu_stack.back().second->resize();
+    m_menu_stack.back().second->onResize();
 }   // onResize

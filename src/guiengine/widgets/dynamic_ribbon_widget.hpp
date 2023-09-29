@@ -174,6 +174,7 @@ namespace GUIEngine
 
         /** Callbacks */
         virtual void add();
+        virtual void resize();
         virtual EventPropagation mouseHovered(Widget* child, const int playerID);
         virtual EventPropagation transmitEvent(Widget* w, const std::string& originator, const int playerID);
 
@@ -311,8 +312,6 @@ namespace GUIEngine
         virtual void onSelectionChange(){}
 
         virtual void setText(const irr::core::stringw& text);
-
-        virtual void resize();
 
         virtual void update(float delta);
 

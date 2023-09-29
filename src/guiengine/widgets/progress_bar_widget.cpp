@@ -52,9 +52,11 @@ ProgressBarWidget::~ProgressBarWidget()
 
 void ProgressBarWidget::add()
 {
-    rect<s32> widget_size = rect<s32>(m_x, m_y, m_x + m_w, m_y + m_h);
+    // Meaningless size. Will be resized later.
+    rect<s32> init_rect = rect<s32>(0, 0, 1, 1); 
+
     stringw&  message = m_text;
-    m_element = GUIEngine::getGUIEnv()->addButton(widget_size, m_parent, 
+    m_element = GUIEngine::getGUIEnv()->addButton(init_rect, m_parent, 
                                                   getNewNoFocusID(),
                                                   message.c_str(), L"");
 
@@ -70,6 +72,8 @@ void ProgressBarWidget::add()
     GUIEngine::needsUpdate.push_back(this);
     if (!m_is_visible)
         m_element->setVisible(false);
+    
+    resize();
 }    // add
 
 // -----------------------------------------------------------------------------

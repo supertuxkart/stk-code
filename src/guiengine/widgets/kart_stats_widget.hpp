@@ -61,11 +61,6 @@ namespace GUIEngine
          * if/how much space must be added to the raw label's size for the widget to be large enough */
         virtual int getHeightNeededAroundLabel() const { return 4; }
 
-        /** widget coordinates 
-            These are not the actual coordinates of any of the skill bars
-            but only (badly named) intermediate values*/
-        int m_skill_bar_x, m_skill_bar_y, m_skill_bar_h, m_skill_bar_w;
-
         int m_player_id;
 
         std::vector<SkillLevelWidget*> m_skills;
@@ -78,9 +73,8 @@ namespace GUIEngine
 
         LEAK_CHECK()
 
-        KartStatsWidget(core::recti area, const int player_id,
-                        std::string kart_group, bool multiplayer,
-                        bool display_icons);
+        KartStatsWidget(const int player_id, std::string kart_group,
+                        bool multiplayer, bool display_icons);
         virtual ~KartStatsWidget() {};
 
         // ------------------------------------------------------------------------
@@ -91,17 +85,8 @@ namespace GUIEngine
         virtual void resize();
 
         // -------------------------------------------------------------------------
-        /** Updates the animation (moving/shrinking/etc.) */
-        void onUpdate(float delta);
-
-        // -------------------------------------------------------------------------
-        /** Event callback */
-
-        // -------------------------------------------------------------------------
         /** Sets the size of the widget as a whole, and placed children widgets
          * inside itself */
-        void setSize(const int x, const int y, const int w, const int h);
-
         void setValues(const KartProperties* props, HandicapLevel h);
 
         void hideAll();

@@ -22,10 +22,9 @@
 #include "guiengine/skin.hpp"
 #include "online/link_helper.hpp"
 
-#include <IGUIElement.h>
+#include <IGUIButton.h>
 #include <IGUIEnvironment.h>
 #include <IGUIStaticText.h>
-#include <IGUIButton.h>
 
 #include <assert.h>
 
@@ -38,9 +37,11 @@ using namespace irr;
 
 LabelWidget::LabelWidget(LabelType type) : Widget(WTYPE_LABEL)
 {
-    m_type   = type;
-    m_scroll_speed = 0;
-    m_scroll_offset = 0;
+    m_type             = type;
+    m_scroll_speed     = 0;
+    m_scroll_offset    = 0;
+    m_expand_if_needed = false;
+    m_container        = NULL;
 
     if (m_type == BRIGHT)
     {
@@ -49,7 +50,7 @@ LabelWidget::LabelWidget(LabelType type) : Widget(WTYPE_LABEL)
     }
     else
         m_has_color = false;
-
+    
     setFocusable(false);
 }   // LabelWidget
 
@@ -58,7 +59,9 @@ LabelWidget::LabelWidget(LabelType type) : Widget(WTYPE_LABEL)
  */
 void LabelWidget::add()
 {
-    rect<s32> widget_size = rect<s32>(m_x, m_y, m_x + m_w, m_y + m_h);
+    // Meaningless size. Will be resized later.
+    rect<s32> init_rect = rect<s32>(0, 0, 1, 1); 
+    
     const bool word_wrap = m_properties[PROP_WORD_WRAP] == "true";
     stringw message = getText();
 
@@ -70,29 +73,22 @@ void LabelWidget::add()
     if (m_properties[PROP_TEXT_VALIGN] == "top") valign = EGUIA_UPPERLEFT;
     if (m_properties[PROP_TEXT_VALIGN] == "bottom") valign = EGUIA_LOWERRIGHT;
 
-    IGUIStaticText* irrwidget;
-    if (m_scroll_speed != 0)
-    {
-        IGUIElement* container = GUIEngine::getGUIEnv()->addButton(widget_size, m_parent, -1);
-        core::rect<s32> r(core::position2di(0,0), widget_size.getSize());
-        irrwidget = GUIEngine::getGUIEnv()->addStaticText(message.c_str(), r,
-                                                          false, word_wrap, /*m_parent*/ container, -1);
-    }
-    else
-    {
-        irrwidget = GUIEngine::getGUIEnv()->addStaticText(message.c_str(), widget_size,
-                                                          false, word_wrap, m_parent, -1);
-        irrwidget->setTextRestrainedInside(false);
-    }
+    m_container = GUIEngine::getGUIEnv()->addButton(init_rect, m_parent, -1);
 
+    IGUIStaticText* irrwidget;
+    irrwidget = GUIEngine::getGUIEnv()->addStaticText(message.c_str(), init_rect,
+                                                      false, word_wrap, m_container, -1);
+
+    irrwidget->setTextRestrainedInside(m_scroll_speed != 0);
     irrwidget->setMouseCallback(Online::LinkHelper::openURLIrrElement);
-    m_element = irrwidget;
     irrwidget->setTextAlignment( align, valign );
 
     if (m_has_color)
     {
         irrwidget->setOverrideColor(m_color);
     }
+
+    m_element = irrwidget;
 
     if (m_type == TITLE)
     {
@@ -122,40 +118,57 @@ void LabelWidget::add()
 
     if (!m_is_visible)
         m_element->setVisible(false);
+    
+    resize();
 }   // add
+
+// ----------------------------------------------------------------------------
+
+void LabelWidget::resize()
+{
+    assert(m_container);
+    assert(m_element);
+
+    m_container->setRelativePosition( core::rect < s32 > (m_x, m_y, m_x+m_w, m_y+m_h) );
+
+    m_element->setRelativePosition( core::rect < s32 > (m_scroll_offset, 0, m_w, m_h) );
+
+    if (m_expand_if_needed)
+    {
+        stringw message = getText();
+        int fwidth;
+
+        if(m_type == TITLE)
+            fwidth = GUIEngine::getTitleFont()->getDimension(message.c_str()).Width;
+        else if(m_type == SMALL_TITLE)
+            fwidth = GUIEngine::getSmallTitleFont()->getDimension(message.c_str()).Width;
+        else if(m_type == TINY_TITLE)
+            fwidth = GUIEngine::getTinyTitleFont()->getDimension(message.c_str()).Width;
+        else 
+            fwidth = GUIEngine::getFont()->getDimension(message.c_str()).Width;
+        
+        core::rect<s32> rect = m_container->getRelativePosition();
+
+        if (rect.getWidth() < fwidth)
+        {
+            rect.LowerRightCorner.X = rect.UpperLeftCorner.X + fwidth;
+            m_container->setRelativePosition(rect);
+        }
+    }
+}
 
 // ----------------------------------------------------------------------------
 
 void LabelWidget::setText(const core::stringw& text, bool expandIfNeeded)
 {
     m_scroll_offset = 0;
-
-    if (expandIfNeeded)
-    {
-        assert(m_element != NULL);
-        int fwidth;
-        if(m_type == TITLE)
-            fwidth = GUIEngine::getTitleFont()->getDimension(text.c_str()).Width;
-        else if(m_type == SMALL_TITLE)
-            fwidth = GUIEngine::getSmallTitleFont()->getDimension(text.c_str()).Width;
-        else if(m_type == TINY_TITLE)
-            fwidth = GUIEngine::getTinyTitleFont()->getDimension(text.c_str()).Width;
-        else 
-            fwidth = GUIEngine::getFont()->getDimension(text.c_str()).Width;
-        core::rect<s32> rect = m_element->getRelativePosition();
-
-        if (rect.getWidth() < fwidth)
-        {
-            rect.LowerRightCorner.X = rect.UpperLeftCorner.X + fwidth;
-            m_element->setRelativePosition(rect);
-            m_element->updateAbsolutePosition();
-        }
-    }
+    m_expand_if_needed = expandIfNeeded;
 
     if (m_scroll_speed > 0)
         m_scroll_offset = (float)m_w;
 
     Widget::setText(text);
+    resize();
 }   // setText
 
 // ----------------------------------------------------------------------------
@@ -167,8 +180,7 @@ void LabelWidget::update(float dt)
     if (m_scroll_speed != 0)
     {
         m_scroll_offset -= dt*m_scroll_speed*5.0f;
-        m_element->setRelativePosition( core::position2di( /*m_x +*/ (int)m_scroll_offset,
-                                                           /*m_y*/ 0 ) );
+        resize();
     }
 }   // update
 // ----------------------------------------------------------------------------

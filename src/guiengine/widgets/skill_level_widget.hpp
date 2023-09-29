@@ -46,10 +46,6 @@ namespace GUIEngine
          * if/how much space must be added to the raw label's size for the widget to be large enough */
         virtual int getHeightNeededAroundLabel() const { return 4; }
         
-        /** widget coordinates */
-        int m_bar_x, m_bar_y, m_bar_h, m_bar_w;
-        int m_iconbutton_x, m_iconbutton_y, m_iconbutton_h, m_iconbutton_w;
-        
         int m_player_id;
         //shall icon be display left of the skill bar?
         bool m_display_icon;
@@ -61,8 +57,8 @@ namespace GUIEngine
         IconButtonWidget* m_iconbutton;
         ProgressBarWidget* m_bar;
 
-        SkillLevelWidget(core::recti area, const int player_id,
-                         bool multiplayer, bool display_text,
+        SkillLevelWidget(const int player_id,
+                        bool display_text,
                          const float value = 0);
 
         virtual ~SkillLevelWidget() {};
@@ -77,18 +73,11 @@ namespace GUIEngine
 
         // -------------------------------------------------------------------------
 
-        /** Sets the size of the widget as a whole, and placed children widgets
-         * inside itself */
-        void setSize(const int x, const int y, const int w, const int h);
-
         /** Change the value of the widget, it must be a percent. */
         void setValue(const float value);
         
         /** Get the current values of the widget. */
         float getValue() {return m_bar->getValue(); };
-
-        /** Change the label of the widget */
-        void setLabel(const irr::core::stringw& label);
         
         /** Change the image for the icon. Expects an absolute file path*/
         void setIcon(const irr::core::stringc& filepath);

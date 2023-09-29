@@ -67,7 +67,7 @@ namespace GUIEngine
 
         virtual void resize();
         
-        void updateSize();
+        virtual void update(float dt);
 
         void setText(const irr::core::stringw &s);
 

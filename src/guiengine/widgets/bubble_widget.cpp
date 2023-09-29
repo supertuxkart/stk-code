@@ -18,6 +18,7 @@
 #include "guiengine/engine.hpp"
 #include "guiengine/widgets/bubble_widget.hpp"
 #include "online/link_helper.hpp"
+#include "states_screens/state_manager.hpp"
 #include <algorithm>
 
 #include <IGUIStaticText.h>
@@ -135,8 +136,24 @@ void BubbleWidget::setText(const irr::core::stringw &s)
     }
 }
 
-void BubbleWidget::updateSize()
+void BubbleWidget::update(float dt)
 {
+    if (isFocusedForPlayer(PLAYER_ID_GAME_MASTER))
+    {
+        if (m_zoom < 1.0f)
+        {
+            m_zoom += dt * 10.0f;
+            if (m_zoom > 1.0f) m_zoom = 1.0f;
+        }
+    }
+    else
+    {
+        if (m_zoom > 0.0f)
+        {
+            m_zoom -= dt * 10.0f;
+            if (m_zoom < 0.0f) m_zoom = 0.0f;
+        }
+    }
     core::rect<s32> currsize = m_shrinked_size;
 
     const int y1_top    = m_shrinked_size.UpperLeftCorner.Y;

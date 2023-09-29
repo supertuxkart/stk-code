@@ -120,6 +120,9 @@ namespace GUIEngine
                 
         /** \brief implement add method from base class GUIEngine::Widget */
         virtual void add();
+
+        /** \brief comments up and down are nearly useless */
+        virtual void resize();
         
         /** \brief implement callback from base class GUIEngine::Widget */
         virtual void unfocused(const int playerID, Widget* new_focus);

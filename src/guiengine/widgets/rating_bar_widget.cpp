@@ -48,11 +48,14 @@ RatingBarWidget::RatingBarWidget() : Widget(WTYPE_RATINGBAR)
 // -----------------------------------------------------------------------------
 void RatingBarWidget::add()
 {
-    const irr::core::recti widget_size = rect<s32>(m_x, m_y, m_x + m_w, m_y + m_h);
-    m_element = GUIEngine::getGUIEnv()->addButton(widget_size, m_parent, getNewID(), NULL, L"");
+    // Meaningless size. Will be resized later.
+    rect<s32> init_rect = rect<s32>(0, 0, 1, 1); 
+    m_element = GUIEngine::getGUIEnv()->addButton(init_rect, m_parent, getNewID(), NULL, L"");
     m_id = m_element->getID();
     m_element->setTabStop(false);
     m_element->setTabGroup(false);
+
+    resize();
 }
 
 // -----------------------------------------------------------------------------

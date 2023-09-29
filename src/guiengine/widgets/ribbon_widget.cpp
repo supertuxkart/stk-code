@@ -339,6 +339,9 @@ void RibbonWidget::resize()
 
             if (m_active_children[i].m_type == WTYPE_ICON_BUTTON || m_active_children[i].m_type == WTYPE_BUTTON)
             {
+                assert(m_labels[i]);
+                assert(m_button_background[i]);
+
                 rect<s32> icon_part = rect<s32>(tab_contents_rect.UpperLeftCorner.X,
                                                 tab_contents_rect.UpperLeftCorner.Y,
                                                 tab_contents_rect.UpperLeftCorner.X + tab_contents_rect.getHeight(),
@@ -359,13 +362,11 @@ void RibbonWidget::resize()
                                                  tab_contents_rect.LowerRightCorner.X,
                                                  tab_contents_rect.LowerRightCorner.Y);
 
-                // label at the *right* of the icon (for tabs)
-                if (m_active_children[i].m_type == WTYPE_ICON_BUTTON)
-                    label_part.UpperLeftCorner.X += icon_part.getWidth() + 15;
-                
-
                 if (m_active_children[i].m_type == WTYPE_ICON_BUTTON)
                 {
+                    assert(m_active_children[i].m_element);
+
+                    label_part.UpperLeftCorner.X += icon_part.getWidth() + 15;
                     m_active_children[i].m_element->setRelativePosition(icon_part);
                 }
 
@@ -434,6 +435,10 @@ void RibbonWidget::resize()
             // TODO Add support for BUTTON type when needed
             if (m_active_children[i].m_type == WTYPE_ICON_BUTTON)
             {
+                assert(m_active_children[i].m_element);
+                assert(m_labels[i]);
+                assert(m_button_background[i]);
+
                 rect<s32> icon_part = rect<s32>(tab_contents_rect.UpperLeftCorner.X,
                                                 tab_contents_rect.UpperLeftCorner.Y,
                                                 tab_contents_rect.UpperLeftCorner.X + tab_contents_rect.getHeight(),

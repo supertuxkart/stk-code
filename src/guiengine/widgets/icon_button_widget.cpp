@@ -255,6 +255,8 @@ void IconButtonWidget::unfocused(const int playerID, Widget* new_focus)
 // -----------------------------------------------------------------------------
 void IconButtonWidget::resize()
 {
+    assert(m_element);
+
     // irrlicht widgets don't support scaling while keeping aspect ratio
     // so, happily, let's implement it ourselves
     float useAspectRatio = -1.0f;
@@ -323,6 +325,8 @@ void IconButtonWidget::resize()
     const stringw& message = getText();
     if (message.size() > 0)
     {
+        assert(m_label);
+        
         const int label_extra_size =
             ( m_properties[PROP_EXTEND_LABEL].size() == 0 ?
                0 : atoi(m_properties[PROP_EXTEND_LABEL].c_str()) );
