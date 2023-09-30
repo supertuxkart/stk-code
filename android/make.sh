@@ -313,7 +313,7 @@ create_translation()
     CUR_LANG=$(basename -- "$PO" | cut -f 1 -d '.')
     # Skip english po file
     if [ "$CUR_LANG" = "en" ]; then
-        continue
+        return
     fi
     # Fix some difference in language code
     if [ "$CUR_LANG" = "he" ]; then
@@ -429,11 +429,6 @@ convert -scale 162x162 "$APP_ICON_ADAPTIVE_FG" "$DIRNAME/res/drawable-hdpi/icon_
 convert -scale 216x216 "$APP_ICON_ADAPTIVE_FG" "$DIRNAME/res/drawable-xhdpi/icon_fg.png"
 convert -scale 324x324 "$APP_ICON_ADAPTIVE_FG" "$DIRNAME/res/drawable-xxhdpi/icon_fg.png"
 convert -scale 432x432 "$APP_ICON_ADAPTIVE_FG" "$DIRNAME/res/drawable-xxxhdpi/icon_fg.png"
-
-if [ -f "/usr/lib/jvm/java-8-openjdk-amd64/bin/java" ]; then
-    export JAVA_HOME="/usr/lib/jvm/java-8-openjdk-amd64"
-    export PATH=$JAVA_HOME/bin:$PATH
-fi
 
 export ANDROID_HOME="$SDK_PATH"
 ./gradlew -Pcompile_sdk_version="$COMPILE_SDK_VERSION"   \
