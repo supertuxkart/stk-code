@@ -765,6 +765,52 @@ bool KartSelectionScreen::playerQuit(StateManager::ActivePlayer* player)
 
 // ----------------------------------------------------------------------------
 
+void KartSelectionScreen::onResize()
+{
+    Screen::onResize();
+
+    Widget* fullarea = getWidget("playerskarts");
+    int amount = m_kart_widgets.size();
+
+    // in this special case, leave room for a message on the right
+    if (m_multiplayer && amount == 1)
+    {
+        const int splitWidth = fullarea->m_w / 2;
+        // Immediately stop animation to avoid scaling issue
+        m_kart_widgets[0].move( fullarea->m_x, fullarea->m_y, splitWidth,
+                                fullarea->m_h );
+        m_kart_widgets[0].moveAnimated( fullarea->m_x, fullarea->m_y, splitWidth,
+                                        fullarea->m_h );
+    }
+    else
+    {
+        const int splitWidth = fullarea->m_w / amount;
+
+        for (int n=0; n<amount; n++)
+        {
+            m_kart_widgets[n].move( fullarea->m_x + splitWidth * n,
+                                    fullarea->m_y, splitWidth, fullarea->m_h);
+            m_kart_widgets[n].moveAnimated( fullarea->m_x + splitWidth * n,
+                                            fullarea->m_y, splitWidth, fullarea->m_h);
+        }
+    }
+
+    if (m_multiplayer_message)
+    {
+        const int splitWidth = fullarea->m_w / 2;
+        int message_x = 0;
+        if (m_kart_widgets.size() == 1)
+            message_x = (int) (fullarea->m_x + splitWidth + splitWidth * 0.2f);
+        else
+            message_x = (int) (fullarea->m_x + splitWidth / 2 + splitWidth * 0.2f);
+
+        m_multiplayer_message->move(message_x, (int) (fullarea->m_y + fullarea->m_h * 0.3f),
+                                    (int) (splitWidth * 0.6f), (int) (fullarea->m_h * 0.6f));
+    }
+}   // onResize
+
+// ----------------------------------------------------------------------------
+
 void KartSelectionScreen::onUpdate(float delta)
 {
     // Dispatch the onUpdate event to each kart, so they can perform their

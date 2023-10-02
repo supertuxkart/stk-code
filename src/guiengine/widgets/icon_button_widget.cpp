@@ -374,7 +374,7 @@ void IconButtonWidget::resize()
                                                              GUIEngine::getFontHeight()));
         }
         m_label->setRelativePosition(widget_size);
-    
+
         setLabelFont();
     }
 }

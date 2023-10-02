@@ -358,16 +358,20 @@ void LayoutManager::applyCoords(Widget* self, AbstractTopLevelContainer* topLeve
     if      (self->m_absolute_x > -1)         self->m_x = parent_x + self->m_absolute_x;
     else if (self->m_absolute_reverse_x > -1) self->m_x = parent_x + (parent_w - self->m_absolute_reverse_x);
     else if (self->m_relative_x > -1)         self->m_x = (int)(parent_x + parent_w*self->m_relative_x/100);
+    else                                      self->m_x = 0;
 
     if      (self->m_absolute_y > -1)         self->m_y = parent_y + self->m_absolute_y;
     else if (self->m_absolute_reverse_y > -1) self->m_y = parent_y + (parent_h - self->m_absolute_reverse_y);
     else if (self->m_relative_y > -1)         self->m_y = (int)(parent_y + parent_h*self->m_relative_y/100);
+    else                                      self->m_y = 0;
 
     if (self->m_absolute_w > -1)      self->m_w = self->m_absolute_w;
     else if (self->m_relative_w > -1) self->m_w = (int)roundf(parent_w*self->m_relative_w/100.0f);
+    else                              self->m_w = 0;
 
     if (self->m_absolute_h > -1)      self->m_h = self->m_absolute_h;
     else if (self->m_relative_h > -1) self->m_h = (int)roundf(parent_h*self->m_relative_h/100.0f);
+    else                              self->m_h = 0;
 
     // ---- can't make widget bigger than parent
     if (self->m_h > (int)parent_h)

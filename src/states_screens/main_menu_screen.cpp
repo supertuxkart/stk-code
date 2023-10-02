@@ -85,7 +85,7 @@ MainMenuScreen::MainMenuScreen() : Screen("main_menu.stkgui")
 void MainMenuScreen::loadedFromFile()
 {
     LabelWidget* w = getWidget<LabelWidget>("info_addons");
-    w->setScrollSpeed(GUIEngine::getFontHeight() / 2);
+    w->setScrollSpeed(0.03f);
     
     RibbonWidget* rw_top = getWidget<RibbonWidget>("menu_toprow");
     assert(rw_top != NULL);
@@ -161,8 +161,8 @@ void MainMenuScreen::init()
 
     m_news_text = L"";
     LabelWidget* w = getWidget<LabelWidget>("info_addons");
-    w->setText(m_news_text, true);
-    w->update(0.01f);
+    w->setText(m_news_text, false);
+    w->resize();
 #endif
 
     RibbonWidget* r = getWidget<RibbonWidget>("menu_bottomrow");
@@ -223,10 +223,10 @@ void MainMenuScreen::onUpdate(float delta)
     if (!m_news_text.empty())
     {
         if (w->getText().empty())
-            w->setText(m_news_text, true);
+            w->setText(m_news_text, false);
         w->update(delta);
         if (w->scrolledOff())
-            w->setText(m_news_text, true);
+            w->setText(m_news_text, false);
     }
 
     PlayerProfile *player = PlayerManager::getCurrentPlayer();
@@ -611,7 +611,7 @@ void MainMenuScreen::eventCallback(Widget* widget, const std::string& name,
 
 void MainMenuScreen::tearDown()
 {
-    GUIEngine::getDevice()->setResizable(false);
+    //GUIEngine::getDevice()->setResizable(false);
 }   // tearDown
 
 // ----------------------------------------------------------------------------

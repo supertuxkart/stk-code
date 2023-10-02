@@ -45,13 +45,20 @@ DynamicRibbonWidget::DynamicRibbonWidget(const bool combo, const bool multi_row)
     m_multi_row            = multi_row;
     m_combo                = combo;
     m_has_label            = false;
-    m_left_widget          = NULL;
-    m_right_widget         = NULL;
     m_check_inside_me      = true;
     m_supports_multiplayer = true;
     m_scrolling_enabled    = true;
     m_animated_contents    = false;
     m_font                 = new ScalableFont(font_manager->getFont<RegularFace>());
+
+    m_left_widget  = new IconButtonWidget(IconButtonWidget::SCALE_MODE_KEEP_TEXTURE_ASPECT_RATIO, false);
+    m_right_widget = new IconButtonWidget(IconButtonWidget::SCALE_MODE_KEEP_TEXTURE_ASPECT_RATIO, false);
+
+    m_left_widget->m_properties[PROP_ID] = "left";
+    m_right_widget->m_properties[PROP_ID] = "right";
+
+    m_children.push_back( m_left_widget );
+    m_children.push_back( m_right_widget );
 
     // by default, set all players to have no selection in this ribbon
     for (unsigned int n=0; n<MAX_PLAYER_COUNT; n++)
@@ -120,16 +127,6 @@ void DynamicRibbonWidget::add()
     // Meaningless size. Will be resized later.
     rect<s32> init_rect = rect<s32>(0, 0, 1, 1); 
 
-    if (m_has_label)
-    {
-        // m_label_height contains the height of ONE text line
-        m_label_height = GUIEngine::getFontHeight();
-    }
-    else
-    {
-        m_label_height = 0;
-    }
-
     // ----- add dynamic label at bottom
     if (m_has_label)
     {
@@ -138,39 +135,33 @@ void DynamicRibbonWidget::add()
         m_label->setWordWrap(true);
     }
 
-    // ---- add arrow buttons on each side
-    if (m_left_widget != NULL)
-    {
-        m_left_widget->elementRemoved();
-        m_right_widget->elementRemoved();
-        delete m_left_widget;
-        delete m_right_widget;
-    }
-    m_left_widget  = new IconButtonWidget(IconButtonWidget::SCALE_MODE_KEEP_TEXTURE_ASPECT_RATIO, false);
-    m_right_widget = new IconButtonWidget(IconButtonWidget::SCALE_MODE_KEEP_TEXTURE_ASPECT_RATIO, false);
-
     m_right_widget->m_event_handler = this;
     m_right_widget->m_focusable = false;
-    m_right_widget->m_properties[PROP_ID] = "right";
     m_right_widget->setImage(GUIEngine::getSkin()->getImage("right_arrow::neutral"));
     m_right_widget->add();
     m_right_widget->setHighlightedImage(GUIEngine::getSkin()->getImage("right_arrow::focus"));
 
-    m_children.push_back( m_right_widget );
-
     // left arrow
     m_left_widget->m_event_handler = this;
     m_left_widget->m_focusable = false;
-    m_left_widget->m_properties[PROP_ID] = "left";
     m_left_widget->setImage( GUIEngine::getSkin()->getImage("left_arrow::neutral") );
     m_left_widget->add();
     m_left_widget->setHighlightedImage(GUIEngine::getSkin()->getImage("left_arrow::focus"));
 
-    m_children.push_back( m_left_widget );
-
     assert( m_left_widget->ok() );
     assert( m_right_widget->ok() );
     m_left_widget->m_element->setVisible(true);
+
+    // Find children size (and ratio)
+    m_child_width  = atoi(m_properties[PROP_CHILD_WIDTH].c_str());
+    m_child_height = atoi(m_properties[PROP_CHILD_HEIGHT].c_str());
+
+    if (m_child_width <= 0 || m_child_height <= 0)
+    {
+        Log::warn("DynamicRibbonWidget", "Ribbon grid widgets require 'child_width' and 'child_height' arguments");
+        m_child_width = 256;
+        m_child_height = 256;
+    }
 
     resize();
 }
@@ -321,6 +312,8 @@ void DynamicRibbonWidget::buildInternalStructure()
 // -----------------------------------------------------------------------------
 void DynamicRibbonWidget::resize()
 {
+    Widget::resize();
+
     m_has_label = (m_properties[PROP_LABELS_LOCATION] == "bottom");
 
     if (m_has_label)
@@ -351,41 +344,17 @@ void DynamicRibbonWidget::resize()
 
     const int button_h = m_arrows_w;
 
-    // right arrow
-    rect<s32> right_arrow_location = rect<s32>(m_x + m_w - m_arrows_w,
-                                               average_y - button_h/2,
-                                               m_x + m_w,
-                                               average_y + button_h/2);
-    m_right_widget->m_x = right_arrow_location.UpperLeftCorner.X;
-    m_right_widget->m_y = right_arrow_location.UpperLeftCorner.Y;
-    m_right_widget->m_w = right_arrow_location.getWidth();
-    m_right_widget->m_h = right_arrow_location.getHeight();
-    m_right_widget->resize();
+    m_right_widget->move(m_x + m_w - m_arrows_w,
+                         average_y - button_h/2,
+                         m_arrows_w,
+                         button_h);
 
-    // left arrow
-    rect<s32> left_arrow_location = rect<s32>(m_x,
-                                              average_y - button_h/2,
-                                              m_x + m_arrows_w,
-                                              average_y + button_h/2);
-    stringw  lmessage = "<<";
-    m_left_widget->m_x = left_arrow_location.UpperLeftCorner.X;
-    m_left_widget->m_y = left_arrow_location.UpperLeftCorner.Y;
-    m_left_widget->m_w = left_arrow_location.getWidth();
-    m_left_widget->m_h = left_arrow_location.getHeight();
-    m_left_widget->resize();
+    m_left_widget->move(m_x,
+                        average_y - button_h/2,
+                        m_arrows_w,
+                        button_h);
 
     // ---- Determine number of rows
-
-    // Find children size (and ratio)
-    m_child_width  = atoi(m_properties[PROP_CHILD_WIDTH].c_str());
-    m_child_height = atoi(m_properties[PROP_CHILD_HEIGHT].c_str());
-
-    if (m_child_width <= 0 || m_child_height <= 0)
-    {
-        Log::warn("DynamicRibbonWidget", "Ribbon grid widgets require 'child_width' and 'child_height' arguments");
-        m_child_width = 256;
-        m_child_height = 256;
-    }
 
     if (m_multi_row)
     {
@@ -483,7 +452,6 @@ void DynamicRibbonWidget::resize()
     }
 
     buildInternalStructure();
-
     updateItemDisplay();
 }
 // -----------------------------------------------------------------------------
@@ -585,8 +553,6 @@ void DynamicRibbonWidget::elementRemoved()
     Widget::elementRemoved();
     m_previous_item_count = 0;
     m_rows.clearWithoutDeleting();
-    m_left_widget = NULL;
-    m_right_widget = NULL;
 
     m_hover_listeners.clearAndDeleteAll();
 }

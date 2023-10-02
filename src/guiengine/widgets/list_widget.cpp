@@ -139,7 +139,9 @@ void ListWidget::resize()
     rect<s32> widget_size = (m_header.size() > 0 ? rect<s32>(m_x, m_y + header_height, m_x + m_w, m_y + m_h) :
                                                    rect<s32>(m_x, m_y, m_x + m_w, m_y + m_h) );
 
-    m_element->setRelativePosition(widget_size);
+    CGUISTKListBox *list = static_cast<CGUISTKListBox*>(m_element);
+    list->setRelativePosition(widget_size);
+    list->updateAbsolutePosition();
 
     if (m_header.size() > 0)
     {
@@ -165,24 +167,22 @@ void ListWidget::resize()
 
             m_header_elements[n].m_reserved_id = getNewNoFocusID();
 
-            m_header_elements[n].m_y = m_y;
-            m_header_elements[n].m_h = header_height;
+            int w = 0;
 
-            m_header_elements[n].m_x = x;
             if (n == m_header.size())
             {
-                m_header_elements[n].m_w = scrollbar_width;
+                w = scrollbar_width;
             }
             else
             {
                 int header_width = m_w - scrollbar_width;
-                m_header_elements[n].m_w = (int)(header_width * float(m_header[n].m_proportion)
-                                    /float(proportion_total));
+                w = (int)(header_width * float(m_header[n].m_proportion)
+                                       / float(proportion_total));
             }
 
-            x += m_header_elements[n].m_w;
+            m_header_elements[n].move(x, m_y, w, header_height);
 
-            m_header_elements[n].resize();
+            x += w;
         }
     }
 }

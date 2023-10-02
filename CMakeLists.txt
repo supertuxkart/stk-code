@@ -534,9 +534,6 @@ else()
     endif()
 endif()
 
-SET(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -Wl,--subsystem,console")
-
-
 if(WIN32)
     configure_file("${STK_SOURCE_DIR}/../tools/windows_installer/icon_rc.template" "${PROJECT_BINARY_DIR}/tmp/icon.rc")
 endif()
@@ -787,8 +784,6 @@ if(UNIX AND NOT APPLE)
         target_link_libraries(supertuxkart "-fsanitize=thread")
     endif()
 endif()
-
-target_link_libraries(supertuxkart "-fsanitize=undefined")
 
 if(BUILD_RECORDER)
     target_link_libraries(supertuxkart ${OPENGLRECORDER_LIBRARY})

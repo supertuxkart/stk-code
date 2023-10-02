@@ -39,9 +39,8 @@ LabelWidget::LabelWidget(LabelType type) : Widget(WTYPE_LABEL)
 {
     m_type             = type;
     m_scroll_speed     = 0;
-    m_scroll_offset    = 0;
+    m_scroll_progress  = 0;
     m_expand_if_needed = false;
-    m_container        = NULL;
 
     if (m_type == BRIGHT)
     {
@@ -73,11 +72,9 @@ void LabelWidget::add()
     if (m_properties[PROP_TEXT_VALIGN] == "top") valign = EGUIA_UPPERLEFT;
     if (m_properties[PROP_TEXT_VALIGN] == "bottom") valign = EGUIA_LOWERRIGHT;
 
-    m_container = GUIEngine::getGUIEnv()->addButton(init_rect, m_parent, -1);
-
     IGUIStaticText* irrwidget;
     irrwidget = GUIEngine::getGUIEnv()->addStaticText(message.c_str(), init_rect,
-                                                      false, word_wrap, m_container, -1);
+                                                      false, word_wrap, m_parent, -1);
 
     irrwidget->setTextRestrainedInside(m_scroll_speed != 0);
     irrwidget->setMouseCallback(Online::LinkHelper::openURLIrrElement);
@@ -112,9 +109,7 @@ void LabelWidget::add()
 
     m_element->setTabStop(false);
     m_element->setTabGroup(false);
-
-    if (m_scroll_speed <= 0)
-        m_element->setNotClipped(true);
+    m_element->setNotClipped(m_scroll_speed <= 0);
 
     if (!m_is_visible)
         m_element->setVisible(false);
@@ -126,49 +121,43 @@ void LabelWidget::add()
 
 void LabelWidget::resize()
 {
-    assert(m_container);
     assert(m_element);
 
-    m_container->setRelativePosition( core::rect < s32 > (m_x, m_y, m_x+m_w, m_y+m_h) );
+    int fwidth = 0;
+    stringw message = getText();
 
-    m_element->setRelativePosition( core::rect < s32 > (m_scroll_offset, 0, m_w, m_h) );
+    if(m_type == TITLE)
+        fwidth = GUIEngine::getTitleFont()->getDimension(message.c_str()).Width;
+    else if(m_type == SMALL_TITLE)
+        fwidth = GUIEngine::getSmallTitleFont()->getDimension(message.c_str()).Width;
+    else if(m_type == TINY_TITLE)
+        fwidth = GUIEngine::getTinyTitleFont()->getDimension(message.c_str()).Width;
+    else 
+        fwidth = GUIEngine::getFont()->getDimension(message.c_str()).Width;
 
-    if (m_expand_if_needed)
+    int offset = 0, real_width = fwidth;
+    if (!m_expand_if_needed || fwidth < m_w)
     {
-        stringw message = getText();
-        int fwidth;
-
-        if(m_type == TITLE)
-            fwidth = GUIEngine::getTitleFont()->getDimension(message.c_str()).Width;
-        else if(m_type == SMALL_TITLE)
-            fwidth = GUIEngine::getSmallTitleFont()->getDimension(message.c_str()).Width;
-        else if(m_type == TINY_TITLE)
-            fwidth = GUIEngine::getTinyTitleFont()->getDimension(message.c_str()).Width;
-        else 
-            fwidth = GUIEngine::getFont()->getDimension(message.c_str()).Width;
-        
-        core::rect<s32> rect = m_container->getRelativePosition();
-
-        if (rect.getWidth() < fwidth)
-        {
-            rect.LowerRightCorner.X = rect.UpperLeftCorner.X + fwidth;
-            m_container->setRelativePosition(rect);
-        }
+        real_width = m_w;
     }
+    if (m_scroll_speed > 0)
+    {
+        offset = -m_scroll_progress * (real_width + fwidth) + real_width;
+    }
+
+    core::rect<s32> rect = core::rect < s32 > (m_x + offset, m_y, m_x + real_width, m_y + m_h);
+
+    m_element->setRelativePosition(rect);
 }
 
 // ----------------------------------------------------------------------------
 
 void LabelWidget::setText(const core::stringw& text, bool expandIfNeeded)
 {
-    m_scroll_offset = 0;
+    m_scroll_progress = 0.0f;
     m_expand_if_needed = expandIfNeeded;
 
-    if (m_scroll_speed > 0)
-        m_scroll_offset = (float)m_w;
-
     Widget::setText(text);
-    resize();
 }   // setText
 
 // ----------------------------------------------------------------------------
@@ -179,7 +168,7 @@ void LabelWidget::update(float dt)
 {
     if (m_scroll_speed != 0)
     {
-        m_scroll_offset -= dt*m_scroll_speed*5.0f;
+        m_scroll_progress += dt * m_scroll_speed;
         resize();
     }
 }   // update
@@ -189,14 +178,14 @@ bool LabelWidget::scrolledOff() const
 {
     // This method may only be called after this widget has been add()ed
     assert(m_element != NULL);
-    return m_scroll_offset <= -m_element->getAbsolutePosition().getWidth();
+    return m_scroll_progress >= 1.0f;
 }
 
 // ----------------------------------------------------------------------------
 
 void LabelWidget::setScrollSpeed(float speed)
 {
-    m_scroll_speed  = speed;
+    m_scroll_speed = speed;
 }   // setScrollSpeed
 
 // ----------------------------------------------------------------------------

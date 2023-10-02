@@ -525,33 +525,17 @@ void RibbonWidget::resize()
                 zoom = zoom_x;
 
             // ---- add bitmap button part
-            // backup and restore position in case the same object is added
-            // multiple times (FIXME: unclean)
-            int old_x = m_active_children[i].m_x;
-            int old_y = m_active_children[i].m_y;
-            int old_w = m_active_children[i].m_w;
-            int old_h = m_active_children[i].m_h;
-
-            m_active_children[i].m_x = widget_x - int(image_w*zoom/2.0f);
-            m_active_children[i].m_y = button_y;
-            m_active_children[i].m_w = int(image_w*zoom);
-            m_active_children[i].m_h = int(image_h*zoom);
 
             IconButtonWidget* icon = ((IconButtonWidget*)m_active_children.get(i));
 
-            m_active_children.get(i)->resize();
+            icon->m_properties[PROP_EXTEND_LABEL] =
+                StringUtils::toString(icon->m_w <= one_button_width ? one_button_width - icon->m_w : 0);
+            
 
-            if (icon->m_properties[PROP_EXTEND_LABEL].size() == 0)
-            {
-                icon->m_properties[PROP_EXTEND_LABEL] =
-                    StringUtils::toString(one_button_width - icon->m_w);
-            }
-
-            // restore backuped size and location (see above for more info)
-            m_active_children[i].m_x = old_x;
-            m_active_children[i].m_y = old_y;
-            m_active_children[i].m_w = old_w;
-            m_active_children[i].m_h = old_h;
+            icon->move(widget_x - int(image_w*zoom/2.0f),
+                       button_y,
+                       int(image_w*zoom),
+                       int(image_h*zoom));
 
             // the label itself will be added by the icon widget. since it
             // adds the label outside of the widget area it is assigned to,

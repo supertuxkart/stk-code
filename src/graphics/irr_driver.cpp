@@ -804,7 +804,7 @@ begin:
     }
 
     // This remaps the window, so it has to be done before the clear to avoid flicker
-    m_device->setResizable(false);
+    m_device->setResizable(true);
 
     // Immediate clear to black for a nicer user loading experience
     m_video_driver->beginScene(/*backBuffer clear*/true, /* Z */ false);

@@ -70,7 +70,6 @@ namespace GUIEngine
         }
         
         void add();
-        void addItem(const char* item);
         
         virtual EventPropagation focused(const int playerID);
         virtual void unfocused(const int playerID, Widget* new_focus);

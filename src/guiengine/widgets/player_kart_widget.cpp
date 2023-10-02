@@ -205,6 +205,11 @@ PlayerKartWidget::PlayerKartWidget(KartSelectionScreen* parent,
     }
     m_model_view->setRotateContinuously( 35.0f );
 
+    m_kart_name->m_properties[PROP_TEXT_ALIGN] = "center";
+    m_kart_name->m_properties[PROP_ID] =
+        StringUtils::insertValues("@p%i_kartname", m_player_id);
+    m_kart_name->setText(props->getName(), false);
+
 }   // PlayerKartWidget
 // ------------------------------------------------------------------------
 
@@ -363,10 +368,6 @@ void PlayerKartWidget::add()
 
     assert(m_player_ident_spinner->getStringValue() == label);
 
-    m_kart_name->m_properties[PROP_TEXT_ALIGN] = "center";
-    m_kart_name->m_properties[PROP_ID] =
-        StringUtils::insertValues("@p%i_kartname", m_player_id);
-
     resize();
 }   // add
 
@@ -402,9 +403,6 @@ void PlayerKartWidget::resize()
     kart_name_w = m_w;
     kart_name_h = GUIEngine::getFontHeight();
     
-    kart_name_x = m_x;
-    kart_name_y = m_y + m_h - kart_name_h;
-
     // for shrinking effect
     if (m_h < 175)
     {
@@ -416,6 +414,10 @@ void PlayerKartWidget::resize()
     // --- layout
     player_name_x = m_x + m_w/2 - player_name_w/2;
     player_name_y = m_y;
+
+    kart_name_x = m_x;
+    kart_name_y = m_y + m_h - kart_name_h;
+
 
     if (m_parent_screen->m_multiplayer)
     {
@@ -480,11 +482,7 @@ void PlayerKartWidget::resize()
                        model_y,
                        model_w,
                        model_h);
-    
-    const std::string default_kart = UserConfigParams::m_default_kart;
-    const KartProperties* props = kart_properties_manager->getKart(default_kart);
 
-    m_kart_name->setText(props->getName(), false);
     m_kart_name->move(kart_name_x,
                       kart_name_y,
                       kart_name_w,

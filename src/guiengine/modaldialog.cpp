@@ -61,7 +61,7 @@ ModalDialog::ModalDialog(const float percentWidth, const float percentHeight,
     m_percent_height  = percentHeight;
     m_irrlicht_window = NULL;
     m_was_resizable   = irr_driver->getDevice()->isResizable();
-    irr_driver->getDevice()->setResizable(false);
+    //irr_driver->getDevice()->setResizable(false);
 }   // ModalDialog
 
 // ----------------------------------------------------------------------------

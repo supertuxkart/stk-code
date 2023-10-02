@@ -170,6 +170,9 @@ public:
                                const int playerID) OVERRIDE;
 
     /** \brief implement callback from parent class GUIEngine::Screen */
+    virtual void onResize() OVERRIDE;
+
+    /** \brief implement callback from parent class GUIEngine::Screen */
     virtual void onUpdate(float dt) OVERRIDE;
 
     /** \brief implement optional callback from parent
