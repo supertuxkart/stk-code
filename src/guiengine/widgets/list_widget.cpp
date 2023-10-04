@@ -129,6 +129,8 @@ void ListWidget::add()
     m_element->setTabOrder( list_box->getID() );
 
     createHeader();
+
+    resize();
 }
 
 // -----------------------------------------------------------------------------
@@ -140,8 +142,6 @@ void ListWidget::resize()
                                                    rect<s32>(m_x, m_y, m_x + m_w, m_y + m_h) );
 
     CGUISTKListBox *list = static_cast<CGUISTKListBox*>(m_element);
-    list->setRelativePosition(widget_size);
-    list->updateAbsolutePosition();
 
     if (m_header.size() > 0)
     {
@@ -156,7 +156,7 @@ void ListWidget::resize()
         int x = m_x;
         int scrollbar_width = GUIEngine::getSkin()->getSize(EGDS_SCROLLBAR_SIZE);
 
-        for (unsigned int n=0; n<m_header.size()+1; n++)
+        for (unsigned int n=0; n<m_header_elements.size(); n++)
         {
             assert(m_header_elements[n]);
 
@@ -164,8 +164,6 @@ void ListWidget::resize()
             name << m_properties[PROP_ID];
             name << "_column_";
             name << n;
-
-            m_header_elements[n].m_reserved_id = getNewNoFocusID();
 
             int w = 0;
 
@@ -185,6 +183,9 @@ void ListWidget::resize()
             x += w;
         }
     }
+
+    list->setRelativePosition(widget_size);
+    list->updateAbsolutePosition();
 }
 
 // -----------------------------------------------------------------------------
@@ -240,8 +241,6 @@ void ListWidget::createHeader()
         m_check_inside_me = true;
     }
     m_header_created = true;
-
-    resize();
 } // createHeader
 
 // -----------------------------------------------------------------------------

@@ -369,6 +369,23 @@ void OptionsScreenInput::filterInput(Input::InputType type,
 
 // -----------------------------------------------------------------------------
 
+void OptionsScreenInput::onResize()
+{
+    const float scale = GUIEngine::getFontHeight() / 72.0f;
+    GUIEngine::ListWidget* devices = this->getWidget<GUIEngine::ListWidget>("devices");
+
+    assert( devices != NULL );
+    assert( m_icon_bank != NULL );
+
+    m_icon_bank->setScale(scale);
+    m_icon_bank->setTargetIconSize(128, 128);
+    devices->setIcons(m_icon_bank);
+
+    Screen::onResize();
+}
+
+// -----------------------------------------------------------------------------
+
 void OptionsScreenInput::onUpdate(float dt)
 {
     // Only rebuild device list when there is difference in gamepad count

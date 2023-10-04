@@ -501,6 +501,20 @@ void GhostReplaySelection::eventCallback(GUIEngine::Widget* widget,
 }   // eventCallback
 
 // ----------------------------------------------------------------------------
+void GhostReplaySelection::onResize()
+{
+    int icon_height = GUIEngine::getFontHeight();
+    int row_height = GUIEngine::getFontHeight() * 5 / 4;
+                                                        
+    // 128 is the height of the image file
+    m_icon_bank->setScale(icon_height/128.0f);
+    m_icon_bank->setTargetIconSize(128, 128);
+    m_replay_list_widget->setIcons(m_icon_bank, (int)row_height);
+
+    Screen::onResize();
+}
+
+// ----------------------------------------------------------------------------
 void GhostReplaySelection::onDeleteReplay(std::string& filename)
 {
     m_file_to_be_deleted = filename;

@@ -172,16 +172,16 @@ void CGUISTKListBox::recalculateItemHeight()
             Font->drop();
 
         Font = skin->getFont();
+    }
+    if ( 0 == ItemHeightOverride )
+        ItemHeight = 0;
+
+    if (Font)
+    {
         if ( 0 == ItemHeightOverride )
-            ItemHeight = 0;
+            ItemHeight = Font->getHeightPerLine() + 4;
 
-        if (Font)
-        {
-            if ( 0 == ItemHeightOverride )
-                ItemHeight = Font->getHeightPerLine() + 4;
-
-            Font->grab();
-        }
+        Font->grab();
     }
 
     TotalItemHeight = ItemHeight * Items.size();

@@ -61,6 +61,7 @@ public:
 
     GUIEngine::EventPropagation processEvent(const std::string& eventSource);
 
+    //virtual void onResize();
     virtual void onUpdate(float dt);
 };   // class HighScoreInfoDialog
 

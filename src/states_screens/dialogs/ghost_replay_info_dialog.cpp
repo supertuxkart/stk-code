@@ -355,6 +355,14 @@ bool GhostReplayInfoDialog::onEscapePressed()
 }   // onEscapePressed
 
 // -----------------------------------------------------------------------------
+/*void GhostReplayInfoDialog::onResize()
+{
+
+
+    Screen::onResize();
+}*/
+
+// -----------------------------------------------------------------------------
 void GhostReplayInfoDialog::onUpdate(float dt)
 {
     if (m_self_destroy)

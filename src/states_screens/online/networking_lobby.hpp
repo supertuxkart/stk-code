@@ -113,6 +113,7 @@ private:
 
 public:
 
+    virtual void onResize() OVERRIDE;
     virtual void onUpdate(float delta) OVERRIDE;
 
     /** \brief implement callback from parent class GUIEngine::Screen */

@@ -634,6 +634,22 @@ void TrackInfoScreen::onEnterPressedInternal()
 }   // onEnterPressedInternal
 
 // ----------------------------------------------------------------------------
+void TrackInfoScreen::onResize()
+{
+    if (RaceManager::get()->modeHasHighscores())
+    {
+        int icon_height = GUIEngine::getFontHeight();
+        int row_height = GUIEngine::getFontHeight() * 1.2f;
+                                                    
+        m_icon_bank->setScale(icon_height/128.0f);
+        m_icon_bank->setTargetIconSize(128, 128);
+        m_highscore_entries->setIcons(m_icon_bank, (int)row_height);
+    } //has_highscores
+
+    Screen::onResize();
+}
+
+// ----------------------------------------------------------------------------
 void TrackInfoScreen::eventCallback(Widget* widget, const std::string& name,
                                    const int playerID)
 {

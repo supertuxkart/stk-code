@@ -222,6 +222,7 @@ public:
 
     virtual void init() OVERRIDE;
     virtual void tearDown() OVERRIDE;
+    virtual void onResize() OVERRIDE;
     virtual bool onEscapePressed() OVERRIDE;
     virtual void unload() OVERRIDE;
     virtual GUIEngine::EventPropagation

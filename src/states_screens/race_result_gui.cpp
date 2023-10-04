@@ -241,6 +241,14 @@ void RaceResultGUI::tearDown()
 }   // tearDown
 
 //-----------------------------------------------------------------------------
+void RaceResultGUI::onResize()
+{
+    Screen::onResize();
+    
+    
+}   // onResize
+
+//-----------------------------------------------------------------------------
 /** Makes the correct buttons visible again, and gives them the right label.
  *  1) If something was unlocked, only a 'next' button is displayed.
  */

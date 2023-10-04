@@ -492,6 +492,22 @@ void AddonsScreen::eventCallback(GUIEngine::Widget* widget,
 }   // eventCallback
 
 // ----------------------------------------------------------------------------
+void AddonsScreen::onResize()
+{
+    GUIEngine::ListWidget* w_list =
+        getWidget<GUIEngine::ListWidget>("list_addons");
+
+    // This defines the row height !
+    m_icon_height = GUIEngine::getFontHeight() * 2;
+    // 128 is the height of the image file
+    m_icon_bank->setScale((float)GUIEngine::getFontHeight() / 72.0f);
+    m_icon_bank->setTargetIconSize(128,128);
+    w_list->setIcons(m_icon_bank, (int)(m_icon_height));
+
+    Screen::onResize();
+}
+
+// ----------------------------------------------------------------------------
 /** Selects the last selected item on the list (which is the item that
  *  is just being installed) again. This function is used from the
  *  addons_loading screen: when it is closed, it will reset the

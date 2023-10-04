@@ -199,6 +199,16 @@ void EditGPScreen::init()
 }   // init
 
 // -----------------------------------------------------------------------------
+void EditGPScreen::onResize()
+{
+    m_icon_bank->clear();
+    m_icon_bank->scaleToHeight (GUIEngine::getFontHeight() * 3 / 2);
+    m_list->setIcons(m_icon_bank, GUIEngine::getFontHeight() * 3 / 2);
+    
+    Screen::onResize();
+}
+
+// -----------------------------------------------------------------------------
 void EditGPScreen::onConfirm()
 {
     ModalDialog::dismiss();

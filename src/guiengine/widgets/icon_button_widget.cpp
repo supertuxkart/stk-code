@@ -255,7 +255,7 @@ void IconButtonWidget::unfocused(const int playerID, Widget* new_focus)
 // -----------------------------------------------------------------------------
 void IconButtonWidget::resize()
 {
-    assert(m_element);
+
 
     // irrlicht widgets don't support scaling while keeping aspect ratio
     // so, happily, let's implement it ourselves

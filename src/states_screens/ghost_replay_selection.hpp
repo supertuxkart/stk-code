@@ -109,6 +109,8 @@ public:
     
     virtual void unloaded() OVERRIDE;
 
+    virtual void onResize() OVERRIDE;
+
     virtual bool onEscapePressed() OVERRIDE;
 
     /** \brief Implement IConfirmDialogListener callback */

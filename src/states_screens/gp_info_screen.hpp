@@ -108,6 +108,7 @@ public:
     virtual void init() OVERRIDE;
     virtual void beforeAddingWidget() OVERRIDE;
 
+    virtual void onResize() OVERRIDE;
     virtual void onUpdate(float dt) OVERRIDE;
 
     void setGP(const std::string &gp_ident);

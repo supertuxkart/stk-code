@@ -415,6 +415,18 @@ void ServerSelection::eventCallback(GUIEngine::Widget* widget,
 }   // eventCallback
 
 // ----------------------------------------------------------------------------
+void ServerSelection::onResize()
+{
+    int row_height = GUIEngine::getFontHeight() * 2;
+    
+    m_icon_bank->setScale((float)GUIEngine::getFontHeight() / 72.0f);
+    m_icon_bank->setTargetIconSize(128, 128);
+    m_server_list_widget->setIcons(m_icon_bank, row_height);
+
+    Screen::onResize();
+}
+
+// ----------------------------------------------------------------------------
 /** If a refresh of the server list was requested, check if it is finished and
  *  if so, update the list of servers.
  */
