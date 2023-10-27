@@ -442,7 +442,7 @@ void RaceGUI::drawGlobalTimer()
     {
         // This assumes only challenges have a time target
         // and don't end the race when reaching the target.
-        if (elapsed_time < 0) 
+        if (elapsed_time < 0)
         {
             sw = _("Challenge Failed"); // We just overwrite the default case
             int string_width = GUIEngine::getFont()->getDimension(sw.c_str()).Width;
@@ -450,6 +450,8 @@ void RaceGUI::drawGlobalTimer()
             time_color = video::SColor(255,255,0,0);
             use_digit_font = false;
         }
+        else if (elapsed_time == 0)
+            time_color = video::SColor(255,255,0,0);
         else if (elapsed_time <= 5)
             time_color = video::SColor(255,255,160,0);
         else if (elapsed_time <= 15)
