@@ -88,6 +88,7 @@ private:
     /** Number of goals needed to win */
     int m_goal_target;
     bool m_count_down_reached_zero;
+    bool m_goal_after_count_down_ending;
 
     SFXBase *m_goal_sound;
 

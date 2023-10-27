@@ -333,6 +333,7 @@ void SoccerWorld::reset(bool restart)
     }
 
     m_count_down_reached_zero = false;
+    m_goal_after_count_down_ending = false;
     m_red_scorers.clear();
     m_blue_scorers.clear();
     m_ball_hitter = -1;
@@ -563,6 +564,9 @@ void SoccerWorld::onCheckGoalTriggered(bool first_goal)
                 sd.m_time = getTime();
             m_blue_scorers.push_back(sd);
         }
+        if (RaceManager::get()->hasTimeTarget() and m_count_down_reached_zero) {
+            m_goal_after_count_down_ending = true;
+        }
         if (NetworkConfig::get()->isNetworking() &&
             NetworkConfig::get()->isServer())
         {
@@ -748,7 +752,7 @@ bool SoccerWorld::isRaceOver()
 
     if (RaceManager::get()->hasTimeTarget())
     {
-        return m_count_down_reached_zero;
+        return m_count_down_reached_zero and m_goal_after_count_down_ending;
     }
     // One team scored the target goals ...
     else
