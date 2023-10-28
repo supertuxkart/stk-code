@@ -453,8 +453,10 @@ void WorldStatus::updateTime(int ticks)
         case CLOCK_CHRONO:
             if (m_process_type == PT_CHILD || !device->getTimer()->isStopped())
             {
-                m_time_ticks++;
-                m_time  = stk_config->ticks2Time(m_time_ticks);
+                if (!m_paused_clock_time) {
+                    m_time_ticks++;
+                    m_time  = stk_config->ticks2Time(m_time_ticks);
+                }
                 m_count_up_ticks++;
             }
             break;
@@ -472,8 +474,10 @@ void WorldStatus::updateTime(int ticks)
 
             if (m_process_type == PT_CHILD || !device->getTimer()->isStopped())
             {
-                m_time_ticks--;
-                m_time = stk_config->ticks2Time(m_time_ticks);
+                if (!m_paused_clock_time) {
+                    m_time_ticks--;
+                    m_time = stk_config->ticks2Time(m_time_ticks);
+                }
                 m_count_up_ticks++;
             }
 

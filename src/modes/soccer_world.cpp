@@ -390,6 +390,7 @@ void SoccerWorld::onGo()
 {
     m_ball->setEnabled(true);
     m_ball->reset();
+    WorldStatus::unpauseClockTime();
     WorldWithRank::onGo();
 }   // onGo
 
@@ -495,6 +496,7 @@ void SoccerWorld::onCheckGoalTriggered(bool first_goal)
     m_goal_sound->play();
     m_ball->reset();
     m_ball->setEnabled(false);
+    WorldStatus::pauseClockTime();
     if (m_ball_hitter != -1)
     {
         if (UserConfigParams::m_arena_ai_stats)
@@ -712,6 +714,7 @@ void SoccerWorld::resetKartsToSelfGoals()
 {
     m_ball->setEnabled(true);
     m_ball->reset();
+    WorldStatus::unpauseClockTime();
     m_bgd->resetCheckGoal(Track::getCurrentTrack());
     for (unsigned i = 0; i < m_karts.size(); i++)
     {

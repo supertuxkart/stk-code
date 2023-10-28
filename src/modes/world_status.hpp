@@ -116,6 +116,9 @@ private:
 
     /** The clock mode: normal counting forwards, or countdown */ 
     ClockType       m_clock_mode;
+
+    /** The clock timing status : paused means time ticks are not inc/decreasing */
+    bool            m_paused_clock_time;
 protected:
     bool            m_play_track_intro_sound;
     bool            m_play_ready_set_go_sounds;
@@ -216,6 +219,11 @@ public:
     /** Will be called to notify your derived class that the clock,
      *  which is in COUNTDOWN mode, has reached zero. */
     virtual void countdownReachedZero() {};
+
+    // ------------------------------------------------------------------------
+    /** Pause/unpause the clock timing */
+    void    pauseClockTime() { m_paused_clock_time = true; }
+    void    unpauseClockTime() { m_paused_clock_time = false; }
 
     // ------------------------------------------------------------------------
     /** Called when the race actually starts. */
