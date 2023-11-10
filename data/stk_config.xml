@@ -144,7 +144,7 @@
       -->
   <physics smooth-normals="true"
            smooth-angle-limit="0.65"
-           fps="120"
+           fps="240"
            default-track-friction="0.5"
            default-moveable-friction="0.5"
            solver-iterations="4"
