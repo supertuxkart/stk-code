@@ -225,12 +225,12 @@
   <item-return-time bonusbox="1.5" nitro="1.0" banana="2.0" bubblegum="2.0"/>
 
   <!-- Powerup
-       collect-mode : decides what is collected if a kart has already an
+       collect-mode : decides what is collected if a kart has already an item.
                same: get one more item of the same type.
-               new:  always get a new item.
-               only-if-same: if the random item is the same one as the
-                      one currently owned, increase the number, otherwise
-                      no more/new item s are given to the kart.
+               new:  check for a random item, replace the held item if different,
+                     add more if it is the same.
+               only-if-same: check for a random item, do nothing if the held item
+                     is different, add more if it is the same.
        no-explosive-items-timeout determines if world time is less than this value
                then no cake or basketball is given by bonus boxes. -->
   <powerup collect-mode="new" no-explosive-items-timeout="15.0"/>
