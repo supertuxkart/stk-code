@@ -257,8 +257,8 @@
             squash-duration: How long a kart will remain squashed.
             squash-slowdown: Percentage of max speed that a kart is
                 restricted to. -->
-        <swatter duration="10" distance="9" squash-duration="5"
-                 squash-slowdown="0.5" />
+        <swatter duration="7" distance="6.25" squash-duration="4"
+                 squash-slowdown="0.6" />
 
         <!-- Plunger and rubber band handling
             band-max-length: The maximum length of rubber band before it snaps.
