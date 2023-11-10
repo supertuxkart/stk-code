@@ -472,7 +472,7 @@ void Attachment::update(int ticks)
 
     if (m_plugin)
     {
-        if (m_plugin->updateAndTestFinished(ticks))
+        if (m_plugin->updateAndTestFinished())
         {
             clear();  // also removes the plugin
             return;
