@@ -210,7 +210,7 @@ protected:
     float        m_current_lean;
 
     /** To prevent using nitro in too short bursts */
-    int8_t        m_min_nitro_ticks;
+    int16_t        m_min_nitro_ticks;
 
     /** True if fire button was pushed and not released */
     bool         m_fire_clicked;

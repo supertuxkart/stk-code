@@ -316,8 +316,8 @@
                 speed due to nitro fades out.
             max: How much nitro a kart can store. -->
         <nitro engine-force="300" engine-mult="1.2" consumption="1"
-               small-container="1" big-container="3"
-               max-speed-increase="5" duration="1" fade-out-time="2.4" max="20" />
+               small-container="1" big-container="2.5"
+               max-speed-increase="5" duration="0.8" fade-out-time="2.0" max="20" />
 
         <!-- Slipstream
             base-speed: the speed for which length and width are valid.
@@ -373,7 +373,7 @@
             <skid reduce-turn-min="0.2" reduce-turn-max="0.9" />
             <startup boost="*1 *1" />
             <explosion time="*1" radius="*1" />
-            <nitro engine-force="*0.6" max-speed-increase="*0.9" duration="*1" />
+            <nitro engine-force="*0.6" consumption="*1.2" max-speed-increase="*1.2" />
             <slipstream length="*0.9" collect-time="*0.9"
                         duration-factor="*1" fade-out-time="*1" />
         </characteristic>
@@ -387,7 +387,7 @@
             <skid reduce-turn-min="0.25" reduce-turn-max="0.9" />
             <startup boost="*0.8 *0.8" />
             <explosion time="*0.8" radius="*0.8" />
-            <nitro engine-force="*0.75" consumption="*1.25" />
+            <nitro engine-force="*0.75" consumption="*1.375" max-speed-increase="*1.1" />
             <slipstream duration-factor="*0.8" fade-out-time="*1" />
         </characteristic>
         <characteristic name="heavy">
@@ -400,7 +400,7 @@
             <skid reduce-turn-min="0.3" reduce-turn-max="0.9" />
             <startup boost="*0.6 *0.6" />
             <explosion time="*0.6" radius="*0.6" />
-            <nitro engine-force="*1" consumption="*1.67" max-speed-increase="*1.1" />
+            <nitro engine-force="*1" consumption="*1.67" max-speed-increase="*1.0" />
             <slipstream length="*1.1" collect-time="*1.1"
                    duration-factor="*0.6" fade-out-time="*1" />
         </characteristic>

@@ -146,7 +146,7 @@ private:
     /** Minimum time during which nitro is consumed when pressing
      *  the nitro key (to prevent using in very small bursts)
      */
-    int8_t m_nitro_min_consumption;
+    int16_t m_nitro_min_consumption;
 
     bool m_is_addon;
 
@@ -385,7 +385,7 @@ public:
     /** Returns minimum time during which nitro is consumed when pressing nitro
     *  key, to prevent using nitro in very short bursts
     */
-    int8_t getNitroMinConsumptionTicks() const
+    int16_t getNitroMinConsumptionTicks() const
                                             { return m_nitro_min_consumption; }
     // ------------------------------------------------------------------------
     bool isAddon() const                                 { return m_is_addon; }
