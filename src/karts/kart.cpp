@@ -1008,21 +1008,26 @@ void Kart::finishedRace(float time, bool from_server)
         RaceGUIBase* m = World::getWorld()->getRaceGUI();
         if (m)
         {
-            bool won_the_race = false, too_slow = false;
+            bool won_the_race = false, too_slow = false, one_kart = false;
             unsigned int win_position = 1;
 
             if (RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_FOLLOW_LEADER)
                 win_position = 2;
 
+            // There is no win if there is no possibility of losing
+            if (RaceManager::get()->getNumberOfKarts() == 1)
+                one_kart = true;
+
             if ((getPosition() == (int)win_position &&
-                World::getWorld()->getNumKarts() > win_position) || RaceManager::get()->getNumberOfKarts() == 1)
+                World::getWorld()->getNumKarts() > win_position))
                 won_the_race = true;
 
             if (RaceManager::get()->hasTimeTarget() && m_finish_time > RaceManager::get()->getTimeTarget())
                 too_slow = true;
 
-            m->addMessage((too_slow     ? _("You were too slow!") :
-                           won_the_race ? _("You won the race!")  :
+            m->addMessage((too_slow     ? _("You were too slow!")     :
+                           one_kart     ? _("You finished the race!") :
+                           won_the_race ? _("You won the race!")      :
                                           _("You finished the race in rank %d!", getPosition())),
             this, 2.0f, video::SColor(255, 255, 255, 255), true, true, true);
         }
