@@ -97,7 +97,7 @@
             max-speed-reverse-ratio is the percentage of max speed for reverse
                 gear.
           -->
-        <engine power="950" max-speed="25" generic-max-speed="25" brake-factor="15"
+        <engine power="950" max-speed="27.5" generic-max-speed="27.5" brake-factor="15"
                 brake-time-increase="6" max-speed-reverse-ratio="0.65" />
 
         <!-- Simulated gears
@@ -148,7 +148,7 @@
             min-speed: Minimum speed a kart must have before it can skid. Must be
                 >0, otherwise the kart can skid at the start of the race.
             time-till-bonus: How long a kart needs to skid in order to get a bonus.
-            bonus-force: A speedup applied to the kart whick skidded for a while.
+            bonus-speed: A speedup applied to the kart whick skidded for a while.
             bonus-time: How long the bonus-force is applied.
             bonus-force: Additional engine force (this is used to offset the fact
                 that turning after skidding (e.g. to correct direction) often uses
@@ -168,8 +168,8 @@
                 but you will always keep on doing a left turn, just more or less. -->
         <skid increase="1.05" decrease="0.95" max="2.5" time-till-max="0.5"
               visual="1.25" visual-time="0.7" revert-visual-time="0.7"
-              min-speed="10"  time-till-bonus="1.0 3.0"
-              bonus-speed="4.5 6.5" bonus-time="3.0 4.0"
+              min-speed="10"  time-till-bonus="1.0 2.7"
+              bonus-speed="4.0 6.5" bonus-time="3.0 4.0"
               bonus-force="250 350"
               physical-jump-time="0" graphical-jump-time="0.4"
               post-skid-rotate-factor="1"
@@ -365,7 +365,7 @@
     <kart-types>
         <characteristic name="light">
             <turn radius="0:3.5 5:5.5 15:11 30:21 50:37" />
-            <engine power="*0.8" max-speed="*0.95" brake-factor="*1"
+            <engine power="*0.8" max-speed="*0.9" brake-factor="*1"
                  max-speed-reverse-ratio="*0.8" />
             <gear switch-ratio="0.1 0.25 0.45 0.7 1.0 4.0"
                   power-increase="2.8 2.3 1.9 1.5 1.25 1.0" />
@@ -379,7 +379,7 @@
         </characteristic>
         <characteristic name="medium">
             <turn radius="0:4.2 5:6.6 15:13.2 30:25.2 50:44.4" />
-            <engine power="*0.875" max-speed="*1" brake-factor="*0.8"
+            <engine power="*0.875" max-speed="*0.95" brake-factor="*0.8"
                     max-speed-reverse-ratio="*0.75" />
             <gear switch-ratio="0.1 0.25 0.45 0.7 1 4"
                   power-increase="2.4 2 1.7 1.4 1.2 1" />
@@ -392,7 +392,7 @@
         </characteristic>
         <characteristic name="heavy">
             <turn radius="0:4.9 5:7.7 15:15.4 30:29.4 50:51.8" />
-            <engine power="*1" max-speed="*1.05" brake-factor="*0.6"
+            <engine power="*1" max-speed="*1" brake-factor="*0.6"
                     max-speed-reverse-ratio="*0.7" />
             <gear switch-ratio="0.1 0.25 0.45 0.7 1 4"
                   power-increase="2 1.7 1.5 1.3 1.15 1" />
