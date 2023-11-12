@@ -493,9 +493,17 @@ void btKart::updateVehicle( btScalar step )
     float dif = m_kart->getKartProperties()->getStabilityDownwardImpulseFactor();
     if(dif!=0 && m_num_wheels_on_ground==4)
     {
-        float f = -fabsf(m_kart->getSpeed()) * dif;
+        float f1 = fabsf(m_kart->getSpeed());
+        // Excessive downward impulse at high speeds is harmful
+        if (f1 > 35.0f)
+            f1 = 35.0f;
+        // Adjust the impulse force for the time step,
+        // to prevent changes to physics FPS from breaking things.
+        // An increase in impulse frequency is almost equivalent to
+        // an increase in impulse strength of the same factor.
+        float f2 = -f1 * dif * step * 120.0f;
         btVector3 downwards_impulse = m_chassisBody->getWorldTransform().getBasis()
-                                    * btVector3(0, f, 0);
+                                    * btVector3(0, f2, 0);
         m_chassisBody->applyCentralImpulse(downwards_impulse);
     }
 
