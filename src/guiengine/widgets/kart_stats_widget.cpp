@@ -103,10 +103,10 @@ void KartStatsWidget::setValues(const KartProperties* props, HandicapLevel h)
                    kp_computed.getCombinedCharacteristic()->getMass()/3.89f,
                    "mass.png", "mass", _("Mass"));
     
-    // The base speed is of 25
+    // The base speed is of 27.5
     // Here we are not fully proportional, because small differences matter more
     setSkillValues(SKILL_SPEED,
-                   (kp_computed.getCombinedCharacteristic()->getEngineMaxSpeed() - 20.0f) * 15.0f,
+                   (kp_computed.getCombinedCharacteristic()->getEngineMaxSpeed() - 22.25f) * 15.0f,
                    "speed.png", "speed", _("Maximum speed"));
     
     // The acceleration depend on power and mass, and it changes depending on speed
