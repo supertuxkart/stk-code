@@ -226,7 +226,7 @@ void ExplosionAnimation::init(bool direct_hit, const Vec3& normal,
     m_curr_rotation.setPitch(pitch);
     m_curr_rotation.setRoll(roll);
 
-    const int max_rotation = direct_hit ? 2 : 1;
+    const int max_rotation = (timer > 1.15f ) ? 2 : 1;
     // To get rotations in both directions for each axis we determine a
     // number calculated by world created ticks between
     // -(max_rotation-1) and +(max_rotation-1)

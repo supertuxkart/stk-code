@@ -296,7 +296,7 @@
                 determines how height the kart is being thrown).
             invulnerability-time: how long a kart will be invulnerable
                 after being hit by an explosion.
-            radius: Kart closer to this value will be affected by
+            radius: Karts closer to this value will be affected by
                 an explosion as well.  -->
         <explosion duration="1.5" radius="6"
                    invulnerability-time="7" />
@@ -372,7 +372,7 @@
             <mass value="*0.6" />
             <skid reduce-turn-min="0.2" reduce-turn-max="0.9" bonus-force="240 320 400" />
             <startup boost="*1 *1" />
-            <explosion time="*1" radius="*1" />
+            <explosion duration="*1" radius="*1" />
             <nitro engine-force="*0.6" consumption="*1.2" max-speed-increase="*1.2" />
             <slipstream length="*0.9" collect-time="*0.9"
                         duration-factor="*1" fade-out-time="*1" />
@@ -387,7 +387,7 @@
             <skid reduce-turn-min="0.2" reduce-turn-max="0.9" bonus-force="262.5 350 437.5" 
                   time-till-bonus="0.9 2.43 3.78" />
             <startup boost="*0.8 *0.8" />
-            <explosion time="*0.8" radius="*0.8" />
+            <explosion duration="*0.8" radius="*0.8" />
             <nitro engine-force="*0.75" consumption="*1.375" max-speed-increase="*1.1" />
             <slipstream duration-factor="*0.8" fade-out-time="*1" />
         </characteristic>
@@ -400,7 +400,7 @@
             <mass value="*0.75" />
             <skid reduce-turn-min="0.25" reduce-turn-max="0.9" bonus-force="262.5 350 437.5" />
             <startup boost="*0.8 *0.8" />
-            <explosion time="*0.8" radius="*0.8" />
+            <explosion duration="*0.8" radius="*0.8" />
             <nitro engine-force="*0.75" consumption="*1.375" max-speed-increase="*1.1" />
             <slipstream duration-factor="*0.8" fade-out-time="*1" />
         </characteristic>
@@ -413,7 +413,7 @@
             <mass value="*1" />
             <skid reduce-turn-min="0.3" reduce-turn-max="0.9" bonus-force="300 400 500" />
             <startup boost="*0.6 *0.6" />
-            <explosion time="*0.6" radius="*0.6" />
+            <explosion duration="*0.6" radius="*0.6" />
             <nitro engine-force="*1" consumption="*1.67" max-speed-increase="*1.0" />
             <slipstream length="*1.1" collect-time="*1.1"
                    duration-factor="*0.6" fade-out-time="*1" />
