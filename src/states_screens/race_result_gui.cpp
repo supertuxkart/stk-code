@@ -241,14 +241,6 @@ void RaceResultGUI::tearDown()
 }   // tearDown
 
 //-----------------------------------------------------------------------------
-void RaceResultGUI::onResize()
-{
-    Screen::onResize();
-    
-    
-}   // onResize
-
-//-----------------------------------------------------------------------------
 /** Makes the correct buttons visible again, and gives them the right label.
  *  1) If something was unlocked, only a 'next' button is displayed.
  */
@@ -1055,7 +1047,46 @@ void RaceResultGUI::unload()
         nextPhase();
         return GUIEngine::EVENT_BLOCK;
     }   // filterActions
+    //-----------------------------------------------------------------------------
+    void RaceResultGUI::onResize()
+    {
+        Screen::onResize();
 
+        determineTableLayout();
+
+        GUIEngine::Widget* result_table = getWidget("result-table");
+        assert(result_table != NULL);
+        m_sshot_height = (int)(UserConfigParams::m_height*0.1275);
+        m_max_tracks = std::max(1, ((result_table->m_h - getFontHeight() * 5) /
+        (m_sshot_height + SSHOT_SEPARATION))); //Show at least one
+        
+        if (RaceManager::get()->getMajorMode() == RaceManager::MAJOR_MODE_GRAND_PRIX
+          &&(m_animation_state == RR_OLD_GP_RESULTS
+          || m_animation_state == RR_INCREASE_POINTS
+          || m_animation_state == RR_RESORT_TABLE
+          || m_animation_state == RR_WAIT_TILL_END))
+        {
+            cleanupGPProgress();
+            determineGPLayout();
+            m_animation_state = RR_OLD_GP_RESULTS;
+        }
+        else
+        {
+            unsigned int first_position = 0;
+            unsigned int sta = RaceManager::get()->getNumSpareTireKarts();
+            if (RaceManager::get()->isFollowMode())
+                first_position = 1;
+
+            float time_scroll = (RaceManager::get()->getNumberOfKarts() - first_position - sta)
+                              * m_time_between_rows;
+
+            if (m_timer > time_scroll - m_time_single_scroll)
+            {
+                m_timer = time_scroll - m_time_between_rows;
+            }
+            m_animation_state = RR_INIT;
+        }
+    } // onResize
     //-----------------------------------------------------------------------------
     /** Called once a frame */
     void RaceResultGUI::onUpdate(float dt)

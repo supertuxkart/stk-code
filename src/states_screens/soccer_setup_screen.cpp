@@ -195,9 +195,6 @@ void SoccerSetupScreen::beforeAddingWidget()
         m_kart_view_info.push_back(info);
         RaceManager::get()->setKartTeam(i, info.team);
     }
-
-    // Update layout
-    updateKartViewsLayout();
 }   // beforeAddingWidget
 
 // -----------------------------------------------------------------------------
@@ -218,6 +215,9 @@ void SoccerSetupScreen::init()
     // 'fire' is not assigned to a GUI event). This is done to support the old
     // way of player joining by pressing 'fire' instead of 'select'.
     input_manager->getDeviceManager()->mapFireToSelect(true);
+    
+    // Update layout
+    updateKartViewsLayout();
 }   // init
 
 // -----------------------------------------------------------------------------
@@ -383,6 +383,14 @@ GUIEngine::EventPropagation SoccerSetupScreen::filterActions(PlayerAction action
 
     return EVENT_LET;
 }   // filterActions
+
+// -----------------------------------------------------------------------------
+void SoccerSetupScreen::onResize()
+{
+    Screen::onResize();
+
+    updateKartViewsLayout();
+}   // onResize
 
 // -----------------------------------------------------------------------------
 void SoccerSetupScreen::onUpdate(float delta)

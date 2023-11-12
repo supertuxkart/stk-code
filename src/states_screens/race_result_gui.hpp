@@ -222,7 +222,6 @@ public:
 
     virtual void init() OVERRIDE;
     virtual void tearDown() OVERRIDE;
-    virtual void onResize() OVERRIDE;
     virtual bool onEscapePressed() OVERRIDE;
     virtual void unload() OVERRIDE;
     virtual GUIEngine::EventPropagation
@@ -239,6 +238,7 @@ public:
     /** No kart specific view needs to be rendered in the result gui. */
     virtual void renderPlayerView(const Camera *camera, float dt) OVERRIDE {}
 
+    virtual void onResize() OVERRIDE;
     virtual void onUpdate(float dt) OVERRIDE;
     virtual void onDraw(float dt) OVERRIDE;
 

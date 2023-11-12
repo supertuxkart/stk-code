@@ -39,6 +39,8 @@ namespace GUIEngine
     public:
         PlayerNameSpinner(KartSelectionScreen* parent, const int playerID);
         // ------------------------------------------------------------------------
+        void resize();
+        // ------------------------------------------------------------------------
         void setID(const int m_playerID);
 
         // ------------------------------------------------------------------------

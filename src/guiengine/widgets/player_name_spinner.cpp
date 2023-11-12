@@ -33,7 +33,21 @@ PlayerNameSpinner::PlayerNameSpinner(KartSelectionScreen* parent,
     m_parent          = parent;
     setUseBackgroundColor();//except for multiplayer kart selection, this is false
     setSpinnerWidgetPlayerID(m_player_id);
-}   // PlayerNameSpinner
+}   // PlayerNameSpinner\
+// ------------------------------------------------------------------------
+void PlayerNameSpinner::resize()
+{
+    SpinnerWidget::resize();
+    if (m_red_mark_widget)
+    {
+        const int mark_size = m_h;
+        const int mark_x = m_w - mark_size*2;
+        const int mark_y = 0;
+        core::recti red_mark_area(mark_x, mark_y, mark_x + mark_size,
+                                  mark_y + mark_size);
+        m_red_mark_widget->setRelativePosition(red_mark_area);
+    }
+} // setID
 // ------------------------------------------------------------------------
 void PlayerNameSpinner::setID(const int m_player_id)
 {

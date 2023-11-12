@@ -465,6 +465,10 @@ void CGUISTKListBox::updateAbsolutePosition()
     IGUIElement::updateAbsolutePosition();
 
     recalculateItemHeight();
+    if (Items.size())
+    {
+        recalculateIconWidth();
+    }
 }
 
 
@@ -682,21 +686,23 @@ bool CGUISTKListBox::isAutoScrollEnabled() const
 
 void CGUISTKListBox::recalculateIconWidth()
 {
+    ItemsIconWidth = 0;
+    
     for(int x = 0; x < (int)Items.getLast().m_contents.size(); ++x)
     {
         s32 icon = Items.getLast().m_contents[x].m_icon;
-    if (IconBank && icon > -1 &&
-        IconBank->getSprites().size() > (u32)icon &&
-        IconBank->getSprites()[(u32)icon].Frames.size())
-    {
-        u32 rno = IconBank->getSprites()[(u32)icon].Frames[0].rectNumber;
-        if (IconBank->getPositions().size() > rno)
+        if (IconBank && icon > -1 &&
+            IconBank->getSprites().size() > (u32)icon &&
+            IconBank->getSprites()[(u32)icon].Frames.size())
         {
-            const s32 w = IconBank->getPositions()[rno].getWidth();
-            if (w > ItemsIconWidth)
-                ItemsIconWidth = w;
+            u32 rno = IconBank->getSprites()[(u32)icon].Frames[0].rectNumber;
+            if (IconBank->getPositions().size() > rno)
+            {
+                const s32 w = IconBank->getPositions()[rno].getWidth();
+                if (w > ItemsIconWidth)
+                    ItemsIconWidth = w;
+            }
         }
-    }
     }
 }
 

@@ -67,6 +67,8 @@ public:
     /** \brief implement callback from parent class GUIEngine::Screen */
     virtual void tearDown() OVERRIDE;
 
+    virtual void onResize() OVERRIDE;
+
     virtual void onUpdate(float delta) OVERRIDE;
 
     /** \brief implement callback from parent class GUIEngine::Screen */

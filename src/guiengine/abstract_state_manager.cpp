@@ -324,12 +324,7 @@ void AbstractStateManager::onResize()
     // In game resizing
     if (m_menu_stack[0].first == RACE_STATE_NAME)
     {
-        if (m_menu_stack.size() == 1)
-        {
-            clearScreenCache();
-            m_menu_stack.emplace_back(RACE_STATE_NAME, (Screen*)NULL);
-        }
-        return;
+        m_menu_stack[0].second = NULL;
     }
 
     // For some window manager it sends resize event when STK is not focus

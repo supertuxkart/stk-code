@@ -185,7 +185,6 @@ void ListWidget::resize()
     }
 
     list->setRelativePosition(widget_size);
-    list->updateAbsolutePosition();
 }
 
 // -----------------------------------------------------------------------------
