@@ -152,6 +152,27 @@ ScreenKeyboard::~ScreenKeyboard()
  */
 void ScreenKeyboard::init()
 {
+    setArea();
+
+    m_irrlicht_window = GUIEngine::getGUIEnv()->addWindow(m_area, true);
+    m_irrlicht_window->setDrawTitlebar(false);
+    m_irrlicht_window->getCloseButton()->setVisible(false);
+    m_irrlicht_window->setDraggable(UserConfigParams::m_artist_debug_mode);
+
+    m_previous_mode=input_manager->getMode();
+    input_manager->setMode(InputManager::MENU);
+    
+    createButtons();
+    assignButtons(getDefaultButtonsType());
+    
+    Widget* button_widget = getWidget<ButtonWidget>("Back");
+    assert(button_widget != NULL);
+    m_back_button = button_widget->getIrrlichtElement<IGUIButton>();
+}   // init
+
+// ----------------------------------------------------------------------------
+void ScreenKeyboard::setArea()
+{
     const core::dimension2d<u32>& frame_size = irr_driver->getFrameSize();
 
     int margin = 0;
@@ -176,22 +197,7 @@ void ScreenKeyboard::init()
 #endif
 
     m_area = core::rect<s32>(x, y, x + w, y + h);
-
-    m_irrlicht_window = GUIEngine::getGUIEnv()->addWindow(m_area, true);
-    m_irrlicht_window->setDrawTitlebar(false);
-    m_irrlicht_window->getCloseButton()->setVisible(false);
-    m_irrlicht_window->setDraggable(UserConfigParams::m_artist_debug_mode);
-
-    m_previous_mode=input_manager->getMode();
-    input_manager->setMode(InputManager::MENU);
-    
-    createButtons();
-    assignButtons(getDefaultButtonsType());
-    
-    Widget* button_widget = getWidget<ButtonWidget>("Back");
-    assert(button_widget != NULL);
-    m_back_button = button_widget->getIrrlichtElement<IGUIButton>();
-}   // init
+}   // ~ScreenKeyboard
 
 // ----------------------------------------------------------------------------
 /** Creates all button widgets
@@ -332,6 +338,77 @@ void ScreenKeyboard::assignButtons(ButtonsType buttons_type)
         }
     }
 }   // assignButtons
+
+// ----------------------------------------------------------------------------
+
+void ScreenKeyboard::onResize()
+{
+    setArea();
+    m_irrlicht_window->setRelativePosition(m_area);
+
+    const auto& layout_proportions = getKeyboardLayoutProportions();
+    int rows_num = layout_proportions.size();
+    int pos_y = 3;
+
+    const int margin = 2;
+    int height = (m_area.getHeight() - 2 * pos_y) / rows_num - margin;
+    int index = 0;
+
+    for (int i = 0; i < rows_num; i++)
+    {
+        float pos_x = 3;
+        int total_width = m_area.getWidth() - 2 * (int)pos_x;
+
+        int total_padding = irr_driver->getDevice()->getLeftPadding() +
+            irr_driver->getDevice()->getRightPadding();
+        if (total_width - total_padding > 0)
+            total_width -= total_padding;
+
+        char tmp[100];
+        sprintf(tmp, "%i", pos_y + (height + margin) * i);
+        std::string pos_y_str = tmp;
+        
+        int total_proportions = 0;
+        
+        for (int value : layout_proportions[i])
+        {
+            total_proportions += value;
+        }
+        
+        int cols_num = layout_proportions[i].size();
+        
+        for (int j = 0; j < cols_num; j++)
+        {
+            ButtonWidget* button = m_buttons[index];
+
+            float width = (float)total_width * layout_proportions[i][j] 
+                                             / total_proportions - margin;
+            
+            char width_str[100];
+            sprintf(width_str, "%i", (int)roundf(width / (SkinConfig::getHorizontalInnerPadding(button->getType(), button)+1.0f)));
+
+            char height_str[100];
+            sprintf(height_str, "%i", (int)roundf(height / (SkinConfig::getVerticalInnerPadding(button->getType(), button)+1.0f)));
+            
+            char tmp[100];
+            sprintf(tmp, "%i", (int)roundf(pos_x));
+            std::string pos_x_str = tmp;
+            
+            button->m_properties[PROP_WIDTH] = width_str;
+            button->m_properties[PROP_HEIGHT] = height_str;
+            button->m_properties[PROP_X] = pos_x_str;
+            button->m_properties[PROP_Y] = pos_y_str;
+            
+            pos_x += width + margin;
+
+            ++index;
+        }
+    }
+
+    LayoutManager::calculateLayout(m_widgets, this);
+    
+    resizeWidgetsRecursively(m_widgets);
+}
 
 // ----------------------------------------------------------------------------
 

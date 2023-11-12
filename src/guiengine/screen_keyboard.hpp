@@ -101,6 +101,7 @@ namespace GUIEngine
         /** Remembered input mode that was used before keyboard creation */
         InputManager::InputDriverMode m_previous_mode;
 
+        void setArea();
         void createButtons();
         void assignButtons(ButtonsType buttons_type);
         core::stringw getKeyName(std::string key_id);
@@ -127,6 +128,8 @@ namespace GUIEngine
 
         static bool shouldUseScreenKeyboard();
         static bool hasSystemScreenKeyboard();
+
+        virtual void onResize();
 
         /** Override to be notified of updates */
         virtual void onUpdate(float dt);

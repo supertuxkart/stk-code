@@ -1239,6 +1239,14 @@ namespace GUIEngine
         Private::tiny_title_font_height =
             g_tiny_title_font->getDimension( L"X" ).Height;
         StateManager::get()->onResize();
+        if (ScreenKeyboard::isActive())
+        {
+            ScreenKeyboard::getCurrent()->onResize();
+        }
+        if (ModalDialog::isADialogActive())
+        {
+            ModalDialog::getCurrent()->onResize();
+        }
     }   // reloadForNewSize
 
     // -----------------------------------------------------------------------
