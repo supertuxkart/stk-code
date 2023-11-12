@@ -405,6 +405,9 @@ void MaxSpeed::update(int ticks)
     // determines the overall decrease of maximum speed.
     // ---------------------------------------------------
     float slowdown_factor = 1.0f;
+    float max_skid_speed = 0.0f;
+    float max_skid_engine_force = 0.0f;
+
     for(unsigned int i=MS_DECREASE_MIN; i<MS_DECREASE_MAX; i++)
     {
         SpeedDecrease &slowdown = m_speed_decrease[i];
@@ -425,13 +428,26 @@ void MaxSpeed::update(int ticks)
         m_current_max_speed += speedup.getSpeedIncrease();
         m_add_engine_force  += speedup.getEngineForce();
     }
-    if (getSpeedIncreaseTicksLeft(MS_INCREASE_SKIDDING) > 0 &&
-        getSpeedIncreaseTicksLeft(MS_INCREASE_RED_SKIDDING) > 0)
+
+    // Prevent the different kinds of skidding speed increases from cumulating
+    // We select the highest active max-speed bonus and engine-force bonus,
+    // which may come from different skid levels, including fade-out bonuses,
+    // and remove the others.
+
+    for(unsigned int i=MS_INCREASE_SKIDDING; i<=MS_INCREASE_PURPLE_SKIDDING; i++)
     {
-        SpeedIncrease &speedup = m_speed_increase[MS_INCREASE_SKIDDING];
+        SpeedIncrease &speedup = m_speed_increase[i];
+        if (speedup.getSpeedIncrease() > max_skid_speed)
+            max_skid_speed = speedup.getSpeedIncrease();
+        if (speedup.getEngineForce() > max_skid_engine_force)
+            max_skid_engine_force = speedup.getEngineForce();
+
         m_current_max_speed -= speedup.getSpeedIncrease();
         m_add_engine_force  -= speedup.getEngineForce();
     }
+
+    m_current_max_speed += max_skid_speed;
+    m_add_engine_force  += max_skid_engine_force;
 
     m_current_max_speed *= slowdown_factor;
 
