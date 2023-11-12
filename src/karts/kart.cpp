@@ -913,6 +913,10 @@ float Kart::getMaxSteerAngle(float speed) const
         turn_angle_at_speed.setY(i, sinf( 1.0f / turn_angle_at_speed.getY(i))
                                     * m_kart_properties->getWheelBase());
 
+    // Make reverse mode turn the same way as forward
+    if (speed < 0.0f)
+        speed = -speed;
+
     return turn_angle_at_speed.get(speed);
 }   // getMaxSteerAngle
 
