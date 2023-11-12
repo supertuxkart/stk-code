@@ -600,6 +600,7 @@ void RaceManager::startNextRace()
     else
     {
         const bool random_pos_available = !NetworkConfig::get()->isNetworking() &&
+            !m_has_ghost_karts &&
             (RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_NORMAL_RACE
             || RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_TIME_TRIAL
             || RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_FOLLOW_LEADER);

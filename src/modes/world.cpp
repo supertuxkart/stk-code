@@ -476,6 +476,11 @@ std::shared_ptr<AbstractKart> World::createKart
     }
 
     int position           = index+1;
+
+    if (index - gk < 0)
+        Log::error("World",
+            "Attempt to create a kart with a ghost_kart index.");
+
     btTransform init_pos   = getStartTransform(index - gk);
     std::shared_ptr<AbstractKart> new_kart;
     if (RewindManager::get()->isEnabled())
