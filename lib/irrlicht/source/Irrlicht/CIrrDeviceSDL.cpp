@@ -52,6 +52,7 @@ namespace irr
 } // end namespace irr
 
 extern "C" void init_objc(SDL_SysWMinfo* info, float* top, float* bottom, float* left, float* right);
+extern "C" void enable_momentum_scroll();
 extern "C" int handle_app_event(void* userdata, SDL_Event* event);
 extern "C" void Android_initDisplayCutout(float* top, float* bottom, float* left, float* right, int* initial_orientation);
 extern "C" int Android_disablePadding();
@@ -122,6 +123,10 @@ CIrrDeviceSDL::CIrrDeviceSDL(const SIrrlichtCreationParameters& param)
 	// create window
 	if (CreationParams.DriverType != video::EDT_NULL)
 	{
+#if defined(_IRR_OSX_PLATFORM_) && !defined(IOS_STK)
+		enable_momentum_scroll();
+#endif
+
 		// create the window, only if we do not use the null device
 		if (!Close && createWindow())
 		{
