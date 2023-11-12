@@ -364,7 +364,7 @@
     <!-- The different kart types, that can be specified in the kart.xml file -->
     <kart-types>
         <characteristic name="light">
-            <turn radius="0:3.5 5:5.5 15:11 30:21 50:37" />
+            <turn radius="0:2.7 5:5 15:11.5 30:22 50:38.5" />
             <engine power="*0.8" max-speed="*0.9" brake-factor="*1"
                  max-speed-reverse-ratio="*0.8" />
             <gear switch-ratio="0.1 0.25 0.45 0.7 1.0 4.0"
@@ -378,7 +378,7 @@
                         duration-factor="*1" fade-out-time="*1" />
         </characteristic>
         <characteristic name="medium-h">
-            <turn radius="0:4.2 5:6.2 15:12.1 30:22.4 50:38.5" />
+            <turn radius="0:3.24 5:5.7 15:12.7 30:23.6 50:41" />
             <engine power="*0.875" max-speed="*0.93" brake-factor="*0.8"
                     max-speed-reverse-ratio="*0.75" />
             <gear switch-ratio="0.1 0.25 0.45 0.7 1 4"
@@ -392,7 +392,7 @@
             <slipstream duration-factor="*0.8" fade-out-time="*1" />
         </characteristic>
         <characteristic name="medium">
-            <turn radius="0:4.2 5:6.6 15:13.2 30:25.2 50:44.4" />
+            <turn radius="0:3.24 5:6 15:13.8 30:26.4 50:46.2" />
             <engine power="*0.875" max-speed="*0.95" brake-factor="*0.8"
                     max-speed-reverse-ratio="*0.75" />
             <gear switch-ratio="0.1 0.25 0.45 0.7 1 4"
@@ -405,7 +405,7 @@
             <slipstream duration-factor="*0.8" fade-out-time="*1" />
         </characteristic>
         <characteristic name="heavy">
-            <turn radius="0:4.9 5:7.7 15:15.4 30:29.4 50:51.8" />
+            <turn radius="0:3.672 5:6.8 15:15.64 30:29.92 50:52.36" />
             <engine power="*1" max-speed="*1" brake-factor="*0.6"
                     max-speed-reverse-ratio="*0.7" />
             <gear switch-ratio="0.1 0.25 0.45 0.7 1 4"
