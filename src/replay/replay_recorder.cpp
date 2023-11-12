@@ -300,7 +300,7 @@ void ReplayRecorder::update(int ticks)
             r->m_distance = 0.0f;
 
         kart->getKartGFX()->getGFXStatus(&(r->m_nitro_usage),
-            &(r->m_zipper_usage), &(r->m_skidding_effect), &(r->m_red_skidding));
+            &(r->m_zipper_usage), &(r->m_skidding_effect), &(r->m_red_skidding), &(r->m_purple_skidding));
         r->m_jumping = kart->isJumping();
     }   // for i
 
@@ -446,7 +446,7 @@ void ReplayRecorder::save()
             const PhysicInfo *q      = &(m_physic_info[k][i]);
             const BonusInfo *b      = &(m_bonus_info[k][i]);
             const KartReplayEvent *r = &(m_kart_replay_event[k][i]);
-            fprintf(fd, "%f  %f %f %f  %f %f %f %f  %f  %f  %f %f %f %f %d  %d %f %d %d %d  %f %d %d %d %d %d\n",
+            fprintf(fd, "%f  %f %f %f  %f %f %f %f  %f  %f  %f %f %f %f %d  %d %f %d %d %d  %f %d %d %d %d %d %d\n",
                     p->m_time,
                     p->m_transform.getOrigin().getX(),
                     p->m_transform.getOrigin().getY(),
@@ -472,6 +472,7 @@ void ReplayRecorder::save()
                     (int)r->m_zipper_usage,
                     r->m_skidding_effect,
                     (int)r->m_red_skidding,
+                    (int)r->m_purple_skidding,
                     (int)r->m_jumping
                 );
         }   // for i

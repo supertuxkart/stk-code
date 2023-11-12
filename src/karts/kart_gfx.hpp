@@ -57,6 +57,8 @@ public:
                        KGFX_SKID1R = KGFX_SKIDR,
                        KGFX_SKID2L,
                        KGFX_SKID2R,
+                       KGFX_SKID3L,
+                       KGFX_SKID3R,
                        KGFX_SKID0L,
                        KGFX_SKID0R,
                        KGFX_EXHAUST1,
@@ -64,14 +66,18 @@ public:
                        KGFX_COUNT};
 
 private:
-    /** The particle kind for skidding bonus level 0. */
+    /** The particle kind for skidding bonus level 0 (no boost yet). */
     const ParticleKind *m_skid_kind0;
 
-    /** The particle kind for skidding bonus level 1. */
+    /** The particle kind for skidding bonus level 1 (yellow). */
     const ParticleKind *m_skid_kind1;
 
-    /** The particle kind for skidding bonus level 2. */
+    /** The particle kind for skidding bonus level 2 (red). */
     const ParticleKind *m_skid_kind2;
+
+    /** The particle kind for skidding bonus level 3 (purple). */
+    const ParticleKind *m_skid_kind3;
+
 
     /** Vector of all particle emitters. */
     std::vector<ParticleEmitter*> m_all_emitters;
@@ -94,6 +100,9 @@ private:
     /** A light that's shown on the second skid-level with another color. */
     irr::scene::ISceneNode* m_skidding_light_2;
 
+    /** A light that's shown on the third skid-level with another color. */
+    irr::scene::ISceneNode* m_skidding_light_3;
+
     void addEffect(KartGFXType type, const std::string &file_name,
                    const Vec3 &position, bool important);
     void resizeBox(const KartGFXType type, float new_size);
@@ -112,9 +121,9 @@ public:
     void updateNitroGraphics(float f);
     void updateSkidLight(unsigned int level);
     void getGFXStatus(int* nitro, bool* zipper,
-                      int* skidding, bool* red_skidding) const;
+                      int* skidding, bool* red_skidding, bool* purple_skidding) const;
     void setGFXFromReplay(int nitro, bool zipper,
-                          int skidding, bool red_skidding);
+                          int skidding, bool red_skidding, bool purple_skidding);
     void setGFXInvisible();
 
 };   // KartWGFX

@@ -269,17 +269,18 @@ float Skidding::updateGraphics(float dt)
 
     float bonus_time, bonus_speed, bonus_force;
     unsigned int level = getSkidBonus(&bonus_time, &bonus_speed, &bonus_force);
-    if (m_kart->m_max_speed
-        ->isSpeedIncreaseActive(MaxSpeed::MS_INCREASE_SKIDDING) &&
-        m_skid_bonus_end_ticks > World::getWorld()->getTicksSinceStart())
+
+    if (m_skid_bonus_end_ticks > World::getWorld()->getTicksSinceStart())
     {
-        level = 1;
-    }
-    else if (m_kart->m_max_speed
-        ->isSpeedIncreaseActive(MaxSpeed::MS_INCREASE_RED_SKIDDING) &&
-        m_skid_bonus_end_ticks > World::getWorld()->getTicksSinceStart())
-    {
-        level = 2;
+        if (m_kart->m_max_speed
+            ->isSpeedIncreaseActive(MaxSpeed::MS_INCREASE_SKIDDING))
+            level = 1;
+        else if (m_kart->m_max_speed
+            ->isSpeedIncreaseActive(MaxSpeed::MS_INCREASE_RED_SKIDDING))
+            level = 2;
+        else if (m_kart->m_max_speed
+            ->isSpeedIncreaseActive(MaxSpeed::MS_INCREASE_PURPLE_SKIDDING))
+            level = 3;
     }
 
     if (level == 0 && m_graphical_remaining_jump_time <= 0.0f &&
@@ -295,7 +296,7 @@ float Skidding::updateGraphics(float dt)
         m_kart->getKartGFX()->updateSkidLight(level);
     }
 
-    if (bonus_time > 0 || level == 1 || level == 2)
+    if (bonus_time > 0 || level == 1 || level == 2 || level == 3)
     {
         m_kart->getKartGFX()->setCreationRateRelative(KartGFX::KGFX_SKIDL,
             1.0f);
@@ -549,8 +550,9 @@ void Skidding::update(int ticks, bool is_on_ground,
                 m_skid_time = stk_config->time2Ticks(t);
                 if(bonus_time>0)
                 {
-                    unsigned int bonus_cat = (level == 1) ? MaxSpeed::MS_INCREASE_SKIDDING :
-                                                            MaxSpeed::MS_INCREASE_RED_SKIDDING;
+                    unsigned int bonus_cat = (level == 1) ? MaxSpeed::MS_INCREASE_SKIDDING     :
+                                             (level == 2) ? MaxSpeed::MS_INCREASE_RED_SKIDDING :
+                                                            MaxSpeed::MS_INCREASE_PURPLE_SKIDDING;
                     m_kart->m_max_speed->
                         instantSpeedIncrease(bonus_cat,
                                bonus_speed, bonus_speed/2,
