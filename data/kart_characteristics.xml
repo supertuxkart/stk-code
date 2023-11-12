@@ -377,6 +377,20 @@
             <slipstream length="*0.9" collect-time="*0.9"
                         duration-factor="*1" fade-out-time="*1" />
         </characteristic>
+        <characteristic name="medium-h">
+            <turn radius="0:4.2 5:6.2 15:12.1 30:22.4 50:38.5" />
+            <engine power="*0.875" max-speed="*0.93" brake-factor="*0.8"
+                    max-speed-reverse-ratio="*0.75" />
+            <gear switch-ratio="0.1 0.25 0.45 0.7 1 4"
+                  power-increase="2.4 2 1.7 1.4 1.2 1" />
+            <mass value="*0.75" />
+            <skid reduce-turn-min="0.2" reduce-turn-max="0.9" bonus-force="262.5 350 437.5" 
+                  time-till-bonus="0.9 2.43 3.78" />
+            <startup boost="*0.8 *0.8" />
+            <explosion time="*0.8" radius="*0.8" />
+            <nitro engine-force="*0.75" consumption="*1.375" max-speed-increase="*1.1" />
+            <slipstream duration-factor="*0.8" fade-out-time="*1" />
+        </characteristic>
         <characteristic name="medium">
             <turn radius="0:4.2 5:6.6 15:13.2 30:25.2 50:44.4" />
             <engine power="*0.875" max-speed="*0.95" brake-factor="*0.8"
