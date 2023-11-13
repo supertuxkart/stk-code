@@ -163,6 +163,8 @@ void DynamicRibbonWidget::add()
         m_child_height = 256;
     }
 
+    m_ids.clear();
+
     resize();
 }
 // -----------------------------------------------------------------------------
