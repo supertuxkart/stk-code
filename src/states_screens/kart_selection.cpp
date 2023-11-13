@@ -797,7 +797,7 @@ void KartSelectionScreen::onResize()
         m_kart_widgets[0].moveAnimated( fullarea->m_x, fullarea->m_y, splitWidth,
                                         fullarea->m_h );
     }
-    else
+    else if (amount)
     {
         const int splitWidth = fullarea->m_w / amount;
 
