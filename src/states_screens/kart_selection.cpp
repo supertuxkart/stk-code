@@ -767,7 +767,22 @@ bool KartSelectionScreen::playerQuit(StateManager::ActivePlayer* player)
 
 void KartSelectionScreen::onResize()
 {
-    Screen::onResize();
+    m_width = irr_driver->getActualScreenSize().Width;
+    m_height = irr_driver->getActualScreenSize().Height;
+
+    // Remove dispatcher from m_widgets before calculateLayout otherwise a
+    // dummy button is shown in kart screen
+    bool removed_dispatcher = false;
+    if (m_widgets.contains(m_dispatcher))
+    {
+        m_widgets.remove(m_dispatcher);
+        removed_dispatcher = true;
+    }
+    calculateLayout();
+    if (removed_dispatcher)
+        m_widgets.push_back(m_dispatcher);
+    
+    resizeWidgetsRecursively(m_widgets);
 
     Widget* fullarea = getWidget("playerskarts");
     int amount = m_kart_widgets.size();

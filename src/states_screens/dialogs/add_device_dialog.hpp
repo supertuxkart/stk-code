@@ -21,6 +21,8 @@
 
 #include "guiengine/modaldialog.hpp"
 
+#include <IGUIStaticText.h>
+
 /**
   * \brief Dialog that warns the user about the potential problems of
   *        creating multiple keyboard configs.
@@ -28,10 +30,15 @@
   */
 class AddDeviceDialog : public GUIEngine::ModalDialog
 {
+private:
+
+    irr::gui::IGUIStaticText* m_message;
+
 public:
 
     AddDeviceDialog();
     
+    void onResize();
     void onEnterPressedInternal();
     GUIEngine::EventPropagation processEvent(const std::string& eventSource);
 };

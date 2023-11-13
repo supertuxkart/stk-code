@@ -96,10 +96,13 @@ namespace GUIEngine
      */
     class Screen : public AbstractTopLevelContainer
     {
-protected:
+    protected:
         /** True if this screen is resizable
          */
         bool m_resizable;
+
+        unsigned m_width, m_height;
+
     private:
         /** True if the race (if it is running) should be paused when this
          *  screen is shown. The RaceResultGUI uses this to leave the race
@@ -120,8 +123,6 @@ protected:
 
         /** to catch errors as early as possible, for debugging purposes only */
         unsigned int m_magic_number;
-
-        unsigned m_width, m_height;
 
         friend class Skin;
 
