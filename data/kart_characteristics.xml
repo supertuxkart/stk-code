@@ -346,11 +346,18 @@
     <!-- The different difficulties (like easy, medium, hard) -->
     <difficulties>
         <characteristic name="easy">
-            <engine power="*0.7" max-speed="*0.6" generic-max-speed="*0.6" 
+            <engine power="*0.75" max-speed="*0.6" generic-max-speed="*0.6" 
                     max-speed-reverse-ratio="0.75"/>
             <nitro engine-force="*0.8" max-speed-increase="*0.7" />
             <skid bonus-speed="*0.5 *0.5 *0.5" bonus-force="*0.5 *0.5 *0.5" />
             <plunger in-face-time="3" />
+        </characteristic>
+        <characteristic name="casual">
+            <engine power="*0.82" max-speed="*0.75" generic-max-speed="*0.75"
+                    max-speed-reverse-ratio="0.725"/>
+            <nitro engine-force="*0.83" max-speed-increase="*0.78" />
+            <skid bonus-speed="*0.7 *0.7 *0.7" bonus-force="*0.7 *0.7 *0.7" />
+            <plunger in-face-time="4" />
         </characteristic>
         <characteristic name="medium">
             <engine power="*0.88" max-speed="*0.85" generic-max-speed="*0.85"

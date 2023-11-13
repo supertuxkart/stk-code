@@ -57,6 +57,8 @@
     III - Race started and finished counters, by difficulty (linear races only)
         easy-started
         easy-finished
+        casual-started
+        casual-finished
         medium-started
         medium-finished
         hard-started

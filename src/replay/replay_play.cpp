@@ -217,6 +217,13 @@ bool ReplayPlay::addReplayFile(const std::string& fn, bool custom_replay, int ca
         return false;
     }
 
+    // Display the correct difficulty for STK 1.X (and older) replays
+    if (version <= 4)
+    {
+        if (rd.m_difficulty >= 1)
+            rd.m_difficulty++;
+    }
+
     if (version >= 4)
     {
         fgets(s, 1023, fd);

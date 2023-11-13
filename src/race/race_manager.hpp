@@ -229,6 +229,7 @@ public:
     /** Game difficulty. */
     enum Difficulty     { DIFFICULTY_EASY = 0,
                           DIFFICULTY_FIRST = DIFFICULTY_EASY,
+                          DIFFICULTY_CASUAL,
                           DIFFICULTY_MEDIUM,
                           DIFFICULTY_HARD,
                           DIFFICULTY_BEST,
@@ -602,6 +603,7 @@ public:
         switch(diff)
         {
         case RaceManager::DIFFICULTY_EASY:   return "easy";   break;
+        case RaceManager::DIFFICULTY_CASUAL: return "casual"; break;    
         case RaceManager::DIFFICULTY_MEDIUM: return "medium"; break;
         case RaceManager::DIFFICULTY_HARD:   return "hard";   break;
         case RaceManager::DIFFICULTY_BEST:   return "best";   break;

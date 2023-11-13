@@ -295,6 +295,8 @@ RaceManager::Difficulty
 {
     if (difficulty == "novice")
         return DIFFICULTY_EASY;
+    else if (difficulty == "casual")
+        return DIFFICULTY_CASUAL;
     else if (difficulty == "intermediate")
         return DIFFICULTY_MEDIUM;
     else if (difficulty == "expert")
@@ -1307,6 +1309,7 @@ core::stringw RaceManager::getDifficultyName(Difficulty diff) const
     switch (diff)
     {
         case RaceManager::DIFFICULTY_EASY:   return _("Novice");   break;
+        case RaceManager::DIFFICULTY_CASUAL: return _("Casual");   break;
         case RaceManager::DIFFICULTY_MEDIUM: return _("Intermediate"); break;
         case RaceManager::DIFFICULTY_HARD:   return _("Expert");   break;
         case RaceManager::DIFFICULTY_BEST:   return _("SuperTux");   break;

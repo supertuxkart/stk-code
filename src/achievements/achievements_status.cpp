@@ -86,7 +86,7 @@ AchievementsStatus::~AchievementsStatus()
 
 /** This function loads a table associating an enum identifier
   * with the matching command in achievements.xml.
-  * counters with anassociated max version are prefixed to allow
+  * counters with an associated max version are prefixed to allow
   * the achievement progress update to do the correct action. */
 void AchievementsStatus::setEnumToString()
 {
@@ -100,6 +100,8 @@ void AchievementsStatus::setEnumToString()
     m_ach_enum_to_xml[(int)CONS_WON_RACES_HARD_MAX] = "LOGM-cons-won-races-hard";
     m_ach_enum_to_xml[(int)EASY_STARTED] = "easy-started";
     m_ach_enum_to_xml[(int)EASY_FINISHED] = "easy-finished";
+    m_ach_enum_to_xml[(int)CASUAL_STARTED] = "casual-started";
+    m_ach_enum_to_xml[(int)CASUAL_FINISHED] = "casual-finished";
     m_ach_enum_to_xml[(int)MEDIUM_STARTED] = "medium-started";
     m_ach_enum_to_xml[(int)MEDIUM_FINISHED] = "medium-finished";
     m_ach_enum_to_xml[(int)HARD_STARTED] = "hard-started";

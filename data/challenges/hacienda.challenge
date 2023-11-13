@@ -17,6 +17,10 @@
         <karts number="5"/>
         <requirements position="1"/>
     </medium>
+    <casual>
+        <karts number="4"/>
+        <requirements position="1"/>
+    </casual>
     <easy>
         <karts number="4"/>
         <requirements position="1"/>

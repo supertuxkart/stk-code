@@ -256,6 +256,12 @@ void FeatureUnlockedCutScene::addTrophy(RaceManager::Difficulty difficulty,
                     CHALLENGE_POINTS[RaceManager::DIFFICULTY_EASY]*gp_factor, 
                     CHALLENGE_POINTS[max_unlocked_difficulty]*gp_factor);
             break;
+        case RaceManager::DIFFICULTY_CASUAL:
+            msg = _("You completed the casual challenge! "
+                    "Points earned on this level: %i/%i",
+                    CHALLENGE_POINTS[RaceManager::DIFFICULTY_CASUAL]*gp_factor, 
+                    CHALLENGE_POINTS[max_unlocked_difficulty]*gp_factor);
+            break;
         case RaceManager::DIFFICULTY_MEDIUM:
             msg = _("You completed the intermediate challenge! "
                     "Points earned on this level: %i/%i",
@@ -282,6 +288,9 @@ void FeatureUnlockedCutScene::addTrophy(RaceManager::Difficulty difficulty,
     switch (difficulty)
     {
         case RaceManager::DIFFICULTY_EASY:
+            model = file_manager->getAsset(FileManager::MODEL,"trophy_bronze.spm");
+            break;
+        case RaceManager::DIFFICULTY_CASUAL:
             model = file_manager->getAsset(FileManager::MODEL,"trophy_bronze.spm");
             break;
         case RaceManager::DIFFICULTY_MEDIUM:

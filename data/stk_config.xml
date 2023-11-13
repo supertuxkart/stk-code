@@ -365,6 +365,27 @@
                 rb-skid-probability="0:0.0"
                 skidding-threshold="4.0"
                 />
+       <!-- copy-pasted medium AI for now
+            No point tweaking until AI is redone and parametrized -->
+        <casual time-full-steer="0.1"
+                straight-length-for-zipper="35"
+                use-slipstream="false"
+                disable-slipstream-usage="false"
+                shield-incoming-radius="10"
+                false-start-probability="0.04"
+                min-start-delay="0.25" max-start-delay="0.4"
+                nitro-usage="1"
+                item-skill="2"
+                collect-avoid-items="true"
+                handle-bomb="false"
+                first-speed-cap="20:1.0 60:0.9 100:0.85"
+                last-speed-cap="-50:0.94 0:0.85 100:0.75"
+                max-item-angle="0.7" max-item-angle-high-speed="0.3"
+                bad-item-closeness="6"
+                collect-item-probability="-10:1.0 0:0"
+                rb-skid-probability="0:0.0"
+                skidding-threshold="3.0"
+                />
         <medium time-full-steer="0.1"
                 straight-length-for-zipper="35"
                 use-slipstream="false"

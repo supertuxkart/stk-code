@@ -475,6 +475,8 @@ void KartProperties::getAllData(const XMLNode * root)
     {
         const XMLNode *easy = ai_node->getNode("easy");
         m_ai_properties[RaceManager::DIFFICULTY_EASY]->load(easy);
+        const XMLNode *casual = ai_node->getNode("casual");
+        m_ai_properties[RaceManager::DIFFICULTY_CASUAL]->load(casual);
         const XMLNode *medium = ai_node->getNode("medium");
         m_ai_properties[RaceManager::DIFFICULTY_MEDIUM]->load(medium);
         const XMLNode *hard = ai_node->getNode("hard");

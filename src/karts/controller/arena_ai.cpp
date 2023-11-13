@@ -433,7 +433,8 @@ void ArenaAI::useItems(const float dt)
     m_time_since_last_shot += dt;
 
     float min_bubble_time = 2.0f;
-    const bool difficulty = m_cur_difficulty == RaceManager::DIFFICULTY_EASY ||
+    const bool difficulty = m_cur_difficulty == RaceManager::DIFFICULTY_EASY   ||
+                            m_cur_difficulty == RaceManager::DIFFICULTY_CASUAL ||
                             m_cur_difficulty == RaceManager::DIFFICULTY_MEDIUM;
 
     const bool fire_behind = closest_kart_point_lc.z() < 0 && !difficulty;

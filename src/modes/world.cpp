@@ -382,10 +382,11 @@ void World::reset(bool restart)
             {
                 PlayerManager::trackEvent(RaceManager::get()->getTrackName(), AchievementsStatus::TR_STARTED);
                 AchievementsStatus::AchievementData diff;
-                diff = (RaceManager::get()->getDifficulty() == RaceManager::DIFFICULTY_EASY)   ? AchievementsStatus::EASY_STARTED :
+                diff = (RaceManager::get()->getDifficulty() == RaceManager::DIFFICULTY_EASY)   ? AchievementsStatus::EASY_STARTED   :
+                       (RaceManager::get()->getDifficulty() == RaceManager::DIFFICULTY_CASUAL) ? AchievementsStatus::CASUAL_STARTED :
                        (RaceManager::get()->getDifficulty() == RaceManager::DIFFICULTY_MEDIUM) ? AchievementsStatus::MEDIUM_STARTED :
-                       (RaceManager::get()->getDifficulty() == RaceManager::DIFFICULTY_HARD)   ? AchievementsStatus::HARD_STARTED :
-                                                                                           AchievementsStatus::BEST_STARTED;
+                       (RaceManager::get()->getDifficulty() == RaceManager::DIFFICULTY_HARD)   ? AchievementsStatus::HARD_STARTED   :
+                                                                                                 AchievementsStatus::BEST_STARTED;
                 PlayerManager::increaseAchievement(diff,1);
             }
             else if (RaceManager::get()->isEggHuntMode())
@@ -1714,10 +1715,11 @@ void World::updateAchievementDataEndRace()
             if (RaceManager::get()->isLinearRaceMode())
             {
                 ACS::AchievementData diff;
-                diff = (RaceManager::get()->getDifficulty() == RaceManager::DIFFICULTY_EASY)   ? ACS::EASY_FINISHED :
+                diff = (RaceManager::get()->getDifficulty() == RaceManager::DIFFICULTY_EASY)   ? ACS::EASY_FINISHED   :
+                       (RaceManager::get()->getDifficulty() == RaceManager::DIFFICULTY_CASUAL) ? ACS::CASUAL_FINISHED :
                        (RaceManager::get()->getDifficulty() == RaceManager::DIFFICULTY_MEDIUM) ? ACS::MEDIUM_FINISHED :
-                       (RaceManager::get()->getDifficulty() == RaceManager::DIFFICULTY_HARD)   ? ACS::HARD_FINISHED :
-                                                                                           ACS::BEST_FINISHED;
+                       (RaceManager::get()->getDifficulty() == RaceManager::DIFFICULTY_HARD)   ? ACS::HARD_FINISHED   :
+                                                                                                 ACS::BEST_FINISHED;
                 PlayerManager::increaseAchievement(diff,1);
 
                 PlayerManager::trackEvent(RaceManager::get()->getTrackName(), ACS::TR_FINISHED);

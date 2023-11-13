@@ -183,6 +183,10 @@ core::stringw AchievementProgressDialog::niceGoalName(std::string internal_name)
     // I18N: A goal for achievements. If this text is in (), it's a precision added to multiple different goals.
     if(internal_name=="easy-finished") nice_name = _("Novice races finished");
     // I18N: A goal for achievements. If this text is in (), it's a precision added to multiple different goals.
+    if(internal_name=="casual-started") nice_name = _("Casual races started");
+    // I18N: A goal for achievements. If this text is in (), it's a precision added to multiple different goals.
+    if(internal_name=="casual-finished") nice_name = _("Casual races finished");
+    // I18N: A goal for achievements. If this text is in (), it's a precision added to multiple different goals.
     if(internal_name=="medium-started") nice_name = _("Intermediate races started");
     // I18N: A goal for achievements. If this text is in (), it's a precision added to multiple different goals.
     if(internal_name=="medium-finished") nice_name = _("Intermediate races finished");

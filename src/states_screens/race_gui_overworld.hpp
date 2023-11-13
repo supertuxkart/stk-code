@@ -53,13 +53,13 @@ private:
 
     // Minimap related variables
     // -------------------------
-    video::ITexture* m_trophy[4];
+    video::ITexture* m_trophy[5];
     video::ITexture *m_lock;
     video::ITexture *m_open_challenge;
     video::ITexture *m_locked_bonus;
 
 
-    video::ITexture* m_icons[7];
+    video::ITexture* m_icons[8];
 
     /** Texture for speedometer. */
     irr::video::ITexture *m_speed_meter_icon;

@@ -144,6 +144,7 @@ void BattleAI::findTarget()
         switch (m_cur_difficulty)
         {
             case RaceManager::DIFFICULTY_EASY:
+            case RaceManager::DIFFICULTY_CASUAL:
             case RaceManager::DIFFICULTY_MEDIUM:
             {
                 find_sta = m_tsb_world->getKartLife(m_kart->getWorldKartId()) == 1;

@@ -263,10 +263,15 @@ public:
         return m_story_mode_status->getNumEasyTrophies();
     }   // getNumEasyTrophies
     // ----------------------------------------------------------------------------------------
+    unsigned int getNumCasualTrophies() const
+    {
+        return m_story_mode_status->getNumCasualTrophies();
+    }   // getNumCasualTrophies
+    // ----------------------------------------------------------------------------------------
     unsigned int getNumMediumTrophies() const
     {
         return m_story_mode_status->getNumMediumTrophies();
-    }   // getNumEasyTrophies
+    }   // getNumMediumTrophies
     // -----------------------------------------------------------------------
     unsigned int getNumHardTrophies() const
     {
