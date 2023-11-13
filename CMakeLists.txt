@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 2.8.4)
 
 # root CMakeLists for the SuperTuxKart project
 project(SuperTuxKart)
-set(PROJECT_VERSION "git")
+set(PROJECT_VERSION "2.0-git")
 
 add_definitions( -DSUPERTUXKART_VERSION="${PROJECT_VERSION}" )
 
@@ -293,7 +293,7 @@ if (BUILD_RECORDER)
     find_library(OPENGLRECORDER_LIBRARY NAMES openglrecorder libopenglrecorder PATHS "${PROJECT_SOURCE_DIR}/${DEPENDENCIES}/lib")
     find_path(OPENGLRECORDER_INCLUDEDIR NAMES openglrecorder.h PATHS "${PROJECT_SOURCE_DIR}/${DEPENDENCIES}/include")
     if (NOT OPENGLRECORDER_LIBRARY OR NOT OPENGLRECORDER_INCLUDEDIR)
-        if(PROJECT_VERSION STREQUAL "git")
+        if(PROJECT_VERSION STREQUAL "2.0-git")
             message(WARNING "libopenglrecorder not found, disabling in-game recorder. "
                 "To use recorder, install libopenglrecorder.")
             set(OPENGLRECORDER_LIBRARY CACHE INTERNAL "")

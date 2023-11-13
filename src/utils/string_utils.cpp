@@ -954,7 +954,7 @@ namespace StringUtils
     int versionToInt(const std::string &version_string)
     {
         // Special case: GIT
-        if(version_string=="GIT" || version_string=="git")
+        if(version_string=="GIT" || version_string=="git" || version_string=="2.0-git")
         {
             // GIT version will be version 99.99.99i-rcJ
             return   10000000*99
