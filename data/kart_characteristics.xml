@@ -70,15 +70,13 @@
                 higher than 25 can only be reached with powerups).
             time-full-steer: This is the amount of change in steering depending
                 on current steering. So if the steering is between 0 and 0.5,
-                the time-for-steering-change is 0.15. If the current steering is
-                between 0.5 and 1.0, the time-for-steering-change is 0.25.
+                the time-for-steering-change is 0.17. If the current steering is
+                between 0.5 and 1.0, the time-for-steering-change is 0.28.
                 The speed is used as dt/time-for-steering-change.
                 In short: steering at less than halfway is somewhat faster,
-                which should avoid oversteering (by pressing the key for too long),
-                but slower when you want to steer more. Overwall with the current
-                settings the expected time-to-full-steer is:
-                0.5 * 0.25 + 0.5 * 0.15 = 0.2 ... which is overall the same
-                time we had previously. -->
+                but slower when you want to steer more, which should avoid
+                oversteering (by pressing the key for too long),
+                 -->
         <turn radius="0:2.5 5:4 12:8 20:14 30:22 50:38.5"
               time-full-steer="0:0.17 0.5:0.17 0.5:0.28 1.0:0.28"
               time-reset-steer="0.1" />
@@ -350,6 +348,7 @@
                     max-speed-reverse-ratio="0.75"/>
             <nitro engine-force="*0.8" max-speed-increase="*0.7" />
             <skid bonus-speed="*0.5 *0.5 *0.5" bonus-force="*0.5 *0.5 *0.5" />
+            <turn time-full-steer="0:0.25 0.5:0.25 0.5:0.42 1.0:0.42" />
             <plunger in-face-time="3" />
         </characteristic>
         <characteristic name="casual">
@@ -357,7 +356,8 @@
                     max-speed-reverse-ratio="0.675"/>
             <nitro engine-force="*0.83" max-speed-increase="*0.78" />
             <skid bonus-speed="*0.7 *0.7 *0.7" bonus-force="*0.7 *0.7 *0.7" />
-            <plunger in-face-time="4" />
+            <turn time-full-steer="0:0.21 0.5:0.21 0.5:0.35 1.0:0.35" />
+            <plunger in-face-time="3.5" />
         </characteristic>
         <characteristic name="medium">
             <engine power="*0.88" max-speed="*0.85" generic-max-speed="*0.85"
