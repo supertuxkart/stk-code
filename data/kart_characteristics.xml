@@ -244,7 +244,7 @@
                 kart-specific maximum kart speed.
             fade-out-time: determines how long it takes for a zipper
                 to fade out (after 'time'). -->
-        <zipper duration="3.5" force="250.0" speed-gain="4.5" max-speed-increase="15"
+        <zipper duration="3.5" force="300.0" speed-gain="4.0" max-speed-increase="15"
                 fade-out-time="1.0" />
 
         <!-- Swatter
@@ -346,6 +346,7 @@
         <characteristic name="easy">
             <engine power="*0.75" max-speed="*0.6" generic-max-speed="*0.6" 
                     max-speed-reverse-ratio="0.75"/>
+            <zipper max-speed-increase="*0.5" />
             <nitro engine-force="*0.8" max-speed-increase="*0.7" />
             <skid bonus-speed="*0.5 *0.5 *0.5" bonus-force="*0.5 *0.5 *0.5" />
             <turn time-full-steer="0:0.25 0.5:0.25 0.5:0.42 1.0:0.42" />
@@ -354,6 +355,7 @@
         <characteristic name="casual">
             <engine power="*0.82" max-speed="*0.75" generic-max-speed="*0.75"
                     max-speed-reverse-ratio="0.675"/>
+            <zipper max-speed-increase="*0.8" />
             <nitro engine-force="*0.83" max-speed-increase="*0.78" />
             <skid bonus-speed="*0.7 *0.7 *0.7" bonus-force="*0.7 *0.7 *0.7" />
             <turn time-full-steer="0:0.21 0.5:0.21 0.5:0.35 1.0:0.35" />

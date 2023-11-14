@@ -1716,8 +1716,14 @@ void Kart::update(int ticks)
         }
         else
         {
+            // If a zipper boost (from the zipper item, texture or a startup boost)
+            // is active, reduce the texture penalty by half
+            float terrain_speed_fraction = material->getMaxSpeedFraction();;
+            if (m_max_speed->isSpeedIncreaseActive(MaxSpeed::MS_INCREASE_ZIPPER) > 0)
+                terrain_speed_fraction += (1.0f - terrain_speed_fraction)*0.5f;
+            
             m_max_speed->setSlowdown(MaxSpeed::MS_DECREASE_TERRAIN,
-                                     material->getMaxSpeedFraction(),
+                                     terrain_speed_fraction,
                                      material->getSlowDownTicks()    );
 #ifdef DEBUG
             if(UserConfigParams::m_material_debug)
@@ -2614,8 +2620,8 @@ void Kart::updatePhysics(int ticks)
             m_max_speed->instantSpeedIncrease(MaxSpeed::MS_INCREASE_ZIPPER,
                 0.9f * m_startup_boost, m_startup_boost,
                 /*engine_force*/200.0f,
-                /*duration*/stk_config->time2Ticks(5.0f),
-                /*fade_out_time*/stk_config->time2Ticks(5.0f));
+                /*duration*/stk_config->time2Ticks(4.0f),
+                /*fade_out_time*/stk_config->time2Ticks(2.0f));
         }
     }
     if (m_bounce_back_ticks > 0)
