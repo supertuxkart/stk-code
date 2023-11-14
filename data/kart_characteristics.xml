@@ -234,7 +234,7 @@
             fade-in-time: How quick the slowdown takes effect.
             shield-duration: How long the bubblegum shield lasts -->
         <bubblegum duration="1" speed-fraction="0.3" torque="500" fade-in-time="0.01"
-                   shield-duration="10.0" />
+                   shield-duration="8.0" />
 
         <!-- Zipper
             duration: Time a zipper is active.
