@@ -85,6 +85,8 @@ void Cake::onFireFlyable()
     btQuaternion q = m_owner->getTrans().getRotation();
     gravity_vector = Vec3(0, -1, 0).rotate(q.getAxis(), q.getAngle());
     gravity_vector = gravity_vector.normalize() * m_gravity;
+    const bool  backwards = m_owner->getControls().getLookBack();
+
     // A bit of a hack: the mass of this kinematic object is still 1.0
     // (see flyable), which enables collisions. I tried setting
     // collisionFilterGroup/mask, but still couldn't get this object to
@@ -93,17 +95,11 @@ void Cake::onFireFlyable()
     // time a homing-track collision happens).
     float forward_offset=m_owner->getKartLength()/2.0f + m_extend.getZ()/2.0f;
 
-    float up_velocity = m_speed/7.0f;
+    float up_velocity = m_speed/6.3f;
 
-    // give a speed proportional to kart speed. m_speed is defined in flyable
-    m_speed *= m_owner->getSpeed() / 23.0f;
-
-    //when going backwards, decrease speed of cake by less
-    if (m_owner->getSpeed() < 0) m_speed /= 3.6f;
-
-    m_speed += 16.0f;
-
-    if (m_speed < 1.0f) m_speed = 1.0f;
+    // Adds the speed of the kart owning the cake. m_speed is defined in flyable
+    m_speed += (backwards ? -m_owner->getSpeed()
+                          :  m_owner->getSpeed());
 
     btTransform trans = m_owner->getTrans();
 
@@ -111,7 +107,6 @@ void Cake::onFireFlyable()
     float pitch = m_owner->getTerrainPitch(heading);
 
     // Find closest kart in front of the current one
-    const bool  backwards = m_owner->getControls().getLookBack();
     const AbstractKart *closest_kart=NULL;
     Vec3        direction;
     float       kart_dist_squared;
@@ -124,8 +119,8 @@ void Cake::onFireFlyable()
     // this code finds the correct angle and upwards velocity to hit an opponents'
     // vehicle if they were to continue travelling in the same direction and same speed
     // (barring any obstacles in the way of course)
-    if(closest_kart != NULL && kart_dist_squared < m_st_max_distance_squared &&
-        m_speed>closest_kart->getSpeed())
+
+    if(closest_kart != NULL && kart_dist_squared < m_st_max_distance_squared)
     {
         m_target = (AbstractKart*)closest_kart;
 

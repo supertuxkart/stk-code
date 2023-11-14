@@ -7,10 +7,13 @@
         force-updown="1"      force-to-target="40"
         max-distance="25"                               />
   <item name="bubblegum"      icon="bubblegum-icon.png" />
+  <!-- The max distance for a target lookup in flyable.cpp
+       is set at 50, but karts that far are very difficult
+       to see and very unlikely to touch -->
   <item name="cake"           icon="cake-icon.png"
-        model="cake.spm"      speed="50"
+        model="cake.spm"      speed="45"
         min-height="0.2"      max-height="1.0"
-        force-updown="25"     max-distance="90"         />
+        force-updown="25"     max-distance="50"         />
   <item name="anchor"         icon="anchor-icon.png"
         model="anchor.spm"                              />
   <item name="switch"         icon="swap-icon.png"      />
