@@ -126,16 +126,15 @@ private:
     std::map<std::string, std::vector<WeightsData*> > m_all_weights;
 
 public:
-    // The anvil and parachute must be at the end of the enum, and the
-    // zipper just before them (see Powerup::hitBonusBox).
     enum PowerupType {POWERUP_NOTHING,
                       POWERUP_FIRST,
                       POWERUP_BUBBLEGUM = POWERUP_FIRST,
                       POWERUP_CAKE,
                       POWERUP_BOWLING, POWERUP_ZIPPER, POWERUP_PLUNGER,
-                      POWERUP_SWITCH, POWERUP_SWATTER, POWERUP_RUBBERBALL,
-                      POWERUP_PARACHUTE,
-                      POWERUP_ANVIL,      //powerup.cpp assumes these two come last
+                      POWERUP_SWITCH, POWERUP_SWATTER,
+                      POWERUP_RUBBERBALL, POWERUP_PARACHUTE,
+                      POWERUP_SUDO, POWERUP_ELECTRO,
+                      POWERUP_ANVIL,
                       POWERUP_LAST=POWERUP_ANVIL,
                       POWERUP_MAX
     };

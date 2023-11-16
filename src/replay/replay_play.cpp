@@ -433,6 +433,7 @@ void ReplayPlay::readKartData(FILE *fd, char *next_line, bool second_replay)
                 kre.m_zipper_usage        = zipper!=0;
                 kre.m_skidding_effect     = skidding;
                 kre.m_red_skidding        = red_skidding!=0;
+                kre.m_purple_skidding     = 0;    //not saved in version 3 replays
                 kre.m_jumping             = jumping != 0;
                 m_ghost_karts[kart_num]->addReplayEvent(time,
                     btTransform(q, xyz), pi, bi, kre);
@@ -482,6 +483,7 @@ void ReplayPlay::readKartData(FILE *fd, char *next_line, bool second_replay)
                 kre.m_zipper_usage        = zipper!=0;
                 kre.m_skidding_effect     = skidding;
                 kre.m_red_skidding        = red_skidding!=0;
+                kre.m_purple_skidding     = 0; //not saved in version 4 replays
                 kre.m_jumping             = jumping != 0;
                 m_ghost_karts[kart_num]->addReplayEvent(time,
                     btTransform(q, xyz), pi, bi, kre);

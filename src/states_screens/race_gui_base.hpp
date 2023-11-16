@@ -188,6 +188,14 @@ protected:
     video::ITexture *m_gauge_full;
     /** Highlight gauge, used when a kart uses nitro. */
     video::ITexture *m_gauge_full_bright;
+    /** Texture for nitro gauge with a nitro-hack activated. */
+    video::ITexture *m_gauge_full_hack;
+    /** Highlight gauge, used when a kart uses nitro
+     * while the nitro-hack is activated. */
+    video::ITexture *m_gauge_full_hack_bright;
+    /** Used when the nitro amount is negative,
+     * or to highlight nitro that just got stolen. */
+    video::ITexture *m_gauge_negative;
 
     video::ITexture *m_gauge_goal;
 

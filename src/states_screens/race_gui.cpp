@@ -787,8 +787,18 @@ void RaceGUI::drawEnergyMeter(int x, int y, const AbstractKart *kart,
 
     float state = (float)(kart->getEnergy())
                 / kart->getKartProperties()->getNitroMax();
-    if (state < 0.0f) state = 0.0f;
-    else if (state > 1.0f) state = 1.0f;
+    bool negative_nitro = false;
+    float stolen_nitro = kart->getStolenNitro() / kart->getKartProperties()->getNitroMax();
+    assert (stolen_nitro >= 0.0f);
+    float full_state = state + stolen_nitro;
+
+    if (state < 0.0f)
+    {
+        state = -state;
+        negative_nitro = true;
+    }
+    if (state > 1.0f)
+        state = 1.0f;
 
     core::vector2df offset;
     offset.X = (float)(x-gauge_width) - 9.5f*scaling.X;
@@ -832,8 +842,15 @@ void RaceGUI::drawEnergyMeter(int x, int y, const AbstractKart *kart,
     position[8].X = 0.94f;//G2 (margin for gauge goal)
     position[8].Y = 0.17f;//G2
 
-    // The states at which different polygons must be used.
+    core::vector2df negative_position[vertices_count];
+    negative_position[0] = position[0];
+    for (int i=1; i<vertices_count;i++)
+    {
+        negative_position[i] = position[vertices_count-i];
+    }
 
+    // The states at which different polygons must be used.
+    // We use the same threshold for position and negative_positions
     float threshold[vertices_count-2];
     threshold[0] = 0.0001f; //for gauge drawing
     threshold[1] = 0.2f;
@@ -845,27 +862,95 @@ void RaceGUI::drawEnergyMeter(int x, int y, const AbstractKart *kart,
 
     // Filling (current state)
 
-    if (state > 0.0f)
+    if (state > 0.0f || kart->hasStolenNitro())
     {
         video::S3DVertex vertices[vertices_count];
+
+        unsigned int count;
 
         //3D effect : wait for the full border to appear before drawing
         for (int i=0;i<5;i++)
         {
+            if ((full_state-0.2f*i < 0.006f && full_state-0.2f*i >= 0.0f) || (0.2f*i-full_state < 0.003f && 0.2f*i-full_state >= 0.0f) )
+            {
+                full_state = 0.2f*i-0.003f;
+            }
             if ((state-0.2f*i < 0.006f && state-0.2f*i >= 0.0f) || (0.2f*i-state < 0.003f && 0.2f*i-state >= 0.0f) )
             {
                 state = 0.2f*i-0.003f;
-                break;
             }
         }
 
-        unsigned int count = computeVerticesForMeter(position, threshold, vertices, vertices_count,
+        if (negative_nitro)
+        {
+            count = computeVerticesForMeter(negative_position, threshold, vertices, vertices_count,
                                                      state, gauge_width, gauge_height, offset);
-
-        if(kart->getControls().getNitro() || kart->isOnMinNitroTime())
-            drawMeterTexture(m_gauge_full_bright, vertices, count, true);
+            drawMeterTexture(m_gauge_negative, vertices, count, true);
+        }
         else
-            drawMeterTexture(m_gauge_full, vertices, count, true);
+        {
+            count = computeVerticesForMeter(position, threshold, vertices, vertices_count,
+                                                     state, gauge_width, gauge_height, offset);
+  
+            if(kart->isNitroHackActive())
+            {
+                if(kart->getControls().getNitro() || kart->isOnMinNitroTime())
+                    drawMeterTexture(m_gauge_full_hack_bright, vertices, count, true);
+                else
+                    drawMeterTexture(m_gauge_full_hack, vertices, count, true);
+            }
+            else
+            {
+                if(kart->getControls().getNitro() || kart->isOnMinNitroTime())
+                    drawMeterTexture(m_gauge_full_bright, vertices, count, true);
+                else
+                    drawMeterTexture(m_gauge_full, vertices, count, true);
+            }
+        }
+
+        // If some nitro was stolen from the kart, display the stolen amount
+        // If the amount of nitro we had before the steal was already negative,
+        // (case full_state <= 0.0f), there is nothing to do
+        if (kart->hasStolenNitro() && full_state > 0.0f)
+        {
+            unsigned int count_temp, count_final;
+            // We still have some nitro left
+            if (!negative_nitro && count > 0)
+            {
+                // The variable vertice is the one stored at index [1]
+                // TODO : Clean up documentation, the explanations of computeVerticesForMeter
+                //        give the wrong impression that the variable vertice is stored last
+                video::S3DVertex variable_vertice = vertices[1];
+
+                count_temp = computeVerticesForMeter(position, threshold, vertices, vertices_count,
+                                                              full_state, gauge_width, gauge_height, offset);
+
+                // Consider a case where the count is 4 with vertices A, B, C, D,
+                // and count_temp is 5 with vertices A, B, C, D', E
+                // We want to trace the gauge using vertices A, D, D', E
+                // The count of required vertices will hence follow the formula below
+                // In theory count_final is an unnecessary variable but it's easier to reason with
+                assert(count <= count_temp);
+                count_final = count_temp - count + 3;
+
+                // The first vertice is always the same, the second use the saved vertice
+                vertices[1] = variable_vertice;
+
+                // Loop over the new vertices
+                for (unsigned int i=2;i<count_final;i++)
+                {
+                    vertices[i] = vertices[count+i-3];
+                }
+            }
+            // We have gone into negative nitro or the remaining amount of nitro is negligible (case count == 0)
+            else
+            {
+                count_final = computeVerticesForMeter(position, threshold, vertices, vertices_count,
+                                                      full_state, gauge_width, gauge_height, offset);
+            }
+
+            drawMeterTexture(m_gauge_negative, vertices, count_final, true);
+        }
     }
 
     // Target

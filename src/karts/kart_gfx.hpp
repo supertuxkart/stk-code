@@ -47,6 +47,8 @@ public:
      *  is the number of entries and must therefore be last. */
     enum KartGFXType { KGFX_NITRO1=0,
                        KGFX_NITRO2,
+                       KGFX_NITROHACK1,
+                       KGFX_NITROHACK2,
                        KGFX_NITROSMOKE1,
                        KGFX_NITROSMOKE2,
                        KGFX_ZIPPER,
@@ -94,6 +96,9 @@ private:
     /** A light that's shown when the kart uses nitro. */
     irr::scene::ISceneNode* m_nitro_light;
 
+    /** A light that's shown when the kart uses nitro with "nitro-hack" on. */
+    irr::scene::ISceneNode* m_nitro_hack_light;
+
     /** Light that is shown when the kart is skidding. */
     irr::scene::ISceneNode* m_skidding_light_1;
 
@@ -118,7 +123,7 @@ public:
     void setCreationRateRelative(const KartGFXType type, float f);
     void updateTerrain(const ParticleKind *pk);
     void update(float dt);
-    void updateNitroGraphics(float f);
+    void updateNitroGraphics(float f, bool isNitroHackOn);
     void updateSkidLight(unsigned int level);
     void getGFXStatus(int* nitro, bool* zipper,
                       int* skidding, bool* red_skidding, bool* purple_skidding) const;

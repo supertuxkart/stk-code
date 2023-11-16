@@ -63,8 +63,9 @@ public:
     virtual void  reset              () = 0;
     virtual void  update             (int ticks) = 0;
     virtual void  handleZipper       (bool play_sound) = 0;
+    // This function is only used by the local controller to play sounds
     virtual void  collectedItem      (const ItemState &item,
-                                      float previous_energy=0) = 0;
+                                      float previous_energy=0) { };
     virtual void  crashed            (const AbstractKart *k) = 0;
     virtual void  crashed            (const Material *m) = 0;
     virtual void  setPosition        (int p) = 0;

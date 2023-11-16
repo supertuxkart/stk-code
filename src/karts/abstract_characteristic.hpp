@@ -189,6 +189,10 @@ public:
         NITRO_FADE_OUT_TIME,
         NITRO_MAX,
 
+        // Nitrohack
+        NITROHACK_DURATION,
+        NITROHACK_FACTOR,
+
         // Slipstream
         SLIPSTREAM_DURATION_FACTOR,
         SLIPSTREAM_BASE_SPEED,
@@ -355,6 +359,9 @@ public:
     float getNitroMaxSpeedIncrease() const;
     float getNitroFadeOutTime() const;
     float getNitroMax() const;
+
+    float getNitrohackDuration() const;
+    float getNitrohackFactor() const;
 
     float getSlipstreamDurationFactor() const;
     float getSlipstreamBaseSpeed() const;

@@ -1198,6 +1198,19 @@ float KartProperties::getNitroMax() const
 }  // getNitroMax
 
 // ----------------------------------------------------------------------------
+float KartProperties::getNitrohackDuration() const
+{
+    return m_cached_characteristic->getNitrohackDuration();
+}  // getNitrohackDuration
+
+
+// ----------------------------------------------------------------------------
+float KartProperties::getNitrohackFactor() const
+{
+    return m_cached_characteristic->getNitrohackFactor();
+}  // getNitrohackFactor
+
+// ----------------------------------------------------------------------------
 float KartProperties::getSlipstreamDurationFactor() const
 {
     return m_cached_characteristic->getSlipstreamDurationFactor();

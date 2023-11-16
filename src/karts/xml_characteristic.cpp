@@ -553,6 +553,14 @@ void XmlCharacteristic::load(const XMLNode *node)
             &m_values[NITRO_MAX]);
     }
 
+    if (const XMLNode *sub_node = node->getNode("nitro-hack"))
+    {
+        sub_node->get("duration",
+            &m_values[NITROHACK_DURATION]);
+        sub_node->get("factor",
+            &m_values[NITROHACK_FACTOR]);
+    }
+
     if (const XMLNode *sub_node = node->getNode("slipstream"))
     {
         sub_node->get("duration-factor",

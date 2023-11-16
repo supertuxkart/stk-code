@@ -230,6 +230,17 @@ protected:
 
     float         m_energy_to_min_ratio;
 
+    /** If > 0 then nitro-hack effect is on. */
+    int16_t       m_nitro_hack_ticks;
+
+    /** The bonus factor for nitro use **/
+    float         m_nitro_hack_factor;
+
+    /** Used to display stolen nitro in the UI **/
+    int16_t       m_stolen_nitro_ticks;
+
+    float         m_stolen_nitro_amount;
+
     float           m_startup_boost;
 
     float           m_falling_time;
@@ -308,6 +319,11 @@ public:
 
     virtual void   startEngineSFX   () OVERRIDE;
     virtual void  collectedItem(ItemState *item) OVERRIDE;
+    virtual void  activateNitroHack() OVERRIDE;
+    virtual bool  isNitroHackActive() const OVERRIDE { return m_nitro_hack_ticks > 0; }
+    virtual void  setStolenNitro(float amount, float duration) OVERRIDE;
+    virtual bool  hasStolenNitro() const OVERRIDE { return m_stolen_nitro_ticks > 0; }
+    virtual float getStolenNitro() const OVERRIDE { return m_stolen_nitro_amount; }
     virtual float getStartupBoostFromStartTicks(int ticks) const OVERRIDE;
     virtual float getStartupBoost() const OVERRIDE  { return m_startup_boost; }
     virtual void setStartupBoost(float val) OVERRIDE { m_startup_boost = val; }
@@ -397,6 +413,9 @@ public:
     // ----------------------------------------------------------------------------------------
     /** Returns the remaining collected energy. */
     virtual float getEnergy() const OVERRIDE { return m_collected_energy; }
+    // ----------------------------------------------------------------------------------------
+    /** Allows to add nitro while enforcing max nitro storage. */
+    virtual void addEnergy(float val, bool allow_negative);
     // ----------------------------------------------------------------------------------------
     /** Sets the energy the kart has collected. */
     virtual void setEnergy(float val) OVERRIDE { m_collected_energy = val; }

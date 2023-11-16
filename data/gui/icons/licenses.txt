@@ -194,8 +194,16 @@ Files:
  speed*.png
  gauge*.png
  ghost_plus.png
+ sudo_nitro.png
 Copyright: Alayan
 License: CC0
+
+Files:
+ sudo_nitro.png
+Copyright: Alayan
+License: CC0
+Comment:
+ The nitro-icon is by Semphris
 
 Files:
  options_language.png

@@ -132,6 +132,10 @@ Kart::Kart (const std::string& ident, unsigned int world_kart_id,
     m_saved_controller     = NULL;
     m_consumption_per_tick = stk_config->ticks2Time(1) *
                              m_kart_properties->getNitroConsumption();
+    m_nitro_hack_ticks     = 0;
+    m_nitro_hack_factor    = 1.0f;
+    m_stolen_nitro_ticks   = 0;
+    m_stolen_nitro_amount  = 0.0f;
     m_fire_clicked         = 0;
     m_default_suspension_force = 0.0f;
     m_boosted_ai           = false;
@@ -330,6 +334,10 @@ void Kart::reset()
     m_energy_to_min_ratio = 0;
     m_consumption_per_tick = stk_config->ticks2Time(1) *
                              m_kart_properties->getNitroConsumption();
+    m_nitro_hack_ticks = 0;
+    m_nitro_hack_factor = 1.0f;
+    m_stolen_nitro_ticks   = 0;
+    m_stolen_nitro_amount  = 0.0f;
 
     // Reset star effect in case that it is currently being shown.
     if (m_stars_effect)
@@ -1180,6 +1188,8 @@ void Kart::collectedItem(ItemState *item_state)
 
     if ( m_collected_energy > m_kart_properties->getNitroMax())
         m_collected_energy = m_kart_properties->getNitroMax();
+
+    // Play sound effects if the kart is controlled by a local player
     m_controller->collectedItem(*item_state, old_energy);
 
 }   // collectedItem
@@ -2238,13 +2248,73 @@ void Kart::handleZipper(const Material *material, bool play_sound)
 
 }   // handleZipper
 
+/** Allows to add nitro while enforcing max nitro storage. */
+void Kart::addEnergy(float val, bool allow_negative = false)
+{
+    // Negative nitro is allowed in general, but this specific
+    // change to the nitro level is not allowed to make it negative
+    // or more negative
+    if (!allow_negative && val < 0 && m_collected_energy > 0)
+    {
+        if (-val > m_collected_energy)
+            m_collected_energy = 0;
+        else
+            m_collected_energy += val;
+    }
+    else
+    {
+        m_collected_energy += val;
+    }
+
+    // Max nitro is always enforced no matter what
+    if (m_collected_energy > m_kart_properties->getNitroMax())
+        m_collected_energy = m_kart_properties->getNitroMax();
+}
+
+//-----------------------------------------------------------------------------
+/** Called when the NitroHack powerup is used by the kart. **/
+void Kart::activateNitroHack()
+{
+    m_nitro_hack_ticks = stk_config->time2Ticks(m_kart_properties->getNitrohackDuration());
+    m_nitro_hack_factor = m_kart_properties->getNitrohackFactor();
+}   // activateNitroHack
+
+//-----------------------------------------------------------------------------
+/** Called when the NitroHack powerup targets this kart. **/
+void Kart::setStolenNitro(float amount, float duration)
+{
+    // If a second steal happens while the first one is displayed,
+    // display both until the expiration of the second one.
+    m_stolen_nitro_amount += amount;
+    m_stolen_nitro_ticks = stk_config->time2Ticks(duration);
+}   // setStolenNitro
+
 // -----------------------------------------------------------------------------
 /** Updates the current nitro status.
  *  \param ticks Number of physics time steps - should be 1.
  */
 void Kart::updateNitro(int ticks)
 {
-    if (m_collected_energy == 0)
+    if (m_stolen_nitro_ticks > 0)
+        m_stolen_nitro_ticks -= ticks;
+    if (m_nitro_hack_ticks > 0)
+        m_nitro_hack_ticks -= ticks;
+
+    // Reset the stolen nitro amount when the display duration expires
+    if (m_stolen_nitro_ticks <= 0)
+    {
+        m_stolen_nitro_ticks = 0;
+        m_stolen_nitro_amount = 0.0f;
+    }
+
+    // Reset the nitro multiplier when the nitro-hack expires
+    if (m_nitro_hack_ticks <= 0)
+    {
+        m_nitro_hack_ticks = 0;
+        m_nitro_hack_factor = 1.0f;
+    }
+
+    if (m_collected_energy <= 0)
         m_min_nitro_ticks = 0;
 
     if (m_controls.getNitro() && m_min_nitro_ticks <= 0 && m_collected_energy > 0)
@@ -2274,13 +2344,17 @@ void Kart::updateNitro(int ticks)
         return;
     }
 
-
+    float previous_energy = m_collected_energy;
     m_collected_energy -= m_consumption_per_tick*ticks;
-    if (m_collected_energy < 0)
+
+    // We don't allow nitro to go into the negative
+    // as a result of normal nitro usage.
+    // It can happen as a result of the Nitro-Hack powerup, however.
+    if (previous_energy >= 0 && m_collected_energy < 0)
     {
+        m_collected_energy = 0;
         if(m_nitro_sound->getStatus() == SFXBase::SFX_PLAYING && !rewinding)
             m_nitro_sound->stop();
-        m_collected_energy = 0;
         return;
     }
 
@@ -2290,8 +2364,8 @@ void Kart::updateNitro(int ticks)
             m_nitro_sound->play();
 
         m_max_speed->increaseMaxSpeed(MaxSpeed::MS_INCREASE_NITRO,
-            m_kart_properties->getNitroMaxSpeedIncrease(),
-            m_kart_properties->getNitroEngineForce(),
+            m_kart_properties->getNitroMaxSpeedIncrease()*m_nitro_hack_factor,
+            m_kart_properties->getNitroEngineForce()*m_nitro_hack_factor,
             stk_config->time2Ticks(m_kart_properties->getNitroDuration()*m_energy_to_min_ratio),
             stk_config->time2Ticks(m_kart_properties->getNitroFadeOutTime()));
     }
@@ -3306,7 +3380,7 @@ void Kart::updateGraphics(float dt)
         // the normal maximum speed of the kart.
         if(nitro_frac>1.0f) nitro_frac = 1.0f;
     }
-    m_kart_gfx->updateNitroGraphics(nitro_frac);
+    m_kart_gfx->updateNitroGraphics(nitro_frac, m_nitro_hack_ticks > 0);
 
     // Handle leaning of karts
     // -----------------------

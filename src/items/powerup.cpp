@@ -168,6 +168,15 @@ void Powerup::set(PowerupManager::PowerupType type, int n)
         case PowerupManager::POWERUP_ZIPPER:
             break ;
 
+        // TODO : add sound effects
+        case PowerupManager::POWERUP_SUDO:
+            m_sound_use = SFXManager::get()->createSoundSource("sudo_bad");
+            break ;
+
+        // TODO : add sound effects
+        case PowerupManager::POWERUP_ELECTRO:
+            break ;
+
         case PowerupManager::POWERUP_BOWLING:
             m_sound_use = SFXManager::get()->createSoundSource("bowling_shoot");
             break ;
@@ -293,10 +302,7 @@ void Powerup::use()
         {
             im->switchItems();
             if (!has_played_sound)
-            {
-                m_sound_use->setPosition(m_kart->getXYZ());
                 m_sound_use->play();
-            }
             break;
         }
     case PowerupManager::POWERUP_CAKE:
@@ -311,13 +317,69 @@ void Powerup::use()
             m_sound_use->play();
         }
         ProjectileManager::get()->newProjectile(m_kart, m_type);
-        break ;
+        break;
 
     case PowerupManager::POWERUP_SWATTER:
         m_kart->getAttachment()
                 ->set(Attachment::ATTACH_SWATTER,
                       stk_config->time2Ticks(kp->getSwatterDuration()));
         break;
+
+    case PowerupManager::POWERUP_SUDO:
+        {
+            AbstractKart* player_kart = NULL;
+
+            float stolen_energy = 0.0f;
+
+            // Steal some nitro from the five karts ahead.
+            // This can set their nitro count to a negative number
+            for(unsigned int i = 0 ; i < world->getNumKarts(); ++i)
+            {
+                AbstractKart *kart=world->getKart(i);
+                // Standard invulnerability (the "stars") is not useful here
+                if( kart->isEliminated()   || kart== m_kart || kart->hasFinishedRace())
+                    continue;
+                if(m_kart->getPosition() >  kart->getPosition() &&
+                m_kart->getPosition() <= kart->getPosition() + 5)
+                {
+                    float amount_to_steal = 1.25f;
+                    // Remove nitro from a target kart and add to the recipient
+                    kart->addEnergy(-amount_to_steal, /* allow negatives */ true);
+                    stolen_energy += amount_to_steal;
+                    // This is used for display in the race GUI
+                    kart->setStolenNitro(amount_to_steal, /* duration */ 1.75f);
+
+                    // Remember if the target kart is player controlled
+                    // for a negative sound effects (TODO)
+                    if(kart->getController()->isLocalPlayerController())
+                        player_kart = kart;
+                }
+            }
+
+            // Gift one additional small nitro on top of the stolen energy
+            // and activate the "nitro boost" mode
+            // TODO make the gift of nitro depend on kart class/ nitro efficiency ??
+            m_kart->addEnergy(stolen_energy + 1.5f, /* allow negatives */ false);
+            m_kart->activateNitroHack();
+
+            // Play a good sound for the kart that benefits from the "nitro-hack",
+            // if it's a local player
+            if (!has_played_sound && m_kart->getController()->isLocalPlayerController())
+            {
+                //Extraordinary. Usually sounds are set in Powerup::set()
+                m_sound_use = SFXManager::get()->createSoundSource("sudo_good");
+                //In this case this is a workaround, since the sudo item has two different sounds
+
+                m_sound_use->play();
+            }
+            // Play a bad sound if the affected kart (but not the user) is a local player
+            else if (!has_played_sound && player_kart != NULL)
+            {
+                m_sound_use->play();
+            }
+
+            break;
+        }   // end of PowerupManager::POWERUP_SUDO
 
     case PowerupManager::POWERUP_BUBBLEGUM:
         // use the bubble gum the traditional way, if the kart is looking back
@@ -500,7 +562,7 @@ void Powerup::use()
 }   // use
 
 //-----------------------------------------------------------------------------
-/** This function is called when a bnous box is it. This function can be
+/** This function is called when a bonus box is it. This function can be
  *  called on a server (in which case item and add_info are not used),
  *  or on a client, in which case the item and additional info is used
  *  to make sure server and clients are synched correctly.
@@ -555,11 +617,11 @@ void Powerup::hitBonusBox(const ItemState &item_state)
     // is divided by 10, meaning even if there is one frame difference,
     // the client will still have a 90% chance to correctly predict the
     // item. We multiply the item with a 'large' (more or less random)
-    // number to spread the random values across the (typically 200)
+    // number to spread the random values across the (typically 1000)
     // weights used in the PowerupManager - same for the position.
     uint64_t random_number = item_state.getItemId() * 31 +
-        world->getTicksSinceStart() / 10 + position * 23 +
-        powerup_manager->getRandomSeed();
+        world->getTicksSinceStart() / stk_config->time2Ticks(0.083334f) +
+        position * 23 + powerup_manager->getRandomSeed();
 
     // Use this random number as a seed of a PRNG (based on the one in 
     // bullet's btSequentialImpulseConstraintSolver) to avoid getting

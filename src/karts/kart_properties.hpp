@@ -494,6 +494,9 @@ public:
     float getNitroFadeOutTime() const;
     float getNitroMax() const;
 
+    float getNitrohackDuration() const;
+    float getNitrohackFactor() const;
+
     float getSlipstreamDurationFactor() const;
     float getSlipstreamBaseSpeed() const;
     float getSlipstreamLength() const;

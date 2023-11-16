@@ -41,6 +41,7 @@
 KartGFX::KartGFX(const AbstractKart *kart, bool is_day)
 {
     m_nitro_light = NULL;
+    m_nitro_hack_light = NULL;
     m_skidding_light_1 = NULL;
     m_skidding_light_2 = NULL;
     m_skidding_light_3 = NULL;
@@ -61,8 +62,15 @@ KartGFX::KartGFX(const AbstractKart *kart, bool is_day)
                                              /*radius*/ 5.0f, 0.0f, 0.4f, 1.0f,
                                              false, node);
         m_nitro_light->setVisible(false);
+
+        m_nitro_hack_light = irr_driver->addLight(location, /*force*/ 0.4f,
+                                             /*radius*/ 5.0f, 0.1f, 1.0f, 0.1f,
+                                             false, node);
+        m_nitro_hack_light->setVisible(false);
 #ifdef DEBUG
         m_nitro_light->setName( ("nitro emitter (" + m_kart->getIdent()
+                                                   + ")").c_str() );
+        m_nitro_hack_light->setName( ("nitro-hack emitter (" + m_kart->getIdent()
                                                    + ")").c_str() );
 #endif
 
@@ -95,6 +103,7 @@ KartGFX::KartGFX(const AbstractKart *kart, bool is_day)
                                                             + ")").c_str() );
 
         m_nitro_light->grab();
+        m_nitro_hack_light->grab();
         m_skidding_light_1->grab();
         m_skidding_light_2->grab();
         m_skidding_light_3->grab();
@@ -122,6 +131,8 @@ KartGFX::KartGFX(const AbstractKart *kart, bool is_day)
     // in the order of KartGFXType.
     addEffect(KGFX_NITRO1,      "nitro.xml",       rear_nitro_right, true );
     addEffect(KGFX_NITRO2,      "nitro.xml",       rear_nitro_left,  true );
+    addEffect(KGFX_NITROHACK1,  "nitro-hack.xml",  rear_nitro_right, true );
+    addEffect(KGFX_NITROHACK2,  "nitro-hack.xml",  rear_nitro_left,  true );
     addEffect(KGFX_NITROSMOKE1, "nitro-smoke.xml", rear_nitro_left,  false);
     addEffect(KGFX_NITROSMOKE2, "nitro-smoke.xml", rear_nitro_right, false);
     addEffect(KGFX_ZIPPER,      "zipper_fire.xml", rear_center,      true );
@@ -163,6 +174,7 @@ KartGFX::~KartGFX()
     if (!GUIEngine::isNoGraphics() && CVS->isGLSL())
     {
         m_nitro_light->drop();
+        m_nitro_hack_light->drop();
         m_skidding_light_1->drop();
         m_skidding_light_2->drop();
         m_skidding_light_3->drop();
@@ -476,7 +488,7 @@ void KartGFX::update(float dt)
 /** Updates nitro dependent particle effects.
  *  \param nitro_frac Nitro fraction/
  */
-void KartGFX::updateNitroGraphics(float nitro_frac)
+void KartGFX::updateNitroGraphics(float nitro_frac, bool isNitroHackOn)
 {
 #ifndef SERVER_ONLY
     if (GUIEngine::isNoGraphics())
@@ -487,23 +499,47 @@ void KartGFX::updateNitroGraphics(float nitro_frac)
     // --------------------------------------------------------
     if (nitro_frac > 0)
     {
-        setCreationRateRelative(KartGFX::KGFX_NITRO1, nitro_frac);
-        setCreationRateRelative(KartGFX::KGFX_NITRO2, nitro_frac);
+        if(isNitroHackOn)
+        {
+            setCreationRateAbsolute(KartGFX::KGFX_NITRO1,      0);
+            setCreationRateAbsolute(KartGFX::KGFX_NITRO2,      0);
+            setCreationRateRelative(KartGFX::KGFX_NITROHACK1, nitro_frac);
+            setCreationRateRelative(KartGFX::KGFX_NITROHACK2, nitro_frac);
+            if (CVS->isGLSL())
+            {
+                m_nitro_light->setVisible(false);
+                m_nitro_hack_light->setVisible(true);
+            }
+        }
+        else
+        {
+            setCreationRateRelative(KartGFX::KGFX_NITRO1, nitro_frac);
+            setCreationRateRelative(KartGFX::KGFX_NITRO2, nitro_frac);
+            setCreationRateAbsolute(KartGFX::KGFX_NITROHACK1,  0);
+            setCreationRateAbsolute(KartGFX::KGFX_NITROHACK2,  0);
+            if (CVS->isGLSL())
+            {
+                m_nitro_light->setVisible(true);
+                m_nitro_hack_light->setVisible(false);
+            }
+        }
         setCreationRateRelative(KartGFX::KGFX_NITROSMOKE1, nitro_frac);
         setCreationRateRelative(KartGFX::KGFX_NITROSMOKE2, nitro_frac);
-        
-        if (CVS->isGLSL())
-            m_nitro_light->setVisible(true);
     }
     else
     {
         setCreationRateAbsolute(KartGFX::KGFX_NITRO1,      0);
         setCreationRateAbsolute(KartGFX::KGFX_NITRO2,      0);
+        setCreationRateAbsolute(KartGFX::KGFX_NITROHACK1,  0);
+        setCreationRateAbsolute(KartGFX::KGFX_NITROHACK2,  0);
         setCreationRateAbsolute(KartGFX::KGFX_NITROSMOKE1, 0);
         setCreationRateAbsolute(KartGFX::KGFX_NITROSMOKE2, 0);
         
         if (CVS->isGLSL())
+        {
             m_nitro_light->setVisible(false);
+            m_nitro_hack_light->setVisible(false);
+        }
     }
     
     // Exhaust is always emitting
@@ -643,6 +679,7 @@ void KartGFX::setGFXInvisible()
     if (!GUIEngine::isNoGraphics() && CVS->isGLSL())
     {
         m_nitro_light->setVisible(false);
+        m_nitro_hack_light->setVisible(false);
         m_skidding_light_1->setVisible(false);
         m_skidding_light_2->setVisible(false);
         m_skidding_light_3->setVisible(false);

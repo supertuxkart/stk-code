@@ -317,6 +317,11 @@
                small-container="1" big-container="2.5"
                max-speed-increase="5" duration="0.8" fade-out-time="2.0" max="20" />
 
+        <!-- Nitro-hack
+            duration: Time a nitro-hack is active.
+            factor: Multiplicative factor for the engine and max-speed boosts of nitro -->
+        <nitro-hack duration="8.0" factor="1.8" />
+
         <!-- Slipstream
             base-speed: the speed for which length and width are valid.
                 They are upscaled when faster and downscaled when slower.
@@ -355,7 +360,7 @@
         <characteristic name="casual">
             <engine power="*0.82" max-speed="*0.75" generic-max-speed="*0.75"
                     max-speed-reverse-ratio="0.675"/>
-            <zipper max-speed-increase="*0.8" />
+            <zipper max-speed-increase="*0.75" />
             <nitro engine-force="*0.83" max-speed-increase="*0.78" />
             <skid bonus-speed="*0.7 *0.7 *0.7" bonus-force="*0.7 *0.7 *0.7" />
             <turn time-full-steer="0:0.21 0.5:0.21 0.5:0.35 1.0:0.35" />
