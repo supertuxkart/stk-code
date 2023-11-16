@@ -284,7 +284,7 @@ void RubberBall::getNextControlPoint()
 }   // getNextControlPoint
 
 // ----------------------------------------------------------------------------
-/** Initialises this object with data from the power.xml file (this is a static
+/** Initialises this object with data from the powerup.xml file (this is a static
  *  function).
  *  \param node XML Node
  *  \param rubberball The rubber ball mesh

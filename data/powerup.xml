@@ -18,7 +18,8 @@
         model="anchor.spm"                              />
   <item name="switch"         icon="swap-icon.png"      />
   <item name="swatter"        icon="swatter-icon.png"   />
-  <!--  interval: How long a single bounce takes.
+  <!--  speed : defines the initial speed. Mainly kept for
+                    compatibility with flyable class
         min-speed-offset: The speed of the ball is calculated
                     by adding the speed-offset to the difficulty's
                     max-speed. min-speed-offset is used when the
@@ -26,8 +27,6 @@
                     to the target.
         max-speed-offset: The additional speed of the ball when
                     farther than max-offset-distance.
-        speed : defines the initial speed. Mainly kept for
-                    compatibility with flyable class
         min-offset-distance: The distance under which the ball is
                     at minimal speed.
         max-offset-distance: The distance over which the ball is
@@ -35,6 +34,8 @@
                     min-offset-distance, the ball speeds between
                     both is a weighted average of the min and
                     max speed.
+        interval:   The time between two bounces when farther away
+                    than fast-ping-distance
         max-height: The maximum height of a bounce.
         min-height: Unused mostly, but defines implicitly
                     the starting height (as average of
@@ -57,13 +58,11 @@
                     off track (e.g. a value of 30 results
                     on the ramp in sand track that the 
                     ball goes to the left of the tunnel,
-                    bouncing on the pyramid). Quite
-                    catastrophal on the startrack and
-                    skyline).
+                    bouncing on the pyramid).
         squash-slowdown: How much karts that are 
                     squashed are slowed down.
         squash-duration: How long karts stay squashed.
-        delete-timer: How long before the ball is removed
+        delete-time: How long before the ball is removed
                     if no suitable target is found.
         early-target-factor: the rubber ball can use the
                     relative position of the kart to the
@@ -82,7 +81,7 @@
         max-speed-offset="29.0"
         min-offset-distance="50.0"
         max-offset-distance="250.0"
-        interval="1"
+        interval="1.0"
         max-height="4.0"      min-height="0"
         fast-ping-distance="50" 
         early-target-factor="1"
@@ -97,7 +96,26 @@
         min-height="0.2"      max-height="1.0"
         force-updown="35"     force-to-target="15"
         max-distance="25"                               />
-  <item name="nitro-hack"         icon="sudo_nitro.png" />
+  <!--  Note that the characteristics of the nitro-hack bonus mode itself
+        are defined in kart_characteristics.xml (so they can be changed by
+        difficulty or kart class if so wished)
+
+        max-targets    : The maximum number of karts in front nitro can be stolen from.
+        bonus-no-kart  : If there is not enough karts in front to steal from, gift this
+                        amount per missing kart.
+        stolen-max     : The amount of nitro taken from the kart immediately in front.
+                        This should be the highest amount so that the stealing is meaningful
+                        with low amount of karts in a race.
+        stolen-add     : For each kart ranked better than the one immediately in front, the
+                        amount of stolen nitro is iteratively computed starting from
+                        stolen-max, multiplying by stolen-multiply and adding stolen-add.
+                        For example, with stolen-max=2, stolen-add=0.2 and stolen-multiply=0.5,
+                        we get 2.0 then (2.0*0.5)+0.2 = 1.2, then (1.2*0.5)+0.2 = 0.8 and so on.
+        stolen-multiply: See above. A low multiply will make the final values closer to each
+                        other. -->
+  <item name="nitro-hack"         icon="sudo_nitro.png"
+        max-targets="6" bonus-no-kart="0.2"
+        stolen-max="1.4" stolen-add="0.36" stolen-multiply="0.25"/>
   <item name="electro-shield"     icon="track_unknown.png" />
 
   <!-- This defines the probabilities to get each type of item depending on

@@ -320,7 +320,7 @@
         <!-- Nitro-hack
             duration: Time a nitro-hack is active.
             factor: Multiplicative factor for the engine and max-speed boosts of nitro -->
-        <nitro-hack duration="8.0" factor="1.8" />
+        <nitro-hack duration="7.0" factor="1.8" />
 
         <!-- Slipstream
             base-speed: the speed for which length and width are valid.

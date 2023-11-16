@@ -328,10 +328,13 @@ void Powerup::use()
     case PowerupManager::POWERUP_SUDO:
         {
             AbstractKart* player_kart = NULL;
+            unsigned int steal_targets = powerup_manager->getNitroHackMaxTargets();
+            float base_bonus = powerup_manager->getNitroHackBaseBonus();
 
             float stolen_energy = 0.0f;
+            unsigned int steal_counter = 0;
 
-            // Steal some nitro from the five karts ahead.
+            // Steal some nitro from up to steal_targets karts ahead.
             // This can set their nitro count to a negative number
             for(unsigned int i = 0 ; i < world->getNumKarts(); ++i)
             {
@@ -339,27 +342,36 @@ void Powerup::use()
                 // Standard invulnerability (the "stars") is not useful here
                 if( kart->isEliminated()   || kart== m_kart || kart->hasFinishedRace())
                     continue;
-                if(m_kart->getPosition() >  kart->getPosition() &&
-                m_kart->getPosition() <= kart->getPosition() + 5)
-                {
-                    float amount_to_steal = 1.25f;
-                    // Remove nitro from a target kart and add to the recipient
-                    kart->addEnergy(-amount_to_steal, /* allow negatives */ true);
-                    stolen_energy += amount_to_steal;
-                    // This is used for display in the race GUI
-                    kart->setStolenNitro(amount_to_steal, /* duration */ 1.75f);
 
-                    // Remember if the target kart is player controlled
-                    // for a negative sound effects (TODO)
-                    if(kart->getController()->isLocalPlayerController())
-                        player_kart = kart;
+                int position_diff = m_kart->getPosition() - kart->getPosition();
+                if(position_diff > 0)
+                {
+                    float amount_to_steal = powerup_manager->getNitroHackStolenDiff(position_diff);
+                    if (amount_to_steal > 0.0f)
+                    {
+                        // Remove nitro from a target kart and add to the recipient
+                        kart->addEnergy(-amount_to_steal, /* allow negatives */ true);
+                        stolen_energy += amount_to_steal;
+                        steal_counter++;
+
+                        // This is used for display in the race GUI
+                        kart->setStolenNitro(amount_to_steal, /* duration */ 1.75f);
+
+                        // Remember if the target kart is player controlled
+                        // for a negative sound effect
+                        if(kart->getController()->isLocalPlayerController())
+                            player_kart = kart;
+                    }
                 }
             }
 
-            // Gift one additional small nitro on top of the stolen energy
-            // and activate the "nitro boost" mode
+            // Gift some free nitro if there is not enough targets in front
+            if (steal_counter < steal_targets)
+                stolen_energy += (steal_targets - steal_counter) * base_bonus;
+
+            // Give the stolen nitro and activate the "nitro boost" mode
             // TODO make the gift of nitro depend on kart class/ nitro efficiency ??
-            m_kart->addEnergy(stolen_energy + 1.5f, /* allow negatives */ false);
+            m_kart->addEnergy(stolen_energy, /* allow negatives */ false);
             m_kart->activateNitroHack();
 
             // Play a good sound for the kart that benefits from the "nitro-hack",

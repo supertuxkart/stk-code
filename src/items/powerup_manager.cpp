@@ -146,7 +146,7 @@ void PowerupManager::loadPowerupsModels()
             exit(-1);
         }
     }
-    
+
     loadWeights(root, "race-weight-list"    );
     loadWeights(root, "ftl-weight-list"     );
     loadWeights(root, "battle-weight-list"  );
@@ -508,9 +508,64 @@ void PowerupManager::loadPowerup(PowerupType type, const XMLNode &node)
              Cake::init(node, m_all_meshes[type]);       break;
         case POWERUP_RUBBERBALL:
              RubberBall::init(node, m_all_meshes[type]); break;
+        case POWERUP_SUDO:
+             loadNitroHack(node);                        break;
         default: break;
     }   // switch
 }   // loadPowerup
+
+/** Loads global parameters for the Nitro-Hack powerup
+ */
+void PowerupManager::loadNitroHack(const XMLNode &node)
+{
+    // Default values used in case they are missing from
+    // the config file
+    m_nh_max_targets = 5;
+    m_nh_base_bonus = 0.2f;
+
+    float stolen_max = 1.6f;
+    float stolen_add = 0.4f;
+    float stolen_multiply = 0.25f;
+
+    if(!node.get("max-targets",     &m_nh_max_targets))
+        Log::warn("powerup",
+                  "No max-targets specified for nitro-hack.");
+    if(!node.get("bonus-no-kart",   &m_nh_base_bonus))
+        Log::warn("powerup",
+                  "No bonus-no-kart specified for nitro-hack.");
+    if(!node.get("stolen-max",      &stolen_max))
+        Log::warn("powerup",
+                  "No stolen-max specified for nitro-hack.");
+    if(!node.get("stolen-add",      &stolen_add))
+        Log::warn("powerup",
+                  "No stolen-add specified for nitro-hack.");
+    if(!node.get("stolen-multiply", &stolen_multiply))
+        Log::warn("powerup",
+                  "No stolen-multiply specified for nitro-hack.");
+
+    if(m_nh_max_targets > 20)
+        m_nh_max_targets = 20;
+
+    // Compute the amount to steal for each position difference,
+    // from immediately ahead [0] to most ahead
+    m_nh_stolen_amount[0] = stolen_max;
+
+    for (unsigned int i=1;i<20;i++)
+    {
+        if (i < m_nh_max_targets)
+            m_nh_stolen_amount[i] = (m_nh_stolen_amount[i-1] * stolen_multiply) + stolen_add;
+        else
+            m_nh_stolen_amount[i] = 0;
+    }
+} // loadNitroHack
+
+float PowerupManager::getNitroHackStolenDiff(unsigned int diff) const
+{
+    if (diff >= 20 || diff == 0)
+        return 0;
+    else
+        return m_nh_stolen_amount[diff-1];
+} //getNitroHackStolenDiff
 
 // ----------------------------------------------------------------------------
 /** Create a (potentially interpolated) WeightsData objects for the current
