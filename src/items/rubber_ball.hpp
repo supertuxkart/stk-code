@@ -38,6 +38,9 @@ private:
      *  a unique number for each ball. */
     int m_id;
 
+    /** Only used if a debug #define is enabled at compile-time*/
+    float m_hit_timer;
+
     /** A class variable to store the default interval size. */
     static float m_st_interval;
 

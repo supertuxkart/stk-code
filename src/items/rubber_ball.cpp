@@ -60,6 +60,8 @@ float RubberBall::m_st_max_offset_distance;
 
 // Debug only, so that we can get a feel on how well balls are aiming etc.
 #undef PRINT_BALL_REMOVE_INFO
+// Debug only
+#undef PRINT_BALL_TIME_TO_TARGET
 
 RubberBall::RubberBall(AbstractKart *kart)
           : Flyable(kart, PowerupManager::POWERUP_RUBBERBALL, 0.0f /* mass */),
@@ -122,6 +124,10 @@ void RubberBall::onFireFlyable()
 
     m_restoring_state = true;
     computeTarget();
+
+#ifdef PRINT_BALL_TIME_TO_TARGET
+    m_hit_timer = 0.0f;
+#endif
 
     // initialises the current graph node
     TrackSector::update(getXYZ());
@@ -352,8 +358,8 @@ void RubberBall::init(const XMLNode &node, scene::IMesh *rubberball)
 
 
     //sanity checks
-    if (m_st_min_speed_offset < 10.0f)
-        m_st_min_speed_offset = 10.0f;
+    if (m_st_min_speed_offset < 1.0f)
+        m_st_min_speed_offset = 1.0f;
     if (m_st_min_speed_offset > m_st_max_speed_offset)
     {
         m_st_max_speed_offset = m_st_min_speed_offset;
@@ -446,6 +452,9 @@ bool RubberBall::updateAndDelete(int ticks)
     TerrainInfo::update(next_xyz + getNormal()*vertical_offset, -getNormal());
 
     m_height_timer += stk_config->ticks2Time(ticks);
+#ifdef PRINT_BALL_TIME_TO_TARGET
+    m_hit_timer += stk_config->ticks2Time(ticks);
+#endif
     float height    = updateHeight()+m_extend.getY()*0.5f;
     
     if(UserConfigParams::logFlyable())
@@ -710,16 +719,22 @@ float RubberBall::updateHeight()
         if(m_fast_ping)
         {
             // Some experimental formulas
-            m_current_max_height = 0.5f*sqrt(m_distance_to_target);
+            m_current_max_height = 0.4f*sqrt(m_distance_to_target+11)-0.005f*m_distance_to_target;
             // If the ball just missed the target, m_distance_to_target
             // can be huge (close to track length) due to the order in
             // which a lost target is detected. Avoid this by clamping
             // m_current_max_height.
             if(m_current_max_height>m_max_height)
                 m_current_max_height = m_max_height;
-            m_interval           = m_current_max_height / 10.0f;
+
+            float fast_ping_ratio = 1.0f - (m_distance_to_target / m_st_fast_ping_distance);
+            // In case the ball just missed the target
+            if (fast_ping_ratio < 0.0f)
+                fast_ping_ratio = 0.0f;
+
+            m_interval           = m_current_max_height / (5.0f + 2.5f * fast_ping_ratio);
             // Avoid too small hops and esp. a division by zero
-            if(m_interval<0.01f)
+            if(m_interval<0.1f)
                 m_interval = 0.1f;
         }
         else
@@ -857,6 +872,10 @@ bool RubberBall::hit(AbstractKart* kart, PhysicalObject* object)
 #ifdef PRINT_BALL_REMOVE_INFO
     if(kart)
         Log::debug("[RuberBall]", "ball %d hit kart.", m_id);
+#endif
+#ifdef PRINT_BALL_TIME_TO_TARGET
+    if(kart && kart == m_target)
+        Log::info("[RuberBall]", "ball %d hit kart after time %f.", m_id, m_hit_timer);
 #endif
     if(kart && kart!=m_target)
     {
