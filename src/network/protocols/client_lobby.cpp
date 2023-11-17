@@ -1686,6 +1686,7 @@ void ClientLobby::handleClientCommand(const std::string& cmd)
         AddonsPack::install(argv[1]);
     else if (argv[0] == "uninstalladdon" && argv.size() == 2)
         AddonsPack::uninstall(argv[1]);
+    // FIXME - this code duplicates functions that should be handled elsewhere.
     else if (argv[0] == "music" && argv.size() == 2)
     {
         int vol = atoi(argv[1].c_str());
