@@ -308,6 +308,8 @@
             big-container: how much energy a big container gives.
             max-speed-increase: How much the speed of a kart might exceed
                 its maximum speed (in m/s).
+            min-burst: The minimum duration of a nitro burst,
+                to prevent using nitro in very short bursts
             duration: How long the increased speed will be valid after
                 the kart stops using nitro (and the fade-out-time starts).
             fade-out-time: Duration during which the increased maximum
@@ -315,7 +317,8 @@
             max: How much nitro a kart can store. -->
         <nitro engine-force="300" engine-mult="1.2" consumption="1"
                small-container="1" big-container="2.5"
-               max-speed-increase="5" duration="0.8" fade-out-time="2.0" max="20" />
+               max-speed-increase="5" min-burst="0.5" duration="0.8"
+               fade-out-time="1.6" max="20" />
 
         <!-- Nitro-hack
             duration: Time a nitro-hack is active.

@@ -114,8 +114,8 @@
         stolen-multiply: See above. A low multiply will make the final values closer to each
                         other. -->
   <item name="nitro-hack"         icon="sudo_nitro.png"
-        max-targets="6" bonus-no-kart="0.2"
-        stolen-max="1.4" stolen-add="0.36" stolen-multiply="0.25"/>
+        max-targets="6" bonus-no-kart="0.125"
+        stolen-max="1.25" stolen-add="0.275" stolen-multiply="0.34"/>
   <item name="electro-shield"     icon="track_unknown.png" />
 
   <!-- This defines the probabilities to get each type of item depending on

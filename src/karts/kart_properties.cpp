@@ -99,7 +99,7 @@ KartProperties::KartProperties(const std::string &filename)
     m_color                      = video::SColor(255, 0, 0, 0);
     m_shape                      = 32;  // close enough to a circle.
     m_engine_sfx_type            = "engine_small";
-    m_nitro_min_consumption      = 120; //FIXME make this a config parameter independent of physics FPS
+
     // The default constructor for stk_config uses filename=""
     if (filename != "")
     {
@@ -1184,6 +1184,12 @@ float KartProperties::getNitroMaxSpeedIncrease() const
 {
     return m_cached_characteristic->getNitroMaxSpeedIncrease();
 }  // getNitroMaxSpeedIncrease
+
+// ----------------------------------------------------------------------------
+float KartProperties::getNitroMinBurst() const
+{
+    return m_cached_characteristic->getNitroMinBurst();
+}  // getNitroMinBurst
 
 // ----------------------------------------------------------------------------
 float KartProperties::getNitroFadeOutTime() const

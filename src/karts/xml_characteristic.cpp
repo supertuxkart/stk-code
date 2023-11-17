@@ -547,6 +547,8 @@ void XmlCharacteristic::load(const XMLNode *node)
             &m_values[NITRO_BIG_CONTAINER]);
         sub_node->get("max-speed-increase",
             &m_values[NITRO_MAX_SPEED_INCREASE]);
+        sub_node->get("min-burst",
+            &m_values[NITRO_MIN_BURST]);
         sub_node->get("fade-out-time",
             &m_values[NITRO_FADE_OUT_TIME]);
         sub_node->get("max",

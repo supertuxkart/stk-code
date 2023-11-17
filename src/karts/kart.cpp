@@ -2319,7 +2319,7 @@ void Kart::updateNitro(int ticks)
 
     if (m_controls.getNitro() && m_min_nitro_ticks <= 0 && m_collected_energy > 0)
     {
-        m_min_nitro_ticks = m_kart_properties->getNitroMinConsumptionTicks();
+        m_min_nitro_ticks = stk_config->time2Ticks(m_kart_properties->getNitroMinBurst());
         float min_consumption = m_min_nitro_ticks * m_consumption_per_tick;
         m_energy_to_min_ratio = std::min<float>(1, m_collected_energy/min_consumption);
     }

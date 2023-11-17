@@ -207,6 +207,8 @@ AbstractCharacteristic::ValueType AbstractCharacteristic::getType(
         return TYPE_FLOAT;
     case NITRO_MAX_SPEED_INCREASE:
         return TYPE_FLOAT;
+    case NITRO_MIN_BURST:
+        return TYPE_FLOAT;
     case NITRO_FADE_OUT_TIME:
         return TYPE_FLOAT;
     case NITRO_MAX:
@@ -445,6 +447,8 @@ std::string AbstractCharacteristic::getName(CharacteristicType type)
         return "NITRO_BIG_CONTAINER";
     case NITRO_MAX_SPEED_INCREASE:
         return "NITRO_MAX_SPEED_INCREASE";
+    case NITRO_MIN_BURST:
+        return "NITRO_MIN_BURST";
     case NITRO_FADE_OUT_TIME:
         return "NITRO_FADE_OUT_TIME";
     case NITRO_MAX:
@@ -1434,6 +1438,18 @@ float AbstractCharacteristic::getNitroMaxSpeedIncrease() const
                     getName(NITRO_MAX_SPEED_INCREASE).c_str());
     return result;
 }  // getNitroMaxSpeedIncrease
+
+// ----------------------------------------------------------------------------
+float AbstractCharacteristic::getNitroMinBurst() const
+{
+    float result;
+    bool is_set = false;
+    process(NITRO_MIN_BURST, &result, &is_set);
+    if (!is_set)
+        Log::fatal("AbstractCharacteristic", "Can't get characteristic %s",
+                    getName(NITRO_MIN_BURST).c_str());
+    return result;
+}  // getNitroMinBurst
 
 // ----------------------------------------------------------------------------
 float AbstractCharacteristic::getNitroFadeOutTime() const

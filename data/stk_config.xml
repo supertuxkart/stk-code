@@ -242,9 +242,8 @@
 
   <!-- Bubblegum
        disappear-counter: How often bubblegum gets driven over before it disappears.
-       shield-time: How long the bubblegum shield lasts
        restrict-weapons: If true, using weapons will destroy the user's shield -->
-  <bubblegum disappear-counter="1" shield-time="10.0" restrict-weapons="false"/>
+  <bubblegum disappear-counter="1" restrict-weapons="true"/>
 
   <!-- explosion-impulse-objects is the impulse that pushes physical objects
        away if there is an explosion. -->
