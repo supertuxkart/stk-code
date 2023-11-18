@@ -1096,6 +1096,42 @@ float KartProperties::getPlungerInFaceTime() const
 }  // getPlungerInFaceTime
 
 // ----------------------------------------------------------------------------
+float KartProperties::getNitrohackDuration() const
+{
+    return m_cached_characteristic->getNitrohackDuration();
+}  // getNitrohackDuration
+
+// ----------------------------------------------------------------------------
+float KartProperties::getNitrohackFactor() const
+{
+    return m_cached_characteristic->getNitrohackFactor();
+}  // getNitrohackFactor
+
+// ----------------------------------------------------------------------------
+float KartProperties::getElectroDuration() const
+{
+    return m_cached_characteristic->getElectroDuration();
+}  // getElectroDuration
+
+// ----------------------------------------------------------------------------
+float KartProperties::getElectroEngineMult() const
+{
+    return m_cached_characteristic->getElectroEngineMult();
+}  // getElectroEngineMult
+
+// ----------------------------------------------------------------------------
+float KartProperties::getElectroMaxSpeedIncrease() const
+{
+    return m_cached_characteristic->getElectroMaxSpeedIncrease();
+}  // getElectroMaxSpeedIncrease
+
+// ----------------------------------------------------------------------------
+float KartProperties::getElectroFadeOutTime() const
+{
+    return m_cached_characteristic->getElectroFadeOutTime();
+}  // getElectroFadeOutTime
+
+// ----------------------------------------------------------------------------
 std::vector<float> KartProperties::getStartupTime() const
 {
     return m_cached_characteristic->getStartupTime();
@@ -1202,19 +1238,6 @@ float KartProperties::getNitroMax() const
 {
     return m_cached_characteristic->getNitroMax();
 }  // getNitroMax
-
-// ----------------------------------------------------------------------------
-float KartProperties::getNitrohackDuration() const
-{
-    return m_cached_characteristic->getNitrohackDuration();
-}  // getNitrohackDuration
-
-
-// ----------------------------------------------------------------------------
-float KartProperties::getNitrohackFactor() const
-{
-    return m_cached_characteristic->getNitrohackFactor();
-}  // getNitrohackFactor
 
 // ----------------------------------------------------------------------------
 float KartProperties::getSlipstreamDurationFactor() const

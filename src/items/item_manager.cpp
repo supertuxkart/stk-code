@@ -409,8 +409,8 @@ void  ItemManager::checkItemHit(AbstractKart* kart)
         // Ignore items that have been collected or are not available atm
         if ((!*i) || !(*i)->isAvailable() || (*i)->isUsedUp()) continue;
 
-        // Shielded karts can simply drive over bubble gums without any effect
-        if ( kart->isShielded() &&
+        // Gum-Shielded karts can simply drive over bubble gums without any effect
+        if ( kart->isGumShielded() &&
              ( (*i)->getType() == ItemState::ITEM_BUBBLEGUM      ||
                (*i)->getType() == ItemState::ITEM_BUBBLEGUM_NOLOK  ) )
         {

@@ -392,6 +392,13 @@ int MaxSpeed::isSpeedDecreaseActive(unsigned int category)
 }   // isSpeedDecreaseActive
 
 // ----------------------------------------------------------------------------
+/** Gracefully ends a max-speed increase, keeping the fade-out time active */
+void MaxSpeed::endSpeedIncrease(unsigned int category)
+{
+    m_speed_increase[category].endSpeedIncrease();
+}   // endSpeedIncrease
+
+// ----------------------------------------------------------------------------
 /** Updates all speed increase and decrease objects, and determines the
  *  current maximum speed. Note that the function can be called with
  *  dt=0, in which case the maximum speed will be updated, but no

@@ -297,6 +297,12 @@ public:
     /** Makes the kart unsquashed again. */
     virtual void unsetSquash() = 0;
     // ------------------------------------------------------------------------
+    /** This activates the kart's electro-shield. */
+    virtual void setElectroShield() = 0;
+    // ------------------------------------------------------------------------
+    /** This disables the kart's electro-shield */
+    virtual void unsetElectroShield() = 0;
+    // ------------------------------------------------------------------------
     /** Returns the speed of the kart in meters/second. This is not declared
      *  pure abstract, since this function is not needed for certain classes,
      *  like Ghost. */
@@ -484,6 +490,9 @@ public:
     // ------------------------------------------------------------------------
     /** Returns if the kart is protected by a shield. */
     virtual bool isShielded() const = 0;
+    // ------------------------------------------------------------------------
+    /** Returns if the kart is protected by a gum shield. */
+    virtual bool isGumShielded() const = 0;
     // ------------------------------------------------------------------------
     virtual void setShieldTime(float t) = 0;
     // ------------------------------------------------------------------------

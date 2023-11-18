@@ -462,6 +462,14 @@ public:
     float getPlungerBandFadeOutTime() const;
     float getPlungerInFaceTime() const;
 
+    float getNitrohackDuration() const;
+    float getNitrohackFactor() const;
+
+    float getElectroDuration() const;
+    float getElectroEngineMult() const;
+    float getElectroMaxSpeedIncrease() const;
+    float getElectroFadeOutTime() const;
+
     std::vector<float> getStartupTime() const;
     std::vector<float> getStartupBoost() const;
 
@@ -483,9 +491,6 @@ public:
     float getNitroMinBurst() const; 
     float getNitroFadeOutTime() const;
     float getNitroMax() const;
-
-    float getNitrohackDuration() const;
-    float getNitrohackFactor() const;
 
     float getSlipstreamDurationFactor() const;
     float getSlipstreamBaseSpeed() const;

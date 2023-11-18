@@ -168,7 +168,6 @@ void Powerup::set(PowerupManager::PowerupType type, int n)
         case PowerupManager::POWERUP_ZIPPER:
             break ;
 
-        // TODO : add sound effects
         case PowerupManager::POWERUP_SUDO:
             m_sound_use = SFXManager::get()->createSoundSource("sudo_bad");
             break ;
@@ -393,6 +392,18 @@ void Powerup::use()
             break;
         }   // end of PowerupManager::POWERUP_SUDO
 
+    case PowerupManager::POWERUP_ELECTRO:
+        {
+            // This takes care of the speed boost
+            m_kart->setElectroShield();
+
+            // We set the attachment
+            m_kart->getAttachment()->set(Attachment::ATTACH_ELECTRO_SHIELD,
+                stk_config->time2Ticks(kp->getElectroDuration()));
+
+            break;
+        }   // end of PowerupManager::POWERUP_ELECTRO
+
     case PowerupManager::POWERUP_BUBBLEGUM:
         // use the bubble gum the traditional way, if the kart is looking back
         if (m_kart->getControls().getLookBack())
@@ -409,41 +420,30 @@ void Powerup::use()
         }
         else // if the kart is looking forward, use the bubblegum as a shield
         {
+            Attachment::AttachmentType type;
 
-            if(!m_kart->isShielded()) //if the previous shield had been used up.
+            if (m_kart->getIdent() == "nolok")
+                type = Attachment::ATTACH_NOLOK_BUBBLEGUM_SHIELD;
+            else
+                type = Attachment::ATTACH_BUBBLEGUM_SHIELD;
+
+            printf("The gum shield status is %i\n", m_kart->isGumShielded());
+            if(!m_kart->isGumShielded()) //if the previous shield had been used up.
             {
-                if (m_kart->getIdent() == "nolok")
-                {
-                    m_kart->getAttachment()
-                          ->set(Attachment::ATTACH_NOLOK_BUBBLEGUM_SHIELD,
-                                stk_config->
-                                  time2Ticks(kp->getBubblegumShieldDuration()));
-                }
-                else
-                {
-                    m_kart->getAttachment()
-                          ->set(Attachment::ATTACH_BUBBLEGUM_SHIELD,
-                                stk_config->
-                                  time2Ticks(kp->getBubblegumShieldDuration()));
-                }
+                    m_kart->getAttachment()->set(type,
+                                     stk_config->
+                                     time2Ticks(kp->getBubblegumShieldDuration()));
             }
-            else // using a bubble gum while still having a shield
+            // using a bubble gum while still having a gum shield
+            // In this case, half of the remaining time of the active
+            // shield is added. The maximum duration of a shield is
+            // never above twice the standard duration.
+            else 
             {
-                if (m_kart->getIdent() == "nolok")
-                {
-                    m_kart->getAttachment()
-                          ->set(Attachment::ATTACH_NOLOK_BUBBLEGUM_SHIELD,
-                                stk_config->
-                                 time2Ticks(kp->getBubblegumShieldDuration()));
-                }
-                else
-                {
-                    m_kart->getAttachment()
-                          ->set(Attachment::ATTACH_BUBBLEGUM_SHIELD,
+                m_kart->getAttachment()->set(type,
                                 stk_config->
                                 time2Ticks(kp->getBubblegumShieldDuration()
-                                           + m_kart->getShieldTime()       ) );
-                }
+                                           + (m_kart->getShieldTime() / 2.0f)) );
             }
 
             if (!has_played_sound)

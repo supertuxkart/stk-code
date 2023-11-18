@@ -33,7 +33,7 @@ friend class KartRewinder;
 public:
     /** The categories to use for increasing the speed of a kart:
      *  Increase due to zipper, slipstream, nitro, rubber band,
-     *  skidding usage. */
+     *  skidding usage, or electro-shield. */
     enum  {MS_INCREASE_MIN,
            MS_INCREASE_ZIPPER = MS_INCREASE_MIN,
            MS_INCREASE_SLIPSTREAM,
@@ -42,6 +42,7 @@ public:
            MS_INCREASE_SKIDDING,
            MS_INCREASE_RED_SKIDDING,
            MS_INCREASE_PURPLE_SKIDDING,
+           MS_INCREASE_ELECTRO,
            MS_INCREASE_MAX};
 
     /** The categories to use for decreasing the speed of a kart:
@@ -119,6 +120,10 @@ private:
         {
             return m_duration > 0 ? (float)m_engine_force / 10.0f : 0;
         }   // getEngineForce
+        // --------------------------------------------------------------------
+        /** This allows to gracefully end a speed increase, keeping
+         * the fade-out time active */
+        void endSpeedIncrease() { m_duration = 0; }
         // --------------------------------------------------------------------
         /** Returns if this speed increase is active atm. */
         bool isActive() const { return m_duration > -m_fade_out_time; }
@@ -198,6 +203,7 @@ public:
     int   getSpeedIncreaseTicksLeft(unsigned int category);
     int   isSpeedIncreaseActive(unsigned int category);
     int   isSpeedDecreaseActive(unsigned int category);
+    void  endSpeedIncrease(unsigned int category);
     void  update(int ticks);
     void  reset();
     void  saveState(BareNetworkString *buffer) const;

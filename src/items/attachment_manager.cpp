@@ -60,7 +60,8 @@ static const initAttachmentType iat[]=
     {Attachment::ATTACH_NOLOKS_SWATTER,   "swatter_nolok.spm",    "swatter-icon.png"             },
     {Attachment::ATTACH_SWATTER_ANIM,     "swatter_anim.spm",     "swatter-icon.png"             },
     {Attachment::ATTACH_BUBBLEGUM_SHIELD, "bubblegum_shield.spm", "shield-icon.png"              },
-    {Attachment::ATTACH_NOLOK_BUBBLEGUM_SHIELD, "bubblegum_shield_nolok.spm", "shield-icon.png"              },
+    {Attachment::ATTACH_NOLOK_BUBBLEGUM_SHIELD, "bubblegum_shield_nolok.spm", "shield-icon.png"  },
+    {Attachment::ATTACH_ELECTRO_SHIELD,   "electro_shield.spm",   "electro-shield-icon.png"      },
     {Attachment::ATTACH_MAX,              "",                     ""                             },
 };
 

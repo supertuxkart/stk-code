@@ -1265,7 +1265,8 @@ bool Kart::isNearGround() const
 }   // isNearGround
 
 // ------------------------------------------------------------------------
-/** Enables a kart shield protection for a certain amount of time.
+/** Sets the duration of an active shield protection.
+ * This does not increase the boost time for the electro-shield.
  */
 void Kart::setShieldTime(float t)
 {
@@ -1285,13 +1286,32 @@ bool Kart::isShielded() const
     {
         Attachment::AttachmentType type = getAttachment()->getType();
         return type == Attachment::ATTACH_BUBBLEGUM_SHIELD ||
-               type == Attachment::ATTACH_NOLOK_BUBBLEGUM_SHIELD;
+               type == Attachment::ATTACH_NOLOK_BUBBLEGUM_SHIELD ||
+               type == Attachment::ATTACH_ELECTRO_SHIELD;
     }
     else
     {
         return false;
     }
 }   // isShielded
+
+// ------------------------------------------------------------------------
+/**
+ * Returns true if the kart is protected by a gum shield.
+ */
+bool Kart::isGumShielded() const
+{
+    if(getAttachment() != NULL)
+    {
+        Attachment::AttachmentType type = getAttachment()->getType();
+        return type == Attachment::ATTACH_BUBBLEGUM_SHIELD ||
+               type == Attachment::ATTACH_NOLOK_BUBBLEGUM_SHIELD;
+    }
+    else
+    {
+        return false;
+    }
+}   // isGumShielded
 
 // ------------------------------------------------------------------------
 /**
@@ -1307,14 +1327,15 @@ float Kart::getShieldTime() const
 
 // ------------------------------------------------------------------------
 /**
- * Decreases the kart's shield time.
- * \param t The time subtracted from the shield timer. If t == 0.0f, the
-             default amout of time is subtracted.
- */
+ * Decreases the kart's shield time to zero. */
 void Kart::decreaseShieldTime()
 {
     if (isShielded())
     {
+        // If the shield is an electro-shield, also disable the speed boost
+        if(getAttachment()->getType() == Attachment::ATTACH_ELECTRO_SHIELD)
+            unsetElectroShield();
+
         getAttachment()->setTicksLeft(0);
     }
 }   // decreaseShieldTime
@@ -1862,6 +1883,32 @@ void Kart::showZipperFire()
 {
     m_kart_gfx->setCreationRateAbsolute(KartGFX::KGFX_ZIPPER, 800.0f);
 }
+
+//-----------------------------------------------------------------------------
+/** This activates the kart's electro-shield. */
+void Kart::setElectroShield()
+{
+    float max_speed_increase = m_kart_properties->getElectroMaxSpeedIncrease();
+    float duration           = m_kart_properties->getElectroDuration();
+    float fade_out_time      = m_kart_properties->getElectroFadeOutTime();
+
+    // The engine multiplier is automatically enabled when
+    // a speed increase from MS_INCREASE_ELECTRO is detected.
+
+    m_max_speed->increaseMaxSpeed(MaxSpeed::MS_INCREASE_ELECTRO,
+                                     max_speed_increase,
+                                     /* engine force */ 0,
+                                     stk_config->time2Ticks(duration),
+                                     stk_config->time2Ticks(fade_out_time));
+}   // setElectroShield
+
+//-----------------------------------------------------------------------------
+/** This disables the kart's electro-shield. */
+void Kart::unsetElectroShield()
+{
+    // Ends the speed increase without disabling fade out time
+    m_max_speed->endSpeedIncrease(MaxSpeed::MS_INCREASE_ELECTRO);
+}   // unsetElectroShield
 
 //-----------------------------------------------------------------------------
 /** Squashes this kart: it will scale the kart in up direction, and causes
@@ -2584,7 +2631,7 @@ void Kart::playCrashSFX(const Material* m, AbstractKart *k)
             
             // In case that the sfx is longer than 0.5 seconds, only play it if
             // it's not already playing.
-            if (isShielded() || (k != NULL && k->isShielded()))
+            if (isGumShielded() || (k != NULL && k->isGumShielded()))
             {
                 crash_sound_emitter->play(getSmoothedXYZ(), m_boing_sound);
             }
@@ -2853,6 +2900,12 @@ void Kart::updateEnginePowerAndBrakes(int ticks)
     if(getSpeedIncreaseTicksLeft(MaxSpeed::MS_INCREASE_NITRO) > 0)
     {
         engine_power*= m_kart_properties->getNitroEngineMult();
+    }
+
+    // apply electro-shield engine boost if relevant
+    if(getSpeedIncreaseTicksLeft(MaxSpeed::MS_INCREASE_ELECTRO) > 0)
+    {
+        engine_power*= m_kart_properties->getElectroEngineMult();
     }
 
     // apply bubblegum physics if relevant

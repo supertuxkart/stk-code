@@ -339,6 +339,9 @@ public:
             void   setSquashGraphics();
     virtual void   unsetSquash      () OVERRIDE;
 
+    virtual void   setElectroShield() OVERRIDE;
+    virtual void   unsetElectroShield() OVERRIDE;
+
     virtual void   crashed          (AbstractKart *k, bool update_attachments) OVERRIDE;
     virtual void   crashed          (const Material *m, const Vec3 &normal) OVERRIDE;
     virtual float  getHoT           () const OVERRIDE;
@@ -477,6 +480,9 @@ public:
     // ----------------------------------------------------------------------------------------
     /** Returns if the kart is protected by a shield. */
     virtual bool isShielded() const OVERRIDE;
+    // ----------------------------------------------------------------------------------------
+    /** Returns if the kart is protected by a gum shield. */
+    virtual bool isGumShielded() const OVERRIDE;
     // ----------------------------------------------------------------------------------------
     /** Returns the remaining time the kart is protected by a shield. */
     virtual float getShieldTime() const OVERRIDE;

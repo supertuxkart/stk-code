@@ -275,11 +275,10 @@ void Attachment::hitBanana(ItemState *item_state)
         if (RaceManager::get()->isLinearRaceMode())
             PlayerManager::increaseAchievement(AchievementsStatus::BANANA_1RACE, 1);
     }
-    //Bubble gum shield effect:
-    if(m_type == ATTACH_BUBBLEGUM_SHIELD ||
-       m_type == ATTACH_NOLOK_BUBBLEGUM_SHIELD)
+    //Shield effect: protect but is used
+    if(m_kart->isShielded())
     {
-        m_ticks_left = 0;
+        m_kart->decreaseShieldTime();
         return;
     }
 
@@ -557,6 +556,24 @@ void Attachment::update(int ticks)
             }
             if (!m_kart->isGhostKart())
                 Track::getCurrentTrack()->getItemManager()->dropNewItem(Item::ITEM_BUBBLEGUM, m_kart);
+        }
+        break;
+
+    case ATTACH_ELECTRO_SHIELD:
+        m_initial_speed = 0;
+        if (m_ticks_left <= 0)
+        {
+            //TODO Add a sound effect for when the electro shield stops working
+            /*
+            if (!RewindManager::get()->isRewinding())
+            {
+                if (m_electro_malfunction_sound) m_electro_malfunction_sound->deleteSFX();
+                m_electro_malfunction_sound =
+                    SFXManager::get()->createSoundSource("electro_malfunction");
+                m_electro_malfunction_sound->setPosition(m_kart->getXYZ());
+                m_electro_malfunction_sound->play();
+            }
+            */
         }
         break;
     }   // switch

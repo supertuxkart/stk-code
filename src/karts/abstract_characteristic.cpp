@@ -177,6 +177,18 @@ AbstractCharacteristic::ValueType AbstractCharacteristic::getType(
         return TYPE_FLOAT;
     case PLUNGER_IN_FACE_TIME:
         return TYPE_FLOAT;
+    case NITROHACK_DURATION:
+        return TYPE_FLOAT;
+    case NITROHACK_FACTOR:
+        return TYPE_FLOAT;
+    case ELECTRO_DURATION:
+        return TYPE_FLOAT;
+    case ELECTRO_ENGINE_MULT:
+        return TYPE_FLOAT;
+    case ELECTRO_MAX_SPEED_INCREASE:
+        return TYPE_FLOAT;
+    case ELECTRO_FADE_OUT_TIME:
+        return TYPE_FLOAT;
     case STARTUP_TIME:
         return TYPE_FLOAT_VECTOR;
     case STARTUP_BOOST:
@@ -212,10 +224,6 @@ AbstractCharacteristic::ValueType AbstractCharacteristic::getType(
     case NITRO_FADE_OUT_TIME:
         return TYPE_FLOAT;
     case NITRO_MAX:
-        return TYPE_FLOAT;
-    case NITROHACK_DURATION:
-        return TYPE_FLOAT;
-    case NITROHACK_FACTOR:
         return TYPE_FLOAT;
     case SLIPSTREAM_DURATION_FACTOR:
         return TYPE_FLOAT;
@@ -417,6 +425,18 @@ std::string AbstractCharacteristic::getName(CharacteristicType type)
         return "PLUNGER_BAND_FADE_OUT_TIME";
     case PLUNGER_IN_FACE_TIME:
         return "PLUNGER_IN_FACE_TIME";
+    case NITROHACK_DURATION:
+        return "NITROHACK_DURATION";
+    case NITROHACK_FACTOR:
+        return "NITROHACK_FACTOR";
+    case ELECTRO_DURATION:
+        return "ELECTRO_DURATION";
+    case ELECTRO_ENGINE_MULT:
+        return "ELECTRO_ENGINE_MULT";
+    case ELECTRO_MAX_SPEED_INCREASE:
+        return "ELECTRO_MAX_SPEED_INCREASE";
+    case ELECTRO_FADE_OUT_TIME:
+        return "ELECTRO_FADE_OUT_TIME";
     case STARTUP_TIME:
         return "STARTUP_TIME";
     case STARTUP_BOOST:
@@ -453,10 +473,6 @@ std::string AbstractCharacteristic::getName(CharacteristicType type)
         return "NITRO_FADE_OUT_TIME";
     case NITRO_MAX:
         return "NITRO_MAX";
-    case NITROHACK_DURATION:
-        return "NITROHACK_DURATION";
-    case NITROHACK_FACTOR:
-        return "NITROHACK_FACTOR";
     case SLIPSTREAM_DURATION_FACTOR:
         return "SLIPSTREAM_DURATION_FACTOR";
     case SLIPSTREAM_BASE_SPEED:
@@ -1260,6 +1276,78 @@ float AbstractCharacteristic::getPlungerInFaceTime() const
 }  // getPlungerInFaceTime
 
 // ----------------------------------------------------------------------------
+float AbstractCharacteristic::getNitrohackDuration() const
+{
+    float result;
+    bool is_set = false;
+    process(NITROHACK_DURATION, &result, &is_set);
+    if (!is_set)
+        Log::fatal("AbstractCharacteristic", "Can't get characteristic %s",
+                    getName(NITROHACK_DURATION).c_str());
+    return result;
+}  // getNitrohackDuration
+
+// ----------------------------------------------------------------------------
+float AbstractCharacteristic::getNitrohackFactor() const
+{
+    float result;
+    bool is_set = false;
+    process(NITROHACK_FACTOR, &result, &is_set);
+    if (!is_set)
+        Log::fatal("AbstractCharacteristic", "Can't get characteristic %s",
+                    getName(NITROHACK_FACTOR).c_str());
+    return result;
+}  // getNitrohackFactor
+
+// ----------------------------------------------------------------------------
+float AbstractCharacteristic::getElectroDuration() const
+{
+    float result;
+    bool is_set = false;
+    process(ELECTRO_DURATION, &result, &is_set);
+    if (!is_set)
+        Log::fatal("AbstractCharacteristic", "Can't get characteristic %s",
+                    getName(ELECTRO_DURATION).c_str());
+    return result;
+}  // getElectroDuration
+
+// ----------------------------------------------------------------------------
+float AbstractCharacteristic::getElectroEngineMult() const
+{
+    float result;
+    bool is_set = false;
+    process(ELECTRO_ENGINE_MULT, &result, &is_set);
+    if (!is_set)
+        Log::fatal("AbstractCharacteristic", "Can't get characteristic %s",
+                    getName(ELECTRO_ENGINE_MULT).c_str());
+    return result;
+}  // getElectroEngineMult
+
+// ----------------------------------------------------------------------------
+float AbstractCharacteristic::getElectroMaxSpeedIncrease() const
+{
+    float result;
+    bool is_set = false;
+    process(ELECTRO_MAX_SPEED_INCREASE, &result, &is_set);
+    if (!is_set)
+        Log::fatal("AbstractCharacteristic", "Can't get characteristic %s",
+                    getName(ELECTRO_MAX_SPEED_INCREASE).c_str());
+    return result;
+}  // getElectroMaxSpeedIncrease
+
+// ----------------------------------------------------------------------------
+float AbstractCharacteristic::getElectroFadeOutTime() const
+{
+    float result;
+    bool is_set = false;
+    process(ELECTRO_FADE_OUT_TIME, &result, &is_set);
+    if (!is_set)
+        Log::fatal("AbstractCharacteristic", "Can't get characteristic %s",
+                    getName(ELECTRO_FADE_OUT_TIME).c_str());
+    return result;
+}  // getElectroFadeOutTime
+
+// ----------------------------------------------------------------------------
 std::vector<float> AbstractCharacteristic::getStartupTime() const
 {
     std::vector<float> result;
@@ -1474,30 +1562,6 @@ float AbstractCharacteristic::getNitroMax() const
                     getName(NITRO_MAX).c_str());
     return result;
 }  // getNitroMax
-
-// ----------------------------------------------------------------------------
-float AbstractCharacteristic::getNitrohackDuration() const
-{
-    float result;
-    bool is_set = false;
-    process(NITROHACK_DURATION, &result, &is_set);
-    if (!is_set)
-        Log::fatal("AbstractCharacteristic", "Can't get characteristic %s",
-                    getName(NITROHACK_DURATION).c_str());
-    return result;
-}  // getNitrohackDuration
-
-// ----------------------------------------------------------------------------
-float AbstractCharacteristic::getNitrohackFactor() const
-{
-    float result;
-    bool is_set = false;
-    process(NITROHACK_FACTOR, &result, &is_set);
-    if (!is_set)
-        Log::fatal("AbstractCharacteristic", "Can't get characteristic %s",
-                    getName(NITROHACK_FACTOR).c_str());
-    return result;
-}  // getNitrohackFactor
 
 // ----------------------------------------------------------------------------
 float AbstractCharacteristic::getSlipstreamDurationFactor() const
