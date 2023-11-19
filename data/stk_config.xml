@@ -242,7 +242,7 @@
 
   <!-- Bubblegum
        disappear-counter: How often bubblegum gets driven over before it disappears.
-       restrict-weapons: If true, using weapons will destroy the user's shield -->
+       restrict-weapons: If true, using weapons will destroy the user's gum shield -->
   <bubblegum disappear-counter="1" restrict-weapons="true"/>
 
   <!-- explosion-impulse-objects is the impulse that pushes physical objects

@@ -308,8 +308,10 @@ void Powerup::use()
     case PowerupManager::POWERUP_RUBBERBALL:
     case PowerupManager::POWERUP_BOWLING:
     case PowerupManager::POWERUP_PLUNGER:
-        if(stk_config->m_shield_restrict_weapons)
-            m_kart->setShieldTime(0.0f); // make weapon usage destroy the shield
+        // make weapon usage destroy gum shields
+        if(stk_config->m_shield_restrict_weapons &&
+            m_kart->isGumShielded())
+            m_kart->decreaseShieldTime();
         if (!has_played_sound)
         {
             Powerup::adjustSound();
@@ -427,7 +429,6 @@ void Powerup::use()
             else
                 type = Attachment::ATTACH_BUBBLEGUM_SHIELD;
 
-            printf("The gum shield status is %i\n", m_kart->isGumShielded());
             if(!m_kart->isGumShielded()) //if the previous shield had been used up.
             {
                     m_kart->getAttachment()->set(type,
