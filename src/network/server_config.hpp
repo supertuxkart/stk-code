@@ -451,7 +451,7 @@ namespace ServerConfig
 
     // ========================================================================
     /** Server version, will be advanced if there are protocol changes. */
-    static const uint32_t m_server_version = 6;
+    static const uint32_t m_server_version = 7;
     // ========================================================================
     /** Server database version, will be advanced if there are protocol
      *  changes. */
