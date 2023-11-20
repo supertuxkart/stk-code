@@ -224,9 +224,9 @@
                 detach parachute. E.g. at max-speed 50% of speed must be lost.
             max-speed: A factor that decides the impact of rate of speed
                 (distance between bounds) -->
-        <parachute friction="5.0" duration="3" duration-other="2.5"
-                   duration-rank-mult="1.5" duration-speed-mult="1.35"
-                   lbound-fraction="0.5" ubound-fraction="0.3" max-speed="30" />
+        <parachute friction="5.0" duration="2.7" duration-other="2.2"
+                   duration-rank-mult="1.6" duration-speed-mult="1.48"
+                   lbound-fraction="0.55" ubound-fraction="0.35" max-speed="40" />
         <!-- Bubblegum
             duration: How long the bubblegum lasts.
             speed-fraction: To what fraction of top-speed the speed is reduced.
@@ -410,6 +410,7 @@
             <nitro engine-force="*0.6" consumption="*1.2" max-speed-increase="*1.2" />
             <slipstream length="*0.9" collect-time="*0.9"
                         duration-factor="*1" fade-out-time="*1" />
+            <parachute lbound-fraction="0.35" ubound-fraction="0.2" />
         </characteristic>
         <characteristic name="medium-h">
             <turn radius="0:3 5:4.6 12:9 20:15.4 30:23.8 50:41.2" />
@@ -423,6 +424,7 @@
             <explosion duration="*0.8" radius="*0.8" />
             <nitro engine-force="*0.75" consumption="*1.375" max-speed-increase="*1.1" />
             <slipstream duration-factor="*0.8" fade-out-time="*1" />
+            <parachute lbound-fraction="0.45" ubound-fraction="0.275" />
         </characteristic>
         <characteristic name="medium">
             <turn radius="0:3 5:4.8 12:9.6 20:16.8 30:26.4 50:46.2" />
@@ -435,6 +437,7 @@
             <explosion duration="*0.8" radius="*0.8" />
             <nitro engine-force="*0.75" consumption="*1.375" max-speed-increase="*1.1" />
             <slipstream duration-factor="*0.8" fade-out-time="*1" />
+            <parachute lbound-fraction="0.45" ubound-fraction="0.275" />
         </characteristic>
         <characteristic name="heavy">
             <turn radius="0:3.4 5:5.44 12:10.88 20:19.04 30:29.92 50:52.36" />
@@ -448,6 +451,7 @@
             <nitro engine-force="*1" consumption="*1.67" max-speed-increase="*1.0" />
             <slipstream length="*1.1" collect-time="*1.1"
                    duration-factor="*0.6" fade-out-time="*1" />
+            <parachute lbound-fraction="0.55" ubound-fraction="0.35" />
         </characteristic>
     </kart-types>
 
