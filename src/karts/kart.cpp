@@ -142,6 +142,7 @@ Kart::Kart (const std::string& ident, unsigned int world_kart_id,
     m_type                 = RaceManager::KT_AI;
     m_flying               = false;
     m_powerup_mask         = 0;
+    m_powerup_buckets.clear();
 
     m_xyz_history_size     = stk_config->time2Ticks(XYZ_HISTORY_TIME);
 
@@ -342,6 +343,7 @@ void Kart::reset()
 
     // Reset the powerup mask
     m_powerup_mask = 0;
+    m_powerup_buckets.clear();
 
     // Reset star effect in case that it is currently being shown.
     if (m_stars_effect)

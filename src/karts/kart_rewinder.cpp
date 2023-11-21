@@ -211,6 +211,8 @@ BareNetworkString* KartRewinder::saveState(std::vector<std::string>* ru)
         bool_for_each_data_2 |= (1 << 4);
     if (isNitroHackActive())
         bool_for_each_data_2 |= (1 << 5);
+    if (getPowerupMask())
+        bool_for_each_data_2 |= (1 << 6);
     buffer->addUInt8(bool_for_each_data_2);
 
     if (m_bubblegum_ticks > 0)
@@ -223,6 +225,8 @@ BareNetworkString* KartRewinder::saveState(std::vector<std::string>* ru)
         buffer->addUInt16(m_nitro_hack_ticks);
     if (getEnergy() != 0.0f)
         buffer->addFloat(getEnergy());
+    if (getPowerupMask())
+        buffer->addUInt32(m_powerup_mask);
 
     // 3) Kart animation status or physics values (transform and velocities)
     // -------------------------------------------
@@ -310,6 +314,7 @@ void KartRewinder::restoreState(BareNetworkString *buffer, int count)
     bool read_powerup = ((bool_for_each_data_2 >> 3) & 1) == 1;
     m_bubblegum_torque_sign = ((bool_for_each_data_2 >> 4) & 1) == 1;
     bool read_nitro_hack = ((bool_for_each_data_2 >> 5) & 1) == 1;
+    bool read_powerup_mask = ((bool_for_each_data_2 >> 6) & 1) == 1;
 
     if (read_bubblegum)
         m_bubblegum_ticks = buffer->getUInt16();
@@ -338,6 +343,11 @@ void KartRewinder::restoreState(BareNetworkString *buffer, int count)
     }
     else
         setEnergy(0.0f);
+
+    if (read_powerup_mask)
+        m_powerup_mask = buffer->getUInt32();
+    else
+        m_powerup_mask = 0;
 
     // 3) Kart animation status or transform and velocities
     // -----------
