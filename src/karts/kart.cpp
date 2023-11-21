@@ -1897,7 +1897,8 @@ void Kart::updatePowerupMask(int bucket)
 
     // We remove the first (oldest) element of the list and
     // update the bitmask accordingly
-    if (b.count() > 16)
+    // MAX_BUCKETS is defined in powerup_manager.hpp
+    if (b.count() > MAX_BUCKETS)
     {
         temp_mask = 1 << m_powerup_buckets[0];
         m_powerup_mask = m_powerup_mask ^ temp_mask; // Bitwise XOR

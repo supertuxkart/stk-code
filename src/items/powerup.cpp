@@ -638,18 +638,28 @@ void Powerup::hitBonusBox(const ItemState &item_state)
     int random_number = 0;
 
     // Pick a random number
-    // If not in full random mode, checkthat's not in one of the already used buckets
+    // If not in full random mode, check that's not in one of the already used buckets
     for (unsigned int i=0; i<30;i++)
     {
+        // Random_number is in the range 0-32767 
         random_number = simplePRNG((int)(powerup_manager->getRandomSeed()+i),
-                                    time+i, item_state.getItemId(), position);
+                                    time+1000*i, item_state.getItemId(), position);
 
-        // Check the bool stk_config setting
+        // Make sure the random number is equally likely to be in any
+        // of the buckets
+        if (random_number > (32767 - (32768 % BUCKET_COUNT)))
+            continue;
+
+        // We don't check for buckets if full random mode is enabled in config
+        // This steps occurs after the previous one to ensure that
+        // the random number is equally likely to be in any part of
+        // the weights list
         if (stk_config->m_full_random)
-            break; // We don't check for buckets in full random mode
+            break; 
 
-        // Random_number is in the range 0-32767 so bucket is in the range 0-31
-        int bucket = random_number / 1024;
+        // Determine the random number's bucket
+        int bucket = random_number / (32768 / BUCKET_COUNT);
+
         uint32_t temp_mask = 1 << bucket;
         // Check that the new random number is not in an already used bucket
         if ((buckets_mask & temp_mask) == 0)

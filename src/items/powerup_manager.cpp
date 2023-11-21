@@ -147,6 +147,9 @@ void PowerupManager::loadPowerupsModels()
         }
     }
 
+    if (BUCKET_COUNT > 32)
+        Log::warn("Powerup", "Excessive number of powerup buckets, %i which is more than 32.", BUCKET_COUNT);
+
     loadWeights(root, "race-weight-list"    );
     loadWeights(root, "ftl-weight-list"     );
     loadWeights(root, "battle-weight-list"  );
