@@ -419,6 +419,12 @@ public:
     /** Show fire to go with a zipper. */
     virtual void showZipperFire() = 0;
     // ------------------------------------------------------------------------
+    /** Get the value of the powerup bitmask. */
+    virtual uint32_t  getPowerupMask() = 0;
+    // ------------------------------------------------------------------------
+    /** Set a new powerup mask */
+    virtual void   updatePowerupMask(int bucket) = 0;
+    // ------------------------------------------------------------------------
     /** Sets zipper time, and apply one time additional speed boost. It can be
      *  used with a specific material, in which case the zipper parmaters are
      *  taken from this material (parameters that are <0 will be using the

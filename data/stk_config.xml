@@ -233,8 +233,11 @@
                      is different, add more if it is the same.
         limited-items-timeout : if world time is less than this value, then cakes,
                 basketballs, parachutes and nitro-hacks are not given.
+        full-random : if true, powerups are (for all practical purposes) fully random,
+                if false, variance is reduced while the rate at which any given powerup
+                is collected stays the same.
          -->
-  <powerup collect-mode="new" limited-items-timeout="15.0"/>
+  <powerup collect-mode="new" limited-items-timeout="15.0" full-random="false"/>
   <!-- time: How long a switch is being effective.
        items for each item list the index of the item it is switched with.
              Order: giftbox, banana, big-nitro, small-nitro, bubble-gum, nolok-bubble-gum,

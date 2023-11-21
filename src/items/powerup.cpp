@@ -624,30 +624,43 @@ void Powerup::hitBonusBox(const ItemState &item_state)
     // of items, if he is overtaken the sequence will change, using (4)
     // to avoid same item sequence when starting
     //
+
     // In order to increase the probability of correct client prediction
     // in networking (where there might be 1 or 2 frames difference
     // between client and server when collecting an item), the time
     // is divided by 10, meaning even if there is one frame difference,
     // the client will still have a 90% chance to correctly predict the
-    // item. We multiply the item with a 'large' (more or less random)
-    // number to spread the random values across the (typically 1000)
-    // weights used in the PowerupManager - same for the position.
-    uint64_t random_number = item_state.getItemId() * 31 +
-        world->getTicksSinceStart() / stk_config->time2Ticks(0.083334f) +
-        position * 23 + powerup_manager->getRandomSeed();
+    // item.
+    const int time = world->getTicksSinceStart() / stk_config->time2Ticks(0.083334f);
 
-    // Use this random number as a seed of a PRNG (based on the one in 
-    // bullet's btSequentialImpulseConstraintSolver) to avoid getting
-    // consecutive numbers. Without this the same item could be 
-    // produced for a longer period of time, which would make this
-    // exploitable: someone could hack STK to display the item that
-    // can be collected for each box, and the pick the one with the
-    // 'best' item.
-    random_number = (1664525L * random_number + 1013904223L);
-    // Lower bits only have a short period, so mix in higher
-    // bits:
-    random_number ^= (random_number >> 16);
-    random_number ^= (random_number >> 8);
+    // A bitmask storing which random buckets have been used
+    uint32_t buckets_mask = m_kart->getPowerupMask();
+    int random_number = 0;
+
+    // Pick a random number
+    // If not in full random mode, checkthat's not in one of the already used buckets
+    for (unsigned int i=0; i<30;i++)
+    {
+        random_number = simplePRNG((int)(powerup_manager->getRandomSeed()+i),
+                                    time+i, item_state.getItemId(), position);
+
+        // Check the bool stk_config setting
+        if (stk_config->m_full_random)
+            break; // We don't check for buckets in full random mode
+
+        // Random_number is in the range 0-32767 so bucket is in the range 0-31
+        int bucket = random_number / 1024;
+        uint32_t temp_mask = 1 << bucket;
+        // Check that the new random number is not in an already used bucket
+        if ((buckets_mask & temp_mask) == 0)
+        {
+            // We update the buckets_mask
+            // This function also handles removing previously used buckets
+            // before we have cycled over all possible buckets
+            m_kart->updatePowerupMask(bucket);
+            break;
+        }
+    }
 
     new_powerup = powerup_manager->getRandomPowerup(position, &n, 
                                                     random_number);
@@ -675,3 +688,51 @@ void Powerup::hitBonusBox(const ItemState &item_state)
     // POWERUP_MODE_SAME
 
 }   // hitBonusBox
+
+//-----------------------------------------------------------------------------
+/** This function is called when a pseudo-random number for a new item
+ *  is needed.
+ *  Usual PRNG update their state when generating a number. For synchronization
+ *  purposes, this would create a difficulty. If the collection of an item
+ *  box is mispredicted, the PRNG could go out of synch. And if messages had
+ *  to be sent to resynch the PRNG, then it would be more efficient to directly
+ *  send appropriate final pseudo-random number for the items.
+ *  The state of the simplePRNG is defined by the seed it is called with
+ *  (determined at race start and constant),
+ *  and some race parameters :
+ *  - the current time of the race
+ *  - the collected item ID
+ *  - the kart's position
+ *  The simplePRNG takes advantage of the fact that this state will have more
+ *  significant bits that the needed output to extract higher-order bits and
+ *  get enough impredictability - and regularity - for our purpose.
+ *  The simplePRNG is modulo 2^31 : it doesn't need to do modulo calculations,
+ *  the arithmetic of 32-bit ints take care of this automatically.
+ *  \param seed The base number.
+ *  \param item_id The item id
+ *  \param position The kart position
+ */
+int Powerup::simplePRNG(const int seed, const int time, const int item_id, const int position)
+{
+    const int c = 12345*(1+2*time); // This is always an odd number
+
+    const int a = 1103515245;
+    int rand = a*(seed + c);
+    if (rand < 0)
+    {
+        // We substract 2^31, which sends back the number to the positives
+        // while keeping the same value modulo 2^31
+        rand += -2147483648;
+    }
+    if (position > 0 && position > item_id)
+        return simplePRNG(rand, time, item_id, position-1);
+    else if (item_id > 0)
+        return simplePRNG(-2147483648 - rand, time, item_id-1, 0);
+
+#ifdef ITEM_DISTRIBUTION_DEBUG
+    Log::verbose("Powerup", "Raw PRN is %d", rand);
+#endif
+
+    // Return the final value and drop the lower order bits
+    return (rand/65536);
+} // simplePRNG

@@ -247,6 +247,14 @@ protected:
 
     float           m_weight;
 
+    /** A bit mask containing the buckets a random powerup 
+     * was already picked from */
+    uint32_t      m_powerup_mask;
+
+    /** Contains the list of powerup buckets in the order
+     * they were picked, so they can be removed*/
+    std::vector <uint8_t> m_powerup_buckets;
+
     /** The current speed (i.e. length of velocity vector) of this kart. */
     float         m_speed;
 
@@ -285,6 +293,7 @@ protected:
     int          m_ticks_last_crash;
     int          m_ticks_last_zipper;
     RaceManager::KartType m_type;
+
 
     void          updatePhysics(int ticks);
     void          handleMaterialSFX();
@@ -351,6 +360,8 @@ public:
     virtual void   beep             () OVERRIDE;
     virtual void   showZipperFire   () OVERRIDE;
 
+    virtual uint32_t getPowerupMask () OVERRIDE { return m_powerup_mask; }
+    virtual void   updatePowerupMask   (int bucket) OVERRIDE;
 
     virtual bool   playCustomSFX    (unsigned int type) OVERRIDE;
     virtual void   setController(Controller *controller) OVERRIDE;

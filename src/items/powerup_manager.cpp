@@ -153,6 +153,8 @@ void PowerupManager::loadPowerupsModels()
     loadWeights(root, "soccer-weight-list"  );
     loadWeights(root, "tutorial-weight-list");
 
+    sortRaceWeights(root, "race-goodness");
+
     delete root;
 
     if (GUIEngine::isNoGraphics())
@@ -169,6 +171,77 @@ void PowerupManager::loadPowerupsModels()
         }
     }
 }  // loadPowerupsModels
+
+//-----------------------------------------------------------------------------
+/** Loads the goodness ordering for races and use them to sort the weights.
+ *  \param node The goodness node of the powerup xml file.
+ *  \param class_name The name of the attribute with the goodness rankings
+ */
+void PowerupManager::sortRaceWeights(const XMLNode *powerup_node,
+                                 const std::string &node_name)
+{
+    const XMLNode *node = powerup_node->getNode(node_name);
+    if(!node)
+    {
+        Log::fatal("PowerupManager",
+                   "Cannot find node '%s' in powerup.xml file.",
+                   node_name.c_str());
+    }
+
+    // (1) - Extract the goodness data from the XML node
+    std::string single_string;
+    node->get("single", &single_string);
+    std::string multi_string;
+    node->get("multi", &multi_string);
+    std::vector<std::string> l_string =
+            StringUtils::split(single_string+" "+multi_string, ' ');
+
+    std::vector<int> values;
+    for(unsigned int i=0; i<l_string.size(); i++)
+    {
+        if(l_string[i]=="") continue;
+        int n;
+        StringUtils::fromString(l_string[i], n);
+        values.push_back(n);
+    }
+
+    // Make sure we have the right number of entries
+    if (values.size() < 2 * (int)POWERUP_LAST)
+    {
+        Log::fatal("PowerupManager",
+                   "Not enough entries for '%s' in powerup.xml",
+                       node->getName().c_str());
+    }
+    if(values.size()>2*(int)POWERUP_LAST)
+    {
+        Log::fatal("PowerupManager",
+                   "Too many entries for '%s' in powerup.xml.",
+                   node->getName().c_str());
+    }
+
+    // Make sure the entries are in the right range
+    for (unsigned int i=0;i< 2* (int)POWERUP_LAST; i++)
+    {
+        if (values[i] < 0 || values[i] > 2* (int)POWERUP_LAST)
+            Log::fatal("PowerupManager",
+               "Incorrect entries for '%s' in powerup.xml.",
+               node->getName().c_str());
+    }
+
+    // (2) - Use the goodness data to sort the races WeightData
+
+    std::vector<WeightsData*> wd = m_all_weights["race-weight-list"];
+
+    for (unsigned int i = 0; i < wd.size(); i++)
+    {
+        // Copy over the powerup ordering for later use
+        wd[i]->m_powerup_order = values;
+
+        // The WeightsData can now sort itself
+        wd[i]->sortWeights();
+    }
+}   // sortRaceWeights
+
 
 //-----------------------------------------------------------------------------
 /** Loads the powerups weights for a given category (race, ft, ...). The data
@@ -257,6 +330,27 @@ void PowerupManager::WeightsData::readData(int num_karts, const XMLNode *node)
     }   // for i in getNumNodes()
 }   // WeightsData::readData
 
+//-----------------------------------------------------------------------------
+/** Sorts the weight according to the data contained within m_powerup_order
+ */
+void PowerupManager::WeightsData::sortWeights()
+{
+    if (m_powerup_order.size() != 2*(int)POWERUP_LAST)
+        Log::fatal("PowerupManager",
+           "SortWeights called without m_powerup_order being set.");
+
+    for (unsigned int i=0; i<m_weights_for_section.size(); i++)
+    {
+        std::vector <int> temp_weights_copy = m_weights_for_section[i];
+
+        for (unsigned int j=0; j< 2 * (int)POWERUP_LAST; j++)
+        {
+            // m_powerup_order[j] contains the new index for the j-th powerup
+            m_weights_for_section[i][m_powerup_order[j]] = temp_weights_copy[j];
+        }
+    }
+}
+
 // ----------------------------------------------------------------------------
 /** Defines the weights for this WeightsData object based on a linear
  *  interpolation between the previous and next WeightsData class (depending
@@ -270,6 +364,7 @@ void PowerupManager::WeightsData::interpolate(WeightsData *prev,
 {
     m_num_karts = num_karts;
     m_weights_for_section.clear();
+    // f = 1 when num_karts = next->getNumKarts
     float f = float(num_karts - prev->getNumKarts())
             / (next->getNumKarts() - prev->getNumKarts());
 
@@ -387,15 +482,34 @@ void PowerupManager::WeightsData::precomputeWeights()
         int prev, next;
         float weight;
         convertRankToSection(i + 1, &prev, &next, &weight);
-        int sum = 0;
+        float sum_av = 0.0f;
+        std::vector<float> summed_weights;
+
         for (unsigned int j = 0;
             j <= 2 * POWERUP_LAST - POWERUP_FIRST; j++)
         {
             float av = (1.0f - weight) * m_weights_for_section[prev][j]
                      +         weight  * m_weights_for_section[next][j];
-            sum += int(av + 0.5f);
-            m_summed_weights_for_rank[i].push_back(sum);
+            sum_av += av;
+            summed_weights.push_back(sum_av);
         }
+        // The pseudo-random number when getting an item will be in
+        // the range 1-32768.
+        // We make sure the total sum is 32768 / REPEAT_WEIGHTS
+        // This way max_summed_weights % max_random_number is as small
+        // as possible.
+        int target_sum = 32768 / REPEAT_WEIGHTS;
+
+        for (unsigned int j = 0;
+            j <= 2 * POWERUP_LAST - POWERUP_FIRST; j++)
+        {
+            int normalized_sum = int( (summed_weights[j]/sum_av*target_sum) + 0.5f);
+            m_summed_weights_for_rank[i].push_back(normalized_sum);
+        }
+#ifdef ITEM_DISTRIBUTION_DEBUG
+        Log::verbose("PowerupManager", "Final summed weight for rank %d is %d",
+          i, m_summed_weights_for_rank[i][2*POWERUP_LAST - POWERUP_FIRST]);
+#endif       
     }
 }   // WeightsData::precomputeWeights
 //-----------------------------------------------------------------------------
@@ -409,7 +523,7 @@ void PowerupManager::WeightsData::precomputeWeights()
  *  \param random_number A random number used to 'randomly' select the item
  *         that was picked.
  */
-int PowerupManager::WeightsData::getRandomItem(int rank, uint64_t random_number)
+int PowerupManager::WeightsData::getRandomItem(int rank, int random_number)
 {
     // E.g. for battle mode with only one entry
     if(rank>(int)m_summed_weights_for_rank.size())
@@ -418,9 +532,8 @@ int PowerupManager::WeightsData::getRandomItem(int rank, uint64_t random_number)
     const std::vector<unsigned> &summed_weights = m_summed_weights_for_rank[rank];
     // The last entry is the sum of all previous entries, i.e. the maximum
     // value
-#undef ITEM_DISTRIBUTION_DEBUG
 #ifdef ITEM_DISTRIBUTION_DEBUG
-    uint64_t original_random_number = random_number;
+    int original_random_number = random_number;
 #endif
     random_number = random_number % summed_weights.back();
     // Put the random number in range [1;max of summed weights],
@@ -430,7 +543,7 @@ int PowerupManager::WeightsData::getRandomItem(int rank, uint64_t random_number)
     // Stop at the first inferior or equal sum, before incrementing
     // So stop while powerup is such that
     // summed_weights[powerup-1] < random_number <= summed_weights[powerup]
-    while ( random_number > summed_weights[powerup] )
+    while ( (unsigned int)random_number > summed_weights[powerup] )
         powerup++;
 
     // We align with the beginning of the enum and return
@@ -440,6 +553,17 @@ int PowerupManager::WeightsData::getRandomItem(int rank, uint64_t random_number)
                  World::getWorld()->getTicksSinceStart(), rank, random_number,
                  original_random_number, powerup);
 #endif
+
+    // The value stored in powerup is still scrambled because of the weights reordering
+    // Correct for the reordering here
+    for (unsigned int i = 0; i<m_powerup_order.size();i++)
+    {
+        if (powerup == m_powerup_order[i])
+        {
+            powerup = i;
+            break;
+        }
+    }
 
     return powerup + POWERUP_FIRST;
 }   // WeightsData::getRandomItem

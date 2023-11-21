@@ -287,6 +287,15 @@
     </weights>
   </tutorial-weight-list>
 
-    
+        <!-- This list is used for self-balancing randomness. The numbers are from 0 to
+      powerup-number*2-1 ; and are used to describe how good a powerup is, with
+      0 being the absolute best powerup and powerup-number*2-1 the least useful.
+      As the purpose is to reduce variance, parachutes and sudo with their effects
+      touching multiple karts are at the top even if other powerups can situationally
+      be more useful. Likewise, it doesn't matter much if e.g. a switch is really better or
+      worse than a swatter.
+                          bubble cake  bowl zipper  plunger  switch swattr rubber  para  sudo electro anvil -->
+  <race-goodness single =" 12     17    22     8      23       13     14     19     2     3       6    20"
+                 multi  ="  7     11    16     5      21        9     10     15     0     1       4    18" />
 </powerup>
 

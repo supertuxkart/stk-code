@@ -247,6 +247,7 @@ void STKConfig::init_defaults()
     m_solver_split_impulse       = false;
     m_smooth_normals             = false;
     m_same_powerup_mode          = POWERUP_MODE_ONLY_IF_SAME;
+    m_full_random                = false;
     m_ai_acceleration            = 1.0f;
     m_disable_steer_while_unskid = false;
     m_camera_follow_skid         = false;
@@ -511,6 +512,8 @@ void STKConfig::getAllData(const XMLNode * root)
         }
         powerup_node->get("limited-items-timeout",
             &m_limited_items_timeout);
+        powerup_node->get("full-random",
+            &m_full_random);
     }
 
     if(const XMLNode *switch_node= root->getNode("switch"))

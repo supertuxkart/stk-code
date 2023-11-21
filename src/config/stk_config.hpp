@@ -95,6 +95,10 @@ public:
     /** Prevent some items before this world time. */
     float m_limited_items_timeout;
 
+    /** Set the powerup collection mode to full random (true)
+     * or to controlled randomness with less variance (false) */
+    bool m_full_random;
+
     /** Maximum number of moveable objects in a track when networking is on. */
     int m_max_moveable_objects;
 

@@ -141,6 +141,7 @@ Kart::Kart (const std::string& ident, unsigned int world_kart_id,
     m_boosted_ai           = false;
     m_type                 = RaceManager::KT_AI;
     m_flying               = false;
+    m_powerup_mask         = 0;
 
     m_xyz_history_size     = stk_config->time2Ticks(XYZ_HISTORY_TIME);
 
@@ -338,6 +339,9 @@ void Kart::reset()
     m_nitro_hack_factor = 1.0f;
     m_stolen_nitro_ticks   = 0;
     m_stolen_nitro_amount  = 0.0f;
+
+    // Reset the powerup mask
+    m_powerup_mask = 0;
 
     // Reset star effect in case that it is currently being shown.
     if (m_stars_effect)
@@ -1158,10 +1162,8 @@ void Kart::collectedItem(ItemState *item_state)
         m_collected_energy += m_kart_properties->getNitroBigContainer();
         break;
     case Item::ITEM_BONUS_BOX  :
-        {
-            m_powerup->hitBonusBox(*item_state);
-            break;
-        }
+        m_powerup->hitBonusBox(*item_state);
+        break;
     case Item::ITEM_BUBBLEGUM:
         m_has_caught_nolok_bubblegum = 
             (item_state->getPreviousOwner()&&
@@ -1883,6 +1885,25 @@ void Kart::showZipperFire()
 {
     m_kart_gfx->setCreationRateAbsolute(KartGFX::KGFX_ZIPPER, 800.0f);
 }
+
+void Kart::updatePowerupMask(int bucket)
+{
+    uint32_t temp_mask = 1 << bucket;
+    m_powerup_mask = m_powerup_mask | temp_mask; // Bitwise OR
+    m_powerup_buckets.push_back(bucket);
+
+    // std::popcount is C++20 only
+    std::bitset<32> b(m_powerup_mask);
+
+    // We remove the first (oldest) element of the list and
+    // update the bitmask accordingly
+    if (b.count() > 16)
+    {
+        temp_mask = 1 << m_powerup_buckets[0];
+        m_powerup_mask = m_powerup_mask ^ temp_mask; // Bitwise XOR
+        m_powerup_buckets.erase(m_powerup_buckets.begin());
+    }
+} // updatePowerupMask
 
 //-----------------------------------------------------------------------------
 /** This activates the kart's electro-shield. */
