@@ -844,10 +844,10 @@ float KartProperties::getEngineBrakeFactor() const
 }  // getEngineBrakeFactor
 
 // ----------------------------------------------------------------------------
-float KartProperties::getEngineBrakeTimeIncrease() const
+float KartProperties::getEngineTimeFullBrake() const
 {
-    return m_cached_characteristic->getEngineBrakeTimeIncrease();
-}  // getEngineBrakeTimeIncrease
+    return m_cached_characteristic->getEngineTimeFullBrake();
+}  // getEngineTimeFullBrake
 
 // ----------------------------------------------------------------------------
 float KartProperties::getEngineMaxSpeedReverseRatio() const

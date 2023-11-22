@@ -121,7 +121,7 @@ void btKart::reset()
     m_min_speed                  = 0.0f;
 
     // Set the brakes so that karts don't slide downhill
-    setAllBrakes(5.0f);
+    setAllBrakes(20.0f);
 
 }   // reset
 
@@ -766,28 +766,19 @@ void btKart::updateFriction(btScalar timeStep)
         btScalar rollingFriction = 0.f;
 
         if (wheelInfo.m_engineForce != 0.f)
-        {
             rollingFriction = wheelInfo.m_engineForce* timeStep;
-        }
-        else
+
+        // Apply braking
+        if (wheelInfo.m_brake)
         {
-            btScalar defaultRollingFrictionImpulse = 0.f;
-            btScalar maxImpulse = wheelInfo.m_brake
-                ? wheelInfo.m_brake
-                : defaultRollingFrictionImpulse;
-            btWheelContactPoint contactPt(m_chassisBody, groundObject,
-                wheelInfo.m_raycastInfo.m_contactPointWS,
-                m_forwardWS[wheel], maxImpulse);
-            rollingFriction = calcRollingFriction(contactPt);
-            // This is a work around for the problem that a kart shakes
-            // if it is braking: we get a minor impulse forward, which
-            // bullet then tries to offset by applying a backward
-            // impulse - which is a bit too big, causing a impulse
-            // backwards, ... till the kart is shaking backwards and
-            // forwards. By only applying half of the impulse in case
-            // of low friction this goes away.
-            if (wheelInfo.m_brake && fabsf(rollingFriction) < 10)
-                rollingFriction *= 0.5f;
+            // Rolling friction gets weaker and weaker as the speed gets lower
+            // whereas braking should apply strong friction on the wheels even if
+            // the vehicle is moving at low speed
+            float speed_brake_factor = 1000 / (fabsf(m_kart->getSpeed()) + 10.0f);
+                btWheelContactPoint contactPt(m_chassisBody, groundObject,
+            wheelInfo.m_raycastInfo.m_contactPointWS,
+            m_forwardWS[wheel], wheelInfo.m_brake);
+            rollingFriction += calcRollingFriction(contactPt)*timeStep*speed_brake_factor;
         }
 
         m_forwardImpulse[wheel] = rollingFriction;

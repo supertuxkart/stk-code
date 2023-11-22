@@ -195,9 +195,11 @@ bool PlayerController::action(PlayerAction action, int value, bool dry_run)
         // let's consider below that to be a deadzone
         if(value > 32768/2)
         {
+            // If the player wants to stop accelerating or using nitro,
+            // he will stop pressing those keys. We allow to brake
+            // while pressing the acceleration key because this offers
+            // better control.
             SET_OR_TEST_GETTER(Brake, true);
-            SET_OR_TEST_GETTER(Accel, 0.0f);
-            SET_OR_TEST_GETTER(Nitro, false);
         }
         else
         {

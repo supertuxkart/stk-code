@@ -369,8 +369,8 @@ void XmlCharacteristic::load(const XMLNode *node)
             &m_values[ENGINE_GENERIC_MAX_SPEED]);
         sub_node->get("brake-factor",
             &m_values[ENGINE_BRAKE_FACTOR]);
-        sub_node->get("brake-time-increase",
-            &m_values[ENGINE_BRAKE_TIME_INCREASE]);
+        sub_node->get("time-full-brake",
+            &m_values[ENGINE_TIME_FULL_BRAKE]);
         sub_node->get("max-speed-reverse-ratio",
             &m_values[ENGINE_MAX_SPEED_REVERSE_RATIO]);
     }

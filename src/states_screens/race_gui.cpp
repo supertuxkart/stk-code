@@ -1102,12 +1102,10 @@ void RaceGUI::drawSpeedEnergyRank(const AbstractKart* kart,
 
     drawRank(kart, offset, min_ratio, meter_width, meter_height, dt);
 
-
-    if(speed <=0) return;  // Nothing to do if speed is negative.
-
     // Draw the actual speed bar (if the speed is >0)
     // ----------------------------------------------
     float speed_ratio = speed/40.0f; //max displayed speed of 40
+    if(speed_ratio<0) speed_ratio = -speed_ratio; // display negative speeds too
     if(speed_ratio>1) speed_ratio = 1;
 
     // see computeVerticesForMeter for the detail of the drawing

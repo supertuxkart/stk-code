@@ -93,7 +93,7 @@ AbstractCharacteristic::ValueType AbstractCharacteristic::getType(
         return TYPE_FLOAT;
     case ENGINE_BRAKE_FACTOR:
         return TYPE_FLOAT;
-    case ENGINE_BRAKE_TIME_INCREASE:
+    case ENGINE_TIME_FULL_BRAKE:
         return TYPE_FLOAT;
     case ENGINE_MAX_SPEED_REVERSE_RATIO:
         return TYPE_FLOAT;
@@ -341,8 +341,8 @@ std::string AbstractCharacteristic::getName(CharacteristicType type)
         return "ENGINE_GENERIC_MAX_SPEED";
     case ENGINE_BRAKE_FACTOR:
         return "ENGINE_BRAKE_FACTOR";
-    case ENGINE_BRAKE_TIME_INCREASE:
-        return "ENGINE_BRAKE_TIME_INCREASE";
+    case ENGINE_TIME_FULL_BRAKE:
+        return "ENGINE_TIME_FULL_BRAKE";
     case ENGINE_MAX_SPEED_REVERSE_RATIO:
         return "ENGINE_MAX_SPEED_REVERSE_RATIO";
     case GEAR_SWITCH_RATIO:
@@ -772,16 +772,16 @@ float AbstractCharacteristic::getEngineBrakeFactor() const
 }  // getEngineBrakeFactor
 
 // ----------------------------------------------------------------------------
-float AbstractCharacteristic::getEngineBrakeTimeIncrease() const
+float AbstractCharacteristic::getEngineTimeFullBrake() const
 {
     float result;
     bool is_set = false;
-    process(ENGINE_BRAKE_TIME_INCREASE, &result, &is_set);
+    process(ENGINE_TIME_FULL_BRAKE, &result, &is_set);
     if (!is_set)
         Log::fatal("AbstractCharacteristic", "Can't get characteristic %s",
-                    getName(ENGINE_BRAKE_TIME_INCREASE).c_str());
+                    getName(ENGINE_TIME_FULL_BRAKE).c_str());
     return result;
-}  // getEngineBrakeTimeIncrease
+}  // getEngineTimeFullBrake
 
 // ----------------------------------------------------------------------------
 float AbstractCharacteristic::getEngineMaxSpeedReverseRatio() const

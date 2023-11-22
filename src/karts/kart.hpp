@@ -304,6 +304,7 @@ protected:
     void          updateEngineSFX(float dt);
     void          updateSpeed();
     void          updateNitro(int ticks);
+    float         compensateLinearSlowdown (float engine_power);
     float         applyAirFriction (float engine_power);
     float         getActualWheelForce();
     void          playCrashSFX(const Material* m, AbstractKart *k);
