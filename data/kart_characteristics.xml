@@ -227,6 +227,7 @@
         <parachute friction="5.0" duration="2.7" duration-other="2.2"
                    duration-rank-mult="1.6" duration-speed-mult="1.48"
                    lbound-fraction="0.55" ubound-fraction="0.35" max-speed="40" />
+
         <!-- Bubblegum
             duration: How long the bubblegum lasts.
             speed-fraction: To what fraction of top-speed the speed is reduced.
@@ -244,7 +245,7 @@
                 kart-specific maximum kart speed.
             fade-out-time: determines how long it takes for a zipper
                 to fade out (after 'time'). -->
-        <zipper duration="3.5" force="300.0" speed-gain="4.0" max-speed-increase="15"
+        <zipper duration="3.5" force="300.0" speed-gain="4.0" max-speed-increase="12"
                 fade-out-time="1.0" />
 
         <!-- Swatter
@@ -271,7 +272,7 @@
          <!-- Nitro-hack
             duration: Time a nitro-hack is active.
             factor: Multiplicative factor for the engine and max-speed boosts of nitro -->
-        <nitro-hack duration="7.0" factor="1.8" />
+        <nitro-hack duration="7.0" factor="1.7" />
 
         <!-- Electro-Shield
             duration: Duration during which the electro-shield is active.
@@ -286,10 +287,11 @@
         <!-- ********** Miscellaneous ********** -->
 
         <!-- Startup
-            If a kart starts within the specified time after 'go',
-            it receives the corresponding bonus from 'boost'. Those
+            If acceleration begins within the specified time after 'set',
+            the kart receives the corresponding bonus from 'boost'. Those
             fields must have the same size, and must be sorted by
-            increasing times. -->
+            increasing times.
+            The startup boost uses the same boost category as zippers. -->
         <startup time="0.3 0.5"
                  boost="8 4" />
 
@@ -363,7 +365,7 @@
         <characteristic name="easy">
             <engine power="*0.75" max-speed="*0.6" generic-max-speed="*0.6" 
                     max-speed-reverse-ratio="0.75"/>
-            <zipper max-speed-increase="*0.5" />
+            <zipper max-speed-increase="*0.6" />
             <nitro engine-force="*0.8" max-speed-increase="*0.7" />
             <skid bonus-speed="*0.5 *0.5 *0.5" bonus-force="*0.5 *0.5 *0.5" />
             <turn time-full-steer="0:0.25 0.5:0.25 0.5:0.42 1.0:0.42" />
@@ -372,7 +374,7 @@
         <characteristic name="casual">
             <engine power="*0.82" max-speed="*0.75" generic-max-speed="*0.75"
                     max-speed-reverse-ratio="0.675"/>
-            <zipper max-speed-increase="*0.75" />
+            <zipper max-speed-increase="*0.8" />
             <nitro engine-force="*0.83" max-speed-increase="*0.78" />
             <skid bonus-speed="*0.7 *0.7 *0.7" bonus-force="*0.7 *0.7 *0.7" />
             <turn time-full-steer="0:0.21 0.5:0.21 0.5:0.35 1.0:0.35" />
