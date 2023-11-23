@@ -103,7 +103,7 @@ private:
     /** Texture for speedometer. */
     irr::video::ITexture *m_speed_meter_icon;
     irr::video::ITexture *m_speed_bar_icon;
-
+    
     /** Animation state: none, getting smaller (old value),
      *  getting bigger (new number). */
     enum AnimationState {AS_NONE, AS_SMALLER, AS_BIGGER};

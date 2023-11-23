@@ -1084,8 +1084,8 @@ void RaceGUI::drawSpeedEnergyRank(const AbstractKart* kart,
     // First draw the meter (i.e. the background )
     // -------------------------------------------------------------------------
     core::vector2df offset;
-    offset.X = (float)(viewport.LowerRightCorner.X-meter_width) - 24.0f*scaling.X;
-    offset.Y = viewport.LowerRightCorner.Y-10.0f*scaling.Y;
+    offset.X = (float)(viewport.LowerRightCorner.X-meter_width) - 24.5f*scaling.X;
+    offset.Y = viewport.LowerRightCorner.Y-8.5f*scaling.Y;
 
     const core::rect<s32> meter_pos((int)offset.X,
                                     (int)(offset.Y-meter_height),
@@ -1104,14 +1104,14 @@ void RaceGUI::drawSpeedEnergyRank(const AbstractKart* kart,
 
     // Draw the actual speed bar (if the speed is >0)
     // ----------------------------------------------
-    float speed_ratio = speed/40.0f; //max displayed speed of 40
+    float speed_ratio = speed/55.0f; //max displayed speed of 55
     if(speed_ratio<0) speed_ratio = -speed_ratio; // display negative speeds too
     if(speed_ratio>1) speed_ratio = 1;
 
     // see computeVerticesForMeter for the detail of the drawing
     // If increasing this, update drawMeterTexture
 
-    const int vertices_count = 12;
+    const int vertices_count = 13;
 
     video::S3DVertex vertices[vertices_count];
 
@@ -1119,64 +1119,57 @@ void RaceGUI::drawSpeedEnergyRank(const AbstractKart* kart,
 
     // They are calculated from speedometer.png
     // A is the center of the speedometer's circle
-    // B2, C, D, E, F, G, H, I and J1 are points on the line
-    // from A to their respective 1/8th threshold division
-    // B2 is 36,9° clockwise from the vertical (on bottom-left)
-    // J1 s 70,7° clockwise from the vertical (on upper-right)
-    // B1 and J2 are used for correct display of the 3D effect
-    // They are 1,13* further than the speedometer farther position because
-    // the lines between them would otherwise cut through the outside circle.
+    // Points B to M are points on the line
+    // from A to their respective 1/11th threshold division
+    // (There is 12 points because it goes from 0/11 to 11/11)
+    // They are further away (at a constand distance from A)
+    // than the speedometer farther position because the lines
+    // between them would otherwise cut through the outside circle.
 
     core::vector2df position[vertices_count];
 
-    position[0].X = 0.546f;//A
-    position[0].Y = 0.566f;//A
-    position[1].X = 0.216f;//B1
-    position[1].Y = 1.036f;//B1
-    position[2].X = 0.201f;//B2
-    position[2].Y = 1.023f;//B2
-    position[3].X = 0.036f;//C
-    position[3].Y = 0.831f;//C
-    position[4].X = -0.029f;//D
-    position[4].Y = 0.589f;//D
-    position[5].X = 0.018f;//E
-    position[5].Y = 0.337f;//E
-    position[6].X = 0.169f;//F
-    position[6].Y = 0.134f;//F
-    position[7].X = 0.391f;//G
-    position[7].Y = 0.014f;//G
-    position[8].X = 0.642f;//H
-    position[8].Y = 0.0f;//H
-    position[9].X = 0.878f;//I
-    position[9].Y = 0.098f;//I
-    position[10].X = 1.046f;//J1
-    position[10].Y = 0.285f;//J1
-    position[11].X = 1.052f;//J2
-    position[11].Y = 0.297f;//J2
+    position[0].X = 0.5332f;//A
+    position[0].Y = 0.5469f;//A
+    position[1].X = 0.2051f;//B
+    position[1].Y = 1.0225f;//B
+    position[2].X = 0.0674f;//C
+    position[2].Y = 0.8887f;//C
+    position[3].X = -0.0195f;//D
+    position[3].Y = 0.7168f;//D
+    position[4].X = -0.0449f;//E
+    position[4].Y = 0.5264f;//E
+    position[5].X = -0.0059f;//F
+    position[5].Y = 0.3379f;//F
+    position[6].X = 0.0928f;//G
+    position[6].Y = 0.1729f;//G
+    position[7].X = 0.2402f;//H
+    position[7].Y = 0.0488f;//H
+    position[8].X = 0.4199f;//I
+    position[8].Y = -0.0195f;//I
+    position[9].X = 0.6113f;//J
+    position[9].Y = -0.0254f;//J
+    position[10].X = 0.7949f;//K
+    position[10].Y = 0.0322f;//K
+    position[11].X = 0.9492f;//L
+    position[11].Y = 0.1465f;//L
+    position[12].X = 1.0576f;//M
+    position[12].Y = 0.3047f;//M
+
 
     // The speed ratios at which different triangles must be used.
 
     float threshold[vertices_count-2];
-    threshold[0] = 0.00001f;//for the 3D margin
-    threshold[1] = 0.125f;
-    threshold[2] = 0.25f;
-    threshold[3] = 0.375f;
-    threshold[4] = 0.50f;
-    threshold[5] = 0.625f;
-    threshold[6] = 0.750f;
-    threshold[7] = 0.875f;
-    threshold[8] = 0.99999f;//for the 3D margin
-    threshold[9] = 1.0f;
-
-    //3D effect : wait for the full border to appear before drawing
-    for (int i=0;i<8;i++)
-    {
-        if ((speed_ratio-0.125f*i < 0.00625f && speed_ratio-0.125f*i >= 0.0f) || (0.125f*i-speed_ratio < 0.0045f && 0.125f*i-speed_ratio >= 0.0f) )
-        {
-            speed_ratio = 0.125f*i-0.0045f;
-            break;
-        }
-    }
+    threshold[0] = 0.0909f;
+    threshold[1] = 0.1818f;
+    threshold[2] = 0.2727f;
+    threshold[3] = 0.3636f;
+    threshold[4] = 0.4545f;
+    threshold[5] = 0.5454f;
+    threshold[6] = 0.6363f;
+    threshold[7] = 0.7272f;
+    threshold[8] = 0.8181f;
+    threshold[9] = 0.9090f;
+    threshold[10] = 1.0f;
 
     unsigned int count = computeVerticesForMeter(position, threshold, vertices, vertices_count, 
                                                      speed_ratio, meter_width, meter_height, offset);
@@ -1192,7 +1185,7 @@ void RaceGUI::drawMeterTexture(video::ITexture *meter_texture, video::S3DVertex 
     //Should be greater or equal than the greatest vertices_count used by the meter functions
     if (count < 2)
         return;
-    short int index[12];
+    short int index[15];
     for(unsigned int i=0; i<count; i++)
     {
         index[i]=i;
@@ -1219,8 +1212,6 @@ void RaceGUI::drawMeterTexture(video::ITexture *meter_texture, video::S3DVertex 
         glDisable(GL_BLEND);
 #endif
 }   // drawMeterTexture
-
-
 
 //-----------------------------------------------------------------------------
 /** This function computes a polygon used for drawing the measure for a meter (speedometer, etc.)
