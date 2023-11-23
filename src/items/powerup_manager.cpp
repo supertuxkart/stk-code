@@ -387,6 +387,9 @@ void PowerupManager::WeightsData::interpolate(WeightsData *prev,
             l.push_back(int(interpolated_weight + 0.5f));
         }
     }   // for l < prev->m_weights_for_section.size()
+
+    // Copy over one m_powerup_order list
+    m_powerup_order = prev->m_powerup_order;
 }   // WeightsData::interpolate
 
 // ----------------------------------------------------------------------------
@@ -552,9 +555,9 @@ int PowerupManager::WeightsData::getRandomItem(int rank, int random_number)
     // We align with the beginning of the enum and return
     // We don't do more, because it would need to be decoded from enum later
 #ifdef ITEM_DISTRIBUTION_DEBUG
-    Log::verbose("Powerup", "World %d rank %d random %d %" PRIu64 " item %d",
+    Log::verbose("Powerup", "World %d rank %d random %d %" PRIu64 " item %d powerup order size %lu",
                  World::getWorld()->getTicksSinceStart(), rank, random_number,
-                 original_random_number, powerup);
+                 original_random_number, powerup, m_powerup_order.size());
 #endif
 
     // The value stored in powerup is still scrambled because of the weights reordering
