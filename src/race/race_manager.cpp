@@ -1311,7 +1311,10 @@ core::stringw RaceManager::getDifficultyName(Difficulty diff) const
         case RaceManager::DIFFICULTY_MEDIUM: return _("Intermediate"); break;
         case RaceManager::DIFFICULTY_HARD:   return _("Expert");   break;
         case RaceManager::DIFFICULTY_BEST:   return _("SuperTux");   break;
-        default:  assert(false);
+        default:    Log::error("RaceManager", "Difficulty level '%u' is unknown.", diff);
+                    // Uncomment to generate a crash and backtrace, if the cause of the
+                    // incorrect difficulty level is unknown (i.e. not online servers' settings)
+                    // assert(false);
     }
     return "";
 }   // getDifficultyName
