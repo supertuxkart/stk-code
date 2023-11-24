@@ -204,6 +204,10 @@ bool SFXBuffer::loadVorbisBuffer(const std::string &name, ALuint buffer)
                  data.get(), len, info->rate);
     success = true;
 
+    if (m_positional && info->channels > 1)
+        Log::error("SFXBuffer", "Positional audio is not supported with stereo files, "
+            "but %s is stereo", m_file.c_str());
+
     int buffer_size, frequency, bits_per_sample, channels;
     buffer_size = len;
     frequency = info->rate;
