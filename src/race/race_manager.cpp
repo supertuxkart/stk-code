@@ -985,6 +985,7 @@ void RaceManager::exitRace(bool delete_world)
 
         StateManager::get()->enterGameState();
         setMinorMode(RaceManager::MINOR_MODE_CUTSCENE);
+        int num_gp_karts = m_num_karts;
         setNumKarts(0);
         setNumPlayers(0);
 
@@ -995,6 +996,7 @@ void RaceManager::exitRace(bool delete_world)
                                   raceWasStartedFromOverworld());
             GrandPrixWin* scene = GrandPrixWin::getInstance();
             scene->push();
+            scene->setNumGPKarts(num_gp_karts); // This must be set before we set karts
             scene->setKarts(winners);
             scene->setPlayerWon(some_human_player_won);
             std::set<std::string> karts;
@@ -1024,6 +1026,7 @@ void RaceManager::exitRace(bool delete_world)
                 scene->setKarts(karts);
             }
         }
+
         kart_properties_manager->onDemandLoadKartTextures(used_karts);
     }
 
@@ -1118,6 +1121,7 @@ void RaceManager::startGP(const GrandPrixData &gp, bool from_overworld,
  * \param trackIdent Internal name of the track to race on
  * \param num_laps   Number of laps to race, or -1 if number of laps is
  *        not relevant in current mode
+ * \param from_overworld If it was started from the Story Mode overworld
  */
 void RaceManager::startSingleRace(const std::string &track_ident,
                                   const int num_laps,
