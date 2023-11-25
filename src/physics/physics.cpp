@@ -446,85 +446,121 @@ void Physics::KartKartCollision(AbstractKart *kart_a,
     kart_b->crashed(kart_a, /*handle_attachments*/false);
 
     AbstractKart *left_kart, *right_kart;
+    float left_kart_contact_Z, right_kart_contact_Z;
 
     // Determine which kart is pushed to the left, and which one to the
-    // right. Ideally the sign of the X coordinate of the local conact point
+    // right. Ideally the sign of the X coordinate of the local contact point
     // could decide the direction (negative X --> was hit on left side, gets
     // push to right), but that can lead to both karts being pushed in the
     // same direction (front left of kart hits rear left).
     // So we just use a simple test (which does the right thing in ideal
     // crashes, but avoids pushing both karts in corner cases
     // - pun intended ;) ).
+
     if(contact_point_a.getX() < contact_point_b.getX())
     {
         left_kart  = kart_b;
         right_kart = kart_a;
+        left_kart_contact_Z  = (kart_b->getKartLength()/2 + contact_point_b.getZ()) / kart_b->getKartLength();
+        right_kart_contact_Z = (kart_a->getKartLength()/2 + contact_point_a.getZ()) / kart_a->getKartLength();
     }
     else
     {
         left_kart  = kart_a;
         right_kart = kart_b;
+        left_kart_contact_Z  = (kart_a->getKartLength()/2 + contact_point_a.getZ()) / kart_a->getKartLength();
+        right_kart_contact_Z = (kart_b->getKartLength()/2 + contact_point_b.getZ()) / kart_b->getKartLength();
     }
+
+    // If both karts have an active impulse, we can return immediately
+    if(right_kart->getVehicle()->getCentralImpulseTicks() > 0 &&
+       left_kart->getVehicle()->getCentralImpulseTicks()  > 0)
+        return;
 
     // Add a scaling factor depending on the mass (avoid div by zero).
     // The value of f_right is applied to the right kart, and f_left
     // to the left kart. f_left = 1 / f_right
+    // The max value based on mass with standard settings is 350/210 = 1.6667
     float f_right =  right_kart->getKartProperties()->getMass() > 0
                      ? left_kart->getKartProperties()->getMass()
                        / right_kart->getKartProperties()->getMass()
-                     : 1.5f;
+                     : 2.0f;
+
+    if (f_right > 2.0f)
+        f_right = 2.0f;
+    if (f_right < 0.5f)
+        f_right = 0.5f;
+
     // Add a scaling factor depending on speed (avoid div by 0)
-    f_right *= right_kart->getSpeed() > 0
-               ? left_kart->getSpeed()
-                  / right_kart->getSpeed()
-               : 1.5f;
-    // Cap f_right to [0.8,1.25], which results in f_left being
-    // capped in the same interval
-    if(f_right > 1.25f)
-        f_right = 1.25f;
-    else if(f_right< 0.8f)
-        f_right = 0.8f;
+    // The impulse is weaker for the kart going faster,
+    // stronger for the kart going slower.
+    float speed_impulse_factor = right_kart->getSpeed() > 0                     ?
+                                 left_kart->getSpeed() / right_kart->getSpeed() : 1.6f;
+    if (speed_impulse_factor > 1.6f)
+        speed_impulse_factor = 1.6f;
+    if (speed_impulse_factor < 0.625f)
+        speed_impulse_factor = 0.625f;
+
+    f_right *= speed_impulse_factor;
+
+    // Because of the caps on the mass and speed factors,
+    // f_right is effectively capped to the interval [0.3125, 3.2]
+    // f_left is capped in the same interval as 3.2*0.3125 = 1 
+
     float f_left = 1/f_right;
 
     // Check if a kart is more 'actively' trying to push another kart
-    // by checking its local sidewards velocity
-    float vel_left  = left_kart->getVelocityLC().getX();
-    float vel_right = right_kart->getVelocityLC().getX();
+    // To do this we check two things:
+    // - The position of the contact point on the kart body.
+    //   The active kart is touching with the front of the kart
+    // - The angle between the two karts. A higher angle indicates
+    //   ramming.
 
-    // Use the difference in speed to determine which kart gets a
-    // ramming bonus. Normally vel_right and vel_left will have
-    // a different sign: right kart will be driving to the left,
-    // and left kart to the right (both pushing at each other).
-    // By using the sum we get the intended effect: if both karts
-    // are pushing with the same speed, vel_diff is 0, if the right
-    // kart is driving faster vel_diff will be < 0. If both velocities
-    // have the same sign, one kart is trying to steer away from the
-    // other, in which case it gets an even bigger push.
-    float vel_diff = vel_right + vel_left;
+    // The "kart_contact_Z" are between 0.0f (kart touching at the very back)
+    // and 1.0f (kart touching at the very front)
+    // Note that the wheels are usually not at the very front
+    bool left_kart_ramming = false, right_kart_ramming = false;
+    if (left_kart_contact_Z > 0.7f && 
+        left_kart_contact_Z > right_kart_contact_Z + 0.15f)
+        left_kart_ramming = true;
+    else if (right_kart_contact_Z > 0.7f &&
+             right_kart_contact_Z > left_kart_contact_Z + 0.15f)
+        right_kart_ramming = true;
 
-    // More driving towards left --> left kart gets bigger impulse
-    if(vel_diff<0)
+    // Kart heading is in the range [-pi, pi]. It depends on the direction
+    // the kart is pointing at.
+    // We can assume that both karts are more or less in the same plane
+    // when they collide, in which case the heading difference indicates
+    // the angle at which they collided in this plane
+    // We use this difference to compute a "ramming factor"
+    float heading_difference = left_kart->getHeading() - right_kart->getHeading();
+
+    // The difference is in the range [-2pi, 2pi]
+    // First, we must normalize it
+    // The small inaccuracies in approximating pi are irrelevant here
+    // Ramming is maximized if one kart has a perpendicular direction to the other
+    if (heading_difference < 0.0f)
+        heading_difference += 6.2831854f;
+    if (heading_difference > 3.1415927f)
+        heading_difference -= 3.1415927f;
+    if (heading_difference > 1.57079635f)
+        heading_difference = 3.1415927f - heading_difference;
+
+    // Now heading difference is in the range [0, pi/2] (approximately)
+    // With 0 indicating parallel karts and pi/2 perpendicular karts
+    // We set ramming_factor in the [1, 1+pi/4] range
+    float ramming_factor = 1.0f + (heading_difference * 0.5f);
+
+    if (left_kart_ramming)
     {
-        // Avoid too large impulse for karts that are driving
-        // slow (and division by zero)
-        if(fabsf(vel_left)>2.0f)
-            f_left *= 1.0f - vel_diff/fabsf(vel_left);
-        if(f_left > 2.0f)
-            f_left = 2.0f;
+        f_left = f_left / ramming_factor;
+        f_right = f_right * ramming_factor;
     }
-    else
+    else if (right_kart_ramming)
     {
-        // Avoid too large impulse for karts that are driving
-        // slow (and division by zero)
-        if(fabsf(vel_right)>2.0f)
-            f_right *= 1.0f + vel_diff/fabsf(vel_right);
-        if(f_right > 2.0f)
-            f_right = 2.0f;
+        f_right = f_right / ramming_factor;
+        f_left = f_left * ramming_factor;
     }
-
-    // Increase the effect somewhat by squaring the factors
-    f_left  = f_left  * f_left;
-    f_right = f_right * f_right;
 
     // First push one kart to the left (if there is not already
     // an impulse happening - one collision might cause more

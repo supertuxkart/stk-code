@@ -115,6 +115,7 @@ void btKart::reset()
     m_num_wheels_on_ground       = 0;
     m_additional_impulse         = btVector3(0,0,0);
     m_ticks_additional_impulse   = 0;
+    m_ticks_total_impulse        = 0;
     m_additional_rotation        = 0;
     m_ticks_additional_rotation  = 0;
     m_max_speed                  = -1.0f;
@@ -513,7 +514,9 @@ void btKart::updateVehicle( btScalar step )
     {
         // We have fixed timestep
         float dt = stk_config->ticks2Time(1);
-        m_chassisBody->applyCentralImpulse(m_additional_impulse*dt);
+        float remaining_impulse_strength = (float)m_ticks_additional_impulse /
+                                           (float) m_ticks_total_impulse;
+        m_chassisBody->applyCentralImpulse(m_additional_impulse*dt*remaining_impulse_strength);
         m_ticks_additional_impulse--;
     }
 

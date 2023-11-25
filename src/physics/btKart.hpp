@@ -83,6 +83,11 @@ private:
     /** The time the additional impulse should be applied. */
     uint16_t            m_ticks_additional_impulse;
 
+    /** The total time the additional impulse should be applied.
+     * This is used to weaken the impulse progressively, as an
+     * impulse suddenly stopping is very noticeable with strong impulses. */
+    uint16_t            m_ticks_total_impulse;
+
     /** Additional rotation in y-axis that is applied over a certain amount of time. */
     float               m_additional_rotation;
 
@@ -231,6 +236,7 @@ public:
         // Only add impulse if no other impulse is active.
         if (m_ticks_additional_impulse > 0 && !rewind) return;
         m_additional_impulse      = imp;
+        m_ticks_total_impulse      = t;
         m_ticks_additional_impulse = t;
     }   // setTimedImpulse
     // ------------------------------------------------------------------------

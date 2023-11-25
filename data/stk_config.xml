@@ -472,9 +472,9 @@
            effect.
          impulse: an additional impulse to be applied in a non-frontal
            collision to push two karts away from each other.
-         impulse-time: The impulse will be applied over a certain time
-           period, which results in less abrupt changes. If set to 0,
-           the impulse is only applied once.
+         impulse-time: The kart-on-kart collision impulse will be applied
+           over a certain time period, which results in less abrupt changes.
+           If set to 0, the impulse is only applied once.
          resitution: restitution value to be used for the kart rigid bodies.
            The restitution used depends on the speed to avoid physics issues
            (a collision with high speed and high restitution will push the
@@ -499,7 +499,7 @@
            outside of the chassis and results in more stable physical
            behaviour of the karts. -->
     <collision impulse-type="normal"
-               impulse="3000" impulse-time="0.1" terrain-impulse="160"
+               impulse="15000" impulse-time="0.25" terrain-impulse="160"
                restitution="0:1.0 5:1.0 20:0.2" bevel-factor="0.5 0.0 0.3"
                physical-wheel-position="0" />
 

@@ -611,7 +611,7 @@ void Kart::setPosition(int p)
 
 // -----------------------------------------------------------------------------
 /** Sets that the view is blocked by a plunger. The duration depends on
- *  the difficulty, see KartPorperties getPlungerInFaceTime.
+ *  the difficulty, see KartProperties getPlungerInFaceTime.
  */
 void Kart::blockViewWithPlunger()
 {
