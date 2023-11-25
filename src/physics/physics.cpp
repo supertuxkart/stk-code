@@ -509,17 +509,6 @@ void Physics::KartKartCollision(AbstractKart *kart_a,
 
     float f_left = 1/f_right;
 
-    // Reduce the bouncing for low-speed impacts
-    float max_speed = std::max(right_kart->getSpeed(), left_kart->getSpeed());
-    if (max_speed < 20.0f)
-    {
-        if (max_speed < 0.0f)
-            max_speed = 0.0f;
-        f_right *= max_speed / 15.0f;
-        f_left  *= max_speed / 15.0f;
-    }
-
-
     // Check if a kart is more 'actively' trying to push another kart
     // To do this we check two things:
     // - The position of the contact point on the kart body.
@@ -559,8 +548,8 @@ void Physics::KartKartCollision(AbstractKart *kart_a,
 
     // Now heading difference is in the range [0, pi/2] (approximately)
     // With 0 indicating parallel karts and pi/2 perpendicular karts
-    // We set ramming_factor in the [1, 1+3*pi/8] range
-    float ramming_factor = 1.0f + (heading_difference * 0.75f);
+    // We set ramming_factor in the [1, 1+pi/2] range
+    float ramming_factor = 1.0f + (heading_difference * 1.0f);
 
     if (left_kart_ramming)
     {
@@ -573,6 +562,21 @@ void Physics::KartKartCollision(AbstractKart *kart_a,
         f_left = f_left * ramming_factor;
     }
 
+    // Reduce the bouncing if relative velocity is low
+    const Vec3 right_velocity = right_kart->getVelocity();
+    const Vec3 left_velocity = left_kart->getVelocity();
+    const Vec3 velocity_difference = right_velocity - left_velocity;
+    const float velocity_value = velocity_difference.length();
+
+    float impulse_time_factor = 1.0f;
+
+    if (velocity_value < 8.0f) // velocity_value is never negative
+    {
+        f_right *= 0.375f + velocity_value / 12.8f;
+        f_left  *= 0.375f + velocity_value / 12.8f;
+        impulse_time_factor = 0.6875f + velocity_value / 25.6f;
+    }
+
     // First push one kart to the left (if there is not already
     // an impulse happening - one collision might cause more
     // than one impulse otherwise)
@@ -583,8 +587,9 @@ void Physics::KartKartCollision(AbstractKart *kart_a,
         impulse = right_kart->getTrans().getBasis() * impulse;
         right_kart->getVehicle()
             ->setTimedCentralImpulse(
-            (uint16_t)stk_config->time2Ticks(kp->getCollisionImpulseTime()),
+            (uint16_t)stk_config->time2Ticks(kp->getCollisionImpulseTime() * impulse_time_factor),
             impulse);
+        right_kart->getVehicle()->setCollisionLean(/* towards the right*/ true);
         // The kart rotation will be prevented as the impulse is applied
     }
 
@@ -597,8 +602,9 @@ void Physics::KartKartCollision(AbstractKart *kart_a,
         impulse = left_kart->getTrans().getBasis() * impulse;
         left_kart->getVehicle()
             ->setTimedCentralImpulse(
-            (uint16_t)stk_config->time2Ticks(kp->getCollisionImpulseTime()),
+            (uint16_t)stk_config->time2Ticks(kp->getCollisionImpulseTime() * impulse_time_factor),
             impulse);
+        left_kart->getVehicle()->setCollisionLean(/* towards the right*/ false);
         // The kart rotation will be prevented as the impulse is applied
     }
 

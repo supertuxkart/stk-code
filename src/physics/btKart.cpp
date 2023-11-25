@@ -120,6 +120,7 @@ void btKart::reset()
     m_ticks_additional_rotation  = 0;
     m_max_speed                  = -1.0f;
     m_min_speed                  = 0.0f;
+    m_leaning_right              = true;
 
     // Set the brakes so that karts don't slide downhill
     setAllBrakes(20.0f);
@@ -557,6 +558,20 @@ void btKart::updateVehicle( btScalar step )
     }
     adjustSpeed(m_min_speed, m_max_speed);
 }   // updateVehicle
+
+// ----------------------------------------------------------------------------
+float btKart::getCollisionLean() const
+{
+    float lean_factor = (float)m_ticks_additional_impulse /
+                        (float)m_ticks_total_impulse;
+    if (lean_factor > 0.5f)
+        lean_factor = 1.0f - lean_factor;
+
+    if (m_leaning_right == false)
+        lean_factor = -lean_factor;
+
+    return 0.35f*lean_factor;
+} // getCollisionLean
 
 // ----------------------------------------------------------------------------
 void btKart::setSteeringValue(btScalar steering, int wheel)

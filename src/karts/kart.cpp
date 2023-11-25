@@ -3509,6 +3509,15 @@ void Kart::updateGraphics(float dt)
             m_current_lean = 0.0f;
     }
 
+    float temp_lean = 0.0f;
+    if (getVehicle()->getCentralImpulseTicks() > 0)
+        temp_lean = getVehicle()->getCollisionLean();
+
+    if (temp_lean > 0.0f)
+        m_current_lean = std::max(temp_lean, m_current_lean);
+    else
+        m_current_lean = std::min(temp_lean, m_current_lean);
+
     // If the kart is leaning, part of the kart might end up 'in' the track.
     // To avoid this, raise the kart enough to offset the leaning.
     float lean_height = tanf(m_current_lean) * getKartWidth()*0.5f;
