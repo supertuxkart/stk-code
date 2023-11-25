@@ -2646,6 +2646,9 @@ void Kart::playCrashSFX(const Material* m, AbstractKart *k)
                 const float LengthOfDifference = VelocityDifference.length();
             
                 volume = sqrt( abs(LengthOfDifference / speed_for_max_volume));
+                // temporary fix for kart collision sounds being annoying
+                // TODO : find a new sound for kart-on-kart collisions
+                volume *= 0.5f;
             }
             
             if (volume > max_volume) { volume = max_volume; }

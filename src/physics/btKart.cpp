@@ -514,9 +514,22 @@ void btKart::updateVehicle( btScalar step )
     {
         // We have fixed timestep
         float dt = stk_config->ticks2Time(1);
-        float remaining_impulse_strength = (float)m_ticks_additional_impulse /
-                                           (float) m_ticks_total_impulse;
-        m_chassisBody->applyCentralImpulse(m_additional_impulse*dt*remaining_impulse_strength);
+        float impulse_strength;
+
+        float remaining_impulse_time_fraction = (float)m_ticks_additional_impulse /
+                                                (float)m_ticks_total_impulse;
+
+        // The impulse strength will increase rapidly at the beginning
+        // up to maximum strength (as (1.0f - 0.8f)*5.0f = 1.0f)
+        // Then fade away slower.
+        if (remaining_impulse_time_fraction < 0.8f)
+            impulse_strength = remaining_impulse_time_fraction*1.25f;
+        else
+            impulse_strength = (1.0f - remaining_impulse_time_fraction)*5.0f;
+
+        m_chassisBody->applyCentralImpulse(m_additional_impulse*dt*impulse_strength);
+        // Prevent the kart from getting rotated
+        m_kart->getBody()->setAngularVelocity(btVector3(0,0,0));
         m_ticks_additional_impulse--;
     }
 
