@@ -464,7 +464,7 @@
         <characteristic name="normal" />
         <characteristic name="handicap">
             <engine power="*0.9" max-speed="*0.9" brake-factor="*0.8" max-speed-reverse-ratio="*0.8" />
-            <skid time-till-bonus="*1.2 *1.0" bonus-speed="*0.9 *0.8" bonus-force="*0.9 *0.9" />
+            <skid bonus-speed="*0.9 *0.9 *0.9" bonus-force="*0.9 *0.9 *0.9" />
             <bubblegum duration="*1.5" torque="*1.5" />
             <zipper force="*0.8" speed-gain="*0.8" max-speed-increase="*0.8" />
             <swatter duration="*0.8" squash-duration="*1.3" />
