@@ -77,7 +77,7 @@
   <item name="rubber-ball"    icon="rubber_ball-icon.png"
         model="rubber_ball.spm"
         speed="45.0"
-        min-speed-offset="11.0"
+        min-speed-offset="10.75"
         max-speed-offset="35.0"
         min-offset-distance="40.0"
         max-offset-distance="220.0"

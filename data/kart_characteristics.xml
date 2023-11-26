@@ -94,7 +94,7 @@
             max-speed-reverse-ratio is the percentage of max speed for reverse
                 gear.
           -->
-        <engine power="950" max-speed="27.5" generic-max-speed="27.5" brake-factor="34"
+        <engine power="975" max-speed="27.5" generic-max-speed="27.5" brake-factor="34"
                 time-full-brake="0.35" max-speed-reverse-ratio="0.55" />
 
         <!-- Simulated gears
@@ -302,7 +302,7 @@
                 releasing them on the ground after a rescue. Used to avoid
                 resetting karts into the track. Not sure if this is still
                 necessary. -->
-        <rescue vert-offset="0.0" duration="1.2" height="2" />
+        <rescue vert-offset="0.0" duration="1.0" height="2" />
 
         <!-- Explosion
             duration: how long it takes before the kart can drive again (this
@@ -365,6 +365,7 @@
             <engine power="*0.75" max-speed="*0.6" generic-max-speed="*0.6" 
                     max-speed-reverse-ratio="0.75"/>
             <zipper max-speed-increase="*0.6" />
+            <rescue duration="*1.2" />
             <nitro engine-force="*0.8" max-speed-increase="*0.7" />
             <skid bonus-speed="*0.5 *0.5 *0.5" bonus-force="*0.5 *0.5 *0.5" />
             <turn time-full-steer="0:0.25 0.5:0.25 0.5:0.42 1.0:0.42" />
@@ -374,6 +375,7 @@
             <engine power="*0.82" max-speed="*0.75" generic-max-speed="*0.75"
                     max-speed-reverse-ratio="0.675"/>
             <zipper max-speed-increase="*0.8" />
+            <rescue duration="*1.2" />
             <nitro engine-force="*0.83" max-speed-increase="*0.78" />
             <skid bonus-speed="*0.7 *0.7 *0.7" bonus-force="*0.7 *0.7 *0.7" />
             <turn time-full-steer="0:0.21 0.5:0.21 0.5:0.35 1.0:0.35" />
@@ -382,6 +384,7 @@
         <characteristic name="medium">
             <engine power="*0.88" max-speed="*0.85" generic-max-speed="*0.85"
                     max-speed-reverse-ratio="0.625"/>
+            <rescue duration="*1.2" />
             <nitro engine-force="*0.88" max-speed-increase="*0.85" />
             <skid bonus-speed="*0.85 *0.85 *0.85" bonus-force="*0.85 *0.85 *0.85" />
             <plunger in-face-time="4" />
@@ -403,7 +406,7 @@
             <turn radius="0:2.5 5:4 12:8 20:14 30:22 50:38.5" />
             <engine power="*0.8" max-speed="*0.9" />
             <gear switch-ratio="0.1 0.25 0.45 0.7 1.0 4.0"
-                  power-increase="2.8 2.3 1.9 1.5 1.25 1.0" />
+                  power-increase="2.95 2.42 1.99 1.56 1.28 1.0" />
             <mass value="*0.6" />
             <skid reduce-turn-min="0.2" reduce-turn-max="0.9" bonus-force="*0.8 *0.8 *0.8" />
             <startup boost="*1 *1" />
@@ -417,7 +420,7 @@
             <turn radius="0:3 5:4.6 12:9 20:15.4 30:23.8 50:41.2" />
             <engine power="*0.875" max-speed="*0.93" />
             <gear switch-ratio="0.1 0.25 0.45 0.7 1 4"
-                  power-increase="2.4 2 1.7 1.4 1.2 1" />
+                  power-increase="2.5 2.08 1.76 1.44 1.22 1" />
             <mass value="*0.75" />
             <skid reduce-turn-min="0.2" reduce-turn-max="0.9" bonus-force="*0.875 *0.875 *0.875" 
                   time-till-bonus="*0.9 *0.9 *0.9" />
@@ -431,7 +434,7 @@
             <turn radius="0:3 5:4.8 12:9.6 20:16.8 30:26.4 50:46.2" />
             <engine power="*0.875" max-speed="*0.95" />
             <gear switch-ratio="0.1 0.25 0.45 0.7 1 4"
-                  power-increase="2.4 2 1.7 1.4 1.2 1" />
+                  power-increase="2.5 2.08 1.76 1.44 1.22 1" />
             <mass value="*0.75" />
             <skid reduce-turn-min="0.25" reduce-turn-max="0.9" bonus-force="*0.875 *0.875 *0.875" />
             <startup boost="*0.8 *0.8" />
@@ -444,7 +447,7 @@
             <turn radius="0:3.4 5:5.44 12:10.88 20:19.04 30:29.92 50:52.36" />
             <engine power="*1" max-speed="*1" />
             <gear switch-ratio="0.1 0.25 0.45 0.7 1 4"
-                  power-increase="2 1.7 1.5 1.3 1.15 1" />
+                  power-increase="2.05 1.74 1.53 1.32 1.16 1" />
             <mass value="*1" />
             <skid reduce-turn-min="0.3" reduce-turn-max="0.9" bonus-force="*1.0 *1.0 *1.0" />
             <startup boost="*0.6 *0.6" />
