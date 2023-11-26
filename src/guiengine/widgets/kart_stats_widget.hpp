@@ -49,6 +49,7 @@ namespace GUIEngine
             SKILL_SPEED,
             SKILL_ACCELERATION,
             SKILL_NITRO_EFFICIENCY,
+            SKILL_SKIDDING,
             SKILL_COUNT
         };
 

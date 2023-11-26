@@ -98,9 +98,9 @@ void KartStatsWidget::setValues(const KartProperties* props, HandicapLevel h)
     // A value of 100 takes the whole bar width, including borders.
     // So values should be in the 0-99 range
 
-    // The base mass is of 350 ; 350/3.89 ~= 90
+    // The base mass is of 350 ; 250/2.78 ~= 90
     setSkillValues(SKILL_MASS,
-                   kp_computed.getCombinedCharacteristic()->getMass()/3.89f,
+                   (kp_computed.getCombinedCharacteristic()->getMass() - 100.0f)/2.78f,
                    "mass.png", "mass", _("Mass"));
     
     // The base speed is of 27.5
@@ -111,9 +111,9 @@ void KartStatsWidget::setValues(const KartProperties* props, HandicapLevel h)
     
     // The acceleration depend on power and mass, and it changes depending on speed
     // We call a function which gives us a single number to represent it
-    // power/mass gives numbers in the 1-10 range, so we multiply it by 10.
+    // power/mass gives numbers in the 1-11 range, so we multiply it by 9.
     setSkillValues(SKILL_ACCELERATION,
-                   kp_computed.getAccelerationEfficiency()*10.0f,
+                   kp_computed.getAccelerationEfficiency()*9.0f,
                    "power.png", "acceleration", _("Acceleration"));
 
     // The base nitro consumption is 1, higher for heavier karts.
@@ -123,6 +123,21 @@ void KartStatsWidget::setValues(const KartProperties* props, HandicapLevel h)
                     18.0f * kp_computed.getCombinedCharacteristic()->getNitroMaxSpeedIncrease()
                           / kp_computed.getCombinedCharacteristic()->getNitroConsumption(),
                    "nitro.png", "nitro", _("Nitro efficiency"));
+
+    // The base time for the skidding bonuses is 1, 2.7 and 4
+    // The lower, the better. We add 4 times level 1, 2 times level 2 and 1 time level 3
+    // to obtain an aggregate value.
+    // We proceed similarly for the skid bonuses (4.0, 6.0, 8.0 by default)
+    float aggregate_skid_time = 4 * kp_computed.getCombinedCharacteristic()->getSkidTimeTillBonus()[0] +
+                                2 * kp_computed.getCombinedCharacteristic()->getSkidTimeTillBonus()[1] +
+                                    kp_computed.getCombinedCharacteristic()->getSkidTimeTillBonus()[2];
+
+    float aggregate_bonus_speed = 4 * kp_computed.getCombinedCharacteristic()->getSkidBonusSpeed()[0] +
+                                  2 * kp_computed.getCombinedCharacteristic()->getSkidBonusSpeed()[1] +
+                                      kp_computed.getCombinedCharacteristic()->getSkidBonusSpeed()[2];
+    setSkillValues(SKILL_SKIDDING,
+                    (56.0f * aggregate_bonus_speed / aggregate_skid_time) - 90.0f,
+                   "android/drift.png", "skidding", _("Drifting bonuses"));
     
     RaceManager::get()->setDifficulty(previous_difficulty);
 }   // setValues
