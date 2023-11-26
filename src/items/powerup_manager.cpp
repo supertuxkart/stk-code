@@ -194,10 +194,12 @@ void PowerupManager::sortRaceWeights(const XMLNode *powerup_node,
     // (1) - Extract the goodness data from the XML node
     std::string single_string;
     node->get("single", &single_string);
-    std::string multi_string;
-    node->get("multi", &multi_string);
+    std::string double_string;
+    node->get("double", &double_string);
+    std::string triple_string;
+    node->get("triple", &triple_string);
     std::vector<std::string> l_string =
-            StringUtils::split(single_string+" "+multi_string, ' ');
+            StringUtils::split(single_string+" "+double_string+" "+triple_string, ' ');
 
     std::vector<int> values;
     for(unsigned int i=0; i<l_string.size(); i++)
@@ -209,13 +211,13 @@ void PowerupManager::sortRaceWeights(const XMLNode *powerup_node,
     }
 
     // Make sure we have the right number of entries
-    if (values.size() < 2 * (int)POWERUP_LAST)
+    if (values.size() < 3 * (int)POWERUP_LAST)
     {
         Log::fatal("PowerupManager",
                    "Not enough entries for '%s' in powerup.xml",
                        node->getName().c_str());
     }
-    if(values.size()>2*(int)POWERUP_LAST)
+    if(values.size() > 3* (int)POWERUP_LAST)
     {
         Log::fatal("PowerupManager",
                    "Too many entries for '%s' in powerup.xml.",
@@ -223,9 +225,9 @@ void PowerupManager::sortRaceWeights(const XMLNode *powerup_node,
     }
 
     // Make sure the entries are in the right range
-    for (unsigned int i=0;i< 2* (int)POWERUP_LAST; i++)
+    for (unsigned int i=0;i< 3 * (int)POWERUP_LAST; i++)
     {
-        if (values[i] < 0 || values[i] > 2* (int)POWERUP_LAST)
+        if (values[i] < 0 || values[i] > 3 * (int)POWERUP_LAST)
             Log::fatal("PowerupManager",
                "Incorrect entries for '%s' in powerup.xml.",
                node->getName().c_str());
@@ -302,10 +304,12 @@ void PowerupManager::WeightsData::readData(int num_karts, const XMLNode *node)
         const XMLNode *w = node->getNode(i);
         std::string single_item;
         w->get("single", &single_item);
-        std::string multi_item;
-        w->get("multi", &multi_item);
+        std::string double_item;
+        w->get("double", &double_item);
+        std::string triple_item;
+        w->get("triple", &triple_item);
         std::vector<std::string> l_string =
-            StringUtils::split(single_item+" "+multi_item,' ');
+            StringUtils::split(single_item+" "+double_item+" "+triple_item,' ');
 
         // Keep a reference for shorter access to the list
         std::vector<int> &l = m_weights_for_section.back();
@@ -317,14 +321,14 @@ void PowerupManager::WeightsData::readData(int num_karts, const XMLNode *node)
             l.push_back(n);
         }
         // Make sure we have the right number of entries
-        if (l.size() < 2 * (int)POWERUP_LAST)
+        if (l.size() < 3 * (int)POWERUP_LAST)
         {
             Log::fatal("PowerupManager",
                        "Not enough entries for '%s' in powerup.xml",
                        node->getName().c_str());
-            while (l.size() < 2 * (int)POWERUP_LAST) l.push_back(0);
+            while (l.size() < 3 * (int)POWERUP_LAST) l.push_back(0);
         }
-        if(l.size()>2*(int)POWERUP_LAST)
+        if(l.size() > 3 * (int)POWERUP_LAST)
         {
             Log::fatal("PowerupManager",
                        "Too many entries for '%s' in powerup.xml.",
@@ -338,7 +342,7 @@ void PowerupManager::WeightsData::readData(int num_karts, const XMLNode *node)
  */
 void PowerupManager::WeightsData::sortWeights()
 {
-    if (m_powerup_order.size() != 2*(int)POWERUP_LAST)
+    if (m_powerup_order.size() != 3*(int)POWERUP_LAST)
         Log::fatal("PowerupManager",
            "SortWeights called without m_powerup_order being set.");
 
@@ -346,7 +350,7 @@ void PowerupManager::WeightsData::sortWeights()
     {
         std::vector <int> temp_weights_copy = m_weights_for_section[i];
 
-        for (unsigned int j=0; j< 2 * (int)POWERUP_LAST; j++)
+        for (unsigned int j=0; j< 3 * (int)POWERUP_LAST; j++)
         {
             // m_powerup_order[j] contains the new index for the j-th powerup
             m_weights_for_section[i][m_powerup_order[j]] = temp_weights_copy[j];
@@ -492,7 +496,7 @@ void PowerupManager::WeightsData::precomputeWeights()
         std::vector<float> summed_weights;
 
         for (unsigned int j = 0;
-            j <= 2 * POWERUP_LAST - POWERUP_FIRST; j++)
+            j <= 3 * POWERUP_LAST - POWERUP_FIRST; j++)
         {
             float av = (1.0f - weight) * m_weights_for_section[prev][j]
                      +         weight  * m_weights_for_section[next][j];
@@ -507,14 +511,14 @@ void PowerupManager::WeightsData::precomputeWeights()
         int target_sum = 32768 / REPEAT_WEIGHTS;
 
         for (unsigned int j = 0;
-            j <= 2 * POWERUP_LAST - POWERUP_FIRST; j++)
+            j <= 3 * POWERUP_LAST - POWERUP_FIRST; j++)
         {
             int normalized_sum = int( (summed_weights[j]/sum_av*target_sum) + 0.5f);
             m_summed_weights_for_rank[i].push_back(normalized_sum);
         }
 #ifdef ITEM_DISTRIBUTION_DEBUG
         Log::verbose("PowerupManager", "Final summed weight for rank %d is %d",
-          i, m_summed_weights_for_rank[i][2*POWERUP_LAST - POWERUP_FIRST]);
+          i, m_summed_weights_for_rank[i][3*POWERUP_LAST - POWERUP_FIRST]);
 #endif       
     }
 }   // WeightsData::precomputeWeights
@@ -792,10 +796,20 @@ PowerupManager::PowerupType PowerupManager::getRandomPowerup(unsigned int pos,
     if(powerup > POWERUP_LAST)
     {
         powerup -= (POWERUP_LAST-POWERUP_FIRST+1);
-        *n = 3;
+        if(powerup > POWERUP_LAST)
+        {
+            powerup -= (POWERUP_LAST-POWERUP_FIRST+1);
+            *n = 3;
+        }
+        else
+        {
+            *n = 2;
+        }
     }
     else
+    {
         *n=1;
+    }
 
     // Prevents some items early on:
     // - Cakes right after the start destroy too much and too easily
@@ -851,15 +865,17 @@ void PowerupManager::unitTesting()
     // Get the sum of all weights, which determine the number
     // of different random numbers we need to test.
     num_weights = wd.m_summed_weights_for_rank[section].back();
-    std::vector<int> count(2*POWERUP_LAST);
+    std::vector<int> count(3*POWERUP_LAST);
     for (int i = 0; i<num_weights; i++)
     {
         unsigned int n;
         int powerup = powerup_manager->getRandomPowerup(position, &n, i);
         if(n==1)
             count[powerup-1]++;
-        else
+        else if (n==2)
             count[powerup+POWERUP_LAST-POWERUP_FIRST]++;
+        else
+            count[powerup+2*POWERUP_LAST-2*POWERUP_FIRST]++;
     }
 
     // Now make sure we reproduce the original weight distribution.
