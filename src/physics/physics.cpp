@@ -577,6 +577,8 @@ void Physics::KartKartCollision(AbstractKart *kart_a,
         impulse_time_factor = 0.6875f + velocity_value / 25.6f;
     }
 
+    float lean_factor = std::min(1.25f, std::max(f_right, f_left)) * 0.8f;
+
     // First push one kart to the left (if there is not already
     // an impulse happening - one collision might cause more
     // than one impulse otherwise)
@@ -590,6 +592,7 @@ void Physics::KartKartCollision(AbstractKart *kart_a,
             (uint16_t)stk_config->time2Ticks(kp->getCollisionImpulseTime() * impulse_time_factor),
             impulse);
         right_kart->getVehicle()->setCollisionLean(/* towards the right*/ true);
+        right_kart->getVehicle()->setCollisionLeanFactor(lean_factor);
         // The kart rotation will be prevented as the impulse is applied
     }
 
@@ -605,6 +608,7 @@ void Physics::KartKartCollision(AbstractKart *kart_a,
             (uint16_t)stk_config->time2Ticks(kp->getCollisionImpulseTime() * impulse_time_factor),
             impulse);
         left_kart->getVehicle()->setCollisionLean(/* towards the right*/ false);
+        left_kart->getVehicle()->setCollisionLeanFactor(lean_factor);
         // The kart rotation will be prevented as the impulse is applied
     }
 

@@ -570,7 +570,7 @@ float btKart::getCollisionLean() const
     if (m_leaning_right == false)
         lean_factor = -lean_factor;
 
-    return 0.35f*lean_factor;
+    return 0.35f*m_leaning_factor*lean_factor;
 } // getCollisionLean
 
 // ----------------------------------------------------------------------------
