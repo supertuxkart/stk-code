@@ -128,16 +128,20 @@ bool ReplayPlay::addReplayFile(const std::string& fn, bool custom_replay, int ca
                   "found in replay file (bogus replay file).");
         return false;
     }
-    if (version > getCurrentReplayVersion() ||
-        version < getMinSupportedReplayVersion() )
+    if ( version < getMinSupportedReplayVersion() )
     {
-        Log::warn("Replay", "Replay is version '%d'", version);
-        Log::warn("Replay", "STK replay version is '%d'", getCurrentReplayVersion());
-        Log::warn("Replay", "Minimum supported replay version is '%d'", getMinSupportedReplayVersion());
-        Log::warn("Replay", "Skipped '%s'", fn.c_str());
+        Log::warn("Replay", "Replay is version '%d', Minimum supported replay version is '%d', skipped '%s'",
+                  version, getMinSupportedReplayVersion(), fn.c_str());
         return false;
     }
-        rd.m_replay_version = version;
+    else if (version > getCurrentReplayVersion())
+    {
+        Log::warn("Replay", "Replay is version '%d', STK replay version is '%d', skipped '%s'",
+                  version, getCurrentReplayVersion(), fn.c_str());
+        return false;
+    }
+
+    rd.m_replay_version = version;
 
     if (version >= 4)
     {
