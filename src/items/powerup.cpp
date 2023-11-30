@@ -63,6 +63,7 @@ Powerup::~Powerup()
 void Powerup::reset()
 {
     m_type = PowerupManager::POWERUP_NOTHING;
+    m_mini_state = PowerupManager::NOT_MINI;
     m_number = 0;
 
     // Ghost kart will update powerup every frame
@@ -176,6 +177,10 @@ void Powerup::set(PowerupManager::PowerupType type, int n)
         case PowerupManager::POWERUP_ELECTRO:
             break ;
 
+        case PowerupManager::POWERUP_MINI:
+            m_mini_state = PowerupManager::MINI_SELECT;
+            break ;
+
         case PowerupManager::POWERUP_BOWLING:
             m_sound_use = SFXManager::get()->createSoundSource("bowling_shoot");
             break ;
@@ -224,6 +229,32 @@ void Powerup::setNum(int n)
  */
 Material *Powerup::getIcon() const
 {
+    // The mini powerup has multiple states,
+    // and each state has its own icon.
+    if (m_type == PowerupManager::POWERUP_MINI)
+    {
+        if (m_mini_state == PowerupManager::MINI_ZIPPER)
+            return powerup_manager->getMiniIcon(3);
+        else if (m_mini_state == PowerupManager::MINI_CAKE)
+            return powerup_manager->getMiniIcon(4);
+        else if (m_mini_state == PowerupManager::MINI_GUM)
+            return powerup_manager->getMiniIcon(5);
+
+        // FIXME
+        // This duplicates the logic to determine which powerup would be
+        // selected by the current cycle
+        if (m_mini_state == PowerupManager::MINI_SELECT)
+        {
+            int cycle_ticks = stk_config->time2Ticks(0.5f);
+            int cycle_value = World::getWorld()->getTicksSinceStart() % (3 * cycle_ticks);
+            if (cycle_value < cycle_ticks)
+                return powerup_manager->getMiniIcon(0);
+            else if (cycle_value < 2*cycle_ticks)
+                return powerup_manager->getMiniIcon(1);
+            else
+                return powerup_manager->getMiniIcon(2);
+        }
+    }
     // Check if it's one of the types which have a separate
     // data file which includes the icon:
     return powerup_manager->getIcon(m_type);
@@ -404,65 +435,69 @@ void Powerup::use()
                 stk_config->time2Ticks(kp->getElectroDuration()));
 
             break;
-        }   // end of PowerupManager::POWERUP_ELECTRO
+        }   // end of PowerupManager::POWERUP_ELECTRO*
+
+
+    case PowerupManager::POWERUP_MINI:
+        {
+            switch (m_mini_state)
+            {
+            case PowerupManager::NOT_MINI: // Keeps the compiler happy
+            // Lock the selected mini-powerup
+            case PowerupManager::MINI_SELECT:
+                {
+                    m_number++; // Avoid the powerup being removed when validating the mini-choice
+                    
+                    int cycle_ticks = stk_config->time2Ticks(0.5f);
+                    int cycle_value = World::getWorld()->getTicksSinceStart() % (3 * cycle_ticks);
+                    if (cycle_value < cycle_ticks)
+                        m_mini_state = PowerupManager::MINI_ZIPPER;
+                    else if (cycle_value < 2*cycle_ticks)
+                        m_mini_state = PowerupManager::MINI_CAKE;
+                    else
+                        m_mini_state = PowerupManager::MINI_GUM;
+
+                    break;
+                }
+            // Mini-cake case
+            case PowerupManager::MINI_CAKE:
+                {
+                    // make weapon usage destroy gum shields
+                    if(stk_config->m_shield_restrict_weapons &&
+                    m_kart->isGumShielded())
+                        m_kart->decreaseShieldTime();
+                    if (!has_played_sound)
+                    {
+                        Powerup::adjustSound();
+                        m_sound_use = SFXManager::get()->createSoundSource("shoot");
+                        m_sound_use->play();
+                    }
+                    ProjectileManager::get()->newProjectile(m_kart, PowerupManager::POWERUP_CAKE);
+                    break;
+                } // mini-cake case
+
+            // Mini-zipper case
+            case PowerupManager::MINI_ZIPPER:
+                {
+                    m_kart->handleZipper(NULL, /* play sound*/ true, /* mini zipper */ true);
+                    break;
+                } // mini-zipper case
+
+
+            // Mini-gum case
+            case PowerupManager::MINI_GUM:
+                {
+                    useBubblegum(has_played_sound, /* mini */ true);
+                    break;
+                } // mini-gum case
+            } // Switch mini-state
+        }   // end of PowerupManager::POWERUP_MINI
+        break;
 
     case PowerupManager::POWERUP_BUBBLEGUM:
-        // use the bubble gum the traditional way, if the kart is looking back
-        if (m_kart->getControls().getLookBack())
         {
-            Item *new_item = im->dropNewItem(Item::ITEM_BUBBLEGUM, m_kart);
-
-            // E.g. ground not found in raycast.
-            if(!new_item) return;
-            if (!has_played_sound)
-            {
-                Powerup::adjustSound();
-                m_sound_use->play();
-            }
+            useBubblegum(has_played_sound);
         }
-        else // if the kart is looking forward, use the bubblegum as a shield
-        {
-            Attachment::AttachmentType type;
-
-            if (m_kart->getIdent() == "nolok")
-                type = Attachment::ATTACH_NOLOK_BUBBLEGUM_SHIELD;
-            else
-                type = Attachment::ATTACH_BUBBLEGUM_SHIELD;
-
-            if(!m_kart->isGumShielded()) //if the previous shield had been used up.
-            {
-                    m_kart->getAttachment()->set(type,
-                                     stk_config->
-                                     time2Ticks(kp->getBubblegumShieldDuration()));
-            }
-            // using a bubble gum while still having a gum shield
-            // In this case, half of the remaining time of the active
-            // shield is added. The maximum duration of a shield is
-            // never above twice the standard duration.
-            else 
-            {
-                m_kart->getAttachment()->set(type,
-                                stk_config->
-                                time2Ticks(kp->getBubblegumShieldDuration()
-                                           + (m_kart->getShieldTime() / 2.0f)) );
-            }
-
-            if (!has_played_sound)
-            {
-                if (m_sound_use != NULL)
-                {
-                    m_sound_use->deleteSFX();
-                    m_sound_use = NULL;
-                }
-                //Extraordinary. Usually sounds are set in Powerup::set()
-                m_sound_use = SFXManager::get()->createSoundSource("inflate");
-                //In this case this is a workaround, since the bubblegum item has two different sounds.
-
-                Powerup::adjustSound();
-                m_sound_use->play();
-            }
-
-        }   // end of PowerupManager::POWERUP_BUBBLEGUM
         break;
 
     case PowerupManager::POWERUP_ANVIL:
@@ -573,6 +608,71 @@ void Powerup::use()
         m_type   = PowerupManager::POWERUP_NOTHING;
     }
 }   // use
+
+void Powerup::useBubblegum(bool has_played_sound, bool mini)
+{
+    ItemManager* im = Track::getCurrentTrack()->getItemManager();
+    const KartProperties *kp = m_kart->getKartProperties();
+
+    // use the bubble gum the traditional way, if the kart is looking back
+    if (m_kart->getControls().getLookBack())
+    {
+        Item *new_item = im->dropNewItem(Item::ITEM_BUBBLEGUM, m_kart);
+
+        // E.g. ground not found in raycast.
+        if(!new_item) return;
+        if (!has_played_sound)
+        {
+            Powerup::adjustSound();
+            m_sound_use->play();
+        }
+    }
+    else // if the kart is looking forward, use the bubblegum as a shield
+    {
+        Attachment::AttachmentType type;
+
+        // TODO : make the mini-gum functinally different
+        float mini_factor = (mini) ? 0.4f : 1.0f;
+
+        if (m_kart->getIdent() == "nolok")
+            type = Attachment::ATTACH_NOLOK_BUBBLEGUM_SHIELD;
+        else
+            type = Attachment::ATTACH_BUBBLEGUM_SHIELD;
+
+        if(!m_kart->isGumShielded()) //if the previous shield had been used up.
+        {
+                m_kart->getAttachment()->set(type,
+                                 stk_config->
+                                 time2Ticks(kp->getBubblegumShieldDuration() * mini_factor));
+        }
+        // using a bubble gum while still having a gum shield
+        // In this case, half of the remaining time of the active
+        // shield is added. The maximum duration of a shield is
+        // never above twice the standard duration.
+        else 
+        {
+            m_kart->getAttachment()->set(type,
+                            stk_config->
+                            time2Ticks(kp->getBubblegumShieldDuration() * mini_factor
+                                       + (m_kart->getShieldTime() / 2.0f)) );
+        }
+
+        if (!has_played_sound)
+        {
+            if (m_sound_use != NULL)
+            {
+                m_sound_use->deleteSFX();
+                m_sound_use = NULL;
+            }
+            //Extraordinary. Usually sounds are set in Powerup::set()
+            m_sound_use = SFXManager::get()->createSoundSource("inflate");
+            //In this case this is a workaround, since the bubblegum item has two different sounds.
+
+            Powerup::adjustSound();
+            m_sound_use->play();
+        }
+    }
+}   // useBubblegum
 
 //-----------------------------------------------------------------------------
 /** This function is called when a bonus box is it. This function can be

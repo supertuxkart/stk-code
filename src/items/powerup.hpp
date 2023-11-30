@@ -43,6 +43,9 @@ private:
     /** The powerup type. */
     PowerupManager::PowerupType m_type;
 
+    /** The mini-state (used only by the mini-wish powerup) */
+    PowerupManager::MiniState m_mini_state;
+
     /** Number of collected powerups. */
     int                         m_number;
 
@@ -53,6 +56,7 @@ private:
 
     /** Returns an integer in the 0-32767 range.*/
     int simplePRNG(const int seed, const int time, const int item_id, const int position);
+    void useBubblegum(bool has_played_sound, bool mini = false);
 
 public:
                     Powerup      (AbstractKart* kart_);

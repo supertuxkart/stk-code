@@ -111,7 +111,7 @@ PowerupManager::PowerupType
         "",            /* Nothing */
         "bubblegum", "cake", "bowling", "zipper", "plunger", "switch",
         "swatter", "rubber-ball", "parachute", "nitro-hack", "electro-shield",
-        "anchor"
+        "mini-wish", "anchor"
     };
 
     for(unsigned int i=POWERUP_FIRST; i<=POWERUP_LAST; i++)
@@ -245,6 +245,16 @@ void PowerupManager::sortRaceWeights(const XMLNode *powerup_node,
         // The WeightsData can now sort itself
         wd[i]->sortWeights();
     }
+
+//#ifdef ITEM_DISTRIBUTION_DEBUG
+    std::sort(values.begin(), values.end());
+    for (unsigned int i = 0; i < 3 * (int)POWERUP_LAST - 1; i++)
+    {
+        if (values[i] == values[i+1])
+            Log::error("PowerupManager", "Two powerups have an identical goodness value of %d",
+                      values[i]);
+    }
+//#endif       
 }   // sortRaceWeights
 
 
@@ -595,7 +605,8 @@ void PowerupManager::loadPowerup(PowerupType type, const XMLNode &node)
     if (icon_file.size() == 0)
     {
         Log::fatal("PowerupManager",
-                   "Cannot load powerup %i, no 'icon' attribute under XML node",
+                   "Cannot load powerup %i, no 'icon' attribute under XML node"
+                   " or incorrect icon path",
                    type);
     }
 #endif
@@ -644,6 +655,8 @@ void PowerupManager::loadPowerup(PowerupType type, const XMLNode &node)
              RubberBall::init(node, m_all_meshes[type]); break;
         case POWERUP_SUDO:
              loadNitroHack(node);                        break;
+        case POWERUP_MINI:
+             loadMiniIcons(node);                        break;
         default: break;
     }   // switch
 }   // loadPowerup
@@ -700,6 +713,115 @@ float PowerupManager::getNitroHackStolenDiff(unsigned int diff) const
     else
         return m_nh_stolen_amount[diff-1];
 } //getNitroHackStolenDiff
+
+/** Loads the special icons of the Mini-Wish powerup
+ */
+void PowerupManager::loadMiniIcons(const XMLNode &node)
+{
+    std::string icon_file("");
+
+    // Load the first special icon
+    node.get("icon_cycle1", &icon_file);
+    icon_file = GUIEngine::getSkin()->getThemedIcon("gui/icons/" + icon_file);
+
+#ifdef DEBUG
+    long unsigned int min_size = icon_file.size();
+#endif
+
+    m_mini_icons[0] = material_manager->getMaterial(icon_file,
+                                  /* full_path */     true,
+                                  /*make_permanent */ true,
+                                  /*complain_if_not_found*/ true,
+                                  /*strip_path*/ false);
+
+    // Load the second special icon
+    node.get("icon_cycle2", &icon_file);
+    icon_file = GUIEngine::getSkin()->getThemedIcon("gui/icons/" + icon_file);
+
+#ifdef DEBUG
+    if (icon_file.size() < min_size)
+        min_size = icon_file.size();
+#endif
+
+    m_mini_icons[1] = material_manager->getMaterial(icon_file,
+                                  /* full_path */     true,
+                                  /*make_permanent */ true,
+                                  /*complain_if_not_found*/ true,
+                                  /*strip_path*/ false);
+
+    // Load the third special icon
+    node.get("icon_cycle3", &icon_file);
+    icon_file = GUIEngine::getSkin()->getThemedIcon("gui/icons/" + icon_file);
+
+#ifdef DEBUG
+    if (icon_file.size() < min_size)
+        min_size = icon_file.size();
+#endif
+
+    m_mini_icons[2] = material_manager->getMaterial(icon_file,
+                                  /* full_path */     true,
+                                  /*make_permanent */ true,
+                                  /*complain_if_not_found*/ true,
+                                  /*strip_path*/ false);
+
+    // Load the fourth special icon
+    node.get("icon_selected1", &icon_file);
+    icon_file = GUIEngine::getSkin()->getThemedIcon("gui/icons/" + icon_file);
+
+#ifdef DEBUG
+    if (icon_file.size() < min_size)
+        min_size = icon_file.size();
+#endif
+
+    m_mini_icons[3] = material_manager->getMaterial(icon_file,
+                                  /* full_path */     true,
+                                  /*make_permanent */ true,
+                                  /*complain_if_not_found*/ true,
+                                  /*strip_path*/ false);
+
+    // Load the fifth special icon
+    node.get("icon_selected2", &icon_file);
+    icon_file = GUIEngine::getSkin()->getThemedIcon("gui/icons/" + icon_file);
+
+#ifdef DEBUG
+    if (icon_file.size() < min_size)
+        min_size = icon_file.size();
+#endif
+
+    m_mini_icons[4] = material_manager->getMaterial(icon_file,
+                                  /* full_path */     true,
+                                  /*make_permanent */ true,
+                                  /*complain_if_not_found*/ true,
+                                  /*strip_path*/ false);
+
+    // Load the sixth special icon
+    node.get("icon_selected3", &icon_file);
+    icon_file = GUIEngine::getSkin()->getThemedIcon("gui/icons/" + icon_file);
+
+#ifdef DEBUG
+    if (icon_file.size() < min_size)
+        min_size = icon_file.size();
+
+    if (min_size == 0)
+    {
+        Log::fatal("PowerupManager",
+                   "Cannot load at least one of the special mini-icons, missing attribute under XML node"
+                   " or incorrect icon path");
+    }
+#endif
+
+    m_mini_icons[5] = material_manager->getMaterial(icon_file,
+                                  /* full_path */     true,
+                                  /*make_permanent */ true,
+                                  /*complain_if_not_found*/ true,
+                                  /*strip_path*/ false);
+
+    for (unsigned int i=0; i<6; i++)
+    {
+        assert(m_mini_icons[i] != NULL);
+        assert(m_mini_icons[i]->getTexture() != NULL);      
+    }
+}   // loadMiniIcons
 
 // ----------------------------------------------------------------------------
 /** Create a (potentially interpolated) WeightsData objects for the current

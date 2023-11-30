@@ -148,15 +148,26 @@ public:
                       POWERUP_SWITCH, POWERUP_SWATTER,
                       POWERUP_RUBBERBALL, POWERUP_PARACHUTE,
                       POWERUP_SUDO, POWERUP_ELECTRO,
+                      POWERUP_MINI,
                       POWERUP_ANVIL,
                       POWERUP_LAST=POWERUP_ANVIL,
                       POWERUP_MAX
+    };
+
+    enum MiniState {NOT_MINI,
+                    MINI_SELECT,
+                    MINI_ZIPPER,
+                    MINI_CAKE,
+                    MINI_GUM
     };
 
 private:
 
     /** The icon for each powerup. */
     Material*     m_all_icons [POWERUP_MAX];
+
+    /** The special icons for the mini-wish powerup. */
+    Material*     m_mini_icons [6];
 
     /** The mesh for each model (if the powerup has a model), e.g. a switch
         has none. */
@@ -188,12 +199,16 @@ public:
     void          computeWeightsForRace(int num_karts);
     void          loadPowerup     (PowerupType type, const XMLNode &node);
     void          loadNitroHack   (const XMLNode &node);
+    void          loadMiniIcons   (const XMLNode &node);
     PowerupManager::PowerupType
         getRandomPowerup(unsigned int pos, unsigned int *n,
                          uint64_t random_number);
     // ------------------------------------------------------------------------
     /** Returns the icon(material) for a powerup. */
     Material* getIcon(int type) const {return m_all_icons [type];}
+    // ------------------------------------------------------------------------
+    /** Returns the icon(material) for a mini status. */
+    Material* getMiniIcon(int index) const {return m_mini_icons [index];}
     // ------------------------------------------------------------------------
     /** Returns the mesh for a certain powerup.
      *  \param type Mesh type for which the model is returned. */

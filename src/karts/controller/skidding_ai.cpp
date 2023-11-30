@@ -1262,8 +1262,14 @@ void SkiddingAI::handleItems(const float dt, const Vec3 *aim_point, int last_nod
         break;   // POWERUP_SUDO
 
     case PowerupManager::POWERUP_ELECTRO:
-        m_controls->setFire(true);
+        if (m_time_since_last_shot > 1.0f) 
+            m_controls->setFire(true);
         break;   // POWERUP_ELECTRO
+
+    case PowerupManager::POWERUP_MINI:
+        if (m_time_since_last_shot > 1.0f) 
+            m_controls->setFire(true);
+        break;   // POWERUP_MINI
 
     case PowerupManager::POWERUP_SWATTER:
         {

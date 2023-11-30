@@ -2253,7 +2253,7 @@ void Kart::handleMaterialGFX(float dt)
 
 //-----------------------------------------------------------------------------
 /** Sets zipper time, and apply one time additional speed boost. It can be
- *  used with a specific material, in which case the zipper parmaters are
+ *  used with a specific material, in which case the zipper parameters are
  *  taken from this material (parameters that are <0 will be using the
  *  kart-specific values from kart-properties.
  *  \param material If not NULL, will be used to determine the zipper
@@ -2261,8 +2261,9 @@ void Kart::handleMaterialGFX(float dt)
  *                  will be used.
  * \param play_sound If true this will cause a sfx to be played even if the
  *                  terrain hasn't changed. It is used by the zipper powerup.
+ * \param mini If true, the duration and other bonuses will be lower.
  */
-void Kart::handleZipper(const Material *material, bool play_sound)
+void Kart::handleZipper(const Material *material, bool play_sound, bool mini_zipper)
 {
     /** The additional speed allowed on top of the kart-specific maximum kart
      *  speed. */
@@ -2295,11 +2296,23 @@ void Kart::handleZipper(const Material *material, bool play_sound)
     }
     else
     {
-        max_speed_increase = m_kart_properties->getZipperMaxSpeedIncrease();
-        duration           = m_kart_properties->getZipperDuration();
-        speed_gain         = m_kart_properties->getZipperSpeedGain();
-        fade_out_time      = m_kart_properties->getZipperFadeOutTime();
-        engine_force       = m_kart_properties->getZipperForce();
+        if (mini_zipper)
+        {
+            max_speed_increase = m_kart_properties->getZipperMaxSpeedIncrease()*0.6;
+            duration           = m_kart_properties->getZipperDuration()*0.5;
+            speed_gain         = m_kart_properties->getZipperSpeedGain()*0.75;
+            fade_out_time      = m_kart_properties->getZipperFadeOutTime()*0.5;
+            engine_force       = m_kart_properties->getZipperForce()*0.5;
+            printf("mini Zipper used!\n");
+        }
+        else
+        {
+            max_speed_increase = m_kart_properties->getZipperMaxSpeedIncrease();
+            duration           = m_kart_properties->getZipperDuration();
+            speed_gain         = m_kart_properties->getZipperSpeedGain();
+            fade_out_time      = m_kart_properties->getZipperFadeOutTime();
+            engine_force       = m_kart_properties->getZipperForce();
+        }
     }
     // Ignore a zipper that's activated while braking
     if(m_controls.getBrake() || m_speed<0) return;
