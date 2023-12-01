@@ -89,7 +89,10 @@ void ItemState::setDisappearCounter()
 {
     switch (m_type)
     {
+    // The Nolok variants are stored as standard variants with special graphics,
+    // so this also applies
     case ITEM_BUBBLEGUM:
+    case ITEM_BUBBLEGUM_SMALL:
         m_used_up_counter = stk_config->m_bubblegum_counter; break;
     case ITEM_EASTER_EGG:
         m_used_up_counter = -1; break;
@@ -444,7 +447,7 @@ void Item::updateGraphics(float dt)
 
     float time_till_return = stk_config->ticks2Time(getTicksTillReturn());
     bool is_visible = isAvailable() || time_till_return <= 1.0f ||
-                      (getType() == ITEM_BUBBLEGUM &&
+                      (isBubblegum() &&
                        getOriginalType() == ITEM_NONE && !isUsedUp());
 
     m_node->setVisible(is_visible);
@@ -460,9 +463,12 @@ void Item::updateGraphics(float dt)
     float time_since_return = stk_config->ticks2Time(
         World::getWorld()->getTicksSinceStart() - m_animation_start_ticks);
 
+    // Scale width and length
+    float scale_factor = (getType() == ITEM_BUBBLEGUM_SMALL ? 0.6f : 1.0f);
+
     if (is_visible)
     {
-        if (!isAvailable() && !(getType() == ITEM_BUBBLEGUM &&
+        if (!isAvailable() && !(isBubblegum() &&
                 getOriginalType() == ITEM_NONE && !isUsedUp()))
         {
             // Keep it visible so particles work, but hide the model
@@ -475,11 +481,11 @@ void Item::updateGraphics(float dt)
                             * pow(2.0f, -10.0f * p) + 1.0f;
             float factor_h = 1.0f - (f * f * f * f * f - f * f * f * sin(f * M_PI));
 
-            m_node->setScale(core::vector3df(factor_h, factor_v, factor_h));
+            m_node->setScale(core::vector3df(factor_h * scale_factor, factor_v, factor_h * scale_factor));
         }
         else
         {
-            m_node->setScale(core::vector3df(1.0f, 1.0f, 1.0f));
+            m_node->setScale(core::vector3df(scale_factor, 1.0f, scale_factor));
         }
 
         // Handle rotation of the item

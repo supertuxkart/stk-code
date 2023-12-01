@@ -72,13 +72,15 @@ void ItemManager::loadDefaultItemMeshes()
 
     // A temporary mapping of items to names used in the XML file:
     std::map<ItemState::ItemType, std::string> item_names;
-    item_names[ItemState::ITEM_BANANA     ] = "banana";
-    item_names[ItemState::ITEM_BONUS_BOX  ] = "bonus-box";
-    item_names[ItemState::ITEM_BUBBLEGUM  ] = "bubblegum";
-    item_names[ItemState::ITEM_NITRO_BIG  ] = "nitro-big";
-    item_names[ItemState::ITEM_NITRO_SMALL] = "nitro-small";
+    item_names[ItemState::ITEM_BANANA         ] = "banana";
+    item_names[ItemState::ITEM_BONUS_BOX      ] = "bonus-box";
+    item_names[ItemState::ITEM_NITRO_BIG      ] = "nitro-big";
+    item_names[ItemState::ITEM_NITRO_SMALL    ] = "nitro-small";
+    item_names[ItemState::ITEM_BUBBLEGUM      ] = "bubblegum";
     item_names[ItemState::ITEM_BUBBLEGUM_NOLOK] = "bubblegum-nolok";
-    item_names[ItemState::ITEM_EASTER_EGG ] = "easter-egg";
+    item_names[ItemState::ITEM_BUBBLEGUM_SMALL] = "bubblegum-small";
+    item_names[ItemState::ITEM_BUBBLEGUM_SMALL_NOLOK] = "bubblegum-small-nolok";
+    item_names[ItemState::ITEM_EASTER_EGG     ] = "easter-egg";
 
     const std::string file_name = file_manager->getAsset("items.xml");
     const XMLNode *root         = file_manager->createXMLTree(file_name);
@@ -315,9 +317,9 @@ Item* ItemManager::dropNewItem(ItemState::ItemType type,
 
     ItemState::ItemType mesh_type = type;
     if (type == ItemState::ITEM_BUBBLEGUM && kart->getIdent() == "nolok")
-    {
         mesh_type = ItemState::ITEM_BUBBLEGUM_NOLOK;
-    }
+    if (type == ItemState::ITEM_BUBBLEGUM_SMALL && kart->getIdent() == "nolok")
+        mesh_type = ItemState::ITEM_BUBBLEGUM_SMALL_NOLOK;
 
     Item* item = new Item(type, pos, normal, m_item_mesh[mesh_type],
                           m_item_lowres_mesh[mesh_type], m_icon[mesh_type],
@@ -410,13 +412,10 @@ void  ItemManager::checkItemHit(AbstractKart* kart)
         if ((!*i) || !(*i)->isAvailable() || (*i)->isUsedUp()) continue;
 
         // Gum-Shielded karts can simply drive over bubble gums without any effect
-        if ( kart->isGumShielded() &&
-             ( (*i)->getType() == ItemState::ITEM_BUBBLEGUM      ||
-               (*i)->getType() == ItemState::ITEM_BUBBLEGUM_NOLOK  ) )
+        if ( kart->isGumShielded() && (*i)->isBubblegum() )
         {
             continue;
         }
-
 
         // To allow inlining and avoid including kart.hpp in item.hpp,
         // we pass the kart and the position separately.

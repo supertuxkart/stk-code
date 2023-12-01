@@ -67,6 +67,8 @@ public:
         ITEM_NITRO_SMALL,
         ITEM_BUBBLEGUM,
         ITEM_BUBBLEGUM_NOLOK,
+        ITEM_BUBBLEGUM_SMALL,
+        ITEM_BUBBLEGUM_SMALL_NOLOK,
 
         /** For easter egg mode only. */
         ITEM_EASTER_EGG,
@@ -243,8 +245,14 @@ public:
     /** Returns if this item is negative, i.e. a banana or bubblegum. */
     bool isNegativeItem() const
     {
-        return m_type == ITEM_BANANA || m_type == ITEM_BUBBLEGUM ||
-               m_type == ITEM_BUBBLEGUM_NOLOK;
+        return m_type == ITEM_BANANA || isBubblegum();
+    }
+    // ------------------------------------------------------------------------
+    /** Returns if this item is a type of bubblegum. */
+    bool isBubblegum() const
+    {
+        return m_type == ITEM_BUBBLEGUM || m_type == ITEM_BUBBLEGUM_SMALL ||
+               m_type == ITEM_BUBBLEGUM_NOLOK || m_type == ITEM_BUBBLEGUM_SMALL_NOLOK;
     }
     // ------------------------------------------------------------------------
     /** Sets how long an item should be disabled. While item itself sets
@@ -409,7 +417,7 @@ public:
         return lc.length2() < m_distance_2;
     }   // hitKart
     // ------------------------------------------------------------------------
-    bool rotating() const               { return getType() != ITEM_BUBBLEGUM; }
+    bool rotating() const               { return !isBubblegum(); }
 
 public:
     // ------------------------------------------------------------------------

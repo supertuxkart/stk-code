@@ -1168,6 +1168,7 @@ void Kart::collectedItem(ItemState *item_state)
         m_powerup->hitBonusBox(*item_state);
         break;
     case Item::ITEM_BUBBLEGUM:
+    case Item::ITEM_BUBBLEGUM_SMALL:
         m_has_caught_nolok_bubblegum = 
             (item_state->getPreviousOwner()&&
              item_state->getPreviousOwner()->getIdent() == "nolok");
@@ -2303,7 +2304,6 @@ void Kart::handleZipper(const Material *material, bool play_sound, bool mini_zip
             speed_gain         = m_kart_properties->getZipperSpeedGain()*0.75;
             fade_out_time      = m_kart_properties->getZipperFadeOutTime()*0.5;
             engine_force       = m_kart_properties->getZipperForce()*0.5;
-            printf("mini Zipper used!\n");
         }
         else
         {

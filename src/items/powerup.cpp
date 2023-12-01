@@ -194,7 +194,7 @@ void Powerup::set(PowerupManager::PowerupType type, int n)
             break;
 
         case PowerupManager::POWERUP_BUBBLEGUM:
-            m_sound_use = SFXManager::get()->createSoundSource("goo");
+            // handled in the useBubblegum function
             break ;
 
         case PowerupManager::POWERUP_SWITCH:
@@ -611,13 +611,15 @@ void Powerup::use()
 
 void Powerup::useBubblegum(bool has_played_sound, bool mini)
 {
+    m_sound_use = SFXManager::get()->createSoundSource("goo");
     ItemManager* im = Track::getCurrentTrack()->getItemManager();
     const KartProperties *kp = m_kart->getKartProperties();
 
     // use the bubble gum the traditional way, if the kart is looking back
     if (m_kart->getControls().getLookBack())
     {
-        Item *new_item = im->dropNewItem(Item::ITEM_BUBBLEGUM, m_kart);
+        Item *new_item = im->dropNewItem(mini ? Item::ITEM_BUBBLEGUM_SMALL :
+                                                Item::ITEM_BUBBLEGUM, m_kart);
 
         // E.g. ground not found in raycast.
         if(!new_item) return;
