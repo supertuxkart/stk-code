@@ -201,7 +201,7 @@ public:
     bool                      isOwnerImmunity(const AbstractKart *kart_hit) const;
     virtual bool              hit(AbstractKart* kart, PhysicalObject* obj=NULL);
     void                      explode(AbstractKart* kart, PhysicalObject* obj=NULL,
-                                      bool secondary_hits=true);
+                                      bool secondary_hits=true, bool indirect_damage=false);
     unsigned int              getOwnerId();
     // ------------------------------------------------------------------------
     /** Returns if this flyable has an animation playing (e.g. cannon). */
@@ -270,6 +270,9 @@ public:
     /** Call when the item is (re-)fired (during rewind if needed) by
      *  projectile_manager. */
     virtual void onFireFlyable();
+    // ------------------------------------------------------------------------
+    /** This is overriden by cakes to allow mini-cakes */
+    virtual void onFireFlyable(bool mini) { onFireFlyable(); }
     // ------------------------------------------------------------------------
     virtual void onDeleteFlyable();
     // ------------------------------------------------------------------------

@@ -472,7 +472,7 @@ void Powerup::use()
                         m_sound_use = SFXManager::get()->createSoundSource("shoot");
                         m_sound_use->play();
                     }
-                    ProjectileManager::get()->newProjectile(m_kart, PowerupManager::POWERUP_CAKE);
+                    ProjectileManager::get()->newProjectile(m_kart, PowerupManager::POWERUP_MINI);
                     break;
                 } // mini-cake case
 

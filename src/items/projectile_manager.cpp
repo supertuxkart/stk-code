@@ -178,7 +178,7 @@ std::shared_ptr<Flyable>
     // Flyable has already created before and now rewinding, re-fire it
     if (it != m_active_projectiles.end())
     {
-        it->second->onFireFlyable();
+        it->second->onFireFlyable(type == PowerupManager::POWERUP_MINI ? true : false);
         return it->second;
     }
 
@@ -194,6 +194,9 @@ std::shared_ptr<Flyable>
         case PowerupManager::POWERUP_CAKE:
             f = std::make_shared<Cake>(kart);
             break;
+        case PowerupManager::POWERUP_MINI:
+            f = std::make_shared<Cake>(kart);
+            break;
         case PowerupManager::POWERUP_RUBBERBALL:
             f = std::make_shared<RubberBall>(kart);
             break;
@@ -201,7 +204,7 @@ std::shared_ptr<Flyable>
             return nullptr;
     }
     // This cannot be done in constructor because of virtual function
-    f->onFireFlyable();
+    f->onFireFlyable(type == PowerupManager::POWERUP_MINI ? true : false);
     m_active_projectiles[uid] = f;
     if (RewindManager::get()->isEnabled())
         f->addForRewind(uid);
@@ -298,6 +301,11 @@ std::string ProjectileManager::getUniqueIdentity(AbstractKart* kart,
             uid.addUInt8(RN_CAKE);
             break;
         }
+        case PowerupManager::POWERUP_MINI:
+        {
+            uid.addUInt8(RN_CAKE_MINI);
+            break;
+        }
         case PowerupManager::POWERUP_RUBBERBALL:
         {
             uid.addUInt8(RN_RUBBERBALL);
@@ -324,7 +332,7 @@ std::shared_ptr<Rewinder>
 
     RewinderName rn = (RewinderName)data.getUInt8();
     if (!(rn == RN_BOWLING || rn == RN_PLUNGER ||
-        rn == RN_CAKE || rn == RN_RUBBERBALL))
+        rn == RN_CAKE || rn == RN_CAKE_MINI || rn == RN_RUBBERBALL))
         return nullptr;
 
     AbstractKart* kart = World::getWorld()->getKart(data.getUInt8());
@@ -347,6 +355,11 @@ std::shared_ptr<Rewinder>
             f = std::make_shared<Cake>(kart);
             break;
         }
+        case RN_CAKE_MINI:
+        {
+            f = std::make_shared<Cake>(kart);
+            break;
+        }
         case RN_RUBBERBALL:
         {
             f = std::make_shared<RubberBall>(kart);
@@ -359,7 +372,7 @@ std::shared_ptr<Rewinder>
     }
     assert(f);
     f->setCreatedTicks(created_ticks);
-    f->onFireFlyable();
+    f->onFireFlyable(/* mini */ rn == RN_CAKE_MINI ? true : false);
     f->addForRewind(uid);
     Flyable* flyable = f.get();
     Log::debug("ProjectileManager", "Missed a firing event, "

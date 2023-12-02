@@ -26,7 +26,9 @@
 #include "utils/constants.hpp"
 #include "utils/random_generator.hpp"
 
-#include "utils/log.hpp" //TODO: remove after debugging is done
+#include "utils/log.hpp"
+#include <ISceneNode.h>
+
 
 float Cake::m_st_max_distance_squared;
 float Cake::m_gravity;
@@ -69,14 +71,17 @@ bool Cake::hit(AbstractKart* kart, PhysicalObject* obj)
             kart->decreaseShieldTime();
             return false; //Not sure if a shield hit is a real hit.
         }
-        explode(kart, obj);
+        if (!m_mini)
+            explode(kart, obj);
+        else
+            explode(kart, obj, /* secondary hits */ false, /* indirect damage */ true);
     }
 
     return was_real_hit;
 }   // hit
 
 // ----------------------------------------------------------------------------
-void Cake::onFireFlyable()
+void Cake::onFireFlyable(bool mini)
 {
     Flyable::onFireFlyable();
     setDoTerrainInfo(false);
@@ -86,6 +91,12 @@ void Cake::onFireFlyable()
     gravity_vector = Vec3(0, -1, 0).rotate(q.getAxis(), q.getAngle());
     gravity_vector = gravity_vector.normalize() * m_gravity;
     const bool  backwards = m_owner->getControls().getLookBack();
+    m_mini = mini;
+
+    if (m_mini)
+        m_node->setScale(core::vector3df(0.6f,0.6f,0.6f));
+    else
+        m_node->setScale(core::vector3df(1.2f,1.2f,1.2f));
 
     // A bit of a hack: the mass of this kinematic object is still 1.0
     // (see flyable), which enables collisions. I tried setting
@@ -94,6 +105,10 @@ void Cake::onFireFlyable()
     // (if bullet is compiled with _DEBUG, a warning will be printed the first
     // time a homing-track collision happens).
     float forward_offset=m_owner->getKartLength()/2.0f + m_extend.getZ()/2.0f;
+
+    // Mini cakes are slightly slower than normal cakes
+    if(m_mini)
+        m_speed = 0.9f * m_speed;
 
     float up_velocity = m_speed/6.3f;
 

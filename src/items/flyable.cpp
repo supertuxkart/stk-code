@@ -569,7 +569,7 @@ bool Flyable::hit(AbstractKart *kart_hit, PhysicalObject* object)
  *         also be affected.
  */
 void Flyable::explode(AbstractKart *kart_hit, PhysicalObject *object,
-                      bool secondary_hits)
+                      bool secondary_hits, bool indirect_damage)
 {
     // Apply explosion effect
     // ----------------------
@@ -597,7 +597,7 @@ void Flyable::explode(AbstractKart *kart_hit, PhysicalObject *object,
         {
             // The explosion animation will register itself with the kart
             // and will free it later.
-            ExplosionAnimation::create(kart, getXYZ(), kart==kart_hit);
+            ExplosionAnimation::create(kart, getXYZ(), indirect_damage ? false : kart==kart_hit);
             if (kart == kart_hit)
             {
                 world->kartHit(kart->getWorldKartId(),
