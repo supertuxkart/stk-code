@@ -93,10 +93,13 @@ void Cake::onFireFlyable(bool mini)
     const bool  backwards = m_owner->getControls().getLookBack();
     m_mini = mini;
 
-    if (m_mini)
-        m_node->setScale(core::vector3df(0.6f,0.6f,0.6f));
-    else
-        m_node->setScale(core::vector3df(1.2f,1.2f,1.2f));
+    if (m_node != NULL) // It can be null when rewinding
+    {
+        if (m_mini)
+            m_node->setScale(core::vector3df(0.6f,0.6f,0.6f));
+        else
+            m_node->setScale(core::vector3df(1.2f,1.2f,1.2f));
+    }
 
     // A bit of a hack: the mass of this kinematic object is still 1.0
     // (see flyable), which enables collisions. I tried setting

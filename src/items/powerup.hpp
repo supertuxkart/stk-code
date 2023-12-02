@@ -79,6 +79,10 @@ public:
     PowerupManager::PowerupType
                     getType      () const {return m_type;  }
     // ------------------------------------------------------------------------
+    PowerupManager::MiniState getMiniState () const { return m_mini_state; }
+    // ------------------------------------------------------------------------
+    void setMiniState (PowerupManager::MiniState new_mini_state)
+            { m_mini_state = new_mini_state; }
 };
 
 #endif

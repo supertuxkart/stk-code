@@ -337,6 +337,7 @@ public:
     virtual void  setStolenNitro(float amount, float duration) OVERRIDE;
     virtual bool  hasStolenNitro() const OVERRIDE { return m_stolen_nitro_ticks > 0; }
     virtual float getStolenNitro() const OVERRIDE { return m_stolen_nitro_amount; }
+    virtual bool  hasHeldMini() const OVERRIDE;
     virtual float getStartupBoostFromStartTicks(int ticks) const OVERRIDE;
     virtual float getStartupBoost() const OVERRIDE  { return m_startup_boost; }
     virtual void setStartupBoost(float val) OVERRIDE { m_startup_boost = val; }

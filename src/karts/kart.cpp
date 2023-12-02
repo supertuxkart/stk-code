@@ -1201,6 +1201,11 @@ void Kart::collectedItem(ItemState *item_state)
 
 }   // collectedItem
 
+bool Kart::hasHeldMini() const
+{
+    return (m_powerup->getType() == PowerupManager::POWERUP_MINI);
+}   // hasHeldMini
+
 //-----------------------------------------------------------------------------
 /** Called the first time a kart accelerates after 'ready'. It searches
  *  through the startup times to find the appropriate slot, and returns the
