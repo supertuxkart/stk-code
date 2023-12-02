@@ -227,7 +227,7 @@ Item::Item(ItemType type, const Vec3& xyz, const Vec3& normal,
     m_icon_node = NULL;
     m_was_available_previously = true;
     m_animation_start_ticks = 0;
-    m_distance_2        = 1.2f;
+    m_distance_2        = ItemManager::getCollectDistanceSquared(type);
     initItem(type, xyz, normal);
     m_graphical_type    = getGrahpicalType();
 
@@ -464,7 +464,7 @@ void Item::updateGraphics(float dt)
         World::getWorld()->getTicksSinceStart() - m_animation_start_ticks);
 
     // Scale width and length
-    float scale_factor = (getType() == ITEM_BUBBLEGUM_SMALL ? 0.6f : 1.0f);
+    float scale_factor = (getType() == ITEM_BUBBLEGUM_SMALL ? 0.75f : 1.0f);
 
     if (is_visible)
     {
@@ -567,3 +567,51 @@ void Item::updateGraphics(float dt)
 
     m_was_available_previously = isAvailable();
 }   // updateGraphics
+
+// ------------------------------------------------------------------------
+/** Returns true if the Kart is close enough to hit this item, the item is
+ *  not deactivated anymore, and it wasn't placed by this kart (this is
+ *  e.g. used to avoid that a kart hits a bubble gum it just dropped).
+ *  \param kart Kart to test.
+ *  \param xyz Location of kart (avoiding to use kart->getXYZ() so that
+ *         kart.hpp does not need to be included here).
+ */
+bool Item::hitKart(const Vec3 &xyz, const AbstractKart *kart) const
+{
+    if (getPreviousOwner() == kart && getDeactivatedTicks() > 0)
+        return false;
+
+    // Only catch bubblegums when driving on the ground
+    if (isBubblegum() && !kart->isOnGround())
+        return false;
+
+    // Set the coordinates in the kart's frame of reference
+    // in order to properly account for kart's width and length
+    Vec3 lc = quatRotate(kart->getVisualRotation().inverse(), xyz - getXYZ());
+
+    // Since we only care about the length of the vector,
+    // we can flip the sign of its components without issue
+    if (lc.getX() < 0.0f)
+        lc.setX(-lc.getX());
+    if (lc.getZ() < 0.0f)
+        lc.setZ(-lc.getZ());
+
+    // Substract half the kart width from the sideways component
+    lc.setX(lc.getX() - kart->getKartWidth() * 0.5f);
+    if (lc.getX() < 0.0f)
+        lc.setX(0.0f);
+    // Substract half the kart length from the forward component
+    lc.setZ(lc.getZ() - kart->getKartLength() * 0.5f);
+    if (lc.getZ() < 0.0f)
+        lc.setZ(0.0f);
+
+    // Don't be too strict if the kart is a bit above the item
+    // TODO : have a per-item height value
+    if (lc.getY() < 0.0f)
+        lc.setY(-lc.getY());
+    lc.setY(lc.getY() - 1.0f);
+    if (lc.getY() < 0.0f)
+        lc.setY(0.0f);
+
+    return lc.length2() < m_distance_2;
+}   // hitKart

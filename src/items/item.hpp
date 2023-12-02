@@ -24,6 +24,7 @@
  *  Defines the various collectibles and weapons of STK.
  */
 
+#include "karts/abstract_kart.hpp"
 #include "utils/cpp2011.hpp"
 #include "utils/leak_check.hpp"
 #include "utils/log.hpp"
@@ -406,16 +407,7 @@ public:
      *  \param xyz Location of kart (avoiding to use kart->getXYZ() so that
      *         kart.hpp does not need to be included here).
      */
-    virtual bool hitKart(const Vec3 &xyz, const AbstractKart *kart=NULL) const
-        OVERRIDE
-    {
-        if (getPreviousOwner() == kart && getDeactivatedTicks() > 0)
-            return false;
-        Vec3 lc = quatRotate(getOriginalRotation(), xyz - getXYZ());
-        // Don't be too strict if the kart is a bit above the item
-        lc.setY(lc.getY() / 2.0f);
-        return lc.length2() < m_distance_2;
-    }   // hitKart
+    virtual bool hitKart(const Vec3 &xyz, const AbstractKart *kart=NULL) const OVERRIDE;
     // ------------------------------------------------------------------------
     bool rotating() const               { return !isBubblegum(); }
 

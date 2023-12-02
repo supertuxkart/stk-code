@@ -242,7 +242,7 @@
        items for each item list the index of the item it is switched with.
              Order: giftbox, banana, big-nitro, small-nitro, bubble-gum, nolok-bubble-gum,
                     small-bubble-gum, small-nolok-bubble-gum, easter egg-->
-  <switch time="5"  items="1 0 4 4 2 2 3 3 8"/>
+  <switch time="5"  items="1 0 4 6 2 2 3 3 8"/>
 
   <!-- Bubblegum
        disappear-counter: How often bubblegum gets driven over before it disappears.
