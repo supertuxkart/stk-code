@@ -495,11 +495,19 @@ public:
     // ------------------------------------------------------------------------
     virtual void setInvulnerableTicks(int ticks) = 0;
     // ------------------------------------------------------------------------
+    /** Returns if the kart is invulnerable to basket ball squashes. */
+    virtual bool hasBasketSquashImmunity() const = 0;
+    // ------------------------------------------------------------------------
+    virtual void setBasketSquashImmunityTicks(int ticks) = 0;
+    // ------------------------------------------------------------------------
     /** Returns if the kart is protected by a shield. */
     virtual bool isShielded() const = 0;
     // ------------------------------------------------------------------------
     /** Returns if the kart is protected by a gum shield. */
     virtual bool isGumShielded() const = 0;
+    // ------------------------------------------------------------------------
+    /** Returns if the kart is protected by a weak shield. */
+    virtual bool isWeakShielded() const = 0;
     // ------------------------------------------------------------------------
     virtual void setShieldTime(float t) = 0;
     // ------------------------------------------------------------------------

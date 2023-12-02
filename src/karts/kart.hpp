@@ -199,6 +199,9 @@ protected:
     /** Time a kart is invulnerable. */
     int16_t      m_invulnerable_ticks;
 
+    /** Time a kart is invulnerable to basket-ball squashing only. */
+    int16_t      m_basket_squash_invulnerable_ticks;
+
     /** If > 0 then bubble gum effect is on. This is the sliding when hitting a gum on the floor, not the shield. */
     int16_t      m_bubblegum_ticks;
 
@@ -480,6 +483,18 @@ public:
     /** Returns if the kart is invulnerable. */
     virtual bool isInvulnerable() const OVERRIDE { return m_invulnerable_ticks > 0; }
     // ----------------------------------------------------------------------------------------
+    /** Makes a kart invulnerable to basketball squashingfor a certain amount of time. */
+    virtual void setBasketSquashImmunityTicks(int ticks) OVERRIDE
+    {
+        // int16_t max
+        if (ticks > 32767)
+            ticks = 32767;
+        m_basket_squash_invulnerable_ticks = ticks;
+    }   // setBasketSquashImmunityTicks
+    // ----------------------------------------------------------------------------------------
+    /** Returns if the kart is invulnerable to basket ball squashing. */
+    virtual bool hasBasketSquashImmunity() const OVERRIDE { return m_basket_squash_invulnerable_ticks > 0; }
+    // ----------------------------------------------------------------------------------------
     /** Returns true if the kart has a plunger attached to its face. */
     virtual int getBlockedByPlungerTicks() const OVERRIDE
                                          { return m_view_blocked_by_plunger; }
@@ -496,6 +511,9 @@ public:
     // ----------------------------------------------------------------------------------------
     /** Returns if the kart is protected by a gum shield. */
     virtual bool isGumShielded() const OVERRIDE;
+    // ----------------------------------------------------------------------------------------
+    /** Returns if the kart is protected by a weak shield. */
+    virtual bool isWeakShielded() const OVERRIDE;
     // ----------------------------------------------------------------------------------------
     /** Returns the remaining time the kart is protected by a shield. */
     virtual float getShieldTime() const OVERRIDE;

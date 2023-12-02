@@ -385,6 +385,7 @@ void Kart::reset()
     m_bubblegum_ticks      = 0;
     m_bubblegum_torque_sign = true;
     m_invulnerable_ticks   = 0;
+    m_basket_squash_invulnerable_ticks = 0;
     m_min_nitro_ticks      = 0;
     m_energy_to_min_ratio  = 0;
     m_collected_energy     = 0;
@@ -1288,11 +1289,10 @@ void Kart::setShieldTime(float t)
  */
 bool Kart::isShielded() const
 {
-    if(getAttachment() != NULL)
+    if(getAttachment() != NULL && getAttachment()->getTicksLeft() > 0)
     {
         Attachment::AttachmentType type = getAttachment()->getType();
-        return type == Attachment::ATTACH_BUBBLEGUM_SHIELD ||
-               type == Attachment::ATTACH_NOLOK_BUBBLEGUM_SHIELD ||
+        return isGumShielded() ||
                type == Attachment::ATTACH_ELECTRO_SHIELD;
     }
     else
@@ -1307,17 +1307,38 @@ bool Kart::isShielded() const
  */
 bool Kart::isGumShielded() const
 {
-    if(getAttachment() != NULL)
+    if(getAttachment() != NULL && getAttachment()->getTicksLeft() > 0)
     {
         Attachment::AttachmentType type = getAttachment()->getType();
         return type == Attachment::ATTACH_BUBBLEGUM_SHIELD ||
-               type == Attachment::ATTACH_NOLOK_BUBBLEGUM_SHIELD;
+               type == Attachment::ATTACH_NOLOK_BUBBLEGUM_SHIELD ||
+               type == Attachment::ATTACH_BUBBLEGUM_SHIELD_SMALL ||
+               type == Attachment::ATTACH_NOLOK_BUBBLEGUM_SHIELD_SMALL;
     }
     else
     {
         return false;
     }
 }   // isGumShielded
+
+// ------------------------------------------------------------------------
+/**
+ * Returns true if the kart is protected by a weak shield.
+ * This is used when the basket-ball reaches its target.
+ */
+bool Kart::isWeakShielded() const
+{
+    if(getAttachment() != NULL && getAttachment()->getTicksLeft() > 0)
+    {
+        Attachment::AttachmentType type = getAttachment()->getType();
+        return type == Attachment::ATTACH_BUBBLEGUM_SHIELD_SMALL ||
+               type == Attachment::ATTACH_NOLOK_BUBBLEGUM_SHIELD_SMALL;
+    }
+    else
+    {
+        return false;
+    }
+}   // isWeakShielded
 
 // ------------------------------------------------------------------------
 /**
@@ -1532,6 +1553,9 @@ void Kart::update(int ticks)
     // Decrease the remaining invulnerability time
     if(m_invulnerable_ticks>0)
         m_invulnerable_ticks -= ticks;
+
+    if(m_basket_squash_invulnerable_ticks>0)
+        m_basket_squash_invulnerable_ticks -= ticks;
 
     if (!RewindManager::get()->isRewinding())
         m_slipstream->update(ticks);

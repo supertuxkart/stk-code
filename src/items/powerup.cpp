@@ -633,13 +633,23 @@ void Powerup::useBubblegum(bool has_played_sound, bool mini)
     {
         Attachment::AttachmentType type;
 
-        // TODO : make the mini-gum functinally different
-        float mini_factor = (mini) ? 0.4f : 1.0f;
+        float mini_factor = (mini) ? 0.5f : 1.0f;
 
-        if (m_kart->getIdent() == "nolok")
-            type = Attachment::ATTACH_NOLOK_BUBBLEGUM_SHIELD;
+        // If the kart has a normal gum shield, don't change the shield type 
+        if (mini && !(m_kart->isGumShielded() && !m_kart->isWeakShielded()))
+        {
+            if (m_kart->getIdent() == "nolok")
+                type = Attachment::ATTACH_NOLOK_BUBBLEGUM_SHIELD_SMALL;
+            else
+                type = Attachment::ATTACH_BUBBLEGUM_SHIELD_SMALL; 
+        }
         else
-            type = Attachment::ATTACH_BUBBLEGUM_SHIELD;
+        {
+            if (m_kart->getIdent() == "nolok")
+                type = Attachment::ATTACH_NOLOK_BUBBLEGUM_SHIELD;
+            else
+                type = Attachment::ATTACH_BUBBLEGUM_SHIELD;
+        }
 
         if(!m_kart->isGumShielded()) //if the previous shield had been used up.
         {
@@ -651,7 +661,12 @@ void Powerup::useBubblegum(bool has_played_sound, bool mini)
         // In this case, half of the remaining time of the active
         // shield is added. The maximum duration of a shield is
         // never above twice the standard duration.
-        else 
+        // The code above guarantees that, if there is a mix and match
+        // of small and normal gum shield between the active shield and
+        // the used shield, the new shield will be normal.
+        // As long as the mini_factor is >= 0.5, using a mini-gum shield
+        // can never reduce the duration of an active gum shield.
+        else
         {
             m_kart->getAttachment()->set(type,
                             stk_config->
