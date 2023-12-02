@@ -497,7 +497,7 @@ void Item::updateGraphics(float dt)
         {
             // have it rotate
             float angle =
-                fmodf((float)World::getWorld()->getTicksSinceStart() / 40.0f,
+                fmodf((float)World::getWorld()->getTicksSinceStart() / (float)stk_config->time2Ticks(0.33334f),
                 M_PI * 2);
 
             btMatrix3x3 m;
