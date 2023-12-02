@@ -170,6 +170,8 @@ void ItemState::collected(const AbstractKart *kart)
                 break;
             case ITEM_BUBBLEGUM:
             case ITEM_BUBBLEGUM_NOLOK:
+            case ITEM_BUBBLEGUM_SMALL:
+            case ITEM_BUBBLEGUM_SMALL_NOLOK:
                 m_ticks_till_return = stk_config->m_bubblegum_item_return_ticks;
                 break;
             default:
@@ -187,12 +189,13 @@ void ItemState::collected(const AbstractKart *kart)
 // ----------------------------------------------------------------------------
 /** Returns the graphical type of this item should be using (takes nolok into
  *  account). */
-Item::ItemType ItemState::getGrahpicalType() const
+Item::ItemType ItemState::getGraphicalType() const
 {
     return m_previous_owner && m_previous_owner->getIdent() == "nolok" &&
-        getType() == ITEM_BUBBLEGUM ?
-        ITEM_BUBBLEGUM_NOLOK : getType();
-}   // getGrahpicalType
+        getType() == ITEM_BUBBLEGUM       ? ITEM_BUBBLEGUM_NOLOK       :
+        getType() == ITEM_BUBBLEGUM_SMALL ? ITEM_BUBBLEGUM_SMALL_NOLOK :
+                                            getType();
+}   // getGraphicalType
 
 //-----------------------------------------------------------------------------
 /** Save item state at current ticks in server for live join
@@ -229,7 +232,7 @@ Item::Item(ItemType type, const Vec3& xyz, const Vec3& normal,
     m_animation_start_ticks = 0;
     m_distance_2        = ItemManager::getCollectDistanceSquared(type);
     initItem(type, xyz, normal);
-    m_graphical_type    = getGrahpicalType();
+    m_graphical_type    = getGraphicalType();
 
     m_node = NULL;
     if (mesh && !GUIEngine::isNoGraphics())
@@ -255,7 +258,7 @@ Item::Item(ItemType type, const Vec3& xyz, const Vec3& normal,
         m_node = lodnode;
     }
     setType(type);
-    handleNewMesh(getGrahpicalType());
+    handleNewMesh(getGraphicalType());
 
     if (!m_node)
         return;
@@ -439,10 +442,10 @@ void Item::updateGraphics(float dt)
     if (m_node == NULL)
         return;
 
-    if (m_graphical_type != getGrahpicalType())
+    if (m_graphical_type != getGraphicalType())
     {
-        handleNewMesh(getGrahpicalType());
-        m_graphical_type = getGrahpicalType();
+        handleNewMesh(getGraphicalType());
+        m_graphical_type = getGraphicalType();
     }
 
     float time_till_return = stk_config->ticks2Time(getTicksTillReturn());

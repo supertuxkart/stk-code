@@ -323,6 +323,9 @@ Item* ItemManager::dropNewItem(ItemState::ItemType type,
         pos    = *server_xyz;
     }
 
+    // TODO : determine if simplifications are possible here
+    //        Nolok gums being of the correct type depend on
+    //        getGraphicalType
     ItemState::ItemType mesh_type = type;
     if (type == ItemState::ITEM_BUBBLEGUM && kart->getIdent() == "nolok")
         mesh_type = ItemState::ITEM_BUBBLEGUM_NOLOK;
