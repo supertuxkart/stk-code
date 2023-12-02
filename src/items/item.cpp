@@ -191,10 +191,10 @@ void ItemState::collected(const AbstractKart *kart)
  *  account). */
 Item::ItemType ItemState::getGraphicalType() const
 {
-    return m_previous_owner && m_previous_owner->getIdent() == "nolok" &&
-        getType() == ITEM_BUBBLEGUM       ? ITEM_BUBBLEGUM_NOLOK       :
-        getType() == ITEM_BUBBLEGUM_SMALL ? ITEM_BUBBLEGUM_SMALL_NOLOK :
-                                            getType();
+    bool nolok_owned = (m_previous_owner && m_previous_owner->getIdent() == "nolok");
+    return nolok_owned && getType() == ITEM_BUBBLEGUM       ? ITEM_BUBBLEGUM_NOLOK       :
+           nolok_owned && getType() == ITEM_BUBBLEGUM_SMALL ? ITEM_BUBBLEGUM_SMALL_NOLOK :
+                                                              getType();
 }   // getGraphicalType
 
 //-----------------------------------------------------------------------------
