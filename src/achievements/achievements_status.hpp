@@ -169,12 +169,14 @@ public:
         TR_MORE_LAPS         = 6,
         TR_MIN_TWICE_LAPS    = 7, // at least twice the track's default lap count
         // counters for egg hunts
-        TR_EGG_HUNT_STARTED  = 8,
+        TR_EGG_HUNT_FIRST    = 8,
+        TR_EGG_HUNT_STARTED  = TR_EGG_HUNT_FIRST,
         TR_EGG_HUNT_FINISHED = 9,
         TR_EGG_HUNT_STARTED_HARD  = 10,
         TR_EGG_HUNT_FINISHED_HARD = 11,
+        TR_EGG_HUNT_LAST = TR_EGG_HUNT_FINISHED_HARD,
 
-        TR_DATA_NUM          = 12
+        TR_DATA_NUM          = 12,
     };    
 
 private:

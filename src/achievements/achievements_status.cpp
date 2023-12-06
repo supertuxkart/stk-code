@@ -424,6 +424,7 @@ int AchievementsStatus::getNumTracksAboveValue(int value, std::string goal_strin
     {
         // Increment on standard tracks, ignore all other kind of tracks (addons, WIP, etc.)
         if (    m_track_stats[i].track_data[enum_id] >= value
+            &&  track_manager->getTrack(m_track_stats[i].ident) != NULL
             &&  track_manager->getTrack(m_track_stats[i].ident)->isInGroup("standard")
             && (track_manager->getTrack(m_track_stats[i].ident)->hasEasterEggs() || !is_egg_hunt))
             counter++;
@@ -439,7 +440,8 @@ int AchievementsStatus::getNumAchieveTracks(bool is_egg_hunt)
     for (unsigned int i=0;i<m_track_stats.size();i++)
     {
         // Increment on standard tracks, ignore all other kind of tracks (addons, WIP, etc.)
-        if (    track_manager->getTrack(m_track_stats[i].ident)->isInGroup("standard")
+        if (    track_manager->getTrack(m_track_stats[i].ident) != NULL
+            &&  track_manager->getTrack(m_track_stats[i].ident)->isInGroup("standard")
             && (!is_egg_hunt || track_manager->getTrack(m_track_stats[i].ident)->hasEasterEggs() || !is_egg_hunt))
             num_tracks++;
     }
@@ -467,12 +469,15 @@ void AchievementsStatus::updateAchievementsProgress(UpdateType type, unsigned in
         goal_string[0] = m_tr_enum_to_xml[(int)enum_id]; // The "one-track at least" goal
         goal_string[1] = m_tr_enum_to_xml[(int)enum_id+(int)TR_DATA_NUM]; // The "all tracks" goal
 
+        bool is_egg_hunt_update = (enum_id >= TR_EGG_HUNT_FIRST && enum_id <= TR_EGG_HUNT_LAST);
+        
         for (unsigned int i=0;i<m_track_stats.size();i++)
         {
-            // ignore addons tracks (compare returns 0 when the values are equal)
-            // Note: non-official tracks installed directly in the tracks folder
-            // are considered as officials by this method.
-            if (m_track_stats[i].ident.compare(0 /*start of sub-string*/,5/*length*/,"addon") == 0)
+            // check on standard tracks, ignore all other kind of tracks (addons, WIP, etc.)
+            // Also ignore tracks without easter eggs for easter egg counters
+            if (    track_manager->getTrack(m_track_stats[i].ident) == NULL
+                || !track_manager->getTrack(m_track_stats[i].ident)->isInGroup("standard")
+                || (is_egg_hunt_update && !track_manager->getTrack(m_track_stats[i].ident)->hasEasterEggs()))
                 continue;
 
             if (m_track_stats[i].track_data[enum_id] > max_across_tracks)
@@ -547,7 +552,7 @@ void AchievementsStatus::increaseDataVar(unsigned int achieve_data_id, int incre
 #ifdef DEBUG
     else
     {
-        Log::error("Achievements", "Achievement data id %i don't match any variable.",
+        Log::error("Achievements", "Achievement data id %i doesn't match any variable.",
                   achieve_data_id);
     }
 #endif

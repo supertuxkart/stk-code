@@ -1784,7 +1784,7 @@ void World::updateAchievementDataEndRace()
             {
                 PlayerManager::trackEvent(RaceManager::get()->getTrackName(), ACS::TR_EGG_HUNT_FINISHED);
                 if (RaceManager::get()->getDifficulty() >= RaceManager::DIFFICULTY_HARD)
-                    PlayerManager::trackEvent(RaceManager::get()->getTrackName(), AchievementsStatus::TR_EGG_HUNT_FINISHED_HARD);
+                    PlayerManager::trackEvent(RaceManager::get()->getTrackName(), ACS::TR_EGG_HUNT_FINISHED_HARD);
             }
 
             updateAchievementModeCounters(false /*start*/);
