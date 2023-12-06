@@ -294,10 +294,15 @@ void GhostReplaySelection::loadList()
 
     unsigned int best_index = 0;
 
-    // getReplayIdByUID will send 0 if the UID is incorrect,
-    // and m_is_comparing will be false if it is incorrect,
-    // so it always work
-    unsigned int compare_index = ReplayPlay::get()->getReplayIdByUID(m_replay_to_compare_uid);
+    // Only compute the compare index if we are actually going to compare.
+    // This avoids spurious errors trying to find a replay with UID 0.
+    unsigned int compare_index = 0;
+    if (m_is_comparing)
+        // In case the requested replay is not found, compare_index will be 0.
+        compare_index = ReplayPlay::get()->getReplayIdByUID(m_replay_to_compare_uid);
+
+    // It's better to do this when not comparing than to do it repeatedly in the loop,
+    // it will simply be unused if not comparing.
     const ReplayPlay::ReplayData& rd_compare = ReplayPlay::get()->getReplayData(compare_index);
 
     for (unsigned int i = 0; i < ReplayPlay::get()->getNumReplayFile() ; i++)

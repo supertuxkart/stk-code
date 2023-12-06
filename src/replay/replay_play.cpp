@@ -543,6 +543,6 @@ unsigned int ReplayPlay::getReplayIdByUID(uint64_t uid)
         }
     }
 
-    Log::error("Replay", "Replay with UID of " PRIu64 " not found.", uid);
+    Log::error("Replay", "Replay with UID of %" PRIu64 " not found.", uid);
     return 0;
-} //setReplayFileByUID
+} //getReplayIdByUID
