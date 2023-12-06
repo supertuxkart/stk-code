@@ -270,7 +270,7 @@ void BaseOnlineProfileAchievements::displayResults()
 // ----------------------------------------------------------------------------
 /** True if a's goal progression is <= to b's.
  *  If they are equal, goalSort(a,b) != goalSort(b,a),
- ù  as the bool can't handle the 3 values required to avoid this
+ *  as the bool can't handle the 3 values required to avoid this
  */
 bool BaseOnlineProfileAchievements::goalSort(Achievement *a, Achievement *b)
 {

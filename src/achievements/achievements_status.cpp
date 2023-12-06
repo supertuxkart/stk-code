@@ -120,6 +120,8 @@ void AchievementsStatus::setEnumToString()
     m_ach_enum_to_xml[(int)SOCCER_FINISHED] = "soccer-finished";
     m_ach_enum_to_xml[(int)EGG_HUNT_STARTED] = "egg-hunt-started";
     m_ach_enum_to_xml[(int)EGG_HUNT_FINISHED] = "egg-hunt-finished";
+    m_ach_enum_to_xml[(int)EGG_HUNT_STARTED_HARD] = "egg-hunt-started-hard";
+    m_ach_enum_to_xml[(int)EGG_HUNT_FINISHED_HARD] = "egg-hunt-finished-hard";
     m_ach_enum_to_xml[(int)WITH_GHOST_STARTED] = "with-ghost-started";
     m_ach_enum_to_xml[(int)WITH_GHOST_FINISHED] = "with-ghost-finished";
     m_ach_enum_to_xml[(int)CTF_STARTED] = "ctf-started";
@@ -155,8 +157,11 @@ void AchievementsStatus::setEnumToString()
     m_tr_enum_to_xml[(int)TR_MORE_LAPS] = "more-laps";
     m_tr_enum_to_xml[(int)TR_MIN_TWICE_LAPS] = "twice-laps";
     m_tr_enum_to_xml[(int)TR_FINISHED_ALONE] = "race-finished-alone";
-    m_tr_enum_to_xml[(int)TR_EGG_HUNT_STARTED] = "egg-hunt-started";
-    m_tr_enum_to_xml[(int)TR_EGG_HUNT_FINISHED] = "egg-hunt-started";
+    m_tr_enum_to_xml[(int)TR_EGG_HUNT_STARTED] = "egg-hunt-started-tr";
+    m_tr_enum_to_xml[(int)TR_EGG_HUNT_FINISHED] = "egg-hunt-finished-tr";
+    m_tr_enum_to_xml[(int)TR_EGG_HUNT_STARTED_HARD] = "egg-hunt-started-hard-tr";
+    m_tr_enum_to_xml[(int)TR_EGG_HUNT_FINISHED_HARD] = "egg-hunt-finished-hard-tr";
+
 
     m_tr_enum_to_xml[(int)TR_STARTED + (int)TR_DATA_NUM] = "race-started-all";
     m_tr_enum_to_xml[(int)TR_FINISHED + (int)TR_DATA_NUM] = "race-finished-all";
@@ -167,7 +172,9 @@ void AchievementsStatus::setEnumToString()
     m_tr_enum_to_xml[(int)TR_MIN_TWICE_LAPS + (int)TR_DATA_NUM] = "twice-laps-all";
     m_tr_enum_to_xml[(int)TR_FINISHED_ALONE + (int)TR_DATA_NUM] = "race-finished-alone-all";
     m_tr_enum_to_xml[(int)TR_EGG_HUNT_STARTED + (int)TR_DATA_NUM] = "egg-hunt-started-all";
-    m_tr_enum_to_xml[(int)TR_EGG_HUNT_FINISHED + (int)TR_DATA_NUM] = "egg-hunt-started-all";
+    m_tr_enum_to_xml[(int)TR_EGG_HUNT_FINISHED + (int)TR_DATA_NUM] = "egg-hunt-finished-all";
+    m_tr_enum_to_xml[(int)TR_EGG_HUNT_STARTED_HARD + (int)TR_DATA_NUM] = "egg-hunt-started-hard-all";
+    m_tr_enum_to_xml[(int)TR_EGG_HUNT_FINISHED_HARD + (int)TR_DATA_NUM] = "egg-hunt-finished-hard-all";
 } // setEnumToString
 
 // ----------------------------------------------------------------------------
@@ -238,6 +245,8 @@ void AchievementsStatus::load(const XMLNode * input)
                     xml_achievement_tracks[i]->get("t_laps",&m_track_stats[j].track_data[(int)TR_MIN_TWICE_LAPS]);
                     xml_achievement_tracks[i]->get("eh_sta",&m_track_stats[j].track_data[(int)TR_EGG_HUNT_STARTED]);
                     xml_achievement_tracks[i]->get("eh_fin",&m_track_stats[j].track_data[(int)TR_EGG_HUNT_FINISHED]);
+                    xml_achievement_tracks[i]->get("eh_stah",&m_track_stats[j].track_data[(int)TR_EGG_HUNT_STARTED_HARD]);
+                    xml_achievement_tracks[i]->get("eh_finh",&m_track_stats[j].track_data[(int)TR_EGG_HUNT_FINISHED_HARD]);
                     track_found = true;
                     break;
                 }
@@ -257,6 +266,8 @@ void AchievementsStatus::load(const XMLNode * input)
                 xml_achievement_tracks[i]->get("t_laps",&new_track.track_data[(int)TR_MIN_TWICE_LAPS]);
                 xml_achievement_tracks[i]->get("eh_sta",&new_track.track_data[(int)TR_EGG_HUNT_STARTED]);
                 xml_achievement_tracks[i]->get("eh_fin",&new_track.track_data[(int)TR_EGG_HUNT_FINISHED]);
+                xml_achievement_tracks[i]->get("eh_stah",&new_track.track_data[(int)TR_EGG_HUNT_STARTED_HARD]);
+                xml_achievement_tracks[i]->get("eh_finh",&new_track.track_data[(int)TR_EGG_HUNT_FINISHED_HARD]);
 
                 m_track_stats.push_back(new_track);
             }
@@ -321,6 +332,8 @@ void AchievementsStatus::save(UTFWriter &out)
         out << " t_laps=\"" << m_track_stats[n].track_data[(int)TR_MIN_TWICE_LAPS] << "\"";
         out << " eh_sta=\"" << m_track_stats[n].track_data[(int)TR_EGG_HUNT_STARTED] << "\"";
         out << " eh_fin=\"" << m_track_stats[n].track_data[(int)TR_EGG_HUNT_FINISHED] << "\"";
+        out << " eh_stah=\"" << m_track_stats[n].track_data[(int)TR_EGG_HUNT_STARTED_HARD] << "\"";
+        out << " eh_finh=\"" << m_track_stats[n].track_data[(int)TR_EGG_HUNT_FINISHED_HARD] << "\"";
         out << "/>\n";
     }   // for n<m_track_stats.size()
     out << "      </achievements>\n";
@@ -342,6 +355,8 @@ Achievement * AchievementsStatus::getAchievement(uint32_t id)
 */
 void AchievementsStatus::sync(const std::vector<uint32_t> & achieved_ids)
 {
+#ifdef SYNC_ACHIEVEMENTS
+
     std::vector<bool> done;
     for(unsigned int i =0; i < achieved_ids.size(); ++i)
     {
@@ -377,6 +392,7 @@ void AchievementsStatus::sync(const std::vector<uint32_t> & achieved_ids)
         request->addParameter("achievementid", ids);
         request->queue();
     }
+#endif
 }   // sync
 
 // ----------------------------------------------------------------------------
@@ -385,7 +401,7 @@ void AchievementsStatus::sync(const std::vector<uint32_t> & achieved_ids)
  * It returns -1 if the goal type is invalid.
  * \param value - the value to match or exceed
  * \param goal_string - the identifier of the value to check. */
-int AchievementsStatus::getNumTracksAboveValue(int value, std::string goal_string)
+int AchievementsStatus::getNumTracksAboveValue(int value, std::string goal_string, bool is_egg_hunt)
 {
     int counter = 0;
     int enum_id = -1;
@@ -406,13 +422,10 @@ int AchievementsStatus::getNumTracksAboveValue(int value, std::string goal_strin
 
     for (unsigned int i=0;i<m_track_stats.size();i++)
     {
-        // ignore addons tracks (compare returns 0 when the values are equal)
-        // Note: non-official tracks installed directly in the tracks folder
-        // are considered as officials by this method.
-        if (m_track_stats[i].ident.compare(0 /*start of sub-string*/,5/*length*/,"addon") == 0)
-            continue;
-
-        if (m_track_stats[i].track_data[enum_id] >= value)
+        // Increment on standard tracks, ignore all other kind of tracks (addons, WIP, etc.)
+        if (    m_track_stats[i].track_data[enum_id] >= value
+            &&  track_manager->getTrack(m_track_stats[i].ident)->isInGroup("standard")
+            && (track_manager->getTrack(m_track_stats[i].ident)->hasEasterEggs() || !is_egg_hunt))
             counter++;
     }
     return counter;
@@ -420,17 +433,15 @@ int AchievementsStatus::getNumTracksAboveValue(int value, std::string goal_strin
 
 // ----------------------------------------------------------------------------
 /* This function returns the number of tracks valid for by-track achievements. */
-int AchievementsStatus::getNumAchieveTracks()
+int AchievementsStatus::getNumAchieveTracks(bool is_egg_hunt)
 {
     int num_tracks = 0;
     for (unsigned int i=0;i<m_track_stats.size();i++)
     {
-        // TODO : have a generic function to call instead
-        // ignore addons tracks (compare returns 0 when the values are equal)
-        if (m_track_stats[i].ident.compare(0 /*start of sub-string*/,5/*length*/,"addon") == 0)
-            continue;
-
-        num_tracks++;
+        // Increment on standard tracks, ignore all other kind of tracks (addons, WIP, etc.)
+        if (    track_manager->getTrack(m_track_stats[i].ident)->isInGroup("standard")
+            && (!is_egg_hunt || track_manager->getTrack(m_track_stats[i].ident)->hasEasterEggs() || !is_egg_hunt))
+            num_tracks++;
     }
     return num_tracks;
 } //getNumAchieveTracks
@@ -504,7 +515,25 @@ void AchievementsStatus::updateAchievementsProgress(UpdateType type, unsigned in
             i->second->setGoalValue(goal_string[0],max_kart_hits);
         }
     }
-}
+} // updateAchievementsProgress
+
+// ----------------------------------------------------------------------------
+/** Returns 0 if it is not an all-track goal, 1 if it is an all-track goal
+ * (non egg hunt) and 2 if it is a egg hunt all track goal */
+int AchievementsStatus::getAllTrackStatus(std::string type)
+{
+    if (type == "race-started-all"        || type == "race-finished-all"         ||
+        type == "race-won-all"            || type == "race-finished-reverse-all" ||
+        type == "race-finished-alone-all" || type == "less-laps-all"             ||
+        type == "more-laps-all"           || type == "twice-laps-all")
+        return 1;
+
+    else if (type == "egg-hunt-started-all"      || type == "egg-hunt-finished-all" ||
+             type == "egg-hunt-started-hard-all" || type == "egg-hunt-finished-hard-all")
+        return 2;
+
+    return 0;
+} // getAllTrackStatus
 
 // ----------------------------------------------------------------------------
 void AchievementsStatus::increaseDataVar(unsigned int achieve_data_id, int increase)

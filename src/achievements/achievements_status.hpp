@@ -20,6 +20,8 @@
 #ifndef HEADER_ACHIEVEMENTS_SLOT_HPP
 #define HEADER_ACHIEVEMENTS_SLOT_HPP
 
+#undef SYNC_ACHIEVEMENTS
+
 #include "utils/types.hpp"
 
 #include <irrString.h>
@@ -85,43 +87,45 @@ public :
            SOCCER_FINISHED               = 27,
            EGG_HUNT_STARTED              = 28,
            EGG_HUNT_FINISHED             = 29,
-           WITH_GHOST_STARTED            = 30,
-           WITH_GHOST_FINISHED           = 31,
-           CTF_STARTED                   = 32,
-           CTF_FINISHED                  = 33,
-           FFA_STARTED                   = 34,
-           FFA_FINISHED                  = 35,
+           EGG_HUNT_STARTED_HARD         = 30,
+           EGG_HUNT_FINISHED_HARD        = 31,
+           WITH_GHOST_STARTED            = 32,
+           WITH_GHOST_FINISHED           = 33,
+           CTF_STARTED                   = 34,
+           CTF_FINISHED                  = 35,
+           FFA_STARTED                   = 36,
+           FFA_FINISHED                  = 37,
 
            // Count the number of powerups used by the player.
-           POWERUP_USED                  = 36,
-           POWERUP_USED_1RACE            = 37,
-           POWERUP_USED_1RACE_MAX        = 38,
+           POWERUP_USED                  = 38,
+           POWERUP_USED_1RACE            = 39,
+           POWERUP_USED_1RACE_MAX        = 40,
            // Count how many times a bowling ball from the player hit a kart
-           BOWLING_HIT                   = 39,
-           BOWLING_HIT_1RACE             = 40,
-           BOWLING_HIT_1RACE_MAX         = 41,
+           BOWLING_HIT                   = 41,
+           BOWLING_HIT_1RACE             = 42,
+           BOWLING_HIT_1RACE_MAX         = 43,
            // Count how many times a swatter from the player hit a kart
-           SWATTER_HIT                   = 42,
-           SWATTER_HIT_1RACE             = 43,
-           SWATTER_HIT_1RACE_MAX         = 44,
+           SWATTER_HIT                   = 44,
+           SWATTER_HIT_1RACE             = 45,
+           SWATTER_HIT_1RACE_MAX         = 46,
            // Count how many times a swatter, bowling ball or cake from
            // the player hit a kart (excluding the player's own kart)
-           ALL_HITS                      = 45,
-           ALL_HITS_1RACE                = 46,
-           ALL_HITS_1RACE_MAX            = 47,
+           ALL_HITS                      = 47,
+           ALL_HITS_1RACE                = 48,
+           ALL_HITS_1RACE_MAX            = 49,
            // Count the number of bananas hit
-           BANANA                        = 48,
-           BANANA_1RACE                  = 49,
-           BANANA_1RACE_MAX              = 50,
+           BANANA                        = 50,
+           BANANA_1RACE                  = 51,
+           BANANA_1RACE_MAX              = 52,
            // Count how many times the player skidded
-           SKIDDING                      = 51,
-           SKIDDING_1RACE                = 52,
-           SKIDDING_1RACE_MAX            = 53,
-           SKIDDING_1LAP                 = 54,
-           SKIDDING_1LAP_MAX             = 55,
+           SKIDDING                      = 53,
+           SKIDDING_1RACE                = 54,
+           SKIDDING_1RACE_MAX            = 55,
+           SKIDDING_1LAP                 = 56,
+           SKIDDING_1LAP_MAX             = 57,
 
 
-           ACHIEVE_DATA_NUM              = 56
+           ACHIEVE_DATA_NUM              = 58
     };
 
 private:
@@ -131,7 +135,7 @@ private:
     // one variable may be used by several achievements.
     // TODO
     // Currently this only uses an int counter.
-    // Evaluate if additional data keeping (max achived ?) can be useful,
+    // Evaluate if additional data keeping (max achieved ?) can be useful,
     // and either expand the struct or remove it.
     struct AchievementVariable
     {
@@ -167,8 +171,10 @@ public:
         // counters for egg hunts
         TR_EGG_HUNT_STARTED  = 8,
         TR_EGG_HUNT_FINISHED = 9,
+        TR_EGG_HUNT_STARTED_HARD  = 10,
+        TR_EGG_HUNT_FINISHED_HARD = 11,
 
-        TR_DATA_NUM          = 10
+        TR_DATA_NUM          = 12
     };    
 
 private:
@@ -226,8 +232,9 @@ public :
     void resetKartHits(int num_karts);
     void addKartHit(int kart_id);
     void updateAllAchievementsProgress();
-    int getNumTracksAboveValue(int value, std::string goal_string);
-    int getNumAchieveTracks();
+    int getNumTracksAboveValue(int value, std::string goal_string, bool is_egg_hunt);
+    int getNumAchieveTracks(bool is_egg_hunt);
+    int getAllTrackStatus(std::string type);
     // ------------------------------------------------------------------------
     std::map<uint32_t, Achievement *>& getAllAchievements()
     {

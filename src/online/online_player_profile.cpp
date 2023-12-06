@@ -256,10 +256,9 @@ namespace Online
                 saveSession(getOnlineId(), getToken());
             }
 
-            std::string achieved_string("");
-
             // Even if no achievements were sent, we have to call sync
             // in order to upload local achievements to the server
+            std::string achieved_string("");
             input->get("achieved", &achieved_string);
             std::vector<uint32_t> achieved_ids =
                             StringUtils::splitToUInt(achieved_string, ' ');

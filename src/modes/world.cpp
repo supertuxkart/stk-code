@@ -392,6 +392,8 @@ void World::reset(bool restart)
             else if (RaceManager::get()->isEggHuntMode())
             {
                 PlayerManager::trackEvent(RaceManager::get()->getTrackName(), AchievementsStatus::TR_EGG_HUNT_STARTED);
+                if (RaceManager::get()->getDifficulty() >= RaceManager::DIFFICULTY_HARD)
+                    PlayerManager::trackEvent(RaceManager::get()->getTrackName(), AchievementsStatus::TR_EGG_HUNT_STARTED_HARD);
             }
             if (reset_streak)
                 PlayerManager::onRaceEnd(true /* previous race aborted */);
@@ -1781,6 +1783,8 @@ void World::updateAchievementDataEndRace()
             else if (RaceManager::get()->isEggHuntMode())
             {
                 PlayerManager::trackEvent(RaceManager::get()->getTrackName(), ACS::TR_EGG_HUNT_FINISHED);
+                if (RaceManager::get()->getDifficulty() >= RaceManager::DIFFICULTY_HARD)
+                    PlayerManager::trackEvent(RaceManager::get()->getTrackName(), AchievementsStatus::TR_EGG_HUNT_FINISHED_HARD);
             }
 
             updateAchievementModeCounters(false /*start*/);
@@ -1798,7 +1802,11 @@ void World::updateAchievementModeCounters(bool start)
     else if (RaceManager::get()->isFollowMode())
         PlayerManager::increaseAchievement(start ? ACS::FTL_STARTED : ACS::FTL_FINISHED,1);
     else if (RaceManager::get()->isEggHuntMode())
+    {
         PlayerManager::increaseAchievement(start ? ACS::EGG_HUNT_STARTED : ACS::EGG_HUNT_FINISHED,1);
+        if (RaceManager::get()->getDifficulty() >= RaceManager::DIFFICULTY_HARD)
+            PlayerManager::increaseAchievement(start ? ACS::EGG_HUNT_STARTED_HARD : ACS::EGG_HUNT_FINISHED_HARD,1);
+    }
     else if (RaceManager::get()->isSoccerMode())
         PlayerManager::increaseAchievement(start ? ACS::SOCCER_STARTED : ACS::SOCCER_FINISHED,1);
     else if (RaceManager::get()->isBattleMode())
