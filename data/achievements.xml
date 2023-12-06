@@ -82,6 +82,8 @@
         soccer-finished
         egg-hunt-started
         egg-hunt-finished
+        egg-hunt-started-hard
+        egg-hunt-finished-hard
         with-ghost-started
         with-ghost-finished
         ctf-started
@@ -120,8 +122,10 @@
         less-laps
         more-laps
         twice-laps
-        egg-hunt-started
-        egg-hunt-finished
+        egg-hunt-started-tr
+        egg-hunt-finished-tr
+        egg-hunt-started-hard-tr
+        egg-hunt-finished-hard-tr
 
     VII - Per-track counters (all non-addon tracks reach the value)
 
@@ -137,7 +141,9 @@
         // For egg hunts, all non-addon tracks with egg hunt support
         // must reach the value
         egg-hunt-started-all
-        egg-hunt-finished-all    
+        egg-hunt-finished-all
+        egg-hunt-started-hard-all
+        egg-hunt-finished-hard-all
         -->
 <achievements version="1">
     <achievement id="109" name="Banana Lover" description="Collect at least 5 bananas in one race.">
