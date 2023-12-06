@@ -500,7 +500,7 @@
            behaviour of the karts. -->
     <collision impulse-type="normal"
                impulse="6500" impulse-time="0.3" terrain-impulse="160"
-               restitution="0:1.0 5:1.0 20:0.2" bevel-factor="0.5 0.0 0.3"
+               restitution="0:1.0 3:0.7 15:0.275 35:0.15" bevel-factor="0.5 0.0 0.3"
                physical-wheel-position="0" />
 
      <!-- Skidding
