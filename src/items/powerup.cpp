@@ -245,7 +245,7 @@ Material *Powerup::getIcon() const
         // selected by the current cycle
         if (m_mini_state == PowerupManager::MINI_SELECT)
         {
-            int cycle_ticks = stk_config->time2Ticks(0.5f);
+            int cycle_ticks = stk_config->time2Ticks(0.65f);
             int cycle_value = World::getWorld()->getTicksSinceStart() % (3 * cycle_ticks);
             if (cycle_value < cycle_ticks)
                 return powerup_manager->getMiniIcon(0);
@@ -448,7 +448,7 @@ void Powerup::use()
                 {
                     m_number++; // Avoid the powerup being removed when validating the mini-choice
                     
-                    int cycle_ticks = stk_config->time2Ticks(0.5f);
+                    int cycle_ticks = stk_config->time2Ticks(0.65f);
                     int cycle_value = World::getWorld()->getTicksSinceStart() % (3 * cycle_ticks);
                     if (cycle_value < cycle_ticks)
                         m_mini_state = PowerupManager::MINI_ZIPPER;
@@ -462,6 +462,9 @@ void Powerup::use()
             // Mini-cake case
             case PowerupManager::MINI_CAKE:
                 {
+                    // This allows to use multiple mini-wishes in different ways
+                    m_mini_state = PowerupManager::MINI_SELECT;
+
                     // make weapon usage destroy gum shields
                     if(stk_config->m_shield_restrict_weapons &&
                     m_kart->isGumShielded())
@@ -479,6 +482,8 @@ void Powerup::use()
             // Mini-zipper case
             case PowerupManager::MINI_ZIPPER:
                 {
+                    // This allows to use multiple mini-wishes in different ways
+                    m_mini_state = PowerupManager::MINI_SELECT;
                     m_kart->handleZipper(NULL, /* play sound*/ true, /* mini zipper */ true);
                     break;
                 } // mini-zipper case
@@ -487,6 +492,8 @@ void Powerup::use()
             // Mini-gum case
             case PowerupManager::MINI_GUM:
                 {
+                    // This allows to use multiple mini-wishes in different ways
+                    m_mini_state = PowerupManager::MINI_SELECT;
                     useBubblegum(has_played_sound, /* mini */ true);
                     break;
                 } // mini-gum case
