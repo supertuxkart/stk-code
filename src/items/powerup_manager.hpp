@@ -207,7 +207,7 @@ public:
                          uint64_t random_number);
     // ------------------------------------------------------------------------
     /** Returns the icon(material) for a powerup. */
-    Material* getIcon(int type) const {return m_all_icons [type];}
+    Material* getIcon(int type) const { return m_all_icons [type];}
     // ------------------------------------------------------------------------
     /** Returns the icon(material) for a mini status. */
     Material* getMiniIcon(int index) const {return m_mini_icons [index];}

@@ -245,18 +245,20 @@ Material *Powerup::getIcon(bool wide) const
         // FIXME
         // This duplicates the logic to determine which powerup would be
         // selected by the current cycle
-        if (m_mini_state == PowerupManager::MINI_SELECT)
-        {
-            int cycle_ticks = stk_config->time2Ticks(0.65f);
-            int cycle_value = World::getWorld()->getTicksSinceStart() % (3 * cycle_ticks);
-            if (cycle_value < cycle_ticks)
-                return powerup_manager->getMiniIcon(0+wide_offset);
-            else if (cycle_value < 2*cycle_ticks)
-                return powerup_manager->getMiniIcon(1+wide_offset);
-            else
-                return powerup_manager->getMiniIcon(2+wide_offset);
-        }
+
+        // If not in one of the mini-powerup-specific states,
+        // We assume that the mini_state is MINI_SELECT for correct display
+        // This may not always be true in networking mode right after item collection.
+        int cycle_ticks = stk_config->time2Ticks(0.65f);
+        int cycle_value = World::getWorld()->getTicksSinceStart() % (3 * cycle_ticks);
+        if (cycle_value < cycle_ticks)
+            return powerup_manager->getMiniIcon(0+wide_offset);
+        else if (cycle_value < 2*cycle_ticks)
+            return powerup_manager->getMiniIcon(1+wide_offset);
+        else
+            return powerup_manager->getMiniIcon(2+wide_offset);
     }
+
     // Check if it's one of the types which have a separate
     // data file which includes the icon:
     return powerup_manager->getIcon(m_type);

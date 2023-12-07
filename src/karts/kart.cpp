@@ -1229,7 +1229,6 @@ void Kart::setStartupBoostFromStartTicks(int ticks)
             m_startup_boost = m_kart_properties->getStartupBoost()[i];
             m_startup_engine_force = m_kart_properties->getStartupEngineForce()[i];
             m_startup_boost_level = 1 + startup_times.size() - i;
-            printf("m_startup_boost_level is %u", (uint)m_startup_boost_level);
             return;
         }
     }

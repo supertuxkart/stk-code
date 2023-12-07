@@ -433,12 +433,17 @@ void RaceGUIBase::drawPowerupIcons(const AbstractKart* kart,
     int x2 = 0;
 
     assert(powerup != NULL);
-    assert(powerup->getIcon() != NULL);
     video::ITexture *t;
     if (powerup->hasWideIcon())
+    {
+        assert(powerup->getIcon(true) != NULL);
         t=powerup->getIcon(/* wide */ true)->getTexture();
+    }
     else
+    {
+        assert(powerup->getIcon() != NULL);
         t=powerup->getIcon()->getTexture();
+    }
     assert(t != NULL);
     core::rect<s32> rect(core::position2di(0, 0), t->getSize());
 
