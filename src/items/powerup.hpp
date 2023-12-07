@@ -64,7 +64,7 @@ public:
     void            set          (PowerupManager::PowerupType _type, int n = 1);
     void            setNum       (int n = 1);
     void            reset        ();
-    Material*       getIcon      () const;
+    Material*       getIcon      (bool wide=false) const;
     void            adjustSound  ();
     void            use          ();
     void            hitBonusBox (const ItemState &item);
@@ -83,6 +83,8 @@ public:
     // ------------------------------------------------------------------------
     void setMiniState (PowerupManager::MiniState new_mini_state)
             { m_mini_state = new_mini_state; }
+    // ------------------------------------------------------------------------
+    bool            hasWideIcon  () const {return m_type == PowerupManager::POWERUP_MINI; }
 };
 
 #endif

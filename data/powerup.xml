@@ -120,7 +120,10 @@
   <item name="mini-wish"          icon="mini_all-on.png"
         icon_cycle1="mini_zipper-on.png" icon_cycle2="mini_cake-on.png"
         icon_cycle3="mini_gum-on.png" icon_selected1="mini_zipper-selected.png"
-        icon_selected2="mini_cake-selected.png" icon_selected3="mini_gum-selected.png" />
+        icon_selected2="mini_cake-selected.png" icon_selected3="mini_gum-selected.png"
+        icon_cycle1_w="mini_wide-zipper-on.png" icon_cycle2_w="mini_wide-cake-on.png"
+        icon_cycle3_w="mini_wide-gum-on.png" icon_selected1_w="mini_wide-zipper-selected.png"
+        icon_selected2_w="mini_wide-cake-selected.png" icon_selected3_w="mini_wide-gum-selected.png" />
 
   <!-- This defines the probabilities to get each type of item depending on
        the position of the kart and number of karts in the race.

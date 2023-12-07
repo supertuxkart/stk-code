@@ -227,18 +227,20 @@ void Powerup::setNum(int n)
 /** Returns the icon for the currently collected powerup. Used in the
  *  race_gui to display the collected item.
  */
-Material *Powerup::getIcon() const
+Material *Powerup::getIcon(bool wide) const
 {
     // The mini powerup has multiple states,
     // and each state has its own icon.
     if (m_type == PowerupManager::POWERUP_MINI)
     {
+        int wide_offset = wide ? 6 : 0;
+
         if (m_mini_state == PowerupManager::MINI_ZIPPER)
-            return powerup_manager->getMiniIcon(3);
+            return powerup_manager->getMiniIcon(3+wide_offset);
         else if (m_mini_state == PowerupManager::MINI_CAKE)
-            return powerup_manager->getMiniIcon(4);
+            return powerup_manager->getMiniIcon(4+wide_offset);
         else if (m_mini_state == PowerupManager::MINI_GUM)
-            return powerup_manager->getMiniIcon(5);
+            return powerup_manager->getMiniIcon(5+wide_offset);
 
         // FIXME
         // This duplicates the logic to determine which powerup would be
@@ -248,11 +250,11 @@ Material *Powerup::getIcon() const
             int cycle_ticks = stk_config->time2Ticks(0.65f);
             int cycle_value = World::getWorld()->getTicksSinceStart() % (3 * cycle_ticks);
             if (cycle_value < cycle_ticks)
-                return powerup_manager->getMiniIcon(0);
+                return powerup_manager->getMiniIcon(0+wide_offset);
             else if (cycle_value < 2*cycle_ticks)
-                return powerup_manager->getMiniIcon(1);
+                return powerup_manager->getMiniIcon(1+wide_offset);
             else
-                return powerup_manager->getMiniIcon(2);
+                return powerup_manager->getMiniIcon(2+wide_offset);
         }
     }
     // Check if it's one of the types which have a separate

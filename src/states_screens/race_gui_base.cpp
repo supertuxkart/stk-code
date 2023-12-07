@@ -395,7 +395,7 @@ void RaceGUIBase::drawPowerupIcons(const AbstractKart* kart,
     int n = kart->getPowerup()->getNum() ;
     int many_powerups = 0;
     if (n<1) return;    // shouldn't happen, but just in case
-    if (n>5)
+    if (n>5 || (powerup->hasWideIcon() && n>1))
     {
         many_powerups = n;
         n = 1;
@@ -434,14 +434,20 @@ void RaceGUIBase::drawPowerupIcons(const AbstractKart* kart,
 
     assert(powerup != NULL);
     assert(powerup->getIcon() != NULL);
-    video::ITexture *t=powerup->getIcon()->getTexture();
+    video::ITexture *t;
+    if (powerup->hasWideIcon())
+        t=powerup->getIcon(/* wide */ true)->getTexture();
+    else
+        t=powerup->getIcon()->getTexture();
     assert(t != NULL);
     core::rect<s32> rect(core::position2di(0, 0), t->getSize());
+
+    int wide_factor = powerup->hasWideIcon() ? 2 : 1;
 
     for ( int i = 0 ; i < n ; i++ )
     {
         x2 = (int)((x1+i*itemSpacing) - (itemSpacing / 2));
-        core::rect<s32> pos(x2, y1, x2+nSize, y1+nSize);
+        core::rect<s32> pos(x2, y1, x2+(nSize*wide_factor), y1+nSize);
         draw2DImage(t, pos, rect, NULL,
                                                   NULL, true);
     }   // for i
@@ -449,7 +455,7 @@ void RaceGUIBase::drawPowerupIcons(const AbstractKart* kart,
     if (many_powerups > 0)
     {
         gui::ScalableFont* font = GUIEngine::getHighresDigitFont();
-        core::rect<s32> pos(x2+nSize, y1, x2+nSize+nSize, y1+nSize);
+        core::rect<s32> pos(x2+(nSize*wide_factor), y1, x2+(nSize*wide_factor)+nSize, y1+nSize);
         font->setScale(scale / (float)font->getDimension(L"X").Height * 64.0f);
         font->draw(core::stringw(L"x")+StringUtils::toWString(many_powerups),
             pos, video::SColor(255, 255, 255, 255));

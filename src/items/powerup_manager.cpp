@@ -718,85 +718,61 @@ float PowerupManager::getNitroHackStolenDiff(unsigned int diff) const
  */
 void PowerupManager::loadMiniIcons(const XMLNode &node)
 {
+    loadMiniIconsHalf(node, false);
+    loadMiniIconsHalf(node, true);
+} // loadMiniIcons
+
+void PowerupManager::loadMiniIconsHalf(const XMLNode &node, bool wide)
+{
     std::string icon_file("");
-
-    // Load the first special icon
-    node.get("icon_cycle1", &icon_file);
-    icon_file = GUIEngine::getSkin()->getThemedIcon("gui/icons/" + icon_file);
-
-#ifdef DEBUG
-    long unsigned int min_size = icon_file.size();
-#endif
-
-    m_mini_icons[0] = material_manager->getMaterial(icon_file,
-                                  /* full_path */     true,
-                                  /*make_permanent */ true,
-                                  /*complain_if_not_found*/ true,
-                                  /*strip_path*/ false);
-
-    // Load the second special icon
-    node.get("icon_cycle2", &icon_file);
-    icon_file = GUIEngine::getSkin()->getThemedIcon("gui/icons/" + icon_file);
+    std::string wide_node("");
+    if (wide)
+        wide_node = "_w";
+    unsigned int wide_offset = wide ? 6 : 0;
 
 #ifdef DEBUG
-    if (icon_file.size() < min_size)
-        min_size = icon_file.size();
+    long unsigned int min_size = 1;
 #endif
 
-    m_mini_icons[1] = material_manager->getMaterial(icon_file,
-                                  /* full_path */     true,
-                                  /*make_permanent */ true,
-                                  /*complain_if_not_found*/ true,
-                                  /*strip_path*/ false);
+    // Load the cycle icons
+    for (int i=0;i<3;i++)
+    {
+        std::string number = std::to_string(i+1);
+        // Load the first special icon
+        node.get("icon_cycle"+number+wide_node, &icon_file);
+        icon_file = GUIEngine::getSkin()->getThemedIcon("gui/icons/" + icon_file);
 
-    // Load the third special icon
-    node.get("icon_cycle3", &icon_file);
-    icon_file = GUIEngine::getSkin()->getThemedIcon("gui/icons/" + icon_file);
+        m_mini_icons[i+wide_offset] = material_manager->getMaterial(icon_file,
+                                      /* full_path */     true,
+                                      /*make_permanent */ true,
+                                      /*complain_if_not_found*/ true,
+                                      /*strip_path*/ false);
 
 #ifdef DEBUG
-    if (icon_file.size() < min_size)
-        min_size = icon_file.size();
+        if (icon_file.size() < min_size)
+            min_size = icon_file.size();
 #endif
+    } // load the cycle icons
 
-    m_mini_icons[2] = material_manager->getMaterial(icon_file,
-                                  /* full_path */     true,
-                                  /*make_permanent */ true,
-                                  /*complain_if_not_found*/ true,
-                                  /*strip_path*/ false);
+    // Load the selected icons
+    for (int i=0;i<3;i++)
+    {
+        std::string number = std::to_string(i+1);
+        // Load the first special icon
+        node.get("icon_selected"+number+wide_node, &icon_file);
+        icon_file = GUIEngine::getSkin()->getThemedIcon("gui/icons/" + icon_file);
 
-    // Load the fourth special icon
-    node.get("icon_selected1", &icon_file);
-    icon_file = GUIEngine::getSkin()->getThemedIcon("gui/icons/" + icon_file);
+        m_mini_icons[i+3+wide_offset] = material_manager->getMaterial(icon_file,
+                                      /* full_path */     true,
+                                      /*make_permanent */ true,
+                                      /*complain_if_not_found*/ true,
+                                      /*strip_path*/ false);
 
 #ifdef DEBUG
-    if (icon_file.size() < min_size)
-        min_size = icon_file.size();
+        if (icon_file.size() < min_size)
+            min_size = icon_file.size();
 #endif
-
-    m_mini_icons[3] = material_manager->getMaterial(icon_file,
-                                  /* full_path */     true,
-                                  /*make_permanent */ true,
-                                  /*complain_if_not_found*/ true,
-                                  /*strip_path*/ false);
-
-    // Load the fifth special icon
-    node.get("icon_selected2", &icon_file);
-    icon_file = GUIEngine::getSkin()->getThemedIcon("gui/icons/" + icon_file);
-
-#ifdef DEBUG
-    if (icon_file.size() < min_size)
-        min_size = icon_file.size();
-#endif
-
-    m_mini_icons[4] = material_manager->getMaterial(icon_file,
-                                  /* full_path */     true,
-                                  /*make_permanent */ true,
-                                  /*complain_if_not_found*/ true,
-                                  /*strip_path*/ false);
-
-    // Load the sixth special icon
-    node.get("icon_selected3", &icon_file);
-    icon_file = GUIEngine::getSkin()->getThemedIcon("gui/icons/" + icon_file);
+    } // load the selected icons
 
 #ifdef DEBUG
     if (icon_file.size() < min_size)
@@ -810,18 +786,12 @@ void PowerupManager::loadMiniIcons(const XMLNode &node)
     }
 #endif
 
-    m_mini_icons[5] = material_manager->getMaterial(icon_file,
-                                  /* full_path */     true,
-                                  /*make_permanent */ true,
-                                  /*complain_if_not_found*/ true,
-                                  /*strip_path*/ false);
-
     for (unsigned int i=0; i<6; i++)
     {
-        assert(m_mini_icons[i] != NULL);
-        assert(m_mini_icons[i]->getTexture() != NULL);      
+        assert(m_mini_icons[i+wide_offset] != NULL);
+        assert(m_mini_icons[i+wide_offset]->getTexture() != NULL);      
     }
-}   // loadMiniIcons
+}   // loadMiniIconsHalf
 
 // ----------------------------------------------------------------------------
 /** Create a (potentially interpolated) WeightsData objects for the current
