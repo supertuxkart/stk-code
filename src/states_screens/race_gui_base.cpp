@@ -446,7 +446,9 @@ void RaceGUIBase::drawPowerupIcons(const AbstractKart* kart,
 
     for ( int i = 0 ; i < n ; i++ )
     {
-        x2 = (int)((x1+i*itemSpacing) - (itemSpacing / 2));
+        // Offset based on the number of icons displayed, on the wide-status
+        // and offset by half-itemSpacing to ensure proper centering
+        x2 = (int)(x1 + itemSpacing * (2*i - 2*wide_factor +1)/2);
         core::rect<s32> pos(x2, y1, x2+(nSize*wide_factor), y1+nSize);
         draw2DImage(t, pos, rect, NULL,
                                                   NULL, true);
