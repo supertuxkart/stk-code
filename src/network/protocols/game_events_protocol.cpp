@@ -112,28 +112,28 @@ bool GameEventsProtocol::notifyEvent(Event* event)
                     kart_id, event->getPeer()->getAddress().toString().c_str());
                 return true;
             }
-            float f = LobbyProtocol::get<ServerLobby>()
+            uint8_t boost_level = LobbyProtocol::get<ServerLobby>()
                 ->getStartupBoostOrPenaltyForKart(
                 event->getPeer()->getAveragePing(), kart_id);
             NetworkString *ns = getNetworkString();
             ns->setSynchronous(true);
-            ns->addUInt8(GE_STARTUP_BOOST).addUInt8(kart_id).addFloat(f);
+            ns->addUInt8(GE_STARTUP_BOOST).addUInt8(kart_id).addUInt8(boost_level);
             sendMessageToPeers(ns, true);
             delete ns;
         }
         else
         {
             uint8_t kart_id = data.getUInt8();
-            float boost = data.getFloat();
+            uint8_t boost_level = data.getUInt8();
             AbstractKart* k = World::getWorld()->getKart(kart_id);
-            if (boost < 0.0f)
+            if (boost_level == 0)
             {
                 PlayerController* pc =
                     dynamic_cast<PlayerController*>(k->getController());
                 pc->displayPenaltyWarning();
             }
             else
-                k->setStartupBoost(boost);
+                k->setStartupBoost(boost_level);
         }
         break;
     }

@@ -177,6 +177,9 @@ public:
         // Startup
         STARTUP_TIME,
         STARTUP_BOOST,
+        STARTUP_ENGINE_FORCE,
+        STARTUP_DURATION,
+        STARTUP_FADE_OUT_TIME,
 
         // Rescue
         RESCUE_DURATION,
@@ -356,6 +359,9 @@ public:
 
     std::vector<float> getStartupTime() const;
     std::vector<float> getStartupBoost() const;
+    std::vector<float> getStartupEngineForce() const;
+    float getStartupDuration() const;
+    float getStartupFadeOutTime() const;
 
     float getRescueDuration() const;
     float getRescueVertOffset() const;

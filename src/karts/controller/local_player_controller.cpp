@@ -183,9 +183,8 @@ bool LocalPlayerController::action(PlayerAction action, int value,
         m_has_started = true;
         if (!NetworkConfig::get()->isNetworking())
         {
-            float f = m_kart->getStartupBoostFromStartTicks(
+            m_kart->setStartupBoostFromStartTicks(
                 World::getWorld()->getAuxiliaryTicks());
-            m_kart->setStartupBoost(f);
         }
         else if (NetworkConfig::get()->isClient())
         {

@@ -529,6 +529,12 @@ void XmlCharacteristic::load(const XMLNode *node)
             &m_values[STARTUP_TIME]);
         sub_node->get("boost",
             &m_values[STARTUP_BOOST]);
+        sub_node->get("engine-force",
+            &m_values[STARTUP_ENGINE_FORCE]);
+        sub_node->get("duration",
+            &m_values[STARTUP_DURATION]);
+        sub_node->get("fade-out-time",
+            &m_values[STARTUP_FADE_OUT_TIME]);
     }
 
     if (const XMLNode *sub_node = node->getNode("rescue"))

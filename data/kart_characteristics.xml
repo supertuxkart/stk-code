@@ -292,7 +292,9 @@
             increasing times.
             The startup boost uses the same boost category as zippers. -->
         <startup time="0.3 0.5"
-                 boost="8 4" />
+                 boost="6.5 3.5"
+                 engine-force="160.0 120.0"
+                 duration="4.0" fade-out-time ="2.0" />
 
         <!-- Rescue
             duration: How long it takes the kart to be raised.
@@ -330,7 +332,7 @@
             fade-out-time: Duration during which the increased maximum
                 speed due to nitro fades out.
             max: How much nitro a kart can store. -->
-        <nitro engine-force="300" engine-mult="1.2" consumption="1"
+        <nitro engine-force="350" engine-mult="1.2" consumption="1"
                small-container="1" big-container="2.5"
                max-speed-increase="5" min-burst="0.5" duration="0.8"
                fade-out-time="1.6" max="20" />
@@ -411,7 +413,7 @@
             <skid reduce-turn-min="0.2" reduce-turn-max="0.9" bonus-force="*0.8 *0.8 *0.8" />
             <startup boost="*1 *1" />
             <explosion duration="*1" radius="*1" />
-            <nitro engine-force="*0.6" consumption="*1.2" max-speed-increase="*1.2" />
+            <nitro engine-force="*0.72" consumption="*1.2" max-speed-increase="*1.2" />
             <slipstream length="*0.9" collect-time="*0.9"
                         duration-factor="*1" fade-out-time="*1" />
             <parachute lbound-fraction="0.35" ubound-fraction="0.2" />
@@ -424,9 +426,9 @@
             <mass value="*0.75" />
             <skid reduce-turn-min="0.2" reduce-turn-max="0.9" bonus-force="*0.875 *0.875 *0.875" 
                   time-till-bonus="*0.9 *0.9 *0.9" />
-            <startup boost="*0.8 *0.8" />
+            <startup boost="*0.875 *0.875" />
             <explosion duration="*0.8" radius="*0.8" />
-            <nitro engine-force="*0.75" consumption="*1.375" max-speed-increase="*1.1" />
+            <nitro engine-force="*0.825" consumption="*1.375" max-speed-increase="*1.1" />
             <slipstream duration-factor="*0.8" fade-out-time="*1" />
             <parachute lbound-fraction="0.45" ubound-fraction="0.275" />
         </characteristic>
@@ -437,9 +439,9 @@
                   power-increase="2.5 2.08 1.76 1.44 1.22 1" />
             <mass value="*0.75" />
             <skid reduce-turn-min="0.25" reduce-turn-max="0.9" bonus-force="*0.875 *0.875 *0.875" />
-            <startup boost="*0.8 *0.8" />
+            <startup boost="*0.875 *0.875" />
             <explosion duration="*0.8" radius="*0.8" />
-            <nitro engine-force="*0.75" consumption="*1.375" max-speed-increase="*1.1" />
+            <nitro engine-force="*0.825" consumption="*1.375" max-speed-increase="*1.1" />
             <slipstream duration-factor="*0.8" fade-out-time="*1" />
             <parachute lbound-fraction="0.45" ubound-fraction="0.275" />
         </characteristic>
@@ -449,8 +451,8 @@
             <gear switch-ratio="0.1 0.25 0.45 0.7 1 4"
                   power-increase="2.05 1.74 1.53 1.32 1.16 1" />
             <mass value="*1" />
-            <skid reduce-turn-min="0.3" reduce-turn-max="0.9" bonus-force="*1.0 *1.0 *1.0" />
-            <startup boost="*0.6 *0.6" />
+            <skid reduce-turn-min="0.29" reduce-turn-max="0.9" bonus-force="*1.0 *1.0 *1.0" />
+            <startup boost="*0.8 *0.8" />
             <explosion duration="*0.6" radius="*0.6" />
             <nitro engine-force="*1" consumption="*1.67" max-speed-increase="*1.0" />
             <slipstream length="*1.1" collect-time="*1.1"

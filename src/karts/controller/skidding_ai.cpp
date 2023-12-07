@@ -2169,8 +2169,7 @@ void SkiddingAI::handleRaceStart()
             m_start_delay+=stk_config->m_penalty_ticks;
             return;
         }
-        m_kart->setStartupBoost(m_kart->getStartupBoostFromStartTicks(
-            m_start_delay + stk_config->time2Ticks(1.0f)));
+        m_kart->setStartupBoostFromStartTicks(m_start_delay + stk_config->time2Ticks(1.0f));
         m_start_delay = 0;
     }
 }   // handleRaceStart

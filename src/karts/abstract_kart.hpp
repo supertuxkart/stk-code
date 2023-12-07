@@ -576,11 +576,13 @@ public:
     // ------------------------------------------------------------------------
     virtual void makeKartRest();
     // ------------------------------------------------------------------------
-    virtual void setStartupBoost(float val) = 0;
+    virtual void setStartupBoost(uint8_t boost_level) = 0;
     // ------------------------------------------------------------------------
     virtual float getStartupBoost() const = 0;
     // ------------------------------------------------------------------------
-    virtual float getStartupBoostFromStartTicks(int ticks) const = 0;
+    virtual uint8_t getStartupBoostLevel() const = 0;
+    // ------------------------------------------------------------------------
+    virtual void setStartupBoostFromStartTicks(int ticks) = 0;
     // ------------------------------------------------------------------------
     virtual Stars* getStarsEffect() const = 0;
     // ------------------------------------------------------------------------

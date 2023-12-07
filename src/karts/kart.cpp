@@ -401,6 +401,8 @@ void Kart::reset()
     m_is_jumping           = false;
     m_flying               = false;
     m_startup_boost        = 0.0f;
+    m_startup_engine_force = 0.0f;
+    m_startup_boost_level  = 1; // 0 penalty, 1 nothing, 2+ boost
 
     if (m_node)
         m_node->setScale(core::vector3df(1.0f, 1.0f, 1.0f));
@@ -1208,25 +1210,47 @@ bool Kart::hasHeldMini() const
 
 //-----------------------------------------------------------------------------
 /** Called the first time a kart accelerates after 'ready'. It searches
- *  through the startup times to find the appropriate slot, and returns the
- *  speed-boost from the corresponding entry.
+ *  through the startup times to find the appropriate slot, and sets up
+ *  m_startup_boost and m_startup_engine_force to the appropriate values
  *  If the kart started too slow (i.e. slower than the longest time in the
  *  startup times list), it returns 0.
  */
-float Kart::getStartupBoostFromStartTicks(int ticks) const
+void Kart::setStartupBoostFromStartTicks(int ticks)
 {
     int ticks_since_ready = ticks - stk_config->time2Ticks(1.0f);
     if (ticks_since_ready < 0)
-        return 0.0f;
+        return;
     float t = stk_config->ticks2Time(ticks_since_ready);
     std::vector<float> startup_times = m_kart_properties->getStartupTime();
     for (unsigned int i = 0; i < startup_times.size(); i++)
     {
         if (t <= startup_times[i])
-            return m_kart_properties->getStartupBoost()[i];
+        {
+            m_startup_boost = m_kart_properties->getStartupBoost()[i];
+            m_startup_engine_force = m_kart_properties->getStartupEngineForce()[i];
+            m_startup_boost_level = 1 + startup_times.size() - i;
+            printf("m_startup_boost_level is %u", (uint)m_startup_boost_level);
+            return;
+        }
     }
-    return 0.0f;
-}   // getStartupBoostFromStartTicks
+    m_startup_boost = 0.0f;
+    m_startup_engine_force = 0.0f;
+    m_startup_boost_level = 1;
+
+}   // setStartupBoostFromStartTicks
+
+//-----------------------------------------------------------------------------
+/** Called directly in networking mode */
+void Kart::setStartupBoost(uint8_t boost_level)
+{
+    std::vector<float> startup_times = m_kart_properties->getStartupTime();
+    int index = m_kart_properties->getStartupTime().size() - boost_level + 1;
+    assert(index >= 0 && index <= (int)m_kart_properties->getStartupTime().size());
+
+    m_startup_boost = m_kart_properties->getStartupBoost()[index];
+    m_startup_engine_force = m_kart_properties->getStartupEngineForce()[index];
+    m_startup_boost_level = boost_level;
+}   // setStartupBoost
 
 //-----------------------------------------------------------------------------
 /** Simulates gears by adjusting the force of the engine. It also takes the
@@ -2809,10 +2833,10 @@ void Kart::updatePhysics(int ticks)
             m_kart_gfx->setCreationRateAbsolute(KartGFX::KGFX_ZIPPER,
                 100.0f * m_startup_boost);
             m_max_speed->instantSpeedIncrease(MaxSpeed::MS_INCREASE_ZIPPER,
-                0.9f * m_startup_boost, m_startup_boost,
-                /*engine_force*/200.0f,
-                /*duration*/stk_config->time2Ticks(4.0f),
-                /*fade_out_time*/stk_config->time2Ticks(2.0f));
+                /*instant speed*/ m_startup_boost, /*max speed*/ m_startup_boost,
+                /*engine_force*/ m_startup_engine_force,
+                /*duration*/ stk_config->time2Ticks(m_kart_properties->getStartupDuration()),
+                /*fade_out_time*/ stk_config->time2Ticks(m_kart_properties->getStartupFadeOutTime()));
         }
     }
     if (m_bounce_back_ticks > 0)

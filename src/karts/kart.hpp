@@ -246,6 +246,14 @@ protected:
 
     float           m_startup_boost;
 
+    float           m_startup_engine_force;
+
+    // boost-level 0 corresponds to a start penalty
+    // boost-level 1 corresponds to a start without boost or penalty
+    // boost-level 2 or more corresponds to a start with boost
+    // This is only used for networking
+    uint8_t         m_startup_boost_level;
+
     float           m_falling_time;
 
     float           m_weight;
@@ -338,9 +346,10 @@ public:
     virtual bool  hasStolenNitro() const OVERRIDE { return m_stolen_nitro_ticks > 0; }
     virtual float getStolenNitro() const OVERRIDE { return m_stolen_nitro_amount; }
     virtual bool  hasHeldMini() const OVERRIDE;
-    virtual float getStartupBoostFromStartTicks(int ticks) const OVERRIDE;
+    virtual void setStartupBoostFromStartTicks(int ticks) OVERRIDE;
     virtual float getStartupBoost() const OVERRIDE  { return m_startup_boost; }
-    virtual void setStartupBoost(float val) OVERRIDE { m_startup_boost = val; }
+    virtual uint8_t getStartupBoostLevel() const OVERRIDE  { return m_startup_boost_level; }
+    virtual void setStartupBoost(uint8_t boost_level) OVERRIDE;
     virtual const Material *getMaterial() const OVERRIDE;
     virtual const Material *getLastMaterial() const OVERRIDE;
     /** Returns the pitch of the terrain depending on the heading. */

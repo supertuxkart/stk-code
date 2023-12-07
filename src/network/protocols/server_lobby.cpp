@@ -5043,12 +5043,17 @@ void ServerLobby::listBanTable()
 }   // listBanTable
 
 //-----------------------------------------------------------------------------
-float ServerLobby::getStartupBoostOrPenaltyForKart(uint32_t ping,
+uint8_t ServerLobby::getStartupBoostOrPenaltyForKart(uint32_t ping,
                                                    unsigned kart_id)
 {
+    // boost-level 0 corresponds to a start penalty
+    // boost-level 1 corresponds to a start without boost or penalty
+    // boost-level 2 or more corresponds to a start with boost
+
     AbstractKart* k = World::getWorld()->getKart(kart_id);
-    if (k->getStartupBoost() != 0.0f)
-        return k->getStartupBoost();
+    // If a boost already exists, return it
+    if (k->getStartupBoostLevel() >= 2)
+        return k->getStartupBoostLevel();
     uint64_t now = STKHost::get()->getNetworkTimer();
     uint64_t client_time = now - ping / 2;
     uint64_t server_time = client_time + m_server_delay;
@@ -5059,11 +5064,10 @@ float ServerLobby::getStartupBoostOrPenaltyForKart(uint32_t ping,
         PlayerController* pc =
             dynamic_cast<PlayerController*>(k->getController());
         pc->displayPenaltyWarning();
-        return -1.0f;
+        return 0;
     }
-    float f = k->getStartupBoostFromStartTicks(ticks);
-    k->setStartupBoost(f);
-    return f;
+    k->setStartupBoostFromStartTicks(ticks);
+    return k->getStartupBoostLevel();
 }   // getStartupBoostOrPenaltyForKart
 
 //-----------------------------------------------------------------------------

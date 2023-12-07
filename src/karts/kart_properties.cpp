@@ -1144,6 +1144,24 @@ std::vector<float> KartProperties::getStartupBoost() const
 }  // getStartupBoost
 
 // ----------------------------------------------------------------------------
+std::vector<float> KartProperties::getStartupEngineForce() const
+{
+    return m_cached_characteristic->getStartupEngineForce();
+}  // getStartupEngineForce
+
+// ----------------------------------------------------------------------------
+float KartProperties::getStartupDuration() const
+{
+    return m_cached_characteristic->getStartupDuration();
+}  // getStartupDuration
+
+// ----------------------------------------------------------------------------
+float KartProperties::getStartupFadeOutTime() const
+{
+    return m_cached_characteristic->getStartupFadeOutTime();
+}  // getStartupFadeOutTime
+
+// ----------------------------------------------------------------------------
 float KartProperties::getRescueDuration() const
 {
     return m_cached_characteristic->getRescueDuration();

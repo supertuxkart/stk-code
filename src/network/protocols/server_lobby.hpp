@@ -400,7 +400,7 @@ public:
     virtual bool isRacing() const OVERRIDE { return m_state.load() == RACING; }
     bool allowJoinedPlayersWaiting() const;
     void setSaveServerConfig(bool val)          { m_save_server_config = val; }
-    float getStartupBoostOrPenaltyForKart(uint32_t ping, unsigned kart_id);
+    uint8_t getStartupBoostOrPenaltyForKart(uint32_t ping, unsigned kart_id);
     int getDifficulty() const                   { return m_difficulty.load(); }
     int getGameMode() const                      { return m_game_mode.load(); }
     int getLobbyPlayers() const              { return m_lobby_players.load(); }
