@@ -158,7 +158,7 @@ void ArenaAI::update(int ticks)
     else
     {
         configSpeed();
-        setSteering(m_steering_angle, dt);
+        setSteering(m_steering_angle);
     }
 
     AIBaseController::update(ticks);
@@ -369,7 +369,7 @@ void ArenaAI::doUTurn(const float dt)
     float turn_angle = atan2f(m_target_point_lc.x(),
         fabsf(m_target_point_lc.z()));
     m_controls->setBrake(true);
-    setSteering(turn_angle > 0.0f ? -1.0f : 1.0f, dt);
+    setSteering(turn_angle > 0.0f ? -1.0f : 1.0f);
     m_time_since_uturn += dt;
 
     if ((m_target_point_lc.z() > 0 && fabsf(turn_angle) < 0.2f) ||
@@ -395,8 +395,7 @@ bool ArenaAI::gettingUnstuck(int ticks)
     if (!m_is_stuck || m_is_uturn) return false;
 
     resetAfterStop();
-    float dt = stk_config->ticks2Time(ticks);
-    setSteering(0.0f, dt);
+    setSteering(0.0f);
     m_controls->setBrake(true);
 
     m_ticks_since_reversing += ticks;

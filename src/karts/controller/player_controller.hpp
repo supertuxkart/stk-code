@@ -35,7 +35,7 @@ protected:
 
     int            m_penalty_ticks;
 
-    virtual void  steer(int ticks, int steer_val);
+    virtual void  steer(int steer_val);
 
 public:
                  PlayerController(AbstractKart *kart);

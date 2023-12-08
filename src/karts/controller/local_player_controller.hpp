@@ -64,7 +64,7 @@ private:
     SFXBuffer   *m_unfull_sound;
 
 
-    virtual void steer(int, int) OVERRIDE;
+    virtual void steer(int) OVERRIDE;
     virtual void displayPenaltyWarning() OVERRIDE;
     void         nitroNotFullSound();
 

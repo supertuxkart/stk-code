@@ -322,10 +322,10 @@ void CannonAnimation::update(int ticks)
         m_current_rotation = MiniGLM::compressQuaternion(current_rotation);
 
         // Adjust the horizontal location based on steering
-        // Use values from getControls directly because in networking steering
-        // can be smoothed for remote karts
+        // In networking steering can be smoothed for remote karts
+        // but getEffectiveSteer is not
         float dt = stk_config->ticks2Time(ticks);
-        m_fraction_of_line += m_kart->getControls().getSteer() * dt * 2.0f;
+        m_fraction_of_line += m_kart->getEffectiveSteer() * dt * 2.0f;
         btClamp(m_fraction_of_line, -1.0f, 1.0f);
     }   // if m_kart
     else

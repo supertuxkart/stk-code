@@ -392,7 +392,7 @@ void SkiddingAI::handleSteering(float dt)
                 target += m_kart_ahead->getVelocity()*time_till_hit;
             }
             float steer_angle = steerToPoint(target);
-            setSteering(steer_angle, dt);
+            setSteering(steer_angle);
             return;
         }
     }
@@ -497,7 +497,7 @@ void SkiddingAI::handleSteering(float dt)
         steer_angle = steerToPoint(aim_point);
     }  // if m_current_track_direction!=LEFT/RIGHT
 
-    setSteering(steer_angle, dt);
+    setSteering(steer_angle);
 }   // handleSteering
 
 //-----------------------------------------------------------------------------
@@ -2122,7 +2122,7 @@ void SkiddingAI::handleBraking(float max_turn_speed, float min_speed)
     {
         if(m_kart->getSpeed() > max_turn_speed  &&
             m_kart->getSpeed()>min_speed        &&
-            fabsf(m_controls->getSteer()) > 0.95f )
+            fabsf(m_kart->getEffectiveSteer()) > 0.95f )
         {
             m_controls->setBrake(true);
 #ifdef DEBUG
@@ -3029,18 +3029,12 @@ bool SkiddingAI::canSkid(float steer_fraction)
 
 //-----------------------------------------------------------------------------
 /** Converts the steering angle to a lr steering in the range of -1 to 1.
- *  If the steering angle is too great, it will also trigger skidding. This
- *  function uses a 'time till full steer' value specifying the time it takes
- *  for the wheel to reach full left/right steering similar to player karts
- *  when using a digital input device. The parameter is defined in the kart
- *  properties and helps somewhat to make AI karts more 'pushable' (since
- *  otherwise the karts counter-steer to fast).
+ *  If the steering angle is too great, it will also trigger skidding.
  *  It also takes the effect of a plunger into account by restricting the
  *  actual steer angle to 50% of the maximum.
  *  \param angle Steering angle.
- *  \param dt Time step.
  */
-void SkiddingAI::setSteering(float angle, float dt)
+void SkiddingAI::setSteering(float angle)
 {
     float steer_fraction = angle / m_kart->getMaxSteerAngle();
 
@@ -3084,28 +3078,6 @@ void SkiddingAI::setSteering(float angle, float dt)
     // Restrict steering when a plunger is in the face
     // The degree of restriction depends on item_skill
 
-    //FIXME : the AI speed estimate in curves don't account for this restriction
-    if(m_kart->getBlockedByPlungerTicks()>0)
-    {
-        int item_skill = computeSkill(ITEM_SKILL);
-        float steering_limit = 0.5f;
-        if (item_skill == 0)
-            steering_limit = 0.35f;
-        else if (item_skill == 1)
-            steering_limit = 0.45f;
-        else if (item_skill == 2)
-            steering_limit = 0.55f;
-        else if (item_skill == 3)
-            steering_limit = 0.65f;
-        else if (item_skill == 4)
-            steering_limit = 0.75f;
-        else if (item_skill == 5)
-            steering_limit = 0.9f;
-
-        if     (steer_fraction >  steering_limit) steer_fraction =  steering_limit;
-        else if(steer_fraction < -steering_limit) steer_fraction = -steering_limit;
-    }
-
     const Skidding *skidding = m_kart->getSkidding();
 
     // If we are supposed to skid, but the current steering is still
@@ -3147,20 +3119,28 @@ void SkiddingAI::setSteering(float angle, float dt)
             steer_fraction = 1.0f;
     }
 
-    float old_steer      = m_controls->getSteer();
-
-    // The AI has its own 'time full steer' value (which is the time
-    float max_steer_change = dt/m_kart->getTimeFullSteer(fabsf(old_steer));
-    if(old_steer < steer_fraction)
+    // Restrict steering when a plunger is in the face
+    //FIXME : the AI speed estimate in curves don't account for this restriction
+    if(m_kart->getBlockedByPlungerTicks()>0)
     {
-        m_controls->setSteer( (old_steer+max_steer_change > steer_fraction)
-                              ? steer_fraction : old_steer+max_steer_change );
-    }
-    else
-    {
-        m_controls->setSteer( (old_steer-max_steer_change < steer_fraction)
-                               ? steer_fraction : old_steer-max_steer_change );
+        int item_skill = computeSkill(ITEM_SKILL);
+        float steering_limit = 0.5f;
+        if (item_skill == 0)
+            steering_limit = 0.35f;
+        else if (item_skill == 1)
+            steering_limit = 0.45f;
+        else if (item_skill == 2)
+            steering_limit = 0.55f;
+        else if (item_skill == 3)
+            steering_limit = 0.65f;
+        else if (item_skill == 4)
+            steering_limit = 0.75f;
+        else if (item_skill == 5)
+            steering_limit = 0.9f;
+
+        if     (steer_fraction >  steering_limit) steer_fraction =  steering_limit;
+        else if(steer_fraction < -steering_limit) steer_fraction = -steering_limit;
     }
 
-
+    m_controls->setSteer(steer_fraction);
 }   // setSteering

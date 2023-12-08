@@ -167,7 +167,7 @@ void ReplayRecorder::update(int ticks)
             PhysicInfo *q_prev      = &(m_physic_info[i][m_count_transforms[i]-1]);
 
             // If the kart changes its steering
-            if (fabsf(kart->getControls().getSteer() - m_previous_steer) >
+            if (fabsf(kart->getEffectiveSteer() - m_previous_steer) >
                                             stk_config->m_replay_delta_steering)
                 force_update = true;
 
@@ -246,7 +246,7 @@ void ReplayRecorder::update(int ticks)
             continue;
         }
 
-        m_previous_steer = kart->getControls().getSteer();
+        m_previous_steer = kart->getEffectiveSteer();
         m_last_saved_time[i] = time;
         m_count_transforms[i]++;
         if (m_count_transforms[i] >= m_transform_events[i].size())

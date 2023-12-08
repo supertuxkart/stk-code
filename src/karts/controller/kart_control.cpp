@@ -23,10 +23,12 @@
 #include <algorithm>
 
 // ------------------------------------------------------------------------
-/** Sets the current steering value. */
-void KartControl::setSteer(float f)
+/** Sets the current steering value.
+ *  The kart keeps an effective steer value that's computed based on the
+ *  requested steer and the time-to-steer values */
+void KartControl::setSteer(float requested_steer)
 {
-    int steer = irr::core::clamp((int)(f * 32767.0f), -32767, 32767);
+    int steer = irr::core::clamp((int)(requested_steer * 32767.0f), -32767, 32767);
     m_steer = (int16_t)steer;
 }   // setSteer
 

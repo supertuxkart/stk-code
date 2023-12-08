@@ -105,6 +105,12 @@ protected:
     /** The kart controls (e.g. steering, fire, ...). */
     KartControl  m_controls;
 
+    /** Used to make the steering angle conform with TimeToFullSteer
+     *  It should always be between -1 and 1
+     *  We put it in abstract kart because of the constraints from
+     *  getSteerPercent, but this should be re-architectured*/
+    float m_effective_steer;
+
     /** A kart animation object to handle rescue, explosion etc. */
     AbstractKartAnimation *m_kart_animation;
 
@@ -126,8 +132,13 @@ public:
     // ========================================================================
     // Functions related to controlling the kart
     // ------------------------------------------------------------------------
-    /** Returns the current steering value for this kart. */
-    virtual float getSteerPercent() const { return m_controls.getSteer(); }
+    /** Returns the current steering value for this kart. 
+     *  This function exists only to be overriden with steering smoothing
+     *  in the rewinder.*/
+    virtual float getSteerPercent() const { return m_effective_steer; }
+    // ------------------------------------------------------------------------
+    virtual void  setEffectiveSteer(float effective_steer)
+                            { m_effective_steer = effective_steer; }
     // ------------------------------------------------------------------------
     /** Returns all controls of this kart. */
     KartControl&  getControls() { return m_controls; }
@@ -385,6 +396,8 @@ public:
     virtual bool  hasStolenNitro() const = 0;
     // ------------------------------------------------------------------------
     virtual float getStolenNitro() const = 0;
+    // ------------------------------------------------------------------------
+    virtual float getEffectiveSteer() const = 0;
     // ------------------------------------------------------------------------
     virtual bool  hasHeldMini() const = 0;
     // ------------------------------------------------------------------------

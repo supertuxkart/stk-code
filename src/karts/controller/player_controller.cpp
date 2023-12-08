@@ -266,52 +266,13 @@ void PlayerController::actionFromNetwork(PlayerAction p_action, int value,
 
 //-----------------------------------------------------------------------------
 /** Handles steering for a player kart.
+ *  Convert the integer steer val
  */
-void PlayerController::steer(int ticks, int steer_val)
+void PlayerController::steer(int steer_val)
 {
-    // Get the old value, compute the new steering value,
-    // and set it at the end of this function
-    float steer = m_controls->getSteer();
-    if(stk_config->m_disable_steer_while_unskid &&
-        m_controls->getSkidControl()==KartControl::SC_NONE &&
-       m_kart->getSkidding()->getVisualSkidRotation()!=0)
-    {
-        steer = 0;
-    }
-
-    // Amount the steering is changed for digital devices.
-    // If the steering is 'back to straight', a different steering
-    // change speed is used.
-    float dt = stk_config->ticks2Time(ticks);
-    const float STEER_CHANGE = ( (steer_val<=0 && steer<0) ||
-                                 (steer_val>=0 && steer>0)   )
-                     ? dt/m_kart->getKartProperties()->getTurnTimeResetSteer()
-                     : dt/m_kart->getTimeFullSteer(fabsf(steer));
-    if (steer_val < 0)
-    {
-        steer += STEER_CHANGE;
-        steer = std::min(steer, -steer_val/32767.0f);
-    }
-    else if(steer_val > 0)
-    {
-        steer -= STEER_CHANGE;
-        steer = std::max(steer, -steer_val/32767.0f);
-    }
-    else
-    {   // no key is pressed
-        if(steer>0.0f)
-        {
-            steer -= STEER_CHANGE;
-            if(steer<0.0f) steer=0.0f;
-        }
-        else
-        {   // steer<=0.0f;
-            steer += STEER_CHANGE;
-            if(steer>0.0f) steer=0.0f;
-        }   // if steer<=0.0f
-    }   // no key is pressed
-    m_controls->setSteer(std::min(1.0f, std::max(-1.0f, steer)) );
-
+    m_controls->setSteer(std::min(1.0f, std::max(-1.0f, -steer_val/32767.0f)) );
+    // If steer_val is 0, there is no input
+    // TODO m_controls->setActiveSteer(steer_val!=0);
 }   // steer
 
 //-----------------------------------------------------------------------------
@@ -328,7 +289,7 @@ void PlayerController::skidBonusTriggered()
  */
 void PlayerController::update(int ticks)
 {
-    steer(ticks, m_steer_val);
+    steer(m_steer_val);
 
     if (World::getWorld()->isStartPhase())
     {

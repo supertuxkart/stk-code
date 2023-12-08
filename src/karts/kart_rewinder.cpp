@@ -217,6 +217,11 @@ BareNetworkString* KartRewinder::saveState(std::vector<std::string>* ru)
         bool_for_each_data_2 |= (1 << 7);
     buffer->addUInt8(bool_for_each_data_2);
 
+    uint8_t bool_for_each_data_3 = 0;
+    if (getEffectiveSteer() != 0.0f)
+        bool_for_each_data_3 |= 1;
+    buffer->addUInt8(bool_for_each_data_3);
+
     if (m_bubblegum_ticks > 0)
         buffer->addUInt16(m_bubblegum_ticks);
     if (m_view_blocked_by_plunger > 0)
@@ -234,6 +239,9 @@ BareNetworkString* KartRewinder::saveState(std::vector<std::string>* ru)
 
     // 3) Kart animation status or physics values (transform and velocities)
     // -------------------------------------------
+    if(getEffectiveSteer() != 0.0f)
+        buffer->addFloat(getEffectiveSteer());
+
     if (has_animation)
     {
         buffer->addUInt8(m_kart_animation->getAnimationType());
@@ -321,6 +329,9 @@ void KartRewinder::restoreState(BareNetworkString *buffer, int count)
     bool read_powerup_mask = ((bool_for_each_data_2 >> 6) & 1) == 1;
     bool has_held_mini = ((bool_for_each_data_2 >> 7) & 1) == 1;
 
+    uint8_t bool_for_each_data_3 = buffer->getUInt8();
+    bool read_effective_steer = (bool_for_each_data_3 & 1) == 1;
+
     if (read_bubblegum)
         m_bubblegum_ticks = buffer->getUInt16();
     else
@@ -361,6 +372,11 @@ void KartRewinder::restoreState(BareNetworkString *buffer, int count)
 
     // 3) Kart animation status or transform and velocities
     // -----------
+    if (read_effective_steer)
+        setEffectiveSteer(buffer->getFloat());
+    else
+        setEffectiveSteer(0.0f);
+    
     if (has_animation_in_state)
     {
         KartAnimationType kat = (KartAnimationType)(buffer->getUInt8());

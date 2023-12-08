@@ -435,6 +435,7 @@ void Kart::reset()
         m_engine_sound->stop();
 
     m_controls.reset();
+    m_effective_steer      = 0.0f;
     m_slipstream->reset();
     
     if(m_vehicle)
@@ -1696,8 +1697,7 @@ void Kart::update(int ticks)
             !has_animation_before && fabs(roll) > 60 * DEGREE_TO_RAD &&
             fabs(getSpeed()) < 3.0f)
         {
-            RescueAnimation::create(this, /*is_auto_rescue*/true);
-            m_last_factor_engine_sound = 0.0f;
+            handleRescue(/*is_auto_rescue*/ true);
         }
     }
 
@@ -1787,16 +1787,14 @@ void Kart::update(int ticks)
         if((min->getY() - getXYZ().getY() > 17 || dist_to_sector > 25) && !m_flying &&
            !has_animation_before)
         {
-            RescueAnimation::create(this);
-            m_last_factor_engine_sound = 0.0f;
+            handleRescue();
         }
     }
     else
     {
         if (!has_animation_before && material->isDriveReset() && isOnGround())
         {
-            RescueAnimation::create(this);
-            m_last_factor_engine_sound = 0.0f;
+            handleRescue();
         }
         else if(material->isZipper()     && isOnGround())
         {
@@ -2656,8 +2654,7 @@ void Kart::crashed(const Material *m, const Vec3 &normal)
 #endif
         if (m->getCollisionReaction() == Material::RESCUE)
         {
-            RescueAnimation::create(this);
-            m_last_factor_engine_sound = 0.0f;
+            handleRescue();
         }
         else if (m->getCollisionReaction() == Material::PUSH_BACK)
         {
@@ -2674,6 +2671,16 @@ void Kart::crashed(const Material *m, const Vec3 &normal)
         //   !getKartAnimation())
     m_controller->crashed(m);
 }   // crashed(Material)
+
+// -----------------------------------------------------------------------------
+/** Create the rescue animation and reset some relevant variables
+ *  World takes care of moving the kart to its rescue position. */
+void Kart::handleRescue(bool auto_rescue)
+{
+    RescueAnimation::create(this, /*is_auto_rescue*/ auto_rescue);
+    m_last_factor_engine_sound = 0.0f;
+    m_effective_steer = 0.0f;
+} // handleRescue
 
 // -----------------------------------------------------------------------------
 /** Common code used when a kart or a material was hit.
@@ -2842,12 +2849,13 @@ void Kart::updatePhysics(int ticks)
         m_bounce_back_ticks -= ticks;
 
     updateEnginePowerAndBrakes(ticks);
+    updateSteering(ticks);
 
     // apply flying physics if relevant
     if (m_flying)
         updateFlying();
 
-    m_skidding->update(ticks, isOnGround(), m_controls.getSteer(),
+    m_skidding->update(ticks, isOnGround(), m_effective_steer,
                        m_controls.getSkidControl());
     if( ( m_skidding->getSkidState() == Skidding::SKID_ACCUMULATE_LEFT ||
           m_skidding->getSkidState() == Skidding::SKID_ACCUMULATE_RIGHT  ) &&
@@ -3115,6 +3123,47 @@ void Kart::updateEnginePowerAndBrakes(int ticks)
 }   // updateEnginePowerAndBrakes
 
 // ----------------------------------------------------------------------------
+/** The steer value from controls contains the steer value requested by the
+ *  controller (AI or player). We convert it here into an effective steering
+ *  value accounting for the TimeToFullSteer properties of the kart. This
+ *  allows uniform behavior without duplicate code or abnormally located code. */
+void Kart::updateSteering(int ticks)
+{
+    // Get the requested value, compute the new steering value,
+    // and set it at the end of this function
+    float requested_steer = m_controls.getSteer();
+    if(stk_config->m_disable_steer_while_unskid &&
+       m_controls.getSkidControl()==KartControl::SC_NONE &&
+       getSkidding()->getVisualSkidRotation()!=0)
+    {
+        requested_steer = 0;
+    }
+
+    // Changes in steering are limited according to timeFullSteer
+    // If the steering is 'back to straight', we use the time
+    // to full steer for a current steer of 0 (which should be
+    // the highest possible value)
+    float dt = stk_config->ticks2Time(ticks);
+    const float STEER_CHANGE = ( (requested_steer > m_effective_steer && m_effective_steer < 0) ||
+                                 (requested_steer < m_effective_steer && m_effective_steer > 0)   )
+                     ? dt/getTimeFullSteer(0.0f)
+                     : dt/getTimeFullSteer(fabsf(m_effective_steer));
+
+    if (requested_steer < m_effective_steer)
+    {
+        m_effective_steer -= STEER_CHANGE;
+        m_effective_steer = std::max(m_effective_steer, requested_steer);
+    }
+    else if(requested_steer > m_effective_steer)
+    {
+        m_effective_steer += STEER_CHANGE;
+        m_effective_steer = std::min(m_effective_steer, requested_steer);
+    }
+
+    // If requested steer is equal to m_effective steer, there is nothing else to do
+}   // updateSteering
+
+// ----------------------------------------------------------------------------
 /** Handles sliding, i.e. the kart sliding off terrain that is too steep.
  *  Dynamically determine friction so that the kart looses its traction
  *  when trying to drive on too steep surfaces. Below angles of 0.25 rad,
@@ -3207,9 +3256,9 @@ void Kart::updateFlying()
         }
     }
 
-    if (m_controls.getSteer()!= 0.0f)
+    if (m_effective_steer!= 0.0f)
     {
-        m_body->applyTorque(btVector3(0.0, m_controls.getSteer()*3500.0f, 0.0));
+        m_body->applyTorque(btVector3(0.0, m_effective_steer*3500.0f, 0.0));
     }
 
     // dampen any roll while flying, makes the kart hard to control

@@ -233,7 +233,7 @@ void EndController::handleSteering(float dt)
     m_debug_sphere->setPosition(target_point.toIrrVector());
 #endif
 
-    setSteering(steerToPoint(target_point), dt);
+    setSteering(steerToPoint(target_point));
 }   // handleSteering
 
 //-----------------------------------------------------------------------------

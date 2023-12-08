@@ -292,7 +292,7 @@ private:
 
     void  determineTrackDirection();
     virtual bool canSkid(float steer_fraction);
-    virtual void setSteering(float angle, float dt);
+    virtual void setSteering(float angle);
     void handleCurve();
 
 protected:

@@ -312,12 +312,14 @@ protected:
     void          updateFlying();
     void          updateSliding();
     void          updateEnginePowerAndBrakes(int ticks);
+    void          updateSteering(int ticks);
     void          updateEngineSFX(float dt);
     void          updateSpeed();
     void          updateNitro(int ticks);
     float         compensateLinearSlowdown (float engine_power);
     float         applyAirFriction (float engine_power);
     float         getActualWheelForce();
+    void          handleRescue(bool auto_rescue=false);
     void          playCrashSFX(const Material* m, AbstractKart *k);
     void          loadData(RaceManager::KartType type, bool animatedModel);
     void          updateWeight();
@@ -345,6 +347,7 @@ public:
     virtual void  setStolenNitro(float amount, float duration) OVERRIDE;
     virtual bool  hasStolenNitro() const OVERRIDE { return m_stolen_nitro_ticks > 0; }
     virtual float getStolenNitro() const OVERRIDE { return m_stolen_nitro_amount; }
+    virtual float getEffectiveSteer() const OVERRIDE { return m_effective_steer; }
     virtual bool  hasHeldMini() const OVERRIDE;
     virtual void setStartupBoostFromStartTicks(int ticks) OVERRIDE;
     virtual float getStartupBoost() const OVERRIDE  { return m_startup_boost; }
