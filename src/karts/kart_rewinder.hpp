@@ -51,9 +51,6 @@ public:
     {
         if (m_steering_smoothing_dt >= 0.0f)
         {
-            printf("m_effective_steering is %f", m_effective_steer);
-            printf("smoothed display is %f\n", m_steering_smoothing_dt * AbstractKart::getSteerPercent() +
-                (1.0f - m_steering_smoothing_dt) * m_prev_steering);
             return m_steering_smoothing_dt * AbstractKart::getSteerPercent() +
                 (1.0f - m_steering_smoothing_dt) * m_prev_steering;
         }
