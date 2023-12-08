@@ -195,14 +195,15 @@ void AIBaseController::setSteering(float angle, float dt)
     if     (steer_fraction >  1.0f) steer_fraction =  1.0f;
     else if(steer_fraction < -1.0f) steer_fraction = -1.0f;
 
+    // FIXME this should be handled in AI code, NOT here
     if(m_kart->getBlockedByPlungerTicks()>0)
     {
         if     (steer_fraction >  0.5f) steer_fraction =  0.5f;
         else if(steer_fraction < -0.5f) steer_fraction = -0.5f;
     }
 
-    // The AI has its own 'time full steer' value (which is the time
-    float max_steer_change = dt/m_ai_properties->m_time_full_steer;
+    // We use the common time-full-steer from kart_characteristics
+    float max_steer_change = dt/m_kart->getTimeFullSteer(fabsf(old_steer));
     if(old_steer < steer_fraction)
     {
         m_controls->setSteer(( old_steer+max_steer_change > steer_fraction)

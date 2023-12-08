@@ -349,8 +349,7 @@
            collection in the first place).
     -->
     <ai>
-        <easy   time-full-steer="0.1"
-                straight-length-for-zipper="35"
+        <easy   straight-length-for-zipper="35"
                 use-slipstream="false"
                 disable-slipstream-usage="true"
                 shield-incoming-radius="0"
@@ -370,8 +369,7 @@
                 />
        <!-- copy-pasted medium AI for now
             No point tweaking until AI is redone and parametrized -->
-        <casual time-full-steer="0.1"
-                straight-length-for-zipper="35"
+        <casual straight-length-for-zipper="35"
                 use-slipstream="false"
                 disable-slipstream-usage="false"
                 shield-incoming-radius="10"
@@ -389,8 +387,7 @@
                 rb-skid-probability="0:0.0"
                 skidding-threshold="3.0"
                 />
-        <medium time-full-steer="0.1"
-                straight-length-for-zipper="35"
+        <medium straight-length-for-zipper="35"
                 use-slipstream="false"
                 disable-slipstream-usage="false"
                 shield-incoming-radius="10"
@@ -408,8 +405,7 @@
                 rb-skid-probability="0:0.0"
                 skidding-threshold="3.0"
                 />
-        <hard   time-full-steer="0.1"
-                straight-length-for-zipper="35"
+        <hard   straight-length-for-zipper="35"
                 use-slipstream="true"
                 disable-slipstream-usage="false"
                 shield-incoming-radius="8"
@@ -427,8 +423,7 @@
                 rb-skid-probability="-50:1.0 -20:0.7 20:0.2 50:0.0"
                 skidding-threshold="2.0"
                 />
-        <best   time-full-steer="0.1"
-                straight-length-for-zipper="35"
+        <best   straight-length-for-zipper="35"
                 use-slipstream="true"
                 disable-slipstream-usage="false"
                 shield-incoming-radius="6"

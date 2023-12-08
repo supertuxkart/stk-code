@@ -32,7 +32,6 @@ AIProperties::AIProperties(RaceManager::Difficulty difficulty)
 
     m_max_item_angle             = UNDEFINED;
     m_max_item_angle_high_speed  = UNDEFINED;
-    m_time_full_steer            = UNDEFINED;
     m_bad_item_closeness_2       = UNDEFINED;
     m_straight_length_for_zipper = UNDEFINED;
     m_skidding_threshold         = UNDEFINED;
@@ -59,7 +58,6 @@ void AIProperties::load(const XMLNode *ai_node)
     ai_node->get("disable-slipstream-usage",  &m_disable_slipstream_usage  );
     ai_node->get("max-item-angle",            &m_max_item_angle            );
     ai_node->get("max-item-angle-high-speed", &m_max_item_angle_high_speed );
-    ai_node->get("time-full-steer",           &m_time_full_steer           );
     ai_node->get("bad-item-closeness",        &m_bad_item_closeness_2      );
     ai_node->get("collect-item-probability",  &m_collect_item_probability  );
     ai_node->get("straight-length-for-zipper",&m_straight_length_for_zipper);
@@ -95,7 +93,6 @@ void AIProperties::checkAllSet(const std::string &filename) const
     }
     CHECK_NEG(m_max_item_angle,            "max-item-angle"            );
     CHECK_NEG(m_max_item_angle_high_speed, "max-item-angle-high-speed" );
-    CHECK_NEG(m_time_full_steer,           "time-full-steer"           );
     CHECK_NEG(m_bad_item_closeness_2,      "bad-item-closeness"        );
     CHECK_NEG(m_straight_length_for_zipper,"straight-length-for-zipper");
     CHECK_NEG(m_skidding_threshold,        "skidding-threshold"        );

@@ -3150,7 +3150,7 @@ void SkiddingAI::setSteering(float angle, float dt)
     float old_steer      = m_controls->getSteer();
 
     // The AI has its own 'time full steer' value (which is the time
-    float max_steer_change = dt/m_ai_properties->m_time_full_steer;
+    float max_steer_change = dt/m_kart->getTimeFullSteer(fabsf(old_steer));
     if(old_steer < steer_fraction)
     {
         m_controls->setSteer( (old_steer+max_steer_change > steer_fraction)
