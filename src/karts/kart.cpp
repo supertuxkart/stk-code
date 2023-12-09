@@ -3796,11 +3796,10 @@ void Kart::updateGraphics(float dt)
     {
         // Use steering and speed ^ 2,
         // which means less effect at lower steering and speed.
-        speed_frac = std::min(speed_frac - 0.6f, 1.0f);
+        speed_frac = std::min(speed_frac - 0.55f, 1.0f);
         steer_frac = (steer_frac+0.25f)*0.8f;
-        const float f = m_skidding->getSteeringFraction();
         const float max_lean = -m_kart_properties->getLeanMax() * DEGREE_TO_RAD
-                             * f * speed_frac * speed_frac;
+                             * steer_frac * speed_frac * speed_frac;
 
         int max_lean_sign = extract_sign(max_lean);
         m_current_lean += max_lean_sign * dt* roll_speed;
@@ -3823,7 +3822,7 @@ void Kart::updateGraphics(float dt)
 
     if (temp_lean > 0.0f)
         m_current_lean = std::max(temp_lean, m_current_lean);
-    else
+    else if (temp_lean < 0.0f)
         m_current_lean = std::min(temp_lean, m_current_lean);
 
     // If the kart is leaning, part of the kart might end up 'in' the track.
