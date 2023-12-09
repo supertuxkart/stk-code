@@ -35,7 +35,7 @@ public:
     }
     // ------------------------------------------------------------------------
     /** Determines the rescue position index of the specified kart. */
-    virtual unsigned int getRescuePositionIndex(AbstractKart *kart) OVERRIDE;
+    virtual unsigned int getRescuePositionIndex(Kart *kart) OVERRIDE;
     // ------------------------------------------------------------------------
     /** Returns the bullet transformation for the specified rescue index. */
     virtual btTransform getRescueTransform(unsigned int index) const OVERRIDE

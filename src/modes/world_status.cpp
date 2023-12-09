@@ -26,7 +26,7 @@
 #include "graphics/irr_driver.hpp"
 #include "guiengine/engine.hpp"
 #include "guiengine/modaldialog.hpp"
-#include "karts/abstract_kart.hpp"
+#include "karts/kart.hpp"
 #include "modes/world.hpp"
 #include "network/network_config.hpp"
 #include "network/protocols/client_lobby.hpp"

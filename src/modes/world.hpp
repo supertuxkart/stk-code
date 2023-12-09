@@ -42,7 +42,7 @@
 
 #include "LinearMath/btTransform.h"
 
-class AbstractKart;
+class Kart;
 class BareNetworkString;
 class btRigidBody;
 class Controller;
@@ -87,14 +87,14 @@ public:
 class World : public WorldStatus
 {
 public:
-    typedef std::vector<std::shared_ptr<AbstractKart> > KartList;
+    typedef std::vector<std::shared_ptr<Kart> > KartList;
 private:
     /** A pointer to the global world object for a race. */
     static World *m_world[PT_COUNT];
     // ------------------------------------------------------------------------
     void setAITeam();
     // ------------------------------------------------------------------------
-    std::shared_ptr<AbstractKart> createKartWithTeam
+    std::shared_ptr<Kart> createKartWithTeam
         (const std::string &kart_ident, int index, int local_player_id,
         int global_player_id, RaceManager::KartType type,
         HandicapLevel handicap);
@@ -115,7 +115,7 @@ protected:
     KartList                  m_karts;
     RandomGenerator           m_random;
 
-    AbstractKart* m_fastest_kart;
+    Kart* m_fastest_kart;
     /** Number of eliminated karts. */
     int         m_eliminated_karts;
     /** Number of eliminated players. */
@@ -137,9 +137,9 @@ protected:
     void  updateHighscores  (int* best_highscore_rank);
     void  resetAllKarts     ();
     Controller*
-          loadAIController  (AbstractKart *kart);
+          loadAIController  (Kart *kart);
 
-    virtual std::shared_ptr<AbstractKart> createKart
+    virtual std::shared_ptr<Kart> createKart
         (const std::string &kart_ident, int index, int local_player_id,
         int global_player_id, RaceManager::KartType type,
         HandicapLevel handicap);
@@ -198,7 +198,7 @@ protected:
      *  around at the end of a race, and other criteria (number of lives,
      *  race position) will be used to determine the final order.
      */
-    virtual float estimateFinishTimeForKart(AbstractKart* kart)
+    virtual float estimateFinishTimeForKart(Kart* kart)
                                         {return getTime(); }
     void updateAchievementDataEndRace();
     void updateAchievementModeCounters(bool start);
@@ -249,12 +249,12 @@ public:
     virtual unsigned int getNumberOfRescuePositions() const;
     // ------------------------------------------------------------------------
     /** Determines the rescue position index of the specified kart. */
-    virtual unsigned int getRescuePositionIndex(AbstractKart *kart) = 0;
+    virtual unsigned int getRescuePositionIndex(Kart *kart) = 0;
     // ------------------------------------------------------------------------
     /** Returns the bullet transformation for the specified rescue index. */
     virtual btTransform getRescueTransform(unsigned int index) const;
     // ------------------------------------------------------------------------
-    virtual void moveKartAfterRescue(AbstractKart* kart);
+    virtual void moveKartAfterRescue(Kart* kart);
     // ------------------------------------------------------------------------
     /** Called when it is needed to know whether this kind of race involves
      *  counting laps. */
@@ -288,7 +288,7 @@ public:
                                            int *amount );
     // ------------------------------------------------------------------------
     /** Receives notification if an item is collected. Used for easter eggs. */
-    virtual void collectedItem(const AbstractKart *kart, 
+    virtual void collectedItem(const Kart *kart,
                                const ItemState *item    ) {}
     // ------------------------------------------------------------------------
     virtual void endRaceEarly() { return; }
@@ -303,7 +303,7 @@ public:
     // ------------------------------------------------------------------------
     /** If you want to do something to karts or their graphics at the start
      *  of the race, override this. */
-    virtual void kartAdded(AbstractKart* kart, scene::ISceneNode* node) {}
+    virtual void kartAdded(Kart* kart, scene::ISceneNode* node) {}
     // ------------------------------------------------------------------------
     /** Called whenever a kart starts a new lap. Meaningless (and won't be
      *  called) in non-laped races.
@@ -324,12 +324,12 @@ public:
     void            scheduleExitRace() { m_schedule_exit_race = true; }
     void            scheduleTutorial();
     void            updateWorld(int ticks);
-    void            handleExplosion(const Vec3 &xyz, AbstractKart *kart_hit,
+    void            handleExplosion(const Vec3 &xyz, Kart *kart_hit,
                                     PhysicalObject *object);
-    AbstractKart*   getPlayerKart(unsigned int player) const;
-    AbstractKart*   getLocalPlayerKart(unsigned int n) const;
+    Kart*   getPlayerKart(unsigned int player) const;
+    Kart*   getLocalPlayerKart(unsigned int n) const;
     virtual const btTransform &getStartTransform(int index);
-    void moveKartTo(AbstractKart* kart, const btTransform &t);
+    void moveKartTo(Kart* kart, const btTransform &t);
     void updateTimeTargetSound();
     // ------------------------------------------------------------------------
     /** Returns a pointer to the race gui. */
@@ -339,7 +339,7 @@ public:
     unsigned int    getNumKarts() const { return (unsigned int) m_karts.size(); }
     // ------------------------------------------------------------------------
     /** Returns the kart with a given world id. */
-    AbstractKart       *getKart(int kartId) const {
+    Kart       *getKart(int kartId) const {
                         assert(kartId >= 0 && kartId < int(m_karts.size()));
                         return m_karts[kartId].get();                              }
     // ------------------------------------------------------------------------
@@ -406,7 +406,7 @@ public:
     bool isNetworkWorld() const { return m_is_network_world; }
     // ------------------------------------------------------------------------
     /** Set the team arrow on karts if necessary*/
-    void initTeamArrows(AbstractKart* k);
+    void initTeamArrows(Kart* k);
     // ------------------------------------------------------------------------
     /** Used by server to get the current started game progress in either or
      *  both remaining time or progress in percent. uint32_t max for either or

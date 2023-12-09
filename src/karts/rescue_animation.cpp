@@ -21,7 +21,7 @@
 #include "config/user_config.hpp"
 #include "graphics/referee.hpp"
 #include "items/attachment.hpp"
-#include "karts/abstract_kart.hpp"
+#include "karts/kart.hpp"
 #include "karts/kart_properties.hpp"
 #include "modes/follow_the_leader.hpp"
 #include "modes/three_strikes_battle.hpp"
@@ -33,7 +33,7 @@
 #include <algorithm>
 #include <cmath>
 
-RescueAnimation* RescueAnimation::create(AbstractKart* kart,
+RescueAnimation* RescueAnimation::create(Kart* kart,
                                          bool is_auto_rescue)
 {
     // When goal phase is happening karts is made stationary, so no animation
@@ -48,7 +48,7 @@ RescueAnimation* RescueAnimation::create(AbstractKart* kart,
  *  and initialised the timer.
  *  \param kart Pointer to the kart which is animated.
  */
-RescueAnimation::RescueAnimation(AbstractKart* kart, bool is_auto_rescue)
+RescueAnimation::RescueAnimation(Kart* kart, bool is_auto_rescue)
                : AbstractKartAnimation(kart, "RescueAnimation")
 {
     m_referee = NULL;
@@ -105,7 +105,7 @@ RescueAnimation::RescueAnimation(AbstractKart* kart, bool is_auto_rescue)
 }   // RescueAnimation
 
 //-----------------------------------------------------------------------------
-RescueAnimation::RescueAnimation(AbstractKart* kart, BareNetworkString* b)
+RescueAnimation::RescueAnimation(Kart* kart, BareNetworkString* b)
                : AbstractKartAnimation(kart, "RescueAnimation")
 {
     m_referee = NULL;

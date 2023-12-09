@@ -24,7 +24,7 @@
 #include "karts/controller/player_controller.hpp"
 #include <memory>
 
-class AbstractKart;
+class Kart;
 class ParticleEmitter;
 class SFXBase;
 class SFXBuffer;
@@ -72,7 +72,7 @@ private:
     void setParticleEmitterPosition(const btTransform& t);
 
 public:
-                 LocalPlayerController(AbstractKart *kart,
+                 LocalPlayerController(Kart *kart,
                                        const int local_player_id,
                                        HandicapLevel h);
                 ~LocalPlayerController();
@@ -89,7 +89,7 @@ public:
     virtual void resetInputState   () OVERRIDE;
     virtual bool canGetAchievements() const OVERRIDE;
 
-    virtual void crashed(const AbstractKart *k) OVERRIDE;
+    virtual void crashed(const Kart *k) OVERRIDE;
     virtual void crashed(const Material *m) OVERRIDE;
 
     virtual void rumble(float strength_low, float strength_high, uint16_t duration) OVERRIDE;

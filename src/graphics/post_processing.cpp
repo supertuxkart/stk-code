@@ -36,7 +36,7 @@
 #include "graphics/sp/sp_shader.hpp"
 #include "graphics/sp/sp_uniform_assigner.hpp"
 #include "io/file_manager.hpp"
-#include "karts/abstract_kart.hpp"
+#include "karts/kart.hpp"
 #include "karts/kart_model.hpp"
 #include "modes/world.hpp"
 #include "physics/physics.hpp"

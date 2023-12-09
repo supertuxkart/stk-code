@@ -47,7 +47,7 @@ public:
     static void enterOverWorld();
 
     virtual void  update(int ticks) OVERRIDE;
-    unsigned int  getRescuePositionIndex(AbstractKart *kart) OVERRIDE;
+    unsigned int  getRescuePositionIndex(Kart *kart) OVERRIDE;
     virtual void  getKartsDisplayInfo(
                  std::vector<RaceGUIBase::KartIconDisplayInfo> *info) OVERRIDE;
     // ------------------------------------------------------------------------

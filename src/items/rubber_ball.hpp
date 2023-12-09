@@ -25,7 +25,7 @@
 #include "tracks/track_sector.hpp"
 #include "utils/cpp2011.hpp"
 
-class AbstractKart;
+class Kart;
 class SFXBase;
 
 /**
@@ -113,7 +113,7 @@ private:
     static float m_st_early_target_factor;
 
     /** A pointer to the target kart. */
-    const AbstractKart  *m_target;
+    const Kart  *m_target;
 
     /** The last graph node who's coordinates are stored in
      *  m_control_points[3]. */
@@ -214,11 +214,11 @@ private:
     void removePingSFX();
 
 public:
-                 RubberBall  (AbstractKart* kart);
+                 RubberBall  (Kart* kart);
     virtual     ~RubberBall();
     static  void init(const XMLNode &node, scene::IMesh *rubberball);
     virtual bool updateAndDelete(int ticks) OVERRIDE;
-    virtual bool hit(AbstractKart* kart, PhysicalObject* obj=NULL) OVERRIDE;
+    virtual bool hit(Kart* kart, PhysicalObject* obj=NULL) OVERRIDE;
     virtual void setAnimation(AbstractKartAnimation *animation) OVERRIDE;
     // ------------------------------------------------------------------------
     /** This object does not create an explosion, all affects on

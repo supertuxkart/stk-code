@@ -27,7 +27,7 @@ TutorialWorld::TutorialWorld()
     m_stop_music_when_dialog_open = false;
 }   // TutorialWorld
 
-unsigned int TutorialWorld::getRescuePositionIndex(AbstractKart *kart)
+unsigned int TutorialWorld::getRescuePositionIndex(Kart *kart)
 {
     const int start_spots_amount = 
                          Track::getCurrentTrack()->getNumberOfStartPositions();

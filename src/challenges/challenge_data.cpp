@@ -22,7 +22,7 @@
 
 #include "challenges/unlock_manager.hpp"
 #include "io/file_manager.hpp"
-#include "karts/abstract_kart.hpp"
+#include "karts/kart.hpp"
 #include "karts/kart_properties.hpp"
 #include "karts/kart_properties_manager.hpp"
 #include "modes/linear_world.hpp"
@@ -503,7 +503,7 @@ bool ChallengeData::isChallengeFulfilled(bool check_best) const
     int d = (check_best) ? RaceManager::DIFFICULTY_BEST :
                            RaceManager::get()->getDifficulty();
 
-    AbstractKart* kart = world->getPlayerKart(0);
+    Kart* kart = world->getPlayerKart(0);
 
     if (kart->isEliminated()                                               ) return false;
     if (track_name != m_track_id                                           ) return false;

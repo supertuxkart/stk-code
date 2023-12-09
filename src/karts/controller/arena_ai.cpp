@@ -22,7 +22,7 @@
 #include "items/item_manager.hpp"
 #include "items/powerup.hpp"
 #include "items/projectile_manager.hpp"
-#include "karts/abstract_kart.hpp"
+#include "karts/kart.hpp"
 #include "karts/controller/ai_properties.hpp"
 #include "karts/kart_properties.hpp"
 #include "karts/rescue_animation.hpp"
@@ -32,7 +32,7 @@
 
 #include <algorithm>
 
-ArenaAI::ArenaAI(AbstractKart *kart)
+ArenaAI::ArenaAI(Kart *kart)
        : AIBaseController(kart)
 {
     m_item_manager = Track::getCurrentTrack()->getItemManager();

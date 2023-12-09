@@ -26,7 +26,7 @@
 #include "input/input_manager.hpp"
 #include "input/multitouch_device.hpp"
 #include "modes/soccer_world.hpp"
-#include "karts/abstract_kart.hpp"
+#include "karts/kart.hpp"
 #include "karts/explosion_animation.hpp"
 #include "karts/kart.hpp"
 #include "karts/kart_properties.hpp"
@@ -43,7 +43,7 @@
  *  \param Kart Pointer to the kart for which this camera is used.
  */
 CameraNormal::CameraNormal(Camera::CameraType type,  int camera_index, 
-                           AbstractKart* kart) 
+                           Kart* kart)
             : Camera(type, camera_index, kart), m_camera_offset(0, 0, -15.0f)
 {
     m_distance = kart ? UserConfigParams::m_camera_distance : 1000.0f;

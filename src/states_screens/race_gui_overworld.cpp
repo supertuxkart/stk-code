@@ -41,7 +41,7 @@
 #include "items/attachment.hpp"
 #include "items/attachment_manager.hpp"
 #include "items/powerup_manager.hpp"
-#include "karts/abstract_kart.hpp"
+#include "karts/kart.hpp"
 #include "karts/controller/controller.hpp"
 #include "karts/kart_properties.hpp"
 #include "karts/kart_properties_manager.hpp"
@@ -230,7 +230,7 @@ void RaceGUIOverworld::renderPlayerView(const Camera *camera, float dt)
     
     RaceGUIBase::renderPlayerView(camera, dt);
     
-    const AbstractKart *kart = camera->getKart();
+    const Kart *kart = camera->getKart();
     if(!kart) return;
     
     const core::recti &viewport = camera->getViewport();
@@ -408,7 +408,7 @@ void RaceGUIOverworld::drawGlobalMiniMap()
     // There can be only player karts on the overworld.
     for(unsigned int i=0; i<world->getNumKarts(); i++)
     {
-        const AbstractKart *kart = world->getKart(i);
+        const Kart *kart = world->getKart(i);
 
         kart_xyz= kart->getXYZ();
         Vec3 draw_at;

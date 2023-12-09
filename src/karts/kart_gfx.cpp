@@ -26,7 +26,7 @@
 #include "graphics/particle_kind.hpp"
 #include "graphics/particle_kind_manager.hpp"
 #include "guiengine/engine.hpp"
-#include "karts/abstract_kart.hpp"
+#include "karts/kart.hpp"
 #include "karts/controller/controller.hpp"
 #include "karts/kart.hpp"
 #include "karts/kart_model.hpp"
@@ -38,7 +38,7 @@
 
 #include <iostream>
 
-KartGFX::KartGFX(const AbstractKart *kart, bool is_day)
+KartGFX::KartGFX(const Kart *kart, bool is_day)
 {
     m_nitro_light = NULL;
     m_nitro_hack_light = NULL;

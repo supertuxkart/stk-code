@@ -22,7 +22,7 @@
 #include "config/user_config.hpp"
 #include "graphics/camera.hpp"
 #include "items/powerup_manager.hpp"
-#include "karts/abstract_kart.hpp"
+#include "karts/kart.hpp"
 #include "karts/controller/controller.hpp"
 #include "states_screens/race_gui_base.hpp"
 #include "tracks/track.hpp"
@@ -131,7 +131,7 @@ void FollowTheLeaderRace::countdownReachedZero()
     // kart, otherwise remove the last kart.
     int position_to_remove = m_karts[0]->getPosition()==1
                            ? getCurrentNumKarts() : 1;
-    AbstractKart *kart = getKartAtPosition(position_to_remove);
+    Kart *kart = getKartAtPosition(position_to_remove);
     if(!kart || kart->isEliminated())
     {
         Log::error("[FTL]", "Problem with removing leader: position %d not found",
@@ -265,7 +265,7 @@ void FollowTheLeaderRace::terminateRace()
     // Mark all still racing karts to be finished.
     for (int i = (int)m_karts.size(); i>0; i--)
     {
-        AbstractKart *kart = getKartAtPosition(i);
+        Kart *kart = getKartAtPosition(i);
         if (kart->isEliminated() || kart->hasFinishedRace())
             continue;
         m_last_eliminated_time += m_leader_intervals[0];

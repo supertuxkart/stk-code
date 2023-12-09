@@ -21,7 +21,7 @@
 
 #include "config/user_config.hpp"
 #include "input/multitouch_device.hpp"
-#include "karts/abstract_kart.hpp"
+#include "karts/kart.hpp"
 #include "karts/controller/controller.hpp"
 #include "graphics/irr_driver.hpp"
 #include "guiengine/modaldialog.hpp"
@@ -668,7 +668,7 @@ void MultitouchDevice::updateController()
         return;
     }
 
-    AbstractKart* pk = m_player->getKart();
+    Kart* pk = m_player->getKart();
 
     if (pk == NULL)
     {

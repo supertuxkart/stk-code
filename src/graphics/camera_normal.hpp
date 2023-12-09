@@ -69,7 +69,7 @@ private:
     friend class CameraDebug;
     friend class CameraEnd;
              CameraNormal(Camera::CameraType type, int camera_index,
-                          AbstractKart* kart);
+                          Kart* kart);
     virtual ~CameraNormal() {}
 public:
 

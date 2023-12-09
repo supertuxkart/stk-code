@@ -25,7 +25,7 @@
 #include "graphics/material_manager.hpp"
 #include "graphics/sp/sp_base.hpp"
 #include "io/file_manager.hpp"
-#include "karts/abstract_kart.hpp"
+#include "karts/kart.hpp"
 #include "karts/controller/spare_tire_ai.hpp"
 #include "modes/easter_egg_hunt.hpp"
 #include "modes/profile_world.hpp"
@@ -289,7 +289,7 @@ void ItemManager::insertItemInQuad(Item *item)
  *  \param server_normal The normal as seen on the server.
  */
 Item* ItemManager::dropNewItem(ItemState::ItemType type,
-                               const AbstractKart *kart, 
+                               const Kart *kart,
                                const Vec3 *server_xyz,
                                const Vec3 *server_normal)
 {
@@ -385,7 +385,7 @@ Item* ItemManager::placeItem(ItemState::ItemType type, const Vec3& xyz,
  *  \param item The item that was collected.
  *  \param kart The kart that collected the item.
  */
-void ItemManager::collectedItem(ItemState *item, AbstractKart *kart)
+void ItemManager::collectedItem(ItemState *item, Kart *kart)
 {
     assert(item);
     item->collected(kart);
@@ -399,7 +399,7 @@ void ItemManager::collectedItem(ItemState *item, AbstractKart *kart)
  *  collectedItem if an item was collected.
  *  \param kart Pointer to the kart.
  */
-void  ItemManager::checkItemHit(AbstractKart* kart)
+void  ItemManager::checkItemHit(Kart* kart)
 {
     // We could use m_items_in_quads to to check for item hits: take the quad
     // of the graph node of the kart, and only check items in that quad. But

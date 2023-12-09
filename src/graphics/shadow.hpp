@@ -22,7 +22,7 @@
 #include "utils/no_copy.hpp"
 #include <memory>
 
-class AbstractKart;
+class Kart;
 class Material;
 
 namespace SP
@@ -57,10 +57,10 @@ private:
     bool             m_shadow_enabled;
 
     /** A read-only kart object for accessing suspension length. */
-    const AbstractKart& m_kart;
+    const Kart& m_kart;
 
 public:
-         Shadow(Material* shadow_mat, const AbstractKart& kart);
+         Shadow(Material* shadow_mat, const Kart& kart);
         ~Shadow();
     void update(bool enabled);
 };   // Shadow

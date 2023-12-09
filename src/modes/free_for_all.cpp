@@ -16,7 +16,7 @@
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include "modes/free_for_all.hpp"
-#include "karts/abstract_kart.hpp"
+#include "karts/kart.hpp"
 #include "karts/controller/controller.hpp"
 #include "network/network_config.hpp"
 #include "network/network_string.hpp"
@@ -247,7 +247,7 @@ video::SColor FreeForAll::getColor(unsigned int kart_id) const
 bool FreeForAll::getKartFFAResult(int kart_id) const
 {
     // the kart(s) which has the top score wins
-    AbstractKart* k = getKartAtPosition(1);
+    Kart* k = getKartAtPosition(1);
     if (!k)
         return false;
     int top_score = getKartScore(k->getWorldKartId());
@@ -278,7 +278,7 @@ std::pair<uint32_t, uint32_t> FreeForAll::getGameStartedProgress() const
     {
         progress.first = (uint32_t)m_time;
     }
-    AbstractKart* k = getKartAtPosition(1);
+    Kart* k = getKartAtPosition(1);
     float score = -1.0f;
     if (k)
         score = (float)getKartScore(k->getWorldKartId());

@@ -23,7 +23,7 @@
 #include "graphics/hit_sfx.hpp"
 #include "graphics/material.hpp"
 #include "io/xml_node.hpp"
-#include "karts/abstract_kart.hpp"
+#include "karts/kart.hpp"
 #include "modes/linear_world.hpp"
 
 #include "utils/log.hpp" //TODO: remove after debugging is done
@@ -33,7 +33,7 @@ float Bowling::m_st_max_distance_squared;
 float Bowling::m_st_force_to_target;
 
 // -----------------------------------------------------------------------------
-Bowling::Bowling(AbstractKart *kart)
+Bowling::Bowling(Kart *kart)
         : Flyable(kart, PowerupManager::POWERUP_BOWLING, 50.0f /* mass */)
 {
     m_has_hit_kart = false;
@@ -125,7 +125,7 @@ bool Bowling::updateAndDelete(int ticks)
  *  \returns True if there was actually a hit (i.e. not owner, and target is
  *           not immune), false otherwise.
  */
-bool Bowling::hit(AbstractKart* kart, PhysicalObject* obj)
+bool Bowling::hit(Kart* kart, PhysicalObject* obj)
 {
     bool was_real_hit = Flyable::hit(kart, obj);
     if(was_real_hit)

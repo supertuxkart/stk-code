@@ -32,7 +32,7 @@ class BareNetworkString;
 #include "input/input.hpp"
 #include "states_screens/state_manager.hpp"
 
-class AbstractKart;
+class Kart;
 class BareNetworString;
 class ItemState;
 class KartControl;
@@ -48,7 +48,7 @@ private:
 
 protected:
     /** Pointer to the kart that is controlled by this controller. */
-    AbstractKart *m_kart;
+    Kart *m_kart;
 
     /** A pointer to the main controller, from which the kart takes
      *  it commands. */
@@ -58,7 +58,7 @@ protected:
     std::string  m_controller_name;
 
 public:
-                  Controller         (AbstractKart *kart);
+                  Controller         (Kart *kart);
     virtual      ~Controller         () {};
     virtual void  reset              () = 0;
     virtual void  update             (int ticks) = 0;
@@ -66,7 +66,7 @@ public:
     // This function is only used by the local controller to play sounds
     virtual void  collectedItem      (const ItemState &item,
                                       float previous_energy=0) { };
-    virtual void  crashed            (const AbstractKart *k) = 0;
+    virtual void  crashed            (const Kart *k) = 0;
     virtual void  crashed            (const Material *m) = 0;
     virtual void  setPosition        (int p) = 0;
     /** This function checks if this is a local player. A local player will get 
@@ -115,7 +115,7 @@ public:
     virtual core::stringw getName(bool include_handicap_string = true) const;
     // ------------------------------------------------------------------------
     /** Returns the kart controlled by this controller. */
-    AbstractKart *getKart() const { return m_kart; }
+    Kart *getKart() const { return m_kart; }
 };   // Controller
 
 #endif

@@ -22,7 +22,7 @@
 #include "items/cake.hpp"
 
 #include "io/xml_node.hpp"
-#include "karts/abstract_kart.hpp"
+#include "karts/kart.hpp"
 #include "utils/constants.hpp"
 #include "utils/random_generator.hpp"
 
@@ -33,7 +33,7 @@
 float Cake::m_st_max_distance_squared;
 float Cake::m_gravity;
 
-Cake::Cake (AbstractKart *kart) : Flyable(kart, PowerupManager::POWERUP_CAKE)
+Cake::Cake (Kart *kart) : Flyable(kart, PowerupManager::POWERUP_CAKE)
 {
     m_target = NULL;
 }   // Cake
@@ -61,7 +61,7 @@ void Cake::init(const XMLNode &node, scene::IMesh *cake_model)
  *  \returns True if there was actually a hit (i.e. not owner, and target is
  *           not immune), false otherwise.
  */
-bool Cake::hit(AbstractKart* kart, PhysicalObject* obj)
+bool Cake::hit(Kart* kart, PhysicalObject* obj)
 {
     bool was_real_hit = Flyable::hit(kart, obj);
     if(was_real_hit)
@@ -125,7 +125,7 @@ void Cake::onFireFlyable(bool mini)
     float pitch = m_owner->getTerrainPitch(heading);
 
     // Find closest kart in front of the current one
-    const AbstractKart *closest_kart=NULL;
+    const Kart *closest_kart=NULL;
     Vec3        direction;
     float       kart_dist_squared;
     getClosestKart(&closest_kart, &kart_dist_squared, &direction,
@@ -140,7 +140,7 @@ void Cake::onFireFlyable(bool mini)
 
     if(closest_kart != NULL && kart_dist_squared < m_st_max_distance_squared)
     {
-        m_target = (AbstractKart*)closest_kart;
+        m_target = (Kart*)closest_kart;
 
         float fire_angle     = 0.0f;
         getLinearKartItemIntersection (m_owner->getXYZ(), closest_kart,

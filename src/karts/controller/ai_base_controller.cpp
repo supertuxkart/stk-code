@@ -21,7 +21,7 @@
 
 #include "config/user_config.hpp"
 #include "graphics/camera.hpp"
-#include "karts/abstract_kart.hpp"
+#include "karts/kart.hpp"
 #include "karts/kart_properties.hpp"
 #include "karts/controller/ai_properties.hpp"
 #include "modes/world.hpp"
@@ -34,7 +34,7 @@
 bool AIBaseController::m_ai_debug = false;
 int  AIBaseController::m_test_ai  = 0;
 
-AIBaseController::AIBaseController(AbstractKart *kart)
+AIBaseController::AIBaseController(Kart *kart)
                 : Controller(kart)
 {
     m_kart          = kart;

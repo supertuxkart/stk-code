@@ -18,7 +18,7 @@
 
 #include "karts/controller/spare_tire_ai.hpp"
 
-#include "karts/abstract_kart.hpp"
+#include "karts/kart.hpp"
 #include "karts/kart_gfx.hpp"
 #include "karts/max_speed.hpp"
 #include "modes/three_strikes_battle.hpp"
@@ -32,7 +32,7 @@
 
 #include <algorithm>
 
-SpareTireAI::SpareTireAI(AbstractKart *kart)
+SpareTireAI::SpareTireAI(Kart *kart)
            : BattleAI(kart)
 {
     reset();
@@ -135,9 +135,9 @@ void SpareTireAI::unspawn()
 //-----------------------------------------------------------------------------
 /** Callback function when a kart crashes into the SpareTireAI, the kart will
  *  increase one life if its life is not equal 3. A message will be shown too.
- *  \param k \ref AbstractKart this SpareTireAI crashed.
+ *  \param k \ref Kart this SpareTireAI crashed.
  */
-void SpareTireAI::crashed(const AbstractKart *k)
+void SpareTireAI::crashed(const Kart *k)
 {
     // Nothing happen when two spare tire karts crash each other
     if (dynamic_cast<const SpareTireAI*>(k->getController()) != NULL) return;

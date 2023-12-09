@@ -30,7 +30,7 @@
 #include "items/item_manager.hpp"
 #include "items/powerup.hpp"
 #include "items/projectile_manager.hpp"
-#include "karts/abstract_kart.hpp"
+#include "karts/kart.hpp"
 #include "karts/controller/kart_control.hpp"
 #include "karts/controller/ai_properties.hpp"
 #include "karts/kart_properties.hpp"
@@ -66,7 +66,7 @@
 
 #define SkiddingAI TestAI
 
-SkiddingAI::SkiddingAI(AbstractKart *kart)
+SkiddingAI::SkiddingAI(Kart *kart)
                    : AIBaseLapController(kart)
 {
     reset();
@@ -1815,10 +1815,10 @@ void SkiddingAI::checkCrashes(const Vec3& pos )
         {
             for( unsigned int j = 0; j < NUM_KARTS; ++j )
             {
-                const AbstractKart* kart = m_world->getKart(j);
+                const Kart* kart = m_world->getKart(j);
                 // Ignore eliminated karts
                 if(kart==m_kart||kart->isEliminated()||kart->isGhostKart()) continue;
-                const AbstractKart *other_kart = m_world->getKart(j);
+                const Kart *other_kart = m_world->getKart(j);
                 // Ignore karts ahead that are faster than this kart.
                 if(m_kart->getVelocityLC().getZ() < other_kart->getVelocityLC().getZ())
                     continue;

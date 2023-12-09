@@ -38,7 +38,7 @@
 #include "guiengine/engine.hpp"
 #include "io/file_manager.hpp"
 #include "io/xml_node.hpp"
-#include "karts/abstract_kart.hpp"
+#include "karts/kart.hpp"
 #include "karts/ghost_kart.hpp"
 #include "karts/kart_properties.hpp"
 #include "physics/btKart.hpp"

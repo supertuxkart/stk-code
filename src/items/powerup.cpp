@@ -26,7 +26,7 @@
 #include "items/item_manager.hpp"
 #include "items/projectile_manager.hpp"
 #include "items/rubber_ball.hpp"
-#include "karts/abstract_kart.hpp"
+#include "karts/kart.hpp"
 #include "karts/controller/controller.hpp"
 #include "karts/kart_properties.hpp"
 #include "modes/world.hpp"
@@ -42,7 +42,7 @@
 /** Constructor, stores the kart to which this powerup belongs.
  *  \param kart The kart to which this powerup belongs.
  */
-Powerup::Powerup(AbstractKart* kart)
+Powerup::Powerup(Kart* kart)
 {
     m_kart      = kart;
     m_sound_use = NULL;
@@ -363,7 +363,7 @@ void Powerup::use()
 
     case PowerupManager::POWERUP_SUDO:
         {
-            AbstractKart* player_kart = NULL;
+            Kart* player_kart = NULL;
             unsigned int steal_targets = powerup_manager->getNitroHackMaxTargets();
             float base_bonus = powerup_manager->getNitroHackBaseBonus();
 
@@ -374,7 +374,7 @@ void Powerup::use()
             // This can set their nitro count to a negative number
             for(unsigned int i = 0 ; i < world->getNumKarts(); ++i)
             {
-                AbstractKart *kart=world->getKart(i);
+                Kart *kart=world->getKart(i);
                 // Standard invulnerability (the "stars") is not useful here
                 if( kart->isEliminated()   || kart== m_kart || kart->hasFinishedRace())
                     continue;
@@ -516,7 +516,7 @@ void Powerup::use()
         //by the bananas) to the kart in the 1st position.
         for(unsigned int i = 0 ; i < world->getNumKarts(); ++i)
         {
-            AbstractKart *kart=world->getKart(i);
+            Kart *kart=world->getKart(i);
             if(kart->isEliminated() || kart->isInvulnerable()) continue;
             if(kart == m_kart) continue;
             if(kart->getPosition() == 1)
@@ -547,13 +547,13 @@ void Powerup::use()
 
     case PowerupManager::POWERUP_PARACHUTE:
         {
-            AbstractKart* player_kart = NULL;
+            Kart* player_kart = NULL;
             //Attach a parachute(that last 1,3 time as long as the
             //one from the bananas and is affected by the rank multiplier)
             //to all the karts that are in front of this one.
             for(unsigned int i = 0 ; i < world->getNumKarts(); ++i)
             {
-                AbstractKart *kart=world->getKart(i);
+                Kart *kart=world->getKart(i);
                 if(kart->isEliminated() || kart== m_kart || kart->isInvulnerable()) continue;
                 if(m_kart->getPosition() > kart->getPosition())
                 {

@@ -33,7 +33,7 @@
 #include "physics/stk_dynamics_world.hpp"
 #include "physics/user_pointer.hpp"
 
-class AbstractKart;
+class Kart;
 class STKDynamicsWorld;
 class Vec3;
 
@@ -134,7 +134,7 @@ private:
     *  processing is taking place, store the pointers to the karts to
     *  be removed here, and remove them once the physics processing
     *  is finished. */
-    std::vector<const AbstractKart*> m_karts_to_delete;
+    std::vector<const Kart*> m_karts_to_delete;
 
     /** Pointer to the physics dynamics world. */
     STKDynamicsWorld                *m_dynamics_world;
@@ -159,12 +159,12 @@ public:
     static void destroy();
     // ----------------------------------------------------------------------------------------
     void  init             (const Vec3 &min_world, const Vec3 &max_world);
-    void  addKart          (const AbstractKart *k);
+    void  addKart          (const Kart *k);
     void  addBody          (btRigidBody* b) {m_dynamics_world->addRigidBody(b);}
-    void  removeKart       (const AbstractKart *k);
+    void  removeKart       (const Kart *k);
     void  removeBody       (btRigidBody* b) {m_dynamics_world->removeRigidBody(b);}
-    void  KartKartCollision(AbstractKart *ka, const Vec3 &contact_point_a,
-                            AbstractKart *kb, const Vec3 &contact_point_b);
+    void  KartKartCollision(Kart *ka, const Vec3 &contact_point_a,
+                            Kart *kb, const Vec3 &contact_point_b);
     void  update           (int ticks);
     void  draw             ();
     STKDynamicsWorld*

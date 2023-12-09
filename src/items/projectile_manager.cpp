@@ -26,7 +26,7 @@
 #include "items/powerup_manager.hpp"
 #include "items/powerup.hpp"
 #include "items/rubber_ball.hpp"
-#include "karts/abstract_kart.hpp"
+#include "karts/kart.hpp"
 #include "karts/controller/controller.hpp"
 #include "modes/world.hpp"
 #include "network/network_config.hpp"
@@ -170,7 +170,7 @@ void ProjectileManager::updateServer(int ticks)
  *  \param type Type of projectile.
  */
 std::shared_ptr<Flyable>
-    ProjectileManager::newProjectile(AbstractKart *kart,
+    ProjectileManager::newProjectile(Kart *kart,
                                      PowerupManager::PowerupType type)
 {
     const std::string& uid = getUniqueIdentity(kart, type);
@@ -218,7 +218,7 @@ std::shared_ptr<Flyable>
  *  \param kart The kart for which the test is done.
  *  \param radius Distance within which the projectile must be.
 */
-bool ProjectileManager::projectileIsClose(const AbstractKart * const kart,
+bool ProjectileManager::projectileIsClose(const Kart * const kart,
                                          float radius)
 {
     float r2 = radius * radius;
@@ -240,7 +240,7 @@ bool ProjectileManager::projectileIsClose(const AbstractKart * const kart,
  *  \param radius Distance within which the projectile must be.
  *  \param type The type of projectile checked
 */
-int ProjectileManager::getNearbyProjectileCount(const AbstractKart * const kart,
+int ProjectileManager::getNearbyProjectileCount(const Kart * const kart,
                                          float radius, PowerupManager::PowerupType type,
                                          bool exclude_owned)
 {
@@ -280,7 +280,7 @@ std::vector<Vec3> ProjectileManager::getBasketballPositions()
     return positions;
 } // getBasketballPositions
 // -----------------------------------------------------------------------------
-std::string ProjectileManager::getUniqueIdentity(AbstractKart* kart,
+std::string ProjectileManager::getUniqueIdentity(Kart* kart,
                                                  PowerupManager::PowerupType t)
 {
     BareNetworkString uid;
@@ -335,7 +335,7 @@ std::shared_ptr<Rewinder>
         rn == RN_CAKE || rn == RN_CAKE_MINI || rn == RN_RUBBERBALL))
         return nullptr;
 
-    AbstractKart* kart = World::getWorld()->getKart(data.getUInt8());
+    Kart* kart = World::getWorld()->getKart(data.getUInt8());
     int created_ticks = data.getUInt32();
     std::shared_ptr<Flyable> f;
     switch (rn)

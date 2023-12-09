@@ -105,7 +105,7 @@ void RaceResultGUI::init()
     unsigned int num_karts = RaceManager::get()->getNumberOfKarts();
     for (unsigned int kart_id = 0; kart_id < num_karts; kart_id++)
     {
-        const AbstractKart *kart = World::getWorld()->getKart(kart_id);
+        const Kart *kart = World::getWorld()->getKart(kart_id);
         if (kart->getController()->isLocalPlayerController())
         {
             has_human_players = true;
@@ -210,7 +210,7 @@ void RaceResultGUI::init()
         (RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_NORMAL_RACE || RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_TIME_TRIAL ||
         RaceManager::get()->isLapTrialMode()))
     {
-        const AbstractKart* k = RaceManager::get()->getKartWithGPRank(RaceManager::get()->getLocalPlayerGPRank(PLAYER_ID_GAME_MASTER));
+        const Kart* k = RaceManager::get()->getKartWithGPRank(RaceManager::get()->getLocalPlayerGPRank(PLAYER_ID_GAME_MASTER));
         RaceManager::get()->addGPTotalLaps(World::getWorld()->getFinishedLapsOfKart(k->getWorldKartId()));
         if (RaceManager::get()->getNumOfTracks() == RaceManager::get()->getTrackNumber() + 1
            && !RaceManager::get()->getGrandPrix().isRandomGP() && RaceManager::get()->getSkippedTracksInGP() == 0)
@@ -692,7 +692,7 @@ void RaceResultGUI::displayCTFResults()
     const unsigned num_karts = ctf->getNumKarts();
     for (unsigned int i = 0; i < num_karts; i++)
     {
-        AbstractKart* kart = ctf->getKartAtPosition(i + 1);
+        Kart* kart = ctf->getKartAtPosition(i + 1);
         unsigned kart_id = kart->getWorldKartId();
         if (ctf->getKartTeam(kart_id) != KART_TEAM_RED)
             continue;
@@ -740,7 +740,7 @@ void RaceResultGUI::displayCTFResults()
     current_x += UserConfigParams::m_width / 2;
     for (unsigned int i = 0; i < num_karts; i++)
     {
-        AbstractKart* kart = ctf->getKartAtPosition(i + 1);
+        Kart* kart = ctf->getKartAtPosition(i + 1);
         unsigned kart_id = kart->getWorldKartId();
         if (ctf->getKartTeam(kart_id) != KART_TEAM_BLUE)
             continue;
@@ -851,7 +851,7 @@ void RaceResultGUI::unload()
         for (unsigned int position = first_position;
         position <= RaceManager::get()->getNumberOfKarts() - sta; position++)
         {
-            const AbstractKart *kart = rank_world->getKartAtPosition(position);
+            const Kart *kart = rank_world->getKartAtPosition(position);
 
             if (ffa && kart->isEliminated())
                 continue;
@@ -1310,7 +1310,7 @@ void RaceResultGUI::unload()
             // In case of FTL mode: ignore the leader
             if (rank < 0) continue;
             old_rank[kart_id] = rank;
-            const AbstractKart *kart = World::getWorld()->getKart(kart_id);
+            const Kart *kart = World::getWorld()->getKart(kart_id);
             RowInfo *ri = &(m_all_row_infos[rank]);
             ri->m_kart_icon =
                 kart->getKartProperties()->getIconMaterial()->getTexture();
@@ -2070,7 +2070,7 @@ void RaceResultGUI::unload()
             video::SColor win_color = video::SColor(255, 0, 255, 0);
             video::SColor lose_color = video::SColor(255, 255, 0, 0);
             video::SColor special_color = video::SColor(255, 0, 255, 255);
-            AbstractKart* kart = World::getWorld()->getPlayerKart(0);
+            Kart* kart = World::getWorld()->getPlayerKart(0);
             bool lose_all = false;
             bool position_passed = false;
             bool time_passed = false;

@@ -21,7 +21,7 @@
 #include "items/powerup.hpp"
 #include "graphics/irr_driver.hpp"
 #include "guiengine/engine.hpp"
-#include "karts/abstract_kart.hpp"
+#include "karts/kart.hpp"
 #include "karts/controller/controller.hpp"
 #include "karts/kart_model.hpp"
 #include "modes/ctf_flag.hpp"
@@ -185,7 +185,7 @@ void CaptureTheFlag::updateGraphics(float dt)
     {
         if (m_red_flag->getHolder() != -1)
         {
-            AbstractKart* kart = getKart(m_red_flag->getHolder());
+            Kart* kart = getKart(m_red_flag->getHolder());
             const core::stringw& name = kart->getController()->getName();
             // I18N: Show when a player gets the red flag in CTF
             msg = _("%s has the red flag!", name);
@@ -203,7 +203,7 @@ void CaptureTheFlag::updateGraphics(float dt)
     {
         if (m_blue_flag->getHolder() != -1)
         {
-            AbstractKart* kart = getKart(m_blue_flag->getHolder());
+            Kart* kart = getKart(m_blue_flag->getHolder());
             const core::stringw& name = kart->getController()->getName();
             // I18N: Show when a player gets the blue flag in CTF
             msg = _("%s has the blue flag!", name);
@@ -238,7 +238,7 @@ void CaptureTheFlag::update(int ticks)
         {
             if (it->second == getTicksSinceStart())
             {
-                AbstractKart* kart = m_karts[it->first].get();
+                Kart* kart = m_karts[it->first].get();
                 if (kart->isEliminated() || !kart->isSquashed())
                 {
                     it++;
@@ -414,7 +414,7 @@ void CaptureTheFlag::ctfScored(int kart_id, bool red_team_scored,
                                int new_blue_score)
 {
     m_scores.at(kart_id) = new_kart_score;
-    AbstractKart* kart = getKart(kart_id);
+    Kart* kart = getKart(kart_id);
     core::stringw scored_msg;
     const core::stringw& name = kart->getController()->getName();
     m_red_scores = new_red_score;
@@ -545,7 +545,7 @@ bool CaptureTheFlag::kartHit(int kart_id, int hitter)
 }   // kartHit
 
 //-----------------------------------------------------------------------------
-unsigned int CaptureTheFlag::getRescuePositionIndex(AbstractKart *kart)
+unsigned int CaptureTheFlag::getRescuePositionIndex(Kart *kart)
 {
     return m_kart_position_map.at(kart->getWorldKartId());
 }   // getRescuePositionIndex

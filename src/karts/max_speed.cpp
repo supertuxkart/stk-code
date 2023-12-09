@@ -19,7 +19,7 @@
 #include "karts/max_speed.hpp"
 
 #include "config/stk_config.hpp"
-#include "karts/abstract_kart.hpp"
+#include "karts/kart.hpp"
 #include "karts/kart_properties.hpp"
 #include "network/network_string.hpp"
 #include "physics/btKart.hpp"
@@ -48,7 +48,7 @@
  *  At the end the maximum is capped by a value specified in stk_config
  *  (to avoid issues with physics etc).
 */
-MaxSpeed::MaxSpeed(AbstractKart *kart)
+MaxSpeed::MaxSpeed(Kart *kart)
 {
     m_kart = kart;
     // Initialise m_add_engine_force since it might be queried before

@@ -37,7 +37,7 @@
 #include "input/input_device.hpp"
 #include "input/input_manager.hpp"
 #include "items/item_manager.hpp"
-#include "karts/abstract_kart.hpp"
+#include "karts/kart.hpp"
 #include "modes/world.hpp"
 #include "scriptengine/script_engine.hpp"
 #include "states_screens/dialogs/tutorial_message_dialog.hpp"

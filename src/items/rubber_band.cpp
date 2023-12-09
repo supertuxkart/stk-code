@@ -26,7 +26,7 @@
 #include "guiengine/engine.hpp"
 #include "items/plunger.hpp"
 #include "items/projectile_manager.hpp"
-#include "karts/abstract_kart.hpp"
+#include "karts/kart.hpp"
 #include "karts/kart_properties.hpp"
 #include "karts/max_speed.hpp"
 #include "modes/world.hpp"
@@ -49,7 +49,7 @@
  *                 can trigger an explosion)
  *  \param kart    Reference to the kart.
  */
-RubberBand::RubberBand(Plunger *plunger, AbstractKart *kart)
+RubberBand::RubberBand(Plunger *plunger, Kart *kart)
           : m_plunger(plunger), m_owner(kart), m_node(NULL)
 {
     m_hit_kart = NULL;
@@ -349,7 +349,7 @@ void RubberBand::checkForHit(const Vec3 &k, const Vec3 &p)
  *  \param track _xyz The coordinated where the track was hit (NULL if a kart
  *                    was hit.
  */
-void RubberBand::hit(AbstractKart *kart_hit, const Vec3 *track_xyz)
+void RubberBand::hit(Kart *kart_hit, const Vec3 *track_xyz)
 {
     // More than one report of a hit. This can happen if the raycast detects
     // a hit as well as the bullet physics.

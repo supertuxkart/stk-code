@@ -101,7 +101,7 @@ private:
     void handleEndCamera(float dt);
 
     friend class Camera;   // Give Camera access to constructor
-             CameraEnd(int camera_index, AbstractKart* kart);
+             CameraEnd(int camera_index, Kart* kart);
     virtual ~CameraEnd() {}
 public:
 

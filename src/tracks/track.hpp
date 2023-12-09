@@ -57,7 +57,7 @@ using namespace irr;
 #include "utils/vec3.hpp"
 #include "utils/stk_process.hpp"
 
-class AbstractKart;
+class Kart;
 class AnimationManager;
 class BezierCurve;
 class CheckManager;
@@ -484,7 +484,7 @@ public:
                                        bool secondary_hits=true) const;
     void               loadTrackModel  (bool reverse_track = false,
                                         unsigned int mode_id=0);
-    bool findGround(AbstractKart *kart);
+    bool findGround(Kart *kart);
 
     std::vector< std::vector<float> > buildHeightMap();
     void               drawMiniMap(const core::rect<s32>& dest_rect) const;

@@ -19,7 +19,7 @@
 #include "karts/controller/network_ai_controller.hpp"
 #include "graphics/camera.hpp"
 #include "guiengine/engine.hpp"
-#include "karts/abstract_kart.hpp"
+#include "karts/kart.hpp"
 #include "karts/controller/kart_control.hpp"
 #include "karts/controller/skidding_ai.hpp"
 #include "modes/world.hpp"
@@ -30,7 +30,7 @@
 // ============================================================================
 int NetworkAIController::m_ai_frequency = 30;
 // ----------------------------------------------------------------------------
-NetworkAIController::NetworkAIController(AbstractKart *kart,
+NetworkAIController::NetworkAIController(Kart *kart,
                                          int local_player_id,
                                          AIBaseController* ai)
                    : PlayerController(kart)

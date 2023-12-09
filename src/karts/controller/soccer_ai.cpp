@@ -20,7 +20,7 @@
 
 #include "items/attachment.hpp"
 #include "items/powerup.hpp"
-#include "karts/abstract_kart.hpp"
+#include "karts/kart.hpp"
 #include "karts/controller/kart_control.hpp"
 #include "karts/kart_properties.hpp"
 #include "modes/soccer_world.hpp"
@@ -35,7 +35,7 @@
 #include "graphics/camera.hpp"
 #endif
 
-SoccerAI::SoccerAI(AbstractKart *kart)
+SoccerAI::SoccerAI(Kart *kart)
         : ArenaAI(kart)
 {
 
@@ -146,7 +146,7 @@ void SoccerAI::findClosestKart(bool consider_difficulty, bool find_sta)
 
     for (unsigned int i = 0; i < n; i++)
     {
-        const AbstractKart* kart = m_world->getKart(i);
+        const Kart* kart = m_world->getKart(i);
         if (kart->isEliminated()) continue;
 
         if (kart->getWorldKartId() == m_kart->getWorldKartId())
@@ -204,7 +204,7 @@ void SoccerAI::findTarget()
     {
         // This AI will attack the other team ball chaser
         int id = m_world->getBallChaser(m_opp_team);
-        const AbstractKart* kart = m_world->getKart(id);
+        const Kart* kart = m_world->getKart(id);
         m_target_point = kart->getXYZ();
         m_target_node  = m_world->getSectorForKart(kart);
     }
@@ -504,7 +504,7 @@ bool SoccerAI::isWaiting() const
 }   // isWaiting
 
 //-----------------------------------------------------------------------------
-float SoccerAI::getKartDistance(const AbstractKart* kart) const
+float SoccerAI::getKartDistance(const Kart* kart) const
 {
     return m_graph->getDistance(getCurrentNode(),
         m_world->getSectorForKart(kart));

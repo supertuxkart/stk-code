@@ -20,7 +20,7 @@
 
 #include "config/user_config.hpp"
 #include "io/xml_node.hpp"
-#include "karts/abstract_kart.hpp"
+#include "karts/kart.hpp"
 #include "modes/linear_world.hpp"
 #include "modes/world.hpp"
 #include "network/network_string.hpp"

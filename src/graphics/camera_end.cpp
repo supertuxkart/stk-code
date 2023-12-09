@@ -19,7 +19,7 @@
 #include "graphics/camera_end.hpp"
 
 #include "config/user_config.hpp"
-#include "karts/abstract_kart.hpp"
+#include "karts/kart.hpp"
 #include "race/race_manager.hpp"
 #include "tracks/drive_graph.hpp"
 
@@ -27,7 +27,7 @@
 
 AlignedArray<CameraEnd::EndCameraInformation> CameraEnd::m_end_cameras;
 // ============================================================================
-CameraEnd::CameraEnd(int camera_index, AbstractKart* kart) 
+CameraEnd::CameraEnd(int camera_index, Kart* kart)
          : CameraNormal(Camera::CM_TYPE_END, camera_index, kart)
 {
     reset();

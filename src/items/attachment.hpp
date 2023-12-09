@@ -30,7 +30,7 @@ namespace irr
     namespace scene { class IAnimatedMeshSceneNode; }
 }
 
-class AbstractKart;
+class Kart;
 class BareNetworkString;
 class ItemState;
 class SFXBase;
@@ -86,7 +86,7 @@ private:
     AttachmentType m_graphical_type;
 
     /** Kart the attachment is attached to. */
-    AbstractKart   *m_kart;
+    Kart   *m_kart;
 
     /** Time left till attachment expires. */
     int16_t         m_ticks_left;
@@ -103,7 +103,7 @@ private:
                      *m_node;
 
     /** Used by bombs so that it's not passed back to previous owner. */
-    AbstractKart     *m_previous_owner;
+    Kart     *m_previous_owner;
 
     /** An optional attachment - additional functionality can be implemented
      *  for certain attachments. */
@@ -116,16 +116,16 @@ private:
     SFXBase          *m_bubble_explode_sound;
 
 public:
-          Attachment(AbstractKart* kart);
+          Attachment(Kart* kart);
          ~Attachment();
     void  clear();
     void  hitBanana(ItemState *item);
     void  updateGraphics(float dt);
 
     void  update(int ticks);
-    void  handleCollisionWithKart(AbstractKart *other);
+    void  handleCollisionWithKart(Kart *other);
     void  set (AttachmentType type, int ticks,
-               AbstractKart *previous_kart=NULL,
+               Kart *previous_kart=NULL,
                bool set_by_rewind_parachute = false);
     void rewindTo(BareNetworkString *buffer);
     void saveState(BareNetworkString *buffer) const;
@@ -146,7 +146,7 @@ public:
     // ------------------------------------------------------------------------
     /** Returns the previous owner of this attachment, used in bombs that
      *  are being passed between karts. */
-    AbstractKart* getPreviousOwner() const { return m_previous_owner; }
+    Kart* getPreviousOwner() const { return m_previous_owner; }
     // ------------------------------------------------------------------------
     /** Returns additional weight for the kart. */
     float weightAdjust() const;

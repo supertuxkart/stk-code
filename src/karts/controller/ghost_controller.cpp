@@ -21,7 +21,7 @@
 #include "karts/controller/kart_control.hpp"
 #include "modes/world.hpp"
 
-GhostController::GhostController(AbstractKart *kart, core::stringw display_name)
+GhostController::GhostController(Kart *kart, core::stringw display_name)
                 : Controller(kart)
 {
     m_display_name = display_name;

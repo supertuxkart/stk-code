@@ -34,7 +34,7 @@
 #include "io/file_manager.hpp"
 #include "items/attachment_manager.hpp"
 #include "items/powerup.hpp"
-#include "karts/abstract_kart.hpp"
+#include "karts/kart.hpp"
 #include "karts/abstract_kart_animation.hpp"
 #include "karts/controller/controller.hpp"
 #include "karts/explosion_animation.hpp"
@@ -174,7 +174,7 @@ void RaceGUIBase::reset()
     // profile mode where there might be a camera, but no player).
     for(unsigned int i=0; i<RaceManager::get()->getNumberOfKarts(); i++)
     {
-        const AbstractKart *kart = World::getWorld()->getKart(i);
+        const Kart *kart = World::getWorld()->getKart(i);
         m_referee_pos[i] = kart->getTrans()(Referee::getStartOffset());
         Vec3 hpr;
         btQuaternion q = btQuaternion(kart->getTrans().getBasis().getColumn(1),
@@ -256,7 +256,7 @@ void RaceGUIBase::createRegularPolygon(unsigned int n, float radius,
 //-----------------------------------------------------------------------------
 /** Displays all messages in the message queue
  **/
-void RaceGUIBase::drawAllMessages(const AbstractKart* kart,
+void RaceGUIBase::drawAllMessages(const Kart* kart,
                                   const core::recti &viewport,
                                   const core::vector2df &scaling)
 {
@@ -380,7 +380,7 @@ void RaceGUIBase::cleanupMessages(const float dt)
  *  \param viewport The viewport into which to draw the icons.
  *  \param scaling The scaling to use when drawing the icons.
  */
-void RaceGUIBase::drawPowerupIcons(const AbstractKart* kart,
+void RaceGUIBase::drawPowerupIcons(const Kart* kart,
                                    const core::recti &viewport,
                                    const core::vector2df &scaling)
 {
@@ -546,7 +546,7 @@ void RaceGUIBase::update(float dt)
 
     for (unsigned i = 0; i < w->getNumKarts(); i++)
     {
-        AbstractKart* k = w->getKart(i);
+        Kart* k = w->getKart(i);
         if (!k->getController()->isLocalPlayerController()
             || !k->hasFinishedRace())
             continue;
@@ -595,7 +595,7 @@ void RaceGUIBase::renderPlayerView(const Camera *camera, float dt)
 {
     const core::recti &viewport = camera->getViewport();
     const core::vector2df scaling = camera->getScaling();
-    const AbstractKart* kart = camera->getKart();
+    const Kart* kart = camera->getKart();
     if(!kart) return;
     
     if (m_multitouch_gui != NULL && !GUIEngine::ModalDialog::isADialogActive())
@@ -611,7 +611,7 @@ void RaceGUIBase::renderPlayerView(const Camera *camera, float dt)
  *  once).
  */
 void RaceGUIBase::addMessage(const core::stringw &msg,
-                             const AbstractKart *kart,
+                             const Kart *kart,
                              float time, const video::SColor &color,
                              bool important, bool big_font, bool outline)
 {
@@ -859,7 +859,7 @@ void RaceGUIBase::drawGlobalPlayerIcons(int bottom_margin)
     {
         for(unsigned int i=0; i<total_karts; i++)
         {
-            const AbstractKart *kart = world->getKart(i);
+            const Kart *kart = world->getKart(i);
             int position = kart->getPosition();
             core::vector2d<s32> pos(x_base,y_base+(position-1)*(ICON_PLAYER_WIDTH+2));
             m_previous_icons_position.push_back(pos);
@@ -890,7 +890,7 @@ void RaceGUIBase::drawGlobalPlayerIcons(int bottom_margin)
 
     for(int position = 1; position <= (int)kart_amount ; position++)
     {
-        AbstractKart *kart = world->getKartAtDrawingPosition(position);
+        Kart *kart = world->getKartAtDrawingPosition(position);
 
         if (kart->getPosition() == -1)//if position is not set
         {
@@ -1026,7 +1026,7 @@ void RaceGUIBase::drawGlobalPlayerIcons(int bottom_margin)
         font->setScale(1.0f);
 
 
-        AbstractKart* target_kart = NULL;
+        Kart* target_kart = NULL;
         Camera* cam = Camera::getActiveCamera();
         auto cl = LobbyProtocol::get<ClientLobby>();
         bool is_nw_spectate = cl && cl->isSpectator();
@@ -1046,7 +1046,7 @@ void RaceGUIBase::drawGlobalPlayerIcons(int bottom_margin)
 /** Draw one player icon
  *  Takes care of icon looking different due to plumber, squashing, ...
  */
-void RaceGUIBase::drawPlayerIcon(AbstractKart *kart, int x, int y, int w,
+void RaceGUIBase::drawPlayerIcon(Kart *kart, int x, int y, int w,
                                  bool is_local)
 {
 #ifndef SERVER_ONLY
@@ -1293,7 +1293,7 @@ void RaceGUIBase::drawPlayerIcon(AbstractKart *kart, int x, int y, int w,
 void RaceGUIBase::drawPlungerInFace(const Camera *camera, float dt)
 {
 #ifndef SERVER_ONLY
-    const AbstractKart *kart = camera->getKart();
+    const Kart *kart = camera->getKart();
     if (kart->getBlockedByPlungerTicks()<=0)
     {
         m_plunger_state = PLUNGER_STATE_INIT;

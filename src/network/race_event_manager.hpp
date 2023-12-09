@@ -23,7 +23,7 @@
 
 class Controller;
 class GameEventsProtocol;
-class AbstractKart;
+class Kart;
 class Item;
 
 /** \brief This is the interface between the main game and the online
@@ -72,7 +72,7 @@ public:
     // ------------------------------------------------------------------------
     bool isRaceOver();
     // ------------------------------------------------------------------------
-    void kartFinishedRace(AbstractKart *kart, float time);
+    void kartFinishedRace(Kart *kart, float time);
 
 };
 

@@ -39,7 +39,7 @@
 #include "graphics/irr_driver.hpp"
 #endif
 
-#include "karts/abstract_kart.hpp"
+#include "karts/kart.hpp"
 #include "karts/max_speed.hpp"
 #include "karts/rescue_animation.hpp"
 #include "modes/linear_world.hpp"
@@ -51,7 +51,7 @@
 #include "utils/constants.hpp"
 #include "utils/log.hpp"
 
-EndController::EndController(AbstractKart *kart,
+EndController::EndController(Kart *kart,
                              Controller *prev_controller)
              : AIBaseLapController(kart)
 {

@@ -104,7 +104,7 @@ void ProfileWorld::setProfileModeLaps(int laps)
  *         this player globally (i.e. including network players).
  *  \param init_pos The start XYZ coordinates.
  */
-std::shared_ptr<AbstractKart> ProfileWorld::createKart
+std::shared_ptr<Kart> ProfileWorld::createKart
     (const std::string &kart_ident, int index, int local_player_id,
     int global_player_id, RaceManager::KartType kart_type,
     HandicapLevel handicap)

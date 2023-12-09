@@ -21,7 +21,7 @@
 
 #include "config/stk_config.hpp"
 #include "config/user_config.hpp"
-#include "karts/abstract_kart.hpp"
+#include "karts/kart.hpp"
 #include "karts/skidding.hpp"
 
 #include "vector3d.h"
@@ -29,7 +29,7 @@
 using namespace irr;
 
 // ============================================================================
-CameraFPS::CameraFPS(int camera_index, AbstractKart* kart)
+CameraFPS::CameraFPS(int camera_index, Kart* kart)
          : Camera(Camera::CM_TYPE_FPS, camera_index, kart)
 {
     m_attached      = false;

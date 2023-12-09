@@ -28,7 +28,7 @@ using namespace irr;
 
 #include "states_screens/race_gui_base.hpp"
 
-class AbstractKart;
+class Kart;
 class InputMap;
 class Material;
 class RaceSetup;
@@ -118,16 +118,16 @@ private:
     bool m_is_tutorial;
 
     /* Display informat for one player on the screen. */
-    void drawEnergyMeter       (int x, int y, const AbstractKart *kart,
+    void drawEnergyMeter       (int x, int y, const Kart *kart,
                                 const core::recti &viewport,
                                 const core::vector2df &scaling);
-    void drawSpeedEnergyRank   (const AbstractKart* kart,
+    void drawSpeedEnergyRank   (const Kart* kart,
                                 const core::recti &viewport,
                                 const core::vector2df &scaling, float dt);
-    void drawLap               (const AbstractKart* kart,
+    void drawLap               (const Kart* kart,
                                 const core::recti &viewport,
                                 const core::vector2df &scaling);
-    void drawRank              (const AbstractKart *kart,
+    void drawRank              (const Kart *kart,
                                 const core::vector2df &offset,
                                 float min_ratio, int meter_width,
                                 int meter_height, float dt);

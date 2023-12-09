@@ -23,7 +23,7 @@
 
 #include "graphics/camera_normal.hpp"
 
-class AbstractKart;
+class Kart;
 
 /**
   * Handles the debug camera. Inherits from CameraNormal to make use
@@ -52,7 +52,7 @@ private:
                         float side_way, float distance);
 
     friend class Camera;
-             CameraDebug(int camera_index, AbstractKart* kart);
+             CameraDebug(int camera_index, Kart* kart);
     virtual ~CameraDebug();
 public:
 

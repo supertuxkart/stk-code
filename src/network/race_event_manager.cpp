@@ -80,7 +80,7 @@ bool RaceEventManager::isRaceOver()
 }   // isRaceOver
 
 // ----------------------------------------------------------------------------
-void RaceEventManager::kartFinishedRace(AbstractKart *kart, float time)
+void RaceEventManager::kartFinishedRace(Kart *kart, float time)
 {
     if (auto game_events_protocol = m_game_events_protocol.lock())
         game_events_protocol->kartFinishedRace(kart, time);

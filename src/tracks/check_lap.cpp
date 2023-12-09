@@ -22,7 +22,7 @@
 
 #include "config/user_config.hpp"
 #include "io/xml_node.hpp"
-#include "karts/abstract_kart.hpp"
+#include "karts/kart.hpp"
 #include "modes/linear_world.hpp"
 #include "race/race_manager.hpp"
 #include "tracks/track.hpp"

@@ -17,7 +17,7 @@
 
 #include "modes/ctf_flag.hpp"
 #include "graphics/irr_driver.hpp"
-#include "karts/abstract_kart.hpp"
+#include "karts/kart.hpp"
 #include "modes/world.hpp"
 #include "network/network_string.hpp"
 #include "mini_glm.hpp"
@@ -77,7 +77,7 @@ void CTFFlag::updateFlagTrans(const btTransform& off_base_trans)
 {
     if (getHolder() != -1)
     {
-        AbstractKart* k = World::getWorld()->getKart(getHolder());
+        Kart* k = World::getWorld()->getKart(getHolder());
         m_flag_trans = k->getTrans();
         m_flag_trans.setOrigin(m_flag_trans(g_kart_flag_offset));
     }
@@ -113,7 +113,7 @@ void CTFFlag::updateFlagGraphics(irr::scene::IAnimatedMeshSceneNode* flag_node)
 {
     if (getHolder() != -1)
     {
-        AbstractKart* k = World::getWorld()->getKart(getHolder());
+        Kart* k = World::getWorld()->getKart(getHolder());
         flag_node->setParent(k->getNode());
         flag_node->setPosition(g_kart_flag_offset.toIrrVector());
         flag_node->setRotation(core::vector3df(0.0f, 180.0f, 0.0f));

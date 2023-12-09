@@ -51,9 +51,9 @@ private:
     bool         m_mini;
 
 public:
-                 Cake (AbstractKart *kart);
+                 Cake (Kart *kart);
     static  void init     (const XMLNode &node, scene::IMesh *cake_model);
-    virtual bool hit(AbstractKart* kart, PhysicalObject* obj=NULL) OVERRIDE;
+    virtual bool hit(Kart* kart, PhysicalObject* obj=NULL) OVERRIDE;
     // ------------------------------------------------------------------------
     virtual void hitTrack () OVERRIDE
     {

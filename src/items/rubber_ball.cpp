@@ -25,7 +25,7 @@
 #include "io/xml_node.hpp"
 #include "items/attachment.hpp"
 #include "items/projectile_manager.hpp"
-#include "karts/abstract_kart.hpp"
+#include "karts/kart.hpp"
 #include "karts/kart_properties.hpp"
 #include "modes/linear_world.hpp"
 #include "network/network_string.hpp"
@@ -63,7 +63,7 @@ float RubberBall::m_st_max_offset_distance;
 // Debug only
 #undef PRINT_BALL_TIME_TO_TARGET
 
-RubberBall::RubberBall(AbstractKart *kart)
+RubberBall::RubberBall(Kart *kart)
           : Flyable(kart, PowerupManager::POWERUP_RUBBERBALL, 0.0f /* mass */),
             TrackSector()
 {
@@ -538,7 +538,7 @@ void RubberBall::moveTowardsTarget(Vec3 *next_xyz, int ticks)
 
     // If ball is close to the target, then explode
     if (diff.length() < m_target->getKartLength())
-        hit((AbstractKart*)m_target);
+        hit((Kart*)m_target);
 
     assert(!std::isnan((*next_xyz)[0]));
     assert(!std::isnan((*next_xyz)[1]));
@@ -865,7 +865,7 @@ void RubberBall::updateDistanceToTarget()
  *  \params object The object that was hit (NULL if none).
  *  \returns True if
  */
-bool RubberBall::hit(AbstractKart* kart, PhysicalObject* object)
+bool RubberBall::hit(Kart* kart, PhysicalObject* object)
 {
     // When moved to infinity during cannon animation do nothing
     if (hasAnimation())

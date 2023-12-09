@@ -27,7 +27,7 @@
 #include "graphics/sp/sp_shader_manager.hpp"
 #include "io/xml_node.hpp"
 #include "items/flyable.hpp"
-#include "karts/abstract_kart.hpp"
+#include "karts/kart.hpp"
 #include "karts/cannon_animation.hpp"
 #include "karts/skidding.hpp"
 #include "modes/world.hpp"
@@ -136,7 +136,7 @@ void CheckCannon::update(float dt)
 
     for (unsigned int i = 0; i < world->getNumKarts(); i++)
     {
-        AbstractKart* kart = world->getKart(i);
+        Kart* kart = world->getKart(i);
         if (kart->getKartAnimation() || kart->isGhostKart() ||
             kart->isEliminated() || !m_is_active[i])
             continue;
@@ -145,7 +145,7 @@ void CheckCannon::update(float dt)
         Vec3 prev_xyz = xyz - kart->getVelocity() * dt;
         if (isTriggered(prev_xyz, xyz, /*kart index - ignore*/ -1))
         {
-            // The constructor AbstractKartAnimation resets the skidding to 0.
+            // The constructor KartAnimation resets the skidding to 0.
             // So in order to smooth rotate the kart, we need to keep the
             // current visual rotation and pass it to the CannonAnimation.
             float skid_rot = kart->getSkidding()->getVisualSkidRotation();

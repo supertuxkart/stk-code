@@ -22,7 +22,7 @@
 #include "karts/abstract_kart_animation.hpp"
 #include "utils/vec3.hpp"
 
-class AbstractKart;
+class Kart;
 class Referee;
 
 /** This triggers a rescue of the specified kart.
@@ -49,16 +49,16 @@ friend class KartRewinder;
     int m_rescue_transform_compressed[4];
 
     // ------------------------------------------------------------------------
-    RescueAnimation(AbstractKart* kart, BareNetworkString* b);
+    RescueAnimation(Kart* kart, BareNetworkString* b);
     // ------------------------------------------------------------------------
-    RescueAnimation(AbstractKart* kart, bool is_auto_rescue);
+    RescueAnimation(Kart* kart, bool is_auto_rescue);
     // ------------------------------------------------------------------------
     void restoreData(BareNetworkString* b);
     // ------------------------------------------------------------------------
     void init(const btTransform& rescue_transform, float velocity);
 public:
     // ------------------------------------------------------------------------
-    static RescueAnimation* create(AbstractKart* kart,
+    static RescueAnimation* create(Kart* kart,
                                    bool is_auto_rescue = false);
     // ------------------------------------------------------------------------
     virtual ~RescueAnimation();

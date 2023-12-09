@@ -123,7 +123,7 @@ void ReplayRecorder::update(int ticks)
     float time = world->getTime();
     for(unsigned int i=0; i<num_karts; i++)
     {
-        AbstractKart *kart = world->getKart(i);
+        Kart *kart = world->getKart(i);
         // If a single player give up in game menu, stop recording
         if (kart->isEliminated() && single_player) return;
 
@@ -401,7 +401,7 @@ void ReplayRecorder::save()
     unsigned int player_count = 0;
     for (unsigned int real_karts = 0; real_karts < num_karts; real_karts++)
     {
-        const AbstractKart *kart = world->getKart(real_karts);
+        const Kart *kart = world->getKart(real_karts);
         if (kart->isGhostKart()) continue;
 
         // XML encode the username to handle Unicode

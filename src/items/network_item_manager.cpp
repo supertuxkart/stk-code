@@ -18,7 +18,7 @@
 
 #include "items/network_item_manager.hpp"
 
-#include "karts/abstract_kart.hpp"
+#include "karts/kart.hpp"
 #include "modes/world.hpp"
 #include "network/network_config.hpp"
 #include "network/network_string.hpp"
@@ -85,7 +85,7 @@ void NetworkItemManager::reset()
  *  \param item The item that was collected.
  *  \param kart The kart that collected the item.
  */
-void NetworkItemManager::collectedItem(ItemState *item, AbstractKart *kart)
+void NetworkItemManager::collectedItem(ItemState *item, Kart *kart)
 {
     if (m_network_item_debugging)
         Log::info("NIM", "collectedItem at %d index %d type %d ttr %d",
@@ -138,7 +138,7 @@ void NetworkItemManager::switchItems()
  *  \param server_normal In case of rewind the server's normal of this item.
  */
 Item* NetworkItemManager::dropNewItem(ItemState::ItemType type,
-                                      const AbstractKart *kart,
+                                      const Kart *kart,
                                       const Vec3 *server_xyz,
                                       const Vec3 *server_normal)
 {
@@ -387,7 +387,7 @@ void NetworkItemManager::restoreState(BareNetworkString *buffer, int count)
         {
             int index = iei.getIndex();
             // An item on the track was collected:
-            AbstractKart *kart = world->getKart(iei.getKartId());
+            Kart *kart = world->getKart(iei.getKartId());
 
             assert(m_confirmed_state[index] != NULL);
             m_confirmed_state[index]->collected(kart); // Collect item
@@ -403,7 +403,7 @@ void NetworkItemManager::restoreState(BareNetworkString *buffer, int count)
         }
         else if(iei.isNewItem())
         {
-            AbstractKart *kart = world->getKart(iei.getKartId());
+            Kart *kart = world->getKart(iei.getKartId());
             ItemState *is = new ItemState(iei.getNewItemType(), kart,
                                           iei.getIndex()             );
             is->initItem(iei.getNewItemType(), iei.getXYZ(), iei.getNormal());

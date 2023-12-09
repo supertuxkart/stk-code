@@ -31,7 +31,7 @@
 #include "guiengine/message_queue.hpp"
 #include "input/device_manager.hpp"
 #include "input/input_manager.hpp"
-#include "karts/abstract_kart.hpp"
+#include "karts/kart.hpp"
 #include "karts/controller/controller.hpp"
 #include "karts/kart_properties_manager.hpp"
 #include "main_loop.hpp"
@@ -242,7 +242,7 @@ void RaceManager::setPlayerHandicap(unsigned int player_id, HandicapLevel handic
 /** Returns a pointer to the kart which has a given GP rank.
  *  \param n The rank (1 to number of karts) to look for.
  */
-const AbstractKart *RaceManager::getKartWithGPRank(unsigned int n)
+const Kart *RaceManager::getKartWithGPRank(unsigned int n)
 {
     for(unsigned int i=0; i<m_kart_status.size(); i++)
         if(m_kart_status[i].m_gp_rank == (int)n)
@@ -708,7 +708,7 @@ void RaceManager::startNextRace()
             const RemoteKartInfo& rki = getKartInfo(i);
             if (rki.isReserved())
             {
-                AbstractKart* k = World::getWorld()->getKart(i);
+                Kart* k = World::getWorld()->getKart(i);
                 World::getWorld()->eliminateKart(i,
                     false/*notify_of_elimination*/);
                 k->setPosition(
@@ -901,7 +901,7 @@ void RaceManager::computeGPRanks()
     {
         if(UserConfigParams::m_ftl_debug)
         {
-            const AbstractKart *kart =
+            const Kart *kart =
                 World::getWorld()->getKart(sort_data[i].m_position);
             Log::debug("Race Manager","[ftl] kart '%s' has now position %d.",
                 kart->getIdent().c_str(),
@@ -1051,7 +1051,7 @@ void RaceManager::exitRace(bool delete_world)
  *  \param kart The kart that finished the race.
  *  \param time Time at which the kart finished the race.
  */
-void RaceManager::kartFinishedRace(const AbstractKart *kart, float time)
+void RaceManager::kartFinishedRace(const Kart *kart, float time)
 {
     unsigned int id = kart->getWorldKartId();
     int pos = kart->getPosition();

@@ -20,7 +20,7 @@
 
 #include "graphics/slip_stream.hpp"
 #include "items/powerup.hpp"
-#include "karts/abstract_kart.hpp"
+#include "karts/kart.hpp"
 #include "karts/kart_model.hpp"
 #include "karts/skidding.hpp"
 #include "modes/world.hpp"
@@ -38,7 +38,7 @@
  *  \param kart Pointer to the kart that is animated, or NULL if the
  *         the animation is meant for a basket ball etc.
  */
-AbstractKartAnimation::AbstractKartAnimation(AbstractKart* kart,
+AbstractKartAnimation::AbstractKartAnimation(Kart* kart,
                                              const std::string &name)
 {
     m_kart = kart;

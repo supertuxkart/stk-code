@@ -175,7 +175,7 @@ void ThreeStrikesBattle::reset(bool restart)
  *  \param kart The pointer to the kart (not used here).
  *  \param node The scene node of this kart.
  */
-void ThreeStrikesBattle::kartAdded(AbstractKart* kart, scene::ISceneNode* node)
+void ThreeStrikesBattle::kartAdded(Kart* kart, scene::ISceneNode* node)
 {
     if (!node)
         return;
@@ -255,10 +255,10 @@ bool ThreeStrikesBattle::kartHit(int kart_id, int hitter)
         // Find a camera of the kart with the most lives ("leader"), and
         // attach all cameras for this kart to the leader.
         int max_lives = 0;
-        AbstractKart *leader = NULL;
+        Kart *leader = NULL;
         for(unsigned int i=0; i<getNumKarts(); i++)
         {
-            AbstractKart * const kart = getKart(i);
+            Kart * const kart = getKart(i);
             if(kart->isEliminated() || kart->hasFinishedRace() ||
                 kart->getWorldKartId()==(unsigned)kart_id) continue;
             if(m_kart_info[i].m_lives > max_lives)

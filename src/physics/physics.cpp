@@ -22,7 +22,7 @@
 #include "config/player_manager.hpp"
 #include "config/player_profile.hpp"
 #include "config/user_config.hpp"
-#include "karts/abstract_kart.hpp"
+#include "karts/kart.hpp"
 #include "graphics/irr_driver.hpp"
 #include "graphics/stars.hpp"
 #include "items/flyable.hpp"
@@ -131,7 +131,7 @@ Physics::~Physics()
  *  \param kart The kart to add.
  *  \param vehicle The raycast vehicle object.
  */
-void Physics::addKart(const AbstractKart *kart)
+void Physics::addKart(const Kart *kart)
 {
     const btCollisionObjectArray &all_objs =
         m_dynamics_world->getCollisionObjectArray();
@@ -149,7 +149,7 @@ void Physics::addKart(const AbstractKart *kart)
  *  (and during cleanup).
  *  \param kart The kart to remove.
  */
-void Physics::removeKart(const AbstractKart *kart)
+void Physics::removeKart(const Kart *kart)
 {
     // We can't simply remove a kart from the physics world when currently
     // loops over all kart objects are active. This can happen in collision
@@ -240,7 +240,7 @@ void Physics::update(int ticks)
         {
             // Kart hits physical object
             // -------------------------
-            AbstractKart *kart = p->getUserPointer(1)->getPointerKart();
+            Kart *kart = p->getUserPointer(1)->getPointerKart();
             int kartId = kart->getWorldKartId();
             PhysicalObject* obj = p->getUserPointer(0)->getPointerPhysicalObject();
             std::string obj_id = obj->getID();
@@ -302,12 +302,12 @@ void Physics::update(int ticks)
             ThreeDAnimation *anim=p->getUserPointer(0)->getPointerAnimation();
             if(anim->isCrashReset())
             {
-                AbstractKart *kart = p->getUserPointer(1)->getPointerKart();
+                Kart *kart = p->getUserPointer(1)->getPointerKart();
                 RescueAnimation::create(kart);
             }
             else if (anim->isExplodeKartObject())
             {
-                AbstractKart *kart = p->getUserPointer(1)->getPointerKart();
+                Kart *kart = p->getUserPointer(1)->getPointerKart();
                 ExplosionAnimation::create(kart);
                 if (kart->getKartAnimation() != NULL)
                 {
@@ -316,7 +316,7 @@ void Physics::update(int ticks)
             }
             else if (anim->isFlattenKartObject())
             {
-                AbstractKart *kart = p->getUserPointer(1)->getPointerKart();
+                Kart *kart = p->getUserPointer(1)->getPointerKart();
                 const KartProperties *kp = kart->getKartProperties();
 
                 // Count squash only once from original state
@@ -374,7 +374,7 @@ void Physics::update(int ticks)
             // --------------------
             // Only explode a bowling ball if the target is
             // not invulnerable
-            AbstractKart* target_kart = p->getUserPointer(1)->getPointerKart();
+            Kart* target_kart = p->getUserPointer(1)->getPointerKart();
             PowerupManager::PowerupType type = p->getUserPointer(0)->getPointerFlyable()->getType();
             if(type != PowerupManager::POWERUP_BOWLING || !target_kart->isInvulnerable())
             {
@@ -382,7 +382,7 @@ void Physics::update(int ticks)
                 f->hit(target_kart);
 
                 // Check for achievements
-                AbstractKart * kart = World::getWorld()->getKart(f->getOwnerId());
+                Kart * kart = World::getWorld()->getKart(f->getOwnerId());
                 LocalPlayerController *lpc =
                     dynamic_cast<LocalPlayerController*>(kart->getController());
 
@@ -435,9 +435,9 @@ void Physics::update(int ticks)
  *  \param contact_point_b Location of collision at second kart (in kart
  *         coordinates).
  */
-void Physics::KartKartCollision(AbstractKart *kart_a,
+void Physics::KartKartCollision(Kart *kart_a,
                                 const Vec3 &contact_point_a,
-                                AbstractKart *kart_b,
+                                Kart *kart_b,
                                 const Vec3 &contact_point_b)
 {
     // Only one kart needs to handle the attachments, it will
@@ -445,7 +445,7 @@ void Physics::KartKartCollision(AbstractKart *kart_a,
     kart_a->crashed(kart_b, /*handle_attachments*/true);
     kart_b->crashed(kart_a, /*handle_attachments*/false);
 
-    AbstractKart *left_kart, *right_kart;
+    Kart *left_kart, *right_kart;
     float left_kart_contact_Z, right_kart_contact_Z;
 
     // Determine which kart is pushed to the left, and which one to the
@@ -676,7 +676,7 @@ btScalar Physics::solveGroup(btCollisionObject** bodies, int numBodies,
                     upA, contact_manifold->getContactPoint(0).m_localPointA);
             else if(upB->is(UserPointer::UP_KART))
             {
-                AbstractKart *kart=upB->getPointerKart();
+                Kart *kart=upB->getPointerKart();
                 int n = contact_manifold->getContactPoint(0).m_index0;
                 const Material *m
                     = n>=0 ? upA->getPointerTriangleMesh()->getMaterial(n)
@@ -714,7 +714,7 @@ btScalar Physics::solveGroup(btCollisionObject** bodies, int numBodies,
         {
             if(upB->is(UserPointer::UP_TRACK))
             {
-                AbstractKart *kart = upA->getPointerKart();
+                Kart *kart = upA->getPointerKart();
                 int n = contact_manifold->getContactPoint(0).m_index1;
                 const Material *m
                     = n>=0 ? upB->getPointerTriangleMesh()->getMaterial(n)
@@ -743,7 +743,7 @@ btScalar Physics::solveGroup(btCollisionObject** bodies, int numBodies,
                 // overworld) add a push back to avoid that karts get stuck
                 if (objB->isStaticObject())
                 {
-                    AbstractKart *kart = upA->getPointerKart();
+                    Kart *kart = upA->getPointerKart();
                     const btVector3 &normal = contact_manifold->getContactPoint(0)
                         .m_normalWorldOnB;
                     kart->crashed((Material*)NULL, normal);

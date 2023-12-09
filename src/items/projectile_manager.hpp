@@ -32,7 +32,7 @@ namespace irr
 #include "items/powerup_manager.hpp"
 #include "utils/no_copy.hpp"
 
-class AbstractKart;
+class Kart;
 class Flyable;
 class HitEffect;
 class Rewinder;
@@ -55,7 +55,7 @@ private:
      *  being shown or have a sfx playing. */
     HitEffects       m_active_hit_effects;
 
-    std::string      getUniqueIdentity(AbstractKart* kart,
+    std::string      getUniqueIdentity(Kart* kart,
                                        PowerupManager::PowerupType type);
     void             updateServer(int ticks);
 public:
@@ -75,10 +75,10 @@ public:
     void             update           (int ticks);
     void             updateGraphics   (float dt);
     void             removeTextures   ();
-    bool             projectileIsClose(const AbstractKart * const kart,
+    bool             projectileIsClose(const Kart * const kart,
                                        float radius);
 
-    int              getNearbyProjectileCount(const AbstractKart * const kart,
+    int              getNearbyProjectileCount(const Kart * const kart,
                                        float radius, PowerupManager::PowerupType type,
                                        bool exclude_owned=false);
     // ------------------------------------------------------------------------
@@ -90,7 +90,7 @@ public:
     std::shared_ptr<Rewinder>
                            addRewinderFromNetworkState(const std::string& uid);
     // ------------------------------------------------------------------------
-    std::shared_ptr<Flyable> newProjectile(AbstractKart *kart,
+    std::shared_ptr<Flyable> newProjectile(Kart *kart,
                                            PowerupManager::PowerupType type);
     // ------------------------------------------------------------------------
     std::vector<Vec3> getBasketballPositions();

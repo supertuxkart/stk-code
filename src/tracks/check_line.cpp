@@ -24,7 +24,7 @@
 #include "graphics/sp/sp_dynamic_draw_call.hpp"
 #include "graphics/sp/sp_shader_manager.hpp"
 #include "io/xml_node.hpp"
-#include "karts/abstract_kart.hpp"
+#include "karts/kart.hpp"
 #include "modes/linear_world.hpp"
 #include "modes/world.hpp"
 #include "network/network_string.hpp"
@@ -170,7 +170,7 @@ void CheckLine::reset(const Track &track)
 void CheckLine::resetAfterKartMove(unsigned int kart_index)
 {
     if (m_previous_position.empty()) return;
-    AbstractKart *kart = World::getWorld()->getKart(kart_index);
+    Kart *kart = World::getWorld()->getKart(kart_index);
     m_previous_position[kart_index] = kart->getXYZ();
 }   // resetAfterKartMove
 

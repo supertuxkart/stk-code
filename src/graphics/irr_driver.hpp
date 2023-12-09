@@ -66,7 +66,7 @@ namespace irr
 using namespace irr;
 
 enum TypeRTT : unsigned int;
-class AbstractKart;
+class Kart;
 class AbstractRenderer;
 class Camera;
 class FrameBuffer;
@@ -261,7 +261,7 @@ public:
                          std::shared_ptr<GE::GERenderInfo> render_info = nullptr);
     scene::ICameraSceneNode
                          *addCameraSceneNode();
-    Camera               *addCamera(unsigned int index, AbstractKart *kart);
+    Camera               *addCamera(unsigned int index, Kart *kart);
     void                  removeCameraSceneNode(scene::ICameraSceneNode *camera);
     void                  removeCamera(Camera *camera);
     void                  update(float dt, bool loading=false);

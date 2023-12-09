@@ -23,7 +23,7 @@
 #include "graphics/stars.hpp"
 #include "guiengine/engine.hpp"
 #include "items/attachment.hpp"
-#include "karts/abstract_kart.hpp"
+#include "karts/kart.hpp"
 #include "karts/kart_properties.hpp"
 #include "modes/follow_the_leader.hpp"
 #include "network/network_string.hpp"
@@ -41,7 +41,7 @@
  *  \param pos The position where the explosion happened.
  *  \param direct_hit If the kart was hit directly.
  */
-ExplosionAnimation *ExplosionAnimation::create(AbstractKart *kart,
+ExplosionAnimation *ExplosionAnimation::create(Kart *kart,
                                                const Vec3 &pos,
                                                bool direct_hit)
 {
@@ -76,7 +76,7 @@ ExplosionAnimation *ExplosionAnimation::create(AbstractKart *kart,
 /** A static create function that does only create an explosion if
  *  the explosion happens to be close enough to affect the kart.
  *  Otherwise, NULL is returned. */
-ExplosionAnimation *ExplosionAnimation::create(AbstractKart *kart)
+ExplosionAnimation *ExplosionAnimation::create(Kart *kart)
 {
     if (kart->isInvulnerable() || World::getWorld()->isGoalPhase())
         return NULL;
@@ -89,7 +89,7 @@ ExplosionAnimation *ExplosionAnimation::create(AbstractKart *kart)
 }   // create
 
 // ----------------------------------------------------------------------------
-ExplosionAnimation::ExplosionAnimation(AbstractKart* kart, bool direct_hit)
+ExplosionAnimation::ExplosionAnimation(Kart* kart, bool direct_hit)
                   : AbstractKartAnimation(kart, "ExplosionAnimation")
 {
     memset(m_reset_trans_compressed, 0, 16);
@@ -124,7 +124,7 @@ ExplosionAnimation::ExplosionAnimation(AbstractKart* kart, bool direct_hit)
 }   // ExplosionAnimation
 
 //-----------------------------------------------------------------------------
-ExplosionAnimation::ExplosionAnimation(AbstractKart* kart, BareNetworkString* b)
+ExplosionAnimation::ExplosionAnimation(Kart* kart, BareNetworkString* b)
                   : AbstractKartAnimation(kart, "ExplosionAnimation")
 {
     restoreBasicState(b);

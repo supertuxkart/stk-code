@@ -37,7 +37,7 @@ namespace SP
 #include "utils/no_copy.hpp"
 #include <memory>
 
-class AbstractKart;
+class Kart;
 class Quad;
 class Material;
 
@@ -48,7 +48,7 @@ class SlipStream
 {
 private:
     /** The kart to which this smoke belongs. */
-    AbstractKart *m_kart;
+    Kart *m_kart;
 
     /** The moving texture for the normal node */
 
@@ -113,18 +113,18 @@ private:
 
     /** The kart from which this kart gets slipstream. Used by the AI to
      ** overtake the right kart. */
-    AbstractKart* m_target_kart;
+    Kart* m_target_kart;
 
     SP::SPMesh*  createMeshSP(unsigned material_id, bool bonus_mesh);
     scene::IAnimatedMesh* createMesh(unsigned material_id, bool bonus_mesh);
 
     void         setDebugColor(const video::SColor &color, bool inner);
     void         updateQuad();
-    void         updateSlipstreamingTextures(float f, const AbstractKart* kart);
+    void         updateSlipstreamingTextures(float f, const Kart* kart);
     void         updateBonusTexture();
     void         hideAllNodes();
 public:
-                 SlipStream  (AbstractKart* kart);
+                 SlipStream  (Kart* kart);
                  ~SlipStream  ();
     void         reset();
     void         update(int ticks);
@@ -136,7 +136,7 @@ public:
     const Quad& getSlipstreamQuad() const { return *m_slipstream_quad; }
     // ------------------------------------------------------------------------
     /** Returns the kart from which slipstream is 'collected'. */
-    const AbstractKart* getSlipstreamTarget() const {return m_target_kart;}
+    const Kart* getSlipstreamTarget() const {return m_target_kart;}
     // ------------------------------------------------------------------------
     /** Returns if slipstream is being used. */
     bool        inUse() const {return m_bonus_time>0.0f; }

@@ -146,14 +146,14 @@ public:
     virtual Item*  placeItem       (ItemState::ItemType type, const Vec3& xyz,
                                     const Vec3 &normal);
     virtual Item*  dropNewItem     (ItemState::ItemType type,
-                                    const AbstractKart* parent,
+                                    const Kart* parent,
                                     const Vec3 *server_xyz = NULL,
                                     const Vec3 *normal = NULL);
     void           update          (int ticks);
     void           updateGraphics  (float dt);
-    void           checkItemHit    (AbstractKart* kart);
+    void           checkItemHit    (Kart* kart);
     void           reset           ();
-    virtual void   collectedItem   (ItemState *item, AbstractKart *kart);
+    virtual void   collectedItem   (ItemState *item, Kart *kart);
     virtual void   switchItems     ();
     bool           randomItemsForArena(const AlignedArray<btTransform>& pos);
 

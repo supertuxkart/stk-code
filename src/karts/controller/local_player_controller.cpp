@@ -31,7 +31,7 @@
 #include "items/attachment.hpp"
 #include "items/item.hpp"
 #include "items/powerup.hpp"
-#include "karts/abstract_kart.hpp"
+#include "karts/kart.hpp"
 #include "karts/controller/player_controller.hpp"
 #include "karts/kart_properties.hpp"
 #include "karts/skidding.hpp"
@@ -63,7 +63,7 @@
  *  \param player The player to which this kart belongs.
  *  \param init_pos The start coordinates and heading of the kart.
  */
-LocalPlayerController::LocalPlayerController(AbstractKart *kart,
+LocalPlayerController::LocalPlayerController(Kart *kart,
                                              const int local_player_id,
                                              HandicapLevel h)
                      : PlayerController(kart)
@@ -351,7 +351,7 @@ void LocalPlayerController::setPosition(int p)
         //I'm not sure if this method of finding the passing kart is fail-safe.
         for(unsigned int i = 0 ; i < world->getNumKarts(); i++ )
         {
-            AbstractKart *kart = world->getKart(i);
+            Kart *kart = world->getKart(i);
             if(kart->getPosition() == p + 1)
             {
                 kart->beep();
@@ -504,7 +504,7 @@ void LocalPlayerController::rumble(float strength_low, float strength_high, uint
 #endif
 }
 
-void LocalPlayerController::crashed(const AbstractKart* k) {
+void LocalPlayerController::crashed(const Kart* k) {
     doCrashHaptics();
 
     PlayerController::crashed(k);

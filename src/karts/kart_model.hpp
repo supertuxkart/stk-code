@@ -36,7 +36,7 @@ namespace GE { class GERenderInfo; }
 #include "utils/no_copy.hpp"
 #include "utils/vec3.hpp"
 
-class AbstractKart;
+class Kart;
 class KartProperties;
 class MovingTexture;
 class XMLNode;
@@ -305,7 +305,7 @@ private:
     void OnAnimationEnd(scene::IAnimatedMeshSceneNode *node);
 
     /** Pointer to the kart object belonging to this kart model. */
-    AbstractKart* m_kart;
+    Kart* m_kart;
 
     /** For our engine to get the desired hue for colorization. */
     std::shared_ptr<GE::GERenderInfo> m_render_info;
@@ -431,7 +431,7 @@ public:
     void  setAnimation(AnimationFrameType type, bool play_non_loop = false);
     // ------------------------------------------------------------------------
     /** Sets the kart this model is currently used for */
-    void  setKart(AbstractKart* k) { m_kart = k; }
+    void  setKart(Kart* k) { m_kart = k; }
     // ------------------------------------------------------------------------
     /**  Name of the hat mesh to use. */
     void setHatMeshName(const std::string &name) {m_hat_name = name; }

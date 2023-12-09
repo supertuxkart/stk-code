@@ -938,7 +938,7 @@ int SoccerWorld::getAttacker(KartTeam team) const
 }   // getAttacker
 
 //-----------------------------------------------------------------------------
-unsigned int SoccerWorld::getRescuePositionIndex(AbstractKart *kart)
+unsigned int SoccerWorld::getRescuePositionIndex(Kart *kart)
 {
     if (!Track::getCurrentTrack()->hasNavMesh())
         return m_kart_position_map.at(kart->getWorldKartId());

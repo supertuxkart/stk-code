@@ -35,7 +35,7 @@ namespace irr
 }
 using namespace irr;
 
-class AbstractKart;
+class Kart;
 class AbstractKartAnimation;
 class HitEffect;
 class PhysicalObject;
@@ -78,7 +78,7 @@ private:
 
 protected:
     /** Kart which shot this flyable. */
-    AbstractKart*     m_owner;
+    Kart*             m_owner;
 
     /** Type of the powerup. */
     PowerupManager::PowerupType
@@ -160,14 +160,14 @@ protected:
     /* For debugging purpose */
     int               m_created_ticks;
 
-    void              getClosestKart(const AbstractKart **minKart,
+    void              getClosestKart(const Kart **minKart,
                                      float *minDistSquared,
                                      Vec3 *minDelta,
-                                     const AbstractKart* inFrontOf=NULL,
+                                     const Kart* inFrontOf=NULL,
                                      const bool backwards=false) const;
 
     void getLinearKartItemIntersection(const Vec3 &origin,
-                                       const AbstractKart *target_kart,
+                                       const Kart *target_kart,
                                        float item_XY_velocity, float gravity,
                                        float forw_offset,
                                        float *fire_angle, float *up_velocity);
@@ -188,7 +188,7 @@ protected:
     void              fixSFXSplitscreen(SFXBase* sfx);
 public:
 
-                 Flyable     (AbstractKart* kart,
+                 Flyable     (Kart* kart,
                               PowerupManager::PowerupType type,
                               float mass=1.0f);
     virtual     ~Flyable     ();
@@ -198,9 +198,9 @@ public:
     virtual bool              updateAndDelete(int ticks);
     virtual void              setAnimation(AbstractKartAnimation *animation);
     virtual HitEffect*        getHitEffect() const;
-    bool                      isOwnerImmunity(const AbstractKart *kart_hit) const;
-    virtual bool              hit(AbstractKart* kart, PhysicalObject* obj=NULL);
-    void                      explode(AbstractKart* kart, PhysicalObject* obj=NULL,
+    bool                      isOwnerImmunity(const Kart *kart_hit) const;
+    virtual bool              hit(Kart* kart, PhysicalObject* obj=NULL);
+    void                      explode(Kart* kart, PhysicalObject* obj=NULL,
                                       bool secondary_hits=true, bool indirect_damage=false);
     unsigned int              getOwnerId();
     // ------------------------------------------------------------------------
@@ -237,7 +237,7 @@ public:
 
     // ------------------------------------------------------------------------
     /** Returns the owner's kart */
-    AbstractKart *getOwner() const { return m_owner;}  
+    Kart *getOwner() const { return m_owner;}
     // ------------------------------------------------------------------------
     /** Sets wether Flyable should update TerrainInfo as part of its update
      *  call, or if the inheriting object will update TerrainInfo itself

@@ -29,7 +29,7 @@ using namespace irr;
 
 #include "states_screens/race_gui_base.hpp"
 
-class AbstractKart;
+class Kart;
 class ChallengeData;
 struct OverworldChallenge;
 class InputMap;

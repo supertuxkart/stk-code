@@ -24,7 +24,7 @@
 #include "items/attachment.hpp"
 #include "items/item.hpp"
 #include "items/powerup.hpp"
-#include "karts/abstract_kart.hpp"
+#include "karts/kart.hpp"
 #include "karts/kart_properties.hpp"
 #include "karts/skidding.hpp"
 #include "karts/rescue_animation.hpp"
@@ -43,7 +43,7 @@
 
 #include <cstdlib>
 
-PlayerController::PlayerController(AbstractKart *kart)
+PlayerController::PlayerController(Kart *kart)
                 : Controller(kart)
 {
     m_penalty_ticks = 0;

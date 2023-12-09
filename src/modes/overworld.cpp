@@ -26,7 +26,7 @@
 #include "input/input.hpp"
 #include "input/input_manager.hpp"
 #include "input/keyboard_device.hpp"
-#include "karts/abstract_kart.hpp"
+#include "karts/kart.hpp"
 #include "karts/kart_properties.hpp"
 #include "karts/kart_properties_manager.hpp"
 #include "karts/rescue_animation.hpp"
@@ -177,7 +177,7 @@ void OverWorld::update(int ticks)
 /** Finds the starting position which is closest to the kart.
  *  \param kart The kart for which a rescue position needs to be determined.
  */
-unsigned int OverWorld::getRescuePositionIndex(AbstractKart *kart)
+unsigned int OverWorld::getRescuePositionIndex(Kart *kart)
 {
     // find closest point to drop kart on
     const int start_spots_amount = getNumberOfRescuePositions();
@@ -227,7 +227,7 @@ void OverWorld::onFirePressed(Controller* who)
     const std::vector<OverworldChallenge>& challenges =
                                   Track::getCurrentTrack()->getChallengeList();
 
-    AbstractKart* k = getKart(0);
+    Kart* k = getKart(0);
     Vec3 kart_xyz = k->getXYZ();
     if (dynamic_cast<RescueAnimation*>(k->getKartAnimation()) != NULL)
     {
@@ -295,7 +295,7 @@ void OverWorld::onMouseClick(int x, int y)
         // Use the 'get closest start point' rescue function
         // from World by setting the kart's position to
         // be the location of the challenge bubble.
-        AbstractKart* kart = getKart(0);
+        Kart* kart = getKart(0);
         kart->setXYZ(challenge->m_position);
         kart->getVehicle()->setMaxSpeed(0);
 

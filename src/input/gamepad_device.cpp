@@ -20,7 +20,7 @@
 #include "input/gamepad_device.hpp"
 
 #include "input/gamepad_config.hpp"
-#include "karts/abstract_kart.hpp"
+#include "karts/kart.hpp"
 #include "karts/controller/local_player_controller.hpp"
 
 /** Constructor for GamePadDevice from a connected gamepad for which no
@@ -99,7 +99,7 @@ void GamePadDevice::resetAxisDirection(const int axis,
     // ignore this while in menus
     if (StateManager::get()->getGameState() != GUIEngine::GAME) return;
 
-    AbstractKart* pk = getPlayer()->getKart();
+    Kart* pk = getPlayer()->getKart();
     if (!pk)
     {
         Log::error("Binding", "Trying to reset axis for an unknown player.");

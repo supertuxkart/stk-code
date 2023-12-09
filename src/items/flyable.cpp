@@ -36,7 +36,7 @@
 #include "guiengine/engine.hpp"
 #include "io/xml_node.hpp"
 #include "items/projectile_manager.hpp"
-#include "karts/abstract_kart.hpp"
+#include "karts/kart.hpp"
 #include "karts/cannon_animation.hpp"
 #include "karts/controller/controller.hpp"
 #include "karts/explosion_animation.hpp"
@@ -62,7 +62,7 @@ float         Flyable::m_st_force_updown[PowerupManager::POWERUP_MAX];
 Vec3          Flyable::m_st_extend      [PowerupManager::POWERUP_MAX];
 // ----------------------------------------------------------------------------
 
-Flyable::Flyable(AbstractKart *kart, PowerupManager::PowerupType type,
+Flyable::Flyable(Kart *kart, PowerupManager::PowerupType type,
                  float mass)
        : Moveable(), TerrainInfo(), m_mass(mass)
 {
@@ -248,9 +248,9 @@ void Flyable::removePhysics()
  *  behind). Useful e.g. for throwing projectiles in front only.
  */
 
-void Flyable::getClosestKart(const AbstractKart **minKart,
+void Flyable::getClosestKart(const Kart **minKart,
                              float *minDistSquared, Vec3 *minDelta,
-                             const AbstractKart* inFrontOf,
+                             const Kart* inFrontOf,
                              const bool backwards) const
 {
     btTransform trans_projectile = (inFrontOf != NULL ? inFrontOf->getTrans()
@@ -262,7 +262,7 @@ void Flyable::getClosestKart(const AbstractKart **minKart,
     World *world = World::getWorld();
     for(unsigned int i=0 ; i<world->getNumKarts(); i++ )
     {
-        AbstractKart *kart = world->getKart(i);
+        Kart *kart = world->getKart(i);
         // If a kart has star effect shown, the kart is immune, so
         // it is not considered a target anymore.
         if(kart->isEliminated() || kart == m_owner ||
@@ -328,7 +328,7 @@ void Flyable::getClosestKart(const AbstractKart **minKart,
  *  \param up_velocity Returns the upwards velocity to use for the item.
  */
 void Flyable::getLinearKartItemIntersection (const Vec3 &origin,
-                                             const AbstractKart *target_kart,
+                                             const Kart *target_kart,
                                              float item_XZ_speed,
                                              float gravity, float forw_offset,
                                              float *fire_angle,
@@ -534,7 +534,7 @@ bool Flyable::updateAndDelete(int ticks)
  *  that's too close to the shooter hits the shooter).
  *  \param kart Kart who was hit.
  */
-bool Flyable::isOwnerImmunity(const AbstractKart* kart_hit) const
+bool Flyable::isOwnerImmunity(const Kart* kart_hit) const
 {
     return m_owner_has_temporary_immunity &&
         kart_hit == m_owner            &&
@@ -548,7 +548,7 @@ bool Flyable::isOwnerImmunity(const AbstractKart* kart_hit) const
  *  \return True if there was actually a hit (i.e. not owner, and target is
  *          not immune), false otherwise.
  */
-bool Flyable::hit(AbstractKart *kart_hit, PhysicalObject* object)
+bool Flyable::hit(Kart *kart_hit, PhysicalObject* object)
 {
     if (!m_has_server_state || hasAnimation())
         return false;
@@ -568,7 +568,7 @@ bool Flyable::hit(AbstractKart *kart_hit, PhysicalObject* object)
  *  \param secondary_hits True if items that are not directly hit should
  *         also be affected.
  */
-void Flyable::explode(AbstractKart *kart_hit, PhysicalObject *object,
+void Flyable::explode(Kart *kart_hit, PhysicalObject *object,
                       bool secondary_hits, bool indirect_damage)
 {
     // Apply explosion effect
@@ -576,7 +576,7 @@ void Flyable::explode(AbstractKart *kart_hit, PhysicalObject *object,
     World *world = World::getWorld();
     for ( unsigned int i = 0 ; i < world->getNumKarts() ; i++ )
     {
-        AbstractKart *kart = world->getKart(i);
+        Kart *kart = world->getKart(i);
         // Don't explode teammates in team world
         if (world->hasTeam() &&
             world->getKartTeam(kart->getWorldKartId()) ==

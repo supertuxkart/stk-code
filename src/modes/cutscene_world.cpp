@@ -26,7 +26,7 @@
 #include "graphics/camera.hpp"
 #include "graphics/irr_driver.hpp"
 #include "io/file_manager.hpp"
-#include "karts/abstract_kart.hpp"
+#include "karts/kart.hpp"
 #include "karts/kart_model.hpp"
 #include "karts/kart_properties.hpp"
 #include "modes/overworld.hpp"

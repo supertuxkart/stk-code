@@ -22,7 +22,7 @@
 #include "items/attachment.hpp"
 #include "items/powerup.hpp"
 #include "guiengine/message_queue.hpp"
-#include "karts/abstract_kart.hpp"
+#include "karts/kart.hpp"
 #include "karts/cannon_animation.hpp"
 #include "karts/explosion_animation.hpp"
 #include "karts/rescue_animation.hpp"
@@ -106,7 +106,7 @@ void KartRewinder::computeError()
         m_skidding->checkSmoothing();
     }
 
-    float diff = fabsf(m_prev_steering - AbstractKart::getSteerPercent());
+    float diff = fabsf(m_prev_steering - Kart::getSteerPercent());
     if (diff > 0.05f)
     {
         m_steering_smoothing_time = getTimeFullSteer(diff) / 2.0f;

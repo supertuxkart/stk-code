@@ -82,7 +82,7 @@ protected:
     virtual bool canSkid(float steer_fraction) = 0;
 
 public:
-             AIBaseController(AbstractKart *kart);
+             AIBaseController(Kart *kart);
     virtual ~AIBaseController() {};
     virtual void reset() OVERRIDE;
     virtual bool disableSlipstreamBonus() const OVERRIDE;
@@ -90,7 +90,7 @@ public:
     static  void enableDebug() {m_ai_debug = true; }
     static  void setTestAI(int n) {m_test_ai = n; }
     static  int  getTestAI() { return m_test_ai; }
-    virtual void crashed(const AbstractKart *k) OVERRIDE {};
+    virtual void crashed(const Kart *k) OVERRIDE {};
     virtual void handleZipper(bool play_sound) OVERRIDE {};
     virtual void finishedRace(float time) OVERRIDE {};
     virtual void setPosition(int p) OVERRIDE {};

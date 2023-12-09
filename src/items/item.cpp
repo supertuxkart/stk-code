@@ -26,7 +26,7 @@
 #include "graphics/sp/sp_mesh_node.hpp"
 #include "guiengine/engine.hpp"
 #include "items/item_manager.hpp"
-#include "karts/abstract_kart.hpp"
+#include "karts/kart.hpp"
 #include "modes/world.hpp"
 #include "network/network_string.hpp"
 #include "network/rewind_manager.hpp"
@@ -52,7 +52,7 @@ const float SPARK_SPEED_H = 1.0f;
  *         indicates an item that's part of the track.
  *  \param id Index of this item in the array of all items.
  */
-ItemState::ItemState(ItemType type, const AbstractKart *owner, int id)
+ItemState::ItemState(ItemType type, const Kart *owner, int id)
 {
     setType(type);
     m_item_id = id;
@@ -136,7 +136,7 @@ void ItemState::update(int ticks)
 /** Called when the item is collected.
  *  \param kart The kart that collected the item.
  */
-void ItemState::collected(const AbstractKart *kart)
+void ItemState::collected(const Kart *kart)
 {
     if (m_type == ITEM_EASTER_EGG)
     {
@@ -224,7 +224,7 @@ void ItemState::saveCompleteState(BareNetworkString* buffer) const
  */
 Item::Item(ItemType type, const Vec3& xyz, const Vec3& normal,
            scene::IMesh* mesh, scene::IMesh* lowres_mesh,
-           const std::string& icon, const AbstractKart *owner)
+           const std::string& icon, const Kart *owner)
     : ItemState(type, owner)
 {
     m_icon_node = NULL;
@@ -579,7 +579,7 @@ void Item::updateGraphics(float dt)
  *  \param xyz Location of kart (avoiding to use kart->getXYZ() so that
  *         kart.hpp does not need to be included here).
  */
-bool Item::hitKart(const Vec3 &xyz, const AbstractKart *kart) const
+bool Item::hitKart(const Vec3 &xyz, const Kart *kart) const
 {
     if (getPreviousOwner() == kart && getDeactivatedTicks() > 0)
         return false;

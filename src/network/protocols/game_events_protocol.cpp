@@ -1,6 +1,6 @@
 #include "network/protocols/game_events_protocol.hpp"
 
-#include "karts/abstract_kart.hpp"
+#include "karts/kart.hpp"
 #include "karts/controller/player_controller.hpp"
 #include "modes/capture_the_flag.hpp"
 #include "modes/linear_world.hpp"
@@ -125,7 +125,7 @@ bool GameEventsProtocol::notifyEvent(Event* event)
         {
             uint8_t kart_id = data.getUInt8();
             uint8_t boost_level = data.getUInt8();
-            AbstractKart* k = World::getWorld()->getKart(kart_id);
+            Kart* k = World::getWorld()->getKart(kart_id);
             if (boost_level == 0)
             {
                 PlayerController* pc =
@@ -158,7 +158,7 @@ bool GameEventsProtocol::notifyEvent(Event* event)
  *  \param kart The kart that finished the race.
  *  \param time The time at which the kart finished.
  */
-void GameEventsProtocol::kartFinishedRace(AbstractKart *kart, float time)
+void GameEventsProtocol::kartFinishedRace(Kart *kart, float time)
 {
     NetworkString *ns = getNetworkString(20);
     ns->setSynchronous(true);

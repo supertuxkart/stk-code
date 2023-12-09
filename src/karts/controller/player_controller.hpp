@@ -21,7 +21,7 @@
 
 #include "karts/controller/controller.hpp"
 
-class AbstractKart;
+class Kart;
 class Player;
 
 class PlayerController : public Controller
@@ -38,7 +38,7 @@ protected:
     virtual void  steer(int steer_val);
 
 public:
-                 PlayerController(AbstractKart *kart);
+                 PlayerController(Kart *kart);
     virtual     ~PlayerController  ();
     virtual void update            (int ticks) OVERRIDE;
     virtual bool action            (PlayerAction action, int value,
@@ -64,9 +64,9 @@ public:
     {
     }   // setPosition
     // ------------------------------------------------------------------------
-    virtual void crashed(const AbstractKart *k) OVERRIDE
+    virtual void crashed(const Kart *k) OVERRIDE
     {
-    }   // crashed(AbstractKart)
+    }   // crashed(Kart)
     // ------------------------------------------------------------------------
     virtual void crashed(const Material *m) OVERRIDE
     {

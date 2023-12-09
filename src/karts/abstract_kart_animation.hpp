@@ -29,7 +29,7 @@
 #include <limits>
 #include <string>
 
-class AbstractKart;
+class Kart;
 class BareNetworkString;
 
 enum KartAnimationType : uint8_t
@@ -64,7 +64,7 @@ private:
 
 protected:
    /** A pointer to the kart which is animated by this class. */
-    AbstractKart *m_kart;
+    Kart *m_kart;
 
     /** Time in ticks for the animation which ends in world count up ticks. */
     int m_end_ticks;
@@ -86,7 +86,7 @@ protected:
     float getMaximumHeight(const Vec3& up_vector, float height_remove);
 
 public:
-                 AbstractKartAnimation(AbstractKart* kart,
+                 AbstractKartAnimation(Kart* kart,
                                        const std::string &name);
     virtual     ~AbstractKartAnimation();
     virtual void update(int ticks);

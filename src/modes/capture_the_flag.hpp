@@ -91,7 +91,7 @@ public:
     // ------------------------------------------------------------------------
     virtual bool kartHit(int kart_id, int hitter = -1) OVERRIDE;
     // ------------------------------------------------------------------------
-    virtual unsigned int getRescuePositionIndex(AbstractKart *kart) OVERRIDE;
+    virtual unsigned int getRescuePositionIndex(Kart *kart) OVERRIDE;
     // ------------------------------------------------------------------------
     virtual const std::string& getIdent() const OVERRIDE;
     // ------------------------------------------------------------------------

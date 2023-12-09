@@ -43,7 +43,7 @@ using namespace irr;
 #include "io/file_manager.hpp"
 #include "items/powerup_manager.hpp"
 #include "items/projectile_manager.hpp"
-#include "karts/abstract_kart.hpp"
+#include "karts/kart.hpp"
 #include "karts/controller/controller.hpp"
 #include "karts/controller/spare_tire_ai.hpp"
 #include "karts/kart_properties.hpp"
@@ -371,7 +371,7 @@ void RaceGUI::renderPlayerView(const Camera *camera, float dt)
     const core::recti &viewport = camera->getViewport();
 
     core::vector2df scaling = camera->getScaling();
-    const AbstractKart *kart = camera->getKart();
+    const Kart *kart = camera->getKart();
     if(!kart) return;
 
     bool isSpectatorCam = Camera::getActiveCamera()->isSpectatorMode();
@@ -627,7 +627,7 @@ void RaceGUI::drawGlobalMiniMap()
         draw2DImage(m_blue_flag, bp, bs, NULL, NULL, true);
     }
 
-    AbstractKart* target_kart = NULL;
+    Kart* target_kart = NULL;
     Camera* cam = Camera::getActiveCamera();
     auto cl = LobbyProtocol::get<ClientLobby>();
     bool is_nw_spectate = cl && cl->isSpectator();
@@ -639,7 +639,7 @@ void RaceGUI::drawGlobalMiniMap()
     // are drawn above them
     World::KartList karts = world->getKarts();
     std::partition(karts.begin(), karts.end(), [target_kart, is_nw_spectate]
-        (const std::shared_ptr<AbstractKart>& k)->bool
+        (const std::shared_ptr<Kart>& k)->bool
     {
         if (is_nw_spectate)
             return k.get() != target_kart;
@@ -649,7 +649,7 @@ void RaceGUI::drawGlobalMiniMap()
 
     for (unsigned int i = 0; i < karts.size(); i++)
     {
-        const AbstractKart *kart = karts[i].get();
+        const Kart *kart = karts[i].get();
         const SpareTireAI* sta =
             dynamic_cast<const SpareTireAI*>(kart->getController());
 
@@ -775,7 +775,7 @@ void RaceGUI::drawGlobalMiniMap()
  *  \param kart Kart to display the data for.
  *  \param scaling Scaling applied (in case of split screen)
  */
-void RaceGUI::drawEnergyMeter(int x, int y, const AbstractKart *kart,
+void RaceGUI::drawEnergyMeter(int x, int y, const Kart *kart,
                               const core::recti &viewport,
                               const core::vector2df &scaling)
 {
@@ -979,7 +979,7 @@ void RaceGUI::drawEnergyMeter(int x, int y, const AbstractKart *kart,
  *  \param meter_height Height of the meter (inside which the rank is shown).
  *  \param dt Time step size.
  */
-void RaceGUI::drawRank(const AbstractKart *kart,
+void RaceGUI::drawRank(const Kart *kart,
                       const core::vector2df &offset,
                       float min_ratio, int meter_width,
                       int meter_height, float dt)
@@ -1066,7 +1066,7 @@ void RaceGUI::drawRank(const AbstractKart *kart,
  *  \param scaling Which scaling to apply to the speedometer.
  *  \param dt Time step size.
  */
-void RaceGUI::drawSpeedEnergyRank(const AbstractKart* kart,
+void RaceGUI::drawSpeedEnergyRank(const Kart* kart,
                                  const core::recti &viewport,
                                  const core::vector2df &scaling,
                                  float dt)
@@ -1310,7 +1310,7 @@ unsigned int RaceGUI::computeVerticesForMeter(core::vector2df position[], float 
 /** Displays the lap of the kart.
  *  \param info Info object c
 */
-void RaceGUI::drawLap(const AbstractKart* kart,
+void RaceGUI::drawLap(const Kart* kart,
                       const core::recti &viewport,
                       const core::vector2df &scaling)
 {

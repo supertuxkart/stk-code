@@ -25,7 +25,7 @@
 #include <vector>
 #include <string>
 
-class AbstractKart;
+class Kart;
 class ParticleEmitter;
 class ParticleKind;
 class Vec3;
@@ -85,7 +85,7 @@ private:
     std::vector<ParticleEmitter*> m_all_emitters;
 
     /** Pointer to the owner of this kart. */
-    const AbstractKart *m_kart;
+    const Kart *m_kart;
 
     /** Used to alternate particle effects from the rear wheels. */
     int         m_wheel_toggle;
@@ -113,7 +113,7 @@ private:
     void resizeBox(const KartGFXType type, float new_size);
 
 public:
-         KartGFX(const AbstractKart *kart, bool is_day);
+         KartGFX(const Kart *kart, bool is_day);
         ~KartGFX();
     void reset();
     void setSkidLevel(const unsigned int level);

@@ -32,7 +32,7 @@
 #include "items/item_manager.hpp"
 #include "items/projectile_manager.hpp"
 #include "items/swatter.hpp"
-#include "karts/abstract_kart.hpp"
+#include "karts/kart.hpp"
 #include "karts/controller/controller.hpp"
 #include "karts/explosion_animation.hpp"
 #include "karts/kart_properties.hpp"
@@ -48,7 +48,7 @@
 
 /** Initialises the attachment each kart has.
  */
-Attachment::Attachment(AbstractKart* kart)
+Attachment::Attachment(Kart* kart)
 {
     m_type                 = ATTACH_NOTHING;
     m_ticks_left           = 0;
@@ -114,7 +114,7 @@ Attachment::~Attachment()
  *         previous owner exists.
  */
 void Attachment::set(AttachmentType type, int ticks,
-                     AbstractKart *current_kart,
+                     Kart *current_kart,
                      bool set_by_rewind_parachute)
 {
     bool was_bomb = m_type == ATTACH_BOMB;
@@ -397,7 +397,7 @@ void Attachment::hitBanana(ItemState *item_state)
  *  the attachment for both karts.
  *  \param other Pointer to the other kart hit.
  */
-void Attachment::handleCollisionWithKart(AbstractKart *other)
+void Attachment::handleCollisionWithKart(Kart *other)
 {
     Attachment *attachment_other=other->getAttachment();
 

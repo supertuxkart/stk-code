@@ -36,7 +36,7 @@
 #include "input/sdl_controller.hpp"
 #include "input/wiimote_manager.hpp"
 #include "karts/controller/controller.hpp"
-#include "karts/abstract_kart.hpp"
+#include "karts/kart.hpp"
 #include "modes/demo_world.hpp"
 #include "modes/world.hpp"
 #include "network/network_config.hpp"
@@ -804,7 +804,7 @@ void InputManager::dispatchInput(Input::InputType type, int deviceID,
             }
 
             // Find the corresponding PlayerKart from our ActivePlayer instance
-            AbstractKart* pk = player->getKart();
+            Kart* pk = player->getKart();
 
             if (pk == NULL)
             {

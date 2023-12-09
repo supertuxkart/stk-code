@@ -89,7 +89,7 @@ private:
     int m_start_time;
     int m_total_hit;
 
-    std::vector<AbstractKart*> m_spare_tire_karts;
+    std::vector<Kart*> m_spare_tire_karts;
     int m_next_sta_spawn_ticks;
 
 public:
@@ -127,7 +127,7 @@ public:
     // ------------------------------------------------------------------------
     virtual void update(int ticks) OVERRIDE;
     // ------------------------------------------------------------------------
-    virtual void kartAdded(AbstractKart* kart, scene::ISceneNode* node)
+    virtual void kartAdded(Kart* kart, scene::ISceneNode* node)
                                                                       OVERRIDE;
     // ------------------------------------------------------------------------
     virtual void enterRaceOverState() OVERRIDE;

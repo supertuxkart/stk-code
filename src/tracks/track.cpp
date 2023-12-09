@@ -55,7 +55,7 @@
 #include "items/item_manager.hpp"
 #include "items/network_item_manager.hpp"
 #include "items/powerup_manager.hpp"
-#include "karts/abstract_kart.hpp"
+#include "karts/kart.hpp"
 #include "karts/kart_properties.hpp"
 #include "main_loop.hpp"
 #include "modes/linear_world.hpp"
@@ -2869,7 +2869,7 @@ bool Track::isOnGround(const Vec3& xyz, const Vec3& down, Vec3* hit_point,
  *  \return True of the kart is on terrain.
  */
 
-bool Track::findGround(AbstractKart *kart)
+bool Track::findGround(Kart *kart)
 {
     const Vec3 &xyz = kart->getXYZ();
     Vec3 down = kart->getTrans().getBasis() * Vec3(0, -10000.0f, 0);

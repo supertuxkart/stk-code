@@ -133,7 +133,7 @@ protected:
     std::vector<KartInfo> m_kart_info;
 
     virtual void  checkForWrongDirection(unsigned int i, float dt);
-    virtual float estimateFinishTimeForKart(AbstractKart* kart) OVERRIDE;
+    virtual float estimateFinishTimeForKart(Kart* kart) OVERRIDE;
 
 public:
                   LinearWorld();
@@ -160,7 +160,7 @@ public:
                   std::vector<RaceGUIBase::KartIconDisplayInfo> *info) OVERRIDE;
 
     virtual unsigned int getNumberOfRescuePositions() const OVERRIDE;
-    virtual unsigned int getRescuePositionIndex(AbstractKart *kart) OVERRIDE;
+    virtual unsigned int getRescuePositionIndex(Kart *kart) OVERRIDE;
     virtual btTransform getRescueTransform(unsigned int index) const OVERRIDE;
     virtual void  reset(bool restart=false) OVERRIDE;
     virtual void  newLap(unsigned int kart_index) OVERRIDE;
