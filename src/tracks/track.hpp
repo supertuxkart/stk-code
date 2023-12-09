@@ -476,9 +476,6 @@ public:
     core::stringw      getSortName() const;
     bool               isInGroup(const std::string &group_name);
     const core::vector3df& getSunRotation();
-    /** Sets the current ambient color for a kart with index k. */
-    void               setAmbientColor(const video::SColor &color,
-                                       unsigned int k);
     void               handleExplosion(const Vec3 &pos,
                                        const PhysicalObject *mp,
                                        bool secondary_hits=true) const;

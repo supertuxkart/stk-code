@@ -96,7 +96,6 @@ public:
     std::string        getRawName()     const { return m_name; }
     std::string        getRawDescription() const { return m_description; }
     bool               isSecret()       const { return m_is_secret; }
-    int                allTrackStatus(std::string type);
 
     // This function should not be called if copy already has children
     void copyGoalTree(goalTree &copy, goalTree &model, bool set_values_to_zero);

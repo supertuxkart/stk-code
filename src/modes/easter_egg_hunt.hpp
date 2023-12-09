@@ -72,7 +72,6 @@ public:
     const int  numberOfEggsFound() { return m_eggs_found; }
     const int  numberOfEggsToFind() { return m_number_of_eggs; }
 
-    void updateKartRanks();
     void readData(const std::string &filename);
 
     virtual void checkForWrongDirection(unsigned int i, float dt) OVERRIDE;

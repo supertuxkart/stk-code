@@ -157,7 +157,6 @@ public:
     virtual void reset(bool restart);
     virtual void updateTime(int ticks);
     virtual void update(int ticks);
-    void         startReadySetGo();
     virtual void pause(Phase phase);
     virtual void unpause();
     virtual void enterRaceOverState();

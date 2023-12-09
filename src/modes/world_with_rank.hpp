@@ -59,8 +59,6 @@ protected:
     bool              m_position_setting_initialised;
 #endif
 
-    unsigned int getClosestStartPoint(Kart *kart);
-
     /** Stores the current graph node and track coordinates for each kart. */
     std::vector<TrackSector*> m_kart_track_sector;
 

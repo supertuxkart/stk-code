@@ -180,7 +180,6 @@ public:
     void               updateSuspension(btScalar deltaTime);
     virtual void       updateFriction(btScalar timeStep);
     void               setSliding(bool active);
-    void               instantSpeedIncreaseTo(btScalar speed);
     void               adjustSpeed(btScalar min_speed, btScalar max_speed);
     void               updateAllWheelPositions();
     void               getVisualContactPoint(const btTransform& chassis_trans,

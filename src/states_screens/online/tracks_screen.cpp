@@ -785,7 +785,8 @@ void TracksScreen::setResult(uint32_t winner_host,
     if (!m_timer || winner_host == std::numeric_limits<uint32_t>::max() ||
         !m_vote_list)
         return;
-    if (m_timer) m_timer->setVisible(false);
+
+    m_timer->setVisible(false);
 
     m_winning_index = winner_host;
     if (auto lp = LobbyProtocol::get<LobbyProtocol>())

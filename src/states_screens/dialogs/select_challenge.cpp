@@ -276,11 +276,6 @@ GUIEngine::EventPropagation SelectChallengeDialog::processEvent(const std::strin
 
             ModalDialog::dismiss();
 
-            core::rect<s32> pos(15,
-                                10,
-                                15 + UserConfigParams::m_width/2,
-                                10 + GUIEngine::getTitleFontHeight());
-
             RaceManager::get()->exitRace();
             //StateManager::get()->resetActivePlayers();
 

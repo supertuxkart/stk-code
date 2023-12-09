@@ -324,8 +324,6 @@ public:
     void            scheduleExitRace() { m_schedule_exit_race = true; }
     void            scheduleTutorial();
     void            updateWorld(int ticks);
-    void            handleExplosion(const Vec3 &xyz, Kart *kart_hit,
-                                    PhysicalObject *object);
     Kart*   getPlayerKart(unsigned int player) const;
     Kart*   getLocalPlayerKart(unsigned int n) const;
     virtual const btTransform &getStartTransform(int index);

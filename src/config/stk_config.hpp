@@ -294,8 +294,6 @@ public:
     void init_defaults();
     void getAllData(const XMLNode * root);
     void load(const std::string &filename);
-    const std::string &getMainMenuPicture(int n);
-    const std::string &getBackgroundPicture(int n);
     void initMusicFiles();
     void  getAllScores(std::vector<int> *all_scores, int num_karts);
     // ------------------------------------------------------------------------

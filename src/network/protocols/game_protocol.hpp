@@ -76,7 +76,6 @@ private:
 
     void handleControllerAction(Event *event);
     void handleState(Event *event);
-    void handleAdjustTime(Event *event);
     void handleItemEventConfirmation(Event *event);
     static std::weak_ptr<GameProtocol> m_game_protocol[PT_COUNT];
     NetworkItemManager* m_network_item_manager;

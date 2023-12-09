@@ -148,8 +148,6 @@ private:
     int                   m_screen_orientation;
     std::vector<VideoMode> m_modes;
 
-    void                  setupViewports();
-
     /** Whether the mouse cursor is currently shown */
     bool                  m_pointer_shown;
 
@@ -209,7 +207,6 @@ public:
     void getOpenGLData(std::string *vendor, std::string *renderer,
                        std::string *version);
 
-    void increaseObjectCount();
     core::array<video::IRenderTarget> &getMainSetup();
     void updateConfigIfRelevant();
     core::recti getSplitscreenWindow(int WindowNum);
@@ -517,9 +514,6 @@ public:
 #endif
     void onLoadWorld();
     void onUnloadWorld();
-
-    void updateSplitAndLightcoordRangeFromComputeShaders(size_t width,
-                                                         size_t height);
 
     void uploadLightingData();
     void sameRestart()             { m_resolution_changing = RES_CHANGE_SAME; }

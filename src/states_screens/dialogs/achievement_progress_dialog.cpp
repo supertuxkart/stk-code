@@ -82,8 +82,7 @@ void AchievementProgressDialog::recursiveFillTable(AchievementInfo::goalTree &pr
 {
     if (progress.children.size() != 1)
     {
-        int goal = -1; // Will be filled with goals or progress
-        int target = -1;
+        int goal, target; // Will be filled with goals or progress
 
         if (progress.type == "AND" ||
             progress.type == "AND-AT-ONCE" || 

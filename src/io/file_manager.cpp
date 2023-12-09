@@ -883,7 +883,6 @@ bool FileManager::searchTextureContainerId(std::string& container_id,
             return true;
         }
     }
-    full_path = "";
     return false;
 }   // findFile
 

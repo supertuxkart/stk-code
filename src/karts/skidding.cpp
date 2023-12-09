@@ -84,7 +84,6 @@ void Skidding::reset()
     m_smoothing_dt = -1.0f;
     m_skid_bonus_end_ticks = -1;
 
-    btVector3 rot(0, 0, 0);
     // Only access the vehicle if the kart is not a ghost
     if (!m_kart->isGhostKart())
         m_kart->getVehicle()->setTimedRotation(0, 0);
@@ -528,7 +527,7 @@ void Skidding::update(int ticks, bool is_on_ground,
             unsigned int level = getSkidBonus(&bonus_time, &bonus_speed,
                                               &bonus_force);
 
-            if (level >= 1 && !(level == 0 && m_remaining_jump_time <= 0.0f))
+            if (level >= 1)
             {
                 m_skid_bonus_ready = true;
             }

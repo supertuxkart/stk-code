@@ -337,7 +337,6 @@ private:
     double getModeFactor();
     double getModeSpread();
     double getTimeSpread(double time);
-    double getUncertaintySpread(uint32_t online_id);
     double scalingValueForTime(double time);
     double computeH2HResult(double player1_time, double player2_time);
     double computeDataAccuracy(double player1_rd, double player2_rd,
