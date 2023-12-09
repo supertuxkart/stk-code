@@ -364,9 +364,9 @@ void RaceManager::computeRandomKartList()
 
     if (m_ai_kart_override != "")
     {
-        for (unsigned int n = 0; n < m_ai_kart_list.size(); n++)
+        for (unsigned int i = 0; i < m_ai_kart_list.size(); i++)
         {
-            m_ai_kart_list[n] = m_ai_kart_override;
+            m_ai_kart_list[i] = m_ai_kart_override;
         }
     }
 

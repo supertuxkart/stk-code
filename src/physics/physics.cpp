@@ -254,7 +254,7 @@ void Physics::update(int ticks)
                 lib_id = library->getID();
             lib_id_ptr = &lib_id;
 
-            if (!is_child && scripting_function.size() > 0)
+            if (!is_child && !scripting_function.empty())
             {
                 Scripting::ScriptEngine* script_engine = Scripting::ScriptEngine::getInstance();
                 script_engine->runFunction(true, "void " + scripting_function + "(int, const string, const string)",
@@ -347,7 +347,7 @@ void Physics::update(int ticks)
             PhysicalObject* obj = p->getUserPointer(1)->getPointerPhysicalObject();
             std::string obj_id = obj->getID();
             std::string scripting_function = obj->getOnItemCollisionFunction();
-            if (!is_child && scripting_function.size() > 0)
+            if (!is_child && !scripting_function.empty())
             {
                 Scripting::ScriptEngine* script_engine = Scripting::ScriptEngine::getInstance();
                 script_engine->runFunction(true, "void " + scripting_function + "(int, int, const string)",

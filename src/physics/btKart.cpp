@@ -215,12 +215,6 @@ void btKart::updateAllWheelTransformsWS()
 {
     updateAllWheelPositions();
 
-    const btTransform& chassisTrans = getChassisWorldTransform();
-
-    btVector3 forwardW(chassisTrans.getBasis()[0][m_indexForwardAxis],
-                       chassisTrans.getBasis()[1][m_indexForwardAxis],
-                       chassisTrans.getBasis()[2][m_indexForwardAxis]);
-
     // Simulate suspension
     // -------------------
 
@@ -567,7 +561,7 @@ float btKart::getCollisionLean() const
     if (lean_factor > 0.5f)
         lean_factor = 1.0f - lean_factor;
 
-    if (m_leaning_right == false)
+    if (!m_leaning_right)
         lean_factor = -lean_factor;
 
     return 0.35f*m_leaning_factor*lean_factor;

@@ -455,14 +455,10 @@ void Skidding::update(int ticks, bool is_on_ground,
             // Some karts might use a graphical-only jump. Set it up:
             m_remaining_jump_time = kp->getSkidGraphicalJumpTime();
             // Don't re-update for local player controller when rewinding
-            if (m_graphical_remaining_jump_time == 0.0f)
-            {
-                if (RewindManager::get()->isRewinding() &&
-                    !m_kart->getController()->isLocalPlayerController())
+            if (m_graphical_remaining_jump_time == 0.0f &&
+                (!RewindManager::get()->isRewinding() ||
+                 !m_kart->getController()->isLocalPlayerController()))
                     m_graphical_remaining_jump_time = m_remaining_jump_time;
-                else if (!RewindManager::get()->isRewinding())
-                    m_graphical_remaining_jump_time = m_remaining_jump_time;
-            }
 
 #ifdef SKID_DEBUG
 #define SPEED 20.0f

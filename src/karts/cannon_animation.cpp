@@ -25,7 +25,6 @@
 #include "karts/kart.hpp"
 #include "karts/kart_model.hpp"
 #include "karts/kart_properties.hpp"
-#include "modes/world.hpp"
 #include "network/network_string.hpp"
 #include "tracks/check_cannon.hpp"
 #include "tracks/check_manager.hpp"
