@@ -101,8 +101,8 @@ private:
     ShowCurve *m_actual_curve;
 #endif
 
-    unsigned int getSkidBonus(float *bonus_time, float *bonus_speed,
-                              float *bonus_force) const;
+    unsigned int getSkidBonus(float *bonus_time, float *fade_out_time,
+                              float *bonus_speed, float *bonus_force) const;
     float updateSteering(float steer, int ticks);
 public:
          Skidding(Kart *kart);

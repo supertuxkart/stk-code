@@ -1390,6 +1390,12 @@ std::vector<float> KartProperties::getSkidBonusTime() const
 }  // getSkidBonusTime
 
 // ----------------------------------------------------------------------------
+std::vector<float> KartProperties::getSkidFadeOutTime() const
+{
+    return m_cached_characteristic->getSkidFadeOutTime();
+}  // getSkidFadeOutTime
+
+// ----------------------------------------------------------------------------
 std::vector<float> KartProperties::getSkidBonusForce() const
 {
     return m_cached_characteristic->getSkidBonusForce();

@@ -518,6 +518,7 @@ public:
     std::vector<float> getSkidTimeTillBonus() const;
     std::vector<float> getSkidBonusSpeed() const;
     std::vector<float> getSkidBonusTime() const;
+    std::vector<float> getSkidFadeOutTime() const;
     std::vector<float> getSkidBonusForce() const;
     float getSkidPhysicalJumpTime() const;
     float getSkidGraphicalJumpTime() const;

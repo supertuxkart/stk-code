@@ -629,6 +629,8 @@ void XmlCharacteristic::load(const XMLNode *node)
             &m_values[SKID_BONUS_SPEED]);
         sub_node->get("bonus-time",
             &m_values[SKID_BONUS_TIME]);
+        sub_node->get("fade-out-time",
+            &m_values[SKID_FADE_OUT_TIME]);
         sub_node->get("bonus-force",
             &m_values[SKID_BONUS_FORCE]);
         sub_node->get("physical-jump-time",

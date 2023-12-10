@@ -266,8 +266,8 @@ float Skidding::updateGraphics(float dt)
     m_kart->getKartGFX()->setCreationRateAbsolute(KartGFX::KGFX_SKIDR, 0);
     m_kart->getKartGFX()->updateSkidLight(0);
 
-    float bonus_time, bonus_speed, bonus_force;
-    unsigned int level = getSkidBonus(&bonus_time, &bonus_speed, &bonus_force);
+    float bonus_time, fade_out_time, bonus_speed, bonus_force;
+    unsigned int level = getSkidBonus(&bonus_time, &fade_out_time, &bonus_speed, &bonus_force);
 
     if (m_skid_bonus_end_ticks > World::getWorld()->getTicksSinceStart())
     {
@@ -519,9 +519,9 @@ void Skidding::update(int ticks, bool is_on_ground,
                 m_kart->getMaxSteerAngle(m_kart->getSpeed()));
 #endif
             m_skid_time += ticks;
-            float bonus_time, bonus_speed, bonus_force;
-            unsigned int level = getSkidBonus(&bonus_time, &bonus_speed,
-                                              &bonus_force);
+            float bonus_time, fade_out_time, bonus_speed, bonus_force;
+            unsigned int level = getSkidBonus(&bonus_time, &fade_out_time,
+                                              &bonus_speed, &bonus_force);
 
             if (level >= 1)
             {
@@ -553,7 +553,7 @@ void Skidding::update(int ticks, bool is_on_ground,
                                bonus_speed, bonus_speed/2,
                                bonus_force,
                                stk_config->time2Ticks(bonus_time),
-                               /*fade-out-time*/ stk_config->time2Ticks(1.0f));
+                               stk_config->time2Ticks(fade_out_time));
 
                     m_skid_bonus_end_ticks = World::getWorld()->getTicksSinceStart() +
                         stk_config->time2Ticks(1.0f);
@@ -595,27 +595,31 @@ void Skidding::update(int ticks, bool is_on_ground,
 /** Determines the bonus time and speed given the currently accumulated
  *  m_skid_time.
  *  \param bonus_time On return contains how long the bonus should be active.
+ *  \param fade_out_time
  *  \param bonus_speed How much additional speed the kart should get.
  *  \param bonus_force Additional engine force.
  *  \return The bonus level: 0 = no bonus, 1 = first entry in bonus array etc.
  */
 unsigned int Skidding::getSkidBonus(float *bonus_time,
+                                    float *fade_out_time,
                                     float *bonus_speed,
                                     float *bonus_force) const
 {
     const KartProperties *kp = m_kart->getKartProperties();
 
-    *bonus_time  = 0;
-    *bonus_speed = 0;
-    *bonus_force = 0;
+    *bonus_time    = 0;
+    *fade_out_time = 0;
+    *bonus_speed   = 0;
+    *bonus_force   = 0;
     for (unsigned int i = 0; i < kp->getSkidBonusSpeed().size(); i++)
     {
         if (stk_config->ticks2Time(m_skid_time) <=
             kp->getSkidTimeTillBonus()[i])
             return i;
-        *bonus_speed = kp->getSkidBonusSpeed()[i];
-        *bonus_time  = kp->getSkidBonusTime()[i];
-        *bonus_force = kp->getSkidBonusForce()[i];
+        *bonus_speed   = kp->getSkidBonusSpeed()[i];
+        *fade_out_time = kp->getSkidFadeOutTime()[i];
+        *bonus_time    = kp->getSkidBonusTime()[i];
+        *bonus_force   = kp->getSkidBonusForce()[i];
     }
     return (unsigned int) kp->getSkidBonusSpeed().size();
-}   // getSkidBonusForce
+}   // getSkidBonus

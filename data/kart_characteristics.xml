@@ -149,6 +149,8 @@
             time-till-bonus: How long a kart needs to skid in order to get a bonus.
             bonus-speed: A speedup applied to the kart whick skidded for a while.
             bonus-time: How long the bonus-force is applied.
+            fade-out-time: How long will the max-speed bonus take to fade out.
+                The additional engine force is not active during fade-out.
             bonus-force: Additional engine force (this is used to offset the fact
                 that turning after skidding (e.g. to correct direction) often uses
                 up the skid bonus).
@@ -169,7 +171,7 @@
               visual="1.25" visual-time="0.7" revert-visual-time="0.7"
               min-speed="10"  time-till-bonus="1.0 2.7 4.0"
               bonus-speed="4.0 6.0 8.0" bonus-time="3.0 4.3 5.7"
-              bonus-force="300 400 600"
+              fade-out-time="1.0 1.0 1.0" bonus-force="300 400 600"
               physical-jump-time="0" graphical-jump-time="0.4"
               post-skid-rotate-factor="1"
               reduce-turn-min="0.2" reduce-turn-max="0.8" enabled="true" />

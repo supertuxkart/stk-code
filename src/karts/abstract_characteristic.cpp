@@ -275,6 +275,8 @@ AbstractCharacteristic::ValueType AbstractCharacteristic::getType(
         return TYPE_FLOAT_VECTOR;
     case SKID_BONUS_TIME:
         return TYPE_FLOAT_VECTOR;
+    case SKID_FADE_OUT_TIME:
+        return TYPE_FLOAT_VECTOR;
     case SKID_BONUS_FORCE:
         return TYPE_FLOAT_VECTOR;
     case SKID_PHYSICAL_JUMP_TIME:
@@ -529,6 +531,8 @@ std::string AbstractCharacteristic::getName(CharacteristicType type)
         return "SKID_BONUS_SPEED";
     case SKID_BONUS_TIME:
         return "SKID_BONUS_TIME";
+    case SKID_FADE_OUT_TIME:
+        return "SKID_FADE_OUT_TIME";
     case SKID_BONUS_FORCE:
         return "SKID_BONUS_FORCE";
     case SKID_PHYSICAL_JUMP_TIME:
@@ -1874,6 +1878,18 @@ std::vector<float> AbstractCharacteristic::getSkidBonusTime() const
                     getName(SKID_BONUS_TIME).c_str());
     return result;
 }  // getSkidBonusTime
+
+// ----------------------------------------------------------------------------
+std::vector<float> AbstractCharacteristic::getSkidFadeOutTime() const
+{
+    std::vector<float> result;
+    bool is_set = false;
+    process(SKID_FADE_OUT_TIME, &result, &is_set);
+    if (!is_set)
+        Log::fatal("AbstractCharacteristic", "Can't get characteristic %s",
+                    getName(SKID_FADE_OUT_TIME).c_str());
+    return result;
+}  // getSkidFadeOutTime
 
 // ----------------------------------------------------------------------------
 std::vector<float> AbstractCharacteristic::getSkidBonusForce() const
