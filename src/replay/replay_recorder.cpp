@@ -496,6 +496,7 @@ int ReplayRecorder::enumToCode (Attachment::AttachmentType type)
         (type == Attachment::ATTACH_BOMB)             ? 3 :
         (type == Attachment::ATTACH_SWATTER)          ? 4 :
         (type == Attachment::ATTACH_BUBBLEGUM_SHIELD) ? 5 :
+        (type == Attachment::ATTACH_ELECTRO_SHIELD)   ? 6 :
                                                        -1 ;
 
     return code;
@@ -507,16 +508,20 @@ int ReplayRecorder::enumToCode (Attachment::AttachmentType type)
 int ReplayRecorder::enumToCode (PowerupManager::PowerupType type)
 {
     int code =
-        (type == PowerupManager::POWERUP_NOTHING)    ? 0 :
-        (type == PowerupManager::POWERUP_BUBBLEGUM)  ? 1 :
-        (type == PowerupManager::POWERUP_CAKE)       ? 2 :
-        (type == PowerupManager::POWERUP_BOWLING)    ? 3 :
-        (type == PowerupManager::POWERUP_ZIPPER)     ? 4 :
-        (type == PowerupManager::POWERUP_PLUNGER)    ? 5 :
-        (type == PowerupManager::POWERUP_SWITCH)     ? 6 :
-        (type == PowerupManager::POWERUP_SWATTER)    ? 7 :
-        (type == PowerupManager::POWERUP_RUBBERBALL) ? 8 :
-        (type == PowerupManager::POWERUP_PARACHUTE)  ? 9 :
+        (type == PowerupManager::POWERUP_NOTHING)    ?  0 :
+        (type == PowerupManager::POWERUP_BUBBLEGUM)  ?  1 :
+        (type == PowerupManager::POWERUP_CAKE)       ?  2 :
+        (type == PowerupManager::POWERUP_BOWLING)    ?  3 :
+        (type == PowerupManager::POWERUP_ZIPPER)     ?  4 :
+        (type == PowerupManager::POWERUP_PLUNGER)    ?  5 :
+        (type == PowerupManager::POWERUP_SWITCH)     ?  6 :
+        (type == PowerupManager::POWERUP_SWATTER)    ?  7 :
+        (type == PowerupManager::POWERUP_RUBBERBALL) ?  8 :
+        (type == PowerupManager::POWERUP_PARACHUTE)  ?  9 :
+        (type == PowerupManager::POWERUP_SUDO)       ? 10 :
+        (type == PowerupManager::POWERUP_ELECTRO)    ? 11 :
+        (type == PowerupManager::POWERUP_MINI)       ? 12 :
+        (type == PowerupManager::POWERUP_ANVIL)      ? 13 :
                                                       -1 ;
 
     return code;
@@ -532,6 +537,7 @@ Attachment::AttachmentType ReplayRecorder::codeToEnumAttach (int code)
         (code == 3) ? Attachment::ATTACH_BOMB             :
         (code == 4) ? Attachment::ATTACH_SWATTER          :
         (code == 5) ? Attachment::ATTACH_BUBBLEGUM_SHIELD :
+        (code == 6) ? Attachment::ATTACH_ELECTRO_SHIELD   :
                       Attachment::ATTACH_NOTHING ;
 
     return type;
@@ -541,16 +547,20 @@ Attachment::AttachmentType ReplayRecorder::codeToEnumAttach (int code)
 PowerupManager::PowerupType ReplayRecorder::codeToEnumItem (int code)
 {
     PowerupManager::PowerupType type =
-        (code == 0) ? PowerupManager::POWERUP_NOTHING    :
-        (code == 1) ? PowerupManager::POWERUP_BUBBLEGUM  :
-        (code == 2) ? PowerupManager::POWERUP_CAKE       :
-        (code == 3) ? PowerupManager::POWERUP_BOWLING    :
-        (code == 4) ? PowerupManager::POWERUP_ZIPPER     :
-        (code == 5) ? PowerupManager::POWERUP_PLUNGER    :
-        (code == 6) ? PowerupManager::POWERUP_SWITCH     :
-        (code == 7) ? PowerupManager::POWERUP_SWATTER    :
-        (code == 8) ? PowerupManager::POWERUP_RUBBERBALL :
-        (code == 9) ? PowerupManager::POWERUP_PARACHUTE  :
+        (code ==  0) ? PowerupManager::POWERUP_NOTHING    :
+        (code ==  1) ? PowerupManager::POWERUP_BUBBLEGUM  :
+        (code ==  2) ? PowerupManager::POWERUP_CAKE       :
+        (code ==  3) ? PowerupManager::POWERUP_BOWLING    :
+        (code ==  4) ? PowerupManager::POWERUP_ZIPPER     :
+        (code ==  5) ? PowerupManager::POWERUP_PLUNGER    :
+        (code ==  6) ? PowerupManager::POWERUP_SWITCH     :
+        (code ==  7) ? PowerupManager::POWERUP_SWATTER    :
+        (code ==  8) ? PowerupManager::POWERUP_RUBBERBALL :
+        (code ==  9) ? PowerupManager::POWERUP_PARACHUTE  :
+        (code == 10) ? PowerupManager::POWERUP_SUDO       :
+        (code == 11) ? PowerupManager::POWERUP_ELECTRO    :
+        (code == 12) ? PowerupManager::POWERUP_MINI       :
+        (code == 13) ? PowerupManager::POWERUP_ANVIL      :
                       PowerupManager::POWERUP_NOTHING ;
 
     return type;
