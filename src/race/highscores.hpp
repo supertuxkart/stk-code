@@ -70,8 +70,7 @@ private:
 
     static SortOrder m_sort_order;
 
-    int findHighscorePosition(const std::string& kart_name, 
-                              const core::stringw& name, const float time);
+    int findHighscorePosition(const float time);
 
 public:
     bool operator < (const Highscores& hi) const;

@@ -234,7 +234,6 @@ void GhostKart::update(int ticks)
         m_is_jumping = false;
         getKartModel()->setAnimation(KartModel::AF_DEFAULT);
     }
-
 }   // update
 
 // ----------------------------------------------------------------------------

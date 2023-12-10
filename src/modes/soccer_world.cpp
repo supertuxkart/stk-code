@@ -860,16 +860,10 @@ int SoccerWorld::getBallNode() const
 bool SoccerWorld::isCorrectGoal(unsigned int kart_id, bool first_goal) const
 {
     KartTeam team = getKartTeam(kart_id);
-    if (first_goal)
-    {
-        if (team == KART_TEAM_RED)
-            return true;
-    }
-    else if (!first_goal)
-    {
-        if (team == KART_TEAM_BLUE)
-            return true;
-    }
+    if (( first_goal && team == KART_TEAM_RED ) ||
+        (!first_goal && team == KART_TEAM_BLUE))
+        return true;
+
     return false;
 }   // isCorrectGoal
 

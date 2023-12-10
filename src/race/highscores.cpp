@@ -211,8 +211,7 @@ int Highscores::matches(int num_karts,
             m_gp_minor_mode   == minor_mode         );
 }
 
-int Highscores::findHighscorePosition(const std::string& kart_name, 
-                              const core::stringw& name, const float time)
+int Highscores::findHighscorePosition(const float time)
 {
     int position=-1;
     for(int i=0; i<HIGHSCORE_LEN; i++)
@@ -249,7 +248,7 @@ int Highscores::findHighscorePosition(const std::string& kart_name,
 int Highscores::addData(const std::string& kart_name,
                         const core::stringw& name, const float time)
 {
-    int position = findHighscorePosition(kart_name, name, time);
+    int position = findHighscorePosition(time);
     if(position>=0)
     {
         m_track               = RaceManager::get()->getTrackName();
@@ -271,7 +270,7 @@ int Highscores::addData(const std::string& kart_name,
 int Highscores::addGPData(const std::string& kart_name,
                           const core::stringw& name, std::string track_name, const float time)
 {
-    int position = findHighscorePosition(kart_name, name, time);
+    int position = findHighscorePosition(time);
     if(position>=0)
     {
         m_track               = track_name;

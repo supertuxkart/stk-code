@@ -1084,10 +1084,8 @@ void Kart::finishedRace(float time, bool from_server)
     // it would trigger a race end again.
     if (m_finished_race) return;
 
-    const bool is_linear_race =
-        RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_NORMAL_RACE ||
-        RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_TIME_TRIAL  ||
-        RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_FOLLOW_LEADER;
+    const bool is_linear_race = RaceManager::get()->isLinearRaceMode();
+
     if (NetworkConfig::get()->isNetworking() && !from_server)
     {
         if (NetworkConfig::get()->isServer())
@@ -1210,27 +1208,23 @@ void Kart::setRaceResult()
         RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_TIME_TRIAL  ||
         RaceManager::get()->isLapTrialMode())
     {
+        bool standard_result_animation = true;
         if (m_controller->isLocalPlayerController()) // if player is on this computer
         {
-            PlayerProfile *player = PlayerManager::getCurrentPlayer();
-            const ChallengeStatus *challenge = player->getCurrentChallengeStatus();
+            const ChallengeStatus *challenge = PlayerManager::getCurrentPlayer()->getCurrentChallengeStatus();
             // In case of a GP challenge don't make the end animation depend
             // on if the challenge is fulfilled
             if (challenge && !challenge->getData()->isGrandPrix())
             {
+                standard_result_animation = false;
                 if (challenge->getData()->isChallengeFulfilled())
                     m_race_result = true;
                 else
                     m_race_result = false;
             }
-            else if (this->getPosition() <= 0.5f *
-                World::getWorld()->getCurrentNumKarts() ||
-                this->getPosition() == 1)
-                m_race_result = true;
-            else
-                m_race_result = false;
         }
-        else
+        // Display a happy animation if in the first half, sad otherwise
+        if (standard_result_animation)
         {
             if (this->getPosition() <= 0.5f *
                 World::getWorld()->getCurrentNumKarts() ||
@@ -1240,7 +1234,7 @@ void Kart::setRaceResult()
                 m_race_result = false;
         }
     }
-    else if (RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_FOLLOW_LEADER ||
+    else if (RaceManager::get()->isFollowMode() ||
              RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_3_STRIKES)
     {
         // the kart wins if it isn't eliminated
@@ -1261,7 +1255,7 @@ void Kart::setRaceResult()
         SoccerWorld* sw = dynamic_cast<SoccerWorld*>(World::getWorld());
         m_race_result = sw->getKartSoccerResult(this->getWorldKartId());
     }
-    else if (RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_EASTER_EGG)
+    else if (RaceManager::get()->isEggHuntMode())
     {
         // Easter egg mode only has one player, so always win
         m_race_result = true;
@@ -2609,22 +2603,23 @@ void Kart::setStolenNitro(float amount, float duration)
 void Kart::updateNitro(int ticks)
 {
     if (m_stolen_nitro_ticks > 0)
-        m_stolen_nitro_ticks -= ticks;
-    if (m_nitro_hack_ticks > 0)
-        m_nitro_hack_ticks -= ticks;
-
-    // Reset the stolen nitro amount when the display duration expires
-    if (m_stolen_nitro_ticks <= 0)
     {
-        m_stolen_nitro_ticks = 0;
-        m_stolen_nitro_amount = 0.0f;
+        // Decrement ticks and, if now negative, reset relevant variables
+        if ((m_stolen_nitro_ticks -= ticks) <= 0)
+        {
+            m_stolen_nitro_ticks = 0;
+            m_stolen_nitro_amount = 0.0f;            
+        }
     }
 
-    // Reset the nitro multiplier when the nitro-hack expires
-    if (m_nitro_hack_ticks <= 0)
+    if (m_nitro_hack_ticks > 0)
     {
-        m_nitro_hack_ticks = 0;
-        m_nitro_hack_factor = 1.0f;
+        // Decrement ticks and, if now negative, reset relevant variables
+        if ((m_nitro_hack_ticks -= ticks) <= 0)
+        {
+            m_nitro_hack_ticks = 0;
+            m_nitro_hack_factor = 1.0f;           
+        }
     }
 
     if (m_collected_energy <= 0)
