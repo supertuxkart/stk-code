@@ -56,6 +56,7 @@ MaxSpeed::MaxSpeed(Kart *kart)
     m_add_engine_force  = 0;
     // This can be used if command line option -N is used
     m_current_max_speed = 0;
+    m_last_triggered_skid_level = 0;
 }   // MaxSpeed
 
 // ----------------------------------------------------------------------------
@@ -67,6 +68,7 @@ void MaxSpeed::reset()
 {
     m_current_max_speed = m_kart->getKartProperties()->getEngineMaxSpeed();
     m_min_speed         = -1.0f;
+    m_last_triggered_skid_level = 0;
 
     for(unsigned int i=MS_DECREASE_MIN; i<MS_DECREASE_MAX; i++)
     {
@@ -105,6 +107,13 @@ void MaxSpeed::increaseMaxSpeed(unsigned int category, float add_speed,
             add_speed, engine_force);
         return;
     }
+
+    if (category == MS_INCREASE_SKIDDING)
+        m_last_triggered_skid_level = 1;
+    else if (category == MS_INCREASE_RED_SKIDDING)
+        m_last_triggered_skid_level = 2;
+    else if (category == MS_INCREASE_PURPLE_SKIDDING)
+        m_last_triggered_skid_level = 3;
 
     int add_speed_i = (int)(add_speed * 1000.0f);
     if (add_speed_i > 65535)

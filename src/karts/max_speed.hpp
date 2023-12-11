@@ -67,6 +67,10 @@ private:
     /** If >0 then the minimum speed a kart should have (used for zippers). */
     float m_min_speed;
 
+    /** Used for display of skid particles after triggering a skid bonus.
+    *  0 is no bonus, 1 is first-stage bonus, etc. */
+    uint8_t m_last_triggered_skid_level;
+
     // ------------------------------------------------------------------------
     /** An internal class to store and handle speed increase related data. */
     class SpeedIncrease
@@ -217,6 +221,8 @@ public:
     // ------------------------------------------------------------------------
     /** Returns the current maximum speed for this kart. */
     float getCurrentMaxSpeed() const { return m_current_max_speed; }
+    // --------------------------------------------------------------------
+    unsigned int getLatestSkidLevel() const { return m_last_triggered_skid_level; }
     // ------------------------------------------------------------------------
     /** Returns the additional engine force. */
     float getCurrentAdditionalEngineForce() const { return m_add_engine_force;}
