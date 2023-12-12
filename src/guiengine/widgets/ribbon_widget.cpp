@@ -361,10 +361,13 @@ void RibbonWidget::add()
             // TODO Add support for BUTTON type when needed
             if (m_active_children[i].m_type == WTYPE_ICON_BUTTON)
             {
+                int icon_size = std::min(tab_contents_rect.getHeight(), tab_contents_rect.getWidth()/2);
+                const int y = tab_contents_rect.getHeight()/2 - icon_size/2;
+
                 rect<s32> icon_part = rect<s32>(tab_contents_rect.UpperLeftCorner.X,
-                                                tab_contents_rect.UpperLeftCorner.Y,
-                                                tab_contents_rect.UpperLeftCorner.X + tab_contents_rect.getHeight(),
-                                                tab_contents_rect.UpperLeftCorner.Y + tab_contents_rect.getHeight());
+                                                tab_contents_rect.UpperLeftCorner.Y + y,
+                                                tab_contents_rect.UpperLeftCorner.X + icon_size,
+                                                tab_contents_rect.UpperLeftCorner.Y + y + icon_size);
 
                 // label at the *right* of the icon (for tabs)
                 rect<s32> label_part = rect<s32>(icon_part.LowerRightCorner.X+5,
