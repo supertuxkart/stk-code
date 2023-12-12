@@ -338,7 +338,8 @@ void KartSelectionScreen::beforeAddingWidget()
     DynamicRibbonWidget* w = getWidget<DynamicRibbonWidget>("karts");
     assert( w != NULL );
 
-    w->setItemCountHint( kart_properties_manager->getNumberOfKarts() );
+    // Avoid too many items shown at the same time
+    w->setItemCountHint(std::min((int)kart_properties_manager->getNumberOfKarts(), 20));
 }   // beforeAddingWidget
 
 // ----------------------------------------------------------------------------

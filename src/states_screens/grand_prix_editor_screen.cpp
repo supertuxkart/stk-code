@@ -193,7 +193,9 @@ void GrandPrixEditorScreen::loadTrackList (const std::string& gpname)
     const std::vector<std::string> tracks = gp->getTrackNames(true);
 
     tracks_widget->clearItems();
-    tracks_widget->setItemCountHint((int)tracks.size());
+
+    // Avoid too many items shown at the same time
+    tracks_widget->setItemCountHint(std::min((int)tracks.size(), 15));
     for (unsigned int t = 0; t < tracks.size(); t++)
     {
         Track* curr = track_manager->getTrack(tracks[t]);

@@ -11,7 +11,7 @@
         <!-- Track selection -->
         <box proportion="3" width="100%" layout="vertical-row">
             <ribbon_grid id="tracks" proportion="1" width="100%" square_items="true"
-                label_location="each" align="center" max_rows="3" child_width="160"
+                label_location="each" align="center" child_width="160"
                 child_height="120"/>
         </box>
 

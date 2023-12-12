@@ -1176,7 +1176,8 @@ void Skin::drawRatingBar(Widget *w, const core::recti &rect,
 
         core::recti source_area = core::recti(0, 0, texture_w, texture_h);
 
-        float scale = (float)irr_driver->getActualScreenSize().Height / 1080.0f;
+        float scale = (float)std::min(irr_driver->getActualScreenSize().Height / 1080.0f, 
+                                    irr_driver->getActualScreenSize().Width / 1350.0f);
         int size = (int)((90.0f + grow) * scale);
         const core::recti rect2(glow_center_x - size,
                                 glow_center_y - size / 2,
@@ -1495,7 +1496,8 @@ void Skin::drawRibbonChild(const core::recti &rect, Widget* widget,
 
                 core::recti source_area(0, 0, texture_w, texture_h);
 
-                float scale = (float)irr_driver->getActualScreenSize().Height / 1080.0f;
+                float scale = (float)std::min(irr_driver->getActualScreenSize().Height / 1080.0f, 
+                                            irr_driver->getActualScreenSize().Width / 1350.0f);
                 int size = (int)((90.0f + grow) * scale);
                 const core::recti rect2(glow_center_x - size,
                                         glow_center_y - size / 2,
@@ -1871,7 +1873,8 @@ void Skin::drawIconButton(const core::recti &rect, Widget* widget,
 
         core::recti source_area = core::recti(0, 0, texture_w, texture_h);
 
-        float scale = (float)irr_driver->getActualScreenSize().Height / 1080.0f;
+        float scale = (float)std::min(irr_driver->getActualScreenSize().Height / 1080.0f, 
+                                    irr_driver->getActualScreenSize().Width / 1350.0f);
         int size = (int)((90.0f + grow) * scale);
         const core::recti rect2(glow_center_x - size,
                                 glow_center_y - size / 2,

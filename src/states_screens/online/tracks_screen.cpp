@@ -374,7 +374,9 @@ void TracksScreen::beforeAddingWidget()
     } // for n<group_amount
 
     DynamicRibbonWidget* tracks_widget = getWidget<DynamicRibbonWidget>("tracks");
-    tracks_widget->setItemCountHint( (int)track_manager->getNumberOfTracks()+1 );
+
+    // Avoid too many items shown at the same time
+    tracks_widget->setItemCountHint(std::min((int)track_manager->getNumberOfTracks() + 1, 15));
 
 }   // beforeAddingWidget
 

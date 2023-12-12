@@ -2,11 +2,10 @@
 <stkgui>
     <icon-button id="back" x="1%" y="0" height="9%" icon="gui/icons/back.png"/>
 
-    <div x="1%" y="1%" width="98%" height="98%" layout="vertical-row" >
-        <header width="8%" I18N="In the track and grand prix selection screen" text="Grand Prix"
+    <div x="1%" y="0" width="98%" height="98%" layout="vertical-row" >
+        <header height="9%" I18N="In the track and grand prix selection screen" text="Grand Prix"
                 align="center" text_align="center" />
-        <spacer width="100%" height="1%" />
-        
+
         <div width="100%" proportion="3" layout="horizontal-row" >
             <box width="80%" height="100%" layout="vertical-row" padding="0">
                 <scrollable_toolbar id="gps" x="1%" y="1%" width="98%" height="98%" align="center" label_location="each"
@@ -20,16 +19,19 @@
             </box>
         </div>
 
-        <spacer width="100%" height="1%"/>
-        <div width="100%" proportion="1" layout="horizontal-row" >
+        <spacer width="100%" height="1%" />
+
+        <div width="100%" height="fit" layout="horizontal-row" >
             <header width="30%" I18N="In the track and grand prix selection screen" text="All Tracks"
                     align="center" text_align="center" />
             <textbox width="60%" id="search"/>
         </div>
 
+        <spacer width="100%" height="1%" />
+
         <box proportion="8" width="100%" layout="vertical-row" padding="1">
             <ribbon_grid id="tracks" proportion="1" width="100%" square_items="true"
-                label_location="bottom" align="center" max_rows="3"
+                label_location="bottom" align="center"
                 child_width="160" child_height="120" />
             <spacer width="20" height="5%" />
         </box>
@@ -37,6 +39,6 @@
         <!-- Populated dynamically at runtime -->
         <tabs width="100%" height="1f" id="trackgroups"> </tabs>
 
-        <spacer width="100%" height="2%" />
+        
     </div>
 </stkgui>

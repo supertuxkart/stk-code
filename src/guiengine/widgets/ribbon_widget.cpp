@@ -145,7 +145,7 @@ void RibbonWidget::add()
     }
 
     //int biggest_y = 0;
-    const int button_y = 10;
+    const int button_y = GUIEngine::getFontHeight() / 5;
 
     const int one_button_width = (subbuttons_amount == 0 ? m_w :
         int(roundf((float)m_w / (float)subbuttons_amount)));
@@ -443,7 +443,7 @@ void RibbonWidget::add()
 
             const int needed_space_under_button = has_label
                                                 ? GUIEngine::getFontHeight()
-                                                : 10;
+                                                : GUIEngine::getFontHeight() / 5;
 
             float imageRatio =
                 (float)m_active_children[i].m_w / (float)m_active_children[i].m_h;
