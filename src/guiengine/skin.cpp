@@ -2918,7 +2918,15 @@ u32 Skin::getIcon (EGUI_DEFAULT_ICON icon) const
 
 s32 Skin::getSize (EGUI_DEFAULT_SIZE texture_size) const
 {
-    return m_fallback_skin->getSize(texture_size);
+    switch(texture_size)
+    {
+        // TODO : make this depend on the text-size parameter and/or skin
+        // and perhaps rename it
+        case EGDS_TEXT_DISTANCE_X:
+            return 10;
+        default:
+            return m_fallback_skin->getSize(texture_size);
+    }
 }
 
 // -----------------------------------------------------------------------------

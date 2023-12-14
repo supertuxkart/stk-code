@@ -338,12 +338,12 @@ to specify all types of ttf.
 <color type="tips_background" state="neutral" a="120" r="0" g="0" b="0" />
 
 <!-- Text field color -->
-<color type="text_field" state="background" a="255" r="35" g="35" b="35" />
+<color type="text_field" state="background" a="255" r="50" g="50" b="50" />
 <color type="text_field" state="background_focused" a="255" r="15" g="15" b="15" />
-<color type="text_field" state="background_deactivated" a="255" r="90" g="90" b="90" />
+<color type="text_field" state="background_deactivated" a="255" r="120" g="120" b="120" />
 <color type="text_field" state="background_marked" a="128" r="220" g="220" b="220" />
-<color type="text_field" state="neutral" a="255" r="35" g="35" b="35" />
-<color type="text_field" state="focused" a="255" r="15" g="15" b="15" />
+<color type="text_field" state="neutral" a="255" r="20" g="20" b="20" />
+<color type="text_field" state="focused" a="255" r="235" g="235" b="235" />
 <color type="text_field" state="deactivated" a="255" r="90" g="90" b="90" />
 
 <!-- Rating star image -->

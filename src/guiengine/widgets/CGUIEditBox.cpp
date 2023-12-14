@@ -1017,7 +1017,7 @@ void CGUIEditBox::draw()
         core::rect< s32 > caret_rect = CurrentTextRect;
         caret_rect.UpperLeftCorner.X += m_cursor_distance - 1;
         caret_rect.LowerRightCorner.X = caret_rect.UpperLeftCorner.X + 2;
-        GL32_draw2DRectangle(video::SColor(255, 0, 0, 0), caret_rect);
+        GL32_draw2DRectangle(skin->getColor(EGDC_BUTTON_TEXT), caret_rect);
     }
 
     // Return the override color information to its previous settings.
