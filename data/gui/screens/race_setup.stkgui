@@ -27,7 +27,7 @@
         <box width="100%" proportion="4" padding="10" layout="vertical-row">
             <spacer height="5%" width="25" />
             <ribbon_grid id="gamemode" height="60%" width="95%" label_location="bottom" align="center"
-                                child_width="256" child_height="256" />
+                                child_width="192" child_height="192" />
             <spacer proportion="1" width="25" />
         </box>
     </div>
