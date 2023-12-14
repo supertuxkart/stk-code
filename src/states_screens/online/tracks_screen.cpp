@@ -448,7 +448,7 @@ void TracksScreen::init()
             m_track_icons->addTextureAsSprite(tex);
         }
 
-        int icon_height = getHeight() / 13;
+        int icon_height = GUIEngine::getFontHeight() * 2.0f;
         m_track_icons->setScale(icon_height / 256.0f);
         m_track_icons->setTargetIconSize(256, 256);
         m_vote_list->setIcons(m_track_icons, (int)icon_height);
@@ -703,6 +703,17 @@ void TracksScreen::voteForPlayer()
     }
     STKHost::get()->sendToServer(&vote, true);
 }   // voteForPlayer
+
+// -----------------------------------------------------------------------------
+void TracksScreen::onResize()
+{
+    int icon_height = GUIEngine::getFontHeight() * 2.0f;
+    m_track_icons->setScale(icon_height / 256.0f);
+    m_track_icons->setTargetIconSize(256, 256);
+    m_vote_list->setIcons(m_track_icons, (int)icon_height);
+
+    Screen::onResize();
+}   // onResize
 
 // -----------------------------------------------------------------------------
 void TracksScreen::onUpdate(float dt)

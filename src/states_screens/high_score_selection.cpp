@@ -89,6 +89,8 @@ void HighScoreSelection::refresh(bool forced_update, bool update_columns)
     {
         m_high_scores_list_widget->clearColumns();
         beforeAddingWidget(); //Reload the columns used
+        m_high_scores_list_widget->createHeader();
+        m_high_scores_list_widget->resize();
     }
 }   // refresh
 
@@ -156,8 +158,6 @@ void HighScoreSelection::beforeAddingWidget()
 
     if (m_active_mode == RaceManager::MINOR_MODE_LAP_TRIAL)
         m_high_scores_list_widget->addColumn(_("Time limit"),4);
-
-    m_high_scores_list_widget->createHeader();
 }   // beforeAddingWidget
 
 // ----------------------------------------------------------------------------
@@ -345,6 +345,20 @@ void HighScoreSelection::eventCallback(GUIEngine::Widget* widget,
         refresh(/*keep high score list*/ false, /* update columns */ true);
     }
 }   // eventCallback
+
+// ----------------------------------------------------------------------------
+void HighScoreSelection::onResize()
+{
+    int icon_height = GUIEngine::getFontHeight();
+    int row_height = GUIEngine::getFontHeight() * 5 / 4;
+
+    // 128 is the height of the image file
+    m_icon_bank->setScale(icon_height/128.0f);
+    m_icon_bank->setTargetIconSize(128, 128);
+    m_high_scores_list_widget->setIcons(m_icon_bank, (int)row_height);
+
+    Screen::onResize();
+}
 
 // ----------------------------------------------------------------------------
 void HighScoreSelection::onDeleteHighscores()

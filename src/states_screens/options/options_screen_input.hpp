@@ -74,6 +74,9 @@ public:
                              int value);
 
     /** \brief implement callback from parent class GUIEngine::Screen */
+    virtual void onResize();
+
+    /** \brief implement callback from parent class GUIEngine::Screen */
     virtual void onUpdate(float dt);
 };
 

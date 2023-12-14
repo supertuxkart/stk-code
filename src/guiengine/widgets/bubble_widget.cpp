@@ -18,6 +18,7 @@
 #include "guiengine/engine.hpp"
 #include "guiengine/widgets/bubble_widget.hpp"
 #include "online/link_helper.hpp"
+#include "states_screens/state_manager.hpp"
 #include <algorithm>
 
 #include <IGUIStaticText.h>
@@ -43,13 +44,13 @@ BubbleWidget::BubbleWidget() : Widget(WTYPE_BUBBLE)
 
 void BubbleWidget::add()
 {
-    m_shrinked_size = rect<s32>(m_x, m_y, m_x + m_w - BUBBLE_MARGIN_ON_RIGHT, m_y + m_h);
+    // Meaningless size. Will be resized later.
+    rect<s32> init_rect = rect<s32>(0, 0, 1, 1); 
+
     stringw message = getText();
 
-    m_shrinked_size.LowerRightCorner.Y -= BOTTOM_MARGIN;
-
     IGUIStaticText* irrwidget;
-    irrwidget = GUIEngine::getGUIEnv()->addStaticText(message.c_str(), m_shrinked_size,
+    irrwidget = GUIEngine::getGUIEnv()->addStaticText(message.c_str(), init_rect,
                                                       false, true /* word wrap */, m_parent,
                                                       (m_focusable ? getNewID() : getNewNoFocusID()));
     irrwidget->setTextRestrainedInside(false);
@@ -72,6 +73,8 @@ void BubbleWidget::add()
     m_element->setTabStop(true);
 
     m_element->setNotClipped(true);
+
+    resize();
 }
 
 void BubbleWidget::replaceText()
@@ -114,6 +117,15 @@ void BubbleWidget::replaceText()
     irrwidget->setTextAlignment( align, valign );
 }
 
+void BubbleWidget::resize()
+{
+    m_shrinked_size = rect<s32>(m_x, m_y, m_x + m_w - BUBBLE_MARGIN_ON_RIGHT, m_y + m_h - BOTTOM_MARGIN);
+
+    m_element->setRelativePosition(m_shrinked_size);
+
+    replaceText();
+}
+
 void BubbleWidget::setText(const irr::core::stringw &s)
 {
     Widget::setText(s);
@@ -124,8 +136,24 @@ void BubbleWidget::setText(const irr::core::stringw &s)
     }
 }
 
-void BubbleWidget::updateSize()
+void BubbleWidget::update(float dt)
 {
+    if (isFocusedForPlayer(PLAYER_ID_GAME_MASTER))
+    {
+        if (m_zoom < 1.0f)
+        {
+            m_zoom += dt * 10.0f;
+            if (m_zoom > 1.0f) m_zoom = 1.0f;
+        }
+    }
+    else
+    {
+        if (m_zoom > 0.0f)
+        {
+            m_zoom -= dt * 10.0f;
+            if (m_zoom < 0.0f) m_zoom = 0.0f;
+        }
+    }
     core::rect<s32> currsize = m_shrinked_size;
 
     const int y1_top    = m_shrinked_size.UpperLeftCorner.Y;

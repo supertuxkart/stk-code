@@ -33,7 +33,6 @@
 
 #include <IGUIElement.h>
 #include <IGUIEnvironment.h>
-#include <IGUIButton.h>
 #include <ITexture.h>
 
 using namespace GUIEngine;
@@ -69,6 +68,7 @@ RibbonWidget::RibbonWidget(const RibbonType type) : Widget(WTYPE_RIBBON)
 RibbonWidget::~RibbonWidget()
 {
     m_active_children.clearWithoutDeleting();
+    m_button_background.clearWithoutDeleting();
 }   // ~RibbonWidget
 
 // ----------------------------------------------------------------------------
@@ -80,15 +80,15 @@ void RibbonWidget::add()
     assert(m_w > 0.0f);
     assert(m_h > 0.0f);
 
-
     m_labels.clearWithoutDeleting();
+    m_button_background.clearWithoutDeleting();
 
-    rect<s32> widget_size = rect<s32>(m_x, m_y, m_x + m_w, m_y + m_h);
+    // Meaningless size. Will be resized later.
+    rect<s32> init_rect = rect<s32>(0, 0, 1, 1);
 
     int id = (m_reserved_id == -1 ? getNewID() : m_reserved_id);
 
-    IGUIButton * btn = GUIEngine::getGUIEnv()->addButton(widget_size,
-                                                         m_parent, id, L"");
+    IGUIButton* btn = GUIEngine::getGUIEnv()->addButton(init_rect, m_parent, id, L"");
     m_element = btn;
 
     m_active_children.clearWithoutDeleting(); // Is just a copy of m_children without the deactivated children. m_children takes care of memory.
@@ -101,20 +101,8 @@ void RibbonWidget::add()
     }
     const int subbuttons_amount = m_active_children.size();
 
-    // For some ribbon types, we can have unequal sizes depending on whether
-    // items have labels or not
-    int with_label = 0;
-    int without_label = 0;
-
-    // ---- check how much space each child button will take and fit
-    // them within available space
-    int total_needed_space = 0;
     for (int i=0; i<subbuttons_amount; i++)
     {
-        // FIXME: why do I manually invoke the Layout Manager here?
-        LayoutManager::readCoords(m_active_children.get(i));
-        LayoutManager::applyCoords(m_active_children.get(i), NULL, this);
-
         if (m_active_children[i].m_type != WTYPE_ICON_BUTTON &&
             m_active_children[i].m_type != WTYPE_BUTTON)
         {
@@ -130,7 +118,121 @@ void RibbonWidget::add()
             IconButtonWidget* icon = ((IconButtonWidget*)m_active_children.get(i));
             icon->m_tab_stop = false;
         }
+    }
 
+    // ---- add children
+    // TODO : the content of the ifs is way too large, separate functions would be better.
+    //        Several pre-loop variables are used inside the ifs,
+    //        so care must be taken to not break things
+    for (int i=0; i<subbuttons_amount; i++)
+    {
+        // ---- tab ribbons
+        if (getRibbonType() == RIBBON_TABS || getRibbonType() == RIBBON_VERTICAL_TABS)
+        {
+            stringw& message = m_active_children[i].m_text;
+
+            IGUIButton * tab = NULL;
+
+            rect<s32> tab_rect_abs;
+
+            if (m_active_children[i].m_type == WTYPE_ICON_BUTTON || m_active_children[i].m_type == WTYPE_BUTTON)
+            {
+                // use the same ID for all subcomponents; since event handling
+                // is done per-ID, no matter which one your hover, this
+                // widget will get it
+                int same_id = getNewNoFocusID();
+                tab = GUIEngine::getGUIEnv()->addButton(tab_rect_abs, btn,
+                                                           same_id, L"", L"");
+
+                if (m_active_children[i].m_type == WTYPE_ICON_BUTTON)
+                {
+                    IGUIButton* icon =
+                        GUIEngine::getGUIEnv()->addButton(init_rect, tab,
+                                                          same_id, L"");
+                    icon->setScaleImage(true);
+                    std::string filename = GUIEngine::getSkin()->getThemedIcon(
+                                         m_active_children[i].m_properties[PROP_ICON]);
+                    icon->setImage( irr_driver->getTexture(filename.c_str()) );
+                    icon->setUseAlphaChannel(true);
+                    icon->setDrawBorder(false);
+                    icon->setTabStop(false);
+
+                    m_active_children[i].m_element = icon;
+                }
+                else
+                {
+                    m_active_children[i].m_element = tab;
+                }
+
+                IGUIStaticText* label =
+                    GUIEngine::getGUIEnv()->addStaticText(message.c_str(),
+                                                          init_rect,
+                                                          false /* border */,
+                                                          true /* word wrap */,
+                                                          tab, same_id);
+
+                label->setTextAlignment(EGUIA_CENTER, EGUIA_CENTER);
+                label->setTabStop(false);
+                label->setNotClipped(true);
+                m_labels.push_back(label);
+
+                tab->setTabStop(false);
+                tab->setTabGroup(false);
+            }
+            else
+            {
+                Log::error("RibbonWidget", "Invalid tab bar contents");
+            }
+
+            m_button_background.push_back(tab);
+        }
+        else if (m_active_children[i].m_type == WTYPE_ICON_BUTTON)
+        {
+            m_active_children.get(i)->m_parent = btn;
+            m_active_children.get(i)->add();
+        }
+        else
+        {
+            Log::warn("RibbonWidget", "Invalid contents type in ribbon");
+        }
+
+        //m_children[i].id = tab->getID();
+        m_active_children[i].m_event_handler = this;
+    }// next sub-button
+
+    id = m_element->getID();
+    m_element->setTabOrder(id);
+    m_element->setTabGroup(false);
+    updateSelection();
+
+    if (!m_is_visible)
+        setVisible(false);
+    
+    resize();
+} // add
+
+// ----------------------------------------------------------------------------
+
+void RibbonWidget::resize()
+{
+    rect<s32> widget_size = rect<s32>(m_x, m_y, m_x + m_w, m_y + m_h);
+
+    m_element->setRelativePosition(widget_size);
+
+    const int subbuttons_amount = m_active_children.size();
+
+    // For some ribbon types, we can have unequal sizes depending on whether
+    // items have labels or not
+    int with_label = 0;
+    int without_label = 0;
+
+    // ---- check how much space each child button will take and fit
+    // them within available space
+    for (int i=0; i<subbuttons_amount; i++)
+    {
+        // FIXME: why do I manually invoke the Layout Manager here?
+        LayoutManager::readCoords(m_active_children.get(i));
+        LayoutManager::applyCoords(m_active_children.get(i), NULL, this);
 
         bool has_label_underneath = m_active_children[i].m_text.size() > 0;
         if (m_active_children[i].m_properties[PROP_LABELS_LOCATION].size() > 0)
@@ -140,8 +242,6 @@ void RibbonWidget::add()
 
         if (has_label_underneath) with_label++;
         else                      without_label++;
-
-        total_needed_space += m_active_children[i].m_w;
     }
 
     //int biggest_y = 0;
@@ -196,8 +296,6 @@ void RibbonWidget::add()
                 else widget_x += large_tab/2;
             }
 
-            IGUIButton * tab = NULL;
-
             rect<s32> tab_rect_abs;
 
             if (message.size() == 0)
@@ -241,6 +339,9 @@ void RibbonWidget::add()
 
             if (m_active_children[i].m_type == WTYPE_ICON_BUTTON || m_active_children[i].m_type == WTYPE_BUTTON)
             {
+                assert(m_labels[i]);
+                assert(m_button_background[i]);
+
                 rect<s32> icon_part = rect<s32>(tab_contents_rect.UpperLeftCorner.X,
                                                 tab_contents_rect.UpperLeftCorner.Y,
                                                 tab_contents_rect.UpperLeftCorner.X + tab_contents_rect.getHeight(),
@@ -261,61 +362,36 @@ void RibbonWidget::add()
                                                  tab_contents_rect.LowerRightCorner.X,
                                                  tab_contents_rect.LowerRightCorner.Y);
 
-                // label at the *right* of the icon (for tabs)
-                if (m_active_children[i].m_type == WTYPE_ICON_BUTTON)
-                    label_part.UpperLeftCorner.X += icon_part.getWidth() + 15;
-
-                // use the same ID for all subcomponents; since event handling
-                // is done per-ID, no matter which one your hover, this
-                // widget will get it
-                int same_id = getNewNoFocusID();
-                tab = GUIEngine::getGUIEnv()->addButton(tab_rect_abs, btn,
-                                                           same_id, L"", L"");
-
                 if (m_active_children[i].m_type == WTYPE_ICON_BUTTON)
                 {
-                    IGUIButton* icon =
-                        GUIEngine::getGUIEnv()->addButton(icon_part, tab,
-                                                          same_id, L"");
-                    icon->setScaleImage(true);
-                    std::string filename = GUIEngine::getSkin()->getThemedIcon(
-                                         m_active_children[i].m_properties[PROP_ICON]);
-                    icon->setImage( irr_driver->getTexture(filename.c_str()) );
-                    icon->setUseAlphaChannel(true);
-                    icon->setDrawBorder(false);
-                    icon->setTabStop(false);
+                    assert(m_active_children[i].m_element);
+
+                    label_part.UpperLeftCorner.X += icon_part.getWidth() + 15;
+                    m_active_children[i].m_element->setRelativePosition(icon_part);
                 }
 
-                IGUIStaticText* label =
-                    GUIEngine::getGUIEnv()->addStaticText(message.c_str(),
-                                                          label_part,
-                                                          false /* border */,
-                                                          true /* word wrap */,
-                                                          tab, same_id);
+                m_labels[i].setRelativePosition(label_part);
 
                 if ((int)GUIEngine::getFont()->getDimension(message.c_str())
-                                              .Width > label_part.getWidth()&&
+                                            .Width > label_part.getWidth()  &&
                     message.findFirst(L' ') == -1                           &&
                     message.findFirst(L'\u00AD') == -1                        )
                 {
                     // if message too long and contains no space and no soft
                     // hyphen, make the font smaller
-                    label->setOverrideFont(GUIEngine::getSmallFont());
+                    m_labels[i].setOverrideFont(GUIEngine::getSmallFont());
                 }
-                label->setTextAlignment(EGUIA_CENTER, EGUIA_CENTER);
-                label->setTabStop(false);
-                label->setNotClipped(true);
-                m_labels.push_back(label);
+                else
+                {
+                    m_labels[i].setOverrideFont(NULL);
+                }
 
-                tab->setTabStop(false);
-                tab->setTabGroup(false);
+                m_button_background[i].setRelativePosition(tab_rect_abs);
             }
             else
             {
                 Log::error("RibbonWidget", "Invalid tab bar contents");
             }
-
-            m_active_children[i].m_element = tab;
 
             if (message.size() == 0) widget_x += small_tab/2;
             else                     widget_x += large_tab/2;
@@ -338,8 +414,6 @@ void RibbonWidget::add()
             else
                 widget_y += one_button_height;
 
-            IGUIButton * tab = NULL;
-
             rect<s32> tab_rect_abs = rect<s32>(widget_x - (tab_width/2) - HORZ_MARGIN, widget_y + VERT_MARGIN,
                                                widget_x + (tab_width/2) + HORZ_MARGIN, widget_y + one_button_height - VERT_MARGIN);
 
@@ -361,6 +435,10 @@ void RibbonWidget::add()
             // TODO Add support for BUTTON type when needed
             if (m_active_children[i].m_type == WTYPE_ICON_BUTTON)
             {
+                assert(m_active_children[i].m_element);
+                assert(m_labels[i]);
+                assert(m_button_background[i]);
+
                 rect<s32> icon_part = rect<s32>(tab_contents_rect.UpperLeftCorner.X,
                                                 tab_contents_rect.UpperLeftCorner.Y,
                                                 tab_contents_rect.UpperLeftCorner.X + tab_contents_rect.getHeight(),
@@ -372,30 +450,11 @@ void RibbonWidget::add()
                                                  tab_contents_rect.LowerRightCorner.X,
                                                  tab_contents_rect.LowerRightCorner.Y);
 
-                // use the same ID for all subcomponents; since event handling
-                // is done per-ID, no matter which one your hover, this
-                // widget will get it
-                int same_id = getNewNoFocusID();
-                tab = GUIEngine::getGUIEnv()->addButton(tab_rect_abs, btn,
-                                                           same_id, L"", L"");
+                m_button_background[i].setRelativePosition(tab_rect_abs);
+                
+                m_active_children[i].m_element->setRelativePosition(icon_part);
 
-                IGUIButton* icon =
-                    GUIEngine::getGUIEnv()->addButton(icon_part, tab,
-                                                      same_id, L"");
-                icon->setScaleImage(true);
-                std::string filename = GUIEngine::getSkin()->getThemedIcon(
-                                     m_active_children[i].m_properties[PROP_ICON]);
-                icon->setImage( irr_driver->getTexture(filename.c_str()) );
-                icon->setUseAlphaChannel(true);
-                icon->setDrawBorder(false);
-                icon->setTabStop(false);
-
-                IGUIStaticText* label =
-                    GUIEngine::getGUIEnv()->addStaticText(message.c_str(),
-                                                          label_part,
-                                                          false /* border */,
-                                                          true /* word wrap */,
-                                                          tab, same_id);
+                m_labels[i].setRelativePosition(label_part);
 
                 if (((int)GUIEngine::getFont()->getDimension(message.c_str())
                                               .Width > label_part.getWidth() &&
@@ -408,22 +467,17 @@ void RibbonWidget::add()
                 {
                     // if message is too long and contains no space and no soft
                     // hyphen, or too tall, make the font smaller
-                    label->setOverrideFont(GUIEngine::getSmallFont());
+                    m_labels[i].setOverrideFont(GUIEngine::getSmallFont());
                 }
-                label->setTextAlignment(EGUIA_CENTER, EGUIA_CENTER);
-                label->setTabStop(false);
-                label->setNotClipped(true);
-                m_labels.push_back(label);
-
-                tab->setTabStop(false);
-                tab->setTabGroup(false);
+                else
+                {
+                    m_labels[i].setOverrideFont(NULL);
+                }
             }
             else
             {
                 Log::error("RibbonWidget", "Invalid tab bar contents");
             }
-
-            m_active_children[i].m_element = tab;
         } // vertical-tabs
 
 
@@ -471,34 +525,17 @@ void RibbonWidget::add()
                 zoom = zoom_x;
 
             // ---- add bitmap button part
-            // backup and restore position in case the same object is added
-            // multiple times (FIXME: unclean)
-            int old_x = m_active_children[i].m_x;
-            int old_y = m_active_children[i].m_y;
-            int old_w = m_active_children[i].m_w;
-            int old_h = m_active_children[i].m_h;
-
-            m_active_children[i].m_x = widget_x - int(image_w*zoom/2.0f);
-            m_active_children[i].m_y = button_y;
-            m_active_children[i].m_w = int(image_w*zoom);
-            m_active_children[i].m_h = int(image_h*zoom);
 
             IconButtonWidget* icon = ((IconButtonWidget*)m_active_children.get(i));
 
-            if (icon->m_properties[PROP_EXTEND_LABEL].size() == 0)
-            {
-                icon->m_properties[PROP_EXTEND_LABEL] =
-                    StringUtils::toString(one_button_width - icon->m_w);
-            }
+            icon->m_properties[PROP_EXTEND_LABEL] =
+                StringUtils::toString(icon->m_w <= one_button_width ? one_button_width - icon->m_w : 0);
+            
 
-            m_active_children.get(i)->m_parent = btn;
-            m_active_children.get(i)->add();
-
-            // restore backuped size and location (see above for more info)
-            m_active_children[i].m_x = old_x;
-            m_active_children[i].m_y = old_y;
-            m_active_children[i].m_w = old_w;
-            m_active_children[i].m_h = old_h;
+            icon->move(widget_x - int(image_w*zoom/2.0f),
+                       button_y,
+                       int(image_w*zoom),
+                       int(image_h*zoom));
 
             // the label itself will be added by the icon widget. since it
             // adds the label outside of the widget area it is assigned to,
@@ -511,19 +548,8 @@ void RibbonWidget::add()
             Log::warn("RibbonWidget", "Invalid contents type in ribbon");
         }
 
-
-        //m_children[i].id = tab->getID();
-        m_active_children[i].m_event_handler = this;
     }// next sub-button
-
-    id = m_element->getID();
-    m_element->setTabOrder(id);
-    m_element->setTabGroup(false);
-    updateSelection();
-
-    if (!m_is_visible)
-        setVisible(false);
-} // add
+}
 
 // ----------------------------------------------------------------------------
 

@@ -31,7 +31,6 @@
 #include "utils/string_utils.hpp"
 #include "utils/translation.hpp"
 
-#include <IGUIStaticText.h>
 #include <IGUIEnvironment.h>
 
 using namespace GUIEngine;
@@ -55,7 +54,7 @@ AddDeviceDialog::AddDeviceDialog() : ModalDialog(0.90f, 0.80f)
 #endif
 
     const int y_bottom = m_area.getHeight() - nbButtons*(buttonHeight + 10) - 10;
-    const int y_stride = buttonHeight+10;
+    const int y_stride = buttonHeight * 5 / 4;
     int cur_y = y_bottom;
 
     core::rect<s32> text_area( 15, 15, m_area.getWidth()-15, y_bottom-15 );
@@ -77,6 +76,8 @@ AddDeviceDialog::AddDeviceDialog() : ModalDialog(0.90f, 0.80f)
                                               m_irrlicht_window);
     b->setTabStop(false);
     b->setText(msg);
+
+    m_message = b;
 
 #ifdef ENABLE_WIIUSE
     {
@@ -141,6 +142,57 @@ AddDeviceDialog::AddDeviceDialog() : ModalDialog(0.90f, 0.80f)
     }
 
 }   // AddDeviceDialog
+
+// ----------------------------------------------------------------------------
+
+void AddDeviceDialog::onResize()
+{
+    ModalDialog::onResize();
+
+    ScalableFont* font = GUIEngine::getFont();
+    const int textHeight = GUIEngine::getFontHeight();
+    const int buttonHeight = textHeight * 5 / 4;
+
+    #ifdef ENABLE_WIIUSE
+        const int nbButtons = 3;
+    #else
+        const int nbButtons = 2;
+    #endif
+
+    const int y_bottom = m_area.getHeight() - nbButtons*(buttonHeight + 10) - 10;
+    const int y_stride = buttonHeight+10;
+    int cur_y = y_bottom;
+
+    core::rect<s32> text_area( 15, 15, m_area.getWidth()-15, y_bottom-15 );
+    m_message->setRelativePosition(text_area);
+
+#ifdef ENABLE_WIIUSE
+    {
+        ButtonWidget* widget = getWidget<ButtonWidget>("addwiimote");
+        const int textWidth =
+            font->getDimension( widget->getText().c_str() ).Width + 40;
+        
+        widget->move(m_area.getWidth()/2 - textWidth/2, cur_y, textWidth, buttonHeight);
+        cur_y += y_stride;
+    }
+#endif  // ENABLE_WIIUSE
+    {
+        ButtonWidget* widget = getWidget<ButtonWidget>("addkeyboard");
+        const int textWidth =
+            font->getDimension( widget->getText().c_str() ).Width + 40;
+        
+        widget->move(m_area.getWidth()/2 - textWidth/2, cur_y, textWidth, buttonHeight);
+        cur_y += y_stride;
+    }
+    {
+        ButtonWidget* widget = getWidget<ButtonWidget>("cancel");
+        const int textWidth =
+            font->getDimension( widget->getText().c_str() ).Width + 40;
+        
+        widget->move(m_area.getWidth()/2 - textWidth/2, cur_y, textWidth, buttonHeight);
+        cur_y += y_stride;
+    }
+}   // onEnterPressedInternal
 
 // ----------------------------------------------------------------------------
 

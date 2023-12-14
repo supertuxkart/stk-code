@@ -111,7 +111,8 @@ TextBoxWidget::TextBoxWidget() : Widget(WTYPE_TEXTBOX)
 
 void TextBoxWidget::add()
 {
-    rect<s32> widget_size = rect<s32>(m_x, m_y, m_x + m_w, m_y + m_h);
+    // Meaningless size. Will be resized later.
+    rect<s32> init_rect = rect<s32>(0, 0, 1, 1); 
 
     // Don't call TextBoxWidget::getText(), which assumes that the irrlicht
     // widget already exists.
@@ -119,7 +120,7 @@ void TextBoxWidget::add()
 
     m_element = new MyCGUIEditBox(text.c_str(), true /* border */, GUIEngine::getGUIEnv(),
                                   (m_parent ? m_parent : GUIEngine::getGUIEnv()->getRootGUIElement()),
-                                  getNewID(), widget_size);
+                                  getNewID(), init_rect);
 
     if (m_deactivated)
         m_element->setEnabled(false);
@@ -130,6 +131,8 @@ void TextBoxWidget::add()
     m_element->setTabOrder(m_id);
     m_element->setTabGroup(false);
     m_element->setTabStop(true);
+
+    resize();
 }
 
 // -----------------------------------------------------------------------------

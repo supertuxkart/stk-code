@@ -103,6 +103,9 @@ public:
     virtual void tearDown() OVERRIDE;
 
     /** \brief implement callback from parent class GUIEngine::Screen */
+    virtual void onResize() OVERRIDE;
+
+    /** \brief implement callback from parent class GUIEngine::Screen */
     virtual void onUpdate(float dt) OVERRIDE;
 
     /** \brief rebuild the list based on search text */

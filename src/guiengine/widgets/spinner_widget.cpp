@@ -169,22 +169,21 @@ void SpinnerWidget::add()
         widgetID = getNewID();
     }
 
-    rect<s32> widget_size = rect<s32>(m_x, m_y, m_x + m_w, m_y + m_h);
-    IGUIButton * btn = new SpinnerIrrElement(widget_size, m_parent, widgetID, this);
+    // Meaningless size. Will be resized later.
+    rect<s32> init_rect = rect<s32>(0, 0, 1, 1);
+
+    IGUIButton * btn = new SpinnerIrrElement(init_rect, m_parent, widgetID, this);
     m_element = btn;
 
     m_element->setTabOrder( m_element->getID() );
 
     // left arrow
-    rect<s32> subsize_left_arrow = rect<s32>(0 ,0, m_h, m_h);
-    IGUIButton * left_arrow = GUIEngine::getGUIEnv()->addButton(subsize_left_arrow, btn, getNewNoFocusID(), L" ");
+    IGUIButton * left_arrow = GUIEngine::getGUIEnv()->addButton(init_rect, btn, getNewNoFocusID(), L" ");
     m_children[0].m_element = left_arrow;
     left_arrow->setTabStop(false);
     m_children[0].m_event_handler = this;
     m_children[0].m_properties[PROP_ID] = "left";
     m_children[0].m_id = m_children[0].m_element->getID();
-
-    m_badge_x_shift = subsize_left_arrow.getWidth();
 
     // label
     if (m_graphical)
@@ -192,11 +191,7 @@ void SpinnerWidget::add()
         ITexture* texture = getTexture();
         assert(texture != NULL);
 
-        const int texture_width = texture->getSize().Width;
-        const int free_h_space = m_w - m_h*2 - texture_width; // to center image
-
-        rect<s32> subsize_label = rect<s32>(m_h + free_h_space/2, 0, m_w - m_h+ free_h_space/2, m_h);
-        IGUIImage * subbtn = GUIEngine::getGUIEnv()->addImage(subsize_label, btn, getNewNoFocusID());
+        IGUIImage * subbtn = GUIEngine::getGUIEnv()->addImage(init_rect, btn, getNewNoFocusID());
         m_children[1].m_element = subbtn;
         m_children[1].m_id = subbtn->getID();
         m_children[1].m_event_handler = this;
@@ -208,9 +203,8 @@ void SpinnerWidget::add()
     }
     else
     {
-        rect<s32> subsize_label = rect<s32>(m_h, 0, m_w - m_h, m_h);
         stringw text = stringw(m_value);
-        IGUIStaticText* label = GUIEngine::getGUIEnv()->addStaticText(text.c_str(), subsize_label,
+        IGUIStaticText* label = GUIEngine::getGUIEnv()->addStaticText(text.c_str(), init_rect,
                                                                       false /* border */, true /* word wrap */,
                                                                       btn, getNewNoFocusID());
         m_children[1].m_element = label;
@@ -225,17 +219,10 @@ void SpinnerWidget::add()
         {
             label->setText(m_labels[m_value].c_str() );
         }
-
-        if (widget_size.getHeight() < GUIEngine::getFontHeight())
-        {
-            label->setOverrideFont(GUIEngine::getSmallFont());
-        }
     }
 
-
     // right arrow
-    rect<s32> subsize_right_arrow = rect<s32>(m_w - m_h, 0, m_w, m_h);
-    IGUIButton * right_arrow = GUIEngine::getGUIEnv()->addButton(subsize_right_arrow, btn, getNewNoFocusID(), L"  ");
+    IGUIButton * right_arrow = GUIEngine::getGUIEnv()->addButton(init_rect, btn, getNewNoFocusID(), L"  ");
     right_arrow->setTabStop(false);
     m_children[2].m_element = right_arrow;
     m_children[2].m_event_handler = this;
@@ -244,8 +231,8 @@ void SpinnerWidget::add()
 
     // refresh display
 
-
     setValue(m_value);
+    resize();
 }
 // -----------------------------------------------------------------------------
 
@@ -260,12 +247,13 @@ ITexture* SpinnerWidget::getTexture()
 
 // -----------------------------------------------------------------------------
 
-void SpinnerWidget::move(const int x, const int y, const int w, const int h)
+void SpinnerWidget::resize()
 {
-    Widget::move(x, y, w, h);
+    Widget::resize();
 
-    rect<s32> subsize_left_arrow = rect<s32>(0 ,0, h, h);
+    rect<s32> subsize_left_arrow = rect<s32>(0 ,0, m_h, m_h);
     m_children[0].m_element->setRelativePosition(subsize_left_arrow);
+    m_badge_x_shift = subsize_left_arrow.getWidth();
 
     if (m_graphical)
     {
@@ -273,18 +261,24 @@ void SpinnerWidget::move(const int x, const int y, const int w, const int h)
         assert(texture != NULL);
 
         const int texture_width = texture->getSize().Width;
-        const int free_h_space = w-h*2-texture_width; // to center image
+        const int free_h_space = m_w-m_h*2-texture_width; // to center image
 
-        rect<s32> subsize_label = rect<s32>(h+free_h_space/2, 0, w-h+free_h_space/2, h);
+        rect<s32> subsize_label = rect<s32>(m_h+free_h_space/2, 0, m_w-m_h+free_h_space/2, m_h);
         m_children[1].m_element->setRelativePosition(subsize_label);
     }
     else
     {
-        rect<s32> subsize_label = rect<s32>(h, 0, w-h, h);
+        rect<s32> subsize_label = rect<s32>(m_h, 0, m_w-m_h, m_h);
         m_children[1].m_element->setRelativePosition(subsize_label);
+
+        if (m_h < GUIEngine::getFontHeight())
+        {
+            IGUIStaticText* label = static_cast<IGUIStaticText*>(m_children[1].m_element);
+            label->setOverrideFont(GUIEngine::getSmallFont());
+        }
     }
 
-    rect<s32> subsize_right_arrow = rect<s32>(w-h, 0, w, h);
+    rect<s32> subsize_right_arrow = rect<s32>(m_w-m_h, 0, m_w, m_h);
     m_children[2].m_element->setRelativePosition(subsize_right_arrow);
 }
 

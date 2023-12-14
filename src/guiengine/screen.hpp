@@ -34,6 +34,7 @@ namespace irr
 using namespace irr;
 
 #include "config/stk_config.hpp"
+#include "graphics/irr_driver.hpp"
 #include "guiengine/abstract_top_level_container.hpp"
 #include "guiengine/engine.hpp"
 #include "guiengine/event_handler.hpp"
@@ -95,10 +96,13 @@ namespace GUIEngine
      */
     class Screen : public AbstractTopLevelContainer
     {
-protected:
+    protected:
         /** True if this screen is resizable
          */
         bool m_resizable;
+
+        unsigned m_width, m_height;
+
     private:
         /** True if the race (if it is running) should be paused when this
          *  screen is shown. The RaceResultGUI uses this to leave the race
@@ -119,8 +123,6 @@ protected:
 
         /** to catch errors as early as possible, for debugging purposes only */
         unsigned int m_magic_number;
-
-        unsigned m_width, m_height;
 
         friend class Skin;
 
@@ -288,6 +290,11 @@ protected:
          * \brief optional callback you can override to be notified at every frame.
          */
         virtual void onDraw(float dt) { };
+
+        /**
+         * \brief optional callback you can override to be notified at every resize.
+         */
+        virtual void onResize();
 
         /**
          * \return which music to play at this screen

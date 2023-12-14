@@ -95,6 +95,8 @@ public:
     
     virtual void unloaded() OVERRIDE;
 
+    virtual void onResize() OVERRIDE;
+
     /** \brief Implement IConfirmDialogListener callback */
     virtual void onConfirm() OVERRIDE;
 

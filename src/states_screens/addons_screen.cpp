@@ -36,6 +36,8 @@
 
 #include <iostream>
 
+#include <IrrlichtDevice.h>
+
 using namespace Online;
 // ----------------------------------------------------------------------------
 
@@ -63,6 +65,8 @@ AddonsScreen::AddonsScreen() : Screen("addons_screen.stkgui")
     m_date_filters.push_back(filter_9m);
     m_date_filters.push_back(filter_1y);
     m_date_filters.push_back(filter_2y);
+
+    m_resizable = true;
 }   // AddonsScreen
 
 // ----------------------------------------------------------------------------
@@ -141,6 +145,7 @@ void AddonsScreen::beforeAddingWidget()
 
 void AddonsScreen::init()
 {
+    GUIEngine::getDevice()->setResizable(true);
     Screen::init();
 
     m_sort_desc = false;
@@ -485,6 +490,22 @@ void AddonsScreen::eventCallback(GUIEngine::Widget* widget,
     }
 #endif
 }   // eventCallback
+
+// ----------------------------------------------------------------------------
+void AddonsScreen::onResize()
+{
+    GUIEngine::ListWidget* w_list =
+        getWidget<GUIEngine::ListWidget>("list_addons");
+
+    // This defines the row height !
+    m_icon_height = GUIEngine::getFontHeight() * 2;
+    // 128 is the height of the image file
+    m_icon_bank->setScale((float)GUIEngine::getFontHeight() / 72.0f);
+    m_icon_bank->setTargetIconSize(128,128);
+    w_list->setIcons(m_icon_bank, (int)(m_icon_height));
+
+    Screen::onResize();
+}
 
 // ----------------------------------------------------------------------------
 /** Selects the last selected item on the list (which is the item that

@@ -956,7 +956,7 @@ void OptionsScreenVideo::tearDown()
         getWidget("fullscreen")->isFocusedForPlayer(PLAYER_ID_GAME_MASTER))
         OptionsScreenVideo::m_fullscreen_checkbox_focus = true;
 
-    GUIEngine::getDevice()->setResizable(false);
+    //GUIEngine::getDevice()->setResizable(false);
 #ifndef SERVER_ONLY
     if (m_prev_adv_pipline != UserConfigParams::m_dynamic_lights &&
         CVS->isGLSL())

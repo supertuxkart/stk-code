@@ -119,6 +119,7 @@ public:
     virtual void eventCallback(GUIEngine::Widget *,const std::string &name ,
                                const int player_id) OVERRIDE;
 
+    virtual void onResize() OVERRIDE;
     void onEnterPressedInternal();
     void setTrack(Track *track);
 };

@@ -320,6 +320,19 @@ GUIEngine::EventPropagation
 }   // processEvent
 
 // ----------------------------------------------------------------------------
+/*void HighScoreInfoDialog::onResize()
+{
+    irr::gui::STKModifiedSpriteBank *icon_bank = HighScoreSelection::getInstance()->getIconBank();
+    int icon_height = GUIEngine::getFontHeight() * 3 / 2;
+
+    icon_bank->setScale(icon_height/128.0f);
+    icon_bank->setTargetIconSize(128, 128);
+    m_high_score_list->setIcons(icon_bank, (int)icon_height);
+
+    Screen::onResize();
+}*/
+
+// ----------------------------------------------------------------------------
 /** Called every update. Used to cycle the screenshots for grand prix entries.
  *  \param dt Time step size.
  */

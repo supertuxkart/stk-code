@@ -20,12 +20,13 @@
 #ifndef HEADER_LABEL_HPP
 #define HEADER_LABEL_HPP
 
-#include <irrString.h>
-#include <SColor.h>
-
 #include "guiengine/widget.hpp"
 #include "utils/leak_check.hpp"
 #include "utils/ptr_vector.hpp"
+
+#include <IGUIElement.h>
+#include <irrString.h>
+#include <SColor.h>
 
 namespace GUIEngine
 {
@@ -48,15 +49,16 @@ namespace GUIEngine
         
     private:
         
-        LabelType         m_type;
-        irr::video::SColor m_color;
-        bool               m_has_color;
+        LabelType             m_type;
+        irr::video::SColor    m_color;
+        bool                  m_has_color;
+        bool                  m_expand_if_needed;
 
-        /** Scroll speed in characters/seconds (0 if no scrolling). */
-        float              m_scroll_speed;
+        /** Scroll speed in cycle/second (0 if no scrolling). */
+        float                 m_scroll_speed;
         
-        /** Current scroll offset. */
-        float              m_scroll_offset;
+        /** Current scroll progress. */
+        float                 m_scroll_progress;
 
         // Hide overloaded methods
         using Widget::setText;
@@ -74,6 +76,8 @@ namespace GUIEngine
         
         /** \brief Callback from base class Widget */
         virtual void add();
+
+        virtual void resize();
 
         /** Sets the color of the widget.
          *  \param color The color to use for this widget. */

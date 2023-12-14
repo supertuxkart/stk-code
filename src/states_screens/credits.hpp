@@ -75,6 +75,10 @@ public:
      *  GUIEngine::Screen */
     void onDraw(float dt) OVERRIDE;
 
+    /** \brief implement optional callback from parent class
+     *  GUIEngine::Screen */
+    void onResize() OVERRIDE;
+
     /** \brief implement callback from parent class GUIEngine::Screen */
     void init() OVERRIDE;
 

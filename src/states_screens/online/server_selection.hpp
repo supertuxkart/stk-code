@@ -116,6 +116,9 @@ public:
     virtual void unloaded() OVERRIDE;
 
     /** \brief implement callback from parent class GUIEngine::Screen */
+    virtual void onResize() OVERRIDE;
+
+    /** \brief implement callback from parent class GUIEngine::Screen */
     virtual void onUpdate(float dt) OVERRIDE;
 
     virtual void onTextUpdated() OVERRIDE             { copyFromServerList(); }

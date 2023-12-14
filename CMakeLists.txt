@@ -534,7 +534,6 @@ else()
     endif()
 endif()
 
-
 if(WIN32)
     configure_file("${STK_SOURCE_DIR}/../tools/windows_installer/icon_rc.template" "${PROJECT_BINARY_DIR}/tmp/icon.rc")
 endif()

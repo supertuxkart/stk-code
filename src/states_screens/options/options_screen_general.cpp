@@ -283,7 +283,7 @@ void OptionsScreenGeneral::setInternetCheckboxes(bool activate)
 
 void OptionsScreenGeneral::tearDown()
 {
-    GUIEngine::getDevice()->setResizable(false);
+    //GUIEngine::getDevice()->setResizable(false);
     Screen::tearDown();
     // save changes when leaving screen
     user_config->saveConfig();

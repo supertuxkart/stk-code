@@ -247,6 +247,7 @@ KartSelectionScreen::KartSelectionScreen(const char* filename) : Screen(filename
     m_multiplayer_message  = NULL;
     m_from_overworld       = false;
     m_go_to_overworld_next = false;
+    m_resizable            = true;
 }   // KartSelectionScreen
 
 // ============================================================================
@@ -345,6 +346,7 @@ void KartSelectionScreen::beforeAddingWidget()
 
 void KartSelectionScreen::init()
 {
+    GUIEngine::getDevice()->setResizable(true);
 #ifndef SERVER_ONLY
     GE::getGEConfig()->m_enable_draw_call_cache = true;
 #endif
@@ -572,15 +574,16 @@ bool KartSelectionScreen::joinPlayer(InputDevice* device, PlayerProfile* p)
     Widget* kartsAreaWidget = getWidget("playerskarts");
     // start at the rightmost of the screen
     const int shift = irr_driver->getFrameSize().Width;
-    core::recti kartsArea(kartsAreaWidget->m_x + shift,
-                          kartsAreaWidget->m_y,
-                          kartsAreaWidget->m_x + shift + kartsAreaWidget->m_w,
-                          kartsAreaWidget->m_y + kartsAreaWidget->m_h);
 
     // ---- Create player/kart widget
     PlayerKartWidget* newPlayerWidget =
-        new PlayerKartWidget(this, aplayer, kartsArea, m_kart_widgets.size(),
+        new PlayerKartWidget(this, aplayer, m_kart_widgets.size(),
                              selected_kart_group);
+    
+    newPlayerWidget->m_x = kartsAreaWidget->m_x + shift;
+    newPlayerWidget->m_y = kartsAreaWidget->m_y;
+    newPlayerWidget->m_w = kartsAreaWidget->m_w;
+    newPlayerWidget->m_h = kartsAreaWidget->m_h;
 
     manualAddWidget(newPlayerWidget);
     m_kart_widgets.push_back(newPlayerWidget);
@@ -603,8 +606,8 @@ bool KartSelectionScreen::joinPlayer(InputDevice* device, PlayerProfile* p)
         if (p == NULL)
             addMultiplayerMessage();
         const int splitWidth = fullarea->m_w / 2;
-        m_kart_widgets[0].move( fullarea->m_x, fullarea->m_y, splitWidth,
-                                fullarea->m_h );
+        m_kart_widgets[0].moveAnimated( fullarea->m_x, fullarea->m_y, splitWidth,
+                                        fullarea->m_h );
     }
     else
     {
@@ -612,8 +615,8 @@ bool KartSelectionScreen::joinPlayer(InputDevice* device, PlayerProfile* p)
 
         for (int n=0; n<amount; n++)
         {
-            m_kart_widgets[n].move( fullarea->m_x + splitWidth * n,
-                                    fullarea->m_y, splitWidth, fullarea->m_h);
+            m_kart_widgets[n].moveAnimated( fullarea->m_x + splitWidth * n,
+                                            fullarea->m_y, splitWidth, fullarea->m_h);
         }
     }
 
@@ -721,8 +724,8 @@ bool KartSelectionScreen::playerQuit(StateManager::ActivePlayer* player)
     // Tell the removed widget to perform the shrinking animation (which will
     // be updated in onUpdate, and will stop when the widget has disappeared)
     Widget* fullarea = getWidget("playerskarts");
-    m_removed_widget->move(m_removed_widget->m_x + m_removed_widget->m_w/2,
-                           fullarea->m_y + fullarea->m_h, 0, 0);
+    m_removed_widget->moveAnimated(m_removed_widget->m_x + m_removed_widget->m_w/2,
+                                   fullarea->m_y + fullarea->m_h, 0, 0);
 
     // update selections
 
@@ -762,6 +765,67 @@ bool KartSelectionScreen::playerQuit(StateManager::ActivePlayer* player)
 
 // ----------------------------------------------------------------------------
 
+void KartSelectionScreen::onResize()
+{
+    m_width = irr_driver->getActualScreenSize().Width;
+    m_height = irr_driver->getActualScreenSize().Height;
+
+    // Remove dispatcher from m_widgets before calculateLayout otherwise a
+    // dummy button is shown in kart screen
+    bool removed_dispatcher = false;
+    if (m_widgets.contains(m_dispatcher))
+    {
+        m_widgets.remove(m_dispatcher);
+        removed_dispatcher = true;
+    }
+    calculateLayout();
+    if (removed_dispatcher)
+        m_widgets.push_back(m_dispatcher);
+    
+    resizeWidgetsRecursively(m_widgets);
+
+    Widget* fullarea = getWidget("playerskarts");
+    int amount = m_kart_widgets.size();
+
+    // in this special case, leave room for a message on the right
+    if (m_multiplayer && amount == 1)
+    {
+        const int splitWidth = fullarea->m_w / 2;
+        // Immediately stop animation to avoid scaling issue
+        m_kart_widgets[0].move( fullarea->m_x, fullarea->m_y, splitWidth,
+                                fullarea->m_h );
+        m_kart_widgets[0].moveAnimated( fullarea->m_x, fullarea->m_y, splitWidth,
+                                        fullarea->m_h );
+    }
+    else if (amount)
+    {
+        const int splitWidth = fullarea->m_w / amount;
+
+        for (int n=0; n<amount; n++)
+        {
+            m_kart_widgets[n].move( fullarea->m_x + splitWidth * n,
+                                    fullarea->m_y, splitWidth, fullarea->m_h);
+            m_kart_widgets[n].moveAnimated( fullarea->m_x + splitWidth * n,
+                                            fullarea->m_y, splitWidth, fullarea->m_h);
+        }
+    }
+
+    if (m_multiplayer_message)
+    {
+        const int splitWidth = fullarea->m_w / 2;
+        int message_x = 0;
+        if (m_kart_widgets.size() == 1)
+            message_x = (int) (fullarea->m_x + splitWidth + splitWidth * 0.2f);
+        else
+            message_x = (int) (fullarea->m_x + splitWidth / 2 + splitWidth * 0.2f);
+
+        m_multiplayer_message->move(message_x, (int) (fullarea->m_y + fullarea->m_h * 0.3f),
+                                    (int) (splitWidth * 0.6f), (int) (fullarea->m_h * 0.6f));
+    }
+}   // onResize
+
+// ----------------------------------------------------------------------------
+
 void KartSelectionScreen::onUpdate(float delta)
 {
     // Dispatch the onUpdate event to each kart, so they can perform their
@@ -769,14 +833,14 @@ void KartSelectionScreen::onUpdate(float delta)
     const int amount = m_kart_widgets.size();
     for (int n=0; n<amount; n++)
     {
-        m_kart_widgets[n].onUpdate(delta);
+        m_kart_widgets[n].update(delta);
     }
 
     // When a kart widget is removed, it's a kept a while, for the disappear
     // animation to take place
     if (m_removed_widget != NULL)
     {
-        m_removed_widget->onUpdate(delta);
+        m_removed_widget->update(delta);
 
         if (m_removed_widget->m_w == 0 || m_removed_widget->m_h == 0)
         {
@@ -1528,8 +1592,8 @@ void KartSelectionScreen::renumberKarts()
     for (unsigned int n=0; n < m_kart_widgets.size(); n++)
     {
         m_kart_widgets[n].setPlayerID(n);
-        m_kart_widgets[n].move( fullarea->m_x + splitWidth*n, fullarea->m_y,
-                                splitWidth, fullarea->m_h );
+        m_kart_widgets[n].moveAnimated( fullarea->m_x + splitWidth*n, fullarea->m_y,
+                                        splitWidth, fullarea->m_h );
     }
 
     w->updateItemDisplay();

@@ -28,6 +28,7 @@
 #include "utils/leak_check.hpp"
 #include "utils/ptr_vector.hpp"
 
+#include <IGUIButton.h>
 #include <IGUIStaticText.h>
 
 namespace GUIEngine
@@ -105,6 +106,7 @@ namespace GUIEngine
         
         virtual EventPropagation onClick() OVERRIDE;
         
+        PtrVector<irr::gui::IGUIButton>          m_button_background;
         PtrVector<irr::gui::IGUIStaticText, REF> m_labels;
         
         IRibbonListener* m_listener;
@@ -130,6 +132,8 @@ namespace GUIEngine
         virtual ~RibbonWidget();
         
         virtual void add() OVERRIDE;
+
+        virtual void resize() OVERRIDE;
 
         /** Sets a listener that will be notified of changes on this ribbon.
          *  Does _not_ take ownership of the listener, i.e. will not delete it.

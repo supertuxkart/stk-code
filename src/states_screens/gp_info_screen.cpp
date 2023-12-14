@@ -438,6 +438,19 @@ void GPInfoScreen::eventCallback(Widget *, const std::string &name,
 }   // eventCallback
 
 // ----------------------------------------------------------------------------
+void GPInfoScreen::onResize()
+{
+    int icon_height = GUIEngine::getFontHeight();
+    int row_height = GUIEngine::getFontHeight() * 1.2f;
+    
+    m_icon_bank->setScale(icon_height/128.0f);
+    m_icon_bank->setTargetIconSize(128,128);
+    m_highscore_list->setIcons(m_icon_bank,row_height);
+
+    Screen::onResize();
+}
+
+// ----------------------------------------------------------------------------
 /** Called every update. Used to cycle the screenshots.
  *  \param dt Time step size.
  */

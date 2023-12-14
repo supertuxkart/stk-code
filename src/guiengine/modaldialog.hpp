@@ -87,6 +87,7 @@ namespace GUIEngine
           */
         virtual void loadedFromFile() {}
         void doInit();
+        void setArea();
 
     public:
         LEAK_CHECK()
@@ -115,6 +116,9 @@ namespace GUIEngine
 
         /** Override to be notified of updates */
         virtual void onUpdate(float dt) { }
+
+        /** Override to be notified of resizes */
+        virtual void onResize();
 
         /**
          * \brief Optional callback invoked very early, before widgets have been added (contrast with

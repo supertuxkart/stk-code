@@ -388,7 +388,22 @@ void CreditsScreen::onDraw(float elapsed_time)
         }
     }
 
-}   // onUpdate
+}   // onDraw
+
+// ----------------------------------------------------------------------------
+
+void CreditsScreen::onResize()
+{
+    Screen::onResize();
+
+    Widget* w = getWidget<Widget>("animated_area");
+    assert(w != NULL);
+    
+    setArea(w->m_x + GUIEngine::getFontHeight(),
+            w->m_y + GUIEngine::getFontHeight() / 2,
+            w->m_w - GUIEngine::getFontHeight() * 2,
+            w->m_h - GUIEngine::getFontHeight());
+}
 
 // ----------------------------------------------------------------------------
 

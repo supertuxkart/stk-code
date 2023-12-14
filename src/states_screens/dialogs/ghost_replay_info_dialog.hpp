@@ -62,6 +62,7 @@ public:
     GUIEngine::EventPropagation processEvent(const std::string& eventSource);
 
     virtual bool onEscapePressed();
+    //virtual void onResize();
     virtual void onUpdate(float dt);
 };   // class GhostReplayInfoDialog
 

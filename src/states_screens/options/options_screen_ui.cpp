@@ -606,7 +606,7 @@ void OptionsScreenUI::reloadGUIEngine()
     if (reload_skin)
     {
         irr_driver->setMaxTextureSize();
-        delete powerup_manager;
+        delete powerup_manager; 
         powerup_manager = new PowerupManager();
         powerup_manager->loadPowerupsModels();
     }

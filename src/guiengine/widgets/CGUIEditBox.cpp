@@ -307,6 +307,21 @@ bool CGUIEditBox::isOverrideColorEnabled() const
 void CGUIEditBox::updateAbsolutePosition()
 {
     IGUIElement::updateAbsolutePosition();
+
+    FrameRect = AbsoluteRect;
+
+    IGUISkin *skin = 0;
+    if (Environment)
+        skin = Environment->getSkin();
+    if (Border && skin)
+    {
+        FrameRect.UpperLeftCorner.X += skin->getSize(EGDS_TEXT_DISTANCE_X)+1;
+        FrameRect.UpperLeftCorner.Y += skin->getSize(EGDS_TEXT_DISTANCE_Y)+1;
+        FrameRect.LowerRightCorner.X -= skin->getSize(EGDS_TEXT_DISTANCE_X)+1;
+        FrameRect.LowerRightCorner.Y -= skin->getSize(EGDS_TEXT_DISTANCE_Y)+1;
+    }
+
+    calculateScrollPos();
 }
 
 

@@ -97,10 +97,8 @@ void ListWidget::setIcons(STKModifiedSpriteBank* icons, int size)
 // -----------------------------------------------------------------------------
 void ListWidget::add()
 {
-    const int header_height = GUIEngine::getFontHeight() + 15;
-
-    rect<s32> widget_size = (m_header.size() > 0 ? rect<s32>(m_x, m_y + header_height, m_x + m_w, m_y + m_h) :
-                                                   rect<s32>(m_x, m_y, m_x + m_w, m_y + m_h) );
+    // Meaningless size. Will be resized later.
+    rect<s32> init_rect = rect<s32>(0, 0, 1, 1); 
 
     IGUISkin * current_skin = GUIEngine::getGUIEnv()->getSkin();
     IGUIFont * current_font = GUIEngine::getGUIEnv()->getBuiltInFont();
@@ -108,7 +106,7 @@ void ListWidget::add()
         GUIEngine::getGUIEnv(),
         m_parent ? m_parent : GUIEngine::getGUIEnv()->getRootGUIElement(),
         getNewID(),
-        widget_size,
+        init_rect,
         true,
         true,
         false);
@@ -131,16 +129,19 @@ void ListWidget::add()
     m_element->setTabOrder( list_box->getID() );
 
     createHeader();
+
+    resize();
 }
 
 // -----------------------------------------------------------------------------
-
-void ListWidget::createHeader()
+void ListWidget::resize()
 {
-    if (m_header_created)
-        return;
-
     const int header_height = GUIEngine::getFontHeight() + 15;
+
+    rect<s32> widget_size = (m_header.size() > 0 ? rect<s32>(m_x, m_y + header_height, m_x + m_w, m_y + m_h) :
+                                                   rect<s32>(m_x, m_y, m_x + m_w, m_y + m_h) );
+
+    CGUISTKListBox *list = static_cast<CGUISTKListBox*>(m_element);
 
     if (m_header.size() > 0)
     {
@@ -154,6 +155,49 @@ void ListWidget::createHeader()
 
         int x = m_x;
         int scrollbar_width = GUIEngine::getSkin()->getSize(EGDS_SCROLLBAR_SIZE);
+
+        for (unsigned int n=0; n<m_header_elements.size(); n++)
+        {
+            assert(m_header_elements[n]);
+
+            std::ostringstream name;
+            name << m_properties[PROP_ID];
+            name << "_column_";
+            name << n;
+
+            int w = 0;
+
+            if (n == m_header.size())
+            {
+                w = scrollbar_width;
+            }
+            else
+            {
+                int header_width = m_w - scrollbar_width;
+                w = (int)(header_width * float(m_header[n].m_proportion)
+                                       / float(proportion_total));
+            }
+
+            m_header_elements[n].move(x, m_y, w, header_height);
+
+            x += w;
+        }
+    }
+
+    list->setRelativePosition(widget_size);
+}
+
+// -----------------------------------------------------------------------------
+
+void ListWidget::createHeader()
+{
+    if (m_header_created)
+        return;
+
+    if (m_header.size() > 0)
+    {
+        //const int col_size = m_w / m_header.size();
+
         for (unsigned int n=0; n<m_header.size()+1; n++)
         {
             std::ostringstream name;
@@ -178,24 +222,10 @@ void ListWidget::createHeader()
             }
             header->m_reserved_id = getNewNoFocusID();
 
-            header->m_y = m_y;
-            header->m_h = header_height;
-
-            header->m_x = x;
             if (n == m_header.size())
             {
-                header->m_w = scrollbar_width;
                 header->setActive(false);
             }
-            else
-            {
-                int header_width = m_w - scrollbar_width;
-                header->m_w = (int)(header_width * float(m_header[n].m_proportion)
-                                    /float(proportion_total));
-            }
-
-            x += header->m_w;
-
             header->m_properties[PROP_ID] = name.str();
 
             header->add();

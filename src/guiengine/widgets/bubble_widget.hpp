@@ -64,8 +64,10 @@ namespace GUIEngine
         virtual void add();
         
         virtual EventPropagation focused(const int playerID);
+
+        virtual void resize();
         
-        void updateSize();
+        virtual void update(float dt);
 
         void setText(const irr::core::stringw &s);
 

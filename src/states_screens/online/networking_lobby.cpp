@@ -436,6 +436,16 @@ void NetworkingLobby::updateServerInfos()
 }   // updateServerInfos
 
 // ----------------------------------------------------------------------------
+void NetworkingLobby::onResize()
+{
+    m_icon_bank->setScale((float)GUIEngine::getFontHeight() / 96.0f);
+    m_icon_bank->setTargetIconSize(128, 128);
+    m_player_list->setIcons(m_icon_bank);
+
+    Screen::onResize();
+}
+
+// ----------------------------------------------------------------------------
 void NetworkingLobby::onUpdate(float delta)
 {
     m_addon_install = NULL;
