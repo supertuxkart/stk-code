@@ -8,7 +8,7 @@
         <spacer height="10" width="25"/>
         <box width="100%" proportion="3" padding="10" layout="vertical-row">
             <spacer height="15%" width="25"/>
-            <ribbon id="difficulty" height="70%" width="100%" align="center">
+            <ribbon x="2%" y="15%" id="difficulty" height="70%" width="96%" align="center">
                 <icon-button id="novice" width="128" height="128" icon="gui/icons/difficulty_easy.png"
                         I18N="Difficulty" text="Novice"/>
                 <icon-button id="intermediate" width="128" height="128" icon="gui/icons/difficulty_medium.png"
@@ -19,15 +19,15 @@
                         I18N="Difficulty"  text="SuperTux"/>
             </ribbon>
         </box>
-        <spacer height="5%" width="25"/>
+        <spacer height="2%" width="25"/>
 
         <bright width="100%" text="Select a game mode" align="center" text_align="left" />
         
-        <spacer height="10" width="25"/>
+        <spacer height="1%" width="25"/>
         <box width="100%" proportion="4" padding="10" layout="vertical-row">
             <spacer height="5%" width="25" />
-            <scrollable_toolbar id="gamemode" height="60%" width="95%" label_location="bottom" align="center"
-                                child_width="256" child_height="256" />
+            <ribbon_grid id="gamemode" height="60%" width="95%" label_location="bottom" align="center"
+                                child_width="192" child_height="192" />
             <spacer proportion="1" width="25" />
         </box>
     </div>
