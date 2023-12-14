@@ -50,6 +50,8 @@ private:
 
     unsigned int                             m_last_egg_idx;
 
+    bool m_finish_computed;
+
     // ----------------------------------------------------------------------------
     /** Compute the time at which the ghost finished the race */
     void          computeFinishTime();
@@ -84,11 +86,9 @@ public:
     // ------------------------------------------------------------------------
     /** Returns the speed of the kart in meters/second. */
     virtual float getSpeed() const OVERRIDE;
-
     // ------------------------------------------------------------------------
     /** Returns the finished time for a ghost kart. */
-    float  getGhostFinishTime() { computeFinishTime(); return m_finish_time; }
-
+    float  getGhostFinishTime();
     // ------------------------------------------------------------------------
     /** Returns the time at which the kart was at a given distance.
       * Returns -1.0f if none */
