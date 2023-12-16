@@ -1,5 +1,4 @@
 #include "ge_main.hpp"
-#include "ge_dx9_texture.hpp"
 #include "ge_gl_texture.hpp"
 #include "ge_vulkan_texture.hpp"
 #include "ge_texture.hpp"
@@ -97,10 +96,6 @@ irr::video::ITexture* createTexture(const std::string& path,
     case video::EDT_OPENGL:
     case video::EDT_OGLES2:
         return new GEGLTexture(path, image_mani);
-#ifdef _IRR_COMPILE_WITH_DIRECT3D_9_
-    case video::EDT_DIRECT3D9:
-        return new GEDX9Texture(path, image_mani);
-#endif
     case video::EDT_VULKAN:
         return new GEVulkanTexture(path, image_mani);
     default:
@@ -117,10 +112,6 @@ irr::video::ITexture* createTexture(video::IImage* img,
     case video::EDT_OPENGL:
     case video::EDT_OGLES2:
         return new GEGLTexture(img, name);
-#ifdef _IRR_COMPILE_WITH_DIRECT3D_9_
-    case video::EDT_DIRECT3D9:
-        return new GEDX9Texture(img, name);
-#endif
     case video::EDT_VULKAN:
         return new GEVulkanTexture(img, name);
     default:
@@ -137,10 +128,6 @@ irr::video::ITexture* createFontTexture(const std::string& name,
     case video::EDT_OPENGL:
     case video::EDT_OGLES2:
         return new GEGLTexture(name, size, single_channel);
-#ifdef _IRR_COMPILE_WITH_DIRECT3D_9_
-    case video::EDT_DIRECT3D9:
-        return new GEDX9Texture(name, size);
-#endif
     case video::EDT_VULKAN:
         return new GEVulkanTexture(name, size, single_channel);
     default:

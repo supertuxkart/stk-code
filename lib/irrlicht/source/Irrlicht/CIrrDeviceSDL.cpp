@@ -39,10 +39,6 @@ namespace irr
 			io::IFileSystem* io, CIrrDeviceSDL* device);
 		IVideoDriver* createOGLES2Driver(const SIrrlichtCreationParameters& params,
 			io::IFileSystem* io, CIrrDeviceSDL* device, u32 default_fb);
-#ifdef _IRR_COMPILE_WITH_DIRECT3D_9_
-		IVideoDriver* createDirectX9Driver(const SIrrlichtCreationParameters& params,
-			io::IFileSystem* io, HWND window);
-#endif
 #ifdef _IRR_COMPILE_WITH_VULKAN_
 		IVideoDriver* createVulkanDriver(const SIrrlichtCreationParameters& params,
 			io::IFileSystem* io, SDL_Window* win, IrrlichtDevice* device);
@@ -132,13 +128,11 @@ CIrrDeviceSDL::CIrrDeviceSDL(const SIrrlichtCreationParameters& param)
 		{
 			SDL_VERSION(&Info.version);
 
-#if (defined(IOS_STK) || defined(_IRR_COMPILE_WITH_DIRECT3D_9_)) && !defined(__SWITCH__)
-			// Only iOS or DirectX9 build uses the Info structure
+#if (defined(IOS_STK) && !defined(__SWITCH__))
+			// Only iOS build uses the Info structure
 			// Switch doesn't support GetWindowWMInfo
 #ifdef IOS_STK
 			if (!SDL_GetWindowWMInfo(Window, &Info))
-#else
-			if (CreationParams.DriverType == video::EDT_DIRECT3D9 && !SDL_GetWindowWMInfo(Window, &Info))
 #endif
 				return;
 #endif
@@ -724,16 +718,6 @@ void CIrrDeviceSDL::createDriver()
 		}
 		#else
 		os::Printer::log("No Vulkan support compiled in.", ELL_ERROR);
-		#endif
-		break;
-	}
-
-	case video::EDT_DIRECT3D9:
-	{
-		#ifdef _IRR_COMPILE_WITH_DIRECT3D_9_
-		VideoDriver = video::createDirectX9Driver(CreationParams, FileSystem, Info.info.win.window);
-		#else
-		os::Printer::log("No DirectX 9 support compiled in.", ELL_ERROR);
 		#endif
 		break;
 	}
