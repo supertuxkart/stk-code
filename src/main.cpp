@@ -687,7 +687,7 @@ void cmdLineHelp()
     "                           Takes precedence over trilinear or bilinear\n"
     "                           texture filtering.\n"
     "       --shadows=n         Set resolution of shadows (0 to disable).\n"
-    "       --render-driver=n   Render driver to use (gl or directx9).\n"
+    "       --render-driver=n   Render driver to use (gl or vulkan).\n"
     "       --disable-addon-karts Disable loading of addon karts.\n"
     "       --disable-addon-tracks Disable loading of addon tracks.\n"
     "       --dump-official-karts Dump official karts for current stk-assets.\n"
