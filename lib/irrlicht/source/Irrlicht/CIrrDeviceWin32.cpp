@@ -58,6 +58,16 @@ namespace irr
 {
     namespace video
     {
+        #ifdef _IRR_COMPILE_WITH_DIRECT3D_8_
+        IVideoDriver* createDirectX8Driver(const irr::SIrrlichtCreationParameters& params,
+            io::IFileSystem* io, HWND window);
+        #endif
+
+        #ifdef _IRR_COMPILE_WITH_DIRECT3D_9_
+        IVideoDriver* createDirectX9Driver(const irr::SIrrlichtCreationParameters& params,
+            io::IFileSystem* io, HWND window);
+        #endif
+
         #ifdef _IRR_COMPILE_WITH_OPENGL_
         IVideoDriver* createOpenGLDriver(const irr::SIrrlichtCreationParameters& params,
             io::IFileSystem* io, CIrrDeviceWin32* device);
@@ -1523,6 +1533,36 @@ void CIrrDeviceWin32::createDriver()
 {
     switch(CreationParams.DriverType)
     {
+    case video::EDT_DIRECT3D8:
+        #ifdef _IRR_COMPILE_WITH_DIRECT3D_8_
+
+        VideoDriver = video::createDirectX8Driver(CreationParams, FileSystem, HWnd);
+
+        if (!VideoDriver)
+        {
+            os::Printer::log("Could not create DIRECT3D8 Driver.", ELL_ERROR);
+        }
+        #else
+        os::Printer::log("DIRECT3D8 Driver was not compiled into this dll. Try another one.", ELL_ERROR);
+        #endif // _IRR_COMPILE_WITH_DIRECT3D_8_
+
+        break;
+
+    case video::EDT_DIRECT3D9:
+        #ifdef _IRR_COMPILE_WITH_DIRECT3D_9_
+
+        VideoDriver = video::createDirectX9Driver(CreationParams, FileSystem, HWnd);
+
+        if (!VideoDriver)
+        {
+            os::Printer::log("Could not create DIRECT3D9 Driver.", ELL_ERROR);
+        }
+        #else
+        os::Printer::log("DIRECT3D9 Driver was not compiled into this dll. Try another one.", ELL_ERROR);
+        #endif // _IRR_COMPILE_WITH_DIRECT3D_9_
+
+        break;
+
     case video::EDT_OPENGL:
 
         #ifdef _IRR_COMPILE_WITH_OPENGL_

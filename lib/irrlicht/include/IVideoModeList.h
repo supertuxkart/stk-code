@@ -17,7 +17,7 @@ namespace video
 	/** You can get a list via IrrlichtDevice::getVideoModeList(). If you are confused
 	now, because you think you have to create an Irrlicht Device with a video
 	mode before being able to get the video mode list, let me tell you that
-	there is no need to start up an Irrlicht Device with EDT_OPENGL or
+	there is no need to start up an Irrlicht Device with EDT_DIRECT3D8, EDT_OPENGL or
 	EDT_SOFTWARE: For this (and for lots of other reasons) the null device,
 	EDT_NULL exists.*/
 	class IVideoModeList : public virtual IReferenceCounted

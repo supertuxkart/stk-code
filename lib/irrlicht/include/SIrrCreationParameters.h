@@ -112,7 +112,8 @@ namespace irr
 
 		//! Type of video driver used to render graphics.
 		/** This can currently be video::EDT_NULL, video::EDT_SOFTWARE,
-		video::EDT_BURNINGSVIDEO, video::EDT_OPENGL, and video::EDT_VULKAN.
+		video::EDT_BURNINGSVIDEO, video::EDT_DIRECT3D8,
+		video::EDT_DIRECT3D9, and video::EDT_OPENGL.
 		Default: Software. */
 		video::E_DRIVER_TYPE DriverType;
 

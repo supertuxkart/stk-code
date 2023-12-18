@@ -26,6 +26,7 @@ else()
     add_definitions(-DNO_IRR_COMPILE_WITH_X11_)
     add_definitions(-DNO_IRR_COMPILE_WITH_WAYLAND_DEVICE_)
     add_definitions(-DNO_IRR_COMPILE_WITH_SDL_DEVICE_)
+    add_definitions(-DNO_IRR_COMPILE_WITH_DIRECT3D_9_)
     add_definitions(-DNO_IRR_COMPILE_WITH_VULKAN_)
 endif()
 

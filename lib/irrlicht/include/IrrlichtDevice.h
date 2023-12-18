@@ -111,8 +111,8 @@ namespace irr
 		/** If you are confused now, because you think you have to
 		create an Irrlicht Device with a video mode before being able
 		to get the video mode list, let me tell you that there is no
-		need to start up an Irrlicht Device with EDT_OPENGL or 
-		EDT_SOFTWARE: For this (and for lots of other
+		need to start up an Irrlicht Device with EDT_DIRECT3D8,
+		EDT_OPENGL or EDT_SOFTWARE: For this (and for lots of other
 		reasons) the null driver, EDT_NULL exists.
 		\return Pointer to a list with all video modes supported
 		by the gfx adapter. */
@@ -341,6 +341,18 @@ namespace irr
 #endif
 				case video::EDT_BURNINGSVIDEO:
 #ifdef _IRR_COMPILE_WITH_BURNINGSVIDEO_
+					return true;
+#else
+					return false;
+#endif
+				case video::EDT_DIRECT3D8:
+#ifdef _IRR_COMPILE_WITH_DIRECT3D_8_
+					return true;
+#else
+					return false;
+#endif
+				case video::EDT_DIRECT3D9:
+#ifdef _IRR_COMPILE_WITH_DIRECT3D_9_
 					return true;
 #else
 					return false;
