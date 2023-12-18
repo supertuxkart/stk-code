@@ -500,6 +500,10 @@ begin:
             driver_created = video::EDT_OPENGL;
 #endif
         }
+        else if (std::string(UserConfigParams::m_render_driver) == "directx9")
+        {
+            driver_created = video::EDT_DIRECT3D9;
+        }
         else if (std::string(UserConfigParams::m_render_driver) == "vulkan")
         {
             driver_created = video::EDT_VULKAN;

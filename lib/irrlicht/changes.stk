@@ -12,6 +12,3 @@ The following changes have been made:
 - non-triangle VBO support
 - extension order mismatch
 - support for some RG texture formats
-
-Changes in 12/2023:
-- drop DirectX9-related code
