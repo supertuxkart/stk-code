@@ -1007,6 +1007,7 @@ void RaceGUIBase::drawGlobalPlayerIcons(int bottom_margin)
             font->setThinBorder(false);
             font->setBlackBorder(false);
         }
+        font->setScale(1.0f);
 
 
         AbstractKart* target_kart = NULL;
