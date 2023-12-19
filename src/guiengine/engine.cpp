@@ -1147,6 +1147,7 @@ namespace GUIEngine
         DigitFace* digit = font_manager->getFont<DigitFace>();
 
         ScalableFont* digit_font = new ScalableFont(digit);
+        digit_font->setScale(0.4f);
         g_digit_font = digit_font;
 
         ScalableFont* sfont = new ScalableFont(regular);

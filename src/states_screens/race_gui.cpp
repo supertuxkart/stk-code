@@ -469,7 +469,7 @@ void RaceGUI::drawGlobalTimer()
     }
 
     gui::ScalableFont* font = (use_digit_font ? GUIEngine::getHighresDigitFont() : GUIEngine::getFont());
-    font->setScale(1.0f);
+    if (use_digit_font) font->setScale(0.4f);
     font->setBlackBorder(true);
     font->draw(sw, pos, time_color, false, false, NULL,
                true /* ignore RTL */);
@@ -534,7 +534,7 @@ void RaceGUI::drawLiveDifference()
                         irr_driver->getActualScreenSize().Height*11/100);
 
     gui::ScalableFont* font = GUIEngine::getHighresDigitFont();
-    font->setScale(1.0f);
+    font->setScale(0.4f);
     font->setBlackBorder(true);
     font->draw(sw.c_str(), pos, time_color, false, false, NULL,
                true /* ignore RTL */);
@@ -970,7 +970,7 @@ void RaceGUI::drawRank(const AbstractKart *kart,
     font->setBlackBorder(true);
     font->draw(oss.str().c_str(), pos, color, true, true);
     font->setBlackBorder(false);
-    font->setScale(1.0f);
+    font->setScale(0.4f);
 }   // drawRank
 
 //-----------------------------------------------------------------------------
@@ -1293,7 +1293,7 @@ void RaceGUI::drawLap(const AbstractKart* kart,
         pos.UpperLeftCorner.X += 30;
         font->draw(StringUtils::toWString(hit_capture_limit).c_str(), pos, color);
         font->setBlackBorder(false);
-        font->setScale(1.0f);
+        font->setScale(0.4f);
         return;
     }
 
@@ -1303,7 +1303,7 @@ void RaceGUI::drawLap(const AbstractKart* kart,
         int blue_score = ctf ? ctf->getBlueScore() : sw->getScore(KART_TEAM_BLUE);
         gui::ScalableFont* font = GUIEngine::getHighresDigitFont();
         font->setBlackBorder(true);
-        font->setScale(1.0f);
+        font->setScale(0.4f);
         core::dimension2du d;
         if (score_limit != -1)
         {
@@ -1382,7 +1382,7 @@ void RaceGUI::drawLap(const AbstractKart* kart,
     font->setBlackBorder(true);
     font->draw(out.str().c_str(), pos, color);
     font->setBlackBorder(false);
-    font->setScale(1.0f);
+    font->setScale(0.4f);
 #endif
 } // drawLap
 
