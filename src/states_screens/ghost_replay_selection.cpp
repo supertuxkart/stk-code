@@ -71,8 +71,6 @@ void GhostReplaySelection::refresh(bool forced_update, bool update_columns)
 {
     if (ReplayPlay::get()->getNumReplayFile() == 0 || forced_update)
         ReplayPlay::get()->loadAllReplayFile();
-    defaultSort();
-    loadList();
 
     // Allow to disable a comparison, but not to start one
     m_compare_toggle_widget->setVisible(m_is_comparing);
@@ -82,8 +80,27 @@ void GhostReplaySelection::refresh(bool forced_update, bool update_columns)
     if (update_columns)
     {
         m_replay_list_widget->clearColumns();
-        beforeAddingWidget();//Reload the columns used
+        m_replay_list_widget->addColumn(_C("column_name", "Track"), 9 );
+        if (m_active_mode_is_linear)
+            m_replay_list_widget->addColumn(_C("column_name", "Reverse"), 3);
+        if (!m_same_difficulty)
+            m_replay_list_widget->addColumn(_C("column_name", "Difficulty"), 4);
+        if (m_active_mode_is_linear)
+            m_replay_list_widget->addColumn(_C("column_name", "Laps"), 3);
+        m_replay_list_widget->addColumn(_C("column_name", "Time"), 4);
+        m_replay_list_widget->addColumn(_C("column_name", "Kart"), 1);
+        m_replay_list_widget->addColumn(_C("column_name", "User"), 5);
+        if (m_multiplayer)
+            m_replay_list_widget->addColumn(_C("column_name", "Players"), 3);
+        if (!m_same_version)
+            m_replay_list_widget->addColumn(_C("column_name", "Version"), 3);
+
+        m_replay_list_widget->createHeader();
+        m_replay_list_widget->resize();
     }
+
+    defaultSort();
+    loadList();
 }   // refresh
 
 // ----------------------------------------------------------------------------
@@ -164,8 +181,6 @@ void GhostReplaySelection::beforeAddingWidget()
         m_replay_list_widget->addColumn(_C("column_name", "Players"), 3);
     if (!m_same_version)
         m_replay_list_widget->addColumn(_C("column_name", "Version"), 3);
-
-    m_replay_list_widget->createHeader();
 }   // beforeAddingWidget
 
 // ----------------------------------------------------------------------------
@@ -182,7 +197,7 @@ void GhostReplaySelection::init()
     m_icon_bank->setTargetIconSize(128, 128);
     m_replay_list_widget->setIcons(m_icon_bank, (int)row_height);
 
-    refresh(/*reload replay files*/ false, /* update columns */ true);
+    refresh(/*reload replay files*/ false, /* update columns */ false);
 }   // init
 
 // ----------------------------------------------------------------------------

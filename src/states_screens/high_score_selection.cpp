@@ -81,17 +81,43 @@ void HighScoreSelection::refresh(bool forced_update, bool update_columns)
         }
         highscore_manager->loadHighscores();
     }
-    defaultSort();
-
-    loadList();
 
     if (update_columns)
     {
+        core::stringw track_type_name;
+
+        if (m_major_mode == RaceManager::MAJOR_MODE_GRAND_PRIX)
+            track_type_name = _("Grand Prix");
+        else
+            track_type_name = _("Track");
+
         m_high_scores_list_widget->clearColumns();
-        beforeAddingWidget(); //Reload the columns used
+        m_high_scores_list_widget->addColumn(_C("column_name", track_type_name.c_str()), 7);
+        m_high_scores_list_widget->addColumn(_C("column_name", "Difficulty"), 4);
+        if (m_active_mode_is_linear)
+        {
+            m_high_scores_list_widget->addColumn(_C("column_name", "Number of karts"), 4);
+
+            if (m_major_mode == RaceManager::MAJOR_MODE_GRAND_PRIX)
+            {
+                m_high_scores_list_widget->addColumn(_("Game mode"),3);
+            }
+            else if (m_active_mode != RaceManager::MINOR_MODE_LAP_TRIAL)
+            {
+                m_high_scores_list_widget->addColumn(_C("column_name", "Laps"), 3);
+            }
+                m_high_scores_list_widget->addColumn(_C("column_name", "Reverse"), 3);
+        }
+
+        if (m_active_mode == RaceManager::MINOR_MODE_LAP_TRIAL)
+            m_high_scores_list_widget->addColumn(_("Time limit"),4);
+
         m_high_scores_list_widget->createHeader();
         m_high_scores_list_widget->resize();
     }
+
+    defaultSort();
+    loadList();
 }   // refresh
 
 // ----------------------------------------------------------------------------
@@ -173,7 +199,7 @@ void HighScoreSelection::init()
     m_icon_bank->setTargetIconSize(128, 128);
     m_high_scores_list_widget->setIcons(m_icon_bank, (int)row_height);
 
-    refresh(/*reload high score list*/ false, /* update columns */ true);
+    refresh(/*reload high score list*/ false, /* update columns */ false);
 }   // init
 
 // ----------------------------------------------------------------------------

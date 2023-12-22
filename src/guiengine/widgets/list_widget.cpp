@@ -114,11 +114,11 @@ void ListWidget::add()
     list_box->setAlternatingDarkness(m_properties[PROP_ALTERNATE_BG] == "true");
     if (current_skin && current_skin->getSpriteBank())
     {
-            list_box->setSpriteBank(current_skin->getSpriteBank());
+        list_box->setSpriteBank(current_skin->getSpriteBank());
     }
     else if (current_font && current_font->getType() == EGFT_BITMAP)
     {
-            list_box->setSpriteBank( ((IGUIFontBitmap*)current_font)->getSpriteBank());
+        list_box->setSpriteBank( ((IGUIFontBitmap*)current_font)->getSpriteBank());
     }
 
     list_box->drop();
@@ -138,10 +138,13 @@ void ListWidget::resize()
 {
     const int header_height = GUIEngine::getFontHeight() + 15;
 
-    rect<s32> widget_size = (m_header.size() > 0 ? rect<s32>(m_x, m_y + header_height, m_x + m_w, m_y + m_h) :
-                                                   rect<s32>(m_x, m_y, m_x + m_w, m_y + m_h) );
+    rect<s32> widget_size = rect<s32>(m_x, m_y, m_x + m_w, m_y + m_h);
+    if (m_header.size() > 0) 
+    {
+        widget_size.UpperLeftCorner.Y += header_height;
+    }
 
-    CGUISTKListBox *list = static_cast<CGUISTKListBox*>(m_element);
+    CGUISTKListBox *list = getIrrlichtElement<CGUISTKListBox>();
 
     if (m_header.size() > 0)
     {
@@ -262,10 +265,12 @@ void ListWidget::clearColumns()
     m_header.clear();
     for (unsigned int n=0; n<m_header_elements.size(); n++)
     {
+        IGUIElement* elem = m_header_elements[n].getIrrlichtElement();
+        if (elem) elem->remove();
+
         m_header_elements[n].elementRemoved();
         m_children.remove( m_header_elements.get(n) );
     }
-
     m_header_elements.clearAndDeleteAll();
     m_header_created = false;
 } //clearColumns

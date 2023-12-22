@@ -179,6 +179,7 @@ void DynamicRibbonWidget::buildInternalStructure()
         if (elem != NULL && m_children[i].m_type == WTYPE_RIBBON)
         {
             elem->remove();
+            m_children[i].elementRemoved();
             m_children.erase(i);
             i--;
         }

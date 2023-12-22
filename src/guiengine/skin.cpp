@@ -49,6 +49,7 @@ using namespace io;
 using namespace gui;
 
 const bool ID_DEBUG = false;
+const bool ID_NO_FOCUS_DEBUG = true;
 
 /**
  * Small utility to read config file info from a XML file.
@@ -2431,7 +2432,7 @@ void Skin::process3DPane(IGUIElement *element, const core::recti &rect,
     }
 
 
-    if (ID_DEBUG && id != -1 && Widget::isFocusableId(id))
+    if (ID_DEBUG && id != -1 && (Widget::isFocusableId(id) || ID_NO_FOCUS_DEBUG))
     {
         irr::core::stringw idstring;
         idstring += id;

@@ -304,7 +304,7 @@ void Widget::resize()
     assert(m_magic_number == 0xCAFEC001);
 
     if (m_element) {
-        m_element->setRelativePosition( core::rect < s32 > (m_x, m_y, m_x+m_w, m_y+m_h) );
+        moveIrrlichtElement();
     }
 }
 
