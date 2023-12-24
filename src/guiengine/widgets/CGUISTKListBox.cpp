@@ -464,6 +464,13 @@ void CGUISTKListBox::updateAbsolutePosition()
 {
     IGUIElement::updateAbsolutePosition();
 
+    for (int i = 0; i < Items.size(); i++)
+    {
+        for (int j = 0; j < Items[i].m_contents.size(); j++)
+        {
+            Items[i].m_contents[j].m_glyph_layouts.clear();
+        }
+    }
     recalculateItemHeight();
     if (Items.size())
     {

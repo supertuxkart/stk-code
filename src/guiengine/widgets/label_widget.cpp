@@ -72,11 +72,12 @@ void LabelWidget::add()
     if (m_properties[PROP_TEXT_VALIGN] == "top") valign = EGUIA_UPPERLEFT;
     if (m_properties[PROP_TEXT_VALIGN] == "bottom") valign = EGUIA_LOWERRIGHT;
 
+    m_container = GUIEngine::getGUIEnv()->addButton(init_rect, m_parent, -1);
+
     IGUIStaticText* irrwidget;
     irrwidget = GUIEngine::getGUIEnv()->addStaticText(message.c_str(), init_rect,
-                                                      false, word_wrap, m_parent, -1);
+                                                      false, word_wrap, m_container, -1);
 
-    irrwidget->setTextRestrainedInside(m_scroll_speed != 0);
     irrwidget->setMouseCallback(Online::LinkHelper::openURLIrrElement);
     irrwidget->setTextAlignment( align, valign );
 
@@ -135,29 +136,38 @@ void LabelWidget::resize()
     else 
         fwidth = GUIEngine::getFont()->getDimension(message.c_str()).Width;
 
-    int offset = 0, real_width = fwidth;
+    int offset = 0, container_width = fwidth, real_width = fwidth;
     if (!m_expand_if_needed || fwidth < m_w)
     {
-        real_width = m_w;
+        container_width = m_w;
+        if (m_scroll_speed <= 0)
+        {
+            real_width = m_w;
+        }
     }
     if (m_scroll_speed > 0)
     {
-        offset = -m_scroll_progress * (real_width + fwidth) + real_width;
+        offset = -m_scroll_progress * (real_width + container_width) + container_width;
     }
 
-    core::rect<s32> rect = core::rect < s32 > (m_x + offset, m_y, m_x + real_width, m_y + m_h);
-
-    m_element->setRelativePosition(rect);
+    m_container->setRelativePosition(core::rect<s32>(m_x, m_y, m_x + container_width, m_y + m_h));
+    m_element->setRelativePosition(core::rect<s32>(offset, 0, offset + real_width, m_h));
+    m_element->updateAbsolutePosition();
 }
 
 // ----------------------------------------------------------------------------
 
 void LabelWidget::setText(const core::stringw& text, bool expandIfNeeded)
 {
-    m_scroll_progress = 0.0f;
     m_expand_if_needed = expandIfNeeded;
 
     Widget::setText(text);
+
+    if (m_element)
+    {
+        m_scroll_progress = 0.0f;
+        resize();
+    }
 }   // setText
 
 // ----------------------------------------------------------------------------
@@ -186,6 +196,10 @@ bool LabelWidget::scrolledOff() const
 void LabelWidget::setScrollSpeed(float speed)
 {
     m_scroll_speed = speed;
+    if (m_element)
+    {
+        getIrrlichtElement<IGUIStaticText>()->setNotClipped(m_scroll_speed <= 0);
+    }
 }   // setScrollSpeed
 
 // ----------------------------------------------------------------------------

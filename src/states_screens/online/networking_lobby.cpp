@@ -465,19 +465,16 @@ void NetworkingLobby::onUpdate(float delta)
     {
         m_header_text_width =
             GUIEngine::getTitleFont()->getDimension(m_header_text.c_str()).Width;
-        m_header->getIrrlichtElement()->remove();
+
         if (m_header_text_width > m_header->m_w)
         {
             m_header->setScrollSpeed(0.1f);
-            m_header->add();
-            m_header->setText(m_header_text, true);
         }
         else
         {
             m_header->setScrollSpeed(0);
-            m_header->add();
-            m_header->setText(m_header_text, true);
         }
+        m_header->setText(m_header_text, false);
         // Make sure server name is not clickable for URL
         m_header->getIrrlichtElement<IGUIStaticText>()->setMouseCallback(nullptr);
     }
@@ -486,7 +483,7 @@ void NetworkingLobby::onUpdate(float delta)
     {
         m_header->update(delta);
         if (m_header->scrolledOff())
-            m_header->setText(m_header->getText(), true);
+            m_header->setText(m_header->getText(), false);
     }
 
     if (m_reload_server_info)

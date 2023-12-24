@@ -197,7 +197,7 @@ void DynamicRibbonWidget::buildInternalStructure()
     // Give some margin for columns for better readability
     col_width *= 1.2f;
     
-    m_col_amount = (int)floor( m_w / col_width );
+    m_col_amount = std::max((int)floor( m_w / col_width ), 1);
 
     // ajust column amount to not add more item slots than we actually need
     const int item_count = (int) m_items.size();

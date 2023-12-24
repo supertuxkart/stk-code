@@ -49,16 +49,18 @@ namespace GUIEngine
         
     private:
         
-        LabelType             m_type;
-        irr::video::SColor    m_color;
-        bool                  m_has_color;
-        bool                  m_expand_if_needed;
+        LabelType              m_type;
+        irr::video::SColor     m_color;
+        bool                   m_has_color;
+        bool                   m_expand_if_needed;
 
         /** Scroll speed in cycle/second (0 if no scrolling). */
-        float                 m_scroll_speed;
+        float                  m_scroll_speed;
         
         /** Current scroll progress. */
-        float                 m_scroll_progress;
+        float                  m_scroll_progress;
+
+        irr::gui::IGUIElement *m_container;
 
         // Hide overloaded methods
         using Widget::setText;
