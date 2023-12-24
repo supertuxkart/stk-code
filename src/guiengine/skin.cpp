@@ -49,7 +49,7 @@ using namespace io;
 using namespace gui;
 
 const bool ID_DEBUG = false;
-const bool ID_NO_FOCUS_DEBUG = true;
+const bool ID_NO_FOCUS_DEBUG = false;
 
 /**
  * Small utility to read config file info from a XML file.

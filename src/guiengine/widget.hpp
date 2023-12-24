@@ -42,21 +42,21 @@ namespace GUIEngine
     enum WidgetType
     {
         WTYPE_NONE = -1,
-        WTYPE_RIBBON,
-        WTYPE_SPINNER,
-        WTYPE_BUTTON,
-        WTYPE_ICON_BUTTON,
-        WTYPE_CHECKBOX,
-        WTYPE_LABEL,
         WTYPE_BUBBLE,
-        WTYPE_SPACER,
+        WTYPE_BUTTON,
+        WTYPE_CHECKBOX,
         WTYPE_DIV,
         WTYPE_DYNAMIC_RIBBON,
-        WTYPE_MODEL_VIEW,
+        WTYPE_ICON_BUTTON,
+        WTYPE_LABEL,
         WTYPE_LIST,
-        WTYPE_TEXTBOX,
+        WTYPE_MODEL_VIEW,
         WTYPE_PROGRESS,
-        WTYPE_RATINGBAR
+        WTYPE_RATINGBAR,
+        WTYPE_RIBBON,
+        WTYPE_SPACER,
+        WTYPE_SPINNER,
+        WTYPE_TEXTBOX
     };
 
     enum BadgeType

@@ -130,7 +130,8 @@ void IconButtonWidget::add()
     const bool word_wrap = (m_properties[PROP_WORD_WRAP] == "true");
 
     IGUIButton* btn = GUIEngine::getGUIEnv()->addButton(init_rect, m_parent,
-                                                        (m_tab_stop ? getNewID() : getNewNoFocusID()),
+                                                       (m_reserved_id != -1 ? m_reserved_id :
+                                                        m_tab_stop ? getNewID() : getNewNoFocusID()),
                                                         L"");
 
     btn->setTabStop(m_tab_stop);

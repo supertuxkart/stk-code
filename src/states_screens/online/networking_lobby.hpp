@@ -72,6 +72,7 @@ private:
     std::shared_ptr<Server> m_joined_server;
 
     std::vector<gui::GlyphLayout> m_server_info;
+    std::vector<core::stringw>    m_server_info_text;
     int m_server_info_height, m_header_text_width;
 
     core::stringw m_start_text, m_ready_text, m_live_join_text,

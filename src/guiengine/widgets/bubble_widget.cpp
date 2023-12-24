@@ -54,6 +54,7 @@ void BubbleWidget::add()
                                                       false, true /* word wrap */, m_parent,
                                                       (m_focusable ? getNewID() : getNewNoFocusID()));
     irrwidget->setTextRestrainedInside(false);
+    irrwidget->setDrawBorder(true);
     irrwidget->setMouseCallback([this](irr::gui::IGUIStaticText* text,
                                        irr::SEvent::SMouseInput mouse)->bool
     {
@@ -65,8 +66,17 @@ void BubbleWidget::add()
         return Online::LinkHelper::openURLIrrElement(text, mouse);
     });
 
+    EGUI_ALIGNMENT align = EGUIA_UPPERLEFT;
+    if      (m_properties[PROP_TEXT_ALIGN] == "center") align = EGUIA_CENTER;
+    else if (m_properties[PROP_TEXT_ALIGN] == "right")  align = EGUIA_LOWERRIGHT;
+
+    EGUI_ALIGNMENT valign = EGUIA_CENTER;
+    if (m_properties[PROP_TEXT_VALIGN] == "top") valign = EGUIA_UPPERLEFT;
+    if (m_properties[PROP_TEXT_VALIGN] == "bottom") valign = EGUIA_LOWERRIGHT;
+
+    irrwidget->setTextAlignment( align, valign );
+
     m_element = irrwidget;
-    replaceText();
     m_id = m_element->getID();
 
     m_element->setTabOrder(m_id);
@@ -77,23 +87,18 @@ void BubbleWidget::add()
     resize();
 }
 
-void BubbleWidget::replaceText()
+void BubbleWidget::resize()
 {
-    IGUIStaticText* irrwidget = (IGUIStaticText*) m_element;
+    IGUIStaticText* irrwidget = getIrrlichtElement<IGUIStaticText>();
     // Take border into account for line breaking (happens in setText)
-    irrwidget->setDrawBorder(true);
+
+    m_shrinked_size = rect<s32>(m_x, m_y, m_x + m_w - BUBBLE_MARGIN_ON_RIGHT, m_y + m_h - BOTTOM_MARGIN);
 
     stringw message = getText();
 
-    EGUI_ALIGNMENT align = EGUIA_UPPERLEFT;
-    if      (m_properties[PROP_TEXT_ALIGN] == "center") align = EGUIA_CENTER;
-    else if (m_properties[PROP_TEXT_ALIGN] == "right")  align = EGUIA_LOWERRIGHT;
-
-    EGUI_ALIGNMENT valign = EGUIA_CENTER;
-    if (m_properties[PROP_TEXT_VALIGN] == "top") valign = EGUIA_UPPERLEFT;
-    if (m_properties[PROP_TEXT_VALIGN] == "bottom") valign = EGUIA_LOWERRIGHT;
-
     // find expanded bubble size
+    irrwidget->setText(message.c_str());
+    irrwidget->setRelativePosition(m_shrinked_size);
     int text_height = irrwidget->getTextHeight();
 
     m_expanded_size = m_shrinked_size;
@@ -114,16 +119,26 @@ void BubbleWidget::replaceText()
         }
     }
     m_shrinked_text = message;
-    irrwidget->setTextAlignment( align, valign );
-}
 
-void BubbleWidget::resize()
-{
-    m_shrinked_size = rect<s32>(m_x, m_y, m_x + m_w - BUBBLE_MARGIN_ON_RIGHT, m_y + m_h - BOTTOM_MARGIN);
+    if (m_zoom > 0.0f)
+    {
+        core::rect<s32> currsize = m_shrinked_size;
 
-    m_element->setRelativePosition(m_shrinked_size);
+        const int y1_top    = m_shrinked_size.UpperLeftCorner.Y;
+        const int y1_bottom = m_shrinked_size.LowerRightCorner.Y;
 
-    replaceText();
+        const int y2_top    = m_expanded_size.UpperLeftCorner.Y;
+        const int y2_bottom = m_expanded_size.LowerRightCorner.Y;
+
+        currsize.UpperLeftCorner.Y  = (int)(y1_top + (y2_top - y1_top)*m_zoom);
+        currsize.LowerRightCorner.Y = (int)(y1_bottom
+                                            +(y2_bottom - y1_bottom)*m_zoom);
+
+        m_element->setRelativePosition(currsize);
+
+        if (m_zoom > 0.5f)
+            irrwidget->setText(getText().c_str());
+    }
 }
 
 void BubbleWidget::setText(const irr::core::stringw &s)
@@ -132,7 +147,7 @@ void BubbleWidget::setText(const irr::core::stringw &s)
     if (m_element != NULL)
     {
         //If add() has already been called (and thus m_element is set) we need to replace the text.
-        replaceText();
+        resize();
     }
 }
 
@@ -144,6 +159,7 @@ void BubbleWidget::update(float dt)
         {
             m_zoom += dt * 10.0f;
             if (m_zoom > 1.0f) m_zoom = 1.0f;
+            resize();
         }
     }
     else
@@ -152,26 +168,9 @@ void BubbleWidget::update(float dt)
         {
             m_zoom -= dt * 10.0f;
             if (m_zoom < 0.0f) m_zoom = 0.0f;
+            resize();
         }
     }
-    core::rect<s32> currsize = m_shrinked_size;
-
-    const int y1_top    = m_shrinked_size.UpperLeftCorner.Y;
-    const int y1_bottom = m_shrinked_size.LowerRightCorner.Y;
-
-    const int y2_top    = m_expanded_size.UpperLeftCorner.Y;
-    const int y2_bottom = m_expanded_size.LowerRightCorner.Y;
-
-    currsize.UpperLeftCorner.Y  = (int)(y1_top + (y2_top - y1_top)*m_zoom);
-    currsize.LowerRightCorner.Y = (int)(y1_bottom
-                                        +(y2_bottom - y1_bottom)*m_zoom);
-
-    m_element->setRelativePosition(currsize);
-
-    if (m_zoom > 0.5f)
-        getIrrlichtElement<IGUIStaticText>()->setText(getText().c_str());
-    else
-        getIrrlichtElement<IGUIStaticText>()->setText(m_shrinked_text.c_str());
 }
 
 // ----------------------------------------------------------------------------

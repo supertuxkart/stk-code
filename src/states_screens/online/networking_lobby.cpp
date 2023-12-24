@@ -342,6 +342,7 @@ handle_player_message_copy:
 void NetworkingLobby::addMoreServerInfo(core::stringw info)
 {
 #ifndef SERVER_ONLY
+    m_server_info_text.push_back(info);
     const unsigned box_width = m_text_bubble->getDimension().Width;
     const float box_height = m_text_bubble->getDimension().Height;
     std::vector<GlyphLayout> cur_info;
@@ -443,6 +444,14 @@ void NetworkingLobby::onResize()
     m_player_list->setIcons(m_icon_bank);
 
     Screen::onResize();
+
+    std::vector<core::stringw> vec_str = m_server_info_text;
+    m_server_info.clear();
+    m_server_info_text.clear();
+    for (auto str : vec_str)
+    {
+        addMoreServerInfo(str);
+    }
 }
 
 // ----------------------------------------------------------------------------
@@ -459,7 +468,7 @@ void NetworkingLobby::onUpdate(float delta)
         m_header->getIrrlichtElement()->remove();
         if (m_header_text_width > m_header->m_w)
         {
-            m_header->setScrollSpeed(GUIEngine::getTitleFontHeight() / 2);
+            m_header->setScrollSpeed(0.1f);
             m_header->add();
             m_header->setText(m_header_text, true);
         }
