@@ -80,6 +80,7 @@ void LabelWidget::add()
 
     irrwidget->setMouseCallback(Online::LinkHelper::openURLIrrElement);
     irrwidget->setTextAlignment( align, valign );
+    irrwidget->setTextRestrainedInside(m_scroll_speed > 0);
 
     if (m_has_color)
     {
@@ -198,7 +199,8 @@ void LabelWidget::setScrollSpeed(float speed)
     m_scroll_speed = speed;
     if (m_element)
     {
-        getIrrlichtElement<IGUIStaticText>()->setNotClipped(m_scroll_speed <= 0);
+        getIrrlichtElement<IGUIStaticText>()->setTextRestrainedInside(m_scroll_speed > 0);
+        m_element->setNotClipped(m_scroll_speed <= 0);
     }
 }   // setScrollSpeed
 
