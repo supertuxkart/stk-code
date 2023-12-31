@@ -324,7 +324,8 @@ void LocalPlayerController::displayPenaltyWarning()
 {
     PlayerController::displayPenaltyWarning();
     RaceGUIBase* m=World::getWorld()->getRaceGUI();
-    if (m)
+    if (m && 
+    RaceManager::get()->getMinorMode() != RaceManager::MINOR_MODE_SOCCER)
     {
         m->addMessage(_("Penalty time!!"), m_kart, 2.0f,
                       GUIEngine::getSkin()->getColor("font::top"), true /* important */,
