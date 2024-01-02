@@ -2468,6 +2468,9 @@ void Kart::handleZipper(const Material *material, bool play_sound, bool mini_zip
     /** Additional engine force. */
     float engine_force;
 
+	/*MS_INCREASE_ZIPPER or MS_INCREASE_GROUND_ZIPPER*/
+    unsigned int boost_category;
+
     if(material)
     {
         material->getZipperParameter(&max_speed_increase, &duration,
@@ -2482,6 +2485,7 @@ void Kart::handleZipper(const Material *material, bool play_sound, bool mini_zip
             fade_out_time      = m_kart_properties->getZipperFadeOutTime();
         if(engine_force<0)
             engine_force       = m_kart_properties->getZipperForce();
+        boost_category = MaxSpeed::MS_INCREASE_GROUND_ZIPPER;
     }
     else
     {
@@ -2501,11 +2505,12 @@ void Kart::handleZipper(const Material *material, bool play_sound, bool mini_zip
             fade_out_time      = m_kart_properties->getZipperFadeOutTime();
             engine_force       = m_kart_properties->getZipperForce();
         }
+        boost_category = MaxSpeed::MS_INCREASE_ZIPPER;
     }
     // Ignore a zipper that's activated while braking
     if(m_controls.getBrake() || m_speed<0) return;
 
-    m_max_speed->instantSpeedIncrease(MaxSpeed::MS_INCREASE_ZIPPER,
+    m_max_speed->instantSpeedIncrease(boost_category,
                                      max_speed_increase, speed_gain,
                                      engine_force,
                                      stk_config->time2Ticks(duration),

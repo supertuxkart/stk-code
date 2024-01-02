@@ -424,6 +424,9 @@ void MaxSpeed::update(int ticks)
     float max_skid_speed = 0.0f;
     float max_skid_engine_force = 0.0f;
 
+    float max_zipper_speed = 0.0f;
+    float max_zipper_engine_force = 0.0f;
+
     for(unsigned int i=MS_DECREASE_MIN; i<MS_DECREASE_MAX; i++)
     {
         SpeedDecrease &slowdown = m_speed_decrease[i];
@@ -444,6 +447,23 @@ void MaxSpeed::update(int ticks)
         m_current_max_speed += speedup.getSpeedIncrease();
         m_add_engine_force  += speedup.getEngineForce();
     }
+
+    // Pick the highest applicable speed boost and the highest applicable engine boost, 
+    // which may come from different effects. This approach fixes all possible "fade-out"
+    // issues.
+    for(unsigned int i=MS_INCREASE_ZIPPER; i<=MS_INCREASE_GROUND_ZIPPER; i++)
+    {
+        SpeedIncrease &speedup = m_speed_increase[i];
+        if (speedup.getSpeedIncrease() > max_zipper_speed)
+            max_zipper_speed = speedup.getSpeedIncrease();
+        if (speedup.getEngineForce() > max_zipper_engine_force)
+            max_zipper_engine_force = speedup.getEngineForce();
+
+        m_current_max_speed -= speedup.getSpeedIncrease();
+        m_add_engine_force  -= speedup.getEngineForce();
+    }
+    m_current_max_speed += max_zipper_speed;
+    m_add_engine_force  += max_zipper_engine_force;
 
     // Prevent the different kinds of skidding speed increases from cumulating
     // We select the highest active max-speed bonus and engine-force bonus,

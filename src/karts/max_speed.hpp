@@ -36,6 +36,7 @@ public:
      *  skidding usage, or electro-shield. */
     enum  {MS_INCREASE_MIN,
            MS_INCREASE_ZIPPER = MS_INCREASE_MIN,
+           MS_INCREASE_GROUND_ZIPPER,
            MS_INCREASE_SLIPSTREAM,
            MS_INCREASE_NITRO,
            MS_INCREASE_RUBBER,
