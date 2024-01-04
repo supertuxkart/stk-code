@@ -386,6 +386,7 @@ void LocalPlayerController::handleZipper(bool play_sound)
     if (play_sound || (m_wee_sound->getStatus() != SFXBase::SFX_PLAYING &&
                        m_kart->getMaterial()!=m_kart->getLastMaterial()      ) )
     {
+        m_wee_sound->setPosition(m_kart->getXYZ());
         m_wee_sound->play();
     }
 
