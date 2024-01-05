@@ -4,9 +4,9 @@ uniform sampler2D ssao_tex;
 uniform sampler2D normal_color;
 uniform sampler2D diffuse_color;
 #if defined(GL_ES) && defined(GL_FRAGMENT_PRECISION_HIGH)
-    uniform highp sampler2D depth_stencil;
+uniform highp sampler2D depth_stencil;
 #else
-    uniform sampler2D depth_stencil;
+uniform sampler2D depth_stencil;
 #endif
 uniform sampler2D light_scatter;
 
