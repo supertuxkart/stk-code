@@ -100,21 +100,24 @@
         are defined in kart_characteristics.xml (so they can be changed by
         difficulty or kart class if so wished)
 
-        max-targets    : The maximum number of karts in front nitro can be stolen from.
-        bonus-no-kart  : If there is not enough karts in front to steal from, gift this
-                        amount per missing kart.
-        stolen-max     : The amount of nitro taken from the kart immediately in front.
-                        This should be the highest amount so that the stealing is meaningful
-                        with low amount of karts in a race.
-        stolen-add     : For each kart ranked better than the one immediately in front, the
-                        amount of stolen nitro is iteratively computed starting from
-                        stolen-max, multiplying by stolen-multiply and adding stolen-add.
-                        For example, with stolen-max=2, stolen-add=0.2 and stolen-multiply=0.5,
-                        we get 2.0 then (2.0*0.5)+0.2 = 1.2, then (1.2*0.5)+0.2 = 0.8 and so on.
-        stolen-multiply: See above. A low multiply will make the final values closer to each
+        max-targets        : The maximum number of karts in front nitro can be stolen from.
+        negative-multiply  : If the current nitro level is negative, multiply it by this number upon
+                             activation, and then apply all other effects. If set to default (1.0),
+                             it has no effect.
+        bonus-no-kart      : If there is not enough karts in front to steal from, gift this
+                             amount per missing kart.
+        stolen-max         : The amount of nitro taken from the kart immediately in front.
+                             This should be the highest amount so that the stealing is meaningful
+                             with low amount of karts in a race.
+        stolen-add         : For each kart ranked better than the one immediately in front, the
+                             amount of stolen nitro is iteratively computed starting from
+                             stolen-max, multiplying by stolen-multiply and adding stolen-add.
+                             For example, with stolen-max=2, stolen-add=0.2 and stolen-multiply=0.5,
+                             we get 2.0 then (2.0*0.5)+0.2 = 1.2, then (1.2*0.5)+0.2 = 0.8 and so on.
+        stolen-multiply    : See above. A low multiply will make the final values closer to each
                         other. -->
   <item name="nitro-hack"         icon="sudo_nitro.png"
-        max-targets="6" bonus-no-kart="0.125"
+        max-targets="6" negative-multiply="1.0" bonus-no-kart="0.125"
         stolen-max="1.25" stolen-add="0.275" stolen-multiply="0.34"/>
   <item name="electro-shield"     icon="electro-shield-icon.png" />
   <item name="mini-wish"          icon="mini_all-on.png"

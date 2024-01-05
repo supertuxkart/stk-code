@@ -669,6 +669,7 @@ void PowerupManager::loadNitroHack(const XMLNode &node)
     // the config file
     m_nh_max_targets = 5;
     m_nh_base_bonus = 0.2f;
+    m_nh_negative_multiply = 1.0f;
 
     float stolen_max = 1.6f;
     float stolen_add = 0.4f;
@@ -677,6 +678,9 @@ void PowerupManager::loadNitroHack(const XMLNode &node)
     if(!node.get("max-targets",     &m_nh_max_targets))
         Log::warn("powerup",
                   "No max-targets specified for nitro-hack.");
+    if(!node.get("negative-multiply",   &m_nh_negative_multiply))
+        Log::warn("powerup",
+                  "No negative-multiply specified for nitro-hack.");
     if(!node.get("bonus-no-kart",   &m_nh_base_bonus))
         Log::warn("powerup",
                   "No bonus-no-kart specified for nitro-hack.");

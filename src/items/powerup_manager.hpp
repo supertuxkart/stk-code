@@ -184,6 +184,7 @@ private:
 
     /** Parameters for the nitro-hack powerup */
     unsigned int m_nh_max_targets;
+    float m_nh_negative_multiply;
     float m_nh_base_bonus;
     float m_nh_stolen_amount[20];
 
@@ -222,6 +223,7 @@ public:
     // ------------------------------------------------------------------------
     /** Functions for the NitroHack powerup */
     unsigned int getNitroHackMaxTargets() const { return m_nh_max_targets; }
+    float getNitroHackNegativeMultiply() const { return m_nh_negative_multiply; }
     float getNitroHackBaseBonus() const { return m_nh_base_bonus; }
     float getNitroHackStolenDiff(unsigned int diff) const;
 

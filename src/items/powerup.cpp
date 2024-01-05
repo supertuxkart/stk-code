@@ -366,6 +366,7 @@ void Powerup::use()
             Kart* player_kart = NULL;
             unsigned int steal_targets = powerup_manager->getNitroHackMaxTargets();
             float base_bonus = powerup_manager->getNitroHackBaseBonus();
+            float negative_multiply = powerup_manager->getNitroHackNegativeMultiply();
 
             float stolen_energy = 0.0f;
             unsigned int steal_counter = 0;
@@ -400,6 +401,9 @@ void Powerup::use()
                     }
                 }
             }
+            // Multiply current nitro by a given factor if it is currently negative
+            if(m_kart->getEnergy() < 0)
+                m_kart->setEnergy(m_kart->getEnergy()*negative_multiply);
 
             // Gift some free nitro if there is not enough targets in front
             if (steal_counter < steal_targets)
