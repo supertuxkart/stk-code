@@ -1,5 +1,9 @@
 uniform sampler2D ntex;
+#if defined(GL_ES) && defined(GL_FRAGMENT_PRECISION_HIGH)
+uniform highp sampler2D dtex;
+#else
 uniform sampler2D dtex;
+#endif
 
 flat in vec3 center;
 flat in float energy;
