@@ -25,21 +25,16 @@ class Player;
 
 class NetworkPlayerController : public PlayerController
 {
-private:
-    SFXBase     *m_wee_sound;
-
 public:
     NetworkPlayerController(AbstractKart *kart) : PlayerController(kart)
     {
-        m_wee_sound    = SFXManager::get()->createSoundSource("wee");
         Log::info("NetworkPlayerController",
                   "New network player controller.");
     }   // NetworkPlayerController
     // ------------------------------------------------------------------------
-    ~NetworkPlayerController()
-    {
-        m_wee_sound->deleteSFX();
-    }   // ~NetworkPlayerController
+    virtual ~NetworkPlayerController(){
+    
+    } // ~NetworkPlayerController
     // ------------------------------------------------------------------------
     virtual bool canGetAchievements() const OVERRIDE          { return false; }
     // ------------------------------------------------------------------------
@@ -49,22 +44,6 @@ public:
     {
         return false; 
     }   // isLocal
-    // ------------------------------------------------------------------------
-    /** Called when a kart hits or uses a zipper. */
-    virtual void handleZipper      (bool play_sound) OVERRIDE
-    {
-        PlayerController::handleZipper(play_sound);
-        // Only play a zipper sound if it's not already playing, and
-        // if the material has changed (to avoid machine gun effect
-        // on conveyor belt zippers).
-        if (play_sound || (m_wee_sound->getStatus() != SFXBase::SFX_PLAYING &&
-                           m_kart->getMaterial()!=m_kart->getLastMaterial()))
-        {
-            m_wee_sound->setPosition(m_kart->getXYZ());
-            m_wee_sound->play();
-        }
-       // There is probably no need to apply graphical effects for a network player
-    }
     // ------------------------------------------------------------------------
     /** Update for network controller. For player with a high ping it is
      *  useful to reduce shaking by reducing the steering somewhat in each

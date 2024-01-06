@@ -20,13 +20,23 @@
 #define HEADER_PLAYER_CONTROLLER_HPP
 
 #include "karts/controller/controller.hpp"
+#include "audio/sfx_base.hpp"
 
 class AbstractKart;
 class Player;
+class SFXBuffer;
+class SFXBase; 
+// SFXBase is required to properly play the zipper sound.
+// There should be a better way to do this after restructuring
+// the class hierarchy. Currently handleZipper() is duplicated
+// and separately overriden for AIBaseController and
+// PlayerController
 
 class PlayerController : public Controller
 {
 friend class KartRewinder;
+private:
+    SFXBase     *m_wee_sound;
 protected:
     int            m_steer_val, m_steer_val_l, m_steer_val_r;
     uint16_t       m_prev_accel;

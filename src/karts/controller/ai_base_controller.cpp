@@ -42,7 +42,16 @@ AIBaseController::AIBaseController(AbstractKart *kart)
     m_kart_width    = m_kart->getKartWidth();
     m_ai_properties = m_kart->getKartProperties()
                             ->getAIPropertiesForDifficulty();
+
+    m_wee_sound    = SFXManager::get()->createSoundSource("wee");
 }   // AIBaseController
+
+//-----------------------------------------------------------------------------
+/** Destructor for AI kart
+ */
+AIBaseController::~AIBaseController(){
+    m_wee_sound->deleteSFX();
+}
 
 //-----------------------------------------------------------------------------
 
@@ -224,6 +233,23 @@ bool AIBaseController::disableSlipstreamBonus() const
     return m_ai_properties->disableSlipstreamUsage();
 }   // disableSlipstreamBonus
 
+//-----------------------------------------------------------------------------
+/** Called when a kart hits or uses a zipper.
+ */
+void AIBaseController::handleZipper(bool play_sound)
+{
+    m_kart->showZipperFire();
+
+    // Only play a zipper sound if it's not already playing, and
+    // if the material has changed (to avoid machine gun effect
+    // on conveyor belt zippers).
+    if (play_sound || (m_wee_sound->getStatus() != SFXBase::SFX_PLAYING &&
+                       m_kart->getMaterial()!=m_kart->getLastMaterial()      ) )
+    {
+        m_wee_sound->setPosition(m_kart->getXYZ());
+        m_wee_sound->play();
+    }
+}
 //-----------------------------------------------------------------------------
 /** This is called when the kart crashed with the terrain. This subroutine
  *  tries to detect if the AI is stuck by determining if a certain number

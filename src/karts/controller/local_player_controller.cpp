@@ -84,7 +84,6 @@ LocalPlayerController::LocalPlayerController(AbstractKart *kart,
         m_camera_index = camera->getIndex();
     }
 
-    m_wee_sound    = SFXManager::get()->createSoundSource("wee");
     m_bzzt_sound   = SFXManager::get()->getBuffer("bzzt");
     m_ugh_sound    = SFXManager::get()->getBuffer("ugh");
     m_grab_sound   = SFXManager::get()->getBuffer("grab_collectable");
@@ -100,7 +99,7 @@ LocalPlayerController::LocalPlayerController(AbstractKart *kart,
  */
 LocalPlayerController::~LocalPlayerController()
 {
-    m_wee_sound->deleteSFX();
+
 }   // ~LocalPlayerController
 
 //-----------------------------------------------------------------------------
@@ -380,16 +379,6 @@ void LocalPlayerController::handleZipper(bool play_sound)
 {
     PlayerController::handleZipper(play_sound);
 
-    // Only play a zipper sound if it's not already playing, and
-    // if the material has changed (to avoid machine gun effect
-    // on conveyor belt zippers).
-    if (play_sound || (m_wee_sound->getStatus() != SFXBase::SFX_PLAYING &&
-                       m_kart->getMaterial()!=m_kart->getLastMaterial()      ) )
-    {
-        m_wee_sound->setPosition(m_kart->getXYZ());
-        m_wee_sound->play();
-    }
-
 #ifndef SERVER_ONLY
     // Apply the motion blur according to the speed of the kart
     if (!GUIEngine::isNoGraphics())
@@ -397,6 +386,7 @@ void LocalPlayerController::handleZipper(bool play_sound)
 #endif
 
 }   // handleZipper
+
 
 //-----------------------------------------------------------------------------
 /** Called when a kart hits an item. It plays certain sfx (e.g. nitro full,
