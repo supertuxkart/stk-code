@@ -537,13 +537,13 @@ void MaxSpeed::saveState(BareNetworkString *buffer) const
     // Now save the speedup state
     // --------------------------
     // Get the bit pattern of all active speedups
-    uint8_t active_speedups = 0;
+    uint16_t active_speedups = 0;
     for(unsigned int i=MS_INCREASE_MIN, b=1; i<MS_INCREASE_MAX; i++, b <<= 1)
     {
         if(m_speed_increase[i].isActive())
             active_speedups |= b;
     }
-    buffer->addUInt8(active_speedups);
+    buffer->addUInt16(active_speedups);
     for(unsigned int i=MS_INCREASE_MIN, b=1; i<MS_INCREASE_MAX; i++, b <<= 1)
     {
         if(active_speedups & b)
@@ -577,7 +577,7 @@ void MaxSpeed::rewindTo(BareNetworkString *buffer)
     // Restore the speedup state
     // --------------------------
     // Get the bit pattern of all active speedups
-    uint8_t active_speedups = buffer->getUInt8();
+    uint16_t active_speedups = buffer->getUInt16();
     for(unsigned int i=MS_INCREASE_MIN, b=1; i<MS_INCREASE_MAX; i++, b <<= 1)
     {
         m_speed_increase[i].rewindTo(buffer, (active_speedups & b) == b);
