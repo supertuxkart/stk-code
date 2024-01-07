@@ -209,7 +209,7 @@ void Bowling::onFireFlyable()
     if( m_owner->getControls().getLookBack())
     {
         y_offset   = -y_offset;
-        m_speed    = -m_speed*2;
+        m_speed = m_owner->getSpeed() < 0 ? -m_speed*4 : -m_speed*2;
     }
     else
     {
