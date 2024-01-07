@@ -67,7 +67,7 @@ STKTextBillboard::STKTextBillboard(const video::SColor& color_top,
 // ----------------------------------------------------------------------------
 float STKTextBillboard::getDefaultScale(FontWithFace* face)
 {
-    return 1.0f / (float)face->getDPI();
+    return 1.0f / (float)face->getDPI() / face->getNativeScalingFactor();
 }   // getDefaultScale
 
 // ----------------------------------------------------------------------------
