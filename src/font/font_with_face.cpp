@@ -498,11 +498,12 @@ core::dimension2d<u32> FontWithFace::getDimension(const core::stringw& text,
     if (GUIEngine::isNoGraphics())
         return core::dimension2d<u32>(1, 1);
 
-    const float scale = font_settings ? font_settings->getScale() : 1.0f;
+    const float scale = (font_settings ? font_settings->getScale() : 1.0f)
+                     * getNativeScalingFactor();
     if (disableTextShaping())
     {
         return gui::getGlyphLayoutsDimension(text2GlyphsWithoutShaping(text),
-            m_font_max_height, 1.0f/*inverse shaping*/, scale);
+            m_font_max_height * scale, 1.0f/*inverse shaping*/, scale);
     }
 
     auto& gls = font_manager->getCachedLayouts(text);
@@ -525,7 +526,8 @@ int FontWithFace::getCharacterFromPos(const wchar_t* text, int pixel_x,
                                       FontSettings* font_settings) const
 {
 #ifndef SERVER_ONLY
-    const float scale = font_settings ? font_settings->getScale() : 1.0f;
+    const float scale = (font_settings ? font_settings->getScale() : 1.0f)
+                     * getNativeScalingFactor();
     float x = 0;
     int idx = 0;
 
@@ -574,7 +576,8 @@ void FontWithFace::render(const std::vector<gui::GlyphLayout>& gl,
         font_settings->useBlackBorder() : false;
     const bool colored_border = font_settings ?
         font_settings->useColoredBorder() : false;
-    const float scale = font_settings ? font_settings->getScale() : 1.0f;
+    const float scale = (font_settings ? font_settings->getScale() : 1.0f)
+                     * getNativeScalingFactor();
     const float shadow = font_settings ? font_settings->useShadow() : false;
 
     if (shadow)
