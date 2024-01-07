@@ -101,7 +101,6 @@ public:
     // ------------------------------------------------------------------------
     /** Returns the name of the player profile. */
     core::stringw getName(bool include_handicap_string = true) const OVERRIDE;
-
 };   // LocalPlayerController
 
 #endif

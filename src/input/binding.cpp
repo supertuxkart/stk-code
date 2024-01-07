@@ -367,7 +367,6 @@ irr::core::stringw Binding::getAsString() const
                         s = _("Axis %d", m_id);
                     }
                 }
-
             }
             break;
         case Input::IT_STICKBUTTON:

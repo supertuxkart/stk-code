@@ -81,7 +81,7 @@ public:
     const Vec3&   getXYZ()        const        {return (Vec3&)m_transform.getOrigin();}
     /** Returns the heading between -pi and pi. */
     float         getHeading()    const        {return m_heading;                  }
-   /** Returns the pitch of the kart, restricted to between -pi/2 and pi/2. */
+    /** Returns the pitch of the kart, restricted to between -pi/2 and pi/2. */
     float         getPitch()      const        {return m_pitch;                    }
     /** Returns the roll of the kart between -pi and pi.  */
     float         getRoll()       const        {return m_roll;                     }

@@ -370,7 +370,7 @@ public:
     /** Returns the current position of this kart in the race. */
     virtual int getPosition() const = 0;
     // ------------------------------------------------------------------------
-    /** Returns the current position of this kart in the race. */
+    /** Set the current position of this kart in the race. */
     virtual void setPosition(int p) = 0;
     // ------------------------------------------------------------------------
     /** Returns the initial position of this kart. */

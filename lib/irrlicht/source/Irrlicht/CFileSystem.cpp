@@ -119,7 +119,7 @@ IReadFile* CFileSystem::createMemoryReadFile(void* memory, s32 len,
 		return 0;
 	else
 		return new CMemoryFile(memory, len, fileName, deleteMemoryWhenDropped);
-			}
+}
 
 
 //! Creates an IReadFile interface for reading files inside files

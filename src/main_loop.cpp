@@ -679,7 +679,7 @@ void MainLoop::run()
             if (World::getWorld() && RewindManager::isEnabled())
                  RewindManager::get()->handleResetSmoothNetworkBody();
 
-            // Handle controller the last to avoid slow PC sending actions too 
+            // Handle controller the last to avoid slow PC sending actions too
             // late
             if (!GUIEngine::isNoGraphics())
             {
