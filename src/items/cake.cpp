@@ -99,7 +99,9 @@ void Cake::onFireFlyable()
     m_speed *= m_owner->getSpeed() / 23.0f;
 
     //when going backwards, decrease speed of cake by less
-    if (m_owner->getSpeed() < 0) m_speed /= 3.6f;
+    const bool  backwards = m_owner->getControls().getLookBack();
+    if (m_owner->getSpeed() < 0)
+        m_speed = backwards ? -m_speed/3.6f : m_speed/3.6f;
 
     m_speed += 16.0f;
 
@@ -111,7 +113,6 @@ void Cake::onFireFlyable()
     float pitch = m_owner->getTerrainPitch(heading);
 
     // Find closest kart in front of the current one
-    const bool  backwards = m_owner->getControls().getLookBack();
     const AbstractKart *closest_kart=NULL;
     Vec3        direction;
     float       kart_dist_squared;
