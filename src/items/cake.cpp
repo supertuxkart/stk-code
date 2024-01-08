@@ -95,14 +95,15 @@ void Cake::onFireFlyable()
 
     float up_velocity = m_speed/7.0f;
 
-    // give a speed proportional to kart speed. m_speed is defined in flyable
-    m_speed *= m_owner->getSpeed() / 23.0f;
-
-    //when going backwards, decrease speed of cake by less
     const bool  backwards = m_owner->getControls().getLookBack();
-    if (m_owner->getSpeed() < 0)
-        m_speed = backwards ? -m_speed/3.6f : m_speed/3.6f;
 
+    // give a speed proportional to kart speed. m_speed is defined in flyable.
+    // when going backwards and not looking backwards, 
+    // decrease speed of cake by less
+    if (m_owner->getSpeed() < 0 && !backwards)
+        m_speed *= m_owner->getSpeed() / 23.0f /3.6f;
+    else
+    m_speed *= abs(m_owner->getSpeed()) / 23.0f;
     m_speed += 16.0f;
 
     if (m_speed < 1.0f) m_speed = 1.0f;
