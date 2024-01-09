@@ -42,29 +42,29 @@ class SphericalHarmonics
 private:
     /** The 6 spherical harmonics textures */
     std::vector<irr::video::IImage *> m_spherical_harmonics_textures;
-    
+
     /** Ambient light is used for tracks without spherical harmonics textures */
     irr::video::SColor m_ambient;
-    
+
     /** The spherical harmonics coefficients */
     SHCoefficients *m_SH_coeff;
 
     void generateSphericalHarmonics(unsigned char *sh_rgba[6], unsigned int edge_size);
-    
+
 public:
     SphericalHarmonics(const std::vector<irr::video::IImage *> &spherical_harmonics_textures);
     SphericalHarmonics(const irr::video::SColor &ambient);
     ~SphericalHarmonics();
-    
+
     void setTextures(const std::vector<irr::video::IImage *> &spherical_harmonics_textures);
     void setAmbientLight(const irr::video::SColor &ambient);
 
     inline const SHCoefficients* getCoefficients() const { return m_SH_coeff;  }
-    
+
     inline bool has6Textures() const {return m_spherical_harmonics_textures.size()==6;}
-    
+
     void printCoeff();
-    
+
     void unprojectSH (unsigned int width, unsigned int height,
                       float *Y00[], float *Y1minus1[], float *Y10[],
                       float *Y11[], float *Y2minus2[], float *Y2minus1[],

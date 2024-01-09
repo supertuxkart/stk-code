@@ -105,11 +105,11 @@ void override_default_params_for_mobile()
     // It has an effect only on the first run, when config file is created.
     // So that we can still modify these params in STK options and user's
     // choice will be then remembered.
-    
+
     // Set smaller texture size to avoid high RAM usage
     UserConfigParams::m_max_texture_size = 256;
     UserConfigParams::m_high_definition_textures = false;
-    
+
     // Enable advanced lighting only for android >= 8
 #ifdef ANDROID
     UserConfigParams::m_dynamic_lights = (SDL_GetAndroidSDKVersion() >= 26);
@@ -154,24 +154,24 @@ void override_default_params_for_mobile()
                 "()I");
             if (method_id != NULL)
                 screen_size = env->CallIntMethod(activity, method_id);
-                
-            jmethodID display_dpi_id = env->GetStaticMethodID(clazz, 
+
+            jmethodID display_dpi_id = env->GetStaticMethodID(clazz,
                 "getDisplayDPI", "()Landroid/util/DisplayMetrics;");
-                
+
             if (display_dpi_id != NULL)
             {
-                jobject display_dpi_obj = env->CallStaticObjectMethod(clazz, 
+                jobject display_dpi_obj = env->CallStaticObjectMethod(clazz,
                                                                 display_dpi_id);
                 jclass display_dpi_class = env->GetObjectClass(display_dpi_obj);
-            
-                jfieldID ddpi_field = env->GetFieldID(display_dpi_class, 
+
+                jfieldID ddpi_field = env->GetFieldID(display_dpi_class,
                                                       "densityDpi", "I");
                 ddpi = env->GetIntField(display_dpi_obj, ddpi_field);
-            
+
                 env->DeleteLocalRef(display_dpi_obj);
                 env->DeleteLocalRef(display_dpi_class);
             }
-            
+
             env->DeleteLocalRef(activity);
             env->DeleteLocalRef(clazz);
         }
@@ -199,7 +199,7 @@ void override_default_params_for_mobile()
     default:
         break;
     }
-    
+
     // Update rtts scale based on display DPI
     if (ddpi < 1)
     {
@@ -220,21 +220,21 @@ void override_default_params_for_mobile()
             UserConfigParams::m_scale_rtts_factor = 0.8f;
 
         Log::info("MainAndroid", "Display DPI: %i", ddpi);
-        Log::info("MainAndroid", "Render scale: %f", 
+        Log::info("MainAndroid", "Render scale: %f",
                   (float)UserConfigParams::m_scale_rtts_factor);
     }
 #endif
 
     // Enable screen keyboard
     UserConfigParams::m_screen_keyboard = 1;
-    
+
     // It shouldn't matter, but STK is always run in fullscreen on android
     UserConfigParams::m_fullscreen = true;
-    
+
     // Make sure that user can play every track even if there are installed
     // only few tracks and it's impossible to finish overworld challenges
     UserConfigParams::m_unlock_everything = 1;
-    
+
     // Create default user istead of showing login screen to make life easier
     UserConfigParams::m_enforce_current_player = true;
 }

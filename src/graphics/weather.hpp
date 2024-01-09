@@ -38,11 +38,11 @@ public:
 
     void update(float dt);
     void playSound();
-    
+
     /** Set the flag that a lightning should be shown. */
     void startLightning() { m_lightning = 1.0f; }
     bool shouldLightning() { return m_lightning > 0.0f; }
-    
+
     irr::core::vector3df getIntensity();
 };
 

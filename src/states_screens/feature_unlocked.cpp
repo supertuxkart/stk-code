@@ -253,7 +253,7 @@ void FeatureUnlockedCutScene::addTrophy(RaceManager::Difficulty difficulty,
         case RaceManager::DIFFICULTY_EASY:
             msg = _("You completed the easy challenge! "
                     "Points earned on this level: %i/%i",
-                    CHALLENGE_POINTS[RaceManager::DIFFICULTY_EASY]*gp_factor, 
+                    CHALLENGE_POINTS[RaceManager::DIFFICULTY_EASY]*gp_factor,
                     CHALLENGE_POINTS[max_unlocked_difficulty]*gp_factor);
             break;
         case RaceManager::DIFFICULTY_MEDIUM:
@@ -364,9 +364,9 @@ void FeatureUnlockedCutScene::init()
     {
         if (m_unlocked_stuff[n].m_unlock_model.size() > 0)
         {
-            irr::scene::IMesh *mesh = 
+            irr::scene::IMesh *mesh =
                 irr_driver->getMesh(m_unlocked_stuff[n].m_unlock_model);
-            m_unlocked_stuff[n].m_root_gift_node = 
+            m_unlocked_stuff[n].m_root_gift_node =
                 irr_driver->addMesh(mesh, "unlocked_model");
             m_unlocked_stuff[n].m_scale = 0.7f;
         }
@@ -457,7 +457,7 @@ void FeatureUnlockedCutScene::init()
                 m_unlocked_stuff[n].m_h);
             irr_driver->setAllMaterialFlags(mesh);
             m_unlocked_stuff[n].m_side_2 =
-                irr_driver->addMesh(mesh, "unlocked_picture", 
+                irr_driver->addMesh(mesh, "unlocked_picture",
                                     m_unlocked_stuff[n].m_root_gift_node);
             m_unlocked_stuff[n].m_side_2
                 ->setRotation(core::vector3df(0.0f, 180.0f, 0.0f));
@@ -506,9 +506,9 @@ void FeatureUnlockedCutScene::onUpdate(float dt)
     // When the chest has opened but the items are not yet at their final position
     if (m_global_time > GIFT_EXIT_FROM && m_global_time < GIFT_EXIT_TO)
     {
-        float progress_factor = (m_global_time - GIFT_EXIT_FROM) 
+        float progress_factor = (m_global_time - GIFT_EXIT_FROM)
                               / (GIFT_EXIT_TO - GIFT_EXIT_FROM);
-        float smoothed_progress_factor = 
+        float smoothed_progress_factor =
                                 sinf((progress_factor - 0.5f)*M_PI)/2.0f + 0.5f;
 
         for (int n=0; n<unlockedStuffCount; n++)
@@ -543,7 +543,7 @@ void FeatureUnlockedCutScene::onUpdate(float dt)
         if (m_unlocked_stuff[n].m_root_gift_node == NULL) continue;
 
         irr::core::vector3df new_rot = m_unlocked_stuff[n].m_root_gift_node
-                                                          ->getRotation() 
+                                                          ->getRotation()
                                      + core::vector3df(0.0f, dt*25.0f, 0.0f);
         m_unlocked_stuff[n].m_root_gift_node->setRotation(new_rot);
 
@@ -582,7 +582,7 @@ void FeatureUnlockedCutScene::onUpdate(float dt)
                     }
                     else
                     {
-                        scene::IMesh* mesh = 
+                        scene::IMesh* mesh =
                             static_cast<scene::IMeshSceneNode*>
                                        (m_unlocked_stuff[n].m_side_1)->getMesh();
 
@@ -718,7 +718,7 @@ void FeatureUnlockedCutScene::addUnlockedGP(const GrandPrixData* gp)
         {
             Track* track = track_manager->getTrack(gptracks[t]);
 
-            const std::string t_name = 
+            const std::string t_name =
                 track ? track->getScreenshotFile()
                       : file_manager->getAsset(FileManager::GUI_ICON, "main_help.png");
             ITexture* tex = irr_driver->getTexture(t_name);

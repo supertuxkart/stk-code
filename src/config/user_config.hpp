@@ -450,7 +450,7 @@ namespace UserConfigParams
             &m_race_setup_group, "Default direction of GP tracks. 0=default, 1=no reverse, 2=all reverse, 3=Random") );
     PARAM_PREFIX IntUserConfigParam          m_rand_gp_num_tracks
             PARAM_DEFAULT(  IntUserConfigParam(1, "random-gp-num-tracks",
-            &m_race_setup_group, "Default number of tracks for random GP.") );            
+            &m_race_setup_group, "Default number of tracks for random GP.") );
     PARAM_PREFIX IntUserConfigParam          m_ffa_time_limit
         PARAM_DEFAULT(IntUserConfigParam(3, "ffa-time-limit",
             &m_race_setup_group, "Time limit in ffa mode."));

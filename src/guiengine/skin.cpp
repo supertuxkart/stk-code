@@ -100,7 +100,7 @@ namespace SkinConfig
 
         node->get("h_inner_padding", &horizontal_inner_padding);
         node->get("v_inner_padding", &vertical_inner_padding);
-        
+
         node->get("h_margin", &horizontal_margin);
         node->get("v_margin", &vertical_margin);
 
@@ -291,7 +291,7 @@ namespace SkinConfig
     {
         std::vector<std::string> chain;
         chain.insert(chain.begin(), initial_skin_id);
-        
+
         for(size_t i=0, n=chain.size(); i<n; i++)
         {
             std::string skin_file = chain[0].find("addon_") != std::string::npos ?
@@ -1176,7 +1176,7 @@ void Skin::drawRatingBar(Widget *w, const core::recti &rect,
 
         core::recti source_area = core::recti(0, 0, texture_w, texture_h);
 
-        float scale = (float)std::min(irr_driver->getActualScreenSize().Height / 1080.0f, 
+        float scale = (float)std::min(irr_driver->getActualScreenSize().Height / 1080.0f,
                                     irr_driver->getActualScreenSize().Width / 1350.0f);
         int size = (int)((90.0f + grow) * scale);
         const core::recti rect2(glow_center_x - size,
@@ -1496,7 +1496,7 @@ void Skin::drawRibbonChild(const core::recti &rect, Widget* widget,
 
                 core::recti source_area(0, 0, texture_w, texture_h);
 
-                float scale = (float)std::min(irr_driver->getActualScreenSize().Height / 1080.0f, 
+                float scale = (float)std::min(irr_driver->getActualScreenSize().Height / 1080.0f,
                                             irr_driver->getActualScreenSize().Width / 1350.0f);
                 int size = (int)((90.0f + grow) * scale);
                 const core::recti rect2(glow_center_x - size,
@@ -1646,7 +1646,7 @@ void Skin::drawSpinnerBody(const core::recti &rect, Widget* widget,
         int player_id=q->getSpinnerWidgetPlayerID();
 
         std::string spinner = "spinner::deactivated";
-        
+
         if (player_id <= 4)
             spinner = "spinner" + StringUtils::toString(player_id+1) + "::neutral";
 
@@ -1750,7 +1750,7 @@ void Skin::drawSpinnerBody(const core::recti &rect, Widget* widget,
                                  /(float)params->getImage()->getSize().Height );
         float value = (float)(w->getValue() - w->getMin())
                           / (w->getMax() - w->getMin());
-                          
+
         if (value > 1.0f) value = 1.0f;
 
         if (value > 0.0f)
@@ -1774,9 +1774,9 @@ void Skin::drawSpinnerBody(const core::recti &rect, Widget* widget,
 
             const int texture_w = texture->getSize().Width;
             const int texture_h = texture->getSize().Height;
-    
+
             const core::recti source_area(0, 0, texture_w, texture_h);
-    
+
             draw2DImage(texture, dest_area, source_area, 0 /* no clipping */, 0,
                         true /* alpha */);
         }
@@ -1873,7 +1873,7 @@ void Skin::drawIconButton(const core::recti &rect, Widget* widget,
 
         core::recti source_area = core::recti(0, 0, texture_w, texture_h);
 
-        float scale = (float)std::min(irr_driver->getActualScreenSize().Height / 1080.0f, 
+        float scale = (float)std::min(irr_driver->getActualScreenSize().Height / 1080.0f,
                                     irr_driver->getActualScreenSize().Width / 1350.0f);
         int size = (int)((90.0f + grow) * scale);
         const core::recti rect2(glow_center_x - size,
@@ -2120,9 +2120,9 @@ void Skin::drawListHeader(const irr::core::rect< irr::s32 > &rect,
 void Skin::renderSections(PtrVector<Widget>* within_vector)
 {
 #ifndef SERVER_ONLY
-    if (within_vector == NULL && getCurrentScreen()) 
+    if (within_vector == NULL && getCurrentScreen())
         within_vector = &getCurrentScreen()->m_widgets;
-        
+
     if (!within_vector)
         return;
 
@@ -2740,7 +2740,7 @@ core::recti Skin::draw3DWindowBackground(IGUIElement *element,
     {
         if (ModalDialog::getCurrent()->fadeBackground())
             drawBGFadeColor();
-        
+
         // draw frame
         if (m_dialog_size < 1.0f)
         {
@@ -2753,7 +2753,7 @@ core::recti Skin::draw3DWindowBackground(IGUIElement *element,
             sized_rect.UpperLeftCorner.Y  = (int)(center.Y -(h/2.0f)*tex_size);
             sized_rect.LowerRightCorner.X = (int)(center.X +(w/2.0f)*tex_size);
             sized_rect.LowerRightCorner.Y = (int)(center.Y +(h/2.0f)*tex_size);
-            
+
             drawBoxFromStretchableTexture(ModalDialog::getCurrent(), sized_rect,
                                SkinConfig::m_render_params["window::neutral"]);
 

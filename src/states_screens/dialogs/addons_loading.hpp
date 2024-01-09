@@ -39,7 +39,7 @@ private:
     GUIEngine::IconButtonWidget  *m_install_button;
 
     GUIEngine::IconButtonWidget  *m_icon;
-    
+
     /** The addon to load. */
 #ifndef SERVER_ONLY
     Addon                         m_addon;
@@ -67,7 +67,7 @@ public:
     virtual GUIEngine::EventPropagation processEvent(const std::string& event_source) OVERRIDE;
     virtual void beforeAddingWidgets() OVERRIDE;
     virtual void init() OVERRIDE;
-    
+
     /** This function is called by the GUI, all the frame (or somthing like
      * that). It checks the flags (m_can_load_icon and
      *  and do the necessary.
@@ -76,7 +76,7 @@ public:
     void voteClicked();
     void tryInstall();
     virtual bool onEscapePressed() OVERRIDE;
-    
+
 };   // AddonsLoading
 
 #endif

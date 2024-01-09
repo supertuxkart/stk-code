@@ -112,7 +112,7 @@ protected:
          */
         bool m_render_3d;
 
-        /** When set to true it updates the screen even if modal dialog is 
+        /** When set to true it updates the screen even if modal dialog is
          *  opened
          */
         bool m_update_in_background;
@@ -170,8 +170,8 @@ protected:
         void manualAddWidget(Widget* w);
 
         void manualRemoveWidget(Widget* w);
-        
-        /** When set to true it updates the screen even if modal dialog is 
+
+        /** When set to true it updates the screen even if modal dialog is
          *  opened
          */
         void setUpdateInBackground(bool value) {m_update_in_background = value;}
@@ -246,7 +246,7 @@ protected:
           */
         virtual void init();
 
-        /** Displays this screen bu pushing it onto the stack of screen 
+        /** Displays this screen bu pushing it onto the stack of screen
          *  in the state manager. */
         void push();
 

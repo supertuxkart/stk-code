@@ -61,7 +61,7 @@
 #include <iostream>
 
 // This define is only used to make the TestAI as similar to the
-// SkiddingAI as possible. This way the two AIs can be compared 
+// SkiddingAI as possible. This way the two AIs can be compared
 // without too many false and distracing positives.
 
 #define SkiddingAI TestAI
@@ -315,7 +315,7 @@ void SkiddingAI::update(int ticks)
 
     // Get information that is needed by more than 1 of the handling funcs
     computeNearestKarts();
-   
+
     //Detect if we are going to crash with the track and/or kart
     checkCrashes(m_kart->getXYZ());
     determineTrackDirection();
@@ -1378,7 +1378,7 @@ void SkiddingAI::handleItems(const float dt)
         // likely that this kart then gets a good iteam), otherwise use it
         // after a waiting an appropriate time
         if(m_kart->getPosition()>1 &&
-            m_time_since_last_shot 
+            m_time_since_last_shot
             > stk_config->ticks2Time(stk_config->m_item_switch_ticks)+2.0f)
             m_controls->setFire(true);
         break;   // POWERUP_SWITCH
@@ -1617,11 +1617,11 @@ void SkiddingAI::handleNitroAndZipper()
     // tight corners. In some cases it would need a reasonable large 'lookahead'
     // to know that at a certain spot a zipper or skidding should not be used
     // (e.g. in xr591, left at the fork - new AI will nearly always fall off the
-    // track after the curve). Here the summarised results of 10 laps runs with 
+    // track after the curve). Here the summarised results of 10 laps runs with
     // 4 old against 4 new AIs in time trail mode. The 'gain' is the sum of all
     // (star_positions-end_positions). So a gain of -10 means that basically
     // the new AI fell from start positions 2,4,6,8 to end positions 6,7,8,9.
-    // On the other hand, +10 means the new AI took positions 1,2,3,4. 
+    // On the other hand, +10 means the new AI took positions 1,2,3,4.
     // name                gain     Time              Skid  Resc Rsc  Brake Expl Exp Itm Ban SNitLNit Bub Off Energy
     // xr591               -10      504.279           204.70 0.00  15  4011 0.00   0   0  26 135   0   0  4881 0.00
     // zengarden           -10      287.496           141.81 0.00  13  2489 0.00   0   0   7   2   0   0  5683 0.00

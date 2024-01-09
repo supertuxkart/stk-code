@@ -29,7 +29,7 @@ class MultitouchSettingsDialog : public GUIEngine::ModalDialog
 {
 private:
     void updateValues();
-    
+
 public:
     /**
      * Creates a modal dialog with given percentage of screen width and height
@@ -40,7 +40,7 @@ public:
     virtual void beforeAddingWidgets();
 
     GUIEngine::EventPropagation processEvent(const std::string& eventSource);
-    
+
 };
 
 #endif

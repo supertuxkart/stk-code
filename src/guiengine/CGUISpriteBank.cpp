@@ -66,7 +66,7 @@ core::array< core::rect<s32> >& STKModifiedSpriteBank::getPositions()
     {
         float icon_scale_x = 1.0f;
         float icon_scale_y = 1.0f;
-        
+
         if (m_target_icon_size.Width > 0 && m_target_icon_size.Height > 0)
         {
             icon_scale_x = (float)m_target_icon_size.Width /
@@ -74,7 +74,7 @@ core::array< core::rect<s32> >& STKModifiedSpriteBank::getPositions()
             icon_scale_y = (float)m_target_icon_size.Height /
                            (float)Rectangles[n].getHeight();
         }
- 
+
         const int h = getScaledHeight(Rectangles[n].getHeight()) * icon_scale_y;
         const int w = getScaledWidth(Rectangles[n].getWidth()) * icon_scale_x;
         copy.push_back( core::rect<s32>(Rectangles[n].UpperLeftCorner,

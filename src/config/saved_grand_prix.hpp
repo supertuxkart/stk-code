@@ -66,7 +66,7 @@ protected:
 
     /** Identifier of this GP. */
     StringUserConfigParam       m_gp_id;
-    
+
     /** Race type at which this GP was run. */
     IntUserConfigParam          m_race_type;
 

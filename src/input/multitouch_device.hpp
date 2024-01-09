@@ -77,7 +77,7 @@ class MultitouchDevice : public InputDevice
 private:
     /** The list of pointers to all created buttons */
     std::vector<MultitouchButton*> m_buttons;
-    
+
     Controller* m_controller;
 
     /** The parameter that is used for steering button and determines dead area
@@ -86,7 +86,7 @@ private:
 
     /** A parameter in range that determines the sensitivity for x axis. */
     float m_sensitivity_x;
-    
+
     /** A parameter in range that determines the sensitivity for y axis. */
     float m_sensitivity_y;
 

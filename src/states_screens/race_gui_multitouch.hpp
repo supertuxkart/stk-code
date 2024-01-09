@@ -40,11 +40,11 @@ class RaceGUIMultitouch
 private:
     RaceGUIBase* m_race_gui;
     MultitouchDevice* m_device;
-    
+
     bool m_gui_action;
     bool m_is_spectator_mode;
     unsigned int m_height;
-    
+
     video::ITexture* m_steering_wheel_tex;
     video::ITexture* m_steering_wheel_tex_mask_up;
     video::ITexture* m_steering_wheel_tex_mask_down;
@@ -75,13 +75,13 @@ public:
 
     void draw(const AbstractKart* kart, const core::recti &viewport,
               const core::vector2df &scaling);
-                                
+
     unsigned int getHeight() {return m_height;}
     bool isSpectatorMode() {return m_is_spectator_mode;}
     void setGuiAction(bool enabled = true) {m_gui_action = enabled;}
     void reset();
     void recreate();
-                                 
+
 };   // RaceGUIMultitouch
 
 #endif

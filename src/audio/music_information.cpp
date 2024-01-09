@@ -178,18 +178,18 @@ void MusicInformation::startMusic()
         delete m_normal_music;
         m_normal_music = NULL;
     }
-    
+
     if (m_fast_music)
     {
         delete m_fast_music;
         m_fast_music = NULL;
     }
-    
+
     // First load the 'normal' music
     // -----------------------------
     if (m_normal_filename.empty())
         return;
-    
+
     if (StringUtils::getExtension(m_normal_filename) != "ogg")
     {
         Log::warn("MusicInformation", "Music file %s is not found or file "
@@ -226,7 +226,7 @@ void MusicInformation::startMusic()
     // -----------------------------------------------------
     if (m_fast_filename.empty())
         return;
-    
+
     if (StringUtils::getExtension(m_fast_filename) != "ogg")
     {
         Log::warn("MusicInformation",
@@ -301,11 +301,11 @@ void MusicInformation::update(float dt)
         break;
                        }
     case SOUND_NORMAL:
-        if ( m_normal_music ) 
+        if ( m_normal_music )
             m_normal_music->update();
         break;
     case SOUND_FAST:
-        if ( m_fast_music ) 
+        if ( m_fast_music )
             m_fast_music->update();
         break;
     }   // switch

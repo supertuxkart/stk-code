@@ -351,7 +351,7 @@ public:
                                     int fade_out_time) OVERRIDE;
     // ----------------------------------------------------------------------------------------
     virtual void   instantSpeedIncrease(unsigned int category, float add_max_speed,
-                                    float speed_boost, float engine_force, 
+                                    float speed_boost, float engine_force,
                                     int duration, int fade_out_time) OVERRIDE;
     // ----------------------------------------------------------------------------------------
     virtual void   setSlowdown(unsigned int category, float max_speed_fraction,

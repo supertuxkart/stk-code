@@ -61,7 +61,7 @@ static const std::string IDENT_LAP_TRIAL("LAP_TRIAL"       );
  *     manager stores the GP information, but World queries only track
  *     and number of laps, so in case of GP this information is taken from
  *     the GrandPrix object), and local player information (number of local
- *     players, and selected karts). 
+ *     players, and selected karts).
  *     Information about player karts (which player selected which kart,
  *     player ids) is stored in a RemoteKartInfo structure and used later
  *     to initialise the KartStatus array (startNew()). The KartStatus array
@@ -521,7 +521,7 @@ public:
     {
         return m_num_local_players;
     }   // getNumLocalPlayers
-    
+
     // ----------------------------------------------------------------------------------------
     /** Returns true if the split screen display leaves an empty space that
      *  can be used to display the minimap.
@@ -541,7 +541,7 @@ public:
     // ----------------------------------------------------------------------------------------
     unsigned int getNumberOfAIKarts() const
     {
-        return (unsigned int)m_ai_kart_list.size(); 
+        return (unsigned int)m_ai_kart_list.size();
     }   // getNumberOfAIKarts
     // ----------------------------------------------------------------------------------------
     unsigned int getNumberOfRedAIKarts() const { return m_num_red_ai; }
@@ -571,9 +571,9 @@ public:
         }
     }
     // ----------------------------------------------------------------------------------------
-    unsigned int getNumPlayers() const 
+    unsigned int getNumPlayers() const
     {
-        return (unsigned int) m_player_karts.size(); 
+        return (unsigned int) m_player_karts.size();
     }   // getNumPlayers
     // ----------------------------------------------------------------------------------------
     /** \brief Returns the number lf laps.
@@ -759,7 +759,7 @@ public:
 
     // ----------------------------------------------------------------------------------------
     bool isCTFMode() const       { return m_minor_mode == MINOR_MODE_CAPTURE_THE_FLAG; }
- 
+
     // ----------------------------------------------------------------------------------------
     bool isEggHuntMode() const   { return m_minor_mode == MINOR_MODE_EASTER_EGG; }
 

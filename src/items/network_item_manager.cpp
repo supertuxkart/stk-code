@@ -289,7 +289,7 @@ void NetworkItemManager::restoreState(BareNetworkString *buffer, int count)
     //
     // 1) Apply all events included in this state to the confirmed state.
     //    It is possible that the server inludes events that have happened
-    //    before the confirmed time on this client (the server keeps on 
+    //    before the confirmed time on this client (the server keeps on
     //    sending all event updates till all clients have confirmed that
     //    that they have received them!!) - which will simply be ignored/
     //    This phase will only act on the confirmed ItemState in the
@@ -305,18 +305,18 @@ void NetworkItemManager::restoreState(BareNetworkString *buffer, int count)
     //       m_confirmed_switch_ticks.
     //
     // 2) Inform the server that those item events have been received.
-    //    Once the server has received confirmation from all clients 
+    //    Once the server has received confirmation from all clients
     //    for events, they will not be resent anymore.
-    // 
+    //
     // 3) Once all new events have been applied to the confirmed state the
-    //    time must be <= world time. Forward the confirmed state to 
+    //    time must be <= world time. Forward the confirmed state to
     //    world time (i.e. all confirmed items will get their ticksTillReturn
     //    value updated), and update m_confirmed_state_time to the world time.
     //
     // 4) Finally update the ItemManager state from the confirmed state:
     //    Any items that exist in both data structures will be updated.
     //    If an item exist in the ItemManager but not in the confirmed state
-    //    of the NetworkItemManager, the item in the item manager will be 
+    //    of the NetworkItemManager, the item in the item manager will be
     //    delete - it was a predict item, which has not been confirmed by
     //    the server (e.g. a kart drops a bubble gum, and either the server
     //    has not received that event yet to confirm it, or perhaps the
@@ -448,7 +448,7 @@ void NetworkItemManager::restoreState(BareNetworkString *buffer, int count)
     }   // while count >0
 
 
-    // 2. Update Server 
+    // 2. Update Server
     // ================
     // Inform the server which events have been received (if there has
     // been any updates - no need to send messages if nothing has changed)
@@ -466,11 +466,11 @@ void NetworkItemManager::restoreState(BareNetworkString *buffer, int count)
 
     // 4. Copy the confirmed state to the current item state
     // ======================================================
-    
+
     // We need to test all items - and confirmed or all_items could
     // be the larger group (confirmed: when a new item was dropped
     // by a remote kart; all_items: if an item is predicted on
-    // the client, but not yet confirmed). So 
+    // the client, but not yet confirmed). So
     size_t max_index = std::max(m_confirmed_state.size(),
                                       m_all_items.size()        );
     m_all_items.resize(max_index, NULL);
@@ -478,7 +478,7 @@ void NetworkItemManager::restoreState(BareNetworkString *buffer, int count)
     for(unsigned int i=0; i<max_index; i++)
     {
         ItemState *item     = m_all_items[i];
-        const ItemState *is = i < m_confirmed_state.size() 
+        const ItemState *is = i < m_confirmed_state.size()
                             ? m_confirmed_state[i] : NULL;
         // For every *(ItemState*)item = *is, all deactivated ticks, item id
         // ... will be copied from item state to item

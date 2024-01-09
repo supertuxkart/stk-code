@@ -36,7 +36,7 @@ public:
      */
     virtual void undo(BareNetworkString *buffer) = 0;
 
-    /** Called when an event needs to be replayed. This is called during 
+    /** Called when an event needs to be replayed. This is called during
      *  rewind, i.e. when going forward in time again.
      */
     virtual void rewind(BareNetworkString *buffer) = 0;

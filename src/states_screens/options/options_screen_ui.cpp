@@ -91,17 +91,17 @@ void OptionsScreenUI::loadedFromFile()
 
     minimap_options->m_properties[PROP_WRAP_AROUND] = "true";
     minimap_options->clearLabels();
-    //I18N: In the UI options, minimap position in the race UI 
+    //I18N: In the UI options, minimap position in the race UI
     minimap_options->addLabel( core::stringw(_("In the bottom-left")));
-    //I18N: In the UI options, minimap position in the race UI 
+    //I18N: In the UI options, minimap position in the race UI
     minimap_options->addLabel( core::stringw(_("On the right side")));
-    //I18N: In the UI options, minimap position in the race UI 
+    //I18N: In the UI options, minimap position in the race UI
     minimap_options->addLabel( core::stringw(_("Hidden")));
     //I18N: In the UI options, minimap position in the race UI
     minimap_options->addLabel( core::stringw(_("Centered")));
     minimap_options->m_properties[GUIEngine::PROP_MIN_VALUE] = "0";
 
-    bool multitouch_enabled = (UserConfigParams::m_multitouch_active == 1 && 
+    bool multitouch_enabled = (UserConfigParams::m_multitouch_active == 1 &&
                                irr_driver->getDevice()->supportsTouchDevice()) ||
                                UserConfigParams::m_multitouch_active > 1;
 
@@ -249,7 +249,7 @@ void OptionsScreenUI::init()
     GUIEngine::SpinnerWidget* minimap_options = getWidget<GUIEngine::SpinnerWidget>("minimap");
     assert( minimap_options != NULL );
 
-    bool multitouch_enabled = (UserConfigParams::m_multitouch_active == 1 && 
+    bool multitouch_enabled = (UserConfigParams::m_multitouch_active == 1 &&
                                irr_driver->getDevice()->supportsTouchDevice()) ||
                                UserConfigParams::m_multitouch_active > 1;
 
@@ -259,9 +259,9 @@ void OptionsScreenUI::init()
         UserConfigParams::m_minimap_display = 1;
     }
     minimap_options->setValue(UserConfigParams::m_minimap_display);
-    
+
     bool in_game = StateManager::get()->getGameState() == GUIEngine::INGAME_MENU;
-    
+
     GUIEngine::SpinnerWidget* font_size = getWidget<GUIEngine::SpinnerWidget>("font_size");
     assert( font_size != NULL );
 

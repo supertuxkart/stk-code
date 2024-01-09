@@ -102,13 +102,13 @@ ScreenKeyboard* ScreenKeyboard::m_screen_keyboard = NULL;
 
 // ----------------------------------------------------------------------------
 /** The screen keyboard constructor
- *  \param percent_width A relative value in range of 0.0 to 1.0 that 
+ *  \param percent_width A relative value in range of 0.0 to 1.0 that
  *         determines width of the screen that will be used by the keyboard.
- *  \param percent_height A relative value in range of 0.0 to 1.0 that 
+ *  \param percent_height A relative value in range of 0.0 to 1.0 that
  *         determines height of the screen that will be used by the keyboard.
  *  \param edit_box The edit box that is assigned to the keyboard.
  */
-ScreenKeyboard::ScreenKeyboard(float percent_width, float percent_height, 
+ScreenKeyboard::ScreenKeyboard(float percent_width, float percent_height,
                                CGUIEditBox* edit_box)
 {
     if (m_screen_keyboard != NULL)
@@ -117,7 +117,7 @@ ScreenKeyboard::ScreenKeyboard(float percent_width, float percent_height,
         Log::warn("GUIEngine", "Showing a screen keyboard while the previous "
                   "one is still open. Destroying the previous keyboard.");
     }
-    
+
     m_screen_keyboard = this;
     m_buttons_type    = BUTTONS_NONE;
     m_percent_width   = std::min(std::max(percent_width, 0.0f), 1.0f);
@@ -136,7 +136,7 @@ ScreenKeyboard::ScreenKeyboard(float percent_width, float percent_height,
 ScreenKeyboard::~ScreenKeyboard()
 {
     m_screen_keyboard = NULL;
-    
+
     GUIEngine::getGUIEnv()->removeFocus(m_irrlicht_window);
     m_irrlicht_window->remove();
 
@@ -163,7 +163,7 @@ void ScreenKeyboard::init()
     if (m_edit_box != NULL)
     {
         core::rect<s32> pos = m_edit_box->getAbsolutePosition();
-        
+
         if (pos.LowerRightCorner.Y + 5 > y)
         {
             y = margin;
@@ -184,10 +184,10 @@ void ScreenKeyboard::init()
 
     m_previous_mode=input_manager->getMode();
     input_manager->setMode(InputManager::MENU);
-    
+
     createButtons();
     assignButtons(getDefaultButtonsType());
-    
+
     Widget* button_widget = getWidget<ButtonWidget>("Back");
     assert(button_widget != NULL);
     m_back_button = button_widget->getIrrlichtElement<IGUIButton>();
@@ -218,33 +218,33 @@ void ScreenKeyboard::createButtons()
         char tmp[100];
         sprintf(tmp, "%i", pos_y + (height + margin) * i);
         std::string pos_y_str = tmp;
-        
+
         int total_proportions = 0;
-        
+
         for (int value : layout_proportions[i])
         {
             total_proportions += value;
         }
-        
+
         int cols_num = layout_proportions[i].size();
-        
+
         for (int j = 0; j < cols_num; j++)
         {
             ButtonWidget* button = new ButtonWidget();
 
-            float width = (float)total_width * layout_proportions[i][j] 
+            float width = (float)total_width * layout_proportions[i][j]
                                              / total_proportions - margin;
-            
+
             char width_str[100];
             sprintf(width_str, "%i", (int)roundf(width / (SkinConfig::getHorizontalInnerPadding(button->getType(), button)+1.0f)));
 
             char height_str[100];
             sprintf(height_str, "%i", (int)roundf(height / (SkinConfig::getVerticalInnerPadding(button->getType(), button)+1.0f)));
-            
+
             char tmp[100];
             sprintf(tmp, "%i", (int)roundf(pos_x));
             std::string pos_x_str = tmp;
-            
+
             button->setParent(m_irrlicht_window);
             button->m_properties[PROP_WIDTH] = width_str;
             button->m_properties[PROP_HEIGHT] = height_str;
@@ -252,14 +252,14 @@ void ScreenKeyboard::createButtons()
             button->m_properties[PROP_Y] = pos_y_str;
             m_widgets.push_back(button);
             m_buttons.push_back(button);
-            
+
             pos_x += width + margin;
         }
     }
 
     LayoutManager::calculateLayout(m_widgets, this);
     addWidgetsRecursively(m_widgets);
-    
+
     assert(m_buttons.size() > 0);
     m_buttons[0]->setFocusForPlayer(PLAYER_ID_GAME_MASTER);
 }   // createButtons
@@ -304,7 +304,7 @@ void ScreenKeyboard::assignButtons(ButtonsType buttons_type)
     KeyboardLayout* keys = getKeyboardLayout(buttons_type);
 
     unsigned int current_button_id = 0;
-    
+
     for (int i = 0; i < rows_num; i++)
     {
         int cols_num = layout_proportions[i].size();
@@ -316,7 +316,7 @@ void ScreenKeyboard::assignButtons(ButtonsType buttons_type)
 
             assert(current_button_id < m_buttons.size());
             ButtonWidget* button = m_buttons[current_button_id];
-            
+
             if (key == "Separator")
             {
                 button->setVisible(false);
@@ -327,7 +327,7 @@ void ScreenKeyboard::assignButtons(ButtonsType buttons_type)
                 button->setText(key_name);
                 button->m_properties[PROP_ID] = key;
             }
-            
+
             current_button_id++;
         }
     }
@@ -341,7 +341,7 @@ void ScreenKeyboard::onUpdate(float dt)
     {
         const unsigned int repeat_rate = 40;
         const unsigned int repeat_delay = 400;
-        
+
         SEvent event;
         event.KeyInput.Key = IRR_KEY_BACK;
         event.KeyInput.Char = 0;
@@ -349,7 +349,7 @@ void ScreenKeyboard::onUpdate(float dt)
         event.KeyInput.PressedDown = true;
         event.KeyInput.Control = false;
         event.KeyInput.Shift = false;
-        
+
         if (m_repeat_time == 0)
         {
             m_edit_box->OnEvent(event);
@@ -360,11 +360,11 @@ void ScreenKeyboard::onUpdate(float dt)
             m_edit_box->OnEvent(event);
             m_repeat_time -= repeat_rate;
         }
-        
+
         m_repeat_time += (unsigned int)(dt * 1000);
     }
-    
-    if (!m_back_button->isPressed())  
+
+    if (!m_back_button->isPressed())
     {
         m_back_button_pressed = false;
         m_repeat_time = 0;
@@ -381,7 +381,7 @@ bool ScreenKeyboard::onEvent(const SEvent &event)
     if (event.EventType == EET_MOUSE_INPUT_EVENT)
     {
         core::position2d<s32> point(event.MouseInput.X, event.MouseInput.Y);
-        
+
         if (m_edit_box->isPointInside(point))
         {
             m_edit_box->OnEvent(event);
@@ -390,7 +390,7 @@ bool ScreenKeyboard::onEvent(const SEvent &event)
         else
         {
             bool is_point_inside = m_irrlicht_window->isPointInside(point);
-            
+
             if (event.MouseInput.Event == EMIE_LMOUSE_PRESSED_DOWN)
             {
                 if (!is_point_inside)
@@ -414,7 +414,7 @@ bool ScreenKeyboard::onEvent(const SEvent &event)
             }
         }
     }
-    
+
     return false;
 }
 
@@ -427,7 +427,7 @@ EventPropagation ScreenKeyboard::processEvent(const std::string& eventSource)
 {
     if (m_edit_box == NULL)
         return EVENT_LET;
-        
+
     SEvent event;
     bool send_event = false;
     bool close_keyboard = false;
@@ -543,6 +543,6 @@ bool ScreenKeyboard::hasSystemScreenKeyboard()
 {
     if (GraphicsRestrictions::isDisabled(GraphicsRestrictions::GR_SYSTEM_SCREEN_KEYBOARD))
         return false;
-        
+
     return irr_driver->getDevice()->hasOnScreenKeyboard();
 }

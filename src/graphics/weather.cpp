@@ -31,7 +31,7 @@ Weather::Weather()
     m_thunder_sound = NULL;
     m_weather_sound = NULL;
     m_lightning = 0.0f;
-    
+
     if (Track::getCurrentTrack()->getWeatherLightning())
     {
         m_thunder_sound = SFXManager::get()->createSoundSource("thunder");
@@ -53,7 +53,7 @@ Weather::~Weather()
 {
     if (m_thunder_sound != NULL)
         m_thunder_sound->deleteSFX();
-        
+
     if (m_weather_sound != NULL)
         m_weather_sound->deleteSFX();
 }   // ~Weather
@@ -64,10 +64,10 @@ void Weather::update(float dt)
 {
     if (!Track::getCurrentTrack()->getWeatherLightning())
         return;
-        
+
     if (World::getWorld()->getRaceGUI() == NULL)
         return;
-        
+
     m_next_lightning -= dt;
 
     if (m_next_lightning < 0.0f)
@@ -83,7 +83,7 @@ void Weather::update(float dt)
         RandomGenerator g;
         m_next_lightning = 35 + (float)g.get(35);
     }
-    
+
     if (m_lightning > 0.0f)
     {
         m_lightning -= dt;
@@ -103,9 +103,9 @@ void Weather::playSound()
 
 irr::core::vector3df Weather::getIntensity()
 {
-    irr::core::vector3df value = {0.7f * m_lightning, 
-                                  0.7f * m_lightning, 
+    irr::core::vector3df value = {0.7f * m_lightning,
+                                  0.7f * m_lightning,
                                   0.7f * std::min(1.0f, m_lightning * 1.5f)};
-                                 
+
     return value;
 }

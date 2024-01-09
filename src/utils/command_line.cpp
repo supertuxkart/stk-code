@@ -57,7 +57,7 @@ void CommandLine::addArgsFromUserConfig()
 {
     std::vector<std::string> config_args;
     config_args = StringUtils::split(UserConfigParams::m_commandline, ' ');
-    
+
     for (std::string config_arg : config_args)
     {
         m_argv.push_back(config_arg);

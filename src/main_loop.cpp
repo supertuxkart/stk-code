@@ -86,7 +86,7 @@ extern "C" {
 MainLoop* main_loop = 0;
 
 #ifdef WIN32
-LRESULT CALLBACK separateProcessProc(_In_ HWND hwnd, _In_ UINT uMsg, 
+LRESULT CALLBACK separateProcessProc(_In_ HWND hwnd, _In_ UINT uMsg,
                                      _In_ WPARAM wParam, _In_ LPARAM lParam)
 {
     if (uMsg == WM_DESTROY)
@@ -334,7 +334,7 @@ void MainLoop::updateRace(int ticks, bool fast_forward)
  *  - Determine next time step size (`getLimitedDt`). This takes maximum fps
  *    into account (i.e. sleep if the fps would be too high), and will actually
  *    slow down the in-game clock if the fps are too low (if more than 3/60 of
- *    a second have passed, more than 3 physics time steps would be needed, 
+ *    a second have passed, more than 3 physics time steps would be needed,
  *    and physics do at most 3 time steps).
  *  - if a race is taking place (i.e. not only a menu being shown), call
  *    `updateRace()`, which is a thin wrapper around a call to
@@ -359,7 +359,7 @@ void MainLoop::updateRace(int ticks, bool fast_forward)
  *        heading, local velocity).
  *      - Updates its controller. This is either:
  *        - an AI using `SkiddingController::update()` (which then will
- *          compute the new controls), or 
+ *          compute the new controls), or
  *        - a player controller using `PlayerController::update()`, which will
  *          handle smooth steering (in case of digital input devices steering
  *          is adjusted a bit over time to avoid an instant change from all
@@ -375,7 +375,7 @@ void MainLoop::updateRace(int ticks, bool fast_forward)
  *      special circumstances like rescue, falling).
  *    - Updates all projectiles using the projectile manager. Some of the
  *      projectiles are mostly handled by the physics (e.g. a cake will mainly
- *      check if it's out of bounds), others (like basket ball) do all 
+ *      check if it's out of bounds), others (like basket ball) do all
  *      their aiming and movement here.
  *    - Updates the rewind manager to store rewind states.
  *  - Updates the music manager.
@@ -649,7 +649,7 @@ void MainLoop::run()
                 // We need to check again because update_race may have requested
                 // the main loop to abort; and it's not a good idea to continue
                 // since the GUI engine is no more to be called then.
-                if (m_abort || m_request_abort) 
+                if (m_abort || m_request_abort)
                     break;
 
                 if (m_frame_before_loading_world)

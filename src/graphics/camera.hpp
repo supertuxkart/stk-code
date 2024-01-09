@@ -146,14 +146,14 @@ public:
      *  command line parameters to select a debug etc camera. */
     static void setDefaultCameraType(CameraType type) { m_default_type = type;}
     // ------------------------------------------------------------------------
-    /** Returns the default type for each camera that will be created. Used 
+    /** Returns the default type for each camera that will be created. Used
      *  for command line parameters to select a debug etc camera. */
     static CameraType getDefaultCameraType() { return m_default_type;}
     // ------------------------------------------------------------------------
     /** Returns the number of cameras used. */
     static unsigned int getNumCameras()
     {
-        return (unsigned int)m_all_cameras.size(); 
+        return (unsigned int)m_all_cameras.size();
     }   // getNumCameras
     // ------------------------------------------------------------------------
     /** Returns a camera. */

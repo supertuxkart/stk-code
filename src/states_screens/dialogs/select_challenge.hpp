@@ -35,11 +35,11 @@ private:
     void updateSolvedIcon(const ChallengeStatus* c, RaceManager::Difficulty diff,
                           const char* widget_name, const char* path);
 public:
-    
+
     SelectChallengeDialog(const float percentWidth, const float percentHeight,
                           std::string challenge_id);
     virtual ~SelectChallengeDialog();
-    
+
     virtual GUIEngine::EventPropagation processEvent(const std::string& eventSource);
     virtual void onUpdate(float dt);
 };

@@ -250,7 +250,7 @@ void OptionsScreenVideo::init()
     GUIEngine::SpinnerWidget* gfx =
         getWidget<GUIEngine::SpinnerWidget>("gfx_level");
     assert( gfx != NULL );
-    
+
     GUIEngine::SpinnerWidget* vsync = getWidget<GUIEngine::SpinnerWidget>("vsync");
     assert( vsync != NULL );
 
@@ -309,7 +309,7 @@ void OptionsScreenVideo::init()
     CheckBoxWidget* full = getWidget<CheckBoxWidget>("fullscreen");
     assert( full != NULL );
     full->setState( UserConfigParams::m_fullscreen );
-    
+
     CheckBoxWidget* rememberWinpos = getWidget<CheckBoxWidget>("rememberWinpos");
     assert( rememberWinpos != NULL );
     rememberWinpos->setState(UserConfigParams::m_remember_window_location);
@@ -318,7 +318,7 @@ void OptionsScreenVideo::init()
     LabelWidget* full_text = getWidget<LabelWidget>("fullscreenText");
     assert( full_text != NULL );
 
-    LabelWidget* rememberWinposText = 
+    LabelWidget* rememberWinposText =
                                    getWidget<LabelWidget>("rememberWinposText");
     assert( rememberWinposText != NULL );
 #endif
@@ -519,18 +519,18 @@ void OptionsScreenVideo::updateResolutionsList()
     CheckBoxWidget* full = getWidget<CheckBoxWidget>("fullscreen");
     assert(full != NULL);
     bool fullscreen_selected = full->getState();
-    
+
     for (auto resolution : m_resolutions)
     {
         DynamicRibbonWidget* drw = getWidget<DynamicRibbonWidget>("resolutions");
         assert(drw != NULL);
         assert(drw->m_rows.size() == 1);
-        
+
         char name[128];
         sprintf(name, "%ix%i", resolution.width, resolution.height);
-        
+
         Widget* w = drw->m_rows[0].findWidgetNamed(name);
-        
+
         if (w != NULL)
         {
             bool active = !fullscreen_selected || resolution.fullscreen;
@@ -627,7 +627,7 @@ void OptionsScreenVideo::updateBlurSlider()
 
 void OptionsScreenVideo::updateScaleRTTsSlider()
 {
-    GUIEngine::SpinnerWidget* scale_rtts_level = 
+    GUIEngine::SpinnerWidget* scale_rtts_level =
         getWidget<GUIEngine::SpinnerWidget>("scale_rtts");
     assert( scale_rtts_level != NULL );
 
@@ -792,10 +792,10 @@ void OptionsScreenVideo::eventCallback(Widget* widget, const std::string& name,
         DynamicRibbonWidget* w1=getWidget<DynamicRibbonWidget>("resolutions");
         assert(w1 != NULL);
         assert(w1->m_rows.size() == 1);
-        
+
         int index = w1->m_rows[0].getSelection(PLAYER_ID_GAME_MASTER);
         Widget* selected_widget = &w1->m_rows[0].getChildren()[index];
-        
+
         if (!selected_widget->isActivated())
             return;
 

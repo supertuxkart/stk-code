@@ -29,7 +29,7 @@ class InitAndroidDialog : public GUIEngine::ModalDialog
 {
 private:
     void updateValues();
-    
+
 public:
     /**
      * Creates a modal dialog with given percentage of screen width and height
@@ -42,7 +42,7 @@ public:
     virtual bool onEscapePressed();
 
     GUIEngine::EventPropagation processEvent(const std::string& eventSource);
-    
+
 };
 
 #endif

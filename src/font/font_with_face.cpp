@@ -406,7 +406,7 @@ void FontWithFace::setDPI()
     float scale = std::min(irr_driver->getActualScreenSize().Height / 720.0f,
                              irr_driver->getActualScreenSize().Width  / 900.0f);
     int factorTwo = getScalingFactorTwo();
-    
+
     if (UserConfigParams::m_font_size < 0)
     {
         UserConfigParams::m_font_size = 0;
@@ -415,7 +415,7 @@ void FontWithFace::setDPI()
     {
         UserConfigParams::m_font_size = 6;
     }
-    
+
     factorTwo += UserConfigParams::m_font_size * 5 - 10;
     m_face_dpi = int(factorTwo * getScalingFactorOne() * scale);
 #ifndef SERVER_ONLY
@@ -514,7 +514,7 @@ core::dimension2d<u32> FontWithFace::getDimension(const core::stringw& text,
         m_font_max_height * scale, m_inverse_shaping, scale);
 #endif
 }   // getDimension
-                                  
+
 // ----------------------------------------------------------------------------
 /** Calculate the index of the character in the text on a specific position.
  *  \param text The text to be calculated.

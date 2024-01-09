@@ -81,7 +81,7 @@ bool DeviceManager::initialize()
         if(UserConfigParams::logMisc())
             Log::info("Device manager","No keyboard configuration exists, creating one.");
         m_keyboard_configs.push_back(new KeyboardConfig());
-        
+
         created = true;
     }
 
@@ -91,7 +91,7 @@ bool DeviceManager::initialize()
         m_keyboards.push_back(new KeyboardDevice(m_keyboard_configs.get(n)));
     }
 
-    if ((UserConfigParams::m_multitouch_active == 1 && 
+    if ((UserConfigParams::m_multitouch_active == 1 &&
         irr_driver->getDevice()->supportsTouchDevice()) ||
         UserConfigParams::m_multitouch_active > 1)
     {
@@ -112,7 +112,7 @@ void DeviceManager::clearKeyboard()
 // -----------------------------------------------------------------------------
 void DeviceManager::clearGamepads()
 {
-    m_gamepads.clearAndDeleteAll(); 
+    m_gamepads.clearAndDeleteAll();
 }   // clearGamepads
 // -----------------------------------------------------------------------------
 void DeviceManager::clearMultitouchDevices()
@@ -261,7 +261,7 @@ bool DeviceManager::deleteConfig(DeviceConfig* config)
  *  \param[in]   button_id  Id of the key pressed.
  *  \param[in]   mode       Used to determine whether to determine menu actions
  *                          or game actions
- *  \param[out]  player     Which player this input belongs to (only set in 
+ *  \param[out]  player     Which player this input belongs to (only set in
  *                          ASSIGN mode).
  *  \param[out]  action     Which action is related to this input trigger.
  *  \return                 The device to which this input belongs
@@ -374,7 +374,7 @@ void DeviceManager::updateMultitouchDevice()
     {
         m_multitouch_device->setPlayer(NULL);
     }
-    
+
     m_multitouch_device->updateController();
 }   // updateMultitouchDevice
 

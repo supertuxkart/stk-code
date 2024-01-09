@@ -122,7 +122,7 @@ void OptionsScreenLanguage::init()
     // Forbid changing language while in-game, since this crashes (changing the language involves
     // tearing down and rebuilding the menu stack. not good when in-game)
     list_widget->setActive(StateManager::get()->getGameState() != GUIEngine::INGAME_MENU);
-    
+
 
 }   // init
 

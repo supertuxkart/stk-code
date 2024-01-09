@@ -378,12 +378,12 @@ Material *MaterialManager::getMaterial(const std::string& fname,
     }
 
     std::string basename;
-    
+
     if (strip_path)
         basename = StringUtils::getBasename(fname);
     else
         basename = fname;
-        
+
     core::stringc basename_lower(basename.c_str());
     basename_lower.make_lower();
 

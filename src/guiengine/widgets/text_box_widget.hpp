@@ -45,7 +45,7 @@ namespace GUIEngine
         virtual void onTextUpdated() = 0;
         virtual bool onEnterPressed(const irr::core::stringw& text) { return false; }
     };
-    
+
     /** \brief A text field widget.
       * \ingroup widgetsgroup
       */
@@ -54,30 +54,30 @@ namespace GUIEngine
         /** When inferring widget size from its label length, this method will be called to
          * if/how much space must be added to the raw label's size for the widget to be large enough */
         virtual int getWidthNeededAroundLabel()  const { return 10; }
-        
+
         /** When inferring widget size from its label length, this method will be called to
          * if/how much space must be added to the raw label's size for the widget to be large enough */
         virtual int getHeightNeededAroundLabel() const { return 10; }
-        
+
     public:
-        
+
         LEAK_CHECK()
-        
+
         TextBoxWidget();
         ~TextBoxWidget()
         {
             setWithinATextBox(false);
         }
-        
+
         void add();
         void addItem(const char* item);
-        
+
         virtual EventPropagation focused(const int playerID);
         virtual void unfocused(const int playerID, Widget* new_focus);
 
         void addListener(ITextBoxWidgetListener* listener);
         void clearListeners();
-        
+
         irr::core::stringw getText() const;
         void setPasswordBox(bool passwordBox, wchar_t passwordChar = L'*');
         void setTextBoxType(TextBoxType t);
@@ -85,7 +85,7 @@ namespace GUIEngine
 
         /** Override method from base class Widget */
         virtual void setActive(bool active=true);
-        
+
         virtual EventPropagation onActivationInput(const int playerID);
         virtual EventPropagation rightPressed(const int playerID);
         virtual EventPropagation leftPressed (const int playerID);

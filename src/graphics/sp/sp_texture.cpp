@@ -81,7 +81,7 @@ SPTexture::SPTexture(const std::string& path, Material* m, bool undo_srgb,
         cache_subdir = StringUtils::insertValues("resized_%i",
             (int)UserConfigParams::m_max_texture_size);
     }
-    
+
 #ifdef USE_GLES2
     if (m_undo_srgb && !CVS->isEXTTextureCompressionS3TCSRGBUsable())
     {
@@ -216,7 +216,7 @@ std::shared_ptr<video::IImage> SPTexture::getTextureImage() const
         }
 #endif
 
-        bool force_undo_srgb = use_tex_compress && 
+        bool force_undo_srgb = use_tex_compress &&
                                   !CVS->isEXTTextureCompressionS3TCSRGBUsable();
 
         if (m_undo_srgb && (!use_tex_compress || force_undo_srgb))

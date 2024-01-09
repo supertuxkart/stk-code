@@ -67,17 +67,17 @@ KartGFX::KartGFX(const AbstractKart *kart, bool is_day)
 
         // Create skidding lights
         // For the first skidding level
-        m_skidding_light_1 = 
-            irr_driver->addLight(core::vector3df(0.0f, 0.1f, -0.5f * length - 
+        m_skidding_light_1 =
+            irr_driver->addLight(core::vector3df(0.0f, 0.1f, -0.5f * length -
                                  0.05f), /* force */ 0.3f, /*radius*/ 3.0f,
                                  1.0f, 0.6f, 0.0f, false, node);
         m_skidding_light_1->setVisible(false);
-        m_skidding_light_1->setName(("skidding emitter 1 (" + m_kart->getIdent() 
+        m_skidding_light_1->setName(("skidding emitter 1 (" + m_kart->getIdent()
                                                             + ")").c_str() );
 
         // For the second skidding level
         m_skidding_light_2 =
-            irr_driver->addLight(core::vector3df(0.0f, 0.1f, -0.5f * length - 
+            irr_driver->addLight(core::vector3df(0.0f, 0.1f, -0.5f * length -
                                  0.05f), /* force */0.4f, /*radius*/4.0f,
                                  1.0f, 0.1f, 0.0f, false, node);
         m_skidding_light_2->setVisible(false);
@@ -145,7 +145,7 @@ KartGFX::~KartGFX()
             delete m_all_emitters[i];
     }   // for i < KGFX_COUNT
 
-#ifndef SERVER_ONLY    
+#ifndef SERVER_ONLY
     if (!GUIEngine::isNoGraphics() && CVS->isGLSL())
     {
         m_nitro_light->drop();
@@ -335,7 +335,7 @@ void KartGFX::setCreationRateAbsolute(KartGFXType type, float f)
 
     if (!m_all_emitters[type])
         return;
-        
+
     if (m_all_emitters[type]->getCreationRateFloat() == f)
         return;
 
@@ -469,7 +469,7 @@ void KartGFX::updateNitroGraphics(float nitro_frac)
         setCreationRateRelative(KartGFX::KGFX_NITRO2, nitro_frac);
         setCreationRateRelative(KartGFX::KGFX_NITROSMOKE1, nitro_frac);
         setCreationRateRelative(KartGFX::KGFX_NITROSMOKE2, nitro_frac);
-        
+
         if (CVS->isGLSL())
             m_nitro_light->setVisible(true);
     }
@@ -479,11 +479,11 @@ void KartGFX::updateNitroGraphics(float nitro_frac)
         setCreationRateAbsolute(KartGFX::KGFX_NITRO2,      0);
         setCreationRateAbsolute(KartGFX::KGFX_NITROSMOKE1, 0);
         setCreationRateAbsolute(KartGFX::KGFX_NITROSMOKE2, 0);
-        
+
         if (CVS->isGLSL())
             m_nitro_light->setVisible(false);
     }
-    
+
     // Exhaust is always emitting
     setCreationRateRelative(KartGFX::KGFX_EXHAUST1, 1.0);
     setCreationRateRelative(KartGFX::KGFX_EXHAUST2, 1.0);
@@ -556,7 +556,7 @@ void KartGFX::setGFXFromReplay(int nitro, bool zipper,
         setCreationRateAbsolute(KartGFX::KGFX_NITRO2,      (float)nitro);
         setCreationRateAbsolute(KartGFX::KGFX_NITROSMOKE1, (float)nitro);
         setCreationRateAbsolute(KartGFX::KGFX_NITROSMOKE2, (float)nitro);
-        
+
         if (CVS->isGLSL())
             m_nitro_light->setVisible(true);
     }
@@ -566,7 +566,7 @@ void KartGFX::setGFXFromReplay(int nitro, bool zipper,
         setCreationRateAbsolute(KartGFX::KGFX_NITRO2,      0.0f);
         setCreationRateAbsolute(KartGFX::KGFX_NITROSMOKE1, 0.0f);
         setCreationRateAbsolute(KartGFX::KGFX_NITROSMOKE2, 0.0f);
-        
+
         if (CVS->isGLSL())
             m_nitro_light->setVisible(false);
     }
@@ -576,7 +576,7 @@ void KartGFX::setGFXFromReplay(int nitro, bool zipper,
 
     if (skidding > 0)
     {
-        const ParticleKind* skid_kind = red_skidding ? m_skid_kind2 
+        const ParticleKind* skid_kind = red_skidding ? m_skid_kind2
                                                      : m_skid_kind1;
 
         if (m_all_emitters[KGFX_SKID1L])
@@ -589,7 +589,7 @@ void KartGFX::setGFXFromReplay(int nitro, bool zipper,
             m_skidding_light_1->setVisible(!red_skidding);
             m_skidding_light_2->setVisible(red_skidding);
         }
-        
+
         setCreationRateAbsolute(KartGFX::KGFX_SKIDL, (float)skidding);
         setCreationRateAbsolute(KartGFX::KGFX_SKIDR, (float)skidding);
     }
@@ -597,7 +597,7 @@ void KartGFX::setGFXFromReplay(int nitro, bool zipper,
     {
         setCreationRateAbsolute(KartGFX::KGFX_SKIDL, 0.0f);
         setCreationRateAbsolute(KartGFX::KGFX_SKIDR, 0.0f);
-        
+
         if (CVS->isGLSL())
         {
             m_skidding_light_1->setVisible(false);

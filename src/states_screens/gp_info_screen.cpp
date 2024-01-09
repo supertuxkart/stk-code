@@ -86,7 +86,7 @@ void GPInfoScreen::loadedFromFile()
     m_ai_kart_spinner = getWidget<SpinnerWidget>("ai-spinner");
 
     m_time_target_spinner = getWidget<SpinnerWidget>("time-target-spinner");
-    
+
     GUIEngine::IconButtonWidget* screenshot = getWidget<IconButtonWidget>("screenshot");
     screenshot->setFocusable(false);
     screenshot->m_tab_stop = false;
@@ -102,7 +102,7 @@ void GPInfoScreen::loadedFromFile()
     video::ITexture* kart_not_found = irr_driver->getTexture(file_manager->getAsset(FileManager::GUI_ICON, "random_kart.png"));
     m_unknown_kart_icon = m_icon_bank->addTextureAsSprite(kart_not_found);
 
-    
+
 }   // loadedFromFile
 
 // ----------------------------------------------------------------------------
@@ -153,7 +153,7 @@ void GPInfoScreen::beforeAddingWidget()
             m_gp.getId(),
             RaceManager::get()->getMinorMode(),
             RaceManager::get()->getNumLocalPlayers());
-            
+
         int tracks = (int)m_gp.getTrackNames(true).size();
         bool continue_visible = saved_gp && saved_gp->getNextTrack() > 0 &&
                                             saved_gp->getNextTrack() < tracks;
@@ -213,9 +213,9 @@ void GPInfoScreen::init()
         {
             min_ai = std::max(0, 3 - local_players);
         }
-        
+
         num_ai = std::max(min_ai, num_ai);
-        
+
         m_ai_kart_spinner->setActive(true);
         m_ai_kart_spinner->setValue(num_ai);
         m_ai_kart_spinner->setMax(stk_config->m_max_karts - local_players);
@@ -370,10 +370,10 @@ void GPInfoScreen::eventCallback(Widget *, const std::string &name,
             const int local_players = RaceManager::get()->getNumLocalPlayers();
             const bool has_AI = RaceManager::get()->hasAI();
             const int num_ai = has_AI ? m_ai_kart_spinner->getValue() : 0;
-            
+
             RaceManager::get()->setNumKarts(local_players + num_ai);
             UserConfigParams::m_num_karts_per_gamemode[RaceManager::MAJOR_MODE_GRAND_PRIX] = local_players + num_ai;
-            
+
             if (RaceManager::get()->isLapTrialMode())
             {
                 RaceManager::get()->setGPTimeTarget(static_cast<int>(m_time_target_spinner->getValue()) * 60);
@@ -463,7 +463,7 @@ void GPInfoScreen::onUpdate(float dt)
     screenshot->m_properties[PROP_ICON] = file;
 }   // onUpdate
 
-/** Get number of available tracks for random GPs 
+/** Get number of available tracks for random GPs
  */
 int GPInfoScreen::getMaxNumTracks(std::string group)
 {
@@ -474,7 +474,7 @@ int GPInfoScreen::getMaxNumTracks(std::string group)
         for (unsigned int i = 0; i < track_manager->getNumberOfTracks(); i++)
         {
             std::string id = track_manager->getTrack(i)->getIdent();
-    
+
             if (!PlayerManager::getCurrentPlayer()->isLocked(id) &&
                 track_manager->getTrack(i)->isRaceTrack())
             {
@@ -485,19 +485,19 @@ int GPInfoScreen::getMaxNumTracks(std::string group)
     else
     {
         std::vector<int> tracks = track_manager->getTracksInGroup(group);
-        
+
         for (unsigned int i = 0; i < tracks.size(); i++)
         {
             std::string id = track_manager->getTrack(tracks[i])->getIdent();
-            
+
             if (!PlayerManager::getCurrentPlayer()->isLocked(id) &&
                 track_manager->getTrack(tracks[i])->isRaceTrack())
             {
                 max_num_tracks++;
-            }               
+            }
         }
     }
-    
+
     return max_num_tracks;
 }   // getNumTracks
 

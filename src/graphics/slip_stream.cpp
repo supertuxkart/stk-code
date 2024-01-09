@@ -904,7 +904,7 @@ void SlipStream::update(int ticks)
         if(UserConfigParams::m_slipstream_debug)
         {
             setDebugColor(video::SColor(255, 0, 0, 0),false);
-            setDebugColor(video::SColor(255, 0, 0, 0),true);            
+            setDebugColor(video::SColor(255, 0, 0, 0),true);
         }
         return;
     }
@@ -1026,7 +1026,7 @@ void SlipStream::update(int ticks)
 
     int best_target=-1;
     float best_target_value=0.0f;
-    
+
     //Select the best target
     for(unsigned int i=0; i<num_karts; i++)
     {

@@ -190,7 +190,7 @@ void ReplayRecorder::update(int ticks)
             // If the attachment has changed
             if (attachment != b_prev->m_attachment)
                   force_update = true;
-    
+
             // If the item amount has changed
             if (kart->getNumPowerup() != b_prev->m_item_amount)
                 force_update = true;

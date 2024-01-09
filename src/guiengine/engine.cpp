@@ -845,14 +845,14 @@ namespace GUIEngine
     {
         return Private::small_font_height;
     }   // getSmallFontHeight
- 
+
     // ------------------------------------------------------------------------
     int getLargeFontHeight()
    {
 
         return Private::large_font_height;
     }   // getSmallFontHeight
-        
+
     // ------------------------------------------------------------------------
     void clear()
     {
@@ -1283,7 +1283,7 @@ namespace GUIEngine
 
         // ---- some menus may need updating
         bool dialog_opened = false;
-        
+
         if (ScreenKeyboard::isActive())
         {
             ScreenKeyboard::getCurrent()->onUpdate(dt);
@@ -1294,18 +1294,18 @@ namespace GUIEngine
             ModalDialog::getCurrent()->onUpdate(dt);
             dialog_opened = true;
         }
-            
+
         if (gamestate != GAME || is_loading)
         {
             Screen* screen = getCurrentScreen();
 
-            if (screen != NULL && 
+            if (screen != NULL &&
                 (!dialog_opened || screen->getUpdateInBackground()))
             {
                 screen->onUpdate(elapsed_time);
             }
         }
-        
+
         gamestate = g_state_manager->getGameState();
 
         // ---- menu drawing
@@ -1359,7 +1359,7 @@ namespace GUIEngine
         {
             Screen* screen = getCurrentScreen();
 
-            if (screen != NULL && 
+            if (screen != NULL &&
                 (!dialog_opened || screen->getUpdateInBackground()))
             {
                 screen->onDraw(elapsed_time);
@@ -1598,15 +1598,15 @@ namespace GUIEngine
         if (ScreenKeyboard::isActive())
         {
             Widget* widget = ScreenKeyboard::getCurrent()->getWidget(name);
-            if (widget != NULL) 
+            if (widget != NULL)
                 return widget;
         }
-        
+
         // if a modal dialog is shown, search within it too
         if (ModalDialog::isADialogActive())
         {
             Widget* widget = ModalDialog::getCurrent()->getWidget(name);
-            if (widget != NULL) 
+            if (widget != NULL)
                 return widget;
         }
 
@@ -1623,15 +1623,15 @@ namespace GUIEngine
         if (ScreenKeyboard::isActive())
         {
             Widget* widget = ScreenKeyboard::getCurrent()->getWidget(id);
-            if (widget != NULL) 
+            if (widget != NULL)
                 return widget;
         }
-        
+
         // if a modal dialog is shown, search within it too
         if (ModalDialog::isADialogActive())
         {
             Widget* widget = ModalDialog::getCurrent()->getWidget(id);
-            if (widget != NULL) 
+            if (widget != NULL)
                 return widget;
         }
 

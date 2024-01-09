@@ -99,8 +99,8 @@ bool Bowling::updateAndDelete(int ticks)
             m_body->applyCentralForce(direction);
         }
     }
-    
-   
+
+
     // Bowling balls lose energy (e.g. when hitting the track), so increase
     // the speed if the ball is too slow, but only if it's not too high (if
     // the ball is too high, it is 'pushed down', which can reduce the

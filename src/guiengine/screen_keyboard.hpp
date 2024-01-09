@@ -38,13 +38,13 @@ namespace GUIEngine
     class ButtonWidget;
 
     /**
-     * \brief Class representing a screen keyboard. Only once instance at a 
-     * time (if you create a 2nd the first will be destroyed). You can call 
+     * \brief Class representing a screen keyboard. Only once instance at a
+     * time (if you create a 2nd the first will be destroyed). You can call
      * static function 'dismiss' to simply close the keyboard (so you don't
      * need to keep track of instances yourself)
      * \ingroup guiengine
      */
-    class ScreenKeyboard : public SkinWidgetContainer, 
+    class ScreenKeyboard : public SkinWidgetContainer,
                            public AbstractTopLevelContainer
     {
     protected:
@@ -62,42 +62,42 @@ namespace GUIEngine
     private:
         /** Global instance of the current screen keyboard */
         static ScreenKeyboard* m_screen_keyboard;
-        
-        /** A value in range of 0.0 to 1.0 that determines width of the screen 
+
+        /** A value in range of 0.0 to 1.0 that determines width of the screen
          *  that is used by the keyboard */
         float m_percent_width;
-        
-        /** A value in range of 0.0 to 1.0 that determines height of the screen 
+
+        /** A value in range of 0.0 to 1.0 that determines height of the screen
          *  that is used by the keyboard */
         float m_percent_height;
-        
+
         /** A time for repeat key feature */
         unsigned int m_repeat_time;
-        
+
         /** True if backspace button was pressed */
         bool m_back_button_pressed;
-        
+
         /** True if screen keyboard is going to be closed */
         bool m_schedule_close;
-        
+
         /** The edit box that is assigned to the keyboard */
         CGUIEditBox* m_edit_box;
-        
+
         /** A button that is used as backspace key */
         irr::gui::IGUIButton* m_back_button;
-        
+
         /** Remembers currently selected button type */
         ButtonsType m_buttons_type;
-        
+
         /** Irrlicht window used by the keyboard widget */
         irr::gui::IGUIWindow* m_irrlicht_window;
-        
+
         /** Contains position and dimensions of the keyboard */
         irr::core::rect<irr::s32> m_area;
-        
+
         /** Contans the pointers to all button widgets */
         std::vector<ButtonWidget*> m_buttons;
-        
+
         /** Remembered input mode that was used before keyboard creation */
         InputManager::InputDriverMode m_previous_mode;
 
@@ -108,7 +108,7 @@ namespace GUIEngine
     public:
         LEAK_CHECK()
 
-        ScreenKeyboard(float percent_width, float percent_height, 
+        ScreenKeyboard(float percent_width, float percent_height,
                        CGUIEditBox* edit_box);
         ~ScreenKeyboard();
 
@@ -121,7 +121,7 @@ namespace GUIEngine
         /** Returns pointer to the created keyboard or NULL if keyboard was
          *  not created */
         static ScreenKeyboard* getCurrent() {return m_screen_keyboard;}
-        
+
         /** Returns true if keyboard is created */
         static bool isActive() {return m_screen_keyboard != NULL;}
 
@@ -130,9 +130,9 @@ namespace GUIEngine
 
         /** Override to be notified of updates */
         virtual void onUpdate(float dt);
-        
+
         bool onEvent(const SEvent &event);
-        
+
         /** Get irrlicht window used by the keyboard widget */
         irr::gui::IGUIWindow* getIrrlichtElement() {return m_irrlicht_window;}
 
@@ -140,15 +140,15 @@ namespace GUIEngine
          *  \param widget A widget that should be checked
          *  \return True if keyboard is the parent
          */
-        bool isMyIrrChild(irr::gui::IGUIElement* widget) const 
+        bool isMyIrrChild(irr::gui::IGUIElement* widget) const
                                 {return m_irrlicht_window->isMyChild(widget);}
 
         /** Returns width of the screen keyboard */
         int getWidth()  {return m_area.getWidth();}
-        
+
         /** Returns height of the screen keyboard */
         int getHeight() {return m_area.getHeight();}
-        
+
         /** Returns assigned edit box */
         CGUIEditBox* getEditBox() {return m_edit_box;}
 

@@ -301,18 +301,18 @@ void IrrDriver::updateConfigIfRelevant()
     {
         int x = 0;
         int y = 0;
-        
+
         bool success = m_device->getWindowPosition(&x, &y);
-        
+
         if (!success)
         {
             Log::warn("irr_driver", "Could not retrieve window location");
             return;
         }
-        
+
         Log::verbose("irr_driver", "Retrieved window location for config: "
                                    "%i %i", x, y);
-                                   
+
         // If the windows position is saved, it must be a non-negative
         // number. So if the window is partly off screen, move it to the
         // corresponding edge.
@@ -321,18 +321,18 @@ void IrrDriver::updateConfigIfRelevant()
     }
 #endif   // !SERVER_ONLY
 }   // updateConfigIfRelevant
-core::recti IrrDriver::getSplitscreenWindow(int WindowNum) 
+core::recti IrrDriver::getSplitscreenWindow(int WindowNum)
 {
     const int playernum = RaceManager::get()->getNumLocalPlayers();
     const float playernum_sqrt = sqrtf((float)playernum);
-    
+
     int rows = int(  UserConfigParams::split_screen_horizontally
                    ? ceil(playernum_sqrt)
                    : round(playernum_sqrt)                       );
     int cols = int(  UserConfigParams::split_screen_horizontally
                    ? round(playernum_sqrt)
                    : ceil(playernum_sqrt)                        );
-    
+
     if (rows == 0){rows = 1;}
     if (cols == 0) {cols = 1;}
     //This could add a bit of overhang
@@ -637,7 +637,7 @@ begin:
     UserConfigParams::m_real_width = (unsigned)((float)UserConfigParams::m_width / m_device->getNativeScaleX());
     UserConfigParams::m_real_height = (unsigned)((float)UserConfigParams::m_height / m_device->getNativeScaleY());
 
-#ifndef SERVER_ONLY 
+#ifndef SERVER_ONLY
 
     GE::setVideoDriver(m_device->getVideoDriver());
 
@@ -776,7 +776,7 @@ begin:
         [](unsigned int t, ptrdiff_t s, const void* d, unsigned int u)
         { glBufferData(t, s, d, u); },
         [](int n, const unsigned int* b) { glDeleteBuffers(n, b); },
-        [](unsigned int t, ptrdiff_t o, ptrdiff_t l, unsigned int a) 
+        [](unsigned int t, ptrdiff_t o, ptrdiff_t l, unsigned int a)
         { return glMapBufferRange(t, o, l, a); },
         [](unsigned int t) { return glUnmapBuffer(t); });
 #endif
@@ -949,7 +949,7 @@ void IrrDriver::getOpenGLData(std::string *vendor, std::string *renderer,
 #ifndef SERVER_ONLY
     if (GUIEngine::isNoGraphics())
         return;
-        
+
     *vendor   = (char*)glGetString(GL_VENDOR  );
     *renderer = (char*)glGetString(GL_RENDERER);
     *version  = (char*)glGetString(GL_VERSION );
@@ -1009,7 +1009,7 @@ bool IrrDriver::moveWindow(int x, int y)
 {
 #ifndef SERVER_ONLY
     bool success = m_device->moveWindow(x, y);
-    
+
     if (!success)
     {
         Log::warn("irr_driver", "Could not set window location\n");
@@ -1763,7 +1763,7 @@ void IrrDriver::grabAllTextures(const scene::IMesh *mesh)
 #ifndef SERVER_ONLY
     if (CVS->isGLSL())
     {
-        // SPM files has shared_ptr auto-delete texture 
+        // SPM files has shared_ptr auto-delete texture
         return;
     }
 #endif
@@ -1792,7 +1792,7 @@ void IrrDriver::dropAllTextures(const scene::IMesh *mesh)
 #ifndef SERVER_ONLY
     if (CVS->isGLSL())
     {
-        // SPM files has shared_ptr auto-delete texture 
+        // SPM files has shared_ptr auto-delete texture
         return;
     }
 #endif
@@ -1844,9 +1844,9 @@ void IrrDriver::setAmbientLight(const video::SColorf &light, bool force_SH_compu
     color.r = powf(color.r, 1.0f / 2.2f);
     color.g = powf(color.g, 1.0f / 2.2f);
     color.b = powf(color.b, 1.0f / 2.2f);
-    
+
     m_scene_manager->setAmbientLight(color);
-    m_renderer->setAmbientLight(light, force_SH_computation);    
+    m_renderer->setAmbientLight(light, force_SH_computation);
 #endif
 }   // setAmbientLight
 

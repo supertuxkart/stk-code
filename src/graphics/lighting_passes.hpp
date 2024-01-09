@@ -57,7 +57,7 @@ private:
 
 public:
     LightingPasses(): m_point_light_count(0){}
-    
+
     void updateLightsInfo(irr::scene::ICameraSceneNode * const camnode,
                           float dt);
     void renderLights(  bool has_shadow,

@@ -63,7 +63,7 @@ void CustomVideoSettingsDialog::beforeAddingWidgets()
     getWidget<CheckBoxWidget>("animated_characters")
         ->setState(UserConfigParams::m_animated_characters);
     getWidget<CheckBoxWidget>("dof")->setState(UserConfigParams::m_dof);
-    
+
     SpinnerWidget* particles_effects = getWidget<SpinnerWidget>("particles_effects");
     assert(particles_effects != NULL);
     particles_effects->addLabel(_("Disabled"));

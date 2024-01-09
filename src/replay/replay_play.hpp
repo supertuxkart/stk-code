@@ -145,7 +145,7 @@ public:
 
     // ------------------------------------------------------------------------
     void               setSecondReplayFile(unsigned int n, bool second_replay_enabled)
-                           { m_second_replay_file = n; 
+                           { m_second_replay_file = n;
                              m_second_replay_enabled = second_replay_enabled;}
 
     // ------------------------------------------------------------------------

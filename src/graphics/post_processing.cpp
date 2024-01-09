@@ -726,7 +726,7 @@ public:
 };   // MLAAGatherSHader
 
 // ============================================================================
-class LightningShader : public TextureShader<LightningShader, 1, 
+class LightningShader : public TextureShader<LightningShader, 1,
                                              core::vector3df>
 {
 public:
@@ -836,7 +836,7 @@ static std::vector<float> getGaussianWeight(float sigma, size_t count)
 }   // getGaussianWeight
 
 // ----------------------------------------------------------------------------
-void PostProcessing::renderGaussian3Blur(const FrameBuffer &in_fbo, 
+void PostProcessing::renderGaussian3Blur(const FrameBuffer &in_fbo,
                                          const FrameBuffer &auxiliary) const
 {
     assert(in_fbo.getWidth() == auxiliary.getWidth() &&
@@ -939,7 +939,7 @@ void PostProcessing::renderGaussian17TapBlur(const FrameBuffer &in_fbo,
 {
     assert(in_fbo.getWidth() == auxiliary.getWidth() &&
            in_fbo.getHeight() == auxiliary.getHeight());
-           
+
 #if !defined(USE_GLES2)
     if (CVS->supportsComputeShadersFiltering())
         glMemoryBarrier(GL_FRAMEBUFFER_BARRIER_BIT);
@@ -963,12 +963,12 @@ void PostProcessing::renderGaussian17TapBlur(const FrameBuffer &in_fbo,
                                                                in_fbo.getHeight());
         }
     }
-    
+
 #if !defined(USE_GLES2)
     if (CVS->supportsComputeShadersFiltering())
         glMemoryBarrier(GL_SHADER_IMAGE_ACCESS_BARRIER_BIT);
 #endif
-        
+
     {
         if (!CVS->supportsComputeShadersFiltering())
         {
@@ -981,13 +981,13 @@ void PostProcessing::renderGaussian17TapBlur(const FrameBuffer &in_fbo,
         else
         {
             ComputeGaussian17TapVShader::getInstance()->render(auxiliary,
-                                                               in_fbo, 
+                                                               in_fbo,
                                                                linear_depth,
                                                                in_fbo.getWidth(),
                                                                in_fbo.getHeight());
         }
     }
-    
+
 #if !defined(USE_GLES2)
     if (CVS->supportsComputeShadersFiltering())
         glMemoryBarrier(GL_TEXTURE_FETCH_BARRIER_BIT);
@@ -1241,7 +1241,7 @@ FrameBuffer *PostProcessing::render(scene::ICameraSceneNode * const camnode,
 
             // Downsample
             FrameBuffer::blit(rtts->getFBO(FBO_BLOOM_512),
-                              rtts->getFBO(FBO_BLOOM_256), 
+                              rtts->getFBO(FBO_BLOOM_256),
                               GL_COLOR_BUFFER_BIT, GL_LINEAR);
             FrameBuffer::blit(rtts->getFBO(FBO_BLOOM_256),
                               rtts->getFBO(FBO_BLOOM_128),
@@ -1249,7 +1249,7 @@ FrameBuffer *PostProcessing::render(scene::ICameraSceneNode * const camnode,
 
 			// Copy for lens flare
 			FrameBuffer::blit(rtts->getFBO(FBO_BLOOM_512),
-                              rtts->getFBO(FBO_LENS_512), 
+                              rtts->getFBO(FBO_LENS_512),
                               GL_COLOR_BUFFER_BIT, GL_LINEAR);
 			FrameBuffer::blit(rtts->getFBO(FBO_BLOOM_256),
                               rtts->getFBO(FBO_LENS_256),
@@ -1267,11 +1267,11 @@ FrameBuffer *PostProcessing::render(scene::ICameraSceneNode * const camnode,
             renderGaussian6Blur(rtts->getFBO(FBO_BLOOM_128),
                                 rtts->getFBO(FBO_TMP_128), 1., 1.);
 
-            renderHorizontalBlur(rtts->getFBO(FBO_LENS_512), 
+            renderHorizontalBlur(rtts->getFBO(FBO_LENS_512),
                                  rtts->getFBO(FBO_TMP_512));
             renderHorizontalBlur(rtts->getFBO(FBO_LENS_256),
                                  rtts->getFBO(FBO_TMP_256));
-            renderHorizontalBlur(rtts->getFBO(FBO_LENS_128), 
+            renderHorizontalBlur(rtts->getFBO(FBO_LENS_128),
                                  rtts->getFBO(FBO_TMP_128));
 
             // Additively blend on top of tmp1

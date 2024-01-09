@@ -159,7 +159,7 @@ void CannonAnimation::init(Ipo *ipo, const Vec3 &start_left,
     // 1) curve.xyz: The point at the curve at t=0.
     // 2) parallel_to_start_line_component:
     //    A component parallel to the start line. This component is scaled
-    //    depending on time and length of start- and end-line (e.g. if the 
+    //    depending on time and length of start- and end-line (e.g. if the
     //    end line is twice as long as the start line, this will make sure
     //    that a kart starting at the very left of the start line will end
     //    up at the very left of the end line). This component can also be
@@ -169,7 +169,7 @@ void CannonAnimation::init(Ipo *ipo, const Vec3 &start_left,
     // 3) rest: The amoount that the kart is ahead and above the
     //    start line. This is stored in m_delta and will be added to the
     //    newly computed curve xyz coordinates.
-    // 
+    //
     // Compute the delta between the kart position and the start of the curve.
     // This delta is rotated with the kart and added to the interpolated curve
     // position to get the actual kart position during the animation.
@@ -212,7 +212,7 @@ void CannonAnimation::init(Ipo *ipo, const Vec3 &start_left,
 void CannonAnimation::initDeltaHeading(float skidding_rotation)
 {
     // Compute the original heading of the kart. At the end of the cannon,
-    // the kart should be parallel to the curve, but at the beginning it 
+    // the kart should be parallel to the curve, but at the beginning it
     // the kart should be parallel to the curve and facing forwards, but
     // at the beginning it might not be. The initial rotation between the
     // tangent of the curce and the kart is stored as a m_delta_heading,
@@ -276,7 +276,7 @@ void CannonAnimation::update(int ticks)
     // -------
     // I tried to also adjust pitch at the same time, but that adds a strong
     // roll to the kart on some cannons while it is in the air (caused by
-    // the rotation axis returned shortestArc not being orthogonal to the 
+    // the rotation axis returned shortestArc not being orthogonal to the
     // up vector).
     Vec3 v1(tangent), v2(forward);
     v1.setY(0); v2.setY(0);
@@ -284,7 +284,7 @@ void CannonAnimation::update(int ticks)
 
     // Align to up-vector
     // ------------------
-    // While start and end line have to have the same 'up' vector, karts can 
+    // While start and end line have to have the same 'up' vector, karts can
     // sometimes be not parallel to them. So slowly adjust this over time
     Vec3 up = trans.getBasis().getColumn(1);
     up.normalize();
@@ -300,7 +300,7 @@ void CannonAnimation::update(int ticks)
     // line. This rotation will be reduced the closer the kart gets to
     // the end line, with the result that at the start line the kart will
     // be not rotated at all (so the visuals from physics to cannon will
-    // be smoothed), and at the end line the kart will face in the 
+    // be smoothed), and at the end line the kart will face in the
     // forward direction.
 
     // The timer counts backwards, so the fraction goes from 1 to 0

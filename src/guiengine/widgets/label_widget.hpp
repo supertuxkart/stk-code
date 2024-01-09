@@ -35,7 +35,7 @@ namespace GUIEngine
     class LabelWidget : public Widget
     {
     public:
-        
+
         enum LabelType
         {
             NORMAL,
@@ -45,16 +45,16 @@ namespace GUIEngine
             TINY_TITLE,
             COUNT
         };
-        
+
     private:
-        
+
         LabelType         m_type;
         irr::video::SColor m_color;
         bool               m_has_color;
 
         /** Scroll speed in characters/seconds (0 if no scrolling). */
         float              m_scroll_speed;
-        
+
         /** Current scroll offset. */
         float              m_scroll_offset;
 
@@ -62,16 +62,16 @@ namespace GUIEngine
         using Widget::setText;
 
     public:
-        
+
         LEAK_CHECK()
-        
+
         /** Constructs the label widget. Parameter:
           * \param type the text type of the label
           */
         LabelWidget(LabelType type = NORMAL);
-        
+
         virtual ~LabelWidget() {}
-        
+
         /** \brief Callback from base class Widget */
         virtual void add();
 
@@ -80,10 +80,10 @@ namespace GUIEngine
         void     setColor(const irr::video::SColor& color);
         void     setErrorColor();
         void     setDefaultColor();
-        
+
         /** \brief Callback from base class Widget */
         virtual void update(float dt);
-                
+
         /**
           * \brief Sets the text in the label.
           *
@@ -101,12 +101,12 @@ namespace GUIEngine
         virtual void setText(const irr::core::stringw& text, bool expandAsNeeded);
 
         // --------------------------------------------------------------------
-        
+
         /** Sets horizontal scroll speed. */
         void setScrollSpeed(float speed);
-        
+
         // --------------------------------------------------------------------
-        
+
         /**
           * \brief Check if the current has been fully scrolled
           * \return true if the text has completely scrolled off

@@ -88,7 +88,7 @@ ConnectToServer::ConnectToServer(std::shared_ptr<Server> server)
 }   // ConnectToServer(server, host)
 
 // ----------------------------------------------------------------------------
-/** Destructor. 
+/** Destructor.
  */
 ConnectToServer::~ConnectToServer()
 {
@@ -515,7 +515,7 @@ bool ConnectToServer::registerWithSTKServer()
         STKHost::get()->getValidPublicAddress().c_str());
 
     // This can be done blocking: till we are registered with the
-    // stk server, there is no need to to react to any other 
+    // stk server, there is no need to to react to any other
     // network requests
     request->executeNow();
 

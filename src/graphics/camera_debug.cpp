@@ -28,7 +28,7 @@
 #include "karts/skidding.hpp"
 #include "physics/btKart.hpp"
 
-CameraDebug::CameraDebugType CameraDebug::m_default_debug_Type = 
+CameraDebug::CameraDebugType CameraDebug::m_default_debug_Type =
                                             CameraDebug::CM_DEBUG_TOP_OF_KART;
 
 // ============================================================================
@@ -64,7 +64,7 @@ void CameraDebug::getCameraSettings(float *above_kart, float *cam_angle,
     *sideway = -m_rotation_range*dampened_steer*0.5f;
     *above_kart = 0;
     *cam_angle  = 0;
-    
+
     switch(m_default_debug_Type)
     {
     case CM_DEBUG_BEHIND_KART:
@@ -81,7 +81,7 @@ void CameraDebug::getCameraSettings(float *above_kart, float *cam_angle,
         *cam_angle     = UserConfigParams::m_camera_forward_up_angle * DEGREE_TO_RAD;
         *distance      = -m_distance;
         break;
-    }   // switch 
+    }   // switch
 
 }   // getCameraSettings
 

@@ -305,7 +305,7 @@ void initSkinning()
     if (!CVS->isARBTextureBufferObjectUsable())
     {
         glGetIntegerv(GL_MAX_TEXTURE_SIZE, &max_size);
-    
+
         if (stk_config->m_max_skinning_bones > (unsigned)max_size)
         {
             Log::warn("SharedGPUObjects", "Too many bones for skinning, max: %d",
@@ -605,7 +605,7 @@ void destroy()
     SPTextureManager::destroy();
 
 #ifndef USE_GLES2
-    if (CVS->isARBTextureBufferObjectUsable() && 
+    if (CVS->isARBTextureBufferObjectUsable() &&
         CVS->isARBBufferStorageUsable())
     {
         glBindBuffer(GL_TEXTURE_BUFFER, g_skinning_buf);
@@ -1127,7 +1127,7 @@ void uploadSkinningMatrices()
 
     unsigned buffer_offset = 0;
 #ifndef USE_GLES2
-    if (CVS->isARBTextureBufferObjectUsable() && 
+    if (CVS->isARBTextureBufferObjectUsable() &&
         !CVS->isARBBufferStorageUsable())
     {
         glBindBuffer(GL_TEXTURE_BUFFER, g_skinning_buf);
@@ -1153,9 +1153,9 @@ void uploadSkinningMatrices()
             GL_FLOAT, g_joint_ptr);
         glBindTexture(GL_TEXTURE_2D, 0);
     }
-    
+
 #ifndef USE_GLES2
-    if (CVS->isARBTextureBufferObjectUsable() && 
+    if (CVS->isARBTextureBufferObjectUsable() &&
         !CVS->isARBBufferStorageUsable())
     {
         glUnmapBuffer(GL_TEXTURE_BUFFER);

@@ -34,7 +34,7 @@ private:
     float m_remaining_time;
 
     bool m_unsupported_resolution;
-        
+
     /** updates countdown message */
     void updateMessage();
 public:
@@ -42,10 +42,10 @@ public:
     ConfirmResolutionDialog(bool unsupported_res);
     void onEnterPressedInternal() OVERRIDE;
     GUIEngine::EventPropagation processEvent(const std::string& eventSource) OVERRIDE;
-    
+
     virtual void onUpdate(float dt) OVERRIDE;
     virtual bool onEscapePressed() OVERRIDE;
 };
-  
+
 
 #endif

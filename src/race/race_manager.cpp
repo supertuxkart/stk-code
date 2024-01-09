@@ -159,7 +159,7 @@ RaceManager::~RaceManager()
 
 //---------------------------------------------------------------------------------------------
 /** Resets the race manager in preparation for a new race. It sets the
- *  counter of finished karts to zero. It is called by world when 
+ *  counter of finished karts to zero. It is called by world when
  *  restarting a race.
  */
 void RaceManager::reset()
@@ -290,7 +290,7 @@ void RaceManager::setNumPlayers(int players, int local_players)
  *  to HARD.
  *  \param difficulty The difficulty as string.
  */
-RaceManager::Difficulty 
+RaceManager::Difficulty
                   RaceManager::convertDifficulty(const std::string &difficulty)
 {
     if (difficulty == "novice")
@@ -408,7 +408,7 @@ void RaceManager::startNew(bool from_overworld)
                                          m_grand_prix.getId(),
                                          m_minor_mode,
                                          (unsigned int)m_player_karts.size());
-    
+
             // Saved GP only in offline mode
             if (m_continue_saved_gp)
             {
@@ -493,7 +493,7 @@ void RaceManager::startNew(bool from_overworld)
     // -----------------------------------------------------
     for(unsigned int i = 0; i < m_player_karts.size(); i++)
     {
-        KartType kt= m_player_karts[i].isNetworkPlayer() ? KT_NETWORK_PLAYER 
+        KartType kt= m_player_karts[i].isNetworkPlayer() ? KT_NETWORK_PLAYER
                                                          : KT_PLAYER;
         m_kart_status.push_back(KartStatus(m_player_karts[i].getKartName(), i,
                                            m_player_karts[i].getLocalPlayerId(),
@@ -521,7 +521,7 @@ void RaceManager::startNew(bool from_overworld)
             // This is useful, e.g., when continuing a saved GP, see #2776
             computeGPRanks();
         }
-        else 
+        else
         {
             while (m_saved_gp != NULL)
             {
@@ -550,7 +550,7 @@ void RaceManager::startNextRace()
 #ifdef __SWITCH__
     // Throttles GPU while boosting CPU
     appletSetCpuBoostMode(ApmCpuBoostMode_FastLoad);
-#endif  
+#endif
     ProcessType type = STKProcess::getType();
     main_loop->renderGUI(0);
     // Uncomment to debug audio leaks

@@ -96,7 +96,7 @@ void ClientLobby::destroyBackgroundDownload()
 }
 
 // ============================================================================
-/** The protocol that manages starting a race with the server. It uses a 
+/** The protocol that manages starting a race with the server. It uses a
  *  finite state machine:
 \dot
 digraph interaction {
@@ -236,7 +236,7 @@ bool ClientLobby::notifyEventAsynchronous(Event* event)
             default:                                                     break;
         }   // switch
     } // message
-    else if (event->getType() == EVENT_TYPE_DISCONNECTED) 
+    else if (event->getType() == EVENT_TYPE_DISCONNECTED)
     {
         // This means we left essentially.
         // We can't delete STKHost from this thread, since the main
@@ -608,7 +608,7 @@ void ClientLobby::receivePlayerVote(Event* event)
  *  \param event : Event providing the information.
  *
  *  Format of the data :
- *  Byte 0 
+ *  Byte 0
  *       --------------
  *  Size |    1       |
  *  Data | player id *|
@@ -949,7 +949,7 @@ void ClientLobby::handleChat(Event* event)
  *  \param event : Event providing the information.
  *
  *  Format of the data :
- *  Byte 0 
+ *  Byte 0
  *       ----------------
  *  Size |      1       |
  *  Data | refusal code |

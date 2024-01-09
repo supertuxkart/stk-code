@@ -73,13 +73,13 @@ bool EventHandler::OnEvent (const SEvent &event)
 
     if(!Debug::onEvent(event))
         return false;
-        
+
     if (ScreenKeyboard::isActive())
     {
         if (ScreenKeyboard::getCurrent()->onEvent(event))
             return true; // EVENT_BLOCK
     }
-    
+
     // TO DEBUG HATS (when you don't actually have a hat)
     /*
     if (event.EventType == EET_KEY_INPUT_EVENT)
@@ -202,7 +202,7 @@ bool EventHandler::OnEvent (const SEvent &event)
         {
             Log::verbose("keyboard", "char %d key %d ctrl %d down %d shift %d",
                 event.KeyInput.Char, event.KeyInput.Key,
-                event.KeyInput.Control, event.KeyInput.PressedDown, 
+                event.KeyInput.Control, event.KeyInput.PressedDown,
                 event.KeyInput.Shift);
         }
         // FIXME? it may be a bit unclean that all input events go trough
@@ -367,7 +367,7 @@ void EventHandler::deallocate()
 void EventHandler::sendNavigationEvent(const NavigationDirection nav, const int playerID)
 {
     Widget* w = GUIEngine::getFocusForPlayer(playerID);
-    
+
     if (w != NULL)
     {
         if (ScreenKeyboard::isActive())
@@ -385,11 +385,11 @@ void EventHandler::sendNavigationEvent(const NavigationDirection nav, const int 
             }
         }
     }
-    
+
     if (w == NULL)
     {
         Widget* defaultWidget = NULL;
-        
+
         if (ScreenKeyboard::isActive())
         {
             defaultWidget = ScreenKeyboard::getCurrent()->getFirstWidget();
@@ -675,7 +675,7 @@ int EventHandler::findIDClosestWidget(const NavigationDirection nav, const int p
     int closest_id = (smallest_distance < BIG_DISTANCE) ? closest_widget_id :
                                                           closest_wrapping_widget_id;
     Widget* w_test = GUIEngine::getWidget(closest_id);
-    
+
     if (w_test == NULL)
         return -1;
 
@@ -691,7 +691,7 @@ int EventHandler::findIDClosestWidget(const NavigationDirection nav, const int p
             return findIDClosestWidget(nav, playerID, w_test, /*ignore disabled*/ false, recursion_counter);
         }
         // If nothing has been found, do a search ignoring disabled/invisible widgets,
-        // restarting from the initial focused widget (otherwise, it could lead to weird results) 
+        // restarting from the initial focused widget (otherwise, it could lead to weird results)
         else if (recursion_counter == 3)
         {
             Widget* w_focus = GUIEngine::getFocusForPlayer(playerID);
@@ -713,7 +713,7 @@ void EventHandler::sendEventToUser(GUIEngine::Widget* widget, std::string& name,
             return;
         }
     }
-    
+
     if (ModalDialog::isADialogActive())
     {
         if (ModalDialog::getCurrent()->processEvent(widget->m_properties[PROP_ID]) != EVENT_LET)
@@ -734,7 +734,7 @@ EventPropagation EventHandler::onWidgetActivated(GUIEngine::Widget* w, const int
         return EVENT_BLOCK;
 
     Widget* parent = w->m_event_handler;
-    
+
     //FIXME : sendEventToUser do the same screen keyboard and modal dialog checks, so they are done twice
     if (ScreenKeyboard::isActive())
     {
@@ -825,7 +825,7 @@ EventPropagation EventHandler::onGUIEvent(const SEvent& event)
                 }
 
                 EventPropagation result = w->onClick();
-                
+
                 if (result == EVENT_BLOCK)
                     return result;
 
@@ -851,7 +851,7 @@ EventPropagation EventHandler::onGUIEvent(const SEvent& event)
                 if (ScreenKeyboard::isActive())
                 {
                     // check for parents too before discarding event
-                    if (!ScreenKeyboard::getCurrent()->isMyChild(w) && 
+                    if (!ScreenKeyboard::getCurrent()->isMyChild(w) &&
                         w->m_event_handler != NULL)
                     {
                         if (!ScreenKeyboard::getCurrent()->isMyChild(w->m_event_handler))
@@ -863,7 +863,7 @@ EventPropagation EventHandler::onGUIEvent(const SEvent& event)
                 else if (ModalDialog::isADialogActive())
                 {
                     // check for parents too before discarding event
-                    if (!ModalDialog::getCurrent()->isMyChild(w) && 
+                    if (!ModalDialog::getCurrent()->isMyChild(w) &&
                         w->m_event_handler != NULL)
                     {
                         if (!ModalDialog::getCurrent()->isMyChild(w->m_event_handler))
@@ -957,7 +957,7 @@ EventPropagation EventHandler::onGUIEvent(const SEvent& event)
             {
                 // currently, enter pressed in text ctrl events can only happen in dialogs.
                 // FIXME : find a cleaner way to route the event to its proper location
-                if (!ScreenKeyboard::isActive() && ModalDialog::isADialogActive()) 
+                if (!ScreenKeyboard::isActive() && ModalDialog::isADialogActive())
                     ModalDialog::onEnterPressed();
                 break;
             }

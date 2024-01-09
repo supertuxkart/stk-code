@@ -125,7 +125,7 @@ void GhostReplaySelection::loadedFromFile()
     m_mode_tabs = getWidget<GUIEngine::RibbonWidget>("race_mode");
     m_active_mode = RaceManager::MINOR_MODE_TIME_TRIAL;
     m_active_mode_is_linear = true;
-    
+
     m_icon_bank = new irr::gui::STKModifiedSpriteBank( GUIEngine::getGUIEnv());
 
     for(unsigned int i=0; i<kart_properties_manager->getNumberOfKarts(); i++)
@@ -173,10 +173,10 @@ void GhostReplaySelection::init()
 {
     Screen::init();
     m_cur_difficulty = RaceManager::get()->getDifficulty();
-    
+
     int icon_height = GUIEngine::getFontHeight();
     int row_height = GUIEngine::getFontHeight() * 5 / 4;
-                                                        
+
     // 128 is the height of the image file
     m_icon_bank->setScale(icon_height/128.0f);
     m_icon_bank->setTargetIconSize(128, 128);
@@ -223,7 +223,7 @@ void GhostReplaySelection::loadList()
                 continue;
 
             Track* track = track_manager->getTrack(rd.m_track_name);
-        
+
             if (track == NULL)
                 continue;
 
@@ -362,7 +362,7 @@ void GhostReplaySelection::loadList()
             continue;
 
         Track* track = track_manager->getTrack(rd.m_track_name);
-        
+
         if (track == NULL)
             continue;
 
@@ -572,7 +572,7 @@ void GhostReplaySelection::onColumnClicked(int column_id, bool sort_desc, bool s
         ReplayPlay::setSortOrder(ReplayPlay::SO_USER);
     else if (column_id == 7)
         ReplayPlay::setSortOrder(ReplayPlay::SO_KART_NUM);
-    else if (column_id == 8)    
+    else if (column_id == 8)
         ReplayPlay::setSortOrder(ReplayPlay::SO_VERSION);
     else
         assert(0);

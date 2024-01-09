@@ -201,7 +201,7 @@ void RegisterScreen::onDialogClose()
 }   // onDialogClose
 
 // -----------------------------------------------------------------------------
-void RegisterScreen::onFocusChanged(GUIEngine::Widget* previous, 
+void RegisterScreen::onFocusChanged(GUIEngine::Widget* previous,
                                     GUIEngine::Widget* focus,  int playerID)
 {
     TextBoxWidget *online_name = getWidget<TextBoxWidget>("username");
@@ -299,7 +299,7 @@ void RegisterScreen::doRegister()
 {
     stringw local_name = getWidget<TextBoxWidget>("local_username")
                        ->getText().trim();
-                       
+
     if (local_name.empty())
     {
         m_info_widget->setErrorColor();
@@ -335,7 +335,7 @@ void RegisterScreen::doRegister()
     // If there is an email_confirm field, use it and check if the email
     // address is correct. If there is no such field, set the confirm email
     // address to email address (so the test below will be passed).
-    stringw email_confirm = getWidget<TextBoxWidget>("email_confirm") 
+    stringw email_confirm = getWidget<TextBoxWidget>("email_confirm")
                           ? getWidget<TextBoxWidget>("email_confirm")->getText()
                           : getWidget<TextBoxWidget>("email")->getText();
     email_confirm.trim();
@@ -391,7 +391,7 @@ void RegisterScreen::doRegister()
     {
         m_info_widget->setText(_("Email is invalid!"), false);
     }
-   
+
     else
     {
         m_info_widget->setDefaultColor();
@@ -402,7 +402,7 @@ void RegisterScreen::doRegister()
             if (player)
             {
                 core::stringw online_name = getWidget<TextBoxWidget>("username")->getText().trim();
-                m_parent_screen->setNewAccountData(/*online*/true, 
+                m_parent_screen->setNewAccountData(/*online*/true,
                                                    /*auto_login*/false,
                                                    username, password);
 

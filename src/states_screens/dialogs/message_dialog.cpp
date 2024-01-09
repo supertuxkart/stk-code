@@ -157,7 +157,7 @@ void MessageDialog::onEnterPressedInternal()
 GUIEngine::EventPropagation MessageDialog::processEvent(const std::string& eventSource)
 {
     RibbonWidget* ribbon = getWidget<RibbonWidget>(eventSource.c_str());
-    
+
     if (ribbon->getSelectionIDString(PLAYER_ID_GAME_MASTER) == "cancel")
     {
         if (m_listener == NULL)

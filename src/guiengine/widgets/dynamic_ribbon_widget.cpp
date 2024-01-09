@@ -342,10 +342,10 @@ void DynamicRibbonWidget::buildInternalStructure()
     // ---- determine column amount
     const float row_height = (float)(m_h - m_label_height)/(float)m_row_amount;
     float col_width = (float)(row_height * m_child_width / m_child_height);
-    
+
     // Give some margin for columns for better readability
     col_width *= 1.2f;
-    
+
     m_col_amount = std::max((int)floor( m_w / col_width ), 1);
 
     // ajust column amount to not add more item slots than we actually need
@@ -540,7 +540,7 @@ void DynamicRibbonWidget::setBadge(const std::string &name, BadgeType badge)
                 m_rows[r].m_children[c].unsetBadge(badge);
         }
     }
-    
+
     for (unsigned int i = 0; i < m_items.size(); i++)
     {
         if (m_items[i].m_code_name == name)

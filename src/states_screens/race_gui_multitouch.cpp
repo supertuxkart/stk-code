@@ -109,7 +109,7 @@ void RaceGUIMultitouch::close()
     {
         m_device->clearButtons();
     }
-    
+
     if (m_device->isAccelerometerActive())
     {
         m_device->deactivateAccelerometer();
@@ -134,8 +134,8 @@ void RaceGUIMultitouch::init()
     {
         UserConfigParams::m_multitouch_scale = 0.8f;
     }
-    
-    m_steering_wheel_tex = irr_driver->getTexture(FileManager::GUI_ICON, 
+
+    m_steering_wheel_tex = irr_driver->getTexture(FileManager::GUI_ICON,
                                                   "android/steering_wheel.png");
     m_accelerator_tex = irr_driver->getTexture(FileManager::GUI_ICON,
                                                "android/accelerator.png");
@@ -143,16 +143,16 @@ void RaceGUIMultitouch::init()
                                                "android/accelerator_handle.png");
     m_pause_tex = irr_driver->getTexture(FileManager::GUI_ICON, "android/pause.png");
     m_nitro_tex = irr_driver->getTexture(FileManager::GUI_ICON, "android/nitro.png");
-    m_nitro_empty_tex = irr_driver->getTexture(FileManager::GUI_ICON, 
+    m_nitro_empty_tex = irr_driver->getTexture(FileManager::GUI_ICON,
                                                      "android/nitro_empty.png");
-    m_wing_mirror_tex = irr_driver->getTexture(FileManager::GUI_ICON, 
+    m_wing_mirror_tex = irr_driver->getTexture(FileManager::GUI_ICON,
                                                      "android/wing_mirror.png");
-    m_thunderbird_reset_tex = irr_driver->getTexture(FileManager::GUI_ICON, 
+    m_thunderbird_reset_tex = irr_driver->getTexture(FileManager::GUI_ICON,
                                                "android/thunderbird_reset.png");
     m_drift_tex = irr_driver->getTexture(FileManager::GUI_ICON, "android/drift.png");
-    m_bg_button_tex = irr_driver->getTexture(FileManager::GUI_ICON, 
+    m_bg_button_tex = irr_driver->getTexture(FileManager::GUI_ICON,
                                                   "android/blur_bg_button.png");
-    m_bg_button_focus_tex = irr_driver->getTexture(FileManager::GUI_ICON, 
+    m_bg_button_focus_tex = irr_driver->getTexture(FileManager::GUI_ICON,
                                             "android/blur_bg_button_focus.png");
     m_gui_action_tex = irr_driver->getTexture(FileManager::GUI_ICON,"challenge.png");
     m_up_tex = irr_driver->getTexture(FileManager::GUI_ICON, "up.png");
@@ -164,7 +164,7 @@ void RaceGUIMultitouch::init()
                                         "android/steering_wheel_mask_down.png");
 
     auto cl = LobbyProtocol::get<ClientLobby>();
-    
+
     if (cl && cl->isSpectator())
     {
         createSpectatorGUI();
@@ -183,7 +183,7 @@ void RaceGUIMultitouch::createRaceGUI()
 {
     if (m_device == NULL)
         return;
-        
+
     if (UserConfigParams::m_multitouch_controls == MULTITOUCH_CONTROLS_ACCELEROMETER)
     {
         m_device->activateAccelerometer();
@@ -236,7 +236,7 @@ void RaceGUIMultitouch::createRaceGUI()
     }
 
     m_height = (unsigned int)(2 * col_size + margin / 2);
-    
+
     if (UserConfigParams::m_multitouch_controls == MULTITOUCH_CONTROLS_ACCELEROMETER ||
         UserConfigParams::m_multitouch_controls == MULTITOUCH_CONTROLS_GYROSCOPE)
     {
@@ -278,7 +278,7 @@ void RaceGUIMultitouch::createSpectatorGUI()
 {
     if (m_device == NULL)
         return;
-        
+
     const float scale = UserConfigParams::m_multitouch_scale;
 
     const int h = irr_driver->getActualScreenSize().Height;
@@ -289,21 +289,21 @@ void RaceGUIMultitouch::createSpectatorGUI()
     const float small_ratio = 0.75f;
     const float btn_small_size = small_ratio * btn_size;
     const float margin_small = small_ratio * margin;
-    
+
     m_height = (unsigned int)(btn_size + 2 * margin);
-    
+
     m_device->addButton(BUTTON_ESCAPE,
                         int(margin_top), int(margin_small),
                         int(btn_small_size), int(btn_small_size));
-                        
+
     m_device->addButton(BUTTON_CUSTOM,
                     int(margin), int(h - margin - btn_size),
                     int(btn_size), int(btn_size), onCustomButtonPress);
-    
+
     m_device->addButton(BUTTON_CUSTOM,
                     int(margin * 2 + btn_size), int(h - margin - btn_size),
                     int(btn_size), int(btn_size), onCustomButtonPress);
-                    
+
     m_device->addButton(BUTTON_CUSTOM,
                     int(margin * 3 + btn_size * 2), int(h - margin - btn_size),
                     int(btn_size), int(btn_size), onCustomButtonPress);
@@ -316,14 +316,14 @@ void RaceGUIMultitouch::createSpectatorGUI()
 //-----------------------------------------------------------------------------
 /** Callback function when custom button is pressed
  */
-void RaceGUIMultitouch::onCustomButtonPress(unsigned int button_id, 
+void RaceGUIMultitouch::onCustomButtonPress(unsigned int button_id,
                                             bool pressed)
 {
     if (!pressed)
         return;
-        
+
     auto cl = LobbyProtocol::get<ClientLobby>();
-    
+
     if (!cl || !cl->isSpectator())
         return;
 
@@ -368,12 +368,12 @@ void RaceGUIMultitouch::draw(const AbstractKart* kart,
 
         core::rect<s32> btn_pos(button->x, button->y, button->x + button->width,
                                 button->y + button->height);
-                                
+
         core::rect<s32> btn_pos_bg((int)(button->x - button->width * 0.2f),
                                    (int)(button->y - button->height * 0.2f),
                                    (int)(button->x + button->width * 1.2f),
                                    (int)(button->y + button->height * 1.2f));
-                                   
+
         const core::position2d<s32> pos_zero = core::position2d<s32>(0,0);
 
         if (button->type == MultitouchButtonType::BUTTON_STEERING)
@@ -513,10 +513,10 @@ void RaceGUIMultitouch::draw(const AbstractKart* kart,
             if (btn_texture)
             {
                 video::ITexture* btn_bg = (can_be_pressed && button->pressed) ?
-                                                        m_bg_button_focus_tex : 
+                                                        m_bg_button_focus_tex :
                                                         m_bg_button_tex;
                 core::rect<s32> coords_bg(pos_zero, btn_bg->getSize());
-                draw2DImage(btn_bg, btn_pos_bg, coords_bg, NULL, NULL, true);                
+                draw2DImage(btn_bg, btn_pos_bg, coords_bg, NULL, NULL, true);
 
                 core::rect<s32> coords(pos_zero, btn_texture->getSize());
                 draw2DImage(btn_texture, btn_pos, coords, NULL, NULL, true);
@@ -534,7 +534,7 @@ void RaceGUIMultitouch::draw(const AbstractKart* kart,
                                             core::vector2df(scale, scale));
             }
             else if (button->type == MultitouchButtonType::BUTTON_FIRE &&
-                     kart->getPowerup()->getNum() > 1 && 
+                     kart->getPowerup()->getNum() > 1 &&
                      !kart->hasFinishedRace() &&
                      m_gui_action == false)
             {

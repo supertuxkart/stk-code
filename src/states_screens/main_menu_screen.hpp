@@ -20,7 +20,7 @@
 
 #include "guiengine/screen.hpp"
 
-namespace GUIEngine { class Widget;       class ListWidget; 
+namespace GUIEngine { class Widget;       class ListWidget;
                       class ButtonWidget; class IconButtonWidget; }
 
 /**
@@ -45,7 +45,7 @@ public:
 
     /** \brief implement callback from parent class GUIEngine::Screen */
     virtual void loadedFromFile() OVERRIDE;
-    
+
     /** \brief implement callback from parent class GUIEngine::Screen */
     virtual void beforeAddingWidget() OVERRIDE;
 

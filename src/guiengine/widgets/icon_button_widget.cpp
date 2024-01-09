@@ -131,7 +131,7 @@ void IconButtonWidget::add()
         m_scale_mode == SCALE_MODE_LIST_WIDGET)
     {
         assert(m_texture->getOriginalSize().Height > 0);
-        useAspectRatio = (float)m_texture->getOriginalSize().Width / 
+        useAspectRatio = (float)m_texture->getOriginalSize().Width /
                          (float)m_texture->getOriginalSize().Height;
     }
     else if (m_scale_mode == SCALE_MODE_KEEP_CUSTOM_ASPECT_RATIO)
@@ -148,16 +148,16 @@ void IconButtonWidget::add()
         suggested_w = (int)(suggested_w*needed_scale_factor);
         suggested_h = (int)(suggested_h*needed_scale_factor);
     }
-    
+
     bool left_horizontal = m_properties[PROP_ICON_ALIGN] == "left";
     bool right_horizontal = m_properties[PROP_ICON_ALIGN] == "right";
-    
+
     // Assume left align if align property is not specified, but x property is specified
     if (m_properties[PROP_X].size() > 0 && m_properties[PROP_ICON_ALIGN].empty())
     {
         left_horizontal = true;
     }
-    
+
     const int x_from = right_horizontal ? m_x + (m_w - suggested_w) :
                        left_horizontal  ? m_x :
                                           m_x + (m_w - suggested_w)/2;

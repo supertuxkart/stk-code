@@ -66,7 +66,7 @@ void CachedCharacteristic::updateSource()
     for (int i = 0; i < CHARACTERISTIC_COUNT; i++)
     {
         SaveValue &v = m_values[i];
-        
+
         bool is_set = false;
         switch (getType(static_cast<CharacteristicType>(i)))
         {

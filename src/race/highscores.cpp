@@ -123,7 +123,7 @@ void Highscores::readEntry(const XMLNode &node)
             Log::warn("Highscores", "Hiscore has too many entries.");
             break;
         }
-        
+
         const XMLNode *entry = node.getNode(i);
         entry->get("time",     &m_time[i]            );
         entry->getAndDecode("name",     &m_name[i]            );
@@ -211,7 +211,7 @@ int Highscores::matches(int num_karts,
             m_gp_minor_mode   == minor_mode         );
 }
 
-int Highscores::findHighscorePosition(const std::string& kart_name, 
+int Highscores::findHighscorePosition(const std::string& kart_name,
                               const core::stringw& name, const float time)
 {
     int position=-1;

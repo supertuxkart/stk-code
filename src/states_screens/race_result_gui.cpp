@@ -204,7 +204,7 @@ void RaceResultGUI::init()
         MessageQueue::add(MessageQueue::MT_GENERIC, tips_string);
     }
 #endif
-    
+
     if (RaceManager::get()->getMajorMode() == RaceManager::MAJOR_MODE_GRAND_PRIX &&
         !NetworkConfig::get()->isNetworking() &&
         (RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_NORMAL_RACE || RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_TIME_TRIAL ||
@@ -1464,7 +1464,7 @@ void RaceResultGUI::unload()
                 NULL, true /* ignoreRTL */);
             current_x += m_width_finish_time + m_width_column_space;
         }
-        
+
 
         current_x += 100 + m_width_column_space;
 

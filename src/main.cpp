@@ -72,11 +72,11 @@
  online_manager -> "STK Server"
  "STK Server" -> online_manager
  karts -> replay
- replay 
+ replay
  # force karts and tracks on the same level, looks better this way
- subgraph { 
-  rank = same; karts; tracks; 
- } 
+ subgraph {
+  rank = same; karts; tracks;
+ }
 
 }
  \enddot
@@ -323,7 +323,7 @@ void gamepadVisualisation()
 
                     if (evt.PressedDown)
                     {
-                        if (evt.Key == IRR_KEY_RETURN || 
+                        if (evt.Key == IRR_KEY_RETURN ||
                             evt.Key == IRR_KEY_ESCAPE ||
                             evt.Key == IRR_KEY_SPACE)
                         {
@@ -1285,7 +1285,7 @@ int handleCmdLine(bool has_server_config, bool has_parent_process)
 
     if (CommandLine::has("--network-item-debugging"))
         NetworkItemManager::m_network_item_debugging = true;
-    
+
     std::string server_password;
     if (CommandLine::has("--server-password", &s))
     {
@@ -1707,17 +1707,17 @@ int handleCmdLine(bool has_server_config, bool has_parent_process)
             RaceManager::get()->setNumLaps(n);
         }
     }   // --profile-laps
-    
+
     if(CommandLine::has("--unlock-all"))
     {
         UserConfigParams::m_unlock_everything = 2;
     } // --unlock-all
-    
+
     if(CommandLine::has("--no-unlock-all"))
     {
         UserConfigParams::m_unlock_everything = 0;
     } // --no-unlock-all
-    
+
     if(CommandLine::has("--profile-time",  &n))
     {
         Log::verbose("main", "Profiling: %d seconds.", n);
@@ -2149,7 +2149,7 @@ int main(int argc, char *argv[])
     std::thread debugThread = std::thread(debugLoop);
 #endif
 #endif
-  
+
     clearGlobalVariables();
     CommandLine::init(argc, argv);
 

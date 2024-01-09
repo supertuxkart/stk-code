@@ -30,7 +30,7 @@
 class MessageDialog : public GUIEngine::ModalDialog
 {
 public:
-    
+
     /**
      * \brief Listener interface to get notified of whether the user chose to confirm or cancel
      * \ingroup states_screens
@@ -38,24 +38,24 @@ public:
     class IConfirmDialogListener
     {
     public:
-        
+
         LEAK_CHECK()
-        
+
         IConfirmDialogListener() {}
         virtual ~IConfirmDialogListener() {}
-        
+
         /** \brief Implement to be notified of dialog confirmed.
           * \note  The dialog is not closed automatically, close it in the callback if this
           *        behavior is desired.
           */
         virtual void onConfirm() { ModalDialog::dismiss(); };
-        
+
         /** \brief Implement to be notified of dialog cancelled.
           * \note  The default implementation is to close the modal dialog, but you may override
           *        this method to change the behavior.
           */
         virtual void onCancel() { ModalDialog::dismiss(); };
-        
+
         /**
           * \brief Optional callback
           */
@@ -65,17 +65,17 @@ public:
     enum MessageDialogType { MESSAGE_DIALOG_OK, MESSAGE_DIALOG_CONFIRM,
                              MESSAGE_DIALOG_OK_CANCEL, MESSAGE_DIALOG_YESNO,
                              MESSAGE_DIALOG_OK_DONTSHOWAGAIN };
-    
+
     MessageDialogType m_type;
 
 private:
-    
+
     IConfirmDialogListener* m_listener;
     bool m_own_listener;
     irr::core::stringw m_msg;
     void doInit(bool from_queue);
 
-    /** If set this will set the focus on 'cancel'/'no' 
+    /** If set this will set the focus on 'cancel'/'no'
      *  instead of "yes"/"ok". */
     bool m_focus_on_cancel;
 
@@ -100,7 +100,7 @@ public:
                   bool focus_on_cancel = false);
 
     ~MessageDialog();
-    
+
     virtual void onEnterPressedInternal() OVERRIDE;
     virtual void onUpdate(float dt) OVERRIDE;
     virtual void load() OVERRIDE;

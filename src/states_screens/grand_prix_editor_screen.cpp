@@ -38,7 +38,7 @@ using namespace GUIEngine;
 using namespace irr::core;
 
 // -----------------------------------------------------------------------------
-GrandPrixEditorScreen::GrandPrixEditorScreen() 
+GrandPrixEditorScreen::GrandPrixEditorScreen()
                      : Screen("grand_prix_editor.stkgui"), m_selection(NULL),
                        m_gpgroup(GrandPrixData::GP_NONE)
 {
@@ -315,7 +315,7 @@ void GrandPrixEditorScreen::onConfirm()
     {
         grand_prix_manager->remove(m_selection->getId());
         loadGPList();
-        
+
         if (grand_prix_manager->getNumberOfGrandPrix() > 0)
         {
             setSelection(grand_prix_manager->getGrandPrix(0));

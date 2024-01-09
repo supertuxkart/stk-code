@@ -141,12 +141,12 @@ public:
     Version(const std::string &driver_version, const std::string &card_name)
     {
         m_version.clear();
-        
+
 #ifdef ANDROID
         // Android version should be enough to disable certain features on this
         // platform
         int version = SDL_GetAndroidSDKVersion();
-        
+
         if (version > 0)
         {
             m_version.push_back(version);
@@ -320,19 +320,19 @@ private:
     /** Operators to test version numbers with. */
     enum VersionTest
     {
-        VERSION_IGNORE, 
-        VERSION_EQUAL, 
-        VERSION_LESS, 
-        VERSION_LESS_EQUAL, 
-        VERSION_MORE, 
+        VERSION_IGNORE,
+        VERSION_EQUAL,
+        VERSION_LESS,
+        VERSION_LESS_EQUAL,
+        VERSION_MORE,
         VERSION_MORE_EQUAL
-    }; 
-    
+    };
+
     std::vector<VersionTest> m_version_tests;
-    
+
     /** Driver version for which this rule applies. */
     std::vector<Version> m_driver_versions;
-    
+
     /** For which OS this rule applies. */
     std::string m_os;
 
@@ -366,7 +366,7 @@ public:
         if (rule->get("disable", &s))
             m_disable_options = StringUtils::split(s, ' ');
     }   // Rule
-    
+
     // ------------------------------------------------------------------------
     void addVersion(std::string version)
     {
@@ -401,13 +401,13 @@ public:
             Log::warn("Graphics", "Invalid version '%s' found - ignored.",
                       version.c_str());
         }
-        
+
         if (m_version_tests.back() != VERSION_IGNORE)
         {
             m_driver_versions.push_back(Version(version));
         }
     }
-    
+
     // ------------------------------------------------------------------------
     bool applies(const std::string &card, const Version &version,
                  const std::string &vendor) const
@@ -432,7 +432,7 @@ public:
             return false;
 #endif
         }   // m_os.size()>0
-        
+
         // Test for vendor
         // ---------------
         if (m_vendor.size() > 0)
@@ -458,7 +458,7 @@ public:
         // Test for driver version
         // -----------------------
         assert(m_version_tests.size() == m_driver_versions.size());
-        
+
         for (unsigned int i = 0; i < m_version_tests.size(); i++)
         {
             switch (m_version_tests[i])
@@ -466,7 +466,7 @@ public:
             case VERSION_IGNORE:
                 // always true
                 break;
-            case VERSION_EQUAL: 
+            case VERSION_EQUAL:
                 if (version != m_driver_versions[i])
                     return false;
                 break;
@@ -479,7 +479,7 @@ public:
                     return false;
                 break;
             case VERSION_MORE_EQUAL:
-                if (version < m_driver_versions[i]) 
+                if (version < m_driver_versions[i])
                     return false;
                 break;
             case VERSION_MORE:
@@ -487,7 +487,7 @@ public:
                     return false;
             }   // switch m_version_tests
         }
-        
+
         return true;
     }   // applies
 

@@ -63,14 +63,14 @@ KartStatsWidget::KartStatsWidget(core::recti area, const int player_id,
                        "kart '%s' nor any other kart.",
                        default_kart.c_str());
     }
-                                                                                                                                    
+
     for (int i = 0; i < SKILL_COUNT; ++i)
     {
         irr::core::recti skillArea(0, 0, 1, 1);
 
         SkillLevelWidget* skill_bar = NULL;
 
-        skill_bar = new SkillLevelWidget(skillArea, m_player_id, multiplayer, display_icons);       
+        skill_bar = new SkillLevelWidget(skillArea, m_player_id, multiplayer, display_icons);
 
         m_skills.push_back(skill_bar);
         m_children.push_back(skill_bar);
@@ -102,13 +102,13 @@ void KartStatsWidget::setValues(const KartProperties* props, HandicapLevel h)
     setSkillValues(SKILL_MASS,
                    kp_computed.getCombinedCharacteristic()->getMass()/3.89f,
                    "mass.png", "mass", _("Mass"));
-    
+
     // The base speed is of 25
     // Here we are not fully proportional, because small differences matter more
     setSkillValues(SKILL_SPEED,
                    (kp_computed.getCombinedCharacteristic()->getEngineMaxSpeed() - 20.0f) * 15.0f,
                    "speed.png", "speed", _("Maximum speed"));
-    
+
     // The acceleration depend on power and mass, and it changes depending on speed
     // We call a function which gives us a single number to represent it
     // power/mass gives numbers in the 1-10 range, so we multiply it by 10.
@@ -121,7 +121,7 @@ void KartStatsWidget::setValues(const KartProperties* props, HandicapLevel h)
     setSkillValues(SKILL_NITRO_EFFICIENCY,
                     90.0f/kp_computed.getCombinedCharacteristic()->getNitroConsumption(),
                    "nitro.png", "nitro", _("Nitro efficiency"));
-    
+
     RaceManager::get()->setDifficulty(previous_difficulty);
 }   // setValues
 
@@ -131,7 +131,7 @@ void KartStatsWidget::setSkillValues(Stats skill_type, float value, const std::s
 {
     m_skills[skill_type]->setValue(value);
     m_skills[skill_type]->setIcon(irr::core::stringc(
-            file_manager->getAsset(FileManager::GUI_ICON, icon_name).c_str()));    
+            file_manager->getAsset(FileManager::GUI_ICON, icon_name).c_str()));
     m_skills[skill_type]->m_properties[PROP_ID] = StringUtils::insertValues("@p%i_"+skillbar_propID, m_player_id);
     m_skills[skill_type]->m_iconbutton->setTooltip(icon_tooltip);
 }   // setSkillValues
@@ -195,7 +195,7 @@ void KartStatsWidget::setSize(const int x, const int y, const int w, const int h
     m_h = h;
 
     // -- sizes
-    m_skill_bar_w = w - m_w / 16; // make sure the bars can't be out of screen 
+    m_skill_bar_w = w - m_w / 16; // make sure the bars can't be out of screen
     m_skill_bar_h = m_h / SKILL_COUNT / 4;
 
     m_skill_bar_x = x;

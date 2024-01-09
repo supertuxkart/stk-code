@@ -143,7 +143,7 @@ private:
     /** Particles to show on touch */
     std::string      m_collision_particles;
 
-    /** 
+    /**
     * Associated with m_mirror_axis_when_reverse, to avoid mirroring the same material twice
     * (setAllMaterialFlags can be called multiple times on the same mesh buffer)
     */
@@ -198,7 +198,7 @@ private:
     float            m_zipper_fade_out_time;
     /** Additional engine force. */
     float            m_zipper_engine_force;
-    
+
     std::string      m_mask;
 
     std::string      m_colorization_mask;
@@ -323,7 +323,7 @@ public:
      * \return The particles to use, or NULL if none. */
     const ParticleKind* getParticlesWhen(ParticleConditions cond) const
     {
-        return m_particles_effects[cond]; 
+        return m_particles_effects[cond];
     }   // getParticlesWhen
     // ------------------------------------------------------------------------
     /** Returns true if a kart falling over this kind of material triggers

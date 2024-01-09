@@ -55,7 +55,7 @@ class TrackInfoScreen : public GUIEngine::Screen,
 
     // When there is no need to tab through / click on images/labels, we can add directly
     // irrlicht labels (more complicated uses require the use of our widget set)
-        
+
     /** Spinner for target types. */
     GUIEngine::SpinnerWidget* m_target_type_spinner;
 
@@ -97,9 +97,9 @@ class TrackInfoScreen : public GUIEngine::Screen,
 
     /** The actual highscore text values shown. */
     GUIEngine::ListWidget* m_highscore_entries;
-    
+
     irr::gui::STKModifiedSpriteBank* m_icon_bank;
-    
+
     int m_icon_unknown_kart;
 
     void updateHighScores();

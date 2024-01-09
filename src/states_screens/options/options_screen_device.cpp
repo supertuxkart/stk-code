@@ -203,7 +203,7 @@ void OptionsScreenDevice::init()
 
     // Disable deleting or disabling configuration mid-race
     bool in_game = StateManager::get()->getGameState() == GUIEngine::INGAME_MENU;
-    
+
     if (in_game)
     {
         delete_button->setActive(false);

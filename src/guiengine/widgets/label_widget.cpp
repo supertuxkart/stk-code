@@ -140,7 +140,7 @@ void LabelWidget::setText(const core::stringw& text, bool expandIfNeeded)
             fwidth = GUIEngine::getSmallTitleFont()->getDimension(text.c_str()).Width;
         else if(m_type == TINY_TITLE)
             fwidth = GUIEngine::getTinyTitleFont()->getDimension(text.c_str()).Width;
-        else 
+        else
             fwidth = GUIEngine::getFont()->getDimension(text.c_str()).Width;
         core::rect<s32> rect = m_element->getRelativePosition();
 

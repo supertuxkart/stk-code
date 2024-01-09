@@ -47,7 +47,7 @@ private:
     virtual void onTextUpdated() OVERRIDE {}
     void handleChat(const irr::core::stringw& text);
     virtual bool onEnterPressed(const irr::core::stringw& text) OVERRIDE;
-    
+
     void updateTouchDeviceIcon();
 
 protected:

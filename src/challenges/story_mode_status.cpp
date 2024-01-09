@@ -292,7 +292,7 @@ void StoryModeStatus::raceFinished()
         unlockFeature(const_cast<ChallengeStatus*>(m_current_challenge),
                       RaceManager::get()->getDifficulty());
     }   // if isActive && challenge solved
-    
+
     //This updates the number of points.
     //It then calls unlockFeatureByList which checks the specially unlocked features (by points, etc)
     computeActive();
@@ -353,10 +353,10 @@ void StoryModeStatus::save(UTFWriter &out, bool current_player)
             story_mode_timer->pauseTimer(/*loading*/ false);
         }
 
-        if(m_first_time) 
+        if(m_first_time)
         {
             m_speedrun_milliseconds = 0;
-            m_story_mode_milliseconds = 0;    
+            m_story_mode_milliseconds = 0;
         }
         else
         {

@@ -88,10 +88,10 @@ RaceGUIOverworld::RaceGUIOverworld()
     m_trophy[2] = irr_driver->getTexture(FileManager::GUI_ICON, "cup_gold.png"  );
     m_trophy[3] = irr_driver->getTexture(FileManager::GUI_ICON, "cup_platinum.png"  );
 
-    bool multitouch_enabled = (UserConfigParams::m_multitouch_active == 1 && 
+    bool multitouch_enabled = (UserConfigParams::m_multitouch_active == 1 &&
                                irr_driver->getDevice()->supportsTouchDevice()) ||
                                UserConfigParams::m_multitouch_active > 1;
-    
+
     if (multitouch_enabled && UserConfigParams::m_multitouch_draw_gui &&
         RaceManager::get()->getNumLocalPlayers() == 1)
     {
@@ -141,25 +141,25 @@ RaceGUIOverworld::~RaceGUIOverworld()
 //-----------------------------------------------------------------------------
 void RaceGUIOverworld::calculateMinimapSize()
 {
-    float scaling = std::min(irr_driver->getFrameSize().Height,  
+    float scaling = std::min(irr_driver->getFrameSize().Height,
         irr_driver->getFrameSize().Width) / 420.0f;
     const float map_size = 250.0f;
-    
+
     // Check if we have enough space for minimap when touch steering is enabled
     if (m_multitouch_gui != NULL)
     {
-        const float map_bottom = (float)(irr_driver->getActualScreenSize().Height - 
+        const float map_bottom = (float)(irr_driver->getActualScreenSize().Height -
                                          m_multitouch_gui->getHeight());
-        
+
         if ((map_size + 20.0f) * scaling > map_bottom)
         {
             scaling = map_bottom / (map_size + 20.0f);
         }
-        
-        // Use some reasonable minimum scale, because minimap size can be 
+
+        // Use some reasonable minimum scale, because minimap size can be
         // changed during the race
         scaling = std::max(scaling,
-                           irr_driver->getActualScreenSize().Height * 0.2f / 
+                           irr_driver->getActualScreenSize().Height * 0.2f /
                            (map_size + 20.0f));
     }
 
@@ -180,11 +180,11 @@ void RaceGUIOverworld::calculateMinimapSize()
 
     if (m_multitouch_gui != NULL)
     {
-        m_map_left = (int)((irr_driver->getActualScreenSize().Width - 
+        m_map_left = (int)((irr_driver->getActualScreenSize().Width -
                                                         m_map_width) * 0.9f);
         m_map_bottom = m_map_height + int(10 * scaling);
     }
-    
+
     m_is_minimap_initialized = false;
 }
 
@@ -224,12 +224,12 @@ void RaceGUIOverworld::renderGlobal(float dt)
 void RaceGUIOverworld::renderPlayerView(const Camera *camera, float dt)
 {
     if (!m_enabled) return;
-    
+
     RaceGUIBase::renderPlayerView(camera, dt);
-    
+
     const AbstractKart *kart = camera->getKart();
     if(!kart) return;
-    
+
     const core::recti &viewport = camera->getViewport();
     core::vector2df scaling     = camera->getScaling();
     //Log::info("RaceGUIOverworld", "Applied ratio: %f", viewport.getWidth()/800.0f);
@@ -387,7 +387,7 @@ void RaceGUIOverworld::drawGlobalMiniMap()
         {
             m_map_left -= (int)left_most;
         }
-        
+
         m_is_minimap_initialized = true;
     }
 
@@ -445,7 +445,7 @@ void RaceGUIOverworld::drawGlobalMiniMap()
 
         Vec3 draw_at;
         track->mapPoint2MiniMap(challenges[n].m_position, &draw_at);
-        
+
         const ChallengeData* challenge = unlock_manager->getChallengeData(challenges[n].m_challenge_id);
         const unsigned int val = challenge->getNumTrophies();
         bool unlocked = (PlayerManager::getCurrentPlayer()->getPoints() >= val);
@@ -463,7 +463,7 @@ void RaceGUIOverworld::drawGlobalMiniMap()
         }
 
         int state = (unlocked ? OPEN : LOCKED);
-        
+
         if (UserConfigParams::m_unlock_everything > 0)
             state = OPEN;
 
@@ -511,10 +511,10 @@ void RaceGUIOverworld::drawGlobalMiniMap()
             const ChallengeData* challenge = unlock_manager->getChallengeData(challenges[n].m_challenge_id);
             const unsigned int val = challenge->getNumTrophies();
             bool unlocked = (PlayerManager::getCurrentPlayer()->getPoints() >= val);
-            
+
             if (UserConfigParams::m_unlock_everything > 0)
                 unlocked = true;
-                            
+
             if (!unlocked)
                 continue;
         }
@@ -633,7 +633,7 @@ void RaceGUIOverworld::drawGlobalMiniMap()
             font->setBlackBorder(false);
         }
     }
-    
+
     if (m_multitouch_gui != NULL)
     {
         m_multitouch_gui->setGuiAction(m_close_to_a_challenge);

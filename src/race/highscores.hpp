@@ -70,7 +70,7 @@ private:
 
     static SortOrder m_sort_order;
 
-    int findHighscorePosition(const std::string& kart_name, 
+    int findHighscorePosition(const std::string& kart_name,
                               const core::stringw& name, const float time);
 
 public:

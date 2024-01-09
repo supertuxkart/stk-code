@@ -104,7 +104,7 @@ public:
     STKPeer* getPeer() const { return m_peer.get(); }
     // ------------------------------------------------------------------------
     /** \brief Get a const reference to the received data.
-     *  This is empty for events like connection or disconnections. 
+     *  This is empty for events like connection or disconnections.
      */
     const NetworkString& data() const { return *m_data; }
     // ------------------------------------------------------------------------

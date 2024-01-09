@@ -81,7 +81,7 @@ FocusDispatcher::FocusDispatcher(KartSelectionScreen* parent) : Widget(WTYPE_BUT
     m_parent = parent;
     m_supports_multiplayer = true;
     m_is_initialised = false;
-    
+
     Widget* kartsAreaWidget = parent->getWidget("playerskarts");
     assert(kartsAreaWidget);
 
@@ -1322,7 +1322,7 @@ void KartSelectionScreen::allPlayersDone()
                 }
             }
         }
-        
+
         if (n == PLAYER_ID_GAME_MASTER)
         {
             UserConfigParams::m_default_kart = selected_kart;
@@ -1338,8 +1338,8 @@ void KartSelectionScreen::allPlayersDone()
     // ---- Switch to assign mode
     input_manager->getDeviceManager()->setAssignMode(ASSIGN);
 
-    StateManager::ActivePlayer *ap = m_multiplayer 
-                                   ? NULL 
+    StateManager::ActivePlayer *ap = m_multiplayer
+                                   ? NULL
                                    : StateManager::get()->getActivePlayer(0);
     input_manager->getDeviceManager()->setSinglePlayer(ap);
 

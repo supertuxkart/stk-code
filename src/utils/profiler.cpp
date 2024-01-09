@@ -50,7 +50,7 @@ Profiler profiler;
 #define GPU_MARKERS_NAMES_POS core::rect<s32>(50,165,150,300)
 
 // The width of the profiler corresponds to TIME_DRAWN_MS milliseconds
-#define TIME_DRAWN_MS 30.0f 
+#define TIME_DRAWN_MS 30.0f
 
 // --- Begin portable precise timer ---
 #ifdef WIN32
@@ -207,7 +207,7 @@ void Profiler::toggleStatus()
 {
     UserConfigParams::m_profiler_enabled = !UserConfigParams::m_profiler_enabled;
     // If the profiler would immediately enabled, calls that have started but
-    // not finished would not be registered correctly. So set the state to 
+    // not finished would not be registered correctly. So set the state to
     // waiting, so the unfreeze started at the next sync frame (which is
     // outside of the main loop, i.e. all profiling events inside of the main
     // loop will work as expected.

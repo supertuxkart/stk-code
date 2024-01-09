@@ -65,7 +65,7 @@ void Achievement::saveProgress(UTFWriter &out)
 {
     out << "        <achievement id=\"" << getID() << "\" "
         << "achieved=\"" << m_achieved << "\"";
- 
+
     out << "/>\n";
 }   // save
 
@@ -122,7 +122,7 @@ int Achievement::computeFullfiledGoals(AchievementInfo::goalTree &progress, Achi
     }
     else if (progress.children.size() == 1 &&
              (progress.children[0].type == "AND" ||
-              progress.children[0].type == "AND-AT-ONCE" || 
+              progress.children[0].type == "AND-AT-ONCE" ||
               progress.children[0].type == "OR"))
     {
         return computeFullfiledGoals(progress.children[0], reference.children[0]);
@@ -202,7 +202,7 @@ int Achievement::computeGoalProgress(AchievementInfo::goalTree &progress, Achiev
     }
     else if (progress.children.size() == 1 &&
              (progress.children[0].type == "AND" ||
-              progress.children[0].type == "AND-AT-ONCE" || 
+              progress.children[0].type == "AND-AT-ONCE" ||
               progress.children[0].type == "OR"))
     {
         return computeGoalProgress(progress.children[0], reference.children[0]);

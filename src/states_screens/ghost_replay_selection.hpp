@@ -106,7 +106,7 @@ public:
     virtual void init() OVERRIDE;
 
     virtual void tearDown() OVERRIDE;
-    
+
     virtual void unloaded() OVERRIDE;
 
     virtual bool onEscapePressed() OVERRIDE;

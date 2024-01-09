@@ -101,7 +101,7 @@ void OnlineProfileSettings::eventCallback(Widget* widget, const std::string& nam
                 changeEmail(new_email);
                 return true;
             }
-            
+
         });
     }
 }   // eventCallback

@@ -119,7 +119,7 @@ void Camera::resetAllCameras()
 }   // resetAllCameras
 
 // ----------------------------------------------------------------------------
-Camera::Camera(CameraType type, int camera_index, AbstractKart* kart) 
+Camera::Camera(CameraType type, int camera_index, AbstractKart* kart)
       : m_kart(NULL)
 {
     m_mode          = CM_NORMAL;
@@ -170,9 +170,9 @@ void Camera::setupCamera()
 {
     m_viewport = irr_driver->getSplitscreenWindow(m_index);
     m_aspect = (float)((float)(m_viewport.getWidth()) / (float)(m_viewport.getHeight()));
-	
+
     m_scaling = core::vector2df(
-        float(irr_driver->getActualScreenSize().Width) / m_viewport.getWidth() , 
+        float(irr_driver->getActualScreenSize().Width) / m_viewport.getWidth() ,
         float(irr_driver->getActualScreenSize().Height) / m_viewport.getHeight());
 
     if (RaceManager::get()->getNumLocalPlayers() > 1)
@@ -199,7 +199,7 @@ void Camera::setMode(Mode mode)
     if (mode == m_mode) return;
     // If we switch from reverse view, move the camera immediately to the
     // correct position.
-    if( (m_mode==CM_REVERSE && mode==CM_NORMAL) || 
+    if( (m_mode==CM_REVERSE && mode==CM_NORMAL) ||
         (m_mode==CM_FALLING && mode==CM_NORMAL)    )
     {
         Vec3 start_offset(0, 1.6f, -3);

@@ -61,7 +61,7 @@ void InitAndroidDialog::beforeAddingWidgets()
 {
     bool accelerometer_available = false;
     bool gyroscope_available = false;
-    
+
     IrrlichtDevice* irrlicht_device = irr_driver->getDevice();
     accelerometer_available = irrlicht_device->isAccelerometerAvailable();
     gyroscope_available = irrlicht_device->isGyroscopeAvailable() && accelerometer_available;
@@ -74,7 +74,7 @@ void InitAndroidDialog::beforeAddingWidgets()
         int index = control_type->findItemNamed("accelerometer");
         Widget* accelerometer = &control_type->getChildren()[index];
         accelerometer->setActive(false);
-        
+
         if (UserConfigParams::m_multitouch_controls == MULTITOUCH_CONTROLS_ACCELEROMETER)
         {
             UserConfigParams::m_multitouch_controls = MULTITOUCH_CONTROLS_STEERING_WHEEL;
@@ -89,7 +89,7 @@ void InitAndroidDialog::beforeAddingWidgets()
         int index = control_type->findItemNamed("gyroscope");
         Widget* gyroscope = &control_type->getChildren()[index];
         gyroscope->setActive(false);
-        
+
         if (UserConfigParams::m_multitouch_controls == MULTITOUCH_CONTROLS_GYROSCOPE)
         {
             UserConfigParams::m_multitouch_controls = MULTITOUCH_CONTROLS_STEERING_WHEEL;
@@ -126,15 +126,15 @@ GUIEngine::EventPropagation InitAndroidDialog::processEvent(
     {
         RibbonWidget* control_type = getWidget<RibbonWidget>("control_type");
         assert(control_type != NULL);
-        
+
         const std::string& selected = control_type->getSelectionIDString(
                                                         PLAYER_ID_GAME_MASTER);
         int index = control_type->getSelection(PLAYER_ID_GAME_MASTER);
         Widget* selected_widget = &control_type->getChildren()[index];
-        
+
         if (!selected_widget->isActivated())
             return GUIEngine::EVENT_BLOCK;
-        
+
         if (selected == "steering_wheel")
         {
             UserConfigParams::m_multitouch_controls = MULTITOUCH_CONTROLS_STEERING_WHEEL;
@@ -150,9 +150,9 @@ GUIEngine::EventPropagation InitAndroidDialog::processEvent(
             UserConfigParams::m_multitouch_controls = MULTITOUCH_CONTROLS_GYROSCOPE;
             UserConfigParams::m_multitouch_auto_acceleration = false;
         }
-        
+
         user_config->saveConfig();
-        
+
         ModalDialog::dismiss();
         return GUIEngine::EVENT_BLOCK;
     }
@@ -166,7 +166,7 @@ void InitAndroidDialog::updateValues()
 {
     RibbonWidget* control_type = getWidget<RibbonWidget>("control_type");
     assert(control_type != NULL);
-    
+
     if (UserConfigParams::m_multitouch_controls == MULTITOUCH_CONTROLS_ACCELEROMETER)
     {
         int id = control_type->findItemNamed("accelerometer");

@@ -31,10 +31,10 @@ class AddDeviceDialog : public GUIEngine::ModalDialog
 public:
 
     AddDeviceDialog();
-    
+
     void onEnterPressedInternal();
     GUIEngine::EventPropagation processEvent(const std::string& eventSource);
 };
-  
+
 
 #endif

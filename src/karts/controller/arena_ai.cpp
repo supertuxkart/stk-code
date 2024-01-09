@@ -344,7 +344,7 @@ void ArenaAI::configSpeed()
     // value. This prevents a kart from going too slow (or even backwards)
     // in tight curves.
     const float MIN_SPEED = 5.0f;
-    const float handicap = (m_cur_difficulty == RaceManager::DIFFICULTY_EASY 
+    const float handicap = (m_cur_difficulty == RaceManager::DIFFICULTY_EASY
                             ? 0.7f : 1.0f                                   );
 
     const float max_turn_speed = m_kart->getSpeedForTurnRadius(m_turn_radius);

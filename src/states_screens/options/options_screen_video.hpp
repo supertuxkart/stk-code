@@ -55,7 +55,7 @@ struct ScaleRttsCustomPreset
 
 struct Resolution
 {
-    int width; 
+    int width;
     int height;
     bool fullscreen;
 

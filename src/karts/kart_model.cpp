@@ -490,7 +490,7 @@ scene::ISceneNode* KartModel::attachModel(bool animated_models, bool human_playe
             if (animated_models)
             {
                 // Only need to keep track of animated node for speed setting
-                obj.m_node = irr_driver->addAnimatedMesh(obj.m_model, 
+                obj.m_node = irr_driver->addAnimatedMesh(obj.m_model,
                     "speedweighted", parent, getRenderInfo());
                 swo = obj.m_node;
                 obj.m_node->grab();
@@ -1096,7 +1096,7 @@ void KartModel::setDefaultSuspension()
 
 // ----------------------------------------------------------------------------
 /** Rotates and turns the wheels appropriately, and adjust for suspension
- *  updates the speed-weighted objects' animations. 
+ *  updates the speed-weighted objects' animations.
  *
  *  \param dt time since last frame
  *  \param distance How far the wheels have rotated since last time.

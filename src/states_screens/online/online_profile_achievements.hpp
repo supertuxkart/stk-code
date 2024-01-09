@@ -80,8 +80,8 @@ public:
 
     // ------------------------------------------------------------------------
     virtual void refreshAchievementsList()
-    { 
-        m_waiting_for_achievements = true; 
+    {
+        m_waiting_for_achievements = true;
     }   // refreshAchievementsList
 };
 
@@ -96,7 +96,7 @@ class TabOnlineProfileAchievements : public BaseOnlineProfileAchievements,
 protected:
     friend class GUIEngine::ScreenSingleton<TabOnlineProfileAchievements>;
 
-    TabOnlineProfileAchievements() 
+    TabOnlineProfileAchievements()
       : BaseOnlineProfileAchievements("online/profile_achievements_tab.stkgui")
     {}
 

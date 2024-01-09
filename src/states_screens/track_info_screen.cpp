@@ -98,7 +98,7 @@ void TrackInfoScreen::loadedFromFile()
     {
         m_highscore_entries = getWidget<ListWidget>("highscore_entries");
     }
-    
+
     GUIEngine::IconButtonWidget* screenshot = getWidget<IconButtonWidget>("screenshot");
     screenshot->setFocusable(false);
     screenshot->m_tab_stop = false;
@@ -325,7 +325,7 @@ void TrackInfoScreen::init()
         m_ai_kart_spinner->setValue(0);
         m_ai_kart_spinner->setActive(false);
         RaceManager::get()->setNumKarts(RaceManager::get()->getNumLocalPlayers());
-        
+
         UserConfigParams::m_num_karts_per_gamemode[RaceManager::get()->getMinorMode()] = RaceManager::get()->getNumLocalPlayers();
     }
     else if (record_available)
@@ -345,7 +345,7 @@ void TrackInfoScreen::init()
     {
         int icon_height = GUIEngine::getFontHeight();
         int row_height = GUIEngine::getFontHeight() * 1.2f;
-                                                    
+
         m_icon_bank->setScale(icon_height/128.0f);
         m_icon_bank->setTargetIconSize(128, 128);
         m_highscore_entries->setIcons(m_icon_bank, (int)row_height);
@@ -393,7 +393,7 @@ void TrackInfoScreen::setSoccerWidgets(bool has_AI)
 
         // Check if there's any local players in both team
         int num_blue_players = 0, num_red_players = 0;
-    
+
         for (int i = 0; i < local_players; i++)
         {
             KartTeam team = RaceManager::get()->getKartInfo(i).getKartTeam();
@@ -503,7 +503,7 @@ void TrackInfoScreen::updateHighScores()
     int time_precision = RaceManager::get()->currentModeTimePrecision();
 
     m_highscore_entries->clear();
-    
+
     // fill highscore entries
     for (int n=0; n<HIGHSCORE_COUNT; n++)
     {
@@ -530,7 +530,7 @@ void TrackInfoScreen::updateHighScores()
                     break;
                 }
             }
-        
+
             line = name + "    " + core::stringw(highscore_string.c_str());
         }
         else
@@ -545,7 +545,7 @@ void TrackInfoScreen::updateHighScores()
         }
 
         std::vector<GUIEngine::ListWidget::ListCell> row;
-        
+
         row.push_back(GUIEngine::ListWidget::ListCell(line.c_str(), icon, 5, false));
         m_highscore_entries->addItem(StringUtils::toString(n), row);
     }
@@ -585,7 +585,7 @@ void TrackInfoScreen::onEnterPressedInternal()
     if (has_AI)
     {
         num_ai = m_ai_kart_spinner->getValue();
-        
+
         if (m_is_soccer) // Soccer mode
             num_ai += m_ai_blue_spinner->getValue();
     }
@@ -730,8 +730,8 @@ void TrackInfoScreen::eventCallback(Widget* widget, const std::string& name,
     else if (name=="ai-spinner")
     {
         if (m_is_soccer) // Soccer mode
-        {            
-            soccerSpinnerUpdate(false /* blue spinner */);            
+        {
+            soccerSpinnerUpdate(false /* blue spinner */);
         }
         else // Other modes
         {
@@ -743,7 +743,7 @@ void TrackInfoScreen::eventCallback(Widget* widget, const std::string& name,
     }
     else if (name == "ai-blue-spinner" && m_is_soccer)
     {
-        soccerSpinnerUpdate(true /* blue spinner */);  
+        soccerSpinnerUpdate(true /* blue spinner */);
     }
 }   // eventCallback
 

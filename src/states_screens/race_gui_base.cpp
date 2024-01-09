@@ -191,7 +191,7 @@ void RaceGUIBase::reset()
     m_showing_kart_colors = false;
     m_enabled_network_spectator = false;
     clearAllMessages();
-    
+
     if (m_multitouch_gui != NULL)
     {
         m_multitouch_gui->reset();
@@ -218,7 +218,7 @@ void RaceGUIBase::recreateGUI()
 
     initSize();
     calculateMinimapSize();
-    
+
     Track* track = Track::getCurrentTrack();
     assert(track != NULL);
     track->updateMiniMapScale();
@@ -258,7 +258,7 @@ void RaceGUIBase::drawAllMessages(const AbstractKart* kart,
                                   const core::vector2df &scaling)
 {
     int y = viewport.LowerRightCorner.Y - m_small_font_max_height - 10;
-    
+
     const int x = viewport.getCenter().X;
     const int w = viewport.getWidth();
 
@@ -407,7 +407,7 @@ void RaceGUIBase::drawPowerupIcons(const AbstractKart* kart,
     int x1, y1;
 
     // When there is not much height or set by user, move items on the side
-    if ((UserConfigParams::m_powerup_display == 1) || 
+    if ((UserConfigParams::m_powerup_display == 1) ||
         ((float) viewport.getWidth() / (float) viewport.getHeight() > 2.0f))
     {
         x1 = viewport.UpperLeftCorner.X  + 3*(viewport.getWidth()/4)
@@ -581,7 +581,7 @@ void RaceGUIBase::renderPlayerView(const Camera *camera, float dt)
     const core::vector2df scaling = camera->getScaling();
     const AbstractKart* kart = camera->getKart();
     if(!kart) return;
-    
+
     if (m_multitouch_gui != NULL && !GUIEngine::ModalDialog::isADialogActive())
     {
         m_multitouch_gui->draw(kart, viewport, scaling);
@@ -613,9 +613,9 @@ void RaceGUIBase::drawGlobalMusicDescription()
     if (!UserConfigParams::m_music) return;
 
     gui::IGUIFont*       font = GUIEngine::getFont();
-    
+
     const int fheight = font->getDimension(L"X").Height;
-    
+
     float race_time =
         stk_config->ticks2Time(World::getWorld()->getMusicDescriptionTicks());
 
@@ -704,14 +704,14 @@ void RaceGUIBase::drawGlobalMusicDescription()
     {
         int iconSizeX = (int)(ICON_SIZE*resize + x_pulse*resize*resize);
         int iconSizeY = (int)(ICON_SIZE*resize + y_pulse*resize*resize);
-    
+
         core::rect<s32> dest(noteX-iconSizeX/2+fheight,
                              noteY-iconSizeY/2+ICON_SIZE/2,
                              noteX+iconSizeX/2+fheight,
                              noteY+iconSizeY/2+ICON_SIZE/2);
         const core::rect<s32> source(core::position2d<s32>(0,0),
                                      m_music_icon->getSize());
-    
+
         draw2DImage(m_music_icon, dest, source, NULL, NULL, true);
     }
 #endif
@@ -863,7 +863,7 @@ void RaceGUIBase::drawGlobalPlayerIcons(int bottom_margin)
     const unsigned int kart_amount = world->getNumKarts() - sta;
 
     //where is the limit to hide last icons
-    int y_icons_limit = irr_driver->getActualScreenSize().Height - 
+    int y_icons_limit = irr_driver->getActualScreenSize().Height -
                                             bottom_margin - ICON_PLAYER_WIDTH;
     if (RaceManager::get()->getIfEmptyScreenSpaceExists())
     {
@@ -1349,17 +1349,17 @@ void RaceGUIBase::drawPlungerInFace(const Camera *camera, float dt)
         const int plunger_size = (int)(0.6f * screen_width);
         int offset_y = viewport.UpperLeftCorner.Y + viewport.getHeight()/2
                      - plunger_size/2 - m_plunger_offset.Y;
-    
+
         int plunger_x = viewport.UpperLeftCorner.X + screen_width/2
                       - plunger_size/2;
-    
+
         plunger_x += (int)m_plunger_offset.X;
         core::rect<s32> dest(plunger_x,              offset_y,
                              plunger_x+plunger_size, offset_y+plunger_size);
-    
+
         const core::rect<s32> source(core::position2d<s32>(0,0),
                                      m_plunger_face->getSize());
-    
+
         draw2DImage(m_plunger_face, dest, source,
                                                   &viewport /* clip */,
                                                   NULL /* color */,

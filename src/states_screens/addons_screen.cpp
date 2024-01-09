@@ -106,13 +106,13 @@ void AddonsScreen::beforeAddingWidget()
     w_list->clearColumns();
     w_list->addColumn( _("Add-on name"), 3 );
     w_list->addColumn( _("Updated date"), 1 );
-    
+
     GUIEngine::SpinnerWidget* w_filter_date =
                         getWidget<GUIEngine::SpinnerWidget>("filter_date");
     w_filter_date->m_properties[GUIEngine::PROP_MIN_VALUE] = "0";
     w_filter_date->m_properties[GUIEngine::PROP_MAX_VALUE] =
                             StringUtils::toString(m_date_filters.size() - 1);
-    
+
     for (unsigned int n = 0; n < m_date_filters.size(); n++)
     {
         w_filter_date->addLabel(m_date_filters[n].label);
@@ -122,7 +122,7 @@ void AddonsScreen::beforeAddingWidget()
                         getWidget<GUIEngine::SpinnerWidget>("filter_rating");
     w_filter_rating->m_properties[GUIEngine::PROP_MIN_VALUE] = "0";
     w_filter_rating->m_properties[GUIEngine::PROP_MAX_VALUE] = "6";
-    
+
     for (int n = 0; n < 7; n++)
     {
         w_filter_rating->addLabel(StringUtils::toWString(n / 2.0));
@@ -229,7 +229,7 @@ void AddonsScreen::loadList()
     GUIEngine::SpinnerWidget* w_filter_rating =
                         getWidget<GUIEngine::SpinnerWidget>("filter_rating");
     float rating = w_filter_rating->getValue() / 2.0f;
-    
+
     GUIEngine::SpinnerWidget* w_filter_installation =
                         getWidget<GUIEngine::SpinnerWidget>("filter_installation");
 

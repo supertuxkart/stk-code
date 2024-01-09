@@ -73,7 +73,7 @@ bool Protocol::checkDataSize(Event* event, unsigned int minimum_size)
 }   // checkDataSize
 
 // ----------------------------------------------------------------------------
-/** Starts a request in the protocol manager to start this protocol. 
+/** Starts a request in the protocol manager to start this protocol.
  */
 void Protocol::requestStart()
 {

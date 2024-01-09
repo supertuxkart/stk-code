@@ -27,7 +27,7 @@
 #include <dimension2d.h>
 
 using namespace irr;
-static GLuint generateRTT3D(GLenum target, unsigned int w, unsigned int h, 
+static GLuint generateRTT3D(GLenum target, unsigned int w, unsigned int h,
                             unsigned int d, GLint internalFormat, GLint format,
                             GLint type, unsigned mipmaplevel = 1)
 {
@@ -63,7 +63,7 @@ RTT::RTT(unsigned int width, unsigned int height, float rtt_scale,
     using namespace core;
 
     dimension2du res(m_width, m_height);
-    
+
     const dimension2du half = res/2;
     const dimension2du quarter = res/4;
 

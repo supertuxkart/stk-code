@@ -150,7 +150,7 @@ RacePausedDialog::RacePausedDialog(const float percentWidth,
             getWidget<IconButtonWidget>("exit")->setLabel(_("Exit Race"));
         }
     }
-    
+
 #ifndef MOBILE_STK
     if (m_text_box && UserConfigParams::m_lobby_chat)
         m_text_box->setFocusForPlayer(PLAYER_ID_GAME_MASTER);
@@ -169,11 +169,11 @@ RacePausedDialog::~RacePausedDialog()
     {
         World::getWorld()->scheduleUnpause();
     }
-    
+
     if (m_touch_controls != UserConfigParams::m_multitouch_controls)
     {
         UserConfigParams::m_multitouch_controls = m_touch_controls;
-        
+
         if (World::getWorld() && World::getWorld()->getRaceGUI())
         {
             World::getWorld()->getRaceGUI()->recreateGUI();
@@ -257,7 +257,7 @@ GUIEngine::EventPropagation
     {
         const std::string& selection =
             backbtn_ribbon->getSelectionIDString(PLAYER_ID_GAME_MASTER);
-            
+
         if (selection == "backbtn")
         {
             // unpausing is done in the destructor so nothing more to do here
@@ -270,7 +270,7 @@ GUIEngine::EventPropagation
             assert(irrlicht_device != NULL);
             bool accelerometer_available = irrlicht_device->isAccelerometerAvailable();
             bool gyroscope_available = irrlicht_device->isGyroscopeAvailable() && accelerometer_available;
-    
+
             if (m_touch_controls == MULTITOUCH_CONTROLS_STEERING_WHEEL)
             {
                 m_touch_controls = MULTITOUCH_CONTROLS_ACCELEROMETER;
@@ -283,20 +283,20 @@ GUIEngine::EventPropagation
             {
                 m_touch_controls = MULTITOUCH_CONTROLS_STEERING_WHEEL;
             }
-            
-            if (m_touch_controls == MULTITOUCH_CONTROLS_ACCELEROMETER && 
+
+            if (m_touch_controls == MULTITOUCH_CONTROLS_ACCELEROMETER &&
                 !accelerometer_available)
             {
                 m_touch_controls = MULTITOUCH_CONTROLS_STEERING_WHEEL;
             }
-            else if (m_touch_controls == MULTITOUCH_CONTROLS_GYROSCOPE && 
+            else if (m_touch_controls == MULTITOUCH_CONTROLS_GYROSCOPE &&
                 !gyroscope_available)
             {
                 m_touch_controls = MULTITOUCH_CONTROLS_STEERING_WHEEL;
             }
-            
+
             updateTouchDeviceIcon();
-            
+
             return GUIEngine::EVENT_BLOCK;
         }
     }
@@ -468,20 +468,20 @@ void RacePausedDialog::beforeAddingWidgets()
     }
     else
         m_text_box = NULL;
-        
+
     bool has_multitouch_gui = false;
-    
-    if (World::getWorld() && World::getWorld()->getRaceGUI() && 
+
+    if (World::getWorld() && World::getWorld()->getRaceGUI() &&
         World::getWorld()->getRaceGUI()->getMultitouchGUI() &&
         !World::getWorld()->getRaceGUI()->getMultitouchGUI()->isSpectatorMode())
     {
         has_multitouch_gui = true;
     }
-    
+
     IrrlichtDevice* irrlicht_device = irr_driver->getDevice();
     assert(irrlicht_device != NULL);
     bool accelerometer_available = irrlicht_device->isAccelerometerAvailable();
-    
+
     if (!has_multitouch_gui || !accelerometer_available)
     {
         GUIEngine::RibbonWidget* backbtn_ribbon =
@@ -496,7 +496,7 @@ void RacePausedDialog::init()
 {
     m_touch_controls = UserConfigParams::m_multitouch_controls;
     updateTouchDeviceIcon();
-    
+
 }   // init
 
 // ----------------------------------------------------------------------------
@@ -536,23 +536,23 @@ void RacePausedDialog::updateTouchDeviceIcon()
                                                 findWidgetNamed("touch_device");
     if (!widget)
         return;
-                                                  
+
     switch (m_touch_controls)
     {
     case MULTITOUCH_CONTROLS_UNDEFINED:
     case MULTITOUCH_CONTROLS_STEERING_WHEEL:
         widget->setLabel(_("Steering wheel"));
-        widget->setImage(irr_driver->getTexture(FileManager::GUI_ICON, 
+        widget->setImage(irr_driver->getTexture(FileManager::GUI_ICON,
                                                 "android/steering_wheel.png"));
         break;
     case MULTITOUCH_CONTROLS_ACCELEROMETER:
         widget->setLabel(_("Accelerometer"));
-        widget->setImage(irr_driver->getTexture(FileManager::GUI_ICON, 
+        widget->setImage(irr_driver->getTexture(FileManager::GUI_ICON,
                                                 "android/accelerator_icon.png"));
         break;
     case MULTITOUCH_CONTROLS_GYROSCOPE:
         widget->setLabel(_("Gyroscope"));
-        widget->setImage(irr_driver->getTexture(FileManager::GUI_ICON, 
+        widget->setImage(irr_driver->getTexture(FileManager::GUI_ICON,
                                                 "android/gyroscope_icon.png"));
         break;
     default:

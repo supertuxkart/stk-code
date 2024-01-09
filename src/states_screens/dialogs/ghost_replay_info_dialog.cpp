@@ -267,7 +267,7 @@ GUIEngine::EventPropagation
             GhostReplaySelection::getInstance()->setCompare(false);
 
             ModalDialog::dismiss();
-          
+
             if (RaceManager::get()->isWatchingReplay())
                 RaceManager::get()->startWatchingReplay(track_name, laps);
             else

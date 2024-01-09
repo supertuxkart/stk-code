@@ -41,7 +41,7 @@ public:
 
              WebAchievementsStatus(int version, std::map<uint32_t, AchievementInfo *> &info);
     virtual ~WebAchievementsStatus();
-    
+
     void updateAchievementsProgress(AchievementsStatus *status);
     void achieved(AchievementInfo *info);
 

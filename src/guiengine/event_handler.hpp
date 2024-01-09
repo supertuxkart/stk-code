@@ -68,7 +68,7 @@ namespace GUIEngine
             a player cannot trigger an action by clicking on the window during loading screen
             for example */
         bool m_accept_events;
-        
+
         EventPropagation onGUIEvent(const irr::SEvent& event);
         EventPropagation onWidgetActivated(Widget* w, const int playerID, Input::InputType type);
         void sendNavigationEvent(const NavigationDirection nav, const int playerID);
@@ -111,7 +111,7 @@ namespace GUIEngine
         /** singleton access */
         static EventHandler* get();
         static void deallocate();
-        
+
         void setAcceptEvents(bool value) { m_accept_events = value; }
         int findIDClosestWidget(const NavigationDirection nav, const int playerID,
                                 Widget* w, bool ignore_disabled, int recursion_counter=1);

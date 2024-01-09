@@ -50,9 +50,9 @@ public:
          Explosion(const Vec3& coord, const char* explosion_sound, const char * particle_file );
         ~Explosion();
     bool updateAndDelete(int ticks) OVERRIDE;
-    bool hasEnded () 
+    bool hasEnded ()
     {
-        return  m_remaining_ticks <= -m_explosion_ticks; 
+        return  m_remaining_ticks <= -m_explosion_ticks;
     }
 
 } ;

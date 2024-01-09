@@ -161,12 +161,12 @@ namespace GUIEngine
       * \return the "title" font (it's bigger and orange, useful for headers/captions)
       */
     inline irr::gui::ScalableFont*    getTitleFont()     { return Private::g_title_font;     }
-    
+
     /**
       * \return the "small title" font (it's bigger and orange, useful for sub headers/captions)
       */
     inline irr::gui::ScalableFont*    getSmallTitleFont() { return Private::g_small_title_font; }
-    
+
     /**
       * \return the "tiny title" font (it's bigger and orange, useful for sub headers/captions)
       */

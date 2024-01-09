@@ -40,7 +40,7 @@ public:
     void updateActivation();
 
     GUIEngine::EventPropagation processEvent(const std::string& eventSource);
-    
+
 };
 
 #endif

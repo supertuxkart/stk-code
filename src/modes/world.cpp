@@ -1361,7 +1361,7 @@ void World::updateHighscores(int* best_highscore_rank)
                                                  k->getController()->getName(),
                                                  k->getFinishTime()    );
         }
-        
+
 
         if (highscore_rank > 0)
         {

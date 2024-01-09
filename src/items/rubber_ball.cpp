@@ -393,7 +393,7 @@ bool RubberBall::updateAndDelete(int ticks)
 
     if (hasAnimation())
     {
-        // Flyable will call update() of the animation to 
+        // Flyable will call update() of the animation to
         // update the ball's position.
         m_previous_xyz = getXYZ();
         bool can_be_deleted = Flyable::updateAndDelete(ticks);
@@ -447,7 +447,7 @@ bool RubberBall::updateAndDelete(int ticks)
 
     m_height_timer += stk_config->ticks2Time(ticks);
     float height    = updateHeight()+m_extend.getY()*0.5f;
-    
+
     if(UserConfigParams::logFlyable())
         Log::debug("[RubberBall]", "ball %d: %f %f %f height %f gethot %f terrain %d aim %d",
                 m_id, next_xyz.getX(), next_xyz.getY(), next_xyz.getZ(), height, getHoT(),
@@ -459,7 +459,7 @@ bool RubberBall::updateAndDelete(int ticks)
     {
         float tunnel_height = getTunnelHeight(next_xyz, vertical_offset)
                              - m_extend.getY();
-        // If the current height of ball (above terrain) is higher than the 
+        // If the current height of ball (above terrain) is higher than the
         // tunnel height then set adjust max height and compute new height again.
         // Else reset the max height.
         if (height > tunnel_height)
@@ -632,7 +632,7 @@ void RubberBall::interpolate(Vec3 *next_xyz, int ticks)
                          +4*m_control_points[2] -  m_control_points[3])*m_t*m_t
                       + (-  m_control_points[0] +  m_control_points[2])*m_t
                       +   2*m_control_points[1]                              );
-                      
+
     assert(!std::isnan((*next_xyz)[0]));
     assert(!std::isnan((*next_xyz)[1]));
     assert(!std::isnan((*next_xyz)[2]));
@@ -746,15 +746,15 @@ float RubberBall::updateHeight()
 
 // ----------------------------------------------------------------------------
 /** When the ball is in a tunnel, this will return the tunnel height.
- *  NOTE: When this function is called next_xyz is usually the interpolated point 
+ *  NOTE: When this function is called next_xyz is usually the interpolated point
  *  on the track and not the ball's current location. Look at updateAndDelete().
- *  
+ *
  *  \param vertical_offset A vertical offset which is added to the current
  *         position in order to avoid hitting the track when doing a raycast up.
  *  \returns The distance to the terrain element found by raycast in the up
               direction. If no terrain found, it returns 99990
  */
-float RubberBall::getTunnelHeight(const Vec3 &next_xyz, 
+float RubberBall::getTunnelHeight(const Vec3 &next_xyz,
                                   const float vertical_offset) const
 {
     const TriangleMesh &tm = Track::getCurrentTrack()->getTriangleMesh();

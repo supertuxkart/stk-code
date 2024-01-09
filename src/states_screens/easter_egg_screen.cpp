@@ -154,7 +154,7 @@ void EasterEggScreen::beforeAddingWidget()
         else // Try to translate group names
             tabs->addTextChild( _(groups[n].c_str()) , groups[n]);
     } // for n<group_amount
-    
+
     int num_of_arenas=0;
     for (unsigned int n=0; n<track_manager->getNumberOfTracks(); n++) //iterate through tracks to find how many are arenas
     {

@@ -123,7 +123,7 @@ void ServerSelection::loadedFromFile()
 }   // loadedFromFile
 
 // ----------------------------------------------------------------------------
-/** Clear the server list, which will be reloaded. 
+/** Clear the server list, which will be reloaded.
  */
 void ServerSelection::beforeAddingWidget()
 {
@@ -206,7 +206,7 @@ void ServerSelection::init()
     }
 
     int row_height = GUIEngine::getFontHeight() * 2;
-    
+
     m_server_list_widget->setIcons(m_icon_bank, row_height);
     m_sort_desc = false;
     refresh();
@@ -428,12 +428,12 @@ void ServerSelection::onUpdate(float dt)
         ServerInfoDialog *sid = new ServerInfoDialog(m_servers[0]);
         sid->requestJoin();
     }
-    
+
     if (m_server_list && m_server_list->m_list_updated && !m_refreshing_server &&
         !NetworkConfig::get()->isWAN())
     {
         m_refresh_timer += dt;
-        
+
         if (m_refresh_timer > 10.0f)
         {
             refresh();

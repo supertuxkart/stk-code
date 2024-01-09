@@ -56,7 +56,7 @@ void MultitouchSettingsDialog::beforeAddingWidgets()
 {
     bool accelerometer_available = false;
     bool gyroscope_available = false;
-    
+
     IrrlichtDevice* irrlicht_device = irr_driver->getDevice();
     assert(irrlicht_device != NULL);
     accelerometer_available = irrlicht_device->isAccelerometerAvailable();
@@ -75,7 +75,7 @@ void MultitouchSettingsDialog::beforeAddingWidgets()
         assert(gyroscope != NULL);
         gyroscope->setActive(false);
     }
-    
+
     if (StateManager::get()->getGameState() == GUIEngine::INGAME_MENU)
     {
         CheckBoxWidget* buttons_en = getWidget<CheckBoxWidget>("buttons_enabled");
@@ -101,7 +101,7 @@ GUIEngine::EventPropagation MultitouchSettingsDialog::processEvent(
         assert(sensitivity_x != NULL);
         UserConfigParams::m_multitouch_sensitivity_x =
                                     (float)sensitivity_x->getValue() / 100.0f;
-                                    
+
         SpinnerWidget* sensitivity_y = getWidget<SpinnerWidget>("sensitivity_y");
         assert(sensitivity_y != NULL);
         UserConfigParams::m_multitouch_sensitivity_y =
@@ -115,7 +115,7 @@ GUIEngine::EventPropagation MultitouchSettingsDialog::processEvent(
         CheckBoxWidget* buttons_en = getWidget<CheckBoxWidget>("buttons_enabled");
         assert(buttons_en != NULL);
         UserConfigParams::m_multitouch_draw_gui = buttons_en->getState();
-        
+
         CheckBoxWidget* buttons_inv = getWidget<CheckBoxWidget>("buttons_inverted");
         assert(buttons_inv != NULL);
         UserConfigParams::m_multitouch_inverted = buttons_inv->getState();
@@ -148,7 +148,7 @@ GUIEngine::EventPropagation MultitouchSettingsDialog::processEvent(
         {
             touch_device->updateConfigParams();
         }
-        
+
         if (World::getWorld() && World::getWorld()->getRaceGUI())
         {
             World::getWorld()->getRaceGUI()->recreateGUI();
@@ -167,7 +167,7 @@ GUIEngine::EventPropagation MultitouchSettingsDialog::processEvent(
         UserConfigParams::m_multitouch_controls.revertToDefaults();
         UserConfigParams::m_multitouch_scale.revertToDefaults();
         UserConfigParams::m_multitouch_sensitivity_x.revertToDefaults();
-    
+
         if (StateManager::get()->getGameState() != GUIEngine::INGAME_MENU)
         {
 #ifdef MOBILE_STK
@@ -211,7 +211,7 @@ void MultitouchSettingsDialog::updateValues()
     assert(sensitivity_x != NULL);
     sensitivity_x->setValue(
                 (int)(UserConfigParams::m_multitouch_sensitivity_x * 100.0f));
-                
+
     SpinnerWidget* sensitivity_y = getWidget<SpinnerWidget>("sensitivity_y");
     assert(sensitivity_y != NULL);
     sensitivity_y->setValue(
@@ -225,7 +225,7 @@ void MultitouchSettingsDialog::updateValues()
     CheckBoxWidget* buttons_en = getWidget<CheckBoxWidget>("buttons_enabled");
     assert(buttons_en != NULL);
     buttons_en->setState(UserConfigParams::m_multitouch_draw_gui);
-    
+
     CheckBoxWidget* buttons_inv = getWidget<CheckBoxWidget>("buttons_inverted");
     assert(buttons_inv != NULL);
     buttons_inv->setState(UserConfigParams::m_multitouch_inverted);

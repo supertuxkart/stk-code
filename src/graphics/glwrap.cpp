@@ -136,7 +136,7 @@ debugCallback(GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei le
         Log::warn("GLWrap", "    Severity : LOW");
         break;
     }
-    
+
     if (msg)
         Log::warn("GLWrap", "    Message : %s", msg);
 }
@@ -658,7 +658,7 @@ else \
 bool checkGLError()
 {
     GLenum err = glGetError();
-    
+
     switch (err)
     {
     case GL_NO_ERROR:
@@ -690,7 +690,7 @@ bool checkGLError()
         Log::warn("GLWrap", "glGetError: %i", (int)err);
         break;
     }
-    
+
     return err != GL_NO_ERROR;
 }
 

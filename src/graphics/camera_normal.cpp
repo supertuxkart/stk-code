@@ -42,8 +42,8 @@
  *  \param camera_index Index of this camera.
  *  \param Kart Pointer to the kart for which this camera is used.
  */
-CameraNormal::CameraNormal(Camera::CameraType type,  int camera_index, 
-                           AbstractKart* kart) 
+CameraNormal::CameraNormal(Camera::CameraType type,  int camera_index,
+                           AbstractKart* kart)
             : Camera(type, camera_index, kart), m_camera_offset(0, 0, -15.0f)
 {
     m_distance = kart ? UserConfigParams::m_camera_distance : 1000.0f;
@@ -74,7 +74,7 @@ CameraNormal::CameraNormal(Camera::CameraType type,  int camera_index,
 //-----------------------------------------------------------------------------
 /** Moves the camera smoothly from the current camera position (and target)
  *  to the new position and target.
- *  \param dt Delta time, 
+ *  \param dt Delta time,
  *  \param if false, the camera instantly moves to the endpoint, or else it smoothly moves
  */
 void CameraNormal::moveCamera(float dt, bool smooth, float cam_angle, float distance)

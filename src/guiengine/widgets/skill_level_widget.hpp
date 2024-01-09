@@ -41,23 +41,23 @@ namespace GUIEngine
         /** When inferring widget size from its label length, this method will be called to
          * if/how much space must be added to the raw label's size for the widget to be large enough */
         virtual int getWidthNeededAroundLabel()  const { return 35; }
-        
+
         /** When inferring widget size from its label length, this method will be called to
          * if/how much space must be added to the raw label's size for the widget to be large enough */
         virtual int getHeightNeededAroundLabel() const { return 4; }
-        
+
         /** widget coordinates */
         int m_bar_x, m_bar_y, m_bar_h, m_bar_w;
         int m_iconbutton_x, m_iconbutton_y, m_iconbutton_h, m_iconbutton_w;
-        
+
         int m_player_id;
         //shall icon be display left of the skill bar?
         bool m_display_icon;
 
     public:
-        
+
         LEAK_CHECK()
-        
+
         IconButtonWidget* m_iconbutton;
         ProgressBarWidget* m_bar;
 
@@ -83,13 +83,13 @@ namespace GUIEngine
 
         /** Change the value of the widget, it must be a percent. */
         void setValue(const float value);
-        
+
         /** Get the current values of the widget. */
         float getValue() {return m_bar->getValue(); };
 
         /** Change the label of the widget */
         void setLabel(const irr::core::stringw& label);
-        
+
         /** Change the image for the icon. Expects an absolute file path*/
         void setIcon(const irr::core::stringc& filepath);
 

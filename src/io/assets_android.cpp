@@ -26,7 +26,7 @@
 
 #ifdef ANDROID
 #include <SDL_system.h>
-#include <sys/statfs.h> 
+#include <sys/statfs.h>
 #include <jni.h>
 #endif
 
@@ -77,11 +77,11 @@ void AssetsAndroid::init()
 
     if (getenv("SECONDARY_STORAGE"))
         paths.push_back(getenv("SECONDARY_STORAGE"));
-        
+
     paths.push_back("/sdcard/");
     paths.push_back("/storage/sdcard0/");
     paths.push_back("/storage/sdcard1/");
-    
+
 #if !defined(ANDROID_PACKAGE_NAME) || !defined(ANDROID_APP_DIR_NAME)
     #error
 #endif
@@ -95,7 +95,7 @@ void AssetsAndroid::init()
     for (std::string path : paths)
     {
         Log::info("AssetsAndroid", "Check data files in: %s", path.c_str());
-        
+
         if (!isWritable(path))
         {
             Log::info("AssetsAndroid", "Path doesn't have write access.");
@@ -107,16 +107,16 @@ void AssetsAndroid::init()
             m_stk_dir = path + "/" + app_dir_name;
             break;
         }
-        
+
         // Stk is an alias of supertuxkart for compatibility with older version.
-        if (app_dir_name == "supertuxkart" && 
+        if (app_dir_name == "supertuxkart" &&
             m_file_manager->fileExists(path + "/stk/data/" + version))
         {
             m_stk_dir = path + "/stk";
             break;
         }
     }
-    
+
     // If data for current version is not available, then try to find any other
     // version, so that we won't accidentaly create second STK directory in
     // different place
@@ -126,22 +126,22 @@ void AssetsAndroid::init()
         {
             Log::info("AssetsAndroid", "Check data files for different STK "
                                        "version in: %s", path.c_str());
-                                       
+
             if (!isWritable(path))
             {
                 Log::info("AssetsAndroid", "Path doesn't have write access.");
                 continue;
             }
-    
+
             if (m_file_manager->fileExists(path + "/" + app_dir_name + "/.extracted"))
             {
                 m_stk_dir = path + "/" + app_dir_name;
                 needs_extract_data = true;
                 break;
             }
-    
+
             // Stk is an alias of supertuxkart for compatibility with older version.
-            if (app_dir_name == "supertuxkart" && 
+            if (app_dir_name == "supertuxkart" &&
                 m_file_manager->fileExists(path + "/stk/.extracted"))
             {
                 m_stk_dir = path + "/stk";
@@ -150,10 +150,10 @@ void AssetsAndroid::init()
             }
         }
     }
-    
+
     if (m_stk_dir.size() > 0)
     {
-        Log::info("AssetsAndroid", "Data files found in: %s", 
+        Log::info("AssetsAndroid", "Data files found in: %s",
                   m_stk_dir.c_str());
     }
 
@@ -181,7 +181,7 @@ void AssetsAndroid::init()
     {
         for (std::string path : paths)
         {
-            if (m_file_manager->checkAndCreateDirectoryP(path + "/" + 
+            if (m_file_manager->checkAndCreateDirectoryP(path + "/" +
                                                         app_dir_name + "/data"))
             {
                 Log::info("AssetsAndroid", "Data directory created in: %s",
@@ -471,7 +471,7 @@ void AssetsAndroid::removeData()
 #ifdef ANDROID
     if (m_stk_dir.length() == 0)
         return;
-        
+
     std::string app_dir_name = ANDROID_APP_DIR_NAME;
 
     // Make sure that we are not accidentally removing wrong directory
@@ -515,21 +515,21 @@ void AssetsAndroid::removeData()
     }
 
     std::string data_path = getDataPath();
-    
+
     if (!data_path.empty())
     {
-        const std::vector<std::string> child_paths = 
+        const std::vector<std::string> child_paths =
         {
             data_path + "/files/libchildprocess.so",
             data_path + "/files/libchildprocess_ai.so"
         };
-    
+
         for (auto child_path : child_paths)
         {
             if (!m_file_manager->fileExists(child_path))
                 continue;
-                
-            Log::info("AssetsAndroid", "Deleting old childprocess: %s", 
+
+            Log::info("AssetsAndroid", "Deleting old childprocess: %s",
                       child_path.c_str());
             m_file_manager->removeFile(child_path);
         }
@@ -602,7 +602,7 @@ bool AssetsAndroid::isWritable(std::string path)
  *  \param paths A list of paths that should be checked
  *  \return Best path or empty string in case of error
  */
-std::string AssetsAndroid::getPreferredPath(const std::vector<std::string>& 
+std::string AssetsAndroid::getPreferredPath(const std::vector<std::string>&
                                             paths)
 {
 #ifdef ANDROID
@@ -617,7 +617,7 @@ std::string AssetsAndroid::getPreferredPath(const std::vector<std::string>&
         // to clean up device
         if (path.find("/data") == 0)
             continue;
-            
+
         if (!isWritable(path))
             continue;
 
@@ -630,7 +630,7 @@ std::string AssetsAndroid::getPreferredPath(const std::vector<std::string>&
 
         Log::info("AssetsAndroid", "Available space in '%s': %i MB",
                   path.c_str(), available_space);
-                  
+
         if (available_space > prev_available_space)
         {
             preferred_path = path;
@@ -652,7 +652,7 @@ std::string AssetsAndroid::getDataPath()
 {
 #ifdef ANDROID
     std::string data_path = "/data/data/" ANDROID_PACKAGE_NAME;
-    
+
     if (access(data_path.c_str(), R_OK) != 0)
     {
         Log::warn("AssetsAndroid", "Cannot use standard data dir");
@@ -665,7 +665,7 @@ std::string AssetsAndroid::getDataPath()
             data_path = "";
         }
     }
-    
+
     return data_path;
 #endif
 

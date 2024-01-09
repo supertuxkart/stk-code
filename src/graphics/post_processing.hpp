@@ -72,7 +72,7 @@ public:
     /** Render tex. Used for blit/texture resize */
     void renderPassThrough(unsigned tex, unsigned width, unsigned height) const;
     void renderTextureLayer(unsigned tex, unsigned layer) const;
-    
+
     void renderDoF(const FrameBuffer &framebuffer, GLuint color_texture, GLuint depth_stencil_texture);
     void renderGodRays(scene::ICameraSceneNode * const camnode,
                        const FrameBuffer &in_fbo,
@@ -92,7 +92,7 @@ public:
 
     /** Use motion blur for a short time */
     void         giveBoost(unsigned int cam_index);
-    
+
     /** Render the post-processed scene */
     FrameBuffer *render(scene::ICameraSceneNode * const camnode, bool isRace,
                         RTT *rtts);

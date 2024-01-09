@@ -27,7 +27,7 @@ namespace MemUtils {
 	deref(callback _c) : cb(std::move(_c)), chg(true) {}
 	deref(const deref &) = delete;
 	deref& operator=(const deref &) = delete;
-	deref(deref &&other) : 
+	deref(deref &&other) :
             cb(other.cb),
 	    chg(other.chg)
 	{

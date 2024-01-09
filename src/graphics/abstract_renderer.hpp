@@ -74,7 +74,7 @@ protected:
 public:
     AbstractRenderer() {}
     virtual ~AbstractRenderer(){}
-        
+
     virtual void onLoadWorld()   = 0;
     virtual void onUnloadWorld() = 0;
 
@@ -82,12 +82,12 @@ public:
     virtual void giveBoost(unsigned int cam_index) {}
 
     virtual void removeSkyBox() {}
-    
+
     //FIXME: these three methods should not appear in the public Renderer interface
     virtual const SHCoefficients* getSHCoefficients()    const { return NULL; }
     virtual GLuint getRenderTargetTexture(TypeRTT which) const { return 0;}
     virtual GLuint getDepthStencilTexture(             ) const { return 0;}
-    
+
     virtual void setAmbientLight(const irr::video::SColorf &light,
                                   bool force_SH_computation = true) {}
 
@@ -95,17 +95,17 @@ public:
 
     virtual void addGlowingNode(irr::scene::ISceneNode *n,
                                 float r = 1.0f, float g = 1.0f, float b = 1.0f) {}
-    
+
     virtual void clearGlowingNodes() {}
 
     virtual void render(float dt, bool is_loading=false) = 0;
- 
+
      // ------------------------------------------------------------------------
     const irr::core::vector2df &getCurrentScreenSize() const
     {
         return m_current_screen_size;
     }
-    
+
     // ----------------------------------------------------------------------------
     /** Create a RenderTarget (for rendering to a texture)
      *  \param dimension The dimension of the texture

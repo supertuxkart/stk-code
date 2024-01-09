@@ -62,15 +62,15 @@ void KartControl::setSkidControl(SkidControl sc)
 // ----------------------------------------------------------------------------
 /** Returns if this kart wants to get rescued. */
 void KartControl::setRescue(bool b)
-{ 
+{
     m_rescue        = b;
 }   // setRescue
 
 // ----------------------------------------------------------------------------
 /** Sets if the kart wants to fire. */
 void KartControl::setFire(bool b)
-{ 
-    m_fire        = b; 
+{
+    m_fire        = b;
 }   // setFire
 
 // ----------------------------------------------------------------------------

@@ -63,12 +63,12 @@ private:
 
     void computeMatrixesAndCameras(scene::ICameraSceneNode * const camnode,
                                    unsigned int width, unsigned int height);
-    
+
     void resetShadowCamNodes(){m_shadow_matrices.resetShadowCamNodes();}
-    
+
     void renderSkybox(const scene::ICameraSceneNode *camera) const;
-    
-    
+
+
     void prepareDrawCalls(scene::ICameraSceneNode *camnode);
 
     void renderSSAO() const;
@@ -88,10 +88,10 @@ private:
 public:
     ShaderBasedRenderer();
     ~ShaderBasedRenderer();
-    
+
     void onLoadWorld() OVERRIDE;
     void onUnloadWorld() OVERRIDE;
-    
+
     void resetPostProcessing() OVERRIDE;
     void giveBoost(unsigned int cam_index) OVERRIDE;
 
@@ -101,7 +101,7 @@ public:
     const SHCoefficients* getSHCoefficients() const OVERRIDE;
     GLuint getRenderTargetTexture(TypeRTT which) const OVERRIDE;
     GLuint getDepthStencilTexture() const OVERRIDE;
-    
+
     void                  setAmbientLight(const irr::video::SColorf &light,
                                           bool force_SH_computation = true) OVERRIDE;
 
@@ -111,7 +111,7 @@ public:
 
     std::unique_ptr<RenderTarget> createRenderTarget(const irr::core::dimension2du &dimension,
                                                      const std::string &name) OVERRIDE;
-    
+
     void renderToTexture(GL3RenderTarget *render_target,
                          irr::scene::ICameraSceneNode* camera,
                          float dt);

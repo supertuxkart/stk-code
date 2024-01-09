@@ -315,7 +315,7 @@ irr::core::stringw Binding::getAsString() const
             case irr::IRR_KEY_OEM_6      : s = "]"; break;
              //I18N: input configuration screen: keyboard key
             case irr::IRR_KEY_OEM_7      : s = "'"; break;
-            
+
             // for azerty layout
             case irr::IRR_KEY_AMPERSAND   : s = "&"; break;
             case irr::IRR_KEY_EACUTE      : s = "é"; break;

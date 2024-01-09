@@ -336,23 +336,23 @@ void Flyable::getLinearKartItemIntersection (const Vec3 &origin,
 {
     // Transform the target into the firing kart's frame of reference
     btTransform inv_trans = m_owner->getTrans().inverse();
-    
+
     Vec3 relative_target_kart_loc = inv_trans(target_kart->getXYZ());
-    
+
     // Find the direction target is moving in
     btTransform trans = target_kart->getTrans();
     Vec3 target_direction(trans.getBasis().getColumn(2));
 
     // Now rotate it to the firing kart's frame of reference
     btQuaternion inv_rotate = inv_trans.getRotation();
-    target_direction = 
+    target_direction =
         target_direction.rotate(inv_rotate.getAxis(), inv_rotate.getAngle());
-    
-    // Now we try to find the angle to aim at to hit the target. 
-    // Warning : Funky math stuff going on below. To understand, see answer by 
-    // Jeffrey Hantin here : 
+
+    // Now we try to find the angle to aim at to hit the target.
+    // Warning : Funky math stuff going on below. To understand, see answer by
+    // Jeffrey Hantin here :
     // http://stackoverflow.com/questions/2248876/2d-game-fire-at-a-moving-target-by-predicting-intersection-of-projectile-and-u
-    
+
     float target_x_speed = target_direction.getX()*target_kart->getSpeed();
     float target_z_speed = target_direction.getZ()*target_kart->getSpeed();
     float target_y_speed = target_direction.getY()*target_kart->getSpeed();
@@ -363,7 +363,7 @@ void Flyable::getLinearKartItemIntersection (const Vec3 &origin,
                     + target_z_speed * (relative_target_kart_loc.getZ()));
     float c = relative_target_kart_loc.getX()*relative_target_kart_loc.getX()
                 + relative_target_kart_loc.getZ()*relative_target_kart_loc.getZ();
-    
+
     float discriminant = b*b - 4 * a*c;
     if (discriminant < 0) discriminant = 0;
 
@@ -381,7 +381,7 @@ void Flyable::getLinearKartItemIntersection (const Vec3 &origin,
 
     assert(time!=0);
     float angle = atan2f(aimX, aimZ);
-    
+
     *fire_angle = angle;
 
     // Now find the up_velocity. This is an application of newton's equation.

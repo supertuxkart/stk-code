@@ -318,8 +318,8 @@ bool CGUISTKListBox::OnEvent(const SEvent& event)
                 return true;
             }
             else
-            if (!event.KeyInput.PressedDown && 
-                (event.KeyInput.Key == IRR_KEY_RETURN || 
+            if (!event.KeyInput.PressedDown &&
+                (event.KeyInput.Key == IRR_KEY_RETURN ||
                 event.KeyInput.Key == IRR_KEY_SPACE))
             {
                 if (Parent)
@@ -446,14 +446,14 @@ void CGUISTKListBox::selectNew(s32 ypos, bool onlyHover)
         event.EventType = EET_GUI_EVENT;
         event.GUIEvent.Caller = this;
         event.GUIEvent.Element = 0;
-        
+
 #if !defined(MOBILE_STK)
         if (Selected != oldSelected /*|| now < selectTime + 500*/)
             event.GUIEvent.EventType = EGET_LISTBOX_CHANGED;
         else
 #endif
             event.GUIEvent.EventType = EGET_LISTBOX_SELECTED_AGAIN;
-            
+
         Parent->OnEvent(event);
     }
 }
@@ -526,7 +526,7 @@ void CGUISTKListBox::draw()
                 skin->draw2DRectangle(this, skin->getColor(EGDC_HIGH_LIGHT), frameRect, &clientClip);
 
             core::rect<s32> textRect = frameRect;
-            
+
             if (!ScrollBar->isVisible())
                 textRect.LowerRightCorner.X = textRect.LowerRightCorner.X - skin->getSize(EGDS_SCROLLBAR_SIZE);
 
@@ -539,11 +539,11 @@ void CGUISTKListBox::draw()
                 }
 
                 int total_width = textRect.getWidth();
-                
+
                 for(unsigned int x = 0; x < Items[i].m_contents.size(); ++x)
                 {
                     int part_size = total_width * Items[i].m_contents[x].m_proportion / total_proportion;
-                    
+
                     textRect.LowerRightCorner.X = textRect.UpperLeftCorner.X + part_size;
                     textRect.UpperLeftCorner.X += 3;
 
@@ -551,7 +551,7 @@ void CGUISTKListBox::draw()
                     {
                         core::position2di iconPos = textRect.UpperLeftCorner;
                         iconPos.Y += textRect.getHeight() / 2;
-                        
+
                         if (Items[i].m_contents[x].m_center && Items[i].m_contents[x].m_text.size() == 0)
                         {
                             iconPos.X += part_size/2 - 3;

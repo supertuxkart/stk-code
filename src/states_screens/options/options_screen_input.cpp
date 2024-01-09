@@ -90,7 +90,7 @@ void OptionsScreenInput::buildDeviceList()
 
     assert( m_icon_bank != NULL );
     devices->setIcons(m_icon_bank);
-    
+
     DeviceManager* device_manager = input_manager->getDeviceManager();
 
     const int keyboard_config_count = device_manager->getKeyboardConfigAmount();
@@ -98,11 +98,11 @@ void OptionsScreenInput::buildDeviceList()
     for (int i=0; i<keyboard_config_count; i++)
     {
         KeyboardConfig *config = device_manager->getKeyboardConfig(i);
-        
+
         std::ostringstream kbname;
         kbname << "keyboard" << i;
         const std::string internal_name = kbname.str();
-        
+
         const int icon = (config->isEnabled() ? 0 : 1);
 
         //Display the configName instead of default name if it exists
@@ -137,12 +137,12 @@ void OptionsScreenInput::buildDeviceList()
             {
                 // since irrLicht's list widget has the nasty tendency to put the
                 // icons very close to the text, I'm adding spaces to compensate.
-                name = (core::stringw("   ") + 
+                name = (core::stringw("   ") +
                              config->getConfigName());
             }
             else
             {
-                name = ("   " + config->getName()).c_str();   
+                name = ("   " + config->getName()).c_str();
 
                 if (config->getNumberOfDevices() > 1)
                 {
@@ -161,12 +161,12 @@ void OptionsScreenInput::buildDeviceList()
             devices->addItem(internal_name, name, icon);
         }   // if config->isPlugged
     }   // for i<gpad_config_count
-    
+
     MultitouchDevice* touch_device = device_manager->getMultitouchDevice();
-                                                        
+
     if (touch_device != NULL)
     {
-        devices->addItem("touch_device", (core::stringw("   ") + 
+        devices->addItem("touch_device", (core::stringw("   ") +
                                                 _("Touch Device")).c_str(), 4);
     }
 }   // buildDeviceList

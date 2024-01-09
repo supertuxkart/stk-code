@@ -80,7 +80,7 @@ private:
     int m_current_column;
 
     bool m_refreshing_server;
-    
+
     float m_refresh_timer;
 
     /** Load the servers into the main list.*/

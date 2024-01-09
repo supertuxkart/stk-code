@@ -60,10 +60,10 @@ GeneralTextFieldDialog::~GeneralTextFieldDialog()
 
 // -----------------------------------------------------------------------------
 GUIEngine::EventPropagation GeneralTextFieldDialog::processEvent(const std::string& eventSource)
-{ 
+{
     GUIEngine::RibbonWidget* buttons_ribbon =
         getWidget<GUIEngine::RibbonWidget>("buttons");
-    
+
     if(eventSource == "buttons")
     {
         const std::string& button =

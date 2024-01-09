@@ -92,7 +92,7 @@ public:
     virtual void init() OVERRIDE;
 
     virtual void tearDown() OVERRIDE;
-    
+
     virtual void unloaded() OVERRIDE;
 
     /** \brief Implement IConfirmDialogListener callback */

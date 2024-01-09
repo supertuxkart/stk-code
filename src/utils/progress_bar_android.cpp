@@ -53,7 +53,7 @@ bool ProgressBarAndroid::compileShaders()
 #ifndef SERVER_ONLY
     if (GUIEngine::isNoGraphics())
         return false;
-        
+
     const GLchar* vsh =
         "precision mediump float;"
         "attribute vec2 position;"
@@ -131,7 +131,7 @@ void ProgressBarAndroid::deleteShaders()
 #ifndef SERVER_ONLY
     if (GUIEngine::isNoGraphics())
         return;
-        
+
     glDeleteShader(m_vertex_shader);
     glDeleteShader(m_fragment_shader);
     glDeleteProgram(m_program);
@@ -143,7 +143,7 @@ void ProgressBarAndroid::init()
 #ifndef SERVER_ONLY
     if (GUIEngine::isNoGraphics())
         return;
-        
+
     SIrrlichtCreationParameters params;
     params.DriverType    = video::EDT_OGLES2;
     params.Bits          = 32;
@@ -188,7 +188,7 @@ void ProgressBarAndroid::close()
 #ifndef SERVER_ONLY
     if (GUIEngine::isNoGraphics())
         return;
-        
+
     glDisableVertexAttribArray(m_position);
     glBindBuffer(GL_ARRAY_BUFFER, 0);
     glUseProgram(0);
@@ -213,22 +213,22 @@ void ProgressBarAndroid::draw(float value)
 #ifndef SERVER_ONLY
     if (GUIEngine::isNoGraphics())
         return;
-        
+
     if (!m_initialized || m_close_event_received)
         return;
 
     value = value > 1.0f ? 1.0f : value;
 
     m_close_event_received = !m_device->run();
-    
+
     if (!m_close_event_received)
     {
         m_device->getVideoDriver()->beginScene(true, true);
-    
+
         glClear(GL_COLOR_BUFFER_BIT);
         glUniform1f(m_progress, value);
         glDrawArrays(GL_TRIANGLES, 0, 6);
-    
+
         m_device->getVideoDriver()->endScene();
     }
 #endif

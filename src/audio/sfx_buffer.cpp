@@ -82,29 +82,29 @@ SFXBuffer::SFXBuffer(const std::string& file,
 
 //----------------------------------------------------------------------------
 /** \brief load the buffer from file into OpenAL.
- *  \note If this buffer is already loaded, this call does nothing and 
+ *  \note If this buffer is already loaded, this call does nothing and
   *       returns false.
  *  \return Whether loading was successful.
  */
 bool SFXBuffer::load()
 {
     if (UserConfigParams::m_sfx == false) return false;
-    
+
 #ifdef ENABLE_SOUND
     if (UserConfigParams::m_enable_sound)
     {
         if (m_loaded) return false;
-    
+
         alGetError(); // clear errors from previously
-    
+
         alGenBuffers(1, &m_buffer);
         if (!SFXManager::checkError("generating a buffer"))
         {
             return false;
         }
-    
+
         assert(alIsBuffer(m_buffer));
-    
+
         if (!loadVorbisBuffer(m_file, m_buffer))
         {
             Log::error("SFXBuffer", "Could not load sound effect %s",
@@ -150,7 +150,7 @@ bool SFXBuffer::loadVorbisBuffer(const std::string &name, ALuint buffer)
 #ifdef ENABLE_SOUND
     if (!UserConfigParams::m_enable_sound)
         return false;
-        
+
     const int ogg_endianness = (IS_LITTLE_ENDIAN ? 0 : 1);
 
 
@@ -222,7 +222,7 @@ bool SFXBuffer::loadVorbisBuffer(const std::string &name, ALuint buffer)
     // duration (which is the norm), compute it:
     if(m_duration < 0)
     {
-        m_duration = float(buffer_size) 
+        m_duration = float(buffer_size)
                    / (frequency*channels*(bits_per_sample / 8));
     }
     return success;

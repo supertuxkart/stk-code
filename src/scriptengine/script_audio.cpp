@@ -51,13 +51,13 @@ namespace Scripting
         void registerScriptFunctions(asIScriptEngine *engine)
         {
             engine->SetDefaultNamespace("Audio");
-            
+
             bool mp = strstr(asGetLibraryOptions(), "AS_MAX_PORTABILITY");
             asDWORD call_conv = mp ? asCALL_GENERIC : asCALL_CDECL;
             int r; // of type asERetCodes
-            
-            r = engine->RegisterGlobalFunction("void playSound(const string &in)", 
-                                               mp ? WRAP_FN(playSound) : asFUNCTION(playSound), 
+
+            r = engine->RegisterGlobalFunction("void playSound(const string &in)",
+                                               mp ? WRAP_FN(playSound) : asFUNCTION(playSound),
                                                call_conv); assert(r >= 0);
         }
     }

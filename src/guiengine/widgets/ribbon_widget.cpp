@@ -403,9 +403,9 @@ void RibbonWidget::add()
                 if (((int)GUIEngine::getFont()->getDimension(message.c_str())
                                               .Width > label_part.getWidth() &&
                     message.findFirst(L' ') == -1                            &&
-                    message.findFirst(L'\u00AD') == -1) || 
+                    message.findFirst(L'\u00AD') == -1) ||
                     ((int)GUIEngine::getFont()->getDimension(message.c_str())
-                                              .Width > label_part.getWidth() && 
+                                              .Width > label_part.getWidth() &&
                     (int)GUIEngine::getFont()->getDimension(message.c_str())
                                               .Height*2 > label_part.getHeight()))
                 {
@@ -835,7 +835,7 @@ EventPropagation RibbonWidget::onClick()
 {
     if (m_ribbon_type == RIBBON_TOOLBAR)
         return EVENT_BLOCK;
-        
+
     return EVENT_LET;
 }
 
@@ -927,7 +927,7 @@ EventPropagation RibbonWidget::transmitEvent(Widget* w,
     // bring focus back to enclosing ribbon widget
     this->setFocusForPlayer( playerID );
 
-    if (m_selection[playerID] > -1 && 
+    if (m_selection[playerID] > -1 &&
         m_selection[playerID] < (int)(m_active_children.size()))
     {
         if (m_active_children[m_selection[playerID]].m_deactivated)

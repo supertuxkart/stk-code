@@ -120,7 +120,7 @@ void CameraFPS::applyMouseMovement (float x, float y)
 void CameraFPS::update(float dt)
 {
     Camera::update(dt);
-    
+
     // To view inside tunnels in top mode, increase near value
     m_camera->setNearValue(1.0f);
 

@@ -76,7 +76,7 @@ void OnlineLanScreen::eventCallback(Widget* widget, const std::string& name, con
             CreateServerScreen::getInstance()->push();
         }
     }
-    
+
 }   // eventCallback
 
 // ----------------------------------------------------------------------------

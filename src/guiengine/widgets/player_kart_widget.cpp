@@ -181,7 +181,7 @@ PlayerKartWidget::PlayerKartWidget(KartSelectionScreen* parent,
     m_kart_internal_name = props->getIdent();
 
     const KartModel &kart_model = props->getMasterKartModel();
-    
+
     float scale = 35.0f;
     if (kart_model.getLength() > 1.45f)
     {
@@ -273,7 +273,7 @@ PlayerKartWidget::~PlayerKartWidget()
 
     if (m_kart_name->getIrrlichtElement() != NULL)
         m_kart_name->getIrrlichtElement()->remove();
-        
+
     if (getCurrentScreen() != NULL)
         getCurrentScreen()->manualRemoveWidget(this);
 

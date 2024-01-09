@@ -278,11 +278,11 @@ namespace Scripting
             return RGT_KEYBOARD_GAMEPAD;
         }
         /** \endcond */
-        
+
         void registerScriptFunctions(asIScriptEngine *engine)
         {
             engine->SetDefaultNamespace("GUI");
-            
+
             bool mp = strstr(asGetLibraryOptions(), "AS_MAX_PORTABILITY");
             asDWORD call_conv = mp ? asCALL_GENERIC : asCALL_CDECL;
             int r; // of type asERetCodes
@@ -312,40 +312,40 @@ namespace Scripting
             r = engine->RegisterGlobalFunction("void displayModalMessage(const string &in)",
                                                mp ? WRAP_FN(displayModalMessage) : asFUNCTION(displayModalMessage),
                                                call_conv); assert(r >= 0);
-                                               
-            r = engine->RegisterGlobalFunction("void displayOverlayMessage(const string &in)", 
-                                               mp ? WRAP_FN(displayOverlayMessage) : asFUNCTION(displayOverlayMessage), 
+
+            r = engine->RegisterGlobalFunction("void displayOverlayMessage(const string &in)",
+                                               mp ? WRAP_FN(displayOverlayMessage) : asFUNCTION(displayOverlayMessage),
                                                call_conv); assert(r >= 0);
-                                               
-            r = engine->RegisterGlobalFunction("void clearOverlayMessages()", 
-                                               mp ? WRAP_FN(clearOverlayMessages) : asFUNCTION(clearOverlayMessages), 
+
+            r = engine->RegisterGlobalFunction("void clearOverlayMessages()",
+                                               mp ? WRAP_FN(clearOverlayMessages) : asFUNCTION(clearOverlayMessages),
                                                call_conv); assert(r >= 0);
 
             r = engine->RegisterGlobalFunction("RaceGUIType getRaceGUIType()",
                                                mp ? WRAP_FN(getRaceGUIType) : asFUNCTION(getRaceGUIType),
                                                call_conv); assert(r >= 0);
 
-            r = engine->RegisterGlobalFunction("string getKeyBinding(int input)", 
-                                               mp ? WRAP_FN(getKeyBinding) : asFUNCTION(getKeyBinding), 
+            r = engine->RegisterGlobalFunction("string getKeyBinding(int input)",
+                                               mp ? WRAP_FN(getKeyBinding) : asFUNCTION(getKeyBinding),
                                                call_conv); assert(r >= 0);
-                                               
-            r = engine->RegisterGlobalFunction("string translate(const string &in)", 
-                                               mp ? WRAP_FN(proxy_translate) : asFUNCTION(proxy_translate), 
+
+            r = engine->RegisterGlobalFunction("string translate(const string &in)",
+                                               mp ? WRAP_FN(proxy_translate) : asFUNCTION(proxy_translate),
                                                call_conv); assert(r >= 0);
-                                               
-            r = engine->RegisterGlobalFunction("string translate(const string &in, const string &in)", 
-                                               mp ? WRAP_FN(proxy_translateAndInsertValues1) 
-                                                  : asFUNCTION(proxy_translateAndInsertValues1), 
+
+            r = engine->RegisterGlobalFunction("string translate(const string &in, const string &in)",
+                                               mp ? WRAP_FN(proxy_translateAndInsertValues1)
+                                                  : asFUNCTION(proxy_translateAndInsertValues1),
                                                call_conv); assert(r >= 0);
-                                               
-            r = engine->RegisterGlobalFunction("string translate(const string &in, const string &in, const string &in)", 
-                                               mp ? WRAP_FN(proxy_translateAndInsertValues2) 
-                                                  : asFUNCTION(proxy_translateAndInsertValues2), 
+
+            r = engine->RegisterGlobalFunction("string translate(const string &in, const string &in, const string &in)",
+                                               mp ? WRAP_FN(proxy_translateAndInsertValues2)
+                                                  : asFUNCTION(proxy_translateAndInsertValues2),
                                                call_conv); assert(r >= 0);
-                                               
-            r = engine->RegisterGlobalFunction("string translate(const string &in, const string &in, const string &in, const string &in)", 
-                                               mp ? WRAP_FN(proxy_translateAndInsertValues3) 
-                                                  : asFUNCTION(proxy_translateAndInsertValues3), 
+
+            r = engine->RegisterGlobalFunction("string translate(const string &in, const string &in, const string &in, const string &in)",
+                                               mp ? WRAP_FN(proxy_translateAndInsertValues3)
+                                                  : asFUNCTION(proxy_translateAndInsertValues3),
                                                call_conv); assert(r >= 0);
 
         }

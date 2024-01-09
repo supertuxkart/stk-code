@@ -60,7 +60,7 @@ const std::string& ShaderFilesManager::getHeader()
 }   // getHeader
 
 // ----------------------------------------------------------------------------
-void ShaderFilesManager::readFile(const std::string& file, 
+void ShaderFilesManager::readFile(const std::string& file,
                                   std::ostringstream& code, bool not_header)
 {
     std::string path = FileUtils::getPortableReadingPath(
@@ -108,7 +108,7 @@ void ShaderFilesManager::readFile(const std::string& file,
             }
 
             filename = filename.substr(0, pos);
-            
+
             // read the whole include file
             readFile(filename, code, false/*not_header*/);
         }

@@ -133,7 +133,7 @@ void LinearWorld::reset(bool restart)
     // be increased to avoid negative values in estimateFinishTimeForKart
     // Increase this value somewhat in case that a kart drivess/slides
     // backwards a little bit at start.
-    m_distance_increase = Track::getCurrentTrack()->getTrackLength() 
+    m_distance_increase = Track::getCurrentTrack()->getTrackLength()
                         - m_distance_increase + 5.0f;
 
     if(m_distance_increase<0) m_distance_increase = 1.0f;  // shouldn't happen
@@ -312,8 +312,8 @@ void LinearWorld::updateGraphics(float dt)
     }
 
     const GUIEngine::GameState gamestate = StateManager::get()->getGameState();
-    
-    if (gamestate == GUIEngine::GAME && 
+
+    if (gamestate == GUIEngine::GAME &&
         !GUIEngine::ModalDialog::isADialogActive())
     {
         const unsigned int kart_amount = getNumKarts();
@@ -406,7 +406,7 @@ void LinearWorld::newLap(unsigned int kart_index)
         kart_info.m_ticks_at_last_lap=getTimeTicks();
         kart_info.m_finished_laps++;
         m_kart_info[kart_index].m_overall_distance =
-              m_kart_info[kart_index].m_finished_laps 
+              m_kart_info[kart_index].m_finished_laps
             * Track::getCurrentTrack()->getTrackLength()
             + getDistanceDownTrackForKart(kart->getWorldKartId(), true);
     }
@@ -503,7 +503,7 @@ void LinearWorld::newLap(unsigned int kart_index)
             if (curr_distance_after_line + prev_distance_before_line != 0.0f)
                 finish_proportion =   curr_distance_after_line
                                    / (prev_distance_before_line + curr_distance_after_line);
-        
+
             float prev_time = kart->getRecentPreviousXYZTime();
             float finish_time = prev_time*finish_proportion + getTime()*(1.0f-finish_proportion);
 
@@ -1048,17 +1048,17 @@ void LinearWorld::updateRacePosition()
  */
 void LinearWorld::checkForWrongDirection(unsigned int i, float dt)
 {
-    if (!m_karts[i]->getController()->isLocalPlayerController()) 
+    if (!m_karts[i]->getController()->isLocalPlayerController())
         return;
 
     KartInfo &ki = m_kart_info[i];
-    
+
     const AbstractKart *kart=m_karts[i].get();
     // If the kart can go in more than one directions from the current track
     // don't do any reverse message handling, since it is likely that there
     // will be one direction in which it isn't going backwards anyway.
     int sector = getTrackSector(i)->getCurrentGraphNode();
-    
+
     if (DriveGraph::get()->getNumberOfSuccessors(sector) > 1)
         return;
 
@@ -1080,7 +1080,7 @@ void LinearWorld::checkForWrongDirection(unsigned int i, float dt)
         !kart->hasFinishedRace())
     {
         ki.m_wrong_way_timer += dt;
-        
+
         if (ki.m_wrong_way_timer> 2.0f)
             ki.m_wrong_way_timer= 2.0f;
     }
@@ -1091,10 +1091,10 @@ void LinearWorld::checkForWrongDirection(unsigned int i, float dt)
         if (ki.m_wrong_way_timer < 0)
             ki.m_wrong_way_timer = 0;
     }
-    
+
     if (kart->getKartAnimation())
         ki.m_wrong_way_timer = 0;
-    
+
     if (ki.m_wrong_way_timer > 1.0f && m_race_gui)
     {
         m_race_gui->addMessage(_("WRONG WAY!"), kart,
@@ -1103,7 +1103,7 @@ void LinearWorld::checkForWrongDirection(unsigned int i, float dt)
                                /*important*/ true,
                                /*big font*/  true);
     }
-    
+
 }   // checkForWrongDirection
 
 //-----------------------------------------------------------------------------

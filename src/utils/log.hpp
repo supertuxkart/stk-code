@@ -120,7 +120,7 @@ public:
     static void toggleConsoleLog(bool val);
 
     // ------------------------------------------------------------------------
-    /** Sets the number of lines to buffer. Setting the buffer size to a 
+    /** Sets the number of lines to buffer. Setting the buffer size to a
      *  a value <=1 means no buffering, lines will be immediately printed. */
     static void setBufferSize(size_t n) { m_buffer_size = n;  }
     // ------------------------------------------------------------------------

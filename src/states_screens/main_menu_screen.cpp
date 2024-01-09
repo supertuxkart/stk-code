@@ -86,10 +86,10 @@ void MainMenuScreen::loadedFromFile()
 {
     LabelWidget* w = getWidget<LabelWidget>("info_addons");
     w->setScrollSpeed(GUIEngine::getFontHeight() / 2);
-    
+
     RibbonWidget* rw_top = getWidget<RibbonWidget>("menu_toprow");
     assert(rw_top != NULL);
-    
+
     if (track_manager->getTrack("overworld") == NULL ||
         track_manager->getTrack("introcutscene") == NULL ||
         track_manager->getTrack("introcutscene2") == NULL)
@@ -451,7 +451,7 @@ void MainMenuScreen::eventCallback(Widget* widget, const std::string& name,
         parts.push_back("introcutscene2");
         ((CutsceneWorld*)World::getWorld())->setParts(parts);
         //RaceManager::get()->startSingleRace("introcutscene2", 999, false);
-        
+
         CutSceneGeneral* scene = CutSceneGeneral::getInstance();
         scene->push();
         return;
@@ -469,7 +469,7 @@ void MainMenuScreen::eventCallback(Widget* widget, const std::string& name,
         std::vector<std::string> parts;
         parts.push_back("endcutscene");
         ((CutsceneWorld*)World::getWorld())->setParts(parts);
-        
+
         CutSceneGeneral* scene = CutSceneGeneral::getInstance();
         scene->push();
     }
@@ -534,7 +534,7 @@ void MainMenuScreen::eventCallback(Widget* widget, const std::string& name,
             parts.push_back("introcutscene2");
             ((CutsceneWorld*)World::getWorld())->setParts(parts);
             //RaceManager::get()->startSingleRace("introcutscene2", 999, false);
-            
+
             CutSceneGeneral* scene = CutSceneGeneral::getInstance();
             scene->push();
             return;

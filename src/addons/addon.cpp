@@ -194,26 +194,26 @@ bool Addon::filterByWords(const core::stringw words) const
     for (unsigned int i = 0; i < list.size(); i++)
     {
         list[i].make_lower();
-        
+
         core::stringw name = core::stringw(m_name).make_lower();
         if (name.find(list[i].c_str()) != -1)
         {
             return true;
         }
-        
+
         core::stringw designer = core::stringw(m_designer).make_lower();
         if (designer.find(list[i].c_str()) != -1)
         {
             return true;
         }
-        
+
         core::stringw description = core::stringw(m_description).make_lower();
         if (description.find(list[i].c_str()) != -1)
         {
             return true;
         }
     }
-    
+
     return false;
 } // filterByWords
 

@@ -54,7 +54,7 @@ private:
 
     /** The openal buffer id. */
     ALuint   m_buffer;
-    
+
     /** If the sound is positional. */
     bool     m_positional;
 

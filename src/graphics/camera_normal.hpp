@@ -56,7 +56,7 @@ private:
     void getCameraSettings(float *above_kart, float *cam_angle,
                            float *side_way, float *distance,
                            bool *smoothing, float *cam_roll_angle);
-    
+
     void positionCamera(float dt, float above_kart, float cam_angle,
                         float side_way, float distance, float smoothing,
                         float cam_roll_angle);

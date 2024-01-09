@@ -157,7 +157,7 @@ Translations::Translations() //: m_dictionary_manager("UTF-16")
         {
             if (language.str() == "en")
                 continue;
-                
+
             g_language_list.push_back(language.str());
         }
     }

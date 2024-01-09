@@ -113,7 +113,7 @@ bool ReplayPlay::addReplayFile(const std::string& fn, bool custom_replay, int ca
         file_manager->getReplayDir() + fn, "r");
     if (fd == NULL) return false;
     auto scoped = [&]() { fclose(fd); };
-    MemUtils::deref<decltype(scoped)> cls(scoped); 
+    MemUtils::deref<decltype(scoped)> cls(scoped);
     ReplayData rd;
 
     // custom_replay is true when full path of filename is given
@@ -259,7 +259,7 @@ bool ReplayPlay::addReplayFile(const std::string& fn, bool custom_replay, int ca
         {
             Log::warn("Replay", "Track name is empty in replay file, '%s'.", fn.c_str());
             return false;
-        }         
+        }
     }
     else
     {
@@ -331,7 +331,7 @@ void ReplayPlay::load()
 
     // Always load the first replay
     loadFile(/* second replay */ false);
-    
+
 } // load
 
 //-----------------------------------------------------------------------------

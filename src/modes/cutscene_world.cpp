@@ -77,7 +77,7 @@ void CutsceneWorld::init()
 {
     // Use real dt even if fps is low. It allows to keep everything synchronized
     main_loop->setAllowLargeDt(true);
-    
+
     m_second_reset = false;
     World::init();
 

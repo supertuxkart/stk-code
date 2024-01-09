@@ -114,32 +114,32 @@ namespace Scripting
         // --------------------------------------------------------------------
         /** @}*/
         /** @}*/
-        
+
         void registerScriptFunctions(asIScriptEngine *engine)
         {
             engine->SetDefaultNamespace("Challenges");
-            
+
             bool mp = strstr(asGetLibraryOptions(), "AS_MAX_PORTABILITY");
             asDWORD call_conv = mp ? asCALL_GENERIC : asCALL_CDECL;
             int r; // of type asERetCodes
-            
-            r = engine->RegisterGlobalFunction("int getCompletedChallengesCount()", 
-                                               mp ? WRAP_FN(getCompletedChallengesCount) 
+
+            r = engine->RegisterGlobalFunction("int getCompletedChallengesCount()",
+                                               mp ? WRAP_FN(getCompletedChallengesCount)
                                                   : asFUNCTION(getCompletedChallengesCount),
                                                call_conv); assert(r >= 0);
-                                               
-            r = engine->RegisterGlobalFunction("int getChallengeCount()", 
-                                               mp ? WRAP_FN(getChallengeCount) 
+
+            r = engine->RegisterGlobalFunction("int getChallengeCount()",
+                                               mp ? WRAP_FN(getChallengeCount)
                                                   : asFUNCTION(getChallengeCount),
                                                call_conv); assert(r >= 0);
-                                               
+
             r = engine->RegisterGlobalFunction("bool isChallengeUnlocked(string &in)",
-                                               mp ? WRAP_FN(isChallengeUnlocked) 
+                                               mp ? WRAP_FN(isChallengeUnlocked)
                                                   : asFUNCTION(isChallengeUnlocked),
                                                call_conv); assert(r >= 0);
-                                               
+
             r = engine->RegisterGlobalFunction("int getChallengeRequiredPoints(string &in)",
-                                               mp ? WRAP_FN(getChallengeRequiredPoints) 
+                                               mp ? WRAP_FN(getChallengeRequiredPoints)
                                                   : asFUNCTION(getChallengeRequiredPoints),
                                                call_conv); assert(r >= 0);
         } // registerScriptFunctions

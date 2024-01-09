@@ -116,7 +116,7 @@ public:
     GamePadDevice*      getGamePadFromIrrID(const int i);
     void                clearGamepads();
     /** Returns the keyboard that has a binding for this button, or NULL if none */
-    bool                getConfigForGamepad(const int sdl_id, 
+    bool                getConfigForGamepad(const int sdl_id,
                                             const std::string& name,
                                             GamepadConfig **config);
 
@@ -186,7 +186,7 @@ public:
      *  events from the device used to connect in the kart selection screen. */
     void setSinglePlayer(StateManager::ActivePlayer* p)
     {
-        m_single_player = p; 
+        m_single_player = p;
     }   // setSinglePlayer
     // ------------------------------------------------------------------------
     /** Sets or reset the 'map fire to select' option.

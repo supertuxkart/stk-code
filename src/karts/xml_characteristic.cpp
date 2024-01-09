@@ -237,7 +237,7 @@ void XmlCharacteristic::processFloat(const std::string &processor, float *value,
     if (parts[index].empty())
     {
         // - is a special case: We don't take e.g. "-5" as relative, it
-        // describes a negative number. So 
+        // describes a negative number. So
         if (!*is_set && operations[index] == "-")
             *value = 0;
         else if (!*is_set)

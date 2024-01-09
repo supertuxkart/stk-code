@@ -74,7 +74,7 @@ SkillLevelWidget::SkillLevelWidget(core::recti area, const int player_id,
 
     m_children.push_back(m_bar);
     m_children.push_back(m_iconbutton);
-    
+
     m_display_icon = display_icon;
 }   // KartStatsWidget
 
@@ -119,18 +119,18 @@ void SkillLevelWidget::setSize(const int x, const int y, const int w, const int 
     m_y = y;
     m_w = w;
     m_h = h;
-    
-    int iconbox_h = h * 5 / 3; 
+
+    int iconbox_h = h * 5 / 3;
     int iconbox_w = h * 5 / 3; //assuming square icon
-    
-    m_iconbutton_h = iconbox_h; 
-    m_iconbutton_w = iconbox_w; 
+
+    m_iconbutton_h = iconbox_h;
+    m_iconbutton_w = iconbox_w;
 
     // -- sizes
-    m_bar_w = m_w - iconbox_w - 25;  //leaving just enough space for icon + its margin  
+    m_bar_w = m_w - iconbox_w - 25;  //leaving just enough space for icon + its margin
     m_bar_h = h;
-    
-    m_bar_x = x + iconbox_w + m_w / 32;    
+
+    m_bar_x = x + iconbox_w + m_w / 32;
     m_bar_y = y + h/2 - m_bar_h/2; //align to midpoint in y direction
 
     m_iconbutton_x = x; //make sure icon has enough space on the right

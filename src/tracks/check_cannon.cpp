@@ -48,7 +48,7 @@ CheckCannon::CheckCannon(const XMLNode &node,  unsigned int index)
         p2 = "p2";
     }
 
-    if( !node.get(p1, &m_target_left ) || 
+    if( !node.get(p1, &m_target_left ) ||
         !node.get(p2, &m_target_right)    )
         Log::fatal("CheckCannon", "No target line specified.");
 

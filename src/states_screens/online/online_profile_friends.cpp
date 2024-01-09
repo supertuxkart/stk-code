@@ -125,7 +125,7 @@ void OnlineProfileFriends::onColumnClicked(int column_id, bool sort_desc, bool s
     m_sort_column = column_id;
     m_sort_desc = sort_desc;
     m_sort_default = sort_default;
-    
+
     if (!m_waiting_for_friends)
     {
         displayResults();
@@ -153,7 +153,7 @@ bool OnlineProfileFriends::compareFriends(int f1, int f2)
     {
         OnlineProfile::RelationInfo *r1 = p1->getRelationInfo();
         OnlineProfile::RelationInfo *r2 = p2->getRelationInfo();
-        
+
         if (r1->isPending() && r2->isPending())
         {
             // In case of same online status, sort by name
@@ -196,9 +196,9 @@ bool OnlineProfileFriends::compareFriends(int f1, int f2)
 void OnlineProfileFriends::displayResults()
 {
     m_friends_list_widget->clear();
-    
+
     OnlineProfile::IDList friends = m_visiting_profile->getFriends();
-    
+
     if (m_sort_desc && !m_sort_default)
     {
         std::sort(friends.rbegin(), friends.rend(), compareFriends);
@@ -207,7 +207,7 @@ void OnlineProfileFriends::displayResults()
     {
         std::sort(friends.begin(), friends.end(), compareFriends);
     }
-                                     
+
     for (unsigned int i = 0; i < friends.size(); i++)
     {
         std::vector<ListWidget::ListCell> row;
@@ -257,7 +257,7 @@ void OnlineProfileFriends::onUpdate(float delta)
     {
         if (m_visiting_profile->hasFetchedFriends())
         {
-            // When browsing other users friends there is no Since/Status 
+            // When browsing other users friends there is no Since/Status
             // columns, so force sorting by name
             if (!m_visiting_profile->isCurrentUser() && m_sort_column != 0)
             {
@@ -265,7 +265,7 @@ void OnlineProfileFriends::onUpdate(float delta)
                 m_sort_desc = false;
                 m_sort_default = true;
             }
-            
+
             displayResults();
         }
         else

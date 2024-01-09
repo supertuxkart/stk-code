@@ -32,7 +32,7 @@ using namespace irr;
 void AbstractRenderer::drawDebugMeshes() const
 {
     std::vector<irr::scene::IAnimatedMeshSceneNode*> debug_meshes = irr_driver->getDebugMeshes();
-    
+
     for (unsigned int n=0; n<debug_meshes.size(); n++)
     {
         scene::IMesh* mesh = debug_meshes[n]->getMesh();
@@ -73,7 +73,7 @@ void AbstractRenderer::drawDebugMeshes() const
 
             drawJoint(true, false, joints[j], smesh, j);
         }
-    }     
+    }
 }  // drawDebugMeshes
 
 // ----------------------------------------------------------------------------

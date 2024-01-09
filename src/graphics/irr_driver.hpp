@@ -83,7 +83,7 @@ struct SHCoefficients;
   * \ingroup graphics
   */
 class IrrDriver : public IEventReceiver, public NoCopy
-{    
+{
 private:
     /** The irrlicht device. */
     IrrlichtDevice             *m_device;
@@ -97,7 +97,7 @@ private:
     gui::IGUIFont              *m_race_font;
     /** Renderer. */
     AbstractRenderer           *m_renderer;
-    
+
     /** Wind. */
     Wind                 *m_wind;
 
@@ -198,7 +198,7 @@ private:
     // ------------------------------------------------------------------------
     void resizeWindow();
 public:
-    void doScreenShot();    
+    void doScreenShot();
 public:
          IrrDriver();
         ~IrrDriver();
@@ -400,27 +400,27 @@ public:
     void clearForcedBloom() { m_forcedbloom.clear(); }
     // ------------------------------------------------------------------------
     const std::vector<BloomData> &getForcedBloom() const
-    { 
+    {
         return m_forcedbloom;
     }
     // ------------------------------------------------------------------------
     void clearBackgroundNodes() { m_background.clear(); }
     // ------------------------------------------------------------------------
-    void addBackgroundNode(scene::ISceneNode * const n) 
+    void addBackgroundNode(scene::ISceneNode * const n)
     {
         m_background.push_back(n);
     }
     // ------------------------------------------------------------------------
     scene::ISceneNode *addLight(const core::vector3df &pos, float energy,
                                 float radius, float r, float g, float b,
-                                bool sun_ = false, 
+                                bool sun_ = false,
                                 scene::ISceneNode* parent = NULL);
     // ------------------------------------------------------------------------
     void clearLights();
     // ------------------------------------------------------------------------
     SP::SPDynamicDrawCall* getSunInterposer() { return m_sun_interposer; }
     // ------------------------------------------------------------------------
-    
+
     void cleanSunInterposer();
     void createSunInterposer();
     // ------------------------------------------------------------------------
@@ -442,16 +442,16 @@ public:
     // ------------------------------------------------------------------------
     const core::matrix4 &getInvProjMatrix() const { return m_InvProjMatrix; }
     // ------------------------------------------------------------------------
-    void genProjViewMatrix() 
+    void genProjViewMatrix()
     {
-        m_ProjViewMatrix = m_ProjMatrix * m_ViewMatrix; 
-        m_InvProjViewMatrix = m_ProjViewMatrix; 
-        m_InvProjViewMatrix.makeInverse(); 
+        m_ProjViewMatrix = m_ProjMatrix * m_ViewMatrix;
+        m_InvProjViewMatrix = m_ProjViewMatrix;
+        m_InvProjViewMatrix.makeInverse();
     }
     // ------------------------------------------------------------------------
     const core::matrix4 &getProjViewMatrix() const { return m_ProjViewMatrix; }
     // ------------------------------------------------------------------------
-    const core::matrix4 &getInvProjViewMatrix() const 
+    const core::matrix4 &getInvProjViewMatrix() const
     {
         return m_InvProjViewMatrix;
     }
@@ -462,7 +462,7 @@ public:
     }
     // ------------------------------------------------------------------------
     const core::dimension2du getActualScreenSize() const
-    { 
+    {
         return m_actual_screen_size;
     }
     // ------------------------------------------------------------------------

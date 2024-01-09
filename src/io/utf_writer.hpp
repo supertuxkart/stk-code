@@ -56,7 +56,7 @@ public:
             m_base.write((char *)txt, strlen(txt));
             return *this;
         }
-            
+
     }   // operator<<(char*)
     // ------------------------------------------------------------------------
     UTFWriter& operator<< (const std::string &txt)

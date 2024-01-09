@@ -62,9 +62,9 @@ class CStdStringFactory : public asIStringFactory
 {
 public:
     CStdStringFactory() {}
-    ~CStdStringFactory() 
+    ~CStdStringFactory()
     {
-        // The script engine must release each string 
+        // The script engine must release each string
         // constant that it has requested
         if (!stringCache.empty())
         {

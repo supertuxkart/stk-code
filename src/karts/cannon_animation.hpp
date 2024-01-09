@@ -77,7 +77,7 @@ private:
      *  start line. */
     float m_start_line_length;
 
-    /** Length of the (adjusted, i.e. taking kart width into account) 
+    /** Length of the (adjusted, i.e. taking kart width into account)
      *  end line. */
     float m_end_line_length;
 

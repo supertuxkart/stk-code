@@ -30,22 +30,22 @@
 
 void FixedPipelineRenderer::onLoadWorld()
 {
-    
+
 }
 
 void FixedPipelineRenderer::onUnloadWorld()
 {
-    
+
 }
 
 void FixedPipelineRenderer::render(float dt, bool is_loading)
-{    
+{
     World *world = World::getWorld(); // Never NULL.
 
-    irr_driver->getVideoDriver()->beginScene(/*backBuffer clear*/ true, 
+    irr_driver->getVideoDriver()->beginScene(/*backBuffer clear*/ true,
                                              /*zBuffer*/ true,
                                              irr_driver->getClearColor());
-    
+
     irr_driver->getVideoDriver()->enableMaterial2D();
 
     RaceGUIBase *rg = world->getRaceGUI();
@@ -114,7 +114,7 @@ void FixedPipelineRenderer::render(float dt, bool is_loading)
 #endif
 
     irr_driver->getVideoDriver()->endScene();
-    
+
 }
 
 std::unique_ptr<RenderTarget> FixedPipelineRenderer::createRenderTarget(const irr::core::dimension2du &dimension,

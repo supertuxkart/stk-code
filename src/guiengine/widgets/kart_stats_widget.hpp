@@ -61,7 +61,7 @@ namespace GUIEngine
          * if/how much space must be added to the raw label's size for the widget to be large enough */
         virtual int getHeightNeededAroundLabel() const { return 4; }
 
-        /** widget coordinates 
+        /** widget coordinates
             These are not the actual coordinates of any of the skill bars
             but only (badly named) intermediate values*/
         int m_skill_bar_x, m_skill_bar_y, m_skill_bar_h, m_skill_bar_w;
