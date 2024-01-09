@@ -175,4 +175,7 @@
     <achievement id="12" name="Beyond Luck" description="Win 10 single races in a row in Expert or SuperTux against at least 5 AIs. Beware, restarting a race counts as a loss.">
         <goal type="cons-won-races-hard" value="10"/>
     </achievement>
+     <achievement id="13" name="Cowabunga!" description="Hit 20 or more karts with a bowling-ball.">
+        <goal type="bowling-hit" value="20"/>
+    </achievement>
 </achievements>
