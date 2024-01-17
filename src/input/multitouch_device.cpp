@@ -266,7 +266,7 @@ void MultitouchDevice::updateDeviceState(unsigned int event_id)
             if (button == NULL)
                 return false;
             return button->type >= BUTTON_FIRE &&
-                button->type <= BUTTON_RESCUE;
+                button->type <= BUTTON_LOOK_BACKWARDS;
         };
 
     const MultitouchEvent& event = m_events[event_id];
