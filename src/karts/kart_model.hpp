@@ -298,7 +298,7 @@ private:
     void  loadNitroEmitterInfo(const XMLNode &node,
                         const std::string &emitter_name, int index);
 
-    void  loadSpeedWeightedInfo(const XMLNode* speed_weighted_node);
+    void  loadSpeedWeightedInfo(const XMLNode* speed_weighted_node, int index);
 
     void  loadHeadlights(const XMLNode &node);
 
