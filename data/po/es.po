@@ -1,7 +1,7 @@
 # SOME DESCRIPTIVE TITLE.
 # Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
 # This file is distributed under the same license as the supertuxkart package.
-# 
+#
 # Translators:
 # Benau, 2018
 # Benau, 2018
@@ -2690,7 +2690,7 @@ msgstr "¿Qué pasa, pequeños hippies? ¿Vuestro gran líder Gnu ha desaparecid
 #. I18N: Cutscene subtitle from ../stk-assets/tracks/introcutscene2/scene.xml
 #. I18N: ../stk-assets/tracks/introcutscene2/scene.xml
 msgid "Oh yes, see, he's in my castle now and will be served for supper..."
-msgstr "¡Oh,sí! Ahora está en mi castillo, y será servido como cena..."
+msgstr "¡Oh, sí! Ahora está en mi castillo, y será servido como cena..."
 
 #. I18N: Cutscene subtitle from ../stk-assets/tracks/introcutscene2/scene.xml
 #. I18N: ../stk-assets/tracks/introcutscene2/scene.xml
