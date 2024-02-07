@@ -460,28 +460,18 @@ bool SocketAddress::isLoopback() const
     else if (m_family == AF_INET6)
     {
         sockaddr_in6* in6 = (sockaddr_in6*)m_sockaddr.data();
-        uint8_t w0 = in6->sin6_addr.s6_addr[0];
-        uint8_t w1 = in6->sin6_addr.s6_addr[1];
-        uint8_t w2 = in6->sin6_addr.s6_addr[2];
-        uint8_t w3 = in6->sin6_addr.s6_addr[3];
-        uint8_t w4 = in6->sin6_addr.s6_addr[4];
-        uint8_t w5 = in6->sin6_addr.s6_addr[5];
-        uint8_t w6 = in6->sin6_addr.s6_addr[6];
-        uint8_t w7 = in6->sin6_addr.s6_addr[7];
-        uint8_t w8 = in6->sin6_addr.s6_addr[8];
-        uint8_t w9 = in6->sin6_addr.s6_addr[9];
-        uint8_t w10 = in6->sin6_addr.s6_addr[10];
-        uint8_t w11 = in6->sin6_addr.s6_addr[11];
-        uint8_t w12 = in6->sin6_addr.s6_addr[12];
-        uint8_t w13 = in6->sin6_addr.s6_addr[13];
-        uint8_t w14 = in6->sin6_addr.s6_addr[14];
-        uint8_t w15 = in6->sin6_addr.s6_addr[15];
-        if (w0 == 0 && w1 == 0 && w2 == 0 && w3 == 0 && w4 == 0 &&
-            w5 == 0 && w6 == 0 && w7 == 0 && w8 == 0 && w9 == 0 &&
-            w10 == 0 && w11 == 0 && w12 == 0 && w13 == 0 && w14 == 0
-            && w15 == 1)
+        for (int i = 0; i < 15; i++)
         {
-            // ::1/128 Loopback
+            uint8_t w_i = in6->sin6_addr.s6_addr[i];
+            if (w_i != 0)
+            {
+                return false;
+            }
+        } // for  (int i = 0; i < 15; i++)
+        // ::1/128 Loopback
+        uint8_t w15 = in6->sin6_addr.s6_addr[15];
+        if (w15 == 1)
+        {
             return true;
         }
     }
