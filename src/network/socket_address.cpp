@@ -460,15 +460,18 @@ bool SocketAddress::isLoopback() const
     else if (m_family == AF_INET6)
     {
         sockaddr_in6* in6 = (sockaddr_in6*)m_sockaddr.data();
-        for (int i = 0; i < 15; ++i) {
-            uint8_t wi = in6->sin6_addr.s6_addr[i];
-            if (wi != 0) {
+        for (int i = 0; i < 15; i++)
+        {
+            uint8_t w_i = in6->sin6_addr.s6_addr[i];
+            if (w_i != 0)
+            {
                 return false;
             }
-        }
+        } // for  (int i = 0; i < 15; i++)
         // ::1/128 Loopback
         uint8_t w15 = in6->sin6_addr.s6_addr[15];
-        if (w15 == 1) {
+        if (w15 == 1)
+        {
             return true;
         }
     }
