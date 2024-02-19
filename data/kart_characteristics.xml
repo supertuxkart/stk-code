@@ -97,7 +97,7 @@
                 gear.
           -->
         <engine power="975" max-speed="27.75" generic-max-speed="27.75" brake-factor="36"
-                time-full-brake="0.35" max-speed-reverse-ratio="0.55" />
+                time-full-brake="0.35" max-speed-reverse-ratio="0.48" />
 
         <!-- Simulated gears
             switch-ratio defines at what ratio of the maximum
@@ -369,7 +369,7 @@
     <difficulties>
         <characteristic name="easy">
             <engine power="*0.75" max-speed="*0.6" generic-max-speed="*0.6" 
-                    max-speed-reverse-ratio="0.75"/>
+                    max-speed-reverse-ratio="0.65"/>
             <zipper max-speed-increase="*0.6" />
             <rescue duration="*1.2" />
             <nitro engine-force="*0.8" max-speed-increase="*0.7" />
@@ -379,7 +379,7 @@
         </characteristic>
         <characteristic name="casual">
             <engine power="*0.82" max-speed="*0.75" generic-max-speed="*0.75"
-                    max-speed-reverse-ratio="0.675"/>
+                    max-speed-reverse-ratio="0.6"/>
             <zipper max-speed-increase="*0.8" />
             <rescue duration="*1.2" />
             <nitro engine-force="*0.83" max-speed-increase="*0.78" />
@@ -389,7 +389,7 @@
         </characteristic>
         <characteristic name="medium">
             <engine power="*0.88" max-speed="*0.85" generic-max-speed="*0.85"
-                    max-speed-reverse-ratio="0.625"/>
+                    max-speed-reverse-ratio="0.55"/>
             <rescue duration="*1.2" />
             <nitro engine-force="*0.88" max-speed-increase="*0.85" />
             <skid bonus-speed="*0.85 *0.85 *0.85" bonus-force="*0.85 *0.85 *0.85" />
@@ -397,7 +397,7 @@
         </characteristic>
         <characteristic name="hard">
             <engine power="*0.95" max-speed="*0.95" generic-max-speed="*0.95" 
-                    max-speed-reverse-ratio="0.575"/>
+                    max-speed-reverse-ratio="0.5"/>
             <nitro engine-force="*0.95" max-speed-increase="*0.95" />
             <skid bonus-speed="*0.95 *0.95 *0.95" bonus-force="*0.95 *0.95 *0.95" />
         </characteristic>
@@ -409,8 +409,9 @@
     <!-- The different kart types, that can be specified in the kart.xml file -->
     <kart-types>
         <characteristic name="light">
-            <turn radius="0:2.5 5:4 12:8 20:14 30:22 50:38.5" />
-            <engine power="*0.8" max-speed="*0.896" />
+            <turn radius="0:2.5 5:3.6 12:7.5 20:13.6 30:21.8 50:38.2" />
+            <engine power="*0.8" max-speed="*0.896"
+                    max-speed-reverse-ratio="*1.15" />
             <gear switch-ratio="0.1 0.25 0.45 0.7 1.0 4.0"
                   power-increase="2.95 2.42 1.99 1.56 1.28 1.0" />
             <mass value="*0.6" />
@@ -423,8 +424,9 @@
             <parachute lbound-fraction="0.35" ubound-fraction="0.2" />
         </characteristic>
         <characteristic name="medium-h">
-            <turn radius="0:2.975 5:4.6 12:9 20:15.4 30:23.8 50:41.2" />
-            <engine power="*0.875" max-speed="*0.927" />
+            <turn radius="0:2.875 5:4.068 12:8.4375 20:14.96 30:23.653 50:40.874" />
+            <engine power="*0.875" max-speed="*0.927"
+                    max-speed-reverse-ratio="*1.075"/>
             <gear switch-ratio="0.1 0.25 0.45 0.7 1 4"
                   power-increase="2.5 2.08 1.76 1.44 1.22 1" />
             <mass value="*0.75" />
@@ -437,8 +439,9 @@
             <parachute lbound-fraction="0.45" ubound-fraction="0.275" />
         </characteristic>
         <characteristic name="medium">
-            <turn radius="0:2.975 5:4.76 12:9.52 20:16.66 30:26.18 50:45.815" />
-            <engine power="*0.875" max-speed="*0.948" />
+            <turn radius="0:2.875 5:4.176 12:8.775 20:16.184 30:25.942 50:45.458" />
+            <engine power="*0.875" max-speed="*0.948"
+                    max-speed-reverse-ratio="*1.05"/>
             <gear switch-ratio="0.1 0.25 0.45 0.7 1 4"
                   power-increase="2.5 2.08 1.76 1.44 1.22 1" />
             <mass value="*0.75" />
@@ -450,8 +453,9 @@
             <parachute lbound-fraction="0.45" ubound-fraction="0.275" />
         </characteristic>
         <characteristic name="heavy">
-            <turn radius="0:3.35 5:5.36 12:10.72 20:18.76 30:29.48 50:51.59" />
-            <engine power="*1" max-speed="*1" />
+            <turn radius="0:3.15 5:4.608 12:9.75 20:18.224 30:29.212 50:51.188" />
+            <engine power="*1" max-speed="*1"
+                    max-speed-reverse-ratio="*1" />
             <gear switch-ratio="0.1 0.25 0.45 0.7 1 4"
                   power-increase="2.05 1.74 1.53 1.32 1.16 1" />
             <mass value="*1" />
