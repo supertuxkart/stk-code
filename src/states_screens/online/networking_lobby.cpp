@@ -891,6 +891,8 @@ void NetworkingLobby::tearDown()
     m_player_list = NULL;
     m_joined_server.reset();
     m_header_text = _("Lobby");
+    if (m_header)
+        m_header->setText(m_header_text, true);
     m_header_text_width = 0;
     // Server has a dummy network lobby too
     if (!NetworkConfig::get()->isClient())
