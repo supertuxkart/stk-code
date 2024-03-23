@@ -32,9 +32,9 @@ public:
                   "New network player controller.");
     }   // NetworkPlayerController
     // ------------------------------------------------------------------------
-    virtual ~NetworkPlayerController()
-    {
-    }   // ~NetworkPlayerController
+    virtual ~NetworkPlayerController(){
+    
+    } // ~NetworkPlayerController
     // ------------------------------------------------------------------------
     virtual bool canGetAchievements() const OVERRIDE          { return false; }
     // ------------------------------------------------------------------------

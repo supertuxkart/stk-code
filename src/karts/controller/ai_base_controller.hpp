@@ -21,10 +21,19 @@
 
 #include "karts/controller/controller.hpp"
 #include "utils/cpp2011.hpp"
+#include "audio/sfx_base.hpp"
 
 class AIProperties;
 class Track;
 class Vec3;
+class SFXBuffer;
+class SFXBase; 
+// SFXBase is required to properly play the zipper sound.
+// There should be a better way to do this after restructuring
+// the class hierarchy. Currently handleZipper() is duplicated
+// and separately overriden for AIBaseController and
+// PlayerController
+
 
 /** A base class for all AI karts. This class basically provides some
  *  common low level functions.
@@ -41,6 +50,8 @@ private:
     /** A flag that is set during the physics processing to indicate that
     *  this kart is stuck and needs to be rescued. */
     bool m_stuck;
+
+    SFXBase     *m_wee_sound;
 
 protected:
     bool m_enabled_network_ai;
@@ -83,7 +94,7 @@ protected:
 
 public:
              AIBaseController(AbstractKart *kart);
-    virtual ~AIBaseController() {};
+    virtual ~AIBaseController();
     virtual void reset() OVERRIDE;
     virtual bool disableSlipstreamBonus() const OVERRIDE;
     virtual void crashed(const Material *m) OVERRIDE;
@@ -91,7 +102,7 @@ public:
     static  void setTestAI(int n) {m_test_ai = n; }
     static  int  getTestAI() { return m_test_ai; }
     virtual void crashed(const AbstractKart *k) OVERRIDE {};
-    virtual void handleZipper(bool play_sound) OVERRIDE {};
+    virtual void handleZipper(bool play_sound) OVERRIDE;
     virtual void finishedRace(float time) OVERRIDE {};
     virtual void collectedItem(const ItemState &item,
                                float previous_energy=0) OVERRIDE {};

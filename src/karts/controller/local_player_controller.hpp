@@ -26,7 +26,6 @@
 
 class AbstractKart;
 class ParticleEmitter;
-class SFXBase;
 class SFXBuffer;
 class btTransform;
 
@@ -56,7 +55,6 @@ private:
 
     HandicapLevel m_handicap;
 
-    SFXBase     *m_wee_sound;
     SFXBuffer   *m_bzzt_sound;
     SFXBuffer   *m_ugh_sound;
     SFXBuffer   *m_grab_sound;
