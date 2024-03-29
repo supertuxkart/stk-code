@@ -148,7 +148,24 @@ void DrawCalls::parseSceneManager(core::array<scene::ISceneNode*> &List,
         if (List[i]->getType() == ESNT_LOD_NODE)
         {
             LODNode *node = static_cast<LODNode *>(List[i]);
-            node->updateVisibility();
+            bool shown = false;
+
+            node->updateVisibility(&shown);
+            node->updateAbsolutePosition();
+
+            if (node->isVisible())
+            {
+                core::array<scene::ISceneNode*> child;
+                if (shown)
+                    child.push_back(node->getAllNodes()[node->getLevel()]);
+                for (int i = 0; i < node->getChildren().size(); i++)
+                {
+                    if (node->getNodesSet().find(node->getChildren()[i]) == node->getNodesSet().end())
+                        child.push_back(node->getChildren()[i]);
+                }
+                parseSceneManager(child, cam);
+            }
+            continue;
         }
 
         List[i]->updateAbsolutePosition();
@@ -159,29 +176,25 @@ void DrawCalls::parseSceneManager(core::array<scene::ISceneNode*> &List,
         {
             SP::SPMeshNode* node = static_cast<SP::SPMeshNode*>(List[i]);
             SP::addObject(node);
+            parseSceneManager(node->getChildren(), cam);
         }
         else if (STKParticle *node = dynamic_cast<STKParticle*>(List[i]))
         {
             if (!isCulledPrecise(cam, List[i], irr_driver->getBoundingBoxesViz()))
                 CPUParticleManager::getInstance()->addParticleNode(node);
-            continue;
         }
         else if (scene::IBillboardSceneNode *node =
             dynamic_cast<scene::IBillboardSceneNode*>(List[i]))
         {
             if (!isCulledPrecise(cam, List[i]))
                 CPUParticleManager::getInstance()->addBillboardNode(node);
-            continue;
         }
         else if (STKTextBillboard *tb =
             dynamic_cast<STKTextBillboard*>(List[i]))
         {
             if (!isCulledPrecise(cam, List[i], irr_driver->getBoundingBoxesViz()))
                 TextBillboardDrawer::addTextBillboard(tb);
-            continue;
         }
-
-        parseSceneManager(List[i]->getChildren(), cam);
     }
 }
 

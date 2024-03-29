@@ -168,14 +168,13 @@ void LODNode::updateVisibility(bool* shown)
     {
         m_nodes[i]->setVisible(i == level);
         if (i == level && shown != NULL)
-            *shown = (i > 0);
+            *shown = true;
     }
 }
 
 void LODNode::OnRegisterSceneNode()
 {
-    bool shown = false;
-    updateVisibility(&shown);
+    updateVisibility();
 
 #ifndef SERVER_ONLY
     if (CVS->isGLSL())

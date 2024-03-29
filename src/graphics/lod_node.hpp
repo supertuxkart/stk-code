@@ -115,6 +115,7 @@ public:
     }
 
     std::vector<scene::ISceneNode*>& getAllNodes() { return m_nodes; }
+    std::set<scene::ISceneNode*>& getNodesSet() { return m_nodes_set; }
 
     //! OnAnimate() is called just before rendering the whole scene.
     /** This method will be called once per frame, independent
