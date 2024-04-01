@@ -330,6 +330,9 @@ private:
                                   const irr::core::stringw& online_name,
                                   const std::string& country_code);
     bool handleAllVotes(PeerVote* winner, uint32_t* winner_peer_id);
+    template<typename T>
+    void findMajorityValue(const std::map<T, unsigned>& choices, unsigned cur_players,
+                           T* best_choice, float* rate);
     void getRankingForPlayer(std::shared_ptr<NetworkPlayerProfile> p);
     void submitRankingsToAddons();
     void computeNewRankings();
