@@ -4362,13 +4362,14 @@ bool ServerLobby::handleAllVotes(PeerVote* winner_vote,
             Log::warn("ServerLobby",
                 "Missing track %s from majority.", top_track.c_str());
             it = m_peers_votes.begin();
-            return false;
+            if (!isVotingOver())
+                return false;
         }
         *winner_peer_id = it->first;
         *winner_vote = it->second;
         return true;
     }
-    else if (isVotingOver())
+    if (isVotingOver())
     {
         // Pick the best lap (or soccer goal / time) from only the top track
         // if no majority agreement from all
