@@ -4358,9 +4358,11 @@ bool ServerLobby::handleAllVotes(PeerVote* winner_vote,
         }
         if (it == m_peers_votes.end())
         {
+            // Don't end if no vote matches all majority choices
             Log::warn("ServerLobby",
                 "Missing track %s from majority.", top_track.c_str());
             it = m_peers_votes.begin();
+            return false;
         }
         *winner_peer_id = it->first;
         *winner_vote = it->second;
