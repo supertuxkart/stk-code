@@ -32,6 +32,7 @@ option(USE_SYSTEM_ENET "Use system ENet instead of the built-in version, when av
 CMAKE_DEPENDENT_OPTION(USE_IPV6 "Allow create or connect to game server with IPv6 address, system enet will not be used." ON
   "NOT USE_SWITCH" OFF)
 option(USE_SYSTEM_WIIUSE "Use system WiiUse instead of the built-in version, when available." OFF)
+option(USE_SYSTEM_BULLET "Use system Bullet instead if the built-in version, when available." OFF)
 option(USE_SQLITE3 "Use sqlite to manage server stats and ban list." ON)
 
 if(APPLE)
@@ -207,9 +208,18 @@ if(UNIX AND NOT APPLE AND NOT ${CMAKE_SYSTEM_NAME} MATCHES "SunOS")
     endif()
 endif()
 
-# Build the Bullet physics library
-add_subdirectory("${PROJECT_SOURCE_DIR}/lib/bullet")
-include_directories(BEFORE "${PROJECT_SOURCE_DIR}/lib/bullet/src")
+if(USE_SYSTEM_BULLET)
+    find_package(Bullet)
+    if(BULLET_FOUND)
+        include_directories(${BULLET_INCLUDE_DIRS})
+    else()
+        message(FATAL_ERROR "Bullet not found. ")
+    endif()
+else()
+    # Build the Bullet physics library
+    add_subdirectory("${PROJECT_SOURCE_DIR}/lib/bullet")
+    include_directories(BEFORE "${PROJECT_SOURCE_DIR}/lib/bullet/src")
+endif()
 
 # Build the DNS C library
 if(USE_DNS_C)
