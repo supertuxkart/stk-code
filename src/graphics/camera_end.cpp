@@ -73,7 +73,7 @@ void CameraEnd::clearEndCameras()
 //-----------------------------------------------------------------------------
 /** Reads the information about the end camera. This information is shared
  *  between all cameras, so this is a static function.
- *  \param node The XML node containing all end camera informations
+ *  \param node The XML node containing all end camera information
  */
 void CameraEnd::readEndCamera(const XMLNode &root)
 {
