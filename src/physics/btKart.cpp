@@ -493,6 +493,9 @@ void btKart::updateVehicle( btScalar step )
         // Excessive downward impulse at high speeds is harmful
         if (f1 > 35.0f)
             f1 = 35.0f;
+        // Normalize for mass, to avoid heavier karts jumping easier
+        // than lighter karts (#5051)
+        f1 = f1 * m_kart->getKartProperties()->getMass() / 300;
         // Adjust the impulse force for the time step,
         // to prevent changes to physics FPS from breaking things.
         // An increase in impulse frequency is almost equivalent to
