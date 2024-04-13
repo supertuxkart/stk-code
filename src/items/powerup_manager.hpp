@@ -20,13 +20,13 @@
 #define HEADER_POWERUPMANAGER_HPP
 
 #undef ITEM_DISTRIBUTION_DEBUG
-#define REPEAT_WEIGHTS 3
-#define BUCKETS_PER_WEIGHT_LIST 9
+#define REPEAT_WEIGHTS 2
+#define BUCKETS_PER_WEIGHT_LIST 12
 /** The maximum supported number of buckets is 32,
  * additional buckets will not be set in the bitmask */
 #define BUCKET_COUNT (REPEAT_WEIGHTS * BUCKETS_PER_WEIGHT_LIST)
 /** A kart will remember at most the last MAX_BUCKETS */
-#define MAX_BUCKETS 15
+#define MAX_BUCKETS 13
 
 #include "utils/leak_check.hpp"
 #include "utils/no_copy.hpp"
