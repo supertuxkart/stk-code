@@ -205,6 +205,24 @@
               double  ="  0      0    35     0        0       0       0     0      0     0      0     0    0"
               triple  ="  0      0    30     0        0       0       0     0      0     0      0     0    0" />
     </weights>
+    <weights num-karts="3">
+      <!--            bubble   cake  bowl zipper  plunger  switch swattr rubber  para  sudo electro mini anvil -->
+      <weight single  =" 97     68   183    43      212      68     152     0      0    80      0    97    0"
+              double  ="  0      0     0     0        0       0       0     0      0     0      0     0    0"
+              triple  ="  0      0     0     0        0       0       0     0      0     0      0     0    0" />
+      <weight single  ="110     85   200    90      130      58     120     0      0    75      0   122    0"
+              double  ="  0      0    10     0        0       0       0     0      0     0      0     0    0"
+              triple  ="  0      0     0     0        0       0       0     0      0     0      0     0    0" />
+      <weight single  ="118     70   190   122      113      50     110     0      0    70     36    96    0"
+              double  ="  0      0    25     0        0       0       0     0      0     0      0     0    0"
+              triple  ="  0      0     0     0        0       0       0     0      0     0      0     0    0" />
+      <weight single  ="132     67   145   175       85      45      95     0      0    65     80    60    0"
+              double  ="  0      0    22    10        0       0       0     0      0     0      0     0    0"
+              triple  ="  0      0    10     0        9       0       0     0      0     0      0     0    0" />
+      <weight single  ="120     35    70   235       45      37      50     0      0    60    140    60    0"
+              double  ="  0      0    35    40        0       0       0     0      0     0      0     0    0"
+              triple  =" 30      0    25     0       18       0       0     0      0     0      0     0    0" />
+    </weights>
     <weights num-karts="5">
       <!--            bubble   cake  bowl zipper  plunger  switch swattr rubber  para  sudo electro mini anvil -->
       <weight single  =" 95     75   190    35      215      60     155     0      0    80      0    95    0"
@@ -213,15 +231,15 @@
       <weight single  ="110     95   200    90      130      45     120     0      0    75      0   125    0"
               double  ="  0      0    10     0        0       0       0     0      0     0      0     0    0"
               triple  ="  0      0     0     0        0       0       0     0      0     0      0     0    0" />
-      <weight single  ="115     90   175   120      113      36     110    25      0    70     36    80    0"
+      <weight single  ="116     90   180   124      114      36     110     0      0    70     40    90    0"
               double  ="  0      0    30     0        0       0       0     0      0     0      0     0    0"
               triple  ="  0      0     0     0        0       0       0     0      0     0      0     0    0" />
-      <weight single  ="120     75   120   140       70      30      85    70     30    65     90    30    0"
+      <weight single  ="120     75   120   155       70      30      85    50     30    65     90    35    0"
               double  ="  0      0    25    20        0       0       0     0      0     0      0     0    0"
               triple  ="  0      0    15     0       15       0       0     0      0     0      0     0    0" />
-      <weight single  =" 95     40    40   115        0      24       0    60     80    60    160     0    0"
-              double  ="  0      0    35   125        0       0       0     0      0     0      0     0    0"
-              triple  =" 60      0    35    45       26       0       0     0      0     0      0     0    0" />
+      <weight single  =" 95     40    40   115        0      24       0    80     80    60    160     0    0"
+              double  ="  0      0    35   120        0       0       0     0      0     0      0     0    0"
+              triple  =" 60      0    35    30       26       0       0     0      0     0      0     0    0" />
     </weights>
     <weights num-karts="9">
       <!--            bubble   cake  bowl zipper  plunger  switch swattr rubber  para  sudo electro mini anvil -->
