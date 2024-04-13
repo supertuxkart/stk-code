@@ -34,7 +34,7 @@
                 http://bulletphysics.org/Bullet/phpBB3/viewtopic.php?f=9&t=7369\&p=25236&hilit=vehicle#p25236
                 for details.
             max-force: Maximum suspension force -->
-        <suspension stiffness="280" rest="0.3" travel="0.29"
+        <suspension stiffness="450" rest="0.3" travel="0.29"
             exp-spring-response="false" max-force="32000" />
 
         <!-- Values related to stability of the chassis: damping, and reduced
@@ -409,6 +409,7 @@
     <!-- The different kart types, that can be specified in the kart.xml file -->
     <kart-types>
         <characteristic name="light">
+            <suspension stiffness="*0.6" />
             <turn radius="0:2.5 5:3.6 12:7.5 20:13.6 30:21.8 50:38.2" />
             <engine power="*0.8" max-speed="*0.896"
                     max-speed-reverse-ratio="*1.15" />
@@ -424,6 +425,7 @@
             <parachute lbound-fraction="0.35" ubound-fraction="0.2" />
         </characteristic>
         <characteristic name="medium-h">
+            <suspension stiffness="*0.75" />
             <turn radius="0:2.875 5:4.068 12:8.4375 20:14.96 30:23.653 50:40.874" />
             <engine power="*0.875" max-speed="*0.927"
                     max-speed-reverse-ratio="*1.075"/>
@@ -439,6 +441,7 @@
             <parachute lbound-fraction="0.45" ubound-fraction="0.275" />
         </characteristic>
         <characteristic name="medium">
+            <suspension stiffness="*0.75" />
             <turn radius="0:2.875 5:4.176 12:8.775 20:16.184 30:25.942 50:45.458" />
             <engine power="*0.875" max-speed="*0.948"
                     max-speed-reverse-ratio="*1.05"/>
@@ -453,6 +456,7 @@
             <parachute lbound-fraction="0.45" ubound-fraction="0.275" />
         </characteristic>
         <characteristic name="heavy">
+            <suspension stiffness="*1" />
             <turn radius="0:3.15 5:4.608 12:9.75 20:18.224 30:29.212 50:51.188" />
             <engine power="*1" max-speed="*1"
                     max-speed-reverse-ratio="*1" />
