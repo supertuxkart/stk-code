@@ -194,25 +194,33 @@ void LODNode::OnRegisterSceneNode()
     scene::ISceneNode::OnRegisterSceneNode();
 }
 
-
+/* Each model with LoD has specific distances beyond which it is rendered at a lower 
+* detail level. This function compute the distances associated with the various
+* LoD levels for a given model.
+* @param scale The model's scale*/
 void LODNode::autoComputeLevel(float scale)
 {
     m_area *= scale;
 
     // Amount of details based on user's input
     float agressivity = 1.0;
-    if(UserConfigParams::m_geometry_level == 0) agressivity = 1.25;
-    if(UserConfigParams::m_geometry_level == 1) agressivity = 1.0;
-    if(UserConfigParams::m_geometry_level == 2) agressivity = 0.75;
+    if(     UserConfigParams::m_geometry_level == 0) agressivity = 1.25;
+    else if(UserConfigParams::m_geometry_level == 1) agressivity = 1.0;
+    else if(UserConfigParams::m_geometry_level == 2) agressivity = 0.75;
+    else if(UserConfigParams::m_geometry_level == 3) agressivity = 1.6;
+    else if(UserConfigParams::m_geometry_level == 4) agressivity = 2.0;
+    else if(UserConfigParams::m_geometry_level == 5) agressivity = 3.0;
 
     // First we try to estimate how far away we need to draw
-    float max_draw = 0.0;
-    max_draw = sqrtf((0.5 * m_area + 10) * 200) - 10;
+    // This first formula is equivalent to the one used up to STK 1.4
+    float max_draw = 10*(sqrtf(m_area + 20) - 1);
     // If the draw distance is too big we artificially reduce it
+    // The formulas are still experimental and improvable.
     if(max_draw > 250)
-    {
-        max_draw = 250 + (max_draw * 0.06);
-    }
+        max_draw = 230 + (max_draw * 0.08);
+    // This effecte is cumulative
+    if (max_draw > 500)
+        max_draw = 200 + (max_draw * 0.6);
 
     max_draw *= agressivity;
 
