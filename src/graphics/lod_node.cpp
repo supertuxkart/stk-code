@@ -49,13 +49,8 @@ LODNode::LODNode(std::string group_name, scene::ISceneNode* parent,
 
     m_forced_lod = -1;
     m_area = 0;
-#ifndef SERVER_ONLY
-    if (!CVS->isGLSL())
-    {
-        m_current_level.reset(new int);
-        *m_current_level = -1;
-    }
-#endif
+    m_current_level = -1;
+    m_current_level_dirty = true;
 }
 
 LODNode::~LODNode()
@@ -76,8 +71,12 @@ int LODNode::getLevel()
         return -1;
 
     // If a level is forced, use it
-    if(m_forced_lod>-1)
+    if (m_forced_lod >- 1)
         return m_forced_lod;
+    
+    if (!m_current_level_dirty)
+        return m_current_level;
+    m_current_level_dirty = false;
 
     Camera* camera = Camera::getActiveCamera();
     if (camera == NULL)
@@ -90,9 +89,12 @@ int LODNode::getLevel()
     for (unsigned int n=0; n<m_detail.size(); n++)
     {
         if (dist < m_detail[n])
+        {
+            m_current_level = n;
             return n;
+        }
     }
-
+    m_current_level = -1;
     return -1;
 }  // getLevel
 
@@ -108,6 +110,8 @@ void LODNode::forceLevelOfDetail(int n)
 // ----------------------------------------------------------------------------
 void LODNode::OnAnimate(u32 timeMs)
 {
+    updateVisibility();
+
     if (isVisible() && m_nodes.size() > 0)
     {
         // update absolute position
@@ -126,9 +130,8 @@ void LODNode::OnAnimate(u32 timeMs)
 #endif
         {
             int level = getLevel();
-            *m_current_level = level;
             // Assume all the scene node have the same bouding box
-            if(level>=0)
+            if(level >= 0)
             {
                 m_nodes[level]->setVisible(true);
                 m_nodes[level]->OnAnimate(timeMs);
@@ -154,29 +157,22 @@ void LODNode::OnAnimate(u32 timeMs)
     }
 }
 
-void LODNode::updateVisibility(bool* shown)
+void LODNode::updateVisibility()
 {
     if (!isVisible()) return;
     if (m_nodes.size() == 0) return;
 
-    unsigned int level = 0;
-    if (m_current_level)
-        level = *m_current_level;
-    else
-        level = getLevel();
+    m_current_level_dirty = true;
+    unsigned int level = getLevel();
+
     for (size_t i = 0; i < m_nodes.size(); i++)
     {
         m_nodes[i]->setVisible(i == level);
-        if (i == level && shown != NULL)
-            *shown = (i > 0);
     }
 }
 
 void LODNode::OnRegisterSceneNode()
 {
-    bool shown = false;
-    updateVisibility(&shown);
-
 #ifndef SERVER_ONLY
     if (CVS->isGLSL())
     {
@@ -184,14 +180,20 @@ void LODNode::OnRegisterSceneNode()
     }
 #endif
 
-#ifndef SERVER_ONLY
-    if (!CVS->isGLSL())
+    if (isVisible() && m_nodes.size() > 0)
     {
-        for (unsigned i = 0; i < Children.size(); ++i)
-            Children[i]->updateAbsolutePosition();
+        int level = getLevel();
+        
+        if (level >= 0)
+        {
+            m_nodes[level]->OnRegisterSceneNode();
+        }
+        for (int i = 0; i < Children.size(); i++)
+        {
+            if (m_nodes_set.find(Children[i]) == m_nodes_set.end())
+                Children[i]->OnRegisterSceneNode();
+        }
     }
-#endif
-    scene::ISceneNode::OnRegisterSceneNode();
 }
 
 /* Each model with LoD has specific distances beyond which it is rendered at a lower 
