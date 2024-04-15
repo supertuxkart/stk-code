@@ -145,40 +145,32 @@ void DrawCalls::parseSceneManager(core::array<scene::ISceneNode*> &List,
 {
     for (unsigned i = 0; i < List.size(); ++i)
     {
+        if (!List[i]->isVisible())
+            continue;
+
         if (List[i]->getType() == ESNT_LOD_NODE)
         {
             LODNode *node = static_cast<LODNode *>(List[i]);
-            bool shown = false;
 
-            node->updateVisibility(&shown);
-            node->updateAbsolutePosition();
-
-            if (node->isVisible())
+            core::array<scene::ISceneNode*> child;
+            if (node->getLevel() >= 0)
+                child.push_back(node->getAllNodes()[node->getLevel()]);
+            for (int i = 0; i < node->getChildren().size(); i++)
             {
-                core::array<scene::ISceneNode*> child;
-                if (shown)
-                    child.push_back(node->getAllNodes()[node->getLevel()]);
-                for (int i = 0; i < node->getChildren().size(); i++)
-                {
-                    if (node->getNodesSet().find(node->getChildren()[i]) == node->getNodesSet().end())
-                        child.push_back(node->getChildren()[i]);
-                }
-                parseSceneManager(child, cam);
+                if (node->getNodesSet().find(node->getChildren()[i]) == node->getNodesSet().end())
+                    child.push_back(node->getChildren()[i]);
             }
+            parseSceneManager(child, cam);
             continue;
         }
-
-        List[i]->updateAbsolutePosition();
-        if (!List[i]->isVisible())
-            continue;
-        
-        if (List[i]->getType() == ESNT_ANIMATED_MESH)
+        else if (List[i]->getType() == ESNT_ANIMATED_MESH)
         {
             SP::SPMeshNode* node = static_cast<SP::SPMeshNode*>(List[i]);
             SP::addObject(node);
         }
         else if (STKParticle *node = dynamic_cast<STKParticle*>(List[i]))
         {
+            node->updateAbsolutePosition();
             if (!isCulledPrecise(cam, List[i], irr_driver->getBoundingBoxesViz()))
                 CPUParticleManager::getInstance()->addParticleNode(node);
             continue;
@@ -186,6 +178,7 @@ void DrawCalls::parseSceneManager(core::array<scene::ISceneNode*> &List,
         else if (scene::IBillboardSceneNode *node =
             dynamic_cast<scene::IBillboardSceneNode*>(List[i]))
         {
+            node->updateAbsolutePosition();
             if (!isCulledPrecise(cam, List[i]))
                 CPUParticleManager::getInstance()->addBillboardNode(node);
             continue;
@@ -193,6 +186,7 @@ void DrawCalls::parseSceneManager(core::array<scene::ISceneNode*> &List,
         else if (STKTextBillboard *tb =
             dynamic_cast<STKTextBillboard*>(List[i]))
         {
+            node->updateAbsolutePosition();
             if (!isCulledPrecise(cam, List[i], irr_driver->getBoundingBoxesViz()))
                 TextBillboardDrawer::addTextBillboard(tb);
             continue;
