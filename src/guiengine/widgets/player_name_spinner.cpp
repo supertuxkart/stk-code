@@ -27,19 +27,14 @@ using namespace GUIEngine;
 PlayerNameSpinner::PlayerNameSpinner(KartSelectionScreen* parent,
                                      const int player_id)
 {
-    m_player_id       = player_id;
+    m_player_id       = player_id; // m_player_id comes from the inheritance of Widget
+    m_has_player_id   = true;
     m_incorrect       = false;
     m_red_mark_widget = NULL;
     m_parent          = parent;
     setUseBackgroundColor();//except for multiplayer kart selection, this is false
-    setSpinnerWidgetPlayerID(m_player_id);
 }   // PlayerNameSpinner
-// ------------------------------------------------------------------------
-void PlayerNameSpinner::setID(const int m_player_id)
-{
-    PlayerNameSpinner::m_player_id = m_player_id;
-    setSpinnerWidgetPlayerID(m_player_id);
-} // setID
+
 // ------------------------------------------------------------------------
 /** Add a red mark on the spinner to mean "invalid choice" */
 void PlayerNameSpinner::markAsIncorrect()

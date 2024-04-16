@@ -543,7 +543,8 @@ int EventHandler::findIDClosestWidget(const NavigationDirection nav, const int p
         if (w_test == NULL || !Widget::isFocusableId(i) || w == w_test ||
             (!w_test->isVisible()   && ignore_disabled) ||
             (!w_test->isActivated() && ignore_disabled) ||
-            (playerID != PLAYER_ID_GAME_MASTER && !w_test->m_supports_multiplayer))
+            (playerID != PLAYER_ID_GAME_MASTER && !w_test->m_supports_multiplayer) ||
+            (w_test->hasPlayerID() && playerID != w_test->getPlayerID()))
             continue;
 
         // Ignore empty ribbon widgets and lists

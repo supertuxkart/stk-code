@@ -97,7 +97,6 @@ SpinnerWidget::SpinnerWidget(const bool gauge) : Widget(WTYPE_SPINNER)
     m_supports_multiplayer = true;
     m_value = -1;
     m_use_background_color=false;
-    m_spinner_widget_player_id=-1;
     m_min = 0;
     m_max = 999;
     m_step = 1.0;

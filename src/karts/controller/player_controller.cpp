@@ -368,7 +368,7 @@ core::stringw PlayerController::getName(bool include_handicap_string) const
         const RemoteKartInfo& rki = RaceManager::get()->getKartInfo(
             m_kart->getWorldKartId());
         name = rki.getPlayerName();
-        if (include_handicap_string && rki.getHandicap() == HANDICAP_MEDIUM)
+        if (include_handicap_string && rki.getHandicap() != HANDICAP_NONE)
         {
 #ifdef SERVER_ONLY
             name += L" (handicapped)";

@@ -58,8 +58,14 @@ std::string KartProperties::getHandicapAsString(HandicapLevel h)
 {
     switch(h)
     {
-    case HANDICAP_NONE:   return "normal";   break;
-    case HANDICAP_MEDIUM: return "handicap"; break;
+    case HANDICAP_NONE: return "normal";   break;
+    case HANDICAP_4:    return "handicap-4"; break;
+    case HANDICAP_8:    return "handicap-8"; break;
+    case HANDICAP_12:   return "handicap-12"; break;
+    case HANDICAP_16:   return "handicap-16"; break;
+    case HANDICAP_20:   return "handicap-20"; break;
+    case HANDICAP_24:   return "handicap-24"; break;
+
     default:  assert(false);
     }
     return "";

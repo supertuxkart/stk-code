@@ -1598,7 +1598,7 @@ void RaceResultGUI::unload()
             const bool own_goal = !(scorers.at(i).m_correct_goal);
 
             result_text = scorers.at(i).m_player;
-            if (scorers.at(i).m_handicap_level == HANDICAP_MEDIUM)
+            if (scorers.at(i).m_handicap_level != HANDICAP_NONE)
                 result_text = _("%s (handicapped)", result_text);
 
             if (own_goal)
@@ -1660,7 +1660,7 @@ void RaceResultGUI::unload()
             const bool own_goal = !(scorers.at(i).m_correct_goal);
 
             result_text = scorers.at(i).m_player;
-            if (scorers.at(i).m_handicap_level == HANDICAP_MEDIUM)
+            if (scorers.at(i).m_handicap_level != HANDICAP_NONE)
                 result_text = _("%s (handicapped)", result_text);
 
             if (own_goal)

@@ -1330,7 +1330,7 @@ void KartSelectionScreen::allPlayersDone()
         RaceManager::get()->setPlayerKart(n, selected_kart);
 
         // Set handicap if needed
-        if (m_multiplayer && UserConfigParams::m_per_player_difficulty)
+        if (UserConfigParams::m_per_player_difficulty)
             RaceManager::get()->setPlayerHandicap(n, m_kart_widgets[n].getHandicap());
     }
 

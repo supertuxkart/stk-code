@@ -113,7 +113,7 @@ GUIEngine::EventPropagation
             assert(pid < PlayerManager::get()->getNumPlayers());
             PlayerProfile* p = m_available_players[pid];
             const HandicapLevel h = m_handicap->getState() ?
-                HANDICAP_MEDIUM : HANDICAP_NONE;
+                HANDICAP_4 : HANDICAP_NONE;
             if (NetworkConfig::get()->addNetworkPlayer(m_device, p, h))
             {
                 core::stringw name = p->getName();

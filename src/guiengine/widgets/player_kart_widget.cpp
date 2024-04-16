@@ -73,10 +73,40 @@ PlayerKartWidget::PlayerKartWidget(KartSelectionScreen* parent,
     m_player_ident_spinner = NULL;
 
     m_player_ident_spinner = new PlayerNameSpinner(parent, m_player_id);
-    m_player_ident_spinner->m_x = player_name_x;
-    m_player_ident_spinner->m_y = player_name_y;
+    // The positions are defined later, only the dimensions matter here
     m_player_ident_spinner->m_w = player_name_w;
     m_player_ident_spinner->m_h = player_name_h;
+
+    // ---- Handicap spinner
+    if (true) //UserConfigParams::m_per_player_difficulty)
+    {
+        m_handicap_spinner = NULL;
+
+        m_handicap_spinner = new SpinnerWidget(/* gauge */ false);
+        m_handicap_spinner->m_w = player_name_w;
+        m_handicap_spinner->m_h = player_name_h;
+
+        m_handicap_spinner->setPlayerID(m_player_id);
+        m_handicap_spinner->setPlayerIDSupport(true);
+
+        core::stringw label = _("No handicap");
+        m_handicap_spinner->addLabel(label);
+        m_handicap_spinner->setValue(label);
+        // I18N: 'Handicap' indicates that per-player handicaps are
+        //       activated for this kart (i.e. it will drive slower)
+        label = _("Handicap (4%)");
+        m_handicap_spinner->addLabel(label);
+        label = _("Handicap (8%)");
+        m_handicap_spinner->addLabel(label);
+        label = _("Handicap (12%)");
+        m_handicap_spinner->addLabel(label);
+        label = _("Handicap (16%)");
+        m_handicap_spinner->addLabel(label);
+        label = _("Handicap (20%)");
+        m_handicap_spinner->addLabel(label);
+        label = _("Handicap (24%)");
+        m_handicap_spinner->addLabel(label);
+    }
 
     // ---- KartStatsWidget
     m_kart_stats = NULL;
@@ -120,9 +150,9 @@ PlayerKartWidget::PlayerKartWidget(KartSelectionScreen* parent,
         m_player_ident_spinner->m_tab_down_root = g_root_id;
     }
 
-    spinnerID = StringUtils::insertValues("@p%i_spinner", m_player_id);
+    playerSpinnerID = StringUtils::insertValues("@p%i_spinner", m_player_id);
 
-    m_player_ident_spinner->m_properties[PROP_ID] = spinnerID;
+    m_player_ident_spinner->m_properties[PROP_ID] = playerSpinnerID;
     if (parent->m_multiplayer)
     {
         const int player_amount = PlayerManager::get()->getNumPlayers();
@@ -139,6 +169,7 @@ PlayerKartWidget::PlayerKartWidget(KartSelectionScreen* parent,
 
     //m_player_ident_spinner->m_event_handler = this;
     m_children.push_back(m_player_ident_spinner);
+    m_children.push_back(m_handicap_spinner);
 
     // ----- Kart model view
     m_model_view = new ModelViewWidget();
@@ -263,9 +294,15 @@ PlayerKartWidget::~PlayerKartWidget()
         m_player_ident_spinner->setListener(NULL);
 
         if (m_player_ident_spinner->getIrrlichtElement() != NULL)
-        {
             m_player_ident_spinner->getIrrlichtElement()->remove();
-        }
+    }
+
+    if (m_handicap_spinner != NULL)
+    {
+        m_handicap_spinner->setListener(NULL);
+
+        if (m_handicap_spinner->getIrrlichtElement() != NULL)
+            m_handicap_spinner->getIrrlichtElement()->remove();
     }
 
     if (m_model_view->getIrrlichtElement() != NULL)
@@ -306,14 +343,14 @@ void PlayerKartWidget::setPlayerID(const int newPlayerID)
     // Change the player ID
     m_player_id = newPlayerID;
     if (!m_ready)
-        m_player_ident_spinner->setID(m_player_id);
+        m_player_ident_spinner->setPlayerID(m_player_id);
     m_kart_stats->setDisplayIcons(m_player_id == 0);
     // restore previous focus, but with new player ID
     if (focus != NULL) focus->setFocusForPlayer(m_player_id);
 
     if (m_player_ident_spinner != NULL)
     {
-        m_player_ident_spinner->setID(m_player_id);
+        m_player_ident_spinner->setPlayerID(m_player_id);
     }
 }   // setPlayerID
 
@@ -359,6 +396,9 @@ void PlayerKartWidget::add()
     m_player_ident_spinner->add();
     m_player_ident_spinner->getIrrlichtElement()->setTabStop(false);
     m_player_ident_spinner->setListener(this);
+    m_handicap_spinner->add();
+    m_handicap_spinner->getIrrlichtElement()->setTabStop(false);
+    m_handicap_spinner->setListener(this);
     m_kart_stats->add();
     m_model_view->add();
     m_kart_name->add();
@@ -380,13 +420,6 @@ void PlayerKartWidget::add()
             core::stringw name = PlayerManager::get()->getPlayer(n)->getName();
             core::stringw label = name;
             m_player_ident_spinner->addLabel(label);
-            if (UserConfigParams::m_per_player_difficulty)
-            {
-                // I18N: 'handicapped' indicates that per-player handicaps are
-                //       activated for this kart (i.e. it will drive slower)
-                label = _("%s (handicapped)", name);
-                m_player_ident_spinner->addLabel(label);
-            }
         }
 
         // select the right player profile in the spinner
@@ -397,6 +430,9 @@ void PlayerKartWidget::add()
         m_player_ident_spinner->addLabel(label);
         m_player_ident_spinner->setVisible(false);
     }
+
+    if (!UserConfigParams::m_per_player_difficulty)
+        m_handicap_spinner->setVisible(false);
 
     assert(m_player_ident_spinner->getStringValue() == label);
 }   // add
@@ -451,6 +487,8 @@ void PlayerKartWidget::markAsReady()
     m_player_ident_spinner->elementRemoved();
     delete m_player_ident_spinner;
     m_player_ident_spinner = NULL;
+
+    m_handicap_spinner->setActive(false);
 
     SFXManager::get()->quickSound( "wee" );
 
@@ -551,6 +589,13 @@ void PlayerKartWidget::onUpdate(float delta)
                                      player_name_w,
                                      player_name_h );
     }
+    if (m_handicap_spinner != NULL)
+    {
+        m_handicap_spinner->move(player_name_x,
+                                 player_name_y + player_name_h + 5,
+                                 player_name_w,
+                                 player_name_h );
+    }
     if (m_ready_text != NULL)
     {
         m_ready_text->setRelativePosition(
@@ -564,12 +609,15 @@ void PlayerKartWidget::onUpdate(float delta)
                            m_kart_stats_w,
                            m_kart_stats_h);
     }
-    else
+    else // multiplayer kart selection
     {
-        m_kart_stats->move(m_x, m_y + m_h/2,
-                           m_w, m_h/2);
+        // The 4/10 and 7/10 values were derived from testing how
+        // to best use the space to avoid too small stat bars
+        // The kart models don't use the bottom of the space assigned to them.
+        // The badges on kart models are shifted upwards to accomodate this.
+        m_kart_stats->move(m_x, m_y + (4 * m_h / 10),
+                           m_w, (7 * m_h / 10 ));
     }
-
 
     m_model_view->move(model_x,
                        model_y,
@@ -600,16 +648,10 @@ GUIEngine::EventPropagation PlayerKartWidget::transmitEvent(Widget* w,
     // if it's declared ready, there is really nothing to process
     if (m_ready) return EVENT_LET;
 
-    //std::cout << "= kart selection :: transmitEvent "
-    // << originator << " =\n";
-
     std::string name = w->m_properties[PROP_ID];
 
-    //std::cout << "    (checking if that's me: I am "
-    // << spinnerID << ")\n";
-
     // update player profile when spinner changed
-    if (originator == spinnerID)
+    if (originator == playerSpinnerID)
     {
         if(UserConfigParams::logGUI())
         {
@@ -623,29 +665,59 @@ GUIEngine::EventPropagation PlayerKartWidget::transmitEvent(Widget* w,
         if (m_parent_screen->m_multiplayer)
         {
             int spinner_value = m_player_ident_spinner->getValue();
-            PlayerProfile* profile = PlayerManager::get()->getPlayer(
-                UserConfigParams::m_per_player_difficulty ? spinner_value / 2 : spinner_value);
+            PlayerProfile* profile = PlayerManager::get()->getPlayer(spinner_value);
             m_associated_player->setPlayerProfile(profile);
-            if(UserConfigParams::m_per_player_difficulty && spinner_value % 2 != 0)
-            {
-                m_handicap = HANDICAP_MEDIUM;
-                m_model_view->setBadge(ANCHOR_BADGE);
-                m_kart_stats->setValues(
-                    kart_properties_manager->getKart(m_kart_internal_name),
-                    HANDICAP_MEDIUM);
-            }
-            else
-            {
-                m_handicap = HANDICAP_NONE;
-                m_model_view->unsetBadge(ANCHOR_BADGE);
-                m_kart_stats->setValues(
-                    kart_properties_manager->getKart(m_kart_internal_name),
-                    HANDICAP_NONE);
-            }
             m_model_view->getModelViewRenderInfo()->setHue(
                 m_associated_player->getConstProfile()->getDefaultKartColor());
         }
-    }
+    } // playerSpinnerID
+
+    if (UserConfigParams::m_per_player_difficulty &&
+        originator == handicapSpinnerID)
+    {
+        int spinner_value = m_handicap_spinner->getValue();
+        if (spinner_value == 0)
+        {
+            m_handicap = HANDICAP_NONE;
+            m_model_view->unsetBadge(ANCHOR_BADGE);
+            m_kart_stats->setValues(kart_properties_manager->getKart(m_kart_internal_name), HANDICAP_NONE);
+        }
+        else
+        {
+            if (spinner_value == 1)
+            {
+                m_handicap = HANDICAP_4;
+                m_model_view->setBadge(ANCHOR_BADGE);
+            }
+            else if (spinner_value == 2)
+            {
+                m_handicap = HANDICAP_8;
+                m_model_view->setBadge(ANCHOR_BADGE);
+            }
+            else if (spinner_value == 3)
+            {
+                m_handicap = HANDICAP_12;
+                m_model_view->setBadge(ANCHOR_BADGE);
+            }
+            else if (spinner_value == 4)
+            {
+                m_handicap = HANDICAP_16;
+                m_model_view->setBadge(ANCHOR_BADGE);
+            }
+            else if (spinner_value == 5)
+            {
+                m_handicap = HANDICAP_20;
+                m_model_view->setBadge(ANCHOR_BADGE);
+            }
+            else // spinner_value == 6
+            {
+                m_handicap = HANDICAP_24;
+                m_model_view->setBadge(ANCHOR_BADGE);
+            }
+
+            m_kart_stats->setValues(kart_properties_manager->getKart(m_kart_internal_name), m_handicap);
+        }
+    } // handicapSpinnerID
 
     return EVENT_LET; // continue propagating the event
 }   // transmitEvent
@@ -663,11 +735,7 @@ void PlayerKartWidget::setSize(const int x, const int y, const int w, const int 
 
     // -- sizes
     player_name_h = GUIEngine::getFontHeight();
-    // Set it a bit higher so there's space for "(handicapped)"
-    if(UserConfigParams::m_per_player_difficulty)
-        player_name_w = std::min(GUIEngine::getFontHeight() * 12, w);
-    else
-        player_name_w = std::min(GUIEngine::getFontHeight() * 10, w);
+    player_name_w = std::min(GUIEngine::getFontHeight() * 12, w);
 
     kart_name_w = w;
     kart_name_h = GUIEngine::getFontHeight();
@@ -690,14 +758,11 @@ void PlayerKartWidget::setSize(const int x, const int y, const int w, const int 
         const int modelMaxWidth =  w;
         const int bestSize = std::min(modelMaxWidth, modelMaxHeight);
         model_x = x + w/2 - (int)(bestSize/2);
-        model_y = y + player_name_h;
+        model_y = y + 2 * player_name_h + 5;
         model_w = bestSize;
         model_h = bestSize;
 
-        m_kart_stats_w = model_w;
-        m_kart_stats_h = model_h;
-        m_kart_stats_x = x + w/2 - (int)(bestSize/2);
-        m_kart_stats_y = model_y + model_h;
+        // The kart stats module is positioned later on
     }
     else
     {
@@ -711,7 +776,8 @@ void PlayerKartWidget::setSize(const int x, const int y, const int w, const int 
         model_h = bestSize;
 
         m_kart_stats_w = w/2;
-        m_kart_stats_h = h;
+        // There is room for it no matter the resolution and it improves the display.
+        m_kart_stats_h = h*1.2;
         m_kart_stats_x = x + w/2;
         m_kart_stats_y = y;
     }
@@ -750,11 +816,11 @@ EventPropagation PlayerKartWidget::onSpinnerConfirmed()
 // -------------------------------------------------------------------------
 void PlayerKartWidget::enableHandicapForNetwork()
 {
-    m_handicap = HANDICAP_MEDIUM;
+    m_handicap = HANDICAP_4;
     m_model_view->setBadge(ANCHOR_BADGE);
     m_kart_stats->setValues(
         kart_properties_manager->getKart(m_kart_internal_name),
-        HANDICAP_MEDIUM);
+        HANDICAP_4);
     core::stringw label = _("%s (handicapped)",
         m_player_ident_spinner->getCustomText());
     m_player_ident_spinner->setCustomText(label);

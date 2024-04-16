@@ -1641,7 +1641,7 @@ void Skin::drawSpinnerBody(const core::recti &rect, Widget* widget,
     SColorf color_rgb = { 1,1,1,1 };
     if(q->getUseBackgroundColor())
     {
-        int player_id=q->getSpinnerWidgetPlayerID();
+        int player_id=q->getPlayerID();
 
         std::string spinner = "spinner::deactivated";
         
@@ -2441,7 +2441,7 @@ void Skin::process3DPane(IGUIElement *element, const core::recti &rect,
 
     if (widget->m_badges != 0)
     {
-        drawBadgeOn(widget, rect+position2d<s32>(widget->m_badge_x_shift, 0));
+        drawBadgeOn(widget, rect+position2d<s32>(widget->m_badge_x_shift, -widget->m_badge_y_up_shift));
     }
 }   // process3DPane
 

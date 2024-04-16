@@ -126,6 +126,8 @@ void ModelViewWidget::addModel(irr::scene::IMesh* mesh,
 // -----------------------------------------------------------------------------
 void ModelViewWidget::update(float delta)
 {
+    m_badge_y_up_shift = m_h/10;
+
     if (m_rtt_unsupported) return;
 
     if (m_rotation_mode == ROTATE_CONTINUOUSLY)

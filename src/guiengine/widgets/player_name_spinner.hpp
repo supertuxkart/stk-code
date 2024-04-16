@@ -26,21 +26,16 @@ class KartSelectionScreen;
 
 namespace GUIEngine
 {
-    /** A small extension to the spinner widget to add features like player ID
-     *  management or badging */
+    /** A small extension to the spinner widget to add features like badging
+     * and to guarantee that the widget is tied to a Player ID. */
     class PlayerNameSpinner : public GUIEngine::SpinnerWidget
     {
-        int m_player_id;
         bool m_incorrect;
         irr::gui::IGUIImage* m_red_mark_widget;
         KartSelectionScreen* m_parent;
-        //virtual EventPropagation focused(const int m_playerID) ;
 
     public:
         PlayerNameSpinner(KartSelectionScreen* parent, const int playerID);
-        // ------------------------------------------------------------------------
-        void setID(const int m_playerID);
-
         // ------------------------------------------------------------------------
         /** Add a red mark on the spinner to mean "invalid choice" */
         void markAsIncorrect();
