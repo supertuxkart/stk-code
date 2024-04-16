@@ -103,10 +103,17 @@ void KartStatsWidget::setValues(const KartProperties* props, HandicapLevel h)
                    (kp_computed.getCombinedCharacteristic()->getMass() - 100.0f)/2.78f,
                    "mass.png", "mass", _("Mass"));
     
-    // The base speed is of 27.5
-    // Here we are not fully proportional, because small differences matter more
+    // The base speed is of 27.75
+    // Speed is the characteristics most affected by handicap, but it is also
+    // important to display the base differences between classes as significant,
+    // as small differences matter a lot.
+    // Therefore, a non-linear formula is used.
+    float speed_power_four = kp_computed.getCombinedCharacteristic()->getEngineMaxSpeed();
+    speed_power_four *= speed_power_four; // squaring
+    speed_power_four *= speed_power_four; // squaring again
+    speed_power_four *= 0.001f; // divide by 1000 to improve readbility of the formula
     setSkillValues(SKILL_SPEED,
-                   (kp_computed.getCombinedCharacteristic()->getEngineMaxSpeed() - 22.25f) * 15.0f,
+                   (speed_power_four - 100.0f) * 0.1924f,
                    "speed.png", "speed", _("Maximum speed"));
     
     // The acceleration depend on power and mass, and it changes depending on speed
