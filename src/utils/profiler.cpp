@@ -89,11 +89,12 @@ Profiler::Profiler()
     // When initializing profile class during static initialization
     // UserConfigParams::m_max_fps may not be properly initialized with default
     // value, so we use hard-coded default value
-    m_max_frames          = 20 * 120;
+    m_max_frames          = 60 * 1000;
     m_current_frame       = 0;
     m_has_wrapped_around  = false;
+    m_drawing             = true;
     m_threads_used = 1;
-}   // Profile
+}   // Profiler
 
 //-----------------------------------------------------------------------------
 Profiler::~Profiler()
@@ -114,6 +115,27 @@ void Profiler::init()
     g_thread_id = 0;
     m_gpu_times.resize(Q_LAST * m_max_frames);
 }   // init
+
+//------------------------------------------------------------------------------
+/** Reset profiling data held in memory, to allow starting a new clean profiling run
+ */
+void Profiler::reset()
+{
+    for (int i = 0; i < m_threads_used; i++)
+    {
+        ThreadData &td = m_all_threads_data[i];
+        td.m_all_event_data.clear();
+        td.m_event_stack.clear();
+        td.m_ordered_headings.clear();
+    }   // for i in threads
+
+    m_all_threads_data.clear();
+    m_gpu_times.clear();
+    m_all_event_names.clear();
+    m_current_frame       = 0;
+    m_has_wrapped_around  = false;
+    m_freeze_state        = UNFROZEN;
+}   // reset
 
 //-----------------------------------------------------------------------------
 /** Returns a unique index for a thread. If the calling thread is not yet in
@@ -206,6 +228,11 @@ void Profiler::popCPUMarker()
 void Profiler::toggleStatus()
 {
     UserConfigParams::m_profiler_enabled = !UserConfigParams::m_profiler_enabled;
+
+    // Avoid data from multiple profiling sessions from merging in one report
+    if (UserConfigParams::m_profiler_enabled)
+        reset();
+
     // If the profiler would immediately enabled, calls that have started but
     // not finished would not be registered correctly. So set the state to 
     // waiting, so the unfreeze started at the next sync frame (which is
@@ -290,6 +317,9 @@ void Profiler::synchronizeFrame()
 void Profiler::draw()
 {
 #ifndef SERVER_ONLY
+    if (!m_drawing)
+        return;
+
     PROFILER_PUSH_CPU_MARKER("ProfilerDraw", 0xFF, 0xFF, 0x00);
     video::IVideoDriver*    driver = irr_driver->getVideoDriver();
 

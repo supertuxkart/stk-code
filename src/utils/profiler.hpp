@@ -244,6 +244,9 @@ private:
     /** True if the circular buffer has wrapped around. */
     bool m_has_wrapped_around;
 
+    /** True if the profiler UI should be rendered */
+    bool m_drawing;
+
     /** The maximum number of frames to be buffered. Used to minimise
      *  reallocations. */
     int m_max_frames;
@@ -279,10 +282,11 @@ public:
              Profiler();
     virtual ~Profiler();
     void     init();
+    void     reset();
     void     pushCPUMarker(const char* name="N/A",
                            const video::SColor& color=video::SColor());
     void     popCPUMarker();
-    void     toggleStatus(); 
+    void     toggleStatus();
     void     synchronizeFrame();
     void     draw();
     void     onClick(const core::vector2di& mouse_pos);
@@ -290,7 +294,9 @@ public:
 
     // ------------------------------------------------------------------------
     bool isFrozen() const { return m_freeze_state == FROZEN; }
+    // ------------------------------------------------------------------------
+    void setDrawing(bool drawing) { m_drawing = drawing; }
+
 
 };
-
 #endif // PROFILER_HPP

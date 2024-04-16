@@ -144,6 +144,7 @@ RaceManager::RaceManager()
     setRecordRace(false);
     setRaceGhostKarts(false);
     setWatchingReplay(false);
+    setBenchmarking(false);
     setTrack("jungle");
     m_default_ai_list.clear();
     setNumPlayers(0);

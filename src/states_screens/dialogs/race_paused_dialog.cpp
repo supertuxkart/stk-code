@@ -121,7 +121,7 @@ RacePausedDialog::RacePausedDialog(const float percentWidth,
                 getWidget("team")->setVisible(false);
         }
     }
-    else
+    else if (!RaceManager::get()->isBenchmarking())
     {
         World::getWorld()->schedulePause(WorldStatus::IN_GAME_MENU_PHASE);
     }
