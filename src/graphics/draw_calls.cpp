@@ -151,6 +151,7 @@ void DrawCalls::parseSceneManager(core::array<scene::ISceneNode*> &List,
         if (List[i]->getType() == ESNT_LOD_NODE)
         {
             LODNode *node = static_cast<LODNode *>(List[i]);
+            node->updateVisibility();
 
             core::array<scene::ISceneNode*> child;
             if (node->getLevel() >= 0)

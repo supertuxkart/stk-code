@@ -110,32 +110,15 @@ void LODNode::forceLevelOfDetail(int n)
 // ----------------------------------------------------------------------------
 void LODNode::OnAnimate(u32 timeMs)
 {
-    updateVisibility();
-
     if (isVisible() && m_nodes.size() > 0)
     {
         // update absolute position
         updateAbsolutePosition();
 
-#ifndef SERVER_ONLY
-        if (CVS->isGLSL())
+        for (size_t i = 0; i < m_nodes.size(); i++)
         {
-            for (size_t i = 0; i < m_nodes.size(); i++)
-            {
-                m_nodes[i]->setVisible(true);
-                m_nodes[i]->OnAnimate(timeMs);
-            }
-        }
-        else
-#endif
-        {
-            int level = getLevel();
-            // Assume all the scene node have the same bouding box
-            if(level >= 0)
-            {
-                m_nodes[level]->setVisible(true);
-                m_nodes[level]->OnAnimate(timeMs);
-            }
+            m_nodes[i]->setVisible(true);
+            m_nodes[i]->OnAnimate(timeMs);
         }
 
         if (m_update_box_every_frame)
@@ -173,6 +156,8 @@ void LODNode::updateVisibility()
 
 void LODNode::OnRegisterSceneNode()
 {
+    updateVisibility();
+
 #ifndef SERVER_ONLY
     if (CVS->isGLSL())
     {
