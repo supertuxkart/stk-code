@@ -414,16 +414,22 @@ namespace UserConfigParams
             PARAM_DEFAULT(  BoolUserConfigParam(true, "music_on",
             &m_audio_group,
             "Whether musics are enabled or not (true or false)") );
+    PARAM_PREFIX IntUserConfigParam         m_sfx_numerator
+            PARAM_DEFAULT(  IntUserConfigParam(10, "sfx_numerator",
+            &m_audio_group, "The value in the audio options SFX spinner") );
     PARAM_PREFIX FloatUserConfigParam       m_sfx_volume
-            PARAM_DEFAULT(  FloatUserConfigParam(0.6f, "sfx_volume",
+            PARAM_DEFAULT(  FloatUserConfigParam(0.2678f, "sfx_volume",
             &m_audio_group, "Volume for sound effects, see openal AL_GAIN "
                             "for interpretation") );
+    PARAM_PREFIX IntUserConfigParam         m_music_numerator
+            PARAM_DEFAULT(  IntUserConfigParam(10, "music_numerator",
+            &m_audio_group, "The value in the audio options music spinner") );
     PARAM_PREFIX FloatUserConfigParam       m_music_volume
-            PARAM_DEFAULT(  FloatUserConfigParam(0.5f, "music_volume",
+            PARAM_DEFAULT(  FloatUserConfigParam(0.2678f, "music_volume",
             &m_audio_group, "Music volume from 0.0 to 1.0") );
 
     PARAM_PREFIX IntUserConfigParam          m_volume_denominator
-            PARAM_DEFAULT(  IntUserConfigParam(10, "volume_denominator",
+            PARAM_DEFAULT(  IntUserConfigParam(15, "volume_denominator",
                             &m_audio_group,
                             "Number of steps for volume adjustment") );
 

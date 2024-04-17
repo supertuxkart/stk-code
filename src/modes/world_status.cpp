@@ -33,6 +33,7 @@
 #include "network/rewind_manager.hpp"
 #include "network/race_event_manager.hpp"
 #include "tracks/track.hpp"
+#include "utils/profiler.hpp"
 #include "utils/stk_process.hpp"
 
 #include <IrrlichtDevice.h>
@@ -352,6 +353,13 @@ void WorldStatus::updateTime(int ticks)
                     m_start_sound->play();
                 }
 
+                if(RaceManager::get()->isBenchmarking())
+                {
+                    // The profiler drawings cost performance
+                    profiler.setDrawing(false);
+                    profiler.toggleStatus();
+                }
+
                 // event
                 onGo();
                 // In artist debug mode, when without opponents,
@@ -430,6 +438,13 @@ void WorldStatus::updateTime(int ticks)
                 stk_config->time2Ticks(stk_config->m_delay_finish_time))
             {
                 m_phase = RESULT_DISPLAY_PHASE;
+                if(RaceManager::get()->isBenchmarking())
+                {
+                    // End profiling
+                    profiler.toggleStatus();
+                    profiler.writeToFile();
+                    profiler.setDrawing(true);
+                }
                 terminateRace();
             }
 

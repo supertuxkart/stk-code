@@ -42,6 +42,7 @@ GhostKart::GhostKart(const std::string& ident, unsigned int world_kart_id,
                  m_replay_data(rd), m_last_egg_idx(0)
 {
     m_graphical_y_offset = 0;
+    m_finish_computed = false;
 }   // GhostKart
 
 // ----------------------------------------------------------------------------
@@ -273,7 +274,18 @@ void GhostKart::computeFinishTime()
                             * Track::getCurrentTrack()->getTrackLength();
         m_finish_time = getTimeForDistance(full_distance);
     }
-}
+    m_finish_computed = true;
+}  // computeFinishTime
+
+// ------------------------------------------------------------------------
+/** Returns the finish time for a ghost kart. */
+float GhostKart::getGhostFinishTime()
+{
+    if (!m_finish_computed)
+        computeFinishTime();
+
+    return m_finish_time;
+}  // getGhostFinishTime
 
 // ----------------------------------------------------------------------------
 /** Returns the time at which the kart was at a given distance.

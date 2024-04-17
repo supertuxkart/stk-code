@@ -63,7 +63,8 @@ private:
      *  m_forced_lod is >=0, only this level is be used. */
     int m_forced_lod;
 
-    std::unique_ptr<int> m_current_level;
+    int m_current_level;
+    bool m_current_level_dirty;
 
     // Area of the bounding box (for autoLOD computation)
     float m_area;
@@ -79,7 +80,7 @@ public:
 
     int getLevel();
 
-    void updateVisibility(bool* shown = NULL);
+    void updateVisibility();
 
     /*
     //! Returns a reference to the current relative transformation matrix.
@@ -115,6 +116,7 @@ public:
     }
 
     std::vector<scene::ISceneNode*>& getAllNodes() { return m_nodes; }
+    std::set<scene::ISceneNode*>& getNodesSet() { return m_nodes_set; }
 
     //! OnAnimate() is called just before rendering the whole scene.
     /** This method will be called once per frame, independent

@@ -4308,7 +4308,7 @@ bool ServerLobby::handleAllVotes(PeerVote* winner_vote,
     }
 
     std::string top_track = m_default_vote->m_track_name;
-    int top_laps = m_default_vote->m_num_laps;
+    unsigned top_laps = m_default_vote->m_num_laps;
     bool top_reverse = m_default_vote->m_reverse;
 
     std::map<std::string, unsigned> tracks;
@@ -4319,7 +4319,6 @@ bool ServerLobby::handleAllVotes(PeerVote* winner_vote,
     float tracks_rate = 0.0f;
     float laps_rate = 0.0f;
     float reverses_rate = 0.0f;
-    RandomGenerator rg;
 
     for (auto& p : m_peers_votes)
     {
@@ -4340,57 +4339,9 @@ bool ServerLobby::handleAllVotes(PeerVote* winner_vote,
             reverse_vote->second++;
     }
 
-    unsigned vote = 0;
-    auto track_vote = tracks.begin();
-    // rg.get(2) == 0 will allow not always the "less" in map get picked
-    for (auto c_vote = tracks.begin(); c_vote != tracks.end(); c_vote++)
-    {
-        if (c_vote->second > vote ||
-            (c_vote->second >= vote && rg.get(2) == 0))
-        {
-            vote = c_vote->second;
-            track_vote = c_vote;
-        }
-    }
-    if (track_vote != tracks.end())
-    {
-        top_track = track_vote->first;
-        tracks_rate = float(track_vote->second) / cur_players;
-    }
-
-    vote = 0;
-    auto lap_vote = laps.begin();
-    for (auto c_vote = laps.begin(); c_vote != laps.end(); c_vote++)
-    {
-        if (c_vote->second > vote ||
-            (c_vote->second >= vote && rg.get(2) == 0))
-        {
-            vote = c_vote->second;
-            lap_vote = c_vote;
-        }
-    }
-    if (lap_vote != laps.end())
-    {
-        top_laps = lap_vote->first;
-        laps_rate = float(lap_vote->second) / cur_players;
-    }
-
-    vote = 0;
-    auto reverse_vote = reverses.begin();
-    for (auto c_vote = reverses.begin(); c_vote != reverses.end(); c_vote++)
-    {
-        if (c_vote->second > vote ||
-            (c_vote->second >= vote && rg.get(2) == 0))
-        {
-            vote = c_vote->second;
-            reverse_vote = c_vote;
-        }
-    }
-    if (reverse_vote != reverses.end())
-    {
-        top_reverse = reverse_vote->first;
-        reverses_rate = float(reverse_vote->second) / cur_players;
-    }
+    findMajorityValue<std::string>(tracks, cur_players, &top_track, &tracks_rate);
+    findMajorityValue<unsigned>(laps, cur_players, &top_laps, &laps_rate);
+    findMajorityValue<bool>(reverses, cur_players, &top_reverse, &reverses_rate);
 
     // End early if there is majority agreement which is all entries rate > 0.5
     it = m_peers_votes.begin();
@@ -4407,15 +4358,18 @@ bool ServerLobby::handleAllVotes(PeerVote* winner_vote,
         }
         if (it == m_peers_votes.end())
         {
+            // Don't end if no vote matches all majority choices
             Log::warn("ServerLobby",
                 "Missing track %s from majority.", top_track.c_str());
             it = m_peers_votes.begin();
+            if (!isVotingOver())
+                return false;
         }
         *winner_peer_id = it->first;
         *winner_vote = it->second;
         return true;
     }
-    else if (isVotingOver())
+    if (isVotingOver())
     {
         // Pick the best lap (or soccer goal / time) from only the top track
         // if no majority agreement from all
@@ -4424,10 +4378,10 @@ bool ServerLobby::handleAllVotes(PeerVote* winner_vote,
         while (it != m_peers_votes.end())
         {
             if (it->second.m_track_name == top_track &&
-                std::abs((int)it->second.m_num_laps - top_laps) < diff)
+                std::abs((int)it->second.m_num_laps - (int)top_laps) < diff)
             {
                 closest_lap = it;
-                diff = std::abs((int)it->second.m_num_laps - top_laps);
+                diff = std::abs((int)it->second.m_num_laps - (int)top_laps);
             }
             else
                 it++;
@@ -4438,6 +4392,42 @@ bool ServerLobby::handleAllVotes(PeerVote* winner_vote,
     }
     return false;
 }   // handleAllVotes
+
+// ----------------------------------------------------------------------------
+template<typename T>
+void ServerLobby::findMajorityValue(const std::map<T, unsigned>& choices, unsigned cur_players,
+                       T* best_choice, float* rate)
+{
+    RandomGenerator rg;
+    unsigned max_votes = 0;
+    auto best_iter = choices.begin();
+    unsigned best_iters_count = 1;
+    // Among choices with max votes, we need to pick one uniformly,
+    // thus we have to keep track of their number
+    for (auto iter = choices.begin(); iter != choices.end(); iter++)
+    {
+        if (iter->second > max_votes)
+        {
+            max_votes = iter->second;
+            best_iter = iter;
+            best_iters_count = 1;
+        }
+        else if (iter->second == max_votes)
+        {
+            best_iters_count++;
+            if (rg.get(best_iters_count) == 0)
+            {
+                max_votes = iter->second;
+                best_iter = iter;
+            }
+        }
+    }
+    if (best_iter != choices.end())
+    {
+        *best_choice = best_iter->first;
+        *rate = float(best_iter->second) / cur_players;
+    }
+}   // findMajorityValue
 
 // ----------------------------------------------------------------------------
 void ServerLobby::getHitCaptureLimit()

@@ -324,6 +324,10 @@ public:
     // ------------------------------------------------------------------------
     virtual bool useColorGlyphPage() const                    { return false; }
     // ------------------------------------------------------------------------
+    /** Defined by sub-class about the native scaling factor, to provide */
+    /** a texture with higher resolution when the scale is > 1.0f */
+    virtual float getNativeScalingFactor() const               { return 1.0f; }
+    // ------------------------------------------------------------------------
     void setDPI();
 };   // FontWithFace
 

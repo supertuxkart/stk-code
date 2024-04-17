@@ -145,7 +145,7 @@ void RibbonWidget::add()
     }
 
     //int biggest_y = 0;
-    const int button_y = 10;
+    const int button_y = GUIEngine::getFontHeight() / 5;
 
     const int one_button_width = (subbuttons_amount == 0 ? m_w :
         int(roundf((float)m_w / (float)subbuttons_amount)));
@@ -361,10 +361,13 @@ void RibbonWidget::add()
             // TODO Add support for BUTTON type when needed
             if (m_active_children[i].m_type == WTYPE_ICON_BUTTON)
             {
+                int icon_size = std::min(tab_contents_rect.getHeight(), tab_contents_rect.getWidth()/2);
+                const int y = tab_contents_rect.getHeight()/2 - icon_size/2;
+
                 rect<s32> icon_part = rect<s32>(tab_contents_rect.UpperLeftCorner.X,
-                                                tab_contents_rect.UpperLeftCorner.Y,
-                                                tab_contents_rect.UpperLeftCorner.X + tab_contents_rect.getHeight(),
-                                                tab_contents_rect.UpperLeftCorner.Y + tab_contents_rect.getHeight());
+                                                tab_contents_rect.UpperLeftCorner.Y + y,
+                                                tab_contents_rect.UpperLeftCorner.X + icon_size,
+                                                tab_contents_rect.UpperLeftCorner.Y + y + icon_size);
 
                 // label at the *right* of the icon (for tabs)
                 rect<s32> label_part = rect<s32>(icon_part.LowerRightCorner.X+5,
@@ -443,7 +446,7 @@ void RibbonWidget::add()
 
             const int needed_space_under_button = has_label
                                                 ? GUIEngine::getFontHeight()
-                                                : 10;
+                                                : GUIEngine::getFontHeight() / 5;
 
             float imageRatio =
                 (float)m_active_children[i].m_w / (float)m_active_children[i].m_h;

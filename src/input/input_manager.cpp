@@ -63,12 +63,12 @@
 #include <ISceneNode.h>
 #include <ITexture.h>
 
-#include <map>
-#include <vector>
-#include <string>
-#include <iostream>
-#include <sstream>
 #include <algorithm>
+#include <iostream>
+#include <map>
+#include <sstream>
+#include <string>
+#include <vector>
 
 #ifndef SERVER_ONLY
 #include <SDL.h>

@@ -278,7 +278,7 @@ bool Swatter::updateAndTestFinished()
                     // Start squashing
                     m_animation_phase = SWATTER_TO_TARGET;
                     m_swatter_animation_ticks =
-                        m_attachment->getTicksLeft() - stk_config->time2Ticks(0.167f);
+                        m_attachment->getTicksLeft() - stk_config->time2Ticks(0.166666672f);
                 }
             }
             break;

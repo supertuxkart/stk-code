@@ -128,16 +128,20 @@ bool ReplayPlay::addReplayFile(const std::string& fn, bool custom_replay, int ca
                   "found in replay file (bogus replay file).");
         return false;
     }
-    if (version > getCurrentReplayVersion() ||
-        version < getMinSupportedReplayVersion() )
+    if ( version < getMinSupportedReplayVersion() )
     {
-        Log::warn("Replay", "Replay is version '%d'", version);
-        Log::warn("Replay", "STK replay version is '%d'", getCurrentReplayVersion());
-        Log::warn("Replay", "Minimum supported replay version is '%d'", getMinSupportedReplayVersion());
-        Log::warn("Replay", "Skipped '%s'", fn.c_str());
+        Log::warn("Replay", "Replay is version '%d', Minimum supported replay version is '%d', skipped '%s'",
+                  version, getMinSupportedReplayVersion(), fn.c_str());
         return false;
     }
-        rd.m_replay_version = version;
+    else if (version > getCurrentReplayVersion())
+    {
+        Log::warn("Replay", "Replay is version '%d', STK replay version is '%d', skipped '%s'",
+                  version, getCurrentReplayVersion(), fn.c_str());
+        return false;
+    }
+
+    rd.m_replay_version = version;
 
     if (version >= 4)
     {
@@ -238,14 +242,37 @@ bool ReplayPlay::addReplayFile(const std::string& fn, bool custom_replay, int ca
     else
         rd.m_minor_mode = "time-trial";
 
-
+    // sscanf always stops at whitespaces, but a track name may contain a whitespace
+    // Official tracks should avoid whitespaces in their name, but it
+    // unavoidably occurs with some addons or WIP tracks.
     fgets(s, 1023, fd);
-    if (sscanf(s, "track: %1023s", s1) != 1)
+    if (std::strncmp(s, "track: ", 7) == 0)
+    {
+        int i = 0;
+        for(i = 7; s[i] != '\0'; i++)
+        {
+            // Break when newline is reached
+            if (s[i] == '\n' || s[i] == '\r')
+                break;
+            s1[i-7] = s[i];
+        }
+        s1[i-7] = '\0';
+
+        if (i >= 8)
+        {
+            rd.m_track_name = std::string(s1);
+        }
+        else
+        {
+            Log::warn("Replay", "Track name is empty in replay file, '%s'.", fn.c_str());
+            return false;
+        }         
+    }
+    else
     {
         Log::warn("Replay", "Track info not found in replay file, '%s'.", fn.c_str());
         return false;
     }
-    rd.m_track_name = std::string(s1);
 
     // If former official tracks are present as addons, show the matching replays.
     if (rd.m_track_name.compare("greenvalley") == 0)
@@ -575,6 +602,6 @@ unsigned int ReplayPlay::getReplayIdByUID(uint64_t uid)
         }
     }
 
-    Log::error("Replay", "Replay with UID of " PRIu64 " not found.", uid);
+    Log::error("Replay", "Replay with UID of %" PRIu64 " not found.", uid);
     return 0;
-} //setReplayFileByUID
+} //getReplayIdByUID

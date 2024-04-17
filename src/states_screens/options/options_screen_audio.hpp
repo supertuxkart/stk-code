@@ -35,6 +35,9 @@ class OptionsScreenAudio : public GUIEngine::Screen, public GUIEngine::ScreenSin
 {
     OptionsScreenAudio();
 
+private:
+    float computeVolume(int numerator, int denominator);
+
 public:
     friend class GUIEngine::ScreenSingleton<OptionsScreenAudio>;
 

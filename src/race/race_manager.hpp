@@ -365,12 +365,11 @@ private:
 
     /** Determines if saved GP should be continued or not*/
     bool m_continue_saved_gp;
-
     bool m_is_recording_race;
-
     bool m_has_ghost_karts;
-
     bool m_watching_replay;
+    bool m_benchmarking;
+
 public:
     // ----------------------------------------------------------------------------------------
     static RaceManager* get();
@@ -857,6 +856,11 @@ public:
         m_watching_replay = watch;
     }   // setWatchingReplay
     // ----------------------------------------------------------------------------------------
+    void setBenchmarking(bool benchmark)
+    {
+        m_benchmarking = benchmark;
+    }   // setBenchmarking
+    // ----------------------------------------------------------------------------------------
     bool isRecordingRace() const
     {
         return m_is_recording_race;
@@ -871,6 +875,11 @@ public:
     {
         return m_watching_replay;
     }   // isWatchingReplay
+    // ----------------------------------------------------------------------------------------
+    bool isBenchmarking() const
+    {
+        return m_benchmarking;
+    }   // isBenchmarking
     // ----------------------------------------------------------------------------------------
     void addSpareTireKart(const std::string& name)
     {

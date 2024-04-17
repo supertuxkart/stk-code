@@ -9,7 +9,7 @@
 
         <box proportion="1" width="100%" layout="vertical-row" padding="1">
             <ribbon_grid id="tracks" proportion="1" width="100%" square_items="true"
-                label_location="bottom" align="center" max_rows="3"
+                label_location="bottom" align="center"
                 child_width="160" child_height="120" />
             <spacer width="20" height="13" />
         </box>

@@ -51,6 +51,8 @@ private:
 
     /** True if the icon is being displayed. */
     bool m_icon_shown;
+    /** True if the error message has shown once. */
+    bool m_message_shown;
 
     std::shared_ptr<bool> m_icon_downloaded;
     /** A pointer to the download request, which gives access

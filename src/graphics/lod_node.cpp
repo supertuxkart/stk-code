@@ -49,13 +49,8 @@ LODNode::LODNode(std::string group_name, scene::ISceneNode* parent,
 
     m_forced_lod = -1;
     m_area = 0;
-#ifndef SERVER_ONLY
-    if (!CVS->isGLSL())
-    {
-        m_current_level.reset(new int);
-        *m_current_level = -1;
-    }
-#endif
+    m_current_level = -1;
+    m_current_level_dirty = true;
 }
 
 LODNode::~LODNode()
@@ -76,8 +71,12 @@ int LODNode::getLevel()
         return -1;
 
     // If a level is forced, use it
-    if(m_forced_lod>-1)
+    if (m_forced_lod >- 1)
         return m_forced_lod;
+    
+    if (!m_current_level_dirty)
+        return m_current_level;
+    m_current_level_dirty = false;
 
     Camera* camera = Camera::getActiveCamera();
     if (camera == NULL)
@@ -90,9 +89,12 @@ int LODNode::getLevel()
     for (unsigned int n=0; n<m_detail.size(); n++)
     {
         if (dist < m_detail[n])
+        {
+            m_current_level = n;
             return n;
+        }
     }
-
+    m_current_level = -1;
     return -1;
 }  // getLevel
 
@@ -108,6 +110,8 @@ void LODNode::forceLevelOfDetail(int n)
 // ----------------------------------------------------------------------------
 void LODNode::OnAnimate(u32 timeMs)
 {
+    updateVisibility();
+
     if (isVisible() && m_nodes.size() > 0)
     {
         // update absolute position
@@ -126,9 +130,8 @@ void LODNode::OnAnimate(u32 timeMs)
 #endif
         {
             int level = getLevel();
-            *m_current_level = level;
             // Assume all the scene node have the same bouding box
-            if(level>=0)
+            if(level >= 0)
             {
                 m_nodes[level]->setVisible(true);
                 m_nodes[level]->OnAnimate(timeMs);
@@ -154,29 +157,22 @@ void LODNode::OnAnimate(u32 timeMs)
     }
 }
 
-void LODNode::updateVisibility(bool* shown)
+void LODNode::updateVisibility()
 {
     if (!isVisible()) return;
     if (m_nodes.size() == 0) return;
 
-    unsigned int level = 0;
-    if (m_current_level)
-        level = *m_current_level;
-    else
-        level = getLevel();
+    m_current_level_dirty = true;
+    unsigned int level = getLevel();
+
     for (size_t i = 0; i < m_nodes.size(); i++)
     {
         m_nodes[i]->setVisible(i == level);
-        if (i == level && shown != NULL)
-            *shown = (i > 0);
     }
 }
 
 void LODNode::OnRegisterSceneNode()
 {
-    bool shown = false;
-    updateVisibility(&shown);
-
 #ifndef SERVER_ONLY
     if (CVS->isGLSL())
     {
@@ -184,35 +180,49 @@ void LODNode::OnRegisterSceneNode()
     }
 #endif
 
-#ifndef SERVER_ONLY
-    if (!CVS->isGLSL())
+    if (isVisible() && m_nodes.size() > 0)
     {
-        for (unsigned i = 0; i < Children.size(); ++i)
-            Children[i]->updateAbsolutePosition();
+        int level = getLevel();
+        
+        if (level >= 0)
+        {
+            m_nodes[level]->OnRegisterSceneNode();
+        }
+        for (int i = 0; i < Children.size(); i++)
+        {
+            if (m_nodes_set.find(Children[i]) == m_nodes_set.end())
+                Children[i]->OnRegisterSceneNode();
+        }
     }
-#endif
-    scene::ISceneNode::OnRegisterSceneNode();
 }
 
-
+/* Each model with LoD has specific distances beyond which it is rendered at a lower 
+* detail level. This function compute the distances associated with the various
+* LoD levels for a given model.
+* @param scale The model's scale*/
 void LODNode::autoComputeLevel(float scale)
 {
     m_area *= scale;
 
     // Amount of details based on user's input
     float agressivity = 1.0;
-    if(UserConfigParams::m_geometry_level == 0) agressivity = 1.25;
-    if(UserConfigParams::m_geometry_level == 1) agressivity = 1.0;
-    if(UserConfigParams::m_geometry_level == 2) agressivity = 0.75;
+    if(     UserConfigParams::m_geometry_level == 0) agressivity = 1.25;
+    else if(UserConfigParams::m_geometry_level == 1) agressivity = 1.0;
+    else if(UserConfigParams::m_geometry_level == 2) agressivity = 0.75;
+    else if(UserConfigParams::m_geometry_level == 3) agressivity = 1.6;
+    else if(UserConfigParams::m_geometry_level == 4) agressivity = 2.0;
+    else if(UserConfigParams::m_geometry_level == 5) agressivity = 3.0;
 
     // First we try to estimate how far away we need to draw
-    float max_draw = 0.0;
-    max_draw = sqrtf((0.5 * m_area + 10) * 200) - 10;
+    // This first formula is equivalent to the one used up to STK 1.4
+    float max_draw = 10*(sqrtf(m_area + 20) - 1);
     // If the draw distance is too big we artificially reduce it
+    // The formulas are still experimental and improvable.
     if(max_draw > 250)
-    {
-        max_draw = 250 + (max_draw * 0.06);
-    }
+        max_draw = 230 + (max_draw * 0.08);
+    // This effecte is cumulative
+    if (max_draw > 500)
+        max_draw = 200 + (max_draw * 0.6);
 
     max_draw *= agressivity;
 

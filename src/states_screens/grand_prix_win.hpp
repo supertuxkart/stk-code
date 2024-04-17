@@ -58,6 +58,9 @@ class GrandPrixWin :
 
     int m_phase;
 
+    /** Used to pick the happy/sad animations of karts */
+    int m_num_gp_karts;
+
     float m_kart_x[3], m_kart_y[3], m_kart_z[3];
     float m_kart_rotation[3];
 
@@ -75,6 +78,7 @@ public:
     MusicInformation* getInGameMenuMusic() const OVERRIDE;
 
     /** \pre must be called after pushing the screen, but before onUpdate had the chance to be invoked */
+    void setNumGPKarts(int num_gp_karts);
     void setKarts(const std::pair<std::string, float> karts[3]);
     void setPlayerWon(bool some_player_won) { m_player_won = some_player_won; }
 };

@@ -52,6 +52,7 @@ namespace irr
 } // end namespace irr
 
 extern "C" void init_objc(SDL_SysWMinfo* info, float* top, float* bottom, float* left, float* right);
+extern "C" void enable_momentum_scroll();
 extern "C" int handle_app_event(void* userdata, SDL_Event* event);
 extern "C" void Android_initDisplayCutout(float* top, float* bottom, float* left, float* right, int* initial_orientation);
 extern "C" int Android_disablePadding();
@@ -122,6 +123,10 @@ CIrrDeviceSDL::CIrrDeviceSDL(const SIrrlichtCreationParameters& param)
 	// create window
 	if (CreationParams.DriverType != video::EDT_NULL)
 	{
+#if defined(_IRR_OSX_PLATFORM_) && !defined(IOS_STK)
+		enable_momentum_scroll();
+#endif
+
 		// create the window, only if we do not use the null device
 		if (!Close && createWindow())
 		{
@@ -833,14 +838,20 @@ bool CIrrDeviceSDL::run()
 			break;
 
 		case SDL_MOUSEWHEEL:
-			if (SDL_event.wheel.x > 0 || SDL_event.wheel.x < 0)
-				break;
 			irrevent.EventType = irr::EET_MOUSE_INPUT_EVENT;
 			irrevent.MouseInput.Event = irr::EMIE_MOUSE_WHEEL;
 			irrevent.MouseInput.X = MouseX;
 			irrevent.MouseInput.Y = MouseY;
+
 			irrevent.MouseInput.ButtonStates = MouseButtonStates;
-			irrevent.MouseInput.Wheel = SDL_event.wheel.y > 0 ? 1.0f : -1.0f;
+#if SDL_VERSION_ATLEAST(2, 0, 18)
+			irrevent.MouseInput.Wheel = 
+				SDL_event.wheel.preciseX + SDL_event.wheel.preciseY;
+#else
+			irrevent.MouseInput.Wheel = irr::core::clamp<irr::f32>(
+				SDL_event.wheel.x + SDL_event.wheel.y, -1.0f, 1.0f);
+#endif
+
 			postEventFromUser(irrevent);
 			break;
 

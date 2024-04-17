@@ -16,7 +16,7 @@
             <div id="kartlist" width="85%" height="100%" layout="vertical-row" >
                 <box proportion="2" width="100%" layout="vertical-row" padding="2">
                     <ribbon_grid id="karts" proportion="1" square_items="true" width="100%" align="center"
-                                child_width="90" child_height="90" max_rows="2"/>
+                                child_width="90" child_height="90"/>
                 </box>
                 <!-- Groups will be added dynamically at runtime -->
                 <tabs width="98%" x="1%" height="1f" id="kartgroups">

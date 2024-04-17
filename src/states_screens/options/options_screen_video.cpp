@@ -30,6 +30,8 @@
 #include "guiengine/widgets/spinner_widget.hpp"
 #include "guiengine/widget.hpp"
 #include "io/file_manager.hpp"
+#include "race/race_manager.hpp"
+#include "replay/replay_play.hpp"
 #include "states_screens/dialogs/custom_video_settings.hpp"
 #include "states_screens/options/options_screen_audio.hpp"
 #include "states_screens/options/options_screen_general.hpp"
@@ -906,6 +908,35 @@ void OptionsScreenVideo::eventCallback(Widget* widget, const std::string& name,
 #endif
         updateScaleRTTsSlider();
     }
+    else if (name == "benchmarkCurrent")
+    {
+        // TODO - Add the possibility to benchmark more tracks and define replay benchmarks in
+        //        a config file
+        const std::string bf_bench("benchmark_black_forest.replay");
+        const bool result = ReplayPlay::get()->addReplayFile(file_manager
+            ->getAsset(FileManager::REPLAY, bf_bench), true/*custom_replay*/);
+
+        if (!result)
+            Log::fatal("OptionsScreenVideo", "Can't open replay for benchmark!");
+        RaceManager::get()->setRaceGhostKarts(true);
+
+        RaceManager::get()->setMinorMode(RaceManager::MINOR_MODE_TIME_TRIAL);
+        ReplayPlay::ReplayData bench_rd = ReplayPlay::get()->getCurrentReplayData();
+        RaceManager::get()->setReverseTrack(bench_rd.m_reverse);
+        RaceManager::get()->setRecordRace(false);
+        RaceManager::get()->setWatchingReplay(true);
+        RaceManager::get()->setDifficulty((RaceManager::Difficulty)bench_rd.m_difficulty);
+
+        // The race manager automatically adds karts for the ghosts
+        RaceManager::get()->setNumKarts(0);
+        RaceManager::get()->setBenchmarking(true);
+        RaceManager::get()->startWatchingReplay(bench_rd.m_track_name, bench_rd.m_laps);
+    }
+    // TODO - Add a standard benchmark testing multiple presets
+    /*else if (name == "benchmarkStandard")
+    {
+        // DO NOTHING FOR NOW
+    }*/
     else if (name == "rememberWinpos")
     {
         CheckBoxWidget* rememberWinpos = getWidget<CheckBoxWidget>("rememberWinpos");

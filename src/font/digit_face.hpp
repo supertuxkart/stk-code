@@ -33,7 +33,7 @@ private:
     // ------------------------------------------------------------------------
     virtual unsigned int getGlyphPageSize() const OVERRIDE      { return 256; }
     // ------------------------------------------------------------------------
-    virtual float getScalingFactorOne() const OVERRIDE         { return 0.7f; }
+    virtual float getScalingFactorOne() const OVERRIDE         { return 1.4f; }
     // ------------------------------------------------------------------------
     virtual unsigned int getScalingFactorTwo() const OVERRIDE    { return 40; }
 
@@ -47,6 +47,8 @@ public:
     virtual void reset() OVERRIDE;
     // ------------------------------------------------------------------------
     virtual bool disableTextShaping() const OVERRIDE           { return true; }
+    // ------------------------------------------------------------------------
+    virtual float getNativeScalingFactor() const OVERRIDE      { return 0.5f; }
 };   // DigitFace
 
 #endif

@@ -114,7 +114,10 @@ void ArenasScreen::beforeAddingWidget()
 
     DynamicRibbonWidget* tracks_widget = this->getWidget<DynamicRibbonWidget>("tracks");
     assert( tracks_widget != NULL );
-    tracks_widget->setItemCountHint(num_of_arenas+1); //set the item hint to that number to prevent weird formatting
+
+    // Set the item hint to that number to prevent weird formatting
+    // Avoid too many items shown at the same time
+    tracks_widget->setItemCountHint(std::min(num_of_arenas + 1, 30)); 
 }
 
 // -----------------------------------------------------------------------------

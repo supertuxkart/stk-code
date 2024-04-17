@@ -2120,7 +2120,6 @@ int main(int argc, char *argv[])
 
     // Up number of maximum concurrent sockets, otherwise we can fail while loading with nxlink
     const SocketInitConfig socketConfig = {
-        .bsdsockets_version = 1,
         .tcp_tx_buf_size        = 0x8000,
         .tcp_rx_buf_size        = 0x10000,
         .tcp_tx_buf_max_size    = 0x40000,

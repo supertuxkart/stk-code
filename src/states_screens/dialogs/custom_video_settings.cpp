@@ -76,11 +76,21 @@ void CustomVideoSettingsDialog::beforeAddingWidgets()
     geometry_level->addLabel(_("Very Low"));
     //I18N: Geometry level low : few details are displayed
     geometry_level->addLabel(_("Low"));
-    //I18N: Geometry level high : everything is displayed
+    //I18N: Geometry level medium : everything is displayed, Level-of-Details distances are medium
+    geometry_level->addLabel(_("Medium"));
+    //I18N: Geometry level high : everything is displayed, Level-of-Details distances are high
     geometry_level->addLabel(_("High"));
+    //I18N: Geometry level very high : everything is displayed, Level-of-Details distances are very high
+    geometry_level->addLabel(_("Very High"));
+    //I18N: Geometry level ultra : everything is displayed, Level-of-Details distances are extremely high
+    geometry_level->addLabel(_("Ultra"));
+    // This strange code is needed because a lower geometry level value
+    // used to be better. The values are now from best to worst: 5, 4, 3, 0, 1, 2.
+    // This keeps compatibility with 1.X installs.
+    // FIXME when profile-compatibility is not a concern.
     geometry_level->setValue(
         UserConfigParams::m_geometry_level == 2 ? 0 :
-        UserConfigParams::m_geometry_level == 0 ? 2 : 1);
+        UserConfigParams::m_geometry_level == 0 ? 2 : UserConfigParams::m_geometry_level);
 
     SpinnerWidget* filtering = getWidget<SpinnerWidget>("image_quality");
     filtering->addLabel(_("Very Low"));
@@ -188,7 +198,10 @@ GUIEngine::EventPropagation CustomVideoSettingsDialog::processEvent(const std::s
 
             const int val =
                 getWidget<SpinnerWidget>("geometry_detail")->getValue();
-            UserConfigParams::m_geometry_level = val == 2 ? 0 : val == 0 ? 2 : 1;
+            // This strange code is needed because a lower geometry level value
+            // used to be better. This keeps compatibility with 1.X installs.
+            UserConfigParams::m_geometry_level = val == 2 ? 0 : 
+                                                 val == 0 ? 2 : val;
             int quality = getWidget<SpinnerWidget>("image_quality")->getValue();
 
             user_config->saveConfig();
