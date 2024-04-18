@@ -158,6 +158,10 @@ fi
 
 #Build packages
 
+if [ ! -d "./android-output" ]; then
+    mkdir ./android-output
+fi
+
 generate_lq_assets
 generate_full_assets
 generate_assets
@@ -189,9 +193,9 @@ cp ./android/build/outputs/apk/release/android-release.apk \
 cp ./android/build/outputs/bundle/release/android-release.aab \
    ./android-output/SuperTuxKart-$PROJECT_VERSION.aab
 
-for arch in $(ls ./android/build/intermediates/ndkBuild/release/obj/local); do
-    cp ./android/build/intermediates/ndkBuild/release/obj/local/$arch/libmain.so \
+for arch in $(ls ./android/build/intermediates/merged_native_libs/release/out/lib); do
+    cp ./android/build/intermediates/merged_native_libs/release/out/lib/$arch/libmain.so \
     ./android-output/SuperTuxKart-$PROJECT_VERSION-$arch-libmain.so
-    cp ./android/build/intermediates/ndkBuild/release/obj/local/$arch/libSDL2.so \
+    cp ./android/build/intermediates/merged_native_libs/release/out/lib/$arch/libSDL2.so \
     ./android-output/SuperTuxKart-$PROJECT_VERSION-$arch-libSDL2.so
 done

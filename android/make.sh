@@ -20,7 +20,7 @@ if [ -z "$STK_MIN_ANDROID_SDK" ]; then
 fi
 
 if [ -z "$STK_TARGET_ANDROID_SDK" ]; then
-    export STK_TARGET_ANDROID_SDK=33
+    export STK_TARGET_ANDROID_SDK=34
 fi
 
 if [ -z "$STK_NDK_VERSION" ]; then
