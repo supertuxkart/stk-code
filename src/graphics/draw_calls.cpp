@@ -187,7 +187,7 @@ void DrawCalls::parseSceneManager(core::array<scene::ISceneNode*> &List,
         else if (STKTextBillboard *tb =
             dynamic_cast<STKTextBillboard*>(List[i]))
         {
-            node->updateAbsolutePosition();
+            tb->updateAbsolutePosition();
             if (!isCulledPrecise(cam, List[i], irr_driver->getBoundingBoxesViz()))
                 TextBillboardDrawer::addTextBillboard(tb);
             continue;
