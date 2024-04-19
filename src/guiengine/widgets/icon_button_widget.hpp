@@ -43,7 +43,7 @@ namespace GUIEngine
     class IconButtonWidget : public Widget
     {
     private:
-        irr::core::rect<s32>  m_list_header_icon_rect;
+        irr::core::rect<s32>  m_list_header_icon_rect, m_icon_rect, m_label_rect;
         irr::video::ITexture* m_texture;
         irr::video::ITexture* m_deactivated_texture;
         irr::video::ITexture* m_highlight_texture;
@@ -51,6 +51,8 @@ namespace GUIEngine
 
         video::ITexture* getDeactivatedTexture(video::ITexture* texture);
         void setLabelFont();
+        void updateIconRect();
+        void updateLabelRect();
 
     public:
         enum ScaleMode
@@ -172,6 +174,8 @@ namespace GUIEngine
             Widget::elementRemoved();
             m_label = NULL;
         }
+        // --------------------------------------------------------------------
+        virtual void resize() OVERRIDE;
         // --------------------------------------------------------------------
         const irr::core::rect<s32>& getListHeaderIconRect() const
         {
