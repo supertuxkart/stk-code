@@ -20,8 +20,11 @@
 
 #include "config/player_manager.hpp"
 #include "config/user_config.hpp"
+#include "graphics/irr_driver.hpp"
 #include "graphics/material.hpp"
 #include "guiengine/CGUISpriteBank.hpp"
+#include "guiengine/widgets/ribbon_widget.hpp"
+#include "io/file_manager.hpp"
 #include "karts/kart_properties.hpp"
 #include "karts/kart_properties_manager.hpp"
 #include "race/grand_prix_data.hpp"

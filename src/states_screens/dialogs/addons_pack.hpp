@@ -18,11 +18,11 @@
 #ifndef HEADER_ADDONS_PACK_HPP
 #define HEADER_ADDONS_PACK_HPP
 
-#include "guiengine/widgets.hpp"
 #include "guiengine/modaldialog.hpp"
 #include "utils/cpp2011.hpp"
 
 class AddonsPackRequest;
+namespace GUIEngine { class LabelWidget; class ProgressBarWidget; }
 
 /**
   * \ingroup states_screens

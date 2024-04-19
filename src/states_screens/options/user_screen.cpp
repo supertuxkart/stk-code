@@ -24,6 +24,7 @@
 #include "config/user_config.hpp"
 #include "graphics/central_settings.hpp"
 #include "guiengine/screen_keyboard.hpp"
+#include "guiengine/widgets/button_widget.hpp"
 #include "guiengine/widgets/check_box_widget.hpp"
 #include "guiengine/widgets/dynamic_ribbon_widget.hpp"
 #include "guiengine/widgets/label_widget.hpp"

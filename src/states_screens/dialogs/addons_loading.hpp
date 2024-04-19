@@ -21,11 +21,11 @@
 
 #include "addons/addon.hpp"
 #include "addons/addons_manager.hpp"
-#include "guiengine/widgets.hpp"
 #include "guiengine/modaldialog.hpp"
 #include "utils/cpp2011.hpp"
 #include "utils/synchronised.hpp"
 
+namespace GUIEngine { class IconButtonWidget; class ProgressBarWidget; }
 namespace Online { class HTTPRequest; }
 
 /**

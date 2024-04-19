@@ -27,6 +27,7 @@
 #include "graphics/irr_driver.hpp"
 #include "guiengine/dialog_queue.hpp"
 #include "guiengine/scalable_font.hpp"
+#include "guiengine/widgets/button_widget.hpp"
 #include "guiengine/widgets/label_widget.hpp"
 #include "guiengine/widgets/list_widget.hpp"
 #include "guiengine/widgets/ribbon_widget.hpp"

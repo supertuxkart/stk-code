@@ -20,8 +20,13 @@
 #define HEADER_GHOST_REPLAY_INFO_DIALOG_HPP
 
 #include "guiengine/modaldialog.hpp"
-#include "guiengine/widgets.hpp"
 #include "replay/replay_play.hpp"
+
+namespace GUIEngine
+{
+    class CheckBoxWidget; class IconButtonWidget; class ListWidget;
+    class RibbonWidget;
+}
 
 /** \brief Dialog that allows a user to do action with ghost replay file
  * \ingroup states_screens

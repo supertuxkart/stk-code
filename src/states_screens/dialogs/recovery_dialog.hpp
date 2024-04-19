@@ -19,10 +19,13 @@
 #ifndef HEADER_RECOVERY_DIALOG_HPP
 #define HEADER_RECOVERY_DIALOG_HPP
 
-
 #include "guiengine/modaldialog.hpp"
-#include "guiengine/widgets.hpp"
 
+namespace GUIEngine
+{
+    class IconButtonWidget; class LabelWidget; class RibbonWidget;
+    class TextBoxWidget;
+}
 namespace Online
 {
     class XMLRequest;

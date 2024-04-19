@@ -20,9 +20,14 @@
 #define HEADER_HIGH_SCORE_INFO_DIALOG_HPP
 
 #include "guiengine/modaldialog.hpp"
-#include "guiengine/widgets.hpp"
 #include "race/grand_prix_data.hpp"
 #include "race/highscores.hpp"
+
+namespace GUIEngine
+{
+    class IconButtonWidget; class LabelWidget; class ListWidget;
+    class RibbonWidget;
+}
 
 /** \brief Dialog that allows a user to manage a high score
  * \ingroup states_screens

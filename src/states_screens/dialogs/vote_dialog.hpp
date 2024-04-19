@@ -21,10 +21,10 @@
 
 
 #include "guiengine/modaldialog.hpp"
-#include "guiengine/widgets.hpp"
 
 #include <irrString.h>
 
+namespace GUIEngine { class IconButtonWidget; class LabelWidget; class RatingBarWidget; class RibbonWidget; }
 namespace Online
 {
     class XMLRequest;
