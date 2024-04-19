@@ -24,6 +24,8 @@
 #include "guiengine/scalable_font.hpp"
 #include "guiengine/screen.hpp"
 #include "guiengine/widget.hpp"
+#include "guiengine/widgets/icon_button_widget.hpp"
+#include "guiengine/widgets/ribbon_widget.hpp"
 #include "online/online_profile.hpp"
 #include "states_screens/dialogs/achievement_progress_dialog.hpp"
 #include "states_screens/dialogs/player_rankings_dialog.hpp"

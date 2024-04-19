@@ -19,11 +19,14 @@
 #define HEADER_ONLINE_USER_SEARCH_HPP
 
 #include "guiengine/screen.hpp"
-#include "guiengine/widgets.hpp"
 #include "online/online_profile.hpp"
 #include "utils/ptr_vector.hpp"
 
-namespace GUIEngine { class Widget; }
+namespace GUIEngine
+{
+    class ButtonWidget; class IconButtonWidget; class ListWidget;
+    class TextBoxWidget; class Widget;
+}
 
 namespace Online { class XMLRequest; }
 

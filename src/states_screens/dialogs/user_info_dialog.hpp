@@ -20,11 +20,11 @@
 #define HEADER_USER_INFO_DIALOG_HPP
 
 #include "guiengine/modaldialog.hpp"
-#include "guiengine/widgets.hpp"
 #include "utils/types.hpp"
 
 #include <irrString.h>
 
+namespace GUIEngine { class IconButtonWidget; class LabelWidget; class RibbonWidget; }
 namespace Online
 {
     class OnlineProfile;

@@ -23,6 +23,7 @@
 #include "config/user_config.hpp"
 #include "guiengine/message_queue.hpp"
 #include "guiengine/screen.hpp"
+#include "io/xml_node.hpp"
 #include "network/network_config.hpp"
 #include "online/online_profile.hpp"
 #include "online/profile_manager.hpp"

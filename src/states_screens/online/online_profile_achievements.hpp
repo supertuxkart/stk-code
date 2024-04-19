@@ -24,9 +24,8 @@
 
 #include "achievements/achievement.hpp"
 #include "guiengine/screen.hpp"
-#include "guiengine/widgets.hpp"
+#include "guiengine/widgets/list_widget.hpp"
 #include "states_screens/online/online_profile_base.hpp"
-#include "online/profile_manager.hpp"
 
 
 namespace GUIEngine { class Widget; }

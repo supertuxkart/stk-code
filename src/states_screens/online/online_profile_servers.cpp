@@ -22,6 +22,7 @@
 #include "guiengine/engine.hpp"
 #include "guiengine/screen.hpp"
 #include "guiengine/widget.hpp"
+#include "guiengine/widgets/ribbon_widget.hpp"
 #include "network/network_config.hpp"
 #include "network/stk_host.hpp"
 #include "network/server_config.hpp"
@@ -54,15 +55,15 @@ void OnlineProfileServers::init()
     if (!PlayerManager::getCurrentOnlineId())
     {
         getWidget("back")->setFocusForPlayer(PLAYER_ID_GAME_MASTER);
-        getWidget<IconButtonWidget>("find_wan_server")->setActive(false);
-        getWidget<IconButtonWidget>("create_wan_server")->setActive(false);
-        getWidget<IconButtonWidget>("quick_wan_play")->setActive(false);
+        getWidget("find_wan_server")->setActive(false);
+        getWidget("create_wan_server")->setActive(false);
+        getWidget("quick_wan_play")->setActive(false);
     }
     else
     {
-        getWidget<IconButtonWidget>("find_wan_server")->setActive(true);
-        getWidget<IconButtonWidget>("create_wan_server")->setActive(true);
-        getWidget<IconButtonWidget>("quick_wan_play")->setActive(true);
+        getWidget("find_wan_server")->setActive(true);
+        getWidget("create_wan_server")->setActive(true);
+        getWidget("quick_wan_play")->setActive(true);
         RibbonWidget* ribbon = getWidget<RibbonWidget>("wan");
         assert(ribbon != NULL);
         ribbon->select("find_wan_server", PLAYER_ID_GAME_MASTER);
