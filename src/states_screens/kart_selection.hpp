@@ -62,7 +62,7 @@ protected:
     friend class GUIEngine::ScreenSingleton<KartSelectionScreen>;
     friend class GUIEngine::PlayerKartWidget;
 
-    bool m_multiplayer;
+    static bool m_multiplayer;
 
     /** Whether this screen is being visited from overworld or not */
     bool m_from_overworld;
