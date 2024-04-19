@@ -63,6 +63,7 @@ namespace GUIEngine
 
                 void         addWidgetsRecursively(PtrVector<Widget>& widgets,
                                     Widget* parent=NULL);
+                void         resizeWidgetsRecursively(PtrVector<Widget>& widgets);
 
     public:
                              AbstractTopLevelContainer();

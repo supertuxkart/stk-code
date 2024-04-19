@@ -951,6 +951,8 @@ namespace GUIEngine
         }
 
         Debug::closeDebugMenu();
+        if (!g_current_screen->isLoaded())
+            g_current_screen->loadFromFile();
         g_current_screen->beforeAddingWidget();
 
         // show screen

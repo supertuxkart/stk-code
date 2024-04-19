@@ -92,6 +92,25 @@ void AbstractTopLevelContainer::addWidgetsRecursively(
 }   // addWidgetsRecursively
 
 // ----------------------------------------------------------------------------
+/** This function invokes resize() of each widgets and its children.
+ *  \param widgets The vector of widgets to resize
+ *  \param parent The parent widget of the vector of widgets */
+void AbstractTopLevelContainer::resizeWidgetsRecursively(PtrVector<Widget>& widgets)
+{
+    const unsigned short widgets_amount = widgets.size();
+
+    for (int n=0; n<widgets_amount; n++)
+    {
+        widgets[n].resize();
+        if (widgets[n].getType() == WTYPE_DIV)
+        {
+            resizeWidgetsRecursively(widgets[n].m_children);
+        }
+    } // for n in all widgets
+
+}   // resizeWidgetsRecursively
+
+// ----------------------------------------------------------------------------
 
 /** This function checks recursively if a widget is a child of a vector of widgets
  *  \param within The vector of widgets that may contain the widget
