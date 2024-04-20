@@ -59,6 +59,7 @@
 #include "utils/translation.hpp"
 
 #include <IGUIEnvironment.h>
+#include <IGUIStaticText.h>
 
 using namespace Online;
 using namespace GUIEngine;

@@ -45,6 +45,7 @@
 #include "utils/string_utils.hpp"
 #include "utils/translation.hpp"
 
+#include <IGUIStaticText.h>
 #include <ITexture.h>
 
 using namespace GUIEngine;

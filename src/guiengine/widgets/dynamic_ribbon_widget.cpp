@@ -28,6 +28,7 @@
 
 #include <IrrlichtDevice.h>
 #include <IGUIEnvironment.h>
+#include <IGUIStaticText.h>
 #include <iostream>
 #include <algorithm>
 
