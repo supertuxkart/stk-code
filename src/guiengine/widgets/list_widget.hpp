@@ -108,6 +108,10 @@ namespace GUIEngine
                 m_sort_col = 0;
         }
 
+        void updateHeader();
+        int getHeaderHeight() const;
+        irr::core::rect<s32> getListBoxSize() const;
+
     public:
         typedef irr::gui::CGUISTKListBox::ListItem ListItem;
         typedef ListItem::ListCell ListCell;
@@ -302,6 +306,7 @@ namespace GUIEngine
         void setSortable(bool sortable) { m_sortable = sortable; }
         void focusHeader(const NavigationDirection nav);
         virtual void setActive(bool active=true);
+        virtual void resize();
     };
 }
 
