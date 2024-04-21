@@ -183,6 +183,7 @@ namespace irr
             void recalculateItemHeight();
             void selectNew(s32 ypos, bool onlyHover=false);
             void recalculateScrollPos();
+            void updateScrollBarSize(s32 size);
 
             // extracted that function to avoid copy&paste code
             void recalculateIconWidth();
