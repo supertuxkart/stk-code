@@ -303,14 +303,15 @@ void Widget::resize()
 {
     assert(m_magic_number == 0xCAFEC001);
 
-    if (m_element)
-        moveIrrlichtElement();
+    moveIrrlichtElement();
 }
 
 // -----------------------------------------------------------------------------
 
 void Widget::move(const int x, const int y, const int w, const int h)
 {
+    assert(m_magic_number == 0xCAFEC001);
+
     m_x = x;
     m_y = y;
     m_w = w;
