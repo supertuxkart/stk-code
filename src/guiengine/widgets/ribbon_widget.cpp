@@ -896,7 +896,7 @@ void RibbonWidget::resize()
                 }
                 else
                 {
-                    label->setOverrideFont(GUIEngine::getFont());
+                    label->setOverrideFont(NULL);
                 }
             }
             else
@@ -980,7 +980,7 @@ void RibbonWidget::resize()
                 }
                 else
                 {
-                    label->setOverrideFont(GUIEngine::getFont());
+                    label->setOverrideFont(NULL);
                 }
             }
             else
