@@ -161,6 +161,13 @@ void CGUISTKListBox::clear()
 }
 
 
+void CGUISTKListBox::updateDefaultItemHeight()
+{
+    if (ItemHeightOverride == 0)
+        ItemHeight = Font->getHeightPerLine() + 4;
+}
+
+
 void CGUISTKListBox::recalculateItemHeight()
 {
     IGUISkin* skin = Environment->getSkin();
@@ -176,9 +183,7 @@ void CGUISTKListBox::recalculateItemHeight()
 
         if (Font)
         {
-            if ( 0 == ItemHeightOverride )
-                ItemHeight = Font->getHeightPerLine() + 4;
-
+            updateDefaultItemHeight();
             Font->grab();
         }
     }
@@ -470,7 +475,11 @@ void CGUISTKListBox::updateAbsolutePosition()
         }
     }
 
-    recalculateItemHeight();
+    if (Font)
+        updateDefaultItemHeight();
+    ItemsIconWidth = 0;
+    if (!Items.empty())
+        recalculateIconWidth();
 }
 
 

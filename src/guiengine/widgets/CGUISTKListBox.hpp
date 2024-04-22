@@ -181,6 +181,7 @@ namespace irr
     private:
 
             void recalculateItemHeight();
+            void updateDefaultItemHeight();
             void selectNew(s32 ypos, bool onlyHover=false);
             void recalculateScrollPos();
             void updateScrollBarSize(s32 size);
