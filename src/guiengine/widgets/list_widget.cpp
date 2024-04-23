@@ -211,6 +211,9 @@ void ListWidget::clearColumns()
     m_header.clear();
     for (unsigned int n=0; n<m_header_elements.size(); n++)
     {
+        irr::gui::IGUIElement* e = m_header_elements[n].getIrrlichtElement();
+        if (e)
+            e->remove();
         m_header_elements[n].elementRemoved();
         m_children.remove( m_header_elements.get(n) );
     }
