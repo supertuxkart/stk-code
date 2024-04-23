@@ -69,8 +69,6 @@ private:
      *  addons_loading is being displayed. */
     int              m_selected_index;
 
-    float            m_icon_height;
-
     bool             m_reloading;
 
     bool             m_sort_desc;

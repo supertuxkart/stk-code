@@ -74,9 +74,7 @@ void OptionsScreenInput::loadedFromFile()
     m_icon_bank->addTextureAsSprite(icon4);
     m_icon_bank->addTextureAsSprite(icon5);
 
-    // scale icons depending on font height
-    const float scale = GUIEngine::getFontHeight() / 72.0f;
-    m_icon_bank->setScale(scale);
+    m_icon_bank->setScale(1.0f / 72.0f);
     m_icon_bank->setTargetIconSize(128, 128);
     m_gamepad_count = 0;
 }   // loadFromFile

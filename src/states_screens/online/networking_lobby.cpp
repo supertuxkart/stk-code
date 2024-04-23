@@ -157,7 +157,7 @@ void NetworkingLobby::loadedFromFile()
     m_icon_bank->addTextureAsSprite(m_spectate_texture);
     m_icon_bank->addTextureAsSprite(icon_6);
 
-    m_icon_bank->setScale((float)GUIEngine::getFontHeight() / 96.0f);
+    m_icon_bank->setScale(1.0f / 96.0f);
     m_icon_bank->setTargetIconSize(128, 128);
 }   // loadedFromFile
 

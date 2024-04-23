@@ -451,10 +451,9 @@ void TracksScreen::init()
             m_track_icons->addTextureAsSprite(tex);
         }
 
-        int icon_height = getHeight() / 13;
-        m_track_icons->setScale(icon_height / 256.0f);
+        m_track_icons->setScale(1.0f / 128.0f);
         m_track_icons->setTargetIconSize(256, 256);
-        m_vote_list->setIcons(m_track_icons, (int)icon_height);
+        m_vote_list->setIcons(m_track_icons);
 
         const PeerVote* vote = cl->getVote(STKHost::get()->getMyHostId());
         if (vote)

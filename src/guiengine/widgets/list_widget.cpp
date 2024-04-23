@@ -48,11 +48,12 @@ ListWidget::ListWidget() : Widget(WTYPE_LIST)
     m_sortable = true;
     m_header_created = false;
     m_choosing_header = false;
+    m_icon_scale = -1.0f;
 }
 
 // -----------------------------------------------------------------------------
 
-void ListWidget::setIcons(STKModifiedSpriteBank* icons, int size)
+void ListWidget::setIcons(STKModifiedSpriteBank* icons, float scale)
 {
     m_use_icons = (icons != NULL);
     m_icons = icons;
@@ -63,34 +64,39 @@ void ListWidget::setIcons(STKModifiedSpriteBank* icons, int size)
     if (m_use_icons)
     {
         list->setSpriteBank(m_icons);
-
-        // determine needed height
-        int item_height = 0;
-        if (size > 0)
-        {
-            item_height = size;
-        }
-        else
-        {
-            const core::array< core::rect<s32> >& rects = m_icons->getPositions();
-            const int count = rects.size();
-            for (int n=0; n<count; n++)
-            {
-                const int h = rects[n].getHeight();
-                if (h > item_height) item_height = h;
-            }
-        }
-
-        if (item_height > 0)
-        {
-            list->setItemHeight( item_height );
-        }
+        m_icon_scale = scale;
+        updateIconScale();
     }
     else
     {
         list->setSpriteBank(NULL);
     }
 
+}
+
+// -----------------------------------------------------------------------------
+void ListWidget::updateIconScale()
+{
+    CGUISTKListBox* list = getIrrlichtElement<CGUISTKListBox>();
+    assert(list != NULL);
+
+    // determine needed height
+    int item_height = (int)(m_icon_scale * GUIEngine::getFontHeight());
+    if (m_icon_scale <= 0.0f)
+    {
+        const core::array< core::rect<s32> >& rects = m_icons->getPositions();
+        const int count = rects.size();
+        for (int n = 0; n < count; n++)
+        {
+            const int h = rects[n].getHeight();
+            if (h > item_height) item_height = h;
+        }
+    }
+
+    if (item_height > 0)
+    {
+        list->setItemHeight(item_height);
+    }
 }
 
 // -----------------------------------------------------------------------------
@@ -699,4 +705,6 @@ void ListWidget::resize()
     if (m_element)
         m_element->setRelativePosition(getListBoxSize());
     updateHeader();
+    if (m_use_icons)
+        updateIconScale();
 }

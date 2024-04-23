@@ -345,12 +345,9 @@ void TrackInfoScreen::init()
 
     if (has_highscores)
     {
-        int icon_height = GUIEngine::getFontHeight();
-        int row_height = GUIEngine::getFontHeight() * 1.2f;
-                                                    
-        m_icon_bank->setScale(icon_height/128.0f);
+        m_icon_bank->setScale(1.0f / 128.0f);
         m_icon_bank->setTargetIconSize(128, 128);
-        m_highscore_entries->setIcons(m_icon_bank, (int)row_height);
+        m_highscore_entries->setIcons(m_icon_bank, 1.2f);
         m_highscore_entries->setVisible(has_highscores);
 
         updateHighScores();

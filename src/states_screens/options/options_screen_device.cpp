@@ -18,7 +18,6 @@
 #include "states_screens/options/options_screen_device.hpp"
 
 #include "config/user_config.hpp"
-#include "guiengine/CGUISpriteBank.hpp"
 #include "guiengine/message_queue.hpp"
 #include "guiengine/scalable_font.hpp"
 #include "guiengine/screen.hpp"

@@ -168,13 +168,10 @@ void HighScoreSelection::init()
 {
     Screen::init();
 
-    int icon_height = GUIEngine::getFontHeight();
-    int row_height = GUIEngine::getFontHeight() * 5 / 4;
-
     // 128 is the height of the image file
-    m_icon_bank->setScale(icon_height/128.0f);
+    m_icon_bank->setScale(1.0f / 128.0f);
     m_icon_bank->setTargetIconSize(128, 128);
-    m_high_scores_list_widget->setIcons(m_icon_bank, (int)row_height);
+    m_high_scores_list_widget->setIcons(m_icon_bank, 1.25f);
 
     refresh(/*reload high score list*/ false, /* update columns */ true);
 }   // init
