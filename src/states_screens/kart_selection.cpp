@@ -65,7 +65,6 @@ static const char ID_DONT_USE[] = "x";
 static const char ID_LOCKED[] = "locked/";
 
 KartSelectionScreen* KartSelectionScreen::m_instance_ptr = NULL;
-bool KartSelectionScreen::m_multiplayer = false;
 
 int g_root_id;
 
