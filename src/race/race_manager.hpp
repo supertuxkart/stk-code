@@ -437,6 +437,7 @@ public:
     void setNumPlayers(int players, int local_players=-1);
     void setDefaultAIKartList(const std::vector<std::string> &ai_list);
     void computeRandomKartList();
+    void setBenchmarking(bool benchmark);
 
     // ----------------------------------------------------------------------------------------
     bool hasTimeTarget() const { return m_time_target > 0.0f; }
@@ -853,11 +854,6 @@ public:
     {
         m_watching_replay = watch;
     }   // setWatchingReplay
-    // ----------------------------------------------------------------------------------------
-    void setBenchmarking(bool benchmark)
-    {
-        m_benchmarking = benchmark;
-    }   // setBenchmarking
     // ----------------------------------------------------------------------------------------
     bool isRecordingRace() const
     {

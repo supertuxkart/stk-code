@@ -60,6 +60,7 @@
 #include "states_screens/main_menu_screen.hpp"
 #include "states_screens/state_manager.hpp"
 #include "tracks/track_manager.hpp"
+#include "utils/profiler.hpp"
 #include "utils/ptr_vector.hpp"
 #include "utils/stk_process.hpp"
 #include "utils/string_utils.hpp"
@@ -1323,3 +1324,18 @@ core::stringw RaceManager::getDifficultyName(Difficulty diff) const
     }
     return "";
 }   // getDifficultyName
+
+//---------------------------------------------------------------------------------------------
+/** Set the benchmarking mode as requested, and turn off the profiler if needed. */
+void RaceManager::setBenchmarking(bool benchmark)
+{
+    m_benchmarking = benchmark;
+
+    // If the benchmark mode is turned off and the profiler is still activated,
+    // turn the profiler off and reset the drawing mode to default.
+    if (!m_benchmarking && UserConfigParams::m_profiler_enabled)
+    {
+        profiler.desactivate();
+        profiler.setDrawing(true);
+    }
+}   // setBenchmarking

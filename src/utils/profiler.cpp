@@ -223,24 +223,33 @@ void Profiler::popCPUMarker()
 }   // popCPUMarker
 
 //-----------------------------------------------------------------------------
-/** Switches the profiler either on or off.
+/** Switches the profiler on
  */
-void Profiler::toggleStatus()
+void Profiler::activate()
 {
-    UserConfigParams::m_profiler_enabled = !UserConfigParams::m_profiler_enabled;
-
-    // Avoid data from multiple profiling sessions from merging in one report
-    if (UserConfigParams::m_profiler_enabled)
+    // If the profiler is not already turned on, reset to avoid data
+    // from multiple profiling sessions from merging in one report
+    if (!UserConfigParams::m_profiler_enabled)
         reset();
 
-    // If the profiler would immediately enabled, calls that have started but
+    UserConfigParams::m_profiler_enabled = true;
+
+    // Would the profiler be enabled immediately, calls that have started but
     // not finished would not be registered correctly. So set the state to 
     // waiting, so the unfreeze started at the next sync frame (which is
     // outside of the main loop, i.e. all profiling events inside of the main
     // loop will work as expected.
     if (m_freeze_state == UNFROZEN)
         m_freeze_state = WAITING_FOR_UNFREEZE;
-}   // toggleStatus
+}   // activate
+
+//-----------------------------------------------------------------------------
+/** Switches the profiler off.
+ */
+void Profiler::desactivate()
+{
+    UserConfigParams::m_profiler_enabled = false;
+}   // desactivate
 
 //-----------------------------------------------------------------------------
 /** Saves all data for the current frame, and starts the next frame in the

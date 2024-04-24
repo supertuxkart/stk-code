@@ -109,7 +109,7 @@ RacePausedDialog::RacePausedDialog(const float percentWidth,
                 if (m_target_team != KART_TEAM_NONE)
                     getWidget("team")->setActive(false);
             }
-        }
+        } // if race chat is enabled
         else
         {
             m_text_box->setActive(false);
@@ -119,15 +119,22 @@ RacePausedDialog::RacePausedDialog(const float percentWidth,
             getWidget("emoji")->setVisible(false);
             if (m_target_team != KART_TEAM_NONE)
                 getWidget("team")->setVisible(false);
-        }
-    }
+        } // else (race chat disabled)
+    } // if isNetworking
     else if (!RaceManager::get()->isBenchmarking())
     {
         World::getWorld()->schedulePause(WorldStatus::IN_GAME_MENU_PHASE);
     }
+
     if (dynamic_cast<OverWorld*>(World::getWorld()) == NULL)
     {
-        if (RaceManager::get()->isBattleMode() || RaceManager::get()->isCTFMode())
+        if (RaceManager::get()->isBenchmarking())
+        {
+            // Other buttons of the pause menu are removed in benchmark mode
+            getWidget<IconButtonWidget>("backbtn")->setLabel(_("Back to the Performance Test"));
+            getWidget<IconButtonWidget>("exit")->setLabel(_("Exit the Performance Test"));
+        }
+        else if (RaceManager::get()->isBattleMode() || RaceManager::get()->isCTFMode())
         {
             getWidget<IconButtonWidget>("backbtn")->setLabel(_("Back to Battle"));
             if (!NetworkConfig::get()->isNetworking())
@@ -165,7 +172,7 @@ RacePausedDialog::~RacePausedDialog()
         music_manager->resumeMusic();
         SFXManager::get()->resumeAll();
     }
-    else
+    else if (!RaceManager::get()->isBenchmarking())
     {
         World::getWorld()->scheduleUnpause();
     }
@@ -215,6 +222,18 @@ void RacePausedDialog::loadedFromFile()
         {
             choice_ribbon->deleteChild("restart");
         }
+    }
+
+    // Remove all extraneous buttons in benchmark mode
+    if (RaceManager::get()->isBenchmarking())
+    {
+        GUIEngine::RibbonWidget* choice_ribbon =
+            getWidget<GUIEngine::RibbonWidget>("choiceribbon");
+        choice_ribbon->deleteChild("newrace");
+        choice_ribbon->deleteChild("restart");
+        choice_ribbon->deleteChild("endrace");
+        choice_ribbon->deleteChild("options");
+        choice_ribbon->deleteChild("help");
     }
 }
 
@@ -315,6 +334,10 @@ GUIEngine::EventPropagation
             }
             RaceManager::get()->exitRace();
             RaceManager::get()->setAIKartOverride("");
+
+            // If a benchmark is exited early through the pause menu, disable benchmarking mode
+            if (RaceManager::get()->isBenchmarking())
+                RaceManager::get()->setBenchmarking(false);
 
             if (NetworkConfig::get()->isNetworking())
             {
