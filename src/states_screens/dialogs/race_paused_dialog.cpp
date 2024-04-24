@@ -41,7 +41,7 @@
 #include "network/network_string.hpp"
 #include "network/stk_host.hpp"
 #include "race/race_manager.hpp"
-#include "states_screens/help_screen_1.hpp"
+#include "states_screens/help/help_screen_1.hpp"
 #include "states_screens/main_menu_screen.hpp"
 #include "states_screens/race_gui_base.hpp"
 #include "states_screens/race_gui_multitouch.hpp"

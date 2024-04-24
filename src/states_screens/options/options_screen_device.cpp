@@ -54,7 +54,7 @@ using namespace GUIEngine;
 
 // ----------------------------------------------------------------------------
 
-OptionsScreenDevice::OptionsScreenDevice() : Screen("options_device.stkgui")
+OptionsScreenDevice::OptionsScreenDevice() : Screen("options/options_device.stkgui")
 {
     m_config = NULL;
 }   // OptionsScreenDevice

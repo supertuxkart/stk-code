@@ -15,24 +15,24 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-#include "states_screens/help_screen_3.hpp"
+#include "states_screens/help/help_screen_3.hpp"
 
 #include "guiengine/widget.hpp"
 #include "guiengine/widgets/ribbon_widget.hpp"
 #include "modes/world.hpp"
-#include "states_screens/help_screen_1.hpp"
-#include "states_screens/help_screen_2.hpp"
-#include "states_screens/help_screen_4.hpp"
-#include "states_screens/help_screen_5.hpp"
-#include "states_screens/help_screen_6.hpp"
-#include "states_screens/help_screen_7.hpp"
+#include "states_screens/help/help_screen_1.hpp"
+#include "states_screens/help/help_screen_2.hpp"
+#include "states_screens/help/help_screen_4.hpp"
+#include "states_screens/help/help_screen_5.hpp"
+#include "states_screens/help/help_screen_6.hpp"
+#include "states_screens/help/help_screen_7.hpp"
 #include "states_screens/state_manager.hpp"
 
 using namespace GUIEngine;
 
 // -----------------------------------------------------------------------------
 
-HelpScreen3::HelpScreen3() : Screen("help3.stkgui")
+HelpScreen3::HelpScreen3() : Screen("help/help3.stkgui")
 {
 }   // HelpSCreen3
 

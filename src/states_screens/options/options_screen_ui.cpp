@@ -69,7 +69,7 @@ using namespace Online;
 
 // -----------------------------------------------------------------------------
 
-OptionsScreenUI::OptionsScreenUI() : Screen("options_ui.stkgui")
+OptionsScreenUI::OptionsScreenUI() : Screen("options/options_ui.stkgui")
 {
     m_inited = false;
 }   // OptionsScreenVideo

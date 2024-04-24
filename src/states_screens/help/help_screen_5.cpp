@@ -1,5 +1,5 @@
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2009-2015 Marianne Gagnon
+//  Copyright (C) 2016 C. Michael Murphey
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -15,36 +15,35 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-#include "states_screens/help_screen_4.hpp"
+#include "states_screens/help/help_screen_5.hpp"
 
 #include "guiengine/widget.hpp"
 #include "guiengine/widgets/ribbon_widget.hpp"
-#include "modes/world.hpp"
-#include "states_screens/help_screen_1.hpp"
-#include "states_screens/help_screen_2.hpp"
-#include "states_screens/help_screen_3.hpp"
-#include "states_screens/help_screen_5.hpp"
-#include "states_screens/help_screen_6.hpp"
-#include "states_screens/help_screen_7.hpp"
+#include "states_screens/help/help_screen_1.hpp"
+#include "states_screens/help/help_screen_2.hpp"
+#include "states_screens/help/help_screen_3.hpp"
+#include "states_screens/help/help_screen_4.hpp"
+#include "states_screens/help/help_screen_6.hpp"
+#include "states_screens/help/help_screen_7.hpp"
 #include "states_screens/state_manager.hpp"
 
 using namespace GUIEngine;
 
 // -----------------------------------------------------------------------------
 
-HelpScreen4::HelpScreen4() : Screen("help4.stkgui")
+HelpScreen5::HelpScreen5() : Screen("help/help5.stkgui")
 {
-}   // HelpScreen4
+}   // HelpScreen5
 
 // -----------------------------------------------------------------------------
 
-void HelpScreen4::loadedFromFile()
+void HelpScreen5::loadedFromFile()
 {
 }   // loadedFromFile
 
 // -----------------------------------------------------------------------------
 
-void HelpScreen4::eventCallback(Widget* widget, const std::string& name, const int playerID)
+void HelpScreen5::eventCallback(Widget* widget, const std::string& name, const int playerID)
 {
     if (name == "category")
     {
@@ -58,10 +57,10 @@ void HelpScreen4::eventCallback(Widget* widget, const std::string& name, const i
             screen = HelpScreen2::getInstance();
         else if (selection == "page3")
             screen = HelpScreen3::getInstance();
-        //else if (selection == "page4")
-        //    screen = HelpScreen4::getInstance();
-        else if (selection == "page5")
-            screen = HelpScreen5::getInstance();
+        else if (selection == "page4")
+            screen = HelpScreen4::getInstance();
+        //else if (selection == "page5")
+        //    screen = HelpScreen5::getInstance();
         else if (selection == "page6")
             screen = HelpScreen6::getInstance();
         else if (selection == "page7")
@@ -77,7 +76,7 @@ void HelpScreen4::eventCallback(Widget* widget, const std::string& name, const i
 
 // -----------------------------------------------------------------------------
 
-void HelpScreen4::init()
+void HelpScreen5::init()
 {
     Screen::init();
     RibbonWidget* w = this->getWidget<RibbonWidget>("category");
@@ -85,7 +84,7 @@ void HelpScreen4::init()
     if (w != NULL)
     {
         w->setFocusForPlayer(PLAYER_ID_GAME_MASTER);
-        w->select( "page4", PLAYER_ID_GAME_MASTER );
+        w->select( "page5", PLAYER_ID_GAME_MASTER );
     }
 }   // init
 

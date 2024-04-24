@@ -43,7 +43,7 @@ using namespace GUIEngine;
 
 // -----------------------------------------------------------------------------
 
-OptionsScreenAudio::OptionsScreenAudio() : Screen("options_audio.stkgui")
+OptionsScreenAudio::OptionsScreenAudio() : Screen("options/options_audio.stkgui")
 {
 }   // OptionsScreenAudio
 

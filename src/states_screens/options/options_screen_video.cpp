@@ -201,7 +201,7 @@ void OptionsScreenVideo::setImageQuality(int quality)
 
 // --------------------------------------------------------------------------------------------
 
-OptionsScreenVideo::OptionsScreenVideo() : Screen("options_video.stkgui"),
+OptionsScreenVideo::OptionsScreenVideo() : Screen("options/options_video.stkgui"),
                                            m_prev_adv_pipline(false),
                                            m_prev_img_quality(-1)
 {

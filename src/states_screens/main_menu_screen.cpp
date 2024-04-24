@@ -46,7 +46,7 @@
 #include "states_screens/credits.hpp"
 #include "states_screens/cutscene_general.hpp"
 #include "states_screens/grand_prix_editor_screen.hpp"
-#include "states_screens/help_screen_1.hpp"
+#include "states_screens/help/help_screen_1.hpp"
 #include "states_screens/high_score_selection.hpp"
 #include "states_screens/offline_kart_selection.hpp"
 #include "states_screens/online/online_profile_achievements.hpp"

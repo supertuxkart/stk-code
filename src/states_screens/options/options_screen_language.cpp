@@ -61,7 +61,7 @@ using namespace Online;
 
 // -----------------------------------------------------------------------------
 
-OptionsScreenLanguage::OptionsScreenLanguage() : Screen("options_language.stkgui")
+OptionsScreenLanguage::OptionsScreenLanguage() : Screen("options/options_language.stkgui")
 {
     m_inited = false;
 }   // OptionsScreenLanguage

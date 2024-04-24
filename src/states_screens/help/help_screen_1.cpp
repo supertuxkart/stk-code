@@ -15,7 +15,7 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-#include "states_screens/help_screen_1.hpp"
+#include "states_screens/help/help_screen_1.hpp"
 
 #include "challenges/unlock_manager.hpp"
 #include "config/player_manager.hpp"
@@ -29,12 +29,12 @@
 #include "input/keyboard_device.hpp"
 #include "karts/kart_properties_manager.hpp"
 #include "race/race_manager.hpp"
-#include "states_screens/help_screen_2.hpp"
-#include "states_screens/help_screen_3.hpp"
-#include "states_screens/help_screen_4.hpp"
-#include "states_screens/help_screen_5.hpp"
-#include "states_screens/help_screen_6.hpp"
-#include "states_screens/help_screen_7.hpp"
+#include "states_screens/help/help_screen_2.hpp"
+#include "states_screens/help/help_screen_3.hpp"
+#include "states_screens/help/help_screen_4.hpp"
+#include "states_screens/help/help_screen_5.hpp"
+#include "states_screens/help/help_screen_6.hpp"
+#include "states_screens/help/help_screen_7.hpp"
 #include "states_screens/state_manager.hpp"
 
 using namespace GUIEngine;
@@ -44,7 +44,7 @@ using namespace GUIEngine;
 //         (the specialized test of this first screen is a tiny exception)
 // -----------------------------------------------------------------------------
 
-HelpScreen1::HelpScreen1() : Screen("help1.stkgui")
+HelpScreen1::HelpScreen1() : Screen("help/help1.stkgui")
 {
 }   // HelpScreen1
 

@@ -53,7 +53,7 @@ using namespace GUIEngine;
 
 // -----------------------------------------------------------------------------
 
-OptionsScreenInput::OptionsScreenInput() : Screen("options_input.stkgui")
+OptionsScreenInput::OptionsScreenInput() : Screen("options/options_input.stkgui")
 {
 }   // OptionsScreenInput
 
