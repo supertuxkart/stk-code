@@ -120,8 +120,8 @@ namespace GUIEngine
         
         SpinnerWidget(const bool gauge=false);
         virtual ~SpinnerWidget() {}
-        virtual void move(const int x, const int y, const int w, const int h);
-                
+        virtual void resize();
+
         void addLabel(irr::core::stringw label);
         void clearLabels();
 
