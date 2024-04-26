@@ -78,26 +78,6 @@ public:
 };   // Gaussian3HBlurShader
 
 // ============================================================================
-class ComputeShadowBlurVShader : public TextureShader<ComputeShadowBlurVShader, 1,
-                                               core::vector2df,
-                                               std::vector<float> >
-{
-public:
-    GLuint m_dest_tu;
-    ComputeShadowBlurVShader()
-    {
-#if !defined(USE_GLES2)
-        loadProgram(OBJECT, GL_COMPUTE_SHADER, "blurshadowV.comp");
-        m_dest_tu = 1;
-        assignUniforms("pixel", "weights");
-        assignSamplerNames(0, "source", ST_NEARED_CLAMPED_FILTERED);
-        assignTextureUnit(m_dest_tu, "dest");
-#endif
-    }   // ComputeShadowBlurVShader
-
-};   // ComputeShadowBlurVShader
-
-// ============================================================================
 class Gaussian6VBlurShader : public TextureShader<Gaussian6VBlurShader, 1,
                                            core::vector2df, float>
 {
@@ -174,23 +154,6 @@ public:
         assignTextureUnit(m_dest_tu, "dest");
     }   // ComputeGaussian6HBlurShader
 };   // ComputeGaussian6HBlurShader
-
-// ============================================================================
-class ComputeShadowBlurHShader : public TextureShader<ComputeShadowBlurHShader, 1,
-                                               core::vector2df,
-                                               std::vector<float> >
-{
-public:
-    GLuint m_dest_tu;
-    ComputeShadowBlurHShader()
-    {
-        loadProgram(OBJECT, GL_COMPUTE_SHADER, "blurshadowH.comp");
-        m_dest_tu = 1;
-        assignUniforms("pixel", "weights");
-        assignSamplerNames(0, "source", ST_NEARED_CLAMPED_FILTERED);
-        assignTextureUnit(m_dest_tu, "dest");
-    }   // ComputeShadowBlurHShader
-};   // ComputeShadowBlurHShader
 #endif
 
 // ============================================================================
