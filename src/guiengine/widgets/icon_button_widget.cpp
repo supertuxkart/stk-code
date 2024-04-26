@@ -371,9 +371,12 @@ void IconButtonWidget::updateIconRect()
     if (m_scale_mode == SCALE_MODE_KEEP_TEXTURE_ASPECT_RATIO ||
         m_scale_mode == SCALE_MODE_LIST_WIDGET)
     {
-        assert(m_texture->getOriginalSize().Height > 0);
-        useAspectRatio = (float)m_texture->getOriginalSize().Width /
-                         (float)m_texture->getOriginalSize().Height;
+        if (m_texture)
+        {
+            assert(m_texture->getOriginalSize().Height > 0);
+            useAspectRatio = (float)m_texture->getOriginalSize().Width /
+                             (float)m_texture->getOriginalSize().Height;
+        }
     }
     else if (m_scale_mode == SCALE_MODE_KEEP_CUSTOM_ASPECT_RATIO)
     {
