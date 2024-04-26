@@ -442,7 +442,6 @@ void WorldStatus::updateTime(int ticks)
                 {
                     // End profiling
                     profiler.desactivate();
-                    profiler.writeToFile();
                     profiler.setDrawing(true);
                 }
                 terminateRace();

@@ -62,10 +62,12 @@
 #include "states_screens/feature_unlocked.hpp"
 #include "states_screens/main_menu_screen.hpp"
 #include "states_screens/online/networking_lobby.hpp"
+#include "states_screens/options/options_screen_video.hpp"
 #include "states_screens/race_setup_screen.hpp"
 #include "tips/tips_manager.hpp"
 #include "tracks/track.hpp"
 #include "tracks/track_manager.hpp"
+#include "utils/profiler.hpp"
 #include "utils/string_utils.hpp"
 #include "utils/translation.hpp"
 
@@ -256,6 +258,23 @@ void RaceResultGUI::enableAllButtons()
     if (RaceManager::get()->getMajorMode() == RaceManager::MAJOR_MODE_GRAND_PRIX)
     {
         enableGPProgress();
+    }
+
+    // In benchmark mode, offer three options : saving the results to a file,
+    // going back to the main menu, and going back to the video options
+    if (RaceManager::get()->isBenchmarking())
+    {
+        right->setLabel(_("Back to video settings"));
+        right->setImage("gui/icons/main_options.png");
+        right->setVisible(true);
+        operations->select("right", PLAYER_ID_GAME_MASTER);
+        middle->setLabel(_("Save the test results"));
+        middle->setImage("gui/icons/blue_arrow.png");
+        middle->setVisible(true);
+        left->setLabel(_("Back to main menu"));
+        left->setImage("gui/icons/back.png");
+        left->setVisible(true);
+        return;        
     }
 
     // If we're in a network world, change the buttons text
@@ -546,6 +565,29 @@ void RaceResultGUI::eventCallback(GUIEngine::Widget* widget,
             return;
         }
 
+        if (RaceManager::get()->isBenchmarking())
+        {
+            if (action == "middle") // Save benchmark results
+            {
+                profiler.writeToFile();
+            }
+            else                    // Leave to menu or video settings
+            {
+                // Turn off benchmark mode and leave
+                RaceManager::get()->setBenchmarking(false);
+                RaceManager::get()->exitRace();
+                RaceManager::get()->setAIKartOverride("");
+
+                // We first go the main menu in both situations, because the back button
+                // in the settings will not work as expected otherwise.
+                StateManager::get()->resetAndGoToScreen(MainMenuScreen::getInstance());
+                // If the video settings is requested, we then immediately go there
+                if (action == "right")
+                    OptionsScreenVideo::getInstance()->push();
+            }
+            return;
+        }
+
         StateManager::get()->popMenu();
         if (action == "right")        // Restart
         {
@@ -596,6 +638,10 @@ void RaceResultGUI::eventCallback(GUIEngine::Widget* widget,
         }
         else if (action == "left")        // Back to main
         {
+            // If benchmarking, turn off benchmark mode
+            if (RaceManager::get()->isBenchmarking())
+                RaceManager::get()->setBenchmarking(false);
+
             RaceManager::get()->exitRace();
             RaceManager::get()->setAIKartOverride("");
             StateManager::get()->resetAndGoToScreen(MainMenuScreen::getInstance());
