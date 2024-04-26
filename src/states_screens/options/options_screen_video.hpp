@@ -102,6 +102,7 @@ private:
     void updateTooltip();
     void updateBlurTooltip();
     void updateResolutionsList();
+    void configResolutionsList();
     void initPresets();
     static void onScrollResolutionsList(void* data);
 public:
@@ -124,6 +125,8 @@ public:
     virtual void unloaded() OVERRIDE;
 
     virtual bool onEscapePressed() OVERRIDE;
+
+    virtual void onResize() OVERRIDE;
 
     void         updateGfxSlider();
     void         updateBlurSlider();

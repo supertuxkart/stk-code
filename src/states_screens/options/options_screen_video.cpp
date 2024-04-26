@@ -325,155 +325,14 @@ void OptionsScreenVideo::init()
     assert( rememberWinposText != NULL );
 #endif
 
-    bool is_fullscreen_desktop = false;
     bool is_vulkan_fullscreen_desktop = false;
 #ifndef SERVER_ONLY
-    is_fullscreen_desktop =
-        GE::getGEConfig()->m_fullscreen_desktop;
     is_vulkan_fullscreen_desktop =
         GE::getDriver()->getDriverType() == video::EDT_VULKAN &&
-        is_fullscreen_desktop;
+        GE::getGEConfig()->m_fullscreen_desktop;
 #endif
 
-    // --- get resolution list from irrlicht the first time
-    if (!m_inited)
-    {
-        res->clearItems();
-
-        const std::vector<IrrDriver::VideoMode>& modes =
-                                                irr_driver->getVideoModes();
-        const int amount = (int)modes.size();
-
-        m_resolutions.clear();
-        Resolution r;
-
-        bool found_config_res = false;
-
-        // for some odd reason, irrlicht sometimes fails to report the good
-        // old standard resolutions
-        // those are always useful for windowed mode
-        bool found_1024_768 = false;
-        bool found_1280_720 = false;
-
-        for (int n=0; n<amount; n++)
-        {
-            r.width  = modes[n].getWidth();
-            r.height = modes[n].getHeight();
-            r.fullscreen = true;
-            m_resolutions.push_back(r);
-
-            if (r.width  == UserConfigParams::m_real_width &&
-                r.height == UserConfigParams::m_real_height)
-            {
-                found_config_res = true;
-            }
-
-            if (r.width == 1024 && r.height == 768)
-            {
-                found_1024_768 = true;
-            }
-            if (r.width == 1280 && r.height == 720)
-            {
-                found_1280_720 = true;
-            }
-        }
-
-        // Use fullscreen desktop so only show current screen size
-        if (is_fullscreen_desktop)
-        {
-            found_config_res = false;
-            m_resolutions.clear();
-            found_1024_768 = true;
-            found_1280_720 = true;
-        }
-
-        if (!found_config_res)
-        {
-            r.width  = UserConfigParams::m_real_width;
-            r.height = UserConfigParams::m_real_height;
-            r.fullscreen = is_fullscreen_desktop;
-            m_resolutions.push_back(r);
-
-            if (r.width == 1024 && r.height == 768)
-            {
-                found_1024_768 = true;
-            }
-            if (r.width == 1280 && r.height == 720)
-            {
-                found_1280_720 = true;
-            }
-        } // next found resolution
-
-#if !defined(MOBILE_STK) && !defined(__SWITCH__)
-        // Add default resolutions that were not found by irrlicht
-        if (!found_1024_768)
-        {
-            r.width  = 1024;
-            r.height = 768;
-            r.fullscreen = false;
-            m_resolutions.push_back(r);
-        }
-
-        if (!found_1280_720)
-        {
-            r.width  = 1280;
-            r.height = 720;
-            r.fullscreen = false;
-            m_resolutions.push_back(r);
-        }
-#endif
-
-        // Sort resolutions by size
-        std::sort(m_resolutions.begin(), m_resolutions.end());
-
-        // Add resolutions list
-        for(std::vector<Resolution>::iterator it = m_resolutions.begin();
-            it != m_resolutions.end(); it++)
-        {
-            const float ratio = it->getRatio();
-            char name[32];
-            sprintf(name, "%ix%i", it->width, it->height);
-
-            core::stringw label;
-            label += it->width;
-            label += L"\u00D7";
-            label += it->height;
-
-#define ABOUT_EQUAL(a , b) (fabsf( a - b ) < 0.01)
-
-            if      (ABOUT_EQUAL( ratio, (5.0f/4.0f) ))
-                res->addItem(label, name, "/gui/icons/screen54.png");
-            else if (ABOUT_EQUAL( ratio, (4.0f/3.0f) ))
-                res->addItem(label, name, "/gui/icons/screen43.png");
-            else if (ABOUT_EQUAL( ratio, (16.0f/10.0f)))
-                res->addItem(label, name, "/gui/icons/screen1610.png");
-            else if (ABOUT_EQUAL( ratio, (5.0f/3.0f) ))
-                res->addItem(label, name, "/gui/icons/screen53.png");
-            else if (ABOUT_EQUAL( ratio, (3.0f/2.0f) ))
-                res->addItem(label, name, "/gui/icons/screen32.png");
-            else if (ABOUT_EQUAL( ratio, (16.0f/9.0f) ))
-                res->addItem(label, name, "/gui/icons/screen169.png");
-            else
-                res->addItem(label, name, "/gui/icons/screen_other.png");
-#undef ABOUT_EQUAL
-        } // add next resolution
-    } // end if not inited
-
-    res->updateItemDisplay();
-
-    // ---- select current resolution every time
-    char searching_for[32];
-    snprintf(searching_for, 32, "%ix%i", (int)UserConfigParams::m_real_width,
-                                         (int)UserConfigParams::m_real_height);
-
-
-    if (!res->setSelection(searching_for, PLAYER_ID_GAME_MASTER,
-                          false /* focus it */, true /* even if deactivated*/))
-    {
-        Log::error("OptionsScreenVideo", "Cannot find resolution %s", searching_for);
-    }
-
-
+    configResolutionsList();
     // --- set gfx settings values
     updateGfxSlider();
     updateBlurSlider();
@@ -513,6 +372,164 @@ void OptionsScreenVideo::init()
         getWidget("fullscreen")->setFocusForPlayer(PLAYER_ID_GAME_MASTER);
     }
 }   // init
+
+// --------------------------------------------------------------------------------------------
+
+void OptionsScreenVideo::onResize()
+{
+    Screen::onResize();
+    configResolutionsList();
+}   // onResize
+
+// --------------------------------------------------------------------------------------------
+
+void OptionsScreenVideo::configResolutionsList()
+{
+    DynamicRibbonWidget* res = getWidget<DynamicRibbonWidget>("resolutions");
+    if (res == NULL)
+        return;
+
+    bool is_fullscreen_desktop = false;
+#ifndef SERVER_ONLY
+    is_fullscreen_desktop =
+        GE::getGEConfig()->m_fullscreen_desktop;
+#endif
+
+    res->clearItems();
+
+    const std::vector<IrrDriver::VideoMode>& modes =
+                                            irr_driver->getVideoModes();
+    const int amount = (int)modes.size();
+
+    m_resolutions.clear();
+    Resolution r;
+
+    bool found_config_res = false;
+
+    // for some odd reason, irrlicht sometimes fails to report the good
+    // old standard resolutions
+    // those are always useful for windowed mode
+    bool found_1024_768 = false;
+    bool found_1280_720 = false;
+
+    for (int n=0; n<amount; n++)
+    {
+        r.width  = modes[n].getWidth();
+        r.height = modes[n].getHeight();
+        r.fullscreen = true;
+        m_resolutions.push_back(r);
+
+        if (r.width  == UserConfigParams::m_real_width &&
+            r.height == UserConfigParams::m_real_height)
+        {
+            found_config_res = true;
+        }
+
+        if (r.width == 1024 && r.height == 768)
+        {
+            found_1024_768 = true;
+        }
+        if (r.width == 1280 && r.height == 720)
+        {
+            found_1280_720 = true;
+        }
+    }
+
+    // Use fullscreen desktop so only show current screen size
+    if (is_fullscreen_desktop)
+    {
+        found_config_res = false;
+        m_resolutions.clear();
+        found_1024_768 = true;
+        found_1280_720 = true;
+    }
+
+    if (!found_config_res)
+    {
+        r.width  = UserConfigParams::m_real_width;
+        r.height = UserConfigParams::m_real_height;
+        r.fullscreen = is_fullscreen_desktop;
+        m_resolutions.push_back(r);
+
+        if (r.width == 1024 && r.height == 768)
+        {
+            found_1024_768 = true;
+        }
+        if (r.width == 1280 && r.height == 720)
+        {
+            found_1280_720 = true;
+        }
+    } // next found resolution
+
+#if !defined(MOBILE_STK) && !defined(__SWITCH__)
+    // Add default resolutions that were not found by irrlicht
+    if (!found_1024_768)
+    {
+        r.width  = 1024;
+        r.height = 768;
+        r.fullscreen = false;
+        m_resolutions.push_back(r);
+    }
+
+    if (!found_1280_720)
+    {
+        r.width  = 1280;
+        r.height = 720;
+        r.fullscreen = false;
+        m_resolutions.push_back(r);
+    }
+#endif
+
+    // Sort resolutions by size
+    std::sort(m_resolutions.begin(), m_resolutions.end());
+
+    // Add resolutions list
+    for(std::vector<Resolution>::iterator it = m_resolutions.begin();
+        it != m_resolutions.end(); it++)
+    {
+        const float ratio = it->getRatio();
+        char name[32];
+        sprintf(name, "%ix%i", it->width, it->height);
+
+        core::stringw label;
+        label += it->width;
+        label += L"\u00D7";
+        label += it->height;
+
+#define ABOUT_EQUAL(a , b) (fabsf( a - b ) < 0.01)
+
+        if      (ABOUT_EQUAL( ratio, (5.0f/4.0f) ))
+            res->addItem(label, name, "/gui/icons/screen54.png");
+        else if (ABOUT_EQUAL( ratio, (4.0f/3.0f) ))
+            res->addItem(label, name, "/gui/icons/screen43.png");
+        else if (ABOUT_EQUAL( ratio, (16.0f/10.0f)))
+            res->addItem(label, name, "/gui/icons/screen1610.png");
+        else if (ABOUT_EQUAL( ratio, (5.0f/3.0f) ))
+            res->addItem(label, name, "/gui/icons/screen53.png");
+        else if (ABOUT_EQUAL( ratio, (3.0f/2.0f) ))
+            res->addItem(label, name, "/gui/icons/screen32.png");
+        else if (ABOUT_EQUAL( ratio, (16.0f/9.0f) ))
+            res->addItem(label, name, "/gui/icons/screen169.png");
+        else
+            res->addItem(label, name, "/gui/icons/screen_other.png");
+#undef ABOUT_EQUAL
+    } // add next resolution
+
+    res->updateItemDisplay();
+
+    // ---- select current resolution every time
+    char searching_for[32];
+    snprintf(searching_for, 32, "%ix%i", (int)UserConfigParams::m_real_width,
+                                         (int)UserConfigParams::m_real_height);
+
+
+    if (!res->setSelection(searching_for, PLAYER_ID_GAME_MASTER,
+                          false /* focus it */, true /* even if deactivated*/))
+    {
+        Log::error("OptionsScreenVideo", "Cannot find resolution %s", searching_for);
+    }
+
+}   // configResolutionsList
 
 // --------------------------------------------------------------------------------------------
 
