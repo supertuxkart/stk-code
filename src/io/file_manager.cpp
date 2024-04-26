@@ -850,6 +850,14 @@ std::string FileManager::getGPDir() const
 }   // getGPDir
 
 //-----------------------------------------------------------------------------
+/** Returns the directory in which the stdout file should be stored.
+ */
+std::string FileManager::getStdoutDir() const
+{
+    return m_stdout_dir;
+}   // getStdoutDir
+
+//-----------------------------------------------------------------------------
 /** Returns the full path of a texture file name by searching in all
  *  directories currently in the texture search path. The difference to
  *  a call getAsset(TEXTURE,...) is that the latter will only return

@@ -570,6 +570,13 @@ void RaceResultGUI::eventCallback(GUIEngine::Widget* widget,
             if (action == "middle") // Save benchmark results
             {
                 profiler.writeToFile();
+
+                // Disable the saving button to make it clearer that it has been done
+                getWidget<GUIEngine::IconButtonWidget>("middle")->setActive(false);
+                // Also push a confirmation to the message queue
+                core::stringw msg = _("Performance report saved in \"%s\".",
+                    StringUtils::utf8ToWide(file_manager->getStdoutDir()));
+                MessageQueue::add(MessageQueue::MT_GENERIC, msg);
             }
             else                    // Leave to menu or video settings
             {

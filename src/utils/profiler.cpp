@@ -622,7 +622,7 @@ void Profiler::computeStableFPS()
         m_time_waited_in_slow_frames[i-1] = 0;
         m_slow_frames[i-1] = m_frame_times.size(); // Will be updated if lower
 
-        for (uint j=0; j<m_frame_times.size(); j++)
+        for (int j=0; j<(int)m_frame_times.size(); j++)
         {
             if (m_frame_times[j] > max_microseconds)
             {
