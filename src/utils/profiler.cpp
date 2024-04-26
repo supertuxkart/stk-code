@@ -26,6 +26,7 @@
 #include "graphics/irr_driver.hpp"
 #include "guiengine/scalable_font.hpp"
 #include "io/file_manager.hpp"
+#include "tracks/track.hpp"
 #include "utils/file_utils.hpp"
 #include "utils/string_utils.hpp"
 #include "utils/tls.hpp"
@@ -244,11 +245,12 @@ void Profiler::activate()
 }   // activate
 
 //-----------------------------------------------------------------------------
-/** Switches the profiler off.
+/** Switches the profiler off and computes frametime analysis.
  */
 void Profiler::desactivate()
 {
     UserConfigParams::m_profiler_enabled = false;
+    computeStableFPS();
 }   // desactivate
 
 //-----------------------------------------------------------------------------
@@ -567,23 +569,140 @@ void Profiler::drawBackground()
 }   // drawBackground
 
 //-----------------------------------------------------------------------------
+/** To be called once the data for a report has been collected,
+ * computes the average FPS, and for each integer FPS value from 1 to 1000,
+ * the proportion of frames fast enough for this FPS value,
+ * the proportion of time spent in frames fast enough for this FPS value,
+ * as well as the proportion of total benchmark time spent waiting for a frame
+ * beyond the normal duration of a frame at this FPS value.
+ */
+void Profiler::computeStableFPS()
+{
+    // TODO: Here we only check frametimes for the 1st CPU thread.
+    //       This is not problematic if there is only one thread
+    //       as seems to be default, but does it necessarily produce
+    //       correct frametimes if there are multiples?
+    //       If not, then additional code to identify the correct
+    //       frametime values is needed. Once the vector of frametimes
+    //       is produced, the rest of the computations are unchanged.
+    m_lock.lock();
+
+    ThreadData &td = m_all_threads_data[0];
+    int start = m_has_wrapped_around ? m_current_frame + 1 : 0;
+    if (start > m_max_frames) start -= m_max_frames;
+    // Remove any old data if needed
+    m_frame_times.clear();
+    m_total_frametime = 0;
+
+    while (start != m_current_frame)
+    {
+        // The overall duration of a frame is recorded in the outermost
+        // marker event, which is always the 1st event in the list.
+        const EventData &ed = td.m_all_event_data[td.m_ordered_headings[0]];
+        int frame_microseconds = int(ed.getMarker(start).getDuration()*1000);
+        // A spurious instant frame is recorded at the beginning of the recording
+        if (frame_microseconds > 0)
+            m_frame_times.push_back(frame_microseconds);
+        m_total_frametime += frame_microseconds;
+
+        start = (start + 1) % m_max_frames;
+    }   // while start != m_current_frame
+
+    m_total_frames = m_frame_times.size();
+
+    // Sort from biggest to smallest with the reverse iterators
+    std::sort(m_frame_times.rbegin(), m_frame_times.rend());
+
+    m_fps_metrics_high = m_fps_metrics_mid = m_fps_metrics_low = 0;
+
+    for (int i=1; i<=MAX_ANALYZED_FPS; i++)
+    {
+        int max_microseconds = 1000000/i; // The rounding errors are acceptable
+        m_time_spent_in_slow_frames[i-1] = 0;
+        m_time_waited_in_slow_frames[i-1] = 0;
+        m_slow_frames[i-1] = m_frame_times.size(); // Will be updated if lower
+
+        for (uint j=0; j<m_frame_times.size(); j++)
+        {
+            if (m_frame_times[j] > max_microseconds)
+            {
+                m_time_spent_in_slow_frames[i-1] += m_frame_times[j];
+                m_time_waited_in_slow_frames[i-1] += (m_frame_times[j] - max_microseconds);
+            }
+            // As frames are sorted, we can skip all remaining frames
+            else
+            {
+                m_slow_frames[i-1] = j;
+                break;
+            }
+        }
+
+        float ratio_time_spent = float(m_time_spent_in_slow_frames[i-1]) / float(m_total_frametime);
+        float ratio_time_waited = float(m_time_waited_in_slow_frames[i-1]) / float(m_total_frametime);
+
+        if (ratio_time_spent < 0.5f  && ratio_time_waited < 0.1f)
+            m_fps_metrics_high = i;
+        if (ratio_time_spent < 0.12f && ratio_time_waited < 0.02f)
+            m_fps_metrics_mid  = i;
+        if (ratio_time_spent < 0.01f && ratio_time_waited < 0.001f)
+            m_fps_metrics_low  = i;
+    }
+
+    Log::info("Profiler", "Frame count '%i', Time (ms) '%i', Steady FPS '%i', Mostly stable FPS '%i', Typical FPS '%i'", m_total_frames, m_total_frametime/1000, m_fps_metrics_low, m_fps_metrics_mid, m_fps_metrics_high);
+
+    m_lock.unlock();
+} // computeStableFPS
+
+//-----------------------------------------------------------------------------
 /** Saves the collected profile data to a file. Filename is based on the
  *  stdout name (with -profile appended).
  */
 void Profiler::writeToFile()
 {
+    // Turn the profiler off, and ensure overall performance metrics are computed
+    if (UserConfigParams::m_profiler_enabled)
+        desactivate();
+
     m_lock.lock();
     std::string base_name =
                file_manager->getUserConfigFile(file_manager->getStdoutName());
-    // First CPU data
+
+    // 1: Save overall performance metrics
+    std::ofstream f(FileUtils::getPortableWritingPath(base_name +
+        ".perf-report-" + (Track::getCurrentTrack() != NULL ? Track::getCurrentTrack()->getIdent() : "menu") + ".csv"));
+
+    f << "Total frame count, Total profiling time (ms),";
+    f << std::endl;
+    f << m_total_frames << ", " << int(m_total_frametime / 1000) << ",";
+    f << std::endl;
+    f << std::endl;
+    f << "Steady FPS, Mostly stable FPS, Typical FPS,";
+    f << std::endl;
+    f << m_fps_metrics_low << ", " << m_fps_metrics_mid << ", " << m_fps_metrics_high << ",";
+    f << std::endl;
+    f << std::endl;
+    f << "Target FPS, Slow frames count, Duration of slow frames (ratio), Excess duration of slow frames (ratio),";
+    f << std::endl;
+
+    for (unsigned int i = 1; i < MAX_ANALYZED_FPS; i++)
+    {
+        float ratio_time_spent = float(m_time_spent_in_slow_frames[i-1]) / float(m_total_frametime);
+        float ratio_time_waited = float(m_time_waited_in_slow_frames[i-1]) / float(m_total_frametime);
+        f << i << ", " << m_slow_frames[i-1] << ", " << ratio_time_spent << ", " << ratio_time_waited << ",";
+        f << std::endl;
+    }
+    f.close();
+
+    // 2: Save per-thread CPU data
     for (int thread_id = 0; thread_id < m_threads_used; thread_id++)
     {
-        std::ofstream f(FileUtils::getPortableWritingPath(
-            base_name + ".profile-cpu-" + StringUtils::toString(thread_id)));
+        std::ofstream f(FileUtils::getPortableWritingPath(base_name +
+            ".profile-" + (Track::getCurrentTrack() != NULL ? Track::getCurrentTrack()->getIdent() : "menu") +
+            "-cpu-" + StringUtils::toString(thread_id) + ".csv"));
         ThreadData &td = m_all_threads_data[thread_id];
         f << "#  ";
         for (unsigned int i = 0; i < td.m_ordered_headings.size(); i++)
-            f << "\"" << td.m_ordered_headings[i] << "(" << i+1 <<")\"   ";
+            f << "\"" << td.m_ordered_headings[i] << "(" << i+1 <<")\",   ";
         f << std::endl;
         int start = m_has_wrapped_around ? m_current_frame + 1 : 0;
         if (start > m_max_frames) start -= m_max_frames;
@@ -592,7 +711,7 @@ void Profiler::writeToFile()
             for (unsigned int i = 0; i < td.m_ordered_headings.size(); i++)
             {
                 const EventData &ed = td.m_all_event_data[td.m_ordered_headings[i]];
-                f << int(ed.getMarker(start).getDuration()*1000) << " ";
+                f << int(ed.getMarker(start).getDuration()*1000) << ", ";
             }   // for i i new_headings
             f << std::endl;
             start = (start + 1) % m_max_frames;
@@ -600,12 +719,15 @@ void Profiler::writeToFile()
         f.close();
     }   // for all thread_ids
 
-    std::ofstream f_gpu(FileUtils::getPortableWritingPath(base_name + ".profile-gpu"));
+
+    // 3: Save GPU data
+    std::ofstream f_gpu(FileUtils::getPortableWritingPath(base_name + ".profile-"
+        + (Track::getCurrentTrack() != NULL ? Track::getCurrentTrack()->getIdent() : "menu") + "-gpu" + ".csv"));
     f_gpu << "# ";
 
     for (unsigned i = 0; i < Q_LAST; i++)
     {
-        f_gpu << "\"" << irr_driver->getGPUQueryPhaseName(i) << "(" << i+1 << ")\"   ";
+        f_gpu << "\"" << irr_driver->getGPUQueryPhaseName(i) << "(" << i+1 << ")\",   ";
     }   // for i < Q_LAST
     f_gpu << std::endl;
 
@@ -615,7 +737,7 @@ void Profiler::writeToFile()
     {
         for (unsigned i = 0; i < Q_LAST; i++)
         {
-            f_gpu << m_gpu_times[start*Q_LAST + i] << "   ";
+            f_gpu << m_gpu_times[start*Q_LAST + i] << ",   ";
         }   // for i < Q_LAST
         f_gpu << std::endl;
         start = (start + 1) % m_max_frames;

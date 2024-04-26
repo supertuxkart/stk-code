@@ -356,7 +356,7 @@ void WorldStatus::updateTime(int ticks)
                 if(RaceManager::get()->isBenchmarking())
                 {
                     // The profiler drawings cost performance
-                    //profiler.setDrawing(false);
+                    profiler.setDrawing(false);
                     profiler.activate();
                 }
 
