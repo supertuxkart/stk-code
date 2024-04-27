@@ -197,9 +197,11 @@ void DynamicRibbonWidget::resize()
     for (unsigned i = 0; i < MAX_PLAYER_COUNT; i++)
         selected[i] = getSelectionIDString(i);
     Widget::resize();
+    GUIEngine::getGUIEnv()->setChildEnd(m_left_widget->m_element);
     updateForResizing();
     buildInternalStructure();
     updateItemDisplay();
+    GUIEngine::getGUIEnv()->setChildEnd(NULL);
     for (unsigned i = 0; i < MAX_PLAYER_COUNT; i++)
     {
         if (!selected[i].empty())

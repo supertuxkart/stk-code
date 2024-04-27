@@ -73,6 +73,7 @@ public:
 
 		T & operator * () { return Current->Element; }
 		T * operator ->() { return &Current->Element; }
+		bool isValid() const { return Current != 0; }
 
 	private:
 		explicit Iterator(SKListNode* begin) : Current(begin) {}

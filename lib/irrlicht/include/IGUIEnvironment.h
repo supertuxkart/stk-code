@@ -612,6 +612,8 @@ public:
 	virtual void readGUIElement(io::IXMLReader* reader, IGUIElement* node) =0;
 
 	virtual void removeHovered(IGUIElement* element) = 0;
+
+	virtual bool setChildEnd(IGUIElement* end) = 0;
 };
 
 
