@@ -104,6 +104,7 @@ private:
     void updateResolutionsList();
     void configResolutionsList();
     void initPresets();
+    void startBenchmark();
     static void onScrollResolutionsList(void* data);
 public:
     friend class GUIEngine::ScreenSingleton<OptionsScreenVideo>;

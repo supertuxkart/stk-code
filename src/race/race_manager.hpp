@@ -368,6 +368,7 @@ private:
     bool m_has_ghost_karts;
     bool m_watching_replay;
     bool m_benchmarking;
+    bool m_scheduled_benchmark;
 
 public:
     // ----------------------------------------------------------------------------------------
@@ -438,6 +439,7 @@ public:
     void setDefaultAIKartList(const std::vector<std::string> &ai_list);
     void computeRandomKartList();
     void setBenchmarking(bool benchmark);
+    void scheduleBenchmark();
 
     // ----------------------------------------------------------------------------------------
     bool hasTimeTarget() const { return m_time_target > 0.0f; }
@@ -874,6 +876,11 @@ public:
     {
         return m_benchmarking;
     }   // isBenchmarking
+    // ----------------------------------------------------------------------------------------
+    bool isBenchmarkScheduled() const
+    {
+        return m_scheduled_benchmark;
+    }   // isBenchmarkSchedule
     // ----------------------------------------------------------------------------------------
     void addSpareTireKart(const std::string& name)
     {

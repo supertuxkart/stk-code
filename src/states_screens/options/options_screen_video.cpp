@@ -371,6 +371,12 @@ void OptionsScreenVideo::init()
         m_fullscreen_checkbox_focus = false;
         getWidget("fullscreen")->setFocusForPlayer(PLAYER_ID_GAME_MASTER);
     }
+
+    // If a benchmark was requested and the game had to reload
+    // the graphics engine, start the benchmark when the
+    // video settings screen is loaded back afterwards.
+    if (RaceManager::get()->isBenchmarkScheduled())
+        startBenchmark();
 }   // init
 
 // --------------------------------------------------------------------------------------------
@@ -882,7 +888,7 @@ void OptionsScreenVideo::eventCallback(Widget* widget, const std::string& name,
 
         updateBlurSlider();
     }
-    else if (name == "vsync")
+    else if (name == "vsync") // Also handles the FPS limiter
     {
         GUIEngine::SpinnerWidget* vsync = getWidget<GUIEngine::SpinnerWidget>("vsync");
         assert( vsync != NULL );
@@ -904,7 +910,7 @@ void OptionsScreenVideo::eventCallback(Widget* widget, const std::string& name,
 #if !defined(SERVER_ONLY) && defined(_IRR_COMPILE_WITH_SDL_DEVICE_)
         update_swap_interval(UserConfigParams::m_swap_interval);
 #endif
-    }
+    } // vSync
     else if (name == "scale_rtts")
     {
         GUIEngine::SpinnerWidget* scale_rtts_level =
@@ -924,7 +930,7 @@ void OptionsScreenVideo::eventCallback(Widget* widget, const std::string& name,
         }
 #endif
         updateScaleRTTsSlider();
-    }
+    } // scale_rtts
     else if (name == "benchmarkCurrent")
     {
         // TODO - Add the possibility to benchmark more tracks and define replay benchmarks in
@@ -935,20 +941,27 @@ void OptionsScreenVideo::eventCallback(Widget* widget, const std::string& name,
 
         if (!result)
             Log::fatal("OptionsScreenVideo", "Can't open replay for benchmark!");
-        RaceManager::get()->setRaceGhostKarts(true);
 
-        RaceManager::get()->setMinorMode(RaceManager::MINOR_MODE_TIME_TRIAL);
-        ReplayPlay::ReplayData bench_rd = ReplayPlay::get()->getCurrentReplayData();
-        RaceManager::get()->setReverseTrack(bench_rd.m_reverse);
-        RaceManager::get()->setRecordRace(false);
-        RaceManager::get()->setWatchingReplay(true);
-        RaceManager::get()->setDifficulty((RaceManager::Difficulty)bench_rd.m_difficulty);
-
-        // The race manager automatically adds karts for the ghosts
-        RaceManager::get()->setNumKarts(0);
-        RaceManager::get()->setBenchmarking(true);
-        RaceManager::get()->startWatchingReplay(bench_rd.m_track_name, bench_rd.m_laps);
-    }
+        // Avoid crashing, when switching between advanced lighting and the old renderer
+        // before starting a performance test, ensure the image quality setting is applied
+        if (m_prev_adv_pipline != UserConfigParams::m_dynamic_lights &&
+            CVS->isGLSL())
+        {
+            irr_driver->sameRestart();
+            // We cannot start the benchmark immediately, in case we just restarted the graphics engine
+            RaceManager::get()->scheduleBenchmark();
+        }
+        else if (m_prev_img_quality != getImageQuality())
+        {
+            // TODO - check if this is enough for the setting to be properly applied
+            irr_driver->setMaxTextureSize();
+            startBenchmark();
+        }
+        else
+        {
+            startBenchmark();
+        }
+    } // benchmarkCurrent
     // TODO - Add a standard benchmark testing multiple presets
     /*else if (name == "benchmarkStandard")
     {
@@ -995,6 +1008,24 @@ void OptionsScreenVideo::eventCallback(Widget* widget, const std::string& name,
 #endif
     }
 }   // eventCallback
+
+// --------------------------------------------------------------------------------------------
+
+void OptionsScreenVideo::startBenchmark()
+{
+    RaceManager::get()->setRaceGhostKarts(true);
+    RaceManager::get()->setMinorMode(RaceManager::MINOR_MODE_TIME_TRIAL);
+    ReplayPlay::ReplayData bench_rd = ReplayPlay::get()->getCurrentReplayData();
+    RaceManager::get()->setReverseTrack(bench_rd.m_reverse);
+    RaceManager::get()->setRecordRace(false);
+    RaceManager::get()->setWatchingReplay(true);
+    RaceManager::get()->setDifficulty((RaceManager::Difficulty)bench_rd.m_difficulty);
+
+    // The race manager automatically adds karts for the ghosts
+    RaceManager::get()->setNumKarts(0);
+    RaceManager::get()->setBenchmarking(true); // Also turns off the scheduled benchmark if needed
+    RaceManager::get()->startWatchingReplay(bench_rd.m_track_name, bench_rd.m_laps);
+} // startBenchmark
 
 // --------------------------------------------------------------------------------------------
 
