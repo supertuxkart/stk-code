@@ -117,7 +117,8 @@ namespace GUIEngine
         void setScrollSpeed(float speed);
         
         // --------------------------------------------------------------------
-        
+        float getScrollSpeed() const { return m_scroll_speed; }
+        // --------------------------------------------------------------------
         /**
           * \brief Check if the current has been fully scrolled
           * \return true if the text has completely scrolled off
