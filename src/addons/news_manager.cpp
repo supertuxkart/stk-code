@@ -302,8 +302,9 @@ void NewsManager::updateNews(const XMLNode *xml, const std::string &filename)
     {
         const XMLNode *node = xml->getNode(i);
         if(node->getName()!="message") continue;
-        core::stringw news;
-        node->get("content", &news);
+        std::string raw_news;
+        node->get("content", &raw_news);
+        core::stringw news = StringUtils::xmlDecode(raw_news);
         int id=-1;
         node->get("id", &id);
         bool important=false;
