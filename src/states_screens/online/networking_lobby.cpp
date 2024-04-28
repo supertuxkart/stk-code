@@ -450,7 +450,7 @@ void NetworkingLobby::onUpdate(float delta)
         m_header->getIrrlichtElement()->remove();
         if (m_header_text_width > m_header->m_w)
         {
-            m_header->setScrollSpeed(GUIEngine::getTitleFontHeight() / 2);
+            m_header->setScrollSpeed(0.5f);
             m_header->add();
             m_header->setText(m_header_text, true);
         }
