@@ -933,6 +933,7 @@ void OptionsScreenVideo::eventCallback(Widget* widget, const std::string& name,
     } // scale_rtts
     else if (name == "benchmarkCurrent")
     {
+#ifndef SERVER_ONLY
         // TODO - Add the possibility to benchmark more tracks and define replay benchmarks in
         //        a config file
         const std::string bf_bench("benchmark_black_forest.replay");
@@ -961,6 +962,7 @@ void OptionsScreenVideo::eventCallback(Widget* widget, const std::string& name,
         {
             startBenchmark();
         }
+#endif
     } // benchmarkCurrent
     // TODO - Add a standard benchmark testing multiple presets
     /*else if (name == "benchmarkStandard")
