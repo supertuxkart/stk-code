@@ -210,6 +210,7 @@ IrrDriver::IrrDriver()
     m_recording = false;
     m_sun_interposer = NULL;
     m_scene_complexity           = 0;
+    m_lod_multiplier             = 1.0f;
 
 #ifndef SERVER_ONLY
     for (unsigned i = 0; i < Q_LAST; i++)

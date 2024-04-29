@@ -156,7 +156,7 @@ void DrawCalls::parseSceneManager(core::array<scene::ISceneNode*> &List,
             core::array<scene::ISceneNode*> child;
             if (node->getLevel() >= 0)
                 child.push_back(node->getAllNodes()[node->getLevel()]);
-            for (int i = 0; i < node->getChildren().size(); i++)
+            for (unsigned int i = 0; i < node->getChildren().size(); i++)
             {
                 if (node->getNodesSet().find(node->getChildren()[i]) == node->getNodesSet().end())
                     child.push_back(node->getChildren()[i]);

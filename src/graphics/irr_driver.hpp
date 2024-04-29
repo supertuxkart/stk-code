@@ -155,6 +155,8 @@ private:
 
     /** Store if the scene is complex (based on polycount, etc) */
     int                  m_scene_complexity;
+    /** Used for auto-LoD adjustment in low-complexity scenes */
+    float                m_lod_multiplier;
 
     /** Internal method that applies the resolution in user settings. */
     void                 applyResolutionSettings(bool recreate_device);
@@ -368,11 +370,17 @@ public:
     bool getBoundingBoxesViz()    { return m_boundingboxesviz;      }
     // ------------------------------------------------------------------------
     int getSceneComplexity() { return m_scene_complexity;           }
+    // ------------------------------------------------------------------------
     void resetSceneComplexity() { m_scene_complexity = 0;           }
+    // ------------------------------------------------------------------------
     void addSceneComplexity(int complexity)
     {
         if (complexity > 1) m_scene_complexity += (complexity - 1);
     }
+    // ------------------------------------------------------------------------
+    float getLODMultiplier() { return m_lod_multiplier;             }
+    // ------------------------------------------------------------------------
+    void  setLODMultiplier(float multiplier) { m_lod_multiplier = multiplier; }
     // ------------------------------------------------------------------------
     bool isRecording() const { return m_recording; }
     // ------------------------------------------------------------------------

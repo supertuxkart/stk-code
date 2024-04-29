@@ -2090,7 +2090,28 @@ void Track::loadTrackModel(bool reverse_track, unsigned int mode_id)
     loadObjects(root, path, model_def_loader, true, NULL, NULL);
     main_loop->renderGUI(5000);
 
-    Log::info("Track", "Overall scene complexity estimated at %d", irr_driver->getSceneComplexity());
+    // If the track is low complexity, increase distances for LoD nodes
+    // Scene complexity is not computed before LoD nodes are loaded, so
+    // instead we set a variable that will be used to update the distances
+    // later on.
+    float squared_multiplier = 1.0f;
+    if (irr_driver->getSceneComplexity() < 1500)
+    {
+        float ratio = 1.0f;
+        // Cap the potential effect
+        if (irr_driver->getSceneComplexity() < 100)
+            ratio = 15.0f;
+        else
+            ratio = 1500.0f / (float)(irr_driver->getSceneComplexity());
+
+        squared_multiplier = 0.3f + 0.7f * ratio;
+    }
+    irr_driver->setLODMultiplier(squared_multiplier);
+    // The LoD distances are stored squared in the node, therefore the real multiplier
+    // is the square root of the one that gets applied
+    Log::info("Track", "Overall scene complexity estimated at %d, Auto-LoD multiplier is %f",
+              irr_driver->getSceneComplexity(), sqrtf(squared_multiplier));
+
     // Correct the parenting of meta library
     for (auto& p : m_meta_library)
     {

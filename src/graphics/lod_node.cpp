@@ -51,6 +51,7 @@ LODNode::LODNode(std::string group_name, scene::ISceneNode* parent,
     m_area = 0;
     m_current_level = -1;
     m_current_level_dirty = true;
+    m_lod_distances_updated = false;
 }
 
 LODNode::~LODNode()
@@ -85,6 +86,15 @@ int LODNode::getLevel()
 
     const int dist =
         (int)((m_nodes[0]->getAbsolutePosition()).getDistanceFromSQ(pos.toIrrVector() ));
+
+    if (!m_lod_distances_updated)
+    {
+        for (unsigned int n=0; n<m_detail.size(); n++)
+        {
+            m_detail[n] = (int)((float)m_detail[n] * irr_driver->getLODMultiplier());
+        }
+        m_lod_distances_updated = true;
+    }
 
     for (unsigned int n=0; n<m_detail.size(); n++)
     {
@@ -136,8 +146,7 @@ void LODNode::OnAnimate(u32 timeMs)
                 }
             }
         }
-
-    }
+    } // if isVisible() && m_nodes.size() > 0
 }
 
 void LODNode::updateVisibility()
@@ -173,12 +182,12 @@ void LODNode::OnRegisterSceneNode()
         {
             m_nodes[level]->OnRegisterSceneNode();
         }
-        for (int i = 0; i < Children.size(); i++)
+        for (unsigned i = 0; i < Children.size(); i++)
         {
             if (m_nodes_set.find(Children[i]) == m_nodes_set.end())
                 Children[i]->OnRegisterSceneNode();
         }
-    }
+    } // if isVisible() && m_nodes.size() > 0
 }
 
 /* Each model with LoD has specific distances beyond which it is rendered at a lower 
@@ -189,18 +198,14 @@ void LODNode::autoComputeLevel(float scale)
 {
     m_area *= scale;
 
-    // Amount of details based on user's input
-    float agressivity = 1.0;
-    if(     UserConfigParams::m_geometry_level == 0) agressivity = 1.3;
-    else if(UserConfigParams::m_geometry_level == 1) agressivity = 0.8;
-    else if(UserConfigParams::m_geometry_level == 2) agressivity = 0.8; // Also removes many objects
-    else if(UserConfigParams::m_geometry_level == 3) agressivity = 1.8;
-    else if(UserConfigParams::m_geometry_level == 4) agressivity = 2.4;
-    else if(UserConfigParams::m_geometry_level == 5) agressivity = 3.2;
-
     // First we try to estimate how far away we need to draw
     // This first formula is equivalent to the one used up to STK 1.4
     float max_draw = 10*(sqrtf(m_area + 20) - 1);
+    // At really short distances, popping is more annoying even if
+    // the object is small, so we limit how small the distance can be
+    if (max_draw < 80)
+        max_draw = 30 + (max_draw * 0.625);
+
     // If the draw distance is too big we artificially reduce it
     // The formulas are still experimental and improvable.
     if(max_draw > 250)
@@ -209,9 +214,23 @@ void LODNode::autoComputeLevel(float scale)
     if (max_draw > 500)
         max_draw = 200 + (max_draw * 0.6);
 
-    max_draw *= agressivity;
+    // As it is faster to compute the squared distance than distance, at runtime
+    // we compare the distance saved in the LoD node with the square of the distance
+    // between the camera and the object. Therefore, we apply squaring here.
+    max_draw *= max_draw;
 
-    int step = (int) (max_draw * max_draw) / m_detail.size();
+    // Amount of details based on the user's input
+    float aggressivity = 1.0;
+    if(     UserConfigParams::m_geometry_level == 0) aggressivity = 1.5;
+    else if(UserConfigParams::m_geometry_level == 1) aggressivity = 0.65;
+    else if(UserConfigParams::m_geometry_level == 2) aggressivity = 0.65; // Also removes many objects
+    else if(UserConfigParams::m_geometry_level == 3) aggressivity = 4.5;
+    else if(UserConfigParams::m_geometry_level == 4) aggressivity = 5.75;
+    else if(UserConfigParams::m_geometry_level == 5) aggressivity = 15.0;
+
+    max_draw *= aggressivity;
+
+    int step = (int) (max_draw) / m_detail.size();
 
     // Then we recompute the level of detail culling distance
     int biais = m_detail.size();
