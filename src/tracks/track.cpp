@@ -2357,8 +2357,9 @@ void Track::loadObjects(const XMLNode* root, const std::string& path,
         {
             int geo_level = 0;
             node->get("geometry-level", &geo_level);
-            if (UserConfigParams::m_geometry_level <= 2 &&
-                UserConfigParams::m_geometry_level + geo_level - 2 > 0 &&
+            // Only remove objects in the "very low" geometry detail level.
+            // Other levels are used for LoD distance
+            if (UserConfigParams::m_geometry_level == 2 && geo_level >= 0 &&
                 !NetworkConfig::get()->isNetworking())
                 continue;
             m_track_object_manager->add(*node, parent, model_def_loader, parent_library);
