@@ -441,11 +441,11 @@ void NetworkingLobby::onResize()
         (m_header->m_w >= header_text_width && m_header->getScrollSpeed() != 0.0f))
     {
         m_header->getIrrlichtElement()->remove();
-        GUIEngine::getGUIEnv()->setChildEnd(m_back_widget->getIrrlichtElement());
+        GUIEngine::getGUIEnv()->getRootGUIElement()->setChildEnd(m_back_widget->getIrrlichtElement());
         m_header->setScrollSpeed(m_header->m_w < header_text_width ? 0.5f: 0.0f);
         m_header->add();
         m_header->setText(m_header_text, true);
-        GUIEngine::getGUIEnv()->setChildEnd(NULL);
+        GUIEngine::getGUIEnv()->getRootGUIElement()->setChildEnd(NULL);
     }
     m_header_text_width = header_text_width;
 }   // onResize
