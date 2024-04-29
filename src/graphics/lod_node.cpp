@@ -191,12 +191,12 @@ void LODNode::autoComputeLevel(float scale)
 
     // Amount of details based on user's input
     float agressivity = 1.0;
-    if(     UserConfigParams::m_geometry_level == 0) agressivity = 1.25;
-    else if(UserConfigParams::m_geometry_level == 1) agressivity = 1.0;
-    else if(UserConfigParams::m_geometry_level == 2) agressivity = 0.75;
-    else if(UserConfigParams::m_geometry_level == 3) agressivity = 1.6;
-    else if(UserConfigParams::m_geometry_level == 4) agressivity = 2.0;
-    else if(UserConfigParams::m_geometry_level == 5) agressivity = 3.0;
+    if(     UserConfigParams::m_geometry_level == 0) agressivity = 1.3;
+    else if(UserConfigParams::m_geometry_level == 1) agressivity = 0.8;
+    else if(UserConfigParams::m_geometry_level == 2) agressivity = 0.8; // Also removes many objects
+    else if(UserConfigParams::m_geometry_level == 3) agressivity = 1.8;
+    else if(UserConfigParams::m_geometry_level == 4) agressivity = 2.4;
+    else if(UserConfigParams::m_geometry_level == 5) agressivity = 3.2;
 
     // First we try to estimate how far away we need to draw
     // This first formula is equivalent to the one used up to STK 1.4
