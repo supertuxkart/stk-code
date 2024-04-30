@@ -41,12 +41,19 @@ BubbleWidget::BubbleWidget() : Widget(WTYPE_BUBBLE)
 
 // ----------------------------------------------------------------------------
 
+rect<s32> BubbleWidget::getShrinkedSize()
+{
+    recti size = rect<s32>(m_x, m_y, m_x + m_w - BUBBLE_MARGIN_ON_RIGHT, m_y + m_h);
+    size.LowerRightCorner.Y -= BOTTOM_MARGIN;
+    return size;
+}
+
+// ----------------------------------------------------------------------------
+
 void BubbleWidget::add()
 {
-    m_shrinked_size = rect<s32>(m_x, m_y, m_x + m_w - BUBBLE_MARGIN_ON_RIGHT, m_y + m_h);
+    m_shrinked_size = getShrinkedSize();
     stringw message = getText();
-
-    m_shrinked_size.LowerRightCorner.Y -= BOTTOM_MARGIN;
 
     IGUIStaticText* irrwidget;
     irrwidget = GUIEngine::getGUIEnv()->addStaticText(message.c_str(), m_shrinked_size,
@@ -74,23 +81,20 @@ void BubbleWidget::add()
     m_element->setNotClipped(true);
 }
 
-void BubbleWidget::replaceText()
+void BubbleWidget::resize()
 {
-    IGUIStaticText* irrwidget = (IGUIStaticText*) m_element;
-    // Take border into account for line breaking (happens in setText)
-    irrwidget->setDrawBorder(true);
+    m_shrinked_size = getShrinkedSize();
+    m_element->setRelativePosition(m_shrinked_size);
+    updateForNewSize();
+    updateSize();
+}
 
-    stringw message = getText();
-
-    EGUI_ALIGNMENT align = EGUIA_UPPERLEFT;
-    if      (m_properties[PROP_TEXT_ALIGN] == "center") align = EGUIA_CENTER;
-    else if (m_properties[PROP_TEXT_ALIGN] == "right")  align = EGUIA_LOWERRIGHT;
-
-    EGUI_ALIGNMENT valign = EGUIA_CENTER;
-    if (m_properties[PROP_TEXT_VALIGN] == "top") valign = EGUIA_UPPERLEFT;
-    if (m_properties[PROP_TEXT_VALIGN] == "bottom") valign = EGUIA_LOWERRIGHT;
-
+void BubbleWidget::updateForNewSize()
+{
+    IGUIStaticText* irrwidget = static_cast<IGUIStaticText*>(m_element);
     // find expanded bubble size
+    stringw message = getText();
+    irrwidget->setText(message);
     int text_height = irrwidget->getTextHeight();
 
     m_expanded_size = m_shrinked_size;
@@ -106,11 +110,28 @@ void BubbleWidget::replaceText()
         while (text_height > m_shrinked_size.getHeight() && message.size() > 10)
         {
             message = message.subString(0, message.size() - 10) + "...";
-            irrwidget->setText(message.c_str());
+            irrwidget->setText(message);
             text_height = irrwidget->getTextHeight();
         }
     }
     m_shrinked_text = message;
+}
+
+void BubbleWidget::replaceText()
+{
+    IGUIStaticText* irrwidget = (IGUIStaticText*) m_element;
+    // Take border into account for line breaking (happens in setText)
+    irrwidget->setDrawBorder(true);
+
+    EGUI_ALIGNMENT align = EGUIA_UPPERLEFT;
+    if      (m_properties[PROP_TEXT_ALIGN] == "center") align = EGUIA_CENTER;
+    else if (m_properties[PROP_TEXT_ALIGN] == "right")  align = EGUIA_LOWERRIGHT;
+
+    EGUI_ALIGNMENT valign = EGUIA_CENTER;
+    if (m_properties[PROP_TEXT_VALIGN] == "top") valign = EGUIA_UPPERLEFT;
+    if (m_properties[PROP_TEXT_VALIGN] == "bottom") valign = EGUIA_LOWERRIGHT;
+
+    updateForNewSize();
     irrwidget->setTextAlignment( align, valign );
 }
 
