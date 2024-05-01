@@ -15,14 +15,17 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
+#include "font/font_manager.hpp"
 #include "guiengine/engine.hpp"
 #include "guiengine/widgets/bubble_widget.hpp"
 #include "online/link_helper.hpp"
 #include <algorithm>
 
+#include <GlyphLayout.h>
 #include <IGUIStaticText.h>
 #include <IGUIElement.h>
 #include <IGUIEnvironment.h>
+#include <IGUIFont.h>
 
 using namespace irr::core;
 using namespace irr::gui;
@@ -77,8 +80,6 @@ void BubbleWidget::add()
 
     m_element->setTabOrder(m_id);
     m_element->setTabStop(true);
-
-    m_element->setNotClipped(true);
 }
 
 void BubbleWidget::resize()
@@ -93,9 +94,47 @@ void BubbleWidget::updateForNewSize()
 {
     IGUIStaticText* irrwidget = static_cast<IGUIStaticText*>(m_element);
     // find expanded bubble size
-    stringw message = getText();
-    irrwidget->setText(message);
-    int text_height = irrwidget->getTextHeight();
+    m_shrinked_text = getText();
+    irrwidget->setText(m_shrinked_text);
+
+start:
+    IGUIFont* font = irrwidget->getActiveFont();
+    int text_height = font->getHeightPerLine();
+    int max_cluster = -1;
+    bool has_newline = false;
+    auto& glyph_layouts = irrwidget->getGlyphLayouts();
+    for (unsigned i = 0; i < glyph_layouts.size(); i++)
+    {
+        const GlyphLayout& glyph = glyph_layouts[i];
+        if ((glyph.flags & GLF_NEWLINE) != 0)
+        {
+            has_newline = true;
+            text_height += font->getHeightPerLine();
+            if (text_height > m_shrinked_size.getHeight())
+            {
+                if (max_cluster != -1)
+                    continue;
+                for (unsigned idx = 0; idx < i; idx++)
+                {
+                    const GlyphLayout& gl = glyph_layouts[idx];
+                    for (int c : gl.cluster)
+                    {
+                        if (c > max_cluster)
+                            max_cluster = c;
+                    }
+                }
+                while (max_cluster > 0 && LineBreakingRules::endSentence(
+                    m_shrinked_text[max_cluster - 1]))
+                    max_cluster--;
+                m_shrinked_text = m_shrinked_text.subString(0, max_cluster) +
+                    L"\u2026";
+                irrwidget->setText(m_shrinked_text);
+            }
+        }
+    }
+
+    irrwidget->setText(getText());
+    text_height = irrwidget->getTextHeight();
 
     m_expanded_size = m_shrinked_size;
     const int additionalNeededSize = std::max(0, text_height - m_shrinked_size.getHeight());
@@ -104,17 +143,11 @@ void BubbleWidget::updateForNewSize()
     {
         m_expanded_size.UpperLeftCorner.Y  -= additionalNeededSize/2 + 10;
         m_expanded_size.LowerRightCorner.Y += additionalNeededSize/2 + 10;
-
-        // reduce text to fit in the available space if it's too long
-        // FIXME : this loop is ugly
-        while (text_height > m_shrinked_size.getHeight() && message.size() > 10)
-        {
-            message = message.subString(0, message.size() - 10) + "...";
-            irrwidget->setText(message);
-            text_height = irrwidget->getTextHeight();
-        }
     }
-    m_shrinked_text = message;
+    irrwidget->setText(m_shrinked_text);
+    text_height = irrwidget->getTextHeight();
+    if (has_newline && text_height > m_shrinked_size.getHeight())
+        goto start;
 }
 
 void BubbleWidget::replaceText()
@@ -122,6 +155,7 @@ void BubbleWidget::replaceText()
     IGUIStaticText* irrwidget = (IGUIStaticText*) m_element;
     // Take border into account for line breaking (happens in setText)
     irrwidget->setDrawBorder(true);
+    irrwidget->setNotClipped(true);
 
     EGUI_ALIGNMENT align = EGUIA_UPPERLEFT;
     if      (m_properties[PROP_TEXT_ALIGN] == "center") align = EGUIA_CENTER;
@@ -147,6 +181,9 @@ void BubbleWidget::setText(const irr::core::stringw &s)
 
 void BubbleWidget::updateSize()
 {
+    stringw real_text = getText();
+    if (m_shrinked_text == real_text)
+        return;
     core::rect<s32> currsize = m_shrinked_size;
 
     const int y1_top    = m_shrinked_size.UpperLeftCorner.Y;
@@ -161,10 +198,11 @@ void BubbleWidget::updateSize()
 
     m_element->setRelativePosition(currsize);
 
+    IGUIStaticText* irrwidget = static_cast<IGUIStaticText*>(m_element);
     if (m_zoom > 0.5f)
-        getIrrlichtElement<IGUIStaticText>()->setText(getText().c_str());
+        irrwidget->setText(real_text);
     else
-        getIrrlichtElement<IGUIStaticText>()->setText(m_shrinked_text.c_str());
+        irrwidget->setText(m_shrinked_text);
 }
 
 // ----------------------------------------------------------------------------

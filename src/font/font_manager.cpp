@@ -112,8 +112,64 @@ namespace LineBreakingRules
     // like using "。"instead of a ".", you can add more characters if needed.
     // For full list please visit:
     // http://webapp.docx4java.org/OnlineDemo/ecma376/WordML/kinsoku.html
+    bool endSentence(char32_t c)
+    {
+        switch (c)
+        {
+            case '!':
+                return true;
+            case ',':
+                return true;
+            case '.':
+                return true;
+            case '?':
+                return true;
+            case ':':
+                return true;
+            case ';':
+                return true;
+            // ،
+            case 1548:
+                return true;
+            // ؛
+            case 1563:
+                return true;
+            // ؟
+            case 1567:
+                return true;
+            // ！
+            case 65281:
+                return true;
+            // ？
+            case 65311:
+                return true;
+            // ，
+            case 65292:
+                return true;
+            // ：
+            case 65306:
+                return true;
+            // ；
+            case 65307:
+                return true;
+            // ．
+            case 65294:
+                return true;
+            // 。
+            case 12290:
+                return true;
+            // 、
+            case 12289:
+                return true;
+            default:
+                return false;
+        }
+    }   // endSentence
+    //-------------------------------------------------------------------------
     bool noStartingLine(char32_t c)
     {
+        if (endSentence(c))
+            return true;
         switch (c)
         {
             // ’
@@ -152,35 +208,11 @@ namespace LineBreakingRules
             // 〗
             case 12311:
                 return true;
-            // ！
-            case 65281:
-                return true;
             // ％
             case 65285:
                 return true;
-            // ？
-            case 65311:
-                return true;
             // ｀
             case 65344:
-                return true;
-            // ，
-            case 65292:
-                return true;
-            // ：
-            case 65306:
-                return true;
-            // ；
-            case 65307:
-                return true;
-            // ．
-            case 65294:
-                return true;
-            // 。
-            case 12290:
-                return true;
-            // 、
-            case 12289:
                 return true;
             default:
                 return false;
