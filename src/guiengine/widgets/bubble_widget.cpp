@@ -100,8 +100,9 @@ void BubbleWidget::updateForNewSize()
 start:
     IGUIFont* font = irrwidget->getActiveFont();
     int text_height = font->getHeightPerLine();
-    int max_cluster = -1;
     bool has_newline = false;
+#ifndef SERVER_ONLY
+    int max_cluster = -1;
     auto& glyph_layouts = irrwidget->getGlyphLayouts();
     for (unsigned i = 0; i < glyph_layouts.size(); i++)
     {
@@ -132,7 +133,7 @@ start:
             }
         }
     }
-
+#endif
     irrwidget->setText(getText());
     text_height = irrwidget->getTextHeight();
 
