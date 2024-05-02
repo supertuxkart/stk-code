@@ -101,7 +101,7 @@ namespace GUIEngine
         /** Remembered input mode that was used before keyboard creation */
         InputManager::InputDriverMode m_previous_mode;
 
-        void createButtons();
+        void initButtons();
         void assignButtons(ButtonsType buttons_type);
         core::stringw getKeyName(std::string key_id);
 
@@ -112,6 +112,7 @@ namespace GUIEngine
                        CGUIEditBox* edit_box);
         ~ScreenKeyboard();
 
+        void setArea();
         void init();
 
         virtual EventPropagation processEvent(const std::string& eventSource);
@@ -160,6 +161,8 @@ namespace GUIEngine
         {
             return BUTTONS_LOWER;
         }
+
+        virtual void onResize();
     };
 }
 

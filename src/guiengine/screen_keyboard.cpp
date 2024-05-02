@@ -147,10 +147,7 @@ ScreenKeyboard::~ScreenKeyboard()
 }   // ~ScreenKeyboard
 
 // ----------------------------------------------------------------------------
-/** Screen keyboard initialization, needs to be called after new to take into
- *  account for runtime polymorphism
- */
-void ScreenKeyboard::init()
+void ScreenKeyboard::setArea()
 {
     const core::dimension2d<u32>& frame_size = irr_driver->getFrameSize();
 
@@ -176,7 +173,15 @@ void ScreenKeyboard::init()
 #endif
 
     m_area = core::rect<s32>(x, y, x + w, y + h);
+}   // setArea
 
+// ----------------------------------------------------------------------------
+/** Screen keyboard initialization, needs to be called after new to take into
+ *  account for runtime polymorphism
+ */
+void ScreenKeyboard::init()
+{
+    setArea();
     m_irrlicht_window = GUIEngine::getGUIEnv()->addWindow(m_area, true);
     m_irrlicht_window->setDrawTitlebar(false);
     m_irrlicht_window->getCloseButton()->setVisible(false);
@@ -185,7 +190,12 @@ void ScreenKeyboard::init()
     m_previous_mode=input_manager->getMode();
     input_manager->setMode(InputManager::MENU);
     
-    createButtons();
+    initButtons();
+
+    LayoutManager::calculateLayout(m_widgets, this);
+    addWidgetsRecursively(m_widgets);
+    assert(m_buttons.size() > 0);
+    m_buttons[0]->setFocusForPlayer(PLAYER_ID_GAME_MASTER);
     assignButtons(getDefaultButtonsType());
     
     Widget* button_widget = getWidget<ButtonWidget>("Back");
@@ -194,9 +204,9 @@ void ScreenKeyboard::init()
 }   // init
 
 // ----------------------------------------------------------------------------
-/** Creates all button widgets
+/** Initializes all button widgets
  */
-void ScreenKeyboard::createButtons()
+void ScreenKeyboard::initButtons()
 {
     const auto& layout_proportions = getKeyboardLayoutProportions();
     int rows_num = layout_proportions.size();
@@ -204,6 +214,7 @@ void ScreenKeyboard::createButtons()
 
     const int margin = 2;
     int height = (m_area.getHeight() - 2 * pos_y) / rows_num - margin;
+    unsigned index = 0;
 
     for (int i = 0; i < rows_num; i++)
     {
@@ -230,7 +241,17 @@ void ScreenKeyboard::createButtons()
         
         for (int j = 0; j < cols_num; j++)
         {
-            ButtonWidget* button = new ButtonWidget();
+            ButtonWidget* button = NULL;
+            if (index < m_buttons.size())
+            {
+                button = m_buttons[index];
+            }
+            else
+            {
+                button = new ButtonWidget();
+                m_widgets.push_back(button);
+                m_buttons.push_back(button);
+            }
 
             float width = (float)total_width * layout_proportions[i][j] 
                                              / total_proportions - margin;
@@ -250,19 +271,13 @@ void ScreenKeyboard::createButtons()
             button->m_properties[PROP_HEIGHT] = height_str;
             button->m_properties[PROP_X] = pos_x_str;
             button->m_properties[PROP_Y] = pos_y_str;
-            m_widgets.push_back(button);
-            m_buttons.push_back(button);
             
             pos_x += width + margin;
+            index++;
         }
     }
 
-    LayoutManager::calculateLayout(m_widgets, this);
-    addWidgetsRecursively(m_widgets);
-    
-    assert(m_buttons.size() > 0);
-    m_buttons[0]->setFocusForPlayer(PLAYER_ID_GAME_MASTER);
-}   // createButtons
+}   // initButtons
 
 // ----------------------------------------------------------------------------
 core::stringw ScreenKeyboard::getKeyName(std::string key_id)
@@ -290,6 +305,16 @@ core::stringw ScreenKeyboard::getKeyName(std::string key_id)
     }
     return key_name;
 }
+
+// ----------------------------------------------------------------------------
+void ScreenKeyboard::onResize()
+{
+    setArea();
+    m_irrlicht_window->setRelativePosition(m_area);
+    initButtons();
+    LayoutManager::calculateLayout(m_widgets, this);
+    resizeWidgetsRecursively(m_widgets);
+}   // onResize
 
 // ----------------------------------------------------------------------------
 /** A function that allows to select one of the available buttons layout
