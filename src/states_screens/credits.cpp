@@ -215,16 +215,21 @@ void CreditsScreen::loadedFromFile()
 void CreditsScreen::init()
 {
     Screen::init();
+    reset();
+    updateAreaSize();
+}   // init
+
+// ----------------------------------------------------------------------------
+
+void CreditsScreen::updateAreaSize()
+{
     Widget* w = getWidget<Widget>("animated_area");
     assert(w != NULL);
-
-    reset();
-    
     setArea(w->m_x + GUIEngine::getFontHeight(),
              w->m_y + GUIEngine::getFontHeight() / 2,
              w->m_w - GUIEngine::getFontHeight() * 2,
              w->m_h - GUIEngine::getFontHeight());
-}   // init
+}   // updateAreaSize
 
 // ----------------------------------------------------------------------------
 
