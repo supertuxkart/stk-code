@@ -78,6 +78,12 @@ public:
 
     virtual bool onEscapePressed() OVERRIDE;
 
+    virtual void onResize() OVERRIDE
+    {
+        Screen::onResize();
+        updateKartViewsLayout();
+    }
+
 private:
     bool areAllKartsConfirmed() const;
     int getNumConfirmedKarts();
