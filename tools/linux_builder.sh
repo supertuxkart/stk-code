@@ -51,10 +51,10 @@ export DIRNAME="$(dirname "$(readlink -f "$0")")"
 
 export STK_VERSION="git`date +%Y%m%d`"
 export THREADS_NUMBER=`nproc`
-export SCHROOT_32BIT_NAME="chroot-stretch32"
-export SCHROOT_64BIT_NAME="chroot-stretch64"
-export SCHROOT_ARMV7_NAME="chroot-stretch-armhf"
-export SCHROOT_ARM64_NAME="chroot-stretch-arm64"
+export SCHROOT_32BIT_NAME="chroot-buster32"
+export SCHROOT_64BIT_NAME="chroot-buster64"
+export SCHROOT_ARMV7_NAME="chroot-buster-armhf"
+export SCHROOT_ARM64_NAME="chroot-buster-arm64"
 
 export STKCODE_DIR="$DIRNAME/.."
 export STKASSETS_DIR="$STKCODE_DIR/../supertuxkart-assets"
@@ -324,13 +324,15 @@ build_stk()
                 -DBUILD_TESTING=0 \
                 -DBUILD_CURL_EXE=0 \
                 -DCURL_USE_MBEDTLS=1 \
-                -DUSE_ZLIB=1 \
                 -DCURL_USE_OPENSSL=0 \
                 -DCURL_USE_LIBSSH=0 \
                 -DCURL_USE_LIBSSH2=0 \
                 -DCURL_USE_GSSAPI=0 \
+                -DCURL_USE_LIBPSL=0 \
+                -DUSE_ZLIB=1 \
                 -DUSE_NGHTTP2=0 \
                 -DUSE_QUICHE=0 \
+                -DUSE_LIBIDN2=0 \
                 -DHTTP_ONLY=1 \
                 -DCURL_CA_BUNDLE=none \
                 -DCURL_CA_PATH=none \
@@ -450,7 +452,7 @@ build_stk()
                 -DCMAKE_CXX_FLAGS="-fpic -O3 -g $ASTC_CFLAGS" \
                 -DNO_INVARIANCE=ON -DCLI=OFF &&
         make -j$THREADS_NUMBER &&
-        cp "$DEPENDENCIES_DIR/astc-encoder/Source/libastcenc.a" "$INSTALL_DIR/lib/" &&
+        cp "$DEPENDENCIES_DIR/astc-encoder/Source/libastcenc-native-static.a" "$INSTALL_DIR/lib/" &&
         cp "$DEPENDENCIES_DIR/astc-encoder/Source/astcenc.h" "$INSTALL_DIR/include/"
         check_error
         touch "$DEPENDENCIES_DIR/astc-encoder.stamp"
@@ -535,7 +537,8 @@ build_stk()
         cd "$DEPENDENCIES_DIR/sqlite"
         cmake . -DCMAKE_FIND_ROOT_PATH="$INSTALL_DIR" \
                 -DCMAKE_INSTALL_PREFIX="$INSTALL_DIR" \
-                -DINSTALL_PKGCONFIG_DIR="$PKG_CONFIG_PATH" &&
+                -DINSTALL_PKGCONFIG_DIR="$PKG_CONFIG_PATH" \
+                -DENABLE_READLINE=0 &&
         make -j$THREADS_NUMBER &&
         make install
         check_error
@@ -742,7 +745,7 @@ create_package()
     echo "Compress package..."
     
     cd "$STK_INSTALL_DIR"
-    tar cf - "SuperTuxKart-$STK_VERSION-linux-$ARCH" | xz -T$THREADS_NUMBER -z -e -f - > "SuperTuxKart-$STK_VERSION-linux-$ARCH.tar.xz"
+    tar -czf "SuperTuxKart-$STK_VERSION-linux-$ARCH.tar.gz" "SuperTuxKart-$STK_VERSION-linux-$ARCH"
     cd -
 }
 
