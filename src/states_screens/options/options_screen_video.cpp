@@ -354,6 +354,7 @@ void OptionsScreenVideo::init()
         getWidget<SpinnerWidget>("scale_rtts")->setActive(!in_game ||
             GE::getDriver()->getDriverType() == video::EDT_VULKAN);
     }
+    getWidget<ButtonWidget>("benchmarkCurrent")->setActive(!in_game);
 #endif
 
 #if defined(MOBILE_STK) || defined(__SWITCH__)
