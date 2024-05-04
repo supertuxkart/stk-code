@@ -270,6 +270,7 @@ public:
 
     virtual void onConfirm() OVERRIDE;
     void cleanupGPProgress();
+    virtual void onResize() OVERRIDE;
 };   // RaceResultGUI
 
 #endif

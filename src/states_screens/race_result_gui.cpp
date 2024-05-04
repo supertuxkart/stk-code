@@ -1784,6 +1784,8 @@ void RaceResultGUI::unload()
             GUIEngine::Widget* result_table = getWidget("result-table");
             assert(result_table != NULL);
 
+            auto wit = m_gp_progress_widgets.begin();
+            bool resize = !m_gp_progress_widgets.empty();
             int currentTrack = RaceManager::get()->getTrackNumber();
             int font_height = getFontHeight();
             int w = (int)(UserConfigParams::m_width*0.17);
@@ -1791,21 +1793,32 @@ void RaceResultGUI::unload()
             int y = (m_top + font_height + 5);
 
             //Current progress
-            GUIEngine::LabelWidget* status_label = new GUIEngine::LabelWidget();
+            GUIEngine::LabelWidget* status_label = resize ?
+                static_cast<GUIEngine::LabelWidget*>(*wit++) :
+                new GUIEngine::LabelWidget();
             status_label->m_properties[GUIEngine::PROP_ID] = "status_label";
             status_label->m_properties[GUIEngine::PROP_TEXT_ALIGN] = "center";
             status_label->m_x = x;
             status_label->m_y = y;
             status_label->m_w = w;
             status_label->m_h = font_height;
-            status_label->add();
-            status_label->setText(_("Track %i/%i", currentTrack + 1,
-                RaceManager::get()->getGrandPrix().getNumberOfTracks()), true);
-            addGPProgressWidget(status_label);
+            if (resize)
+            {
+                status_label->resize();
+            }
+            else
+            {
+                status_label->add();
+                status_label->setText(_("Track %i/%i", currentTrack + 1,
+                    RaceManager::get()->getGrandPrix().getNumberOfTracks()), true);
+                addGPProgressWidget(status_label);
+            }
             y = (status_label->m_y + status_label->m_h + 5);
 
             //Scroll up button
-            GUIEngine::IconButtonWidget* up_button = new GUIEngine::IconButtonWidget(
+            GUIEngine::IconButtonWidget* up_button = resize ?
+                static_cast<GUIEngine::IconButtonWidget*>(*wit++) :
+                new GUIEngine::IconButtonWidget(
                 GUIEngine::IconButtonWidget::SCALE_MODE_KEEP_CUSTOM_ASPECT_RATIO,
                 false, false, GUIEngine::IconButtonWidget::ICON_PATH_TYPE_ABSOLUTE);
             up_button->m_properties[GUIEngine::PROP_ID] = "up_button";
@@ -1813,9 +1826,16 @@ void RaceResultGUI::unload()
             up_button->m_y = y;
             up_button->m_w = w;
             up_button->m_h = font_height;
-            up_button->add();
-            up_button->setImage(file_manager->getAsset(FileManager::GUI_ICON, "scroll_up.png"));
-            addGPProgressWidget(up_button);
+            if (resize)
+            {
+                up_button->resize();
+            }
+            else
+            {
+                up_button->add();
+                up_button->setImage(file_manager->getAsset(FileManager::GUI_ICON, "scroll_up.png"));
+                addGPProgressWidget(up_button);
+            }
             y = (up_button->m_y + up_button->m_h + SSHOT_SEPARATION);
 
             //Track screenshots and labels
@@ -1823,7 +1843,8 @@ void RaceResultGUI::unload()
             for (int i = m_start_track; i < m_end_track; i++)
             {
                 //Screenshot
-                GUIEngine::IconButtonWidget* screenshot_widget =
+                GUIEngine::IconButtonWidget* screenshot_widget = resize ?
+                    static_cast<GUIEngine::IconButtonWidget*>(*wit++) :
                     new GUIEngine::IconButtonWidget(
                         GUIEngine::IconButtonWidget::
                         SCALE_MODE_KEEP_CUSTOM_ASPECT_RATIO,
@@ -1836,11 +1857,20 @@ void RaceResultGUI::unload()
                 screenshot_widget->m_h = m_sshot_height;
                 screenshot_widget->m_properties[GUIEngine::PROP_ID] =
                     ("sshot_" + StringUtils::toString(n_sshot));
-                screenshot_widget->add();
-                addGPProgressWidget(screenshot_widget);
+                if (resize)
+                {
+                    screenshot_widget->resize();
+                }
+                else
+                {
+                    screenshot_widget->add();
+                    addGPProgressWidget(screenshot_widget);
+                }
 
                 //Label
-                GUIEngine::LabelWidget* sshot_label = new GUIEngine::LabelWidget();
+                GUIEngine::LabelWidget* sshot_label = resize ?
+                    static_cast<GUIEngine::LabelWidget*>(*wit++) :
+                    new GUIEngine::LabelWidget();
                 sshot_label->m_properties[GUIEngine::PROP_ID] =
                     ("sshot_label_" + StringUtils::toString(n_sshot));
                 sshot_label->m_properties[GUIEngine::PROP_TEXT_ALIGN] = "left";
@@ -1848,8 +1878,15 @@ void RaceResultGUI::unload()
                 sshot_label->m_y = (y + (m_sshot_height / 2) - (font_height / 2));
                 sshot_label->m_w = (w / 2);
                 sshot_label->m_h = font_height;
-                sshot_label->add();
-                addGPProgressWidget(sshot_label);
+                if (resize)
+                {
+                    sshot_label->resize();
+                }
+                else
+                {
+                    sshot_label->add();
+                    addGPProgressWidget(sshot_label);
+                }
 
                 y += (m_sshot_height + SSHOT_SEPARATION);
                 n_sshot++;
@@ -1857,7 +1894,9 @@ void RaceResultGUI::unload()
             displayScreenShots();
 
             //Scroll down button
-            GUIEngine::IconButtonWidget* down_button = new GUIEngine::IconButtonWidget(
+            GUIEngine::IconButtonWidget* down_button = resize ?
+                static_cast<GUIEngine::IconButtonWidget*>(*wit++) :
+                new GUIEngine::IconButtonWidget(
                 GUIEngine::IconButtonWidget::SCALE_MODE_KEEP_CUSTOM_ASPECT_RATIO,
                 false, false, GUIEngine::IconButtonWidget::ICON_PATH_TYPE_ABSOLUTE);
             down_button->m_properties[GUIEngine::PROP_ID] = "down_button";
@@ -1865,9 +1904,16 @@ void RaceResultGUI::unload()
             down_button->m_y = y;
             down_button->m_w = w;
             down_button->m_h = font_height;
-            down_button->add();
-            down_button->setImage(file_manager->getAsset(FileManager::GUI_ICON, "scroll_down.png"));
-            addGPProgressWidget(down_button);
+            if (resize)
+            {
+                down_button->resize();
+            }
+            else
+            {
+                down_button->add();
+                down_button->setImage(file_manager->getAsset(FileManager::GUI_ICON, "scroll_down.png"));
+                addGPProgressWidget(down_button);
+            }
 
         }   // if MAJOR_MODE_GRAND_PRIX)
 
@@ -2249,4 +2295,12 @@ void RaceResultGUI::unload()
     {
         assert(m_font != NULL);
         return m_font->getDimension(L"A").Height; //Could be any capital letter
+    }
+
+    // ----------------------------------------------------------------------------
+    void RaceResultGUI::onResize()
+    {
+        Screen::onResize();
+        if (!m_gp_progress_widgets.empty())
+            enableGPProgress();
     }
