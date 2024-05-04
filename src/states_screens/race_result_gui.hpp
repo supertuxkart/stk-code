@@ -206,6 +206,9 @@ private:
     void addGPProgressWidget(GUIEngine::Widget* widget);
     void displayGPProgress();
     void displayPostRaceInfo();
+    int  displayHighscores(int x, int y);
+    int  displayLapDifficulty(int x, int y);
+    int  displayChallengeInfo(int x, int y);
     void displayCTFResults();
     void displaySoccerResults();
     void displayScreenShots();
