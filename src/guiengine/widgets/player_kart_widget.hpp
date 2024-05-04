@@ -72,6 +72,8 @@ namespace GUIEngine
         long m_magic_number;
 #endif
 
+        // -------------------------------------------------------------------------
+        void updateSize();
     public:
 
         LEAK_CHECK()
@@ -166,6 +168,15 @@ namespace GUIEngine
         virtual GUIEngine::EventPropagation onSpinnerConfirmed();
         // -------------------------------------------------------------------------
         void enableHandicapForNetwork();
+        // -------------------------------------------------------------------------
+        void updateSizeNow(int x, int y, int w, int h)
+        {
+            target_x = m_x = x;
+            target_y = m_y = y;
+            target_w = m_w = w;
+            target_h = m_h = h;
+            updateSize();
+        }
     };   // PlayerKartWidget
 }
 

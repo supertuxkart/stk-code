@@ -542,6 +542,19 @@ void PlayerKartWidget::onUpdate(float delta)
         if (m_h < target_h) m_h = target_h;
     }
 
+    updateSize();
+    // When coming from the overworld, we must rebuild the preview scene at
+    // least once, since the scene is being cleared by leaving the overworld
+    if (m_not_updated_yet)
+    {
+        m_model_view->clearRttProvider();
+        m_not_updated_yet = false;
+    }
+}   // onUpdate
+
+// -------------------------------------------------------------------------
+void PlayerKartWidget::updateSize()
+{
     setSize(m_x, m_y, m_w, m_h);
 
     if (m_player_ident_spinner != NULL)
@@ -580,15 +593,7 @@ void PlayerKartWidget::onUpdate(float delta)
                       kart_name_y,
                       kart_name_w,
                       kart_name_h);
-
-    // When coming from the overworld, we must rebuild the preview scene at
-    // least once, since the scene is being cleared by leaving the overworld
-    if (m_not_updated_yet)
-    {
-        m_model_view->clearRttProvider();
-        m_not_updated_yet = false;
-    }
-}   // onUpdate
+}   // updateSize
 
 // -------------------------------------------------------------------------
 /** Event callback */
