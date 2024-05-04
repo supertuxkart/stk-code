@@ -211,6 +211,7 @@ private:
     int  displayChallengeInfo(int x, int y);
     void displayCTFResults();
     void displaySoccerResults();
+    void drawTeamScorers(KartTeam team, int x, int y, int height);
     void displayScreenShots();
 
     int  getFontHeight () const;

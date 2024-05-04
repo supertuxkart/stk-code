@@ -1587,10 +1587,8 @@ void RaceResultGUI::displaySoccerResults()
     //Draw team scores:
     current_y += rect.Height;
     current_x /= 2;
-    irr::video::ITexture* red_icon = irr_driver->getTexture(FileManager::GUI_ICON,
-        "soccer_ball_red.png");
-    irr::video::ITexture* blue_icon = irr_driver->getTexture(FileManager::GUI_ICON,
-        "soccer_ball_blue.png");
+    irr::video::ITexture* red_icon  = irr_driver->getTexture(FileManager::GUI_ICON, "soccer_ball_red.png");
+    irr::video::ITexture* blue_icon = irr_driver->getTexture(FileManager::GUI_ICON, "soccer_ball_blue.png");
 
     int team_icon_width = team_icon_height * (red_icon->getSize().Width / red_icon->getSize().Height);
     core::recti source_rect(core::vector2di(0, 0), red_icon->getSize());
@@ -1621,135 +1619,92 @@ void RaceResultGUI::displaySoccerResults()
     pos = core::rect<s32>(center_x, current_y, center_x, current_y);
     font->draw("-", pos, color, true, false);
 
-    //Draw goal scorers:
-    //The red scorers:
-    current_y += rect.Height / 2 + rect.Height / 4;
-    font = GUIEngine::getSmallFont();
-    std::vector<SoccerWorld::ScorerData> scorers = sw->getScorers(KART_TEAM_RED);
-
-    // Maximum 10 scorers displayed in result screen
-    while (scorers.size() > 10)
-    {
-        scorers.erase(scorers.begin());
-    }
-
-    int prev_y = current_y;
-
-    for (unsigned int i = 0; i < scorers.size(); i++)
-    {
-        const bool own_goal = !(scorers.at(i).m_correct_goal);
-
-        result_text = scorers.at(i).m_player;
-        if (scorers.at(i).m_handicap_level == HANDICAP_MEDIUM)
-            result_text = _("%s (handicapped)", result_text);
-
-        if (own_goal)
-        {
-            result_text.append(" ");
-            //I18N: indicates a player that scored in their own goal in result screen
-            result_text.append(_("(Own Goal)"));
-        }
-        if (!scorers.at(i).m_country_code.empty())
-        {
-            result_text += " ";
-            result_text += StringUtils::getCountryFlag(scorers.at(i).m_country_code);
-        }
-
-        result_text.append("  ");
-        result_text.append(StringUtils::timeToString(scorers.at(i).m_time).c_str());
-        rect = font->getDimension(result_text.c_str());
-
-        if (height - prev_y < ((short)scorers.size() + 1)*(short)rect.Height)
-            current_y += (height - prev_y) / ((short)scorers.size() + 1);
-        else
-            current_y += rect.Height;
-
-        if (current_y > height) break;
-
-        pos = core::rect<s32>(current_x, current_y, current_x, current_y);
-        font->draw(result_text, pos, (own_goal ?
-            video::SColor(255, 255, 0, 0) : color), true, false);
-        irr::video::ITexture* scorer_icon = NULL;
-        const KartProperties* kp = kart_properties_manager->getKart(scorers.at(i).m_kart);
-        // For addon kart online
-        if (!kp)
-            kp = kart_properties_manager->getKart("tux");
-        if (kp)
-            scorer_icon = kp->getIconMaterial()->getTexture();
-        if (scorer_icon)
-        {
-            source_rect = core::recti(core::vector2di(0, 0), scorer_icon->getSize());
-            irr::u32 offset_x = (irr::u32)(font->getDimension(result_text.c_str()).Width / 1.5f);
-            core::recti r = core::recti(current_x - offset_x - m_width_icon, current_y,
-                current_x - offset_x, current_y + m_width_icon);
-            draw2DImage(scorer_icon, r, source_rect,
-                NULL, NULL, true);
-        }
-    }
-
-    //The blue scorers:
-    current_y = prev_y;
-    current_x += UserConfigParams::m_width / 2;
-    scorers = sw->getScorers(KART_TEAM_BLUE);
-
-    while (scorers.size() > 10)
-    {
-        scorers.erase(scorers.begin());
-    }
-
-    for (unsigned int i = 0; i < scorers.size(); i++)
-    {
-        const bool own_goal = !(scorers.at(i).m_correct_goal);
-
-        result_text = scorers.at(i).m_player;
-        if (scorers.at(i).m_handicap_level == HANDICAP_MEDIUM)
-            result_text = _("%s (handicapped)", result_text);
-
-        if (own_goal)
-        {
-            result_text.append(" ");
-            //I18N: indicates a player that scored in their own goal in result screen
-            result_text.append(_("(Own Goal)"));
-        }
-        if (!scorers.at(i).m_country_code.empty())
-        {
-            result_text += " ";
-            result_text += StringUtils::getCountryFlag(scorers.at(i).m_country_code);
-        }
-
-        result_text.append("  ");
-        result_text.append(StringUtils::timeToString(scorers.at(i).m_time).c_str());
-        rect = font->getDimension(result_text.c_str());
-
-        if (height - prev_y < ((short)scorers.size() + 1)*(short)rect.Height)
-            current_y += (height - prev_y) / ((short)scorers.size() + 1);
-        else
-            current_y += rect.Height;
-
-        if (current_y > height) break;
-
-        pos = core::rect<s32>(current_x, current_y, current_x, current_y);
-        font->draw(result_text, pos, (own_goal ?
-            video::SColor(255, 255, 0, 0) : color), true, false);
-        irr::video::ITexture* scorer_icon = NULL;
-        const KartProperties* kp = kart_properties_manager->getKart(scorers.at(i).m_kart);
-        // For addon kart online
-        if (!kp)
-            kp = kart_properties_manager->getKart("tux");
-        if (kp)
-            scorer_icon = kp->getIconMaterial()->getTexture();
-        if (scorer_icon)
-        {
-            source_rect = core::recti(core::vector2di(0, 0), scorer_icon->getSize());
-            irr::u32 offset_x = (irr::u32)(font->getDimension(result_text.c_str()).Width / 1.5f);
-            core::recti r = core::recti(current_x - offset_x - m_width_icon, current_y,
-                current_x - offset_x, current_y + m_width_icon);
-            draw2DImage(scorer_icon, r, source_rect,
-                NULL, NULL, true);
-        }
-    }
+    // Draw the scorers for each team
+    current_y += (3 * rect.Height) / 4;
+    drawTeamScorers(KART_TEAM_RED, current_x, current_y, height);
+    drawTeamScorers(KART_TEAM_BLUE, current_x, current_y, height);    
 #endif
 } // displaySoccerResults
+
+//-----------------------------------------------------------------------------
+/** Displays the goal scorers for a team
+ *  \param team The team for which to draw goal scorers
+ *  \param x Left limit of the scorers lists (both blue and red)
+ *  \param y Top limit of the scorers lists
+ *  \param height Maximum y of the table area (??) */
+void RaceResultGUI::drawTeamScorers(KartTeam team, int x, int y, int height)
+{
+#ifndef SERVER_ONLY
+    int current_x = (team == KART_TEAM_RED) ? x : x + UserConfigParams::m_width / 2;
+    int current_y = y;
+    core::rect<s32> pos(current_x, current_y, current_x, current_y);
+    int prev_y = y;
+    gui::IGUIFont* font = GUIEngine::getSmallFont();
+    core::dimension2du rect; // Filled later
+    core::stringw scorer_text;
+    static video::SColor color = video::SColor(255, 255, 255, 255);
+    SoccerWorld* sw = (SoccerWorld*)World::getWorld();
+    std::vector<SoccerWorld::ScorerData> scorers = sw->getScorers(team);
+
+    // Display a maximum of 10 scorers
+    while (scorers.size() > 10)
+    {
+        scorers.erase(scorers.begin());
+    }
+
+    for (unsigned int i = 0; i < scorers.size(); i++)
+    {
+        const bool own_goal = !(scorers.at(i).m_correct_goal);
+
+        scorer_text = scorers.at(i).m_player;
+        if (scorers.at(i).m_handicap_level == HANDICAP_MEDIUM)
+            scorer_text = _("%s (handicapped)", scorer_text);
+
+        if (own_goal)
+        {
+            scorer_text.append(" ");
+            //I18N: indicates a player that scored in their own goal in result screen
+            scorer_text.append(_("(Own Goal)"));
+        }
+        if (!scorers.at(i).m_country_code.empty())
+        {
+            scorer_text += " ";
+            scorer_text += StringUtils::getCountryFlag(scorers.at(i).m_country_code);
+        }
+
+        scorer_text.append("  ");
+        scorer_text.append(StringUtils::timeToString(scorers.at(i).m_time).c_str());
+        rect = font->getDimension(scorer_text.c_str());
+
+        if (height - prev_y < ((short)scorers.size() + 1)*(short)rect.Height)
+            current_y += (height - prev_y) / ((short)scorers.size() + 1);
+        else
+            current_y += rect.Height;
+
+        if (current_y > height) break;
+
+        pos = core::rect<s32>(current_x, current_y, current_x, current_y);
+        font->draw(scorer_text, pos, (own_goal ?
+            video::SColor(255, 255, 0, 0) : color), true, false);
+        irr::video::ITexture* scorer_icon = NULL;
+        const KartProperties* kp = kart_properties_manager->getKart(scorers.at(i).m_kart);
+        // For addon kart online
+        if (!kp)
+            kp = kart_properties_manager->getKart("tux");
+        if (kp)
+            scorer_icon = kp->getIconMaterial()->getTexture();
+        if (scorer_icon)
+        {
+            core::recti source_rect = core::recti(core::vector2di(0, 0), scorer_icon->getSize());
+            irr::u32 offset_x = (irr::u32)(font->getDimension(scorer_text.c_str()).Width / 1.5f);
+            core::recti r = core::recti(current_x - offset_x - m_width_icon, current_y,
+                current_x - offset_x, current_y + m_width_icon);
+            draw2DImage(scorer_icon, r, source_rect,
+                NULL, NULL, true);
+        }
+    } // for scorers.size()
+#endif
+} // drawTeamScorers
 
 //-----------------------------------------------------------------------------
 
