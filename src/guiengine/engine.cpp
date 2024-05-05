@@ -1240,7 +1240,10 @@ namespace GUIEngine
             g_small_title_font->getDimension( L"X" ).Height;
         Private::tiny_title_font_height =
             g_tiny_title_font->getDimension( L"X" ).Height;
-        StateManager::get()->onResize();
+        if (ScreenKeyboard::isActive())
+            ScreenKeyboard::getCurrent()->onResize();
+        if (ModalDialog::isADialogActive())
+            ModalDialog::getCurrent()->onResize();
     }   // reloadForNewSize
 
     // -----------------------------------------------------------------------
@@ -1282,6 +1285,16 @@ namespace GUIEngine
 #endif
 
         GameState gamestate = g_state_manager->getGameState();
+
+        core::dimension2d<u32> screen_size = irr_driver->getFrameSize();
+        core::dimension2d<u32> cur_screen_size;
+        if (getCurrentScreen())
+        {
+            cur_screen_size.Width = getCurrentScreen()->getWidth();
+            cur_screen_size.Height = getCurrentScreen()->getHeight();
+            if (screen_size != cur_screen_size)
+                getCurrentScreen()->onResize();
+        }
 
         // ---- some menus may need updating
         bool dialog_opened = false;
@@ -1372,7 +1385,6 @@ namespace GUIEngine
 
         if (gamestate != GAME && !gui_messages.empty())
         {
-            core::dimension2d<u32> screen_size = irr_driver->getFrameSize();
             const int text_height = getFontHeight() + 20;
             const int y_from = screen_size.Height - text_height;
 

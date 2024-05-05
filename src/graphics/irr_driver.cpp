@@ -805,7 +805,7 @@ begin:
     }
 
     // This remaps the window, so it has to be done before the clear to avoid flicker
-    m_device->setResizable(false);
+    //m_device->setResizable(false);
 
     // Immediate clear to black for a nicer user loading experience
     m_video_driver->beginScene(/*backBuffer clear*/true, /* Z */ false);
@@ -2078,14 +2078,11 @@ void IrrDriver::doScreenShot()
 // ----------------------------------------------------------------------------
 void IrrDriver::handleWindowResize()
 {
-    bool dialog_exists = GUIEngine::ModalDialog::isADialogActive() ||
-            GUIEngine::ScreenKeyboard::isActive();
-
     // This will allow main menu auto resize if missed a resize event
     core::dimension2du current_screen_size =
         m_video_driver->getCurrentRenderTargetSize();
     GUIEngine::Screen* screen = GUIEngine::getCurrentScreen();
-    if (screen && screen->isResizable())
+    if (screen)
     {
         current_screen_size.Width = screen->getWidth();
         current_screen_size.Height = screen->getHeight();
@@ -2102,8 +2099,8 @@ void IrrDriver::handleWindowResize()
         current_screen_size != new_size ||
         screen_orientation_changed)
     {
-        // Don't update when dialog is opened or minimized
-        if (dialog_exists || new_size.getArea() == 0)
+        // Don't update when minimized
+        if (new_size.getArea() == 0)
             return;
 
         m_screen_orientation = new_orientation;
@@ -2114,11 +2111,6 @@ void IrrDriver::handleWindowResize()
         UserConfigParams::m_real_height = (unsigned)((float)m_actual_screen_size.Height / m_device->getNativeScaleY());
         resizeWindow();
     }
-    // In case reset by opening options in game
-    if (!dialog_exists &&
-        StateManager::get()->getGameState() == GUIEngine::GAME &&
-        !m_device->isResizable())
-        m_device->setResizable(true);
 }   // handleWindowResize
 
 // ----------------------------------------------------------------------------

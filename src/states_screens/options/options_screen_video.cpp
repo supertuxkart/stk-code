@@ -205,7 +205,6 @@ OptionsScreenVideo::OptionsScreenVideo() : Screen("options/options_video.stkgui"
                                            m_prev_adv_pipline(false),
                                            m_prev_img_quality(-1)
 {
-    m_resizable = true;
     m_inited = false;
     initPresets();
 }   // OptionsScreenVideo
@@ -235,8 +234,6 @@ void OptionsScreenVideo::loadedFromFile()
 
 void OptionsScreenVideo::init()
 {
-    GUIEngine::getDevice()->setResizable(
-        StateManager::get()->getGameState() == GUIEngine::MENU);
     Screen::init();
     m_prev_adv_pipline = UserConfigParams::m_dynamic_lights;
     m_prev_img_quality = getImageQuality();
@@ -367,12 +364,6 @@ void OptionsScreenVideo::init()
 
     updateResolutionsList();
 
-    if (m_fullscreen_checkbox_focus)
-    {
-        m_fullscreen_checkbox_focus = false;
-        getWidget("fullscreen")->setFocusForPlayer(PLAYER_ID_GAME_MASTER);
-    }
-
     // If a benchmark was requested and the game had to reload
     // the graphics engine, start the benchmark when the
     // video settings screen is loaded back afterwards.
@@ -386,6 +377,13 @@ void OptionsScreenVideo::onResize()
 {
     Screen::onResize();
     configResolutionsList();
+    if (m_fullscreen_checkbox_focus)
+    {
+        m_fullscreen_checkbox_focus = false;
+        Widget* full = getWidget("fullscreen");
+        if (full->isActivated() && full->isVisible())
+            full->setFocusForPlayer(PLAYER_ID_GAME_MASTER);
+    }
 }   // onResize
 
 // --------------------------------------------------------------------------------------------
@@ -987,24 +985,7 @@ void OptionsScreenVideo::eventCallback(Widget* widget, const std::string& name,
         {
             UserConfigParams::m_fullscreen = fullscreen->getState();
             update_fullscreen_desktop(UserConfigParams::m_fullscreen);
-            if (StateManager::get()->getGameState() == GUIEngine::INGAME_MENU)
-            {
-                StateManager::get()->popMenu();
-                std::function<Screen*()> screen_function =
-                    getNewScreenPointer();
-                int new_width = 0;
-                int new_height = 0;
-                SDL_GetWindowSize(gevk->getSDLWindow(), &new_width,
-                    &new_height);
-                static_cast<CIrrDeviceSDL*>(gevk->getIrrlichtDevice())
-                    ->handleNewSize(new_width, new_height);
-                irr_driver->handleWindowResize();
-                Screen* new_screen = screen_function();
-                OptionsScreenVideo::m_fullscreen_checkbox_focus = true;
-                new_screen->push();
-            }
-            else
-                OptionsScreenVideo::m_fullscreen_checkbox_focus = true;
+            OptionsScreenVideo::m_fullscreen_checkbox_focus = true;
         }
         else
             updateResolutionsList();
@@ -1034,11 +1015,6 @@ void OptionsScreenVideo::startBenchmark()
 
 void OptionsScreenVideo::tearDown()
 {
-    if (getWidget("fullscreen")->isVisible() &&
-        getWidget("fullscreen")->isFocusedForPlayer(PLAYER_ID_GAME_MASTER))
-        OptionsScreenVideo::m_fullscreen_checkbox_focus = true;
-
-    GUIEngine::getDevice()->setResizable(false);
 #ifndef SERVER_ONLY
     if (m_prev_adv_pipline != UserConfigParams::m_dynamic_lights &&
         CVS->isGLSL())

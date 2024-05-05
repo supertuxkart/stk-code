@@ -129,8 +129,6 @@ World* World::m_world[PT_COUNT];
  */
 World::World() : WorldStatus()
 {
-    if (m_process_type == PT_MAIN)
-        GUIEngine::getDevice()->setResizable(true);
     RewindManager::setEnable(NetworkConfig::get()->isNetworking());
 #ifdef DEBUG
     m_magic_number = 0xB01D6543;
@@ -614,7 +612,6 @@ World::~World()
 {
     if (m_process_type == PT_MAIN)
     {
-        GUIEngine::getDevice()->setResizable(false);
         material_manager->unloadAllTextures();
     }
 

@@ -58,7 +58,6 @@ Screen::Screen(const char* file, bool pause_race)
     m_update_in_background = false;
     m_width = irr_driver->getActualScreenSize().Width;
     m_height = irr_driver->getActualScreenSize().Height;
-    m_resizable = false;
 }   // Screen
 
 // -----------------------------------------------------------------------------

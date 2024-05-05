@@ -66,7 +66,6 @@ using namespace Online;
 
 OptionsScreenGeneral::OptionsScreenGeneral() : Screen("options/options_general.stkgui")
 {
-    m_resizable = true;
     m_inited = false;
 }   // OptionsScreenVideo
 
@@ -81,8 +80,6 @@ void OptionsScreenGeneral::loadedFromFile()
 
 void OptionsScreenGeneral::init()
 {
-    GUIEngine::getDevice()->setResizable(
-        StateManager::get()->getGameState() == GUIEngine::MENU);
     Screen::init();
     RibbonWidget* ribbon = getWidget<RibbonWidget>("options_choice");
     assert(ribbon != NULL);
@@ -283,7 +280,6 @@ void OptionsScreenGeneral::setInternetCheckboxes(bool activate)
 
 void OptionsScreenGeneral::tearDown()
 {
-    GUIEngine::getDevice()->setResizable(false);
     Screen::tearDown();
     // save changes when leaving screen
     user_config->saveConfig();
