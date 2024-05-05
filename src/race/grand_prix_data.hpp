@@ -23,6 +23,7 @@
 #include <irrString.h>
 #include <string>
 #include <vector>
+#include "utils/types.hpp"
 
 using irr::core::stringw;
 
