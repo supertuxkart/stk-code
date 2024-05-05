@@ -129,6 +129,16 @@ Camera::Camera(CameraType type, int camera_index, AbstractKart* kart)
     m_camera        = irr_driver->addCameraSceneNode();
     m_previous_pv_matrix = core::matrix4();
 
+    if (RaceManager::get()->getNumLocalPlayers() > 1)
+    {
+        m_fov = DEGREE_TO_RAD * stk_config->m_camera_fov
+          [RaceManager::get()->getNumLocalPlayers() - 1];
+    }
+    else
+    {
+        m_fov = DEGREE_TO_RAD * UserConfigParams::m_camera_fov;
+    }
+    m_camera->setFOV(m_fov);
     setupCamera();
     setKart(kart);
     m_ambient_light = Track::getCurrentTrack()->getDefaultAmbientColor();
@@ -170,22 +180,10 @@ void Camera::setupCamera()
 {
     m_viewport = irr_driver->getSplitscreenWindow(m_index);
     m_aspect = (float)((float)(m_viewport.getWidth()) / (float)(m_viewport.getHeight()));
-	
     m_scaling = core::vector2df(
         float(irr_driver->getActualScreenSize().Width) / m_viewport.getWidth() , 
         float(irr_driver->getActualScreenSize().Height) / m_viewport.getHeight());
 
-    if (RaceManager::get()->getNumLocalPlayers() > 1)
-    {
-        m_fov = DEGREE_TO_RAD * stk_config->m_camera_fov
-          [RaceManager::get()->getNumLocalPlayers() - 1];
-    }
-    else
-    {
-        m_fov = DEGREE_TO_RAD * UserConfigParams::m_camera_fov;
-    }
-
-    m_camera->setFOV(m_fov);
     m_camera->setAspectRatio(m_aspect);
     m_camera->setFarValue(Track::getCurrentTrack()->getCameraFar());
 }   // setupCamera
