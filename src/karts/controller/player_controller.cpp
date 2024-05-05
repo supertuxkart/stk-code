@@ -41,11 +41,13 @@
 #include "utils/string_utils.hpp"
 #include "utils/translation.hpp"
 
+
 #include <cstdlib>
 
 PlayerController::PlayerController(AbstractKart *kart)
                 : Controller(kart)
 {
+    m_wee_sound    = SFXManager::get()->createSoundSource("wee");
     m_penalty_ticks = 0;
 }   // PlayerController
 
@@ -54,6 +56,7 @@ PlayerController::PlayerController(AbstractKart *kart)
  */
 PlayerController::~PlayerController()
 {
+    m_wee_sound->deleteSFX();
 }   // ~PlayerController
 
 //-----------------------------------------------------------------------------
@@ -313,6 +316,24 @@ void PlayerController::steer(int ticks, int steer_val)
 }   // steer
 
 //-----------------------------------------------------------------------------
+/** Called when a kart hits or uses a zipper.
+ */
+void PlayerController::handleZipper(bool play_sound)
+{
+    m_kart->showZipperFire();
+
+    // Only play a zipper sound if it's not already playing, and
+    // if the material has changed (to avoid machine gun effect
+    // on conveyor belt zippers).
+    if (play_sound || (m_wee_sound->getStatus() != SFXBase::SFX_PLAYING &&
+                       m_kart->getMaterial()!=m_kart->getLastMaterial()      ) )
+    {
+        m_wee_sound->setPosition(m_kart->getXYZ());
+        m_wee_sound->play();
+    }
+}
+
+//-----------------------------------------------------------------------------
 /** Callback when the skidding bonus is triggered. The player controller
  *  resets the current steering to 0, which makes the kart easier to control.
  */
@@ -364,14 +385,6 @@ void PlayerController::update(int ticks)
         m_controls->setRescue(false);
     }
 }   // update
-
-//-----------------------------------------------------------------------------
-/** Called when a kart hits or uses a zipper.
- */
-void PlayerController::handleZipper(bool play_sound)
-{
-    m_kart->showZipperFire();
-}   // handleZipper
 
 //-----------------------------------------------------------------------------
 bool PlayerController::saveState(BareNetworkString *buffer) const
