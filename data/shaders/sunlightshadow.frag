@@ -11,6 +11,7 @@ uniform float split1;
 uniform float split2;
 uniform float splitmax;
 uniform float shadow_res;
+uniform float overlap_proportion;
 
 uniform vec3 sundirection;
 uniform vec3 sun_color;
@@ -30,56 +31,56 @@ out vec4 Spec;
 #stk_include "utils/getPosFromUVDepth.frag"
 #stk_include "utils/SunMRP.frag"
 
-float quick_hash(vec2 pos) {
-	const vec3 magic = vec3(0.06711056f, 0.00583715f, 52.9829189f);
-	return fract(magic.z * fract(dot(pos, magic.xy)));
-}
-
-float getShadowFactor(vec3 pos, int index, float split)
+// https://web.archive.org/web/20230210095515/http://the-witness.net/news/2013/09/shadow-mapping-summary-part-1
+float getShadowFactor(vec3 pos, int index, float bias)
 {
-    // PCF with Vogel Disk Sampling
-    // From https://drdesten.github.io/web/tools/vogel_disk/
-    const vec2 vogel_disk_16[16] = vec2[](
-        vec2(0.18993645671348536, 0.027087114076591513),
-        vec2(-0.21261242652069953, 0.23391293246949066),
-        vec2(0.04771781344140756, -0.3666840644525993),
-        vec2(0.297730981239584, 0.398259878229082),
-        vec2(-0.509063425827436, -0.06528681462854097),
-        vec2(0.507855152944665, -0.2875976005206389),
-        vec2(-0.15230616564632418, 0.6426121151781916),
-        vec2(-0.30240170651828074, -0.5805072900736001),
-        vec2(0.6978019230005561, 0.2771173334141519),
-        vec2(-0.6990963248129052, 0.3210960724922725),
-        vec2(0.3565142601623699, -0.7066415061851589),
-        vec2(0.266890002328106, 0.8360191043249159),
-        vec2(-0.7515861305520581, -0.41609876195815027),
-        vec2(0.9102937449894895, -0.17014527555321657),
-        vec2(-0.5343471434373126, 0.8058593459499529),
-        vec2(-0.1133270115046468, -0.9490025827627441)
-    );
-
     vec4 shadowcoord = (u_shadow_projection_view_matrices[index] * u_inverse_view_matrix * vec4(pos, 1.0));
     shadowcoord.xy /= shadowcoord.w;
     vec2 shadowtexcoord = shadowcoord.xy * 0.5 + 0.5;
-    //float d = .5 * shadowcoord.z + .5;
-    float d = .5 * shadowcoord.z + .5 - .5 * (pos.z + 1) / shadow_res / split * (index + 2);
-    float smooth_factor = (pos.z + 1) * 4 / shadow_res / split;
+    float d = .5 * shadowcoord.z + .5 - bias;
 
-    mat2 disk_rotation;
-	{
-		float r = quick_hash(gl_FragCoord.xy) * 2.0 * 3.1415926;
-		float sr = sin(r);
-		float cr = cos(r);
-		disk_rotation = mat2(vec2(cr, -sr), vec2(sr, cr));
-	}
+    vec2 uv = shadowtexcoord * shadow_res;
+    vec2 base_uv = floor(uv + 0.5);
+    float s = (uv.x + 0.5 - base_uv.x);
+    float t = (uv.y + 0.5 - base_uv.y);
+    base_uv -= 0.5;
+    base_uv /= shadow_res;
 
-    float result = texture(shadowtex, vec4(shadowtexcoord, float(index), d));
+    float uw0 = (4.0 - 3.0 * s);
+    float uw1 = 7.0;
+    float uw2 = (1.0 + 3.0 * s);
 
-    for (uint i = 0; i < 16; i++)
-    {
-        result += texture(shadowtex, vec4(shadowtexcoord + disk_rotation * vogel_disk_16[i] * smooth_factor, float(index), d));
-    }
-    return result / 16.;
+    float u0 = (3.0 - 2.0 * s) / uw0 - 2.0;
+    float u1 = (3.0 + s) / uw1;
+    float u2 = s / uw2 + 2.0;
+
+    float vw0 = (4.0 - 3.0 * t);
+    float vw1 = 7.0;
+    float vw2 = (1.0 + 3.0 * t);
+
+    float v0 = (3.0 - 2.0 * t) / vw0 - 2.0;
+    float v1 = (3.0 + t) / vw1;
+    float v2 = t / vw2 + 2.0;
+
+    float sum = 0.0;
+
+    sum += uw0 * vw0 * texture(shadowtex, vec4(base_uv + (vec2(u0, v0) / shadow_res), float(index), d));
+    sum += uw1 * vw0 * texture(shadowtex, vec4(base_uv + (vec2(u1, v0) / shadow_res), float(index), d));
+    sum += uw2 * vw0 * texture(shadowtex, vec4(base_uv + (vec2(u2, v0) / shadow_res), float(index), d));
+
+    sum += uw0 * vw1 * texture(shadowtex, vec4(base_uv + (vec2(u0, v1) / shadow_res), float(index), d));
+    sum += uw1 * vw1 * texture(shadowtex, vec4(base_uv + (vec2(u1, v1) / shadow_res), float(index), d));
+    sum += uw2 * vw1 * texture(shadowtex, vec4(base_uv + (vec2(u2, v1) / shadow_res), float(index), d));
+
+    sum += uw0 * vw2 * texture(shadowtex, vec4(base_uv + (vec2(u0, v2) / shadow_res), float(index), d));
+    sum += uw1 * vw2 * texture(shadowtex, vec4(base_uv + (vec2(u1, v2) / shadow_res), float(index), d));
+    sum += uw2 * vw2 * texture(shadowtex, vec4(base_uv + (vec2(u2, v2) / shadow_res), float(index), d));
+
+    return sum / 144.0;
+}
+
+float blend_start(float x) {
+    return x * (1.0 - overlap_proportion);
 }
 
 void main() {
@@ -99,16 +100,30 @@ void main() {
 
     // Shadows
     float factor;
-    if (xpos.z < split0)
-        factor = getShadowFactor(xpos.xyz, 0, split0);
-    else if (xpos.z < split1)
-        factor = getShadowFactor(xpos.xyz, 1, split1);
-    else if (xpos.z < split2)
-        factor = getShadowFactor(xpos.xyz, 2, split2);
-    else if (xpos.z < splitmax)
-        factor = getShadowFactor(xpos.xyz, 3, splitmax);
-    else
+    float bias = max(1.0 - NdotL, .2) / shadow_res;
+    if (xpos.z < split0) {
+        factor = getShadowFactor(xpos.xyz, 0, bias);
+        if (xpos.z > blend_start(split0)) {
+            factor = mix(factor, getShadowFactor(xpos.xyz, 1, bias), (xpos.z - blend_start(split0)) / split0 / overlap_proportion);
+        }
+    } else if (xpos.z < split1) {
+        factor = getShadowFactor(xpos.xyz, 1, bias);
+        if (xpos.z > blend_start(split1)) {
+            factor = mix(factor, getShadowFactor(xpos.xyz, 2, bias), (xpos.z - blend_start(split1)) / split1 / overlap_proportion);
+        }
+    } else if (xpos.z < split2) {
+        factor = getShadowFactor(xpos.xyz, 2, bias);
+        if (xpos.z > blend_start(split2)) {
+            factor = mix(factor, getShadowFactor(xpos.xyz, 3, bias), (xpos.z - blend_start(split2)) / split2 / overlap_proportion);
+        }
+    } else if (xpos.z < splitmax) {
+        factor = getShadowFactor(xpos.xyz, 3, bias);
+        if (xpos.z > blend_start(splitmax)) {
+            factor = mix(factor, 1.0, (xpos.z - blend_start(splitmax)) / splitmax / overlap_proportion);
+        }
+    } else {
         factor = 1.;
+    }
 
     Diff = vec4(factor * NdotL * Diffuse * sun_color, 1.);
     Spec = vec4(factor * NdotL * Specular * sun_color, 1.);

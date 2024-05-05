@@ -201,7 +201,7 @@ public:
 // ============================================================================
 class ShadowedSunLightShaderPCF : public TextureShader<ShadowedSunLightShaderPCF,
                                                        3,  float, float, float,
-                                                       float, float,
+                                                       float, float, float,
                                                        core::vector3df, video::SColorf>
 {
 public:
@@ -215,7 +215,7 @@ public:
                            1, "dtex", ST_NEAREST_FILTERED,
                            8, "shadowtex", ST_SHADOW_SAMPLER);
         assignUniforms("split0", "split1", "split2", "splitmax", "shadow_res",
-            "sundirection", "sun_color");
+            "overlap_proportion", "sundirection", "sun_color");
     }   // ShadowedSunLightShaderPCF
     // ------------------------------------------------------------------------
     void render(GLuint normal_depth_texture,
@@ -232,6 +232,7 @@ public:
                             ShadowMatrices::m_shadow_split[3],
                             ShadowMatrices::m_shadow_split[4],
                             float(UserConfigParams::m_shadows_resolution),
+                            ShadowMatrices::m_shadow_overlap_proportion,
                             direction, col);
 
     }    // render
