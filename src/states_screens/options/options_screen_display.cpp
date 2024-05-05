@@ -46,6 +46,17 @@ OptionsScreenDisplay::OptionsScreenDisplay() : Screen("options/options_display.s
 void OptionsScreenDisplay::loadedFromFile()
 {
     m_inited = false;
+
+    // Setup splitscreen spinner
+    GUIEngine::SpinnerWidget* splitscreen_method = getWidget<GUIEngine::SpinnerWidget>("splitscreen_method");
+    splitscreen_method->m_properties[PROP_WRAP_AROUND] = "true";
+    splitscreen_method->clearLabels();
+    //I18N: In the UI options, splitscreen_method in the race UI
+    splitscreen_method->addLabel( core::stringw(_("Vertical")));
+    //I18N: In the UI options, splitscreen_method position in the race UI
+    splitscreen_method->addLabel( core::stringw(_("Horizontal")));
+    splitscreen_method->m_properties[GUIEngine::PROP_MIN_VALUE] = "0";
+    splitscreen_method->m_properties[GUIEngine::PROP_MAX_VALUE] = "1";
 }   // loadedFromFile
 
 // --------------------------------------------------------------------------------------------
@@ -111,6 +122,13 @@ void OptionsScreenDisplay::init()
 #endif
 
     updateResolutionsList();
+
+    // ---- splitscreen mode
+    GUIEngine::SpinnerWidget* splitscreen_method = getWidget<GUIEngine::SpinnerWidget>("splitscreen_method");
+    assert( splitscreen_method != NULL );
+    if (UserConfigParams::split_screen_horizontally) splitscreen_method->setValue(1);
+    else splitscreen_method->setValue(0);
+    splitscreen_method->setActive(!in_game);
 }   // init
 
 // --------------------------------------------------------------------------------------------
@@ -383,6 +401,12 @@ void OptionsScreenDisplay::eventCallback(Widget* widget, const std::string& name
         else
             updateResolutionsList();
 #endif
+    } // fullscreen
+    else if (name == "splitscreen_method")
+    {
+        GUIEngine::SpinnerWidget* splitscreen_method = getWidget<GUIEngine::SpinnerWidget>("splitscreen_method");
+        assert( splitscreen_method != NULL );
+        UserConfigParams::split_screen_horizontally = (splitscreen_method->getValue() == 1);
     }
 }   // eventCallback
 

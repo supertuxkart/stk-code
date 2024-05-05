@@ -47,13 +47,6 @@
 
                 <spacer width="5" height="2%"/>
 
-                <div layout="horizontal-row" width="100%" height="fit">
-                    <spinner id="splitscreen_method" width="10f" align="center" />
-                    <label height="100%" x="0" y="0" I18N="In the ui settings" text="Splitscreen Multiplayer layout"/>
-                </div>
-
-                <spacer width="5" height="2%"/>
-
                 <div width="100%" height="fit" layout="horizontal-row">
                     <gauge id="font_size" width="10f" align="center" />
                     <label height="100%" x="0" y="0" I18N="In the ui settings" text="Font size"/>

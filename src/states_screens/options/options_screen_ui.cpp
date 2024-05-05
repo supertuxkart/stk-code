@@ -80,17 +80,6 @@ void OptionsScreenUI::loadedFromFile()
     }
     minimap_options->m_properties[GUIEngine::PROP_MAX_VALUE] = "3";
 
-    // Setup splitscreen spinner
-    GUIEngine::SpinnerWidget* splitscreen_method = getWidget<GUIEngine::SpinnerWidget>("splitscreen_method");
-    splitscreen_method->m_properties[PROP_WRAP_AROUND] = "true";
-    splitscreen_method->clearLabels();
-    //I18N: In the UI options, splitscreen_method in the race UI
-    splitscreen_method->addLabel( core::stringw(_("Vertical")));
-    //I18N: In the UI options, splitscreen_method position in the race UI
-    splitscreen_method->addLabel( core::stringw(_("Horizontal")));
-    splitscreen_method->m_properties[GUIEngine::PROP_MIN_VALUE] = "0";
-    splitscreen_method->m_properties[GUIEngine::PROP_MAX_VALUE] = "1";
-
     // Setup fontsize spinner
     GUIEngine::SpinnerWidget* font_size = getWidget<GUIEngine::SpinnerWidget>("font_size");
     assert( font_size != NULL );
@@ -246,13 +235,6 @@ void OptionsScreenUI::init()
     UserConfigParams::m_font_size = font_size->getValue();
     font_size->setActive(!in_game);
 
-    // ---- video modes
-    GUIEngine::SpinnerWidget* splitscreen_method = getWidget<GUIEngine::SpinnerWidget>("splitscreen_method");
-    assert( splitscreen_method != NULL );
-    if (UserConfigParams::split_screen_horizontally) splitscreen_method->setValue(1);
-    else splitscreen_method->setValue(0);
-    splitscreen_method->setActive(!in_game);
-
     CheckBoxWidget* karts_powerup_gui = getWidget<CheckBoxWidget>("karts_powerup_gui");
     assert(karts_powerup_gui != NULL);
     karts_powerup_gui->setState(UserConfigParams::m_karts_powerup_gui);
@@ -405,12 +387,6 @@ void OptionsScreenUI::eventCallback(Widget* widget, const std::string& name, con
         m_reload_option->m_reload_skin = false;
         m_reload_option->m_focus_name = "font_size";
         m_reload_option->m_focus_right = right;
-    }
-    else if (name == "splitscreen_method")
-    {
-        GUIEngine::SpinnerWidget* splitscreen_method = getWidget<GUIEngine::SpinnerWidget>("splitscreen_method");
-        assert( splitscreen_method != NULL );
-        UserConfigParams::split_screen_horizontally = (splitscreen_method->getValue() == 1);
     }
     else if (name == "karts_powerup_gui")
     {
