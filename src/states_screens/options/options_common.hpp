@@ -15,11 +15,12 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-#ifndef __HEADER_OPTIONS_INCLUDE_HEADERS_HPP__
-#define __HEADER_OPTIONS_INCLUDE_HEADERS_HPP__
+#ifndef __HEADER_OPTIONS_COMMON_HPP__
+#define __HEADER_OPTIONS_COMMON_HPP__
 
-// This file only contains include headers that are used by all or most
-// options screens. This simplifies maintenance.
+// This file contains include headers that are used by all or most options screens.
+// It also contains a standalone function to switch between the options screens.
+// This simplifies maintenance.
 
 // Config to read and save settings
 #include "config/user_config.hpp"
@@ -46,5 +47,10 @@
 // Utils for translation of tooltips
 #include "utils/string_utils.hpp"
 #include "utils/translation.hpp"
+
+namespace OptionsCommon
+{
+	void switchTab(std::string selected_tab);
+}
 
 #endif

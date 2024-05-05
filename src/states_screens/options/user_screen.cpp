@@ -706,8 +706,6 @@ void BaseUserScreen::unloaded()
 {
 }   // unloaded
 
-
-
 // ============================================================================
 /** In the tab version, make sure the right tab is selected.
  */
@@ -731,25 +729,8 @@ void TabbedUserScreen::eventCallback(GUIEngine::Widget* widget,
     {
         std::string selection = ((RibbonWidget*)widget)->getSelectionIDString(PLAYER_ID_GAME_MASTER);
 
-        Screen *screen = NULL;
-        if (selection == "tab_audio")
-            screen = OptionsScreenAudio::getInstance();
-        else if (selection == "tab_display")
-            screen = OptionsScreenDisplay::getInstance();
-        else if (selection == "tab_video")
-            screen = OptionsScreenVideo::getInstance();
-        //else if (selection == "tab_players")
-        //    screen = TabbedUserScreen::getInstance();
-        else if (selection == "tab_controls")
-            screen = OptionsScreenInput::getInstance();
-        else if (selection == "tab_ui")
-            screen = OptionsScreenUI::getInstance();
-        else if (selection == "tab_general")
-            screen = OptionsScreenGeneral::getInstance();
-        else if (selection == "tab_language")
-            screen = OptionsScreenLanguage::getInstance();
-        if(screen)
-            StateManager::get()->replaceTopMostScreen(screen);
+        if (selection != "tab_players")
+            OptionsCommon::switchTab(selection);
     }
     else
         BaseUserScreen::eventCallback(widget, name, player_id);
