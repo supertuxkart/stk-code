@@ -316,7 +316,8 @@ private:
     std::vector<int>                 m_num_laps;
 
     /** Whether a track should be reversed */
-    std::vector<bool>                m_reverse_track;
+    // This is uint8_t instead of bool because of GitHub issue #5053
+    std::vector<uint8_t>                m_reverse_track;
 
     /** The list of default AI karts to use. This is from the command line. */
     std::vector<std::string>         m_default_ai_list;

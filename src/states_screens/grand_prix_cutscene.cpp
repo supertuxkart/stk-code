@@ -53,7 +53,7 @@ void GrandPrixCutscene::setNewGPWithName(const irr::core::stringw& name)
     const GrandPrixData current_gp = RaceManager::get()->getGrandPrix();
     std::vector<std::string> tracks  = current_gp.getTrackNames();
     std::vector<int>         laps    = current_gp.getLaps();
-    std::vector<bool>        reverse = current_gp.getReverse();
+    std::vector<uint8_t>        reverse = current_gp.getReverse();
     for (unsigned int i = 0; i < laps.size(); i++)
         gp->addTrack(track_manager->getTrack(tracks[i]), laps[i], reverse[i]);
     gp->writeToFile();
