@@ -638,8 +638,8 @@ void FeatureUnlockedCutScene::onUpdate(float dt)
 
     assert(m_unlocked_stuff.size() > 0);
 
-    static const int w = irr_driver->getFrameSize().Width;
-    static const int h = irr_driver->getFrameSize().Height;
+    const int w = irr_driver->getFrameSize().Width;
+    const int h = irr_driver->getFrameSize().Height;
     const irr::video::SColor color(255, 255, 255, 255);
 
     GUIEngine::getTitleFont()->draw(_("Challenge Completed"),
