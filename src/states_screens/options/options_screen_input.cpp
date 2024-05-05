@@ -31,14 +31,15 @@
 #include "io/file_manager.hpp"
 #include "states_screens/options/options_screen_device.hpp"
 #include "states_screens/options/options_screen_audio.hpp"
+#include "states_screens/options/options_screen_display.hpp"
 #include "states_screens/options/options_screen_general.hpp"
 #include "states_screens/options/options_screen_language.hpp"
 #include "states_screens/options/options_screen_video.hpp"
 #include "states_screens/options/options_screen_ui.hpp"
+#include "states_screens/options/user_screen.hpp"
 #include "states_screens/dialogs/add_device_dialog.hpp"
 #include "states_screens/dialogs/multitouch_settings_dialog.hpp"
 #include "states_screens/state_manager.hpp"
-#include "states_screens/options/user_screen.hpp"
 #include "utils/string_utils.hpp"
 #include "utils/translation.hpp"
 
@@ -248,6 +249,8 @@ void OptionsScreenInput::eventCallback(Widget* widget, const std::string& name, 
         Screen *screen = NULL;
         if (selection == "tab_audio")
             screen = OptionsScreenAudio::getInstance();
+        else if (selection == "tab_display")
+            screen = OptionsScreenDisplay::getInstance();
         else if (selection == "tab_video")
             screen = OptionsScreenVideo::getInstance();
         else if (selection == "tab_players")

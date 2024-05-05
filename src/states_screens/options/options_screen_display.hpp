@@ -16,8 +16,8 @@
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 
-#ifndef __HEADER_OPTIONS_SCREEN_VIDEO_HPP__
-#define __HEADER_OPTIONS_SCREEN_VIDEO_HPP__
+#ifndef __HEADER_OPTIONS_SCREEN_DISPLAY_HPP__
+#define __HEADER_OPTIONS_SCREEN_DISPLAY_HPP__
 
 #include <string>
 
@@ -25,56 +25,53 @@
 
 namespace GUIEngine { class Widget; }
 
-struct GFXPreset
+struct Resolution
 {
-    bool lights;
-    int shadows;
-    bool bloom;
-    bool lightshaft;
-    bool glow;
-    bool mlaa;
-    bool ssao;
-    bool light_scatter;
-    bool animatedCharacters;
-    int particles;
-    int image_quality;
-    bool degraded_ibl;
-};
+    int width;
+    int height;
+    bool fullscreen;
 
-struct BlurPreset
-{
-    bool motionblur;
-    /** Depth of field */
-    bool dof;
-};
+    Resolution()
+    {
+        width = 0;
+        height = 0;
+    }
 
-struct ScaleRttsCustomPreset
-{
-    float value;
+    Resolution(int w, int h)
+    {
+        width = w;
+        height = h;
+    }
+
+    bool operator< (Resolution r) const
+    {
+        return width < r.width || (width == r.width && height < r.height);
+    }
+
+    float getRatio() const
+    {
+        return (float) width / height;
+    }
 };
 
 /**
-  * \brief Graphics options screen
+  * \brief Display options screen
   * \ingroup states_screens
   */
-class OptionsScreenVideo : public GUIEngine::Screen, public GUIEngine::ScreenSingleton<OptionsScreenVideo>
+class OptionsScreenDisplay : public GUIEngine::Screen, public GUIEngine::ScreenSingleton<OptionsScreenDisplay>
 {
 private:
-    bool m_prev_adv_pipline;
-    int m_prev_img_quality;
-    OptionsScreenVideo();
+    static bool m_fullscreen_checkbox_focus;
+    OptionsScreenDisplay();
     bool m_inited;
-    std::vector<GFXPreset> m_presets;
-    std::vector<BlurPreset> m_blur_presets;
-    std::vector<ScaleRttsCustomPreset> m_scale_rtts_custom_presets;
+    std::vector<Resolution> m_resolutions;
 
-    void updateTooltip();
-    void updateBlurTooltip();
+    void updateResolutionsList();
+    void configResolutionsList();
     void initPresets();
-    void startBenchmark();
     static void onScrollResolutionsList(void* data);
 public:
-    friend class GUIEngine::ScreenSingleton<OptionsScreenVideo>;
+    friend class GUIEngine::ScreenSingleton<OptionsScreenDisplay>;
 
     /** \brief implement callback from parent class GUIEngine::Screen */
     virtual void loadedFromFile() OVERRIDE;
@@ -95,12 +92,6 @@ public:
     virtual bool onEscapePressed() OVERRIDE;
 
     virtual void onResize() OVERRIDE;
-
-    void         updateGfxSlider();
-    void         updateBlurSlider();
-    void         updateScaleRTTsSlider();
-    static int getImageQuality();
-    static void setImageQuality(int quality);
 };
 
 #endif

@@ -27,13 +27,14 @@
 #include "guiengine/widgets/spinner_widget.hpp"
 #include "guiengine/widget.hpp"
 #include "io/file_manager.hpp"
+#include "states_screens/options/options_screen_display.hpp"
 #include "states_screens/options/options_screen_general.hpp"
 #include "states_screens/options/options_screen_input.hpp"
 #include "states_screens/options/options_screen_language.hpp"
 #include "states_screens/options/options_screen_ui.hpp"
 #include "states_screens/options/options_screen_video.hpp"
-#include "states_screens/state_manager.hpp"
 #include "states_screens/options/user_screen.hpp"
+#include "states_screens/state_manager.hpp"
 #include "utils/translation.hpp"
 
 #include <iostream>
@@ -110,7 +111,9 @@ void OptionsScreenAudio::eventCallback(Widget* widget, const std::string& name, 
         Screen *screen = NULL;
         //if (selection == "tab_audio")
         //    screen = OptionsScreenAudio::getInstance();
-        if (selection == "tab_video")
+        if (selection == "tab_display")
+            screen = OptionsScreenDisplay::getInstance();
+        else if (selection == "tab_video")
             screen = OptionsScreenVideo::getInstance();
         else if (selection == "tab_players")
             screen = TabbedUserScreen::getInstance();

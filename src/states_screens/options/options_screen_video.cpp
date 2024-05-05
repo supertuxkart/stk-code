@@ -34,6 +34,7 @@
 #include "replay/replay_play.hpp"
 #include "states_screens/dialogs/custom_video_settings.hpp"
 #include "states_screens/options/options_screen_audio.hpp"
+#include "states_screens/options/options_screen_display.hpp"
 #include "states_screens/options/options_screen_general.hpp"
 #include "states_screens/options/options_screen_input.hpp"
 #include "states_screens/options/options_screen_language.hpp"
@@ -59,7 +60,6 @@
 #include <sstream>
 
 using namespace GUIEngine;
-bool OptionsScreenVideo::m_fullscreen_checkbox_focus = false;
 
 // --------------------------------------------------------------------------------------------
 void OptionsScreenVideo::initPresets()
@@ -242,10 +242,6 @@ void OptionsScreenVideo::init()
     ribbon->setFocusForPlayer(PLAYER_ID_GAME_MASTER);
     ribbon->select( "tab_video", PLAYER_ID_GAME_MASTER );
 
-    GUIEngine::ButtonWidget* applyBtn =
-        getWidget<GUIEngine::ButtonWidget>("apply_resolution");
-    assert( applyBtn != NULL );
-
     GUIEngine::SpinnerWidget* gfx =
         getWidget<GUIEngine::SpinnerWidget>("gfx_level");
     assert( gfx != NULL );
@@ -300,49 +296,16 @@ void OptionsScreenVideo::init()
     scale_rtts->addLabel("95%");
     scale_rtts->addLabel("100%");
 
-    // ---- video modes
-    DynamicRibbonWidget* res = getWidget<DynamicRibbonWidget>("resolutions");
-    assert(res != NULL);
-    res->registerScrollCallback(onScrollResolutionsList, this);
-
-    CheckBoxWidget* full = getWidget<CheckBoxWidget>("fullscreen");
-    assert( full != NULL );
-    full->setState( UserConfigParams::m_fullscreen );
-    
-    CheckBoxWidget* rememberWinpos = getWidget<CheckBoxWidget>("rememberWinpos");
-    assert( rememberWinpos != NULL );
-    rememberWinpos->setState(UserConfigParams::m_remember_window_location);
-    rememberWinpos->setActive(!UserConfigParams::m_fullscreen);
-#ifdef DEBUG
-    LabelWidget* full_text = getWidget<LabelWidget>("fullscreenText");
-    assert( full_text != NULL );
-
-    LabelWidget* rememberWinposText = 
-                                   getWidget<LabelWidget>("rememberWinposText");
-    assert( rememberWinposText != NULL );
-#endif
-
-    bool is_vulkan_fullscreen_desktop = false;
-#ifndef SERVER_ONLY
-    is_vulkan_fullscreen_desktop =
-        GE::getDriver()->getDriverType() == video::EDT_VULKAN &&
-        GE::getGEConfig()->m_fullscreen_desktop;
-#endif
-
-    configResolutionsList();
     // --- set gfx settings values
     updateGfxSlider();
     updateBlurSlider();
     updateScaleRTTsSlider();
 
-    // ---- forbid changing resolution or animation settings from in-game
+    // ---- forbid changing graphic settings from in-game
     // (we need to disable them last because some items can't be edited when
     // disabled)
     bool in_game = StateManager::get()->getGameState() == GUIEngine::INGAME_MENU;
 
-    res->setActive(!in_game || is_vulkan_fullscreen_desktop);
-    full->setActive(!in_game || is_vulkan_fullscreen_desktop);
-    applyBtn->setActive(!in_game);
 #ifndef SERVER_ONLY
     gfx->setActive(!in_game && CVS->isGLSL());
     getWidget<ButtonWidget>("custom")->setActive(!in_game || !CVS->isGLSL());
@@ -353,16 +316,6 @@ void OptionsScreenVideo::init()
     }
     getWidget<ButtonWidget>("benchmarkCurrent")->setActive(!in_game);
 #endif
-
-#if defined(MOBILE_STK) || defined(__SWITCH__)
-    applyBtn->setVisible(false);
-    full->setVisible(false);
-    getWidget<LabelWidget>("fullscreenText")->setVisible(false);
-    rememberWinpos->setVisible(false);
-    getWidget<LabelWidget>("rememberWinposText")->setVisible(false);
-#endif
-
-    updateResolutionsList();
 
     // If a benchmark was requested and the game had to reload
     // the graphics engine, start the benchmark when the
@@ -376,200 +329,7 @@ void OptionsScreenVideo::init()
 void OptionsScreenVideo::onResize()
 {
     Screen::onResize();
-    configResolutionsList();
-    if (m_fullscreen_checkbox_focus)
-    {
-        m_fullscreen_checkbox_focus = false;
-        Widget* full = getWidget("fullscreen");
-        if (full->isActivated() && full->isVisible())
-            full->setFocusForPlayer(PLAYER_ID_GAME_MASTER);
-    }
 }   // onResize
-
-// --------------------------------------------------------------------------------------------
-
-void OptionsScreenVideo::configResolutionsList()
-{
-    DynamicRibbonWidget* res = getWidget<DynamicRibbonWidget>("resolutions");
-    if (res == NULL)
-        return;
-
-    bool is_fullscreen_desktop = false;
-#ifndef SERVER_ONLY
-    is_fullscreen_desktop =
-        GE::getGEConfig()->m_fullscreen_desktop;
-#endif
-
-    res->clearItems();
-
-    const std::vector<IrrDriver::VideoMode>& modes =
-                                            irr_driver->getVideoModes();
-    const int amount = (int)modes.size();
-
-    m_resolutions.clear();
-    Resolution r;
-
-    bool found_config_res = false;
-
-    // for some odd reason, irrlicht sometimes fails to report the good
-    // old standard resolutions
-    // those are always useful for windowed mode
-    bool found_1024_768 = false;
-    bool found_1280_720 = false;
-
-    for (int n=0; n<amount; n++)
-    {
-        r.width  = modes[n].getWidth();
-        r.height = modes[n].getHeight();
-        r.fullscreen = true;
-        m_resolutions.push_back(r);
-
-        if (r.width  == UserConfigParams::m_real_width &&
-            r.height == UserConfigParams::m_real_height)
-        {
-            found_config_res = true;
-        }
-
-        if (r.width == 1024 && r.height == 768)
-        {
-            found_1024_768 = true;
-        }
-        if (r.width == 1280 && r.height == 720)
-        {
-            found_1280_720 = true;
-        }
-    }
-
-    // Use fullscreen desktop so only show current screen size
-    if (is_fullscreen_desktop)
-    {
-        found_config_res = false;
-        m_resolutions.clear();
-        found_1024_768 = true;
-        found_1280_720 = true;
-    }
-
-    if (!found_config_res)
-    {
-        r.width  = UserConfigParams::m_real_width;
-        r.height = UserConfigParams::m_real_height;
-        r.fullscreen = is_fullscreen_desktop;
-        m_resolutions.push_back(r);
-
-        if (r.width == 1024 && r.height == 768)
-        {
-            found_1024_768 = true;
-        }
-        if (r.width == 1280 && r.height == 720)
-        {
-            found_1280_720 = true;
-        }
-    } // next found resolution
-
-#if !defined(MOBILE_STK) && !defined(__SWITCH__)
-    // Add default resolutions that were not found by irrlicht
-    if (!found_1024_768)
-    {
-        r.width  = 1024;
-        r.height = 768;
-        r.fullscreen = false;
-        m_resolutions.push_back(r);
-    }
-
-    if (!found_1280_720)
-    {
-        r.width  = 1280;
-        r.height = 720;
-        r.fullscreen = false;
-        m_resolutions.push_back(r);
-    }
-#endif
-
-    // Sort resolutions by size
-    std::sort(m_resolutions.begin(), m_resolutions.end());
-
-    // Add resolutions list
-    for(std::vector<Resolution>::iterator it = m_resolutions.begin();
-        it != m_resolutions.end(); it++)
-    {
-        const float ratio = it->getRatio();
-        char name[32];
-        sprintf(name, "%ix%i", it->width, it->height);
-
-        core::stringw label;
-        label += it->width;
-        label += L"\u00D7";
-        label += it->height;
-
-#define ABOUT_EQUAL(a , b) (fabsf( a - b ) < 0.01)
-
-        if      (ABOUT_EQUAL( ratio, (5.0f/4.0f) ))
-            res->addItem(label, name, "/gui/icons/screen54.png");
-        else if (ABOUT_EQUAL( ratio, (4.0f/3.0f) ))
-            res->addItem(label, name, "/gui/icons/screen43.png");
-        else if (ABOUT_EQUAL( ratio, (16.0f/10.0f)))
-            res->addItem(label, name, "/gui/icons/screen1610.png");
-        else if (ABOUT_EQUAL( ratio, (5.0f/3.0f) ))
-            res->addItem(label, name, "/gui/icons/screen53.png");
-        else if (ABOUT_EQUAL( ratio, (3.0f/2.0f) ))
-            res->addItem(label, name, "/gui/icons/screen32.png");
-        else if (ABOUT_EQUAL( ratio, (16.0f/9.0f) ))
-            res->addItem(label, name, "/gui/icons/screen169.png");
-        else
-            res->addItem(label, name, "/gui/icons/screen_other.png");
-#undef ABOUT_EQUAL
-    } // add next resolution
-
-    res->updateItemDisplay();
-
-    // ---- select current resolution every time
-    char searching_for[32];
-    snprintf(searching_for, 32, "%ix%i", (int)UserConfigParams::m_real_width,
-                                         (int)UserConfigParams::m_real_height);
-
-
-    if (!res->setSelection(searching_for, PLAYER_ID_GAME_MASTER,
-                          false /* focus it */, true /* even if deactivated*/))
-    {
-        Log::error("OptionsScreenVideo", "Cannot find resolution %s", searching_for);
-    }
-
-}   // configResolutionsList
-
-// --------------------------------------------------------------------------------------------
-
-void OptionsScreenVideo::updateResolutionsList()
-{
-    CheckBoxWidget* full = getWidget<CheckBoxWidget>("fullscreen");
-    assert(full != NULL);
-    bool fullscreen_selected = full->getState();
-    
-    for (auto resolution : m_resolutions)
-    {
-        DynamicRibbonWidget* drw = getWidget<DynamicRibbonWidget>("resolutions");
-        assert(drw != NULL);
-        assert(drw->m_rows.size() == 1);
-        
-        char name[128];
-        sprintf(name, "%ix%i", resolution.width, resolution.height);
-        
-        Widget* w = drw->m_rows[0].findWidgetNamed(name);
-        
-        if (w != NULL)
-        {
-            bool active = !fullscreen_selected || resolution.fullscreen;
-            w->setActive(active);
-        }
-    }
-}
-
-// --------------------------------------------------------------------------------------------
-
-void OptionsScreenVideo::onScrollResolutionsList(void* data)
-{
-    OptionsScreenVideo* screen = (OptionsScreenVideo*)data;
-    screen->updateResolutionsList();
-}
 
 // --------------------------------------------------------------------------------------------
 
@@ -773,7 +533,6 @@ void OptionsScreenVideo::updateBlurTooltip()
 
 // --------------------------------------------------------------------------------------------
 extern "C" void update_swap_interval(int swap_interval);
-extern "C" void update_fullscreen_desktop(int val);
 extern "C" void reset_network_body();
 
 void OptionsScreenVideo::eventCallback(Widget* widget, const std::string& name,
@@ -786,6 +545,8 @@ void OptionsScreenVideo::eventCallback(Widget* widget, const std::string& name,
         Screen *screen = NULL;
         if (selection == "tab_audio")
             screen = OptionsScreenAudio::getInstance();
+        else if (selection == "tab_display")
+            screen = OptionsScreenDisplay::getInstance();
         //else if (selection == "tab_video")
         //    screen = OptionsScreenVideo::getInstance();
         else if (selection == "tab_players")
@@ -808,36 +569,6 @@ void OptionsScreenVideo::eventCallback(Widget* widget, const std::string& name,
     else if(name == "custom")
     {
         new CustomVideoSettingsDialog(0.8f, 0.9f);
-    }
-    else if(name == "apply_resolution")
-    {
-        using namespace GUIEngine;
-
-        DynamicRibbonWidget* w1=getWidget<DynamicRibbonWidget>("resolutions");
-        assert(w1 != NULL);
-        assert(w1->m_rows.size() == 1);
-        
-        int index = w1->m_rows[0].getSelection(PLAYER_ID_GAME_MASTER);
-        Widget* selected_widget = &w1->m_rows[0].getChildren()[index];
-        
-        if (!selected_widget->isActivated())
-            return;
-
-        const std::string& res =
-            w1->getSelectionIDString(PLAYER_ID_GAME_MASTER);
-
-        int w = -1, h = -1;
-        if (sscanf(res.c_str(), "%ix%i", &w, &h) != 2 || w == -1 || h == -1)
-        {
-            Log::error("OptionsScreenVideo", "Failed to decode resolution %s", res.c_str());
-            return;
-        }
-
-        CheckBoxWidget* w2 = getWidget<CheckBoxWidget>("fullscreen");
-        assert(w2 != NULL);
-
-
-        irr_driver->changeResolution(w, h, w2->getState());
     }
     else if (name == "gfx_level")
     {
@@ -968,29 +699,6 @@ void OptionsScreenVideo::eventCallback(Widget* widget, const std::string& name,
     {
         // DO NOTHING FOR NOW
     }*/
-    else if (name == "rememberWinpos")
-    {
-        CheckBoxWidget* rememberWinpos = getWidget<CheckBoxWidget>("rememberWinpos");
-        UserConfigParams::m_remember_window_location = rememberWinpos->getState();
-    }
-    else if (name == "fullscreen")
-    {
-        CheckBoxWidget* fullscreen = getWidget<CheckBoxWidget>("fullscreen");
-        CheckBoxWidget* rememberWinpos = getWidget<CheckBoxWidget>("rememberWinpos");
-
-        rememberWinpos->setActive(!fullscreen->getState());
-#ifndef SERVER_ONLY
-        GE::GEVulkanDriver* gevk = GE::getVKDriver();
-        if (gevk && GE::getGEConfig()->m_fullscreen_desktop)
-        {
-            UserConfigParams::m_fullscreen = fullscreen->getState();
-            update_fullscreen_desktop(UserConfigParams::m_fullscreen);
-            OptionsScreenVideo::m_fullscreen_checkbox_focus = true;
-        }
-        else
-            updateResolutionsList();
-#endif
-    }
 }   // eventCallback
 
 // --------------------------------------------------------------------------------------------
