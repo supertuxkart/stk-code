@@ -15,18 +15,8 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-#include "states_screens/help/help_screen_3.hpp"
-
-#include "guiengine/widget.hpp"
-#include "guiengine/widgets/ribbon_widget.hpp"
-#include "modes/world.hpp"
-#include "states_screens/help/help_screen_1.hpp"
-#include "states_screens/help/help_screen_2.hpp"
-#include "states_screens/help/help_screen_4.hpp"
-#include "states_screens/help/help_screen_5.hpp"
-#include "states_screens/help/help_screen_6.hpp"
-#include "states_screens/help/help_screen_7.hpp"
-#include "states_screens/state_manager.hpp"
+// Manages includes common to all help screens
+#include "states_screens/help/help_common.hpp"
 
 using namespace GUIEngine;
 
@@ -51,23 +41,8 @@ void HelpScreen3::eventCallback(Widget* widget, const std::string& name, const i
         
         std::string selection = ((RibbonWidget*)widget)->getSelectionIDString(PLAYER_ID_GAME_MASTER);
 
-        Screen *screen = NULL;
-        if (selection == "page1")
-            screen = HelpScreen1::getInstance();
-        else if (selection == "page2")
-            screen = HelpScreen2::getInstance();
-        //else if (selection == "page3")
-        //    screen = HelpScreen3::getInstance();
-        else if (selection == "page4")
-            screen = HelpScreen4::getInstance();
-        else if (selection == "page5")
-            screen = HelpScreen5::getInstance();
-        else if (selection == "page6")
-            screen = HelpScreen6::getInstance();
-        else if (selection == "page7")
-            screen = HelpScreen7::getInstance();
-        if(screen)
-            StateManager::get()->replaceTopMostScreen(screen);
+        if (selection != "page3")
+            HelpCommon::switchTab(selection);
     }
     else if (name == "back")
     {
