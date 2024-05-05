@@ -24,7 +24,6 @@
 #include "config/player_manager.hpp"
 #include "graphics/central_settings.hpp"
 #include "guiengine/screen_keyboard.hpp"
-#include "guiengine/widgets/label_widget.hpp"
 #include "guiengine/widgets/text_box_widget.hpp"
 #include "online/link_helper.hpp"
 #include "online/request_manager.hpp"

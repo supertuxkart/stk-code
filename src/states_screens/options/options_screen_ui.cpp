@@ -24,7 +24,6 @@
 #include "config/player_manager.hpp"
 #include "font/font_manager.hpp"
 #include "graphics/irr_driver.hpp"
-#include "guiengine/widgets/label_widget.hpp"
 #include "items/powerup_manager.hpp"
 #include "modes/world.hpp"
 #include "states_screens/dialogs/custom_camera_settings.hpp"
