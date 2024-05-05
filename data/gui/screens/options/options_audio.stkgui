@@ -44,6 +44,7 @@
                         <checkbox id="music_enabled"/>
                     </div>
                 </div>
+                <spacer width="5" height="2%"/>
                 <div width="75%" height="fit" layout="horizontal-row" >
                     <label proportion="1" height="100%" text_align="right" I18N="In the audio options screen" text="Volume"/>
                     <div proportion="1" height="fit" layout="horizontal-row" >
@@ -52,7 +53,7 @@
                     </div>
                 </div>
 
-                <spacer width="5" height="1%"/>
+                <spacer width="5" height="3%"/>
 
                 <!-- ******** SFX ******** -->
                 <label width="100%" I18N="In the audio options screen" text="Sound Effects"/>
@@ -65,6 +66,7 @@
                         <checkbox id="sfx_enabled"/>
                     </div>
                 </div>
+                <spacer width="5" height="2%"/>
                 <div width="75%" height="fit" layout="horizontal-row" >
                     <label proportion="1" height="100%" text_align="right" I18N="In the audio options screen" text="Volume"/>
                     <div proportion="1" height="fit" layout="horizontal-row" >

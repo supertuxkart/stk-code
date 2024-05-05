@@ -31,7 +31,7 @@
             <box width="78%" height="100%" layout="vertical-row">
                 <label width="100%" I18N="In the video settings" text="Graphics"/>
 
-                <spacer width="5" height="1%"/>
+                <spacer width="5" height="2%"/>
 
                 <!-- ************ GRAPHICAL EFFECTS SETTINGS ************ -->
                 <div width="100%" height="fit" layout="horizontal-row">
@@ -44,7 +44,7 @@
                     </div>
                 </div>
 
-                <spacer width="5" height="1%"/>
+                <spacer width="5" height="2%"/>
 
                 <div width="100%" height="fit" layout="horizontal-row">
                     <spacer width="3%" height="100%" />
@@ -56,7 +56,7 @@
                     </div>
                 </div>
 
-                <spacer width="5" height="1%"/>
+                <spacer width="5" height="2%"/>
 
                 <div width="100%" height="fit" layout="horizontal-row">
                     <spacer width="3%" height="100%" />
@@ -68,7 +68,7 @@
                     </div>
                 </div>
 
-                <spacer width="5" height="1%"/>
+                <spacer width="5" height="2%"/>
 
                 <!-- ************ VSYNC ************ -->
                 <div width="100%" height="fit" layout="horizontal-row" id="outer_box" >
@@ -81,7 +81,7 @@
                     </div>
                 </div>
 
-                <spacer width="5" height="1%"/>
+                <spacer width="5" height="2%"/>
 
                 <!-- ************ CUSTOM SETTINGS ************ -->
                 <div width="100%" height="fit" layout="horizontal-row" id="outer_box" >
@@ -94,14 +94,14 @@
 
                 <label width="100%" I18N="In the video settings" text="Performance tests"/>
 
-                <spacer width="5" height="1%"/>
+                <spacer width="5" height="2%"/>
 
                 <div width="100%" height="fit" layout="horizontal-row" id="outer_box" >
                     <spacer width="5%" height="100%" />
                     <button id="benchmarkCurrent" text="Performance test of the current settings" I18N="In the video settings" align="center"/>
                 </div>
 <!-- 
-                <spacer width="5" height="1%"/>
+                <spacer width="5" height="2%"/>
 
                 <div width="100%" height="fit" layout="horizontal-row" id="outer_box" >
                     <spacer width="5%" height="100%" />

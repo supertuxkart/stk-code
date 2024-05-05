@@ -15,49 +15,23 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-#include "states_screens/options/options_screen_video.hpp"
+// Manages includes common to all options screens
+#include "states_screens/options/options_common.hpp"
 
-#include "audio/sfx_manager.hpp"
-#include "audio/sfx_base.hpp"
-#include "config/user_config.hpp"
 #include "graphics/central_settings.hpp"
 #include "graphics/irr_driver.hpp"
-#include "guiengine/screen.hpp"
-#include "guiengine/widgets/button_widget.hpp"
-#include "guiengine/widgets/check_box_widget.hpp"
-#include "guiengine/widgets/dynamic_ribbon_widget.hpp"
-#include "guiengine/widgets/label_widget.hpp"
-#include "guiengine/widgets/spinner_widget.hpp"
-#include "guiengine/widget.hpp"
 #include "io/file_manager.hpp"
 #include "race/race_manager.hpp"
 #include "replay/replay_play.hpp"
 #include "states_screens/dialogs/custom_video_settings.hpp"
-#include "states_screens/options/options_screen_audio.hpp"
-#include "states_screens/options/options_screen_display.hpp"
-#include "states_screens/options/options_screen_general.hpp"
-#include "states_screens/options/options_screen_input.hpp"
-#include "states_screens/options/options_screen_language.hpp"
-#include "states_screens/options/options_screen_ui.hpp"
-#include "states_screens/state_manager.hpp"
-#include "states_screens/options/user_screen.hpp"
-#include "utils/string_utils.hpp"
-#include "utils/translation.hpp"
 
 #ifndef SERVER_ONLY
 #include <ge_main.hpp>
 #include <ge_vulkan_driver.hpp>
 #include <ge_vulkan_texture_descriptor.hpp>
-#include <SDL_video.h>
-#include "../../lib/irrlicht/source/Irrlicht/CIrrDeviceSDL.h"
 #endif
 
 #include <IrrlichtDevice.h>
-
-#include <functional>
-#include <iostream>
-#include <iterator>
-#include <sstream>
 
 using namespace GUIEngine;
 
