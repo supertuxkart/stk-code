@@ -72,7 +72,7 @@ void CustomVideoSettingsDialog::beforeAddingWidgets()
     particles_effects->setValue(UserConfigParams::m_particles_effects);
 
     SpinnerWidget* geometry_level = getWidget<SpinnerWidget>("geometry_detail");
-    //I18N: Geometry level disabled : lowest level, no details, Level-of-Details distances are low
+    //I18N: Geometry level disabled : lowest level, Level-of-Details distances are very low
     geometry_level->addLabel(_("Very Low"));
     //I18N: Geometry level low : everything is displayed, Level-of-Details distances are low
     geometry_level->addLabel(_("Low"));
