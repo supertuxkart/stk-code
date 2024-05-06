@@ -96,12 +96,19 @@ int LODNode::getLevel()
         m_lod_distances_updated = true;
     }
 
-    for (unsigned int n=0; n<m_detail.size(); n++)
+    // The LoD levels are ordered from highest quality to lowest
+    unsigned int lod_levels = m_detail.size();
+
+    for (unsigned int n=0; n<lod_levels; n++)
     {
-        if (squared_dist < m_detail[n])
+        // If a high-level of detail would only be triggered from very close (distance < ~90),
+        // and there are lower levels available, skip it completely. It's better to display
+        // a low level than to have the high-level pop suddenly when already quite close.
+        if (squared_dist < m_detail[n] &&
+            (m_detail[n] > 8000 || (n == lod_levels - 1)))
         {
-            m_current_level = n;
-            return n;
+                m_current_level = n;
+                return n;
         }
     }
     m_current_level = -1;
