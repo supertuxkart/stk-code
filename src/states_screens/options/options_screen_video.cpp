@@ -43,7 +43,7 @@ void OptionsScreenVideo::initPresets()
         false /* light */, 0 /* shadow */, false /* bloom */, false /* lightshaft */,
         false /* glow */, false /* mlaa */, false /* ssao */, false /* light scatter */,
         false /* animatedCharacters */, 1 /* particles */, 0 /* image_quality */,
-        true /* degraded IBL */
+        true /* degraded IBL */, 0 /* Geometry Detail */
     });
 
     m_presets.push_back // Level 2
@@ -51,7 +51,7 @@ void OptionsScreenVideo::initPresets()
         false /* light */, 0 /* shadow */, false /* bloom */, false /* lightshaft */,
         false /* glow */, false /* mlaa */, false /* ssao */, false /* light scatter */,
         true /* animatedCharacters */, 2 /* particles */, 0 /* image_quality */,
-        true /* degraded IBL */
+        true /* degraded IBL */, 1 /* Geometry Detail */
     });
 
     m_presets.push_back // Level 3
@@ -59,7 +59,7 @@ void OptionsScreenVideo::initPresets()
         true /* light */, 0 /* shadow */, false /* bloom */, false /* lightshaft */,
         false /* glow */, false /* mlaa */, false /* ssao */, false /* light scatter */,
         true /* animatedCharacters */, 2 /* particles */, 1 /* image_quality */,
-        true /* degraded IBL */
+        true /* degraded IBL */, 2 /* Geometry Detail */
     });
 
     m_presets.push_back // Level 4
@@ -67,7 +67,7 @@ void OptionsScreenVideo::initPresets()
         true /* light */, 0 /* shadow */, false /* bloom */, true /* lightshaft */,
         true /* glow */, true /* mlaa */, false /* ssao */, true /* light scatter */,
         true /* animatedCharacters */, 2 /* particles */, 1 /* image_quality */,
-        false /* degraded IBL */
+        false /* degraded IBL */, 3 /* Geometry Detail */
     });
 
     m_presets.push_back // Level 5
@@ -75,7 +75,7 @@ void OptionsScreenVideo::initPresets()
         true /* light */, 512 /* shadow */, true /* bloom */, true /* lightshaft */,
         true /* glow */, true /* mlaa */, false /* ssao */, true /* light scatter */,
         true /* animatedCharacters */, 2 /* particles */, 2 /* image_quality */,
-        false /* degraded IBL */
+        false /* degraded IBL */, 3 /* Geometry Detail */
     });
 
     m_presets.push_back // Level 6
@@ -83,7 +83,7 @@ void OptionsScreenVideo::initPresets()
         true /* light */, 1024 /* shadow */, true /* bloom */, true /* lightshaft */,
         true /* glow */, true /* mlaa */, true /* ssao */, true /* light scatter */,
         true /* animatedCharacters */, 2 /* particles */, 2 /* image_quality */,
-        false /* degraded IBL */
+        false /* degraded IBL */, 4 /* Geometry Detail */
     });
 
     m_blur_presets.push_back
@@ -326,7 +326,10 @@ void OptionsScreenVideo::updateGfxSlider()
             m_presets[l].shadows == UserConfigParams::m_shadows_resolution &&
             m_presets[l].ssao == UserConfigParams::m_ssao &&
             m_presets[l].light_scatter == UserConfigParams::m_light_scatter &&
-            m_presets[l].degraded_ibl == UserConfigParams::m_degraded_IBL)
+            m_presets[l].degraded_ibl == UserConfigParams::m_degraded_IBL &&
+            m_presets[l].geometry_detail == (UserConfigParams::m_geometry_level == 0 ? 2 :
+                                             UserConfigParams::m_geometry_level == 2 ? 0 :
+                                             UserConfigParams::m_geometry_level))
         {
             gfx->setValue(l + 1);
             found = true;
@@ -426,14 +429,17 @@ void OptionsScreenVideo::updateTooltip()
     const core::stringw important_only = _("Important only");
 
     //I18N: in the graphical options tooltip;
-    // indicates the rendered image quality is very low
     const core::stringw very_low = _("Very Low");
     //I18N: in the graphical options tooltip;
-    // indicates the rendered image quality is low
     const core::stringw low = _("Low");
     //I18N: in the graphical options tooltip;
-    // indicates the rendered image quality is high
+    const core::stringw medium = _("Medium");
+    //I18N: in the graphical options tooltip;
     const core::stringw high = _("High");
+    //I18N: in the graphical options tooltip;
+    const core::stringw very_high = _("Very High");
+    //I18N: in the graphical options tooltip;
+    const core::stringw ultra = _("Ultra");
 
     //I18N: in graphical options
     tooltip = _("Particles Effects: %s",
@@ -478,6 +484,17 @@ void OptionsScreenVideo::updateTooltip()
     int quality = getImageQuality();
     tooltip = tooltip + L"\n" + _("Rendered image quality: %s",
         quality == 0 ? very_low : quality == 1 ? low : high);
+
+    //I18N: in graphical options
+    int geometry_detail = (UserConfigParams::m_geometry_level == 0 ? 2 :
+                           UserConfigParams::m_geometry_level == 2 ? 0 :
+                           UserConfigParams::m_geometry_level);
+    tooltip = tooltip + L"\n" + _("Geometry detail: %s",
+        geometry_detail == 0 ? very_low  :
+        geometry_detail == 1 ? low       :
+        geometry_detail == 2 ? medium    :
+        geometry_detail == 3 ? high      :
+        geometry_detail == 4 ? very_high : ultra);
 
     gfx->setTooltip(tooltip);
 }   // updateTooltip
@@ -547,15 +564,18 @@ void OptionsScreenVideo::eventCallback(Widget* widget, const std::string& name,
         UserConfigParams::m_animated_characters = m_presets[level].animatedCharacters;
         UserConfigParams::m_particles_effects = m_presets[level].particles;
         setImageQuality(m_presets[level].image_quality);
-        UserConfigParams::m_bloom = m_presets[level].bloom;
-        UserConfigParams::m_glow = m_presets[level].glow;
-        UserConfigParams::m_dynamic_lights = m_presets[level].lights;
-        UserConfigParams::m_light_shaft = m_presets[level].lightshaft;
-        UserConfigParams::m_mlaa = m_presets[level].mlaa;
+        UserConfigParams::m_bloom              = m_presets[level].bloom;
+        UserConfigParams::m_glow               = m_presets[level].glow;
+        UserConfigParams::m_dynamic_lights     = m_presets[level].lights;
+        UserConfigParams::m_light_shaft        = m_presets[level].lightshaft;
+        UserConfigParams::m_mlaa               = m_presets[level].mlaa;
         UserConfigParams::m_shadows_resolution = m_presets[level].shadows;
-        UserConfigParams::m_ssao = m_presets[level].ssao;
-        UserConfigParams::m_light_scatter = m_presets[level].light_scatter;
-        UserConfigParams::m_degraded_IBL = m_presets[level].degraded_ibl;
+        UserConfigParams::m_ssao               = m_presets[level].ssao;
+        UserConfigParams::m_light_scatter      = m_presets[level].light_scatter;
+        UserConfigParams::m_degraded_IBL       = m_presets[level].degraded_ibl;
+        UserConfigParams::m_geometry_level     = (m_presets[level].geometry_detail == 0 ? 2 :
+                                                  m_presets[level].geometry_detail == 2 ? 0 :
+                                                  m_presets[level].geometry_detail);
 
         updateGfxSlider();
     }
