@@ -329,6 +329,10 @@ public:
     // ------------------------------------------------------------------------
     void setDrawing(bool drawing) { m_drawing = drawing; }
 
-
+    int getTotalFrametime() { return m_total_frametime;  }
+    int getTotalFrames()    { return m_total_frames;     }
+    int getFPSMetricsHigh() { return m_fps_metrics_high; }
+    int getFPSMetricsMid()  { return m_fps_metrics_mid;  }
+    int getFPSMetricsLow()  { return m_fps_metrics_low;  }
 };
 #endif // PROFILER_HPP

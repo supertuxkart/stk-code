@@ -212,6 +212,7 @@ private:
     void displayCTFResults();
     void displaySoccerResults();
     void drawTeamScorers(KartTeam team, int x, int y, int height);
+    void displayBenchmarkSummary();
     void displayScreenShots();
 
     int  getFontHeight () const;
