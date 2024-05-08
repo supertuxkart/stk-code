@@ -97,18 +97,12 @@ int LODNode::getLevel()
     }
 
     // The LoD levels are ordered from highest quality to lowest
-    unsigned int lod_levels = m_detail.size();
-
-    for (unsigned int n=0; n<lod_levels; n++)
+    for (unsigned int n=0; n<m_detail.size(); n++)
     {
-        // If a high-level of detail would only be triggered from very close (distance < ~90),
-        // and there are lower levels available, skip it completely. It's better to display
-        // a low level than to have the high-level pop suddenly when already quite close.
-        if (squared_dist < m_detail[n] &&
-            (m_detail[n] > 8000 || (n == lod_levels - 1)))
+        if (squared_dist < m_detail[n])
         {
-                m_current_level = n;
-                return n;
+            m_current_level = n;
+            return n;
         }
     }
     m_current_level = -1;
@@ -205,22 +199,29 @@ void LODNode::autoComputeLevel(float scale)
 {
     m_area *= scale;
 
+    // We want to determine two things:
+    // 1.) beyond which distance the object should disappear entirely
+    // 2.) at which distances we should switch between a lower-quality model and a higher quality model,
+    //     if these distances are too low we stick to a lower-quality model
+
     // Step 1 - We try to estimate how far away we need to draw
-    // This first formula is equivalent to the one used up to STK 1.4
+    //          This first formula is equivalent to the one used up to STK 1.4
     float max_draw = 10*(sqrtf(m_area + 20) - 1);
 
     // Step 2 - At really short distances, popping is more annoying even if
-    // the object is small, so we limit how small the distance can be
+    //          the object is small, so we limit how small the distance can be
     if (max_draw < 100)
         max_draw = 40 + (max_draw * 0.6);
 
     // Step 3 - If the draw distance is too big we artificially reduce it
-    // The formulas are still experimental and improvable.
+    //          The formulas are still experimental and improvable.
     if(max_draw > 250)
         max_draw = 230 + (max_draw * 0.08);
     // This effecte is cumulative
     if (max_draw > 500)
         max_draw = 200 + (max_draw * 0.6);
+
+    float max_quality_switch_dist = 90;
 
     // Step 4 - Distance multiplier based on the user's input
     float aggressivity = 1.0;
@@ -234,23 +235,32 @@ void LODNode::autoComputeLevel(float scale)
     max_draw *= aggressivity;
 
     // Step 5 - As it is faster to compute the squared distance than distance, at runtime
-    // we compare the distance saved in the LoD node with the square of the distance
-    // between the camera and the object. Therefore, we apply squaring here.
+    //          we compare the distance saved in the LoD node with the square of the distance
+    //          between the camera and the object. Therefore, we apply squaring here.
     max_draw *= max_draw;
+    max_quality_switch_dist *= max_quality_switch_dist;
 
     int step = (int) (max_draw) / m_detail.size();
-
-    // Step 6 - Then we recompute the level of detail culling distance
-    //          If there are N levels of detail, the transition distance
-    //          between each level is currently each 1/Nth of the max
-    //          display distance
-    // TODO - investigate a better division scheme
     int biais = m_detail.size();
+
     for(unsigned i = 0; i < m_detail.size(); i++)
     {
+        // Step 6 - Then we recompute the level of detail culling distance
+        //          If there are N levels of detail, the transition distance
+        //          between each level is currently each SQRT(1/N)th of the max
+        //          display distance
+        // TODO - investigate a better division scheme
         m_detail[i] = ((step / biais) * (i + 1));
         biais--;
+
+        // Step 7 - If a high-level of detail would only be triggered from too close,
+        //          and there are lower levels available, skip it completely.
+        //          It's better to display a low level than to have the high-level pop
+        //          suddenly when already quite close.
+        if(m_detail[i] < max_quality_switch_dist && (i + 1) < m_detail.size())
+            m_detail[i] = -1.0f;
     }
+
     const size_t max_level = m_detail.size() - 1;
 
     // Only animated mesh needs to be updated bounding box every frame,
