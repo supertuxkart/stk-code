@@ -2003,7 +2003,8 @@ void Kart::handleMaterialSFX()
 
     bool m_schedule_pause = m_flying ||
                         dynamic_cast<RescueAnimation*>(getKartAnimation()) ||
-                        dynamic_cast<ExplosionAnimation*>(getKartAnimation());
+                        dynamic_cast<ExplosionAnimation*>(getKartAnimation()) ||
+                        World::getWorld()->getPhase() == World::IN_GAME_MENU_PHASE;
 
     // terrain sound is not necessarily a looping sound so check its status before
     // setting its speed, to avoid 'ressuscitating' sounds that had already stopped

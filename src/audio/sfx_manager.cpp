@@ -519,7 +519,7 @@ void SFXManager::toggleSound(const bool on)
             resume_later = (World::getWorld()->getPhase() == World::IN_GAME_MENU_PHASE);
         for (int n=0; n<sfx_amount; n++)
         {
-            // This also pauses sound effects
+            // This also pauses sound effects if they should be resumed later
             m_all_sfx.getData()[n]->onSoundEnabledBack(resume_later);
         }
         m_all_sfx.unlock();
