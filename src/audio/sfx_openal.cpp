@@ -262,10 +262,11 @@ void SFXOpenAL::reallySetLoop(bool status)
 
 //-----------------------------------------------------------------------------
 /** Queues a stop for this effect to the sound manager.
+ * Stopping MUST be allowed when SFX are disabled
  */
 void SFXOpenAL::stop()
 {
-    if (m_status == SFX_UNKNOWN || !SFXManager::get()->sfxAllowed()) return;
+    if (m_status == SFX_UNKNOWN) return;
     SFXManager::get()->queue(SFXManager::SFX_STOP, this);
 }   // stop
 
@@ -295,12 +296,13 @@ void SFXOpenAL::pause()
 //-----------------------------------------------------------------------------
 /** Pauses a SFX that's currently played. Nothing happens it the effect is
  *  currently not being played.
+ *  Pausing MUST be allowed when SFX are disabled
  */
 void SFXOpenAL::reallyPauseNow()
 {
     // Need to be tested again here, since this function can be called
     // from pauseAll, and we have to make sure to only pause playing sfx.
-    if (m_status != SFX_PLAYING || !SFXManager::get()->sfxAllowed()) return;
+    if (m_status != SFX_PLAYING) return;
     m_status = SFX_PAUSED;
     alSourcePause(m_sound_source);
     SFXManager::checkError("pausing");
@@ -513,7 +515,7 @@ void SFXOpenAL::deleteSFX()
 
 //-----------------------------------------------------------------------------
 
-void SFXOpenAL::onSoundEnabledBack()
+void SFXOpenAL::onSoundEnabledBack(bool resume_later)
 {
     if (m_loop)
     {
@@ -525,6 +527,8 @@ void SFXOpenAL::onSoundEnabledBack()
             pause();
             alSourcef(m_sound_source, AL_GAIN,
                      (m_gain < 0.0f ? m_default_gain : m_gain) * m_master_gain);
+            if (!resume_later)
+                play();
         }
     }
 }   // onSoundEnabledBack
