@@ -118,7 +118,7 @@ private:
 public:
           Attachment(Kart* kart);
          ~Attachment();
-    void  clear();
+    void  clear(AttachmentType type = ATTACH_NOTHING);
     void  hitBanana(ItemState *item);
     void  updateGraphics(float dt);
 

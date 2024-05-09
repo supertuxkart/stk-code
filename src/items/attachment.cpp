@@ -119,7 +119,7 @@ void Attachment::set(AttachmentType type, int ticks,
 {
     bool was_bomb = m_type == ATTACH_BOMB;
     int16_t prev_ticks = m_ticks_left;
-    clear();
+    clear(type);
 
     // If necessary create the appropriate plugin which encapsulates
     // the associated behavior
@@ -176,8 +176,15 @@ void Attachment::set(AttachmentType type, int ticks,
  *  takes care of resetting the owner kart's physics structures to account for
  *  the updated mass.
  */
-void Attachment::clear()
+void Attachment::clear(AttachmentType type)
 {
+    // Ensure that the boost from an electro-shield is always removed when the
+    // electro-shield attachment gets cleared, except when a new electro-shield
+    // is about to be set, as this would incorrectly remove the boost.
+    if(m_ticks_left > 0 && type   != ATTACH_ELECTRO_SHIELD &&
+                           m_type == ATTACH_ELECTRO_SHIELD)
+        m_kart->unsetElectroShield();
+
     if (m_plugin)
     {
         delete m_plugin;
