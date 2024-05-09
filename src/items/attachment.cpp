@@ -554,23 +554,7 @@ void Attachment::update(int ticks)
     case ATTACH_NOLOK_BUBBLEGUM_SHIELD_SMALL:
         m_initial_speed = 0;
         if (m_ticks_left <= 0)
-        {
-            if (!RewindManager::get()->isRewinding())
-            {
-                if (m_bubble_explode_sound) m_bubble_explode_sound->deleteSFX();
-                m_bubble_explode_sound =
-                    SFXManager::get()->createSoundSource("bubblegum_explode");
-                m_bubble_explode_sound->setPosition(m_kart->getXYZ());
-                m_bubble_explode_sound->play();
-            }
-            if (!m_kart->isGhostKart())
-            {
-                if (m_type == ATTACH_BUBBLEGUM_SHIELD || m_type == ATTACH_NOLOK_BUBBLEGUM_SHIELD)
-                    Track::getCurrentTrack()->getItemManager()->dropNewItem(Item::ITEM_BUBBLEGUM, m_kart);
-                else
-                    Track::getCurrentTrack()->getItemManager()->dropNewItem(Item::ITEM_BUBBLEGUM_SMALL, m_kart);
-            }
-        }
+            popGumShield();
         break;
 
     case ATTACH_ELECTRO_SHIELD:
@@ -724,3 +708,28 @@ float Attachment::weightAdjust() const
            ? m_kart->getKartProperties()->getAnvilWeight() 
           : 0.0f;
 }   // weightAdjust
+
+// ----------------------------------------------------------------------------
+/** Performs all actions necessary for a gum shield to leave a ground gum behind.
+ * The expiration of the gum shield is not managed here.
+ */
+void Attachment::popGumShield()
+{
+    // Neither sound nor actual ground gum should be left behind by a ghost kart
+    // TODO: when replay of normal races is supported, drop a "ghost ground gum"?
+    if (m_kart->isGhostKart())
+        return;
+
+    if (!RewindManager::get()->isRewinding())
+    {
+        if (m_bubble_explode_sound) m_bubble_explode_sound->deleteSFX();
+        m_bubble_explode_sound =
+            SFXManager::get()->createSoundSource("bubblegum_explode");
+        m_bubble_explode_sound->setPosition(m_kart->getXYZ());
+        m_bubble_explode_sound->play();
+    }
+    if (m_type == ATTACH_BUBBLEGUM_SHIELD || m_type == ATTACH_NOLOK_BUBBLEGUM_SHIELD)
+        Track::getCurrentTrack()->getItemManager()->dropNewItem(Item::ITEM_BUBBLEGUM, m_kart);
+    else
+        Track::getCurrentTrack()->getItemManager()->dropNewItem(Item::ITEM_BUBBLEGUM_SMALL, m_kart);
+} // popGumShield

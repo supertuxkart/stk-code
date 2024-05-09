@@ -151,6 +151,9 @@ public:
     /** Returns additional weight for the kart. */
     float weightAdjust() const;
     // ------------------------------------------------------------------------
+    /** Performs all actions necessary for a gum shield to leave a ground gum behind. */
+    void popGumShield();
+    // ------------------------------------------------------------------------
     /** Return the currently associated scene node (used by e.g the swatter) */
     scene::IAnimatedMeshSceneNode* getNode() {return m_node;}
     // ------------------------------------------------------------------------

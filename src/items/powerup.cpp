@@ -356,11 +356,17 @@ void Powerup::use()
         break;
 
     case PowerupManager::POWERUP_SWATTER:
-        m_kart->getAttachment()
-                ->set(Attachment::ATTACH_SWATTER,
-                      stk_config->time2Ticks(kp->getSwatterDuration()));
-        break;
-
+        {
+            // Instead of having the swatter attachment just replace the gum shield,
+            // ensure the gum is popped on the ground.
+            // DecreaseShieldTime would not work here because the new attachment
+            // would be set before the next attachment update.
+            if(m_kart->isGumShielded())
+                m_kart->getAttachment()->popGumShield();
+            m_kart->getAttachment()->set(Attachment::ATTACH_SWATTER,
+                  stk_config->time2Ticks(kp->getSwatterDuration()));
+            break;
+        }
     case PowerupManager::POWERUP_SUDO:
         {
             Kart* player_kart = NULL;
