@@ -671,6 +671,10 @@ void Profiler::writeToFile()
     std::ofstream f(FileUtils::getPortableWritingPath(base_name +
         ".perf-report-" + (Track::getCurrentTrack() != NULL ? Track::getCurrentTrack()->getIdent() : "menu") + ".csv"));
 
+    int effective_LoD_level = (UserConfigParams::m_geometry_level == 0 ? 2 :
+                                    UserConfigParams::m_geometry_level == 2 ? 0 :
+                                    UserConfigParams::m_geometry_level);
+
     f << "Total frame count, Total profiling time (ms),";
     f << std::endl;
     f << m_total_frames << ", " << int(m_total_frametime / 1000) << ",";
@@ -679,6 +683,37 @@ void Profiler::writeToFile()
     f << "Steady FPS, Mostly stable FPS, Typical FPS,";
     f << std::endl;
     f << m_fps_metrics_low << ", " << m_fps_metrics_mid << ", " << m_fps_metrics_high << ",";
+    f << std::endl;
+    f << std::endl;
+    // Anisotropic Filtering is one of the settings affected by the Image Quality spinner
+    f << "Graphics parameters, Resolution width, Resolution height, Render resolution," 
+      << "Dynamic lighting, Particle effects, Animated characters, Geometry Detail, "
+      << "Bloom, Glow, Light Shaft, Anti-Aliasing (MLAA), SSAO,"
+      << "Anisotropic Filtering, Shadow Resolution, Light scattering, Degraded IBL,"
+      << "Motion Blur, Depth of Field, Texture compression, HD Textures, HQ Mipmap,";
+    f << std::endl;
+    f << "Values, "
+      << UserConfigParams::m_real_width << ", "
+      << UserConfigParams::m_real_height << ", "
+      << (UserConfigParams::m_dynamic_lights ? UserConfigParams::m_scale_rtts_factor : 1.0f) << ", "
+      << UserConfigParams::m_dynamic_lights << ", "
+      << UserConfigParams::m_particles_effects << ", "
+      << UserConfigParams::m_animated_characters << ", "
+      << effective_LoD_level << ", "
+      << UserConfigParams::m_bloom  << ", "
+      << UserConfigParams::m_glow << ", "
+      << UserConfigParams::m_light_shaft << ", "
+      << UserConfigParams::m_mlaa << ", "
+      << UserConfigParams::m_ssao << ", "
+      << UserConfigParams::m_anisotropic << ", "
+      << UserConfigParams::m_shadows_resolution << ", "
+      << UserConfigParams::m_light_scatter << ", "
+      << UserConfigParams::m_degraded_IBL << ", "
+      << UserConfigParams::m_motionblur << ", "
+      << UserConfigParams::m_dof << ", "
+      << UserConfigParams::m_texture_compression << ", "
+      << UserConfigParams::m_high_definition_textures << ", "
+      << UserConfigParams::m_hq_mipmap << ",";
     f << std::endl;
     f << std::endl;
     f << "Target FPS, Slow frames count, Duration of slow frames (ratio), Excess duration of slow frames (ratio),";

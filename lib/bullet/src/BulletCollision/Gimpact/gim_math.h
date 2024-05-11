@@ -32,6 +32,7 @@ email: projectileman@yahoo.com
 -----------------------------------------------------------------------------
 */
 
+#include <string.h>
 #include "LinearMath/btScalar.h"
 
 
@@ -56,21 +57,21 @@ email: projectileman@yahoo.com
 #define G_ROOT2 1.41421f
 #define G_UINT_INFINITY 0xffffffff //!< A very very high value
 #define G_REAL_INFINITY FLT_MAX
-#define	G_SIGN_BITMASK			0x80000000
+#define G_SIGN_BITMASK          0x80000000
 #define G_EPSILON SIMD_EPSILON
 
 
 
 enum GIM_SCALAR_TYPES
 {
-	G_STYPE_REAL =0,
-	G_STYPE_REAL2,
-	G_STYPE_SHORT,
-	G_STYPE_USHORT,
-	G_STYPE_INT,
-	G_STYPE_UINT,
-	G_STYPE_INT64,
-	G_STYPE_UINT64
+    G_STYPE_REAL =0,
+    G_STYPE_REAL2,
+    G_STYPE_SHORT,
+    G_STYPE_USHORT,
+    G_STYPE_INT,
+    G_STYPE_UINT,
+    G_STYPE_INT64,
+    G_STYPE_UINT64
 };
 
 
@@ -78,17 +79,31 @@ enum GIM_SCALAR_TYPES
 #define G_DEGTORAD(X) ((X)*3.1415926f/180.0f)
 #define G_RADTODEG(X) ((X)*180.0f/3.1415926f)
 
+static GUINT gim_ir__(float r)
+{
+    GUINT i;
+    memcpy(&i, &r, sizeof(i));
+    return i;
+}
+
+static GREAL gim_fr__(GUINT i)
+{
+    float r;
+    memcpy(&r, &i, sizeof(r));
+    return r;
+}
+
 //! Integer representation of a floating-point value.
-#define GIM_IR(x)					((GUINT&)(x))
+#define GIM_IR(x) (gim_ir__(x))
 
 //! Signed integer representation of a floating-point value.
-#define GIM_SIR(x)					((GINT&)(x))
+#define GIM_SIR(x) ((GINT)gim_ir__(x))
 
 //! Absolute integer representation of a floating-point value
-#define GIM_AIR(x)					(GIM_IR(x)&0x7fffffff)
+#define GIM_AIR(x) (gim_ir__(x) & 0x7fffffff)
 
 //! Floating-point representation of an integer value.
-#define GIM_FR(x)					((GREAL&)(x))
+#define GIM_FR(x) (gim_fr__(x))
 
 #define GIM_MAX(a,b) (a<b?b:a)
 #define GIM_MIN(a,b) (a>b?b:a)
@@ -107,7 +122,7 @@ enum GIM_SCALAR_TYPES
 ///returns a clamped number
 #define GIM_CLAMP(number,minval,maxval) (number<minval?minval:(number>maxval?maxval:number))
 
-#define GIM_GREATER(x, y)	btFabs(x) > (y)
+#define GIM_GREATER(x, y)   btFabs(x) > (y)
 
 ///Swap numbers
 #define GIM_SWAP_NUMBERS(a,b){ \

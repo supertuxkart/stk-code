@@ -14,15 +14,6 @@ Former project leader
 -   A lot of bugfixes and enhancements
 -   Windows packaging
 
-= Marianne Gagnon (Auria) =
-
-Developer
-- Former lead programmer
-- Mac OS X Packager
-- Among too many things to list:
--   GUI engine and user interface
--   A lot of bugfixes and enhancements
-
 = Benau =
 
 Lead developer, modeller & animator
@@ -31,11 +22,14 @@ Lead developer, modeller & animator
 - A lot of networking code
 - Other graphical improvements to karts and tracks
 
-= Dawid Gan (deveee) =
+= Marianne Gagnon (Auria) =
 
 Developer
-- Android port
-- General improvements and many many bugfixes
+- Former lead programmer
+- Mac OS X Packager
+- Among too many things to list:
+-   GUI engine and user interface
+-   A lot of bugfixes and enhancements
 
 = Jean-Manuel Clémençon (Samuncle) =
 
@@ -54,23 +48,36 @@ Lead developer
 - AI improvements
 - General improvements and bugfixes
 
+= Dawid Gan (deveee) =
+
+Developer
+- Android port
+- General improvements and many many bugfixes
+
 = Online =
 Add-ons website
 - Daniel Butum (leyyin)
 - Stephen Just
-
 
 = Additional Programming =
 
 Significant bug fixes & misc. contributions for 1.0 and 1.1
 - Ben Krajancic
 - QwertyChouskie
-- Dumaosen
-- Luffah
+- CodingJellyfish
 - Mrxx99
 - Pelya
 - Riso
 
+
+Significant bug fixes & misc. contributions for 1.2 to 1.5
+- QwertyChouskie
+- CodingJellyfish
+- Mary
+- Luffah
+- CodedOre
+- Riso
+- mrkubax10
 
 = Visual art =
 
@@ -104,6 +111,9 @@ Karts
 
 Objects
 - GeekPenguinBR, TuxKartDriver : Models from Las Dunas Stadium
+
+Miscellaneous
+- Semphris : Item respawn animations
 
 Jymis
 - Karts and icons
@@ -200,7 +210,7 @@ Packaging
 - hiker: Windows
 - Dawid Gan: Linux and Android packages
 
-Testing for 1.0 and 1.1
+Testing for 1.0 to 1.5
 - Alayan
 - deveee
 - Wuzzy

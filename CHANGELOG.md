@@ -5,6 +5,48 @@ It should be kept in mind that some versions have a less complete changelog than
 
 For similar reasons, and because some features are vastly more complex than others, attributions of main changes should not be taken as a shortcut for overall contribution.
 
+## SuperTuxKart 1.5 (TBD, still unfinished)
+
+### Networking
+* Improve track-voting logic when no majority is achieved, by kimden
+
+### General
+* Make the game's window resizable in all the screens, by CodingJellyfish (previously, most UI screens did not support resizing)
+* New benchmark mode, by Alayan:
+- Can be run with a few clicks, allowing to easily test the performance of various settings or to compare different systems
+- Robust performance metrics that better reflect the impact of varying frametimes than Average FPS and 1% Lows.
+* Fix incorrect unlock information in Story Mode after a Grand Prix, by CodingJellyfish
+* Make the progression of audio levels geometrical and increase default steps, allowing to set lower audio levels and better accuracy for low audio levels (especially useful for headphone users), by Alayan
+* Fix drive-on sound from materials being played when the game is paused, by Alayan
+* Fix a crash trying to read replays when the random starting position setting is enabled, by Alayan
+* Handle track names with spaces in the replay reader, by Alayan
+* Various tweaks, bugfixes and code-quality improvements
+
+### Graphics
+* Improve the accuracy of the framerate limiter, by Benau
+* Add more maximum framerate options to the built-in framerate limiter, by Benau (this does not affect physics, which run at 120FPs independetly of graphical FPS)
+* Add some graphical effects for legacy video drivers, by Benau
+* Ensure fragment shaders use high precision, to avoid rendering issues with some drivers, by zmike
+* Fix a related precision issue causing black artifacts with GL_ES, by CodingJellyfish
+* Fix other shader issues that could produce black artifacts in specific situations, by CodingJellyfish
+* Various improvements to the automatic computations of Level of Detail (LoD) distances, by Alayan
+* Improve draw call performance in some situations, by CodingJellyfish
+* Enable new higher LoD and shadows settings, by Alayan
+* Integrate LoD (Geometry Detail) settings in the graphics presets, by Alayan
+* Prefer displaying a lower quality LoD model over switching to a higher quality one when too close, by Alayan
+
+### User Interface
+* Add a new Display tab in the Settings, by Alayan
+* Allow to rate addons with a keyboard or a controller, and notify when trying to rate an addon while not logged in, by CodingJellyfish
+* Fix an issue that prevented to go up with a scrollbar using a trackpad, by CodingJellyfish
+* Improve the typing bars, especially for the coal theme, by Alayan
+* Greatly improve UI layout for 'tall' resolutions (greater height than width), by CodingJellyfish
+* Improve font scaling, by CodingJellyfish
+* Various enhancements, by Qwertychouskie and others
+
+### Mobile
+* Don't keep the rescue button active after it stops being touched, when the finger keeps touching the screen (e. g. to handle the steering wheel), by S0nter
+
 ## SuperTuxKart 1.4 (31. October 2022)
 ### General
 * Lap trial mode, by mrkubax10
@@ -209,24 +251,24 @@ For similar reasons, and because some features are vastly more complex than othe
     * Several changes or fixes to ensure proper behavior (input, screen-scaling, and more)
     
 ### User Interface
-* Show tips for players when loading and after race ends, by dumaosen
-* Better scaling of many many UI elements to large resolutions, by dumaosen and others
+* Show tips for players when loading and after race ends, by CodingJellyfish
+* Better scaling of many many UI elements to large resolutions, by CodingJellyfish and others
 * Show country flags for servers and players in online multiplayer, by Benau
 * Add a new option to change font size on the fly, by Benau and deveee
-* Add icons for the available options in the race result screens, by dumaosen
+* Add icons for the available options in the race result screens, by CodingJellyfish
 * Make the highscore list scrollable, by deveee
 * Display all the relevant info in the challenge dialog in Story Mode, by Alayan
-* New challenge selection interface, by dumaosen
+* New challenge selection interface, by CodingJellyfish
 * Show the number of ranking points won or lost after a ranked race, by Benau
 * Separate blurring visual effects from the main graphics presets, by Alayan
 * Fix incorrect text resizing in the help menu, by Benau
-* Make the custom random GP option more prominent in the track selection screen, by dumaosen
+* Make the custom random GP option more prominent in the track selection screen, by CodingJellyfish
 * Improvements to the scrollbars, by QwertyChouskie
 * Allow sorting lists with the keyboard, by Benau
 * Allow tooltip drawing outside of menus, by deveee
 * Prevent some font scaling blur caused by non-integer offsets, by Benau
 * Add a (configurable) limit to chat message frequency, by GuillaumeBft and Benau
-* Allow to explicitly set the flip direction of tabs, by dumaosen
+* Allow to explicitly set the flip direction of tabs, by CodingJellyfish
 * Allow to download addons from the server lobby interface, by Benau
 * Allow to filter installed and non-installed addons in the addons screen, by Alayan
 * Many minor tweaks and bugfixes
