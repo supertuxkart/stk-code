@@ -19,7 +19,9 @@
 // Manages includes common to all or most options screens
 #include "states_screens/options/options_common.hpp"
 
+#include "graphics/camera.hpp"
 #include "graphics/irr_driver.hpp"
+#include "modes/world.hpp"
 
 #ifndef SERVER_ONLY
 #include <ge_main.hpp>
@@ -126,9 +128,7 @@ void OptionsScreenDisplay::init()
     // ---- splitscreen mode
     GUIEngine::SpinnerWidget* splitscreen_method = getWidget<GUIEngine::SpinnerWidget>("splitscreen_method");
     assert( splitscreen_method != NULL );
-    if (UserConfigParams::split_screen_horizontally) splitscreen_method->setValue(1);
-    else splitscreen_method->setValue(0);
-    splitscreen_method->setActive(!in_game);
+    splitscreen_method->setValue(UserConfigParams::split_screen_horizontally ? 1 : 0);
 }   // init
 
 // --------------------------------------------------------------------------------------------
@@ -407,6 +407,11 @@ void OptionsScreenDisplay::eventCallback(Widget* widget, const std::string& name
         GUIEngine::SpinnerWidget* splitscreen_method = getWidget<GUIEngine::SpinnerWidget>("splitscreen_method");
         assert( splitscreen_method != NULL );
         UserConfigParams::split_screen_horizontally = (splitscreen_method->getValue() == 1);
+        if (World::getWorld())
+        {
+            for (unsigned i = 0; i < Camera::getNumCameras(); i++)
+                Camera::getCamera(i)->setupCamera();
+        }
     }
 }   // eventCallback
 
