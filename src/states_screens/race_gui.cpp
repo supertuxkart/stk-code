@@ -438,6 +438,7 @@ void RaceGUI::drawGlobalTimer()
 
     sw = core::stringw (StringUtils::timeToString(elapsed_time).c_str() );
 
+    // Use colors to draw player attention to countdowns in challenges and FTL
     if (RaceManager::get()->hasTimeTarget())
     {
         // This assumes only challenges have a time target
@@ -453,6 +454,13 @@ void RaceGUI::drawGlobalTimer()
         else if (elapsed_time <= 5)
             time_color = video::SColor(255,255,160,0);
         else if (elapsed_time <= 15)
+            time_color = video::SColor(255,255,255,0);
+    }
+    else if(RaceManager::get()->isFollowMode())
+    {
+        if (elapsed_time <= 3)
+            time_color = video::SColor(255,255,160,0);
+        else if (elapsed_time <= 8)
             time_color = video::SColor(255,255,255,0);
     }
 
@@ -1385,4 +1393,3 @@ void RaceGUI::drawLap(const AbstractKart* kart,
     font->setScale(1.0f);
 #endif
 } // drawLap
-

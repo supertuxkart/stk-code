@@ -949,19 +949,27 @@ void World::moveKartTo(AbstractKart* kart, const btTransform &transform)
 // ----------------------------------------------------------------------------
 void World::updateTimeTargetSound()
 {
-    if (RaceManager::get()->hasTimeTarget() && !RewindManager::get()->isRewinding())
+    if (RewindManager::get()->isRewinding())
+        return;
+
+    float time_left = getTime();;
+    if (RaceManager::get()->hasTimeTarget())
     {
-        float time_left = getTime();
         float time_target = RaceManager::get()->getTimeTarget();
         // In linear mode, the internal time still counts up even when displayed down.
         if (RaceManager::get()->isLinearRaceMode())
             time_left = time_target - time_left;
+    }
+    else if (!RaceManager::get()->isFollowMode())
+    {
+        return; // No Time Target and no FTL
+    }
 
-        if (time_left <= 5 && getTimeTicks() % stk_config->time2Ticks(1.0f) == 0 &&
-                !World::getWorld()->isRaceOver() && time_left > 0)
-        {
-                SFXManager::get()->quickSound("pre_start_race");
-        }
+    if (time_left <= (RaceManager::get()->isFollowMode() ? 3 : 5) &&
+            getTimeTicks() % stk_config->time2Ticks(1.0f) == 0 &&
+            !World::getWorld()->isRaceOver() && time_left > 0)
+    {
+        SFXManager::get()->quickSound("pre_start_race");
     }
 }  // updateTimeTargetSound
 
