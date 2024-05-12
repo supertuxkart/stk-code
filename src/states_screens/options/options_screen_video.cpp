@@ -50,7 +50,7 @@ void OptionsScreenVideo::initPresets()
     ({
         false /* light */, 0 /* shadow */, false /* bloom */, false /* lightshaft */,
         false /* glow */, false /* mlaa */, false /* ssao */, false /* light scatter */,
-        true /* animatedCharacters */, 2 /* particles */, 0 /* image_quality */,
+        true /* animatedCharacters */, 2 /* particles */, 1 /* image_quality */,
         true /* degraded IBL */, 1 /* Geometry Detail */
     });
 
@@ -66,7 +66,7 @@ void OptionsScreenVideo::initPresets()
     ({
         true /* light */, 0 /* shadow */, false /* bloom */, true /* lightshaft */,
         true /* glow */, true /* mlaa */, false /* ssao */, true /* light scatter */,
-        true /* animatedCharacters */, 2 /* particles */, 1 /* image_quality */,
+        true /* animatedCharacters */, 2 /* particles */, 2 /* image_quality */,
         false /* degraded IBL */, 3 /* Geometry Detail */
     });
 
@@ -74,7 +74,7 @@ void OptionsScreenVideo::initPresets()
     ({
         true /* light */, 512 /* shadow */, true /* bloom */, true /* lightshaft */,
         true /* glow */, true /* mlaa */, false /* ssao */, true /* light scatter */,
-        true /* animatedCharacters */, 2 /* particles */, 2 /* image_quality */,
+        true /* animatedCharacters */, 2 /* particles */, 3 /* image_quality */,
         false /* degraded IBL */, 3 /* Geometry Detail */
     });
 
@@ -82,7 +82,7 @@ void OptionsScreenVideo::initPresets()
     ({
         true /* light */, 1024 /* shadow */, true /* bloom */, true /* lightshaft */,
         true /* glow */, true /* mlaa */, true /* ssao */, true /* light scatter */,
-        true /* animatedCharacters */, 2 /* particles */, 2 /* image_quality */,
+        true /* animatedCharacters */, 2 /* particles */, 3 /* image_quality */,
         false /* degraded IBL */, 4 /* Geometry Detail */
     });
 
@@ -122,18 +122,22 @@ void OptionsScreenVideo::initPresets()
 // --------------------------------------------------------------------------------------------
 int OptionsScreenVideo::getImageQuality()
 {
-    if (UserConfigParams::m_anisotropic == 2 &&
+    if (UserConfigParams::m_anisotropic == 4 &&
         (UserConfigParams::m_high_definition_textures & 0x01) == 0x00 &&
         UserConfigParams::m_hq_mipmap == false)
         return 0;
-    if (UserConfigParams::m_anisotropic == 4 &&
-        (UserConfigParams::m_high_definition_textures & 0x01) == 0x01 &&
+    if (UserConfigParams::m_anisotropic == 16 &&
+        (UserConfigParams::m_high_definition_textures & 0x01) == 0x00 &&
         UserConfigParams::m_hq_mipmap == false)
         return 1;
     if (UserConfigParams::m_anisotropic == 16 &&
         (UserConfigParams::m_high_definition_textures & 0x01) == 0x01 &&
-        UserConfigParams::m_hq_mipmap == true)
+        UserConfigParams::m_hq_mipmap == false)
         return 2;
+    if (UserConfigParams::m_anisotropic == 16 &&
+        (UserConfigParams::m_high_definition_textures & 0x01) == 0x01 &&
+        UserConfigParams::m_hq_mipmap == true)
+        return 3;
     return 1;
 }   // getImageQuality
 
@@ -147,20 +151,27 @@ void OptionsScreenVideo::setImageQuality(int quality)
     switch (quality)
     {
         case 0:
-            UserConfigParams::m_anisotropic = 2;
+            UserConfigParams::m_anisotropic = 4;
             UserConfigParams::m_high_definition_textures = 0x02;
             UserConfigParams::m_hq_mipmap = false;
             if (td)
                 td->setSamplerUse(GE::GVS_3D_MESH_MIPMAP_2);
             break;
         case 1:
-            UserConfigParams::m_anisotropic = 4;
+            UserConfigParams::m_anisotropic = 16;
+            UserConfigParams::m_high_definition_textures = 0x02;
+            UserConfigParams::m_hq_mipmap = false;
+            if (td)
+                td->setSamplerUse(GE::GVS_3D_MESH_MIPMAP_2);
+            break;
+        case 2:
+            UserConfigParams::m_anisotropic = 16;
             UserConfigParams::m_high_definition_textures = 0x03;
             UserConfigParams::m_hq_mipmap = false;
             if (td)
                 td->setSamplerUse(GE::GVS_3D_MESH_MIPMAP_4);
             break;
-        case 2:
+        case 3:
             UserConfigParams::m_anisotropic = 16;
             UserConfigParams::m_high_definition_textures = 0x03;
             UserConfigParams::m_hq_mipmap = true;
@@ -483,7 +494,9 @@ void OptionsScreenVideo::updateTooltip()
     //I18N: in graphical options
     int quality = getImageQuality();
     tooltip = tooltip + L"\n" + _("Rendered image quality: %s",
-        quality == 0 ? very_low : quality == 1 ? low : high);
+        quality == 0 ? very_low :
+        quality == 1 ? low      :
+        quality == 2 ? medium   : high);
 
     //I18N: in graphical options
     int geometry_detail = (UserConfigParams::m_geometry_level == 0 ? 2 :

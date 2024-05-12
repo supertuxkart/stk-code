@@ -95,6 +95,7 @@ void CustomVideoSettingsDialog::beforeAddingWidgets()
     SpinnerWidget* filtering = getWidget<SpinnerWidget>("image_quality");
     filtering->addLabel(_("Very Low"));
     filtering->addLabel(_("Low"));
+    filtering->addLabel(_("Medium"));
     filtering->addLabel(_("High"));
     filtering->setValue(OptionsScreenVideo::getImageQuality());
 
