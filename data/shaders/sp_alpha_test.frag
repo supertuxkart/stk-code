@@ -32,7 +32,7 @@ void main(void)
     vec4 layer_2 = sampleTextureLayer2(uv);
     o_diffuse_color = vec4(col.xyz, layer_2.z);
 
-    o_normal_color.xy = 0.5 * EncodeNormal(normalize(normal)) + 0.5;
+    o_normal_color.xy = EncodeNormal(normalize(normal));
     o_normal_color.zw = layer_2.xy;
 #else
     o_diffuse_color = vec4(col.xyz, 1.0);

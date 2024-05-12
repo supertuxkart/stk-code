@@ -85,7 +85,7 @@ void main()
 
     vec3 world_normal = t_b_n * tangent_space_normal;
 
-    o_normal_color.xy = 0.5 * EncodeNormal(normalize(world_normal)) + 0.5;
+    o_normal_color.xy = EncodeNormal(normalize(world_normal));
     o_normal_color.zw = layer_2.xy;
 #else
     o_diffuse_color = vec4(final_color, 1.0);
