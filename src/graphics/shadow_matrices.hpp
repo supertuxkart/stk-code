@@ -40,6 +40,7 @@ class ShadowMatrices
 {
 public:
     static float m_shadow_split[5];
+    static float m_shadow_overlap_proportion;
 
 private:
     std::vector<core::matrix4> m_sun_ortho_matrices;
