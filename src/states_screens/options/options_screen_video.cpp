@@ -86,6 +86,14 @@ void OptionsScreenVideo::initPresets()
         false /* degraded IBL */, 4 /* Geometry Detail */
     });
 
+    m_presets.push_back // Level 7
+    ({
+        true /* light */, 2048 /* shadow */, true /* bloom */, true /* lightshaft */,
+        true /* glow */, true /* mlaa */, true /* ssao */, true /* light scatter */,
+        true /* animatedCharacters */, 2 /* particles */, 3 /* image_quality */,
+        false /* degraded IBL */, 5 /* Geometry Detail */
+    });
+
     m_blur_presets.push_back
     ({
         false /* motionblur */, false /* depth of field */
@@ -199,7 +207,7 @@ OptionsScreenVideo::OptionsScreenVideo() : Screen("options/options_video.stkgui"
 void OptionsScreenVideo::loadedFromFile()
 {
     m_inited = false;
-    assert(m_presets.size() == 6);
+    assert(m_presets.size() == 7);
     assert(m_blur_presets.size() == 3);
 
     GUIEngine::SpinnerWidget* gfx =
