@@ -101,12 +101,10 @@ void main(void)
     // otherwise just use specular IBL
     if (specval > 0.5)
     {
-        vec3 View_Pos               = CalcViewPositionFromDepth(uv);
-
         // Reflection vector
         vec3 reflected              = reflect(-eyedir, normal);
 
-        vec2 coords = RayCast(reflected, View_Pos);
+        vec2 coords = RayCast(reflected, xpos.xyz);
 
         if (coords.x == 0.0 && coords.y == 0.0) {
             outColor = fallback;
