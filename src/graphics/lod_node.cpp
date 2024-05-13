@@ -52,6 +52,7 @@ LODNode::LODNode(std::string group_name, scene::ISceneNode* parent,
     m_current_level = -1;
     m_current_level_dirty = true;
     m_lod_distances_updated = false;
+    m_min_switch_distance = 0;
 }
 
 LODNode::~LODNode()
@@ -99,7 +100,12 @@ int LODNode::getLevel()
     // The LoD levels are ordered from highest quality to lowest
     for (unsigned int n=0; n<m_detail.size(); n++)
     {
-        if (squared_dist < m_detail[n])
+        // Display this level if close enough.
+        // If a high-level of detail would only be triggered from too close,
+        // and there are lower levels available, skip it completely.
+        // It's better to display a low level than to have the high-level pop suddenly.
+        if (squared_dist < m_detail[n] &&
+            ((n + 1 >= m_detail.size()) || (m_min_switch_distance < m_detail[n])))
         {
             m_current_level = n;
             return n;
@@ -220,7 +226,7 @@ void LODNode::autoComputeLevel(float scale)
 
     float max_draw = p4_ratio * p4_component + (1.0f - p4_ratio) * p2_component;
 
-    float max_quality_switch_dist = 90;
+    float m_min_switch_dist = 90;
 
     // Step 2 - Distance multiplier based on the user's input
     float aggressivity = 1.0;
@@ -237,7 +243,7 @@ void LODNode::autoComputeLevel(float scale)
     //          we compare the distance saved in the LoD node with the square of the distance
     //          between the camera and the object. Therefore, we apply squaring here.
     max_draw *= max_draw;
-    max_quality_switch_dist *= max_quality_switch_dist;
+    m_min_switch_dist *= m_min_switch_dist;
 
     int step = (int) (max_draw) / m_detail.size();
     int biais = m_detail.size();
@@ -251,13 +257,6 @@ void LODNode::autoComputeLevel(float scale)
         // TODO - investigate a better division scheme
         m_detail[i] = ((step / biais) * (i + 1));
         biais--;
-
-        // Step 5 - If a high-level of detail would only be triggered from too close,
-        //          and there are lower levels available, skip it completely.
-        //          It's better to display a low level than to have the high-level pop
-        //          suddenly when already quite close.
-        if(m_detail[i] < max_quality_switch_dist && (i + 1) < m_detail.size())
-            m_detail[i] = -1.0f;
     }
 
     const size_t max_level = m_detail.size() - 1;
