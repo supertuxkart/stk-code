@@ -203,38 +203,37 @@ void LODNode::autoComputeLevel(float scale)
     // 1.) beyond which distance the object should disappear entirely
     // 2.) at which distances we should switch between a lower-quality model and a higher quality model,
     //     if these distances are too low we stick to a lower-quality model
+    // To do so, we use a mix between a power 2 (quadratic) formula and a power 4 formula.
 
-    // Step 1 - We try to estimate how far away we need to draw
-    //          This first formula is equivalent to the one used up to STK 1.4
-    float max_draw = 10*(sqrtf(m_area + 20) - 1);
+    // Step 1a - compute the base formulas
+    float p2_component = 20.0f + 7.0f * sqrtf(m_area + 10);
+    float p4_component = 50.0f + 22.0f * sqrtf(sqrtf(m_area + 2));
 
-    // Step 2 - At really short distances, popping is more annoying even if
-    //          the object is small, so we limit how small the distance can be
-    if (max_draw < 100)
-        max_draw = 40 + (max_draw * 0.6);
+    // Step 1b - combine them
+    float p4_ratio = p4_component;
+    if (p4_component < 210.0f)
+        p4_ratio = p4_component / 220.0f;
+    else if (p4_component < 230.0f) // Smooth the transition
+        p4_ratio = (105.0f + p4_component * 0.5f) / 220.0f;
+    else
+        p4_ratio = 1.0f;
 
-    // Step 3 - If the draw distance is too big we artificially reduce it
-    //          The formulas are still experimental and improvable.
-    if(max_draw > 250)
-        max_draw = 230 + (max_draw * 0.08);
-    // This effecte is cumulative
-    if (max_draw > 500)
-        max_draw = 200 + (max_draw * 0.6);
+    float max_draw = p4_ratio * p4_component + (1.0f - p4_ratio) * p2_component;
 
     float max_quality_switch_dist = 90;
 
-    // Step 4 - Distance multiplier based on the user's input
+    // Step 2 - Distance multiplier based on the user's input
     float aggressivity = 1.0;
-    if(     UserConfigParams::m_geometry_level == 2) aggressivity = 0.8; // 2 in the params is the lowest setting
-    else if(UserConfigParams::m_geometry_level == 1) aggressivity = 1.1;
-    else if(UserConfigParams::m_geometry_level == 0) aggressivity = 1.5;
-    else if(UserConfigParams::m_geometry_level == 3) aggressivity = 2.0;
-    else if(UserConfigParams::m_geometry_level == 4) aggressivity = 2.7;
-    else if(UserConfigParams::m_geometry_level == 5) aggressivity = 3.6;
+    if(     UserConfigParams::m_geometry_level == 2) aggressivity = 1.0; // 2 in the params is the lowest setting
+    else if(UserConfigParams::m_geometry_level == 1) aggressivity = 1.4;
+    else if(UserConfigParams::m_geometry_level == 0) aggressivity = 1.95;
+    else if(UserConfigParams::m_geometry_level == 3) aggressivity = 2.7;
+    else if(UserConfigParams::m_geometry_level == 4) aggressivity = 3.75;
+    else if(UserConfigParams::m_geometry_level == 5) aggressivity = 5.25;
 
     max_draw *= aggressivity;
 
-    // Step 5 - As it is faster to compute the squared distance than distance, at runtime
+    // Step 3 - As it is faster to compute the squared distance than distance, at runtime
     //          we compare the distance saved in the LoD node with the square of the distance
     //          between the camera and the object. Therefore, we apply squaring here.
     max_draw *= max_draw;
@@ -245,7 +244,7 @@ void LODNode::autoComputeLevel(float scale)
 
     for(unsigned i = 0; i < m_detail.size(); i++)
     {
-        // Step 6 - Then we recompute the level of detail culling distance
+        // Step 4 - Then we recompute the level of detail culling distance
         //          If there are N levels of detail, the transition distance
         //          between each level is currently each SQRT(1/N)th of the max
         //          display distance
@@ -253,7 +252,7 @@ void LODNode::autoComputeLevel(float scale)
         m_detail[i] = ((step / biais) * (i + 1));
         biais--;
 
-        // Step 7 - If a high-level of detail would only be triggered from too close,
+        // Step 5 - If a high-level of detail would only be triggered from too close,
         //          and there are lower levels available, skip it completely.
         //          It's better to display a low level than to have the high-level pop
         //          suddenly when already quite close.
