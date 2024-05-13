@@ -226,35 +226,45 @@ void LODNode::autoComputeLevel(float scale)
 
     float max_draw = p4_ratio * p4_component + (1.0f - p4_ratio) * p2_component;
 
-    float m_min_switch_dist = 90;
-
-    // Step 2 - Distance multiplier based on the user's input
+    // Step 2a - Distance multiplier based on the user's input
     float aggressivity = 1.0;
     if(     UserConfigParams::m_geometry_level == 2) aggressivity = 1.0; // 2 in the params is the lowest setting
-    else if(UserConfigParams::m_geometry_level == 1) aggressivity = 1.4;
-    else if(UserConfigParams::m_geometry_level == 0) aggressivity = 1.95;
-    else if(UserConfigParams::m_geometry_level == 3) aggressivity = 2.7;
-    else if(UserConfigParams::m_geometry_level == 4) aggressivity = 3.75;
-    else if(UserConfigParams::m_geometry_level == 5) aggressivity = 5.25;
+    else if(UserConfigParams::m_geometry_level == 1) aggressivity = 1.42;
+    else if(UserConfigParams::m_geometry_level == 0) aggressivity = 2.0;
+    else if(UserConfigParams::m_geometry_level == 3) aggressivity = 2.84;
+    else if(UserConfigParams::m_geometry_level == 4) aggressivity = 4.0;
+    else if(UserConfigParams::m_geometry_level == 5) aggressivity = 5.7;
 
     max_draw *= aggressivity;
+
+    // Step 2b - Determine the minimum distance for a model switch based on user input
+    float temp_switch_dist = max_draw;
+    if(     UserConfigParams::m_geometry_level == 2) temp_switch_dist *= 0.75f; // 2 in the params is the lowest setting
+    else if(UserConfigParams::m_geometry_level == 1) temp_switch_dist *= 0.55f;
+    else if(UserConfigParams::m_geometry_level == 0) temp_switch_dist *= 0.4f;
+    else if(UserConfigParams::m_geometry_level == 3) temp_switch_dist *= 0.3f;
+    else if(UserConfigParams::m_geometry_level == 4) temp_switch_dist *= 0.23f;
+    else if(UserConfigParams::m_geometry_level == 5) temp_switch_dist *= 0.18f;
+
+    temp_switch_dist = (temp_switch_dist + 100.0f) / 2.0f;
+
+    m_min_switch_distance = (int)temp_switch_dist;
 
     // Step 3 - As it is faster to compute the squared distance than distance, at runtime
     //          we compare the distance saved in the LoD node with the square of the distance
     //          between the camera and the object. Therefore, we apply squaring here.
     max_draw *= max_draw;
-    m_min_switch_dist *= m_min_switch_dist;
+    m_min_switch_distance *= m_min_switch_distance;
 
+    // Step 4 - Then we recompute the level of detail culling distance
+    //          If there are N levels of detail, the highest level
+    //          is displayed when under 1/Nth of the max display distance.
+    //          Other levels are spaced approximately at the geometrical mean points.
     int step = (int) (max_draw) / m_detail.size();
     int biais = m_detail.size();
 
     for(unsigned i = 0; i < m_detail.size(); i++)
     {
-        // Step 4 - Then we recompute the level of detail culling distance
-        //          If there are N levels of detail, the transition distance
-        //          between each level is currently each SQRT(1/N)th of the max
-        //          display distance
-        // TODO - investigate a better division scheme
         m_detail[i] = ((step / biais) * (i + 1));
         biais--;
     }
