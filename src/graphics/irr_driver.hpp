@@ -214,7 +214,7 @@ public:
     void increaseObjectCount();
     core::array<video::IRenderTarget> &getMainSetup();
     void updateConfigIfRelevant();
-    core::recti getSplitscreenWindow(int WindowNum);
+    core::recti getSplitscreenWindow(int window_num);
     void setAllMaterialFlags(scene::IMesh *mesh) const;
     scene::IAnimatedMesh *getAnimatedMesh(const std::string &name);
     scene::IMesh         *getMesh(const std::string &name);
