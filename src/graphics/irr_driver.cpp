@@ -334,7 +334,7 @@ core::recti IrrDriver::getSplitscreenWindow(int window_num)
         total_players = 1;
     int columns = (int)(std::ceil(std::sqrt(total_players)));
     int rows = (int)(std::ceil((double)(total_players) / columns));
-    if (UserConfigParams::split_screen_horizontally)
+    if (UserConfigParams::m_split_screen_horizontally)
         std::swap(columns, rows);
 
     // Calculate the base dimensions of each viewport

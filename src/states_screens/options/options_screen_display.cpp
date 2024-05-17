@@ -128,7 +128,7 @@ void OptionsScreenDisplay::init()
     // ---- splitscreen mode
     GUIEngine::SpinnerWidget* splitscreen_method = getWidget<GUIEngine::SpinnerWidget>("splitscreen_method");
     assert( splitscreen_method != NULL );
-    splitscreen_method->setValue(UserConfigParams::split_screen_horizontally ? 1 : 0);
+    splitscreen_method->setValue(UserConfigParams::m_split_screen_horizontally ? 1 : 0);
 }   // init
 
 // --------------------------------------------------------------------------------------------
@@ -406,7 +406,7 @@ void OptionsScreenDisplay::eventCallback(Widget* widget, const std::string& name
     {
         GUIEngine::SpinnerWidget* splitscreen_method = getWidget<GUIEngine::SpinnerWidget>("splitscreen_method");
         assert( splitscreen_method != NULL );
-        UserConfigParams::split_screen_horizontally = (splitscreen_method->getValue() == 1);
+        UserConfigParams::m_split_screen_horizontally = (splitscreen_method->getValue() == 1);
         if (World::getWorld())
         {
             for (unsigned i = 0; i < Camera::getNumCameras(); i++)
