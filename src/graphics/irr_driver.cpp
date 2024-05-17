@@ -350,12 +350,12 @@ core::recti IrrDriver::getSplitscreenWindow(int window_num)
     int col = window_num % columns;
 
     // Calculate the top-left corner of the viewport
-    int viewport_x = col * base_viewport_width + std::min(col, extra_width);
-    int viewport_y = row * base_viewport_height + std::min(row, extra_height);
+    int viewport_x = col * base_viewport_width;
+    int viewport_y = row * base_viewport_height;
 
     // Adjust width and height to fully occupy the remaining pixels
-    int viewport_width = base_viewport_width + (col < extra_width ? 1 : 0);
-    int viewport_height = base_viewport_height + (row < extra_height ? 1 : 0);
+    int viewport_width = base_viewport_width + (col == columns - 1 ? extra_width : 0);
+    int viewport_height = base_viewport_height + (row == rows - 1 ? extra_height : 0);
 
     return core::recti(core::position2di(viewport_x, viewport_y),
         core::dimension2du(viewport_width, viewport_height));
