@@ -376,7 +376,6 @@ void OptionsScreenDisplay::eventCallback(Widget* widget, const std::string& name
         CheckBoxWidget* w2 = getWidget<CheckBoxWidget>("fullscreen");
         assert(w2 != NULL);
 
-
         irr_driver->changeResolution(w, h, w2->getState());
     }
     else if (name == "rememberWinpos")

@@ -1028,8 +1028,7 @@ bool IrrDriver::moveWindow(int x, int y)
 }
 //-----------------------------------------------------------------------------
 
-void IrrDriver::changeResolution(const int w, const int h,
-                                 const bool fullscreen)
+void IrrDriver::changeResolution(const int w, const int h, const bool fullscreen)
 {
     // update user config values
     UserConfigParams::m_prev_real_width = UserConfigParams::m_real_width;

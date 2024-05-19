@@ -131,6 +131,8 @@ void OptionsScreenVideo::initPresets()
 // --------------------------------------------------------------------------------------------
 int OptionsScreenVideo::getImageQuality()
 {
+    // applySettings assumes that only the first image quality preset has a different
+    // level of anisotropic filtering from others
     if (UserConfigParams::m_anisotropic == 4 &&
         (UserConfigParams::m_high_definition_textures & 0x01) == 0x00 &&
         UserConfigParams::m_hq_mipmap == false)
@@ -672,25 +674,13 @@ void OptionsScreenVideo::eventCallback(Widget* widget, const std::string& name,
         if (!result)
             Log::fatal("OptionsScreenVideo", "Can't open replay for benchmark!");
 
-        // Avoid crashing, when switching between advanced lighting and the old renderer
-        // before starting a performance test, ensure the image quality setting is applied
-        if (m_prev_adv_pipline != UserConfigParams::m_dynamic_lights &&
-            CVS->isGLSL())
-        {
-            irr_driver->sameRestart();
-            // We cannot start the benchmark immediately, in case we just restarted the graphics engine
-            RaceManager::get()->scheduleBenchmark();
-        }
-        else if (m_prev_img_quality != getImageQuality())
-        {
-            // TODO - check if this is enough for the setting to be properly applied
-            irr_driver->setMaxTextureSize();
+        // To avoid crashes and ensure the proper settings are used during the benchmark,
+        // we apply the settings. If this doesn't require restarting the screen, we start
+        // the benchmark immediately, otherwise we schedule it to start after the restart.
+        if (applySettings() == 0)
             startBenchmark();
-        }
         else
-        {
-            startBenchmark();
-        }
+            RaceManager::get()->scheduleBenchmark();
 #endif
     } // benchmarkCurrent
     else if (name == "benchmarkRecommend")
@@ -722,20 +712,39 @@ void OptionsScreenVideo::startBenchmark()
 void OptionsScreenVideo::tearDown()
 {
 #ifndef SERVER_ONLY
-    if (m_prev_adv_pipline != UserConfigParams::m_dynamic_lights &&
-        CVS->isGLSL())
-    {
-        irr_driver->sameRestart();
-    }
-    else if (m_prev_img_quality != getImageQuality())
-    {
-        irr_driver->setMaxTextureSize();
-    }
+    applySettings();
     Screen::tearDown();
     // save changes when leaving screen
     user_config->saveConfig();
 #endif
 }   // tearDown
+
+// --------------------------------------------------------------------------------------------
+/* Returns 1 or 2 if a restart will be done, 0 otherwise */
+int OptionsScreenVideo::applySettings()
+{
+    int restart = 0;
+#ifndef SERVER_ONLY
+    if (m_prev_adv_pipline != UserConfigParams::m_dynamic_lights && CVS->isGLSL())
+        restart = 1;
+
+    if (m_prev_img_quality != getImageQuality())
+    {
+        irr_driver->setMaxTextureSize();
+        // A full restart is needed to properly apply anisotropic filtering if it was changed
+        // We assume that all ImageQuality settings >= 1 use the same x16 setting.
+        if ((m_prev_img_quality == 0 && getImageQuality() != 0) ||
+            (m_prev_img_quality != 0 && getImageQuality() == 0))
+            restart = 2;
+    }
+
+    if (restart == 1)
+        irr_driver->sameRestart();
+    else if (restart == 2)
+        irr_driver->fullRestart();
+#endif
+    return restart;
+}   // applySettings
 
 // --------------------------------------------------------------------------------------------
 
