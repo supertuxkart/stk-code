@@ -23,7 +23,6 @@
 #include "guiengine/widgets/spinner_widget.hpp"
 #include "states_screens/options/options_screen_video.hpp"
 #include "states_screens/state_manager.hpp"
-#include "utils/translation.hpp"
 #include "graphics/central_settings.hpp"
 #include "graphics/irr_driver.hpp"
 #include "utils/string_utils.hpp"

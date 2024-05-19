@@ -24,6 +24,7 @@
 #include "race/race_manager.hpp"
 #include "replay/replay_play.hpp"
 #include "states_screens/dialogs/custom_video_settings.hpp"
+#include "states_screens/dialogs/recommend_video_settings.hpp"
 
 #ifndef SERVER_ONLY
 #include <ge_main.hpp>
@@ -692,11 +693,10 @@ void OptionsScreenVideo::eventCallback(Widget* widget, const std::string& name,
         }
 #endif
     } // benchmarkCurrent
-    // TODO - Add a standard benchmark testing multiple presets
-    /*else if (name == "benchmarkStandard")
+    else if (name == "benchmarkRecommend")
     {
-        // DO NOTHING FOR NOW
-    }*/
+        new RecommendVideoSettingsDialog(0.8f, 0.9f);
+    } // benchmarkRecommend
 }   // eventCallback
 
 // --------------------------------------------------------------------------------------------
