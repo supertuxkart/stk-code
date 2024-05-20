@@ -21,10 +21,9 @@
 #include "graphics/central_settings.hpp"
 #include "graphics/irr_driver.hpp"
 #include "io/file_manager.hpp"
-#include "race/race_manager.hpp"
-#include "replay/replay_play.hpp"
 #include "states_screens/dialogs/custom_video_settings.hpp"
 #include "states_screens/dialogs/recommend_video_settings.hpp"
+#include "utils/profiler.hpp"
 
 #ifndef SERVER_ONLY
 #include <ge_main.hpp>
@@ -317,7 +316,7 @@ void OptionsScreenVideo::init()
     // the graphics engine, start the benchmark when the
     // video settings screen is loaded back afterwards.
     if (RaceManager::get()->isBenchmarkScheduled())
-        startBenchmark();
+        profiler.startBenchmark();
 }   // init
 
 // --------------------------------------------------------------------------------------------
@@ -665,20 +664,11 @@ void OptionsScreenVideo::eventCallback(Widget* widget, const std::string& name,
     else if (name == "benchmarkCurrent")
     {
 #ifndef SERVER_ONLY
-        // TODO - Add the possibility to benchmark more tracks and define replay benchmarks in
-        //        a config file
-        const std::string bf_bench("benchmark_black_forest.replay");
-        const bool result = ReplayPlay::get()->addReplayFile(file_manager
-            ->getAsset(FileManager::REPLAY, bf_bench), true/*custom_replay*/);
-
-        if (!result)
-            Log::fatal("OptionsScreenVideo", "Can't open replay for benchmark!");
-
         // To avoid crashes and ensure the proper settings are used during the benchmark,
         // we apply the settings. If this doesn't require restarting the screen, we start
         // the benchmark immediately, otherwise we schedule it to start after the restart.
         if (applySettings() == 0)
-            startBenchmark();
+            profiler.startBenchmark();
         else
             RaceManager::get()->scheduleBenchmark();
 #endif
@@ -688,24 +678,6 @@ void OptionsScreenVideo::eventCallback(Widget* widget, const std::string& name,
         new RecommendVideoSettingsDialog(0.8f, 0.9f);
     } // benchmarkRecommend
 }   // eventCallback
-
-// --------------------------------------------------------------------------------------------
-
-void OptionsScreenVideo::startBenchmark()
-{
-    RaceManager::get()->setRaceGhostKarts(true);
-    RaceManager::get()->setMinorMode(RaceManager::MINOR_MODE_TIME_TRIAL);
-    ReplayPlay::ReplayData bench_rd = ReplayPlay::get()->getCurrentReplayData();
-    RaceManager::get()->setReverseTrack(bench_rd.m_reverse);
-    RaceManager::get()->setRecordRace(false);
-    RaceManager::get()->setWatchingReplay(true);
-    RaceManager::get()->setDifficulty((RaceManager::Difficulty)bench_rd.m_difficulty);
-
-    // The race manager automatically adds karts for the ghosts
-    RaceManager::get()->setNumKarts(0);
-    RaceManager::get()->setBenchmarking(true); // Also turns off the scheduled benchmark if needed
-    RaceManager::get()->startWatchingReplay(bench_rd.m_track_name, bench_rd.m_laps);
-} // startBenchmark
 
 // --------------------------------------------------------------------------------------------
 

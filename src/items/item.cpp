@@ -249,7 +249,7 @@ Item::Item(ItemType type, const Vec3& xyz, const Vec3& normal,
         // Auto-compute the rendering distance, but use a high scaling factor
         // to ensure that even at low settings, on-track items only become invisible
         // when already quite far.
-        lodnode->autoComputeLevel(24); // The distance grows with the square of the scaling factor
+        lodnode->autoComputeLevel(24); // The distance grows with the square root of the scaling factor
         m_node = lodnode;
     }
     setType(type);

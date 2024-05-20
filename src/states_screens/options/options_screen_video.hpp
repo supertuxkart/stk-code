@@ -72,7 +72,6 @@ private:
     void updateTooltip();
     void updateBlurTooltip();
     void initPresets();
-    void startBenchmark();
     static void onScrollResolutionsList(void* data);
     /* Returns 1 or 2 if a restart will be done, 0 otherwise */
     int applySettings();

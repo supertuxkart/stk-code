@@ -26,6 +26,8 @@
 #include "graphics/irr_driver.hpp"
 #include "guiengine/scalable_font.hpp"
 #include "io/file_manager.hpp"
+#include "race/race_manager.hpp"
+#include "replay/replay_play.hpp"
 #include "tracks/track.hpp"
 #include "utils/file_utils.hpp"
 #include "utils/string_utils.hpp"
@@ -652,6 +654,33 @@ void Profiler::computeStableFPS()
 
     m_lock.unlock();
 } // computeStableFPS
+
+// --------------------------------------------------------------------------------------------
+
+void Profiler::startBenchmark()
+{
+    // TODO - Add the possibility to benchmark more tracks and define replay benchmarks in
+    //        a config file
+    const std::string bf_bench("benchmark_black_forest.replay");
+    const bool result = ReplayPlay::get()->addReplayFile(file_manager
+        ->getAsset(FileManager::REPLAY, bf_bench), true/*custom_replay*/);
+
+    if (!result)
+        Log::fatal("OptionsScreenVideo", "Can't open replay for benchmark!");
+
+    RaceManager::get()->setRaceGhostKarts(true);
+    RaceManager::get()->setMinorMode(RaceManager::MINOR_MODE_TIME_TRIAL);
+    ReplayPlay::ReplayData bench_rd = ReplayPlay::get()->getCurrentReplayData();
+    RaceManager::get()->setReverseTrack(bench_rd.m_reverse);
+    RaceManager::get()->setRecordRace(false);
+    RaceManager::get()->setWatchingReplay(true);
+    RaceManager::get()->setDifficulty((RaceManager::Difficulty)bench_rd.m_difficulty);
+
+    // The race manager automatically adds karts for the ghosts
+    RaceManager::get()->setNumKarts(0);
+    RaceManager::get()->setBenchmarking(true); // Also turns off the scheduled benchmark if needed
+    RaceManager::get()->startWatchingReplay(bench_rd.m_track_name, bench_rd.m_laps);
+} // startBenchmark
 
 //-----------------------------------------------------------------------------
 /** Saves the collected profile data to a file. Filename is based on the
