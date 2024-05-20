@@ -119,7 +119,7 @@ private:
      *  Same indicates a change of the resolution (back to the original
      *  one), but no confirmation dialog. */
     enum {RES_CHANGE_NONE, RES_CHANGE_YES, RES_CHANGE_CANCEL,
-          RES_CHANGE_SAME, RES_CHANGE_YES_WARN} m_resolution_changing;
+          RES_CHANGE_SAME, RES_CHANGE_YES_WARN, RES_CHANGE_SAME_FULL} m_resolution_changing;
 
 
 public:
@@ -153,6 +153,8 @@ private:
 
     /** Store if the scene is complex (based on polycount, etc) */
     int                  m_scene_complexity;
+    /** Used for auto-LoD adjustment in low-complexity scenes */
+    float                m_lod_multiplier;
 
     /** Internal method that applies the resolution in user settings. */
     void                 applyResolutionSettings(bool recreate_device);
@@ -209,7 +211,7 @@ public:
 
     core::array<video::IRenderTarget> &getMainSetup();
     void updateConfigIfRelevant();
-    core::recti getSplitscreenWindow(int WindowNum);
+    core::recti getSplitscreenWindow(int window_num);
     void setAllMaterialFlags(scene::IMesh *mesh) const;
     scene::IAnimatedMesh *getAnimatedMesh(const std::string &name);
     scene::IMesh         *getMesh(const std::string &name);
@@ -365,11 +367,17 @@ public:
     bool getBoundingBoxesViz()    { return m_boundingboxesviz;      }
     // ------------------------------------------------------------------------
     int getSceneComplexity() { return m_scene_complexity;           }
+    // ------------------------------------------------------------------------
     void resetSceneComplexity() { m_scene_complexity = 0;           }
+    // ------------------------------------------------------------------------
     void addSceneComplexity(int complexity)
     {
         if (complexity > 1) m_scene_complexity += (complexity - 1);
     }
+    // ------------------------------------------------------------------------
+    float getLODMultiplier() { return m_lod_multiplier;             }
+    // ------------------------------------------------------------------------
+    void  setLODMultiplier(float multiplier) { m_lod_multiplier = multiplier; }
     // ------------------------------------------------------------------------
     bool isRecording() const { return m_recording; }
     // ------------------------------------------------------------------------
@@ -517,6 +525,9 @@ public:
 
     void uploadLightingData();
     void sameRestart()             { m_resolution_changing = RES_CHANGE_SAME; }
+    /** Used when we don't want a changed resolution prompt but need to reinit things
+     * that sameRestart doesn't affect */
+    void fullRestart()             { m_resolution_changing = RES_CHANGE_SAME_FULL; }
     // ------------------------------------------------------------------------
     u32 getDefaultFramebuffer() const;
     // ------------------------------------------------------------------------

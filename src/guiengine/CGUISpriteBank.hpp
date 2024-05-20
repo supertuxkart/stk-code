@@ -67,7 +67,8 @@ public:
         m_scale = scale;
     }
 
-    void scaleToHeight(int height);
+    void setFixedScale(float scale)
+                                                     { m_fixed_scale = scale; }
 
     void setTargetIconSize(int width, int height)
                     { m_target_icon_size = core::dimension2du(width, height); }
@@ -78,7 +79,7 @@ protected:
     unsigned int m_magic_number;
 
     float m_scale;
-    int m_height;
+    float m_fixed_scale;
 
     struct SDrawBatch
     {

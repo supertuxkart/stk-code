@@ -19,7 +19,7 @@
 #include "input/input_manager.hpp"
 
 #include "config/user_config.hpp"
-#include "graphics/camera_fps.hpp"
+#include "graphics/camera/camera_fps.hpp"
 #include "graphics/irr_driver.hpp"
 #include "graphics/shader_based_renderer.hpp"
 #include "graphics/sp/sp_base.hpp"

@@ -19,7 +19,7 @@
 #include "karts/explosion_animation.hpp"
 
 #include "audio/sfx_manager.hpp"
-#include "graphics/camera.hpp"
+#include "graphics/camera/camera.hpp"
 #include "graphics/stars.hpp"
 #include "guiengine/engine.hpp"
 #include "items/attachment.hpp"

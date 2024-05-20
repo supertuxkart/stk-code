@@ -66,10 +66,14 @@ private:
     int m_current_level;
     bool m_current_level_dirty;
 
+    // Distance below which switching between two levels of detail is avoided
+    int m_min_switch_distance;
+
     // Area of the bounding box (for autoLOD computation)
     float m_area;
 
     bool m_update_box_every_frame;
+    bool m_lod_distances_updated;
 public:
 
     LODNode(std::string group_name, scene::ISceneNode* parent, scene::ISceneManager* mgr, s32 id=-1);

@@ -25,7 +25,11 @@
 #include "guiengine/engine.hpp"
 #include "guiengine/message_queue.hpp"
 #include "guiengine/scalable_font.hpp"
-#include "guiengine/widgets.hpp"
+#include "guiengine/widgets/bubble_widget.hpp"
+#include "guiengine/widgets/label_widget.hpp"
+#include "guiengine/widgets/rating_bar_widget.hpp"
+#include "guiengine/widgets/ribbon_widget.hpp"
+#include "guiengine/widgets/progress_bar_widget.hpp"
 #include "input/input_manager.hpp"
 #include "io/file_manager.hpp"
 #include "network/protocols/client_lobby.hpp"
@@ -41,6 +45,7 @@
 #include "utils/string_utils.hpp"
 #include "utils/translation.hpp"
 
+#include <IGUIStaticText.h>
 #include <ITexture.h>
 
 using namespace GUIEngine;

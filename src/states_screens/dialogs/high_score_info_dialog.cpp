@@ -22,6 +22,10 @@
 #include "config/user_config.hpp"
 #include "guiengine/CGUISpriteBank.hpp"
 #include "graphics/stk_tex_manager.hpp"
+#include "guiengine/widgets/icon_button_widget.hpp"
+#include "guiengine/widgets/label_widget.hpp"
+#include "guiengine/widgets/list_widget.hpp"
+#include "guiengine/widgets/ribbon_widget.hpp"
 #include "input/device_manager.hpp"
 #include "input/input_manager.hpp"
 #include "karts/kart_properties.hpp"
@@ -97,11 +101,10 @@ HighScoreInfoDialog::HighScoreInfoDialog(Highscores* highscore, bool is_linear, 
 
     /* Used to display kart icons for the entries */
     irr::gui::STKModifiedSpriteBank *icon_bank = HighScoreSelection::getInstance()->getIconBank();
-    int icon_height = GUIEngine::getFontHeight() * 3 / 2;
 
-    icon_bank->setScale(icon_height/128.0f);
+    icon_bank->setScale(1.5f / 128.0f);
     icon_bank->setTargetIconSize(128, 128);
-    m_high_score_list->setIcons(icon_bank, (int)icon_height);
+    m_high_score_list->setIcons(icon_bank, 1.5f);
 
     updateHighscoreEntries();
 

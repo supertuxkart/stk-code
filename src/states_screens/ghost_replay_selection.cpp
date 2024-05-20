@@ -20,8 +20,13 @@
 
 #include "config/player_manager.hpp"
 #include "config/user_config.hpp"
+#include "graphics/irr_driver.hpp"
 #include "graphics/material.hpp"
 #include "guiengine/CGUISpriteBank.hpp"
+#include "guiengine/widgets/check_box_widget.hpp"
+#include "guiengine/widgets/label_widget.hpp"
+#include "guiengine/widgets/ribbon_widget.hpp"
+#include "io/file_manager.hpp"
 #include "karts/kart_properties.hpp"
 #include "karts/kart_properties_manager.hpp"
 #include "states_screens/dialogs/ghost_replay_info_dialog.hpp"
@@ -122,7 +127,6 @@ void GhostReplaySelection::loadedFromFile()
     m_compare_toggle_widget->setVisible(false);
     getWidget<LabelWidget>("compare-toggle-text")->setVisible(false);
 
-    m_mode_tabs = getWidget<GUIEngine::RibbonWidget>("race_mode");
     m_active_mode = RaceManager::MINOR_MODE_TIME_TRIAL;
     m_active_mode_is_linear = true;
     
@@ -173,14 +177,11 @@ void GhostReplaySelection::init()
 {
     Screen::init();
     m_cur_difficulty = RaceManager::get()->getDifficulty();
-    
-    int icon_height = GUIEngine::getFontHeight();
-    int row_height = GUIEngine::getFontHeight() * 5 / 4;
-                                                        
+
     // 128 is the height of the image file
-    m_icon_bank->setScale(icon_height/128.0f);
+    m_icon_bank->setScale(1.0f / 128.0f);
     m_icon_bank->setTargetIconSize(128, 128);
-    m_replay_list_widget->setIcons(m_icon_bank, (int)row_height);
+    m_replay_list_widget->setIcons(m_icon_bank, 1.25f);
 
     refresh(/*reload replay files*/ false, /* update columns */ true);
 }   // init

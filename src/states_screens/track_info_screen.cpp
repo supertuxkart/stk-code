@@ -21,6 +21,7 @@
 #include "challenges/unlock_manager.hpp"
 #include "config/player_manager.hpp"
 #include "config/user_config.hpp"
+#include "graphics/irr_driver.hpp"
 #include "graphics/material.hpp"
 #include "graphics/stk_tex_manager.hpp"
 #include "guiengine/CGUISpriteBank.hpp"
@@ -30,6 +31,7 @@
 #include "guiengine/widgets/check_box_widget.hpp"
 #include "guiengine/widgets/icon_button_widget.hpp"
 #include "guiengine/widgets/label_widget.hpp"
+#include "guiengine/widgets/list_widget.hpp"
 #include "guiengine/widgets/ribbon_widget.hpp"
 #include "guiengine/widgets/spinner_widget.hpp"
 #include "io/file_manager.hpp"
@@ -343,12 +345,9 @@ void TrackInfoScreen::init()
 
     if (has_highscores)
     {
-        int icon_height = GUIEngine::getFontHeight();
-        int row_height = GUIEngine::getFontHeight() * 1.2f;
-                                                    
-        m_icon_bank->setScale(icon_height/128.0f);
+        m_icon_bank->setScale(1.0f / 128.0f);
         m_icon_bank->setTargetIconSize(128, 128);
-        m_highscore_entries->setIcons(m_icon_bank, (int)row_height);
+        m_highscore_entries->setIcons(m_icon_bank, 1.2f);
         m_highscore_entries->setVisible(has_highscores);
 
         updateHighScores();

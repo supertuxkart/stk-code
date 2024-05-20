@@ -15,47 +15,27 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
+// Manages includes common to all options screens
+#include "states_screens/options/options_common.hpp"
+
 #include "states_screens/options/options_screen_device.hpp"
 
-#include "config/user_config.hpp"
-#include "guiengine/CGUISpriteBank.hpp"
 #include "guiengine/message_queue.hpp"
 #include "guiengine/scalable_font.hpp"
-#include "guiengine/screen.hpp"
-#include "guiengine/widget.hpp"
-#include "guiengine/widgets/button_widget.hpp"
-#include "guiengine/widgets/check_box_widget.hpp"
-#include "guiengine/widgets/label_widget.hpp"
 #include "guiengine/widgets/text_box_widget.hpp"
 #include "guiengine/widgets/list_widget.hpp"
-#include "guiengine/widgets/ribbon_widget.hpp"
 #include "input/input_manager.hpp"
 #include "input/device_manager.hpp"
 #include "input/gamepad_config.hpp"
 #include "input/gamepad_device.hpp"
-#include "io/file_manager.hpp"
 #include "states_screens/dialogs/press_a_key_dialog.hpp"
 #include "states_screens/dialogs/general_text_field_dialog.hpp"
-#include "states_screens/options/options_screen_audio.hpp"
-#include "states_screens/options/options_screen_general.hpp"
-#include "states_screens/options/options_screen_input.hpp"
-#include "states_screens/options/options_screen_language.hpp"
-#include "states_screens/options/options_screen_video.hpp"
-#include "states_screens/options/options_screen_ui.hpp"
-#include "states_screens/state_manager.hpp"
-#include "states_screens/options/user_screen.hpp"
-#include "utils/string_utils.hpp"
-#include "utils/translation.hpp"
-
-#include <iostream>
-#include <sstream>
-#include <set>
 
 using namespace GUIEngine;
 
 // ----------------------------------------------------------------------------
 
-OptionsScreenDevice::OptionsScreenDevice() : Screen("options_device.stkgui")
+OptionsScreenDevice::OptionsScreenDevice() : Screen("options/options_device.stkgui")
 {
     m_config = NULL;
 }   // OptionsScreenDevice
@@ -539,23 +519,8 @@ void OptionsScreenDevice::eventCallback(Widget* widget,
     {
         std::string selection = ((RibbonWidget*)widget)->getSelectionIDString(PLAYER_ID_GAME_MASTER);
 
-        Screen *screen = NULL;
-        if (selection == "tab_audio")
-            screen = OptionsScreenAudio::getInstance();
-        else if (selection == "tab_video")
-            screen = OptionsScreenVideo::getInstance();
-        else if (selection == "tab_players")
-            screen = TabbedUserScreen::getInstance();
-        //else if (selection == "tab_controls")
-        //    screen = OptionsScreenInput::getInstance();
-        else if (selection == "tab_ui")
-            screen = OptionsScreenUI::getInstance();
-        else if (selection == "tab_general")
-            screen = OptionsScreenGeneral::getInstance();
-        else if (selection == "tab_language")
-            screen = OptionsScreenLanguage::getInstance();
-        if(screen)
-            StateManager::get()->replaceTopMostScreen(screen);
+        if (selection != "tab_controls")
+            OptionsCommon::switchTab(selection);
     }
     else if (name == "back_to_device_list")
     {

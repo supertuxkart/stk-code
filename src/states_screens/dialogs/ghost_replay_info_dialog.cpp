@@ -21,6 +21,11 @@
 #include "config/player_manager.hpp"
 #include "guiengine/CGUISpriteBank.hpp"
 #include "graphics/stk_tex_manager.hpp"
+#include "guiengine/widgets/check_box_widget.hpp"
+#include "guiengine/widgets/icon_button_widget.hpp"
+#include "guiengine/widgets/label_widget.hpp"
+#include "guiengine/widgets/list_widget.hpp"
+#include "guiengine/widgets/ribbon_widget.hpp"
 #include "karts/kart_properties.hpp"
 #include "karts/kart_properties_manager.hpp"
 #include "race/race_manager.hpp"
@@ -78,8 +83,7 @@ GhostReplayInfoDialog::GhostReplayInfoDialog(unsigned int replay_id,
 
     /* Used to display kart icons for the selected replay(s) */
     irr::gui::STKModifiedSpriteBank *icon_bank = GhostReplaySelection::getInstance()->getIconBank();
-    int icon_height = GUIEngine::getFontHeight() * 3 / 2;
-    m_replay_info_widget->setIcons(icon_bank, (int)icon_height);
+    m_replay_info_widget->setIcons(icon_bank, 1.5f);
 
     updateReplayDisplayedInfo();
 

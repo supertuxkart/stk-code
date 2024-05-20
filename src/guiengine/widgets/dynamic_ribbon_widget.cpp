@@ -28,6 +28,7 @@
 
 #include <IrrlichtDevice.h>
 #include <IGUIEnvironment.h>
+#include <IGUIStaticText.h>
 #include <iostream>
 #include <algorithm>
 
@@ -117,25 +118,10 @@ void DynamicRibbonWidget::add()
             m_properties[PROP_LABELS_LOCATION] == "none" ||
             m_properties[PROP_LABELS_LOCATION] == "");
 
-    if (m_has_label)
-    {
-        // m_label_height contains the height of ONE text line
-        m_label_height = GUIEngine::getFontHeight();
-    }
-    else
-    {
-        m_label_height = 0;
-    }
-
     // ----- add dynamic label at bottom
     if (m_has_label)
     {
-        // leave room for many lines, just in case
-        rect<s32> label_size = rect<s32>(m_x,
-                                         m_y + m_h - m_label_height,
-                                         m_x + m_w,
-                                         m_y + m_h + m_label_height*5);
-        m_label = GUIEngine::getGUIEnv()->addStaticText(L" ", label_size, false, true /* word wrap */, NULL, -1);
+        m_label = GUIEngine::getGUIEnv()->addStaticText(L" ", rect<s32>(0, 0, 1, 1), false, true /* word wrap */, NULL, -1);
         m_label->setTextAlignment( EGUIA_CENTER, EGUIA_UPPERLEFT );
         m_label->setWordWrap(true);
     }
@@ -151,22 +137,11 @@ void DynamicRibbonWidget::add()
     m_left_widget  = new IconButtonWidget(IconButtonWidget::SCALE_MODE_KEEP_TEXTURE_ASPECT_RATIO, false);
     m_right_widget = new IconButtonWidget(IconButtonWidget::SCALE_MODE_KEEP_TEXTURE_ASPECT_RATIO, false);
 
-    const int average_y = m_y + (m_h - m_label_height)/2;
-
-    m_arrows_w = GUIEngine::getFontHeight() * 2;
-    m_arrows_w = std::max(m_arrows_w, 40);
-
-    const int button_h = m_arrows_w;
-
     // right arrow
-    rect<s32> right_arrow_location = rect<s32>(m_x + m_w - m_arrows_w,
-                                               average_y - button_h/2,
-                                               m_x + m_w,
-                                               average_y + button_h/2);
-    m_right_widget->m_x = right_arrow_location.UpperLeftCorner.X;
-    m_right_widget->m_y = right_arrow_location.UpperLeftCorner.Y;
-    m_right_widget->m_w = right_arrow_location.getWidth();
-    m_right_widget->m_h = right_arrow_location.getHeight();
+    m_right_widget->m_x = 0;
+    m_right_widget->m_y = 0;
+    m_right_widget->m_w = 1;
+    m_right_widget->m_h = 1;
     m_right_widget->m_event_handler = this;
     m_right_widget->m_focusable = false;
     m_right_widget->m_properties[PROP_ID] = "right";
@@ -177,15 +152,10 @@ void DynamicRibbonWidget::add()
     m_children.push_back( m_right_widget );
 
     // left arrow
-    rect<s32> left_arrow_location = rect<s32>(m_x,
-                                              average_y - button_h/2,
-                                              m_x + m_arrows_w,
-                                              average_y + button_h/2);
-    stringw  lmessage = "<<";
-    m_left_widget->m_x = left_arrow_location.UpperLeftCorner.X;
-    m_left_widget->m_y = left_arrow_location.UpperLeftCorner.Y;
-    m_left_widget->m_w = left_arrow_location.getWidth();
-    m_left_widget->m_h = left_arrow_location.getHeight();
+    m_left_widget->m_x = 0;
+    m_left_widget->m_y = 0;
+    m_left_widget->m_w = 1;
+    m_left_widget->m_h = 1;
     m_left_widget->m_event_handler = this;
     m_left_widget->m_focusable = false;
     m_left_widget->m_properties[PROP_ID] = "left";
@@ -212,7 +182,83 @@ void DynamicRibbonWidget::add()
         m_child_height = 256;
     }
 
+    assert( m_left_widget->ok() );
+    assert( m_right_widget->ok() );
+    m_left_widget->m_element->setVisible(true);
 
+    updateForResizing();
+    buildInternalStructure();
+}
+
+// -----------------------------------------------------------------------------
+void DynamicRibbonWidget::resize()
+{
+    std::string selected[MAX_PLAYER_COUNT];
+    for (unsigned i = 0; i < MAX_PLAYER_COUNT; i++)
+        selected[i] = getSelectionIDString(i);
+    Widget::resize();
+    GUIEngine::getGUIEnv()->getRootGUIElement()->setChildEnd(m_left_widget->m_element);
+    updateForResizing();
+    buildInternalStructure();
+    updateItemDisplay();
+    GUIEngine::getGUIEnv()->getRootGUIElement()->setChildEnd(NULL);
+    for (unsigned i = 0; i < MAX_PLAYER_COUNT; i++)
+    {
+        if (!selected[i].empty())
+            setSelection(selected[i], i, true);
+    }
+}
+
+// -----------------------------------------------------------------------------
+void DynamicRibbonWidget::updateForResizing()
+{
+    if (m_has_label)
+    {
+        // m_label_height contains the height of ONE text line
+        m_label_height = GUIEngine::getFontHeight();
+
+        // leave room for many lines, just in case
+        rect<s32> label_size = rect<s32>(m_x,
+                                         m_y + m_h - m_label_height,
+                                         m_x + m_w,
+                                         m_y + m_h + m_label_height*5);
+        m_label->setRelativePosition(label_size);
+    }
+    else
+    {
+        m_label_height = 0;
+    }
+    const int average_y = m_y + (m_h - m_label_height)/2;
+
+    m_arrows_w = GUIEngine::getFontHeight() * 2;
+    m_arrows_w = std::max(m_arrows_w, 40);
+
+    const int button_h = m_arrows_w;
+
+    rect<s32> right_arrow_location = rect<s32>(m_x + m_w - m_arrows_w,
+                                               average_y - button_h/2,
+                                               m_x + m_w,
+                                               average_y + button_h/2);
+    m_right_widget->m_x = right_arrow_location.UpperLeftCorner.X;
+    m_right_widget->m_y = right_arrow_location.UpperLeftCorner.Y;
+    m_right_widget->m_w = right_arrow_location.getWidth();
+    m_right_widget->m_h = right_arrow_location.getHeight();
+    m_right_widget->resize();
+
+    rect<s32> left_arrow_location = rect<s32>(m_x,
+                                              average_y - button_h/2,
+                                              m_x + m_arrows_w,
+                                              average_y + button_h/2);
+    m_left_widget->m_x = left_arrow_location.UpperLeftCorner.X;
+    m_left_widget->m_y = left_arrow_location.UpperLeftCorner.Y;
+    m_left_widget->m_w = left_arrow_location.getWidth();
+    m_left_widget->m_h = left_arrow_location.getHeight();
+    m_left_widget->resize();
+}
+
+// -----------------------------------------------------------------------------
+void DynamicRibbonWidget::buildInternalStructure()
+{
     if (m_multi_row)
     {
         // determine row amount
@@ -302,10 +348,6 @@ void DynamicRibbonWidget::add()
         m_row_amount = 1;
     }
 
-    assert( m_left_widget->ok() );
-    assert( m_right_widget->ok() );
-    m_left_widget->m_element->setVisible(true);
-
     // get and build a list of IDs (by now we may not yet know everything about items,
     // but we need to get IDs *now* in order for tabbing to work.
     m_ids.resize(m_row_amount);
@@ -315,11 +357,6 @@ void DynamicRibbonWidget::add()
         //Log::info("DynamicRibbonWidget", "getNewID returns %d", m_ids[i]);
     }
 
-    buildInternalStructure();
-}
-// -----------------------------------------------------------------------------
-void DynamicRibbonWidget::buildInternalStructure()
-{
     //printf("****DynamicRibbonWidget::buildInternalStructure()****\n");
 
     // ---- Clean-up what was previously there
@@ -836,6 +873,8 @@ void DynamicRibbonWidget::scroll(int x_delta, bool evenIfDeactivated)
     {
         for (unsigned int n=0; n<MAX_PLAYER_COUNT; n++)
         {
+            if (m_selected_item[n] == -1)
+                continue;
             RibbonWidget* ribbon = m_rows.get(0); // there is a single row when we can select items
             int id = m_selected_item[n] - m_scroll_offset;
             if (id < 0) id += (int) m_items.size();

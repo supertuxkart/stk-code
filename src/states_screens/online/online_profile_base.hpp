@@ -23,10 +23,9 @@
 #include <irrString.h>
 
 #include "guiengine/screen.hpp"
-#include "guiengine/widgets.hpp"
-#include "online/profile_manager.hpp"
 
-namespace GUIEngine { class Widget; }
+namespace GUIEngine { class IconButtonWidget; class LabelWidget; class RibbonWidget; class Widget; }
+namespace Online { class OnlineProfile; }
 
 
 /** Online profile base screen. Used for displaying friends, achievements,

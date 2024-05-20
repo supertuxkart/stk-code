@@ -420,6 +420,7 @@ void LayoutManager::recursivelyReadCoords(PtrVector<Widget>& widgets)
     // ----- read x/y/size parameters
     for (unsigned short n=0; n<widgets_amount; n++)
     {
+        widgets.get(n)->resetCoordinates();
         readCoords(widgets.get(n));
     }//next widget
 }

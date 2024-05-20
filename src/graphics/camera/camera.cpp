@@ -17,15 +17,15 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-#include "graphics/camera.hpp"
+#include "graphics/camera/camera.hpp"
 
 #include "audio/sfx_manager.hpp"
 #include "config/stk_config.hpp"
 #include "config/user_config.hpp"
-#include "graphics/camera_debug.hpp"
-#include "graphics/camera_end.hpp"
-#include "graphics/camera_fps.hpp"
-#include "graphics/camera_normal.hpp"
+#include "graphics/camera/camera_debug.hpp"
+#include "graphics/camera/camera_end.hpp"
+#include "graphics/camera/camera_fps.hpp"
+#include "graphics/camera/camera_normal.hpp"
 #include "graphics/irr_driver.hpp"
 #include "io/xml_node.hpp"
 #include "karts/kart.hpp"
@@ -129,6 +129,16 @@ Camera::Camera(CameraType type, int camera_index, Kart* kart)
     m_camera        = irr_driver->addCameraSceneNode();
     m_previous_pv_matrix = core::matrix4();
 
+    if (RaceManager::get()->getNumLocalPlayers() > 1)
+    {
+        m_fov = DEGREE_TO_RAD * stk_config->m_camera_fov
+          [RaceManager::get()->getNumLocalPlayers() - 1];
+    }
+    else
+    {
+        m_fov = DEGREE_TO_RAD * UserConfigParams::m_camera_fov;
+    }
+    m_camera->setFOV(m_fov);
     setupCamera();
     setKart(kart);
     m_ambient_light = Track::getCurrentTrack()->getDefaultAmbientColor();
@@ -170,22 +180,10 @@ void Camera::setupCamera()
 {
     m_viewport = irr_driver->getSplitscreenWindow(m_index);
     m_aspect = (float)((float)(m_viewport.getWidth()) / (float)(m_viewport.getHeight()));
-	
     m_scaling = core::vector2df(
         float(irr_driver->getActualScreenSize().Width) / m_viewport.getWidth() , 
         float(irr_driver->getActualScreenSize().Height) / m_viewport.getHeight());
 
-    if (RaceManager::get()->getNumLocalPlayers() > 1)
-    {
-        m_fov = DEGREE_TO_RAD * stk_config->m_camera_fov
-          [RaceManager::get()->getNumLocalPlayers() - 1];
-    }
-    else
-    {
-        m_fov = DEGREE_TO_RAD * UserConfigParams::m_camera_fov;
-    }
-
-    m_camera->setFOV(m_fov);
     m_camera->setAspectRatio(m_aspect);
     m_camera->setFarValue(Track::getCurrentTrack()->getCameraFar());
 }   // setupCamera

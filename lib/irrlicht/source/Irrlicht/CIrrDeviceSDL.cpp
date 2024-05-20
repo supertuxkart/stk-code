@@ -437,7 +437,7 @@ bool CIrrDeviceSDL::createWindow()
 		}
 	}
 
-	u32 flags = SDL_WINDOW_SHOWN;
+	u32 flags = SDL_WINDOW_SHOWN | SDL_WINDOW_RESIZABLE;
 #if !defined(ANDROID) && !defined(__SWITCH__)
 	if (CreationParams.DriverType == video::EDT_OPENGL ||
 		CreationParams.DriverType == video::EDT_OGLES2 ||

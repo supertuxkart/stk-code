@@ -60,10 +60,6 @@ Widget::Widget(WidgetType type, bool reserve_id)
     m_active_event_callback[Input::IT_NONE] = false;
     m_magic_number = 0xCAFEC001;
 
-    m_x  = -1;
-    m_y  = -1;
-    m_w  = -1;
-    m_h  = -1;
     m_id = -1;
     m_badge_x_shift         = 0;
     m_badge_y_up_shift      = 0;
@@ -82,11 +78,7 @@ Widget::Widget(WidgetType type, bool reserve_id)
     m_has_tooltip           = false;
     m_uncollapsed_height    = 0;
     m_is_collapsed          = false;
-
-    m_absolute_x = m_absolute_y = m_absolute_w = m_absolute_h = -1;
-    m_relative_x = m_relative_y = m_relative_w = m_relative_h = -1;
-    m_absolute_reverse_x = m_absolute_reverse_y = -1;
-
+    resetCoordinates();
 
     m_tab_down_root = -1;
     m_tab_up_root = -1;
@@ -125,6 +117,18 @@ Widget::~Widget()
     }
 
     m_magic_number = 0xDEADBEEF;
+}
+
+// -----------------------------------------------------------------------------
+void Widget::resetCoordinates()
+{
+    m_x = -1;
+    m_y = -1;
+    m_w = -1;
+    m_h = -1;
+    m_absolute_x = m_absolute_y = m_absolute_w = m_absolute_h = -1;
+    m_relative_x = m_relative_y = m_relative_w = m_relative_h = -1;
+    m_absolute_reverse_x = m_absolute_reverse_y = -1;
 }
 
 // -----------------------------------------------------------------------------
@@ -303,6 +307,15 @@ bool Widget::isFocusedForPlayer(const int playerID)
 
 // -----------------------------------------------------------------------------
 
+void Widget::resize()
+{
+    assert(m_magic_number == 0xCAFEC001);
+
+    moveIrrlichtElement();
+}
+
+// -----------------------------------------------------------------------------
+
 void Widget::move(const int x, const int y, const int w, const int h)
 {
     assert(m_magic_number == 0xCAFEC001);
@@ -311,9 +324,7 @@ void Widget::move(const int x, const int y, const int w, const int h)
     m_y = y;
     m_w = w;
     m_h = h;
-
-    if (m_element != NULL)
-        m_element->setRelativePosition( core::rect < s32 > (x, y, x+w, y+h) );
+    resize();
 }
 
 // -----------------------------------------------------------------------------

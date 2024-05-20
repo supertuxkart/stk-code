@@ -23,8 +23,8 @@
 #include "font/digit_face.hpp"
 #include "font/font_manager.hpp"
 #include "font/regular_face.hpp"
-#include "graphics/camera_debug.hpp"
-#include "graphics/camera_fps.hpp"
+#include "graphics/camera/camera_debug.hpp"
+#include "graphics/camera/camera_fps.hpp"
 #include "graphics/central_settings.hpp"
 #include "graphics/shader_based_renderer.hpp"
 #include "graphics/sp/sp_base.hpp"
@@ -511,7 +511,10 @@ bool handleContextMenuAction(s32 cmd_id)
         break;
     }
     case DEBUG_PROFILER:
-        profiler.toggleStatus();
+        if (UserConfigParams::m_profiler_enabled)
+            profiler.desactivate();
+        else
+            profiler.activate();
         break;
     case DEBUG_PROFILER_WRITE_REPORT:
         profiler.writeToFile();

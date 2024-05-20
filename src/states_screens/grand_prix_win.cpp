@@ -316,8 +316,8 @@ void GrandPrixWin::onUpdate(float dt)
 
 
     // ---- title
-    static const int w = irr_driver->getFrameSize().Width;
-    static const int h = irr_driver->getFrameSize().Height;
+    const int w = irr_driver->getFrameSize().Width;
+    const int h = irr_driver->getFrameSize().Height;
     const irr::video::SColor color(255, 255, 255, 255);
 
     static int test_y = 0;

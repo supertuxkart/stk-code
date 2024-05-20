@@ -39,7 +39,8 @@
 #define MAX2(a, b) ((a) > (b) ? (a) : (b))
 #define MIN2(a, b) ((a) > (b) ? (b) : (a))
 
-float ShadowMatrices:: m_shadow_split[5] = { 1., 5., 20., 50., 150 };
+float ShadowMatrices:: m_shadow_split[5] = { 1., 5., 20., 60., 150 };
+float ShadowMatrices:: m_shadow_overlap_proportion = 0.2;
 
 // ============================================================================
 class ViewFrustrumShader : public Shader<ViewFrustrumShader, video::SColor, int>
@@ -236,9 +237,9 @@ void ShadowMatrices::computeMatrixesAndCameras(scene::ICameraSceneNode *const ca
         float NearValues[] =
         {
             ShadowMatrices::m_shadow_split[0],
-            ShadowMatrices::m_shadow_split[1],
-            ShadowMatrices::m_shadow_split[2],
-            ShadowMatrices::m_shadow_split[3]
+            ShadowMatrices::m_shadow_split[1] * (1.0f - m_shadow_overlap_proportion),
+            ShadowMatrices::m_shadow_split[2] * (1.0f - m_shadow_overlap_proportion),
+            ShadowMatrices::m_shadow_split[3] * (1.0f - m_shadow_overlap_proportion)
         };
 
         // Shadow Matrixes and cameras

@@ -20,11 +20,13 @@
 #include "addons/addons_manager.hpp"
 #include "addons/news_manager.hpp"
 #include "config/user_config.hpp"
+#include "graphics/irr_driver.hpp"
 #include "guiengine/CGUISpriteBank.hpp"
 #include "guiengine/modaldialog.hpp"
 #include "guiengine/scalable_font.hpp"
 #include "guiengine/widget.hpp"
 #include "guiengine/widgets/ribbon_widget.hpp"
+#include "guiengine/widgets/spinner_widget.hpp"
 #include "io/file_manager.hpp"
 #include "online/request_manager.hpp"
 #include "states_screens/dialogs/addons_loading.hpp"
@@ -155,11 +157,10 @@ void AddonsScreen::init()
         getWidget<GUIEngine::ListWidget>("list_addons");
 
     // This defines the row height !
-    m_icon_height = GUIEngine::getFontHeight() * 2;
+    m_icon_bank->setScale(1.0f / 72.0f);
     // 128 is the height of the image file
-    m_icon_bank->setScale((float)GUIEngine::getFontHeight() / 72.0f);
-    m_icon_bank->setTargetIconSize(128,128);
-    w_list->setIcons(m_icon_bank, (int)(m_icon_height));
+    m_icon_bank->setTargetIconSize(128, 128);
+    w_list->setIcons(m_icon_bank, 2.0f);
 
     m_type = "kart";
 

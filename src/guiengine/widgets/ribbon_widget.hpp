@@ -28,7 +28,13 @@
 #include "utils/leak_check.hpp"
 #include "utils/ptr_vector.hpp"
 
-#include <IGUIStaticText.h>
+#include <map>
+
+namespace irr
+{
+    namespace gui { class IGUIButton; class IGUIStaticText; }
+}
+
 
 namespace GUIEngine
 {
@@ -109,7 +115,7 @@ namespace GUIEngine
         
         IRibbonListener* m_listener;
         PtrVector<Widget> m_active_children;
-        
+        std::map<int, std::pair<irr::gui::IGUIStaticText*, irr::gui::IGUIButton*> > m_child_data;
     public:
         
         LEAK_CHECK()
@@ -224,6 +230,8 @@ namespace GUIEngine
         PtrVector<Widget>& getRibbonChildren() { return m_children; }
 
         virtual EventPropagation onActivationInput(const int playerID) OVERRIDE;
+
+        virtual void resize() OVERRIDE;
     };
 
 }

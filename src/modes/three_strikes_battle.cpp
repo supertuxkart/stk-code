@@ -20,7 +20,7 @@
 #include "main_loop.hpp"
 #include "audio/music_manager.hpp"
 #include "config/user_config.hpp"
-#include "graphics/camera.hpp"
+#include "graphics/camera/camera.hpp"
 #include "graphics/irr_driver.hpp"
 #include <ge_render_info.hpp>
 #include "io/file_manager.hpp"

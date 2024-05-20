@@ -55,6 +55,9 @@ namespace GUIEngine
         /** Will add/replace text in the bubble. If it doesn't fit, the text will get shrinked. **/
         void replaceText();
 
+        void updateForNewSize();
+
+        irr::core::rect<irr::s32> getShrinkedSize();
     public:
         
         LEAK_CHECK()
@@ -70,6 +73,8 @@ namespace GUIEngine
         void setText(const irr::core::stringw &s);
 
         virtual int getHeightNeededAroundLabel() const { return 10; }
+
+        virtual void resize();
     };
 
 }

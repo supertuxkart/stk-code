@@ -573,6 +573,27 @@ public:
 	}
 
 
+	virtual bool setChildEnd(IGUIElement* end)
+	{
+		if (end == 0)
+		{
+			ChildEnd = core::list<IGUIElement*>::Iterator();
+			return true;
+		}
+
+		core::list<IGUIElement*>::Iterator it = Children.begin();
+		for (; it != Children.end(); ++it)
+		{
+			if (*it == end)
+			{
+				ChildEnd = it;
+				return true;
+			}
+		}
+		return false;
+	}
+
+
 	//! Finds the first element with the given id.
 	/** \param id: Id to search for.
 	\param searchchildren: Set this to true, if also children of this
@@ -823,7 +844,10 @@ protected:
 			child->remove(); // remove from old parent
 			child->LastParentRect = getAbsolutePosition();
 			child->Parent = this;
-			Children.push_back(child);
+			if (ChildEnd.isValid())
+				Children.insert_after(ChildEnd, child);
+			else
+				Children.push_back(child);
 		}
 	}
 
@@ -1027,6 +1051,8 @@ protected:
 
 	//! type of element
 	EGUI_ELEMENT_TYPE Type;
+
+	core::list<IGUIElement*>::Iterator ChildEnd;
 };
 
 

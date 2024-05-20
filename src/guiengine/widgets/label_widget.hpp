@@ -27,6 +27,11 @@
 #include "utils/leak_check.hpp"
 #include "utils/ptr_vector.hpp"
 
+namespace irr
+{
+    namespace gui { class IGUIFont; }
+}
+
 namespace GUIEngine
 {
     /** \brief A simple label widget.
@@ -51,10 +56,16 @@ namespace GUIEngine
         LabelType         m_type;
         irr::video::SColor m_color;
         bool               m_has_color;
+        bool               m_expand_if_needed;
+
+        irr::gui::IGUIFont* getCurrentFont() const;
+        void updateExpandedText(const irr::core::stringw& text);
 
         /** Scroll speed in characters/seconds (0 if no scrolling). */
         float              m_scroll_speed;
-        
+
+        float              m_per_character_size;
+
         /** Current scroll offset. */
         float              m_scroll_offset;
 
@@ -106,7 +117,8 @@ namespace GUIEngine
         void setScrollSpeed(float speed);
         
         // --------------------------------------------------------------------
-        
+        float getScrollSpeed() const { return m_scroll_speed; }
+        // --------------------------------------------------------------------
         /**
           * \brief Check if the current has been fully scrolled
           * \return true if the text has completely scrolled off
@@ -114,6 +126,7 @@ namespace GUIEngine
           */
         bool scrolledOff() const;
 
+        virtual void resize();
     };
 }
 

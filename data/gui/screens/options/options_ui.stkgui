@@ -10,6 +10,8 @@
             <vertical-tabs id="options_choice" height="100%" width="20%">
                 <icon-button id="tab_general" width="128" height="128" icon="gui/icons/options_general.png"
                         I18N="Section in the settings menu" text="General"/>
+                <icon-button id="tab_display" width="128" height="128" icon="gui/icons/options_display.png"
+                        I18N="Section in the settings menu" text="Display"/>
                 <icon-button id="tab_video" width="128" height="128" icon="gui/icons/options_video.png"
                         I18N="Section in the settings menu" text="Graphics"/>
                 <icon-button id="tab_audio" width="128" height="128" icon="gui/icons/options_audio.png"
@@ -41,13 +43,6 @@
                 <div width="100%" height="fit" layout="horizontal-row">
                     <spinner id="minimap" width="10f" align="center" />
                     <label height="100%" x="0" y="0" I18N="In the ui settings" text="Minimap"/>
-                </div>
-
-                <spacer width="5" height="2%"/>
-
-                <div layout="horizontal-row" width="100%" height="fit">
-                    <spinner id="splitscreen_method" width="10f" align="center" />
-                    <label height="100%" x="0" y="0" I18N="In the ui settings" text="Splitscreen Multiplayer layout"/>
                 </div>
 
                 <spacer width="5" height="2%"/>

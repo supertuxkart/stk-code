@@ -112,11 +112,6 @@ namespace GUIEngine
         void resetAndSetStack(Screen* screens[]);
 
         /**
-         * \brief Called when resizing of stk window
-         */
-        void onResize();
-
-        /**
          * \brief Used in no graphics STK to enter menu screen (when server is
          * idle state)
          */

@@ -15,19 +15,15 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-#include "states_screens/options/user_screen.hpp"
+// Manages includes common to all options screens
+#include "states_screens/options/options_common.hpp"
 
 #include "addons/news_manager.hpp"
 #include "audio/sfx_manager.hpp"
 #include "challenges/unlock_manager.hpp"
 #include "config/player_manager.hpp"
-#include "config/user_config.hpp"
 #include "graphics/central_settings.hpp"
 #include "guiengine/screen_keyboard.hpp"
-#include "guiengine/widgets/check_box_widget.hpp"
-#include "guiengine/widgets/dynamic_ribbon_widget.hpp"
-#include "guiengine/widgets/label_widget.hpp"
-#include "guiengine/widgets/list_widget.hpp"
 #include "guiengine/widgets/text_box_widget.hpp"
 #include "online/link_helper.hpp"
 #include "online/request_manager.hpp"
@@ -35,16 +31,7 @@
 #include "states_screens/dialogs/kart_color_slider_dialog.hpp"
 #include "states_screens/dialogs/recovery_dialog.hpp"
 #include "states_screens/main_menu_screen.hpp"
-#include "states_screens/options/options_screen_audio.hpp"
-#include "states_screens/options/options_screen_general.hpp"
-#include "states_screens/options/options_screen_input.hpp"
-#include "states_screens/options/options_screen_language.hpp"
-#include "states_screens/options/options_screen_ui.hpp"
-#include "states_screens/options/options_screen_video.hpp"
 #include "states_screens/online/register_screen.hpp"
-#include "states_screens/state_manager.hpp"
-#include "utils/string_utils.hpp"
-#include "utils/translation.hpp"
 
 using namespace GUIEngine;
 
@@ -718,8 +705,6 @@ void BaseUserScreen::unloaded()
 {
 }   // unloaded
 
-
-
 // ============================================================================
 /** In the tab version, make sure the right tab is selected.
  */
@@ -743,23 +728,8 @@ void TabbedUserScreen::eventCallback(GUIEngine::Widget* widget,
     {
         std::string selection = ((RibbonWidget*)widget)->getSelectionIDString(PLAYER_ID_GAME_MASTER);
 
-        Screen *screen = NULL;
-        if (selection == "tab_audio")
-            screen = OptionsScreenAudio::getInstance();
-        else if (selection == "tab_video")
-            screen = OptionsScreenVideo::getInstance();
-        //else if (selection == "tab_players")
-        //    screen = TabbedUserScreen::getInstance();
-        else if (selection == "tab_controls")
-            screen = OptionsScreenInput::getInstance();
-        else if (selection == "tab_ui")
-            screen = OptionsScreenUI::getInstance();
-        else if (selection == "tab_general")
-            screen = OptionsScreenGeneral::getInstance();
-        else if (selection == "tab_language")
-            screen = OptionsScreenLanguage::getInstance();
-        if(screen)
-            StateManager::get()->replaceTopMostScreen(screen);
+        if (selection != "tab_players")
+            OptionsCommon::switchTab(selection);
     }
     else
         BaseUserScreen::eventCallback(widget, name, player_id);

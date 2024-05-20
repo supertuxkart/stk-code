@@ -22,6 +22,7 @@
 #include "audio/sfx_buffer.hpp"
 #include "config/user_config.hpp"
 #include "io/file_manager.hpp"
+#include "modes/world.hpp"
 #include "race/race_manager.hpp"
 #include "states_screens/state_manager.hpp"
 #include "utils/stk_process.hpp"
@@ -336,7 +337,7 @@ void SFXManager::stopThread()
 }   // stopThread
 
 //----------------------------------------------------------------------------
-/** This loops runs in a different threads, and starts sfx to be played.
+/** This loops runs in a different thread, and starts playing sfx.
  *  This can sometimes take up to 5 ms, so it needs to be handled in a thread
  *  in order to avoid rendering delays.
  *  \param obj A pointer to the SFX singleton.
@@ -513,25 +514,18 @@ void SFXManager::toggleSound(const bool on)
         reallyResumeAllNow();
         m_all_sfx.lock();
         const int sfx_amount = (int)m_all_sfx.getData().size();
+        bool resume_later = false;
+        if (World::getWorld() != NULL)
+            resume_later = (World::getWorld()->getPhase() == World::IN_GAME_MENU_PHASE);
         for (int n=0; n<sfx_amount; n++)
         {
-            m_all_sfx.getData()[n]->onSoundEnabledBack();
+            // This also pauses sound effects if they should be resumed later
+            m_all_sfx.getData()[n]->onSoundEnabledBack(resume_later);
         }
         m_all_sfx.unlock();
     }
     else
     {
-        // First stop all sfx that are not looped
-        const int sfx_amount = (int)m_all_sfx.getData().size();
-        m_all_sfx.lock();
-        for (int i=0; i<sfx_amount; i++)
-        {
-            if(!m_all_sfx.getData()[i]->isLooped())
-            {
-                m_all_sfx.getData()[i]->reallyStopNow();
-            }
-        }
-        m_all_sfx.unlock();
         pauseAll();
     }
 }   // toggleSound
@@ -898,20 +892,29 @@ void SFXManager::deleteSFX(SFXBase *sfx)
 }   // deleteSFX
 
 //----------------------------------------------------------------------------
-/** Pauses all looping SFXs. Non-looping SFX will be finished, since it's
- *  otherwise not possible to determine which SFX must be resumed (i.e. were
- *  actually playing at the time pause was called).
+/** Request the pausing of all SFXs. Non-looping SFXs are finished,
+ * since it's otherwise not possible to determine which SFXs must be resumed
+ * (i.e. were actually playing at the time pause was called).
  */
 void SFXManager::pauseAll()
 {
-    if (!sfxAllowed()) return;
+    // First stop all sfx that are not looped
+    const int sfx_amount = (int)m_all_sfx.getData().size();
+    m_all_sfx.lock();
+    for (int i=0; i<sfx_amount; i++)
+    {
+        if(!m_all_sfx.getData()[i]->isLooped())
+        {
+            m_all_sfx.getData()[i]->reallyStopNow();
+        }
+    }
+    m_all_sfx.unlock();
+
     queue(SFX_PAUSE_ALL);
 }   // pauseAll
 
 //----------------------------------------------------------------------------
-/** Pauses all looping SFXs. Non-looping SFX will be finished, since it's
- *  otherwise not possible to determine which SFX must be resumed (i.e. were
- *  actually playing at the time pause was called.
+/** Actually pauses the SFXs.
  */
 void SFXManager::reallyPauseAllNow()
 {
@@ -922,7 +925,7 @@ void SFXManager::reallyPauseAllNow()
         (*i)->reallyPauseNow();
     }   // for i in m_all_sfx
     m_all_sfx.unlock();
-}   // pauseAll
+}   // reallyPauseAllNow
 
 //----------------------------------------------------------------------------
 /** Resumes all paused SFXs. If sound is disabled, does nothing.
@@ -950,7 +953,7 @@ void SFXManager::reallyResumeAllNow()
         (*i)->reallyResumeNow();
     }   // for i in m_all_sfx
     m_all_sfx.unlock();
-}   // resumeAll
+}   // reallyResumeAllNow
 
 //-----------------------------------------------------------------------------
 /** Returns whether or not an openal error has occurred. If so, an error

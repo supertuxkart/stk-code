@@ -19,9 +19,8 @@
 #define HEADER_EDIT_TRACK_SCREEN_HPP
 
 #include "guiengine/screen.hpp"
-#include "guiengine/widgets.hpp"
 
-namespace GUIEngine { class Widget; }
+namespace GUIEngine { class IconButtonWidget; class Widget; }
 
 namespace irr { namespace gui { class STKModifiedSpriteBank; } }
 

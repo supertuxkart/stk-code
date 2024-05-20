@@ -98,6 +98,8 @@ namespace GUIEngine
 
         bool m_header_created;
 
+        float m_icon_scale;
+
         void repairSortCol()
         {
             // Exclude scrollbar
@@ -107,6 +109,11 @@ namespace GUIEngine
             else if (m_sort_col >= max_size)
                 m_sort_col = 0;
         }
+
+        void updateHeader();
+        void updateIconScale();
+        int getHeaderHeight() const;
+        irr::core::rect<s32> getListBoxSize() const;
 
     public:
         typedef irr::gui::CGUISTKListBox::ListItem ListItem;
@@ -136,7 +143,7 @@ namespace GUIEngine
           *        you're done with it (but do not delete it when the list widget is still active)
           * \pre may only be called after the widget has been added to the screen with add()
           */
-        void setIcons(irr::gui::STKModifiedSpriteBank* icons, int size=-1);
+        void setIcons(irr::gui::STKModifiedSpriteBank* icons, float scale = -1.0f);
         
         
         // ---- contents management
@@ -302,6 +309,7 @@ namespace GUIEngine
         void setSortable(bool sortable) { m_sortable = sortable; }
         void focusHeader(const NavigationDirection nav);
         virtual void setActive(bool active=true);
+        virtual void resize();
     };
 }
 

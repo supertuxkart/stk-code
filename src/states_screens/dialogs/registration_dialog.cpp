@@ -18,7 +18,8 @@
 #include "states_screens/dialogs/registration_dialog.hpp"
 
 #include "guiengine/engine.hpp"
-#include "guiengine/widgets.hpp"
+#include "guiengine/widgets/label_widget.hpp"
+#include "guiengine/widgets/ribbon_widget.hpp"
 #include "states_screens/state_manager.hpp"
 #include "states_screens/online/register_screen.hpp"
 #include "utils/translation.hpp"

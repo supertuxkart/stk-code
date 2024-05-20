@@ -20,11 +20,11 @@
 #define HEADER_HIGH_SCORE_SELECTION_HPP
 
 #include "guiengine/screen.hpp"
-#include "guiengine/widgets.hpp"
+#include "guiengine/widgets/list_widget.hpp"
 #include "race/race_manager.hpp"
 #include "states_screens/dialogs/message_dialog.hpp"
 
-namespace GUIEngine { class Widget; }
+namespace GUIEngine { class ListWidget; class RibbonWidget; class Widget; }
 
 /**
   * \brief HighScoreSelection

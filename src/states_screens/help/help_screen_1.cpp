@@ -15,36 +15,22 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-#include "states_screens/help_screen_1.hpp"
+// Manages includes common to all help screens
+#include "states_screens/help/help_common.hpp"
 
-#include "challenges/unlock_manager.hpp"
 #include "config/player_manager.hpp"
 #include "config/user_config.hpp"
-#include "guiengine/widget.hpp"
 #include "guiengine/widgets/button_widget.hpp"
-#include "guiengine/widgets/list_widget.hpp"
-#include "guiengine/widgets/ribbon_widget.hpp"
 #include "input/device_manager.hpp"
 #include "input/input_manager.hpp"
-#include "input/keyboard_device.hpp"
 #include "karts/kart_properties_manager.hpp"
 #include "race/race_manager.hpp"
-#include "states_screens/help_screen_2.hpp"
-#include "states_screens/help_screen_3.hpp"
-#include "states_screens/help_screen_4.hpp"
-#include "states_screens/help_screen_5.hpp"
-#include "states_screens/help_screen_6.hpp"
-#include "states_screens/help_screen_7.hpp"
-#include "states_screens/state_manager.hpp"
 
 using namespace GUIEngine;
 
-// FIXME : it's hugely repetitive to have one class per help screen when
-//         THEY ALL DO THE SAME THING
-//         (the specialized test of this first screen is a tiny exception)
 // -----------------------------------------------------------------------------
 
-HelpScreen1::HelpScreen1() : Screen("help1.stkgui")
+HelpScreen1::HelpScreen1() : Screen("help/help1.stkgui")
 {
 }   // HelpScreen1
 
@@ -97,23 +83,8 @@ void HelpScreen1::eventCallback(Widget* widget, const std::string& name, const i
     {
         std::string selection = ((RibbonWidget*)widget)->getSelectionIDString(PLAYER_ID_GAME_MASTER);
 
-        Screen *screen = NULL;
-        //if (selection == "page1")
-        //    screen = HelpScreen1::getInstance();
-        if (selection == "page2")
-            screen = HelpScreen2::getInstance();
-        else if (selection == "page3")
-            screen = HelpScreen3::getInstance();
-        else if (selection == "page4")
-            screen = HelpScreen4::getInstance();
-        else if (selection == "page5")
-            screen = HelpScreen5::getInstance();
-        else if (selection == "page6")
-            screen = HelpScreen6::getInstance();
-        else if (selection == "page7")
-            screen = HelpScreen7::getInstance();
-        if(screen)
-            StateManager::get()->replaceTopMostScreen(screen);
+        if (selection != "page1")
+            HelpCommon::switchTab(selection);
     }
     else if (name == "back")
     {

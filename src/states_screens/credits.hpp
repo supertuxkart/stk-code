@@ -59,7 +59,7 @@ class CreditsScreen : public GUIEngine::Screen,
     bool getLineAsWide(std::ifstream& file, core::stringw* out);
 
     bool m_is_victory_music;
-
+    void updateAreaSize();
 public:
 
 
@@ -90,6 +90,12 @@ public:
             return music_manager->getMusicInformation("win_theme.music");
         else
             return stk_config->m_title_music;
+    }
+
+    virtual void onResize() OVERRIDE
+    {
+        Screen::onResize();
+        updateAreaSize();
     }
 };
 

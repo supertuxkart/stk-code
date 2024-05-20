@@ -103,7 +103,7 @@ public:
     virtual void      reallySetVolume(float volume) OVERRIDE;
     virtual void      setMasterVolume(float volume) OVERRIDE;
     virtual void      reallySetMasterVolumeNow(float volue) OVERRIDE;
-    virtual void      onSoundEnabledBack() OVERRIDE;
+    virtual void      onSoundEnabledBack(bool resume_later) OVERRIDE;
     virtual void      setRolloff(float rolloff) OVERRIDE;
     // ------------------------------------------------------------------------
     /** Returns if this sfx is looped or not. */

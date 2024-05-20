@@ -27,7 +27,7 @@ void main()
 {
     vec2 texc = gl_FragCoord.xy / u_screen;
     float z = texture(dtex, texc).x;
-    vec3 norm = normalize(DecodeNormal(2. * texture(ntex, texc).xy - 1.));
+    vec3 norm = DecodeNormal(texture(ntex, texc).xy);
     float roughness = texture(ntex, texc).z;
 
     vec4 xpos = getPosFromUVDepth(vec3(texc, z), u_inverse_projection_matrix);

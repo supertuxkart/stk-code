@@ -60,7 +60,6 @@ namespace GUIEngine
 
         float m_percent_width, m_percent_height;
         bool m_init;
-        bool m_was_resizable;
     protected:
         irr::gui::IGUIWindow* m_irrlicht_window;
         irr::core::rect< irr::s32 > m_area;
@@ -87,6 +86,7 @@ namespace GUIEngine
           */
         virtual void loadedFromFile() {}
         void doInit();
+        void setArea();
 
     public:
         LEAK_CHECK()
@@ -115,6 +115,9 @@ namespace GUIEngine
 
         /** Override to be notified of updates */
         virtual void onUpdate(float dt) { }
+
+        /** Override to be notified of resizes */
+        virtual void onResize();
 
         /**
          * \brief Optional callback invoked very early, before widgets have been added (contrast with

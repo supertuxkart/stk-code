@@ -23,7 +23,7 @@ void main() {
     float z = texture(dtex, uv).x;
     vec4 xpos = getPosFromUVDepth(vec3(uv, z), u_inverse_projection_matrix);
 
-    vec3 norm = normalize(DecodeNormal(2. * texture(ntex, uv).xy - 1.));
+    vec3 norm = DecodeNormal(texture(ntex, uv).xy);
     float roughness = texture(ntex, uv).z;
     vec3 eyedir = -normalize(xpos.xyz);
 

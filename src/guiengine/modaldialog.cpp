@@ -60,8 +60,6 @@ ModalDialog::ModalDialog(const float percentWidth, const float percentHeight,
     m_percent_width   = percentWidth;
     m_percent_height  = percentHeight;
     m_irrlicht_window = NULL;
-    m_was_resizable   = irr_driver->getDevice()->isResizable();
-    irr_driver->getDevice()->setResizable(false);
 }   // ModalDialog
 
 // ----------------------------------------------------------------------------
@@ -96,6 +94,34 @@ void ModalDialog::doInit()
     pointer_was_shown = irr_driver->isPointerShown();
     irr_driver->showPointer();
 
+    setArea();
+
+    if (modalWindow != NULL)
+    {
+        delete modalWindow;
+        Log::warn("GUIEngine", "Showing a modal dialog while the previous one "
+                  "is still open. Destroying the previous dialog.");
+    }
+    modalWindow = this;
+
+    m_irrlicht_window = GUIEngine::getGUIEnv()->addWindow(m_area,
+                                                          true /* modal */);
+    m_irrlicht_window->setDrawTitlebar(false);
+    m_irrlicht_window->getCloseButton()->setVisible(false);
+    if (!UserConfigParams::m_artist_debug_mode)
+        m_irrlicht_window->setDraggable(false);
+
+    GUIEngine::getSkin()->m_dialog = true;
+    GUIEngine::getSkin()->m_dialog_size = 0.0f;
+
+    m_previous_mode=input_manager->getMode();
+    input_manager->setMode(InputManager::MENU);
+}   // doInit
+
+// ----------------------------------------------------------------------------
+
+void ModalDialog::setArea()
+{
     const core::dimension2d<u32>& frame_size =
         GUIEngine::getDriver()->getCurrentRenderTargetSize();
 
@@ -134,28 +160,7 @@ void ModalDialog::doInit()
     {
         assert(false);
     }
-
-    if (modalWindow != NULL)
-    {
-        delete modalWindow;
-        Log::warn("GUIEngine", "Showing a modal dialog while the previous one "
-                  "is still open. Destroying the previous dialog.");
-    }
-    modalWindow = this;
-
-    m_irrlicht_window = GUIEngine::getGUIEnv()->addWindow(m_area,
-                                                          true /* modal */);
-    m_irrlicht_window->setDrawTitlebar(false);
-    m_irrlicht_window->getCloseButton()->setVisible(false);
-    if (!UserConfigParams::m_artist_debug_mode)
-        m_irrlicht_window->setDraggable(false);
-
-    GUIEngine::getSkin()->m_dialog = true;
-    GUIEngine::getSkin()->m_dialog_size = 0.0f;
-
-    m_previous_mode=input_manager->getMode();
-    input_manager->setMode(InputManager::MENU);
-}   // doInit
+}   // setArea
 
 // ----------------------------------------------------------------------------
 
@@ -184,7 +189,6 @@ ModalDialog::~ModalDialog()
     // to the deleted widgets will be gone, but some widgets
     // may want to perform additional cleanup at this time
     elementsWereDeleted();
-    GUIEngine::getDevice()->setResizable(m_was_resizable);
 }   // ~ModalDialog
 
 // ----------------------------------------------------------------------------
@@ -204,6 +208,16 @@ void ModalDialog::clearWindow()
     m_irrlicht_window->remove();
     m_irrlicht_window = GUIEngine::getGUIEnv()->addWindow( m_area, true /* modal */ );
 }   // clearWindow
+
+// ----------------------------------------------------------------------------
+
+void ModalDialog::onResize()
+{
+    setArea();
+    m_irrlicht_window->setRelativePosition(m_area);
+    LayoutManager::calculateLayout(m_widgets, this);
+    resizeWidgetsRecursively(m_widgets);
+}   // onResize
 
 // ----------------------------------------------------------------------------
 

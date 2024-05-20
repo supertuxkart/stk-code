@@ -15,35 +15,18 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-#include "states_screens/options/options_screen_audio.hpp"
+// Manages includes common to all options screens
+#include "states_screens/options/options_common.hpp"
 
 #include "audio/music_manager.hpp"
 #include "audio/sfx_manager.hpp"
 #include "audio/sfx_base.hpp"
-#include "config/user_config.hpp"
-#include "guiengine/screen.hpp"
-#include "guiengine/widgets/check_box_widget.hpp"
-#include "guiengine/widgets/dynamic_ribbon_widget.hpp"
-#include "guiengine/widgets/spinner_widget.hpp"
-#include "guiengine/widget.hpp"
-#include "io/file_manager.hpp"
-#include "states_screens/options/options_screen_general.hpp"
-#include "states_screens/options/options_screen_input.hpp"
-#include "states_screens/options/options_screen_language.hpp"
-#include "states_screens/options/options_screen_ui.hpp"
-#include "states_screens/options/options_screen_video.hpp"
-#include "states_screens/state_manager.hpp"
-#include "states_screens/options/user_screen.hpp"
-#include "utils/translation.hpp"
-
-#include <iostream>
-#include <sstream>
 
 using namespace GUIEngine;
 
 // -----------------------------------------------------------------------------
 
-OptionsScreenAudio::OptionsScreenAudio() : Screen("options_audio.stkgui")
+OptionsScreenAudio::OptionsScreenAudio() : Screen("options/options_audio.stkgui")
 {
 }   // OptionsScreenAudio
 
@@ -107,23 +90,8 @@ void OptionsScreenAudio::eventCallback(Widget* widget, const std::string& name, 
     {
         std::string selection = ((RibbonWidget*)widget)->getSelectionIDString(PLAYER_ID_GAME_MASTER);
 
-        Screen *screen = NULL;
-        //if (selection == "tab_audio")
-        //    screen = OptionsScreenAudio::getInstance();
-        if (selection == "tab_video")
-            screen = OptionsScreenVideo::getInstance();
-        else if (selection == "tab_players")
-            screen = TabbedUserScreen::getInstance();
-        else if (selection == "tab_controls")
-            screen = OptionsScreenInput::getInstance();
-        else if (selection == "tab_ui")
-            screen = OptionsScreenUI::getInstance();
-        else if (selection == "tab_general")
-            screen = OptionsScreenGeneral::getInstance();
-        else if (selection == "tab_language")
-            screen = OptionsScreenLanguage::getInstance();
-        if(screen)
-            StateManager::get()->replaceTopMostScreen(screen);
+        if (selection != "tab_audio")
+            OptionsCommon::switchTab(selection);
     }
     else if(name == "back")
     {

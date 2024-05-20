@@ -10,6 +10,8 @@
             <vertical-tabs id="options_choice" height="100%" width="20%">
                 <icon-button id="tab_general" width="128" height="128" icon="gui/icons/options_general.png"
                         I18N="Section in the settings menu" text="General"/>
+                <icon-button id="tab_display" width="128" height="128" icon="gui/icons/options_display.png"
+                        I18N="Section in the settings menu" text="Display"/>
                 <icon-button id="tab_video" width="128" height="128" icon="gui/icons/options_video.png"
                         I18N="Section in the settings menu" text="Graphics"/>
                 <icon-button id="tab_audio" width="128" height="128" icon="gui/icons/options_audio.png"
@@ -29,7 +31,7 @@
             <box width="78%" height="100%" layout="vertical-row">
                 <label width="100%" I18N="In the video settings" text="Graphics"/>
 
-                <spacer width="5" height="1%"/>
+                <spacer width="5" height="2%"/>
 
                 <!-- ************ GRAPHICAL EFFECTS SETTINGS ************ -->
                 <div width="100%" height="fit" layout="horizontal-row">
@@ -42,7 +44,7 @@
                     </div>
                 </div>
 
-                <spacer width="5" height="1%"/>
+                <spacer width="5" height="2%"/>
 
                 <div width="100%" height="fit" layout="horizontal-row">
                     <spacer width="3%" height="100%" />
@@ -54,7 +56,7 @@
                     </div>
                 </div>
 
-                <spacer width="5" height="1%"/>
+                <spacer width="5" height="2%"/>
 
                 <div width="100%" height="fit" layout="horizontal-row">
                     <spacer width="3%" height="100%" />
@@ -66,7 +68,7 @@
                     </div>
                 </div>
 
-                <spacer width="5" height="1%"/>
+                <spacer width="5" height="2%"/>
 
                 <!-- ************ VSYNC ************ -->
                 <div width="100%" height="fit" layout="horizontal-row" id="outer_box" >
@@ -79,7 +81,7 @@
                     </div>
                 </div>
 
-                <spacer width="5" height="1%"/>
+                <spacer width="5" height="2%"/>
 
                 <!-- ************ CUSTOM SETTINGS ************ -->
                 <div width="100%" height="fit" layout="horizontal-row" id="outer_box" >
@@ -87,62 +89,25 @@
                     <button id="custom" text="Custom settings..." I18N="In the video settings" align="center"/>
                 </div>
 
-                <spacer width="5" height="3%"/>
-
-                <!-- ************ RESOLUTION CHOICE ************ -->
-                <label width="100%" I18N="In the video settings" text="Resolution"/>
-
-                <spacer width="5" height="1%"/>
-
-                <div layout="horizontal-row" width="100%" height="fit">
-                    <div proportion="2" height="fit" layout="horizontal-row" >
-                        <spacer width="5%" height="100%" />
-                        <checkbox id="fullscreen"/>
-                        <spacer width="2%" height="100%" />
-                        <label id="fullscreenText" height="100%" I18N="In the video settings" text="Fullscreen"/>
-                    </div>
-
-                    <div proportion="3" layout="horizontal-row" height="fit">
-                        <spacer width="5%" height="100%" />
-                        <checkbox id="rememberWinpos"/>
-                        <spacer width="2%" height="100%" />
-                        <label id="rememberWinposText" height="100%" I18N="In the video settings" text="Remember window location"/>
-                    </div>
-                </div>
-
-                <spacer width="5" height="1%"/>
-
-                <scrollable_ribbon id="resolutions" height="20%" label_location="each"
-                                   width="100%" square_items="false"
-                                   align="center" child_width="128" child_height="128" />
-
-                <spacer width="5" height="2%"/>
-
-                <div width="100%" height="fit" layout="horizontal-row" >
-                    <spacer width="5%" height="100%" />
-                    <button id="apply_resolution"
-                        I18N="In the video settings" text="Apply new resolution" />
-                </div>
-
                 <!-- ************ BENCHMARK OPTIONS ************ -->
                 <spacer width="5" height="3%"/>
 
                 <label width="100%" I18N="In the video settings" text="Performance tests"/>
 
-                <spacer width="5" height="1%"/>
+                <spacer width="5" height="2%"/>
 
                 <div width="100%" height="fit" layout="horizontal-row" id="outer_box" >
                     <spacer width="5%" height="100%" />
-                    <button id="benchmarkCurrent" text="Benchmark current settings" I18N="In the video settings" align="center"/>
+                    <button id="benchmarkCurrent" text="Performance test of the current settings" I18N="In the video settings" align="center"/>
                 </div>
-<!-- 
-                <spacer width="5" height="1%"/>
+
+                <spacer width="5" height="2%"/>
 
                 <div width="100%" height="fit" layout="horizontal-row" id="outer_box" >
                     <spacer width="5%" height="100%" />
-                    <button id="benchmarkStandard" text="Standard Benchmark" I18N="In the video settings" align="center"/>
+                    <button id="benchmarkRecommend" text="Recommend settings" I18N="In the video settings" align="center"/>
                 </div>
- -->
+
             </box>
         </div>
     </div>

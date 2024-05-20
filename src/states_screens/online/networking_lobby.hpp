@@ -149,6 +149,7 @@ public:
     void reloadServerInfos()                   { m_reload_server_info = true; }
     void setHeader(const core::stringw& header)     { m_header_text = header; }
     void setAssignedPlayers(bool val)             { m_assigned_players = val; }
+    virtual void onResize() OVERRIDE;
 };   // class NetworkingLobby
 
 #endif

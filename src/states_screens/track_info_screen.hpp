@@ -21,13 +21,14 @@
 #define HEADER_TRACK_INFO_SCREEN_HPP
 
 #include "guiengine/screen.hpp"
-#include "guiengine/widgets.hpp"
 
+namespace irr { namespace gui { class STKModifiedSpriteBank; } }
 namespace GUIEngine
 {
     class CheckBoxWidget;
     class IconButtonWidget;
     class LabelWidget;
+    class ListWidget;
     class SpinnerWidget;
     class Widget;
 }

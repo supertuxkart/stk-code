@@ -18,6 +18,7 @@
 #include "states_screens/online/online_profile_servers.hpp"
 
 #include "guiengine/screen.hpp"
+#include "guiengine/widgets/ribbon_widget.hpp"
 #include "network/network_config.hpp"
 #include "states_screens/state_manager.hpp"
 #include "states_screens/online/create_server_screen.hpp"

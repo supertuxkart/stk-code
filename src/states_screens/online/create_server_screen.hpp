@@ -19,10 +19,12 @@
 #define HEADER_CREATE_SERVER_SCREEN_HPP
 
 #include "guiengine/screen.hpp"
-#include "guiengine/widgets.hpp"
 
-
-namespace GUIEngine { class Widget; class ListWidget; }
+namespace GUIEngine
+{
+    class IconButtonWidget; class LabelWidget; class RibbonWidget;
+    class SpinnerWidget; class TextBoxWidget; class Widget;
+}
 
 /**
   * \brief Handles the main menu

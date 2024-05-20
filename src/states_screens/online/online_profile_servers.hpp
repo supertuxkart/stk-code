@@ -23,7 +23,6 @@
 #include <irrString.h>
 
 #include "guiengine/screen.hpp"
-#include "guiengine/widgets.hpp"
 #include "states_screens/online/online_profile_base.hpp"
 
 namespace GUIEngine { class Widget; }

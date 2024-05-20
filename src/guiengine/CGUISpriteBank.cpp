@@ -11,6 +11,7 @@
 #include <cassert>
 #include "font/font_drawer.hpp"
 #include "graphics/2dutils.hpp"
+#include "guiengine/engine.hpp"
 
 namespace irr
 {
@@ -27,7 +28,7 @@ STKModifiedSpriteBank::STKModifiedSpriteBank(IGUIEnvironment* env) :
     #endif
 
     m_scale = 1.0f;
-    m_height = 0;
+    m_fixed_scale = 0.0f;
     m_target_icon_size = core::dimension2du(0, 0);
     if (Environment)
     {
@@ -333,27 +334,21 @@ void STKModifiedSpriteBank::draw2DSpriteBatch(const core::array<u32>& indices,
 }   // draw2DSpriteBatch
 
 // ----------------------------------------------------------------------------
-void STKModifiedSpriteBank::scaleToHeight(int height)
-{
-    m_height = height;
-}
-
-// ----------------------------------------------------------------------------
 s32 STKModifiedSpriteBank::getScaledWidth(s32 width) const
 {
-    if (m_height == 0)
-        return (s32)((float)width * m_scale);
+    if (m_fixed_scale == 0.0f)
+        return (s32)(GUIEngine::getFontHeight() * (float)width * m_scale);
     else
-        return m_height;
+        return (s32)(GUIEngine::getFontHeight() * m_fixed_scale);
 }
 
 // ----------------------------------------------------------------------------
 s32 STKModifiedSpriteBank::getScaledHeight(s32 height) const
 {
-    if (m_height == 0)
-        return (s32)((float)height * m_scale);
+    if (m_fixed_scale == 0.0f)
+        return (s32)(GUIEngine::getFontHeight() * (float)height * m_scale);
     else
-        return m_height;
+        return (s32)(GUIEngine::getFontHeight() * m_fixed_scale);
 }
 
 // ----------------------------------------------------------------------------

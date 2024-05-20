@@ -23,6 +23,7 @@
 #include "config/user_config.hpp"
 #include "guiengine/message_queue.hpp"
 #include "guiengine/screen.hpp"
+#include "io/xml_node.hpp"
 #include "network/network_config.hpp"
 #include "online/online_profile.hpp"
 #include "online/profile_manager.hpp"
@@ -106,7 +107,6 @@ namespace Online
         m_online_state = OS_SIGNED_OUT;
         m_token        = "";
         m_profile      = NULL;
-
     }   // OnlinePlayerProfile
 
     // ------------------------------------------------------------------------
@@ -135,10 +135,11 @@ namespace Online
     void OnlinePlayerProfile::requestSignIn(const core::stringw &username,
                                            const core::stringw &password)
     {
-        // If the player changes the online account, there can be a
-        // logout stil happening.
-        assert(m_online_state == OS_SIGNED_OUT ||
-               m_online_state == OS_SIGNING_OUT);
+        // Avoid multiple sign in requests from happening at once,
+        // this can occur for example when using the enter key to request a sign-in.
+        if (m_online_state != OS_SIGNED_OUT && m_online_state != OS_SIGNING_OUT)
+            return;
+
         auto request = std::make_shared<PrivateRequest::SignInRequest>();
 
         // We can't use setUserDetail here, since there is no token yet

@@ -307,6 +307,7 @@ bool CGUIEditBox::isOverrideColorEnabled() const
 void CGUIEditBox::updateAbsolutePosition()
 {
     IGUIElement::updateAbsolutePosition();
+    calculateScrollPos();
 }
 
 

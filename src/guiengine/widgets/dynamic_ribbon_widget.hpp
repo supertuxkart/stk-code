@@ -185,6 +185,7 @@ namespace GUIEngine
         void setLabelSize(const irr::core::stringw& text);
         irr::core::stringw getUserName(const irr::core::stringw& user_name) const;
 
+        void updateForResizing();
         /**
          * Font used to write the labels, can be scaled down depending on the
          * length of the text
@@ -313,6 +314,8 @@ namespace GUIEngine
         virtual void setText(const irr::core::stringw& text);
 
         virtual void update(float delta);
+
+        virtual void resize();
 
         /** Set approximately how many items are expected to be in this ribbon; will help the layout
           * algorithm next time add() is called */

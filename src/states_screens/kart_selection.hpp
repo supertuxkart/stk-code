@@ -180,6 +180,8 @@ public:
      *  class GUIEngine::Screen */
     virtual bool onEscapePressed() OVERRIDE;
 
+    virtual void onResize() OVERRIDE;
+
 };   // KartSelectionScreen
 
 //!----------------------------------------------------------------------------

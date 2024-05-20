@@ -291,11 +291,9 @@ void GPInfoScreen::init()
         getWidget<LabelWidget>("name")->setText(m_gp.getName(), false);
         m_gp.checkConsistency();
 
-        int icon_height = GUIEngine::getFontHeight();
-        int row_height = GUIEngine::getFontHeight() * 1.2f;
-        m_icon_bank->setScale(icon_height/128.0f);
-        m_icon_bank->setTargetIconSize(128,128);
-        m_highscore_list->setIcons(m_icon_bank,row_height);
+        m_icon_bank->setScale(1.0f / 128.0f);
+        m_icon_bank->setTargetIconSize(128, 128);
+        m_highscore_list->setIcons(m_icon_bank, 1.2f);
         RaceManager::get()->setNumKarts(RaceManager::get()->getNumLocalPlayers() + m_ai_kart_spinner->getValue());
         // We don't save highscores for random gps so load highscores here
         updateHighscores();

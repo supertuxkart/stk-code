@@ -38,6 +38,7 @@
 
 #include <IGUIEnvironment.h>
 #include <IGUIScrollBar.h>
+#include <IGUIStaticText.h>
 
 using namespace GUIEngine;
 using namespace irr;

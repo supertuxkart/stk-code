@@ -357,7 +357,7 @@ void WorldStatus::updateTime(int ticks)
                 {
                     // The profiler drawings cost performance
                     profiler.setDrawing(false);
-                    profiler.toggleStatus();
+                    profiler.activate();
                 }
 
                 // event
@@ -441,8 +441,7 @@ void WorldStatus::updateTime(int ticks)
                 if(RaceManager::get()->isBenchmarking())
                 {
                     // End profiling
-                    profiler.toggleStatus();
-                    profiler.writeToFile();
+                    profiler.desactivate();
                     profiler.setDrawing(true);
                 }
                 terminateRace();

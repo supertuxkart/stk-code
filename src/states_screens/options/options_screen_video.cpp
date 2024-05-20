@@ -15,51 +15,25 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-#include "states_screens/options/options_screen_video.hpp"
+// Manages includes common to all options screens
+#include "states_screens/options/options_common.hpp"
 
-#include "audio/sfx_manager.hpp"
-#include "audio/sfx_base.hpp"
-#include "config/user_config.hpp"
 #include "graphics/central_settings.hpp"
 #include "graphics/irr_driver.hpp"
-#include "guiengine/screen.hpp"
-#include "guiengine/widgets/button_widget.hpp"
-#include "guiengine/widgets/check_box_widget.hpp"
-#include "guiengine/widgets/dynamic_ribbon_widget.hpp"
-#include "guiengine/widgets/label_widget.hpp"
-#include "guiengine/widgets/spinner_widget.hpp"
-#include "guiengine/widget.hpp"
 #include "io/file_manager.hpp"
-#include "race/race_manager.hpp"
-#include "replay/replay_play.hpp"
 #include "states_screens/dialogs/custom_video_settings.hpp"
-#include "states_screens/options/options_screen_audio.hpp"
-#include "states_screens/options/options_screen_general.hpp"
-#include "states_screens/options/options_screen_input.hpp"
-#include "states_screens/options/options_screen_language.hpp"
-#include "states_screens/options/options_screen_ui.hpp"
-#include "states_screens/state_manager.hpp"
-#include "states_screens/options/user_screen.hpp"
-#include "utils/string_utils.hpp"
-#include "utils/translation.hpp"
+#include "states_screens/dialogs/recommend_video_settings.hpp"
+#include "utils/profiler.hpp"
 
 #ifndef SERVER_ONLY
 #include <ge_main.hpp>
 #include <ge_vulkan_driver.hpp>
 #include <ge_vulkan_texture_descriptor.hpp>
-#include <SDL_video.h>
-#include "../../lib/irrlicht/source/Irrlicht/CIrrDeviceSDL.h"
 #endif
 
 #include <IrrlichtDevice.h>
 
-#include <functional>
-#include <iostream>
-#include <iterator>
-#include <sstream>
-
 using namespace GUIEngine;
-bool OptionsScreenVideo::m_fullscreen_checkbox_focus = false;
 
 // --------------------------------------------------------------------------------------------
 void OptionsScreenVideo::initPresets()
@@ -69,15 +43,15 @@ void OptionsScreenVideo::initPresets()
         false /* light */, 0 /* shadow */, false /* bloom */, false /* lightshaft */,
         false /* glow */, false /* mlaa */, false /* ssao */, false /* light scatter */,
         false /* animatedCharacters */, 1 /* particles */, 0 /* image_quality */,
-        true /* degraded IBL */
+        true /* degraded IBL */, 0 /* Geometry Detail */
     });
 
     m_presets.push_back // Level 2
     ({
         false /* light */, 0 /* shadow */, false /* bloom */, false /* lightshaft */,
         false /* glow */, false /* mlaa */, false /* ssao */, false /* light scatter */,
-        true /* animatedCharacters */, 2 /* particles */, 0 /* image_quality */,
-        true /* degraded IBL */
+        true /* animatedCharacters */, 2 /* particles */, 1 /* image_quality */,
+        true /* degraded IBL */, 1 /* Geometry Detail */
     });
 
     m_presets.push_back // Level 3
@@ -85,31 +59,39 @@ void OptionsScreenVideo::initPresets()
         true /* light */, 0 /* shadow */, false /* bloom */, false /* lightshaft */,
         false /* glow */, false /* mlaa */, false /* ssao */, false /* light scatter */,
         true /* animatedCharacters */, 2 /* particles */, 1 /* image_quality */,
-        true /* degraded IBL */
+        true /* degraded IBL */, 2 /* Geometry Detail */
     });
 
     m_presets.push_back // Level 4
     ({
         true /* light */, 0 /* shadow */, false /* bloom */, true /* lightshaft */,
         true /* glow */, true /* mlaa */, false /* ssao */, true /* light scatter */,
-        true /* animatedCharacters */, 2 /* particles */, 1 /* image_quality */,
-        false /* degraded IBL */
+        true /* animatedCharacters */, 2 /* particles */, 2 /* image_quality */,
+        false /* degraded IBL */, 3 /* Geometry Detail */
     });
 
     m_presets.push_back // Level 5
     ({
         true /* light */, 512 /* shadow */, true /* bloom */, true /* lightshaft */,
         true /* glow */, true /* mlaa */, false /* ssao */, true /* light scatter */,
-        true /* animatedCharacters */, 2 /* particles */, 2 /* image_quality */,
-        false /* degraded IBL */
+        true /* animatedCharacters */, 2 /* particles */, 3 /* image_quality */,
+        false /* degraded IBL */, 3 /* Geometry Detail */
     });
 
     m_presets.push_back // Level 6
     ({
         true /* light */, 1024 /* shadow */, true /* bloom */, true /* lightshaft */,
         true /* glow */, true /* mlaa */, true /* ssao */, true /* light scatter */,
-        true /* animatedCharacters */, 2 /* particles */, 2 /* image_quality */,
-        false /* degraded IBL */
+        true /* animatedCharacters */, 2 /* particles */, 3 /* image_quality */,
+        false /* degraded IBL */, 4 /* Geometry Detail */
+    });
+
+    m_presets.push_back // Level 7
+    ({
+        true /* light */, 2048 /* shadow */, true /* bloom */, true /* lightshaft */,
+        true /* glow */, true /* mlaa */, true /* ssao */, true /* light scatter */,
+        true /* animatedCharacters */, 2 /* particles */, 3 /* image_quality */,
+        false /* degraded IBL */, 5 /* Geometry Detail */
     });
 
     m_blur_presets.push_back
@@ -148,18 +130,24 @@ void OptionsScreenVideo::initPresets()
 // --------------------------------------------------------------------------------------------
 int OptionsScreenVideo::getImageQuality()
 {
-    if (UserConfigParams::m_anisotropic == 2 &&
+    // applySettings assumes that only the first image quality preset has a different
+    // level of anisotropic filtering from others
+    if (UserConfigParams::m_anisotropic == 4 &&
         (UserConfigParams::m_high_definition_textures & 0x01) == 0x00 &&
         UserConfigParams::m_hq_mipmap == false)
         return 0;
-    if (UserConfigParams::m_anisotropic == 4 &&
-        (UserConfigParams::m_high_definition_textures & 0x01) == 0x01 &&
+    if (UserConfigParams::m_anisotropic == 16 &&
+        (UserConfigParams::m_high_definition_textures & 0x01) == 0x00 &&
         UserConfigParams::m_hq_mipmap == false)
         return 1;
     if (UserConfigParams::m_anisotropic == 16 &&
         (UserConfigParams::m_high_definition_textures & 0x01) == 0x01 &&
-        UserConfigParams::m_hq_mipmap == true)
+        UserConfigParams::m_hq_mipmap == false)
         return 2;
+    if (UserConfigParams::m_anisotropic == 16 &&
+        (UserConfigParams::m_high_definition_textures & 0x01) == 0x01 &&
+        UserConfigParams::m_hq_mipmap == true)
+        return 3;
     return 1;
 }   // getImageQuality
 
@@ -173,20 +161,27 @@ void OptionsScreenVideo::setImageQuality(int quality)
     switch (quality)
     {
         case 0:
-            UserConfigParams::m_anisotropic = 2;
+            UserConfigParams::m_anisotropic = 4;
             UserConfigParams::m_high_definition_textures = 0x02;
             UserConfigParams::m_hq_mipmap = false;
             if (td)
                 td->setSamplerUse(GE::GVS_3D_MESH_MIPMAP_2);
             break;
         case 1:
-            UserConfigParams::m_anisotropic = 4;
+            UserConfigParams::m_anisotropic = 16;
+            UserConfigParams::m_high_definition_textures = 0x02;
+            UserConfigParams::m_hq_mipmap = false;
+            if (td)
+                td->setSamplerUse(GE::GVS_3D_MESH_MIPMAP_2);
+            break;
+        case 2:
+            UserConfigParams::m_anisotropic = 16;
             UserConfigParams::m_high_definition_textures = 0x03;
             UserConfigParams::m_hq_mipmap = false;
             if (td)
                 td->setSamplerUse(GE::GVS_3D_MESH_MIPMAP_4);
             break;
-        case 2:
+        case 3:
             UserConfigParams::m_anisotropic = 16;
             UserConfigParams::m_high_definition_textures = 0x03;
             UserConfigParams::m_hq_mipmap = true;
@@ -201,11 +196,10 @@ void OptionsScreenVideo::setImageQuality(int quality)
 
 // --------------------------------------------------------------------------------------------
 
-OptionsScreenVideo::OptionsScreenVideo() : Screen("options_video.stkgui"),
+OptionsScreenVideo::OptionsScreenVideo() : Screen("options/options_video.stkgui"),
                                            m_prev_adv_pipline(false),
                                            m_prev_img_quality(-1)
 {
-    m_resizable = true;
     m_inited = false;
     initPresets();
 }   // OptionsScreenVideo
@@ -215,7 +209,7 @@ OptionsScreenVideo::OptionsScreenVideo() : Screen("options_video.stkgui"),
 void OptionsScreenVideo::loadedFromFile()
 {
     m_inited = false;
-    assert(m_presets.size() == 6);
+    assert(m_presets.size() == 7);
     assert(m_blur_presets.size() == 3);
 
     GUIEngine::SpinnerWidget* gfx =
@@ -235,8 +229,6 @@ void OptionsScreenVideo::loadedFromFile()
 
 void OptionsScreenVideo::init()
 {
-    GUIEngine::getDevice()->setResizable(
-        StateManager::get()->getGameState() == GUIEngine::MENU);
     Screen::init();
     m_prev_adv_pipline = UserConfigParams::m_dynamic_lights;
     m_prev_img_quality = getImageQuality();
@@ -244,10 +236,6 @@ void OptionsScreenVideo::init()
     assert(ribbon != NULL);
     ribbon->setFocusForPlayer(PLAYER_ID_GAME_MASTER);
     ribbon->select( "tab_video", PLAYER_ID_GAME_MASTER );
-
-    GUIEngine::ButtonWidget* applyBtn =
-        getWidget<GUIEngine::ButtonWidget>("apply_resolution");
-    assert( applyBtn != NULL );
 
     GUIEngine::SpinnerWidget* gfx =
         getWidget<GUIEngine::SpinnerWidget>("gfx_level");
@@ -303,190 +291,16 @@ void OptionsScreenVideo::init()
     scale_rtts->addLabel("95%");
     scale_rtts->addLabel("100%");
 
-    // ---- video modes
-    DynamicRibbonWidget* res = getWidget<DynamicRibbonWidget>("resolutions");
-    assert(res != NULL);
-    res->registerScrollCallback(onScrollResolutionsList, this);
-
-    CheckBoxWidget* full = getWidget<CheckBoxWidget>("fullscreen");
-    assert( full != NULL );
-    full->setState( UserConfigParams::m_fullscreen );
-    
-    CheckBoxWidget* rememberWinpos = getWidget<CheckBoxWidget>("rememberWinpos");
-    assert( rememberWinpos != NULL );
-    rememberWinpos->setState(UserConfigParams::m_remember_window_location);
-    rememberWinpos->setActive(!UserConfigParams::m_fullscreen);
-#ifdef DEBUG
-    LabelWidget* full_text = getWidget<LabelWidget>("fullscreenText");
-    assert( full_text != NULL );
-
-    LabelWidget* rememberWinposText = 
-                                   getWidget<LabelWidget>("rememberWinposText");
-    assert( rememberWinposText != NULL );
-#endif
-
-    bool is_fullscreen_desktop = false;
-    bool is_vulkan_fullscreen_desktop = false;
-#ifndef SERVER_ONLY
-    is_fullscreen_desktop =
-        GE::getGEConfig()->m_fullscreen_desktop;
-    is_vulkan_fullscreen_desktop =
-        GE::getDriver()->getDriverType() == video::EDT_VULKAN &&
-        is_fullscreen_desktop;
-#endif
-
-    // --- get resolution list from irrlicht the first time
-    if (!m_inited)
-    {
-        res->clearItems();
-
-        const std::vector<IrrDriver::VideoMode>& modes =
-                                                irr_driver->getVideoModes();
-        const int amount = (int)modes.size();
-
-        m_resolutions.clear();
-        Resolution r;
-
-        bool found_config_res = false;
-
-        // for some odd reason, irrlicht sometimes fails to report the good
-        // old standard resolutions
-        // those are always useful for windowed mode
-        bool found_1024_768 = false;
-        bool found_1280_720 = false;
-
-        for (int n=0; n<amount; n++)
-        {
-            r.width  = modes[n].getWidth();
-            r.height = modes[n].getHeight();
-            r.fullscreen = true;
-            m_resolutions.push_back(r);
-
-            if (r.width  == UserConfigParams::m_real_width &&
-                r.height == UserConfigParams::m_real_height)
-            {
-                found_config_res = true;
-            }
-
-            if (r.width == 1024 && r.height == 768)
-            {
-                found_1024_768 = true;
-            }
-            if (r.width == 1280 && r.height == 720)
-            {
-                found_1280_720 = true;
-            }
-        }
-
-        // Use fullscreen desktop so only show current screen size
-        if (is_fullscreen_desktop)
-        {
-            found_config_res = false;
-            m_resolutions.clear();
-            found_1024_768 = true;
-            found_1280_720 = true;
-        }
-
-        if (!found_config_res)
-        {
-            r.width  = UserConfigParams::m_real_width;
-            r.height = UserConfigParams::m_real_height;
-            r.fullscreen = is_fullscreen_desktop;
-            m_resolutions.push_back(r);
-
-            if (r.width == 1024 && r.height == 768)
-            {
-                found_1024_768 = true;
-            }
-            if (r.width == 1280 && r.height == 720)
-            {
-                found_1280_720 = true;
-            }
-        } // next found resolution
-
-#if !defined(MOBILE_STK) && !defined(__SWITCH__)
-        // Add default resolutions that were not found by irrlicht
-        if (!found_1024_768)
-        {
-            r.width  = 1024;
-            r.height = 768;
-            r.fullscreen = false;
-            m_resolutions.push_back(r);
-        }
-
-        if (!found_1280_720)
-        {
-            r.width  = 1280;
-            r.height = 720;
-            r.fullscreen = false;
-            m_resolutions.push_back(r);
-        }
-#endif
-
-        // Sort resolutions by size
-        std::sort(m_resolutions.begin(), m_resolutions.end());
-
-        // Add resolutions list
-        for(std::vector<Resolution>::iterator it = m_resolutions.begin();
-            it != m_resolutions.end(); it++)
-        {
-            const float ratio = it->getRatio();
-            char name[32];
-            sprintf(name, "%ix%i", it->width, it->height);
-
-            core::stringw label;
-            label += it->width;
-            label += L"\u00D7";
-            label += it->height;
-
-#define ABOUT_EQUAL(a , b) (fabsf( a - b ) < 0.01)
-
-            if      (ABOUT_EQUAL( ratio, (5.0f/4.0f) ))
-                res->addItem(label, name, "/gui/icons/screen54.png");
-            else if (ABOUT_EQUAL( ratio, (4.0f/3.0f) ))
-                res->addItem(label, name, "/gui/icons/screen43.png");
-            else if (ABOUT_EQUAL( ratio, (16.0f/10.0f)))
-                res->addItem(label, name, "/gui/icons/screen1610.png");
-            else if (ABOUT_EQUAL( ratio, (5.0f/3.0f) ))
-                res->addItem(label, name, "/gui/icons/screen53.png");
-            else if (ABOUT_EQUAL( ratio, (3.0f/2.0f) ))
-                res->addItem(label, name, "/gui/icons/screen32.png");
-            else if (ABOUT_EQUAL( ratio, (16.0f/9.0f) ))
-                res->addItem(label, name, "/gui/icons/screen169.png");
-            else
-                res->addItem(label, name, "/gui/icons/screen_other.png");
-#undef ABOUT_EQUAL
-        } // add next resolution
-    } // end if not inited
-
-    res->updateItemDisplay();
-
-    // ---- select current resolution every time
-    char searching_for[32];
-    snprintf(searching_for, 32, "%ix%i", (int)UserConfigParams::m_real_width,
-                                         (int)UserConfigParams::m_real_height);
-
-
-    if (!res->setSelection(searching_for, PLAYER_ID_GAME_MASTER,
-                          false /* focus it */, true /* even if deactivated*/))
-    {
-        Log::error("OptionsScreenVideo", "Cannot find resolution %s", searching_for);
-    }
-
-
     // --- set gfx settings values
     updateGfxSlider();
     updateBlurSlider();
     updateScaleRTTsSlider();
 
-    // ---- forbid changing resolution or animation settings from in-game
+    // ---- forbid changing graphic settings from in-game
     // (we need to disable them last because some items can't be edited when
     // disabled)
     bool in_game = StateManager::get()->getGameState() == GUIEngine::INGAME_MENU;
 
-    res->setActive(!in_game || is_vulkan_fullscreen_desktop);
-    full->setActive(!in_game || is_vulkan_fullscreen_desktop);
-    applyBtn->setActive(!in_game);
 #ifndef SERVER_ONLY
     gfx->setActive(!in_game && CVS->isGLSL());
     getWidget<ButtonWidget>("custom")->setActive(!in_game || !CVS->isGLSL());
@@ -495,59 +309,22 @@ void OptionsScreenVideo::init()
         getWidget<SpinnerWidget>("scale_rtts")->setActive(!in_game ||
             GE::getDriver()->getDriverType() == video::EDT_VULKAN);
     }
+    getWidget<ButtonWidget>("benchmarkCurrent")->setActive(!in_game);
 #endif
 
-#if defined(MOBILE_STK) || defined(__SWITCH__)
-    applyBtn->setVisible(false);
-    full->setVisible(false);
-    getWidget<LabelWidget>("fullscreenText")->setVisible(false);
-    rememberWinpos->setVisible(false);
-    getWidget<LabelWidget>("rememberWinposText")->setVisible(false);
-#endif
-
-    updateResolutionsList();
-
-    if (m_fullscreen_checkbox_focus)
-    {
-        m_fullscreen_checkbox_focus = false;
-        getWidget("fullscreen")->setFocusForPlayer(PLAYER_ID_GAME_MASTER);
-    }
+    // If a benchmark was requested and the game had to reload
+    // the graphics engine, start the benchmark when the
+    // video settings screen is loaded back afterwards.
+    if (RaceManager::get()->isBenchmarkScheduled())
+        profiler.startBenchmark();
 }   // init
 
 // --------------------------------------------------------------------------------------------
 
-void OptionsScreenVideo::updateResolutionsList()
+void OptionsScreenVideo::onResize()
 {
-    CheckBoxWidget* full = getWidget<CheckBoxWidget>("fullscreen");
-    assert(full != NULL);
-    bool fullscreen_selected = full->getState();
-    
-    for (auto resolution : m_resolutions)
-    {
-        DynamicRibbonWidget* drw = getWidget<DynamicRibbonWidget>("resolutions");
-        assert(drw != NULL);
-        assert(drw->m_rows.size() == 1);
-        
-        char name[128];
-        sprintf(name, "%ix%i", resolution.width, resolution.height);
-        
-        Widget* w = drw->m_rows[0].findWidgetNamed(name);
-        
-        if (w != NULL)
-        {
-            bool active = !fullscreen_selected || resolution.fullscreen;
-            w->setActive(active);
-        }
-    }
-}
-
-// --------------------------------------------------------------------------------------------
-
-void OptionsScreenVideo::onScrollResolutionsList(void* data)
-{
-    OptionsScreenVideo* screen = (OptionsScreenVideo*)data;
-    screen->updateResolutionsList();
-}
+    Screen::onResize();
+}   // onResize
 
 // --------------------------------------------------------------------------------------------
 
@@ -570,7 +347,10 @@ void OptionsScreenVideo::updateGfxSlider()
             m_presets[l].shadows == UserConfigParams::m_shadows_resolution &&
             m_presets[l].ssao == UserConfigParams::m_ssao &&
             m_presets[l].light_scatter == UserConfigParams::m_light_scatter &&
-            m_presets[l].degraded_ibl == UserConfigParams::m_degraded_IBL)
+            m_presets[l].degraded_ibl == UserConfigParams::m_degraded_IBL &&
+            m_presets[l].geometry_detail == (UserConfigParams::m_geometry_level == 0 ? 2 :
+                                             UserConfigParams::m_geometry_level == 2 ? 0 :
+                                             UserConfigParams::m_geometry_level))
         {
             gfx->setValue(l + 1);
             found = true;
@@ -670,14 +450,17 @@ void OptionsScreenVideo::updateTooltip()
     const core::stringw important_only = _("Important only");
 
     //I18N: in the graphical options tooltip;
-    // indicates the rendered image quality is very low
     const core::stringw very_low = _("Very Low");
     //I18N: in the graphical options tooltip;
-    // indicates the rendered image quality is low
     const core::stringw low = _("Low");
     //I18N: in the graphical options tooltip;
-    // indicates the rendered image quality is high
+    const core::stringw medium = _("Medium");
+    //I18N: in the graphical options tooltip;
     const core::stringw high = _("High");
+    //I18N: in the graphical options tooltip;
+    const core::stringw very_high = _("Very High");
+    //I18N: in the graphical options tooltip;
+    const core::stringw ultra = _("Ultra");
 
     //I18N: in graphical options
     tooltip = _("Particles Effects: %s",
@@ -721,7 +504,20 @@ void OptionsScreenVideo::updateTooltip()
     //I18N: in graphical options
     int quality = getImageQuality();
     tooltip = tooltip + L"\n" + _("Rendered image quality: %s",
-        quality == 0 ? very_low : quality == 1 ? low : high);
+        quality == 0 ? very_low :
+        quality == 1 ? low      :
+        quality == 2 ? medium   : high);
+
+    //I18N: in graphical options
+    int geometry_detail = (UserConfigParams::m_geometry_level == 0 ? 2 :
+                           UserConfigParams::m_geometry_level == 2 ? 0 :
+                           UserConfigParams::m_geometry_level);
+    tooltip = tooltip + L"\n" + _("Geometry detail: %s",
+        geometry_detail == 0 ? very_low  :
+        geometry_detail == 1 ? low       :
+        geometry_detail == 2 ? medium    :
+        geometry_detail == 3 ? high      :
+        geometry_detail == 4 ? very_high : ultra);
 
     gfx->setTooltip(tooltip);
 }   // updateTooltip
@@ -751,7 +547,6 @@ void OptionsScreenVideo::updateBlurTooltip()
 
 // --------------------------------------------------------------------------------------------
 extern "C" void update_swap_interval(int swap_interval);
-extern "C" void update_fullscreen_desktop(int val);
 extern "C" void reset_network_body();
 
 void OptionsScreenVideo::eventCallback(Widget* widget, const std::string& name,
@@ -761,23 +556,8 @@ void OptionsScreenVideo::eventCallback(Widget* widget, const std::string& name,
     {
         std::string selection = ((RibbonWidget*)widget)->getSelectionIDString(PLAYER_ID_GAME_MASTER);
 
-        Screen *screen = NULL;
-        if (selection == "tab_audio")
-            screen = OptionsScreenAudio::getInstance();
-        //else if (selection == "tab_video")
-        //    screen = OptionsScreenVideo::getInstance();
-        else if (selection == "tab_players")
-            screen = TabbedUserScreen::getInstance();
-        else if (selection == "tab_controls")
-            screen = OptionsScreenInput::getInstance();
-        else if (selection == "tab_ui")
-            screen = OptionsScreenUI::getInstance();
-        else if (selection == "tab_general")
-            screen = OptionsScreenGeneral::getInstance();
-        else if (selection == "tab_language")
-            screen = OptionsScreenLanguage::getInstance();
-        if(screen)
-            StateManager::get()->replaceTopMostScreen(screen);
+        if (selection != "tab_video")
+            OptionsCommon::switchTab(selection);
     }
     else if(name == "back")
     {
@@ -786,36 +566,6 @@ void OptionsScreenVideo::eventCallback(Widget* widget, const std::string& name,
     else if(name == "custom")
     {
         new CustomVideoSettingsDialog(0.8f, 0.9f);
-    }
-    else if(name == "apply_resolution")
-    {
-        using namespace GUIEngine;
-
-        DynamicRibbonWidget* w1=getWidget<DynamicRibbonWidget>("resolutions");
-        assert(w1 != NULL);
-        assert(w1->m_rows.size() == 1);
-        
-        int index = w1->m_rows[0].getSelection(PLAYER_ID_GAME_MASTER);
-        Widget* selected_widget = &w1->m_rows[0].getChildren()[index];
-        
-        if (!selected_widget->isActivated())
-            return;
-
-        const std::string& res =
-            w1->getSelectionIDString(PLAYER_ID_GAME_MASTER);
-
-        int w = -1, h = -1;
-        if (sscanf(res.c_str(), "%ix%i", &w, &h) != 2 || w == -1 || h == -1)
-        {
-            Log::error("OptionsScreenVideo", "Failed to decode resolution %s", res.c_str());
-            return;
-        }
-
-        CheckBoxWidget* w2 = getWidget<CheckBoxWidget>("fullscreen");
-        assert(w2 != NULL);
-
-
-        irr_driver->changeResolution(w, h, w2->getState());
     }
     else if (name == "gfx_level")
     {
@@ -837,15 +587,18 @@ void OptionsScreenVideo::eventCallback(Widget* widget, const std::string& name,
         UserConfigParams::m_animated_characters = m_presets[level].animatedCharacters;
         UserConfigParams::m_particles_effects = m_presets[level].particles;
         setImageQuality(m_presets[level].image_quality);
-        UserConfigParams::m_bloom = m_presets[level].bloom;
-        UserConfigParams::m_glow = m_presets[level].glow;
-        UserConfigParams::m_dynamic_lights = m_presets[level].lights;
-        UserConfigParams::m_light_shaft = m_presets[level].lightshaft;
-        UserConfigParams::m_mlaa = m_presets[level].mlaa;
+        UserConfigParams::m_bloom              = m_presets[level].bloom;
+        UserConfigParams::m_glow               = m_presets[level].glow;
+        UserConfigParams::m_dynamic_lights     = m_presets[level].lights;
+        UserConfigParams::m_light_shaft        = m_presets[level].lightshaft;
+        UserConfigParams::m_mlaa               = m_presets[level].mlaa;
         UserConfigParams::m_shadows_resolution = m_presets[level].shadows;
-        UserConfigParams::m_ssao = m_presets[level].ssao;
-        UserConfigParams::m_light_scatter = m_presets[level].light_scatter;
-        UserConfigParams::m_degraded_IBL = m_presets[level].degraded_ibl;
+        UserConfigParams::m_ssao               = m_presets[level].ssao;
+        UserConfigParams::m_light_scatter      = m_presets[level].light_scatter;
+        UserConfigParams::m_degraded_IBL       = m_presets[level].degraded_ibl;
+        UserConfigParams::m_geometry_level     = (m_presets[level].geometry_detail == 0 ? 2 :
+                                                  m_presets[level].geometry_detail == 2 ? 0 :
+                                                  m_presets[level].geometry_detail);
 
         updateGfxSlider();
     }
@@ -865,7 +618,7 @@ void OptionsScreenVideo::eventCallback(Widget* widget, const std::string& name,
 
         updateBlurSlider();
     }
-    else if (name == "vsync")
+    else if (name == "vsync") // Also handles the FPS limiter
     {
         GUIEngine::SpinnerWidget* vsync = getWidget<GUIEngine::SpinnerWidget>("vsync");
         assert( vsync != NULL );
@@ -887,7 +640,7 @@ void OptionsScreenVideo::eventCallback(Widget* widget, const std::string& name,
 #if !defined(SERVER_ONLY) && defined(_IRR_COMPILE_WITH_SDL_DEVICE_)
         update_swap_interval(UserConfigParams::m_swap_interval);
 #endif
-    }
+    } // vSync
     else if (name == "scale_rtts")
     {
         GUIEngine::SpinnerWidget* scale_rtts_level =
@@ -907,102 +660,63 @@ void OptionsScreenVideo::eventCallback(Widget* widget, const std::string& name,
         }
 #endif
         updateScaleRTTsSlider();
-    }
+    } // scale_rtts
     else if (name == "benchmarkCurrent")
     {
-        // TODO - Add the possibility to benchmark more tracks and define replay benchmarks in
-        //        a config file
-        const std::string bf_bench("benchmark_black_forest.replay");
-        const bool result = ReplayPlay::get()->addReplayFile(file_manager
-            ->getAsset(FileManager::REPLAY, bf_bench), true/*custom_replay*/);
-
-        if (!result)
-            Log::fatal("OptionsScreenVideo", "Can't open replay for benchmark!");
-        RaceManager::get()->setRaceGhostKarts(true);
-
-        RaceManager::get()->setMinorMode(RaceManager::MINOR_MODE_TIME_TRIAL);
-        ReplayPlay::ReplayData bench_rd = ReplayPlay::get()->getCurrentReplayData();
-        RaceManager::get()->setReverseTrack(bench_rd.m_reverse);
-        RaceManager::get()->setRecordRace(false);
-        RaceManager::get()->setWatchingReplay(true);
-        RaceManager::get()->setDifficulty((RaceManager::Difficulty)bench_rd.m_difficulty);
-
-        // The race manager automatically adds karts for the ghosts
-        RaceManager::get()->setNumKarts(0);
-        RaceManager::get()->setBenchmarking(true);
-        RaceManager::get()->startWatchingReplay(bench_rd.m_track_name, bench_rd.m_laps);
-    }
-    // TODO - Add a standard benchmark testing multiple presets
-    /*else if (name == "benchmarkStandard")
-    {
-        // DO NOTHING FOR NOW
-    }*/
-    else if (name == "rememberWinpos")
-    {
-        CheckBoxWidget* rememberWinpos = getWidget<CheckBoxWidget>("rememberWinpos");
-        UserConfigParams::m_remember_window_location = rememberWinpos->getState();
-    }
-    else if (name == "fullscreen")
-    {
-        CheckBoxWidget* fullscreen = getWidget<CheckBoxWidget>("fullscreen");
-        CheckBoxWidget* rememberWinpos = getWidget<CheckBoxWidget>("rememberWinpos");
-
-        rememberWinpos->setActive(!fullscreen->getState());
 #ifndef SERVER_ONLY
-        GE::GEVulkanDriver* gevk = GE::getVKDriver();
-        if (gevk && GE::getGEConfig()->m_fullscreen_desktop)
-        {
-            UserConfigParams::m_fullscreen = fullscreen->getState();
-            update_fullscreen_desktop(UserConfigParams::m_fullscreen);
-            if (StateManager::get()->getGameState() == GUIEngine::INGAME_MENU)
-            {
-                StateManager::get()->popMenu();
-                std::function<Screen*()> screen_function =
-                    getNewScreenPointer();
-                int new_width = 0;
-                int new_height = 0;
-                SDL_GetWindowSize(gevk->getSDLWindow(), &new_width,
-                    &new_height);
-                static_cast<CIrrDeviceSDL*>(gevk->getIrrlichtDevice())
-                    ->handleNewSize(new_width, new_height);
-                irr_driver->handleWindowResize();
-                Screen* new_screen = screen_function();
-                OptionsScreenVideo::m_fullscreen_checkbox_focus = true;
-                new_screen->push();
-            }
-            else
-                OptionsScreenVideo::m_fullscreen_checkbox_focus = true;
-        }
+        // To avoid crashes and ensure the proper settings are used during the benchmark,
+        // we apply the settings. If this doesn't require restarting the screen, we start
+        // the benchmark immediately, otherwise we schedule it to start after the restart.
+        if (applySettings() == 0)
+            profiler.startBenchmark();
         else
-            updateResolutionsList();
+            RaceManager::get()->scheduleBenchmark();
 #endif
-    }
+    } // benchmarkCurrent
+    else if (name == "benchmarkRecommend")
+    {
+        new RecommendVideoSettingsDialog(0.8f, 0.9f);
+    } // benchmarkRecommend
 }   // eventCallback
 
 // --------------------------------------------------------------------------------------------
 
 void OptionsScreenVideo::tearDown()
 {
-    if (getWidget("fullscreen")->isVisible() &&
-        getWidget("fullscreen")->isFocusedForPlayer(PLAYER_ID_GAME_MASTER))
-        OptionsScreenVideo::m_fullscreen_checkbox_focus = true;
-
-    GUIEngine::getDevice()->setResizable(false);
 #ifndef SERVER_ONLY
-    if (m_prev_adv_pipline != UserConfigParams::m_dynamic_lights &&
-        CVS->isGLSL())
-    {
-        irr_driver->sameRestart();
-    }
-    else if (m_prev_img_quality != getImageQuality())
-    {
-        irr_driver->setMaxTextureSize();
-    }
+    applySettings();
     Screen::tearDown();
     // save changes when leaving screen
     user_config->saveConfig();
 #endif
 }   // tearDown
+
+// --------------------------------------------------------------------------------------------
+/* Returns 1 or 2 if a restart will be done, 0 otherwise */
+int OptionsScreenVideo::applySettings()
+{
+    int restart = 0;
+#ifndef SERVER_ONLY
+    if (m_prev_adv_pipline != UserConfigParams::m_dynamic_lights && CVS->isGLSL())
+        restart = 1;
+
+    if (m_prev_img_quality != getImageQuality())
+    {
+        irr_driver->setMaxTextureSize();
+        // A full restart is needed to properly apply anisotropic filtering if it was changed
+        // We assume that all ImageQuality settings >= 1 use the same x16 setting.
+        if ((m_prev_img_quality == 0 && getImageQuality() != 0) ||
+            (m_prev_img_quality != 0 && getImageQuality() == 0))
+            restart = 2;
+    }
+
+    if (restart == 1)
+        irr_driver->sameRestart();
+    else if (restart == 2)
+        irr_driver->fullRestart();
+#endif
+    return restart;
+}   // applySettings
 
 // --------------------------------------------------------------------------------------------
 

@@ -27,7 +27,7 @@
 #include "config/user_config.hpp"
 #include "font/bold_face.hpp"
 #include "font/font_manager.hpp"
-#include "graphics/camera.hpp"
+#include "graphics/camera/camera.hpp"
 #include "graphics/central_settings.hpp"
 #include "graphics/explosion.hpp"
 #include "graphics/irr_driver.hpp"
@@ -2284,7 +2284,8 @@ void Kart::handleMaterialSFX()
 
     bool m_schedule_pause = m_flying ||
                         dynamic_cast<RescueAnimation*>(getKartAnimation()) ||
-                        dynamic_cast<ExplosionAnimation*>(getKartAnimation());
+                        dynamic_cast<ExplosionAnimation*>(getKartAnimation()) ||
+                        World::getWorld()->getPhase() == World::IN_GAME_MENU_PHASE;
 
     // terrain sound is not necessarily a looping sound so check its status before
     // setting its speed, to avoid 'ressuscitating' sounds that had already stopped

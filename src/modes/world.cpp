@@ -24,7 +24,7 @@
 #include "config/player_manager.hpp"
 #include "challenges/unlock_manager.hpp"
 #include "config/user_config.hpp"
-#include "graphics/camera.hpp"
+#include "graphics/camera/camera.hpp"
 #include "graphics/central_settings.hpp"
 #include "graphics/irr_driver.hpp"
 #include "graphics/material.hpp"
@@ -129,8 +129,6 @@ World* World::m_world[PT_COUNT];
  */
 World::World() : WorldStatus()
 {
-    if (m_process_type == PT_MAIN)
-        GUIEngine::getDevice()->setResizable(true);
     RewindManager::setEnable(NetworkConfig::get()->isNetworking());
 #ifdef DEBUG
     m_magic_number = 0xB01D6543;
@@ -617,7 +615,6 @@ World::~World()
 {
     if (m_process_type == PT_MAIN)
     {
-        GUIEngine::getDevice()->setResizable(false);
         material_manager->unloadAllTextures();
     }
 
@@ -955,19 +952,27 @@ void World::moveKartTo(Kart* kart, const btTransform &transform)
 // ----------------------------------------------------------------------------
 void World::updateTimeTargetSound()
 {
-    if (RaceManager::get()->hasTimeTarget() && !RewindManager::get()->isRewinding())
+    if (RewindManager::get()->isRewinding())
+        return;
+
+    float time_left = getTime();;
+    if (RaceManager::get()->hasTimeTarget())
     {
-        float time_left = getTime();
         float time_target = RaceManager::get()->getTimeTarget();
         // In linear mode, the internal time still counts up even when displayed down.
         if (RaceManager::get()->isLinearRaceMode())
             time_left = time_target - time_left;
+    }
+    else if (!RaceManager::get()->isFollowMode())
+    {
+        return; // No Time Target and no FTL
+    }
 
-        if (time_left <= 5 && getTimeTicks() % stk_config->time2Ticks(1.0f) == 0 &&
-                !World::getWorld()->isRaceOver() && time_left > 0)
-        {
-                SFXManager::get()->quickSound("pre_start_race");
-        }
+    if (time_left <= (RaceManager::get()->isFollowMode() ? 3 : 5) &&
+            getTimeTicks() % stk_config->time2Ticks(1.0f) == 0 &&
+            !World::getWorld()->isRaceOver() && time_left > 0)
+    {
+        SFXManager::get()->quickSound("pre_start_race");
     }
 }  // updateTimeTargetSound
 

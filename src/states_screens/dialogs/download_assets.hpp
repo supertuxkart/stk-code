@@ -20,11 +20,11 @@
 
 #ifdef MOBILE_STK
 
-#include "guiengine/widgets.hpp"
 #include "guiengine/modaldialog.hpp"
 #include "utils/cpp2011.hpp"
 
 class DownloadAssetsRequest;
+namespace GUIEngine { class IconButtonWidget; class ProgressBarWidget; }
 
 /**
   * \ingroup states_screens

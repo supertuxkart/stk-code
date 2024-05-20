@@ -64,7 +64,7 @@ public:
     virtual void       setMasterVolume(float gain) OVERRIDE {}
     virtual void       reallySetMasterVolumeNow(float gain) OVERRIDE {}
     virtual SFXStatus  getStatus() OVERRIDE { return SFX_STOPPED; }
-    virtual void       onSoundEnabledBack() OVERRIDE {}
+    virtual void       onSoundEnabledBack(bool resume_later) OVERRIDE {}
     virtual void       setRolloff(float rolloff) OVERRIDE {}
     virtual SFXBuffer* getBuffer() const OVERRIDE { return NULL; }
 

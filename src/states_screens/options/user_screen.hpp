@@ -152,7 +152,7 @@ class TabbedUserScreen : public BaseUserScreen,
                          public GUIEngine::ScreenSingleton<TabbedUserScreen>
 {
 private:
-    TabbedUserScreen() : BaseUserScreen("user_screen_tab.stkgui")
+    TabbedUserScreen() : BaseUserScreen("options/user_screen_tab.stkgui")
     {}
 
 public:

@@ -20,15 +20,15 @@
 
 #include "addons/addons_manager.hpp"
 #include "guiengine/screen.hpp"
-#include "guiengine/widgets/label_widget.hpp"
+#include "guiengine/widgets/list_widget.hpp"
 #include "guiengine/widgets/text_box_widget.hpp"
-#include "states_screens/dialogs/addons_loading.hpp"
 
 /* used for the installed/unsinstalled icons*/
 namespace irr { namespace gui { class STKModifiedSpriteBank; } }
 
-namespace GUIEngine { class Widget; }
+namespace GUIEngine { class LabelWidget; class Widget; }
 
+class AddonsLoading;
 struct DateFilter {
     core::stringw label;
     int year;
@@ -61,8 +61,6 @@ private:
 
     irr::gui::STKModifiedSpriteBank
                     *m_icon_bank;
-    GUIEngine::LabelWidget
-                    *m_update_status;
 
     /** Currently selected type. */
     std::string      m_type;
@@ -70,8 +68,6 @@ private:
     /** The currently selected index, used to re-select this item after
      *  addons_loading is being displayed. */
     int              m_selected_index;
-
-    float            m_icon_height;
 
     bool             m_reloading;
 

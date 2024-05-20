@@ -40,17 +40,16 @@ CGUISTKListBox::CGUISTKListBox(IGUIEnvironment* environment, IGUIElement* parent
     #endif
 
     IGUISkin* skin = Environment->getSkin();
-    const s32 s = skin->getSize(EGDS_SCROLLBAR_SIZE);
 
-    ScrollBar = Environment->addScrollBar(false,
-                            core::rect<s32>(RelativeRect.getWidth() - s, 0,
-                                            RelativeRect.getWidth(), RelativeRect.getHeight()), this, -1);
+    ScrollBar = Environment->addScrollBar(false, core::recti(0, 0, 1, 1), this, -1);
     ScrollBar->grab();
     ScrollBar->setSubElement(true);
     ScrollBar->setTabStop(false);
     ScrollBar->setAlignment(EGUIA_LOWERRIGHT, EGUIA_LOWERRIGHT, EGUIA_UPPERLEFT, EGUIA_LOWERRIGHT);
     ScrollBar->setVisible(false);
     ScrollBar->setPos(0);
+
+    updateScrollBarSize(skin->getSize(EGDS_SCROLLBAR_SIZE));
 
     setNotClipped(!clip);
 
@@ -162,6 +161,13 @@ void CGUISTKListBox::clear()
 }
 
 
+void CGUISTKListBox::updateDefaultItemHeight()
+{
+    if (ItemHeightOverride == 0)
+        ItemHeight = Font->getHeightPerLine() + 4;
+}
+
+
 void CGUISTKListBox::recalculateItemHeight()
 {
     IGUISkin* skin = Environment->getSkin();
@@ -177,9 +183,7 @@ void CGUISTKListBox::recalculateItemHeight()
 
         if (Font)
         {
-            if ( 0 == ItemHeightOverride )
-                ItemHeight = Font->getHeightPerLine() + 4;
-
+            updateDefaultItemHeight();
             Font->grab();
         }
     }
@@ -463,8 +467,19 @@ void CGUISTKListBox::selectNew(s32 ypos, bool onlyHover)
 void CGUISTKListBox::updateAbsolutePosition()
 {
     IGUIElement::updateAbsolutePosition();
+    for (int i = 0; i < Items.size(); i++)
+    {
+        for (int j = 0; j < Items[i].m_contents.size(); j++)
+        {
+            Items[i].m_contents[j].m_glyph_layouts.clear();
+        }
+    }
 
-    recalculateItemHeight();
+    if (Font)
+        updateDefaultItemHeight();
+    ItemsIconWidth = 0;
+    if (!Items.empty())
+        recalculateIconWidth();
 }
 
 
@@ -478,6 +493,7 @@ void CGUISTKListBox::draw()
     recalculateItemHeight(); // if the font changed
 
     IGUISkin* skin = Environment->getSkin();
+    updateScrollBarSize(skin->getSize(EGDS_SCROLLBAR_SIZE));
 
     core::rect<s32>* clipRect = 0;
 
@@ -489,7 +505,7 @@ void CGUISTKListBox::draw()
     core::rect<s32> clientClip(AbsoluteRect);
     clientClip.UpperLeftCorner.Y += 1;
     if (ScrollBar->isVisible())
-        clientClip.LowerRightCorner.X = AbsoluteRect.LowerRightCorner.X - skin->getSize(EGDS_SCROLLBAR_SIZE);
+        clientClip.LowerRightCorner.X -= ScrollBar->getRelativePosition().getWidth();
     clientClip.LowerRightCorner.Y -= 1;
     clientClip.clipAgainst(AbsoluteClippingRect);
 
@@ -501,7 +517,7 @@ void CGUISTKListBox::draw()
 
     frameRect = AbsoluteRect;
     if (ScrollBar->isVisible())
-        frameRect.LowerRightCorner.X = AbsoluteRect.LowerRightCorner.X - skin->getSize(EGDS_SCROLLBAR_SIZE);
+        frameRect.LowerRightCorner.X -= ScrollBar->getRelativePosition().getWidth();
 
     frameRect.LowerRightCorner.Y = AbsoluteRect.UpperLeftCorner.Y + ItemHeight;
 
@@ -814,6 +830,16 @@ void CGUISTKListBox::setItemHeight( s32 height )
 void CGUISTKListBox::setDrawBackground(bool draw)
 {
     DrawBack = draw;
+}
+
+
+void CGUISTKListBox::updateScrollBarSize(s32 size)
+{
+    if (size != ScrollBar->getRelativePosition().getWidth())
+    {
+        core::recti r(RelativeRect.getWidth() - size, 0, RelativeRect.getWidth(), RelativeRect.getHeight());
+        ScrollBar->setRelativePosition(r);
+    }
 }
 
 

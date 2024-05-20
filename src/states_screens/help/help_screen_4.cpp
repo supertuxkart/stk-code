@@ -1,5 +1,5 @@
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2016 C. Michael Murphey
+//  Copyright (C) 2009-2015 Marianne Gagnon
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -15,58 +15,34 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-#include "states_screens/help_screen_6.hpp"
-
-#include "guiengine/widget.hpp"
-#include "guiengine/widgets/ribbon_widget.hpp"
-#include "states_screens/help_screen_1.hpp"
-#include "states_screens/help_screen_2.hpp"
-#include "states_screens/help_screen_3.hpp"
-#include "states_screens/help_screen_4.hpp"
-#include "states_screens/help_screen_5.hpp"
-#include "states_screens/help_screen_7.hpp"
-#include "states_screens/state_manager.hpp"
+// Manages includes common to all help screens
+#include "states_screens/help/help_common.hpp"
 
 using namespace GUIEngine;
 
 // -----------------------------------------------------------------------------
 
-HelpScreen6::HelpScreen6() : Screen("help6.stkgui")
+HelpScreen4::HelpScreen4() : Screen("help/help4.stkgui")
 {
-}   // HelpScreen6
+}   // HelpScreen4
 
 // -----------------------------------------------------------------------------
 
-void HelpScreen6::loadedFromFile()
+void HelpScreen4::loadedFromFile()
 {
 }   // loadedFromFile
 
 // -----------------------------------------------------------------------------
 
-void HelpScreen6::eventCallback(Widget* widget, const std::string& name, const int playerID)
+void HelpScreen4::eventCallback(Widget* widget, const std::string& name, const int playerID)
 {
     if (name == "category")
     {
         
         std::string selection = ((RibbonWidget*)widget)->getSelectionIDString(PLAYER_ID_GAME_MASTER);
 
-        Screen *screen = NULL;
-        if (selection == "page1")
-            screen = HelpScreen1::getInstance();
-        else if (selection == "page2")
-            screen = HelpScreen2::getInstance();
-        else if (selection == "page3")
-            screen = HelpScreen3::getInstance();
-        else if (selection == "page4")
-            screen = HelpScreen4::getInstance();
-        else if (selection == "page5")
-            screen = HelpScreen5::getInstance();
-        //else if (selection == "page6")
-        //    screen = HelpScreen6::getInstance();
-        else if (selection == "page7")
-            screen = HelpScreen7::getInstance();
-        if(screen)
-            StateManager::get()->replaceTopMostScreen(screen);
+        if (selection != "page4")
+            HelpCommon::switchTab(selection);
     }
     else if (name == "back")
     {
@@ -76,7 +52,7 @@ void HelpScreen6::eventCallback(Widget* widget, const std::string& name, const i
 
 // -----------------------------------------------------------------------------
 
-void HelpScreen6::init()
+void HelpScreen4::init()
 {
     Screen::init();
     RibbonWidget* w = this->getWidget<RibbonWidget>("category");
@@ -84,7 +60,7 @@ void HelpScreen6::init()
     if (w != NULL)
     {
         w->setFocusForPlayer(PLAYER_ID_GAME_MASTER);
-        w->select( "page6", PLAYER_ID_GAME_MASTER );
+        w->select( "page4", PLAYER_ID_GAME_MASTER );
     }
 }   // init
 

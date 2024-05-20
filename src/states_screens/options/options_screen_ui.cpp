@@ -15,52 +15,20 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-#include "states_screens/options/options_screen_ui.hpp"
+// Manages includes common to all options screens
+#include "states_screens/options/options_common.hpp"
 
-#include "addons/news_manager.hpp"
-#include "audio/sfx_manager.hpp"
-#include "audio/sfx_base.hpp"
-#include "graphics/camera.hpp"
-#include "graphics/camera_normal.hpp"
+#include "graphics/camera/camera.hpp"
+#include "graphics/camera/camera_normal.hpp"
 #include "challenges/story_mode_timer.hpp"
-#include "config/hardware_stats.hpp"
 #include "config/player_manager.hpp"
-#include "config/user_config.hpp"
-#include "config/stk_config.hpp"
-#include "font/bold_face.hpp"
 #include "font/font_manager.hpp"
-#include "font/regular_face.hpp"
 #include "graphics/irr_driver.hpp"
-#include "guiengine/scalable_font.hpp"
-#include "guiengine/screen.hpp"
-#include "guiengine/widgets/button_widget.hpp"
-#include "guiengine/widgets/check_box_widget.hpp"
-#include "guiengine/widgets/dynamic_ribbon_widget.hpp"
-#include "guiengine/widgets/label_widget.hpp"
-#include "guiengine/widgets/list_widget.hpp"
-#include "guiengine/widgets/spinner_widget.hpp"
-#include "guiengine/widget.hpp"
-#include "io/file_manager.hpp"
 #include "items/powerup_manager.hpp"
 #include "modes/world.hpp"
-#include "online/request_manager.hpp"
+#include "states_screens/dialogs/custom_camera_settings.hpp"
 #include "states_screens/dialogs/message_dialog.hpp"
 #include "states_screens/main_menu_screen.hpp"
-#include "states_screens/dialogs/custom_camera_settings.hpp"
-#include "states_screens/options/options_screen_audio.hpp"
-#include "states_screens/options/options_screen_general.hpp"
-#include "states_screens/options/options_screen_input.hpp"
-#include "states_screens/options/options_screen_language.hpp"
-#include "states_screens/options/options_screen_video.hpp"
-#include "states_screens/state_manager.hpp"
-#include "states_screens/options/user_screen.hpp"
-#include "utils/log.hpp"
-#include "utils/string_utils.hpp"
-#include "utils/translation.hpp"
-
-#include <algorithm>
-#include <iostream>
-#include <sstream>
 
 #include <IrrlichtDevice.h>
 
@@ -69,7 +37,7 @@ using namespace Online;
 
 // -----------------------------------------------------------------------------
 
-OptionsScreenUI::OptionsScreenUI() : Screen("options_ui.stkgui")
+OptionsScreenUI::OptionsScreenUI() : Screen("options/options_ui.stkgui")
 {
     m_inited = false;
 }   // OptionsScreenVideo
@@ -110,17 +78,6 @@ void OptionsScreenUI::loadedFromFile()
         minimap_options->m_properties[GUIEngine::PROP_MIN_VALUE] = "1";
     }
     minimap_options->m_properties[GUIEngine::PROP_MAX_VALUE] = "3";
-
-    // Setup splitscreen spinner
-    GUIEngine::SpinnerWidget* splitscreen_method = getWidget<GUIEngine::SpinnerWidget>("splitscreen_method");
-    splitscreen_method->m_properties[PROP_WRAP_AROUND] = "true";
-    splitscreen_method->clearLabels();
-    //I18N: In the UI options, splitscreen_method in the race UI
-    splitscreen_method->addLabel( core::stringw(_("Vertical")));
-    //I18N: In the UI options, splitscreen_method position in the race UI
-    splitscreen_method->addLabel( core::stringw(_("Horizontal")));
-    splitscreen_method->m_properties[GUIEngine::PROP_MIN_VALUE] = "0";
-    splitscreen_method->m_properties[GUIEngine::PROP_MAX_VALUE] = "1";
 
     // Setup fontsize spinner
     GUIEngine::SpinnerWidget* font_size = getWidget<GUIEngine::SpinnerWidget>("font_size");
@@ -277,13 +234,6 @@ void OptionsScreenUI::init()
     UserConfigParams::m_font_size = font_size->getValue();
     font_size->setActive(!in_game);
 
-    // ---- video modes
-    GUIEngine::SpinnerWidget* splitscreen_method = getWidget<GUIEngine::SpinnerWidget>("splitscreen_method");
-    assert( splitscreen_method != NULL );
-    if (UserConfigParams::split_screen_horizontally) splitscreen_method->setValue(1);
-    else splitscreen_method->setValue(0);
-    splitscreen_method->setActive(!in_game);
-
     CheckBoxWidget* karts_powerup_gui = getWidget<CheckBoxWidget>("karts_powerup_gui");
     assert(karts_powerup_gui != NULL);
     karts_powerup_gui->setState(UserConfigParams::m_karts_powerup_gui);
@@ -391,23 +341,8 @@ void OptionsScreenUI::eventCallback(Widget* widget, const std::string& name, con
     {
         std::string selection = ((RibbonWidget*)widget)->getSelectionIDString(PLAYER_ID_GAME_MASTER);
 
-        Screen *screen = NULL;
-        if (selection == "tab_audio")
-            screen = OptionsScreenAudio::getInstance();
-        else if (selection == "tab_video")
-            screen = OptionsScreenVideo::getInstance();
-        else if (selection == "tab_players")
-            screen = TabbedUserScreen::getInstance();
-        else if (selection == "tab_controls")
-            screen = OptionsScreenInput::getInstance();
-        //else if (selection == "tab_ui")
-        //    screen = OptionsScreenUI::getInstance();
-        else if (selection == "tab_general")
-            screen = OptionsScreenGeneral::getInstance();
-        else if (selection == "tab_language")
-            screen = OptionsScreenLanguage::getInstance();
-        if(screen)
-            StateManager::get()->replaceTopMostScreen(screen);
+        if (selection != "tab_ui")
+            OptionsCommon::switchTab(selection);
     }
     else if(name == "back")
     {
@@ -451,12 +386,6 @@ void OptionsScreenUI::eventCallback(Widget* widget, const std::string& name, con
         m_reload_option->m_reload_skin = false;
         m_reload_option->m_focus_name = "font_size";
         m_reload_option->m_focus_right = right;
-    }
-    else if (name == "splitscreen_method")
-    {
-        GUIEngine::SpinnerWidget* splitscreen_method = getWidget<GUIEngine::SpinnerWidget>("splitscreen_method");
-        assert( splitscreen_method != NULL );
-        UserConfigParams::split_screen_horizontally = (splitscreen_method->getValue() == 1);
     }
     else if (name == "karts_powerup_gui")
     {

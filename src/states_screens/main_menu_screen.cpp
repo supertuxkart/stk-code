@@ -27,6 +27,7 @@
 #include "graphics/irr_driver.hpp"
 #include "guiengine/dialog_queue.hpp"
 #include "guiengine/scalable_font.hpp"
+#include "guiengine/widgets/button_widget.hpp"
 #include "guiengine/widgets/label_widget.hpp"
 #include "guiengine/widgets/list_widget.hpp"
 #include "guiengine/widgets/ribbon_widget.hpp"
@@ -45,7 +46,7 @@
 #include "states_screens/credits.hpp"
 #include "states_screens/cutscene_general.hpp"
 #include "states_screens/grand_prix_editor_screen.hpp"
-#include "states_screens/help_screen_1.hpp"
+#include "states_screens/help/help_screen_1.hpp"
 #include "states_screens/high_score_selection.hpp"
 #include "states_screens/offline_kart_selection.hpp"
 #include "states_screens/online/online_profile_achievements.hpp"
@@ -77,7 +78,6 @@ using namespace Online;
 
 MainMenuScreen::MainMenuScreen() : Screen("main_menu.stkgui")
 {
-    m_resizable = true;
 }   // MainMenuScreen
 
 // ----------------------------------------------------------------------------
@@ -85,7 +85,7 @@ MainMenuScreen::MainMenuScreen() : Screen("main_menu.stkgui")
 void MainMenuScreen::loadedFromFile()
 {
     LabelWidget* w = getWidget<LabelWidget>("info_addons");
-    w->setScrollSpeed(GUIEngine::getFontHeight() / 2);
+    w->setScrollSpeed(0.5f);
     
     RibbonWidget* rw_top = getWidget<RibbonWidget>("menu_toprow");
     assert(rw_top != NULL);
@@ -124,7 +124,6 @@ void MainMenuScreen::beforeAddingWidget()
 //
 void MainMenuScreen::init()
 {
-    GUIEngine::getDevice()->setResizable(true);
     Screen::init();
 
     m_user_id = getWidget<ButtonWidget>("user-id");
@@ -611,7 +610,6 @@ void MainMenuScreen::eventCallback(Widget* widget, const std::string& name,
 
 void MainMenuScreen::tearDown()
 {
-    GUIEngine::getDevice()->setResizable(false);
 }   // tearDown
 
 // ----------------------------------------------------------------------------

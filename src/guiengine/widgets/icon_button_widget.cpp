@@ -116,69 +116,8 @@ void IconButtonWidget::add()
 
     }
 
-    // irrlicht widgets don't support scaling while keeping aspect ratio
-    // so, happily, let's implement it ourselves
-    float useAspectRatio = -1.0f;
-
-    if (m_properties[PROP_CUSTOM_RATIO] != "")
-    {
-        StringUtils::fromString(m_properties[PROP_CUSTOM_RATIO],
-                                m_custom_aspect_ratio);
-        m_scale_mode = SCALE_MODE_KEEP_CUSTOM_ASPECT_RATIO;
-    }
-
-    if (m_scale_mode == SCALE_MODE_KEEP_TEXTURE_ASPECT_RATIO ||
-        m_scale_mode == SCALE_MODE_LIST_WIDGET)
-    {
-        assert(m_texture->getOriginalSize().Height > 0);
-        useAspectRatio = (float)m_texture->getOriginalSize().Width / 
-                         (float)m_texture->getOriginalSize().Height;
-    }
-    else if (m_scale_mode == SCALE_MODE_KEEP_CUSTOM_ASPECT_RATIO)
-    {
-        useAspectRatio = m_custom_aspect_ratio;
-    }
-
-    int suggested_h = m_h;
-    int suggested_w = (int)((useAspectRatio < 0 ? m_w : useAspectRatio * suggested_h));
-
-    if (suggested_w > m_w)
-    {
-        const float needed_scale_factor = (float)m_w / (float)suggested_w;
-        suggested_w = (int)(suggested_w*needed_scale_factor);
-        suggested_h = (int)(suggested_h*needed_scale_factor);
-    }
-    
-    bool left_horizontal = m_properties[PROP_ICON_ALIGN] == "left";
-    bool right_horizontal = m_properties[PROP_ICON_ALIGN] == "right";
-    
-    // Assume left align if align property is not specified, but x property is specified
-    if (m_properties[PROP_X].size() > 0 && m_properties[PROP_ICON_ALIGN].empty())
-    {
-        left_horizontal = true;
-    }
-    
-    const int x_from = right_horizontal ? m_x + (m_w - suggested_w) :
-                       left_horizontal  ? m_x :
-                                          m_x + (m_w - suggested_w)/2;
-    const int y_from = m_y + (m_h - suggested_h)/2; // center vertically
-
-    rect<s32> widget_size = rect<s32>(x_from,
-                                      y_from,
-                                      x_from + suggested_w,
-                                      y_from + suggested_h);
-
-    if (m_scale_mode == SCALE_MODE_LIST_WIDGET)
-    {
-        m_list_header_icon_rect = widget_size;
-        m_list_header_icon_rect.UpperLeftCorner.X = m_list_header_icon_rect.UpperLeftCorner.X + 4;
-        m_list_header_icon_rect.UpperLeftCorner.Y = m_list_header_icon_rect.UpperLeftCorner.Y + 4;
-        m_list_header_icon_rect.LowerRightCorner.X = m_list_header_icon_rect.LowerRightCorner.X - 4;
-        m_list_header_icon_rect.LowerRightCorner.Y = m_list_header_icon_rect.LowerRightCorner.Y - 4;
-        widget_size = rect<s32>(m_x, m_y, m_x + m_w, m_y + m_h);
-    }
-
-    IGUIButton* btn = GUIEngine::getGUIEnv()->addButton(widget_size,
+    updateIconRect();
+    IGUIButton* btn = GUIEngine::getGUIEnv()->addButton(m_icon_rect,
                                                         m_parent,
                                                         (m_tab_stop ? getNewID() : getNewNoFocusID()),
                                                         L"");
@@ -194,55 +133,10 @@ void IconButtonWidget::add()
     const stringw& message = getText();
     if (message.size() > 0)
     {
-        const int label_extra_size =
-            ( m_properties[PROP_EXTEND_LABEL].size() == 0 ?
-               0 : atoi(m_properties[PROP_EXTEND_LABEL].c_str()) );
-
-        const bool word_wrap = (m_properties[PROP_WORD_WRAP] == "true");
-
-        if (m_properties[PROP_LABELS_LOCATION] == "hover")
-        {
-            core::dimension2du text_size = GUIEngine::getFont()->getDimension(message.c_str());
-            core::recti pos = btn->getAbsolutePosition();
-            int center_x = pos.UpperLeftCorner.X + pos.getWidth() / 2;
-            int x1 = center_x - text_size.Width / 2 - label_extra_size / 2;
-            int y1 = pos.UpperLeftCorner.Y - (word_wrap ? GUIEngine::getFontHeight() * 2 :
-                GUIEngine::getFontHeight()) - 15;
-            int x2 = center_x + text_size.Width / 2 + label_extra_size / 2;
-            int y2 = pos.UpperLeftCorner.Y - 15;
-
-            if (x1 < 0)
-            {
-                int diff = -x1;
-                x1 += diff;
-                x2 += diff;
-            }
-            else if (x2 > (int)irr_driver->getActualScreenSize().Width)
-            {
-                int diff = x2 - irr_driver->getActualScreenSize().Width;
-                x2 -= diff;
-                x1 -= diff;
-            }
-
-            core::recti parent_pos = m_parent->getAbsolutePosition();
-            x1 -= parent_pos.UpperLeftCorner.X;
-            x2 -= parent_pos.UpperLeftCorner.X;
-            y1 -= parent_pos.UpperLeftCorner.Y;
-            y2 -= parent_pos.UpperLeftCorner.Y;
-            widget_size = rect<s32>(x1, y1, x2, y2);
-        }
-        else
-        {
-            // leave enough room for two lines of text if word wrap is enabled, otherwise a single line
-            widget_size = rect<s32>(m_x - label_extra_size/2,
-                                    m_y + m_h,
-                                    m_x + m_w + label_extra_size/2,
-                                    m_y + m_h + (word_wrap ? GUIEngine::getFontHeight()*2 :
-                                                             GUIEngine::getFontHeight()));
-        }
-
-        m_label = GUIEngine::getGUIEnv()->addStaticText(message.c_str(), widget_size,
-                                                        false, word_wrap, m_parent);
+        updateLabelRect();
+        m_label = GUIEngine::getGUIEnv()->addStaticText(message.c_str(), m_label_rect,
+                                                        false, m_properties[PROP_WORD_WRAP] == "true",
+                                                        m_parent);
         m_label->setTextAlignment(EGUIA_CENTER, EGUIA_UPPERLEFT);
         m_label->setTabStop(false);
         m_label->setNotClipped(true);
@@ -460,3 +354,140 @@ void IconButtonWidget::setVisible(bool visible)
         m_label->setVisible(visible);
 }
 
+// -----------------------------------------------------------------------------
+void IconButtonWidget::updateIconRect()
+{
+    // irrlicht widgets don't support scaling while keeping aspect ratio
+    // so, happily, let's implement it ourselves
+    float useAspectRatio = -1.0f;
+
+    if (m_properties[PROP_CUSTOM_RATIO] != "")
+    {
+        StringUtils::fromString(m_properties[PROP_CUSTOM_RATIO],
+                                m_custom_aspect_ratio);
+        m_scale_mode = SCALE_MODE_KEEP_CUSTOM_ASPECT_RATIO;
+    }
+
+    if (m_scale_mode == SCALE_MODE_KEEP_TEXTURE_ASPECT_RATIO ||
+        m_scale_mode == SCALE_MODE_LIST_WIDGET)
+    {
+        if (m_texture)
+        {
+            assert(m_texture->getOriginalSize().Height > 0);
+            useAspectRatio = (float)m_texture->getOriginalSize().Width /
+                             (float)m_texture->getOriginalSize().Height;
+        }
+    }
+    else if (m_scale_mode == SCALE_MODE_KEEP_CUSTOM_ASPECT_RATIO)
+    {
+        useAspectRatio = m_custom_aspect_ratio;
+    }
+
+    int suggested_h = m_h;
+    int suggested_w = (int)((useAspectRatio < 0 ? m_w : useAspectRatio * suggested_h));
+
+    if (suggested_w > m_w)
+    {
+        const float needed_scale_factor = (float)m_w / (float)suggested_w;
+        suggested_w = (int)(suggested_w*needed_scale_factor);
+        suggested_h = (int)(suggested_h*needed_scale_factor);
+    }
+
+    bool left_horizontal = m_properties[PROP_ICON_ALIGN] == "left";
+    bool right_horizontal = m_properties[PROP_ICON_ALIGN] == "right";
+
+    // Assume left align if align property is not specified, but x property is specified
+    if (m_properties[PROP_X].size() > 0 && m_properties[PROP_ICON_ALIGN].empty())
+    {
+        left_horizontal = true;
+    }
+
+    const int x_from = right_horizontal ? m_x + (m_w - suggested_w) :
+                       left_horizontal  ? m_x :
+                                          m_x + (m_w - suggested_w)/2;
+    const int y_from = m_y + (m_h - suggested_h)/2; // center vertically
+
+    m_icon_rect = rect<s32>(x_from,
+                                      y_from,
+                                      x_from + suggested_w,
+                                      y_from + suggested_h);
+
+    if (m_scale_mode == SCALE_MODE_LIST_WIDGET)
+    {
+        m_list_header_icon_rect = m_icon_rect;
+        m_list_header_icon_rect.UpperLeftCorner.X = m_list_header_icon_rect.UpperLeftCorner.X + 4;
+        m_list_header_icon_rect.UpperLeftCorner.Y = m_list_header_icon_rect.UpperLeftCorner.Y + 4;
+        m_list_header_icon_rect.LowerRightCorner.X = m_list_header_icon_rect.LowerRightCorner.X - 4;
+        m_list_header_icon_rect.LowerRightCorner.Y = m_list_header_icon_rect.LowerRightCorner.Y - 4;
+        m_icon_rect = rect<s32>(m_x, m_y, m_x + m_w, m_y + m_h);
+    }
+}
+
+// -----------------------------------------------------------------------------
+void IconButtonWidget::updateLabelRect()
+{
+    if (!m_element)
+        return;
+
+    const stringw& message = getText();
+    const int label_extra_size =
+        ( m_properties[PROP_EXTEND_LABEL].size() == 0 ?
+           0 : atoi(m_properties[PROP_EXTEND_LABEL].c_str()) );
+
+    const bool word_wrap = (m_properties[PROP_WORD_WRAP] == "true");
+
+    if (m_properties[PROP_LABELS_LOCATION] == "hover")
+    {
+        core::dimension2du text_size = GUIEngine::getFont()->getDimension(message.c_str());
+        core::recti pos = m_element->getAbsolutePosition();
+        int center_x = pos.UpperLeftCorner.X + pos.getWidth() / 2;
+        int x1 = center_x - text_size.Width / 2 - label_extra_size / 2;
+        int y1 = pos.UpperLeftCorner.Y - (word_wrap ? GUIEngine::getFontHeight() * 2 :
+            GUIEngine::getFontHeight()) - 15;
+        int x2 = center_x + text_size.Width / 2 + label_extra_size / 2;
+        int y2 = pos.UpperLeftCorner.Y - 15;
+
+        if (x1 < 0)
+        {
+            int diff = -x1;
+            x1 += diff;
+            x2 += diff;
+        }
+        else if (x2 > (int)irr_driver->getActualScreenSize().Width)
+        {
+            int diff = x2 - irr_driver->getActualScreenSize().Width;
+            x2 -= diff;
+            x1 -= diff;
+        }
+
+        core::recti parent_pos = m_parent->getAbsolutePosition();
+        x1 -= parent_pos.UpperLeftCorner.X;
+        x2 -= parent_pos.UpperLeftCorner.X;
+        y1 -= parent_pos.UpperLeftCorner.Y;
+        y2 -= parent_pos.UpperLeftCorner.Y;
+        m_label_rect = rect<s32>(x1, y1, x2, y2);
+    }
+    else
+    {
+        // leave enough room for two lines of text if word wrap is enabled, otherwise a single line
+        m_label_rect = rect<s32>(m_x - label_extra_size/2,
+                                 m_y + m_h,
+                                 m_x + m_w + label_extra_size/2,
+                                 m_y + m_h + (word_wrap ? GUIEngine::getFontHeight()*2 :
+                                                          GUIEngine::getFontHeight()));
+    }
+}
+
+// -----------------------------------------------------------------------------
+void IconButtonWidget::resize()
+{
+    updateIconRect();
+    if (m_element)
+        m_element->setRelativePosition(m_icon_rect);
+    if (m_label)
+    {
+        updateLabelRect();
+        m_label->setRelativePosition(m_label_rect);
+        setLabelFont();
+    }
+}

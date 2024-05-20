@@ -20,11 +20,11 @@
 #define HEADER_GHOST_REPLAY_SELECTION_HPP
 
 #include "guiengine/screen.hpp"
-#include "guiengine/widgets.hpp"
+#include "guiengine/widgets/list_widget.hpp"
 #include "race/race_manager.hpp"
 #include "states_screens/dialogs/message_dialog.hpp"
 
-namespace GUIEngine { class Widget; }
+namespace GUIEngine { class CheckBoxWidget; class Widget; }
 
 /**
   * \brief GhostReplaySelection
@@ -48,7 +48,6 @@ private:
     GUIEngine::CheckBoxWidget* m_replay_version_toggle_widget;
     GUIEngine::CheckBoxWidget* m_best_times_toggle_widget;
     GUIEngine::CheckBoxWidget* m_compare_toggle_widget;
-    GUIEngine::RibbonWidget*   m_mode_tabs;
     RaceManager::Difficulty    m_cur_difficulty;
     std::string                m_file_to_be_deleted;
     std::vector<unsigned int>  m_best_times_index;
