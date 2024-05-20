@@ -23,7 +23,7 @@
 #include "audio/music_manager.hpp"
 #include "config/user_config.hpp"
 #include "graphics/2dutils.hpp"
-#include "graphics/camera.hpp"
+#include "graphics/camera/camera.hpp"
 #include "graphics/central_settings.hpp"
 #include "graphics/irr_driver.hpp"
 #include "graphics/material.hpp"

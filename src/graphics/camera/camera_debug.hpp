@@ -21,7 +21,7 @@
 #ifndef HEADER_CAMERA_DEBUG_HPP
 #define HEADER_CAMERA_DEBUG_HPP
 
-#include "graphics/camera_normal.hpp"
+#include "graphics/camera/camera_normal.hpp"
 
 class AbstractKart;
 

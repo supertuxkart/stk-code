@@ -18,8 +18,8 @@
 // Manages includes common to all options screens
 #include "states_screens/options/options_common.hpp"
 
-#include "graphics/camera.hpp"
-#include "graphics/camera_normal.hpp"
+#include "graphics/camera/camera.hpp"
+#include "graphics/camera/camera_normal.hpp"
 #include "challenges/story_mode_timer.hpp"
 #include "config/player_manager.hpp"
 #include "font/font_manager.hpp"

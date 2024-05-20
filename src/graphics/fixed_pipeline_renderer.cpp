@@ -18,7 +18,7 @@
 #ifndef SERVER_ONLY
 #include "graphics/fixed_pipeline_renderer.hpp"
 #include "config/user_config.hpp"
-#include "graphics/camera.hpp"
+#include "graphics/camera/camera.hpp"
 #include "graphics/irr_driver.hpp"
 #include "graphics/render_target.hpp"
 #include "modes/world.hpp"

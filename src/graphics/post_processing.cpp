@@ -20,7 +20,7 @@
 #include "graphics/post_processing.hpp"
 
 #include "config/user_config.hpp"
-#include "graphics/camera.hpp"
+#include "graphics/camera/camera.hpp"
 #include "graphics/central_settings.hpp"
 #include "graphics/frame_buffer.hpp"
 #include "graphics/graphics_restrictions.hpp"
