@@ -38,8 +38,9 @@
 #include "karts/kart_properties_manager.hpp"
 #include "main_loop.hpp"
 #include "modes/cutscene_world.hpp"
-#include "modes/overworld.hpp"
 #include "modes/demo_world.hpp"
+#include "modes/overworld.hpp"
+#include "modes/tutorial_utils.hpp"
 #include "network/network_config.hpp"
 #include "online/request_manager.hpp"
 #include "states_screens/addons_screen.hpp"
@@ -258,7 +259,7 @@ void MainMenuScreen::onUpdate(float delta)
         virtual void onConfirm()
         {
             GUIEngine::ModalDialog::dismiss();
-            MainMenuScreen::getInstance()->startTutorial();
+            TutorialUtils::startTutorial();
         }   // onConfirm
     };   // PlayTutorial
 
@@ -270,41 +271,6 @@ void MainMenuScreen::onUpdate(float delta)
         false/*closes_any_dialog*/);
 #endif
 }   // onUpdate
-
-// ----------------------------------------------------------------------------
-void MainMenuScreen::startTutorial()
-{
-    RaceManager::get()->setNumPlayers(1);
-    RaceManager::get()->setMajorMode (RaceManager::MAJOR_MODE_SINGLE);
-    RaceManager::get()->setMinorMode (RaceManager::MINOR_MODE_TUTORIAL);
-    RaceManager::get()->setNumKarts( 1 );
-    RaceManager::get()->setTrack("tutorial");
-    RaceManager::get()->setDifficulty(RaceManager::DIFFICULTY_EASY);
-    RaceManager::get()->setReverseTrack(false);
-
-    // Use the last used device
-    InputDevice* device = input_manager->getDeviceManager()->getLatestUsedDevice();
-
-    // Create player and associate player with device
-    StateManager::get()->createActivePlayer(PlayerManager::getCurrentPlayer(), device);
-
-    if (kart_properties_manager->getKart(UserConfigParams::m_default_kart) == NULL)
-    {
-        Log::warn("MainMenuScreen", "Cannot find kart '%s', will revert to default",
-            UserConfigParams::m_default_kart.c_str());
-        UserConfigParams::m_default_kart.revertToDefaults();
-    }
-    RaceManager::get()->setPlayerKart(0, UserConfigParams::m_default_kart);
-
-    // ASSIGN should make sure that only input from assigned devices is read
-    input_manager->getDeviceManager()->setAssignMode(ASSIGN);
-    input_manager->getDeviceManager()
-        ->setSinglePlayer( StateManager::get()->getActivePlayer(0) );
-
-    StateManager::get()->enterGameState();
-    RaceManager::get()->setupPlayerKartInfo();
-    RaceManager::get()->startNew(false);
-}   // startTutorial
 
 // ----------------------------------------------------------------------------
 
@@ -509,7 +475,7 @@ void MainMenuScreen::eventCallback(Widget* widget, const std::string& name,
     }
     else if (selection == "startTutorial")
     {
-        startTutorial();
+        TutorialUtils::startTutorial();
     }
     else if (selection == "story")
     {

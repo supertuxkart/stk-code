@@ -9,6 +9,10 @@ add_definitions( -DSUPERTUXKART_VERSION="${PROJECT_VERSION}" )
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${PROJECT_SOURCE_DIR}/cmake")
 include(CMakeDependentOption)
 
+if(MSVC)
+  cmake_policy(SET CMP0043 OLD)
+endif()
+
 include(BuildTypeSTKRelease)
 if(NOT CMAKE_BUILD_TYPE)
     message(STATUS "No build type selected, default to STKRelease")
