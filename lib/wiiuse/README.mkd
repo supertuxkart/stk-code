@@ -68,6 +68,12 @@ Additional Contributors:
 - Chadwick Boulay <https://github.com/cboulay>
 - Florian Baumgartl <https://github.com/Baumgartl>
 - Philipp Hartl <https://github.com/phHartl>
+Bryan Quigley <https://github.com/BryanQuigley>
+Bart Ribbers <https://github.com/PureTryOut>
+Samuel Hackbeil <https://github.com/shackbei>
+Jean-Michaël Celerier <https://github.com/jcelerier>
+Dave Murphy <https://github.com/WinterMute>
+Forrest Cahoon <https://github.com/forrcaho>
 
 ## License
 
@@ -253,10 +259,10 @@ greatly appreciated.
 
 ### Forks not yet fully integrated
 
-- [libogc/WPAD/DevKitPro](http://wiibrew.org/wiki/Libogc)
-  - Started before the disappearance of the original upstream
+- [libogc/wiiuse](https://github.com/devkitPro/libogc/tree/master/wiiuse)
+  - wii port created by Shagkur and contributed upstream
   - Focused on Wiimote use with Wii hardware
-  - Functions renamed, copyright statements removed
+  - code unfortunately diverged
   - Additional functionality unknown?
   - git-svn mirror found here: <https://github.com/xloem/libogc-wiiuse>
 - [fwiine](http://sourceforge.net/projects/fwiine/files/wiiuse/0.13/)
