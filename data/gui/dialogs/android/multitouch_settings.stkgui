@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <stkgui>
-    <div x="2%" y="1%" width="96%" height="98%" layout="vertical-row" >
+    <div x="2%" y="2%" width="96%" height="96%" layout="vertical-row" >
         <header id="title" width="100%" height="fit" text_align="center" word_wrap="true" text="Touch Device Settings" />
 
         <spacer height="35" width="10" />
