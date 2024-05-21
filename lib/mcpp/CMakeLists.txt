@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 2.6)
+cmake_minimum_required(VERSION 3.6.0)
 if (UNIX OR MINGW)
     add_definitions(-O3)
     if (APPLE)
