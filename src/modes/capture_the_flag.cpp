@@ -109,8 +109,7 @@ void CaptureTheFlag::init()
         return;
 
     m_red_flag_node = irr_driver->addAnimatedMesh(m_red_flag_mesh, "red_flag");
-    m_blue_flag_node = irr_driver->addAnimatedMesh(m_blue_flag_mesh,
-        "blue_flag");
+    m_blue_flag_node = irr_driver->addAnimatedMesh(m_blue_flag_mesh, "blue_flag");
     assert(m_red_flag_node);
     assert(m_blue_flag_node);
     m_red_flag_node->grab();
@@ -262,66 +261,9 @@ void CaptureTheFlag::update(int ticks)
     m_red_flag->update(ticks);
     m_blue_flag->update(ticks);
 
-    if (m_red_flag->getHolder() != -1 && m_blue_flag->isInBase() &&
-        (m_blue_flag->getBaseOrigin() - m_red_flag->getOrigin()).length() <
-        g_capture_length)
-    {
-        // Blue team scored
-        if (!NetworkConfig::get()->isNetworking() ||
-            NetworkConfig::get()->isServer())
-        {
-            int red_holder = m_red_flag->getHolder();
-            int new_kart_scores = m_scores.at(red_holder) + g_captured_score;
-            int new_blue_scores = m_blue_scores + 1;
-            m_scores.at(red_holder) = new_kart_scores;
-            if (NetworkConfig::get()->isServer())
-            {
-                NetworkString p(PROTOCOL_GAME_EVENTS);
-                p.setSynchronous(true);
-                p.addUInt8(GameEventsProtocol::GE_CTF_SCORED)
-                    .addUInt8((int8_t)red_holder)
-                    .addUInt8(0/*red_team_scored*/)
-                    .addUInt16((int16_t)new_kart_scores)
-                    .addUInt8((uint8_t)m_red_scores)
-                    .addUInt8((uint8_t)new_blue_scores);
-                STKHost::get()->sendPacketToAllPeers(&p, true);
-            }
-            ctfScored(red_holder, false/*red_team_scored*/, new_kart_scores,
-                m_red_scores, new_blue_scores);
-        }
-        m_last_captured_flag_ticks = World::getWorld()->getTicksSinceStart();
-        m_red_flag->resetToBase(RaceManager::get()->getFlagDeactivatedTicks());
-    }
-    else if (m_blue_flag->getHolder() != -1 && m_red_flag->isInBase() &&
-        (m_red_flag->getBaseOrigin() - m_blue_flag->getOrigin()).length() <
-        g_capture_length)
-    {
-        // Red team scored
-        if (!NetworkConfig::get()->isNetworking() ||
-            NetworkConfig::get()->isServer())
-        {
-            int blue_holder = m_blue_flag->getHolder();
-            int new_kart_scores = m_scores.at(blue_holder) + g_captured_score;
-            int new_red_scores = m_red_scores + 1;
-            m_scores.at(blue_holder) = new_kart_scores;
-            if (NetworkConfig::get()->isServer())
-            {
-                NetworkString p(PROTOCOL_GAME_EVENTS);
-                p.setSynchronous(true);
-                p.addUInt8(GameEventsProtocol::GE_CTF_SCORED)
-                    .addUInt8((int8_t)blue_holder)
-                    .addUInt8(1/*red_team_scored*/)
-                    .addUInt16((int16_t)new_kart_scores)
-                    .addUInt8((uint8_t)new_red_scores)
-                    .addUInt8((uint8_t)m_blue_scores);
-                STKHost::get()->sendPacketToAllPeers(&p, true);
-            }
-            ctfScored(blue_holder, true/*red_team_scored*/, new_kart_scores,
-                new_red_scores, m_blue_scores);
-        }
-        m_last_captured_flag_ticks = World::getWorld()->getTicksSinceStart();
-        m_blue_flag->resetToBase(RaceManager::get()->getFlagDeactivatedTicks());
-    }
+    // Test if points have been scored
+    checkScoring(FC_RED);
+    checkScoring(FC_BLUE);
 
     // Test if red or blue flag is touched
     for (auto& k : m_karts)
@@ -371,6 +313,48 @@ void CaptureTheFlag::update(int ticks)
         }
     }
 }   // update
+
+// ----------------------------------------------------------------------------
+void CaptureTheFlag::checkScoring(FlagColor color)
+{
+    bool red_active = (color == FC_RED);
+    std::shared_ptr<CTFFlag> active_flag = (red_active) ? m_red_flag  : m_blue_flag;
+    std::shared_ptr<CTFFlag> other_flag  = (red_active) ? m_blue_flag : m_red_flag;
+
+    // If a flag is held close enough to the base of the other flag,
+    // while the other flag is in base, the flag has been successfully captured.
+    // If the active flag is red (blue), the scoring team is blue (red). 
+    if (active_flag->getHolder() != -1 && other_flag->isInBase() &&
+        (other_flag->getBaseOrigin() - active_flag->getOrigin()).length() <
+        g_capture_length)
+    {
+        if (!NetworkConfig::get()->isNetworking() ||
+            NetworkConfig::get()->isServer())
+        {
+            int active_holder = active_flag->getHolder();
+            int new_kart_score = m_scores.at(active_holder) + g_captured_score;
+            int new_red_score  = (red_active) ? m_red_scores      : m_red_scores + 1; 
+            int new_blue_score = (red_active) ? m_blue_scores + 1 : m_blue_scores;
+            m_scores.at(active_holder) = new_kart_score;
+            if (NetworkConfig::get()->isServer())
+            {
+                NetworkString p(PROTOCOL_GAME_EVENTS);
+                p.setSynchronous(true);
+                p.addUInt8(GameEventsProtocol::GE_CTF_SCORED)
+                    .addUInt8((int8_t)active_holder)
+                    .addUInt8((red_active) ? 0 : 1 /*red_team_scored*/)
+                    .addUInt16((int16_t)new_kart_score)
+                    .addUInt8((uint8_t)new_red_score)
+                    .addUInt8((uint8_t)new_blue_score);
+                STKHost::get()->sendPacketToAllPeers(&p, true);
+            }
+            ctfScored(active_holder, (red_active) ? false : true /*red_team_scored*/,
+                new_kart_score, new_red_score, new_blue_score); 
+        }
+        m_last_captured_flag_ticks = World::getWorld()->getTicksSinceStart();
+        active_flag->resetToBase(RaceManager::get()->getFlagDeactivatedTicks());
+    }
+}   // checkScoring
 
 // ----------------------------------------------------------------------------
 int CaptureTheFlag::getRedHolder() const
