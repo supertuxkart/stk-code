@@ -9,10 +9,6 @@ add_definitions( -DSUPERTUXKART_VERSION="${PROJECT_VERSION}" )
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${PROJECT_SOURCE_DIR}/cmake")
 include(CMakeDependentOption)
 
-if(MSVC)
-  cmake_policy(SET CMP0043 OLD)
-endif()
-
 include(BuildTypeSTKRelease)
 if(NOT CMAKE_BUILD_TYPE)
     message(STATUS "No build type selected, default to STKRelease")
@@ -523,7 +519,8 @@ endif()
 if(MSVC)
     # VS will automatically add NDEBUG for release mode, but only _DEBUG in debug mode.
     # Since STK uses DEBUG, this is added for debug compilation only:
-    set_property(DIRECTORY PROPERTY COMPILE_DEFINITIONS $<$<CONFIG:Debug>:DEBUG>)
+    cmake_policy(SET CMP0043 OLD)
+    set_property(DIRECTORY PROPERTY COMPILE_DEFINITIONS_DEBUG DEBUG)
 else()
     # All non VS generators used create only a single compile mode, so
     # compile flags can be simplye be added
