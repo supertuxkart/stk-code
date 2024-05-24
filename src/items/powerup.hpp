@@ -57,6 +57,7 @@ private:
     /** Returns an integer in the 0-32767 range.*/
     int simplePRNG(const int seed, const int time, const int item_id, const int position);
     void useBubblegum(bool has_played_sound, bool mini = false);
+    void resetSoundSource();
 
 public:
                     Powerup      (Kart* kart_);

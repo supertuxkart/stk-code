@@ -155,11 +155,7 @@ void Powerup::set(PowerupManager::PowerupType type, int n)
     if (RewindManager::get()->isRewinding())
         return;
 
-    if (m_sound_use != NULL)
-    {
-        m_sound_use->deleteSFX();
-        m_sound_use = NULL;
-    }
+    resetSoundSource();
 
     switch (m_type)
     {
@@ -270,6 +266,9 @@ Material *Powerup::getIcon(bool wide) const
  */
 void Powerup::adjustSound()
 {
+    if (m_sound_use == NULL)
+        return;
+
     m_sound_use->setPosition(m_kart->getXYZ());
     // in multiplayer mode, sounds are NOT positional (because we have multiple listeners)
     // so the sounds of all AIs are constantly heard. So reduce volume of sounds.
@@ -318,12 +317,6 @@ void Powerup::use()
         m_type != PowerupManager::POWERUP_SWATTER &&
         m_type != PowerupManager::POWERUP_ZIPPER)
         m_kart->playCustomSFX(SFXManager::CUSTOM_SHOOT);
-
-    // FIXME - for some collectibles, set() is never called
-    if (!has_played_sound && m_sound_use == NULL)
-    {
-        m_sound_use = SFXManager::get()->createSoundSource("shoot");
-    }
 
     m_number--;
     World *world = World::getWorld();
@@ -478,8 +471,9 @@ void Powerup::use()
                         m_kart->decreaseShieldTime();
                     if (!has_played_sound)
                     {
-                        Powerup::adjustSound();
+                        resetSoundSource();
                         m_sound_use = SFXManager::get()->createSoundSource("shoot");
+                        Powerup::adjustSound();
                         m_sound_use->play();
                     }
                     ProjectileManager::get()->newProjectile(m_kart, PowerupManager::POWERUP_MINI);
@@ -625,7 +619,7 @@ void Powerup::use()
 
 void Powerup::useBubblegum(bool has_played_sound, bool mini)
 {
-    m_sound_use = SFXManager::get()->createSoundSource("goo");
+    resetSoundSource();
     ItemManager* im = Track::getCurrentTrack()->getItemManager();
     const KartProperties *kp = m_kart->getKartProperties();
 
@@ -639,6 +633,7 @@ void Powerup::useBubblegum(bool has_played_sound, bool mini)
         if(!new_item) return;
         if (!has_played_sound)
         {
+            m_sound_use = SFXManager::get()->createSoundSource("goo");
             Powerup::adjustSound();
             m_sound_use->play();
         }
@@ -690,20 +685,25 @@ void Powerup::useBubblegum(bool has_played_sound, bool mini)
 
         if (!has_played_sound)
         {
-            if (m_sound_use != NULL)
-            {
-                m_sound_use->deleteSFX();
-                m_sound_use = NULL;
-            }
             //Extraordinary. Usually sounds are set in Powerup::set()
-            m_sound_use = SFXManager::get()->createSoundSource("inflate");
             //In this case this is a workaround, since the bubblegum item has two different sounds.
-
+            m_sound_use = SFXManager::get()->createSoundSource("inflate");
             Powerup::adjustSound();
             m_sound_use->play();
         }
     }
 }   // useBubblegum
+
+//-----------------------------------------------------------------------------
+/** This function ensure we don't leak sound sources */
+void Powerup::resetSoundSource()
+{
+    if (m_sound_use != NULL)
+    {
+        m_sound_use->deleteSFX();
+        m_sound_use = NULL;
+    }
+} // resetSoundSource
 
 //-----------------------------------------------------------------------------
 /** This function is called when a bonus box is it. This function can be
