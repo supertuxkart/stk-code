@@ -24,6 +24,7 @@
 #include "config/stk_config.hpp"
 #include "items/attachment.hpp"
 #include "items/item_manager.hpp"
+#include "items/powerup_audio.hpp"
 #include "items/projectile_manager.hpp"
 #include "items/rubber_ball.hpp"
 #include "karts/kart.hpp"
@@ -169,8 +170,8 @@ void Powerup::set(PowerupManager::PowerupType type, int n)
         case PowerupManager::POWERUP_ZIPPER:
             break ;
 
+        // Special sound effect management
         case PowerupManager::POWERUP_SUDO:
-            m_sound_use = SFXManager::get()->createSoundSource("sudo_bad");
             break ;
 
         // TODO : add sound effects
@@ -422,19 +423,11 @@ void Powerup::use()
 
             // Play a good sound for the kart that benefits from the "nitro-hack",
             // if it's a local player
-            if (!has_played_sound && m_kart->getController()->isLocalPlayerController())
-            {
-                //Extraordinary. Usually sounds are set in Powerup::set()
-                m_sound_use = SFXManager::get()->createSoundSource("sudo_good");
-                //In this case this is a workaround, since the sudo item has two different sounds
-
-                m_sound_use->play();
-            }
-            // Play a bad sound if the affected kart (but not the user) is a local player
-            else if (!has_played_sound && player_kart != NULL)
-            {
-                m_sound_use->play();
-            }
+            if (m_kart->getController()->isLocalPlayerController())
+                PowerupAudio::getInstance()->playSudoGoodSFX();
+            // Play a bad sound if there is an affected local player
+            if (player_kart != NULL)
+                PowerupAudio::getInstance()->playSudoBadSFX();
 
             break;
         }   // end of PowerupManager::POWERUP_SUDO
