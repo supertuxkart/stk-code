@@ -673,7 +673,7 @@ namespace UserConfigParams
     PARAM_PREFIX BoolUserConfigParam        m_force_legacy_device
         PARAM_DEFAULT(BoolUserConfigParam(false, "force_legacy_device",
         &m_video_group, "Force OpenGL 2 context, even if OpenGL 3 is available."));
-    PARAM_PREFIX BoolUserConfigParam        split_screen_horizontally
+    PARAM_PREFIX BoolUserConfigParam        m_split_screen_horizontally
         PARAM_DEFAULT(BoolUserConfigParam(true, "split_screen_horizontally",
             &m_video_group, "When playing a non-square amount of players (e.g. 2),"
             " should it split horizontally (top/bottom)"));

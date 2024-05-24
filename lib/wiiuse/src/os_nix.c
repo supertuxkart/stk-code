@@ -374,21 +374,32 @@ int wiiuse_os_read(struct wiimote_t *wm, byte *buf, int len)
 {
     int rc;
 
-    rc = read(wm->in_sock, buf, len);
+    rc = recv(wm->in_sock, buf, len, MSG_DONTWAIT);
 
     if (rc == -1)
     {
-        /* error reading data */
-        WIIUSE_ERROR("Receiving wiimote data (id %i).", wm->unid);
-        perror("Error Details");
-
-        if (errno == ENOTCONN)
+        switch(errno)
         {
+        case ENOTCONN:
             /* this can happen if the bluetooth dongle is disconnected */
+            WIIUSE_ERROR("Receiving wiimote data (id %i).", wm->unid);
+            perror("Error Details");
+
             WIIUSE_ERROR("Bluetooth appears to be disconnected. Wiimote unid %i will be disconnected.",
                          wm->unid);
             wiiuse_os_disconnect(wm);
             wiiuse_disconnected(wm);
+            break;
+
+        case EAGAIN:
+            /* no data available yet */
+            break;
+
+        default:
+            /* error reading data */
+            WIIUSE_ERROR("Receiving wiimote data (id %i).", wm->unid);
+            perror("Error Details");
+            break;
         }
     } else if (rc == 0)
     {
@@ -406,7 +417,7 @@ int wiiuse_os_read(struct wiimote_t *wm, byte *buf, int len)
         { /* hack for chatty Balance Boards that flood the logs with useless button reports */
             int i;
             printf("[DEBUG] (id %i) RECV: (%.2x) ", wm->unid, buf[0]);
-            for (i = 1; i < rc; i++)
+            for (i = 1; i < rc - 1; i++)
             {
                 printf("%.2x ", buf[i]);
             }
@@ -427,7 +438,7 @@ int wiiuse_os_write(struct wiimote_t *wm, byte report_type, byte *buf, int len)
     write_buffer[1] = report_type;
     memcpy(write_buffer + 2, buf, len);
 
-    rc = write(wm->in_sock, write_buffer, len + 2);
+    rc = send(wm->in_sock, write_buffer, len + 2, 0);
 
     if (rc < 0)
     {

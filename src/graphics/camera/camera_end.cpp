@@ -16,7 +16,7 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-#include "graphics/camera_end.hpp"
+#include "graphics/camera/camera_end.hpp"
 
 #include "config/user_config.hpp"
 #include "karts/abstract_kart.hpp"

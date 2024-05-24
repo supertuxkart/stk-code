@@ -1,5 +1,5 @@
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2009-2015 Marianne Gagnon
+//  Copyright (C) 2009-2015 Marianne Gagnon, 2024 Alayan
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -16,28 +16,27 @@
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 
-#ifndef HEADER_CUSTOM_VIDEO_SETTINGS_HPP
-#define HEADER_CUSTOM_VIDEO_SETTINGS_HPP
+#ifndef HEADER_RECOMMEND_VIDEO_SETTINGS_HPP
+#define HEADER_RECOMMEND_VIDEO_SETTINGS_HPP
 
 #include "guiengine/modaldialog.hpp"
+#include "guiengine/screen.hpp"
 
 /**
- * \brief Dialog that allows the player to select custom video settings
+ * \brief Dialog that asks the player some questions before starting a benchmark to
+ *        recommend video settings
  * \ingroup states_screens
  */
-class CustomVideoSettingsDialog : public GUIEngine::ModalDialog
+class RecommendVideoSettingsDialog : public GUIEngine::ModalDialog
 {
 public:
     /**
      * Creates a modal dialog with given percentage of screen width and height
      */
-    CustomVideoSettingsDialog(const float percentWidth, const float percentHeight);
-    ~CustomVideoSettingsDialog();
+    RecommendVideoSettingsDialog(const float percentWidth, const float percentHeight);
+    ~RecommendVideoSettingsDialog();
 
     virtual void beforeAddingWidgets();
-
-    /** Updates the activation state of the advanced pipeline checkboxes. */
-    void updateActivation();
 
     GUIEngine::EventPropagation processEvent(const std::string& eventSource);
     

@@ -39,7 +39,7 @@ set(VERSION "0.1.0")
 
 ### CMake configuration
 
-cmake_minimum_required(VERSION 2.4)
+cmake_minimum_required(VERSION 3.6.0)
 if(COMMAND cmake_policy)
 	CMAKE_POLICY(SET CMP0003 NEW)
 endif(COMMAND cmake_policy)

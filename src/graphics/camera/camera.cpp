@@ -17,15 +17,15 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-#include "graphics/camera.hpp"
+#include "graphics/camera/camera.hpp"
 
 #include "audio/sfx_manager.hpp"
 #include "config/stk_config.hpp"
 #include "config/user_config.hpp"
-#include "graphics/camera_debug.hpp"
-#include "graphics/camera_end.hpp"
-#include "graphics/camera_fps.hpp"
-#include "graphics/camera_normal.hpp"
+#include "graphics/camera/camera_debug.hpp"
+#include "graphics/camera/camera_end.hpp"
+#include "graphics/camera/camera_fps.hpp"
+#include "graphics/camera/camera_normal.hpp"
 #include "graphics/irr_driver.hpp"
 #include "io/xml_node.hpp"
 #include "karts/abstract_kart.hpp"

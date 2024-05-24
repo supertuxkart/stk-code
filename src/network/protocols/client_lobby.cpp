@@ -23,7 +23,7 @@
 #include "audio/sfx_manager.hpp"
 #include "config/user_config.hpp"
 #include "config/player_manager.hpp"
-#include "graphics/camera.hpp"
+#include "graphics/camera/camera.hpp"
 #include "guiengine/engine.hpp"
 #include "guiengine/modaldialog.hpp"
 #include "guiengine/message_queue.hpp"

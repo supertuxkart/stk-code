@@ -24,7 +24,7 @@
 #include "config/player_manager.hpp"
 #include "challenges/unlock_manager.hpp"
 #include "config/user_config.hpp"
-#include "graphics/camera.hpp"
+#include "graphics/camera/camera.hpp"
 #include "graphics/central_settings.hpp"
 #include "graphics/irr_driver.hpp"
 #include "graphics/material.hpp"
@@ -52,6 +52,7 @@
 #include "karts/kart_rewinder.hpp"
 #include "main_loop.hpp"
 #include "modes/overworld.hpp"
+#include "modes/tutorial_utils.hpp"
 #include "network/child_loop.hpp"
 #include "network/protocols/client_lobby.hpp"
 #include "network/network_config.hpp"
@@ -81,12 +82,6 @@
 #include "utils/profiler.hpp"
 #include "utils/translation.hpp"
 #include "utils/string_utils.hpp"
-
-#include <algorithm>
-#include <assert.h>
-#include <ctime>
-#include <sstream>
-#include <stdexcept>
 
 #include <IrrlichtDevice.h>
 #include <ISceneManager.h>
@@ -1016,7 +1011,6 @@ void World::updateWorld(int ticks)
     assert(m_magic_number == 0xB01D6543);
 #endif
 
-
     if (m_schedule_pause)
     {
         pause(m_scheduled_pause_phase);
@@ -1067,41 +1061,8 @@ void World::updateWorld(int ticks)
             if (m_schedule_tutorial)
             {
                 m_schedule_tutorial = false;
-                RaceManager::get()->setNumPlayers(1);
-                RaceManager::get()->setMajorMode (RaceManager::MAJOR_MODE_SINGLE);
-                RaceManager::get()->setMinorMode (RaceManager::MINOR_MODE_TUTORIAL);
-                RaceManager::get()->setNumKarts( 1 );
-                RaceManager::get()->setTrack( "tutorial" );
-                RaceManager::get()->setDifficulty(RaceManager::DIFFICULTY_EASY);
-                RaceManager::get()->setReverseTrack(false);
-
-                // Use keyboard 0 by default (FIXME: let player choose?)
-                InputDevice* device = input_manager->getDeviceManager()->getKeyboard(0);
-
-                // Create player and associate player with keyboard
-                StateManager::get()->createActivePlayer(PlayerManager::getCurrentPlayer(),
-                                                        device);
-
-                if (!kart_properties_manager->getKart(UserConfigParams::m_default_kart))
-                {
-                    Log::warn("[World]",
-                              "Cannot find kart '%s', will revert to default.",
-                              UserConfigParams::m_default_kart.c_str());
-                    UserConfigParams::m_default_kart.revertToDefaults();
-                }
-                RaceManager::get()->setPlayerKart(0, UserConfigParams::m_default_kart);
-
-                // ASSIGN should make sure that only input from assigned devices
-                // is read.
-                input_manager->getDeviceManager()->setAssignMode(ASSIGN);
-                input_manager->getDeviceManager()
-                    ->setSinglePlayer( StateManager::get()->getActivePlayer(0) );
-
                 delete this;
-
-                StateManager::get()->enterGameState();
-                RaceManager::get()->setupPlayerKartInfo();
-                RaceManager::get()->startNew(true);
+                TutorialUtils::startTutorial(true /*from overworld*/);
             }
             else
             {
@@ -1123,6 +1084,7 @@ void World::updateWorld(int ticks)
 
 void World::scheduleTutorial()
 {
+    printf("Tutorial scheduled\n");
     m_schedule_exit_race = true;
     m_schedule_tutorial = true;
 }   // scheduleTutorial

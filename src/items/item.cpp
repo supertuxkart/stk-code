@@ -237,18 +237,19 @@ Item::Item(ItemType type, const Vec3& xyz, const Vec3& normal,
         scene::ISceneNode* meshnode =
             irr_driver->addMesh(mesh, StringUtils::insertValues("item_%i", (int)type));
 
+        lodnode->add(1, meshnode, true);
         if (lowres_mesh != NULL)
         {
-            lodnode->add(35, meshnode, true);
             scene::ISceneNode* meshnode =
                 irr_driver->addMesh(lowres_mesh,
                 StringUtils::insertValues("item_lo_%i", (int)type));
-            lodnode->add(100, meshnode, true);
+            lodnode->add(2, meshnode, true);
         }
-        else
-        {
-            lodnode->add(100, meshnode, true);
-        }
+
+        // Auto-compute the rendering distance, but use a high scaling factor
+        // to ensure that even at low settings, on-track items only become invisible
+        // when already quite far.
+        lodnode->autoComputeLevel(24); // The distance grows with the square root of the scaling factor
         m_node = lodnode;
     }
     setType(type);

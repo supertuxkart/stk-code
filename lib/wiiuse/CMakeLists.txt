@@ -2,13 +2,7 @@
 # http://academic.cleardefinition.com/
 # Iowa State University HCI Graduate Program/VRAC
 
-cmake_minimum_required(VERSION 2.8.0)
-
-# Added for STK, silences CMake warning
-# See https://github.com/supertuxkart/stk-code/commit/b0ff15873ee7fa8901672672b47def9039a5534b#diff-a3e272598233e89e4b577a434cc2a89d
-if(NOT (CMAKE_MAJOR_VERSION VERSION_LESS 3))
-  cmake_policy(SET CMP0048 OLD)
-endif()
+cmake_minimum_required(VERSION 3.6.0)
 
 # Set package properties
 project(WiiUse)

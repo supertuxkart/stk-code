@@ -322,6 +322,7 @@ public:
     void     draw();
     void     onClick(const core::vector2di& mouse_pos);
     void     computeStableFPS();
+    void     startBenchmark();
     void     writeToFile();
 
     // ------------------------------------------------------------------------

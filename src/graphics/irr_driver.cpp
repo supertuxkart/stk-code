@@ -26,7 +26,7 @@
 #include "font/regular_face.hpp"
 #include "graphics/2dutils.hpp"
 #include "graphics/b3d_mesh_loader.hpp"
-#include "graphics/camera.hpp"
+#include "graphics/camera/camera.hpp"
 #include "graphics/central_settings.hpp"
 #include "graphics/fixed_pipeline_renderer.hpp"
 #include "graphics/glwrap.hpp"
@@ -88,6 +88,8 @@
 #include "utils/translation.hpp"
 #include "utils/vs.hpp"
 
+#include <algorithm>
+#include <cmath>
 #include <irrlicht.h>
 
 #if !defined(SERVER_ONLY) && defined(ANDROID)
@@ -322,38 +324,43 @@ void IrrDriver::updateConfigIfRelevant()
     }
 #endif   // !SERVER_ONLY
 }   // updateConfigIfRelevant
-core::recti IrrDriver::getSplitscreenWindow(int WindowNum) 
+
+// ----------------------------------------------------------------------------
+core::recti IrrDriver::getSplitscreenWindow(int window_num)
 {
-    const int playernum = RaceManager::get()->getNumLocalPlayers();
-    const float playernum_sqrt = sqrtf((float)playernum);
-    
-    int rows = int(  UserConfigParams::split_screen_horizontally
-                   ? ceil(playernum_sqrt)
-                   : round(playernum_sqrt)                       );
-    int cols = int(  UserConfigParams::split_screen_horizontally
-                   ? round(playernum_sqrt)
-                   : ceil(playernum_sqrt)                        );
-    
-    if (rows == 0){rows = 1;}
-    if (cols == 0) {cols = 1;}
-    //This could add a bit of overhang
-    const int width_of_space =
-        int(ceil(   (float)irr_driver->getActualScreenSize().Width
-                  / (float)cols)                                  );
-    const int height_of_space =
-        int (ceil(  (float)irr_driver->getActualScreenSize().Height
-                  / (float)rows)                                   );
+    // Determine the number of columns and rows needed
+    int total_players = RaceManager::get()->getNumLocalPlayers();
+    if (total_players < 1)
+        total_players = 1;
+    int columns = (int)(std::ceil(std::sqrt(total_players)));
+    int rows = (int)(std::ceil((double)(total_players) / columns));
+    if (UserConfigParams::m_split_screen_horizontally)
+        std::swap(columns, rows);
 
-    const int x_grid_Position = WindowNum % cols;
-    const int y_grid_Position = int(floor((WindowNum) / cols));
+    // Calculate the base dimensions of each viewport
+    int base_viewport_width = irr_driver->getActualScreenSize().Width / columns;
+    int base_viewport_height = irr_driver->getActualScreenSize().Height / rows;
 
-//To prevent the viewport going over the right side, we use std::min to ensure the right corners are never larger than the total width
-    return core::recti(
-        x_grid_Position * width_of_space,
-        y_grid_Position * height_of_space,
-        (x_grid_Position * width_of_space) + width_of_space,
-        (y_grid_Position * height_of_space) + height_of_space);
-}
+    // Calculate remaining pixels to distribute
+    int extra_width = irr_driver->getActualScreenSize().Width % columns;
+    int extra_height = irr_driver->getActualScreenSize().Height % rows;
+
+    // Determine the row and column for the given player index
+    int row = window_num / columns;
+    int col = window_num % columns;
+
+    // Calculate the top-left corner of the viewport
+    int viewport_x = col * base_viewport_width;
+    int viewport_y = row * base_viewport_height;
+
+    // Adjust width and height to fully occupy the remaining pixels
+    int viewport_width = base_viewport_width + (col == columns - 1 ? extra_width : 0);
+    int viewport_height = base_viewport_height + (row == rows - 1 ? extra_height : 0);
+
+    return core::recti(core::position2di(viewport_x, viewport_y),
+        core::dimension2du(viewport_width, viewport_height));
+}   // getSplitscreenWindow
+
 // ----------------------------------------------------------------------------
 /** Gets a list of supported video modes from the irrlicht device. This data
  *  is stored in m_modes.
@@ -1021,8 +1028,7 @@ bool IrrDriver::moveWindow(int x, int y)
 }
 //-----------------------------------------------------------------------------
 
-void IrrDriver::changeResolution(const int w, const int h,
-                                 const bool fullscreen)
+void IrrDriver::changeResolution(const int w, const int h, const bool fullscreen)
 {
     // update user config values
     UserConfigParams::m_prev_real_width = UserConfigParams::m_real_width;

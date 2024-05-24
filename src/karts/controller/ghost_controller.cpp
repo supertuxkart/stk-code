@@ -16,7 +16,7 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-#include "graphics/camera_fps.hpp"
+#include "graphics/camera/camera_fps.hpp"
 #include "karts/controller/ghost_controller.hpp"
 #include "karts/controller/kart_control.hpp"
 #include "modes/world.hpp"

@@ -23,7 +23,6 @@
 #include "guiengine/widgets/spinner_widget.hpp"
 #include "states_screens/options/options_screen_video.hpp"
 #include "states_screens/state_manager.hpp"
-#include "utils/translation.hpp"
 #include "graphics/central_settings.hpp"
 #include "graphics/irr_driver.hpp"
 #include "utils/string_utils.hpp"
@@ -95,6 +94,7 @@ void CustomVideoSettingsDialog::beforeAddingWidgets()
     SpinnerWidget* filtering = getWidget<SpinnerWidget>("image_quality");
     filtering->addLabel(_("Very Low"));
     filtering->addLabel(_("Low"));
+    filtering->addLabel(_("Medium"));
     filtering->addLabel(_("High"));
     filtering->setValue(OptionsScreenVideo::getImageQuality());
 

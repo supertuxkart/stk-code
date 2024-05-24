@@ -14,6 +14,16 @@ Original project (0.12 and earlier):
     most recent archive from 2010 (looks identical on homepage to 2011 snapshot above)
     <https://web.archive.org/web/20100216015311/http://wiiuse.sourceforge.net/>
 
+v0.15.6 -- 18-Feb-2024
+--------------------
+
+Fixed:
+
+- Linux - Fixed hang with kernels 6.6.x and newer
+- Corrected historical record about Wiiuse origins
+- Require CMake > 3.6.x to avoid deprecation warnings
+- Support for Balance Board calibration
+
 v0.15.5 -- 24-Nov-2019
 --------------------
 

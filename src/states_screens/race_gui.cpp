@@ -28,7 +28,7 @@ using namespace irr;
 #include "challenges/unlock_manager.hpp"
 #include "config/user_config.hpp"
 #include "font/font_drawer.hpp"
-#include "graphics/camera.hpp"
+#include "graphics/camera/camera.hpp"
 #include "graphics/central_settings.hpp"
 #include "graphics/2dutils.hpp"
 #ifndef SERVER_ONLY
@@ -378,10 +378,11 @@ void RaceGUI::renderPlayerView(const Camera *camera, float dt)
 
     if (!isSpectatorCam) drawPlungerInFace(camera, dt);
 
-    if (viewport.getWidth() != (int)irr_driver->getActualScreenSize().Width &&
+    if (viewport.getWidth() != (int)irr_driver->getActualScreenSize().Width ||
         viewport.getHeight() != (int)irr_driver->getActualScreenSize().Height)
     {
-        scaling *= float(viewport.getWidth()) / float(irr_driver->getActualScreenSize().Width); // scale race GUI along screen size
+        scaling.X *= float(viewport.getWidth()) / float(irr_driver->getActualScreenSize().Width); // scale race GUI along screen size
+        scaling.Y *= float(viewport.getHeight()) / float(irr_driver->getActualScreenSize().Height); // scale race GUI along screen size
     }
     else
     {

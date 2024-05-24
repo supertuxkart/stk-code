@@ -19,7 +19,7 @@
 // Manages includes common to all or most options screens
 #include "states_screens/options/options_common.hpp"
 
-#include "graphics/camera.hpp"
+#include "graphics/camera/camera.hpp"
 #include "graphics/irr_driver.hpp"
 #include "modes/world.hpp"
 
@@ -128,7 +128,7 @@ void OptionsScreenDisplay::init()
     // ---- splitscreen mode
     GUIEngine::SpinnerWidget* splitscreen_method = getWidget<GUIEngine::SpinnerWidget>("splitscreen_method");
     assert( splitscreen_method != NULL );
-    splitscreen_method->setValue(UserConfigParams::split_screen_horizontally ? 1 : 0);
+    splitscreen_method->setValue(UserConfigParams::m_split_screen_horizontally ? 1 : 0);
 }   // init
 
 // --------------------------------------------------------------------------------------------
@@ -376,7 +376,6 @@ void OptionsScreenDisplay::eventCallback(Widget* widget, const std::string& name
         CheckBoxWidget* w2 = getWidget<CheckBoxWidget>("fullscreen");
         assert(w2 != NULL);
 
-
         irr_driver->changeResolution(w, h, w2->getState());
     }
     else if (name == "rememberWinpos")
@@ -406,7 +405,7 @@ void OptionsScreenDisplay::eventCallback(Widget* widget, const std::string& name
     {
         GUIEngine::SpinnerWidget* splitscreen_method = getWidget<GUIEngine::SpinnerWidget>("splitscreen_method");
         assert( splitscreen_method != NULL );
-        UserConfigParams::split_screen_horizontally = (splitscreen_method->getValue() == 1);
+        UserConfigParams::m_split_screen_horizontally = (splitscreen_method->getValue() == 1);
         if (World::getWorld())
         {
             for (unsigned i = 0; i < Camera::getNumCameras(); i++)

@@ -23,7 +23,7 @@
 #include "audio/music_manager.hpp"
 #include "config/user_config.hpp"
 #include "graphics/2dutils.hpp"
-#include "graphics/camera.hpp"
+#include "graphics/camera/camera.hpp"
 #include "graphics/central_settings.hpp"
 #include "graphics/irr_driver.hpp"
 #include "graphics/material.hpp"
@@ -1034,35 +1034,21 @@ void RaceGUIBase::drawPlayerIcon(AbstractKart *kart, int x, int y, int w,
                                  bool is_local)
 {
 #ifndef SERVER_ONLY
-    video::ITexture *icon =
-    kart->getKartProperties()->getIconMaterial()->getTexture();
+    video::ITexture *icon = kart->getKartProperties()->getIconMaterial()->getTexture();
 
     CaptureTheFlag* ctf = dynamic_cast<CaptureTheFlag*>(World::getWorld());
     unsigned int kart_id = kart->getWorldKartId();
 
     // CTF
-    if (ctf)
+    if (ctf && (ctf->getRedHolder()  == (int)kart_id ||
+                ctf->getBlueHolder() == (int)kart_id))
     {
-        if (ctf->getRedHolder() == (int)kart_id)
-        {
-            video::ITexture* red =
-                irr_driver->getTexture(FileManager::GUI_ICON, "red_flag.png");
-            const core::rect<s32> rect(core::position2d<s32>(0, 0),
-                red->getSize());
-            const core::rect<s32> pos1
-                (x - 20, y - 10, x + w - 20, y + w - 30);
-            draw2DImage(red, pos1, rect, NULL, NULL, true);
-        }
-        else if (ctf->getBlueHolder() == (int)kart_id)
-        {
-            video::ITexture* blue =
-                irr_driver->getTexture(FileManager::GUI_ICON, "blue_flag.png");
-            const core::rect<s32> rect(core::position2d<s32>(0, 0),
-                blue->getSize());
-            const core::rect<s32> pos1
-                (x - 20, y - 10, x + w - 20, y + w - 30);
-            draw2DImage(blue, pos1, rect, NULL, NULL, true);
-        }
+        video::ITexture* flag = irr_driver->getTexture(FileManager::GUI_ICON,
+            (ctf->getRedHolder() == (int)kart_id) ? "red_flag.png" : "blue_flag.png");
+
+        const core::rect<s32> rect(core::position2d<s32>(0, 0), flag->getSize());
+        const core::rect<s32> pos1(x - 20, y - 10, x + w - 20, y + w - 30);
+        draw2DImage(flag, pos1, rect, NULL, NULL, true);
     }
 
     const core::rect<s32> pos(x, y, x+w, y+w);

@@ -20,7 +20,7 @@
 #include "graphics/post_processing.hpp"
 
 #include "config/user_config.hpp"
-#include "graphics/camera.hpp"
+#include "graphics/camera/camera.hpp"
 #include "graphics/central_settings.hpp"
 #include "graphics/frame_buffer.hpp"
 #include "graphics/graphics_restrictions.hpp"
@@ -76,26 +76,6 @@ public:
         drawFullScreenEffect(core::vector2df(inv_width, inv_height));
     }   // render
 };   // Gaussian3HBlurShader
-
-// ============================================================================
-class ComputeShadowBlurVShader : public TextureShader<ComputeShadowBlurVShader, 1,
-                                               core::vector2df,
-                                               std::vector<float> >
-{
-public:
-    GLuint m_dest_tu;
-    ComputeShadowBlurVShader()
-    {
-#if !defined(USE_GLES2)
-        loadProgram(OBJECT, GL_COMPUTE_SHADER, "blurshadowV.comp");
-        m_dest_tu = 1;
-        assignUniforms("pixel", "weights");
-        assignSamplerNames(0, "source", ST_NEARED_CLAMPED_FILTERED);
-        assignTextureUnit(m_dest_tu, "dest");
-#endif
-    }   // ComputeShadowBlurVShader
-
-};   // ComputeShadowBlurVShader
 
 // ============================================================================
 class Gaussian6VBlurShader : public TextureShader<Gaussian6VBlurShader, 1,
@@ -174,23 +154,6 @@ public:
         assignTextureUnit(m_dest_tu, "dest");
     }   // ComputeGaussian6HBlurShader
 };   // ComputeGaussian6HBlurShader
-
-// ============================================================================
-class ComputeShadowBlurHShader : public TextureShader<ComputeShadowBlurHShader, 1,
-                                               core::vector2df,
-                                               std::vector<float> >
-{
-public:
-    GLuint m_dest_tu;
-    ComputeShadowBlurHShader()
-    {
-        loadProgram(OBJECT, GL_COMPUTE_SHADER, "blurshadowH.comp");
-        m_dest_tu = 1;
-        assignUniforms("pixel", "weights");
-        assignSamplerNames(0, "source", ST_NEARED_CLAMPED_FILTERED);
-        assignTextureUnit(m_dest_tu, "dest");
-    }   // ComputeShadowBlurHShader
-};   // ComputeShadowBlurHShader
 #endif
 
 // ============================================================================

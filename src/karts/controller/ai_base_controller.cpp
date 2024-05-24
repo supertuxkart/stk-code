@@ -20,7 +20,7 @@
 #include "karts/controller/ai_base_controller.hpp"
 
 #include "config/user_config.hpp"
-#include "graphics/camera.hpp"
+#include "graphics/camera/camera.hpp"
 #include "karts/abstract_kart.hpp"
 #include "karts/kart_properties.hpp"
 #include "karts/controller/ai_properties.hpp"

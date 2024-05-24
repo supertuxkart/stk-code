@@ -22,8 +22,8 @@ using namespace irr;
 #include <algorithm>
 
 #include "config/user_config.hpp"
-#include "graphics/camera.hpp"
-#include "graphics/camera_debug.hpp"
+#include "graphics/camera/camera.hpp"
+#include "graphics/camera/camera_debug.hpp"
 #include "graphics/2dutils.hpp"
 #include "graphics/irr_driver.hpp"
 #include "graphics/material.hpp"

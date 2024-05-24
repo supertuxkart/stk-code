@@ -19,7 +19,7 @@
 #include "modes/profile_world.hpp"
 
 #include "main_loop.hpp"
-#include "graphics/camera.hpp"
+#include "graphics/camera/camera.hpp"
 #include "graphics/irr_driver.hpp"
 #include "karts/kart_with_stats.hpp"
 #include "karts/controller/controller.hpp"

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <stkgui>
-    <div x="2%" y="1%" width="96%" height="98%" layout="vertical-row" >
+    <div x="2%" y="2%" width="96%" height="96%" layout="vertical-row" >
         <header id="title" width="100%" height="fit" text_align="center" word_wrap="true" text="Graphics Settings" />
 
         <spacer height="20" width="10" />
@@ -156,7 +156,7 @@
         <div layout="horizontal-row" width="100%" proportion="1">
             <label text="Rendered image quality" I18N="Video settings" width="40%"/>
             <spacer width="10" height="10"/>
-            <gauge id="image_quality" min_value="0" max_value="2" width="50%" />
+            <gauge id="image_quality" min_value="0" max_value="3" width="50%" />
         </div>
 
         <spacer height="4" width="10" />

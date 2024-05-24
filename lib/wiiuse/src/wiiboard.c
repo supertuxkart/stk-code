@@ -161,6 +161,45 @@ void wii_board_event(struct wii_board_t *wb, byte *msg)
 }
 
 /**
-        @todo not implemented!
+*   @brief Calib wii board
+* 
+*    @param wm      Pointer to a wiimote_t struct the calib values are used.
 */
-void wiiuse_set_wii_board_calib(struct wiimote_t *wm) {}
+void wiiuse_set_wii_board_calib(struct wiimote_t *wm)
+{
+    byte pkt[21];
+    uint16_t test = 1;
+    memset(pkt, 0, sizeof(pkt));
+
+    /*
+     * address in big endian first, the leading byte will
+     * be overwritten (only 3 bytes are sent)
+     */
+    to_big_endian_uint32_t(pkt, WM_EXP_MEM_CALIBR + 4);
+
+    pkt[0] = 0x04; //write register
+    pkt[4] = 0x0f; //size of data
+
+    to_big_endian_uint16_t(&pkt[5], wm->exp.wb.ctr[0]);
+    to_big_endian_uint16_t(&pkt[7], wm->exp.wb.cbr[0]);
+    to_big_endian_uint16_t(&pkt[9], wm->exp.wb.ctl[0]);
+    to_big_endian_uint16_t(&pkt[11], wm->exp.wb.cbl[0]);
+    to_big_endian_uint16_t(&pkt[13], wm->exp.wb.ctr[1]);
+    to_big_endian_uint16_t(&pkt[15], wm->exp.wb.cbr[1]);
+    to_big_endian_uint16_t(&pkt[17], wm->exp.wb.ctl[1]);
+    to_big_endian_uint16_t(&pkt[19], wm->exp.wb.cbl[1]);
+    if (wiiuse_send(wm, WM_CMD_WRITE_DATA, pkt, sizeof(pkt)) < 0)
+        return;
+    wiiuse_millisleep(100);
+
+    to_big_endian_uint32_t(pkt, WM_EXP_MEM_CALIBR + 20);
+    pkt[0] = 0x04; //write register
+    pkt[4] = 0x08; //size of data
+
+    to_big_endian_uint16_t(&pkt[5], wm->exp.wb.ctr[2]);
+    to_big_endian_uint16_t(&pkt[7], wm->exp.wb.cbr[2]);
+    to_big_endian_uint16_t(&pkt[9], wm->exp.wb.ctl[2]);
+    to_big_endian_uint16_t(&pkt[11], wm->exp.wb.cbl[2]);
+    wiiuse_send(wm, WM_CMD_WRITE_DATA, pkt, sizeof(pkt));
+    wiiuse_millisleep(100);
+}

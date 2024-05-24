@@ -100,14 +100,14 @@
                     <spacer width="5%" height="100%" />
                     <button id="benchmarkCurrent" text="Performance test of the current settings" I18N="In the video settings" align="center"/>
                 </div>
-<!-- 
+
                 <spacer width="5" height="2%"/>
 
                 <div width="100%" height="fit" layout="horizontal-row" id="outer_box" >
                     <spacer width="5%" height="100%" />
-                    <button id="benchmarkStandard" text="Standard Benchmark" I18N="In the video settings" align="center"/>
+                    <button id="benchmarkRecommend" text="Recommend settings" I18N="In the video settings" align="center"/>
                 </div>
- -->
+
             </box>
         </div>
     </div>

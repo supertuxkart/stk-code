@@ -21,7 +21,7 @@
 #ifndef HEADER_CAMERA_FPS_HPP
 #define HEADER_CAMERA_FPS_HPP
 
-#include "graphics/camera.hpp"
+#include "graphics/camera/camera.hpp"
 
 #include "utils/cpp2011.hpp"
 

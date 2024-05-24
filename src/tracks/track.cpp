@@ -26,7 +26,7 @@
 #include "config/player_manager.hpp"
 #include "config/stk_config.hpp"
 #include "config/user_config.hpp"
-#include "graphics/camera_end.hpp"
+#include "graphics/camera/camera_end.hpp"
 #include "graphics/CBatchingMesh.hpp"
 #include "graphics/central_settings.hpp"
 #include "graphics/cpu_particle_manager.hpp"
@@ -936,7 +936,7 @@ void Track::createPhysicsModel(unsigned int main_track_count,
 // -----------------------------------------------------------------------------
 
 
-/** Convert the graohics track into its physics equivalents.
+/** Convert the graphics track into its physics equivalents.
  *  \param mesh The mesh to convert.
  *  \param node The scene node.
  */

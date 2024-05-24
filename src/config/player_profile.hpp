@@ -160,7 +160,9 @@ public:
     /** Returns the name of this player. */
     const core::stringw& getName() const
     {
+        #ifdef DEBUG
         assert(m_magic_number == 0xABCD1234);
+        #endif
         return m_local_name;
     }   // getName
 

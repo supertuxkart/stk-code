@@ -21,7 +21,7 @@
 #ifndef HEADER_CAMERA_END_HPP
 #define HEADER_CAMERA_END_HPP
 
-#include "graphics/camera_normal.hpp"
+#include "graphics/camera/camera_normal.hpp"
 
 #include "utils/cpp2011.hpp"
 

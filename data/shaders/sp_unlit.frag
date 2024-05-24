@@ -22,7 +22,7 @@ void main(void)
 #if defined(Advanced_Lighting_Enabled)
     o_diffuse_color = vec4(final_color, 0.4);
 
-    o_normal_color.xy = 0.5 * EncodeNormal(normalize(normal)) + 0.5;
+    o_normal_color.xy = EncodeNormal(normalize(normal));
     o_normal_color.zw = vec2(0.0);
 #else
     o_diffuse_color = vec4(final_color, 1.0);
