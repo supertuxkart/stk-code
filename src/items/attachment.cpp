@@ -400,7 +400,8 @@ void Attachment::hitBanana(ItemState *item_state)
  */
 void Attachment::handleCollisionWithKart(AbstractKart *other)
 {
-    Attachment *attachment_other=other->getAttachment();
+    Attachment *attachment_other = other->getAttachment();
+    const World*  world          = World::getWorld();
 
     if(getType()==Attachment::ATTACH_BOMB)
     {
@@ -410,6 +411,13 @@ void Attachment::handleCollisionWithKart(AbstractKart *other)
             other->decreaseShieldTime();
             return;
         }
+
+        // Don't hit teammates in team world
+        if (world->hasTeam() &&
+            world->getKartTeam(other->getWorldKartId()) ==
+            world->getKartTeam(m_kart->getWorldKartId()))
+            return;
+
         // If both karts have a bomb, explode them immediately:
         if(attachment_other->getType()==Attachment::ATTACH_BOMB)
         {
@@ -420,7 +428,7 @@ void Attachment::handleCollisionWithKart(AbstractKart *other)
         {
             // if there are only two karts, let them switch bomb from one to other
             if (getPreviousOwner() != other ||
-                World::getWorld()->getNumKarts() <= 2)
+                world->getNumKarts() <= 2)
             {
                 // Don't move if this bomb was from other kart originally
                 other->getAttachment()
@@ -435,7 +443,7 @@ void Attachment::handleCollisionWithKart(AbstractKart *other)
     }   // type==BOMB
     else if(attachment_other->getType()==Attachment::ATTACH_BOMB &&
              (attachment_other->getPreviousOwner()!=m_kart || 
-               World::getWorld()->getNumKarts() <= 2         )      )
+               world->getNumKarts() <= 2         )      )
     {
         // Don't attach a bomb when the kart is shielded
         if(m_kart->isShielded())
