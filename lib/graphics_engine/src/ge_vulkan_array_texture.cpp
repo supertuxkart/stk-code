@@ -220,7 +220,7 @@ void GEVulkanArrayTexture::reloadInternal(const std::vector<io::path>& list,
         VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_SAMPLED_BIT))
         goto destroy;
 
-    command_buffer = GEVulkanCommandLoader::beginSingleTimeCommands();
+    command_buffer = GEVulkanCommandLoader::beginSingleTimeCommands(GVQI_TRANSFER);
 
     transitionImageLayout(command_buffer, VK_IMAGE_LAYOUT_UNDEFINED,
         VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL);
@@ -239,7 +239,7 @@ void GEVulkanArrayTexture::reloadInternal(const std::vector<io::path>& list,
     transitionImageLayout(command_buffer, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL,
         VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
 
-    GEVulkanCommandLoader::endSingleTimeCommands(command_buffer);
+    GEVulkanCommandLoader::endSingleTimeCommands(command_buffer, GVQI_TRANSFER);
 
     createImageView(VK_IMAGE_ASPECT_COLOR_BIT);
 

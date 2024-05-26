@@ -112,7 +112,7 @@ void GEVulkanFeatures::init(GEVulkanDriver* vk)
         std::vector<VkQueueFamilyProperties> queue_families(queue_family_count);
         vkGetPhysicalDeviceQueueFamilyProperties(vk->getPhysicalDevice(),
             &queue_family_count, &queue_families[0]);
-        uint32_t main_family = vk->getGraphicsFamily();
+        uint32_t main_family = vk->getQueueFamily(GVQI_GRAPHICS);;
         if (main_family < queue_families.size())
         {
             g_supports_compute_in_main_queue =

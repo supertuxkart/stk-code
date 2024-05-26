@@ -23,16 +23,15 @@ unsigned getLoaderCount();
 // ----------------------------------------------------------------------------
 int getLoaderId();
 // ----------------------------------------------------------------------------
-VkCommandPool getCurrentCommandPool();
+VkCommandPool getCurrentCommandPool(uint32_t index);
 // ----------------------------------------------------------------------------
-VkFence getCurrentFence();
+VkFence getCurrentFence(uint32_t index);
 // ----------------------------------------------------------------------------
 void addMultiThreadingCommand(std::function<void()> cmd);
 // ----------------------------------------------------------------------------
-VkCommandBuffer beginSingleTimeCommands();
+VkCommandBuffer beginSingleTimeCommands(uint32_t index);
 // ----------------------------------------------------------------------------
-void endSingleTimeCommands(VkCommandBuffer command_buffer,
-                           VkQueueFlagBits bit = VK_QUEUE_GRAPHICS_BIT);
+void endSingleTimeCommands(VkCommandBuffer command_buffer, uint32_t index);
 // ----------------------------------------------------------------------------
 void waitIdle();
 };   // GEVulkanCommandLoader

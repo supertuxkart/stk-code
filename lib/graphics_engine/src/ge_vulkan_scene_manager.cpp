@@ -191,7 +191,7 @@ void GEVulkanSceneManager::drawAll(irr::u32 flags)
     };
     clear_values[1].depthStencil = {1.0f, 0};
 
-    VkCommandBuffer cmd = GEVulkanCommandLoader::beginSingleTimeCommands();
+    VkCommandBuffer cmd = GEVulkanCommandLoader::beginSingleTimeCommands(GVQI_GRAPHICS);
 
     GEVulkanCameraSceneNode* cam = static_cast<
         GEVulkanCameraSceneNode*>(getActiveCamera());
@@ -217,7 +217,7 @@ void GEVulkanSceneManager::drawAll(irr::u32 flags)
 
     vkCmdEndRenderPass(cmd);
 
-    GEVulkanCommandLoader::endSingleTimeCommands(cmd);
+    GEVulkanCommandLoader::endSingleTimeCommands(cmd, GVQI_GRAPHICS);
     vk->handleDeletedTextures();
 }   // drawAll
 

@@ -236,7 +236,7 @@ bool GEVulkanTexture::createTextureImage(uint8_t* texture_data,
         goto destroy;
     }
 
-    command_buffer = GEVulkanCommandLoader::beginSingleTimeCommands();
+    command_buffer = GEVulkanCommandLoader::beginSingleTimeCommands(GVQI_TRANSFER);
 
     transitionImageLayout(command_buffer, VK_IMAGE_LAYOUT_UNDEFINED,
         VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL);
@@ -262,7 +262,7 @@ bool GEVulkanTexture::createTextureImage(uint8_t* texture_data,
     transitionImageLayout(command_buffer, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL,
         VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
 
-    GEVulkanCommandLoader::endSingleTimeCommands(command_buffer);
+    GEVulkanCommandLoader::endSingleTimeCommands(command_buffer, GVQI_TRANSFER);
 
 destroy:
     delete mipmap_generator;
@@ -625,7 +625,7 @@ uint8_t* GEVulkanTexture::getTextureData()
         buffer_allocation))
         return NULL;
 
-    VkCommandBuffer command_buffer = GEVulkanCommandLoader::beginSingleTimeCommands();
+    VkCommandBuffer command_buffer = GEVulkanCommandLoader::beginSingleTimeCommands(GVQI_TRANSFER);
 
     transitionImageLayout(command_buffer,
         VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL,
@@ -648,7 +648,7 @@ uint8_t* GEVulkanTexture::getTextureData()
     transitionImageLayout(command_buffer, VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL,
         VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
 
-    GEVulkanCommandLoader::endSingleTimeCommands(command_buffer);
+    GEVulkanCommandLoader::endSingleTimeCommands(command_buffer, GVQI_TRANSFER);
 
     uint8_t* texture_data = new uint8_t[image_size];
     void* mapped_data;
@@ -750,7 +750,7 @@ void GEVulkanTexture::updateTexture(void* data, video::ECOLOR_FORMAT format,
         }
     }
 
-    VkCommandBuffer command_buffer = GEVulkanCommandLoader::beginSingleTimeCommands();
+    VkCommandBuffer command_buffer = GEVulkanCommandLoader::beginSingleTimeCommands(GVQI_TRANSFER);
     transitionImageLayout(command_buffer,
         VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL,
         VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL);
@@ -830,7 +830,7 @@ void GEVulkanTexture::updateTexture(void* data, video::ECOLOR_FORMAT format,
 
     transitionImageLayout(command_buffer, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL,
         VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
-    GEVulkanCommandLoader::endSingleTimeCommands(command_buffer);
+    GEVulkanCommandLoader::endSingleTimeCommands(command_buffer, GVQI_TRANSFER);
 
     vmaDestroyBuffer(m_vk->getVmaAllocator(), staging_buffer,
         staging_buffer_allocation);

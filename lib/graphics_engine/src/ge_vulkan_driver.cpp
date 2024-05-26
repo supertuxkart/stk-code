@@ -510,8 +510,10 @@ GEVulkanDriver::GEVulkanDriver(const SIrrlichtCreationParameters& params,
     m_vk.reset(new VK());
     m_physical_device = VK_NULL_HANDLE;
     m_present_queue = VK_NULL_HANDLE;
-    m_graphics_family = m_present_family = 0;
-    m_graphics_queue_count = 0;
+    memset(m_queue_family, 0, sizeof(m_queue_family));
+    memset(m_queue_count, 0, sizeof(m_queue_count));
+    m_present_family = 0;
+    m_queue_family_count = 0;
     m_properties = {};
     m_features = {};
 
@@ -706,9 +708,12 @@ void GEVulkanDriver::destroyVulkan()
     GEVulkanShaderManager::destroy();
 
     GEVulkanCommandLoader::destroy();
-    for (std::mutex* m : m_graphics_queue_mutexes)
-        delete m;
-    m_graphics_queue_mutexes.clear();
+    for (int i = GVQI_MIN; i < GVQI_COUNT; i++)
+    {
+        for (std::mutex* m : m_queue_mutexes[i])
+            delete m;
+        m_queue_mutexes[i].clear();
+    }
 
     delete m_vk.get();
     m_vk.release();
@@ -835,17 +840,70 @@ void GEVulkanDriver::findPhysicalDevice()
         throw std::runtime_error("findPhysicalDevice has < 1 device_count");
 
     std::vector<VkPhysicalDevice> devices(device_count);
-    vkEnumeratePhysicalDevices(m_vk->instance, &device_count, &devices[0]);
+    vkEnumeratePhysicalDevices(m_vk->instance, &device_count, devices.data());
 
     for (VkPhysicalDevice& device : devices)
     {
-        uint32_t graphics_family = 0;
-        uint32_t present_family = 0;
-        unsigned graphics_queue_count = 0;
+        memset(m_queue_family, 0, sizeof(m_queue_family));
+        memset(m_queue_count, 0, sizeof(m_queue_count));
+        m_present_family = 0;
+        m_queue_family_count = 0;
 
-        bool success = findQueueFamilies(device, &graphics_family,
-            &graphics_queue_count, &present_family);
+        uint32_t queue_family_count = 0;
+        vkGetPhysicalDeviceQueueFamilyProperties(device, &queue_family_count, NULL);
+        if (queue_family_count == 0)
+            continue;
 
+        std::vector<VkQueueFamilyProperties> queue_families(queue_family_count);
+        vkGetPhysicalDeviceQueueFamilyProperties(device, &queue_family_count,
+            queue_families.data());
+
+        bool find_present_family = false;
+
+        for (unsigned int i = 0; i < queue_families.size(); i++)
+        {
+            VkBool32 present_support = false;
+            vkGetPhysicalDeviceSurfaceSupportKHR(device, i, m_vk->surface, &present_support);
+
+            if (queue_families[i].queueCount > 0 && present_support)
+            {
+                find_present_family = true;
+                m_present_family = i;
+                break;
+            }
+        }
+
+        for (unsigned int i = 0; i < queue_families.size(); i++)
+        {
+            if (queue_families[i].queueCount == 0)
+                continue;
+
+            if (queue_families[i].queueFlags & VK_QUEUE_GRAPHICS_BIT
+             && m_queue_count[GVQI_GRAPHICS] == 0)
+            {
+                m_queue_family[GVQI_GRAPHICS] = i;
+                m_queue_count[GVQI_GRAPHICS] = queue_families[i].queueCount;
+                m_queue_family_count++;
+            }
+            else if (queue_families[i].queueFlags & VK_QUEUE_COMPUTE_BIT
+             && i != m_present_family
+             && m_queue_count[GVQI_COMPUTE] == 0)
+            {
+                m_queue_family[GVQI_COMPUTE] = i;
+                m_queue_count[GVQI_COMPUTE] = queue_families[i].queueCount;
+                m_queue_family_count++;
+            }
+            else if (queue_families[i].queueFlags & VK_QUEUE_TRANSFER_BIT
+             && i != m_present_family
+             && m_queue_count[GVQI_TRANSFER] == 0)
+            {
+                m_queue_family[GVQI_TRANSFER] = i;
+                m_queue_count[GVQI_TRANSFER] = queue_families[i].queueCount;
+                m_queue_family_count++;
+            }
+        }
+
+        bool success = m_queue_count[GVQI_GRAPHICS] != 0 && find_present_family;
         if (!success)
             continue;
 
@@ -865,9 +923,6 @@ void GEVulkanDriver::findPhysicalDevice()
             continue;
 
         vkGetPhysicalDeviceFeatures(device, &m_features);
-        m_graphics_family = graphics_family;
-        m_graphics_queue_count = graphics_queue_count;
-        m_present_family = present_family;
         m_surface_capabilities = surface_capabilities;
         m_surface_formats = surface_formats;
         m_present_modes = present_modes;
@@ -951,8 +1006,10 @@ bool GEVulkanDriver::updateSurfaceInformation(VkPhysicalDevice device,
 
 // ----------------------------------------------------------------------------
 bool GEVulkanDriver::findQueueFamilies(VkPhysicalDevice device,
-                                       uint32_t* graphics_family,
-                                       unsigned* graphics_queue_count,
+                                       VkQueueFlags required_queue_flags,
+                                       VkQueueFlags ignored_queue_flags,
+                                       uint32_t* family,
+                                       unsigned* queue_count,
                                        uint32_t* present_family)
 {
     uint32_t queue_family_count = 0;
@@ -962,54 +1019,85 @@ bool GEVulkanDriver::findQueueFamilies(VkPhysicalDevice device,
 
     std::vector<VkQueueFamilyProperties> queue_families(queue_family_count);
     vkGetPhysicalDeviceQueueFamilyProperties(device, &queue_family_count,
-        &queue_families[0]);
+        queue_families.data());
 
     bool found_graphics_family = false;
-    bool found_present_family = false;
+    bool found_present_family = true;
 
     for (unsigned int i = 0; i < queue_families.size(); i++)
     {
         if (queue_families[i].queueCount > 0 &&
-            queue_families[i].queueFlags & VK_QUEUE_GRAPHICS_BIT)
+            !(~queue_families[i].queueFlags & required_queue_flags) && // All required flags
+            !(queue_families[i].queueFlags & ignored_queue_flags)) // No ignored flags
         {
-            *graphics_family = i;
-            *graphics_queue_count = queue_families[i].queueCount;
+            *family = i;
+            *queue_count = queue_families[i].queueCount;
             found_graphics_family = true;
             break;
         }
     }
-
-    for (unsigned int i = 0; i < queue_families.size(); i++)
+    if (present_family)
     {
-        VkBool32 present_support = false;
-        vkGetPhysicalDeviceSurfaceSupportKHR(device, i, m_vk->surface, &present_support);
+        found_present_family = false;
 
-        if (queue_families[i].queueCount > 0 && present_support)
+        for (unsigned int i = 0; i < queue_families.size(); i++)
         {
-            *present_family = i;
-            found_present_family = true;
-            break;
+            VkBool32 present_support = false;
+            vkGetPhysicalDeviceSurfaceSupportKHR(device, i, m_vk->surface, &present_support);
+
+            if (queue_families[i].queueCount > 0 && present_support)
+            {
+                *present_family = i;
+                found_present_family = true;
+                break;
+            }
         }
     }
-
     return found_graphics_family && found_present_family;
 }   // findQueueFamilies
+
+// ----------------------------------------------------------------------------
+uint32_t GEVulkanDriver::getQueueFamily(uint32_t queue_index) const
+{
+    if (queue_index == GVQI_TRANSFER && m_queue_count[queue_index] == 0)
+        queue_index = GVQI_COMPUTE;
+    if (queue_index == GVQI_COMPUTE && m_queue_count[queue_index] == 0)
+        queue_index = GVQI_GRAPHICS;
+    return m_queue_family[queue_index];
+}
+
+// ----------------------------------------------------------------------------
+uint32_t GEVulkanDriver::getQueueCount(uint32_t queue_index) const
+{
+    if (queue_index == GVQI_TRANSFER && m_queue_count[queue_index] == 0)
+        queue_index = GVQI_COMPUTE;
+    if (queue_index == GVQI_COMPUTE && m_queue_count[queue_index] == 0)
+        queue_index = GVQI_GRAPHICS;
+    return m_queue_count[queue_index];
+}
 
 // ----------------------------------------------------------------------------
 void GEVulkanDriver::createDevice()
 {
     std::vector<VkDeviceQueueCreateInfo> queue_create_infos;
-    std::vector<float> queue_priority;
-    queue_priority.resize(m_graphics_queue_count, 1.0f);
+    std::vector<float> queue_priority[GVQI_COUNT];
 
     VkDeviceQueueCreateInfo queue_create_info = {};
-    queue_create_info.sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO;
-    queue_create_info.queueFamilyIndex = m_graphics_family;
-    queue_create_info.queueCount = m_graphics_queue_count;
-    queue_create_info.pQueuePriorities = queue_priority.data();
-    queue_create_infos.push_back(queue_create_info);
+    for (int i = GVQI_MIN; i < GVQI_COUNT; i++)
+    {
+        if (m_queue_count[i] == 0)
+        {
+            continue;
+        }
+        queue_priority[i].resize(m_queue_count[i], 1.0f);
+        queue_create_info.sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO;
+        queue_create_info.queueFamilyIndex = m_queue_family[i];
+        queue_create_info.queueCount = m_queue_count[i];
+        queue_create_info.pQueuePriorities = queue_priority[i].data();
+        queue_create_infos.push_back(queue_create_info);
+    }
 
-    if (m_present_family != m_graphics_family)
+    if (m_present_family != m_queue_family[GVQI_GRAPHICS])
     {
         queue_create_info.queueFamilyIndex = m_present_family;
         queue_create_info.queueCount = 1;
@@ -1045,10 +1133,10 @@ void GEVulkanDriver::createDevice()
     VkDeviceCreateInfo create_info = {};
     create_info.sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;
     create_info.queueCreateInfoCount = queue_create_infos.size();
-    create_info.pQueueCreateInfos = &queue_create_infos[0];
+    create_info.pQueueCreateInfos = queue_create_infos.data();
     create_info.pEnabledFeatures = &device_features;
     create_info.enabledExtensionCount = m_device_extensions.size();
-    create_info.ppEnabledExtensionNames = &m_device_extensions[0];
+    create_info.ppEnabledExtensionNames = m_device_extensions.data();
     create_info.enabledLayerCount = 0;
     create_info.pNext = &descriptor_indexing_features;
 
@@ -1057,40 +1145,49 @@ void GEVulkanDriver::createDevice()
     if (result != VK_SUCCESS)
         throw std::runtime_error("vkCreateDevice failed");
 
-    m_graphics_queue.resize(m_graphics_queue_count);
-    for (unsigned i = 0; i < m_graphics_queue_count; i++)
+    for (unsigned i = GVQI_MIN; i < GVQI_COUNT; i++)
     {
-        vkGetDeviceQueue(m_vk->device, m_graphics_family, i,
-            &m_graphics_queue[i]);
-        m_graphics_queue_mutexes.push_back(new std::mutex());
+        for (unsigned j = 0; j < m_queue_count[i]; j++)
+        {
+            VkQueue queue;
+            vkGetDeviceQueue(m_vk->device, m_queue_family[i], j,
+                &queue);
+            m_queues[i].push_back(queue);
+            m_queue_mutexes[i].push_back(new std::mutex());
+        }
     }
 
-    if (m_present_family != m_graphics_family)
+    if (m_present_family != m_queue_family[GVQI_GRAPHICS])
         vkGetDeviceQueue(m_vk->device, m_present_family, 0, &m_present_queue);
 }   // createDevice
 
 // ----------------------------------------------------------------------------
-std::unique_lock<std::mutex> GEVulkanDriver::getGraphicsQueue(VkQueue* queue) const
+std::unique_lock<std::mutex> GEVulkanDriver::getQueue(VkQueue* queue, uint32_t index) const
 {
-    if (m_graphics_queue_count == 0)
-        throw std::runtime_error("No graphics queue created");
-    if (m_graphics_queue_count == 1)
-    {
-        *queue = m_graphics_queue[0];
-        return std::unique_lock<std::mutex>(*m_graphics_queue_mutexes[0]);
-    }
+    if (index == GVQI_TRANSFER && m_queue_count[index] == 0)
+        index = GVQI_COMPUTE;
+    if (index == GVQI_COMPUTE && m_queue_count[index] == 0)
+        index = GVQI_GRAPHICS;
+
     while (true)
     {
-        for (unsigned i = 0; i < m_graphics_queue_count; i++)
+        bool has_queue = false;
+        int offset = 0;
+
+        for (unsigned j = 0; j < m_queue_count[index]; j++)
         {
-            std::unique_lock<std::mutex> lock(*m_graphics_queue_mutexes[i],
+            has_queue = true;
+            std::unique_lock<std::mutex> lock(*m_queue_mutexes[index][j],
                 std::defer_lock);
             if (lock.try_lock())
             {
-                *queue = m_graphics_queue[i];
+                *queue = m_queues[index][j];
                 return lock;
             }
         }
+
+        if (!has_queue)
+            throw std::runtime_error("GEVulkanDriver::getQueue: Cannot fetch suitable queue");
     }
 }   // getGraphicsQueue
 
@@ -1234,8 +1331,8 @@ found_mode:
     create_info.imageArrayLayers = 1;
     create_info.imageUsage = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT;
 
-    uint32_t queueFamilyIndices[] = { m_graphics_family, m_present_family };
-    if (m_graphics_family != m_present_family)
+    uint32_t queueFamilyIndices[] = { m_queue_family[GVQI_GRAPHICS], m_present_family };
+    if (m_present_family != m_queue_family[GVQI_GRAPHICS])
     {
         create_info.imageSharingMode = VK_SHARING_MODE_CONCURRENT;
         create_info.queueFamilyIndexCount = 2;
@@ -1391,7 +1488,7 @@ void GEVulkanDriver::createCommandBuffers()
     {
         VkCommandPoolCreateInfo pool_info = {};
         pool_info.sType = VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO;
-        pool_info.queueFamilyIndex = m_graphics_family;
+        pool_info.queueFamilyIndex = m_queue_family[GVQI_GRAPHICS];
         VkResult result = vkCreateCommandPool(m_vk->device, &pool_info,
             NULL, &m_vk->command_pools[i]);
         if (result != VK_SUCCESS)
@@ -1641,13 +1738,13 @@ bool GEVulkanDriver::createBuffer(VkDeviceSize size, VkBufferUsageFlags usage,
 void GEVulkanDriver::copyBuffer(VkBuffer src_buffer, VkBuffer dst_buffer,
                                 VkDeviceSize size)
 {
-    VkCommandBuffer command_buffer = GEVulkanCommandLoader::beginSingleTimeCommands();
+    VkCommandBuffer command_buffer = GEVulkanCommandLoader::beginSingleTimeCommands(GVQI_TRANSFER);
 
     VkBufferCopy copy_region = {};
     copy_region.size = size;
     vkCmdCopyBuffer(command_buffer, src_buffer, dst_buffer, 1, &copy_region);
 
-    GEVulkanCommandLoader::endSingleTimeCommands(command_buffer);
+    GEVulkanCommandLoader::endSingleTimeCommands(command_buffer, GVQI_TRANSFER);
 }   // copyBuffer
 
 // ----------------------------------------------------------------------------
@@ -1763,7 +1860,7 @@ bool GEVulkanDriver::endScene()
     submit_info.pSignalSemaphores = signal_semaphores;
 
     VkQueue queue = VK_NULL_HANDLE;
-    std::unique_lock<std::mutex> ul = getGraphicsQueue(&queue);
+    std::unique_lock<std::mutex> ul = getQueue(&queue, GVQI_GRAPHICS);;
     result = vkQueueSubmit(queue, 1, &submit_info,
         m_vk->in_flight_fences[m_current_frame]);
     ul.unlock();
@@ -1792,12 +1889,12 @@ bool GEVulkanDriver::endScene()
     m_current_buffer_idx =
         (m_current_buffer_idx + 1) % (getMaxFrameInFlight() + 1);
 
-    if (m_present_queue)
+    if (m_present_family != m_queue_family[GVQI_GRAPHICS])
         result = vkQueuePresentKHR(m_present_queue, &present_info);
     else
     {
         VkQueue present_queue = VK_NULL_HANDLE;
-        std::unique_lock<std::mutex> ul = getGraphicsQueue(&present_queue);
+        std::unique_lock<std::mutex> ul = getQueue(&present_queue, GVQI_GRAPHICS);
         result = vkQueuePresentKHR(present_queue, &present_info);
         ul.unlock();
     }
@@ -2348,11 +2445,13 @@ void GEVulkanDriver::waitIdle(bool flush_command_loader)
     if (m_disable_wait_idle)
         return;
     // Host access to all VkQueue objects created from device must be externally synchronized
-    for (std::mutex* m : m_graphics_queue_mutexes)
-        m->lock();
+    for (int i = GVQI_MIN; i < GVQI_COUNT; i++)
+        for (std::mutex* m : m_queue_mutexes[i])
+            m->lock();
     vkDeviceWaitIdle(m_vk->device);
-    for (std::mutex* m : m_graphics_queue_mutexes)
-        m->unlock();
+    for (int i = GVQI_MIN; i < GVQI_COUNT; i++)
+        for (std::mutex* m : m_queue_mutexes[i])
+            m->unlock();
 
     if (flush_command_loader)
         GEVulkanCommandLoader::waitIdle();

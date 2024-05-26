@@ -42,6 +42,14 @@ namespace GE
         GVS_2D_RENDER,
         GVS_COUNT,
     };
+    enum GEVulkanQueueIndices : unsigned
+    {
+        GVQI_MIN = 0,
+        GVQI_GRAPHICS = GVQI_MIN,
+        GVQI_COMPUTE,
+        GVQI_TRANSFER,
+        GVQI_COUNT
+    };
     class GEVulkanDriver : public video::CNullDriver
     {
     public:
@@ -342,10 +350,9 @@ namespace GE
             createSwapChainRelated(false/*handle_surface*/);
         }
         void updateDriver(bool reload_shaders = false);
-        uint32_t getGraphicsFamily() const         { return m_graphics_family; }
-        unsigned getGraphicsQueueCount() const
-                                              { return m_graphics_queue_count; }
-        std::unique_lock<std::mutex> getGraphicsQueue(VkQueue* queue) const;
+        uint32_t getQueueFamily(uint32_t queue_index) const;
+        uint32_t getQueueCount(uint32_t queue_index) const;
+        std::unique_lock<std::mutex> getQueue(VkQueue* queue, uint32_t queue_index) const;
         void waitIdle(bool flush_command_loader = false);
         void setDisableWaitIdle(bool val)         { m_disable_wait_idle = val; }
         IrrlichtDevice* getIrrlichtDevice() const  { return m_irrlicht_device; }
@@ -483,13 +490,14 @@ namespace GE
         VkSurfaceCapabilitiesKHR m_surface_capabilities;
         std::vector<VkSurfaceFormatKHR> m_surface_formats;
         std::vector<VkPresentModeKHR> m_present_modes;
-        std::vector<VkQueue> m_graphics_queue;
+        std::vector<VkQueue> m_queues[GVQI_COUNT];
+        uint32_t m_queue_count[GVQI_COUNT];
+        mutable std::vector<std::mutex*> m_queue_mutexes[GVQI_COUNT];
+        uint32_t m_queue_family[GVQI_COUNT];
+        uint32_t m_queue_family_count;
         VkQueue m_present_queue;
-        mutable std::vector<std::mutex*> m_graphics_queue_mutexes;
-
-        uint32_t m_graphics_family;
         uint32_t m_present_family;
-        unsigned m_graphics_queue_count;
+       
         VkPhysicalDeviceProperties m_properties;
         VkPhysicalDeviceFeatures m_features;
 
@@ -522,7 +530,8 @@ namespace GE
         void createInstance(SDL_Window* window);
         void findPhysicalDevice();
         bool checkDeviceExtensions(VkPhysicalDevice device);
-        bool findQueueFamilies(VkPhysicalDevice device, uint32_t* graphics_family, unsigned* graphics_queue_count, uint32_t* present_family);
+        bool findQueueFamilies(VkPhysicalDevice device, VkQueueFlags required_queue_flags, VkQueueFlags ignored_queue_flags, 
+                               uint32_t* family, unsigned* queue_count, uint32_t* present_family = NULL);
         bool updateSurfaceInformation(VkPhysicalDevice device,
                                       VkSurfaceCapabilitiesKHR* surface_capabilities,
                                       std::vector<VkSurfaceFormatKHR>* surface_formats,
