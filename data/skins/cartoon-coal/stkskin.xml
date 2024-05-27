@@ -225,39 +225,35 @@ Here you can configure advanced theming rules for this skin
 <element type="left_arrow"  state="focus"   image="left_arrow_focus.png" />
 <element type="right_arrow" state="focus"   image="right_arrow_focus.png" />
 
-<!-- Provided by base theme
-<element type="list_header"  state="neutral" image="table_header.png" />-->
+
+<element type="list_header"  state="neutral" image="table_header.png" />
 <element type="list_sort_up" state="neutral" image="up_arrow.png" />
 <element type="list_sort_down" state="neutral" image="down_arrow.png" />
 <element type="list_header"  state="down"    image="table_header_down.png" />
 
 <!-- Stateless -->
-<!-- Provided by base theme
 <element type="section" image="section.png"
       left_border="15" right_border="15" top_border="15" bottom_border="15"
       hborder_out_portion="0.0" vborder_out_portion="0.0" />
 
 <element type="section" state="selected" image="section.png"
       left_border="15" right_border="15" top_border="15" bottom_border="15"
-      hborder_out_portion="0.0" vborder_out_portion="0.0" />-->
+      hborder_out_portion="0.0" vborder_out_portion="0.0" />
 
 <!-- Stateless -->
-<!-- Provided by base theme
 <element type="rounded_section" image="rsection.png"
       left_border="15" right_border="15" top_border="15" bottom_border="15"
-      hborder_out_portion="0.0" vborder_out_portion="0.0" />-->
+      hborder_out_portion="0.0" vborder_out_portion="0.0" />
 
 <!-- Stateless -->
-<!-- Provided by base theme
 <element type="window" image="dialog.png"
       left_border="32" right_border="32" top_border="32" bottom_border="32"
-      hborder_out_portion="1.0" vborder_out_portion="1.0" />-->
+      hborder_out_portion="1.0" vborder_out_portion="1.0" />
 
 <!-- Stateless -->
-<!-- Provided by base theme
 <element type="tooltip" image="tooltip.png"
     left_border="10" right_border="10" top_border="10" bottom_border="10"
-    hborder_out_portion="1.5" vborder_out_portion="1.0" />-->
+    hborder_out_portion="1.5" vborder_out_portion="1.0" />
     
 <!--                   Colors                  -->
 <color type="text" state="neutral" r="220" g="220" b="220" />
