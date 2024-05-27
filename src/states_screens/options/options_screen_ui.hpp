@@ -55,6 +55,9 @@ class OptionsScreenUI : public GUIEngine::Screen, public GUIEngine::ScreenSingle
     std::vector<core::stringw> m_current_skin_variants;
     core::stringw              m_active_base_skin;
 
+    GUIEngine::SpinnerWidget* m_base_skin_selector;
+    GUIEngine::SpinnerWidget* m_variant_skin_selector;
+
     void updateCamera();
 
     void loadSkins(const std::set<std::string>& files, bool addon);

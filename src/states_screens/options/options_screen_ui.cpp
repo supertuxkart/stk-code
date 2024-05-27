@@ -48,14 +48,13 @@ void OptionsScreenUI::loadedFromFile()
 {
     m_inited = false;
 
-    GUIEngine::SpinnerWidget* baseSkinSelector = getWidget<GUIEngine::SpinnerWidget>("base_skinchoice");
-    assert( baseSkinSelector != NULL );
+    m_base_skin_selector = getWidget<GUIEngine::SpinnerWidget>("base_skinchoice");
+    m_variant_skin_selector = getWidget<GUIEngine::SpinnerWidget>("variant_skinchoice");
+    assert( m_base_skin_selector != NULL );
+    assert( m_variant_skin_selector != NULL );
 
-    GUIEngine::SpinnerWidget* variantSkinSelector = getWidget<GUIEngine::SpinnerWidget>("variant_skinchoice");
-    assert( variantSkinSelector != NULL );
-
-    baseSkinSelector->m_properties[PROP_WRAP_AROUND] = "true";
-    variantSkinSelector->m_properties[PROP_WRAP_AROUND] = "true";
+    m_base_skin_selector->m_properties[PROP_WRAP_AROUND] = "true";
+    m_variant_skin_selector->m_properties[PROP_WRAP_AROUND] = "true";
 
     // Setup the minimap options spinner
     GUIEngine::SpinnerWidget* minimap_options = getWidget<GUIEngine::SpinnerWidget>("minimap");
@@ -78,12 +77,11 @@ void OptionsScreenUI::loadedFromFile()
                                UserConfigParams::m_multitouch_active > 1;
 
     if (multitouch_enabled && UserConfigParams::m_multitouch_draw_gui)
-    {
         minimap_options->m_properties[GUIEngine::PROP_MIN_VALUE] = "1";
-    }
+
     minimap_options->m_properties[GUIEngine::PROP_MAX_VALUE] = "3";
 
-    // Setup fontsize spinner
+    // Setup the fontsize spinner
     GUIEngine::SpinnerWidget* font_size = getWidget<GUIEngine::SpinnerWidget>("font_size");
     assert( font_size != NULL );
 
@@ -157,17 +155,11 @@ void OptionsScreenUI::init()
     ribbon->setFocusForPlayer(PLAYER_ID_GAME_MASTER);
     ribbon->select( "tab_ui", PLAYER_ID_GAME_MASTER );
 
-    GUIEngine::SpinnerWidget* baseSkinSelector = getWidget<GUIEngine::SpinnerWidget>("base_skinchoice");
-    assert( baseSkinSelector != NULL );
-
-    GUIEngine::SpinnerWidget* variantSkinSelector = getWidget<GUIEngine::SpinnerWidget>("variant_skinchoice");
-    assert( variantSkinSelector != NULL );
-
     m_skins.clear();
     m_base_skins.clear();
     m_current_skin_variants.clear();
-    baseSkinSelector->clearLabels();
-    variantSkinSelector->clearLabels();
+    m_base_skin_selector ->clearLabels();
+    m_variant_skin_selector->clearLabels();
 
     std::set<std::string> skin_files;
     file_manager->listFiles(skin_files /* out */, file_manager->getAsset(FileManager::SKIN,""),
@@ -183,41 +175,40 @@ void OptionsScreenUI::init()
     {
         Log::warn("OptionsScreenUI", "Could not find a single skin, make sure that "
                                      "the data files are correctly installed");
-        baseSkinSelector->setActive(false);
-        variantSkinSelector->setActive(false);
+        m_base_skin_selector ->setActive(false);
+        m_variant_skin_selector->setActive(false);
         return;
     }
 
     const int base_skin_count = (int)m_base_skins.size();
     for (auto& p : m_base_skins)
-        baseSkinSelector->addLabel(p);
-    baseSkinSelector->m_properties[GUIEngine::PROP_MIN_VALUE] = "0";
-    baseSkinSelector->m_properties[GUIEngine::PROP_MAX_VALUE] = StringUtils::toString(base_skin_count-1);
+        m_base_skin_selector ->addLabel(p);
+    m_base_skin_selector ->m_properties[GUIEngine::PROP_MIN_VALUE] = "0";
+    m_base_skin_selector ->m_properties[GUIEngine::PROP_MAX_VALUE] = StringUtils::toString(base_skin_count-1);
 
     // --- select the right skin in the spinner
     bool currSkinFound = false;
     const std::string& user_skin = UserConfigParams::m_skin_file;
-    baseSkinSelector->setActive(!in_game);
-    variantSkinSelector->setActive(!in_game);
+    m_base_skin_selector ->setActive(!in_game);
+    m_variant_skin_selector->setActive(!in_game);
 
     for (unsigned int i = 0; i < m_skins.size(); i++)
     {
         if (m_skins[i].m_folder_name == user_skin)
         {
             m_active_base_skin = m_skins[i].m_base_theme_name;
-            baseSkinSelector->setValue(getBaseID(m_skins[i]));
+            m_base_skin_selector ->setValue(getBaseID(m_skins[i]));
             loadCurrentSkinVariants();
-            variantSkinSelector->setValue(getVariantID(m_skins[i]));
+            m_variant_skin_selector->setValue(getVariantID(m_skins[i]));
             currSkinFound = true;
             break;
         } 
     }
     if (!currSkinFound)
     {
-        Log::warn("OptionsScreenUI",
-                  "Couldn't find current skin in the list of skins!");
-        baseSkinSelector->setValue(0);
-        variantSkinSelector->setValue(0);
+        Log::warn("OptionsScreenUI", "Couldn't find the current skin in the list of skins!");
+        m_base_skin_selector ->setValue(0);
+        m_variant_skin_selector->setValue(0);
         irr_driver->unsetMaxTextureSize();
         GUIEngine::reloadSkin();
         irr_driver->setMaxTextureSize();
@@ -358,29 +349,28 @@ void OptionsScreenUI::loadSkins(const std::set<std::string>& files, bool addon)
 /** Set up the variant spinner with the appropriate values based on the current base skin. */
 void OptionsScreenUI::loadCurrentSkinVariants()
 {
-    GUIEngine::SpinnerWidget* variantSkinSelector = getWidget<GUIEngine::SpinnerWidget>("variant_skinchoice");
-    variantSkinSelector->clearLabels();
-
+    m_variant_skin_selector->clearLabels();
     m_current_skin_variants.clear();
+
     for (int i=0; i<(int)m_skins.size();i++)
     {
         if (m_skins[i].m_base_theme_name == m_active_base_skin)
         {
             m_current_skin_variants.push_back(m_skins[i].m_variant_name);
-            variantSkinSelector->addLabel(m_skins[i].m_variant_name);
+            m_variant_skin_selector->addLabel(m_skins[i].m_variant_name);
         }
     }
     
-    variantSkinSelector->m_properties[GUIEngine::PROP_MIN_VALUE] = "0";
-    variantSkinSelector->m_properties[GUIEngine::PROP_MAX_VALUE] =
+    m_variant_skin_selector->m_properties[GUIEngine::PROP_MIN_VALUE] = "0";
+    m_variant_skin_selector->m_properties[GUIEngine::PROP_MAX_VALUE] =
         StringUtils::toString(m_current_skin_variants.size()-1);
 
     bool in_game = StateManager::get()->getGameState() == GUIEngine::INGAME_MENU;
 
     if (m_current_skin_variants.size() == 1)
-        variantSkinSelector->setActive(false);
+        m_variant_skin_selector->setActive(false);
     else
-        variantSkinSelector->setActive(!in_game);
+        m_variant_skin_selector->setActive(!in_game);
 } // loadCurrentSkinVariants
 
 // -----------------------------------------------------------------------------
@@ -411,13 +401,10 @@ int OptionsScreenUI::getVariantID(SkinID skin)
 /** Returns the folder name of the current skin based on the spinners */
 std::string OptionsScreenUI::getCurrentSpinnerSkin()
 {
-    GUIEngine::SpinnerWidget* baseSkinSelector = getWidget<GUIEngine::SpinnerWidget>("base_skinchoice");
-    GUIEngine::SpinnerWidget* variantSkinSelector = getWidget<GUIEngine::SpinnerWidget>("variant_skinchoice");
-
     for (int i=0; i<(int)m_skins.size();i++)
     {
-        if (m_skins[i].m_base_theme_name == baseSkinSelector->getStringValue() &&
-            m_skins[i].m_variant_name    == variantSkinSelector->getStringValue())
+        if (m_skins[i].m_base_theme_name == m_base_skin_selector ->getStringValue() &&
+            m_skins[i].m_variant_name    == m_variant_skin_selector->getStringValue())
             return m_skins[i].m_folder_name;
     }
     return "classic"; // Default if nothing is found
@@ -461,21 +448,19 @@ void OptionsScreenUI::eventCallback(Widget* widget, const std::string& name, con
     }
     else if (name == "base_skinchoice")
     {
-        GUIEngine::SpinnerWidget* baseSkinSelector = getWidget<GUIEngine::SpinnerWidget>("base_skinchoice");
-        m_active_base_skin = baseSkinSelector->getStringValue();
+        m_active_base_skin = m_base_skin_selector->getStringValue();
         loadCurrentSkinVariants();
         UserConfigParams::m_skin_file = getCurrentSpinnerSkin();
         onSkinChange();
         m_reload_option->m_focus_name = "base_skinchoice";
-        m_reload_option->m_focus_right = baseSkinSelector->isButtonSelected(true/*right*/);
+        m_reload_option->m_focus_right = m_base_skin_selector->isButtonSelected(true/*right*/);
     }
     else if (name == "variant_skinchoice")
     {
-        GUIEngine::SpinnerWidget* variantSkinSelector = getWidget<GUIEngine::SpinnerWidget>("variant_skinchoice");
         UserConfigParams::m_skin_file = getCurrentSpinnerSkin();
         onSkinChange();
         m_reload_option->m_focus_name = "variant_skinchoice";
-        m_reload_option->m_focus_right = variantSkinSelector->isButtonSelected(true/*right*/);
+        m_reload_option->m_focus_right = m_variant_skin_selector->isButtonSelected(true/*right*/);
     }
     else if (name == "minimap")
     {
@@ -659,7 +644,7 @@ void OptionsScreenUI::onSkinChange()
     bool prev_font = GUIEngine::getSkin()->hasFont();
     irr_driver->unsetMaxTextureSize();
     GUIEngine::reloadSkin();
-    // Reload GUIEngine will clear widgets so we don't do that in eventCallback
+    // Reload GUIEngine will clear widgets and set max texture Size so we don't do that here
     m_reload_option = std::unique_ptr<ReloadOption>(new ReloadOption);
     m_reload_option->m_reload_font = prev_font != GUIEngine::getSkin()->hasFont();
     m_reload_option->m_reload_skin = true;
