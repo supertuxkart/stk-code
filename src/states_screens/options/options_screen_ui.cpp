@@ -349,6 +349,7 @@ void OptionsScreenUI::loadSkins(const std::set<std::string>& files, bool addon)
 /** Set up the variant spinner with the appropriate values based on the current base skin. */
 void OptionsScreenUI::loadCurrentSkinVariants()
 {
+    core::stringw old_label = m_variant_skin_selector->getStringValue();
     m_variant_skin_selector->clearLabels();
     m_current_skin_variants.clear();
 
@@ -364,6 +365,14 @@ void OptionsScreenUI::loadCurrentSkinVariants()
     m_variant_skin_selector->m_properties[GUIEngine::PROP_MIN_VALUE] = "0";
     m_variant_skin_selector->m_properties[GUIEngine::PROP_MAX_VALUE] =
         StringUtils::toString(m_current_skin_variants.size()-1);
+
+    // When switching base theme, don't reset the variant spinner
+    // if the variant exists for both the previous and the new base theme.
+    for (int i=0; i<(int)m_current_skin_variants.size();i++)
+    {
+        if(m_current_skin_variants[i] == old_label)
+            m_variant_skin_selector->setValue(i);
+    }
 
     bool in_game = StateManager::get()->getGameState() == GUIEngine::INGAME_MENU;
 
