@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
 
-Peach skin by Dakal and Marianne Gagnon, released under creative-commons BY-SA 3.0+
+Ocean skin by Dakal and Marianne Gagnon, released under creative-commons BY-SA 3.0+
 Except background.jpg, by elisee
 Except stars, by s@f
 
 See SKIN_MAKING.md for more details on how the skin elements work.
 -->
 
-<skin name="Peach" author="Dakal & Marianne Gagnon (Auria)">
+<skin base_theme_name="Classic" variant_name="Ocean" author="Dakal & Marianne Gagnon (Auria)" base_theme="classic">
 
 <!--
 Here you can configure advanced theming rules for this skin
@@ -56,9 +56,9 @@ Here you can configure advanced theming rules for this skin
 <element type="textbubble" state="focused" image="textbubble2.png"
       left_border="13" right_border="13" top_border="13" bottom_border="13"
       hborder_out_portion="0.7" vborder_out_portion="0.3" />
-
+      
 <element type="progress" state="fill" image="glasssgauge_fill.png"
-      left_border="10" right_border="10" top_border="10" bottom_border="10" />
+      left_border="5" right_border="5" top_border="5" bottom_border="5" />
 
 <element type="progress" state="neutral" common="y" image="progress_bg.png"
       left_border="31" right_border="31" top_border="15" bottom_border="15" />
@@ -74,7 +74,7 @@ Here you can configure advanced theming rules for this skin
       preserve_h_aspect_ratios="false" hborder_out_portion="0.0" vborder_out_portion="0.0"
       h_inner_padding="0" v_inner_padding="0" h_margin="0" v_margin="0" />
 
-<element type="tab" state="down" image="glasstab_down.png"
+<element type="tab" state="down" image="glasstab.png"
       left_border="11" right_border="11" top_border="6" bottom_border="10"
       preserve_h_aspect_ratios="false" hborder_out_portion="0.0" vborder_out_portion="0.0"
       h_inner_padding="0" v_inner_padding="0" h_margin="0" v_margin="0" />
@@ -90,7 +90,7 @@ Here you can configure advanced theming rules for this skin
       preserve_h_aspect_ratios="false" hborder_out_portion="0.0" vborder_out_portion="0.0"
       h_inner_padding="0" v_inner_padding="0" h_margin="0" v_margin="0" />
 
-<element type="verticalTab" state="down" image="glasstab_vert_down.png"
+<element type="verticalTab" state="down" image="glasstab_vert.png"
       left_border="10" right_border="10" top_border="10" bottom_border="10"
       preserve_h_aspect_ratios="false" hborder_out_portion="0.0" vborder_out_portion="0.0"
       h_inner_padding="0" v_inner_padding="0" h_margin="0" v_margin="0" />
@@ -99,16 +99,16 @@ Here you can configure advanced theming rules for this skin
 <element type="squareFocusHaloBW" common="y" image="glass_square_focused_bw.png"
       left_border="6" right_border ="6" top_border="6" bottom_border="6"
       hborder_out_portion="1.0" />
-<element type="squareFocusHalo1" common="y" image="glass_square_focused_red.png"
+<element type="squareFocusHalo1" common="y" image="glass_square_focused_cyan.png"
       left_border="6" right_border ="6" top_border="6" bottom_border="6"
       hborder_out_portion="1.0" />
-<element type="squareFocusHalo2" common="y" image="glass_square_focused_cyan.png"
+<element type="squareFocusHalo2" common="y" image="glass_square_focused_yellow.png"
       left_border="6" right_border ="6" top_border="6" bottom_border="6"
       hborder_out_portion="1.0" />
-<element type="squareFocusHalo3" common="y" image="glass_square_focused_green.png"
+<element type="squareFocusHalo3" common="y" image="glass_square_focused_red.png"
       left_border="6" right_border ="6" top_border="6" bottom_border="6"
       hborder_out_portion="1.0" />
-<element type="squareFocusHalo4" common="y" image="glass_square_focused_yellow.png"
+<element type="squareFocusHalo4" common="y" image="glass_square_focused_green.png"
       left_border="6" right_border ="6" top_border="6" bottom_border="6"
       hborder_out_portion="1.0" />
 <element type="squareFocusHalo5" common="y" image="glass_square_focused_pink.png"
@@ -145,21 +145,22 @@ Here you can configure advanced theming rules for this skin
       preserve_h_aspect_ratios="true" hborder_out_portion="0.0" common="y"/>
 
 <!-- player name spinner color in multiplayer-->
-<element type="spinner1" state="neutral" common="y" image="glass_square_red.png"
+<element type="spinner1" state="neutral" common="y" image="glass_square_cyan.png"
       left_border="110" right_border="110" top_border="0" bottom_border="36"
     preserve_h_aspect_ratios="true" hborder_out_portion="0.0" />
-<element type="spinner2" state="neutral" common="y" image="glass_square_cyan.png"
+<element type="spinner2" state="neutral" common="y" image="glass_square_yellow.png"
       left_border="110" right_border="110" top_border="0" bottom_border="36"
     preserve_h_aspect_ratios="true" hborder_out_portion="0.0" />
-<element type="spinner3" state="neutral" common="y" image="glass_square_green.png"
+<element type="spinner3" state="neutral" common="y" image="glass_square_red.png"
       left_border="110" right_border="110" top_border="0" bottom_border="36"
     preserve_h_aspect_ratios="true" hborder_out_portion="0.0" />
-<element type="spinner4" state="neutral" common="y" image="glass_square_yellow.png"
+<element type="spinner4" state="neutral" common="y" image="glass_square_green.png"
       left_border="110" right_border="110" top_border="0" bottom_border="36"
     preserve_h_aspect_ratios="true" hborder_out_portion="0.0" />
 <element type="spinner5" state="neutral" common="y" image="glass_square_pink.png"
       left_border="110" right_border="110" top_border="0" bottom_border="36"
     preserve_h_aspect_ratios="true" hborder_out_portion="0.0" />
+
 
 <!-- This one is a bit special. Only area(s) LEFT and/or RIGHT will be rendered. They will be overlaid
      on top of the spinner's background -->
@@ -189,6 +190,7 @@ Here you can configure advanced theming rules for this skin
     left_border="0" right_border="0" top_border="0" bottom_border="0"
     hborder_out_portion="0.0" vborder_out_portion="0.0" />
     
+
 <!-- Scrollbars. Background and thumb have no state (always neutral state).
      The buttons are the top and bottom arrows. Image must be top arrow, will
      be mirrorred for bottom. Buttons can be in neutral or down state.
@@ -238,13 +240,13 @@ Here you can configure advanced theming rules for this skin
     
 <!--                   Colors                  -->
 <color type="text" state="neutral" r="0" g="0" b="0" />
-<color type="brighttext" state="neutral" r="255" g="145" b="0" />
+<color type="brighttext" state="neutral" r="28" g="176" b="255" />
 
 <!-- For highlighted items, e.g. in list -->
 <color type="text" state="focused" r="255" g="255" b="255" />
 
 <!-- Color used in the credits -->
-<color type="credits_text" state="neutral" r="65" g="15" b="0" />
+<color type="credits_text" state="neutral" r="0" g="0" b="75" />
 
 <!-- Color used for emphasized items in e.g. lists -->
 <color type="emphasis_text" state="neutral" r="0" g="0" b="180" />
@@ -264,19 +266,19 @@ Here you can configure advanced theming rules for this skin
 
 <!-- Text field color -->
 <color type="text_field" state="background" a="255" r="200" g="200" b="200" />
-<color type="text_field" state="background_focused" a="255" r="236" g="226" b="201" />
+<color type="text_field" state="background_focused" a="255" r="223" g="238" b="248" />
 <color type="text_field" state="background_deactivated" a="255" r="200" g="200" b="200" />
-<color type="text_field" state="background_marked" a="128" r="90" g="55" b="25" />
+<color type="text_field" state="background_marked" a="128" r="40" g="80" b="100" />
 <color type="text_field" state="neutral" a="255" r="138" g="138" b="138" />
-<color type="text_field" state="focused" a="255" r="243" g="164" b="80" />
+<color type="text_field" state="focused" a="255" r="42" g="169" b="211" />
 <color type="text_field" state="deactivated" a="255" r="138" g="138" b="138" />
 
 <!-- Rating star image -->
 <element type="rating" state="neutral" common="y" image="rating_star.png" />
 
 <!-- Font color -->
-<color type="font" state="top" a="255" r="255" g="128" b="0" />
-<color type="font" state="bottom" a="255" r="255" g="220" b="15" />
-<color type="font" state="normal" a="255" r="210" g="100" b="50" />
+<color type="font" state="top" a="255" r="100" g="200" b="220" />
+<color type="font" state="bottom" a="255" r="80" g="80" b="220" />
+<color type="font" state="normal" a="255" r="40" g="40" b="180" />
 
 </skin>

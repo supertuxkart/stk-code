@@ -8,7 +8,7 @@ Cartoon skin by LCP and QwertyChouskie, released under CC-BY-SA 4.0+
 See SKIN_MAKING.md for more details on how the skin elements work.
 -->
 
-<skin name="Cartoon - Ocean" author="LCP and QwertyChouskie (edited by CrystalDaEevee)" base_theme="cartoon">
+<skin base_theme_name="Cartoon" variant_name="Ocean" author="LCP and QwertyChouskie (edited by CrystalDaEevee)" base_theme="cartoon">
 
 <!--
 Here you can configure advanced theming rules for this skin

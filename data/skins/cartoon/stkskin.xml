@@ -6,7 +6,7 @@ Cartoon skin by LCP and QwertyChouskie, released under CC-BY-SA 4.0+
 See SKIN_MAKING.md for more details on how the skin elements work.
 -->
 
-<skin name="Cartoon" author="LCP and QwertyChouskie">
+<skin base_theme_name="Cartoon" variant_name="Peach" author="LCP and QwertyChouskie">
 
 <!--
 Here you can configure advanced theming rules for this skin

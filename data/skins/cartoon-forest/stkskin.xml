@@ -8,19 +8,10 @@ Cartoon skin by LCP and QwertyChouskie, released under CC-BY-SA 4.0+
 See SKIN_MAKING.md for more details on how the skin elements work.
 -->
 
-<skin name="Cartoon - Forest" author="LCP and QwertyChouskie (edited by CrystalDaEevee)" base_theme="cartoon">
+<skin base_theme_name="Cartoon" variant_name="Forest" author="LCP and QwertyChouskie (edited by CrystalDaEevee)" base_theme="cartoon">
 
 <!--
 Here you can configure advanced theming rules for this skin
-
-For TTF specify the list like the following, for normal and digit ttf it will be added at the beginning of the
-font list in STK, so those TTF will be used first, and any missing characters will be rendered from the base
-theme font list. For color emoji ttf it will replace the base theme color emoji directly. You are not required
-to specify all types of ttf.
-
-<advanced normal_ttf="xxx.ttf yyy.ttf"
-          digit_ttf="zzz.ttf"
-          color_emoji_ttf="www.ttf"/>
 -->
 
 <!--  Stateless -->

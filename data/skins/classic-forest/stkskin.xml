@@ -9,7 +9,7 @@ Except stars, by s@f
 See SKIN_MAKING.md for more details on how the skin elements work.
 -->
 
-<skin name="Forest" author="Benau" base_theme="peach">
+<skin base_theme_name="Classic" variant_name="Forest" author="Benau" base_theme="classic">
 
 <!--
 Here you can configure advanced theming rules for this skin
