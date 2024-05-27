@@ -252,7 +252,8 @@ void GEVulkanDrawCall::addNode(irr::scene::ISceneNode* node)
         {
             GEVulkanDynamicSPMBuffer* dbuffer = static_cast<
                 GEVulkanDynamicSPMBuffer*>(buffer);
-            m_dynamic_spm_buffers[shader].emplace_back(dbuffer, node);
+            m_dynamic_spm_buffers[getDynamicBufferKey(shader)]
+                .emplace_back(dbuffer, node);
             continue;
         }
         m_visible_nodes[buffer][shader].emplace_back(node, i);
@@ -1378,19 +1379,20 @@ void GEVulkanDrawCall::render(GEVulkanDriver* vk, GEVulkanCameraSceneNode* cam,
     const size_t dynamic_spm_size = sizeof(ObjectData) + getPadding(
         sizeof(ObjectData), sbo_alignment);
     size_t dynamic_spm_offset = 0;
+
+    int cur_mid = -1;
+    std::vector<uint32_t> dynamic_offsets =
+    {
+        0u,
+        0u,
+        0u,
+        0u,
+    };
     if (bind_mesh_textures)
     {
         vkCmdBindDescriptorSets(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS,
             m_pipeline_layout, 0, 1, m_texture_descriptor->getDescriptorSet(),
             0, NULL);
-
-        std::array<uint32_t, 4> dynamic_offsets =
-        {{
-            0u,
-            0u,
-            0u,
-            0u,
-        }};
         size_t indirect_offset = sizeof(GEVulkanCameraUBO);
         const size_t indirect_size = sizeof(VkDrawIndexedIndirectCommand);
         unsigned draw_count = 0;
@@ -1404,12 +1406,13 @@ void GEVulkanDrawCall::render(GEVulkanDriver* vk, GEVulkanCameraSceneNode* cam,
             if (m_cmds[i].m_shader != cur_pipeline)
             {
                 bindPipeline(cmd, cur_pipeline);
-                auto it = m_dynamic_spm_buffers.find(cur_pipeline);
-                if (it != m_dynamic_spm_buffers.end() && !it->second.empty())
+                auto it = m_dynamic_spm_buffers.find(
+                    getDynamicBufferKey(cur_pipeline));
+                if (it != m_dynamic_spm_buffers.end())
                 {
-                    rebind_base_vertex = true;
                     for (auto& buf : it->second)
                     {
+                        rebind_base_vertex = true;
                         dynamic_offsets[1] = dynamic_spm_offset;
                         vkCmdBindDescriptorSets(cmd,
                             VK_PIPELINE_BIND_POINT_GRAPHICS, m_pipeline_layout,
@@ -1419,6 +1422,7 @@ void GEVulkanDrawCall::render(GEVulkanDriver* vk, GEVulkanCameraSceneNode* cam,
                             current_buffer_idx);
                         dynamic_spm_offset += dynamic_spm_size;
                     }
+                    m_dynamic_spm_buffers.erase(it);
                 }
                 if (rebind_base_vertex)
                 {
@@ -1451,12 +1455,13 @@ void GEVulkanDrawCall::render(GEVulkanDriver* vk, GEVulkanCameraSceneNode* cam,
             draw_count++;
         }
         bindPipeline(cmd, m_cmds.back().m_shader);
-        auto it = m_dynamic_spm_buffers.find(m_cmds.back().m_shader);
-        if (it != m_dynamic_spm_buffers.end() && !it->second.empty())
+        auto it = m_dynamic_spm_buffers.find(
+            getDynamicBufferKey(m_cmds.back().m_shader));
+        if (it != m_dynamic_spm_buffers.end())
         {
-            rebind_base_vertex = true;
             for (auto& buf : it->second)
             {
+                rebind_base_vertex = true;
                 dynamic_offsets[1] = dynamic_spm_offset;
                 vkCmdBindDescriptorSets(cmd,
                     VK_PIPELINE_BIND_POINT_GRAPHICS, m_pipeline_layout, 1, 1,
@@ -1466,6 +1471,7 @@ void GEVulkanDrawCall::render(GEVulkanDriver* vk, GEVulkanCameraSceneNode* cam,
                     current_buffer_idx);
                 dynamic_spm_offset += dynamic_spm_size;
             }
+            m_dynamic_spm_buffers.erase(it);
         }
         if (rebind_base_vertex)
             bindBaseVertex(vk, cmd);
@@ -1480,21 +1486,16 @@ void GEVulkanDrawCall::render(GEVulkanDriver* vk, GEVulkanCameraSceneNode* cam,
     }
     else
     {
-        std::array<uint32_t, 3> dynamic_offsets =
-        {{
-            0u,
-            0u,
-            0u,
-        }};
+        dynamic_offsets.resize(3);
         bool rebind_base_vertex = true;
-        int cur_mid = -1;
         bindPipeline(cmd, cur_pipeline);
-        auto it = m_dynamic_spm_buffers.find(cur_pipeline);
-        if (it != m_dynamic_spm_buffers.end() && !it->second.empty())
+        auto it = m_dynamic_spm_buffers.find(
+            getDynamicBufferKey(cur_pipeline));
+        if (it != m_dynamic_spm_buffers.end())
         {
-            rebind_base_vertex = true;
             for (auto& buf : it->second)
             {
+                rebind_base_vertex = true;
                 dynamic_offsets[1] = dynamic_spm_offset;
                 vkCmdBindDescriptorSets(cmd,
                     VK_PIPELINE_BIND_POINT_GRAPHICS, m_pipeline_layout,
@@ -1514,6 +1515,7 @@ void GEVulkanDrawCall::render(GEVulkanDriver* vk, GEVulkanCameraSceneNode* cam,
                     current_buffer_idx);
                 dynamic_spm_offset += dynamic_spm_size;
             }
+            m_dynamic_spm_buffers.erase(it);
         }
         if (cur_mid != m_materials[m_cmds[0].m_mb])
         {
@@ -1541,12 +1543,13 @@ void GEVulkanDrawCall::render(GEVulkanDriver* vk, GEVulkanCameraSceneNode* cam,
             {
                 cur_pipeline = m_cmds[i].m_shader;
                 bindPipeline(cmd, cur_pipeline);
-                auto it = m_dynamic_spm_buffers.find(cur_pipeline);
-                if (it != m_dynamic_spm_buffers.end() && !it->second.empty())
+                auto it = m_dynamic_spm_buffers.find(
+                    getDynamicBufferKey(cur_pipeline));
+                if (it != m_dynamic_spm_buffers.end())
                 {
-                    rebind_base_vertex = true;
                     for (auto& buf : it->second)
                     {
+                        rebind_base_vertex = true;
                         dynamic_offsets[1] = dynamic_spm_offset;
                         vkCmdBindDescriptorSets(cmd,
                             VK_PIPELINE_BIND_POINT_GRAPHICS, m_pipeline_layout,
@@ -1566,6 +1569,7 @@ void GEVulkanDrawCall::render(GEVulkanDriver* vk, GEVulkanCameraSceneNode* cam,
                             current_buffer_idx);
                         dynamic_spm_offset += dynamic_spm_size;
                     }
+                    m_dynamic_spm_buffers.erase(it);
                 }
             }
             int mid = m_materials[m_cmds[i].m_mb];
@@ -1604,6 +1608,41 @@ void GEVulkanDrawCall::render(GEVulkanDriver* vk, GEVulkanCameraSceneNode* cam,
     }
     if (!drawn_skybox)
         GEVulkanSkyBoxRenderer::render(cmd, cam);
+    for (auto& p : m_dynamic_spm_buffers)
+    {
+        bindPipeline(cmd, getShaderFromKey(p.first));
+        for (auto& buf : p.second)
+        {
+            dynamic_offsets[1] = dynamic_spm_offset;
+            vkCmdBindDescriptorSets(cmd,
+                VK_PIPELINE_BIND_POINT_GRAPHICS, m_pipeline_layout,
+                1, 1, &m_data_descriptor_sets[current_buffer_idx],
+                dynamic_offsets.size(), dynamic_offsets.data());
+            if (bind_mesh_textures)
+            {
+                if (!drawn_skybox)
+                {
+                    vkCmdBindDescriptorSets(cmd,
+                        VK_PIPELINE_BIND_POINT_GRAPHICS, m_pipeline_layout, 0,
+                        1, m_texture_descriptor->getDescriptorSet(), 0, NULL);
+                }
+            }
+            else
+            {
+                int dy_mat = m_materials[buf.first];
+                if (dy_mat != cur_mid)
+                {
+                    cur_mid = dy_mat;
+                    vkCmdBindDescriptorSets(cmd,
+                        VK_PIPELINE_BIND_POINT_GRAPHICS, m_pipeline_layout, 0,
+                        1, &m_texture_descriptor->getDescriptorSet()[cur_mid],
+                        0, NULL);
+                }
+            }
+            buf.first->drawDynamicVertexIndexBuffer(cmd, current_buffer_idx);
+            dynamic_spm_offset += dynamic_spm_size;
+        }
+    }
 }   // render
 
 // ----------------------------------------------------------------------------

@@ -115,7 +115,7 @@ private:
 
     std::unordered_map<GESPMBuffer*, irr::scene::IMesh*> m_mb_map;
 
-    std::unordered_map<std::string, std::vector<
+    std::map<std::string, std::vector<
         std::pair<GEVulkanDynamicSPMBuffer*, irr::scene::ISceneNode*> > >
         m_dynamic_spm_buffers;
 
@@ -199,6 +199,20 @@ private:
     void updateDataDescriptorSets(GEVulkanDriver* vk);
     // ------------------------------------------------------------------------
     void bindBaseVertex(GEVulkanDriver* vk, VkCommandBuffer cmd);
+    // ------------------------------------------------------------------------
+    std::string getDynamicBufferKey(const std::string& shader) const
+    {
+        static PipelineSettings default_settings = {};
+        const PipelineSettings* settings = &default_settings;
+        auto it = m_graphics_pipelines.find(shader);
+        if (it != m_graphics_pipelines.end())
+            settings = &it->second.second;
+        return std::string(1, settings->isTransparent() ? (char)1 : (char)0) +
+            std::string(1, settings->m_drawing_priority) + shader;
+    }
+    // ------------------------------------------------------------------------
+    std::string getShaderFromKey(const std::string& key) const
+                                                      { return key.substr(2); }
 public:
     // ------------------------------------------------------------------------
     GEVulkanDrawCall();

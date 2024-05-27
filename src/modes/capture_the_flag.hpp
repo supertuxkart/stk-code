@@ -20,8 +20,6 @@
 
 #include "modes/free_for_all.hpp"
 
-#include "modes/ctf_flag.hpp"
-
 #include <vector>
 #include <string>
 
@@ -34,6 +32,7 @@ namespace irr
 }
 
 class CTFFlag;
+enum FlagColor : unsigned int;
 
 class CaptureTheFlag : public FreeForAll
 {
