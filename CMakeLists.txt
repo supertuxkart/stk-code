@@ -61,13 +61,13 @@ endif()
 if(EMSCRIPTEN)
     set(CMAKE_PREFIX_PATH "${CMAKE_SOURCE_DIR}/wasm/prefix/")
 
-    set(JPEG_INCLUDE_DIR "${CMAKE_SOURCE_DIR}/wasm/prefix/include/")
+    set(JPEG_INCLUDE_DIR "${CMAKE_SOURCE_DIR}/wasm/prefix/include")
     set(JPEG_LIBRARY "${CMAKE_SOURCE_DIR}/wasm/prefix/lib/libjpeg.a")
 
     set(PNG_PNG_INCLUDE_DIR "${CMAKE_SOURCE_DIR}/wasm/prefix/include/")
-    set(PNG_LIBRARY "${CMAKE_SOURCE_DIR}/wasm/prefix/lib/libpng.a")
+    set(PNG_LIBRARY "${CMAKE_SOURCE_DIR}/wasm/prefix/lib/libpng16.a")
 
-    set(ZLIB_INCLUDE_DIR "${CMAKE_SOURCE_DIR}/wasm/prefix/include/")
+    set(ZLIB_INCLUDE_DIR "${CMAKE_SOURCE_DIR}/wasm/prefix/include")
     set(ZLIB_LIBRARY "${CMAKE_SOURCE_DIR}/wasm/prefix/lib/libz.a")
 
     set(HARFBUZZ_INCLUDEDIR "${CMAKE_SOURCE_DIR}/wasm/prefix/include/")
@@ -82,9 +82,11 @@ if(EMSCRIPTEN)
     set(OGGVORBIS_OGG_INCLUDE_DIR "${CMAKE_SOURCE_DIR}/wasm/prefix/include/")
     set(OGGVORBIS_VORBIS_INCLUDE_DIR "${CMAKE_SOURCE_DIR}/wasm/prefix/include/")
     set(OGGVORBIS_OGG_LIBRARY "${CMAKE_SOURCE_DIR}/wasm/prefix/lib/libogg.a")
-    set(OGGVORBIS_VORBISFILE_LIBRARY "${CMAKE_SOURCE_DIR}/wasm/prefix/lib/lobvorbisfile.a")
+    set(OGGVORBIS_VORBISFILE_LIBRARY "${CMAKE_SOURCE_DIR}/wasm/prefix/lib/libvorbisfile.a")
     set(OGGVORBIS_VORBIS_LIBRARY "${CMAKE_SOURCE_DIR}/wasm/prefix/lib/libvorbis.a")
     #-DFREETYPE_INCLUDE_DIRS=/home/heatingdevice/projects/freetype/include \
+
+    set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -L${CMAKE_SOURCE_DIR}/wasm/prefix/lib/ -lcrypto -lSDL2 -logg -lvorbis")
 
     #todo: avoid hardcoding this path
     set(PTHREAD_LIBRARY "/usr/share/emscripten/cache/sysroot/")

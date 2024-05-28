@@ -1059,7 +1059,9 @@ bool CIrrDeviceSDL::run()
 			}
 			break;
 		default:
+		#ifndef __EMSCRIPTEN__
 			handle_joystick(SDL_event);
+		#endif
 			break;
 		} // end switch
 

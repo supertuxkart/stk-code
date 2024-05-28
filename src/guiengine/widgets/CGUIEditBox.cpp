@@ -1382,7 +1382,7 @@ void CGUIEditBox::calculateScrollPos()
 
     // todo: adjust scrollbar
     // calculate the position of input composition window
-#if !defined(ANDROID) && defined(_IRR_COMPILE_WITH_SDL_DEVICE_)
+#if !defined(ANDROID) && !defined(__EMSCRIPTEN__) && defined(_IRR_COMPILE_WITH_SDL_DEVICE_)
     SDL_Rect rect;
     rect.x = CurrentTextRect.UpperLeftCorner.X + m_cursor_distance - 1;
     rect.y = CurrentTextRect.UpperLeftCorner.Y;

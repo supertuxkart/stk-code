@@ -78,7 +78,7 @@ private:
     void   inputSensing(Input::InputType type, int deviceID, int btnID,
                         Input::AxisDirection axisDirection,  int value);
 
-#ifndef SERVER_ONLY
+#if !defined(SERVER_ONLY) && !defined(__EMSCRIPTEN__)
     std::map<int, std::unique_ptr<SDLController> > m_sdl_controller;
 #endif
 
@@ -109,7 +109,7 @@ public:
     /** Returns the ID of the player that plays with the keyboard,
      *  or -1 if none. */
     int    getPlayerKeyboardID() const;
-#ifdef SERVER_ONLY
+#if defined(SERVER_ONLY) || defined(__EMSCRIPTEN__)
     size_t getGamepadCount() const { return 0; }
 #else
     /** Returns number of active connected gamepad (with SDL), notice the

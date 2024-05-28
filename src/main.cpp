@@ -305,7 +305,7 @@ void runUnitTests();
 
 void gamepadVisualisation()
 {
-#ifndef SERVER_ONLY
+#if !defined(SERVER_ONLY) && !defined(__EMSCRIPTEN__)
 
     input_manager = new InputManager();
     #define GAMEPAD_COUNT 8 // const won't work

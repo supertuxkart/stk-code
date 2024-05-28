@@ -109,7 +109,7 @@ InputManager::InputManager() : m_mode(BOOTSTRAP),
     m_device_manager->initialize();
 
     m_master_player_only = false;
-#ifndef SERVER_ONLY
+#if !defined(SERVER_ONLY) && !defined(__EMSCRIPTEN__)
 #ifdef __SWITCH__
     padConfigureInput(8, HidNpadStyleSet_NpadStandard);
     // Otherwise we report 'B' as 'A' (like Xbox controller)
@@ -135,7 +135,7 @@ InputManager::InputManager() : m_mode(BOOTSTRAP),
 // -----------------------------------------------------------------------------
 void InputManager::addJoystick()
 {
-#ifndef SERVER_ONLY
+#if !defined(SERVER_ONLY) && !defined(__EMSCRIPTEN__)
     // When irrlicht device is reinitialized the joystick added event may be
     // lost, we look for them and add it back
     for (int i = 0; i < SDL_NumJoysticks(); i++)
@@ -162,7 +162,7 @@ void InputManager::addJoystick()
 }
 
 // -----------------------------------------------------------------------------
-#ifndef SERVER_ONLY
+#if !defined(SERVER_ONLY) && !defined(__EMSCRIPTEN__)
 // For CIrrDeviceSDL
 extern "C" void handle_joystick(SDL_Event& event)
 {
@@ -258,14 +258,14 @@ void InputManager::update(float dt)
             it++;
     }
 
-#ifndef SERVER_ONLY
+#if !defined(SERVER_ONLY) && !defined(__EMSCRIPTEN__)
     for (auto& controller : m_sdl_controller)
         controller.second->checkPowerLevel();
 #endif
 }
 
 //-----------------------------------------------------------------------------
-#ifndef SERVER_ONLY
+#if !defined(SERVER_ONLY) && !defined(__EMSCRIPTEN__)
 const irr::SEvent& InputManager::getEventForGamePad(unsigned i) const
 {
     auto it = m_sdl_controller.begin();
@@ -278,7 +278,7 @@ const irr::SEvent& InputManager::getEventForGamePad(unsigned i) const
  */
 InputManager::~InputManager()
 {
-#ifndef SERVER_ONLY
+#if !defined(SERVER_ONLY) && !defined(__EMSCRIPTEN__)
     m_sdl_controller.clear();
 #endif
     delete m_device_manager;

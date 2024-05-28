@@ -73,7 +73,11 @@ build_curl() {
   cd "$SRC_DIR"
 
   autoreconf -fi
-  emconfigure ./configure --host none-linux --prefix="$PREFIX" --with-ssl="$PREFIX" --with-zlib="$PREFIX" --disable-shared --disable-threaded-resolver --without-libpsl --disable-netrc --disable-ipv6 --disable-tftp --disable-ntlm-wb
+  emconfigure ./configure --host none-linux --prefix="$PREFIX" \
+    --with-ssl="$PREFIX" --with-zlib="$PREFIX" \
+    --disable-shared --disable-threaded-resolver \
+    --without-libpsl --disable-netrc --disable-ipv6 \
+    --disable-tftp --disable-ntlm-wb
   emmake make -j$CORE_COUNT
   make install
 }
@@ -106,9 +110,20 @@ build_freetype() {
   local SRC_DIR="$BUILD_DIR/freetype"
   clone_repo "https://github.com/freetype/freetype" VER-2-13-2 "$SRC_DIR"
   cd "$SRC_DIR"
+  mkdir -p build
+  cd build
 
-  ./autogen.sh
-  emconfigure ./configure --host=none-linux --prefix="$PREFIX" --disable-shared PKG_CONFIG_PATH="$LIB/pkgconfig"
+  if [ ! "$with_harfbuzz" ]; then
+    emcmake cmake .. -DCMAKE_INSTALL_PREFIX:PATH="$PREFIX" \
+      -DZLIB_LIBRARY="$LIB/libz.a" -DZLIB_INCLUDE_DIR="$INCLUDE" \
+      -DPNG_LIBRARY="$LIB/libpng.a" -DPNG_PNG_INCLUDE_DIR="$INCLUDE" 
+  else
+    emcmake cmake .. -DCMAKE_INSTALL_PREFIX:PATH="$PREFIX" \
+      -DZLIB_LIBRARY="$LIB/libz.a" -DZLIB_INCLUDE_DIR="$INCLUDE" \
+      -DPNG_LIBRARY="$LIB/libpng.a" -DPNG_PNG_INCLUDE_DIR="$INCLUDE" \
+      -DHarfBuzz_LIBRARY="$LIB/libharfbuzz.a" -DHarfBuzz_INCLUDE_DIR="$INCLUDE/harfbuzz/" \
+      -DFT_REQUIRE_HARFBUZZ=TRUE   
+  fi
   emmake make -j$CORE_COUNT
   make install
 }
@@ -161,5 +176,7 @@ if [ ! -d "$INCLUDE/harfbuzz" ]; then
 
   #rebuild freetype with harfbuzz support
   rm -rf "$INCLUDE/freetype2"
-  build_freetype
+  build_freetype true
 fi
+
+build_freetype true

@@ -82,12 +82,8 @@ scene::IAnimatedMesh* B3DMeshLoader::createMesh(io::IReadFile* f)
         AnimatedMesh->setMinMax(min.toIrrVector(), max.toIrrVector());
     }
 
-#ifndef SERVER_ONLY
-    #ifdef _IRR_COMPILE_WITH_VULKAN_
+#if !defined(SERVER_ONLY) && defined(_IRR_COMPILE_WITH_VULKAN_)
     bool convert_spm = CVS->isGLSL() || GE::getVKDriver() != NULL;
-    #else
-    bool convert_spm = CVS->isGLSL();
-    #endif
     if (convert_spm)
     {
         if (!AnimatedMesh)
@@ -1375,12 +1371,8 @@ void B3DMeshLoader::loadTextures(SB3dMaterial& material, scene::IMeshBuffer* mb)
             }
 #endif
 
-#ifndef SERVER_ONLY
-            #ifdef _IRR_COMPILE_WITH_VULKAN_
+#if !defined(SERVER_ONLY) && defined(_IRR_COMPILE_WITH_VULKAN_)
             bool convert_spm = CVS->isGLSL() || GE::getVKDriver() != NULL;
-            #else
-            bool convert_spm = CVS->isGLSL();
-            #endif
             if (convert_spm)
             {
                 auto& ret = m_texture_string[mb];

@@ -135,6 +135,8 @@ void mathPlaneFrustumf(float* out, const irr::core::matrix4& pvm)
     mathPlaneNormf(&out[5 * 4]);
 }
 
+#ifdef _IRR_COMPILE_WITH_VULKAN_
+
 irr::scene::IAnimatedMesh* convertIrrlichtMeshToSPM(irr::scene::IMesh* mesh)
 {
     GESPM* spm = new GESPM();
@@ -174,5 +176,7 @@ irr::scene::IAnimatedMesh* convertIrrlichtMeshToSPM(irr::scene::IMesh* mesh)
     spm->finalize();
     return spm;
 }
+#endif
 
 }
+
