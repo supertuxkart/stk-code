@@ -103,13 +103,13 @@ void Graph::createDebugMesh()
     }
 #endif
 
-#ifndef SERVER_ONLY
+#if !defined(SERVER_ONLY) && defined(_IRR_COMPILE_WITH_VULKAN_)
     bool vk = (GE::getVKDriver() != NULL);
     if (vk)
         GE::getGEConfig()->m_convert_irrlicht_mesh = true;
 #endif
     m_node = irr_driver->addMesh(m_mesh, "track-debug-mesh");
-#ifndef SERVER_ONLY
+#if !defined(SERVER_ONLY) && defined(_IRR_COMPILE_WITH_VULKAN_)
     if (vk)
         GE::getGEConfig()->m_convert_irrlicht_mesh = false;
 #endif
@@ -485,13 +485,13 @@ RenderTarget* Graph::makeMiniMap(const core::dimension2du &dimension,
     }
 #endif
 
-#ifndef SERVER_ONLY
+#if !defined(SERVER_ONLY) && defined(_IRR_COMPILE_WITH_VULKAN_)
     bool vk = (GE::getVKDriver() != NULL);
     if (vk)
         GE::getGEConfig()->m_convert_irrlicht_mesh = true;
 #endif
     m_node = irr_driver->addMesh(m_mesh, "mini_map");
-#ifndef SERVER_ONLY
+#if !defined(SERVER_ONLY) && defined(_IRR_COMPILE_WITH_VULKAN_)
     if (vk)
         GE::getGEConfig()->m_convert_irrlicht_mesh = false;
 #endif

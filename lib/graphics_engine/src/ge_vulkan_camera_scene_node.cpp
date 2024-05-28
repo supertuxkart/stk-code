@@ -1,3 +1,5 @@
+#ifdef _IRR_COMPILE_WITH_VULKAN_
+
 #include "ge_vulkan_camera_scene_node.hpp"
 
 #include "ge_main.hpp"
@@ -68,3 +70,5 @@ irr::core::matrix4 GEVulkanCameraSceneNode::getPVM() const
 }   // getPVM
 
 }
+
+#endif

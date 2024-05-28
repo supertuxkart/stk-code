@@ -1,3 +1,5 @@
+#ifdef _IRR_COMPILE_WITH_VULKAN_
+
 #include <stdexcept>
 
 #include "ge_vulkan_depth_texture.hpp"
@@ -39,3 +41,5 @@ GEVulkanDepthTexture::GEVulkanDepthTexture(GEVulkanDriver* vk,
 }   // GEVulkanDepthTexture
 
 }
+
+#endif

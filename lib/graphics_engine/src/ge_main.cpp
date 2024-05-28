@@ -44,10 +44,12 @@ irr::video::IVideoDriver* getDriver()
     return g_driver;
 }
 
+#ifdef _IRR_COMPILE_WITH_VULKAN_
 GE::GEVulkanDriver* getVKDriver()
 {
     return dynamic_cast<GE::GEVulkanDriver*>(g_driver);
 }
+#endif
 
 GEConfig* getGEConfig()
 {

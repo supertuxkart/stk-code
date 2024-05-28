@@ -62,25 +62,29 @@ if(EMSCRIPTEN)
     set(CMAKE_PREFIX_PATH "${CMAKE_SOURCE_DIR}/wasm/prefix/")
 
     set(JPEG_INCLUDE_DIR "${CMAKE_SOURCE_DIR}/wasm/prefix/include/")
-    set(JPEG_LIBRARY "${CMAKE_SOURCE_DIR}/wasm/prefix/lib/")
+    set(JPEG_LIBRARY "${CMAKE_SOURCE_DIR}/wasm/prefix/lib/libjpeg.a")
 
     set(PNG_PNG_INCLUDE_DIR "${CMAKE_SOURCE_DIR}/wasm/prefix/include/")
-    set(PNG_LIBRARY "${CMAKE_SOURCE_DIR}/wasm/prefix/lib/")
+    set(PNG_LIBRARY "${CMAKE_SOURCE_DIR}/wasm/prefix/lib/libpng.a")
 
     set(ZLIB_INCLUDE_DIR "${CMAKE_SOURCE_DIR}/wasm/prefix/include/")
-    set(ZLIB_LIBRARY "${CMAKE_SOURCE_DIR}/wasm/prefix/lib/")
-
-    set(LIB_INCLUDE_DIR "${CMAKE_SOURCE_DIR}/wasm/prefix/include/")
-    set(ZLIB_LIBRARY "${CMAKE_SOURCE_DIR}/wasm/prefix/lib/")
+    set(ZLIB_LIBRARY "${CMAKE_SOURCE_DIR}/wasm/prefix/lib/libz.a")
 
     set(HARFBUZZ_INCLUDEDIR "${CMAKE_SOURCE_DIR}/wasm/prefix/include/")
-    set(HARFBUZZ_LIBRARY "${CMAKE_SOURCE_DIR}/wasm/prefix/lib/")
+    set(HARFBUZZ_LIBRARY "${CMAKE_SOURCE_DIR}/wasm/prefix/lib/libharfbuzz.a")
 
     set(CURL_INCLUDE_DIR "${CMAKE_SOURCE_DIR}/wasm/prefix/include/")
-    set(CURL_LIBRARY "${CMAKE_SOURCE_DIR}/wasm/prefix/lib/")
+    set(CURL_LIBRARY "${CMAKE_SOURCE_DIR}/wasm/prefix/lib/libcurl.a")
 
     set(OPENSSL_INCLUDE_DIR "${CMAKE_SOURCE_DIR}/wasm/prefix/include/")
-    set(OPENSSL_CRYPTO_LIBRARY "${CMAKE_SOURCE_DIR}/wasm/prefix/lib/")
+    set(OPENSSL_CRYPTO_LIBRARY "${CMAKE_SOURCE_DIR}/wasm/prefix/lib/libssl.a")
+
+    set(OGGVORBIS_OGG_INCLUDE_DIR "${CMAKE_SOURCE_DIR}/wasm/prefix/include/")
+    set(OGGVORBIS_VORBIS_INCLUDE_DIR "${CMAKE_SOURCE_DIR}/wasm/prefix/include/")
+    set(OGGVORBIS_OGG_LIBRARY "${CMAKE_SOURCE_DIR}/wasm/prefix/lib/libogg.a")
+    set(OGGVORBIS_VORBISFILE_LIBRARY "${CMAKE_SOURCE_DIR}/wasm/prefix/lib/lobvorbisfile.a")
+    set(OGGVORBIS_VORBIS_LIBRARY "${CMAKE_SOURCE_DIR}/wasm/prefix/lib/libvorbis.a")
+    #-DFREETYPE_INCLUDE_DIRS=/home/heatingdevice/projects/freetype/include \
 
     #todo: avoid hardcoding this path
     set(PTHREAD_LIBRARY "/usr/share/emscripten/cache/sysroot/")
@@ -91,6 +95,8 @@ if(EMSCRIPTEN)
     add_definitions(-DNO_IRR_COMPILE_WITH_WAYLAND_DEVICE_)
     add_definitions(-DNO_IRR_COMPILE_WITH_DIRECT3D_9_)
     add_definitions(-DNO_IRR_COMPILE_WITH_VULKAN_)
+    add_definitions(-DNO_IRR_COMPILE_WITH_OPENGL_)
+    add_definitions(-D_IRR_COMPILE_WITH_OGLES2_)
 endif()
 
 if(APPLE AND NOT IOS)
@@ -879,6 +885,10 @@ if(MINGW)
     endif()
 endif()
 
+if(EMSCRIPTEN)
+    target_compile_options(supertuxkart PRIVATE -sUSE_SDL=2)
+    target_compile_options(stkirrlicht PRIVATE -sUSE_SDL=2)
+endif()
 
 # Find LibGamerzilla library or build it if missing
 if (NOT APPLE)

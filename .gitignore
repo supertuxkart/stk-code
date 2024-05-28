@@ -9,6 +9,7 @@ stk-editor/
 tags.*
 wasm/build/
 wasm/prefix/
+wasm/emsdk/
 
 # clangd
 .cache/

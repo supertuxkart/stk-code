@@ -455,7 +455,7 @@ void KartSelectionScreen::init()
 
 void KartSelectionScreen::tearDown()
 {
-#ifndef SERVER_ONLY
+#if !defined(SERVER_ONLY) && defined(_IRR_COMPILE_WITH_VULKAN_)
     GE::getGEConfig()->m_enable_draw_call_cache = false;
     GE::GEVulkanDriver* gevk = GE::getVKDriver();
     if (gevk)

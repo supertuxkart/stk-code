@@ -244,7 +244,7 @@ CGUIEditBox::~CGUIEditBox()
     if (GUIEngine::ScreenKeyboard::shouldUseScreenKeyboard() &&
         GUIEngine::ScreenKeyboard::hasSystemScreenKeyboard())
         Android_toggleOnScreenKeyboard(false, 0, 0);
-#elif defined(_IRR_COMPILE_WITH_SDL_DEVICE_)
+#elif defined(_IRR_COMPILE_WITH_SDL_DEVICE_) && !defined(__EMSCRIPTEN__)
     if (SDL_IsTextInputActive())
         SDL_StopTextInput();
 #endif
@@ -372,7 +372,7 @@ bool CGUIEditBox::OnEvent(const SEvent& event)
                     MouseMarking = false;
                     setTextMarkers(0,0);
                 }
-#if !defined(ANDROID) && defined(_IRR_COMPILE_WITH_SDL_DEVICE_)
+#if !defined(ANDROID) && defined(_IRR_COMPILE_WITH_SDL_DEVICE_) && !defined(__EMSCRIPTEN__)
                 if (SDL_IsTextInputActive())
                     SDL_StopTextInput();
 #endif

@@ -18,7 +18,9 @@ namespace irr
 
 namespace GE
 {
+#ifdef _IRR_COMPILE_WITH_VULKAN_
 class GEVulkanDriver;
+#endif
 struct GEConfig
 {
 bool m_disable_npot_texture;
@@ -34,7 +36,9 @@ float m_render_scale;
 void setVideoDriver(irr::video::IVideoDriver* driver);
 void setShaderFolder(const std::string& path);
 irr::video::IVideoDriver* getDriver();
+#ifdef _IRR_COMPILE_WITH_VULKAN_
 GE::GEVulkanDriver* getVKDriver();
+#endif
 const std::string& getShaderFolder();
 GEConfig* getGEConfig();
 void deinit();

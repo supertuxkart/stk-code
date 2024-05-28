@@ -6,10 +6,12 @@ set -e
 CORE_COUNT="$(nproc --all)"
 BASE_DIR="$(realpath "$(dirname "$0")")"
 BUILD_DIR="$BASE_DIR/build"
+EMSDK_DIR="$BASE_DIR/emsdk"
 PREFIX="$BASE_DIR/prefix"
 INCLUDE="$PREFIX/include"
 LIB="$PREFIX/lib"
 
+source $EMSDK_DIR/emsdk_env.sh
 export PKG_CONFIG_PATH="$LIB/pkgconfig"
 
 clone_repo() {
@@ -83,7 +85,7 @@ build_jpeg() {
   mkdir -p build
   cd build
 
-  emcmake cmake -G"Unix Makefiles" -DCMAKE_INSTALL_PREFIX:PATH="$PREFIX" -DWITH_SIMD=0 ..
+  emcmake cmake -G"Unix Makefiles" -DCMAKE_INSTALL_PREFIX:PATH="$PREFIX" -DWITH_SIMD=0 -DENABLE_SHARED=0 ..
   emmake make -j$CORE_COUNT
   make install
 }

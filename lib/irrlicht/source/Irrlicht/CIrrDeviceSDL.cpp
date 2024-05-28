@@ -22,11 +22,13 @@
 #include "guiengine/engine.hpp"
 #include "ge_main.hpp"
 #include "glad/gl.h"
+
+#ifdef _IRR_COMPILE_WITH_VULKAN_
 #include "ge_vulkan_driver.hpp"
 #include "ge_vulkan_scene_manager.hpp"
 #include "MoltenVK.h"
-
 #include <SDL_vulkan.h>
+#endif
 
 extern bool GLContextDebugBit;
 
@@ -82,16 +84,20 @@ CIrrDeviceSDL::CIrrDeviceSDL(const SIrrlichtCreationParameters& param)
 	Operator = 0;
 	// Initialize SDL... Timer for sleep, video for the obvious, and
 	// noparachute prevents SDL from catching fatal errors.
+#ifndef __EMSCRIPTEN__
 	SDL_SetHint(SDL_HINT_NO_SIGNAL_HANDLERS, "1");
 	SDL_SetHint(SDL_HINT_ACCELEROMETER_AS_JOYSTICK, "0");
+#endif
 #if SDL_VERSION_ATLEAST(2, 0, 18)
 	SDL_SetHint(SDL_HINT_IME_SHOW_UI, "1");
 #endif
 
 	// Switch SDL disables this hint by default: https://github.com/devkitPro/SDL/pull/55#issuecomment-633775255
+#ifndef __EMSCRIPTEN__
 	SDL_SetHint(SDL_HINT_TOUCH_MOUSE_EVENTS, "1");
+#endif
 
-#ifndef MOBILE_STK
+#if !defined(MOBILE_STK) && !defined(__EMSCRIPTEN__)
 	// Prevent fullscreen minimizes when losing focus
 	if (CreationParams.Fullscreen)
 	{
@@ -205,9 +211,9 @@ CIrrDeviceSDL::CIrrDeviceSDL(const SIrrlichtCreationParameters& param)
 #endif
 }
 
-
 void CIrrDeviceSDL::updateNativeScale(u32* saving_width, u32* saving_height)
 {
+#ifndef __EMSCRIPTEN__
 	int width, height = 0;
 	SDL_GetWindowSize(Window, &width, &height);
 	int real_width = width;
@@ -227,8 +233,8 @@ void CIrrDeviceSDL::updateNativeScale(u32* saving_width, u32* saving_height)
 		*saving_width = width;
 	if (saving_height)
 		*saving_height = height;
+#endif
 }
-
 
 //! destructor
 CIrrDeviceSDL::~CIrrDeviceSDL()
@@ -241,11 +247,13 @@ CIrrDeviceSDL::~CIrrDeviceSDL()
 		if (h)
 			h->clearGLExtensions();
 #endif
+#ifdef _IRR_COMPILE_WITH_VULKAN_
 		GE::GEVulkanDriver* gevk = dynamic_cast<GE::GEVulkanDriver*>(VideoDriver);
 		if (gevk)
 			gevk->destroyVulkan();
 		VideoDriver->drop();
 		VideoDriver = NULL;
+#endif
 	}
 #ifdef DLOPEN_MOLTENVK
 	delete m_moltenvk;
@@ -360,6 +368,7 @@ bool versionCorrect(int major, int minor)
 // Used in OptionsScreenVideo for live fullscreen toggle for vulkan driver
 extern "C" void update_fullscreen_desktop(int val)
 {
+#ifdef _IRR_COMPILE_WITH_VULKAN_
 	GE::GEVulkanDriver* gevk = GE::getVKDriver();
 	if (!gevk || !GE::getGEConfig()->m_fullscreen_desktop)
 		return;
@@ -377,6 +386,9 @@ extern "C" void update_fullscreen_desktop(int val)
 		SDL_SetWindowSize(window, prev_width * 0.8f, prev_height * 0.8f);
 		SDL_RaiseWindow(window);
 	}
+#else
+	return;
+#endif
 }
 
 
@@ -388,12 +400,14 @@ extern "C" void update_swap_interval(int swap_interval)
 	if (swap_interval > 1)
 		swap_interval = 1;
 
+#ifdef _IRR_COMPILE_WITH_VULKAN_
 	GE::GEVulkanDriver* gevk = GE::getVKDriver();
 	if (gevk)
 	{
 		gevk->updateSwapInterval(swap_interval);
 		return;
 	}
+#endif
 
 	// Try adaptive vsync first if support
 	if (swap_interval > 0)
@@ -438,7 +452,7 @@ bool CIrrDeviceSDL::createWindow()
 	}
 
 	u32 flags = SDL_WINDOW_SHOWN | SDL_WINDOW_RESIZABLE;
-#if !defined(ANDROID) && !defined(__SWITCH__)
+#if !defined(ANDROID) && !defined(__SWITCH__) && !defined(__EMSCRIPTEN__)
 	if (CreationParams.DriverType == video::EDT_OPENGL ||
 		CreationParams.DriverType == video::EDT_OGLES2 ||
 		CreationParams.DriverType == video::EDT_VULKAN)
@@ -446,7 +460,8 @@ bool CIrrDeviceSDL::createWindow()
 #endif
 
 	if (CreationParams.Fullscreen)
-	{
+	{	
+#ifndef __EMSCRIPTEN__
 		if (GE::getGEConfig()->m_fullscreen_desktop)
 		{
 			flags |= SDL_WINDOW_FULLSCREEN_DESKTOP;
@@ -454,6 +469,9 @@ bool CIrrDeviceSDL::createWindow()
 		}
 		else
 			flags |= SDL_WINDOW_FULLSCREEN;
+#else
+		flags |= SDL_WINDOW_FULLSCREEN;
+#endif
 	}
 
 	if (CreationParams.DriverType == video::EDT_OPENGL ||
@@ -472,7 +490,9 @@ bool CIrrDeviceSDL::createWindow()
 #if SDL_VERSION_ATLEAST(2, 0, 12)
 		SDL_SetHint(SDL_HINT_VIDEO_EXTERNAL_CONTEXT, "1");
 #endif
+#ifdef _IRR_COMPILE_WITH_VULKAN_
 		flags |= SDL_WINDOW_VULKAN;
+#endif
 	}
 
 #ifdef MOBILE_STK
@@ -517,6 +537,7 @@ start:
 	SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, CreationParams.Doublebuffer);
 	irr::video::useCoreContext = true;
 
+#ifndef __EMSCRIPTEN__
 	if (GLContextDebugBit)
 		SDL_GL_SetAttribute(SDL_GL_CONTEXT_FLAGS, SDL_GL_CONTEXT_DEBUG_FLAG);
 
@@ -524,6 +545,7 @@ start:
 		SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_ES);
 	else
 		SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
+#endif
 
 	if (CreationParams.ForceLegacyDevice)
 		goto legacy;
@@ -651,10 +673,12 @@ legacy:
 	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 2);
 	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 1);
 #endif
+#ifndef __EMSCRIPTEN__
 	if (CreationParams.DriverType == video::EDT_OGLES2)
 		SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_ES);
 	else
 		SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, 0);
+#endif
 	Window = SDL_CreateWindow("",
 		(float)CreationParams.WindowPosition.X,
 		(float)CreationParams.WindowPosition.Y,
@@ -1228,11 +1252,13 @@ bool CIrrDeviceSDL::getWindowPosition(int* x, int* y)
 //! Get DPI of current display.
 bool CIrrDeviceSDL::getDisplayDPI(float* ddpi, float* hdpi, float* vdpi)
 {
+#ifndef __EMSCRIPTEN__
 	if (Window)
 	{
         SDL_GetDisplayDPI(SDL_GetWindowDisplayIndex(Window), ddpi, hdpi, vdpi);
 		return true;
 	}
+#endif
 	return false;
 }
 
@@ -1279,8 +1305,10 @@ bool CIrrDeviceSDL::getGammaRamp( f32 &red, f32 &green, f32 &blue, f32 &brightne
 
 void CIrrDeviceSDL::setWindowMinimumSize(u32 width, u32 height)
 {
+#ifndef __EMSCRIPTEN__
 	if (Window)
 		SDL_SetWindowMinimumSize(Window, width, height);
+#endif
 }
 
 //! returns color format of the window.
@@ -1576,7 +1604,11 @@ bool CIrrDeviceSDL::supportsTouchDevice() const
 
 bool CIrrDeviceSDL::hasOnScreenKeyboard() const
 {
+#ifndef __EMSCRIPTEN__
 	return SDL_HasScreenKeyboardSupport() == SDL_TRUE;
+#else
+	return false;
+#endif
 }
 
 
@@ -1681,8 +1713,10 @@ void CIrrDeviceSDL::createGUIAndVulkanScene()
 	GUIEnvironment = gui::createGUIEnvironment(FileSystem, VideoDriver, Operator);
 	#endif
 
+	#ifdef _IRR_COMPILE_WITH_VULKAN_
 	// create Scene manager
 	SceneManager = new GE::GEVulkanSceneManager(VideoDriver, FileSystem, CursorControl, GUIEnvironment);
+	#endif
 
 	setEventReceiver(UserReceiver);
 }

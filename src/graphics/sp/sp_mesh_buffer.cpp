@@ -474,7 +474,7 @@ void SPMeshBuffer::reloadTextureCompare()
 void SPMeshBuffer::setSTKMaterial(Material* m)
 {
     m_stk_material[0] = std::make_tuple(0u, getIndexCount(), m);
-#ifndef SERVER_ONLY
+#if !defined(SERVER_ONLY) && defined(_IRR_COMPILE_WITH_VULKAN_)
     // Used by b3d mesh loader, clean up later after SP is removed
     if (GE::getVKDriver() != NULL)
         return;
