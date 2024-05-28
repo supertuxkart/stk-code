@@ -58,6 +58,41 @@ if(IOS)
     include(cmake/XcodeHelper.cmake)
 endif()
 
+if(EMSCRIPTEN)
+    set(CMAKE_PREFIX_PATH "${CMAKE_SOURCE_DIR}/wasm/prefix/")
+
+    set(JPEG_INCLUDE_DIR "${CMAKE_SOURCE_DIR}/wasm/prefix/include/")
+    set(JPEG_LIBRARY "${CMAKE_SOURCE_DIR}/wasm/prefix/lib/")
+
+    set(PNG_PNG_INCLUDE_DIR "${CMAKE_SOURCE_DIR}/wasm/prefix/include/")
+    set(PNG_LIBRARY "${CMAKE_SOURCE_DIR}/wasm/prefix/lib/")
+
+    set(ZLIB_INCLUDE_DIR "${CMAKE_SOURCE_DIR}/wasm/prefix/include/")
+    set(ZLIB_LIBRARY "${CMAKE_SOURCE_DIR}/wasm/prefix/lib/")
+
+    set(LIB_INCLUDE_DIR "${CMAKE_SOURCE_DIR}/wasm/prefix/include/")
+    set(ZLIB_LIBRARY "${CMAKE_SOURCE_DIR}/wasm/prefix/lib/")
+
+    set(HARFBUZZ_INCLUDEDIR "${CMAKE_SOURCE_DIR}/wasm/prefix/include/")
+    set(HARFBUZZ_LIBRARY "${CMAKE_SOURCE_DIR}/wasm/prefix/lib/")
+
+    set(CURL_INCLUDE_DIR "${CMAKE_SOURCE_DIR}/wasm/prefix/include/")
+    set(CURL_LIBRARY "${CMAKE_SOURCE_DIR}/wasm/prefix/lib/")
+
+    set(OPENSSL_INCLUDE_DIR "${CMAKE_SOURCE_DIR}/wasm/prefix/include/")
+    set(OPENSSL_CRYPTO_LIBRARY "${CMAKE_SOURCE_DIR}/wasm/prefix/lib/")
+
+    #todo: avoid hardcoding this path
+    set(PTHREAD_LIBRARY "/usr/share/emscripten/cache/sysroot/")
+    
+    set(USE_WIIUSE 0)
+    set(USE_DNS_C 1)
+    add_definitions(-DNO_IRR_COMPILE_WITH_X11_)
+    add_definitions(-DNO_IRR_COMPILE_WITH_WAYLAND_DEVICE_)
+    add_definitions(-DNO_IRR_COMPILE_WITH_DIRECT3D_9_)
+    add_definitions(-DNO_IRR_COMPILE_WITH_VULKAN_)
+endif()
+
 if(APPLE AND NOT IOS)
     if(${CMAKE_SYSTEM_PROCESSOR} STREQUAL "arm")
 	set(ARCHFLAGS "arm64")
@@ -326,7 +361,7 @@ else()
     MESSAGE(STATUS "Use system libmcpp: ${MCPP_LIBRARY}")
 endif()
 
-if (NOT SERVER_ONLY)
+if (NOT SERVER_ONLY AND NOT EMSCRIPTEN)
     # SDL2
     find_library(SDL2_LIBRARY NAMES SDL2 libSDL2)
     find_path(SDL2_INCLUDEDIR NAMES SDL.h PATH_SUFFIXES SDL2 include/SDL2 include PATHS)
