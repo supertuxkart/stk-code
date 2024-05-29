@@ -50,6 +50,7 @@ private:
     /** Returns an integer in the 0-32767 range.*/
     int simplePRNG(const int seed, const int time, const int item_id, const int position);
     int useBubblegum(bool mini = false);
+    int useNitroHack();
 
 public:
                     Powerup      (Kart* kart_);

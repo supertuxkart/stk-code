@@ -248,61 +248,9 @@ void Powerup::use()
         }
     case PowerupManager::POWERUP_SUDO:
         {
-            Kart* player_kart = NULL;
-            unsigned int steal_targets = powerup_manager->getNitroHackMaxTargets();
-            float base_bonus = powerup_manager->getNitroHackBaseBonus();
-            float negative_multiply = powerup_manager->getNitroHackNegativeMultiply();
-
-            float stolen_energy = 0.0f;
-            unsigned int steal_counter = 0;
-
-            // Steal some nitro from up to steal_targets karts ahead.
-            // This can set their nitro count to a negative number
-            for(unsigned int i = 0 ; i < world->getNumKarts(); ++i)
-            {
-                Kart *kart=world->getKart(i);
-                // Standard invulnerability (the "stars") is not useful here
-                if( kart->isEliminated()   || kart== m_kart || kart->hasFinishedRace())
-                    continue;
-
-                int position_diff = m_kart->getPosition() - kart->getPosition();
-                if(position_diff > 0)
-                {
-                    float amount_to_steal = powerup_manager->getNitroHackStolenDiff(position_diff);
-                    if (amount_to_steal > 0.0f)
-                    {
-                        // Remove nitro from a target kart and add to the recipient
-                        kart->addEnergy(-amount_to_steal, /* allow negatives */ true);
-                        stolen_energy += amount_to_steal;
-                        steal_counter++;
-
-                        // This is used for display in the race GUI
-                        kart->setStolenNitro(amount_to_steal, /* duration */ 1.75f);
-
-                        // Remember if the target kart is player controlled
-                        // for a negative sound effect
-                        if(kart->getController()->isLocalPlayerController())
-                            player_kart = kart;
-                    }
-                }
-            }
-
-            // Multiply current nitro by a given factor if it is currently negative
-            if(m_kart->getEnergy() < 0)
-                m_kart->setEnergy(m_kart->getEnergy()*negative_multiply);
-
-            // Gift some free nitro if there is not enough targets in front
-            if (steal_counter < steal_targets)
-                stolen_energy += (steal_targets - steal_counter) * base_bonus;
-
-            // Give the stolen nitro and activate the "nitro boost" mode
-            // TODO make the gift of nitro depend on kart class/ nitro efficiency ??
-            m_kart->addEnergy(stolen_energy, /* allow negatives */ false);
-            m_kart->activateNitroHack();
-
+            sound_type = useNitroHack();
             break;
         } // end of PowerupManager::POWERUP_SUDO
-
     case PowerupManager::POWERUP_ELECTRO:
         {
             // This takes care of the speed boost
@@ -314,70 +262,51 @@ void Powerup::use()
 
             break;
         } // end of PowerupManager::POWERUP_ELECTRO
-
     case PowerupManager::POWERUP_MINI:
         {
-            switch (m_mini_state)
-            {
-            case PowerupManager::NOT_MINI: // Keeps the compiler happy
             // Lock the selected mini-powerup
-            case PowerupManager::MINI_SELECT:
-                {
-                    m_number++; // Avoid the powerup being removed when validating the mini-choice
+            if (m_mini_state == PowerupManager::MINI_SELECT)
+            {
+                m_number++; // Avoid the powerup being removed when validating the mini-choice
                     
-                    int cycle_ticks = stk_config->time2Ticks(0.65f);
-                    int cycle_value = World::getWorld()->getTicksSinceStart() % (3 * cycle_ticks);
-                    if (cycle_value < cycle_ticks)
-                        m_mini_state = PowerupManager::MINI_ZIPPER;
-                    else if (cycle_value < 2*cycle_ticks)
-                        m_mini_state = PowerupManager::MINI_CAKE;
-                    else
-                        m_mini_state = PowerupManager::MINI_GUM;
-
-                    break;
-                }
-            // Mini-cake case
-            case PowerupManager::MINI_CAKE:
+                int cycle_ticks = stk_config->time2Ticks(0.65f);
+                int cycle_value = World::getWorld()->getTicksSinceStart() % (3 * cycle_ticks);
+                if (cycle_value < cycle_ticks)
+                    m_mini_state = PowerupManager::MINI_ZIPPER;
+                else if (cycle_value < 2*cycle_ticks)
+                    m_mini_state = PowerupManager::MINI_CAKE;
+                else
+                    m_mini_state = PowerupManager::MINI_GUM;
+            }
+            // Use the selected mini-powerup
+            else
+            {
+                if (m_mini_state == PowerupManager::MINI_CAKE)
                 {
-                    // This allows to use multiple mini-wishes in different ways
-                    m_mini_state = PowerupManager::MINI_SELECT;
-
                     // make weapon usage destroy gum shields
-                    if(stk_config->m_shield_restrict_weapons &&
-                    m_kart->isGumShielded())
+                    if(stk_config->m_shield_restrict_weapons && m_kart->isGumShielded())
                         m_kart->decreaseShieldTime();
                     ProjectileManager::get()->newProjectile(m_kart, PowerupManager::POWERUP_MINI);
-                    break;
                 } // mini-cake case
-
-            // Mini-zipper case
-            case PowerupManager::MINI_ZIPPER:
+                else if (m_mini_state == PowerupManager::MINI_ZIPPER)
                 {
-                    // This allows to use multiple mini-wishes in different ways
-                    m_mini_state = PowerupManager::MINI_SELECT;
                     m_kart->handleZipper(NULL, /* play sound*/ true, /* mini zipper */ true);
-                    break;
                 } // mini-zipper case
-
-
-            // Mini-gum case
-            case PowerupManager::MINI_GUM:
+                else if (m_mini_state == PowerupManager::MINI_GUM)
                 {
-                    // This allows to use multiple mini-wishes in different ways
-                    m_mini_state = PowerupManager::MINI_SELECT;
                     sound_type = useBubblegum(/* mini */ true);
-                    break;
                 } // mini-gum case
-            } // Switch mini-state
+
+                // This allows to use multiple mini-wishes in different ways
+                m_mini_state = PowerupManager::MINI_SELECT;
+            }
             break;
         } // end of PowerupManager::POWERUP_MINI
-
     case PowerupManager::POWERUP_BUBBLEGUM:
         {
             sound_type = useBubblegum();
             break; 
         }
-
     case PowerupManager::POWERUP_ANVIL:
         {
             //Attach an anvil(twice as good as the one given
@@ -398,7 +327,6 @@ void Powerup::use()
             }
             break;
         }
-
     case PowerupManager::POWERUP_PARACHUTE:
         {
             Kart* player_kart = NULL;
@@ -444,7 +372,6 @@ void Powerup::use()
             }
             break;
         }
-
     case PowerupManager::POWERUP_NOTHING:
     default : break;
     }
@@ -462,7 +389,6 @@ void Powerup::use()
 /** This function handles the bubblegum logic, in backward use (dropping a ground
  * gum) and forward use (creating a gum shield).
  * Its return value indicates the sound to play: none (0), ground gum (1), shield (2) */
-
 int Powerup::useBubblegum(bool mini)
 {
     int sound_type = 0;
@@ -503,13 +429,11 @@ int Powerup::useBubblegum(bool mini)
         if(!m_kart->isGumShielded()) //if the previous shield had been used up.
         {
                 m_kart->getAttachment()->set(type,
-                                 stk_config->
-                                 time2Ticks(kp->getBubblegumShieldDuration() * mini_factor));
+                    stk_config->time2Ticks(kp->getBubblegumShieldDuration() * mini_factor));
         }
-        // using a bubble gum while still having a gum shield
-        // In this case, half of the remaining time of the active
-        // shield is added. The maximum duration of a shield is
-        // never above twice the standard duration.
+        // Using a bubble gum while still having a gum shield. In this case,
+        // half of the remaining time of the active shield is added. The maximum
+        // duration of a shield is never above twice the standard duration.
         // The code above guarantees that, if there is a mix and match
         // of small and normal gum shield between the active shield and
         // the used shield, the new shield will be normal.
@@ -518,14 +442,75 @@ int Powerup::useBubblegum(bool mini)
         else
         {
             m_kart->getAttachment()->set(type,
-                            stk_config->
-                            time2Ticks(kp->getBubblegumShieldDuration() * mini_factor
+                stk_config-> time2Ticks(kp->getBubblegumShieldDuration() * mini_factor
                                        + (m_kart->getShieldTime() / 2.0f)) );
         }
         sound_type = 2;
     }
     return sound_type;
 }   // useBubblegum
+
+//-----------------------------------------------------------------------------
+/** This function handles the nitro-hack logic.
+ * Its return value indicates the sound to play: good sound (1), bad sound (2)
+ * or both (3) */
+int Powerup::useNitroHack()
+{
+    unsigned int steal_targets = powerup_manager->getNitroHackMaxTargets();
+    float base_bonus = powerup_manager->getNitroHackBaseBonus();
+    float negative_multiply = powerup_manager->getNitroHackNegativeMultiply();
+
+    float stolen_energy = 0.0f;
+    unsigned int steal_counter = 0;
+    int sound_type = (m_kart->getController()->isLocalPlayerController()) ? 1 : 0;
+    World *world = World::getWorld();
+
+    // Steal some nitro from up to steal_targets karts ahead.
+    // This can set their nitro count to a negative number
+    for(unsigned int i = 0 ; i < world->getNumKarts(); ++i)
+    {
+        Kart *kart = world->getKart(i);
+        // Standard invulnerability (the "stars") is not useful here
+        if( kart->isEliminated() || kart == m_kart || kart->hasFinishedRace())
+            continue;
+
+        int position_diff = m_kart->getPosition() - kart->getPosition();
+        if(position_diff > 0)
+        {
+            float amount_to_steal = powerup_manager->getNitroHackStolenDiff(position_diff);
+            if (amount_to_steal > 0.0f)
+            {
+                // Remove nitro from a target kart and add to the recipient
+                kart->addEnergy(-amount_to_steal, /* allow negatives */ true);
+                stolen_energy += amount_to_steal;
+                steal_counter++;
+
+                // This is used for display in the race GUI
+                kart->setStolenNitro(amount_to_steal, /* duration */ 1.75f);
+
+                // If a local player is affected, we will play a negative sound effect
+                if(kart->getController()->isLocalPlayerController() && sound_type <= 1)
+                    sound_type += 2;
+            }
+        }
+    }
+
+    // Multiply current nitro by a given factor, if it is currently negative
+    // With default values, this does nothing.
+    if(m_kart->getEnergy() < 0)
+        m_kart->setEnergy(m_kart->getEnergy()*negative_multiply);
+
+    // Gift some free nitro if there is not enough targets in front
+    if (steal_counter < steal_targets)
+        stolen_energy += (steal_targets - steal_counter) * base_bonus;
+
+    // Give the stolen nitro and activate the "nitro boost" mode
+    // TODO make the gift of nitro depend on kart class/ nitro efficiency ??
+    m_kart->addEnergy(stolen_energy, /* allow negatives */ false);
+    m_kart->activateNitroHack();
+
+    return sound_type;
+} // useNitroHack
 
 //-----------------------------------------------------------------------------
 /** This function is called when a bonus box is it. This function can be

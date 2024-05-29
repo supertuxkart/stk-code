@@ -134,14 +134,12 @@ void PowerupAudio::onUseAudio(Kart* kart, PowerupManager::PowerupType type, int 
 	case PowerupManager::POWERUP_SWATTER:
 		break;
 	case PowerupManager::POWERUP_SUDO:
-		// Play a good sound for the kart that benefits from the "nitro-hack",
-		// if it's a local player
-		if (kart->getController()->isLocalPlayerController())
+		// If a local player benefits from the "nitro-hack", play a good sound
+		if (sound_type % 2 == 1)
 			m_sudo_good->play();
 		// Play a bad sound if there is an affected local player
-		// FIXME if (player_kart != NULL)
-			// FIXME m_sudo_bad->play();
-
+		if (sound_type >= 2)
+			m_sudo_bad->play();
 		break;
 	case PowerupManager::POWERUP_ELECTRO:
 		break;
