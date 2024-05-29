@@ -49,7 +49,6 @@ public:
 
 	 ~PowerupAudio();
 
-    void setPowerupSound(Kart* kart, PowerupManager::PowerupType type);
     void onUseAudio(Kart* kart, PowerupManager::PowerupType type, PowerupManager::MiniState mini_state, int sound_type);
     void update(Kart* kart, int ticks);
 

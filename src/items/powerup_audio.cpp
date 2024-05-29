@@ -53,57 +53,6 @@ PowerupAudio::~PowerupAudio()
 } // ~PowerupAudio
 
 //-----------------------------------------------------------------------------
-/** Sets the appropriate sound effect for the current powerup
- */
-void PowerupAudio::setPowerupSound(Kart* kart, PowerupManager::PowerupType type)
-{
-    resetSoundSource();
-
-    switch (type)
-    {
-        // No sound effect when arming the glove
-        case PowerupManager::POWERUP_SWATTER:
-        // Special sound management
-        case PowerupManager::POWERUP_ZIPPER:
-        // Special sound effect management
-        case PowerupManager::POWERUP_SUDO:
-        // TODO : add sound effects
-        case PowerupManager::POWERUP_ELECTRO:
-        // Special sound effect management
-        case PowerupManager::POWERUP_MINI:
-            break ;
-
-        case PowerupManager::POWERUP_BOWLING:
-            m_powerup_sound = SFXManager::get()->createSoundSource("bowling_shoot");
-            break ;
-
-        case PowerupManager::POWERUP_ANVIL:
-            m_powerup_sound = SFXManager::get()->createSoundSource("anvil");
-            break;
-
-        case PowerupManager::POWERUP_PARACHUTE:
-            m_powerup_sound = SFXManager::get()->createSoundSource("parachute");
-            break;
-
-        case PowerupManager::POWERUP_BUBBLEGUM:
-            // handled in the useBubblegum function
-            break ;
-
-        case PowerupManager::POWERUP_SWITCH:
-            m_powerup_sound = SFXManager::get()->createSoundSource("swap");
-            break;
-
-        case PowerupManager::POWERUP_NOTHING:
-        case PowerupManager::POWERUP_CAKE:
-        case PowerupManager::POWERUP_PLUNGER:
-        default :
-            m_powerup_sound = SFXManager::get()->createSoundSource("shoot");
-            break ;
-    }
-} // setPowerupSound
-
-
-//-----------------------------------------------------------------------------
 /** Does the sound configuration.
  */
 void PowerupAudio::adjustSound(Kart* kart)
@@ -147,6 +96,8 @@ void PowerupAudio::onUseAudio(Kart* kart, PowerupManager::PowerupType type, Powe
     if (has_played_sound)
     	return;
 
+    resetSoundSource();
+
     // Play custom kart sound when collectible is used //TODO: what about the bubble gum?
     if (type != PowerupManager::POWERUP_NOTHING &&
         type != PowerupManager::POWERUP_SWATTER &&
@@ -161,14 +112,23 @@ void PowerupAudio::onUseAudio(Kart* kart, PowerupManager::PowerupType type, Powe
     {
     case PowerupManager::POWERUP_ZIPPER:
 		// TODO
-        break ;
+        break;
     case PowerupManager::POWERUP_SWITCH:
+    	m_powerup_sound = SFXManager::get()->createSoundSource("swap");
         m_powerup_sound->play();
         break;
     case PowerupManager::POWERUP_CAKE:       // Fall-through
-    case PowerupManager::POWERUP_RUBBERBALL: // Fall-through
-    case PowerupManager::POWERUP_BOWLING:    // Fall-through
     case PowerupManager::POWERUP_PLUNGER:
+    	m_powerup_sound = SFXManager::get()->createSoundSource("shoot");
+        adjustSound(kart);
+        m_powerup_sound->play();
+        break;
+    case PowerupManager::POWERUP_RUBBERBALL: // Fall-through
+        adjustSound(kart);
+        m_powerup_sound->play();
+        break;
+    case PowerupManager::POWERUP_BOWLING:    // Fall-through
+    	m_powerup_sound = SFXManager::get()->createSoundSource("bowling_shoot");
         adjustSound(kart);
         m_powerup_sound->play();
         break;
@@ -213,10 +173,12 @@ void PowerupAudio::onUseAudio(Kart* kart, PowerupManager::PowerupType type, Powe
         break;
 
     case PowerupManager::POWERUP_ANVIL:
+    	m_powerup_sound = SFXManager::get()->createSoundSource("anvil");
         // Not worth the effort
         break;
 
     case PowerupManager::POWERUP_PARACHUTE:
+    	m_powerup_sound = SFXManager::get()->createSoundSource("parachute");
         // should we position the sound at the kart that is hit,
         // or the kart "throwing" the anvil? Ideally it should be both.
         // Meanwhile, don't play it near AI karts since they obviously

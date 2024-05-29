@@ -111,7 +111,6 @@ void Powerup::update(int ticks)
 //-----------------------------------------------------------------------------
 /** Sets the collected items. The number of items is increased if the same
  *  item is currently collected, otherwise replaces the existing item.
- *  Also set the item-specific sound.
  *  \param type Thew new type.
  *  \param n Number of items of the given type.
  */
@@ -125,10 +124,6 @@ void Powerup::set(PowerupManager::PowerupType type, int n)
     {
         m_type=type;
         m_number=n;
-
-        // Don't re-create sound during rewinding
-        if (!RewindManager::get()->isRewinding())
-            PowerupAudio::getInstance()->setPowerupSound(m_kart, m_type);
 
         if (m_type == PowerupManager::POWERUP_MINI)
             m_mini_state = PowerupManager::MINI_SELECT;
