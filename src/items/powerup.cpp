@@ -449,7 +449,7 @@ void Powerup::use()
     default : break;
     }
 
-    PowerupAudio::getInstance()->onUseAudio(m_kart, m_type, audio_mini_state, sound_type);
+    PowerupAudio::getInstance()->onUseAudio(m_kart, m_type, sound_type, audio_mini_state);
 
     if ( m_number <= 0 )
     {
