@@ -12,7 +12,6 @@ async function extract_tar(url, fs_path) {
   for (let file of files) {
     let relative_path = file.name.substring(1);
     let out_path = fs_path + relative_path;
-    console.log(file);
     if (out_path.endsWith("/")) {
       FS.mkdir(out_path);
     }

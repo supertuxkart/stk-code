@@ -84,21 +84,27 @@ if(EMSCRIPTEN)
     set(OGGVORBIS_OGG_LIBRARY "${CMAKE_SOURCE_DIR}/wasm/prefix/lib/libogg.a")
     set(OGGVORBIS_VORBISFILE_LIBRARY "${CMAKE_SOURCE_DIR}/wasm/prefix/lib/libvorbisfile.a")
     set(OGGVORBIS_VORBIS_LIBRARY "${CMAKE_SOURCE_DIR}/wasm/prefix/lib/libvorbis.a")
-    #-DFREETYPE_INCLUDE_DIRS=/home/heatingdevice/projects/freetype/include \
-
-    set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -L${CMAKE_SOURCE_DIR}/wasm/prefix/lib/ -lcrypto -lSDL2 -logg -lvorbis")
 
     #todo: avoid hardcoding this path
     set(PTHREAD_LIBRARY "/usr/share/emscripten/cache/sysroot/")
-    
+
     set(USE_WIIUSE 0)
     set(USE_DNS_C 1)
+    set(NO_SHADERC on)
     add_definitions(-DNO_IRR_COMPILE_WITH_X11_)
     add_definitions(-DNO_IRR_COMPILE_WITH_WAYLAND_DEVICE_)
     add_definitions(-DNO_IRR_COMPILE_WITH_DIRECT3D_9_)
     add_definitions(-DNO_IRR_COMPILE_WITH_VULKAN_)
     add_definitions(-DNO_IRR_COMPILE_WITH_OPENGL_)
     add_definitions(-D_IRR_COMPILE_WITH_OGLES2_)
+
+    add_compile_options("-sUSE_SDL=2")
+    set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -L${CMAKE_SOURCE_DIR}/wasm/prefix/lib/ -sUSE_SDL=2 -lcrypto -logg -lvorbis")
+    if(CMAKE_BUILD_TYPE MATCHES Debug)
+        set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -sEXCEPTION_DEBUG=1 --profiling-funcs")
+        add_compile_options(-g3)
+    endif()
+
 endif()
 
 if(APPLE AND NOT IOS)

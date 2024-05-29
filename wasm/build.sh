@@ -6,15 +6,13 @@ SRC_DIR="$(dirname "$BASE_DIR")"
 WEB_DIR="$BASE_DIR/web"
 BUILD_DIR="$SRC_DIR/cmake_build"
 EMSDK_DIR="$BASE_DIR/emsdk"
-PACKAGER="$EMSDK_DIR/upstream/emscripten/tools/file_packager.py"
-PREFIX="$BASE_DIR/prefix"
 
 mkdir -p $BUILD_DIR
 cd $BUILD_DIR
 
 source $EMSDK_DIR/emsdk_env.sh
-emcmake cmake .. -DNO_SHADERC=on
-make -j4
+emcmake cmake .. -DNO_SHADERC=on -DCMAKE_BUILD_TYPE=Debug
+make -j$CORE_COUNT
 
 echo "packing game files"
 mkdir -p "$WEB_DIR/game"
