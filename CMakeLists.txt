@@ -59,6 +59,9 @@ if(IOS)
 endif()
 
 if(EMSCRIPTEN)
+    #note: cmake fails the first few times you run it then works fine without changing anything
+    #i have no idea why this happens
+
     set(CMAKE_PREFIX_PATH "${CMAKE_SOURCE_DIR}/wasm/prefix/")
 
     set(JPEG_INCLUDE_DIR "${CMAKE_SOURCE_DIR}/wasm/prefix/include")
@@ -98,11 +101,14 @@ if(EMSCRIPTEN)
     add_definitions(-DNO_IRR_COMPILE_WITH_OPENGL_)
     add_definitions(-D_IRR_COMPILE_WITH_OGLES2_)
 
-    add_compile_options("-sUSE_SDL=2")
-    set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -L${CMAKE_SOURCE_DIR}/wasm/prefix/lib/ -sUSE_SDL=2 -lcrypto -logg -lvorbis")
+    
+    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -sUSE_SDL=2 -fwasm-exceptions -sSUPPORT_LONGJMP=wasm")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -sUSE_SDL=2 -fwasm-exceptions -sSUPPORT_LONGJMP=wasm")
+    set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -L${CMAKE_SOURCE_DIR}/wasm/prefix/lib/ -lcrypto -logg -lvorbis -fwasm-exceptions")
     if(CMAKE_BUILD_TYPE MATCHES Debug)
         set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -sEXCEPTION_DEBUG=1 --profiling-funcs")
-        add_compile_options(-g3)
+        set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -g3")
+        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g3")
     endif()
 
 endif()

@@ -13,7 +13,10 @@ async function extract_tar(url, fs_path) {
     let relative_path = file.name.substring(1);
     let out_path = fs_path + relative_path;
     if (out_path.endsWith("/")) {
-      FS.mkdir(out_path);
+      try {
+        FS.mkdir(out_path);
+      }
+      catch {}
     }
     else {
       let array = new Uint8Array(file.buffer);
@@ -23,9 +26,14 @@ async function extract_tar(url, fs_path) {
 }
 
 async function load_data() {
+  console.log("downloading and extracting game data");
   await extract_tar("/game/data.tar.gz", "/data");
+  console.log("downloading and extracting assets");
+  await extract_tar("/game/assets.tar.gz", "/data");
 }
 
 globalThis.pako = pako;
 globalThis.jsUntar = jsUntar;
 globalThis.load_data = load_data;
+
+Module["canvas"] = document.getElementById("canvas")

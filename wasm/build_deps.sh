@@ -13,6 +13,9 @@ LIB="$PREFIX/lib"
 
 source $EMSDK_DIR/emsdk_env.sh
 export PKG_CONFIG_PATH="$LIB/pkgconfig"
+export CFLAGS="-fwasm-exceptions -sSUPPORT_LONGJMP=wasm"
+export CPPFLAGS="-fwasm-exceptions -sSUPPORT_LONGJMP=wasm"
+export LDFLAGS="-fwasm-exceptions -sSUPPORT_LONGJMP=wasm"
 
 clone_repo() {
   local url="$1"
@@ -99,11 +102,10 @@ build_png() {
   clone_repo "https://github.com/pnggroup/libpng" v1.6.43 "$SRC_DIR"
   cd "$SRC_DIR"
 
-  emconfigure ./configure --host none-linux --prefix="$PREFIX" --disable-shared CPPFLAGS="-I$INCLUDE" LDFLAGS="-L$LIB"
+  emconfigure ./configure --host none-linux --prefix="$PREFIX" --disable-shared CPPFLAGS="$CPPFLAGS -I$INCLUDE" LDFLAGS="$LDFLAGS -L$LIB"
   emmake make -j$CORE_COUNT 
   make install
 }
-
 
 build_freetype() {
   local with_harfbuzz="$1"
@@ -133,7 +135,7 @@ build_harfbuzz() {
   clone_repo "https://github.com/harfbuzz/harfbuzz" 8.5.0 "$SRC_DIR"
   cd "$SRC_DIR"
 
-  ./autogen.sh
+  emconfigure ./autogen.sh
   emconfigure ./configure --host=none-linux --prefix="$PREFIX" --disable-shared PKG_CONFIG_PATH="$LIB/pkgconfig"
   emmake make -j$CORE_COUNT
   make install
@@ -178,5 +180,3 @@ if [ ! -d "$INCLUDE/harfbuzz" ]; then
   rm -rf "$INCLUDE/freetype2"
   build_freetype true
 fi
-
-build_freetype true
