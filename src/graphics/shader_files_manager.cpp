@@ -22,6 +22,7 @@
 #include "config/stk_config.hpp"
 #include "graphics/central_settings.hpp"
 #include "graphics/graphics_restrictions.hpp"
+#include "graphics/sp/sp_base.hpp"
 #include "guiengine/message_queue.hpp"
 #include "io/file_manager.hpp"
 #include "utils/file_utils.hpp"
@@ -179,8 +180,8 @@ ShaderFilesManager::SharedShader ShaderFilesManager::loadShader
     code << "//" << full_path << "\n";
     if (!CVS->isARBUniformBufferObjectUsable())
         code << "#define UBO_DISABLED\n";
-    if (!CVS->isARBTextureBufferObjectUsable())
-        code << "#define TBO_DISABLED\n";
+    if (!SP::skinningUseTBO())
+        code << "#define SKINNING_TBO_DISABLED\n";
     if (CVS->needsVertexIdWorkaround())
         code << "#define Needs_Vertex_Id_Workaround\n";
     if (CVS->isDeferredEnabled())

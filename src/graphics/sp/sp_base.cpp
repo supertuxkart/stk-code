@@ -123,6 +123,8 @@ unsigned g_skinning_offset = 0;
 // ----------------------------------------------------------------------------
 std::vector<SPMeshNode*> g_skinning_mesh;
 // ----------------------------------------------------------------------------
+int g_skinning_tbo_limit = 0;
+// ----------------------------------------------------------------------------
 int sp_cur_shadow_cascade = 0;
 // ----------------------------------------------------------------------------
 void initSTKRenderer(ShaderBasedRenderer* sbr)
@@ -251,9 +253,7 @@ void resizeSkinning(unsigned number)
     const irr::core::matrix4 m;
     g_skinning_size = number;
 
-
-
-    if (!CVS->isARBTextureBufferObjectUsable())
+    if (!skinningUseTBO())
     {
         glBindTexture(GL_TEXTURE_2D, g_skinning_tex);
         glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA32F, 4, number, 0, GL_RGBA,
@@ -302,7 +302,7 @@ void initSkinning()
 
     int max_size = 0;
 
-    if (!CVS->isARBTextureBufferObjectUsable())
+    if (!skinningUseTBO())
     {
         glGetIntegerv(GL_MAX_TEXTURE_SIZE, &max_size);
     
@@ -319,12 +319,12 @@ void initSkinning()
     else
     {
 #ifndef USE_GLES2
-        glGetIntegerv(GL_MAX_TEXTURE_BUFFER_SIZE, &max_size);
-        if (stk_config->m_max_skinning_bones << 6 > (unsigned)max_size)
+        glGetIntegerv(GL_MAX_TEXTURE_BUFFER_SIZE, &g_skinning_tbo_limit);
+        if (stk_config->m_max_skinning_bones << 6 > (unsigned)g_skinning_tbo_limit)
         {
             Log::warn("SharedGPUObjects", "Too many bones for skinning, max: %d",
-                      max_size >> 6);
-            stk_config->m_max_skinning_bones = max_size >> 6;
+                      g_skinning_tbo_limit >> 6);
+            stk_config->m_max_skinning_bones = g_skinning_tbo_limit >> 6;
         }
         Log::info("SharedGPUObjects", "Hardware Skinning enabled, method: TBO, "
                   "max bones: %u", stk_config->m_max_skinning_bones);
@@ -337,7 +337,7 @@ void initSkinning()
     const irr::core::matrix4 m;
     glGenTextures(1, &g_skinning_tex);
 #ifndef USE_GLES2
-    if (CVS->isARBTextureBufferObjectUsable())
+    if (skinningUseTBO())
     {
         glGenBuffers(1, &g_skinning_buf);
     }
@@ -440,6 +440,11 @@ void init()
     if (GUIEngine::isNoGraphics())
     {
         return;
+    }
+
+    if (CVS->isARBTextureBufferObjectUsable())
+    {
+        glGetIntegerv(GL_MAX_TEXTURE_BUFFER_SIZE_ARB, &g_skinning_tbo_limit);
     }
 
     initSkinning();
@@ -605,7 +610,7 @@ void destroy()
     SPTextureManager::destroy();
 
 #ifndef USE_GLES2
-    if (CVS->isARBTextureBufferObjectUsable() && 
+    if (skinningUseTBO() && 
         CVS->isARBBufferStorageUsable())
     {
         glBindBuffer(GL_TEXTURE_BUFFER, g_skinning_buf);
@@ -646,6 +651,13 @@ SPShader* getNormalVisualizer()
 {
     return g_normal_visualizer;
 }   // getNormalVisualizer
+
+// ----------------------------------------------------------------------------
+bool skinningUseTBO()
+{
+    return CVS->isARBTextureBufferObjectUsable()
+        && g_skinning_tbo_limit >= 64 * stk_config->m_max_skinning_bones;
+}
 
 
 // ----------------------------------------------------------------------------
@@ -1127,7 +1139,7 @@ void uploadSkinningMatrices()
 
     unsigned buffer_offset = 0;
 #ifndef USE_GLES2
-    if (CVS->isARBTextureBufferObjectUsable() && 
+    if (skinningUseTBO() && 
         !CVS->isARBBufferStorageUsable())
     {
         glBindBuffer(GL_TEXTURE_BUFFER, g_skinning_buf);
@@ -1146,7 +1158,7 @@ void uploadSkinningMatrices()
         buffer_offset += g_skinning_mesh[i]->getTotalJoints();
     }
 
-    if (!CVS->isARBTextureBufferObjectUsable())
+    if (!skinningUseTBO())
     {
         glBindTexture(GL_TEXTURE_2D, g_skinning_tex);
         glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 1, 4, buffer_offset, GL_RGBA,
@@ -1155,7 +1167,7 @@ void uploadSkinningMatrices()
     }
     
 #ifndef USE_GLES2
-    if (CVS->isARBTextureBufferObjectUsable() && 
+    if (skinningUseTBO() && 
         !CVS->isARBBufferStorageUsable())
     {
         glUnmapBuffer(GL_TEXTURE_BUFFER);

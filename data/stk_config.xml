@@ -542,8 +542,9 @@
   <!-- Maximum bones from all animated meshes in each frame to be uploaded for
        hardware skinning, For gles 3.0 the specification guarantees at least 2048, for
        TBO in desktop at least 65536 (max buffer size) / 64, SSBO at least 2^24 / 64,
-       so 1024 will work everywhere. -->
-  <skinning max-bones="1024"/>
+       and for cases TBO doesn't support equal or more than 2048, use texture instead,
+       so 2048 will work everywhere. -->
+  <skinning max-bones="2048"/>
 
   <!-- For users with libsquish:
     Use a slow but high quality colour compressor.

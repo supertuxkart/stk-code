@@ -458,13 +458,7 @@ stringw SpinnerWidget::getStringValue() const
         stringw text = StringUtils::insertValues(m_text.c_str(), m_value);
         return text;
     }
-    else
-#ifndef __EMSCRIPTEN__
-    {
-        assert(false);
-    }
-#endif
-    /** To avoid compiler warnings about missing return statements. */
+    // This can happen if the spinner has not been initialized yet.
     return "";
 }
 
