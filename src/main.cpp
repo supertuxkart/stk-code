@@ -2105,6 +2105,7 @@ void debugLoop()
 #endif
 
 // ----------------------------------------------------------------------------
+void endMainLoop();
 #if defined(ANDROID)
 int android_main(int argc, char *argv[])
 #elif defined(IOS_STK)
@@ -2594,6 +2595,11 @@ int main(int argc, char *argv[])
 #ifdef __EMSCRIPTEN__
         auto mainLoopWrapper = []() {
             main_loop->run();
+            if (main_loop->isAborted()) {
+                endMainLoop();
+                emscripten_cancel_main_loop();
+                exit(0);
+            }
         };
         emscripten_set_main_loop(mainLoopWrapper, 0, 1);
 #else
@@ -2610,6 +2616,18 @@ int main(int argc, char *argv[])
     }
 
     /* Program closing...*/
+    endMainLoop();
+
+#ifdef IOS_STK
+    // App store may not like this, but this can happen if player uses keyboard to quit stk
+    exit(0);
+    return 0;
+#else
+    return 0 ;
+#endif
+}   // main
+
+void endMainLoop() {
 
 #ifdef ENABLE_WIIUSE
     if(wiimote_manager)
@@ -2661,15 +2679,7 @@ int main(int argc, char *argv[])
     socketExit();
     nifmExit();
 #endif
-
-#ifdef IOS_STK
-    // App store may not like this, but this can happen if player uses keyboard to quit stk
-    exit(0);
-    return 0;
-#else
-    return 0 ;
-#endif
-}   // main
+}
 
 // ============================================================================
 #ifdef WIN32

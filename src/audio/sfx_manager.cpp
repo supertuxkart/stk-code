@@ -95,7 +95,7 @@ SFXManager::SFXManager()
     {
         // The thread is created even if there atm sfx are disabled
         // (since the user might enable it later).
-#ifndef __SWITCH__
+#if !defined(__SWITCH__) && !defined(__EMSCRIPTEN__)
         m_thread = std::thread(std::bind(mainLoop, this));
 #endif
         setMasterSFXVolume( UserConfigParams::m_sfx_volume );
@@ -111,7 +111,7 @@ SFXManager::SFXManager()
  */
 SFXManager::~SFXManager()
 {
-#if defined(ENABLE_SOUND) && !defined(__SWITCH__)
+#if defined(ENABLE_SOUND) && !defined(__SWITCH__) && !defined(__EMSCRIPTEN__)
     if (UserConfigParams::m_enable_sound)
     {
         m_thread.join();
@@ -348,19 +348,19 @@ void SFXManager::mainLoop(void *obj)
     if (!UserConfigParams::m_enable_sound)
         return;
         
-#ifndef __SWITCH__
+#if !defined(__SWITCH__) && !defined(__EMSCRIPTEN__)
     VS::setThreadName("SFXManager");
 #endif
     SFXManager *me = (SFXManager*)obj;
 
     std::unique_lock<std::mutex> ul = me->m_sfx_commands.acquireMutex();
 
-#ifdef __SWITCH__
+#if defined(__SWITCH__) || defined(__EMSCRIPTEN__)
     int iterCount = 0;
 #endif
     // Wait till we have an empty sfx in the queue
     while (
-#ifdef __SWITCH__
+#if defined(__SWITCH__) || defined(__EMSCRIPTEN__)
            // Don't spend too much time working on audio
            ++iterCount != 30 && !me->m_sfx_commands.getData().empty()
 #else
@@ -374,7 +374,7 @@ void SFXManager::mainLoop(void *obj)
         // Wait in cond_wait for a request to arrive. The 'while' is necessary
         // since "spurious wakeups from the pthread_cond_wait ... may occur"
         // (pthread_cond_wait man page)!
-#ifndef __SWITCH__
+#if !defined(__SWITCH__) && !defined(__EMSCRIPTEN__)
         while (empty)
         {
             me->m_condition_variable.wait(ul);
@@ -387,7 +387,7 @@ void SFXManager::mainLoop(void *obj)
         if (current->m_command == SFX_EXIT)
         {
             delete current;
-#ifdef __SWITCH__
+#if defined(__SWITCH__) || defined(__EMSCRIPTEN__)
             return;
 #else
             break;
@@ -482,7 +482,7 @@ void SFXManager::mainLoop(void *obj)
     // need to keep the user waiting for STK to exit.
     me->setCanBeDeleted();
 
-#ifndef __SWITCH__
+#if !defined(__SWITCH__) && !defined(__EMSCRIPTEN__)
     // Clean up memory to avoid leak detection
     while(!me->m_sfx_commands.getData().empty())
     {
@@ -808,7 +808,7 @@ void SFXManager::update()
     // Wake up the sfx thread to handle all queued up audio commands.
     m_condition_variable.notify_one();
 
-#ifdef __SWITCH__
+#if defined(__SWITCH__) || defined(__EMSCRIPTEN__)
     mainLoop(this);
 #endif
 #endif
