@@ -358,8 +358,12 @@ bool CentralVideoSettings::isARBGeometryShadersUsable() const
 
 bool CentralVideoSettings::isARBUniformBufferObjectUsable() const
 {
+#if 0
+    return false;
+#else
     return hasUBO ||
         (m_gl_major_version > 3 || (m_gl_major_version == 3 && m_gl_minor_version >= 1));
+#endif
 }
 
 bool CentralVideoSettings::isARBExplicitAttribLocationUsable() const

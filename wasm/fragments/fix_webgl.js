@@ -1,0 +1,4 @@
+/* INSERT
+GLctx.getAttachedShaders\(\S+?\)
+*/
+ || []

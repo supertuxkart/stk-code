@@ -252,11 +252,12 @@ SkidMarks::SkidMarkQuads::SkidMarkQuads(const Vec3 &left,
     }
     else
     {
-        #ifdef _IRR_COMPILE_WITH_VULKAN_
         scene::IMeshBuffer* buffer = NULL;
+#ifdef _IRR_COMPILE_WITH_VULKAN_
         if (irr_driver->getVideoDriver()->getDriverType() == video::EDT_VULKAN)
             buffer = new GE::GEVulkanDynamicSPMBuffer();
         else
+#endif
             buffer = new scene::SMeshBuffer();
         material->setMaterialProperties(&buffer->getMaterial(), buffer);
         buffer->getMaterial().setTexture(0, material->getTexture());
@@ -270,7 +271,6 @@ SkidMarks::SkidMarkQuads::SkidMarkQuads(const Vec3 &left,
         m_node->getMaterial(0).getRenderInfo() =
             std::make_shared<GE::GERenderInfo>();
         mesh->drop();
-        #endif
     }
     m_start_color = (custom_color != NULL ? *custom_color :
         video::SColor(255, SkidMarks::m_start_grey, SkidMarks::m_start_grey,

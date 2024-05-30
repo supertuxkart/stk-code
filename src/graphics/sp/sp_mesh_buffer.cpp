@@ -158,9 +158,14 @@ void SPMeshBuffer::uploadGLMesh()
     unsigned v_size = (unsigned)m_vertices.size() * pitch;
     glBufferData(GL_ARRAY_BUFFER, v_size, NULL, GL_DYNAMIC_DRAW);
     size_t offset = 0;
+#ifdef __EMSCRIPTEN__
+    char* ptr = (char*)glMapBufferRange(GL_ARRAY_BUFFER, 0, v_size,
+        GL_MAP_WRITE_BIT | GL_MAP_INVALIDATE_BUFFER_BIT);
+#else
     char* ptr = (char*)glMapBufferRange(GL_ARRAY_BUFFER, 0, v_size,
         GL_MAP_WRITE_BIT | GL_MAP_UNSYNCHRONIZED_BIT |
         GL_MAP_INVALIDATE_BUFFER_BIT);
+#endif
     v_size = 0;
     for (unsigned i = 0 ; i < m_vertices.size(); i++)
     {
@@ -407,9 +412,15 @@ void SPMeshBuffer::uploadInstanceData()
         else
         {
             glBindBuffer(GL_ARRAY_BUFFER, m_ins_array[i]);
+#ifdef __EMSCRIPTEN__
+    void* ptr = glMapBufferRange(GL_ARRAY_BUFFER, 0,
+                m_ins_dat[i].size() * 44, GL_MAP_WRITE_BIT | GL_MAP_INVALIDATE_BUFFER_BIT);
+#else
+
             void* ptr = glMapBufferRange(GL_ARRAY_BUFFER, 0,
                 m_ins_dat[i].size() * 44, GL_MAP_WRITE_BIT |
                 GL_MAP_UNSYNCHRONIZED_BIT | GL_MAP_INVALIDATE_BUFFER_BIT);
+#endif
             memcpy(ptr, m_ins_dat[i].data(), m_ins_dat[i].size() * 44);
             glUnmapBuffer(GL_ARRAY_BUFFER);
             glBindBuffer(GL_ARRAY_BUFFER, 0);

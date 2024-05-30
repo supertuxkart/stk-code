@@ -227,7 +227,6 @@ void ShaderBasedRenderer::renderSceneDeferred(scene::ICameraSceneNode * const ca
                                               bool hasShadow,
                                               bool forceRTT)
 {
-
     if (CVS->isARBUniformBufferObjectUsable())
     {
         glBindBufferBase(GL_UNIFORM_BUFFER, 0,

@@ -109,7 +109,7 @@ InputManager::InputManager() : m_mode(BOOTSTRAP),
     m_device_manager->initialize();
 
     m_master_player_only = false;
-#if !defined(SERVER_ONLY) && !defined(__EMSCRIPTEN__)
+#ifndef SERVER_ONLY
 #ifdef __SWITCH__
     padConfigureInput(8, HidNpadStyleSet_NpadStandard);
     // Otherwise we report 'B' as 'A' (like Xbox controller)
@@ -124,18 +124,20 @@ InputManager::InputManager() : m_mode(BOOTSTRAP),
             SDL_GetError());
     }
 
+#ifndef __EMSCRIPTEN__
     if (SDL_InitSubSystem(SDL_INIT_HAPTIC) != 0)
     {
         Log::error("InputManager", "Failed to init SDL haptics: %s",
             SDL_GetError());
     }
+#endif
 #endif // SERVER_ONLY
 }
 
 // -----------------------------------------------------------------------------
 void InputManager::addJoystick()
 {
-#if !defined(SERVER_ONLY) && !defined(__EMSCRIPTEN__)
+#ifndef SERVER_ONLY
     // When irrlicht device is reinitialized the joystick added event may be
     // lost, we look for them and add it back
     for (int i = 0; i < SDL_NumJoysticks(); i++)
@@ -162,7 +164,7 @@ void InputManager::addJoystick()
 }
 
 // -----------------------------------------------------------------------------
-#if !defined(SERVER_ONLY) && !defined(__EMSCRIPTEN__)
+#ifndef SERVER_ONLY
 // For CIrrDeviceSDL
 extern "C" void handle_joystick(SDL_Event& event)
 {
@@ -258,14 +260,14 @@ void InputManager::update(float dt)
             it++;
     }
 
-#if !defined(SERVER_ONLY) && !defined(__EMSCRIPTEN__)
+#ifndef SERVER_ONLY
     for (auto& controller : m_sdl_controller)
         controller.second->checkPowerLevel();
 #endif
 }
 
 //-----------------------------------------------------------------------------
-#if !defined(SERVER_ONLY) && !defined(__EMSCRIPTEN__)
+#ifndef SERVER_ONLY
 const irr::SEvent& InputManager::getEventForGamePad(unsigned i) const
 {
     auto it = m_sdl_controller.begin();
@@ -278,7 +280,7 @@ const irr::SEvent& InputManager::getEventForGamePad(unsigned i) const
  */
 InputManager::~InputManager()
 {
-#if !defined(SERVER_ONLY) && !defined(__EMSCRIPTEN__)
+#ifndef SERVER_ONLY
     m_sdl_controller.clear();
 #endif
     delete m_device_manager;

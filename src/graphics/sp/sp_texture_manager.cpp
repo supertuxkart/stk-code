@@ -42,6 +42,12 @@ SPTextureManager::SPTextureManager()
     {
         m_max_threaded_load_obj.store(2);
     }
+#ifdef __EMSCRIPTEN__
+    //some browsers limit the number of web workers
+    if (m_max_threaded_load_obj.load() > 8) {
+        m_max_threaded_load_obj.store(8);
+    }
+#endif
     m_max_threaded_load_obj.store(m_max_threaded_load_obj.load() + 1);
     for (unsigned i = 0; i < m_max_threaded_load_obj; i++)
     {
