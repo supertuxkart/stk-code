@@ -135,7 +135,7 @@ build_harfbuzz() {
   clone_repo "https://github.com/harfbuzz/harfbuzz" 8.5.0 "$SRC_DIR"
   cd "$SRC_DIR"
 
-  emconfigure ./autogen.sh
+  NOCONFIGURE=1 ./autogen.sh
   emconfigure ./configure --host=none-linux --prefix="$PREFIX" --disable-shared PKG_CONFIG_PATH="$LIB/pkgconfig"
   emmake make -j$CORE_COUNT
   make install
