@@ -25,5 +25,7 @@ for fragment_file in fragments_path.iterdir():
       target_text = re.sub(patch_regex, patch_text, target_text)
     elif mode == "INSERT":
       target_text = re.sub("("+patch_regex+")", r'\1'+patch_text, target_text)
+    elif mode == "INSERT_BEFORE":
+      target_text = re.sub("("+patch_regex+")", patch_text+r'\1', target_text)
 
 target_path.write_text(target_text)

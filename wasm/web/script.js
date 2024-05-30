@@ -5,23 +5,32 @@ let db = null;
 let db_name = "stk_db";
 let store_name = "stk_store";
 
-function load_store() {
+let start_button = document.getElementById("start_button");
+let status_text = document.getElementById("status_text");
+
+function load_db() {
+  if (db) return db;
   return new Promise((resolve, reject) => {
     let request = indexedDB.open(db_name, 1);
     request.onerror = (event) => {
       reject(event);
     };
     request.onsuccess = (event) => {
-      let db = event.target.result;
-      let transaction = db.transaction(store_name, "readwrite");
-      let store = transaction.objectStore(store_name);
-      resolve(store);
+      db = event.target.result;
+      resolve(db);
     };
     request.onupgradeneeded = (event) => {
       let db = event.target.result;
       db.createObjectStore(store_name);
     };
   });
+}
+
+async function load_store() {
+  await load_db();
+  let transaction = db.transaction(store_name, "readwrite");
+  let store = transaction.objectStore(store_name);
+  return store;
 }
 
 function check_db(key) {
@@ -109,6 +118,18 @@ async function load_data() {
 
 async function main() {
   await load_data();
+  start_button.onclick = start_game;
+  start_button.disabled = false;
+  status_text.textContent = "Ready";
+}
+
+function start_game() {
+  start_button.disabled = true;
+  status_text.textContent = "Initializing";
+  setTimeout(() => {
+    run();
+    status_text.textContent = "Running";
+  }, 1);
 }
 
 globalThis.pako = pako;

@@ -2,9 +2,31 @@
 <html>
   <head>
     <script src="/game/supertuxkart.js"></script>
-    <script src="/script.js" type="module"></script>
+    <script src="/script.js" type="module" defer></script>
+    <style>
+      * {
+        font-family: Arial, sans-serif;
+      }
+      #canvas {
+        background-color: #222222;
+      }
+      #status_bar {
+        display: flex;
+        align-items: flex-start;
+      }
+      #status_text {
+        font-size: 12px;
+        margin: 4px;
+        margin-left: 4px;
+      }
+    </style>
   </head>
   <body>
     <canvas id="canvas"></canvas>
+    <br>
+    <div id="status_bar">
+      <button id="start_button" disabled>Start Game</button>
+      <p id="status_text">Downloading game files...</p>
+    </div>
   </body>
 </html>

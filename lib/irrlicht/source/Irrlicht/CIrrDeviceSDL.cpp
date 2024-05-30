@@ -500,7 +500,9 @@ bool CIrrDeviceSDL::createWindow()
 			os::Printer::log( "Could not initialize display!" );
 			return false;
 		}
+#ifndef __EMSCRIPTEN__
 		update_swap_interval(CreationParams.SwapInterval);
+#endif
 	}
 	else
 	{
@@ -539,7 +541,9 @@ start:
 	else
 		SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
 
+#ifndef __EMSCRIPTEN__
 	if (CreationParams.ForceLegacyDevice)
+#endif
 		goto legacy;
 
 #ifdef _IRR_COMPILE_WITH_OGLES2_
