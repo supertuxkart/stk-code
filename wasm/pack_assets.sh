@@ -15,4 +15,4 @@ fi
 ASSETS_DIR="$(realpath "$1")"
 
 tar -cf - -C "$SRC_DIR/data" . | gzip -9 - > "$WEB_DIR/game/data.tar.gz"
-tar -cf - -C "$ASSETS_DIR" . | gzip -6 - > "$WEB_DIR/game/assets.tar.gz"
+tar -cf - -C "$ASSETS_DIR" . | gzip -3 - > "$WEB_DIR/game/assets.tar.gz"

@@ -459,9 +459,11 @@ stringw SpinnerWidget::getStringValue() const
         return text;
     }
     else
+#ifndef __EMSCRIPTEN__
     {
         assert(false);
     }
+#endif
     /** To avoid compiler warnings about missing return statements. */
     return "";
 }
