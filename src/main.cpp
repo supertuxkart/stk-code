@@ -166,6 +166,10 @@
 #include <jni.h>
 #endif
 
+#ifdef __EMSCRIPTEN__
+#include <emscripten.h>
+#endif
+
 #ifdef __SWITCH__
 extern "C" {
   #include <sys/iosupport.h>
@@ -2587,8 +2591,14 @@ int main(int argc, char *argv[])
         // Game loaded, bring CPU / GPU clock back to normal
         appletSetCpuBoostMode(ApmCpuBoostMode_Normal);
 #endif
-
+#ifdef __EMSCRIPTEN__
+        auto mainLoopWrapper = []() {
+            main_loop->run();
+        };
+        emscripten_set_main_loop(mainLoopWrapper, 0, 1);
+#else
         main_loop->run();
+#endif
 
     }  // try
     catch (std::exception &e)

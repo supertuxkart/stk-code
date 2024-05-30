@@ -108,7 +108,7 @@ CIrrDeviceSDL::CIrrDeviceSDL(const SIrrlichtCreationParameters& param)
 	}
 #endif
 
-	u32 init_flags = SDL_INIT_TIMER | SDL_INIT_VIDEO;
+	u32 init_flags = SDL_INIT_VIDEO;
 	if (SDL_Init(init_flags) < 0)
 	{
 		os::Printer::log("Unable to initialize SDL!", SDL_GetError());

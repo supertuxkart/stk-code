@@ -13,9 +13,9 @@ LIB="$PREFIX/lib"
 
 source $EMSDK_DIR/emsdk_env.sh
 export PKG_CONFIG_PATH="$LIB/pkgconfig"
-export CFLAGS="-fwasm-exceptions -sSUPPORT_LONGJMP=wasm"
-export CPPFLAGS="-fwasm-exceptions -sSUPPORT_LONGJMP=wasm"
-export LDFLAGS="-fwasm-exceptions -sSUPPORT_LONGJMP=wasm"
+export CFLAGS="-fwasm-exceptions -sSUPPORT_LONGJMP=wasm -pthread"
+export CPPFLAGS="-fwasm-exceptions -sSUPPORT_LONGJMP=wasm -pthread"
+export LDFLAGS="-fwasm-exceptions -sSUPPORT_LONGJMP=wasm -pthread"
 
 clone_repo() {
   local url="$1"
@@ -53,7 +53,7 @@ build_openssl() {
   clone_repo "https://github.com/openssl/openssl" openssl-3.3.0 "$SRC_DIR"
   cd "$SRC_DIR"
 
-  emconfigure ./Configure linux-x32 -no-asm -static -no-afalgeng -no-dso -no-threads -DOPENSSL_SYS_NETWARE -DSIG_DFL=0 -DSIG_IGN=0 -DHAVE_FORK=0 -DOPENSSL_NO_AFALGENG=1 -DOPENSSL_NO_SPEED=1 -DOPENSSL_NO_DYNAMIC_ENGINE -DDLOPEN_FLAG=0
+  emconfigure ./Configure linux-x32 -no-asm -static -no-afalgeng -no-dso -DOPENSSL_SYS_NETWARE -DSIG_DFL=0 -DSIG_IGN=0 -DHAVE_FORK=0 -DOPENSSL_NO_AFALGENG=1 -DOPENSSL_NO_SPEED=1 -DOPENSSL_NO_DYNAMIC_ENGINE -DDLOPEN_FLAG=0
   sed -i 's|^CROSS_COMPILE.*$|CROSS_COMPILE=|g' Makefile
   emmake make -j$CORE_COUNT build_generated libssl.a libcrypto.a
   cp -r include/openssl $PREFIX/include

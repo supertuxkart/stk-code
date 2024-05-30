@@ -30,6 +30,7 @@ async function load_data() {
   await extract_tar("/game/data.tar.gz", "/data");
   console.log("downloading and extracting assets");
   await extract_tar("/game/assets.tar.gz", "/data");
+  console.log("done")
 }
 
 globalThis.pako = pako;
@@ -37,3 +38,4 @@ globalThis.jsUntar = jsUntar;
 globalThis.load_data = load_data;
 
 Module["canvas"] = document.getElementById("canvas")
+load_data();
