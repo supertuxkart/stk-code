@@ -73,25 +73,77 @@ function write_db(key, data) {
   });
 }
 
+async function read_db_chunks(key) {
+  let {size, chunk_count} = await read_db(key);
+  let offset = 0;
+  let array = new Uint8Array(size);
+  
+  for (let i = 0; i < chunk_count; i++) {
+    let chunk_array = await read_db(key + "." + i);
+    array.set(chunk_array, offset);
+    offset += chunk_array.length;
+  }
+
+  return array;
+}
+
+async function write_db_chunks(key, data) {
+  let size = data.length;
+  let chunk_size = 20_000_000;
+  let chunk_count = Math.ceil(size / chunk_size);
+
+  let offset = 0;
+  for (let i = 0; i < chunk_count; i++) {
+    let chunk_array = data.slice(offset, offset + chunk_size);
+    await write_db(key + "." + i, chunk_array);
+    offset += chunk_size;
+  }
+
+  await write_db(key, {size, chunk_count});
+}
+
+async function download_chunks(url) {
+  let r1 = await fetch(url + ".manifest");
+  let manifest = (await r1.text()).split("\n");
+  let size = parseInt(manifest.shift());
+  manifest.pop();
+
+  let path = url.split("/");
+  path.pop();
+  let base_url = path.join("/");
+
+  let offset = 0;
+  let chunk = null;
+  let array = new Uint8Array(size);
+  while (chunk = manifest.shift()) {
+    let r2 = await fetch(base_url + "/" + chunk);
+    let buffer = await r2.arrayBuffer();
+    let chunk_array = new Uint8Array(buffer);
+    array.set(chunk_array, offset);
+    offset += chunk_array.length;
+  }
+
+  return array.buffer;
+}
+
 async function extract_tar(url, fs_path, use_cache = false) {
   //download tar file from server and decompress
   let decompressed;
   if (!use_cache || !await check_db(url)) {
-    let r = await fetch(url);
-    let compressed = await r.arrayBuffer();
-    decompressed = pako.inflate(compressed).buffer;
+    let compressed = await download_chunks(url);
+    decompressed = pako.inflate(compressed);
     compressed = null;
     if (use_cache) {
       console.log("saving to cache");
-      await write_db(url, decompressed);
+      await write_db_chunks(url, decompressed);
     }
   }
   else {
-    decompressed = await read_db(url);
+    decompressed = await read_db_chunks(url);
   }
 
   //read the tar file and add to emscripten's fs
-  let files = await jsUntar(decompressed);
+  let files = await jsUntar(decompressed.buffer);
   for (let file of files) {
     let relative_path = file.name.substring(1);
     let out_path = fs_path + relative_path;
