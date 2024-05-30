@@ -50,6 +50,10 @@ static std::vector<UserConfigParam*> all_params;
 #include <string>
 #include <vector>
 
+#if defined(__EMSCRIPTEN__)
+#include <emscripten.h>
+#endif
+
 const int UserConfig::m_current_config_version = 8;
 
 
@@ -749,6 +753,12 @@ void UserConfig::saveConfig()
         configfile.close();
         file_manager->removeFile(filename);
         FileUtils::renameU8Path(filename + "new", filename);
+
+#ifdef __EMSCRIPTEN__
+        EM_ASM(
+            globalThis.sync_idbfs();
+        );
+#endif
     }
     catch (std::runtime_error& e)
     {

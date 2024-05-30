@@ -464,6 +464,7 @@ void SFXManager::mainLoop(void *obj)
         current = NULL;
         PROFILER_POP_CPU_MARKER();
         PROFILER_PUSH_CPU_MARKER("yield", 0, 0, 255);
+#ifndef __EMSCRIPTEN__
         if (empty_queue && me->sfxAllowed())
         {
             // Wait some time to let other threads run, then queue an
@@ -473,6 +474,7 @@ void SFXManager::mainLoop(void *obj)
             t = StkTime::getMonoTimeMs() - t;
             me->queue(SFX_UPDATE, (SFXBase*)NULL, float(t / 1000.0));
         }
+#endif
         ul = me->m_sfx_commands.acquireMutex();
         PROFILER_POP_CPU_MARKER();
     }   // while

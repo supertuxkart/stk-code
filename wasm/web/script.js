@@ -4,6 +4,7 @@ import jsUntar from "https://cdn.jsdelivr.net/npm/js-untar@2.0.0/+esm";
 let db = null;
 let db_name = "stk_db";
 let store_name = "stk_store";
+let idbfs_mount = null;
 
 let start_button = document.getElementById("start_button");
 let status_text = document.getElementById("status_text");
@@ -116,9 +117,24 @@ async function load_data() {
   console.log("done")
 }
 
+async function load_idbfs() {
+  idbfs_mount = FS.mount(IDBFS, {}, "/home/web_user").mount;
+  await sync_idbfs(true);
+}
+
+function sync_idbfs(populate = false) {
+  return new Promise((resolve, reject) => {
+    idbfs_mount.type.syncfs(idbfs_mount, populate, (err) => {
+      if (err) reject(err);
+      else resolve();
+    });
+  })
+}
+
 async function main() {
   await load_data();
-  start_button.onclick = start_game;
+  await load_idbfs();
+  start_button.onclick = () => {requestAnimationFrame(start_game)};
   start_button.disabled = false;
   status_text.textContent = "Ready";
 }
@@ -126,15 +142,17 @@ async function main() {
 function start_game() {
   start_button.disabled = true;
   status_text.textContent = "Initializing";
-  setTimeout(() => {
+  requestAnimationFrame(() => {
     run();
     status_text.textContent = "Running";
-  }, 1);
+    sync_idbfs();
+  });
 }
 
 globalThis.pako = pako;
 globalThis.jsUntar = jsUntar;
 globalThis.load_data = load_data;
+globalThis.sync_idbfs = sync_idbfs;
 
 Module["canvas"] = document.getElementById("canvas")
 main();

@@ -720,6 +720,7 @@ void MainLoop::run()
             (irr_driver->isRecording() && UserConfigParams::m_limit_game_fps) ?
             UserConfigParams::m_record_fps : UserConfigParams::m_max_fps;
 
+#ifndef __EMSCRIPTEN__
         // Throttle fps if more than maximum, which can reduce
         // the noise the fan on a graphics card makes.
         // No need to throttle if vsync is on (m_swap_interval == 1) as
@@ -736,6 +737,7 @@ void MainLoop::run()
             std::this_thread::sleep_for(wait_time_ns);
             PROFILER_POP_CPU_MARKER();
         }
+#endif
 
         PROFILER_POP_CPU_MARKER();   // MainLoop pop
         PROFILER_SYNC_FRAME();
