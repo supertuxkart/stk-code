@@ -270,7 +270,7 @@ convert_image()
         QUALITY_CMD="-quality $PNG_QUALITY"
     fi
 
-    convert $SCALE_CMD $QUALITY_CMD "$FILE" "tmp.$FILE_TYPE"
+    magick "$FILE" $SCALE_CMD $QUALITY_CMD "tmp.$FILE_TYPE"
     
     if [ -s "tmp.$FILE_TYPE" ]; then
         SIZE_OLD=`du -k "$FILE" | cut -f1`
@@ -419,7 +419,7 @@ convert_to_jpg()
     fi
 
     # We can check if new file is smaller
-    convert -quality $JPEG_QUALITY "$FILE" "$NEW_FILE"
+    magick "$FILE" -quality $JPEG_QUALITY "$NEW_FILE"
     rm -f "$FILE"
 
     echo "$FILE" >> "./converted_textures"
