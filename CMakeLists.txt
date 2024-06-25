@@ -36,7 +36,7 @@ if(APPLE)
 endif()
 
 CMAKE_DEPENDENT_OPTION(USE_CRYPTO_OPENSSL "Use OpenSSL instead of MbedTLS for cryptography in STK." ON
-    "NOT USE_SWITCH;NOT WIN32" OFF)
+    "NOT USE_SWITCH;NOT MSVC" OFF)
 CMAKE_DEPENDENT_OPTION(BUILD_RECORDER "Build opengl recorder" ON
     "NOT SERVER_ONLY;NOT APPLE;NOT USE_SWITCH" OFF)
 CMAKE_DEPENDENT_OPTION(USE_SYSTEM_SQUISH "Use system Squish library instead of the built-in version, when available." ON
@@ -50,7 +50,7 @@ if (DLOPEN_MOLTENVK)
     ADD_DEFINITIONS(-DDLOPEN_MOLTENVK)
 endif()
 
-if((UNIX AND NOT APPLE) OR NINTENDO_SWITCH)
+if((UNIX AND NOT APPLE) OR NINTENDO_SWITCH OR MINGW)
     include(FindPkgConfig)
 endif()
 
@@ -84,7 +84,7 @@ if (IOS)
 endif()
 
 if((UNIX AND NOT APPLE) AND NOT SERVER_ONLY)
-    if((${CMAKE_SYSTEM_PROCESSOR} MATCHES "arm") OR 
+    if((${CMAKE_SYSTEM_PROCESSOR} MATCHES "arm") OR
        (${CMAKE_SYSTEM_PROCESSOR} MATCHES "aarch64") OR
        (${CMAKE_SYSTEM_PROCESSOR} MATCHES "riscv64"))
         option(USE_GLES2 "Use OpenGL ES2 renderer" ON)
@@ -200,7 +200,7 @@ if(UNIX OR MINGW)
     endif()
 endif()
 
-if(UNIX AND NOT APPLE AND NOT ${CMAKE_SYSTEM_NAME} MATCHES "SunOS")
+if((UNIX AND NOT APPLE OR MINGW) AND NOT ${CMAKE_SYSTEM_NAME} MATCHES "SunOS")
     find_package(PkgConfig REQUIRED)
 
     if(NOT PKGCONFIG_FOUND)
@@ -228,7 +228,7 @@ else()
 endif()
 
 # Find system ENet library or build it if missing
-if((UNIX AND NOT APPLE) AND USE_SYSTEM_ENET AND NOT USE_IPV6)
+if((UNIX AND NOT APPLE OR MINGW) AND USE_SYSTEM_ENET AND NOT USE_IPV6)
     pkg_check_modules(ENET libenet>=1.3.4)
 endif()
 
@@ -617,7 +617,7 @@ else()
     else()
         add_executable(supertuxkart ${STK_SOURCES} ${STK_RESOURCES} ${STK_HEADERS})
     endif()
-    if (NOT WIN32)
+    if (NOT MSVC)
         target_link_libraries(supertuxkart ${PTHREAD_LIBRARY})
     endif()
 endif()
