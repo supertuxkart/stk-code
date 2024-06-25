@@ -122,9 +122,7 @@ namespace video
 	//! destructor
 	COGLES2Driver::~COGLES2Driver()
 	{
-		deleteMaterialRenders();
-		delete MaterialRenderer2D;
-		deleteAllTextures();
+		cleanUp();
 
 		if (BridgeCalls)
 			delete BridgeCalls;

@@ -18,6 +18,7 @@
 #include <stdlib.h>
 #include "SIrrCreationParameters.h"
 #include "COpenGLExtensionHandler.h"
+#include "COGLES2Driver.h"
 
 #include "guiengine/engine.hpp"
 #include "ge_main.hpp"
@@ -240,6 +241,12 @@ CIrrDeviceSDL::~CIrrDeviceSDL()
 		irr::video::COpenGLExtensionHandler* h = dynamic_cast<irr::video::COpenGLExtensionHandler*>(VideoDriver);
 		if (h)
 			h->clearGLExtensions();
+#endif
+#ifdef _IRR_COMPILE_WITH_OGLES2_
+		irr::video::COGLES2Driver* es2 = dynamic_cast<irr::video::COGLES2Driver*>(VideoDriver);
+		if (es2) {
+			es2->cleanUp();
+		}
 #endif
 		GE::GEVulkanDriver* gevk = dynamic_cast<GE::GEVulkanDriver*>(VideoDriver);
 		if (gevk)
