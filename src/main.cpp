@@ -166,6 +166,10 @@
 #include <jni.h>
 #endif
 
+#ifdef __EMSCRIPTEN__
+#include <emscripten.h>
+#endif
+
 #ifdef __SWITCH__
 extern "C" {
   #include <sys/iosupport.h>
@@ -2101,6 +2105,7 @@ void debugLoop()
 #endif
 
 // ----------------------------------------------------------------------------
+void endMainLoop();
 #if defined(ANDROID)
 int android_main(int argc, char *argv[])
 #elif defined(IOS_STK)
@@ -2587,8 +2592,19 @@ int main(int argc, char *argv[])
         // Game loaded, bring CPU / GPU clock back to normal
         appletSetCpuBoostMode(ApmCpuBoostMode_Normal);
 #endif
-
+#ifdef __EMSCRIPTEN__
+        auto mainLoopWrapper = []() {
+            main_loop->run();
+            if (main_loop->isAborted()) {
+                endMainLoop();
+                emscripten_cancel_main_loop();
+                exit(0);
+            }
+        };
+        emscripten_set_main_loop(mainLoopWrapper, 0, 1);
+#else
         main_loop->run();
+#endif
 
     }  // try
     catch (std::exception &e)
@@ -2600,6 +2616,18 @@ int main(int argc, char *argv[])
     }
 
     /* Program closing...*/
+    endMainLoop();
+
+#ifdef IOS_STK
+    // App store may not like this, but this can happen if player uses keyboard to quit stk
+    exit(0);
+    return 0;
+#else
+    return 0 ;
+#endif
+}   // main
+
+void endMainLoop() {
 
 #ifdef ENABLE_WIIUSE
     if(wiimote_manager)
@@ -2651,15 +2679,7 @@ int main(int argc, char *argv[])
     socketExit();
     nifmExit();
 #endif
-
-#ifdef IOS_STK
-    // App store may not like this, but this can happen if player uses keyboard to quit stk
-    exit(0);
-    return 0;
-#else
-    return 0 ;
-#endif
-}   // main
+}
 
 // ============================================================================
 #ifdef WIN32

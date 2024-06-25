@@ -1,3 +1,5 @@
+#ifdef _IRR_COMPILE_WITH_VULKAN_
+
 #include "ge_vulkan_2d_renderer.hpp"
 
 #include "ge_main.hpp"
@@ -439,3 +441,5 @@ void GEVulkan2dRenderer::addVerticesIndices(irr::video::S3DVertex* vertices,
 }   // addVerticesIndices
 
 }
+
+#endif

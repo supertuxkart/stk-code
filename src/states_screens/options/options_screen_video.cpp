@@ -155,38 +155,48 @@ int OptionsScreenVideo::getImageQuality()
 void OptionsScreenVideo::setImageQuality(int quality)
 {
 #ifndef SERVER_ONLY
+    #ifdef _IRR_COMPILE_WITH_VULKAN_
     GE::GEVulkanTextureDescriptor* td = NULL;
     if (GE::getVKDriver())
         td = GE::getVKDriver()->getMeshTextureDescriptor();
+    #endif
     switch (quality)
     {
         case 0:
             UserConfigParams::m_anisotropic = 4;
             UserConfigParams::m_high_definition_textures = 0x02;
             UserConfigParams::m_hq_mipmap = false;
+            #ifdef _IRR_COMPILE_WITH_VULKAN_
             if (td)
                 td->setSamplerUse(GE::GVS_3D_MESH_MIPMAP_2);
+            #endif
             break;
         case 1:
             UserConfigParams::m_anisotropic = 16;
             UserConfigParams::m_high_definition_textures = 0x02;
             UserConfigParams::m_hq_mipmap = false;
+            #ifdef _IRR_COMPILE_WITH_VULKAN_
             if (td)
                 td->setSamplerUse(GE::GVS_3D_MESH_MIPMAP_2);
+            #endif
             break;
         case 2:
             UserConfigParams::m_anisotropic = 16;
             UserConfigParams::m_high_definition_textures = 0x03;
             UserConfigParams::m_hq_mipmap = false;
+            #ifdef _IRR_COMPILE_WITH_VULKAN_
             if (td)
                 td->setSamplerUse(GE::GVS_3D_MESH_MIPMAP_4);
+            #endif
             break;
         case 3:
             UserConfigParams::m_anisotropic = 16;
             UserConfigParams::m_high_definition_textures = 0x03;
             UserConfigParams::m_hq_mipmap = true;
+            #ifdef _IRR_COMPILE_WITH_VULKAN_
             if (td)
                 td->setSamplerUse(GE::GVS_3D_MESH_MIPMAP_16);
+            #endif
             break;
         default:
             assert(false);
@@ -651,7 +661,7 @@ void OptionsScreenVideo::eventCallback(Widget* widget, const std::string& name,
         assert(level < (int)m_scale_rtts_custom_presets.size());
 
         UserConfigParams::m_scale_rtts_factor = m_scale_rtts_custom_presets[level].value;
-#ifndef SERVER_ONLY
+#if !defined(SERVER_ONLY) && defined(_IRR_COMPILE_WITH_VULKAN_)
         GE::GEVulkanDriver* gevk = GE::getVKDriver();
         if (gevk && GE::getGEConfig()->m_render_scale != UserConfigParams::m_scale_rtts_factor)
         {

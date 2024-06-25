@@ -1,3 +1,5 @@
+#ifdef _IRR_COMPILE_WITH_VULKAN_
+
 #include "ge_vulkan_dynamic_buffer.hpp"
 
 #include "ge_vulkan_driver.hpp"
@@ -222,3 +224,5 @@ VkBuffer GEVulkanDynamicBuffer::getCurrentBuffer() const
 }   // getCurrentBuffer
 
 }
+
+#endif

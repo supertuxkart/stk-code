@@ -37,7 +37,7 @@
 // ----------------------------------------------------------------------------
 STKTexManager::~STKTexManager()
 {
-#ifndef SERVER_ONLY
+#if !defined(SERVER_ONLY) && defined(_IRR_COMPILE_WITH_VULKAN_)
     GE::GEVulkanDriver* gevd = GE::getVKDriver();
     if (gevd)
     {
@@ -48,7 +48,7 @@ STKTexManager::~STKTexManager()
 
     removeTexture(NULL/*texture*/, true/*remove_all*/);
 
-#ifndef SERVER_ONLY
+#if !defined(SERVER_ONLY) && defined(_IRR_COMPILE_WITH_VULKAN_)
     if (gevd)
         gevd->setDisableWaitIdle(false);
 #endif
@@ -249,7 +249,7 @@ bool STKTexManager::hasTexture(const std::string& path)
 // ----------------------------------------------------------------------------
 void STKTexManager::reloadAllTextures()
 {
-#ifndef SERVER_ONLY
+#if !defined(SERVER_ONLY) && defined(_IRR_COMPILE_WITH_VULKAN_)
     GE::GEVulkanDriver* gevd = GE::getVKDriver();
     if (gevd)
     {
@@ -265,7 +265,7 @@ void STKTexManager::reloadAllTextures()
         p.second->reload();
     }
 
-#ifndef SERVER_ONLY
+#if !defined(SERVER_ONLY) && defined(_IRR_COMPILE_WITH_VULKAN_)
     if (gevd)
         gevd->setDisableWaitIdle(false);
 #endif

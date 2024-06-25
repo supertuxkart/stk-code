@@ -22,11 +22,13 @@
 #include "guiengine/engine.hpp"
 #include "ge_main.hpp"
 #include "glad/gl.h"
+
+#ifdef _IRR_COMPILE_WITH_VULKAN_
 #include "ge_vulkan_driver.hpp"
 #include "ge_vulkan_scene_manager.hpp"
 #include "MoltenVK.h"
-
 #include <SDL_vulkan.h>
+#endif
 
 extern bool GLContextDebugBit;
 
@@ -102,7 +104,7 @@ CIrrDeviceSDL::CIrrDeviceSDL(const SIrrlichtCreationParameters& param)
 	}
 #endif
 
-	u32 init_flags = SDL_INIT_TIMER | SDL_INIT_VIDEO;
+	u32 init_flags = SDL_INIT_VIDEO;
 	if (SDL_Init(init_flags) < 0)
 	{
 		os::Printer::log("Unable to initialize SDL!", SDL_GetError());
@@ -205,7 +207,6 @@ CIrrDeviceSDL::CIrrDeviceSDL(const SIrrlichtCreationParameters& param)
 #endif
 }
 
-
 void CIrrDeviceSDL::updateNativeScale(u32* saving_width, u32* saving_height)
 {
 	int width, height = 0;
@@ -217,10 +218,12 @@ void CIrrDeviceSDL::updateNativeScale(u32* saving_width, u32* saving_height)
 	{
 		SDL_GL_GetDrawableSize(Window, &real_width, &real_height);
 	}
+#ifdef _IRR_COMPILE_WITH_VULKAN_
 	else if (CreationParams.DriverType == video::EDT_VULKAN)
 	{
 		SDL_Vulkan_GetDrawableSize(Window, &real_width, &real_height);
 	}
+#endif
 	NativeScaleX = (f32)real_width / (f32)width;
 	NativeScaleY = (f32)real_height / (f32)height;
 	if (saving_width)
@@ -228,7 +231,6 @@ void CIrrDeviceSDL::updateNativeScale(u32* saving_width, u32* saving_height)
 	if (saving_height)
 		*saving_height = height;
 }
-
 
 //! destructor
 CIrrDeviceSDL::~CIrrDeviceSDL()
@@ -241,11 +243,13 @@ CIrrDeviceSDL::~CIrrDeviceSDL()
 		if (h)
 			h->clearGLExtensions();
 #endif
+#ifdef _IRR_COMPILE_WITH_VULKAN_
 		GE::GEVulkanDriver* gevk = dynamic_cast<GE::GEVulkanDriver*>(VideoDriver);
 		if (gevk)
 			gevk->destroyVulkan();
 		VideoDriver->drop();
 		VideoDriver = NULL;
+#endif
 	}
 #ifdef DLOPEN_MOLTENVK
 	delete m_moltenvk;
@@ -360,6 +364,7 @@ bool versionCorrect(int major, int minor)
 // Used in OptionsScreenVideo for live fullscreen toggle for vulkan driver
 extern "C" void update_fullscreen_desktop(int val)
 {
+#ifdef _IRR_COMPILE_WITH_VULKAN_
 	GE::GEVulkanDriver* gevk = GE::getVKDriver();
 	if (!gevk || !GE::getGEConfig()->m_fullscreen_desktop)
 		return;
@@ -377,6 +382,9 @@ extern "C" void update_fullscreen_desktop(int val)
 		SDL_SetWindowSize(window, prev_width * 0.8f, prev_height * 0.8f);
 		SDL_RaiseWindow(window);
 	}
+#else
+	return;
+#endif
 }
 
 
@@ -388,12 +396,14 @@ extern "C" void update_swap_interval(int swap_interval)
 	if (swap_interval > 1)
 		swap_interval = 1;
 
+#ifdef _IRR_COMPILE_WITH_VULKAN_
 	GE::GEVulkanDriver* gevk = GE::getVKDriver();
 	if (gevk)
 	{
 		gevk->updateSwapInterval(swap_interval);
 		return;
 	}
+#endif
 
 	// Try adaptive vsync first if support
 	if (swap_interval > 0)
@@ -446,7 +456,7 @@ bool CIrrDeviceSDL::createWindow()
 #endif
 
 	if (CreationParams.Fullscreen)
-	{
+	{	
 		if (GE::getGEConfig()->m_fullscreen_desktop)
 		{
 			flags |= SDL_WINDOW_FULLSCREEN_DESKTOP;
@@ -472,7 +482,9 @@ bool CIrrDeviceSDL::createWindow()
 #if SDL_VERSION_ATLEAST(2, 0, 12)
 		SDL_SetHint(SDL_HINT_VIDEO_EXTERNAL_CONTEXT, "1");
 #endif
+#ifdef _IRR_COMPILE_WITH_VULKAN_
 		flags |= SDL_WINDOW_VULKAN;
+#endif
 	}
 
 #ifdef MOBILE_STK
@@ -488,7 +500,9 @@ bool CIrrDeviceSDL::createWindow()
 			os::Printer::log( "Could not initialize display!" );
 			return false;
 		}
+#ifndef __EMSCRIPTEN__
 		update_swap_interval(CreationParams.SwapInterval);
+#endif
 	}
 	else
 	{
@@ -517,15 +531,19 @@ start:
 	SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, CreationParams.Doublebuffer);
 	irr::video::useCoreContext = true;
 
+#ifndef __EMSCRIPTEN__
 	if (GLContextDebugBit)
 		SDL_GL_SetAttribute(SDL_GL_CONTEXT_FLAGS, SDL_GL_CONTEXT_DEBUG_FLAG);
+#endif
 
 	if (CreationParams.DriverType == video::EDT_OGLES2)
 		SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_ES);
 	else
 		SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
 
+#ifndef __EMSCRIPTEN__
 	if (CreationParams.ForceLegacyDevice)
+#endif
 		goto legacy;
 
 #ifdef _IRR_COMPILE_WITH_OGLES2_
@@ -1681,8 +1699,10 @@ void CIrrDeviceSDL::createGUIAndVulkanScene()
 	GUIEnvironment = gui::createGUIEnvironment(FileSystem, VideoDriver, Operator);
 	#endif
 
+	#ifdef _IRR_COMPILE_WITH_VULKAN_
 	// create Scene manager
 	SceneManager = new GE::GEVulkanSceneManager(VideoDriver, FileSystem, CursorControl, GUIEnvironment);
+	#endif
 
 	setEventReceiver(UserReceiver);
 }
