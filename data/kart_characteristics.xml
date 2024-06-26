@@ -361,11 +361,12 @@
         <characteristic name="best" />
     </difficulties>
 
-    <!-- The different kart types, that can be specified in the kart.xml file -->
+ <!-- The different kart types, that can be specified in the kart.xml file -->
     <kart-types>
+		<!--  light  -->
         <characteristic name="light">
             <turn radius="0:2.0 10:7.5 25:15 45:30" />
-            <engine power="*0.8" max-speed="*0.95" brake-factor="*1"
+            <engine power="*0.75" max-speed="*0.95" brake-factor="*1"
                  max-speed-reverse-ratio="*0.8" />
             <gear switch-ratio="0.1 0.25 0.45 0.7 1.0 4.0"
                   power-increase="2.8 2.3 1.9 1.5 1.25 1.0" />
@@ -373,9 +374,26 @@
             <startup boost="*1 *1" />
             <explosion time="*1" radius="*1" />
             <nitro engine-force="*0.6" max-speed-increase="*0.9" duration="*1" />
-            <slipstream length="*0.9" collect-time="*0.9"
+            <slipstream length="*0.75" collect-time="*0.8"
                         duration-factor="*1" fade-out-time="*1" />
         </characteristic>
+
+		<!--   light medium -->
+        <characteristic name="light-medium">
+			<<turn radius="0:2.0 10:7.5 25:15 45:30" />
+            <engine power="*0.8" max-speed="*0.97" brake-factor="*0.92"
+                 max-speed-reverse-ratio="*0.8" />
+            <gear switch-ratio="0.1 0.25 0.45 0.7 1.0 4.0"
+                  power-increase="2.8 2.3 1.9 1.5 1.25 1.0" />
+            <mass value="*0.6" />
+            <startup boost="*0.92 *0.92" />
+            <explosion time="*0.92" radius="*0.92" />
+            <nitro engine-force="*0.6" max-speed-increase="*0.9" duration="*1" />
+            <slipstream length="*0.75" collect-time="*0.8"
+                        duration-factor="*0.92" fade-out-time="*1" />
+        </characteristic>
+
+		<!--  medium  -->
         <characteristic name="medium">
             <turn radius="0:2.3 10:8.625 25:17.25 45:34.5" />
             <engine power="*0.875" max-speed="*1" brake-factor="*0.8"
@@ -388,6 +406,23 @@
             <nitro engine-force="*0.75" consumption="*1.25" />
             <slipstream duration-factor="*0.8" fade-out-time="*1" />
         </characteristic>
+		
+		<!--   medium medium -->
+        <characteristic name="medium-medium">
+			<turn radius="0:2.45 10:9.1875 25:18.25 45:36.75" />
+            <engine power="*0.9375" max-speed="*1.025" brake-factor="*0.7"
+                    max-speed-reverse-ratio="*0.725" />
+			<gear switch-ratio="0.1 0.25 0.45 0.7 1 4"
+                  power-increase="1.8 1.4 1.6 1.35 1.175 1" />
+            <mass value="*0.875" />
+            <startup boost="*0.7 *0.7" />
+            <explosion time="*0.7" radius="*0.7" />
+            <nitro engine-force="*0.875" consumption="*1.46" max-speed-increase="*1.1" />
+            <slipstream length="*1" collect-time="*1.05"
+                   duration-factor="*0.7" fade-out-time="*1" />
+        </characteristic>
+
+		<!--  heavy  -->
         <characteristic name="heavy">
             <turn radius="0:2.6 10:9.75 25:19.5 45:39" />
             <engine power="*1" max-speed="*1.05" brake-factor="*0.6"
