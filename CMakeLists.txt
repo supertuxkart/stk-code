@@ -88,8 +88,7 @@ if(EMSCRIPTEN)
     set(OGGVORBIS_VORBISFILE_LIBRARY "${CMAKE_SOURCE_DIR}/wasm/prefix/lib/libvorbisfile.a")
     set(OGGVORBIS_VORBIS_LIBRARY "${CMAKE_SOURCE_DIR}/wasm/prefix/lib/libvorbis.a")
 
-    #todo: avoid hardcoding this path
-    set(PTHREAD_LIBRARY "/usr/share/emscripten/cache/sysroot/")
+    set(PTHREAD_LIBRARY "${CMAKE_SOURCE_DIR}/wasm/emsdk/upstream")
 
     set(USE_WIIUSE 0)
     set(USE_DNS_C 1)

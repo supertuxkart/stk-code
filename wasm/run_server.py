@@ -2,7 +2,7 @@ from http import server
 import sys
 
 port = 8000
-if len(sys.argv) >= 1:
+if len(sys.argv) >= 2:
   port = int(sys.argv[1])
 
 class MyHTTPRequestHandler(server.SimpleHTTPRequestHandler):

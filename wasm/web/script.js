@@ -5,10 +5,12 @@ let db = null;
 let db_name = "stk_db";
 let store_name = "stk_store";
 let idbfs_mount = null;
+let data_version = 1;
 
 let start_button = document.getElementById("start_button");
 let status_text = document.getElementById("status_text");
 let info_container = document.getElementById("info_container");
+let quality_select = document.getElementById("quality_select");
 
 function load_db() {
   if (db) return db;
@@ -28,6 +30,25 @@ function load_db() {
   });
 }
 
+function request_async(request) {
+  return new Promise((resolve, reject) => {
+    request.onerror = (event) => {
+      reject(event);
+    };
+    request.onsuccess = () => {
+      resolve(request.result);
+    };
+  });
+}
+
+async function delete_db() {
+  if (db) {
+    db.close();
+    db = null;
+  }
+  await request_async(indexedDB.deleteDatabase(db_name));
+}
+
 async function load_store() {
   await load_db();
   let transaction = db.transaction(store_name, "readwrite");
@@ -35,43 +56,19 @@ async function load_store() {
   return store;
 }
 
-function check_db(key) {
-  return new Promise(async (resolve, reject) => {
-    let store = await load_store();
-    let query = store.count(key);
-    query.onsuccess = () => {
-      resolve(query.result);
-    }
-    query.onerror = (event) => {
-      reject(event);
-    }
-  });
+async function check_db(key) {
+  let store = await load_store();
+  return await request_async(store.count(key));
 }
 
-function read_db(key) {
-  return new Promise(async (resolve, reject) => {
-    let store = await load_store();
-    let query = store.get(key);
-    query.onsuccess = () => {
-      resolve(query.result);
-    }
-    query.onerror = (event) => {
-      reject(event);
-    }
-  });
+async function read_db(key) {
+  let store = await load_store();
+  return await request_async(store.get(key));
 }
 
-function write_db(key, data) {
-  return new Promise(async (resolve, reject) => {
-    let store = await load_store();
-    let query = store.put(data, key);
-    query.onsuccess = () => {
-      resolve();
-    }
-    query.onerror = (event) => {
-      reject(event);
-    }
-  });
+async function write_db(key, data) {
+  let store = await load_store();
+  return await request_async(store.put(data, key));
 }
 
 async function read_db_chunks(key) {
@@ -142,6 +139,7 @@ async function extract_tar(url, fs_path, use_cache = false) {
   if (!use_cache || !await check_db(url)) {
     let filename = url.split("/").pop();
     let compressed = await download_chunks(url);
+    status_text.textContent = `Decompressing ${filename}...`;
     decompressed = pako.inflate(compressed);
     compressed = null;
     if (use_cache) {
@@ -173,8 +171,15 @@ async function extract_tar(url, fs_path, use_cache = false) {
 }
 
 async function load_data() {
-  await extract_tar("/game/data.tar.gz", "/data", true);
-  await extract_tar("/game/assets.tar.gz", "/data", true);
+  //check if we need to update the assets bundle
+  if (!await check_db("/version") || !(await read_db("/version") == data_version)) {
+    await delete_db();
+    await write_db("/version", data_version);
+  }
+
+  let quality = quality_select.value;
+  let data_url = `/game/data_${quality}.tar.gz`;
+  await extract_tar(data_url, "/data", true);
 }
 
 async function load_idbfs() {
@@ -200,6 +205,7 @@ async function main() {
   await load_idbfs();
   start_button.onclick = start_game;
   start_button.disabled = false;
+  status_text.innerText = "";
 }
 
 async function start_game() {

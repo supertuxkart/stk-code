@@ -25,7 +25,7 @@
         font-family: Arial, sans-serif;
         box-sizing: border-box;
       }
-      p {
+      p, label, select {
         font-size: 12px;
         margin: 4px;
       }
@@ -45,15 +45,16 @@
         position: absolute;
         top: 50%;
         left: 50%;
-        width: 440px;
-        height: 260px;
+        width: 450px;
+        height: 290px;
         margin-left: -220px;
-        margin-top: -130px;
+        margin-top: -145px;
         z-index: 2;
         background-color: white;
         padding: 12px;
         padding-top: 6px;
         border-radius: 8px;
+        overflow-y: auto;
       }
       #header_bar {
         display: flex;
@@ -85,12 +86,18 @@
         <h1 style="margin: 0px;">SuperTuxKart Wasm</h1>
       </div>
       <p>This is an experimental port of SuperTuxKart to the browser using WebAssembly and Emscripten. Currently, everything works except for some rendering APIs and networking.</p>
-      <p>There is a 700MB initial download required to play, and the game will require around 1GB of memory.</p>
+      <p>There is a 120MB initial download required to play, and the game will require around 500MB of memory.</p>
       <p>This web port was made by <a href="https://github.com/ading2210/">ading2210</a>, and the source code is located at <a href="https://github.com/ading2210/stk-code/tree/wasm">github.com/ading2210/stk-code</a>.</p>  
       <p>If you want to check on the status of this port, take a look at the <a href="https://github.com/supertuxkart/stk-code/pull/5106/">corresponding pull request</a> in the SuperTuxKart repository.</p>
+      <label for="quality_select">Texture quality:</label>
+      <select name="quality_select" id="quality_select" style="margin: 0px;">
+        <option value="low">Low (120MiB)</option>
+        <option value="mid">Medium (171MiB)</option>
+        <option value="high">High (249MiB)</option>
+      </select> 
       <div id="status_bar">
         <button id="start_button" disabled>Start Game</button>
-        <p id="status_text"></p>
+        <p id="status_text">Loading game code...</p>
       </div>
     </div>
   </body>

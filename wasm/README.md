@@ -35,14 +35,19 @@ wasm/build_deps.sh
 ```
 wasm/build.sh
 ```
-4. Bundle the game data and assets:
+4. Compress the assets using the script from the Android port:
 ```
-wasm/pack_assets.sh ../stk-assets
+sudo apt install imagemagick vorbis-tools pngquant advancecomp libjpeg-progs optipng
+android/generate_assets.sh
+(cd android/assets/data && ./optimize_data.sh)
 ```
-5. Host a web server:
+5. Bundle the game data and assets:
 ```
-cd wasm/web
-python3 ../run_server.py
+wasm/pack_assets.sh android/assets/data/
+```
+6. Host a web server:
+```
+(cd wasm/web && python3 ../run_server.py)
 ```
 
 ## Project Structure:
