@@ -65,7 +65,6 @@ class ItemManager;
 class ModelDefinitionLoader;
 class MovingTexture;
 class MusicInformation;
-class ParticleEmitter;
 class ParticleKind;
 class PhysicalObject;
 class RenderTarget;

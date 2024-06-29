@@ -32,7 +32,10 @@ using namespace irr;
 
 class Vec3;
 class SFXBase;
+
+#ifndef SERVER_ONLY
 class ParticleEmitter;
+#endif
 
 /**
   * \ingroup graphics
@@ -42,7 +45,11 @@ class Explosion : public HitSFX
 private:
     int              m_remaining_ticks;
     int              m_emission_frames;
+
+#ifndef SERVER_ONLY
     ParticleEmitter* m_emitter;
+#endif
+
     int              m_explosion_ticks;
 
 

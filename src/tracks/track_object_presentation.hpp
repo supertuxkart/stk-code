@@ -35,7 +35,6 @@
 #include <string>
 
 class SFXBase;
-class ParticleEmitter;
 class PhysicalObject;
 class ThreeDAnimation;
 class ModelDefinitionLoader;
@@ -43,6 +42,10 @@ namespace GE { class GERenderInfo; }
 class STKInstancedSceneNode;
 class XMLNode;
 class TrackObject;
+
+#ifndef SERVER_ONLY
+class ParticleEmitter;
+#endif
 
 namespace irr
 {
@@ -335,7 +338,9 @@ public:
 class TrackObjectPresentationParticles : public TrackObjectPresentationSceneNode
 {
 private:
+#ifndef SERVER_ONLY
     ParticleEmitter* m_emitter;
+#endif
     LODNode* m_lod_emitter_node;
     std::string m_trigger_condition;
     bool m_delayed_stop;
