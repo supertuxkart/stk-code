@@ -3,6 +3,7 @@
   <id>supertuxkart.desktop</id>
   <metadata_license>CC0-1.0</metadata_license>
   <project_license>GPL-3.0+</project_license>
+  <launchable type="desktop-id">supertuxkart.desktop</launchable>
   <name>SuperTuxKart</name>
   <summary>A 3D open-source kart racing game</summary>
   <summary xml:lang="zh_TW">3D 開源卡丁車賽車遊戲</summary>
