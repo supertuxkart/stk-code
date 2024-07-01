@@ -26,9 +26,12 @@
 #include <string>
 
 class AbstractKart;
-class ParticleEmitter;
 class ParticleKind;
 class Vec3;
+
+#ifndef SERVER_ONLY
+class ParticleEmitter;
+#endif
 
 namespace irr {
     namespace scene {
@@ -73,8 +76,10 @@ private:
     /** The particle kind for skidding bonus level 2. */
     const ParticleKind *m_skid_kind2;
 
+#ifndef SERVER_ONLY
     /** Vector of all particle emitters. */
     std::vector<ParticleEmitter*> m_all_emitters;
+#endif
 
     /** Pointer to the owner of this kart. */
     const AbstractKart *m_kart;
