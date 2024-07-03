@@ -34,10 +34,6 @@
 #include <mutex>
 #include <set>
 
-// #ifdef ENABLE_SQLITE3
-// #include <sqlite3.h>
-// #endif
-
 class BareNetworkString;
 class DatabaseConnector;
 class NetworkItemManager;
