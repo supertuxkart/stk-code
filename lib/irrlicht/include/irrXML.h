@@ -371,13 +371,13 @@ namespace io
 	struct xmlChar
 	{
 		T c;
-		xmlChar<T>() {}
-		xmlChar<T>(char in) : c(static_cast<T>(in)) {}
-		xmlChar<T>(wchar_t in) : c(static_cast<T>(in)) {}
-		explicit xmlChar<T>(unsigned char in) : c(static_cast<T>(in)) {}
-		explicit xmlChar<T>(unsigned short in) : c(static_cast<T>(in)) {}
-		explicit xmlChar<T>(unsigned int in) : c(static_cast<T>(in)) {}
-		explicit xmlChar<T>(unsigned long in) : c(static_cast<T>(in)) {}
+		xmlChar() {}
+		xmlChar(char in) : c(static_cast<T>(in)) {}
+		xmlChar(wchar_t in) : c(static_cast<T>(in)) {}
+		explicit xmlChar(unsigned char in) : c(static_cast<T>(in)) {}
+		explicit xmlChar(unsigned short in) : c(static_cast<T>(in)) {}
+		explicit xmlChar(unsigned int in) : c(static_cast<T>(in)) {}
+		explicit xmlChar(unsigned long in) : c(static_cast<T>(in)) {}
 		operator T() const { return c; }
 		void operator=(int t) { c=static_cast<T>(t); }
 	};
