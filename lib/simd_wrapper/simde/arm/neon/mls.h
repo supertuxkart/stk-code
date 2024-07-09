@@ -151,18 +151,13 @@ simde_float32x4_t
 simde_vmlsq_f32(simde_float32x4_t a, simde_float32x4_t b, simde_float32x4_t c) {
   #if defined(SIMDE_ARM_NEON_A32V7_NATIVE)
     return vmlsq_f32(a, b, c);
-  #elif \
-      defined(SIMDE_X86_FMA_NATIVE)
+  #elif defined(SIMDE_X86_FMA_NATIVE)
     simde_float32x4_private
       r_,
       a_ = simde_float32x4_to_private(a),
       b_ = simde_float32x4_to_private(b),
       c_ = simde_float32x4_to_private(c);
-
-    #if defined(SIMDE_X86_FMA_NATIVE)
-      r_.m128 = _mm_fnmadd_ps(b_.m128, c_.m128, a_.m128);
-    #endif
-
+    r_.m128 = _mm_fnmadd_ps(b_.m128, c_.m128, a_.m128);
     return simde_float32x4_from_private(r_);
   #else
     return simde_vsubq_f32(a, simde_vmulq_f32(b, c));
@@ -178,18 +173,13 @@ simde_float64x2_t
 simde_vmlsq_f64(simde_float64x2_t a, simde_float64x2_t b, simde_float64x2_t c) {
   #if defined(SIMDE_ARM_NEON_A64V8_NATIVE)
     return vmlsq_f64(a, b, c);
-  #elif \
-      defined(SIMDE_X86_FMA_NATIVE)
+  #elif defined(SIMDE_X86_FMA_NATIVE)
     simde_float64x2_private
       r_,
       a_ = simde_float64x2_to_private(a),
       b_ = simde_float64x2_to_private(b),
       c_ = simde_float64x2_to_private(c);
-
-    #if defined(SIMDE_X86_FMA_NATIVE)
-      r_.m128d = _mm_fnmadd_pd(b_.m128d, c_.m128d, a_.m128d);
-    #endif
-
+    r_.m128d = _mm_fnmadd_pd(b_.m128d, c_.m128d, a_.m128d);
     return simde_float64x2_from_private(r_);
   #else
     return simde_vsubq_f64(a, simde_vmulq_f64(b, c));

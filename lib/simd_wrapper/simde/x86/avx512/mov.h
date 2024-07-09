@@ -452,6 +452,12 @@ simde_mm512_mask_mov_ps (simde__m512 src, simde__mmask16 k, simde__m512 a) {
 #endif
 
 SIMDE_FUNCTION_ATTRIBUTES
+simde__m512h
+simde_x_mm512_mask_mov_ph (simde__m512h src, simde__mmask32 k, simde__m512h a) {
+  return simde_mm512_castsi512_ph(simde_mm512_mask_mov_epi16(simde_mm512_castph_si512(src), k, simde_mm512_castph_si512(a)));
+}
+
+SIMDE_FUNCTION_ATTRIBUTES
 simde__m128i
 simde_mm_maskz_mov_epi8 (simde__mmask16 k, simde__m128i a) {
   #if defined(SIMDE_X86_AVX512BW_NATIVE) && defined(SIMDE_X86_AVX512VL_NATIVE)

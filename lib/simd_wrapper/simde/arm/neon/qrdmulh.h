@@ -40,7 +40,10 @@ simde_vqrdmulhh_s16(int16_t a, int16_t b) {
   #if defined(SIMDE_ARM_NEON_A64V8_NATIVE)
     return vqrdmulhh_s16(a, b);
   #else
-    return HEDLEY_STATIC_CAST(int16_t, (((1 << 15) + ((HEDLEY_STATIC_CAST(int32_t, (HEDLEY_STATIC_CAST(int32_t, a) * HEDLEY_STATIC_CAST(int32_t, b)))) << 1)) >> 16) & 0xffff);
+    int32_t temp = HEDLEY_STATIC_CAST(int32_t, a) * HEDLEY_STATIC_CAST(int32_t, b);
+    int32_t r = temp > 0 ? (temp > (INT32_MAX >> 1) ? INT32_MAX : (temp << 1)) : (temp < (INT32_MIN >> 1) ? INT32_MIN : (temp << 1));
+    r = (r > (INT32_MAX - (1 << 15))) ? INT32_MAX : ((1 << 15) + r);
+    return HEDLEY_STATIC_CAST(int16_t, ((r >> 16) & 0xffff));
   #endif
 }
 #if defined(SIMDE_ARM_NEON_A64V8_ENABLE_NATIVE_ALIASES)
@@ -54,7 +57,10 @@ simde_vqrdmulhs_s32(int32_t a, int32_t b) {
   #if defined(SIMDE_ARM_NEON_A64V8_NATIVE)
     return vqrdmulhs_s32(a, b);
   #else
-    return HEDLEY_STATIC_CAST(int32_t, (((HEDLEY_STATIC_CAST(int64_t, 1) << 31) + ((HEDLEY_STATIC_CAST(int64_t, (HEDLEY_STATIC_CAST(int64_t, a) * HEDLEY_STATIC_CAST(int64_t, b)))) << 1)) >> 32) & 0xffffffff);
+    int64_t temp = HEDLEY_STATIC_CAST(int64_t, a) * HEDLEY_STATIC_CAST(int64_t, b);
+    int64_t r = temp > 0 ? (temp > (INT64_MAX >> 1) ? INT64_MAX : (temp << 1)) : (temp < (INT64_MIN >> 1) ? INT64_MIN : (temp << 1));
+    r = (r > (INT64_MAX - (HEDLEY_STATIC_CAST(int64_t, 1) << 31))) ? INT64_MAX : ((HEDLEY_STATIC_CAST(int64_t, 1) << 31) + r);
+    return HEDLEY_STATIC_CAST(int32_t, ((r >> 32) & 0xffffffff));
   #endif
 }
 #if defined(SIMDE_ARM_NEON_A64V8_ENABLE_NATIVE_ALIASES)

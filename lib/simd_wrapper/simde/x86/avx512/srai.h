@@ -64,6 +64,32 @@ simde_mm512_srai_epi16 (simde__m512i a, const int imm8) {
   #define _mm512_srai_epi16(a, imm8) simde_mm512_srai_epi16(a, imm8)
 #endif
 
+SIMDE_FUNCTION_ATTRIBUTES
+simde__m512i
+simde_mm512_srai_epi32 (simde__m512i a, const unsigned int imm8) {
+  simde__m512i_private
+    r_,
+    a_ = simde__m512i_to_private(a);
+
+  #if defined(SIMDE_VECTOR_SUBSCRIPT_SCALAR)
+    r_.i32 = a_.i32 >> HEDLEY_STATIC_CAST(int32_t, imm8);
+  #else
+    SIMDE_VECTORIZE
+    for (size_t i = 0 ; i < (sizeof(r_.i32) / sizeof(r_.i32[0])) ; i++) {
+      r_.i32[i] = a_.i32[i] >> imm8;
+    }
+  #endif
+
+  return simde__m512i_from_private(r_);
+}
+#if defined(SIMDE_X86_AVX512F_NATIVE)
+#  define simde_mm512_srai_epi32(a, imm8) _mm512_srai_epi32(a, imm8)
+#endif
+#if defined(SIMDE_X86_AVX512F_ENABLE_NATIVE_ALIASES)
+  #undef _mm512_srai_epi32
+  #define _mm512_srai_epi32(a, imm8) simde_mm512_srai_epi32(a, imm8)
+#endif
+
 SIMDE_END_DECLS_
 HEDLEY_DIAGNOSTIC_POP
 

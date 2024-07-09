@@ -23,6 +23,7 @@
  * Copyright:
  *   2020      Evan Nemerson <evan@nemerson.com>
  *   2020      Christopher Moore <moore@free.fr>
+ *   2023      Yi-Yen Chung <eric681@andestech.com> (Copyright owned by Andes Technology)
  */
 
 #if !defined(SIMDE_ARM_NEON_MVN_H)
@@ -418,6 +419,52 @@ simde_vmvn_u32(simde_uint32x2_t a) {
 #if defined(SIMDE_ARM_NEON_A32V7_ENABLE_NATIVE_ALIASES)
   #undef vmvn_u32
   #define vmvn_u32(a) simde_vmvn_u32(a)
+#endif
+
+SIMDE_FUNCTION_ATTRIBUTES
+simde_poly8x8_t
+simde_vmvn_p8(simde_poly8x8_t a) {
+  #if defined(SIMDE_ARM_NEON_A32V7_NATIVE)
+    return vmvn_p8(a);
+  #else
+    simde_poly8x8_private
+      r_,
+      a_ = simde_poly8x8_to_private(a);
+
+    SIMDE_VECTORIZE
+    for (size_t i = 0 ; i < (sizeof(r_.values) / sizeof(r_.values[0])) ; i++) {
+      r_.values[i] = ~(a_.values[i]);
+    }
+
+    return simde_poly8x8_from_private(r_);
+  #endif
+}
+#if defined(SIMDE_ARM_NEON_A32V7_ENABLE_NATIVE_ALIASES)
+  #undef vmvn_p8
+  #define vmvn_p8(a) simde_vmvn_p8(a)
+#endif
+
+SIMDE_FUNCTION_ATTRIBUTES
+simde_poly8x16_t
+simde_vmvnq_p8(simde_poly8x16_t a) {
+  #if defined(SIMDE_ARM_NEON_A32V7_NATIVE)
+    return vmvnq_p8(a);
+  #else
+    simde_poly8x16_private
+      r_,
+      a_ = simde_poly8x16_to_private(a);
+
+    SIMDE_VECTORIZE
+    for (size_t i = 0 ; i < (sizeof(r_.values) / sizeof(r_.values[0])) ; i++) {
+      r_.values[i] = ~(a_.values[i]);
+    }
+
+    return simde_poly8x16_from_private(r_);
+  #endif
+}
+#if defined(SIMDE_ARM_NEON_A32V7_ENABLE_NATIVE_ALIASES)
+  #undef vmvnq_p8
+  #define vmvnq_p8(a) simde_vmvnq_p8(a)
 #endif
 
 SIMDE_END_DECLS_

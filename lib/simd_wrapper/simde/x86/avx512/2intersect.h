@@ -37,36 +37,35 @@ SIMDE_BEGIN_DECLS_
 SIMDE_FUNCTION_ATTRIBUTES
 void
 simde_mm_2intersect_epi32(simde__m128i a, simde__m128i b, simde__mmask8 *k1, simde__mmask8 *k2) {
-  #if defined(SIMDE_X86_AVX512VP2INTERSECT_NATIVE) && defined(SIMDE_X86_AVX512VL_NATIVE)
-    _mm_2intersect_epi32(a, b, k1, k2);
-  #else
-    simde__m128i_private
-      a_ = simde__m128i_to_private(a),
-      b_ = simde__m128i_to_private(b);
-    simde__mmask8
-      k1_ = 0,
-      k2_ = 0;
+  simde__m128i_private
+    a_ = simde__m128i_to_private(a),
+    b_ = simde__m128i_to_private(b);
+  simde__mmask8
+    k1_ = 0,
+    k2_ = 0;
 
-    for (size_t i = 0 ; i < sizeof(a_.i32) / sizeof(a_.i32[0]) ; i++) {
-      #if defined(SIMDE_ENABLE_OPENMP)
-        #pragma omp simd reduction(|:k1_) reduction(|:k2_)
-      #else
-        SIMDE_VECTORIZE
-      #endif
-      for (size_t j = 0 ; j < sizeof(b_.i32) / sizeof(b_.i32[0]) ; j++) {
-        const int32_t m = a_.i32[i] == b_.i32[j];
-        k1_ |= m << i;
-        k2_ |= m << j;
-      }
+  for (size_t i = 0 ; i < sizeof(a_.i32) / sizeof(a_.i32[0]) ; i++) {
+    #if defined(SIMDE_ENABLE_OPENMP)
+      #pragma omp simd reduction(|:k1_) reduction(|:k2_)
+    #else
+      SIMDE_VECTORIZE
+    #endif
+    for (size_t j = 0 ; j < sizeof(b_.i32) / sizeof(b_.i32[0]) ; j++) {
+      const int32_t m = a_.i32[i] == b_.i32[j];
+      k1_ |= m << i;
+      k2_ |= m << j;
     }
+  }
 
-    *k1 = k1_;
-    *k2 = k2_;
-  #endif
+  *k1 = k1_;
+  *k2 = k2_;
 }
+#if defined(SIMDE_X86_AVX512VP2INTERSECT_NATIVE) && defined(SIMDE_X86_AVX512VL_NATIVE)
+  #define simde_mm_2intersect_epi32(a, b, k1, k2) _mm_2intersect_epi32(a, b, k1, k2)
+#endif
 #if defined(SIMDE_X86_AVX512VP2INTERSECT_ENABLE_NATIVE_ALIASES) && defined(SIMDE_X86_AVX512VL_ENABLE_NATIVE_ALIASES)
-  #undef __mm_2intersect_epi32
-  #define __mm_2intersect_epi32(a,b, k1, k2) simde_mm_2intersect_epi32(a, b, k1, k2)
+  #undef _mm_2intersect_epi32
+  #define _mm_2intersect_epi32(a, b, k1, k2) simde_mm_2intersect_epi32(a, b, k1, k2)
 #endif
 
 SIMDE_FUNCTION_ATTRIBUTES
@@ -100,8 +99,8 @@ simde_mm_2intersect_epi64(simde__m128i a, simde__m128i b, simde__mmask8 *k1, sim
   #endif
 }
 #if defined(SIMDE_X86_AVX512VP2INTERSECT_ENABLE_NATIVE_ALIASES) && defined(SIMDE_X86_AVX512VL_ENABLE_NATIVE_ALIASES)
-  #undef __mm_2intersect_epi64
-  #define __mm_2intersect_epi64(a,b, k1, k2) simde_mm_2intersect_epi64(a, b, k1, k2)
+  #undef _mm_2intersect_epi64
+  #define _mm_2intersect_epi64(a, b, k1, k2) simde_mm_2intersect_epi64(a, b, k1, k2)
 #endif
 
 SIMDE_FUNCTION_ATTRIBUTES
@@ -136,7 +135,7 @@ simde_mm256_2intersect_epi32(simde__m256i a, simde__m256i b, simde__mmask8 *k1, 
 }
 #if defined(SIMDE_X86_AVX512VP2INTERSECT_ENABLE_NATIVE_ALIASES) && defined(SIMDE_X86_AVX512VL_ENABLE_NATIVE_ALIASES)
   #undef _mm256_2intersect_epi32
-  #define _mm256_2intersect_epi32(a,b, k1, k2) simde_mm256_2intersect_epi32(a, b, k1, k2)
+  #define _mm256_2intersect_epi32(a, b, k1, k2) simde_mm256_2intersect_epi32(a, b, k1, k2)
 #endif
 
 SIMDE_FUNCTION_ATTRIBUTES
@@ -171,7 +170,7 @@ simde_mm256_2intersect_epi64(simde__m256i a, simde__m256i b, simde__mmask8 *k1, 
 }
 #if defined(SIMDE_X86_AVX512VP2INTERSECT_ENABLE_NATIVE_ALIASES) && defined(SIMDE_X86_AVX512VL_ENABLE_NATIVE_ALIASES)
   #undef _mm256_2intersect_epi64
-  #define _mm256_2intersect_epi64(a,b, k1, k2) simde_mm256_2intersect_epi64(a, b, k1, k2)
+  #define _mm256_2intersect_epi64(a, b, k1, k2) simde_mm256_2intersect_epi64(a, b, k1, k2)
 #endif
 
 SIMDE_FUNCTION_ATTRIBUTES

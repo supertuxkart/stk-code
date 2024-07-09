@@ -10,7 +10,7 @@ SIMDE_BEGIN_DECLS_
 #if SIMDE_NATURAL_VECTOR_SIZE_LE(256) && defined(SIMDE_STATEMENT_EXPR_)
   #define simde_x_mm512_round_ps(a, rounding) SIMDE_STATEMENT_EXPR_(({ \
     simde__m512_private \
-      simde_x_mm512_round_ps_r_, \
+      simde_x_mm512_round_ps_r_ = simde__m512_to_private(simde_mm512_setzero_ps()), \
       simde_x_mm512_round_ps_a_ = simde__m512_to_private(a); \
     \
     for (size_t simde_x_mm512_round_ps_i = 0 ; simde_x_mm512_round_ps_i < (sizeof(simde_x_mm512_round_ps_r_.m256) / sizeof(simde_x_mm512_round_ps_r_.m256[0])) ; simde_x_mm512_round_ps_i++) { \
@@ -148,7 +148,7 @@ SIMDE_BEGIN_DECLS_
 #if SIMDE_NATURAL_VECTOR_SIZE_LE(256) && defined(SIMDE_STATEMENT_EXPR_)
   #define simde_x_mm512_round_pd(a, rounding) SIMDE_STATEMENT_EXPR_(({ \
     simde__m512d_private \
-      simde_x_mm512_round_pd_r_, \
+      simde_x_mm512_round_pd_r_ = simde__m512d_to_private(simde_mm512_setzero_pd()), \
       simde_x_mm512_round_pd_a_ = simde__m512d_to_private(a); \
     \
     for (size_t simde_x_mm512_round_pd_i = 0 ; simde_x_mm512_round_pd_i < (sizeof(simde_x_mm512_round_pd_r_.m256d) / sizeof(simde_x_mm512_round_pd_r_.m256d[0])) ; simde_x_mm512_round_pd_i++) { \

@@ -272,13 +272,21 @@
   #define SIMDE_DIAGNOSTIC_DISABLE_CAST_FUNCTION_TYPE_
 #endif
 
-/* clang will emit this warning when we use C99 extensions whan not in
+/* clang will emit this warning when we use C99 extensions when not in
  * C99 mode, even though it does support this.  In such cases we check
  * the compiler and version first, so we know it's not a problem. */
 #if HEDLEY_HAS_WARNING("-Wc99-extensions")
   #define SIMDE_DIAGNOSTIC_DISABLE_C99_EXTENSIONS_ _Pragma("clang diagnostic ignored \"-Wc99-extensions\"")
 #else
   #define SIMDE_DIAGNOSTIC_DISABLE_C99_EXTENSIONS_
+#endif
+
+/* Similar problm as above; we rely on some basic C99 support, but clang
+ * has started warning obut this even in C17 mode with -Weverything. */
+#if HEDLEY_HAS_WARNING("-Wdeclaration-after-statement")
+  #define SIMDE_DIAGNOSTIC_DISABLE_DECLARATION_AFTER_STATEMENT_ _Pragma("clang diagnostic ignored \"-Wdeclaration-after-statement\"")
+#else
+  #define SIMDE_DIAGNOSTIC_DISABLE_DECLARATION_AFTER_STATEMENT_
 #endif
 
 /* https://github.com/simd-everywhere/simde/issues/277 */
@@ -392,6 +400,8 @@
  * more elegantly, but until then... */
 #if defined(HEDLEY_MSVC_VERSION)
   #define SIMDE_DIAGNOSTIC_DISABLE_UNREACHABLE_ __pragma(warning(disable:4702))
+#elif defined(__clang__)
+  #define SIMDE_DIAGNOSTIC_DISABLE_UNREACHABLE_ HEDLEY_PRAGMA(clang diagnostic ignored "-Wunreachable-code")
 #else
   #define SIMDE_DIAGNOSTIC_DISABLE_UNREACHABLE_
 #endif
@@ -429,6 +439,7 @@
   SIMDE_DIAGNOSTIC_DISABLE_NO_EMMS_INSTRUCTION_ \
   SIMDE_DIAGNOSTIC_DISABLE_SIMD_PRAGMA_DEPRECATED_ \
   SIMDE_DIAGNOSTIC_DISABLE_CONDITIONAL_UNINITIALIZED_ \
+  SIMDE_DIAGNOSTIC_DISABLE_DECLARATION_AFTER_STATEMENT_ \
   SIMDE_DIAGNOSTIC_DISABLE_FLOAT_EQUAL_ \
   SIMDE_DIAGNOSTIC_DISABLE_NON_CONSTANT_AGGREGATE_INITIALIZER_ \
   SIMDE_DIAGNOSTIC_DISABLE_EXTRA_SEMI_ \

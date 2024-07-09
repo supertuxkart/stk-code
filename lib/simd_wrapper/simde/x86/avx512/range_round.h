@@ -117,7 +117,7 @@ SIMDE_BEGIN_DECLS_
 #endif
 #if defined(SIMDE_X86_AVX512DQ_ENABLE_NATIVE_ALIASES)
   #undef _mm512_mask_range_round_ps
-  #define _mm512_mask_range_round_ps(src, k, a, b, imm8) simde_mm512_mask_range_round_ps(src, k, a, b, imm8)
+  #define _mm512_mask_range_round_ps(src, k, a, b, imm8, sae) simde_mm512_mask_range_round_ps(src, k, a, b, imm8, sae)
 #endif
 
 #if defined(SIMDE_X86_AVX512DQ_NATIVE)
@@ -173,7 +173,7 @@ SIMDE_BEGIN_DECLS_
 #endif
 #if defined(SIMDE_X86_AVX512DQ_ENABLE_NATIVE_ALIASES)
   #undef _mm512_maskz_range_round_ps
-  #define _mm512_maskz_range_round_ps(k, a, b, imm8) simde_mm512_maskz_range_round_ps(k, a, b, imm8)
+  #define _mm512_maskz_range_round_ps(k, a, b, imm8, sae) simde_mm512_maskz_range_round_ps(k, a, b, imm8, sae)
 #endif
 
 #if defined(SIMDE_X86_AVX512DQ_NATIVE)
@@ -285,7 +285,7 @@ SIMDE_BEGIN_DECLS_
 #endif
 #if defined(SIMDE_X86_AVX512DQ_ENABLE_NATIVE_ALIASES)
   #undef _mm512_mask_range_round_pd
-  #define _mm512_mask_range_round_pd(src, k, a, b, imm8) simde_mm512_mask_range_round_pd(src, k, a, b, imm8)
+  #define _mm512_mask_range_round_pd(src, k, a, b, imm8, sae) simde_mm512_mask_range_round_pd(src, k, a, b, imm8, sae)
 #endif
 
 #if defined(SIMDE_X86_AVX512DQ_NATIVE)
@@ -341,7 +341,7 @@ SIMDE_BEGIN_DECLS_
 #endif
 #if defined(SIMDE_X86_AVX512DQ_ENABLE_NATIVE_ALIASES)
   #undef _mm512_maskz_range_round_pd
-  #define _mm512_maskz_range_round_pd(k, a, b, imm8) simde_mm512_maskz_range_round_pd(k, a, b, imm8)
+  #define _mm512_maskz_range_round_pd(k, a, b, imm8, sae) simde_mm512_maskz_range_round_pd(k, a, b, imm8, sae)
 #endif
 
 #if defined(SIMDE_X86_AVX512DQ_NATIVE)
@@ -453,7 +453,7 @@ SIMDE_BEGIN_DECLS_
 #endif
 #if defined(SIMDE_X86_AVX512DQ_ENABLE_NATIVE_ALIASES)
   #undef _mm_mask_range_round_ss
-  #define _mm_mask_range_round_ss(src, k, a, b, imm8) simde_mm_mask_range_round_ss(src, k, a, b, imm8)
+  #define _mm_mask_range_round_ss(src, k, a, b, imm8, sae) simde_mm_mask_range_round_ss(src, k, a, b, imm8, sae)
 #endif
 
 #if defined(SIMDE_X86_AVX512DQ_NATIVE)
@@ -509,7 +509,7 @@ SIMDE_BEGIN_DECLS_
 #endif
 #if defined(SIMDE_X86_AVX512DQ_ENABLE_NATIVE_ALIASES)
   #undef _mm_maskz_range_round_ss
-  #define _mm_maskz_range_round_ss(k, a, b, imm8) simde_mm_maskz_range_round_ss(k, a, b, imm8)
+  #define _mm_maskz_range_round_ss(k, a, b, imm8, sae) simde_mm_maskz_range_round_ss(k, a, b, imm8, sae)
 #endif
 
 #if defined(SIMDE_X86_AVX512DQ_NATIVE)
@@ -621,7 +621,7 @@ SIMDE_BEGIN_DECLS_
 #endif
 #if defined(SIMDE_X86_AVX512DQ_ENABLE_NATIVE_ALIASES)
   #undef _mm_mask_range_round_sd
-  #define _mm_mask_range_round_sd(src, k, a, b, imm8) simde_mm_mask_range_round_sd(src, k, a, b, imm8)
+  #define _mm_mask_range_round_sd(src, k, a, b, imm8, sae) simde_mm_mask_range_round_sd(src, k, a, b, imm8, sae)
 #endif
 
 #if defined(SIMDE_X86_AVX512DQ_NATIVE)
@@ -677,7 +677,7 @@ SIMDE_BEGIN_DECLS_
 #endif
 #if defined(SIMDE_X86_AVX512DQ_ENABLE_NATIVE_ALIASES)
   #undef _mm_maskz_range_round_sd
-  #define _mm_maskz_range_round_sd(k, a, b, imm8) simde_mm_maskz_range_round_sd(k, a, b, imm8)
+  #define _mm_maskz_range_round_sd(k, a, b, imm8, sae) simde_mm_maskz_range_round_sd(k, a, b, imm8, sae)
 #endif
 
 SIMDE_END_DECLS_

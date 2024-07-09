@@ -22,6 +22,7 @@
  *
  * Copyright:
  *   2021      Zhi An Ng <zhin@google.com> (Copyright owned by Google, LLC)
+ *   2023      Yi-Yen Chung <eric681@andestech.com> (Copyright owned by Andes Technology)
  */
 
 #if !defined(SIMDE_ARM_NEON_QSHRUN_N_H)
@@ -34,6 +35,16 @@
 HEDLEY_DIAGNOSTIC_PUSH
 SIMDE_DISABLE_UNWANTED_DIAGNOSTICS
 SIMDE_BEGIN_DECLS_
+
+#if defined(SIMDE_ARM_NEON_A64V8_NATIVE)
+  #define simde_vqshrunh_n_s16(a, n) HEDLEY_STATIC_CAST(uint8_t, vqshrunh_n_s16((a), (n)))
+#else
+  #define simde_vqshrunh_n_s16(a, n) simde_vqmovunh_s16(simde_x_vshrh_n_s16(a, n))
+#endif
+#if defined(SIMDE_ARM_NEON_A64V8_ENABLE_NATIVE_ALIASES)
+  #undef vqshrunh_n_s16
+  #define vqshrunh_n_s16(a, n) simde_vqshrunh_n_s16(a, n)
+#endif
 
 #if defined(SIMDE_ARM_NEON_A64V8_NATIVE)
   #define simde_vqshruns_n_s32(a, n) HEDLEY_STATIC_CAST(uint16_t, vqshruns_n_s32((a), (n)))

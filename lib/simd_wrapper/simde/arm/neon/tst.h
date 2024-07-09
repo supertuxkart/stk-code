@@ -23,6 +23,7 @@
  * Copyright:
  *   2020      Evan Nemerson <evan@nemerson.com>
  *   2020      Christopher Moore <moore@free.fr>
+ *   2023      Yi-Yen Chung <eric681@andestech.com> (Copyright owned by Andes Technology)
  */
 
 #if !defined(SIMDE_ARM_NEON_TST_H)
@@ -560,6 +561,102 @@ simde_vtst_u64(simde_uint64x1_t a, simde_uint64x1_t b) {
 #if defined(SIMDE_ARM_NEON_A64V8_ENABLE_NATIVE_ALIASES)
   #undef vtst_u64
   #define vtst_u64(a, b) simde_vtst_u64((a), (b))
+#endif
+
+SIMDE_FUNCTION_ATTRIBUTES
+simde_uint8x8_t
+simde_vtst_p8(simde_poly8x8_t a, simde_poly8x8_t b) {
+  #if defined(SIMDE_ARM_NEON_A32V7_NATIVE)
+    return vtst_p8(a, b);
+  #else
+    simde_poly8x8_private
+      a_ = simde_poly8x8_to_private(a),
+      b_ = simde_poly8x8_to_private(b);
+    simde_uint8x8_private r_;
+
+    SIMDE_VECTORIZE
+    for (size_t i = 0 ; i < (sizeof(r_.values) / sizeof(r_.values[0])) ; i++) {
+      r_.values[i] = ((a_.values[i] & b_.values[i]) != 0) ? UINT8_MAX : 0;
+    }
+
+    return simde_uint8x8_from_private(r_);
+  #endif
+}
+#if defined(SIMDE_ARM_NEON_A32V7_ENABLE_NATIVE_ALIASES)
+  #undef vtst_p8
+  #define vtst_p8(a, b) simde_vtst_p8((a), (b))
+#endif
+
+SIMDE_FUNCTION_ATTRIBUTES
+simde_uint64x1_t
+simde_vtst_p64(simde_poly64x1_t a, simde_poly64x1_t b) {
+  #if defined(SIMDE_ARM_NEON_A64V8_NATIVE)
+    return vtst_p64(a, b);
+  #else
+    simde_poly64x1_private
+      a_ = simde_poly64x1_to_private(a),
+      b_ = simde_poly64x1_to_private(b);
+    simde_uint64x1_private r_;
+
+    SIMDE_VECTORIZE
+    for (size_t i = 0 ; i < (sizeof(r_.values) / sizeof(r_.values[0])) ; i++) {
+      r_.values[i] = ((a_.values[i] & b_.values[i]) != 0) ? UINT64_MAX : 0;
+    }
+
+    return simde_uint64x1_from_private(r_);
+  #endif
+}
+#if defined(SIMDE_ARM_NEON_A64V8_ENABLE_NATIVE_ALIASES)
+  #undef vtst_p64
+  #define vtst_p64(a, b) simde_vtst_p64((a), (b))
+#endif
+
+SIMDE_FUNCTION_ATTRIBUTES
+simde_uint8x16_t
+simde_vtstq_p8(simde_poly8x16_t a, simde_poly8x16_t b) {
+  #if defined(SIMDE_ARM_NEON_A32V7_NATIVE)
+    return vtstq_p8(a, b);
+  #else
+    simde_poly8x16_private
+      a_ = simde_poly8x16_to_private(a),
+      b_ = simde_poly8x16_to_private(b);
+    simde_uint8x16_private r_;
+
+    SIMDE_VECTORIZE
+    for (size_t i = 0 ; i < (sizeof(r_.values) / sizeof(r_.values[0])) ; i++) {
+      r_.values[i] = ((a_.values[i] & b_.values[i]) != 0) ? UINT8_MAX : 0;
+    }
+
+    return simde_uint8x16_from_private(r_);
+  #endif
+}
+#if defined(SIMDE_ARM_NEON_A32V7_ENABLE_NATIVE_ALIASES)
+  #undef vtstq_p8
+  #define vtstq_p8(a, b) simde_vtstq_p8((a), (b))
+#endif
+
+SIMDE_FUNCTION_ATTRIBUTES
+simde_uint64x2_t
+simde_vtstq_p64(simde_poly64x2_t a, simde_poly64x2_t b) {
+  #if defined(SIMDE_ARM_NEON_A64V8_NATIVE)
+    return vtstq_p64(a, b);
+  #else
+    simde_poly64x2_private
+      a_ = simde_poly64x2_to_private(a),
+      b_ = simde_poly64x2_to_private(b);
+    simde_uint64x2_private r_;
+
+    SIMDE_VECTORIZE
+    for (size_t i = 0 ; i < (sizeof(r_.values) / sizeof(r_.values[0])) ; i++) {
+      r_.values[i] = ((a_.values[i] & b_.values[i]) != 0) ? UINT64_MAX : 0;
+    }
+
+    return simde_uint64x2_from_private(r_);
+  #endif
+}
+#if defined(SIMDE_ARM_NEON_A64V8_ENABLE_NATIVE_ALIASES)
+  #undef vtstq_p64
+  #define vtstq_p64(a, b) simde_vtstq_p64((a), (b))
 #endif
 
 SIMDE_END_DECLS_
