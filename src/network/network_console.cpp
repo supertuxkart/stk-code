@@ -29,6 +29,7 @@
 
 #include <iostream>
 #include <limits>
+#include "utils/string_utils.hpp"
 
 #ifndef WIN32
 #  include <stdint.h>
@@ -110,8 +111,9 @@ void mainLoop(STKHost* host)
         std::stringstream ss(str);
 #endif
 
-        int number = -1;
-        ss >> str >> number;
+        //int number = -1;
+        std::string str2 = "";
+        ss >> str >> str2;
         if (str == "help")
         {
             showHelp();
@@ -128,19 +130,19 @@ void mainLoop(STKHost* host)
                 peers[i]->kick();
             }
         }
-        else if (str == "kick" && number != -1 &&
+        else if (str == "kick" && str2 != "" &&
             NetworkConfig::get()->isServer())
         {
-            std::shared_ptr<STKPeer> peer = host->findPeerByHostId(number);
+	    std::shared_ptr<STKPeer> peer = STKHost::get()->findPeerByName(StringUtils::utf8ToWide(str2));
             if (peer)
                 peer->kick();
             else
-                std::cout << "Unknown host id: " << number << std::endl;
+                std::cout << "Unknown player: " << str2 << std::endl;
         }
-        else if (str == "kickban" && number != -1 &&
+        else if (str == "kickban" && str2 != "" &&
             NetworkConfig::get()->isServer())
         {
-            std::shared_ptr<STKPeer> peer = host->findPeerByHostId(number);
+	    std::shared_ptr<STKPeer> peer = STKHost::get()->findPeerByName(StringUtils::utf8ToWide(str2));
             if (peer)
             {
                 peer->kick();
@@ -151,7 +153,7 @@ void mainLoop(STKHost* host)
                     sl->saveIPBanTable(peer->getAddress());
             }
             else
-                std::cout << "Unknown host id: " << number << std::endl;
+                std::cout << "Unknown player: " << str2 << std::endl;
         }
         else if (str == "listpeers")
         {
@@ -162,6 +164,7 @@ void mainLoop(STKHost* host)
             {
                 std::cout << peers[i]->getHostId() << ": " <<
                     peers[i]->getAddress().toString() <<  " " <<
+		    StringUtils::wideToUtf8(peers[i]->getPlayerProfiles()[0]->getName()) << " " <<
                     peers[i]->getUserVersion() << std::endl;
             }
         }

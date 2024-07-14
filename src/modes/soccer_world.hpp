@@ -95,6 +95,10 @@ private:
      *  triggered if the ball is off for more than 2 seconds. */
     int m_ball_invalid_timer;
     int m_ball_hitter;
+    int m_red_ball_hitter;
+    int m_blue_ball_hitter;
+    int m_blue_hit_ticks;
+    int m_red_hit_ticks;
 
     /** Goals data of each team scored */
     std::vector<ScorerData> m_red_scorers;

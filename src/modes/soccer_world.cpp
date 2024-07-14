@@ -504,25 +504,33 @@ void SoccerWorld::onCheckGoalTriggered(bool first_goal)
         }
 
         ScorerData sd = {};
-        sd.m_id = m_ball_hitter;
-        sd.m_correct_goal = isCorrectGoal(m_ball_hitter, first_goal);
-        sd.m_kart = getKart(m_ball_hitter)->getIdent();
-        sd.m_player = getKart(m_ball_hitter)->getController()
+
+        int hitter = (first_goal ? m_red_ball_hitter : m_blue_ball_hitter);
+        if (hitter < 0)  hitter = m_ball_hitter;
+        sd.m_id = hitter;
+        m_red_hit_ticks = -1;
+        m_blue_hit_ticks = -1;
+        m_red_ball_hitter = -1;
+        m_blue_ball_hitter = -1;
+
+        sd.m_correct_goal = isCorrectGoal(sd.m_id, first_goal);
+        sd.m_kart = getKart(sd.m_id)->getIdent();
+        sd.m_player = getKart(sd.m_id)->getController()
             ->getName(false/*include_handicap_string*/);
-        sd.m_handicap_level = getKart(m_ball_hitter)->getHandicap();
-        if (RaceManager::get()->getKartGlobalPlayerId(m_ball_hitter) > -1)
+        sd.m_handicap_level = getKart(sd.m_id)->getHandicap();
+        if (RaceManager::get()->getKartGlobalPlayerId(sd.m_id) > -1)
         {
             sd.m_country_code =
-                RaceManager::get()->getKartInfo(m_ball_hitter).getCountryCode();
+                RaceManager::get()->getKartInfo(sd.m_id).getCountryCode();
         }
         if (sd.m_correct_goal)
         {
-            m_karts[m_ball_hitter]->getKartModel()
+            m_karts[sd.m_id]->getKartModel()
                 ->setAnimation(KartModel::AF_WIN_START, true/* play_non_loop*/);
         }
         else if (!sd.m_correct_goal)
         {
-            m_karts[m_ball_hitter]->getKartModel()
+            m_karts[sd.m_id]->getKartModel()
                 ->setAnimation(KartModel::AF_LOSE_START, true/* play_non_loop*/);
         }
 
@@ -736,6 +744,17 @@ void SoccerWorld::resetKartsToSelfGoals()
 void SoccerWorld::setBallHitter(unsigned int kart_id)
 {
     m_ball_hitter = kart_id;
+    KartTeam team = getKartTeam(kart_id);
+    if (team == KART_TEAM_RED)
+    {
+        m_red_ball_hitter = kart_id;
+        m_red_hit_ticks = m_time_ticks;
+    }
+    else if (team == KART_TEAM_BLUE)
+    {
+        m_blue_ball_hitter = kart_id;
+        m_blue_hit_ticks = m_time_ticks;
+    }
 }   // setBallHitter
 
 //-----------------------------------------------------------------------------
