@@ -812,10 +812,10 @@ std::string GEVulkanDrawCall::getShader(const irr::video::SMaterial& m)
 }   // getShader
 
 // ----------------------------------------------------------------------------
-void GEVulkanDrawCall::prepare(GEVulkanCameraSceneNode* cam)
+void GEVulkanDrawCall::prepare(GEVulkanDriver* vk, GEVulkanCameraSceneNode* cam)
 {
     reset();
-    m_culling_tool->init(cam);
+    m_culling_tool->init(vk, cam);
     m_view_position = cam->getPosition();
     m_billboard_rotation = MiniGLM::getBulletQuaternion(cam->getViewMatrix());
 }   // prepare

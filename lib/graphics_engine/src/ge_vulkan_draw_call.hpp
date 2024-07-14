@@ -224,7 +224,7 @@ public:
     void addBillboardNode(irr::scene::ISceneNode* node,
                           irr::scene::ESCENE_NODE_TYPE node_type);
     // ------------------------------------------------------------------------
-    void prepare(GEVulkanCameraSceneNode* cam);
+    void prepare(GEVulkanDriver* vk, GEVulkanCameraSceneNode* cam);
     // ------------------------------------------------------------------------
     void generate(GEVulkanDriver* vk);
     // ------------------------------------------------------------------------

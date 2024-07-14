@@ -37,6 +37,7 @@
 #include <set>
 #include <sstream>
 #include <stdexcept>
+#include <thread>
 #include "../source/Irrlicht/os.h"
 
 extern "C" VKAPI_ATTR VkBool32 VKAPI_CALL debug_callback(
@@ -523,6 +524,8 @@ GEVulkanDriver::GEVulkanDriver(const SIrrlichtCreationParameters& params,
     m_rtt_clear_color = m_clear_color;
     m_white_texture = NULL;
     m_transparent_texture = NULL;
+    m_occlusion = NULL;
+    m_occlusion_manager = NULL;
     m_pre_rotation_matrix = core::matrix4(core::matrix4::EM4CONST_IDENTITY);
 
     m_window = window;
@@ -623,6 +626,11 @@ GEVulkanDriver::GEVulkanDriver(const SIrrlichtCreationParameters& params,
     createRenderPass();
     createFramebuffers();
 
+    m_occlusion = MaskedOcclusionCulling::Create();
+    m_occlusion_manager = new CullingThreadpool(std::thread::hardware_concurrency(), 4, 4);
+    m_occlusion_manager->SetBuffer(m_occlusion);
+    m_occlusion_manager->SetResolution(640, 480);
+
     os::Printer::log("Vulkan version", getVulkanVersionString().c_str());
     os::Printer::log("Vulkan vendor", getVendorInfo().c_str());
     os::Printer::log("Vulkan renderer", m_properties.deviceName);
@@ -686,6 +694,12 @@ void GEVulkanDriver::destroyVulkan()
     {
         m_transparent_texture->drop();
         m_transparent_texture = NULL;
+    }
+    if (m_occlusion_manager)
+    {
+        delete m_occlusion_manager;
+        m_occlusion_manager = NULL;
+        MaskedOcclusionCulling::Destroy(m_occlusion);
     }
     if (m_billboard_quad)
     {
@@ -1903,6 +1917,146 @@ bool GEVulkanDriver::endScene()
 
     return (result != VK_ERROR_OUT_OF_DATE_KHR && result != VK_SUBOPTIMAL_KHR);
 }   // endScene
+
+// ----------------------------------------------------------------------------
+void GEVulkanDriver::addOcclusionQuery(scene::ISceneNode* node,
+                                    const scene::IMesh* mesh)
+{
+    int voffset = 0;
+    int ioffset = 0;
+
+    for (int i = 0; i < mesh->getMeshBufferCount(); i++)
+    {
+        scene::IMeshBuffer *mesh_buffer = mesh->getMeshBuffer(i);
+        voffset += mesh_buffer->getVertexCount();
+        ioffset += mesh_buffer->getIndexCount();
+    }
+    
+    m_occlusion_vertices[node].resize(voffset * 3);
+    m_occlusion_indices[node].resize(ioffset);
+
+    int vit = 0;
+    int iit = 0;
+
+    for (int i = 0; i < mesh->getMeshBufferCount(); i++)
+    {
+        scene::IMeshBuffer *mesh_buffer = mesh->getMeshBuffer(i);
+        
+        int offset = vit;
+        for (int j = 0; j < mesh_buffer->getVertexCount(); j++)
+        {
+            m_occlusion_vertices[node][voffset * 0 + vit] = ((float*)mesh_buffer->getVertices())[12 * j];
+            m_occlusion_vertices[node][voffset * 1 + vit] = ((float*)mesh_buffer->getVertices())[12 * j + 1];
+            m_occlusion_vertices[node][voffset * 2 + vit] = ((float*)mesh_buffer->getVertices())[12 * j + 2];
+            vit++;
+        }
+        for (int j = 0; j < mesh_buffer->getIndexCount(); j++)
+        {
+            m_occlusion_indices[node][iit] = mesh_buffer->getIndices()[j] + offset;
+            iit++;
+        }
+    }
+    CNullDriver::addOcclusionQuery(node);
+}
+
+// ----------------------------------------------------------------------------
+void GEVulkanDriver::removeOcclusionQuery(scene::ISceneNode* node)
+{
+    CNullDriver::removeOcclusionQuery(node);
+}
+
+// ----------------------------------------------------------------------------
+void GEVulkanDriver::runOcclusionQuery(scene::ISceneNode* node, bool visible)
+{
+    if (!visible)
+    {
+        return;
+    }
+    s32 index = OcclusionQueries.linear_search(SOccQuery(node));
+
+    const scene::IMesh *mesh = OcclusionQueries[index].Mesh;
+    GEVulkanCameraSceneNode *camera =
+        static_cast<GEVulkanCameraSceneNode*>(m_irrlicht_device->getSceneManager()->getActiveCamera());
+    core::matrix4 matrix = camera->getPVM() * node->getAbsoluteTransformation();
+    m_occlusion_manager->SetMatrix(matrix.pointer());
+
+    int offset = m_occlusion_vertices[node].size() / 3;
+    m_occlusion_manager->SetVertexLayout(MaskedOcclusionCulling::VertexLayout(
+        sizeof(float), sizeof(float) * offset, sizeof(float) * offset * 2));
+
+    m_occlusion_manager->RenderTriangles(
+        m_occlusion_vertices[node].data(),
+        m_occlusion_indices[node].data(),
+        m_occlusion_indices[node].size() / 3,
+        MaskedOcclusionCulling::BACKFACE_CCW,
+        MaskedOcclusionCulling::CLIP_PLANE_ALL);
+
+    m_occlusion_manager->Flush();
+}
+
+// ----------------------------------------------------------------------------
+void GEVulkanDriver::runAllOcclusionQueries(bool visible)
+{
+    m_occlusion_manager->SetNearClipPlane(0.0f);
+    m_occlusion_manager->ClearBuffer();
+    m_occlusion_manager->WakeThreads();
+    CNullDriver::runAllOcclusionQueries(visible);
+    m_occlusion_manager->SuspendThreads();
+}
+
+// ----------------------------------------------------------------------------
+void GEVulkanDriver::updateOcclusionQuery(scene::ISceneNode* node, bool block)
+{
+    
+}
+
+// ----------------------------------------------------------------------------
+u32 GEVulkanDriver::getOcclusionQueryResult(scene::ISceneNode* node) const
+{
+    if (OcclusionQueries.empty())
+    {
+        return 1;
+    }
+    core::aabbox3df bbox = node->getBoundingBox();
+    if (bbox.isPointInside(m_irrlicht_device->getSceneManager()->getActiveCamera()->getPosition()))
+    {
+        return 1;
+    }
+
+    std::vector<float> vertices;
+    vertices.resize(24);
+
+    for (int i = 0; i < 8; i++)
+    {
+        vertices[i * 3] = i & 4 ? bbox.MaxEdge.X : bbox.MinEdge.X;            
+        vertices[i * 3 + 1] = i & 2 ? bbox.MaxEdge.Y : bbox.MinEdge.Y;
+        vertices[i * 3 + 2] = i & 1 ? bbox.MaxEdge.Z : bbox.MinEdge.Z;
+    }
+
+    GEVulkanCameraSceneNode *camera =
+        static_cast<GEVulkanCameraSceneNode*>(m_irrlicht_device->getSceneManager()->getActiveCamera());
+    core::matrix4 matrix = camera->getPVM() * node->getAbsoluteTransformation();
+
+    std::vector<float> trans_vertices;
+    trans_vertices.resize(32);
+    m_occlusion->TransformVertices(matrix.pointer(), vertices.data(), trans_vertices.data(), 8);
+
+    float x1 = trans_vertices[0] / trans_vertices[3], x2 = trans_vertices[0] / trans_vertices[3];
+    float y1 = trans_vertices[1] / trans_vertices[3], y2 = trans_vertices[1] / trans_vertices[3];
+    float w1 = trans_vertices[3];
+
+    for (int i = 1; i < 8; i++)
+    {
+        x1 = std::min(x1, trans_vertices[i * 4] / trans_vertices[i * 4 + 3]);
+        x2 = std::max(x2, trans_vertices[i * 4] / trans_vertices[i * 4 + 3]);
+        y1 = std::min(y1, trans_vertices[i * 4 + 1] / trans_vertices[i * 4 + 3]);
+        y2 = std::max(y2, trans_vertices[i * 4 + 1] / trans_vertices[i * 4 + 3]);
+        w1 = std::min(w1, trans_vertices[i * 4 + 3]);
+    }
+    if (w1 < 0.0f) return 1;
+    MaskedOcclusionCulling::CullingResult res = m_occlusion_manager->TestRect(x1, y1, x2, y2, w1);
+    return res == MaskedOcclusionCulling::CullingResult::VISIBLE ? 1 : 0;
+}
 
 // ----------------------------------------------------------------------------
 void GEVulkanDriver::draw2DVertexPrimitiveList(const void* vertices,

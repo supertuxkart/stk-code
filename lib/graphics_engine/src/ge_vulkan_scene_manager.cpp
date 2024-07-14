@@ -168,7 +168,7 @@ void GEVulkanSceneManager::drawAllInternal()
         if (it == m_draw_calls.end())
             return;
 
-        it->second->prepare(cam);
+        it->second->prepare(static_cast<GEVulkanDriver*>(getVideoDriver()), cam);
         OnRegisterSceneNode();
         it->second->generate(static_cast<GEVulkanDriver*>(getVideoDriver()));
     }

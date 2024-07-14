@@ -9,15 +9,19 @@
 namespace GE
 {
 // ----------------------------------------------------------------------------
-void GECullingTool::init(GEVulkanCameraSceneNode* cam)
+void GECullingTool::init(irr::video::IVideoDriver *driver, GEVulkanCameraSceneNode* cam)
 {
+    m_driver = driver;
     mathPlaneFrustumf(&m_frustum[0].X, cam->getPVM());
     m_cam_bbox = cam->getViewFrustum()->getBoundingBox();
+    m_results.clear();
 }   // init
 
 // ----------------------------------------------------------------------------
 bool GECullingTool::isCulled(irr::core::aabbox3df& bb)
 {
+    if (m_results.find(bb) != m_results.end())
+        return m_results[bb];
     if (!m_cam_bbox.intersectsWithBox(bb))
         return true;
 
@@ -57,7 +61,7 @@ bool GECullingTool::isCulled(GESPMBuffer* buffer, irr::scene::ISceneNode* node)
 {
     irr::core::aabbox3df bb = buffer->getBoundingBox();
     node->getAbsoluteTransformation().transformBoxEx(bb);
-    return isCulled(bb);
+    return isCulled(bb) || !m_driver->getOcclusionQueryResult(node);
 }   // isCulled
 
 }

@@ -190,6 +190,7 @@ bool GEVulkanDynamicBuffer::setCurrentData(const std::vector<
 // ----------------------------------------------------------------------------
 bool GEVulkanDynamicBuffer::resizeIfNeeded(size_t new_size)
 {
+    //printf("%d\n", new_size);
     if (new_size > m_size)
     {
         destroy();

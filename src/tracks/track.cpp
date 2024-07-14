@@ -1300,6 +1300,7 @@ bool Track::loadMainTrack(const XMLNode &root)
     // The merged mesh is grabbed by the octtree, so we don't need
     // to keep a reference to it.
     scene_node = irr_driver->addMesh(tangent_mesh, "track_main");
+    irr_driver->getVideoDriver()->addOcclusionQuery(scene_node, tangent_mesh);
     // We should drop the merged mesh (since it's now referred to in the
     // scene node), but then we need to grab it since it's in the
     // m_all_cached_meshes.

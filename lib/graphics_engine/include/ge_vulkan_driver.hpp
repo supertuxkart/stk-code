@@ -9,6 +9,7 @@
 #include "ge_vma.hpp"
 #include "SDL_video.h"
 
+#include "occlusion/CullingThreadpool.h"
 #include "../source/Irrlicht/CNullDriver.h"
 #include "SIrrCreationParameters.h"
 #include "SColor.h"
@@ -110,26 +111,28 @@ namespace GE
         //! Create occlusion query.
         /** Use node for identification and mesh for occlusion test. */
         virtual void addOcclusionQuery(scene::ISceneNode* node,
-                const scene::IMesh* mesh=0) {}
+                const scene::IMesh* mesh=0);
 
         //! Remove occlusion query.
-        virtual void removeOcclusionQuery(scene::ISceneNode* node) {}
+        virtual void removeOcclusionQuery(scene::ISceneNode* node);
 
         //! Run occlusion query. Draws mesh stored in query.
         /** If the mesh shall not be rendered visible, use
         overrideMaterial to disable the color and depth buffer. */
-        virtual void runOcclusionQuery(scene::ISceneNode* node, bool visible=false) {}
+        virtual void runOcclusionQuery(scene::ISceneNode* node, bool visible=false);
+
+        virtual void runAllOcclusionQueries(bool visible=false);
 
         //! Update occlusion query. Retrieves results from GPU.
         /** If the query shall not block, set the flag to false.
         Update might not occur in this case, though */
-        virtual void updateOcclusionQuery(scene::ISceneNode* node, bool block=true) {}
+        virtual void updateOcclusionQuery(scene::ISceneNode* node, bool block=true);
 
         //! Return query result.
         /** Return value is the number of visible pixels/fragments.
         The value is a safe approximation, i.e. can be larger then the
         actual value of pixels. */
-        virtual u32 getOcclusionQueryResult(scene::ISceneNode* node) const { return 0; }
+        virtual u32 getOcclusionQueryResult(scene::ISceneNode* node) const;
 
         //! draws a vertex primitive list
         virtual void drawVertexPrimitiveList(const void* vertices, u32 vertexCount,
@@ -507,6 +510,11 @@ namespace GE
         core::rect<s32> m_clip;
         core::rect<s32> m_viewport;
         core::matrix4 m_pre_rotation_matrix;
+
+        MaskedOcclusionCulling *m_occlusion;
+        CullingThreadpool *m_occlusion_manager;
+        std::unordered_map<scene::ISceneNode*, std::vector<float> > m_occlusion_vertices;
+        std::unordered_map<scene::ISceneNode*, std::vector<unsigned> > m_occlusion_indices;
 
         video::ITexture* m_white_texture;
         video::ITexture* m_transparent_texture;

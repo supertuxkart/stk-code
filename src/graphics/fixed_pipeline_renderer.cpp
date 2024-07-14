@@ -54,8 +54,13 @@ void FixedPipelineRenderer::render(float dt, bool is_loading)
 
     for(unsigned int i=0; i<Camera::getNumCameras(); i++)
     {
+        std::ostringstream oss2;
+        oss2 << "Occlusion culling";
+        PROFILER_PUSH_CPU_MARKER(oss2.str().c_str(), 114,
+                                    0x00, 0x00);
+        irr_driver->getVideoDriver()->runAllOcclusionQueries(true);
+        PROFILER_POP_CPU_MARKER();
         Camera *camera = Camera::getCamera(i);
-
         std::ostringstream oss;
         oss << "drawAll() for kart " << i;
         PROFILER_PUSH_CPU_MARKER(oss.str().c_str(), (i+1)*60,

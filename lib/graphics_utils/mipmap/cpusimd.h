@@ -34,61 +34,6 @@
 ////
 #include <simd_wrapper.h>
 
-#if __SSE4A__ || CPU_ENABLE_SSE4A
- #include <ammintrin.h>
- #define CPU_SSE4A_SUPPORT (1)
-#endif
-#if __AVX__ || CPU_ENABLE_AVX
- #include <immintrin.h>
- #define CPU_AVX_SUPPORT (1)
-#endif
-#if __AVX2__ || CPU_ENABLE_AVX2
- #include <immintrin.h>
- #define CPU_AVX2_SUPPORT (1)
-#endif
-#if __XOP__ || CPU_ENABLE_XOP
- #include <immintrin.h>
- #define CPU_XOP_SUPPORT (1)
-#endif
-#if __FMA3__ || CPU_ENABLE_FMA3
- #include <immintrin.h>
- #define CPU_FMA3_SUPPORT (1)
-#endif
-#if __FMA4__ || CPU_ENABLE_FMA4
- #include <immintrin.h>
- #define CPU_FMA4_SUPPORT (1)
-#endif
-#if __RDRND__ || CPU_ENABLE_RDRND
- #include <immintrin.h>
- #define CPU_RDRND_SUPPORT (1)
-#endif
-#if __POPCNT__ || CPU_ENABLE_POPCNT
- #include <popcntintrin.h>
- #define CPU_POPCNT_SUPPORT (1)
-#endif
-#if __LZCNT__ || CPU_ENABLE_LZCNT
- #include <x86intrin.h>
- #define CPU_LZCNT_SUPPORT (1)
-#endif
-#if __F16C__ || CPU_ENABLE_F16C
- #include <x86intrin.h>
- #define CPU_F16C_SUPPORT (1)
-#endif
-#if __BMI__ || CPU_ENABLE_BMI
- #include <x86intrin.h>
- #define CPU_BMI_SUPPORT (1)
-#endif
-#if __BMI2__ || CPU_ENABLE_BMI2
- #include <x86intrin.h>
- #define CPU_BMI2_SUPPORT (1)
-#endif
-#if __TBM__ || CPU_ENABLE_TBM
- #include <x86intrin.h>
- #define CPU_TBM_SUPPORT (1)
-#endif
-
-
-
 #if defined(__GNUC__) || defined(__INTEL_COMPILER)
  #define CPU_ALIGN16 __attribute__((aligned(16)))
  #define CPU_ALIGN32 __attribute__((aligned(32)))
