@@ -22,6 +22,7 @@
  *
  * Copyright:
  *   2020      Evan Nemerson <evan@nemerson.com>
+ *   2023      Yi-Yen Chung <eric681@andestech.com> (Copyright owned by Andes Technology)
  */
 
 /* TODO: float fallbacks should use vclt(a, vdup_n(0.0)) */
@@ -79,6 +80,42 @@ simde_vcltzs_f32(simde_float32_t a) {
 #if defined(SIMDE_ARM_NEON_A64V8_ENABLE_NATIVE_ALIASES)
   #undef vcltzs_f32
   #define vcltzs_f32(a) simde_vcltzs_f32(a)
+#endif
+
+SIMDE_FUNCTION_ATTRIBUTES
+uint16_t
+simde_vcltzh_f16(simde_float16_t a) {
+  #if defined(SIMDE_ARM_NEON_A64V8_NATIVE) && defined(SIMDE_ARM_NEON_FP16)
+    return HEDLEY_STATIC_CAST(uint16_t, vcltzh_f16(a));
+  #else
+    return (simde_float16_to_float32(a) < SIMDE_FLOAT32_C(0.0)) ? UINT16_MAX : 0;
+  #endif
+}
+#if defined(SIMDE_ARM_NEON_A64V8_ENABLE_NATIVE_ALIASES)
+  #undef vcltzh_f16
+  #define vcltzh_f16(a) simde_vcltzh_f16(a)
+#endif
+
+SIMDE_FUNCTION_ATTRIBUTES
+simde_uint16x4_t
+simde_vcltz_f16(simde_float16x4_t a) {
+  #if defined(SIMDE_ARM_NEON_A32V8_NATIVE) && defined(SIMDE_ARM_NEON_FP16)
+    return vcltz_f16(a);
+  #else
+    simde_float16x4_private a_ = simde_float16x4_to_private(a);
+    simde_uint16x4_private r_;
+
+    SIMDE_VECTORIZE
+    for (size_t i = 0 ; i < (sizeof(r_.values) / sizeof(r_.values[0])) ; i++) {
+      r_.values[i] = simde_vcltzh_f16(a_.values[i]);
+    }
+
+    return simde_uint16x4_from_private(r_);
+  #endif
+}
+#if defined(SIMDE_ARM_NEON_A32V7_ENABLE_NATIVE_ALIASES)
+  #undef vcltz_f16
+  #define vcltz_f16(a) simde_vcltz_f16(a)
 #endif
 
 SIMDE_FUNCTION_ATTRIBUTES
@@ -199,6 +236,28 @@ simde_vcltz_s64(simde_int64x1_t a) {
 #if defined(SIMDE_ARM_NEON_A32V7_ENABLE_NATIVE_ALIASES)
   #undef vcltz_s64
   #define vcltz_s64(a) simde_vcltz_s64(a)
+#endif
+
+SIMDE_FUNCTION_ATTRIBUTES
+simde_uint16x8_t
+simde_vcltzq_f16(simde_float16x8_t a) {
+  #if defined(SIMDE_ARM_NEON_A32V8_NATIVE) && defined(SIMDE_ARM_NEON_FP16)
+    return vcltzq_f16(a);
+  #else
+    simde_float16x8_private a_ = simde_float16x8_to_private(a);
+    simde_uint16x8_private r_;
+
+    SIMDE_VECTORIZE
+    for (size_t i = 0 ; i < (sizeof(r_.values) / sizeof(r_.values[0])) ; i++) {
+      r_.values[i] = simde_vcltzh_f16(a_.values[i]);
+    }
+
+    return simde_uint16x8_from_private(r_);
+  #endif
+}
+#if defined(SIMDE_ARM_NEON_A32V8_ENABLE_NATIVE_ALIASES)
+  #undef vcltzq_f16
+  #define vcltzq_f16(a) simde_vcltzq_f16(a)
 #endif
 
 SIMDE_FUNCTION_ATTRIBUTES

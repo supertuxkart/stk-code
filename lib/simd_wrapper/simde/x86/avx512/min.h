@@ -581,6 +581,30 @@ simde_mm512_maskz_min_pd(simde__mmask8 k, simde__m512d a, simde__m512d b) {
   #define _mm512_maskz_min_pd(k, a, b) simde_mm512_maskz_min_pd(k, a, b)
 #endif
 
+SIMDE_FUNCTION_ATTRIBUTES
+simde__m512h
+simde_mm512_min_ph (simde__m512h a, simde__m512h b) {
+  #if defined(SIMDE_X86_AVX512FP16_NATIVE)
+    return _mm512_min_ph(a, b);
+  #else
+    simde__m512h_private
+      r_,
+      a_ = simde__m512h_to_private(a),
+      b_ = simde__m512h_to_private(b);
+
+    SIMDE_VECTORIZE
+    for (size_t i = 0 ; i < (sizeof(r_.f16) / sizeof(r_.f16[0])) ; i++) {
+      r_.f16[i] = simde_float16_to_float32(a_.f16[i]) < simde_float16_to_float32(b_.f16[i]) ? a_.f16[i] : b_.f16[i];
+    }
+
+    return simde__m512h_from_private(r_);
+  #endif
+}
+#if defined(SIMDE_X86_AVX512FP16_ENABLE_NATIVE_ALIASES)
+  #undef _mm512_min_ph
+  #define _mm512_min_ph(a, b) simde_mm512_min_ph(a, b)
+#endif
+
 SIMDE_END_DECLS_
 HEDLEY_DIAGNOSTIC_POP
 

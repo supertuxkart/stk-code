@@ -703,8 +703,8 @@ simde_mm256_permutex2var_epi16 (simde__m256i a, simde__m256i idx, simde__m256i b
                                                  _mm256_castsi256_ps(tb),
                                                  _mm256_castsi256_ps(select)));
 
-    lo = HEDLEY_REINTERPRET_CAST(__typeof__(lo), _mm256_blend_epi16(_mm256_slli_epi32(hilo2, 16), hilo, 0x55));
-    hi = HEDLEY_REINTERPRET_CAST(__typeof__(hi), _mm256_blend_epi16(hilo2, _mm256_srli_epi32(hilo, 16), 0x55));
+    lo = _mm256_blend_epi16(_mm256_slli_epi32(hilo2, 16), hilo, 0x55);
+    hi = _mm256_blend_epi16(hilo2, _mm256_srli_epi32(hilo, 16), 0x55);
 
     select = _mm256_cmpeq_epi16(_mm256_and_si256(idx, ones), ones);
     return _mm256_blendv_epi8(lo, hi, select);
@@ -1178,8 +1178,8 @@ simde_mm512_permutex2var_epi16 (simde__m512i a, simde__m512i idx, simde__m512i b
                                                      _mm256_castsi256_ps(hilo2),
                                                      _mm256_castsi256_ps(select)));
 
-        lo = HEDLEY_REINTERPRET_CAST(__typeof__(lo), _mm256_blend_epi16(_mm256_slli_epi32(hilo2, 16), hilo1, 0x55));
-        hi = HEDLEY_REINTERPRET_CAST(__typeof__(hi), _mm256_blend_epi16(hilo2, _mm256_srli_epi32(hilo1, 16), 0x55));
+        lo = _mm256_blend_epi16(_mm256_slli_epi32(hilo2, 16), hilo1, 0x55);
+        hi = _mm256_blend_epi16(hilo2, _mm256_srli_epi32(hilo1, 16), 0x55);
 
         select = _mm256_cmpeq_epi16(_mm256_and_si256(idx1, ones), ones);
         r_.m256i[i] = _mm256_blendv_epi8(lo, hi, select);

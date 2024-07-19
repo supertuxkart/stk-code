@@ -26,7 +26,7 @@
  */
 
 /* This is a SIMDe extension which is not part of AVX-512.  It exists
- * because a lot of numerical methods in SIMDe have algoriths which do
+ * because a lot of numerical methods in SIMDe have algorithms which do
  * something like:
  *
  *   float sgn = input < 0 ? -1 : 1;

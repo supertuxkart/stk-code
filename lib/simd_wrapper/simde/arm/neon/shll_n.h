@@ -46,7 +46,7 @@ SIMDE_BEGIN_DECLS_
 SIMDE_FUNCTION_ATTRIBUTES
 simde_int16x8_t
 simde_vshll_n_s8 (const simde_int8x8_t a, const int n)
-    SIMDE_REQUIRE_CONSTANT_RANGE(n, 1, 7) {
+    SIMDE_REQUIRE_CONSTANT_RANGE(n, 0, 8) {
   simde_int16x8_private r_;
   simde_int8x8_private a_ = simde_int8x8_to_private(a);
 
@@ -68,7 +68,7 @@ simde_vshll_n_s8 (const simde_int8x8_t a, const int n)
 SIMDE_FUNCTION_ATTRIBUTES
 simde_int32x4_t
 simde_vshll_n_s16 (const simde_int16x4_t a, const int n)
-    SIMDE_REQUIRE_CONSTANT_RANGE(n, 1, 15) {
+    SIMDE_REQUIRE_CONSTANT_RANGE(n, 0, 16) {
   simde_int32x4_private r_;
   simde_int16x4_private a_ = simde_int16x4_to_private(a);
 
@@ -90,7 +90,7 @@ simde_vshll_n_s16 (const simde_int16x4_t a, const int n)
 SIMDE_FUNCTION_ATTRIBUTES
 simde_int64x2_t
 simde_vshll_n_s32 (const simde_int32x2_t a, const int n)
-    SIMDE_REQUIRE_CONSTANT_RANGE(n, 1, 31) {
+    SIMDE_REQUIRE_CONSTANT_RANGE(n, 0, 32) {
   simde_int64x2_private r_;
   simde_int32x2_private a_ = simde_int32x2_to_private(a);
 
@@ -112,7 +112,7 @@ simde_vshll_n_s32 (const simde_int32x2_t a, const int n)
 SIMDE_FUNCTION_ATTRIBUTES
 simde_uint16x8_t
 simde_vshll_n_u8 (const simde_uint8x8_t a, const int n)
-    SIMDE_REQUIRE_CONSTANT_RANGE(n, 1, 7) {
+    SIMDE_REQUIRE_CONSTANT_RANGE(n, 0, 8) {
   simde_uint16x8_private r_;
   simde_uint8x8_private a_ = simde_uint8x8_to_private(a);
 
@@ -134,7 +134,7 @@ simde_vshll_n_u8 (const simde_uint8x8_t a, const int n)
 SIMDE_FUNCTION_ATTRIBUTES
 simde_uint32x4_t
 simde_vshll_n_u16 (const simde_uint16x4_t a, const int n)
-    SIMDE_REQUIRE_CONSTANT_RANGE(n, 1, 15) {
+    SIMDE_REQUIRE_CONSTANT_RANGE(n, 0, 16) {
   simde_uint32x4_private r_;
   simde_uint16x4_private a_ = simde_uint16x4_to_private(a);
 
@@ -156,7 +156,7 @@ simde_vshll_n_u16 (const simde_uint16x4_t a, const int n)
 SIMDE_FUNCTION_ATTRIBUTES
 simde_uint64x2_t
 simde_vshll_n_u32 (const simde_uint32x2_t a, const int n)
-    SIMDE_REQUIRE_CONSTANT_RANGE(n, 1, 31) {
+    SIMDE_REQUIRE_CONSTANT_RANGE(n, 0, 32) {
   simde_uint64x2_private r_;
   simde_uint32x2_private a_ = simde_uint32x2_to_private(a);
 

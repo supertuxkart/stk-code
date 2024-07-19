@@ -34,6 +34,54 @@ SIMDE_DISABLE_UNWANTED_DIAGNOSTICS
 SIMDE_BEGIN_DECLS_
 
 SIMDE_FUNCTION_ATTRIBUTES
+simde__m512d
+simde_mm512_load_pd (void const * mem_addr) {
+  #if defined(SIMDE_X86_AVX512F_NATIVE)
+    return _mm512_load_pd(SIMDE_ALIGN_ASSUME_LIKE(mem_addr, simde__m512d));
+  #else
+    simde__m512d r;
+    simde_memcpy(&r, SIMDE_ALIGN_ASSUME_LIKE(mem_addr, simde__m512d), sizeof(r));
+    return r;
+  #endif
+}
+#if defined(SIMDE_X86_AVX512F_ENABLE_NATIVE_ALIASES)
+  #undef _mm512_load_pd
+  #define _mm512_load_pd(a) simde_mm512_load_pd(a)
+#endif
+
+SIMDE_FUNCTION_ATTRIBUTES
+simde__m512
+simde_mm512_load_ps (void const * mem_addr) {
+  #if defined(SIMDE_X86_AVX512F_NATIVE)
+    return _mm512_load_ps(SIMDE_ALIGN_ASSUME_LIKE(mem_addr, simde__m512));
+  #else
+    simde__m512 r;
+    simde_memcpy(&r, SIMDE_ALIGN_ASSUME_LIKE(mem_addr, simde__m512), sizeof(r));
+    return r;
+  #endif
+}
+#if defined(SIMDE_X86_AVX512F_ENABLE_NATIVE_ALIASES)
+  #undef _mm512_load_ps
+  #define _mm512_load_ps(a) simde_mm512_load_ps(a)
+#endif
+
+SIMDE_FUNCTION_ATTRIBUTES
+simde__m512h
+simde_mm512_load_ph (void const * mem_addr) {
+  #if defined(SIMDE_X86_AVX512FP16_NATIVE)
+    return _mm512_load_ph(SIMDE_ALIGN_ASSUME_LIKE(mem_addr, simde__m512h));
+  #else
+    simde__m512h r;
+    simde_memcpy(&r, SIMDE_ALIGN_ASSUME_LIKE(mem_addr, simde__m512h), sizeof(r));
+    return r;
+  #endif
+}
+#if defined(SIMDE_X86_AVX512FP16_ENABLE_NATIVE_ALIASES)
+  #undef _mm512_load_ph
+  #define _mm512_load_ph(a) simde_mm512_load_ph(a)
+#endif
+
+SIMDE_FUNCTION_ATTRIBUTES
 simde__m512i
 simde_mm512_load_si512 (void const * mem_addr) {
   #if defined(SIMDE_X86_AVX512F_NATIVE)

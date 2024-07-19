@@ -73,7 +73,7 @@ SIMDE_BEGIN_DECLS_
 #endif
 #if defined(SIMDE_X86_AVX512F_ENABLE_NATIVE_ALIASES) && defined(SIMDE_X86_AVX512VL_ENABLE_NATIVE_ALIASES)
   #undef _mm_maskz_ror_epi32
-  #define _mm_maskz_ror_epi32(src, k, a, imm8) simde_mm_maskz_ror_epi32(src, k, a, imm8)
+  #define _mm_maskz_ror_epi32(k, a, imm8) simde_mm_maskz_ror_epi32(k, a, imm8)
 #endif
 
 #if defined(SIMDE_X86_AVX512F_NATIVE) && defined(SIMDE_X86_AVX512VL_NATIVE)

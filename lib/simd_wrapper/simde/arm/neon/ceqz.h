@@ -23,6 +23,7 @@
  * Copyright:
  *   2020      Evan Nemerson <evan@nemerson.com>
  *   2020      Sean Maher <seanptmaher@gmail.com> (Copyright owned by Google, LLC)
+ *   2023      Yi-Yen Chung <eric681@andestech.com> (Copyright owned by Andes Technology)
  */
 
 #if !defined(SIMDE_ARM_NEON_CEQZ_H)
@@ -375,7 +376,7 @@ simde_vceqzd_u64(uint64_t a) {
 
 SIMDE_FUNCTION_ATTRIBUTES
 uint16_t
-simde_vceqzh_f16(simde_float16 a) {
+simde_vceqzh_f16(simde_float16_t a) {
   #if defined(SIMDE_ARM_NEON_A64V8_NATIVE) && defined(SIMDE_ARM_NEON_FP16)
     return vceqzh_f16(a);
   #else
@@ -413,6 +414,62 @@ simde_vceqzd_f64(simde_float64_t a) {
 #if defined(SIMDE_ARM_NEON_A32V7_ENABLE_NATIVE_ALIASES)
   #undef vceqzd_f64
   #define vceqzd_f64(a) simde_vceqzd_f64((a))
+#endif
+
+SIMDE_FUNCTION_ATTRIBUTES
+simde_uint8x8_t
+simde_vceqz_p8(simde_poly8x8_t a) {
+  #if defined(SIMDE_ARM_NEON_A64V8_NATIVE)
+    return vceqz_p8(a);
+  #else
+    return simde_vceq_p8(a, simde_vdup_n_p8(0));
+  #endif
+}
+#if defined(SIMDE_ARM_NEON_A64V8_ENABLE_NATIVE_ALIASES)
+  #undef vceqz_p8
+  #define vceqz_p8(a) simde_vceqz_p8((a))
+#endif
+
+SIMDE_FUNCTION_ATTRIBUTES
+simde_uint8x16_t
+simde_vceqzq_p8(simde_poly8x16_t a) {
+  #if defined(SIMDE_ARM_NEON_A64V8_NATIVE)
+    return vceqzq_p8(a);
+  #else
+    return simde_vceqq_p8(a, simde_vdupq_n_p8(0));
+  #endif
+}
+#if defined(SIMDE_ARM_NEON_A64V8_ENABLE_NATIVE_ALIASES)
+  #undef vceqzq_p8
+  #define vceqzq_p8(a) simde_vceqzq_p8((a))
+#endif
+
+SIMDE_FUNCTION_ATTRIBUTES
+simde_uint64x1_t
+simde_vceqz_p64(simde_poly64x1_t a) {
+  #if defined(SIMDE_ARM_NEON_A64V8_NATIVE)
+    return vceqz_p64(a);
+  #else
+    return simde_vceq_p64(a, simde_vdup_n_p64(0));
+  #endif
+}
+#if defined(SIMDE_ARM_NEON_A64V8_ENABLE_NATIVE_ALIASES)
+  #undef vceqz_p64
+  #define vceqz_p64(a) simde_vceqz_p64((a))
+#endif
+
+SIMDE_FUNCTION_ATTRIBUTES
+simde_uint64x2_t
+simde_vceqzq_p64(simde_poly64x2_t a) {
+  #if defined(SIMDE_ARM_NEON_A64V8_NATIVE)
+    return vceqzq_p64(a);
+  #else
+    return simde_vceqq_p64(a, simde_vdupq_n_p64(0));
+  #endif
+}
+#if defined(SIMDE_ARM_NEON_A64V8_ENABLE_NATIVE_ALIASES)
+  #undef vceqzq_p64
+  #define vceqzq_p64(a) simde_vceqzq_p64((a))
 #endif
 
 SIMDE_END_DECLS_

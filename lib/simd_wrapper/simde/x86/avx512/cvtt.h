@@ -98,6 +98,32 @@ simde_mm_maskz_cvttpd_epi64(simde__mmask8 k, simde__m128d a) {
   #define _mm_maskz_cvttpd_epi64(k, a) simde_mm_maskz_cvttpd_epi64(k, a)
 #endif
 
+SIMDE_FUNCTION_ATTRIBUTES
+simde__m512i
+simde_mm512_cvttps_epi32 (simde__m512 a) {
+  #if defined(SIMDE_X86_AVX512F_NATIVE)
+    return _mm512_cvttps_epi32(a);
+  #else
+    simde__m512i_private r_;
+    simde__m512_private a_ = simde__m512_to_private(a);
+
+    #if defined(simde_math_truncf)
+      SIMDE_VECTORIZE
+      for (size_t i = 0 ; i < (sizeof(r_.i32) / sizeof(r_.i32[0])) ; i++) {
+        r_.i32[i] = SIMDE_CONVERT_FTOI(int32_t, simde_math_truncf(a_.f32[i]));
+      }
+    #else
+      HEDLEY_UNREACHABLE();
+    #endif
+
+    return simde__m512i_from_private(r_);
+  #endif
+}
+#if defined(SIMDE_X86_AVX512F_ENABLE_NATIVE_ALIASES)
+  #undef _mm512_cvttps_epi32
+  #define _mm512_cvttps_epi32(a) simde_mm512_cvttps_epi32(a)
+#endif
+
 SIMDE_END_DECLS_
 HEDLEY_DIAGNOSTIC_POP
 

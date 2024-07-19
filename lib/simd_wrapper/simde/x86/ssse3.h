@@ -334,6 +334,9 @@ simde_mm_shuffle_epi8 (simde__m128i a, simde__m128i b) {
       SIMDE_POWER_ALTIVEC_VECTOR(signed char) msb_mask = HEDLEY_REINTERPRET_CAST(SIMDE_POWER_ALTIVEC_VECTOR(signed char), vec_cmplt(b_.altivec_i8, z));
       SIMDE_POWER_ALTIVEC_VECTOR(signed char) c = vec_perm(a_.altivec_i8, a_.altivec_i8, HEDLEY_REINTERPRET_CAST(SIMDE_POWER_ALTIVEC_VECTOR(unsigned char), b_.altivec_i8));
       r_.altivec_i8 = vec_sel(c, z, HEDLEY_REINTERPRET_CAST(SIMDE_POWER_ALTIVEC_VECTOR(unsigned char), msb_mask));
+    #elif defined(SIMDE_WASM_SIMD128_NATIVE)
+      r_.wasm_v128 = wasm_i8x16_swizzle(
+        a_.wasm_v128, wasm_v128_and(b_.wasm_v128, wasm_i8x16_splat(0x8F)));
     #else
       for (size_t i = 0 ; i < (sizeof(r_.i8) / sizeof(r_.i8[0])) ; i++) {
         r_.i8[i] = a_.i8[b_.i8[i] & 15] & (~(b_.i8[i]) >> 7);
@@ -763,6 +766,15 @@ simde_mm_mulhrs_epi16 (simde__m128i a, simde__m128i b) {
 
       /* Join together */
       r_.neon_i16 = vcombine_s16(narrow_lo, narrow_hi);
+    #elif defined(SIMDE_WASM_SIMD128_NATIVE)
+        v128_t __lo = wasm_i32x4_mul(wasm_i32x4_extend_low_i16x8(a_.wasm_v128), wasm_i32x4_extend_low_i16x8(b_.wasm_v128));
+        v128_t __hi = wasm_i32x4_mul(wasm_i32x4_extend_high_i16x8(a_.wasm_v128), wasm_i32x4_extend_high_i16x8(b_.wasm_v128));
+        const v128_t __inc = wasm_i32x4_splat(0x4000);
+        __lo = wasm_i32x4_add(__lo, __inc);
+        __hi = wasm_i32x4_add(__hi, __inc);
+        __lo = wasm_i32x4_add(__lo, __lo);
+        __hi = wasm_i32x4_add(__hi, __hi);
+        r_.wasm_v128 = wasm_i16x8_shuffle(__lo, __hi, 1, 3, 5, 7, 9, 11, 13, 15);
     #else
       SIMDE_VECTORIZE
       for (size_t i = 0 ; i < (sizeof(r_.i16) / sizeof(r_.i16[0])) ; i++) {

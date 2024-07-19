@@ -66,8 +66,8 @@ simde_mm512_setzero_ps(void) {
   #endif
 }
 #if defined(SIMDE_X86_AVX512F_ENABLE_NATIVE_ALIASES)
-  #undef _mm512_setzero_si512
-  #define _mm512_setzero_si512() simde_mm512_setzero_si512()
+  #undef _mm512_setzero_ps
+  #define _mm512_setzero_ps() simde_mm512_setzero_ps()
 #endif
 
 SIMDE_FUNCTION_ATTRIBUTES
@@ -80,9 +80,24 @@ simde_mm512_setzero_pd(void) {
   #endif
 }
 #if defined(SIMDE_X86_AVX512F_ENABLE_NATIVE_ALIASES)
-  #undef _mm512_setzero_si512
-  #define _mm512_setzero_si512() simde_mm512_setzero_si512()
+  #undef _mm512_setzero_pd
+  #define _mm512_setzero_pd() simde_mm512_setzero_pd()
 #endif
+
+SIMDE_FUNCTION_ATTRIBUTES
+simde__m512h
+simde_mm512_setzero_ph(void) {
+  #if defined(SIMDE_X86_AVX512FP16_NATIVE)
+    return _mm512_setzero_ph();
+  #else
+    return simde_mm512_castsi512_ph(simde_mm512_setzero_si512());
+  #endif
+}
+#if defined(SIMDE_X86_AVX512FP16_ENABLE_NATIVE_ALIASES)
+  #undef _mm512_setzero_ph
+  #define _mm512_setzero_ph() simde_mm512_setzero_ph()
+#endif
+
 
 SIMDE_END_DECLS_
 HEDLEY_DIAGNOSTIC_POP

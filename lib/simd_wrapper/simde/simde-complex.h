@@ -26,7 +26,7 @@
 
 /* Support for complex math.
  *
- * We try to avoid inculding <complex> (in C++ mode) since it pulls in
+ * We try to avoid including <complex> (in C++ mode) since it pulls in
  * a *lot* of code.  Unfortunately this only works for GNU modes (i.e.,
  * -std=gnu++14 not -std=c++14) unless you pass -fext-numeric-literals,
  * but there is no way (AFAICT) to detect that flag so we have to rely

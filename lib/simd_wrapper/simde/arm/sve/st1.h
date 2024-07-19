@@ -37,9 +37,11 @@ void
 simde_svst1_s8(simde_svbool_t pg, int8_t * base, simde_svint8_t data) {
   #if defined(SIMDE_ARM_SVE_NATIVE)
     svst1_s8(pg, base, data);
-  #elif defined(SIMDE_X86_AVX512BW_NATIVE) && (SIMDE_ARM_SVE_VECTOR_SIZE >= 512)
+  #elif defined(SIMDE_X86_AVX512BW_NATIVE) && (SIMDE_ARM_SVE_VECTOR_SIZE >= 512) \
+      && (!defined(HEDLEY_MSVC_VERSION) || HEDLEY_MSVC_VERSION_CHECK(19,20,0))
     _mm512_mask_storeu_epi8(base, simde_svbool_to_mmask64(pg), data.m512i);
-  #elif defined(SIMDE_X86_AVX512BW_NATIVE) && defined(SIMDE_X86_AVX512VL_NATIVE)
+  #elif defined(SIMDE_X86_AVX512BW_NATIVE) && defined(SIMDE_X86_AVX512VL_NATIVE) \
+      && (!defined(HEDLEY_MSVC_VERSION) || HEDLEY_MSVC_VERSION_CHECK(19,20,0))
     _mm256_mask_storeu_epi8(base, simde_svbool_to_mmask32(pg), data.m256i[0]);
   #else
     for (int i = 0 ; i < HEDLEY_STATIC_CAST(int, simde_svcntb()) ; i++) {
@@ -59,10 +61,12 @@ void
 simde_svst1_s16(simde_svbool_t pg, int16_t * base, simde_svint16_t data) {
   #if defined(SIMDE_ARM_SVE_NATIVE)
     svst1_s16(pg, base, data);
-  #elif defined(SIMDE_X86_AVX512BW_NATIVE) && (SIMDE_ARM_SVE_VECTOR_SIZE >= 512)
-     _mm512_mask_storeu_epi16(base, simde_svbool_to_mmask32(pg), data.m512i);
-  #elif defined(SIMDE_X86_AVX512BW_NATIVE) && defined(SIMDE_X86_AVX512VL_NATIVE)
-     _mm256_mask_storeu_epi16(base, simde_svbool_to_mmask16(pg), data.m256i[0]);
+  #elif defined(SIMDE_X86_AVX512BW_NATIVE) && (SIMDE_ARM_SVE_VECTOR_SIZE >= 512) \
+      && (!defined(HEDLEY_MSVC_VERSION) || HEDLEY_MSVC_VERSION_CHECK(19,20,0))
+    _mm512_mask_storeu_epi16(base, simde_svbool_to_mmask32(pg), data.m512i);
+  #elif defined(SIMDE_X86_AVX512BW_NATIVE) && defined(SIMDE_X86_AVX512VL_NATIVE) \
+      && (!defined(HEDLEY_MSVC_VERSION) || HEDLEY_MSVC_VERSION_CHECK(19,20,0))
+    _mm256_mask_storeu_epi16(base, simde_svbool_to_mmask16(pg), data.m256i[0]);
   #else
     for (int i = 0 ; i < HEDLEY_STATIC_CAST(int, simde_svcnth()) ; i++) {
       if (pg.values_i16[i]) {
@@ -81,10 +85,12 @@ void
 simde_svst1_s32(simde_svbool_t pg, int32_t * base, simde_svint32_t data) {
   #if defined(SIMDE_ARM_SVE_NATIVE)
     svst1_s32(pg, base, data);
-  #elif defined(SIMDE_X86_AVX512BW_NATIVE) && (SIMDE_ARM_SVE_VECTOR_SIZE >= 512)
-     _mm512_mask_storeu_epi32(base, simde_svbool_to_mmask16(pg), data.m512i);
-  #elif defined(SIMDE_X86_AVX512BW_NATIVE) && defined(SIMDE_X86_AVX512VL_NATIVE)
-     _mm256_mask_storeu_epi32(base, simde_svbool_to_mmask8(pg), data.m256i[0]);
+  #elif defined(SIMDE_X86_AVX512BW_NATIVE) && (SIMDE_ARM_SVE_VECTOR_SIZE >= 512) \
+      && (!defined(HEDLEY_MSVC_VERSION) || HEDLEY_MSVC_VERSION_CHECK(19,20,0))
+    _mm512_mask_storeu_epi32(base, simde_svbool_to_mmask16(pg), data.m512i);
+  #elif defined(SIMDE_X86_AVX512BW_NATIVE) && defined(SIMDE_X86_AVX512VL_NATIVE) \
+      && (!defined(HEDLEY_MSVC_VERSION) || HEDLEY_MSVC_VERSION_CHECK(19,20,0))
+    _mm256_mask_storeu_epi32(base, simde_svbool_to_mmask8(pg), data.m256i[0]);
   #else
     for (int i = 0 ; i < HEDLEY_STATIC_CAST(int, simde_svcntw()) ; i++) {
       if (pg.values_i32[i]) {
@@ -103,10 +109,12 @@ void
 simde_svst1_s64(simde_svbool_t pg, int64_t * base, simde_svint64_t data) {
   #if defined(SIMDE_ARM_SVE_NATIVE)
     svst1_s64(pg, base, data);
-  #elif defined(SIMDE_X86_AVX512BW_NATIVE) && (SIMDE_ARM_SVE_VECTOR_SIZE >= 512)
-     _mm512_mask_storeu_epi64(base, simde_svbool_to_mmask8(pg), data.m512i);
-  #elif defined(SIMDE_X86_AVX512BW_NATIVE) && defined(SIMDE_X86_AVX512VL_NATIVE)
-     _mm256_mask_storeu_epi64(base, simde_svbool_to_mmask4(pg), data.m256i[0]);
+  #elif defined(SIMDE_X86_AVX512BW_NATIVE) && (SIMDE_ARM_SVE_VECTOR_SIZE >= 512) \
+      && (!defined(HEDLEY_MSVC_VERSION) || HEDLEY_MSVC_VERSION_CHECK(19,20,0))
+    _mm512_mask_storeu_epi64(base, simde_svbool_to_mmask8(pg), data.m512i);
+  #elif defined(SIMDE_X86_AVX512BW_NATIVE) && defined(SIMDE_X86_AVX512VL_NATIVE) \
+      && (!defined(HEDLEY_MSVC_VERSION) || HEDLEY_MSVC_VERSION_CHECK(19,20,0))
+    _mm256_mask_storeu_epi64(base, simde_svbool_to_mmask4(pg), data.m256i[0]);
   #else
     for (int i = 0 ; i < HEDLEY_STATIC_CAST(int, simde_svcntd()) ; i++) {
       if (pg.values_i64[i]) {
@@ -125,10 +133,12 @@ void
 simde_svst1_u8(simde_svbool_t pg, uint8_t * base, simde_svuint8_t data) {
   #if defined(SIMDE_ARM_SVE_NATIVE)
     svst1_u8(pg, base, data);
-  #elif defined(SIMDE_X86_AVX512BW_NATIVE) && (SIMDE_ARM_SVE_VECTOR_SIZE >= 512)
-     _mm512_mask_storeu_epi8(base, simde_svbool_to_mmask64(pg), data.m512i);
-  #elif defined(SIMDE_X86_AVX512BW_NATIVE) && defined(SIMDE_X86_AVX512VL_NATIVE)
-     _mm256_mask_storeu_epi8(base, simde_svbool_to_mmask32(pg), data.m256i[0]);
+  #elif defined(SIMDE_X86_AVX512BW_NATIVE) && (SIMDE_ARM_SVE_VECTOR_SIZE >= 512) \
+      && (!defined(HEDLEY_MSVC_VERSION) || HEDLEY_MSVC_VERSION_CHECK(19,20,0))
+    _mm512_mask_storeu_epi8(base, simde_svbool_to_mmask64(pg), data.m512i);
+  #elif defined(SIMDE_X86_AVX512BW_NATIVE) && defined(SIMDE_X86_AVX512VL_NATIVE) \
+      && (!defined(HEDLEY_MSVC_VERSION) || HEDLEY_MSVC_VERSION_CHECK(19,20,0))
+    _mm256_mask_storeu_epi8(base, simde_svbool_to_mmask32(pg), data.m256i[0]);
   #else
     for (int i = 0 ; i < HEDLEY_STATIC_CAST(int, simde_svcntb()) ; i++) {
       if (pg.values_u8[i]) {
@@ -147,10 +157,12 @@ void
 simde_svst1_u16(simde_svbool_t pg, uint16_t * base, simde_svuint16_t data) {
   #if defined(SIMDE_ARM_SVE_NATIVE)
     svst1_u16(pg, base, data);
-  #elif defined(SIMDE_X86_AVX512BW_NATIVE) && (SIMDE_ARM_SVE_VECTOR_SIZE >= 512)
-     _mm512_mask_storeu_epi16(base, simde_svbool_to_mmask32(pg), data.m512i);
-  #elif defined(SIMDE_X86_AVX512BW_NATIVE) && defined(SIMDE_X86_AVX512VL_NATIVE)
-     _mm256_mask_storeu_epi16(base, simde_svbool_to_mmask16(pg), data.m256i[0]);
+  #elif defined(SIMDE_X86_AVX512BW_NATIVE) && (SIMDE_ARM_SVE_VECTOR_SIZE >= 512) \
+      && (!defined(HEDLEY_MSVC_VERSION) || HEDLEY_MSVC_VERSION_CHECK(19,20,0))
+    _mm512_mask_storeu_epi16(base, simde_svbool_to_mmask32(pg), data.m512i);
+  #elif defined(SIMDE_X86_AVX512BW_NATIVE) && defined(SIMDE_X86_AVX512VL_NATIVE) \
+      && (!defined(HEDLEY_MSVC_VERSION) || HEDLEY_MSVC_VERSION_CHECK(19,20,0))
+    _mm256_mask_storeu_epi16(base, simde_svbool_to_mmask16(pg), data.m256i[0]);
   #else
     for (int i = 0 ; i < HEDLEY_STATIC_CAST(int, simde_svcnth()) ; i++) {
       if (pg.values_u16[i]) {
@@ -169,10 +181,12 @@ void
 simde_svst1_u32(simde_svbool_t pg, uint32_t * base, simde_svuint32_t data) {
   #if defined(SIMDE_ARM_SVE_NATIVE)
     svst1_u32(pg, base, data);
-  #elif defined(SIMDE_X86_AVX512BW_NATIVE) && (SIMDE_ARM_SVE_VECTOR_SIZE >= 512)
-     _mm512_mask_storeu_epi32(base, simde_svbool_to_mmask16(pg), data.m512i);
-  #elif defined(SIMDE_X86_AVX512BW_NATIVE) && defined(SIMDE_X86_AVX512VL_NATIVE)
-     _mm256_mask_storeu_epi32(base, simde_svbool_to_mmask8(pg), data.m256i[0]);
+  #elif defined(SIMDE_X86_AVX512BW_NATIVE) && (SIMDE_ARM_SVE_VECTOR_SIZE >= 512) \
+      && (!defined(HEDLEY_MSVC_VERSION) || HEDLEY_MSVC_VERSION_CHECK(19,20,0))
+    _mm512_mask_storeu_epi32(base, simde_svbool_to_mmask16(pg), data.m512i);
+  #elif defined(SIMDE_X86_AVX512BW_NATIVE) && defined(SIMDE_X86_AVX512VL_NATIVE) \
+      && (!defined(HEDLEY_MSVC_VERSION) || HEDLEY_MSVC_VERSION_CHECK(19,20,0))
+    _mm256_mask_storeu_epi32(base, simde_svbool_to_mmask8(pg), data.m256i[0]);
   #else
     for (int i = 0 ; i < HEDLEY_STATIC_CAST(int, simde_svcntw()) ; i++) {
       if (pg.values_u32[i]) {
@@ -191,10 +205,12 @@ void
 simde_svst1_u64(simde_svbool_t pg, uint64_t * base, simde_svuint64_t data) {
   #if defined(SIMDE_ARM_SVE_NATIVE)
     svst1_u64(pg, base, data);
-  #elif defined(SIMDE_X86_AVX512BW_NATIVE) && (SIMDE_ARM_SVE_VECTOR_SIZE >= 512)
-     _mm512_mask_storeu_epi64(base, simde_svbool_to_mmask8(pg), data.m512i);
-  #elif defined(SIMDE_X86_AVX512BW_NATIVE) && defined(SIMDE_X86_AVX512VL_NATIVE)
-     _mm256_mask_storeu_epi64(base, simde_svbool_to_mmask4(pg), data.m256i[0]);
+  #elif defined(SIMDE_X86_AVX512BW_NATIVE) && (SIMDE_ARM_SVE_VECTOR_SIZE >= 512) \
+      && (!defined(HEDLEY_MSVC_VERSION) || HEDLEY_MSVC_VERSION_CHECK(19,20,0))
+    _mm512_mask_storeu_epi64(base, simde_svbool_to_mmask8(pg), data.m512i);
+  #elif defined(SIMDE_X86_AVX512BW_NATIVE) && defined(SIMDE_X86_AVX512VL_NATIVE) \
+      && (!defined(HEDLEY_MSVC_VERSION) || HEDLEY_MSVC_VERSION_CHECK(19,20,0))
+    _mm256_mask_storeu_epi64(base, simde_svbool_to_mmask4(pg), data.m256i[0]);
   #else
     for (int i = 0 ; i < HEDLEY_STATIC_CAST(int, simde_svcntd()) ; i++) {
       if (pg.values_u64[i]) {
@@ -213,10 +229,12 @@ void
 simde_svst1_f32(simde_svbool_t pg, simde_float32 * base, simde_svfloat32_t data) {
   #if defined(SIMDE_ARM_SVE_NATIVE)
     svst1_f32(pg, base, data);
-  #elif defined(SIMDE_X86_AVX512BW_NATIVE) && (SIMDE_ARM_SVE_VECTOR_SIZE >= 512)
-     _mm512_mask_storeu_ps(base, simde_svbool_to_mmask16(pg), data.m512);
-  #elif defined(SIMDE_X86_AVX512BW_NATIVE) && defined(SIMDE_X86_AVX512VL_NATIVE)
-     _mm256_mask_storeu_ps(base, simde_svbool_to_mmask8(pg), data.m256[0]);
+  #elif defined(SIMDE_X86_AVX512BW_NATIVE) && (SIMDE_ARM_SVE_VECTOR_SIZE >= 512) \
+      && (!defined(HEDLEY_MSVC_VERSION) || HEDLEY_MSVC_VERSION_CHECK(19,20,0))
+    _mm512_mask_storeu_ps(base, simde_svbool_to_mmask16(pg), data.m512);
+  #elif defined(SIMDE_X86_AVX512BW_NATIVE) && defined(SIMDE_X86_AVX512VL_NATIVE) \
+      && (!defined(HEDLEY_MSVC_VERSION) || HEDLEY_MSVC_VERSION_CHECK(19,20,0))
+    _mm256_mask_storeu_ps(base, simde_svbool_to_mmask8(pg), data.m256[0]);
   #else
     for (int i = 0 ; i < HEDLEY_STATIC_CAST(int, simde_svcntw()) ; i++) {
       if (pg.values_i32[i]) {
@@ -235,10 +253,12 @@ void
 simde_svst1_f64(simde_svbool_t pg, simde_float64 * base, simde_svfloat64_t data) {
   #if defined(SIMDE_ARM_SVE_NATIVE)
     svst1_f64(pg, base, data);
-  #elif defined(SIMDE_X86_AVX512BW_NATIVE) && (SIMDE_ARM_SVE_VECTOR_SIZE >= 512)
-     _mm512_mask_storeu_pd(base, simde_svbool_to_mmask8(pg), data.m512d);
-  #elif defined(SIMDE_X86_AVX512BW_NATIVE) && defined(SIMDE_X86_AVX512VL_NATIVE)
-     _mm256_mask_storeu_pd(base, simde_svbool_to_mmask4(pg), data.m256d[0]);
+  #elif defined(SIMDE_X86_AVX512BW_NATIVE) && (SIMDE_ARM_SVE_VECTOR_SIZE >= 512) \
+      && (!defined(HEDLEY_MSVC_VERSION) || HEDLEY_MSVC_VERSION_CHECK(19,20,0))
+    _mm512_mask_storeu_pd(base, simde_svbool_to_mmask8(pg), data.m512d);
+  #elif defined(SIMDE_X86_AVX512BW_NATIVE) && defined(SIMDE_X86_AVX512VL_NATIVE) \
+      && (!defined(HEDLEY_MSVC_VERSION) || HEDLEY_MSVC_VERSION_CHECK(19,20,0))
+    _mm256_mask_storeu_pd(base, simde_svbool_to_mmask4(pg), data.m256d[0]);
   #else
     for (int i = 0 ; i < HEDLEY_STATIC_CAST(int, simde_svcntd()) ; i++) {
       if (pg.values_i64[i]) {
