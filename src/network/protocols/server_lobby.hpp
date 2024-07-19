@@ -34,11 +34,8 @@
 #include <mutex>
 #include <set>
 
-#ifdef ENABLE_SQLITE3
-#include <sqlite3.h>
-#endif
-
 class BareNetworkString;
+class DatabaseConnector;
 class NetworkItemManager;
 class NetworkString;
 class NetworkPlayerProfile;
@@ -78,39 +75,12 @@ private:
         std::string m_country_code;
         bool m_tried = false;
     };
-    bool m_player_reports_table_exists;
 
 #ifdef ENABLE_SQLITE3
-    sqlite3* m_db;
-
-    std::string m_server_stats_table;
-
-    bool m_ip_ban_table_exists;
-
-    bool m_ipv6_ban_table_exists;
-
-    bool m_online_id_ban_table_exists;
-
-    bool m_ip_geolocation_table_exists;
-
-    bool m_ipv6_geolocation_table_exists;
-
-    uint64_t m_last_poll_db_time;
+    DatabaseConnector* m_db_connector;
 
     void pollDatabase();
-
-    bool easySQLQuery(const std::string& query,
-        std::function<void(sqlite3_stmt* stmt)> bind_function = nullptr) const;
-
-    void checkTableExists(const std::string& table, bool& result);
-
-    std::string ip2Country(const SocketAddress& addr) const;
-
-    std::string ipv62Country(const SocketAddress& addr) const;
 #endif
-    void initDatabase();
-
-    void destroyDatabase();
 
     std::atomic<ServerState> m_state;
 
@@ -378,7 +348,6 @@ private:
     void testBannedForIP(STKPeer* peer) const;
     void testBannedForIPv6(STKPeer* peer) const;
     void testBannedForOnlineId(STKPeer* peer, uint32_t online_id) const;
-    void writeDisconnectInfoTable(STKPeer* peer);
     void writePlayerReport(Event* event);
     bool supportsAI();
     void updateAddons();
@@ -419,6 +388,7 @@ public:
     uint32_t getServerIdOnline() const           { return m_server_id_online; }
     void setClientServerHostId(uint32_t id)   { m_client_server_host_id = id; }
     static int m_fixed_laps;
+    bool playerReportsTableExists() const;
 };   // class ServerLobby
 
 #endif // SERVER_LOBBY_HPP

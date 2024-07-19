@@ -30,6 +30,7 @@
 #include "modes/capture_the_flag.hpp"
 #include "modes/linear_world.hpp"
 #include "network/crypto.hpp"
+#include "network/database_connector.hpp"
 #include "network/event.hpp"
 #include "network/game_setup.hpp"
 #include "network/network.hpp"
@@ -101,69 +102,6 @@ public:
 
 // We use max priority for all server requests to avoid downloading of addons
 // icons blocking the poll request in all-in-one graphical client server
-
-#ifdef ENABLE_SQLITE3
-
-// ----------------------------------------------------------------------------
-static void upperIPv6SQL(sqlite3_context* context, int argc,
-                         sqlite3_value** argv)
-{
-    if (argc != 1)
-    {
-        sqlite3_result_int64(context, 0);
-        return;
-    }
-
-    char* ipv6 = (char*)sqlite3_value_text(argv[0]);
-    if (ipv6 == NULL)
-    {
-        sqlite3_result_int64(context, 0);
-        return;
-    }
-    sqlite3_result_int64(context, upperIPv6(ipv6));
-}
-
-// ----------------------------------------------------------------------------
-void insideIPv6CIDRSQL(sqlite3_context* context, int argc,
-                       sqlite3_value** argv)
-{
-    if (argc != 2)
-    {
-        sqlite3_result_int(context, 0);
-        return;
-    }
-
-    char* ipv6_cidr = (char*)sqlite3_value_text(argv[0]);
-    char* ipv6_in = (char*)sqlite3_value_text(argv[1]);
-    if (ipv6_cidr == NULL || ipv6_in == NULL)
-    {
-        sqlite3_result_int(context, 0);
-        return;
-    }
-    sqlite3_result_int(context, insideIPv6CIDR(ipv6_cidr, ipv6_in));
-}   // insideIPv6CIDRSQL
-
-// ----------------------------------------------------------------------------
-/*
-Copy below code so it can be use as loadable extension to be used in sqlite3
-command interface (together with andIPv6 and insideIPv6CIDR from stk_ipv6)
-
-#include "sqlite3ext.h"
-SQLITE_EXTENSION_INIT1
-// ----------------------------------------------------------------------------
-sqlite3_extension_init(sqlite3* db, char** pzErrMsg,
-                       const sqlite3_api_routines* pApi)
-{
-    SQLITE_EXTENSION_INIT2(pApi)
-    sqlite3_create_function(db, "insideIPv6CIDR", 2, SQLITE_UTF8, NULL,
-        insideIPv6CIDRSQL, NULL, NULL);
-    sqlite3_create_function(db, "upperIPv6", 1, SQLITE_UTF8,  0, upperIPv6SQL,
-        0, 0);
-    return 0;
-}   // sqlite3_extension_init
-*/
-
-#endif
 
 /** This is the central game setup protocol running in the server. It is
  *  mostly a finite state machine. Note that all nodes in ellipses and light
@@ -248,8 +186,11 @@ ServerLobby::ServerLobby() : LobbyProtocol()
     m_difficulty.store(ServerConfig::m_server_difficulty);
     m_game_mode.store(ServerConfig::m_server_mode);
     m_default_vote = new PeerVote();
-    m_player_reports_table_exists = false;
-    initDatabase();
+
+#ifdef ENABLE_SQLITE3
+    m_db_connector = new DatabaseConnector();
+    m_db_connector->initDatabase();
+#endif
 }   // ServerLobby
 
 //-----------------------------------------------------------------------------
@@ -267,301 +208,21 @@ ServerLobby::~ServerLobby()
     if (m_save_server_config)
         ServerConfig::writeServerConfigToDisk();
     delete m_default_vote;
-    destroyDatabase();
+
+#ifdef ENABLE_SQLITE3
+    m_db_connector->destroyDatabase();
+    delete m_db_connector;
+#endif
 }   // ~ServerLobby
 
 //-----------------------------------------------------------------------------
-void ServerLobby::initDatabase()
-{
-#ifdef ENABLE_SQLITE3
-    m_last_poll_db_time = StkTime::getMonoTimeMs();
-    m_db = NULL;
-    m_ip_ban_table_exists = false;
-    m_ipv6_ban_table_exists = false;
-    m_online_id_ban_table_exists = false;
-    m_ip_geolocation_table_exists = false;
-    m_ipv6_geolocation_table_exists = false;
-    if (!ServerConfig::m_sql_management)
-        return;
-    const std::string& path = ServerConfig::getConfigDirectory() + "/" +
-        ServerConfig::m_database_file.c_str();
-    int ret = sqlite3_open_v2(path.c_str(), &m_db,
-        SQLITE_OPEN_SHAREDCACHE | SQLITE_OPEN_FULLMUTEX |
-        SQLITE_OPEN_READWRITE, NULL);
-    if (ret != SQLITE_OK)
-    {
-        Log::error("ServerLobby", "Cannot open database: %s.",
-            sqlite3_errmsg(m_db));
-        sqlite3_close(m_db);
-        m_db = NULL;
-        return;
-    }
-    sqlite3_busy_handler(m_db, [](void* data, int retry)
-        {
-            int retry_count = ServerConfig::m_database_timeout / 100;
-            if (retry < retry_count)
-            {
-                sqlite3_sleep(100);
-                // Return non-zero to let caller retry again
-                return 1;
-            }
-            // Return zero to let caller return SQLITE_BUSY immediately
-            return 0;
-        }, NULL);
-    sqlite3_create_function(m_db, "insideIPv6CIDR", 2, SQLITE_UTF8, NULL,
-        &insideIPv6CIDRSQL, NULL, NULL);
-    sqlite3_create_function(m_db, "upperIPv6", 1, SQLITE_UTF8, NULL,
-        &upperIPv6SQL, NULL, NULL);
-    checkTableExists(ServerConfig::m_ip_ban_table, m_ip_ban_table_exists);
-    checkTableExists(ServerConfig::m_ipv6_ban_table, m_ipv6_ban_table_exists);
-    checkTableExists(ServerConfig::m_online_id_ban_table,
-        m_online_id_ban_table_exists);
-    checkTableExists(ServerConfig::m_player_reports_table,
-        m_player_reports_table_exists);
-    checkTableExists(ServerConfig::m_ip_geolocation_table,
-        m_ip_geolocation_table_exists);
-    checkTableExists(ServerConfig::m_ipv6_geolocation_table,
-        m_ipv6_geolocation_table_exists);
-#endif
-}   // initDatabase
 
-//-----------------------------------------------------------------------------
 void ServerLobby::initServerStatsTable()
 {
 #ifdef ENABLE_SQLITE3
-    if (!ServerConfig::m_sql_management || !m_db)
-        return;
-    std::string table_name = std::string("v") +
-        StringUtils::toString(ServerConfig::m_server_db_version) + "_" +
-        ServerConfig::m_server_uid + "_stats";
-
-    std::ostringstream oss;
-    oss << "CREATE TABLE IF NOT EXISTS " << table_name << " (\n"
-        "    host_id INTEGER UNSIGNED NOT NULL PRIMARY KEY, -- Unique host id in STKHost of each connection session for a STKPeer\n"
-        "    ip INTEGER UNSIGNED NOT NULL, -- IP decimal of host\n";
-    if (ServerConfig::m_ipv6_connection)
-        oss << "    ipv6 TEXT NOT NULL DEFAULT '', -- IPv6 (if exists) in string of host\n";
-    oss << "    port INTEGER UNSIGNED NOT NULL, -- Port of host\n"
-        "    online_id INTEGER UNSIGNED NOT NULL, -- Online if of the host (0 for offline account)\n"
-        "    username TEXT NOT NULL, -- First player name in the host (if the host has splitscreen player)\n"
-        "    player_num INTEGER UNSIGNED NOT NULL, -- Number of player(s) from the host, more than 1 if it has splitscreen player\n"
-        "    country_code TEXT NULL DEFAULT NULL, -- 2-letter country code of the host\n"
-        "    version TEXT NOT NULL, -- SuperTuxKart version of the host\n"
-        "    os TEXT NOT NULL, -- Operating system of the host\n"
-        "    connected_time TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP, -- Time when connected\n"
-        "    disconnected_time TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP, -- Time when disconnected (saved when disconnected)\n"
-        "    ping INTEGER UNSIGNED NOT NULL DEFAULT 0, -- Ping of the host\n"
-        "    packet_loss INTEGER NOT NULL DEFAULT 0 -- Mean packet loss count from ENet (saved when disconnected)\n"
-        ") WITHOUT ROWID;";
-    std::string query = oss.str();
-    sqlite3_stmt* stmt = NULL;
-    int ret = sqlite3_prepare_v2(m_db, query.c_str(), -1, &stmt, 0);
-    if (ret == SQLITE_OK)
-    {
-        ret = sqlite3_step(stmt);
-        ret = sqlite3_finalize(stmt);
-        if (ret == SQLITE_OK)
-            m_server_stats_table = table_name;
-        else
-        {
-            Log::error("ServerLobby",
-                "Error finalize database for query %s: %s",
-                query.c_str(), sqlite3_errmsg(m_db));
-        }
-    }
-    else
-    {
-        Log::error("ServerLobby", "Error preparing database for query %s: %s",
-            query.c_str(), sqlite3_errmsg(m_db));
-    }
-    if (m_server_stats_table.empty())
-        return;
-
-    // Extra default table _countries:
-    // Server owner need to initialise this table himself, check NETWORKING.md
-    std::string country_table_name = std::string("v") + StringUtils::toString(
-        ServerConfig::m_server_db_version) + "_countries";
-    query = StringUtils::insertValues(
-        "CREATE TABLE IF NOT EXISTS %s (\n"
-        "    country_code TEXT NOT NULL PRIMARY KEY UNIQUE, -- Unique 2-letter country code\n"
-        "    country_flag TEXT NOT NULL, -- Unicode country flag representation of 2-letter country code\n"
-        "    country_name TEXT NOT NULL -- Readable name of this country\n"
-        ") WITHOUT ROWID;", country_table_name.c_str());
-    easySQLQuery(query);
-
-    // Default views:
-    // _full_stats
-    // Full stats with ip in human readable format and time played of each
-    // players in minutes
-    std::string full_stats_view_name = std::string("v") +
-        StringUtils::toString(ServerConfig::m_server_db_version) + "_" +
-        ServerConfig::m_server_uid + "_full_stats";
-    oss.str("");
-    oss << "CREATE VIEW IF NOT EXISTS " << full_stats_view_name << " AS\n"
-        << "    SELECT host_id, ip,\n"
-        << "    ((ip >> 24) & 255) ||'.'|| ((ip >> 16) & 255) ||'.'|| ((ip >>  8) & 255) ||'.'|| ((ip ) & 255) AS ip_readable,\n";
-    if (ServerConfig::m_ipv6_connection)
-        oss << "    ipv6,";
-    oss << "    port, online_id, username, player_num,\n"
-        << "    " << m_server_stats_table << ".country_code AS country_code, country_flag, country_name, version, os,\n"
-        << "    ROUND((STRFTIME(\"%s\", disconnected_time) - STRFTIME(\"%s\", connected_time)) / 60.0, 2) AS time_played,\n"
-        << "    connected_time, disconnected_time, ping, packet_loss FROM " << m_server_stats_table << "\n"
-        << "    LEFT JOIN " << country_table_name << " ON "
-        <<      country_table_name << ".country_code = " << m_server_stats_table << ".country_code\n"
-        << "    ORDER BY connected_time DESC;";
-    query = oss.str();
-    easySQLQuery(query);
-
-    // _current_players
-    // Current players in server with ip in human readable format and time
-    // played of each players in minutes
-    std::string current_players_view_name = std::string("v") +
-        StringUtils::toString(ServerConfig::m_server_db_version) + "_" +
-        ServerConfig::m_server_uid + "_current_players";
-    oss.str("");
-    oss.clear();
-    oss << "CREATE VIEW IF NOT EXISTS " << current_players_view_name << " AS\n"
-        << "    SELECT host_id, ip,\n"
-        << "    ((ip >> 24) & 255) ||'.'|| ((ip >> 16) & 255) ||'.'|| ((ip >>  8) & 255) ||'.'|| ((ip ) & 255) AS ip_readable,\n";
-    if (ServerConfig::m_ipv6_connection)
-        oss << "    ipv6,";
-    oss << "    port, online_id, username, player_num,\n"
-        << "    " << m_server_stats_table << ".country_code AS country_code, country_flag, country_name, version, os,\n"
-        << "    ROUND((STRFTIME(\"%s\", 'now') - STRFTIME(\"%s\", connected_time)) / 60.0, 2) AS time_played,\n"
-        << "    connected_time, ping FROM " << m_server_stats_table << "\n"
-        << "    LEFT JOIN " << country_table_name << " ON "
-        <<      country_table_name << ".country_code = " << m_server_stats_table << ".country_code\n"
-        << "    WHERE connected_time = disconnected_time;";
-    query = oss.str();
-    easySQLQuery(query);
-
-    // _player_stats
-    // All players with online id and username with their time played stats
-    // in this server since creation of this database
-    // If sqlite supports window functions (since 3.25), it will include last session player info (ip, country, ping...)
-    std::string player_stats_view_name = std::string("v") +
-        StringUtils::toString(ServerConfig::m_server_db_version) + "_" +
-        ServerConfig::m_server_uid + "_player_stats";
-    oss.str("");
-    oss.clear();
-    if (sqlite3_libversion_number() < 3025000)
-    {
-        oss << "CREATE VIEW IF NOT EXISTS " << player_stats_view_name << " AS\n"
-            << "    SELECT online_id, username, COUNT(online_id) AS num_connections,\n"
-            << "    MIN(connected_time) AS first_connected_time,\n"
-            << "    MAX(connected_time) AS last_connected_time,\n"
-            << "    ROUND(SUM((STRFTIME(\"%s\", disconnected_time) - STRFTIME(\"%s\", connected_time)) / 60.0), 2) AS total_time_played,\n"
-            << "    ROUND(AVG((STRFTIME(\"%s\", disconnected_time) - STRFTIME(\"%s\", connected_time)) / 60.0), 2) AS average_time_played,\n"
-            << "    ROUND(MIN((STRFTIME(\"%s\", disconnected_time) - STRFTIME(\"%s\", connected_time)) / 60.0), 2) AS min_time_played,\n"
-            << "    ROUND(MAX((STRFTIME(\"%s\", disconnected_time) - STRFTIME(\"%s\", connected_time)) / 60.0), 2) AS max_time_played\n"
-            << "    FROM " << m_server_stats_table << "\n"
-            << "    WHERE online_id != 0 GROUP BY online_id ORDER BY num_connections DESC;";
-    }
-    else
-    {
-        oss << "CREATE VIEW IF NOT EXISTS " << player_stats_view_name << " AS\n"
-            << "    SELECT a.online_id, a.username, a.ip, a.ip_readable,\n";
-        if (ServerConfig::m_ipv6_connection)
-            oss << "    a.ipv6,";
-        oss << "    a.port, a.player_num,\n"
-            << "    a.country_code, a.country_flag, a.country_name, a.version, a.os, a.ping, a.packet_loss,\n"
-            << "    b.num_connections, b.first_connected_time, b.first_disconnected_time,\n"
-            << "    a.connected_time AS last_connected_time, a.disconnected_time AS last_disconnected_time,\n"
-            << "    a.time_played AS last_time_played, b.total_time_played, b.average_time_played,\n"
-            << "    b.min_time_played, b.max_time_played\n"
-            << "    FROM\n"
-            << "    (\n"
-            << "        SELECT *,\n"
-            << "        ROW_NUMBER() OVER\n"
-            << "        (\n"
-            << "            PARTITION BY online_id\n"
-            << "            ORDER BY connected_time DESC\n"
-            << "        ) RowNum\n"
-            << "        FROM " << full_stats_view_name << " where online_id != 0\n"
-            << "    ) as a\n"
-            << "    JOIN\n"
-            << "    (\n"
-            << "        SELECT online_id, COUNT(online_id) AS num_connections,\n"
-            << "        MIN(connected_time) AS first_connected_time,\n"
-            << "        MIN(disconnected_time) AS first_disconnected_time,\n"
-            << "        ROUND(SUM((STRFTIME(\"%s\", disconnected_time) - STRFTIME(\"%s\", connected_time)) / 60.0), 2) AS total_time_played,\n"
-            << "        ROUND(AVG((STRFTIME(\"%s\", disconnected_time) - STRFTIME(\"%s\", connected_time)) / 60.0), 2) AS average_time_played,\n"
-            << "        ROUND(MIN((STRFTIME(\"%s\", disconnected_time) - STRFTIME(\"%s\", connected_time)) / 60.0), 2) AS min_time_played,\n"
-            << "        ROUND(MAX((STRFTIME(\"%s\", disconnected_time) - STRFTIME(\"%s\", connected_time)) / 60.0), 2) AS max_time_played\n"
-            << "        FROM " << m_server_stats_table << " WHERE online_id != 0 GROUP BY online_id\n"
-            << "    ) AS b\n"
-            << "    ON b.online_id = a.online_id\n"
-            << "    WHERE RowNum = 1 ORDER BY num_connections DESC;\n";
-    }
-    query = oss.str();
-    easySQLQuery(query);
-
-    uint32_t last_host_id = 0;
-    query = StringUtils::insertValues("SELECT MAX(host_id) FROM %s;",
-        m_server_stats_table.c_str());
-    ret = sqlite3_prepare_v2(m_db, query.c_str(), -1, &stmt, 0);
-    if (ret == SQLITE_OK)
-    {
-        ret = sqlite3_step(stmt);
-        if (ret == SQLITE_ROW && sqlite3_column_type(stmt, 0) != SQLITE_NULL)
-        {
-            last_host_id = (unsigned)sqlite3_column_int64(stmt, 0);
-            Log::info("ServerLobby", "%u was last server session max host id.",
-                last_host_id);
-        }
-        ret = sqlite3_finalize(stmt);
-        if (ret != SQLITE_OK)
-        {
-            Log::error("ServerLobby",
-                "Error finalize database for query %s: %s",
-                query.c_str(), sqlite3_errmsg(m_db));
-            m_server_stats_table = "";
-        }
-    }
-    else
-    {
-        Log::error("ServerLobby", "Error preparing database for query %s: %s",
-            query.c_str(), sqlite3_errmsg(m_db));
-        m_server_stats_table = "";
-    }
-    STKHost::get()->setNextHostId(last_host_id);
-
-    // Update disconnected time (if stk crashed it will not be written)
-    query = StringUtils::insertValues(
-        "UPDATE %s SET disconnected_time = datetime('now') "
-        "WHERE connected_time = disconnected_time;",
-        m_server_stats_table.c_str());
-    easySQLQuery(query);
+    m_db_connector->initServerStatsTable();
 #endif
 }   // initServerStatsTable
-
-//-----------------------------------------------------------------------------
-void ServerLobby::destroyDatabase()
-{
-#ifdef ENABLE_SQLITE3
-    auto peers = STKHost::get()->getPeers();
-    for (auto& peer : peers)
-        writeDisconnectInfoTable(peer.get());
-    if (m_db != NULL)
-        sqlite3_close(m_db);
-#endif
-}   // destroyDatabase
-
-//-----------------------------------------------------------------------------
-void ServerLobby::writeDisconnectInfoTable(STKPeer* peer)
-{
-#ifdef ENABLE_SQLITE3
-    if (m_server_stats_table.empty())
-        return;
-    std::string query = StringUtils::insertValues(
-        "UPDATE %s SET disconnected_time = datetime('now'), "
-        "ping = %d, packet_loss = %d "
-        "WHERE host_id = %u;", m_server_stats_table.c_str(),
-        peer->getAveragePing(), peer->getPacketLoss(),
-        peer->getHostId());
-    easySQLQuery(query);
-#endif
-}   // writeDisconnectInfoTable
 
 //-----------------------------------------------------------------------------
 void ServerLobby::updateAddons()
@@ -964,346 +625,104 @@ bool ServerLobby::notifyEventAsynchronous(Event* event)
  */
 void ServerLobby::pollDatabase()
 {
-    if (!ServerConfig::m_sql_management || !m_db)
+    if (!ServerConfig::m_sql_management || !m_db_connector->hasDatabase())
         return;
 
-    if (StkTime::getMonoTimeMs() < m_last_poll_db_time + 60000)
+    if (!m_db_connector->isTimeToPoll())
         return;
 
-    m_last_poll_db_time = StkTime::getMonoTimeMs();
+    m_db_connector->updatePollTime();
 
-    if (m_ip_ban_table_exists)
+    std::vector<DatabaseConnector::IpBanTableData> ip_ban_list =
+            m_db_connector->getIpBanTableData();
+    std::vector<DatabaseConnector::Ipv6BanTableData> ipv6_ban_list =
+            m_db_connector->getIpv6BanTableData();
+    std::vector<DatabaseConnector::OnlineIdBanTableData> online_id_ban_list =
+            m_db_connector->getOnlineIdBanTableData();
+
+    for (std::shared_ptr<STKPeer>& p : STKHost::get()->getPeers())
     {
-        std::string query =
-            "SELECT ip_start, ip_end, reason, description FROM ";
-        query += ServerConfig::m_ip_ban_table;
-        query += " WHERE datetime('now') > datetime(starting_time) AND "
-            "(expired_days is NULL OR datetime"
-            "(starting_time, '+'||expired_days||' days') > datetime('now'));";
-        auto peers = STKHost::get()->getPeers();
-        sqlite3_exec(m_db, query.c_str(),
-            [](void* ptr, int count, char** data, char** columns)
+        if (p->isAIPeer())
+            continue;
+        bool is_kicked = false;
+        std::string address = "";
+        std::string reason = "";
+        std::string description = "";
+
+        if (p->getAddress().isIPv6())
+        {
+            address = p->getAddress().toString(false);
+            if (address.empty())
+                continue;
+            for (auto& item: ipv6_ban_list)
             {
-                std::vector<std::shared_ptr<STKPeer> >* peers_ptr =
-                    (std::vector<std::shared_ptr<STKPeer> >*)ptr;
-                for (std::shared_ptr<STKPeer>& p : *peers_ptr)
+                if (insideIPv6CIDR(item.ipv6_cidr.c_str(), address.c_str()) == 1)
                 {
-                    // IPv4 ban list atm
-                    if (p->isAIPeer() || p->getAddress().isIPv6())
-                        continue;
-
-                    uint32_t ip_start = 0;
-                    uint32_t ip_end = 0;
-                    if (!StringUtils::fromString(data[0], ip_start))
-                        continue;
-                    if (!StringUtils::fromString(data[1], ip_end))
-                        continue;
-                    uint32_t peer_addr = p->getAddress().getIP();
-                    if (ip_start <= peer_addr && ip_end >= peer_addr)
-                    {
-                        Log::info("ServerLobby",
-                            "Kick %s, reason: %s, description: %s",
-                            p->getAddress().toString().c_str(),
-                            data[2], data[3]);
-                        p->kick();
-                    }
+                    is_kicked = true;
+                    reason = item.reason;
+                    description = item.description;
+                    break;
                 }
-                return 0;
-            }, &peers, NULL);
-    }
-
-    if (m_ipv6_ban_table_exists)
-    {
-        std::string query =
-            "SELECT ipv6_cidr, reason, description FROM ";
-        query += ServerConfig::m_ipv6_ban_table;
-        query += " WHERE datetime('now') > datetime(starting_time) AND "
-            "(expired_days is NULL OR datetime"
-            "(starting_time, '+'||expired_days||' days') > datetime('now'));";
-        auto peers = STKHost::get()->getPeers();
-        sqlite3_exec(m_db, query.c_str(),
-            [](void* ptr, int count, char** data, char** columns)
+            }
+        }
+        else
+        {
+            uint32_t peer_addr = p->getAddress().getIP();
+            address = p->getAddress().toString();
+            for (auto& item: ip_ban_list)
             {
-                std::vector<std::shared_ptr<STKPeer> >* peers_ptr =
-                    (std::vector<std::shared_ptr<STKPeer> >*)ptr;
-                for (std::shared_ptr<STKPeer>& p : *peers_ptr)
+                if (item.ip_start <= peer_addr && item.ip_end >= peer_addr)
                 {
-                    std::string ipv6;
-                    if (p->getAddress().isIPv6())
-                        ipv6 = p->getAddress().toString(false);
-                    // IPv6 ban list atm
-                    if (p->isAIPeer() || ipv6.empty())
-                        continue;
-
-                    char* ipv6_cidr = data[0];
-                    if (insideIPv6CIDR(ipv6_cidr, ipv6.c_str()) == 1)
-                    {
-                        Log::info("ServerLobby",
-                            "Kick %s, reason: %s, description: %s",
-                            ipv6.c_str(), data[1], data[2]);
-                        p->kick();
-                    }
+                    is_kicked = true;
+                    reason = item.reason;
+                    description = item.description;
+                    break;
                 }
-                return 0;
-            }, &peers, NULL);
-    }
-
-    if (m_online_id_ban_table_exists)
-    {
-        std::string query = "SELECT online_id, reason, description FROM ";
-        query += ServerConfig::m_online_id_ban_table;
-        query += " WHERE datetime('now') > datetime(starting_time) AND "
-            "(expired_days is NULL OR datetime"
-            "(starting_time, '+'||expired_days||' days') > datetime('now'));";
-        auto peers = STKHost::get()->getPeers();
-        sqlite3_exec(m_db, query.c_str(),
-            [](void* ptr, int count, char** data, char** columns)
+            }
+        }
+        if (!is_kicked && !p->getPlayerProfiles().empty())
+        {
+            uint32_t online_id = p->getPlayerProfiles()[0]->getOnlineId();
+            for (auto& item: online_id_ban_list)
             {
-                std::vector<std::shared_ptr<STKPeer> >* peers_ptr =
-                    (std::vector<std::shared_ptr<STKPeer> >*)ptr;
-                for (std::shared_ptr<STKPeer>& p : *peers_ptr)
+                if (item.online_id == online_id)
                 {
-                    if (p->isAIPeer()
-                        || p->getPlayerProfiles().empty())
-                        continue;
-
-                    uint32_t online_id = 0;
-                    if (!StringUtils::fromString(data[0], online_id))
-                        continue;
-                    if (online_id == p->getPlayerProfiles()[0]->getOnlineId())
-                    {
-                        Log::info("ServerLobby",
-                            "Kick %s, reason: %s, description: %s",
-                            p->getAddress().toString().c_str(),
-                            data[1], data[2]);
-                        p->kick();
-                    }
+                    is_kicked = true;
+                    reason = item.reason;
+                    description = item.description;
+                    break;
                 }
-                return 0;
-            }, &peers, NULL);
-    }
+            }
+        }
+        if (is_kicked)
+        {
+            Log::info("ServerLobby", "Kick %s, reason: %s, description: %s",
+                address.c_str(), reason.c_str(), description.c_str());
+            p->kick();
+        }
+    } // for p in peers
 
-    if (m_player_reports_table_exists &&
-        ServerConfig::m_player_reports_expired_days != 0.0f)
-    {
-        std::string query = StringUtils::insertValues(
-            "DELETE FROM %s "
-            "WHERE datetime"
-            "(reported_time, '+%f days') < datetime('now');",
-            ServerConfig::m_player_reports_table.c_str(),
-            ServerConfig::m_player_reports_expired_days);
-        easySQLQuery(query);
-    }
-    if (m_server_stats_table.empty())
-        return;
+    m_db_connector->clearOldReports();
 
-    std::string query;
     auto peers = STKHost::get()->getPeers();
-    std::vector<uint32_t> exist_hosts;
+    std::vector<uint32_t> hosts;
     if (!peers.empty())
     {
         for (auto& peer : peers)
         {
             if (!peer->isValidated())
                 continue;
-            exist_hosts.push_back(peer->getHostId());
+            hosts.push_back(peer->getHostId());
         }
     }
-    if (peers.empty() || exist_hosts.empty())
-    {
-        query = StringUtils::insertValues(
-            "UPDATE %s SET disconnected_time = datetime('now') "
-            "WHERE connected_time = disconnected_time;",
-            m_server_stats_table.c_str());
-    }
-    else
-    {
-        std::ostringstream oss;
-        oss << "UPDATE " << m_server_stats_table
-            << "    SET disconnected_time = datetime('now')"
-            << "    WHERE connected_time = disconnected_time AND"
-            << "    host_id NOT IN (";
-        for (unsigned i = 0; i < exist_hosts.size(); i++)
-        {
-            oss << exist_hosts[i];
-            if (i != (exist_hosts.size() - 1))
-                oss << ",";
-        }
-        oss << ");";
-        query = oss.str();
-    }
-    easySQLQuery(query);
+    m_db_connector->setDisconnectionTimes(hosts);
 }   // pollDatabase
-
-//-----------------------------------------------------------------------------
-/** Run simple query with write lock waiting and optional function, this
- *  function has no callback for the return (if any) by the query.
- *  Return true if no error occurs
- */
-bool ServerLobby::easySQLQuery(const std::string& query,
-                   std::function<void(sqlite3_stmt* stmt)> bind_function) const
-{
-    if (!m_db)
-        return false;
-    sqlite3_stmt* stmt = NULL;
-    int ret = sqlite3_prepare_v2(m_db, query.c_str(), -1, &stmt, 0);
-    if (ret == SQLITE_OK)
-    {
-        if (bind_function)
-            bind_function(stmt);
-        ret = sqlite3_step(stmt);
-        ret = sqlite3_finalize(stmt);
-        if (ret != SQLITE_OK)
-        {
-            Log::error("ServerLobby",
-                "Error finalize database for easy query %s: %s",
-                query.c_str(), sqlite3_errmsg(m_db));
-            return false;
-        }
-    }
-    else
-    {
-        Log::error("ServerLobby",
-            "Error preparing database for easy query %s: %s",
-            query.c_str(), sqlite3_errmsg(m_db));
-        return false;
-    }
-    return true;
-}   // easySQLQuery
-
-//-----------------------------------------------------------------------------
-/* Write true to result if table name exists in database. */
-void ServerLobby::checkTableExists(const std::string& table, bool& result)
-{
-    if (!m_db)
-        return;
-    sqlite3_stmt* stmt = NULL;
-    if (!table.empty())
-    {
-        std::string query = StringUtils::insertValues(
-            "SELECT count(type) FROM sqlite_master "
-            "WHERE type='table' AND name='%s';", table.c_str());
-
-        int ret = sqlite3_prepare_v2(m_db, query.c_str(), -1, &stmt, 0);
-        if (ret == SQLITE_OK)
-        {
-            ret = sqlite3_step(stmt);
-            if (ret == SQLITE_ROW)
-            {
-                int number = sqlite3_column_int(stmt, 0);
-                if (number == 1)
-                {
-                    Log::info("ServerLobby", "Table named %s will used.",
-                        table.c_str());
-                    result = true;
-                }
-            }
-            ret = sqlite3_finalize(stmt);
-            if (ret != SQLITE_OK)
-            {
-                Log::error("ServerLobby",
-                    "Error finalize database for query %s: %s",
-                    query.c_str(), sqlite3_errmsg(m_db));
-            }
-        }
-    }
-    if (!result && !table.empty())
-    {
-        Log::warn("ServerLobby", "Table named %s not found in database.",
-            table.c_str());
-    }
-}   // checkTableExists
-
-//-----------------------------------------------------------------------------
-std::string ServerLobby::ip2Country(const SocketAddress& addr) const
-{
-    if (!m_db || !m_ip_geolocation_table_exists || addr.isLAN())
-        return "";
-
-    std::string cc_code;
-    std::string query = StringUtils::insertValues(
-        "SELECT country_code FROM %s "
-        "WHERE `ip_start` <= %d AND `ip_end` >= %d "
-        "ORDER BY `ip_start` DESC LIMIT 1;",
-        ServerConfig::m_ip_geolocation_table.c_str(), addr.getIP(),
-        addr.getIP());
-
-    sqlite3_stmt* stmt = NULL;
-    int ret = sqlite3_prepare_v2(m_db, query.c_str(), -1, &stmt, 0);
-    if (ret == SQLITE_OK)
-    {
-        ret = sqlite3_step(stmt);
-        if (ret == SQLITE_ROW)
-        {
-            const char* country_code = (char*)sqlite3_column_text(stmt, 0);
-            cc_code = country_code;
-        }
-        ret = sqlite3_finalize(stmt);
-        if (ret != SQLITE_OK)
-        {
-            Log::error("ServerLobby",
-                "Error finalize database for query %s: %s",
-                query.c_str(), sqlite3_errmsg(m_db));
-        }
-    }
-    else
-    {
-        Log::error("ServerLobby", "Error preparing database for query %s: %s",
-            query.c_str(), sqlite3_errmsg(m_db));
-        return "";
-    }
-    return cc_code;
-}   // ip2Country
-
-//-----------------------------------------------------------------------------
-std::string ServerLobby::ipv62Country(const SocketAddress& addr) const
-{
-    if (!m_db || !m_ipv6_geolocation_table_exists)
-        return "";
-
-    std::string cc_code;
-    const std::string& ipv6 = addr.toString(false/*show_port*/);
-    std::string query = StringUtils::insertValues(
-        "SELECT country_code FROM %s "
-        "WHERE `ip_start` <= upperIPv6(\"%s\") AND `ip_end` >= upperIPv6(\"%s\") "
-        "ORDER BY `ip_start` DESC LIMIT 1;",
-        ServerConfig::m_ipv6_geolocation_table.c_str(), ipv6.c_str(),
-        ipv6.c_str());
-
-    sqlite3_stmt* stmt = NULL;
-    int ret = sqlite3_prepare_v2(m_db, query.c_str(), -1, &stmt, 0);
-    if (ret == SQLITE_OK)
-    {
-        ret = sqlite3_step(stmt);
-        if (ret == SQLITE_ROW)
-        {
-            const char* country_code = (char*)sqlite3_column_text(stmt, 0);
-            cc_code = country_code;
-        }
-        ret = sqlite3_finalize(stmt);
-        if (ret != SQLITE_OK)
-        {
-            Log::error("ServerLobby",
-                "Error finalize database for query %s: %s",
-                query.c_str(), sqlite3_errmsg(m_db));
-        }
-    }
-    else
-    {
-        Log::error("ServerLobby", "Error preparing database for query %s: %s",
-            query.c_str(), sqlite3_errmsg(m_db));
-        return "";
-    }
-    return cc_code;
-}   // ipv62Country
-
 #endif
-
 //-----------------------------------------------------------------------------
 void ServerLobby::writePlayerReport(Event* event)
 {
 #ifdef ENABLE_SQLITE3
-    if (!m_db || !m_player_reports_table_exists)
+    if (!m_db_connector->hasDatabase() || !m_db_connector->hasPlayerReportsTable())
         return;
     STKPeer* reporter = event->getPeer();
     if (!reporter->hasPlayerProfiles())
@@ -1321,65 +740,8 @@ void ServerLobby::writePlayerReport(Event* event)
         return;
     auto reporting_npp = reporting_peer->getPlayerProfiles()[0];
 
-    std::string query;
-    if (ServerConfig::m_ipv6_connection)
-    {
-        query = StringUtils::insertValues(
-            "INSERT INTO %s "
-            "(server_uid, reporter_ip, reporter_ipv6, reporter_online_id, reporter_username, "
-            "info, reporting_ip, reporting_ipv6, reporting_online_id, reporting_username) "
-            "VALUES (?, %u, \"%s\", %u, ?, ?, %u, \"%s\", %u, ?);",
-            ServerConfig::m_player_reports_table.c_str(),
-            !reporter->getAddress().isIPv6() ? reporter->getAddress().getIP() : 0,
-            reporter->getAddress().isIPv6() ? reporter->getAddress().toString(false) : "",
-            reporter_npp->getOnlineId(),
-            !reporting_peer->getAddress().isIPv6() ? reporting_peer->getAddress().getIP() : 0,
-            reporting_peer->getAddress().isIPv6() ? reporting_peer->getAddress().toString(false) : "",
-            reporting_npp->getOnlineId());
-    }
-    else
-    {
-        query = StringUtils::insertValues(
-            "INSERT INTO %s "
-            "(server_uid, reporter_ip, reporter_online_id, reporter_username, "
-            "info, reporting_ip, reporting_online_id, reporting_username) "
-            "VALUES (?, %u, %u, ?, ?, %u, %u, ?);",
-            ServerConfig::m_player_reports_table.c_str(),
-            reporter->getAddress().getIP(), reporter_npp->getOnlineId(),
-            reporting_peer->getAddress().getIP(), reporting_npp->getOnlineId());
-    }
-    bool written = easySQLQuery(query,
-        [reporter_npp, reporting_npp, info](sqlite3_stmt* stmt)
-        {
-            // SQLITE_TRANSIENT to copy string
-            if (sqlite3_bind_text(stmt, 1, ServerConfig::m_server_uid.c_str(),
-                -1, SQLITE_TRANSIENT) != SQLITE_OK)
-            {
-                Log::error("easySQLQuery", "Failed to bind %s.",
-                    ServerConfig::m_server_uid.c_str());
-            }
-            if (sqlite3_bind_text(stmt, 2,
-                StringUtils::wideToUtf8(reporter_npp->getName()).c_str(),
-                -1, SQLITE_TRANSIENT) != SQLITE_OK)
-            {
-                Log::error("easySQLQuery", "Failed to bind %s.",
-                    StringUtils::wideToUtf8(reporter_npp->getName()).c_str());
-            }
-            if (sqlite3_bind_text(stmt, 3,
-                StringUtils::wideToUtf8(info).c_str(),
-                -1, SQLITE_TRANSIENT) != SQLITE_OK)
-            {
-                Log::error("easySQLQuery", "Failed to bind %s.",
-                    StringUtils::wideToUtf8(info).c_str());
-            }
-            if (sqlite3_bind_text(stmt, 4,
-                StringUtils::wideToUtf8(reporting_npp->getName()).c_str(),
-                -1, SQLITE_TRANSIENT) != SQLITE_OK)
-            {
-                Log::error("easySQLQuery", "Failed to bind %s.",
-                    StringUtils::wideToUtf8(reporting_npp->getName()).c_str());
-            }
-        });
+    bool written = m_db_connector->writeReport(reporter, reporter_npp,
+            reporting_peer.get(), reporting_npp, info);
     if (written)
     {
         NetworkString* success = getNetworkString();
@@ -3359,7 +2721,9 @@ void ServerLobby::clientDisconnected(Event* event)
     updatePlayerList();
     delete msg;
 
-    writeDisconnectInfoTable(event->getPeer());
+#ifdef ENABLE_SQLITE3
+    m_db_connector->writeDisconnectInfoTable(event->getPeer());
+#endif
 }   // clientDisconnected
 
 //-----------------------------------------------------------------------------
@@ -3402,14 +2766,7 @@ void ServerLobby::kickPlayerWithReason(STKPeer* peer, const char* reason) const
 void ServerLobby::saveIPBanTable(const SocketAddress& addr)
 {
 #ifdef ENABLE_SQLITE3
-    if (addr.isIPv6() || !m_db || !m_ip_ban_table_exists)
-        return;
-
-    std::string query = StringUtils::insertValues(
-        "INSERT INTO %s (ip_start, ip_end) "
-        "VALUES (%u, %u);",
-        ServerConfig::m_ip_ban_table.c_str(), addr.getIP(), addr.getIP());
-    easySQLQuery(query);
+    m_db_connector->saveAddressToIpBanTable(addr);
 #endif
 }   // saveIPBanTable
 
@@ -3754,9 +3111,9 @@ void ServerLobby::handleUnencryptedConnection(std::shared_ptr<STKPeer> peer,
 
 #ifdef ENABLE_SQLITE3
     if (country_code.empty() && !peer->getAddress().isIPv6())
-        country_code = ip2Country(peer->getAddress());
+        country_code = m_db_connector->ip2Country(peer->getAddress());
     if (country_code.empty() && peer->getAddress().isIPv6())
-        country_code = ipv62Country(peer->getAddress());
+        country_code = m_db_connector->ipv62Country(peer->getAddress());
 #endif
 
     auto red_blue = STKHost::get()->getAllPlayersTeamInfo();
@@ -3828,7 +3185,7 @@ void ServerLobby::handleUnencryptedConnection(std::shared_ptr<STKPeer> peer,
     message_ack->addFloat(auto_start_timer)
         .addUInt32(ServerConfig::m_state_frequency)
         .addUInt8(ServerConfig::m_chat ? 1 : 0)
-        .addUInt8(m_player_reports_table_exists ? 1 : 0);
+        .addUInt8(playerReportsTableExists() ? 1 : 0);
 
     peer->setSpectator(false);
 
@@ -3889,74 +3246,7 @@ void ServerLobby::handleUnencryptedConnection(std::shared_ptr<STKPeer> peer,
     }
 
 #ifdef ENABLE_SQLITE3
-    if (m_server_stats_table.empty() || peer->isAIPeer())
-        return;
-    std::string query;
-    if (ServerConfig::m_ipv6_connection && peer->getAddress().isIPv6())
-    {
-        query = StringUtils::insertValues(
-            "INSERT INTO %s "
-            "(host_id, ip, ipv6 ,port, online_id, username, player_num, "
-            "country_code, version, os, ping) "
-            "VALUES (%u, 0, \"%s\" ,%u, %u, ?, %u, ?, ?, ?, %u);",
-            m_server_stats_table.c_str(), peer->getHostId(),
-            peer->getAddress().toString(false), peer->getAddress().getPort(),
-            online_id, player_count, peer->getAveragePing());
-    }
-    else
-    {
-        query = StringUtils::insertValues(
-            "INSERT INTO %s "
-            "(host_id, ip, port, online_id, username, player_num, "
-            "country_code, version, os, ping) "
-            "VALUES (%u, %u, %u, %u, ?, %u, ?, ?, ?, %u);",
-            m_server_stats_table.c_str(), peer->getHostId(),
-            peer->getAddress().getIP(), peer->getAddress().getPort(),
-            online_id, player_count, peer->getAveragePing());
-    }
-    easySQLQuery(query, [peer, country_code](sqlite3_stmt* stmt)
-        {
-            if (sqlite3_bind_text(stmt, 1, StringUtils::wideToUtf8(
-                peer->getPlayerProfiles()[0]->getName()).c_str(),
-                -1, SQLITE_TRANSIENT) != SQLITE_OK)
-            {
-                Log::error("easySQLQuery", "Failed to bind %s.",
-                    StringUtils::wideToUtf8(
-                    peer->getPlayerProfiles()[0]->getName()).c_str());
-            }
-            if (country_code.empty())
-            {
-                if (sqlite3_bind_null(stmt, 2) != SQLITE_OK)
-                {
-                    Log::error("easySQLQuery",
-                        "Failed to bind NULL for country code.");
-                }
-            }
-            else
-            {
-                if (sqlite3_bind_text(stmt, 2, country_code.c_str(),
-                    -1, SQLITE_TRANSIENT) != SQLITE_OK)
-                {
-                    Log::error("easySQLQuery", "Failed to bind country: %s.",
-                        country_code.c_str());
-                }
-            }
-            auto version_os =
-                StringUtils::extractVersionOS(peer->getUserVersion());
-            if (sqlite3_bind_text(stmt, 3, version_os.first.c_str(),
-                -1, SQLITE_TRANSIENT) != SQLITE_OK)
-            {
-                Log::error("easySQLQuery", "Failed to bind %s.",
-                    version_os.first.c_str());
-            }
-            if (sqlite3_bind_text(stmt, 4, version_os.second.c_str(),
-                -1, SQLITE_TRANSIENT) != SQLITE_OK)
-            {
-                Log::error("easySQLQuery", "Failed to bind %s.",
-                    version_os.second.c_str());
-            }
-        }
-    );
+    m_db_connector->onPlayerJoinQueries(peer, online_id, player_count, country_code);
 #endif
 }   // handleUnencryptedConnection
 
@@ -4796,66 +4086,34 @@ void ServerLobby::resetServer()
 void ServerLobby::testBannedForIP(STKPeer* peer) const
 {
 #ifdef ENABLE_SQLITE3
-    if (!m_db || !m_ip_ban_table_exists)
+    if (!m_db_connector->hasDatabase() || !m_db_connector->hasIpBanTable())
         return;
 
     // Test for IPv4
     if (peer->getAddress().isIPv6())
         return;
 
-    int row_id = -1;
-    unsigned ip_start = 0;
-    unsigned ip_end = 0;
-    std::string query = StringUtils::insertValues(
-        "SELECT rowid, ip_start, ip_end, reason, description FROM %s "
-        "WHERE ip_start <= %u AND ip_end >= %u "
-        "AND datetime('now') > datetime(starting_time) AND "
-        "(expired_days is NULL OR datetime"
-        "(starting_time, '+'||expired_days||' days') > datetime('now')) "
-        "LIMIT 1;",
-        ServerConfig::m_ip_ban_table.c_str(),
-        peer->getAddress().getIP(), peer->getAddress().getIP());
+    bool is_banned = false;
+    uint32_t ip_start = 0;
+    uint32_t ip_end = 0;
 
-    sqlite3_stmt* stmt = NULL;
-    int ret = sqlite3_prepare_v2(m_db, query.c_str(), -1, &stmt, 0);
-    if (ret == SQLITE_OK)
+    std::vector<DatabaseConnector::IpBanTableData> ip_ban_list =
+            m_db_connector->getIpBanTableData(peer->getAddress().getIP());
+    if (!ip_ban_list.empty())
     {
-        ret = sqlite3_step(stmt);
-        if (ret == SQLITE_ROW)
-        {
-            row_id = sqlite3_column_int(stmt, 0);
-            ip_start = (unsigned)sqlite3_column_int64(stmt, 1);
-            ip_end = (unsigned)sqlite3_column_int64(stmt, 2);
-            const char* reason = (char*)sqlite3_column_text(stmt, 3);
-            const char* desc = (char*)sqlite3_column_text(stmt, 4);
-            Log::info("ServerLobby", "%s banned by IP: %s "
+        is_banned = true;
+        ip_start = ip_ban_list[0].ip_start;
+        ip_end = ip_ban_list[0].ip_end;
+        int row_id = ip_ban_list[0].row_id;
+        std::string reason = ip_ban_list[0].reason;
+        std::string description = ip_ban_list[0].description;
+        Log::info("ServerLobby", "%s banned by IP: %s "
                 "(rowid: %d, description: %s).",
-                peer->getAddress().toString().c_str(), reason, row_id, desc);
-            kickPlayerWithReason(peer, reason);
-        }
-        ret = sqlite3_finalize(stmt);
-        if (ret != SQLITE_OK)
-        {
-            Log::error("ServerLobby",
-                "Error finalize database for query %s: %s",
-                query.c_str(), sqlite3_errmsg(m_db));
-        }
+                peer->getAddress().toString().c_str(), reason.c_str(), row_id, description.c_str());
+        kickPlayerWithReason(peer, reason.c_str());
     }
-    else
-    {
-        Log::error("ServerLobby", "Error preparing database for query %s: %s",
-            query.c_str(), sqlite3_errmsg(m_db));
-        return;
-    }
-    if (row_id != -1)
-    {
-        query = StringUtils::insertValues(
-            "UPDATE %s SET trigger_count = trigger_count + 1, "
-            "last_trigger = datetime('now') "
-            "WHERE ip_start = %u AND ip_end = %u;",
-            ServerConfig::m_ip_ban_table.c_str(), ip_start, ip_end);
-        easySQLQuery(query);
-    }
+    if (is_banned)
+        m_db_connector->increaseIpBanTriggerCount(ip_start, ip_end);
 #endif
 }   // testBannedForIP
 
@@ -4863,78 +4121,33 @@ void ServerLobby::testBannedForIP(STKPeer* peer) const
 void ServerLobby::testBannedForIPv6(STKPeer* peer) const
 {
 #ifdef ENABLE_SQLITE3
-    if (!m_db || !m_ipv6_ban_table_exists)
+    if (!m_db_connector->hasDatabase() || !m_db_connector->hasIpv6BanTable())
         return;
 
     // Test for IPv6
     if (!peer->getAddress().isIPv6())
         return;
 
-    int row_id = -1;
-    std::string ipv6_cidr;
-    std::string query = StringUtils::insertValues(
-        "SELECT rowid, ipv6_cidr, reason, description FROM %s "
-        "WHERE insideIPv6CIDR(ipv6_cidr, ?) = 1 "
-        "AND datetime('now') > datetime(starting_time) AND "
-        "(expired_days is NULL OR datetime"
-        "(starting_time, '+'||expired_days||' days') > datetime('now')) "
-        "LIMIT 1;",
-        ServerConfig::m_ipv6_ban_table.c_str());
+    bool is_banned = false;
+    std::string ipv6_cidr = "";
 
-    sqlite3_stmt* stmt = NULL;
-    int ret = sqlite3_prepare_v2(m_db, query.c_str(), -1, &stmt, 0);
-    if (ret == SQLITE_OK)
+    std::vector<DatabaseConnector::Ipv6BanTableData> ipv6_ban_list =
+            m_db_connector->getIpv6BanTableData(peer->getAddress().toString(false));
+
+    if (!ipv6_ban_list.empty())
     {
-        if (sqlite3_bind_text(stmt, 1,
-            peer->getAddress().toString(false).c_str(), -1, SQLITE_TRANSIENT)
-            != SQLITE_OK)
-        {
-            Log::error("ServerLobby", "Error binding ipv6 addr for query: %s",
-                sqlite3_errmsg(m_db));
-        }
-
-        ret = sqlite3_step(stmt);
-        if (ret == SQLITE_ROW)
-        {
-            row_id = sqlite3_column_int(stmt, 0);
-            ipv6_cidr = (char*)sqlite3_column_text(stmt, 1);
-            const char* reason = (char*)sqlite3_column_text(stmt, 2);
-            const char* desc = (char*)sqlite3_column_text(stmt, 3);
-            Log::info("ServerLobby", "%s banned by IP: %s "
+        is_banned = true;
+        ipv6_cidr = ipv6_ban_list[0].ipv6_cidr;
+        int row_id = ipv6_ban_list[0].row_id;
+        std::string reason = ipv6_ban_list[0].reason;
+        std::string description = ipv6_ban_list[0].description;
+        Log::info("ServerLobby", "%s banned by IPv6: %s "
                 "(rowid: %d, description: %s).",
-                peer->getAddress().toString().c_str(), reason, row_id, desc);
-            kickPlayerWithReason(peer, reason);
-        }
-        ret = sqlite3_finalize(stmt);
-        if (ret != SQLITE_OK)
-        {
-            Log::error("ServerLobby",
-                "Error finalize database for query %s: %s",
-                query.c_str(), sqlite3_errmsg(m_db));
-        }
+                peer->getAddress().toString(false).c_str(), reason.c_str(), row_id, description.c_str());
+        kickPlayerWithReason(peer, reason.c_str());
     }
-    else
-    {
-        Log::error("ServerLobby", "Error preparing database for query %s: %s",
-            query.c_str(), sqlite3_errmsg(m_db));
-        return;
-    }
-    if (row_id != -1)
-    {
-        query = StringUtils::insertValues(
-            "UPDATE %s SET trigger_count = trigger_count + 1, "
-            "last_trigger = datetime('now') "
-            "WHERE ipv6_cidr = ?;", ServerConfig::m_ipv6_ban_table.c_str());
-        easySQLQuery(query, [ipv6_cidr](sqlite3_stmt* stmt)
-            {
-                if (sqlite3_bind_text(stmt, 1, ipv6_cidr.c_str(),
-                    -1, SQLITE_TRANSIENT) != SQLITE_OK)
-                {
-                    Log::error("easySQLQuery", "Failed to bind %s.",
-                        ipv6_cidr.c_str());
-                }
-            });
-    }
+    if (is_banned)
+        m_db_connector->increaseIpv6BanTriggerCount(ipv6_cidr);
 #endif
 }   // testBannedForIPv6
 
@@ -4943,57 +4156,26 @@ void ServerLobby::testBannedForOnlineId(STKPeer* peer,
                                         uint32_t online_id) const
 {
 #ifdef ENABLE_SQLITE3
-    if (!m_db || !m_online_id_ban_table_exists)
+    if (!m_db_connector->hasDatabase() || !m_db_connector->hasOnlineIdBanTable())
         return;
 
-    int row_id = -1;
-    std::string query = StringUtils::insertValues(
-        "SELECT rowid, reason, description FROM %s "
-        "WHERE online_id = %u "
-        "AND datetime('now') > datetime(starting_time) AND "
-        "(expired_days is NULL OR datetime"
-        "(starting_time, '+'||expired_days||' days') > datetime('now')) "
-        "LIMIT 1;",
-        ServerConfig::m_online_id_ban_table.c_str(), online_id);
+    bool is_banned = false;
+    std::vector<DatabaseConnector::OnlineIdBanTableData> online_id_ban_list =
+            m_db_connector->getOnlineIdBanTableData(online_id);
 
-    sqlite3_stmt* stmt = NULL;
-    int ret = sqlite3_prepare_v2(m_db, query.c_str(), -1, &stmt, 0);
-    if (ret == SQLITE_OK)
+    if (!online_id_ban_list.empty())
     {
-        ret = sqlite3_step(stmt);
-        if (ret == SQLITE_ROW)
-        {
-            row_id = sqlite3_column_int(stmt, 0);
-            const char* reason = (char*)sqlite3_column_text(stmt, 1);
-            const char* desc = (char*)sqlite3_column_text(stmt, 2);
-            Log::info("ServerLobby", "%s banned by online id: %s "
-                "(online id: %u rowid: %d, description: %s).",
-                peer->getAddress().toString().c_str(), reason, online_id,
-                row_id, desc);
-            kickPlayerWithReason(peer, reason);
-        }
-        ret = sqlite3_finalize(stmt);
-        if (ret != SQLITE_OK)
-        {
-            Log::error("ServerLobby", "Error finalize database: %s",
-                sqlite3_errmsg(m_db));
-        }
+        is_banned = true;
+        int row_id = online_id_ban_list[0].row_id;
+        std::string reason = online_id_ban_list[0].reason;
+        std::string description = online_id_ban_list[0].description;
+        Log::info("ServerLobby", "%s banned by online id: %s "
+                "(online id: %u, rowid: %d, description: %s).",
+                peer->getAddress().toString().c_str(), reason.c_str(), online_id, row_id, description.c_str());
+        kickPlayerWithReason(peer, reason.c_str());
     }
-    else
-    {
-        Log::error("ServerLobby", "Error preparing database: %s",
-            sqlite3_errmsg(m_db));
-        return;
-    }
-    if (row_id != -1)
-    {
-        query = StringUtils::insertValues(
-            "UPDATE %s SET trigger_count = trigger_count + 1, "
-            "last_trigger = datetime('now') "
-            "WHERE online_id = %u;",
-            ServerConfig::m_online_id_ban_table.c_str(), online_id);
-        easySQLQuery(query);
-    }
+    if (is_banned)
+        m_db_connector->increaseOnlineIdBanTriggerCount(online_id);
 #endif
 }   // testBannedForOnlineId
 
@@ -5001,34 +4183,7 @@ void ServerLobby::testBannedForOnlineId(STKPeer* peer,
 void ServerLobby::listBanTable()
 {
 #ifdef ENABLE_SQLITE3
-    if (!m_db)
-        return;
-    auto printer = [](void* data, int argc, char** argv, char** name)
-        {
-            for (int i = 0; i < argc; i++)
-            {
-                std::cout << name[i] << " = " << (argv[i] ? argv[i] : "NULL")
-                    << "\n";
-            }
-            std::cout << "\n";
-            return 0;
-        };
-    if (m_ip_ban_table_exists)
-    {
-        std::string query = "SELECT * FROM ";
-        query += ServerConfig::m_ip_ban_table;
-        query += ";";
-        std::cout << "IP ban list:\n";
-        sqlite3_exec(m_db, query.c_str(), printer, NULL, NULL);
-    }
-    if (m_online_id_ban_table_exists)
-    {
-        std::string query = "SELECT * FROM ";
-        query += ServerConfig::m_online_id_ban_table;
-        query += ";";
-        std::cout << "Online Id ban list:\n";
-        sqlite3_exec(m_db, query.c_str(), printer, NULL, NULL);
-    }
+    m_db_connector->listBanTable();
 #endif
 }   // listBanTable
 
@@ -6052,3 +5207,13 @@ unmute_error:
         delete chat;
     }
 }   // handleServerCommand
+
+//-----------------------------------------------------------------------------
+bool ServerLobby::playerReportsTableExists() const
+{
+#ifdef ENABLE_SQLITE3
+    return m_db_connector->hasPlayerReportsTable();
+#else
+    return false;
+#endif
+}
