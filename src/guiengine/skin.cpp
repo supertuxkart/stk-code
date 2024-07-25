@@ -1143,6 +1143,7 @@ void Skin::drawRatingBar(Widget *w, const core::recti &rect,
     RatingBarWidget *ratingBar = (RatingBarWidget*)w;
 
     const ITexture *texture = SkinConfig::m_render_params["rating::neutral"].getImage();
+    int all_steps = ratingBar->getSteps();
     const int texture_w = texture->getSize().Width / 4;
     const int texture_h = texture->getSize().Height;
     const float aspect_ratio = 1.0f;
@@ -1216,9 +1217,10 @@ void Skin::drawRatingBar(Widget *w, const core::recti &rect,
         star_rect.LowerRightCorner.Y = y_from + star_h;
 
         int step = ratingBar->getStepsOfStar(i);
+        int begin = roundf(2.0f * step / (all_steps - 1)) * texture_w; // Round to the closest actual image
 
-        const core::recti source_area(texture_w * step, 0,
-                                      texture_w * (step + 1), texture_h);
+        const core::recti source_area(begin, 0,
+                                      begin + texture_w, texture_h);
 
         draw2DImage(texture,
                     star_rect, source_area,
