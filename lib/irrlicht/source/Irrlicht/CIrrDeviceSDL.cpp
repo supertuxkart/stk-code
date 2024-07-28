@@ -92,6 +92,10 @@ CIrrDeviceSDL::CIrrDeviceSDL(const SIrrlichtCreationParameters& param)
 	// Switch SDL disables this hint by default: https://github.com/devkitPro/SDL/pull/55#issuecomment-633775255
 	SDL_SetHint(SDL_HINT_TOUCH_MOUSE_EVENTS, "1");
 
+#ifdef ANDROID
+	SDL_SetHint(SDL_HINT_ORIENTATIONS, "LandscapeLeft LandscapeRight");
+#endif
+
 #ifndef MOBILE_STK
 	// Prevent fullscreen minimizes when losing focus
 	if (CreationParams.Fullscreen)
