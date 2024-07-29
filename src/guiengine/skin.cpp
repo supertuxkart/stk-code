@@ -1490,9 +1490,8 @@ void Skin::drawRibbonChild(const core::recti &rect, Widget* widget,
                 return;
                 
             nPlayersOnThisItem = 1;
-        } 
+        }
 
-        // Handle drawing for everyone else
         for (unsigned i = 1; i < MAX_PLAYER_COUNT; i++)
         {
             // ---- Draw selection for other players than player 1
@@ -1500,6 +1499,20 @@ void Skin::drawRibbonChild(const core::recti &rect, Widget* widget,
                 parentRibbon->getSelectionIDString(i) ==
                 widget->m_properties[PROP_ID])
             {
+                nPlayersOnThisItem++;
+            }
+        }
+
+        // Handle drawing for everyone else
+        for (unsigned i = MAX_PLAYER_COUNT - 1; i >= 1; i--)
+        {
+            // ---- Draw selection for other players than player 1
+            if (parentRibbon->isFocusedForPlayer(i) &&
+                parentRibbon->getSelectionIDString(i) ==
+                widget->m_properties[PROP_ID])
+            {
+                nPlayersOnThisItem--;
+                
                 short red_previous = parentRibbonWidget->m_skin_r;
                 short green_previous = parentRibbonWidget->m_skin_g;
                 short blue_previous = parentRibbonWidget->m_skin_b;
@@ -1546,7 +1559,6 @@ void Skin::drawRibbonChild(const core::recti &rect, Widget* widget,
                     parentRibbonWidget->m_skin_g = green_previous;
                     parentRibbonWidget->m_skin_b = blue_previous;
                 }
-                nPlayersOnThisItem++;
             }
         }
 
