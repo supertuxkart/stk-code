@@ -27,6 +27,7 @@
 #include "karts/kart_properties.hpp"
 #include "karts/kart_properties_manager.hpp"
 #include "online/online_player_profile.hpp"
+#include "tracks/track_manager.hpp"
 #include "utils/string_utils.hpp"
 
 //------------------------------------------------------------------------------
@@ -78,6 +79,7 @@ PlayerProfile::PlayerProfile(const XMLNode* node)
     m_remember_password   = false;
     m_story_mode_status   = NULL;
     m_achievements_status = NULL;
+    m_favorite_tracks.clear();
     m_default_kart_color  = 0.0f;
     m_icon_filename       = "";
 
@@ -111,9 +113,8 @@ PlayerProfile::~PlayerProfile()
 
 
 //------------------------------------------------------------------------------
-/** This function loads the achievement and story mode data. These can only
- *  be loaded after the UnlockManager is created, which needs the karts
- *  and tracks to be loaded first.
+/** This function loads the achievement, story mode and favorites data.
+ *  These can only be loaded after the karts and tracks.
  */
 void PlayerProfile::loadRemainingData(const XMLNode *node)
 {
@@ -123,6 +124,24 @@ void PlayerProfile::loadRemainingData(const XMLNode *node)
     const XMLNode *xml_achievements = node->getNode("achievements");
     m_achievements_status = AchievementsManager::get()
                           ->createAchievementsStatus(xml_achievements, m_unique_id == 1);
+
+    // We first load the list of all favorite tracks
+    // Some favorites may correspond to uninstalled addons, so we do not sanitize the strings
+    // TODO : handle Arena and Soccer fields
+    const XMLNode *xml_favorites = node->getNode("favorites");
+    std::vector<XMLNode*> xml_favorite_tracks;
+    xml_favorites->getNodes("track", xml_favorite_tracks);
+    for (unsigned int i = 0; i < xml_favorite_tracks.size(); i++)
+    {
+        std::string temp_string;
+        xml_favorite_tracks[i]->get("ident", &temp_string);
+        m_favorite_tracks.push_back(temp_string);
+    }
+    // Deduplicate the list just in case.
+    std::sort(m_favorite_tracks.begin(), m_favorite_tracks.end());
+    auto it = std::unique(m_favorite_tracks.begin(), m_favorite_tracks.end());
+    m_favorite_tracks.erase(it, m_favorite_tracks.end());
+
     // Fix up any potentially missing icons.
     addIcon();
 }   // initRemainingData
@@ -138,6 +157,16 @@ void PlayerProfile::initRemainingData()
         AchievementsManager::get()->createAchievementsStatus();
     addIcon();
 }   // initRemainingData
+
+void PlayerProfile::setFavoriteTracks()
+{
+    // Update the group data from the Track Manager
+    track_manager->clearFavoriteTracks();
+    for (unsigned int i = 0; i < m_favorite_tracks.size(); i++)
+    {
+        track_manager->addFavoriteTrack(m_favorite_tracks[i]);
+    }
+}   // setFavoriteTracks
 
 //------------------------------------------------------------------------------
 /** Creates an icon for a player if non exist so far. It takes the unique
@@ -201,6 +230,8 @@ const std::string PlayerProfile::getIconFilename() const
  */
 void PlayerProfile::save(UTFWriter &out)
 {
+    //m_favorite_tracks.push_back("cornfield_crossing");
+
     out << "    <player name=\"" << StringUtils::xmlEncode(m_local_name)
         << "\" guest=\""         << m_is_guest_account
         << "\" use-frequency=\"" << m_use_frequency << "\"\n";
@@ -228,6 +259,13 @@ void PlayerProfile::save(UTFWriter &out)
 
         if(m_achievements_status)
             m_achievements_status->save(out);
+
+        out << "      <favorites>\n";
+        for (unsigned int i=0; i < m_favorite_tracks.size(); i++)
+        {
+            out << "        <track ident=\"" << m_favorite_tracks[i] << "\"/>\n";
+        }
+        out << "      </favorites>\n";
     }
     out << "    </player>\n";
 }   // save

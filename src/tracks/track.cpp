@@ -258,6 +258,14 @@ core::stringw Track::getSortName() const
  */
 bool Track::isInGroup(const std::string &group_name)
 {
+    if (group_name == "Favorites")
+    {
+        int index = track_manager->getTrackIndexByIdent(m_ident);
+        std::vector<int> favorite_list =  track_manager->getTracksInGroup("Favorites");
+        return std::find(favorite_list.begin(), favorite_list.end(), index)
+            != favorite_list.end();
+    }
+
     return std::find(m_groups.begin(), m_groups.end(), group_name)
         != m_groups.end();
 }   // isInGroup

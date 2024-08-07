@@ -164,6 +164,9 @@ void TrackManager::loadTrackList()
         delete track;
     m_tracks.clear();
 
+    // Add the special favorites group
+    m_track_group_names.push_back("Favorites");
+
     for(unsigned int i=0; i<m_track_search_path.size(); i++)
     {
         const std::string &dir = m_track_search_path[i];
@@ -312,6 +315,7 @@ void TrackManager::updateGroups(const Track* track)
 {
     if (track->isInternal()) return;
 
+    //TODO : ignore self-declarations from tracks as being in the "favorites" group
     const std::vector<std::string>& new_groups = track->getGroups();
 
     Group2Indices &group_2_indices =
@@ -334,6 +338,26 @@ void TrackManager::updateGroups(const Track* track)
         group_2_indices[new_groups[i]].push_back((int)m_tracks.size()-1);
     }
 }   // updateGroups
+
+// ----------------------------------------------------------------------------
+/** \brief Adds a track to the favorite track group
+  */
+void TrackManager::addFavoriteTrack(const std::string& ident)
+{
+    // TODO : check if the ident corresponds to a race-track
+    int index = getTrackIndexByIdent(ident);
+    if (index >= 0) // index is negative if a track matching the index is missing
+        m_track_groups["Favorites"].push_back(index);
+}   // addFavoriteTrack
+
+// ----------------------------------------------------------------------------
+/** \brief Clears the list of active favorite tracks, used e.g. when switching
+ * between player profiles.
+  */
+void TrackManager::clearFavoriteTracks()
+{
+    m_track_groups["Favorites"].clear();
+}   // clearFavoriteTracks
 
 // ----------------------------------------------------------------------------
 int TrackManager::getTrackIndexByIdent(const std::string& ident) const

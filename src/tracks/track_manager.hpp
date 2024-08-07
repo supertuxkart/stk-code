@@ -44,13 +44,13 @@ private:
     Tracks                                   m_tracks;
 
     typedef std::map<std::string, std::vector<int> > Group2Indices;
-    /** List of all racing track groups. */
+    /** List of all track indexes for each racing track group. */
     Group2Indices                            m_track_groups;
 
-    /** List of all arena groups. */
+    /** List of all arena indexes for each arena group. */
     Group2Indices                            m_arena_groups;
 
-    /** List of all soccer arena groups. */
+    /** List of all soccer arena indexes for each soccer arena group. */
     Group2Indices                            m_soccer_arena_groups;
 
     /** List of the names of all groups containing tracks */
@@ -74,6 +74,14 @@ public:
                ~TrackManager();
     static void removeTrackSearchDirs();
     static void addTrackSearchDir(const std::string &dir);
+
+    /** Adds a track to the special group of favorite tracks.
+    * We need a special treatment, because the list of tracks in this group
+    * depends on the player-profile, not on the track data. */
+    void addFavoriteTrack(const std::string& ident);
+
+    void clearFavoriteTracks();
+
     /** Returns a list of all track identifiers. */
     std::vector<std::string> getAllTrackIdentifiers();
 

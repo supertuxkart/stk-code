@@ -111,7 +111,11 @@ private:
     /** The complete challenge state. */
     StoryModeStatus *m_story_mode_status;
 
+    /** The complete achievement data. */
     AchievementsStatus *m_achievements_status;
+
+    /** The list of identifiers of favorite tracks .*/
+    std::vector<std::string> m_favorite_tracks;
 
 public:
 
@@ -121,6 +125,7 @@ public:
     void save(UTFWriter &out);
     void loadRemainingData(const XMLNode *node);
     void initRemainingData();
+    void setFavoriteTracks();
     void incrementUseFrequency();
     int getUseFrequency() const { return m_use_frequency; }
     bool operator<(const PlayerProfile &other);

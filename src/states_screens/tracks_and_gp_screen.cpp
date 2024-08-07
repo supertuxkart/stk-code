@@ -156,6 +156,8 @@ void TracksAndGPScreen::beforeAddingWidget()
     //I18N: track group name
     FOR_GETTEXT_ONLY( _("All") )
     //I18N: track group name
+    FOR_GETTEXT_ONLY( _("Favorites") )
+    //I18N: track group name
     FOR_GETTEXT_ONLY( _("Standard") )
     //I18N: track group name
     FOR_GETTEXT_ONLY( _("Add-Ons") )
@@ -250,8 +252,8 @@ void TracksAndGPScreen::init()
 }   // init
 
 // -----------------------------------------------------------------------------
-/** Rebuild the list of tracks and GPs. This need to be recomputed e.g. to
- *  take unlocked tracks into account.
+/** Rebuild the list of tracks and GPs. This need to be recomputed to
+ *  take unlocked tracks into account, when changing the current track group, etc.
  */
 void TracksAndGPScreen::buildTrackList()
 {
