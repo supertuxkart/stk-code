@@ -80,7 +80,9 @@ namespace GUIEngine
         /** A anchor badge to indicate that this player receives a handicap */
         ANCHOR_BADGE   = 256,
         /** A down arrow badge to indicate new addons for downloading */
-        DOWN_BADGE   = 512
+        DOWN_BADGE     = 512,
+        /** A heart badge, to indicate e.g. a favorite track */
+        HEART_BADGE    = 1024
     };
 
 

@@ -180,7 +180,6 @@ void PlayerProfile::setFavoriteTracks()
 void PlayerProfile::addFavoriteTrack(std::string ident)
 {
     m_favorite_tracks.push_back(ident);
-    printf("Ident %s added to favorite tracks.\n", ident.c_str());
     track_manager->addFavoriteTrack(ident);
 } // addFavoriteTrack
 
@@ -195,12 +194,7 @@ void PlayerProfile::removeFavoriteTrack(std::string ident)
     if (it != m_favorite_tracks.end()) // the track to remove has been found
     {
         m_favorite_tracks.erase(it);
-        printf("Ident %s removed from favorite tracks.\n", ident.c_str());
         setFavoriteTracks();
-    }
-    else
-    {
-        printf("Favorite track to remove not found.\n");
     }
 } // removeFavoriteTrack
 

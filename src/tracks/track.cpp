@@ -212,12 +212,15 @@ bool Track::operator<(const Track &other) const
     PlayerProfile *p = PlayerManager::getCurrentPlayer();
     bool this_is_locked = p->isLocked(getIdent());
     bool other_is_locked = p->isLocked(other.getIdent());
-    if(this_is_locked == other_is_locked)
-    {
-        return getSortName() < other.getSortName();
-    }
-    else
+    bool this_is_favorite = p->isFavoriteTrack(getIdent());
+    bool other_is_favorite = p->isFavoriteTrack(other.getIdent());
+    // Locked tracks cannot be favorite, so favorites < normal < locked
+    if (this_is_favorite != other_is_favorite)
+        return this_is_favorite;
+    else if(this_is_locked != other_is_locked)
         return other_is_locked;
+    else
+        return getSortName() < other.getSortName();
 }   // operator<
 
 //-----------------------------------------------------------------------------

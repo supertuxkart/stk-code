@@ -94,6 +94,8 @@ void TracksAndGPScreen::eventCallback(Widget* widget, const std::string& name,
                     PlayerManager::getCurrentPlayer()->removeFavoriteTrack(track->getIdent());
                 else
                     PlayerManager::getCurrentPlayer()->addFavoriteTrack(track->getIdent());
+
+                buildTrackList();
             }
             else // Normal mode
             {
@@ -291,6 +293,7 @@ void TracksAndGPScreen::buildTrackList()
     for (int n = 0; n < track_amount; n++)
     {
         Track* curr = track_manager->getTrack(n);
+        if (curr->isArena() || curr->isSoccer() || curr->isInternal()) continue;
         if (RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_EASTER_EGG
             && !curr->hasEasterEggs())
             continue;
@@ -299,7 +302,6 @@ void TracksAndGPScreen::buildTrackList()
         if (!search_text.empty() &&
             curr->getName().make_lower().find(search_text.c_str()) == -1)
             continue;
-        if (curr->isArena() || curr->isSoccer()||curr->isInternal()) continue;
         if (curr_group_name != ALL_TRACK_GROUPS_ID &&
             !curr->isInGroup(curr_group_name)) continue;
 
@@ -318,10 +320,16 @@ void TracksAndGPScreen::buildTrackList()
                 "locked", curr->getScreenshotFile(), LOCKED_BADGE,
                 IconButtonWidget::ICON_PATH_TYPE_ABSOLUTE);
         }
+        else if (curr->isInGroup("Favorites"))
+        {
+            tracks_widget->addItem(curr->getName(), curr->getIdent(),
+                curr->getScreenshotFile(), HEART_BADGE,
+                IconButtonWidget::ICON_PATH_TYPE_ABSOLUTE);
+            m_random_track_list.push_back(curr->getIdent());
+        }
         else
         {
-            tracks_widget->addItem(curr->getName(),
-                curr->getIdent(),
+            tracks_widget->addItem(curr->getName(), curr->getIdent(),
                 curr->getScreenshotFile(), 0,
                 IconButtonWidget::ICON_PATH_TYPE_ABSOLUTE);
             m_random_track_list.push_back(curr->getIdent());

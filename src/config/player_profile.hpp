@@ -204,6 +204,13 @@ public:
         return m_story_mode_status->isLocked(feature);
     }   // isLocked
     // ----------------------------------------------------------------------------------------
+    /** Returnes if the track is favorite. */
+    bool isFavoriteTrack(const std::string &ident) const
+    {
+        return std::find(m_favorite_tracks.begin(), m_favorite_tracks.end(), ident)
+            != m_favorite_tracks.end();
+    }   // isFavoriteTrack
+    // ----------------------------------------------------------------------------------------
     /** Returns all active challenges. */
     void computeActive() { m_story_mode_status->computeActive(); }
     // ----------------------------------------------------------------------------------------
