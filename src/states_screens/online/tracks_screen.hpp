@@ -24,6 +24,7 @@
 #include <deque>
 #include <limits>
 #include <string>
+#include <random>
 #include <vector>
 
 class PeerVote;
@@ -88,7 +89,9 @@ private:
 
     void voteForPlayer();
 
-    TracksScreen() : Screen("tracks.stkgui")
+    std::mt19937 m_random_number_generator;
+
+    TracksScreen() : Screen("tracks.stkgui"), m_random_number_generator(std::random_device{}())
     {
         m_network_tracks = false;
         m_quit_server = false;

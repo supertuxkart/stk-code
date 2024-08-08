@@ -48,7 +48,7 @@
 //-----------------------------------------------------------------------------
 /** Constructor. Sets up the clock mode etc.
  */
-ThreeStrikesBattle::ThreeStrikesBattle() : WorldWithRank()
+ThreeStrikesBattle::ThreeStrikesBattle() : WorldWithRank(), m_random_number_generator(std::random_device{}())
 {
     WorldStatus::setClockMode(CLOCK_CHRONO);
     m_use_highscores = false;
@@ -684,8 +684,8 @@ void ThreeStrikesBattle::loadCustomModels()
             }
 
             // Find random nodes to pre-spawn spare tire karts
-            std::random_shuffle(sta_possible_nodes.begin(),
-                sta_possible_nodes.end());
+            std::shuffle(sta_possible_nodes.begin(),
+                         sta_possible_nodes.end(), m_random_number_generator);
 
             // Compute a random kart list
             std::vector<std::string> sta_list;

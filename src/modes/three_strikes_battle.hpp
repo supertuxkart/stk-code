@@ -24,6 +24,7 @@
 #include "tracks/track_object.hpp"
 #include "states_screens/race_gui_base.hpp"
 
+#include <random>
 #include <string>
 
 class PhysicalObject;
@@ -91,6 +92,8 @@ private:
 
     std::vector<AbstractKart*> m_spare_tire_karts;
     int m_next_sta_spawn_ticks;
+
+    std::mt19937 m_random_number_generator;
 
 public:
     /** Used to show a nice graph when battle is over */

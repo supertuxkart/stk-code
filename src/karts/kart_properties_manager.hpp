@@ -23,6 +23,7 @@
 #include "utils/ptr_vector.hpp"
 #include <map>
 #include <memory>
+#include <random>
 #include <set>
 
 #include "network/remote_kart_info.hpp"
@@ -69,6 +70,8 @@ private:
     std::map<std::string, std::unique_ptr<AbstractCharacteristic> > m_difficulty_characteristics;
     std::map<std::string, std::unique_ptr<AbstractCharacteristic> > m_kart_type_characteristics;
     std::map<std::string, std::unique_ptr<AbstractCharacteristic> > m_player_characteristics;
+
+    std::mt19937 m_random_number_generator;
 
 protected:
 
