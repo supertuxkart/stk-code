@@ -126,6 +126,8 @@ public:
     void loadRemainingData(const XMLNode *node);
     void initRemainingData();
     void setFavoriteTracks();
+    void addFavoriteTrack(std::string ident);
+    void removeFavoriteTrack(std::string ident);
     void incrementUseFrequency();
     int getUseFrequency() const { return m_use_frequency; }
     bool operator<(const PlayerProfile &other);

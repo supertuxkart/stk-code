@@ -144,7 +144,7 @@ void PlayerProfile::loadRemainingData(const XMLNode *node)
 
     // Fix up any potentially missing icons.
     addIcon();
-}   // initRemainingData
+}   // loadRemainingData
 
 //------------------------------------------------------------------------------
 /** Initialises the story- and achievement data structure in case of the first
@@ -158,6 +158,10 @@ void PlayerProfile::initRemainingData()
     addIcon();
 }   // initRemainingData
 
+//------------------------------------------------------------------------------
+/** Update the group of favorite tracks handled by the Track Manager.
+ * To be used only if this player profile is the current player.
+ */
 void PlayerProfile::setFavoriteTracks()
 {
     // Update the group data from the Track Manager
@@ -167,6 +171,38 @@ void PlayerProfile::setFavoriteTracks()
         track_manager->addFavoriteTrack(m_favorite_tracks[i]);
     }
 }   // setFavoriteTracks
+
+//------------------------------------------------------------------------------
+/** Adds a new favorite track to this player profile and to the group
+ * of favorite tracks of the Track Manager.
+ * To be used only if this player profile is the current player.
+ */
+void PlayerProfile::addFavoriteTrack(std::string ident)
+{
+    m_favorite_tracks.push_back(ident);
+    printf("Ident %s added to favorite tracks.\n", ident.c_str());
+    track_manager->addFavoriteTrack(ident);
+} // addFavoriteTrack
+
+//------------------------------------------------------------------------------
+/** Removes a favorite track from this player profile and from the group
+ * of favorite tracks of the Track Manager.
+ * To be used only if this player profile is the current player.
+ */
+void PlayerProfile::removeFavoriteTrack(std::string ident)
+{
+    auto it = std::find(m_favorite_tracks.begin(), m_favorite_tracks.end(), ident);
+    if (it != m_favorite_tracks.end()) // the track to remove has been found
+    {
+        m_favorite_tracks.erase(it);
+        printf("Ident %s removed from favorite tracks.\n", ident.c_str());
+        setFavoriteTracks();
+    }
+    else
+    {
+        printf("Favorite track to remove not found.\n");
+    }
+} // removeFavoriteTrack
 
 //------------------------------------------------------------------------------
 /** Creates an icon for a player if non exist so far. It takes the unique
@@ -230,8 +266,6 @@ const std::string PlayerProfile::getIconFilename() const
  */
 void PlayerProfile::save(UTFWriter &out)
 {
-    //m_favorite_tracks.push_back("cornfield_crossing");
-
     out << "    <player name=\"" << StringUtils::xmlEncode(m_local_name)
         << "\" guest=\""         << m_is_guest_account
         << "\" use-frequency=\"" << m_use_frequency << "\"\n";

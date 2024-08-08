@@ -22,6 +22,7 @@
 #include "config/user_config.hpp"
 #include "graphics/stk_tex_manager.hpp"
 #include "guiengine/widget.hpp"
+#include "guiengine/widgets/check_box_widget.hpp"
 #include "guiengine/widgets/dynamic_ribbon_widget.hpp"
 #include "guiengine/widgets/icon_button_widget.hpp"
 #include "io/file_manager.hpp"
@@ -86,8 +87,19 @@ void TracksAndGPScreen::eventCallback(Widget* widget, const std::string& name,
 
         if (track)
         {
-            TrackInfoScreen::getInstance()->setTrack(track);
-            TrackInfoScreen::getInstance()->push();
+            // In favorite edit mode, switch the status of the selected track
+            if (getWidget<CheckBoxWidget>("favorite")->getState())
+            {
+                if(track->isInGroup("Favorites"))
+                    PlayerManager::getCurrentPlayer()->removeFavoriteTrack(track->getIdent());
+                else
+                    PlayerManager::getCurrentPlayer()->addFavoriteTrack(track->getIdent());
+            }
+            else // Normal mode
+            {
+                TrackInfoScreen::getInstance()->setTrack(track);
+                TrackInfoScreen::getInstance()->push();             
+            }
         }   // if clicked_track
 
     }   // name=="tracks"
@@ -132,6 +144,7 @@ void TracksAndGPScreen::eventCallback(Widget* widget, const std::string& name,
     {
         StateManager::get()->escapePressed();
     }
+    // The favorite track checkbox does not need any specific additional handling
 }   // eventCallback
 
 // -----------------------------------------------------------------------------
@@ -141,6 +154,10 @@ void TracksAndGPScreen::beforeAddingWidget()
     Screen::init();
     RibbonWidget* tabs = getWidget<RibbonWidget>("trackgroups");
     tabs->clearAllChildren();
+
+    CheckBoxWidget* favorite_cb = getWidget<CheckBoxWidget>("favorite");
+    assert( favorite_cb != NULL );
+    favorite_cb->setState(false);
 
     const std::vector<std::string>& groups = track_manager->getAllTrackGroups();
     const int group_amount = (int)groups.size();
