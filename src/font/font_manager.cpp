@@ -30,6 +30,7 @@
 #include "utils/translation.hpp"
 
 #ifndef SERVER_ONLY
+#include <stdlib.h>
 #include <harfbuzz/hb-ft.h>
 extern "C"
 {

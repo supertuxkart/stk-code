@@ -42,7 +42,7 @@ static const char ALL_TRACK_GROUPS_ID[] = "all";
 
 // -----------------------------------------------------------------------------
 
-EasterEggScreen::EasterEggScreen() : Screen("easter_egg.stkgui")
+EasterEggScreen::EasterEggScreen() : Screen("easter_egg.stkgui"), m_random_number_generator(std::random_device{}())
 {
 }
 
@@ -278,7 +278,7 @@ void EasterEggScreen::buildTrackList()
                            0 /* no badge */, IconButtonWidget::ICON_PATH_TYPE_RELATIVE);
 
     tracks_widget->updateItemDisplay();
-    std::random_shuffle( m_random_track_list.begin(), m_random_track_list.end() );
+    std::shuffle( m_random_track_list.begin(), m_random_track_list.end(), m_random_number_generator );
 }
 
 // -----------------------------------------------------------------------------

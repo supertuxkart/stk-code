@@ -50,7 +50,7 @@ KartPropertiesManager *kart_properties_manager=0;
 std::vector<std::string> KartPropertiesManager::m_kart_search_path;
 
 /** Constructor, only clears internal data structures. */
-KartPropertiesManager::KartPropertiesManager()
+KartPropertiesManager::KartPropertiesManager() : m_random_number_generator(std::random_device{}())
 {
     m_all_groups.clear();
 }   // KartPropertiesManager
@@ -601,8 +601,8 @@ void KartPropertiesManager::getRandomKartList(int count,
 
             assert(random_kart_queue.size() > 0);
 
-            std::random_shuffle(random_kart_queue.begin(),
-                                random_kart_queue.end()   );
+            std::shuffle(random_kart_queue.begin(),
+                         random_kart_queue.end(), m_random_number_generator);
         }
 
         while (count > 0 && random_kart_queue.size() > 0)
