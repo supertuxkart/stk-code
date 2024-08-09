@@ -1,5 +1,5 @@
 #include <atomic>
-#ifdef WIN32
+#if defined(WIN32) || defined(__MINGW32__)
 #include <namedpipeapi.h>
 #endif
 #include <thread>
@@ -26,7 +26,7 @@ namespace RichPresenceNS
         bool m_connected;
         std::atomic_bool m_ready;
         time_t m_last;
-#ifdef WIN32
+#if defined(WIN32) || defined(__MINGW32__)
         HANDLE m_socket;
 #else
         int m_socket;

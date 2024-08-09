@@ -126,7 +126,7 @@ void OptionsScreenLanguage::eventCallback(Widget* widget, const std::string& nam
 
         if (selection == "system")
         {
-#ifdef WIN32
+#if defined(WIN32) || defined(__MINGW32__)
             _putenv("LANGUAGE=");
 #else
             unsetenv("LANGUAGE");
@@ -134,7 +134,7 @@ void OptionsScreenLanguage::eventCallback(Widget* widget, const std::string& nam
         }
         else
         {
-#ifdef WIN32
+#if defined(WIN32) || defined(__MINGW32__)
             std::string s=std::string("LANGUAGE=")+selection.c_str();
             _putenv(s.c_str());
 #else

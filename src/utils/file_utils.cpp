@@ -24,7 +24,7 @@
 #include <sys/stat.h>
 
 // ----------------------------------------------------------------------------
-#if defined(WIN32)
+#if defined(WIN32) || defined(__MINGW32__)
 #include <windows.h>
 // ----------------------------------------------------------------------------
 namespace u8checker
@@ -117,7 +117,7 @@ std::string FileUtils::Private::getShortPathWriting(const std::string& u8_path)
  */
 FILE* FileUtils::fopenU8Path(const std::string& u8_path, const char* mode)
 {
-#if defined(WIN32)
+#if defined(WIN32) || defined(__MINGW32__)
     std::vector<wchar_t> mode_str;
     for (unsigned i = 0; i < strlen(mode); i++)
         mode_str.push_back((wchar_t)mode[i]);
@@ -133,7 +133,7 @@ FILE* FileUtils::fopenU8Path(const std::string& u8_path, const char* mode)
  */
 int FileUtils::statU8Path(const std::string& u8_path, struct stat *buf)
 {
-#if defined(WIN32)
+#if defined(WIN32) || defined(__MINGW32__)
     struct _stat st;
     int ret = _wstat(StringUtils::utf8ToWide(u8_path).c_str(), &st);
     buf->st_dev = st.st_dev;
@@ -159,7 +159,7 @@ int FileUtils::statU8Path(const std::string& u8_path, struct stat *buf)
 int FileUtils::renameU8Path(const std::string& u8_path_old,
                             const std::string& u8_path_new)
 {
-#if defined(WIN32)
+#if defined(WIN32) || defined(__MINGW32__)
     return _wrename(StringUtils::utf8ToWide(u8_path_old).c_str(),
         StringUtils::utf8ToWide(u8_path_new).c_str());
 #else

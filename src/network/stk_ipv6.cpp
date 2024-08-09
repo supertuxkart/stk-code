@@ -16,7 +16,7 @@
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include <string.h>
-#ifdef WIN32
+#if defined(WIN32) || defined(__MINGW32__)
 #ifdef __GNUC__
 #    include <ws2tcpip.h>    // Mingw / gcc on windows
 #    undef _WIN32_WINNT
