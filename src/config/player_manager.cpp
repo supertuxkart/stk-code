@@ -241,10 +241,6 @@ void PlayerManager::initRemainingData()
 
     // Sort player by frequency
     m_all_players.insertionSort(/*start*/0, /*desc*/true);
-
-    // Load favorite tracks for the current player
-    if (m_current_player)
-        m_current_player->setFavoriteTracks();
 }   // initRemainingData
 
 // ----------------------------------------------------------------------------
@@ -486,7 +482,6 @@ void PlayerManager::setCurrentPlayer(PlayerProfile *player)
     if(m_current_player)
     {
         m_current_player->computeActive();
-        m_current_player->setFavoriteTracks();
     }
 
     if (player_has_changed)

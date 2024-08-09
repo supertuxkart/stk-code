@@ -18,6 +18,7 @@
 #include "states_screens/tracks_and_gp_screen.hpp"
 
 #include "challenges/unlock_manager.hpp"
+#include "config/favorite_track_status.hpp"
 #include "config/player_manager.hpp"
 #include "config/user_config.hpp"
 #include "graphics/stk_tex_manager.hpp"
@@ -90,7 +91,7 @@ void TracksAndGPScreen::eventCallback(Widget* widget, const std::string& name,
             // In favorite edit mode, switch the status of the selected track
             if (getWidget<CheckBoxWidget>("favorite")->getState())
             {
-                if(track->isInGroup("Favorites"))
+                if(PlayerManager::getCurrentPlayer()->isFavoriteTrack(track->getIdent()))
                     PlayerManager::getCurrentPlayer()->removeFavoriteTrack(track->getIdent());
                 else
                     PlayerManager::getCurrentPlayer()->addFavoriteTrack(track->getIdent());
@@ -154,6 +155,10 @@ void TracksAndGPScreen::eventCallback(Widget* widget, const std::string& name,
 void TracksAndGPScreen::beforeAddingWidget()
 {
     Screen::init();
+    
+    // Add user-defined group to track groups
+    track_manager->setFavoriteTrackStatus(PlayerManager::getCurrentPlayer()->getFavoriteTrackStatus());
+
     RibbonWidget* tabs = getWidget<RibbonWidget>("trackgroups");
     tabs->clearAllChildren();
 
@@ -276,6 +281,9 @@ void TracksAndGPScreen::init()
  */
 void TracksAndGPScreen::buildTrackList()
 {
+    // Add user-defined group to track groups
+    track_manager->setFavoriteTrackStatus(PlayerManager::getCurrentPlayer()->getFavoriteTrackStatus());
+
     DynamicRibbonWidget* tracks_widget = this->getWidget<DynamicRibbonWidget>("tracks");
     RibbonWidget* tabs = this->getWidget<RibbonWidget>("trackgroups");
 
@@ -285,28 +293,49 @@ void TracksAndGPScreen::buildTrackList()
 
     const std::string& curr_group_name = tabs->getSelectionIDString(0);
 
-    const int track_amount = (int)track_manager->getNumberOfTracks();
-
     // First build a list of all tracks to be displayed
     // (e.g. exclude arenas, ...)
     PtrVector<Track, REF> tracks;
-    for (int n = 0; n < track_amount; n++)
+    if (curr_group_name == ALL_TRACK_GROUPS_ID)
     {
-        Track* curr = track_manager->getTrack(n);
-        if (curr->isArena() || curr->isSoccer() || curr->isInternal()) continue;
-        if (RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_EASTER_EGG
-            && !curr->hasEasterEggs())
-            continue;
-        core::stringw search_text = m_search_box->getText();
-        search_text.make_lower();
-        if (!search_text.empty() &&
-            curr->getName().make_lower().find(search_text.c_str()) == -1)
-            continue;
-        if (curr_group_name != ALL_TRACK_GROUPS_ID &&
-            !curr->isInGroup(curr_group_name)) continue;
+        const int track_amount = (int)track_manager->getNumberOfTracks();
+        for (int n = 0; n < track_amount; n++)
+        {
+            Track* curr = track_manager->getTrack(n);
+            if (curr->isArena() || curr->isSoccer() || curr->isInternal()) continue;
+            if (RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_EASTER_EGG
+                && !curr->hasEasterEggs())
+                continue;
+            core::stringw search_text = m_search_box->getText();
+            search_text.make_lower();
+            if (!search_text.empty() &&
+                curr->getName().make_lower().find(search_text.c_str()) == -1)
+                continue;
 
-        tracks.push_back(curr);
-    }   // for n<track_amount
+            tracks.push_back(curr);
+        }   // for n<track_amount
+    }
+    else
+    {
+        const std::vector<int>& curr_tracks = track_manager->getTracksInGroup(curr_group_name);
+        const int track_amount = (int)curr_tracks.size();
+
+        for (int n = 0; n < track_amount; n++)
+        {
+            Track* curr = track_manager->getTrack(curr_tracks[n]);
+            if (curr->isArena() || curr->isSoccer() || curr->isInternal()) continue;
+            if (RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_EASTER_EGG
+                && !curr->hasEasterEggs())
+                continue;
+            core::stringw search_text = m_search_box->getText();
+            search_text.make_lower();
+            if (!search_text.empty() &&
+                curr->getName().make_lower().find(search_text.c_str()) == -1)
+                continue;
+
+            tracks.push_back(curr);
+        }   // for n<track_amount
+    }
 
     tracks.insertionSort();
     for (unsigned int i = 0; i < tracks.size(); i++)
@@ -320,7 +349,7 @@ void TracksAndGPScreen::buildTrackList()
                 "locked", curr->getScreenshotFile(), LOCKED_BADGE,
                 IconButtonWidget::ICON_PATH_TYPE_ABSOLUTE);
         }
-        else if (curr->isInGroup("Favorites"))
+        else if (PlayerManager::getCurrentPlayer()->isFavoriteTrack(curr->getIdent()))
         {
             tracks_widget->addItem(curr->getName(), curr->getIdent(),
                 curr->getScreenshotFile(), HEART_BADGE,

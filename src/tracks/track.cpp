@@ -23,6 +23,7 @@
 #include "audio/music_manager.hpp"
 #include "challenges/challenge_status.hpp"
 #include "challenges/unlock_manager.hpp"
+#include "config/favorite_track_status.hpp"
 #include "config/player_manager.hpp"
 #include "config/stk_config.hpp"
 #include "config/user_config.hpp"
@@ -261,14 +262,6 @@ core::stringw Track::getSortName() const
  */
 bool Track::isInGroup(const std::string &group_name)
 {
-    if (group_name == "Favorites")
-    {
-        int index = track_manager->getTrackIndexByIdent(m_ident);
-        std::vector<int> favorite_list =  track_manager->getTracksInGroup("Favorites");
-        return std::find(favorite_list.begin(), favorite_list.end(), index)
-            != favorite_list.end();
-    }
-
     return std::find(m_groups.begin(), m_groups.end(), group_name)
         != m_groups.end();
 }   // isInGroup
@@ -623,7 +616,7 @@ void Track::loadTrackInfo()
         m_all_modes.push_back(tm);
     }
 
-    if(m_groups.size()==0) m_groups.push_back(DEFAULT_GROUP_NAME);
+    if(m_groups.size()==0) m_groups.push_back(FavoriteTrackStatus::DEFAULT_FAVORITE_GROUP_NAME);
     const XMLNode *xml_node = root->getNode("curves");
 
     if(xml_node) loadCurves(*xml_node);

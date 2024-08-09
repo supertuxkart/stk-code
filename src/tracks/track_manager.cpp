@@ -43,7 +43,9 @@ std::vector<std::string>  TrackManager::m_track_search_path;
 /** Constructor (currently empty). The real work happens in loadTrackList.
  */
 TrackManager::TrackManager()
-{}   // TrackManager
+{
+    m_current_favorite_status = NULL;
+}   // TrackManager
 
 //-----------------------------------------------------------------------------
 /** Delete all tracks.
@@ -151,21 +153,24 @@ std::vector<std::string> TrackManager::getAllTrackIdentifiers()
 void TrackManager::loadTrackList()
 {
     m_all_track_dirs.clear();
+
     m_track_group_names.clear();
     m_track_groups.clear();
     m_arena_group_names.clear();
     m_soccer_arena_group_names.clear();
     m_arena_groups.clear();
     m_soccer_arena_groups.clear();
+
+    m_track_groups_no_custom.clear();
+    m_arena_groups_no_custom.clear();
+    m_soccer_arena_groups_no_custom.clear();
+
     m_track_avail.clear();
     // This function is called when install a new addons, delete previous
     // tracks
     for (Track* track : m_tracks)
         delete track;
     m_tracks.clear();
-
-    // Add the special favorites group
-    m_track_group_names.push_back("Favorites");
 
     for(unsigned int i=0; i<m_track_search_path.size(); i++)
     {
@@ -257,17 +262,46 @@ void TrackManager::removeTrack(const std::string &ident)
             (track->isArena() ? m_arena_groups :
              (track->isSoccer() ? m_soccer_arena_groups :
                m_track_groups));
+    
+    Group2Indices &group_2_indices_no_custom =
+            (track->isArena() ? m_arena_groups_no_custom :
+             (track->isSoccer() ? m_soccer_arena_groups_no_custom :
+               m_track_groups_no_custom));
 
     std::vector<std::string> &group_names =
             (track->isArena() ? m_arena_group_names :
              (track->isSoccer() ? m_soccer_arena_group_names :
                m_track_group_names));
 
-    const std::vector<std::string>& groups=track->getGroups();
+    std::vector<std::string> groups=track->getGroups();
+    if (m_current_favorite_status)
+    {
+        for (auto it = m_current_favorite_status->m_favorite_tracks.begin();
+                it != m_current_favorite_status->m_favorite_tracks.end(); it++)
+        { // User-defined groups
+            if (it->second.find(ident) != it->second.end())
+            {
+                groups.push_back(it->first);
+            }
+        }
+    }
+
     for(unsigned int i=0; i<groups.size(); i++)
     {
-        std::vector<int> &indices = group_2_indices[groups[i]];
+        std::vector<int> &indices = group_2_indices_no_custom[groups[i]];
         std::vector<int>::iterator j;
+        j = std::find(indices.begin(), indices.end(), index);
+        if (j != indices.end())
+            indices.erase(j);
+
+        // If the track was the last member of a group,
+        // completely remove the group
+        if(indices.size()==0)
+        {
+            group_2_indices_no_custom.erase(groups[i]);
+        }   // if complete group must be removed
+
+        indices = group_2_indices[groups[i]];
         j = std::find(indices.begin(), indices.end(), index);
         assert(j!=indices.end());
         indices.erase(j);
@@ -279,7 +313,7 @@ void TrackManager::removeTrack(const std::string &ident)
             group_2_indices.erase(groups[i]);
             std::vector<std::string>::iterator it_g;
             it_g = std::find(group_names.begin(), group_names.end(),
-                             groups[i]);
+                            groups[i]);
             assert(it_g!=group_names.end());
             group_names.erase(it_g);
         }   // if complete group must be removed
@@ -293,11 +327,19 @@ void TrackManager::removeTrack(const std::string &ident)
         Group2Indices &g2i = (i==0 ? m_soccer_arena_groups :
                                (i==1 ? m_arena_groups :
                                  m_track_groups));
+        Group2Indices &g2i_nc = (i==0 ? m_soccer_arena_groups_no_custom :
+                                (i==1 ? m_arena_groups_no_custom :
+                                 m_track_groups_no_custom));
         Group2Indices::iterator j;
-        for(j=g2i.begin(); j!=g2i.end(); j++)
+        for(j = g2i.begin(); j != g2i.end(); j++)
         {
-            for(unsigned int i=0; i<(*j).second.size(); i++)
-                if((*j).second[i]>index) (*j).second[i]--;
+            for(unsigned int i = 0; i < (*j).second.size(); i++)
+                if((*j).second[i] > index) (*j).second[i]--;
+        }   // for j in group_2_indices
+        for(j = g2i_nc.begin(); j != g2i_nc.end(); j++)
+        {
+            for(unsigned int i = 0; i < (*j).second.size(); i++)
+                if((*j).second[i] > index) (*j).second[i]--;
         }   // for j in group_2_indices
     }   // for i in arenas, tracks
 
@@ -315,13 +357,18 @@ void TrackManager::updateGroups(const Track* track)
 {
     if (track->isInternal()) return;
 
-    //TODO : ignore self-declarations from tracks as being in the "favorites" group
-    const std::vector<std::string>& new_groups = track->getGroups();
+    std::string ident = track->getIdent();
+    std::vector<std::string> new_groups = track->getGroups();
 
     Group2Indices &group_2_indices =
             (track->isArena() ? m_arena_groups :
              (track->isSoccer() ? m_soccer_arena_groups :
                m_track_groups));
+    
+    Group2Indices &group_2_indices_no_custom =
+            (track->isArena() ? m_arena_groups_no_custom :
+             (track->isSoccer() ? m_soccer_arena_groups_no_custom :
+               m_track_groups_no_custom));
 
     std::vector<std::string> &group_names =
             (track->isArena() ? m_arena_group_names :
@@ -336,27 +383,91 @@ void TrackManager::updateGroups(const Track* track)
         if(!group_exists)
             group_names.push_back(new_groups[i]);
         group_2_indices[new_groups[i]].push_back((int)m_tracks.size()-1);
+        group_2_indices_no_custom[new_groups[i]].push_back((int)m_tracks.size()-1);
+    }
+
+    if (m_current_favorite_status)
+    {
+        for (auto it = m_current_favorite_status->m_favorite_tracks.begin();
+                it != m_current_favorite_status->m_favorite_tracks.end(); it++)
+        { // User-defined groups
+            if (it->second.find(ident) != it->second.end())
+            {
+                bool group_exists = group_2_indices.find(ident)
+                                                        != group_2_indices.end();
+                if(!group_exists)
+                    group_names.push_back(ident);
+                group_2_indices[ident].push_back((int)m_tracks.size()-1);
+            }
+        }
     }
 }   // updateGroups
 
 // ----------------------------------------------------------------------------
-/** \brief Adds a track to the favorite track group
+/** \brief Adds a player's favorite track status to define the custom group
   */
-void TrackManager::addFavoriteTrack(const std::string& ident)
+void TrackManager::setFavoriteTrackStatus(FavoriteTrackStatus *status)
 {
-    // TODO : check if the ident corresponds to a race-track
-    int index = getTrackIndexByIdent(ident);
-    if (index >= 0) // index is negative if a track matching the index is missing
-        m_track_groups["Favorites"].push_back(index);
+    clearFavoriteTrackStatus();
+
+    m_current_favorite_status = status;
+
+    if (status == NULL)
+    {
+        return;
+    }
+    
+    // Add all user-defined groups
+    for (auto it = status->m_favorite_tracks.begin(); it != status->m_favorite_tracks.end(); it++)
+    {
+        for (auto it_name = it->second.begin(); it_name != it->second.end(); it_name++)
+        {
+            int id = getTrackIndexByIdent(*it_name);
+            Track *track = m_tracks[id];
+
+            Group2Indices &group_2_indices =
+                    (track->isArena() ? m_arena_groups :
+                    (track->isSoccer() ? m_soccer_arena_groups :
+                    m_track_groups));
+                
+            group_2_indices[it->first].push_back(id);
+        }
+    }
+    for (int i = 0; i < 3; i++)
+    {
+        Group2Indices &g2i = (i==0 ? m_soccer_arena_groups :
+                             (i==1 ? m_arena_groups :
+                                m_track_groups));
+        std::vector<std::string> &gn = (i==0 ? m_soccer_arena_group_names :
+                                        (i==1 ? m_arena_group_names :
+                                            m_track_group_names));
+        gn.clear();
+        for (auto it = g2i.begin(); it != g2i.end(); it++)
+        {
+            std::sort(it->second.begin(), it->second.end());
+            auto unique_end = std::unique(it->second.begin(), it->second.end());
+            it->second.erase(unique_end, it->second.end());
+            gn.push_back(it->first);
+        }
+        // Make sure the order of groups are right
+        std::sort(gn.begin(), gn.end(), [&, g2i](std::string &a, std::string &b)->bool{
+            int x = g2i.find(a)->second[0], y = g2i.find(b)->second[0];
+            return x == y ? a < b : x < y;
+        });
+    }
 }   // addFavoriteTrack
 
 // ----------------------------------------------------------------------------
 /** \brief Clears the list of active favorite tracks, used e.g. when switching
  * between player profiles.
   */
-void TrackManager::clearFavoriteTracks()
+void TrackManager::clearFavoriteTrackStatus()
 {
-    m_track_groups["Favorites"].clear();
+    m_track_groups = m_track_groups_no_custom;
+    m_arena_groups = m_arena_groups_no_custom;
+    m_soccer_arena_groups = m_soccer_arena_groups_no_custom;
+
+    m_current_favorite_status = NULL;
 }   // clearFavoriteTracks
 
 // ----------------------------------------------------------------------------

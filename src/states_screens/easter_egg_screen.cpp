@@ -121,6 +121,9 @@ void EasterEggScreen::eventCallback(Widget* widget, const std::string& name, con
 
 void EasterEggScreen::beforeAddingWidget()
 {
+    // Add user-defined group to track groups
+    track_manager->setFavoriteTrackStatus(PlayerManager::getCurrentPlayer()->getFavoriteTrackStatus());
+
     Screen::init();
     // Dynamically add tabs
     RibbonWidget* tabs = this->getWidget<RibbonWidget>("trackgroups");
@@ -201,6 +204,9 @@ void EasterEggScreen::init()
 
 void EasterEggScreen::buildTrackList()
 {
+    // Add user-defined group to track groups
+    track_manager->setFavoriteTrackStatus(PlayerManager::getCurrentPlayer()->getFavoriteTrackStatus());
+
     DynamicRibbonWidget* tracks_widget = this->getWidget<DynamicRibbonWidget>("tracks");
     assert( tracks_widget != NULL );
 
