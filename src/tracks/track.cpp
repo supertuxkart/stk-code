@@ -112,7 +112,7 @@ bool        Track::m_dont_load_navmesh = false;
 std::atomic<Track*> Track::m_current_track[PT_COUNT];
 
 // ----------------------------------------------------------------------------
-Track::Track(const std::string &filename)
+Track::Track(const std::string &filename) : m_random_number_generator(std::random_device{}())
 {
 #ifdef DEBUG
     m_magic_number          = 0x17AC3802;
