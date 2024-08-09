@@ -29,6 +29,7 @@
 #include <algorithm>
 #include <atomic>
 #include <memory>
+#include <random>
 #include <string>
 #include <vector>
 
@@ -138,6 +139,7 @@ private:
 
     std::vector<Subtitle> m_subtitles;
 
+    std::mt19937 m_random_number_generator;
     /** Start transforms of karts (either the default, or the ones taken
      *  from the scene file). */
     AlignedArray<btTransform> m_start_transforms;
@@ -562,7 +564,7 @@ public:
     */
     void shuffleStartTransforms()
     {
-        std::random_shuffle(m_start_transforms.begin(), m_start_transforms.end());
+        std::shuffle(m_start_transforms.begin(), m_start_transforms.end(), m_random_number_generator);
     }
     // ------------------------------------------------------------------------
     /** Sets pointer to the aabb of this track. */

@@ -21,6 +21,7 @@
 #include "guiengine/screen.hpp"
 #include "guiengine/widgets/text_box_widget.hpp"
 #include <deque>
+#include <random>
 
 namespace GUIEngine { class Widget; }
 
@@ -37,7 +38,8 @@ class TracksAndGPScreen : public GUIEngine::Screen,
 private:
     GUIEngine::TextBoxWidget* m_search_box;
 
-    TracksAndGPScreen() : Screen("tracks_and_gp.stkgui") {}
+    std::mt19937 m_random_number_generator;
+    TracksAndGPScreen() : Screen("tracks_and_gp.stkgui"), m_random_number_generator(std::random_device{}()) {}
 
     /** adds the tracks from the current track group into the tracks ribbon */
     void buildTrackList();

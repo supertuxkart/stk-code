@@ -341,7 +341,7 @@ void TracksAndGPScreen::buildTrackList()
                            IconButtonWidget::ICON_PATH_TYPE_RELATIVE);
 
     tracks_widget->updateItemDisplay();
-    std::random_shuffle( m_random_track_list.begin(), m_random_track_list.end() );
+    std::shuffle( m_random_track_list.begin(), m_random_track_list.end(), m_random_number_generator );
 }   // buildTrackList
 
 // -----------------------------------------------------------------------------
