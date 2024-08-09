@@ -42,7 +42,6 @@ public:
 private:
 
 	core::stringc OperatingSystem;
-    IrrlichtDevice* IrrDevice;
 
 };
 

@@ -236,7 +236,7 @@ namespace os
 	//! generates a pseudo random number
 	f32 Randomizer::frand()
 	{
-		return rand()*(1.f/rMax);
+           return rand()*(1.f/static_cast<f32>(rMax));
 	}
 
 	s32 Randomizer::randMax()

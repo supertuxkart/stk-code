@@ -31,15 +31,15 @@ namespace irr
 {
 
 // constructor  linux
-	COSOperator::COSOperator(const core::stringc& osVersion, IrrlichtDevice* device)
-: OperatingSystem(osVersion), IrrDevice(device)
+   COSOperator::COSOperator(const core::stringc& osVersion, IrrlichtDevice* /*device*/)
+: OperatingSystem(osVersion)
 {
 }
 
 
 // constructor
 COSOperator::COSOperator(const core::stringc& osVersion) 
-: OperatingSystem(osVersion), IrrDevice(NULL)
+: OperatingSystem(osVersion)
 {
 	#ifdef _DEBUG
 	setDebugName("COSOperator");

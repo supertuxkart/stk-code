@@ -906,8 +906,12 @@ const core::aabbox3d<f32>& CSceneManager::getBoundingBox() const
 {
 	_IRR_DEBUG_BREAK_IF(true) // Bounding Box of Scene Manager wanted.
 
-	// should never be used.
-	return *((core::aabbox3d<f32>*)0);
+        os::Printer::log("Unexpected call to CSceneManager::getBoundingBox()", ELL_ERROR);
+        // Static default bounding box to return in case this function is called unexpectedly
+        static const core::aabbox3d<f32> defaultBox;
+
+        // Should never be used, but we return a safe reference instead of dereferencing a null pointer.
+        return defaultBox;
 }
 
 

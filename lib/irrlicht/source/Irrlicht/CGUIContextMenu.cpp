@@ -531,7 +531,6 @@ void CGUIContextMenu::draw()
 	// loop through all menu items
 
 	rect = AbsoluteRect;
-	s32 y = AbsoluteRect.UpperLeftCorner.Y;
 
 	for (s32 i=0; i<(s32)Items.size(); ++i)
 	{
@@ -549,7 +548,6 @@ void CGUIContextMenu::draw()
 			rect.UpperLeftCorner.Y += 1;
 			skin->draw2DRectangle(this, skin->getColor(EGDC_3D_HIGH_LIGHT), rect, clip);
 
-			y += 10;
 		}
 		else
 		{
