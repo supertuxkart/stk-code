@@ -152,6 +152,8 @@ CIrrDeviceSDL::CIrrDeviceSDL(const SIrrlichtCreationParameters& param)
 #endif
 #ifdef ANDROID
 			Android_initDisplayCutout(&TopPadding, &BottomPadding, &LeftPadding, &RightPadding, &InitialOrientation);
+#else
+                        (void)InitialOrientation;
 #endif
 			core::stringc sdlversion = "Compiled SDL Version ";
 			sdlversion += Info.version.major;

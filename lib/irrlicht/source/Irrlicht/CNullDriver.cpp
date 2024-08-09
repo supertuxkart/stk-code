@@ -947,8 +947,9 @@ const SLight& CNullDriver::getDynamicLight(u32 idx) const
 {
 	if ( idx < Lights.size() )
 		return Lights[idx];
-	else
-		return *((SLight*)0);
+        static const SLight defaultLight;
+        os::Printer::log("Error: CNullDriver::getDynamicLight was invoked with an invalid index.", ELL_ERROR);
+        return defaultLight;
 }
 
 
