@@ -921,7 +921,7 @@ bool FileManager::checkAndCreateDirectory(const std::string &path)
     Log::info("FileManager", "Creating directory '%s'.", path.c_str());
 
     // Otherwise try to create the directory:
-#if defined(WIN32)
+#if defined(WIN32) || defined(__MINGW32__)
     bool error = _wmkdir(StringUtils::utf8ToWide(path).c_str()) != 0;
 #else
     bool error = mkdir(path.c_str(), 0777) != 0;

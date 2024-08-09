@@ -909,7 +909,7 @@ void FontManager::unitTesting()
         // Hide gettext warning
         Log::setLogLevel(5);
         delete translations;
-#ifdef WIN32
+#if defined(WIN32) || defined(__MINGW32__)
         std::string s=std::string("LANGUAGE=") + lang.c_str();
         _putenv(s.c_str());
 #else

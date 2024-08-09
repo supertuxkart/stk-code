@@ -43,7 +43,7 @@ namespace FileUtils
      * u8_path is unicode encoded. */
     inline std::string getPortableWritingPath(const std::string& u8_path)
     {
-#if defined(WIN32)
+#if defined(WIN32) || defined(__MINGW32__)
         return Private::getShortPathWriting(u8_path);
 #else
         return u8_path;
@@ -54,7 +54,7 @@ namespace FileUtils
      * is unicode encoded. */
     inline std::string getPortableReadingPath(const std::string& u8_path)
     {
-#if defined(WIN32)
+#if defined(WIN32) || defined(__MINGW32__)
         return Private::getShortPath(u8_path);
 #else
         return u8_path;

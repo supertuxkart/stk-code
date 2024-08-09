@@ -23,7 +23,7 @@
 
 #include "utils/types.hpp"
 
-#ifdef WIN32
+#if defined(WIN32) || defined(__MINGW32__)
 #  include <winsock2.h>
 #  include <ws2tcpip.h>
 #else

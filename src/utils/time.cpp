@@ -50,7 +50,7 @@ std::string StkTime::getLogTime()
     time_t time_now = 0;
     time(&time_now);
     std::tm timeptr = {};
-#ifdef WIN32
+#if defined(WIN32) || defined(__MINGW32__)
     localtime_s(&timeptr, &time_now);
 #else
     localtime_r(&time_now, &timeptr);
