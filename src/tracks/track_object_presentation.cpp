@@ -1172,7 +1172,7 @@ void TrackObjectPresentationActionTrigger::onTriggerItemApproached(int kart_id)
     {
         Scripting::ScriptEngine::getInstance()->runFunction(true, "void "
             + m_library_name + "::" + m_action +
-            "(int, const string, const string)", [=](asIScriptContext* ctx)
+            "(int, const string, const string)", [this, kart_id](asIScriptContext* ctx)
             {
                 ctx->SetArgDWord(0, kart_id);
                 ctx->SetArgObject(1, &m_library_id);
