@@ -624,7 +624,14 @@ void TracksScreen::buildTrackList()
     }
     else
     {
-        const std::vector<int>& curr_tracks = track_manager->getTracksInGroup(curr_group_name);
+        // Get all tracks in this group and concatrate into one vector
+        std::vector<int> curr_tracks        = track_manager->getTracksInGroup(curr_group_name);
+        const std::vector<int>& curr_arenas = track_manager->getArenasInGroup(curr_group_name, false);
+        const std::vector<int>& curr_soccers = track_manager->getArenasInGroup(curr_group_name, true);
+
+        curr_tracks.insert(curr_tracks.end(), curr_arenas.begin(), curr_arenas.end());
+        curr_tracks.insert(curr_tracks.end(), curr_soccers.begin(), curr_soccers.end());
+        
         const int track_amount = (int)curr_tracks.size();
 
         for (int n = 0; n < track_amount; n++)
@@ -666,6 +673,13 @@ void TracksScreen::buildTrackList()
                 _("Locked: solve active challenges to gain access to more!"),
                 "locked", curr->getScreenshotFile(), LOCKED_BADGE,
                 IconButtonWidget::ICON_PATH_TYPE_ABSOLUTE);
+        }
+        else if (PlayerManager::getCurrentPlayer()->isFavoriteTrack(curr->getIdent()))
+        {
+            tracks_widget->addItem(curr->getName(), curr->getIdent(),
+                curr->getScreenshotFile(), HEART_BADGE,
+                IconButtonWidget::ICON_PATH_TYPE_ABSOLUTE );
+            m_random_track_list.push_back(curr->getIdent());
         }
         else
         {

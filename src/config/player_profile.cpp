@@ -130,7 +130,7 @@ void PlayerProfile::loadRemainingData(const XMLNode *node)
 
     // We first load the list of all favorite tracks
     // Some favorites may correspond to uninstalled addons, so we do not sanitize the strings
-    assert(m_favorite_track_statuss == NULL);
+    assert(m_favorite_track_status == NULL);
     const XMLNode *xml_favorites = node->getNode("favorites");
     m_favorite_track_status = new FavoriteTrackStatus(xml_favorites);
 

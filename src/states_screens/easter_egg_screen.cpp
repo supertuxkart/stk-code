@@ -219,6 +219,8 @@ void EasterEggScreen::buildTrackList()
 
     const std::string curr_group_name = tabs->getSelectionIDString(0);
 
+    PtrVector<Track, REF> tracks;
+
     // Build track list
     if (curr_group_name == ALL_TRACK_GROUPS_ID)
     {
@@ -233,21 +235,8 @@ void EasterEggScreen::buildTrackList()
             if (curr->isArena() || curr->isSoccer()) continue;
             if (curr->isInternal()) continue;
 
-            if (PlayerManager::getCurrentPlayer()->isLocked(curr->getIdent()))
-            {
-                tracks_widget->addItem( _("Locked : solve active challenges to gain access to more!"),
-                                       "locked", curr->getScreenshotFile(), LOCKED_BADGE,
-                                       IconButtonWidget::ICON_PATH_TYPE_ABSOLUTE);
-            }
-            else
-            {
-                tracks_widget->addItem(curr->getName(), curr->getIdent(),
-                                       curr->getScreenshotFile(), 0,
-                                       IconButtonWidget::ICON_PATH_TYPE_ABSOLUTE );
-                m_random_track_list.push_back(curr->getIdent());
-            }
+            tracks.push_back(curr);
         }
-
     }
     else
     {
@@ -264,19 +253,34 @@ void EasterEggScreen::buildTrackList()
             if (curr->isSoccer()) continue;
             if (curr->isInternal()) continue;
 
-            if (PlayerManager::getCurrentPlayer()->isLocked(curr->getIdent()))
-            {
-                tracks_widget->addItem( _("Locked : solve active challenges to gain access to more!"),
-                                       "locked", curr->getScreenshotFile(), LOCKED_BADGE,
-                                       IconButtonWidget::ICON_PATH_TYPE_ABSOLUTE);
-            }
-            else
-            {
-                tracks_widget->addItem(curr->getName(), curr->getIdent(),
-                                       curr->getScreenshotFile(), 0 /* no badge */,
-                                       IconButtonWidget::ICON_PATH_TYPE_ABSOLUTE );
-                m_random_track_list.push_back(curr->getIdent());
-            }
+            tracks.push_back(curr);
+        }
+    }
+    tracks.insertionSort();
+
+    for (int n=0; n<tracks.size(); n++)
+    {
+        Track* curr = tracks.get(n);
+
+        if (PlayerManager::getCurrentPlayer()->isLocked(curr->getIdent()))
+        {
+            tracks_widget->addItem( _("Locked : solve active challenges to gain access to more!"),
+                                    "locked", curr->getScreenshotFile(), LOCKED_BADGE,
+                                    IconButtonWidget::ICON_PATH_TYPE_ABSOLUTE);
+        }
+        else if (PlayerManager::getCurrentPlayer()->isFavoriteTrack(curr->getIdent()))
+        {
+            tracks_widget->addItem(curr->getName(), curr->getIdent(),
+                                    curr->getScreenshotFile(), HEART_BADGE,
+                                    IconButtonWidget::ICON_PATH_TYPE_ABSOLUTE );
+            m_random_track_list.push_back(curr->getIdent());
+        }
+        else
+        {
+            tracks_widget->addItem(curr->getName(), curr->getIdent(),
+                                    curr->getScreenshotFile(), 0,
+                                    IconButtonWidget::ICON_PATH_TYPE_ABSOLUTE );
+            m_random_track_list.push_back(curr->getIdent());
         }
     }
 
