@@ -968,9 +968,30 @@ void ServerLobby::asynchronousUpdate()
             m_item_seed = (uint32_t)StkTime::getTimeSinceEpoch();
             ItemManager::updateRandomSeed(m_item_seed);
             m_game_setup->setRace(winner_vote);
+
+            // For spectators that don't have the track, remember their
+            // spectate mode and don't load the track
+            std::string track_name = winner_vote.m_track_name;
+            auto peers = STKHost::get()->getPeers();
+            std::map<std::shared_ptr<STKPeer>,
+                    AlwaysSpectateMode> previous_spectate_mode;
+            for (auto peer : peers)
+            {
+                if (peer->alwaysSpectate() &&
+                    peer->getClientAssets().second.count(track_name) == 0)
+                {
+                    previous_spectate_mode[peer] = peer->getAlwaysSpectate();
+                    peer->setAlwaysSpectate(ASM_NONE);
+                    peer->setWaitingForGame(true);
+                    m_peers_ready.erase(peer);
+                }
+            }
             bool has_always_on_spectators = false;
             auto players = STKHost::get()
                 ->getPlayersForNewGame(&has_always_on_spectators);
+            for (auto& p: previous_spectate_mode)
+                if (p.first)
+                    p.first->setAlwaysSpectate(p.second);
             auto ai_instance = m_ai_peer.lock();
             if (supportsAI())
             {
@@ -1861,8 +1882,7 @@ void ServerLobby::startSelection(const Event *event)
         }
     }
 
-    // Remove karts / tracks from server that are not supported on all clients
-    std::set<std::string> karts_erase, tracks_erase;
+    // Find if there are peers playing the game
     auto peers = STKHost::get()->getPeers();
     std::set<STKPeer*> always_spectate_peers;
     bool has_peer_plays_game = false;
@@ -1870,8 +1890,6 @@ void ServerLobby::startSelection(const Event *event)
     {
         if (!peer->isValidated() || peer->isWaitingForGame())
             continue;
-        peer->eraseServerKarts(m_available_kts.first, karts_erase);
-        peer->eraseServerTracks(m_available_kts.second, tracks_erase);
         if (peer->alwaysSpectate())
             always_spectate_peers.insert(peer.get());
         else if (!peer->isAIPeer())
@@ -1906,11 +1924,23 @@ void ServerLobby::startSelection(const Event *event)
             "spectate for late coming players!");
         return;
     }
-    for(auto &peer : spectators_by_limit)
+    for (auto &peer : spectators_by_limit)
     {
         peer->setAlwaysSpectate(ASM_FULL);
         peer->setWaitingForGame(true);
         always_spectate_peers.insert(peer.get());
+    }
+
+    // Remove karts / tracks from server that are not supported
+    // on all clients that are playing
+    std::set<std::string> karts_erase, tracks_erase;
+    for (auto peer : peers)
+    {
+        // Spectators won't remove maps as they are already waiting for game
+        if (!peer->isValidated() || peer->isWaitingForGame())
+            continue;
+        peer->eraseServerKarts(m_available_kts.first, karts_erase);
+        peer->eraseServerTracks(m_available_kts.second, tracks_erase);
     }
 
     for (const std::string& kart_erase : karts_erase)
