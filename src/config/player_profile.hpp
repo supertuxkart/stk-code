@@ -20,6 +20,7 @@
 #define HEADER_PLAYER_PROFILE_HPP
 
 #include "challenges/story_mode_status.hpp"
+#include "config/favorite_track_status.hpp"
 #include "network/remote_kart_info.hpp"
 #include "utils/leak_check.hpp"
 #include "utils/no_copy.hpp"
@@ -114,8 +115,8 @@ private:
     /** The complete achievement data. */
     AchievementsStatus *m_achievements_status;
 
-    /** The list of identifiers of favorite tracks .*/
-    std::vector<std::string> m_favorite_tracks;
+    /** The favorite tracks selected by this player. */
+    FavoriteTrackStatus *m_favorite_track_status;
 
 public:
 
@@ -125,9 +126,6 @@ public:
     void save(UTFWriter &out);
     void loadRemainingData(const XMLNode *node);
     void initRemainingData();
-    void setFavoriteTracks();
-    void addFavoriteTrack(std::string ident);
-    void removeFavoriteTrack(std::string ident);
     void incrementUseFrequency();
     int getUseFrequency() const { return m_use_frequency; }
     bool operator<(const PlayerProfile &other);
@@ -203,13 +201,6 @@ public:
     {
         return m_story_mode_status->isLocked(feature);
     }   // isLocked
-    // ----------------------------------------------------------------------------------------
-    /** Returnes if the track is favorite. */
-    bool isFavoriteTrack(const std::string &ident) const
-    {
-        return std::find(m_favorite_tracks.begin(), m_favorite_tracks.end(), ident)
-            != m_favorite_tracks.end();
-    }   // isFavoriteTrack
     // ----------------------------------------------------------------------------------------
     /** Returns all active challenges. */
     void computeActive() { m_story_mode_status->computeActive(); }
@@ -302,6 +293,23 @@ public:
     bool hasSavedSession() const { return m_saved_session;  }
     // ----------------------------------------------------------------------------------------
     StoryModeStatus* getStoryModeStatus() { return m_story_mode_status; }
+    // ----------------------------------------------------------------------------------------
+    FavoriteTrackStatus* getFavoriteTrackStatus() { return m_favorite_track_status; }
+    // ----------------------------------------------------------------------------------------
+    bool isFavoriteTrack(std::string ident)
+    {
+        return m_favorite_track_status->isFavoriteTrack(ident);
+    }   // getNumBestTrophies
+    void addFavoriteTrack(std::string ident, std::string group = 
+        FavoriteTrackStatus::DEFAULT_FAVORITE_GROUP_NAME)
+    {
+        m_favorite_track_status->addFavoriteTrack(ident, group);
+    }   // getNumBestTrophies
+    void removeFavoriteTrack(std::string ident, std::string group = 
+        FavoriteTrackStatus::DEFAULT_FAVORITE_GROUP_NAME)
+    {
+        m_favorite_track_status->removeFavoriteTrack(ident, group);
+    }   // getNumBestTrophies
     // ----------------------------------------------------------------------------------------
     /** If a session was saved, return the id of the saved user. */
     int getSavedUserId() const
