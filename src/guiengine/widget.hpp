@@ -520,6 +520,10 @@ namespace GUIEngine
           */
         int getID() const { return m_id; }
 
+        /** Get the name used for this widget in the GUI files or set in the code
+         * Use only for debugging. */
+        std::string getName() { return m_properties[PROP_ID]; }
+
         /** Get whether this object is allowed to receive focus */
         bool isFocusable() const { return m_focusable; }
 

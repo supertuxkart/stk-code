@@ -148,9 +148,7 @@ EventPropagation FocusDispatcher::focused(const int player_id)
             //             ->getIrrlichtElement()->getID() <<
             //             ")" << std::endl;
 
-            m_parent->m_kart_widgets[n].m_player_ident_spinner
-            ->setFocusForPlayer(player_id);
-
+            m_parent->m_kart_widgets[n].m_player_ident_spinner->setFocusForPlayer(player_id);
 
             return GUIEngine::EVENT_BLOCK;
         }
@@ -438,6 +436,8 @@ void KartSelectionScreen::init()
                 // if kart from config not found, select the first instead
                 w->setSelection(0, 0, true);
             }
+
+            m_dispatcher->setVisible(false);
         }
         else
         {
