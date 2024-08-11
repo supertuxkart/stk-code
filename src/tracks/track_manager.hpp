@@ -19,6 +19,8 @@
 #ifndef HEADER_TRACK_MANAGER_HPP
 #define HEADER_TRACK_MANAGER_HPP
 
+#include "config/favorite_track_status.hpp"
+
 #include <string>
 #include <vector>
 #include <map>
@@ -62,10 +64,17 @@ private:
     /** List of the names of all groups containing soccer arenas */
     std::vector<std::string>                 m_soccer_arena_group_names;
 
+    /** Same as above but without user-defined groups. */
+    Group2Indices                            m_track_groups_no_custom;
+    Group2Indices                            m_arena_groups_no_custom;
+    Group2Indices                            m_soccer_arena_groups_no_custom;
+
     /** Flag if this track is available or not. Tracks are set unavailable
      *  if they are not available on all clients (applies only to network mode)
      */
     std::vector<bool>                        m_track_avail;
+
+    FavoriteTrackStatus                     *m_current_favorite_status;
 
     void          updateGroups(const Track* track);
 
@@ -78,9 +87,9 @@ public:
     /** Adds a track to the special group of favorite tracks.
     * We need a special treatment, because the list of tracks in this group
     * depends on the player-profile, not on the track data. */
-    void addFavoriteTrack(const std::string& ident);
+    void setFavoriteTrackStatus(FavoriteTrackStatus *status);
 
-    void clearFavoriteTracks();
+    void clearFavoriteTrackStatus();
 
     /** Returns a list of all track identifiers. */
     std::vector<std::string> getAllTrackIdentifiers();

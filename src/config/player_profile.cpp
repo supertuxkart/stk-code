@@ -79,7 +79,7 @@ PlayerProfile::PlayerProfile(const XMLNode* node)
     m_remember_password   = false;
     m_story_mode_status   = NULL;
     m_achievements_status = NULL;
-    m_favorite_tracks.clear();
+    m_favorite_track_status = NULL;
     m_default_kart_color  = 0.0f;
     m_icon_filename       = "";
 
@@ -106,6 +106,7 @@ PlayerProfile::~PlayerProfile()
 {
     delete m_story_mode_status;
     delete m_achievements_status;
+    delete m_favorite_track_status;
 #ifdef DEBUG
     m_magic_number = 0xDEADBEEF;
 #endif
@@ -118,29 +119,20 @@ PlayerProfile::~PlayerProfile()
  */
 void PlayerProfile::loadRemainingData(const XMLNode *node)
 {
+    assert(m_story_mode_status == NULL);
     const XMLNode *xml_story_mode = node->getNode("story-mode");
-    m_story_mode_status =
-                  unlock_manager->createStoryModeStatus(xml_story_mode);
+    m_story_mode_status = unlock_manager->createStoryModeStatus(xml_story_mode);
+
+    assert(m_achievements_status == NULL);
     const XMLNode *xml_achievements = node->getNode("achievements");
     m_achievements_status = AchievementsManager::get()
-                          ->createAchievementsStatus(xml_achievements, m_unique_id == 1);
+                        ->createAchievementsStatus(xml_achievements, m_unique_id == 1);
 
     // We first load the list of all favorite tracks
     // Some favorites may correspond to uninstalled addons, so we do not sanitize the strings
-    // TODO : handle Arena and Soccer fields
+    assert(m_favorite_track_status == NULL);
     const XMLNode *xml_favorites = node->getNode("favorites");
-    std::vector<XMLNode*> xml_favorite_tracks;
-    xml_favorites->getNodes("track", xml_favorite_tracks);
-    for (unsigned int i = 0; i < xml_favorite_tracks.size(); i++)
-    {
-        std::string temp_string;
-        xml_favorite_tracks[i]->get("ident", &temp_string);
-        m_favorite_tracks.push_back(temp_string);
-    }
-    // Deduplicate the list just in case.
-    std::sort(m_favorite_tracks.begin(), m_favorite_tracks.end());
-    auto it = std::unique(m_favorite_tracks.begin(), m_favorite_tracks.end());
-    m_favorite_tracks.erase(it, m_favorite_tracks.end());
+    m_favorite_track_status = new FavoriteTrackStatus(xml_favorites);
 
     // Fix up any potentially missing icons.
     addIcon();
@@ -155,48 +147,9 @@ void PlayerProfile::initRemainingData()
     m_story_mode_status = unlock_manager->createStoryModeStatus();
     m_achievements_status =
         AchievementsManager::get()->createAchievementsStatus();
+    m_favorite_track_status = new FavoriteTrackStatus(NULL);
     addIcon();
 }   // initRemainingData
-
-//------------------------------------------------------------------------------
-/** Update the group of favorite tracks handled by the Track Manager.
- * To be used only if this player profile is the current player.
- */
-void PlayerProfile::setFavoriteTracks()
-{
-    // Update the group data from the Track Manager
-    track_manager->clearFavoriteTracks();
-    for (unsigned int i = 0; i < m_favorite_tracks.size(); i++)
-    {
-        track_manager->addFavoriteTrack(m_favorite_tracks[i]);
-    }
-}   // setFavoriteTracks
-
-//------------------------------------------------------------------------------
-/** Adds a new favorite track to this player profile and to the group
- * of favorite tracks of the Track Manager.
- * To be used only if this player profile is the current player.
- */
-void PlayerProfile::addFavoriteTrack(std::string ident)
-{
-    m_favorite_tracks.push_back(ident);
-    track_manager->addFavoriteTrack(ident);
-} // addFavoriteTrack
-
-//------------------------------------------------------------------------------
-/** Removes a favorite track from this player profile and from the group
- * of favorite tracks of the Track Manager.
- * To be used only if this player profile is the current player.
- */
-void PlayerProfile::removeFavoriteTrack(std::string ident)
-{
-    auto it = std::find(m_favorite_tracks.begin(), m_favorite_tracks.end(), ident);
-    if (it != m_favorite_tracks.end()) // the track to remove has been found
-    {
-        m_favorite_tracks.erase(it);
-        setFavoriteTracks();
-    }
-} // removeFavoriteTrack
 
 //------------------------------------------------------------------------------
 /** Creates an icon for a player if non exist so far. It takes the unique
@@ -282,18 +235,14 @@ void PlayerProfile::save(UTFWriter &out)
         if (player != NULL && (getName() == player->getName()))
             is_current_player = true;
 
-        if(m_story_mode_status)
+        if (m_story_mode_status)
             m_story_mode_status->save(out, is_current_player);
 
-        if(m_achievements_status)
+        if (m_achievements_status)
             m_achievements_status->save(out);
-
-        out << "      <favorites>\n";
-        for (unsigned int i=0; i < m_favorite_tracks.size(); i++)
-        {
-            out << "        <track ident=\"" << m_favorite_tracks[i] << "\"/>\n";
-        }
-        out << "      </favorites>\n";
+        
+        if (m_favorite_track_status)
+            m_favorite_track_status->save(out);
     }
     out << "    </player>\n";
 }   // save
