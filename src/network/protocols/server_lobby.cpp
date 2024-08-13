@@ -3226,7 +3226,12 @@ void ServerLobby::handleUnencryptedConnection(std::shared_ptr<STKPeer> peer,
         unsigned max_players = ServerConfig::m_server_max_players;
         // We need to reserve at least 1 slot for new player
         if (player_count + ai_add + 1 > max_players)
-            ai_add = max_players - player_count - 1;
+        {
+            if (max_players >= player_count + 1)
+                ai_add = max_players - player_count - 1;
+            else
+                ai_add = 0;
+        }
         for (unsigned i = 0; i < ai_add; i++)
         {
 #ifdef SERVER_ONLY
