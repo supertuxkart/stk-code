@@ -34,6 +34,13 @@ class Track;
 class TrackManager
 {
 private:
+    enum TrackGroupType
+    {
+        RACING_TRACK = 0,
+        BATTLE_ARENA,
+        SOCCER_ARENA
+    };
+
     /** All directories in which tracks are searched. */
     static std::vector<std::string>          m_track_search_path;
 
@@ -76,7 +83,9 @@ private:
 
     FavoriteTrackStatus                     *m_current_favorite_status;
 
-    void          updateGroups(const Track* track);
+    void updateAllGroups(const Track* track);
+    void updateGroups(TrackGroupType type, const Track* track);
+    void removeTrackFromGroups(TrackGroupType type, const Track* track);
 
 public:
                 TrackManager();

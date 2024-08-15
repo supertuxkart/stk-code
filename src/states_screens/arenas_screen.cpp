@@ -213,6 +213,7 @@ void ArenasScreen::eventCallback(Widget* widget, const std::string& name, const 
             Track* clicked_track = track_manager->getTrack(selection);
             if (clicked_track != NULL)
             {
+                // In favorite edit mode, switch the status of the selected track
                 if (getWidget<CheckBoxWidget>("favorite")->getState())
                 {
                     if(PlayerManager::getCurrentPlayer()->isFavoriteTrack(clicked_track->getIdent()))
