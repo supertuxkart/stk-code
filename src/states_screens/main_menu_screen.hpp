@@ -21,7 +21,8 @@
 #include "guiengine/screen.hpp"
 
 namespace GUIEngine { class Widget;       class ListWidget; 
-                      class ButtonWidget; class IconButtonWidget; }
+                      class ButtonWidget; class IconButtonWidget;
+                      class STKModifiedSpriteBank; }
 
 /**
   * \brief Handles the main menu

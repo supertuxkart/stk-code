@@ -82,7 +82,9 @@ namespace GUIEngine
         /** A down arrow badge to indicate new addons for downloading */
         DOWN_BADGE     = 512,
         /** A heart badge, to indicate e.g. a favorite track */
-        HEART_BADGE    = 1024
+        HEART_BADGE    = 1024,
+        /** A red dot badge, to indicate there's something new inside */
+        REDDOT_BADGE   = 2048
     };
 
 
