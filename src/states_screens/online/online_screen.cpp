@@ -39,6 +39,7 @@
 #include "network/socket_address.hpp"
 #include "network/stk_host.hpp"
 #include "network/stk_peer.hpp"
+#include "online/link_helper.hpp"
 #include "online/profile_manager.hpp"
 #include "online/request_manager.hpp"
 #include "states_screens/online/networking_lobby.hpp"
@@ -154,14 +155,18 @@ void OnlineScreen::loadList()
     NewsManager::get()->prioritizeNewsAfterID(NewsManager::NTYPE_MAINMENU, last_shown_id);
 
     m_news_list->clear();
+    m_news_links.clear();
 
     while (news_count--)
     {
         int id = NewsManager::get()->getNextNewsID(NewsManager::NTYPE_MAINMENU);
+        std::string id_str = StringUtils::toString(id);
         core::stringw str = NewsManager::get()->getCurrentNewsMessage(NewsManager::NTYPE_MAINMENU);
         std::string date = NewsManager::get()->getCurrentNewsDate(NewsManager::NTYPE_MAINMENU);
         int icon = NewsManager::get()->isCurrentNewsImportant(NewsManager::NTYPE_MAINMENU) ?
             m_icon_news_headline : m_icon_news;
+
+        m_news_links[id_str] = NewsManager::get()->getCurrentNewsLink(NewsManager::NTYPE_MAINMENU);
         
         if (id > UserConfigParams::m_news_list_shown_id)
             icon = m_icon_red_dot;
@@ -178,7 +183,7 @@ void OnlineScreen::loadList()
         std::vector<GUIEngine::ListWidget::ListCell> row;
         row.push_back(GUIEngine::ListWidget::ListCell(str.c_str(), icon, 4, false));
         row.push_back(GUIEngine::ListWidget::ListCell(date.c_str(), -1, 1, true));
-        m_news_list->addItem(StringUtils::toString(id).c_str(), row);
+        m_news_list->addItem(id_str.c_str(), row);
     }
 
     UserConfigParams::m_news_list_shown_id = last_shown_id;
@@ -240,6 +245,15 @@ void OnlineScreen::eventCallback(Widget* widget, const std::string& name,
     {
         StateManager::get()->escapePressed();
         return;
+    }
+    else if (name == "news_list")
+    {
+        std::string id = m_news_list->getSelectionInternalName();
+
+        if (!m_news_links[id].empty())
+        {
+            Online::LinkHelper::openURL(m_news_links[id]);
+        }
     }
     else if (name == "enable-splitscreen")
     {

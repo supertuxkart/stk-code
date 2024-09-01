@@ -68,6 +68,8 @@ private:
     irr::gui::STKModifiedSpriteBank
                     *m_icon_bank;
 
+    std::unordered_map<std::string, std::string> m_news_links;
+
     OnlineScreen();
 
 public:
