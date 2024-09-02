@@ -22,11 +22,13 @@
 #include "guiengine/widgets/list_widget.hpp"
 
 #include <memory>
+#include <unordered_map>
 
 class Server;
 class SocketAddress;
 
-namespace GUIEngine { class CheckBoxWidget; class ButtonWidget; class IconButtonWidget; }
+namespace GUIEngine { class CheckBoxWidget; class ButtonWidget;
+                      class IconButtonWidget; class STKModifiedSpriteBank; }
 
 /**
   * \brief Handles the networking main menu
