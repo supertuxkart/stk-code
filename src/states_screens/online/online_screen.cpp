@@ -147,6 +147,8 @@ void OnlineScreen::init()
 
 void OnlineScreen::loadList()
 {
+#ifndef SERVER_ONLY
+
     int news_count = NewsManager::get()->getNewsCount(NewsManager::NTYPE_MAINMENU);
 
     int last_shown_id = UserConfigParams::m_news_list_shown_id;
@@ -187,6 +189,8 @@ void OnlineScreen::loadList()
     }
 
     UserConfigParams::m_news_list_shown_id = last_shown_id;
+
+#endif
 }
 
 // ----------------------------------------------------------------------------
