@@ -198,15 +198,13 @@ void MainMenuScreen::init()
     if (chosen_id != -1)
     {
         UserConfigParams::m_last_important_message_id = chosen_id;
-    }
-    NewsManager::get()->resetNewsPtr(NewsManager::NTYPE_MAINMENU);
-
-    if (chosen_id != -1)
-    {
         new MessageDialog(important_message,
                         MessageDialog::MESSAGE_DIALOG_OK,
                         NULL, true);
     }   // if important_message
+
+    // Back to the first news
+    NewsManager::get()->getNextNewsID(NewsManager::NTYPE_MAINMENU);
 
     m_news_text = L"";
     LabelWidget* w = getWidget<LabelWidget>("info_addons");
