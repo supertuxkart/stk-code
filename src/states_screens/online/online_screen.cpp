@@ -16,7 +16,7 @@
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 
-#include "states_screens/main_menu_screen.hpp"
+#include "states_screens/online/online_screen.hpp"
 
 #include "addons/news_manager.hpp"
 #include "config/player_manager.hpp"
@@ -42,11 +42,11 @@
 #include "online/link_helper.hpp"
 #include "online/profile_manager.hpp"
 #include "online/request_manager.hpp"
+#include "states_screens/main_menu_screen.hpp"
 #include "states_screens/online/networking_lobby.hpp"
 #include "states_screens/online/online_lan.hpp"
 #include "states_screens/online/online_profile_achievements.hpp"
 #include "states_screens/online/online_profile_servers.hpp"
-#include "states_screens/online/online_screen.hpp"
 #include "states_screens/state_manager.hpp"
 #include "states_screens/options/user_screen.hpp"
 #include "states_screens/dialogs/general_text_field_dialog.hpp"
