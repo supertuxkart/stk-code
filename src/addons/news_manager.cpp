@@ -401,7 +401,7 @@ void NewsManager::addNewsMessage(NewsType type, const core::stringw &s)
 const core::stringw NewsManager::getCurrentNewsMessage(NewsType type)
 {
     // Only display error message in case of a problem.
-    if(m_error_message.getAtomic().size()>0)
+    if (m_error_message.getAtomic().size()>0)
         return _(m_error_message.getAtomic().c_str());
     
     core::stringw message = L"";
@@ -475,6 +475,10 @@ const bool NewsManager::isCurrentNewsImportant(NewsType type)
 // ----------------------------------------------------------------------------
 const int NewsManager::getNewsCount(NewsType type)
 {
+    // Only show error message one time
+    if(m_error_message.getAtomic().size()>0)
+        return 1;
+    
     m_news[type].lock();
     int count = m_news[type].getData().size();
     m_news[type].unlock();
@@ -514,6 +518,9 @@ void NewsManager::prioritizeNewsAfterID(NewsType type, int id)
  */
 const int NewsManager::getNextNewsID(NewsType type)
 {
+    if (m_error_message.getAtomic().size()>0)
+        return -1;
+
     m_news[type].lock();
 
     if(m_news[type].getData().size()==0)

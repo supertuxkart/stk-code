@@ -149,26 +149,43 @@ void OnlineScreen::loadList()
 {
 #ifndef SERVER_ONLY
 
-    int news_count = NewsManager::get()->getNewsCount(NewsManager::NTYPE_MAINMENU);
+    int news_count = NewsManager::get()->getNewsCount(NewsManager::NTYPE_LIST);
 
     int last_shown_id = UserConfigParams::m_news_list_shown_id;
 
-    NewsManager::get()->resetNewsPtr(NewsManager::NTYPE_MAINMENU);
-    NewsManager::get()->prioritizeNewsAfterID(NewsManager::NTYPE_MAINMENU, last_shown_id);
+    NewsManager::get()->resetNewsPtr(NewsManager::NTYPE_LIST);
+    NewsManager::get()->prioritizeNewsAfterID(NewsManager::NTYPE_LIST, last_shown_id);
 
     m_news_list->clear();
     m_news_links.clear();
 
+    if (news_count == 0)
+    {
+        std::vector<GUIEngine::ListWidget::ListCell> row;
+        row.push_back(GUIEngine::ListWidget::ListCell(
+            _("There are currently no news available."), -1, 4, false));
+        m_news_list->addItem("-1", row);
+    }
+
     while (news_count--)
     {
-        int id = NewsManager::get()->getNextNewsID(NewsManager::NTYPE_MAINMENU);
+        int id = NewsManager::get()->getNextNewsID(NewsManager::NTYPE_LIST);
         std::string id_str = StringUtils::toString(id);
-        core::stringw str = NewsManager::get()->getCurrentNewsMessage(NewsManager::NTYPE_MAINMENU);
-        std::string date = NewsManager::get()->getCurrentNewsDate(NewsManager::NTYPE_MAINMENU);
-        int icon = NewsManager::get()->isCurrentNewsImportant(NewsManager::NTYPE_MAINMENU) ?
+        core::stringw str = NewsManager::get()->getCurrentNewsMessage(NewsManager::NTYPE_LIST);
+
+        if (id == -1) // It's an error message
+        {
+            std::vector<GUIEngine::ListWidget::ListCell> row;
+            row.push_back(GUIEngine::ListWidget::ListCell(str.c_str(), -1, 4, false));
+            m_news_list->addItem(id_str.c_str(), row);
+            continue;
+        }
+
+        std::string date = NewsManager::get()->getCurrentNewsDate(NewsManager::NTYPE_LIST);
+        int icon = NewsManager::get()->isCurrentNewsImportant(NewsManager::NTYPE_LIST) ?
             m_icon_news_headline : m_icon_news;
 
-        m_news_links[id_str] = NewsManager::get()->getCurrentNewsLink(NewsManager::NTYPE_MAINMENU);
+        m_news_links[id_str] = NewsManager::get()->getCurrentNewsLink(NewsManager::NTYPE_LIST);
         
         if (id > UserConfigParams::m_news_list_shown_id)
             icon = m_icon_red_dot;

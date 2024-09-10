@@ -166,12 +166,6 @@ void MainMenuScreen::init()
     int news_len = NewsManager::get()->getNewsCount(NewsManager::NTYPE_MAINMENU);
     int chosen_id = -1;
 
-    IconButtonWidget* online_icon = getWidget<IconButtonWidget>("online");
-    if (online_icon != NULL)
-    {
-        online_icon->resetAllBadges();
-    }
-
     // Iterate through every news
     // Find the unread important message with smallest id
     while (news_len--)
@@ -186,14 +180,6 @@ void MainMenuScreen::init()
             important_message = 
                 NewsManager::get()->getCurrentNewsMessage(NewsManager::NTYPE_MAINMENU);
         }
-        // Also detects if there's new news
-        if (online_icon != NULL)
-        {
-            if (UserConfigParams::m_news_list_shown_id < id)
-            {
-                online_icon->setBadge(REDDOT_BADGE);
-            }
-        }
     }
     if (chosen_id != -1)
     {
@@ -205,6 +191,30 @@ void MainMenuScreen::init()
 
     // Back to the first news
     NewsManager::get()->getNextNewsID(NewsManager::NTYPE_MAINMENU);
+
+    // Check if there's new news
+
+    IconButtonWidget* online_icon = getWidget<IconButtonWidget>("online");
+    if (online_icon != NULL)
+    {
+        NewsManager::get()->resetNewsPtr(NewsManager::NTYPE_LIST);
+        online_icon->resetAllBadges();
+
+        int news_list_len = NewsManager::get()->getNewsCount(NewsManager::NTYPE_LIST);
+
+        while (news_list_len--)
+        {
+            int id = NewsManager::get()->getNextNewsID(NewsManager::NTYPE_LIST);
+
+            if (UserConfigParams::m_news_list_shown_id < id)
+            {
+                online_icon->setBadge(REDDOT_BADGE);
+            }
+        }
+        
+        // Back to the first news
+        NewsManager::get()->getNextNewsID(NewsManager::NTYPE_LIST);
+    }
 
     m_news_text = L"";
     LabelWidget* w = getWidget<LabelWidget>("info_addons");
@@ -271,8 +281,7 @@ void MainMenuScreen::onUpdate(float delta)
         // Show important messages seperately
         // Concatrate adjacent unimportant messages together
         m_news_text = L"";
-
-        NewsManager::get()->prioritizeNewsAfterID(NewsManager::NTYPE_MAINMENU, -1);
+        
         int news_count = NewsManager::get()->getNewsCount(NewsManager::NTYPE_MAINMENU);
 
         while (news_count--)

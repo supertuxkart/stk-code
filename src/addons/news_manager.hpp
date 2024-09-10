@@ -155,7 +155,9 @@ public:
         }
     }   // deallocate
     // ------------------------------------------------------------------------
-    /** Would go back to the first one when the list ends. */
+    /** News are stored in an array, it would iterate to
+     * the next one when calling this function and
+     * would go back to the first one when the iteration ends. */
     const int     getNextNewsID(NewsType type);
     const core::stringw
                   getCurrentNewsMessage(NewsType type);
