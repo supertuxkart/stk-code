@@ -93,7 +93,7 @@ jobs:
           make -j4
           mv bin ../${{ steps.sysroot.outputs.lowercase }}-${{ matrix.arch }}
       - name: Upload binaries
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v4
         with:
           name: ${{ steps.sysroot.outputs.lowercase }}-${{ matrix.arch }}
           path: ${{ steps.sysroot.outputs.lowercase }}-${{ matrix.arch }}
@@ -131,7 +131,7 @@ jobs:
           echo "${{ env.release_name }}"
           echo "${{ env.release_pre }}"
       - name: Download binaries
-        uses: actions/download-artifact@v2
+        uses: actions/download-artifact@v4
       - name: Mask developer name
         run: |
           echo "::add-mask::${{ secrets.MAC_DEVELOPER_NAME }}"
