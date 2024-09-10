@@ -2584,6 +2584,13 @@ void Skin::drawBadgeOn(const Widget* widget, const core::recti& rect)
                                                           "heart.png");
         doDrawBadge(texture, rect, max_icon_size, false);
     }
+    if (widget->m_badges & REDDOT_BADGE)
+    {
+        float max_icon_size = 0.43f;
+        video::ITexture* texture = irr_driver->getTexture(FileManager::GUI_ICON,
+                                                          "red_dot.png");
+        doDrawBadge(texture, rect, max_icon_size, false);
+    }
 }   // drawBadgeOn
 
 // -----------------------------------------------------------------------------
