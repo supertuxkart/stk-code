@@ -213,7 +213,7 @@ jobs:
           echo "${{ env.release_name }}"
           echo "${{ env.release_pre }}"
       - name: Download MinGW binaries and data
-        uses: actions/download-artifact@v2
+        uses: actions/download-artifact@v4
       - name: Generate .pdb files
         if: ${{ env.release_tag != '' }}
         run: |
