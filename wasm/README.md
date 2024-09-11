@@ -11,15 +11,11 @@ Working features:
 
 TODO:
 - Fix GLES 3 (maybe someone with more experience in webgl could help here)
-- Webpage theming
-- Better compression for assets
 - Lazy load assets during gameplay
 - Networking
 
 Caveats:
-- The RAM usage is rather high because the assets are always loaded in memory
 - The performance isn't great, probably because the legacy renderer is still being used
-- There is a large ~700MB download required immediately
 - Some options, like anything related to online multiplayer, may hang the game
 
 ## Building
@@ -35,17 +31,12 @@ wasm/build_deps.sh
 ```
 wasm/build.sh
 ```
-4. Compress the assets using the script from the Android port:
+4. Compress and bundle the game data and assets:
 ```
 sudo apt install imagemagick vorbis-tools pngquant advancecomp libjpeg-progs optipng
-android/generate_assets.sh
-(cd android/assets/data && ./optimize_data.sh)
+wasm/pack_assets.sh ../stk-assets
 ```
-5. Bundle the game data and assets:
-```
-wasm/pack_assets.sh android/assets/data/
-```
-6. Host a web server:
+5. Host a web server:
 ```
 (cd wasm/web && python3 ../run_server.py)
 ```
