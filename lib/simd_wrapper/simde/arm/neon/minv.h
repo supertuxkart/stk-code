@@ -22,6 +22,7 @@
  *
  * Copyright:
  *   2020      Evan Nemerson <evan@nemerson.com>
+ *   2023      Yi-Yen Chung <eric681@andestech.com> (Copyright owned by Andes Technology)
  */
 
 #if !defined(SIMDE_ARM_NEON_MINV_H)
@@ -33,6 +34,38 @@
 HEDLEY_DIAGNOSTIC_PUSH
 SIMDE_DISABLE_UNWANTED_DIAGNOSTICS
 SIMDE_BEGIN_DECLS_
+
+SIMDE_FUNCTION_ATTRIBUTES
+simde_float16_t
+simde_vminv_f16(simde_float16x4_t a) {
+  #if defined(SIMDE_ARM_NEON_A64V8_NATIVE) && defined(SIMDE_ARM_NEON_FP16)
+    return vminv_f16(a);
+  #else
+    simde_float32_t r;
+    simde_float16x4_private a_ = simde_float16x4_to_private(a);
+
+    r = simde_float16_to_float32(SIMDE_INFINITYHF);
+    #if defined(SIMDE_FAST_NANS)
+      SIMDE_VECTORIZE_REDUCTION(min:r)
+    #else
+      SIMDE_VECTORIZE
+    #endif
+    for (size_t i = 0 ; i < (sizeof(a_.values) / sizeof(a_.values[0])) ; i++) {
+      simde_float32_t a32 = simde_float16_to_float32(a_.values[i]);
+      #if defined(SIMDE_FAST_NANS)
+        r = a32 < r ? a32 : r;
+      #else
+        r = a32 < r ? a32 : (a32 >= r ? r : ((a32 == a32) ? r : a32));
+      #endif
+    }
+
+    return simde_float16_from_float32(r);
+  #endif
+}
+#if defined(SIMDE_ARM_NEON_A64V8_ENABLE_NATIVE_ALIASES)
+  #undef vminv_f16
+  #define vminv_f16(v) simde_vminv_f16(v)
+#endif
 
 SIMDE_FUNCTION_ATTRIBUTES
 simde_float32_t
@@ -208,6 +241,38 @@ simde_vminv_u32(simde_uint32x2_t a) {
 #if defined(SIMDE_ARM_NEON_A64V8_ENABLE_NATIVE_ALIASES)
   #undef vminv_u32
   #define vminv_u32(v) simde_vminv_u32(v)
+#endif
+
+SIMDE_FUNCTION_ATTRIBUTES
+simde_float16_t
+simde_vminvq_f16(simde_float16x8_t a) {
+  #if defined(SIMDE_ARM_NEON_A64V8_NATIVE) && defined(SIMDE_ARM_NEON_FP16)
+    return vminvq_f16(a);
+  #else
+    simde_float32_t r;
+    simde_float16x8_private a_ = simde_float16x8_to_private(a);
+
+    r = simde_float16_to_float32(SIMDE_INFINITYHF);
+    #if defined(SIMDE_FAST_NANS)
+      SIMDE_VECTORIZE_REDUCTION(min:r)
+    #else
+      SIMDE_VECTORIZE
+    #endif
+    for (size_t i = 0 ; i < (sizeof(a_.values) / sizeof(a_.values[0])) ; i++) {
+      simde_float32_t a32 = simde_float16_to_float32(a_.values[i]);
+      #if defined(SIMDE_FAST_NANS)
+        r = a32 < r ? a32 : r;
+      #else
+        r = a32 < r ? a32 : (a32 >= r ? r : ((a32 == a32) ? r : a32));
+      #endif
+    }
+
+    return simde_float16_from_float32(r);
+  #endif
+}
+#if defined(SIMDE_ARM_NEON_A64V8_ENABLE_NATIVE_ALIASES)
+  #undef vminvq_f16
+  #define vminvq_f16(v) simde_vminvq_f16(v)
 #endif
 
 SIMDE_FUNCTION_ATTRIBUTES

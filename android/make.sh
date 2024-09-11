@@ -435,6 +435,7 @@ convert -scale 432x432 "$APP_ICON_ADAPTIVE_FG" "$DIRNAME/res/drawable-xxxhdpi/ic
 export ANDROID_HOME="$SDK_PATH"
 ./gradlew -Pcompile_sdk_version="$COMPILE_SDK_VERSION"   \
           -Pmin_sdk_version="$STK_MIN_ANDROID_SDK"       \
+          -Pcompile_sdk_version="$STK_TARGET_ANDROID_SDK"\
           -Ptarget_sdk_version="$STK_TARGET_ANDROID_SDK" \
           -Pstorepass="$STK_STOREPASS"                   \
           -Pkeystore="$STK_KEYSTORE"                     \
@@ -450,6 +451,7 @@ export ANDROID_HOME="$SDK_PATH"
 if [ "$GRADLE_BUILD_TYPE" = "assembleRelease" ]; then
 ./gradlew -Pcompile_sdk_version="$COMPILE_SDK_VERSION"   \
           -Pmin_sdk_version="$STK_MIN_ANDROID_SDK"       \
+          -Pcompile_sdk_version="$STK_TARGET_ANDROID_SDK"\
           -Ptarget_sdk_version="$STK_TARGET_ANDROID_SDK" \
           -Pstorepass="$STK_STOREPASS"                   \
           -Pkeystore="$STK_KEYSTORE"                     \

@@ -107,9 +107,9 @@ LocalPlayerController::~LocalPlayerController()
 void LocalPlayerController::initParticleEmitter()
 {
     // Attach Particle System
+#ifndef SERVER_ONLY
     m_sky_particles_emitter = nullptr;
     Track *track = Track::getCurrentTrack();
-#ifndef SERVER_ONLY
     if (!GUIEngine::isNoGraphics() &&
         UserConfigParams::m_particles_effects > 1 &&
         track->getSkyParticles() != NULL)

@@ -105,25 +105,24 @@ Here you can configure advanced theming rules for this skin
       h_inner_padding="0" v_inner_padding="-8" h_margin="0" v_margin="4" />
 
 <!-- Stateless -->
-<!-- Provided by base theme
 <element type="squareFocusHaloBW" common="y" image="glass_square_focused_bw.png"
       left_border="6" right_border ="6" top_border="6" bottom_border="6"
       hborder_out_portion="1.0" />
-<element type="squareFocusHalo1" common="y" image="glass_square_focused_red.png"
+<element type="squareFocusHalo1" common="y" image="glass_square_focused_black.png"
       left_border="6" right_border ="6" top_border="6" bottom_border="6"
       hborder_out_portion="1.0" />
 <element type="squareFocusHalo2" common="y" image="glass_square_focused_cyan.png"
       left_border="6" right_border ="6" top_border="6" bottom_border="6"
       hborder_out_portion="1.0" />
-<element type="squareFocusHalo3" common="y" image="glass_square_focused_green.png"
+<element type="squareFocusHalo3" common="y" image="glass_square_focused_red.png"
       left_border="6" right_border ="6" top_border="6" bottom_border="6"
       hborder_out_portion="1.0" />
-<element type="squareFocusHalo4" common="y" image="glass_square_focused_yellow.png"
+<element type="squareFocusHalo4" common="y" image="glass_square_focused_green.png"
       left_border="6" right_border ="6" top_border="6" bottom_border="6"
       hborder_out_portion="1.0" />
-<element type="squareFocusHalo5" common="y" image="glass_square_focused_pink.png"
+<element type="squareFocusHalo5" common="y" image="glass_square_focused_yellow.png"
       left_border="6" right_border ="6" top_border="6" bottom_border="6"
-      hborder_out_portion="1.0" />-->
+      hborder_out_portion="1.0" />
       
 <!-- Stateless. No splitting into 9 areas is done; the image is just resized. -->
 <element type="selectionHalo" image="bubble.png"  />
@@ -270,10 +269,10 @@ Here you can configure advanced theming rules for this skin
 <color type="emphasis_text" state="focused" r="255" g="226" b="56" />
 
 <!-- Color used for red/blue items in list (e.g. player team color in networking) -->
-<color type="list_blue" state="neutral" r="0" g="0" b="180" />
-<color type="list_blue" state="focused" r="0" g="0" b="255" />
-<color type="list_red" state="neutral" r="255" g="0" b="0" />
-<color type="list_red" state="focused" r="255" g="0" b="0" />
+<color type="list_blue" state="neutral" r="0" g="0" b="90" />
+<color type="list_blue" state="focused" r="0" g="0" b="225" />
+<color type="list_red" state="neutral" r="255" g="30" b="30" />
+<color type="list_red" state="focused" r="145" g="0" b="0" />
 
 <!-- Color used to fade out background when a dialog is shown -->
 <color type="dialog_background" state="neutral" a="120" r="0" g="0" b="0" />

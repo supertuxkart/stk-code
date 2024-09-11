@@ -60,6 +60,12 @@ simde_x_mm512_setone_pd(void) {
   return simde_mm512_castsi512_pd(simde_x_mm512_setone_si512());
 }
 
+SIMDE_FUNCTION_ATTRIBUTES
+simde__m512h
+simde_x_mm512_setone_ph(void) {
+  return simde_mm512_castsi512_ph(simde_x_mm512_setone_si512());
+}
+
 SIMDE_END_DECLS_
 HEDLEY_DIAGNOSTIC_POP
 

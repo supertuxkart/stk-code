@@ -54,10 +54,27 @@
  * need more resolution I'm happy to accept patches that are able to
  * detect minor versions as well.  That said, you'll probably have a
  * hard time with detection since AFAIK most minor releases don't add
- * anything we can detect. */
+ * anything we can detect. Updated based on
+ * https://github.com/google/highway/blob/438c705a295176b96a50336527bb3e7ea365ffac/hwy/detect_compiler_arch.h#L73
+ * - would welcome patches/updates there as well.
+ */
 
 #if defined(__clang__) && !defined(SIMDE_DETECT_CLANG_VERSION)
-#  if __has_warning("-Wformat-insufficient-args")
+#  if __has_warning("-Wmissing-designated-field-initializers")
+#    define SIMDE_DETECT_CLANG_VERSION 190000
+#  elif __has_warning("-Woverriding-option")
+#    define SIMDE_DETECT_CLANG_VERSION 180000
+#  elif __has_attribute(unsafe_buffer_usage)  // no new warnings in 17.0
+#    define SIMDE_DETECT_CLANG_VERSION 170000
+#  elif __has_attribute(nouwtable)  // no new warnings in 16.0
+#    define SIMDE_DETECT_CLANG_VERSION 160000
+#  elif __has_warning("-Warray-parameter")
+#    define SIMDE_DETECT_CLANG_VERSION 150000
+#  elif __has_warning("-Wbitwise-instead-of-logical")
+#    define SIMDE_DETECT_CLANG_VERSION 140000
+#  elif __has_warning("-Waix-compat")
+#    define SIMDE_DETECT_CLANG_VERSION 130000
+#  elif __has_warning("-Wformat-insufficient-args")
 #    define SIMDE_DETECT_CLANG_VERSION 120000
 #  elif __has_warning("-Wimplicit-const-int-float-conversion")
 #    define SIMDE_DETECT_CLANG_VERSION 110000
@@ -67,7 +84,12 @@
 #    define SIMDE_DETECT_CLANG_VERSION 90000
 #  elif __has_warning("-Wextra-semi-stmt") || __has_builtin(__builtin_rotateleft32)
 #    define SIMDE_DETECT_CLANG_VERSION 80000
-#  elif __has_warning("-Wc++98-compat-extra-semi")
+// For reasons unknown, Xcode 10.3 (Apple LLVM version 10.0.1) is apparently
+// based on Clang 7, but does not support the warning we test.
+// See https://en.wikipedia.org/wiki/Xcode#Toolchain_versions and
+// https://trac.macports.org/wiki/XcodeVersionInfo.
+#  elif __has_warning("-Wc++98-compat-extra-semi") || \
+      (defined(__apple_build_version__) && __apple_build_version__ >= 10010000)
 #    define SIMDE_DETECT_CLANG_VERSION 70000
 #  elif __has_warning("-Wpragma-pack")
 #    define SIMDE_DETECT_CLANG_VERSION 60000

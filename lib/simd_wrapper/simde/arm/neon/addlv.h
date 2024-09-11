@@ -184,6 +184,12 @@ int16_t
 simde_vaddlvq_s8(simde_int8x16_t a) {
   #if defined(SIMDE_ARM_NEON_A64V8_NATIVE)
     return vaddlvq_s8(a);
+  #elif defined(SIMDE_X86_SSE2_NATIVE)
+    __m128i a_ = simde_int8x16_to_m128i(a);
+    a_ = _mm_xor_si128(a_, _mm_set1_epi8('\x80'));
+    a_ = _mm_sad_epu8(a_, _mm_setzero_si128());
+    a_ = _mm_add_epi16(a_, _mm_shuffle_epi32(a_, 0xEE));
+    return HEDLEY_STATIC_CAST(int16_t, _mm_cvtsi128_si32(a_) - 2048);
   #else
     simde_int8x16_private a_ = simde_int8x16_to_private(a);
     int16_t r = 0;
@@ -206,6 +212,13 @@ int32_t
 simde_vaddlvq_s16(simde_int16x8_t a) {
   #if defined(SIMDE_ARM_NEON_A64V8_NATIVE)
     return vaddlvq_s16(a);
+  #elif defined(SIMDE_X86_SSSE3_NATIVE) && !defined(HEDLEY_MSVC_VERSION)
+    __m128i a_ = simde_int16x8_to_m128i(a);
+    a_ = _mm_xor_si128(a_, _mm_set1_epi16(HEDLEY_STATIC_CAST(int16_t, 0x8000)));
+    a_ = _mm_shuffle_epi8(a_, _mm_set_epi8(15, 13, 11, 9, 7, 5, 3, 1, 14, 12, 10, 8, 6, 4, 2, 0));
+    a_ = _mm_sad_epu8(a_, _mm_setzero_si128());
+    a_ = _mm_add_epi32(a_, _mm_srli_si128(a_, 7));
+    return _mm_cvtsi128_si32(a_) - 262144;
   #else
     simde_int16x8_private a_ = simde_int16x8_to_private(a);
     int32_t r = 0;
@@ -250,6 +263,11 @@ uint16_t
 simde_vaddlvq_u8(simde_uint8x16_t a) {
   #if defined(SIMDE_ARM_NEON_A64V8_NATIVE)
     return vaddlvq_u8(a);
+  #elif defined(SIMDE_X86_SSE2_NATIVE)
+    __m128i a_ = simde_uint8x16_to_m128i(a);
+    a_ = _mm_sad_epu8(a_, _mm_setzero_si128());
+    a_ = _mm_add_epi16(a_, _mm_shuffle_epi32(a_, 0xEE));
+    return HEDLEY_STATIC_CAST(uint16_t, _mm_cvtsi128_si32(a_));
   #else
     simde_uint8x16_private a_ = simde_uint8x16_to_private(a);
     uint16_t r = 0;
@@ -272,6 +290,12 @@ uint32_t
 simde_vaddlvq_u16(simde_uint16x8_t a) {
   #if defined(SIMDE_ARM_NEON_A64V8_NATIVE)
     return vaddlvq_u16(a);
+  #elif defined(SIMDE_X86_SSSE3_NATIVE)
+    __m128i a_ = simde_uint16x8_to_m128i(a);
+    a_ = _mm_shuffle_epi8(a_, _mm_set_epi8(15, 13, 11, 9, 7, 5, 3, 1, 14, 12, 10, 8, 6, 4, 2, 0));
+    a_ = _mm_sad_epu8(a_, _mm_setzero_si128());
+    a_ = _mm_add_epi32(a_, _mm_srli_si128(a_, 7));
+    return HEDLEY_STATIC_CAST(uint32_t, _mm_cvtsi128_si32(a_));
   #else
     simde_uint16x8_private a_ = simde_uint16x8_to_private(a);
     uint32_t r = 0;

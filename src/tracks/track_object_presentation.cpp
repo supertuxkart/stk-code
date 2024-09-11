@@ -476,12 +476,12 @@ TrackObjectPresentationMesh::TrackObjectPresentationMesh(
     m_node         = NULL;
     m_is_in_skybox = false;
     m_render_info  = NULL;
-    bool animated  = (UserConfigParams::m_particles_effects > 1 ||
-                      World::getWorld()->getIdent() == IDENT_CUTSCENE);
 
     m_model_file = model_file;
     file_manager->pushTextureSearchPath(StringUtils::getPath(model_file), "");
 #ifndef SERVER_ONLY
+    bool animated  = (UserConfigParams::m_particles_effects > 1 ||
+                      World::getWorld()->getIdent() == IDENT_CUTSCENE);
     if (file_manager->fileExists(model_file))
     {
         if (animated)
@@ -879,7 +879,9 @@ TrackObjectPresentationParticles::TrackObjectPresentationParticles(
         m_init_hpr.Z = 0;
     }
 
+#ifndef SERVER_ONLY
     m_emitter = NULL;
+#endif
     m_lod_emitter_node = NULL;
     std::string path;
     xml_node.get("kind", &path);
@@ -937,6 +939,7 @@ TrackObjectPresentationParticles::TrackObjectPresentationParticles(
 // ----------------------------------------------------------------------------
 TrackObjectPresentationParticles::~TrackObjectPresentationParticles()
 {
+#ifndef SERVER_ONLY
     if (m_emitter)
     {
         if (m_lod_emitter_node != NULL)
@@ -946,15 +949,18 @@ TrackObjectPresentationParticles::~TrackObjectPresentationParticles()
         }
         delete m_emitter; // this will also delete m_node
     }
+#endif
 }   // ~TrackObjectPresentationParticles
 
 // ----------------------------------------------------------------------------
 void TrackObjectPresentationParticles::updateGraphics(float dt)
 {
+#ifndef SERVER_ONLY
     if (m_emitter != NULL)
     {
         m_emitter->update(dt);
     }
+#endif
 
     if (m_delayed_stop)
     {

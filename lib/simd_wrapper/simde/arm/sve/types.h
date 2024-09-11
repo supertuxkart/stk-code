@@ -396,7 +396,7 @@ SIMDE_BEGIN_DECLS_
     #endif
   } simde_svfloat64_t;
 
-  #if defined(SIMDE_X86_AVX512BW_NATIVE)
+  #if defined(SIMDE_X86_AVX512BW_NATIVE) && (!defined(HEDLEY_MSVC_VERSION) || HEDLEY_MSVC_VERSION_CHECK(19,20,0))
     typedef struct {
       __mmask64 value;
       int       type;

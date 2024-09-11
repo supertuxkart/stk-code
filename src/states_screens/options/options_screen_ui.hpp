@@ -65,7 +65,7 @@ class OptionsScreenUI : public GUIEngine::Screen, public GUIEngine::ScreenSingle
     int getBaseID(SkinID skin);
     int getVariantID(SkinID skin);
     std::string getCurrentSpinnerSkin();
-    void onSkinChange();
+    void onSkinChange(bool is_variant);
 public:
     friend class GUIEngine::ScreenSingleton<OptionsScreenUI>;
 

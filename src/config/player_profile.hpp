@@ -20,6 +20,7 @@
 #define HEADER_PLAYER_PROFILE_HPP
 
 #include "challenges/story_mode_status.hpp"
+#include "config/favorite_track_status.hpp"
 #include "network/remote_kart_info.hpp"
 #include "utils/leak_check.hpp"
 #include "utils/no_copy.hpp"
@@ -111,7 +112,11 @@ private:
     /** The complete challenge state. */
     StoryModeStatus *m_story_mode_status;
 
+    /** The complete achievement data. */
     AchievementsStatus *m_achievements_status;
+
+    /** The favorite tracks selected by this player. */
+    FavoriteTrackStatus *m_favorite_track_status;
 
 public:
 
@@ -288,6 +293,23 @@ public:
     bool hasSavedSession() const { return m_saved_session;  }
     // ----------------------------------------------------------------------------------------
     StoryModeStatus* getStoryModeStatus() { return m_story_mode_status; }
+    // ----------------------------------------------------------------------------------------
+    FavoriteTrackStatus* getFavoriteTrackStatus() { return m_favorite_track_status; }
+    // ----------------------------------------------------------------------------------------
+    bool isFavoriteTrack(std::string ident)
+    {
+        return m_favorite_track_status->isFavoriteTrack(ident);
+    }   // getNumBestTrophies
+    void addFavoriteTrack(std::string ident, std::string group = 
+        FavoriteTrackStatus::DEFAULT_FAVORITE_GROUP_NAME)
+    {
+        m_favorite_track_status->addFavoriteTrack(ident, group);
+    }   // getNumBestTrophies
+    void removeFavoriteTrack(std::string ident, std::string group = 
+        FavoriteTrackStatus::DEFAULT_FAVORITE_GROUP_NAME)
+    {
+        m_favorite_track_status->removeFavoriteTrack(ident, group);
+    }   // getNumBestTrophies
     // ----------------------------------------------------------------------------------------
     /** If a session was saved, return the id of the saved user. */
     int getSavedUserId() const

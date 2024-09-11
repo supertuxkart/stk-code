@@ -23,6 +23,7 @@
  * Copyright:
  *   2021      Evan Nemerson <evan@nemerson.com>
  *   2021      Zhi An Ng <zhin@google.com> (Copyright owned by Google, LLC)
+ *   2023      Yi-Yen Chung <eric681@andestech.com> (Copyright owned by Andes Technology)
  */
 
 #if !defined(SIMDE_ARM_NEON_QDMULH_LANE_H)
@@ -36,6 +37,17 @@
 HEDLEY_DIAGNOSTIC_PUSH
 SIMDE_DISABLE_UNWANTED_DIAGNOSTICS
 SIMDE_BEGIN_DECLS_
+
+#if defined(SIMDE_ARM_NEON_A64V8_NATIVE)
+  #define simde_vqdmulhh_lane_s16(a, v, lane) vqdmulhh_lane_s16((a), (v), (lane))
+#else
+  #define simde_vqdmulhh_lane_s16(a, v, lane) \
+    simde_vqdmulhh_s16((a), simde_vget_lane_s16((v), (lane)))
+#endif
+#if defined(SIMDE_ARM_NEON_A64V8_ENABLE_NATIVE_ALIASES)
+  #undef vqdmulhh_lane_s16
+  #define vqdmulhh_lane_s16(a, v, lane) simde_vqdmulhh_lane_s16((a), (v), (lane))
+#endif
 
 #if defined(SIMDE_ARM_NEON_A32V7_NATIVE)
   #define simde_vqdmulh_lane_s16(a, v, lane) vqdmulh_lane_s16((a), (v), (lane))
@@ -79,6 +91,17 @@ SIMDE_BEGIN_DECLS_
 #if defined(SIMDE_ARM_NEON_A32V7_ENABLE_NATIVE_ALIASES)
   #undef vqdmulhq_lane_s32
   #define vqdmulhq_lane_s32(a, v, lane) simde_vqdmulhq_lane_s32((a), (v), (lane))
+#endif
+
+#if defined(SIMDE_ARM_NEON_A64V8_NATIVE)
+  #define simde_vqdmulhh_laneq_s16(a, v, lane) vqdmulhh_laneq_s16((a), (v), (lane))
+#else
+  #define simde_vqdmulhh_laneq_s16(a, v, lane) \
+    simde_vqdmulhh_s16((a), simde_vgetq_lane_s16((v), (lane)))
+#endif
+#if defined(SIMDE_ARM_NEON_A64V8_ENABLE_NATIVE_ALIASES)
+  #undef vqdmulhh_laneq_s16
+  #define vqdmulhh_laneq_s16(a, v, lane) simde_vqdmulhh_laneq_s16((a), (v), (lane))
 #endif
 
 #if defined(SIMDE_ARM_NEON_A64V8_NATIVE)

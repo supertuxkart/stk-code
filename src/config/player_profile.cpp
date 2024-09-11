@@ -27,6 +27,7 @@
 #include "karts/kart_properties.hpp"
 #include "karts/kart_properties_manager.hpp"
 #include "online/online_player_profile.hpp"
+#include "tracks/track_manager.hpp"
 #include "utils/string_utils.hpp"
 
 //------------------------------------------------------------------------------
@@ -78,6 +79,7 @@ PlayerProfile::PlayerProfile(const XMLNode* node)
     m_remember_password   = false;
     m_story_mode_status   = NULL;
     m_achievements_status = NULL;
+    m_favorite_track_status = NULL;
     m_default_kart_color  = 0.0f;
     m_icon_filename       = "";
 
@@ -104,6 +106,7 @@ PlayerProfile::~PlayerProfile()
 {
     delete m_story_mode_status;
     delete m_achievements_status;
+    delete m_favorite_track_status;
 #ifdef DEBUG
     m_magic_number = 0xDEADBEEF;
 #endif
@@ -111,21 +114,29 @@ PlayerProfile::~PlayerProfile()
 
 
 //------------------------------------------------------------------------------
-/** This function loads the achievement and story mode data. These can only
- *  be loaded after the UnlockManager is created, which needs the karts
- *  and tracks to be loaded first.
+/** This function loads the achievement, story mode and favorites data.
+ *  These can only be loaded after the karts and tracks.
  */
 void PlayerProfile::loadRemainingData(const XMLNode *node)
 {
+    assert(m_story_mode_status == NULL);
     const XMLNode *xml_story_mode = node->getNode("story-mode");
-    m_story_mode_status =
-                  unlock_manager->createStoryModeStatus(xml_story_mode);
+    m_story_mode_status = unlock_manager->createStoryModeStatus(xml_story_mode);
+
+    assert(m_achievements_status == NULL);
     const XMLNode *xml_achievements = node->getNode("achievements");
     m_achievements_status = AchievementsManager::get()
-                          ->createAchievementsStatus(xml_achievements, m_unique_id == 1);
+                        ->createAchievementsStatus(xml_achievements, m_unique_id == 1);
+
+    // We first load the list of all favorite tracks
+    // Some favorites may correspond to uninstalled addons, so we do not sanitize the strings
+    assert(m_favorite_track_status == NULL);
+    const XMLNode *xml_favorites = node->getNode("favorites");
+    m_favorite_track_status = new FavoriteTrackStatus(xml_favorites);
+
     // Fix up any potentially missing icons.
     addIcon();
-}   // initRemainingData
+}   // loadRemainingData
 
 //------------------------------------------------------------------------------
 /** Initialises the story- and achievement data structure in case of the first
@@ -136,6 +147,7 @@ void PlayerProfile::initRemainingData()
     m_story_mode_status = unlock_manager->createStoryModeStatus();
     m_achievements_status =
         AchievementsManager::get()->createAchievementsStatus();
+    m_favorite_track_status = new FavoriteTrackStatus(NULL);
     addIcon();
 }   // initRemainingData
 
@@ -223,11 +235,14 @@ void PlayerProfile::save(UTFWriter &out)
         if (player != NULL && (getName() == player->getName()))
             is_current_player = true;
 
-        if(m_story_mode_status)
+        if (m_story_mode_status)
             m_story_mode_status->save(out, is_current_player);
 
-        if(m_achievements_status)
+        if (m_achievements_status)
             m_achievements_status->save(out);
+        
+        if (m_favorite_track_status)
+            m_favorite_track_status->save(out);
     }
     out << "    </player>\n";
 }   // save

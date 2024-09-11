@@ -540,10 +540,12 @@ int EventHandler::findIDClosestWidget(const NavigationDirection nav, const int p
         // - it corresponds to the current widget
         // - it corresponds to an invisible or disabled widget
         // - the player is not allowed to select it
+        // - Its base coordinates are negative (such as buttons within ribbons)
         if (w_test == NULL || !Widget::isFocusableId(i) || w == w_test ||
             (!w_test->isVisible()   && ignore_disabled) ||
             (!w_test->isActivated() && ignore_disabled) ||
-            (playerID != PLAYER_ID_GAME_MASTER && !w_test->m_supports_multiplayer))
+            (playerID != PLAYER_ID_GAME_MASTER && !w_test->m_supports_multiplayer) ||
+            (w_test->m_x < 0) || (w_test->m_y < 0))
             continue;
 
         // Ignore empty ribbon widgets and lists

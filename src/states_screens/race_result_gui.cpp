@@ -2307,11 +2307,12 @@ void RaceResultGUI::displayBenchmarkSummary()
     // Draw the results
     core::dimension2du rect = font->getDimension(title_text.c_str());
     current_y += rect.Height;
+    int info_y = current_y;
     current_x /= 2;
     font = GUIEngine::getFont();
     rect = font->getDimension(title_text.c_str());
 
-    core::stringw info_text[5];
+    core::stringw info_text[8];
     core::stringw value = StringUtils::toWString(
         StringUtils::timeToString(float(profiler.getTotalFrametime())/1000000.0f, 2, true));
     info_text[0] = _("Test duration: %s",     value);
@@ -2320,7 +2321,7 @@ void RaceResultGUI::displayBenchmarkSummary()
     value = StringUtils::toWString(profiler.getFPSMetricsLow());
     info_text[2] = _("Steady FPS: %s",        value);
     value = StringUtils::toWString(profiler.getFPSMetricsMid());
-    info_text[3] = _("Mostly Stable FPS: %s", value); // TODO - better name
+    info_text[3] = _("Mostly Steady FPS: %s", value); // TODO - better name
     value = StringUtils::toWString(profiler.getFPSMetricsHigh());
     info_text[4] = _("Typical FPS: %s",       value);
 
@@ -2330,10 +2331,35 @@ void RaceResultGUI::displayBenchmarkSummary()
         font->draw(info_text[i].c_str(), pos, white_color, true, false);
         current_y += (5 * rect.Height) / 4;       
     }
-    // TODO : Draw info on the settings
-    // * resolution
-    // * Render scale
-    // * graphics settings
+
+    // Draw info on the graphical settings
+    current_y = info_y;
+    current_x *= 3;
+
+    value = StringUtils::toWString(UserConfigParams::m_real_width);
+    info_text[0] = _("Horizontal resolution: %s",     value);
+    value = StringUtils::toWString(UserConfigParams::m_real_height);
+    info_text[1] = _("Vertical resolution: %s",  value);
+    info_text[2] = UserConfigParams::m_dynamic_lights ? _("Dynamic lighting: ON")
+                                                      : _("Dynamic lighting: OFF");
+    value = StringUtils::toWString(UserConfigParams::m_dynamic_lights ?
+                          UserConfigParams::m_scale_rtts_factor * 100 : 100);
+    info_text[3] = _("Render resolution: %s%%", value);
+    info_text[4] = UserConfigParams::m_mlaa ? _("Anti-aliasing: ON")
+                                            : _("Anti-aliasing : OFF");
+    info_text[5] = UserConfigParams::m_degraded_IBL ? _("Image-based lighting: OFF")
+                                                    : _("Image-based lighting: ON");
+    info_text[6] = UserConfigParams::m_ssao ? _("Ambient occlusion: ON")
+                                            : _("Ambient occlusion: OFF");
+    value = StringUtils::toWString(UserConfigParams::m_shadows_resolution);
+    info_text[7] = _("Shadow resolution: %s", value);
+
+    for (int i=0; i<8; i++)
+    {
+        pos = core::rect<s32>(current_x, current_y, current_x, current_y);
+        font->draw(info_text[i].c_str(), pos, white_color, true, false);
+        current_y += (5 * rect.Height) / 4;
+    }
 #endif
 } // displayBenchmarkSummary
 

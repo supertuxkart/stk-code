@@ -2529,21 +2529,6 @@ int main(int argc, char *argv[])
             StateManager::get()->enterGameState();
         }
 
-#ifndef SERVER_ONLY
-        // If an important news message exists it is shown in a popup dialog.
-        if (!GUIEngine::isNoGraphics())
-        {
-            const core::stringw important_message =
-                                        NewsManager::get()->getImportantMessage();
-            if (important_message!="")
-            {
-                new MessageDialog(important_message,
-                                MessageDialog::MESSAGE_DIALOG_OK,
-                                NULL, true);
-            }   // if important_message
-        }
-#endif
-
         // Reset the story mode timer before going in the main loop
         // as it needs to be able to run continuously
         // Now the story mode status and player manager is loaded

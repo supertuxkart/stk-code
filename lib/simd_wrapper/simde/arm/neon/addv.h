@@ -352,6 +352,11 @@ simde_vaddvq_u8(simde_uint8x16_t a) {
 
   #if defined(SIMDE_ARM_NEON_A64V8_NATIVE)
     r = vaddvq_u8(a);
+  #elif defined(SIMDE_X86_SSE2_NATIVE)
+    __m128i a_ = simde_uint8x16_to_m128i(a);
+    a_ = _mm_sad_epu8(a_, _mm_setzero_si128());
+    a_ = _mm_add_epi8(a_, _mm_shuffle_epi32(a_, 0xEE));
+    return HEDLEY_STATIC_CAST(uint8_t, _mm_cvtsi128_si32(a_));
   #else
     simde_uint8x16_private a_ = simde_uint8x16_to_private(a);
 

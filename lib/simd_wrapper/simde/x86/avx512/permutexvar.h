@@ -1147,6 +1147,20 @@ simde_mm512_permutexvar_ps (simde__m512i idx, simde__m512 a) {
 #endif
 
 SIMDE_FUNCTION_ATTRIBUTES
+simde__m512h
+simde_mm512_permutexvar_ph (simde__m512i idx, simde__m512h a) {
+  #if defined(SIMDE_X86_AVX512FP16_NATIVE)
+    return _mm512_permutexvar_ph(idx, a);
+  #else
+    return simde_mm512_castsi512_ph(simde_mm512_permutexvar_epi16(idx, simde_mm512_castph_si512(a)));
+  #endif
+}
+#if defined(SIMDE_X86_AVX512FP16_ENABLE_NATIVE_ALIASES)
+  #undef _mm512_permutexvar_ph
+  #define _mm512_permutexvar_ph(idx, a) simde_mm512_permutexvar_ph(idx, a)
+#endif
+
+SIMDE_FUNCTION_ATTRIBUTES
 simde__m512
 simde_mm512_mask_permutexvar_ps (simde__m512 src, simde__mmask16 k, simde__m512i idx, simde__m512 a) {
   #if defined(SIMDE_X86_AVX512F_NATIVE)

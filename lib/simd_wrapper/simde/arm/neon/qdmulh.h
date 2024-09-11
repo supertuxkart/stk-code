@@ -23,6 +23,7 @@
  * Copyright:
  *   2020      Evan Nemerson <evan@nemerson.com>
  *   2020      Sean Maher <seanptmaher@gmail.com> (Copyright owned by Google, LLC)
+ *   2023      Yi-Yen Chung <eric681@andestech.com> (Copyright owned by Andes Technology)
  */
 
 #if !defined(SIMDE_ARM_NEON_QDMULH_H)
@@ -63,7 +64,7 @@ simde_vqdmulh_s16(simde_int16x4_t a, simde_int16x4_t b) {
   #else
     simde_int16x4_private r_;
 
-    #if HEDLEY_HAS_BUILTIN(__builtin_shufflevector)
+    #if HEDLEY_HAS_BUILTIN(__builtin_shufflevector) && !(HEDLEY_GCC_VERSION_CHECK(12,1,0) && defined(SIMDE_ARCH_ZARCH))
       simde_int16x8_private tmp_ =
         simde_int16x8_to_private(
           simde_vreinterpretq_s16_s32(
@@ -90,6 +91,21 @@ simde_vqdmulh_s16(simde_int16x4_t a, simde_int16x4_t b) {
 #endif
 
 SIMDE_FUNCTION_ATTRIBUTES
+int16_t
+simde_vqdmulhh_s16(int16_t a, int16_t b) {
+  #if defined(SIMDE_ARM_NEON_A64V8_NATIVE)
+    return vqdmulhh_s16(a, b);
+  #else
+    int32_t tmp = simde_vqdmullh_s16(a, b);
+    return HEDLEY_STATIC_CAST(int16_t, tmp >> 16);
+  #endif
+}
+#if defined(SIMDE_ARM_NEON_A64V8_ENABLE_NATIVE_ALIASES)
+  #undef vqdmulhh_s16
+  #define vqdmulhh_s16(a, b) simde_vqdmulhh_s16((a), (b))
+#endif
+
+SIMDE_FUNCTION_ATTRIBUTES
 simde_int32x2_t
 simde_vqdmulh_s32(simde_int32x2_t a, simde_int32x2_t b) {
   #if defined(SIMDE_ARM_NEON_A32V7_NATIVE)
@@ -97,7 +113,7 @@ simde_vqdmulh_s32(simde_int32x2_t a, simde_int32x2_t b) {
   #else
     simde_int32x2_private r_;
 
-    #if HEDLEY_HAS_BUILTIN(__builtin_shufflevector)
+    #if HEDLEY_HAS_BUILTIN(__builtin_shufflevector) && !(HEDLEY_GCC_VERSION_CHECK(12,1,0) && defined(SIMDE_ARCH_ZARCH))
       simde_int32x4_private tmp_ =
         simde_int32x4_to_private(
           simde_vreinterpretq_s32_s64(

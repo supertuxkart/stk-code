@@ -120,7 +120,7 @@ Here you can configure advanced theming rules for this skin
 <element type="selectionHalo" image="bubble.png"  />
 <element type="focusHalo" image="glass_iconhighlight_focus.png"  />
 
-<element type="spinner" state="neutral" common="y" image="glassspinner.png"
+<element type="spinner" state="neutral" image="glassspinner.png"
     left_border="110" right_border="110" top_border="0" bottom_border="36"
     preserve_h_aspect_ratios="true" hborder_out_portion="0.0" />
 
@@ -254,10 +254,10 @@ Here you can configure advanced theming rules for this skin
 <color type="emphasis_text" state="focused" r="255" g="226" b="56" />
 
 <!-- Color used for red/blue items in list (e.g. player team color in networking) -->
-<color type="list_blue" state="neutral" r="0" g="0" b="180" />
-<color type="list_blue" state="focused" r="0" g="0" b="255" />
-<color type="list_red" state="neutral" r="255" g="0" b="0" />
-<color type="list_red" state="focused" r="255" g="0" b="0" />
+<color type="list_blue" state="neutral" r="0" g="0" b="115" />
+<color type="list_blue" state="focused" r="45" g="45" b="255" />
+<color type="list_red" state="neutral" r="255" g="30" b="30" />
+<color type="list_red" state="focused" r="255" g="30" b="30" />
 
 <!-- Color used to fade out background when a dialog is shown -->
 <color type="dialog_background" state="neutral" a="120" r="0" g="0" b="0" />

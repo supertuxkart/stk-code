@@ -149,21 +149,21 @@ jobs:
           mv COPYING tools
       - name: Upload binaries of MinGW
         if: ${{ matrix.os == 'ubuntu-latest' }}
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v4
         with:
           name: ${{ matrix.arch }}
           path: build/bin/*
       - name: Upload stk-code/data
         # We only need to upload stk-code/data once
         if: ${{ matrix.os == 'ubuntu-latest' && matrix.arch == 'i686'}}
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v4
         with:
           name: data
           path: data
       - name: Upload stk-code/tools
         # We only need to upload stk-code/tools once
         if: ${{ matrix.os == 'ubuntu-latest' && matrix.arch == 'i686'}}
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v4
         with:
           name: tools
           path: tools
@@ -213,7 +213,7 @@ jobs:
           echo "${{ env.release_name }}"
           echo "${{ env.release_pre }}"
       - name: Download MinGW binaries and data
-        uses: actions/download-artifact@v2
+        uses: actions/download-artifact@v4
       - name: Generate .pdb files
         if: ${{ env.release_tag != '' }}
         run: |
