@@ -80,6 +80,7 @@ PlayerProfile::PlayerProfile(const XMLNode* node)
     m_story_mode_status   = NULL;
     m_achievements_status = NULL;
     m_favorite_track_status = NULL;
+    m_favorite_kart_status = NULL;
     m_default_kart_color  = 0.0f;
     m_icon_filename       = "";
 
@@ -132,7 +133,10 @@ void PlayerProfile::loadRemainingData(const XMLNode *node)
     // Some favorites may correspond to uninstalled addons, so we do not sanitize the strings
     assert(m_favorite_track_status == NULL);
     const XMLNode *xml_favorites = node->getNode("favorites");
-    m_favorite_track_status = new FavoriteTrackStatus(xml_favorites);
+    m_favorite_track_status = new FavoriteStatus(xml_favorites, "track");
+
+    assert(m_favorite_kart_status == NULL);
+    m_favorite_kart_status = new FavoriteStatus(xml_favorites, "kart");
 
     // Fix up any potentially missing icons.
     addIcon();
@@ -147,7 +151,8 @@ void PlayerProfile::initRemainingData()
     m_story_mode_status = unlock_manager->createStoryModeStatus();
     m_achievements_status =
         AchievementsManager::get()->createAchievementsStatus();
-    m_favorite_track_status = new FavoriteTrackStatus(NULL);
+    m_favorite_track_status = new FavoriteStatus(NULL, "track");
+    m_favorite_kart_status = new FavoriteStatus(NULL, "kart");
     addIcon();
 }   // initRemainingData
 
@@ -241,8 +246,13 @@ void PlayerProfile::save(UTFWriter &out)
         if (m_achievements_status)
             m_achievements_status->save(out);
         
+        
+        out << "      <favorites>\n";
         if (m_favorite_track_status)
             m_favorite_track_status->save(out);
+        if (m_favorite_kart_status)
+            m_favorite_kart_status->save(out);
+        out << "      </favorites>\n";
     }
     out << "    </player>\n";
 }   // save

@@ -16,8 +16,8 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-#ifndef HEADER_FAVORITE_TRACK_STATUS_HPP
-#define HEADER_FAVORITE_TRACK_STATUS_HPP
+#ifndef HEADER_FAVORITE_STATUS_HPP
+#define HEADER_FAVORITE_STATUS_HPP
 
 #include "utils/leak_check.hpp"
 
@@ -29,6 +29,7 @@
 
 using namespace irr;
 
+class KartPropertiesManager;
 class TrackManager;
 class UTFWriter;
 class XMLNode;
@@ -43,30 +44,34 @@ class XMLNode;
  *  where the interface is fully implemented.
  * \ingroup config
  */
-class FavoriteTrackStatus
+class FavoriteStatus
 {
 private:
     LEAK_CHECK()
 
+    std::string m_parse_type;
+
     /** unordered_map<Group Name, set<Track Name> > .*/
-    std::unordered_map<std::string, std::set<std::string> > m_favorite_tracks;
+    std::unordered_map<std::string, std::set<std::string> > m_favorite;
 
 public:
+    friend class KartPropertiesManager;
     friend class TrackManager;
 
     static const std::string DEFAULT_FAVORITE_GROUP_NAME;
 
-    FavoriteTrackStatus(const XMLNode *node);
+    /** Parse all <(parse_type)/> in <favorite> in xml node */
+    FavoriteStatus(const XMLNode *node, std::string parse_type);
 
-    virtual ~FavoriteTrackStatus();
+    virtual ~FavoriteStatus();
 
     void save(UTFWriter &out);
 
-    bool isFavoriteTrack(std::string ident);
+    bool isFavorite(std::string ident);
 
-    void addFavoriteTrack(std::string ident, std::string group = DEFAULT_FAVORITE_GROUP_NAME);
+    void addFavorite(std::string ident, std::string group = DEFAULT_FAVORITE_GROUP_NAME);
 
-    void removeFavoriteTrack(std::string ident, std::string group = DEFAULT_FAVORITE_GROUP_NAME);
+    void removeFavorite(std::string ident, std::string group = DEFAULT_FAVORITE_GROUP_NAME);
 };   // class PlayerProfile
 
 #endif

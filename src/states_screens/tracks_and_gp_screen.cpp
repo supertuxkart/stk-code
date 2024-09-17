@@ -18,7 +18,7 @@
 #include "states_screens/tracks_and_gp_screen.hpp"
 
 #include "challenges/unlock_manager.hpp"
-#include "config/favorite_track_status.hpp"
+#include "config/favorite_status.hpp"
 #include "config/player_manager.hpp"
 #include "config/user_config.hpp"
 #include "graphics/stk_tex_manager.hpp"
@@ -227,7 +227,7 @@ void TracksAndGPScreen::init()
         const GrandPrixData* gp = grand_prix_manager->getGrandPrix(n);
         const std::vector<std::string> tracks = gp->getTrackNames(true);
 
-        //Skip epmpty GPs
+        //Skip empty GPs
         if (gp->getNumberOfTracks()==0)
             continue;
 

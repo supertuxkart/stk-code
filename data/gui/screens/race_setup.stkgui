@@ -4,7 +4,7 @@
         <header height="8%" width="80%" text="Race Setup" align="center" text_align="center" />
         <spacer height="1%" width="25"/>
 
-        <bright width="100%" text="Select a difficulty" align="center" text_align="left" />
+        <tiny-header width="100%" text="Select a difficulty" align="center" text_align="left" />
         <spacer height="10" width="25"/>
         <box width="100%" proportion="3" padding="10" layout="vertical-row">
             <spacer height="15%" width="25"/>
@@ -21,7 +21,7 @@
         </box>
         <spacer height="2%" width="25"/>
 
-        <bright width="100%" text="Select a game mode" align="center" text_align="left" />
+        <tiny-header width="100%" text="Select a game mode" align="center" text_align="left" />
         
         <spacer height="1%" width="25"/>
         <box width="100%" proportion="4" padding="10" layout="vertical-row">

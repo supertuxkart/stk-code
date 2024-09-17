@@ -22,6 +22,7 @@
 #include "guiengine/screen.hpp"
 #include "guiengine/widgets/dynamic_ribbon_widget.hpp"
 #include "guiengine/widgets/player_kart_widget.hpp"
+#include "guiengine/widgets/text_box_widget.hpp"
 #include "states_screens/state_manager.hpp"
 
 namespace GUIEngine
@@ -47,7 +48,8 @@ extern int g_root_id;
   * \brief screen where players can choose their kart
   * \ingroup states_screens
   */
-class KartSelectionScreen : public GUIEngine::Screen
+class KartSelectionScreen : public GUIEngine::Screen,
+                            public GUIEngine::ITextBoxWidgetListener
 {
     friend class KartHoverListener;
     friend class PlayerNameSpinner;
@@ -77,6 +79,8 @@ protected:
     bool m_game_master_confirmed;
 
     GUIEngine::PlayerKartWidget* m_removed_widget;
+
+    GUIEngine::TextBoxWidget *m_search_box;
 
     /** Message shown in multiplayer mode */
     GUIEngine::BubbleWidget* m_multiplayer_message;
@@ -171,6 +175,14 @@ public:
 
     /** \brief implement callback from parent class GUIEngine::Screen */
     virtual void onUpdate(float dt) OVERRIDE;
+
+    /** Rebuild the list of tracks based on search text */
+    virtual void onTextUpdated() OVERRIDE
+    {
+        setKartsFromCurrentGroup();
+        // After setKartsFromCurrentGroup the m_search_box may be unfocused
+        m_search_box->focused(PLAYER_ID_GAME_MASTER);
+    }
 
     /** \brief implement optional callback from parent
      *  class GUIEngine::Screen */
