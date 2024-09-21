@@ -10,6 +10,7 @@ layout(std140, set = 1, binding = 0) uniform CameraBuffer
     mat4 m_inverse_projection_matrix;
     mat4 m_projection_view_matrix;
     mat4 m_inverse_projection_view_matrix;
+    vec4 m_viewport;
 } u_camera;
 
 struct ObjectData
@@ -55,3 +56,6 @@ layout(location = 1) out vec2 f_uv;
 layout(location = 2) out vec2 f_uv_two;
 layout(location = 3) flat out int f_material_id;
 layout(location = 4) out float f_hue_change;
+layout(location = 5) out vec3 f_normal;
+layout(location = 6) out vec3 f_tangent;
+layout(location = 7) out vec3 f_bitangent;

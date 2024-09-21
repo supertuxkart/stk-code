@@ -30,5 +30,9 @@ void main()
     }
 
     vec3 mixed_color = tex_color.xyz * f_vertex_color.xyz;
-    o_color = vec4(mixed_color * 0.5, 0.5);
+    mixed_color *= 0.5;
+#ifdef PBR_ENABLED
+    mixed_color = (mixed_color * (6.9 * mixed_color + 0.5)) / (mixed_color * (5.2 * mixed_color + 1.7) + 0.06);
+#endif
+    o_color = vec4(mixed_color, 0.5);
 }
