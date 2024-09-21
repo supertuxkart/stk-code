@@ -158,14 +158,6 @@ vec3 SunMRP(vec3 normal, vec3 eyedir, vec3 sundirection)
     return (DdotR < d) ? normalize(d * D + normalize (S) * r) : R;
 }
 
-float LinearizeDepth(float depth)
-{
-    float near = 1.0;
-    float far = 1500.0;
-    float z = depth * 2.0 - 1.0; // Back to NDC
-    return (2.0 * near) / (far + near - z * (far - near));
-}
-
 void main()
 {
     vec4 tex_color = sampleMeshTexture0(f_material_id, f_uv);
@@ -207,10 +199,10 @@ void main()
     vec3 Lightdir = normalize(sun.xyz);
     float NdotL = clamp(dot(normal, Lightdir), 0., 1.);
 
-    vec3 Specular = NdotL * SpecularBRDF(normal, eyedir, Lightdir, diffuse_color, roughness, metallic) * vec3(0.5)
-                          + SpecularIBL(normal, eyedir, diffuse_color, roughness, metallic) * vec3(0.3);
-    vec3 Diffuse = NdotL * DiffuseBRDF(normal, eyedir, Lightdir, diffuse_color, roughness, metallic) * vec3(0.5)
-                         + DiffuseIBL(normal, eyedir, diffuse_color, roughness, metallic) * vec3(0.3);
+    vec3 Specular = NdotL * SpecularBRDF(normal, eyedir, Lightdir, diffuse_color, roughness, metallic) * vec3(30./256., 35./256., 60./256.)
+                          + SpecularIBL(normal, eyedir, diffuse_color, roughness, metallic) * vec3(35./256., 35./256., 35./256.);
+    vec3 Diffuse = NdotL * DiffuseBRDF(normal, eyedir, Lightdir, diffuse_color, roughness, metallic) * vec3(30./256., 35./256., 60./256.)
+                         + DiffuseIBL(normal, eyedir, diffuse_color, roughness, metallic) * vec3(35./256., 35./256., 35./256.);
 
     vec3 mixed_color = Specular + Diffuse;
 
