@@ -199,14 +199,14 @@ void main()
     vec3 Lightdir = normalize(sun.xyz);
     float NdotL = clamp(dot(normal, Lightdir), 0., 1.);
 
-    vec3 Specular = NdotL * SpecularBRDF(normal, eyedir, Lightdir, diffuse_color, roughness, metallic) * vec3(30./256., 35./256., 60./256.)
-                          + SpecularIBL(normal, eyedir, diffuse_color, roughness, metallic) * vec3(35./256., 35./256., 35./256.);
-    vec3 Diffuse = NdotL * DiffuseBRDF(normal, eyedir, Lightdir, diffuse_color, roughness, metallic) * vec3(30./256., 35./256., 60./256.)
-                         + DiffuseIBL(normal, eyedir, diffuse_color, roughness, metallic) * vec3(35./256., 35./256., 35./256.);
+    vec3 Specular = NdotL * SpecularBRDF(normal, eyedir, Lightdir, diffuse_color, roughness, metallic) * vec3(211./256., 235./256., 110./256.)
+                          + SpecularIBL(normal, eyedir, diffuse_color, roughness, metallic) * vec3(120./256., 120./256., 120./256.);
+    vec3 Diffuse = NdotL * DiffuseBRDF(normal, eyedir, Lightdir, diffuse_color, roughness, metallic) * vec3(211./256., 235./256., 110./256.)
+                         + DiffuseIBL(normal, eyedir, diffuse_color, roughness, metallic) * vec3(120./256., 120./256., 120./256.);
 
     vec3 mixed_color = Specular + Diffuse;
 
-    float factor = (1.0 - exp(length(xpos) * -0.00001));
+    float factor = (1.0 - exp(length(xpos) * -0.0001));
     mixed_color = mixed_color + vec3(0.5) * factor;
 
     mixed_color = (mixed_color * (6.9 * mixed_color + 0.5)) / (mixed_color * (5.2 * mixed_color + 1.7) + 0.06);

@@ -57,23 +57,6 @@ void GEVulkanCameraSceneNode::render()
 
     m_ubo_data.m_projection_view_matrix.getInverse(
         m_ubo_data.m_inverse_projection_view_matrix);
-
-    for (int i = 0; i < 4; i++)
-    {
-        for (int j = 0; j < 4; j++)
-        {
-            printf("%f ", m_ubo_data.m_projection_matrix(i, j));
-        }
-        printf("\n");
-    }
-    for (int i = 0; i < 4; i++)
-    {
-        for (int j = 0; j < 4; j++)
-        {
-            printf("%f ", m_ubo_data.m_inverse_projection_matrix(i, j));
-        }
-        printf("\n");
-    }
     
     m_ubo_data.m_viewport.UpperLeftCorner.X = m_viewport.UpperLeftCorner.X;
     m_ubo_data.m_viewport.UpperLeftCorner.Y = m_viewport.UpperLeftCorner.Y;

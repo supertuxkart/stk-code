@@ -819,6 +819,17 @@ void  Material::setMaterialProperties(video::SMaterial *m, scene::IMeshBuffer* m
     {
         install(nullptr, m);
     }
+#ifndef SERVER_ONLY
+    else for (unsigned i = 2; i < m_sampler_path.size(); i++)
+    { // PBR textures are installed but aren't in the material
+        if (m_sampler_path[i].size() && m_vk_textures[i - 2])
+        {
+            m_vk_textures[i - 2]->grab();
+            m->setTexture(i, m_vk_textures[i - 2]);
+        }
+    }
+#endif
+    
 
     if (m_deprecated ||
         (m->getTexture(0) != NULL &&
