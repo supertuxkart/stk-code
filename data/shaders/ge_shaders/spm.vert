@@ -1,5 +1,7 @@
-#include "utils/spm_layout.h"
-#include "utils/get_vertex_color.h"
+#include "utils/camera.glsl"
+#include "utils/get_vertex_color.glsl"
+#include "utils/spm_data.glsl"
+#include "utils/spm_layout.vert"
 #include "../utils/get_world_location.vert"
 
 void main()

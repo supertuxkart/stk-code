@@ -4,7 +4,7 @@ layout(location = 3) flat in int f_material_id;
 
 layout(location = 0) out vec4 o_color;
 
-#include "utils/sample_mesh_texture.h"
+#include "utils/sample_mesh_texture.glsl"
 
 void main()
 {

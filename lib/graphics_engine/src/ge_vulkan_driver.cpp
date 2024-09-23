@@ -1924,12 +1924,22 @@ void GEVulkanDriver::addOcclusionQuery(scene::ISceneNode* node,
 {
     int voffset = 0;
     int ioffset = 0;
+    std::vector<scene::IMeshBuffer*> buffers;
 
     for (int i = 0; i < mesh->getMeshBufferCount(); i++)
     {
         scene::IMeshBuffer *mesh_buffer = mesh->getMeshBuffer(i);
+
+        if (mesh_buffer->getMaterial().MaterialType != EMT_SOLID
+         && mesh_buffer->getMaterial().MaterialType != EMT_NORMAL_MAP_SOLID)
+            continue;
+        
+        if (mesh_buffer->getBoundingBox().getArea() / (mesh_buffer->getVertexCount() + 16) > 300.0)
+            continue;
+
         voffset += mesh_buffer->getVertexCount();
         ioffset += mesh_buffer->getIndexCount();
+        buffers.push_back(mesh_buffer);
     }
     
     m_occlusion_vertices[node].resize(voffset * 3);
@@ -1938,9 +1948,9 @@ void GEVulkanDriver::addOcclusionQuery(scene::ISceneNode* node,
     int vit = 0;
     int iit = 0;
 
-    for (int i = 0; i < mesh->getMeshBufferCount(); i++)
+    for (int i = 0; i < buffers.size(); i++)
     {
-        scene::IMeshBuffer *mesh_buffer = mesh->getMeshBuffer(i);
+        scene::IMeshBuffer *mesh_buffer = buffers[i];
         
         int offset = vit;
         for (int j = 0; j < mesh_buffer->getVertexCount(); j++)

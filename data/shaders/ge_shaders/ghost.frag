@@ -5,7 +5,7 @@ layout(location = 4) in float f_hue_change;
 
 layout(location = 0) out vec4 o_color;
 
-#include "utils/sample_mesh_texture.h"
+#include "utils/sample_mesh_texture.glsl"
 #include "../utils/rgb_conversion.frag"
 
 void main()

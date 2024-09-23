@@ -4,6 +4,8 @@ layout(location = 3) flat in int f_material_id;
 layout(location = 4) in float f_hue_change;
 #ifdef PBR_ENABLED
 layout(location = 5) in vec3 f_normal;
+layout(location = 6) in vec3 f_tangent;
+layout(location = 7) in vec3 f_bitangent;
 #endif
 
 layout(location = 0) out vec4 o_color;
@@ -52,7 +54,15 @@ void main()
     o_color = vec4(mixed_color, 1.0);
 #else
     vec3 diffuse_color = tex_color.xyz * f_vertex_color.xyz;
-    vec3 normal = normalize(f_normal.xyz);
+
+    vec4 layer_3 = sampleMeshTexture3(f_material_id, f_uv);
+    vec3 tangent_space_normal = 2.0 * layer_3.xyz - 1.0;
+    vec3 frag_tangent = normalize(f_tangent);
+    vec3 frag_bitangent = normalize(f_bitangent);
+    vec3 frag_normal = normalize(f_normal);
+    mat3 t_b_n = mat3(frag_tangent, frag_bitangent, frag_normal);
+
+    vec3 normal = normalize(t_b_n * tangent_space_normal);
 
     vec4 pbr = sampleMeshTexture2(f_material_id, f_uv);
     vec3 xpos = getPosFromFragCoord(gl_FragCoord, u_camera.m_viewport, u_camera.m_inverse_projection_matrix);
