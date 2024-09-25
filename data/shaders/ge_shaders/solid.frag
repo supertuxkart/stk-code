@@ -12,13 +12,14 @@ layout(location = 0) out vec4 o_color;
 #include "utils/get_pos_from_frag_coord.glsl"
 #include "utils/pbr_light.glsl"
 #include "utils/sample_mesh_texture.glsl"
+#include "utils/sun_direction.glsl"
 #include "../utils/rgb_conversion.frag"
 
 vec3 SunMRP(vec3 normal, vec3 eyedir, vec3 sundirection)
 {
     vec3 local_sundir = normalize((transpose(u_camera.m_inverse_view_matrix) * vec4(sundirection, 0.)).xyz);
     vec3 R = reflect(-eyedir, normal);
-    float angularRadius = 3.14 * 5. / 180.;
+    float angularRadius = 3.14 * 0.5 / 180.;
     vec3 D = local_sundir;
     float d = cos(angularRadius);
     float r = sin(angularRadius);
@@ -58,7 +59,7 @@ void main()
     vec3 xpos = getPosFromFragCoord(gl_FragCoord, u_camera.m_viewport, u_camera.m_inverse_projection_matrix);
     vec3 eyedir = -normalize(xpos);
 
-    vec3 sun = SunMRP(normal, eyedir, vec3(-642.22, 673.75, -219.26));
+    vec3 sun = sunDirection(normal, eyedir, vec3(-642.22, 673.75, -219.26));
     vec3 lightdir = normalize(sun.xyz);
 
     vec3 mixed_color = PBRSunAmbientEmitLight(

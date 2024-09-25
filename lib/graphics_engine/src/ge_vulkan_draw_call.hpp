@@ -11,9 +11,10 @@
 
 #include "vulkan_wrapper.h"
 
+#include "SMaterial.h"
+#include "ISceneNode.h"
 #include "matrix4.h"
 #include "vector3d.h"
-#include "ESceneNodeTypes.h"
 #include "SColor.h"
 #include "SMaterial.h"
 
@@ -23,7 +24,7 @@ namespace irr
 {
     namespace scene
     {
-        class ISceneNode; class IBillboardSceneNode; struct SParticle;
+        class IBillboardSceneNode; struct SParticle;
         class IMesh;
     }
 }
@@ -31,6 +32,8 @@ namespace irr
 namespace GE
 {
 class GECullingTool;
+class GEMeshNodeCache;
+class GEMeshNodeData;
 class GESPMBuffer;
 class GEVulkanAnimatedMeshSceneNode;
 class GEVulkanCameraSceneNode;
@@ -221,12 +224,14 @@ public:
     // ------------------------------------------------------------------------
     void addNode(irr::scene::ISceneNode* node);
     // ------------------------------------------------------------------------
+    void addNode(GEMeshNodeData &data);
+    // ------------------------------------------------------------------------
     void addBillboardNode(irr::scene::ISceneNode* node,
                           irr::scene::ESCENE_NODE_TYPE node_type);
     // ------------------------------------------------------------------------
     void prepare(GEVulkanDriver* vk, GEVulkanCameraSceneNode* cam);
     // ------------------------------------------------------------------------
-    void generate(GEVulkanDriver* vk);
+    void generate(GEVulkanDriver* vk, GEMeshNodeCache *cache);
     // ------------------------------------------------------------------------
     void uploadDynamicData(GEVulkanDriver* vk, GEVulkanCameraSceneNode* cam,
                            VkCommandBuffer custom_cmd = VK_NULL_HANDLE);

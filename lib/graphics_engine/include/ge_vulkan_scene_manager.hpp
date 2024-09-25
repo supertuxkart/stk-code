@@ -2,11 +2,14 @@
 #define HEADER_GE_VULKAN_SCENE_MANAGER_HPP
 
 #include "../source/Irrlicht/CSceneManager.h"
+#include "IMesh.h"
+#include "SMaterial.h"
 #include <memory>
 #include <map>
 
 namespace GE
 {
+class GEMeshNodeCache;
 class GEVulkanCameraSceneNode;
 class GEVulkanDrawCall;
 
@@ -14,6 +17,8 @@ class GEVulkanSceneManager : public irr::scene::CSceneManager
 {
 private:
     std::map<GEVulkanCameraSceneNode*, std::unique_ptr<GEVulkanDrawCall> > m_draw_calls;
+
+    std::unique_ptr<GEMeshNodeCache> m_mesh_node_cache;
 
     // ------------------------------------------------------------------------
     void drawAllInternal();

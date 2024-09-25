@@ -3,6 +3,7 @@
 #include "../source/Irrlicht/os.h"
 
 #include "ge_main.hpp"
+#include "ge_mesh_node_cache.hpp"
 #include "ge_vulkan_animated_mesh_scene_node.hpp"
 #include "ge_vulkan_camera_scene_node.hpp"
 #include "ge_vulkan_command_loader.hpp"
@@ -27,6 +28,7 @@ GEVulkanSceneManager::GEVulkanSceneManager(irr::video::IVideoDriver* driver,
                     : CSceneManager(driver, fs, cursor_control,
                                     new GEVulkanMeshCache(), gui_environment)
 {
+    m_mesh_node_cache = std::unique_ptr<GEMeshNodeCache>(new GEMeshNodeCache);
     // CSceneManager grabbed it
     getMeshCache()->drop();
 }   // GEVulkanSceneManager
@@ -43,6 +45,8 @@ void GEVulkanSceneManager::clear()
     static_cast<GEVulkanDriver*>(getVideoDriver())
         ->getMeshTextureDescriptor()->clear();
     GEVulkanSkyBoxRenderer::destroy();
+
+    m_mesh_node_cache.get()->clear();
 }   // clear
 
 // ----------------------------------------------------------------------------
@@ -170,7 +174,7 @@ void GEVulkanSceneManager::drawAllInternal()
 
         it->second->prepare(static_cast<GEVulkanDriver*>(getVideoDriver()), cam);
         OnRegisterSceneNode();
-        it->second->generate(static_cast<GEVulkanDriver*>(getVideoDriver()));
+        it->second->generate(static_cast<GEVulkanDriver*>(getVideoDriver()), m_mesh_node_cache.get());
     }
 }   // drawAllInternal
 
@@ -251,7 +255,18 @@ irr::u32 GEVulkanSceneManager::registerNodeForRendering(
         pass != irr::scene::ESNRP_SOLID))
         return 0;
 
-    m_draw_calls.at(cam)->addNode(node);
+    if (node->getType() == irr::scene::ESNT_ANIMATED_MESH)
+    {
+        m_draw_calls.at(cam)->addNode(m_mesh_node_cache.get()->getMeshNodeData(
+            static_cast<irr::scene::IAnimatedMeshSceneNode*>(node)
+        ));
+    }
+    else if (node->getType() == irr::scene::ESNT_MESH)
+    {
+        m_draw_calls.at(cam)->addNode(m_mesh_node_cache.get()->getMeshNodeData(
+            static_cast<irr::scene::IMeshSceneNode*>(node)
+        ));
+    }
     return 1;
 }   // registerNodeForRendering
 

@@ -2,6 +2,7 @@
 
 #include "ge_culling_tool.hpp"
 #include "ge_main.hpp"
+#include "ge_mesh_node_cache.hpp"
 #include "ge_render_info.hpp"
 #include "ge_spm.hpp"
 #include "ge_vulkan_animated_mesh_scene_node.hpp"
@@ -14,6 +15,7 @@
 #include "ge_vulkan_features.hpp"
 #include "ge_vulkan_mesh_cache.hpp"
 #include "ge_vulkan_mesh_scene_node.hpp"
+#include "ge_vulkan_scene_manager.hpp"
 #include "ge_vulkan_shader_manager.hpp"
 #include "ge_vulkan_skybox_renderer.hpp"
 #include "ge_vulkan_texture_descriptor.hpp"
@@ -269,6 +271,55 @@ void GEVulkanDrawCall::addNode(irr::scene::ISceneNode* node)
 }   // addNode
 
 // ----------------------------------------------------------------------------
+void GEVulkanDrawCall::addNode(GEMeshNodeData &data)
+{
+    GEVulkanAnimatedMeshSceneNode* anode = NULL;
+    if (data.node->getType() == irr::scene::ESNT_ANIMATED_MESH)
+    {
+        anode = static_cast<GEVulkanAnimatedMeshSceneNode*>(data.node);
+    }
+    else if (data.node->getType() == irr::scene::ESNT_MESH)
+    {
+        for (unsigned i = 0; i < data.mesh_buffer_count; i++)
+        {
+            irr::scene::IMeshBuffer* b = data.mesh_buffer[i];
+            if (b->getVertexType() != irr::video::EVT_SKINNED_MESH)
+                return;
+        }
+    }
+    else
+        return;
+
+    bool added_skinning = false;
+    for (unsigned i = 0; i < data.mesh_buffer_count; i++)
+    {
+        GESPMBuffer* buffer = static_cast<GESPMBuffer*>(
+            data.mesh_buffer[i]);
+        if (m_culling_tool->isCulled(data.bounding_box))
+            continue;
+        const std::string& shader = getShader(data.material[i]);
+        if (buffer->getHardwareMappingHint_Vertex() == irr::scene::EHM_STREAM ||
+            buffer->getHardwareMappingHint_Index() == irr::scene::EHM_STREAM)
+        {
+            GEVulkanDynamicSPMBuffer* dbuffer = static_cast<
+                GEVulkanDynamicSPMBuffer*>(buffer);
+            m_dynamic_spm_buffers[getDynamicBufferKey(shader)]
+                .emplace_back(dbuffer, data.node);
+            continue;
+        }
+        m_visible_nodes[buffer][shader].emplace_back(data.node, i);
+        m_mb_map[buffer] = data.mesh;
+        if (anode && !added_skinning &&
+            !anode->getSkinningMatrices().empty() &&
+            m_skinning_nodes.find(anode) == m_skinning_nodes.end())
+        {
+            added_skinning = true;
+            m_skinning_nodes.insert(anode);
+        }
+    }
+}   // addNode
+
+// ----------------------------------------------------------------------------
 void GEVulkanDrawCall::addBillboardNode(irr::scene::ISceneNode* node,
                                         irr::scene::ESCENE_NODE_TYPE node_type)
 {
@@ -290,7 +341,7 @@ void GEVulkanDrawCall::addBillboardNode(irr::scene::ISceneNode* node,
 }   // addBillboardNode
 
 // ----------------------------------------------------------------------------
-void GEVulkanDrawCall::generate(GEVulkanDriver* vk)
+void GEVulkanDrawCall::generate(GEVulkanDriver* vk, GEMeshNodeCache *cache)
 {
     if (!m_visible_nodes.empty() && m_data_layout == VK_NULL_HANDLE)
         createVulkanData();
@@ -411,7 +462,10 @@ start:
                 goto start;
             }
             irr::scene::ISceneNode* node = q.second;
-            const irr::video::SMaterial& m = node->getMaterial(0);
+            const irr::video::SMaterial& m = 
+                node->getType() == ESNT_ANIMATED_MESH ? cache->getMeshNodeData(static_cast<IAnimatedMeshSceneNode*>(node)).material[0]:
+                node->getType() == ESNT_MESH ? cache->getMeshNodeData(static_cast<IMeshSceneNode*>(node)).material[0]:
+                node->getMaterial(0);
             TexturesList textures = getTexturesList(m);
             const irr::video::ITexture** list = &textures[0];
             int material_id = m_texture_descriptor->getTextureID(list,
