@@ -107,12 +107,12 @@ int LODNode::getLevel()
         if (squared_dist < m_detail[n] &&
             ((n + 1 >= m_detail.size()) || (m_min_switch_distance < m_detail[n])))
         {
-            m_current_level = n;
-            return n;
+            m_current_level = 0;
+            return 0;
         }
     }
-    m_current_level = -1;
-    return -1;
+    m_current_level = 0;
+    return 0;
 }  // getLevel
 
 // ---------------------------------------------------------------------------

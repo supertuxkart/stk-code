@@ -24,6 +24,8 @@ irr::scene::ISceneNode* g_skybox = NULL;
 std::unordered_map<GEVulkanCameraSceneNode*, bool> g_render_skybox;
 
 GEVulkanArrayTexture* g_texture_cubemap = NULL;
+GEVulkanArrayTexture* g_diffuse_env_cubemap = NULL;
+GEVulkanArrayTexture* g_specular_env_cubemap = NULL;
 bool g_updated_texture_descriptor = false;
 
 VkDescriptorSetLayout g_descriptor_layout = VK_NULL_HANDLE;
@@ -31,6 +33,12 @@ VkDescriptorPool g_descriptor_pool = VK_NULL_HANDLE;
 VkDescriptorSet g_descriptor_set = VK_NULL_HANDLE;
 VkPipelineLayout g_pipeline_layout = VK_NULL_HANDLE;
 VkPipeline g_graphics_pipeline = VK_NULL_HANDLE;
+
+VkDescriptorSetLayout g_descriptor_layout_env_map = VK_NULL_HANDLE;
+VkDescriptorPool g_descriptor_pool_env_map = VK_NULL_HANDLE;
+VkDescriptorSet g_descriptor_set_env_map = VK_NULL_HANDLE;
+
+void updateDescriptorSet();
 }   // GEVulkanSkyBoxRenderer
 
 // ============================================================================
@@ -41,6 +49,9 @@ void GEVulkanSkyBoxRenderer::init()
     g_descriptor_layout = VK_NULL_HANDLE;
     g_descriptor_pool = VK_NULL_HANDLE;
     g_descriptor_set = VK_NULL_HANDLE;
+    g_descriptor_layout_env_map = VK_NULL_HANDLE;
+    g_descriptor_pool_env_map = VK_NULL_HANDLE;
+    g_descriptor_set_env_map = VK_NULL_HANDLE;
     g_pipeline_layout = VK_NULL_HANDLE;
     g_graphics_pipeline = VK_NULL_HANDLE;
     g_updated_texture_descriptor = true;
@@ -58,6 +69,18 @@ void GEVulkanSkyBoxRenderer::destroy()
     {
         g_texture_cubemap->drop();
         g_texture_cubemap = NULL;
+    }
+
+    if (g_diffuse_env_cubemap != NULL)
+    {
+        g_diffuse_env_cubemap->drop();
+        g_diffuse_env_cubemap = NULL;
+    }
+
+    if (g_specular_env_cubemap != NULL)
+    {
+        g_specular_env_cubemap->drop();
+        g_specular_env_cubemap = NULL;
     }
 
     if (g_graphics_pipeline != VK_NULL_HANDLE)
@@ -80,10 +103,80 @@ void GEVulkanSkyBoxRenderer::destroy()
     g_descriptor_layout = VK_NULL_HANDLE;
 
     g_descriptor_set = VK_NULL_HANDLE;
+
+    {
+        if (g_descriptor_pool_env_map != VK_NULL_HANDLE)
+            vkDestroyDescriptorPool(vk->getDevice(), g_descriptor_pool_env_map, NULL);
+        g_descriptor_pool_env_map = VK_NULL_HANDLE;
+
+        if (g_descriptor_layout_env_map != VK_NULL_HANDLE)
+        {
+            vkDestroyDescriptorSetLayout(vk->getDevice(), g_descriptor_layout_env_map,
+                NULL);
+        }
+        g_descriptor_layout_env_map = VK_NULL_HANDLE;
+
+        g_descriptor_set_env_map = VK_NULL_HANDLE;
+    }
     g_skybox = NULL;
     g_render_skybox.clear();
     g_updated_texture_descriptor = true;
 }   // destroy
+
+// ----------------------------------------------------------------------------
+void GEVulkanSkyBoxRenderer::updateDescriptorSet()
+{
+    if (g_updated_texture_descriptor)
+    {   
+        return;
+    }
+    g_updated_texture_descriptor = true;
+
+    GEVulkanDriver* vk = getVKDriver();
+    VkDescriptorImageInfo info;
+    info.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
+    info.sampler = vk->getSampler(GVS_SKYBOX);
+    info.imageView = (VkImageView)g_texture_cubemap->getTextureHandler();
+
+    VkWriteDescriptorSet write_descriptor_set = {};
+    write_descriptor_set.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+    write_descriptor_set.dstBinding = 0;
+    write_descriptor_set.dstArrayElement = 0;
+    write_descriptor_set.descriptorType =
+        VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
+    write_descriptor_set.descriptorCount = 1;
+    write_descriptor_set.pBufferInfo = 0;
+    write_descriptor_set.dstSet = g_descriptor_set;
+    write_descriptor_set.pImageInfo = &info;
+
+    vkUpdateDescriptorSets(vk->getDevice(), 1, &write_descriptor_set, 0,
+        NULL);
+
+    std::vector<VkWriteDescriptorSet> data_set;
+
+    VkDescriptorImageInfo info_diffuse;
+    info_diffuse.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
+    info_diffuse.sampler = vk->getSampler(GVS_SKYBOX);
+    info_diffuse.imageView = (VkImageView)g_diffuse_env_cubemap->getTextureHandler();
+
+    write_descriptor_set.dstBinding = 0;
+    write_descriptor_set.dstSet = g_descriptor_set_env_map;
+    write_descriptor_set.pImageInfo = &info_diffuse;
+    data_set.push_back(write_descriptor_set);
+
+    VkDescriptorImageInfo info_specular;
+    info_specular.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
+    info_specular.sampler = vk->getSampler(GVS_SKYBOX);
+    info_specular.imageView = (VkImageView)g_specular_env_cubemap->getTextureHandler();
+
+    write_descriptor_set.dstBinding = 1;
+    write_descriptor_set.dstSet = g_descriptor_set_env_map;
+    write_descriptor_set.pImageInfo = &info_specular;
+    data_set.push_back(write_descriptor_set);
+
+    vkUpdateDescriptorSets(vk->getDevice(), data_set.size(), data_set.data(), 0,
+        NULL);
+}
 
 // ----------------------------------------------------------------------------
 void GEVulkanSkyBoxRenderer::render(VkCommandBuffer cmd,
@@ -94,30 +187,7 @@ void GEVulkanSkyBoxRenderer::render(VkCommandBuffer cmd,
         return;
     g_render_skybox.at(cam) = false;
 
-    if (!g_updated_texture_descriptor)
-    {
-        g_updated_texture_descriptor = true;
-
-        GEVulkanDriver* vk = getVKDriver();
-        VkDescriptorImageInfo info;
-        info.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
-        info.sampler = vk->getSampler(GVS_SKYBOX);
-        info.imageView = (VkImageView)g_texture_cubemap->getTextureHandler();
-
-        VkWriteDescriptorSet write_descriptor_set = {};
-        write_descriptor_set.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
-        write_descriptor_set.dstBinding = 0;
-        write_descriptor_set.dstArrayElement = 0;
-        write_descriptor_set.descriptorType =
-            VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
-        write_descriptor_set.descriptorCount = 1;
-        write_descriptor_set.pBufferInfo = 0;
-        write_descriptor_set.dstSet = g_descriptor_set;
-        write_descriptor_set.pImageInfo = &info;
-
-        vkUpdateDescriptorSets(vk->getDevice(), 1, &write_descriptor_set, 0,
-            NULL);
-    }
+    updateDescriptorSet();
 
     vkCmdBindPipeline(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, g_graphics_pipeline);
 
@@ -174,11 +244,82 @@ void GEVulkanSkyBoxRenderer::addSkyBox(GEVulkanCameraSceneNode* cam,
     };
     g_texture_cubemap = new GEVulkanArrayTexture(sky_tex,
         VK_IMAGE_VIEW_TYPE_CUBE, swap_pixels);
+
+    g_diffuse_env_cubemap = new GEVulkanArrayTexture(sky_tex,
+        VK_IMAGE_VIEW_TYPE_CUBE, swap_pixels);
+    g_specular_env_cubemap = new GEVulkanArrayTexture(sky_tex,
+        VK_IMAGE_VIEW_TYPE_CUBE, swap_pixels);
+    
     g_updated_texture_descriptor = false;
 
     g_skybox = skybox;
     g_render_skybox[cam] = true;
     GEVulkanDriver* vk = getVKDriver();
+
+    // Environment map
+    {
+        std::vector<VkDescriptorSetLayoutBinding> layout_list;
+
+        VkDescriptorSetLayoutBinding texture_layout_binding;
+        texture_layout_binding.binding = 0;
+        texture_layout_binding.descriptorCount = 1;
+        texture_layout_binding.descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
+        texture_layout_binding.pImmutableSamplers = NULL;
+        texture_layout_binding.stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT;
+        layout_list.push_back(texture_layout_binding);
+
+        texture_layout_binding.binding = 1;
+        texture_layout_binding.descriptorCount = 1;
+        texture_layout_binding.descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
+        texture_layout_binding.pImmutableSamplers = NULL;
+        texture_layout_binding.stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT;
+        layout_list.push_back(texture_layout_binding);
+
+        VkDescriptorSetLayoutCreateInfo setinfo = {};
+        setinfo.flags = 0;
+        setinfo.pNext = NULL;
+        setinfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO;
+        setinfo.pBindings = layout_list.data();
+        setinfo.bindingCount = layout_list.size();
+        if (vkCreateDescriptorSetLayout(vk->getDevice(), &setinfo,
+            NULL, &g_descriptor_layout_env_map) != VK_SUCCESS)
+        {
+            throw std::runtime_error("vkCreateDescriptorSetLayout failed for "
+                "addSkyBox");
+        }
+
+        VkDescriptorPoolSize pool_size;
+        pool_size.type = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
+        pool_size.descriptorCount = 2;
+
+        VkDescriptorPoolCreateInfo pool_info = {};
+        pool_info.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO;
+        pool_info.flags = 0;
+        pool_info.maxSets = 1;
+        pool_info.poolSizeCount = 1;
+        pool_info.pPoolSizes = &pool_size;
+        if (vkCreateDescriptorPool(vk->getDevice(), &pool_info, NULL,
+            &g_descriptor_pool_env_map) != VK_SUCCESS)
+        {
+            throw std::runtime_error("vkCreateDescriptorPool failed for "
+                "addSkyBox");
+        }
+
+        std::vector<VkDescriptorSetLayout> layouts(1, g_descriptor_layout_env_map);
+
+        VkDescriptorSetAllocateInfo alloc_info = {};
+        alloc_info.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;
+        alloc_info.descriptorPool = g_descriptor_pool_env_map;
+        alloc_info.descriptorSetCount = layouts.size();
+        alloc_info.pSetLayouts = layouts.data();
+
+        if (vkAllocateDescriptorSets(vk->getDevice(), &alloc_info,
+            &g_descriptor_set_env_map) != VK_SUCCESS)
+        {
+            throw std::runtime_error("vkAllocateDescriptorSets failed for "
+                "addSkyBox");
+        }
+    } // Environment map
 
     // g_descriptor_layout
     VkDescriptorSetLayoutBinding texture_layout_binding;
@@ -383,5 +524,19 @@ void GEVulkanSkyBoxRenderer::addSkyBox(GEVulkanCameraSceneNode* cam,
     }
 
 }   // addSkyBox
+
+// ----------------------------------------------------------------------------
+VkDescriptorSet *GEVulkanSkyBoxRenderer::getEnvMapDescriptor()
+{
+    updateDescriptorSet();
+
+    return &g_descriptor_set_env_map;
+}
+
+// ----------------------------------------------------------------------------
+VkDescriptorSetLayout *GEVulkanSkyBoxRenderer::getEnvMapDescriptorLayout()
+{
+    return &g_descriptor_layout_env_map;
+}
 
 }

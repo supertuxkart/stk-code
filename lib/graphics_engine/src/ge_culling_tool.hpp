@@ -7,45 +7,54 @@
 #include "IVideoDriver.h"
 
 #include <unordered_map>
+#include <unordered_set>
 
 namespace irr
 {
     namespace scene { class ISceneNode; }
 }
 
-template<>
-struct std::hash<irr::core::aabbox3df>
-{
-    std::size_t operator()(const irr::core::aabbox3df& box) const noexcept
-    {
-        std::size_t ret = std::hash<float>{}(box.MinEdge.X);
-        ret = (ret * 0x100000001b3ull) ^ std::hash<float>{}(box.MinEdge.Y);
-        ret = (ret * 0x100000001b3ull) ^ std::hash<float>{}(box.MinEdge.Z);
-        ret = (ret * 0x100000001b3ull) ^ std::hash<float>{}(box.MaxEdge.X);
-        ret = (ret * 0x100000001b3ull) ^ std::hash<float>{}(box.MaxEdge.Y);
-        ret = (ret * 0x100000001b3ull) ^ std::hash<float>{}(box.MaxEdge.Z);
-        return ret;
-    }
-};
+class CullingThreadpool;
+class MaskedOcclusionCulling;
 
 namespace GE
 {
 class GESPMBuffer;
 class GEVulkanCameraSceneNode;
-
 class GECullingTool
+
 {
 private:
-    irr::video::IVideoDriver *m_driver;
-
     irr::core::quaternion m_frustum[6];
 
     irr::core::aabbox3df m_cam_bbox;
+    irr::core::matrix4 m_pvm_matrix;
+    irr::core::vector3df m_cam_position;
 
-    std::unordered_map<irr::core::aabbox3df, bool> m_results;
+    MaskedOcclusionCulling *m_occlusion;
+    CullingThreadpool *m_occlusion_manager;
+
+    std::unordered_map<irr::scene::IMeshBuffer*, std::vector<float> > m_occluder_vertices;
+    std::unordered_map<irr::scene::IMeshBuffer*, std::vector<unsigned> > m_occluder_indices;
+
+    std::unordered_set<irr::scene::ISceneNode*> m_all_occluder_nodes;
 public:
     // ------------------------------------------------------------------------
-    void init(irr::video::IVideoDriver *driver, GEVulkanCameraSceneNode* cam);
+    GECullingTool();
+    // ------------------------------------------------------------------------
+    ~GECullingTool();
+    // ------------------------------------------------------------------------
+    void init(GEVulkanCameraSceneNode* cam, bool occlusion = false);
+    // ------------------------------------------------------------------------
+    void addOccluder(GESPMBuffer* buffer, irr::scene::ISceneNode* node);
+    // ------------------------------------------------------------------------
+    void clearOccluders();
+    // ------------------------------------------------------------------------
+    void processOccluders();
+    // ------------------------------------------------------------------------
+    bool isViewCulled(irr::core::aabbox3df& bb);
+    // ------------------------------------------------------------------------
+    bool isOcclusionCulled(irr::core::aabbox3df& bb);
     // ------------------------------------------------------------------------
     bool isCulled(irr::core::aabbox3df& bb);
     // ------------------------------------------------------------------------

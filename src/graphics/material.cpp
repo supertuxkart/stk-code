@@ -638,6 +638,7 @@ void Material::unloadTexture()
                 irr_driver->removeTexture(m_vk_textures[i - 2]);
             m_vk_textures[i - 2] = NULL;
         }
+        m_installed = false;
     }
 #endif
 }

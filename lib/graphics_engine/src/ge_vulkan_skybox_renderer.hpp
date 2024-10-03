@@ -22,6 +22,10 @@ void destroy();
 void render(VkCommandBuffer, GEVulkanCameraSceneNode*);
 // ----------------------------------------------------------------------------
 void addSkyBox(GEVulkanCameraSceneNode*, irr::scene::ISceneNode*);
+// ----------------------------------------------------------------------------
+VkDescriptorSet *getEnvMapDescriptor();
+// ----------------------------------------------------------------------------
+VkDescriptorSetLayout *getEnvMapDescriptorLayout();
 };   // GEVulkanSkyBoxRenderer
 
 }

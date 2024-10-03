@@ -9,10 +9,10 @@
 #include "ge_vma.hpp"
 #include "SDL_video.h"
 
-#include "occlusion/CullingThreadpool.h"
 #include "../source/Irrlicht/CNullDriver.h"
 #include "SIrrCreationParameters.h"
 #include "SColor.h"
+
 #include <array>
 #include <memory>
 #include <mutex>
@@ -50,6 +50,16 @@ namespace GE
         GVQI_COMPUTE,
         GVQI_TRANSFER,
         GVQI_COUNT
+    };
+    struct GEGlobalLightUBO
+    {
+        irr::core::vector3df m_ambient_color;
+        irr::f32             m_sun_angle_tan_half;
+        irr::core::vector3df m_sun_color;
+        irr::f32             m_sun_scatter;
+        irr::core::vector3df m_sun_direction;
+        irr::f32             m_fog_density;
+        irr::video::SColorf  m_fog_color;
     };
     class GEVulkanDriver : public video::CNullDriver
     {
@@ -195,7 +205,7 @@ namespace GE
         //! adds a dynamic light, returning an index to the light
         //! \param light: the light data to use to create the light
         //! \return An index to the light, or -1 if an error occurs
-        virtual s32 addDynamicLight(const SLight& light) { return -1; }
+        virtual s32 addDynamicLight(const SLight& light);
 
         //! Turns a dynamic light on or off
         //! \param lightIndex: the index returned by addDynamicLight
@@ -208,7 +218,7 @@ namespace GE
         //! Sets the dynamic ambient light color. The default color is
         //! (0,0,0,0) which means it is dark.
         //! \param color: New color of the ambient light.
-        virtual void setAmbientLight(const SColorf& color) {}
+        virtual void setAmbientLight(const SColorf& color);
 
         //! Draws a shadow volume into the stencil buffer.
         virtual void drawStencilShadowVolume(const core::array<core::vector3df>& triangles, bool zfail=true, u32 debugDataVisible=0) {}
@@ -230,7 +240,7 @@ namespace GE
 
         //! Sets the fog mode.
         virtual void setFog(SColor color, E_FOG_TYPE fogType, f32 start,
-            f32 end, f32 density, bool pixelFog, bool rangeFog) {}
+            f32 end, f32 density, bool pixelFog, bool rangeFog);
 
         //! Only used by the internal engine. Used to notify the driver that
         //! the window was resized.
@@ -382,6 +392,7 @@ namespace GE
                                        { m_dynamic_spm_buffers.insert(buffer); }
         void removeDynamicSPMBuffer(GEVulkanDynamicSPMBuffer* buffer)
                                         { m_dynamic_spm_buffers.erase(buffer); }
+        const GEGlobalLightUBO *getGlobalLightUBO(const core::matrix4 &inverse_view);
     private:
         struct SwapChainSupportDetails
         {
@@ -417,6 +428,7 @@ namespace GE
         SIrrlichtCreationParameters m_params;
         SMaterial Material;
         // RAII to auto cleanup
+
         struct VK
         {
             VkInstance instance;
@@ -511,11 +523,6 @@ namespace GE
         core::rect<s32> m_viewport;
         core::matrix4 m_pre_rotation_matrix;
 
-        MaskedOcclusionCulling *m_occlusion;
-        CullingThreadpool *m_occlusion_manager;
-        std::unordered_map<scene::ISceneNode*, std::vector<float> > m_occlusion_vertices;
-        std::unordered_map<scene::ISceneNode*, std::vector<unsigned> > m_occlusion_indices;
-
         video::ITexture* m_white_texture;
         video::ITexture* m_transparent_texture;
 
@@ -534,6 +541,9 @@ namespace GE
         GESPM* m_billboard_quad;
         int m_current_buffer_idx;
         std::set<GEVulkanDynamicSPMBuffer*> m_dynamic_spm_buffers;
+
+        GEGlobalLightUBO m_global_light_ubo;
+        GEGlobalLightUBO m_global_light_ubo_gpu;
 
         void createInstance(SDL_Window* window);
         void findPhysicalDevice();

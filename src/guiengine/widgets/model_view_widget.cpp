@@ -27,8 +27,9 @@
 #include <IAnimatedMeshSceneNode.h>
 #include <ICameraSceneNode.h>
 #include <ILightSceneNode.h>
-#include <ISceneManager.h>
 #include <IMeshSceneNode.h>
+#include <ISceneManager.h>
+#include <IVideoDriver.h>
 
 #include <algorithm>
 #ifndef SERVER_ONLY
@@ -292,6 +293,8 @@ void ModelViewWidget::setupRTTScene()
         scene::ILightSceneNode* light = irr_driver->getSceneManager()
             ->addLightSceneNode(NULL, spot_pos, video::SColorf(1.0f,1.0f,1.0f),
                                 1600 /* radius */);
+        irr_driver->getVideoDriver()->setFog(video::SColor(0, 255, 255, 255),
+                                            video::EFT_FOG_EXP);
         light->setLightType(video::ELT_SPOT);
         light->setRotation((core::vector3df(0, 10, 0) - spot_pos).getHorizontalAngle());
         light->updateAbsolutePosition();
@@ -299,7 +302,7 @@ void ModelViewWidget::setupRTTScene()
     }
     else
     {
-        m_light = irr_driver->addLight(spot_pos, 0.3f /* energy */, 10 /* distance */, 1.0f /* r */, 1.0f /* g */, 1.0f /* g*/, true, NULL);
+        m_light = irr_driver->addLight(spot_pos, 0.3f /* energy */, 10 /* distance */, 1.0f /* r */, 1.0f /* g */, 1.0f /*b*/, true, NULL);
     }
 
     m_rtt_main_node->setMaterialFlag(video::EMF_GOURAUD_SHADING, true);

@@ -3,7 +3,6 @@
 #include "../source/Irrlicht/os.h"
 
 #include "ge_main.hpp"
-#include "ge_mesh_node_cache.hpp"
 #include "ge_vulkan_animated_mesh_scene_node.hpp"
 #include "ge_vulkan_camera_scene_node.hpp"
 #include "ge_vulkan_command_loader.hpp"
@@ -13,6 +12,7 @@
 #include "ge_vulkan_mesh_cache.hpp"
 #include "ge_vulkan_mesh_scene_node.hpp"
 #include "ge_vulkan_skybox_renderer.hpp"
+#include "ge_vulkan_sun_scene_node.hpp"
 #include "ge_vulkan_texture_descriptor.hpp"
 
 #include "IBillboardSceneNode.h"
@@ -28,7 +28,6 @@ GEVulkanSceneManager::GEVulkanSceneManager(irr::video::IVideoDriver* driver,
                     : CSceneManager(driver, fs, cursor_control,
                                     new GEVulkanMeshCache(), gui_environment)
 {
-    m_mesh_node_cache = std::unique_ptr<GEMeshNodeCache>(new GEMeshNodeCache);
     // CSceneManager grabbed it
     getMeshCache()->drop();
 }   // GEVulkanSceneManager
@@ -45,8 +44,6 @@ void GEVulkanSceneManager::clear()
     static_cast<GEVulkanDriver*>(getVideoDriver())
         ->getMeshTextureDescriptor()->clear();
     GEVulkanSkyBoxRenderer::destroy();
-
-    m_mesh_node_cache.get()->clear();
 }   // clear
 
 // ----------------------------------------------------------------------------
@@ -155,6 +152,23 @@ irr::scene::IMeshSceneNode* GEVulkanSceneManager::addMeshSceneNode(
 }   // addMeshSceneNode
 
 // ----------------------------------------------------------------------------
+irr::scene::ILightSceneNode *GEVulkanSceneManager::addSunSceneNode(
+    irr::scene::ISceneNode* parent,
+    const irr::core::vector3df& position,
+    irr::video::SColorf color,
+    irr::f32 range, irr::s32 id)
+{
+    if (!parent)
+		parent = this;
+
+    GEVulkanSunSceneNode *node =
+        new GEVulkanSunSceneNode(parent, this, id, position, color, range);
+    node->drop();
+
+    return node;
+}
+
+// ----------------------------------------------------------------------------
 void GEVulkanSceneManager::drawAllInternal()
 {
     static_cast<GEVulkanMeshCache*>(getMeshCache())->updateCache();
@@ -165,6 +179,10 @@ void GEVulkanSceneManager::drawAllInternal()
             GEVulkanCameraSceneNode*>(getActiveCamera());
     }
     OnAnimate(os::Timer::getTime());
+    
+    GEVulkanDriver* vk = static_cast<GEVulkanDriver*>(getVideoDriver());
+    vk->setAmbientLight(getAmbientLight());
+
     if (cam)
     {
         cam->render();
@@ -172,9 +190,9 @@ void GEVulkanSceneManager::drawAllInternal()
         if (it == m_draw_calls.end())
             return;
 
-        it->second->prepare(static_cast<GEVulkanDriver*>(getVideoDriver()), cam);
+        it->second->prepare(vk, cam);
         OnRegisterSceneNode();
-        it->second->generate(static_cast<GEVulkanDriver*>(getVideoDriver()), m_mesh_node_cache.get());
+        it->second->generate(vk, cam);
     }
 }   // drawAllInternal
 
@@ -257,15 +275,11 @@ irr::u32 GEVulkanSceneManager::registerNodeForRendering(
 
     if (node->getType() == irr::scene::ESNT_ANIMATED_MESH)
     {
-        m_draw_calls.at(cam)->addNode(m_mesh_node_cache.get()->getMeshNodeData(
-            static_cast<irr::scene::IAnimatedMeshSceneNode*>(node)
-        ));
+        m_draw_calls.at(cam)->addNode(node);
     }
     else if (node->getType() == irr::scene::ESNT_MESH)
     {
-        m_draw_calls.at(cam)->addNode(m_mesh_node_cache.get()->getMeshNodeData(
-            static_cast<irr::scene::IMeshSceneNode*>(node)
-        ));
+        m_draw_calls.at(cam)->addNode(node);
     }
     return 1;
 }   // registerNodeForRendering

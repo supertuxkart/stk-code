@@ -78,7 +78,8 @@ void GEVulkanAnimatedMeshSceneNode::OnAnimate(irr::u32 time_ms)
 
     spm->getSkinningMatrices(getFrameNr(), m_skinning_matrices,
         m_saved_transition_frame, TransitingBlend);
-    recursiveUpdateAbsolutePosition();
+
+    IAnimatedMeshSceneNode::OnAnimate(time_ms);
 
     for (Armature& arm : spm->getArmatures())
     {
@@ -88,8 +89,6 @@ void GEVulkanAnimatedMeshSceneNode::OnAnimate(irr::u32 time_ms)
                 (AbsoluteTransformation * arm.m_world_matrices[i].first);
         }
     }
-
-    IAnimatedMeshSceneNode::OnAnimate(time_ms);
 }   // OnAnimate
 
 // ----------------------------------------------------------------------------

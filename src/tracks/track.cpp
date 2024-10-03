@@ -447,6 +447,8 @@ void Track::cleanup()
     irr_driver->clearForcedBloom();
     irr_driver->clearBackgroundNodes();
 
+    irr_driver->getVideoDriver()->removeAllOcclusionQueries();
+
     if (CVS->isGLSL())
     {
         SP::SPShaderManager::get()->removeUnusedShaders();
@@ -1300,7 +1302,7 @@ bool Track::loadMainTrack(const XMLNode &root)
     // The merged mesh is grabbed by the octtree, so we don't need
     // to keep a reference to it.
     scene_node = irr_driver->addMesh(tangent_mesh, "track_main");
-    //irr_driver->getVideoDriver()->addOcclusionQuery(scene_node, tangent_mesh);
+    irr_driver->getVideoDriver()->addOcclusionQuery(scene_node, tangent_mesh);
     // We should drop the merged mesh (since it's now referred to in the
     // scene node), but then we need to grab it since it's in the
     // m_all_cached_meshes.
@@ -2015,6 +2017,7 @@ void Track::loadTrackModel(bool reverse_track, unsigned int mode_id)
     // we need to check for fog before loading the main track model
     if (const XMLNode *node = root->getNode("sun"))
     {
+        m_fog_color.setAlpha(128);
         node->get("xyz",           &m_sun_position );
         node->get("ambient",       &m_default_ambient_color);
         node->get("sun-specular",  &m_sun_specular_color);
@@ -2144,15 +2147,15 @@ void Track::loadTrackModel(bool reverse_track, unsigned int mode_id)
     // otherwise the skycube node could be modified to have fog enabled, which
     // we don't want
 #ifndef SERVER_ONLY
-    if (m_use_fog && Camera::getDefaultCameraType()!=Camera::CM_TYPE_DEBUG &&
+    if (Camera::getDefaultCameraType()!=Camera::CM_TYPE_DEBUG &&
         !CVS->isGLSL())
     {
         /* NOTE: if LINEAR type, density does not matter, if EXP or EXP2, start
            and end do not matter */
         irr_driver->getVideoDriver()->setFog(m_fog_color,
-                                             video::EFT_FOG_LINEAR,
+                                             video::EFT_FOG_EXP,
                                              m_fog_start, m_fog_end,
-                                             1.0f);
+                                             m_use_fog ? 1.0f / (40.0f * (m_fog_start + 0.001f)) : 0.0f);
     }
 #endif
 
@@ -3035,6 +3038,7 @@ void Track::cleanChildTrack()
     assert(STKProcess::getType() == PT_CHILD);
     Track* child_track = m_current_track[PT_CHILD];
     child_track->m_item_manager = nullptr;
+    irr_driver->getVideoDriver()->removeAllOcclusionQueries();
     delete child_track->m_check_manager;
     delete child_track->m_track_object_manager;
     delete child_track->m_track_mesh;

@@ -85,11 +85,14 @@ void GEVulkanFBOTexture::createRTT()
     VkAttachmentReference color_reference = { 0, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL };
     VkAttachmentReference depth_reference = { 1, VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL };
 
-    VkSubpassDescription subpass_desc = {};
-    subpass_desc.pipelineBindPoint = VK_PIPELINE_BIND_POINT_GRAPHICS;
-    subpass_desc.colorAttachmentCount = 1;
-    subpass_desc.pColorAttachments = &color_reference;
-    subpass_desc.pDepthStencilAttachment = &depth_reference;
+    std::vector<VkSubpassDescription> all_subpass;
+    VkSubpassDescription shading_subpass_desc = {};
+    shading_subpass_desc.pipelineBindPoint = VK_PIPELINE_BIND_POINT_GRAPHICS;
+    shading_subpass_desc.colorAttachmentCount = 1;
+    shading_subpass_desc.pColorAttachments = &color_reference;
+    shading_subpass_desc.pDepthStencilAttachment = &depth_reference;
+
+    all_subpass.push_back(shading_subpass_desc);
 
     // Use subpass dependencies for layout transitions
     std::array<VkSubpassDependency, 2> dependencies;
@@ -121,8 +124,8 @@ void GEVulkanFBOTexture::createRTT()
     render_pass_info.sType = VK_STRUCTURE_TYPE_RENDER_PASS_CREATE_INFO;
     render_pass_info.attachmentCount = attchment_desc.size();
     render_pass_info.pAttachments = attchment_desc.data();
-    render_pass_info.subpassCount = 1;
-    render_pass_info.pSubpasses = &subpass_desc;
+    render_pass_info.subpassCount = all_subpass.size();
+    render_pass_info.pSubpasses = all_subpass.data();
     render_pass_info.dependencyCount = dependencies.size();
     render_pass_info.pDependencies = dependencies.data();
 

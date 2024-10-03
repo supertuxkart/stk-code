@@ -32,8 +32,6 @@ namespace irr
 namespace GE
 {
 class GECullingTool;
-class GEMeshNodeCache;
-class GEMeshNodeData;
 class GESPMBuffer;
 class GEVulkanAnimatedMeshSceneNode;
 class GEVulkanCameraSceneNode;
@@ -41,6 +39,12 @@ class GEVulkanDriver;
 class GEVulkanDynamicBuffer;
 class GEVulkanDynamicSPMBuffer;
 class GEVulkanTextureDescriptor;
+
+enum GEVulkanDrawCallType : uint8_t
+{
+    GVDCT_COLOR = 1,
+    GVDCT_DEPTH = 2
+};
 
 struct ObjectData
 {
@@ -74,12 +78,14 @@ struct PipelineSettings
     std::string m_vertex_shader;
     std::string m_skinning_vertex_shader;
     std::string m_fragment_shader;
+    std::string m_depth_only_fragment_shader;
     std::string m_shader_name;
     bool m_alphablend;
     bool m_additive;
     bool m_backface_culling;
     bool m_depth_test;
     bool m_depth_write;
+    bool m_depth_prepass;
     char m_drawing_priority;
     std::function<void(uint32_t*, void**)> m_push_constants_func;
 
@@ -109,6 +115,8 @@ private:
     std::map<TexturesList, GESPMBuffer*> m_billboard_buffers;
 
     irr::core::vector3df m_view_position;
+    
+    GEVulkanDrawCallType m_draw_call_type;
 
     btQuaternion m_billboard_rotation;
 
@@ -146,11 +154,23 @@ private:
 
     VkDescriptorSetLayout m_data_layout;
 
+    VkDescriptorSetLayout m_data_layout_pbr;
+
     VkDescriptorPool m_descriptor_pool;
+
+    VkDescriptorPool m_descriptor_pool_pbr;
 
     std::vector<VkDescriptorSet> m_data_descriptor_sets;
 
+    std::vector<VkDescriptorSet> m_data_descriptor_sets_pbr;
+
+    std::unordered_map<std::string, std::pair<uint32_t, void*> >
+        m_push_constants;
+
     VkPipelineLayout m_pipeline_layout;
+
+    std::unordered_map<std::string, std::pair<VkPipeline, PipelineSettings> >
+        m_depth_only_pipelines;
 
     std::unordered_map<std::string, std::pair<VkPipeline, PipelineSettings> >
         m_graphics_pipelines;
@@ -175,18 +195,24 @@ private:
     // ------------------------------------------------------------------------
     std::string getShader(irr::scene::ISceneNode* node, int material_id);
     // ------------------------------------------------------------------------
-    void bindPipeline(VkCommandBuffer cmd, const std::string& name) const
+    bool bindPipeline(VkCommandBuffer cmd, const std::string& name,
+                      bool depth_only) const
     {
-        auto& ret = m_graphics_pipelines.at(name);
+        const auto& pipeline_map = depth_only ? m_depth_only_pipelines
+                                              : m_graphics_pipelines; 
+        if (pipeline_map.find(name) == pipeline_map.end())
+        {
+            return false;
+        }
+        auto& ret = pipeline_map.at(name);
         vkCmdBindPipeline(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, ret.first);
         if (ret.second.m_push_constants_func)
         {
-            uint32_t size;
-            void* data;
-            ret.second.m_push_constants_func(&size, &data);
+            std::pair<uint32_t, void*> constant = m_push_constants.at(name);
             vkCmdPushConstants(cmd, m_pipeline_layout,
-                VK_SHADER_STAGE_ALL_GRAPHICS, 0, size, data);
+                VK_SHADER_STAGE_ALL_GRAPHICS, 0, constant.first, constant.second);
         }
+        return true;
     }
     // ------------------------------------------------------------------------
     TexturesList getTexturesList(const irr::video::SMaterial& m)
@@ -203,12 +229,15 @@ private:
     // ------------------------------------------------------------------------
     void bindBaseVertex(GEVulkanDriver* vk, VkCommandBuffer cmd);
     // ------------------------------------------------------------------------
-    std::string getDynamicBufferKey(const std::string& shader) const
+    std::string getDynamicBufferKey(const std::string& shader, 
+                                    bool depth_only) const
     {
         static PipelineSettings default_settings = {};
         const PipelineSettings* settings = &default_settings;
-        auto it = m_graphics_pipelines.find(shader);
-        if (it != m_graphics_pipelines.end())
+        const auto& pipeline_map = depth_only ? m_depth_only_pipelines
+                                              : m_graphics_pipelines; 
+        auto it = pipeline_map.find(shader);
+        if (it != pipeline_map.end())
             settings = &it->second.second;
         return std::string(1, settings->isTransparent() ? (char)1 : (char)0) +
             std::string(1, settings->m_drawing_priority) + shader;
@@ -224,14 +253,13 @@ public:
     // ------------------------------------------------------------------------
     void addNode(irr::scene::ISceneNode* node);
     // ------------------------------------------------------------------------
-    void addNode(GEMeshNodeData &data);
-    // ------------------------------------------------------------------------
     void addBillboardNode(irr::scene::ISceneNode* node,
                           irr::scene::ESCENE_NODE_TYPE node_type);
     // ------------------------------------------------------------------------
-    void prepare(GEVulkanDriver* vk, GEVulkanCameraSceneNode* cam);
+    void prepare(GEVulkanDriver* vk, GEVulkanCameraSceneNode* cam,
+                 GEVulkanDrawCallType type = (GEVulkanDrawCallType)(GVDCT_COLOR | GVDCT_DEPTH));
     // ------------------------------------------------------------------------
-    void generate(GEVulkanDriver* vk, GEMeshNodeCache *cache);
+    void generate(GEVulkanDriver* vk, GEVulkanCameraSceneNode* cam);
     // ------------------------------------------------------------------------
     void uploadDynamicData(GEVulkanDriver* vk, GEVulkanCameraSceneNode* cam,
                            VkCommandBuffer custom_cmd = VK_NULL_HANDLE);

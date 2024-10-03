@@ -9,7 +9,6 @@
 
 namespace GE
 {
-class GEMeshNodeCache;
 class GEVulkanCameraSceneNode;
 class GEVulkanDrawCall;
 
@@ -17,8 +16,6 @@ class GEVulkanSceneManager : public irr::scene::CSceneManager
 {
 private:
     std::map<GEVulkanCameraSceneNode*, std::unique_ptr<GEVulkanDrawCall> > m_draw_calls;
-
-    std::unique_ptr<GEMeshNodeCache> m_mesh_node_cache;
 
     // ------------------------------------------------------------------------
     void drawAllInternal();
@@ -51,6 +48,11 @@ public:
         const irr::core::vector3df& rotation = irr::core::vector3df(0, 0, 0),
         const irr::core::vector3df& scale = irr::core::vector3df(1.0f, 1.0f, 1.0f),
         bool alsoAddIfMeshPointerZero = false);
+    // ------------------------------------------------------------------------
+    irr::scene::ILightSceneNode *addSunSceneNode(irr::scene::ISceneNode* parent = 0,
+        const irr::core::vector3df& position = irr::core::vector3df(0,0,0),
+        irr::video::SColorf color = irr::video::SColorf(1.0f, 1.0f, 1.0f),
+        irr::f32 range=100.0f, irr::s32 id=-1);
     // ------------------------------------------------------------------------
     virtual void clear();
     // ------------------------------------------------------------------------

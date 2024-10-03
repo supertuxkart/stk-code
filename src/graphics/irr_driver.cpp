@@ -102,6 +102,7 @@
 #ifndef SERVER_ONLY
 #include <ge_main.hpp>
 #include <ge_vulkan_driver.hpp>
+#include <ge_vulkan_scene_manager.hpp>
 #include <ge_vulkan_texture_descriptor.hpp>
 #endif
 
@@ -2401,11 +2402,23 @@ scene::ISceneNode *IrrDriver::addLight(const core::vector3df &pos,
     }
     else
     {
-        scene::ILightSceneNode* light = m_scene_manager
-               ->addLightSceneNode(m_scene_manager->getRootSceneNode(),
-                                   pos, video::SColorf(r, g, b, 1.0f));
-        light->setRadius(radius);
-        return light;
+        if (sun_ && GE::getVKDriver())
+        {
+            scene::ILightSceneNode* light = 
+                static_cast<GE::GEVulkanSceneManager*>(m_scene_manager)
+                ->addSunSceneNode(m_scene_manager->getRootSceneNode(),
+                                pos, video::SColorf(r, g, b, 0.5f),
+                                0.26 * 3.14159 / 180.);
+            return light;
+        }
+        else
+        {
+            scene::ILightSceneNode* light = m_scene_manager
+                ->addLightSceneNode(m_scene_manager->getRootSceneNode(),
+                                    pos, video::SColorf(r, g, b, 1.0f));
+            light->setRadius(radius);
+            return light;
+        }
     }
 #else
     return NULL;

@@ -1,3 +1,6 @@
+layout(set = 2, binding = 0) uniform samplerCube u_diffuse_environment_map;
+layout(set = 2, binding = 1) uniform samplerCube u_specular_environment_map;
+
 vec2 F_AB(float perceptual_roughness, float NdotV) 
 {
     vec4 c0 = vec4(-1.0, -0.0275, -0.572, 0.022);
@@ -99,10 +102,58 @@ vec3 PBRLight(
     return NdotL * (diffuse + specular);
 }
 
+vec3 environmentLight(
+    vec3 world_position,
+    vec3 world_normal,
+    vec3 world_reflection,
+    float perceptual_roughness,
+    float roughness,
+    vec3 diffuse_color,
+    vec2 F_ab,
+    vec3 F0,
+    float F90,
+    float NdotV)
+{
+    // Split-sum approximation for image based lighting: https://cdn2.unrealengine.com/Resources/files/2013SiggraphPresentationsNotes-26915738.pdf
+    // Technically we could use textureNumLevels(specular_environment_map) - 1 here, but we use a uniform
+    // because textureNumLevels() does not work on WebGL2
+    float radiance_level = perceptual_roughness * 8.;
+
+    float intensity = 0.15;
+
+    vec3 irradiance = textureLod(
+        u_diffuse_environment_map,
+        world_normal, radiance_level).rgb * intensity;
+
+    vec3 radiance = textureLod(
+        u_specular_environment_map,
+        world_reflection, radiance_level).rgb * intensity;
+
+    // Multiscattering approximation: https://www.jcgt.org/published/0008/01/03/paper.pdf
+    // Useful reference: https://bruop.github.io/ibl
+    vec3 Fr = max(vec3(1.0 - roughness), F0) - F0;
+    vec3 kS = F0 + Fr * pow(1.0 - NdotV, 5.0);
+    float Ess = F_ab.x + F_ab.y;
+    vec3 FssEss = kS * Ess * F90;
+    float Ems = 1.0 - Ess;
+    vec3 Favg = F0 + (1.0 - F0) / 21.0;
+    vec3 Fms = FssEss * Favg / (1.0 - Ems * Favg);
+    vec3 FmsEms = Fms * Ems;
+    vec3 Edss = 1.0 - (FssEss + FmsEms);
+    vec3 kD = diffuse_color * Edss;
+
+    vec3 diffuse = (FmsEms + kD) * irradiance;
+    vec3 specular = FssEss * radiance;
+    return diffuse + specular;
+}
+
 vec3 PBRSunAmbientEmitLight(
     vec3 normal,
     vec3 eyedir, 
     vec3 sundir,
+    vec3 world_position,
+    vec3 world_normal,
+    vec3 world_reflection,
     vec3 color,
     vec3 sun_color,
     vec3 ambient_color,
@@ -142,7 +193,15 @@ vec3 PBRSunAmbientEmitLight(
 
     vec3 specular_ambient = F90 * envBRDFApprox(F0, F_ab);
 
+    vec3 environment = environmentLight(
+        world_position, world_normal, world_reflection,
+        perceptual_roughness, roughness,
+        diffuse_color, F_ab, F0, F90, NdotV
+    );
+
     vec3 emit = emissive * color * 4.0;
 
-    return sun_color * sunlight + ambient_color * (diffuse_ambient + specular_ambient) + emit;
+    return sun_color * sunlight
+         + environment
+         + ambient_color * (diffuse_ambient + specular_ambient) + emit;
 }
