@@ -117,13 +117,13 @@ vec3 environmentLight(
     // Split-sum approximation for image based lighting: https://cdn2.unrealengine.com/Resources/files/2013SiggraphPresentationsNotes-26915738.pdf
     // Technically we could use textureNumLevels(specular_environment_map) - 1 here, but we use a uniform
     // because textureNumLevels() does not work on WebGL2
-    float radiance_level = perceptual_roughness * 8.;
+    float radiance_level = perceptual_roughness * 7.;
 
-    float intensity = 0.15;
+    float intensity = 0.5;
 
     vec3 irradiance = textureLod(
         u_diffuse_environment_map,
-        world_normal, radiance_level).rgb * intensity;
+        world_normal, 0).rgb * intensity;
 
     vec3 radiance = textureLod(
         u_specular_environment_map,

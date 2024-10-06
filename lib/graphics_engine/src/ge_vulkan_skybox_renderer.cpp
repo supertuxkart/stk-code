@@ -242,13 +242,297 @@ void GEVulkanSkyBoxRenderer::addSkyBox(GEVulkanCameraSceneNode* cam,
         delete [] u8_data;
         img->setMemory(tmp);
     };
+
+    using irr::core::PI;
+    using irr::core::vector2df;
+    using irr::core::vector2di;
+    using irr::core::vector3df;
+    using irr::video::SColorf;
+    using irr::core::clamp;
+
+    auto hammersly2d = [](int i, int n)->vector2df
+    {
+        uint32_t bits = i;
+        bits = (bits << 16u) | (bits >> 16u);
+        bits = ((bits & 0x55555555u) << 1u) | ((bits & 0xAAAAAAAAu) >> 1u);
+        bits = ((bits & 0x33333333u) << 2u) | ((bits & 0xCCCCCCCCu) >> 2u);
+        bits = ((bits & 0x0F0F0F0Fu) << 4u) | ((bits & 0xF0F0F0F0u) >> 4u);
+        bits = ((bits & 0x00FF00FFu) << 8u) | ((bits & 0xFF00FF00u) >> 8u);
+        return vector2df(float(i) / float(n), 
+                         float(bits) * 2.3283064365386963e-10);
+    };
+    auto texture_lod = [](const std::vector<std::vector<GEImageLevel> > &cubemap,
+                         vector3df dir, float lod) -> SColorf
+    {
+        auto sample_lod = [](const std::vector<GEImageLevel>& mipmap,
+                             vector2df uv, float lod) -> SColorf
+        {
+            auto sample = [](const GEImageLevel& level, vector2df uv) -> SColorf
+            {
+                uv = vector2df(
+                    clamp<float>(uv.X * level.m_dim.Width, 0.5f, -0.5f + level.m_dim.Width),
+                    clamp<float>(uv.Y * level.m_dim.Height, 0.5f, -0.5f + level.m_dim.Height));
+                vector2di point = vector2di(uv.X - 0.5f, uv.Y - 0.5f);
+                vector2df lerp = vector2df(uv.X - (0.5f + point.X), uv.Y - (0.5f + point.Y));
+                SColorf texel0 = 
+                    SColorf(((uint32_t*)level.m_data)[point.Y * level.m_dim.Width + point.X]);
+                if (lerp.Y != 0.)
+                {
+                    SColorf texel1 = 
+                        SColorf(((uint32_t*)level.m_data)[(point.Y + 1) * level.m_dim.Width + point.X]);
+                    texel0 = texel0.getInterpolated(texel1, lerp.Y);
+                }
+                if (lerp.X != 0.)
+                {
+                    SColorf texel2 = 
+                        SColorf(((uint32_t*)level.m_data)[point.Y * level.m_dim.Width + (point.X + 1)]);
+                    if (lerp.Y != 0.)
+                    {
+                        SColorf texel3 = 
+                            SColorf(((uint32_t*)level.m_data)[(point.Y + 1) * level.m_dim.Width + (point.X + 1)]);
+                        texel2 = texel2.getInterpolated(texel3, lerp.Y);
+                    }
+                    texel0 = texel0.getInterpolated(texel2, lerp.X);
+                }
+                return texel0;
+            };
+            lod = std::min(lod, float(mipmap.size() - 1));
+            float level;
+            float lerp = modff(lod, &level);
+            SColorf lod0 = sample(mipmap[level], uv);
+            if (lerp == 0.0) return lod0;
+            SColorf lod1 = sample(mipmap[level + 1], uv);
+            return lod0.getInterpolated(lod1, lerp);
+        };
+        float ax = abs(dir.X), ay = abs(dir.Y), az = abs(dir.Z);
+        if (ax > ay && ax > az)
+        {
+            return dir.X > 0.0 ? sample_lod(cubemap[0], vector2df(-dir.Z / ax * 0.5 + 0.5, -dir.Y / ax * 0.5 + 0.5), lod)
+                               : sample_lod(cubemap[1], vector2df(dir.Z / ax * 0.5 + 0.5, -dir.Y / ax * 0.5 + 0.5), lod);
+        }
+        else if (ay > ax && ay > az)
+        {
+            return dir.Y > 0.0 ? sample_lod(cubemap[2], vector2df(dir.X / ay * 0.5 + 0.5, dir.Z / ay * 0.5 + 0.5), lod)
+                               : sample_lod(cubemap[3], vector2df(dir.X / ay * 0.5 + 0.5, -dir.Z / ay * 0.5 + 0.5), lod);
+        }
+        else
+        {
+            return dir.Z > 0.0 ? sample_lod(cubemap[4], vector2df(dir.X / az * 0.5 + 0.5, -dir.Y / az * 0.5 + 0.5), lod)
+                               : sample_lod(cubemap[5], vector2df(-dir.X / az * 0.5 + 0.5, -dir.Y / az * 0.5 + 0.5), lod);
+        }
+    };
+    auto diffuse_presample = [hammersly2d, texture_lod]
+                            (const std::vector<GEImageLevel> &dst, 
+                             const std::vector<std::vector<GEImageLevel> > &src,
+                             int tex_index)
+    {
+        float lodbias = 0.;
+        for (int i = 0; i < src[tex_index].size(); i++)
+        {
+            if (src[tex_index][i].m_dim.Width > dst[0].m_dim.Width) lodbias += 1.0;
+            else break;
+        }
+
+        const int sample_count = 32;
+
+        for (int level = 0; level < dst.size(); level++)
+        for (int u = 0; u < dst[level].m_dim.Width; u++)
+        for (int v = 0; v < dst[level].m_dim.Height; v++)
+        {
+            vector2df uv = vector2df(
+                (0.5f + u) / dst[level].m_dim.Width  * 2.0f - 1.0f,
+                (0.5f + v) / dst[level].m_dim.Height * 2.0f - 1.0f);
+            vector3df scan = vector3df();
+            switch(tex_index)
+            {
+                case 0: scan = vector3df( 1.f,  uv.Y, -uv.X); break;
+                case 1: scan = vector3df(-1.f,  uv.Y,  uv.X); break;
+                case 2: scan = vector3df( uv.X, -1.f,  uv.Y); break;
+                case 3: scan = vector3df( uv.X,  1.f, -uv.Y); break;
+                case 4: scan = vector3df( uv.X, uv.Y,  1.f ); break;
+                case 5: scan = vector3df(-uv.X, uv.Y, -1.f ); break;
+            }
+            vector3df dir = scan.normalize(); // Normal
+            dir.Y = -dir.Y;
+            vector3df bitangent = vector3df(0.0, 1.0, 0.0);
+            float ndotup = dir.dotProduct(vector3df(0.0, 1.0, 0.0));
+            if (1.0 - abs(ndotup) < 0.00001)
+            {
+                bitangent = ndotup > 0.0 ? vector3df(0.0, 0.0, 1.0)
+                                         : vector3df(0.0, 0.0, -1.0);
+            }
+            vector3df tangent = bitangent.crossProduct(dir).normalize();
+            bitangent         = dir.crossProduct(tangent);
+
+            SColorf color = SColorf();
+            float weight = 0.;
+        
+            for (int i = 0; i < sample_count; i++)
+            {
+                // Lambertian
+                vector2df xi = hammersly2d(i, sample_count);
+                float cos_theta = sqrtf(1.0 - xi.Y);
+                float sin_theta = sqrtf(xi.Y);
+                float phi = 2.0 * PI * xi.X;
+                float pdf = cos_theta / PI;
+                vector3df local_space_dir = vector3df(
+                    sin_theta * cosf(phi),
+                    sin_theta * sinf(phi),
+                    cos_theta).normalize();
+                // TBN * local_space_dir
+                vector3df world_dir = vector3df(
+                    tangent.X * local_space_dir.X + 
+                    bitangent.X * local_space_dir.Y + 
+                    dir.X * local_space_dir.Z,
+
+                    tangent.Y * local_space_dir.X + 
+                    bitangent.Y * local_space_dir.Y + 
+                    dir.Y * local_space_dir.Z,
+
+                    tangent.Z * local_space_dir.X + 
+                    bitangent.Z * local_space_dir.Y + 
+                    dir.Z * local_space_dir.Z
+                );
+                float lod = 0.5f * log2(6.0 * dst[level].m_dim.Width
+                                            * dst[level].m_dim.Height
+                                            / (sample_count * pdf)) + lodbias;
+                SColorf samp = texture_lod(src, world_dir, lod);
+                color.a += samp.a;
+                color.r += samp.r;
+                color.g += samp.g;
+                color.b += samp.b;
+                weight += 1.0f;
+            }
+            color.a /= weight;
+            color.r /= weight;
+            color.g /= weight;
+            color.b /= weight;
+            ((uint32_t*)dst[level].m_data)[v * dst[level].m_dim.Width + u]
+                = ((uint32_t)(color.b * 256.))
+                + ((uint32_t)(color.g * 256.) << 8)
+                + ((uint32_t)(color.r * 256.) << 16)
+                + ((uint32_t)(color.a * 256.) << 24);
+        }
+    };
+    auto specular_presample = [hammersly2d, texture_lod]
+                              (const std::vector<GEImageLevel> &dst, 
+                               const std::vector<std::vector<GEImageLevel> > &src,
+                               int tex_index)
+    {
+        float lodbias = 0.;
+        for (int i = 0; i < src[tex_index].size(); i++)
+        {
+            if (src[tex_index][i].m_dim.Width > dst[0].m_dim.Width) lodbias += 1.0;
+            else break;
+        }
+
+        const int sample_count = 32;
+
+        memcpy(dst[0].m_data, src[tex_index][lodbias].m_data, 
+               sizeof(uint32_t) * dst[0].m_dim.getArea());
+
+        for (int level = 1; level < dst.size(); level++)
+        for (int u = 0; u < dst[level].m_dim.Width; u++)
+        for (int v = 0; v < dst[level].m_dim.Height; v++)
+        {
+            vector2df uv = vector2df(
+                (0.5f + u) / dst[level].m_dim.Width  * 2.0f - 1.0f,
+                (0.5f + v) / dst[level].m_dim.Height * 2.0f - 1.0f);
+            vector3df scan = vector3df();
+            switch(tex_index)
+            {
+                case 0: scan = vector3df( 1.f,  uv.Y, -uv.X); break;
+                case 1: scan = vector3df(-1.f,  uv.Y,  uv.X); break;
+                case 2: scan = vector3df( uv.X, -1.f,  uv.Y); break;
+                case 3: scan = vector3df( uv.X,  1.f, -uv.Y); break;
+                case 4: scan = vector3df( uv.X, uv.Y,  1.f); break;
+                case 5: scan = vector3df(-uv.X, uv.Y, -1.f); break;
+            }
+            vector3df dir = scan.normalize(); // Normal
+            dir.Y = -dir.Y;
+            
+            vector3df bitangent = vector3df(0.0, 1.0, 0.0);
+            float ndotup = dir.dotProduct(vector3df(0.0, 1.0, 0.0));
+            if (1.0 - abs(ndotup) < 0.00001)
+            {
+                bitangent = ndotup > 0.0 ? vector3df(0.0, 0.0, 1.0)
+                                         : vector3df(0.0, 0.0, -1.0);
+            }
+            vector3df tangent = bitangent.crossProduct(dir).normalize();
+            bitangent         = dir.crossProduct(tangent);
+
+            SColorf color = SColorf();
+            float weight = 1e-8;
+
+            for (int i = 0; i < sample_count; i++)
+            {
+                // Lambertian
+                vector2df xi = hammersly2d(i, sample_count);
+                float roughness = 1.0f * level / (dst.size() - 1);
+                float alpha = roughness * roughness;
+                float cos_theta = clamp<float>(sqrtf((1.0 - xi.Y) / (1.0 + (alpha * alpha - 1.0) * xi.Y)), 0.0, 1.0);
+                float sin_theta = sqrtf(1.0 - cos_theta * cos_theta);
+                float phi = 2.0 * PI * xi.X;
+                float ggx_a = cos_theta * alpha;
+                float pdf = alpha / (1.0 - cos_theta * cos_theta + ggx_a * ggx_a);
+                pdf = pdf * pdf / PI / 4.0;  // GGX + Jacobian
+                vector3df local_space_dir = vector3df(
+                    sin_theta * cosf(phi),
+                    sin_theta * sinf(phi),
+                    cos_theta).normalize();
+                // TBN * local_space_dir
+                vector3df world_dir = vector3df(
+                    tangent.X * local_space_dir.X + 
+                    bitangent.X * local_space_dir.Y + 
+                    dir.X * local_space_dir.Z,
+
+                    tangent.Y * local_space_dir.X + 
+                    bitangent.Y * local_space_dir.Y + 
+                    dir.Y * local_space_dir.Z,
+
+                    tangent.Z * local_space_dir.X + 
+                    bitangent.Z * local_space_dir.Y + 
+                    dir.Z * local_space_dir.Z
+                );
+                float lod = 0.5f * log2(6.0 * dst[level].m_dim.Width
+                                            * dst[level].m_dim.Height
+                                            / (sample_count * pdf)) + lodbias;
+                // Reflect
+                vector3df light = -dir;
+                light -= 2.0f * world_dir * light.dotProduct(world_dir);
+                light = light.normalize();
+                float NdotL = dir.dotProduct(light);
+                
+                if (NdotL > 0.0)
+                {
+                    SColorf samp = texture_lod(src, light, lod);
+                    color.a += samp.a * NdotL;
+                    color.r += samp.r * NdotL;
+                    color.g += samp.g * NdotL;
+                    color.b += samp.b * NdotL;
+                    weight += NdotL;
+                }
+            }
+            color.a /= weight;
+            color.r /= weight;
+            color.g /= weight;
+            color.b /= weight;
+            ((uint32_t*)dst[level].m_data)[v * dst[level].m_dim.Width + u]
+                = ((uint32_t)(color.b * 255.))
+                + ((uint32_t)(color.g * 255.) << 8)
+                + ((uint32_t)(color.r * 255.) << 16)
+                + ((uint32_t)(color.a * 255.) << 24);
+        }
+    };
     g_texture_cubemap = new GEVulkanArrayTexture(sky_tex,
         VK_IMAGE_VIEW_TYPE_CUBE, swap_pixels);
 
     g_diffuse_env_cubemap = new GEVulkanArrayTexture(sky_tex,
-        VK_IMAGE_VIEW_TYPE_CUBE, swap_pixels);
+        VK_IMAGE_VIEW_TYPE_CUBE, swap_pixels, diffuse_presample, 
+        irr::core::dimension2d<irr::u32>(32, 32));
     g_specular_env_cubemap = new GEVulkanArrayTexture(sky_tex,
-        VK_IMAGE_VIEW_TYPE_CUBE, swap_pixels);
+        VK_IMAGE_VIEW_TYPE_CUBE, swap_pixels, specular_presample, 
+        irr::core::dimension2d<irr::u32>(256, 256));
     
     g_updated_texture_descriptor = false;
 

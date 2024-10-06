@@ -29,7 +29,12 @@ std::vector<io::path> getPathList(const std::vector<GEVulkanTexture*>& tlist)
 GEVulkanArrayTexture::GEVulkanArrayTexture(const std::vector<io::path>& list,
                                            VkImageViewType type,
                                            std::function<void(video::IImage*,
-                                           unsigned)> image_mani)
+                                           unsigned)> image_mani,
+                        // For environment map prefilter
+                        std::function<void(const std::vector<GEImageLevel>&, // dst
+                                           const std::vector<std::vector<GEImageLevel> >&, // src
+                                           int)> mipmap_mani, // Image ID
+                        const irr::core::dimension2d<irr::u32>& mipmap_mani_size)
                     : GEVulkanTexture()
 {
     if (list.empty())
@@ -51,9 +56,9 @@ GEVulkanArrayTexture::GEVulkanArrayTexture(const std::vector<io::path>& list,
     m_image_view_lock.lock();
     m_thread_loading_lock.lock();
     GEVulkanCommandLoader::addMultiThreadingCommand(
-        [list, image_mani, this]()
+        [list, image_mani, mipmap_mani, mipmap_mani_size, this]()
         {
-            reloadInternal(list, image_mani);
+            reloadInternal(list, image_mani, mipmap_mani, mipmap_mani_size);
         });
 }   // GEVulkanArrayTexture
 
@@ -62,16 +67,26 @@ GEVulkanArrayTexture::GEVulkanArrayTexture(
                                  const std::vector<GEVulkanTexture*>& textures,
                                  VkImageViewType type,
                                  std::function<void(video::IImage*, unsigned)>
-                                 image_mani)
+                                 image_mani,
+                        // For environment map prefilter
+                         std::function<void(const std::vector<GEImageLevel>&, // dst
+                                            const std::vector<std::vector<GEImageLevel> >&, // src
+                                            int)> mipmap_mani, // Image ID
+                         const irr::core::dimension2d<irr::u32>& mipmap_mani_size)
                     : GEVulkanArrayTexture(getPathList(textures), type,
-                      image_mani)
+                      image_mani, mipmap_mani, mipmap_mani_size)
 {
 }   // GEVulkanArrayTexture
 
 // ----------------------------------------------------------------------------
 void GEVulkanArrayTexture::reloadInternal(const std::vector<io::path>& list,
                                           std::function<void(video::IImage*,
-                                          unsigned)> image_mani)
+                                          unsigned)> image_mani,
+                        // For environment map prefilter
+                         std::function<void(const std::vector<GEImageLevel>&, // dst
+                                            const std::vector<std::vector<GEImageLevel> >&, // src
+                                            int)> mipmap_mani, // Image ID
+                         const irr::core::dimension2d<irr::u32>& mipmap_mani_size)
 {
     VkDeviceSize image_size = 0;
     VkDeviceSize mipmap_data_size = 0;
@@ -92,6 +107,8 @@ void GEVulkanArrayTexture::reloadInternal(const std::vector<io::path>& list,
     unsigned offset = 0;
     unsigned width = 0;
     unsigned height = 0;
+
+    std::vector<std::vector<GEImageLevel> > mipmap_levels;
 
     for (unsigned i = 0; i < list.size(); i++)
     {
@@ -130,7 +147,10 @@ void GEVulkanArrayTexture::reloadInternal(const std::vector<io::path>& list,
     m_size = core::dimension2du(width, height);
     image_size = m_size.Width * m_size.Height * 4;
     m_orig_size = m_size;
-    m_size_lock.unlock();
+    if (!mipmap_mani)
+    {
+        m_size_lock.unlock();
+    }
 
     for (unsigned i = 0; i < list.size(); i++)
     {
@@ -184,34 +204,113 @@ void GEVulkanArrayTexture::reloadInternal(const std::vector<io::path>& list,
         {
             if (i == 0)
                 m_internal_format = VK_FORMAT_R8G8B8A8_UNORM;
+            
             mipmap_generator = new GEMipmapGenerator(texture_data, 4, m_size,
                 normal_map);
         }
-        mipmap_data_size = mipmap_generator->getMipmapSizes();
-        if (mipmaps.empty())
-        {
-            image_total_size = image_size + mipmap_data_size;
-            image_total_size *= m_layer_count;
-            if (!m_vk->createBuffer(image_total_size,
-                VK_BUFFER_USAGE_TRANSFER_SRC_BIT, staging_buffer_create_info,
-                staging_buffer, staging_buffer_allocation))
-            {
-                goto destroy;
-            }
-            if (vmaMapMemory(m_vk->getVmaAllocator(),
-                staging_buffer_allocation, (void**)&mapped) != VK_SUCCESS)
-            {
-                goto destroy;
-            }
-        }
         mipmaps.push_back(mipmap_generator);
-        for (GEImageLevel& level : mipmap_generator->getAllLevels())
-        {
-            memcpy(mapped, level.m_data, level.m_size);
-            mapped += level.m_size;
-        }
         images.push_back(texture_image);
     }
+    
+    if (mipmap_mani)
+    {
+        m_size = mipmap_mani_size;
+        image_size = m_size.Width * m_size.Height * 4;
+        m_orig_size = m_size;
+        m_size_lock.unlock();
+    }
+
+    if (mipmap_mani && !getGEConfig()->m_texture_compression)
+    {
+        std::vector<std::vector<GEImageLevel> > src_levels;
+        for (int i = 0; i < list.size(); i++)
+        {
+            src_levels.push_back(mipmaps[i]->getAllLevels());
+
+            std::vector<GEImageLevel> dst_levels;
+            unsigned mipwidth = mipmap_mani_size.Width ? mipmap_mani_size.Width : width;
+            unsigned mipheight = mipmap_mani_size.Height ? mipmap_mani_size.Height : height;
+
+            while (mipwidth != 1 || mipheight != 1)
+            {
+                const unsigned cur_mipmap_size = mipwidth * mipheight * 4;
+                mipmap_data_size += cur_mipmap_size;
+
+                uint8_t *new_data = new uint8_t[cur_mipmap_size];
+
+                dst_levels.push_back({ irr::core::dimension2du(mipwidth, mipheight),
+                    cur_mipmap_size, new_data });
+
+                mipwidth = mipwidth < 2 ? 1 : mipwidth >> 1;
+                mipheight = mipheight < 2 ? 1 : mipheight >> 1;
+            }
+            mipmap_levels.push_back(dst_levels);
+        }    
+        image_total_size = mipmap_data_size;
+        if (!m_vk->createBuffer(image_total_size,
+            VK_BUFFER_USAGE_TRANSFER_SRC_BIT, staging_buffer_create_info,
+            staging_buffer, staging_buffer_allocation))
+        {
+            goto destroy;
+        }
+        if (vmaMapMemory(m_vk->getVmaAllocator(),
+            staging_buffer_allocation, (void**)&mapped) != VK_SUCCESS)
+        {
+            goto destroy;
+        }
+        std::vector<GESpinLock*> mani_locks;
+        for (int i = 0; i < mipmap_levels.size(); i++)
+        {
+            mani_locks.push_back(new GESpinLock());
+            mani_locks[i]->lock();
+            GEVulkanCommandLoader::addMultiThreadingCommand(
+                [mipmap_mani, mipmap_levels, src_levels, mani_locks, i](){
+                mipmap_mani(mipmap_levels[i], src_levels, i);
+                mani_locks[i]->unlock();
+            });
+        }
+        for (int i = 0; i < mipmap_levels.size(); i++)
+        {
+            mani_locks[i]->lock();
+            mani_locks[i]->unlock();
+            delete mani_locks[i];
+            for (GEImageLevel& level : mipmap_levels[i])
+            {
+                memcpy(mapped, level.m_data, level.m_size);
+                mapped += level.m_size;
+                delete[] static_cast<uint8_t*>(level.m_data);
+            }
+        }
+    }
+    else
+    {
+        for (int i = 0; i < mipmaps.size(); i++)
+        {
+            mipmap_data_size += image_size + mipmaps[i]->getMipmapSizes();
+        }
+        image_total_size = mipmap_data_size;
+        if (!m_vk->createBuffer(image_total_size,
+            VK_BUFFER_USAGE_TRANSFER_SRC_BIT, staging_buffer_create_info,
+            staging_buffer, staging_buffer_allocation))
+        {
+            goto destroy;
+        }
+        if (vmaMapMemory(m_vk->getVmaAllocator(),
+            staging_buffer_allocation, (void**)&mapped) != VK_SUCCESS)
+        {
+            goto destroy;
+        }
+        for (int i = 0; i < mipmaps.size(); i++)
+        {
+            for (GEImageLevel& level : mipmaps[i]->getAllLevels())
+            {
+                memcpy(mapped, level.m_data, level.m_size);
+                mapped += level.m_size;
+            }
+            mipmap_levels.push_back(mipmaps[i]->getAllLevels());
+        }    
+    }
+    
     vmaUnmapMemory(m_vk->getVmaAllocator(), staging_buffer_allocation);
     vmaFlushAllocation(m_vk->getVmaAllocator(),
         staging_buffer_allocation, 0, image_total_size);
@@ -227,7 +326,7 @@ void GEVulkanArrayTexture::reloadInternal(const std::vector<io::path>& list,
 
     for (unsigned i = 0; i < list.size(); i++)
     {
-        std::vector<GEImageLevel>& levels =  mipmaps[i]->getAllLevels();
+        std::vector<GEImageLevel>& levels =  mipmap_levels[i];
         for (unsigned j = 0; j < levels.size(); j++)
         {
             GEImageLevel& level = levels[j];
