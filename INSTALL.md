@@ -170,12 +170,12 @@ and unpack the archive into the `stk-code` directory. Download `i686` if you use
 
 *Note: To avoid confusion between releases and versions, refer to this table:*
 
-Visual Studio Release | Version
-----------------------|------------
-Visual Studio 2019| 16
-Visual Studio 2017| 15
-Visual Studio 2015| 14
-Visual Studio 2013| 13
+| Visual Studio Release | Version |
+| --------------------- | ------- |
+| Visual Studio 2019    | 16      |
+| Visual Studio 2017    | 15      |
+| Visual Studio 2015    | 14      |
+| Visual Studio 2013    | 13      |
 
 ## Building SuperTuxKart on Windows (from PowerShell/Command line)
 
@@ -225,6 +225,23 @@ and unpack the archive into the `stk-code` directory. Download `i686` if you com
     ```cmd
     C:\llvm-mingw\ninja.exe
     ```
+
+### Building SuperTuxKart on Windows using LLVM MinGW (from PowerShell/Command line)
+
+Do the above steps 1 to 6 to setup the required dependencies.
+
+7. Once inside the build directory; run CMake to start the compilation process:
+
+    ```cmd
+    cmake .. -G Ninja -DLLVM_ARCH="x86_64" -DLLVM_PREFIX=C:\llvm-mingw -DCMAKE_MAKE_PROGRAM=C:\llvm-mingw\ninja.exe -DUSE_WIIUSE=OFF -DCMAKE_TOOLCHAIN_FILE="../cmake/Toolchain-llvm-mingw.cmake"
+    ```
+
+2. Now that CMake finished configuring and creating the necessary files for the build, run the build command in the same directory:
+
+    ```cmd
+    C:\llvm-mingw\ninja.exe
+    ```
+
 
 SuperTuxKart can now be run as `bin\supertuxkart.exe`.
 
