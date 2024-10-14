@@ -89,7 +89,8 @@ void TracksAndGPScreen::eventCallback(Widget* widget, const std::string& name,
         if (track)
         {
             // In favorite edit mode, switch the status of the selected track
-            if (getWidget<CheckBoxWidget>("favorite")->getState())
+            CheckBoxWidget* favorite_cb = getWidget<CheckBoxWidget>("favorite");
+            if (favorite_cb != NULL && favorite_cb->getState())
             {
                 if(PlayerManager::getCurrentPlayer()->isFavoriteTrack(track->getIdent()))
                     PlayerManager::getCurrentPlayer()->removeFavoriteTrack(track->getIdent());
@@ -163,8 +164,9 @@ void TracksAndGPScreen::beforeAddingWidget()
     tabs->clearAllChildren();
 
     CheckBoxWidget* favorite_cb = getWidget<CheckBoxWidget>("favorite");
-    assert( favorite_cb != NULL );
-    favorite_cb->setState(false);
+    //assert( favorite_cb != NULL );
+    if (favorite_cb != NULL)
+        favorite_cb->setState(false);
 
     const std::vector<std::string>& groups = track_manager->getAllTrackGroups();
     const int group_amount = (int)groups.size();

@@ -82,6 +82,9 @@ namespace video
 		egl_params.platform = CEGL_PLATFORM_DEFAULT;
 		egl_params.window = ((struct android_app *)(params.PrivateData))->window;
 		egl_params.display = NULL;
+#elif defined(__EMSCRIPTEN__)
+		egl_params.platform = CEGL_PLATFORM_DEFAULT;
+		egl_params.display = NULL;
 #endif
 
 		EglContext->init(egl_params);

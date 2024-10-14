@@ -1,3 +1,5 @@
+#ifdef _IRR_COMPILE_WITH_VULKAN_
+
 #include "ge_vulkan_skybox_renderer.hpp"
 
 #include "ge_main.hpp"
@@ -385,3 +387,5 @@ void GEVulkanSkyBoxRenderer::addSkyBox(GEVulkanCameraSceneNode* cam,
 }   // addSkyBox
 
 }
+
+#endif

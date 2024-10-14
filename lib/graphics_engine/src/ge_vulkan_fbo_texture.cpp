@@ -1,3 +1,5 @@
+#ifdef _IRR_COMPILE_WITH_VULKAN_
+
 #include "ge_vulkan_fbo_texture.hpp"
 
 #include "ge_main.hpp"
@@ -151,3 +153,5 @@ void GEVulkanFBOTexture::createRTT()
 }   // createRTT
 
 }
+
+#endif
