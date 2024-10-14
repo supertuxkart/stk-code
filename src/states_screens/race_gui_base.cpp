@@ -1150,40 +1150,18 @@ void RaceGUIBase::drawPlayerIcon(AbstractKart *kart, int x, int y, int w,
                                                   true);
     }
 
-    if (icon  &&
-        dynamic_cast<ExplosionAnimation*>(kart->getKartAnimation()) )
+    // "Explodes" by animating the cart spinning
+    if (icon && dynamic_cast<ExplosionAnimation*>(kart->getKartAnimation()))
     {
-        //exploses into 4 parts
-        float t = kart->getKartAnimation()->getAnimationTimer();
-        float t_anim=50.0f*sinf(0.5f*M_PI*t);
-        u16 icon_size_x=icon->getSize().Width;
-        u16 icon_size_y=icon->getSize().Height;
+        float a = kart->getKartAnimation()->getAlpha();
 
-        const core::rect<s32> rect1(0, 0, icon_size_x/2,icon_size_y/2);
-        const core::rect<s32> pos1((int)(x-t_anim), (int)(y-t_anim),
-                                   (int)(x+w/2-t_anim),
-                                   (int)(y+w/2-t_anim));
-        draw2DImage(icon, pos1, rect1,
-                                                  NULL, NULL, true);
+        // Use quadratic ease-out
+        float eased = 1.0f - powf(2.0f, -10.0f * a);
 
-        const core::rect<s32> rect2(icon_size_x/2,0,
-                                    icon_size_x,icon_size_y/2);
-        const core::rect<s32> pos2((int)(x+w/2+t_anim),
-                                   (int)(y-t_anim),
-                                   (int)(x+w+t_anim),
-                                   (int)(y+w/2-t_anim));
-        draw2DImage(icon, pos2, rect2,
-                                                  NULL, NULL, true);
+        const core::rect<s32> sourceRect(core::position2d<s32>(0, 0),
+            icon->getSize());
 
-        const core::rect<s32> rect3(0, icon_size_y/2, icon_size_x/2,icon_size_y);
-        const core::rect<s32> pos3((int)(x-t_anim), (int)(y+w/2+t_anim),
-                                   (int)(x+w/2-t_anim), (int)(y+w+t_anim));
-        draw2DImage(icon, pos3, rect3, NULL, NULL, true);
-
-        const core::rect<s32> rect4(icon_size_x/2,icon_size_y/2,icon_size_x,icon_size_y);
-        const core::rect<s32> pos4((int)(x+w/2+t_anim), (int)(y+w/2+t_anim),
-                                   (int)(x+w+t_anim), (int)(y+w+t_anim));
-        draw2DImage(icon, pos4, rect4, NULL, NULL, true);
+        draw2DImageRotationColor(icon, pos, sourceRect, NULL, M_PI * 4.0f * eased, video::SColor((unsigned)-1));
     }
 
     // Current item(s) and how many if > 1

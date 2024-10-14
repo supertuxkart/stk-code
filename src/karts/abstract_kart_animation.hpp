@@ -94,6 +94,11 @@ public:
     virtual void updateGraphics(float dt);
     // ------------------------------------------------------------------------
     virtual float getAnimationTimer() const;
+
+    // ------------------------------------------------------------------------
+    /* Get the animation time normalized (i.e. [0.0 - 1.0] where 0.0 is the first tick and 1 is the last) */
+    virtual float getAlpha() const;
+
     // ------------------------------------------------------------------------
     /** To easily allow printing the name of the animation being used atm.
      *  Used in AstractKart in case of an incorrect sequence of calls. */
