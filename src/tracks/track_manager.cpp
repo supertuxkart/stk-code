@@ -318,8 +318,8 @@ void TrackManager::removeTrackFromGroups(TrackGroupType type, const Track* track
     std::vector<std::string> groups = track->getGroups();
     if (m_current_favorite_status)
     {
-        for (auto it = m_current_favorite_status->m_favorite.begin();
-                it != m_current_favorite_status->m_favorite.end(); it++)
+        for (auto it = m_current_favorite_status->getAllFavorites().begin();
+                it != m_current_favorite_status->getAllFavorites().end(); it++)
         { // User-defined groups
             if (it->second.find(track->getIdent()) != it->second.end())
             {
@@ -415,8 +415,8 @@ void TrackManager::updateGroups(TrackGroupType type, const Track* track)
 
     if (m_current_favorite_status)
     {
-        for (auto it = m_current_favorite_status->m_favorite.begin();
-                it != m_current_favorite_status->m_favorite.end(); it++)
+        for (auto it = m_current_favorite_status->getAllFavorites().begin();
+                it != m_current_favorite_status->getAllFavorites().end(); it++)
         { // User-defined groups
             if (it->second.find(ident) != it->second.end())
             {
@@ -444,7 +444,7 @@ void TrackManager::setFavoriteTrackStatus(FavoriteStatus *status)
     if (status)
     {
         // Add all user-defined groups
-        for (auto it = status->m_favorite.begin(); it != status->m_favorite.end(); it++)
+        for (auto it = status->getAllFavorites().begin(); it != status->getAllFavorites().end(); it++)
         {
             for (auto it_name = it->second.begin(); it_name != it->second.end(); it_name++)
             {

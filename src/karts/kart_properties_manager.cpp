@@ -113,8 +113,8 @@ void KartPropertiesManager::removeKart(const std::string &ident)
     std::vector<std::string> groups = kp->getGroups();
     if (m_current_favorite_status)
     {
-        for (auto it = m_current_favorite_status->m_favorite.begin();
-                it != m_current_favorite_status->m_favorite.end(); it++)
+        for (auto it = m_current_favorite_status->getAllFavorites().begin();
+                it != m_current_favorite_status->getAllFavorites().end(); it++)
         { // User-defined groups
             if (it->second.find(kp->getNonTranslatedName()) != it->second.end())
             {
@@ -319,8 +319,8 @@ bool KartPropertiesManager::loadKart(const std::string &dir)
     std::vector<std::string> groups=kart_properties->getGroups();
     if (m_current_favorite_status)
     {
-        for (auto it = m_current_favorite_status->m_favorite.begin();
-                it != m_current_favorite_status->m_favorite.end(); it++)
+        for (auto it = m_current_favorite_status->getAllFavorites().begin();
+                it != m_current_favorite_status->getAllFavorites().end(); it++)
         { // User-defined groups
             if (it->second.find(kart_properties->getNonTranslatedName()) != it->second.end())
             {
@@ -512,7 +512,7 @@ void KartPropertiesManager::setFavoriteKartStatus(FavoriteStatus *status)
     if (status)
     {
         // Add all user-defined groups
-        for (auto it = status->m_favorite.begin(); it != status->m_favorite.end(); it++)
+        for (auto it = status->getAllFavorites().begin(); it != status->getAllFavorites().end(); it++)
         {
             for (auto it_name = it->second.begin(); it_name != it->second.end(); it_name++)
             {
