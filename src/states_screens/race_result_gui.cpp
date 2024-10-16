@@ -70,6 +70,7 @@
 #include "utils/profiler.hpp"
 #include "utils/string_utils.hpp"
 #include "utils/translation.hpp"
+#include "main_loop.hpp"
 
 #include <algorithm>
 
@@ -1269,7 +1270,16 @@ void RaceResultGUI::renderGlobal(float dt)
     }
     else if (RaceManager::get()->isBenchmarking())
     {
-        displayBenchmarkSummary();
+        if(!UserConfigParams::m_benchmark)
+        {
+            displayBenchmarkSummary();
+        }
+        else
+        {
+            // Benchmark requested from CLI, write to file and exit
+            profiler.writeToFile();
+            main_loop->requestAbort();
+        }
     }
     else
     {
