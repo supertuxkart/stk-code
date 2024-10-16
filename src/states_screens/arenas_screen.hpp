@@ -19,7 +19,9 @@
 #define HEADER_ARENAS_SCREEN_HPP
 
 #include "guiengine/screen.hpp"
+#include "guiengine/widgets/text_box_widget.hpp"
 
+#include <queue>
 
 namespace GUIEngine { class Widget; }
 
@@ -27,7 +29,9 @@ namespace GUIEngine { class Widget; }
   * \brief Handles the screen where a battle arena choice is offered
   * \ingroup states_screens
   */
-class ArenasScreen : public GUIEngine::Screen, public GUIEngine::ScreenSingleton<ArenasScreen>
+class ArenasScreen : public GUIEngine::Screen,
+                     public GUIEngine::ScreenSingleton<ArenasScreen>,
+                     public GUIEngine::ITextBoxWidgetListener
 {
     friend class GUIEngine::ScreenSingleton<ArenasScreen>;
 
@@ -35,7 +39,9 @@ class ArenasScreen : public GUIEngine::Screen, public GUIEngine::ScreenSingleton
     void buildTrackList();
 
 private:
-    std::set<int> m_unsupported_arena;
+    std::deque<std::string> m_random_arena_list;
+
+    GUIEngine::TextBoxWidget *m_search_box;
 
 public:
 
@@ -51,6 +57,14 @@ public:
     /** \brief implement callback from parent class GUIEngine::Screen */
     virtual void eventCallback(GUIEngine::Widget* widget, const std::string& name,
                                const int playerID) OVERRIDE;
+    
+    /** Rebuild the list of arenas based on search text */
+    virtual void onTextUpdated() OVERRIDE
+    {
+        buildTrackList();
+        // After buildTrackList the m_search_box may be unfocused
+        m_search_box->focused(0);
+    }
 
     void setFocusOnTrack(const std::string& trackName);
 };
