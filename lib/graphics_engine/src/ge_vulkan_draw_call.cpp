@@ -181,8 +181,9 @@ void ObjectData::init(const irr::scene::SParticle& particle, int material_id,
 }   // init
 
 // ----------------------------------------------------------------------------
-GEVulkanDrawCall::GEVulkanDrawCall()
-                : m_limits(getVKDriver()->getPhysicalDeviceProperties().limits)
+GEVulkanDrawCall::GEVulkanDrawCall(GEVulkanDrawCallPass pass) :
+                m_limits(getVKDriver()->getPhysicalDeviceProperties().limits),
+                m_draw_call_pass(pass)
 {
     m_culling_tool = new GECullingTool;
     m_dynamic_data = NULL;
@@ -259,7 +260,7 @@ void GEVulkanDrawCall::addNode(irr::scene::ISceneNode* node)
         {
             GEVulkanDynamicSPMBuffer* dbuffer = static_cast<
                 GEVulkanDynamicSPMBuffer*>(buffer);
-            m_dynamic_spm_buffers[getDynamicBufferKey(shader, !(m_draw_call_type & GVDCT_COLOR))]
+            m_dynamic_spm_buffers[getDynamicBufferKey(shader, !(m_draw_call_pipeline_flag & GVDCPF_COLOR))]
                 .emplace_back(dbuffer, node);
             continue;
         }
@@ -432,7 +433,7 @@ start:
     }
     m_dynamic_spm_padded_size = written_size - skinning_data_padded_size;
 
-    auto &pipeline_map = m_draw_call_type & GVDCT_COLOR ? 
+    auto &pipeline_map = m_draw_call_pipeline_flag & GVDCPF_COLOR ? 
         m_graphics_pipelines : m_depth_only_pipelines;
     for (auto &it : pipeline_map)
     {
@@ -835,12 +836,12 @@ std::string GEVulkanDrawCall::getShader(const irr::video::SMaterial& m)
 
 // ----------------------------------------------------------------------------
 void GEVulkanDrawCall::prepare(GEVulkanDriver* vk, GEVulkanCameraSceneNode* cam,
-                               GEVulkanDrawCallType type)
+                               GEVulkanDrawCallPipelineFlag type)
 {
     reset();
     m_culling_tool->init(cam);
     m_view_position = cam->getPosition();
-    m_draw_call_type = type;
+    m_draw_call_pipeline_flag = type;
     m_billboard_rotation = MiniGLM::getBulletQuaternion(cam->getViewMatrix());
 }   // prepare
 
@@ -922,7 +923,7 @@ void GEVulkanDrawCall::createPipeline(GEVulkanDriver* vk,
 {
     bool creating_animated_pipeline_for_skinning = false;
     bool creating_pipeline_for_depth_only = false;
-    if ((m_draw_call_type & GVDCT_COLOR) == 0)
+    if ((m_draw_call_pipeline_flag & GVDCPF_COLOR) == 0)
     {
         creating_pipeline_for_depth_only = true;
     }
@@ -1052,8 +1053,8 @@ start:
     multisampling.sampleShadingEnable = VK_FALSE;
     multisampling.rasterizationSamples = VK_SAMPLE_COUNT_1_BIT;
 
-    bool has_depth_prepass = (m_draw_call_type & GVDCT_COLOR)
-        && (m_draw_call_type & GVDCT_DEPTH)
+    bool has_depth_prepass = (m_draw_call_pipeline_flag & GVDCPF_COLOR)
+        && (m_draw_call_pipeline_flag & GVDCPF_DEPTH)
         && !creating_pipeline_for_depth_only
         && !settings.m_depth_only_fragment_shader.empty();
     VkPipelineDepthStencilStateCreateInfo depth_stencil = {};
@@ -1122,8 +1123,8 @@ start:
     pipeline_info.pColorBlendState = &color_blending;
     pipeline_info.pDynamicState = &dynamic_state_info;
     pipeline_info.layout = m_pipeline_layout;
-    pipeline_info.renderPass = vk->getRTTTexture() ?
-        vk->getRTTTexture()->getRTTRenderPass() : vk->getRenderPass();
+    pipeline_info.renderPass = m_draw_call_pass == GVDCP_SHADOW ? vk->getShadowRenderPass():
+        vk->getRTTTexture() ? vk->getRTTTexture()->getRTTRenderPass() : vk->getRenderPass();
     pipeline_info.subpass = 0;
     pipeline_info.basePipelineHandle = VK_NULL_HANDLE;
 
@@ -1155,7 +1156,7 @@ start:
     }
     
     if (!creating_pipeline_for_depth_only
-     && (m_draw_call_type & GVDCT_DEPTH))
+     && (m_draw_call_pipeline_flag & GVDCPF_DEPTH))
     { // Depth Pipeline
         creating_pipeline_for_depth_only = true;
         creating_animated_pipeline_for_skinning = false;
@@ -1529,10 +1530,10 @@ void GEVulkanDrawCall::render(GEVulkanDriver* vk, GEVulkanCameraSceneNode* cam,
     vkCmdBindDescriptorSets(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS,
         m_pipeline_layout, 2, 1, GEVulkanSkyBoxRenderer::getEnvMapDescriptor(),
         0, NULL);
-    bool is_depth_only = (m_draw_call_type & GVDCT_DEPTH) ? true : false;
+    bool is_depth_only = (m_draw_call_pipeline_flag & GVDCPF_DEPTH) ? true : false;
 
 start:
-    if (!is_depth_only && !(m_draw_call_type & GVDCT_COLOR))
+    if (!is_depth_only && !(m_draw_call_pipeline_flag & GVDCPF_COLOR))
     {
         return;
     }

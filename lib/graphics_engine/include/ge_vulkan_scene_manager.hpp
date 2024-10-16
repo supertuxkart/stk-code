@@ -11,6 +11,7 @@ namespace GE
 {
 class GEVulkanCameraSceneNode;
 class GEVulkanDrawCall;
+class GEVulkanSunSceneNode;
 
 class GEVulkanSceneManager : public irr::scene::CSceneManager
 {

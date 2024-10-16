@@ -331,6 +331,7 @@ namespace GE
         size_t getSwapChainImagesCount() const
                                       { return m_vk->swap_chain_images.size(); }
         VkRenderPass getRenderPass() const         { return m_vk->render_pass; }
+        VkRenderPass getShadowRenderPass() const { return m_shadow_render_pass; }
         void copyBuffer(VkBuffer src_buffer, VkBuffer dst_buffer, VkDeviceSize size);
         VkCommandBuffer getCurrentCommandBuffer()
                               { return m_vk->command_buffers[m_current_frame]; }
@@ -370,6 +371,9 @@ namespace GE
         void setDisableWaitIdle(bool val)         { m_disable_wait_idle = val; }
         IrrlichtDevice* getIrrlichtDevice() const  { return m_irrlicht_device; }
         GEVulkanDepthTexture* getDepthTexture() const { return m_depth_texture; }
+        GEVulkanDepthTexture* getShadowMap() const    { return m_shadow_map; }
+        VkFramebuffer getShadowMapFramebuffer() const  
+                                            { return m_shadow_map_framebuffer; }
         VkFormat findSupportedFormat(const std::vector<VkFormat>& candidates,
                                      VkImageTiling tiling,
                                      VkFormatFeatureFlags features);
@@ -531,6 +535,9 @@ namespace GE
 
         IrrlichtDevice* m_irrlicht_device;
         GEVulkanDepthTexture* m_depth_texture;
+        GEVulkanDepthTexture* m_shadow_map;
+        VkFramebuffer   m_shadow_map_framebuffer;
+        VkRenderPass    m_shadow_render_pass;
         GEVulkanTextureDescriptor* m_mesh_texture_descriptor;
         GEVulkanFBOTexture* m_rtt_texture;
         GEVulkanFBOTexture* m_prev_rtt_texture;

@@ -40,10 +40,16 @@ class GEVulkanDynamicBuffer;
 class GEVulkanDynamicSPMBuffer;
 class GEVulkanTextureDescriptor;
 
-enum GEVulkanDrawCallType : uint8_t
+enum GEVulkanDrawCallPass : uint8_t
 {
-    GVDCT_COLOR = 1,
-    GVDCT_DEPTH = 2
+    GVDCP_SHADOW,
+    GVDCP_FORWARD
+};
+
+enum GEVulkanDrawCallPipelineFlag : uint8_t
+{
+    GVDCPF_COLOR = 1,
+    GVDCPF_DEPTH = 2
 };
 
 struct ObjectData
@@ -112,11 +118,13 @@ private:
 
     const int PARTICLE_NODE = -2;
 
+    const GEVulkanDrawCallPass m_draw_call_pass;
+
     std::map<TexturesList, GESPMBuffer*> m_billboard_buffers;
 
     irr::core::vector3df m_view_position;
     
-    GEVulkanDrawCallType m_draw_call_type;
+    GEVulkanDrawCallPipelineFlag m_draw_call_pipeline_flag;
 
     btQuaternion m_billboard_rotation;
 
@@ -247,7 +255,7 @@ private:
                                                       { return key.substr(2); }
 public:
     // ------------------------------------------------------------------------
-    GEVulkanDrawCall();
+    GEVulkanDrawCall(GEVulkanDrawCallPass pass);
     // ------------------------------------------------------------------------
     ~GEVulkanDrawCall();
     // ------------------------------------------------------------------------
@@ -257,7 +265,7 @@ public:
                           irr::scene::ESCENE_NODE_TYPE node_type);
     // ------------------------------------------------------------------------
     void prepare(GEVulkanDriver* vk, GEVulkanCameraSceneNode* cam,
-                 GEVulkanDrawCallType type = (GEVulkanDrawCallType)(GVDCT_COLOR | GVDCT_DEPTH));
+                 GEVulkanDrawCallPipelineFlag type = (GEVulkanDrawCallPipelineFlag)(GVDCPF_COLOR));
     // ------------------------------------------------------------------------
     void generate(GEVulkanDriver* vk, GEVulkanCameraSceneNode* cam);
     // ------------------------------------------------------------------------

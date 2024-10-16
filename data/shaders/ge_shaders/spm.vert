@@ -10,7 +10,7 @@ void main()
         u_object_buffer.m_objects[gl_InstanceIndex].m_translation,
         u_object_buffer.m_objects[gl_InstanceIndex].m_rotation,
         u_object_buffer.m_objects[gl_InstanceIndex].m_scale, v_position);
-    gl_Position = u_camera.m_projection_view_matrix * v_world_position;
+    gl_Position = u_camera.m_light_view_matrix * v_world_position;
     f_vertex_color = v_color.zyxw * getVertexColor(
         u_object_buffer.m_objects[gl_InstanceIndex].m_custom_vertex_color);
     f_uv = v_uv + u_object_buffer.m_objects[gl_InstanceIndex].m_texture_trans;

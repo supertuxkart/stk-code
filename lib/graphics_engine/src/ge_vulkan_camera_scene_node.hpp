@@ -9,13 +9,14 @@ namespace GE
 {
 struct GEVulkanCameraUBO
 {
-irr::core::matrix4 m_view_matrix;
-irr::core::matrix4 m_projection_matrix;
-irr::core::matrix4 m_inverse_view_matrix;
-irr::core::matrix4 m_inverse_projection_matrix;
-irr::core::matrix4 m_projection_view_matrix;
-irr::core::matrix4 m_inverse_projection_view_matrix;
-irr::core::rectf   m_viewport;
+    irr::core::matrix4 m_view_matrix;
+    irr::core::matrix4 m_projection_matrix;
+    irr::core::matrix4 m_inverse_view_matrix;
+    irr::core::matrix4 m_inverse_projection_matrix;
+    irr::core::matrix4 m_projection_view_matrix;
+    irr::core::matrix4 m_inverse_projection_view_matrix;
+    irr::core::matrix4 m_light_view_matrix;
+    irr::core::rectf   m_viewport;
 };
 
 class GEVulkanCameraSceneNode : public irr::scene::CCameraSceneNode
@@ -41,6 +42,8 @@ public:
     const irr::core::rect<irr::s32>& getViewPort() const { return m_viewport; }
     // ------------------------------------------------------------------------
     irr::core::matrix4 getPVM() const;
+    // ------------------------------------------------------------------------
+    irr::core::matrix4 getLightVM() const;
     // ------------------------------------------------------------------------
     const GEVulkanCameraUBO* const getUBOData() const   { return &m_ubo_data; }
 };   // GEVulkanCameraSceneNode
