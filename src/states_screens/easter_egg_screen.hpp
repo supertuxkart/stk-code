@@ -20,6 +20,7 @@
 
 #include "guiengine/screen.hpp"
 #include <deque>
+#include <random>
 
 namespace GUIEngine { class Widget; }
 
@@ -30,6 +31,8 @@ namespace GUIEngine { class Widget; }
 class EasterEggScreen : public GUIEngine::Screen, public GUIEngine::ScreenSingleton<EasterEggScreen>
 {
     friend class GUIEngine::ScreenSingleton<EasterEggScreen>;
+
+    std::mt19937 m_random_number_generator;
 
     EasterEggScreen();
 
