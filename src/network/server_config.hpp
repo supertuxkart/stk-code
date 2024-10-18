@@ -130,7 +130,7 @@ namespace ServerConfig
         "Enable network console, which can do for example kickban."));
 
     SERVER_CFG_PREFIX IntServerConfigParam m_server_max_players
-        SERVER_CFG_DEFAULT(IntServerConfigParam(8, "server-max-players",
+        SERVER_CFG_DEFAULT(IntServerConfigParam(32, "server-max-players",
         "Maximum number of players on the server, setting this to a value "
         "greater than 8 can cause performance degradation."));
 
