@@ -1206,12 +1206,14 @@ void KartSelectionScreen::eventCallback(Widget* widget,
     }
     else if (name == "karts")
     {
-        if (getWidget<CheckBoxWidget>("favorite")->getState())
-        {
-            DynamicRibbonWidget* w = getWidget<DynamicRibbonWidget>("karts");
-            assert(w != NULL);
-            const std::string selection = w->getSelectionIDString(PLAYER_ID_GAME_MASTER);
+        DynamicRibbonWidget* w = getWidget<DynamicRibbonWidget>("karts");
+        assert(w != NULL);
+        const std::string selection = w->getSelectionIDString(player_id);
 
+        if (getWidget<CheckBoxWidget>("favorite")->getState()
+         && player_id == PLAYER_ID_GAME_MASTER
+         && selection != RANDOM_KART_ID)
+        {
             const KartProperties *kp = kart_properties_manager->getKart(selection);
 
             if (PlayerManager::getCurrentPlayer()->isFavoriteKart(kp->getNonTranslatedName()))
@@ -1222,7 +1224,6 @@ void KartSelectionScreen::eventCallback(Widget* widget,
             {
                 PlayerManager::getCurrentPlayer()->addFavoriteKart(kp->getNonTranslatedName());
             }
-
             setKartsFromCurrentGroup();
         }
         else if (m_kart_widgets.size() > unsigned(player_id))
