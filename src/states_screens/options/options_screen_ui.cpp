@@ -24,6 +24,7 @@
 #include "config/player_manager.hpp"
 #include "font/font_manager.hpp"
 #include "graphics/irr_driver.hpp"
+#include "items/attachment_manager.hpp"
 #include "items/powerup_manager.hpp"
 #include "modes/world.hpp"
 #include "states_screens/dialogs/custom_camera_settings.hpp"
@@ -640,9 +641,14 @@ void OptionsScreenUI::reloadGUIEngine()
     if (reload_skin)
     {
         irr_driver->setMaxTextureSize();
+
         delete powerup_manager;
         powerup_manager = new PowerupManager();
         powerup_manager->loadPowerupsModels();
+
+        delete attachment_manager;
+        attachment_manager = new AttachmentManager();
+        attachment_manager->loadModels();
     }
     OptionsScreenUI::getInstance()->m_reload_option = nullptr;
 }   // reloadGUIEngine
