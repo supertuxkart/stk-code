@@ -1713,7 +1713,6 @@ int handleCmdLine(bool has_server_config, bool has_parent_process)
     {
         Log::verbose("main", "Benchmark mode requested from command-line");
         UserConfigParams::m_no_start_screen = true;
-        UserConfigParams::m_max_fps = 9999;
         UserConfigParams::m_benchmark = true;
     }   // --benchmark
     
