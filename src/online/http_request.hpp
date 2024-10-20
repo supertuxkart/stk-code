@@ -31,11 +31,13 @@
 #include <assert.h>
 #include <string>
 
-#if defined(CURLOPT_XFERINFODATA)
+#if LIBCURL_VERSION_MAJOR > 7 || (LIBCURL_VERSION_MAJOR == 7 && LIBCURL_VERSION_MINOR > 31)
+// Use CURLOPT_XFERINFOFUNCTION (introduced in 7.32.0)
 #define PROGRESSDATA     CURLOPT_XFERINFODATA
 #define PROGRESSFUNCTION CURLOPT_XFERINFOFUNCTION
 typedef curl_off_t progress_t;
 #else
+// Use CURLOPT_PROGRESSFUNCTION (deprecated since 7.32.0)
 #define PROGRESSDATA     CURLOPT_PROGRESSDATA
 #define PROGRESSFUNCTION CURLOPT_PROGRESSFUNCTION
 typedef double progress_t;
