@@ -247,7 +247,7 @@ void OptionsScreenVideo::init()
     vsync->clearLabels();
     //I18N: In the video options
     vsync->addLabel(_("Vertical Sync"));
-    std::set<int> fps = { 30, 60, 120, 180, 250, 500, 1000 };
+    std::set<int> fps = { 30, 60, 120, 144, 180, 250, 500, 1000 };
     fps.insert(UserConfigParams::m_max_fps);
     for (auto& i : fps)
         vsync->addLabel(core::stringw(i));
