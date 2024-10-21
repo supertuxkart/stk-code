@@ -206,9 +206,9 @@ private:
     void addGPProgressWidget(GUIEngine::Widget* widget);
     void displayGPProgress();
     void displayPostRaceInfo();
-    int  displayHighscores(int x, int y);
-    int  displayLapDifficulty(int x, int y);
-    int  displayChallengeInfo(int x, int y);
+    int  displayHighscores(int x, int y, bool increase_density);
+    int  displayLapDifficulty(int x, int y, bool increase_density);
+    int  displayChallengeInfo(int x, int y, bool increase_density);
     void displayCTFResults();
     void displaySoccerResults();
     void drawTeamScorers(KartTeam team, int x, int y, int height);
