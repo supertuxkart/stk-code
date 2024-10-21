@@ -323,7 +323,7 @@ void KartSelectionScreen::beforeAddingWidget()
 
     // Make group names being picked up by gettext
 #define FOR_GETTEXT_ONLY(x)
-    //I18N: kart group name
+    //I18N: kart group/class name
     FOR_GETTEXT_ONLY( _("All") )
     //I18N: kart group name
     FOR_GETTEXT_ONLY( _("Favorite") )
@@ -332,11 +332,11 @@ void KartSelectionScreen::beforeAddingWidget()
     //I18N: kart group name
     FOR_GETTEXT_ONLY( _("Add-Ons") )
     //I18N: kart class name
-    FOR_GETTEXT_ONLY( _("light") )
+    FOR_GETTEXT_ONLY( _("Light") )
     //I18N: kart class name
-    FOR_GETTEXT_ONLY( _("medium") )
+    FOR_GETTEXT_ONLY( _("Medium") )
     //I18N: kart class name
-    FOR_GETTEXT_ONLY( _("heavy") )
+    FOR_GETTEXT_ONLY( _("Heavy") )
 
 
     // Add other groups after
@@ -356,7 +356,14 @@ void KartSelectionScreen::beforeAddingWidget()
     
     for (int i = 0; i < classes.size(); i++)
     {
-        kart_class->addLabel(_(classes[i].c_str()));
+        // Make the first letter upper-case
+        std::string class_str = classes[i];
+
+        if (class_str.size() && class_str[0] >= 'a' && class_str[0] <= 'z')
+        {
+            class_str[0] += 'A' - 'a';
+        }
+        kart_class->addLabel(_(class_str.c_str()));
     }
     kart_class->addLabel(_("All"));
 
