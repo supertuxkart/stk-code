@@ -76,7 +76,10 @@ public:
     virtual void  init() OVERRIDE;
     virtual void  reset(bool restart=false) OVERRIDE;
 
-    bool          displayRank() const { return m_display_rank; }
+    virtual bool  shouldDrawSpeedometerDigit() const OVERRIDE 
+                                                    { return m_display_rank; }
+    virtual std::pair<int, video::SColor> 
+                  getSpeedometerDigit(const AbstractKart *kart) const OVERRIDE;
 
     void          beginSetKartPositions();
     bool          setKartPosition(unsigned int kart_id,

@@ -86,6 +86,12 @@ AbstractKart* WorldWithRank::getKartAtPosition(unsigned int p) const
 }   // getKartAtPosition
 
 //-----------------------------------------------------------------------------
+std::pair<int, video::SColor> WorldWithRank::getSpeedometerDigit(const AbstractKart *kart) const
+{
+    return std::make_pair(kart->getPosition(), video::SColor(255, 255, 255, 255)); 
+}    // getSpeedometerDigit
+
+//-----------------------------------------------------------------------------
 /** This function must be called before starting to set all kart positions
  *  again. It's mainly used to add some debug support, i.e. detect if the
  *  same position is set in different karts.

@@ -226,6 +226,15 @@ void FreeForAll::getKartsDisplayInfo(
     }
 }   // getKartsDisplayInfo
 
+//-----------------------------------------------------------------------------
+std::pair<int, video::SColor> FreeForAll::getSpeedometerDigit(
+                                                const AbstractKart *kart) const
+{
+    // Use golden color to identify it's score not rank.
+    int id = kart->getWorldKartId();
+    return std::make_pair(m_scores[id], video::SColor(255, 255, 215, 0));
+}   // getSpeedometerDigit
+
 // ----------------------------------------------------------------------------
 void FreeForAll::terminateRace()
 {
