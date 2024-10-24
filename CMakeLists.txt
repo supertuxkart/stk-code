@@ -833,6 +833,10 @@ if(MSVC OR MINGW)
   add_custom_target(stkshaders SOURCES ${STK_SHADERS})
 endif()
 
+if(MSVC OR MINGW)
+  target_sources(supertuxkart PRIVATE windows/windows_config.rc)
+endif()
+
 if(MINGW)
     target_link_libraries(supertuxkart -ldxguid -ldnsapi)
     if (NOT CMAKE_BUILD_TYPE MATCHES Debug)
