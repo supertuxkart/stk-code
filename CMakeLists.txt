@@ -834,6 +834,7 @@ if(MSVC OR MINGW)
 endif()
 
 if(MSVC OR MINGW)
+  SET(CMAKE_SHARED_LINKER_FLAGS /MANIFEST:NO)
   target_sources(supertuxkart PRIVATE windows/windows_config.rc)
 endif()
 
