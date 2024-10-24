@@ -833,6 +833,19 @@ if(MSVC OR MINGW)
   add_custom_target(stkshaders SOURCES ${STK_SHADERS})
 endif()
 
+if(MSVC)
+  SET(CMAKE_SHARED_LINKER_FLAGS /MANIFEST:NO)
+  add_custom_command(
+    TARGET supertuxkart POST_BUILD COMMAND "mt.exe" 
+    -manifest \"${PROJECT_SOURCE_DIR}\\windows\\dpi_aware.manifest\" 
+    -outputresource:\"$<TARGET_FILE_DIR:supertuxkart>\"\;\#1)
+endif()
+
+if(MINGW)
+  SET(CMAKE_SHARED_LINKER_FLAGS /MANIFEST:NO)
+  target_sources(supertuxkart PRIVATE windows/windows_config.rc)
+endif()
+
 if(MINGW)
     target_link_libraries(supertuxkart -ldxguid -ldnsapi)
     if (NOT CMAKE_BUILD_TYPE MATCHES Debug)

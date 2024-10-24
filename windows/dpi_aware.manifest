@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<assembly manifestVersion="1.0" xmlns="urn:schemas-microsoft-com:asm.v1" xmlns:asmv3="urn:schemas-microsoft-com:asm.v3">
+    <assemblyIdentity type="win32" name="MyApplication" version="1.0.0.0" processorArchitecture="amd64"/>
+
+    <asmv3:application>
+        <asmv3:windowsSettings>
+            <!-- fallback for Windows 7 and 8 -->
+            <dpiAware xmlns="http://schemas.microsoft.com/SMI/2005/WindowsSettings">true/pm</dpiAware>
+            <!-- adding v1 as fallback would result in v2 not being applied to dialogs on capable systems -->
+            <dpiAwareness xmlns="http://schemas.microsoft.com/SMI/2016/WindowsSettings">PerMonitorV2,permonitor</dpiAwareness> 
+        </asmv3:windowsSettings>
+    </asmv3:application>
+</assembly>
