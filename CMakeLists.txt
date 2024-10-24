@@ -837,7 +837,7 @@ if(MSVC)
   SET(CMAKE_SHARED_LINKER_FLAGS /MANIFEST:NO)
   add_custom_command(
     TARGET supertuxkart POST_BUILD COMMAND "mt.exe" 
-    -manifest \"windows\\dpi_aware.manifest\" 
+    -manifest \"${PROJECT_SOURCE_DIR}\\windows\\dpi_aware.manifest\" 
     -outputresource:\"$<TARGET_FILE_DIR:supertuxkart>\"\;\#1)
 endif()
 
