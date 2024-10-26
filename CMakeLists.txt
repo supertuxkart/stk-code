@@ -838,7 +838,8 @@ if(MSVC)
   add_custom_command(
     TARGET supertuxkart POST_BUILD COMMAND "mt.exe" 
     -manifest \"${PROJECT_SOURCE_DIR}\\windows\\dpi_aware.manifest\" 
-    -outputresource:\"$<TARGET_FILE_DIR:supertuxkart>\"\;\#1)
+    -inputresource:\"$<TARGET_FILE:supertuxkart>\"\;\#1
+    -outputresource:\"$<TARGET_FILE:supertuxkart>\"\;\#1)
 endif()
 
 if(MINGW)
