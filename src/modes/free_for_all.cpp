@@ -230,9 +230,32 @@ void FreeForAll::getKartsDisplayInfo(
 std::pair<int, video::SColor> FreeForAll::getSpeedometerDigit(
                                                 const AbstractKart *kart) const
 {
-    // Use golden color to identify it's score not rank.
+    if (kart->isEliminated()) // m_scores[id] is INT_MIN
+    {
+        return std::make_pair(0, video::SColor(255, 128, 128, 128));
+    }
+    
     int id = kart->getWorldKartId();
-    return std::make_pair(m_scores[id], video::SColor(255, 255, 215, 0));
+    if (getNumKarts() == 1)
+    {
+        int s = m_scores[id];
+        video::SColor color = video::SColor(255, s <= 0 ? 255 : 0, s >= 0 ? 255 : 0, 0);
+        return std::make_pair(s, color);
+    }
+    
+    // Fade from green to red
+    std::vector<int> sorted_scores = m_scores;
+    std::sort(sorted_scores.begin(), sorted_scores.end(), std::greater<int>());
+
+    int rank = std::lower_bound(
+        sorted_scores.begin(), sorted_scores.end(),
+        m_scores[id], std::greater<int>()) - sorted_scores.begin();
+    
+    float value = (float)rank / (sorted_scores.size() - 1);
+    int r = std::min(int(value * 510), 255);
+    int g = std::min(int((1.0 - value) * 510), 255);
+    
+    return std::make_pair(m_scores[id], video::SColor(255, r, g, 0));
 }   // getSpeedometerDigit
 
 // ----------------------------------------------------------------------------

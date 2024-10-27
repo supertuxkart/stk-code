@@ -556,7 +556,7 @@ std::pair<int, video::SColor> ThreeStrikesBattle::getSpeedometerDigit(
             color = video::SColor(255, 255, 0, 0);
             break;
         case 0:
-            color = video::SColor(128, 128, 128, 0);
+            color = video::SColor(255, 128, 128, 128);
             break;
     }
     return std::make_pair(m_kart_info[id].m_lives, color);
