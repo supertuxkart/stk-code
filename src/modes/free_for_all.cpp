@@ -236,16 +236,24 @@ std::pair<int, video::SColor> FreeForAll::getSpeedometerDigit(
     }
     
     int id = kart->getWorldKartId();
-    if (getNumKarts() == 1)
+    
+    // Fade from green to red
+    std::vector<int> sorted_scores;
+    for (int i = 0; i < m_scores.size(); i++)
     {
-        int s = m_scores[id];
+        if (!getKart(i)->isEliminated())
+        {
+            sorted_scores.push_back(m_scores[i]);
+        }
+    }
+    std::sort(sorted_scores.begin(), sorted_scores.end(), std::greater<int>());
+
+    if (sorted_scores.size() == 1)
+    {
+        int s = sorted_scores[id];
         video::SColor color = video::SColor(255, s <= 0 ? 255 : 0, s >= 0 ? 255 : 0, 0);
         return std::make_pair(s, color);
     }
-    
-    // Fade from green to red
-    std::vector<int> sorted_scores = m_scores;
-    std::sort(sorted_scores.begin(), sorted_scores.end(), std::greater<int>());
 
     int rank = std::lower_bound(
         sorted_scores.begin(), sorted_scores.end(),
