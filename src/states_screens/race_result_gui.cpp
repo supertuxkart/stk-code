@@ -1926,7 +1926,8 @@ void RaceResultGUI::displayPostRaceInfo()
     if (RaceManager::get()->isBenchmarking())
         return;
 
-    int size_esti = 1 + World::getWorld()->getHighscores()->getNumberEntries();
+    Highscores *highscore = World::getWorld()->getHighscores();
+    int size_esti = highscore ? highscore->getNumberEntries() + 1 : 1;
 
     if (!RaceManager::get()->isSoccerMode())
         size_esti += RaceManager::get()->modeHasLaps() ? 4 : 2;
