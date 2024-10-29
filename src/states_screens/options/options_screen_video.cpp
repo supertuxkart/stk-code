@@ -673,10 +673,10 @@ void OptionsScreenVideo::eventCallback(Widget* widget, const std::string& name,
             RaceManager::get()->scheduleBenchmark();
 #endif
     } // benchmarkCurrent
-    else if (name == "benchmarkRecommend")
+    /*else if (name == "benchmarkRecommend")
     {
         new RecommendVideoSettingsDialog(0.8f, 0.9f);
-    } // benchmarkRecommend
+    }*/ // benchmarkRecommend
 }   // eventCallback
 
 // --------------------------------------------------------------------------------------------
