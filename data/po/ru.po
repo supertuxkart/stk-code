@@ -3,7 +3,7 @@
 # This file is distributed under the same license as the supertuxkart package.
 # 
 # Translators:
-# Andrei Stepanov, 2015-2023
+# Andrei Stepanov, 2015-2024
 # Benau, 2018-2020
 # cda3b49fcd26cff178434c994782573e_67b0153 <f126a7d8ac866d9b5ea61e063f1eaf74_660325>, 2018
 # Dmitry Dubrov <dimprogpro@hotmail.ru>, 2015
@@ -14,7 +14,8 @@
 # Valeri <v19930312@gmail.com>, 2016,2018
 # Valeri <v19930312@gmail.com>, 2016,2018
 # cda3b49fcd26cff178434c994782573e_67b0153 <f126a7d8ac866d9b5ea61e063f1eaf74_660325>, 2018
-# Артём Котлубай <artemkotlubai@yandex.ru>, 2022-2023
+# Темак, 2022-2023
+# Денис Ким <dvkim98@gmail.com>, 2024
 # Олег Лазарев <laoltomsk@gmail.com>, 2017,2019
 msgid ""
 msgstr ""
@@ -22,7 +23,7 @@ msgstr ""
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-06-16 01:41+0800\n"
 "PO-Revision-Date: 2015-02-15 01:58+0000\n"
-"Last-Translator: Andrei Stepanov, 2015-2023\n"
+"Last-Translator: Andrei Stepanov, 2015-2024\n"
 "Language-Team: Russian (http://app.transifex.com/supertuxkart/supertuxkart/language/ru/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -564,7 +565,7 @@ msgstr "Хорошо"
 #. I18N: ./data/gui/screens/track_info.stkgui
 #. I18N: In the track info screen
 msgid "Record the race for ghost replay"
-msgstr "Записать гонку для повтора с призраком"
+msgstr "Записать повтор с призраком во время гонки"
 
 #. I18N: ./data/gui/dialogs/ghost_replay_info_dialog.stkgui
 #. I18N: Ghost replay info action
@@ -700,7 +701,7 @@ msgstr "Справка"
 #. I18N: ./data/gui/dialogs/online/player_rankings_dialog.stkgui
 #. I18N: In player rankings dialog
 msgid "Top 10 players"
-msgstr "Топ-10 игроков"
+msgstr "Топ-10 рейтинга игроков"
 
 #. I18N: ./data/gui/dialogs/online/player_rankings_dialog.stkgui
 msgid "Refresh"
@@ -1427,7 +1428,7 @@ msgid ""
 "Collecting nitro allows you to get speed boosts whenever you wish by "
 "pressing the appropriate key or button. You can see your current level of "
 "nitro in the gauge at the bottom-right of the race screen."
-msgstr "Собрав нитро-заряды, вы можете получить временный прирост скорости по нажатию соответствующей кнопки в нужный момент. Текущий уровень нитро показан в виде шкалы в правом нижнем углу экрана."
+msgstr "Собрав нитро-заряды, вы можете получить временный прирост скорости по нажатии соответствующей кнопки в нужный момент. Текущий уровень нитро показан в виде шкалы в правом нижнем углу экрана."
 
 #. I18N: ./data/gui/screens/help1.stkgui
 #. I18N: In the help menu
@@ -1488,7 +1489,7 @@ msgid ""
 "player who hits others the most will win in a given hit or time limit. In "
 "Capture The Flag, your team needs to bring the flag of the other team to "
 "your own flag base, as long as your flag is not captured by the other team."
-msgstr "Есть 3 режима сражений: в «Битве трёх ударов» вам нужно поразить других оружием, пока они не потеряют все свои жизни. В «Свободном заезде» побеждает игрок, который поразит других больше всего по достижению нужного количества очков или по истечению времени. В «Захвате флага» ваша команда должна доставить флаг вражеской команды на собственную базу и не дать захватить свой флаг."
+msgstr "Есть 3 режима сражений: в «Битве трёх ударов» вам нужно поразить других оружием, пока они не потеряют все свои жизни. В «Битве против всех» побеждает игрок, который поразит других больше всего по достижению нужного количества очков или по истечению времени. В «Захвате флага» ваша команда должна доставить флаг вражеской команды на собственную базу и не дать захватить свой флаг."
 
 #. I18N: ./data/gui/screens/help2.stkgui
 #. I18N: In the help menu
@@ -1511,7 +1512,7 @@ msgstr "Повтор с призраком: сразитесь против пр
 #. I18N: In the help menu
 msgid ""
 "Lap Trial: Complete as many laps as possible in a given amount of time."
-msgstr "Круговой заезд: пройдите как можно больше кругов за отведённое времени."
+msgstr "Круговой заезд: пройдите как можно больше кругов за отведённое время."
 
 #. I18N: ./data/gui/screens/help2.stkgui
 #. I18N: In the help menu
@@ -1520,7 +1521,7 @@ msgid ""
 "instead of playing a single race, you play many in a row. The better you "
 "rank, the more points you get. In the end, the player with the most points "
 "wins the cup."
-msgstr "* В бо́льшую часть этих режимов игры можно сыграть в Гран-при: вместо одной трассы, вы можете проехать сразу несколько. Чем лучше ваш ранг, тем больше очков вы получите. По окончании игрок с бо́льшим количеством очков выигрывает кубок."
+msgstr "* В бо́льшую часть этих режимов игры можно сыграть в Гран-при: вместо одной трассы, вы можете проехать сразу несколько. Чем лучше ваш ранг, тем больше очков вы получите. По окончании игрок с наибольшим числом очков выигрывает кубок."
 
 #. I18N: ./data/gui/screens/help3.stkgui
 #. I18N: In the help menu
@@ -1615,7 +1616,7 @@ msgid ""
 "completed. In the top-right of the screen, it also tells you how many points"
 " you currently have. Complete as many challenges as possible, and Nolok will"
 " accept to race against you. Win to liberate Gnu!"
-msgstr "Этот значкок на мини-карте обозначает доступные для прохождения испытания. Он также показывает количество ваших очков в верхнем правом углу экрана. Завершите как можно больше испытаний, и Нолок посоревнуется с вами в гонке. Победите его, чтобы освободить Гну!"
+msgstr "Этот значок на мини-карте обозначает доступные для прохождения испытания. Он также показывает количество ваших очков в верхнем правом углу экрана. Завершите как можно больше испытаний, и Нолок посоревнуется с вами в гонке. Победите его, чтобы освободить Гну!"
 
 #. I18N: ./data/gui/screens/help5.stkgui
 #. I18N: In the help menu
@@ -1873,7 +1874,7 @@ msgstr "Лобби"
 #. I18N: In networking lobby to configuration server settings
 #: src/states_screens/online/networking_lobby.cpp:200
 msgid "Configuration"
-msgstr "Схема"
+msgstr "Настройки"
 
 #. I18N: ./data/gui/screens/online/networking_lobby.stkgui
 #. I18N: In the network lobby
@@ -1919,7 +1920,7 @@ msgstr "…"
 #. I18N: ./data/gui/screens/online/profile_achievements_tab.stkgui
 #. I18N: In the achievements screen
 msgid "Player rankings"
-msgstr "Таблица лидеров"
+msgstr "Рейтинг игроков"
 
 #. I18N: ./data/gui/screens/online/profile_friends.stkgui
 #. I18N: Section in the profile screen
@@ -2009,7 +2010,7 @@ msgid ""
 "You can play without creating an online account by selecting an offline "
 "account. Though then you can not connect to friends, vote for addons etc. "
 "Please read our privacy statement at https://privacy.supertuxkart.net"
-msgstr "Вы можете играть без создания сетевой учётной записи, выбрав автономную учётку. Но тогда вы не сможете подключаться к друзьям, голосовать за дополнения и прочее. Пожалуйста, ознакомься с нашим заявление о защите персональных данных по адресу: https://privacy.supertuxkart.net"
+msgstr "Вы можете играть без создания сетевой учётной записи, выбрав автономный аккаунт. Но тогда вы не сможете подключаться к друзьям, голосовать за дополнения и прочее. Пожалуйста, ознакомьтесь с нашим заявлением о защите персональных данных по адресу: https://privacy.supertuxkart.net"
 
 #. I18N: ./data/gui/screens/online/server_selection.stkgui
 #: src/states_screens/online/server_selection.cpp:580
@@ -2307,7 +2308,7 @@ msgstr "Показывать счётчик кадров"
 #. I18N: ./data/gui/screens/options_ui.stkgui
 #. I18N: In the ui settings
 msgid "Show other karts' held powerups"
-msgstr "Показывать другие карты с усилителями"
+msgstr "Показывать усилители других картов"
 
 #. I18N: ./data/gui/screens/options_ui.stkgui
 #. I18N: In the ui settings
@@ -2322,7 +2323,7 @@ msgstr "Включить таймер скоростного прохожден�
 #. I18N: ./data/gui/screens/options_video.stkgui
 #. I18N: In the video settings
 msgid "Render resolution"
-msgstr "Разрешение рендеринга"
+msgstr "Разрешение отрисовки"
 
 #. I18N: ./data/gui/screens/options_video.stkgui
 #. I18N: In the video settings
@@ -3646,7 +3647,7 @@ msgid ""
 " Would you like this feature to be enabled? (To change this setting at a "
 "later time, go to options, select tab 'General', and edit \"Connect to the "
 "Internet\")."
-msgstr "SuperTuxKart может подключаться к серверу для загрузки дополнений и уведомлять вас об обновлениях.  Пожалуйста, прочтите нашу политику конфиденциальности на https://supertuxkart.net/Privacy. Вам нужна такая возможность? (Для изменения этой настройки перейдите в «Настройки» > «Основные» > «Подключаться к интернету»)."
+msgstr "SuperTuxKart может подключаться к серверу для загрузки дополнений и уведомлять вас об обновлениях. Пожалуйста, прочтите нашу политику конфиденциальности на https://supertuxkart.net/Privacy. Хотите включить эту возможность? (Для правки этой настройки перейдите в «Настройки» > «Основные» > «Подключаться к интернету»)."
 
 #: src/main.cpp:2386
 msgid "Your screen resolution is too low to run STK."
@@ -3673,7 +3674,7 @@ msgstr "Истекло время ожидания соединения с се�
 #: src/modes/capture_the_flag.cpp:191
 #, c-format
 msgid "%s has the red flag!"
-msgstr "%s захватил(а) красный флаг!"
+msgstr "%s взял(а) красный флаг!"
 
 #. I18N: Show when the red flag is returned to its base in CTF
 #: src/modes/capture_the_flag.cpp:198
@@ -3684,7 +3685,7 @@ msgstr "Красный флаг был возвращён!"
 #: src/modes/capture_the_flag.cpp:209
 #, c-format
 msgid "%s has the blue flag!"
-msgstr "%s захватил(а) синий флаг!"
+msgstr "%s взял(а) синий флаг!"
 
 #. I18N: Show when the blue flag is returned to its base in CTF
 #: src/modes/capture_the_flag.cpp:216
@@ -3723,15 +3724,15 @@ msgstr "Круг %i"
 #, c-format
 msgctxt "fastest_lap"
 msgid "%s by %s"
-msgstr "лучший круг: %s, %s"
+msgstr " %s от %s"
 
 #: src/modes/linear_world.cpp:555
 msgid "New fastest lap"
-msgstr "Новый рекорд круга"
+msgstr "Новый лучший круг"
 
 #: src/modes/linear_world.cpp:1097
 msgid "WRONG WAY!"
-msgstr "В ОБРАТНУЮ СТОРОНУ!"
+msgstr "НЕВЕРНОЕ НАПРАВЛЕНИЕ!"
 
 #: src/modes/soccer_world.cpp:533 src/modes/soccer_world.cpp:660
 #, c-format
@@ -3809,7 +3810,7 @@ msgstr "Сложность: %s"
 #: src/network/protocols/client_lobby.cpp:743
 #, c-format
 msgid "Max players: %d"
-msgstr "Максимальное число игроков: %d"
+msgstr "Максимум игроков: %d"
 
 #. I18N: In server info dialog
 #: src/network/protocols/client_lobby.cpp:756
@@ -3984,7 +3985,7 @@ msgstr "Гонка на время (Гран-при)"
 #: src/states_screens/online/create_server_screen.cpp:237
 #: src/states_screens/track_info_screen.cpp:252
 msgid "Free-For-All"
-msgstr "Свободный заезд"
+msgstr "Битва против всех"
 
 #. I18N: Game mode
 #. I18N: In the create server screen for battle server
@@ -4050,7 +4051,7 @@ msgstr "По умолчанию"
 
 #: src/race/grand_prix_data.cpp:641 src/states_screens/gp_info_screen.cpp:78
 msgid "None"
-msgstr "Ничего"
+msgstr "Нет"
 
 #: src/race/grand_prix_data.cpp:645 src/states_screens/gp_info_screen.cpp:80
 msgid "Random"
@@ -4388,13 +4389,13 @@ msgstr "Матчей Захвата флага закончено"
 #. added to multiple different goals.
 #: src/states_screens/dialogs/achievement_progress_dialog.cpp:230
 msgid "Free-for-All matches started"
-msgstr "Матчей Свободного заезда начато"
+msgstr "Матчей Битвы против всех начато"
 
 #. I18N: A goal for achievements. If this text is in (), it's a precision
 #. added to multiple different goals.
 #: src/states_screens/dialogs/achievement_progress_dialog.cpp:232
 msgid "Free-for-All matches finished"
-msgstr "Матчей Свободного заезда закончено"
+msgstr "Матчей Битвы против всех закончено"
 
 #. I18N: A goal for achievements. If this text is in (), it's a precision
 #. added to multiple different goals.
@@ -4563,7 +4564,7 @@ msgid ""
 "New gamepads and joysticks will automatically appear in the list when you connect them to this device.\n"
 "\n"
 "To add a keyboard config, you can use the button below, HOWEVER please note that most keyboards only support a limited amount of simultaneous keypresses and are thus inappropriate for multiplayer gameplay. (You can, however, connect multiple keyboards to this device. Remember that everyone still needs different keybindings in this case.)"
-msgstr "Новые контроллеры автоматически появятся в списке после того, как вы подключите их к этому устройству.\n\nЧтобы добавить настройки клавиатуры, вы можете нажать на кнопку, находящуюся ниже. Но учтите, что большинство клавиатур поддерживают ограниченное количество одновременных нажатий клавиш и поэтому не подходят для многопользовательской игры. (Однако вы можете решить эту проблему подключением нескольких клавиатур к компьютеру. Но даже в этом случае нужно назначать различные сочетания клавиш для разных игроков.)"
+msgstr "Новые контроллеры автоматически появятся в списке после того, как вы подключите их к этому устройству.\n\nЧтобы добавить настройки клавиатуры, вы можете нажать на кнопку, находящуюся ниже. Но учтите, что большинство клавиатур поддерживают ограниченное число одновременных нажатий клавиш и поэтому не подходят для многопользовательской игры. (Однако вы можете решить эту проблему подключением нескольких клавиатур к компьютеру. Но даже в этом случае нужно назначать различные сочетания клавиш для разных игроков.)"
 
 #. I18N: In the 'add new input device' dialog
 #: src/states_screens/dialogs/add_device_dialog.cpp:87
@@ -4663,19 +4664,19 @@ msgid_plural "Confirm resolution within %i seconds"
 msgstr[0] "Подтвердите сохранение разрешения в течение %i секунды"
 msgstr[1] "Подтвердите сохранение разрешения в течение %i секунд"
 msgstr[2] "Подтвердите сохранение разрешения в течение %i секунд"
-msgstr[3] "Подтвердите сохранение разрешения в течение %i секунды"
+msgstr[3] "Подтвердите сохранение разрешения в течение %i секунд"
 
 #: src/states_screens/dialogs/confirm_resolution_dialog.cpp:93
 msgid ""
 "Resolutions smaller than 1024x768 or 1280x720 are unsupported. Some parts of"
 " the UI may not work correctly."
-msgstr "Разрешения меньше 1024×768 или 1280×720 не поддерживаются. Некоторые части интерфейса могут работать некорректно."
+msgstr "Разрешения меньше 1024×768 или 1280×720 не поддерживаются. Некоторые части интерфейса могут сломаться."
 
 #. I18N: In the UI options, Camera setting: Drone chase
 #: src/states_screens/dialogs/custom_camera_settings.cpp:86
 #: src/states_screens/options/options_screen_ui.cpp:166
 msgid "Drone chase"
-msgstr "Следование за дроном"
+msgstr "Погоня за дроном"
 
 #. I18N: In the UI options, Camera setting: Custom
 #. I18N: custom video settings
@@ -4756,7 +4757,7 @@ msgstr "Введите адрес сервера, по желанию допиш
 #: src/states_screens/dialogs/enter_address_dialog.cpp:124
 #, c-format
 msgid "Invalid server address: %s."
-msgstr "Недействительный адрес сервера: %s."
+msgstr "Неверный адрес сервера: %s."
 
 #: src/states_screens/dialogs/ghost_replay_info_dialog.cpp:146
 #: src/states_screens/ghost_replay_selection.cpp:155
@@ -4859,7 +4860,7 @@ msgstr "(Пусто)"
 #. I18N: In kart color choosing dialog
 #: src/states_screens/dialogs/kart_color_slider_dialog.cpp:47
 msgid "Use original color"
-msgstr "Использовать оригинальный цвет"
+msgstr "Использовать исходный цвет"
 
 #. I18N: In kart color choosing dialog
 #: src/states_screens/dialogs/kart_color_slider_dialog.cpp:49
@@ -4926,7 +4927,7 @@ msgstr "Получение информации о рейтинге %s"
 #: src/states_screens/dialogs/network_player_dialog.cpp:194
 #, c-format
 msgid "Tell server administrator about this player (%s):"
-msgstr "Скажите администратору об этом игроке (%s):"
+msgstr "Скажите администратору сервера об этом игроке (%s):"
 
 #. I18N: In press a key dialog, tell user to press a key to bind configuration
 #: src/states_screens/dialogs/press_a_key_dialog.cpp:43
@@ -5148,7 +5149,7 @@ msgstr "Обработка"
 
 #: src/states_screens/dialogs/vote_dialog.cpp:169
 msgid "Fetching last vote"
-msgstr "Получение последнего голосования"
+msgstr "Получение последнего голоса"
 
 #: src/states_screens/dialogs/vote_dialog.cpp:188
 msgid "You can adapt your previous rating by clicking the stars beneath."
@@ -5184,7 +5185,7 @@ msgstr "Вы действительно хотите удалить «%s»?"
 #: src/states_screens/edit_gp_screen.cpp:134
 #: src/states_screens/edit_gp_screen.cpp:382
 msgid "Do you want to save your changes?"
-msgstr "Хотите сохранить изменения?"
+msgstr "Хотите сохранить ваши изменения?"
 
 #: src/states_screens/edit_gp_screen.cpp:152
 msgid "Laps"
@@ -5229,7 +5230,7 @@ msgstr "Вы закончили сложное испытание! Получе�
 #, c-format
 msgid ""
 "You completed the SuperTux challenge! Points earned on this level: %i/%i"
-msgstr "Вы закончили SuperTux-испытание! Полученные очки на данном уровне: %i/%i"
+msgstr "Вы закончили испытание SuperTux! Полученные очки на этом уровне: %i/%i"
 
 #: src/states_screens/feature_unlocked.cpp:315
 #, c-format
@@ -5544,7 +5545,7 @@ msgstr "Адрес новой почты должен быть в предела
 
 #: src/states_screens/online/online_profile_settings.cpp:93
 msgid "New Email is invalid!"
-msgstr "Новая почта является недопустимой!"
+msgstr "Новая эл. почта является неверной!"
 
 #: src/states_screens/online/online_profile_settings.cpp:118
 msgid "E-mail changed!"
@@ -5575,7 +5576,7 @@ msgstr "Выйти из игры"
 #: src/states_screens/online/register_screen.cpp:289
 #, c-format
 msgid "Could not create player '%s'."
-msgstr "Невозможно создать игрока «%s»."
+msgstr "Не удалось создать игрока «%s»."
 
 #: src/states_screens/online/register_screen.cpp:306
 msgid "User name cannot be empty."
@@ -5652,12 +5653,12 @@ msgstr "Неизвестно"
 #. I18N: Message shown to user if no IPv4 detected by STK
 #: src/states_screens/online/server_selection.cpp:363
 msgid "No IPv4 detected, you may not be able to join any servers."
-msgstr "Не удалось распознать IPv4, скорее всего вы не сможете подключаться к серверам."
+msgstr "Не удалось распознать IPv4, скорее всего, вы не сможете подключаться к серверам по этому протоколу."
 
 #. I18N: Message shown to user if no IPv6 detected by STK
 #: src/states_screens/online/server_selection.cpp:365
 msgid "No IPv6 detected, you may not be able to join any servers."
-msgstr "Не удалось распознать IPv6, скорее всего вы не сможете подключаться к серверам."
+msgstr "Не удалось распознать IPv6, скорее всего, вы не сможете подключаться к серверам по этому протоколу."
 
 #: src/states_screens/online/server_selection.cpp:504
 msgid "No server is available."
@@ -5684,13 +5685,13 @@ msgstr "Если большинство игроков выберет одни �
 #: src/states_screens/online/tracks_screen.cpp:522
 #: src/states_screens/track_info_screen.cpp:303
 msgid "Random item location"
-msgstr "Случайное расположение предметов"
+msgstr "Случайное размещение усилителей"
 
 #. I18N: In track screen
 #: src/states_screens/online/tracks_screen.cpp:504
 #: src/states_screens/track_info_screen.cpp:455
 msgid "Number of goals to win"
-msgstr "Количество голов для победы"
+msgstr "Число голов для победы"
 
 #. I18N: In the track info screen
 #: src/states_screens/online/tracks_screen.cpp:552
@@ -6378,7 +6379,7 @@ msgstr "Собирайте голубые коробки и используйт
 msgid ""
 "Press <%s> to look behind.\n"
 "Fire the weapon with <%s> while pressing <%s> to fire behind!"
-msgstr "Нажмите «%s», чтобы обернуться.\nНажмите кнопку огня «%s» с удерживанием «%s» для стрельбы назад!"
+msgstr "Нажмите «%s», чтобы обернуться.\nНажмите кнопку огня «%s» при зажатии «%s» для стрельбы назад!"
 
 #: ../stk-assets/tracks/tutorial/scripting.as:88
 msgid ""

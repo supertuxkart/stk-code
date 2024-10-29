@@ -6,14 +6,14 @@
 # Гондрош Руснак, 2022
 # Ондрош Руснак, 2022
 # Ондрош Руснак, 2022
-# Ондрош Руснак, 2022-2023
+# Ондрош Руснак, 2022-2024
 msgid ""
 msgstr ""
 "Project-Id-Version: SuperTuxKart\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-06-16 01:41+0800\n"
 "PO-Revision-Date: 2015-02-15 01:58+0000\n"
-"Last-Translator: Ондрош Руснак, 2022-2023\n"
+"Last-Translator: Ондрош Руснак, 2022-2024\n"
 "Language-Team: Rusyn (http://app.transifex.com/supertuxkart/supertuxkart/language/rue/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -912,7 +912,7 @@ msgstr "Інфо хосновача"
 #. I18N: ./data/gui/dialogs/online/user_info_dialog.stkgui
 #. I18N: User info dialog
 msgid "Remove Friend"
-msgstr ""
+msgstr "Удалити цімбору"
 
 #. I18N: ./data/gui/dialogs/online/user_info_dialog.stkgui
 #. I18N: User info dialog
@@ -922,17 +922,17 @@ msgstr "Придати цімбору"
 #. I18N: ./data/gui/dialogs/online/user_info_dialog.stkgui
 #. I18N: User info dialog
 msgid "Accept Invite"
-msgstr ""
+msgstr "Прияти закликаня"
 
 #. I18N: ./data/gui/dialogs/online/user_info_dialog.stkgui
 #. I18N: User info dialog
 msgid "Decline Invite"
-msgstr ""
+msgstr "Не прияти закликаня"
 
 #. I18N: ./data/gui/dialogs/online/user_info_dialog.stkgui
 #. I18N: User info dialog
 msgid "View Profile"
-msgstr ""
+msgstr "Увідіти профіл"
 
 #. I18N: ./data/gui/dialogs/online/vote_dialog.stkgui
 #. I18N: In the vote dialog
@@ -1120,7 +1120,7 @@ msgstr "Вшыткі причастні"
 
 #. I18N: ./data/gui/screens/cutscene.stkgui
 msgid "Skip"
-msgstr ""
+msgstr "Лишити"
 
 #. I18N: ./data/gui/screens/easter_egg.stkgui
 #. I18N: Section in easter egg tracks selection screen
@@ -2000,7 +2000,7 @@ msgid ""
 "You can play without creating an online account by selecting an offline "
 "account. Though then you can not connect to friends, vote for addons etc. "
 "Please read our privacy statement at https://privacy.supertuxkart.net"
-msgstr ""
+msgstr "Можете бавити без учиненя онлайн акаунта, просто уберавучи офлайн акаунт. Айбо не будете скапчовати ся з цімборами, голосовати за придаткы тай дале. Будьте добрі, почитайте наш устав на https://privacy.superuxkart.net"
 
 #. I18N: ./data/gui/screens/online/server_selection.stkgui
 #: src/states_screens/online/server_selection.cpp:580
@@ -6410,7 +6410,7 @@ msgstr "Вы тепирь прилажені од перебігови. Сере
 #. description in Google Play
 #: supertuxkart.desktop:4 supertuxkart.appdata.xml:6
 msgid "A 3D open-source kart racing game"
-msgstr "3х-мірна возикова перебігова бавка"
+msgstr "3х-мірна возикова перебігова бавка из одкрытым зачаточным кодом"
 
 #. I18N: Keywords in desktop entry, translators please keep it separated with
 #. semicolons
@@ -6424,7 +6424,7 @@ msgid ""
 "variety of characters, tracks, and modes to play. Our aim is to create a "
 "game that is more fun than realistic, and provide an enjoyable experience "
 "for all ages."
-msgstr "Моторвозикы. Нітро. Екшен! SuperTuxKart се 3ьохмірна аркадна гонитва из одкрытым зачаточным кодом рузными особами, автомапами и режімув для бавкы. Наша цїль учинити бавку яка май весела, чим реалістічна и натїшит вшыткі рокы."
+msgstr "Моторвозикы. Нітро. Екшен! SuperTuxKart се 3ьохмірна аркадна гонитва яка має одкрытый зачаточный код, тай рузні особы, автомапы и режімы для бавкы. Наша цїль учинити бавку яка май весела, чим реалістічна и натїшит бавлячув усьых рокув."
 
 #: supertuxkart.appdata.xml:11
 msgid ""

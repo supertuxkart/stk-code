@@ -9,14 +9,14 @@
 # Źmicier Turok <nashtlumach@gmail.com>, 2018
 # Zmicer Turok <zmicerturok@gmail.com >, 2018
 # Źmicier Turok <nashtlumach@gmail.com>, 2018
-# Денис Ким <dvkim98@gmail.com>, 2019-2023
+# Денис Ким <dvkim98@gmail.com>, 2019-2024
 msgid ""
 msgstr ""
 "Project-Id-Version: SuperTuxKart\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-06-16 01:41+0800\n"
 "PO-Revision-Date: 2015-02-15 01:58+0000\n"
-"Last-Translator: Денис Ким <dvkim98@gmail.com>, 2019-2023\n"
+"Last-Translator: Денис Ким <dvkim98@gmail.com>, 2019-2024\n"
 "Language-Team: Belarusian (http://app.transifex.com/supertuxkart/supertuxkart/language/be/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -197,7 +197,7 @@ msgstr "Абярыце пераважны тып кіравання"
 #. I18N: In the multitouch settings screen
 #: src/states_screens/dialogs/race_paused_dialog.cpp:549
 msgid "Accelerometer"
-msgstr "Паскарэнне"
+msgstr "Акселерометр"
 
 #. I18N: ./data/gui/dialogs/android/init_android.stkgui
 #. I18N: Control type
@@ -435,7 +435,7 @@ msgstr "Налады графікі"
 #. I18N: ./data/gui/dialogs/custom_video_settings.stkgui
 #. I18N: Video settings
 msgid "Advanced pipeline (lights, etc.)"
-msgstr "Свой ланцужок (святло і г.д.)"
+msgstr "Палепшаная графіка (святло і інш.)"
 
 #. I18N: ./data/gui/dialogs/custom_video_settings.stkgui
 #. I18N: Video settings
@@ -558,7 +558,7 @@ msgstr "Добра"
 #. I18N: ./data/gui/screens/track_info.stkgui
 #. I18N: In the track info screen
 msgid "Record the race for ghost replay"
-msgstr "Запісаць гонку для паўтору з прывідам"
+msgstr "Запісаць паўтор з прывідам падчас гонкі"
 
 #. I18N: ./data/gui/dialogs/ghost_replay_info_dialog.stkgui
 #. I18N: Ghost replay info action
@@ -694,7 +694,7 @@ msgstr "Даведка"
 #. I18N: ./data/gui/dialogs/online/player_rankings_dialog.stkgui
 #. I18N: In player rankings dialog
 msgid "Top 10 players"
-msgstr "10 найлепшых гульцоў"
+msgstr "10 найлепшых гульцоў у рэйтынгу"
 
 #. I18N: ./data/gui/dialogs/online/player_rankings_dialog.stkgui
 msgid "Refresh"
@@ -885,7 +885,7 @@ msgstr "Дадаць гульца"
 #. I18N: Splitscreen player in network
 #: src/states_screens/online/online_profile_achievements.cpp:76
 msgid "Name"
-msgstr "Назва"
+msgstr "Імя"
 
 #. I18N: ./data/gui/dialogs/online/splitscreen_player_dialog.stkgui
 #. I18N: Splitscreen player in network
@@ -915,7 +915,7 @@ msgstr "Інфармацыя аб карыстальніку"
 #. I18N: ./data/gui/dialogs/online/user_info_dialog.stkgui
 #. I18N: User info dialog
 msgid "Remove Friend"
-msgstr ""
+msgstr "Выдаліць сябра"
 
 #. I18N: ./data/gui/dialogs/online/user_info_dialog.stkgui
 #. I18N: User info dialog
@@ -925,17 +925,17 @@ msgstr "Дадаць сябра"
 #. I18N: ./data/gui/dialogs/online/user_info_dialog.stkgui
 #. I18N: User info dialog
 msgid "Accept Invite"
-msgstr ""
+msgstr "Прыняць заяўку"
 
 #. I18N: ./data/gui/dialogs/online/user_info_dialog.stkgui
 #. I18N: User info dialog
 msgid "Decline Invite"
-msgstr ""
+msgstr "Адхіліць заяўку"
 
 #. I18N: ./data/gui/dialogs/online/user_info_dialog.stkgui
 #. I18N: User info dialog
 msgid "View Profile"
-msgstr ""
+msgstr "Праглядзець профіль"
 
 #. I18N: ./data/gui/dialogs/online/vote_dialog.stkgui
 #. I18N: In the vote dialog
@@ -945,7 +945,7 @@ msgstr "Галасаваць"
 #. I18N: ./data/gui/dialogs/overworld_dialog.stkgui
 #. I18N: ./data/gui/dialogs/race_paused_dialog.stkgui
 msgid "Paused"
-msgstr "Прыпынена"
+msgstr "Паўза"
 
 #. I18N: ./data/gui/dialogs/overworld_dialog.stkgui
 #. I18N: In the in-game dialog
@@ -965,7 +965,7 @@ msgstr "Абраць карт"
 #. I18N: ./data/gui/dialogs/press_a_key_dialog.stkgui
 #. I18N: When changing input configurations
 msgid "Press fully and release..."
-msgstr "Моцна націсніце і адпусціце"
+msgstr "Моцна націсніце і адпусціце..."
 
 #. I18N: ./data/gui/dialogs/press_a_key_dialog.stkgui
 #. I18N: When configuring input
@@ -975,7 +975,7 @@ msgstr "Прызначыць да кнопкі ESC"
 #. I18N: ./data/gui/dialogs/press_a_key_dialog.stkgui
 #. I18N: When configuring input
 msgid "Assign nothing"
-msgstr "Нічога не прызначана"
+msgstr "Не прызначаць нічога"
 
 #. I18N: ./data/gui/dialogs/select_challenge.stkgui
 #. I18N: ./data/gui/screens/race_setup.stkgui
@@ -1123,7 +1123,7 @@ msgstr "Стваральнікі"
 
 #. I18N: ./data/gui/screens/cutscene.stkgui
 msgid "Skip"
-msgstr ""
+msgstr "Прапусціць"
 
 #. I18N: ./data/gui/screens/easter_egg.stkgui
 #. I18N: Section in easter egg tracks selection screen
@@ -1178,7 +1178,7 @@ msgstr "Колькасць кругоў:"
 #. I18N: ./data/gui/screens/edit_track.stkgui
 #. I18N: In the edit track screen
 msgid "Reverse:"
-msgstr "Адвернута:"
+msgstr "У адваротным напрамку:"
 
 #. I18N: ./data/gui/screens/ghost_replay_selection.stkgui
 #. I18N: In the ghost replay selection screen
@@ -1207,27 +1207,27 @@ msgstr "Параўнаць паўторы"
 #. I18N: ./data/gui/screens/ghost_replay_selection.stkgui
 #. I18N: In the ghost replay selection screen
 msgid "Only show replays matching the current difficulty"
-msgstr "Паказваць толькі паўторы, што адпавядаюць бягучаму ўзроўню складанасці"
+msgstr "Паказваць толькі паўторы з бягучым ўзроўнем складанасці"
 
 #. I18N: ./data/gui/screens/ghost_replay_selection.stkgui
 #. I18N: In the ghost replay selection screen
 msgid "Only show replays matching the current version"
-msgstr "Паказваць толькі паўторы, што адпавядаюць бягучай версіі"
+msgstr "Паказваць толькі паўторы з бягучай версіяй"
 
 #. I18N: ./data/gui/screens/ghost_replay_selection.stkgui
 #. I18N: In the ghost replay selection screen
 msgid "Hide multiplayer replays"
-msgstr "Схаваць шматкарыстальніцкія прайграванні"
+msgstr "Схаваць шматкарыстальніцкія паўторы"
 
 #. I18N: ./data/gui/screens/ghost_replay_selection.stkgui
 #. I18N: In the ghost replay selection screen
 msgid "Record a ghost replay"
-msgstr "Запісваць паўторы з прывідам"
+msgstr "Запісаць паўтор з прывідам"
 
 #. I18N: ./data/gui/screens/gp_info.stkgui
 #. I18N: In the grand prix info screen
 msgid "AI karts"
-msgstr "Карты са штучным інтэлектам"
+msgstr "Боты"
 
 #. I18N: ./data/gui/screens/gp_info.stkgui
 #. I18N: In the grand prix info screen
@@ -1482,7 +1482,7 @@ msgid ""
 "player who hits others the most will win in a given hit or time limit. In "
 "Capture The Flag, your team needs to bring the flag of the other team to "
 "your own flag base, as long as your flag is not captured by the other team."
-msgstr "Ёсць тры тыпы рэжымаў бітвы. У Бітве трох удараў вам неабходна выкарыстоўваць зброю супраць іншых гульцоў, пакуль яны не страцяць усе свае жыцці. У рэжыме свабоднай гульні той гулец, які стукне іншых больш разоў, пераможа, калі набярэ некаторую колькасць удараў або скончыцца час гульні. У гульні \"Захоп сцяга\" вашай камандзе трэба прынесці сцяг іншай каманды на сваю базу, пры гэтым ваш сцяг павінны быць на вашай базе."
+msgstr "Ёсць 3 тыпы рэжымаў бітвы. У \"Бітве трох удараў\" вам неабходна выкарыстоўваць зброю супраць іншых гульцоў, пакуль яны не страцяць усе свае жыцці. У \"Бітве супраць усіх\" той гулец, які стукне іншых больш разоў, пераможа, калі набярэ некаторую колькасць удараў або скончыцца час гульні. У гульні \"Захоп сцяга\" вашай камандзе трэба прынесці сцяг іншай каманды на сваю базу, пры гэтым ваш сцяг павінны быць на вашай базе."
 
 #. I18N: ./data/gui/screens/help2.stkgui
 #. I18N: In the help menu
@@ -2003,7 +2003,7 @@ msgid ""
 "You can play without creating an online account by selecting an offline "
 "account. Though then you can not connect to friends, vote for addons etc. "
 "Please read our privacy statement at https://privacy.supertuxkart.net"
-msgstr ""
+msgstr "Вы можаце гуляць без стварэння сеціўнага рахунка, абраўшы пазасеціўны рахунак. Але пры гэтым вы не зможаце злучыцца з сябрамі, галасаваць за дадаткі і інш. Азнаёмцеся з нашымі ўмовамі канфідэнцыйнасці на https://privacy.supertuxkart.net"
 
 #. I18N: ./data/gui/screens/online/server_selection.stkgui
 #: src/states_screens/online/server_selection.cpp:580
@@ -2301,7 +2301,7 @@ msgstr "Паказваць FPS"
 #. I18N: ./data/gui/screens/options_ui.stkgui
 #. I18N: In the ui settings
 msgid "Show other karts' held powerups"
-msgstr "Паказваць зброю іншых картаў"
+msgstr "Паказваць бонусы іншых картаў"
 
 #. I18N: ./data/gui/screens/options_ui.stkgui
 #. I18N: In the ui settings
@@ -2360,7 +2360,7 @@ msgstr "Ужыць новую раздзяляльную здольнасць"
 
 #. I18N: ./data/gui/screens/race_setup.stkgui
 msgid "Select a difficulty"
-msgstr "Абярыце цяжкасць"
+msgstr "Абярыце складанасць"
 
 #. I18N: ./data/gui/screens/race_setup.stkgui
 msgid "Select a game mode"
@@ -2393,7 +2393,7 @@ msgstr "Колькасць кругоў"
 #: src/states_screens/online/create_server_screen.cpp:196
 #: src/states_screens/track_info_screen.cpp:195
 msgid "Number of AI karts"
-msgstr "Колькасць картаў-кампутараў"
+msgstr "Колькасць ботаў"
 
 #. I18N: ./data/gui/screens/track_info.stkgui
 #. I18N: In the track info screen
@@ -2439,7 +2439,7 @@ msgstr "Афармленне інтэрфейсу можна памяняць у
 
 #. I18N: ./data/tips.xml
 msgid "You can see other karts' powerups by enabling it in the UI options."
-msgstr "Вы зможаце бачыць зброю іншых картаў, калі ўключыце гэта ў наладах інтэрфейсу."
+msgstr "Вы зможаце бачыць бонусы іншых картаў, калі ўключыце гэта ў наладах інтэрфейсу."
 
 #. I18N: ./data/tips.xml
 msgid "The font size can be changed in the UI options."
@@ -2516,7 +2516,7 @@ msgstr "Баскетбольны мяч можна знішчыць, калі д
 msgid ""
 "Try to avoid crashing into the backs of other karts as this will slow you "
 "down."
-msgstr ""
+msgstr "Не сутыкайцеся з іншымі картамі, бо гэта запавольвае вас."
 
 #. I18N: ./data/tips.xml
 msgid "You can use bowling balls to push and block the ball."
@@ -2692,7 +2692,7 @@ msgstr "О так, глядзі, ён цяпер у маім замку і бу�
 #. I18N: Cutscene subtitle from ../stk-assets/tracks/introcutscene2/scene.xml
 #. I18N: ../stk-assets/tracks/introcutscene2/scene.xml
 msgid "But I'm a fair creature, so I'll make you a deal."
-msgstr "Але я сумленнае стварэнне, таму прапаную ўгоду."
+msgstr "Але я сумленная істота, таму прапаную ўгоду."
 
 #. I18N: Cutscene subtitle from ../stk-assets/tracks/introcutscene2/scene.xml
 #. I18N: ../stk-assets/tracks/introcutscene2/scene.xml
@@ -2704,15 +2704,15 @@ msgstr "Калі ты зможаш перамагчы мяне ў гонцы, я
 msgid ""
 " But you pathetic little twerps will never be able to beat me - King of the "
 "Karts!"
-msgstr " Але ты, гаротны валацуга, ніколі не зможаш адолець мяне — караля картаў!"
+msgstr "Але ты, гаротны валацуга, ніколі не зможаш адолець мяне — караля картаў!"
 
 #. I18N: ../stk-assets/tracks/lasdunasarena/track.xml
 msgid "Las Dunas Arena"
-msgstr "Лас-Дунас-Арэна"
+msgstr "Арэна Лас-Дунас"
 
 #. I18N: ../stk-assets/tracks/lasdunassoccer/track.xml
 msgid "Las Dunas Soccer Stadium"
-msgstr "Футбольны стадыён Лас-Дзюнас"
+msgstr "Футбольны стадыён Лас-Дунас"
 
 #. I18N: ../stk-assets/tracks/lighthouse/track.xml
 msgid "Around the Lighthouse"
@@ -2833,7 +2833,7 @@ msgstr "Руш за лідарам (адна гонка)"
 #: src/challenges/challenge_data.cpp:324
 #: src/states_screens/dialogs/select_challenge.cpp:78
 msgid "Mode: Reverse"
-msgstr "Рэжым: адваротны"
+msgstr "Рэжым: адваротны напрамак"
 
 #: src/challenges/challenge_data.cpp:601
 #, c-format
@@ -3978,7 +3978,7 @@ msgstr "Часовая гонка (Гран-пры)"
 #: src/states_screens/online/create_server_screen.cpp:237
 #: src/states_screens/track_info_screen.cpp:252
 msgid "Free-For-All"
-msgstr "Свабодная гульня"
+msgstr "Бітва супраць усіх"
 
 #. I18N: Game mode
 #. I18N: In the create server screen for battle server
@@ -4382,13 +4382,13 @@ msgstr "Скончана гульняў \"Захоп сцяга\""
 #. added to multiple different goals.
 #: src/states_screens/dialogs/achievement_progress_dialog.cpp:230
 msgid "Free-for-All matches started"
-msgstr "Пачата свабодных гульняў"
+msgstr "Пачата бітваў супраць усіх"
 
 #. I18N: A goal for achievements. If this text is in (), it's a precision
 #. added to multiple different goals.
 #: src/states_screens/dialogs/achievement_progress_dialog.cpp:232
 msgid "Free-for-All matches finished"
-msgstr "Скончана свабодных гульняў"
+msgstr "Скончана бітваў супраць усіх"
 
 #. I18N: A goal for achievements. If this text is in (), it's a precision
 #. added to multiple different goals.
@@ -4407,7 +4407,7 @@ msgstr "Бонусаў выкарыстана"
 #: src/states_screens/dialogs/achievement_progress_dialog.cpp:254
 #: src/states_screens/dialogs/achievement_progress_dialog.cpp:262
 msgid " (1 race)"
-msgstr "(1 гонка)"
+msgstr " (1 гонка)"
 
 #. I18N: A goal for achievements. If this text is in (), it's a precision
 #. added to multiple different goals.
@@ -4457,7 +4457,7 @@ msgstr "Слізганне"
 #. added to multiple different goals.
 #: src/states_screens/dialogs/achievement_progress_dialog.cpp:269
 msgid " (1 lap)"
-msgstr "(1 круг)"
+msgstr " (1 круг)"
 
 #. I18N: A goal for achievements. If this text is in (), it's a precision
 #. added to multiple different goals.
@@ -4479,7 +4479,7 @@ msgstr "Гонак пачата"
 #: src/states_screens/dialogs/achievement_progress_dialog.cpp:288
 #: src/states_screens/dialogs/achievement_progress_dialog.cpp:294
 msgid " (maximum on one official track)"
-msgstr "(не больш, чым на адной афіцыйнай трасе)"
+msgstr " (не больш, чым на адной афіцыйнай трасе)"
 
 #. I18N: A goal for achievements. If this text is in (), it's a precision
 #. added to multiple different goals.
@@ -4550,7 +4550,7 @@ msgstr "Скончана паляванняў на яйкі"
 #: src/states_screens/dialogs/achievement_progress_dialog.cpp:313
 #: src/states_screens/dialogs/achievement_progress_dialog.cpp:319
 msgid " (official tracks matching the goal)"
-msgstr "(афіцыйныя трасы, што адпавядаюць мэце)"
+msgstr " (афіцыйныя трасы, што адпавядаюць мэце)"
 
 #: src/states_screens/dialogs/add_device_dialog.cpp:64
 msgid ""
@@ -5038,7 +5038,7 @@ msgstr "Неабходная колькасць нітра: %i"
 #: src/states_screens/dialogs/select_challenge.cpp:109
 #, c-format
 msgid "Number of AI Karts: %i"
-msgstr "Колькасць картаў са штучным інтэлектам: %i"
+msgstr "Колькасць ботаў: %i"
 
 #. I18N: In the create server screen, show various battle mode available
 #: src/states_screens/dialogs/server_configuration_dialog.cpp:158
@@ -5646,12 +5646,12 @@ msgstr "Невядома"
 #. I18N: Message shown to user if no IPv4 detected by STK
 #: src/states_screens/online/server_selection.cpp:363
 msgid "No IPv4 detected, you may not be able to join any servers."
-msgstr "Не ўдалося выявіць IPv4, магчыма, вы не зможаце далучацца да сервераў."
+msgstr "Не ўдалося выявіць IPv4, магчыма, вы не зможаце далучацца да сервераў па гэтаму пратаколу."
 
 #. I18N: Message shown to user if no IPv6 detected by STK
 #: src/states_screens/online/server_selection.cpp:365
 msgid "No IPv6 detected, you may not be able to join any servers."
-msgstr "Не ўдалося выявіць IPv6, магчыма, вы не зможаце далучацца да сервераў. "
+msgstr "Не ўдалося выявіць IPv6, магчыма, вы не зможаце далучацца да сервераў па гэтаму пратаколу."
 
 #: src/states_screens/online/server_selection.cpp:504
 msgid "No server is available."
@@ -6188,7 +6188,7 @@ msgstr "Гэта нічыя"
 #: src/states_screens/race_result_gui.cpp:881
 #, c-format
 msgid "Eliminated after %s"
-msgstr "Ліквідацыя праз %s"
+msgstr "Выбыў праз %s"
 
 #: src/states_screens/race_result_gui.cpp:886
 #: src/states_screens/race_result_gui.cpp:1334

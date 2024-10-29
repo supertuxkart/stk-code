@@ -8,15 +8,16 @@
 # Bobby Youstra, 2022
 # Bobby Youstra, 2022
 # David Blaszyk <david@sudomail.ne.jp>, 2017
-# Happymc! <isena200536@gmail.com>, 2019-2020,2022-2023
+# Happymc <isena200536@gmail.com>, 2024
+# Happymc <isena200536@gmail.com>, 2019-2020,2022-2023
 # lindwurm, 2015
-# Kazma <kazma.otsubo@outlook.com>, 2023
+# Kazma Otsubo <kazma.otsubo@outlook.com>, 2023
 # 5605c392824fda3ac2df0bdbd59ff35b_058bab5 <4437a8e713388fd5aa2ba28f526ee201_779197>, 2019-2020
-# Kazma <kazma.otsubo@outlook.com>, 2020-2021
+# Kazma Otsubo <kazma.otsubo@outlook.com>, 2020-2021
 # lindwurm, 2015
 # lip_of_cygnus <Shinya1248@gmail.com>, 2015
 # Masayuki Sugahara <brindflontia@gmail.com>, 2015
-# Kazma <kazma.otsubo@outlook.com>, 2020
+# Kazma Otsubo <kazma.otsubo@outlook.com>, 2020
 # Otsubo Kazma, 2022
 # ec688d94bb12b1f70fb8e51df58a9b21_e09dba8, 2022-2023
 # paontv <paonntv@gmail.com>, 2020
@@ -25,8 +26,8 @@
 # Masayuki Sugahara <brindflontia@gmail.com>, 2015
 # Ubuntu Jackson <santenichiyonitchigo@gmail.com>, 2018-2020
 # Ubuntu Jackson <santenichiyonitchigo@gmail.com>, 2020
-# 加瀬義悠, 2023
-# 加瀬義悠, 2023
+# よっちゃん, 2023
+# よっちゃん, 2023
 # David Blaszyk <david@sudomail.ne.jp>, 2017
 msgid ""
 msgstr ""
@@ -34,7 +35,7 @@ msgstr ""
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-06-16 01:41+0800\n"
 "PO-Revision-Date: 2015-02-15 01:58+0000\n"
-"Last-Translator: Happymc! <isena200536@gmail.com>, 2019-2020,2022-2023\n"
+"Last-Translator: Happymc <isena200536@gmail.com>, 2024\n"
 "Language-Team: Japanese (http://app.transifex.com/supertuxkart/supertuxkart/language/ja/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -933,7 +934,7 @@ msgstr "ユーザー情報"
 #. I18N: ./data/gui/dialogs/online/user_info_dialog.stkgui
 #. I18N: User info dialog
 msgid "Remove Friend"
-msgstr ""
+msgstr "フレンドを削除"
 
 #. I18N: ./data/gui/dialogs/online/user_info_dialog.stkgui
 #. I18N: User info dialog
@@ -943,17 +944,17 @@ msgstr "フレンドを追加"
 #. I18N: ./data/gui/dialogs/online/user_info_dialog.stkgui
 #. I18N: User info dialog
 msgid "Accept Invite"
-msgstr ""
+msgstr "招待を受け入れる"
 
 #. I18N: ./data/gui/dialogs/online/user_info_dialog.stkgui
 #. I18N: User info dialog
 msgid "Decline Invite"
-msgstr ""
+msgstr "招待を断る"
 
 #. I18N: ./data/gui/dialogs/online/user_info_dialog.stkgui
 #. I18N: User info dialog
 msgid "View Profile"
-msgstr ""
+msgstr "プロフィールを見る"
 
 #. I18N: ./data/gui/dialogs/online/vote_dialog.stkgui
 #. I18N: In the vote dialog
@@ -1141,7 +1142,7 @@ msgstr "クレジット"
 
 #. I18N: ./data/gui/screens/cutscene.stkgui
 msgid "Skip"
-msgstr ""
+msgstr "スキップ"
 
 #. I18N: ./data/gui/screens/easter_egg.stkgui
 #. I18N: Section in easter egg tracks selection screen
@@ -1523,7 +1524,7 @@ msgstr "ゴーストプレイ: タイムトライアルや卵狩りモードで�
 #. I18N: In the help menu
 msgid ""
 "Lap Trial: Complete as many laps as possible in a given amount of time."
-msgstr ""
+msgstr "ラップトライアル： 一定時間内にできるだけ多く周回する。"
 
 #. I18N: ./data/gui/screens/help2.stkgui
 #. I18N: In the help menu
@@ -2021,7 +2022,7 @@ msgid ""
 "You can play without creating an online account by selecting an offline "
 "account. Though then you can not connect to friends, vote for addons etc. "
 "Please read our privacy statement at https://privacy.supertuxkart.net"
-msgstr ""
+msgstr "オフラインアカウントを選択すれば、オンラインアカウントを作成せずにプレイできます。ただし、フレンドとの接続やアドオンへの投票などはできません。プライバシーに関する声明は、 https://privacy.supertuxkart.net をお読みください。"
 
 #. I18N: ./data/gui/screens/online/server_selection.stkgui
 #: src/states_screens/online/server_selection.cpp:580
@@ -2534,7 +2535,7 @@ msgstr "バスケットボールはカップケーキ、きゅうばん、ボー
 msgid ""
 "Try to avoid crashing into the backs of other karts as this will slow you "
 "down."
-msgstr ""
+msgstr "他のカートの後部に衝突しないようにして、速度が低下するのを防ごう。"
 
 #. I18N: ./data/tips.xml
 msgid "You can use bowling balls to push and block the ball."

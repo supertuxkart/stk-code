@@ -4,6 +4,7 @@
 # 
 # Translators:
 # Andrej Znidarsic <andrej.znidarsic@gmail.com>, 2015-2016,2021
+# Gorzy Gorup <gorupgorazd@gmail.com>, 2023
 # Gorzy Gorup <gorupgorazd@gmail.com>, 2018,2023
 # Luka116, 2023
 # Sasa Batistic <sasa.batistic@gmail.com>, 2018
@@ -15,7 +16,7 @@ msgstr ""
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-06-16 01:41+0800\n"
 "PO-Revision-Date: 2015-02-15 01:58+0000\n"
-"Last-Translator: Gorzy Gorup <gorupgorazd@gmail.com>, 2018,2023\n"
+"Last-Translator: Gorzy Gorup <gorupgorazd@gmail.com>, 2023\n"
 "Language-Team: Slovenian (http://app.transifex.com/supertuxkart/supertuxkart/language/sl/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -2599,7 +2600,7 @@ msgstr "Puffy"
 
 #. I18N: ../stk-assets/karts/sara_the_racer/kart.xml
 msgid "Pepper"
-msgstr "Pepper"
+msgstr "Paprika"
 
 #. I18N: ../stk-assets/karts/sara_the_wizard/kart.xml
 msgid "Sara"

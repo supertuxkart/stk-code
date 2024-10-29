@@ -4,7 +4,7 @@
 # 
 # Translators:
 # FIRST AUTHOR <EMAIL@ADDRESS>, 2012
-# Timur Seber <seber.tatsoft@gmail.com>, 2021
+# Timur Seber <seber.tatsoft@gmail.com>, 2021,2023-2024
 # Булат Ибраһим <bulat_ibrahim@mail.ru>, 2015-2017,2021
 msgid ""
 msgstr ""
@@ -12,7 +12,7 @@ msgstr ""
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-06-16 01:41+0800\n"
 "PO-Revision-Date: 2015-02-15 01:58+0000\n"
-"Last-Translator: Timur Seber <seber.tatsoft@gmail.com>, 2021\n"
+"Last-Translator: Timur Seber <seber.tatsoft@gmail.com>, 2021,2023-2024\n"
 "Language-Team: Tatar (http://app.transifex.com/supertuxkart/supertuxkart/language/tt/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -219,7 +219,7 @@ msgstr ""
 #. I18N: ./data/gui/dialogs/android/multitouch_settings.stkgui
 #. I18N: In the multitouch settings screen
 msgid "Auto acceleration"
-msgstr ""
+msgstr "Автоматик тизләнеш"
 
 #. I18N: ./data/gui/dialogs/android/init_android.stkgui
 msgid "You can change it later in touch device settings."
@@ -298,7 +298,7 @@ msgstr "Өстәмә"
 #. I18N: ./data/gui/dialogs/android/multitouch_settings.stkgui
 #. I18N: In the multitouch settings screen
 msgid "Deadzone"
-msgstr ""
+msgstr "Үле зона"
 
 #. I18N: ./data/gui/dialogs/android/multitouch_settings.stkgui
 #. I18N: In the multitouch settings screen
@@ -690,7 +690,7 @@ msgstr "Ярдәм"
 #. I18N: ./data/gui/dialogs/online/player_rankings_dialog.stkgui
 #. I18N: In player rankings dialog
 msgid "Top 10 players"
-msgstr ""
+msgstr "Иң яхшы 10 уенчы"
 
 #. I18N: ./data/gui/dialogs/online/player_rankings_dialog.stkgui
 msgid "Refresh"
@@ -747,7 +747,7 @@ msgstr "Мин шартлар белән риза, һәм миңа 13 яшьтә
 #. I18N: ./data/gui/dialogs/online/server_configuration_dialog.stkgui
 #. I18N: In the server configuration screen
 msgid "Server Configuration"
-msgstr ""
+msgstr "Серверне көйләү"
 
 #. I18N: ./data/gui/dialogs/online/server_configuration_dialog.stkgui
 #. I18N: In the server configuration screen
@@ -870,12 +870,12 @@ msgstr "Серсүз"
 #. I18N: In the server info dialog
 #: src/states_screens/dialogs/server_info_dialog.cpp:291
 msgid "Bookmark this server"
-msgstr ""
+msgstr "Бу серверны кыстыргычларга кую"
 
 #. I18N: ./data/gui/dialogs/online/splitscreen_player_dialog.stkgui
 #. I18N: Splitscreen player in network
 msgid "Add player"
-msgstr ""
+msgstr "Уенчы өстәү"
 
 #. I18N: ./data/gui/dialogs/online/splitscreen_player_dialog.stkgui
 #. I18N: Splitscreen player in network
@@ -896,7 +896,7 @@ msgstr ""
 #. I18N: ./data/gui/dialogs/online/splitscreen_player_dialog.stkgui
 #. I18N: Splitscreen player in network
 msgid "Clear players"
-msgstr ""
+msgstr "Уенчыларны чистарту"
 
 #. I18N: ./data/gui/dialogs/online/splitscreen_player_dialog.stkgui
 #. I18N: Splitscreen player in network
@@ -921,17 +921,17 @@ msgstr "Дусны өстәргә"
 #. I18N: ./data/gui/dialogs/online/user_info_dialog.stkgui
 #. I18N: User info dialog
 msgid "Accept Invite"
-msgstr ""
+msgstr "Чакыруны кабул итү"
 
 #. I18N: ./data/gui/dialogs/online/user_info_dialog.stkgui
 #. I18N: User info dialog
 msgid "Decline Invite"
-msgstr ""
+msgstr "Чакырудан баш тарту"
 
 #. I18N: ./data/gui/dialogs/online/user_info_dialog.stkgui
 #. I18N: User info dialog
 msgid "View Profile"
-msgstr ""
+msgstr "Профильне карау"
 
 #. I18N: ./data/gui/dialogs/online/vote_dialog.stkgui
 #. I18N: In the vote dialog
@@ -1119,7 +1119,7 @@ msgstr "Ясаучылар"
 
 #. I18N: ./data/gui/screens/cutscene.stkgui
 msgid "Skip"
-msgstr ""
+msgstr "Калдырып тору"
 
 #. I18N: ./data/gui/screens/easter_egg.stkgui
 #. I18N: Section in easter egg tracks selection screen
@@ -1323,7 +1323,7 @@ msgstr "Уен төре"
 #. I18N: ./data/gui/screens/help7.stkgui
 #. I18N: Tab in help menu
 msgid "Powerups"
-msgstr ""
+msgstr "Ташламалар"
 
 #. I18N: ./data/gui/screens/help1.stkgui
 #. I18N: Tab in help menu
@@ -1863,7 +1863,7 @@ msgstr "Лобби"
 #. I18N: In networking lobby to configuration server settings
 #: src/states_screens/online/networking_lobby.cpp:200
 msgid "Configuration"
-msgstr ""
+msgstr "Көйләү"
 
 #. I18N: ./data/gui/screens/online/networking_lobby.stkgui
 #. I18N: In the network lobby
@@ -1889,7 +1889,7 @@ msgstr ""
 #. I18N: ./data/gui/screens/online/online.stkgui
 #. I18N: Networking menu button
 msgid "Enter server address"
-msgstr ""
+msgstr "Сервер адресын кертү"
 
 #. I18N: ./data/gui/screens/online/online.stkgui
 #. I18N: Networking menu button
@@ -1954,7 +1954,7 @@ msgstr "Үзгәртергә"
 #. I18N: ./data/gui/screens/online/profile_settings.stkgui
 #. I18N: In the online account settings screen
 msgid "E-mail:"
-msgstr ""
+msgstr "Эл. почта:"
 
 #. I18N: ./data/gui/screens/online/register.stkgui
 #. I18N: In the registration dialog
@@ -1991,7 +1991,7 @@ msgstr "Челтәр исеме"
 #. I18N: ./data/gui/screens/user_screen.stkgui
 #. I18N: ./data/gui/screens/user_screen_tab.stkgui
 msgid "Reset password"
-msgstr ""
+msgstr "Серсүзне алыштыру"
 
 #. I18N: ./data/gui/screens/online/register.stkgui
 #. I18N: In the registration dialog
@@ -2014,7 +2014,7 @@ msgstr ""
 #. I18N: ./data/gui/screens/online/server_selection.stkgui
 #. I18N: In the server selection screen
 msgid "Use IPv6 connection"
-msgstr ""
+msgstr "IPv6 тоташуын куллану"
 
 #. I18N: ./data/gui/screens/online/user_search.stkgui
 msgid "User search"
@@ -2145,7 +2145,7 @@ msgstr "Идарә итү"
 #. I18N: ./data/gui/screens/user_screen_tab.stkgui
 #. I18N: Section in the settings menu
 msgid "Language"
-msgstr ""
+msgstr "Тел"
 
 #. I18N: ./data/gui/screens/options_audio.stkgui
 #. I18N: In the audio options screen
@@ -2267,7 +2267,7 @@ msgstr "Тема"
 #. I18N: ./data/gui/screens/options_ui.stkgui
 #. I18N: In the ui settings
 msgid "Minimap"
-msgstr ""
+msgstr "Кечкенә карта"
 
 #. I18N: ./data/gui/screens/options_ui.stkgui
 #. I18N: In the ui settings
@@ -2277,17 +2277,17 @@ msgstr ""
 #. I18N: ./data/gui/screens/options_ui.stkgui
 #. I18N: In the ui settings
 msgid "Font size"
-msgstr ""
+msgstr "Шрифт үлчәме"
 
 #. I18N: ./data/gui/screens/options_ui.stkgui
 #. I18N: In the ui settings
 msgid "Camera"
-msgstr ""
+msgstr "Камера"
 
 #. I18N: ./data/gui/screens/options_ui.stkgui
 #. I18N: In the ui settings
 msgid "Custom..."
-msgstr ""
+msgstr "Үзгә..."
 
 #. I18N: ./data/gui/screens/options_ui.stkgui
 #. I18N: In the ui settings
@@ -2427,7 +2427,7 @@ msgstr "Бетерергә"
 #. I18N: ./data/gui/screens/user_screen_tab.stkgui
 #. I18N: In the user screen
 msgid "Kart color"
-msgstr ""
+msgstr "Картинг төсе"
 
 #. I18N: ./data/tips.xml
 msgid "The UI skin can be changed in the UI options."
@@ -2568,7 +2568,7 @@ msgstr "Гаврош"
 
 #. I18N: ../stk-assets/karts/gnu/kart.xml
 msgid "Gnu"
-msgstr ""
+msgstr "Гну"
 
 #. I18N: ../stk-assets/karts/hexley/kart.xml
 msgid "Hexley"
@@ -2576,7 +2576,7 @@ msgstr "Хекслей"
 
 #. I18N: ../stk-assets/karts/kiki/kart.xml
 msgid "Kiki"
-msgstr ""
+msgstr "Кики"
 
 #. I18N: ../stk-assets/karts/konqi/kart.xml
 msgid "Konqi"
@@ -2596,11 +2596,11 @@ msgstr "Пуфи"
 
 #. I18N: ../stk-assets/karts/sara_the_racer/kart.xml
 msgid "Pepper"
-msgstr ""
+msgstr "Борыч"
 
 #. I18N: ../stk-assets/karts/sara_the_wizard/kart.xml
 msgid "Sara"
-msgstr ""
+msgstr "Сара"
 
 #. I18N: ../stk-assets/karts/suzanne/kart.xml
 msgid "Suzanne"
@@ -2641,7 +2641,7 @@ msgstr "Сугыш утравы"
 
 #. I18N: ../stk-assets/tracks/black_forest/track.xml
 msgid "Black Forest"
-msgstr ""
+msgstr "Кара урман"
 
 #. I18N: ../stk-assets/tracks/cave/track.xml
 msgid "Cave X"
@@ -2724,7 +2724,7 @@ msgstr "Минигольф"
 
 #. I18N: ../stk-assets/tracks/oasis/track.xml
 msgid "Oasis"
-msgstr ""
+msgstr "Оазис"
 
 #. I18N: ../stk-assets/tracks/olivermath/track.xml
 msgid "Oliver's Math Class"
@@ -2732,7 +2732,7 @@ msgstr "Оливерның математика бүлмәсе"
 
 #. I18N: ../stk-assets/tracks/pumpkin_park/track.xml
 msgid "Pumpkin Park"
-msgstr ""
+msgstr "Кабак паркы"
 
 #. I18N: ../stk-assets/tracks/ravenbridge_mansion/track.xml
 msgid "Ravenbridge Mansion"
@@ -2744,7 +2744,7 @@ msgstr "Шуучан Комнар"
 
 #. I18N: ../stk-assets/tracks/scotland/track.xml
 msgid "Nessie's Pond"
-msgstr ""
+msgstr "Лох-Несс албастысы күле"
 
 #. I18N: ../stk-assets/tracks/snowmountain/track.xml
 msgid "Northern Resort"
@@ -2891,12 +2891,12 @@ msgstr "Сезнең көйләүләрегез искергәнгә күрә б
 
 #: src/graphics/irr_driver.cpp:730
 msgid "Video recording started."
-msgstr ""
+msgstr "Видеоны яздыру башланды."
 
 #: src/graphics/irr_driver.cpp:737
 #, c-format
 msgid "Video saved in \"%s\"."
-msgstr ""
+msgstr "Видео монда \"%s\" сакланылды."
 
 #: src/graphics/irr_driver.cpp:741
 msgid "Encoding progress:"
@@ -2906,13 +2906,13 @@ msgstr ""
 #: src/graphics/irr_driver.cpp:1961
 #, c-format
 msgid "FPS: %d/%d/%d - %d KTris, Ping: %dms"
-msgstr ""
+msgstr "Кадр/с: %d/%d/%d - %d КТр, Пинг: %d мс "
 
 #. I18N: Tip shown in gui for giving player hints
 #: src/guiengine/engine.cpp:1452 src/states_screens/race_result_gui.cpp:203
 #, c-format
 msgid "Tip: %s"
-msgstr ""
+msgstr "Киңәш: %s"
 
 #: src/guiengine/engine.cpp:1496
 msgid "Loading"
@@ -2920,15 +2920,15 @@ msgstr "Йөкләнү"
 
 #: src/guiengine/widgets/kart_stats_widget.cpp:104
 msgid "Mass"
-msgstr ""
+msgstr "Масса"
 
 #: src/guiengine/widgets/kart_stats_widget.cpp:110
 msgid "Maximum speed"
-msgstr ""
+msgstr "Максималь тизлек"
 
 #: src/guiengine/widgets/kart_stats_widget.cpp:117
 msgid "Acceleration"
-msgstr ""
+msgstr "Тизләнеш"
 
 #: src/guiengine/widgets/kart_stats_widget.cpp:123
 msgid "Nitro efficiency"
@@ -3453,7 +3453,7 @@ msgstr "Сезнең көйләүләр файлы уенның бу верси�
 #. I18N: name of buttons on gamepads
 #: src/input/gamepad_config.cpp:159
 msgid "Guide"
-msgstr ""
+msgstr "Кулланма"
 
 #. I18N: name of buttons on gamepads
 #: src/input/gamepad_config.cpp:161
@@ -3589,7 +3589,7 @@ msgstr "Wiimote-ны табып булмый"
 
 #: src/io/rich_presence.cpp:477
 msgid "Getting ready to race"
-msgstr ""
+msgstr "Ярышка әзерләнү"
 
 #: src/karts/controller/local_player_controller.cpp:329
 msgid "Penalty time!!"
@@ -3597,7 +3597,7 @@ msgstr "Җаза вакыты!!"
 
 #: src/karts/controller/local_player_controller.cpp:332
 msgid "Don't accelerate before 'Set!'"
-msgstr ""
+msgstr "'Игътибар' сүзенә кадәр кузгалмагыз!"
 
 #: src/karts/controller/spare_tire_ai.cpp:150
 msgid "You can have at most 3 lives!"
@@ -3624,7 +3624,7 @@ msgstr ""
 #: src/karts/kart_rewinder.cpp:126 src/network/protocols/client_lobby.cpp:1172
 #, c-format
 msgid "%s left the game."
-msgstr ""
+msgstr "%s уеннан китте."
 
 #: src/main.cpp:2034
 msgid ""
@@ -3681,12 +3681,12 @@ msgstr ""
 #: src/modes/capture_the_flag.cpp:424
 #, c-format
 msgid "%s captured the blue flag!"
-msgstr ""
+msgstr "%s зәңгәр байракны яулап алды!"
 
 #: src/modes/capture_the_flag.cpp:428
 #, c-format
 msgid "%s captured the red flag!"
-msgstr ""
+msgstr "%s кызыл байракны яулап алды!"
 
 #: src/modes/easter_egg_hunt.cpp:222
 #, c-format
@@ -3770,7 +3770,7 @@ msgstr "Бот"
 #: src/network/protocols/client_lobby.cpp:641
 #, c-format
 msgid "%s disconnected."
-msgstr ""
+msgstr "%s тоташмаган."
 
 #. I18N: Message shown in network lobby to tell user that
 #. player name is clickable
@@ -3801,7 +3801,7 @@ msgstr ""
 #: src/states_screens/dialogs/server_info_dialog.cpp:101
 #, c-format
 msgid "Game mode: %s"
-msgstr ""
+msgstr "Уен төре: %s"
 
 #. I18N: In the create server screen for soccer server
 #: src/network/protocols/client_lobby.cpp:769
@@ -3868,7 +3868,7 @@ msgstr ""
 
 #: src/network/protocols/client_lobby.cpp:1026
 msgid "Failed to start the network game."
-msgstr ""
+msgstr "Челтәр уенын башлый алмады."
 
 #. I18N: Error message shown if live join or spectate failed in network
 #: src/network/protocols/client_lobby.cpp:1241
@@ -3945,7 +3945,7 @@ msgstr ""
 #: src/network/protocols/connect_to_server.cpp:380
 #, c-format
 msgid "Cannot connect to server %s."
-msgstr ""
+msgstr "%s серверына тоташып булмый"
 
 #. I18N: Show the failed detect port server name
 #: src/network/protocols/connect_to_server.cpp:883
@@ -3976,7 +3976,7 @@ msgstr ""
 #: src/states_screens/dialogs/server_configuration_dialog.cpp:162
 #: src/states_screens/online/create_server_screen.cpp:239
 msgid "Capture The Flag"
-msgstr ""
+msgstr "Байракны яулап алу"
 
 #: src/online/online_player_profile.cpp:455
 #, c-format
@@ -4150,7 +4150,7 @@ msgstr "Launchpad Contributions:\nTimur Seber, 2021\nБулат Ибраһим, 
 #: src/states_screens/dialogs/achievement_progress_dialog.cpp:65
 msgctxt "achievement_info"
 msgid "Subgoals"
-msgstr ""
+msgstr "Эчке максатлар"
 
 #: src/states_screens/dialogs/achievement_progress_dialog.cpp:67
 msgctxt "achievement_info"
@@ -4219,13 +4219,13 @@ msgstr ""
 #. added to multiple different goals.
 #: src/states_screens/dialogs/achievement_progress_dialog.cpp:182
 msgid "Novice races started"
-msgstr ""
+msgstr "Өйрәнчек ярышлары башланды"
 
 #. I18N: A goal for achievements. If this text is in (), it's a precision
 #. added to multiple different goals.
 #: src/states_screens/dialogs/achievement_progress_dialog.cpp:184
 msgid "Novice races finished"
-msgstr ""
+msgstr "Өйрәнчек ярышлары тәмамланды"
 
 #. I18N: A goal for achievements. If this text is in (), it's a precision
 #. added to multiple different goals.
@@ -4243,13 +4243,13 @@ msgstr ""
 #. added to multiple different goals.
 #: src/states_screens/dialogs/achievement_progress_dialog.cpp:190
 msgid "Expert races started"
-msgstr ""
+msgstr "Эксперт узышлары башланды"
 
 #. I18N: A goal for achievements. If this text is in (), it's a precision
 #. added to multiple different goals.
 #: src/states_screens/dialogs/achievement_progress_dialog.cpp:192
 msgid "Expert races finished"
-msgstr ""
+msgstr "Эксперт узышлары тәмамланды"
 
 #. I18N: A goal for achievements. If this text is in (), it's a precision
 #. added to multiple different goals.
@@ -4267,13 +4267,13 @@ msgstr ""
 #. added to multiple different goals.
 #: src/states_screens/dialogs/achievement_progress_dialog.cpp:198
 msgid "Normal races started"
-msgstr ""
+msgstr "Нормаль узышлар башланды"
 
 #. I18N: A goal for achievements. If this text is in (), it's a precision
 #. added to multiple different goals.
 #: src/states_screens/dialogs/achievement_progress_dialog.cpp:200
 msgid "Normal races finished"
-msgstr ""
+msgstr "Нормаль узышлар тәмамланды"
 
 #. I18N: A goal for achievements. If this text is in (), it's a precision
 #. added to multiple different goals.
@@ -4351,13 +4351,13 @@ msgstr ""
 #. added to multiple different goals.
 #: src/states_screens/dialogs/achievement_progress_dialog.cpp:226
 msgid "Capture-the-Flag matches started"
-msgstr ""
+msgstr "\"Байракны яулап алу\" матчлары башланды"
 
 #. I18N: A goal for achievements. If this text is in (), it's a precision
 #. added to multiple different goals.
 #: src/states_screens/dialogs/achievement_progress_dialog.cpp:228
 msgid "Capture-the-Flag matches finished"
-msgstr ""
+msgstr "\"Байракны яулап алу\" матчлары тәмамланды"
 
 #. I18N: A goal for achievements. If this text is in (), it's a precision
 #. added to multiple different goals.
@@ -4376,7 +4376,7 @@ msgstr ""
 #: src/states_screens/dialogs/achievement_progress_dialog.cpp:234
 #: src/states_screens/dialogs/achievement_progress_dialog.cpp:236
 msgid "Powerups used"
-msgstr ""
+msgstr "Ташламалар кулланды"
 
 #. I18N: A goal for achievements. If this text is in (), it's a precision
 #. added to multiple different goals.
@@ -4445,7 +4445,7 @@ msgstr "(1 әйләнә)"
 #: src/states_screens/dialogs/achievement_progress_dialog.cpp:272
 #: src/states_screens/dialogs/achievement_progress_dialog.cpp:297
 msgid "Races started"
-msgstr ""
+msgstr "Узышлар башланды"
 
 #. I18N: A goal for achievements. If this text is in (), it's a precision
 #. added to multiple different goals.
@@ -4467,7 +4467,7 @@ msgstr ""
 #: src/states_screens/dialogs/achievement_progress_dialog.cpp:274
 #: src/states_screens/dialogs/achievement_progress_dialog.cpp:299
 msgid "Races finished"
-msgstr ""
+msgstr "Узышлар тәмамланды"
 
 #. I18N: A goal for achievements. If this text is in (), it's a precision
 #. added to multiple different goals.
@@ -4682,7 +4682,7 @@ msgstr ""
 #: src/states_screens/dialogs/custom_video_settings.cpp:86
 #: src/states_screens/options/options_screen_video.cpp:672
 msgid "Very Low"
-msgstr ""
+msgstr "Бик түбән"
 
 #. I18N: Geometry level low : few details are displayed
 #. I18N: in the graphical options tooltip;
@@ -4799,7 +4799,7 @@ msgstr ""
 #: src/states_screens/dialogs/high_score_info_dialog.cpp:112
 #, c-format
 msgid "%s: %s"
-msgstr ""
+msgstr "%s: %s"
 
 #: src/states_screens/dialogs/high_score_info_dialog.cpp:125
 #, c-format
@@ -4831,7 +4831,7 @@ msgstr "(Буш)"
 #. I18N: In kart color choosing dialog
 #: src/states_screens/dialogs/kart_color_slider_dialog.cpp:47
 msgid "Use original color"
-msgstr ""
+msgstr "Оригиналь төс куллану"
 
 #. I18N: In kart color choosing dialog
 #: src/states_screens/dialogs/kart_color_slider_dialog.cpp:49
@@ -4840,18 +4840,18 @@ msgstr ""
 
 #: src/states_screens/dialogs/message_dialog.cpp:145
 msgid "Don't show again"
-msgstr ""
+msgstr "Кабат күрсәтмә"
 
 #. I18N: In the network player dialog
 #: src/states_screens/dialogs/network_player_dialog.cpp:50
 msgid "Player info"
-msgstr ""
+msgstr "Уенчы турында мәгълүмат"
 
 #. I18N: In the network player dialog
 #: src/states_screens/dialogs/network_player_dialog.cpp:55
 #, c-format
 msgid "Player name: %s"
-msgstr ""
+msgstr "Уенчы исеме: %s"
 
 #. I18N: In the network player dialog, show the player location with
 #. country name (based on IP geolocation)
@@ -4868,7 +4868,7 @@ msgstr ""
 #. I18N: In the network player dialog
 #: src/states_screens/dialogs/network_player_dialog.cpp:124
 msgid "Change team"
-msgstr ""
+msgstr "Команданы үзгәртү"
 
 #. I18N: In the network player dialog
 #: src/states_screens/dialogs/network_player_dialog.cpp:139
@@ -4905,11 +4905,11 @@ msgstr ""
 msgid ""
 "Press any key...\n"
 "(Press ESC to cancel)"
-msgstr ""
+msgstr "Теләсә нинди төймәгә басыгыз...\n(Баш тарту өчен ESC басыгыз)"
 
 #: src/states_screens/dialogs/press_a_key_dialog.cpp:49
 msgid "Press any key..."
-msgstr ""
+msgstr "Теләсә нинди төймәгә басыгыз..."
 
 #: src/states_screens/dialogs/race_paused_dialog.cpp:117
 #: src/states_screens/online/networking_lobby.cpp:249
@@ -4919,7 +4919,7 @@ msgstr ""
 
 #: src/states_screens/dialogs/race_paused_dialog.cpp:132
 msgid "Back to Battle"
-msgstr ""
+msgstr "Сугышка кире кайту"
 
 #: src/states_screens/dialogs/race_paused_dialog.cpp:135
 msgid "Setup New Game"
@@ -4927,11 +4927,11 @@ msgstr "Яңа уен урнаштыру"
 
 #: src/states_screens/dialogs/race_paused_dialog.cpp:137
 msgid "Restart Battle"
-msgstr ""
+msgstr "Сугышны яңадан башлау"
 
 #: src/states_screens/dialogs/race_paused_dialog.cpp:139
 msgid "Exit Battle"
-msgstr ""
+msgstr "Сугыштан чыгу"
 
 #: src/states_screens/dialogs/race_paused_dialog.cpp:146
 #: src/states_screens/race_result_gui.cpp:350
@@ -5022,7 +5022,7 @@ msgstr "Ботлар саны: %i"
 #: src/states_screens/dialogs/server_configuration_dialog.cpp:158
 #: src/states_screens/online/create_server_screen.cpp:233
 msgid "Battle mode"
-msgstr ""
+msgstr "Сугыш төре"
 
 #. I18N: In the create server screen
 #: src/states_screens/dialogs/server_configuration_dialog.cpp:171
@@ -5052,7 +5052,7 @@ msgstr "Урын"
 #. the user name on server
 #: src/states_screens/dialogs/server_info_dialog.cpp:132
 msgid "Player"
-msgstr ""
+msgstr "Уенчы"
 
 #. I18N: Show above the player list in server info dialog, tell
 #. the scores of user calculated by player rankings
@@ -5069,7 +5069,7 @@ msgstr ""
 #: src/states_screens/dialogs/server_info_dialog.cpp:281
 #: src/states_screens/dialogs/server_info_dialog.cpp:296
 msgid "Remove from bookmarks"
-msgstr ""
+msgstr "Кыстыргычлардан бетерү"
 
 #: src/states_screens/dialogs/splitscreen_player_dialog.cpp:130
 msgid "Input device already exists."
@@ -5206,7 +5206,7 @@ msgstr ""
 #: src/states_screens/feature_unlocked.cpp:315
 #, c-format
 msgid "You unlocked %s!"
-msgstr ""
+msgstr "Сез %s ачтыгыз!"
 
 #: src/states_screens/feature_unlocked.cpp:645
 msgid "Challenge Completed"
@@ -5282,7 +5282,7 @@ msgstr "Сез Гран-Прины тәмамладыгыз!"
 #: src/states_screens/high_score_selection.cpp:144
 msgctxt "column_name"
 msgid "Number of karts"
-msgstr ""
+msgstr "Картлар саны"
 
 #: src/states_screens/high_score_selection.cpp:352
 msgid "Are you sure you want to remove this high score entry?"
@@ -5386,11 +5386,11 @@ msgstr ""
 #. to join the current started in-progress game
 #: src/states_screens/online/networking_lobby.cpp:203
 msgid "Spectate"
-msgstr ""
+msgstr "Күзәтү"
 
 #: src/states_screens/online/networking_lobby.cpp:204
 msgid "Install addon"
-msgstr ""
+msgstr "Кушымча урнаштыру"
 
 #. I18N: In the networking lobby, show when player is required to
 #. wait before the current game finish with remaining time,
@@ -5447,7 +5447,7 @@ msgstr[0] ""
 #: src/states_screens/online/networking_lobby.cpp:698
 #, c-format
 msgid "Connecting to server %s"
-msgstr ""
+msgstr "%s серверына тоташу"
 
 #: src/states_screens/online/networking_lobby.cpp:703
 msgid "Finding a quick play server"
@@ -5463,7 +5463,7 @@ msgstr ""
 #. I18N: Goals in achievement
 #: src/states_screens/online/online_profile_achievements.cpp:83
 msgid "Goals"
-msgstr ""
+msgstr "Максатлар"
 
 #: src/states_screens/online/online_profile_achievements.cpp:116
 #: src/states_screens/online/online_profile_achievements.cpp:315
@@ -5502,11 +5502,11 @@ msgstr "Челтәрдә түгел"
 
 #: src/states_screens/online/online_profile_settings.cpp:79
 msgid "Enter new E-mail below"
-msgstr ""
+msgstr "Түбәндә яңа эл. почта кертегез"
 
 #: src/states_screens/online/online_profile_settings.cpp:84
 msgid "New Email has to be between 5 and 254 characters long!"
-msgstr ""
+msgstr "Яңа эл. почта кимендә 5, ә иң күбе 254 билгедән торырга тиеш!"
 
 #: src/states_screens/online/online_profile_settings.cpp:93
 msgid "New Email is invalid!"
@@ -5519,7 +5519,7 @@ msgstr "Эл. почта үзгәрде!"
 #: src/states_screens/online/online_profile_settings.cpp:120
 #, c-format
 msgid "Failed to change E-mail: %s"
-msgstr ""
+msgstr "Эл. почтаны үзгәртә алмады: %s"
 
 #. I18N: Shown to players when he is not is not logged in
 #: src/states_screens/online/online_screen.cpp:201
@@ -5545,11 +5545,11 @@ msgstr "'%s' уенчысын ясап булмый."
 
 #: src/states_screens/online/register_screen.cpp:306
 msgid "User name cannot be empty."
-msgstr ""
+msgstr "Кулланучының исеме буш була алмый."
 
 #: src/states_screens/online/register_screen.cpp:362
 msgid "Online username and password must not be the same!"
-msgstr ""
+msgstr "Онлайн кулланучы исеме һәм серсүз бер үк булырга тиеш түгел!"
 
 #: src/states_screens/online/register_screen.cpp:366
 msgid "Emails don't match!"
@@ -5627,7 +5627,7 @@ msgstr ""
 
 #: src/states_screens/online/server_selection.cpp:504
 msgid "No server is available."
-msgstr ""
+msgstr "Бер сервер да юк."
 
 #: src/states_screens/online/server_selection.cpp:512
 msgid "Fetching servers"
@@ -5829,7 +5829,7 @@ msgstr "Төймәсар %i"
 
 #: src/states_screens/options/options_screen_input.cpp:170
 msgid "Touch Device"
-msgstr ""
+msgstr "Сизгер җиһаз"
 
 #. I18N: In the input configuration screen, help for touch device
 #: src/states_screens/options/options_screen_input.cpp:207
@@ -6024,13 +6024,13 @@ msgstr "Керү '%s'"
 
 #: src/states_screens/options/user_screen.cpp:659
 msgid "You can't delete the only player."
-msgstr ""
+msgstr "Сез бердәнбер уенчыны бетерә алмыйсыз."
 
 #. I18N: In the player info dialog (when deleting)
 #: src/states_screens/options/user_screen.cpp:667
 #, c-format
 msgid "Do you really want to delete player '%s'?"
-msgstr ""
+msgstr "Чыннан да '%s' уенчысын бетерергәме?"
 
 #. I18N: as in "ready, set, go", shown at the beginning of the race
 #: src/states_screens/race_gui_base.cpp:73
@@ -6057,12 +6057,12 @@ msgstr "ГОЛ!"
 #: src/states_screens/race_gui_base.cpp:82
 #: src/states_screens/race_result_gui.cpp:409
 msgid "Waiting for others"
-msgstr ""
+msgstr "Башкаларны көтү"
 
 #. I18N: Shown waiting for the server in network if live join or spectate
 #: src/states_screens/race_gui_base.cpp:84
 msgid "Waiting for the server"
-msgstr ""
+msgstr "Серверны көтү"
 
 #. I18N: string used to show the song title (e.g. "Sunny Song")
 #: src/states_screens/race_gui_base.cpp:646
@@ -6098,11 +6098,11 @@ msgstr "Ярыш уңышсыз тәмамланды"
 #. and press the podium (2, 1, 3 like) icon instead of fire button
 #: src/states_screens/race_gui_overworld.cpp:541
 msgid "Press podium icon to start tutorial"
-msgstr ""
+msgstr "Өйрәтүне башлау өчен, \"подиум тамгачыгы\"-на басыгыз"
 
 #: src/states_screens/race_gui_overworld.cpp:547
 msgid "Press fire to start the tutorial"
-msgstr ""
+msgstr "Өйрәтүне башлау өчен, \"ут\"-ка басыгыз"
 
 #. I18N: Shown when multitouch GUI exists
 #. and press the podium (2, 1, 3 like) icon instead of fire button
