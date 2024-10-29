@@ -658,12 +658,18 @@ bool KartProperties::operator<(const KartProperties &other) const
     PlayerProfile *p = PlayerManager::getCurrentPlayer();
     bool this_is_locked = p->isLocked(getIdent());
     bool other_is_locked = p->isLocked(other.getIdent());
-    if (this_is_locked == other_is_locked)
+    bool this_is_favorite = p->isFavoriteKart(getNonTranslatedName());
+    bool other_is_favorite = p->isFavoriteKart(other.getNonTranslatedName());
+
+    if (this_is_locked != other_is_locked)
     {
-        return getName() < other.getName();
-    }
-    else
         return other_is_locked;
+    }
+    else if (this_is_favorite != other_is_favorite)
+    {
+        return this_is_favorite;
+    }
+    else return getName() < other.getName();
 
     return true;
 }  // operator<

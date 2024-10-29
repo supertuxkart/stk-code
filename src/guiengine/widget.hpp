@@ -80,7 +80,11 @@ namespace GUIEngine
         /** A anchor badge to indicate that this player receives a handicap */
         ANCHOR_BADGE   = 256,
         /** A down arrow badge to indicate new addons for downloading */
-        DOWN_BADGE   = 512
+        DOWN_BADGE     = 512,
+        /** A heart badge, to indicate e.g. a favorite track */
+        HEART_BADGE    = 1024,
+        /** A red dot badge, to indicate there's something new inside */
+        REDDOT_BADGE   = 2048
     };
 
 
@@ -517,6 +521,10 @@ namespace GUIEngine
           * \pre Only call this method after the widget has been add()ed
           */
         int getID() const { return m_id; }
+
+        /** Get the name used for this widget in the GUI files or set in the code
+         * Use only for debugging. */
+        std::string getName() { return m_properties[PROP_ID]; }
 
         /** Get whether this object is allowed to receive focus */
         bool isFocusable() const { return m_focusable; }

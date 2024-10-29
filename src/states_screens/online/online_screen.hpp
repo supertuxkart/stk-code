@@ -19,20 +19,24 @@
 #define HEADER_ONLINE_SCREEN_HPP
 
 #include "guiengine/screen.hpp"
+#include "guiengine/widgets/list_widget.hpp"
 
 #include <memory>
+#include <unordered_map>
 
 class Server;
 class SocketAddress;
 
-namespace GUIEngine { class CheckBoxWidget; class ListWidget;
-                      class ButtonWidget; class IconButtonWidget; }
+namespace GUIEngine { class CheckBoxWidget; class ButtonWidget;
+                      class IconButtonWidget; class STKModifiedSpriteBank; }
 
 /**
   * \brief Handles the networking main menu
   * \ingroup states_screens
   */
-class OnlineScreen : public GUIEngine::Screen, public GUIEngine::ScreenSingleton<OnlineScreen>
+class OnlineScreen : public GUIEngine::Screen,
+                     public GUIEngine::ScreenSingleton<OnlineScreen>,
+                     public GUIEngine::IListWidgetHeaderListener
 {
 private:
     friend class GUIEngine::ScreenSingleton<OnlineScreen>;
@@ -49,10 +53,24 @@ private:
 
     GUIEngine::CheckBoxWidget* m_enable_splitscreen;
 
+    GUIEngine::ListWidget* m_news_list;
+
     std::shared_ptr<Server> m_entered_server;
 
     /** Save the previous successfully connected server name. */
     core::stringw m_entered_server_name;
+
+    /** Icon for unread news. */
+    int              m_icon_red_dot;
+    /** Icon for headline news. */
+    int              m_icon_news_headline;
+    /** Icon for normal news. */
+    int              m_icon_news;
+
+    irr::gui::STKModifiedSpriteBank
+                    *m_icon_bank;
+
+    std::unordered_map<std::string, std::string> m_news_links;
 
     OnlineScreen();
 
@@ -62,6 +80,8 @@ public:
 
     /** \brief implement callback from parent class GUIEngine::Screen */
     virtual void loadedFromFile() OVERRIDE;
+
+    virtual void unloaded() OVERRIDE;
     
     /** \brief implement callback from parent class GUIEngine::Screen */
     virtual void beforeAddingWidget() OVERRIDE;
@@ -72,6 +92,10 @@ public:
 
     /** \brief implement callback from parent class GUIEngine::Screen */
     virtual void init() OVERRIDE;
+
+    void loadList();
+
+    virtual void onColumnClicked(int column_id, bool sort_desc, bool sort_default) OVERRIDE;
 
     /** \brief implement callback from parent class GUIEngine::Screen */
     virtual bool onEscapePressed() OVERRIDE;

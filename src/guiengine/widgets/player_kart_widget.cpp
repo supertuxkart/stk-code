@@ -238,7 +238,11 @@ PlayerKartWidget::PlayerKartWidget(KartSelectionScreen* parent,
     m_model_view->setRotateContinuously( 35.0f );
 
     // ---- Kart name label
-    m_kart_name = new LabelWidget(LabelWidget::NORMAL);
+    m_kart_name = new LabelWidget(
+        m_parent_screen->m_multiplayer ?
+        LabelWidget::TINY_TITLE:
+        LabelWidget::SMALL_TITLE);
+    
     m_kart_name->setText(props->getName(), false);
     m_kart_name->m_properties[PROP_TEXT_ALIGN] = "center";
     m_kart_name->m_properties[PROP_ID] =

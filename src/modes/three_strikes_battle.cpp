@@ -539,6 +539,30 @@ void ThreeStrikesBattle::getKartsDisplayInfo(
 }   // getKartsDisplayInfo
 
 //-----------------------------------------------------------------------------
+std::pair<int, video::SColor> ThreeStrikesBattle::getSpeedometerDigit(
+                                                const AbstractKart *kart) const
+{
+    video::SColor color = video::SColor(255, 255, 255, 255);
+    int id = kart->getWorldKartId();
+    switch(m_kart_info[id].m_lives)
+    {
+        case 3:
+            color = video::SColor(255, 0, 255, 0);
+            break;
+        case 2:
+            color = video::SColor(255, 255, 229, 0);
+            break;
+        case 1:
+            color = video::SColor(255, 255, 0, 0);
+            break;
+        case 0:
+            color = video::SColor(255, 128, 128, 128);
+            break;
+    }
+    return std::make_pair(m_kart_info[id].m_lives, color);
+}   // getSpeedometerDigit
+
+//-----------------------------------------------------------------------------
 void ThreeStrikesBattle::enterRaceOverState()
 {
     WorldWithRank::enterRaceOverState();

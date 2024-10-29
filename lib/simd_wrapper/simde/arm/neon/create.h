@@ -23,11 +23,8 @@
  * Copyright:
  *   2020      Evan Nemerson <evan@nemerson.com>
  *   2020      Christopher Moore <moore@free.fr>
+ *   2023      Yi-Yen Chung <eric681@andestech.com> (Copyright owned by Andes Technology)
  */
-
-/* N.B. CM: vcreate_f16 and vcreate_bf16 are omitted as
- * SIMDe has no 16-bit floating point support.
- * Idem for the poly types. */
 
 #if !defined(SIMDE_ARM_NEON_CREATE_H)
 #define SIMDE_ARM_NEON_CREATE_H
@@ -153,6 +150,20 @@ simde_vcreate_u64(uint64_t a) {
 #endif
 
 SIMDE_FUNCTION_ATTRIBUTES
+simde_float16x4_t
+simde_vcreate_f16(uint64_t a) {
+  #if defined(SIMDE_ARM_NEON_A32V7_NATIVE) && defined(SIMDE_ARM_NEON_FP16)
+    return vcreate_f16(a);
+  #else
+    return simde_vreinterpret_f16_u64(simde_vdup_n_u64(a));
+  #endif
+}
+#if defined(SIMDE_ARM_NEON_A32V7_ENABLE_NATIVE_ALIASES)
+  #undef vcreate_f16
+  #define vcreate_f16(a) simde_vcreate_f16(a)
+#endif
+
+SIMDE_FUNCTION_ATTRIBUTES
 simde_float32x2_t
 simde_vcreate_f32(uint64_t a) {
   #if defined(SIMDE_ARM_NEON_A32V7_NATIVE)
@@ -178,6 +189,62 @@ simde_vcreate_f64(uint64_t a) {
 #if defined(SIMDE_ARM_NEON_A32V7_ENABLE_NATIVE_ALIASES)
   #undef vcreate_f64
   #define vcreate_f64(a) simde_vcreate_f64(a)
+#endif
+
+SIMDE_FUNCTION_ATTRIBUTES
+simde_poly8x8_t
+simde_vcreate_p8(simde_poly64_t a) {
+  #if defined(SIMDE_ARM_NEON_A32V7_NATIVE)
+    return vcreate_p8(a);
+  #else
+    return simde_vreinterpret_p8_p64(simde_vdup_n_p64(a));
+  #endif
+}
+#if defined(SIMDE_ARM_NEON_A32V7_ENABLE_NATIVE_ALIASES)
+  #undef vcreate_p8
+  #define vcreate_p8(a) simde_vcreate_p8(a)
+#endif
+
+SIMDE_FUNCTION_ATTRIBUTES
+simde_poly16x4_t
+simde_vcreate_p16(simde_poly64_t a) {
+  #if defined(SIMDE_ARM_NEON_A32V7_NATIVE)
+    return vcreate_p16(a);
+  #else
+    return simde_vreinterpret_p16_p64(simde_vdup_n_p64(a));
+  #endif
+}
+#if defined(SIMDE_ARM_NEON_A32V7_ENABLE_NATIVE_ALIASES)
+  #undef vcreate_p16
+  #define vcreate_p16(a) simde_vcreate_p16(a)
+#endif
+
+SIMDE_FUNCTION_ATTRIBUTES
+simde_poly64x1_t
+simde_vcreate_p64(simde_poly64_t a) {
+  #if defined(SIMDE_ARM_NEON_A32V8_NATIVE)
+    return vcreate_p64(a);
+  #else
+    return simde_vdup_n_p64(a);
+  #endif
+}
+#if defined(SIMDE_ARM_NEON_A32V8_ENABLE_NATIVE_ALIASES)
+  #undef vcreate_p64
+  #define vcreate_p64(a) simde_vcreate_p64(a)
+#endif
+
+SIMDE_FUNCTION_ATTRIBUTES
+simde_bfloat16x4_t
+simde_vcreate_bf16(uint64_t a) {
+  #if defined(SIMDE_ARM_NEON_A32V8_NATIVE) && defined(SIMDE_ARM_NEON_BF16)
+    return vcreate_bf16(a);
+  #else
+    return simde_vreinterpret_bf16_u64(simde_vdup_n_u64(a));
+  #endif
+}
+#if defined(SIMDE_ARM_NEON_A32V8_ENABLE_NATIVE_ALIASES)
+  #undef vcreate_bf16
+  #define vcreate_bf16(a) simde_vcreate_bf16(a)
 #endif
 
 SIMDE_END_DECLS_

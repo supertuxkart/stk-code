@@ -23,6 +23,7 @@
  * Copyright:
  *   2020      Evan Nemerson <evan@nemerson.com>
  *   2020      Sean Maher <seanptmaher@gmail.com> (Copyright owned by Google, LLC)
+ *   2023      Yi-Yen Chung <eric681@andestech.com> (Copyright owned by Andes Technology)
  */
 
 /* Implementation notes (seanptmaher):
@@ -67,8 +68,8 @@ simde_vqdmulls_s32(int32_t a, int32_t b) {
   #endif
 }
 #if defined(SIMDE_ARM_NEON_A32V7_ENABLE_NATIVE_ALIASES)
-  #undef vqdmulls_s16
-  #define vqdmulls_s16(a, b) simde_vqdmulls_s16((a), (b))
+  #undef vqdmulls_s32
+  #define vqdmulls_s32(a, b) simde_vqdmulls_s32((a), (b))
 #endif
 
 SIMDE_FUNCTION_ATTRIBUTES

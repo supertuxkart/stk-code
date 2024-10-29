@@ -284,8 +284,8 @@ simde_mm_scalef_ss (simde__m128 a, simde__m128 b) {
 SIMDE_FUNCTION_ATTRIBUTES
 simde__m128
 simde_mm_mask_scalef_ss (simde__m128 src, simde__mmask8 k, simde__m128 a, simde__m128 b) {
-  #if defined(SIMDE_X86_AVX512F_NATIVE) && !defined(SIMDE_BUG_GCC_95483)
-    return _mm_mask_scalef_ss(src, k, a, b);
+  #if defined(SIMDE_X86_AVX512F_NATIVE) && !defined(HEDLEY_GCC_VERSION)
+    return _mm_mask_scalef_round_ss(src, k, a, b, _MM_FROUND_CUR_DIRECTION);
   #else
     simde__m128_private
       src_ = simde__m128_to_private(src),
@@ -305,7 +305,7 @@ simde_mm_mask_scalef_ss (simde__m128 src, simde__mmask8 k, simde__m128 a, simde_
 SIMDE_FUNCTION_ATTRIBUTES
 simde__m128
 simde_mm_maskz_scalef_ss (simde__mmask8 k, simde__m128 a, simde__m128 b) {
-  #if defined(SIMDE_X86_AVX512F_NATIVE) && !defined(SIMDE_BUG_GCC_95483)
+  #if defined(SIMDE_X86_AVX512F_NATIVE) && !defined(SIMDE_BUG_GCC_95483) && !defined(SIMDE_BUG_GCC_105339)
     return _mm_maskz_scalef_ss(k, a, b);
   #else
     simde__m128_private
@@ -345,7 +345,7 @@ simde_mm_scalef_sd (simde__m128d a, simde__m128d b) {
 SIMDE_FUNCTION_ATTRIBUTES
 simde__m128d
 simde_mm_mask_scalef_sd (simde__m128d src, simde__mmask8 k, simde__m128d a, simde__m128d b) {
-  #if defined(SIMDE_X86_AVX512F_NATIVE) && !defined(SIMDE_BUG_GCC_95483)
+  #if defined(SIMDE_X86_AVX512F_NATIVE) && !defined(SIMDE_BUG_GCC_95483) && !defined(SIMDE_BUG_GCC_105339)
     return _mm_mask_scalef_sd(src, k, a, b);
   #else
     simde__m128d_private
@@ -366,7 +366,7 @@ simde_mm_mask_scalef_sd (simde__m128d src, simde__mmask8 k, simde__m128d a, simd
 SIMDE_FUNCTION_ATTRIBUTES
 simde__m128d
 simde_mm_maskz_scalef_sd (simde__mmask8 k, simde__m128d a, simde__m128d b) {
-  #if defined(SIMDE_X86_AVX512F_NATIVE) && !defined(SIMDE_BUG_GCC_95483)
+  #if defined(SIMDE_X86_AVX512F_NATIVE) && !defined(SIMDE_BUG_GCC_95483) && !defined(SIMDE_BUG_GCC_105339)
     return _mm_maskz_scalef_sd(k, a, b);
   #else
     simde__m128d_private

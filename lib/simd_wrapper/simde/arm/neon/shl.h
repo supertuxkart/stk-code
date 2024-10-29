@@ -29,6 +29,7 @@
 #define SIMDE_ARM_NEON_SHL_H
 
 #include "types.h"
+#include "../../x86/avx.h"
 
 /* Notes from the implementer (Christopher Moore aka rosbif)
  *
@@ -99,7 +100,7 @@ SIMDE_FUNCTION_ATTRIBUTES
 uint64_t
 simde_vshld_u64 (const uint64_t a, const int64_t b) {
   #if defined(SIMDE_ARM_NEON_A64V8_NATIVE)
-    return vshld_u64(a, HEDLEY_STATIC_CAST(uint64_t, b));
+    return vshld_u64(a, HEDLEY_STATIC_CAST(int64_t, b));
   #else
     int8_t b_ = HEDLEY_STATIC_CAST(int8_t, b);
     return
@@ -140,7 +141,7 @@ simde_vshl_s8 (const simde_int8x8_t a, const simde_int8x8_t b) {
                                         _mm256_srav_epi32(a256, _mm256_abs_epi32(b256)),
                                         _mm256_cmpgt_epi32(_mm256_setzero_si256(), b256));
       r256 = _mm256_shuffle_epi8(r256, _mm256_set1_epi32(0x0C080400));
-      r_.m64 = _mm_set_pi32(_mm256_extract_epi32(r256, 4), _mm256_extract_epi32(r256, 0));
+      r_.m64 = _mm_set_pi32(simde_mm256_extract_epi32(r256, 4), simde_mm256_extract_epi32(r256, 0));
     #else
       SIMDE_VECTORIZE
       for (size_t i = 0 ; i < (sizeof(r_.values) / sizeof(r_.values[0])) ; i++) {
@@ -305,7 +306,7 @@ simde_vshl_u8 (const simde_uint8x8_t a, const simde_int8x8_t b) {
                                         _mm256_srlv_epi32(a256, _mm256_abs_epi32(b256)),
                                         _mm256_cmpgt_epi32(_mm256_setzero_si256(), b256));
       r256 = _mm256_shuffle_epi8(r256, _mm256_set1_epi32(0x0C080400));
-      r_.m64 = _mm_set_pi32(_mm256_extract_epi32(r256, 4), _mm256_extract_epi32(r256, 0));
+      r_.m64 = _mm_set_pi32(simde_mm256_extract_epi32(r256, 4), simde_mm256_extract_epi32(r256, 0));
     #else
       SIMDE_VECTORIZE
       for (size_t i = 0 ; i < (sizeof(r_.values) / sizeof(r_.values[0])) ; i++) {
@@ -533,7 +534,7 @@ simde_vshlq_s16 (const simde_int16x8_t a, const simde_int16x8_t b) {
                                         _mm256_srav_epi32(a256, _mm256_abs_epi32(b256)),
                                         _mm256_cmpgt_epi32(_mm256_setzero_si256(), b256));
       r256 = _mm256_shuffle_epi8(r256, _mm256_set1_epi64x(0x0D0C090805040100));
-      r_.m128i = _mm_set_epi64x(_mm256_extract_epi64(r256, 2), _mm256_extract_epi64(r256, 0));
+      r_.m128i = _mm_set_epi64x(simde_mm256_extract_epi64(r256, 2), simde_mm256_extract_epi64(r256, 0));
     #else
       SIMDE_VECTORIZE
       for (size_t i = 0 ; i < (sizeof(r_.values) / sizeof(r_.values[0])) ; i++) {
@@ -743,7 +744,7 @@ simde_vshlq_u16 (const simde_uint16x8_t a, const simde_int16x8_t b) {
                                         _mm256_srlv_epi32(a256, _mm256_abs_epi32(b256)),
                                         _mm256_cmpgt_epi32(_mm256_setzero_si256(), b256));
       r256 = _mm256_shuffle_epi8(r256, _mm256_set1_epi64x(0x0D0C090805040100));
-      r_.m128i = _mm_set_epi64x(_mm256_extract_epi64(r256, 2), _mm256_extract_epi64(r256, 0));
+      r_.m128i = _mm_set_epi64x(simde_mm256_extract_epi64(r256, 2), simde_mm256_extract_epi64(r256, 0));
     #else
       SIMDE_VECTORIZE
       for (size_t i = 0 ; i < (sizeof(r_.values) / sizeof(r_.values[0])) ; i++) {

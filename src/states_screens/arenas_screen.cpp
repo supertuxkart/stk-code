@@ -20,6 +20,7 @@
 #include "config/user_config.hpp"
 #include "graphics/irr_driver.hpp"
 #include "guiengine/widget.hpp"
+#include "guiengine/widgets/check_box_widget.hpp"
 #include "guiengine/widgets/dynamic_ribbon_widget.hpp"
 #include "guiengine/widgets/icon_button_widget.hpp"
 #include "io/file_manager.hpp"
@@ -57,6 +58,12 @@ void ArenasScreen::loadedFromFile()
 
 void ArenasScreen::beforeAddingWidget()
 {
+    // Add user-defined group to track groups
+    track_manager->setFavoriteTrackStatus(PlayerManager::getCurrentPlayer()->getFavoriteTrackStatus());
+
+    CheckBoxWidget* favorite_cb = getWidget<CheckBoxWidget>("favorite");
+    assert( favorite_cb != NULL );
+    favorite_cb->setState(false);
 
     // Dynamically add tabs
     RibbonWidget* tabs = this->getWidget<RibbonWidget>("trackgroups");
@@ -78,6 +85,8 @@ void ArenasScreen::beforeAddingWidget()
 #define FOR_GETTEXT_ONLY(x)
     //I18N: track group name
     FOR_GETTEXT_ONLY( _("All") )
+    //I18N: track group name
+    FOR_GETTEXT_ONLY( _("Favorites") )
     //I18N: track group name
     FOR_GETTEXT_ONLY( _("Standard") )
     //I18N: track group name
@@ -124,8 +133,13 @@ void ArenasScreen::beforeAddingWidget()
 
 void ArenasScreen::init()
 {
-    m_unsupported_arena.clear();
+    m_random_arena_list.clear();
     Screen::init();
+
+    m_search_box = getWidget<TextBoxWidget>("search");
+    m_search_box->clearListeners();
+    m_search_box->addListener(this);
+
     buildTrackList();
     DynamicRibbonWidget* w = this->getWidget<DynamicRibbonWidget>("tracks");
     // select something by default for the game master
@@ -142,72 +156,48 @@ void ArenasScreen::eventCallback(Widget* widget, const std::string& name, const 
         DynamicRibbonWidget* w2 = dynamic_cast<DynamicRibbonWidget*>(widget);
         if (w2 == NULL) return;
 
-        const std::string selection = w2->getSelectionIDString(PLAYER_ID_GAME_MASTER);
+        std::string selection = w2->getSelectionIDString(PLAYER_ID_GAME_MASTER);
         if (UserConfigParams::logGUI())
             Log::info("ArenasScreen", "Clicked on arena %s", selection.c_str());
 
 
         if (selection == "random_track")
         {
-            RibbonWidget* tabs = this->getWidget<RibbonWidget>("trackgroups");
-            assert( tabs != NULL );
+            if (m_random_arena_list.empty()) return;
 
-            bool soccer_mode = RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_SOCCER;
-
-            std::vector<int> curr_group;
-            if (tabs->getSelectionIDString(PLAYER_ID_GAME_MASTER) == ALL_ARENA_GROUPS_ID)
-            {
-                const std::vector<std::string>& groups = track_manager->getAllArenaGroups();
-                for (unsigned int i = 0; i < groups.size(); i++)
-                {
-                    const std::vector<int>& tmp_group = track_manager->getArenasInGroup(groups[i], soccer_mode);
-                    // Append to our main vector
-                    curr_group.insert(curr_group.end(), tmp_group.begin(), tmp_group.end());
-                }
-            } // if on tab "all"
-            else
-            {
-                curr_group = track_manager->getArenasInGroup(
-                        tabs->getSelectionIDString(PLAYER_ID_GAME_MASTER), soccer_mode );
-            }
-            // Remove unsupported arena
-            if (m_unsupported_arena.size() > 0)
-            {
-                for (std::set<int>::iterator it = m_unsupported_arena.begin();
-                    it != m_unsupported_arena.end(); ++it)
-                {
-                    curr_group.erase(std::remove(curr_group.begin(),
-                        curr_group.end(), *it), curr_group.end());
-                }
-            }
-
-            RandomGenerator random;
-            const int randomID = random.get((int)curr_group.size());
-
-            Track* clicked_track = track_manager->getTrack( curr_group[randomID] );
-            if (clicked_track != NULL)
-            {
-                TrackInfoScreen::getInstance()->setTrack(clicked_track);
-                TrackInfoScreen::getInstance()->push();
-            }
-
+            selection = m_random_arena_list.front();
+            m_random_arena_list.pop_front();
+            m_random_arena_list.push_back(selection);
         }
         else if (selection == "locked")
         {
             unlock_manager->playLockSound();
+            return;
         }
         else if (selection == RibbonWidget::NO_ITEM_ID)
         {
+            return;
         }
-        else
+        
+        Track* clicked_track = track_manager->getTrack(selection);
+        if (clicked_track)
         {
-            Track* clicked_track = track_manager->getTrack(selection);
-            if (clicked_track != NULL)
+            // In favorite edit mode, switch the status of the selected track
+            if (getWidget<CheckBoxWidget>("favorite")->getState())
+            {
+                if(PlayerManager::getCurrentPlayer()->isFavoriteTrack(clicked_track->getIdent()))
+                    PlayerManager::getCurrentPlayer()->removeFavoriteTrack(clicked_track->getIdent());
+                else
+                    PlayerManager::getCurrentPlayer()->addFavoriteTrack(clicked_track->getIdent());
+
+                buildTrackList();
+            }
+            else
             {
                 TrackInfoScreen::getInstance()->setTrack(clicked_track);
                 TrackInfoScreen::getInstance()->push();
-            }   // clickedTrack !=  NULL
-        }   // if random_track
+            }
+        }   // clickedTrack !=  NULL
 
     }
     else if (name == "trackgroups")
@@ -225,6 +215,9 @@ void ArenasScreen::eventCallback(Widget* widget, const std::string& name, const 
 
 void ArenasScreen::buildTrackList()
 {
+    // Add user-defined group to track groups
+    track_manager->setFavoriteTrackStatus(PlayerManager::getCurrentPlayer()->getFavoriteTrackStatus());
+
     DynamicRibbonWidget* w = this->getWidget<DynamicRibbonWidget>("tracks");
     assert( w != NULL );
 
@@ -237,6 +230,9 @@ void ArenasScreen::buildTrackList()
 
     bool soccer_mode = RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_SOCCER;
     bool arenas_have_navmesh = false;
+    PtrVector<Track, REF> tracks;
+
+    m_random_arena_list.clear();
 
     if (curr_group_name == ALL_ARENA_GROUPS_ID)
     {
@@ -245,6 +241,13 @@ void ArenasScreen::buildTrackList()
         for (int n=0; n<track_amount; n++)
         {
             Track* curr = track_manager->getTrack(n);
+            
+            core::stringw search_text = m_search_box->getText();
+            search_text.make_lower();
+            if (!search_text.empty() &&
+                curr->getName().make_lower().find(search_text.c_str()) == -1)
+                continue;
+            
             if (soccer_mode)
             {
                 if(curr->isSoccer() && curr->hasNavMesh() && !arenas_have_navmesh)
@@ -255,8 +258,6 @@ void ArenasScreen::buildTrackList()
                   RaceManager::get()->getNumLocalPlayers() > 1 ||
                   UserConfigParams::m_artist_debug_mode)))
                 {
-                    if (curr->isSoccer())
-                        m_unsupported_arena.insert(n);
                     continue;
                 }
             }
@@ -270,24 +271,11 @@ void ArenasScreen::buildTrackList()
                   RaceManager::get()->getNumLocalPlayers() > 1 ||
                   UserConfigParams::m_artist_debug_mode)))
                 {
-                    if (curr->isArena())
-                        m_unsupported_arena.insert(n);
                     continue;
                 }
             }
-
-            if (PlayerManager::getCurrentPlayer()->isLocked(curr->getIdent()))
-            {
-                w->addItem( _("Locked : solve active challenges to gain access to more!"),
-                           "locked", curr->getScreenshotFile(), LOCKED_BADGE );
-            }
-            else
-            {
-                w->addItem(curr->getName(), curr->getIdent(), curr->getScreenshotFile(), 0,
-                           IconButtonWidget::ICON_PATH_TYPE_ABSOLUTE );
-            }
+            tracks.push_back(curr);
         }
-
     }
     else
     {
@@ -297,6 +285,13 @@ void ArenasScreen::buildTrackList()
         for (int n=0; n<track_amount; n++)
         {
             Track* curr = track_manager->getTrack(currArenas[n]);
+
+            core::stringw search_text = m_search_box->getText();
+            search_text.make_lower();
+            if (!search_text.empty() &&
+                curr->getName().make_lower().find(search_text.c_str()) == -1)
+                continue;
+            
             if (soccer_mode)
             {
                 if(curr->isSoccer() && curr->hasNavMesh() && !arenas_have_navmesh)
@@ -307,8 +302,6 @@ void ArenasScreen::buildTrackList()
                   RaceManager::get()->getNumLocalPlayers() > 1 ||
                   UserConfigParams::m_artist_debug_mode)))
                 {
-                    if (curr->isSoccer())
-                        m_unsupported_arena.insert(currArenas[n]);
                     continue;
                 }
             }
@@ -322,33 +315,43 @@ void ArenasScreen::buildTrackList()
                   RaceManager::get()->getNumLocalPlayers() > 1 ||
                   UserConfigParams::m_artist_debug_mode)))
                 {
-                    if (curr->isArena())
-                        m_unsupported_arena.insert(currArenas[n]);
                     continue;
                 }
             }
-
-            if (PlayerManager::getCurrentPlayer()->isLocked(curr->getIdent()))
-            {
-                w->addItem( _("Locked : solve active challenges to gain access to more!"),
-                           "locked", curr->getScreenshotFile(), LOCKED_BADGE );
-            }
-            else
-            {
-                w->addItem(curr->getName(), curr->getIdent(), curr->getScreenshotFile(), 0,
-                           IconButtonWidget::ICON_PATH_TYPE_ABSOLUTE );
-            }
+            tracks.push_back(curr);
         }
     }
+    tracks.insertionSort();
+
+    for (unsigned int i = 0; i < tracks.size(); i++)
+    {
+        Track *curr = tracks.get(i);
+        if (PlayerManager::getCurrentPlayer()->isLocked(curr->getIdent()))
+        {
+            w->addItem( _("Locked : solve active challenges to gain access to more!"),
+                        "locked", curr->getScreenshotFile(), LOCKED_BADGE );
+        }
+        else if (PlayerManager::getCurrentPlayer()->isFavoriteTrack(curr->getIdent()))
+        {
+            w->addItem(curr->getName(), curr->getIdent(),
+                curr->getScreenshotFile(), HEART_BADGE,
+                IconButtonWidget::ICON_PATH_TYPE_ABSOLUTE);
+            m_random_arena_list.push_back(curr->getIdent());
+        }
+        else
+        {
+            w->addItem(curr->getName(), curr->getIdent(), curr->getScreenshotFile(), 0,
+                        IconButtonWidget::ICON_PATH_TYPE_ABSOLUTE );
+            m_random_arena_list.push_back(curr->getIdent());
+        }
+    }
+
     if (arenas_have_navmesh || RaceManager::get()->getNumLocalPlayers() > 1 ||
         UserConfigParams::m_artist_debug_mode)
         w->addItem(_("Random Arena"), "random_track", "/gui/icons/track_random.png");
     w->updateItemDisplay();
 
-    if (m_unsupported_arena.size() > 0)
-        w->setText( _P("%d arena unavailable in single player.",
-                       "%d arenas unavailable in single player.",
-                       (int)m_unsupported_arena.size()) );
+    std::random_shuffle( m_random_arena_list.begin(), m_random_arena_list.end() );
 }
 
 // ------------------------------------------------------------------------------------------------------

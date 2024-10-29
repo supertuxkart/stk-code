@@ -52,6 +52,7 @@ std::vector<std::string> KartPropertiesManager::m_kart_search_path;
 /** Constructor, only clears internal data structures. */
 KartPropertiesManager::KartPropertiesManager()
 {
+    m_current_favorite_status = NULL;
     m_all_groups.clear();
 }   // KartPropertiesManager
 
@@ -89,6 +90,7 @@ void KartPropertiesManager::unloadAllKarts()
     m_selected_karts.clear();
     m_kart_available.clear();
     m_groups_2_indices.clear();
+    m_groups_2_indices_no_custom.clear();
     m_all_groups.clear();
 }   // unloadAllKarts
 
@@ -108,11 +110,34 @@ void KartPropertiesManager::removeKart(const std::string &ident)
     // Remove the just removed kart from the 'group-name to kart property
     // index' mapping. If a group is now empty (i.e. the removed kart was
     // the only member of this group), remove the group
-    const std::vector<std::string> &groups = kp->getGroups();
+    std::vector<std::string> groups = kp->getGroups();
+    if (m_current_favorite_status)
+    {
+        for (auto it = m_current_favorite_status->getAllFavorites().begin();
+                it != m_current_favorite_status->getAllFavorites().end(); it++)
+        { // User-defined groups
+            if (it->second.find(kp->getNonTranslatedName()) != it->second.end())
+            {
+                groups.push_back(it->first);
+            }
+        }
+    }
 
     for (unsigned int i=0; i<groups.size(); i++)
     {
         std::vector<int> ::iterator it;
+        it = std::find(m_groups_2_indices_no_custom[groups[i]].begin(),
+                       m_groups_2_indices_no_custom[groups[i]].end(),   index);
+        // Handle no custom group first
+        assert(it!=m_groups_2_indices_no_custom[groups[i]].end());
+
+        m_groups_2_indices_no_custom[groups[i]].erase(it);
+
+        if(m_groups_2_indices_no_custom[groups[i]].size()==0)
+        {
+            m_groups_2_indices_no_custom.erase(groups[i]);
+        } 
+
         it = std::find(m_groups_2_indices[groups[i]].begin(),
                        m_groups_2_indices[groups[i]].end(),   index);
         // Since we are iterating over all groups the kart belongs to,
@@ -138,6 +163,15 @@ void KartPropertiesManager::removeKart(const std::string &ident)
     // kart property index' mapping: all kart properties with an index
     // greater than index were moved one position further to the beginning
     std::map<std::string, std::vector<int> >::iterator it_gr;
+    for(it_gr=m_groups_2_indices_no_custom.begin(); it_gr != m_groups_2_indices_no_custom.end();
+        it_gr++)
+    {
+        for(unsigned int i=0; i<(*it_gr).second.size(); i++)
+        {
+            if( (*it_gr).second[i]>index)
+                (*it_gr).second[i]--;
+        }
+    }
     for(it_gr=m_groups_2_indices.begin(); it_gr != m_groups_2_indices.end();
         it_gr++)
     {
@@ -281,7 +315,20 @@ bool KartPropertiesManager::loadKart(const std::string &dir)
 
     m_karts_properties.push_back(kart_properties);
     m_kart_available.push_back(true);
-    const std::vector<std::string>& groups=kart_properties->getGroups();
+
+    std::vector<std::string> groups=kart_properties->getGroups();
+    if (m_current_favorite_status)
+    {
+        for (auto it = m_current_favorite_status->getAllFavorites().begin();
+                it != m_current_favorite_status->getAllFavorites().end(); it++)
+        { // User-defined groups
+            if (it->second.find(kart_properties->getNonTranslatedName()) != it->second.end())
+            {
+                groups.push_back(it->first);
+            }
+        }
+    }
+
     for(unsigned int g=0; g<groups.size(); g++)
     {
         if(m_groups_2_indices.find(groups[g])==m_groups_2_indices.end())
@@ -289,6 +336,7 @@ bool KartPropertiesManager::loadKart(const std::string &dir)
             m_all_groups.push_back(groups[g]);
         }
         m_groups_2_indices[groups[g]].push_back(m_karts_properties.size()-1);
+        m_groups_2_indices_no_custom[groups[g]].push_back(m_karts_properties.size()-1);
     }
     m_all_kart_dirs.push_back(dir);
     return true;
@@ -453,6 +501,56 @@ bool KartPropertiesManager::testAndSetKart(int kartid)
     m_selected_karts.push_back(kartid);
     return true;
 }   // kartAvailable
+
+//-----------------------------------------------------------------------------
+void KartPropertiesManager::setFavoriteKartStatus(FavoriteStatus *status)
+{
+    m_groups_2_indices = m_groups_2_indices_no_custom;
+
+    m_current_favorite_status = status;
+
+    if (status)
+    {
+        // Add all user-defined groups
+        for (auto it = status->getAllFavorites().begin(); it != status->getAllFavorites().end(); it++)
+        {
+            for (auto it_name = it->second.begin(); it_name != it->second.end(); it_name++)
+            {
+                for (unsigned int i=0; i<m_karts_properties.size(); i++)
+                {
+                    if (m_karts_properties[i].getNonTranslatedName() == *it_name)
+                    {
+                        m_groups_2_indices[it->first].push_back(i);
+                        break;
+                    }
+                }
+            }
+        }
+    }
+    
+    std::map<std::string, std::vector<int> > &g2i = m_groups_2_indices;
+    std::vector<std::string> &gn = m_all_groups;
+    gn.clear();
+
+    for (auto it = g2i.begin(); it != g2i.end(); it++)
+    {
+        std::sort(it->second.begin(), it->second.end());
+        auto unique_end = std::unique(it->second.begin(), it->second.end());
+        it->second.erase(unique_end, it->second.end());
+        gn.push_back(it->first);
+    }
+    // Make sure the order of groups are correct
+    std::sort(gn.begin(), gn.end(), [&, g2i](std::string &a, std::string &b)->bool{
+        int x = g2i.find(a)->second[0], y = g2i.find(b)->second[0];
+        return x == y ? a < b : x < y;
+    });
+}   // addFavorite
+
+//-----------------------------------------------------------------------------
+void KartPropertiesManager::clearFavoriteKartStatus()
+{
+    setFavoriteKartStatus(NULL);
+}   // addFavorite
 
 //-----------------------------------------------------------------------------
 /** Returns true if a kart is available to be selected. A kart is available to

@@ -172,6 +172,8 @@ simde_mm_cmpgt_epi64 (simde__m128i a, simde__m128i b) {
       r_.neon_i64 = vshrq_n_s64(vqsubq_s64(b_.neon_i64, a_.neon_i64), 63);
     #elif defined(SIMDE_POWER_ALTIVEC_P8_NATIVE)
       r_.altivec_u64 = HEDLEY_REINTERPRET_CAST(SIMDE_POWER_ALTIVEC_VECTOR(unsigned long long), vec_cmpgt(a_.altivec_i64, b_.altivec_i64));
+    #elif defined(SIMDE_WASM_SIMD128_NATIVE)
+      r_.wasm_v128 = wasm_i64x2_gt(a_.wasm_v128, b_.wasm_v128);
     #elif defined(SIMDE_VECTOR_SUBSCRIPT_OPS)
       r_.i64 = HEDLEY_REINTERPRET_CAST(__typeof__(r_.i64), a_.i64 > b_.i64);
     #else

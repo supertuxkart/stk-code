@@ -23,6 +23,7 @@
  * Copyright:
  *   2020      Evan Nemerson <evan@nemerson.com>
  *   2020      Christopher Moore <moore@free.fr>
+ *   2023      Yi-Yen Chung <eric681@andestech.com> (Copyright owned by Andes Technology)
  */
 
 #if !defined(SIMDE_ARM_NEON_TBX_H)
@@ -245,6 +246,74 @@ simde_vtbx4_s8(simde_int8x8_t a, simde_int8x8x4_t b, simde_int8x8_t c) {
 #if defined(SIMDE_ARM_NEON_A32V7_ENABLE_NATIVE_ALIASES)
   #undef vtbx4_s8
   #define vtbx4_s8(a, b, c) simde_vtbx4_s8((a), (b), (c))
+#endif
+
+SIMDE_FUNCTION_ATTRIBUTES
+simde_poly8x8_t
+simde_vtbx1_p8(simde_poly8x8_t a, simde_poly8x8_t b, simde_uint8x8_t c) {
+  #if defined(SIMDE_ARM_NEON_A32V7_NATIVE)
+    return vtbx1_p8(a, b, c);
+  #else
+    return simde_vreinterpret_p8_u8(simde_vtbx1_u8(simde_vreinterpret_u8_p8(a), simde_vreinterpret_u8_p8(b), c));
+  #endif
+}
+#if defined(SIMDE_ARM_NEON_A32V7_ENABLE_NATIVE_ALIASES)
+  #undef vtbx1_p8
+  #define vtbx1_p8(a, b, c) simde_vtbx1_p8((a), (b), (c))
+#endif
+
+SIMDE_FUNCTION_ATTRIBUTES
+simde_poly8x8_t
+simde_vtbx2_p8(simde_poly8x8_t a, simde_poly8x8x2_t b, simde_uint8x8_t c) {
+  #if defined(SIMDE_ARM_NEON_A32V7_NATIVE)
+    return vtbx2_p8(a, b, c);
+  #else
+    simde_uint8x8x2_t b_;
+    simde_memcpy(&b_, &b, sizeof(b_));
+    return simde_vreinterpret_p8_u8(simde_vtbx2_u8(simde_vreinterpret_u8_p8(a),
+                                                   b_,
+                                                   c));
+  #endif
+}
+#if defined(SIMDE_ARM_NEON_A32V7_ENABLE_NATIVE_ALIASES)
+  #undef vtbx2_p8
+  #define vtbx2_p8(a, b, c) simde_vtbx2_p8((a), (b), (c))
+#endif
+
+SIMDE_FUNCTION_ATTRIBUTES
+simde_poly8x8_t
+simde_vtbx3_p8(simde_poly8x8_t a, simde_poly8x8x3_t b, simde_uint8x8_t c) {
+  #if defined(SIMDE_ARM_NEON_A32V7_NATIVE)
+    return vtbx3_p8(a, b, c);
+  #else
+    simde_uint8x8x3_t b_;
+    simde_memcpy(&b_, &b, sizeof(b_));
+    return simde_vreinterpret_p8_u8(simde_vtbx3_u8(simde_vreinterpret_u8_p8(a),
+                                                   b_,
+                                                   c));
+  #endif
+}
+#if defined(SIMDE_ARM_NEON_A32V7_ENABLE_NATIVE_ALIASES)
+  #undef vtbx3_p8
+  #define vtbx3_p8(a, b, c) simde_vtbx3_p8((a), (b), (c))
+#endif
+
+SIMDE_FUNCTION_ATTRIBUTES
+simde_poly8x8_t
+simde_vtbx4_p8(simde_poly8x8_t a, simde_poly8x8x4_t b, simde_uint8x8_t c) {
+  #if defined(SIMDE_ARM_NEON_A32V7_NATIVE)
+    return vtbx4_p8(a, b, c);
+  #else
+    simde_uint8x8x4_t b_;
+    simde_memcpy(&b_, &b, sizeof(b_));
+    return simde_vreinterpret_p8_u8(simde_vtbx4_u8(simde_vreinterpret_u8_p8(a),
+                                                   b_,
+                                                   c));
+  #endif
+}
+#if defined(SIMDE_ARM_NEON_A32V7_ENABLE_NATIVE_ALIASES)
+  #undef vtbx4_p8
+  #define vtbx4_p8(a, b, c) simde_vtbx4_p8((a), (b), (c))
 #endif
 
 #endif /* !defined(SIMDE_BUG_INTEL_857088) */

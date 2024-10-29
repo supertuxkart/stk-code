@@ -849,6 +849,8 @@ namespace UserConfigParams
 
     PARAM_PREFIX bool m_disable_addon_tracks  PARAM_DEFAULT( false );
 
+    PARAM_PREFIX bool m_benchmark  PARAM_DEFAULT( false );
+
     // ---- Networking
     PARAM_PREFIX StringToUIntUserConfigParam    m_server_bookmarks
         PARAM_DEFAULT(StringToUIntUserConfigParam("server-bookmarks",
@@ -1244,7 +1246,7 @@ namespace UserConfigParams
                            "If debug logging should be enabled for rich presence") );
 
     PARAM_PREFIX StringUserConfigParam      m_skin_file
-            PARAM_DEFAULT(  StringUserConfigParam("peach", "skin_name",
+            PARAM_DEFAULT(  StringUserConfigParam("classic", "skin_name",
                                                   "Name of the skin to use") );
 
     // ---- settings for minimap display
@@ -1361,6 +1363,12 @@ namespace UserConfigParams
                                                &m_addon_group,
                                                "Don't show important message "
                                                "with this or a lower id again") );
+
+    PARAM_PREFIX IntUserConfigParam         m_news_list_shown_id
+            PARAM_DEFAULT(  IntUserConfigParam(0, "news_list_shown_id",
+                                               &m_addon_group,
+                                               "News before this id has been "
+                                               "shown once so no red dot") );      
 
     PARAM_PREFIX TimeUserConfigParam        m_addons_last_updated
             PARAM_DEFAULT(  TimeUserConfigParam(0, "addon_last_updated",

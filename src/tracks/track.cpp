@@ -23,6 +23,7 @@
 #include "audio/music_manager.hpp"
 #include "challenges/challenge_status.hpp"
 #include "challenges/unlock_manager.hpp"
+#include "config/favorite_status.hpp"
 #include "config/player_manager.hpp"
 #include "config/stk_config.hpp"
 #include "config/user_config.hpp"
@@ -212,12 +213,15 @@ bool Track::operator<(const Track &other) const
     PlayerProfile *p = PlayerManager::getCurrentPlayer();
     bool this_is_locked = p->isLocked(getIdent());
     bool other_is_locked = p->isLocked(other.getIdent());
-    if(this_is_locked == other_is_locked)
-    {
-        return getSortName() < other.getSortName();
-    }
-    else
+    bool this_is_favorite = p->isFavoriteTrack(getIdent());
+    bool other_is_favorite = p->isFavoriteTrack(other.getIdent());
+    // Locked tracks cannot be favorite, so favorites < normal < locked
+    if (this_is_favorite != other_is_favorite)
+        return this_is_favorite;
+    else if(this_is_locked != other_is_locked)
         return other_is_locked;
+    else
+        return getSortName() < other.getSortName();
 }   // operator<
 
 //-----------------------------------------------------------------------------
@@ -614,7 +618,7 @@ void Track::loadTrackInfo()
         m_all_modes.push_back(tm);
     }
 
-    if(m_groups.size()==0) m_groups.push_back(DEFAULT_GROUP_NAME);
+    if(m_groups.size()==0) m_groups.push_back(FavoriteStatus::DEFAULT_FAVORITE_GROUP_NAME);
     const XMLNode *xml_node = root->getNode("curves");
 
     if(xml_node) loadCurves(*xml_node);
@@ -655,10 +659,6 @@ void Track::loadTrackInfo()
         // Currently only max eight players in soccer mode
         m_max_arena_players = 8;
     }
-    // Max 10 players supported in arena
-    if (m_max_arena_players > 10)
-        m_max_arena_players = 10;
-
 }   // loadTrackInfo
 
 //-----------------------------------------------------------------------------

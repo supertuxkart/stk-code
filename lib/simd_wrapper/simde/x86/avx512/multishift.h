@@ -57,7 +57,7 @@ simde_mm_maskz_multishift_epi64_epi8 (simde__mmask16 k, simde__m128i a, simde__m
 }
 #if defined(SIMDE_X86_AVX512VBMI_ENABLE_NATIVE_ALIASES) && defined(SIMDE_X86_AVX512VL_ENABLE_NATIVE_ALIASES)
   #undef _mm_maskz_multishift_epi64_epi8
-  #define _mm_maskz_multishift_epi64_epi8(src, k, a, b) simde_mm_maskz_multishift_epi64_epi8(src, k, a, b)
+  #define _mm_maskz_multishift_epi64_epi8(k, a, b) simde_mm_maskz_multishift_epi64_epi8(k, a, b)
 #endif
 
 SIMDE_FUNCTION_ATTRIBUTES
@@ -109,7 +109,7 @@ simde_mm256_maskz_multishift_epi64_epi8 (simde__mmask32 k, simde__m256i a, simde
 }
 #if defined(SIMDE_X86_AVX512VBMI_ENABLE_NATIVE_ALIASES) && defined(SIMDE_X86_AVX512VL_ENABLE_NATIVE_ALIASES)
   #undef _mm256_maskz_multishift_epi64_epi8
-  #define _mm256_maskz_multishift_epi64_epi8(src, k, a, b) simde_mm256_maskz_multishift_epi64_epi8(src, k, a, b)
+  #define _mm256_maskz_multishift_epi64_epi8(k, a, b) simde_mm256_maskz_multishift_epi64_epi8(k, a, b)
 #endif
 
 SIMDE_FUNCTION_ATTRIBUTES
@@ -161,7 +161,7 @@ simde_mm512_maskz_multishift_epi64_epi8 (simde__mmask64 k, simde__m512i a, simde
 }
 #if defined(SIMDE_X86_AVX512VBMI_ENABLE_NATIVE_ALIASES)
   #undef _mm512_maskz_multishift_epi64_epi8
-  #define _mm512_maskz_multishift_epi64_epi8(src, k, a, b) simde_mm512_maskz_multishift_epi64_epi8(src, k, a, b)
+  #define _mm512_maskz_multishift_epi64_epi8(k, a, b) simde_mm512_maskz_multishift_epi64_epi8(k, a, b)
 #endif
 
 SIMDE_END_DECLS_

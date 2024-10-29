@@ -43,34 +43,31 @@ SIMDE_BEGIN_DECLS_
 
 SIMDE_FUNCTION_ATTRIBUTES
 simde__m128i
-simde_mm_cvtps_ph(simde__m128 a, const int sae) {
-  #if defined(SIMDE_X86_F16C_NATIVE)
-    SIMDE_LCC_DISABLE_DEPRECATED_WARNINGS
-    switch (sae & SIMDE_MM_FROUND_NO_EXC) {
-      case SIMDE_MM_FROUND_NO_EXC:
-        return _mm_cvtps_ph(a, SIMDE_MM_FROUND_NO_EXC);
-      default:
-        return _mm_cvtps_ph(a, 0);
+simde_mm_cvtps_ph(simde__m128 a, const int imm8) {
+  simde__m128_private a_ = simde__m128_to_private(a);
+  simde__m128i_private r_ = simde__m128i_to_private(simde_mm_setzero_si128());
+
+  HEDLEY_STATIC_CAST(void, imm8);
+
+  #if defined(SIMDE_ARM_NEON_A32V7_NATIVE) && defined(__ARM_FEATURE_FP16_VECTOR_ARITHMETIC)
+    r_.neon_f16 = vcombine_f16(vcvt_f16_f32(a_.neon_f32), vdup_n_f16(SIMDE_FLOAT16_C(0.0)));
+  #elif defined(SIMDE_FLOAT16_VECTOR)
+    SIMDE_VECTORIZE
+    for (size_t i = 0 ; i < (sizeof(a_.f32) / sizeof(a_.f32[0])) ; i++) {
+      r_.f16[i] = simde_float16_from_float32(a_.f32[i]);
     }
-    SIMDE_LCC_REVERT_DEPRECATED_WARNINGS
   #else
-    simde__m128_private a_ = simde__m128_to_private(a);
-    simde__m128i_private r_ = simde__m128i_to_private(simde_mm_setzero_si128());
-
-    HEDLEY_STATIC_CAST(void, sae);
-
-    #if defined(SIMDE_ARM_NEON_A32V7_NATIVE) && defined(__ARM_FEATURE_FP16_VECTOR_ARITHMETIC)
-      r_.neon_f16 = vcombine_f16(vcvt_f16_f32(a_.neon_f32), vdup_n_f16(SIMDE_FLOAT16_C(0.0)));
-    #else
-      SIMDE_VECTORIZE
-      for (size_t i = 0 ; i < (sizeof(a_.f32) / sizeof(a_.f32[0])) ; i++) {
-        r_.u16[i] = simde_float16_as_uint16(simde_float16_from_float32(a_.f32[i]));
-      }
-    #endif
-
-    return simde__m128i_from_private(r_);
+    SIMDE_VECTORIZE
+    for (size_t i = 0 ; i < (sizeof(a_.f32) / sizeof(a_.f32[0])) ; i++) {
+      r_.u16[i] = simde_float16_as_uint16(simde_float16_from_float32(a_.f32[i]));
+    }
   #endif
+
+  return simde__m128i_from_private(r_);
 }
+#if defined(SIMDE_X86_F16C_NATIVE)
+  #define simde_mm_cvtps_ph(a, imm8) _mm_cvtps_ph(a, imm8)
+#endif
 #if defined(SIMDE_X86_F16C_ENABLE_NATIVE_ALIASES)
   #define _mm_cvtps_ph(a, sae) simde_mm_cvtps_ph(a, sae)
 #endif
@@ -86,6 +83,11 @@ simde_mm_cvtph_ps(simde__m128i a) {
 
     #if defined(SIMDE_ARM_NEON_A32V7_NATIVE) && defined(__ARM_FEATURE_FP16_VECTOR_ARITHMETIC)
       r_.neon_f32 = vcvt_f32_f16(vget_low_f16(a_.neon_f16));
+    #elif defined(SIMDE_FLOAT16_VECTOR)
+      SIMDE_VECTORIZE
+      for (size_t i = 0 ; i < (sizeof(a_.f32) / sizeof(a_.f32[0])) ; i++) {
+        r_.f32[i] = simde_float16_to_float32(a_.f16[i]);
+      }
     #else
       SIMDE_VECTORIZE
       for (size_t i = 0 ; i < (sizeof(a_.f32) / sizeof(a_.f32[0])) ; i++) {
@@ -102,39 +104,32 @@ simde_mm_cvtph_ps(simde__m128i a) {
 
 SIMDE_FUNCTION_ATTRIBUTES
 simde__m128i
-simde_mm256_cvtps_ph(simde__m256 a, const int sae) {
-  #if defined(SIMDE_X86_F16C_NATIVE) && defined(SIMDE_X86_AVX_NATIVE)
-    SIMDE_LCC_DISABLE_DEPRECATED_WARNINGS
-    switch (sae & SIMDE_MM_FROUND_NO_EXC) {
-      case SIMDE_MM_FROUND_NO_EXC:
-        return _mm256_cvtps_ph(a, SIMDE_MM_FROUND_NO_EXC);
-      default:
-        return _mm256_cvtps_ph(a, 0);
-    }
-    SIMDE_LCC_REVERT_DEPRECATED_WARNINGS
+simde_mm256_cvtps_ph(simde__m256 a, const int imm8) {
+  simde__m256_private a_ = simde__m256_to_private(a);
+  simde__m128i_private r_;
+
+  HEDLEY_STATIC_CAST(void, imm8);
+
+  #if defined(SIMDE_FLOAT16_VECTOR)
+    SIMDE_VECTORIZE
+      for (size_t i = 0 ; i < (sizeof(a_.f32) / sizeof(a_.f32[0])) ; i++) {
+        r_.f16[i] = simde_float16_from_float32(a_.f32[i]);
+      }
   #else
-    simde__m256_private a_ = simde__m256_to_private(a);
-    simde__m128i_private r_;
-
-    HEDLEY_STATIC_CAST(void, sae);
-
-    #if defined(SIMDE_X86_F16C_NATIVE)
-      return _mm_castps_si128(_mm_movelh_ps(
-        _mm_castsi128_ps(_mm_cvtps_ph(a_.m128[0], SIMDE_MM_FROUND_NO_EXC)),
-        _mm_castsi128_ps(_mm_cvtps_ph(a_.m128[1], SIMDE_MM_FROUND_NO_EXC))
-      ));
-    #else
-      SIMDE_VECTORIZE
+    SIMDE_VECTORIZE
       for (size_t i = 0 ; i < (sizeof(a_.f32) / sizeof(a_.f32[0])) ; i++) {
         r_.u16[i] = simde_float16_as_uint16(simde_float16_from_float32(a_.f32[i]));
       }
-    #endif
-
-    return simde__m128i_from_private(r_);
   #endif
+
+
+  return simde__m128i_from_private(r_);
 }
+#if defined(SIMDE_X86_F16C_NATIVE)
+  #define simde_mm256_cvtps_ph(a, imm8) _mm256_cvtps_ph(a, imm8)
+#endif
 #if defined(SIMDE_X86_F16C_ENABLE_NATIVE_ALIASES)
-  #define _mm256_cvtps_ph(a, sae) simde_mm256_cvtps_ph(a, sae)
+  #define _mm256_cvtps_ph(a, imm8) simde_mm256_cvtps_ph(a, imm8)
 #endif
 
 SIMDE_FUNCTION_ATTRIBUTES
@@ -151,10 +146,17 @@ simde_mm256_cvtph_ps(simde__m128i a) {
     simde__m128i_private a_ = simde__m128i_to_private(a);
     simde__m256_private r_;
 
-    SIMDE_VECTORIZE
-    for (size_t i = 0 ; i < (sizeof(r_.f32) / sizeof(r_.f32[0])) ; i++) {
-      r_.f32[i] = simde_float16_to_float32(simde_uint16_as_float16(a_.u16[i]));
-    }
+    #if defined(SIMDE_FLOAT16_VECTOR)
+      SIMDE_VECTORIZE
+      for (size_t i = 0 ; i < (sizeof(r_.f32) / sizeof(r_.f32[0])) ; i++) {
+        r_.f32[i] = simde_float16_to_float32(a_.f16[i]);
+      }
+    #else
+      SIMDE_VECTORIZE
+      for (size_t i = 0 ; i < (sizeof(r_.f32) / sizeof(r_.f32[0])) ; i++) {
+        r_.f32[i] = simde_float16_to_float32(simde_uint16_as_float16(a_.u16[i]));
+      }
+    #endif
 
     return simde__m256_from_private(r_);
   #endif

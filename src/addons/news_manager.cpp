@@ -40,9 +40,13 @@ NewsManager *NewsManager::m_news_manager = nullptr;
 std::string NewsManager::m_news_filename = "online_news.xml";
 
 // ----------------------------------------------------------------------------
-NewsManager::NewsManager() : m_news(std::vector<NewsMessage>())
+NewsManager::NewsManager()
 {
-    m_current_news_message = -1;
+    for (int i = 0; i < NTYPE_COUNT; i++)
+    {
+        m_current_news_ptr[i] = -1;
+        m_news_prioritize_after_id[i] = -1;
+    }
     m_error_message.setAtomic("");
     m_force_refresh = false;
 
@@ -285,23 +289,35 @@ void NewsManager::checkRedirect(const XMLNode *xml)
  */
 void NewsManager::updateNews(const XMLNode *xml, const std::string &filename)
 {
-
-    m_all_news_messages = "";
-    const core::stringw message_divider="  +++  ";
-    // This function is also called in case of a reinit, so
-    // we have to delete existing news messages here first.
-    m_news.lock();
-    m_news.getData().clear();
-    m_news.unlock();
     bool error = true;
     int frequency=0;
     if(xml->get("frequency", &frequency))
         UserConfigParams::m_news_frequency = frequency;
 
+    for (int type = 0; type < NTYPE_COUNT; type++)
+    {
+        // This function is also called in case of a reinit, so
+        // we have to delete existing news messages here first.
+        m_news[type].lock();
+        m_news[type].getData().clear();
+    }
+
     for(unsigned int i=0; i<xml->getNumNodes(); i++)
     {
         const XMLNode *node = xml->getNode(i);
-        if(node->getName()!="message") continue;
+
+        NewsType type;
+
+        if (node->getName() == "message")
+        {
+            type = NTYPE_MAINMENU;
+        }
+        else if (node->getName() == "list")
+        {
+            type = NTYPE_LIST;
+        }
+        else continue;
+
         std::string raw_news;
         node->get("content", &raw_news);
         core::stringw news = StringUtils::xmlDecode(raw_news);
@@ -309,30 +325,23 @@ void NewsManager::updateNews(const XMLNode *xml, const std::string &filename)
         node->get("id", &id);
         bool important=false;
         node->get("important", &important);
+        std::string date="";
+        node->get("date", &date);
+        std::string link="";
+        node->get("link", &link);
 
         std::string cond;
         node->get("condition", &cond);
         if(!conditionFulfilled(cond))
             continue;
-        m_news.lock();
-        {
 
-            if(!important)
-                m_all_news_messages += m_all_news_messages.size()>0
-                                    ?  message_divider + news
-                                    : news;
-            else
-            // Define this if news messages should be removed
-            // after being shown a certain number of times.
-            {
-                NewsMessage n(news, id, important);
-                m_news.getData().push_back(n);
-            }
-        }   // m_news.lock()
-        m_news.unlock();
+        NewsMessage n(news, id, date, link, important);
+
+        m_news[type].getData().push_back(n);
 
         error = false;
     }
+
     if(error)
     {
         // In case of an error (e.g. the file only contains
@@ -342,11 +351,35 @@ void NewsManager::updateNews(const XMLNode *xml, const std::string &filename)
         // for some time).
         file_manager->removeFile(filename);
         NewsMessage n(_("Failed to connect to the SuperTuxKart add-ons server."), -1);
-        m_news.lock();
-        m_news.getData().push_back(n);
 
-        m_all_news_messages="";
-        m_news.unlock();
+        for (int type = 0; type < NTYPE_COUNT; type++)
+        {
+            m_news[type].getData().push_back(n);
+            m_news[type].unlock();
+        }
+    }
+    else
+    {
+        for (int type = 0; type < NTYPE_COUNT; type++)
+        {
+            std::sort(
+                m_news[type].getData().begin(),
+                m_news[type].getData().end()
+            );
+
+            int after_id = m_news_prioritize_after_id[type];
+            if (after_id != -1)
+            {
+                std::stable_partition(
+                    m_news[type].getData().begin(),
+                    m_news[type].getData().end(),
+                    [after_id](NewsMessage& n)->bool{
+                        return n.getMessageId() >= after_id;
+                    }
+                );
+            }
+            m_news[type].unlock();
+        }
     }
 }   // updateNews
 
@@ -355,46 +388,127 @@ void NewsManager::updateNews(const XMLNode *xml, const std::string &filename)
  *  when downloading addons.
  *  \param s The news message to add.
  */
-void NewsManager::addNewsMessage(const core::stringw &s)
+void NewsManager::addNewsMessage(NewsType type, const core::stringw &s)
 {
     NewsMessage n(s, -1);
-    m_news.lock();
-    m_news.getData().push_back(n);
-    m_news.unlock();
+    m_news[type].lock();
+    m_news[type].getData().push_back(n);
+    m_news[type].unlock();
 }   // addNewsMessage
 // ----------------------------------------------------------------------------
-/** Returns the  important message with the smallest id that has not been
- *  shown, or NULL if no important (not shown before) message exists atm. The
- *  user config is updated to store the last important message id shown.
+/** Returns the message pointed by the current ptr
  */
-const core::stringw NewsManager::getImportantMessage()
+const core::stringw NewsManager::getCurrentNewsMessage(NewsType type)
 {
-    int index = -1;
-    m_news.lock();
-    for(unsigned int i=0; i<m_news.getData().size(); i++)
-    {
-        const NewsMessage &m = m_news.getData()[i];
-        //
-        if(m.isImportant() &&
-           m.getMessageId()>UserConfigParams::m_last_important_message_id  &&
-            (index == -1 ||
-            m.getMessageId() < m_news.getData()[index].getMessageId() )     )
-        {
-            index = i;
-        }   // if new unshown important message with smaller message id
-    }
-    core::stringw message("");
-    if(index>=0)
-    {
-        const NewsMessage &m = m_news.getData()[index];
-        message = m.getNews();
-        UserConfigParams::m_last_important_message_id = m.getMessageId();
+    // Only display error message in case of a problem.
+    if (m_error_message.getAtomic().size()>0)
+        return _(m_error_message.getAtomic().c_str());
+    
+    core::stringw message = L"";
 
+    m_news[type].lock();
+
+    if (m_current_news_ptr[type] >= 0
+     && m_current_news_ptr[type] < m_news[type].getData().size())
+    {
+        message = m_news[type].getData()[m_current_news_ptr[type]].getNews();
     }
-    m_news.unlock();
+    m_news[type].unlock();
 
     return message;
-}   // getImportantMessage
+}   // getCurrentNewsMessage
+// ----------------------------------------------------------------------------
+/** Returns the date of the news pointed by the current ptr
+ */
+const std::string NewsManager::getCurrentNewsDate(NewsType type)
+{
+    std::string date = "";
+
+    m_news[type].lock();
+
+    if (m_current_news_ptr[type] >= 0
+     && m_current_news_ptr[type] < m_news[type].getData().size())
+    {
+        date = m_news[type].getData()[m_current_news_ptr[type]].getDate();
+    }
+    m_news[type].unlock();
+
+    return date;
+}   // getCurrentNewsMessage
+// ----------------------------------------------------------------------------
+/** Returns the date of the news pointed by the current ptr
+ */
+const std::string NewsManager::getCurrentNewsLink(NewsType type)
+{
+    std::string link = "";
+
+    m_news[type].lock();
+
+    if (m_current_news_ptr[type] >= 0
+     && m_current_news_ptr[type] < m_news[type].getData().size())
+    {
+        link = m_news[type].getData()[m_current_news_ptr[type]].getLink();
+    }
+    m_news[type].unlock();
+
+    return link;
+}   // getCurrentNewsMessage
+// ----------------------------------------------------------------------------
+/** Returns the importance of the message pointed by the current ptr
+ */
+const bool NewsManager::isCurrentNewsImportant(NewsType type)
+{
+    bool importance = false;
+
+    m_news[type].lock();
+
+    if (m_current_news_ptr[type] >= 0
+     && m_current_news_ptr[type] < m_news[type].getData().size())
+    {
+        importance = m_news[type].getData()[m_current_news_ptr[type]].isImportant();
+    }
+    m_news[type].unlock();
+
+    return importance;
+}   // isCurrentNewsImportant
+
+// ----------------------------------------------------------------------------
+const int NewsManager::getNewsCount(NewsType type)
+{
+    // Only show error message one time
+    if(m_error_message.getAtomic().size()>0)
+        return 1;
+    
+    m_news[type].lock();
+    int count = m_news[type].getData().size();
+    m_news[type].unlock();
+
+    return count;
+}
+
+// ----------------------------------------------------------------------------
+void NewsManager::prioritizeNewsAfterID(NewsType type, int id)
+{
+    m_news[type].lock();
+
+    std::sort(
+        m_news[type].getData().begin(),
+        m_news[type].getData().end()
+    );
+    if (id != -1)
+    {
+        std::stable_partition(
+            m_news[type].getData().begin(),
+            m_news[type].getData().end(),
+            [id](NewsMessage& n)->bool{
+                return n.getMessageId() > id;
+            }
+        );
+    }
+
+    m_news_prioritize_after_id[type] = id;
+    m_news[type].unlock();
+}
 
 // ----------------------------------------------------------------------------
 /** Returns the next loaded news message. It will 'wrap around', i.e.
@@ -402,38 +516,30 @@ const core::stringw NewsManager::getImportantMessage()
  *  To be used by the the main menu to get the next news message after
  *  one message was scrolled off screen.
  */
-const core::stringw NewsManager::getNextNewsMessage()
+const int NewsManager::getNextNewsID(NewsType type)
 {
-    // Only display error message in case of a problem.
-    if(m_error_message.getAtomic().size()>0)
-        return _(m_error_message.getAtomic().c_str());
+    if (m_error_message.getAtomic().size()>0)
+        return -1;
 
-    m_news.lock();
-    if(m_all_news_messages.size()>0)
-    {
-        // Copy the news message while it is locked.
-        core::stringw anm = m_all_news_messages;
-        m_news.unlock();
-        return anm;
-    }
+    m_news[type].lock();
 
-    if(m_news.getData().size()==0)
+    if(m_news[type].getData().size()==0)
     {
         // Lock
-        m_news.unlock();
-        return "";
+        m_news[type].unlock();
+        return -1;
     }
 
-    core::stringw m("");
+    int m = -1;
     {
-        m_current_news_message++;
-        if(m_current_news_message >= (int)m_news.getData().size())
-            m_current_news_message = 0;
+        m_current_news_ptr[type]++;
+        if(m_current_news_ptr[type] >= (int)m_news[type].getData().size())
+            m_current_news_ptr[type] = 0;
 
-        m = m_news.getData()[m_current_news_message].getNews();
+        m = m_news[type].getData()[m_current_news_ptr[type]].getMessageId();
     }
-    m_news.unlock();
-    return _(m.c_str());
+    m_news[type].unlock();
+    return m;
 }   // getNextNewsMessage
 
 // ----------------------------------------------------------------------------

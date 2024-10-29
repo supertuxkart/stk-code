@@ -37,7 +37,8 @@ simde_svbool_t
 simde_svwhilelt_b8_s32(int32_t op1, int32_t op2) {
   #if defined(SIMDE_ARM_SVE_NATIVE)
     return svwhilelt_b8_s32(op1, op2);
-  #elif defined(SIMDE_X86_AVX512BW_NATIVE) && (SIMDE_ARM_SVE_VECTOR_SIZE >= 512)
+  #elif defined(SIMDE_X86_AVX512BW_NATIVE) && (SIMDE_ARM_SVE_VECTOR_SIZE >= 512) \
+      && (!defined(HEDLEY_MSVC_VERSION) || HEDLEY_MSVC_VERSION_CHECK(19,20,0))
     if (HEDLEY_UNLIKELY(op1 >= op2))
       return simde_svbool_from_mmask64(HEDLEY_STATIC_CAST(__mmask64, 0));
 
@@ -48,7 +49,8 @@ simde_svwhilelt_b8_s32(int32_t op1, int32_t op2) {
     }
 
     return simde_svbool_from_mmask64(r);
-  #elif defined(SIMDE_X86_AVX512BW_NATIVE) && defined(SIMDE_X86_AVX512VL_NATIVE)
+  #elif defined(SIMDE_X86_AVX512BW_NATIVE) && defined(SIMDE_X86_AVX512VL_NATIVE) \
+      && (!defined(HEDLEY_MSVC_VERSION) || HEDLEY_MSVC_VERSION_CHECK(19,20,0))
     if (HEDLEY_UNLIKELY(op1 >= op2))
       return simde_svbool_from_mmask32(HEDLEY_STATIC_CAST(__mmask32, 0));
 
@@ -82,7 +84,8 @@ simde_svbool_t
 simde_svwhilelt_b16_s32(int32_t op1, int32_t op2) {
   #if defined(SIMDE_ARM_SVE_NATIVE)
     return svwhilelt_b16_s32(op1, op2);
-  #elif defined(SIMDE_X86_AVX512BW_NATIVE) && (SIMDE_ARM_SVE_VECTOR_SIZE >= 512)
+  #elif defined(SIMDE_X86_AVX512BW_NATIVE) && (SIMDE_ARM_SVE_VECTOR_SIZE >= 512) \
+      && (!defined(HEDLEY_MSVC_VERSION) || HEDLEY_MSVC_VERSION_CHECK(19,20,0))
     if (HEDLEY_UNLIKELY(op1 >= op2))
       return simde_svbool_from_mmask32(HEDLEY_STATIC_CAST(__mmask32, 0));
 
@@ -93,7 +96,8 @@ simde_svwhilelt_b16_s32(int32_t op1, int32_t op2) {
     }
 
     return simde_svbool_from_mmask32(r);
-  #elif defined(SIMDE_X86_AVX512BW_NATIVE) && defined(SIMDE_X86_AVX512VL_NATIVE)
+  #elif defined(SIMDE_X86_AVX512BW_NATIVE) && defined(SIMDE_X86_AVX512VL_NATIVE) \
+      && (!defined(HEDLEY_MSVC_VERSION) || HEDLEY_MSVC_VERSION_CHECK(19,20,0))
     if (HEDLEY_UNLIKELY(op1 >= op2))
       return simde_svbool_from_mmask16(HEDLEY_STATIC_CAST(__mmask16, 0));
 
@@ -127,7 +131,8 @@ simde_svbool_t
 simde_svwhilelt_b32_s32(int32_t op1, int32_t op2) {
   #if defined(SIMDE_ARM_SVE_NATIVE)
     return svwhilelt_b32_s32(op1, op2);
-  #elif defined(SIMDE_X86_AVX512BW_NATIVE) && (SIMDE_ARM_SVE_VECTOR_SIZE >= 512)
+  #elif defined(SIMDE_X86_AVX512BW_NATIVE) && (SIMDE_ARM_SVE_VECTOR_SIZE >= 512) \
+      && (!defined(HEDLEY_MSVC_VERSION) || HEDLEY_MSVC_VERSION_CHECK(19,20,0))
     if (HEDLEY_UNLIKELY(op1 >= op2))
       return simde_svbool_from_mmask16(HEDLEY_STATIC_CAST(__mmask16, 0));
 
@@ -138,7 +143,8 @@ simde_svwhilelt_b32_s32(int32_t op1, int32_t op2) {
     }
 
     return simde_svbool_from_mmask16(r);
-  #elif defined(SIMDE_X86_AVX512BW_NATIVE) && defined(SIMDE_X86_AVX512VL_NATIVE)
+  #elif defined(SIMDE_X86_AVX512BW_NATIVE) && defined(SIMDE_X86_AVX512VL_NATIVE) \
+      && (!defined(HEDLEY_MSVC_VERSION) || HEDLEY_MSVC_VERSION_CHECK(19,20,0))
     if (HEDLEY_UNLIKELY(op1 >= op2))
       return simde_svbool_from_mmask8(HEDLEY_STATIC_CAST(__mmask8, 0));
 
@@ -172,7 +178,8 @@ simde_svbool_t
 simde_svwhilelt_b64_s32(int32_t op1, int32_t op2) {
   #if defined(SIMDE_ARM_SVE_NATIVE)
     return svwhilelt_b64_s32(op1, op2);
-  #elif defined(SIMDE_X86_AVX512BW_NATIVE) && (SIMDE_ARM_SVE_VECTOR_SIZE >= 512)
+  #elif defined(SIMDE_X86_AVX512BW_NATIVE) && (SIMDE_ARM_SVE_VECTOR_SIZE >= 512) \
+      && (!defined(HEDLEY_MSVC_VERSION) || HEDLEY_MSVC_VERSION_CHECK(19,20,0))
     if (HEDLEY_UNLIKELY(op1 >= op2))
       return simde_svbool_from_mmask8(HEDLEY_STATIC_CAST(__mmask8, 0));
 
@@ -183,7 +190,8 @@ simde_svwhilelt_b64_s32(int32_t op1, int32_t op2) {
     }
 
     return simde_svbool_from_mmask8(r);
-  #elif defined(SIMDE_X86_AVX512BW_NATIVE) && defined(SIMDE_X86_AVX512VL_NATIVE)
+  #elif defined(SIMDE_X86_AVX512BW_NATIVE) && defined(SIMDE_X86_AVX512VL_NATIVE) \
+      && (!defined(HEDLEY_MSVC_VERSION) || HEDLEY_MSVC_VERSION_CHECK(19,20,0))
     if (HEDLEY_UNLIKELY(op1 >= op2))
       return simde_svbool_from_mmask4(HEDLEY_STATIC_CAST(__mmask8, 0));
 
@@ -217,7 +225,8 @@ simde_svbool_t
 simde_svwhilelt_b8_s64(int64_t op1, int64_t op2) {
   #if defined(SIMDE_ARM_SVE_NATIVE)
     return svwhilelt_b8_s64(op1, op2);
-  #elif defined(SIMDE_X86_AVX512BW_NATIVE) && (SIMDE_ARM_SVE_VECTOR_SIZE >= 512)
+  #elif defined(SIMDE_X86_AVX512BW_NATIVE) && (SIMDE_ARM_SVE_VECTOR_SIZE >= 512) \
+      && (!defined(HEDLEY_MSVC_VERSION) || HEDLEY_MSVC_VERSION_CHECK(19,20,0))
     if (HEDLEY_UNLIKELY(op1 >= op2))
       return simde_svbool_from_mmask64(HEDLEY_STATIC_CAST(__mmask64, 0));
 
@@ -228,7 +237,8 @@ simde_svwhilelt_b8_s64(int64_t op1, int64_t op2) {
     }
 
     return simde_svbool_from_mmask64(r);
-  #elif defined(SIMDE_X86_AVX512BW_NATIVE) && defined(SIMDE_X86_AVX512VL_NATIVE)
+  #elif defined(SIMDE_X86_AVX512BW_NATIVE) && defined(SIMDE_X86_AVX512VL_NATIVE) \
+      && (!defined(HEDLEY_MSVC_VERSION) || HEDLEY_MSVC_VERSION_CHECK(19,20,0))
     if (HEDLEY_UNLIKELY(op1 >= op2))
       return simde_svbool_from_mmask32(HEDLEY_STATIC_CAST(__mmask32, 0));
 
@@ -262,18 +272,20 @@ simde_svbool_t
 simde_svwhilelt_b16_s64(int64_t op1, int64_t op2) {
   #if defined(SIMDE_ARM_SVE_NATIVE)
     return svwhilelt_b16_s64(op1, op2);
-  #elif defined(SIMDE_X86_AVX512BW_NATIVE) && (SIMDE_ARM_SVE_VECTOR_SIZE >= 512)
+  #elif defined(SIMDE_X86_AVX512BW_NATIVE) && (SIMDE_ARM_SVE_VECTOR_SIZE >= 512) \
+      && (!defined(HEDLEY_MSVC_VERSION) || HEDLEY_MSVC_VERSION_CHECK(19,20,0))
     if (HEDLEY_UNLIKELY(op1 >= op2))
       return simde_svbool_from_mmask32(HEDLEY_STATIC_CAST(__mmask32, 0));
 
     int_fast64_t remaining = (HEDLEY_STATIC_CAST(int_fast64_t, op2) - HEDLEY_STATIC_CAST(int_fast64_t, op1));
-    __mmask32 r = HEDLEY_STATIC_CAST(__mmask32, ~UINT64_C(0));
+    __mmask32 r = HEDLEY_STATIC_CAST(__mmask32, ~UINT32_C(0));
     if (HEDLEY_UNLIKELY(remaining < 32)) {
       r >>= 32 - remaining;
     }
 
     return simde_svbool_from_mmask32(r);
-  #elif defined(SIMDE_X86_AVX512BW_NATIVE) && defined(SIMDE_X86_AVX512VL_NATIVE)
+  #elif defined(SIMDE_X86_AVX512BW_NATIVE) && defined(SIMDE_X86_AVX512VL_NATIVE) \
+      && (!defined(HEDLEY_MSVC_VERSION) || HEDLEY_MSVC_VERSION_CHECK(19,20,0))
     if (HEDLEY_UNLIKELY(op1 >= op2))
       return simde_svbool_from_mmask16(HEDLEY_STATIC_CAST(__mmask16, 0));
 
@@ -307,7 +319,8 @@ simde_svbool_t
 simde_svwhilelt_b32_s64(int64_t op1, int64_t op2) {
   #if defined(SIMDE_ARM_SVE_NATIVE)
     return svwhilelt_b32_s64(op1, op2);
-  #elif defined(SIMDE_X86_AVX512BW_NATIVE) && (SIMDE_ARM_SVE_VECTOR_SIZE >= 512)
+  #elif defined(SIMDE_X86_AVX512BW_NATIVE) && (SIMDE_ARM_SVE_VECTOR_SIZE >= 512) \
+      && (!defined(HEDLEY_MSVC_VERSION) || HEDLEY_MSVC_VERSION_CHECK(19,20,0))
     if (HEDLEY_UNLIKELY(op1 >= op2))
       return simde_svbool_from_mmask16(HEDLEY_STATIC_CAST(__mmask16, 0));
 
@@ -318,7 +331,8 @@ simde_svwhilelt_b32_s64(int64_t op1, int64_t op2) {
     }
 
     return simde_svbool_from_mmask16(r);
-  #elif defined(SIMDE_X86_AVX512BW_NATIVE) && defined(SIMDE_X86_AVX512VL_NATIVE)
+  #elif defined(SIMDE_X86_AVX512BW_NATIVE) && defined(SIMDE_X86_AVX512VL_NATIVE) \
+      && (!defined(HEDLEY_MSVC_VERSION) || HEDLEY_MSVC_VERSION_CHECK(19,20,0))
     if (HEDLEY_UNLIKELY(op1 >= op2))
       return simde_svbool_from_mmask8(HEDLEY_STATIC_CAST(__mmask8, 0));
 
@@ -352,7 +366,8 @@ simde_svbool_t
 simde_svwhilelt_b64_s64(int64_t op1, int64_t op2) {
   #if defined(SIMDE_ARM_SVE_NATIVE)
     return svwhilelt_b64_s64(op1, op2);
-  #elif defined(SIMDE_X86_AVX512BW_NATIVE) && (SIMDE_ARM_SVE_VECTOR_SIZE >= 512)
+  #elif defined(SIMDE_X86_AVX512BW_NATIVE) && (SIMDE_ARM_SVE_VECTOR_SIZE >= 512) \
+      && (!defined(HEDLEY_MSVC_VERSION) || HEDLEY_MSVC_VERSION_CHECK(19,20,0))
     if (HEDLEY_UNLIKELY(op1 >= op2))
       return simde_svbool_from_mmask8(HEDLEY_STATIC_CAST(__mmask8, 0));
 
@@ -363,7 +378,8 @@ simde_svwhilelt_b64_s64(int64_t op1, int64_t op2) {
     }
 
     return simde_svbool_from_mmask8(r);
-  #elif defined(SIMDE_X86_AVX512BW_NATIVE) && defined(SIMDE_X86_AVX512VL_NATIVE)
+  #elif defined(SIMDE_X86_AVX512BW_NATIVE) && defined(SIMDE_X86_AVX512VL_NATIVE) \
+      && (!defined(HEDLEY_MSVC_VERSION) || HEDLEY_MSVC_VERSION_CHECK(19,20,0))
     if (HEDLEY_UNLIKELY(op1 >= op2))
       return simde_svbool_from_mmask4(HEDLEY_STATIC_CAST(__mmask8, 0));
 
@@ -397,7 +413,8 @@ simde_svbool_t
 simde_svwhilelt_b8_u32(uint32_t op1, uint32_t op2) {
   #if defined(SIMDE_ARM_SVE_NATIVE)
     return svwhilelt_b8_u32(op1, op2);
-  #elif defined(SIMDE_X86_AVX512BW_NATIVE) && (SIMDE_ARM_SVE_VECTOR_SIZE >= 512)
+  #elif defined(SIMDE_X86_AVX512BW_NATIVE) && (SIMDE_ARM_SVE_VECTOR_SIZE >= 512) \
+      && (!defined(HEDLEY_MSVC_VERSION) || HEDLEY_MSVC_VERSION_CHECK(19,20,0))
     if (HEDLEY_UNLIKELY(op1 >= op2))
       return simde_svbool_from_mmask64(HEDLEY_STATIC_CAST(__mmask64, 0));
 
@@ -408,7 +425,8 @@ simde_svwhilelt_b8_u32(uint32_t op1, uint32_t op2) {
     }
 
     return simde_svbool_from_mmask64(r);
-  #elif defined(SIMDE_X86_AVX512BW_NATIVE) && defined(SIMDE_X86_AVX512VL_NATIVE)
+  #elif defined(SIMDE_X86_AVX512BW_NATIVE) && defined(SIMDE_X86_AVX512VL_NATIVE) \
+      && (!defined(HEDLEY_MSVC_VERSION) || HEDLEY_MSVC_VERSION_CHECK(19,20,0))
     if (HEDLEY_UNLIKELY(op1 >= op2))
       return simde_svbool_from_mmask32(HEDLEY_STATIC_CAST(__mmask32, 0));
 
@@ -442,7 +460,8 @@ simde_svbool_t
 simde_svwhilelt_b16_u32(uint32_t op1, uint32_t op2) {
   #if defined(SIMDE_ARM_SVE_NATIVE)
     return svwhilelt_b16_u32(op1, op2);
-  #elif defined(SIMDE_X86_AVX512BW_NATIVE) && (SIMDE_ARM_SVE_VECTOR_SIZE >= 512)
+  #elif defined(SIMDE_X86_AVX512BW_NATIVE) && (SIMDE_ARM_SVE_VECTOR_SIZE >= 512) \
+      && (!defined(HEDLEY_MSVC_VERSION) || HEDLEY_MSVC_VERSION_CHECK(19,20,0))
     if (HEDLEY_UNLIKELY(op1 >= op2))
       return simde_svbool_from_mmask32(HEDLEY_STATIC_CAST(__mmask32, 0));
 
@@ -453,7 +472,8 @@ simde_svwhilelt_b16_u32(uint32_t op1, uint32_t op2) {
     }
 
     return simde_svbool_from_mmask32(r);
-  #elif defined(SIMDE_X86_AVX512BW_NATIVE) && defined(SIMDE_X86_AVX512VL_NATIVE)
+  #elif defined(SIMDE_X86_AVX512BW_NATIVE) && defined(SIMDE_X86_AVX512VL_NATIVE) \
+      && (!defined(HEDLEY_MSVC_VERSION) || HEDLEY_MSVC_VERSION_CHECK(19,20,0))
     if (HEDLEY_UNLIKELY(op1 >= op2))
       return simde_svbool_from_mmask16(HEDLEY_STATIC_CAST(__mmask16, 0));
 
@@ -487,7 +507,8 @@ simde_svbool_t
 simde_svwhilelt_b32_u32(uint32_t op1, uint32_t op2) {
   #if defined(SIMDE_ARM_SVE_NATIVE)
     return svwhilelt_b32_u32(op1, op2);
-  #elif defined(SIMDE_X86_AVX512BW_NATIVE) && (SIMDE_ARM_SVE_VECTOR_SIZE >= 512)
+  #elif defined(SIMDE_X86_AVX512BW_NATIVE) && (SIMDE_ARM_SVE_VECTOR_SIZE >= 512) \
+      && (!defined(HEDLEY_MSVC_VERSION) || HEDLEY_MSVC_VERSION_CHECK(19,20,0))
     if (HEDLEY_UNLIKELY(op1 >= op2))
       return simde_svbool_from_mmask16(HEDLEY_STATIC_CAST(__mmask16, 0));
 
@@ -498,7 +519,8 @@ simde_svwhilelt_b32_u32(uint32_t op1, uint32_t op2) {
     }
 
     return simde_svbool_from_mmask16(r);
-  #elif defined(SIMDE_X86_AVX512BW_NATIVE) && defined(SIMDE_X86_AVX512VL_NATIVE)
+  #elif defined(SIMDE_X86_AVX512BW_NATIVE) && defined(SIMDE_X86_AVX512VL_NATIVE) \
+      && (!defined(HEDLEY_MSVC_VERSION) || HEDLEY_MSVC_VERSION_CHECK(19,20,0))
     if (HEDLEY_UNLIKELY(op1 >= op2))
       return simde_svbool_from_mmask8(HEDLEY_STATIC_CAST(__mmask8, 0));
 
@@ -532,7 +554,8 @@ simde_svbool_t
 simde_svwhilelt_b64_u32(uint32_t op1, uint32_t op2) {
   #if defined(SIMDE_ARM_SVE_NATIVE)
     return svwhilelt_b64_u32(op1, op2);
-  #elif defined(SIMDE_X86_AVX512BW_NATIVE) && (SIMDE_ARM_SVE_VECTOR_SIZE >= 512)
+  #elif defined(SIMDE_X86_AVX512BW_NATIVE) && (SIMDE_ARM_SVE_VECTOR_SIZE >= 512) \
+      && (!defined(HEDLEY_MSVC_VERSION) || HEDLEY_MSVC_VERSION_CHECK(19,20,0))
     if (HEDLEY_UNLIKELY(op1 >= op2))
       return simde_svbool_from_mmask8(HEDLEY_STATIC_CAST(__mmask8, 0));
 
@@ -543,7 +566,8 @@ simde_svwhilelt_b64_u32(uint32_t op1, uint32_t op2) {
     }
 
     return simde_svbool_from_mmask8(r);
-  #elif defined(SIMDE_X86_AVX512BW_NATIVE) && defined(SIMDE_X86_AVX512VL_NATIVE)
+  #elif defined(SIMDE_X86_AVX512BW_NATIVE) && defined(SIMDE_X86_AVX512VL_NATIVE) \
+      && (!defined(HEDLEY_MSVC_VERSION) || HEDLEY_MSVC_VERSION_CHECK(19,20,0))
     if (HEDLEY_UNLIKELY(op1 >= op2))
       return simde_svbool_from_mmask4(HEDLEY_STATIC_CAST(__mmask8, 0));
 
@@ -577,7 +601,8 @@ simde_svbool_t
 simde_svwhilelt_b8_u64(uint64_t op1, uint64_t op2) {
   #if defined(SIMDE_ARM_SVE_NATIVE)
     return svwhilelt_b8_u64(op1, op2);
-  #elif defined(SIMDE_X86_AVX512BW_NATIVE) && (SIMDE_ARM_SVE_VECTOR_SIZE >= 512)
+  #elif defined(SIMDE_X86_AVX512BW_NATIVE) && (SIMDE_ARM_SVE_VECTOR_SIZE >= 512) \
+      && (!defined(HEDLEY_MSVC_VERSION) || HEDLEY_MSVC_VERSION_CHECK(19,20,0))
     if (HEDLEY_UNLIKELY(op1 >= op2))
       return simde_svbool_from_mmask64(HEDLEY_STATIC_CAST(__mmask64, 0));
 
@@ -588,7 +613,8 @@ simde_svwhilelt_b8_u64(uint64_t op1, uint64_t op2) {
     }
 
     return simde_svbool_from_mmask64(r);
-  #elif defined(SIMDE_X86_AVX512BW_NATIVE) && defined(SIMDE_X86_AVX512VL_NATIVE)
+  #elif defined(SIMDE_X86_AVX512BW_NATIVE) && defined(SIMDE_X86_AVX512VL_NATIVE) \
+      && (!defined(HEDLEY_MSVC_VERSION) || HEDLEY_MSVC_VERSION_CHECK(19,20,0))
     if (HEDLEY_UNLIKELY(op1 >= op2))
       return simde_svbool_from_mmask32(HEDLEY_STATIC_CAST(__mmask32, 0));
 
@@ -622,18 +648,20 @@ simde_svbool_t
 simde_svwhilelt_b16_u64(uint64_t op1, uint64_t op2) {
   #if defined(SIMDE_ARM_SVE_NATIVE)
     return svwhilelt_b16_u64(op1, op2);
-  #elif defined(SIMDE_X86_AVX512BW_NATIVE) && (SIMDE_ARM_SVE_VECTOR_SIZE >= 512)
+  #elif defined(SIMDE_X86_AVX512BW_NATIVE) && (SIMDE_ARM_SVE_VECTOR_SIZE >= 512) \
+      && (!defined(HEDLEY_MSVC_VERSION) || HEDLEY_MSVC_VERSION_CHECK(19,20,0))
     if (HEDLEY_UNLIKELY(op1 >= op2))
       return simde_svbool_from_mmask32(HEDLEY_STATIC_CAST(__mmask32, 0));
 
     uint_fast64_t remaining = (HEDLEY_STATIC_CAST(uint_fast64_t, op2) - HEDLEY_STATIC_CAST(uint_fast64_t, op1));
-    __mmask32 r = HEDLEY_STATIC_CAST(__mmask32, ~UINT64_C(0));
+    __mmask32 r = HEDLEY_STATIC_CAST(__mmask32, ~UINT32_C(0));
     if (HEDLEY_UNLIKELY(remaining < 32)) {
       r >>= 32 - remaining;
     }
 
     return simde_svbool_from_mmask32(r);
-  #elif defined(SIMDE_X86_AVX512BW_NATIVE) && defined(SIMDE_X86_AVX512VL_NATIVE)
+  #elif defined(SIMDE_X86_AVX512BW_NATIVE) && defined(SIMDE_X86_AVX512VL_NATIVE) \
+      && (!defined(HEDLEY_MSVC_VERSION) || HEDLEY_MSVC_VERSION_CHECK(19,20,0))
     if (HEDLEY_UNLIKELY(op1 >= op2))
       return simde_svbool_from_mmask16(HEDLEY_STATIC_CAST(__mmask16, 0));
 
@@ -667,7 +695,8 @@ simde_svbool_t
 simde_svwhilelt_b32_u64(uint64_t op1, uint64_t op2) {
   #if defined(SIMDE_ARM_SVE_NATIVE)
     return svwhilelt_b32_u64(op1, op2);
-  #elif defined(SIMDE_X86_AVX512BW_NATIVE) && (SIMDE_ARM_SVE_VECTOR_SIZE >= 512)
+  #elif defined(SIMDE_X86_AVX512BW_NATIVE) && (SIMDE_ARM_SVE_VECTOR_SIZE >= 512) \
+      && (!defined(HEDLEY_MSVC_VERSION) || HEDLEY_MSVC_VERSION_CHECK(19,20,0))
     if (HEDLEY_UNLIKELY(op1 >= op2))
       return simde_svbool_from_mmask16(HEDLEY_STATIC_CAST(__mmask16, 0));
 
@@ -678,7 +707,8 @@ simde_svwhilelt_b32_u64(uint64_t op1, uint64_t op2) {
     }
 
     return simde_svbool_from_mmask16(r);
-  #elif defined(SIMDE_X86_AVX512BW_NATIVE) && defined(SIMDE_X86_AVX512VL_NATIVE)
+  #elif defined(SIMDE_X86_AVX512BW_NATIVE) && defined(SIMDE_X86_AVX512VL_NATIVE) \
+      && (!defined(HEDLEY_MSVC_VERSION) || HEDLEY_MSVC_VERSION_CHECK(19,20,0))
     if (HEDLEY_UNLIKELY(op1 >= op2))
       return simde_svbool_from_mmask8(HEDLEY_STATIC_CAST(__mmask8, 0));
 
@@ -712,7 +742,8 @@ simde_svbool_t
 simde_svwhilelt_b64_u64(uint64_t op1, uint64_t op2) {
   #if defined(SIMDE_ARM_SVE_NATIVE)
     return svwhilelt_b64_u64(op1, op2);
-  #elif defined(SIMDE_X86_AVX512BW_NATIVE) && (SIMDE_ARM_SVE_VECTOR_SIZE >= 512)
+  #elif defined(SIMDE_X86_AVX512BW_NATIVE) && (SIMDE_ARM_SVE_VECTOR_SIZE >= 512) \
+      && (!defined(HEDLEY_MSVC_VERSION) || HEDLEY_MSVC_VERSION_CHECK(19,20,0))
     if (HEDLEY_UNLIKELY(op1 >= op2))
       return simde_svbool_from_mmask8(HEDLEY_STATIC_CAST(__mmask8, 0));
 
@@ -723,7 +754,8 @@ simde_svwhilelt_b64_u64(uint64_t op1, uint64_t op2) {
     }
 
     return simde_svbool_from_mmask8(r);
-  #elif defined(SIMDE_X86_AVX512BW_NATIVE) && defined(SIMDE_X86_AVX512VL_NATIVE)
+  #elif defined(SIMDE_X86_AVX512BW_NATIVE) && defined(SIMDE_X86_AVX512VL_NATIVE) \
+      && (!defined(HEDLEY_MSVC_VERSION) || HEDLEY_MSVC_VERSION_CHECK(19,20,0))
     if (HEDLEY_UNLIKELY(op1 >= op2))
       return simde_svbool_from_mmask4(HEDLEY_STATIC_CAST(__mmask8, 0));
 

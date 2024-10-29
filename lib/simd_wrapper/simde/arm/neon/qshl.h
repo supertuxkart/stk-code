@@ -23,6 +23,7 @@
  * Copyright:
  *   2020      Evan Nemerson <evan@nemerson.com>
  *   2020      Christopher Moore <moore@free.fr>
+ *   2023      Yi-Yen Chung <eric681@andestech.com> (Copyright owned by Andes Technology)
  */
 
 #if !defined(SIMDE_ARM_NEON_QSHL_H)
@@ -330,7 +331,7 @@ simde_vqshld_u64(uint64_t a, int64_t b) {
   #endif
 }
 #if defined(SIMDE_ARM_NEON_A64V8_ENABLE_NATIVE_ALIASES)
-  #undef vqshldb_u64
+  #undef vqshld_u64
   #define vqshld_u64(a, b) simde_vqshld_u64((a), (b))
 #endif
 

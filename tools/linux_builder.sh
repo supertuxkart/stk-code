@@ -465,10 +465,9 @@ build_stk()
         cp -a -f "$DEPENDENCIES_DIR/../lib/wayland/"* "$DEPENDENCIES_DIR/wayland"
     
         cd "$DEPENDENCIES_DIR/wayland"
-        ./autogen.sh
-        ./configure --prefix="$INSTALL_DIR" --disable-documentation &&
-        make -j$THREADS_NUMBER &&
-        make install
+        meson --prefix="$INSTALL_DIR" -Ddocumentation=false build &&
+        ninja -C build -j$THREADS_NUMBER &&
+        ninja -C build install
         check_error
         touch "$DEPENDENCIES_DIR/wayland.stamp"
     fi
@@ -584,15 +583,15 @@ build_stk()
     check_error
     
     # Stk editor
-    mkdir -p "$STKEDITOR_DIR/$BUILD_DIR"
-    cd "$STKEDITOR_DIR/$BUILD_DIR"
-    cmake .. -DCMAKE_FIND_ROOT_PATH="$INSTALL_DIR" \
-             -DSTATIC_ZLIB=1 \
-             -DSTATIC_PHYSFS=1 \
-             -DCMAKE_DISABLE_FIND_PACKAGE_Fontconfig=1 \
-             $STK_CMAKE_FLAGS &&
-    make -j$THREADS_NUMBER
-    check_error
+    # mkdir -p "$STKEDITOR_DIR/$BUILD_DIR"
+    # cd "$STKEDITOR_DIR/$BUILD_DIR"
+    # cmake .. -DCMAKE_FIND_ROOT_PATH="$INSTALL_DIR" \
+    #          -DSTATIC_ZLIB=1 \
+    #          -DSTATIC_PHYSFS=1 \
+    #          -DCMAKE_DISABLE_FIND_PACKAGE_Fontconfig=1 \
+    #          $STK_CMAKE_FLAGS &&
+    # make -j$THREADS_NUMBER
+    # check_error
 }
 
 copy_libraries()
@@ -649,20 +648,20 @@ test_package()
         exit 1
     fi
     
-    if [ `objdump -a "$PACKAGE_DIR/bin/supertuxkart-editor" | grep -c "$BINARY_ARCH"` -eq 0 ]; then
-        echo "Error: bin/supertuxkart-editor is not $BINARY_ARCH"
-        exit 1
-    fi
+    # if [ `objdump -a "$PACKAGE_DIR/bin/supertuxkart-editor" | grep -c "$BINARY_ARCH"` -eq 0 ]; then
+    #     echo "Error: bin/supertuxkart-editor is not $BINARY_ARCH"
+    #     exit 1
+    # fi
 
     if [ `LD_LIBRARY_PATH="$PACKAGE_DIR/lib" ldd "$PACKAGE_DIR/bin/supertuxkart" | grep -c "not found"` -gt 0 ]; then
         echo "Error: bin/supertuxkart has some missing libraries"
         exit 1
     fi
     
-    if [ `ldd "$PACKAGE_DIR/bin/supertuxkart-editor" | grep -c "not found"` -gt 0 ]; then
-        echo "Error: bin/supertuxkart-editor has some missing libraries"
-        exit 1
-    fi
+    # if [ `ldd "$PACKAGE_DIR/bin/supertuxkart-editor" | grep -c "not found"` -gt 0 ]; then
+    #     echo "Error: bin/supertuxkart-editor has some missing libraries"
+    #     exit 1
+    # fi
 
     LD_LIBRARY_PATH="$PACKAGE_DIR/lib" "$PACKAGE_DIR/bin/supertuxkart" --version
     
@@ -711,13 +710,13 @@ create_package()
     write_run_game_sh "$STK_PACKAGE_DIR"
     
     cp "$STKCODE_DIR/$BUILD_DIR-$ARCH/bin/supertuxkart" "$STK_INSTALL_DIR/supertuxkart-$STK_VERSION-linux-$ARCH-symbols"
-    cp "$STKEDITOR_DIR/$BUILD_DIR-$ARCH/bin/supertuxkart-editor" "$STK_INSTALL_DIR/supertuxkart-editor-$STK_VERSION-linux-$ARCH-symbols"
+    # cp "$STKEDITOR_DIR/$BUILD_DIR-$ARCH/bin/supertuxkart-editor" "$STK_INSTALL_DIR/supertuxkart-editor-$STK_VERSION-linux-$ARCH-symbols"
     
     cp -a "$STKCODE_DIR/$BUILD_DIR-$ARCH/bin/supertuxkart" "$STK_PACKAGE_DIR/bin/"
-    cp -a "$STKEDITOR_DIR/$BUILD_DIR-$ARCH/bin/supertuxkart-editor" "$STK_PACKAGE_DIR/bin/"
+    # cp -a "$STKEDITOR_DIR/$BUILD_DIR-$ARCH/bin/supertuxkart-editor" "$STK_PACKAGE_DIR/bin/"
     
     cp -a "$STKCODE_DIR/data/." "$STK_PACKAGE_DIR/data"
-    cp -a "$STKASSETS_DIR/editor" "$STK_PACKAGE_DIR/data/"
+    # cp -a "$STKASSETS_DIR/editor" "$STK_PACKAGE_DIR/data/"
     cp -a "$STKASSETS_DIR/karts" "$STK_PACKAGE_DIR/data/"
     cp -a "$STKASSETS_DIR/library" "$STK_PACKAGE_DIR/data/"
     cp -a "$STKASSETS_DIR/models" "$STK_PACKAGE_DIR/data/"
@@ -728,7 +727,7 @@ create_package()
     cp -a "$STKASSETS_DIR/licenses.txt" "$STK_PACKAGE_DIR/data/"
     
     strip --strip-debug "$STK_PACKAGE_DIR/bin/supertuxkart"
-    strip --strip-debug "$STK_PACKAGE_DIR/bin/supertuxkart-editor"
+    # strip --strip-debug "$STK_PACKAGE_DIR/bin/supertuxkart-editor"
     
     find "$STK_PACKAGE_DIR/bin" -type f -exec chrpath -d {} \;
     find "$STK_PACKAGE_DIR/lib" -type f -exec chrpath -d {} \;
@@ -753,7 +752,7 @@ create_package()
 if [ ! -z "$1" ] && [ "$1" = "clean" ]; then
     rm -rf "$DEPENDENCIES_DIR-"*
     rm -rf "$STKCODE_DIR/$BUILD_DIR-"*
-    rm -rf "$STKEDITOR_DIR/$BUILD_DIR-"*
+    # rm -rf "$STKEDITOR_DIR/$BUILD_DIR-"*
     rm -rf "$STK_INSTALL_DIR"
     exit 0
 fi

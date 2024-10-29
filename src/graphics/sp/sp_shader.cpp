@@ -44,7 +44,7 @@ SPShader::SPShader(const std::string& name,
                    m_use_tangents(use_tangents), m_srgb(srgb)
 {
 #ifndef SERVER_ONLY
-    if (CVS->isARBTextureBufferObjectUsable())
+    if (skinningUseTBO())
     {
 #ifndef USE_GLES2
         m_prefilled_names["skinning_tex"] = std::make_pair<unsigned, 

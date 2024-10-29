@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 #
 # (C) 2016-2017 Dawid Gan, under the GPLv3
 #
@@ -57,6 +57,7 @@ export BLACKLIST_FILES="data/supertuxkart.icns \
 
 ################################################################################
 
+export OS_NAME="`uname -s`"
 export LANG=C
 
 cd "`dirname "$0"`"
@@ -411,7 +412,7 @@ convert_to_jpg()
         return
     fi
 
-    NEW_FILE="`echo $FILE | head -c -5`.jpg"
+    NEW_FILE="`echo $FILE | rev | cut -c 5- | rev`.jpg"
 
     if [ -f "$NEW_FILE" ]; then
         #echo "  There is already a file with .jpg extension. Ignore..."
@@ -441,9 +442,13 @@ convert_to_jpg_extract_b3dz()
     rm -f "$FILE"
 
     TEXNAME="`basename "$FILE"`"
-    NEWNAME="`echo $TEXNAME | head -c -6`.b3d"
+    NEWNAME="`echo $TEXNAME | rev | cut -c 6- | rev`.b3d"
 
-    sed -i "s/\"$TEXNAME\"/\"$NEWNAME\"/g" "$DIRNAME/kart.xml"
+    if [ "$OS_NAME" = "Darwin" ]; then
+        sed -i "" "s/\"$TEXNAME\"/\"$NEWNAME\"/g" "$DIRNAME/kart.xml"
+    else
+        sed -i "s/\"$TEXNAME\"/\"$NEWNAME\"/g" "$DIRNAME/kart.xml"
+    fi
 }
 
 convert_to_jpg_update_b3d()
@@ -617,10 +622,15 @@ convert_to_jpg_update_xml()
             continue;
         fi
 
-        TEXNAME="`basename "$CONVERTED_TEXTURE" | head -c -5`"
+        TEXNAME="`basename "$CONVERTED_TEXTURE" | rev | cut -c 5- | rev`"
 
-        sed -i "s/\"$TEXNAME.[pP][nN][gG]/\"$TEXNAME.jpg/g" "$FILE"
-        sed -i "s/ $TEXNAME.[pP][nN][gG]/ $TEXNAME.jpg/g" "$FILE"
+        if [ "$OS_NAME" = "Darwin" ]; then
+            sed -i "" "s/\"$TEXNAME.[pP][nN][gG]/\"$TEXNAME.jpg/g" "$FILE"
+            sed -i "" "s/ $TEXNAME.[pP][nN][gG]/ $TEXNAME.jpg/g" "$FILE"
+        else
+            sed -i "s/\"$TEXNAME.[pP][nN][gG]/\"$TEXNAME.jpg/g" "$FILE"
+            sed -i "s/ $TEXNAME.[pP][nN][gG]/ $TEXNAME.jpg/g" "$FILE"
+        fi
     done < "./converted_textures"
 }
 
@@ -679,12 +689,21 @@ fi
 # Generate files list
 echo "Generate files list"
 find "$OUTPUT_PATH"/* -type d| sort > tmp1.txt
-sed -i 's/$/\//' tmp1.txt
+if [ "$OS_NAME" = "Darwin" ]; then
+    sed -i "" 's/$/\//' tmp1.txt
+else
+    sed -i 's/$/\//' tmp1.txt
+fi
 find "$OUTPUT_PATH"/* -type f| sort > tmp2.txt
 cat tmp1.txt tmp2.txt | sort > "$OUTPUT_PATH/files.txt"
 rm tmp1.txt tmp2.txt
-sed -i s/".\/$OUTPUT_PATH\/"// "$OUTPUT_PATH/files.txt"
-sed -i s/"$OUTPUT_PATH\/"// "$OUTPUT_PATH/files.txt"
+if [ "$OS_NAME" = "Darwin" ]; then
+    sed -i "" s/".\/$OUTPUT_PATH\/"// "$OUTPUT_PATH/files.txt"
+    sed -i "" s/"$OUTPUT_PATH\/"// "$OUTPUT_PATH/files.txt"
+else
+    sed -i s/".\/$OUTPUT_PATH\/"// "$OUTPUT_PATH/files.txt"
+    sed -i s/"$OUTPUT_PATH\/"// "$OUTPUT_PATH/files.txt"
+fi
 
 # A file that can be used to check if apk has assets
 echo "has_assets" > "$OUTPUT_PATH/has_assets.txt"

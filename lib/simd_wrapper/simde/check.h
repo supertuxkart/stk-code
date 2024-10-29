@@ -1,5 +1,5 @@
 /* Check (assertions)
- * Portable Snippets - https://gitub.com/nemequ/portable-snippets
+ * Portable Snippets - https://github.com/nemequ/portable-snippets
  * Created by Evan Nemerson <evan@nemerson.com>
  *
  *   To the extent possible under law, the authors have waived all

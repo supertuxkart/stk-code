@@ -17,8 +17,8 @@
 
 #include "states_screens/edit_track_screen.hpp"
 
+#include "config/player_manager.hpp"
 #include "graphics/stk_tex_manager.hpp"
-
 #include "guiengine/widgets/button_widget.hpp"
 #include "guiengine/widgets/check_box_widget.hpp"
 #include "guiengine/widgets/dynamic_ribbon_widget.hpp"
@@ -92,6 +92,8 @@ void EditTrackScreen::loadedFromFile()
     DynamicRibbonWidget* tracks_widget = getWidget<DynamicRibbonWidget>("tracks");
     assert(tracks_widget != NULL);
     tracks_widget->setMaxLabelLength(MAX_LABEL_LENGTH);
+    // Avoid too many items shown at the same time
+    tracks_widget->setItemCountHint(std::min((int)track_manager->getNumberOfTracks()+1, 30));
 
     m_screenshot = getWidget<IconButtonWidget>("screenshot");
     m_screenshot->setFocusable(false);
@@ -101,6 +103,9 @@ void EditTrackScreen::loadedFromFile()
 // -----------------------------------------------------------------------------
 void EditTrackScreen::beforeAddingWidget()
 {
+    track_manager->setFavoriteTrackStatus(
+        PlayerManager::getCurrentPlayer()->getFavoriteTrackStatus());
+    
     RibbonWidget* tabs = getWidget<RibbonWidget>("trackgroups");
     assert (tabs != NULL);
 
@@ -118,6 +123,11 @@ void EditTrackScreen::beforeAddingWidget()
 // -----------------------------------------------------------------------------
 void EditTrackScreen::init()
 {
+    m_search_box = getWidget<TextBoxWidget>("search");
+    assert(m_search_box != NULL);
+    m_search_box->clearListeners();
+    m_search_box->addListener(this);
+
     RibbonWidget* tabs = getWidget<RibbonWidget>("trackgroups");
     assert (tabs != NULL);
     SpinnerWidget* laps = getWidget<SpinnerWidget>("laps");
@@ -183,24 +193,75 @@ void EditTrackScreen::eventCallback(GUIEngine::Widget* widget, const std::string
 // -----------------------------------------------------------------------------
 void EditTrackScreen::loadTrackList()
 {
+    track_manager->setFavoriteTrackStatus(
+        PlayerManager::getCurrentPlayer()->getFavoriteTrackStatus());
+
     DynamicRibbonWidget* tracks_widget = getWidget<DynamicRibbonWidget>("tracks");
     assert(tracks_widget != NULL);
 
     tracks_widget->clearItems();
 
-    for (unsigned int i = 0; i < track_manager->getNumberOfTracks(); i++)
+    // First build a list of all tracks to be displayed
+    // (e.g. exclude arenas, ...)
+    PtrVector<Track, REF> tracks;
+
+    if (m_track_group == ALL_TRACKS_GROUP_ID)
     {
-        Track* t = track_manager->getTrack(i);
-        bool belongs_to_group = (m_track_group.empty()                ||
-                          m_track_group == ALL_TRACKS_GROUP_ID ||
-                          t->isInGroup(m_track_group)                );
-        if (!t->isArena()    && !t->isSoccer() &&
-            !t->isInternal() && belongs_to_group       )
+        const int track_amount = (int)track_manager->getNumberOfTracks();
+        for (int n = 0; n < track_amount; n++)
         {
-            tracks_widget->addItem(t->getName(),
-                                   t->getIdent(),
-                                   t->getScreenshotFile(), 0,
-                                   IconButtonWidget::ICON_PATH_TYPE_ABSOLUTE);
+            Track* curr = track_manager->getTrack(n);
+            if (curr->isArena() || curr->isSoccer() || curr->isInternal()) continue;
+            if (RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_EASTER_EGG
+                && !curr->hasEasterEggs())
+                continue;
+            core::stringw search_text = m_search_box->getText();
+            search_text.make_lower();
+            if (!search_text.empty() &&
+                curr->getName().make_lower().find(search_text.c_str()) == -1)
+                continue;
+
+            tracks.push_back(curr);
+        }   // for n<track_amount
+    }
+    else
+    {
+        const std::vector<int>& curr_tracks = track_manager->getTracksInGroup(m_track_group);
+        const int track_amount = (int)curr_tracks.size();
+
+        for (int n = 0; n < track_amount; n++)
+        {
+            Track* curr = track_manager->getTrack(curr_tracks[n]);
+            if (curr->isArena() || curr->isSoccer() || curr->isInternal()) continue;
+            if (RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_EASTER_EGG
+                && !curr->hasEasterEggs())
+                continue;
+            core::stringw search_text = m_search_box->getText();
+            search_text.make_lower();
+            if (!search_text.empty() &&
+                curr->getName().make_lower().find(search_text.c_str()) == -1)
+                continue;
+
+            tracks.push_back(curr);
+        }   // for n<track_amount
+    }
+
+    tracks.insertionSort();
+
+    for (unsigned int i = 0; i < tracks.size(); i++)
+    {
+        Track *curr = tracks.get(i);
+        if (PlayerManager::getCurrentPlayer()->isFavoriteTrack(curr->getIdent()))
+        {
+            tracks_widget->addItem(curr->getName(), curr->getIdent(),
+                curr->getScreenshotFile(), HEART_BADGE,
+                IconButtonWidget::ICON_PATH_TYPE_ABSOLUTE);
+        }
+        else
+        {
+            tracks_widget->addItem(curr->getName(), curr->getIdent(),
+                curr->getScreenshotFile(), 0,
+                IconButtonWidget::ICON_PATH_TYPE_ABSOLUTE);
         }
     }
 

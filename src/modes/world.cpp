@@ -1084,7 +1084,6 @@ void World::updateWorld(int ticks)
 
 void World::scheduleTutorial()
 {
-    printf("Tutorial scheduled\n");
     m_schedule_exit_race = true;
     m_schedule_tutorial = true;
 }   // scheduleTutorial

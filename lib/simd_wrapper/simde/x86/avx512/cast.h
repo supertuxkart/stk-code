@@ -101,6 +101,39 @@ simde_mm512_castps_si512 (simde__m512 a) {
 #endif
 
 SIMDE_FUNCTION_ATTRIBUTES
+simde__m512i
+simde_mm512_castph_si512 (simde__m512h a) {
+  #if defined(SIMDE_X86_AVX512FP16_NATIVE)
+    return _mm512_castph_si512(a);
+  #else
+    simde__m512i r;
+    simde_memcpy(&r, &a, sizeof(r));
+    return r;
+  #endif
+}
+#if defined(SIMDE_X86_AVX512FP16_ENABLE_NATIVE_ALIASES)
+  #undef _mm512_castph_si512
+  #define _mm512_castph_si512(a) simde_mm512_castph_si512(a)
+#endif
+
+
+SIMDE_FUNCTION_ATTRIBUTES
+simde__m512h
+simde_mm512_castsi512_ph (simde__m512i a) {
+  #if defined(SIMDE_X86_AVX512FP16_NATIVE)
+    return _mm512_castsi512_ph(a);
+  #else
+    simde__m512h r;
+    simde_memcpy(&r, &a, sizeof(r));
+    return r;
+  #endif
+}
+#if defined(SIMDE_X86_AVX512FP16_ENABLE_NATIVE_ALIASES)
+  #undef _mm512_castsi512_ph
+  #define _mm512_castsi512_ph(a) simde_mm512_castsi512_ph(a)
+#endif
+
+SIMDE_FUNCTION_ATTRIBUTES
 simde__m512
 simde_mm512_castsi512_ps (simde__m512i a) {
   #if defined(SIMDE_X86_AVX512F_NATIVE)

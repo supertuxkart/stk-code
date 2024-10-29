@@ -37,7 +37,7 @@ simde_bool
 simde_svptest_first(simde_svbool_t pg, simde_svbool_t op) {
   #if defined(SIMDE_ARM_SVE_NATIVE)
     return svptest_first(pg, op);
-  #elif defined(SIMDE_X86_AVX512BW_NATIVE)
+  #elif defined(SIMDE_X86_AVX512BW_NATIVE) && (!defined(HEDLEY_MSVC_VERSION) || HEDLEY_MSVC_VERSION_CHECK(19,20,0))
     if (HEDLEY_LIKELY(pg.value & 1))
       return op.value & 1;
 

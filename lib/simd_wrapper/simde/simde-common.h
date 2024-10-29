@@ -22,6 +22,8 @@
  *
  * Copyright:
  *   2017-2020 Evan Nemerson <evan@nemerson.com>
+ *   2023      Yi-Yen Chung <eric681@andestech.com> (Copyright owned by Andes Technology)
+ *   2023      Ju-Hung Li <jhlee@pllab.cs.nthu.edu.tw> (Copyright owned by NTHU pllab)
  */
 
 #if !defined(SIMDE_COMMON_H)
@@ -30,8 +32,8 @@
 #include "hedley.h"
 
 #define SIMDE_VERSION_MAJOR 0
-#define SIMDE_VERSION_MINOR 7
-#define SIMDE_VERSION_MICRO 3
+#define SIMDE_VERSION_MINOR 8
+#define SIMDE_VERSION_MICRO 2
 #define SIMDE_VERSION HEDLEY_VERSION_ENCODE(SIMDE_VERSION_MAJOR, SIMDE_VERSION_MINOR, SIMDE_VERSION_MICRO)
 // Also update meson.build in the root directory of the repository
 
@@ -177,11 +179,24 @@
       HEDLEY_INTEL_VERSION_CHECK(13,0,0) || \
       defined(_Static_assert) \
     )
-#  define SIMDE_STATIC_ASSERT(expr, message) _Static_assert(expr, message)
+  /* Sometimes _Static_assert is defined (in cdefs.h) using a symbol which
+   * starts with a double-underscore. This is a system header so we have no
+   * control over it, but since it's a macro it will emit a diagnostic which
+   * prevents compilation with -Werror. */
+  #if HEDLEY_HAS_WARNING("-Wreserved-identifier")
+    #define SIMDE_STATIC_ASSERT(expr, message) (__extension__({ \
+      HEDLEY_DIAGNOSTIC_PUSH \
+      _Pragma("clang diagnostic ignored \"-Wreserved-identifier\"") \
+      _Static_assert(expr, message); \
+      HEDLEY_DIAGNOSTIC_POP \
+    }))
+  #else
+    #define SIMDE_STATIC_ASSERT(expr, message) _Static_assert(expr, message)
+  #endif
 #elif \
   (defined(__cplusplus) && (__cplusplus >= 201103L)) || \
   HEDLEY_MSVC_VERSION_CHECK(16,0,0)
-#  define SIMDE_STATIC_ASSERT(expr, message) HEDLEY_DIAGNOSTIC_DISABLE_CPP98_COMPAT_WRAP_(static_assert(expr, message))
+  #define SIMDE_STATIC_ASSERT(expr, message) HEDLEY_DIAGNOSTIC_DISABLE_CPP98_COMPAT_WRAP_(static_assert(expr, message))
 #endif
 
 /* Statement exprs */
@@ -549,6 +564,57 @@ typedef SIMDE_FLOAT32_TYPE simde_float32;
 #endif
 typedef SIMDE_FLOAT64_TYPE simde_float64;
 
+#if defined(SIMDE_POLY8_TYPE)
+#  undef SIMDE_POLY8_TYPE
+#endif
+#if defined(SIMDE_ARM_NEON_A32V7_NATIVE)
+#  define SIMDE_POLY8_TYPE poly8_t
+#  define SIMDE_POLY8_C(value) (HEDLEY_STATIC_CAST(poly8_t, value))
+#else
+#  define SIMDE_POLY8_TYPE uint8_t
+#  define SIMDE_POLY8_C(value) (HEDLEY_STATIC_CAST(uint8_t, value))
+#endif
+typedef SIMDE_POLY8_TYPE simde_poly8;
+
+#if defined(SIMDE_POLY16_TYPE)
+#  undef SIMDE_POLY16_TYPE
+#endif
+#if defined(SIMDE_ARM_NEON_A32V7_NATIVE)
+#  define SIMDE_POLY16_TYPE poly16_t
+#  define SIMDE_POLY16_C(value) (HEDLEY_STATIC_CAST(poly16_t, value))
+#else
+#  define SIMDE_POLY16_TYPE uint16_t
+#  define SIMDE_POLY16_C(value) (HEDLEY_STATIC_CAST(uint16_t, value))
+#endif
+typedef SIMDE_POLY16_TYPE simde_poly16;
+
+#if defined(SIMDE_POLY64_TYPE)
+#  undef SIMDE_POLY64_TYPE
+#endif
+#if defined(SIMDE_ARM_NEON_A32V8_NATIVE)
+#  define SIMDE_POLY64_TYPE poly64_t
+#  define SIMDE_POLY64_C(value) (HEDLEY_STATIC_CAST(poly64_t, value ## ull))
+#else
+#  define SIMDE_POLY64_TYPE uint64_t
+#  define SIMDE_POLY64_C(value) value ## ull
+#endif
+typedef SIMDE_POLY64_TYPE simde_poly64;
+
+#if defined(SIMDE_POLY128_TYPE)
+#  undef SIMDE_POLY128_TYPE
+#endif
+#if defined(SIMDE_ARM_NEON_A32V8_NATIVE) && defined(SIMDE_ARCH_ARM_CRYPTO)
+#  define SIMDE_POLY128_TYPE poly128_t
+#  define SIMDE_POLY128_C(value) value
+#elif defined(__SIZEOF_INT128__)
+#  define SIMDE_POLY128_TYPE __int128
+#  define SIMDE_POLY128_C(value) (HEDLEY_STATIC_CAST(__int128, value))
+#else
+#  define SIMDE_POLY128_TYPE uint64_t
+#  define SIMDE_TARGET_NOT_SUPPORT_INT128_TYPE 1
+#endif
+typedef SIMDE_POLY128_TYPE simde_poly128;
+
 #if defined(__cplusplus)
   typedef bool simde_bool;
 #elif defined(__STDC_VERSION__) && (__STDC_VERSION__ >= 199901L)
@@ -699,6 +765,36 @@ typedef SIMDE_FLOAT64_TYPE simde_float64;
   #endif
 #endif
 
+/*** Functions that quiet a signaling NaN ***/
+
+static HEDLEY_INLINE
+double
+simde_math_quiet(double x) {
+  uint64_t tmp, mask;
+  if (!simde_math_isnan(x)) {
+    return x;
+  }
+  simde_memcpy(&tmp, &x, 8);
+  mask = 0x7ff80000;
+  mask <<= 32;
+  tmp |= mask;
+  simde_memcpy(&x, &tmp, 8);
+  return x;
+}
+
+static HEDLEY_INLINE
+float
+simde_math_quietf(float x) {
+  uint32_t tmp;
+  if (!simde_math_isnanf(x)) {
+    return x;
+  }
+  simde_memcpy(&tmp, &x, 4);
+  tmp |= 0x7fc00000lu;
+  simde_memcpy(&x, &tmp, 4);
+  return x;
+}
+
 #if defined(FE_ALL_EXCEPT)
   #define SIMDE_HAVE_FENV_H
 #elif defined(__has_include)
@@ -813,6 +909,9 @@ SIMDE_DIAGNOSTIC_DISABLE_CPP98_COMPAT_PEDANTIC_
   #define SIMDE_BUILTIN_TYPE_64_ long long
 #endif
 
+/* SIMDE_DIAGNOSTIC_DISABLE_CPP98_COMPAT_PEDANTIC_ */
+HEDLEY_DIAGNOSTIC_POP
+
 #if defined(SIMDE_BUILTIN_SUFFIX_8_)
   #define SIMDE_BUILTIN_8_(name) HEDLEY_CONCAT3(__builtin_, name, SIMDE_BUILTIN_SUFFIX_8_)
   #define SIMDE_BUILTIN_HAS_8_(name) HEDLEY_HAS_BUILTIN(HEDLEY_CONCAT3(__builtin_, name, SIMDE_BUILTIN_SUFFIX_8_))
@@ -886,6 +985,9 @@ SIMDE_DIAGNOSTIC_DISABLE_CPP98_COMPAT_PEDANTIC_
 #    if !HEDLEY_GCC_VERSION_CHECK(4,6,0)
 #      define SIMDE_BUG_GCC_BAD_MM_EXTRACT_EPI8 /* TODO: find relevant bug or commit */
 #    endif
+#    if !HEDLEY_GCC_VERSION_CHECK(7,4,0) || (HEDLEY_GCC_VERSION_CHECK(8,0,0) && !HEDLEY_GCC_VERSION_CHECK(8,3,0))
+#      define SIMDE_BUG_GCC_87467
+#    endif
 #    if !HEDLEY_GCC_VERSION_CHECK(8,0,0)
 #      define SIMDE_BUG_GCC_REV_247851
 #    endif
@@ -900,7 +1002,9 @@ SIMDE_DIAGNOSTIC_DISABLE_CPP98_COMPAT_PEDANTIC_
 #    if !HEDLEY_GCC_VERSION_CHECK(9,0,0) && defined(SIMDE_ARCH_AARCH64)
 #      define SIMDE_BUG_GCC_BAD_VEXT_REV32
 #    endif
-#    if defined(SIMDE_ARCH_X86) && !defined(SIMDE_ARCH_AMD64)
+#    if !(HEDLEY_GCC_VERSION_CHECK(9,4,0) \
+          || (HEDLEY_GCC_VERSION_CHECK(8,5,0) && !HEDLEY_GCC_VERSION_CHECK(9,0,0)) \
+         ) && defined(SIMDE_ARCH_X86) && !defined(SIMDE_ARCH_AMD64)
 #      define SIMDE_BUG_GCC_94482
 #    endif
 #    if (defined(SIMDE_ARCH_X86) && !defined(SIMDE_ARCH_AMD64)) || defined(SIMDE_ARCH_ZARCH)
@@ -910,13 +1014,15 @@ SIMDE_DIAGNOSTIC_DISABLE_CPP98_COMPAT_PEDANTIC_
 #      if HEDLEY_GCC_VERSION_CHECK(4,3,0) /* -Wsign-conversion */
 #        define SIMDE_BUG_GCC_95144
 #      endif
-#      if !HEDLEY_GCC_VERSION_CHECK(11,0,0)
+#      if !HEDLEY_GCC_VERSION_CHECK(11,2,0)
 #        define SIMDE_BUG_GCC_95483
 #      endif
 #      if defined(__OPTIMIZE__)
 #        define SIMDE_BUG_GCC_100927
 #      endif
-#      define SIMDE_BUG_GCC_98521
+#      if !(HEDLEY_GCC_VERSION_CHECK(10,3,0))
+#        define SIMDE_BUG_GCC_98521
+#      endif
 #    endif
 #    if !HEDLEY_GCC_VERSION_CHECK(9,4,0) && defined(SIMDE_ARCH_AARCH64)
 #      define SIMDE_BUG_GCC_94488
@@ -924,18 +1030,30 @@ SIMDE_DIAGNOSTIC_DISABLE_CPP98_COMPAT_PEDANTIC_
 #    if !HEDLEY_GCC_VERSION_CHECK(9,1,0) && defined(SIMDE_ARCH_AARCH64)
 #      define SIMDE_BUG_GCC_REV_264019
 #    endif
-#    if defined(SIMDE_ARCH_ARM)
+#    if (!HEDLEY_GCC_VERSION_CHECK(9,0,0) && !defined(SIMDE_ARCH_AARCH64)) || (!defined(SIMDE_ARCH_AARCH64) && defined(SIMDE_ARCH_ARM))
+#      define SIMDE_BUG_GCC_REV_260989
+#    endif
+#    if defined(SIMDE_ARCH_ARM) && !defined(SIMDE_ARCH_AARCH64)
 #      define SIMDE_BUG_GCC_95399
 #      define SIMDE_BUG_GCC_95471
-#    elif defined(SIMDE_ARCH_POWER)
+#      define SIMDE_BUG_GCC_111609
+#      if SIMDE_ARCH_ARM_CHECK(8,0)
+#        define SIMDE_BUG_GCC_113065
+#      endif
+#    endif
+#    if defined(SIMDE_ARCH_POWER)
 #      define SIMDE_BUG_GCC_95227
 #      define SIMDE_BUG_GCC_95782
-#      define SIMDE_BUG_VEC_CPSGN_REVERSED_ARGS
-#    elif defined(SIMDE_ARCH_X86) || defined(SIMDE_ARCH_AMD64)
+#      if !HEDLEY_GCC_VERSION_CHECK(12,0,0)
+#        define SIMDE_BUG_VEC_CPSGN_REVERSED_ARGS
+#      endif
+#    endif
+#    if defined(SIMDE_ARCH_X86) || defined(SIMDE_ARCH_AMD64)
 #      if !HEDLEY_GCC_VERSION_CHECK(10,2,0) && !defined(__OPTIMIZE__)
 #        define SIMDE_BUG_GCC_96174
 #      endif
-#    elif defined(SIMDE_ARCH_ZARCH)
+#    endif
+#    if defined(SIMDE_ARCH_ZARCH)
 #      define SIMDE_BUG_GCC_95782
 #      if HEDLEY_GCC_VERSION_CHECK(10,0,0)
 #        define SIMDE_BUG_GCC_101614
@@ -943,18 +1061,30 @@ SIMDE_DIAGNOSTIC_DISABLE_CPP98_COMPAT_PEDANTIC_
 #    endif
 #    if defined(SIMDE_ARCH_MIPS_MSA)
 #      define SIMDE_BUG_GCC_97248
-#      define SIMDE_BUG_GCC_100760
-#      define SIMDE_BUG_GCC_100761
-#      define SIMDE_BUG_GCC_100762
+#      if !HEDLEY_GCC_VERSION_CHECK(12,1,0)
+#        define SIMDE_BUG_GCC_100760
+#        define SIMDE_BUG_GCC_100761
+#        define SIMDE_BUG_GCC_100762
+#      endif
 #    endif
-#    define SIMDE_BUG_GCC_95399
+#    if !defined(__OPTIMIZE__) && !(\
+       HEDLEY_GCC_VERSION_CHECK(11,4,0) \
+       || (HEDLEY_GCC_VERSION_CHECK(10,4,0) && !(HEDLEY_GCC_VERSION_CHECK(11,0,0))) \
+       || (HEDLEY_GCC_VERSION_CHECK(9,5,0) && !(HEDLEY_GCC_VERSION_CHECK(10,0,0))))
+#      define SIMDE_BUG_GCC_105339
+#    endif
 #  elif defined(__clang__)
 #    if defined(SIMDE_ARCH_AARCH64)
-#      define SIMDE_BUG_CLANG_45541
-#      define SIMDE_BUG_CLANG_46844
-#      define SIMDE_BUG_CLANG_48257
+#      define SIMDE_BUG_CLANG_48257  // https://github.com/llvm/llvm-project/issues/47601
+#      define SIMDE_BUG_CLANG_71362  // https://github.com/llvm/llvm-project/issues/71362
+#      define SIMDE_BUG_CLANG_71365  // https://github.com/llvm/llvm-project/issues/71365
+#      define SIMDE_BUG_CLANG_71751  // https://github.com/llvm/llvm-project/issues/71751
+#      if !SIMDE_DETECT_CLANG_VERSION_CHECK(15,0,0)
+#        define SIMDE_BUG_CLANG_45541
+#      endif
 #      if !SIMDE_DETECT_CLANG_VERSION_CHECK(12,0,0)
 #        define SIMDE_BUG_CLANG_46840
+#        define SIMDE_BUG_CLANG_46844
 #      endif
 #      if SIMDE_DETECT_CLANG_VERSION_CHECK(10,0,0) && SIMDE_DETECT_CLANG_VERSION_NOT(11,0,0)
 #        define SIMDE_BUG_CLANG_BAD_VI64_OPS
@@ -968,19 +1098,26 @@ SIMDE_DIAGNOSTIC_DISABLE_CPP98_COMPAT_PEDANTIC_
 #      if !SIMDE_DETECT_CLANG_VERSION_CHECK(11,0,0)
 #        define SIMDE_BUG_CLANG_BAD_VGET_SET_LANE_TYPES
 #      endif
+#      if defined(SIMDE_ARM_NEON_A32V7_NATIVE) && !defined(SIMDE_ARM_NEON_A32V8_NATIVE)
+#        define SIMDE_BUG_CLANG_71763  // https://github.com/llvm/llvm-project/issues/71763
+#      endif
 #    endif
 #    if defined(SIMDE_ARCH_POWER) && !SIMDE_DETECT_CLANG_VERSION_CHECK(12,0,0)
 #      define SIMDE_BUG_CLANG_46770
 #    endif
 #    if defined(SIMDE_ARCH_POWER) && (SIMDE_ARCH_POWER == 700) && (SIMDE_DETECT_CLANG_VERSION_CHECK(11,0,0))
-#      define SIMDE_BUG_CLANG_50893
-#      define SIMDE_BUG_CLANG_50901
+#      if !SIMDE_DETECT_CLANG_VERSION_CHECK(13,0,0)
+#        define SIMDE_BUG_CLANG_50893
+#        define SIMDE_BUG_CLANG_50901
+#      endif
 #    endif
 #    if defined(_ARCH_PWR9) && !SIMDE_DETECT_CLANG_VERSION_CHECK(12,0,0) && !defined(__OPTIMIZE__)
 #      define SIMDE_BUG_CLANG_POWER9_16x4_BAD_SHIFT
 #    endif
 #    if defined(SIMDE_ARCH_POWER)
-#      define SIMDE_BUG_CLANG_50932
+#      if !SIMDE_DETECT_CLANG_VERSION_CHECK(14,0,0)
+#        define SIMDE_BUG_CLANG_50932
+#      endif
 #      if !SIMDE_DETECT_CLANG_VERSION_CHECK(12,0,0)
 #        define SIMDE_BUG_VEC_CPSGN_REVERSED_ARGS
 #      endif
@@ -1007,9 +1144,12 @@ SIMDE_DIAGNOSTIC_DISABLE_CPP98_COMPAT_PEDANTIC_
 #      if HEDLEY_HAS_WARNING("-Wvector-conversion") && SIMDE_DETECT_CLANG_VERSION_NOT(11,0,0)
 #        define SIMDE_BUG_CLANG_44589
 #      endif
-#      define SIMDE_BUG_CLANG_48673
+#      define SIMDE_BUG_CLANG_48673  // https://github.com/llvm/llvm-project/issues/48017
 #    endif
-#    define SIMDE_BUG_CLANG_45959
+#    define SIMDE_BUG_CLANG_45959  // https://github.com/llvm/llvm-project/issues/45304
+#    if defined(SIMDE_ARCH_WASM_SIMD128) && !SIMDE_DETECT_CLANG_VERSION_CHECK(17,0,0)
+#      define SIMDE_BUG_CLANG_60655
+#    endif
 #  elif defined(HEDLEY_MSVC_VERSION)
 #    if defined(SIMDE_ARCH_X86)
 #      define SIMDE_BUG_MSVC_ROUND_EXTRACT
@@ -1037,10 +1177,9 @@ SIMDE_DIAGNOSTIC_DISABLE_CPP98_COMPAT_PEDANTIC_
     HEDLEY_GCC_VERSION_CHECK(4,3,0)
 #  define SIMDE_BUG_IGNORE_SIGN_CONVERSION(expr) (__extension__ ({ \
        HEDLEY_DIAGNOSTIC_PUSH  \
-       HEDLEY_DIAGNOSTIC_POP  \
        _Pragma("GCC diagnostic ignored \"-Wsign-conversion\"") \
        __typeof__(expr) simde_bug_ignore_sign_conversion_v_= (expr); \
-       HEDLEY_DIAGNOSTIC_PUSH  \
+       HEDLEY_DIAGNOSTIC_POP  \
        simde_bug_ignore_sign_conversion_v_; \
      }))
 #else
@@ -1055,6 +1194,34 @@ SIMDE_DIAGNOSTIC_DISABLE_CPP98_COMPAT_PEDANTIC_
   #define SIMDE_CAST_VECTOR_SHIFT_COUNT(width, value) HEDLEY_STATIC_CAST(uint##width##_t, (value))
 #else
   #define SIMDE_CAST_VECTOR_SHIFT_COUNT(width, value) HEDLEY_STATIC_CAST(int##width##_t, (value))
+#endif
+
+/* Initial support for RISCV V extensions based on ZVE64D. */
+#if defined(SIMDE_ARCH_RISCV_ZVE64D) && SIMDE_NATURAL_VECTOR_SIZE >= 64
+  #define RVV_FIXED_TYPE_DEF(name, lmul) \
+    typedef vint8##name##_t  fixed_vint8##name##_t __attribute__((riscv_rvv_vector_bits(__riscv_v_fixed_vlen * lmul))); \
+    typedef vint16##name##_t fixed_vint16##name##_t __attribute__((riscv_rvv_vector_bits(__riscv_v_fixed_vlen * lmul))); \
+    typedef vint32##name##_t fixed_vint32##name##_t __attribute__((riscv_rvv_vector_bits(__riscv_v_fixed_vlen * lmul))); \
+    typedef vuint8##name##_t fixed_vuint8##name##_t __attribute__((riscv_rvv_vector_bits(__riscv_v_fixed_vlen * lmul))); \
+    typedef vuint16##name##_t fixed_vuint16##name##_t __attribute__((riscv_rvv_vector_bits(__riscv_v_fixed_vlen * lmul))); \
+    typedef vuint32##name##_t fixed_vuint32##name##_t __attribute__((riscv_rvv_vector_bits(__riscv_v_fixed_vlen * lmul))); \
+    typedef vfloat32##name##_t fixed_vfloat32##name##_t __attribute__((riscv_rvv_vector_bits(__riscv_v_fixed_vlen * lmul)));
+    RVV_FIXED_TYPE_DEF(mf2, 1/2);
+    RVV_FIXED_TYPE_DEF(m1, 1);
+    RVV_FIXED_TYPE_DEF(m2, 2);
+  #define RVV_FIXED_TYPE_DEF_64B(name, lmul) \
+    typedef vint64##name##_t fixed_vint64##name##_t __attribute__((riscv_rvv_vector_bits(__riscv_v_fixed_vlen * lmul))); \
+    typedef vuint64##name##_t fixed_vuint64##name##_t __attribute__((riscv_rvv_vector_bits(__riscv_v_fixed_vlen * lmul))); \
+    typedef vfloat64##name##_t fixed_vfloat64##name##_t __attribute__((riscv_rvv_vector_bits(__riscv_v_fixed_vlen * lmul)));
+    RVV_FIXED_TYPE_DEF_64B(m1, 1);
+    RVV_FIXED_TYPE_DEF_64B(m2, 2);
+  #if defined(SIMDE_ARCH_RISCV_ZVFH)
+    #define RVV_FIXED_TYPE_DEF_16F(name, lmul) \
+      typedef vfloat16##name##_t fixed_vfloat16##name##_t __attribute__((riscv_rvv_vector_bits(__riscv_v_fixed_vlen * lmul)));
+    RVV_FIXED_TYPE_DEF_16F(mf2, 1/2);
+    RVV_FIXED_TYPE_DEF_16F(m1, 1);
+    RVV_FIXED_TYPE_DEF_16F(m2, 2);
+  #endif
 #endif
 
 /* SIMDE_DIAGNOSTIC_DISABLE_USED_BUT_MARKED_UNUSED_ */
