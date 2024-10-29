@@ -18,7 +18,7 @@
                     <label I18N="In the networking menu" align="center" proportion="1" word_wrap="true"
                         text="Enable splitscreen or player handicaps" text_align="center"/>
                     <checkbox id="enable-splitscreen" align="center"/>
-                </box>
+                </div>
                 <icon id="logo" align="center" proportion="1" width="100%" icon="gui/icons/logo.png"/>
             </div>
         </box>
