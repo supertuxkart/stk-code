@@ -10,15 +10,15 @@ For similar reasons, and because some features are vastly more complex than othe
 ### Networking
 * Improve track-voting logic when no majority is achieved, by kimden
 * Prevent selectable addons to be removed by spectators, by kimden
-* Various bugfixes and code refactors, by kimden
+* Make bot indices start from one, by JipFr
+* Various bugfixes and code-quality improvements, by kimden
 
 ### General
-* Make the game's window resizable in all the screens, by Benau and CodingJellyfish (previously, most UI screens did not support resizing)
 * New benchmark mode, by Alayan:
 - Can be run with a few clicks, allowing to easily test the performance of various settings or to compare different systems
 - Robust performance metrics that better reflect the impact of varying frametimes than Average FPS and 1% Lows.
 * Add benchmark mode to commandline options, by ektor5
-* Implement blog post announcement system in Online screen, by CodingJellyfish
+* Implement blog announcement system in Online screen, by CodingJellyfish
 * Make the progression of audio levels geometrical and increase default steps, allowing to set lower audio levels and better accuracy for low audio levels (especially useful for headphone users), by Alayan
 * Fix drive-on sound from materials being played when the game is paused, by Alayan
 * Fix a crash trying to read replays when the random starting position setting is enabled, by Alayan
@@ -26,6 +26,7 @@ For similar reasons, and because some features are vastly more complex than othe
 * Handle track names with spaces in the replay reader, by Alayan
 * Add launchable tag and use rDNS format for AppData file, by AsciiWolf
 * Various build system updates, by deveee, tobbi, ognevny and others
+* Various compiler fixes, by heirecka, limburgher, nyllet and others
 * Various tweaks, bugfixes and code-quality improvements
 
 ### Graphics
@@ -41,12 +42,14 @@ For similar reasons, and because some features are vastly more complex than othe
 * Enable new higher LoD and shadows settings, by Alayan
 * Integrate LoD (Geometry Detail) settings in the graphics presets, by Alayan
 * Prefer displaying a lower quality LoD model over switching to a higher quality one when too close, by Alayan
-* Various bugfixes, by zmike, Icenowy and others
+* Various bugfixes and improvements, by zmike, Icenowy and others
 
 ### User Interface
+* Make the game window resizable in all UI screens, by Benau and CodingJellyfish
 * Use separated "base theme" and "skin variant" values for skin configuration, by Alayan
 * Add some skin variants for Classic and Cartoon base theme, by Alayan
 * Add a new Display tab in the Settings, by Alayan
+* Add help information for Lap Trial mode, by searinminecraft
 * Allow to rate addons with a keyboard or a controller, by CodingJellyfish
 * Allow users to select favorite karts/tracks/arenas, by Alayan and CodingJellyfish
 * Allow users to search karts/arenas, by CodingJellyfish
@@ -58,6 +61,8 @@ For similar reasons, and because some features are vastly more complex than othe
 * Various enhancements, by QwertyChouskie, Nomagno, Nstelt and others
 
 ### Tracks and modeling
+* Fix start positions for negative sidewards distance, by kimden
+* Make the rescue bird place the kart towards the ball in soccer mode, by Snoker101
 * New music for Las Dunas Arena/Las Dunas Soccer, by ALBatross
 * Update Godette face texture, by ZAQraven99
 * Fix Northern Resort skybox, by Alayan
