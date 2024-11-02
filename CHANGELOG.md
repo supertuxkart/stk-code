@@ -65,8 +65,8 @@ For similar reasons, and because some features are vastly more complex than othe
 * Make the rescue bird place the kart towards the ball in soccer mode, by Snoker101
 * New music for Las Dunas Arena/Las Dunas Soccer, by ALBatross
 * Update Godette face texture, by ZAQraven99
-* Fix Northern Resort skybox, by Alayan
-* Various cut/checkline fixes, by Benau
+* Fix Northern Resort skybox, by CrystalDaEevee
+* Various cut/checkline fixes, by CrystalDaEevee
 
 ### Mobile
 * Don't keep the rescue button active after it stops being touched, when the finger keeps touching the screen (e. g. to handle the steering wheel), by S0nter
@@ -90,10 +90,12 @@ For similar reasons, and because some features are vastly more complex than othe
 ### Tracks and modeling
 * Updated Konqi, by ZAQraven99
 * New Godette kart, by ZAQraven99
+* New Hole Drop Soccer Field, by CrystalDaEevee, music by DernisNW
+* New Oasis Soccer Field, by CrystalDaEevee
 * Updated Battle Island and Cave X, by Typhon306
 * Fix broken invisible wall in Antediluvian Abyss, by Benau
 * New textures in Shifting Sands, by KartOym
-* Balanced starting positions in all official soccer fields, by Crystal
+* Balanced starting positions in all official soccer fields, by CrystalDaEevee
 
 ### Networking
 * Add track searching to network track screen, by Benau
@@ -202,7 +204,7 @@ For similar reasons, and because some features are vastly more complex than othe
 ### Tracks and modeling
 #### Karts
 * New version of Kiki, by Typhon306 and ZAQraven99
-* Improved karts, by Crystal
+* Improved karts, by CrystalDaEevee
     * Pidgin, Puffy
 * Improved beastie animation, by D_ft Kid
 
