@@ -6,13 +6,14 @@
 # 111more1, 2022
 # FIRST AUTHOR <EMAIL@ADDRESS>, 2010
 # IAN RODRÍGUEZ Lorenzo, 2022
+# Tómas Helgason, 2024
 msgid ""
 msgstr ""
 "Project-Id-Version: SuperTuxKart\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-06-16 01:41+0800\n"
 "PO-Revision-Date: 2015-02-15 01:58+0000\n"
-"Last-Translator: 111more1, 2022\n"
+"Last-Translator: Tómas Helgason, 2024\n"
 "Language-Team: Icelandic (http://app.transifex.com/supertuxkart/supertuxkart/language/is/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -22,53 +23,53 @@ msgstr ""
 
 #. I18N: In Android UI, po_extract_game_data
 msgid "Extracting game data..."
-msgstr ""
+msgstr "Vinnur úr leikjagögnum..."
 
 #. I18N: In Android UI, po_extract_error
 msgid "Game data extraction error"
-msgstr ""
+msgstr "Villa kom upp við útdrátt á leikjagögnum"
 
 #. I18N: In Android UI, po_extract_error_msg
 msgid "Check remaining device space or reinstall SuperTuxKart."
-msgstr ""
+msgstr "Skoðaðu laust Geymslurými eftir eða endursettu SuperTuxKart."
 
 #. I18N: In Android UI, po_quit
 #. I18N: ./data/gui/screens/main_menu.stkgui
 #. I18N: In the main screen
 msgid "Quit"
-msgstr ""
+msgstr "Hætta"
 
 #. I18N: ./data/achievements.xml
 msgid "Christoffel Columbus"
-msgstr ""
+msgstr "Kristófer Kólumbus"
 
 #. I18N: ./data/achievements.xml
 msgid "Play every official track at least once."
-msgstr ""
+msgstr "Spilaðu allar opinbera brautir að minnsta kosti einu sinni."
 
 #. I18N: ./data/achievements.xml
 msgid "Strike!"
-msgstr ""
+msgstr "Slag!"
 
 #. I18N: ./data/achievements.xml
 msgid "Hit 10 karts with a bowling-ball."
-msgstr ""
+msgstr "hittu 10 karts með keilukúlu."
 
 #. I18N: ./data/achievements.xml
 msgid "Arch Enemy"
-msgstr ""
+msgstr "Erkióvinur"
 
 #. I18N: ./data/achievements.xml
 msgid "Hit the same kart at least 5 times in one race."
-msgstr ""
+msgstr "Hittu sama kartinn að minnsta kosti 5 sinnum í röð í einni keppni."
 
 #. I18N: ./data/achievements.xml
 msgid "Marathoner"
-msgstr ""
+msgstr "Maraþonari"
 
 #. I18N: ./data/achievements.xml
 msgid "Finish a race with at least twice the track's default lap number."
-msgstr ""
+msgstr "Kláraðu keppni með að minnsta kosti tvöfald sjálgefna hringfjölda brautarinnar."
 
 #. I18N: ./data/achievements.xml
 msgid "Skid-row"
@@ -76,7 +77,7 @@ msgstr ""
 
 #. I18N: ./data/achievements.xml
 msgid "Skid 5 times in a single lap."
-msgstr ""
+msgstr "Skransaðu 5 sinnum í einum hring."
 
 #. I18N: ./data/achievements.xml
 msgid "Gold driver"
@@ -86,77 +87,77 @@ msgstr ""
 msgid ""
 "Win against at least 3 AIs in normal race, time-trial, and follow the "
 "leader."
-msgstr ""
+msgstr "Sigraðu á móti að minnsta kosti 3 gervigreindum í venjulegum kappakstri, tímatöku og fylgdu leiðtogan."
 
 #. I18N: ./data/achievements.xml
 msgid "Powerup Love"
-msgstr ""
+msgstr "Powerup Ást"
 
 #. I18N: ./data/achievements.xml
 msgid "Use 10 or more powerups in a race."
-msgstr ""
+msgstr "Notaðu 10 eða fleiri powerups í keppni."
 
 #. I18N: ./data/achievements.xml
 msgid "Unstoppable"
-msgstr ""
+msgstr "Óstöðvandi"
 
 #. I18N: ./data/achievements.xml
 msgid ""
 "Win 5 single races in a row against at least 3 AIs. Beware, restarting a "
 "race counts as a loss."
-msgstr ""
+msgstr "Sigraðu 5 stakar keppnir í röð á móti að minnsta kosti 3 Gervigreindum. Hafðu í huga að endurtökur á keppnum tells sem tap. "
 
 #. I18N: ./data/achievements.xml
 msgid "Banana Lover"
-msgstr ""
+msgstr "Banana elskhugi"
 
 #. I18N: ./data/achievements.xml
 msgid "Collect at least 5 bananas in one race."
-msgstr ""
+msgstr "Safnaðu að minnsta kosti 5 bönunum í einni keppni."
 
 #. I18N: ./data/achievements.xml
 msgid "It's secret"
-msgstr ""
+msgstr "Það er leyndarmál"
 
 #. I18N: ./data/achievements.xml
 msgid "Really ... a secret."
-msgstr ""
+msgstr "Virkilega ... leyndarmál."
 
 #. I18N: ./data/achievements.xml
 msgid "Mosquito Hunter"
-msgstr ""
+msgstr "Moskító veiðimaður"
 
 #. I18N: ./data/achievements.xml
 msgid ""
 "Take your opponents for mosquitos! With the swatter, squash them at least 5 "
 "times in a race."
-msgstr ""
+msgstr "Taktu andstæðinga þína fyrir moskítóflugur! Krembdu þá að minnsta kosti 5 sinnum með flugnaspaða í keppni."
 
 #. I18N: ./data/achievements.xml
 msgid "Beyond Luck"
-msgstr ""
+msgstr "Handan heppni"
 
 #. I18N: ./data/achievements.xml
 msgid ""
 "Win 10 single races in a row in Expert or SuperTux against at least 5 AIs. "
 "Beware, restarting a race counts as a loss."
-msgstr ""
+msgstr "Sigraðu 10 stakar keppnir í röð á móti að minnsta kosti 5 Gervigreindum á Erfitt eða SuperTux Erfiðleikastigi. Hafðu í huga að endurtökur á keppnum tells sem tap. "
 
 #. I18N: ./data/grandprix/1_penguinplayground.grandprix
 msgid "Penguin Playground"
-msgstr ""
+msgstr "Mörgæsa Leikvöllur"
 
 #. I18N: ./data/grandprix/2_offthebeatentrack.grandprix
 msgid "Off the Beaten Track"
-msgstr ""
+msgstr "Utan alfaraleið"
 
 #. I18N: ./data/grandprix/3_tothemoonandback.grandprix
 msgid "To the Moon and Back"
-msgstr ""
+msgstr "Til tunglsins og til baka"
 
 #. I18N: ./data/grandprix/4_atworldsend.grandprix
 msgid "At World's End"
-msgstr ""
+msgstr "Á enda heimsins"
 
 #. I18N: ./data/gui/dialogs/addons_loading.stkgui
 #. I18N: Add-on screen action
@@ -171,21 +172,21 @@ msgstr ""
 #: src/input/gamepad_config.cpp:157
 #: src/states_screens/dialogs/addons_loading.cpp:303
 msgid "Back"
-msgstr ""
+msgstr "Til baka"
 
 #. I18N: ./data/gui/dialogs/addons_loading.stkgui
 #. I18N: Add-on screen action
 msgid "Install"
-msgstr ""
+msgstr "Uppsettu"
 
 #. I18N: ./data/gui/dialogs/addons_loading.stkgui
 #. I18N: Add-on screen action
 msgid "Uninstall"
-msgstr ""
+msgstr "Fjarlægðu"
 
 #. I18N: ./data/gui/dialogs/android/init_android.stkgui
 msgid "Select a type of control that you prefer"
-msgstr ""
+msgstr "Veldu tengund af fjarstýringu sem þú hyggist"
 
 #. I18N: ./data/gui/dialogs/android/init_android.stkgui
 #. I18N: Control type
@@ -193,7 +194,7 @@ msgstr ""
 #. I18N: In the multitouch settings screen
 #: src/states_screens/dialogs/race_paused_dialog.cpp:549
 msgid "Accelerometer"
-msgstr ""
+msgstr "Hröðunarmælir"
 
 #. I18N: ./data/gui/dialogs/android/init_android.stkgui
 #. I18N: Control type
@@ -207,23 +208,23 @@ msgstr ""
 #. I18N: Race paused button
 #: src/states_screens/dialogs/race_paused_dialog.cpp:554
 msgid "Gyroscope"
-msgstr ""
+msgstr "Gyroscope"
 
 #. I18N: ./data/gui/dialogs/android/init_android.stkgui
 #. I18N: Control type
 #: src/states_screens/dialogs/race_paused_dialog.cpp:544
 msgid "Steering wheel"
-msgstr ""
+msgstr "Stýrihjól"
 
 #. I18N: ./data/gui/dialogs/android/init_android.stkgui
 #. I18N: ./data/gui/dialogs/android/multitouch_settings.stkgui
 #. I18N: In the multitouch settings screen
 msgid "Auto acceleration"
-msgstr ""
+msgstr "Sjálfvirk hröðun"
 
 #. I18N: ./data/gui/dialogs/android/init_android.stkgui
 msgid "You can change it later in touch device settings."
-msgstr ""
+msgstr "Þú getur breytt því seinna í snertitækja stillingum."
 
 #. I18N: ./data/gui/dialogs/android/init_android.stkgui
 #. I18N: ./data/gui/dialogs/android/multitouch_settings.stkgui
@@ -234,11 +235,11 @@ msgstr ""
 #. I18N: ./data/gui/dialogs/kart_color_slider.stkgui
 #. I18N: In the kart color slider dialog
 msgid "Apply"
-msgstr ""
+msgstr "Nota"
 
 #. I18N: ./data/gui/dialogs/android/multitouch_settings.stkgui
 msgid "Touch Device Settings"
-msgstr ""
+msgstr "Snertitækja Stillingar"
 
 #. I18N: ./data/gui/dialogs/android/multitouch_settings.stkgui
 #. I18N: In the multitouch settings screen
@@ -273,46 +274,46 @@ msgstr ""
 #. I18N: ./data/gui/screens/user_screen_tab.stkgui
 #. I18N: Section in the settings menu
 msgid "General"
-msgstr ""
+msgstr "Almennt"
 
 #. I18N: ./data/gui/dialogs/android/multitouch_settings.stkgui
 #. I18N: In the multitouch settings screen
 msgid "Device enabled"
-msgstr ""
+msgstr "Tækið er virkt"
 
 #. I18N: ./data/gui/dialogs/android/multitouch_settings.stkgui
 #. I18N: In the multitouch settings screen
 msgid "Inverted buttons"
-msgstr ""
+msgstr "Öfugir hnappar"
 
 #. I18N: ./data/gui/dialogs/android/multitouch_settings.stkgui
 #. I18N: In the multitouch settings screen
 msgid "Buttons scale"
-msgstr ""
+msgstr "Hnappa kvarði"
 
 #. I18N: ./data/gui/dialogs/android/multitouch_settings.stkgui
 #. I18N: In the multitouch settings screen
 msgid "Advanced"
-msgstr ""
+msgstr "Ítarleg"
 
 #. I18N: ./data/gui/dialogs/android/multitouch_settings.stkgui
 #. I18N: In the multitouch settings screen
 msgid "Deadzone"
-msgstr ""
+msgstr "Deadzone"
 
 #. I18N: ./data/gui/dialogs/android/multitouch_settings.stkgui
 #. I18N: In the multitouch settings screen
 msgid "Sensitivity X"
-msgstr ""
+msgstr "Næmi X ás"
 
 #. I18N: ./data/gui/dialogs/android/multitouch_settings.stkgui
 #. I18N: In the multitouch settings screen
 msgid "Sensitivity Y"
-msgstr ""
+msgstr "Næmi Y ás"
 
 #. I18N: ./data/gui/dialogs/android/multitouch_settings.stkgui
 msgid "Restore defaults"
-msgstr ""
+msgstr "Endurheimtu sjálgefnar breytur"
 
 #. I18N: ./data/gui/dialogs/confirm_dialog.stkgui
 #. I18N: In a 'are you sure?' dialog
@@ -354,7 +355,7 @@ msgstr ""
 #: src/states_screens/online/register_screen.cpp:168
 #: src/states_screens/options/user_screen.cpp:128
 msgid "Cancel"
-msgstr ""
+msgstr "Hætta við"
 
 #. I18N: ./data/gui/dialogs/confirm_dialog.stkgui
 #. I18N: In a 'are you sure?' dialog
@@ -364,13 +365,13 @@ msgstr ""
 #: src/states_screens/ghost_replay_selection.cpp:388
 #: src/states_screens/high_score_selection.cpp:265
 msgid "Yes"
-msgstr ""
+msgstr "Já"
 
 #. I18N: ./data/gui/dialogs/confirm_resolution_dialog.stkgui
 #. I18N: In the 'confirm resolution' dialog, that's shown when switching
 #. resoluton
 msgid "Revert"
-msgstr ""
+msgstr "Afturkalla"
 
 #. I18N: ./data/gui/dialogs/confirm_resolution_dialog.stkgui
 #. I18N: In the 'confirm resolution' dialog, that's shown when switching
@@ -378,31 +379,31 @@ msgstr ""
 #. I18N: ./data/gui/dialogs/online/registration_terms.stkgui
 #. I18N: In the registration dialog
 msgid "Accept"
-msgstr ""
+msgstr "Samþykkja"
 
 #. I18N: ./data/gui/dialogs/custom_camera_settings.stkgui
 msgid "Camera Settings"
-msgstr ""
+msgstr "Myndavéla stillingar"
 
 #. I18N: ./data/gui/dialogs/custom_camera_settings.stkgui
 #. I18N: In the ui/camera settings
 msgid "Player camera"
-msgstr ""
+msgstr "Myndarvél leikmans"
 
 #. I18N: ./data/gui/dialogs/custom_camera_settings.stkgui
 #. I18N: In the ui/camera screen
 msgid "FOV"
-msgstr ""
+msgstr "Sjónsvið"
 
 #. I18N: ./data/gui/dialogs/custom_camera_settings.stkgui
 #. I18N: In the ui/camera screen
 msgid "Distance"
-msgstr ""
+msgstr "Fjarlægð"
 
 #. I18N: ./data/gui/dialogs/custom_camera_settings.stkgui
 #. I18N: In the ui/camera screen
 msgid "Angle"
-msgstr ""
+msgstr "Horn"
 
 #. I18N: ./data/gui/dialogs/custom_camera_settings.stkgui
 #. I18N: In the ui/camera screen
@@ -766,7 +767,7 @@ msgstr ""
 #. I18N: Difficulty
 #: src/race/race_manager.cpp:1309
 msgid "Novice"
-msgstr ""
+msgstr "Létt"
 
 #. I18N: ./data/gui/dialogs/online/server_configuration_dialog.stkgui
 #. I18N: Difficulty
@@ -778,7 +779,7 @@ msgstr ""
 #. I18N: Difficulty
 #: src/race/race_manager.cpp:1310
 msgid "Intermediate"
-msgstr ""
+msgstr "Venjulegt"
 
 #. I18N: ./data/gui/dialogs/online/server_configuration_dialog.stkgui
 #. I18N: Difficulty
@@ -790,7 +791,7 @@ msgstr ""
 #. I18N: Difficulty
 #: src/race/race_manager.cpp:1311
 msgid "Expert"
-msgstr ""
+msgstr "Erfitt"
 
 #. I18N: ./data/gui/dialogs/online/server_configuration_dialog.stkgui
 #. I18N: Difficulty

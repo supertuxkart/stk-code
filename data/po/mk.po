@@ -910,7 +910,7 @@ msgstr "Информации за Корисникот"
 #. I18N: ./data/gui/dialogs/online/user_info_dialog.stkgui
 #. I18N: User info dialog
 msgid "Remove Friend"
-msgstr ""
+msgstr "Отстрани пријател"
 
 #. I18N: ./data/gui/dialogs/online/user_info_dialog.stkgui
 #. I18N: User info dialog
@@ -920,17 +920,17 @@ msgstr "Додади Пријател"
 #. I18N: ./data/gui/dialogs/online/user_info_dialog.stkgui
 #. I18N: User info dialog
 msgid "Accept Invite"
-msgstr ""
+msgstr "Прифати покана"
 
 #. I18N: ./data/gui/dialogs/online/user_info_dialog.stkgui
 #. I18N: User info dialog
 msgid "Decline Invite"
-msgstr ""
+msgstr "Одби покана"
 
 #. I18N: ./data/gui/dialogs/online/user_info_dialog.stkgui
 #. I18N: User info dialog
 msgid "View Profile"
-msgstr ""
+msgstr "Погледни профил"
 
 #. I18N: ./data/gui/dialogs/online/vote_dialog.stkgui
 #. I18N: In the vote dialog
@@ -1118,7 +1118,7 @@ msgstr "Заслуги"
 
 #. I18N: ./data/gui/screens/cutscene.stkgui
 msgid "Skip"
-msgstr ""
+msgstr "Прескокни"
 
 #. I18N: ./data/gui/screens/easter_egg.stkgui
 #. I18N: Section in easter egg tracks selection screen
@@ -1500,7 +1500,7 @@ msgstr "Дух снимка: Тркајте се против дух снимк�
 #. I18N: In the help menu
 msgid ""
 "Lap Trial: Complete as many laps as possible in a given amount of time."
-msgstr ""
+msgstr "Пробен круг: Завршете колку што е можно повеќе кругови во одредено дадено време."
 
 #. I18N: ./data/gui/screens/help2.stkgui
 #. I18N: In the help menu
@@ -1998,7 +1998,7 @@ msgid ""
 "You can play without creating an online account by selecting an offline "
 "account. Though then you can not connect to friends, vote for addons etc. "
 "Please read our privacy statement at https://privacy.supertuxkart.net"
-msgstr ""
+msgstr "Можете да играте без да создадете онлајн акаунт така што ќе селектирате офлајн акаунт. Меѓутоа тогаш не можете да се конектирате со пријатели, да гласате за додатоци итн. Ве молиме прочитајте ја нашата приватна изјава на  https://privacy.supertuxkart.net"
 
 #. I18N: ./data/gui/screens/online/server_selection.stkgui
 #: src/states_screens/online/server_selection.cpp:580
@@ -2511,7 +2511,7 @@ msgstr "Кошаркаските топки можат да се уништат 
 msgid ""
 "Try to avoid crashing into the backs of other karts as this will slow you "
 "down."
-msgstr ""
+msgstr "Пробајте да избегнувате да се судирате позади други возила бидејќи ова ќе ве успори."
 
 #. I18N: ./data/tips.xml
 msgid "You can use bowling balls to push and block the ball."
@@ -2668,7 +2668,7 @@ msgstr "Хациенда"
 
 #. I18N: ../stk-assets/tracks/hole_drop/track.xml
 msgid "Hole Drop"
-msgstr ""
+msgstr "Испуштање Дупка"
 
 #. I18N: ../stk-assets/tracks/icy_soccer_field/track.xml
 msgid "Icy Soccer Field"
@@ -3794,7 +3794,7 @@ msgstr "Тежина: %s"
 #: src/network/protocols/client_lobby.cpp:743
 #, c-format
 msgid "Max players: %d"
-msgstr "Максиумум играчи: %d"
+msgstr "Максимум играчи: %d"
 
 #. I18N: In server info dialog
 #: src/network/protocols/client_lobby.cpp:756

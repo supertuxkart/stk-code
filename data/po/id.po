@@ -5,17 +5,17 @@
 # Translators:
 # Adzka - <4dzka.m.ivi@gmail.com>, 2021
 # Ai_ZAQraven <ishaqalasyja@gmail.com>, 2021-2022
-# liimee <alt3753.7@gmail.com>, 2021
-# Christian Elbrianno <christian.elbrianno41@gmail.com>, 2017
+# liimee <peackt@fedora.email>, 2021
+# Chris <christian.elbrianno41@gmail.com>, 2017
 # Christian Elbrianno, 2017
-# Christian Elbrianno <christian.elbrianno41@gmail.com>, 2023
-# Christian Elbrianno <christian.elbrianno41@gmail.com>, 2017
+# Chris <christian.elbrianno41@gmail.com>, 2023
+# Chris <christian.elbrianno41@gmail.com>, 2017
 # Christian Elbrianno Yoga, 2017
 # Dito Kurnia Pratama <ditokpl@gmail.com>, 2019
 # FIRST AUTHOR <EMAIL@ADDRESS>, 2011
 # Icho Yulian Chandra <icho.yulian@gmail.com>, 2016
 # Iwan Rahardi Putra <iwan.rahardi.putra@gmail.com>, 2017
-# liimee <alt3753.7@gmail.com>, 2021
+# liimee <peackt@fedora.email>, 2021
 # Raja Sulaiman <wormsplaycheats@gmail.com>, 2017
 # Triyan W. Nugroho <triyan.wn@gmail.com>, 2020
 # Ai_ZAQraven <ishaqalasyja@gmail.com>, 2020-2021
@@ -25,7 +25,7 @@ msgstr ""
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-06-16 01:41+0800\n"
 "PO-Revision-Date: 2015-02-15 01:58+0000\n"
-"Last-Translator: Christian Elbrianno <christian.elbrianno41@gmail.com>, 2023\n"
+"Last-Translator: Chris <christian.elbrianno41@gmail.com>, 2023\n"
 "Language-Team: Indonesian (http://app.transifex.com/supertuxkart/supertuxkart/language/id/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"

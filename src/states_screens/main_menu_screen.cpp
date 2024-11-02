@@ -72,6 +72,10 @@
 
 #include <IrrlichtDevice.h>
 
+#ifdef ANDROID
+#include <SDL_system.h>
+#endif
+
 using namespace GUIEngine;
 using namespace Online;
 
@@ -118,6 +122,15 @@ void MainMenuScreen::beforeAddingWidget()
     Widget* w = getWidget("quit");
     if (w)
         w->setVisible(false);
+#endif
+
+#ifdef ANDROID
+    if (SDL_IsAndroidTV())
+    {
+        Widget* tutorial = getWidget("startTutorial");
+        if (tutorial)
+            tutorial->setVisible(false);
+    }
 #endif
 }
 
@@ -326,6 +339,12 @@ void MainMenuScreen::onUpdate(float delta)
     // Ask if user want to play tutorial when profile is newly created
     if (player->getUseFrequency() != 0)
         return;
+
+#ifdef ANDROID
+    // Don't show tutorial dialog on Android TV
+    if (SDL_IsAndroidTV())
+        return;
+#endif
 
     player->incrementUseFrequency();
     class PlayTutorial :

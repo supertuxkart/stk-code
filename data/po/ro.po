@@ -3,7 +3,7 @@
 # This file is distributed under the same license as the supertuxkart package.
 # 
 # Translators:
-# Dominik Jastrzębski, 2022-2023
+# Dominik Jastrzębski, 2022-2024
 # Har Gosmos <hargosmos@zohomail.eu>, 2019
 # Nicolae Crefelean, 2015,2017-2018
 # Sorin Ingeaua <sorin.ingeaua@gmail.com>, 2020
@@ -13,7 +13,7 @@ msgstr ""
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-06-16 01:41+0800\n"
 "PO-Revision-Date: 2015-02-15 01:58+0000\n"
-"Last-Translator: Dominik Jastrzębski, 2022-2023\n"
+"Last-Translator: Dominik Jastrzębski, 2022-2024\n"
 "Language-Team: Romanian (http://app.transifex.com/supertuxkart/supertuxkart/language/ro/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -379,16 +379,16 @@ msgstr "Reveni"
 #. I18N: ./data/gui/dialogs/online/registration_terms.stkgui
 #. I18N: In the registration dialog
 msgid "Accept"
-msgstr "Acepta"
+msgstr "Acceptați"
 
 #. I18N: ./data/gui/dialogs/custom_camera_settings.stkgui
 msgid "Camera Settings"
-msgstr "Setări cameră"
+msgstr "Setările camerei"
 
 #. I18N: ./data/gui/dialogs/custom_camera_settings.stkgui
 #. I18N: In the ui/camera settings
 msgid "Player camera"
-msgstr "Camera de la jucator"
+msgstr "Cameră de la jucător"
 
 #. I18N: ./data/gui/dialogs/custom_camera_settings.stkgui
 #. I18N: In the ui/camera screen
@@ -398,7 +398,7 @@ msgstr "FOV"
 #. I18N: ./data/gui/dialogs/custom_camera_settings.stkgui
 #. I18N: In the ui/camera screen
 msgid "Distance"
-msgstr "Distanta"
+msgstr "Distanță"
 
 #. I18N: ./data/gui/dialogs/custom_camera_settings.stkgui
 #. I18N: In the ui/camera screen
@@ -413,7 +413,7 @@ msgstr "Cameră netedă"
 #. I18N: ./data/gui/dialogs/custom_camera_settings.stkgui
 #. I18N: In the ui/camera settings
 msgid "Backward camera"
-msgstr "Camera pe spate"
+msgstr "Cameră pe spate"
 
 #. I18N: ./data/gui/dialogs/custom_camera_settings.stkgui
 #. I18N: In the ui/camera screen
@@ -610,24 +610,24 @@ msgstr "Progres"
 #. I18N: ./data/gui/dialogs/online/change_password.stkgui
 #. I18N: In the change password dialog
 msgid "Password Change"
-msgstr "Schimba parola"
+msgstr "Schimbă parola"
 
 #. I18N: ./data/gui/dialogs/online/change_password.stkgui
 #. I18N: In the change password dialog
 msgid "Current Password"
-msgstr "Parola curenta"
+msgstr "Parola curentă"
 
 #. I18N: ./data/gui/dialogs/online/change_password.stkgui
 #. I18N: In the change password dialog
 msgid "New Password"
-msgstr "Parola Noua"
+msgstr "Parola nouă"
 
 #. I18N: ./data/gui/dialogs/online/change_password.stkgui
 #. I18N: In the change password dialog
 #. I18N: ./data/gui/screens/online/register.stkgui
 #. I18N: In the registration dialog
 msgid "Confirm"
-msgstr "Confirma"
+msgstr "Confirmă"
 
 #. I18N: ./data/gui/dialogs/online/change_password.stkgui
 #. I18N: In the change password dialog
@@ -640,12 +640,12 @@ msgstr "Trimite"
 #. I18N: Race paused button
 #: src/states_screens/dialogs/race_paused_dialog.cpp:143
 msgid "Back to Race"
-msgstr "Înapoi la Cursă"
+msgstr "Înapoi la cursă"
 
 #. I18N: ./data/gui/dialogs/online/network_ingame_dialog.stkgui
 #. I18N: Race paused button
 msgid "Quit Server"
-msgstr "Iesi din server"
+msgstr "Ieși din server"
 
 #. I18N: ./data/gui/dialogs/online/network_ingame_dialog.stkgui
 #. I18N: Show in network ingame dialog to allow user to go back to lobby to
@@ -657,14 +657,14 @@ msgstr "Înapoi la lobby"
 #. I18N: Race paused button
 #: src/states_screens/dialogs/race_paused_dialog.cpp:148
 msgid "Restart Race"
-msgstr "Reincepe cursa"
+msgstr "Reîncepe cursa"
 
 #. I18N: ./data/gui/dialogs/online/network_ingame_dialog.stkgui
 #. I18N: Race paused button
 #. I18N: ./data/gui/dialogs/race_paused_dialog.stkgui
 #. I18N: Race paused button
 msgid "Give Up Race"
-msgstr "Iesi din Cursa"
+msgstr "Ieși din cursă"
 
 #. I18N: ./data/gui/dialogs/online/network_ingame_dialog.stkgui
 #. I18N: Race paused button
@@ -702,7 +702,7 @@ msgstr "Reîncarca"
 #. I18N: ./data/gui/dialogs/online/recovery_input.stkgui
 #. I18N: In the recovery dialog
 msgid "Account Recovery"
-msgstr "Recuperaza contul"
+msgstr "Recuperarea contului"
 
 #. I18N: ./data/gui/dialogs/online/recovery_info.stkgui
 #. I18N: In the recovery dialog
@@ -715,7 +715,7 @@ msgstr "Veți primi un e-mail cu instrucțiuni suplimentare despre cum să vă r
 msgid ""
 "Fill in the username and email address you supplied at registration to be "
 "able to reset your password."
-msgstr "Ca sa poti reseta parola ta"
+msgstr "Completați numele de utilizator și adresa de e-mail pe care le-ați furnizat la înregistrare pentru a vă putea reseta parola."
 
 #. I18N: ./data/gui/dialogs/online/recovery_input.stkgui
 #. I18N: In the recovery dialog
@@ -871,12 +871,12 @@ msgstr "Parola"
 #. I18N: In the server info dialog
 #: src/states_screens/dialogs/server_info_dialog.cpp:291
 msgid "Bookmark this server"
-msgstr "Marcă acest server"
+msgstr "Marcați acest server"
 
 #. I18N: ./data/gui/dialogs/online/splitscreen_player_dialog.stkgui
 #. I18N: Splitscreen player in network
 msgid "Add player"
-msgstr "Adaugă jucător"
+msgstr "Adăugați jucător"
 
 #. I18N: ./data/gui/dialogs/online/splitscreen_player_dialog.stkgui
 #. I18N: Splitscreen player in network
@@ -897,12 +897,12 @@ msgstr "Apăsați butonul „Toți jucătorii gata” după ce lista de jucător
 #. I18N: ./data/gui/dialogs/online/splitscreen_player_dialog.stkgui
 #. I18N: Splitscreen player in network
 msgid "Clear players"
-msgstr "Jucatori limpezi"
+msgstr "Jucători limpezi"
 
 #. I18N: ./data/gui/dialogs/online/splitscreen_player_dialog.stkgui
 #. I18N: Splitscreen player in network
 msgid "All players ready"
-msgstr "Toti jucatorii pregatiti"
+msgstr "Toți jucătorii pregătiți"
 
 #. I18N: ./data/gui/dialogs/online/user_info_dialog.stkgui
 #. I18N: User info dialog
@@ -912,32 +912,32 @@ msgstr "Informații despre utilizator"
 #. I18N: ./data/gui/dialogs/online/user_info_dialog.stkgui
 #. I18N: User info dialog
 msgid "Remove Friend"
-msgstr ""
+msgstr "Ștergeți prietenul"
 
 #. I18N: ./data/gui/dialogs/online/user_info_dialog.stkgui
 #. I18N: User info dialog
 msgid "Add Friend"
-msgstr "Adaugă prieten"
+msgstr "Adăugați prieten"
 
 #. I18N: ./data/gui/dialogs/online/user_info_dialog.stkgui
 #. I18N: User info dialog
 msgid "Accept Invite"
-msgstr ""
+msgstr "Acceptați invitația"
 
 #. I18N: ./data/gui/dialogs/online/user_info_dialog.stkgui
 #. I18N: User info dialog
 msgid "Decline Invite"
-msgstr ""
+msgstr "Respingeți invitația"
 
 #. I18N: ./data/gui/dialogs/online/user_info_dialog.stkgui
 #. I18N: User info dialog
 msgid "View Profile"
-msgstr ""
+msgstr "Afișați profilul"
 
 #. I18N: ./data/gui/dialogs/online/vote_dialog.stkgui
 #. I18N: In the vote dialog
 msgid "Vote"
-msgstr "Votează"
+msgstr "Votați"
 
 #. I18N: ./data/gui/dialogs/overworld_dialog.stkgui
 #. I18N: ./data/gui/dialogs/race_paused_dialog.stkgui
@@ -957,7 +957,7 @@ msgstr "Înapoi in meniu"
 #. I18N: ./data/gui/dialogs/overworld_dialog.stkgui
 #. I18N: In the in-game dialog
 msgid "Select kart"
-msgstr "Selectează kart"
+msgstr "Selectați kartul"
 
 #. I18N: ./data/gui/dialogs/press_a_key_dialog.stkgui
 #. I18N: When changing input configurations
@@ -994,7 +994,7 @@ msgstr "Configurarea cursei"
 #: src/states_screens/race_result_gui.cpp:304
 #: src/states_screens/race_result_gui.cpp:1142
 msgid "Continue"
-msgstr "Continuă"
+msgstr "Continuați"
 
 #. I18N: ./data/gui/screens/addons_screen.stkgui
 msgid "SuperTuxKart Addons"
@@ -1120,7 +1120,7 @@ msgstr "Autori"
 
 #. I18N: ./data/gui/screens/cutscene.stkgui
 msgid "Skip"
-msgstr ""
+msgstr "Omite"
 
 #. I18N: ./data/gui/screens/easter_egg.stkgui
 #. I18N: Section in easter egg tracks selection screen
@@ -1139,12 +1139,12 @@ msgstr "Editați Marele Premiu"
 #. I18N: ./data/gui/screens/edit_gp.stkgui
 #. I18N: Menu item
 msgid "Move up"
-msgstr "Mișcă în sus"
+msgstr "Mișcați în sus"
 
 #. I18N: ./data/gui/screens/edit_gp.stkgui
 #. I18N: Menu item
 msgid "Move down"
-msgstr "Mișcă în jos"
+msgstr "Mișcați în jos"
 
 #. I18N: ./data/gui/screens/edit_gp.stkgui
 #. I18N: Menu item
@@ -1160,12 +1160,12 @@ msgstr "Adaugă"
 #. I18N: ./data/gui/screens/grand_prix_editor.stkgui
 #. I18N: Menu item
 msgid "Edit"
-msgstr "Editează"
+msgstr "Editați"
 
 #. I18N: ./data/gui/screens/edit_gp.stkgui
 #. I18N: Menu item
 msgid "Save"
-msgstr "Salvează"
+msgstr "Salvați"
 
 #. I18N: ./data/gui/screens/edit_track.stkgui
 #. I18N: In the edit track screen
@@ -1180,7 +1180,7 @@ msgstr "Cu spatele"
 #. I18N: ./data/gui/screens/ghost_replay_selection.stkgui
 #. I18N: In the ghost replay selection screen
 msgid "Ghost Replay Selection"
-msgstr "Selecția Reluarea Fantoma"
+msgstr "Selecția reluării fantomei"
 
 #. I18N: ./data/gui/screens/ghost_replay_selection.stkgui
 #. I18N: In the ghost replay selection screen
@@ -1189,12 +1189,12 @@ msgstr "Selecția Reluarea Fantoma"
 #. I18N: Game mode
 #: src/race/race_manager.cpp:1296
 msgid "Egg Hunt"
-msgstr ""
+msgstr "Vânătoare de ouă"
 
 #. I18N: ./data/gui/screens/ghost_replay_selection.stkgui
 #. I18N: In the ghost replay selection screen
 msgid "Only show the best times"
-msgstr "Arată doar cele mai bune timpuri"
+msgstr "Arătați doar cele mai bune timpuri"
 
 #. I18N: ./data/gui/screens/ghost_replay_selection.stkgui
 #. I18N: In the ghost replay selection screen
@@ -1239,7 +1239,7 @@ msgstr "Înapoi"
 #: src/states_screens/track_info_screen.cpp:284
 #: src/states_screens/track_info_screen.cpp:450
 msgid "Maximum time (min.)"
-msgstr ""
+msgstr "Timp maxim (min.)"
 
 #. I18N: ./data/gui/screens/gp_info.stkgui
 #. I18N: In the grand prix info screen
@@ -1404,7 +1404,7 @@ msgstr "Începe tutorialul"
 #. I18N: ./data/gui/screens/help1.stkgui
 #. I18N: In the help menu
 msgid "Collect blue gift boxes, they will give you powerups."
-msgstr "Colectează cadourile albastre ca să primești powerup"
+msgstr "Colectați cadourile albastre ca să primiți powerup"
 
 #. I18N: ./data/gui/screens/help1.stkgui
 #. I18N: In the help menu
@@ -1446,7 +1446,7 @@ msgstr ""
 #. I18N: ./data/gui/screens/help1.stkgui
 #. I18N: in the help screen
 msgid "* Current key bindings can be seen/changed in the Options menu"
-msgstr ""
+msgstr "* Tastele de control se pot vedea/modifica în meniul Opțiuni"
 
 #. I18N: ./data/gui/screens/help2.stkgui
 msgid "SuperTuxKart features several game modes:"
@@ -1528,7 +1528,7 @@ msgstr ""
 msgid ""
 "Zipper - will give you a strong speed boost. But beware of not losing "
 "control of your kart!"
-msgstr "Controleaza kartul"
+msgstr "Controlați kartul"
 
 #. I18N: ./data/gui/screens/help3.stkgui
 msgid ""
@@ -1597,7 +1597,7 @@ msgstr ""
 
 #. I18N: ./data/gui/screens/help5.stkgui
 msgid "The evil Nolok has captured Gnu! Here are a few tips to help you:"
-msgstr ""
+msgstr "Maleficul Nolok l-a capturat pe Gnu! Iată câteva sfaturi pentru a vă ajuta:"
 
 #. I18N: ./data/gui/screens/help5.stkgui
 #. I18N: In the help menu
@@ -1606,7 +1606,7 @@ msgid ""
 "completed. In the top-right of the screen, it also tells you how many points"
 " you currently have. Complete as many challenges as possible, and Nolok will"
 " accept to race against you. Win to liberate Gnu!"
-msgstr ""
+msgstr "Această pictogramă de pe minimap arată provocările disponibile pe care nu le-ați finalizat. În partea dreaptă sus a ecranului, vă spune, de asemenea, câte puncte aveți în prezent. Finalizează cât mai multe provocări posibil, iar Nolok va accepta să concureze împotriva ta. Victorie pentru eliberarea lui Gnu!"
 
 #. I18N: ./data/gui/screens/help5.stkgui
 #. I18N: In the help menu
@@ -3616,7 +3616,7 @@ msgstr ""
 
 #: src/karts/kart.cpp:1025
 msgid "You won the race!"
-msgstr "Ai castigat cursa!"
+msgstr "Ați câștigat cursa!"
 
 #: src/karts/kart.cpp:1026
 #, c-format
@@ -3653,7 +3653,7 @@ msgid ""
 "Your graphics driver appears to be very old. Please check if an update is "
 "available. SuperTuxKart recommends a driver supporting %s or better. The "
 "game will likely still run, but in a reduced-graphics mode."
-msgstr ""
+msgstr "Driverul grafic pare să fie foarte vechi. Vă rugăm să verificați dacă este disponibilă o actualizare. SuperTuxKart recomandă un driver care să suporte %s sau mai bine. Probabil că jocul va rula în continuare, dar într-un mod cu grafică redusă."
 
 #: src/main_loop.cpp:480 src/network/protocols/client_lobby.cpp:128
 msgid "Server connection timed out."

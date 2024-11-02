@@ -14,6 +14,7 @@
 # Flakebi, 2015
 # Flakebi, 2015
 # hiker <joerg@chiu-henrichs.id.au>, 2015
+# Iwan Gabovitch, 2023
 # hiker <joerg@chiu-henrichs.id.au>, 2015
 # Juli X, 2022
 # Juli X, 2022
@@ -37,7 +38,7 @@ msgstr ""
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-06-16 01:41+0800\n"
 "PO-Revision-Date: 2015-02-15 01:58+0000\n"
-"Last-Translator: FabianF, 2020-2023\n"
+"Last-Translator: Iwan Gabovitch, 2023\n"
 "Language-Team: German (http://app.transifex.com/supertuxkart/supertuxkart/language/de/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -936,7 +937,7 @@ msgstr "Benutzerinformation"
 #. I18N: ./data/gui/dialogs/online/user_info_dialog.stkgui
 #. I18N: User info dialog
 msgid "Remove Friend"
-msgstr ""
+msgstr "Freund entfernen"
 
 #. I18N: ./data/gui/dialogs/online/user_info_dialog.stkgui
 #. I18N: User info dialog
@@ -946,17 +947,17 @@ msgstr "Freund hinzufügen"
 #. I18N: ./data/gui/dialogs/online/user_info_dialog.stkgui
 #. I18N: User info dialog
 msgid "Accept Invite"
-msgstr ""
+msgstr "Einladung annehmen"
 
 #. I18N: ./data/gui/dialogs/online/user_info_dialog.stkgui
 #. I18N: User info dialog
 msgid "Decline Invite"
-msgstr ""
+msgstr "Einladung ablehnen"
 
 #. I18N: ./data/gui/dialogs/online/user_info_dialog.stkgui
 #. I18N: User info dialog
 msgid "View Profile"
-msgstr ""
+msgstr "Profil anzeigen"
 
 #. I18N: ./data/gui/dialogs/online/vote_dialog.stkgui
 #. I18N: In the vote dialog
@@ -1144,7 +1145,7 @@ msgstr "Mitwirkende"
 
 #. I18N: ./data/gui/screens/cutscene.stkgui
 msgid "Skip"
-msgstr ""
+msgstr "Überspringen"
 
 #. I18N: ./data/gui/screens/easter_egg.stkgui
 #. I18N: Section in easter egg tracks selection screen
@@ -2024,7 +2025,7 @@ msgid ""
 "You can play without creating an online account by selecting an offline "
 "account. Though then you can not connect to friends, vote for addons etc. "
 "Please read our privacy statement at https://privacy.supertuxkart.net"
-msgstr ""
+msgstr "Du kannst spielen, ohne ein Online-Konto zu erstellen, indem du ein Offline-Konto auswählst. Allerdings kannst du dich dann nicht mit Freunden verbinden, für Add-ons abstimmen usw. Bitte lies unsere Datenschutzerklärung unter https://privacy.supertuxkart.net"
 
 #. I18N: ./data/gui/screens/online/server_selection.stkgui
 #: src/states_screens/online/server_selection.cpp:580
@@ -2537,7 +2538,7 @@ msgstr "Basketbälle können mit präzisen Rückwärtsschüssen mit einer Bowlin
 msgid ""
 "Try to avoid crashing into the backs of other karts as this will slow you "
 "down."
-msgstr ""
+msgstr "Krache anderen Karts nicht ins Heck, das verlangsamt dich."
 
 #. I18N: ./data/tips.xml
 msgid "You can use bowling balls to push and block the ball."

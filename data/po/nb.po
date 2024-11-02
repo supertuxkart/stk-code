@@ -12,13 +12,14 @@
 # IAN RODRÍGUEZ Lorenzo, 2022
 # Karl Ove Hufthammer <karl@huftis.org>, 2015
 # Magne Djupvik <magnedj@gmail.com>, 2017-2018
+# Stian Onarheim, 2023
 msgid ""
 msgstr ""
 "Project-Id-Version: SuperTuxKart\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-06-16 01:41+0800\n"
 "PO-Revision-Date: 2015-02-15 01:58+0000\n"
-"Last-Translator: Karl Ove Hufthammer <karl@huftis.org>, 2015\n"
+"Last-Translator: Stian Onarheim, 2023\n"
 "Language-Team: Norwegian Bokmål (http://app.transifex.com/supertuxkart/supertuxkart/language/nb/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -376,7 +377,7 @@ msgstr "Ja"
 #. I18N: In the 'confirm resolution' dialog, that's shown when switching
 #. resoluton
 msgid "Revert"
-msgstr ""
+msgstr "Tilbakestill"
 
 #. I18N: ./data/gui/dialogs/confirm_resolution_dialog.stkgui
 #. I18N: In the 'confirm resolution' dialog, that's shown when switching
@@ -917,7 +918,7 @@ msgstr "Brukerinfo"
 #. I18N: ./data/gui/dialogs/online/user_info_dialog.stkgui
 #. I18N: User info dialog
 msgid "Remove Friend"
-msgstr ""
+msgstr "Fjern venn"
 
 #. I18N: ./data/gui/dialogs/online/user_info_dialog.stkgui
 #. I18N: User info dialog
@@ -927,17 +928,17 @@ msgstr "Legg til venn"
 #. I18N: ./data/gui/dialogs/online/user_info_dialog.stkgui
 #. I18N: User info dialog
 msgid "Accept Invite"
-msgstr ""
+msgstr "Godta invitasjon"
 
 #. I18N: ./data/gui/dialogs/online/user_info_dialog.stkgui
 #. I18N: User info dialog
 msgid "Decline Invite"
-msgstr ""
+msgstr "Avslå invitasjon"
 
 #. I18N: ./data/gui/dialogs/online/user_info_dialog.stkgui
 #. I18N: User info dialog
 msgid "View Profile"
-msgstr ""
+msgstr "Vis profil"
 
 #. I18N: ./data/gui/dialogs/online/vote_dialog.stkgui
 #. I18N: In the vote dialog
@@ -1125,7 +1126,7 @@ msgstr "Bidragsytere"
 
 #. I18N: ./data/gui/screens/cutscene.stkgui
 msgid "Skip"
-msgstr ""
+msgstr "Hopp over"
 
 #. I18N: ./data/gui/screens/easter_egg.stkgui
 #. I18N: Section in easter egg tracks selection screen
@@ -2333,7 +2334,7 @@ msgstr ""
 #. I18N: ./data/gui/screens/options_video.stkgui
 #. I18N: In the video options, maximum frame per second
 msgid "Maximum FPS"
-msgstr ""
+msgstr "Maksimal FPS"
 
 #. I18N: ./data/gui/screens/options_video.stkgui
 #. I18N: In the video settings
@@ -3625,7 +3626,7 @@ msgstr "Du vant løpet!"
 #: src/karts/kart.cpp:1026
 #, c-format
 msgid "You finished the race in rank %d!"
-msgstr ""
+msgstr "Du fullførte løpet på %d. plass!"
 
 #. I18N: Message shown in game to tell player left the game in network
 #: src/karts/kart_rewinder.cpp:126 src/network/protocols/client_lobby.cpp:1172
@@ -3773,7 +3774,7 @@ msgstr ""
 #: src/network/protocols/client_lobby.cpp:463
 #: src/network/protocols/server_lobby.cpp:3848
 msgid "Bot"
-msgstr ""
+msgstr "Bot"
 
 #: src/network/protocols/client_lobby.cpp:641
 #, c-format
