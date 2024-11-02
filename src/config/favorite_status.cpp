@@ -59,13 +59,7 @@ FavoriteStatus::FavoriteStatus(const XMLNode* node, std::string parse_type)
             m_favorite[temp_group_string].insert(temp_string);
         }
     }
-}   // FavoriteStatus
-
-//------------------------------------------------------------------------------
-FavoriteStatus::~FavoriteStatus()
-{
-
-}   // ~FavoriteStatus
+}   // FavoriteStatu
 
 //------------------------------------------------------------------------------
 /** Adds a new favorite track to this player profile and to the group
