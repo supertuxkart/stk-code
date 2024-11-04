@@ -223,7 +223,8 @@ Item::Item(ItemType type, const Vec3& xyz, const Vec3& normal,
 {
     m_icon_node = NULL;
     m_was_available_previously = true;
-    m_animation_start_ticks = 0;
+    // Prevent appear animation at start
+    m_animation_start_ticks = -9999;
     m_distance_2        = 1.2f;
     initItem(type, xyz, normal);
     m_graphical_type    = getGrahpicalType();
@@ -251,6 +252,7 @@ Item::Item(ItemType type, const Vec3& xyz, const Vec3& normal,
         // when already quite far.
         lodnode->autoComputeLevel(24); // The distance grows with the square root of the scaling factor
         m_node = lodnode;
+        m_appear_anime_node = irr_driver->getSceneManager()->addEmptySceneNode(m_node);
     }
     setType(type);
     handleNewMesh(getGrahpicalType());
@@ -273,7 +275,7 @@ Item::Item(ItemType type, const Vec3& xyz, const Vec3& normal,
     {
         scene::ISceneNode* billboard =
             irr_driver->addBillboard(core::dimension2df(SPARK_SIZE, SPARK_SIZE),
-                                     "item_spark.png", m_node);
+                                     "item_spark.png", m_appear_anime_node);
 #ifdef DEBUG
         billboard->setName("spark");
 #endif
@@ -361,9 +363,11 @@ Item::~Item()
     if (m_node != NULL)
     {
         for (auto* node : m_spark_nodes)
-            m_node->removeChild(node);
+            m_appear_anime_node->removeChild(node);
         if (m_icon_node)
-            m_node->removeChild(m_icon_node);
+            m_appear_anime_node->removeChild(m_icon_node);
+        
+        m_node->removeChild(m_appear_anime_node);
 
         irr_driver->removeNode(m_node);
         m_node->drop();
@@ -380,7 +384,7 @@ Item::~Item()
 void Item::reset()
 {
     m_was_available_previously = true;
-    m_animation_start_ticks = 0;
+    m_animation_start_ticks = -9999;
     ItemState::reset();
 
     if (m_node != NULL)
@@ -417,7 +421,7 @@ void Item::handleNewMesh(ItemType type)
     if (!icon.empty())
     {
         m_icon_node = irr_driver->addBillboard(core::dimension2df(1.0f, 1.0f),
-                                        icon, m_node);
+                                        icon, m_appear_anime_node);
 
         m_icon_node->setPosition(core::vector3df(0.0f, 0.5f, 0.0f));
         m_icon_node->setVisible(false);
@@ -503,60 +507,54 @@ void Item::updateGraphics(float dt)
         m_node->setRotation(hpr.toIrrHPR());
     } // if item is available
 
-    for (size_t i = 0; i < SPARK_AMOUNT; i++)
+    bool is_in_appear_anime = time_since_return < 1.0f
+                             || (!isAvailable() && time_till_return < 1.0f);
+    m_appear_anime_node->setVisible(is_in_appear_anime);
+
+    if (is_in_appear_anime)
     {
-        if (time_since_return >= 1.0f)
+        for (size_t i = 0; i < SPARK_AMOUNT; i++)
         {
-            m_spark_nodes[i]->setVisible(false);
-            continue;
-        }
+            float t = time_since_return + 0.5f;
+            float t2 = time_since_return + 1.0f;
 
-        float t = time_since_return + 0.5f;
-        float t2 = time_since_return + 1.0f;
+            float node_angle = !rotating() ? 0.0f :
+                    fmodf((float)World::getWorld()->getTicksSinceStart() / 40.0f,
+                    M_PI * 2);
 
-        float node_angle = !rotating() ? 0.0f :
-                fmodf((float)World::getWorld()->getTicksSinceStart() / 40.0f,
-                M_PI * 2);
+            float x = sin(float(i) / float(SPARK_AMOUNT) * 2.0f * M_PI - node_angle)
+                        * t * SPARK_SPEED_H;
+            float y = 2.0f * t2 - t2 * t2 - 0.5f;
+            float z = cos(float(i) / float(SPARK_AMOUNT) * 2.0f * M_PI - node_angle)
+                        * t * SPARK_SPEED_H;
 
-        float x = sin(float(i) / float(SPARK_AMOUNT) * 2.0f * M_PI - node_angle)
-                    * t * SPARK_SPEED_H;
-        float y = 2.0f * t2 - t2 * t2 - 0.5f;
-        float z = cos(float(i) / float(SPARK_AMOUNT) * 2.0f * M_PI - node_angle)
-                    * t * SPARK_SPEED_H;
+            m_spark_nodes[i]->setPosition(core::vector3df(x, y, z));
 
-        m_spark_nodes[i]->setPosition(core::vector3df(x, y, z));
+            float factor = std::max(0.0f, 1.0f - t / 2.0f);
 
-        float factor = std::max(0.0f, 1.0f - t / 2.0f);
-
-        if (factor < 0.001f)
-        {
-            m_spark_nodes[i]->setVisible(false);
-        }
-        else
-        {
             m_spark_nodes[i]->setVisible(true);
 
             ((scene::IBillboardSceneNode*)m_spark_nodes[i])
                     ->setSize(core::dimension2df(factor * SPARK_SIZE,
-                                                 factor * SPARK_SIZE));
+                                                factor * SPARK_SIZE));
         }
-    }
 
-    if (m_icon_node)
-    {
-        if (!isAvailable() && time_till_return <= 1.0f)
+        if (m_icon_node)
         {
-            m_icon_node->setVisible(true);
-            float size = 1.0f / (pow(6.0f, -time_till_return - 0.2f) *
-                        (-time_till_return - 0.2f)) + 7.0f;
+            if (!isAvailable())
+            {
+                m_icon_node->setVisible(true);
+                float size = 1.0f / (pow(6.0f, -time_till_return - 0.2f) *
+                            (-time_till_return - 0.2f)) + 7.0f;
 
-            ((scene::IBillboardSceneNode*)m_icon_node)
-                    ->setSize(core::dimension2df(size * ICON_SIZE,
-                                                 size * ICON_SIZE));
-        }
-        else
-        {
-            m_icon_node->setVisible(false);
+                ((scene::IBillboardSceneNode*)m_icon_node)
+                        ->setSize(core::dimension2df(size * ICON_SIZE,
+                                                    size * ICON_SIZE));
+            }
+            else
+            {
+                m_icon_node->setVisible(false);
+            }
         }
     }
 
