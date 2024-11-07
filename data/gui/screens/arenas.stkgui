@@ -11,7 +11,7 @@
             <div width="fit" height="100%" layout="horizontal-row" align="center">
                 <checkbox id="favorite" align="center"/>
                 <spacer width="5%" height="100%" />
-                <tiny-header width="fit" height="100%" I18N="Section in arena tracksselection screen" text="Edit favorite arenas"/>
+                <tiny-header width="fit" height="100%" I18N="Section in arena tracks selection screen" text="Edit favorite arenas"/>
             </div>
         </div>
 

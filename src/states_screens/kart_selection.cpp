@@ -279,12 +279,12 @@ void KartSelectionScreen::beforeAddingWidget()
     );
     if (useContinueButton())
     {
-        getWidget("kartlist")->m_properties[GUIEngine::PROP_WIDTH] = "85%";
+        getWidget("karts")->m_properties[GUIEngine::PROP_WIDTH] = "85%";
         getWidget("continue")->setVisible(true);
     }
     else
     {
-        getWidget("kartlist")->m_properties[GUIEngine::PROP_WIDTH] = "100%";
+        getWidget("karts")->m_properties[GUIEngine::PROP_WIDTH] = "100%";
         getWidget("continue")->setVisible(false);
     }
     // Remove dispatcher from m_widgets before calculateLayout otherwise a
@@ -418,9 +418,6 @@ void KartSelectionScreen::init()
 
     DynamicRibbonWidget* w = getWidget<DynamicRibbonWidget>("karts");
     assert( w != NULL );
-    // Only allow keyboard and gamepad to choose kart without continue button in
-    // multitouch GUI, so mouse (touch) clicking can be used as previewing karts
-    w->setEventCallbackActive(Input::IT_MOUSEBUTTON, !useContinueButton());
 
     KartHoverListener* karthoverListener = new KartHoverListener(this);
     w->registerHoverListener(karthoverListener);
@@ -1233,7 +1230,7 @@ void KartSelectionScreen::eventCallback(Widget* widget,
             }
             setKartsFromCurrentGroup();
         }
-        else if (m_kart_widgets.size() > unsigned(player_id))
+        else if (m_kart_widgets.size() > unsigned(player_id) && !useContinueButton())
             playerConfirm(player_id);
     }
     else if (name == "kart_class")
