@@ -354,7 +354,7 @@ void KartSelectionScreen::beforeAddingWidget()
     kart_class->m_properties[GUIEngine::PROP_MIN_VALUE] = "0";
     kart_class->m_properties[GUIEngine::PROP_MAX_VALUE] = StringUtils::toString(classes.size());
     
-    for (int i = 0; i < classes.size(); i++)
+    for (unsigned int i = 0; i < classes.size(); i++)
     {
         // Make the first letter upper-case
         std::string class_str = classes[i];
@@ -1214,9 +1214,9 @@ void KartSelectionScreen::eventCallback(Widget* widget,
         assert(w != NULL);
         const std::string selection = w->getSelectionIDString(player_id);
 
-        if (getWidget<CheckBoxWidget>("favorite")->getState()
-         && player_id == PLAYER_ID_GAME_MASTER
-         && selection != RANDOM_KART_ID)
+        if (getWidget<CheckBoxWidget>("favorite")->getState() &&
+            player_id == PLAYER_ID_GAME_MASTER &&
+            selection != RANDOM_KART_ID && !selection.empty())
         {
             const KartProperties *kp = kart_properties_manager->getKart(selection);
 
@@ -1632,7 +1632,7 @@ PtrVector<const KartProperties, REF> KartSelectionScreen::getUsableKarts(
             prop->getName().make_lower().find(search_text.c_str()) == -1)
             continue;
         
-        if (kart_class->getValue() != classes.size() &&
+        if (kart_class->getValue() != (int)classes.size() &&
             classes[kart_class->getValue()] != prop->getKartType())
             continue;
 
