@@ -30,6 +30,7 @@ namespace GE
     class GEVulkanDrawCall;
     class GEVulkanDynamicSPMBuffer;
     class GEVulkanFBOTexture;
+    class GEVulkanFBOShadowMap;
     class GEVulkanMeshCache;
     class GEVulkanTextureDescriptor;
     enum GEVulkanSampler : unsigned
@@ -37,6 +38,7 @@ namespace GE
         GVS_MIN = 0,
         GVS_NEAREST = GVS_MIN,
         GVS_SKYBOX,
+        GVS_SHADOWMAP,
         GVS_3D_MESH_MIPMAP_2,
         GVS_3D_MESH_MIPMAP_4,
         GVS_3D_MESH_MIPMAP_16,
@@ -331,7 +333,6 @@ namespace GE
         size_t getSwapChainImagesCount() const
                                       { return m_vk->swap_chain_images.size(); }
         VkRenderPass getRenderPass() const         { return m_vk->render_pass; }
-        VkRenderPass getShadowRenderPass() const { return m_shadow_render_pass; }
         void copyBuffer(VkBuffer src_buffer, VkBuffer dst_buffer, VkDeviceSize size);
         VkCommandBuffer getCurrentCommandBuffer()
                               { return m_vk->command_buffers[m_current_frame]; }
@@ -371,9 +372,6 @@ namespace GE
         void setDisableWaitIdle(bool val)         { m_disable_wait_idle = val; }
         IrrlichtDevice* getIrrlichtDevice() const  { return m_irrlicht_device; }
         GEVulkanDepthTexture* getDepthTexture() const { return m_depth_texture; }
-        GEVulkanDepthTexture* getShadowMap() const    { return m_shadow_map; }
-        VkFramebuffer getShadowMapFramebuffer() const  
-                                            { return m_shadow_map_framebuffer; }
         VkFormat findSupportedFormat(const std::vector<VkFormat>& candidates,
                                      VkImageTiling tiling,
                                      VkFormatFeatureFlags features);
@@ -381,6 +379,7 @@ namespace GE
         GEVulkanMeshCache* getVulkanMeshCache() const;
         GEVulkanTextureDescriptor* getMeshTextureDescriptor() const
                                            { return m_mesh_texture_descriptor; }
+        GEVulkanFBOShadowMap* getRTTShadowMap() const{ return m_rtt_shadowmap; }
         GEVulkanFBOTexture* getRTTTexture() const      { return m_rtt_texture; }
         GEVulkanFBOTexture* getSeparateRTTTexture() const
                                               { return m_separate_rtt_texture; }
@@ -389,7 +388,7 @@ namespace GE
         SDL_Window* getSDLWindow() const                    { return m_window; }
         void clearDrawCallsCache();
         void addDrawCallToCache(std::unique_ptr<GEVulkanDrawCall>& dc);
-        std::unique_ptr<GEVulkanDrawCall> getDrawCallFromCache();
+        std::unique_ptr<GEVulkanDrawCall> getDrawCallFromCache(uint8_t pass);
         GESPM* getBillboardQuad() const             { return m_billboard_quad; }
         int getCurrentBufferIdx() const         { return m_current_buffer_idx; }
         void addDynamicSPMBuffer(GEVulkanDynamicSPMBuffer* buffer)
@@ -535,16 +534,14 @@ namespace GE
 
         IrrlichtDevice* m_irrlicht_device;
         GEVulkanDepthTexture* m_depth_texture;
-        GEVulkanDepthTexture* m_shadow_map;
-        VkFramebuffer   m_shadow_map_framebuffer;
-        VkRenderPass    m_shadow_render_pass;
         GEVulkanTextureDescriptor* m_mesh_texture_descriptor;
+        GEVulkanFBOShadowMap* m_rtt_shadowmap;
         GEVulkanFBOTexture* m_rtt_texture;
         GEVulkanFBOTexture* m_prev_rtt_texture;
         GEVulkanFBOTexture* m_separate_rtt_texture;
         u32 m_rtt_polycount;
 
-        std::vector<std::unique_ptr<GEVulkanDrawCall> > m_draw_calls_cache;
+        std::vector<std::vector<std::unique_ptr<GEVulkanDrawCall> > > m_draw_calls_cache;
         GESPM* m_billboard_quad;
         int m_current_buffer_idx;
         std::set<GEVulkanDynamicSPMBuffer*> m_dynamic_spm_buffers;

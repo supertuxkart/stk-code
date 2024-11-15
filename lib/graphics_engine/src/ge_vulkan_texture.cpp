@@ -433,6 +433,13 @@ bool GEVulkanTexture::createImageView(VkImageAspectFlags aspect_flags)
     view_info.subresourceRange.levelCount = getMipmapLevels();
     view_info.subresourceRange.baseArrayLayer = 0;
     view_info.subresourceRange.layerCount = m_layer_count;
+    if (m_image_view_type == VK_FORMAT_D32_SFLOAT)
+    {
+        view_info.components.r = VK_COMPONENT_SWIZZLE_R;
+        view_info.components.g = VK_COMPONENT_SWIZZLE_G;
+        view_info.components.b = VK_COMPONENT_SWIZZLE_B;
+        view_info.components.a = VK_COMPONENT_SWIZZLE_A;
+    }
     if (isSingleChannel())
     {
         view_info.components.r = VK_COMPONENT_SWIZZLE_ONE;

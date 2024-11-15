@@ -1,5 +1,6 @@
 layout(set = 2, binding = 0) uniform samplerCube u_diffuse_environment_map;
 layout(set = 2, binding = 1) uniform samplerCube u_specular_environment_map;
+layout(set = 3, binding = 0) uniform sampler2DShadow u_shadow_map;
 
 vec2 F_AB(float perceptual_roughness, float NdotV) 
 {
@@ -103,7 +104,6 @@ vec3 PBRLight(
 }
 
 vec3 environmentLight(
-    vec3 world_position,
     vec3 world_normal,
     vec3 world_reflection,
     float perceptual_roughness,
@@ -119,7 +119,7 @@ vec3 environmentLight(
     // because textureNumLevels() does not work on WebGL2
     float radiance_level = perceptual_roughness * 7.;
 
-    float intensity = 0.5;
+    float intensity = 0.8;
 
     vec3 irradiance = textureLod(
         u_diffuse_environment_map,
@@ -151,7 +151,7 @@ vec3 PBRSunAmbientEmitLight(
     vec3 normal,
     vec3 eyedir, 
     vec3 sundir,
-    vec3 world_position,
+    float shadow,
     vec3 world_normal,
     vec3 world_reflection,
     vec3 color,
@@ -187,14 +187,14 @@ vec3 PBRSunAmbientEmitLight(
     vec3 F = fresnel(F0, F90, LdotH);
     vec3 specular = D * V * F * (1.0 + F0 * (1.0 / F_ab.x - 1.0));
 
-    vec3 sunlight = NdotL * (diffuse + specular);
+    vec3 sunlight = NdotL * (diffuse + specular) * shadow;
 
     vec3 diffuse_ambient = envBRDFApprox(diffuse_color, F_AB(1.0, NdotV));
 
     vec3 specular_ambient = F90 * envBRDFApprox(F0, F_ab);
 
     vec3 environment = environmentLight(
-        world_position, world_normal, world_reflection,
+        world_normal, world_reflection,
         perceptual_roughness, roughness,
         diffuse_color, F_ab, F0, F90, NdotV
     );
@@ -202,6 +202,5 @@ vec3 PBRSunAmbientEmitLight(
     vec3 emit = emissive * color * 4.0;
 
     return sun_color * sunlight
-         + environment
-         + ambient_color * (diffuse_ambient + specular_ambient) + emit;
+         + environment + emit;
 }

@@ -26,8 +26,6 @@
 #include "ISceneManager.h"
 #include "IrrlichtDevice.h"
 
-#define ENABLE_VALIDATION
-
 #ifdef __ANDROID__
 #include <android/log.h>
 #endif
@@ -506,7 +504,7 @@ GEVulkanDriver::GEVulkanDriver(const SIrrlichtCreationParameters& params,
                                IrrlichtDevice* device)
               : CNullDriver(io, core::dimension2d<u32>(0, 0)),
                 m_params(params), m_irrlicht_device(device),
-                m_depth_texture(NULL), m_shadow_map(NULL), 
+                m_depth_texture(NULL), m_rtt_shadowmap(NULL), 
                 m_mesh_texture_descriptor(NULL),
                 m_rtt_texture(NULL), m_prev_rtt_texture(NULL),
                 m_separate_rtt_texture(NULL), m_rtt_polycount(0),
@@ -515,8 +513,6 @@ GEVulkanDriver::GEVulkanDriver(const SIrrlichtCreationParameters& params,
     m_vk.reset(new VK());
     m_physical_device = VK_NULL_HANDLE;
     m_present_queue = VK_NULL_HANDLE;
-    m_shadow_map_framebuffer = VK_NULL_HANDLE;
-    m_shadow_render_pass = VK_NULL_HANDLE;
     memset(m_queue_family, 0, sizeof(m_queue_family));
     memset(m_queue_count, 0, sizeof(m_queue_count));
     m_present_family = 0;
@@ -537,6 +533,8 @@ GEVulkanDriver::GEVulkanDriver(const SIrrlichtCreationParameters& params,
     g_schedule_pausing_rendering.store(false);
     g_paused_rendering.store(false);
     g_device_created.store(true);
+
+    m_draw_calls_cache.resize(GVDCP_COUNT);
 
 #if defined(__APPLE__)
     MVKConfiguration cfg = {};
@@ -679,20 +677,10 @@ void GEVulkanDriver::destroyVulkan()
         m_depth_texture->drop();
         m_depth_texture = NULL;
     }
-    if (m_shadow_map)
+    if (m_rtt_shadowmap)
     {
-        m_shadow_map->drop();
-        m_shadow_map = NULL;
-    }
-    if (m_shadow_map_framebuffer)
-    {
-        vkDestroyFramebuffer(m_vk->device, m_shadow_map_framebuffer, NULL);
-        m_shadow_map_framebuffer = VK_NULL_HANDLE;
-    }
-    if (m_shadow_render_pass)
-    {
-        vkDestroyRenderPass(m_vk->device, m_shadow_render_pass, NULL);
-        m_shadow_render_pass = VK_NULL_HANDLE;
+        m_rtt_shadowmap->drop();
+        m_rtt_shadowmap = NULL;
     }
     if (m_rtt_texture)
     {
@@ -1454,8 +1442,9 @@ found_mode:
             core::dimension2du(m_swap_chain_extent.width,
             m_swap_chain_extent.height));
     }
-    //m_shadow_map = new GEVulkanDepthTexture(this,
-    //    core::dimension2du(2048, 2048));
+    m_rtt_shadowmap = new GEVulkanFBOShadowMap(this,
+        core::dimension2du(2048, 2048));
+    m_rtt_shadowmap->createRTT();
 }   // createSwapChain
 
 // ----------------------------------------------------------------------------
@@ -1574,12 +1563,33 @@ void GEVulkanDriver::createSamplers()
         throw std::runtime_error("vkCreateSampler failed for GVS_SKYBOX");
     m_vk->samplers[GVS_SKYBOX] = sampler;
 
+    // GVS_SHADOWMAP
+    sampler_info.anisotropyEnable = false;
+    sampler_info.magFilter = VK_FILTER_LINEAR;
+    sampler_info.minFilter = VK_FILTER_LINEAR;
+    sampler_info.mipmapMode = VK_SAMPLER_MIPMAP_MODE_NEAREST;
+    sampler_info.compareEnable = VK_TRUE;
+    sampler_info.compareOp = VK_COMPARE_OP_LESS;
+    sampler_info.addressModeU = VK_SAMPLER_ADDRESS_MODE_CLAMP_TO_EDGE;
+    sampler_info.addressModeV = VK_SAMPLER_ADDRESS_MODE_CLAMP_TO_EDGE;
+    sampler_info.addressModeW = VK_SAMPLER_ADDRESS_MODE_CLAMP_TO_EDGE;
+    sampler_info.borderColor = VK_BORDER_COLOR_INT_OPAQUE_WHITE;
+    result = vkCreateSampler(m_vk->device, &sampler_info, NULL,
+        &sampler);
+
+    if (result != VK_SUCCESS)
+        throw std::runtime_error("vkCreateSampler failed for GVS_SKYBOX");
+    m_vk->samplers[GVS_SHADOWMAP] = sampler;
+
     const float max_aniso = m_properties.limits.maxSamplerAnisotropy;
     // GVS_3D_MESH_MIPMAP_2
+    sampler_info.mipmapMode = VK_SAMPLER_MIPMAP_MODE_LINEAR;
     sampler_info.anisotropyEnable = supported_anisotropy;
     sampler_info.addressModeU = VK_SAMPLER_ADDRESS_MODE_REPEAT;
     sampler_info.addressModeV = VK_SAMPLER_ADDRESS_MODE_REPEAT;
     sampler_info.addressModeW = VK_SAMPLER_ADDRESS_MODE_REPEAT;
+    sampler_info.compareEnable = VK_FALSE;
+    sampler_info.compareOp = VK_COMPARE_OP_ALWAYS;
     sampler_info.maxAnisotropy = std::min(2.0f, max_aniso);
     result = vkCreateSampler(m_vk->device, &sampler_info, NULL,
         &sampler);
@@ -1704,61 +1714,6 @@ void GEVulkanDriver::createRenderPass()
 
     if (result != VK_SUCCESS)
         throw std::runtime_error("vkCreateRenderPass failed");
-
-    if (m_shadow_map)
-    {
-        VkAttachmentDescription shadow_attachment = {};
-        shadow_attachment.format = m_shadow_map->getInternalFormat();
-        shadow_attachment.samples = VK_SAMPLE_COUNT_1_BIT;
-        shadow_attachment.loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR;
-        shadow_attachment.storeOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
-        shadow_attachment.stencilLoadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
-        shadow_attachment.stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
-        shadow_attachment.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
-        shadow_attachment.finalLayout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL;
-
-        VkAttachmentReference shadow_attachment_ref = {};
-        shadow_attachment_ref.attachment = 1;
-        shadow_attachment_ref.layout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL;
-
-        VkSubpassDescription subpass = {};
-        subpass.pipelineBindPoint = VK_PIPELINE_BIND_POINT_GRAPHICS;
-        subpass.colorAttachmentCount = 0;
-        subpass.pColorAttachments = NULL;
-        subpass.pDepthStencilAttachment = &shadow_attachment_ref;
-
-        std::array<VkSubpassDependency, 2> dependencies;
-        dependencies[0].srcSubpass = VK_SUBPASS_EXTERNAL;
-        dependencies[0].dstSubpass = 0;
-        dependencies[0].srcStageMask = VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT;
-        dependencies[0].dstStageMask = VK_PIPELINE_STAGE_EARLY_FRAGMENT_TESTS_BIT;
-        dependencies[0].srcAccessMask = VK_ACCESS_SHADER_READ_BIT;
-        dependencies[0].dstAccessMask = VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE_BIT;
-        dependencies[0].dependencyFlags = VK_DEPENDENCY_BY_REGION_BIT;
-
-        dependencies[1].srcSubpass = 0;
-        dependencies[1].dstSubpass = VK_SUBPASS_EXTERNAL;
-        dependencies[1].srcStageMask = VK_PIPELINE_STAGE_EARLY_FRAGMENT_TESTS_BIT;
-        dependencies[1].dstStageMask = VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT;
-        dependencies[1].srcAccessMask = VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE_BIT;
-        dependencies[1].dstAccessMask = VK_ACCESS_SHADER_READ_BIT;
-        dependencies[1].dependencyFlags = VK_DEPENDENCY_BY_REGION_BIT;
-
-        VkRenderPassCreateInfo render_pass_info = {};
-        render_pass_info.sType = VK_STRUCTURE_TYPE_RENDER_PASS_CREATE_INFO;
-        render_pass_info.attachmentCount = 1;
-        render_pass_info.pAttachments = &shadow_attachment;
-        render_pass_info.subpassCount = 1;
-        render_pass_info.pSubpasses = &subpass;
-        render_pass_info.dependencyCount = dependencies.size();
-        render_pass_info.pDependencies = dependencies.data();
-
-        VkResult result = vkCreateRenderPass(m_vk->device, &render_pass_info, NULL,
-            &m_vk->render_pass);
-
-        if (result != VK_SUCCESS)
-            throw std::runtime_error("vkCreateRenderPass failed");
-    }
 }   // createRenderPass
 
 // ----------------------------------------------------------------------------
@@ -1792,23 +1747,6 @@ void GEVulkanDriver::createFramebuffers()
             throw std::runtime_error("vkCreateFramebuffer failed");
 
         m_vk->swap_chain_framebuffers.push_back(swap_chain_framebuffer);
-    }
-    if (m_shadow_map)
-    {
-        VkImageView attachment = (VkImageView)m_shadow_map->getTextureHandler();
-        VkFramebufferCreateInfo framebuffer_info = {};
-        framebuffer_info.sType = VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO;
-        framebuffer_info.renderPass = m_shadow_render_pass;
-        framebuffer_info.attachmentCount = 1;
-        framebuffer_info.pAttachments = &attachment;
-        framebuffer_info.width = 2048;
-        framebuffer_info.height = 2048;
-        framebuffer_info.layers = 1;
-
-        VkResult result = vkCreateFramebuffer(m_vk->device, &framebuffer_info,
-            NULL, &m_shadow_map_framebuffer);
-        if (result != VK_SUCCESS)
-            throw std::runtime_error("vkCreateFramebuffer failed");
     }
 }   // createFramebuffers
 
@@ -2568,20 +2506,10 @@ void GEVulkanDriver::destroySwapChainRelated(bool handle_surface)
         m_depth_texture->drop();
         m_depth_texture = NULL;
     }
-    if (m_shadow_map)
+    if (m_rtt_shadowmap)
     {
-        m_shadow_map->drop();
-        m_shadow_map = NULL;
-    }
-    if (m_shadow_map_framebuffer)
-    {
-        vkDestroyFramebuffer(m_vk->device, m_shadow_map_framebuffer, NULL);
-        m_shadow_map_framebuffer = VK_NULL_HANDLE;
-    }
-    if (m_shadow_render_pass)
-    {
-        vkDestroyRenderPass(m_vk->device, m_shadow_render_pass, NULL);
-        m_shadow_render_pass = VK_NULL_HANDLE;
+        m_rtt_shadowmap->drop();
+        m_rtt_shadowmap = NULL;
     }
     if (m_rtt_texture)
     {
@@ -2662,6 +2590,50 @@ GEVulkanMeshCache* GEVulkanDriver::getVulkanMeshCache() const
 // ----------------------------------------------------------------------------
 void GEVulkanDriver::buildCommandBuffers()
 {
+    VkCommandBufferBeginInfo begin_info = {};
+    begin_info.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
+    begin_info.flags = VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT;
+
+    VkResult result = vkBeginCommandBuffer(getCurrentCommandBuffer(),
+        &begin_info);
+    if (result != VK_SUCCESS)
+        return;
+
+    if (m_rtt_shadowmap)
+    {
+
+        VkClearValue shadow_clear;
+        shadow_clear.depthStencil = {1.0f, 0};
+
+        VkRenderPassBeginInfo shadow_pass_info = {};
+        shadow_pass_info.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
+        shadow_pass_info.clearValueCount = 1;
+        shadow_pass_info.pClearValues = &shadow_clear;
+        shadow_pass_info.renderArea.offset = {0, 0};
+        shadow_pass_info.renderPass = m_rtt_shadowmap->getRTTRenderPass();
+        shadow_pass_info.framebuffer = m_rtt_shadowmap->getRTTFramebuffer();
+        shadow_pass_info.renderArea.extent = { m_rtt_shadowmap->getSize().Width,
+                                            m_rtt_shadowmap->getSize().Height };
+
+        for (auto& p : static_cast<GEVulkanSceneManager*>(
+            m_irrlicht_device->getSceneManager())->getDrawCalls(GVDCP_SHADOW))
+        {
+            p.second->uploadDynamicData(this, p.first);
+        }
+
+        vkCmdBeginRenderPass(getCurrentCommandBuffer(), &shadow_pass_info,
+            VK_SUBPASS_CONTENTS_INLINE);
+
+        for (auto& p : static_cast<GEVulkanSceneManager*>(
+            m_irrlicht_device->getSceneManager())->getDrawCalls(GVDCP_SHADOW))
+        {
+            p.second->render(this, p.first);
+            PrimitivesDrawn += p.second->getPolyCount();
+        }
+
+        vkCmdEndRenderPass(getCurrentCommandBuffer());
+    }
+
     std::array<VkClearValue, 2> clear_values = {};
     video::SColorf cf(getClearColor());
     clear_values[0].color =
@@ -2691,18 +2663,10 @@ void GEVulkanDriver::buildCommandBuffers()
         render_pass_info.renderArea.extent = getSwapChainExtent();
     }
 
-    VkCommandBufferBeginInfo begin_info = {};
-    begin_info.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
-    begin_info.flags = VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT;
-
-    VkResult result = vkBeginCommandBuffer(getCurrentCommandBuffer(),
-        &begin_info);
-    if (result != VK_SUCCESS)
-        return;
-
     GEVulkan2dRenderer::uploadTrisBuffers();
+
     for (auto& p : static_cast<GEVulkanSceneManager*>(
-        m_irrlicht_device->getSceneManager())->getDrawCalls())
+        m_irrlicht_device->getSceneManager())->getDrawCalls(GVDCP_FORWARD))
     {
         p.second->uploadDynamicData(this, p.first);
     }
@@ -2711,7 +2675,7 @@ void GEVulkanDriver::buildCommandBuffers()
         VK_SUBPASS_CONTENTS_INLINE);
 
     for (auto& p : static_cast<GEVulkanSceneManager*>(
-        m_irrlicht_device->getSceneManager())->getDrawCalls())
+        m_irrlicht_device->getSceneManager())->getDrawCalls(GVDCP_FORWARD))
     {
         p.second->render(this, p.first);
         PrimitivesDrawn += p.second->getPolyCount();
@@ -2816,9 +2780,16 @@ void GEVulkanDriver::updateDriver(bool reload_shaders)
             GEVulkanFeatures::supportsBindMeshTexturesAtOnce());
     }
     createSwapChainRelated(false/*handle_surface*/);
-    for (auto& dc : static_cast<GEVulkanSceneManager*>(
-        m_irrlicht_device->getSceneManager())->getDrawCalls())
-        dc.second = std::unique_ptr<GEVulkanDrawCall>(new GEVulkanDrawCall(GVDCP_FORWARD));
+    for (int i = 0; i < GVDCP_COUNT; i++)
+    {
+        for (auto& dc : static_cast<GEVulkanSceneManager*>(
+            m_irrlicht_device->getSceneManager())->getDrawCalls(
+                (GEVulkanDrawCallPass)i))
+        {
+            dc.second = std::unique_ptr<GEVulkanDrawCall>(
+                new GEVulkanDrawCall((GEVulkanDrawCallPass)i));
+        }
+    }
     GEVulkanSkyBoxRenderer::destroy();
     GEVulkan2dRenderer::destroy();
     GEVulkan2dRenderer::init(this);
@@ -2828,23 +2799,30 @@ void GEVulkanDriver::updateDriver(bool reload_shaders)
 // ----------------------------------------------------------------------------
 void GEVulkanDriver::clearDrawCallsCache()
 {
-    m_draw_calls_cache.clear();
+    for (int i = 0; i < GVDCP_COUNT; i++)
+    {
+        m_draw_calls_cache[i].clear();
+    }
 }   // clearDrawCallsCache
 
 // ----------------------------------------------------------------------------
 void GEVulkanDriver::addDrawCallToCache(std::unique_ptr<GEVulkanDrawCall>& dc)
 {
     if (getGEConfig()->m_enable_draw_call_cache)
-        m_draw_calls_cache.push_back(std::move(dc));
+    {
+        m_draw_calls_cache[dc->getPass()].push_back(std::move(dc));
+    }
 }   // addDrawCallToCache
 
 // ----------------------------------------------------------------------------
-std::unique_ptr<GEVulkanDrawCall> GEVulkanDriver::getDrawCallFromCache()
+std::unique_ptr<GEVulkanDrawCall> GEVulkanDriver::getDrawCallFromCache(uint8_t pass)
 {
-    if (!getGEConfig()->m_enable_draw_call_cache || m_draw_calls_cache.empty())
-        return std::unique_ptr<GEVulkanDrawCall>(new GEVulkanDrawCall(GVDCP_FORWARD));
-    auto dc = std::move(m_draw_calls_cache.back());
-    m_draw_calls_cache.pop_back();
+    if (!getGEConfig()->m_enable_draw_call_cache || m_draw_calls_cache[pass].empty())
+    {
+        return std::unique_ptr<GEVulkanDrawCall>(new GEVulkanDrawCall((GEVulkanDrawCallPass)pass));
+    }
+    auto dc = std::move(m_draw_calls_cache[pass].back());
+    m_draw_calls_cache[pass].pop_back();
     return dc;
 }   // getDrawCallFromCache
 

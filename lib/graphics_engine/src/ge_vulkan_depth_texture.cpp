@@ -31,7 +31,8 @@ GEVulkanDepthTexture::GEVulkanDepthTexture(GEVulkanDriver* vk,
         VK_IMAGE_TILING_OPTIMAL,
         VK_FORMAT_FEATURE_DEPTH_STENCIL_ATTACHMENT_BIT);
 
-    if (!createImage(VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT))
+    if (!createImage(VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT |
+        VK_IMAGE_USAGE_SAMPLED_BIT))
         throw std::runtime_error("createImage failed for depth texture");
 
     if (!createImageView(VK_IMAGE_ASPECT_DEPTH_BIT))

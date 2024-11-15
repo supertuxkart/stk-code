@@ -313,7 +313,7 @@ void GEVulkanSkyBoxRenderer::addSkyBox(GEVulkanCameraSceneNode* cam,
         else if (ay > ax && ay > az)
         {
             return dir.Y > 0.0 ? sample_lod(cubemap[2], vector2df(dir.X / ay * 0.5 + 0.5, dir.Z / ay * 0.5 + 0.5), lod)
-                               : sample_lod(cubemap[3], vector2df(dir.X / ay * 0.5 + 0.5, -dir.Z / ay * 0.5 + 0.5), lod);
+                               : SColorf();
         }
         else
         {
@@ -333,7 +333,7 @@ void GEVulkanSkyBoxRenderer::addSkyBox(GEVulkanCameraSceneNode* cam,
             else break;
         }
 
-        const int sample_count = 32;
+        const int sample_count = 128;
 
         for (int level = 0; level < dst.size(); level++)
         for (int u = 0; u < dst[level].m_dim.Width; u++)
@@ -428,8 +428,15 @@ void GEVulkanSkyBoxRenderer::addSkyBox(GEVulkanCameraSceneNode* cam,
 
         const int sample_count = 32;
 
-        memcpy(dst[0].m_data, src[tex_index][lodbias].m_data, 
-               sizeof(uint32_t) * dst[0].m_dim.getArea());
+        if (tex_index == 3)
+        {
+            memset(dst[0].m_data, 0, sizeof(uint32_t) * dst[0].m_dim.getArea());
+        }
+        else
+        {
+            memcpy(dst[0].m_data, src[tex_index][lodbias].m_data, 
+                    sizeof(uint32_t) * dst[0].m_dim.getArea());
+        }
 
         for (int level = 1; level < dst.size(); level++)
         for (int u = 0; u < dst[level].m_dim.Width; u++)

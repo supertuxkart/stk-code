@@ -83,6 +83,7 @@ set(GE_SOURCES
     src/ge_vulkan_draw_call.cpp
     src/ge_vulkan_dynamic_buffer.cpp
     src/ge_vulkan_dynamic_spm_buffer.cpp
+    src/ge_vulkan_fbo_shadow_map.cpp
     src/ge_vulkan_fbo_texture.cpp
     src/ge_vulkan_features.cpp
     src/ge_vulkan_mesh_cache.cpp

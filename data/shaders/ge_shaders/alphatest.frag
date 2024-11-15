@@ -46,9 +46,14 @@ void main()
                                 u_camera.m_sun_direction,
                                 u_camera.m_sun_angle_tan_half);
 
+    vec4 world_position = u_camera.m_inverse_view_matrix * vec4(xpos.xyz, 1.0);
+    vec4 light_view_position = u_camera.m_light_view_matrix * vec4(world_position.xyz, 1.0);
+    light_view_position.xyz /= light_view_position.w;
+    light_view_position.xy = light_view_position.xy * 0.5 + 0.5;
+    float shadow = xpos.z > 150.0 ? 1.0 : texture(u_shadow_map, light_view_position.xyz - vec3(0., 0., max(dot(normal, lightdir), 0.) / 2048.));
+
     vec3 mixed_color = PBRSunAmbientEmitLight(
-        normal, eyedir, lightdir, 
-        (u_camera.m_inverse_view_matrix * vec4(xpos.xyz, 0.0)).xyz,
+        normal, eyedir, lightdir, shadow,
         (u_camera.m_inverse_view_matrix * vec4(normal, 0.0)).xyz,
         (u_camera.m_inverse_view_matrix * vec4(reflection, 0.0)).xyz,
         diffuse_color,
@@ -58,7 +63,7 @@ void main()
 
     mixed_color = applyFog(
         eyedir, -lightdir, mixed_color,
-        u_camera.m_sun_color, u_camera.m_sun_scatter,
+        u_camera.m_sun_color, u_camera.m_sun_scatter * shadow,
         length(xpos), 
         u_camera.m_fog_color, u_camera.m_fog_density);
 

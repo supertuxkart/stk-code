@@ -59,12 +59,25 @@ void GEVulkanCameraSceneNode::render()
         m_ubo_data.m_inverse_projection_view_matrix);
     
     clip[5] = 1.0f;
-	m_ubo_data.m_light_view_matrix = clip * getLightVM();
+
+    irr::core::vector3df viewdir = getTarget() - getAbsolutePosition();
+    viewdir = viewdir.normalize();
+    irr::core::vector3df lightdir = -vk->getGlobalLightUBO(irr::core::matrix4())->m_sun_direction;
+    float cosgamma	= viewdir.dotProduct(lightdir);
+	float singamma	= sqrtf(1.0f - cosgamma * cosgamma);
+
+    float factor = std::max(singamma - sinf(getFOV() / 2), 0.0f) / (1.0f - sinf(getFOV() / 2));
+    float far = 20.0f + 100.0f * factor;
+
+	m_ubo_data.m_light_view_matrix = clip * getLightVM(5.0f, 150.0f);
     
     m_ubo_data.m_viewport.UpperLeftCorner.X = m_viewport.UpperLeftCorner.X;
     m_ubo_data.m_viewport.UpperLeftCorner.Y = m_viewport.UpperLeftCorner.Y;
     m_ubo_data.m_viewport.LowerRightCorner.X = m_viewport.getWidth();
     m_ubo_data.m_viewport.LowerRightCorner.Y = m_viewport.getHeight();
+
+    m_ubo_data_shadow = m_ubo_data;
+    m_ubo_data_shadow.m_projection_view_matrix = m_ubo_data.m_light_view_matrix;
 }   // render
 
 // ----------------------------------------------------------------------------
@@ -76,10 +89,8 @@ irr::core::matrix4 GEVulkanCameraSceneNode::getPVM() const
 }   // getPVM
 
 // ----------------------------------------------------------------------------
-irr::core::matrix4 GEVulkanCameraSceneNode::getLightVM() const
+irr::core::matrix4 GEVulkanCameraSceneNode::getLightVM(float vnear, float vfar) const
 {
-    const float render_depth = 150.0;
-    
     GEVulkanDriver* vk = getVKDriver();
 
     // calculate light space perspective frustum
@@ -104,14 +115,17 @@ irr::core::matrix4 GEVulkanCameraSceneNode::getLightVM() const
     std::vector<irr::core::vector3df> points;
     irr::scene::ISceneNode *scene = getSceneManager()->getRootSceneNode();
 
-    points.push_back(getViewFrustum()->getFarLeftDown());
-    points.push_back(getViewFrustum()->getFarLeftUp());
-    points.push_back(getViewFrustum()->getFarRightDown());
-    points.push_back(getViewFrustum()->getFarRightUp());
+    float scale = (vfar - getNearValue()) / (getFarValue() - getNearValue());
+    points.push_back(scale * getViewFrustum()->getFarLeftDown() + (1.0 - scale) * getViewFrustum()->getNearLeftDown());
+    points.push_back(scale * getViewFrustum()->getFarLeftUp() + (1.0 - scale) * getViewFrustum()->getNearLeftUp());
+    points.push_back(scale * getViewFrustum()->getFarRightDown() + (1.0 - scale) * getViewFrustum()->getNearRightDown());
+    points.push_back(scale * getViewFrustum()->getFarRightUp() + (1.0 - scale) * getViewFrustum()->getNearRightUp());
     points.push_back(getViewFrustum()->getNearLeftDown());
     points.push_back(getViewFrustum()->getNearLeftUp());
     points.push_back(getViewFrustum()->getNearRightDown());
     points.push_back(getViewFrustum()->getNearRightUp());
+    points.push_back(getViewFrustum()->getNearLeftDown() + 100 * lightdir);
+    points.push_back(getViewFrustum()->getNearRightDown() + 100 * lightdir);
 
     if (scene)
     {
@@ -147,6 +161,11 @@ irr::core::matrix4 GEVulkanCameraSceneNode::getLightVM() const
 
     irr::core::aabbox3df lsbody = irr::core::aabbox3df();
 
+    float cosgamma	= viewdir.dotProduct(lightdir);
+	float singamma	= sqrtf(1.0f - cosgamma * cosgamma);
+    float dznear    = std::max(vnear - getNearValue(), 0.0f);
+    float dzfar     = std::max(getFarValue() - vfar, 0.0f);
+
     for (int i = 0; i < points.size(); i++)
     {
         irr::core::vector3df point = points[i];
@@ -159,6 +178,9 @@ irr::core::matrix4 GEVulkanCameraSceneNode::getLightVM() const
         else lsbody.addInternalPoint(point);
     }
 
+    float znear = std::max(getNearValue(), lsbody.MinEdge.Y);
+    float zfar = std::min(getFarValue(), lsbody.MaxEdge.Y);
+
     for (int i = 0; i < points.size(); i++)
     {
         irr::core::vector3df point = points[i];
@@ -169,55 +191,56 @@ irr::core::matrix4 GEVulkanCameraSceneNode::getLightVM() const
         point.Z = vec[2] / vec[3];
         if (i == 0) lsbody.reset(point);
         else lsbody.addInternalPoint(point);
-    } 
+    }
 
-    float cosgamma	= viewdir.dotProduct(lightdir);
-	float singamma	= sqrtf(1.0f - cosgamma * cosgamma);
-	float znear		= getNearValue();
-	float d			= lsbody.getExtent().Y;
-	float zfar		= znear + d * singamma;
-	float n		    = (znear + sqrtf(zfar * znear)) / singamma;
-	float f			= n + d;
+	float n	 = lsbody.MinEdge.Y;
+    float f  = lsbody.MaxEdge.Y;
+	float d	 = lsbody.getExtent().Y;
 
-    //printf("%f %f\n", n, f);
+    float z0 = znear;
+    float z1 = z0 + d * singamma;
 
-	lispsmproj(1, 1) = (f + n) / d;
-	lispsmproj(3, 1) = -2.0 * f * n / d;
-	lispsmproj(1, 3) = 1;
-	lispsmproj(3, 3) = 0;
+    if (singamma > 0.02f && 3.0f * (dznear / (zfar - znear)) < 2.0f)
+    {
+        float vz0 = std::max(0.0f, std::max(std::max(znear, getNearValue() + dznear), z0));
+        float vz1 = std::max(0.0f, std::min(std::min(zfar, getFarValue() - dzfar), z1));
 
-    // project everything into unit cube
+        float n = (z0 + sqrtf(vz0 * vz1)) / singamma;
+        n = std::max(n, dznear / (2.0f - 3.0f * (dznear / (zfar - znear))));
 
-    irr::core::vector3df corrected = eyepos - lsup * (n - getNearValue());
+	    float f	= n + d;
 
-	lslightview(3, 0) = -lsleft.dotProduct(corrected);
-	lslightview(3, 1) = -lsup.dotProduct(corrected);
-	lslightview(3, 2) = -lightdir.dotProduct(corrected);
+        lispsmproj(1, 1) = (f + n) / d;
+        lispsmproj(3, 1) = -2.0 * f * n / d;
+        lispsmproj(1, 3) = 1;
+        lispsmproj(3, 3) = 0;
+
+        irr::core::vector3df point = eyepos;
+        float vec[4];
+        lslightview.transformVect(vec, point);
+        point.X = vec[0] / vec[3];
+        point.Y = vec[1] / vec[3];
+        point.Z = vec[2] / vec[3];
+
+        irr::core::matrix4 correct;
+        correct(3, 0) = -point.X;
+        correct(3, 1) = -lsbody.MinEdge.Y + n;
+
+        lispsmproj = lispsmproj * correct;
+    }
 
     irr::core::matrix4 lslightviewproj = lslightview;
 
     lslightviewproj = lispsmproj * lslightview;
-
-    /*for (int i = 0; i < 4; i++)
-    {
-        for (int j = 0; j < 4; j++)
-        {
-            printf("%f ", lslightviewproj(i, j));
-        }
-        printf("\n");
-    }
-    printf("\n");*/
     
     for (int i = 0; i < points.size(); i++)
     {
         irr::core::vector3df point = points[i];
         float vec[4];
-        //printf("%f %f %f\n", point.X, point.Y, point.Z);
         lslightviewproj.transformVect(vec, point);
         point.X = vec[0] / vec[3];
         point.Y = vec[1] / vec[3];
         point.Z = vec[2] / vec[3];
-        //printf("%f %f %f %f\n", point.X, point.Y, point.Z, vec[3]);
         if (i == 0) lsbody.reset(point);
         else lsbody.addInternalPoint(point);
     } 
@@ -232,8 +255,6 @@ irr::core::matrix4 GEVulkanCameraSceneNode::getLightVM() const
     
 
 	lslightviewproj = fittounitcube * lslightviewproj; 
-
-    printf("%f\n", singamma);
     
     return lslightviewproj;
 }

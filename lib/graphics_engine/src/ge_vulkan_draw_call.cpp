@@ -10,6 +10,7 @@
 #include "ge_vulkan_driver.hpp"
 #include "ge_vulkan_dynamic_buffer.hpp"
 #include "ge_vulkan_dynamic_spm_buffer.hpp"
+#include "ge_vulkan_fbo_shadow_map.hpp"
 #include "ge_vulkan_fbo_texture.hpp"
 #include "ge_vulkan_features.hpp"
 #include "ge_vulkan_mesh_cache.hpp"
@@ -1021,14 +1022,19 @@ start:
     VkViewport viewport = {};
     viewport.x = 0.0f;
     viewport.y = 0.0f;
-    viewport.width = (float)vk->getSwapChainExtent().width;
-    viewport.height = (float)vk->getSwapChainExtent().height;
+    viewport.width = m_draw_call_pass == GVDCP_SHADOW ? 2048.f : (float)vk->getSwapChainExtent().width;
+    viewport.height = m_draw_call_pass == GVDCP_SHADOW ? 2048.f : (float)vk->getSwapChainExtent().height;
     viewport.minDepth = 0.0f;
     viewport.maxDepth = 1.0f;
 
     VkRect2D scissor = {};
     scissor.offset = {0, 0};
     scissor.extent = vk->getSwapChainExtent();
+
+    if (m_draw_call_pass == GVDCP_SHADOW)
+    {
+        scissor.extent.width = scissor.extent.height = 2048;
+    }
 
     VkPipelineViewportStateCreateInfo viewport_state = {};
     viewport_state.sType = VK_STRUCTURE_TYPE_PIPELINE_VIEWPORT_STATE_CREATE_INFO;
@@ -1123,7 +1129,7 @@ start:
     pipeline_info.pColorBlendState = &color_blending;
     pipeline_info.pDynamicState = &dynamic_state_info;
     pipeline_info.layout = m_pipeline_layout;
-    pipeline_info.renderPass = m_draw_call_pass == GVDCP_SHADOW ? vk->getShadowRenderPass():
+    pipeline_info.renderPass = m_draw_call_pass == GVDCP_SHADOW ? vk->getRTTShadowMap()->getRTTRenderPass():
         vk->getRTTTexture() ? vk->getRTTTexture()->getRTTRenderPass() : vk->getRenderPass();
     pipeline_info.subpass = 0;
     pipeline_info.basePipelineHandle = VK_NULL_HANDLE;
@@ -1213,17 +1219,17 @@ void GEVulkanDrawCall::createVulkanData()
         bindings.push_back(material_binding);
     }
 
-    VkDescriptorSetLayoutBinding global_light_binding = {};
-    global_light_binding.binding = 0;
-    global_light_binding.descriptorCount = 1;
-    global_light_binding.descriptorType =
-        VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER_DYNAMIC;
-    global_light_binding.pImmutableSamplers = NULL;
-    global_light_binding.stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT;
+    VkDescriptorSetLayoutBinding shadowmap_binding = {};
+    shadowmap_binding.binding = 0;
+    shadowmap_binding.descriptorCount = 1;
+    shadowmap_binding.descriptorType =
+        VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
+    shadowmap_binding.pImmutableSamplers = NULL;
+    shadowmap_binding.stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT;
 
     std::vector<VkDescriptorSetLayoutBinding> bindings_pbr =
     {
-        global_light_binding
+        shadowmap_binding
     };
 
     VkDescriptorSetLayoutCreateInfo setinfo = {};
@@ -1274,8 +1280,8 @@ void GEVulkanDrawCall::createVulkanData()
     std::vector<VkDescriptorPoolSize> sizes_pbr =
     {
         {
-            VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER_DYNAMIC,
-            vk->getMaxFrameInFlight() + 1
+            VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,
+            1
         }
     };
 
@@ -1293,7 +1299,7 @@ void GEVulkanDrawCall::createVulkanData()
     VkDescriptorPoolCreateInfo pool_info_pbr = {};
     pool_info_pbr.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO;
     pool_info_pbr.flags = 0;
-    pool_info_pbr.maxSets = vk->getMaxFrameInFlight() + 1;
+    pool_info_pbr.maxSets = 1;
     pool_info_pbr.poolSizeCount = sizes_pbr.size();
     pool_info_pbr.pPoolSizes = sizes_pbr.data();
 
@@ -1320,18 +1326,14 @@ void GEVulkanDrawCall::createVulkanData()
             "layout");
     }
 
-    m_data_descriptor_sets_pbr.resize(set_size);
-    std::vector<VkDescriptorSetLayout> data_layouts_pbr(
-        m_data_descriptor_sets_pbr.size(), m_data_layout_pbr);
-
     VkDescriptorSetAllocateInfo alloc_info_pbr = {};
     alloc_info_pbr.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;
     alloc_info_pbr.descriptorPool = m_descriptor_pool_pbr;
-    alloc_info_pbr.descriptorSetCount = data_layouts_pbr.size();
-    alloc_info_pbr.pSetLayouts = data_layouts_pbr.data();
+    alloc_info_pbr.descriptorSetCount = 1;
+    alloc_info_pbr.pSetLayouts = &m_data_layout_pbr;
 
     if (vkAllocateDescriptorSets(vk->getDevice(), &alloc_info_pbr,
-        m_data_descriptor_sets_pbr.data()) != VK_SUCCESS)
+        &m_data_descriptor_set_pbr) != VK_SUCCESS)
     {
         throw std::runtime_error("vkAllocateDescriptorSets failed for data "
             "layout");
@@ -1344,6 +1346,10 @@ void GEVulkanDrawCall::createVulkanData()
         m_data_layout,
         *GEVulkanSkyBoxRenderer::getEnvMapDescriptorLayout()
     }};
+    if (m_draw_call_pass == GVDCP_FORWARD)
+    {
+        all_layouts.push_back(m_data_layout_pbr);
+    }
 
     VkPipelineLayoutCreateInfo pipeline_layout_info = {};
     pipeline_layout_info.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
@@ -1409,8 +1415,16 @@ void GEVulkanDrawCall::uploadDynamicData(GEVulkanDriver* vk,
         VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT;
 
     std::vector<std::pair<void*, size_t> > data_uploading;
-    data_uploading.emplace_back((void*)cam->getUBOData(),
-        sizeof(GEVulkanCameraUBO));
+    if (m_draw_call_pass == GVDCP_SHADOW)
+    {
+        data_uploading.emplace_back((void*)cam->getShadowUBOData(),
+            sizeof(GEVulkanCameraUBO));
+    }
+    else
+    {
+        data_uploading.emplace_back((void*)cam->getUBOData(),
+            sizeof(GEVulkanCameraUBO));
+    }
     data_uploading.emplace_back((void*)vk->getGlobalLightUBO(cam->getUBOData()->m_inverse_view_matrix),
         sizeof(GEGlobalLightUBO));
 
@@ -1492,10 +1506,10 @@ void GEVulkanDrawCall::render(GEVulkanDriver* vk, GEVulkanCameraSceneNode* cam,
     float scale = getGEConfig()->m_render_scale;
     if (vk->getSeparateRTTTexture())
         scale = 1.0f;
-    vp.x = cam->getViewPort().UpperLeftCorner.X * scale;
-    vp.y = cam->getViewPort().UpperLeftCorner.Y * scale;
-    vp.width = cam->getViewPort().getWidth() * scale;
-    vp.height = cam->getViewPort().getHeight() * scale;
+    vp.x = m_draw_call_pass==GVDCP_SHADOW ? 0 : cam->getViewPort().UpperLeftCorner.X * scale;
+    vp.y = m_draw_call_pass==GVDCP_SHADOW ? 0 :  cam->getViewPort().UpperLeftCorner.Y * scale;
+    vp.width = m_draw_call_pass==GVDCP_SHADOW ? 2048 :  cam->getViewPort().getWidth() * scale;
+    vp.height = m_draw_call_pass==GVDCP_SHADOW ? 2048 :  cam->getViewPort().getHeight() * scale;
     vp.minDepth = 0;
     vp.maxDepth = 1.0f;
     vk->getRotatedViewport(&vp, true/*handle_rtt*/);
@@ -1530,6 +1544,12 @@ void GEVulkanDrawCall::render(GEVulkanDriver* vk, GEVulkanCameraSceneNode* cam,
     vkCmdBindDescriptorSets(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS,
         m_pipeline_layout, 2, 1, GEVulkanSkyBoxRenderer::getEnvMapDescriptor(),
         0, NULL);
+    if (m_draw_call_pass == GVDCP_FORWARD)
+    {
+        vkCmdBindDescriptorSets(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS,
+            m_pipeline_layout, 3, 1, &m_data_descriptor_set_pbr,
+            0, NULL);
+    }
     bool is_depth_only = (m_draw_call_pipeline_flag & GVDCPF_DEPTH) ? true : false;
 
 start:
@@ -1942,6 +1962,28 @@ void GEVulkanDrawCall::updateDataDescriptorSets(GEVulkanDriver* vk)
 
         vkUpdateDescriptorSets(vk->getDevice(), data_set.size(),
             data_set.data(), 0, NULL);
+    }
+    
+    if (m_draw_call_pass == GVDCP_FORWARD)
+    {
+        VkDescriptorImageInfo info;
+        info.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
+        info.sampler = vk->getSampler(GVS_SHADOWMAP);
+        info.imageView = (VkImageView)vk->getRTTShadowMap()->getTextureHandler();
+
+        VkWriteDescriptorSet write_descriptor_set = {};
+        write_descriptor_set.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+        write_descriptor_set.dstBinding = 0;
+        write_descriptor_set.dstArrayElement = 0;
+        write_descriptor_set.descriptorType =
+            VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
+        write_descriptor_set.descriptorCount = 1;
+        write_descriptor_set.pBufferInfo = 0;
+        write_descriptor_set.dstSet = m_data_descriptor_set_pbr;
+        write_descriptor_set.pImageInfo = &info;
+
+        vkUpdateDescriptorSets(vk->getDevice(), 1,
+            &write_descriptor_set, 0, NULL);
     }
 }   // updateDataDescriptor
 }

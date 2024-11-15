@@ -326,7 +326,7 @@ void GEVulkanArrayTexture::reloadInternal(const std::vector<io::path>& list,
 
     for (unsigned i = 0; i < list.size(); i++)
     {
-        std::vector<GEImageLevel>& levels =  mipmap_levels[i];
+        std::vector<GEImageLevel>& levels = mipmap_levels[i];
         for (unsigned j = 0; j < levels.size(); j++)
         {
             GEImageLevel& level = levels[j];

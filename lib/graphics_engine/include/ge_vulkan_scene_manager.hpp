@@ -16,7 +16,8 @@ class GEVulkanSunSceneNode;
 class GEVulkanSceneManager : public irr::scene::CSceneManager
 {
 private:
-    std::map<GEVulkanCameraSceneNode*, std::unique_ptr<GEVulkanDrawCall> > m_draw_calls;
+    std::vector<std::map<GEVulkanCameraSceneNode*, std::unique_ptr<GEVulkanDrawCall> > >
+        m_draw_calls;
 
     // ------------------------------------------------------------------------
     void drawAllInternal();
@@ -67,7 +68,7 @@ public:
     void removeDrawCall(GEVulkanCameraSceneNode* cam);
     // ------------------------------------------------------------------------
     std::map<GEVulkanCameraSceneNode*, std::unique_ptr<GEVulkanDrawCall> >&
-                                        getDrawCalls() { return m_draw_calls; }
+            getDrawCalls(uint8_t pass) { return m_draw_calls[pass]; }
 };   // GEVulkanSceneManager
 
 }

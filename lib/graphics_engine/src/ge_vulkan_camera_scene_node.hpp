@@ -24,6 +24,8 @@ class GEVulkanCameraSceneNode : public irr::scene::CCameraSceneNode
 private:
     GEVulkanCameraUBO m_ubo_data;
 
+    GEVulkanCameraUBO m_ubo_data_shadow;
+
     irr::core::rect<irr::s32> m_viewport;
 public:
     // ------------------------------------------------------------------------
@@ -43,9 +45,12 @@ public:
     // ------------------------------------------------------------------------
     irr::core::matrix4 getPVM() const;
     // ------------------------------------------------------------------------
-    irr::core::matrix4 getLightVM() const;
+    irr::core::matrix4 getLightVM(float vnear, float vfar) const;
     // ------------------------------------------------------------------------
     const GEVulkanCameraUBO* const getUBOData() const   { return &m_ubo_data; }
+    // ------------------------------------------------------------------------
+    const GEVulkanCameraUBO* const getShadowUBOData() const   
+                                                { return &m_ubo_data_shadow; }
 };   // GEVulkanCameraSceneNode
 
 }

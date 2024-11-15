@@ -28,6 +28,7 @@ GEVulkanSceneManager::GEVulkanSceneManager(irr::video::IVideoDriver* driver,
                     : CSceneManager(driver, fs, cursor_control,
                                     new GEVulkanMeshCache(), gui_environment)
 {
+    m_draw_calls.resize(GVDCP_COUNT);
     // CSceneManager grabbed it
     getMeshCache()->drop();
 }   // GEVulkanSceneManager
@@ -186,12 +187,22 @@ void GEVulkanSceneManager::drawAllInternal()
     if (cam)
     {
         cam->render();
-        auto it = m_draw_calls.find(cam);
-        if (it == m_draw_calls.end())
+
+        auto it_shadow = m_draw_calls[GVDCP_SHADOW].find(cam);
+        if (it_shadow == m_draw_calls[GVDCP_SHADOW].end())
             return;
 
-        it->second->prepare(vk, cam);
+        auto it = m_draw_calls[GVDCP_FORWARD].find(cam);
+        if (it == m_draw_calls[GVDCP_FORWARD].end())
+            return;
+
+        it_shadow->second->prepare(vk, cam, GVDCPF_DEPTH);
+        it->second->prepare(vk, cam, (GEVulkanDrawCallPipelineFlag)
+                                        (GVDCPF_COLOR | GVDCPF_DEPTH));
+
         OnRegisterSceneNode();
+        
+        it_shadow->second->generate(vk, cam);
         it->second->generate(vk, cam);
     }
 }   // drawAllInternal
@@ -217,7 +228,7 @@ void GEVulkanSceneManager::drawAll(irr::u32 flags)
 
     GEVulkanCameraSceneNode* cam = static_cast<
         GEVulkanCameraSceneNode*>(getActiveCamera());
-    std::unique_ptr<GEVulkanDrawCall>& dc = m_draw_calls.at(cam);
+    std::unique_ptr<GEVulkanDrawCall>& dc = m_draw_calls[GVDCP_FORWARD].at(cam);
     dc->uploadDynamicData(vk, cam, cmd);
 
     VkRenderPassBeginInfo render_pass_info = {};
@@ -253,7 +264,7 @@ irr::u32 GEVulkanSceneManager::registerNodeForRendering(
 
     GEVulkanCameraSceneNode* cam = static_cast<
         GEVulkanCameraSceneNode*>(getActiveCamera());
-
+    
     if (node->getType() == irr::scene::ESNT_SKY_BOX)
     {
         GEVulkanSkyBoxRenderer::addSkyBox(cam, node);
@@ -263,7 +274,8 @@ irr::u32 GEVulkanSceneManager::registerNodeForRendering(
     if (node->getType() == irr::scene::ESNT_BILLBOARD ||
         node->getType() == irr::scene::ESNT_PARTICLE_SYSTEM)
     {
-        m_draw_calls.at(cam)->addBillboardNode(node, node->getType());
+        m_draw_calls[GVDCP_SHADOW].at(cam)->addBillboardNode(node, node->getType());
+        m_draw_calls[GVDCP_FORWARD].at(cam)->addBillboardNode(node, node->getType());
         return 1;
     }
 
@@ -275,11 +287,13 @@ irr::u32 GEVulkanSceneManager::registerNodeForRendering(
 
     if (node->getType() == irr::scene::ESNT_ANIMATED_MESH)
     {
-        m_draw_calls.at(cam)->addNode(node);
+        m_draw_calls[GVDCP_SHADOW].at(cam)->addNode(node);
+        m_draw_calls[GVDCP_FORWARD].at(cam)->addNode(node);
     }
     else if (node->getType() == irr::scene::ESNT_MESH)
     {
-        m_draw_calls.at(cam)->addNode(node);
+        m_draw_calls[GVDCP_SHADOW].at(cam)->addNode(node);
+        m_draw_calls[GVDCP_FORWARD].at(cam)->addNode(node);
     }
     return 1;
 }   // registerNodeForRendering
@@ -288,18 +302,22 @@ irr::u32 GEVulkanSceneManager::registerNodeForRendering(
 void GEVulkanSceneManager::addDrawCall(GEVulkanCameraSceneNode* cam)
 {
     GEVulkanDriver* gevk = static_cast<GEVulkanDriver*>(getVideoDriver());
-    m_draw_calls[cam] = gevk->getDrawCallFromCache();
+    for (int i = 0; i < GVDCP_COUNT; i++)
+        m_draw_calls[i][cam] = gevk->getDrawCallFromCache((GEVulkanDrawCallPass)i);
 }   // addDrawCall
 
 // ----------------------------------------------------------------------------
 void GEVulkanSceneManager::removeDrawCall(GEVulkanCameraSceneNode* cam)
 {
-    if (m_draw_calls.find(cam) == m_draw_calls.end())
-        return;
     GEVulkanDriver* gevk = static_cast<GEVulkanDriver*>(getVideoDriver());
-    auto& dc = m_draw_calls.at(cam);
-    gevk->addDrawCallToCache(dc);
-    m_draw_calls.erase(cam);
+    for (int i = 0; i < GVDCP_COUNT; i++)
+    {
+        if (m_draw_calls[i].find(cam) == m_draw_calls[i].end())
+            continue;
+        auto& dc = m_draw_calls[i].at(cam);
+        gevk->addDrawCallToCache(dc);
+        m_draw_calls[i].erase(cam);
+    }
 }   // removeDrawCall
 
 }

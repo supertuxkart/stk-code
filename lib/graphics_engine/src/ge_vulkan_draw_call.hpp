@@ -43,7 +43,8 @@ class GEVulkanTextureDescriptor;
 enum GEVulkanDrawCallPass : uint8_t
 {
     GVDCP_SHADOW,
-    GVDCP_FORWARD
+    GVDCP_FORWARD,
+    GVDCP_COUNT
 };
 
 enum GEVulkanDrawCallPipelineFlag : uint8_t
@@ -170,7 +171,7 @@ private:
 
     std::vector<VkDescriptorSet> m_data_descriptor_sets;
 
-    std::vector<VkDescriptorSet> m_data_descriptor_sets_pbr;
+    VkDescriptorSet m_data_descriptor_set_pbr;
 
     std::unordered_map<std::string, std::pair<uint32_t, void*> >
         m_push_constants;
@@ -265,7 +266,7 @@ public:
                           irr::scene::ESCENE_NODE_TYPE node_type);
     // ------------------------------------------------------------------------
     void prepare(GEVulkanDriver* vk, GEVulkanCameraSceneNode* cam,
-                 GEVulkanDrawCallPipelineFlag type = (GEVulkanDrawCallPipelineFlag)(GVDCPF_COLOR));
+                 GEVulkanDrawCallPipelineFlag type);
     // ------------------------------------------------------------------------
     void generate(GEVulkanDriver* vk, GEVulkanCameraSceneNode* cam);
     // ------------------------------------------------------------------------
@@ -282,6 +283,8 @@ public:
             result += (cmd.m_cmd.indexCount / 3) * cmd.m_cmd.instanceCount;
         return result;
     }
+    // ------------------------------------------------------------------------
+    const GEVulkanDrawCallPass getPass() const { return m_draw_call_pass; }
     // ------------------------------------------------------------------------
     void reset()
     {
