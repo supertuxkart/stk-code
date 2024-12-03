@@ -2457,7 +2457,7 @@ int main(int argc, char *argv[])
             }
             else if (!CVS->isGLSL())
             {
-                #if !defined(MOBILE_STK)
+                #if !defined(MOBILE_STK) && !defined(__EMSCRIPTEN__)
                 if (UserConfigParams::m_old_driver_popup)
                 {
                     #ifdef USE_GLES2
