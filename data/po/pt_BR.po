@@ -43,7 +43,7 @@ msgstr "Erro ao extrair os dados do jogo"
 
 #. I18N: In Android UI, po_extract_error_msg
 msgid "Check remaining device space or reinstall SuperTuxKart."
-msgstr "Verifique se há espaço suficiente no dispositivo ou reinicie o SuperTuxKart."
+msgstr "Verifique se há espaço suficiente no dispositivo ou reinstale o SuperTuxKart."
 
 #. I18N: In Android UI, po_quit
 #. I18N: ./data/gui/screens/main_menu.stkgui
@@ -924,7 +924,7 @@ msgstr "Dados do usuário"
 #. I18N: ./data/gui/dialogs/online/user_info_dialog.stkgui
 #. I18N: User info dialog
 msgid "Remove Friend"
-msgstr ""
+msgstr "Remover Amizade"
 
 #. I18N: ./data/gui/dialogs/online/user_info_dialog.stkgui
 #. I18N: User info dialog
@@ -934,17 +934,17 @@ msgstr "Adicionar como amigo"
 #. I18N: ./data/gui/dialogs/online/user_info_dialog.stkgui
 #. I18N: User info dialog
 msgid "Accept Invite"
-msgstr ""
+msgstr "Aceitar Convite"
 
 #. I18N: ./data/gui/dialogs/online/user_info_dialog.stkgui
 #. I18N: User info dialog
 msgid "Decline Invite"
-msgstr ""
+msgstr "Recusar Convite"
 
 #. I18N: ./data/gui/dialogs/online/user_info_dialog.stkgui
 #. I18N: User info dialog
 msgid "View Profile"
-msgstr ""
+msgstr "Ver Perfil"
 
 #. I18N: ./data/gui/dialogs/online/vote_dialog.stkgui
 #. I18N: In the vote dialog
@@ -1132,7 +1132,7 @@ msgstr "Créditos"
 
 #. I18N: ./data/gui/screens/cutscene.stkgui
 msgid "Skip"
-msgstr ""
+msgstr "Pular"
 
 #. I18N: ./data/gui/screens/easter_egg.stkgui
 #. I18N: Section in easter egg tracks selection screen
@@ -2012,7 +2012,7 @@ msgid ""
 "You can play without creating an online account by selecting an offline "
 "account. Though then you can not connect to friends, vote for addons etc. "
 "Please read our privacy statement at https://privacy.supertuxkart.net"
-msgstr ""
+msgstr "Você pode jogar sem criar uma conta online selecionando uma conta offline. Porém você não poderá se conectar aos amigos, dar votos aos complementos, etc. Por favor, leia nossa Declaração de Privacidade em https://privacy.supertuxkart.net"
 
 #. I18N: ./data/gui/screens/online/server_selection.stkgui
 #: src/states_screens/online/server_selection.cpp:580

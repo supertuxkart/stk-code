@@ -5,44 +5,68 @@ It should be kept in mind that some versions have a less complete changelog than
 
 For similar reasons, and because some features are vastly more complex than others, attributions of main changes should not be taken as a shortcut for overall contribution.
 
-## SuperTuxKart 1.5 (TBD, still unfinished)
+## SuperTuxKart 1.5 Beta1
 
 ### Networking
 * Improve track-voting logic when no majority is achieved, by kimden
+* Prevent selectable addons to be removed by spectators, by kimden
+* Make bot indices start from one, by JipFr
+* Various bugfixes and code-quality improvements, by kimden
 
 ### General
-* Make the game's window resizable in all the screens, by CodingJellyfish (previously, most UI screens did not support resizing)
 * New benchmark mode, by Alayan:
 - Can be run with a few clicks, allowing to easily test the performance of various settings or to compare different systems
 - Robust performance metrics that better reflect the impact of varying frametimes than Average FPS and 1% Lows.
-* Fix incorrect unlock information in Story Mode after a Grand Prix, by CodingJellyfish
+* Add benchmark mode to commandline options, by ektor5
+* Implement blog announcement system in Online screen, by CodingJellyfish
 * Make the progression of audio levels geometrical and increase default steps, allowing to set lower audio levels and better accuracy for low audio levels (especially useful for headphone users), by Alayan
 * Fix drive-on sound from materials being played when the game is paused, by Alayan
 * Fix a crash trying to read replays when the random starting position setting is enabled, by Alayan
+* Enable smooth scrolling for Irrlicht, by CodingJellyfish
 * Handle track names with spaces in the replay reader, by Alayan
+* Add launchable tag and use rDNS format for AppData file, by AsciiWolf
+* Various build system updates, by deveee, tobbi, ognevny and others
+* Various compiler fixes, by heirecka, limburgher, nyllet and others
 * Various tweaks, bugfixes and code-quality improvements
 
 ### Graphics
 * Improve the accuracy of the framerate limiter, by Benau
-* Add more maximum framerate options to the built-in framerate limiter, by Benau (this does not affect physics, which run at 120FPs independetly of graphical FPS)
+* Add more maximum framerate options to the built-in framerate limiter, by Benau
 * Add some graphical effects for legacy video drivers, by Benau
-* Ensure fragment shaders use high precision, to avoid rendering issues with some drivers, by zmike
-* Fix a related precision issue causing black artifacts with GL_ES, by CodingJellyfish
-* Fix other shader issues that could produce black artifacts in specific situations, by CodingJellyfish
+* Replace inaccurate normal compression algorithm with Octahedron Normal Vector, by CodingJellyfish
+* Guarantee 2048 overall bone limit for skinned mesh, by CodingJellyfish
+* Improve Cascaded Shadow Mapping, by CodingJellyfish
+* Fix incorrect Screen-Space Reflection shader, by CodingJellyfish
 * Various improvements to the automatic computations of Level of Detail (LoD) distances, by Alayan
-* Improve draw call performance in some situations, by CodingJellyfish
+* Improve the performance of scene node iteration, by CodingJellyfish
 * Enable new higher LoD and shadows settings, by Alayan
 * Integrate LoD (Geometry Detail) settings in the graphics presets, by Alayan
 * Prefer displaying a lower quality LoD model over switching to a higher quality one when too close, by Alayan
+* Various bugfixes and improvements, by zmike, Icenowy and others
 
 ### User Interface
+* Make the game window resizable in all UI screens, by Benau and CodingJellyfish
+* Use separated "base theme" and "skin variant" values for skin configuration, by Alayan
+* Add some skin variants for Classic and Cartoon base theme, by Alayan
 * Add a new Display tab in the Settings, by Alayan
-* Allow to rate addons with a keyboard or a controller, and notify when trying to rate an addon while not logged in, by CodingJellyfish
-* Fix an issue that prevented to go up with a scrollbar using a trackpad, by CodingJellyfish
+* Add help information for Lap Trial mode, by searinminecraft
+* Allow to rate addons with a keyboard or a controller, by CodingJellyfish
+* Allow users to select favorite karts/tracks/arenas, by Alayan and CodingJellyfish
+* Allow users to search karts/arenas, by CodingJellyfish
+* Allow users to group karts by kart classes, by CodingJellyfish
 * Improve the typing bars, especially for the coal theme, by Alayan
-* Greatly improve UI layout for 'tall' resolutions (greater height than width), by CodingJellyfish
-* Improve font scaling, by CodingJellyfish
-* Various enhancements, by Qwertychouskie and others
+* Various UI layout improvements, by CodingJellyfish
+* Generate higher resolution texture for scalable fonts, by CodingJellyfish
+* Show score with color on the center of speedometer in battles, by CodingJellyfish
+* Various enhancements, by QwertyChouskie, Nomagno, Nstelt and others
+
+### Tracks and modeling
+* Fix start positions for negative sidewards distance, by kimden
+* Make the rescue bird place the kart towards the ball in soccer mode, by Snoker101
+* New music for Las Dunas Arena/Las Dunas Soccer, by ALBatross
+* Update Godette face texture, by ZAQraven99
+* Fix Northern Resort skybox, by CrystalDaEevee
+* Various cut/checkline fixes, by CrystalDaEevee
 
 ### Mobile
 * Don't keep the rescue button active after it stops being touched, when the finger keeps touching the screen (e. g. to handle the steering wheel), by S0nter
@@ -66,10 +90,12 @@ For similar reasons, and because some features are vastly more complex than othe
 ### Tracks and modeling
 * Updated Konqi, by ZAQraven99
 * New Godette kart, by ZAQraven99
+* New Hole Drop Soccer Field, by CrystalDaEevee, music by DernisNW
+* New Oasis Soccer Field, by CrystalDaEevee
 * Updated Battle Island and Cave X, by Typhon306
 * Fix broken invisible wall in Antediluvian Abyss, by Benau
 * New textures in Shifting Sands, by KartOym
-* Balanced starting positions in all official soccer fields, by Crystal
+* Balanced starting positions in all official soccer fields, by CrystalDaEevee
 
 ### Networking
 * Add track searching to network track screen, by Benau
@@ -178,7 +204,7 @@ For similar reasons, and because some features are vastly more complex than othe
 ### Tracks and modeling
 #### Karts
 * New version of Kiki, by Typhon306 and ZAQraven99
-* Improved karts, by Crystal
+* Improved karts, by CrystalDaEevee
     * Pidgin, Puffy
 * Improved beastie animation, by D_ft Kid
 

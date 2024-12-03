@@ -26,6 +26,7 @@
 #include <ge_render_info.hpp>
 #include "guiengine/message_queue.hpp"
 #include "guiengine/widgets/bubble_widget.hpp"
+#include "guiengine/widgets/check_box_widget.hpp"
 #include "guiengine/widgets/kart_stats_widget.hpp"
 #include "guiengine/widgets/model_view_widget.hpp"
 #include "guiengine/widgets/player_name_spinner.hpp"
@@ -273,14 +274,17 @@ void KartSelectionScreen::loadedFromFile()
 
 void KartSelectionScreen::beforeAddingWidget()
 {
+    kart_properties_manager->setFavoriteKartStatus(
+        PlayerManager::getCurrentPlayer()->getFavoriteKartStatus()
+    );
     if (useContinueButton())
     {
-        getWidget("kartlist")->m_properties[GUIEngine::PROP_WIDTH] = "85%";
+        getWidget("karts")->m_properties[GUIEngine::PROP_WIDTH] = "85%";
         getWidget("continue")->setVisible(true);
     }
     else
     {
-        getWidget("kartlist")->m_properties[GUIEngine::PROP_WIDTH] = "100%";
+        getWidget("karts")->m_properties[GUIEngine::PROP_WIDTH] = "100%";
         getWidget("continue")->setVisible(false);
     }
     // Remove dispatcher from m_widgets before calculateLayout otherwise a
@@ -294,6 +298,10 @@ void KartSelectionScreen::beforeAddingWidget()
     calculateLayout();
     if (removed_dispatcher)
         m_widgets.push_back(m_dispatcher);
+
+    CheckBoxWidget* favorite_cb = getWidget<CheckBoxWidget>("favorite");
+    assert( favorite_cb != NULL );
+    favorite_cb->setState(false);
 
     // Dynamically add tabs
     RibbonWidget* tabs = getWidget<RibbonWidget>("kartgroups");
@@ -315,12 +323,20 @@ void KartSelectionScreen::beforeAddingWidget()
 
     // Make group names being picked up by gettext
 #define FOR_GETTEXT_ONLY(x)
-    //I18N: kart group name
+    //I18N: kart group/class name
     FOR_GETTEXT_ONLY( _("All") )
+    //I18N: kart group name
+    FOR_GETTEXT_ONLY( _("Favorite") )
     //I18N: kart group name
     FOR_GETTEXT_ONLY( _("Standard") )
     //I18N: kart group name
     FOR_GETTEXT_ONLY( _("Add-Ons") )
+    //I18N: kart class name
+    FOR_GETTEXT_ONLY( _("Light") )
+    //I18N: kart class name
+    FOR_GETTEXT_ONLY( _("Medium") )
+    //I18N: kart class name
+    FOR_GETTEXT_ONLY( _("Heavy") )
 
 
     // Add other groups after
@@ -332,6 +348,24 @@ void KartSelectionScreen::beforeAddingWidget()
             tabs->addTextChild( _(groups[n].c_str()) , groups[n]);
     } // for n<group_amount
 
+    const std::vector<std::string> &classes = kart_properties_manager->getAllKartTypes();
+    GUIEngine::SpinnerWidget* kart_class = getWidget<GUIEngine::SpinnerWidget>("kart_class");
+    assert(kart_class != NULL);
+    kart_class->m_properties[GUIEngine::PROP_MIN_VALUE] = "0";
+    kart_class->m_properties[GUIEngine::PROP_MAX_VALUE] = StringUtils::toString(classes.size());
+    
+    for (unsigned int i = 0; i < classes.size(); i++)
+    {
+        // Make the first letter upper-case
+        std::string class_str = classes[i];
+
+        if (class_str.size() && class_str[0] >= 'a' && class_str[0] <= 'z')
+        {
+            class_str[0] += 'A' - 'a';
+        }
+        kart_class->addLabel(_(class_str.c_str()));
+    }
+    kart_class->addLabel(_("All"));
 
     DynamicRibbonWidget* w = getWidget<DynamicRibbonWidget>("karts");
     assert( w != NULL );
@@ -378,15 +412,20 @@ void KartSelectionScreen::init()
 
     m_kart_widgets.clearAndDeleteAll();
 
+    m_search_box = getWidget<TextBoxWidget>("search");
+    m_search_box->clearListeners();
+    m_search_box->addListener(this);
+
     DynamicRibbonWidget* w = getWidget<DynamicRibbonWidget>("karts");
     assert( w != NULL );
-    // Only allow keyboard and gamepad to choose kart without continue button in
-    // multitouch GUI, so mouse (touch) clicking can be used as previewing karts
-    w->setEventCallbackActive(Input::IT_MOUSEBUTTON, !useContinueButton());
 
     KartHoverListener* karthoverListener = new KartHoverListener(this);
     w->registerHoverListener(karthoverListener);
 
+    const std::vector<std::string> &classes = kart_properties_manager->getAllKartTypes();
+    GUIEngine::SpinnerWidget* kart_class = getWidget<GUIEngine::SpinnerWidget>("kart_class");
+    assert(kart_class != NULL);
+    kart_class->setValue(classes.size()); // All
 
     // Build kart list (it is built everytime, to account for .g. locking)
     setKartsFromCurrentGroup();
@@ -455,6 +494,8 @@ void KartSelectionScreen::init()
 
 void KartSelectionScreen::tearDown()
 {
+    kart_properties_manager->clearFavoriteKartStatus();
+
 #if !defined(SERVER_ONLY) && defined(_IRR_COMPILE_WITH_VULKAN_)
     GE::getGEConfig()->m_enable_draw_call_cache = false;
     GE::GEVulkanDriver* gevk = GE::getVKDriver();
@@ -795,7 +836,13 @@ void KartSelectionScreen::playerConfirm(const int player_id)
 {
     DynamicRibbonWidget* w = getWidget<DynamicRibbonWidget>("karts");
     assert(w != NULL);
+
     const std::string selection = w->getSelectionIDString(player_id);
+
+    if (selection == RANDOM_KART_ID && w->getItems().size() == 1)
+    { // Random kart only, do nothing
+        return;
+    }
     if (StringUtils::startsWith(selection, ID_LOCKED) && !m_multiplayer)
     {
         unlock_manager->playLockSound();
@@ -1163,8 +1210,32 @@ void KartSelectionScreen::eventCallback(Widget* widget,
     }
     else if (name == "karts")
     {
-        if (m_kart_widgets.size() > unsigned(player_id))
+        DynamicRibbonWidget* w = getWidget<DynamicRibbonWidget>("karts");
+        assert(w != NULL);
+        const std::string selection = w->getSelectionIDString(player_id);
+
+        if (getWidget<CheckBoxWidget>("favorite")->getState() &&
+            player_id == PLAYER_ID_GAME_MASTER &&
+            selection != RANDOM_KART_ID && !selection.empty())
+        {
+            const KartProperties *kp = kart_properties_manager->getKart(selection);
+
+            if (PlayerManager::getCurrentPlayer()->isFavoriteKart(kp->getNonTranslatedName()))
+            {
+                PlayerManager::getCurrentPlayer()->removeFavoriteKart(kp->getNonTranslatedName());
+            }
+            else
+            {
+                PlayerManager::getCurrentPlayer()->addFavoriteKart(kp->getNonTranslatedName());
+            }
+            setKartsFromCurrentGroup();
+        }
+        else if (m_kart_widgets.size() > unsigned(player_id) && !useContinueButton())
             playerConfirm(player_id);
+    }
+    else if (name == "kart_class")
+    {
+        setKartsFromCurrentGroup();
     }
     else if (name == "continue")
     {
@@ -1541,13 +1612,30 @@ PtrVector<const KartProperties, REF> KartSelectionScreen::getUsableKarts(
     const std::string& selected_kart_group)
 {
     PtrVector<const KartProperties, REF> karts;
-    for(unsigned int i=0; i<kart_properties_manager->getNumberOfKarts(); i++)
+    std::vector<int> group = kart_properties_manager->getKartsInGroup(selected_kart_group);
+
+    const std::vector<std::string> &classes = kart_properties_manager->getAllKartTypes();
+    GUIEngine::SpinnerWidget* kart_class = getWidget<GUIEngine::SpinnerWidget>("kart_class");
+    assert(kart_class != NULL);
+
+    for(unsigned int i=0; i<group.size(); i++)
     {
-        const KartProperties* prop = kart_properties_manager->getKartById(i);
+        const KartProperties* prop = kart_properties_manager->getKartById(group[i]);
         // Ignore karts that are not in the selected group
-        if((selected_kart_group != ALL_KART_GROUPS_ID &&
-            !prop->isInGroup(selected_kart_group)) || isIgnored(prop->getIdent()))
+        if(isIgnored(prop->getIdent()))
             continue;
+        
+        // Check if there's text in search bar
+        core::stringw search_text = m_search_box->getText();
+            search_text.make_lower();
+        if (!search_text.empty() &&
+            prop->getName().make_lower().find(search_text.c_str()) == -1)
+            continue;
+        
+        if (kart_class->getValue() != (int)classes.size() &&
+            classes[kart_class->getValue()] != prop->getKartType())
+            continue;
+
         karts.push_back(prop);
     }
     karts.insertionSort();
@@ -1558,6 +1646,10 @@ PtrVector<const KartProperties, REF> KartSelectionScreen::getUsableKarts(
 
 void KartSelectionScreen::setKartsFromCurrentGroup()
 {
+    kart_properties_manager->setFavoriteKartStatus(
+        PlayerManager::getCurrentPlayer()->getFavoriteKartStatus()
+    );
+    
     RibbonWidget* tabs = getWidget<RibbonWidget>("kartgroups");
     assert(tabs != NULL);
 
@@ -1566,29 +1658,10 @@ void KartSelectionScreen::setKartsFromCurrentGroup()
 
     UserConfigParams::m_last_used_kart_group = selected_kart_group;
 
-    // This can happen if addons are removed so that also the previously
-    // selected kart group is removed. In this case, select the
-    // 'standard' group
-    if (selected_kart_group != ALL_KART_GROUPS_ID &&
-        !kart_properties_manager->getKartsInGroup(selected_kart_group).size())
-    {
-        selected_kart_group = DEFAULT_GROUP_NAME;
-    }
-
     DynamicRibbonWidget* w = getWidget<DynamicRibbonWidget>("karts");
     w->clearItems();
 
-    int usable_kart_count = 0;
     PtrVector<const KartProperties, REF> karts = getUsableKarts(selected_kart_group);
-
-    if (karts.empty())
-    {
-        // In network this will happen if no addons kart on server
-        PtrVector<const KartProperties, REF> new_karts =
-            getUsableKarts(DEFAULT_GROUP_NAME);
-        std::swap(karts.m_contents_vector, new_karts.m_contents_vector);
-        tabs->select(DEFAULT_GROUP_NAME, PLAYER_ID_GAME_MASTER);
-    }
 
     for(unsigned int i=0; i<karts.size(); i++)
     {
@@ -1601,21 +1674,24 @@ void KartSelectionScreen::setKartsFromCurrentGroup()
                        prop->getAbsoluteIconFile(), LOCKED_BADGE,
                        IconButtonWidget::ICON_PATH_TYPE_ABSOLUTE);
         }
+        else if (PlayerManager::getCurrentPlayer()->isFavoriteKart(prop->getNonTranslatedName()))
+        {
+            w->addItem(prop->getName(),
+                       prop->getIdent(),
+                       prop->getAbsoluteIconFile(), HEART_BADGE,
+                       IconButtonWidget::ICON_PATH_TYPE_ABSOLUTE);
+        }
         else
         {
             w->addItem(prop->getName(),
                        prop->getIdent(),
                        prop->getAbsoluteIconFile(), 0,
                        IconButtonWidget::ICON_PATH_TYPE_ABSOLUTE);
-            usable_kart_count++;
         }
     }
 
     // add random
-    if (usable_kart_count > 1)
-    {
-        w->addItem(_("Random Kart"), RANDOM_KART_ID, "/gui/icons/random_kart.png");
-    }
+    w->addItem(_("Random Kart"), RANDOM_KART_ID, "/gui/icons/random_kart.png");
 
     w->updateItemDisplay();
 }

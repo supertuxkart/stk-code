@@ -4,14 +4,15 @@
 
     <div x="2%" y="1%" width="96%" height="99%" layout="vertical-row" >
         <div width="100%" height="8%" layout="horizontal-row" >
-            <spacer width="30%" height="100%" />
-            <header height="8%" width="40%" I18N="Section in arena tracks selection screen" text="Arenas"
+            <header width="30%" height="100%" I18N="Section in arena tracks selection screen" text="Arenas"
                     align="center" text_align="center" />
-            <spacer width="1%" height="100%" />
-            <checkbox id="favorite" align="center"/>
-            <spacer width="1%" height="100%" />
-            <bright width="30%" height="100%" I18N="In the track and grand prix selection screen" text="Edit favorite tracks"/>
-            <spacer width="20" height="1%" />
+            <textbox width="40%" id="search" align="center"/>
+            <spacer width="5%" height="100%" />
+            <div width="fit" height="100%" layout="horizontal-row" align="center">
+                <checkbox id="favorite" align="center"/>
+                <spacer width="5%" height="100%" />
+                <tiny-header width="fit" height="100%" I18N="Section in arena tracks selection screen" text="Edit favorite arenas"/>
+            </div>
         </div>
 
         <box proportion="1" width="100%" layout="vertical-row" padding="2">

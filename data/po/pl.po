@@ -5,7 +5,7 @@
 # Translators:
 # Deve <deveee@gmail.com>, 2015
 # Deve <deveee@gmail.com>, 2015-2021
-# Jakub Fabijan <animatorzpolski@gmail.com>, 2021
+# Jakub Fabijan (Felidae) <animatorzpolski@gmail.com>, 2021
 # Jakub Wojtkowiak <ctrahg123@gmail.com>, 2016,2021
 # Marcin Węclewski, 2022
 # Marcin Węclewski, 2022-2023
@@ -917,7 +917,7 @@ msgstr "Informacje o użytkowniku"
 #. I18N: ./data/gui/dialogs/online/user_info_dialog.stkgui
 #. I18N: User info dialog
 msgid "Remove Friend"
-msgstr ""
+msgstr "Usuń znajomego"
 
 #. I18N: ./data/gui/dialogs/online/user_info_dialog.stkgui
 #. I18N: User info dialog
@@ -927,17 +927,17 @@ msgstr "Dodaj Przyjaciela"
 #. I18N: ./data/gui/dialogs/online/user_info_dialog.stkgui
 #. I18N: User info dialog
 msgid "Accept Invite"
-msgstr ""
+msgstr "Zaakceptuj zaproszenie"
 
 #. I18N: ./data/gui/dialogs/online/user_info_dialog.stkgui
 #. I18N: User info dialog
 msgid "Decline Invite"
-msgstr ""
+msgstr "Odrzuć zaproszenie"
 
 #. I18N: ./data/gui/dialogs/online/user_info_dialog.stkgui
 #. I18N: User info dialog
 msgid "View Profile"
-msgstr ""
+msgstr "Wyświetl profil"
 
 #. I18N: ./data/gui/dialogs/online/vote_dialog.stkgui
 #. I18N: In the vote dialog
@@ -1125,7 +1125,7 @@ msgstr "Autorzy"
 
 #. I18N: ./data/gui/screens/cutscene.stkgui
 msgid "Skip"
-msgstr ""
+msgstr "Pomiń"
 
 #. I18N: ./data/gui/screens/easter_egg.stkgui
 #. I18N: Section in easter egg tracks selection screen
@@ -2005,7 +2005,7 @@ msgid ""
 "You can play without creating an online account by selecting an offline "
 "account. Though then you can not connect to friends, vote for addons etc. "
 "Please read our privacy statement at https://privacy.supertuxkart.net"
-msgstr ""
+msgstr "Możesz grać bez tworzenia konta online, wybierając konto offline. Jednak w takim przypadku nie będziesz mógł połączyć się ze znajomymi, oceniać dodatków, itp. Prosimy zapoznać się z naszą polityką prywatności na stronie https://privacy.supertuxkart.net."
 
 #. I18N: ./data/gui/screens/online/server_selection.stkgui
 #: src/states_screens/online/server_selection.cpp:580

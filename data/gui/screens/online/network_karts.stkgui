@@ -4,25 +4,37 @@
         <header width="80%" height="8%" align="center" text_align="center" I18N="In the kart selection (player setup) screen" text="Choose a Kart"/>
         <spacer width="100%" height="1%"/>
 
-        <placeholder id="playerskarts" width="100%" height="70%" align="center" proportion="5">
+        <placeholder id="playerskarts" width="100%" align="center" proportion="1">
             <!-- Contents is added programatically -->
         </placeholder>
 
-        <spacer height="1f"/>
-        <div width="100%" height="30%" layout="horizontal-row" >
-            <div id="kartlist" width="85%" height="100%" layout="vertical-row" >
-                <box proportion="2" width="100%" layout="vertical-row" padding="2">
-                    <ribbon_grid id="karts" proportion="1" square_items="true" width="100%" align="center"
-                                child_width="90" child_height="90" max_rows="2"/>
-                </box>
-                <!-- Groups will be added dynamically at runtime -->
-                <tabs width="98%" x="1%" height="1f" id="kartgroups">
-                </tabs>
-                <spacer width="100%" height="2%"/>
-            </div>
-            <spacer width="5%"/>
-            <icon-button id="continue" proportion="1" icon="gui/icons/green_check.png" text="Continue"/>
-            <spacer width="5%"/>
+        <spacer height="2%"/>
+        <div width="100%" height="38%" layout="vertical-row" >
+            <box proportion="2" width="100%" layout="vertical-row" padding="2">
+                <spacer height="5%"/>
+                <div width="95%" height="1f" layout="horizontal-row" align="center">
+                    <label text="Kart Class" align="center" I18N="In karts selection screen, determine the kart group shown on the list"/>
+                    <spacer width="1%" />
+                    <spinner id="kart_class" proportion="2" align="center" min_value="0" wrap_around="true"/>
+                    <spacer width="3%"/>
+                    <textbox proportion="3" id="search" align="center"/>
+                    <spacer width="3%"/>
+                    <checkbox id="favorite"/>
+                    <spacer width="1%"/>
+                    <label width="fit" height="100%" I18N="In the track and grand prix selection screen" text="Edit favorite karts"/>
+                </div>
+                <spacer height="3%"/>
+                <div width="100%" proportion="1" layout="horizontal-row" align="center">
+                    <ribbon_grid id="karts" square_items="true" width="100%" height="100%" align="center"
+                            child_width="90" child_height="90"/>
+                    <spacer width="3%">
+                    <icon-button id="continue" y="10%" icon="gui/icons/green_check.png" text="Continue"/>
+                </div>
+            </box>
+            <!-- Groups will be added dynamically at runtime -->
+            <tabs width="98%" x="1%" height="1f" id="kartgroups">
+            </tabs>
+            <spacer width="100%" height="2%"/>
         </div>
     </div>
     <progressbar x="2%" y="93%" id="timer" height="1f" width="96%"></progressbar>

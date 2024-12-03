@@ -148,13 +148,10 @@ RaceGUI::~RaceGUI()
 void RaceGUI::init()
 {
     RaceGUIBase::init();
-    // Technically we only need getNumLocalPlayers, but using the
-    // global kart id to find the data for a specific kart.
-    int n = RaceManager::get()->getNumberOfKarts();
 
-    m_animation_states.resize(n);
-    m_rank_animation_duration.resize(n);
-    m_last_ranks.resize(n);
+    m_animation_states.clear();
+    m_animation_duration.clear();
+    m_last_digit.clear();
 }   // init
 
 //-----------------------------------------------------------------------------
@@ -164,11 +161,10 @@ void RaceGUI::init()
 void RaceGUI::reset()
 {
     RaceGUIBase::reset();
-    for(unsigned int i=0; i<RaceManager::get()->getNumberOfKarts(); i++)
-    {
-        m_animation_states[i] = AS_NONE;
-        m_last_ranks[i]       = i+1;
-    }
+
+    m_animation_states.clear();
+    m_animation_duration.clear();
+    m_last_digit.clear();
 }  // reset
 
 //-----------------------------------------------------------------------------
@@ -908,49 +904,59 @@ void RaceGUI::drawRank(const AbstractKart *kart,
                       float min_ratio, int meter_width,
                       int meter_height, float dt)
 {
-    static video::SColor color = video::SColor(255, 255, 255, 255);
-
     // Draw rank
-    WorldWithRank *world = dynamic_cast<WorldWithRank*>(World::getWorld());
-    if (!world || !world->displayRank())
+    World *world = World::getWorld();
+    if (!world || !world->shouldDrawSpeedometerDigit())
         return;
+
+    std::pair<int, video::SColor> digit_data = world->getSpeedometerDigit(kart);
+
+    int number = digit_data.first;
+    video::SColor color = digit_data.second;
 
     int id = kart->getWorldKartId();
 
+    if (m_animation_states.find(id) == m_animation_states.end())
+    {
+        m_animation_duration[id] = 0.0f;
+        m_animation_states[id] = AS_NONE;
+        m_last_digit[id] = number;
+    }
+
     if (m_animation_states[id] == AS_NONE)
     {
-        if (m_last_ranks[id] != kart->getPosition())
+        if (m_last_digit[id] != number)
         {
-            m_rank_animation_duration[id] = 0.0f;
+            m_animation_duration[id] = 0.0f;
             m_animation_states[id] = AS_SMALLER;
         }
     }
     else
     {
-        m_rank_animation_duration[id] += dt;
+        m_animation_duration[id] += dt;
     }
 
     float scale = 1.0f;
-    int rank = kart->getPosition();
+    int shown_number = number;
     const float DURATION = 0.4f;
     const float MIN_SHRINK = 0.3f;
     if (m_animation_states[id] == AS_SMALLER)
     {
-        scale = 1.0f - m_rank_animation_duration[id]/ DURATION;
-        rank = m_last_ranks[id];
+        scale = 1.0f - m_animation_duration[id]/ DURATION;
+        shown_number = m_last_digit[id];
         if (scale < MIN_SHRINK)
         {
             m_animation_states[id] = AS_BIGGER;
-            m_rank_animation_duration[id] = 0.0f;
+            m_animation_duration[id] = 0.0f;
             // Store the new rank
-            m_last_ranks[id] = kart->getPosition();
+            m_last_digit[id] = number;
             scale = MIN_SHRINK;
         }
     }
     else if (m_animation_states[id] == AS_BIGGER)
     {
-        scale = m_rank_animation_duration[id] / DURATION + MIN_SHRINK;
-        rank = m_last_ranks[id];
+        scale = m_animation_duration[id] / DURATION + MIN_SHRINK;
+        shown_number = m_last_digit[id];
         if (scale > 1.0f)
         {
             m_animation_states[id] = AS_NONE;
@@ -960,7 +966,7 @@ void RaceGUI::drawRank(const AbstractKart *kart,
     }
     else
     {
-        m_last_ranks[id] = kart->getPosition();
+        m_last_digit[id] = number;
     }
 
     gui::ScalableFont* font = GUIEngine::getHighresDigitFont();
@@ -968,7 +974,7 @@ void RaceGUI::drawRank(const AbstractKart *kart,
     int font_height = font->getDimension(L"X").Height;
     font->setScale((float)meter_height / font_height * 0.4f * scale);
     std::ostringstream oss;
-    oss << rank; // the current font has no . :(   << ".";
+    oss << shown_number; // the current font has no . :(   << ".";
 
     core::recti pos;
     pos.LowerRightCorner = core::vector2di(int(offset.X + 0.64f*meter_width),

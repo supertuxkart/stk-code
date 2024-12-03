@@ -914,7 +914,7 @@ msgstr "Brugerinformation"
 #. I18N: ./data/gui/dialogs/online/user_info_dialog.stkgui
 #. I18N: User info dialog
 msgid "Remove Friend"
-msgstr ""
+msgstr "Fjern ven"
 
 #. I18N: ./data/gui/dialogs/online/user_info_dialog.stkgui
 #. I18N: User info dialog
@@ -924,17 +924,17 @@ msgstr "Tilføj ven"
 #. I18N: ./data/gui/dialogs/online/user_info_dialog.stkgui
 #. I18N: User info dialog
 msgid "Accept Invite"
-msgstr ""
+msgstr "Acceptér invitation"
 
 #. I18N: ./data/gui/dialogs/online/user_info_dialog.stkgui
 #. I18N: User info dialog
 msgid "Decline Invite"
-msgstr ""
+msgstr "Afvis invitation"
 
 #. I18N: ./data/gui/dialogs/online/user_info_dialog.stkgui
 #. I18N: User info dialog
 msgid "View Profile"
-msgstr ""
+msgstr "Vis profil"
 
 #. I18N: ./data/gui/dialogs/online/vote_dialog.stkgui
 #. I18N: In the vote dialog
@@ -1122,7 +1122,7 @@ msgstr "Anerkendelser"
 
 #. I18N: ./data/gui/screens/cutscene.stkgui
 msgid "Skip"
-msgstr ""
+msgstr "Spring over"
 
 #. I18N: ./data/gui/screens/easter_egg.stkgui
 #. I18N: Section in easter egg tracks selection screen
@@ -2002,7 +2002,7 @@ msgid ""
 "You can play without creating an online account by selecting an offline "
 "account. Though then you can not connect to friends, vote for addons etc. "
 "Please read our privacy statement at https://privacy.supertuxkart.net"
-msgstr ""
+msgstr "Du kan spille uden en online konto ved at vælge offlinekonto. Men så kan du ikke forbinde dig til venner, stemme for udvidelser osv. Læs venligst vores privatlivserklæring på https://privacy.supertuxkart.net"
 
 #. I18N: ./data/gui/screens/online/server_selection.stkgui
 #: src/states_screens/online/server_selection.cpp:580

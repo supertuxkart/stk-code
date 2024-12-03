@@ -58,6 +58,11 @@
 #include <IrrlichtDevice.h>
 #include <ISceneCollisionManager.h>
 #include <ISceneManager.h>
+
+#ifdef ANDROID
+#include <SDL_system.h>
+#endif
+
 using namespace irr;
 
 #include <algorithm>
@@ -526,6 +531,11 @@ void RaceGUIOverworld::drawGlobalMiniMap()
 
             if (challenges[n].m_challenge_id == "tutorial")
             {
+#ifdef ANDROID
+                if (SDL_IsAndroidTV())
+                    continue;
+#endif
+
                 gui::ScalableFont* font = GUIEngine::getTitleFont();
                 font->draw(_("Tutorial"), pos, video::SColor(255,255,255,255),
                            false, true /* vcenter */, NULL);

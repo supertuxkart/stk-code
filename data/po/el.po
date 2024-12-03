@@ -17,7 +17,7 @@
 # Nick Tsakalidis <neorisionick@greeklug.gr>, 2021
 # othon alexandros stamataras <alex.stam2000@gmail.com>, 2022
 # Savvas Adamtziloglou <savvas-gr@greeklug.gr>, 2021
-# Vangelis Skarmoutsos <skarmoutsosv@gmail.com>, 2015-2017
+# Vangelis Skarmoutsos (SkarmoutsosV) <skarmoutsosv@gmail.com>, 2015-2017
 # 79353a696ad19dc202b261b3067b7640_bec941e, 2015
 # Χριστόφορος Δρόσος <akisdrosos@yahoo.com>, 2019
 msgid ""

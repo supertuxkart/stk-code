@@ -226,6 +226,46 @@ void FreeForAll::getKartsDisplayInfo(
     }
 }   // getKartsDisplayInfo
 
+//-----------------------------------------------------------------------------
+std::pair<int, video::SColor> FreeForAll::getSpeedometerDigit(
+                                                const AbstractKart *kart) const
+{
+    if (kart->isEliminated()) // m_scores[id] is INT_MIN
+    {
+        return std::make_pair(0, video::SColor(255, 128, 128, 128));
+    }
+    
+    int id = kart->getWorldKartId();
+    
+    // Fade from green to red
+    std::vector<int> sorted_scores;
+    for (int i = 0; i < m_scores.size(); i++)
+    {
+        if (!getKart(i)->isEliminated())
+        {
+            sorted_scores.push_back(m_scores[i]);
+        }
+    }
+    std::sort(sorted_scores.begin(), sorted_scores.end(), std::greater<int>());
+
+    if (sorted_scores.size() == 1)
+    {
+        int s = sorted_scores[id];
+        video::SColor color = video::SColor(255, s <= 0 ? 255 : 0, s >= 0 ? 255 : 0, 0);
+        return std::make_pair(s, color);
+    }
+
+    int rank = std::lower_bound(
+        sorted_scores.begin(), sorted_scores.end(),
+        m_scores[id], std::greater<int>()) - sorted_scores.begin();
+    
+    float value = (float)rank / (sorted_scores.size() - 1);
+    int r = std::min(int(value * 510), 255);
+    int g = std::min(int((1.0 - value) * 510), 255);
+    
+    return std::make_pair(m_scores[id], video::SColor(255, r, g, 0));
+}   // getSpeedometerDigit
+
 // ----------------------------------------------------------------------------
 void FreeForAll::terminateRace()
 {

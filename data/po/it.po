@@ -8,7 +8,7 @@
 # Davide Depau <me@davideddu.org>, 2015
 # Enrico B. <enricobe@hotmail.com>, 2015
 # Enrico B. <enricobe@hotmail.com>, 2015
-# Giuseppe Pignataro <rogepix@gmail.com>, 2015
+# Giuseppe Pignataro (Fastbyte01) <rogepix@gmail.com>, 2015
 # Ioma Taani, 2016,2018
 # Ioma Taani, 2019-2023
 # Ioma Taani, 2016,2018
@@ -16,8 +16,9 @@
 # Lorenzo <lorenzo.mijorus@gmail.com>, 2015
 # Luca Argentieri <luca@elinvention.ovh>, 2015
 # Luca Argentieri <luca@elinvention.ovh>, 2015
+# Machinari Utens, 2023
 # Massimo Gismondi <omino.gis@gmail.com>, 2021
-# mattia_b89 <mattia.b89@gmail.com>, 2017,2019-2020
+# mattia_b89 <mattia.b89@gmail.com>, 2017,2019-2020,2023
 # mimiz skindoor, 2020-2023
 # Massimo Gismondi <omino.gis@gmail.com>, 2019-2020
 # Ioma Taani, 2018-2021
@@ -32,7 +33,7 @@ msgstr ""
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-06-16 01:41+0800\n"
 "PO-Revision-Date: 2015-02-15 01:58+0000\n"
-"Last-Translator: mimiz skindoor, 2020-2023\n"
+"Last-Translator: Machinari Utens, 2023\n"
 "Language-Team: Italian (http://app.transifex.com/supertuxkart/supertuxkart/language/it/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -106,7 +107,7 @@ msgstr "Pilota d'oro"
 msgid ""
 "Win against at least 3 AIs in normal race, time-trial, and follow the "
 "leader."
-msgstr "Vinci contro almeno 3 IA in gare \"prova a tempo\" e/o \"segui il leader\"."
+msgstr "Vinci contro almeno 3 IA in gare normali, \"prova a tempo\" e/o \"segui il leader\"."
 
 #. I18N: ./data/achievements.xml
 msgid "Powerup Love"
@@ -132,7 +133,7 @@ msgstr "Amante delle banane"
 
 #. I18N: ./data/achievements.xml
 msgid "Collect at least 5 bananas in one race."
-msgstr "Raccogli almeno 5 banane in una gara"
+msgstr "Raccogli almeno 5 banane in una gara."
 
 #. I18N: ./data/achievements.xml
 msgid "It's secret"
@@ -140,7 +141,7 @@ msgstr "È un segreto"
 
 #. I18N: ./data/achievements.xml
 msgid "Really ... a secret."
-msgstr "Davvero... un segreto"
+msgstr "Davvero... un segreto."
 
 #. I18N: ./data/achievements.xml
 msgid "Mosquito Hunter"
@@ -150,7 +151,7 @@ msgstr "Cacciatore di zanzare"
 msgid ""
 "Take your opponents for mosquitos! With the swatter, squash them at least 5 "
 "times in a race."
-msgstr "I tuoi avversari sono zanzare! Schiaccia almeno 5 avversari in una gara con l'acchiappamosche. "
+msgstr "Tratta i tuoi avversari come fossero zanzare! Schiacciali almeno 5 volte in una gara con l'acchiappamosche."
 
 #. I18N: ./data/achievements.xml
 msgid "Beyond Luck"
@@ -160,7 +161,7 @@ msgstr "Oltre la fortuna"
 msgid ""
 "Win 10 single races in a row in Expert or SuperTux against at least 5 AIs. "
 "Beware, restarting a race counts as a loss."
-msgstr "Vinci 10 gare singole in serie in difficoltà Esperto o SuperTux contro almeno 5 IA. Attenzione: ricominciare la gara conta come una sconfitta."
+msgstr "Vinci 10 gare singole di fila in difficoltà Esperto o SuperTux contro almeno 5 IA. Attenzione, ricominciare la gara conta come una sconfitta."
 
 #. I18N: ./data/grandprix/1_penguinplayground.grandprix
 msgid "Penguin Playground"
@@ -332,7 +333,7 @@ msgstr "Sensitività Y"
 
 #. I18N: ./data/gui/dialogs/android/multitouch_settings.stkgui
 msgid "Restore defaults"
-msgstr "Ripristina impostazione "
+msgstr "Ripristina impostazioni"
 
 #. I18N: ./data/gui/dialogs/confirm_dialog.stkgui
 #. I18N: In a 'are you sure?' dialog
@@ -384,7 +385,7 @@ msgstr "Annulla"
 #: src/states_screens/ghost_replay_selection.cpp:388
 #: src/states_screens/high_score_selection.cpp:265
 msgid "Yes"
-msgstr "Si"
+msgstr "Sì"
 
 #. I18N: ./data/gui/dialogs/confirm_resolution_dialog.stkgui
 #. I18N: In the 'confirm resolution' dialog, that's shown when switching
@@ -653,7 +654,7 @@ msgstr "Conferma"
 #. I18N: ./data/gui/dialogs/online/recovery_input.stkgui
 #. I18N: In the recovery dialog
 msgid "Submit"
-msgstr "Manda"
+msgstr "Invia"
 
 #. I18N: ./data/gui/dialogs/online/network_ingame_dialog.stkgui
 #. I18N: Race paused button
@@ -670,7 +671,7 @@ msgstr "Esci dal server"
 #. I18N: Show in network ingame dialog to allow user to go back to lobby to
 #. end spectating (for example)
 msgid "Back to lobby"
-msgstr "Torna alla sala d'attesa."
+msgstr "Torna alla sala d'attesa"
 
 #. I18N: ./data/gui/dialogs/online/network_ingame_dialog.stkgui
 #. I18N: Race paused button
@@ -762,7 +763,7 @@ msgstr "Termini e condizioni"
 #. I18N: ./data/gui/dialogs/online/registration_terms.stkgui
 #. I18N: In the registration dialog
 msgid "I agree to the above terms and am 13 years or older. "
-msgstr "Accetto i termini e dichiaro di avere più di 13 anni."
+msgstr "Accetto i termini e dichiaro di avere almeno 13 anni."
 
 #. I18N: ./data/gui/dialogs/online/server_configuration_dialog.stkgui
 #. I18N: In the server configuration screen
@@ -931,7 +932,7 @@ msgstr "Informazioni utente"
 #. I18N: ./data/gui/dialogs/online/user_info_dialog.stkgui
 #. I18N: User info dialog
 msgid "Remove Friend"
-msgstr ""
+msgstr "Rimuovi amicizia"
 
 #. I18N: ./data/gui/dialogs/online/user_info_dialog.stkgui
 #. I18N: User info dialog
@@ -941,17 +942,17 @@ msgstr "Aggiungi amico"
 #. I18N: ./data/gui/dialogs/online/user_info_dialog.stkgui
 #. I18N: User info dialog
 msgid "Accept Invite"
-msgstr ""
+msgstr "Accetta l'invito"
 
 #. I18N: ./data/gui/dialogs/online/user_info_dialog.stkgui
 #. I18N: User info dialog
 msgid "Decline Invite"
-msgstr ""
+msgstr "Rifiuta l'invito"
 
 #. I18N: ./data/gui/dialogs/online/user_info_dialog.stkgui
 #. I18N: User info dialog
 msgid "View Profile"
-msgstr ""
+msgstr "Visualizza il profilo"
 
 #. I18N: ./data/gui/dialogs/online/vote_dialog.stkgui
 #. I18N: In the vote dialog
@@ -1139,7 +1140,7 @@ msgstr "Riconoscimenti"
 
 #. I18N: ./data/gui/screens/cutscene.stkgui
 msgid "Skip"
-msgstr ""
+msgstr "Salta"
 
 #. I18N: ./data/gui/screens/easter_egg.stkgui
 #. I18N: Section in easter egg tracks selection screen
@@ -1153,7 +1154,7 @@ msgstr "Tutte le piste"
 #. I18N: ./data/gui/screens/edit_gp.stkgui
 #. I18N: Title in edit grand prix screen
 msgid "Edit Grand Prix"
-msgstr "Modifica Gran premio"
+msgstr "Modifica Gran Premio"
 
 #. I18N: ./data/gui/screens/edit_gp.stkgui
 #. I18N: Menu item
@@ -1269,12 +1270,12 @@ msgstr "Gruppo di piste"
 #. I18N: In the grand prix info screen
 #: src/states_screens/gp_info_screen.cpp:164
 msgid "Continue saved GP"
-msgstr "Continua il Gran premio salvato"
+msgstr "Continua il Gran Premio salvato"
 
 #. I18N: ./data/gui/screens/grand_prix_editor.stkgui
 #. I18N: Title in grand prix editor screen
 msgid "Grand Prix editor"
-msgstr "Editor gran premio"
+msgstr "Editor Gran Premio"
 
 #. I18N: ./data/gui/screens/grand_prix_editor.stkgui
 #. I18N: Menu item
@@ -1299,7 +1300,7 @@ msgstr "Rinomina"
 #. I18N: ./data/gui/screens/grand_prix_lose.stkgui
 #. I18N: ./data/gui/screens/grand_prix_win.stkgui
 msgid "Save Grand Prix"
-msgstr "Salva Gran premio"
+msgstr "Salva Gran Premio"
 
 #. I18N: ./data/gui/screens/help1.stkgui
 #. I18N: ./data/gui/screens/help2.stkgui
@@ -1465,7 +1466,7 @@ msgstr "Puoi avere un bonus velocità alla partenza premendo il pulsante per acc
 #. I18N: ./data/gui/screens/help1.stkgui
 #. I18N: in the help screen
 msgid "* Current key bindings can be seen/changed in the Options menu"
-msgstr "La configurazione dei tasti può essere controllata o personalizzata nel menu Opzioni"
+msgstr "* La configurazione dei tasti può essere controllata o personalizzata nel menu Opzioni"
 
 #. I18N: ./data/gui/screens/help2.stkgui
 msgid "SuperTuxKart features several game modes:"
@@ -1475,7 +1476,7 @@ msgstr "SuperTuxKart ha differenti modalità di gioco:"
 #. I18N: In the help menu
 msgid ""
 "Regular Race: All blows allowed, so collect powerups and use them smartly!"
-msgstr "Gara: tutte le armi presenti possono essere utilizzate, quindi usale con intelligenza!"
+msgstr "Gara normale: tutte le armi presenti possono essere utilizzate, quindi usale con intelligenza!"
 
 #. I18N: ./data/gui/screens/help2.stkgui
 #. I18N: In the help menu
@@ -1488,7 +1489,7 @@ msgid ""
 "Follow the leader: Run for second place, as the last kart will be "
 "disqualified every time the counter hits zero. Beware: going in front of the"
 " leader will get you eliminated too!"
-msgstr "Insegui il leader: gareggia per il secondo posto, l'ultimo kart verrà squalificato ogni volta che il contatore raggiunge lo zero. Attenzione: anche superando il leader verrai eliminato! "
+msgstr "Segui il Leader: gareggia per il secondo posto, l'ultimo kart verrà squalificato ogni volta che il contatore raggiunge lo zero. Attenzione: anche superando il leader verrai eliminato!"
 
 #. I18N: ./data/gui/screens/help2.stkgui
 #. I18N: In the help menu
@@ -1503,7 +1504,7 @@ msgstr "Per la battaglia ci sono tre tipi di modalità: In \"Battaglia a tre col
 #. I18N: ./data/gui/screens/help2.stkgui
 #. I18N: In the help menu
 msgid "Soccer: Use your kart to push the ball into the goal."
-msgstr "Calcio: usa il kart per spingere la palla in rete."
+msgstr "Calcio: usa il kart per spingere la palla nella rete."
 
 #. I18N: ./data/gui/screens/help2.stkgui
 #. I18N: In the help menu
@@ -1530,7 +1531,7 @@ msgid ""
 "instead of playing a single race, you play many in a row. The better you "
 "rank, the more points you get. In the end, the player with the most points "
 "wins the cup."
-msgstr "* Molte di queste modalità di gioco possono essere anche giocate in stile Grand Prix: invece di gareggiare in gara singola è possibile giocarne diverse in serie. Migliore è il tuo posto in classifica, maggiori saranno i punti ricevuti. Alla fine il giocatore con più punti vincerà la coppa."
+msgstr "* Molte di queste modalità di gioco possono essere anche giocate in stile Gran Premio: invece di gareggiare in gara singola è possibile giocarne diverse in serie. Migliore è il tuo posto in classifica, maggiori saranno i punti ricevuti. Alla fine il giocatore con più punti vincerà la coppa."
 
 #. I18N: ./data/gui/screens/help3.stkgui
 #. I18N: In the help menu
@@ -1593,7 +1594,7 @@ msgstr "Acchiappamosche - schiaccia i kart vicini rallentandoli. Può essere uti
 msgid ""
 "Hitting a banana can result in one of the following being attached to the "
 "kart:"
-msgstr "Colpire una banana potraà agganciare al tuo kart uno di questi oggetti:"
+msgstr "Colpire una banana potrà agganciare al tuo kart uno di questi oggetti:"
 
 #. I18N: ./data/gui/screens/help4.stkgui
 #. I18N: In the help menu
@@ -1759,7 +1760,7 @@ msgstr "Giro di prova"
 #: src/states_screens/dialogs/select_challenge.cpp:51
 #: src/states_screens/high_score_selection.cpp:136
 msgid "Grand Prix"
-msgstr "Gran premio"
+msgstr "Gran Premio"
 
 #. I18N: ./data/gui/screens/karts.stkgui
 #. I18N: In the kart selection (player setup) screen
@@ -1817,7 +1818,7 @@ msgstr "Obiettivi raggiunti"
 #. I18N: ./data/gui/screens/main_menu.stkgui
 #. I18N: In the main screen
 msgid "Grand Prix Editor"
-msgstr "Editor gran premio"
+msgstr "Editor Gran Premio"
 
 #. I18N: ./data/gui/screens/main_menu.stkgui
 #. I18N: In the main screen
@@ -2019,7 +2020,7 @@ msgid ""
 "You can play without creating an online account by selecting an offline "
 "account. Though then you can not connect to friends, vote for addons etc. "
 "Please read our privacy statement at https://privacy.supertuxkart.net"
-msgstr ""
+msgstr "Puoi giocare senza creare un account in rete scegliendo un account non in rete. Tuttavia non potrai connetterti con i tuoi amici, votare i componenti aggiuntivi, ecc. Leggi la nostra informativa privacy all'indirizzo https://privacy.supertuxkart.net"
 
 #. I18N: ./data/gui/screens/online/server_selection.stkgui
 #: src/states_screens/online/server_selection.cpp:580
@@ -2223,7 +2224,7 @@ msgstr "Abilita la vibrazione (se supportato)"
 #. I18N: ./data/gui/screens/options_general.stkgui
 #. I18N: In the general settings
 msgid "Internet options"
-msgstr "Opzioni internet"
+msgstr "Opzioni Internet"
 
 #. I18N: ./data/gui/screens/options_general.stkgui
 #. I18N: In the general settings
@@ -2233,7 +2234,7 @@ msgstr "Mostra sempre la schermata di accesso"
 #. I18N: ./data/gui/screens/options_general.stkgui
 #. I18N: In the general settings
 msgid "Connect to the Internet"
-msgstr "Connetti ad internet"
+msgstr "Connetti ad Internet"
 
 #. I18N: ./data/gui/screens/options_general.stkgui
 #. I18N: In the general settings
@@ -2277,7 +2278,7 @@ msgstr "Aggiungi un dispositivo"
 msgid ""
 "* Which config to use will be inferred from which 'Select' key is pressed to"
 " join the game."
-msgstr "* Quale configurazione usare verrà dedotta da quale pulsante 'Seleziona' verrà premuto per unirsi al gioco."
+msgstr "* La configurazione da usare verrà dedotta da quale pulsante 'Seleziona' verrà premuto per unirsi al gioco."
 
 #. I18N: ./data/gui/screens/options_ui.stkgui
 #. I18N: In the ui settings
@@ -2347,7 +2348,7 @@ msgstr "Livello di sfocatura"
 #. I18N: ./data/gui/screens/options_video.stkgui
 #. I18N: In the video options, maximum frame per second
 msgid "Maximum FPS"
-msgstr "FPS massimo"
+msgstr "FPS massimi"
 
 #. I18N: ./data/gui/screens/options_video.stkgui
 #. I18N: In the video settings
@@ -2420,7 +2421,7 @@ msgstr "Numero di kart gestiti dall'IA della squadra blu."
 #. I18N: In the track and grand prix selection screen
 #: src/race/grand_prix_data.cpp:623
 msgid "Random Grand Prix"
-msgstr "Gran premio casuale"
+msgstr "Gran Premio casuale"
 
 #. I18N: ./data/gui/screens/user_screen.stkgui
 #. I18N: Used as a verb, appears on the main networking menu (login button)
@@ -2818,7 +2819,7 @@ msgstr "Errore durante il caricamento delle notizie: '%s'"
 
 #: src/challenges/challenge_data.cpp:303 src/network/server_config.cpp:261
 msgid "Normal Race (Grand Prix)"
-msgstr "Gara Normale (Gran Premio)"
+msgstr "Gara normale (Gran Premio)"
 
 #: src/challenges/challenge_data.cpp:305
 msgid "Time-Trial (Grand Prix)"
@@ -3853,7 +3854,7 @@ msgstr "Modalità gioco calcio: %s"
 #: src/network/protocols/client_lobby.cpp:784
 #, c-format
 msgid "Grand prix progress: %d / %d"
-msgstr "Progresso del Grand Prix: %d / %d"
+msgstr "Progresso del Gran Premio: %d / %d"
 
 #. I18N: Display when all players are in red or blue team, which the race
 #. will not be allowed to start
@@ -3979,11 +3980,11 @@ msgstr "Impossibile determinare il numero della porta per il server %s."
 
 #: src/network/protocols/lobby_protocol.cpp:294
 msgid "Network grand prix has been finished."
-msgstr "Il Gran premio in rete è stato completato."
+msgstr "Il Gran Premio in rete è stato completato."
 
 #: src/network/server_config.cpp:263
 msgid "Time Trial (Grand Prix)"
-msgstr "Prova a tempo (Grand premio)"
+msgstr "Prova a tempo (Gran Premio)"
 
 #. I18N: Game mode
 #. I18N: In the create server screen for battle server
@@ -4231,7 +4232,7 @@ msgstr "Prove a tempo vinte"
 #. added to multiple different goals.
 #: src/states_screens/dialogs/achievement_progress_dialog.cpp:176
 msgid "Follow-the-Leader races won"
-msgstr "Gare \"segui il capo\" vinte"
+msgstr "Gare \"Segui il Leader\" vinte"
 
 #. I18N: A goal for achievements. If this text is in (), it's a precision
 #. added to multiple different goals.
@@ -4321,13 +4322,13 @@ msgstr "Prove a tempo completate"
 #. added to multiple different goals.
 #: src/states_screens/dialogs/achievement_progress_dialog.cpp:206
 msgid "Follow-the-Leader races started"
-msgstr "Gare \"segui il capo\" iniziate"
+msgstr "Gare \"Segui il Leader\" iniziate"
 
 #. I18N: A goal for achievements. If this text is in (), it's a precision
 #. added to multiple different goals.
 #: src/states_screens/dialogs/achievement_progress_dialog.cpp:208
 msgid "Follow-the-Leader races finished"
-msgstr "Gare \"segui il capo\" completate"
+msgstr "Gare \"Segui il Leader\" completate"
 
 #. I18N: A goal for achievements. If this text is in (), it's a precision
 #. added to multiple different goals.
@@ -5206,7 +5207,7 @@ msgstr "%s (+)"
 
 #: src/states_screens/edit_gp_screen.cpp:330
 msgid "An error occurred while trying to save your grand prix."
-msgstr "Si è verificato un errore durante il salvataggio del tuo gran premio"
+msgstr "Si è verificato un errore durante il salvataggio del tuo Gran Premio."
 
 #: src/states_screens/edit_track_screen.cpp:255
 msgid "Select a track"
@@ -5272,11 +5273,11 @@ msgstr "Ricarica"
 #: src/states_screens/grand_prix_editor_screen.cpp:100
 #: src/states_screens/grand_prix_editor_screen.cpp:117
 msgid "Please enter the name of the grand prix"
-msgstr "Inserisci il nome del gran premio"
+msgstr "Inserisci il nome del Gran Premio"
 
 #: src/states_screens/grand_prix_editor_screen.cpp:168
 msgid "Please select a Grand Prix"
-msgstr "Inserisci il nome del gran premio"
+msgstr "Scegli un Gran Premio"
 
 #: src/states_screens/grand_prix_editor_screen.cpp:336
 msgid "User defined"
@@ -5288,7 +5289,7 @@ msgstr "Il nome è vuoto."
 
 #: src/states_screens/grand_prix_editor_screen.cpp:357
 msgid "Another grand prix with this name already exists."
-msgstr "Un altro gran premio è già salvato con questo nome"
+msgstr "Esiste già un altro Gran Premio con questo nome."
 
 #: src/states_screens/grand_prix_editor_screen.cpp:363
 msgid "Name is too long."
@@ -5305,11 +5306,11 @@ msgstr "Hai completato una sfida!"
 
 #: src/states_screens/grand_prix_win.cpp:324
 msgid "You won the Grand Prix!"
-msgstr "Hai vinto il Gran premio!"
+msgstr "Hai vinto il Gran Premio!"
 
 #: src/states_screens/grand_prix_win.cpp:325
 msgid "You completed the Grand Prix!"
-msgstr "Hai completato il Gran premio!"
+msgstr "Hai completato il Gran Premio!"
 
 #: src/states_screens/high_score_selection.cpp:144
 msgctxt "column_name"
@@ -5392,7 +5393,7 @@ msgstr "Server di %s"
 #. I18N: In the create server screen
 #: src/states_screens/online/create_server_screen.cpp:215
 msgid "No. of grand prix track(s)"
-msgstr "Numero di piste per il Gran premio"
+msgstr "Numero di piste per il Gran Premio"
 
 #: src/states_screens/online/create_server_screen.cpp:298
 msgid "Name has to be between 4 and 30 characters long!"
@@ -5759,7 +5760,7 @@ msgstr "Accelera"
 #. I18N: Key binding name
 #: src/states_screens/options/options_screen_device.cpp:275
 msgid "Brake / Reverse"
-msgstr "Frena / Retromarcia"
+msgstr "Freno / Retromarcia"
 
 #. I18N: Key binding name
 #: src/states_screens/options/options_screen_device.cpp:278
@@ -6118,7 +6119,7 @@ msgstr "Raccogli nitro!"
 
 #: src/states_screens/race_gui_base.cpp:771
 msgid "Follow the leader!"
-msgstr "Segui il capo!"
+msgstr "Segui il leader!"
 
 #. I18N: When some GlobalPlayerIcons are hidden, write "Top 10" to show it
 #: src/states_screens/race_gui_base.cpp:954
@@ -6156,7 +6157,7 @@ msgstr "Esci dal server"
 
 #: src/states_screens/race_result_gui.cpp:310
 msgid "Abort Grand Prix"
-msgstr "Abbandona Gran premio"
+msgstr "Abbandona Gran Premio"
 
 #: src/states_screens/race_result_gui.cpp:330
 msgid "Restart"
@@ -6176,7 +6177,7 @@ msgstr "Torna al menu"
 
 #: src/states_screens/race_result_gui.cpp:536
 msgid "Do you really want to abort the Grand Prix?"
-msgstr "Vuoi davvero abbandonare il Gran premio?"
+msgstr "Vuoi davvero abbandonare il Gran Premio?"
 
 #: src/states_screens/race_result_gui.cpp:636
 #: src/states_screens/race_result_gui.cpp:1529
@@ -6216,7 +6217,7 @@ msgstr "Pista %i/%i"
 
 #: src/states_screens/race_result_gui.cpp:1833
 msgid "Grand Prix progress:"
-msgstr "Progressi Gran premio:"
+msgstr "Progressi Gran Premio:"
 
 #: src/states_screens/race_result_gui.cpp:1879
 msgid "Highscores"
@@ -6305,7 +6306,7 @@ msgstr "Numero di kart gestiti dall'IA della squadra rossa."
 msgid ""
 "You cannot play this Grand Prix because it contains tracks that aren't "
 "unlocked!"
-msgstr "Non puoi gareggiare in questo grand prix perché contiene tracciati che non sono ancora stati sbloccati!"
+msgstr "Non puoi gareggiare in questo Gran Premio perché contiene piste che non sono ancora state sbloccate!"
 
 #: src/states_screens/tracks_and_gp_screen.cpp:217
 msgid "Locked!"
@@ -6469,7 +6470,7 @@ msgid ""
 "battle mode against the computer or your friends, and more! For a greater "
 "challenge, join online and meet players from all over the world and prove "
 "your racing skills!"
-msgstr "Puoi fare una gara singola contro altri kart, competere in uno dei numerosi Gran Prix, provare a battere i punteggi più alti nelle prove a tempo, sfidare amici e IA in modalità battaglia e altro ancora! Per una sfida ancora più stimolante, gioca in rete e mettiti alla prova gareggiando contro giocatori da tutto il mondo!"
+msgstr "Puoi fare una gara singola contro altri kart, competere in uno dei numerosi Gran Premi, provare a battere i punteggi più alti nelle prove a tempo, sfidare amici e IA in modalità battaglia e altro ancora! Per una sfida ancora più stimolante, gioca in rete e mettiti alla prova gareggiando contro giocatori da tutto il mondo!"
 
 #: supertuxkart.appdata.xml:17
 msgid "This game has no ads."
@@ -6480,13 +6481,13 @@ msgid ""
 "This is an unstable version of SuperTuxKart that contains latest "
 "improvements. It is released mainly for testing, to make stable STK as good "
 "as possible."
-msgstr "Questa è una versione instabile di SuperTuxKart che contiene gli ultimi miglioramenti. Praticamente è rilasciata per fare test, in modo che la prossima versione stabile sia al meglio."
+msgstr "Questa è una versione instabile di SuperTuxKart che contiene gli ultimi miglioramenti. È stata rilasciata principalmente per fare test, in modo da rendere la versione stabile il meglio possibile."
 
 #: supertuxkart.appdata.xml:23
 msgid ""
 "This version can be installed in parallel with the stable version on the "
 "device."
-msgstr "Questa versione può essere installata in parallelo con la versione stabile nel dispositivo"
+msgstr "Questa versione può essere installata in parallelo con la versione stabile nel dispositivo."
 
 #: supertuxkart.appdata.xml:26
 msgid "If you need more stability, consider using the stable version: %s"

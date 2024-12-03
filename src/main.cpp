@@ -596,6 +596,7 @@ void cmdLineHelp()
                               "laps.\n"
     "       --profile-time=n   Enable automatic driven profile mode for n "
                               "seconds.\n"
+    "       --benchmark        Start Benchmark Mode, save results and exit. \n"
     "       --unlock-all       Permanently unlock all karts and tracks for testing.\n"
     "       --no-unlock-all    Disable unlock-all (i.e. base unlocking on player achievement).\n"
     "       --xmas=n           Toggle Xmas/Christmas mode. n=0 Use current date, n=1, Always enable,\n"
@@ -1711,6 +1712,13 @@ int handleCmdLine(bool has_server_config, bool has_parent_process)
             RaceManager::get()->setNumLaps(n);
         }
     }   // --profile-laps
+
+    if(CommandLine::has("--benchmark"))
+    {
+        Log::verbose("main", "Benchmark mode requested from command-line");
+        UserConfigParams::m_no_start_screen = true;
+        UserConfigParams::m_benchmark = true;
+    }   // --benchmark
     
     if(CommandLine::has("--unlock-all"))
     {
@@ -2557,11 +2565,18 @@ int main(int argc, char *argv[])
         {
             if(UserConfigParams::m_no_start_screen)
             {
-                // Quickstart (-N)
-                // ===============
-                // all defaults are set in InitTuxkart()
-                RaceManager::get()->setupPlayerKartInfo();
-                RaceManager::get()->startNew(false);
+                if (UserConfigParams::m_benchmark)
+                {
+                    profiler.startBenchmark();
+                }
+                else
+                {
+                    // Quickstart (-N)
+                    // ===============
+                    // all defaults are set in InitTuxkart()
+                    RaceManager::get()->setupPlayerKartInfo();
+                    RaceManager::get()->startNew(false);
+                }
             }
         }
         else  // profile

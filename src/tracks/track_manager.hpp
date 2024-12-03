@@ -19,7 +19,7 @@
 #ifndef HEADER_TRACK_MANAGER_HPP
 #define HEADER_TRACK_MANAGER_HPP
 
-#include "config/favorite_track_status.hpp"
+#include "config/favorite_status.hpp"
 
 #include <string>
 #include <vector>
@@ -81,7 +81,7 @@ private:
      */
     std::vector<bool>                        m_track_avail;
 
-    FavoriteTrackStatus                     *m_current_favorite_status;
+    FavoriteStatus                     *m_current_favorite_status;
 
     void updateAllGroups(const Track* track);
     void updateGroups(TrackGroupType type, const Track* track);
@@ -94,9 +94,9 @@ public:
     static void addTrackSearchDir(const std::string &dir);
 
     /** Adds a track to the special group of favorite tracks.
-    * We need a special treatment, because the list of tracks in this group
+    * We need to treat it specially, because the list of tracks in this group
     * depends on the player-profile, not on the track data. */
-    void setFavoriteTrackStatus(FavoriteTrackStatus *status);
+    void setFavoriteTrackStatus(FavoriteStatus *status);
 
     void clearFavoriteTrackStatus();
 

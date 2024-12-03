@@ -70,6 +70,7 @@
 #include "utils/profiler.hpp"
 #include "utils/string_utils.hpp"
 #include "utils/translation.hpp"
+#include "main_loop.hpp"
 
 #include <algorithm>
 
@@ -1012,7 +1013,7 @@ void RaceResultGUI::determineTableLayout()
     r = m_font->getDimension(L"Y");
     m_distance_between_rows = (int)(1.5f*r.Height);
     m_distance_between_meta_rows = m_distance_between_rows;
-
+    
     // If there are too many highscores, reduce size between rows
     Highscores* scores = World::getWorld()->getHighscores();
     if (scores != NULL &&
@@ -1269,7 +1270,16 @@ void RaceResultGUI::renderGlobal(float dt)
     }
     else if (RaceManager::get()->isBenchmarking())
     {
-        displayBenchmarkSummary();
+        if(!UserConfigParams::m_benchmark)
+        {
+            displayBenchmarkSummary();
+        }
+        else
+        {
+            // Benchmark requested from CLI, write to file and exit
+            profiler.writeToFile();
+            main_loop->requestAbort();
+        }
     }
     else
     {
@@ -1916,15 +1926,29 @@ void RaceResultGUI::displayPostRaceInfo()
     if (RaceManager::get()->isBenchmarking())
         return;
 
-    int current_y = displayHighscores(x, y);
+    Highscores *highscore = World::getWorld()->getHighscores();
+    int size_esti = highscore ? highscore->getNumberEntries() + 1 : 1;
+
+    if (!RaceManager::get()->isSoccerMode())
+        size_esti += RaceManager::get()->modeHasLaps() ? 4 : 2;
+    
+    if (RaceManager::get()->raceWasStartedFromOverworld())
+        size_esti += 3;
+    
+    int size_esti_real = size_esti * m_distance_between_meta_rows;
+
+    int current_y = displayHighscores(x, y, 
+                        size_esti_real > UserConfigParams::m_height * 0.7f);
 
     // Display the number of laps, difficulty, and the best lap time if applicable
     if (!RaceManager::get()->isSoccerMode())
-        current_y = displayLapDifficulty(x, current_y);
+        current_y = displayLapDifficulty(x, current_y, 
+                        size_esti_real > UserConfigParams::m_height * 0.8f);
 
     // Display challenge result and goals
     if (RaceManager::get()->raceWasStartedFromOverworld())
-        current_y = displayChallengeInfo(x, current_y);
+        current_y = displayChallengeInfo(x, current_y,
+                        size_esti_real > UserConfigParams::m_height * 0.85f);
 #endif
 } // displayPostRaceInfo
 
@@ -1934,7 +1958,7 @@ void RaceResultGUI::displayPostRaceInfo()
  * be properly positioned vertically.
  *  \param x Left limit of the highscore display area
  *  \param y Top limit of the highscore display area */
-int RaceResultGUI::displayHighscores(int x, int y)
+int RaceResultGUI::displayHighscores(int x, int y, bool increase_density)
 {
 #ifndef SERVER_ONLY
     Highscores* scores = World::getWorld()->getHighscores();
@@ -1962,6 +1986,8 @@ int RaceResultGUI::displayHighscores(int x, int y)
     if (max_width < 15)
         max_characters = max_width;
 
+    int width_icon_adjusted = increase_density ? m_width_icon * 0.8f : m_width_icon;
+
     float time;
     for (int i = 0; i < scores->getNumberEntries(); i++)
     {
@@ -1979,7 +2005,9 @@ int RaceResultGUI::displayHighscores(int x, int y)
         }
 
         int current_x = x;
-        current_y = y + (int)((i + 1) * m_distance_between_meta_rows);
+        current_y = y + m_distance_between_meta_rows
+                      + (int)(i * m_distance_between_meta_rows
+                                * (increase_density ? 0.8f : 1.0f));
 
         const KartProperties* prop = kart_properties_manager->getKart(kart_name);
         if (prop != NULL)
@@ -1993,12 +2021,12 @@ int RaceResultGUI::displayHighscores(int x, int y)
                     kart_icon_texture->getSize());
 
                 core::recti dest_rect(current_x, current_y,
-                    current_x + m_width_icon, current_y + m_width_icon);
+                    current_x + width_icon_adjusted, current_y + width_icon_adjusted);
 
                 draw2DImage(kart_icon_texture, dest_rect,
                     source_rect, NULL, NULL, true);
 
-                current_x += m_width_icon + m_width_column_space;
+                current_x += width_icon_adjusted + m_width_column_space;
             }
         }
 
@@ -2030,19 +2058,22 @@ int RaceResultGUI::displayHighscores(int x, int y)
  * so that other elements can be properly positioned vertically.
  *  \param x Left limit of the highscore display area
  *  \param y Top limit of the highscore display area */
-int RaceResultGUI::displayLapDifficulty(int x, int y)
+int RaceResultGUI::displayLapDifficulty(int x, int y, bool increase_density)
 {
 #ifndef SERVER_ONLY
     video::SColor white_color = video::SColor(255, 255, 255, 255);
     int current_y = y;
     int time_precision = RaceManager::get()->currentModeTimePrecision();
 
+    irr::gui::ScalableFont *the_font = increase_density ? GUIEngine::getSmallFont() : GUIEngine::getFont();
+    const int line_height = m_distance_between_meta_rows * 0.8f * (increase_density ? 0.8f : 1.0f);
+
     // display lap count
     if (RaceManager::get()->modeHasLaps())
     {
         core::stringw laps = _("Laps: %i", RaceManager::get()->getNumLaps());
-        current_y += int(m_distance_between_meta_rows * 0.8f * 2);
-        GUIEngine::getFont()->draw(laps,
+        current_y += int(line_height * 1.6f);
+        the_font->draw(laps,
             // 0.96 from stkgui
             core::recti(x, current_y, UserConfigParams::m_width * 0.96f, current_y + GUIEngine::getFontHeight()),
             white_color, false, false, nullptr, true);
@@ -2066,7 +2097,7 @@ int RaceResultGUI::displayLapDifficulty(int x, int y)
             if (difficulty_one.empty())
             {
                 difficulty_one = RaceManager::get()->getDifficultyName((RaceManager::Difficulty)rd.m_difficulty);
-                core::dimension2d<u32> dim_1 = m_font->getDimension(difficulty_one.c_str());
+                core::dimension2d<u32> dim_1 = the_font->getDimension(difficulty_one.c_str());
                 RowInfo* ri_1 = &(m_all_row_infos[k]);
                 diff_ghost_one.UpperLeftCorner.X = ri_1->m_x_pos + m_width_icon + m_width_kart_name + m_width_finish_time + m_width_column_space + 20;
                 diff_ghost_one.UpperLeftCorner.Y = ri_1->m_y_pos;
@@ -2076,7 +2107,7 @@ int RaceResultGUI::displayLapDifficulty(int x, int y)
             else if (difficulty_two.empty())
             {
                 difficulty_two = RaceManager::get()->getDifficultyName((RaceManager::Difficulty)rd.m_difficulty);
-                core::dimension2d<u32> dim_2 = m_font->getDimension(difficulty_two.c_str());
+                core::dimension2d<u32> dim_2 = the_font->getDimension(difficulty_two.c_str());
                 RowInfo* ri_2 = &(m_all_row_infos[k]);
                 diff_ghost_two.UpperLeftCorner.X = ri_2->m_x_pos + m_width_icon + m_width_kart_name + m_width_finish_time + m_width_column_space + 20;
                 diff_ghost_two.UpperLeftCorner.Y = ri_2->m_y_pos;
@@ -2090,12 +2121,12 @@ int RaceResultGUI::displayLapDifficulty(int x, int y)
             difficulty_name = difficulty_one;
 
         // Left side difficulty display
-        m_font->draw(difficulty_one, diff_ghost_one, video::SColor(255, 255, 255, 255), false, false, nullptr, true);
-        m_font->draw(difficulty_two, diff_ghost_two, video::SColor(255, 255, 255, 255), false, false, nullptr, true);
+        the_font->draw(difficulty_one, diff_ghost_one, video::SColor(255, 255, 255, 255), false, false, nullptr, true);
+        the_font->draw(difficulty_two, diff_ghost_two, video::SColor(255, 255, 255, 255), false, false, nullptr, true);
     }
     core::stringw difficulty_string = _("Difficulty: %s", difficulty_name);
-    current_y += int(m_distance_between_meta_rows * 0.8f);
-    GUIEngine::getFont()->draw(difficulty_string,
+    current_y += line_height;
+    the_font->draw(difficulty_string,
         // 0.96 from stkgui
         core::recti(x, current_y, UserConfigParams::m_width * 0.96f, current_y + GUIEngine::getFontHeight()),
         white_color, false, false, nullptr, true);
@@ -2110,8 +2141,8 @@ int RaceResultGUI::displayLapDifficulty(int x, int y)
         {
             core::stringw best_lap_string = _("Best lap time: %s",
                 StringUtils::timeToString(best_lap_time, time_precision).c_str());
-            current_y += int(m_distance_between_meta_rows * 0.8f);
-            GUIEngine::getFont()->draw(best_lap_string,
+            current_y += line_height;
+            the_font->draw(best_lap_string,
                 // 0.96 from stkgui
                 core::recti(x, current_y, UserConfigParams::m_width * 0.96f, current_y + GUIEngine::getFontHeight()),
                 white_color, false, false, nullptr, true);
@@ -2123,8 +2154,8 @@ int RaceResultGUI::displayLapDifficulty(int x, int y)
                 //I18N: is used to indicate who has the bast laptime (best laptime "by kart_name")
                 core::stringw best_lap_by_string = _("by %s", best_lap_by);
                 // Make it closer to the above line
-                current_y += int(GUIEngine::getFontHeight() * 0.8f);
-                GUIEngine::getFont()->draw(best_lap_by_string,
+                current_y += int(line_height * 0.8f);
+                the_font->draw(best_lap_by_string,
                     // 0.96 from stkgui
                     core::recti(x, current_y, UserConfigParams::m_width * 0.96f, current_y + GUIEngine::getFontHeight()),
                     white_color, false, false,
@@ -2143,7 +2174,7 @@ int RaceResultGUI::displayLapDifficulty(int x, int y)
  * "best while slower" requirements have been met.
  *  \param x Left limit of the highscore display area
  *  \param y Top limit of the highscore display area */
-int RaceResultGUI::displayChallengeInfo(int x, int y)
+int RaceResultGUI::displayChallengeInfo(int x, int y, bool increase_density)
 {
 #ifndef SERVER_ONLY
     int current_y = y;
@@ -2154,8 +2185,6 @@ int RaceResultGUI::displayChallengeInfo(int x, int y)
         return current_y;
 
     // Display challenge result and goals
-    current_y += int(m_distance_between_meta_rows * 0.4f);
-
     const ChallengeStatus* c_stat = PlayerManager::getCurrentPlayer()->getCurrentChallengeStatus();
     if (!c_stat)
         return current_y;
@@ -2199,11 +2228,16 @@ int RaceResultGUI::displayChallengeInfo(int x, int y)
 
     core::stringw text_string = all_passed ? _("You completed the challenge!") : _("You failed the challenge!");
     video::SColor text_color = all_passed ? win_color : lose_color;
-    current_y += int(m_distance_between_meta_rows * 0.8f);
+
+    current_y += int(m_distance_between_meta_rows);
+    
     GUIEngine::getFont()->draw(text_string, core::recti(x, current_y, UserConfigParams::m_width * 0.96f,
                                y + GUIEngine::getFontHeight()), text_color, false, false, nullptr, true);
 
-    current_y += int(m_distance_between_meta_rows * 0.2f);
+    current_y += int(m_distance_between_meta_rows);
+
+    irr::gui::ScalableFont *the_font = increase_density ? GUIEngine::getSmallFont() : GUIEngine::getFont();
+    const int line_height = m_distance_between_meta_rows * 0.8f * (increase_density ? 0.8f : 1.0f);
 
     // Display goals
     if (c_data->getMaxPosition(difficulty) != -1)
@@ -2214,18 +2248,20 @@ int RaceResultGUI::displayChallengeInfo(int x, int y)
 
         text_string = _("Required Rank: %i", r);
         text_color = position_passed ? win_color : lose_color;
-        current_y += int(m_distance_between_meta_rows * 0.7f);
-        GUIEngine::getFont()->draw(text_string, core::recti(x, current_y, UserConfigParams::m_width * 0.96f,
-                                       y + GUIEngine::getSmallFontHeight()), text_color, false, false, nullptr, true);
+        
+        the_font->draw(text_string, core::recti(x, current_y, UserConfigParams::m_width * 0.96f,
+                       y + line_height), text_color, false, false, nullptr, true);
+        current_y += line_height;
     }
     if (c_data->getTimeRequirement(difficulty) > 0)
     {
         text_string = _("Required Time: %i",
             StringUtils::timeToString(c_data->getTimeRequirement(difficulty)).c_str());
         text_color = time_passed ? win_color : lose_color;
-        current_y += int(m_distance_between_meta_rows * 0.7f);
-        GUIEngine::getFont()->draw(text_string, core::recti(x, current_y, UserConfigParams::m_width * 0.96f,
-                               y + GUIEngine::getSmallFontHeight()), text_color, false, false, nullptr, true);
+        
+        the_font->draw(text_string, core::recti(x, current_y, UserConfigParams::m_width * 0.96f,
+                       y + line_height), text_color, false, false, nullptr, true);
+        current_y += line_height;
     }
     if (c_data->getEnergy(difficulty) > 0)
     {
@@ -2233,18 +2269,33 @@ int RaceResultGUI::displayChallengeInfo(int x, int y)
 
         text_string = _("Required Nitro Points: %i", energy);
         text_color = energy_passed ? win_color : lose_color;
-        current_y += int(m_distance_between_meta_rows * 0.7f);
-        GUIEngine::getFont()->draw(text_string, core::recti(x, current_y, UserConfigParams::m_width * 0.96f,
-                               y + GUIEngine::getSmallFontHeight()), text_color, false, false, nullptr, true);
+        
+        the_font->draw(text_string, core::recti(x, current_y, UserConfigParams::m_width * 0.96f,
+                       y + line_height), text_color, false, false, nullptr, true);
+        current_y += line_height;
     }
 
     if (c_data->isChallengeFulfilled(true /*best*/) && RaceManager::get()->getDifficulty() != RaceManager::DIFFICULTY_BEST)
     {
+        // The translated string might be too long, implement word wrap
+        std::vector<irr::gui::GlyphLayout> best_while_slower_layout;
         text_string = _("Reached Requirements of SuperTux");
+        the_font->initGlyphLayouts(text_string,
+                                   best_while_slower_layout);
+        irr::gui::breakGlyphLayouts(best_while_slower_layout, 
+                                    UserConfigParams::m_width * 0.93f - x,
+                                    the_font->getInverseShaping(),
+                                    the_font->getScale());
+        irr::core::dimension2du dim = 
+            irr::gui::getGlyphLayoutsDimension(best_while_slower_layout,
+                                               line_height,
+                                               the_font->getInverseShaping(),
+                                               the_font->getScale());
         text_color = special_color;
-        current_y += int(m_distance_between_meta_rows * 0.7f);
-        GUIEngine::getFont()->draw(text_string, core::recti(x, current_y, UserConfigParams::m_width * 0.96f,
-                               y + GUIEngine::getSmallFontHeight()), text_color, false, false, nullptr, true);
+        
+        the_font->draw(best_while_slower_layout, core::recti(x, current_y, x + dim.Width,
+                       current_y + dim.Height), text_color, false, false, nullptr);
+        current_y += line_height;
     }
 
     return current_y;

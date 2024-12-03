@@ -3,20 +3,21 @@
 # This file is distributed under the same license as the supertuxkart package.
 # 
 # Translators:
+# A. Cem Hanoğlu <cemhanoglu.ege@gmail.com>, 2024
 # FIRST AUTHOR <EMAIL@ADDRESS>, 2010
 # Rover, 2022
 # Rover, 2022
-# Serdar Sağlam <teknomobil@msn.com>, 2019-2022
+# Serdar Sağlam <teknomobil@msn.com>, 2019-2023
 # U. Ozan Basar <software@nano.net.tr>, 2015
 # Volkan Gezer <volkangezer@gmail.com>, 2015
-# yakup <mutouk@yandex.ru>, 2015-2017
+# 9d4282795e87ad099e39d98812f1a822_ade2f01 <c3fa67bcf1b8b90bf10d2d5dae1637ab_127851>, 2015-2017
 msgid ""
 msgstr ""
 "Project-Id-Version: SuperTuxKart\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-06-16 01:41+0800\n"
 "PO-Revision-Date: 2015-02-15 01:58+0000\n"
-"Last-Translator: Volkan Gezer <volkangezer@gmail.com>, 2015\n"
+"Last-Translator: A. Cem Hanoğlu <cemhanoglu.ege@gmail.com>, 2024\n"
 "Language-Team: Turkish (http://app.transifex.com/supertuxkart/supertuxkart/language/tr/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -34,7 +35,7 @@ msgstr "Oyun verisi ayıklama hatası"
 
 #. I18N: In Android UI, po_extract_error_msg
 msgid "Check remaining device space or reinstall SuperTuxKart."
-msgstr "Cihazda kalan alanını kontrol edin veya SuperTuxKart'ı yeniden kurun."
+msgstr "Cihazda kalan alanı kontrol edin veya SuperTuxKart'ı yeniden kurun."
 
 #. I18N: In Android UI, po_quit
 #. I18N: ./data/gui/screens/main_menu.stkgui
@@ -52,7 +53,7 @@ msgstr "Her bölümü en az bir kez oyna."
 
 #. I18N: ./data/achievements.xml
 msgid "Strike!"
-msgstr "Vurgun!"
+msgstr "Strike!"
 
 #. I18N: ./data/achievements.xml
 msgid "Hit 10 karts with a bowling-ball."
@@ -64,7 +65,7 @@ msgstr "Baş Düşman"
 
 #. I18N: ./data/achievements.xml
 msgid "Hit the same kart at least 5 times in one race."
-msgstr "Aynı araca bir yarışta en az 5 kez vurun."
+msgstr "Aynı araca bir yarışta en az 5 kez vur."
 
 #. I18N: ./data/achievements.xml
 msgid "Marathoner"
@@ -72,7 +73,7 @@ msgstr "Maratoncu"
 
 #. I18N: ./data/achievements.xml
 msgid "Finish a race with at least twice the track's default lap number."
-msgstr "Bir yarışı pistin varsayılan tur sayısının en az iki katı ile bitirin."
+msgstr "Bir yarışı pistin varsayılan tur sayısının en az iki katı ile bitir."
 
 #. I18N: ./data/achievements.xml
 msgid "Skid-row"
@@ -80,7 +81,7 @@ msgstr "Patinajcı"
 
 #. I18N: ./data/achievements.xml
 msgid "Skid 5 times in a single lap."
-msgstr "Tek bir turda 5 kez kaydırın."
+msgstr "Tek bir turda 5 kez kaydır."
 
 #. I18N: ./data/achievements.xml
 msgid "Gold driver"
@@ -90,7 +91,7 @@ msgstr "Altın Sürücü"
 msgid ""
 "Win against at least 3 AIs in normal race, time-trial, and follow the "
 "leader."
-msgstr "Normal yarışta en az 3 Yapay zekaya karşı kazanın, deneme yapın ve lideri takip edin."
+msgstr "Normal yarış, zamana karşı ve lideri takip et modlarında en az 3 yapay zekaya karşı kazan. "
 
 #. I18N: ./data/achievements.xml
 msgid "Powerup Love"
@@ -98,7 +99,7 @@ msgstr "Güçartışı Sever"
 
 #. I18N: ./data/achievements.xml
 msgid "Use 10 or more powerups in a race."
-msgstr "Bir yarışta 10 veya daha fazla güç artışları kullanın."
+msgstr "Bir yarışta 10 veya daha fazla güç artışı kullan."
 
 #. I18N: ./data/achievements.xml
 msgid "Unstoppable"
@@ -120,7 +121,7 @@ msgstr "Bir yarışta en az 5 muz topla."
 
 #. I18N: ./data/achievements.xml
 msgid "It's secret"
-msgstr "O gizli"
+msgstr "Sır"
 
 #. I18N: ./data/achievements.xml
 msgid "Really ... a secret."
@@ -128,13 +129,13 @@ msgstr "Gerçekten ... bir sır."
 
 #. I18N: ./data/achievements.xml
 msgid "Mosquito Hunter"
-msgstr "Sivri Sinek Avcısı"
+msgstr "Sivrisinek Avcısı"
 
 #. I18N: ./data/achievements.xml
 msgid ""
 "Take your opponents for mosquitos! With the swatter, squash them at least 5 "
 "times in a race."
-msgstr "Rakiplerini sivrisineklere götür! Renk örneği ile, yarışta en az 5 kez ezin."
+msgstr "Rakiplerini sivrisineklermiş gibi gör! Onları bir yarışta sinek raketiyle en az 5 kere ez."
 
 #. I18N: ./data/achievements.xml
 msgid "Beyond Luck"
@@ -144,7 +145,7 @@ msgstr "Şansın Ötesinde"
 msgid ""
 "Win 10 single races in a row in Expert or SuperTux against at least 5 AIs. "
 "Beware, restarting a race counts as a loss."
-msgstr "En az 5 Yapay zekaya karşı Uzman veya SuperTux'ta arka arkaya 10 yarış kazanın. Dikkat edin, bir yarışı yeniden başlatmak bir kayıp olarak sayılır."
+msgstr "Expert ya da SuperTux zorluklarında en az 5 yapay zekaya karşı art arda 10 kere tek yarış kazan. Dikkat et, bir yarışı yeniden başlatırsan kaybetmiş sayılırsın. "
 
 #. I18N: ./data/grandprix/1_penguinplayground.grandprix
 msgid "Penguin Playground"
@@ -292,7 +293,7 @@ msgstr "Ters çevrilmiş düğmeler"
 #. I18N: ./data/gui/dialogs/android/multitouch_settings.stkgui
 #. I18N: In the multitouch settings screen
 msgid "Buttons scale"
-msgstr "Düğmeler ölçeği"
+msgstr "Düğme ölçeği"
 
 #. I18N: ./data/gui/dialogs/android/multitouch_settings.stkgui
 #. I18N: In the multitouch settings screen
@@ -667,7 +668,7 @@ msgstr "Yarışı Yeniden Başlat"
 #. I18N: ./data/gui/dialogs/race_paused_dialog.stkgui
 #. I18N: Race paused button
 msgid "Give Up Race"
-msgstr "Yarışı Bırak"
+msgstr "Yarıştan Çekil"
 
 #. I18N: ./data/gui/dialogs/online/network_ingame_dialog.stkgui
 #. I18N: Race paused button
@@ -736,7 +737,7 @@ msgstr "Kullanıcı adı"
 #. I18N: ./data/gui/screens/online/register.stkgui
 #. I18N: In the registration dialog
 msgid "Email"
-msgstr "Eposta"
+msgstr "E-posta"
 
 #. I18N: ./data/gui/dialogs/online/registration_terms.stkgui
 #. I18N: In the registration dialog
@@ -915,7 +916,7 @@ msgstr "Kullanıcı Bilgisi"
 #. I18N: ./data/gui/dialogs/online/user_info_dialog.stkgui
 #. I18N: User info dialog
 msgid "Remove Friend"
-msgstr ""
+msgstr "Arkadaşı Kaldır"
 
 #. I18N: ./data/gui/dialogs/online/user_info_dialog.stkgui
 #. I18N: User info dialog
@@ -925,17 +926,17 @@ msgstr "Arkadaş Ekle"
 #. I18N: ./data/gui/dialogs/online/user_info_dialog.stkgui
 #. I18N: User info dialog
 msgid "Accept Invite"
-msgstr ""
+msgstr "Daveti Kabul Et"
 
 #. I18N: ./data/gui/dialogs/online/user_info_dialog.stkgui
 #. I18N: User info dialog
 msgid "Decline Invite"
-msgstr ""
+msgstr "Daveti Reddet"
 
 #. I18N: ./data/gui/dialogs/online/user_info_dialog.stkgui
 #. I18N: User info dialog
 msgid "View Profile"
-msgstr ""
+msgstr "Profili Görüntüle"
 
 #. I18N: ./data/gui/dialogs/online/vote_dialog.stkgui
 #. I18N: In the vote dialog
@@ -1123,7 +1124,7 @@ msgstr "Hazırlayanlar"
 
 #. I18N: ./data/gui/screens/cutscene.stkgui
 msgid "Skip"
-msgstr ""
+msgstr "Atla"
 
 #. I18N: ./data/gui/screens/easter_egg.stkgui
 #. I18N: Section in easter egg tracks selection screen
@@ -1505,7 +1506,7 @@ msgstr "Hayaletin: Zamana karşı veya yumurta avı kipinde hayaletine karşı y
 #. I18N: In the help menu
 msgid ""
 "Lap Trial: Complete as many laps as possible in a given amount of time."
-msgstr ""
+msgstr "Tur Denemesi: Belirli bir süre içinde mümkün olduğunca çok tur tamamlayın."
 
 #. I18N: ./data/gui/screens/help2.stkgui
 #. I18N: In the help menu
@@ -2003,7 +2004,7 @@ msgid ""
 "You can play without creating an online account by selecting an offline "
 "account. Though then you can not connect to friends, vote for addons etc. "
 "Please read our privacy statement at https://privacy.supertuxkart.net"
-msgstr ""
+msgstr "Bir çevrimdışı hesap seçerek çevrimiçi bir hesap oluşturmadan oynayabilirsiniz. Ancak o zaman arkadaşlara bağlanamaz, eklentiler için oy kullanamazsınız vb. Lütfen https://privacy.supertuxkart.net adresindeki gizlilik bildirimimizi okuyun."
 
 #. I18N: ./data/gui/screens/online/server_selection.stkgui
 #: src/states_screens/online/server_selection.cpp:580
@@ -2516,7 +2517,7 @@ msgstr "Basket topları bir bowling topu, kek veya dalgıç ile hassas geri atı
 msgid ""
 "Try to avoid crashing into the backs of other karts as this will slow you "
 "down."
-msgstr ""
+msgstr "Sizi yavaşlatacağı için diğer araçlara arkadan çarpmaktan kaçının."
 
 #. I18N: ./data/tips.xml
 msgid "You can use bowling balls to push and block the ball."
@@ -2560,7 +2561,7 @@ msgstr "Amanda"
 
 #. I18N: ../stk-assets/karts/beastie/kart.xml
 msgid "Godette"
-msgstr ""
+msgstr "Godette"
 
 #. I18N: ../stk-assets/karts/emule/kart.xml
 msgid "Emule"
@@ -2673,7 +2674,7 @@ msgstr "Çiftlik"
 
 #. I18N: ../stk-assets/tracks/hole_drop/track.xml
 msgid "Hole Drop"
-msgstr ""
+msgstr "Hole Drop"
 
 #. I18N: ../stk-assets/tracks/icy_soccer_field/track.xml
 msgid "Icy Soccer Field"
@@ -2728,7 +2729,7 @@ msgstr "Minigolf"
 
 #. I18N: ../stk-assets/tracks/oasis/track.xml
 msgid "Oasis"
-msgstr ""
+msgstr "Vaha"
 
 #. I18N: ../stk-assets/tracks/olivermath/track.xml
 msgid "Oliver's Math Class"

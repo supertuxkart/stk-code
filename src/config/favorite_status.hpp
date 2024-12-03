@@ -16,8 +16,8 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-#ifndef HEADER_FAVORITE_TRACK_STATUS_HPP
-#define HEADER_FAVORITE_TRACK_STATUS_HPP
+#ifndef HEADER_FAVORITE_STATUS_HPP
+#define HEADER_FAVORITE_STATUS_HPP
 
 #include "utils/leak_check.hpp"
 
@@ -29,45 +29,43 @@
 
 using namespace irr;
 
+class KartPropertiesManager;
 class TrackManager;
 class UTFWriter;
 class XMLNode;
 
-/** Class for managing player profiles (name, usage frequency,
- *  etc.). All PlayerProfiles are managed by the PlayerManager.
- *  A PlayerProfile keeps track of the story mode progress using an instance
- *  of StoryModeStatus, and achievements with AchievementsStatus. All data
- *  is saved in the players.xml file.
- *  This class also defines the interface for handling online data. All of
- *  the online handling is done in the derived class OnlinePlayerProfile,
- *  where the interface is fully implemented.
+/** Class for storing the current favorites/custom groups of karts and tracks.
+ * Put it into KartPropertiesManager or TrackManager by setFavoriteStatus()
+ * to add them into the original groups.
  * \ingroup config
  */
-class FavoriteTrackStatus
+class FavoriteStatus
 {
 private:
     LEAK_CHECK()
 
+    std::string m_parse_type;
+
     /** unordered_map<Group Name, set<Track Name> > .*/
-    std::unordered_map<std::string, std::set<std::string> > m_favorite_tracks;
+    std::unordered_map<std::string, std::set<std::string> > m_favorite;
 
 public:
-    friend class TrackManager;
-
     static const std::string DEFAULT_FAVORITE_GROUP_NAME;
 
-    FavoriteTrackStatus(const XMLNode *node);
-
-    virtual ~FavoriteTrackStatus();
+    /** Parse all <(parse_type)/> in <favorite> in xml node */
+    FavoriteStatus(const XMLNode *node, std::string parse_type);
 
     void save(UTFWriter &out);
 
-    bool isFavoriteTrack(std::string ident);
+    bool isFavorite(std::string ident);
 
-    void addFavoriteTrack(std::string ident, std::string group = DEFAULT_FAVORITE_GROUP_NAME);
+    void addFavorite(std::string ident, std::string group = DEFAULT_FAVORITE_GROUP_NAME);
 
-    void removeFavoriteTrack(std::string ident, std::string group = DEFAULT_FAVORITE_GROUP_NAME);
-};   // class PlayerProfile
+    void removeFavorite(std::string ident, std::string group = DEFAULT_FAVORITE_GROUP_NAME);
+
+    const std::unordered_map<std::string, std::set<std::string> >& getAllFavorites() const
+                                                                    { return m_favorite; }
+};   // class FavoriteStatus
 
 #endif
 
