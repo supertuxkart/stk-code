@@ -1400,6 +1400,7 @@ void Skin::drawRibbonChild(const core::recti &rect, Widget* widget,
     else
     {
         bool use_glow = true;
+        bool use_square = true;
 
         if (widget->m_event_handler != NULL &&
             widget->m_event_handler->m_properties[PROP_SQUARE] == "true")
@@ -1410,6 +1411,13 @@ void Skin::drawRibbonChild(const core::recti &rect, Widget* widget,
                     ->m_properties[PROP_SQUARE] == "true")
             use_glow = false;
 
+        if (widget->m_properties[PROP_ID] == "story" || widget->m_properties[PROP_ID] == "new" 
+            || widget->m_properties[PROP_ID] == "multiplayer" || widget->m_properties[PROP_ID] == "online" 
+            || widget->m_properties[PROP_ID] == "addons")
+        {
+            use_glow = false; use_square = false;
+        }
+            
         /* in combo ribbons, always show selection */
         RibbonWidget* parentRibbonWidget = NULL;
         bool always_show_selection = false;
@@ -1601,7 +1609,7 @@ void Skin::drawRibbonChild(const core::recti &rect, Widget* widget,
                     /*alpha*/true);
             }
             // if we're not using glow, draw square focus instead
-            else
+            else if (use_square)
             {
                 drawBoxFromStretchableTexture(parentRibbonWidget, rect,
                     SkinConfig::m_render_params["squareFocusHalo1::neutral"]);
