@@ -17,6 +17,7 @@
 #include "ge_vulkan_mesh_scene_node.hpp"
 #include "ge_vulkan_scene_manager.hpp"
 #include "ge_vulkan_shader_manager.hpp"
+#include "ge_vulkan_shadow_camera_scene_node.hpp"
 #include "ge_vulkan_skybox_renderer.hpp"
 #include "ge_vulkan_texture_descriptor.hpp"
 
@@ -182,11 +183,13 @@ void ObjectData::init(const irr::scene::SParticle& particle, int material_id,
 }   // init
 
 // ----------------------------------------------------------------------------
-GEVulkanDrawCall::GEVulkanDrawCall(GEVulkanDrawCallPass pass) :
+GEVulkanDrawCall::GEVulkanDrawCall(GEVulkanDrawCallType type) :
                 m_limits(getVKDriver()->getPhysicalDeviceProperties().limits),
-                m_draw_call_pass(pass)
+                m_draw_call_type(type)
 {
     m_culling_tool = new GECullingTool;
+    m_shadow_camera = nullptr;
+    m_camera = nullptr;
     m_dynamic_data = NULL;
     m_sbo_data = NULL;
     m_object_data_padded_size = 0;
@@ -261,7 +264,7 @@ void GEVulkanDrawCall::addNode(irr::scene::ISceneNode* node)
         {
             GEVulkanDynamicSPMBuffer* dbuffer = static_cast<
                 GEVulkanDynamicSPMBuffer*>(buffer);
-            m_dynamic_spm_buffers[getDynamicBufferKey(shader, !(m_draw_call_pipeline_flag & GVDCPF_COLOR))]
+            m_dynamic_spm_buffers[getDynamicBufferKey(shader, m_draw_call_type != GVDCT_FORWARD)]
                 .emplace_back(dbuffer, node);
             continue;
         }
@@ -299,7 +302,7 @@ void GEVulkanDrawCall::addBillboardNode(irr::scene::ISceneNode* node,
 }   // addBillboardNode
 
 // ----------------------------------------------------------------------------
-void GEVulkanDrawCall::generate(GEVulkanDriver* vk, GEVulkanCameraSceneNode* cam)
+void GEVulkanDrawCall::generate(GEVulkanDriver* vk)
 {
     if (!m_visible_nodes.empty() && m_data_layout == VK_NULL_HANDLE)
         createVulkanData();
@@ -358,6 +361,8 @@ start:
     memcpy(mapped_addr, identity.pointer(), sizeof(irr::core::matrix4));
     size_t written_size = sizeof(irr::core::matrix4);
     mapped_addr += sizeof(irr::core::matrix4);
+
+    btQuaternion billboard_rotation = MiniGLM::getBulletQuaternion(m_camera->getViewMatrix());
 
     for (GEVulkanAnimatedMeshSceneNode* node : m_skinning_nodes)
     {
@@ -434,7 +439,7 @@ start:
     }
     m_dynamic_spm_padded_size = written_size - skinning_data_padded_size;
 
-    auto &pipeline_map = m_draw_call_pipeline_flag & GVDCPF_COLOR ? 
+    auto &pipeline_map = m_draw_call_type == GVDCT_FORWARD ? 
         m_graphics_pipelines : m_depth_only_pipelines;
     for (auto &it : pipeline_map)
     {
@@ -552,7 +557,7 @@ start:
                         ObjectData* obj = (ObjectData*)mapped_addr;
                         obj->init(
                             static_cast<irr::scene::IBillboardSceneNode*>(
-                            node), material_id, m_billboard_rotation);
+                            node), material_id, billboard_rotation);
                         written_size += sizeof(ObjectData);
                         mapped_addr += sizeof(ObjectData);
                     }
@@ -583,7 +588,7 @@ start:
                         for (unsigned i = 0; i < ps; i++)
                         {
                             obj[i].init(particles[i], material_id,
-                                m_billboard_rotation, m_view_position, flips,
+                                billboard_rotation, m_camera->getPosition(), flips,
                                 sky_particle, settings.m_backface_culling);
                             written_size += sizeof(ObjectData);
                             mapped_addr += sizeof(ObjectData);
@@ -837,13 +842,30 @@ std::string GEVulkanDrawCall::getShader(const irr::video::SMaterial& m)
 
 // ----------------------------------------------------------------------------
 void GEVulkanDrawCall::prepare(GEVulkanDriver* vk, GEVulkanCameraSceneNode* cam,
-                               GEVulkanDrawCallPipelineFlag type)
+                                                   GEVulkanShadowCameraSceneNode* shadow_cam)
 {
     reset();
-    m_culling_tool->init(cam);
-    m_view_position = cam->getPosition();
-    m_draw_call_pipeline_flag = type;
-    m_billboard_rotation = MiniGLM::getBulletQuaternion(cam->getViewMatrix());
+
+    switch (m_draw_call_type)
+    {
+    case GVDCT_FORWARD:
+        m_culling_tool->init(cam);
+        break;
+    case GVDCT_SHADOW_NEAR:
+        m_culling_tool->init(shadow_cam, GVSCC_NEAR);
+        break;
+    case GVDCT_SHADOW_MIDDLE:
+        m_culling_tool->init(shadow_cam, GVSCC_MIDDLE);
+        break;
+    case GVDCT_SHADOW_FAR:
+        m_culling_tool->init(shadow_cam, GVSCC_FAR);
+        break;
+    default:
+        break;
+    }
+
+    m_camera = cam;
+    m_shadow_camera = shadow_cam;
 }   // prepare
 
 // ----------------------------------------------------------------------------
@@ -922,39 +944,56 @@ void GEVulkanDrawCall::createAllPipelines(GEVulkanDriver* vk)
 void GEVulkanDrawCall::createPipeline(GEVulkanDriver* vk,
                                       const PipelineSettings& settings)
 {
-    bool creating_animated_pipeline_for_skinning = false;
-    bool creating_pipeline_for_depth_only = false;
-    if ((m_draw_call_pipeline_flag & GVDCPF_COLOR) == 0)
-    {
-        creating_pipeline_for_depth_only = true;
-    }
+    bool create_pipeline_for_depth = false;
+    bool create_pipeline_for_color = false;
+    VkRenderPass render_pass = vk->getRenderPass();
+    uint32_t render_subpass = 0;
+    VkBool32 depth_clamp = VK_FALSE;
 
-start:
-    if (creating_pipeline_for_depth_only
-     && settings.m_depth_only_fragment_shader.empty())
+    switch (m_draw_call_type)
     {
-        return;
-    }
-    std::string shader_name = settings.m_shader_name;
-    if (creating_animated_pipeline_for_skinning)
-    {
-        shader_name += "_skinning";
+    case GVDCT_FORWARD:
+        create_pipeline_for_depth = true;
+        create_pipeline_for_color = true;
+        render_pass = vk->getRTTTexture() ? vk->getRTTTexture()->getRTTRenderPass() : vk->getRenderPass();
+        render_subpass = 0;
+        depth_clamp = VK_FALSE;
+        break;
+    case GVDCT_SHADOW_NEAR:
+        create_pipeline_for_depth = true;
+        create_pipeline_for_color = false;
+        render_pass = vk->getRTTShadowMap()->getRTTRenderPass();
+        render_subpass = 0;
+        depth_clamp = VK_TRUE;
+        break;
+    case GVDCT_SHADOW_MIDDLE:
+        create_pipeline_for_depth = true;
+        create_pipeline_for_color = false;
+        render_pass = vk->getRTTShadowMap()->getRTTRenderPass();
+        render_subpass = 1;
+        depth_clamp = VK_TRUE;
+        break;
+    case GVDCT_SHADOW_FAR:
+        create_pipeline_for_depth = true;
+        create_pipeline_for_color = false;
+        render_pass = vk->getRTTShadowMap()->getRTTRenderPass();
+        render_subpass = 2;
+        depth_clamp = VK_TRUE;
+        break;
+    default:
+        break;
     }
 
     VkPipelineShaderStageCreateInfo vert_shader_stage_info = {};
     vert_shader_stage_info.sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
     vert_shader_stage_info.stage = VK_SHADER_STAGE_VERTEX_BIT;
-    vert_shader_stage_info.module = GEVulkanShaderManager::getShader(
-        creating_animated_pipeline_for_skinning ?
-        settings.m_skinning_vertex_shader : settings.m_vertex_shader);
+    vert_shader_stage_info.module = VK_NULL_HANDLE; // Filled before creating pipeline
     vert_shader_stage_info.pName = "main";
 
     VkPipelineShaderStageCreateInfo frag_shader_stage_info = {};
     frag_shader_stage_info.sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
     frag_shader_stage_info.stage = VK_SHADER_STAGE_FRAGMENT_BIT;
-    frag_shader_stage_info.module = GEVulkanShaderManager::getShader(
-        creating_pipeline_for_depth_only ?
-        settings.m_depth_only_fragment_shader : settings.m_fragment_shader);
+    frag_shader_stage_info.module = VK_NULL_HANDLE; // Filled before creating pipeline
     frag_shader_stage_info.pName = "main";
 
     std::array<VkPipelineShaderStageCreateInfo, 2> shader_stages =
@@ -1019,22 +1058,19 @@ start:
     input_assembly.topology = VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST;
     input_assembly.primitiveRestartEnable = VK_FALSE;
 
+    VkExtent2D dummy_extent = vk->getSwapChainExtent();
+
     VkViewport viewport = {};
     viewport.x = 0.0f;
     viewport.y = 0.0f;
-    viewport.width = m_draw_call_pass == GVDCP_SHADOW ? 2048.f : (float)vk->getSwapChainExtent().width;
-    viewport.height = m_draw_call_pass == GVDCP_SHADOW ? 2048.f : (float)vk->getSwapChainExtent().height;
+    viewport.width = dummy_extent.width;
+    viewport.height = dummy_extent.height;
     viewport.minDepth = 0.0f;
     viewport.maxDepth = 1.0f;
 
     VkRect2D scissor = {};
     scissor.offset = {0, 0};
-    scissor.extent = vk->getSwapChainExtent();
-
-    if (m_draw_call_pass == GVDCP_SHADOW)
-    {
-        scissor.extent.width = scissor.extent.height = 2048;
-    }
+    scissor.extent = dummy_extent;
 
     VkPipelineViewportStateCreateInfo viewport_state = {};
     viewport_state.sType = VK_STRUCTURE_TYPE_PIPELINE_VIEWPORT_STATE_CREATE_INFO;
@@ -1045,7 +1081,7 @@ start:
 
     VkPipelineRasterizationStateCreateInfo rasterizer = {};
     rasterizer.sType = VK_STRUCTURE_TYPE_PIPELINE_RASTERIZATION_STATE_CREATE_INFO;
-    rasterizer.depthClampEnable = VK_FALSE;
+    rasterizer.depthClampEnable = depth_clamp;
     rasterizer.rasterizerDiscardEnable = VK_FALSE;
     rasterizer.polygonMode = VK_POLYGON_MODE_FILL;
     rasterizer.lineWidth = 1.0f;
@@ -1059,15 +1095,11 @@ start:
     multisampling.sampleShadingEnable = VK_FALSE;
     multisampling.rasterizationSamples = VK_SAMPLE_COUNT_1_BIT;
 
-    bool has_depth_prepass = (m_draw_call_pipeline_flag & GVDCPF_COLOR)
-        && (m_draw_call_pipeline_flag & GVDCPF_DEPTH)
-        && !creating_pipeline_for_depth_only
-        && !settings.m_depth_only_fragment_shader.empty();
     VkPipelineDepthStencilStateCreateInfo depth_stencil = {};
     depth_stencil.sType = VK_STRUCTURE_TYPE_PIPELINE_DEPTH_STENCIL_STATE_CREATE_INFO;
     depth_stencil.depthTestEnable = settings.m_depth_test;
-    depth_stencil.depthWriteEnable = has_depth_prepass ? false : settings.m_depth_write;
-    depth_stencil.depthCompareOp = has_depth_prepass ? VK_COMPARE_OP_EQUAL : VK_COMPARE_OP_LESS;
+    depth_stencil.depthWriteEnable = settings.m_depth_write;
+    depth_stencil.depthCompareOp = VK_COMPARE_OP_LESS;
     depth_stencil.depthBoundsTestEnable = VK_FALSE;
     depth_stencil.stencilTestEnable = VK_FALSE;
 
@@ -1129,45 +1161,82 @@ start:
     pipeline_info.pColorBlendState = &color_blending;
     pipeline_info.pDynamicState = &dynamic_state_info;
     pipeline_info.layout = m_pipeline_layout;
-    pipeline_info.renderPass = m_draw_call_pass == GVDCP_SHADOW ? vk->getRTTShadowMap()->getRTTRenderPass():
-        vk->getRTTTexture() ? vk->getRTTTexture()->getRTTRenderPass() : vk->getRenderPass();
-    pipeline_info.subpass = 0;
+    pipeline_info.renderPass = render_pass;
+    pipeline_info.subpass = render_subpass;
     pipeline_info.basePipelineHandle = VK_NULL_HANDLE;
 
-    VkPipeline graphics_pipeline;
-    VkResult result = vkCreateGraphicsPipelines(vk->getDevice(),
-        VK_NULL_HANDLE, 1, &pipeline_info, NULL, &graphics_pipeline);
+    VkPipeline pipeline;
 
-    if (result != VK_SUCCESS)
+    if (create_pipeline_for_depth && settings.m_depth_write && !settings.m_depth_only_fragment_shader.empty())
     {
-        throw std::runtime_error("vkCreateGraphicsPipelines failed for " +
-            shader_name);
+        shader_stages[0].module = GEVulkanShaderManager::getShader(settings.m_vertex_shader);
+        shader_stages[1].module = GEVulkanShaderManager::getShader(settings.m_depth_only_fragment_shader);
+        
+        VkResult result = vkCreateGraphicsPipelines(vk->getDevice(), VK_NULL_HANDLE, 1, 
+            &pipeline_info, NULL, &pipeline);
+        
+        if (result != VK_SUCCESS)
+        {
+            throw std::runtime_error("vkCreateGraphicsPipelines failed for " +
+                settings.m_vertex_shader);
+        }
+
+        m_depth_only_pipelines[settings.m_shader_name] = std::make_pair(pipeline, settings);
+
+        if (!settings.m_skinning_vertex_shader.empty())
+        {
+            shader_stages[0].module = GEVulkanShaderManager::getShader(settings.m_skinning_vertex_shader);
+
+            VkResult result = vkCreateGraphicsPipelines(vk->getDevice(), VK_NULL_HANDLE, 1, 
+                &pipeline_info, NULL, &pipeline);
+            
+            if (result != VK_SUCCESS)
+            {
+                throw std::runtime_error("vkCreateGraphicsPipelines failed for " +
+                    settings.m_skinning_vertex_shader);
+            }
+
+            m_depth_only_pipelines[settings.m_shader_name + "_skinning"] = std::make_pair(pipeline, settings);
+        }
     }
-    if (creating_pipeline_for_depth_only)
+
+    if (create_pipeline_for_color)
     {
-        m_depth_only_pipelines[shader_name] = std::make_pair(
-        graphics_pipeline, settings);
-    }
-    else
-    {
-        m_graphics_pipelines[shader_name] = std::make_pair(
-        graphics_pipeline, settings);
-    }
-   
-    if (!creating_animated_pipeline_for_skinning
-     && !settings.m_skinning_vertex_shader.empty())
-    { // Skinning Pipeline
-        creating_animated_pipeline_for_skinning = true;
-        goto start;
-    }
-    
-    if (!creating_pipeline_for_depth_only
-     && (m_draw_call_pipeline_flag & GVDCPF_DEPTH))
-    { // Depth Pipeline
-        creating_pipeline_for_depth_only = true;
-        creating_animated_pipeline_for_skinning = false;
-        goto start;
-    }
+        shader_stages[0].module = GEVulkanShaderManager::getShader(settings.m_vertex_shader);
+        shader_stages[1].module = GEVulkanShaderManager::getShader(settings.m_fragment_shader);
+        if (create_pipeline_for_depth && settings.m_depth_write && !settings.m_depth_only_fragment_shader.empty()) // Depth prepass
+        {
+            depth_stencil.depthWriteEnable = VK_FALSE;
+            depth_stencil.depthCompareOp = VK_COMPARE_OP_EQUAL;
+        }
+
+        VkResult result = vkCreateGraphicsPipelines(vk->getDevice(), VK_NULL_HANDLE, 1, 
+            &pipeline_info, NULL, &pipeline);
+        
+        if (result != VK_SUCCESS)
+        {
+            throw std::runtime_error("vkCreateGraphicsPipelines failed for " +
+                settings.m_vertex_shader);
+        }
+
+        m_graphics_pipelines[settings.m_shader_name] = std::make_pair(pipeline, settings);
+
+        if (!settings.m_skinning_vertex_shader.empty())
+        {
+            shader_stages[0].module = GEVulkanShaderManager::getShader(settings.m_skinning_vertex_shader);
+
+            VkResult result = vkCreateGraphicsPipelines(vk->getDevice(), VK_NULL_HANDLE, 1, 
+                &pipeline_info, NULL, &pipeline);
+            
+            if (result != VK_SUCCESS)
+            {
+                throw std::runtime_error("vkCreateGraphicsPipelines failed for " +
+                    settings.m_skinning_vertex_shader);
+            }
+
+            m_graphics_pipelines[settings.m_shader_name + "_skinning"] = std::make_pair(pipeline, settings);
+        }
+    }    
 }   // createPipeline
 
 // ----------------------------------------------------------------------------
@@ -1346,7 +1415,7 @@ void GEVulkanDrawCall::createVulkanData()
         m_data_layout,
         *GEVulkanSkyBoxRenderer::getEnvMapDescriptorLayout()
     }};
-    if (m_draw_call_pass == GVDCP_FORWARD)
+    if (m_draw_call_type == GVDCT_FORWARD)
     {
         all_layouts.push_back(m_data_layout_pbr);
     }
@@ -1385,7 +1454,7 @@ void GEVulkanDrawCall::createVulkanData()
     // Use VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT | VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT
     // or a staging buffer when buffer is small
     m_dynamic_data = new GEVulkanDynamicBuffer(flags,
-        extra_size + sizeof(GEVulkanCameraUBO) + sizeof(GEGlobalLightUBO),
+        extra_size + sizeof(GEVulkanCameraUBO) + sizeof(GEGlobalLightUBO) + sizeof(GEVulkanShadowUBO),
         GEVulkanDriver::getMaxFrameInFlight() + 1,
         GEVulkanDynamicBuffer::supportsHostTransfer() ? 0 :
         GEVulkanDriver::getMaxFrameInFlight() + 1);
@@ -1400,7 +1469,6 @@ void GEVulkanDrawCall::createVulkanData()
 
 // ----------------------------------------------------------------------------
 void GEVulkanDrawCall::uploadDynamicData(GEVulkanDriver* vk,
-                                         GEVulkanCameraSceneNode* cam,
                                          VkCommandBuffer custom_cmd)
 {
     if (!m_dynamic_data || m_cmds.empty())
@@ -1409,27 +1477,46 @@ void GEVulkanDrawCall::uploadDynamicData(GEVulkanDriver* vk,
     VkCommandBuffer cmd =
         custom_cmd ? custom_cmd : vk->getCurrentCommandBuffer();
 
+    std::vector<std::pair<void*, size_t> > data_uploading;
+
+    switch (m_draw_call_type)
+    {
+    case GVDCT_FORWARD:
+        data_uploading.emplace_back((void*)m_camera->getUBOData(), sizeof(GEVulkanCameraUBO));
+        break;
+    case GVDCT_SHADOW_NEAR:
+        data_uploading.emplace_back((void*)m_shadow_camera->getCameraUBOData(GVSCC_NEAR), sizeof(GEVulkanCameraUBO));
+        break;
+    case GVDCT_SHADOW_MIDDLE:
+        data_uploading.emplace_back((void*)m_shadow_camera->getCameraUBOData(GVSCC_MIDDLE), sizeof(GEVulkanCameraUBO));
+        break;
+    case GVDCT_SHADOW_FAR:
+        data_uploading.emplace_back((void*)m_shadow_camera->getCameraUBOData(GVSCC_FAR), sizeof(GEVulkanCameraUBO));
+        break;
+    default:
+        break;
+    }
+
+    data_uploading.emplace_back((void*)vk->getGlobalLightUBO(m_camera->getUBOData()->m_inverse_view_matrix),
+        sizeof(GEGlobalLightUBO));
+
+    if (m_shadow_camera == nullptr)
+    {
+        GEVulkanShadowUBO tmp;
+        data_uploading.emplace_back((void*)&tmp, sizeof(GEVulkanShadowUBO));
+    }
+    else 
+    {
+        data_uploading.emplace_back((void*)m_shadow_camera->getShadowUBOData(), sizeof(GEVulkanShadowUBO));
+    }
     // https://github.com/google/filament/pull/3814
     // Need both vertex and fragment bit
     VkPipelineStageFlags dst_stage = VK_PIPELINE_STAGE_VERTEX_SHADER_BIT |
         VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT;
 
-    std::vector<std::pair<void*, size_t> > data_uploading;
-    if (m_draw_call_pass == GVDCP_SHADOW)
-    {
-        data_uploading.emplace_back((void*)cam->getShadowUBOData(),
-            sizeof(GEVulkanCameraUBO));
-    }
-    else
-    {
-        data_uploading.emplace_back((void*)cam->getUBOData(),
-            sizeof(GEVulkanCameraUBO));
-    }
-    data_uploading.emplace_back((void*)vk->getGlobalLightUBO(cam->getUBOData()->m_inverse_view_matrix),
-        sizeof(GEGlobalLightUBO));
-
     const bool use_multidraw =
         GEVulkanFeatures::supportsBindMeshTexturesAtOnce();
+
     if (use_multidraw)
     {
         for (auto& cmd : m_cmds)
@@ -1486,8 +1573,7 @@ void GEVulkanDrawCall::bindBaseVertex(GEVulkanDriver* vk, VkCommandBuffer cmd)
 }   // bindBaseVertex
 
 // ----------------------------------------------------------------------------
-void GEVulkanDrawCall::render(GEVulkanDriver* vk, GEVulkanCameraSceneNode* cam,
-                              VkCommandBuffer custom_cmd)
+void GEVulkanDrawCall::render(GEVulkanDriver* vk, VkCommandBuffer custom_cmd)
 {
     if (m_data_layout == VK_NULL_HANDLE || m_cmds.empty())
         return;
@@ -1502,17 +1588,37 @@ void GEVulkanDrawCall::render(GEVulkanDriver* vk, GEVulkanCameraSceneNode* cam,
     updateDataDescriptorSets(vk);
     m_texture_descriptor->updateDescriptor();
 
-    VkViewport vp;
     float scale = getGEConfig()->m_render_scale;
     if (vk->getSeparateRTTTexture())
         scale = 1.0f;
-    vp.x = m_draw_call_pass==GVDCP_SHADOW ? 0 : cam->getViewPort().UpperLeftCorner.X * scale;
-    vp.y = m_draw_call_pass==GVDCP_SHADOW ? 0 :  cam->getViewPort().UpperLeftCorner.Y * scale;
-    vp.width = m_draw_call_pass==GVDCP_SHADOW ? 2048 :  cam->getViewPort().getWidth() * scale;
-    vp.height = m_draw_call_pass==GVDCP_SHADOW ? 2048 :  cam->getViewPort().getHeight() * scale;
-    vp.minDepth = 0;
-    vp.maxDepth = 1.0f;
-    vk->getRotatedViewport(&vp, true/*handle_rtt*/);
+
+    VkViewport vp = {};
+
+    switch (m_draw_call_type)
+    {
+    case GVDCT_FORWARD:
+        vp.x = m_camera->getViewPort().UpperLeftCorner.X * scale;
+        vp.y = m_camera->getViewPort().UpperLeftCorner.Y * scale;
+        vp.width = m_camera->getViewPort().getWidth() * scale;
+        vp.height = m_camera->getViewPort().getHeight() * scale;
+        vp.minDepth = 0;
+        vp.maxDepth = 1.0f;
+        vk->getRotatedViewport(&vp, true/*handle_rtt*/);
+        break;
+    case GVDCT_SHADOW_NEAR:
+    case GVDCT_SHADOW_MIDDLE:
+    case GVDCT_SHADOW_FAR:
+        vp.x = m_shadow_camera->getViewPort().UpperLeftCorner.X;
+        vp.y = m_shadow_camera->getViewPort().UpperLeftCorner.Y;
+        vp.width = m_shadow_camera->getViewPort().getWidth();
+        vp.height = m_shadow_camera->getViewPort().getHeight();
+        vp.minDepth = 0;
+        vp.maxDepth = 1.0f;
+        break;
+    default:
+        break;
+    }
+
     vkCmdSetViewport(cmd, 0, 1, &vp);
 
     VkRect2D scissor;
@@ -1544,16 +1650,16 @@ void GEVulkanDrawCall::render(GEVulkanDriver* vk, GEVulkanCameraSceneNode* cam,
     vkCmdBindDescriptorSets(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS,
         m_pipeline_layout, 2, 1, GEVulkanSkyBoxRenderer::getEnvMapDescriptor(),
         0, NULL);
-    if (m_draw_call_pass == GVDCP_FORWARD)
+    if (m_draw_call_type == GVDCT_FORWARD)
     {
         vkCmdBindDescriptorSets(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS,
             m_pipeline_layout, 3, 1, &m_data_descriptor_set_pbr,
             0, NULL);
     }
-    bool is_depth_only = (m_draw_call_pipeline_flag & GVDCPF_DEPTH) ? true : false;
+    bool is_depth_only = true;
 
 start:
-    if (!is_depth_only && !(m_draw_call_pipeline_flag & GVDCPF_COLOR))
+    if (!is_depth_only && m_draw_call_type != GVDCT_FORWARD)
     {
         return;
     }
@@ -1563,7 +1669,7 @@ start:
             m_pipeline_layout, 0, 1, m_texture_descriptor->getDescriptorSet(),
             0, NULL);
         
-        size_t indirect_offset = sizeof(GEVulkanCameraUBO) + sizeof(GEGlobalLightUBO);
+        size_t indirect_offset = sizeof(GEVulkanCameraUBO) + sizeof(GEGlobalLightUBO) + sizeof(GEVulkanShadowUBO);
         const size_t indirect_size = sizeof(VkDrawIndexedIndirectCommand);
         unsigned draw_count = 0;
         VkBuffer indirect_buffer =
@@ -1616,7 +1722,7 @@ start:
                 if (m_cmds[i].m_transparent && !drawn_skybox && !is_depth_only)
                 {
                     drawn_skybox = true;
-                    GEVulkanSkyBoxRenderer::render(cmd, cam);
+                    GEVulkanSkyBoxRenderer::render(cmd, m_camera);
 
                     vkCmdBindDescriptorSets(cmd,
                         VK_PIPELINE_BIND_POINT_GRAPHICS, m_pipeline_layout, 0,
@@ -1708,7 +1814,7 @@ start:
             if (m_cmds[i].m_transparent && !drawn_skybox && !is_depth_only)
             {
                 drawn_skybox = true;
-                GEVulkanSkyBoxRenderer::render(cmd, cam);
+                GEVulkanSkyBoxRenderer::render(cmd, m_camera);
 
                 vkCmdBindDescriptorSets(cmd,
                     VK_PIPELINE_BIND_POINT_GRAPHICS, m_pipeline_layout, 0, 1,
@@ -1794,7 +1900,7 @@ start:
         }
     }
     if (!drawn_skybox && !is_depth_only)
-        GEVulkanSkyBoxRenderer::render(cmd, cam);
+        GEVulkanSkyBoxRenderer::render(cmd, m_camera);
     for (auto& p : m_dynamic_spm_buffers)
     {
         if (!bindPipeline(cmd, getShaderFromKey(p.first), is_depth_only))
@@ -1902,7 +2008,7 @@ void GEVulkanDrawCall::updateDataDescriptorSets(GEVulkanDriver* vk)
             m_dynamic_data->getHostBuffer()[i] :
             m_dynamic_data->getLocalBuffer()[i];
         ubo_info.offset = 0;
-        ubo_info.range = sizeof(GEVulkanCameraUBO) + sizeof(GEGlobalLightUBO);
+        ubo_info.range = sizeof(GEVulkanCameraUBO) + sizeof(GEGlobalLightUBO) + sizeof(GEVulkanShadowUBO);
 
         std::vector<VkWriteDescriptorSet> data_set;
         data_set.resize(3, {});
@@ -1964,7 +2070,7 @@ void GEVulkanDrawCall::updateDataDescriptorSets(GEVulkanDriver* vk)
             data_set.data(), 0, NULL);
     }
     
-    if (m_draw_call_pass == GVDCP_FORWARD)
+    if (m_draw_call_type == GVDCT_FORWARD)
     {
         VkDescriptorImageInfo info;
         info.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;

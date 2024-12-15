@@ -19,8 +19,11 @@ class MaskedOcclusionCulling;
 
 namespace GE
 {
+enum GEVulkanShadowCameraCascade : unsigned;
+
 class GESPMBuffer;
 class GEVulkanCameraSceneNode;
+class GEVulkanShadowCameraSceneNode;
 class GECullingTool
 
 {
@@ -45,6 +48,8 @@ public:
     ~GECullingTool();
     // ------------------------------------------------------------------------
     void init(GEVulkanCameraSceneNode* cam, bool occlusion = false);
+    // ------------------------------------------------------------------------
+    void init(GEVulkanShadowCameraSceneNode* cam, GEVulkanShadowCameraCascade cascade);
     // ------------------------------------------------------------------------
     void addOccluder(GESPMBuffer* buffer, irr::scene::ISceneNode* node);
     // ------------------------------------------------------------------------

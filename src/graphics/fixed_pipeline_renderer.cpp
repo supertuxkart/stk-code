@@ -93,6 +93,7 @@ void FixedPipelineRenderer::render(float dt, bool is_loading)
         Camera *camera = Camera::getCamera(i);
         irr_driver->getSceneManager()->setActiveCamera(
             camera->getCameraSceneNode());
+        
         std::ostringstream oss;
         oss << "renderPlayerView() for kart " << i;
 

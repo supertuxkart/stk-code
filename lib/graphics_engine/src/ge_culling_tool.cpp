@@ -3,6 +3,7 @@
 #include "ge_main.hpp"
 #include "ge_spm_buffer.hpp"
 #include "ge_vulkan_camera_scene_node.hpp"
+#include "ge_vulkan_shadow_camera_scene_node.hpp"
 
 #include "occlusion/CullingThreadpool.h"
 
@@ -33,9 +34,9 @@ GECullingTool::~GECullingTool()
 // ----------------------------------------------------------------------------
 void GECullingTool::init(GEVulkanCameraSceneNode* cam, bool occlusion)
 {
-    mathPlaneFrustumf(&m_frustum[0].X, cam->getPVM());
+    mathPlaneFrustumf(&m_frustum[0].X, cam->getProjectionViewMatrix());
     m_cam_bbox = cam->getViewFrustum()->getBoundingBox();
-    m_pvm_matrix = cam->getPVM();
+    m_pvm_matrix = cam->getProjectionViewMatrix();
     m_cam_position = cam->getPosition();
 
     if (occlusion)
@@ -55,6 +56,22 @@ void GECullingTool::init(GEVulkanCameraSceneNode* cam, bool occlusion)
         m_occlusion = NULL;
         m_occlusion_manager = NULL;
     }
+}   // init
+
+// ----------------------------------------------------------------------------
+void GECullingTool::init(GEVulkanShadowCameraSceneNode* cam, GEVulkanShadowCameraCascade cascade)
+{
+    mathPlaneFrustumf(&m_frustum[0].X, cam->getProjectionViewMatrix(cascade));
+
+    // Replace near
+    irr::core::vector3df dir = cam->getPosition();
+    m_frustum[0] = irr::core::quaternion(dir.X, dir.Y, dir.Z, dir.getLengthSQ());
+
+    m_cam_bbox = cam->getBoundingBox();
+    m_pvm_matrix = cam->getProjectionViewMatrix(cascade);
+    m_cam_position = cam->getPosition();
+    m_occlusion = NULL;
+    m_occlusion_manager = NULL;
 }   // init
 
 // ----------------------------------------------------------------------------

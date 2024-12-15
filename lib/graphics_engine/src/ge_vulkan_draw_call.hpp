@@ -31,6 +31,11 @@ namespace irr
 
 namespace GE
 {
+enum GEVulkanShadowCameraCascade : unsigned;
+
+class GEVulkanCameraUBO;
+class GEVulkanShadowUBO;
+
 class GECullingTool;
 class GESPMBuffer;
 class GEVulkanAnimatedMeshSceneNode;
@@ -38,19 +43,16 @@ class GEVulkanCameraSceneNode;
 class GEVulkanDriver;
 class GEVulkanDynamicBuffer;
 class GEVulkanDynamicSPMBuffer;
+class GEVulkanShadowCameraSceneNode;
 class GEVulkanTextureDescriptor;
 
-enum GEVulkanDrawCallPass : uint8_t
+enum GEVulkanDrawCallType : unsigned
 {
-    GVDCP_SHADOW,
-    GVDCP_FORWARD,
-    GVDCP_COUNT
-};
-
-enum GEVulkanDrawCallPipelineFlag : uint8_t
-{
-    GVDCPF_COLOR = 1,
-    GVDCPF_DEPTH = 2
+    GVDCT_FORWARD,
+    GVDCT_SHADOW_NEAR,
+    GVDCT_SHADOW_MIDDLE,
+    GVDCT_SHADOW_FAR,
+    GVDCT_COUNT
 };
 
 struct ObjectData
@@ -119,15 +121,15 @@ private:
 
     const int PARTICLE_NODE = -2;
 
-    const GEVulkanDrawCallPass m_draw_call_pass;
+    const GEVulkanDrawCallType m_draw_call_type;
+
+    GEVulkanCameraSceneNode *m_camera;
+
+    GEVulkanShadowCameraSceneNode *m_shadow_camera;
+
+    GECullingTool* m_culling_tool;
 
     std::map<TexturesList, GESPMBuffer*> m_billboard_buffers;
-
-    irr::core::vector3df m_view_position;
-    
-    GEVulkanDrawCallPipelineFlag m_draw_call_pipeline_flag;
-
-    btQuaternion m_billboard_rotation;
 
     std::unordered_map<GESPMBuffer*, std::unordered_map<std::string,
         std::vector<std::pair<irr::scene::ISceneNode*, int> > > >
@@ -138,8 +140,6 @@ private:
     std::map<std::string, std::vector<
         std::pair<GEVulkanDynamicSPMBuffer*, irr::scene::ISceneNode*> > >
         m_dynamic_spm_buffers;
-
-    GECullingTool* m_culling_tool;
 
     std::vector<DrawCallData> m_cmds;
 
@@ -256,7 +256,7 @@ private:
                                                       { return key.substr(2); }
 public:
     // ------------------------------------------------------------------------
-    GEVulkanDrawCall(GEVulkanDrawCallPass pass);
+    GEVulkanDrawCall(GEVulkanDrawCallType type);
     // ------------------------------------------------------------------------
     ~GEVulkanDrawCall();
     // ------------------------------------------------------------------------
@@ -266,15 +266,15 @@ public:
                           irr::scene::ESCENE_NODE_TYPE node_type);
     // ------------------------------------------------------------------------
     void prepare(GEVulkanDriver* vk, GEVulkanCameraSceneNode* cam,
-                 GEVulkanDrawCallPipelineFlag type);
+                                     GEVulkanShadowCameraSceneNode* shadow_cam = nullptr);
     // ------------------------------------------------------------------------
-    void generate(GEVulkanDriver* vk, GEVulkanCameraSceneNode* cam);
+    void generate(GEVulkanDriver* vk);
     // ------------------------------------------------------------------------
-    void uploadDynamicData(GEVulkanDriver* vk, GEVulkanCameraSceneNode* cam,
-                           VkCommandBuffer custom_cmd = VK_NULL_HANDLE);
+    void uploadDynamicData(GEVulkanDriver* vk, VkCommandBuffer custom_cmd = VK_NULL_HANDLE);
     // ------------------------------------------------------------------------
-    void render(GEVulkanDriver* vk, GEVulkanCameraSceneNode* cam,
-                VkCommandBuffer custom_cmd = VK_NULL_HANDLE);
+    void render(GEVulkanDriver* vk, VkCommandBuffer custom_cmd = VK_NULL_HANDLE);
+    // ------------------------------------------------------------------------
+    GEVulkanDrawCallType getType() const { return m_draw_call_type; }
     // ------------------------------------------------------------------------
     unsigned getPolyCount() const
     {
@@ -283,8 +283,6 @@ public:
             result += (cmd.m_cmd.indexCount / 3) * cmd.m_cmd.instanceCount;
         return result;
     }
-    // ------------------------------------------------------------------------
-    const GEVulkanDrawCallPass getPass() const { return m_draw_call_pass; }
     // ------------------------------------------------------------------------
     void reset()
     {
@@ -296,6 +294,8 @@ public:
         m_skinning_nodes.clear();
         m_materials_data.clear();
         m_dynamic_spm_buffers.clear();
+        m_camera = nullptr;
+        m_shadow_camera = nullptr;
     }
 };   // GEVulkanDrawCall
 

@@ -1,6 +1,6 @@
 layout(set = 2, binding = 0) uniform samplerCube u_diffuse_environment_map;
 layout(set = 2, binding = 1) uniform samplerCube u_specular_environment_map;
-layout(set = 3, binding = 0) uniform sampler2DShadow u_shadow_map;
+layout(set = 3, binding = 0) uniform sampler2DArrayShadow u_shadow_map;
 
 vec2 F_AB(float perceptual_roughness, float NdotV) 
 {
@@ -145,6 +145,102 @@ vec3 environmentLight(
     vec3 diffuse = (FmsEms + kD) * irradiance;
     vec3 specular = FssEss * radiance;
     return diffuse + specular;
+}
+
+float getShadowPCF(vec2 shadowtexcoord, float layer, float d)
+{
+    float shadow_res = 1024.;
+    vec2 uv = shadowtexcoord * shadow_res;
+    vec2 base_uv = floor(uv + 0.5);
+    float s = (uv.x + 0.5 - base_uv.x);
+    float t = (uv.y + 0.5 - base_uv.y);
+    base_uv -= 0.5;
+    base_uv /= shadow_res;
+
+    float uw0 = (4.0 - 3.0 * s);
+    float uw1 = 7.0;
+    float uw2 = (1.0 + 3.0 * s);
+
+    float u0 = (3.0 - 2.0 * s) / uw0 - 2.0;
+    float u1 = (3.0 + s) / uw1;
+    float u2 = s / uw2 + 2.0;
+
+    float vw0 = (4.0 - 3.0 * t);
+    float vw1 = 7.0;
+    float vw2 = (1.0 + 3.0 * t);
+
+    float v0 = (3.0 - 2.0 * t) / vw0 - 2.0;
+    float v1 = (3.0 + t) / vw1;
+    float v2 = t / vw2 + 2.0;
+
+    float sum = 0.0;
+
+    sum += uw0 * vw0 * texture(u_shadow_map, vec4(base_uv + (vec2(u0, v0) / shadow_res), layer, d));
+    sum += uw1 * vw0 * texture(u_shadow_map, vec4(base_uv + (vec2(u1, v0) / shadow_res), layer, d));
+    sum += uw2 * vw0 * texture(u_shadow_map, vec4(base_uv + (vec2(u2, v0) / shadow_res), layer, d));
+
+    sum += uw0 * vw1 * texture(u_shadow_map, vec4(base_uv + (vec2(u0, v1) / shadow_res), layer, d));
+    sum += uw1 * vw1 * texture(u_shadow_map, vec4(base_uv + (vec2(u1, v1) / shadow_res), layer, d));
+    sum += uw2 * vw1 * texture(u_shadow_map, vec4(base_uv + (vec2(u2, v1) / shadow_res), layer, d));
+
+    sum += uw0 * vw2 * texture(u_shadow_map, vec4(base_uv + (vec2(u0, v2) / shadow_res), layer, d));
+    sum += uw1 * vw2 * texture(u_shadow_map, vec4(base_uv + (vec2(u1, v2) / shadow_res), layer, d));
+    sum += uw2 * vw2 * texture(u_shadow_map, vec4(base_uv + (vec2(u2, v2) / shadow_res), layer, d));
+
+    return sum / 144.0;
+}
+
+float getShadowFactor(vec3 world_position, vec3 xpos, vec3 normal, vec3 lightdir)
+{
+    float bias = max(1.0 - dot(normal, -lightdir), 0.2) / 1024.;
+    float shadow = 1.0;
+    
+    if (xpos.z < 11.0)
+    {
+        vec4 light_view_position = u_camera.m_shadow_matrix_near * vec4(world_position.xyz, 1.0);
+        light_view_position.xyz /= light_view_position.w;
+        light_view_position.xy = light_view_position.xy * 0.5 + 0.5;
+        light_view_position.z -= bias;
+        shadow = getShadowPCF(light_view_position.xy, 0.0, light_view_position.z);
+        if (xpos.z > 10.0)
+        {
+            light_view_position = u_camera.m_shadow_matrix_middle * vec4(world_position.xyz, 1.0);
+            light_view_position.xyz /= light_view_position.w;
+            light_view_position.xy = light_view_position.xy * 0.5 + 0.5;
+            light_view_position.z -= bias;
+            float factor = smoothstep(10.0, 11.0, xpos.z);
+            shadow = mix(shadow, getShadowPCF(light_view_position.xy, 1.0, light_view_position.z), factor);
+        }
+    }
+    else if (xpos.z < 40.0)
+    {   
+        vec4 light_view_position = u_camera.m_shadow_matrix_middle * vec4(world_position.xyz, 1.0);
+        light_view_position.xyz /= light_view_position.w;
+        light_view_position.xy = light_view_position.xy * 0.5 + 0.5;
+        light_view_position.z -= bias;
+        shadow = getShadowPCF(light_view_position.xy, 1.0, light_view_position.z);
+        if (xpos.z > 35.0)
+        {
+            light_view_position = u_camera.m_shadow_matrix_far * vec4(world_position.xyz, 1.0);
+            light_view_position.xyz /= light_view_position.w;
+            light_view_position.xy = light_view_position.xy * 0.5 + 0.5;
+            light_view_position.z -= bias;
+            float factor = smoothstep(35.0, 40.0, xpos.z);
+            shadow = mix(shadow, getShadowPCF(light_view_position.xy, 2.0, light_view_position.z), factor);
+        }
+    }
+    else if (xpos.z < 150.0)
+    {
+        vec4 light_view_position = u_camera.m_shadow_matrix_far * vec4(world_position.xyz, 1.0);
+        light_view_position.xyz /= light_view_position.w;
+        light_view_position.xy = light_view_position.xy * 0.5 + 0.5;
+        light_view_position.z -= bias;
+        shadow = getShadowPCF(light_view_position.xy, 2.0, light_view_position.z);
+        float factor = smoothstep(130.0, 150.0, xpos.z);
+        shadow = (1.0 - factor) * shadow + factor * 1.0;
+    }
+    else shadow = 1.0;
+    return shadow;
 }
 
 vec3 PBRSunAmbientEmitLight(

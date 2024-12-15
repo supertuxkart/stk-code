@@ -25,6 +25,8 @@ using namespace video;
 
 namespace GE
 {
+    enum GEVulkanDrawCallType : unsigned;
+
     class GESPM;
     class GEVulkanDepthTexture;
     class GEVulkanDrawCall;
@@ -388,7 +390,7 @@ namespace GE
         SDL_Window* getSDLWindow() const                    { return m_window; }
         void clearDrawCallsCache();
         void addDrawCallToCache(std::unique_ptr<GEVulkanDrawCall>& dc);
-        std::unique_ptr<GEVulkanDrawCall> getDrawCallFromCache(uint8_t pass);
+        std::unique_ptr<GEVulkanDrawCall> getDrawCallFromCache(GEVulkanDrawCallType type);
         GESPM* getBillboardQuad() const             { return m_billboard_quad; }
         int getCurrentBufferIdx() const         { return m_current_buffer_idx; }
         void addDynamicSPMBuffer(GEVulkanDynamicSPMBuffer* buffer)
@@ -541,7 +543,7 @@ namespace GE
         GEVulkanFBOTexture* m_separate_rtt_texture;
         u32 m_rtt_polycount;
 
-        std::vector<std::vector<std::unique_ptr<GEVulkanDrawCall> > > m_draw_calls_cache;
+        std::vector<std::unique_ptr<GEVulkanDrawCall> > m_draw_calls_cache;
         GESPM* m_billboard_quad;
         int m_current_buffer_idx;
         std::set<GEVulkanDynamicSPMBuffer*> m_dynamic_spm_buffers;

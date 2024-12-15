@@ -47,11 +47,7 @@ void main()
                                 u_camera.m_sun_angle_tan_half);
 
     vec4 world_position = u_camera.m_inverse_view_matrix * vec4(xpos.xyz, 1.0);
-    vec4 light_view_position = u_camera.m_light_view_matrix * vec4(world_position.xyz, 1.0);
-    light_view_position.xyz /= light_view_position.w;
-    light_view_position.xy = light_view_position.xy * 0.5 + 0.5;
-    float bias = max(1.0 - dot(normal, -lightdir), 0.2) / 2048.;
-    float shadow = xpos.z > 150.0 ? 1.0 : texture(u_shadow_map, light_view_position.xyz - vec3(0., 0., bias));
+    float shadow = getShadowFactor(world_position.xyz, xpos, normal, lightdir);
 
     vec3 mixed_color = PBRSunAmbientEmitLight(
         normal, eyedir, lightdir, shadow,

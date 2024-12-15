@@ -18,6 +18,7 @@
 #include "ge_vulkan_mesh_cache.hpp"
 #include "ge_vulkan_scene_manager.hpp"
 #include "ge_vulkan_shader_manager.hpp"
+#include "ge_vulkan_shadow_camera_scene_node.hpp"
 #include "ge_vulkan_skybox_renderer.hpp"
 #include "ge_vulkan_texture_descriptor.hpp"
 
@@ -533,8 +534,6 @@ GEVulkanDriver::GEVulkanDriver(const SIrrlichtCreationParameters& params,
     g_schedule_pausing_rendering.store(false);
     g_paused_rendering.store(false);
     g_device_created.store(true);
-
-    m_draw_calls_cache.resize(GVDCP_COUNT);
 
 #if defined(__APPLE__)
     MVKConfiguration cfg = {};
@@ -1442,8 +1441,7 @@ found_mode:
             core::dimension2du(m_swap_chain_extent.width,
             m_swap_chain_extent.height));
     }
-    m_rtt_shadowmap = new GEVulkanFBOShadowMap(this,
-        core::dimension2du(2048, 2048));
+    m_rtt_shadowmap = new GEVulkanFBOShadowMap(this);
     m_rtt_shadowmap->createRTT();
 }   // createSwapChain
 
@@ -1564,15 +1562,9 @@ void GEVulkanDriver::createSamplers()
     m_vk->samplers[GVS_SKYBOX] = sampler;
 
     // GVS_SHADOWMAP
-    sampler_info.anisotropyEnable = false;
-    sampler_info.magFilter = VK_FILTER_LINEAR;
-    sampler_info.minFilter = VK_FILTER_LINEAR;
     sampler_info.mipmapMode = VK_SAMPLER_MIPMAP_MODE_NEAREST;
     sampler_info.compareEnable = VK_TRUE;
     sampler_info.compareOp = VK_COMPARE_OP_LESS;
-    sampler_info.addressModeU = VK_SAMPLER_ADDRESS_MODE_CLAMP_TO_EDGE;
-    sampler_info.addressModeV = VK_SAMPLER_ADDRESS_MODE_CLAMP_TO_EDGE;
-    sampler_info.addressModeW = VK_SAMPLER_ADDRESS_MODE_CLAMP_TO_EDGE;
     sampler_info.borderColor = VK_BORDER_COLOR_INT_OPAQUE_WHITE;
     result = vkCreateSampler(m_vk->device, &sampler_info, NULL,
         &sampler);
@@ -2601,34 +2593,42 @@ void GEVulkanDriver::buildCommandBuffers()
 
     if (m_rtt_shadowmap)
     {
-
-        VkClearValue shadow_clear;
-        shadow_clear.depthStencil = {1.0f, 0};
+        std::array<VkClearValue, GVSCC_COUNT> shadow_clear = {};
+        for (int i = 0; i < shadow_clear.size(); i++)
+        {
+            shadow_clear[i].depthStencil = {1.0f, 0};
+        }
 
         VkRenderPassBeginInfo shadow_pass_info = {};
         shadow_pass_info.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
-        shadow_pass_info.clearValueCount = 1;
-        shadow_pass_info.pClearValues = &shadow_clear;
+        shadow_pass_info.clearValueCount = shadow_clear.size();
+        shadow_pass_info.pClearValues = shadow_clear.data();
         shadow_pass_info.renderArea.offset = {0, 0};
         shadow_pass_info.renderPass = m_rtt_shadowmap->getRTTRenderPass();
         shadow_pass_info.framebuffer = m_rtt_shadowmap->getRTTFramebuffer();
         shadow_pass_info.renderArea.extent = { m_rtt_shadowmap->getSize().Width,
-                                            m_rtt_shadowmap->getSize().Height };
+                                               m_rtt_shadowmap->getSize().Height };
 
         for (auto& p : static_cast<GEVulkanSceneManager*>(
-            m_irrlicht_device->getSceneManager())->getDrawCalls(GVDCP_SHADOW))
+            m_irrlicht_device->getSceneManager())->getShadowDrawCalls())
         {
-            p.second->uploadDynamicData(this, p.first);
+            for (int i = 0; i < p.second.size(); i++)
+                p.second[i]->uploadDynamicData(this);
         }
 
         vkCmdBeginRenderPass(getCurrentCommandBuffer(), &shadow_pass_info,
             VK_SUBPASS_CONTENTS_INLINE);
 
-        for (auto& p : static_cast<GEVulkanSceneManager*>(
-            m_irrlicht_device->getSceneManager())->getDrawCalls(GVDCP_SHADOW))
+        for (int i = 0; i < GVSCC_COUNT; i++)
         {
-            p.second->render(this, p.first);
-            PrimitivesDrawn += p.second->getPolyCount();
+            for (auto& p : static_cast<GEVulkanSceneManager*>(
+                m_irrlicht_device->getSceneManager())->getShadowDrawCalls())
+            {
+                p.second[i]->render(this);
+                PrimitivesDrawn += p.second[i]->getPolyCount();
+            }
+            if (i != GVSCC_COUNT - 1)
+                vkCmdNextSubpass(getCurrentCommandBuffer(), VK_SUBPASS_CONTENTS_INLINE);
         }
 
         vkCmdEndRenderPass(getCurrentCommandBuffer());
@@ -2666,18 +2666,18 @@ void GEVulkanDriver::buildCommandBuffers()
     GEVulkan2dRenderer::uploadTrisBuffers();
 
     for (auto& p : static_cast<GEVulkanSceneManager*>(
-        m_irrlicht_device->getSceneManager())->getDrawCalls(GVDCP_FORWARD))
+        m_irrlicht_device->getSceneManager())->getDrawCalls())
     {
-        p.second->uploadDynamicData(this, p.first);
+        p.second->uploadDynamicData(this);
     }
 
     vkCmdBeginRenderPass(getCurrentCommandBuffer(), &render_pass_info,
         VK_SUBPASS_CONTENTS_INLINE);
 
     for (auto& p : static_cast<GEVulkanSceneManager*>(
-        m_irrlicht_device->getSceneManager())->getDrawCalls(GVDCP_FORWARD))
+        m_irrlicht_device->getSceneManager())->getDrawCalls())
     {
-        p.second->render(this, p.first);
+        p.second->render(this);
         PrimitivesDrawn += p.second->getPolyCount();
     }
 
@@ -2780,16 +2780,23 @@ void GEVulkanDriver::updateDriver(bool reload_shaders)
             GEVulkanFeatures::supportsBindMeshTexturesAtOnce());
     }
     createSwapChainRelated(false/*handle_surface*/);
-    for (int i = 0; i < GVDCP_COUNT; i++)
+
+    for (auto& dc : static_cast<GEVulkanSceneManager*>(
+        m_irrlicht_device->getSceneManager())->getDrawCalls())
     {
-        for (auto& dc : static_cast<GEVulkanSceneManager*>(
-            m_irrlicht_device->getSceneManager())->getDrawCalls(
-                (GEVulkanDrawCallPass)i))
-        {
-            dc.second = std::unique_ptr<GEVulkanDrawCall>(
-                new GEVulkanDrawCall((GEVulkanDrawCallPass)i));
-        }
+        dc.second = std::unique_ptr<GEVulkanDrawCall>(
+            new GEVulkanDrawCall(GVDCT_FORWARD));
     }
+
+    for (auto& dc : static_cast<GEVulkanSceneManager*>(
+        m_irrlicht_device->getSceneManager())->getShadowDrawCalls())
+    {
+        dc.second.clear();
+        dc.second.emplace_back(new GEVulkanDrawCall(GVDCT_SHADOW_NEAR));
+        dc.second.emplace_back(new GEVulkanDrawCall(GVDCT_SHADOW_MIDDLE));
+        dc.second.emplace_back(new GEVulkanDrawCall(GVDCT_SHADOW_FAR));
+    }
+    
     GEVulkanSkyBoxRenderer::destroy();
     GEVulkan2dRenderer::destroy();
     GEVulkan2dRenderer::init(this);
@@ -2799,10 +2806,7 @@ void GEVulkanDriver::updateDriver(bool reload_shaders)
 // ----------------------------------------------------------------------------
 void GEVulkanDriver::clearDrawCallsCache()
 {
-    for (int i = 0; i < GVDCP_COUNT; i++)
-    {
-        m_draw_calls_cache[i].clear();
-    }
+    m_draw_calls_cache.clear();
 }   // clearDrawCallsCache
 
 // ----------------------------------------------------------------------------
@@ -2810,20 +2814,26 @@ void GEVulkanDriver::addDrawCallToCache(std::unique_ptr<GEVulkanDrawCall>& dc)
 {
     if (getGEConfig()->m_enable_draw_call_cache)
     {
-        m_draw_calls_cache[dc->getPass()].push_back(std::move(dc));
+        m_draw_calls_cache.push_back(std::move(dc));
     }
 }   // addDrawCallToCache
 
 // ----------------------------------------------------------------------------
-std::unique_ptr<GEVulkanDrawCall> GEVulkanDriver::getDrawCallFromCache(uint8_t pass)
+std::unique_ptr<GEVulkanDrawCall> GEVulkanDriver::getDrawCallFromCache(GEVulkanDrawCallType type)
 {
-    if (!getGEConfig()->m_enable_draw_call_cache || m_draw_calls_cache[pass].empty())
+    if (getGEConfig()->m_enable_draw_call_cache)
     {
-        return std::unique_ptr<GEVulkanDrawCall>(new GEVulkanDrawCall((GEVulkanDrawCallPass)pass));
+        for (auto it = m_draw_calls_cache.begin(); it != m_draw_calls_cache.end(); it++)
+        {
+            if ((*it)->getType() == type)
+            {
+                auto dc = std::move(*it);
+                m_draw_calls_cache.erase(it);
+                return dc;
+            }
+        }
     }
-    auto dc = std::move(m_draw_calls_cache[pass].back());
-    m_draw_calls_cache[pass].pop_back();
-    return dc;
+    return std::unique_ptr<GEVulkanDrawCall>(new GEVulkanDrawCall(type));
 }   // getDrawCallFromCache
 
 // ----------------------------------------------------------------------------

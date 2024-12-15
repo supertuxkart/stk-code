@@ -2409,6 +2409,8 @@ scene::ISceneNode *IrrDriver::addLight(const core::vector3df &pos,
                 ->addSunSceneNode(m_scene_manager->getRootSceneNode(),
                                 pos, video::SColorf(r, g, b, 0.5f),
                                 0.26 * 3.14159 / 180.);
+            static_cast<GE::GEVulkanSceneManager*>(m_scene_manager)
+                ->addShadowCameraSceneNode(m_scene_manager->getActiveCamera(), pos);
             return light;
         }
         else

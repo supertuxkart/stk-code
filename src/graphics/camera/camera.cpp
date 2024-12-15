@@ -44,6 +44,10 @@
 #include <algorithm>
 #include <cmath>
 
+#include <ge_main.hpp>
+#include <ge_vulkan_driver.hpp>
+#include <ge_vulkan_scene_manager.hpp>
+
 std::vector<Camera*> Camera::m_all_cameras;
 Camera*              Camera::s_active_camera = NULL;
 Camera::CameraType   Camera::m_default_type  = Camera::CM_TYPE_NORMAL;
@@ -127,6 +131,11 @@ Camera::Camera(CameraType type, int camera_index, AbstractKart* kart)
     m_index         = camera_index;
     m_original_kart = kart;
     m_camera        = irr_driver->addCameraSceneNode();
+    if (GE::getVKDriver())
+    {
+        GE::GEVulkanSceneManager *vsm = static_cast<GE::GEVulkanSceneManager*>(irr_driver->getSceneManager());
+        m_shadow_camera = vsm->addShadowCameraSceneNode(m_camera);
+    }
     m_previous_pv_matrix = core::matrix4();
 
     if (RaceManager::get()->getNumLocalPlayers() > 1)
@@ -324,6 +333,12 @@ void Camera::activate(bool alsoActivateInIrrlicht)
         irr::scene::ISceneManager *sm = irr_driver->getSceneManager();
         sm->setActiveCamera(m_camera);
         irr_driver->getVideoDriver()->setViewPort(m_viewport);
+
+        if (GE::getVKDriver())
+        {
+            GE::GEVulkanSceneManager *vsm = static_cast<GE::GEVulkanSceneManager*>(irr_driver->getSceneManager());
+            vsm->setActiveShadowCamera(m_shadow_camera);
+        }
     }
 }   // activate
 

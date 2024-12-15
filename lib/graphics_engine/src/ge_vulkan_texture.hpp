@@ -243,6 +243,8 @@ public:
     virtual const io::path& getFullPath() const         { return m_full_path; }
     // ------------------------------------------------------------------------
     VkFormat getInternalFormat() const            { return m_internal_format; }
+    // ------------------------------------------------------------------------
+    unsigned getLayerCount() const                    { return m_layer_count; }
 };   // GEVulkanTexture
 
 }
