@@ -17,6 +17,8 @@ GECullingTool::GECullingTool()
 {
     m_occlusion = NULL;
     m_occlusion_manager = NULL;
+
+    m_ignore_near_plane = false;
 }
 
 // ----------------------------------------------------------------------------
@@ -62,10 +64,7 @@ void GECullingTool::init(GEVulkanCameraSceneNode* cam, bool occlusion)
 void GECullingTool::init(GEVulkanShadowCameraSceneNode* cam, GEVulkanShadowCameraCascade cascade)
 {
     mathPlaneFrustumf(&m_frustum[0].X, cam->getProjectionViewMatrix(cascade));
-
-    // Replace near
-    irr::core::vector3df dir = cam->getPosition();
-    m_frustum[0] = irr::core::quaternion(dir.X, dir.Y, dir.Z, dir.getLengthSQ());
+    m_ignore_near_plane = true;
 
     m_cam_bbox = cam->getBoundingBox();
     m_pvm_matrix = cam->getProjectionViewMatrix(cascade);
@@ -235,7 +234,7 @@ bool GECullingTool::isViewCulled(irr::core::aabbox3df& bb)
         quaternion(bb.MaxEdge.X, bb.MaxEdge.Y, bb.MaxEdge.Z, 1.0f)
     };
 
-    for (int i = 0; i < 6; i++)
+    for (int i = m_ignore_near_plane ? 1 : 0; i < 6; i++)
     {
         bool culled = true;
         for (int j = 0; j < 8; j++)

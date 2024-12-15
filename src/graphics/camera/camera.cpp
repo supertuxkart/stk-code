@@ -161,6 +161,13 @@ Camera::Camera(CameraType type, int camera_index, AbstractKart* kart)
 Camera::~Camera()
 {
     irr_driver->removeCameraSceneNode(m_camera);
+    if (GE::getVKDriver())
+    {
+        GE::GEVulkanSceneManager *vsm = static_cast<GE::GEVulkanSceneManager*>(irr_driver->getSceneManager());
+        if (vsm->getActiveShadowCamera() == m_shadow_camera)
+            vsm->setActiveShadowCamera(NULL);
+        reinterpret_cast<irr::scene::ISceneNode*>(m_shadow_camera)->remove();
+    }
 
     if (s_active_camera == this)
         s_active_camera = NULL;

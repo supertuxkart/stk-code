@@ -192,7 +192,7 @@ float getShadowPCF(vec2 shadowtexcoord, float layer, float d)
 
 float getShadowFactor(vec3 world_position, vec3 xpos, vec3 normal, vec3 lightdir)
 {
-    float bias = max(1.0 - dot(normal, -lightdir), 0.2) / 1024.;
+    float bias = max(1.0 - dot(normal, -lightdir), 0.1) / 1024.;
     float shadow = 1.0;
     
     if (xpos.z < 11.0)

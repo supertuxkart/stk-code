@@ -29,6 +29,7 @@ class GECullingTool
 {
 private:
     irr::core::quaternion m_frustum[6];
+    bool m_ignore_near_plane; // For shadows
 
     irr::core::aabbox3df m_cam_bbox;
     irr::core::matrix4 m_pvm_matrix;
