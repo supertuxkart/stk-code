@@ -194,52 +194,37 @@ float getShadowFactor(vec3 world_position, vec3 xpos, vec3 normal, vec3 lightdir
 {
     float bias = max(1.0 - dot(normal, -lightdir), 0.1) / 1024.;
     float shadow = 1.0;
-    
-    if (xpos.z < 11.0)
+
+    if (xpos.z >= 150.0)
     {
-        vec4 light_view_position = u_camera.m_shadow_matrix_near * vec4(world_position.xyz, 1.0);
-        light_view_position.xyz /= light_view_position.w;
-        light_view_position.xy = light_view_position.xy * 0.5 + 0.5;
-        light_view_position.z -= bias;
-        shadow = getShadowPCF(light_view_position.xy, 0.0, light_view_position.z);
-        if (xpos.z > 10.0)
-        {
-            light_view_position = u_camera.m_shadow_matrix_middle * vec4(world_position.xyz, 1.0);
-            light_view_position.xyz /= light_view_position.w;
-            light_view_position.xy = light_view_position.xy * 0.5 + 0.5;
-            light_view_position.z -= bias;
-            float factor = smoothstep(10.0, 11.0, xpos.z);
-            shadow = mix(shadow, getShadowPCF(light_view_position.xy, 1.0, light_view_position.z), factor);
-        }
+        return shadow;
     }
-    else if (xpos.z < 40.0)
-    {   
-        vec4 light_view_position = u_camera.m_shadow_matrix_middle * vec4(world_position.xyz, 1.0);
-        light_view_position.xyz /= light_view_position.w;
-        light_view_position.xy = light_view_position.xy * 0.5 + 0.5;
-        light_view_position.z -= bias;
-        shadow = getShadowPCF(light_view_position.xy, 1.0, light_view_position.z);
-        if (xpos.z > 35.0)
-        {
-            light_view_position = u_camera.m_shadow_matrix_far * vec4(world_position.xyz, 1.0);
-            light_view_position.xyz /= light_view_position.w;
-            light_view_position.xy = light_view_position.xy * 0.5 + 0.5;
-            light_view_position.z -= bias;
-            float factor = smoothstep(35.0, 40.0, xpos.z);
-            shadow = mix(shadow, getShadowPCF(light_view_position.xy, 2.0, light_view_position.z), factor);
-        }
-    }
-    else if (xpos.z < 150.0)
+
+    float factor = smoothstep(10.0, 11.0, xpos.z) + smoothstep(35.0, 40.0, xpos.z);
+    float end_factor = smoothstep(130.0, 150.0, xpos.z);
+    int level = int(factor);
+
+    vec4 light_view_position = u_camera.m_shadow_matrix[level] * vec4(world_position.xyz, 1.0);
+    light_view_position.xyz /= light_view_position.w;
+    light_view_position.xy = light_view_position.xy * 0.5 + 0.5;
+    light_view_position.z -= bias;
+
+    shadow = getShadowPCF(light_view_position.xy, float(level), light_view_position.z);
+    shadow = mix(shadow, 1.0, end_factor);
+
+    if (factor == float(level))
     {
-        vec4 light_view_position = u_camera.m_shadow_matrix_far * vec4(world_position.xyz, 1.0);
-        light_view_position.xyz /= light_view_position.w;
-        light_view_position.xy = light_view_position.xy * 0.5 + 0.5;
-        light_view_position.z -= bias;
-        shadow = getShadowPCF(light_view_position.xy, 2.0, light_view_position.z);
-        float factor = smoothstep(130.0, 150.0, xpos.z);
-        shadow = (1.0 - factor) * shadow + factor * 1.0;
+        return shadow;
     }
-    else shadow = 1.0;
+
+    // Blend with next cascade by factor
+    light_view_position = u_camera.m_shadow_matrix[level + 1] * vec4(world_position.xyz, 1.0);
+    light_view_position.xyz /= light_view_position.w;
+    light_view_position.xy = light_view_position.xy * 0.5 + 0.5;
+    light_view_position.z -= bias;
+
+    shadow = mix(shadow, getShadowPCF(light_view_position.xy, float(level + 1), light_view_position.z), factor - float(level));
+
     return shadow;
 }
 

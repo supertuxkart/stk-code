@@ -14,8 +14,6 @@ layout(std140, set = 1, binding = 0) uniform CameraBuffer
     vec3  m_sun_direction; // Premultipled by transposed inverse view matrix
     float m_fog_density;
     vec4  m_fog_color;
-    mat4 m_shadow_matrix_near;
-    mat4 m_shadow_matrix_middle;
-    mat4 m_shadow_matrix_far;
+    mat4 m_shadow_matrix[3];
     vec4 m_warp_strength;
 } u_camera;

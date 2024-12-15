@@ -217,7 +217,7 @@ void GECullingTool::processOccluders()
 // ----------------------------------------------------------------------------
 bool GECullingTool::isViewCulled(irr::core::aabbox3df& bb)
 {
-    if (!m_cam_bbox.intersectsWithBox(bb))
+    if (!m_ignore_near_plane && !m_cam_bbox.intersectsWithBox(bb))
         return true;
 
     using namespace irr;
