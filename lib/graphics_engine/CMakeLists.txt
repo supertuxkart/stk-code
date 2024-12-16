@@ -69,7 +69,6 @@ set(GE_SOURCES
     src/ge_culling_tool.cpp
     src/ge_dx9_texture.cpp
     src/ge_main.cpp
-    src/ge_mesh_node_cache.cpp
     src/ge_texture.cpp
     src/ge_vma.cpp
     src/ge_vulkan_2d_renderer.cpp
