@@ -6,6 +6,7 @@
 #include "SMaterial.h"
 #include <memory>
 #include <map>
+#include <vector>
 
 namespace GE
 {
