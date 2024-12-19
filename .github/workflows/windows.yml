@@ -16,7 +16,7 @@ jobs:
         arch: [i686, x86_64, armv7, aarch64]
         os: [windows-latest, ubuntu-latest]
         exclude:
-          - arch: aarch64
+          - arch: armv7
             os: windows-latest
     runs-on: ${{ matrix.os }}
     steps:
