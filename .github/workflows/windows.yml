@@ -15,6 +15,9 @@ jobs:
       matrix:
         arch: [i686, x86_64, armv7, aarch64]
         os: [windows-latest, ubuntu-latest]
+        exclude:
+          - arch: aarch64
+            os: windows-latest
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v2
@@ -31,6 +34,8 @@ jobs:
             echo "cmake_arch=Win32" >> $GITHUB_ENV
           elif [ ${{ matrix.arch }} = "x86_64" ]; then
             echo "cmake_arch=x64" >> $GITHUB_ENV
+          elif [ ${{ matrix.arch }} = "armv7" ]; then
+            echo "cmake_arch=ARM" >> $GITHUB_ENV
           else
             echo "cmake_arch=ARM64" >> $GITHUB_ENV
           fi
