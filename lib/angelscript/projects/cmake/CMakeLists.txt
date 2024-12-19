@@ -191,7 +191,9 @@ endif()
 
 # Don't override the default library output path to avoid conflicts when building for multiple target platforms
 #set(LIBRARY_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/../../lib)
-target_link_libraries(${ANGELSCRIPT_LIBRARY_NAME} Threads::Threads)
+if(NOT EMSCRIPTEN)
+    target_link_libraries(${ANGELSCRIPT_LIBRARY_NAME} Threads::Threads)
+endif()
 
 set_target_properties(${ANGELSCRIPT_LIBRARY_NAME} PROPERTIES VERSION ${PROJECT_VERSION})
 
