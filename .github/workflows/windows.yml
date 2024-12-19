@@ -31,8 +31,6 @@ jobs:
             echo "cmake_arch=Win32" >> $GITHUB_ENV
           elif [ ${{ matrix.arch }} = "x86_64" ]; then
             echo "cmake_arch=x64" >> $GITHUB_ENV
-          elif [ ${{ matrix.arch }} = "armv7" ]; then
-            echo "cmake_arch=ARM" >> $GITHUB_ENV
           else
             echo "cmake_arch=ARM64" >> $GITHUB_ENV
           fi
@@ -118,17 +116,11 @@ jobs:
           echo "set(CMAKE_FIND_ROOT_PATH_MODE_INCLUDE ONLY)" >> toolchain.cmake
       # Manually specify CMAKE_SYSTEM_PROCESSOR, it can only be set together with -DDCMAKE_SYSTEM_NAME
       - name: Configure bulid for MSVC
-        if: ${{ matrix.os == 'windows-latest' && matrix.arch != 'armv7' }}
+        if: ${{ matrix.os == 'windows-latest' }}
         run: |
           mkdir -Force build
           cd build
           cmake .. -G "Visual Studio 17 2022" -DCMAKE_SYSTEM_NAME=Windows -DCMAKE_SYSTEM_PROCESSOR=${{ matrix.arch }} -A ${{ env.cmake_arch }} -DCHECK_ASSETS=OFF
-      - name: Configure bulid for MSVC (Legacy)
-        if: ${{ matrix.os == 'windows-latest' && matrix.arch == 'armv7' }}
-        run: |
-          mkdir -Force build
-          cd build
-          cmake .. -G "Visual Studio 17 2022" -DCMAKE_SYSTEM_NAME=Windows -DCMAKE_SYSTEM_VERSION=10.0.22621 -DCMAKE_SYSTEM_PROCESSOR=${{ matrix.arch }} -A ${{ env.cmake_arch }} -DCHECK_ASSETS=OFF
       - name: Configure bulid for MinGW (i686 or x86_64)
         if: ${{ matrix.os == 'ubuntu-latest' && matrix.arch != 'armv7' && matrix.arch != 'aarch64' }}
         run: |
