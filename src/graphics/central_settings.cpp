@@ -75,12 +75,14 @@ void CentralVideoSettings::init()
             GE::getGEConfig()->m_disable_npot_texture =
                 GraphicsRestrictions::isDisabled(
                 GraphicsRestrictions::GR_NPOT_TEXTURES);
+            #ifdef _IRR_COMPILE_WITH_VULKAN_
             if (GE::getDriver()->getDriverType() == video::EDT_VULKAN)
             {
                 hasTextureCompression = GEVulkanFeatures::supportsS3TCBC3() ||
                     GEVulkanFeatures::supportsBPTCBC7() ||
                     GEVulkanFeatures::supportsASTC4x4();
             }
+            #endif
             return;
         }
 
