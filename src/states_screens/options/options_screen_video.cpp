@@ -230,6 +230,8 @@ void OptionsScreenVideo::loadedFromFile()
 void OptionsScreenVideo::init()
 {
     Screen::init();
+    OptionsCommon::setTabStatus();
+
     m_prev_adv_pipline = UserConfigParams::m_dynamic_lights;
     m_prev_img_quality = getImageQuality();
     RibbonWidget* ribbon = getWidget<RibbonWidget>("options_choice");
