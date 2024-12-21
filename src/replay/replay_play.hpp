@@ -62,6 +62,7 @@ public:
         std::string                m_minor_mode;
         core::stringw              m_stk_version;
         core::stringw              m_user_name;
+        core::stringw              m_info;
         std::vector<std::string>   m_kart_list;
         std::vector<core::stringw> m_name_list;
         std::vector<float>         m_kart_color; //no sorting for this
