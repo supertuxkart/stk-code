@@ -874,9 +874,14 @@ void ServerLobby::asynchronousUpdate()
     {
         if (ServerConfig::m_owner_less)
         {
+            // Ensure that a game can auto-start if the server meets the config's starting limit or if it's already full.
+            int starting_limit = std::min((int)ServerConfig::m_min_start_game_players, (int)ServerConfig::m_server_max_players);
+            if (ServerConfig::m_max_players_in_game > 0) // 0 here means it's not the limit
+                starting_limit = std::min(starting_limit, (int)ServerConfig::m_max_players_in_game);
+
             unsigned players = 0;
             STKHost::get()->updatePlayers(&players);
-            if (((int)players >= ServerConfig::m_min_start_game_players ||
+            if (((int)players >= starting_limit ||
                 m_game_setup->isGrandPrixStarted()) &&
                 m_timeout.load() == std::numeric_limits<int64_t>::max())
             {
@@ -884,7 +889,7 @@ void ServerLobby::asynchronousUpdate()
                     (int64_t)
                     (ServerConfig::m_start_game_counter * 1000.0f));
             }
-            else if ((int)players < ServerConfig::m_min_start_game_players &&
+            else if ((int)players < starting_limit &&
                 !m_game_setup->isGrandPrixStarted())
             {
                 resetPeersReady();
@@ -894,7 +899,7 @@ void ServerLobby::asynchronousUpdate()
             }
             if (m_timeout.load() < (int64_t)StkTime::getMonoTimeMs() ||
                 (checkPeersReady(true/*ignore_ai_peer*/) &&
-                (int)players >= ServerConfig::m_min_start_game_players))
+                (int)players >= starting_limit))
             {
                 resetPeersReady();
                 startSelection();
@@ -4355,7 +4360,12 @@ std::set<std::shared_ptr<STKPeer>> ServerLobby::getSpectatorsByLimit()
     auto peers = STKHost::get()->getPeers();
     std::set<std::shared_ptr<STKPeer>> always_spectate_peers;
 
-    unsigned player_limit = ServerConfig::m_max_players_in_game;
+    unsigned player_limit = ServerConfig::m_server_max_players;
+    // If the server has an in-game player limit lower than the lobby limit, apply it,
+    // A value of 0 for this parameter means no limit.
+    if (ServerConfig::m_max_players_in_game > 0)
+        player_limit = std::min(player_limit, (unsigned)ServerConfig::m_max_players_in_game);
+
     // only 10 players allowed for battle or soccer
     if (RaceManager::get()->isBattleMode() || RaceManager::get()->isSoccerMode())
         player_limit = std::min(player_limit, 10u);
