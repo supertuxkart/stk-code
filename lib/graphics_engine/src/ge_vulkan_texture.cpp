@@ -1,3 +1,5 @@
+#ifdef _IRR_COMPILE_WITH_VULKAN_
+
 #include "ge_vulkan_texture.hpp"
 
 #include "ge_main.hpp"
@@ -921,3 +923,5 @@ std::shared_ptr<std::atomic<VkImageView> > GEVulkanTexture::getImageViewLive(
 }   // getImageViewLive
 
 }
+
+#endif
