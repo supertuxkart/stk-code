@@ -49,7 +49,6 @@ public:
     virtual ~MusicOggStream();
 
     virtual void update();
-    virtual void updateFaster(float percent, float max_pitch);
 
     virtual bool load(const std::string& filename);
 

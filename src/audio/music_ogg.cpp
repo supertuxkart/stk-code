@@ -256,13 +256,6 @@ void MusicOggStream::setVolume(float volume)
 }   // setVolume
 
 //-----------------------------------------------------------------------------
-void MusicOggStream::updateFaster(float percent, float max_pitch)
-{
-    alSourcef(m_soundSource,AL_PITCH,1+max_pitch*percent);
-    update();
-}   // updateFaster
-
-//-----------------------------------------------------------------------------
 void MusicOggStream::update()
 {
 
