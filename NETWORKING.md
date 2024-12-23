@@ -200,11 +200,11 @@ The current server configuration xml looks like this:
 ```
 
 At the moment STK has a list of STUN servers for NAT penetration which allows players or servers behind a firewall or router to be able to connect to each other, but in case it doesn't work, you have to manually disable the firewall or port forward the port(s) used by STK.
-By default STK servers use port `2759`. For example, in Ubuntu based distributions, run the following command to disable the firewall on that port:
+By default STK servers use port `2759` (UDP). For example, in Ubuntu based distributions, run the following command to disable the firewall on that port:
 
 `sudo ufw allow 2759`
 
-You may also need to handle the server discovery port `2757` for connecting your WAN server in LAN / localhost.
+You may also need to handle the server discovery port `2757` (UDP) for connecting your WAN server in LAN / localhost.
 
 Notice: You don't need to make any firewall or router configuration changes if you connect to the recommended servers (marked with ☆★STK★☆).
 
