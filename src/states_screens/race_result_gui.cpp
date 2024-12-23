@@ -207,27 +207,6 @@ void RaceResultGUI::init()
         MessageQueue::add(MessageQueue::MT_GENERIC, tips_string);
     }
 #endif
-    
-    if (RaceManager::get()->getMajorMode() == RaceManager::MAJOR_MODE_GRAND_PRIX &&
-        !NetworkConfig::get()->isNetworking() &&
-        (RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_NORMAL_RACE || RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_TIME_TRIAL ||
-        RaceManager::get()->isLapTrialMode()))
-    {
-        const AbstractKart* k = RaceManager::get()->getKartWithGPRank(RaceManager::get()->getLocalPlayerGPRank(PLAYER_ID_GAME_MASTER));
-        RaceManager::get()->addGPTotalLaps(World::getWorld()->getFinishedLapsOfKart(k->getWorldKartId()));
-        if (RaceManager::get()->getNumOfTracks() == RaceManager::get()->getTrackNumber() + 1
-           && !RaceManager::get()->getGrandPrix().isRandomGP() && RaceManager::get()->getSkippedTracksInGP() == 0)
-        {
-            Highscores* highscores = World::getWorld()->getGPHighscores();
-            float full_time;
-            if (RaceManager::get()->isLapTrialMode())
-                full_time = static_cast<float>(RaceManager::get()->getGPTotalLaps());
-            else
-                full_time = RaceManager::get()->getOverallTime(RaceManager::get()->getLocalPlayerGPRank(PLAYER_ID_GAME_MASTER));
-            std::string gp_name = RaceManager::get()->getGrandPrix().getId();
-            highscores->addGPData(k->getIdent(), k->getController()->getName(), gp_name, full_time);
-        }
-    }
 }   // init
 
 //-----------------------------------------------------------------------------

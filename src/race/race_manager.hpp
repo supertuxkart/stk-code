@@ -936,10 +936,6 @@ public:
     // ----------------------------------------------------------------------------------------
     void setGPTimeTarget(float time_target) { m_gp_time_target = time_target; }
     // ----------------------------------------------------------------------------------------
-    int getGPTotalLaps() const { return m_gp_total_laps; }
-    // ----------------------------------------------------------------------------------------
-    void addGPTotalLaps(int laps) { m_gp_total_laps += laps; }
-    // ----------------------------------------------------------------------------------------
     /** Whether the current game mode allow live joining even the current game
      *. started in network*/
     bool supportsLiveJoining() const

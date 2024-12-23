@@ -1256,14 +1256,13 @@ Highscores* World::getGPHighscores() const
 }
 
 // ----------------------------------------------------------------------------
-/** Called at the end of a race. Checks if the current times are worth a new
- *  score, if so it notifies the HighscoreManager so the new score is added
- *  and saved.
+/** Called at the end of a race.
+ * Submits the valid new times through the addHighscore functions, which then handles
+ * checking if the new times are worth of a highscore and saving them.
+ * The best highscore rank is transmitted to highlight the best new highscore in the GUI.
  */
 void World::updateHighscores(int* best_highscore_rank)
 {
-    *best_highscore_rank = -1;
-
     if(!m_use_highscores) return;
 
     // Add times to highscore list. First compute the order of karts,
@@ -1291,7 +1290,6 @@ void World::updateHighscores(int* best_highscore_rank)
         {
             // no kart claimed to be in this position, most likely means
             // the kart location data is wrong
-
 #ifdef DEBUG
             Log::error("[World]", "Incorrect kart positions:");
             for (unsigned int i=0; i<m_karts.size(); i++ )
@@ -1314,39 +1312,49 @@ void World::updateHighscores(int* best_highscore_rank)
         Kart *k = (Kart*)m_karts[index[pos]].get();
 
         Highscores* highscores = getHighscores();
-
-        int highscore_rank = 0;
+        float highscore_value = RaceManager::get()->isLapTrialMode() ? static_cast<float>(getFinishedLapsOfKart(index[pos]))
+                                                                     : k->getFinishTime();
         // The player is a local player, so there is a name:
-        if (RaceManager::get()->isLapTrialMode())
-        {
-            highscore_rank = highscores->addData(k->getIdent(),
-                                                 k->getController()->getName(),
-                                                 static_cast<float>(getFinishedLapsOfKart(index[pos])));
-        }
-        else
-        {
-            highscore_rank = highscores->addData(k->getIdent(),
-                                                 k->getController()->getName(),
-                                                 k->getFinishTime()    );
-        }
-        
+        int highscore_rank = highscores->addData(k->getIdent(), k->getController()->getName(), highscore_value);
 
-        if (highscore_rank > 0)
+        if (highscore_rank > 0 && (*best_highscore_rank == -1 ||
+                                    highscore_rank < *best_highscore_rank))
         {
-            if (*best_highscore_rank == -1 ||
-                highscore_rank < *best_highscore_rank)
-            {
-                *best_highscore_rank = highscore_rank;
-            }
-
-            Highscores::setSortOrder(Highscores::SO_DEFAULT);
-            highscore_manager->sortHighscores(false);
-
-            highscore_manager->saveHighscores();
+            *best_highscore_rank = highscore_rank;
         }
     } // next position
-    delete []index;
 
+    // Handle GP highscores
+    if (RaceManager::get()->getMajorMode() == RaceManager::MAJOR_MODE_GRAND_PRIX &&
+        RaceManager::get()->getNumOfTracks() == RaceManager::get()->getTrackNumber() + 1 &&
+        !RaceManager::get()->getGrandPrix().isRandomGP() &&
+        RaceManager::get()->getSkippedTracksInGP() == 0)
+    {
+        std::string gp_name = RaceManager::get()->getGrandPrix().getId();
+
+        for (unsigned int kart_id = 0; kart_id < RaceManager::get()->getNumberOfKarts(); kart_id++)
+        {
+            // Only record times for local player karts and only if
+            // they finished the race
+            if (!m_karts[kart_id]->getController()->isLocalPlayerController() ||
+                !m_karts[kart_id]->hasFinishedRace() ||
+                m_karts[kart_id]->isEliminated())
+                continue;
+
+            // The original lap trial GP code was a mess. I'm not fixing it...
+            if (RaceManager::get()->isLapTrialMode())
+                continue;
+
+            Kart *k = (Kart*)m_karts[kart_id].get();
+            float full_time = RaceManager::get()->getOverallTime(kart_id);
+
+            Highscores* highscores = World::getWorld()->getGPHighscores();
+            // The player is a local player, so there is a name:
+            highscores->addGPData(k->getIdent(), k->getController()->getName(), gp_name, full_time);
+        } // for kart_id
+    } // Handle GP highscores
+
+    delete []index;
 }   // updateHighscores
 
 //-----------------------------------------------------------------------------
