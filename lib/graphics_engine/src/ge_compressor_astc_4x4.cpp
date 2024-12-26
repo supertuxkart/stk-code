@@ -1,3 +1,5 @@
+#ifdef _IRR_COMPILE_WITH_VULKAN_
+
 #include "ge_compressor_astc_4x4.hpp"
 
 #include "ge_main.hpp"
@@ -135,3 +137,5 @@ GECompressorASTC4x4::GECompressorASTC4x4(uint8_t* texture, unsigned channels,
 }   // GECompressorASTC4x4
 
 }
+
+#endif
