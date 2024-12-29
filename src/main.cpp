@@ -514,21 +514,34 @@ void setupRaceStart()
     // a current player
     PlayerManager::get()->enforceCurrentPlayer();
 
-    InputDevice *device;
+    InputDevice *device = NULL;
 
     // Assign the player a device; check the command line params for preferences; by default use keyboard 0
 
-    if(UserConfigParams::m_default_keyboard > -1) {
+    if(UserConfigParams::m_default_keyboard > -1)
+    {
         device = input_manager->getDeviceManager()->getKeyboard(UserConfigParams::m_default_keyboard);
     }
-    else if(UserConfigParams::m_default_gamepad > -1) {
+    else if(UserConfigParams::m_default_gamepad > -1)
+    {
         // getGamePad(int) returns a GamePadDevice which is a subclass of InputDevice
         // However, the compiler doesn't like it so it has to be manually casted in
         device = (InputDevice *) input_manager->getDeviceManager()->getGamePad(UserConfigParams::m_default_gamepad);
     }
-    else {
+    // If no config requested or if the requested config doesn't exist
+    if (device == NULL)
+    {
+        if (UserConfigParams::m_default_keyboard > -1 ||
+            UserConfigParams::m_default_gamepad > -1)
+        {
+            Log::error("main", "Requested input device unavailable, fallback to the default keyboard");
+        }
         device = input_manager->getDeviceManager()->getKeyboard(0);
     }
+
+    // In case the requested config was disabled, enable it.
+    if (!device->getConfiguration()->isEnabled())
+        device->getConfiguration()->setEnabled(true);
 
     // Create player and associate player with device
     StateManager::get()->createActivePlayer(
