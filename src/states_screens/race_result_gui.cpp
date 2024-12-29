@@ -1286,20 +1286,15 @@ void RaceResultGUI::renderGlobal(float dt)
             {
                 WorldWithRank *wwr = dynamic_cast<WorldWithRank*>(World::getWorld());
                 assert(wwr);
-                int most_points;
-                if (RaceManager::get()->isFollowMode())
-                    most_points = wwr->getScoreForPosition(2);
-                else
-                    most_points = wwr->getScoreForPosition(1);
                 ri->m_current_displayed_points +=
-                    dt*most_points / m_time_for_points;
+                    dt * m_most_points / m_time_for_points;
                 if (ri->m_current_displayed_points > ri->m_new_overall_points)
                 {
                     ri->m_current_displayed_points =
                         (float)ri->m_new_overall_points;
                 }
                 ri->m_new_points -=
-                    dt*most_points / m_time_for_points;
+                    dt * m_most_points / m_time_for_points;
                 if (ri->m_new_points < 0)
                     ri->m_new_points = 0;
                 break;
@@ -1345,6 +1340,7 @@ void RaceResultGUI::determineGPLayout()
         max_time = std::max(RaceManager::get()->getOverallTime(kart_id), max_time);
     }
 
+    m_most_points = 0.;
     for (unsigned int kart_id = 0; kart_id < num_karts; kart_id++)
     {
         int rank = RaceManager::get()->getKartGPRank(kart_id);
@@ -1385,17 +1381,6 @@ void RaceResultGUI::determineGPLayout()
         ri->m_y_pos = (float)(m_top + rank*m_distance_between_rows);
         int p = RaceManager::get()->getKartPrevScore(kart_id);
         ri->m_current_displayed_points = (float)p;
-        if (kart->isEliminated() && !(RaceManager::get()->isFollowMode()))
-        {
-            ri->m_new_points = 0;
-        }
-        else
-        {
-            WorldWithRank *wwr = dynamic_cast<WorldWithRank*>(World::getWorld());
-            assert(wwr);
-            ri->m_new_points =
-                (float)wwr->getScoreForPosition(kart->getPosition());
-        }
     }
 
     // Now update the GP ranks, and determine the new position
@@ -1412,6 +1397,8 @@ void RaceResultGUI::determineGPLayout()
         ri->m_centre_point = m_top + (gp_position + j)*m_distance_between_rows*0.5f;
         int p = RaceManager::get()->getKartScore(i);
         ri->m_new_overall_points = p;
+        ri->m_new_points = ri->m_new_overall_points - ri->m_current_displayed_points;
+        m_most_points = std::max(m_most_points, ri->m_new_points);
         ri->m_new_gp_rank = gp_position;
         ri->m_laps = World::getWorld()->getFinishedLapsOfKart(i);
     }   // i < num_karts
