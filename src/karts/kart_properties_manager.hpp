@@ -104,7 +104,6 @@ public:
     * We need to treat it specially, because the list of tracks in this group
     * depends on the player-profile, not on the track data. */
     void                     setFavoriteKartStatus(FavoriteStatus *status);
-    void                     clearFavoriteKartStatus();
     bool                     kartAvailable(int kartid);
     std::vector<std::string> getAllAvailableKarts() const;
     void                     setUnavailableKarts(std::vector<std::string>);
