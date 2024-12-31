@@ -24,6 +24,7 @@
 
 namespace GUIEngine
 {
+    class BubbleWidget;
     class CheckBoxWidget; class IconButtonWidget; class ListWidget;
     class RibbonWidget;
 }
@@ -48,6 +49,7 @@ private:
 
     ReplayPlay::ReplayData m_rd;
 
+    GUIEngine::BubbleWidget*      m_info_widget;
     GUIEngine::RibbonWidget*      m_action_widget;
     GUIEngine::IconButtonWidget*  m_back_widget;
     GUIEngine::CheckBoxWidget*    m_record_widget;
