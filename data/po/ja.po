@@ -6367,7 +6367,7 @@ msgstr "プレゼントボックスを拾って、ボーリングアイコンを
 msgid ""
 "Press <%s> to look behind.\n"
 "Fire the weapon with <%s> while pressing <%s> to fire behind!"
-msgstr "後ろを除くには<%s>を押してください\n後ろへ攻撃するには<%s>と<%s>を同時押ししてください！"
+msgstr "後ろを覗くには<%s>を押してください\n後ろへ攻撃するには<%s>と<%s>を同時押ししてください！"
 
 #: ../stk-assets/tracks/tutorial/scripting.as:88
 msgid ""
