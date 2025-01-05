@@ -11,6 +11,7 @@
 #include "ge_vulkan_command_loader.hpp"
 #include "ge_vulkan_depth_texture.hpp"
 #include "ge_vulkan_draw_call.hpp"
+#include "ge_vulkan_dynamic_buffer.hpp"
 #include "ge_vulkan_dynamic_spm_buffer.hpp"
 #include "ge_vulkan_fbo_shadow_map.hpp"
 #include "ge_vulkan_fbo_texture.hpp"
@@ -18,8 +19,8 @@
 #include "ge_vulkan_mesh_cache.hpp"
 #include "ge_vulkan_scene_manager.hpp"
 #include "ge_vulkan_shader_manager.hpp"
-#include "ge_vulkan_shadow_camera_scene_node.hpp"
 #include "ge_vulkan_skybox_renderer.hpp"
+#include "ge_vulkan_sun_scene_node.hpp"
 #include "ge_vulkan_texture_descriptor.hpp"
 
 #include "mini_glm.hpp"
@@ -529,6 +530,10 @@ GEVulkanDriver::GEVulkanDriver(const SIrrlichtCreationParameters& params,
     m_transparent_texture = NULL;
     m_pre_rotation_matrix = core::matrix4(core::matrix4::EM4CONST_IDENTITY);
 
+    m_global_ubo = NULL;
+    m_global_ubo_descriptor_layout = VK_NULL_HANDLE;
+    m_global_ubo_descriptor_pool = VK_NULL_HANDLE;
+
     m_window = window;
     m_disable_wait_idle = false;
     g_schedule_pausing_rendering.store(false);
@@ -651,6 +656,7 @@ GEVulkanDriver::GEVulkanDriver(const SIrrlichtCreationParameters& params,
             GEVulkanFeatures::supportsBindMeshTexturesAtOnce());
         GECompressorASTC4x4::init();
         GECompressorBPTCBC7::init();
+        createGlobalUBO();
         GEVulkanFeatures::printStats();
     }
     catch (std::exception& e)
@@ -701,7 +707,20 @@ void GEVulkanDriver::destroyVulkan()
         getVulkanMeshCache()->removeMesh(m_billboard_quad);
         m_billboard_quad = NULL;
     }
+    if (m_global_ubo)
+    {
+        delete m_global_ubo;
+        m_global_ubo = NULL;
 
+        if (m_global_ubo_descriptor_layout != VK_NULL_HANDLE)
+            vkDestroyDescriptorSetLayout(m_vk->device, m_global_ubo_descriptor_layout, NULL);
+        
+        if (m_global_ubo_descriptor_pool != VK_NULL_HANDLE)
+            vkDestroyDescriptorPool(m_vk->device, m_global_ubo_descriptor_pool, NULL);
+        
+        m_global_ubo_descriptor_layout = VK_NULL_HANDLE;
+        m_global_ubo_descriptor_pool = VK_NULL_HANDLE;
+    }
     if (m_irrlicht_device->getSceneManager() &&
         m_irrlicht_device->getSceneManager()->getActiveCamera())
     {
@@ -1441,8 +1460,11 @@ found_mode:
             core::dimension2du(m_swap_chain_extent.width,
             m_swap_chain_extent.height));
     }
-    m_rtt_shadowmap = new GEVulkanFBOShadowMap(this);
-    m_rtt_shadowmap->createRTT();
+    if (getGEConfig()->m_pbr)
+    {
+        m_rtt_shadowmap = new GEVulkanFBOShadowMap(this);
+        m_rtt_shadowmap->createRTT();
+    }
 }   // createSwapChain
 
 // ----------------------------------------------------------------------------
@@ -2354,45 +2376,55 @@ void GEVulkanDriver::setViewPort(const core::rect<s32>& area)
 
 s32 GEVulkanDriver::addDynamicLight(const SLight& light)
 {
-    CNullDriver::addDynamicLight(light);
-
     if (light.Type == ELT_DIRECTIONAL)
     {
-        // Assume there is only one sun.
-        m_global_light_ubo.m_sun_color.X = light.DiffuseColor.r;
-        m_global_light_ubo.m_sun_color.Y = light.DiffuseColor.g;
-        m_global_light_ubo.m_sun_color.Z = light.DiffuseColor.b;
-        m_global_light_ubo.m_sun_scatter = light.DiffuseColor.a;
-        m_global_light_ubo.m_sun_direction = light.Direction;
-        m_global_light_ubo.m_sun_angle_tan_half = tanf(light.Radius * 0.5);
+        if (Lights.empty() || memcmp(&light, &Lights[0], sizeof(SLight)))
+        {
+            // Update global UBO
+            std::fill(m_global_ubo_dirty.begin(), m_global_ubo_dirty.end(), true);
+        }
+        if (Lights.empty())
+        {
+            Lights.push_back(light);
+        }
+        else
+        {
+            Lights[0] = light;
+        }
 
         // The id of the sun is always 0.
         return 0;
     }
     else
     {
-        // Point and spot light
-        return -1;
+        return CNullDriver::addDynamicLight(light);
     }
 }
 
 void GEVulkanDriver::setAmbientLight(const SColorf& color)
 {
-    CNullDriver::setAmbientLight(color);
+    if (color.toSColor() != m_ambient_light.toSColor())
+    {
+        // Update global UBO
+        std::fill(m_global_ubo_dirty.begin(), m_global_ubo_dirty.end(), true);
+    }
 
-    m_global_light_ubo.m_ambient_color.X = color.r;
-    m_global_light_ubo.m_ambient_color.Y = color.g;
-    m_global_light_ubo.m_ambient_color.Z = color.b;
+    m_ambient_light = color;
+
+    CNullDriver::setAmbientLight(color);
 }
 
 void GEVulkanDriver::setFog(SColor color, E_FOG_TYPE fogType, f32 start,
                             f32 end, f32 density, bool pixelFog, bool rangeFog)
 {
-    if (fogType == EFT_FOG_EXP)
+    if (color != FogColor || fogType != FogType
+     || start != FogStart || end != FogEnd
+     || density != FogDensity || pixelFog != PixelFog || rangeFog != RangeFog)
     {
-        m_global_light_ubo.m_fog_color = color;
-        m_global_light_ubo.m_fog_density = density;
+        // Update global UBO
+        std::fill(m_global_ubo_dirty.begin(), m_global_ubo_dirty.end(), true);
     }
+    CNullDriver::setFog(color, fogType, start, end, density, pixelFog, rangeFog);
     // Too lazy to write support for other types lol
 }
 
@@ -2590,6 +2622,8 @@ void GEVulkanDriver::buildCommandBuffers()
         &begin_info);
     if (result != VK_SUCCESS)
         return;
+    
+    updateGlobalUBO();
 
     if (m_rtt_shadowmap)
     {
@@ -2624,6 +2658,7 @@ void GEVulkanDriver::buildCommandBuffers()
             for (auto& p : static_cast<GEVulkanSceneManager*>(
                 m_irrlicht_device->getSceneManager())->getShadowDrawCalls())
             {
+                if (i >= p.second.size()) continue;
                 p.second[i]->render(this);
                 PrimitivesDrawn += p.second[i]->getPolyCount();
             }
@@ -2792,9 +2827,12 @@ void GEVulkanDriver::updateDriver(bool reload_shaders)
         m_irrlicht_device->getSceneManager())->getShadowDrawCalls())
     {
         dc.second.clear();
-        dc.second.emplace_back(new GEVulkanDrawCall(GVDCT_SHADOW_NEAR));
-        dc.second.emplace_back(new GEVulkanDrawCall(GVDCT_SHADOW_MIDDLE));
-        dc.second.emplace_back(new GEVulkanDrawCall(GVDCT_SHADOW_FAR));
+        if (getGEConfig()->m_pbr)
+        {
+            dc.second.emplace_back(new GEVulkanDrawCall(GVDCT_SHADOW_NEAR));
+            dc.second.emplace_back(new GEVulkanDrawCall(GVDCT_SHADOW_MIDDLE));
+            dc.second.emplace_back(new GEVulkanDrawCall(GVDCT_SHADOW_FAR));
+        }
     }
     
     GEVulkanSkyBoxRenderer::destroy();
@@ -2835,6 +2873,169 @@ std::unique_ptr<GEVulkanDrawCall> GEVulkanDriver::getDrawCallFromCache(GEVulkanD
     }
     return std::unique_ptr<GEVulkanDrawCall>(new GEVulkanDrawCall(type));
 }   // getDrawCallFromCache
+
+// ----------------------------------------------------------------------------
+void GEVulkanDriver::createGlobalUBO()
+{
+    m_global_ubo = new GEVulkanDynamicBuffer(VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT,
+        sizeof(GEGlobalLightUBO), getMaxFrameInFlight() + 1,
+        GEVulkanDynamicBuffer::supportsHostTransfer() ? 0 : getMaxFrameInFlight() + 1);
+    m_global_ubo_dirty.resize(getMaxFrameInFlight() + 1);
+    m_global_ubo_descriptor_sets.resize(getMaxFrameInFlight() + 1);
+
+    std::fill(m_global_ubo_dirty.begin(), m_global_ubo_dirty.end(), true);
+
+    std::array<VkDescriptorSetLayoutBinding, 2> layout_bindings = {};
+    layout_bindings[0].binding = 0;
+    layout_bindings[0].descriptorCount = 1;
+    layout_bindings[0].descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+    layout_bindings[0].pImmutableSamplers = NULL;
+    layout_bindings[0].stageFlags = VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT;
+    layout_bindings[1].binding = 1;
+    layout_bindings[1].descriptorCount = 1;
+    layout_bindings[1].descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
+    layout_bindings[1].pImmutableSamplers = NULL;
+    layout_bindings[1].stageFlags = VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT;
+
+    VkDescriptorSetLayoutCreateInfo setinfo = {};
+    setinfo.flags = 0;
+    setinfo.pNext = NULL;
+    setinfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO;
+    setinfo.pBindings = layout_bindings.data();
+    setinfo.bindingCount = layout_bindings.size();
+
+    if (vkCreateDescriptorSetLayout(m_vk->device, &setinfo,
+        NULL, &m_global_ubo_descriptor_layout) != VK_SUCCESS)
+    {
+        throw std::runtime_error("vkCreateDescriptorSetLayout failed for "
+            "GlobalUBO");
+    }
+
+    std::array<VkDescriptorPoolSize, 2> pool_sizes = {};
+    pool_sizes[0].type = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+    pool_sizes[0].descriptorCount = getMaxFrameInFlight() + 1;
+    pool_sizes[1].type = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
+    pool_sizes[1].descriptorCount = getMaxFrameInFlight() + 1;
+
+    VkDescriptorPoolCreateInfo pool_info = {};
+    pool_info.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO;
+    pool_info.flags = 0;
+    pool_info.maxSets = getMaxFrameInFlight() + 1;
+    pool_info.poolSizeCount = pool_sizes.size();
+    pool_info.pPoolSizes = pool_sizes.data();
+
+    if (vkCreateDescriptorPool(m_vk->device, &pool_info, NULL,
+        &m_global_ubo_descriptor_pool) != VK_SUCCESS)
+    {
+        throw std::runtime_error("vkCreateDescriptorPool failed for "
+            "GlobalUBO");
+    }
+
+    std::vector<VkDescriptorSetLayout> layouts(getMaxFrameInFlight() + 1, m_global_ubo_descriptor_layout);
+
+    VkDescriptorSetAllocateInfo alloc_info = {};
+    alloc_info.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;
+    alloc_info.descriptorPool = m_global_ubo_descriptor_pool;
+    alloc_info.descriptorSetCount = layouts.size();
+    alloc_info.pSetLayouts = layouts.data();
+
+    if (vkAllocateDescriptorSets(m_vk->device, &alloc_info,
+        m_global_ubo_descriptor_sets.data()) != VK_SUCCESS)
+    {
+        throw std::runtime_error("vkAllocateDescriptorSets failed for "
+            "GlobalUBO");
+    }
+
+    for (unsigned i = 0; i < m_global_ubo_descriptor_sets.size(); i++)
+    {
+        std::array<VkWriteDescriptorSet, 2> data_sets = {};
+
+        VkDescriptorBufferInfo ubo_info;
+        ubo_info.buffer = GEVulkanDynamicBuffer::supportsHostTransfer() ?
+            m_global_ubo->getHostBuffer()[i] :
+            m_global_ubo->getLocalBuffer()[i];
+        ubo_info.offset = 0;
+        ubo_info.range = sizeof(GEGlobalLightUBO);
+        
+        data_sets[0].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+        data_sets[0].dstSet = m_global_ubo_descriptor_sets[i];
+        data_sets[0].dstBinding = 0;
+        data_sets[0].dstArrayElement = 0;
+        data_sets[0].descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+        data_sets[0].descriptorCount = 1;
+        data_sets[0].pBufferInfo = &ubo_info;
+
+        VkDescriptorImageInfo image_info;
+        image_info.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
+        image_info.sampler = getSampler(GVS_SHADOWMAP);
+        image_info.imageView = getRTTShadowMap() ?
+            (VkImageView)getRTTShadowMap()->getTextureHandler() :
+            (VkImageView)getWhiteTexture()->getTextureHandler();
+
+        data_sets[1].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+        data_sets[1].dstSet = m_global_ubo_descriptor_sets[i];
+        data_sets[1].dstBinding = 1;
+        data_sets[1].dstArrayElement = 0;
+        data_sets[1].descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
+        data_sets[1].descriptorCount = 1;
+        data_sets[1].pImageInfo = &image_info;
+        
+        vkUpdateDescriptorSets(m_vk->device, data_sets.size(), data_sets.data(), 0, NULL);
+    }
+}
+
+// ----------------------------------------------------------------------------
+void GEVulkanDriver::updateGlobalUBO()
+{
+    if (!m_global_ubo_dirty[m_current_buffer_idx])
+    {
+        return;
+    }
+    m_global_ubo_dirty[m_current_buffer_idx] = false;
+
+    VkCommandBuffer cmd = getCurrentCommandBuffer();
+
+    GEGlobalLightUBO light_ubo = {};
+
+    light_ubo.m_ambient_color.X = m_ambient_light.r;
+    light_ubo.m_ambient_color.Y = m_ambient_light.g;
+    light_ubo.m_ambient_color.Z = m_ambient_light.b;
+
+    if (Lights.size())
+    {
+        light_ubo.m_sun_color.X = Lights[0].DiffuseColor.r;
+        light_ubo.m_sun_color.Y = Lights[0].DiffuseColor.g;
+        light_ubo.m_sun_color.Z = Lights[0].DiffuseColor.b;
+        light_ubo.m_sun_scatter = Lights[0].DiffuseColor.a;
+        light_ubo.m_sun_direction = -Lights[0].Direction.normalize();
+        light_ubo.m_sun_angle_tan_half = tanf(Lights[0].Radius * 0.5);
+    }
+    light_ubo.m_fog_color = FogColor;
+    light_ubo.m_fog_density = FogDensity;
+
+    std::vector<std::pair<void*, size_t> > data_uploading;
+
+    data_uploading.emplace_back((void*)&light_ubo, sizeof(GEGlobalLightUBO));
+
+    // https://github.com/google/filament/pull/3814
+    // Need both vertex and fragment bit
+    VkPipelineStageFlags dst_stage = VK_PIPELINE_STAGE_VERTEX_SHADER_BIT |
+        VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT;
+
+    m_global_ubo->setCurrentData(data_uploading, cmd,
+        m_current_buffer_idx);
+
+    if (!GEVulkanDynamicBuffer::supportsHostTransfer())
+    {
+        VkMemoryBarrier barrier = {};
+        barrier.sType = VK_STRUCTURE_TYPE_MEMORY_BARRIER;
+        barrier.srcAccessMask = VK_ACCESS_TRANSFER_WRITE_BIT;
+        barrier.dstAccessMask = VK_ACCESS_SHADER_READ_BIT;
+
+        vkCmdPipelineBarrier(cmd, VK_PIPELINE_STAGE_TRANSFER_BIT, dst_stage, 0,
+            1, &barrier, 0, NULL, 0, NULL);
+    }
+}
 
 // ----------------------------------------------------------------------------
 void GEVulkanDriver::createBillboardQuad()
@@ -2886,23 +3087,6 @@ void GEVulkanDriver::createBillboardQuad()
     getVulkanMeshCache()->addMesh(oss.str().c_str(), m_billboard_quad);
     m_billboard_quad->drop();
 }   // createBillboardQuad
-
-const GEGlobalLightUBO *GEVulkanDriver::getGlobalLightUBO(const core::matrix4 &inverse_view)
-{
-    // Premultiply inverse view matrix
-    m_global_light_ubo_gpu = m_global_light_ubo;
-
-    core::matrix4 inverse_view_transposed;
-
-    inverse_view.getTransposed(inverse_view_transposed);
-
-    inverse_view_transposed.transformVect(m_global_light_ubo_gpu.m_sun_direction.invert());
-
-    m_global_light_ubo_gpu.m_sun_direction = 
-        m_global_light_ubo_gpu.m_sun_direction.normalize();
-    
-    return &m_global_light_ubo_gpu;
-}
 
 }
 

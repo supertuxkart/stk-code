@@ -38,9 +38,6 @@
 #include "ICameraSceneNode.h"
 
 class AbstractKart;
-namespace GE {
-    class GEVulkanShadowCameraSceneNode;
-}
 /**
   * \brief This is the base class for all cameras. It also includes some
   *  static functions to keep track of all cameras (e.g. a static function to
@@ -113,8 +110,6 @@ private:
 
     /** Aspect ratio for camera. */
     float           m_aspect;
-
-    GE::GEVulkanShadowCameraSceneNode *m_shadow_camera;
 
 
     /** List of all cameras. */

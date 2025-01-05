@@ -103,6 +103,7 @@
 #ifndef SERVER_ONLY
 #include <ge_main.hpp>
 #include <ge_texture.hpp>
+#include <ge_vulkan_scene_manager.hpp>
 #endif
 
 using namespace irr;
@@ -378,6 +379,8 @@ void Track::cleanup()
     irr_driver->removeNode(m_sun);
     if (CVS->isGLSL())
         m_sun->drop();
+    else if (GE::getVKDriver())
+        reinterpret_cast<GE::GEVulkanSceneManager*>(irr_driver->getSceneManager())->setActiveSun(NULL);
 #endif
     delete m_track_mesh;
     m_track_mesh = NULL;

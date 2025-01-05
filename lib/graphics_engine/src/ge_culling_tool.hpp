@@ -24,13 +24,13 @@ enum GEVulkanShadowCameraCascade : unsigned;
 
 class GESPMBuffer;
 class GEVulkanCameraSceneNode;
-class GEVulkanShadowCameraSceneNode;
+class GEVulkanSunSceneNode;
 class GECullingTool
 
 {
 private:
     irr::core::quaternion m_frustum[6];
-    bool m_ignore_near_plane; // For shadows
+    bool m_cull_for_shadows;
 
     irr::core::aabbox3df m_cam_bbox;
     irr::core::matrix4 m_pvm_matrix;
@@ -51,7 +51,7 @@ public:
     // ------------------------------------------------------------------------
     void init(GEVulkanCameraSceneNode* cam, bool occlusion = false);
     // ------------------------------------------------------------------------
-    void init(GEVulkanShadowCameraSceneNode* cam, GEVulkanShadowCameraCascade cascade);
+    void init(GEVulkanSunSceneNode* sun, GEVulkanShadowCameraCascade cascade);
     // ------------------------------------------------------------------------
     void addOccluder(GESPMBuffer* buffer, irr::scene::ISceneNode* node);
     // ------------------------------------------------------------------------

@@ -131,11 +131,6 @@ Camera::Camera(CameraType type, int camera_index, AbstractKart* kart)
     m_index         = camera_index;
     m_original_kart = kart;
     m_camera        = irr_driver->addCameraSceneNode();
-    if (GE::getVKDriver())
-    {
-        GE::GEVulkanSceneManager *vsm = static_cast<GE::GEVulkanSceneManager*>(irr_driver->getSceneManager());
-        m_shadow_camera = vsm->addShadowCameraSceneNode(m_camera);
-    }
     m_previous_pv_matrix = core::matrix4();
 
     if (RaceManager::get()->getNumLocalPlayers() > 1)
@@ -161,13 +156,6 @@ Camera::Camera(CameraType type, int camera_index, AbstractKart* kart)
 Camera::~Camera()
 {
     irr_driver->removeCameraSceneNode(m_camera);
-    if (GE::getVKDriver())
-    {
-        GE::GEVulkanSceneManager *vsm = static_cast<GE::GEVulkanSceneManager*>(irr_driver->getSceneManager());
-        if (vsm->getActiveShadowCamera() == m_shadow_camera)
-            vsm->setActiveShadowCamera(NULL);
-        reinterpret_cast<irr::scene::ISceneNode*>(m_shadow_camera)->remove();
-    }
 
     if (s_active_camera == this)
         s_active_camera = NULL;
@@ -340,12 +328,6 @@ void Camera::activate(bool alsoActivateInIrrlicht)
         irr::scene::ISceneManager *sm = irr_driver->getSceneManager();
         sm->setActiveCamera(m_camera);
         irr_driver->getVideoDriver()->setViewPort(m_viewport);
-
-        if (GE::getVKDriver())
-        {
-            GE::GEVulkanSceneManager *vsm = static_cast<GE::GEVulkanSceneManager*>(irr_driver->getSceneManager());
-            vsm->setActiveShadowCamera(m_shadow_camera);
-        }
     }
 }   // activate
 

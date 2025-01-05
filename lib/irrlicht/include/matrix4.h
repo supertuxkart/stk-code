@@ -286,9 +286,6 @@ namespace core
 			//! Builds a right-handed orthogonal projection matrix.
 			CMatrix4<T>& buildProjectionMatrixOrthoRH(f32 widthOfViewVolume, f32 heightOfViewVolume, f32 zNear, f32 zFar);
 
-			//! Builds a right-handed orthogonal projection matrix, with specific corners.
-			CMatrix4<T>& buildProjectionMatrixOrthoRH(f32 left, f32 right, f32 up, f32 down, f32 zNear, f32 zFar);
-
 			//! Builds a left-handed look-at matrix.
 			CMatrix4<T>& buildCameraLookAtMatrixLH(
 					const vector3df& position,

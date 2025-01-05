@@ -396,11 +396,13 @@ void GEVulkanSkyBoxRenderer::addSkyBox(GEVulkanCameraSceneNode* cam,
                 float lod = 0.5f * log2(6.0 * dst[level].m_dim.Width
                                             * dst[level].m_dim.Height
                                             / (sample_count * pdf)) + lodbias;
+                float factor = world_dir.Y > 0.0 ? 1.0 : 
+                               world_dir.Y > -0.7 ? 1.0 - world_dir.Y / -0.7 : 0.0; // Make lower hemisphere dark
                 SColorf samp = texture_lod(src, world_dir, lod);
                 color.a += samp.a;
-                color.r += samp.r;
-                color.g += samp.g;
-                color.b += samp.b;
+                color.r += samp.r * factor;
+                color.g += samp.g * factor;
+                color.b += samp.b * factor;
                 weight += 1.0f;
             }
             color.a /= weight;
@@ -428,17 +430,7 @@ void GEVulkanSkyBoxRenderer::addSkyBox(GEVulkanCameraSceneNode* cam,
 
         const int sample_count = 32;
 
-        if (tex_index == 3)
-        {
-            memset(dst[0].m_data, 0, sizeof(uint32_t) * dst[0].m_dim.getArea());
-        }
-        else
-        {
-            memcpy(dst[0].m_data, src[tex_index][lodbias].m_data, 
-                    sizeof(uint32_t) * dst[0].m_dim.getArea());
-        }
-
-        for (int level = 1; level < dst.size(); level++)
+        for (int level = 0; level < dst.size(); level++)
         for (int u = 0; u < dst[level].m_dim.Width; u++)
         for (int v = 0; v < dst[level].m_dim.Height; v++)
         {
@@ -457,6 +449,22 @@ void GEVulkanSkyBoxRenderer::addSkyBox(GEVulkanCameraSceneNode* cam,
             }
             vector3df dir = scan.normalize(); // Normal
             dir.Y = -dir.Y;
+
+            if (level == 0)
+            {
+                float factor = dir.Y > 0.0 ? 1.0 : 
+                               dir.Y > -0.7 ? 1.0 - dir.Y / -0.7 : 0.0; // Make lower hemisphere dark
+
+                SColorf color = texture_lod(src, dir, lodbias);
+
+                ((uint32_t*)dst[level].m_data)[v * dst[level].m_dim.Width + u]
+                    = ((uint32_t)(color.b * factor * 255.))
+                    + ((uint32_t)(color.g * factor * 255.) << 8)
+                    + ((uint32_t)(color.r * factor * 255.) << 16)
+                    + ((uint32_t)(color.a * 255.) << 24);
+                continue;
+            }
+            
             
             vector3df bitangent = vector3df(0.0, 1.0, 0.0);
             float ndotup = dir.dotProduct(vector3df(0.0, 1.0, 0.0));
@@ -512,11 +520,14 @@ void GEVulkanSkyBoxRenderer::addSkyBox(GEVulkanCameraSceneNode* cam,
                 
                 if (NdotL > 0.0)
                 {
+                    float factor = light.Y > 0.0 ? 1.0 : 
+                                   light.Y > -0.7 ? 1.0 - light.Y / -0.7 : 0.0; // Make lower hemisphere dark
+
                     SColorf samp = texture_lod(src, light, lod);
                     color.a += samp.a * NdotL;
-                    color.r += samp.r * NdotL;
-                    color.g += samp.g * NdotL;
-                    color.b += samp.b * NdotL;
+                    color.r += samp.r * NdotL * factor;
+                    color.g += samp.g * NdotL * factor;
+                    color.b += samp.b * NdotL * factor;
                     weight += NdotL;
                 }
             }

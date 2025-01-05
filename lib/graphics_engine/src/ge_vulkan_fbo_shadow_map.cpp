@@ -2,7 +2,7 @@
 
 #include "ge_main.hpp"
 #include "ge_vulkan_driver.hpp"
-#include "ge_vulkan_shadow_camera_scene_node.hpp"
+#include "ge_vulkan_sun_scene_node.hpp"
 
 #include <array>
 #include <exception>
@@ -20,8 +20,8 @@ GEVulkanFBOShadowMap::GEVulkanFBOShadowMap(GEVulkanDriver* vk)
     m_has_mipmaps = false;
     m_locked_data = NULL;
     m_size = m_orig_size = m_max_size = 
-        irr::core::dimension2du(GEVulkanShadowCameraSceneNode::getShadowMapSize(),
-                                GEVulkanShadowCameraSceneNode::getShadowMapSize());
+        irr::core::dimension2du(GEVulkanSunSceneNode::getShadowMapSize(),
+                                GEVulkanSunSceneNode::getShadowMapSize());
     m_layer_count = GVSCC_COUNT;
     m_image_view_type = VK_IMAGE_VIEW_TYPE_2D_ARRAY;
 

@@ -43,7 +43,7 @@ class GEVulkanCameraSceneNode;
 class GEVulkanDriver;
 class GEVulkanDynamicBuffer;
 class GEVulkanDynamicSPMBuffer;
-class GEVulkanShadowCameraSceneNode;
+class GEVulkanSunSceneNode;
 class GEVulkanTextureDescriptor;
 
 enum GEVulkanDrawCallType : unsigned
@@ -125,7 +125,7 @@ private:
 
     GEVulkanCameraSceneNode *m_camera;
 
-    GEVulkanShadowCameraSceneNode *m_shadow_camera;
+    GEVulkanSunSceneNode *m_sun;
 
     GECullingTool* m_culling_tool;
 
@@ -266,7 +266,7 @@ public:
                           irr::scene::ESCENE_NODE_TYPE node_type);
     // ------------------------------------------------------------------------
     void prepare(GEVulkanDriver* vk, GEVulkanCameraSceneNode* cam,
-                                     GEVulkanShadowCameraSceneNode* shadow_cam = nullptr);
+                                     GEVulkanSunSceneNode* sun = nullptr);
     // ------------------------------------------------------------------------
     void generate(GEVulkanDriver* vk);
     // ------------------------------------------------------------------------
@@ -295,7 +295,7 @@ public:
         m_materials_data.clear();
         m_dynamic_spm_buffers.clear();
         m_camera = nullptr;
-        m_shadow_camera = nullptr;
+        m_sun = nullptr;
     }
 };   // GEVulkanDrawCall
 

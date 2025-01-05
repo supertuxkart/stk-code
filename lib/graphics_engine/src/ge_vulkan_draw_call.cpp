@@ -17,8 +17,8 @@
 #include "ge_vulkan_mesh_scene_node.hpp"
 #include "ge_vulkan_scene_manager.hpp"
 #include "ge_vulkan_shader_manager.hpp"
-#include "ge_vulkan_shadow_camera_scene_node.hpp"
 #include "ge_vulkan_skybox_renderer.hpp"
+#include "ge_vulkan_sun_scene_node.hpp"
 #include "ge_vulkan_texture_descriptor.hpp"
 
 #include "mini_glm.hpp"
@@ -188,7 +188,7 @@ GEVulkanDrawCall::GEVulkanDrawCall(GEVulkanDrawCallType type) :
                 m_draw_call_type(type)
 {
     m_culling_tool = new GECullingTool;
-    m_shadow_camera = nullptr;
+    m_sun = nullptr;
     m_camera = nullptr;
     m_dynamic_data = NULL;
     m_sbo_data = NULL;
@@ -231,6 +231,10 @@ GEVulkanDrawCall::~GEVulkanDrawCall()
 // ----------------------------------------------------------------------------
 void GEVulkanDrawCall::addNode(irr::scene::ISceneNode* node)
 {
+    // Skip small objects for far shadows
+    if (m_draw_call_type == GVDCT_SHADOW_FAR && node->getBoundingBox().getVolume() < 10.)
+        return;
+    
     irr::scene::IMesh* mesh;
     GEVulkanAnimatedMeshSceneNode* anode = NULL;
     if (node->getType() == irr::scene::ESNT_ANIMATED_MESH)
@@ -842,7 +846,7 @@ std::string GEVulkanDrawCall::getShader(const irr::video::SMaterial& m)
 
 // ----------------------------------------------------------------------------
 void GEVulkanDrawCall::prepare(GEVulkanDriver* vk, GEVulkanCameraSceneNode* cam,
-                                                   GEVulkanShadowCameraSceneNode* shadow_cam)
+                                                   GEVulkanSunSceneNode* sun)
 {
     reset();
 
@@ -852,20 +856,20 @@ void GEVulkanDrawCall::prepare(GEVulkanDriver* vk, GEVulkanCameraSceneNode* cam,
         m_culling_tool->init(cam);
         break;
     case GVDCT_SHADOW_NEAR:
-        m_culling_tool->init(shadow_cam, GVSCC_NEAR);
+        m_culling_tool->init(sun, GVSCC_NEAR);
         break;
     case GVDCT_SHADOW_MIDDLE:
-        m_culling_tool->init(shadow_cam, GVSCC_MIDDLE);
+        m_culling_tool->init(sun, GVSCC_MIDDLE);
         break;
     case GVDCT_SHADOW_FAR:
-        m_culling_tool->init(shadow_cam, GVSCC_FAR);
+        m_culling_tool->init(sun, GVSCC_FAR);
         break;
     default:
         break;
     }
 
     m_camera = cam;
-    m_shadow_camera = shadow_cam;
+    m_sun = sun;
 }   // prepare
 
 // ----------------------------------------------------------------------------
@@ -953,7 +957,7 @@ void GEVulkanDrawCall::createPipeline(GEVulkanDriver* vk,
     switch (m_draw_call_type)
     {
     case GVDCT_FORWARD:
-        create_pipeline_for_depth = true;
+        create_pipeline_for_depth = getGEConfig()->m_pbr;
         create_pipeline_for_color = true;
         render_pass = vk->getRTTTexture() ? vk->getRTTTexture()->getRTTRenderPass() : vk->getRenderPass();
         render_subpass = 0;
@@ -1086,7 +1090,7 @@ void GEVulkanDrawCall::createPipeline(GEVulkanDriver* vk,
     rasterizer.polygonMode = VK_POLYGON_MODE_FILL;
     rasterizer.lineWidth = 1.0f;
     rasterizer.cullMode = settings.m_backface_culling ?
-        VK_CULL_MODE_BACK_BIT : VK_CULL_MODE_NONE;
+        m_draw_call_type == GVDCT_FORWARD ? VK_CULL_MODE_BACK_BIT : VK_CULL_MODE_FRONT_BIT : VK_CULL_MODE_NONE;
     rasterizer.frontFace = VK_FRONT_FACE_CLOCKWISE;
     rasterizer.depthBiasEnable = VK_FALSE;
 
@@ -1099,7 +1103,7 @@ void GEVulkanDrawCall::createPipeline(GEVulkanDriver* vk,
     depth_stencil.sType = VK_STRUCTURE_TYPE_PIPELINE_DEPTH_STENCIL_STATE_CREATE_INFO;
     depth_stencil.depthTestEnable = settings.m_depth_test;
     depth_stencil.depthWriteEnable = settings.m_depth_write;
-    depth_stencil.depthCompareOp = VK_COMPARE_OP_LESS;
+    depth_stencil.depthCompareOp = VK_COMPARE_OP_LESS_OR_EQUAL;
     depth_stencil.depthBoundsTestEnable = VK_FALSE;
     depth_stencil.stencilTestEnable = VK_FALSE;
 
@@ -1207,7 +1211,6 @@ void GEVulkanDrawCall::createPipeline(GEVulkanDriver* vk,
         if (create_pipeline_for_depth && settings.m_depth_write && !settings.m_depth_only_fragment_shader.empty()) // Depth prepass
         {
             depth_stencil.depthWriteEnable = VK_FALSE;
-            depth_stencil.depthCompareOp = VK_COMPARE_OP_EQUAL;
         }
 
         VkResult result = vkCreateGraphicsPipelines(vk->getDevice(), VK_NULL_HANDLE, 1, 
@@ -1413,12 +1416,9 @@ void GEVulkanDrawCall::createVulkanData()
     {{
         *m_texture_descriptor->getDescriptorSetLayout(),
         m_data_layout,
-        *GEVulkanSkyBoxRenderer::getEnvMapDescriptorLayout()
+        *GEVulkanSkyBoxRenderer::getEnvMapDescriptorLayout(),
+        vk->getGlobalUBOLayout()
     }};
-    if (m_draw_call_type == GVDCT_FORWARD)
-    {
-        all_layouts.push_back(m_data_layout_pbr);
-    }
 
     VkPipelineLayoutCreateInfo pipeline_layout_info = {};
     pipeline_layout_info.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
@@ -1454,7 +1454,7 @@ void GEVulkanDrawCall::createVulkanData()
     // Use VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT | VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT
     // or a staging buffer when buffer is small
     m_dynamic_data = new GEVulkanDynamicBuffer(flags,
-        extra_size + sizeof(GEVulkanCameraUBO) + sizeof(GEGlobalLightUBO) + sizeof(GEVulkanShadowUBO),
+        extra_size + sizeof(GEVulkanCameraUBO) + sizeof(GEVulkanShadowUBO),
         GEVulkanDriver::getMaxFrameInFlight() + 1,
         GEVulkanDynamicBuffer::supportsHostTransfer() ? 0 :
         GEVulkanDriver::getMaxFrameInFlight() + 1);
@@ -1485,29 +1485,26 @@ void GEVulkanDrawCall::uploadDynamicData(GEVulkanDriver* vk,
         data_uploading.emplace_back((void*)m_camera->getUBOData(), sizeof(GEVulkanCameraUBO));
         break;
     case GVDCT_SHADOW_NEAR:
-        data_uploading.emplace_back((void*)m_shadow_camera->getCameraUBOData(GVSCC_NEAR), sizeof(GEVulkanCameraUBO));
+        data_uploading.emplace_back((void*)m_sun->getShadowCameraUBOData(GVSCC_NEAR), sizeof(GEVulkanCameraUBO));
         break;
     case GVDCT_SHADOW_MIDDLE:
-        data_uploading.emplace_back((void*)m_shadow_camera->getCameraUBOData(GVSCC_MIDDLE), sizeof(GEVulkanCameraUBO));
+        data_uploading.emplace_back((void*)m_sun->getShadowCameraUBOData(GVSCC_MIDDLE), sizeof(GEVulkanCameraUBO));
         break;
     case GVDCT_SHADOW_FAR:
-        data_uploading.emplace_back((void*)m_shadow_camera->getCameraUBOData(GVSCC_FAR), sizeof(GEVulkanCameraUBO));
+        data_uploading.emplace_back((void*)m_sun->getShadowCameraUBOData(GVSCC_FAR), sizeof(GEVulkanCameraUBO));
         break;
     default:
         break;
     }
 
-    data_uploading.emplace_back((void*)vk->getGlobalLightUBO(m_camera->getUBOData()->m_inverse_view_matrix),
-        sizeof(GEGlobalLightUBO));
-
-    if (m_shadow_camera == nullptr)
+    if (m_sun == nullptr)
     {
         GEVulkanShadowUBO tmp;
         data_uploading.emplace_back((void*)&tmp, sizeof(GEVulkanShadowUBO));
     }
     else 
     {
-        data_uploading.emplace_back((void*)m_shadow_camera->getShadowUBOData(), sizeof(GEVulkanShadowUBO));
+        data_uploading.emplace_back((void*)m_sun->getShadowUBOData(), sizeof(GEVulkanShadowUBO));
     }
     // https://github.com/google/filament/pull/3814
     // Need both vertex and fragment bit
@@ -1608,10 +1605,10 @@ void GEVulkanDrawCall::render(GEVulkanDriver* vk, VkCommandBuffer custom_cmd)
     case GVDCT_SHADOW_NEAR:
     case GVDCT_SHADOW_MIDDLE:
     case GVDCT_SHADOW_FAR:
-        vp.x = m_shadow_camera->getViewPort().UpperLeftCorner.X;
-        vp.y = m_shadow_camera->getViewPort().UpperLeftCorner.Y;
-        vp.width = m_shadow_camera->getViewPort().getWidth();
-        vp.height = m_shadow_camera->getViewPort().getHeight();
+        vp.x = 0;
+        vp.y = 0;
+        vp.width = GEVulkanSunSceneNode::getShadowMapSize();
+        vp.height = GEVulkanSunSceneNode::getShadowMapSize();
         vp.minDepth = 0;
         vp.maxDepth = 1.0f;
         break;
@@ -1650,13 +1647,12 @@ void GEVulkanDrawCall::render(GEVulkanDriver* vk, VkCommandBuffer custom_cmd)
     vkCmdBindDescriptorSets(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS,
         m_pipeline_layout, 2, 1, GEVulkanSkyBoxRenderer::getEnvMapDescriptor(),
         0, NULL);
-    if (m_draw_call_type == GVDCT_FORWARD)
-    {
-        vkCmdBindDescriptorSets(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS,
-            m_pipeline_layout, 3, 1, &m_data_descriptor_set_pbr,
-            0, NULL);
-    }
-    bool is_depth_only = true;
+
+    vkCmdBindDescriptorSets(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS,
+        m_pipeline_layout, 3, 1, vk->getGlobalUBOSet(),
+        0, NULL);
+
+    bool is_depth_only = getGEConfig()->m_pbr;
 
 start:
     if (!is_depth_only && m_draw_call_type != GVDCT_FORWARD)
@@ -1669,7 +1665,7 @@ start:
             m_pipeline_layout, 0, 1, m_texture_descriptor->getDescriptorSet(),
             0, NULL);
         
-        size_t indirect_offset = sizeof(GEVulkanCameraUBO) + sizeof(GEGlobalLightUBO) + sizeof(GEVulkanShadowUBO);
+        size_t indirect_offset = sizeof(GEVulkanCameraUBO) + sizeof(GEVulkanShadowUBO);
         const size_t indirect_size = sizeof(VkDrawIndexedIndirectCommand);
         unsigned draw_count = 0;
         VkBuffer indirect_buffer =
@@ -2008,7 +2004,7 @@ void GEVulkanDrawCall::updateDataDescriptorSets(GEVulkanDriver* vk)
             m_dynamic_data->getHostBuffer()[i] :
             m_dynamic_data->getLocalBuffer()[i];
         ubo_info.offset = 0;
-        ubo_info.range = sizeof(GEVulkanCameraUBO) + sizeof(GEGlobalLightUBO) + sizeof(GEVulkanShadowUBO);
+        ubo_info.range = sizeof(GEVulkanCameraUBO) + sizeof(GEVulkanShadowUBO);
 
         std::vector<VkWriteDescriptorSet> data_set;
         data_set.resize(3, {});
@@ -2034,8 +2030,7 @@ void GEVulkanDrawCall::updateDataDescriptorSets(GEVulkanDriver* vk)
         data_set[1].pBufferInfo = &sbo_info_objects;
 
         VkDescriptorBufferInfo sbo_info_skinning;
-        sbo_info_skinning.buffer =
-            m_sbo_data->getHostBuffer()[i];
+        sbo_info_skinning.buffer = m_sbo_data->getHostBuffer()[i];
         sbo_info_skinning.offset = 0;
         sbo_info_skinning.range = m_skinning_data_padded_size;
 
@@ -2048,10 +2043,8 @@ void GEVulkanDrawCall::updateDataDescriptorSets(GEVulkanDriver* vk)
         data_set[2].pBufferInfo = &sbo_info_skinning;
 
         VkDescriptorBufferInfo sbo_info_material;
-        sbo_info_material.buffer =
-            m_sbo_data->getHostBuffer()[i];
-        sbo_info_material.offset = m_skinning_data_padded_size +
-            m_object_data_padded_size;
+        sbo_info_material.buffer = m_sbo_data->getHostBuffer()[i];
+        sbo_info_material.offset = m_skinning_data_padded_size + m_object_data_padded_size;
         sbo_info_material.range = m_materials_padded_size;
         if (bind_mesh_textures)
         {
@@ -2068,28 +2061,6 @@ void GEVulkanDrawCall::updateDataDescriptorSets(GEVulkanDriver* vk)
 
         vkUpdateDescriptorSets(vk->getDevice(), data_set.size(),
             data_set.data(), 0, NULL);
-    }
-    
-    if (m_draw_call_type == GVDCT_FORWARD)
-    {
-        VkDescriptorImageInfo info;
-        info.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
-        info.sampler = vk->getSampler(GVS_SHADOWMAP);
-        info.imageView = (VkImageView)vk->getRTTShadowMap()->getTextureHandler();
-
-        VkWriteDescriptorSet write_descriptor_set = {};
-        write_descriptor_set.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
-        write_descriptor_set.dstBinding = 0;
-        write_descriptor_set.dstArrayElement = 0;
-        write_descriptor_set.descriptorType =
-            VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
-        write_descriptor_set.descriptorCount = 1;
-        write_descriptor_set.pBufferInfo = 0;
-        write_descriptor_set.dstSet = m_data_descriptor_set_pbr;
-        write_descriptor_set.pImageInfo = &info;
-
-        vkUpdateDescriptorSets(vk->getDevice(), 1,
-            &write_descriptor_set, 0, NULL);
     }
 }   // updateDataDescriptor
 }

@@ -3,7 +3,7 @@
 #include "ge_main.hpp"
 #include "ge_spm_buffer.hpp"
 #include "ge_vulkan_camera_scene_node.hpp"
-#include "ge_vulkan_shadow_camera_scene_node.hpp"
+#include "ge_vulkan_sun_scene_node.hpp"
 
 #include "occlusion/CullingThreadpool.h"
 
@@ -18,7 +18,7 @@ GECullingTool::GECullingTool()
     m_occlusion = NULL;
     m_occlusion_manager = NULL;
 
-    m_ignore_near_plane = false;
+    m_cull_for_shadows = false;
 }
 
 // ----------------------------------------------------------------------------
@@ -61,14 +61,14 @@ void GECullingTool::init(GEVulkanCameraSceneNode* cam, bool occlusion)
 }   // init
 
 // ----------------------------------------------------------------------------
-void GECullingTool::init(GEVulkanShadowCameraSceneNode* cam, GEVulkanShadowCameraCascade cascade)
+void GECullingTool::init(GEVulkanSunSceneNode* sun, GEVulkanShadowCameraCascade cascade)
 {
-    mathPlaneFrustumf(&m_frustum[0].X, cam->getProjectionViewMatrix(cascade));
-    m_ignore_near_plane = true;
+    mathPlaneFrustumf(&m_frustum[0].X, sun->getShadowProjectionViewMatrix(cascade));
+    m_cull_for_shadows = true;
 
-    m_cam_bbox = cam->getBoundingBox();
-    m_pvm_matrix = cam->getProjectionViewMatrix(cascade);
-    m_cam_position = cam->getPosition();
+    m_cam_bbox = irr::core::aabbox3df();
+    m_pvm_matrix = sun->getShadowProjectionViewMatrix(cascade);
+    m_cam_position = irr::core::vector3df();
     m_occlusion = NULL;
     m_occlusion_manager = NULL;
 }   // init
@@ -217,7 +217,7 @@ void GECullingTool::processOccluders()
 // ----------------------------------------------------------------------------
 bool GECullingTool::isViewCulled(irr::core::aabbox3df& bb)
 {
-    if (!m_ignore_near_plane && !m_cam_bbox.intersectsWithBox(bb))
+    if (!m_cull_for_shadows && !m_cam_bbox.intersectsWithBox(bb))
         return true;
 
     using namespace irr;
@@ -234,7 +234,7 @@ bool GECullingTool::isViewCulled(irr::core::aabbox3df& bb)
         quaternion(bb.MaxEdge.X, bb.MaxEdge.Y, bb.MaxEdge.Z, 1.0f)
     };
 
-    for (int i = m_ignore_near_plane ? 1 : 0; i < 6; i++)
+    for (int i = m_cull_for_shadows ? 1 : 0; i < 6; i++)
     {
         bool culled = true;
         for (int j = 0; j < 8; j++)
@@ -259,7 +259,7 @@ bool GECullingTool::isOcclusionCulled(irr::core::aabbox3df& bb)
         return false;
     }
 
-    if (bb.isPointInside(m_cam_position))
+    if (!m_cull_for_shadows && bb.isPointInside(m_cam_position))
     {
         return false;
     }

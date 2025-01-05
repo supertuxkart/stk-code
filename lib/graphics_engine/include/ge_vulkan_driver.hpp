@@ -30,6 +30,7 @@ namespace GE
     class GESPM;
     class GEVulkanDepthTexture;
     class GEVulkanDrawCall;
+    class GEVulkanDynamicBuffer;
     class GEVulkanDynamicSPMBuffer;
     class GEVulkanFBOTexture;
     class GEVulkanFBOShadowMap;
@@ -54,16 +55,6 @@ namespace GE
         GVQI_COMPUTE,
         GVQI_TRANSFER,
         GVQI_COUNT
-    };
-    struct GEGlobalLightUBO
-    {
-        irr::core::vector3df m_ambient_color;
-        irr::f32             m_sun_angle_tan_half;
-        irr::core::vector3df m_sun_color;
-        irr::f32             m_sun_scatter;
-        irr::core::vector3df m_sun_direction;
-        irr::f32             m_fog_density;
-        irr::video::SColorf  m_fog_color;
     };
     class GEVulkanDriver : public video::CNullDriver
     {
@@ -397,7 +388,9 @@ namespace GE
                                        { m_dynamic_spm_buffers.insert(buffer); }
         void removeDynamicSPMBuffer(GEVulkanDynamicSPMBuffer* buffer)
                                         { m_dynamic_spm_buffers.erase(buffer); }
-        const GEGlobalLightUBO *getGlobalLightUBO(const core::matrix4 &inverse_view);
+        VkDescriptorSetLayout getGlobalUBOLayout() { return m_global_ubo_descriptor_layout; }
+        VkDescriptorSet* getGlobalUBOSet() { return &m_global_ubo_descriptor_sets[m_current_buffer_idx]; }
+
     private:
         struct SwapChainSupportDetails
         {
@@ -502,6 +495,16 @@ namespace GE
                     vkDestroyInstance(instance, NULL);
             }
         };
+        struct GEGlobalLightUBO
+        {
+            irr::core::vector3df m_ambient_color;
+            irr::f32             m_sun_scatter;
+            irr::core::vector3df m_sun_color;
+            irr::f32             m_sun_angle_tan_half;
+            irr::core::vector3df m_sun_direction;
+            irr::f32             m_fog_density;
+            irr::video::SColorf  m_fog_color;
+        };
         std::unique_ptr<VK> m_vk;
         VkFormat m_swap_chain_image_format;
         VkExtent2D m_swap_chain_extent;
@@ -548,8 +551,13 @@ namespace GE
         int m_current_buffer_idx;
         std::set<GEVulkanDynamicSPMBuffer*> m_dynamic_spm_buffers;
 
-        GEGlobalLightUBO m_global_light_ubo;
-        GEGlobalLightUBO m_global_light_ubo_gpu;
+        video::SColorf m_ambient_light;
+
+        GEVulkanDynamicBuffer *m_global_ubo;
+        std::vector<bool> m_global_ubo_dirty;
+        VkDescriptorSetLayout m_global_ubo_descriptor_layout;
+        VkDescriptorPool m_global_ubo_descriptor_pool;
+        std::vector<VkDescriptorSet> m_global_ubo_descriptor_sets;
 
         void createInstance(SDL_Window* window);
         void findPhysicalDevice();
@@ -568,12 +576,14 @@ namespace GE
         void createRenderPass();
         void createFramebuffers();
         void createUnicolorTextures();
+        void createGlobalUBO();
         void initPreRotationMatrix();
         std::string getVulkanVersionString() const;
         std::string getDriverVersionString() const;
         void destroySwapChainRelated(bool handle_surface);
         void createSwapChainRelated(bool handle_surface);
         void buildCommandBuffers();
+        void updateGlobalUBO();
         void createBillboardQuad();
     };
 

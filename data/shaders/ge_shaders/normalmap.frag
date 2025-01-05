@@ -60,8 +60,9 @@ void main()
     vec3 reflection = reflect(-eyedir, normal);
 
     vec3 lightdir = sunDirection(reflection,
-                                u_camera.m_sun_direction,
-                                u_camera.m_sun_angle_tan_half);
+                                u_global_light.m_sun_direction,
+                                u_global_light.m_sun_angle_tan_half,
+                                u_camera.m_inverse_view_matrix);
 
     vec4 world_position = u_camera.m_inverse_view_matrix * vec4(xpos.xyz, 1.0);
     float shadow = getShadowFactor(world_position.xyz, xpos, normal, lightdir);
@@ -71,15 +72,15 @@ void main()
         (u_camera.m_inverse_view_matrix * vec4(normal, 0.0)).xyz,
         (u_camera.m_inverse_view_matrix * vec4(reflection, 0.0)).xyz,
         diffuse_color,
-        u_camera.m_sun_color,
-        u_camera.m_ambient_color,
+        u_global_light.m_sun_color,
+        u_global_light.m_ambient_color,
         1.0 - pbr.x, pbr.y, pbr.z);
 
     mixed_color = applyFog(
         eyedir, -lightdir, mixed_color,
-        u_camera.m_sun_color, u_camera.m_sun_scatter * shadow,
+        u_global_light.m_sun_color, u_global_light.m_sun_scatter * shadow,
         length(xpos), 
-        u_camera.m_fog_color, u_camera.m_fog_density);
+        u_global_light.m_fog_color, u_global_light.m_fog_density);
 
     mixed_color = (mixed_color * (6.9 * mixed_color + 0.5)) / (mixed_color * (5.2 * mixed_color + 1.7) + 0.06);
 

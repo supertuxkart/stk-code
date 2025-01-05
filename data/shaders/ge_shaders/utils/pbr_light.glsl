@@ -1,7 +1,3 @@
-layout(set = 2, binding = 0) uniform samplerCube u_diffuse_environment_map;
-layout(set = 2, binding = 1) uniform samplerCube u_specular_environment_map;
-layout(set = 3, binding = 0) uniform sampler2DArrayShadow u_shadow_map;
-
 vec2 F_AB(float perceptual_roughness, float NdotV) 
 {
     vec4 c0 = vec4(-1.0, -0.0275, -0.572, 0.022);
@@ -119,15 +115,11 @@ vec3 environmentLight(
     // because textureNumLevels() does not work on WebGL2
     float radiance_level = perceptual_roughness * 7.;
 
-    float intensity = 0.8;
+    float intensity = 0.5;
 
-    vec3 irradiance = textureLod(
-        u_diffuse_environment_map,
-        world_normal, 0).rgb * intensity;
+    vec3 irradiance = vec3(intensity);
 
-    vec3 radiance = textureLod(
-        u_specular_environment_map,
-        world_reflection, radiance_level).rgb * intensity;
+    vec3 radiance = vec3(intensity);
 
     // Multiscattering approximation: https://www.jcgt.org/published/0008/01/03/paper.pdf
     // Useful reference: https://bruop.github.io/ibl
@@ -192,8 +184,7 @@ float getShadowPCF(vec2 shadowtexcoord, float layer, float d)
 
 float getShadowFactor(vec3 world_position, vec3 xpos, vec3 normal, vec3 lightdir)
 {
-    vec3 dir = normalize(vec3(1., 1., 1.));
-    float bias = max(1.0 - dot(normal, -dir), 0.2) / 1024.;
+    float bias = max(1.0 - dot(normal, lightdir), 0.2) / 1024.;
     float shadow = 1.0;
 
     if (xpos.z >= 150.0)
@@ -208,7 +199,7 @@ float getShadowFactor(vec3 world_position, vec3 xpos, vec3 normal, vec3 lightdir
     vec4 light_view_position = u_camera.m_shadow_matrix[level] * vec4(world_position.xyz, 1.0);
     light_view_position.xyz /= light_view_position.w;
     light_view_position.xy = light_view_position.xy * 0.5 + 0.5;
-    light_view_position.z -= bias;
+    light_view_position.z += bias;
 
     shadow = getShadowPCF(light_view_position.xy, float(level), light_view_position.z);
     shadow = mix(shadow, 1.0, end_factor);
@@ -222,7 +213,7 @@ float getShadowFactor(vec3 world_position, vec3 xpos, vec3 normal, vec3 lightdir
     light_view_position = u_camera.m_shadow_matrix[level + 1] * vec4(world_position.xyz, 1.0);
     light_view_position.xyz /= light_view_position.w;
     light_view_position.xy = light_view_position.xy * 0.5 + 0.5;
-    light_view_position.z -= bias;
+    light_view_position.z += bias;
 
     shadow = mix(shadow, getShadowPCF(light_view_position.xy, float(level + 1), light_view_position.z), factor - float(level));
 
@@ -284,5 +275,5 @@ vec3 PBRSunAmbientEmitLight(
     vec3 emit = emissive * color * 4.0;
 
     return sun_color * sunlight
-         + environment + emit;
+         + environment + emit + (diffuse_ambient + specular_ambient) * 0.02;
 }
