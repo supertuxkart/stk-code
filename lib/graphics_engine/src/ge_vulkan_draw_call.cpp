@@ -1291,7 +1291,7 @@ void GEVulkanDrawCall::createVulkanData()
         bindings.push_back(material_binding);
     }
 
-    VkDescriptorSetLayoutBinding shadowmap_binding = {};
+    /*VkDescriptorSetLayoutBinding shadowmap_binding = {};
     shadowmap_binding.binding = 0;
     shadowmap_binding.descriptorCount = 1;
     shadowmap_binding.descriptorType =
@@ -1302,7 +1302,7 @@ void GEVulkanDrawCall::createVulkanData()
     std::vector<VkDescriptorSetLayoutBinding> bindings_pbr =
     {
         shadowmap_binding
-    };
+    };*/
 
     VkDescriptorSetLayoutCreateInfo setinfo = {};
     setinfo.flags = 0;
@@ -1311,12 +1311,12 @@ void GEVulkanDrawCall::createVulkanData()
     setinfo.pBindings = bindings.data();
     setinfo.bindingCount = bindings.size();
 
-    VkDescriptorSetLayoutCreateInfo setinfo_pbr = {};
+    /*VkDescriptorSetLayoutCreateInfo setinfo_pbr = {};
     setinfo_pbr.flags = 0;
     setinfo_pbr.pNext = NULL;
     setinfo_pbr.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO;
     setinfo_pbr.pBindings = bindings_pbr.data();
-    setinfo_pbr.bindingCount = bindings_pbr.size();
+    setinfo_pbr.bindingCount = bindings_pbr.size();*/
 
     VkResult result = vkCreateDescriptorSetLayout(vk->getDevice(), &setinfo,
         NULL, &m_data_layout);
@@ -1326,13 +1326,13 @@ void GEVulkanDrawCall::createVulkanData()
             "layout");
     }
 
-    result = vkCreateDescriptorSetLayout(vk->getDevice(), &setinfo_pbr,
+    /*result = vkCreateDescriptorSetLayout(vk->getDevice(), &setinfo_pbr,
         NULL, &m_data_layout_pbr);
     if (result != VK_SUCCESS)
     {
         throw std::runtime_error("vkCreateDescriptorSetLayout failed for pbr "
             "data layout");
-    }
+    }*/
 
     // m_descriptor_pool
     std::vector<VkDescriptorPoolSize> sizes =
@@ -1349,13 +1349,13 @@ void GEVulkanDrawCall::createVulkanData()
     if (GEVulkanFeatures::supportsBindMeshTexturesAtOnce())
         sizes.push_back(sizes.back());
     
-    std::vector<VkDescriptorPoolSize> sizes_pbr =
+    /*std::vector<VkDescriptorPoolSize> sizes_pbr =
     {
         {
             VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,
             1
         }
-    };
+    };*/
 
     VkDescriptorPoolCreateInfo pool_info = {};
     pool_info.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO;
@@ -1368,7 +1368,7 @@ void GEVulkanDrawCall::createVulkanData()
         &m_descriptor_pool) != VK_SUCCESS)
         throw std::runtime_error("createDescriptorPool failed");
     
-    VkDescriptorPoolCreateInfo pool_info_pbr = {};
+    /*VkDescriptorPoolCreateInfo pool_info_pbr = {};
     pool_info_pbr.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO;
     pool_info_pbr.flags = 0;
     pool_info_pbr.maxSets = 1;
@@ -1377,7 +1377,7 @@ void GEVulkanDrawCall::createVulkanData()
 
     if (vkCreateDescriptorPool(vk->getDevice(), &pool_info_pbr, NULL,
         &m_descriptor_pool_pbr) != VK_SUCCESS)
-        throw std::runtime_error("createDescriptorPool failed");
+        throw std::runtime_error("createDescriptorPool failed");*/
 
     // m_data_descriptor_sets
     unsigned set_size = vk->getMaxFrameInFlight() + 1;
@@ -1398,7 +1398,7 @@ void GEVulkanDrawCall::createVulkanData()
             "layout");
     }
 
-    VkDescriptorSetAllocateInfo alloc_info_pbr = {};
+    /*VkDescriptorSetAllocateInfo alloc_info_pbr = {};
     alloc_info_pbr.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;
     alloc_info_pbr.descriptorPool = m_descriptor_pool_pbr;
     alloc_info_pbr.descriptorSetCount = 1;
@@ -1409,7 +1409,7 @@ void GEVulkanDrawCall::createVulkanData()
     {
         throw std::runtime_error("vkAllocateDescriptorSets failed for data "
             "layout");
-    }
+    }*/
 
     // m_pipeline_layout
     std::vector<VkDescriptorSetLayout> all_layouts =
@@ -1644,14 +1644,16 @@ void GEVulkanDrawCall::render(GEVulkanDriver* vk, VkCommandBuffer custom_cmd)
     {
         0u
     };
-    vkCmdBindDescriptorSets(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS,
-        m_pipeline_layout, 2, 1, GEVulkanSkyBoxRenderer::getEnvMapDescriptor(),
-        0, NULL);
+    if (getGEConfig()->m_pbr)
+    {
+        vkCmdBindDescriptorSets(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS,
+            m_pipeline_layout, 2, 1, GEVulkanSkyBoxRenderer::getEnvMapDescriptor(),
+            0, NULL);
 
-    vkCmdBindDescriptorSets(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS,
-        m_pipeline_layout, 3, 1, vk->getGlobalUBOSet(),
-        0, NULL);
-
+        vkCmdBindDescriptorSets(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS,
+            m_pipeline_layout, 3, 1, vk->getGlobalUBOSet(),
+            0, NULL);
+    }
     bool is_depth_only = getGEConfig()->m_pbr;
 
 start:
@@ -1680,7 +1682,7 @@ start:
                 if (bindPipeline(cmd, cur_pipeline, is_depth_only))
                 {
                     auto it = m_dynamic_spm_buffers.find(
-                        getDynamicBufferKey(cur_pipeline, is_depth_only));
+                        getDynamicBufferKey(cur_pipeline, m_draw_call_type != GVDCT_FORWARD));
                     if (it != m_dynamic_spm_buffers.end())
                     {
                         for (auto& buf : it->second)
@@ -1731,7 +1733,7 @@ start:
         if (bindPipeline(cmd, m_cmds.back().m_shader, is_depth_only))
         {
             auto it = m_dynamic_spm_buffers.find(
-                getDynamicBufferKey(m_cmds.back().m_shader, is_depth_only));
+                getDynamicBufferKey(m_cmds.back().m_shader, m_draw_call_type != GVDCT_FORWARD));
             if (it != m_dynamic_spm_buffers.end())
             {
                 for (auto& buf : it->second)
@@ -1768,7 +1770,7 @@ start:
         if (current_pipeline_exists)
         {
             auto it = m_dynamic_spm_buffers.find(
-                getDynamicBufferKey(cur_pipeline, is_depth_only));
+                getDynamicBufferKey(cur_pipeline, m_draw_call_type != GVDCT_FORWARD));
             if (it != m_dynamic_spm_buffers.end())
             {
                 for (auto& buf : it->second)
@@ -1829,7 +1831,7 @@ start:
                     continue;
                 }
                 auto it = m_dynamic_spm_buffers.find(
-                    getDynamicBufferKey(cur_pipeline, is_depth_only));
+                    getDynamicBufferKey(cur_pipeline, m_draw_call_type != GVDCT_FORWARD));
                 if (it != m_dynamic_spm_buffers.end())
                 {
                     for (auto& buf : it->second)
