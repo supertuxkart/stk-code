@@ -91,14 +91,6 @@ void TracksScreen::eventCallback(Widget* widget, const std::string& name,
                 m_laps->setValue(host_vote->m_num_laps);
                 m_reversed->setState(host_vote->m_reverse);
                 voteForPlayer();
-
-                // If editing favorite, also favorite that track
-                if (getWidget<CheckBoxWidget>("favorite")->getState()
-                 && !PlayerManager::getCurrentPlayer()->isFavoriteTrack(host_vote->m_track_name))
-                {
-                    PlayerManager::getCurrentPlayer()->addFavoriteTrack(host_vote->m_track_name);
-                    buildTrackList();
-                }
             }
         }
     }
@@ -138,16 +130,7 @@ void TracksScreen::eventCallback(Widget* widget, const std::string& name,
 
         if (m_selected_track)
         {
-            if (getWidget<CheckBoxWidget>("favorite")->getState())
-            {
-                if(PlayerManager::getCurrentPlayer()->isFavoriteTrack(m_selected_track->getIdent()))
-                    PlayerManager::getCurrentPlayer()->removeFavoriteTrack(m_selected_track->getIdent());
-                else
-                    PlayerManager::getCurrentPlayer()->addFavoriteTrack(m_selected_track->getIdent());
-
-                buildTrackList();
-            }
-            else if (STKHost::existHost())
+            if (STKHost::existHost())
             {
                 w2->setBadge(selection, OK_BADGE);
                 voteForPlayer();
@@ -361,10 +344,6 @@ void TracksScreen::beforeAddingWidget()
     RibbonWidget* tabs = getWidget<RibbonWidget>("trackgroups");
     tabs->clearAllChildren();
 
-    CheckBoxWidget* favorite_cb = getWidget<CheckBoxWidget>("favorite");
-    assert( favorite_cb != NULL );
-    favorite_cb->setState(false);
-    
     RaceManager::MinorRaceModeType minor_mode = RaceManager::get()->getMinorMode();
     bool is_soccer = minor_mode == RaceManager::MINOR_MODE_SOCCER;
     bool is_arena = is_soccer || RaceManager::get()->isBattleMode();
