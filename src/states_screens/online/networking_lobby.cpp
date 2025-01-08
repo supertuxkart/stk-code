@@ -841,6 +841,7 @@ void NetworkingLobby::eventCallback(Widget* widget, const std::string& name,
     {
         onEnterPressed(m_chat_box->getText());
         m_chat_box->setText("");
+        m_chat_box->setFocusForPlayer(PLAYER_ID_GAME_MASTER);
     }   // send chat message
     else if (name == m_emoji_button->m_properties[PROP_ID] &&
         !ScreenKeyboard::isActive())
