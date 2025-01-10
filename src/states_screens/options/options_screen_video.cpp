@@ -124,6 +124,9 @@ void OptionsScreenVideo::initPresets()
     m_scale_rtts_custom_presets.push_back({ 0.9f });
     m_scale_rtts_custom_presets.push_back({ 0.95f });
     m_scale_rtts_custom_presets.push_back({ 1.0f });
+    m_scale_rtts_custom_presets.push_back({ 1.25f });
+    m_scale_rtts_custom_presets.push_back({ 1.5f });
+    m_scale_rtts_custom_presets.push_back({ 2.0f });
 
 }   // initPresets
 
@@ -292,6 +295,9 @@ void OptionsScreenVideo::init()
     scale_rtts->addLabel("90%");
     scale_rtts->addLabel("95%");
     scale_rtts->addLabel("100%");
+    scale_rtts->addLabel("125%");
+    scale_rtts->addLabel("150%");
+    scale_rtts->addLabel("200%");
 
     // --- set gfx settings values
     updateGfxSlider();
