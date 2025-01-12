@@ -1849,7 +1849,10 @@ void IrrDriver::setAmbientLight(const video::SColorf &light, bool force_SH_compu
 {
 #ifndef SERVER_ONLY
     video::SColorf color = light;
-    
+    if (GE::getVKDriver())
+    {
+        color.a *= 0.4; // Other 0.6 comes from skybox
+    }
     m_scene_manager->setAmbientLight(color);
     m_renderer->setAmbientLight(light, force_SH_computation);    
 #endif

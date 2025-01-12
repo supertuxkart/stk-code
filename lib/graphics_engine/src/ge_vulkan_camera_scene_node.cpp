@@ -58,10 +58,10 @@ void GEVulkanCameraSceneNode::render()
     m_ubo_data.m_projection_view_matrix.getInverse(
         m_ubo_data.m_inverse_projection_view_matrix);
 
-    m_ubo_data.m_viewport.UpperLeftCorner.X = m_viewport.UpperLeftCorner.X;
-    m_ubo_data.m_viewport.UpperLeftCorner.Y = m_viewport.UpperLeftCorner.Y;
-    m_ubo_data.m_viewport.LowerRightCorner.X = m_viewport.getWidth();
-    m_ubo_data.m_viewport.LowerRightCorner.Y = m_viewport.getHeight();
+    m_ubo_data.m_viewport.UpperLeftCorner.X = m_viewport.UpperLeftCorner.X * getGEConfig()->m_render_scale;
+    m_ubo_data.m_viewport.UpperLeftCorner.Y = m_viewport.UpperLeftCorner.Y * getGEConfig()->m_render_scale;
+    m_ubo_data.m_viewport.LowerRightCorner.X = m_viewport.getWidth() * getGEConfig()->m_render_scale;
+    m_ubo_data.m_viewport.LowerRightCorner.Y = m_viewport.getHeight() * getGEConfig()->m_render_scale;
 }   // render
 
 // ----------------------------------------------------------------------------

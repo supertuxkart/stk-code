@@ -4,8 +4,6 @@ layout(location = 3) flat in int f_material_id;
 layout(location = 4) in float f_hue_change;
 #ifdef PBR_ENABLED
 layout(location = 5) in vec3 f_normal;
-layout(location = 6) in vec3 f_tangent;
-layout(location = 7) in vec3 f_bitangent;
 #endif
 
 layout(location = 0) out vec4 o_color;
@@ -22,39 +20,24 @@ layout(location = 0) out vec4 o_color;
 void main()
 {
     vec4 tex_color = sampleMeshTexture0(f_material_id, f_uv);
+    if (tex_color.a * f_vertex_color.a < 0.5)
+        discard;
 
     if (f_hue_change > 0.0)
     {
-        float mask = tex_color.a;
         vec3 old_hsv = rgbToHsv(tex_color.rgb);
-        float mask_step = step(mask, 0.5);
-#ifndef PBR_ENABLED
-        // For similar color
-        float saturation = mask * 1.825; // 2.5 * 0.5 ^ (1. / 2.2)
-#else
-        float saturation = mask * 2.5;
-#endif
-        vec2 new_xy = mix(vec2(old_hsv.x, old_hsv.y), vec2(f_hue_change,
-            max(old_hsv.y, saturation)), vec2(mask_step, mask_step));
+        vec2 new_xy = vec2(f_hue_change, old_hsv.y);
         vec3 new_color = hsvToRgb(vec3(new_xy.x, new_xy.y, old_hsv.z));
-        tex_color = vec4(new_color.r, new_color.g, new_color.b, 1.0);
+        tex_color = vec4(new_color.r, new_color.g, new_color.b, tex_color.a);
     }
 #ifndef PBR_ENABLED
     vec3 mixed_color = tex_color.xyz * f_vertex_color.xyz;
     o_color = vec4(mixed_color, 1.0);
 #else
     vec3 diffuse_color = tex_color.xyz * f_vertex_color.xyz;
+    vec3 normal = normalize(f_normal.xyz);
 
-    vec4 layer_3 = sampleMeshTexture3(f_material_id, f_uv);
-    vec3 tangent_space_normal = 2.0 * layer_3.xyz - 1.0;
-    vec3 frag_tangent = normalize(f_tangent);
-    vec3 frag_bitangent = normalize(f_bitangent);
-    vec3 frag_normal = normalize(f_normal);
-    mat3 t_b_n = mat3(frag_tangent, frag_bitangent, frag_normal);
-
-    vec3 normal = normalize(t_b_n * tangent_space_normal);
-
-    vec4 pbr = sampleMeshTexture2(f_material_id, f_uv);
+    vec4 pbr = vec4(0.0, 0.0, 0.2, 0.0);
     vec3 xpos = getPosFromFragCoord(gl_FragCoord, u_camera.m_viewport, u_camera.m_inverse_projection_matrix);
     vec3 eyedir = -normalize(xpos);
     vec3 reflection = reflect(-eyedir, normal);
@@ -65,7 +48,7 @@ void main()
                                 u_camera.m_inverse_view_matrix);
 
     vec4 world_position = u_camera.m_inverse_view_matrix * vec4(xpos.xyz, 1.0);
-    float shadow = getShadowFactor(world_position.xyz, xpos, frag_normal, lightdir);
+    float shadow = getShadowFactor(world_position.xyz, xpos, normal, lightdir);
 
     vec3 mixed_color = PBRSunAmbientEmitLight(
         normal, eyedir, lightdir, shadow,

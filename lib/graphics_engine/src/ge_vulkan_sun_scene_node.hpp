@@ -44,13 +44,13 @@ public:
     // ------------------------------------------------------------------------
     static const float getSplitNear(GEVulkanShadowCameraCascade cascade)
     {
-        const float cascade_near[GVSCC_COUNT] = { 1.0f, 10.0f, 35.0f };
+        const float cascade_near[GVSCC_COUNT] = { 1.0f, 7.0f, 35.0f };
         return cascade_near[cascade];
     }
     // ------------------------------------------------------------------------
     static const float getSplitFar(GEVulkanShadowCameraCascade cascade)
     {
-        const float cascade_far[GVSCC_COUNT] = { 11.0f, 40.0f, 150.0f };
+        const float cascade_far[GVSCC_COUNT] = { 8.0f, 40.0f, 150.0f };
         return cascade_far[cascade];
     }
     // ------------------------------------------------------------------------

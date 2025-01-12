@@ -115,11 +115,15 @@ vec3 environmentLight(
     // because textureNumLevels() does not work on WebGL2
     float radiance_level = perceptual_roughness * 7.;
 
-    float intensity = 0.5;
+    float intensity = 1.0;
 
-    vec3 irradiance = vec3(intensity);
+    vec3 irradiance = textureLod(
+        u_diffuse_environment_map,
+        world_normal, 0).rgb * intensity;
 
-    vec3 radiance = vec3(intensity);
+    vec3 radiance = textureLod(
+        u_specular_environment_map,
+        world_reflection, radiance_level).rgb * intensity;
 
     // Multiscattering approximation: https://www.jcgt.org/published/0008/01/03/paper.pdf
     // Useful reference: https://bruop.github.io/ibl
@@ -139,52 +143,51 @@ vec3 environmentLight(
     return diffuse + specular;
 }
 
-float getShadowPCF(vec2 shadowtexcoord, float layer, float d)
+float sampleDepth(vec2 shadowtexcoord, int layer, float depth)
 {
-    float shadow_res = 1024.;
-    vec2 uv = shadowtexcoord * shadow_res;
-    vec2 base_uv = floor(uv + 0.5);
-    float s = (uv.x + 0.5 - base_uv.x);
-    float t = (uv.y + 0.5 - base_uv.y);
-    base_uv -= 0.5;
-    base_uv /= shadow_res;
+    // clamp needed for directional lights and/or large kernels
+    shadowtexcoord = clamp(shadowtexcoord, vec2(0.0), vec2(1.0));
 
-    float uw0 = (4.0 - 3.0 * s);
-    float uw1 = 7.0;
-    float uw2 = (1.0 + 3.0 * s);
+    // depth must be clamped to support floating-point depth formats which are always in
+    // the range [0, 1].
+    return texture(u_shadow_map, vec4(shadowtexcoord, float(layer), depth));
+}
 
-    float u0 = (3.0 - 2.0 * s) / uw0 - 2.0;
-    float u1 = (3.0 + s) / uw1;
-    float u2 = s / uw2 + 2.0;
+// use hardware assisted PCF + 3x3 gaussian filter
+float getShadowPCF(vec2 shadowtexcoord, int layer, float depth)
+{
+    // Castaño, 2013, "Shadow Mapping Summary Part 1"
 
-    float vw0 = (4.0 - 3.0 * t);
-    float vw1 = 7.0;
-    float vw2 = (1.0 + 3.0 * t);
+    // clamp position to avoid overflows below, which cause some GPUs to abort
+    shadowtexcoord = clamp(shadowtexcoord, vec2(-1.0), vec2(2.0));
+    depth = clamp(depth, 0.0, 1.0);
 
-    float v0 = (3.0 - 2.0 * t) / vw0 - 2.0;
-    float v1 = (3.0 + t) / vw1;
-    float v2 = t / vw2 + 2.0;
+    float size = 1024.;
+    vec2 texel_size = vec2(1.0) / size;
+    vec2 offset = vec2(0.5);
+    vec2 uv = (shadowtexcoord * size) + offset;
+    vec2 base = (floor(uv) - offset) * texel_size;
+    vec2 st = fract(uv);
+
+    vec2 uw = vec2(3.0 - 2.0 * st.x, 1.0 + 2.0 * st.x);
+    vec2 vw = vec2(3.0 - 2.0 * st.y, 1.0 + 2.0 * st.y);
+
+    vec2 u = vec2((2.0 - st.x) / uw.x - 1.0, st.x / uw.y + 1.0);
+    vec2 v = vec2((2.0 - st.y) / vw.x - 1.0, st.y / vw.y + 1.0);
+
+    u *= texel_size.x;
+    v *= texel_size.y;
 
     float sum = 0.0;
-
-    sum += uw0 * vw0 * texture(u_shadow_map, vec4(base_uv + (vec2(u0, v0) / shadow_res), layer, d));
-    sum += uw1 * vw0 * texture(u_shadow_map, vec4(base_uv + (vec2(u1, v0) / shadow_res), layer, d));
-    sum += uw2 * vw0 * texture(u_shadow_map, vec4(base_uv + (vec2(u2, v0) / shadow_res), layer, d));
-
-    sum += uw0 * vw1 * texture(u_shadow_map, vec4(base_uv + (vec2(u0, v1) / shadow_res), layer, d));
-    sum += uw1 * vw1 * texture(u_shadow_map, vec4(base_uv + (vec2(u1, v1) / shadow_res), layer, d));
-    sum += uw2 * vw1 * texture(u_shadow_map, vec4(base_uv + (vec2(u2, v1) / shadow_res), layer, d));
-
-    sum += uw0 * vw2 * texture(u_shadow_map, vec4(base_uv + (vec2(u0, v2) / shadow_res), layer, d));
-    sum += uw1 * vw2 * texture(u_shadow_map, vec4(base_uv + (vec2(u1, v2) / shadow_res), layer, d));
-    sum += uw2 * vw2 * texture(u_shadow_map, vec4(base_uv + (vec2(u2, v2) / shadow_res), layer, d));
-
-    return sum / 144.0;
+    sum += uw.x * vw.x * sampleDepth(base + vec2(u.x, v.x), layer, depth);
+    sum += uw.y * vw.x * sampleDepth(base + vec2(u.y, v.x), layer, depth);
+    sum += uw.x * vw.y * sampleDepth(base + vec2(u.x, v.y), layer, depth);
+    sum += uw.y * vw.y * sampleDepth(base + vec2(u.y, v.y), layer, depth);
+    return sum * (1.0 / 16.0);
 }
 
 float getShadowFactor(vec3 world_position, vec3 xpos, vec3 normal, vec3 lightdir)
 {
-    float bias = max(1.0 - dot(normal, lightdir), 0.2) / 1024.;
     float shadow = 1.0;
 
     if (xpos.z >= 150.0)
@@ -192,16 +195,17 @@ float getShadowFactor(vec3 world_position, vec3 xpos, vec3 normal, vec3 lightdir
         return shadow;
     }
 
-    float factor = smoothstep(10.0, 11.0, xpos.z) + smoothstep(35.0, 40.0, xpos.z);
+    float factor = smoothstep(7.0, 8.0, xpos.z) + smoothstep(35.0, 40.0, xpos.z);
     float end_factor = smoothstep(130.0, 150.0, xpos.z);
     int level = int(factor);
+    float bias = (0.4 + 2.0 * (1.0 - max(0.0, dot(lightdir, -normal)))) / 1024.;
 
-    vec4 light_view_position = u_camera.m_shadow_matrix[level] * vec4(world_position.xyz, 1.0);
+    vec4 light_view_position = u_camera.m_shadow_matrix[level] * vec4(world_position, 1.0);
     light_view_position.xyz /= light_view_position.w;
     light_view_position.xy = light_view_position.xy * 0.5 + 0.5;
-    light_view_position.z += bias;
+    light_view_position.z -= bias;
 
-    shadow = getShadowPCF(light_view_position.xy, float(level), light_view_position.z);
+    shadow = getShadowPCF(light_view_position.xy, level, light_view_position.z);
     shadow = mix(shadow, 1.0, end_factor);
 
     if (factor == float(level))
@@ -210,12 +214,12 @@ float getShadowFactor(vec3 world_position, vec3 xpos, vec3 normal, vec3 lightdir
     }
 
     // Blend with next cascade by factor
-    light_view_position = u_camera.m_shadow_matrix[level + 1] * vec4(world_position.xyz, 1.0);
+    light_view_position = u_camera.m_shadow_matrix[level + 1] * vec4(world_position, 1.0);
     light_view_position.xyz /= light_view_position.w;
     light_view_position.xy = light_view_position.xy * 0.5 + 0.5;
-    light_view_position.z += bias;
+    light_view_position.z -= bias;
 
-    shadow = mix(shadow, getShadowPCF(light_view_position.xy, float(level + 1), light_view_position.z), factor - float(level));
+    shadow = mix(shadow, getShadowPCF(light_view_position.xy, level + 1, light_view_position.z), factor - float(level));
 
     return shadow;
 }
@@ -275,5 +279,6 @@ vec3 PBRSunAmbientEmitLight(
     vec3 emit = emissive * color * 4.0;
 
     return sun_color * sunlight
-         + environment + emit + (diffuse_ambient + specular_ambient) * 0.02;
+         + environment + emit
+         + (diffuse_ambient + specular_ambient) * ambient_color;
 }

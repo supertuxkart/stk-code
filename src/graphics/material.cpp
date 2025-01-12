@@ -894,6 +894,8 @@ void  Material::setMaterialProperties(video::SMaterial *m, scene::IMeshBuffer* m
         m->EmissiveColor = video::SColor(255, 255, 255, 255);
         m->SpecularColor = video::SColor(255, 255, 255, 255);
         m->MaterialType = video::EMT_TRANSPARENT_ALPHA_CHANNEL_REF;
+        if (is_vk)
+            m->MaterialType = video::EMT_TRANSPARENT_ALPHA_CHANNEL_UNLIT;
     }
     else if (m_shader_name == "alphatest")
     {

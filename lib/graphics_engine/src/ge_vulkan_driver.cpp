@@ -32,6 +32,8 @@
 #include <android/log.h>
 #endif
 
+#define ENABLE_VALIDATION
+
 #ifdef _IRR_COMPILE_WITH_VULKAN_
 #include "SDL_vulkan.h"
 #include <algorithm>
@@ -2997,9 +2999,9 @@ void GEVulkanDriver::updateGlobalUBO()
 
     GEGlobalLightUBO light_ubo = {};
 
-    light_ubo.m_ambient_color.X = m_ambient_light.r;
-    light_ubo.m_ambient_color.Y = m_ambient_light.g;
-    light_ubo.m_ambient_color.Z = m_ambient_light.b;
+    light_ubo.m_ambient_color.X = m_ambient_light.r * m_ambient_light.a;
+    light_ubo.m_ambient_color.Y = m_ambient_light.g * m_ambient_light.a;
+    light_ubo.m_ambient_color.Z = m_ambient_light.b * m_ambient_light.a;
 
     if (Lights.size())
     {

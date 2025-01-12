@@ -387,7 +387,7 @@ void STKTextBillboard::initLegacy(const core::stringw& text, FontWithFace* face)
             GE::GESPMBuffer* spm_mb = new GE::GESPMBuffer();
             spm_mb->getMaterial().setTexture(0, p.first);
             spm_mb->getMaterial().MaterialType =
-                video::EMT_TRANSPARENT_ALPHA_CHANNEL_REF;
+                video::EMT_TRANSPARENT_ALPHA_CHANNEL_UNLIT;
             spm_mb->getMaterial().Lighting = false;
             for (auto& q : p.second)
             {

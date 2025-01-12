@@ -88,13 +88,36 @@ void GEVulkanSunSceneNode::render()
         float znear = std::max(cam->getNearValue(), lsbody.MinEdge.Y);
         float zfar = std::min(cam->getFarValue(), lsbody.MaxEdge.Y);
 
+        lslightproj(2, 2) = 1.0 / lsbody.getExtent().Z;
+        lslightproj(3, 2) = -lsbody.MinEdge.Z / lsbody.getExtent().Z;
+
+        if (viewdir.dotProduct(lightdir) < 0.9997f)
+        {
+            irr::core::vector2df vp(viewdir.dotProduct(lsleft), viewdir.dotProduct(lsup));
+            vp = vp.normalize();
+            
+            irr::core::matrix4 light_rotation;
+            light_rotation(0, 0) = vp.Y, light_rotation(0, 1) = vp.X;
+            light_rotation(1, 0) = -vp.X,light_rotation(1, 1) = vp.Y;
+            lslightproj = light_rotation * lslightproj;
+        }
+
         // lsbody as PSR (Potential Shadow Receiver) in light view space
         for (int j = 0; j < points.size(); j++)
         {
             m_shadow_view_matrix.transformVect(points[j]);
-            if (j == 0) lsbody.reset(points[j]);
-            else lsbody.addInternalPoint(points[j]);
-            
+        }
+
+        for (int j = 0; j < points.size(); j++)
+        {
+            irr::core::vector3df point = points[j];
+            float vec[4];
+            lslightproj.transformVect(vec, point);
+            point.X = vec[0] / vec[3];
+            point.Y = vec[1] / vec[3];
+            point.Z = vec[2] / vec[3];
+            if (j == 0) lsbody.reset(point);
+            else lsbody.addInternalPoint(point);
         }
 
         float n	 = lsbody.MinEdge.Y;
@@ -114,19 +137,28 @@ void GEVulkanSunSceneNode::render()
 
             float f	= n + d;
 
-            lslightproj(1, 1) = (f + n) / d;
-            lslightproj(3, 1) = -2.0 * f * n / d;
-            lslightproj(1, 3) = 1;
-            lslightproj(3, 3) = 0;
+            irr::core::matrix4 lispsmproj;
+            lispsmproj(0, 0) = n;
+            lispsmproj(1, 1) = (f + n) / d;
+            lispsmproj(2, 2) = n;
+            lispsmproj(3, 1) = -2.0 * f * n / d;
+            lispsmproj(1, 3) = 1;
+            lispsmproj(3, 3) = 0;
 
             irr::core::vector3df point = eyepos;
             m_shadow_view_matrix.transformVect(point);
+            
+            float vec[4];
+            lslightproj.transformVect(vec, point);
+            point.X = vec[0] / vec[3];
+            point.Y = vec[1] / vec[3];
+            point.Z = vec[2] / vec[3];
 
             irr::core::matrix4 correct;
             correct(3, 0) = -point.X;
             correct(3, 1) = -lsbody.MinEdge.Y + n;
 
-            lslightproj = lslightproj * correct;
+            lslightproj = lispsmproj * correct * lslightproj;
         }
         
         // lsbody as PSR (Potential Shadow Receiver) in light clip space
@@ -143,12 +175,10 @@ void GEVulkanSunSceneNode::render()
         }
 
         irr::core::matrix4 fittounitcube;
-        fittounitcube.buildProjectionMatrixOrthoLH(lsbody.MinEdge.X,
-                                                   lsbody.MaxEdge.X,
-                                                   lsbody.MaxEdge.Y,
-                                                   lsbody.MinEdge.Y,
-                                                   lsbody.MinEdge.Z,
-                                                   lsbody.MaxEdge.Z);
+        fittounitcube(0, 0) = 2.0f / lsbody.getExtent().X;
+		fittounitcube(1, 1) = 2.0f / lsbody.getExtent().Y;
+		fittounitcube(3, 0) = -(lsbody.MinEdge.X + lsbody.MaxEdge.X) / lsbody.getExtent().X;
+		fittounitcube(3, 1) = -(lsbody.MinEdge.Y + lsbody.MaxEdge.Y) / lsbody.getExtent().Y;
         
         lslightproj = fittounitcube * lslightproj;
 

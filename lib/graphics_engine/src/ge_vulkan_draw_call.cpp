@@ -819,6 +819,9 @@ std::string GEVulkanDrawCall::getShader(const irr::video::SMaterial& m)
     case irr::video::EMT_TRANSPARENT_ALPHA_CHANNEL_REF:
         shader = "alphatest";
         break;
+    case irr::video::EMT_TRANSPARENT_ALPHA_CHANNEL_UNLIT:
+        shader = "unlit";
+        break;
     case irr::video::EMT_ONETEXTURE_BLEND:
         shader = "alphablend";
         break;
@@ -901,8 +904,13 @@ void GEVulkanDrawCall::createAllPipelines(GEVulkanDriver* vk)
     settings.m_drawing_priority = (char)5;
     createPipeline(vk, settings);
 
+    settings.m_fragment_shader = "unlit.frag";
+    settings.m_shader_name = "unlit";
+    createPipeline(vk, settings);
+
     settings.m_vertex_shader = "grass.vert";
     settings.m_skinning_vertex_shader = "";
+    settings.m_fragment_shader = "alphatest.frag";
     settings.m_shader_name = "grass";
     settings.m_drawing_priority = (char)5;
     settings.m_push_constants_func = [](uint32_t* size, void** data)
@@ -1089,8 +1097,7 @@ void GEVulkanDrawCall::createPipeline(GEVulkanDriver* vk,
     rasterizer.rasterizerDiscardEnable = VK_FALSE;
     rasterizer.polygonMode = VK_POLYGON_MODE_FILL;
     rasterizer.lineWidth = 1.0f;
-    rasterizer.cullMode = settings.m_backface_culling ?
-        m_draw_call_type == GVDCT_FORWARD ? VK_CULL_MODE_BACK_BIT : VK_CULL_MODE_FRONT_BIT : VK_CULL_MODE_NONE;
+    rasterizer.cullMode = settings.m_backface_culling ? VK_CULL_MODE_BACK_BIT : VK_CULL_MODE_NONE;
     rasterizer.frontFace = VK_FRONT_FACE_CLOCKWISE;
     rasterizer.depthBiasEnable = VK_FALSE;
 

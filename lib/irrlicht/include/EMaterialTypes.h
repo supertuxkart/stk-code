@@ -195,6 +195,8 @@ namespace video
 		//! Alphatest material for grass without using vertex color in stk. */
 		EMT_STK_GRASS,
 
+		EMT_TRANSPARENT_ALPHA_CHANNEL_UNLIT,
+
 		//! This value is not used. It only forces this enumeration to compile to 32 bit.
 		EMT_FORCE_32BIT = 0x7fffffff
 	};
