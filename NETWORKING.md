@@ -360,7 +360,7 @@ CREATE TABLE ipv6_mapping
     latitude REAL NOT NULL, -- Latitude of this IP range
     longitude REAL NOT NULL, -- Longitude of this IP range
     country_code TEXT NOT NULL -- 2-letter country code
-)
+);
 ```
 
 For initialization of `ip_mapping` table, check [this script](tools/generate-ip-mappings.py).
