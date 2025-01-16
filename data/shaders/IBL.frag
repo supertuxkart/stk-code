@@ -89,7 +89,7 @@ void main(void)
     float specval = texture(ntex, uv).z;
 
     // Lagarde and de Rousiers 2014, "Moving Frostbite to PBR"
-    float ao_spec = clamp(pow(max(dot(normal, eyedir), 0.) + ao, exp2(-16.0 * (1.0 - specval) - 1.0)) - 1.0 + ao);
+    float ao_spec = clamp(pow(max(dot(normal, eyedir), 0.) + ao, exp2(-16.0 * (1.0 - specval) - 1.0)) - 1.0 + ao, 0.0, 1.0);
 
 #ifdef GL_ES
     Spec = vec4(.25 * SpecularIBL(normal, eyedir, specval) * ao_spec, 1.);
