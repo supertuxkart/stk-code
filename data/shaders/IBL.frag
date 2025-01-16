@@ -1,6 +1,7 @@
 uniform sampler2D ntex;
 uniform sampler2D dtex;
 uniform sampler2D albedo;
+uniform sampler2D ssao;
 
 #ifdef GL_ES
 layout (location = 0) out vec4 Diff;
@@ -76,8 +77,9 @@ void main(void)
 {
     vec2 uv = gl_FragCoord.xy / u_screen;
     vec3 normal = DecodeNormal(texture(ntex, uv).xy);
+    float ao = texture(ssao, uv).x;
 
-    Diff = vec4(0.25 * DiffuseIBL(normal), 1.);
+    Diff = vec4(0.25 * DiffuseIBL(normal) * ao, 1.);
 
     float z = texture(dtex, uv).x;
 
@@ -86,8 +88,11 @@ void main(void)
     // Extract roughness
     float specval = texture(ntex, uv).z;
 
+    // Lagarde and de Rousiers 2014, "Moving Frostbite to PBR"
+    float ao_spec = clamp(pow(max(dot(normal, eyedir), 0.) + ao, exp2(-16.0 * (1.0 - specval) - 1.0)) - 1.0 + ao);
+
 #ifdef GL_ES
-    Spec = vec4(.25 * SpecularIBL(normal, eyedir, specval), 1.);
+    Spec = vec4(.25 * SpecularIBL(normal, eyedir, specval) * ao_spec, 1.);
 #else
     // :::::::: Compute Space Screen Reflection ::::::::::::::::::::::::::::::::::::
 
@@ -123,7 +128,7 @@ void main(void)
         outColor = fallback;
     }
 
-    Spec = vec4(outColor.rgb, 1.0);
+    Spec = vec4(outColor.rgb * ao_spec, 1.0);
 #endif
 
 }

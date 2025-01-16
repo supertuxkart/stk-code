@@ -902,59 +902,60 @@ void PostProcessing::renderGaussian17TapBlur(const FrameBuffer &in_fbo,
 {
     assert(in_fbo.getWidth() == auxiliary.getWidth() &&
            in_fbo.getHeight() == auxiliary.getHeight());
-           
-#if !defined(USE_GLES2)
-    if (CVS->supportsComputeShadersFiltering())
-        glMemoryBarrier(GL_FRAMEBUFFER_BARRIER_BIT);
-#endif
 
-    {
-        if (!CVS->supportsComputeShadersFiltering())
-        {
-            auxiliary.bind();
-            Gaussian17TapHShader::getInstance()->render(in_fbo,
-                                                        linear_depth,
-                                                        in_fbo.getWidth(),
-                                                        in_fbo.getHeight());
-        }
-        else
-        {
-            ComputeGaussian17TapHShader::getInstance()->render(in_fbo,
-                                                               auxiliary,
-                                                               linear_depth,
-                                                               in_fbo.getWidth(),
-                                                               in_fbo.getHeight());
-        }
-    }
+// Not quite necessary         
+// #if !defined(USE_GLES2)
+//     if (CVS->supportsComputeShadersFiltering())
+//         glMemoryBarrier(GL_FRAMEBUFFER_BARRIER_BIT);
+// #endif
+
+//     {
+//         if (!CVS->supportsComputeShadersFiltering())
+//         {
+    auxiliary.bind();
+    Gaussian17TapHShader::getInstance()->render(in_fbo,
+                                                linear_depth,
+                                                in_fbo.getWidth(),
+                                                in_fbo.getHeight());
+//         }
+//         else
+//         {
+//             ComputeGaussian17TapHShader::getInstance()->render(in_fbo,
+//                                                                auxiliary,
+//                                                                linear_depth,
+//                                                                in_fbo.getWidth(),
+//                                                                in_fbo.getHeight());
+//         }
+//     }
     
-#if !defined(USE_GLES2)
-    if (CVS->supportsComputeShadersFiltering())
-        glMemoryBarrier(GL_SHADER_IMAGE_ACCESS_BARRIER_BIT);
-#endif
+// #if !defined(USE_GLES2)
+//     if (CVS->supportsComputeShadersFiltering())
+//         glMemoryBarrier(GL_SHADER_IMAGE_ACCESS_BARRIER_BIT);
+// #endif
         
-    {
-        if (!CVS->supportsComputeShadersFiltering())
-        {
-            in_fbo.bind();
-            Gaussian17TapVShader::getInstance()->render(auxiliary,
-                                                        linear_depth,
-                                                        in_fbo.getWidth(),
-                                                        in_fbo.getHeight());
-        }
-        else
-        {
-            ComputeGaussian17TapVShader::getInstance()->render(auxiliary,
-                                                               in_fbo, 
-                                                               linear_depth,
-                                                               in_fbo.getWidth(),
-                                                               in_fbo.getHeight());
-        }
-    }
+//     {
+//         if (!CVS->supportsComputeShadersFiltering())
+//         {
+    in_fbo.bind();
+    Gaussian17TapVShader::getInstance()->render(auxiliary,
+                                                linear_depth,
+                                                in_fbo.getWidth(),
+                                                in_fbo.getHeight());
+//         }
+//         else
+//         {
+//             ComputeGaussian17TapVShader::getInstance()->render(auxiliary,
+//                                                                in_fbo, 
+//                                                                linear_depth,
+//                                                                in_fbo.getWidth(),
+//                                                                in_fbo.getHeight());
+//         }
+//     }
     
-#if !defined(USE_GLES2)
-    if (CVS->supportsComputeShadersFiltering())
-        glMemoryBarrier(GL_TEXTURE_FETCH_BARRIER_BIT);
-#endif
+// #if !defined(USE_GLES2)
+//     if (CVS->supportsComputeShadersFiltering())
+//         glMemoryBarrier(GL_TEXTURE_FETCH_BARRIER_BIT);
+// #endif
 }   // renderGaussian17TapBlur
 
 // ----------------------------------------------------------------------------
