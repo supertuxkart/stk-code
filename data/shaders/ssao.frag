@@ -40,7 +40,7 @@ void main(void)
     vec3 ddy = dFdy(FragPos);
     vec3 norm = normalize(cross(ddy, ddx));
 
-    float r = radius / FragPos.z * 0.5;
+    float r = radius / FragPos.z;
     float phi = interleavedGradientNoise(vec2(gl_FragCoord.x, gl_FragCoord.y));
     float bl = 0.0;
     float m = log2(r) + 6. + log2(invSamples);

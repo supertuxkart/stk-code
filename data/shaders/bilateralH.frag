@@ -23,7 +23,7 @@ void main()
     g0 *= g1;
     g1 *= g2;
     float tmp_weight, total_weight = g0;
-    for (int i = 1; i < 3; i++) {
+    for (int i = 1; i < 4; i++) {
         tmp_weight = max(0.0, 1.0 - .001 * abs(texture(depth, vec2(X - float(i) * pixel.x, Y)).x - pixel_depth));
         sum += texture(tex, vec2(X - float(i) * pixel.x, Y)) * g0 * tmp_weight;
         total_weight += g0 * tmp_weight;
