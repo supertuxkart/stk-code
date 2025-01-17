@@ -10,6 +10,7 @@ out float AO;
 
 const float bias = .0005;
 const float thickness = 10.0;
+const float horizon = 0.1;
 
 #define SAMPLES 4
 const float invSamples = 0.25; // 1. / SAMPLES
@@ -60,9 +61,7 @@ void main(void)
         float h = r * alpha;
         vec2 localoffset = h * rotations;
 
-        ivec2 ioccluder_uv = ivec2(x, y) + ivec2(localoffset);
-
-        if (ioccluder_uv.x < 0 || ioccluder_uv.x > int(u_screen.x) || ioccluder_uv.y < 0 || ioccluder_uv.y > int(u_screen.y)) continue;
+        ivec2 ioccluder_uv = clamp(ivec2(x, y) + ivec2(localoffset), ivec2(0), ivec2(u_screen));
 
         float LinearoccluderFragmentDepth = textureLod(dtex, vec2(ioccluder_uv) / u_screen, max(m, 0.)).x;
         vec3 OccluderPos = getXcYcZc(ioccluder_uv.x, ioccluder_uv.y, LinearoccluderFragmentDepth);
@@ -72,6 +71,7 @@ void main(void)
         float vn = dot(vi, norm);
         float w = max(0.0, 1.0 - vv / thickness / thickness);
         w = w * w;
+        w *= step(vv * horizon * horizon, vn * vn);
         bl += w * max(0., vn - FragPos.z * bias) / (vv + peak);
     }
 
