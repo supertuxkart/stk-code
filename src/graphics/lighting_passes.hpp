@@ -48,7 +48,8 @@ private:
                       GLuint depth_stencil_texture,
                       GLuint specular_probe,
                       GLuint albedo_buffer,
-                      GLuint ssao_buffer);
+                      GLuint ssao_buffer,
+                      GLuint diffuse_color_texture);
 
     /** Generate diffuse and specular map */
     void         renderSunlight(const core::vector3df &direction,
@@ -67,6 +68,7 @@ public:
                         GLuint albedo_texture,
                         const FrameBuffer* shadow_framebuffer,
                         GLuint ssao_texture,
+                        GLuint diffuse_color_texture,
                         GLuint specular_probe);
     void renderLightsScatter(GLuint depth_stencil_texture,
                              const FrameBuffer& half1_framebuffer,

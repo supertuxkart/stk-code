@@ -138,7 +138,7 @@ void ShaderBasedRenderer::renderSSAO() const
     FrameBuffer::blit(m_rtts->getFBO(FBO_SSAO),
                       m_rtts->getFBO(FBO_HALF1_R), 
                       GL_COLOR_BUFFER_BIT, GL_LINEAR);
-    m_post_processing->renderGaussian17TapBlur(m_rtts->getFBO(FBO_HALF1_R), 
+    m_post_processing->renderGaussian9TapBlur(m_rtts->getFBO(FBO_HALF1_R), 
                                                m_rtts->getFBO(FBO_HALF2_R),
                                                m_rtts->getFBO(FBO_LINEAR_DEPTH));
 
@@ -291,6 +291,7 @@ void ShaderBasedRenderer::renderSceneDeferred(scene::ICameraSceneNode * const ca
                                         m_rtts->getRenderTarget(RTT_COLOR),
                                         m_rtts->getShadowFrameBuffer(),
                                         m_rtts->getRenderTarget(RTT_HALF1_R),
+                                        m_rtts->getRenderTarget(RTT_SP_DIFF_COLOR),
                                         specular_probe);
         PROFILER_POP_CPU_MARKER();
     }

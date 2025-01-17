@@ -170,7 +170,7 @@ public:
 };
 
 // ============================================================================
-class IBLShader : public TextureShader<IBLShader, 5>
+class IBLShader : public TextureShader<IBLShader, 6>
 {
 public:
     IBLShader()
@@ -182,7 +182,8 @@ public:
                            1, "dtex",  ST_NEAREST_FILTERED,
                            2, "probe", ST_TRILINEAR_CUBEMAP,
                            3, "albedo",ST_NEAREST_FILTERED,
-                           4, "ssao",  ST_NEAREST_FILTERED);
+                           4, "ssao",  ST_NEAREST_FILTERED,
+                           5, "ctex",  ST_NEAREST_FILTERED);
     }   // IBLShader
 };   // IBLShader
 
@@ -301,7 +302,8 @@ void LightingPasses::renderEnvMap(GLuint normal_depth_texture,
                                   GLuint depth_stencil_texture,
                                   GLuint specular_probe,
                                   GLuint albedo_buffer,
-                                  GLuint ssao_texture)
+                                  GLuint ssao_texture,
+                                  GLuint diffuse_color_texture)
 {
     glDisable(GL_DEPTH_TEST);
     glEnable(GL_BLEND);
@@ -327,7 +329,8 @@ void LightingPasses::renderEnvMap(GLuint normal_depth_texture,
             depth_stencil_texture,
             specular_probe,
             albedo_buffer,
-            ssao_texture);
+            ssao_texture,
+            diffuse_color_texture);
         IBLShader::getInstance()->setUniforms();
     }
 
@@ -439,6 +442,7 @@ void LightingPasses::renderLights(  bool has_shadow,
                                     GLuint albedo_texture,
                                     const FrameBuffer* shadow_framebuffer,
                                     GLuint ssao_texture,
+                                    GLuint diffuse_color_texture,
                                     GLuint specular_probe)
 {
     {
@@ -447,7 +451,8 @@ void LightingPasses::renderLights(  bool has_shadow,
                      depth_stencil_texture,
                      specular_probe,
                      albedo_texture,
-                     ssao_texture);
+                     ssao_texture,
+                     diffuse_color_texture);
     }
 
     // Render sunlight if and only if track supports shadow
