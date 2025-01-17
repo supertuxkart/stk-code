@@ -8,7 +8,7 @@ out vec4 FragColor;
 
 void main()
 {
-    float sigma = 1.5;
+    float sigma = 2.;
 
     vec2 uv = gl_FragCoord.xy * pixel;
     float X = uv.x;
