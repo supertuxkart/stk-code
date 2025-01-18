@@ -541,8 +541,8 @@ void Track::loadTrackInfo()
     m_sun_specular_color    = video::SColor(255, 255, 255, 255);
     m_sun_diffuse_color     = video::SColor(255, 255, 255, 255);
     m_sun_position          = core::vector3df(0, 10, 10);
-    irr_driver->setSSAORadius(1.);
-    irr_driver->setSSAOK(1.5);
+    irr_driver->setSSAORadius(0.5);
+    irr_driver->setSSAOK(3.);
     irr_driver->setSSAOSigma(1.);
     XMLNode *root           = file_manager->createXMLTree(m_filename);
 

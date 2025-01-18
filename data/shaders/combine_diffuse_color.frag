@@ -1,6 +1,5 @@
 uniform sampler2D diffuse_map;
 uniform sampler2D specular_map;
-uniform sampler2D ssao_tex;
 uniform sampler2D normal_color;
 uniform sampler2D diffuse_color;
 #if defined(GL_ES) && defined(GL_FRAGMENT_PRECISION_HIGH)
@@ -28,7 +27,6 @@ void main()
     float specMapValue = texture(normal_color, tc).z;
     float emitMapValue = diffuseMatColor.w;
 
-    float ao = texture(ssao_tex, tc).x;
     vec3 DiffuseComponent = texture(diffuse_map, tc).xyz;
     vec3 SpecularComponent = texture(specular_map, tc).xyz;
 
@@ -42,7 +40,7 @@ void main()
     vec3 tmp = DiffuseComponent * mix(diffuseMatColor.xyz, vec3(0.0), metallicMapValue) + (metallicMatColor * SpecularComponent);
 
     vec3 emitCol = diffuseMatColor.xyz + (diffuseMatColor.xyz * diffuseMatColor.xyz * emitMapValue * emitMapValue * 10.0);
-    vec4 color_1 = vec4(tmp * ao + (emitMapValue * emitCol), 1.0);
+    vec4 color_1 = vec4(tmp + (emitMapValue * emitCol), 1.0);
 
     // Fog
     float depth = texture(depth_stencil, tc).x;

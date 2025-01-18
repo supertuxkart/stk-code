@@ -138,7 +138,7 @@ void ShaderBasedRenderer::renderSSAO() const
     FrameBuffer::blit(m_rtts->getFBO(FBO_SSAO),
                       m_rtts->getFBO(FBO_HALF1_R), 
                       GL_COLOR_BUFFER_BIT, GL_LINEAR);
-    m_post_processing->renderGaussian17TapBlur(m_rtts->getFBO(FBO_HALF1_R), 
+    m_post_processing->renderGaussian9TapBlur(m_rtts->getFBO(FBO_HALF1_R), 
                                                m_rtts->getFBO(FBO_HALF2_R),
                                                m_rtts->getFBO(FBO_LINEAR_DEPTH));
 
@@ -195,7 +195,7 @@ void ShaderBasedRenderer::renderShadows()
 }
 
 // ============================================================================
-class CombineDiffuseColor : public TextureShader<CombineDiffuseColor, 7,
+class CombineDiffuseColor : public TextureShader<CombineDiffuseColor, 6,
                                                  std::array<float, 4> >
 {
 public:
@@ -206,17 +206,16 @@ public:
         assignUniforms("bg_color");
         assignSamplerNames(0, "diffuse_map", ST_NEAREST_FILTERED,
                            1, "specular_map", ST_NEAREST_FILTERED,
-                           2, "ssao_tex", ST_NEAREST_FILTERED,
-                           3, "normal_color", ST_NEAREST_FILTERED,
-                           4, "diffuse_color", ST_NEAREST_FILTERED,
-                           5, "depth_stencil", ST_NEAREST_FILTERED,
-                           6, "light_scatter", ST_NEAREST_FILTERED);
+                           2, "normal_color", ST_NEAREST_FILTERED,
+                           3, "diffuse_color", ST_NEAREST_FILTERED,
+                           4, "depth_stencil", ST_NEAREST_FILTERED,
+                           5, "light_scatter", ST_NEAREST_FILTERED);
     }   // CombineDiffuseColor
     // ------------------------------------------------------------------------
-    void render(GLuint dm, GLuint sm, GLuint st, GLuint nt, GLuint dc,
+    void render(GLuint dm, GLuint sm, GLuint nt, GLuint dc,
                 GLuint ds, GLuint lt, const std::array<float, 4> & bg_color)
     {
-        setTextureUnits(dm, sm, st, nt, dc, ds, lt);
+        setTextureUnits(dm, sm, nt, dc, ds, lt);
         drawFullScreenEffect(bg_color);
     }   // render
 };   // CombineDiffuseColor
@@ -266,6 +265,15 @@ void ShaderBasedRenderer::renderSceneDeferred(scene::ICameraSceneNode * const ca
         SP::draw(SP::RP_1ST, SP::DCT_NORMAL);
     }
 
+    // Handle SSAO
+    {
+        PROFILER_PUSH_CPU_MARKER("- SSAO", 0xFF, 0xFF, 0x00);
+        ScopedGPUTimer Timer(irr_driver->getGPUTimer(Q_SSAO));
+        if (UserConfigParams::m_ssao)
+            renderSSAO();
+        PROFILER_POP_CPU_MARKER();
+    }
+
     glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
     // Lights
     {
@@ -282,16 +290,9 @@ void ShaderBasedRenderer::renderSceneDeferred(scene::ICameraSceneNode * const ca
                                         m_rtts->getDepthStencilTexture(),
                                         m_rtts->getRenderTarget(RTT_COLOR),
                                         m_rtts->getShadowFrameBuffer(),
+                                        m_rtts->getRenderTarget(RTT_HALF1_R),
+                                        m_rtts->getRenderTarget(RTT_SP_DIFF_COLOR),
                                         specular_probe);
-        PROFILER_POP_CPU_MARKER();
-    }
-
-    // Handle SSAO
-    {
-        PROFILER_PUSH_CPU_MARKER("- SSAO", 0xFF, 0xFF, 0x00);
-        ScopedGPUTimer Timer(irr_driver->getGPUTimer(Q_SSAO));
-        if (UserConfigParams::m_ssao)
-            renderSSAO();
         PROFILER_POP_CPU_MARKER();
     }
 
@@ -349,7 +350,6 @@ void ShaderBasedRenderer::renderSceneDeferred(scene::ICameraSceneNode * const ca
         CombineDiffuseColor::getInstance()->render(
             m_rtts->getRenderTarget(RTT_DIFFUSE),
             m_rtts->getRenderTarget(RTT_SPECULAR),
-            m_rtts->getRenderTarget(RTT_HALF1_R),
             m_rtts->getRenderTarget(RTT_NORMAL_AND_DEPTH),
             m_rtts->getRenderTarget(RTT_SP_DIFF_COLOR),
             m_rtts->getDepthStencilTexture(),
