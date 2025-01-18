@@ -8,9 +8,7 @@ uniform float k;
 uniform float sigma;
 out float AO;
 
-const float bias = .0005;
 const float thickness = 10.0;
-const float horizon = 0.1;
 
 #define SAMPLES 4
 const float invSamples = 0.25; // 1. / SAMPLES
@@ -49,6 +47,10 @@ void main(void)
     float peak = 0.1 * radius;
     float peak2 = peak * peak;
     float intensity = 2.0 * 3.14159 * sigma * peak * invSamples;
+
+    // Apply stronger bias when the resolution is lower.
+    float horizon = min(100. / min(u_screen.x, u_screen.y), 0.3);
+    float bias =  min(1. / min(u_screen.x, u_screen.y), 0.003);
 
     float theta = phi * 2.0 * 2.4 * 3.14159;
     vec2 rotations = vec2(cos(theta), sin(theta)) * u_screen;
