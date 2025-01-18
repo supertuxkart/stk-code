@@ -478,6 +478,35 @@ void ServerLobby::handleChat(Event* event)
     core::stringw message;
     event->data().decodeString16(&message, 360/*max_len*/);
 
+    // Check if the message starts with "(one of profile names): " to prevent
+    // impersonation, see #5121.
+    // If the server allows many messages in a row and there are many players
+    // inside one peer, naive check can become a problem. For most cases,
+    // it should be completely fine.
+    bool valid_message = false;
+    std::string message_utf8 = StringUtils::wideToUtf8(message);
+    for (auto& profile: event->getPeer()->getPlayerProfiles())
+    {
+        std::string prefix = StringUtils::wideToUtf8(
+            profile->getName()) + ": ";
+        if (StringUtils::startsWith(message_utf8, prefix))
+        {
+            valid_message = true;
+            break;
+        }
+    }
+
+    if (!valid_message)
+    {
+        NetworkString* chat = getNetworkString();
+        chat->setSynchronous(true);
+        core::stringw warn = "Don't try to impersonate others!";
+        chat->addUInt8(LE_CHAT).encodeString16(warn);
+        event->getPeer()->sendPacket(chat, true/*reliable*/);
+        delete chat;
+        return;
+    }
+
     KartTeam target_team = KART_TEAM_NONE;
     if (event->data().size() > 0)
         target_team = (KartTeam)event->data().getUInt8();
