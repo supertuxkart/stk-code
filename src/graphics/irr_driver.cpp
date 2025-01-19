@@ -1140,6 +1140,7 @@ void IrrDriver::applyResolutionSettings(bool recreate_device)
     // Input manager set first so it recieves SDL joystick event
     // Re-init GUI engine
     GUIEngine::init(m_device, m_video_driver, StateManager::get());
+    GUIEngine::reserveLoadingIcons(3);
     // If not recreate device we need to add the previous joystick manually
     if (!recreate_device)
         input_manager->addJoystick();

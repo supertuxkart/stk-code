@@ -1323,7 +1323,7 @@ void KartModel::initInverseBoneMatrices()
     float striaght_frame = (float)m_animation_frame[AF_STRAIGHT];
     if (m_animation_frame[AF_STRAIGHT] == -1)
     {
-        Log::warn("KartModel", "%s has no striaght frame defined.",
+        Log::warn("KartModel", "%s has no straight frame defined.",
             m_model_filename.c_str());
         striaght_frame = 0.0f;
     }

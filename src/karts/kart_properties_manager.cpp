@@ -207,6 +207,7 @@ void KartPropertiesManager::loadAllKarts(bool loading_icon)
         // --------------------------------------------
         std::set<std::string> result;
         file_manager->listFiles(result, *dir);
+        GUIEngine::reserveLoadingIcons(result.size());
         for(std::set<std::string>::const_iterator subdir=result.begin();
             subdir!=result.end(); subdir++)
         {
