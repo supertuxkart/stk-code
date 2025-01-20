@@ -2410,7 +2410,7 @@ scene::ISceneNode *IrrDriver::addLight(const core::vector3df &pos,
             scene::ILightSceneNode* light = 
                 static_cast<GE::GEVulkanSceneManager*>(m_scene_manager)
                 ->addSunSceneNode(m_scene_manager->getRootSceneNode(),
-                                pos, video::SColorf(r, g, b, 0.5f),
+                                pos, video::SColorf(r, g, b, 0.2f),
                                 0.26 * 3.14159 / 180.);
             light->setRotation(-pos);
             static_cast<GE::GEVulkanSceneManager*>(m_scene_manager)->setActiveSun(
@@ -2420,8 +2420,8 @@ scene::ISceneNode *IrrDriver::addLight(const core::vector3df &pos,
         else
         {
             scene::ILightSceneNode* light = m_scene_manager
-                ->addLightSceneNode(m_scene_manager->getRootSceneNode(),
-                                    pos, video::SColorf(r, g, b, 1.0f));
+                ->addLightSceneNode(parent ? parent : m_scene_manager->getRootSceneNode(),
+                                    pos, video::SColorf(r * energy, g * energy, b * energy, 1.0f));
             light->setRadius(radius);
             return light;
         }

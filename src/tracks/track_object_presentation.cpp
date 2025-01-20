@@ -1037,7 +1037,9 @@ TrackObjectPresentationLight::TrackObjectPresentationLight(
     else
 #endif
     {
-        m_node = NULL; // lights require shaders to work
+        m_node = irr_driver->addLight(m_init_xyz, m_energy, m_distance,
+                                      colorf.r, colorf.g, colorf.b, false,
+                                      parent); // lights require shaders to work
     }
 }   // TrackObjectPresentationLight
 

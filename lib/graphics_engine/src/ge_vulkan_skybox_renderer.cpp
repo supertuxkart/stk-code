@@ -157,7 +157,7 @@ void GEVulkanSkyBoxRenderer::updateDescriptorSet()
     VkDescriptorImageInfo info_diffuse;
     info_diffuse.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
     info_diffuse.sampler = vk->getSampler(GVS_SKYBOX);
-    info_diffuse.imageView = (VkImageView)g_diffuse_env_cubemap->getTextureHandler();
+    info_diffuse.imageView = *g_diffuse_env_cubemap->getImageView(true);
 
     write_descriptor_set.dstBinding = 0;
     write_descriptor_set.dstSet = g_descriptor_set_env_map;
@@ -167,7 +167,7 @@ void GEVulkanSkyBoxRenderer::updateDescriptorSet()
     VkDescriptorImageInfo info_specular;
     info_specular.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
     info_specular.sampler = vk->getSampler(GVS_SKYBOX);
-    info_specular.imageView = (VkImageView)g_specular_env_cubemap->getTextureHandler();
+    info_specular.imageView = *g_specular_env_cubemap->getImageView(true);
 
     write_descriptor_set.dstBinding = 1;
     write_descriptor_set.dstSet = g_descriptor_set_env_map;
@@ -397,10 +397,10 @@ void GEVulkanSkyBoxRenderer::addSkyBox(GEVulkanCameraSceneNode* cam,
                                             * dst[level].m_dim.Height
                                             / (sample_count * pdf)) + lodbias;
                 SColorf samp = texture_lod(src, world_dir, lod);
-                color.a += samp.a * irr::core::clamp(world_dir.Y + 0.2f, 0.f, 1.f);
-                color.r += samp.r * irr::core::clamp(world_dir.Y + 0.2f, 0.f, 1.f);
-                color.g += samp.g * irr::core::clamp(world_dir.Y + 0.2f, 0.f, 1.f);
-                color.b += samp.b * irr::core::clamp(world_dir.Y + 0.2f, 0.f, 1.f);
+                color.a += samp.a * irr::core::clamp(world_dir.Y * 2.f + 0.2f, 0.f, 1.f);
+                color.r += samp.r * irr::core::clamp(world_dir.Y * 2.f + 0.2f, 0.f, 1.f);
+                color.g += samp.g * irr::core::clamp(world_dir.Y * 2.f + 0.2f, 0.f, 1.f);
+                color.b += samp.b * irr::core::clamp(world_dir.Y * 2.f + 0.2f, 0.f, 1.f);
                 weight += 1.0f;
             }
             color.a /= weight;
@@ -453,10 +453,10 @@ void GEVulkanSkyBoxRenderer::addSkyBox(GEVulkanCameraSceneNode* cam,
                 SColorf color = texture_lod(src, dir, lodbias);
 
                 ((uint32_t*)dst[level].m_data)[v * dst[level].m_dim.Width + u]
-                    = ((uint32_t)(color.b * irr::core::clamp(dir.Y + 0.2f, 0.f, 1.f) * 255.))
-                    + ((uint32_t)(color.g * irr::core::clamp(dir.Y + 0.2f, 0.f, 1.f) * 255.) << 8)
-                    + ((uint32_t)(color.r * irr::core::clamp(dir.Y + 0.2f, 0.f, 1.f) * 255.) << 16)
-                    + ((uint32_t)(color.a * irr::core::clamp(dir.Y + 0.2f, 0.f, 1.f) * 255.) << 24);
+                    = ((uint32_t)(color.b * irr::core::clamp(dir.Y * 2.f + 0.2f, 0.f, 1.f) * 255.))
+                    + ((uint32_t)(color.g * irr::core::clamp(dir.Y * 2.f + 0.2f, 0.f, 1.f) * 255.) << 8)
+                    + ((uint32_t)(color.r * irr::core::clamp(dir.Y * 2.f + 0.2f, 0.f, 1.f) * 255.) << 16)
+                    + ((uint32_t)(color.a * irr::core::clamp(dir.Y * 2.f + 0.2f, 0.f, 1.f) * 255.) << 24);
                 continue;
             }
             
@@ -516,10 +516,10 @@ void GEVulkanSkyBoxRenderer::addSkyBox(GEVulkanCameraSceneNode* cam,
                 if (NdotL > 0.0)
                 {
                     SColorf samp = texture_lod(src, light, lod);
-                    color.a += samp.a * irr::core::clamp(light.Y + 0.2f, 0.f, 1.f) * NdotL;
-                    color.r += samp.r * irr::core::clamp(light.Y + 0.2f, 0.f, 1.f) * NdotL;
-                    color.g += samp.g * irr::core::clamp(light.Y + 0.2f, 0.f, 1.f) * NdotL;
-                    color.b += samp.b * irr::core::clamp(light.Y + 0.2f, 0.f, 1.f) * NdotL;
+                    color.a += samp.a * irr::core::clamp(light.Y * 2.f + 0.2f, 0.f, 1.f) * NdotL;
+                    color.r += samp.r * irr::core::clamp(light.Y * 2.f + 0.2f, 0.f, 1.f) * NdotL;
+                    color.g += samp.g * irr::core::clamp(light.Y * 2.f + 0.2f, 0.f, 1.f) * NdotL;
+                    color.b += samp.b * irr::core::clamp(light.Y * 2.f + 0.2f, 0.f, 1.f) * NdotL;
                     weight += NdotL;
                 }
             }

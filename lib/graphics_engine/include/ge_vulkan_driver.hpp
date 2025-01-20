@@ -195,7 +195,7 @@ namespace GE
         virtual const wchar_t* getName() const { return L""; }
 
         //! deletes all dynamic lights there are
-        virtual void deleteAllDynamicLights() {}
+        virtual void deleteAllDynamicLights() { CNullDriver::deleteAllDynamicLights(); }
 
         //! adds a dynamic light, returning an index to the light
         //! \param light: the light data to use to create the light
@@ -504,6 +504,16 @@ namespace GE
             irr::core::vector3df m_sun_direction;
             irr::f32             m_fog_density;
             irr::video::SColorf  m_fog_color;
+        };
+        struct GELightUBO
+        {
+            irr::core::vector3df m_position;
+            irr::f32             m_radius;
+            irr::core::vector3df m_color;
+            irr::f32             m_inverse_range_squared;
+            irr::core::vector2df m_direction;
+            irr::f32             m_scale;
+            irr::f32             m_offset;
         };
         std::unique_ptr<VK> m_vk;
         VkFormat m_swap_chain_image_format;

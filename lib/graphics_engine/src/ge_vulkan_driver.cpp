@@ -1788,13 +1788,13 @@ bool GEVulkanDriver::createBuffer(VkDeviceSize size, VkBufferUsageFlags usage,
 void GEVulkanDriver::copyBuffer(VkBuffer src_buffer, VkBuffer dst_buffer,
                                 VkDeviceSize size)
 {
-    VkCommandBuffer command_buffer = GEVulkanCommandLoader::beginSingleTimeCommands(GVQI_TRANSFER);
+    VkCommandBuffer command_buffer = GEVulkanCommandLoader::beginSingleTimeCommands(GVQI_GRAPHICS);
 
     VkBufferCopy copy_region = {};
     copy_region.size = size;
     vkCmdCopyBuffer(command_buffer, src_buffer, dst_buffer, 1, &copy_region);
 
-    GEVulkanCommandLoader::endSingleTimeCommands(command_buffer, GVQI_TRANSFER);
+    GEVulkanCommandLoader::endSingleTimeCommands(command_buffer, GVQI_GRAPHICS);
 }   // copyBuffer
 
 // ----------------------------------------------------------------------------
@@ -1894,6 +1894,8 @@ bool GEVulkanDriver::endScene()
     }
 
     buildCommandBuffers();
+
+    deleteAllDynamicLights();
 
     VkSemaphore wait_semaphores[] = {m_vk->image_available_semaphores[m_current_frame]};
     VkPipelineStageFlags wait_stages[] = {VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT};
@@ -2399,6 +2401,7 @@ s32 GEVulkanDriver::addDynamicLight(const SLight& light)
     }
     else
     {
+        std::fill(m_global_ubo_dirty.begin(), m_global_ubo_dirty.end(), true);
         return CNullDriver::addDynamicLight(light);
     }
 }
@@ -2877,10 +2880,11 @@ std::unique_ptr<GEVulkanDrawCall> GEVulkanDriver::getDrawCallFromCache(GEVulkanD
 }   // getDrawCallFromCache
 
 // ----------------------------------------------------------------------------
+// ----------------------------------------------------------------------------
 void GEVulkanDriver::createGlobalUBO()
 {
     m_global_ubo = new GEVulkanDynamicBuffer(VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT,
-        sizeof(GEGlobalLightUBO), getMaxFrameInFlight() + 1,
+        sizeof(GEGlobalLightUBO) + 255 * sizeof(GELightUBO), getMaxFrameInFlight() + 1,
         GEVulkanDynamicBuffer::supportsHostTransfer() ? 0 : getMaxFrameInFlight() + 1);
     m_global_ubo_dirty.resize(getMaxFrameInFlight() + 1);
     m_global_ubo_descriptor_sets.resize(getMaxFrameInFlight() + 1);
@@ -2957,7 +2961,7 @@ void GEVulkanDriver::createGlobalUBO()
             m_global_ubo->getHostBuffer()[i] :
             m_global_ubo->getLocalBuffer()[i];
         ubo_info.offset = 0;
-        ubo_info.range = sizeof(GEGlobalLightUBO);
+        ubo_info.range = sizeof(GEGlobalLightUBO) + 255 * sizeof(GELightUBO);
         
         data_sets[0].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
         data_sets[0].dstSet = m_global_ubo_descriptor_sets[i];
@@ -2998,6 +3002,7 @@ void GEVulkanDriver::updateGlobalUBO()
     VkCommandBuffer cmd = getCurrentCommandBuffer();
 
     GEGlobalLightUBO light_ubo = {};
+    std::array<GELightUBO, 255> light_array = {};
 
     light_ubo.m_ambient_color.X = m_ambient_light.r * m_ambient_light.a;
     light_ubo.m_ambient_color.Y = m_ambient_light.g * m_ambient_light.a;
@@ -3015,9 +3020,29 @@ void GEVulkanDriver::updateGlobalUBO()
     light_ubo.m_fog_color = FogColor;
     light_ubo.m_fog_density = FogDensity;
 
+    for (int i = 1; i < Lights.size() && i < 256; i++)
+    {
+        light_array[i - 1].m_position = Lights[i].Position;
+        light_array[i - 1].m_radius = std::max(-Lights[i].Attenuation.X, 0.f);
+        light_array[i - 1].m_color.X = Lights[i].DiffuseColor.r;
+        light_array[i - 1].m_color.Y = Lights[i].DiffuseColor.g;
+        light_array[i - 1].m_color.Z = Lights[i].DiffuseColor.b;
+        light_array[i - 1].m_inverse_range_squared = Lights[i].Attenuation.Y * Lights[i].Attenuation.Y;
+        if (Lights[i].Type == irr::video::ELT_SPOT)
+        {
+            light_array[i - 1].m_direction.X = Lights[i].Direction.X;
+            light_array[i - 1].m_direction.Y = Lights[i].Direction.Y;
+            float cos_outer = cosf(Lights[i].OuterCone);
+            light_array[i - 1].m_scale = 1.0 / std::max(cosf(Lights[i].InnerCone) - cos_outer, 1e-4f);
+            light_array[i - 1].m_offset = -cos_outer * light_array[i - 1].m_scale;
+            light_array[i - 1].m_scale *= Lights[i].Direction.Z > 0.f ? 1.f : -1.f;
+        }
+    }
+
     std::vector<std::pair<void*, size_t> > data_uploading;
 
     data_uploading.emplace_back((void*)&light_ubo, sizeof(GEGlobalLightUBO));
+    data_uploading.emplace_back((void*)&light_array, sizeof(GELightUBO) * 255);
 
     // https://github.com/google/filament/pull/3814
     // Need both vertex and fragment bit

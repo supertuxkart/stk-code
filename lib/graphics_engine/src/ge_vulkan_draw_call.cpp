@@ -232,7 +232,7 @@ GEVulkanDrawCall::~GEVulkanDrawCall()
 void GEVulkanDrawCall::addNode(irr::scene::ISceneNode* node)
 {
     // Skip small objects for far shadows
-    if (m_draw_call_type == GVDCT_SHADOW_FAR && node->getBoundingBox().getVolume() < 10.)
+    if (m_draw_call_type == GVDCT_SHADOW_FAR && node->getBoundingBox().getArea() < 20.)
         return;
     
     irr::scene::IMesh* mesh;
@@ -303,6 +303,16 @@ void GEVulkanDrawCall::addBillboardNode(irr::scene::ISceneNode* node,
     m_visible_nodes[buffer][shader].emplace_back(node,
         node_type == irr::scene::ESNT_BILLBOARD ? BILLBOARD_NODE :
         PARTICLE_NODE);
+}   // addBillboardNode
+
+// ----------------------------------------------------------------------------
+void GEVulkanDrawCall::addLightNode(irr::scene::ILightSceneNode* node)
+{
+    irr::core::aabbox3df bb = node->getTransformedBoundingBox();
+    if (node->getLightType() == irr::video::ELT_DIRECTIONAL || m_culling_tool->isCulled(bb))
+        return;
+    GEVulkanDriver* vk = getVKDriver();
+    m_light_nodes[node] = vk->addDynamicLight(node->getLightData());
 }   // addBillboardNode
 
 // ----------------------------------------------------------------------------
@@ -961,6 +971,7 @@ void GEVulkanDrawCall::createPipeline(GEVulkanDriver* vk,
     VkRenderPass render_pass = vk->getRenderPass();
     uint32_t render_subpass = 0;
     VkBool32 depth_clamp = VK_FALSE;
+    VkBool32 depth_bias = VK_FALSE;
 
     switch (m_draw_call_type)
     {
@@ -970,6 +981,7 @@ void GEVulkanDrawCall::createPipeline(GEVulkanDriver* vk,
         render_pass = vk->getRTTTexture() ? vk->getRTTTexture()->getRTTRenderPass() : vk->getRenderPass();
         render_subpass = 0;
         depth_clamp = VK_FALSE;
+        depth_bias = VK_FALSE;
         break;
     case GVDCT_SHADOW_NEAR:
         create_pipeline_for_depth = true;
@@ -977,6 +989,7 @@ void GEVulkanDrawCall::createPipeline(GEVulkanDriver* vk,
         render_pass = vk->getRTTShadowMap()->getRTTRenderPass();
         render_subpass = 0;
         depth_clamp = VK_TRUE;
+        depth_bias = VK_TRUE;
         break;
     case GVDCT_SHADOW_MIDDLE:
         create_pipeline_for_depth = true;
@@ -984,6 +997,7 @@ void GEVulkanDrawCall::createPipeline(GEVulkanDriver* vk,
         render_pass = vk->getRTTShadowMap()->getRTTRenderPass();
         render_subpass = 1;
         depth_clamp = VK_TRUE;
+        depth_bias = VK_TRUE;
         break;
     case GVDCT_SHADOW_FAR:
         create_pipeline_for_depth = true;
@@ -991,6 +1005,7 @@ void GEVulkanDrawCall::createPipeline(GEVulkanDriver* vk,
         render_pass = vk->getRTTShadowMap()->getRTTRenderPass();
         render_subpass = 2;
         depth_clamp = VK_TRUE;
+        depth_bias = VK_TRUE;
         break;
     default:
         break;
@@ -1099,7 +1114,10 @@ void GEVulkanDrawCall::createPipeline(GEVulkanDriver* vk,
     rasterizer.lineWidth = 1.0f;
     rasterizer.cullMode = settings.m_backface_culling ? VK_CULL_MODE_BACK_BIT : VK_CULL_MODE_NONE;
     rasterizer.frontFace = VK_FRONT_FACE_CLOCKWISE;
-    rasterizer.depthBiasEnable = VK_FALSE;
+    rasterizer.depthBiasEnable = depth_bias;
+    rasterizer.depthBiasConstantFactor = 1.;
+    rasterizer.depthBiasSlopeFactor = 2.;
+    rasterizer.depthBiasClamp = 15.;
 
     VkPipelineMultisampleStateCreateInfo multisampling = {};
     multisampling.sType = VK_STRUCTURE_TYPE_PIPELINE_MULTISAMPLE_STATE_CREATE_INFO;
@@ -1461,7 +1479,7 @@ void GEVulkanDrawCall::createVulkanData()
     // Use VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT | VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT
     // or a staging buffer when buffer is small
     m_dynamic_data = new GEVulkanDynamicBuffer(flags,
-        extra_size + sizeof(GEVulkanCameraUBO) + sizeof(GEVulkanShadowUBO),
+        extra_size + sizeof(GEVulkanCameraUBO) + sizeof(GEVulkanShadowUBO) + 4 * sizeof(float),
         GEVulkanDriver::getMaxFrameInFlight() + 1,
         GEVulkanDynamicBuffer::supportsHostTransfer() ? 0 :
         GEVulkanDriver::getMaxFrameInFlight() + 1);
@@ -1513,6 +1531,10 @@ void GEVulkanDrawCall::uploadDynamicData(GEVulkanDriver* vk,
     {
         data_uploading.emplace_back((void*)m_sun->getShadowUBOData(), sizeof(GEVulkanShadowUBO));
     }
+    float len[4];
+    len[3] = m_light_nodes.size();
+    data_uploading.emplace_back((void*)len, sizeof(len));
+
     // https://github.com/google/filament/pull/3814
     // Need both vertex and fragment bit
     VkPipelineStageFlags dst_stage = VK_PIPELINE_STAGE_VERTEX_SHADER_BIT |
@@ -1674,7 +1696,7 @@ start:
             m_pipeline_layout, 0, 1, m_texture_descriptor->getDescriptorSet(),
             0, NULL);
         
-        size_t indirect_offset = sizeof(GEVulkanCameraUBO) + sizeof(GEVulkanShadowUBO);
+        size_t indirect_offset = sizeof(GEVulkanCameraUBO) + sizeof(GEVulkanShadowUBO) + 4 * sizeof(float);
         const size_t indirect_size = sizeof(VkDrawIndexedIndirectCommand);
         unsigned draw_count = 0;
         VkBuffer indirect_buffer =
@@ -2013,7 +2035,7 @@ void GEVulkanDrawCall::updateDataDescriptorSets(GEVulkanDriver* vk)
             m_dynamic_data->getHostBuffer()[i] :
             m_dynamic_data->getLocalBuffer()[i];
         ubo_info.offset = 0;
-        ubo_info.range = sizeof(GEVulkanCameraUBO) + sizeof(GEVulkanShadowUBO);
+        ubo_info.range = sizeof(GEVulkanCameraUBO) + sizeof(GEVulkanShadowUBO) + 4 * sizeof(float);
 
         std::vector<VkWriteDescriptorSet> data_set;
         data_set.resize(3, {});

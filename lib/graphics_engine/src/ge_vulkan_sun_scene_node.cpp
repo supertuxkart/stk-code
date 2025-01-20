@@ -58,14 +58,16 @@ void GEVulkanSunSceneNode::render()
         irr::core::aabbox3df lsbody;
         irr::core::matrix4 lslightproj;
 
-        float vnear     = getSplitNear(GEVulkanShadowCameraCascade(i));
-        float vfar      = getSplitFar(GEVulkanShadowCameraCascade(i));
+        float snear     = getSplitNear(GEVulkanShadowCameraCascade(i));
+        float sfar      = getSplitFar(GEVulkanShadowCameraCascade(i));
+        float vnear     = i ? getSplitFar(GEVulkanShadowCameraCascade(i - 1)) : 3.0;
+        float vfar      = sfar;
         float dznear    = std::max(vnear - cam->getNearValue(), 0.0f);
         float dzfar     = std::max(cam->getFarValue() - vfar, 0.0f);
 
         // Frustum split by vnear and vfar
-        float f1 = (vnear - cam->getNearValue()) / (cam->getFarValue() - cam->getNearValue());
-        float f2 = (vfar - cam->getNearValue()) / (cam->getFarValue() - cam->getNearValue());
+        float f1 = (snear - cam->getNearValue()) / (cam->getFarValue() - cam->getNearValue());
+        float f2 = (sfar - cam->getNearValue()) / (cam->getFarValue() - cam->getNearValue());
         const irr::scene::SViewFrustum *frust = cam->getViewFrustum();
         points.push_back(frust->getFarLeftDown() * f1 + frust->getNearLeftDown() * (1.0 - f1));
         points.push_back(frust->getFarLeftDown() * f2 + frust->getNearLeftDown() * (1.0 - f2));
@@ -85,33 +87,25 @@ void GEVulkanSunSceneNode::render()
             else lsbody.addInternalPoint(point);
         }
 
-        float znear = std::max(cam->getNearValue(), lsbody.MinEdge.Y);
-        float zfar = std::min(cam->getFarValue(), lsbody.MaxEdge.Y);
-
-        lslightproj(2, 2) = 1.0 / lsbody.getExtent().Z;
-        lslightproj(3, 2) = -lsbody.MinEdge.Z / lsbody.getExtent().Z;
-
-        if (viewdir.dotProduct(lightdir) < 0.9997f)
-        {
-            irr::core::vector2df vp(viewdir.dotProduct(lsleft), viewdir.dotProduct(lsup));
-            vp = vp.normalize();
-            
-            irr::core::matrix4 light_rotation;
-            light_rotation(0, 0) = vp.Y, light_rotation(0, 1) = vp.X;
-            light_rotation(1, 0) = -vp.X,light_rotation(1, 1) = vp.Y;
-            lslightproj = light_rotation * lslightproj;
-        }
+        float znear = std::max(cam->getNearValue(), lsbody.MinEdge.Z);
+        float zfar = std::min(cam->getFarValue(), lsbody.MaxEdge.Z);
 
         // lsbody as PSR (Potential Shadow Receiver) in light view space
         for (int j = 0; j < points.size(); j++)
         {
             m_shadow_view_matrix.transformVect(points[j]);
+            irr::core::vector3df point = points[j];
+            if (j == 0) lsbody.reset(point);
+            else lsbody.addInternalPoint(point);
         }
+
+        lslightproj(2, 2) = 1.0 / lsbody.getExtent().Z;
+        lslightproj(3, 2) = -lsbody.MinEdge.Z / lsbody.getExtent().Z;
 
         for (int j = 0; j < points.size(); j++)
         {
-            irr::core::vector3df point = points[j];
             float vec[4];
+            irr::core::vector3df point = points[j];
             lslightproj.transformVect(vec, point);
             point.X = vec[0] / vec[3];
             point.Y = vec[1] / vec[3];
@@ -126,6 +120,9 @@ void GEVulkanSunSceneNode::render()
 
         float z0 = znear;
         float z1 = z0 + d * singamma;
+
+        m_shadow_ubo_data.m_bias_a[i] = 0.f;
+        m_shadow_ubo_data.m_bias_b[i] = 0.f;
 
         if (singamma > 0.02f && 3.0f * (dznear / (zfar - znear)) < 2.0f)
         {
@@ -145,6 +142,9 @@ void GEVulkanSunSceneNode::render()
             lispsmproj(1, 3) = 1;
             lispsmproj(3, 3) = 0;
 
+            m_shadow_ubo_data.m_bias_a[i] = (f + n) / d;
+            m_shadow_ubo_data.m_bias_b[i] = -2.0 * f * n / d;
+
             irr::core::vector3df point = eyepos;
             m_shadow_view_matrix.transformVect(point);
             
@@ -159,19 +159,18 @@ void GEVulkanSunSceneNode::render()
             correct(3, 1) = -lsbody.MinEdge.Y + n;
 
             lslightproj = lispsmproj * correct * lslightproj;
-        }
-        
-        // lsbody as PSR (Potential Shadow Receiver) in light clip space
-        for (int j = 0; j < points.size(); j++)
-        {
-            irr::core::vector3df point = points[j];
-            float vec[4];
-            lslightproj.transformVect(vec, point);
-            point.X = vec[0] / vec[3];
-            point.Y = vec[1] / vec[3];
-            point.Z = vec[2] / vec[3];
-            if (j == 0) lsbody.reset(point);
-            else lsbody.addInternalPoint(point);
+
+            for (int j = 0; j < points.size(); j++)
+            {
+                irr::core::vector3df point = points[j];
+                float vec[4];
+                lslightproj.transformVect(vec, point);
+                point.X = vec[0] / vec[3];
+                point.Y = vec[1] / vec[3];
+                point.Z = vec[2] / vec[3];
+                if (j == 0) lsbody.reset(point);
+                else lsbody.addInternalPoint(point);
+            }
         }
 
         irr::core::matrix4 fittounitcube;
@@ -179,6 +178,12 @@ void GEVulkanSunSceneNode::render()
 		fittounitcube(1, 1) = 2.0f / lsbody.getExtent().Y;
 		fittounitcube(3, 0) = -(lsbody.MinEdge.X + lsbody.MaxEdge.X) / lsbody.getExtent().X;
 		fittounitcube(3, 1) = -(lsbody.MinEdge.Y + lsbody.MaxEdge.Y) / lsbody.getExtent().Y;
+
+        m_shadow_ubo_data.m_bias_a[i] *= 2.0f / lsbody.getExtent().Y;
+        m_shadow_ubo_data.m_bias_b[i] *= 2.0f / lsbody.getExtent().Y / 1024.f;
+        m_shadow_ubo_data.m_bias_a[i] += fittounitcube(3, 1) * 0.5f + 0.5f;
+
+        float f3 = (m_shadow_ubo_data.m_bias_a[i] - 0.5f / 1024.f);
         
         lslightproj = fittounitcube * lslightproj;
 
@@ -199,7 +204,7 @@ void GEVulkanSunSceneNode::render()
     for (int i = 0; i < GVSCC_COUNT; i++)
     {
         // View & Proj
-        m_shadow_camera_ubo_data[i].m_view_matrix = m_shadow_view_matrix;
+        m_shadow_camera_ubo_data[i].m_view_matrix = m_shadow_view_matrix[i];
         m_shadow_camera_ubo_data[i].m_projection_matrix = clip * m_shadow_projection_matrices[i];
         // Inverse View & Inverse Proj
         m_shadow_camera_ubo_data[i].m_inverse_view_matrix = inv_view;

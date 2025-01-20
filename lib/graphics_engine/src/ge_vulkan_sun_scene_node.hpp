@@ -27,6 +27,8 @@ enum GEVulkanShadowCameraCascade : unsigned
 struct GEVulkanShadowUBO
 {
     irr::core::matrix4 m_light_projection_view_matrix[GVSCC_COUNT];
+    float m_bias_a[4];
+    float m_bias_b[4];
 };
 
 class GEVulkanSunSceneNode : public irr::scene::CLightSceneNode
@@ -44,13 +46,13 @@ public:
     // ------------------------------------------------------------------------
     static const float getSplitNear(GEVulkanShadowCameraCascade cascade)
     {
-        const float cascade_near[GVSCC_COUNT] = { 1.0f, 7.0f, 35.0f };
+        const float cascade_near[GVSCC_COUNT] = { 0.1f, 9.0f, 45.0f };
         return cascade_near[cascade];
     }
     // ------------------------------------------------------------------------
     static const float getSplitFar(GEVulkanShadowCameraCascade cascade)
     {
-        const float cascade_far[GVSCC_COUNT] = { 8.0f, 40.0f, 150.0f };
+        const float cascade_far[GVSCC_COUNT] = { 10.0f, 50.0f, 150.0f };
         return cascade_far[cascade];
     }
     // ------------------------------------------------------------------------

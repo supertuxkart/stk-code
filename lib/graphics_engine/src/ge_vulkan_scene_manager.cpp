@@ -274,6 +274,8 @@ void GEVulkanSceneManager::drawAll(irr::u32 flags)
 
     vkCmdEndRenderPass(cmd);
 
+    vk->deleteAllDynamicLights();
+
     GEVulkanCommandLoader::endSingleTimeCommands(cmd, GVQI_GRAPHICS);
     vk->handleDeletedTextures();
 }   // drawAll
@@ -301,6 +303,12 @@ irr::u32 GEVulkanSceneManager::registerNodeForRendering(
     if (node->getType() == irr::scene::ESNT_SKY_BOX)
     {
         GEVulkanSkyBoxRenderer::addSkyBox(cam, node);
+        return 1;
+    }
+
+    if (node->getType() == irr::scene::ESNT_LIGHT)
+    {
+        m_draw_calls.at(cam)->addLightNode(static_cast<irr::scene::ILightSceneNode*>(node));
         return 1;
     }
 

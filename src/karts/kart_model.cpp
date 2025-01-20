@@ -52,6 +52,8 @@
 #include <ge_render_info.hpp>
 #include <ge_spm.hpp>
 
+#include <ILightSceneNode.h>
+
 #define SKELETON_DEBUG 0
 
 float KartModel::UNDEFINED = -99.9f;
@@ -528,7 +530,7 @@ scene::ISceneNode* KartModel::attachModel(bool animated_models, bool human_playe
                 irr_driver->addMesh(obj.getModel(), "kart_headlight",
                 parent, getRenderInfo());
 #ifndef SERVER_ONLY
-            if (human_player && CVS->isGLSL() && CVS->isDeferredEnabled())
+            if (human_player && CVS->isDeferredEnabled())
             {
                 obj.setLight(headlight_model, each_energy, each_radius);
             }
@@ -572,10 +574,29 @@ scene::ISceneNode* KartModel::attachModel(bool animated_models, bool human_playe
 void HeadlightObject::setLight(scene::ISceneNode* parent,
                                           float energy, float radius)
 {
-    m_node = irr_driver->addLight(core::vector3df(0.0f, 0.0f, 0.0f),
-        energy, radius, m_headlight_color.getRed() / 255.f,
-        m_headlight_color.getGreen() / 255.f,
-        m_headlight_color.getBlue() / 255.f, false/*sun*/, parent);
+    if (CVS->isGLSL())
+    {
+        m_node = irr_driver->addLight(core::vector3df(0.0f, 0.0f, 0.0f),
+            energy, radius, m_headlight_color.getRed() / 255.f,
+            m_headlight_color.getGreen() / 255.f,
+            m_headlight_color.getBlue() / 255.f, false/*sun*/, parent);
+    }
+    else
+    {
+        energy *= 10.;
+        scene::ILightSceneNode* light = irr_driver->getSceneManager()
+                ->addLightSceneNode(parent, core::vector3df(0.0f, 0.0f, 0.0f), 
+                                    video::SColorf(m_headlight_color.getRed() / 255.f * energy,
+                                                   m_headlight_color.getGreen() / 255.f * energy, 
+                                                   m_headlight_color.getBlue() / 255.f * energy, 1.0f));
+        light->setRadius(radius * 100.);
+        light->setRotation(irr::core::vector3df(0., 0., 0.));
+        light->setLightType(irr::video::ELT_SPOT);
+        irr::video::SLight &data = light->getLightData();
+        data.InnerCone = 30. / 180. * 3.14;
+        data.OuterCone = 45. / 180. * 3.14;
+        m_node = light;
+    }
     m_node->grab();
 }   // setLight
 

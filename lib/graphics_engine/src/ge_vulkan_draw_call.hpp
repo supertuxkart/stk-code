@@ -12,6 +12,7 @@
 #include "vulkan_wrapper.h"
 
 #include "SMaterial.h"
+#include "ILightSceneNode.h"
 #include "ISceneNode.h"
 #include "matrix4.h"
 #include "vector3d.h"
@@ -192,6 +193,8 @@ private:
 
     std::unordered_map<std::string, std::pair<uint32_t, std::vector<int> > >
         m_materials_data;
+    
+    std::unordered_map<irr::scene::ILightSceneNode*, irr::u32> m_light_nodes;
 
     // ------------------------------------------------------------------------
     void createAllPipelines(GEVulkanDriver* vk);
@@ -262,6 +265,8 @@ public:
     // ------------------------------------------------------------------------
     void addNode(irr::scene::ISceneNode* node);
     // ------------------------------------------------------------------------
+    void addLightNode(irr::scene::ILightSceneNode* node);
+    // ------------------------------------------------------------------------
     void addBillboardNode(irr::scene::ISceneNode* node,
                           irr::scene::ESCENE_NODE_TYPE node_type);
     // ------------------------------------------------------------------------
@@ -287,6 +292,7 @@ public:
     void reset()
     {
         m_visible_nodes.clear();
+        m_light_nodes.clear();
         m_mb_map.clear();
         m_cmds.clear();
         m_visible_objects.clear();

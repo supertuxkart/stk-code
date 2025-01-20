@@ -69,7 +69,8 @@ vec3 PBRLight(
     vec3 lightdir, 
     vec3 color, 
     float perceptual_roughness, 
-    float metallic)
+    float metallic,
+    float specular_intensity)
 {
     float NdotV = max(dot(normal, eyedir), 0.0001);
     float NdotL = clamp(dot(normal, lightdir), 0.0, 1.0);
@@ -96,10 +97,20 @@ vec3 PBRLight(
     vec3 F = fresnel(F0, F90, LdotH);
     vec3 specular = D * V * F * (1.0 + F0 * (1.0 / F_ab.x - 1.0));
 
-    return NdotL * (diffuse + specular);
+    return NdotL * (diffuse + specular * specular_intensity);
+}
+
+float getDistanceAttenuation(float distanceSquare, float inverseRangeSquared)
+{
+    float factor = distanceSquare * inverseRangeSquared;
+    float smoothFactor = clamp(1.0 - factor * factor, 0.0, 1.0);
+    float attenuation = smoothFactor * smoothFactor;
+    return attenuation * 1.0 / max(distanceSquare, 0.0001);
 }
 
 vec3 environmentLight(
+    samplerCube diffuse_map,
+    samplerCube specular_map,
     vec3 world_normal,
     vec3 world_reflection,
     float perceptual_roughness,
@@ -117,13 +128,9 @@ vec3 environmentLight(
 
     float intensity = 1.0;
 
-    vec3 irradiance = textureLod(
-        u_diffuse_environment_map,
-        world_normal, 0).rgb * intensity;
+    vec3 irradiance = textureLod(diffuse_map, world_normal, 0).rgb * intensity;
 
-    vec3 radiance = textureLod(
-        u_specular_environment_map,
-        world_reflection, radiance_level).rgb * intensity;
+    vec3 radiance = textureLod(specular_map, world_reflection, radiance_level).rgb * intensity;
 
     // Multiscattering approximation: https://www.jcgt.org/published/0008/01/03/paper.pdf
     // Useful reference: https://bruop.github.io/ibl
@@ -143,83 +150,93 @@ vec3 environmentLight(
     return diffuse + specular;
 }
 
-float sampleDepth(vec2 shadowtexcoord, int layer, float depth)
+// https://web.archive.org/web/20230210095515/http://the-witness.net/news/2013/09/shadow-mapping-summary-part-1
+float getShadowPCF(sampler2DArrayShadow map, vec2 shadowtexcoord, int index, float depth)
 {
-    // clamp needed for directional lights and/or large kernels
-    shadowtexcoord = clamp(shadowtexcoord, vec2(0.0), vec2(1.0));
-
-    // depth must be clamped to support floating-point depth formats which are always in
-    // the range [0, 1].
-    return texture(u_shadow_map, vec4(shadowtexcoord, float(layer), depth));
-}
-
-// use hardware assisted PCF + 3x3 gaussian filter
-float getShadowPCF(vec2 shadowtexcoord, int layer, float depth)
-{
-    // Castaño, 2013, "Shadow Mapping Summary Part 1"
-
-    // clamp position to avoid overflows below, which cause some GPUs to abort
     shadowtexcoord = clamp(shadowtexcoord, vec2(-1.0), vec2(2.0));
     depth = clamp(depth, 0.0, 1.0);
 
-    float size = 1024.;
-    vec2 texel_size = vec2(1.0) / size;
-    vec2 offset = vec2(0.5);
-    vec2 uv = (shadowtexcoord * size) + offset;
-    vec2 base = (floor(uv) - offset) * texel_size;
+    float shadow_res = 1024.;
+    vec2 uv = (shadowtexcoord * shadow_res) + 0.5;
+    vec2 base = (floor(uv) - 0.5) / shadow_res;
     vec2 st = fract(uv);
 
-    vec2 uw = vec2(3.0 - 2.0 * st.x, 1.0 + 2.0 * st.x);
-    vec2 vw = vec2(3.0 - 2.0 * st.y, 1.0 + 2.0 * st.y);
+    vec2 w0 = 4.0 - 3.0 * st;
+    vec2 w1 = vec2(7.0);
+    vec2 w2 = 1.0 + 3.0 * st;
 
-    vec2 u = vec2((2.0 - st.x) / uw.x - 1.0, st.x / uw.y + 1.0);
-    vec2 v = vec2((2.0 - st.y) / vw.x - 1.0, st.y / vw.y + 1.0);
-
-    u *= texel_size.x;
-    v *= texel_size.y;
+    vec2 o0 = (3.0 - 2.0 * st) / w0 - 2.0;
+    vec2 o1 = (3.0 + st) / w1;
+    vec2 o2 = st / w2 + 2.0;
 
     float sum = 0.0;
-    sum += uw.x * vw.x * sampleDepth(base + vec2(u.x, v.x), layer, depth);
-    sum += uw.y * vw.x * sampleDepth(base + vec2(u.y, v.x), layer, depth);
-    sum += uw.x * vw.y * sampleDepth(base + vec2(u.x, v.y), layer, depth);
-    sum += uw.y * vw.y * sampleDepth(base + vec2(u.y, v.y), layer, depth);
-    return sum * (1.0 / 16.0);
+
+    sum += w0.x * w0.y * texture(map, vec4(base + (vec2(o0.x, o0.y) / shadow_res), float(index), depth));
+    sum += w1.x * w0.y * texture(map, vec4(base + (vec2(o1.x, o0.y) / shadow_res), float(index), depth));
+    sum += w2.x * w0.y * texture(map, vec4(base + (vec2(o2.x, o0.y) / shadow_res), float(index), depth));
+
+    sum += w0.x * w1.y * texture(map, vec4(base + (vec2(o0.x, o1.y) / shadow_res), float(index), depth));
+    sum += w1.x * w1.y * texture(map, vec4(base + (vec2(o1.x, o1.y) / shadow_res), float(index), depth));
+    sum += w2.x * w1.y * texture(map, vec4(base + (vec2(o2.x, o1.y) / shadow_res), float(index), depth));
+
+    sum += w0.x * w2.y * texture(map, vec4(base + (vec2(o0.x, o2.y) / shadow_res), float(index), depth));
+    sum += w1.x * w2.y * texture(map, vec4(base + (vec2(o1.x, o2.y) / shadow_res), float(index), depth));
+    sum += w2.x * w2.y * texture(map, vec4(base + (vec2(o2.x, o2.y) / shadow_res), float(index), depth));
+
+    return sum / 144.0;
 }
 
-float getShadowFactor(vec3 world_position, vec3 xpos, vec3 normal, vec3 lightdir)
+float getShadowFactor(sampler2DArrayShadow map, vec3 world_position, float view_depth, float NdotL, vec3 normal, vec3 lightdir)
 {
-    float shadow = 1.0;
-
-    if (xpos.z >= 150.0)
+    float end_factor = smoothstep(120.0, 150.0, view_depth);
+    if (view_depth >= 150.0 || NdotL <= 0.001)
     {
-        return shadow;
+        return end_factor;
     }
 
-    float factor = smoothstep(7.0, 8.0, xpos.z) + smoothstep(35.0, 40.0, xpos.z);
-    float end_factor = smoothstep(130.0, 150.0, xpos.z);
+    float shadow = 1.0;
+    float factor = smoothstep(9.0, 10.0, view_depth) + smoothstep(45.0, 50.0, view_depth);
     int level = int(factor);
-    float bias = (0.4 + 2.0 * (1.0 - max(0.0, dot(lightdir, -normal)))) / 1024.;
+
+    vec3 base_normal_bias = normal * (1.0 - max(0.0, dot(-normal, lightdir)));
 
     vec4 light_view_position = u_camera.m_shadow_matrix[level] * vec4(world_position, 1.0);
     light_view_position.xyz /= light_view_position.w;
     light_view_position.xy = light_view_position.xy * 0.5 + 0.5;
-    light_view_position.z -= bias;
+    
+	vec3 world_position_bias = world_position;
+    float dz = u_camera.m_bias_a[level] - (1. - light_view_position.y) / 1024.;
+	vec3 normal_bias = base_normal_bias * -u_camera.m_bias_b[level] / dz / dz * 6.; // PCF Kernel size
+	normal_bias -= lightdir * dot(lightdir, normal_bias);
+	world_position_bias += normal_bias;
 
-    shadow = getShadowPCF(light_view_position.xy, level, light_view_position.z);
-    shadow = mix(shadow, 1.0, end_factor);
+    light_view_position = u_camera.m_shadow_matrix[level] * vec4(world_position_bias, 1.0);
+    light_view_position.xyz /= light_view_position.w;
+    light_view_position.xy = light_view_position.xy * 0.5 + 0.5;
+
+    shadow = mix(getShadowPCF(map, light_view_position.xy, level, light_view_position.z), 1.0, end_factor);
 
     if (factor == float(level))
     {
         return shadow;
     }
 
-    // Blend with next cascade by factor
     light_view_position = u_camera.m_shadow_matrix[level + 1] * vec4(world_position, 1.0);
     light_view_position.xyz /= light_view_position.w;
     light_view_position.xy = light_view_position.xy * 0.5 + 0.5;
-    light_view_position.z -= bias;
+    
+	world_position_bias = world_position;
+    dz = u_camera.m_bias_a[level + 1] - (1. - light_view_position.y) / 1024.;
+	normal_bias = base_normal_bias * -u_camera.m_bias_b[level + 1] / dz / dz * 6.; // PCF Kernel size
+	normal_bias -= lightdir * dot(lightdir, normal_bias);
+	world_position_bias += normal_bias;
 
-    shadow = mix(shadow, getShadowPCF(light_view_position.xy, level + 1, light_view_position.z), factor - float(level));
+    // Blend with next cascade by factor
+    light_view_position = u_camera.m_shadow_matrix[level + 1] * vec4(world_position_bias, 1.0);
+    light_view_position.xyz /= light_view_position.w;
+    light_view_position.xy = light_view_position.xy * 0.5 + 0.5;
+
+    shadow = mix(shadow, getShadowPCF(map, light_view_position.xy, level + 1, light_view_position.z), factor - float(level));
 
     return shadow;
 }
@@ -229,6 +246,9 @@ vec3 PBRSunAmbientEmitLight(
     vec3 eyedir, 
     vec3 sundir,
     float shadow,
+    float NdotL,
+    samplerCube diffuse_map,
+    samplerCube specular_map,
     vec3 world_normal,
     vec3 world_reflection,
     vec3 color,
@@ -240,7 +260,6 @@ vec3 PBRSunAmbientEmitLight(
 {
     // Copied from PBRLight to use F_ab and F90 again
     float NdotV = max(dot(normal, eyedir), 0.0001);
-    float NdotL = clamp(dot(normal, sundir), 0.0, 1.0);
     
     vec2 F_ab = F_AB(perceptual_roughness, NdotV);
 
@@ -271,6 +290,7 @@ vec3 PBRSunAmbientEmitLight(
     vec3 specular_ambient = F90 * envBRDFApprox(F0, F_ab);
 
     vec3 environment = environmentLight(
+        diffuse_map, specular_map,
         world_normal, world_reflection,
         perceptual_roughness, roughness,
         diffuse_color, F_ab, F0, F90, NdotV
