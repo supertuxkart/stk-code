@@ -7,7 +7,7 @@
     </div>
 
     <div x="0%" y="1%" width="100%" height="98%" layout="vertical-row" >
-        <header width="80%" height="8%" align="center" text_align="center" text="SuperTuxKart Addons"/>
+        <header width="80%" height="8%" align="center" text_align="center" text="Addons"/>
         <spacer width="100%" height="1%"/>
 
         <box id="filter_box" width="97%" height="2f" layout="vertical-row" align="center">
