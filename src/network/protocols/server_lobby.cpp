@@ -478,25 +478,13 @@ void ServerLobby::handleChat(Event* event)
     core::stringw message;
     event->data().decodeString16(&message, 360/*max_len*/);
 
-    // Check if the message starts with "(one of profile names): " to prevent
+    // Check if the message starts with "(the name of main profile): " to prevent
     // impersonation, see #5121.
-    // If the server allows many messages in a row and there are many players
-    // inside one peer, naive check can become a problem. For most cases,
-    // it should be completely fine.
-    bool valid_message = false;
     std::string message_utf8 = StringUtils::wideToUtf8(message);
-    for (auto& profile: event->getPeer()->getPlayerProfiles())
-    {
-        std::string prefix = StringUtils::wideToUtf8(
-            profile->getName()) + ": ";
-        if (StringUtils::startsWith(message_utf8, prefix))
-        {
-            valid_message = true;
-            break;
-        }
-    }
-
-    if (!valid_message)
+    std::string prefix = StringUtils::wideToUtf8(
+        event->getPeer()->getPlayerProfiles()[0]->getName()) + ": ";
+    
+    if (!StringUtils::startsWith(message_utf8, prefix))
     {
         NetworkString* chat = getNetworkString();
         chat->setSynchronous(true);
