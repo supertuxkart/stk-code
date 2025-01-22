@@ -27,8 +27,7 @@ enum GEVulkanShadowCameraCascade : unsigned
 struct GEVulkanShadowUBO
 {
     irr::core::matrix4 m_light_projection_view_matrix[GVSCC_COUNT];
-    float m_bias_a[4];
-    float m_bias_b[4];
+    float m_bias[3][4];
 };
 
 class GEVulkanSunSceneNode : public irr::scene::CLightSceneNode

@@ -1115,9 +1115,9 @@ void GEVulkanDrawCall::createPipeline(GEVulkanDriver* vk,
     rasterizer.cullMode = settings.m_backface_culling ? VK_CULL_MODE_BACK_BIT : VK_CULL_MODE_NONE;
     rasterizer.frontFace = VK_FRONT_FACE_CLOCKWISE;
     rasterizer.depthBiasEnable = depth_bias;
-    rasterizer.depthBiasConstantFactor = 1.;
-    rasterizer.depthBiasSlopeFactor = 2.;
-    rasterizer.depthBiasClamp = 15.;
+    rasterizer.depthBiasConstantFactor = 0.5;
+    rasterizer.depthBiasSlopeFactor = 1.5;
+    rasterizer.depthBiasClamp = 8.0;
 
     VkPipelineMultisampleStateCreateInfo multisampling = {};
     multisampling.sType = VK_STRUCTURE_TYPE_PIPELINE_MULTISAMPLE_STATE_CREATE_INFO;

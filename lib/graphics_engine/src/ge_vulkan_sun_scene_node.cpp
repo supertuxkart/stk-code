@@ -29,6 +29,8 @@ void GEVulkanSunSceneNode::render()
         return;
     }
 
+    bool stable_mode = true;
+
     // Calculate shadow view matrix
     irr::core::vector3df eyepos = cam->getAbsolutePosition();
     irr::core::vector3df viewdir = cam->getTarget() - eyepos;
@@ -36,7 +38,7 @@ void GEVulkanSunSceneNode::render()
     viewdir = viewdir.normalize();
     lightdir = lightdir.normalize();
 
-	irr::core::vector3df lsleft = lightdir.crossProduct(viewdir).normalize();
+	irr::core::vector3df lsleft = lightdir.crossProduct(stable_mode ? irr::core::vector3df(1.0, 0.0, 0.0) : viewdir).normalize();
     irr::core::vector3df lsup = lsleft.crossProduct(lightdir).normalize();
 
     m_shadow_view_matrix = irr::core::matrix4();
@@ -44,9 +46,12 @@ void GEVulkanSunSceneNode::render()
 	m_shadow_view_matrix(1, 0) = lsleft.Y, m_shadow_view_matrix(1, 1) = lsup.Y, m_shadow_view_matrix(1, 2) = lightdir.Y;
 	m_shadow_view_matrix(2, 0) = lsleft.Z, m_shadow_view_matrix(2, 1) = lsup.Z, m_shadow_view_matrix(2, 2) = lightdir.Z;
 
-	m_shadow_view_matrix(3, 0) = -lsleft.dotProduct(eyepos);
-	m_shadow_view_matrix(3, 1) = -lsup.dotProduct(eyepos);
-	m_shadow_view_matrix(3, 2) = -lightdir.dotProduct(eyepos);
+    if (!stable_mode)
+    {
+        m_shadow_view_matrix(3, 0) = -lsleft.dotProduct(eyepos);
+        m_shadow_view_matrix(3, 1) = -lsup.dotProduct(eyepos);
+        m_shadow_view_matrix(3, 2) = -lightdir.dotProduct(eyepos);
+    }
 
     // Calculate light space perspective (warp) matrix * shadow perspective matrix
     float cosgamma	= viewdir.dotProduct(lightdir);
@@ -99,6 +104,22 @@ void GEVulkanSunSceneNode::render()
             else lsbody.addInternalPoint(point);
         }
 
+        double bounding_sphere[4] = {};
+
+        for (int j = 0; j < points.size(); j++)
+        {
+            bounding_sphere[0] += points[j].X / points.size();
+            bounding_sphere[1] += points[j].Y / points.size();
+            bounding_sphere[2] += points[j].Z / points.size();
+        }
+        irr::core::vector3df scenter(bounding_sphere[0], bounding_sphere[1], bounding_sphere[2]);
+
+        for (int j = 0; j < points.size(); j++)
+        {
+            bounding_sphere[3] = std::max(bounding_sphere[3], (double) points[j].getDistanceFromSQ(scenter));
+        }
+        bounding_sphere[3] = std::sqrt(bounding_sphere[3]);
+
         lslightproj(2, 2) = 1.0 / lsbody.getExtent().Z;
         lslightproj(3, 2) = -lsbody.MinEdge.Z / lsbody.getExtent().Z;
 
@@ -120,11 +141,13 @@ void GEVulkanSunSceneNode::render()
 
         float z0 = znear;
         float z1 = z0 + d * singamma;
+       
+        m_shadow_ubo_data.m_bias[i][0] = -1.f;
+        m_shadow_ubo_data.m_bias[i][1] = -1.f;
+        m_shadow_ubo_data.m_bias[i][2] = 1.f;
+        m_shadow_ubo_data.m_bias[i][3] = 0.f;
 
-        m_shadow_ubo_data.m_bias_a[i] = 0.f;
-        m_shadow_ubo_data.m_bias_b[i] = 0.f;
-
-        if (singamma > 0.02f && 3.0f * (dznear / (zfar - znear)) < 2.0f)
+        if (!stable_mode && singamma > 0.02f && 3.0f * (dznear / (zfar - znear)) < 2.0f)
         {
             float vz0 = std::max(0.0f, std::max(std::max(znear, cam->getNearValue() + dznear), z0));
             float vz1 = std::max(0.0f, std::min(std::min(zfar, cam->getFarValue() - dzfar), z1));
@@ -142,8 +165,9 @@ void GEVulkanSunSceneNode::render()
             lispsmproj(1, 3) = 1;
             lispsmproj(3, 3) = 0;
 
-            m_shadow_ubo_data.m_bias_a[i] = (f + n) / d;
-            m_shadow_ubo_data.m_bias_b[i] = -2.0 * f * n / d;
+            m_shadow_ubo_data.m_bias[i][1] = lispsmproj(1, 1);
+            m_shadow_ubo_data.m_bias[i][2] = lispsmproj(0, 0);
+            m_shadow_ubo_data.m_bias[i][3] = lispsmproj(3, 1);
 
             irr::core::vector3df point = eyepos;
             m_shadow_view_matrix.transformVect(point);
@@ -174,16 +198,30 @@ void GEVulkanSunSceneNode::render()
         }
 
         irr::core::matrix4 fittounitcube;
-        fittounitcube(0, 0) = 2.0f / lsbody.getExtent().X;
-		fittounitcube(1, 1) = 2.0f / lsbody.getExtent().Y;
-		fittounitcube(3, 0) = -(lsbody.MinEdge.X + lsbody.MaxEdge.X) / lsbody.getExtent().X;
-		fittounitcube(3, 1) = -(lsbody.MinEdge.Y + lsbody.MaxEdge.Y) / lsbody.getExtent().Y;
 
-        m_shadow_ubo_data.m_bias_a[i] *= 2.0f / lsbody.getExtent().Y;
-        m_shadow_ubo_data.m_bias_b[i] *= 2.0f / lsbody.getExtent().Y / 1024.f;
-        m_shadow_ubo_data.m_bias_a[i] += fittounitcube(3, 1) * 0.5f + 0.5f;
+        if (stable_mode)
+        {
+            fittounitcube(0, 0) = 1.0f / bounding_sphere[3];
+            fittounitcube(1, 1) = 1.0f / bounding_sphere[3];
+            fittounitcube(3, 0) = -bounding_sphere[0] / bounding_sphere[3];
+            fittounitcube(3, 1) = -bounding_sphere[1] / bounding_sphere[3];
 
-        float f3 = (m_shadow_ubo_data.m_bias_a[i] - 0.5f / 1024.f);
+            fittounitcube(3, 0) -= fmod((double)fittounitcube(3, 0), 1. / (getShadowMapSize() / 4));
+            fittounitcube(3, 1) -= fmod((double)fittounitcube(3, 1), 1. / (getShadowMapSize() / 4));
+        }
+        else
+        {
+            fittounitcube(0, 0) = 2.0f / lsbody.getExtent().X;
+            fittounitcube(1, 1) = 2.0f / lsbody.getExtent().Y;
+            fittounitcube(3, 0) = -(lsbody.MinEdge.X + lsbody.MaxEdge.X) / lsbody.getExtent().X;
+            fittounitcube(3, 1) = -(lsbody.MinEdge.Y + lsbody.MaxEdge.Y) / lsbody.getExtent().Y;
+
+            m_shadow_ubo_data.m_bias[i][0]  = fittounitcube(3, 0) * 0.5f + 0.5f;
+            m_shadow_ubo_data.m_bias[i][1] *= 1.0f / lsbody.getExtent().Y;
+            m_shadow_ubo_data.m_bias[i][1] += fittounitcube(3, 1) * 0.5f + 0.5f;
+            m_shadow_ubo_data.m_bias[i][2] *= 1.0f / lsbody.getExtent().X;
+            m_shadow_ubo_data.m_bias[i][3] *= -1.0f / lsbody.getExtent().Y / getShadowMapSize();
+        }
         
         lslightproj = fittounitcube * lslightproj;
 

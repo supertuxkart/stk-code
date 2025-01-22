@@ -150,40 +150,34 @@ vec3 environmentLight(
     return diffuse + specular;
 }
 
-// https://web.archive.org/web/20230210095515/http://the-witness.net/news/2013/09/shadow-mapping-summary-part-1
-float getShadowPCF(sampler2DArrayShadow map, vec2 shadowtexcoord, int index, float depth)
+float getShadowPCF(sampler2DArrayShadow map, vec2 shadowtexcoord, int layer, float depth)
 {
-    shadowtexcoord = clamp(shadowtexcoord, vec2(-1.0), vec2(2.0));
-    depth = clamp(depth, 0.0, 1.0);
-
-    float shadow_res = 1024.;
-    vec2 uv = (shadowtexcoord * shadow_res) + 0.5;
-    vec2 base = (floor(uv) - 0.5) / shadow_res;
+    // Castaño, 2013, "Shadow Mapping Summary Part 1"
+    float size = 1024.;
+    vec2 uv = shadowtexcoord * size + 0.5;
+    vec2 base = (floor(uv) - 0.5) / size;
     vec2 st = fract(uv);
 
-    vec2 w0 = 4.0 - 3.0 * st;
-    vec2 w1 = vec2(7.0);
-    vec2 w2 = 1.0 + 3.0 * st;
+    vec2 uw = vec2(3.0 - 2.0 * st.x, 1.0 + 2.0 * st.x);
+    vec2 vw = vec2(3.0 - 2.0 * st.y, 1.0 + 2.0 * st.y);
 
-    vec2 o0 = (3.0 - 2.0 * st) / w0 - 2.0;
-    vec2 o1 = (3.0 + st) / w1;
-    vec2 o2 = st / w2 + 2.0;
+    vec2 u = vec2((2.0 - st.x) / uw.x - 1.0, st.x / uw.y + 1.0) / size;
+    vec2 v = vec2((2.0 - st.y) / vw.x - 1.0, st.y / vw.y + 1.0) / size;
 
     float sum = 0.0;
+    sum += uw.x * vw.x * texture(map, vec4(base + vec2(u.x, v.x), float(layer), depth));
+    sum += uw.y * vw.x * texture(map, vec4(base + vec2(u.y, v.x), float(layer), depth));
+    sum += uw.x * vw.y * texture(map, vec4(base + vec2(u.x, v.y), float(layer), depth));
+    sum += uw.y * vw.y * texture(map, vec4(base + vec2(u.y, v.y), float(layer), depth));
+    return sum * (1.0 / 16.0);
+}
 
-    sum += w0.x * w0.y * texture(map, vec4(base + (vec2(o0.x, o0.y) / shadow_res), float(index), depth));
-    sum += w1.x * w0.y * texture(map, vec4(base + (vec2(o1.x, o0.y) / shadow_res), float(index), depth));
-    sum += w2.x * w0.y * texture(map, vec4(base + (vec2(o2.x, o0.y) / shadow_res), float(index), depth));
-
-    sum += w0.x * w1.y * texture(map, vec4(base + (vec2(o0.x, o1.y) / shadow_res), float(index), depth));
-    sum += w1.x * w1.y * texture(map, vec4(base + (vec2(o1.x, o1.y) / shadow_res), float(index), depth));
-    sum += w2.x * w1.y * texture(map, vec4(base + (vec2(o2.x, o1.y) / shadow_res), float(index), depth));
-
-    sum += w0.x * w2.y * texture(map, vec4(base + (vec2(o0.x, o2.y) / shadow_res), float(index), depth));
-    sum += w1.x * w2.y * texture(map, vec4(base + (vec2(o1.x, o2.y) / shadow_res), float(index), depth));
-    sum += w2.x * w2.y * texture(map, vec4(base + (vec2(o2.x, o2.y) / shadow_res), float(index), depth));
-
-    return sum / 144.0;
+vec3 getNormalBias(vec3 normal, vec3 lightdir, vec4 bias, vec2 texcoord)
+{
+    bias.xy -= texcoord;
+	vec3 normal_bias = normal * bias.w / bias.y / bias.y * max(length(bias.xy) / bias.z, 1.0);
+	normal_bias -= lightdir * dot(lightdir, normal_bias);
+    return normal_bias;
 }
 
 float getShadowFactor(sampler2DArrayShadow map, vec3 world_position, float view_depth, float NdotL, vec3 normal, vec3 lightdir)
@@ -204,11 +198,7 @@ float getShadowFactor(sampler2DArrayShadow map, vec3 world_position, float view_
     light_view_position.xyz /= light_view_position.w;
     light_view_position.xy = light_view_position.xy * 0.5 + 0.5;
     
-	vec3 world_position_bias = world_position;
-    float dz = u_camera.m_bias_a[level] - (1. - light_view_position.y) / 1024.;
-	vec3 normal_bias = base_normal_bias * -u_camera.m_bias_b[level] / dz / dz * 6.; // PCF Kernel size
-	normal_bias -= lightdir * dot(lightdir, normal_bias);
-	world_position_bias += normal_bias;
+	vec3 world_position_bias = world_position + getNormalBias(base_normal_bias, lightdir, u_camera.m_bias[level], light_view_position.xy);
 
     light_view_position = u_camera.m_shadow_matrix[level] * vec4(world_position_bias, 1.0);
     light_view_position.xyz /= light_view_position.w;
@@ -221,17 +211,14 @@ float getShadowFactor(sampler2DArrayShadow map, vec3 world_position, float view_
         return shadow;
     }
 
+    // Blend with next cascade by factor
+
     light_view_position = u_camera.m_shadow_matrix[level + 1] * vec4(world_position, 1.0);
     light_view_position.xyz /= light_view_position.w;
     light_view_position.xy = light_view_position.xy * 0.5 + 0.5;
     
-	world_position_bias = world_position;
-    dz = u_camera.m_bias_a[level + 1] - (1. - light_view_position.y) / 1024.;
-	normal_bias = base_normal_bias * -u_camera.m_bias_b[level + 1] / dz / dz * 6.; // PCF Kernel size
-	normal_bias -= lightdir * dot(lightdir, normal_bias);
-	world_position_bias += normal_bias;
+	world_position_bias = world_position + getNormalBias(base_normal_bias, lightdir, u_camera.m_bias[level + 1], light_view_position.xy);
 
-    // Blend with next cascade by factor
     light_view_position = u_camera.m_shadow_matrix[level + 1] * vec4(world_position_bias, 1.0);
     light_view_position.xyz /= light_view_position.w;
     light_view_position.xy = light_view_position.xy * 0.5 + 0.5;
