@@ -25,6 +25,7 @@
 #include "challenges/unlock_manager.hpp"
 #include "config/user_config.hpp"
 #include "graphics/camera/camera.hpp"
+#include "graphics/camera/camera_normal.hpp"
 #include "graphics/central_settings.hpp"
 #include "graphics/irr_driver.hpp"
 #include "graphics/material.hpp"
@@ -891,7 +892,11 @@ void World::resetAllKarts()
     {
         for(unsigned int i=0; i<Camera::getNumCameras(); i++)
         {
-            Camera::getCamera(i)->setInitialTransform();
+            Camera* cam = Camera::getCamera(i);
+            cam->setInitialTransform();
+            // Ensure that smoothed cameras start from a correct position
+            if (cam->isNormal())
+                dynamic_cast<CameraNormal*>(cam)->snapToPosition();
         }
     }
 }   // resetAllKarts
