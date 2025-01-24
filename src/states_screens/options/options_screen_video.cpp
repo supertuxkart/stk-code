@@ -64,7 +64,7 @@ void OptionsScreenVideo::initPresets()
 
     m_presets.push_back // Level 4
     ({
-        true /* light */, 0 /* shadow */, false /* bloom */, true /* lightshaft */,
+        true /* light */, 0 /* shadow */, false /* bloom */, false /* lightshaft */,
         true /* glow */, true /* mlaa */, false /* ssao */, true /* light scatter */,
         true /* animatedCharacters */, 2 /* particles */, 2 /* image_quality */,
         false /* degraded IBL */, 3 /* Geometry Detail */
@@ -81,7 +81,7 @@ void OptionsScreenVideo::initPresets()
     m_presets.push_back // Level 6
     ({
         true /* light */, 1024 /* shadow */, true /* bloom */, true /* lightshaft */,
-        true /* glow */, true /* mlaa */, true /* ssao */, true /* light scatter */,
+        true /* glow */, true /* mlaa */, false /* ssao */, true /* light scatter */,
         true /* animatedCharacters */, 2 /* particles */, 3 /* image_quality */,
         false /* degraded IBL */, 4 /* Geometry Detail */
     });
@@ -94,17 +94,25 @@ void OptionsScreenVideo::initPresets()
         false /* degraded IBL */, 5 /* Geometry Detail */
     });
 
-    m_blur_presets.push_back
+    m_presets.push_back // Level 8
+    ({
+        true /* light */, 4096 /* shadow */, true /* bloom */, true /* lightshaft */,
+        true /* glow */, true /* mlaa */, true /* ssao */, true /* light scatter */,
+        true /* animatedCharacters */, 2 /* particles */, 3 /* image_quality */,
+        false /* degraded IBL */, 5 /* Geometry Detail */
+    });
+
+    m_blur_presets.push_back // Level 0
     ({
         false /* motionblur */, false /* depth of field */
     });
 
-    m_blur_presets.push_back
+    m_blur_presets.push_back // Level 1
     ({
         true  /* motionblur */, false /* depth of field */
     });
 
-    m_blur_presets.push_back
+    m_blur_presets.push_back // Level 2
     ({
         true  /* motionblur */, true  /* depth of field */
     });
