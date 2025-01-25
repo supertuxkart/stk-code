@@ -328,7 +328,7 @@ void ArenasScreen::buildTrackList()
         Track *curr = tracks.get(i);
         if (PlayerManager::getCurrentPlayer()->isLocked(curr->getIdent()))
         {
-            w->addItem( _("Locked : solve active challenges to gain access to more!"),
+            w->addItem( _("Locked: solve active challenges to gain access to more!"),
                         "locked", curr->getScreenshotFile(), LOCKED_BADGE );
         }
         else if (PlayerManager::getCurrentPlayer()->isFavoriteTrack(curr->getIdent()))
