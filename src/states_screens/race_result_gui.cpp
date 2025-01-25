@@ -2347,7 +2347,7 @@ void RaceResultGUI::displayBenchmarkSummary()
                           UserConfigParams::m_scale_rtts_factor * 100 : 100);
     info_text[3] = _("Render resolution: %s%%", value);
     info_text[4] = UserConfigParams::m_mlaa ? _("Anti-aliasing: ON")
-                                            : _("Anti-aliasing : OFF");
+                                            : _("Anti-aliasing: OFF");
     info_text[5] = UserConfigParams::m_degraded_IBL ? _("Image-based lighting: OFF")
                                                     : _("Image-based lighting: ON");
     info_text[6] = UserConfigParams::m_ssao ? _("Ambient occlusion: ON")
