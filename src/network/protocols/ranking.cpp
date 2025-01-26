@@ -34,7 +34,7 @@ namespace
     const double BASE_RD_PER_DISCONNECT = 15.0;
     const double VAR_RD_PER_DISCONNECT  = 3.0;
     const double MAX_SCALING_TIME       = 360.0;
-    const double BASE_POINTS_PER_SECOND = 0.18;
+    const double BASE_POINTS_PER_SECOND = 0.25;
     const double HANDICAP_OFFSET        = 2000.0;
 }
 
@@ -296,10 +296,11 @@ double Ranking::getModeSpread(bool time_trial)
     if (time_trial)
         return 1.0;
 
-    //TODO: the value used here for normal races is a wild guess.
-    // When hard data to the spread tendencies of time-trial
-    // and normal mode becomes available, update this to make
-    // the spreads more comparable
+    //TODO: For 2.0, it would be more sensible to simply use
+    // a different ranking for time-trial and normal races, as
+    // some players perform better in one mode than in the other,
+    // so an unified list is always going to be flawed. Trying to
+    // patch these flaws is never going to work well.
     return 1.25;
 }   // getModeSpread
 
@@ -307,6 +308,8 @@ double Ranking::getModeSpread(bool time_trial)
 /** Returns the time spread factor.
  *  Short races are more random, so the expected result changes depending
  *  on race duration.
+ * TODO: collect real-world data on the relationship between race duration and
+ * the likelihood of winning of players, and fit the formula based on it.
  */
 double Ranking::getTimeSpread(double time)
 {
@@ -369,7 +372,10 @@ double Ranking::computeH2HResult(double player1_time, double player2_time)
  *     strong players would go.
  *  For the purposes of this rating computation, we assume that the informational value
  *  of a race is roughly proportional to the likelihood of the weaker player winning.
- *  We cap the effect so that losing to a much weaker player still costs rating points.
+ * 
+ *  A downside of this method is that a legitimate loss to a much lower rated player won't
+ *  change the rating much, but these are rare enough that it's better to miss them than
+ *  to reward "farming" and to incorrectly reward wins due to external factors.
  *
  *  In a race with many players, a single event can have a significant impact on the
  *  results of all the H2H. To avoid races with high players count having too strong
@@ -383,10 +389,10 @@ double Ranking::computeDataAccuracy(double player1_rd, double player2_rd, double
 {
     double accuracy = player1_rd / (sqrt(player2_rd) * sqrt(MIN_RATING_DEVIATION));
 
-    double strong_lowerbound = (player1_scores > player2_scores) ? player1_scores - 3 * player1_rd
-                                                                 : player2_scores - 3 * player2_rd;
-    double weak_upperbound   = (player1_scores > player2_scores) ? player2_scores + 3 * player2_rd
-                                                                 : player1_scores + 3 * player1_rd;
+    double strong_lowerbound = (player1_scores > player2_scores) ? player1_scores - 350 - (player1_rd/2)
+                                                                 : player2_scores - 350 - (player2_rd/2);
+    double weak_upperbound   = (player1_scores > player2_scores) ? player2_scores + 350 + (player2_rd/2)
+                                                                 : player1_scores + 350 + (player1_rd/2);
 
     if (weak_upperbound < strong_lowerbound)
     {
@@ -395,7 +401,7 @@ double Ranking::computeDataAccuracy(double player1_rd, double player2_rd, double
 
         // The expected result is that of the weaker player and is between 0 and 0.5
         double expected_result = 1.0/ (1.0 + std::pow(10.0, diff));
-        expected_result = std::max(0.2, sqrt(2*expected_result));
+        expected_result = std::max(0.05, 2*expected_result);
 
         accuracy *= expected_result;
     }
