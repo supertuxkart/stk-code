@@ -31,6 +31,7 @@
 #include "karts/kart.hpp"
 #include "karts/kart_properties.hpp"
 #include "karts/skidding.hpp"
+#include "network/rewind_manager.hpp"
 #include "tracks/track.hpp"
 
 // ============================================================================
@@ -80,6 +81,8 @@ CameraNormal::CameraNormal(Camera::CameraType type,  int camera_index,
 void CameraNormal::moveCamera(float dt, bool smooth, float cam_angle, float distance)
 {
     if(!m_kart) return;
+
+    if (RewindManager::get()->isRewinding()) return;
 
     Kart *kart = dynamic_cast<Kart*>(m_kart);
     if (kart->isFlying())
