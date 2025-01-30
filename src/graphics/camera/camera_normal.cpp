@@ -115,7 +115,7 @@ void CameraNormal::moveCamera(float dt, bool smooth, float cam_angle, float dist
 
     // Adjust the camera angle
     float tan_up = 0;
-    if (cam_angle > 0) tan_up = tanf(cam_angle) * distance;
+    if (cam_angle > 0) tan_up = tanf(cam_angle) * std::max(distance - 1.0f, distance * (1.0f + 0.25f * ratio));
     // Avoid a camera razing the ground (it generates a lot of terrain clipping with the current near value of 1.0)
     if (tan_up > -0.5f)
         tan_up = -0.5f;
