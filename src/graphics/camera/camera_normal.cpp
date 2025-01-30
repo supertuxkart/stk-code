@@ -207,6 +207,22 @@ void CameraNormal::getCameraSettings(float *above_kart, float *cam_angle,
                                      float *sideway, float *distance,
                                      bool *smoothing, float *cam_roll_angle)
 {
+    // Update the standard camera for users updating to 1.5
+    if(!UserConfigParams::m_camera_updated_one_five)
+    {
+        UserConfigParams::m_standard_camera_fov.revertToDefaults();
+        UserConfigParams::m_standard_camera_distance.revertToDefaults();
+        UserConfigParams::m_standard_camera_forward_up_angle.revertToDefaults();
+        if (UserConfigParams::m_camera_present == 1) // Currently using a standard camera 
+        {
+            UserConfigParams::m_camera_fov.revertToDefaults();
+            UserConfigParams::m_camera_distance.revertToDefaults();
+            UserConfigParams::m_camera_forward_up_angle.revertToDefaults();
+            m_distance = UserConfigParams::m_camera_distance;
+        }
+        UserConfigParams::m_camera_updated_one_five = true;
+    }
+
     switch(getMode())
     {
     case CM_NORMAL:

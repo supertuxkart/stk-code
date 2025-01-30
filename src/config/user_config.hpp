@@ -1076,6 +1076,10 @@ namespace UserConfigParams
                             "The current used camera. 0=Custom; 1=Standard; 2=Drone chase") );
 
     // ---- Standard camera settings
+    PARAM_PREFIX BoolUserConfigParam       m_camera_updated_one_five
+            PARAM_DEFAULT(  BoolUserConfigParam(false, "camera-updated-one-five",
+                            "Used to update the standard camera values for users upgrading to 1.5") );
+
     PARAM_PREFIX GroupUserConfigParam        m_standard_camera_settings
             PARAM_DEFAULT( GroupUserConfigParam(
                         "standard-camera-settings",
