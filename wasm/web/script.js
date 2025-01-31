@@ -12,6 +12,8 @@ let status_text = document.getElementById("status_text");
 let info_container = document.getElementById("info_container");
 let quality_select = document.getElementById("quality_select");
 
+let syncing_fs = false;
+
 function load_db() {
   if (db) return db;
   return new Promise((resolve, reject) => {
@@ -183,13 +185,16 @@ async function load_data() {
 }
 
 async function load_idbfs() {
-  idbfs_mount = FS.mount(IDBFS, {}, "/home/web_user").mount;
+  idbfs_mount = FS.mount(IDBFS, {}, "/home").mount;
   await sync_idbfs(true);
 }
 
 function sync_idbfs(populate = false) {
+  if (syncing_fs) return;
+  syncing_fs = true;
   return new Promise((resolve, reject) => {
     idbfs_mount.type.syncfs(idbfs_mount, populate, (err) => {
+      syncing_fs = false;
       if (err) reject(err);
       else resolve();
     });
@@ -200,7 +205,16 @@ function wait_for_frame() {
   return new Promise((resolve) => {requestAnimationFrame(resolve)});
 }
 
+function set_websocket_url(url) {
+  if (typeof Module.websocket === "undefined") 
+    Module.websocket = {};
+  if (typeof SOCKFS.websocketArgs !== "undefined") 
+    SOCKFS.websocketArgs.url = url;
+  Module.websocket.url = url;
+}
+
 async function main() {
+  set_websocket_url("wss://anura.pro/");
   globalThis.ready = true;
   await load_idbfs();
   start_button.onclick = start_game;
