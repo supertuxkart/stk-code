@@ -148,6 +148,7 @@ void OptionsScreenUI::loadedFromFile()
 void OptionsScreenUI::init()
 {
     Screen::init();
+    OptionsCommon::setTabStatus();
 
     bool in_game = StateManager::get()->getGameState() == GUIEngine::INGAME_MENU;
 

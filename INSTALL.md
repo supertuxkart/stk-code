@@ -26,6 +26,15 @@ To build SuperTuxKart from source, you'll need to install the following packages
 * jpeg (libjpeg-turbo-devel)
 * SDL2 (libsdl2-devel)
 
+Debian-based Distributions command:
+
+```bash
+sudo apt-get install build-essential cmake libbluetooth-dev libsdl2-dev \
+libcurl4-openssl-dev libenet-dev libfreetype6-dev libharfbuzz-dev \
+libjpeg-dev libogg-dev libopenal-dev libpng-dev \
+libssl-dev libvorbis-dev libmbedtls-dev pkg-config zlib1g-dev
+```
+
 Fedora command:
 
 ```bash
@@ -39,13 +48,12 @@ libogg-devel openssl-devel pkgconf \
 wiiuse-devel zlib-devel
 ```
 
-Mageia 6 command:
+Arch-based Distributions command:
 
 ```bash
-su -c 'urpmi gcc-c++ cmake openssl-devel libcurl-devel freetype-devel harfbuzz-devel \
-libjpeg-turbo-devel libogg-devel openal-soft-devel SDL2-devel \
-libpng-devel libvorbis-devel nettle-devel zlib-devel git subversion \
-libbluez-devel libfreetype6-devel
+sudo pacman -S openal libogg libvorbis freetype2 harfbuzz curl \
+bluez-libs openssl libpng zlib libjpeg-turbo sdl2 gcc cmake \
+pkgconf make git subversion
 ```
 
 openSUSE command:
@@ -57,13 +65,13 @@ libvorbis-devel pkgconf zlib-devel enet-devel \
 libjpeg-devel bluez-devel freetype2-devel
 ```
 
-Debian-based Distributions command:
+Mageia 6 command:
 
 ```bash
-sudo apt-get install build-essential cmake libbluetooth-dev libsdl2-dev \
-libcurl4-openssl-dev libenet-dev libfreetype6-dev libharfbuzz-dev \
-libjpeg-dev libogg-dev libopenal-dev libpng-dev \
-libssl-dev libvorbis-dev libmbedtls-dev pkg-config zlib1g-dev
+su -c 'urpmi gcc-c++ cmake openssl-devel libcurl-devel freetype-devel harfbuzz-devel \
+libjpeg-turbo-devel libogg-devel openal-soft-devel SDL2-devel \
+libpng-devel libvorbis-devel nettle-devel zlib-devel git subversion \
+libbluez-devel libfreetype6-devel
 ```
 
 Solus command:
@@ -73,19 +81,19 @@ harfbuzz-devel curl-devel bluez-devel openssl-devel libpng-devel zlib-devel \
 libjpeg-turbo-devel sdl2-devel enet-devel libjpeg-turbo-devel bluez-devel curl-devel
 ```
 
-### In-game recorder
+#### In-game recorder
 
 To build the in-game recorder for STK, you have to install
 `libopenglrecorder` from your distribution, or compile it yourself from [here](https://github.com/Benau/libopenglrecorder).
 Compilation instruction is explained there. If you don't need this feature, pass `-DBUILD_RECORDER=off` to CMake.
 
-### Shaderc for Vulkan support
+#### Shaderc for Vulkan support
 
 You need to compile [Shaderc](https://github.com/google/shaderc) for Vulkan support in SuperTuxKart if you are not building for Windows or macOS. If you don't need this feature, pass `-DNO_SHADERC=on` to CMake.
 
 ### Compiling
 
-To compile SuperTuxKart, run the following commands inside the `stk-code` directory
+To compile SuperTuxKart, run the following commands inside the `stk-code` directory:
 
 ```bash
 # go into the stk-code directory
@@ -102,7 +110,7 @@ cmake ..
 make -j$(nproc)
 ```
 
-STK can then be run from the build directory with `bin/supertuxkart`
+STK can then be run from the build directory with `bin/supertuxkart`.
 
 #### Keeping your build up to date
 
@@ -115,11 +123,11 @@ cmake ..
 make -j$(nproc)
 ```
 
-##### Build Speed Optimization
+#### Build Speed Optimization
 
-"-j$(nproc)" is an example, for a faster build, use "-jx" instead, where "x" is the amount of CPU threads you have, minus one.
+The `-j$(nproc)` option is an example. For a faster build, use `-jx` instead, where "x" is the amount of CPU threads you have, minus one.
 
-### Further options
+#### Further options
 
 To create a debug version of STK, run:
 
@@ -134,21 +142,21 @@ sudo make install
 ```
 
 The default install location is `/usr/local`, i.e. the data files will
-be written to `/usr/local/share/games/supertuxkart`, the executable
+be written to `/usr/local/share/games/supertuxkart` and the executable
 will be copied to `/usr/local/bin`. To change the default installation
 location, specify `CMAKE_INSTALL_PREFIX` when running CMake, e.g.:
-`cmake .. -DCMAKE_INSTALL_PREFIX=/opt/stk`
+`cmake .. -DCMAKE_INSTALL_PREFIX=/opt/stk`.
 
 ## Building SuperTuxKart on Windows
 
-To Build SuperTuxKart on Windows follow these instructions:
+To Build SuperTuxKart on Windows, follow these instructions:
 
 1. Download and install Visual Studio from here: [Visual Studio - Download](https://www.visualstudio.com/downloads/). The free Visual Studio Community edition works fine. Remember to select "Desktop development with C++" in the installer.
 
-2. If you want the stable version, download the SuperTuxKart source package from the latest stable version [SuperTuxKart on GitHub](https://github.com/supertuxkart/stk-code/releases) and unpack it.
+2. If you want the stable version, download the SuperTuxKart source package from the latest stable version of [SuperTuxKart on GitHub](https://github.com/supertuxkart/stk-code/releases) and unpack it.
 
 3. If you want the development version, you will need a Git client and an SVN client. More information can be found here: [SuperTuxKart.net - Source Control](https://supertuxkart.net/Source_control).
-Open your file browser and find somewhere you want to put the development version of SuperTuxKart. For example in C:\Users\<Your Username> as the Git and SVN clients will have write permissions there, and you should create its own directory, for example SuperTuxKart-dev. Enter that directory, and create a directory inside called stk-assets, and enter it. If you installed TortoiseSVN, right-click, select TortoiseSVN -> Checkout... and paste the corresponding URL found in [SuperTuxKart.net - Source Control](https://supertuxkart.net/Source_control). While it is downloading the game assets, go back to your file browser and one level up. Right-click again somewhere empty and select "Git clone..." and paste the corresponding link found in [SuperTuxKart.net - Source Control](https://supertuxkart.net/Source_control).
+Open your file browser and find somewhere you want to put the development version of SuperTuxKart. For example in C:\\Users\\\<Your Username\> as the Git and SVN clients will have write permissions there, and you should create its own directory, for example "SuperTuxKart-dev". Enter that directory, and create a directory inside called "stk-assets", and enter it. If you installed TortoiseSVN, right-click, select TortoiseSVN -> Checkout... and paste the corresponding URL found in [SuperTuxKart.net - Source Control](https://supertuxkart.net/Source_control). While it is downloading the game assets, go back to your file browser and move one level up (if you followed the example that directory would be named "SuperTuxKart-dev"). Right-click again somewhere empty and select "Git clone..." and paste the corresponding link found in [SuperTuxKart.net - Source Control](https://supertuxkart.net/Source_control).
 *Note: Both `stk-code` and `stk-assets` **must** be in the same directory, otherwise the build will likely fail!*
 
 4. If you got the stable version, download the Windows dependencies package from [SuperTuxKart on GitHub - Dependencies Releases](https://github.com/supertuxkart/dependencies/releases), find the stk-code version there and download the `dependencies(arch).zip` as needed and unpack the archive into the `stk-code` directory.
@@ -204,7 +212,7 @@ and unpack the archive into the `stk-code` directory. Download `i686` if you use
     msbuild.exe SuperTuxKart.sln
     ```
 
-SuperTuxKart can now be run as `bin\Debug\supertuxkart.exe` or `bin\Release\supertuxkart.exe`
+SuperTuxKart can now be run as `bin\Debug\supertuxkart.exe` or `bin\Release\supertuxkart.exe`.
 
 ## Building SuperTuxKart on Windows using LLVM MinGW
 
@@ -250,7 +258,7 @@ Install the developer tools, either from the OS X Install DVD or from Apple's we
 
 Download `dependencies-macosx.tar.xz` from the `Assets` section [here](https://github.com/supertuxkart/dependencies/releases) and extract it inside the `stk-code` directory, use the `preview` version for git stk-code.
 
-Build STK
+Build STK:
 
 ```bash
 cd /path/to/stk-code
@@ -270,6 +278,6 @@ By default, the executable that is produced is not ready for distribution. Insta
 dylibbundler -od -b -x ./bin/SuperTuxKart.app/Contents/MacOS/supertuxkart -d ./bin/SuperTuxKart.app/Contents/libs/ -p @executable_path/../libs/ -s ../dependencies-macosx/lib
 ```
 
-Add `-ns` to disable ad-hoc codesigning
+Add `-ns` to disable ad-hoc codesigning.
 
 Afterwards, copy the contents of `stk-assets` into `/SuperTuxKart.app/Contents/Resources/data`.

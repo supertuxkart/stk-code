@@ -31,6 +31,7 @@
 #include "karts/kart.hpp"
 #include "karts/kart_properties.hpp"
 #include "karts/skidding.hpp"
+#include "network/rewind_manager.hpp"
 #include "tracks/track.hpp"
 
 // ============================================================================
@@ -81,6 +82,8 @@ void CameraNormal::moveCamera(float dt, bool smooth, float cam_angle, float dist
 {
     if(!m_kart) return;
 
+    if (RewindManager::get()->isRewinding()) return;
+
     Kart *kart = dynamic_cast<Kart*>(m_kart);
     if (kart->isFlying())
     {
@@ -102,23 +105,34 @@ void CameraNormal::moveCamera(float dt, bool smooth, float cam_angle, float dist
     float skid_factor = ks->getVisualSkidRotation();
 
     float skid_angle = asinf(skid_factor);
+
+    // Adjust the distance of the camera to the kart with speed
+    // Note that distance is negative (< 0)
     float ratio = current_speed / max_speed_without_zipper;
-
     ratio = ratio > -0.12f ? ratio : -0.12f;
+    float speed_factor = ((distance - 2.0f) - 1.0f * ratio) / (distance - 2.0f);
+    float camera_distance = distance * speed_factor;
 
-    // distance of camera from kart in x and z plane
-    float camera_distance = -1.25f - 2.5f * ratio;
-    float min_distance = (distance * 2.0f);
-    if (distance > 0) camera_distance += distance + 1; // note that distance < 0
-    if (camera_distance > min_distance) camera_distance = min_distance; // don't get too close to the kart
-
+    // Adjust the camera angle
     float tan_up = 0;
-    if (cam_angle > 0) tan_up = tanf(cam_angle) * distance;
+    if (cam_angle > 0) tan_up = tanf(cam_angle) * std::max(distance - 1.0f, distance * (1.0f + 0.25f * ratio));
+    // Avoid a camera razing the ground (it generates a lot of terrain clipping with the current near value of 1.0)
+    if (tan_up > -0.5f)
+        tan_up = -0.5f;
 
-    // Defines how far camera should be from player kart.
-    Vec3 wanted_camera_offset(camera_distance * sinf(skid_angle / 2),
-        (0.85f + ratio / 2.5f) - tan_up,
-        camera_distance * cosf(skid_angle / 2));
+    // Defines how far the camera should be from the player's kart.
+    float squared_x = distance * sinf(skid_angle / 2);
+    squared_x *= squared_x;
+    float squared_y = tan_up;
+    squared_y *= squared_y;
+    float squared_z = distance * cosf(skid_angle / 2);
+    squared_z *= squared_z;
+    float length = sqrt(squared_x + squared_y + squared_z);
+    float camera_distance_factor = -camera_distance * camera_distance / length;
+
+    Vec3 wanted_camera_offset(camera_distance_factor * sinf(skid_angle / 2),
+        -tan_up,
+        camera_distance_factor * cosf(skid_angle / 2));
 
     float delta = 1;
     float delta2 = 1;
@@ -177,7 +191,8 @@ void CameraNormal::moveCamera(float dt, bool smooth, float cam_angle, float dist
 //-----------------------------------------------------------------------------
 void CameraNormal::snapToPosition()
 {
-    moveCamera(1.0f, false, 0, 0);
+    float angle = UserConfigParams::m_camera_forward_up_angle * DEGREE_TO_RAD;
+    moveCamera(1.0f, false, angle, -m_distance);
 }   // snapToPosition
 
 //-----------------------------------------------------------------------------
@@ -192,6 +207,22 @@ void CameraNormal::getCameraSettings(float *above_kart, float *cam_angle,
                                      float *sideway, float *distance,
                                      bool *smoothing, float *cam_roll_angle)
 {
+    // Update the standard camera for users updating to 1.5
+    if(!UserConfigParams::m_camera_updated_one_five)
+    {
+        UserConfigParams::m_standard_camera_fov.revertToDefaults();
+        UserConfigParams::m_standard_camera_distance.revertToDefaults();
+        UserConfigParams::m_standard_camera_forward_up_angle.revertToDefaults();
+        if (UserConfigParams::m_camera_present == 1) // Currently using a standard camera 
+        {
+            UserConfigParams::m_camera_fov.revertToDefaults();
+            UserConfigParams::m_camera_distance.revertToDefaults();
+            UserConfigParams::m_camera_forward_up_angle.revertToDefaults();
+            m_distance = UserConfigParams::m_camera_distance;
+        }
+        UserConfigParams::m_camera_updated_one_five = true;
+    }
+
     switch(getMode())
     {
     case CM_NORMAL:

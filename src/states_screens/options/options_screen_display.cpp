@@ -66,6 +66,8 @@ void OptionsScreenDisplay::loadedFromFile()
 void OptionsScreenDisplay::init()
 {
     Screen::init();
+    OptionsCommon::setTabStatus();
+
     RibbonWidget* ribbon = getWidget<RibbonWidget>("options_choice");
     assert(ribbon != NULL);
     ribbon->setFocusForPlayer(PLAYER_ID_GAME_MASTER);

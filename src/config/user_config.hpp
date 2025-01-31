@@ -834,6 +834,10 @@ namespace UserConfigParams
 
     PARAM_PREFIX bool m_race_now          PARAM_DEFAULT( false );
 
+    PARAM_PREFIX int m_default_keyboard   PARAM_DEFAULT( -1 );
+
+    PARAM_PREFIX int m_default_gamepad    PARAM_DEFAULT( -1 );
+
     PARAM_PREFIX bool m_enforce_current_player PARAM_DEFAULT( false );
 
     PARAM_PREFIX bool m_enable_sound PARAM_DEFAULT( true );
@@ -1033,12 +1037,12 @@ namespace UserConfigParams
                         "Camera settings for player.") );
 
     PARAM_PREFIX FloatUserConfigParam         m_camera_distance
-            PARAM_DEFAULT(  FloatUserConfigParam(1.0, "distance",
+            PARAM_DEFAULT(  FloatUserConfigParam(2.8, "distance",
             &m_camera_normal,
             "Distance between kart and camera"));
 
     PARAM_PREFIX FloatUserConfigParam         m_camera_forward_up_angle
-            PARAM_DEFAULT(  FloatUserConfigParam(0, "forward-up-angle",
+            PARAM_DEFAULT(  FloatUserConfigParam(25, "forward-up-angle",
             &m_camera_normal,
             "Angle between camera and plane of kart (pitch) when the camera is pointing forward"));
 
@@ -1058,7 +1062,7 @@ namespace UserConfigParams
             "Angle between camera and plane of kart (pitch) when the camera is pointing backwards. This is usually larger than the forward-up-angle, since the kart itself otherwise obstricts too much of the view"));
 
     PARAM_PREFIX IntUserConfigParam         m_camera_fov
-            PARAM_DEFAULT(  IntUserConfigParam(80, "fov",
+            PARAM_DEFAULT(  IntUserConfigParam(85, "fov",
             &m_camera_normal,
             "Focal distance (single player)"));
 
@@ -1072,18 +1076,22 @@ namespace UserConfigParams
                             "The current used camera. 0=Custom; 1=Standard; 2=Drone chase") );
 
     // ---- Standard camera settings
+    PARAM_PREFIX BoolUserConfigParam       m_camera_updated_one_five
+            PARAM_DEFAULT(  BoolUserConfigParam(false, "camera-updated-one-five",
+                            "Used to update the standard camera values for users upgrading to 1.5") );
+
     PARAM_PREFIX GroupUserConfigParam        m_standard_camera_settings
             PARAM_DEFAULT( GroupUserConfigParam(
                         "standard-camera-settings",
                         "Standard camera settings for player.") );
 
     PARAM_PREFIX FloatUserConfigParam         m_standard_camera_distance
-            PARAM_DEFAULT(  FloatUserConfigParam(1.0, "distance",
+            PARAM_DEFAULT(  FloatUserConfigParam(2.8, "distance",
             &m_standard_camera_settings,
             "Distance between kart and camera"));
 
     PARAM_PREFIX FloatUserConfigParam         m_standard_camera_forward_up_angle
-            PARAM_DEFAULT(  FloatUserConfigParam(0, "forward-up-angle",
+            PARAM_DEFAULT(  FloatUserConfigParam(25, "forward-up-angle",
             &m_standard_camera_settings,
             "Angle between camera and plane of kart (pitch) when the camera is pointing forward"));
 
@@ -1103,7 +1111,7 @@ namespace UserConfigParams
             "Angle between camera and plane of kart (pitch) when the camera is pointing backwards. This is usually larger than the forward-up-angle, since the kart itself otherwise obstricts too much of the view"));
 
     PARAM_PREFIX IntUserConfigParam         m_standard_camera_fov
-            PARAM_DEFAULT(  IntUserConfigParam(80, "fov",
+            PARAM_DEFAULT(  IntUserConfigParam(85, "fov",
             &m_standard_camera_settings,
             "Focal distance (single player)"));
 
@@ -1160,12 +1168,12 @@ namespace UserConfigParams
                         "Saved custom camera settings for player.") );
 
     PARAM_PREFIX FloatUserConfigParam         m_saved_camera_distance
-            PARAM_DEFAULT(  FloatUserConfigParam(1.0, "distance",
+            PARAM_DEFAULT(  FloatUserConfigParam(2.8, "distance",
             &m_saved_camera_settings,
             "Distance between kart and camera"));
 
     PARAM_PREFIX FloatUserConfigParam         m_saved_camera_forward_up_angle
-            PARAM_DEFAULT(  FloatUserConfigParam(0, "forward-up-angle",
+            PARAM_DEFAULT(  FloatUserConfigParam(25, "forward-up-angle",
             &m_saved_camera_settings,
             "Angle between camera and plane of kart (pitch) when the camera is pointing forward"));
 
@@ -1185,7 +1193,7 @@ namespace UserConfigParams
             "Angle between camera and plane of kart (pitch) when the camera is pointing backwards. This is usually larger than the forward-up-angle, since the kart itself otherwise obstricts too much of the view"));
 
     PARAM_PREFIX IntUserConfigParam         m_saved_camera_fov
-            PARAM_DEFAULT(  IntUserConfigParam(80, "fov",
+            PARAM_DEFAULT(  IntUserConfigParam(85, "fov",
             &m_saved_camera_settings,
             "Focal distance (single player)"));
 

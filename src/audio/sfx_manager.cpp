@@ -438,7 +438,7 @@ void SFXManager::mainLoop(void *obj)
             current->m_music_information->pauseMusic();           break;
         case SFX_MUSIC_RESUME:
             current->m_music_information->resumeMusic();
-            // This might be necessasary if the volume was changed
+            // This might be necessary if the volume was changed
             // in the in-game menu
             current->m_music_information->setDefaultVolume();     break;
         case SFX_MUSIC_SWITCH_FAST:
