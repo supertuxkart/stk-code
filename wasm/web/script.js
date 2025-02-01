@@ -13,6 +13,7 @@ let info_container = document.getElementById("info_container");
 let quality_select = document.getElementById("quality_select");
 
 let syncing_fs = false;
+let config = {};
 
 function load_db() {
   if (db) return db;
@@ -213,10 +214,20 @@ function set_websocket_url(url) {
   Module.websocket.url = url;
 }
 
+async function load_config() {
+  let response = await fetch("/config.json");
+  config = await response.json();
+  globalThis.config = config;
+}
+
 async function main() {
-  set_websocket_url("wss://anura.pro/");
   globalThis.ready = true;
+  await load_config();
   await load_idbfs();
+  if (config.ws_enabled) {
+    set_websocket_url(config.ws_proxy);
+  }
+
   start_button.onclick = start_game;
   start_button.disabled = false;
   status_text.innerText = "";

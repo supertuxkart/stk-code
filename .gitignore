@@ -7,10 +7,6 @@ CMakeFiles/
 stk-editor/
 .vscode/
 tags.*
-wasm/build/
-wasm/prefix/
-wasm/emsdk/
-wasm/web/game
 
 # clangd
 .cache/
