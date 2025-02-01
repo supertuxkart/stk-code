@@ -310,20 +310,20 @@ public:
      *  category.
      *  \param category Which category to report on. */
     virtual int getSpeedIncreaseTicksLeft(unsigned int category) const = 0;
-    
+
     // ------------------------------------------------------------------------
     /** Sets the kart AI boost state.
      *  Not pure abstract, since there is no need to implement this e.g. in Ghost.
      *  \param boosted True if a boost should be applied. */
     virtual void setBoostAI(bool boosted) = 0;
-    
+
     // ------------------------------------------------------------------------
     /** Returns the kart AI boost state.
      *  Not pure abstract, since there is no need to implement this e.g. in Ghost. */
     virtual bool getBoostAI() const = 0;
-    
+
     // ------------------------------------------------------------------------
-    
+
     /** Sets an increased maximum speed for a category.
      *  \param category The category for which to set the higher maximum speed.
      *  \param add_speed How much speed (in m/s) is added to the maximum speed.
@@ -461,6 +461,8 @@ public:
     /** This is used on the client side only to set the speed of the kart
      *  from the server information.                                       */
     virtual void setSpeed(float s) = 0;
+    /** Removes all status effects */
+    virtual void removeStatusEffects() = 0;
     // ------------------------------------------------------------------------
     /** Returns if the kart is invulnerable. */
     virtual bool isInvulnerable() const = 0;
