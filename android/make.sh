@@ -242,6 +242,13 @@ if [ -d "$DIRNAME/assets/data" ]; then
     fi
 fi
 
+# Use `magick` when it's available
+if command -v magick > /dev/null; then
+    MAGICK='magick'
+else
+    MAGICK='convert'
+fi
+
 # Standalone toolchain
 if [ ! -f "$DIRNAME/obj/make_standalone_toolchain.stamp" ]; then
     echo "Creating standalone toolchain"
@@ -408,29 +415,29 @@ cp -f "$DIRNAME/../lib/sdl2/android-project/app/src/main/java/org/libsdl/app/SDL
 
 cp "banner.png" "$DIRNAME/res/drawable/banner.png"
 cp "$APP_ICON" "$DIRNAME/res/drawable/icon.png"
-magick "$APP_ICON" -scale 48x48 "$DIRNAME/res/drawable-mdpi/icon.png"
-magick "$APP_ICON" -scale 72x72 "$DIRNAME/res/drawable-hdpi/icon.png"
-magick "$APP_ICON" -scale 96x96 "$DIRNAME/res/drawable-xhdpi/icon.png"
-magick "$APP_ICON" -scale 144x144 "$DIRNAME/res/drawable-xxhdpi/icon.png"
-magick "$APP_ICON" -scale 192x192 "$DIRNAME/res/drawable-xxxhdpi/icon.png"
+$MAGICK "$APP_ICON" -scale 48x48 "$DIRNAME/res/drawable-mdpi/icon.png"
+$MAGICK "$APP_ICON" -scale 72x72 "$DIRNAME/res/drawable-hdpi/icon.png"
+$MAGICK "$APP_ICON" -scale 96x96 "$DIRNAME/res/drawable-xhdpi/icon.png"
+$MAGICK "$APP_ICON" -scale 144x144 "$DIRNAME/res/drawable-xxhdpi/icon.png"
+$MAGICK "$APP_ICON" -scale 192x192 "$DIRNAME/res/drawable-xxxhdpi/icon.png"
 
-#magick "$APP_ICON_ADAPTIVE_BG" -scale 108x108 "$DIRNAME/res/drawable-mdpi/icon_bg.png"
-#magick "$APP_ICON_ADAPTIVE_BG" -scale 162x162 "$DIRNAME/res/drawable-hdpi/icon_bg.png"
-#magick "$APP_ICON_ADAPTIVE_BG" -scale 216x216 "$DIRNAME/res/drawable-xhdpi/icon_bg.png"
-#magick "$APP_ICON_ADAPTIVE_BG" -scale 324x324 "$DIRNAME/res/drawable-xxhdpi/icon_bg.png"
-#magick "$APP_ICON_ADAPTIVE_BG" -scale 432x432 "$DIRNAME/res/drawable-xxxhdpi/icon_bg.png"
+#$MAGICK "$APP_ICON_ADAPTIVE_BG" -scale 108x108 "$DIRNAME/res/drawable-mdpi/icon_bg.png"
+#$MAGICK "$APP_ICON_ADAPTIVE_BG" -scale 162x162 "$DIRNAME/res/drawable-hdpi/icon_bg.png"
+#$MAGICK "$APP_ICON_ADAPTIVE_BG" -scale 216x216 "$DIRNAME/res/drawable-xhdpi/icon_bg.png"
+#$MAGICK "$APP_ICON_ADAPTIVE_BG" -scale 324x324 "$DIRNAME/res/drawable-xxhdpi/icon_bg.png"
+#$MAGICK "$APP_ICON_ADAPTIVE_BG" -scale 432x432 "$DIRNAME/res/drawable-xxxhdpi/icon_bg.png"
 
-magick xc:"rgba(255,255,255,255)" -scale 108x108 "$DIRNAME/res/drawable-mdpi/icon_bg.png"
-magick xc:"rgba(255,255,255,255)" -scale 162x162 "$DIRNAME/res/drawable-hdpi/icon_bg.png"
-magick xc:"rgba(255,255,255,255)" -scale 216x216 "$DIRNAME/res/drawable-xhdpi/icon_bg.png"
-magick xc:"rgba(255,255,255,255)" -scale 324x324 "$DIRNAME/res/drawable-xxhdpi/icon_bg.png"
-magick xc:"rgba(255,255,255,255)" -scale 432x432 "$DIRNAME/res/drawable-xxxhdpi/icon_bg.png"
+$MAGICK xc:"rgba(255,255,255,255)" -scale 108x108 "$DIRNAME/res/drawable-mdpi/icon_bg.png"
+$MAGICK xc:"rgba(255,255,255,255)" -scale 162x162 "$DIRNAME/res/drawable-hdpi/icon_bg.png"
+$MAGICK xc:"rgba(255,255,255,255)" -scale 216x216 "$DIRNAME/res/drawable-xhdpi/icon_bg.png"
+$MAGICK xc:"rgba(255,255,255,255)" -scale 324x324 "$DIRNAME/res/drawable-xxhdpi/icon_bg.png"
+$MAGICK xc:"rgba(255,255,255,255)" -scale 432x432 "$DIRNAME/res/drawable-xxxhdpi/icon_bg.png"
 
-magick "$APP_ICON_ADAPTIVE_FG" -scale 108x108 "$DIRNAME/res/drawable-mdpi/icon_fg.png"
-magick "$APP_ICON_ADAPTIVE_FG" -scale 162x162 "$DIRNAME/res/drawable-hdpi/icon_fg.png"
-magick "$APP_ICON_ADAPTIVE_FG" -scale 216x216 "$DIRNAME/res/drawable-xhdpi/icon_fg.png"
-magick "$APP_ICON_ADAPTIVE_FG" -scale 324x324 "$DIRNAME/res/drawable-xxhdpi/icon_fg.png"
-magick "$APP_ICON_ADAPTIVE_FG" -scale 432x432 "$DIRNAME/res/drawable-xxxhdpi/icon_fg.png"
+$MAGICK "$APP_ICON_ADAPTIVE_FG" -scale 108x108 "$DIRNAME/res/drawable-mdpi/icon_fg.png"
+$MAGICK "$APP_ICON_ADAPTIVE_FG" -scale 162x162 "$DIRNAME/res/drawable-hdpi/icon_fg.png"
+$MAGICK "$APP_ICON_ADAPTIVE_FG" -scale 216x216 "$DIRNAME/res/drawable-xhdpi/icon_fg.png"
+$MAGICK "$APP_ICON_ADAPTIVE_FG" -scale 324x324 "$DIRNAME/res/drawable-xxhdpi/icon_fg.png"
+$MAGICK "$APP_ICON_ADAPTIVE_FG" -scale 432x432 "$DIRNAME/res/drawable-xxxhdpi/icon_fg.png"
 
 export ANDROID_HOME="$SDK_PATH"
 ./gradlew -Pcompile_sdk_version="$COMPILE_SDK_VERSION"   \
