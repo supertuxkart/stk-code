@@ -25,6 +25,7 @@ To build SuperTuxKart from source, you'll need to install the following packages
 * zlib (zlib-devel)
 * jpeg (libjpeg-turbo-devel)
 * SDL2 (libsdl2-devel)
+* Git (git)
 
 Debian-based Distributions command:
 
@@ -32,7 +33,7 @@ Debian-based Distributions command:
 sudo apt-get install build-essential cmake libbluetooth-dev libsdl2-dev \
 libcurl4-openssl-dev libenet-dev libfreetype6-dev libharfbuzz-dev \
 libjpeg-dev libogg-dev libopenal-dev libpng-dev \
-libssl-dev libvorbis-dev libmbedtls-dev pkg-config zlib1g-dev
+libssl-dev libvorbis-dev libmbedtls-dev pkg-config zlib1g-dev git
 ```
 
 Fedora command:
@@ -45,7 +46,7 @@ gcc-c++ git-core libcurl-devel libjpeg-turbo-devel \
 libpng-devel libsquish-devel libtool libvorbis-devel \
 openal-soft-devel openssl-devel libcurl-devel harfbuzz-devel \
 libogg-devel openssl-devel pkgconf \
-wiiuse-devel zlib-devel
+wiiuse-devel zlib-devel git
 ```
 
 Arch-based Distributions command:
@@ -53,7 +54,7 @@ Arch-based Distributions command:
 ```bash
 sudo pacman -S openal libogg libvorbis freetype2 harfbuzz curl \
 bluez-libs openssl libpng zlib libjpeg-turbo sdl2 gcc cmake \
-pkgconf make git subversion
+pkgconf make git subversion git
 ```
 
 openSUSE command:
@@ -62,7 +63,7 @@ openSUSE command:
 sudo zypper install gcc-c++ cmake openssl-devel libcurl-devel libSDL2-devel \
 freetype-devel harfbuzz-devel libogg-devel openal-soft-devel libpng-devel \
 libvorbis-devel pkgconf zlib-devel enet-devel \
-libjpeg-devel bluez-devel freetype2-devel
+libjpeg-devel bluez-devel freetype2-devel git
 ```
 
 Mageia 6 command:
@@ -71,14 +72,14 @@ Mageia 6 command:
 su -c 'urpmi gcc-c++ cmake openssl-devel libcurl-devel freetype-devel harfbuzz-devel \
 libjpeg-turbo-devel libogg-devel openal-soft-devel SDL2-devel \
 libpng-devel libvorbis-devel nettle-devel zlib-devel git subversion \
-libbluez-devel libfreetype6-devel
+libbluez-devel libfreetype6-devel git
 ```
 
 Solus command:
 ```bash
 sudo eopkg it cmake openal-soft-devel libogg-devel libvorbis-devel freetype2-devel \
 harfbuzz-devel curl-devel bluez-devel openssl-devel libpng-devel zlib-devel \
-libjpeg-turbo-devel sdl2-devel enet-devel libjpeg-turbo-devel bluez-devel curl-devel
+libjpeg-turbo-devel sdl2-devel enet-devel libjpeg-turbo-devel bluez-devel curl-devel git
 ```
 
 #### In-game recorder
