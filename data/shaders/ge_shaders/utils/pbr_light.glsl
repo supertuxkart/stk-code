@@ -172,18 +172,17 @@ float getShadowPCF(sampler2DArrayShadow map, vec2 shadowtexcoord, int layer, flo
     return sum * (1.0 / 16.0);
 }
 
-vec3 getNormalBias(vec3 normal, vec3 lightdir, vec4 bias, vec2 texcoord)
+vec3 getNormalBias(vec3 normal, vec3 lightdir, float texel)
 {
-    bias.xy -= texcoord;
-	vec3 normal_bias = normal * bias.w / bias.y / bias.y * max(length(bias.xy) / bias.z, 1.0);
+	vec3 normal_bias = normal * texel;
 	normal_bias -= lightdir * dot(lightdir, normal_bias);
     return normal_bias;
 }
 
 float getShadowFactor(sampler2DArrayShadow map, vec3 world_position, float view_depth, float NdotL, vec3 normal, vec3 lightdir)
 {
-    float end_factor = smoothstep(120.0, 150.0, view_depth);
-    if (view_depth >= 150.0 || NdotL <= 0.001)
+    float end_factor = smoothstep(u_camera.m_shadow_far * 0.8, u_camera.m_shadow_far, view_depth);
+    if (view_depth >= u_camera.m_shadow_far || NdotL <= 0.001)
     {
         return end_factor;
     }
@@ -193,14 +192,10 @@ float getShadowFactor(sampler2DArrayShadow map, vec3 world_position, float view_
     int level = int(factor);
 
     vec3 base_normal_bias = normal * (1.0 - max(0.0, dot(-normal, lightdir)));
-
-    vec4 light_view_position = u_camera.m_shadow_matrix[level] * vec4(world_position, 1.0);
-    light_view_position.xyz /= light_view_position.w;
-    light_view_position.xy = light_view_position.xy * 0.5 + 0.5;
     
-	vec3 world_position_bias = world_position + getNormalBias(base_normal_bias, lightdir, u_camera.m_bias[level], light_view_position.xy);
+	vec3 world_position_bias = world_position + getNormalBias(base_normal_bias, lightdir, u_camera.m_world_texel_size[level]);
 
-    light_view_position = u_camera.m_shadow_matrix[level] * vec4(world_position_bias, 1.0);
+    vec4 light_view_position = u_camera.m_shadow_matrix[level] * vec4(world_position_bias, 1.0);
     light_view_position.xyz /= light_view_position.w;
     light_view_position.xy = light_view_position.xy * 0.5 + 0.5;
 
@@ -212,12 +207,8 @@ float getShadowFactor(sampler2DArrayShadow map, vec3 world_position, float view_
     }
 
     // Blend with next cascade by factor
-
-    light_view_position = u_camera.m_shadow_matrix[level + 1] * vec4(world_position, 1.0);
-    light_view_position.xyz /= light_view_position.w;
-    light_view_position.xy = light_view_position.xy * 0.5 + 0.5;
     
-	world_position_bias = world_position + getNormalBias(base_normal_bias, lightdir, u_camera.m_bias[level + 1], light_view_position.xy);
+	world_position_bias = world_position + getNormalBias(base_normal_bias, lightdir, u_camera.m_world_texel_size[level + 1]);
 
     light_view_position = u_camera.m_shadow_matrix[level + 1] * vec4(world_position_bias, 1.0);
     light_view_position.xyz /= light_view_position.w;
