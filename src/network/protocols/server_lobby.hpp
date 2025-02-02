@@ -20,15 +20,20 @@
 #define SERVER_LOBBY_HPP
 
 #include "network/protocols/lobby_protocol.hpp"
+#include "network/remote_kart_info.hpp"
+#include "race/race_manager.hpp"
+#include "race/kart_restriction.hpp"
 #include "utils/cpp2011.hpp"
 #include "utils/time.hpp"
+#include "network/servers_manager.hpp"
 
 #include "irrString.h"
 
 #include <algorithm>
-#include <array>
+//#include <array>
 #include <atomic>
 #include <functional>
+#include <limits>
 #include <map>
 #include <memory>
 #include <mutex>
@@ -50,9 +55,27 @@ namespace Online
     class Request;
 }
 
+
 class ServerLobby : public LobbyProtocol
 {
-public:
+public:	
+    typedef std::map<STKPeer*,
+                      std::weak_ptr<NetworkPlayerProfile>>
+        PoleVoterMap;
+    typedef std::map<STKPeer* const,
+                      std::weak_ptr<NetworkPlayerProfile>>
+        PoleVoterConstMap;
+    typedef std::pair<STKPeer* const,
+                      std::weak_ptr<NetworkPlayerProfile>>
+        PoleVoterConstEntry;
+    typedef std::pair<std::weak_ptr<NetworkPlayerProfile>,
+                      unsigned int>
+        PoleVoterResultEntry;
+    typedef std::pair<const std::weak_ptr<NetworkPlayerProfile>,
+                      unsigned int>
+        PoleVoterConstResultEntry;
+
+
     /* The state for a small finite state machine. */
     enum ServerState : unsigned int
     {
@@ -69,7 +92,38 @@ public:
         ERROR_LEAVE,              // shutting down server
         EXITING
     };
+
+    /* Moderation toolkit */
+    enum ServerPermissionLevel : int
+    {
+        PERM_NONE = -100,        // no chat, nothing
+        PERM_SPECTATOR = -20,    // chat is allowed, can spectate the game
+        PERM_PRISONER = -10,     // can play the game, but unable to change teams
+        PERM_PLAYER = 0,         // can participate in the game and change teams
+        PERM_MODERATOR = 80,     // staff, allowed to change other players perm status
+                                 // (only less to the own)
+                                 // and use general moderation commands such as 
+                                 // mute, kick, ban.
+        PERM_REFEREE = 90,       // only active during tournament
+        PERM_ADMINISTRATOR = 100,// staff, can change current server's mode and toggle
+                                 // between owner-less on or off, can disable command 
+                                 // voting
+        PERM_OWNER = std::numeric_limits<int>::max(),
+                                 // Special peer, has all permissions,
+                                 // including giving the administrator permission level.
+                                 // Specified in the configuration file.
+    };
 private:
+    bool m_random_karts_enabled;
+    void assignRandomKarts();
+    void resetKartSelections();
+    std::string m_replay_dir;
+    bool m_replay_requested = false;    
+    std::string getTimeStamp();    
+    std::string exec_python_script();    
+    std::string currentTrackName;
+    std::string currentPlayerName;
+    std::string currentRecordTime;
     struct KeyData
     {
         std::string m_aes_key;
@@ -95,6 +149,10 @@ private:
 
     bool m_ipv6_geolocation_table_exists;
 
+    bool m_permissions_table_exists;
+
+    bool m_restrictions_table_exists;
+
     uint64_t m_last_poll_db_time;
 
     void pollDatabase();
@@ -107,6 +165,7 @@ private:
     std::string ip2Country(const SocketAddress& addr) const;
 
     std::string ipv62Country(const SocketAddress& addr) const;
+
 #endif
     void initDatabase();
 
@@ -257,6 +316,20 @@ private:
     // Calculated before each game started
     unsigned m_ai_count;
 
+    // TierS additional members
+    uint64_t m_last_wanrefresh_cmd_time;
+    std::shared_ptr<ServerList> m_last_wanrefresh_res;
+    std::weak_ptr<STKPeer> m_last_wanrefresh_requester;
+    std::mutex m_wanrefresh_lock;
+
+    // Pole
+    bool m_pole_enabled = false;
+    // For which player each peer submits a vote
+    std::map<STKPeer*, std::weak_ptr<NetworkPlayerProfile>>
+        m_blue_pole_votes;
+    std::map<STKPeer*, std::weak_ptr<NetworkPlayerProfile>>
+        m_red_pole_votes;
+
     // connection management
     void clientDisconnected(Event* event);
     void connectionRequested(Event* event);
@@ -273,26 +346,6 @@ private:
     void handleChat(Event* event);
     void unregisterServer(bool now,
         std::weak_ptr<ServerLobby> sl = std::weak_ptr<ServerLobby>());
-    void updatePlayerList(bool update_when_reset_server = false);
-    void updateServerOwner();
-    void handleServerConfiguration(Event* event);
-    void updateTracksForMode();
-    bool checkPeersReady(bool ignore_ai_peer) const;
-    void resetPeersReady()
-    {
-        for (auto it = m_peers_ready.begin(); it != m_peers_ready.end();)
-        {
-            if (it->first.expired())
-            {
-                it = m_peers_ready.erase(it);
-            }
-            else
-            {
-                it->second = false;
-                it++;
-            }
-        }
-    }
     void addPeerConnection(const std::string& addr_str)
     {
         m_pending_peer_connection[addr_str] = StkTime::getMonoTimeMs();
@@ -354,7 +407,9 @@ private:
     void changeHandicap(Event* event);
     void handlePlayerDisconnection() const;
     void addLiveJoinPlaceholder(
-        std::vector<std::shared_ptr<NetworkPlayerProfile> >& players) const;
+        std::vector<std::shared_ptr<NetworkPlayerProfile> >& players,
+        unsigned int push_front_blue = 0,
+        unsigned int push_front_red = 0) const;
     NetworkString* getLoadWorldMessage(
         std::vector<std::shared_ptr<NetworkPlayerProfile> >& players,
         bool live_join) const;
@@ -392,6 +447,36 @@ public:
     virtual void update(int ticks) OVERRIDE;
     virtual void asynchronousUpdate() OVERRIDE;
 
+    void updatePlayerList(bool update_when_reset_server = false);
+    void updateServerOwner(std::shared_ptr<STKPeer> owner = nullptr);
+    void updateTracksForMode();
+    bool checkPeersReady(bool ignore_ai_peer) const;
+    bool checkPeersCanPlay(bool ignore_ai_peer) const;
+    char checkPeersCanPlayAndReady(bool ignore_ai_peer) const;
+    void handleServerConfiguration(Event* event);
+    void updateServerConfiguration(int new_difficulty, int new_game_mode,
+            std::int8_t new_soccer_goal_target);
+    void resetPeersReady()
+    {
+        for (auto it = m_peers_ready.begin(); it != m_peers_ready.end();)
+        {
+            if (it->first.expired())
+            {
+                it = m_peers_ready.erase(it);
+            }
+            else
+            {
+                it->second = false;
+                it++;
+            }
+        }
+    }
+
+    void insertKartsIntoNotType(std::set<std::string>& set, const char* type) const;
+    std::set<std::string> getOtherKartsThan(const std::string& name) const;
+    const char* kartRestrictedTypeName(const enum KartRestrictionMode mode) const;
+    enum KartRestrictionMode getKartRestrictionMode() const { return m_kart_restriction; }
+    void setKartRestrictionMode(enum KartRestrictionMode mode);
     void startSelection(const Event *event=NULL);
     void checkIncomingConnectionRequests();
     void finishedLoadingWorld() OVERRIDE;
@@ -402,6 +487,7 @@ public:
                             { return m_state.load() >= WAIT_FOR_RACE_STARTED; }
     virtual bool isRacing() const OVERRIDE { return m_state.load() == RACING; }
     bool allowJoinedPlayersWaiting() const;
+    void broadcastMessageInGame(const irr::core::stringw& message);
     void setSaveServerConfig(bool val)          { m_save_server_config = val; }
     float getStartupBoostOrPenaltyForKart(uint32_t ping, unsigned kart_id);
     int getDifficulty() const                   { return m_difficulty.load(); }
@@ -409,6 +495,7 @@ public:
     int getLobbyPlayers() const              { return m_lobby_players.load(); }
     void saveInitialItems(std::shared_ptr<NetworkItemManager> nim);
     void saveIPBanTable(const SocketAddress& addr);
+    void removeIPBanTable(const SocketAddress& addr);
     void listBanTable();
     void initServerStatsTable();
     bool isAIProfile(const std::shared_ptr<NetworkPlayerProfile>& npp) const
@@ -418,7 +505,121 @@ public:
     }
     uint32_t getServerIdOnline() const           { return m_server_id_online; }
     void setClientServerHostId(uint32_t id)   { m_client_server_host_id = id; }
+    bool isVIP(std::shared_ptr<STKPeer>& peer) const;
+    bool isVIP(STKPeer* peer) const;
+    bool isTrusted(std::shared_ptr<STKPeer>& peer) const;
+    bool isTrusted(STKPeer* peer) const;
+    std::set<std::string> m_vip_players;
+    std::set<std::string> m_trusted_players;
+    std::set<std::string> m_red_team;
+    std::set<std::string> m_blue_team;
+    std::set<std::string> m_must_have_tracks;
+    std::set<std::string> m_only_played_tracks;
+    std::vector<std::vector<std::string>>
+                          m_tournament_fields_per_game;
+    bool serverAndPeerHaveTrack(std::shared_ptr<STKPeer>& peer, std::string track_id) const;
+    bool serverAndPeerHaveTrack(STKPeer* peer, std::string track_id) const;
+    /* forced track to be playing, or field */
+    std::string m_set_field;
+    /* forced laps, or forced minutes to play in case of the soccer game. */
+    int         m_set_laps;
+    /* for race it's reverse on/off, for battle/soccer it's random items */
+    bool        m_set_specvalue;
+    bool canRace(std::shared_ptr<STKPeer>& peer) const;
+    bool canRace(STKPeer* peer) const;
     static int m_fixed_laps;
+    void sendStringToPeer(const std::string& s, std::shared_ptr<STKPeer>& peer) const;
+    void sendStringToPeer(const irr::core::stringw& s, std::shared_ptr<STKPeer>& peer) const;
+    void sendStringToAllPeers(std::string& s);
+    void sendRandomInstalladdonLine(STKPeer* peer) const;
+    void sendRandomInstalladdonLine(std::shared_ptr<STKPeer> peer) const;
+    void sendCurrentModifiers(STKPeer* peer) const;
+    void sendCurrentModifiers(std::shared_ptr<STKPeer>& peer) const;
+    void sendWANListToPeer(std::shared_ptr<STKPeer> peer);
+    bool voteForCommand(std::shared_ptr<STKPeer>& peer, std::string command);
+    NetworkString* addRandomInstalladdonMessage(NetworkString* ns) const;
+    void addKartRestrictionMessage(std::string& msg) const;
+    void addPowerupSMMessage(std::string& msg) const;
+    const std::string getRandomAddon(RaceManager::MinorRaceModeType m=RaceManager::MINOR_MODE_NONE) const;
+    bool isPoleEnabled() const { return m_pole_enabled; }
+    core::stringw formatTeammateList(
+            const std::vector<std::shared_ptr<NetworkPlayerProfile>> &team) const;
+    void setPoleEnabled(bool mode);
+    void submitPoleVote(std::shared_ptr<STKPeer>& voter, unsigned int vote);
+
+    std::shared_ptr<NetworkPlayerProfile> decidePoleFor(const PoleVoterMap& mapping, KartTeam team) const;
+
+    std::pair<
+        std::shared_ptr<NetworkPlayerProfile>,
+        std::shared_ptr<NetworkPlayerProfile>> decidePoles();
+    void announcePoleFor(std::shared_ptr<NetworkPlayerProfile>& p, KartTeam team) const;
+
+    /* Moderation toolkit */
+    bool moderationToolkitAvailable()
+    {
+#ifdef ENABLE_SQLITE3
+        return m_permissions_table_exists;
+#else
+        return false;
+#endif
+    }
+    int getPeerPermissionLevel(STKPeer* p);
+    int loadPermissionLevelForOID(uint32_t online_id);
+    int loadPermissionLevelForUsername(const core::stringw& name);
+    void writePermissionLevelForOID(uint32_t online_id, int lvl);
+    void writePermissionLevelForUsername(const core::stringw& name, int lvl);
+    std::tuple<uint32_t, std::string> loadRestrictionsForOID(uint32_t online_id);
+    std::tuple<uint32_t, std::string> loadRestrictionsForUsername(const core::stringw& name);
+    void writeRestrictionsForOID(uint32_t online_id, uint32_t flags);
+    void writeRestrictionsForOID(uint32_t online_id, uint32_t flags, const std::string& set_kart);
+    void writeRestrictionsForOID(uint32_t online_id, const std::string& set_kart);
+    void writeRestrictionsForUsername(const core::stringw& name, uint32_t flags);
+    void writeRestrictionsForUsername(const core::stringw& name, uint32_t flags, const std::string& set_kart);
+    void writeRestrictionsForUsername(const core::stringw& name, const std::string& set_kart);
+    void sendNoPermissionToPeer(STKPeer* p, const std::vector<std::string>& argv);
+    const char* getPermissionLevelName(int lvl) const;
+    ServerPermissionLevel getPermissionLevelByName(const std::string& name) const;
+    const char* getRestrictionName(PlayerRestriction prf) const;
+    const std::string formatRestrictions(PlayerRestriction prf) const;
+    PlayerRestriction getRestrictionValue(const std::string& restriction) const;
+    void forceChangeTeam(NetworkPlayerProfile* player, KartTeam team);
+    void forceChangeHandicap(NetworkPlayerProfile* player, HandicapLevel lvl);
+    bool forceSetTrack(std::string track_id, int laps, bool specvalue = false,
+            bool is_soccer = false, bool announce = true);
+    uint32_t lookupOID(const std::string& name);
+    uint32_t lookupOID(const core::stringw& name);
+    int banPlayer(const std::string& name, const std::string& reason, int days = -1);
+    int unbanPlayer(const std::string& name);
+    const std::string formatBanList(unsigned int page = 0, unsigned int psize = 8);
+    const std::string formatBanInfo(const std::string& name);
+    int64_t getTimeout();
+    void changeTimeout(long timeout, bool infinite = false, bool absolute = false);
+
+    std::map<std::string, std::vector<std::string>> m_command_voters;
+    std::set<STKPeer*> m_team_speakers;
+    //Deprecated
+    //std::map<STKPeer*, std::set<irr::core::stringw>> m_message_receivers;
+    int m_max_players;
+    int m_max_players_in_game;
+    bool m_powerupper_active = false;
+    // TODO:
+    enum KartRestrictionMode m_kart_restriction = NONE;
+    bool m_allow_powerupper = false;
+    bool m_show_elo = false;
+    bool m_show_rank = false;
+    int getMaxPlayers() const                                           { return m_max_players; }
+    int getMaxPlayersInGame() const                                     { return m_max_players_in_game; }
+    void setMaxPlayersInGame(int value, bool notify = true);
+    std::string get_elo_change_string();
+    std::string getPlayerAlt(std::string username) const;
+    std::pair<unsigned int, int> getPlayerRanking(std::string username) const;
+    std::pair<std::vector<std::string>, std::vector<std::string>> createBalancedTeams(std::vector<std::pair<std::string, int>>& elo_players);
+    void soccer_ranked_make_teams(std::pair<std::vector<std::string>, std::vector<std::string>> teams, int min, std::vector <std::pair<std::string, int>> player_vec);
+
+    void onTournamentGameEnded();
+    void updateTournamentTeams(const std::string& team_red, const std::string& team_blue);
+    bool isReplayRequested() const                                      { return m_replay_requested; }
+    void setReplayRequested(const bool value)                           { m_replay_requested = value; }
 };   // class ServerLobby
 
 #endif // SERVER_LOBBY_HPP

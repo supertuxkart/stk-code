@@ -42,10 +42,11 @@
 /** Constructor, stores the kart to which this powerup belongs.
  *  \param kart The kart to which this powerup belongs.
  */
-Powerup::Powerup(AbstractKart* kart)
+Powerup::Powerup(AbstractKart* kart, const SpecialModifier modifier)
 {
-    m_kart      = kart;
-    m_sound_use = NULL;
+    m_kart              = kart;
+    m_sound_use         = NULL;
+    m_special_modifier  = modifier;
     reset();
 }   // Powerup
 
@@ -177,23 +178,23 @@ void Powerup::set(PowerupManager::PowerupType type, int n)
             break;
 
         case PowerupManager::POWERUP_PARACHUTE:
-            m_sound_use = SFXManager::get()->createSoundSource("parachute");
-            break;
+	    m_sound_use = SFXManager::get()->createSoundSource("parachute");
+	    break;
+	    
+	case PowerupManager::POWERUP_BUBBLEGUM:
+	    m_sound_use = SFXManager::get()->createSoundSource("goo");
+	    break;
 
-        case PowerupManager::POWERUP_BUBBLEGUM:
-            m_sound_use = SFXManager::get()->createSoundSource("goo");
-            break ;
-
-        case PowerupManager::POWERUP_SWITCH:
-            m_sound_use = SFXManager::get()->createSoundSource("swap");
-            break;
+	case PowerupManager::POWERUP_SWITCH: 
+	    m_sound_use = SFXManager::get()->createSoundSource("swap");
+	    break;
 
         case PowerupManager::POWERUP_NOTHING:
-        case PowerupManager::POWERUP_CAKE:
+	case PowerupManager::POWERUP_CAKE:
         case PowerupManager::POWERUP_PLUNGER:
-        default :
-            m_sound_use = SFXManager::get()->createSoundSource("shoot");
-            break ;
+	default:
+	    m_sound_use = SFXManager::get()->createSoundSource("shoot");
+            break;
     }
 
 }  // set
@@ -511,9 +512,17 @@ void Powerup::use()
  */
 void Powerup::hitBonusBox(const ItemState &item_state)
 {
+     if (RaceManager::get()->getItemlessMode())
+	     return;
+     if (RaceManager::get()->getItemlessMode() ||
+		     (m_type == PowerupManager::POWERUP_ZIPPER && RaceManager::get()->getNitrolessMode()))
+	     return;
+
     // Position can be -1 in case of a battle mode (which doesn't have
     // positions), but this case is properly handled in getRandomPowerup.
     int position = m_kart->getPosition();
+
+    unsigned int kart_id = m_kart->getWorldKartId();
 
     unsigned int n=1;
     PowerupManager::PowerupType new_powerup;
@@ -574,8 +583,34 @@ void Powerup::hitBonusBox(const ItemState &item_state)
     random_number ^= (random_number >> 16);
     random_number ^= (random_number >> 8);
 
-    new_powerup = powerup_manager->getRandomPowerup(position, &n, 
-                                                    random_number);
+    // in case of bowlparty, the modifier is applied as is
+    switch (m_special_modifier)
+    {
+        case TSM_BOWLPARTY:
+            m_number = 0;
+            set(PowerupManager::POWERUP_BOWLING, 3);
+            return;
+	case TSM_CAKEPARTY:
+	    m_number = 0;
+	    set(PowerupManager::POWERUP_CAKE, 2);
+	    return;
+	case TSM_PLUNGERPARTY:
+	    m_number = 0;
+	    set(PowerupManager::POWERUP_PLUNGER, 5);
+  	    return;
+	case TSM_ZIPPERPARTY:
+	    m_number = 0;
+	    set(PowerupManager::POWERUP_ZIPPER, 3);
+	    return;
+	case TSM_BOWLTRAININGPARTY:
+	    m_number = 0;
+	    set(PowerupManager::POWERUP_BOWLING, 1);
+	    return;
+        default:
+            new_powerup = powerup_manager->getRandomPowerup(
+                    position, &n, random_number, kart_id);
+            break;
+    }
 
     // Always add a new powerup in ITEM_MODE_NEW (or if the kart
     // doesn't have a powerup atm).
@@ -600,3 +635,7 @@ void Powerup::hitBonusBox(const ItemState &item_state)
     // POWERUP_MODE_SAME
 
 }   // hitBonusBox
+void Powerup::setSpecialModifier(const SpecialModifier modifier)
+{
+    m_special_modifier = modifier;
+}

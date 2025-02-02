@@ -23,6 +23,7 @@
 #include "karts/controller/controller.hpp"
 #include "karts/controller/ghost_controller.hpp"
 #include "network/network_config.hpp"
+#include "network/server_config.hpp"
 
 //-----------------------------------------------------------------------------
 StandardRace::StandardRace() : LinearWorld()
@@ -35,6 +36,13 @@ StandardRace::StandardRace() : LinearWorld()
  */
 bool StandardRace::isRaceOver()
 {
+    if (m_schedule_interrupt_race)
+    {
+        return true;
+    }
+    if (ServerConfig::m_infinite_game)
+        return false;
+
     if (RaceManager::get()->isWatchingReplay())
     {
         return dynamic_cast<GhostController*>

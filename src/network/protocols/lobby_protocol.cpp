@@ -32,8 +32,10 @@
 #include "network/network_config.hpp"
 #include "network/network_player_profile.hpp"
 #include "network/peer_vote.hpp"
+#include "network/server_config.hpp"
 #include "network/protocols/game_protocol.hpp"
 #include "network/protocols/game_events_protocol.hpp"
+#include "network/protocols/global_log.hpp"
 #include "network/race_event_manager.hpp"
 #include "race/race_manager.hpp"
 #include "states_screens/online/networking_lobby.hpp"
@@ -118,11 +120,16 @@ void LobbyProtocol::configRemoteKart(
     }
     // Create the kart information for the race manager:
     // -------------------------------------------------
+    if (ServerConfig::m_soccer_log) GlobalLog::resetIngamePlayers();
     for (unsigned int i = 0; i < players.size(); i++)
     {
         const std::shared_ptr<NetworkPlayerProfile>& profile = players[i];
+#if 0
+        Log::verbose("ServerLobby", "ConfigRemoteKart i=%u, profileName->getName()=%s",
+                i,
+                StringUtils::wideToUtf8(profile->getName()).c_str());
+#endif
         bool is_local = profile->isLocalPlayer();
-
         // All non-local players are created here. This means all players
         // on the server, and all non-local players on a client (the local
         // karts are created in the ClientLobby).
@@ -157,6 +164,15 @@ void LobbyProtocol::configRemoteKart(
         rki.setNetworkPlayerProfile(profile);
         // Inform the race manager about the data for this kart.
         RaceManager::get()->setPlayerKart(i, rki);
+	if (ServerConfig::m_soccer_log)
+	{
+            GlobalLog::addIngamePlayer(i, StringUtils::wideToUtf8(profile->getName()), profile->isOfflineAccount());
+	    auto kart_team = profile->getTeam();
+	    std::string team = kart_team == KART_TEAM_RED ? "red" : "blue";
+	    std::string msg =  StringUtils::wideToUtf8(profile->getName()) + " joined the " + team + " team.\n";
+	    std::string empty_msg = " joined the " + team + " team.\n";
+	    if (!(msg == empty_msg)) GlobalLog::writeLog(msg, GlobalLogTypes::POS_LOG);
+	}
     }   // for i in players
     // Clean all previous AI if exists in offline game
     RaceManager::get()->computeRandomKartList();
@@ -243,6 +259,13 @@ void LobbyProtocol::addLiveJoiningKart(int kart_id, const RemoteKartInfo& rki,
     World::getWorld()->initTeamArrows(k);
     if (!k->getController()->isLocalPlayerController())
         k->setOnScreenText(rki.getPlayerName().c_str());
+    if (k->getController()->isNetworkPlayerController())
+        k->getController()->updateNetworkPlayerProfile(
+                rki.getNetworkPlayerProfile().lock().get());
+    if (RaceManager::get()->getWorldTimedModifiers() & TIERS_TMODIFIER_CHAOSPARTY)
+    {
+        RaceManager::get()->chaosGivePowerup(k);
+    }
 }   // addLiveJoiningKart
 
 //-----------------------------------------------------------------------------

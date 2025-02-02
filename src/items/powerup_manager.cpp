@@ -34,7 +34,9 @@
 #include "items/cake.hpp"
 #include "items/plunger.hpp"
 #include "items/rubber_ball.hpp"
+#include "karts/kart.hpp"
 #include "modes/world.hpp"
+#include "modes/soccer_world.hpp"
 #include "race/race_manager.hpp"
 #include "utils/constants.hpp"
 #include "utils/string_utils.hpp"
@@ -42,6 +44,7 @@
 #include <IMesh.h>
 
 PowerupManager* powerup_manager=0;
+unsigned int powerup_multiplier = 1;
 
 //-----------------------------------------------------------------------------
 /** The constructor initialises everything to zero. */
@@ -81,6 +84,15 @@ PowerupManager::~PowerupManager()
             delete p;
     }
 }   // ~PowerupManager
+
+void set_powerup_multiplier(unsigned int value)
+{
+    powerup_multiplier = value;
+    if (value == 3)
+    set_nitro_multiplier(20);
+    else if (value == 1)
+    set_nitro_multiplier(0);
+}
 
 //-----------------------------------------------------------------------------
 /** Removes any textures so that they can be reloaded.
@@ -600,7 +612,7 @@ void PowerupManager::computeWeightsForRace(int num_karts)
  */
 PowerupManager::PowerupType PowerupManager::getRandomPowerup(unsigned int pos,
                                                              unsigned int *n,
-                                                             uint64_t random_number)
+                                                             uint64_t random_number, unsigned int kartid)
 {
     int powerup = m_current_item_weights.getRandomItem(pos-1, random_number);
     if(powerup > POWERUP_LAST)
@@ -608,6 +620,23 @@ PowerupManager::PowerupType PowerupManager::getRandomPowerup(unsigned int pos,
         powerup -= (POWERUP_LAST-POWERUP_FIRST+1);
         *n = 3;
     }
+
+    else if (powerup_multiplier == 3) //powerupper on
+    {
+            SoccerWorld* sw = (SoccerWorld*)World::getWorld();
+            bool is_winning_team = sw->getKartSoccerResult(kartid);
+            if (!is_winning_team)
+            {
+                int powerup_multiplier_value = 1;
+                int red_score = sw->getScore(KART_TEAM_RED);
+                int blue_score = sw->getScore(KART_TEAM_BLUE);
+                int diff = abs(red_score-blue_score);
+                if (diff > 2) diff =2;
+                powerup_multiplier_value = diff+1;
+                *n=powerup_multiplier_value;
+            }
+    }
+
     else
         *n=1;
 
@@ -678,3 +707,55 @@ void PowerupManager::unitTesting()
         assert(count[i] == wd.m_weights_for_section[section][i]);
     }
 }   // unitTesting
+PowerupManager::PowerupType PowerupManager::getPowerupFromName(const std::string &query)
+{
+    if (query == "boost" 
+        || query == "speed")
+        return POWERUP_ZIPPER;
+
+    if (StringUtils::startsWith(query, "bu") ||
+        StringUtils::startsWith(query, "g"))
+    {
+        return POWERUP_BUBBLEGUM;
+    }
+    if (StringUtils::startsWith(query, "swi") ||
+        StringUtils::startsWith(query, "cha"))
+    {
+        return POWERUP_SWITCH;
+    }
+    if (StringUtils::startsWith(query, "c"))
+    {
+        return POWERUP_CAKE;
+    }
+    if (StringUtils::startsWith(query, "bas") ||
+        StringUtils::startsWith(query, "r"))
+    {
+        return POWERUP_RUBBERBALL;
+    }
+    if (StringUtils::startsWith(query, "bo") ||
+        StringUtils::startsWith(query, "ba"))
+    {
+        return POWERUP_BOWLING;
+    }
+    if (StringUtils::startsWith(query, "z"))
+    {
+        return POWERUP_ZIPPER;
+    }
+    if (StringUtils::startsWith(query, "pl"))
+    {
+        return POWERUP_PLUNGER;
+    }
+    if (StringUtils::startsWith(query, "sw"))
+    {
+        return POWERUP_SWATTER;
+    }
+    if (StringUtils::startsWith(query, "pa"))
+    {
+        return POWERUP_PARACHUTE;
+    }
+    if (StringUtils::startsWith(query, "a"))
+    {
+        return POWERUP_ANVIL;
+    }
+    return POWERUP_NOTHING;
+}

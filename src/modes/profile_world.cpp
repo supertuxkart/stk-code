@@ -135,6 +135,11 @@ std::shared_ptr<AbstractKart> ProfileWorld::createKart
  */
 bool ProfileWorld::isRaceOver()
 {
+    if (m_schedule_interrupt_race)
+    {
+        return true;
+    }
+
     if(m_profile_mode==PROFILE_TIME)
         return getTime()>m_time;
 

@@ -96,7 +96,7 @@ ServersManager::~ServersManager()
 /** Returns a WAN update-list-of-servers request. It queries the
  *  STK server for an up-to-date list of servers.
  */
-std::shared_ptr<ServerList> ServersManager::getWANRefreshRequest() const
+std::shared_ptr<ServerList> ServersManager::getWANRefreshRequest(bool doIPDetection) const
 {
     // ========================================================================
     /** A small local class that triggers an update of the ServersManager
@@ -108,25 +108,30 @@ std::shared_ptr<ServerList> ServersManager::getWANRefreshRequest() const
         // Run the ip detect in separate thread, so it can be done parallel
         // with the wan server request (which takes few seconds too)
         uint64_t m_creation_time;
+        bool m_ip_detection;
     public:
-        WANRefreshRequest(std::shared_ptr<ServerList> server_list)
+        WANRefreshRequest(std::shared_ptr<ServerList> server_list, bool ip_detection)
         : Online::XMLRequest(/*priority*/100)
         {
             NetworkConfig::queueIPDetection();
             m_creation_time = StkTime::getMonoTimeMs();
             m_server_list = server_list;
+            m_ip_detection = ip_detection;
         }
         // --------------------------------------------------------------------
         virtual void afterOperation() OVERRIDE
         {
             Online::XMLRequest::afterOperation();
-            // Wait at most 2 seconds for ip detection
-            uint64_t timeout = StkTime::getMonoTimeMs() - m_creation_time;
-            if (timeout > 2000)
-                timeout = 0;
-            else
-                timeout = 2000 - timeout;
-            NetworkConfig::get()->getIPDetectionResult(timeout);
+            if (m_ip_detection)
+            {
+                // Wait at most 2 seconds for ip detection
+                uint64_t timeout = StkTime::getMonoTimeMs() - m_creation_time;
+                if (timeout > 2000)
+                    timeout = 0;
+                else
+                    timeout = 2000 - timeout;
+                NetworkConfig::get()->getIPDetectionResult(timeout);
+            }
             auto server_list = m_server_list.lock();
             if (!server_list)
                 return;
@@ -171,7 +176,7 @@ std::shared_ptr<ServerList> ServersManager::getWANRefreshRequest() const
     // ========================================================================
 
     auto server_list = std::make_shared<ServerList>();
-    auto request = std::make_shared<WANRefreshRequest>(server_list);
+    auto request = std::make_shared<WANRefreshRequest>(server_list, doIPDetection);
     request->setApiURL(Online::API::SERVER_PATH, "get-all");
     Online::RequestManager::get()->addRequest(request);
     return server_list;

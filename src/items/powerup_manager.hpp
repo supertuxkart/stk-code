@@ -160,6 +160,7 @@ private:
 
 public:
     static void unitTesting();
+    static PowerupManager::PowerupType getPowerupFromName(const std::string &query);
 
                   PowerupManager  ();
                  ~PowerupManager  ();
@@ -170,7 +171,7 @@ public:
     void          loadPowerup     (PowerupType type, const XMLNode &node);
     PowerupManager::PowerupType
         getRandomPowerup(unsigned int pos, unsigned int *n,
-                         uint64_t random_number);
+                         uint64_t random_number, unsigned int kartid = 1);
     // ------------------------------------------------------------------------
     /** Returns the icon(material) for a powerup. */
     Material* getIcon(int type) const {return m_all_icons [type];}
@@ -184,6 +185,8 @@ public:
     void setRandomSeed(uint64_t seed) { m_random_seed.store(seed); }
 
 };   // class PowerupManager
+
+void set_powerup_multiplier(unsigned int value);
 
 extern PowerupManager* powerup_manager;
 

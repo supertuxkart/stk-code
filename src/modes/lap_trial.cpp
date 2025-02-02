@@ -30,6 +30,13 @@ LapTrial::LapTrial() : LinearWorld()
 
 bool LapTrial::isRaceOver()
 {
+    if (m_schedule_interrupt_race)
+    {
+        return true;
+    }
+    if (RaceManager::get()->isInfiniteMode())
+        return false;
+
     return m_count_down_reached_zero;
 }
 

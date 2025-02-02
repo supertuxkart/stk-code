@@ -183,6 +183,13 @@ void FreeForAll::update(int ticks)
  */
 bool FreeForAll::isRaceOver()
 {
+    if (m_schedule_interrupt_race)
+    {
+        return true;
+    }
+    if (RaceManager::get()->isInfiniteMode())
+        return false;
+
     if (NetworkConfig::get()->isNetworking() &&
         NetworkConfig::get()->isClient())
         return false;

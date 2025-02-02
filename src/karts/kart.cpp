@@ -24,6 +24,7 @@
 #include "challenges/challenge_status.hpp"
 #include "challenges/unlock_manager.hpp"
 #include "config/player_manager.hpp"
+#include "config/stk_config.hpp"
 #include "config/user_config.hpp"
 #include "font/bold_face.hpp"
 #include "font/font_manager.hpp"
@@ -99,6 +100,10 @@
 #include <limits>
 #include <cmath>
 
+#include <fstream>
+using namespace std;
+
+unsigned int nitro_multiplier = 0;
 
 #if defined(WIN32) && !defined(__CYGWIN__)  && !defined(__MINGW32__)
    // Disable warning for using 'this' in base member initializer list
@@ -203,6 +208,11 @@ void Kart::init(RaceManager::KartType type)
     initSound();
     reset();
 }   // init
+
+void set_nitro_multiplier(unsigned int value)
+{
+    nitro_multiplier = value;
+}
 
 // ----------------------------------------------------------------------------
 void Kart::initSound()
@@ -1138,16 +1148,33 @@ void Kart::collectedItem(ItemState *item_state)
     float old_energy          = m_collected_energy;
     const Item::ItemType type = item_state->getType();
 
+    float ibost = 0;
+
+    if (nitro_multiplier == 20)
+    {
+    SoccerWorld* sw = dynamic_cast<SoccerWorld*>(World::getWorld());
+    bool winy = sw->getKartSoccerResult(this->getWorldKartId());
+
+    const int red_score = sw->getScore(KART_TEAM_RED);
+    const int blue_score = sw->getScore(KART_TEAM_BLUE);
+    int diff = abs(red_score-blue_score);
+    if (!winy) ibost = (diff+1)*round(nitro_multiplier/7);
+    }
+
     switch (type)
     {
     case Item::ITEM_BANANA:
         m_attachment->hitBanana(item_state);
         break;
     case Item::ITEM_NITRO_SMALL:
-        m_collected_energy += m_kart_properties->getNitroSmallContainer();
+	if (RaceManager::get()->getNitrolessMode())
+		break;
+        m_collected_energy += m_kart_properties->getNitroSmallContainer() + ibost/2;
         break;
     case Item::ITEM_NITRO_BIG:
-        m_collected_energy += m_kart_properties->getNitroBigContainer();
+	if (RaceManager::get()->getNitrolessMode())
+		break;
+        m_collected_energy += m_kart_properties->getNitroBigContainer() + ibost;
         break;
     case Item::ITEM_BONUS_BOX  :
         {
@@ -2619,6 +2646,13 @@ void Kart::updatePhysics(int ticks)
                 /*fade_out_time*/stk_config->time2Ticks(5.0f));
         }
     }
+    /*
+    else if (World::getWorld()->getTicksSinceStart() ==
+            stk_config->time2Ticks(1.0f) && m_startup_boost > 0.0f)
+    {
+        m_kart_gfx->setCreationRateAbsolute(KartGFX::KGFX_ZIPPER, 0.0f);
+    }
+    */
     if (m_bounce_back_ticks > 0)
         m_bounce_back_ticks -= ticks;
 
@@ -3260,28 +3294,31 @@ void Kart::updateGraphics(float dt)
         }
     }
 
-    if (m_kart_animation)
-        m_kart_animation->updateGraphics(dt);
-
-    for (int i = 0; i < EMITTER_COUNT; i++)
-        m_emitters[i]->setPosition(getXYZ());
-    if (m_skid_sound)
-        m_skid_sound->setPosition(getSmoothedXYZ());
-    m_nitro_sound->setPosition(getSmoothedXYZ());
-
-    m_attachment->updateGraphics(dt);
-
-    // update star effect (call will do nothing if stars are not activated)
-    // Remove it if no invulnerability
-    if (m_stars_effect)
+    if (isVisible())
     {
-        if (!isInvulnerable() && m_stars_effect->isEnabled())
+        if (m_kart_animation)
+            m_kart_animation->updateGraphics(dt);
+
+        for (int i = 0; i < EMITTER_COUNT; i++)
+            m_emitters[i]->setPosition(getXYZ());
+        if (m_skid_sound)
+            m_skid_sound->setPosition(getSmoothedXYZ());
+        m_nitro_sound->setPosition(getSmoothedXYZ());
+
+        m_attachment->updateGraphics(dt);
+
+        // update star effect (call will do nothing if stars are not activated)
+        // Remove it if no invulnerability
+        if (m_stars_effect)
         {
-            m_stars_effect->reset();
-            m_stars_effect->update(1);
+            if (!isInvulnerable() && m_stars_effect->isEnabled())
+            {
+                m_stars_effect->reset();
+                m_stars_effect->update(1);
+            }
+            else
+                m_stars_effect->update(dt);
         }
-        else
-            m_stars_effect->update(dt);
     }
 
     // Update particle effects (creation rate, and emitter size

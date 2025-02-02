@@ -22,6 +22,7 @@
 #ifndef STK_HOST_HPP
 #define STK_HOST_HPP
 
+#include "network/remote_kart_info.hpp"
 #include "utils/stk_process.hpp"
 #include "utils/synchronised.hpp"
 #include "utils/time.hpp"
@@ -100,6 +101,16 @@ private:
 
     /** The list of peers connected to this instance. */
     std::map<ENetPeer*, std::shared_ptr<STKPeer> > m_peers;
+
+    /** Network player profile that takes precedence over the resulting
+     *  vector that is returned by the method getPlayersForNewGame(),
+     *  always first. */
+    std::weak_ptr<NetworkPlayerProfile> m_forced_first_player;
+
+    /** Network player profile that takes second precedence over the resulting
+     *  vector that is returned by the method getPlayersForNewGame(),
+     *  always second. */
+    std::weak_ptr<NetworkPlayerProfile> m_forced_second_player;
 
     /** Next unique host id. It is increased whenever a new peer is added (see
      *  getPeer()), but not decreased whena host (=peer) disconnects. This
@@ -263,11 +274,25 @@ public:
     std::vector<std::shared_ptr<NetworkPlayerProfile> >
                                                   getAllPlayerProfiles() const;
     // ------------------------------------------------------------------------
+    std::vector<std::shared_ptr<NetworkPlayerProfile> >
+                                  getPlayerProfilesOfTeam(KartTeam team,
+                                          bool onlyCanPlay = true) const;
+    // ------------------------------------------------------------------------
+    /** Returns two vectors with player profiles for blue and red team. */
+    void getTeamLists(
+          std::vector<std::shared_ptr<NetworkPlayerProfile>>& blue_team,
+          std::vector<std::shared_ptr<NetworkPlayerProfile>>& red_team,
+          bool onlyCanPlay = true) const;
+    // ------------------------------------------------------------------------
     std::set<uint32_t> getAllPlayerOnlineIds() const;
     // ------------------------------------------------------------------------
     std::shared_ptr<STKPeer> findPeerByHostId(uint32_t id) const;
     // ------------------------------------------------------------------------
-    std::shared_ptr<STKPeer> findPeerByName(const core::stringw& name) const;
+    std::shared_ptr<STKPeer> findPeerByOnlineId(uint32_t id) const;
+    // ------------------------------------------------------------------------
+    std::shared_ptr<STKPeer> findPeerByName(const core::stringw& name,
+            bool ignoreCase=false, bool onlyPrefix=false,
+            std::shared_ptr<NetworkPlayerProfile>* out_profile=nullptr) const;
     // ------------------------------------------------------------------------
     void sendPacketExcept(STKPeer* peer, NetworkString *data,
                           bool reliable = true);
@@ -319,6 +344,36 @@ public:
             peers.push_back(p.second);
         }
         return peers;
+    }
+    // ------------------------------------------------------------------------
+    /** Returns currently forced first position for network player profiles */
+    std::shared_ptr<NetworkPlayerProfile> getForcedFirstPlayer() const
+    {
+        if (m_forced_first_player.expired())
+            return nullptr;
+
+        return m_forced_first_player.lock();
+    }
+    // ------------------------------------------------------------------------
+    /** Returns currently forced second position for network player profiles */
+    std::shared_ptr<NetworkPlayerProfile> getForcedSecondPlayer() const
+    {
+        if (m_forced_second_player.expired())
+            return nullptr;
+
+        return m_forced_second_player.lock();
+    }
+    // ------------------------------------------------------------------------
+    /** Set currently forced first position for network player profiles */
+    void setForcedFirstPlayer(const std::shared_ptr<NetworkPlayerProfile>& p)
+    {
+        m_forced_first_player = p;
+    }
+    // ------------------------------------------------------------------------
+    /** Set currently forced second position for network player profiles */
+    void setForcedSecondPlayer(const std::shared_ptr<NetworkPlayerProfile>& p)
+    {
+        m_forced_second_player = p;
     }
     // ------------------------------------------------------------------------
     /** Returns the next (unique) host id. */
@@ -396,6 +451,10 @@ public:
     static BareNetworkString getStunRequest(uint8_t* stun_tansaction_id);
     // ------------------------------------------------------------------------
     ChildLoop* getChildLoop() const { return m_client_loop; }
+    bool isPeerInTeam(
+        std::shared_ptr<STKPeer>& p, KartTeam team) const;
+    bool isPeerInTeam(
+        STKPeer* p, KartTeam team) const;
 };   // class STKHost
 
 #endif // STK_HOST_HPP

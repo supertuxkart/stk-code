@@ -456,6 +456,13 @@ video::SColor CaptureTheFlag::getColor(unsigned int kart_id) const
 // ----------------------------------------------------------------------------
 bool CaptureTheFlag::isRaceOver()
 {
+    if (m_schedule_interrupt_race)
+    {
+        return true;
+    }
+    if (RaceManager::get()->isInfiniteMode())
+        return false;
+
     if (m_unfair_team)
         return true;
 

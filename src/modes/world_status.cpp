@@ -58,6 +58,7 @@ WorldStatus::WorldStatus() : m_process_type(STKProcess::getType()), m_started_at
     m_play_ready_set_go_sounds = true;
     m_play_racestart_sounds = true;
     m_live_join_world = false;
+    m_stopped = false;
 
     if (m_process_type == PT_MAIN)
     {
@@ -163,6 +164,14 @@ void WorldStatus::setClockMode(const ClockType mode, const float initial_time)
     m_time       = stk_config->ticks2Time(m_time_ticks);
 }   // setClockMode
 
+// ----------------------------------------------------------------------------
+float WorldStatus::getElapsedTime() const
+{
+    if (RaceManager::get()->hasTimeTarget())
+        return RaceManager::get()->getTimeTarget() - getTime();
+    else
+        return getTime();
+} // getElapsedTime
 //-----------------------------------------------------------------------------
 /** Called when the race is finished, but it still leaves some time
  *  for an end of race animation, and potentially let some more AI karts
@@ -598,3 +607,14 @@ void WorldStatus::endLiveJoinWorld(int ticks_now)
     music_manager->startMusic();
     setTicksForRewind(m_live_join_ticks);
 }   // endLiveJoinWorld
+void WorldStatus::stop()
+{
+    m_stopped = true;
+    Log::info("WorldStatus", "The game is stopped.");
+}
+// ------------------------------------------------------------------------
+void WorldStatus::resume()
+{
+    m_stopped = false;
+    Log::info("WorldStatus", "The game is resumed.");
+}

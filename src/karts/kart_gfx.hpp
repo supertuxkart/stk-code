@@ -79,6 +79,11 @@ private:
 #ifndef SERVER_ONLY
     /** Vector of all particle emitters. */
     std::vector<ParticleEmitter*> m_all_emitters;
+#else
+    /** TierS Addition: server-side replay recording workarounds. */
+    float m_ss_nitro_rate;
+    float m_ss_skid_rate;
+    float m_ss_zipper_rate;
 #endif
 
     /** Pointer to the owner of this kart. */
@@ -98,6 +103,7 @@ private:
 
     /** A light that's shown on the second skid-level with another color. */
     irr::scene::ISceneNode* m_skidding_light_2;
+
 
     void addEffect(KartGFXType type, const std::string &file_name,
                    const Vec3 &position, bool important);

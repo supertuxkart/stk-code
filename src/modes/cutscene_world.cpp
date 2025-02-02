@@ -631,6 +631,13 @@ void CutsceneWorld::enterRaceOverState()
  */
 bool CutsceneWorld::isRaceOver()
 {
+    if (m_schedule_interrupt_race)
+    {
+        return true;
+    }
+    if (RaceManager::get()->isInfiniteMode())
+        return false;
+
     bool isOver = (m_time > m_duration);
 
     if (!s_use_duration && !m_aborted)

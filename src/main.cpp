@@ -262,12 +262,14 @@ extern "C" {
 #include "network/socket_address.hpp"
 #include "network/stk_host.hpp"
 #include "network/stk_peer.hpp"
+#include "network/tournament/tournament_manager.hpp"
 #include "online/profile_manager.hpp"
 #include "online/request_manager.hpp"
 #include "race/grand_prix_manager.hpp"
 #include "race/highscore_manager.hpp"
 #include "race/history.hpp"
 #include "race/race_manager.hpp"
+#include "race/tiers_roulette.hpp"
 #include "replay/replay_play.hpp"
 #include "replay/replay_recorder.hpp"
 #include "states_screens/main_menu_screen.hpp"
@@ -1474,6 +1476,18 @@ int handleCmdLine(bool has_server_config, bool has_parent_process)
 
     if (NetworkConfig::get()->isServer())
     {
+        // Load TournamentManager when supertournament is enabled.
+        if (ServerConfig::m_supertournament)
+        {
+            TournamentManager::create();
+            TournamentManager::get()->LoadGamePlan();
+            TournamentManager::get()->LoadMatchPlan();
+            TournamentManager::get()->LoadRequiredFields();
+            TournamentManager::get()->LoadSemiRequiredFields();
+            TournamentManager::get()->InitializePlayersAndTeams(
+                    ServerConfig::m_red_team,
+                    ServerConfig::m_blue_team);
+        }
         PlayerManager::get()->enforceCurrentPlayer();
         const std::string& server_name = ServerConfig::m_server_name;
         if (ServerConfig::m_wan_server)
@@ -1826,6 +1840,7 @@ void clearGlobalVariables()
 {
     // In android sometimes global variables is not reset when restart the app
     // we clear it here as much as possible
+    TournamentManager::clear();
     STKProcess::reset();
     StateManager::clear();
     NetworkConfig::clear();
@@ -1942,6 +1957,7 @@ void initRest()
     powerup_manager         = new PowerupManager       ();
     attachment_manager      = new AttachmentManager    ();
     highscore_manager       = new HighscoreManager     ();
+    tiers_roulette          = new TierSRoulette        ();
 
     // The maximum texture size can not be set earlier, since
     // e.g. the background image needs to be loaded in high res.
@@ -1988,6 +2004,13 @@ void initRest()
         UserConfigParams::m_last_track.revertToDefaults();
 
     RaceManager::get()->setTrack(UserConfigParams::m_last_track);
+
+    irr::core::stringc tiers_roulette_sequence =
+        ServerConfig::m_tiers_roulette_sequence.toString();
+    if (!tiers_roulette_sequence.empty())
+        tiers_roulette->populateFromBuffer(
+                tiers_roulette_sequence.size(),
+                tiers_roulette_sequence.c_str());
 
 }   // initRest
 
@@ -2678,6 +2701,7 @@ static void cleanSuperTuxKart()
 {
 
     delete main_loop;
+    TournamentManager::destroy();
 
     if(Online::RequestManager::isRunning())
         Online::RequestManager::get()->stopNetworkThread();
@@ -2713,6 +2737,7 @@ static void cleanSuperTuxKart()
     RaceManager::destroy();
     if(grand_prix_manager)      delete grand_prix_manager;
     if(highscore_manager)       delete highscore_manager;
+    if(tiers_roulette)          delete tiers_roulette;
     if(attachment_manager)      delete attachment_manager;
     ItemManager::removeTextures();
     if(powerup_manager)         delete powerup_manager;

@@ -26,6 +26,30 @@
 
 #include <vector>
 
+
+struct PhysicInfo {
+    float m_speed;
+    float m_steer;
+    float m_suspension_length[4];
+    int m_skidding_state;
+};
+
+struct BonusInfo {
+    int m_attachment;
+    float m_nitro_amount;
+    int m_item_amount;
+    int m_item_type;
+    int m_special_value;
+};
+
+struct KartReplayEvent {
+    float m_distance;
+    int m_nitro_usage;
+    bool m_zipper_usage;
+    int m_skidding_effect;
+    bool m_red_skidding;
+    bool m_jumping;
+};
 /**
   * \ingroup replay
   */
@@ -55,7 +79,6 @@ private:
     /** Static pointer to the one instance of the replay object. */
     static ReplayRecorder *m_replay_recorder;
 
-    bool  m_complete_replay;
 
     bool  m_incorrect_replay;
 
@@ -89,6 +112,11 @@ private:
           ReplayRecorder();
          ~ReplayRecorder();
 public:
+    bool isRecording() const { return m_complete_replay == false; } 	 
+    bool isReplayComplete() const { return m_complete_replay; }
+    bool getSaveStatus() const { return !m_count_transforms.empty() && !m_incorrect_replay; }
+    bool  m_complete_replay;
+    void setFilename(const std::string& filename) { m_filename = filename; } 
     void  init();
     void  reset();
     void  save();

@@ -99,6 +99,7 @@ private:
     int m_blue_ball_hitter;
     int m_blue_hit_ticks;
     int m_red_hit_ticks;
+    bool m_soccer_log;
 
     /** Goals data of each team scored */
     std::vector<ScorerData> m_red_scorers;
@@ -127,6 +128,15 @@ private:
     int m_ticks_back_to_own_goal;
 
     void resetKartsToSelfGoals();
+
+    std::vector<ScorerData> m_backup_red_scorers;
+    std::vector<ScorerData> m_backup_blue_scorers;
+    int m_backup_reset_ball_ticks;
+    int m_backup_ticks_back_to_own_goal;
+    int m_bad_red_goals;
+    int m_bad_blue_goals;
+    int m_init_red_goals;
+    int m_init_blue_goals;
 
 public:
 
@@ -170,8 +180,8 @@ public:
     // ------------------------------------------------------------------------
     int getScore(KartTeam team) const
     {
-        return (int)(team == KART_TEAM_BLUE ? m_blue_scorers.size()
-                                              : m_red_scorers.size());
+        return (int)(team == KART_TEAM_BLUE ? m_blue_scorers.size() - m_bad_blue_goals + m_init_blue_goals
+                                              : m_red_scorers.size() - m_bad_red_goals + m_init_red_goals);
     }
     // ------------------------------------------------------------------------
     const std::vector<ScorerData>& getScorers(KartTeam team) const
@@ -254,6 +264,18 @@ public:
                                 { return getKart(m_team_icon_draw_id[p - 1]); }
     // ------------------------------------------------------------------------
     TrackObject* getBall() const { return m_ball; }
+
+    // SuperTournament
+    // ------------------------------------------------------------------------
+    virtual void stop() OVERRIDE;
+    // ------------------------------------------------------------------------
+    virtual void resume() OVERRIDE;
+    // ------------------------------------------------------------------------
+    void setInitialCount(int red, int blue);
+    // ------------------------------------------------------------------------
+    void tellCount() const;
+    // ------------------------------------------------------------------------
+    void tellCountIfDiffers() const;
 };   // SoccerWorld
 
 

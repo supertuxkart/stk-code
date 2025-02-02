@@ -35,6 +35,8 @@
 #include "io/file_manager.hpp"
 #include "input/device_manager.hpp"
 #include "input/keyboard_device.hpp"
+#include "items/powerup.hpp"
+#include "items/powerup_manager.hpp"
 #include "items/projectile_manager.hpp"
 #include "karts/controller/battle_ai.hpp"
 #include "karts/ghost_kart.hpp"
@@ -54,10 +56,13 @@
 #include "modes/overworld.hpp"
 #include "modes/tutorial_utils.hpp"
 #include "network/child_loop.hpp"
+#include "network/network_string.hpp"
 #include "network/protocols/client_lobby.hpp"
 #include "network/network_config.hpp"
+#include "network/protocols/server_lobby.hpp"
 #include "network/rewind_manager.hpp"
 #include "network/stk_host.hpp"
+#include "network/stk_peer.hpp"
 #include "physics/btKart.hpp"
 #include "physics/physics.hpp"
 #include "physics/triangle_mesh.hpp"
@@ -85,6 +90,7 @@
 
 #include <IrrlichtDevice.h>
 #include <ISceneManager.h>
+#include <memory>
 
 World* World::m_world[PT_COUNT];
 
@@ -129,16 +135,19 @@ World::World() : WorldStatus()
     m_magic_number = 0xB01D6543;
 #endif
 
-    m_race_gui           = NULL;
-    m_saved_race_gui     = NULL;
-    m_use_highscores     = true;
-    m_schedule_pause     = false;
-    m_schedule_unpause   = false;
-    m_schedule_exit_race = false;
-    m_schedule_tutorial  = false;
-    m_is_network_world   = false;
+    m_race_gui                  = NULL;
+    m_saved_race_gui            = NULL;
+    m_use_highscores            = true;
+    m_schedule_pause            = false;
+    m_schedule_unpause          = false;
+    m_schedule_exit_race        = false;
+    m_schedule_interrupt_race   = false;
+    m_schedule_tutorial         = false;
+    m_is_network_world          = false;
 
     m_stop_music_when_dialog_open = true;
+
+    m_wtm_chaosparty_ticks      = 0;
 
     WorldStatus::setClockMode(CLOCK_CHRONO);
 
@@ -490,6 +499,9 @@ std::shared_ptr<AbstractKart> World::createKart
     }
 
     new_kart->init(RaceManager::get()->getKartType(index));
+    /** TierS: bowlparty and other powerup modifiers */
+    new_kart->getPowerup()->setSpecialModifier(
+            RaceManager::get()->getPowerupSpecialModifier());
     Controller *controller = NULL;
     switch(kart_type)
     {
@@ -531,7 +543,10 @@ std::shared_ptr<AbstractKart> World::createKart
     }
     case RaceManager::KT_NETWORK_PLAYER:
     {
-        controller = new NetworkPlayerController(new_kart.get());
+        std::weak_ptr<NetworkPlayerProfile> npp =
+            RaceManager::get()->getKartInfo(global_player_id).getNetworkPlayerProfile();
+        controller = new NetworkPlayerController(new_kart.get(),
+                npp.expired() ? nullptr : npp.lock().get());
         m_num_players++;
         break;
     }
@@ -691,6 +706,9 @@ World::~World()
  */
 void World::onGo()
 {
+    // manually trigger the tiers world timed modifier for chaosparty
+    if (RaceManager::get()->getWorldTimedModifiers() & TIERS_TMODIFIER_CHAOSPARTY)
+        m_wtm_chaosparty_ticks += stk_config->time2Ticks(30.0f);
     // Reset the brakes now that the prestart
     // phase is over (braking prevents the karts
     // from sliding downhill)
@@ -1021,7 +1039,6 @@ void World::updateWorld(int ticks)
         unpause();
         m_schedule_unpause = false;
     }
-
     // Don't update world if a menu is shown or the race is over.
     // Exceptions : - Networking (local pause doesn't affect the server or other players)
     //              - Benchmarking (a pause would mess up measurements)
@@ -1033,13 +1050,13 @@ void World::updateWorld(int ticks)
     try
     {
         update(ticks);
+        updateTSMFeatures(ticks);
     }
     catch (AbortWorldUpdateException& e)
     {
         (void)e;   // avoid compiler warning
         return;
     }
-
 #ifdef DEBUG
     assert(m_magic_number == 0xB01D6543);
 #endif
@@ -1077,6 +1094,24 @@ void World::updateWorld(int ticks)
         }
     }
 }   // updateWorld
+void World::updateTSMFeatures(const int ticks)
+{
+    if (RaceManager::get()->getWorldTimedModifiers() & TIERS_TMODIFIER_CHAOSPARTY)
+    {
+        // chaosparty
+        if (m_wtm_chaosparty_ticks < stk_config->time2Ticks(30.0f))
+        {
+            m_wtm_chaosparty_ticks += ticks;
+            return;
+        }
+        m_wtm_chaosparty_ticks = 0;
+        // trigger chaos party: set random powerup in 50 every 60 seconds
+        for (auto& kart : getKarts())
+        {
+            RaceManager::get()->chaosGivePowerup(kart.get());
+        }
+    }
+}   // updateTSMFeatures
 
 #define MEASURE_FPS 0
 
@@ -1115,10 +1150,14 @@ void World::updateGraphics(float dt)
     for (int i = 0; i < kart_amount; ++i)
     {
         // Update all karts that are visible
+#ifndef SERVER_ONLY
         if (m_karts[i]->isVisible())
         {
             m_karts[i]->updateGraphics(dt);
         }
+#else
+        m_karts[i]->updateGraphics(dt);
+#endif
     }
 
     PROFILER_PUSH_CPU_MARKER("World::updateGraphics (camera)", 0x60, 0x7F, 0);
@@ -1556,17 +1595,72 @@ std::shared_ptr<AbstractKart> World::createKartWithTeam
         online_name = RaceManager::get()->getKartInfo(global_player_id)
             .getPlayerName();
     }
+#if 0
+    const bool doPoles = RaceManager::get()->hasPolePlayers();
+    const int redPoleID = 4;
+    const int bluePoleID = 5;
+    KartTeam poleTeam = KART_TEAM_NONE;
+    std::weak_ptr<NetworkPlayerProfile> npp =
+        RaceManager::get()->getKartInfo(global_player_id).getNetworkPlayerProfile();
+    std::shared_ptr<NetworkPlayerProfile> npp_s = nullptr;
+    if (!npp.expired() && (npp_s = npp.lock()) != nullptr)
+    {
+        if (doPoles)
+            poleTeam = RaceManager::get()->getPoleTeam(npp_s.get());
+    }
+#endif
 
-    // Notice: In blender, please set 1,3,5,7... for blue starting position;
-    // 2,4,6,8... for red.
+    // Notice: In blender, please set 1,3,5,7... (odd number) for blue starting position;
+    // 2,4,6,8... (even number) for red.
     if (team == KART_TEAM_BLUE)
     {
+#if 0
+        int def = 1 + 2 * cur_blue;
+        // odd
+        if (RaceManager::get()->hasBluePole())
+        {
+            // the current kart is a pole, it gets the pole position no matter what
+            if (poleTeam == KART_TEAM_BLUE) pos_index = bluePoleID;
+            // the kart is not a pole kart, but it tries to claim the pole slot or past it
+            else if (bluePoleID <= def)
+                pos_index = ((def + 1) % RaceManager::get()->getNumberOfKarts()) + 1;
+                //pos_index = def;
+            // the kart claims slot that is prior the pole slot, normal behavior
+            else pos_index = def;
+        }
+        // default
+        else pos_index = def;
+#endif
         pos_index = 1 + 2 * cur_blue;
     }
     else
     {
+#if 0
+        int def = 2 + 2 * cur_red;
+        // even
+        if (RaceManager::get()->hasRedPole())
+        {
+            if (poleTeam == KART_TEAM_RED) pos_index = redPoleID;
+            else if (redPoleID <= def)
+                pos_index = ((def + 1) % RaceManager::get()->getNumberOfKarts()) + 1;
+                //pos_index = def;
+            else pos_index = def;
+        }
+        // default
+        else pos_index = def;
+#endif
         pos_index = 2 + 2 * cur_red;
     }
+
+    // Debugging pole
+#if 0
+    Log::verbose("World", "Player %s#%d with GID %d LID %d gets the position of #%d.",
+            StringUtils::wideToUtf8(online_name).c_str(),
+            index,
+            global_player_id,
+            local_player_id,
+            pos_index);
+#endif
 
     btTransform init_pos = getStartTransform(pos_index - 1);
     m_kart_position_map[index] = (unsigned)(pos_index - 1);
@@ -1590,7 +1684,12 @@ std::shared_ptr<AbstractKart> World::createKartWithTeam
     }
 
     new_kart->init(RaceManager::get()->getKartType(index));
+
+    /** TierS: bowlparty and other powerup modifiers */
+    new_kart->getPowerup()->setSpecialModifier(
+            RaceManager::get()->getPowerupSpecialModifier());
     Controller *controller = NULL;
+    std::weak_ptr<NetworkPlayerProfile> npp;
 
     switch(kart_type)
     {
@@ -1599,7 +1698,10 @@ std::shared_ptr<AbstractKart> World::createKartWithTeam
         m_num_players ++;
         break;
     case RaceManager::KT_NETWORK_PLAYER:
-        controller = new NetworkPlayerController(new_kart.get());
+        npp =
+            RaceManager::get()->getKartInfo(global_player_id).getNetworkPlayerProfile();
+        controller = new NetworkPlayerController(new_kart.get(),
+                npp.expired() ? nullptr : npp.lock().get());
         if (!online_name.empty())
             new_kart->setOnScreenText(online_name.c_str());
         m_num_players++;
@@ -1619,6 +1721,7 @@ std::shared_ptr<AbstractKart> World::createKartWithTeam
 }   // createKartWithTeam
 
 //-----------------------------------------------------------------------------
+// count the number of teammates for the specified team
 int World::getTeamNum(KartTeam team) const
 {
     int total = 0;
@@ -1787,4 +1890,14 @@ void World::updateAchievementModeCounters(bool start)
     if (RaceManager::get()->hasGhostKarts())
         PlayerManager::increaseAchievement(start ? ACS::WITH_GHOST_STARTED : ACS::WITH_GHOST_FINISHED,1);
 } // updateAchievementModeCounters
+//-----------------------------------------------------------------------------
+// Override functions below in SoccerWorld class
+const btTransform &World::getRedPoleStartTransform()
+{
+    return getStartTransform(getRedPoleStartTransformID());
+}
+const btTransform &World::getBluePoleStartTransform()
+{
+    return getStartTransform(getBluePoleStartTransformID());
+}
 #undef ACS

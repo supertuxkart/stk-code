@@ -35,6 +35,22 @@ class STKPeer;
 enum KartTeam : int8_t;
 enum HandicapLevel : uint8_t;
 
+// Moderation toolkit
+enum PlayerRestriction: uint32_t
+{
+    PRF_OK = 0, //!< Default, no restrictions are applied to the player
+    PRF_NOSPEC = 1, //!< Player is unable to spectate
+    PRF_NOGAME = 2, //!< Player is unable to play the game
+    PRF_NOCHAT = 4, //!< Player is unable to send chat messages
+    PRF_NOPCHAT = 8, //!< Player is unable to send private chat messages
+    PRF_NOTEAM = 16, //!< Player profiles of the peer cannot change teams
+    PRF_HANDICAP = 32, //!< Player is unable to toggle the handicap
+    //PRF_KART = 64, //!< Player is unable to select the kart by themselved
+    PRF_TRACK = 128, //!< Player is unable to vote for the track
+    PRF_ITEMS = 256, //!< Player is unable to pick up items in game
+};  // PlayerRestriction
+
+
 /*! \class NetworkPlayerProfile
  *  \brief Contains the profile of a player.
  */
@@ -58,6 +74,20 @@ private:
 
     /** The selected kart id. */
     std::string m_kart_name; 
+
+    /** The forced kart id if any. */
+    std::string m_forced_kart_name;
+
+    /** Cached value for permissions. Usually updated by ServerLobby. */
+    uint32_t m_permission_level;
+
+    /** Veto level: 0 is for no veto, 80 is for lobby commands veto,
+     * 100 is for track selection veto. Cannot be set higher than
+     * the permission level defined by the server lobby. */
+    uint32_t m_veto;
+
+    // Player restrictions are defined by the flag enum PeerRestriction
+    uint32_t m_restrictions;
 
     /** The local player id relative to each peer. */
     uint8_t m_local_player_id;
@@ -92,6 +122,8 @@ public:
         m_online_id             = 0;
         m_handicap.store((HandicapLevel)0);
         m_local_player_id       = 0;
+        m_permission_level      = 0;
+        m_veto                  = 0;
         m_team.store(team);
         resetGrandPrixData();
     }
@@ -101,7 +133,8 @@ public:
                          float default_kart_color, uint32_t online_id,
                          HandicapLevel handicap,
                          uint8_t local_player_id, KartTeam team,
-                         const std::string& country_code)
+                         const std::string& country_code, int permlvl = 0,
+                         uint32_t restrictions = 0)
     {
         m_peer                  = peer;
         m_player_name           = name;
@@ -112,6 +145,9 @@ public:
         m_local_player_id       = local_player_id;
         m_team.store(team);
         m_country_code          = country_code;
+        m_permission_level      = permlvl;
+        m_veto                  = 0;
+        m_restrictions          = restrictions;
         resetGrandPrixData();
     }
     // ------------------------------------------------------------------------
@@ -174,6 +210,42 @@ public:
     void setKartData(const KartData& data)              { m_kart_data = data; }
     // ------------------------------------------------------------------------
     const KartData& getKartData() const                 { return m_kart_data; }
+    // ------------------------------------------------------------------------
+    // Moderation toolkit
+    // ------------------------------------------------------------------------
+    const int32_t getPermissionLevel() const     { return m_permission_level; }
+    // ------------------------------------------------------------------------
+    void setPermissionLevel(const int32_t lvl)    { m_permission_level = lvl; }
+    // ------------------------------------------------------------------------
+    uint32_t getVeto() const                                 { return m_veto; }
+    // ------------------------------------------------------------------------
+    void setVeto(const uint32_t v)                              { m_veto = v; }
+    // ------------------------------------------------------------------------
+    uint32_t getRestrictions() const                 { return m_restrictions; }
+    // ------------------------------------------------------------------------
+    void setRestrictions(const uint32_t r)              { m_restrictions = r; }
+    // ------------------------------------------------------------------------
+    void clearRestrictions()                       { m_restrictions = PRF_OK; }
+    // ------------------------------------------------------------------------
+    void addRestriction(const PlayerRestriction restriction)
+                                             { m_restrictions |= restriction; }
+    // ------------------------------------------------------------------------
+    void removeRestriction(const PlayerRestriction restriction)
+                                            { m_restrictions &= ~restriction; }
+    // ------------------------------------------------------------------------
+    bool notRestrictedBy(const PlayerRestriction restriction)
+                                      { return ~m_restrictions & restriction; }
+    // ------------------------------------------------------------------------
+    bool hasRestriction(const PlayerRestriction restriction)
+                                       { return m_restrictions & restriction; }
+    // ------------------------------------------------------------------------
+    const std::string& getForcedKart() const     { return m_forced_kart_name; }
+    // ------------------------------------------------------------------------
+    void forceKart(const std::string& name)      { m_forced_kart_name = name; }
+    // ------------------------------------------------------------------------
+    void unforceKart()                          { m_forced_kart_name.clear(); }
+    // ------------------------------------------------------------------------
+
 };   // class NetworkPlayerProfile
 
 #endif // HEADER_NETWORK_PLAYER_PROFILE

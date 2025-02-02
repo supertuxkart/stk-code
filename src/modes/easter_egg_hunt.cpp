@@ -176,6 +176,13 @@ void EasterEggHunt::update(int ticks)
  */
 bool EasterEggHunt::isRaceOver()
 {
+    if (m_schedule_interrupt_race)
+    {
+        return true;
+    }
+    if (RaceManager::get()->isInfiniteMode())
+        return false;
+
     if(!m_only_ghosts && m_eggs_found == m_number_of_eggs)
     {
         if (m_finish_time == 0)

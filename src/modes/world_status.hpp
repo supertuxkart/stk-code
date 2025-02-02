@@ -102,6 +102,9 @@ protected:
     /** Process type of this world (main or child). */
     const ProcessType m_process_type;
 
+    /** SuperTournament: if game is stopped, don't account anything... */
+    bool        m_stopped;
+
 private:
     /** Sound to play at the beginning of a race, during which a
      *  a camera intro of the track can be shown. */
@@ -204,6 +207,10 @@ public:
     float   getTime() const { return (float)m_time; }
 
     // ------------------------------------------------------------------------
+    /** Same as getTime(), but acts in the same fashion as m_count_up_ticks. */
+    float   getElapsedTime() const;
+
+    // ------------------------------------------------------------------------
     /** Returns the start time. */
     uint64_t   getStart() const { return m_started_at; }
 
@@ -238,6 +245,14 @@ public:
     }
     // ------------------------------------------------------------------------
     void endLiveJoinWorld(int ticks_now);
+
+    // ------------------------------------------------------------------------
+    // SuperTournament
+    virtual void stop();
+    // ------------------------------------------------------------------------
+    virtual void resume();
+    // ------------------------------------------------------------------------
+    virtual bool getStopped() const                       { return m_stopped; }
 };   // WorldStatus
 
 

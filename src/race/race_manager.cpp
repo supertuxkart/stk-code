@@ -20,6 +20,7 @@
 
 #include <iostream>
 #include <algorithm>
+#include <limits>
 #include <random>
 
 #include "challenges/unlock_manager.hpp"
@@ -51,6 +52,10 @@
 #include "network/protocol_manager.hpp"
 #include "network/network_config.hpp"
 #include "network/network_string.hpp"
+#include "network/protocols/global_log.hpp"
+#include "network/protocols/lobby_protocol.hpp"
+#include "network/protocols/server_lobby.hpp"
+#include "network/stk_peer.hpp"
 #include "replay/replay_play.hpp"
 #include "scriptengine/property_animator.hpp"
 #include "states_screens/grand_prix_cutscene.hpp"
@@ -130,6 +135,10 @@ RaceManager::RaceManager()
     m_ai_superpower      = SUPERPOWER_NONE;
     m_track_number       = 0;
     m_coin_target        = 0;
+    m_powerup_special_modifier
+                         = Powerup::TSM_NONE;
+    m_world_tmodifiers   = 0;
+    m_infinite_mode      = false;
     m_started_from_overworld = false;
     m_have_kart_last_position_on_overworld = false;
     m_num_local_players = 0;
@@ -689,6 +698,7 @@ void RaceManager::startNextRace()
         Log::error("RaceManager", "Could not create given race mode.");
         assert(0);
     }
+
     main_loop->renderGUI(200);
 
     // A second constructor phase is necessary in order to be able to
@@ -1046,6 +1056,8 @@ void RaceManager::exitRace(bool delete_world)
     m_track_number = 0;
 
     RichPresenceNS::RichPresence::get()->update(true);
+    GlobalLog::closeLog(GlobalLogTypes::POS_LOG);
+
 }   // exitRace
 
 //---------------------------------------------------------------------------------------------
@@ -1079,6 +1091,18 @@ void RaceManager::kartFinishedRace(const AbstractKart *kart, float time)
 
     m_kart_status[id].m_overall_time += time;
     m_kart_status[id].m_last_time     = time;
+
+    if (!kart->isEliminated())
+    {
+        // Log the finisher for wrapper handling
+        std::string player_name = GlobalLog::getPlayerName(id);
+        std::string kart_name = kart->getIdent();
+        Log::verbose("RaceManager", "Finisher: %s %f %s",
+                player_name.c_str(), time, kart_name.c_str());
+        // legacy support
+        GlobalLog::writeLog(player_name + " " + std::to_string(time) + " " + kart_name + "\n",
+                GlobalLogTypes::POS_LOG);
+    }
     m_num_finished_karts ++;
     if(kart->getController()->isPlayerController())
         m_num_finished_players++;
@@ -1154,7 +1178,8 @@ void RaceManager::startSingleRace(const std::string &track_ident,
 
     setTrack(track_ident);
 
-    if (num_laps != -1) setNumLaps( num_laps );
+    if (isInfiniteMode()) setNumLaps( std::numeric_limits<int>::max() );
+    else if (num_laps != -1) setNumLaps( num_laps );
 
     setMajorMode(RaceManager::MAJOR_MODE_SINGLE);
 
@@ -1349,3 +1374,245 @@ void RaceManager::scheduleBenchmark()
 {
     m_scheduled_benchmark = true;
 }   // scheduleBenchmark
+
+//---------------------------------------------------------------------------------------------
+bool RaceManager::getMinorModeFromName(const std::string& name, MinorRaceModeType* out,
+        const bool allow_singleplayer, const bool allow_experimental)
+{
+    if (name == "normal" || name == "race" || name == "normal-race")
+    {
+        *out = MINOR_MODE_NORMAL_RACE;
+        return true;
+    }
+    if (name == "timed" || name == "time" || name == "time-trial")
+    {
+        *out = MINOR_MODE_TIME_TRIAL;
+        return true;
+    }
+    if (allow_singleplayer && (name == "follow-the-leader" || name == "ftl"))
+    {
+        *out = MINOR_MODE_FOLLOW_LEADER;
+        return true;
+    }
+    if (allow_singleplayer && (name == "three-strikes-battle" ||
+                               name == "3-strikes-battle" ||
+                               name == "tsb" ||
+                               name == "3sb"))
+    {
+        *out = MINOR_MODE_3_STRIKES;
+        return true;
+    }
+    if (name == "free-for-all" || name == "ffa")
+    {
+        *out = MINOR_MODE_FREE_FOR_ALL;
+        return true;
+    }
+    if (name == "capture-the-flag" || name == "ctf")
+    {
+        *out = MINOR_MODE_CAPTURE_THE_FLAG;
+        return true;
+    }
+    if (allow_singleplayer && (name == "egg-hunt" ||
+                               name == "easter-egg-hunt" ||
+                               name == "eeh"))
+    {
+        *out = MINOR_MODE_EASTER_EGG;
+        return true;
+    }
+    if (name == "soccer")
+    {
+        *out = MINOR_MODE_SOCCER;
+        return true;
+    }
+
+    return false;
+}
+
+//---------------------------------------------------------------------------------------------
+bool RaceManager::getDifficultyFromName(const std::string& name, Difficulty* out)
+{
+    if (name == "novice" || name == "easy" || name == "noob" || name == "noob-difficulty")
+    {
+        *out = DIFFICULTY_EASY;
+        return true;
+    }
+    if (name == "intermediate" || name == "medium")
+    {
+        *out = DIFFICULTY_MEDIUM;
+        return true;
+    }
+    if (name == "expert" || name == "hard")
+    {
+        *out = DIFFICULTY_HARD;
+        return true;
+    }
+    if (name == "supertux" || name == "supertuxkart" || name == "best")
+    {
+        *out = DIFFICULTY_BEST;
+        return true;
+    }
+
+    return false;
+}
+
+//---------------------------------------------------------------------------------------------
+KartTeam RaceManager::getPoleTeam(NetworkPlayerProfile* profile) const
+{
+    if (!profile || profile->getTeam() == KART_TEAM_NONE || !hasPolePlayers())
+        return KART_TEAM_NONE;
+
+    std::shared_ptr<NetworkPlayerProfile> blue_pole, red_pole;
+    blue_pole = getBluePole();
+    red_pole = getRedPole();
+    
+    if (profile->getTeam() == KART_TEAM_RED && red_pole.get() == profile)
+        return KART_TEAM_RED;
+    if (profile->getTeam() == KART_TEAM_BLUE && blue_pole.get() == profile)
+        return KART_TEAM_BLUE;
+    return KART_TEAM_NONE;
+} // getPoleTeam
+//---------------------------------------------------------------------------------------------
+std::shared_ptr<NetworkPlayerProfile> RaceManager::getBluePole() const
+{
+    if (m_blue_pole.expired())
+        return nullptr;
+
+    return m_blue_pole.lock();
+} // getBluePole
+//---------------------------------------------------------------------------------------------
+std::shared_ptr<NetworkPlayerProfile> RaceManager::getRedPole() const
+{
+    if (m_red_pole.expired())
+        return nullptr;
+
+    return m_red_pole.lock();
+} // getRedPole
+//---------------------------------------------------------------------------------------------
+void RaceManager::setBluePole(std::shared_ptr<NetworkPlayerProfile>& profile)
+{
+    m_blue_pole = profile;
+} // setBluePole
+//---------------------------------------------------------------------------------------------
+void RaceManager::setRedPole(std::shared_ptr<NetworkPlayerProfile>& profile)
+{
+    m_red_pole = profile;
+} // setRedPole
+//---------------------------------------------------------------------------------------------
+void RaceManager::resetPoleProfile(std::shared_ptr<NetworkPlayerProfile>& profile)
+{
+    if (profile == nullptr)
+        return;
+
+    std::shared_ptr<NetworkPlayerProfile> blue_pole = nullptr, red_pole = nullptr;
+
+    if (!m_blue_pole.expired()) blue_pole = m_blue_pole.lock();
+    if (!m_red_pole.expired()) red_pole = m_red_pole.lock();
+
+    if (blue_pole == profile) m_blue_pole.reset();
+    if (red_pole == profile) m_red_pole.reset();
+} // resetPoleProfile
+//---------------------------------------------------------------------------------------------
+void RaceManager::resetPoleProfile(STKPeer* peer)
+{
+    if (peer == nullptr)
+        return;
+
+    std::shared_ptr<NetworkPlayerProfile> blue_pole = nullptr, red_pole = nullptr;
+
+    if (!m_blue_pole.expired()) blue_pole = m_blue_pole.lock();
+    if (!m_red_pole.expired()) red_pole = m_red_pole.lock();
+
+    for (auto& profile : peer->getPlayerProfiles())
+    {
+        if (blue_pole == profile) m_blue_pole.reset();
+        if (red_pole == profile) m_red_pole.reset();
+    }
+} // resetPoleProfile
+//---------------------------------------------------------------------------------------------
+void RaceManager::clearPoles()
+{
+    m_blue_pole.reset();
+    m_red_pole.reset();
+}
+void RaceManager::setPowerupSpecialModifier(const Powerup::SpecialModifier modifier)
+{
+    m_powerup_special_modifier = modifier;
+}
+//---------------------------------------------------------------------------------------------
+void RaceManager::setWorldTimedModifiers(const uint32_t value)
+{
+    m_world_tmodifiers = value;
+}
+//---------------------------------------------------------------------------------------------
+uint32_t RaceManager::applyWorldTimedModifiers(const uint32_t value)
+{
+    m_world_tmodifiers |= value;
+    return m_world_tmodifiers;
+}
+//---------------------------------------------------------------------------------------------
+uint32_t RaceManager::eraseWorldTimedModifiers(const uint32_t value)
+{
+    m_world_tmodifiers &= ~value;
+    return m_world_tmodifiers;
+}
+//---------------------------------------------------------------------------------------------
+void RaceManager::chaosGivePowerup(AbstractKart* kart)
+{
+    kart->setPowerup(PowerupManager::POWERUP_NOTHING, 0);
+
+    RandomGenerator rg;
+    unsigned int pw = rg.get(
+            PowerupManager::POWERUP_MAX - 4 - 3) + 1;
+    if (pw >= PowerupManager::POWERUP_SWATTER)
+        pw++;
+    if (pw >= PowerupManager::POWERUP_SWITCH)
+        pw++;
+    if (pw >= PowerupManager::POWERUP_PLUNGER)
+        pw++;
+    kart->setPowerup((PowerupManager::PowerupType)pw, 10);
+    kart->setEnergy(kart->getEnergy() + 7.0f);
+
+    if (!kart->getController()->isNetworkPlayerController())
+        return;
+    
+    // also notify the player with ServerLobby protocol if available
+    auto sl = LobbyProtocol::get<ServerLobby>();
+    if (!sl)
+        return;
+
+    NetworkPlayerProfile* npp = 
+        kart->getController()->getNetworkPlayerProfile();
+    if (!npp)
+        return;
+
+    std::string msg("Powerup randomized! Nitro is filled up!");
+    std::shared_ptr<STKPeer> peer = npp->getPeer();
+    if (!peer)
+        return;
+
+    sl->sendStringToPeer(msg, peer);
+}
+bool RaceManager::isInfiniteMode() const
+{
+    return m_infinite_mode;
+}
+void RaceManager::setInfiniteMode(bool state, bool use_sl)
+{
+    m_infinite_mode = state;
+    if (state)
+        ServerLobby::m_fixed_laps = std::numeric_limits<int>::max();
+    else
+        ServerLobby::m_fixed_laps = -1;
+
+    // also notify the player with ServerLobby protocol if available
+    auto sl = LobbyProtocol::get<ServerLobby>();
+    if (!sl || !use_sl)
+        return;
+
+    sl->updateServerConfiguration(-1, -1, state ? 0 : -1);
+
+    std::string msg("Games are now ");
+    msg += state ? "infinite" : "finite";
+    msg += ".";
+    sl->sendStringToAllPeers(msg);
+}

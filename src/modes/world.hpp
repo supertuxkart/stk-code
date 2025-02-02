@@ -170,6 +170,11 @@ protected:
 
     bool m_schedule_exit_race;
 
+    /** This method should be implemented by isRaceOver, and always return 
+     * true in case if this member is true.
+     */
+    bool m_schedule_interrupt_race; 
+
     bool m_schedule_tutorial;
 
     Phase m_scheduled_pause_phase;
@@ -315,6 +320,13 @@ public:
     // ------------------------------------------------------------------------
     virtual void onMouseClick(int x, int y) {};
 
+    // Virtual functions Pole related
+    // ===============
+    virtual const btTransform &getRedPoleStartTransform();
+    virtual const btTransform &getBluePoleStartTransform();
+    virtual const int getRedPoleStartTransformID() { return 2; }
+    virtual const int getBluePoleStartTransformID() { return 1; }
+
     // Other functions
     // ===============
     Highscores     *getHighscores() const;
@@ -322,8 +334,15 @@ public:
     void            schedulePause(Phase phase);
     void            scheduleUnpause();
     void            scheduleExitRace() { m_schedule_exit_race = true; }
+    void            scheduleInterruptRace()
+                                  { m_schedule_interrupt_race = true; }
     void            scheduleTutorial();
     void            updateWorld(int ticks);
+    // Timed TierS modifiers
+    // =====================
+    int             m_wtm_chaosparty_ticks;
+    virtual void    updateTSMFeatures(int ticks);
+
     void            handleExplosion(const Vec3 &xyz, AbstractKart *kart_hit,
                                     PhysicalObject *object);
     AbstractKart*   getPlayerKart(unsigned int player) const;

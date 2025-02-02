@@ -215,6 +215,11 @@ void ThreeStrikesBattle::kartAdded(AbstractKart* kart, scene::ISceneNode* node)
  */
 bool ThreeStrikesBattle::kartHit(int kart_id, int hitter)
 {
+    if (m_schedule_interrupt_race)
+    {
+        return true;
+    }
+
     if (isRaceOver()) return false;
 
     SpareTireAI* sta =

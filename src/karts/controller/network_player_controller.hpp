@@ -18,6 +18,7 @@
 #define HEADER_NETWORK_PLAYER_CONTROLLER_HPP
 
 #include "karts/controller/player_controller.hpp"
+#include "karts/controller/kart_control.hpp"
 #include "network/network_config.hpp"
 
 class AbstractKart;
@@ -25,8 +26,12 @@ class Player;
 
 class NetworkPlayerController : public PlayerController
 {
+private:
+    NetworkPlayerProfile* m_player_profile;
 public:
-    NetworkPlayerController(AbstractKart *kart) : PlayerController(kart)
+    NetworkPlayerController(AbstractKart *kart,
+            NetworkPlayerProfile *npp = nullptr) : PlayerController(kart),
+                                                   m_player_profile(npp)
     {
         Log::info("NetworkPlayerController",
                   "New network player controller.");
@@ -44,6 +49,11 @@ public:
     {
         return false; 
     }   // isLocal
+    virtual bool  isNetworkPlayerController () const OVERRIDE  { return true; }
+    virtual NetworkPlayerProfile*
+        getNetworkPlayerProfile () const OVERRIDE  { return m_player_profile; }
+    virtual void updateNetworkPlayerProfile(NetworkPlayerProfile* npp) OVERRIDE
+    { m_player_profile = npp; };
     // ------------------------------------------------------------------------
     /** Update for network controller. For player with a high ping it is
      *  useful to reduce shaking by reducing the steering somewhat in each

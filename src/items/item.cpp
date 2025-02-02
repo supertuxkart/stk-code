@@ -562,3 +562,4 @@ void Item::updateGraphics(float dt)
 
     m_was_available_previously = isAvailable();
 }   // updateGraphics
+

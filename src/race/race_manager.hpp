@@ -26,12 +26,15 @@
   * track was selected, etc.
   */
 
+#include <memory>
 #include <vector>
 #include <algorithm>
 #include <cassert>
 #include <string>
 
+#include "network/network_player_profile.hpp"
 #include "network/remote_kart_info.hpp"
+#include "items/powerup.hpp"
 #include "race/grand_prix_data.hpp"
 #include "utils/vec3.hpp"
 #include "utils/types.hpp"
@@ -293,9 +296,22 @@ public:
 
     };   // KartStatus
 private:
-
+     bool m_itemless_mode = false;
+     bool m_nitroless_mode = false;
     /** The kart status data for each kart. */
     std::vector<KartStatus>          m_kart_status;
+
+    /** Pole: Race Manager side */
+    std::weak_ptr<NetworkPlayerProfile>
+                                     m_blue_pole,
+                                     m_red_pole;
+
+    /** TierS' Powerup Special Modifier */
+    Powerup::SpecialModifier         m_powerup_special_modifier;
+    /** Timed world modifiers */
+    uint32_t                         m_world_tmodifiers;
+    /** Infinite game mode */
+    bool                             m_infinite_mode;
 
     /** The selected difficulty. */
     Difficulty                       m_difficulty;
@@ -373,6 +389,10 @@ private:
     bool m_scheduled_benchmark;
 
 public:
+    void setItemlessMode(bool enabled) { m_itemless_mode = enabled; }
+    bool getItemlessMode() const { return m_itemless_mode; }
+    void setNitrolessMode(bool enabled) { m_nitroless_mode = enabled; }
+    bool getNitrolessMode() const { return m_nitroless_mode; }
     // ----------------------------------------------------------------------------------------
     static RaceManager* get();
     // ----------------------------------------------------------------------------------------
@@ -574,6 +594,8 @@ public:
             default: assert(false);         return "";
         }
     }
+    static bool getMinorModeFromName(const std::string& name, MinorRaceModeType* out,
+            bool allow_singleplayer = true, bool allow_experimental = false);
     // ----------------------------------------------------------------------------------------
     unsigned int getNumPlayers() const 
     {
@@ -613,6 +635,8 @@ public:
         }
         return "";
     }   // getDifficultyAsString
+
+    static bool getDifficultyFromName(const std::string& name, Difficulty* out);
 
     // ----------------------------------------------------------------------------------------
     core::stringw getDifficultyName(Difficulty diff) const;
@@ -948,6 +972,51 @@ public:
             m_minor_mode == MINOR_MODE_CAPTURE_THE_FLAG ||
             m_minor_mode == MINOR_MODE_FREE_FOR_ALL;
     }
+
+    /** Pole: methods */
+    bool hasPolePlayers() const 
+    {
+        return (!m_blue_pole.expired() && m_blue_pole.lock() != nullptr) ||
+               (!m_red_pole.expired() && m_red_pole.lock() != nullptr);
+    }
+    bool hasBluePole() const
+    {
+        return (!m_blue_pole.expired() && m_blue_pole.lock() != nullptr);
+    }
+    bool hasRedPole() const
+    {
+        return (!m_red_pole.expired() && m_red_pole.lock() != nullptr);
+    }
+    KartTeam getPoleTeam(NetworkPlayerProfile* profile) const;
+    std::weak_ptr<NetworkPlayerProfile> getBluePoleWeak() const { return m_blue_pole; }
+    std::weak_ptr<NetworkPlayerProfile> getRedPoleWeak() const  { return m_red_pole; }
+    std::shared_ptr<NetworkPlayerProfile> getBluePole() const;
+    std::shared_ptr<NetworkPlayerProfile> getRedPole() const;
+    void setBluePole(std::shared_ptr<NetworkPlayerProfile>& profile);
+    void setRedPole(std::shared_ptr<NetworkPlayerProfile>& profile);
+    void resetBluePole() { m_blue_pole.reset(); }
+    void resetRedPole() { m_red_pole.reset(); }
+    void resetPoleProfile(std::shared_ptr<NetworkPlayerProfile>& profile);
+    void resetPoleProfile(STKPeer* peer);
+    void clearPoles();
+    // ----------------------------------------------------------------------------------------
+    /** Time-based modifiers: m_world_tmodifiers */
+    uint32_t getWorldTimedModifiers() const { return m_world_tmodifiers; }
+    // ----------------------------------------------------------------------------------------
+    void setWorldTimedModifiers(uint32_t value);
+    // ----------------------------------------------------------------------------------------
+    uint32_t applyWorldTimedModifiers(uint32_t value);
+    // ----------------------------------------------------------------------------------------
+    uint32_t eraseWorldTimedModifiers(uint32_t value);
+    // ----------------------------------------------------------------------------------------
+    // Chaos party
+    void chaosGivePowerup(AbstractKart* kart);
+    // ----------------------------------------------------------------------------------------
+
+    Powerup::SpecialModifier getPowerupSpecialModifier() const { return m_powerup_special_modifier; }
+    void setPowerupSpecialModifier(Powerup::SpecialModifier modifier);
+    bool isInfiniteMode() const;
+    void setInfiniteMode(bool state, bool use_sl = true);
 };   // RaceManager
 
 #endif

@@ -108,6 +108,13 @@ void DemoWorld::setTracks(const std::vector<std::string> &tracks)
  */
 bool DemoWorld::isRaceOver()
 {
+    if (m_schedule_interrupt_race)
+    {
+        return true;
+    }
+    if (RaceManager::get()->isInfiniteMode())
+        return false;
+
     if(m_abort) return true;
 
     // Now it must be laps based profiling:

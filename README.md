@@ -1,3 +1,12 @@
+# About this fork:
+This fork has the aim to bring as many good functions for STK-Soccer together. That is why, this fork includes code from other STK forks.
+1) The code changes here are not only done by me but also from NobWow and Bcf-World. Sometimes the owner of the changes is not clearly visuable because they are pushed online from my account.
+2) Some parts of the code are taken or inspired from other Supertuxkart-Forks, so we want to mention them here:
+* https://github.com/STK-TheRocker/stk-code
+* https://github.com/STK-TheRocker/stk-rocker/
+* https://github.com/Snoker101/stk-code
+* https://github.com/kimden/stk-code
+
 # SuperTuxKart
 [![Linux build status](https://github.com/supertuxkart/stk-code/actions/workflows/linux.yml/badge.svg)](https://github.com/supertuxkart/stk-code/actions/workflows/linux.yml)
 [![Apple build status](https://github.com/supertuxkart/stk-code/actions/workflows/apple.yml/badge.svg)](https://github.com/supertuxkart/stk-code/actions/workflows/apple.yml)

@@ -55,13 +55,33 @@ namespace StringUtils
                           rhs.c_str()                             )==0;
     }   // hasSuffix
 
-    bool startsWith(const std::string& str, const std::string& prefix)
+    bool startsWith(const std::string& str, const std::string& prefix, const bool ignoreCase)
     {
         if (str.length() < prefix.length())
             return false;
+        else if (ignoreCase)
+            return strncasecmp(str.c_str(), prefix.c_str(), prefix.size())==0;
         else
             return strncmp(str.c_str(), prefix.c_str(), prefix.size())==0;
-    }
+    }   // startsWith
+
+    bool wideStartsWith(const core::stringw& str, const core::stringw& prefix, const bool ignoreCase)
+    {
+        if (str.size() < prefix.size())
+            return false;
+        else if (ignoreCase)
+            return wcsncasecmp(str.c_str(), prefix.c_str(), prefix.size()) == 0;
+        else
+            return wcsncmp(str.c_str(), prefix.c_str(), prefix.size()) == 0;
+    }   //wideStartsWith
+
+    bool equalsIgnoreCase(const std::string& a, const std::string& b)
+    {
+        if (a.length() != b.length())
+            return false;
+
+        return strncasecmp(a.c_str(), b.c_str(), a.length());
+    }   //equalsIgnoreCase
 
     //-------------------------------------------------------------------------
     /** Returns the path of a filename, i.e. everything till the last '/'.

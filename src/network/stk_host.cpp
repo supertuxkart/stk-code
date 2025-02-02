@@ -41,6 +41,7 @@
 #include "utils/time.hpp"
 #include "utils/vs.hpp"
 
+#include <cstddef>
 #include <string.h>
 #if defined(WIN32)
 #  include "ws2tcpip.h"
@@ -1432,7 +1433,71 @@ std::vector<std::shared_ptr<NetworkPlayerProfile> >
     lock.unlock();
     return p;
 }   // getAllPlayerProfiles
+//-----------------------------------------------------------------------------
+std::vector<std::shared_ptr<NetworkPlayerProfile> >
+    STKHost::getPlayerProfilesOfTeam(const KartTeam team,
+            const bool onlyCanPlay) const
+{
+    std::vector<std::shared_ptr<NetworkPlayerProfile> > p;
+    std::unique_lock<std::mutex> lock(m_peers_mutex);
+    for (auto& peer : m_peers)
+    {
+        if (peer.second->isDisconnected() || !peer.second->isValidated())
+            continue;
+        if (ServerConfig::m_ai_handling && peer.second->isAIPeer())
+            continue;
+        if (onlyCanPlay && (peer.second->isSpectator() ||
+                    peer.second->alwaysSpectate()))
+            continue;
+        for (auto& profile : peer.second->getPlayerProfiles())
+        {
+            if (profile->getTeam() != team)
+                continue;
 
+            if (onlyCanPlay && (profile->getPermissionLevel() < ServerLobby::PERM_PLAYER ||
+                        profile->hasRestriction(PRF_NOGAME)))
+                continue;
+
+            p.push_back(profile);
+        }
+    }
+    lock.unlock();
+    return p;
+}   // getAllPlayerProfiles
+//-----------------------------------------------------------------------------
+void STKHost::getTeamLists(
+    std::vector<std::shared_ptr<NetworkPlayerProfile>>& blue_team,
+    std::vector<std::shared_ptr<NetworkPlayerProfile>>& red_team,
+    const bool onlyCanPlay) const
+{
+    std::unique_lock<std::mutex> lock(m_peers_mutex);
+    for (auto& peer : m_peers)
+    {
+        if (peer.second->isDisconnected() || !peer.second->isValidated())
+            continue;
+        if (onlyCanPlay && (peer.second->isSpectator() ||
+                    peer.second->alwaysSpectate()))
+            continue;
+        if (ServerConfig::m_ai_handling && peer.second->isAIPeer())
+            continue;
+        for (auto& profile : peer.second->getPlayerProfiles())
+        {
+            if (profile->getTeam() == KART_TEAM_NONE)
+                continue;
+
+            if (onlyCanPlay && (profile->getPermissionLevel() < ServerLobby::PERM_PLAYER ||
+                        profile->hasRestriction(PRF_NOGAME)))
+                continue;
+
+            if (profile->getTeam() == KART_TEAM_BLUE)
+                blue_team.push_back(profile);
+
+            else
+                red_team.push_back(profile);
+        }
+    }
+    lock.unlock();
+} // getTeamLists
 //-----------------------------------------------------------------------------
 std::set<uint32_t> STKHost::getAllPlayerOnlineIds() const
 {
@@ -1465,19 +1530,47 @@ std::shared_ptr<STKPeer> STKHost::findPeerByHostId(uint32_t id) const
 }   // findPeerByHostId
 
 //-----------------------------------------------------------------------------
-std::shared_ptr<STKPeer>
-    STKHost::findPeerByName(const core::stringw& name) const
+std::shared_ptr<STKPeer> STKHost::findPeerByOnlineId(uint32_t id) const
 {
     std::lock_guard<std::mutex> lock(m_peers_mutex);
     auto ret = std::find_if(m_peers.begin(), m_peers.end(),
-        [name](const std::pair<ENetPeer*, std::shared_ptr<STKPeer> >& p)
+        [id](const std::pair<ENetPeer*, std::shared_ptr<STKPeer> >& p)
+        {
+            return p.second->hasPlayerProfiles() && 
+                p.second->getPlayerProfiles()[0]->getOnlineId() == id;
+        });
+    return ret != m_peers.end() ? ret->second : nullptr;
+}  // findPeerByOnlineId
+//-----------------------------------------------------------------------------
+std::shared_ptr<STKPeer>
+    STKHost::findPeerByName(const core::stringw& name,
+            const bool ignoreCase, const bool onlyPrefix,
+            std::shared_ptr<NetworkPlayerProfile>* const out_ptr) const
+{
+    std::lock_guard<std::mutex> lock(m_peers_mutex);
+    auto ret = std::find_if(m_peers.begin(), m_peers.end(),
+        [name, onlyPrefix, ignoreCase, out_ptr](const std::pair<ENetPeer*, std::shared_ptr<STKPeer> >& p)
         {
             bool found = false;
             for (auto& profile : p.second->getPlayerProfiles())
             {
-                if (profile->getName() == name)
+                const irr::core::stringw& cname = profile->getName();
+                if (
+                        // test equality based on priority:
+                        // case sensitive equal, case insensitive equal,
+                        // starts with case sensitive,
+                        // starts with case insensitive
+                        //
+                        (cname == name) ||
+                        (ignoreCase && cname.equals_ignore_case(name)) ||
+                        (onlyPrefix && StringUtils::wideStartsWith(cname, name)) ||
+                        (ignoreCase && onlyPrefix && StringUtils::wideStartsWith(
+                            cname, name, true/*ignoreCase*/))
+                        )
                 {
                     found = true;
+                    if (out_ptr)
+                        *out_ptr = profile;
                     break;
                 }
             }
@@ -1529,8 +1622,17 @@ std::pair<int, int> STKHost::getAllPlayersTeamInfo() const
 std::vector<std::shared_ptr<NetworkPlayerProfile> >
     STKHost::getPlayersForNewGame(bool* has_always_on_spectators) const
 {
+    // Forced position overrides if specified
     std::vector<std::shared_ptr<NetworkPlayerProfile> > players;
     std::lock_guard<std::mutex> lock(m_peers_mutex);
+    auto forced_first_player =
+        m_forced_first_player.expired() ? nullptr 
+        : m_forced_first_player.lock();
+
+    auto forced_second_player =
+        m_forced_second_player.expired() ? nullptr 
+        : m_forced_second_player.lock();
+
     for (auto& p : m_peers)
     {
         auto& stk_peer = p.second;
@@ -1547,8 +1649,78 @@ std::vector<std::shared_ptr<NetworkPlayerProfile> >
         if (ServerConfig::m_ai_handling && stk_peer->isAIPeer())
             continue;
         for (auto& q : stk_peer->getPlayerProfiles())
+        {
+
+            if (forced_second_player != nullptr &&
+                    forced_second_player == q)
+            {
+                //players.insert(players.begin(), q);
+                Log::verbose("STKHost", "%s will be added to the top of the list (#2).",
+                        StringUtils::wideToUtf8(q->getName()).c_str());
+                continue;
+            }
+
+            if (forced_first_player != nullptr &&
+                    forced_first_player == q)
+            {
+                //players.insert(players.begin(), q);
+                Log::verbose("STKHost", "%s will be added to the top of the list (#1).",
+                        StringUtils::wideToUtf8(q->getName()).c_str());
+                continue;
+            }
             players.push_back(q);
+        }
     }
+    if (forced_second_player != nullptr &&
+            forced_second_player->getPeer()->isValidated() &&
+            !forced_second_player->getPeer()->alwaysSpectate() &&
+            !forced_second_player->getPeer()->isDisconnected() &&
+            !forced_second_player->getPeer()->isAIPeer())
+        players.insert(players.begin(), forced_second_player);
+    if (forced_first_player != nullptr &&
+            forced_first_player->getPeer()->isValidated() &&
+            !forced_first_player->getPeer()->alwaysSpectate() &&
+            !forced_first_player->getPeer()->isDisconnected() &&
+            !forced_first_player->getPeer()->isAIPeer())
+        players.insert(players.begin(), forced_first_player);
+#if 0
+    if (players.size() <= 2)
+    {
+        Log::info("STKHost", "Altering player order is not necessary. There's not enough players to make a difference.");
+        return players;
+    }
+    if (first_resid == second_resid && found0 && found1)
+    {
+        Log::error("STKHost", "Forced first and second kart positions"
+                " collide. Kart positions have not been changed.");
+        return players;
+    }
+    std::shared_ptr<NetworkPlayerProfile> temp;
+    // Swap first and second
+    if (found0 && found1 && players.size() > 1 && first_resid == 1 && second_resid == 0)
+    {
+        temp = players[0];
+        players[0] = players[1];
+        players[1] = temp;
+        Log::verbose("STKHost", "Swapped first #0 and second #1 player positions.");
+        return players;
+    }
+    if (players.size() > 0 && found0 && first_resid != 0)
+    {
+        temp = players[0];
+        players[0] = players[first_resid];
+        players[first_resid] = temp;
+        Log::verbose("STKHost", "Set %u player to #0.", first_resid);
+    }
+    if (players.size() > 1 && found1 && second_resid != 1)
+    {
+        temp = players[1];
+        players[1] = players[second_resid];
+        players[second_resid] = temp;
+        Log::verbose("STKHost", "Set %u player to #1.", second_resid);
+    }
+#endif
+
     return players;
 }   // getPlayersForNewGame
 
@@ -1632,3 +1804,27 @@ uint16_t STKHost::getPrivatePort() const
 {
     return m_network->getPort();
 }  // getPrivatePort
+bool STKHost::isPeerInTeam(
+    std::shared_ptr<STKPeer>& p, const KartTeam team) const
+{
+    if (!p->hasPlayerProfiles()) return false;
+
+    for (auto& profile : p->getPlayerProfiles())
+    {
+        if (profile->getTeam() == team)
+            return true;
+    }
+    return false;
+}
+bool STKHost::isPeerInTeam(
+    STKPeer* p, const KartTeam team) const
+{
+    if (!p->hasPlayerProfiles()) return false;
+
+    for (auto& profile : p->getPlayerProfiles())
+    {
+        if (profile->getTeam() == team)
+            return true;
+    }
+    return false;
+}

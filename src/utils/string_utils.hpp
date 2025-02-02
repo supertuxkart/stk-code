@@ -21,6 +21,13 @@
 #ifndef HEADER_STRING_UTILS_HPP
 #define HEADER_STRING_UTILS_HPP
 
+#ifdef _MSC_VER
+#define strncasecmp _strnicmp
+#define strcasecmp _stricmp
+#define wcsncasecmp _wcsnicmp
+#define wstrcasecmp _wstricmp
+#endif
+
 #include "utils/types.hpp"
 #include <limits>
 #include <string>
@@ -36,7 +43,12 @@ namespace StringUtils
     int versionToInt(const std::string &s);
 
     bool hasSuffix(const std::string& lhs, const std::string &rhs);
-    bool startsWith(const std::string& str, const std::string& prefix);
+    bool startsWith(const std::string& str, const std::string& prefix, bool ignoreCase=false);
+    bool wideStartsWith(const irr::core::stringw& str, const irr::core::stringw& prefix, bool ignoreCase=false);
+    bool equalsIgnoreCase(const std::string& a, const std::string& b);
+
+    // irr::core::stringw::equals_ignore_case() exists
+    //bool wideEquals(const irr::core::stringw& a, const irr::core::stringw& b, bool ignoreCase=false);
 
     /** Return the filename part of a path */
     std::string getBasename(const std::string& filename);

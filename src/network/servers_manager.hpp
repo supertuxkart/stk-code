@@ -72,7 +72,7 @@ public:
     // ------------------------------------------------------------------------
     std::vector<SocketAddress> getBroadcastAddresses(bool ipv6);
     // ------------------------------------------------------------------------
-    std::shared_ptr<ServerList> getWANRefreshRequest() const;
+    std::shared_ptr<ServerList> getWANRefreshRequest(bool doIPDetection = true) const;
     // ------------------------------------------------------------------------
     std::shared_ptr<ServerList> getLANRefreshRequest() const;
 

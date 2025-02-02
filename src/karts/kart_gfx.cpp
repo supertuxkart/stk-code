@@ -36,7 +36,20 @@
 #include "utils/log.hpp"
 #include "race/race_manager.hpp"
 
+#include <algorithm>
 #include <iostream>
+
+
+#define KART_GFX_SS_NITRO_LIGHT_MAX     1
+#define KART_GFX_SS_SKID_LIGHT_1_MAX    1
+#define KART_GFX_SS_SKID_LIGHT_2_MAX    1
+#define KART_GFX_SS_NITRO_RATE_MIN      1
+#define KART_GFX_SS_SKID_RATE_MIN       100
+#define KART_GFX_SS_ZIPPER_RATE_MIN     10
+#define KART_GFX_SS_NITRO_RATE_MAX      800
+#define KART_GFX_SS_SKID_RATE_MAX       2000
+#define KART_GFX_SS_ZIPPER_RATE_MAX     100
+ 
 
 KartGFX::KartGFX(const AbstractKart *kart, bool is_day)
 {
@@ -87,6 +100,10 @@ KartGFX::KartGFX(const AbstractKart *kart, bool is_day)
         m_skidding_light_1->grab();
         m_skidding_light_2->grab();
     }
+#else
+    m_ss_nitro_rate     = 0.0f;
+    m_ss_skid_rate      = 0.0f;
+    m_ss_zipper_rate    = 0.0f;
 #endif
 
     // Create particle effects
@@ -154,6 +171,10 @@ KartGFX::~KartGFX()
         m_skidding_light_1->drop();
         m_skidding_light_2->drop();
     }
+#else
+    m_ss_nitro_rate = 0.0f;
+    m_ss_skid_rate = 0.0f;
+    m_ss_zipper_rate = 0.0f;
 #endif
 
 }   // ~KartGFX
@@ -278,11 +299,11 @@ void KartGFX::setSkidLevel(const unsigned int level)
         m_all_emitters[KGFX_SKID1L]->setParticleType(pk);
     if(m_all_emitters[KGFX_SKID1R])
         m_all_emitters[KGFX_SKID1R]->setParticleType(pk);
+#endif
     // Relative 0 means it will emitt the minimum rate, i.e. the rate
     // set to indicate that the bonus is now available.
     setCreationRateRelative(KartGFX::KGFX_SKIDL, 0.0f);
     setCreationRateRelative(KartGFX::KGFX_SKIDR, 0.0f);
-#endif
 }   // setSkidLevel
 
 // ----------------------------------------------------------------------------
@@ -340,6 +361,22 @@ void KartGFX::setCreationRateAbsolute(KartGFXType type, float f)
         return;
 
     m_all_emitters[type]->setCreationRateAbsolute(f);
+#else
+    // for now only those that are returned in getGFXStatus() are implemented
+    switch (type)
+    {
+        case KartGFX::KGFX_ZIPPER:
+            m_ss_zipper_rate = f;
+            break;
+        case KartGFX::KGFX_SKIDL:
+            m_ss_skid_rate = f * KART_GFX_SS_SKID_RATE_MAX;
+            break;
+        case KartGFX::KGFX_NITRO1:
+            m_ss_nitro_rate = f;
+            break;
+        default:
+            break;
+    }
 #endif
 }   // setCreationRateAbsolute
 
@@ -363,6 +400,23 @@ void KartGFX::setCreationRateRelative(KartGFXType type, float f)
             m_all_emitters[type]->setCreationRateAbsolute(0);
         else
             m_all_emitters[type]->setCreationRateRelative(f);
+    }
+#else
+    // for now only those that are returned in getGFXStatus() are implemented
+    switch (type)
+    {
+        case KartGFX::KGFX_ZIPPER:
+            m_ss_zipper_rate = f * KART_GFX_SS_ZIPPER_RATE_MAX;
+            break;
+        case KartGFX::KGFX_SKIDL:
+            m_ss_skid_rate = f == 0.0f ? KART_GFX_SS_SKID_RATE_MIN :
+                f * KART_GFX_SS_SKID_RATE_MAX;
+            break;
+        case KartGFX::KGFX_NITRO1:
+            m_ss_nitro_rate = f * KART_GFX_SS_NITRO_RATE_MAX;
+            break;
+        default:
+            break;
     }
 #endif
 }   // setCreationRateRelative
@@ -448,6 +502,12 @@ void KartGFX::update(float dt)
         if (m_all_emitters[i])
             m_all_emitters[i]->update(dt);
     }
+#else
+    // decrease the zipper effect gradually
+    if (m_ss_zipper_rate)
+    {
+        m_ss_zipper_rate -= std::min(m_ss_zipper_rate, std::max(dt * 60.0f, 10.0f));
+    }
 #endif
 
 }  // update
@@ -489,6 +549,17 @@ void KartGFX::updateNitroGraphics(float nitro_frac)
     // Exhaust is always emitting
     setCreationRateRelative(KartGFX::KGFX_EXHAUST1, 1.0);
     setCreationRateRelative(KartGFX::KGFX_EXHAUST2, 1.0);
+#else
+    if (nitro_frac > 0)
+    {
+        //
+        m_ss_nitro_rate = nitro_frac * 800.0f;
+    }
+    else
+    {
+        //
+        m_ss_nitro_rate = 0;
+    }
 #endif
 }  // updateGraphics
 
@@ -505,6 +576,7 @@ void KartGFX::updateSkidLight(unsigned int level)
         m_skidding_light_1->setVisible(level == 1);
         m_skidding_light_2->setVisible(level > 1);
     }
+#else
 #endif
 }   // updateSkidLight
 
@@ -541,6 +613,12 @@ void KartGFX::getGFXStatus(int* nitro, bool* zipper,
     *zipper = z;
     *skidding = s;
     *red_skidding = r;
+#else
+    // TierS Addition: apply fixed creation rate for server-recorded replays
+    *nitro = m_ss_nitro_rate;
+    *zipper = m_ss_zipper_rate > 0;
+    *skidding = m_ss_skid_rate;
+    *red_skidding = m_skid_level == 2;
 #endif
 }   // getGFXStatus
 

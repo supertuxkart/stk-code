@@ -20,6 +20,7 @@
 #define HEADER_POWERUP_HPP
 
 #define MAX_POWERUPS 5
+#define TIERS_TMODIFIER_CHAOSPARTY 1
 
 #include "items/powerup_manager.hpp"  // needed for powerup_type
 #include "utils/no_copy.hpp"
@@ -36,6 +37,17 @@ class SFXBase;
   */
 class Powerup : public NoCopy
 {
+public:
+    /** TierS additions: forced powerup type and amount, additional powerups etc... */
+    enum SpecialModifier : uint8_t
+    {
+        TSM_NONE = 0,
+        TSM_BOWLPARTY = 1,  // getRandomPowerup is not used, hitBonusBox always sets
+        TSM_CAKEPARTY =2,   // BOWLING with n=3
+        TSM_PLUNGERPARTY =3, // Time to partyyy
+        TSM_ZIPPERPARTY= 4,
+        TSM_BOWLTRAININGPARTY= 5,	// PARTY TIMEZZZ
+    };
 private:
     /** Sound effect that is being played. */
     SFXBase                    *m_sound_use;
@@ -51,8 +63,11 @@ private:
 
     std::set<int>               m_played_sound_ticks;
 
+    /** TierS */
+    SpecialModifier             m_special_modifier;
+
 public:
-                    Powerup      (AbstractKart* kart_);
+                    Powerup      (AbstractKart* kart_, SpecialModifier modifier = TSM_NONE);
                    ~Powerup      ();
     void            set          (PowerupManager::PowerupType _type, int n = 1);
     void            setNum       (int n = 1);
@@ -72,6 +87,10 @@ public:
     PowerupManager::PowerupType
                     getType      () const {return m_type;  }
     // ------------------------------------------------------------------------
+
+    SpecialModifier getSpecialModifier() const { return m_special_modifier; }
+    // ------------------------------------------------------------------------
+    void            setSpecialModifier(SpecialModifier modifier);
 };
 
 #endif

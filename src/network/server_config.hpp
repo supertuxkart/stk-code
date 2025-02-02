@@ -92,6 +92,64 @@ namespace ServerConfig
         "Name of server, encode in XML if you want to use unicode "
         "characters."));
 
+        // ----Server Config Variables
+    SERVER_CFG_PREFIX BoolServerConfigParam m_supertournament
+        SERVER_CFG_DEFAULT(BoolServerConfigParam(false, "supertournament",
+                    "supertournament"));
+    SERVER_CFG_PREFIX StringServerConfigParam m_gameplan_path
+        SERVER_CFG_DEFAULT(StringServerConfigParam(
+                    "supertournament_gameplan.txt",
+                    "gameplan-file", "Path to the gameplan file. "
+                    "Defines amount of games per match, game duration, "
+                    "selectable fields or forces a certain field."));
+    SERVER_CFG_PREFIX StringServerConfigParam m_tourn_required_fields_path
+        SERVER_CFG_DEFAULT(StringServerConfigParam(
+                    "supertournament_required_fields.txt",
+                    "tourn-required-fields-path",
+                    "Path to the file that contains required fields. "
+                    "Players without said fields won't be"
+                    " able to play the game."));
+    SERVER_CFG_PREFIX StringServerConfigParam m_tourn_semi_required_fields_path
+        SERVER_CFG_DEFAULT(StringServerConfigParam(
+                    "supertournament_semi_required_fields.txt",
+                    "tourn-semi-required-fields-path",
+                    "Path to the file that contains required fields. "
+                    "Players that have less than their amount minus the "
+                    "'tourn-semi-required-fields-minus'"
+                    " won't be"
+                    " able to play the game."));
+    SERVER_CFG_PREFIX IntServerConfigParam m_tourn_semi_required_fields_minus
+        SERVER_CFG_DEFAULT(IntServerConfigParam(1,
+                    "tourn-semi-required-fields-minus",
+                    "Amount of fields that could be forgiven "
+                    "for not being installed in semi-required fields."));
+    SERVER_CFG_PREFIX StringServerConfigParam m_matchplan_path
+        SERVER_CFG_DEFAULT(StringServerConfigParam(
+                    "supertournament_matchplan.txt",
+                    "matchplan-file", "Path to the matchplan file. "
+                    "Defines scheduled matches and their results."));
+    SERVER_CFG_PREFIX BoolServerConfigParam m_update_matchplan
+        SERVER_CFG_DEFAULT(BoolServerConfigParam(false, "update-matchplan",
+                    "If set to true, matchplan will be updated"
+                    " once the game ends."));
+    SERVER_CFG_PREFIX StringServerConfigParam m_teams_path
+        SERVER_CFG_DEFAULT(StringServerConfigParam("supertournament_teams.txt",
+                    "teams-file", "Path to the teams file."));
+    SERVER_CFG_PREFIX StringServerConfigParam m_tourn_log
+        SERVER_CFG_DEFAULT(StringServerConfigParam("supertournament_log.txt", 
+                    "tourn-log-file",
+                    "File where to log the supertournament game results."));
+    SERVER_CFG_PREFIX StringServerConfigParam m_red_team
+        SERVER_CFG_DEFAULT(StringServerConfigParam(
+                    "", "red-team", "Tournament team of red players."));
+    SERVER_CFG_PREFIX StringServerConfigParam m_blue_team
+        SERVER_CFG_DEFAULT(StringServerConfigParam(
+                    "", "blue-team", "Tournament team of blue players."));
+    SERVER_CFG_PREFIX IntServerConfigParam m_fixed_lap_count
+        SERVER_CFG_DEFAULT(IntServerConfigParam(
+                    -1, "fixed-lap-count","fixed-lap-count"));
+
+
     SERVER_CFG_PREFIX IntServerConfigParam m_server_port
         SERVER_CFG_DEFAULT(IntServerConfigParam(0, "server-port",
         "Port used in server, if you specify 0, it will use the server port "
@@ -119,6 +177,91 @@ namespace ServerConfig
     SERVER_CFG_PREFIX BoolServerConfigParam m_soccer_goal_target
         SERVER_CFG_DEFAULT(BoolServerConfigParam(false, "soccer-goal-target",
         "Use goal target in soccer."));
+    
+    SERVER_CFG_PREFIX BoolServerConfigParam m_allow_powerupper
+        SERVER_CFG_DEFAULT(BoolServerConfigParam(false, "allow-powerupper",
+        "Allow powerupper."));
+
+    SERVER_CFG_PREFIX BoolServerConfigParam m_tiers_roulette
+        SERVER_CFG_DEFAULT(BoolServerConfigParam(false, "tiers-roulette",
+        "Enable roulette between features. This will rotate after every finished game."));
+
+    SERVER_CFG_PREFIX StringServerConfigParam m_tiers_roulette_sequence
+        SERVER_CFG_DEFAULT(StringServerConfigParam(
+        "kartheavy+itemchaos,kartmedium+itemchaos,kartlight+itemchaos,bowlparty,cakeparty",
+        "tiers-roulette-sequence",
+        "When TierS roulette is enabled, this is the sequence of the features being rotated. "
+        "Separate modifiers with commas: kartheavy,kartmedium,none,... "
+        "Combine modifiers with a plus sign: kartheavy+itemcakeparty,... "
+        "Specify none for the iteration to be all default (without any modifiers): none,none,... "
+        "THIS OVERRIDES THE FALSE VALUE OF THE allow-*party, which only controls the command "
+        "invocation."));
+
+    SERVER_CFG_PREFIX BoolServerConfigParam m_show_elo
+        SERVER_CFG_DEFAULT(BoolServerConfigParam(false, "show-elo",
+        "Show the elo after the username in the lobby."));
+
+    SERVER_CFG_PREFIX BoolServerConfigParam m_show_rank
+        SERVER_CFG_DEFAULT(BoolServerConfigParam(false, "show-rank",
+        "Show the rank before the username in the lobby."));
+
+    SERVER_CFG_PREFIX BoolServerConfigParam m_allow_heavyparty
+        SERVER_CFG_DEFAULT(BoolServerConfigParam(false, "allow-heavyparty",
+        "Allow heavy party."));
+
+    SERVER_CFG_PREFIX BoolServerConfigParam m_allow_mediumparty
+        SERVER_CFG_DEFAULT(BoolServerConfigParam(false, "allow-mediumparty",
+        "Allow medium party."));
+
+    SERVER_CFG_PREFIX BoolServerConfigParam m_allow_lightparty
+        SERVER_CFG_DEFAULT(BoolServerConfigParam(false, "allow-lightparty",
+        "Allow light party."));
+
+    SERVER_CFG_PREFIX BoolServerConfigParam m_allow_itemchaos
+        SERVER_CFG_DEFAULT(BoolServerConfigParam(false, "allow-itemchaos",
+        "Allow item chaos. This will set random powerup (except for basketball, anvil, parachute and plunger) "
+        "for all the karts in the world during game every one minute as well as filling up the nitro to 100.0"));
+
+    SERVER_CFG_PREFIX BoolServerConfigParam m_allow_bowlparty
+        SERVER_CFG_DEFAULT(BoolServerConfigParam(false, "allow-bowlparty",
+        "Allow bowling party command."));
+
+    SERVER_CFG_PREFIX BoolServerConfigParam m_allow_cakeparty
+        SERVER_CFG_DEFAULT(BoolServerConfigParam(false, "allow-cakeparty",
+        "Allow cake party command."));
+
+    SERVER_CFG_PREFIX BoolServerConfigParam m_allow_plungerparty
+        SERVER_CFG_DEFAULT(BoolServerConfigParam(false, "allow-plungerparty",
+        "Allow plunger party command."));
+
+    SERVER_CFG_PREFIX BoolServerConfigParam m_allow_zipperparty
+        SERVER_CFG_DEFAULT(BoolServerConfigParam(false, "allow-zipperparty",
+        "Allow zipper party command."));
+
+    SERVER_CFG_PREFIX BoolServerConfigParam m_allow_pole
+        SERVER_CFG_DEFAULT(BoolServerConfigParam(false, "allow-pole",
+        "Allow pole. Players can team vote which teammate gets the leading start position."));
+
+    SERVER_CFG_PREFIX BoolServerConfigParam m_enable_ril
+        SERVER_CFG_DEFAULT(BoolServerConfigParam(false, "enable-ril",
+        "When a player enters server lobby, show random /installaddon command line according to the current server mode (default is false)."));
+
+    SERVER_CFG_PREFIX StringServerConfigParam m_ril_prefix
+        SERVER_CFG_DEFAULT(StringServerConfigParam("/installaddon", "ril-prefix",
+        "If random-installaddon-lines is configured, specifies the prefix before the addon name."));
+
+    SERVER_CFG_PREFIX StringServerConfigParam m_game_start_message
+        SERVER_CFG_DEFAULT(StringServerConfigParam("Have Fun", "game-start-message",
+        "This message is shown when the game is started. Defaults to \"Have Fun\", if empty, this function is disabled."));
+
+    SERVER_CFG_PREFIX BoolServerConfigParam  m_soccer_log
+        SERVER_CFG_DEFAULT(BoolServerConfigParam(false, "soccer-log","Soccer Log (true or false.)"));
+
+    SERVER_CFG_PREFIX StringServerConfigParam m_soccer_log_path
+        SERVER_CFG_DEFAULT(StringServerConfigParam("soccer_log.txt", "soccer-log-path", "Directory where the soccer log should be written to with / at the end."));
+    
+    SERVER_CFG_PREFIX StringServerConfigParam m_live_soccer_log_path
+        SERVER_CFG_DEFAULT(StringServerConfigParam("soccer_match.log", "live-soccer-log-path", "File path to the live soccer log."));
 
     SERVER_CFG_PREFIX BoolServerConfigParam m_wan_server
         SERVER_CFG_DEFAULT(BoolServerConfigParam(true, "wan-server",
@@ -140,6 +283,18 @@ namespace ServerConfig
         "the server are spectators. Specify 0 to allow all players on "
         "the server to play."));
 
+    SERVER_CFG_PREFIX IntServerConfigParam m_slots_min
+        SERVER_CFG_DEFAULT(IntServerConfigParam(2, "slots-min",
+        "Bottom limit of the /slots command argument that can be voted for."));
+
+    SERVER_CFG_PREFIX IntServerConfigParam m_slots_max
+        SERVER_CFG_DEFAULT(IntServerConfigParam(12, "slots-max",
+        "Top limit of the /slots command argument that can be voted for."));
+    
+    SERVER_CFG_PREFIX BoolServerConfigParam m_command_voting
+        SERVER_CFG_DEFAULT(BoolServerConfigParam(true, "command-voting",
+        "Set true to enable command voting on the server."));
+
     SERVER_CFG_PREFIX StringServerConfigParam m_private_server_password
         SERVER_CFG_DEFAULT(StringServerConfigParam("",
         "private-server-password", "Password for private server, "
@@ -150,10 +305,23 @@ namespace ServerConfig
         "motd", "Message of today shown in lobby, you can enter encoded XML "
         "words here or a file.txt and let STK load it."));
 
+    SERVER_CFG_PREFIX StringServerConfigParam m_feature_filepath
+        SERVER_CFG_DEFAULT(StringServerConfigParam("features.txt",
+        "feature-filepath", "File to log the /inform (message) messages into from players."));
+
+    SERVER_CFG_PREFIX StringServerConfigParam m_reports_filepath
+        SERVER_CFG_DEFAULT(StringServerConfigParam("report.txt",
+        "reports-filepath", "File to log the /report (message) messages into from players."));
+
     SERVER_CFG_PREFIX BoolServerConfigParam m_chat
         SERVER_CFG_DEFAULT(BoolServerConfigParam(true, "chat",
         "If this value is set to false, the server will ignore chat messages "
         "from all players."));
+
+    SERVER_CFG_PREFIX BoolServerConfigParam m_global_chat
+        SERVER_CFG_DEFAULT(BoolServerConfigParam(false, "global-chat",
+        "If this is set to true, chat messages won't be separated from players in game and"
+        " lobby."));
 
     SERVER_CFG_PREFIX IntServerConfigParam m_chat_consecutive_interval
         SERVER_CFG_DEFAULT(IntServerConfigParam(8, "chat-consecutive-interval",
@@ -166,6 +334,22 @@ namespace ServerConfig
         "Allow players to vote for which track to play. If this value is set "
         "to false, the server will randomly pick the next track to play."));
 
+    SERVER_CFG_PREFIX BoolServerConfigParam m_command_track_mode
+        SERVER_CFG_DEFAULT(BoolServerConfigParam(false, "command-track-mode",
+        "In order to play the next game, the player(s) need to use /settrack "
+        "command, in which case the track voting screen is skipped "
+        "(it will override track-voting parameter above). This will also "
+        "lower the permission level for settrack command to PLAYER, plus "
+        "the player being able to play the game (not being queued)."));
+
+    SERVER_CFG_PREFIX BoolServerConfigParam m_command_kart_mode
+        SERVER_CFG_DEFAULT(BoolServerConfigParam(false, "command-kart-mode",
+        "In order to play the next game, the player(s) need to use /setkart "
+        "command. "
+        "This will also "
+        "lower the permission level for setkart command to PLAYER, plus "
+        "the player being able to play the game (not being queued)."));
+
     SERVER_CFG_PREFIX FloatServerConfigParam m_voting_timeout
         SERVER_CFG_DEFAULT(FloatServerConfigParam(30.0f, "voting-timeout",
         "Timeout in seconds for selecting karts and (or) voting tracks in "
@@ -177,6 +361,10 @@ namespace ServerConfig
         "Timeout in seconds for validation of clients in wan, currently "
         "STK will use the stk-addons server to share AES key between the client "
         "and server."));
+
+    SERVER_CFG_PREFIX FloatServerConfigParam m_check_servers_cooldown
+        SERVER_CFG_DEFAULT(FloatServerConfigParam(10.0f, "check-servers-cooldown",
+        "Global cooldown for the /check-servers command. Set to 0 to disable the command."));
 
     SERVER_CFG_PREFIX BoolServerConfigParam m_validating_player
         SERVER_CFG_DEFAULT(BoolServerConfigParam(true, "validating-player",
@@ -256,6 +444,38 @@ namespace ServerConfig
         "for linear race games, you require permission for that. "
         "validating-player, auto-end, strict-player and owner-less will be "
         "turned on."));
+
+    SERVER_CFG_PREFIX BoolServerConfigParam m_cheats
+        SERVER_CFG_DEFAULT(BoolServerConfigParam(false, "cheats",
+        "Allow cheat commands for non-admins like /item and /nitro."));
+
+    SERVER_CFG_PREFIX BoolServerConfigParam m_infinite_game
+        SERVER_CFG_DEFAULT(BoolServerConfigParam(false, "infinite-game",
+        "Make the games last forever, until /end is done or when all players"
+        " leave the game. For soccer it also acts the same as"
+        " soccer-goal-target set to false, with infinite time."));
+
+    SERVER_CFG_PREFIX StringServerConfigParam m_cheat_items
+        SERVER_CFG_DEFAULT(StringServerConfigParam(
+        "bowl:10,cake:10,zipper:10,plunger:10,switch:10,swatter:10,gum:10",
+        "cheat-items", "Whitelist of the items:amount that can be get with "
+        "/item command."));
+
+    SERVER_CFG_PREFIX FloatServerConfigParam m_cheat_nitro
+        SERVER_CFG_DEFAULT(FloatServerConfigParam(20.0, "cheat-nitro",
+        "Amount of nitro that is received with /nitro command. Full nitro bar"
+        " is 20.0 units."));
+
+    SERVER_CFG_PREFIX StringServerConfigParam m_must_have_tracks
+        SERVER_CFG_DEFAULT(StringServerConfigParam("",
+        "must-have-tracks",
+        "The tracks you must have."));
+
+    SERVER_CFG_PREFIX StringServerConfigParam m_only_played_tracks
+        SERVER_CFG_DEFAULT(StringServerConfigParam("",
+        "only-played-tracks",
+        "The only tracks that are played."));
+
 
     SERVER_CFG_PREFIX BoolServerConfigParam m_server_configurable
         SERVER_CFG_DEFAULT(BoolServerConfigParam(false, "server-configurable",
@@ -438,6 +658,46 @@ namespace ServerConfig
         "empty to disable. "
         "This table can be shared for all servers if you use the same name."));
 
+    SERVER_CFG_PREFIX IntServerConfigParam m_server_owner
+        SERVER_CFG_DEFAULT(IntServerConfigParam(-1, "server-owner",
+        "Online ID that owns the server and has all permissions"
+        ". (Works only when the player is validated.)"));
+
+    SERVER_CFG_PREFIX StringServerConfigParam m_permissions_table
+        SERVER_CFG_DEFAULT(StringServerConfigParam("permissions",
+        "permissions-table",
+        "Table used for defining staff players. "
+        "Contains 2 fields: int online_id and int permission_level. "
+        "Usually 0 is for regular player, 80 is for moderator, 100 is for "
+        "administrator. Note that the server owner basically has infinite "
+        "permission level."));
+
+    SERVER_CFG_PREFIX StringServerConfigParam m_restrictions_table
+        SERVER_CFG_DEFAULT(StringServerConfigParam("restrictions",
+        "restrictions-table",
+        "Table used for issuing restrictions to players. "
+        "Contains 2 fields: int online_id and unsigned int restrictions. "
+        "Second field has flags: NOSPEC, NOGAME, NOCHAT, NOPCHAT, NOTEAM, "
+        "HANDICAP, KART, TRACK. In specified order, 1, 2, 4, 8, 16 etc. "));
+
+    SERVER_CFG_PREFIX StringServerConfigParam m_permission_message
+        SERVER_CFG_DEFAULT(StringServerConfigParam(
+        "You are not allowed to run this command.",
+        "permission-message",
+        "Message to show to a player with insufficient permissions "
+        "tries to use a restricted command."));
+
+    SERVER_CFG_PREFIX BoolServerConfigParam m_shadow_nochat
+        SERVER_CFG_DEFAULT(BoolServerConfigParam(false, "shadow-nochat",
+        "Players restricted from chatting/DM won't be aware of it."));
+
+    SERVER_CFG_PREFIX StringServerConfigParam m_soccer_ranking_file
+        SERVER_CFG_DEFAULT(StringServerConfigParam(
+        "soccer_ranking.txt",
+        "soccer-ranking-file",
+        "Path of the file to read from by /rank, /rank10 and /rank (player) "
+        "commands, must be of a valid structure."));
+
     SERVER_CFG_PREFIX BoolServerConfigParam m_ai_handling
         SERVER_CFG_DEFAULT(BoolServerConfigParam(false, "ai-handling",
         "If true this server will auto add / remove AI connected with "
@@ -474,6 +734,11 @@ namespace ServerConfig
     std::pair<RaceManager::MinorRaceModeType, RaceManager::MajorRaceModeType>
         getLocalGameMode(int mode);
     // ------------------------------------------------------------------------
+    bool getLocalGameModeFromName(const std::string& name,
+            int* out,
+            bool allow_gp = true,
+            bool allow_singleplayer = true);
+    // ------------------------------------------------------------------------
     core::stringw getModeName(unsigned id);
     // ------------------------------------------------------------------------
     inline bool unsupportedGameMode()
@@ -482,6 +747,10 @@ namespace ServerConfig
     void loadServerLobbyFromConfig();
     // ------------------------------------------------------------------------
     std::string getConfigDirectory();
+    // ------------------------------------------------------------------------
+    // TierS additions: /item and /nitro commands
+    // return an amount for an item got in m_cheat_items, otherwise return 0
+    int getCheatQuantity(PowerupManager::PowerupType type);
 
 };   // namespace ServerConfig
 

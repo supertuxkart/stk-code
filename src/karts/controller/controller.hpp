@@ -18,6 +18,7 @@
 #ifndef HEADER_CONTROLLER_HPP
 #define HEADER_CONTROLLER_HPP
 
+#include "network/network_player_profile.hpp"
 #include <irrString.h>
 using namespace irr;
 
@@ -76,6 +77,10 @@ public:
      *  a local or a remote/networked player. This is tested e.g. by the AI for
      *  rubber-banding. */
     virtual bool  isPlayerController () const = 0;
+    virtual bool  isNetworkPlayerController () const { return false; };
+    virtual NetworkPlayerProfile*
+                  getNetworkPlayerProfile () const { return nullptr; };
+    virtual void updateNetworkPlayerProfile(NetworkPlayerProfile* npp) {}
     virtual bool  disableSlipstreamBonus() const = 0;
     virtual bool  saveState(BareNetworkString *buffer) const = 0;
     virtual void  rewindTo(BareNetworkString *buffer) = 0;

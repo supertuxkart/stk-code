@@ -310,6 +310,7 @@ public:
         if (m_always_spectate.load() == ASM_FULL)
             m_always_spectate.store(ASM_NONE);
     }
+    // ------------------------------------------------------------------------
 };   // STKPeer
 
 #endif // STK_PEER_HPP
