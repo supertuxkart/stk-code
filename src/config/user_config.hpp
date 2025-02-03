@@ -1016,7 +1016,7 @@ namespace UserConfigParams
     PARAM_PREFIX BoolUserConfigParam         m_pcss
             PARAM_DEFAULT(BoolUserConfigParam(false,
                            "pcss", &m_graphics_quality,
-                           "Enable Percentage Filtered Soft Shadows (Very heavy, needs high shadow resolution)") );
+                           "Enable Percentage Filtered Soft Shadows (needs high shadow resolution)") );
     PARAM_PREFIX IntUserConfigParam          m_shadows_resolution
             PARAM_DEFAULT( IntUserConfigParam(0,
                            "shadows_resolution", &m_graphics_quality,
