@@ -482,9 +482,10 @@ void EventHandler::navigate(const NavigationDirection nav, const int playerID)
             assert(ribbon != NULL);
             if (ribbon->getRibbonType() == GUIEngine::RibbonType::RIBBON_VERTICAL_TABS)
             {
-                int new_selection = (nav == NAV_UP) ?
-                                   ribbon->getActiveChildrenNumber(playerID) - 1 : 0;
-                ribbon->setSelection(new_selection, playerID);
+                // Some of the tabs may be disabled. So we navigate until an active tab is found
+                (nav == NAV_UP) ? ribbon->setLastSelection(playerID)
+                                : ribbon->setFirstSelection(playerID);
+
                 // The tab selection triggers an action
                 sendEventToUser(ribbon, ribbon->m_properties[PROP_ID], playerID);
             }
