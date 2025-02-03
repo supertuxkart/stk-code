@@ -40,6 +40,7 @@ struct GFXPreset
     int image_quality;
     bool degraded_ibl;
     int geometry_detail;
+    bool pcss;
 };
 
 struct BlurPreset

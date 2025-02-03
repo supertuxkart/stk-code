@@ -242,6 +242,53 @@ public:
 };   // ShadowedSunLightShaderPCF
 
 // ============================================================================
+class ShadowedSunLightShaderPCSS : public TextureShader<ShadowedSunLightShaderPCSS,
+                                                        4,  float, float, float,
+                                                        float, float, float,
+                                                        core::vector3df, core::vector3df,
+                                                        core::vector3df, core::vector3df,
+                                                        core::vector3df, video::SColorf>
+{
+public:
+    ShadowedSunLightShaderPCSS()
+    {
+        loadProgram(OBJECT, GL_VERTEX_SHADER, "screenquad.vert",
+                            GL_FRAGMENT_SHADER, "sunlightshadowpcss.frag");
+
+        // Use 8 to circumvent a catalyst bug when binding sampler
+        assignSamplerNames(0, "ntex", ST_NEAREST_FILTERED,
+                           1, "dtex", ST_NEAREST_FILTERED,
+                           8, "shadowtexdepth", ST_NEAREST_FILTERED_ARRAY2D,
+                           16, "shadowtex", ST_SHADOW_SAMPLER);
+        assignUniforms("split0", "split1", "split2", "splitmax", "shadow_res",
+            "overlap_proportion", "box0", "box1", "box2", "box3", "sundirection", "sun_color");
+    }   // ShadowedSunLightShaderPCF
+    // ------------------------------------------------------------------------
+    void render(GLuint normal_depth_texture,
+                GLuint depth_stencil_texture,
+                const FrameBuffer* shadow_framebuffer,
+                const core::vector3df &direction,
+                const video::SColorf &col,
+                const core::vector3df* shadow_box_extents)
+    {
+        setTextureUnits(normal_depth_texture,
+                        depth_stencil_texture,
+                        shadow_framebuffer->getDepthTexture(),
+                        shadow_framebuffer->getDepthTexture()                );
+       drawFullScreenEffect(ShadowMatrices::m_shadow_split[1],
+                            ShadowMatrices::m_shadow_split[2],
+                            ShadowMatrices::m_shadow_split[3],
+                            ShadowMatrices::m_shadow_split[4],
+                            float(UserConfigParams::m_shadows_resolution),
+                            ShadowMatrices::m_shadow_overlap_proportion,
+                            shadow_box_extents[0], shadow_box_extents[1],
+                            shadow_box_extents[2], shadow_box_extents[3],
+                            direction, col);
+
+    }    // render
+};   // ShadowedSunLightShaderPCSS
+
+// ============================================================================
 class SunLightShader : public TextureShader<SunLightShader, 2,
                                             core::vector3df, video::SColorf>
 {
@@ -443,7 +490,8 @@ void LightingPasses::renderLights(  bool has_shadow,
                                     const FrameBuffer* shadow_framebuffer,
                                     GLuint ssao_texture,
                                     GLuint diffuse_color_texture,
-                                    GLuint specular_probe)
+                                    GLuint specular_probe,
+                                    const core::vector3df* shadow_box_extents)
 {
     {
         ScopedGPUTimer timer(irr_driver->getGPUTimer(Q_ENVMAP));
@@ -466,11 +514,23 @@ void LightingPasses::renderLights(  bool has_shadow,
             glDisable(GL_DEPTH_TEST);
             glBlendFunc(GL_ONE, GL_ONE);
             glBlendEquation(GL_FUNC_ADD);
-            ShadowedSunLightShaderPCF::getInstance()->render(normal_depth_texture,
-                                                             depth_stencil_texture,
-                                                             shadow_framebuffer,
-                                                             irr_driver->getSunDirection(),
-                                                             irr_driver->getSunColor());
+            if (UserConfigParams::m_pcss)
+            {
+                ShadowedSunLightShaderPCSS::getInstance()->render(normal_depth_texture,
+                                                                  depth_stencil_texture,
+                                                                  shadow_framebuffer,
+                                                                  irr_driver->getSunDirection(),
+                                                                  irr_driver->getSunColor(),
+                                                                  shadow_box_extents);
+            }
+            else
+            {
+                ShadowedSunLightShaderPCF::getInstance()->render(normal_depth_texture,
+                                                                 depth_stencil_texture,
+                                                                 shadow_framebuffer,
+                                                                 irr_driver->getSunDirection(),
+                                                                 irr_driver->getSunColor());
+            }
         }
         else
             renderSunlight(irr_driver->getSunDirection(),

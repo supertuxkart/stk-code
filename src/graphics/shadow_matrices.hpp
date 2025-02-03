@@ -51,9 +51,11 @@ private:
     float                      m_shadows_cam[4][24];
     bool                       m_rsm_map_available;
     float                      m_mat_ubo[16 * 9 + 2];
+    core::vector3df            m_frustum_box_extent[4];
 
     core::matrix4 getTightestFitOrthoProj(const core::matrix4 &transform,
-                              const std::vector<core::vector3df> &pointsInside);
+                              const std::vector<core::vector3df> &pointsInside,
+                              core::vector3df& bounding_box_extent);
     void renderWireFrameFrustrum(float *tmp, unsigned i);
 public:
 
@@ -73,6 +75,11 @@ public:
     scene::ICameraSceneNode** getShadowCamNodes()
     {
         return m_shadow_cam_nodes;
+    }   // getShadowCamNodes
+    // ------------------------------------------------------------------------
+    core::vector3df* getShadowFrustumBoxExtent()
+    {
+        return m_frustum_box_extent;
     }   // getShadowCamNodes
     // ------------------------------------------------------------------------
     scene::ICameraSceneNode* getSunCam() { return m_sun_cam; }

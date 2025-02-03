@@ -145,7 +145,8 @@ static std::vector<vector3df> getFrustrumVertex(const scene::SViewFrustum &frust
  *  \param pointsInside a vector of point in 3d space.
  */
 core::matrix4 ShadowMatrices::getTightestFitOrthoProj(const core::matrix4 &transform,
-                                    const std::vector<vector3df> &pointsInside)
+                                    const std::vector<vector3df> &pointsInside,
+                                    core::vector3df& bounding_box_extent)
 {
     float xmin = std::numeric_limits<float>::infinity();
     float xmax = -std::numeric_limits<float>::infinity();
@@ -178,6 +179,9 @@ core::matrix4 ShadowMatrices::getTightestFitOrthoProj(const core::matrix4 &trans
     tmp_matrix.buildProjectionMatrixOrthoLH(left, right,
         down, up,
         zmin - 100, zmax);
+    bounding_box_extent.X = right - left;
+    bounding_box_extent.Y = down - up;
+    bounding_box_extent.Z = zmax - zmin + 100;
     return tmp_matrix;
 }   // getTightestFitOrthoProj
 
@@ -275,7 +279,7 @@ void ShadowMatrices::computeMatrixesAndCameras(scene::ICameraSceneNode *const ca
             memcpy(m_shadows_cam[i], tmp, 24 * sizeof(float));
 
             std::vector<vector3df> vectors = getFrustrumVertex(*frustrum);
-            tmp_matrix = getTightestFitOrthoProj(sun_cam_view_matrix, vectors);
+            tmp_matrix = getTightestFitOrthoProj(sun_cam_view_matrix, vectors, m_frustum_box_extent[i]);
 
 
             m_shadow_cam_nodes[i]->setProjectionMatrix(tmp_matrix, true);

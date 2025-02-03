@@ -103,9 +103,7 @@ void CustomVideoSettingsDialog::beforeAddingWidgets()
     shadows->addLabel(_("Low"));        // 1
     shadows->addLabel(_("Medium"));     // 2
     shadows->addLabel(_("High"));       // 3
-    shadows->addLabel(_("Very High"));  // 4
-    shadows->setValue(UserConfigParams::m_shadows_resolution == 4096 ? 4 :
-                      UserConfigParams::m_shadows_resolution == 2048 ? 3 :
+    shadows->setValue(UserConfigParams::m_shadows_resolution == 2048 ? 3 :
                       UserConfigParams::m_shadows_resolution == 1024 ? 2 :
                       UserConfigParams::m_shadows_resolution ==  512 ? 1 : 0);
 
@@ -118,6 +116,7 @@ void CustomVideoSettingsDialog::beforeAddingWidgets()
     getWidget<CheckBoxWidget>("ssao")->setState(UserConfigParams::m_ssao);
     getWidget<CheckBoxWidget>("bloom")->setState(UserConfigParams::m_bloom);
     getWidget<CheckBoxWidget>("lightscattering")->setState(UserConfigParams::m_light_scatter);
+    getWidget<CheckBoxWidget>("pcss")->setState(UserConfigParams::m_pcss);
     if (CVS->isEXTTextureCompressionS3TCUsable())
     {
         getWidget<CheckBoxWidget>("texture_compression")->setState(UserConfigParams::m_texture_compression);
@@ -163,8 +162,7 @@ GUIEngine::EventPropagation CustomVideoSettingsDialog::processEvent(const std::s
                 UserConfigParams::m_shadows_resolution =
                     getWidget<SpinnerWidget>("shadows")->getValue() == 1 ?  512 :
                     getWidget<SpinnerWidget>("shadows")->getValue() == 2 ? 1024 :
-                    getWidget<SpinnerWidget>("shadows")->getValue() == 3 ? 2048 :
-                    getWidget<SpinnerWidget>("shadows")->getValue() == 4 ? 4096 : 0;
+                    getWidget<SpinnerWidget>("shadows")->getValue() == 3 ? 2048 : 0;
             }
             else
             {
@@ -191,6 +189,9 @@ GUIEngine::EventPropagation CustomVideoSettingsDialog::processEvent(const std::s
 
             UserConfigParams::m_light_scatter =
                 advanced_pipeline && getWidget<CheckBoxWidget>("lightscattering")->getState();
+
+            UserConfigParams::m_pcss =
+                advanced_pipeline && getWidget<CheckBoxWidget>("pcss")->getState();
 
             UserConfigParams::m_texture_compression =
                 getWidget<CheckBoxWidget>("texture_compression")->getState();
@@ -261,6 +262,6 @@ void CustomVideoSettingsDialog::updateActivation()
     getWidget<CheckBoxWidget>("glow")->setActive(light);
     getWidget<CheckBoxWidget>("bloom")->setActive(light);
     getWidget<CheckBoxWidget>("lightscattering")->setActive(light);
+    getWidget<CheckBoxWidget>("pcss")->setActive(light);
 #endif
 }   // updateActivation
-

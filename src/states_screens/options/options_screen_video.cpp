@@ -43,7 +43,7 @@ void OptionsScreenVideo::initPresets()
         false /* light */, 0 /* shadow */, false /* bloom */, false /* lightshaft */,
         false /* glow */, false /* mlaa */, false /* ssao */, false /* light scatter */,
         false /* animatedCharacters */, 1 /* particles */, 0 /* image_quality */,
-        true /* degraded IBL */, 0 /* Geometry Detail */
+        true /* degraded IBL */, 0 /* Geometry Detail */, false /* pcss */
     });
 
     m_presets.push_back // Level 2
@@ -51,7 +51,7 @@ void OptionsScreenVideo::initPresets()
         false /* light */, 0 /* shadow */, false /* bloom */, false /* lightshaft */,
         false /* glow */, false /* mlaa */, false /* ssao */, false /* light scatter */,
         true /* animatedCharacters */, 2 /* particles */, 1 /* image_quality */,
-        true /* degraded IBL */, 1 /* Geometry Detail */
+        true /* degraded IBL */, 1 /* Geometry Detail */, false /* pcss */
     });
 
     m_presets.push_back // Level 3
@@ -59,15 +59,15 @@ void OptionsScreenVideo::initPresets()
         true /* light */, 0 /* shadow */, false /* bloom */, false /* lightshaft */,
         false /* glow */, false /* mlaa */, false /* ssao */, false /* light scatter */,
         true /* animatedCharacters */, 2 /* particles */, 1 /* image_quality */,
-        true /* degraded IBL */, 2 /* Geometry Detail */
+        true /* degraded IBL */, 2 /* Geometry Detail */, false /* pcss */
     });
 
     m_presets.push_back // Level 4
     ({
-        true /* light */, 0 /* shadow */, false /* bloom */, false /* lightshaft */,
+        true /* light */, 0 /* shadow */, false /* bloom */, true /* lightshaft */,
         true /* glow */, true /* mlaa */, false /* ssao */, true /* light scatter */,
         true /* animatedCharacters */, 2 /* particles */, 2 /* image_quality */,
-        false /* degraded IBL */, 3 /* Geometry Detail */
+        false /* degraded IBL */, 3 /* Geometry Detail */, false /* pcss */
     });
 
     m_presets.push_back // Level 5
@@ -75,15 +75,15 @@ void OptionsScreenVideo::initPresets()
         true /* light */, 512 /* shadow */, true /* bloom */, true /* lightshaft */,
         true /* glow */, true /* mlaa */, false /* ssao */, true /* light scatter */,
         true /* animatedCharacters */, 2 /* particles */, 3 /* image_quality */,
-        false /* degraded IBL */, 3 /* Geometry Detail */
+        false /* degraded IBL */, 3 /* Geometry Detail */, false /* pcss */
     });
 
     m_presets.push_back // Level 6
     ({
         true /* light */, 1024 /* shadow */, true /* bloom */, true /* lightshaft */,
-        true /* glow */, true /* mlaa */, false /* ssao */, true /* light scatter */,
+        true /* glow */, true /* mlaa */, true /* ssao */, true /* light scatter */,
         true /* animatedCharacters */, 2 /* particles */, 3 /* image_quality */,
-        false /* degraded IBL */, 4 /* Geometry Detail */
+        false /* degraded IBL */, 4 /* Geometry Detail */, false /* pcss */
     });
 
     m_presets.push_back // Level 7
@@ -91,28 +91,20 @@ void OptionsScreenVideo::initPresets()
         true /* light */, 2048 /* shadow */, true /* bloom */, true /* lightshaft */,
         true /* glow */, true /* mlaa */, true /* ssao */, true /* light scatter */,
         true /* animatedCharacters */, 2 /* particles */, 3 /* image_quality */,
-        false /* degraded IBL */, 5 /* Geometry Detail */
+        false /* degraded IBL */, 5 /* Geometry Detail */, true /* pcss */
     });
 
-    m_presets.push_back // Level 8
-    ({
-        true /* light */, 4096 /* shadow */, true /* bloom */, true /* lightshaft */,
-        true /* glow */, true /* mlaa */, true /* ssao */, true /* light scatter */,
-        true /* animatedCharacters */, 2 /* particles */, 3 /* image_quality */,
-        false /* degraded IBL */, 5 /* Geometry Detail */
-    });
-
-    m_blur_presets.push_back // Level 0
+    m_blur_presets.push_back
     ({
         false /* motionblur */, false /* depth of field */
     });
 
-    m_blur_presets.push_back // Level 1
+    m_blur_presets.push_back
     ({
         true  /* motionblur */, false /* depth of field */
     });
 
-    m_blur_presets.push_back // Level 2
+    m_blur_presets.push_back
     ({
         true  /* motionblur */, true  /* depth of field */
     });
@@ -220,7 +212,7 @@ OptionsScreenVideo::OptionsScreenVideo() : Screen("options/options_video.stkgui"
 void OptionsScreenVideo::loadedFromFile()
 {
     m_inited = false;
-    assert(m_presets.size() == 8);
+    assert(m_presets.size() == 7);
     assert(m_blur_presets.size() == 3);
 
     GUIEngine::SpinnerWidget* gfx =
@@ -366,7 +358,8 @@ void OptionsScreenVideo::updateGfxSlider()
             m_presets[l].degraded_ibl == UserConfigParams::m_degraded_IBL &&
             m_presets[l].geometry_detail == (UserConfigParams::m_geometry_level == 0 ? 2 :
                                              UserConfigParams::m_geometry_level == 2 ? 0 :
-                                             UserConfigParams::m_geometry_level))
+                                             UserConfigParams::m_geometry_level) &&
+            m_presets[l].pcss == UserConfigParams::m_pcss)
         {
             gfx->setValue(l + 1);
             found = true;
@@ -615,6 +608,7 @@ void OptionsScreenVideo::eventCallback(Widget* widget, const std::string& name,
         UserConfigParams::m_geometry_level     = (m_presets[level].geometry_detail == 0 ? 2 :
                                                   m_presets[level].geometry_detail == 2 ? 0 :
                                                   m_presets[level].geometry_detail);
+        UserConfigParams::m_pcss               = m_presets[level].pcss;
 
         updateGfxSlider();
     }
