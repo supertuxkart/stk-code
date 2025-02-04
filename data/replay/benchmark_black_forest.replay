@@ -7,6 +7,7 @@ reverse: 0
 difficulty: 3
 mode: time-trial
 track: black_forest
+info: Sped up 2x for benchmarking purpose.
 laps: 1
 min_time: 73.286743
 replay_uid: 564944495606616311
