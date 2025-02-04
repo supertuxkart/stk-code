@@ -235,6 +235,10 @@ GUIEngine::EventPropagation CustomVideoSettingsDialog::processEvent(const std::s
     {
         updateActivation();
     }
+    else if (eventSource == "shadows")
+    {
+        updateActivation();
+    }
 #endif
     return GUIEngine::EVENT_LET;
 }   // processEvent
@@ -245,6 +249,7 @@ void CustomVideoSettingsDialog::updateActivation()
 {
 #ifndef SERVER_ONLY
     bool light = getWidget<CheckBoxWidget>("dynamiclight")->getState();
+    bool shadows = getWidget<SpinnerWidget>("shadows")->getValue();
     if (!CVS->isGLSL())
     {
         getWidget<CheckBoxWidget>("dynamiclight")->setActive(false);
@@ -262,6 +267,6 @@ void CustomVideoSettingsDialog::updateActivation()
     getWidget<CheckBoxWidget>("glow")->setActive(light);
     getWidget<CheckBoxWidget>("bloom")->setActive(light);
     getWidget<CheckBoxWidget>("lightscattering")->setActive(light);
-    getWidget<CheckBoxWidget>("pcss")->setActive(light);
+    getWidget<CheckBoxWidget>("pcss")->setActive(light & shadows);
 #endif
 }   // updateActivation

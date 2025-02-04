@@ -470,45 +470,46 @@ void OptionsScreenVideo::updateTooltip()
     const core::stringw very_high = _("Very High");
     //I18N: in the graphical options tooltip;
     const core::stringw ultra = _("Ultra");
-
+    
     //I18N: in graphical options
-    tooltip = _("Particles Effects: %s",
-        UserConfigParams::m_particles_effects == 2 ? enabled :
-        UserConfigParams::m_particles_effects == 1 ? important_only :
-        disabled);
-
-    //I18N: in graphical options
-    tooltip = tooltip + L"\n" + _("Animated Characters: %s",
-        UserConfigParams::m_animated_characters ? enabled : disabled);
-    //I18N: in graphical options
-    tooltip = tooltip + L"\n" + _("Dynamic lights: %s",
+    tooltip = _("Dynamic lights: %s",
         UserConfigParams::m_dynamic_lights ? enabled : disabled);
-    //I18N: in graphical options
-    tooltip = tooltip + L"\n" + _("Light scattering: %s",
-        UserConfigParams::m_light_scatter ? enabled : disabled);
-    //I18N: in graphical options
-    tooltip = tooltip + L"\n" + _("Anti-aliasing: %s",
-        UserConfigParams::m_mlaa ? enabled : disabled);
-    //I18N: in graphical options
-    tooltip = tooltip + L"\n" + _("Ambient occlusion: %s",
-        UserConfigParams::m_ssao ? enabled : disabled);
+
     //I18N: in graphical options
     if (UserConfigParams::m_shadows_resolution == 0)
         tooltip = tooltip + L"\n" + _("Shadows: %s", disabled);
     else
         tooltip = tooltip + L"\n" + _("Shadows: %i", UserConfigParams::m_shadows_resolution);
-
     //I18N: in graphical options
-    tooltip = tooltip + L"\n" + _("Bloom: %s",
-        UserConfigParams::m_bloom ? enabled : disabled);
-
+    tooltip = tooltip + L"\n" + _("Anti-aliasing: %s",
+        UserConfigParams::m_mlaa ? enabled : disabled);
+    //I18N: in graphical options
+    tooltip = tooltip + L"\n" + _("Light scattering: %s",
+        UserConfigParams::m_light_scatter ? enabled : disabled);
     //I18N: in graphical options
     tooltip = tooltip + L"\n" + _("Glow (outlines): %s",
         UserConfigParams::m_glow ? enabled : disabled);
-
     //I18N: in graphical options
     tooltip = tooltip + L"\n" + _("Light shaft (God rays): %s",
         UserConfigParams::m_light_shaft ? enabled : disabled);
+    //I18N: in graphical options
+    tooltip = tooltip + L"\n" + _("Bloom: %s",
+        UserConfigParams::m_bloom ? enabled : disabled);
+    //I18N: in graphical options
+    tooltip = tooltip + L"\n" + _("Ambient occlusion: %s",
+        UserConfigParams::m_ssao ? enabled : disabled);
+    //I18N: in graphical options
+    tooltip = tooltip + L"\n" + _("Soft shadows: %s",
+        UserConfigParams::m_pcss ? enabled : disabled);
+
+    //I18N: in graphical options
+    tooltip = tooltip + L"\n" + _("Animated Characters: %s",
+        UserConfigParams::m_animated_characters ? enabled : disabled);
+    //I18N: in graphical options
+    tooltip = tooltip + L"\n" + _("Particles Effects: %s",
+        UserConfigParams::m_particles_effects == 2 ? enabled :
+        UserConfigParams::m_particles_effects == 1 ? important_only :
+        disabled);
 
     //I18N: in graphical options
     int quality = getImageQuality();
