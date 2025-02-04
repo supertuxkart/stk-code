@@ -34,6 +34,7 @@
                         <spacer width="1%"/>
                         <label proportion="1" id="compare-ghost-text" height="100%" text_align="left" I18N="Ghost replay info action" text="Compare to another ghost"/>
                     </div>
+                    <bubble id="info" width="100%" proportion="1" word_wrap="true"/>
                 </div>
 
                 <div width="95%" height="40%" align="center">
