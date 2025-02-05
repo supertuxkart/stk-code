@@ -177,7 +177,7 @@ core::matrix4 ShadowMatrices::getTightestFitOrthoProj(const core::matrix4 &trans
     if (left == right || up == down)
         return tmp_matrix;
     
-    float vnear = std::min((zmax + zmin) / 2 - 200, zmin); // 200m above karts
+    float vnear = std::min((zmax + zmin) / 2 - 250, zmin); // 250m above karts
     tmp_matrix.buildProjectionMatrixOrthoLH(left, right,
         down, up,
         vnear, zmax);

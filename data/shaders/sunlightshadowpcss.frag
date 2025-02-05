@@ -99,18 +99,18 @@ mat2 getRandomRotationMatrix(vec2 fragCoord)
 }
 
 void blockerSearchAndFilter(out float occludedCount, out float z_occSum,
-        vec2 uv, float z_rec, uint layer, vec2 filterRadii, mat2 R, vec2 dz_duv)
+        vec2 uv, float z_rec, uint layer, vec2 filterRadii, vec2 dz_duv)
 {
     // Make sure no light leaking
     float z_occ = texture(shadowtexdepth, vec3(uv, float(layer))).r;
     float dz = z_rec - z_occ;
-    float occluded = 0.01 * step(0., dz);
+    float occluded = 0.01 * step(0.5 / shadow_res, dz);
     occludedCount = occluded;
     z_occSum = z_occ * occluded;
 
     for (uint i = 0u; i < 8u; i++)
     {
-        vec2 duv = R * sample_point_pos[i] * filterRadii;
+        vec2 duv = sample_point_pos[i] * filterRadii;
         vec2 tc = clamp(uv + duv, vec2(0.), vec2(1.));
         // receiver plane depth bias
         float z_bias = dot(dz_duv, duv);
@@ -149,7 +149,7 @@ float getShadowFactor(vec3 position, vec3 bbox, vec2 dz_duv, uint layer)
     float occludedCount = 0.0;
     float z_occSum = 0.0;
 
-    blockerSearchAndFilter(occludedCount, z_occSum, position.xy, position.z, layer, penumbra / bbox.xy, R, dz_duv);
+    blockerSearchAndFilter(occludedCount, z_occSum, position.xy, position.z, layer, penumbra / bbox.xy, dz_duv);
 
     // early exit if there is no occluders at all, also avoids a divide-by-zero below.
     if (z_occSum == 0.0) {
