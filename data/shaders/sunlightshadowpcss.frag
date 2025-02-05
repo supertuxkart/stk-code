@@ -1,3 +1,4 @@
+// Implementation from https://github.com/google/filament/blob/main/shaders/src/surface_shadowing.fs
 uniform sampler2D ntex;
 #if defined(GL_ES) && defined(GL_FRAGMENT_PRECISION_HIGH)
 uniform highp sampler2D dtex;
@@ -58,11 +59,16 @@ vec2 vogel_disk_16[16] = vec2[](
     vec2(-0.1133270115046468, -0.9490025827627441)
 );
 
-vec2 vogel_disk_4[4] = vec2[](
-	vec2(0.21848650099008202, -0.09211370200809937),
-	vec2(-0.5866112654782878, 0.32153793477769893),
-	vec2(-0.06595078555407359, -0.879656059066481),
-	vec2(0.43407555004227927, 0.6502318262968816)
+// https://learn.microsoft.com/en-us/windows/win32/api/d3d11/ne-d3d11-d3d11_standard_multisample_quality_levels?redirectedfrom=MSDN
+vec2 sample_point_pos[8] = vec2[](
+    vec2( 0.125, -0.375),
+    vec2(-0.125,  0.375),
+    vec2( 0.625,  0.125),
+    vec2(-0.375, -0.625),
+    vec2(-0.625,  0.625),
+    vec2(-0.875, -0.125),
+    vec2( 0.375,  0.875),
+    vec2( 0.875, -0.875)
 );
 
 float interleavedGradientNoise(vec2 w)
@@ -95,27 +101,26 @@ mat2 getRandomRotationMatrix(vec2 fragCoord)
 void blockerSearchAndFilter(out float occludedCount, out float z_occSum,
         vec2 uv, float z_rec, uint layer, vec2 filterRadii, mat2 R, vec2 dz_duv)
 {
-    occludedCount = 0.0;
-    z_occSum = 0.0;
-    for (uint i = 0u; i < 4u; i++)
+    // Make sure no light leaking
+    float z_occ = texture(shadowtexdepth, vec3(uv, float(layer))).r;
+    float dz = z_rec - z_occ;
+    float occluded = 0.01 * step(0., dz);
+    occludedCount = occluded;
+    z_occSum = z_occ * occluded;
+
+    for (uint i = 0u; i < 8u; i++)
     {
-        vec2 duv = R * (vogel_disk_4[i] * filterRadii);
+        vec2 duv = R * sample_point_pos[i] * filterRadii;
         vec2 tc = clamp(uv + duv, vec2(0.), vec2(1.));
-
-        float z_occ = texture(shadowtexdepth, vec3(tc, float(layer))).r;
-
         // receiver plane depth bias
         float z_bias = dot(dz_duv, duv);
+
+        float z_occ = texture(shadowtexdepth, vec3(tc, float(layer))).r;
         float dz = z_rec - z_occ; // dz>0 when blocker is between receiver and light
         float occluded = step(z_bias, dz);
         occludedCount += occluded;
         z_occSum += z_occ * occluded;
     }
-    float z_occ = texture(shadowtexdepth, vec3(uv, float(layer))).r;
-    float dz = z_rec - z_occ;
-    float occluded = step(0., dz);
-    occludedCount += occluded;
-    z_occSum += z_occ * occluded;
 }
 
 float filterPCSS(vec2 uv, float z_rec, uint layer,
@@ -152,8 +157,9 @@ float getShadowFactor(vec3 position, vec3 bbox, vec2 dz_duv, uint layer)
     }
 
     float penumbraRatio = 1.0 - z_occSum / occludedCount / position.z;
+    vec2 radius = max(penumbra / bbox.xy * penumbraRatio, vec2(0.5 / shadow_res));
 
-    float percentageOccluded = filterPCSS(position.xy, position.z, layer, penumbra / bbox.xy * penumbraRatio, R, dz_duv);
+    float percentageOccluded = filterPCSS(position.xy, position.z, layer, radius, R, dz_duv);
 
     return percentageOccluded;
 }

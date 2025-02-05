@@ -176,12 +176,14 @@ core::matrix4 ShadowMatrices::getTightestFitOrthoProj(const core::matrix4 &trans
     // Prevent Matrix without extend
     if (left == right || up == down)
         return tmp_matrix;
+    
+    float vnear = std::min((zmax + zmin) / 2 - 200, zmin); // 200m above karts
     tmp_matrix.buildProjectionMatrixOrthoLH(left, right,
         down, up,
-        zmin - 100, zmax);
+        vnear, zmax);
     bounding_box_extent.X = right - left;
     bounding_box_extent.Y = down - up;
-    bounding_box_extent.Z = zmax - zmin + 100;
+    bounding_box_extent.Z = zmax - vnear;
     return tmp_matrix;
 }   // getTightestFitOrthoProj
 

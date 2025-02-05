@@ -116,7 +116,6 @@ void CustomVideoSettingsDialog::beforeAddingWidgets()
     getWidget<CheckBoxWidget>("ssao")->setState(UserConfigParams::m_ssao);
     getWidget<CheckBoxWidget>("bloom")->setState(UserConfigParams::m_bloom);
     getWidget<CheckBoxWidget>("lightscattering")->setState(UserConfigParams::m_light_scatter);
-    getWidget<CheckBoxWidget>("pcss")->setState(UserConfigParams::m_pcss);
     if (CVS->isEXTTextureCompressionS3TCUsable())
     {
         getWidget<CheckBoxWidget>("texture_compression")->setState(UserConfigParams::m_texture_compression);
@@ -190,9 +189,6 @@ GUIEngine::EventPropagation CustomVideoSettingsDialog::processEvent(const std::s
             UserConfigParams::m_light_scatter =
                 advanced_pipeline && getWidget<CheckBoxWidget>("lightscattering")->getState();
 
-            UserConfigParams::m_pcss =
-                advanced_pipeline && getWidget<CheckBoxWidget>("pcss")->getState();
-
             UserConfigParams::m_texture_compression =
                 getWidget<CheckBoxWidget>("texture_compression")->getState();
 #ifndef SERVER_ONLY
@@ -235,10 +231,6 @@ GUIEngine::EventPropagation CustomVideoSettingsDialog::processEvent(const std::s
     {
         updateActivation();
     }
-    else if (eventSource == "shadows")
-    {
-        updateActivation();
-    }
 #endif
     return GUIEngine::EVENT_LET;
 }   // processEvent
@@ -249,7 +241,6 @@ void CustomVideoSettingsDialog::updateActivation()
 {
 #ifndef SERVER_ONLY
     bool light = getWidget<CheckBoxWidget>("dynamiclight")->getState();
-    bool shadows = getWidget<SpinnerWidget>("shadows")->getValue();
     if (!CVS->isGLSL())
     {
         getWidget<CheckBoxWidget>("dynamiclight")->setActive(false);
@@ -267,6 +258,5 @@ void CustomVideoSettingsDialog::updateActivation()
     getWidget<CheckBoxWidget>("glow")->setActive(light);
     getWidget<CheckBoxWidget>("bloom")->setActive(light);
     getWidget<CheckBoxWidget>("lightscattering")->setActive(light);
-    getWidget<CheckBoxWidget>("pcss")->setActive(light & shadows);
 #endif
 }   // updateActivation

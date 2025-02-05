@@ -514,7 +514,7 @@ void LightingPasses::renderLights(  bool has_shadow,
             glDisable(GL_DEPTH_TEST);
             glBlendFunc(GL_ONE, GL_ONE);
             glBlendEquation(GL_FUNC_ADD);
-            if (UserConfigParams::m_pcss)
+            if (UserConfigParams::m_pcss_threshold <= UserConfigParams::m_shadows_resolution)
             {
                 ShadowedSunLightShaderPCSS::getInstance()->render(normal_depth_texture,
                                                                   depth_stencil_texture,
