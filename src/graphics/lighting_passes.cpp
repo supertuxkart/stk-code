@@ -205,6 +205,8 @@ public:
 class ShadowedSunLightShaderPCF : public TextureShader<ShadowedSunLightShaderPCF,
                                                        3,  float, float, float,
                                                        float, float, float,
+                                                       core::vector3df, core::vector3df,
+                                                       core::vector3df, core::vector3df,
                                                        core::vector3df, video::SColorf>
 {
 public:
@@ -218,14 +220,15 @@ public:
                            1, "dtex", ST_NEAREST_FILTERED,
                            8, "shadowtex", ST_SHADOW_SAMPLER);
         assignUniforms("split0", "split1", "split2", "splitmax", "shadow_res",
-            "overlap_proportion", "sundirection", "sun_color");
+            "overlap_proportion", "box0", "box1", "box2", "box3", "sundirection", "sun_color");
     }   // ShadowedSunLightShaderPCF
     // ------------------------------------------------------------------------
     void render(GLuint normal_depth_texture,
                 GLuint depth_stencil_texture,
                 const FrameBuffer* shadow_framebuffer,
                 const core::vector3df &direction,
-                const video::SColorf &col)
+                const video::SColorf &col,
+                const core::vector3df* shadow_box_extents)
     {
         setTextureUnits(normal_depth_texture,
                         depth_stencil_texture,
@@ -236,6 +239,8 @@ public:
                             ShadowMatrices::m_shadow_split[4],
                             float(UserConfigParams::m_shadows_resolution),
                             ShadowMatrices::m_shadow_overlap_proportion,
+                            shadow_box_extents[0], shadow_box_extents[1],
+                            shadow_box_extents[2], shadow_box_extents[3],
                             direction, col);
 
     }    // render
@@ -529,7 +534,8 @@ void LightingPasses::renderLights(  bool has_shadow,
                                                                  depth_stencil_texture,
                                                                  shadow_framebuffer,
                                                                  irr_driver->getSunDirection(),
-                                                                 irr_driver->getSunColor());
+                                                                 irr_driver->getSunColor(),
+                                                                 shadow_box_extents);
             }
         }
         else
