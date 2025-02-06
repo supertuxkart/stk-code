@@ -65,9 +65,7 @@ CameraNormal::CameraNormal(Camera::CameraType type,  int camera_index,
 
     if (kart)
     {
-        btTransform btt = kart->getSmoothedTrans();
-        m_kart_position = btt.getOrigin();
-        m_kart_rotation = btt.getRotation();
+        snapToPosition(true);
     }
 }   // Camera
 
@@ -121,7 +119,7 @@ void CameraNormal::moveCamera(float dt, bool smooth, float cam_angle, float dist
         camera_distance * cosf(skid_angle / 2));
 
     float delta = 1;
-    float delta2 = 1;
+    float delta2 = 0.5;
     if (smooth)
     {
         delta = (dt*5.0f);
@@ -178,24 +176,19 @@ void CameraNormal::moveCamera(float dt, bool smooth, float cam_angle, float dist
 void CameraNormal::snapToPosition(bool reset_distance)
 {
     btTransform btt = m_kart->getSmoothedTrans();
+    const Vec3& up = btt.getBasis().getColumn(1);
+    m_camera->setUpVector(up.toIrrVector());
 
     if (reset_distance)
     {
-        const Vec3& up = btt.getBasis().getColumn(1);
         m_kart_position = btt.getOrigin();
         m_kart_rotation = btt.getRotation();
-        m_camera->setUpVector(up.toIrrVector());
         m_camera_offset = irr::core::vector3df(0., 1., -15.);
     }
     else
     {
         float angle = UserConfigParams::m_camera_forward_up_angle * DEGREE_TO_RAD;
-        btQuaternion q1 = m_kart_rotation.normalized();
-        btQuaternion q2 = btt.getRotation().normalized();
         moveCamera(1.0f, false, angle, -m_distance);
-
-        // Quick adjustion of camera direction
-        m_kart_rotation = q1.slerp(q2, 0.5f);
     }
 }   // snapToPosition
 
