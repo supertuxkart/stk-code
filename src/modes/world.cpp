@@ -895,10 +895,9 @@ void World::resetAllKarts()
         {
             Camera* cam = Camera::getCamera(i);
             cam->setInitialTransform();
-            // Ensure that smoothed cameras start from a correct position
-            if (cam->isNormal())
-                dynamic_cast<CameraNormal*>(cam)->snapToPosition();
         }
+        m_snap_camera = true;
+        m_snap_reset_distance = true;
     }
 }   // resetAllKarts
 
@@ -946,6 +945,7 @@ void World::moveKartTo(AbstractKart* kart, const btTransform &transform)
     Track::getCurrentTrack()->getCheckManager()->resetAfterKartMove(kart);
 
     m_snap_camera = true;
+    m_snap_reset_distance = false;
 }   // moveKartTo
 
 // ----------------------------------------------------------------------------
@@ -1029,18 +1029,6 @@ void World::updateWorld(int ticks)
         m_schedule_unpause = false;
     }
 
-    if (m_snap_camera)
-    {
-        m_snap_camera = false;
-        for(unsigned int i=0; i<Camera::getNumCameras(); i++)
-        {
-            Camera* cam = Camera::getCamera(i);
-            // Ensure that smoothed cameras start from a correct position
-            if (cam->isNormal())
-                dynamic_cast<CameraNormal*>(cam)->snapToPosition();
-        }
-    }
-
     // Don't update world if a menu is shown or the race is over.
     // Exceptions : - Networking (local pause doesn't affect the server or other players)
     //              - Benchmarking (a pause would mess up measurements)
@@ -1057,6 +1045,18 @@ void World::updateWorld(int ticks)
     {
         (void)e;   // avoid compiler warning
         return;
+    }
+
+    if (m_snap_camera)
+    {
+        m_snap_camera = false;
+        for(unsigned int i=0; i<Camera::getNumCameras(); i++)
+        {
+            Camera* cam = Camera::getCamera(i);
+            // Ensure that smoothed cameras start from a correct position
+            dynamic_cast<CameraNormal*>(cam)->snapToPosition(m_snap_reset_distance);
+        }
+        m_snap_reset_distance = false;
     }
 
 #ifdef DEBUG

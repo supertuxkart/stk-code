@@ -185,8 +185,6 @@ public:
     /** Returns the type of this camera. */
     CameraType getType() { return m_type; }
     // ------------------------------------------------------------------------
-    bool isNormal() { return (m_type == CM_TYPE_NORMAL); }
-    // ------------------------------------------------------------------------
     /** Sets the field of view for the irrlicht camera. */
     void setFoV() { m_camera->setFOV(m_fov); }
     // ------------------------------------------------------------------------

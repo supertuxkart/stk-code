@@ -73,8 +73,8 @@ private:
     virtual ~CameraNormal() {}
 public:
 
-    void snapToPosition();
-     // ------------------------------------------------------------------------
+    void snapToPosition(bool reset_distance);
+    // ------------------------------------------------------------------------
     bool isDebug() { return false; }
     // ------------------------------------------------------------------------
     bool isFPS() { return false; }
