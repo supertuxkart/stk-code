@@ -1128,7 +1128,7 @@ void GEVulkanDrawCall::createPipeline(GEVulkanDriver* vk,
     depth_stencil.sType = VK_STRUCTURE_TYPE_PIPELINE_DEPTH_STENCIL_STATE_CREATE_INFO;
     depth_stencil.depthTestEnable = settings.m_depth_test;
     depth_stencil.depthWriteEnable = settings.m_depth_write;
-    depth_stencil.depthCompareOp = VK_COMPARE_OP_LESS_OR_EQUAL;
+    depth_stencil.depthCompareOp = VK_COMPARE_OP_LESS;
     depth_stencil.depthBoundsTestEnable = VK_FALSE;
     depth_stencil.stencilTestEnable = VK_FALSE;
 
@@ -1236,6 +1236,7 @@ void GEVulkanDrawCall::createPipeline(GEVulkanDriver* vk,
         if (create_pipeline_for_depth && settings.m_depth_write && !settings.m_depth_only_fragment_shader.empty()) // Depth prepass
         {
             depth_stencil.depthWriteEnable = VK_FALSE;
+            depth_stencil.depthCompareOp = VK_COMPARE_OP_EQUAL;
         }
 
         VkResult result = vkCreateGraphicsPipelines(vk->getDevice(), VK_NULL_HANDLE, 1, 

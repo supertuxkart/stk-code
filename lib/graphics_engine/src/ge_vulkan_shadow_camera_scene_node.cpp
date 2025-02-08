@@ -171,6 +171,8 @@ void GEVulkanShadowCameraSceneNode::render()
     clip[10] = 0.5f;
     clip[14] = 0.5f;
 
+    m_shadow_ubo_data.m_light_view_matrix = m_view_matrix;
+
     for (int i = 0; i < GVSCC_COUNT; i++)
     {
         // View & Proj
@@ -188,7 +190,6 @@ void GEVulkanShadowCameraSceneNode::render()
 
         // Build shadow UBO
         m_shadow_ubo_data.m_light_projection_view_matrix[i] = m_camera_ubo_data[i].m_projection_view_matrix;
-        m_shadow_ubo_data.m_warp_strength[i] = warp_strength[i];
     }
 }
 

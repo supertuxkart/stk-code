@@ -142,13 +142,6 @@ void GEVulkanSunSceneNode::render()
         float z0 = znear;
         float z1 = z0 + d * singamma;
 
-        float lispsm_bias[4];
-       
-        lispsm_bias[0] = -1.f;
-        lispsm_bias[1] = -1.f;
-        lispsm_bias[2] = 1.f;
-        lispsm_bias[3] = 0.f;
-
         if (!stable_mode && singamma > 0.02f && 3.0f * (dznear / (zfar - znear)) < 2.0f)
         {
             float vz0 = std::max(0.0f, std::max(std::max(znear, cam->getNearValue() + dznear), z0));
@@ -166,10 +159,6 @@ void GEVulkanSunSceneNode::render()
             lispsmproj(3, 1) = -2.0 * f * n / d;
             lispsmproj(1, 3) = 1;
             lispsmproj(3, 3) = 0;
-
-            lispsm_bias[1] = lispsmproj(1, 1);
-            lispsm_bias[2] = lispsmproj(0, 0);
-            lispsm_bias[3] = lispsmproj(3, 1);
 
             irr::core::vector3df point = eyepos;
             m_shadow_view_matrix.transformVect(point);
@@ -210,8 +199,6 @@ void GEVulkanSunSceneNode::render()
 
             fittounitcube(3, 0) -= fmod((double)fittounitcube(3, 0), 1. / (getShadowMapSize() / 4));
             fittounitcube(3, 1) -= fmod((double)fittounitcube(3, 1), 1. / (getShadowMapSize() / 4));
-
-            m_shadow_ubo_data.m_world_texel_size[i] = bounding_sphere[3] / (getShadowMapSize() / 2);
         }
         else
         {
@@ -219,25 +206,6 @@ void GEVulkanSunSceneNode::render()
             fittounitcube(1, 1) = 2.0f / lsbody.getExtent().Y;
             fittounitcube(3, 0) = -(lsbody.MinEdge.X + lsbody.MaxEdge.X) / lsbody.getExtent().X;
             fittounitcube(3, 1) = -(lsbody.MinEdge.Y + lsbody.MaxEdge.Y) / lsbody.getExtent().Y;
-
-            lispsm_bias[0]  = fittounitcube(3, 0) * 0.5f + 0.5f;
-            lispsm_bias[1] *= 1.0f / lsbody.getExtent().Y;
-            lispsm_bias[1] += fittounitcube(3, 1) * 0.5f + 0.5f;
-            lispsm_bias[2] *= 1.0f / lsbody.getExtent().X;
-            lispsm_bias[3] *= -1.0f / lsbody.getExtent().Y / getShadowMapSize();
-
-            if (lispsm_bias[3])
-            {
-                float x2 = (lispsm_bias[0] - 0.5) * (lispsm_bias[0] - 0.5);
-                float y2 = (lispsm_bias[1] - 0.5) * (lispsm_bias[1] - 0.5);
-                m_shadow_ubo_data.m_world_texel_size[i] = 
-                    lispsm_bias[3] / y2 * std::max(1.0f, sqrt(x2 + y2) / lispsm_bias[2]);
-            }
-            else
-            {
-                m_shadow_ubo_data.m_world_texel_size[i] = 
-                    std::max(lsbody.getExtent().X,  lsbody.getExtent().Y) / getShadowMapSize();
-            }
         }
         
         lslightproj = fittounitcube * lslightproj;
@@ -256,7 +224,7 @@ void GEVulkanSunSceneNode::render()
     irr::core::matrix4 inv_view;
     m_shadow_view_matrix.getInverse(inv_view);
 
-    m_shadow_ubo_data.m_shadow_far = 150.f;
+    m_shadow_ubo_data.m_light_view_matrix = m_shadow_view_matrix;
 
     for (int i = 0; i < GVSCC_COUNT; i++)
     {

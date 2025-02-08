@@ -150,10 +150,9 @@ vec3 environmentLight(
     return diffuse + specular;
 }
 
-float getShadowPCF(sampler2DArrayShadow map, vec2 shadowtexcoord, int layer, float depth)
+float getShadowPCF(sampler2DArrayShadow map, vec2 shadowtexcoord, int layer, float depth, float size)
 {
     // Castaño, 2013, "Shadow Mapping Summary Part 1"
-    float size = 1024.;
     vec2 uv = shadowtexcoord * size + 0.5;
     vec2 base = (floor(uv) - 0.5) / size;
     vec2 st = fract(uv);
@@ -181,25 +180,25 @@ vec3 getNormalBias(vec3 normal, vec3 lightdir, float texel)
 
 float getShadowFactor(sampler2DArrayShadow map, vec3 world_position, float view_depth, float NdotL, vec3 normal, vec3 lightdir)
 {
-    float end_factor = smoothstep(u_camera.m_shadow_far * 0.8, u_camera.m_shadow_far, view_depth);
-    if (view_depth >= u_camera.m_shadow_far || NdotL <= 0.001)
+    float end_factor = smoothstep(135., 150., view_depth);
+    if (view_depth >= 150. || NdotL <= 0.001)
     {
         return end_factor;
     }
 
     float shadow = 1.0;
+    float size = 1024.;
     float factor = smoothstep(9.0, 10.0, view_depth) + smoothstep(45.0, 50.0, view_depth);
     int level = int(factor);
 
-    vec3 base_normal_bias = normal * (1.0 - max(0.0, dot(-normal, lightdir)));
-    
-	vec3 world_position_bias = world_position + getNormalBias(base_normal_bias, lightdir, u_camera.m_world_texel_size[level]);
+    vec2 base_normal_bias = (u_camera.m_shadow_view_matrix * vec4(normal, 0.)).xy;
+    base_normal_bias *= (1.0 - max(0.0, dot(-normal, lightdir))) / size;
 
-    vec4 light_view_position = u_camera.m_shadow_matrix[level] * vec4(world_position_bias, 1.0);
+    vec4 light_view_position = u_camera.m_shadow_matrix[level] * vec4(world_position, 1.0);
     light_view_position.xyz /= light_view_position.w;
-    light_view_position.xy = light_view_position.xy * 0.5 + 0.5;
+    light_view_position.xy = light_view_position.xy * 0.5 + 0.5 + base_normal_bias;
 
-    shadow = mix(getShadowPCF(map, light_view_position.xy, level, light_view_position.z), 1.0, end_factor);
+    shadow = mix(getShadowPCF(map, light_view_position.xy, level, light_view_position.z, size), 1.0, end_factor);
 
     if (factor == float(level))
     {
@@ -207,14 +206,11 @@ float getShadowFactor(sampler2DArrayShadow map, vec3 world_position, float view_
     }
 
     // Blend with next cascade by factor
-    
-	world_position_bias = world_position + getNormalBias(base_normal_bias, lightdir, u_camera.m_world_texel_size[level + 1]);
-
-    light_view_position = u_camera.m_shadow_matrix[level + 1] * vec4(world_position_bias, 1.0);
+    light_view_position = u_camera.m_shadow_matrix[level + 1] * vec4(world_position, 1.0);
     light_view_position.xyz /= light_view_position.w;
-    light_view_position.xy = light_view_position.xy * 0.5 + 0.5;
+    light_view_position.xy = light_view_position.xy * 0.5 + 0.5 + base_normal_bias;
 
-    shadow = mix(shadow, getShadowPCF(map, light_view_position.xy, level + 1, light_view_position.z), factor - float(level));
+    shadow = mix(shadow, getShadowPCF(map, light_view_position.xy, level + 1, light_view_position.z, size), factor - float(level));
 
     return shadow;
 }
