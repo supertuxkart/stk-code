@@ -62,12 +62,6 @@ FavoriteStatus::FavoriteStatus(const XMLNode* node, std::string parse_type)
 }   // FavoriteStatus
 
 //------------------------------------------------------------------------------
-FavoriteStatus::~FavoriteStatus()
-{
-
-}   // ~FavoriteStatus
-
-//------------------------------------------------------------------------------
 /** Adds a new favorite track to this player profile and to the group
  * of favorite tracks of the Track Manager.
  * To be used only if this player profile is the current player.

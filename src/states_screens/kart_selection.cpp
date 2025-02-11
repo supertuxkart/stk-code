@@ -279,12 +279,12 @@ void KartSelectionScreen::beforeAddingWidget()
     );
     if (useContinueButton())
     {
-        getWidget("kartlist")->m_properties[GUIEngine::PROP_WIDTH] = "85%";
+        getWidget("karts")->m_properties[GUIEngine::PROP_WIDTH] = "85%";
         getWidget("continue")->setVisible(true);
     }
     else
     {
-        getWidget("kartlist")->m_properties[GUIEngine::PROP_WIDTH] = "100%";
+        getWidget("karts")->m_properties[GUIEngine::PROP_WIDTH] = "100%";
         getWidget("continue")->setVisible(false);
     }
     // Remove dispatcher from m_widgets before calculateLayout otherwise a
@@ -354,7 +354,7 @@ void KartSelectionScreen::beforeAddingWidget()
     kart_class->m_properties[GUIEngine::PROP_MIN_VALUE] = "0";
     kart_class->m_properties[GUIEngine::PROP_MAX_VALUE] = StringUtils::toString(classes.size());
     
-    for (int i = 0; i < classes.size(); i++)
+    for (unsigned int i = 0; i < classes.size(); i++)
     {
         // Make the first letter upper-case
         std::string class_str = classes[i];
@@ -418,9 +418,6 @@ void KartSelectionScreen::init()
 
     DynamicRibbonWidget* w = getWidget<DynamicRibbonWidget>("karts");
     assert( w != NULL );
-    // Only allow keyboard and gamepad to choose kart without continue button in
-    // multitouch GUI, so mouse (touch) clicking can be used as previewing karts
-    w->setEventCallbackActive(Input::IT_MOUSEBUTTON, !useContinueButton());
 
     KartHoverListener* karthoverListener = new KartHoverListener(this);
     w->registerHoverListener(karthoverListener);
@@ -497,8 +494,6 @@ void KartSelectionScreen::init()
 
 void KartSelectionScreen::tearDown()
 {
-    kart_properties_manager->clearFavoriteKartStatus();
-
 #ifndef SERVER_ONLY
     GE::getGEConfig()->m_enable_draw_call_cache = false;
     GE::GEVulkanDriver* gevk = GE::getVKDriver();
@@ -527,8 +522,10 @@ void KartSelectionScreen::tearDown()
     m_kart_widgets.clearAndDeleteAll();
 
     if (m_must_delete_on_back)
+    {
+        elementsWereDeleted();
         GUIEngine::removeScreen(this);
-
+    }
 }   // tearDown
 
 // ----------------------------------------------------------------------------
@@ -1217,23 +1214,23 @@ void KartSelectionScreen::eventCallback(Widget* widget,
         assert(w != NULL);
         const std::string selection = w->getSelectionIDString(player_id);
 
-        if (getWidget<CheckBoxWidget>("favorite")->getState()
-         && player_id == PLAYER_ID_GAME_MASTER
-         && selection != RANDOM_KART_ID)
+        if (getWidget<CheckBoxWidget>("favorite")->getState() &&
+            player_id == PLAYER_ID_GAME_MASTER &&
+            selection != RANDOM_KART_ID && !selection.empty())
         {
             const KartProperties *kp = kart_properties_manager->getKart(selection);
 
-            if (PlayerManager::getCurrentPlayer()->isFavoriteKart(kp->getNonTranslatedName()))
+            if (PlayerManager::getCurrentPlayer()->isFavoriteKart(kp->getIdent()))
             {
-                PlayerManager::getCurrentPlayer()->removeFavoriteKart(kp->getNonTranslatedName());
+                PlayerManager::getCurrentPlayer()->removeFavoriteKart(kp->getIdent());
             }
             else
             {
-                PlayerManager::getCurrentPlayer()->addFavoriteKart(kp->getNonTranslatedName());
+                PlayerManager::getCurrentPlayer()->addFavoriteKart(kp->getIdent());
             }
             setKartsFromCurrentGroup();
         }
-        else if (m_kart_widgets.size() > unsigned(player_id))
+        else if (m_kart_widgets.size() > unsigned(player_id) && !useContinueButton())
             playerConfirm(player_id);
     }
     else if (name == "kart_class")
@@ -1635,7 +1632,7 @@ PtrVector<const KartProperties, REF> KartSelectionScreen::getUsableKarts(
             prop->getName().make_lower().find(search_text.c_str()) == -1)
             continue;
         
-        if (kart_class->getValue() != classes.size() &&
+        if (kart_class->getValue() != (int)classes.size() &&
             classes[kart_class->getValue()] != prop->getKartType())
             continue;
 
@@ -1677,7 +1674,7 @@ void KartSelectionScreen::setKartsFromCurrentGroup()
                        prop->getAbsoluteIconFile(), LOCKED_BADGE,
                        IconButtonWidget::ICON_PATH_TYPE_ABSOLUTE);
         }
-        else if (PlayerManager::getCurrentPlayer()->isFavoriteKart(prop->getNonTranslatedName()))
+        else if (PlayerManager::getCurrentPlayer()->isFavoriteKart(prop->getIdent()))
         {
             w->addItem(prop->getName(),
                        prop->getIdent(),

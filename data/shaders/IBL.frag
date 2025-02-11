@@ -1,6 +1,8 @@
 uniform sampler2D ntex;
 uniform sampler2D dtex;
 uniform sampler2D albedo;
+uniform sampler2D ssao;
+uniform sampler2D ctex;
 
 #ifdef GL_ES
 layout (location = 0) out vec4 Diff;
@@ -70,14 +72,22 @@ vec2 RayCast(vec3 dir, vec3 hitCoord)
     }
 }
 
+vec3 gtaoMultiBounce(float visibility, vec3 albedo)
+{
+    // Jimenez et al. 2016, "Practical Realtime Strategies for Accurate Indirect Occlusion"
+    vec3 a =  2.0404 * albedo - 0.3324;
+    vec3 b = -4.7951 * albedo + 0.6417;
+    vec3 c =  2.7552 * albedo + 0.6903;
+
+    return max(vec3(visibility), ((visibility * a + b) * visibility + c) * visibility);
+}
+
 // Main ===================================================================
 
 void main(void)
 {
     vec2 uv = gl_FragCoord.xy / u_screen;
     vec3 normal = DecodeNormal(texture(ntex, uv).xy);
-
-    Diff = vec4(0.25 * DiffuseIBL(normal), 1.);
 
     float z = texture(dtex, uv).x;
 
@@ -86,9 +96,18 @@ void main(void)
     // Extract roughness
     float specval = texture(ntex, uv).z;
 
+    float ao = texture(ssao, uv).x;
+    // Lagarde and de Rousiers 2014, "Moving Frostbite to PBR"
+    float ao_spec = clamp(pow(max(dot(normal, eyedir), 0.) + ao, exp2(-16.0 * (1.0 - specval) - 1.0)) - 1.0 + ao, 0.0, 1.0);
+
 #ifdef GL_ES
-    Spec = vec4(.25 * SpecularIBL(normal, eyedir, specval), 1.);
+    Diff = vec4(0.25 * DiffuseIBL(normal) * ao, 1.);
+    Spec = vec4(.25 * SpecularIBL(normal, eyedir, specval) * ao_spec, 1.);
 #else
+    vec3 surface_color = texture(ctex, uv).xyz;
+    vec3 ao_multi = gtaoMultiBounce(ao, surface_color);
+    vec3 ao_spec_multi = gtaoMultiBounce(ao_spec, surface_color);
+
     // :::::::: Compute Space Screen Reflection ::::::::::::::::::::::::::::::::::::
 
     // Output color
@@ -123,7 +142,8 @@ void main(void)
         outColor = fallback;
     }
 
-    Spec = vec4(outColor.rgb, 1.0);
+    Diff = vec4(0.25 * DiffuseIBL(normal) * ao_multi, 1.);
+    Spec = vec4(outColor.rgb * ao_spec_multi, 1.0);
 #endif
 
 }

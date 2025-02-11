@@ -8,7 +8,7 @@ out vec4 FragColor;
 
 void main()
 {
-    float sigma = 5.;
+    float sigma = 2.;
 
     vec2 uv = gl_FragCoord.xy * pixel;
     float X = uv.x;
@@ -23,7 +23,7 @@ void main()
     g0 *= g1;
     g1 *= g2;
     float tmp_weight, total_weight = g0;
-    for (int i = 1; i < 9; i++) {
+    for (int i = 1; i < 5; i++) {
         tmp_weight = max(0.0, 1.0 - .001 * abs(texture(depth, vec2(X, Y - float(i) * pixel.y)).x - pixel_depth));
         sum += texture(tex, vec2(X, Y - float(i) * pixel.y)) * g0 * tmp_weight;
         total_weight += g0 * tmp_weight;

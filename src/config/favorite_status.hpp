@@ -55,8 +55,6 @@ public:
     /** Parse all <(parse_type)/> in <favorite> in xml node */
     FavoriteStatus(const XMLNode *node, std::string parse_type);
 
-    virtual ~FavoriteStatus();
-
     void save(UTFWriter &out);
 
     bool isFavorite(std::string ident);

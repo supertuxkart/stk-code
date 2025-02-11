@@ -4,8 +4,8 @@
 # in sqlite3 terminal:
 #
 # .mode csv
-# .import `full path to ipv4.csv` ip_mapping
-# .import `full path to ipv6.csv` ipv6_mapping
+# .import 'full path to ipv4.csv' ip_mapping
+# .import 'full path to ipv6.csv' ipv6_mapping
 #
 
 # For query by ip:
@@ -27,8 +27,8 @@ def ipv62int64(addr):
     hi, lo = struct.unpack('!QQ', socket.inet_pton(socket.AF_INET6, addr))
     return hi
 
-CSV_WEB_LINK = 'https://download.db-ip.com/free/dbip-city-lite-2020-01.csv.gz'
-CSV_FILE = 'dbip-city-lite-2020-01.csv'
+CSV_WEB_LINK = 'https://download.db-ip.com/free/dbip-city-lite-2025-01.csv.gz'
+CSV_FILE = 'dbip-city-lite-2025-01.csv'
 
 if not os.path.exists(CSV_FILE):
     print("File = {} does not exist. Download it from = {} ".format(CSV_FILE, CSV_WEB_LINK))
@@ -42,7 +42,7 @@ with open(CSV_FILE, 'r') as csvfile, open('ipv4.csv', 'w') as ipv4, open('ipv6.c
         if row[3] == "ZZ":
             continue
         # Skip empty latitude and longitude
-        if row[6] is "" or row[7] is "":
+        if row[6] == "" or row[7] == "":
             continue
 
         if row[0].find(':') == -1:

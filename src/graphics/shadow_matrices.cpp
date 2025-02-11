@@ -143,11 +143,9 @@ static std::vector<vector3df> getFrustrumVertex(const scene::SViewFrustum &frust
  *  and 1.
  *  \param transform a transform matrix.
  *  \param pointsInside a vector of point in 3d space.
- *  \param size returns the size (width, height) of shadowmap coverage
  */
-core::matrix4 ShadowMatrices::getTighestFitOrthoProj(const core::matrix4 &transform,
-                                    const std::vector<vector3df> &pointsInside,
-                                    std::pair<float, float> &size)
+core::matrix4 ShadowMatrices::getTightestFitOrthoProj(const core::matrix4 &transform,
+                                    const std::vector<vector3df> &pointsInside)
 {
     float xmin = std::numeric_limits<float>::infinity();
     float xmax = -std::numeric_limits<float>::infinity();
@@ -173,9 +171,6 @@ core::matrix4 ShadowMatrices::getTighestFitOrthoProj(const core::matrix4 &transf
     float up = ymin;
     float down = ymax;
 
-    size.first = right - left;
-    size.second = down - up;
-
     core::matrix4 tmp_matrix;
     // Prevent Matrix without extend
     if (left == right || up == down)
@@ -184,7 +179,7 @@ core::matrix4 ShadowMatrices::getTighestFitOrthoProj(const core::matrix4 &transf
         down, up,
         zmin - 100, zmax);
     return tmp_matrix;
-}   // getTighestFitOrthoProj
+}   // getTightestFitOrthoProj
 
 // ----------------------------------------------------------------------------
 /** Generate View, Projection, Inverse View, Inverse Projection, ViewProjection
@@ -280,8 +275,7 @@ void ShadowMatrices::computeMatrixesAndCameras(scene::ICameraSceneNode *const ca
             memcpy(m_shadows_cam[i], tmp, 24 * sizeof(float));
 
             std::vector<vector3df> vectors = getFrustrumVertex(*frustrum);
-            tmp_matrix = getTighestFitOrthoProj(sun_cam_view_matrix, vectors,
-                                                m_shadow_scales[i]);
+            tmp_matrix = getTightestFitOrthoProj(sun_cam_view_matrix, vectors);
 
 
             m_shadow_cam_nodes[i]->setProjectionMatrix(tmp_matrix, true);

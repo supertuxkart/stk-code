@@ -29,7 +29,7 @@
             <div layout="horizontal-row" proportion="1" height="fit">
                 <label text="Shadows" I18N="Video settings"/>
                 <spacer width="10" height="10"/>
-                <gauge id="shadows" min_value="0" max_value="3" proportion="1"/>
+                <gauge id="shadows" min_value="0" max_value="4" proportion="1"/>
             </div>
         </div>
 
@@ -39,9 +39,29 @@
             <spacer width="70" height="10"/>
 
             <div layout="horizontal-row" proportion="1" height="fit">
-                <checkbox id="bloom"/>
+                <checkbox id="mlaa"/>
                 <spacer width="10" height="10"/>
-                <label text="Bloom" I18N="Video settings"/>
+                <label text="Anti-aliasing" I18N="Video settings"/>
+            </div>
+
+            <spacer height="4" width="10" />
+
+            <div layout="horizontal-row" proportion="1" height="fit">
+                <checkbox id="lightscattering"/>
+                <spacer width="10" height="10"/>
+                <label text="Light Scattering" I18N="Video settings"/>
+            </div>
+        </div>
+
+        <spacer height="4" width="10" />
+
+        <div layout="horizontal-row" width="100%" proportion="1">
+            <spacer width="70" height="10"/>
+
+            <div layout="horizontal-row" proportion="1" height="fit">
+                <checkbox id="glow"/>
+                <spacer width="10" height="10"/>
+                <label text="Glow (Outlines)" I18N="Video settings"/>
             </div>
 
             <spacer height="4" width="10" />
@@ -59,45 +79,37 @@
             <spacer width="70" height="10"/>
 
             <div layout="horizontal-row" proportion="1" height="fit">
+                <checkbox id="ibl"/>
+                <spacer width="10" height="10"/>
+                <label text="Image-based lighting" I18N="Video settings"/>
+            </div>
+
+            <spacer height="4" width="10" />
+
+            <div layout="horizontal-row" proportion="1" height="fit">
+                <checkbox id="bloom"/>
+                <spacer width="10" height="10"/>
+                <label text="Bloom" I18N="Video settings"/>
+            </div>
+        </div>
+        
+        <spacer height="4" width="10" />
+
+        <div layout="horizontal-row" width="100%" proportion="1">
+            <spacer width="70" height="10"/>
+
+            <div layout="horizontal-row" proportion="1" height="fit">
                 <checkbox id="ssao"/>
                 <spacer width="10" height="10"/>
                 <label text="Ambient occlusion" I18N="Video settings"/>
             </div>
-
-            <spacer height="4" width="10" />
-
-            <div layout="horizontal-row" proportion="1" height="fit">
-                <checkbox id="dof"/>
-                <spacer width="10" height="10"/>
-                <label text="Depth of field" I18N="Video settings"/>
-            </div>
-        </div>
-
-        <spacer height="4" width="10" />
-
-        <div layout="horizontal-row" width="100%" proportion="1">
-            <spacer width="70" height="10"/>
-        
-            <div layout="horizontal-row" proportion="1" height="fit">
-                <checkbox id="glow"/>
-                <spacer width="10" height="10"/>
-                <label text="Glow (Outlines)" I18N="Video settings"/>
-            </div>
-
-            <spacer height="4" width="10" />
-
-            <div layout="horizontal-row" proportion="1" height="fit">
-                <checkbox id="mlaa"/>
-                <spacer width="10" height="10"/>
-                <label text="Anti-aliasing" I18N="Video settings"/>
-            </div>
         </div>
         
         <spacer height="4" width="10" />
 
         <div layout="horizontal-row" width="100%" proportion="1">
             <spacer width="70" height="10"/>
-            
+
             <div layout="horizontal-row" proportion="1" height="fit">
                 <checkbox id="motionblur"/>
                 <spacer width="10" height="10"/>
@@ -107,21 +119,9 @@
             <spacer height="4" width="10" />
 
             <div layout="horizontal-row" proportion="1" height="fit">
-                <checkbox id="ibl"/>
+                <checkbox id="dof"/>
                 <spacer width="10" height="10"/>
-                <label text="Image-based lighting" I18N="Video settings"/>
-            </div>
-        </div>
-        
-        <spacer height="4" width="10" />
-
-        <div layout="horizontal-row" width="100%" proportion="1">
-            <spacer width="70" height="10"/>
-            
-            <div layout="horizontal-row" proportion="1" height="fit">
-                <checkbox id="lightscattering"/>
-                <spacer width="10" height="10"/>
-                <label text="Light Scattering" I18N="Video settings"/>
+                <label text="Depth of field" I18N="Video settings"/>
             </div>
         </div>
         
@@ -167,11 +167,7 @@
             <gauge id="geometry_detail" min_value="0" max_value="5" width="50%" />
         </div>
 
-        <spacer height="10" width="10" />
-
-        <label text="* Restart STK to apply new settings" width="100%" text_align="center" I18N="Video settings"/>
-
-        <spacer height="4" width="10"/>
+        <spacer height="10" width="10"/>
 
         <buttonbar id="buttons" height="15%" width="30%" align="center">
             <icon-button id="cancel" width="128" height="128" icon="gui/icons/red_x.png"
