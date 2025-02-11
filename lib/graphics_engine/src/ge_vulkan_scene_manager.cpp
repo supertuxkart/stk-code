@@ -188,6 +188,8 @@ void GEVulkanSceneManager::drawAllInternal()
 
     if (cam && sun && sun->getCastShadow())
     {
+        GEVulkanFBOTexture* rtt = vk->getSeparateRTTTexture();
+        if (rtt) cam->setViewPort(core::recti(0, 0, rtt->getSize().Width, rtt->getSize().Height));
         cam->render();
         sun->render();
 
@@ -216,6 +218,8 @@ void GEVulkanSceneManager::drawAllInternal()
     }
     else if (cam)
     {
+        GEVulkanFBOTexture* rtt = vk->getSeparateRTTTexture();
+        if (rtt) cam->setViewPort(core::recti(0, 0, rtt->getSize().Width, rtt->getSize().Height));
         cam->render();
 
         auto it = m_draw_calls.find(cam);

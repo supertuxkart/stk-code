@@ -7,6 +7,7 @@
 #include "ge_vulkan_animated_mesh_scene_node.hpp"
 #include "ge_vulkan_billboard_buffer.hpp"
 #include "ge_vulkan_camera_scene_node.hpp"
+#include "ge_vulkan_command_loader.hpp"
 #include "ge_vulkan_driver.hpp"
 #include "ge_vulkan_dynamic_buffer.hpp"
 #include "ge_vulkan_dynamic_spm_buffer.hpp"
@@ -716,6 +717,142 @@ start:
         object_data_padded_size = m_object_data_padded_size;
         written_size += extra;
         mapped_addr += extra;
+    }
+    
+    if (m_light_nodes.size())
+    {
+        float scale = getGEConfig()->m_render_scale;
+        float x_step = 32.0f / (m_camera->getViewPort().getWidth() * scale);
+        float y_step = 32.0f / (m_camera->getViewPort().getHeight() * scale);
+        printf("%d %d\n", m_camera->getViewPort().getWidth(), m_camera->getViewPort().getHeight());
+
+        irr::core::vector3df fld = m_camera->getViewFrustum()->getFarLeftDown();
+        irr::core::vector3df fru = m_camera->getViewFrustum()->getFarRightUp();
+
+        irr::core::matrix4 view_mat = m_camera->getViewMatrix();
+
+        view_mat.transformVect(fld);
+        view_mat.transformVect(fru);
+
+        std::vector<irr::core::vector3df> x_planes;
+        std::vector<irr::core::vector3df> y_planes;
+
+        for (float i = 0.0f; i < 1.0f; i += x_step)
+        {
+            irr::core::vector3df ray = fru.getInterpolated(fld, i);
+            x_planes.push_back(irr::core::vector3df(-ray.Z, 0., ray.X).normalize());
+        }
+        x_planes.push_back(irr::core::vector3df(-fru.Z, 0., fru.X).normalize());
+        for (float i = 0.0f; i < 1.0f; i += y_step)
+        {
+            irr::core::vector3df ray = fru.getInterpolated(fld, i);
+            y_planes.push_back(irr::core::vector3df(0., -ray.Z, ray.Y).normalize());
+        }
+        y_planes.push_back(irr::core::vector3df(0., -fru.Z, fru.Y).normalize());
+
+        float far = m_camera->getViewFrustum()->getFarLeftUp().getDistanceFrom(m_camera->getAbsolutePosition());
+        for (auto &light : m_light_nodes)
+        {
+            far = std::min(far, light.first->getAbsolutePosition()
+                                    .getDistanceFrom(m_camera->getAbsolutePosition()) + light.first->getRadius());
+        }
+        float near = m_camera->getNearValue();
+        float lnf = logf(far);
+        float lnn = logf(near);
+
+        int setsize = (m_light_nodes.size() - 1) / 32 + 1;
+
+        std::atomic<uint32_t> *cluster_data_xz = new std::atomic<uint32_t>[(x_planes.size() + 1) * 32 * setsize];
+        std::atomic<uint32_t> *cluster_data_yz = new std::atomic<uint32_t>[(y_planes.size() + 1) * 32 * setsize];
+
+        int lid = 0;
+        for (auto &light : m_light_nodes)
+        {
+            auto fill_slice = [lnn, lnf, near, far, setsize](std::atomic<uint32_t> *data, int slice, float n, float f, irr::u32 id)
+            {
+                if (n <= near || f >= far) return;
+                int rn = (logf(std::max(n, near)) - lnn) / (lnf - lnn) * 32;
+                int rf = (logf(std::min(f, far)) - lnn) / (lnf - lnn) * 32;
+                int offset = id >> 5;
+                uint32_t value = 1u << (id & 31);
+                for (int i = rn; i <= rf; i++)
+                {
+                    data[(slice * 32 + i) * setsize + offset].fetch_or(value); 
+                }
+            };
+            GEVulkanCommandLoader::addMultiThreadingCommand(
+                [view_mat, light, fld, fru, x_step, y_step, x_planes, y_planes, fill_slice, cluster_data_xz, cluster_data_yz, lid]() mutable {
+                irr::core::vector3df point = light.first->getAbsolutePosition();
+                view_mat.transformVect(point);
+
+                float dis = point.getLength();
+                float rad = light.first->getRadius();
+                int xcenter = 0;
+                int ycenter = 0;
+                if (x_planes[0].dotProduct(point) < 0.f && x_planes[x_planes.size() - 1].dotProduct(point) > 0.f)
+                {
+                    irr::core::vector3df pf = point * (fld.Z / point.Z);
+                    pf = (pf - fld) / (fru - fld);
+                    xcenter = pf.X / x_step;
+                    fill_slice(cluster_data_xz, xcenter, dis - rad, dis + rad, lid);
+                }
+                else
+                {
+                    if (abs(x_planes[0].dotProduct(point)) < rad) xcenter = -1;
+                    else if (abs(x_planes[x_planes.size() - 1].dotProduct(point)) < rad) xcenter = x_planes.size() - 1;
+                    else return;
+                }
+                if (y_planes[0].dotProduct(point) < 0.f && y_planes[y_planes.size() - 1].dotProduct(point) > 0.f)
+                {
+                    irr::core::vector3df pf = point * (fld.Z / point.Z);
+                    pf = (pf - fld) / (fru - fld);
+                    ycenter = pf.Y / y_step;
+                    fill_slice(cluster_data_yz, ycenter, dis - rad, dis + rad, lid);
+                }
+                else
+                {
+                    if (abs(y_planes[0].dotProduct(point)) < rad) ycenter = -1;
+                    else if (abs(y_planes[y_planes.size() - 1].dotProduct(point)) < rad) ycenter = y_planes.size() - 1;
+                    else return;
+                }
+                for (int i = xcenter - 1; i >= 0; i--)
+                {
+                    float rad2 = abs(x_planes[i + 1].dotProduct(point));
+                    if (rad2 >= rad) break;
+                    float dis2 = sqrtf(dis * dis - rad2 * rad2);
+                    rad2 = sqrtf(rad * rad - rad2 * rad2);
+                    fill_slice(cluster_data_xz, i, dis2 - rad2, dis2 + rad2, lid);
+                }
+                for (int i = xcenter + 1; i < x_planes.size() - 1; i++)
+                {
+                    float rad2 = abs(x_planes[i].dotProduct(point));
+                    if (rad2 >= rad) break;
+                    float dis2 = sqrtf(dis * dis - rad2 * rad2);
+                    rad2 = sqrtf(rad * rad - rad2 * rad2);
+                    fill_slice(cluster_data_xz, i, dis2 - rad2, dis2 + rad2, lid);
+                }
+                for (int i = ycenter - 1; i >= 0; i--)
+                {
+                    float rad2 = abs(y_planes[i + 1].dotProduct(point));
+                    if (rad2 >= rad) break;
+                    float dis2 = sqrtf(dis * dis - rad2 * rad2);
+                    rad2 = sqrtf(rad * rad - rad2 * rad2);
+                    fill_slice(cluster_data_yz, i, dis2 - rad2, dis2 + rad2, lid);
+                }
+                for (int i = ycenter + 1; i < y_planes.size() - 1; i++)
+                {
+                    float rad2 = abs(y_planes[i].dotProduct(point));
+                    if (rad2 >= rad) break;
+                    float dis2 = sqrtf(dis * dis - rad2 * rad2);
+                    rad2 = sqrtf(rad * rad - rad2 * rad2);
+                    fill_slice(cluster_data_yz, i, dis2 - rad2, dis2 + rad2, lid);
+                }
+            });
+            lid++;
+        }
+        GEVulkanCommandLoader::waitIdle();
+        delete[] cluster_data_xz;
+        delete[] cluster_data_yz;
     }
 
     size_t materials_padded_size = 0;

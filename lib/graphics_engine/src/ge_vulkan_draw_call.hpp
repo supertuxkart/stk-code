@@ -160,6 +160,10 @@ private:
 
     size_t m_dynamic_spm_padded_size;
 
+    size_t m_clusters_xz_added_size;
+
+    size_t m_clusters_yz_padded_size;
+
     bool m_update_data_descriptor_sets;
 
     VkDescriptorSetLayout m_data_layout;
