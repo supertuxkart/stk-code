@@ -330,6 +330,9 @@ private:
     /** Graphical type of the mesh. */
     ItemType m_graphical_type;
 
+    /** The parent of m_spark_nodes and m_icon_node */
+    scene::ISceneNode* m_appear_anime_node;
+
     /** Vector containing the sparks */
     std::vector<scene::ISceneNode*> m_spark_nodes;
 

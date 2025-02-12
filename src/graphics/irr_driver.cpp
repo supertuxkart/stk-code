@@ -803,7 +803,7 @@ begin:
 
     if (UserConfigParams::m_shadows_resolution != 0 &&
         (UserConfigParams::m_shadows_resolution < 512 ||
-         UserConfigParams::m_shadows_resolution > 2048))
+         UserConfigParams::m_shadows_resolution > 4096))
     {
         Log::warn("irr_driver",
                "Invalid value for UserConfigParams::m_shadows_resolution : %i",

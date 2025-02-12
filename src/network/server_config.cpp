@@ -341,8 +341,10 @@ void loadServerLobbyFromConfig()
         m_server_max_players > 10)
         m_server_max_players = 10;
 
-    m_max_players_in_game = (m_max_players_in_game <= 0) ? m_server_max_players :
-        std::min(m_max_players_in_game, m_server_max_players);
+    // Parameters should only be sanity checked, not modified for interpretation (see #5173).
+    // A parameter of 0 here means no limit is to be applied.
+    if (m_max_players_in_game < 0)
+        m_max_players_in_game = 0;
 
     if (m_ipv6_connection)
     {
@@ -360,8 +362,6 @@ void loadServerLobbyFromConfig()
     }
     if (m_owner_less)
     {
-        if (m_min_start_game_players > m_max_players_in_game)
-            m_min_start_game_players = 1;
         if (!m_live_players)
             m_team_choosing = false;
         m_server_configurable = false;

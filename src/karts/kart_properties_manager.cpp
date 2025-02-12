@@ -131,8 +131,8 @@ void KartPropertiesManager::removeKart(const std::string &ident)
         // Handle no custom group first
         if(it!=m_groups_2_indices_no_custom[groups[i]].end())
         {
-            m_groups_2_indices_no_custom.erase(groups[i]);
             m_groups_2_indices_no_custom[groups[i]].erase(it);
+
             if(m_groups_2_indices_no_custom[groups[i]].size()==0)
             {
                 m_groups_2_indices_no_custom.erase(groups[i]);

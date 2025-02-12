@@ -46,16 +46,14 @@ private:
     std::vector<core::matrix4> m_sun_ortho_matrices;
     scene::ICameraSceneNode   *m_sun_cam;
     scene::ICameraSceneNode   *m_shadow_cam_nodes[4];
-    std::pair<float, float>    m_shadow_scales[4];
     core::matrix4              m_rsm_matrix;
     bool                       m_rsm_matrix_initialized;
     float                      m_shadows_cam[4][24];
     bool                       m_rsm_map_available;
     float                      m_mat_ubo[16 * 9 + 2];
 
-    core::matrix4 getTighestFitOrthoProj(const core::matrix4 &transform,
-                              const std::vector<core::vector3df> &pointsInside,
-                              std::pair<float, float> &size);
+    core::matrix4 getTightestFitOrthoProj(const core::matrix4 &transform,
+                              const std::vector<core::vector3df> &pointsInside);
     void renderWireFrameFrustrum(float *tmp, unsigned i);
 public:
 
@@ -82,11 +80,6 @@ public:
     std::vector<core::matrix4>& getSunOrthoMatrices()
     {
         return m_sun_ortho_matrices;
-    }
-    // ------------------------------------------------------------------------
-    const std::pair<float, float>* getShadowScales() const
-    {
-        return m_shadow_scales;
     }
     // ------------------------------------------------------------------------
     const float* getMatricesData() const { return m_mat_ubo; }

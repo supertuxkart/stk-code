@@ -65,7 +65,7 @@ public:
                               float sigmaV, float sigmaH) const;
 	void renderHorizontalBlur(const FrameBuffer &in_fbo, const FrameBuffer &auxiliary) const;
 
-    void renderGaussian17TapBlur(const FrameBuffer &in_fbo,
+    void renderGaussian9TapBlur(const FrameBuffer &in_fbo,
                                  const FrameBuffer &auxiliary,
                                  const FrameBuffer &linear_depth) const;
 

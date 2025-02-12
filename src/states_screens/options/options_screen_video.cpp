@@ -64,7 +64,7 @@ void OptionsScreenVideo::initPresets()
 
     m_presets.push_back // Level 4
     ({
-        true /* light */, 0 /* shadow */, false /* bloom */, true /* lightshaft */,
+        true /* light */, 0 /* shadow */, false /* bloom */, false /* lightshaft */,
         true /* glow */, true /* mlaa */, false /* ssao */, true /* light scatter */,
         true /* animatedCharacters */, 2 /* particles */, 2 /* image_quality */,
         false /* degraded IBL */, 3 /* Geometry Detail */
@@ -81,7 +81,7 @@ void OptionsScreenVideo::initPresets()
     m_presets.push_back // Level 6
     ({
         true /* light */, 1024 /* shadow */, true /* bloom */, true /* lightshaft */,
-        true /* glow */, true /* mlaa */, true /* ssao */, true /* light scatter */,
+        true /* glow */, true /* mlaa */, false /* ssao */, true /* light scatter */,
         true /* animatedCharacters */, 2 /* particles */, 3 /* image_quality */,
         false /* degraded IBL */, 4 /* Geometry Detail */
     });
@@ -94,17 +94,25 @@ void OptionsScreenVideo::initPresets()
         false /* degraded IBL */, 5 /* Geometry Detail */
     });
 
-    m_blur_presets.push_back
+    m_presets.push_back // Level 8
+    ({
+        true /* light */, 4096 /* shadow */, true /* bloom */, true /* lightshaft */,
+        true /* glow */, true /* mlaa */, true /* ssao */, true /* light scatter */,
+        true /* animatedCharacters */, 2 /* particles */, 3 /* image_quality */,
+        false /* degraded IBL */, 5 /* Geometry Detail */
+    });
+
+    m_blur_presets.push_back // Level 0
     ({
         false /* motionblur */, false /* depth of field */
     });
 
-    m_blur_presets.push_back
+    m_blur_presets.push_back // Level 1
     ({
         true  /* motionblur */, false /* depth of field */
     });
 
-    m_blur_presets.push_back
+    m_blur_presets.push_back // Level 2
     ({
         true  /* motionblur */, true  /* depth of field */
     });
@@ -124,6 +132,9 @@ void OptionsScreenVideo::initPresets()
     m_scale_rtts_custom_presets.push_back({ 0.9f });
     m_scale_rtts_custom_presets.push_back({ 0.95f });
     m_scale_rtts_custom_presets.push_back({ 1.0f });
+    m_scale_rtts_custom_presets.push_back({ 1.25f });
+    m_scale_rtts_custom_presets.push_back({ 1.5f });
+    m_scale_rtts_custom_presets.push_back({ 2.0f });
 
 }   // initPresets
 
@@ -209,7 +220,7 @@ OptionsScreenVideo::OptionsScreenVideo() : Screen("options/options_video.stkgui"
 void OptionsScreenVideo::loadedFromFile()
 {
     m_inited = false;
-    assert(m_presets.size() == 7);
+    assert(m_presets.size() == 8);
     assert(m_blur_presets.size() == 3);
 
     GUIEngine::SpinnerWidget* gfx =
@@ -230,6 +241,8 @@ void OptionsScreenVideo::loadedFromFile()
 void OptionsScreenVideo::init()
 {
     Screen::init();
+    OptionsCommon::setTabStatus();
+
     m_prev_adv_pipline = UserConfigParams::m_dynamic_lights;
     m_prev_img_quality = getImageQuality();
     RibbonWidget* ribbon = getWidget<RibbonWidget>("options_choice");
@@ -290,6 +303,9 @@ void OptionsScreenVideo::init()
     scale_rtts->addLabel("90%");
     scale_rtts->addLabel("95%");
     scale_rtts->addLabel("100%");
+    scale_rtts->addLabel("125%");
+    scale_rtts->addLabel("150%");
+    scale_rtts->addLabel("200%");
 
     // --- set gfx settings values
     updateGfxSlider();
