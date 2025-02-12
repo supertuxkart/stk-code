@@ -24,7 +24,6 @@
 #include "config/stk_config.hpp"
 #include "config/user_config.hpp"
 #include "graphics/camera/camera.hpp"
-#include "graphics/camera/camera_normal.hpp"
 #include "graphics/irr_driver.hpp"
 #include "graphics/particle_emitter.hpp"
 #include "graphics/particle_kind.hpp"
@@ -57,7 +56,7 @@
 
 #include "LinearMath/btTransform.h"
 
-/** The constructor for a local player kart, i.e. a player that is playing
+/** The constructor for a loca player kart, i.e. a player that is playing
  *  on this machine (non-local player would be network clients).
  *  \param kart_name Name of the kart.
  *  \param position The starting position (1 to n).
@@ -270,10 +269,7 @@ void LocalPlayerController::update(int ticks)
         else
         {
             if (camera->getMode() == Camera::CM_REVERSE)
-            {
                 camera->setMode(Camera::CM_NORMAL);
-                dynamic_cast<CameraNormal*>(camera)->snapToPosition();
-            }
         }
         if (m_sky_particles_emitter)
         {

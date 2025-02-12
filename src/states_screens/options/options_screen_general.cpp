@@ -72,8 +72,6 @@ void OptionsScreenGeneral::init()
     assert( show_login!= NULL );
     show_login->setState( UserConfigParams::m_always_show_login_screen);
 
-    OptionsCommon::setTabStatus();
-
 #ifdef MOBILE_STK
     if (ExtractMobileAssets::hasFullAssets())
     {

@@ -35,7 +35,6 @@ MusicOggStream::MusicOggStream(float loop_start, float loop_end)
     m_soundSource     = -1;
     m_pausedMusic     = true;
     m_playing.store(false);
-    m_play_initialized.store(false);
     m_loop_start      = loop_start;
     m_loop_end        = loop_end;
 }   // MusicOggStream
@@ -167,7 +166,6 @@ bool MusicOggStream::release()
 
     m_soundSource = -1;
     m_playing.store(false);
-    m_play_initialized.store(false);
 
     return true;
 }   // release
@@ -189,7 +187,6 @@ bool MusicOggStream::playMusic()
     alSourcePlay(m_soundSource);
     m_pausedMusic = false;
     m_playing.store(true);
-    m_play_initialized.store(true);
     check("playMusic");
     return true;
 }   // playMusic
@@ -198,6 +195,15 @@ bool MusicOggStream::playMusic()
 bool MusicOggStream::isPlaying()
 {
     return m_playing.load();
+
+    /*
+    if (m_soundSource == -1) return false;
+
+    ALenum state;
+    alGetSourcei(m_soundSource, AL_SOURCE_STATE, &state);
+
+    return (state == AL_PLAYING);
+     */
 }   // isPlaying
 
 //-----------------------------------------------------------------------------
@@ -231,8 +237,7 @@ bool MusicOggStream::resumeMusic()
         return true;
     }
 
-    if(m_play_initialized.load()) // Avoid #5204
-        m_playing.store(true);
+    m_playing.store(true);
 
     alSourcePlay(m_soundSource);
     m_pausedMusic= false;
@@ -249,6 +254,13 @@ void MusicOggStream::setVolume(float volume)
     alSourcef(m_soundSource, AL_GAIN, volume);
     check("volume music");   // clear errors
 }   // setVolume
+
+//-----------------------------------------------------------------------------
+void MusicOggStream::updateFaster(float percent, float max_pitch)
+{
+    alSourcef(m_soundSource,AL_PITCH,1+max_pitch*percent);
+    update();
+}   // updateFaster
 
 //-----------------------------------------------------------------------------
 void MusicOggStream::update()

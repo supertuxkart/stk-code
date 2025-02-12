@@ -31,6 +31,7 @@
 #include "karts/kart_properties_manager.hpp"
 #include "physics/physics.hpp"
 #include "states_screens/race_gui_base.hpp"
+#include "states_screens/track_info_screen.hpp"
 #include "tracks/arena_graph.hpp"
 #include "tracks/arena_node.hpp"
 #include "tracks/terrain_info.hpp"
@@ -44,6 +45,8 @@
 #include <deque>
 #include <string>
 #include <IMeshSceneNode.h>
+
+#include <iostream>
 
 //-----------------------------------------------------------------------------
 /** Constructor. Sets up the clock mode etc.
@@ -62,6 +65,7 @@ ThreeStrikesBattle::ThreeStrikesBattle() : WorldWithRank()
     m_frame_count = 0;
     m_start_time = irr_driver->getRealTime();
     m_total_hit = 0;
+
 
 }   // ThreeStrikesBattle
 
@@ -98,7 +102,7 @@ ThreeStrikesBattle::~ThreeStrikesBattle()
 void ThreeStrikesBattle::reset(bool restart)
 {
     WorldWithRank::reset(restart);
-
+    
     float next_spawn_time =
         RaceManager::get()->getDifficulty() == RaceManager::DIFFICULTY_BEST ? 40.0f :
         RaceManager::get()->getDifficulty() == RaceManager::DIFFICULTY_HARD ? 30.0f :
@@ -116,7 +120,9 @@ void ThreeStrikesBattle::reset(bool restart)
         }
         else
         {
-            m_kart_info[n].m_lives = 3;
+            //m_kart_info[n].m_lives = RaceManager::get()->getTireAmount();
+            //m_kart_info[n].m_lives = 1;   
+            m_kart_info[n].m_lives = UserConfigParams::m_ffa_time_limit;         
         }
 
         // no positions in this mode
@@ -229,10 +235,15 @@ bool ThreeStrikesBattle::kartHit(int kart_id, int hitter)
     assert(kart_id < (int)m_karts.size());
     // make kart lose a life, ignore if in profiling mode
     if (!UserConfigParams::m_arena_ai_stats)
+    {
         m_kart_info[kart_id].m_lives--;
+        if (hitter != -1 && hitter != kart_id && UserConfigParams::m_tire_steal)
+            m_kart_info[hitter].m_lives++;
+    }  
     else
+    {
         m_total_hit++;
-
+    }
     // record event
     BattleEvent evt;
     evt.m_time = getTime();
@@ -316,6 +327,11 @@ bool ThreeStrikesBattle::kartHit(int kart_id, int hitter)
 
     // schedule a tire to be thrown away (but can't do it in this callback
     // because the caller is currently iterating the list of track objects)
+    // don't do this if the tire is getting stolen
+    
+    if (hitter != -1 && hitter != kart_id && UserConfigParams::m_tire_steal)
+        return true;
+    
     m_insert_tire++;
     core::vector3df wheel_pos(m_karts[kart_id]->getKartWidth()*0.5f,
                               0.0f, 0.0f);
@@ -514,23 +530,19 @@ void ThreeStrikesBattle::getKartsDisplayInfo(
 
         // reset color
         rank_info.lap = -1;
-
-        switch(m_kart_info[i].m_lives)
+        
+        if (m_kart_info[i].m_lives == 0)
         {
-            case 3:
-                rank_info.m_color = video::SColor(255, 0, 255, 0);
-                break;
-            case 2:
-                rank_info.m_color = video::SColor(255, 255, 229, 0);
-                break;
-            case 1:
-                rank_info.m_color = video::SColor(255, 255, 0, 0);
-                break;
-            case 0:
-                rank_info.m_color = video::SColor(128, 128, 128, 0);
-                break;
+            rank_info.m_color = video::SColor(128,128,128,0);
         }
-
+        else
+        {
+            float lerp_time;
+            lerp_time = float(m_kart_info[i].m_lives-1)/float(UserConfigParams::m_ffa_time_limit);
+            int lerp_lower = floor(lerp_time*gradientLength);
+    
+            rank_info.m_color = video::SColor(255, lerp(redGradient[lerp_lower+1],redGradient[lerp_lower+2],lerp_time*gradientLength-lerp_lower), lerp(greenGradient[lerp_lower+1],greenGradient[lerp_lower+2],lerp_time*gradientLength-lerp_lower), lerp(blueGradient[lerp_lower+1],blueGradient[lerp_lower+2],lerp_time*gradientLength-lerp_lower));
+    }
         std::ostringstream oss;
         oss << m_kart_info[i].m_lives;
 
@@ -544,20 +556,17 @@ std::pair<int, video::SColor> ThreeStrikesBattle::getSpeedometerDigit(
 {
     video::SColor color = video::SColor(255, 255, 255, 255);
     int id = kart->getWorldKartId();
-    switch(m_kart_info[id].m_lives)
+    if (m_kart_info[id].m_lives == 0)
     {
-        case 3:
-            color = video::SColor(255, 0, 255, 0);
-            break;
-        case 2:
-            color = video::SColor(255, 255, 229, 0);
-            break;
-        case 1:
-            color = video::SColor(255, 255, 0, 0);
-            break;
-        case 0:
-            color = video::SColor(255, 128, 128, 128);
-            break;
+        color = video::SColor(128,128,128,0);
+    }
+    else
+    {
+        float lerp_time;
+        lerp_time = float(m_kart_info[id].m_lives-1)/float(UserConfigParams::m_ffa_time_limit);
+        int lerp_lower = floor(lerp_time*gradientLength);
+    
+        color = video::SColor(255, lerp(redGradient[lerp_lower+1],redGradient[lerp_lower+2],lerp_time*gradientLength-lerp_lower), lerp(greenGradient[lerp_lower+1],greenGradient[lerp_lower+2],lerp_time*gradientLength-lerp_lower), lerp(blueGradient[lerp_lower+1],blueGradient[lerp_lower+2],lerp_time*gradientLength-lerp_lower));
     }
     return std::make_pair(m_kart_info[id].m_lives, color);
 }   // getSpeedometerDigit

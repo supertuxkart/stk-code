@@ -343,7 +343,7 @@ void TracksScreen::beforeAddingWidget()
 
     RibbonWidget* tabs = getWidget<RibbonWidget>("trackgroups");
     tabs->clearAllChildren();
-
+    
     RaceManager::MinorRaceModeType minor_mode = RaceManager::get()->getMinorMode();
     bool is_soccer = minor_mode == RaceManager::MINOR_MODE_SOCCER;
     bool is_arena = is_soccer || RaceManager::get()->isBattleMode();

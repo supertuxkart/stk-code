@@ -49,6 +49,7 @@ public:
     virtual ~MusicOggStream();
 
     virtual void update();
+    virtual void updateFaster(float percent, float max_pitch);
 
     virtual bool load(const std::string& filename);
 
@@ -77,7 +78,6 @@ private:
     bool            m_error;
 
     std::atomic_bool m_playing;
-    std::atomic_bool m_play_initialized;
 
     ALuint m_soundBuffers[2];
     ALuint m_soundSource;

@@ -519,22 +519,14 @@ void RaceGUI::drawLiveDifference()
     video::SColor time_color;
 
     // Change color depending on value
-    if (live_difference > 2.5f)
+    if (live_difference > 1.0f)
         time_color = video::SColor(255, 255, 0, 0);
-    else if (live_difference > 1.0f)
-        time_color = video::SColor(255, 255, 60, 0);
-    else if (live_difference > 0.3f)
-        time_color = video::SColor(255, 255, 120, 0);
     else if (live_difference > 0.0f)
-        time_color = video::SColor(255, 255, 180, 0);
-    else if (live_difference > -0.3f)
-        time_color = video::SColor(255, 210, 230, 0);
+        time_color = video::SColor(255, 255, 160, 0);
     else if (live_difference > -1.0f)
-        time_color = video::SColor(255, 105, 255, 0);
-    else if (live_difference > -2.5f)
-        time_color = video::SColor(255, 0, 210, 30);
+        time_color = video::SColor(255, 160, 255, 0);
     else
-        time_color = video::SColor(255, 0, 160, 60);
+        time_color = video::SColor(255, 0, 255, 0);
 
     int dist_from_right = 10 + timer_width;
 

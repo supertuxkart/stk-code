@@ -154,8 +154,6 @@ void OptionsScreenInput::buildDeviceList()
 void OptionsScreenInput::init()
 {
     Screen::init();
-    OptionsCommon::setTabStatus();
-
     RibbonWidget* tabBar = this->getWidget<RibbonWidget>("options_choice");
     assert(tabBar != NULL);
     tabBar->setFocusForPlayer(PLAYER_ID_GAME_MASTER);

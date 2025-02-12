@@ -123,7 +123,7 @@ unsigned g_skinning_offset = 0;
 // ----------------------------------------------------------------------------
 std::vector<SPMeshNode*> g_skinning_mesh;
 // ----------------------------------------------------------------------------
-bool g_skinning_use_tbo = false;
+int g_skinning_tbo_limit = 0;
 // ----------------------------------------------------------------------------
 int sp_cur_shadow_cascade = 0;
 // ----------------------------------------------------------------------------
@@ -319,13 +319,12 @@ void initSkinning()
     else
     {
 #ifndef USE_GLES2
-        int skinning_tbo_limit;
-        glGetIntegerv(GL_MAX_TEXTURE_BUFFER_SIZE, &skinning_tbo_limit);
-        if (stk_config->m_max_skinning_bones << 6 > (unsigned)skinning_tbo_limit)
+        glGetIntegerv(GL_MAX_TEXTURE_BUFFER_SIZE, &g_skinning_tbo_limit);
+        if (stk_config->m_max_skinning_bones << 6 > (unsigned)g_skinning_tbo_limit)
         {
             Log::warn("SharedGPUObjects", "Too many bones for skinning, max: %d",
-                      skinning_tbo_limit >> 6);
-            stk_config->m_max_skinning_bones = skinning_tbo_limit >> 6;
+                      g_skinning_tbo_limit >> 6);
+            stk_config->m_max_skinning_bones = g_skinning_tbo_limit >> 6;
         }
         Log::info("SharedGPUObjects", "Hardware Skinning enabled, method: TBO, "
                   "max bones: %u", stk_config->m_max_skinning_bones);
@@ -445,14 +444,7 @@ void init()
 
     if (CVS->isARBTextureBufferObjectUsable())
     {
-        int skinning_tbo_limit;
-        glGetIntegerv(GL_MAX_TEXTURE_BUFFER_SIZE_ARB, &skinning_tbo_limit);
-        
-        g_skinning_use_tbo = skinning_tbo_limit >= stk_config->m_max_skinning_bones << 6;
-    }
-    else
-    {
-        g_skinning_use_tbo = false;
+        glGetIntegerv(GL_MAX_TEXTURE_BUFFER_SIZE_ARB, &g_skinning_tbo_limit);
     }
 
     initSkinning();
@@ -663,7 +655,8 @@ SPShader* getNormalVisualizer()
 // ----------------------------------------------------------------------------
 bool skinningUseTBO()
 {
-    return g_skinning_use_tbo;
+    return CVS->isARBTextureBufferObjectUsable()
+        && g_skinning_tbo_limit >= 64 * stk_config->m_max_skinning_bones;
 }
 
 

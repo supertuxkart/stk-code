@@ -134,9 +134,6 @@ private:
         This includes a small waiting time at the end. */
     float                      m_time_overall_scroll;
 
-    /** The small waiting time for the above. */
-    float                      m_extra_scroll_time;
-
     /** Distance between each row of the race results */
     unsigned int               m_distance_between_rows;
 
@@ -189,9 +186,6 @@ private:
     /** For highscores */
     int m_highscore_rank;
 
-    /** Maximum number of points earned by a player in this game (used in animation). */
-    float m_most_points;
-
     unsigned int m_width_all_points;
 
     int m_max_tracks;
@@ -216,7 +210,6 @@ private:
     int  displayLapDifficulty(int x, int y, bool increase_density);
     int  displayChallengeInfo(int x, int y, bool increase_density);
     void displayCTFResults();
-    void drawCTFScorers(KartTeam team, int x, int y, int height);
     void displaySoccerResults();
     void drawTeamScorers(KartTeam team, int x, int y, int height);
     void displayBenchmarkSummary();

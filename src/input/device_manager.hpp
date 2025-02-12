@@ -98,6 +98,8 @@ private:
     void shutdown();
 
 public:
+
+
     DeviceManager();
     ~DeviceManager();
 
@@ -109,7 +111,7 @@ public:
     void addGamepad(GamePadDevice* d);
     int getGamePadAmount() const                            { return m_gamepads.size(); }
     int getGamePadConfigAmount() const                      { return m_gamepad_configs.size(); }
-    GamePadDevice*      getGamePad(const int i);
+    GamePadDevice*      getGamePad(const int i)             { return m_gamepads.get(i); }
     GamepadConfig*      getGamepadConfig(const int i)       { return m_gamepad_configs.get(i); }
     GamePadDevice*      getGamePadFromIrrID(const int i);
     void                clearGamepads();
@@ -133,7 +135,7 @@ public:
         return active;
     }
     int                 getKeyboardConfigAmount() const     { return m_keyboard_configs.size(); }
-    KeyboardDevice*     getKeyboard(const int i);
+    KeyboardDevice*     getKeyboard(const int i)            { return m_keyboards.get(i); }
     KeyboardConfig*     getKeyboardConfig(const int i)      { return m_keyboard_configs.get(i); }
     KeyboardDevice*     getKeyboardFromBtnID(const int btnID);
 

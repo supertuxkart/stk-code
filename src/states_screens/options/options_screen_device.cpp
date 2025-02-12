@@ -63,8 +63,6 @@ void OptionsScreenDevice::beforeAddingWidget()
 void OptionsScreenDevice::init()
 {
     Screen::init();
-    OptionsCommon::setTabStatus();
-
     RibbonWidget* tabBar = getWidget<RibbonWidget>("options_choice");
     assert(tabBar != NULL);
     // Focus is set to the actions list later in the init
@@ -184,7 +182,9 @@ void OptionsScreenDevice::init()
     actions->setSelectionID(0);
 
     // Disable deleting or disabling configuration mid-race
-    if (StateManager::get()->getGameState() == GUIEngine::INGAME_MENU)
+    bool in_game = StateManager::get()->getGameState() == GUIEngine::INGAME_MENU;
+    
+    if (in_game)
     {
         delete_button->setActive(false);
         disable_toggle->setActive(false);

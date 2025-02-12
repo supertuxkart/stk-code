@@ -514,36 +514,12 @@ void setupRaceStart()
     // a current player
     PlayerManager::get()->enforceCurrentPlayer();
 
-    InputDevice *device = NULL;
+    InputDevice *device;
 
-    // Assign the player a device; check the command line params for preferences; by default use keyboard 0
+    // Use keyboard 0 by default in --no-start-screen
+    device = input_manager->getDeviceManager()->getKeyboard(0);
 
-    if(UserConfigParams::m_default_keyboard > -1)
-    {
-        device = input_manager->getDeviceManager()->getKeyboard(UserConfigParams::m_default_keyboard);
-    }
-    else if(UserConfigParams::m_default_gamepad > -1)
-    {
-        // getGamePad(int) returns a GamePadDevice which is a subclass of InputDevice
-        // However, the compiler doesn't like it so it has to be manually casted in
-        device = (InputDevice *) input_manager->getDeviceManager()->getGamePad(UserConfigParams::m_default_gamepad);
-    }
-    // If no config requested or if the requested config doesn't exist
-    if (device == NULL)
-    {
-        if (UserConfigParams::m_default_keyboard > -1 ||
-            UserConfigParams::m_default_gamepad > -1)
-        {
-            Log::error("main", "Requested input device unavailable, fallback to the default keyboard");
-        }
-        device = input_manager->getDeviceManager()->getKeyboard(0);
-    }
-
-    // In case the requested config was disabled, enable it.
-    if (!device->getConfiguration()->isEnabled())
-        device->getConfiguration()->setEnabled(true);
-
-    // Create player and associate player with device
+    // Create player and associate player with keyboard
     StateManager::get()->createActivePlayer(
         PlayerManager::get()->getPlayer(0), device);
 
@@ -581,14 +557,10 @@ void cmdLineHelp()
                               "menu.\n"
     "  -R,  --race-now         Same as -N but also skip the ready-set-go phase"
                               " and the music.\n"
-    "       --use-keyboard=N   Used in conjunction with the -N or -R option, will assign the player to the specified"
-                              " keyboard. Is zero indexed.\n"
-    "       --use-gamepad=N    Used in conjunction with the -N or -R option, will assign the player to the specified"
-                              " gamepad. Is zero indexed.\n"
     "  -t,  --track=NAME       Start track NAME.\n"
     "       --gp=NAME          Start the specified Grand Prix.\n"
-    "       --add-gp-dir=DIR   Load Grand Prix files in DIR. Setting will be saved"
-                              "in config.xml under additional_gp_directory. Use"
+    "       --add-gp-dir=DIR   Load Grand Prix files in DIR. Setting will be saved\n"
+                              "in config.xml under additional_gp_directory. Use\n"
                               "--add-gp-dir=\"\" to unset.\n"
     "       --stk-config=FILE  use ./data/FILE instead of "
                               "./data/stk_config.xml\n"
@@ -1702,14 +1674,6 @@ int handleCmdLine(bool has_server_config, bool has_parent_process)
         UserConfigParams::m_no_start_screen = true;
         UserConfigParams::m_race_now = true;
     }   // --race-now
-
-    if(CommandLine::has( "--use-keyboard",&n)) {
-        UserConfigParams::m_default_keyboard = n;
-    } //--use-keyboard
-
-    if(CommandLine::has( "--use-gamepad",&n)) {
-        UserConfigParams::m_default_gamepad = n;
-    } //--use-gamepad
 
     if(CommandLine::has("--laps", &s))
     {

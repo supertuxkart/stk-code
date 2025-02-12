@@ -170,7 +170,7 @@ public:
 };
 
 // ============================================================================
-class IBLShader : public TextureShader<IBLShader, 6>
+class IBLShader : public TextureShader<IBLShader, 4>
 {
 public:
     IBLShader()
@@ -181,14 +181,12 @@ public:
         assignSamplerNames(0, "ntex",  ST_NEAREST_FILTERED,
                            1, "dtex",  ST_NEAREST_FILTERED,
                            2, "probe", ST_TRILINEAR_CUBEMAP,
-                           3, "albedo",ST_NEAREST_FILTERED,
-                           4, "ssao",  ST_NEAREST_FILTERED,
-                           5, "ctex",  ST_NEAREST_FILTERED);
+                           3, "albedo",ST_NEAREST_FILTERED);
     }   // IBLShader
 };   // IBLShader
 
 // ============================================================================
-class DegradedIBLShader : public TextureShader<DegradedIBLShader, 2>
+class DegradedIBLShader : public TextureShader<DegradedIBLShader, 1>
 {
 public:
     DegradedIBLShader()
@@ -196,8 +194,7 @@ public:
         loadProgram(OBJECT, GL_VERTEX_SHADER, "screenquad.vert",
                             GL_FRAGMENT_SHADER, "degraded_ibl.frag");
         assignUniforms();
-        assignSamplerNames(0, "ntex", ST_NEAREST_FILTERED,
-                           1, "ssao", ST_NEAREST_FILTERED);
+        assignSamplerNames(0, "ntex", ST_NEAREST_FILTERED);
     }   // DegradedIBLShader
 };   // DegradedIBLShader
 
@@ -301,9 +298,7 @@ static void renderPointLights(unsigned count,
 void LightingPasses::renderEnvMap(GLuint normal_depth_texture,
                                   GLuint depth_stencil_texture,
                                   GLuint specular_probe,
-                                  GLuint albedo_buffer,
-                                  GLuint ssao_texture,
-                                  GLuint diffuse_color_texture)
+                                  GLuint albedo_buffer)
 {
     glDisable(GL_DEPTH_TEST);
     glEnable(GL_BLEND);
@@ -316,7 +311,7 @@ void LightingPasses::renderEnvMap(GLuint normal_depth_texture,
         glBindVertexArray(SharedGPUObjects::getFullScreenQuadVAO());
 
         DegradedIBLShader::getInstance()
-            ->setTextureUnits(normal_depth_texture, ssao_texture);
+            ->setTextureUnits(normal_depth_texture);
         DegradedIBLShader::getInstance()->setUniforms();
     }
     else
@@ -328,9 +323,7 @@ void LightingPasses::renderEnvMap(GLuint normal_depth_texture,
             normal_depth_texture,
             depth_stencil_texture,
             specular_probe,
-            albedo_buffer,
-            ssao_texture,
-            diffuse_color_texture);
+            albedo_buffer);
         IBLShader::getInstance()->setUniforms();
     }
 
@@ -441,8 +434,6 @@ void LightingPasses::renderLights(  bool has_shadow,
                                     GLuint depth_stencil_texture,
                                     GLuint albedo_texture,
                                     const FrameBuffer* shadow_framebuffer,
-                                    GLuint ssao_texture,
-                                    GLuint diffuse_color_texture,
                                     GLuint specular_probe)
 {
     {
@@ -450,9 +441,7 @@ void LightingPasses::renderLights(  bool has_shadow,
         renderEnvMap(normal_depth_texture,
                      depth_stencil_texture,
                      specular_probe,
-                     albedo_texture,
-                     ssao_texture,
-                     diffuse_color_texture);
+                     albedo_texture);
     }
 
     // Render sunlight if and only if track supports shadow

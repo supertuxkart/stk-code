@@ -53,7 +53,8 @@ private:
      *  was told not to start right away). */
     bool                    m_music_waiting;
 
-    /** If faster music is enabled at all. */
+    /** If faster music is enabled at all (either separate file or using
+     *  the pitch shift approach). */
     bool                     m_enable_fast;
 
     float                    m_gain;
@@ -63,19 +64,18 @@ private:
     float                    m_normal_loop_end;
     float                    m_fast_loop_end;
 
-    /** Time for fading faster music in. */
+    /** Either time for fading faster music in, or time to change pitch. */
     float                    m_faster_time;
-
-    /* Avoid the temporary volume being forgotten */
-    float                    m_temporary_volume;
-
+    /** Maximum pitch for faster music. */
+    float                    m_max_pitch;
     static const int         LOOP_FOREVER=-1;
     mutable std::mutex       m_music_mutex;
     Music                   *m_normal_music,
                             *m_fast_music;
     enum {SOUND_NORMAL,     //!< normal music is played
           SOUND_FADING,     //!< normal music fading out, faster fading in
-          SOUND_FAST}       //!< playing faster music
+          SOUND_FASTER,     //!< change pitch of normal music
+          SOUND_FAST}       //!< playing faster music or max pitch reached
                              m_mode;
     float                    m_time_since_faster;
 
@@ -127,6 +127,8 @@ public:
     // ------------------------------------------------------------------------
     /** If available, returns the file name of the faster/last-lap music. */
     const std::string& getFastFilename() const { return m_fast_filename; }
+    // ------------------------------------------------------------------------
+    float getMaxPitch() const { return m_max_pitch; }
 
 };   // MusicInformation
 #endif

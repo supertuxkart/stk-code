@@ -41,7 +41,6 @@ class NetworkString;
 class NetworkPlayerProfile;
 class STKPeer;
 class SocketAddress;
-class Ranking;
 
 namespace Online
 {
@@ -155,7 +154,39 @@ private:
 
     std::map<std::string, uint64_t> m_pending_peer_connection;
 
-    std::shared_ptr<Ranking> m_ranking;
+    /* Ranking related variables */
+    // If updating the base points, update the base points distribution in DB
+    const double BASE_RANKING_POINTS    = 4000.0; // Given to a new player on 1st connection to a ranked server
+    const double BASE_RATING_DEVIATION  = 1000.0; // Given to a new player on 1st connection to a ranked server
+    const double MIN_RATING_DEVIATION   = 100.0; // A server cron job makes RD go up if a player is inactive
+    const double BASE_RD_PER_DISCONNECT = 15.0;
+    const double VAR_RD_PER_DISCONNECT  = 3.0;
+    const double MAX_SCALING_TIME       = 360.0;
+    const double BASE_POINTS_PER_SECOND = 0.18;
+    const double HANDICAP_OFFSET        = 2000.0;
+
+    /** Online id to profile map, handling disconnection in ranked server */
+    std::map<uint32_t, std::weak_ptr<NetworkPlayerProfile> > m_ranked_players;
+
+    /** Multi-session rating for each current player */
+    std::map<uint32_t, double> m_raw_scores;
+
+    /** The rating uncertainty for each current player */
+    std::map<uint32_t, double> m_rating_deviations;
+
+    /** A single number compounding "raw score" and RD,
+      * for rating display to players and rankings */
+    std::map<uint32_t, double> m_scores;
+
+    /** The maximum rating obtained for each current player.
+      * This is based on m_scores, not m_raw_scores */
+    std::map<uint32_t, double> m_max_scores;
+
+    /** Number of disconnects in the previous 64 ranked races for each current players */
+    std::map<uint32_t, uint64_t> m_num_ranked_disconnects;
+
+    /** Number of ranked races done for each current players */
+    std::map<uint32_t, unsigned> m_num_ranked_races;
 
     /* Saved the last game result */
     NetworkString* m_result_ns;
@@ -275,6 +306,16 @@ private:
     void getRankingForPlayer(std::shared_ptr<NetworkPlayerProfile> p);
     void submitRankingsToAddons();
     void computeNewRankings();
+    void clearDisconnectedRankedPlayer();
+    double getModeFactor();
+    double getModeSpread();
+    double getTimeSpread(double time);
+    double getUncertaintySpread(uint32_t online_id);
+    double scalingValueForTime(double time);
+    double computeH2HResult(double player1_time, double player2_time);
+    double computeDataAccuracy(double player1_rd, double player2_rd,
+                               double player1_scores, double player2_scores,
+                               int player_count, bool handicap_used);
     void checkRaceFinished();
     void getHitCaptureLimit();
     void configPeersStartTime();

@@ -52,7 +52,6 @@
 namespace OptionsCommon
 {
 	void switchTab(std::string selected_tab);
-	void setTabStatus();
 }
 
 #endif

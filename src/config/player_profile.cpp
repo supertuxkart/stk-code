@@ -105,22 +105,9 @@ PlayerProfile::PlayerProfile(const XMLNode* node)
 //------------------------------------------------------------------------------
 PlayerProfile::~PlayerProfile()
 {
-    if (m_story_mode_status)
-    {
-        delete m_story_mode_status;
-    }
-    if (m_achievements_status)
-    {
-        delete m_achievements_status;
-    }
-    if (m_favorite_track_status)
-    {
-        delete m_favorite_track_status;
-    }
-    if (m_favorite_kart_status)
-    {
-        delete m_favorite_kart_status;
-    }
+    delete m_story_mode_status;
+    delete m_achievements_status;
+    delete m_favorite_track_status;
 #ifdef DEBUG
     m_magic_number = 0xDEADBEEF;
 #endif
