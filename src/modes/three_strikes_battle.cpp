@@ -46,8 +46,6 @@
 #include <string>
 #include <IMeshSceneNode.h>
 
-#include <iostream>
-
 //-----------------------------------------------------------------------------
 /** Constructor. Sets up the clock mode etc.
  */
@@ -120,8 +118,7 @@ void ThreeStrikesBattle::reset(bool restart)
         }
         else
         {
-            //m_kart_info[n].m_lives = RaceManager::get()->getTireAmount();
-            //m_kart_info[n].m_lives = 1;   
+            // Gets starting amount of lives straight from the config (please tell me if this is the best method)
             m_kart_info[n].m_lives = UserConfigParams::m_ffa_time_limit;         
         }
 
@@ -237,6 +234,7 @@ bool ThreeStrikesBattle::kartHit(int kart_id, int hitter)
     if (!UserConfigParams::m_arena_ai_stats)
     {
         m_kart_info[kart_id].m_lives--;
+        // Don't return the tire if 1. the checkbox says so or if 2. the kart hit itself or 3. if there is no hitter. That causes a crash otherwise.
         if (hitter != -1 && hitter != kart_id && UserConfigParams::m_tire_steal)
             m_kart_info[hitter].m_lives++;
     }  
@@ -528,7 +526,8 @@ void ThreeStrikesBattle::getKartsDisplayInfo(
     {
         RaceGUIBase::KartIconDisplayInfo& rank_info = (*info)[i];
 
-        // reset color
+        // Samples colours from a gradient at a regular interval. The colours get funky if it goes out of bound, i dont know why.        
+        
         rank_info.lap = -1;
         
         if (m_kart_info[i].m_lives == 0)
@@ -554,6 +553,8 @@ void ThreeStrikesBattle::getKartsDisplayInfo(
 std::pair<int, video::SColor> ThreeStrikesBattle::getSpeedometerDigit(
                                                 const AbstractKart *kart) const
 {
+    // Samples colours from a gradient at a regular interval. The colours get funky if it goes out of bound, i dont know why.
+        
     video::SColor color = video::SColor(255, 255, 255, 255);
     int id = kart->getWorldKartId();
     if (m_kart_info[id].m_lives == 0)

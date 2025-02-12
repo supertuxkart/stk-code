@@ -297,7 +297,7 @@ void TrackInfoScreen::init()
         m_target_value_label->setText(_("Maximum time (min.)"), false);
         m_target_value_spinner->setValue(UserConfigParams::m_lap_trial_time_limit);
     }
-    // Reverse track or tire stealing and random item in arena
+    // Reverse track and random item in arena
     // -------------
     const bool reverse_available =     m_track->reverseAvailable()
                                    && !(RaceManager::get()->isEggHuntMode());
