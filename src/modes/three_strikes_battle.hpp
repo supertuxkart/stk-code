@@ -151,15 +151,6 @@ public:
     // ------------------------------------------------------------------------
     void spawnSpareTireKarts();
     // ------------------------------------------------------------------------
-    const int redGradient[12] = {30, 64, 255, 255, 255, 128, 0, 0, 0, 0, 0, 0};
-    // ------------------------------------------------------------------------
-    const int greenGradient[12] = {0, 0, 0, 128, 255, 255, 255, 128, 255, 128, 0, 0};
-    // ------------------------------------------------------------------------
-    const int blueGradient[12] = {0, 0, 0, 0, 0, 0, 0, 0, 255, 255, 192, 64};
-    // ------------------------------------------------------------------------
-    /* Must be two lower than the actual length, the first and last items in the 
-     array are just buffers to prevent floating-point disasters */
-    const int gradientLength = 10;
 
 };   // ThreeStrikesBattles
 

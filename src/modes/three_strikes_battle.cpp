@@ -56,7 +56,7 @@ ThreeStrikesBattle::ThreeStrikesBattle() : WorldWithRank()
     m_insert_tire = 0;
 
     m_tire = irr_driver->getMesh(file_manager->getAsset(FileManager::MODEL,
-                                 "tire.spm") );
+                                "tire.spm") );
     irr_driver->grabAllTextures(m_tire);
 
     m_total_rescue = 0;
@@ -66,6 +66,27 @@ ThreeStrikesBattle::ThreeStrikesBattle() : WorldWithRank()
 
 
 }   // ThreeStrikesBattle
+
+namespace
+{
+    const int redGradient[12] = {30, 64, 255, 255, 255, 128, 0, 0, 0, 0, 0, 0};
+    // ------------------------------------------------------------------------
+    const int greenGradient[12] = {0, 0, 0, 128, 255, 255, 255, 128, 255, 128, 0, 0};
+    // ------------------------------------------------------------------------
+    const int blueGradient[12] = {0, 0, 0, 0, 0, 0, 0, 0, 255, 255, 192, 64};
+    // ------------------------------------------------------------------------
+    /* Must be two lower than the actual length, the first and last items in the 
+     array are just buffers to prevent floating-point disasters */
+    const int gradientLength = 10;
+
+    video::SColor calculateColor(int lerp_index, float lerp_time)
+    {
+        int redVal = lerp(redGradient[lerp_index + 1], redGradient[lerp_index + 2], lerp_time);
+        int greenVal = lerp(greenGradient[lerp_index + 1], greenGradient[lerp_index + 2], lerp_time);
+        int blueVal = lerp(blueGradient[lerp_index + 1], blueGradient[lerp_index + 2], lerp_time);
+        return video::SColor(255, redVal, greenVal, blueVal);
+    }
+}
 
 //-----------------------------------------------------------------------------
 /** Initialises the three strikes battle. It sets up the data structure
@@ -102,9 +123,9 @@ void ThreeStrikesBattle::reset(bool restart)
     WorldWithRank::reset(restart);
     
     float next_spawn_time =
-        RaceManager::get()->getDifficulty() == RaceManager::DIFFICULTY_BEST ? 40.0f :
-        RaceManager::get()->getDifficulty() == RaceManager::DIFFICULTY_HARD ? 30.0f :
-        RaceManager::get()->getDifficulty() == RaceManager::DIFFICULTY_MEDIUM ?
+    RaceManager::get()->getDifficulty() == RaceManager::DIFFICULTY_BEST ? 40.0f :
+    RaceManager::get()->getDifficulty() == RaceManager::DIFFICULTY_HARD ? 30.0f :
+    RaceManager::get()->getDifficulty() == RaceManager::DIFFICULTY_MEDIUM ?
         25.0f : 20.0f;
     m_next_sta_spawn_ticks = stk_config->time2Ticks(next_spawn_time);
 
@@ -540,8 +561,8 @@ void ThreeStrikesBattle::getKartsDisplayInfo(
             lerp_time = float(m_kart_info[i].m_lives-1)/float(UserConfigParams::m_ffa_time_limit);
             int lerp_lower = floor(lerp_time*gradientLength);
     
-            rank_info.m_color = video::SColor(255, lerp(redGradient[lerp_lower+1],redGradient[lerp_lower+2],lerp_time*gradientLength-lerp_lower), lerp(greenGradient[lerp_lower+1],greenGradient[lerp_lower+2],lerp_time*gradientLength-lerp_lower), lerp(blueGradient[lerp_lower+1],blueGradient[lerp_lower+2],lerp_time*gradientLength-lerp_lower));
-    }
+            rank_info.m_color = calculateColor(lerp_lower, lerp_time * gradientLength - lerp_lower);
+        }
         std::ostringstream oss;
         oss << m_kart_info[i].m_lives;
 
@@ -567,7 +588,7 @@ std::pair<int, video::SColor> ThreeStrikesBattle::getSpeedometerDigit(
         lerp_time = float(m_kart_info[id].m_lives-1)/float(UserConfigParams::m_ffa_time_limit);
         int lerp_lower = floor(lerp_time*gradientLength);
     
-        color = video::SColor(255, lerp(redGradient[lerp_lower+1],redGradient[lerp_lower+2],lerp_time*gradientLength-lerp_lower), lerp(greenGradient[lerp_lower+1],greenGradient[lerp_lower+2],lerp_time*gradientLength-lerp_lower), lerp(blueGradient[lerp_lower+1],blueGradient[lerp_lower+2],lerp_time*gradientLength-lerp_lower));
+        color = color = calculateColor(lerp_lower, lerp_time * gradientLength - lerp_lower);
     }
     return std::make_pair(m_kart_info[id].m_lives, color);
 }   // getSpeedometerDigit

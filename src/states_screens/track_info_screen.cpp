@@ -253,19 +253,19 @@ void TrackInfoScreen::init()
         m_target_type_label->setText(_("Game mode"), false);
         m_target_type_spinner->clearLabels();
         m_target_type_spinner->addLabel(_("3 Strikes Battle"));
-                
+        
         m_target_type_spinner->addLabel(_("Free-For-All"));
         m_target_type_spinner->setValue(UserConfigParams::m_use_ffa_mode ? 1 : 0);
         m_target_value_spinner->setValue(UserConfigParams::m_ffa_time_limit);
         if (UserConfigParams::m_use_ffa_mode)
             m_target_value_label->setText(_("Maximum time (min.)"), false);
             
-		else
-		    m_target_value_label->setText(_("Starting tires"), false);
+        else
+            m_target_value_label->setText(_("Starting tires"), false);
         
         m_tire_stealing->setVisible(!UserConfigParams::m_use_ffa_mode);
         getWidget<LabelWidget>("tire-stealing-text")->setVisible(!UserConfigParams::m_use_ffa_mode);
-		getWidget<LabelWidget>("tire-stealing-text")->setText(_("Steal tires"), false);
+        getWidget<LabelWidget>("tire-stealing-text")->setText(_("Steal tires"), false);
         m_tire_stealing->setState(UserConfigParams::m_tire_steal);
 
         m_target_value_label->setVisible(true);
@@ -681,8 +681,8 @@ void TrackInfoScreen::eventCallback(Widget* widget, const std::string& name,
 
             if (enable_ffa)
                 m_target_value_label->setText(_("Maximum time (min.)"), false);
-		    else
-		        m_target_value_label->setText(_("Starting tires"), false);
+            else
+                m_target_value_label->setText(_("Starting tires"), false);
         }
     }
     else if (name == "target-value-spinner")
