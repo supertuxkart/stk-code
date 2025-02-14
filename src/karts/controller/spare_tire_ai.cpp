@@ -18,6 +18,7 @@
 
 #include "karts/controller/spare_tire_ai.hpp"
 
+#include "config/user_config.hpp"
 #include "karts/abstract_kart.hpp"
 #include "karts/kart_gfx.hpp"
 #include "karts/max_speed.hpp"
@@ -144,9 +145,18 @@ void SpareTireAI::crashed(const AbstractKart *k)
 
     // Add a life
     RaceGUIBase* r = World::getWorld()->getRaceGUI();
-    m_tsb_world->addKartLife(k->getWorldKartId());
-    if (r)
-        r->addMessage(_("+1 life."), k, 2.0f);
+    if (m_tsb_world->getKartLife(k->getWorldKartId()) == UserConfigParams::m_ffa_time_limit && !UserConfigParams::m_tire_steal)
+    {
+        if (r)
+            r->addMessage(_("You can't go over the starting amount!"), k, 2.0f);
+    }
+    // Otherwise add one life for that kart 
+    else
+    {
+        m_tsb_world->addKartLife(k->getWorldKartId());
+        if (r)
+            r->addMessage(_("+1 life."), k, 2.0f);
+    }
     unspawn();
 
 }   // crashed

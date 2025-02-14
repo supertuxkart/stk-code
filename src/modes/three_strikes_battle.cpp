@@ -69,21 +69,22 @@ ThreeStrikesBattle::ThreeStrikesBattle() : WorldWithRank()
 
 namespace
 {
-    const int redGradient[12] = {30, 64, 255, 255, 255, 128, 0, 0, 0, 0, 0, 0};
+    const int redGradient[12] =   {200,   255,   255,   255,   128,   0,     0,     0,     0,     0,    192,   200};
     // ------------------------------------------------------------------------
-    const int greenGradient[12] = {0, 0, 0, 128, 255, 255, 255, 128, 255, 128, 0, 0};
+    const int greenGradient[12] = {0,     100,   200,   255,   255,   255,   128,   255,   128,   0,    0,     0};
     // ------------------------------------------------------------------------
-    const int blueGradient[12] = {0, 0, 0, 0, 0, 0, 0, 0, 255, 255, 192, 64};
+    const int blueGradient[12] =  {0,     0,     0,     0,     0,     0,     0,     255,   255,   192,  192,   0};
     // ------------------------------------------------------------------------
-    /* Must be two lower than the actual length, the first and last items in the 
-     array are just buffers to prevent floating-point disasters */
-    const int gradientLength = 10;
+    /* Must be 3 lower than the length of the array so it doesn't 
+    and so that it connects once you get more lives than the starting amount.
+    The first and last items in the array must be the same.*/
+    const int gradientLength = 9;
 
     video::SColor calculateColor(int lerp_index, float lerp_time)
     {
-        int redVal = lerp(redGradient[lerp_index + 1], redGradient[lerp_index + 2], lerp_time);
-        int greenVal = lerp(greenGradient[lerp_index + 1], greenGradient[lerp_index + 2], lerp_time);
-        int blueVal = lerp(blueGradient[lerp_index + 1], blueGradient[lerp_index + 2], lerp_time);
+        int redVal = lerp(redGradient[lerp_index], redGradient[lerp_index + 1], lerp_time);
+        int greenVal = lerp(greenGradient[lerp_index], greenGradient[lerp_index + 1], lerp_time);
+        int blueVal = lerp(blueGradient[lerp_index], blueGradient[lerp_index + 1], lerp_time);
         return video::SColor(255, redVal, greenVal, blueVal);
     }
 }
@@ -154,11 +155,11 @@ void ThreeStrikesBattle::reset(bool restart)
 
             if (core::stringc(curr->getName()) == "tire1")
             {
-                curr->setVisible(true);
+                curr->setVisible(UserConfigParams::m_ffa_time_limit >= 3);
             }
             else if (core::stringc(curr->getName()) == "tire2")
             {
-                curr->setVisible(true);
+                curr->setVisible(UserConfigParams::m_ffa_time_limit >= 2);
             }
         }
 
@@ -257,7 +258,8 @@ bool ThreeStrikesBattle::kartHit(int kart_id, int hitter)
         m_kart_info[kart_id].m_lives--;
         // Don't return the tire if 1. the checkbox says so or if 2. the kart hit itself or 3. if there is no hitter. That causes a crash otherwise.
         if (hitter != -1 && hitter != kart_id && UserConfigParams::m_tire_steal)
-            m_kart_info[hitter].m_lives++;
+            addKartLife(hitter);
+
     }  
     else
     {
@@ -561,7 +563,7 @@ void ThreeStrikesBattle::getKartsDisplayInfo(
             lerp_time = float(m_kart_info[i].m_lives-1)/float(UserConfigParams::m_ffa_time_limit);
             int lerp_lower = floor(lerp_time*gradientLength);
     
-            rank_info.m_color = calculateColor(lerp_lower, lerp_time * gradientLength - lerp_lower);
+            rank_info.m_color = calculateColor(lerp_lower % (gradientLength + 2), lerp_time * gradientLength - lerp_lower);
         }
         std::ostringstream oss;
         oss << m_kart_info[i].m_lives;
@@ -588,7 +590,7 @@ std::pair<int, video::SColor> ThreeStrikesBattle::getSpeedometerDigit(
         lerp_time = float(m_kart_info[id].m_lives-1)/float(UserConfigParams::m_ffa_time_limit);
         int lerp_lower = floor(lerp_time*gradientLength);
     
-        color = color = calculateColor(lerp_lower, lerp_time * gradientLength - lerp_lower);
+        color = color = calculateColor(lerp_lower % (gradientLength + 2), lerp_time * gradientLength - lerp_lower);
     }
     return std::make_pair(m_kart_info[id].m_lives, color);
 }   // getSpeedometerDigit
