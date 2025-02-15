@@ -69,26 +69,31 @@ ThreeStrikesBattle::ThreeStrikesBattle() : WorldWithRank()
 
 namespace
 {
-    const int redGradient[12] =   {200,   255,   255,   255,   128,   0,     0,     0,     0,     0,    192,   200};
-    // ------------------------------------------------------------------------
-    const int greenGradient[12] = {0,     100,   200,   255,   255,   255,   128,   255,   128,   0,    0,     0};
-    // ------------------------------------------------------------------------
-    const int blueGradient[12] =  {0,     0,     0,     0,     0,     0,     0,     255,   255,   192,  192,   0};
-    // ------------------------------------------------------------------------
-    /* Must be 3 lower than the length of the array so it doesn't 
-    and so that it connects once you get more lives than the starting amount.
-    The first and last items in the array must be the same.*/
     const int gradientLength = 9;
+    
+    const int redGradient[gradientLength + 3] =   {200,   255,   255,   255,   128,   0,     0,     0,     0,     0,    192,   200};
+    // ------------------------------------------------------------------------
+    const int greenGradient[gradientLength + 3] = {0,     100,   200,   255,   255,   255,   128,   255,   128,   0,    0,     0};
+    // ------------------------------------------------------------------------
+    const int blueGradient[gradientLength + 3] =  {0,     0,     0,     0,     0,     0,     0,     255,   255,   192,  192,   0};
+    // ------------------------------------------------------------------------
 
-    video::SColor calculateColor(int lerp_index, float lerp_time)
+    video::SColor calculateColor(int current_lives, int starting_lives)
     {
-        int redVal = lerp(redGradient[lerp_index], redGradient[lerp_index + 1], lerp_time);
-        int greenVal = lerp(greenGradient[lerp_index], greenGradient[lerp_index + 1], lerp_time);
-        int blueVal = lerp(blueGradient[lerp_index], blueGradient[lerp_index + 1], lerp_time);
-        return video::SColor(255, redVal, greenVal, blueVal);
+        float lerp_time;
+        lerp_time = float(current_lives - 1)/float(starting_lives);
+        int lerp_index = floor(lerp_time*gradientLength);
+        lerp_index = lerp_index % (gradientLength + 2);
+        lerp_time = lerp_time * gradientLength - lerp_index;
+
+        auto channelBrightness = [lerp_time, lerp_index](const int* gradient)
+        {
+            return lerp(gradient[lerp_index], gradient[lerp_index + 1], lerp_time);
+        };
+
+        return video::SColor(255, channelBrightness(redGradient), channelBrightness(greenGradient), channelBrightness(blueGradient));
     }
 }
-
 //-----------------------------------------------------------------------------
 /** Initialises the three strikes battle. It sets up the data structure
  *  to keep track of points etc. for each kart.
@@ -558,12 +563,8 @@ void ThreeStrikesBattle::getKartsDisplayInfo(
             rank_info.m_color = video::SColor(128,128,128,0);
         }
         else
-        {
-            float lerp_time;
-            lerp_time = float(m_kart_info[i].m_lives-1)/float(UserConfigParams::m_ffa_time_limit);
-            int lerp_lower = floor(lerp_time*gradientLength);
-    
-            rank_info.m_color = calculateColor(lerp_lower % (gradientLength + 2), lerp_time * gradientLength - lerp_lower);
+        {    
+            rank_info.m_color = calculateColor(m_kart_info[i].m_lives, UserConfigParams::m_ffa_time_limit);
         }
         std::ostringstream oss;
         oss << m_kart_info[i].m_lives;
@@ -585,12 +586,8 @@ std::pair<int, video::SColor> ThreeStrikesBattle::getSpeedometerDigit(
         color = video::SColor(128,128,128,0);
     }
     else
-    {
-        float lerp_time;
-        lerp_time = float(m_kart_info[id].m_lives-1)/float(UserConfigParams::m_ffa_time_limit);
-        int lerp_lower = floor(lerp_time*gradientLength);
-    
-        color = color = calculateColor(lerp_lower % (gradientLength + 2), lerp_time * gradientLength - lerp_lower);
+    { 
+        color = calculateColor(m_kart_info[id].m_lives, UserConfigParams::m_ffa_time_limit);
     }
     return std::make_pair(m_kart_info[id].m_lives, color);
 }   // getSpeedometerDigit

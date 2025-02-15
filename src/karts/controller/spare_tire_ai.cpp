@@ -148,7 +148,7 @@ void SpareTireAI::crashed(const AbstractKart *k)
     if (m_tsb_world->getKartLife(k->getWorldKartId()) == UserConfigParams::m_ffa_time_limit && !UserConfigParams::m_tire_steal)
     {
         if (r)
-            r->addMessage(_("You can't go over the starting amount!"), k, 2.0f);
+            r->addMessage(_("You can have at most %d lives!"), k, 2.0f);
     }
     // Otherwise add one life for that kart 
     else
