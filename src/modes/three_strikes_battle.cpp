@@ -83,8 +83,8 @@ namespace
         float lerp_time;
         lerp_time = float(current_lives - 1)/float(starting_lives);
         int lerp_index = floor(lerp_time*gradientLength);
-        lerp_index = lerp_index % (gradientLength + 2);
         lerp_time = lerp_time * gradientLength - lerp_index;
+        lerp_index = lerp_index % (gradientLength + 2);
 
         auto channelBrightness = [lerp_time, lerp_index](const int* gradient)
         {
