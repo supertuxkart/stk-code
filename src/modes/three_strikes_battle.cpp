@@ -560,7 +560,7 @@ void ThreeStrikesBattle::getKartsDisplayInfo(
         
         if (m_kart_info[i].m_lives == 0)
         {
-            rank_info.m_color = video::SColor(128,128,128,0);
+            rank_info.m_color = video::SColor(255,128,128,128);
         }
         else
         {    
@@ -583,7 +583,7 @@ std::pair<int, video::SColor> ThreeStrikesBattle::getSpeedometerDigit(
     int id = kart->getWorldKartId();
     if (m_kart_info[id].m_lives == 0)
     {
-        color = video::SColor(128,128,128,0);
+        color = video::SColor(255,128,128,128);
     }
     else
     { 
