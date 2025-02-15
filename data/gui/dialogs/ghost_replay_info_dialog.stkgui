@@ -34,8 +34,9 @@
                         <spacer width="1%"/>
                         <label proportion="1" id="compare-ghost-text" height="100%" text_align="left" I18N="Ghost replay info action" text="Compare to another ghost"/>
                     </div>
+                    <bubble id="info" width="100%" proportion="1" word_wrap="true"/>
                 </div>
-
+                <spacer width="10" height="5%"/>
                 <div width="95%" height="40%" align="center">
                     <buttonbar id="actions" x="0" y="0" height="100%" width="100%" align="center">
                         <icon-button id="back" width="128" height="128"
@@ -52,7 +53,7 @@
                                      I18N="Ghost replay info screen action" text="Start Race" word_wrap="true" />
                     </buttonbar>
                 </div>
-                <spacer width="10" height="10%"/>
+                <spacer width="10" height="5%"/>
             </div>
         </div>
 
