@@ -103,9 +103,7 @@ void CustomVideoSettingsDialog::beforeAddingWidgets()
     shadows->addLabel(_("Low"));        // 1
     shadows->addLabel(_("Medium"));     // 2
     shadows->addLabel(_("High"));       // 3
-    shadows->addLabel(_("Very High"));  // 4
-    shadows->setValue(UserConfigParams::m_shadows_resolution == 4096 ? 4 :
-                      UserConfigParams::m_shadows_resolution == 2048 ? 3 :
+    shadows->setValue(UserConfigParams::m_shadows_resolution == 2048 ? 3 :
                       UserConfigParams::m_shadows_resolution == 1024 ? 2 :
                       UserConfigParams::m_shadows_resolution ==  512 ? 1 : 0);
 
@@ -163,8 +161,7 @@ GUIEngine::EventPropagation CustomVideoSettingsDialog::processEvent(const std::s
                 UserConfigParams::m_shadows_resolution =
                     getWidget<SpinnerWidget>("shadows")->getValue() == 1 ?  512 :
                     getWidget<SpinnerWidget>("shadows")->getValue() == 2 ? 1024 :
-                    getWidget<SpinnerWidget>("shadows")->getValue() == 3 ? 2048 :
-                    getWidget<SpinnerWidget>("shadows")->getValue() == 4 ? 4096 : 0;
+                    getWidget<SpinnerWidget>("shadows")->getValue() == 3 ? 2048 : 0;
             }
             else
             {
@@ -263,4 +260,3 @@ void CustomVideoSettingsDialog::updateActivation()
     getWidget<CheckBoxWidget>("lightscattering")->setActive(light);
 #endif
 }   // updateActivation
-

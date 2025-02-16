@@ -69,7 +69,8 @@ public:
                         const FrameBuffer* shadow_framebuffer,
                         GLuint ssao_texture,
                         GLuint diffuse_color_texture,
-                        GLuint specular_probe);
+                        GLuint specular_probe,
+                        const core::vector3df* shadow_box_extents);
     void renderLightsScatter(GLuint depth_stencil_texture,
                              const FrameBuffer& half1_framebuffer,
                              const FrameBuffer& half2_framebuffer,

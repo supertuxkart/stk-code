@@ -1017,6 +1017,10 @@ namespace UserConfigParams
             PARAM_DEFAULT( IntUserConfigParam(0,
                            "shadows_resolution", &m_graphics_quality,
                            "Shadow resolution (0 = disabled") );
+    PARAM_PREFIX IntUserConfigParam          m_pcss_threshold
+            PARAM_DEFAULT( IntUserConfigParam(2048,
+                           "pcss_threshold", &m_graphics_quality,
+                           "Enable Percentage Closer Soft Shadows when shadow resolution is higher than this value") );
     PARAM_PREFIX BoolUserConfigParam          m_degraded_IBL
         PARAM_DEFAULT(BoolUserConfigParam(true,
         "Degraded_IBL", &m_graphics_quality,

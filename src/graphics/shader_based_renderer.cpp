@@ -292,7 +292,8 @@ void ShaderBasedRenderer::renderSceneDeferred(scene::ICameraSceneNode * const ca
                                         m_rtts->getShadowFrameBuffer(),
                                         m_rtts->getRenderTarget(RTT_HALF1_R),
                                         m_rtts->getRenderTarget(RTT_SP_DIFF_COLOR),
-                                        specular_probe);
+                                        specular_probe,
+                                        m_shadow_matrices.getShadowFrustumBoxExtent());
         PROFILER_POP_CPU_MARKER();
     }
 
