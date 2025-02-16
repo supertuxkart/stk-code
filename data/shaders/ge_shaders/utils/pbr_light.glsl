@@ -270,7 +270,7 @@ vec3 PBRSunAmbientEmitLight(
         diffuse_color, F_ab, F0, F90, NdotV
     );
 
-    vec3 emit = emissive * color * 4.0;
+    vec3 emit = emissive * (color + emissive * emissive * color * color * 10.0);
 
     return sun_color * sunlight
          + environment + emit

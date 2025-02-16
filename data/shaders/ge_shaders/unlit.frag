@@ -37,7 +37,7 @@ void main()
     vec3 diffuse_color = tex_color.xyz * f_vertex_color.xyz;
     vec3 normal = normalize(f_normal.xyz);
 
-    vec4 pbr = vec4(0.0, 0.0, 0.2, 0.0);
+    vec4 pbr = vec4(0.0, 0.0, 0.4, 0.0);
     vec3 xpos = getPosFromFragCoord(gl_FragCoord, u_camera.m_viewport, u_camera.m_inverse_projection_matrix);
     vec3 eyedir = -normalize(xpos);
     vec3 reflection = reflect(-eyedir, normal);
