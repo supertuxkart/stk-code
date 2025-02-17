@@ -36,6 +36,8 @@ namespace OptionsCommon
         	screen = OptionsScreenInput::getInstance();
     	else if (selected_tab == "tab_ui")
         	screen = OptionsScreenUI::getInstance();
+    	else if (selected_tab == "tab_camera")
+        	screen = OptionsScreenCamera::getInstance();
     	else if (selected_tab == "tab_general")
         	screen = OptionsScreenGeneral::getInstance();
     	else if (selected_tab == "tab_language")

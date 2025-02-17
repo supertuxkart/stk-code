@@ -34,6 +34,7 @@
 
 // Other option screens, for navigation between them
 #include "states_screens/options/options_screen_audio.hpp"
+#include "states_screens/options/options_screen_camera.hpp"
 #include "states_screens/options/options_screen_display.hpp"
 #include "states_screens/options/options_screen_general.hpp"
 #include "states_screens/options/options_screen_input.hpp"

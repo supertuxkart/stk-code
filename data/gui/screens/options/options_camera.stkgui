@@ -34,51 +34,15 @@
 
                 <spacer width="5" height="1%"/>
 
-                <!-- ******** Music ******** -->
-                <label width="100%" I18N="In the audio options screen" text="Music"/>
-
-                <div width="75%" height="fit" layout="horizontal-row" >
-                    <label proportion="1" height="100%" text_align="right" I18N="In the audio options screen" text="Enabled"/>
-
-                    <div proportion="1" height="fit" layout="horizontal-row" >
-                        <spacer width="40" height="100%" />
-                        <!-- FIXME: don't hardcode height -->
-                        <checkbox id="music_enabled"/>
-                    </div>
-                </div>
-                <spacer width="5" height="2%"/>
-                <div width="75%" height="fit" layout="horizontal-row" >
-                    <label proportion="1" height="100%" text_align="right" I18N="In the audio options screen" text="Volume"/>
-                    <div proportion="1" height="fit" layout="horizontal-row" >
-                        <spacer width="40" height="100%" />
-                        <gauge id="music_volume" proportion="1" min_value="1" max_value="10"/>
-                    </div>
-                </div>
-
-                <spacer width="5" height="3%"/>
-
-                <!-- ******** SFX ******** -->
-                <label width="100%" I18N="In the audio options screen" text="Sound Effects"/>
-
-                <div width="75%" height="fit" layout="horizontal-row" >
-                    <label proportion="1" height="100%" text_align="right" I18N="In the audio options screen" text="Enabled"/>
-                    <div proportion="1" height="fit" layout="horizontal-row" >
-                        <spacer width="40" height="100%" />
-                        <!-- FIXME: don't hardcode height -->
-                        <checkbox id="sfx_enabled"/>
-                    </div>
-                </div>
-                <spacer width="5" height="2%"/>
-                <div width="75%" height="fit" layout="horizontal-row" >
-                    <label proportion="1" height="100%" text_align="right" I18N="In the audio options screen" text="Volume"/>
-                    <div proportion="1" height="fit" layout="horizontal-row" >
-                        <spacer width="40" height="100%" />
-                        <gauge id="sfx_volume" proportion="1" min_value="1" max_value="10"/>
-                    </div>
+                <!-- ************ EXTRA UI ELEMENTS SETTINGS ************ -->
+                <div width="100%" height="fit" layout="horizontal-row">
+                    <spinner id="camera_preset" width="10f" align="center" />
+                    <label height="100%" x="0" y="0" I18N="In the ui settings" text="Camera"/>
+                    <spacer width="2%" height="100%" />
+                    <button id="custom_camera" text="Custom..." I18N="In the ui settings" align="center"/>
                 </div>
 
                 <spacer width="5" height="2%"/>
-
             </box>
         </div>
     </div>
