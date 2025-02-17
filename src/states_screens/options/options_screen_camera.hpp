@@ -57,6 +57,14 @@ public:
 
     void         updateCameraPresetSpinner();
 
+    /** Enables or disables the spinners allowing to customize a camera values */
+    void setSpinnersActive(bool spinner_status);
+
+    /** Update the active camera parameters and the status of the parameters widgets,
+     * used when switching the active camera */
+    void setCameraParameters(int fov, float distance, float angle, float bw_distance,
+                            float bw_angle, bool forward_smoothing, bool soccer_follow);
+
     void reloadGUIEngine();
 };
 

@@ -34,15 +34,77 @@
 
                 <spacer width="5" height="1%"/>
 
-                <!-- ************ EXTRA UI ELEMENTS SETTINGS ************ -->
                 <div width="100%" height="fit" layout="horizontal-row">
                     <spinner id="camera_preset" width="10f" align="center" />
-                    <label height="100%" x="0" y="0" I18N="In the ui settings" text="Camera"/>
-                    <spacer width="2%" height="100%" />
-                    <button id="custom_camera" text="Custom..." I18N="In the ui settings" align="center"/>
+                    <spacer width="3%" height="100%" />
+                    <label id="camera_name" width="100%" I18N="In the ui/camera settings" text="Player camera"/>
                 </div>
 
                 <spacer width="5" height="2%"/>
+
+                <div width="100%" height="fit" layout="horizontal-row">
+                    <spacer width="3%" height="100%" />
+                    <div proportion="1" height="fit" layout="horizontal-row" >
+                        <label width="35%" height="100%" text_align="left" I18N="In the ui/camera screen" text="FOV"/>
+                        <gauge id="fov" proportion="1"/>
+                    </div>
+                </div>
+
+                <spacer width="5" height="2%"/>
+
+                <div width="100%" height="fit" layout="horizontal-row">
+                    <spacer width="3%" height="100%" />
+                    <div proportion="1" height="fit" layout="horizontal-row" >
+                        <label width="35%" height="100%" text_align="left" I18N="In the ui/camera screen" text="Distance"/>
+                        <gauge id="camera_distance" proportion="1"/>
+                    </div>
+                </div>
+
+                <spacer width="5" height="2%"/>
+
+                <div width="100%" height="fit" layout="horizontal-row">
+                    <spacer width="3%" height="100%" />
+                    <div proportion="1" height="fit" layout="horizontal-row" >
+                        <label width="35%" height="100%" text_align="left" I18N="In the ui/camera screen" text="Angle"/>
+                        <gauge id="camera_angle" proportion="1"/>
+                    </div>
+                </div>
+
+                <spacer width="5" height="2%"/>
+
+                <div width="100%" height="fit" layout="horizontal-row">
+                    <spacer width="3%" height="100%" />
+                    <div proportion="1" height="fit" layout="horizontal-row" >
+                        <checkbox id="camera_smoothing"/>
+                        <spacer width="1%" height="100%" />
+                        <label height="100%" text_align="left" I18N="In the ui/camera screen" text="Smooth camera"/>
+                    </div>
+                </div>
+
+                <spacer width="5" height="2%"/>
+
+                <label width="100%" I18N="In the ui/camera settings" text="Backward camera"/>
+                <spacer height="2%" width="100%" />
+                <div width="100%" height="fit" layout="horizontal-row">
+                    <spacer width="3%" height="100%" />
+                    <label width="fit" height="100%" text_align="left" I18N="In the ui/camera screen" text="Distance"/>
+                    <gauge id="backward_camera_distance" width="35%"/>
+                    <spacer width="2%" height="100%" />
+                    <label width="fit" height="100%" text_align="left" I18N="In the ui/camera screen" text="Angle"/>
+                    <gauge id="backward_camera_angle" width="35%"/>
+                </div>
+
+                <spacer width="5" height="2%"/>
+
+                <div width="100%" height="fit" layout="horizontal-row">
+                    <spacer width="3%" height="100%" />
+                    <div proportion="1" height="fit" layout="horizontal-row" >
+                        <checkbox id="use_soccer_camera"/>
+                        <spacer width="1%" height="100%" />
+                        <label height="100%" text_align="left" I18N="In the ui/camera screen" text="Follow ball in soccer mode"/>
+                    </div>
+                </div>
+
             </box>
         </div>
     </div>
