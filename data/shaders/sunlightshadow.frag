@@ -10,16 +10,16 @@ uniform float split0;
 uniform float split1;
 uniform float split2;
 uniform float splitmax;
+
+uniform vec3  sundirection;
 uniform float shadow_res;
+uniform vec3  sun_color;
 uniform float overlap_proportion;
 
-uniform vec3 box0;
-uniform vec3 box1;
-uniform vec3 box2;
-uniform vec3 box3;
-
-uniform vec3 sundirection;
-uniform vec3 sun_color;
+uniform float texel0;
+uniform float texel1;
+uniform float texel2;
+uniform float texel3;
 
 in vec2 uv;
 #ifdef GL_ES
@@ -123,25 +123,25 @@ void main() {
     nbias -= Lightdir * dot(nbias, Lightdir); // Slope-scaled normal bias
 
     if (xpos.z < split0) {
-        factor = getShadowFactor(xpos.xyz + lbias + nbias * max(box0.x, box0.y), 0);
+        factor = getShadowFactor(xpos.xyz + lbias + nbias * texel0, 0);
         if (xpos.z > blend_start(split0)) {
-            factor = mix(factor, getShadowFactor(xpos.xyz + lbias + nbias * max(box1.x, box1.y), 1), 
+            factor = mix(factor, getShadowFactor(xpos.xyz + lbias + nbias * texel1, 1), 
                             (xpos.z - blend_start(split0)) / split0 / overlap_proportion);
         }
     } else if (xpos.z < split1) {
-        factor = getShadowFactor(xpos.xyz + lbias + nbias * max(box1.x, box1.y), 1);
+        factor = getShadowFactor(xpos.xyz + lbias + nbias * texel1, 1);
         if (xpos.z > blend_start(split1)) {
-            factor = mix(factor, getShadowFactor(xpos.xyz + lbias + nbias * max(box2.x, box2.y), 2), 
+            factor = mix(factor, getShadowFactor(xpos.xyz + lbias + nbias * texel2, 2), 
                             (xpos.z - blend_start(split1)) / split1 / overlap_proportion);
         }
     } else if (xpos.z < split2) {
-        factor = getShadowFactor(xpos.xyz + lbias + nbias * max(box2.x, box2.y), 2);
+        factor = getShadowFactor(xpos.xyz + lbias + nbias * texel2, 2);
         if (xpos.z > blend_start(split2)) {
-            factor = mix(factor, getShadowFactor(xpos.xyz + lbias + nbias * max(box3.x, box3.y), 3), 
+            factor = mix(factor, getShadowFactor(xpos.xyz + lbias + nbias * texel3, 3), 
                             (xpos.z - blend_start(split2)) / split2 / overlap_proportion);
         }
     } else if (xpos.z < splitmax) {
-        factor = getShadowFactor(xpos.xyz + lbias + nbias * max(box3.x, box3.y), 3);
+        factor = getShadowFactor(xpos.xyz + lbias + nbias * texel3, 3);
         if (xpos.z > blend_start(splitmax)) {
             factor = mix(factor, 1.0, (xpos.z - blend_start(splitmax)) / splitmax / overlap_proportion);
         }

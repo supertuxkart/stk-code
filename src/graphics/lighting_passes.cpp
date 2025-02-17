@@ -205,8 +205,7 @@ public:
 class ShadowedSunLightShaderPCF : public TextureShader<ShadowedSunLightShaderPCF,
                                                        3,  float, float, float,
                                                        float, float, float,
-                                                       core::vector3df, core::vector3df,
-                                                       core::vector3df, core::vector3df,
+                                                       float, float, float, float,
                                                        core::vector3df, video::SColorf>
 {
 public:
@@ -220,7 +219,8 @@ public:
                            1, "dtex", ST_NEAREST_FILTERED,
                            8, "shadowtex", ST_SHADOW_SAMPLER);
         assignUniforms("split0", "split1", "split2", "splitmax", "shadow_res",
-            "overlap_proportion", "box0", "box1", "box2", "box3", "sundirection", "sun_color");
+            "overlap_proportion", "texel0", "texel1", "texel2", "texel3", 
+            "sundirection", "sun_color");
     }   // ShadowedSunLightShaderPCF
     // ------------------------------------------------------------------------
     void render(GLuint normal_depth_texture,
@@ -233,15 +233,19 @@ public:
         setTextureUnits(normal_depth_texture,
                         depth_stencil_texture,
                         shadow_framebuffer->getDepthTexture()                );
-       drawFullScreenEffect(ShadowMatrices::m_shadow_split[1],
-                            ShadowMatrices::m_shadow_split[2],
-                            ShadowMatrices::m_shadow_split[3],
-                            ShadowMatrices::m_shadow_split[4],
-                            float(UserConfigParams::m_shadows_resolution),
-                            ShadowMatrices::m_shadow_overlap_proportion,
-                            shadow_box_extents[0], shadow_box_extents[1],
-                            shadow_box_extents[2], shadow_box_extents[3],
-                            direction, col);
+        std::array<float, 4> texel;
+        for (int i = 0; i < 4; i++)
+        {
+            texel[i] = std::max(shadow_box_extents[i].X, shadow_box_extents[i].Y);
+        }
+        drawFullScreenEffect(ShadowMatrices::m_shadow_split[1],
+                             ShadowMatrices::m_shadow_split[2],
+                             ShadowMatrices::m_shadow_split[3],
+                             ShadowMatrices::m_shadow_split[4],
+                             float(UserConfigParams::m_shadows_resolution),
+                             ShadowMatrices::m_shadow_overlap_proportion,
+                             texel[0], texel[1], texel[2], texel[3],
+                             direction, col);
 
     }    // render
 };   // ShadowedSunLightShaderPCF
@@ -250,8 +254,8 @@ public:
 class ShadowedSunLightShaderPCSS : public TextureShader<ShadowedSunLightShaderPCSS,
                                                         4,  float, float, float,
                                                         float, float, float,
-                                                        core::vector3df, core::vector3df,
-                                                        core::vector3df, core::vector3df,
+                                                        core::vector2df, core::vector2df,
+                                                        core::vector2df, core::vector2df,
                                                         core::vector3df, video::SColorf>
 {
 public:
@@ -266,7 +270,8 @@ public:
                            8, "shadowtexdepth", ST_NEAREST_FILTERED_ARRAY2D,
                            16, "shadowtex", ST_SHADOW_SAMPLER);
         assignUniforms("split0", "split1", "split2", "splitmax", "shadow_res",
-            "overlap_proportion", "box0", "box1", "box2", "box3", "sundirection", "sun_color");
+            "overlap_proportion", "penumbra0", "penumbra1", "penumbra2", "penumbra3",
+            "sundirection", "sun_color");
     }   // ShadowedSunLightShaderPCF
     // ------------------------------------------------------------------------
     void render(GLuint normal_depth_texture,
@@ -280,15 +285,20 @@ public:
                         depth_stencil_texture,
                         shadow_framebuffer->getDepthTexture(),
                         shadow_framebuffer->getDepthTexture()                );
-       drawFullScreenEffect(ShadowMatrices::m_shadow_split[1],
-                            ShadowMatrices::m_shadow_split[2],
-                            ShadowMatrices::m_shadow_split[3],
-                            ShadowMatrices::m_shadow_split[4],
-                            float(UserConfigParams::m_shadows_resolution),
-                            ShadowMatrices::m_shadow_overlap_proportion,
-                            shadow_box_extents[0], shadow_box_extents[1],
-                            shadow_box_extents[2], shadow_box_extents[3],
-                            direction, col);
+        std::array<core::vector2df, 4> penumbra;
+        for (int i = 0; i < 4; i++)
+        {
+            float size = tan(core::PI64 * 0.54 / 360.) * shadow_box_extents[i].Z;
+            penumbra[i] = core::vector2df(size / shadow_box_extents[i].X, size / shadow_box_extents[i].Y);
+        }
+        drawFullScreenEffect(ShadowMatrices::m_shadow_split[1],
+                             ShadowMatrices::m_shadow_split[2],
+                             ShadowMatrices::m_shadow_split[3],
+                             ShadowMatrices::m_shadow_split[4],
+                             float(UserConfigParams::m_shadows_resolution),
+                             ShadowMatrices::m_shadow_overlap_proportion,
+                             penumbra[0], penumbra[1], penumbra[2], penumbra[3],
+                             direction, col);
 
     }    // render
 };   // ShadowedSunLightShaderPCSS

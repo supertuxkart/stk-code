@@ -12,16 +12,16 @@ uniform float split0;
 uniform float split1;
 uniform float split2;
 uniform float splitmax;
+
+uniform vec3  sundirection;
 uniform float shadow_res;
+uniform vec3  sun_color;
 uniform float overlap_proportion;
 
-uniform vec3 box0;
-uniform vec3 box1;
-uniform vec3 box2;
-uniform vec3 box3;
-
-uniform vec3 sundirection;
-uniform vec3 sun_color;
+uniform vec2 penumbra0;
+uniform vec2 penumbra1;
+uniform vec2 penumbra2;
+uniform vec2 penumbra3;
 
 in vec2 uv;
 #ifdef GL_ES
@@ -139,25 +139,23 @@ float filterPCSS(vec2 uv, float z_rec, uint layer,
     return occludedCount * (1.0 / 16.0);
 }
 
-float getShadowFactor(vec3 position, vec3 bbox, vec2 dz_duv, uint layer)
+float getShadowFactor(vec3 position, vec2 penumbra, vec2 dz_duv, uint layer)
 {
-    float penumbra = tan(3.14 * sun_angle / 360.) * bbox.z * position.z;
-
     // rotate the poisson disk randomly
     mat2 R = getRandomRotationMatrix(gl_FragCoord.xy);
 
     float occludedCount = 0.0;
     float z_occSum = 0.0;
 
-    blockerSearchAndFilter(occludedCount, z_occSum, position.xy, position.z, layer, penumbra / bbox.xy, dz_duv);
+    blockerSearchAndFilter(occludedCount, z_occSum, position.xy, position.z, layer, penumbra * position.z, dz_duv);
 
     // early exit if there is no occluders at all, also avoids a divide-by-zero below.
     if (z_occSum == 0.0) {
         return 1.0;
     }
 
-    float penumbraRatio = 1.0 - z_occSum / occludedCount / position.z;
-    vec2 radius = max(penumbra / bbox.xy * penumbraRatio, vec2(0.5 / shadow_res));
+    float penumbraRatio = position.z - z_occSum / occludedCount;
+    vec2 radius = max(penumbra * penumbraRatio, vec2(0.5 / shadow_res));
 
     float percentageOccluded = filterPCSS(position.xy, position.z, layer, radius, R, dz_duv);
 
@@ -174,7 +172,7 @@ void main() {
     vec4 xpos = getPosFromUVDepth(vec3(uv, z), u_inverse_projection_matrix);
 
     vec3 norm = DecodeNormal(texture(ntex, uv).xy);
-    float roughness =texture(ntex, uv).z;
+    float roughness = texture(ntex, uv).z;
     vec3 eyedir = -normalize(xpos.xyz);
 
     vec3 Lightdir = SunMRP(norm, eyedir);
@@ -206,11 +204,11 @@ void main() {
 
     float factor;
     if (xpos.z < split0) {
-        float factor2 = getShadowFactor(position1, box0, dz_duv1, 0);
+        float factor2 = getShadowFactor(position1, penumbra0, dz_duv1, 0);
         factor = factor2;
     }
     if (blend_start(split0) < xpos.z && xpos.z < split1) {
-        float factor2 = getShadowFactor(position2, box1, dz_duv2, 1);
+        float factor2 = getShadowFactor(position2, penumbra1, dz_duv2, 1);
         if (xpos.z < split0) {
             factor = mix(factor, factor2, (xpos.z - blend_start(split0)) / split0 / overlap_proportion);
         } else {
@@ -218,7 +216,7 @@ void main() {
         }
     }
     if (blend_start(split1) < xpos.z && xpos.z < split2) {
-        float factor2 = getShadowFactor(position3, box2, dz_duv3, 2);
+        float factor2 = getShadowFactor(position3, penumbra2, dz_duv3, 2);
         if (xpos.z < split1) {
             factor = mix(factor, factor2, (xpos.z - blend_start(split1)) / split1 / overlap_proportion);
         } else {
@@ -226,7 +224,7 @@ void main() {
         }
     }
     if (blend_start(split2) < xpos.z && xpos.z < splitmax) {
-        float factor2 = getShadowFactor(position4, box3, dz_duv4, 3);
+        float factor2 = getShadowFactor(position4, penumbra3, dz_duv4, 3);
         if (xpos.z < split2) {
             factor = mix(factor, factor2, (xpos.z - blend_start(split2)) / split2 / overlap_proportion);
         } else {
