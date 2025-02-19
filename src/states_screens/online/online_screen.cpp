@@ -195,9 +195,7 @@ void OnlineScreen::loadList()
         // Date format
         int yyyy, mm, dd;
         sscanf(date.c_str(), "%d-%d-%d", &yyyy, &mm, &dd);
-        date = StringUtils::toString(yyyy) + "-"
-             + StringUtils::toString(mm) + "-"
-             + StringUtils::toString(dd);
+        date = StkTime::toString(yyyy, mm, dd);
 
         std::vector<GUIEngine::ListWidget::ListCell> row;
         row.push_back(GUIEngine::ListWidget::ListCell(str.c_str(), icon, 4, false));
