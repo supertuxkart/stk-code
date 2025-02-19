@@ -402,6 +402,11 @@ void World::reset(bool restart)
     // explosion animation will be created
     ProjectileManager::get()->cleanup();
     resetAllKarts();
+
+    if (restart)
+    {
+        m_snap_camera = true;
+    }
     // Note: track reset must be called after all karts exist, since check
     // objects need to allocate data structures depending on the number
     // of karts.
@@ -895,9 +900,6 @@ void World::resetAllKarts()
         {
             Camera* cam = Camera::getCamera(i);
             cam->setInitialTransform();
-            // Ensure that smoothed cameras start from a correct position
-            if (cam->isNormal())
-                dynamic_cast<CameraNormal*>(cam)->snapToPosition();
         }
     }
 }   // resetAllKarts
@@ -944,8 +946,6 @@ void World::moveKartTo(AbstractKart* kart, const btTransform &transform)
     // This will set the physics transform
     Track::getCurrentTrack()->findGround(kart);
     Track::getCurrentTrack()->getCheckManager()->resetAfterKartMove(kart);
-
-    m_snap_camera = true;
 }   // moveKartTo
 
 // ----------------------------------------------------------------------------
@@ -1027,18 +1027,6 @@ void World::updateWorld(int ticks)
     {
         unpause();
         m_schedule_unpause = false;
-    }
-
-    if (m_snap_camera)
-    {
-        m_snap_camera = false;
-        for(unsigned int i=0; i<Camera::getNumCameras(); i++)
-        {
-            Camera* cam = Camera::getCamera(i);
-            // Ensure that smoothed cameras start from a correct position
-            if (cam->isNormal())
-                dynamic_cast<CameraNormal*>(cam)->snapToPosition();
-        }
     }
 
     // Don't update world if a menu is shown or the race is over.
@@ -1175,6 +1163,17 @@ void World::update(int ticks)
         printf("%i\n",irr_driver->getVideoDriver()->getFPS());
     }
 #endif
+
+    if (m_snap_camera)
+    {
+        m_snap_camera = false;
+        for(unsigned int i=0; i<Camera::getNumCameras(); i++)
+        {
+            Camera* cam = Camera::getCamera(i);
+            // Ensure that smoothed cameras start from a correct position
+            dynamic_cast<CameraNormal*>(cam)->snapToPosition(true);
+        }
+    }
 
     PROFILER_PUSH_CPU_MARKER("World::update (sub-updates)", 0x20, 0x7F, 0x00);
     WorldStatus::update(ticks);
