@@ -59,6 +59,13 @@ vec2 vogel_disk_16[16] = vec2[](
     vec2(-0.1133270115046468, -0.9490025827627441)
 );
 
+vec2 vogel_disk_4[4] = vec2[](
+	vec2(0.21848650099008202, -0.09211370200809937),
+	vec2(-0.5866112654782878, 0.32153793477769893),
+	vec2(-0.06595078555407359, -0.879656059066481),
+	vec2(0.43407555004227927, 0.6502318262968816)
+);
+
 // https://learn.microsoft.com/en-us/windows/win32/api/d3d11/ne-d3d11-d3d11_standard_multisample_quality_levels?redirectedfrom=MSDN
 vec2 sample_point_pos[8] = vec2[](
     vec2( 0.125, -0.375),
@@ -69,6 +76,17 @@ vec2 sample_point_pos[8] = vec2[](
     vec2(-0.875, -0.125),
     vec2( 0.375,  0.875),
     vec2( 0.875, -0.875)
+);
+
+float sample_point_coeff[8] = float[](
+    0.157112,
+    0.157112,
+    0.138651,
+    0.130251,
+    0.114946,
+    0.114946,
+    0.107982,
+    0.079001
 );
 
 float interleavedGradientNoise(vec2 w)
@@ -98,68 +116,80 @@ mat2 getRandomRotationMatrix(vec2 fragCoord)
     return R;
 }
 
-void blockerSearchAndFilter(out float occludedCount, out float z_occSum,
-        vec2 uv, float z_rec, uint layer, vec2 filterRadii, vec2 dz_duv)
+void blockerSearchAndFilter(out float occludedFactor, out float z_occSum,
+        vec2 uv, float z_rec, float layer, vec2 filterRadii, vec2 dz_duv, float bias)
 {
-    // Make sure no light leaking
-    float z_occ = texture(shadowtexdepth, vec3(uv, float(layer))).r;
-    float dz = z_rec - z_occ;
-    float occluded = 0.01 * step(0.5 / shadow_res, dz);
-    occludedCount = occluded;
-    z_occSum = z_occ * occluded;
+    occludedFactor = 0.;
+    z_occSum = 0.;
 
     for (uint i = 0u; i < 8u; i++)
     {
         vec2 duv = sample_point_pos[i] * filterRadii;
         vec2 tc = clamp(uv + duv, vec2(0.), vec2(1.));
         // receiver plane depth bias
-        float z_bias = dot(dz_duv, duv);
+        float z_bias = -dot(dz_duv, duv) + bias;
 
-        float z_occ = texture(shadowtexdepth, vec3(tc, float(layer))).r;
+        float z_occ = texture(shadowtexdepth, vec3(tc, layer)).r;
         float dz = z_rec - z_occ; // dz>0 when blocker is between receiver and light
-        float occluded = step(z_bias, dz);
-        occludedCount += occluded;
+        float occluded = step(z_bias, dz) * sample_point_coeff[i];
+        occludedFactor += occluded;
         z_occSum += z_occ * occluded;
     }
 }
 
-float filterPCSS(vec2 uv, float z_rec, uint layer,
+float filterPCF(vec2 uv, float z_rec, float layer,
+        vec2 filterRadii, mat2 R, vec2 dz_duv)
+{
+    float occludedCount = 0.0; // must be to workaround a spirv-tools issue
+    for (uint i = 0u; i < 4u; i++)
+    {
+        vec2 duv = R * (vogel_disk_4[i] * filterRadii);
+        vec2 tc = uv + duv;
+        
+        // receiver plane depth bias
+        float z_bias = dot(dz_duv, duv); 
+        occludedCount += texture(shadowtex, vec4(tc, layer, z_rec + z_bias));
+    }
+    return occludedCount * (1.0 / 4.0);
+}
+
+float filterPCSS(vec2 uv, float z_rec, float layer,
         vec2 filterRadii, mat2 R, vec2 dz_duv)
 {
     float occludedCount = 0.0; // must be to workaround a spirv-tools issue
     for (uint i = 0u; i < 16u; i++)
     {
         vec2 duv = R * (vogel_disk_16[i] * filterRadii);
-        vec2 tc = clamp(uv + duv, vec2(0.), vec2(1.));
+        vec2 tc = uv + duv;
         
         // receiver plane depth bias
         float z_bias = dot(dz_duv, duv); 
-        occludedCount += texture(shadowtex, vec4(tc, float(layer), z_rec + z_bias));
+        occludedCount += texture(shadowtex, vec4(tc, layer, z_rec + z_bias));
     }
     return occludedCount * (1.0 / 16.0);
 }
 
-float getShadowFactor(vec3 position, vec2 penumbra, vec2 dz_duv, uint layer)
+float getShadowFactor(vec3 position, vec2 penumbra, vec2 dz_duv, float layer)
 {
     // rotate the poisson disk randomly
     mat2 R = getRandomRotationMatrix(gl_FragCoord.xy);
+    float min_radius = 0.5 / shadow_res;
 
-    float occludedCount = 0.0;
+    float occludedFactor = 0.0;
     float z_occSum = 0.0;
 
-    blockerSearchAndFilter(occludedCount, z_occSum, position.xy, position.z, layer, penumbra * position.z, dz_duv);
+    blockerSearchAndFilter(occludedFactor, z_occSum, 
+        position.xy, position.z, layer, penumbra, dz_duv, min_radius / max(penumbra.x, penumbra.y));
 
     // early exit if there is no occluders at all, also avoids a divide-by-zero below.
-    if (z_occSum == 0.0) {
-        return 1.0;
+    if (occludedFactor == 0.0) {
+        return filterPCF(position.xy, position.z, layer, vec2(min_radius), R, dz_duv);
     }
 
-    float penumbraRatio = position.z - z_occSum / occludedCount;
-    vec2 radius = max(penumbra * penumbraRatio, vec2(0.5 / shadow_res));
+    float penumbraRatio = position.z - z_occSum / occludedFactor;
+    vec2 radius = max(penumbra * penumbraRatio, vec2(min_radius));
 
-    float percentageOccluded = filterPCSS(position.xy, position.z, layer, radius, R, dz_duv);
-
-    return percentageOccluded;
+    return filterPCSS(position.xy, position.z, layer, radius, R, dz_duv);
 }
 
 float blend_start(float x) {
@@ -204,11 +234,11 @@ void main() {
 
     float factor;
     if (xpos.z < split0) {
-        float factor2 = getShadowFactor(position1, penumbra0, dz_duv1, 0);
+        float factor2 = getShadowFactor(position1, penumbra0, dz_duv1, 0.);
         factor = factor2;
     }
     if (blend_start(split0) < xpos.z && xpos.z < split1) {
-        float factor2 = getShadowFactor(position2, penumbra1, dz_duv2, 1);
+        float factor2 = getShadowFactor(position2, penumbra1, dz_duv2, 1.);
         if (xpos.z < split0) {
             factor = mix(factor, factor2, (xpos.z - blend_start(split0)) / split0 / overlap_proportion);
         } else {
@@ -216,7 +246,7 @@ void main() {
         }
     }
     if (blend_start(split1) < xpos.z && xpos.z < split2) {
-        float factor2 = getShadowFactor(position3, penumbra2, dz_duv3, 2);
+        float factor2 = getShadowFactor(position3, penumbra2, dz_duv3, 2.);
         if (xpos.z < split1) {
             factor = mix(factor, factor2, (xpos.z - blend_start(split1)) / split1 / overlap_proportion);
         } else {
@@ -224,7 +254,7 @@ void main() {
         }
     }
     if (blend_start(split2) < xpos.z && xpos.z < splitmax) {
-        float factor2 = getShadowFactor(position4, penumbra3, dz_duv4, 3);
+        float factor2 = getShadowFactor(position4, penumbra3, dz_duv4, 3.);
         if (xpos.z < split2) {
             factor = mix(factor, factor2, (xpos.z - blend_start(split2)) / split2 / overlap_proportion);
         } else {
