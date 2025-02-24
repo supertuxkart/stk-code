@@ -141,7 +141,7 @@
     <achievement id="1" name="Christoffel Columbus" description="Play every official track at least once." >
         <goal type="race-finished-all" value="1"/>
     </achievement>
-    <achievement id="2" name="Strike!" description="Hit 10 karts with a bowling-ball.">
+    <achievement id="2" name="Strike!" description="Hit 10 karts with a bowling ball.">
         <goal type="bowling-hit" value="10"/>
     </achievement>
     <achievement id="3" name="Arch Enemy" description="Hit the same kart at least 5 times in one race.">
