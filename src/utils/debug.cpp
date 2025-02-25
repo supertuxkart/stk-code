@@ -1250,7 +1250,7 @@ bool onEvent(const SEvent &event)
             sub = mnu->getSubMenu(3);
             sub->addItem(L"Anchor (F1)", DEBUG_POWERUP_ANVIL );
             sub->addItem(L"Basketball (F2)", DEBUG_POWERUP_RUBBERBALL );
-            sub->addItem(L"Bowling (F3)", DEBUG_POWERUP_BOWLING );
+            sub->addItem(L"Bowling ball (F3)", DEBUG_POWERUP_BOWLING );
             sub->addItem(L"Bubblegum (F4)", DEBUG_POWERUP_BUBBLEGUM );
             sub->addItem(L"Cake (F5)", DEBUG_POWERUP_CAKE );
             sub->addItem(L"Parachute (F6)", DEBUG_POWERUP_PARACHUTE );
