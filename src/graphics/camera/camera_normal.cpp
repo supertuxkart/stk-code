@@ -314,12 +314,6 @@ void CameraNormal::update(float dt)
     getCameraSettings(getMode(), &above_kart, &cam_angle, &side_way, 
                                  &distance, &smoothing, &cam_roll_angle);
 
-    if (smoothing)
-    {
-        m_last_smooth_mode = getMode();
-        moveCamera(dt, true, cam_angle, distance);
-    }
-
     // If an explosion is happening, stop moving the camera,
     // but keep it target on the kart.
     ExplosionAnimation* ea =
@@ -333,12 +327,20 @@ void CameraNormal::update(float dt)
         // above the kart).
         // Note: this code is replicated from smoothMoveCamera so that
         // the camera keeps on pointing to the same spot.
+        smoothing = false;
+
         core::vector3df current_target = (m_kart->getSmoothedXYZ().toIrrVector()
                                        +  core::vector3df(0, above_kart, 0));
         m_camera->setTarget(current_target);
     }
     else // no kart animation
     {
+        if (smoothing)
+        {
+            m_last_smooth_mode = getMode();
+            moveCamera(dt, true, cam_angle, distance);
+        }
+
         positionCamera(dt, above_kart, cam_angle, side_way, distance, smoothing, cam_roll_angle);
     }
 
