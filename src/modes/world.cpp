@@ -138,7 +138,7 @@ World::World() : WorldStatus()
     m_schedule_exit_race = false;
     m_schedule_tutorial  = false;
     m_is_network_world   = false;
-    m_snap_camera        = false;
+    m_restart_camera        = false;
 
     m_stop_music_when_dialog_open = true;
 
@@ -405,7 +405,7 @@ void World::reset(bool restart)
 
     if (restart)
     {
-        m_snap_camera = true;
+        m_restart_camera = true;
     }
     // Note: track reset must be called after all karts exist, since check
     // objects need to allocate data structures depending on the number
@@ -1164,14 +1164,13 @@ void World::update(int ticks)
     }
 #endif
 
-    if (m_snap_camera)
+    if (m_restart_camera)
     {
-        m_snap_camera = false;
+        m_restart_camera = false;
         for(unsigned int i=0; i<Camera::getNumCameras(); i++)
         {
             Camera* cam = Camera::getCamera(i);
-            // Ensure that smoothed cameras start from a correct position
-            dynamic_cast<CameraNormal*>(cam)->snapToPosition(true);
+            dynamic_cast<CameraNormal*>(cam)->restart();
         }
     }
 
