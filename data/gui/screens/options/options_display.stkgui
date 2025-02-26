@@ -36,6 +36,8 @@
                 <spacer width="5" height="1%"/>
 
                 <div layout="horizontal-row" width="100%" height="fit">
+                    <spacer width="3%" height="100%" />
+
                     <div proportion="2" height="fit" layout="horizontal-row" >
                         <spacer width="5%" height="100%" />
                         <checkbox id="fullscreen"/>
@@ -65,15 +67,28 @@
                         I18N="In the display settings" text="Apply new resolution" />
                 </div>
 
-                <!-- ************ SPLITSCREEN METHOD ************ -->
+                <!-- ************ CAMERA SETTINGS ************ -->
                 <spacer width="5" height="3%"/>
 
-                <label width="100%" I18N="In the display settings" text="Splitscreen Multiplayer layout"/>
+                <label width="100%" I18N="In the display settings" text="Camera Settings"/>
+
+                <spacer width="5" height="2%"/>
+
+                <!-- ************ EXTRA UI ELEMENTS SETTINGS ************ -->
+                <div width="100%" height="fit" layout="horizontal-row">
+                    <spacer width="3%" height="100%" />
+                    <spinner id="camera_preset" width="10f" align="center" />
+                    <label height="100%" x="0" y="0" I18N="In the ui settings" text="Camera"/>
+                    <spacer width="2%" height="100%" />
+                    <button id="custom_camera" text="Custom..." I18N="In the ui settings" align="center"/>
+                </div>
 
                 <spacer width="5" height="2%"/>
 
                 <div layout="horizontal-row" width="100%" height="fit">
+                    <spacer width="3%" height="100%" />
                     <spinner id="splitscreen_method" width="10f" align="center" />
+                    <label height="100%" x="0" y="0" I18N="In the ui settings" text="Splitscreen Multiplayer layout"/>
                 </div>
             </box>
         </div>

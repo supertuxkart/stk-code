@@ -22,7 +22,7 @@
 #include "guiengine/widgets/label_widget.hpp"
 #include "guiengine/widgets/ribbon_widget.hpp"
 #include "guiengine/widgets/spinner_widget.hpp"
-#include "states_screens/options/options_screen_ui.hpp"
+#include "states_screens/options/options_screen_display.hpp"
 #include "states_screens/state_manager.hpp"
 #include "utils/translation.hpp"
 #include "graphics/central_settings.hpp"
@@ -152,7 +152,7 @@ GUIEngine::EventPropagation CustomCameraSettingsDialog::processEvent(const std::
                 UserConfigParams::m_saved_camera_backward_up_angle = UserConfigParams::m_camera_backward_up_angle;
                 UserConfigParams::m_saved_reverse_look_use_soccer_cam = UserConfigParams::m_reverse_look_use_soccer_cam;
             }
-            OptionsScreenUI::getInstance()->updateCameraPresetSpinner();
+            OptionsScreenDisplay::getInstance()->updateCamera();
             m_self_destroy = true;
             return GUIEngine::EVENT_BLOCK;
         }
