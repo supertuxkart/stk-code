@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<stkgui>
+    <div x="2%" y="2%" width="96%" height="96%" layout="vertical-row" >
+        <header id="title" width="100%" height="fit" text_align="center" word_wrap="true" text="Camera Settings" />
+        <spacer width="100%" height="3%"/>
+        <div width="100%" height="91%" layout="vertical-row" >
+
+            <label id="camera_name" width="100%" I18N="In the ui/camera settings" text="Player camera"/>
+            <spacer width="5" height="1%"/>
+
+            <div width="100%" height="fit" layout="horizontal-row">
+                <spacer width="3%" height="100%" />
+                <div proportion="1" height="fit" layout="horizontal-row" >
+                    <label width="35%" height="100%" text_align="left" I18N="In the ui/camera screen" text="FOV"/>
+                    <gauge id="fov" proportion="1"/>
+                </div>
+            </div>
+
+            <spacer height="2%" width="100%" />
+
+            <div width="100%" height="fit" layout="horizontal-row">
+                <spacer width="3%" height="100%" />
+                <div proportion="1" height="fit" layout="horizontal-row" >
+                    <label width="35%" height="100%" text_align="left" I18N="In the ui/camera screen" text="Distance"/>
+                    <gauge id="camera_distance" proportion="1"/>
+                </div>
+            </div>
+
+            <spacer height="2%" width="100%" />
+
+
+            <div width="100%" height="fit" layout="horizontal-row">
+                <spacer width="3%" height="100%" />
+                <div proportion="1" height="fit" layout="horizontal-row" >
+                    <label width="35%" height="100%" text_align="left" I18N="In the ui/camera screen" text="Angle"/>
+                    <gauge id="camera_angle" proportion="1"/>
+                </div>
+            </div>
+
+            <spacer height="2%" width="100%" />
+
+            <div width="100%" height="fit" layout="horizontal-row">
+                <spacer width="3%" height="100%" />
+                <div proportion="1" height="fit" layout="horizontal-row" >
+                    <checkbox id="camera_smoothing"/>
+                    <spacer width="1%" height="100%" />
+                    <label height="100%" text_align="left" I18N="In the ui/camera screen" text="Smooth camera"/>
+                </div>
+            </div>
+
+            <spacer width="5" height="2%"/>
+
+            <label width="100%" I18N="In the ui/camera settings" text="Backward camera"/>
+            <spacer height="2%" width="100%" />
+            <div width="100%" height="fit" layout="horizontal-row">
+                <spacer width="3%" height="100%" />
+                <label width="fit" height="100%" text_align="left" I18N="In the ui/camera screen" text="Distance"/>
+                <gauge id="backward_camera_distance" width="35%"/>
+                <spacer width="2%" height="100%" />
+                <label width="fit" height="100%" text_align="left" I18N="In the ui/camera screen" text="Angle"/>
+                <gauge id="backward_camera_angle" width="35%"/>
+            </div>
+
+            <spacer height="2%" width="100%" />
+
+            <div width="100%" height="fit" layout="horizontal-row">
+                <spacer width="3%" height="100%" />
+                <div proportion="1" height="fit" layout="horizontal-row" >
+                    <checkbox id="use_soccer_camera"/>
+                    <spacer width="1%" height="100%" />
+                    <label height="100%" text_align="left" I18N="In the ui/camera screen" text="Follow ball in soccer mode"/>
+                </div>
+            </div>
+
+            <spacer height="2%" width="100%" />
+
+            <buttonbar id="buttons" height="20%" width="90%" align="center">
+                <icon-button id="reset" width="128" height="128" icon="gui/icons/restart.png"
+                    I18N="In the ui/camera screen" text="Reset" align="center"/>
+                <icon-button id="cancel" width="128" height="128" icon="gui/icons/red_x.png"
+                    I18N="In the ui/camera screen" text="Cancel" align="center"/>
+                <icon-button id="apply" width="128" height="128" icon="gui/icons/green_check.png"
+                    I18N="In the ui/camera screen" text="Apply" align="center"/>
+            </buttonbar>
+        </div>
+    </div>
+</stkgui>
