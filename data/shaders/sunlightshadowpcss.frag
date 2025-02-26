@@ -144,7 +144,7 @@ float filterPCF(vec2 uv, float z_rec, float layer,
     for (uint i = 0u; i < 4u; i++)
     {
         vec2 duv = R * (vogel_disk_4[i] * filterRadii);
-        vec2 tc = uv + duv;
+        vec2 tc = clamp(uv + duv, vec2(0.), vec2(1.));
         
         // receiver plane depth bias
         float z_bias = dot(dz_duv, duv); 
@@ -160,7 +160,7 @@ float filterPCSS(vec2 uv, float z_rec, float layer,
     for (uint i = 0u; i < 16u; i++)
     {
         vec2 duv = R * (vogel_disk_16[i] * filterRadii);
-        vec2 tc = uv + duv;
+        vec2 tc = clamp(uv + duv, vec2(0.), vec2(1.));
         
         // receiver plane depth bias
         float z_bias = dot(dz_duv, duv); 
