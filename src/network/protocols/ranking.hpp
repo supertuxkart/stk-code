@@ -22,6 +22,7 @@
 #include <map>
 #include <memory>
 #include <vector>
+#include <stdint.h>
 
 class XMLNode;
 class NetworkPlayerProfile;
