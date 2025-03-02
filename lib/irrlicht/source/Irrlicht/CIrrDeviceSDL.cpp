@@ -52,7 +52,7 @@ namespace irr
 
 } // end namespace irr
 
-extern "C" void init_objc(SDL_SysWMinfo* info, float* top, float* bottom, float* left, float* right);
+//extern "C" void init_objc(SDL_SysWMinfo* info, float* top, float* bottom, float* left, float* right);
 extern "C" void enable_momentum_scroll();
 extern "C" int handle_app_event(void* userdata, SDL_Event* event);
 extern "C" void Android_initDisplayCutout(float* top, float* bottom, float* left, float* right, int* initial_orientation);
@@ -84,9 +84,9 @@ CIrrDeviceSDL::CIrrDeviceSDL(const SIrrlichtCreationParameters& param)
 	// Initialize SDL... Timer for sleep, video for the obvious, and
 	// noparachute prevents SDL from catching fatal errors.
 	SDL_SetHint(SDL_HINT_NO_SIGNAL_HANDLERS, "1");
-	SDL_SetHint(SDL_HINT_ACCELEROMETER_AS_JOYSTICK, "0");
+	SDL_SetHint(SDL_HINT_TV_REMOTE_AS_JOYSTICK, "0"); // SDL_HINT_ACCELEROMETER_AS_JOYSTICK ???
 #if SDL_VERSION_ATLEAST(2, 0, 18)
-	SDL_SetHint(SDL_HINT_IME_SHOW_UI, "1");
+	//SDL_SetHint(SDL_HINT_IME_SHOW_UI, "1");
 #endif
 
 	// Switch SDL disables this hint by default: https://github.com/devkitPro/SDL/pull/55#issuecomment-633775255
@@ -107,8 +107,8 @@ CIrrDeviceSDL::CIrrDeviceSDL(const SIrrlichtCreationParameters& param)
 	}
 #endif
 
-	u32 init_flags = SDL_INIT_TIMER | SDL_INIT_VIDEO;
-	if (SDL_Init(init_flags) < 0)
+	u32 init_flags = /*SDL_INIT_TIMER |*/ SDL_INIT_VIDEO;
+	if (!SDL_Init(init_flags))
 	{
 		os::Printer::log("Unable to initialize SDL!", SDL_GetError());
 		Close = true;
@@ -116,7 +116,7 @@ CIrrDeviceSDL::CIrrDeviceSDL(const SIrrlichtCreationParameters& param)
 
 #if SDL_VERSION_ATLEAST(2, 0, 9)
 	// Don't exit if failed to init sensor (doesn't work in wine)
-	if (SDL_InitSubSystem(SDL_INIT_SENSOR) < 0)
+	if (!SDL_InitSubSystem(SDL_INIT_SENSOR))
 	{
 		os::Printer::log("Failed to init SDL sensor!", SDL_GetError());
 	}
@@ -135,20 +135,20 @@ CIrrDeviceSDL::CIrrDeviceSDL(const SIrrlichtCreationParameters& param)
 		// create the window, only if we do not use the null device
 		if (!Close && createWindow())
 		{
-			SDL_VERSION(&Info.version);
+			//SDL_VERSION(&Info.version);
 
 #if (defined(IOS_STK) || defined(_IRR_COMPILE_WITH_DIRECT3D_9_)) && !defined(__SWITCH__)
 			// Only iOS or DirectX9 build uses the Info structure
 			// Switch doesn't support GetWindowWMInfo
 #ifdef IOS_STK
-			if (!SDL_GetWindowWMInfo(Window, &Info))
+			//if (!SDL_GetWindowWMInfo(Window, &Info))
 #else
-			if (CreationParams.DriverType == video::EDT_DIRECT3D9 && !SDL_GetWindowWMInfo(Window, &Info))
+			//if (CreationParams.DriverType == video::EDT_DIRECT3D9 && !SDL_GetWindowWMInfo(Window, &Info))
 #endif
-				return;
+			//	return;
 #endif
 #ifdef IOS_STK
-			init_objc(&Info, &TopPadding, &BottomPadding, &LeftPadding, &RightPadding);
+			//init_objc(&Info, &TopPadding, &BottomPadding, &LeftPadding, &RightPadding);
 #endif
 #ifdef ANDROID
 			Android_initDisplayCutout(&TopPadding, &BottomPadding, &LeftPadding, &RightPadding, &InitialOrientation);
@@ -156,33 +156,33 @@ CIrrDeviceSDL::CIrrDeviceSDL(const SIrrlichtCreationParameters& param)
                         (void)InitialOrientation;
 #endif
 			core::stringc sdlversion = "Compiled SDL Version ";
-			sdlversion += Info.version.major;
+			const int compiled_version = SDL_VERSION;
+			sdlversion += SDL_VERSIONNUM_MAJOR(compiled_version);
 			sdlversion += ".";
-			sdlversion += Info.version.minor;
+			sdlversion += SDL_VERSIONNUM_MINOR(compiled_version);
 			sdlversion += ".";
-			sdlversion += Info.version.patch;
+			sdlversion += SDL_VERSIONNUM_MICRO(compiled_version);
 
 			Operator = new COSOperator(sdlversion);
 			os::Printer::log(sdlversion.c_str(), ELL_INFORMATION);
 
 			core::stringc cur_sdlversion = "Current SDL Version ";
-			SDL_version version = {};
-			SDL_GetVersion(&version);
-			cur_sdlversion += version.major;
+			const int linked_version = SDL_GetVersion();
+			cur_sdlversion += SDL_VERSIONNUM_MAJOR(linked_version);
 			cur_sdlversion += ".";
-			cur_sdlversion += version.minor;
+			cur_sdlversion += SDL_VERSIONNUM_MINOR(linked_version);
 			cur_sdlversion += ".";
-			cur_sdlversion += version.patch;
+			cur_sdlversion += SDL_VERSIONNUM_MICRO(linked_version);
 
 			os::Printer::log(cur_sdlversion.c_str(), ELL_INFORMATION);
 #if SDL_VERSION_ATLEAST(2, 0, 9)
-			for (int i = 0; i < SDL_NumSensors(); i++)
-			{
-				if (SDL_SensorGetDeviceType(i) == SDL_SENSOR_ACCEL)
-					AccelerometerIndex = i;
-				else if (SDL_SensorGetDeviceType(i) == SDL_SENSOR_GYRO)
-					GyroscopeIndex = i;
-			}
+			//for (int i = 0; i < SDL_NumSensors(); i++)
+			//{
+			//	if (SDL_SensorGetDeviceType(i) == SDL_SENSOR_ACCEL)
+			//		AccelerometerIndex = i;
+			//	else if (SDL_SensorGetDeviceType(i) == SDL_SENSOR_GYRO)
+			//		GyroscopeIndex = i;
+			//}
 #endif
 		}
 		else
@@ -219,15 +219,7 @@ void CIrrDeviceSDL::updateNativeScale(u32* saving_width, u32* saving_height)
 	SDL_GetWindowSize(Window, &width, &height);
 	int real_width = width;
 	int real_height = height;
-	if (CreationParams.DriverType == video::EDT_OPENGL ||
-		CreationParams.DriverType == video::EDT_OGLES2)
-	{
-		SDL_GL_GetDrawableSize(Window, &real_width, &real_height);
-	}
-	else if (CreationParams.DriverType == video::EDT_VULKAN)
-	{
-		SDL_Vulkan_GetDrawableSize(Window, &real_width, &real_height);
-	}
+	SDL_GetWindowSizeInPixels(Window, &real_width, &real_height);
 	NativeScaleX = (f32)real_width / (f32)width;
 	NativeScaleY = (f32)real_height / (f32)height;
 	if (saving_width)
@@ -264,7 +256,7 @@ CIrrDeviceSDL::~CIrrDeviceSDL()
 	delete m_moltenvk;
 #endif
 	if (Context)
-		SDL_GL_DeleteContext(Context);
+		SDL_GL_DestroyContext(Context);
 	if (Window)
 		SDL_DestroyWindow(Window);
 	SDL_Quit();
@@ -276,9 +268,9 @@ bool CIrrDeviceSDL::activateAccelerometer(float updateInterval)
 #if SDL_VERSION_ATLEAST(2, 0, 9)
 	if (AccelerometerInstance == -1 && AccelerometerIndex != -1)
 	{
-		SDL_Sensor* accel = SDL_SensorOpen(AccelerometerIndex);
+		SDL_Sensor* accel = SDL_OpenSensor(AccelerometerIndex);
 		if (accel)
-			AccelerometerInstance = SDL_SensorGetInstanceID(accel);
+			AccelerometerInstance = SDL_GetSensorID(accel);
 	}
 #endif
 	return AccelerometerInstance != -1;
@@ -290,10 +282,10 @@ bool CIrrDeviceSDL::deactivateAccelerometer()
 #if SDL_VERSION_ATLEAST(2, 0, 9)
 	if (AccelerometerInstance == -1)
 		return false;
-	SDL_Sensor* accel = SDL_SensorFromInstanceID(AccelerometerInstance);
+	SDL_Sensor* accel = SDL_GetSensorFromID(AccelerometerInstance);
 	if (!accel)
 		return false;
-	SDL_SensorClose(accel);
+	SDL_CloseSensor(accel);
 	AccelerometerInstance = -1;
 #endif
 	return true;
@@ -317,9 +309,9 @@ bool CIrrDeviceSDL::activateGyroscope(float updateInterval)
 #if SDL_VERSION_ATLEAST(2, 0, 9)
 	if (GyroscopeInstance == -1 && GyroscopeIndex != -1)
 	{
-		SDL_Sensor* gyro = SDL_SensorOpen(GyroscopeIndex);
+		SDL_Sensor* gyro = SDL_OpenSensor(GyroscopeIndex);
 		if (gyro)
-			GyroscopeInstance = SDL_SensorGetInstanceID(gyro);
+			GyroscopeInstance = SDL_GetSensorID(gyro);
 	}
 #endif
 	return GyroscopeInstance != -1;
@@ -331,10 +323,10 @@ bool CIrrDeviceSDL::deactivateGyroscope()
 #if SDL_VERSION_ATLEAST(2, 0, 9)
 	if (GyroscopeInstance == -1)
 		return false;
-	SDL_Sensor* gyro = SDL_SensorFromInstanceID(GyroscopeInstance);
+	SDL_Sensor* gyro = SDL_GetSensorFromID(GyroscopeInstance);
 	if (!gyro)
 		return false;
-	SDL_SensorClose(gyro);
+	SDL_CloseSensor(gyro);
 	GyroscopeInstance = -1;
 #endif
 	return true;
@@ -382,8 +374,9 @@ extern "C" void update_fullscreen_desktop(int val)
 	int prev_height = 0;
 	SDL_GetWindowSize(window, &prev_width, &prev_height);
 
-	if (val != 0)
-		val = SDL_WINDOW_FULLSCREEN_DESKTOP;
+	//if (val != 0)
+	//	val = SDL_WINDOW_FULLSCREEN_DESKTOP;
+		val = SDL_WINDOW_FULLSCREEN;
 	SDL_SetWindowFullscreen(window, val);
 	if (val == 0)
 	{
@@ -450,19 +443,20 @@ bool CIrrDeviceSDL::createWindow()
 		}
 	}
 
-	u32 flags = SDL_WINDOW_SHOWN | SDL_WINDOW_RESIZABLE;
+	u32 flags = SDL_WINDOW_RESIZABLE;
 #if !defined(ANDROID) && !defined(__SWITCH__)
 	if (CreationParams.DriverType == video::EDT_OPENGL ||
 		CreationParams.DriverType == video::EDT_OGLES2 ||
 		CreationParams.DriverType == video::EDT_VULKAN)
-		flags |= SDL_WINDOW_ALLOW_HIGHDPI;
+		flags |= SDL_WINDOW_HIGH_PIXEL_DENSITY;
 #endif
 
 	if (CreationParams.Fullscreen)
 	{
 		if (GE::getGEConfig()->m_fullscreen_desktop)
 		{
-			flags |= SDL_WINDOW_FULLSCREEN_DESKTOP;
+			//flags |= SDL_WINDOW_FULLSCREEN_DESKTOP;
+			flags |= SDL_WINDOW_FULLSCREEN;
 			CreationParams.Fullscreen = false;
 		}
 		else
@@ -483,7 +477,7 @@ bool CIrrDeviceSDL::createWindow()
 		}
 #endif
 #if SDL_VERSION_ATLEAST(2, 0, 12)
-		SDL_SetHint(SDL_HINT_VIDEO_EXTERNAL_CONTEXT, "1");
+		//SDL_SetHint(SDL_HINT_VIDEO_EXTERNAL_CONTEXT, "1"); // replaced with SDL_PROP_WINDOW_CREATE_EXTERNAL_GRAPHICS_CONTEXT
 #endif
 		flags |= SDL_WINDOW_VULKAN;
 	}
@@ -506,16 +500,16 @@ bool CIrrDeviceSDL::createWindow()
 	else
 	{
 		Window = SDL_CreateWindow("",
-			(float)CreationParams.WindowPosition.X,
-			(float)CreationParams.WindowPosition.Y,
+			//(float)CreationParams.WindowPosition.X,
+			//(float)CreationParams.WindowPosition.Y,
 			(float)CreationParams.WindowSize.Width,
 			(float)CreationParams.WindowSize.Height, flags);
 		if (!Window)
 		{
 			os::Printer::log( "Could not initialize display!" );
 #if SDL_VERSION_ATLEAST(2, 0, 12)
-			if (CreationParams.DriverType == video::EDT_VULKAN)
-				SDL_SetHint(SDL_HINT_VIDEO_EXTERNAL_CONTEXT, "0");
+			//if (CreationParams.DriverType == video::EDT_VULKAN)
+				//SDL_SetHint(SDL_HINT_VIDEO_EXTERNAL_CONTEXT, "0"); // replaced with SDL_PROP_WINDOW_CREATE_EXTERNAL_GRAPHICS_CONTEXT
 #endif
 			return false;
 		}
@@ -544,7 +538,7 @@ start:
 #ifdef _IRR_COMPILE_WITH_OGLES2_
 	if (Context)
 	{
-		SDL_GL_DeleteContext(Context);
+		SDL_GL_DestroyContext(Context);
 		Context = NULL;
 	}
 	if (Window)
@@ -556,8 +550,8 @@ start:
 	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
 	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 0);
 	Window = SDL_CreateWindow("",
-		(float)CreationParams.WindowPosition.X,
-		(float)CreationParams.WindowPosition.Y,
+		//(float)CreationParams.WindowPosition.X,
+		//(float)CreationParams.WindowPosition.Y,
 		(float)CreationParams.WindowSize.Width,
 		(float)CreationParams.WindowSize.Height, flags);
 	if (Window)
@@ -570,7 +564,7 @@ start:
 #else
 	if (Context)
 	{
-		SDL_GL_DeleteContext(Context);
+		SDL_GL_DestroyContext(Context);
 		Context = NULL;
 	}
 	if (Window)
@@ -582,8 +576,8 @@ start:
 	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 4);
 	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 3);
 	Window = SDL_CreateWindow("",
-		(float)CreationParams.WindowPosition.X,
-		(float)CreationParams.WindowPosition.Y,
+		//(float)CreationParams.WindowPosition.X,
+		//(float)CreationParams.WindowPosition.Y,
 		(float)CreationParams.WindowSize.Width,
 		(float)CreationParams.WindowSize.Height, flags);
 	if (Window)
@@ -595,7 +589,7 @@ start:
 
 	if (Context)
 	{
-		SDL_GL_DeleteContext(Context);
+		SDL_GL_DestroyContext(Context);
 		Context = NULL;
 	}
 	if (Window)
@@ -607,8 +601,8 @@ start:
 	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
 	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 3);
 	Window = SDL_CreateWindow("",
-		(float)CreationParams.WindowPosition.X,
-		(float)CreationParams.WindowPosition.Y,
+		//(float)CreationParams.WindowPosition.X,
+		//(float)CreationParams.WindowPosition.Y,
 		(float)CreationParams.WindowSize.Width,
 		(float)CreationParams.WindowSize.Height, flags);
 	if (Window)
@@ -620,7 +614,7 @@ start:
 
 	if (Context)
 	{
-		SDL_GL_DeleteContext(Context);
+		SDL_GL_DestroyContext(Context);
 		Context = NULL;
 	}
 	if (Window)
@@ -632,8 +626,8 @@ start:
 	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
 	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 1);
 	Window = SDL_CreateWindow("",
-		(float)CreationParams.WindowPosition.X,
-		(float)CreationParams.WindowPosition.Y,
+		//(float)CreationParams.WindowPosition.X,
+		//(float)CreationParams.WindowPosition.Y,
 		(float)CreationParams.WindowSize.Width,
 		(float)CreationParams.WindowSize.Height, flags);
 	if (Window)
@@ -648,7 +642,7 @@ legacy:
 	irr::video::useCoreContext = false;
 	if (Context)
 	{
-		SDL_GL_DeleteContext(Context);
+		SDL_GL_DestroyContext(Context);
 		Context = NULL;
 	}
 	if (Window)
@@ -669,8 +663,8 @@ legacy:
 	else
 		SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, 0);
 	Window = SDL_CreateWindow("",
-		(float)CreationParams.WindowPosition.X,
-		(float)CreationParams.WindowPosition.Y,
+		//(float)CreationParams.WindowPosition.X,
+		//(float)CreationParams.WindowPosition.Y,
 		(float)CreationParams.WindowSize.Width,
 		(float)CreationParams.WindowSize.Height, flags);
 	if (Window)
@@ -731,7 +725,7 @@ void CIrrDeviceSDL::createDriver()
 		catch (std::exception& e)
 		{
 #if SDL_VERSION_ATLEAST(2, 0, 12)
-			SDL_SetHint(SDL_HINT_VIDEO_EXTERNAL_CONTEXT, "0");
+			// SDL_SetHint(SDL_HINT_VIDEO_EXTERNAL_CONTEXT, "0"); // replaced with SDL_PROP_WINDOW_CREATE_EXTERNAL_GRAPHICS_CONTEXT
 #endif
 			os::Printer::log("createVulkanDriver failed", e.what(), ELL_ERROR);
 		}
@@ -780,28 +774,28 @@ bool CIrrDeviceSDL::run()
 		switch ( SDL_event.type )
 		{
 #if defined(MOBILE_STK) && !defined(IOS_STK)
-		case SDL_APP_WILLENTERBACKGROUND:
+		case SDL_EVENT_WILL_ENTER_BACKGROUND:
 			pause_mainloop();
 			break;
-		case SDL_APP_DIDENTERFOREGROUND:
+		case SDL_EVENT_DID_ENTER_FOREGROUND:
 			resume_mainloop();
 			break;
 #ifdef ANDROID
 		// From https://github.com/libsdl-org/SDL/blob/main/docs/README-android.md
 		// However, there's a chance (on older hardware, or on systems under heavy load),
 		// where the GL context can not be restored. In that case you have to
-		// listen for a specific message (SDL_RENDER_DEVICE_RESET) and restore
+		// listen for a specific message (SDL_EVENT_RENDER_DEVICE_RESET) and restore
 		// your textures manually or quit the app.
-		case SDL_RENDER_DEVICE_RESET:
+		case SDL_EVENT_RENDER_DEVICE_RESET:
 			Close = true;
 			break;
 #endif
 #endif
 #if SDL_VERSION_ATLEAST(2, 0, 9)
-		case SDL_SENSORUPDATE:
+		case SDL_EVENT_SENSOR_UPDATE:
 			if (SDL_event.sensor.which == AccelerometerInstance)
 			{
-				SDL_DisplayOrientation o = SDL_GetDisplayOrientation(0);
+				SDL_DisplayOrientation o = SDL_GetCurrentDisplayOrientation(0);
 				irrevent.EventType = irr::EET_ACCELEROMETER_EVENT;
 				if (o == SDL_ORIENTATION_LANDSCAPE ||
 					o == SDL_ORIENTATION_LANDSCAPE_FLIPPED)
@@ -836,39 +830,39 @@ bool CIrrDeviceSDL::run()
 			}
 			break;
 #endif
-		case SDL_FINGERMOTION:
-		case SDL_FINGERDOWN:
-		case SDL_FINGERUP:
+		case SDL_EVENT_FINGER_MOTION:
+		case SDL_EVENT_FINGER_DOWN:
+		case SDL_EVENT_FINGER_UP:
 			irrevent.EventType = irr::EET_TOUCH_INPUT_EVENT;
-			irrevent.TouchInput.Event = SDL_event.type == SDL_FINGERMOTION ? irr::ETIE_MOVED :
-				SDL_event.type == SDL_FINGERDOWN ? irr::ETIE_PRESSED_DOWN : irr::ETIE_LEFT_UP;
-			irrevent.TouchInput.ID = getTouchId(SDL_event.tfinger.fingerId);
-			if (SDL_event.type == SDL_FINGERUP)
-				removeTouchId(SDL_event.tfinger.fingerId);
+			irrevent.TouchInput.Event = SDL_event.type == SDL_EVENT_FINGER_MOTION ? irr::ETIE_MOVED :
+				SDL_event.type == SDL_EVENT_FINGER_DOWN ? irr::ETIE_PRESSED_DOWN : irr::ETIE_LEFT_UP;
+			irrevent.TouchInput.ID = getTouchId(SDL_event.tfinger.fingerID);
+			if (SDL_event.type == SDL_EVENT_FINGER_UP)
+				removeTouchId(SDL_event.tfinger.fingerID);
 			irrevent.TouchInput.X = SDL_event.tfinger.x * Width;
 			irrevent.TouchInput.Y = SDL_event.tfinger.y * Height;
 			postEventFromUser(irrevent);
 			break;
 
-		case SDL_MOUSEWHEEL:
+		case SDL_EVENT_MOUSE_WHEEL:
 			irrevent.EventType = irr::EET_MOUSE_INPUT_EVENT;
 			irrevent.MouseInput.Event = irr::EMIE_MOUSE_WHEEL;
 			irrevent.MouseInput.X = MouseX;
 			irrevent.MouseInput.Y = MouseY;
 
 			irrevent.MouseInput.ButtonStates = MouseButtonStates;
-#if SDL_VERSION_ATLEAST(2, 0, 18)
-			irrevent.MouseInput.Wheel = 
-				SDL_event.wheel.preciseX + SDL_event.wheel.preciseY;
-#else
+//#if SDL_VERSION_ATLEAST(2, 0, 18)
+//			irrevent.MouseInput.Wheel = 
+//				SDL_event.wheel.preciseX + SDL_event.wheel.preciseY;
+//#else
 			irrevent.MouseInput.Wheel = irr::core::clamp<irr::f32>(
 				SDL_event.wheel.x + SDL_event.wheel.y, -1.0f, 1.0f);
-#endif
+//#endif
 
 			postEventFromUser(irrevent);
 			break;
 
-		case SDL_MOUSEMOTION:
+		case SDL_EVENT_MOUSE_MOTION:
 			irrevent.EventType = irr::EET_MOUSE_INPUT_EVENT;
 			irrevent.MouseInput.Event = irr::EMIE_MOUSE_MOVED;
 			MouseX = irrevent.MouseInput.X = SDL_event.motion.x * NativeScaleX;
@@ -878,8 +872,8 @@ bool CIrrDeviceSDL::run()
 			postEventFromUser(irrevent);
 			break;
 
-		case SDL_MOUSEBUTTONDOWN:
-		case SDL_MOUSEBUTTONUP:
+		case SDL_EVENT_MOUSE_BUTTON_DOWN:
+		case SDL_EVENT_MOUSE_BUTTON_UP:
 
 			irrevent.EventType = irr::EET_MOUSE_INPUT_EVENT;
 			irrevent.MouseInput.X = SDL_event.button.x * NativeScaleX;
@@ -890,7 +884,7 @@ bool CIrrDeviceSDL::run()
 			switch(SDL_event.button.button)
 			{
 			case SDL_BUTTON_LEFT:
-				if (SDL_event.type == SDL_MOUSEBUTTONDOWN)
+				if (SDL_event.type == SDL_EVENT_MOUSE_BUTTON_DOWN)
 				{
 					irrevent.MouseInput.Event = irr::EMIE_LMOUSE_PRESSED_DOWN;
 					MouseButtonStates |= irr::EMBSM_LEFT;
@@ -903,7 +897,7 @@ bool CIrrDeviceSDL::run()
 				break;
 
 			case SDL_BUTTON_RIGHT:
-				if (SDL_event.type == SDL_MOUSEBUTTONDOWN)
+				if (SDL_event.type == SDL_EVENT_MOUSE_BUTTON_DOWN)
 				{
 					irrevent.MouseInput.Event = irr::EMIE_RMOUSE_PRESSED_DOWN;
 					MouseButtonStates |= irr::EMBSM_RIGHT;
@@ -916,7 +910,7 @@ bool CIrrDeviceSDL::run()
 				break;
 
 			case SDL_BUTTON_MIDDLE:
-				if (SDL_event.type == SDL_MOUSEBUTTONDOWN)
+				if (SDL_event.type == SDL_EVENT_MOUSE_BUTTON_DOWN)
 				{
 					irrevent.MouseInput.Event = irr::EMIE_MMOUSE_PRESSED_DOWN;
 					MouseButtonStates |= irr::EMBSM_MIDDLE;
@@ -952,11 +946,11 @@ bool CIrrDeviceSDL::run()
 			}
 			break;
 
-		case SDL_KEYDOWN:
-		case SDL_KEYUP:
+		case SDL_EVENT_KEY_DOWN:
+		case SDL_EVENT_KEY_UP:
 			{
 				SKeyMap mp;
-				mp.SDLKey = SDL_event.key.keysym.sym;
+				mp.SDLKey = SDL_event.key.key;
 				s32 idx = KeyMap.binary_search(mp);
 
 				EKEY_CODE key;
@@ -964,7 +958,7 @@ bool CIrrDeviceSDL::run()
 				{
 					// Fallback to use scancode directly if not found, happens in
 					// belarusian keyboard layout for example
-					auto it = ScanCodeMap.find(SDL_event.key.keysym.scancode);
+					auto it = ScanCodeMap.find(SDL_event.key.scancode);
 					if (it != ScanCodeMap.end())
 						key = it->second;
 					else
@@ -976,52 +970,43 @@ bool CIrrDeviceSDL::run()
 				irrevent.EventType = irr::EET_KEY_INPUT_EVENT;
 				irrevent.KeyInput.Char = 0;
 				irrevent.KeyInput.Key = key;
-				irrevent.KeyInput.PressedDown = (SDL_event.type == SDL_KEYDOWN);
-				irrevent.KeyInput.Shift = (SDL_event.key.keysym.mod & KMOD_SHIFT) != 0;
-				irrevent.KeyInput.Control = (SDL_event.key.keysym.mod & KMOD_CTRL ) != 0;
+				irrevent.KeyInput.PressedDown = (SDL_event.type == SDL_EVENT_KEY_DOWN);
+				irrevent.KeyInput.Shift = (SDL_event.key.mod & SDL_KMOD_SHIFT) != 0;
+				irrevent.KeyInput.Control = (SDL_event.key.mod & SDL_KMOD_CTRL ) != 0;
 				postEventFromUser(irrevent);
 			}
 			break;
 
-		case SDL_QUIT:
+		case SDL_EVENT_QUIT:
 			Close = true;
 			break;
 
-		case SDL_WINDOWEVENT:
-			{
-				if (SDL_event.window.event == SDL_WINDOWEVENT_SIZE_CHANGED)
-				{
-					handleNewSize(SDL_event.window.data1, SDL_event.window.data2);
-				}
-				else if (SDL_event.window.event == SDL_WINDOWEVENT_MINIMIZED)
-				{
-					WindowMinimized = true;
-				}
-				else if (SDL_event.window.event == SDL_WINDOWEVENT_MAXIMIZED)
-				{
-					WindowMinimized = false;
-				}
-				else if (SDL_event.window.event == SDL_WINDOWEVENT_FOCUS_GAINED)
-				{
-					WindowHasFocus = true;
-					reset_network_body();
-#ifdef ANDROID
-					if (VideoDriver)
-						VideoDriver->unpauseRendering();
-#endif
-				}
-				else if (SDL_event.window.event == SDL_WINDOWEVENT_FOCUS_LOST)
-				{
-					WindowHasFocus = false;
-				}
-				else if (SDL_event.window.event == SDL_WINDOWEVENT_MOVED)
-				{
-					// In windows the rendering is paused when window is moving
-					reset_network_body();
-				}
-			}
+		case SDL_EVENT_WINDOW_PIXEL_SIZE_CHANGED:
+			handleNewSize(SDL_event.window.data1, SDL_event.window.data2);
 			break;
-		case SDL_TEXTEDITING:
+		case SDL_EVENT_WINDOW_MINIMIZED:
+			WindowMinimized = true;
+			break;
+		case SDL_EVENT_WINDOW_MAXIMIZED:
+			WindowMinimized = false;
+			break;
+		case SDL_EVENT_WINDOW_FOCUS_GAINED:
+			WindowHasFocus = true;
+			reset_network_body();
+#ifdef ANDROID
+			if (VideoDriver)
+				VideoDriver->unpauseRendering();
+#endif
+			break;
+		case SDL_EVENT_WINDOW_FOCUS_LOST:
+			WindowHasFocus = false;
+			break;
+		case SDL_EVENT_WINDOW_MOVED:
+			// In windows the rendering is paused when window is moving
+			reset_network_body();
+			break;
+			
+		case SDL_EVENT_TEXT_EDITING:
 			{
 				irrevent.EventType = irr::EET_SDL_TEXT_EVENT;
 				irrevent.SDLTextEvent.Type = SDL_event.type;
@@ -1034,7 +1019,7 @@ bool CIrrDeviceSDL::run()
 				postEventFromUser(irrevent);
 			}
 			break;
-		case SDL_TEXTINPUT:
+		case SDL_EVENT_TEXT_INPUT:
 			{
 				irrevent.EventType = irr::EET_SDL_TEXT_EVENT;
 				irrevent.SDLTextEvent.Type = SDL_event.type;
@@ -1132,41 +1117,48 @@ video::IVideoModeList* CIrrDeviceSDL::getVideoModeList()
 	{
 		// enumerate video modes.
 		int display_count = 0;
-		if ((display_count = SDL_GetNumVideoDisplays()) < 1)
+		SDL_DisplayID* displays = SDL_GetDisplays(&display_count);
+		
+		if (display_count < 1)
 		{
 			os::Printer::log("No display created: ", SDL_GetError(), ELL_ERROR);
 			return &VideoModeList;
 		}
 
 		int mode_count = 0;
-		if ((mode_count = SDL_GetNumDisplayModes(0)) < 1)
+		SDL_DisplayMode** modes = SDL_GetFullscreenDisplayModes(displays[0], &mode_count);
+		if (mode_count < 1)
 		{
 			os::Printer::log("No display modes available: ", SDL_GetError(), ELL_ERROR);
 			return &VideoModeList;
 		}
 
-		SDL_DisplayMode mode = { SDL_PIXELFORMAT_UNKNOWN, 0, 0, 0, 0 };
-		if (SDL_GetDesktopDisplayMode(0, &mode) == 0)
+		const SDL_DisplayMode* mode = SDL_GetDesktopDisplayMode(displays[0]);
+		if (mode)
 		{
-			VideoModeList.setDesktop(SDL_BITSPERPIXEL(mode.format),
-				core::dimension2d<u32>(mode.w, mode.h));
+			VideoModeList.setDesktop(SDL_BITSPERPIXEL(mode->format),
+				core::dimension2d<u32>(mode->w, mode->h));
 		}
 
 #ifdef MOBILE_STK
 	// SDL2 will return w,h and h,w for mobile STK, as we only use landscape
 	// so we just use desktop resolution for now
-	VideoModeList.addMode(core::dimension2d<u32>(mode.w, mode.h),
-		SDL_BITSPERPIXEL(mode.format));
+	VideoModeList.addMode(core::dimension2d<u32>(mode->w, mode->h),
+		SDL_BITSPERPIXEL(mode->format));
 #else
 		for (int i = 0; i < mode_count; i++)
 		{
-			if (SDL_GetDisplayMode(0, i, &mode) == 0)
+			const SDL_DisplayMode* mode = modes[i];
+			if (mode)
 			{
-				VideoModeList.addMode(core::dimension2d<u32>(mode.w, mode.h),
-					SDL_BITSPERPIXEL(mode.format));
+				VideoModeList.addMode(core::dimension2d<u32>(mode->w, mode->h),
+					SDL_BITSPERPIXEL(mode->format));
 			}
 		}
 #endif
+
+		SDL_free(modes);
+		SDL_free(displays);
 	}
 
 	return &VideoModeList;
@@ -1179,7 +1171,7 @@ void CIrrDeviceSDL::setResizable(bool resize)
 #if SDL_VERSION_ATLEAST(2, 0, 5)
 	if (CreationParams.Fullscreen)
 		return;
-	SDL_SetWindowResizable(Window, resize ? SDL_TRUE : SDL_FALSE);
+	SDL_SetWindowResizable(Window, resize ? true : false);
 	Resizable = resize;
 #endif
 }
@@ -1241,11 +1233,11 @@ bool CIrrDeviceSDL::getWindowPosition(int* x, int* y)
 //! Get DPI of current display.
 bool CIrrDeviceSDL::getDisplayDPI(float* ddpi, float* hdpi, float* vdpi)
 {
-	if (Window)
-	{
-        SDL_GetDisplayDPI(SDL_GetWindowDisplayIndex(Window), ddpi, hdpi, vdpi);
-		return true;
-	}
+	//if (Window)
+	//{
+    //    SDL_GetDisplayDPI(SDL_GetDisplayForWindow(Window), ddpi, hdpi, vdpi);
+	//	return true;
+	//}
 	return false;
 }
 
@@ -1378,32 +1370,32 @@ void CIrrDeviceSDL::createKeyMap()
 	KeyMap.push_back(SKeyMap(SDLK_8, IRR_KEY_8));
 	KeyMap.push_back(SKeyMap(SDLK_9, IRR_KEY_9));
 
-	KeyMap.push_back(SKeyMap(SDLK_a, IRR_KEY_A));
-	KeyMap.push_back(SKeyMap(SDLK_b, IRR_KEY_B));
-	KeyMap.push_back(SKeyMap(SDLK_c, IRR_KEY_C));
-	KeyMap.push_back(SKeyMap(SDLK_d, IRR_KEY_D));
-	KeyMap.push_back(SKeyMap(SDLK_e, IRR_KEY_E));
-	KeyMap.push_back(SKeyMap(SDLK_f, IRR_KEY_F));
-	KeyMap.push_back(SKeyMap(SDLK_g, IRR_KEY_G));
-	KeyMap.push_back(SKeyMap(SDLK_h, IRR_KEY_H));
-	KeyMap.push_back(SKeyMap(SDLK_i, IRR_KEY_I));
-	KeyMap.push_back(SKeyMap(SDLK_j, IRR_KEY_J));
-	KeyMap.push_back(SKeyMap(SDLK_k, IRR_KEY_K));
-	KeyMap.push_back(SKeyMap(SDLK_l, IRR_KEY_L));
-	KeyMap.push_back(SKeyMap(SDLK_m, IRR_KEY_M));
-	KeyMap.push_back(SKeyMap(SDLK_n, IRR_KEY_N));
-	KeyMap.push_back(SKeyMap(SDLK_o, IRR_KEY_O));
-	KeyMap.push_back(SKeyMap(SDLK_p, IRR_KEY_P));
-	KeyMap.push_back(SKeyMap(SDLK_q, IRR_KEY_Q));
-	KeyMap.push_back(SKeyMap(SDLK_r, IRR_KEY_R));
-	KeyMap.push_back(SKeyMap(SDLK_s, IRR_KEY_S));
-	KeyMap.push_back(SKeyMap(SDLK_t, IRR_KEY_T));
-	KeyMap.push_back(SKeyMap(SDLK_u, IRR_KEY_U));
-	KeyMap.push_back(SKeyMap(SDLK_v, IRR_KEY_V));
-	KeyMap.push_back(SKeyMap(SDLK_w, IRR_KEY_W));
-	KeyMap.push_back(SKeyMap(SDLK_x, IRR_KEY_X));
-	KeyMap.push_back(SKeyMap(SDLK_y, IRR_KEY_Y));
-	KeyMap.push_back(SKeyMap(SDLK_z, IRR_KEY_Z));
+	KeyMap.push_back(SKeyMap(SDLK_A, IRR_KEY_A));
+	KeyMap.push_back(SKeyMap(SDLK_B, IRR_KEY_B));
+	KeyMap.push_back(SKeyMap(SDLK_C, IRR_KEY_C));
+	KeyMap.push_back(SKeyMap(SDLK_D, IRR_KEY_D));
+	KeyMap.push_back(SKeyMap(SDLK_E, IRR_KEY_E));
+	KeyMap.push_back(SKeyMap(SDLK_F, IRR_KEY_F));
+	KeyMap.push_back(SKeyMap(SDLK_G, IRR_KEY_G));
+	KeyMap.push_back(SKeyMap(SDLK_H, IRR_KEY_H));
+	KeyMap.push_back(SKeyMap(SDLK_I, IRR_KEY_I));
+	KeyMap.push_back(SKeyMap(SDLK_J, IRR_KEY_J));
+	KeyMap.push_back(SKeyMap(SDLK_K, IRR_KEY_K));
+	KeyMap.push_back(SKeyMap(SDLK_L, IRR_KEY_L));
+	KeyMap.push_back(SKeyMap(SDLK_M, IRR_KEY_M));
+	KeyMap.push_back(SKeyMap(SDLK_N, IRR_KEY_N));
+	KeyMap.push_back(SKeyMap(SDLK_O, IRR_KEY_O));
+	KeyMap.push_back(SKeyMap(SDLK_P, IRR_KEY_P));
+	KeyMap.push_back(SKeyMap(SDLK_Q, IRR_KEY_Q));
+	KeyMap.push_back(SKeyMap(SDLK_R, IRR_KEY_R));
+	KeyMap.push_back(SKeyMap(SDLK_S, IRR_KEY_S));
+	KeyMap.push_back(SKeyMap(SDLK_T, IRR_KEY_T));
+	KeyMap.push_back(SKeyMap(SDLK_U, IRR_KEY_U));
+	KeyMap.push_back(SKeyMap(SDLK_V, IRR_KEY_V));
+	KeyMap.push_back(SKeyMap(SDLK_W, IRR_KEY_W));
+	KeyMap.push_back(SKeyMap(SDLK_X, IRR_KEY_X));
+	KeyMap.push_back(SKeyMap(SDLK_Y, IRR_KEY_Y));
+	KeyMap.push_back(SKeyMap(SDLK_Z, IRR_KEY_Z));
 
 	KeyMap.push_back(SKeyMap(SDLK_LGUI, IRR_KEY_LWIN));
 	KeyMap.push_back(SKeyMap(SDLK_RGUI, IRR_KEY_RWIN));
@@ -1583,13 +1575,16 @@ void CIrrDeviceSDL::createKeyMap()
 
 bool CIrrDeviceSDL::supportsTouchDevice() const
 {
-	return SDL_GetNumTouchDevices() > 0;
+	int count = 0;
+	SDL_TouchID* touch_devices = SDL_GetTouchDevices(&count);
+	SDL_free(touch_devices);
+	return count > 0;
 }
 
 
 bool CIrrDeviceSDL::hasOnScreenKeyboard() const
 {
-	return SDL_HasScreenKeyboardSupport() == SDL_TRUE;
+	return SDL_HasScreenKeyboardSupport() == true;
 }
 
 
@@ -1659,7 +1654,7 @@ s32 CIrrDeviceSDL::getLeftPadding()
 #if SDL_VERSION_ATLEAST(2, 0, 9)
 	if ((InitialOrientation == SDL_ORIENTATION_LANDSCAPE ||
 		InitialOrientation == SDL_ORIENTATION_LANDSCAPE_FLIPPED) &&
-		SDL_GetDisplayOrientation(0) != InitialOrientation)
+		SDL_GetCurrentDisplayOrientation(0) != InitialOrientation)
 		return RightPadding;
 #endif
 	return LeftPadding;
@@ -1677,7 +1672,7 @@ s32 CIrrDeviceSDL::getRightPadding()
 		return 0;
 	if ((InitialOrientation == SDL_ORIENTATION_LANDSCAPE ||
 		InitialOrientation == SDL_ORIENTATION_LANDSCAPE_FLIPPED) &&
-		SDL_GetDisplayOrientation(0) != InitialOrientation)
+		SDL_GetCurrentDisplayOrientation(0) != InitialOrientation)
 		return LeftPadding;
 #endif
 	return RightPadding;

@@ -27,11 +27,11 @@ extern "C" int Android_getKeyboardHeight()
     jmethodID method = NULL;
     jint keyboard_height = 0;
 
-    env = (JNIEnv*)SDL_AndroidGetJNIEnv();
+    env = (JNIEnv*)SDL_GetAndroidJNIEnv();
     if (!env)
         goto exit;
 
-    activity = (jobject)SDL_AndroidGetActivity();
+    activity = (jobject)SDL_GetAndroidActivity();
     if (!activity)
         goto exit;
 
@@ -59,11 +59,11 @@ extern "C" int Android_getMovedHeight()
     jmethodID method = NULL;
     jint moved_height = 0;
 
-    env = (JNIEnv*)SDL_AndroidGetJNIEnv();
+    env = (JNIEnv*)SDL_GetAndroidJNIEnv();
     if (!env)
         goto exit;
 
-    activity = (jobject)SDL_AndroidGetActivity();
+    activity = (jobject)SDL_GetAndroidActivity();
     if (!activity)
         goto exit;
 
@@ -123,11 +123,11 @@ extern "C" void Android_initDisplayCutout(float* top, float* bottom,
     jmethodID right_method = NULL;
     jmethodID initial_orientation_method = NULL;
 
-    env = (JNIEnv*)SDL_AndroidGetJNIEnv();
+    env = (JNIEnv*)SDL_GetAndroidJNIEnv();
     if (!env)
         goto exit;
 
-    activity = (jobject)SDL_AndroidGetActivity();
+    activity = (jobject)SDL_GetAndroidActivity();
     if (!activity)
         goto exit;
 
@@ -168,13 +168,13 @@ exit:
 
 bool Android_isHardwareKeyboardConnected()
 {
-    JNIEnv* env = (JNIEnv*)SDL_AndroidGetJNIEnv();
+    JNIEnv* env = (JNIEnv*)SDL_GetAndroidJNIEnv();
     if (!env)
     {
         return false;
     }
 
-    jobject activity = (jobject)SDL_AndroidGetActivity();
+    jobject activity = (jobject)SDL_GetAndroidActivity();
     if (!activity)
     {
         return false;
@@ -203,13 +203,13 @@ bool Android_isHardwareKeyboardConnected()
 
 void Android_toggleOnScreenKeyboard(bool show, int type, int y)
 {
-    JNIEnv* env = (JNIEnv*)SDL_AndroidGetJNIEnv();
+    JNIEnv* env = (JNIEnv*)SDL_GetAndroidJNIEnv();
     if (!env)
     {
         return;
     }
 
-    jobject activity = (jobject)SDL_AndroidGetActivity();
+    jobject activity = (jobject)SDL_GetAndroidActivity();
     if (!activity)
     {
         return;
@@ -245,13 +245,13 @@ void Android_toggleOnScreenKeyboard(bool show, int type, int y)
 
 void Android_fromSTKEditBox(int widget_id, const core::stringw& text, int selection_start, int selection_end, int type)
 {
-    JNIEnv* env = (JNIEnv*)SDL_AndroidGetJNIEnv();
+    JNIEnv* env = (JNIEnv*)SDL_GetAndroidJNIEnv();
     if (!env)
     {
         return;
     }
 
-    jobject activity = (jobject)SDL_AndroidGetActivity();
+    jobject activity = (jobject)SDL_GetAndroidActivity();
     if (!activity)
     {
         return;

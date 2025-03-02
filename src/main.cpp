@@ -1926,9 +1926,9 @@ void initRest()
     GUIEngine::flushRenderLoading(true/*launching*/);
 
 #ifdef ANDROID
-    JNIEnv* env = (JNIEnv*)SDL_AndroidGetJNIEnv();
+    JNIEnv* env = (JNIEnv*)SDL_GetAndroidJNIEnv();
     assert(env);
-    jobject activity = (jobject)SDL_AndroidGetActivity();
+    jobject activity = (jobject)SDL_GetAndroidActivity();
     if (activity != NULL)
     {
         jclass clazz = env->GetObjectClass(activity);

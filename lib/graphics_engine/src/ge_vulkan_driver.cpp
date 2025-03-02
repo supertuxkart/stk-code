@@ -567,10 +567,10 @@ GEVulkanDriver::GEVulkanDriver(const SIrrlichtCreationParameters& params,
             NULL, &m_vk->debug);
     }
 
-    if (SDL_Vulkan_CreateSurface(window, m_vk->instance, &m_vk->surface) == SDL_FALSE)
+    if (SDL_Vulkan_CreateSurface(window, m_vk->instance, NULL, &m_vk->surface) == false)
         throw std::runtime_error("SDL_Vulkan_CreateSurface failed");
     int w, h = 0;
-    SDL_Vulkan_GetDrawableSize(window, &w, &h);
+    SDL_GetWindowSizeInPixels(window, &w, &h);
     ScreenSize.Width = w;
     ScreenSize.Height = h;
 
@@ -741,12 +741,13 @@ void GEVulkanDriver::createInstance(SDL_Window* window)
     }
 #endif
 
+    //It's now just char const * const * SDL_Vulkan_GetInstanceExtensions(Uint32 *count);
     unsigned int count = 0;
-    if (!SDL_Vulkan_GetInstanceExtensions(window, &count, NULL))
-        throw std::runtime_error("SDL_Vulkan_GetInstanceExtensions failed with NULL extensions");
+    //if (!SDL_Vulkan_GetInstanceExtensions(window, &count, NULL))
+    //    throw std::runtime_error("SDL_Vulkan_GetInstanceExtensions failed with NULL extensions");
     std::vector<const char*> extensions(count, NULL);
-    if (!SDL_Vulkan_GetInstanceExtensions(window, &count, extensions.data()))
-        throw std::runtime_error("SDL_Vulkan_GetInstanceExtensions failed with extensions vector");
+    //if (!SDL_Vulkan_GetInstanceExtensions(window, &count, extensions.data()))
+    //    throw std::runtime_error("SDL_Vulkan_GetInstanceExtensions failed with extensions vector");
 
     uint32_t vk_version = 0;
     bool vulkan_1_1 = false;
@@ -1213,7 +1214,7 @@ found_mode:
     }
 
     int w, h = 0;
-    SDL_Vulkan_GetDrawableSize(m_window, &w, &h);
+    SDL_GetWindowSizeInPixels(m_window, &w, &h);
     VkExtent2D max_extent = m_surface_capabilities.maxImageExtent;
     VkExtent2D min_extent = m_surface_capabilities.minImageExtent;
     VkExtent2D actual_extent =
@@ -2331,7 +2332,7 @@ void GEVulkanDriver::createSwapChainRelated(bool handle_surface)
     waitIdle();
     if (handle_surface)
     {
-        if (SDL_Vulkan_CreateSurface(m_window, m_vk->instance, &m_vk->surface) == SDL_FALSE)
+        if (SDL_Vulkan_CreateSurface(m_window, m_vk->instance, NULL, &m_vk->surface) == false)
             throw std::runtime_error("SDL_Vulkan_CreateSurface failed");
     }
     updateSurfaceInformation(m_physical_device, &m_surface_capabilities,

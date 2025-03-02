@@ -229,6 +229,10 @@ CGUIEditBox::CGUIEditBox(const wchar_t* text, bool border,
     }
 
     m_scroll_pos = m_cursor_distance = 0;
+
+#if defined(_IRR_COMPILE_WITH_SDL_DEVICE_)
+    m_sdl_device = (CIrrDeviceSDL*)(irr_driver->getDevice());
+#endif
 }
 
 
@@ -245,8 +249,8 @@ CGUIEditBox::~CGUIEditBox()
         GUIEngine::ScreenKeyboard::hasSystemScreenKeyboard())
         Android_toggleOnScreenKeyboard(false, 0, 0);
 #elif defined(_IRR_COMPILE_WITH_SDL_DEVICE_)
-    if (SDL_IsTextInputActive())
-        SDL_StopTextInput();
+    if (SDL_TextInputActive(m_sdl_device->getWindow()))
+        SDL_StopTextInput(m_sdl_device->getWindow());
 #endif
 
 #endif
@@ -345,7 +349,7 @@ bool CGUIEditBox::OnEvent(const SEvent& event)
         switch(event.EventType)
         {
         case EET_SDL_TEXT_EVENT:
-            if (event.SDLTextEvent.Type == SDL_TEXTINPUT)
+            if (event.SDLTextEvent.Type == SDL_EVENT_TEXT_INPUT)
             {
                 m_composing_text.clear();
                 m_composing_start = 0;
@@ -373,8 +377,8 @@ bool CGUIEditBox::OnEvent(const SEvent& event)
                     setTextMarkers(0,0);
                 }
 #if !defined(ANDROID) && defined(_IRR_COMPILE_WITH_SDL_DEVICE_)
-                if (SDL_IsTextInputActive())
-                    SDL_StopTextInput();
+                if (SDL_TextInputActive(m_sdl_device->getWindow()))
+                    SDL_StopTextInput(m_sdl_device->getWindow());
 #endif
 #ifdef ANDROID
             // If using non touchscreen input in android dismiss text input
@@ -411,7 +415,7 @@ bool CGUIEditBox::OnEvent(const SEvent& event)
                 // needs to calculate it first
                 calculateScrollPos();
 #endif
-                SDL_StartTextInput();
+                SDL_StartTextInput(m_sdl_device->getWindow());
 #endif
 #if !defined(ANDROID) && !defined(WIN32)
                 calculateScrollPos();
@@ -1395,7 +1399,7 @@ void CGUIEditBox::calculateScrollPos()
     rect.y *= inverse_scale_y;
     rect.w *= inverse_scale_x;
     rect.h *= inverse_scale_y;
-    SDL_SetTextInputRect(&rect);
+    SDL_SetTextInputArea(m_sdl_device->getWindow(), &rect, 0);
 #endif
 
 #endif   // SERVER_ONLY

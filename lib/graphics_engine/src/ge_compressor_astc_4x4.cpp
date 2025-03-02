@@ -34,10 +34,10 @@ void GECompressorASTC4x4::init()
 
     // Check for neon existence because libastcenc doesn't do that
 #if defined(__arm__) || defined(__aarch64__) || defined(_M_ARM) || defined (_M_ARM64)
-    if (SDL_HasNEON() == SDL_FALSE)
+    if (SDL_HasNEON() == false)
         return;
 #else
-    if (SDL_HasSSE41() == SDL_FALSE)
+    if (SDL_HasSSE41() == false)
         return;
 #endif
 

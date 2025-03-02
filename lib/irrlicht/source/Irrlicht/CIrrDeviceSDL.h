@@ -17,7 +17,8 @@
 #include "ICursorControl.h"
 
 #include <SDL.h>
-#include <SDL_syswm.h>
+#include <SDL_version.h>
+//#include <SDL_syswm.h>
 #include <map>
 #include <set>
 
@@ -115,7 +116,7 @@ class MoltenVK;
 		SDL_Window* getWindow() const { return Window; }
 
 #ifdef IOS_STK
-		const SDL_SysWMinfo& getWMInfo() const { return Info; }
+		//const SDL_SysWMinfo& getWMInfo() const { return Info; }
 #endif
 
 		virtual s32 getTopPadding();
@@ -162,9 +163,9 @@ class MoltenVK;
 			{
 				IsVisible = visible;
 				if ( visible )
-					SDL_ShowCursor( SDL_ENABLE );
+					SDL_ShowCursor();
 				else
-					SDL_ShowCursor( SDL_DISABLE );
+					SDL_HideCursor();
 			}
 
 			//! Returns if the cursor is currently visible.
@@ -326,7 +327,7 @@ class MoltenVK;
 
 		core::array<SKeyMap> KeyMap;
 		std::map<SDL_Scancode, irr::EKEY_CODE> ScanCodeMap;
-		SDL_SysWMinfo Info;
+		//SDL_SysWMinfo Info;
 		void tryCreateOpenGLContext(u32 flags);
 #ifdef DLOPEN_MOLTENVK
 		MoltenVK* m_moltenvk;

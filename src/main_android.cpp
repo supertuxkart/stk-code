@@ -52,7 +52,7 @@ void registering_natives()
         { "addDNSSrvRecords",   "(Ljava/lang/String;I)V", (void*)&addDNSSrvRecords },
         { "pauseRenderingJNI",   "()V", (void*)&pauseRenderingJNI }
     };
-    JNIEnv* env = (JNIEnv*)SDL_AndroidGetJNIEnv();
+    JNIEnv* env = (JNIEnv*)SDL_GetAndroidJNIEnv();
     assert(env);
     const char* stkactivity_class = ANDROID_PACKAGE_CLASS_NAME "/SuperTuxKartActivity";
     jclass clazz = env->FindClass(stkactivity_class);
@@ -142,9 +142,9 @@ void override_default_params_for_mobile()
     const int SCREENLAYOUT_SIZE_XLARGE = 4;
     int32_t screen_size = 0;
     int ddpi = 0;
-    JNIEnv* env = (JNIEnv*)SDL_AndroidGetJNIEnv();
+    JNIEnv* env = (JNIEnv*)SDL_GetAndroidJNIEnv();
     assert(env);
-    jobject activity = (jobject)SDL_AndroidGetActivity();
+    jobject activity = (jobject)SDL_GetAndroidActivity();
     if (activity != NULL)
     {
         jclass clazz = env->GetObjectClass(activity);

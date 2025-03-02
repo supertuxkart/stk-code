@@ -374,7 +374,7 @@ Translations::Translations() //: m_dictionary_manager("UTF-16")
                 language = StringUtils::findAndReplace(language, "-", "_");
             }
 #elif defined(ANDROID)
-            JNIEnv* env = (JNIEnv*)SDL_AndroidGetJNIEnv();
+            JNIEnv* env = (JNIEnv*)SDL_GetAndroidJNIEnv();
             jobject native_activity = NULL;
             jclass class_native_activity = NULL;
             jmethodID method_id = NULL;
@@ -382,15 +382,15 @@ Translations::Translations() //: m_dictionary_manager("UTF-16")
             if (env == NULL)
             {
                 Log::error("Translation",
-                    "constructor is unable to SDL_AndroidGetJNIEnv.");
+                    "constructor is unable to SDL_GetAndroidJNIEnv.");
                 goto end;
             }
 
-            native_activity = (jobject)SDL_AndroidGetActivity();
+            native_activity = (jobject)SDL_GetAndroidActivity();
             if (native_activity == NULL)
             {
                 Log::error("Translation",
-                    "constructor is unable to SDL_AndroidGetActivity.");
+                    "constructor is unable to SDL_GetAndroidActivity.");
                 goto end;
             }
 

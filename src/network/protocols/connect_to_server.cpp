@@ -540,20 +540,20 @@ bool ConnectToServer::registerWithSTKServer()
 auto get_txt_record = [](const core::stringw& name)->std::vector<std::string>
 {
     std::vector<std::string> result;
-    JNIEnv* env = (JNIEnv*)SDL_AndroidGetJNIEnv();
+    JNIEnv* env = (JNIEnv*)SDL_GetAndroidJNIEnv();
     if (env == NULL)
     {
         Log::error("ConnectToServer",
-            "getDNSSrvRecords unable to SDL_AndroidGetJNIEnv.");
+            "getDNSSrvRecords unable to SDL_GetAndroidJNIEnv.");
         return result;
     }
 
-    jobject native_activity = (jobject)SDL_AndroidGetActivity();
+    jobject native_activity = (jobject)SDL_GetAndroidActivity();
 
     if (native_activity == NULL)
     {
         Log::error("ConnectToServer",
-            "getDNSSrvRecords unable to SDL_AndroidGetActivity.");
+            "getDNSSrvRecords unable to SDL_GetAndroidActivity.");
         return result;
     }
 

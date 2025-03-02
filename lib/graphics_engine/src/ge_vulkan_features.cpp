@@ -78,7 +78,7 @@ void GEVulkanFeatures::init(GEVulkanDriver* vk)
 #ifdef BC7_ISPC
     format_properties = {};
     // We compile bc7e.ispc with avx2 on
-    if (SDL_HasAVX2() == SDL_TRUE)
+    if (SDL_HasAVX2() == true)
     {
         vkGetPhysicalDeviceFormatProperties(vk->getPhysicalDevice(),
             VK_FORMAT_BC7_UNORM_BLOCK, &format_properties);

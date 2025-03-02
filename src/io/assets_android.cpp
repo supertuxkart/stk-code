@@ -58,16 +58,16 @@ void AssetsAndroid::init()
     if (getenv("SUPERTUXKART_DATADIR"))
         paths.push_back(getenv("SUPERTUXKART_DATADIR"));
 
-    if (SDL_AndroidGetExternalStoragePath() != NULL)
+    if (SDL_GetAndroidExternalStoragePath() != NULL)
     {
-        std::string external_storage_path = SDL_AndroidGetExternalStoragePath();
+        std::string external_storage_path = SDL_GetAndroidExternalStoragePath();
         m_file_manager->checkAndCreateDirectoryP(external_storage_path);
         paths.push_back(external_storage_path);
     }
 
-    if (SDL_AndroidGetInternalStoragePath() != NULL)
+    if (SDL_GetAndroidInternalStoragePath() != NULL)
     {
-        std::string internal_storage_path = SDL_AndroidGetInternalStoragePath();
+        std::string internal_storage_path = SDL_GetAndroidInternalStoragePath();
         m_file_manager->checkAndCreateDirectoryP(internal_storage_path);
         paths.push_back(internal_storage_path);
     }
@@ -338,19 +338,19 @@ void AssetsAndroid::extractData()
 void AssetsAndroid::setProgressBar(int progress)
 {
 #ifdef ANDROID
-    JNIEnv* env = (JNIEnv*)SDL_AndroidGetJNIEnv();
+    JNIEnv* env = (JNIEnv*)SDL_GetAndroidJNIEnv();
     if (env == NULL)
     {
         Log::error("AssetsAndroid",
-            "setProgressBar unable to SDL_AndroidGetJNIEnv.");
+            "setProgressBar unable to SDL_GetAndroidJNIEnv.");
         return;
     }
 
-    jobject native_activity = (jobject)SDL_AndroidGetActivity();
+    jobject native_activity = (jobject)SDL_GetAndroidActivity();
     if (native_activity == NULL)
     {
         Log::error("AssetsAndroid",
-            "setProgressBar unable to SDL_AndroidGetActivity.");
+            "setProgressBar unable to SDL_GetAndroidActivity.");
         return;
     }
 
@@ -413,7 +413,7 @@ bool AssetsAndroid::extractFile(std::string filename)
         return true;
     }
 
-    SDL_RWops* asset = SDL_RWFromFile(filename.c_str(), "rb");
+    SDL_IOStream* asset = SDL_IOFromFile(filename.c_str(), "rb");
     if (asset == NULL)
     {
         Log::warn("AssetsAndroid", "Couldn't get asset: %s",
@@ -430,25 +430,25 @@ bool AssetsAndroid::extractFile(std::string filename)
     {
         Log::error("AssetsAndroid", "Couldn't create a file: %s",
             output_file.c_str());
-        SDL_RWclose(asset);
+        SDL_CloseIO(asset);
         return false;
     }
 
     size_t nb_read = 0;
-    while ((nb_read = SDL_RWread(asset, buf, 1, buf_size)) > 0)
+    while ((nb_read = SDL_ReadIO(asset, buf, 1, buf_size)) > 0)
     {
         out_file.write(buf, nb_read);
         if (out_file.fail())
         {
             delete[] buf;
-            SDL_RWclose(asset);
+            SDL_CloseIO(asset);
             return false;
         }
     }
 
     out_file.close();
     delete[] buf;
-    SDL_RWclose(asset);
+    SDL_CloseIO(asset);
 
     if (out_file.fail())
     {
@@ -544,7 +544,7 @@ void AssetsAndroid::removeData()
 bool AssetsAndroid::hasAssets()
 {
 #ifdef ANDROID
-    SDL_RWops* asset = SDL_RWFromFile("has_assets.txt", "r");
+    SDL_IOStream* asset = SDL_IOFromFile("has_assets.txt", "r");
 
     if (asset == NULL)
     {
@@ -553,7 +553,7 @@ bool AssetsAndroid::hasAssets()
     }
 
     Log::info("AssetsAndroid", "Package has assets");
-    SDL_RWclose(asset);
+    SDL_CloseIO(asset);
     return true;
 #endif
 
@@ -657,8 +657,8 @@ std::string AssetsAndroid::getDataPath()
     {
         Log::warn("AssetsAndroid", "Cannot use standard data dir");
 
-        if (SDL_AndroidGetInternalStoragePath() != NULL)
-            data_path = SDL_AndroidGetInternalStoragePath();
+        if (SDL_GetAndroidInternalStoragePath() != NULL)
+            data_path = SDL_GetAndroidInternalStoragePath();
 
         if (access(data_path.c_str(), R_OK) != 0)
         {

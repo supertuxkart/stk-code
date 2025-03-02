@@ -877,7 +877,7 @@ begin:
 #endif
     m_pointer_shown = true;
 #ifdef ENABLE_SCREEN_ORIENTATION_HANDLING
-    m_screen_orientation = (int)SDL_GetDisplayOrientation(0);
+    m_screen_orientation = (int)SDL_GetCurrentDisplayOrientation(0);
 #endif
     if (GUIEngine::isNoGraphics())
         return;
@@ -2097,7 +2097,7 @@ void IrrDriver::handleWindowResize()
     bool screen_orientation_changed = false;
     int new_orientation = -1;
 #ifdef ENABLE_SCREEN_ORIENTATION_HANDLING
-    new_orientation = (int)SDL_GetDisplayOrientation(0);
+    new_orientation = (int)SDL_GetCurrentDisplayOrientation(0);
     screen_orientation_changed = m_screen_orientation != new_orientation;
 #endif
     const core::dimension2du& new_size = m_video_driver->getCurrentRenderTargetSize();

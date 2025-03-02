@@ -20,8 +20,12 @@
 #include "SDL_events.h"
 #endif
 
+#include "../../../lib/irrlicht/source/Irrlicht/CIrrDeviceSDL.h"
+
+
 using namespace irr;
 using namespace gui;
+
 
 namespace GUIEngine
 {
@@ -196,6 +200,11 @@ namespace GUIEngine
         core::position2di m_ic_pos;
         void correctCursor(s32& cursor_pos, bool left);
         void updateSurrogatePairText();
+
+    private:    
+#if defined(_IRR_COMPILE_WITH_SDL_DEVICE_)
+        CIrrDeviceSDL* m_sdl_device;
+#endif
     };
 
 

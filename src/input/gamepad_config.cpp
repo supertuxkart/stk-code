@@ -34,7 +34,7 @@
 
 enum AxisWithDirection : unsigned
 {
-    SDL_CONTROLLER_AXIS_LEFTX_RIGHT = SDL_CONTROLLER_BUTTON_MAX,
+    SDL_CONTROLLER_AXIS_LEFTX_RIGHT = SDL_GAMEPAD_BUTTON_COUNT,
     SDL_CONTROLLER_AXIS_LEFTX_LEFT,
     SDL_CONTROLLER_AXIS_LEFTY_DOWN,
     SDL_CONTROLLER_AXIS_LEFTY_UP,
@@ -149,34 +149,34 @@ core::stringw GamepadConfig::getBindingAsString(const PlayerAction action) const
 #ifndef SERVER_ONLY
     std::map<unsigned, core::stringw> readable =
     {{
-        { SDL_CONTROLLER_BUTTON_A, "A" },
-        { SDL_CONTROLLER_BUTTON_B, "B" },
-        { SDL_CONTROLLER_BUTTON_X, "X" },
-        { SDL_CONTROLLER_BUTTON_Y, "Y" },
+        { SDL_GAMEPAD_BUTTON_SOUTH, "A" },
+        { SDL_GAMEPAD_BUTTON_EAST, "B" },
+        { SDL_GAMEPAD_BUTTON_WEST, "X" },
+        { SDL_GAMEPAD_BUTTON_NORTH, "Y" },
         // I18N: name of buttons on gamepads
-        { SDL_CONTROLLER_BUTTON_BACK, _("Back") },
+        { SDL_GAMEPAD_BUTTON_BACK, _("Back") },
         // I18N: name of buttons on gamepads
-        { SDL_CONTROLLER_BUTTON_GUIDE, _("Guide") },
+        { SDL_GAMEPAD_BUTTON_GUIDE, _("Guide") },
         // I18N: name of buttons on gamepads
-        { SDL_CONTROLLER_BUTTON_START, _("Start") },
+        { SDL_GAMEPAD_BUTTON_START, _("Start") },
         // I18N: name of buttons on gamepads
-        { SDL_CONTROLLER_BUTTON_LEFTSTICK, _("Left thumbstick press") },
+        { SDL_GAMEPAD_BUTTON_LEFT_STICK, _("Left thumbstick press") },
         // I18N: name of buttons on gamepads
-        { SDL_CONTROLLER_BUTTON_RIGHTSTICK, _("Right thumbstick press") },
+        { SDL_GAMEPAD_BUTTON_RIGHT_STICK, _("Right thumbstick press") },
         // I18N: name of buttons on gamepads
-        { SDL_CONTROLLER_BUTTON_LEFTSHOULDER, _("Left shoulder") },
+        { SDL_GAMEPAD_BUTTON_LEFT_SHOULDER, _("Left shoulder") },
         // I18N: name of buttons on gamepads
-        { SDL_CONTROLLER_BUTTON_RIGHTSHOULDER, _("Right shoulder") },
+        { SDL_GAMEPAD_BUTTON_RIGHT_SHOULDER, _("Right shoulder") },
         // I18N: name of buttons on gamepads
-        { SDL_CONTROLLER_BUTTON_DPAD_UP, _("DPad up") },
+        { SDL_GAMEPAD_BUTTON_DPAD_UP, _("DPad up") },
         // I18N: name of buttons on gamepads
-        { SDL_CONTROLLER_BUTTON_DPAD_DOWN, _("DPad down") },
+        { SDL_GAMEPAD_BUTTON_DPAD_DOWN, _("DPad down") },
         // I18N: name of buttons on gamepads
-        { SDL_CONTROLLER_BUTTON_DPAD_LEFT, _("DPad left") },
+        { SDL_GAMEPAD_BUTTON_DPAD_LEFT, _("DPad left") },
         // I18N: name of buttons on gamepads
-        { SDL_CONTROLLER_BUTTON_DPAD_RIGHT, _("DPad right") },
+        { SDL_GAMEPAD_BUTTON_DPAD_RIGHT, _("DPad right") },
 
-        // Below are extensions after SDL2 header SDL_CONTROLLER_BUTTON_MAX
+        // Below are extensions after SDL2 header SDL_GAMEPAD_BUTTON_COUNT
         // I18N: name of buttons on gamepads
         { SDL_CONTROLLER_AXIS_LEFTX_RIGHT, _("Left thumbstick right") },
         // I18N: name of buttons on gamepads
@@ -337,21 +337,21 @@ void GamepadConfig::initSDLController(const std::string& mapping, int buttons,
     // We need to maunally parse the mapping as API from SDL2 is not enough
     std::map<std::string, int> lhs_mapping =
     {
-        { "a", SDL_CONTROLLER_BUTTON_A },
-        { "b", SDL_CONTROLLER_BUTTON_B },
-        { "x", SDL_CONTROLLER_BUTTON_X },
-        { "y", SDL_CONTROLLER_BUTTON_Y },
-        { "back", SDL_CONTROLLER_BUTTON_BACK },
-        { "guide", SDL_CONTROLLER_BUTTON_GUIDE },
-        { "start", SDL_CONTROLLER_BUTTON_START },
-        { "leftstick", SDL_CONTROLLER_BUTTON_LEFTSTICK },
-        { "rightstick", SDL_CONTROLLER_BUTTON_RIGHTSTICK },
-        { "leftshoulder", SDL_CONTROLLER_BUTTON_LEFTSHOULDER },
-        { "rightshoulder", SDL_CONTROLLER_BUTTON_RIGHTSHOULDER },
-        { "dpup", SDL_CONTROLLER_BUTTON_DPAD_UP },
-        { "dpdown", SDL_CONTROLLER_BUTTON_DPAD_DOWN },
-        { "dpleft", SDL_CONTROLLER_BUTTON_DPAD_LEFT },
-        { "dpright", SDL_CONTROLLER_BUTTON_DPAD_RIGHT },
+        { "a", SDL_GAMEPAD_BUTTON_SOUTH },
+        { "b", SDL_GAMEPAD_BUTTON_EAST },
+        { "x", SDL_GAMEPAD_BUTTON_WEST },
+        { "y", SDL_GAMEPAD_BUTTON_NORTH },
+        { "back", SDL_GAMEPAD_BUTTON_BACK },
+        { "guide", SDL_GAMEPAD_BUTTON_GUIDE },
+        { "start", SDL_GAMEPAD_BUTTON_START },
+        { "leftstick", SDL_GAMEPAD_BUTTON_LEFT_STICK },
+        { "rightstick", SDL_GAMEPAD_BUTTON_RIGHT_STICK },
+        { "leftshoulder", SDL_GAMEPAD_BUTTON_LEFT_SHOULDER },
+        { "rightshoulder", SDL_GAMEPAD_BUTTON_RIGHT_SHOULDER },
+        { "dpup", SDL_GAMEPAD_BUTTON_DPAD_UP },
+        { "dpdown", SDL_GAMEPAD_BUTTON_DPAD_DOWN },
+        { "dpleft", SDL_GAMEPAD_BUTTON_DPAD_LEFT },
+        { "dpright", SDL_GAMEPAD_BUTTON_DPAD_RIGHT },
         { "+leftx", SDL_CONTROLLER_AXIS_LEFTX_RIGHT },
         { "-leftx", SDL_CONTROLLER_AXIS_LEFTX_LEFT },
         { "+lefty", SDL_CONTROLLER_AXIS_LEFTY_DOWN },
@@ -439,8 +439,8 @@ void GamepadConfig::initSDLController(const std::string& mapping, int buttons,
         auto a2 = m_sdl_mapping.find(std::make_tuple(i, Input::AD_NEGATIVE));
         if (a1 != m_sdl_mapping.end() && a2 != m_sdl_mapping.end())
         {
-            if (a1->second < SDL_CONTROLLER_BUTTON_MAX &&
-                a2->second < SDL_CONTROLLER_BUTTON_MAX)
+            if (a1->second < SDL_GAMEPAD_BUTTON_COUNT &&
+                a2->second < SDL_GAMEPAD_BUTTON_COUNT)
                 m_digital_axes.insert(i);
         }
     }
@@ -481,10 +481,10 @@ void GamepadConfig::initSDLMapping()
         has_direction = true;
         use_axes_direction = true;
     }
-    if (actions_map.find(SDL_CONTROLLER_BUTTON_DPAD_UP) != actions_map.end() &&
-        actions_map.find(SDL_CONTROLLER_BUTTON_DPAD_DOWN) != actions_map.end() &&
-        actions_map.find(SDL_CONTROLLER_BUTTON_DPAD_LEFT) != actions_map.end() &&
-        actions_map.find(SDL_CONTROLLER_BUTTON_DPAD_RIGHT) != actions_map.end())
+    if (actions_map.find(SDL_GAMEPAD_BUTTON_DPAD_UP) != actions_map.end() &&
+        actions_map.find(SDL_GAMEPAD_BUTTON_DPAD_DOWN) != actions_map.end() &&
+        actions_map.find(SDL_GAMEPAD_BUTTON_DPAD_LEFT) != actions_map.end() &&
+        actions_map.find(SDL_GAMEPAD_BUTTON_DPAD_RIGHT) != actions_map.end())
     {
         has_direction = true;
     }
@@ -503,63 +503,63 @@ void GamepadConfig::initSDLMapping()
     }
     else
     {
-        setBindingFromTuple(PA_STEER_LEFT, actions_map.at(SDL_CONTROLLER_BUTTON_DPAD_LEFT));
-        setBindingFromTuple(PA_STEER_RIGHT, actions_map.at(SDL_CONTROLLER_BUTTON_DPAD_RIGHT));
-        setBindingFromTuple(PA_ACCEL, actions_map.at(SDL_CONTROLLER_BUTTON_DPAD_UP));
-        setBindingFromTuple(PA_BRAKE, actions_map.at(SDL_CONTROLLER_BUTTON_DPAD_DOWN));
-        setBindingFromTuple(PA_MENU_UP, actions_map.at(SDL_CONTROLLER_BUTTON_DPAD_UP));
-        setBindingFromTuple(PA_MENU_DOWN, actions_map.at(SDL_CONTROLLER_BUTTON_DPAD_DOWN));
-        setBindingFromTuple(PA_MENU_LEFT, actions_map.at(SDL_CONTROLLER_BUTTON_DPAD_LEFT));
-        setBindingFromTuple(PA_MENU_RIGHT, actions_map.at(SDL_CONTROLLER_BUTTON_DPAD_RIGHT));
+        setBindingFromTuple(PA_STEER_LEFT, actions_map.at(SDL_GAMEPAD_BUTTON_DPAD_LEFT));
+        setBindingFromTuple(PA_STEER_RIGHT, actions_map.at(SDL_GAMEPAD_BUTTON_DPAD_RIGHT));
+        setBindingFromTuple(PA_ACCEL, actions_map.at(SDL_GAMEPAD_BUTTON_DPAD_UP));
+        setBindingFromTuple(PA_BRAKE, actions_map.at(SDL_GAMEPAD_BUTTON_DPAD_DOWN));
+        setBindingFromTuple(PA_MENU_UP, actions_map.at(SDL_GAMEPAD_BUTTON_DPAD_UP));
+        setBindingFromTuple(PA_MENU_DOWN, actions_map.at(SDL_GAMEPAD_BUTTON_DPAD_DOWN));
+        setBindingFromTuple(PA_MENU_LEFT, actions_map.at(SDL_GAMEPAD_BUTTON_DPAD_LEFT));
+        setBindingFromTuple(PA_MENU_RIGHT, actions_map.at(SDL_GAMEPAD_BUTTON_DPAD_RIGHT));
     }
     // Goto fallback if not all required bindings are found
-    if (actions_map.find(SDL_CONTROLLER_BUTTON_A) == actions_map.end())
+    if (actions_map.find(SDL_GAMEPAD_BUTTON_SOUTH) == actions_map.end())
         goto fallback;
-    if (actions_map.find(SDL_CONTROLLER_BUTTON_B) == actions_map.end())
+    if (actions_map.find(SDL_GAMEPAD_BUTTON_EAST) == actions_map.end())
         goto fallback;
-    if (actions_map.find(SDL_CONTROLLER_BUTTON_X) == actions_map.end())
+    if (actions_map.find(SDL_GAMEPAD_BUTTON_WEST) == actions_map.end())
         goto fallback;
-    if (actions_map.find(SDL_CONTROLLER_BUTTON_Y) == actions_map.end())
+    if (actions_map.find(SDL_GAMEPAD_BUTTON_NORTH) == actions_map.end())
         goto fallback;
-    if (actions_map.find(SDL_CONTROLLER_BUTTON_BACK) == actions_map.end())
+    if (actions_map.find(SDL_GAMEPAD_BUTTON_BACK) == actions_map.end())
         goto fallback;
-    if (actions_map.find(SDL_CONTROLLER_BUTTON_START) == actions_map.end())
+    if (actions_map.find(SDL_GAMEPAD_BUTTON_START) == actions_map.end())
         goto fallback;
     // If shoulder buttons are found change acceleration handling because some
     // stick may not handle acceleration and steering good together
-    if (actions_map.find(SDL_CONTROLLER_BUTTON_LEFTSHOULDER) != actions_map.end() &&
-        actions_map.find(SDL_CONTROLLER_BUTTON_RIGHTSHOULDER) != actions_map.end())
+    if (actions_map.find(SDL_GAMEPAD_BUTTON_LEFT_SHOULDER) != actions_map.end() &&
+        actions_map.find(SDL_GAMEPAD_BUTTON_RIGHT_SHOULDER) != actions_map.end())
     {
 #ifdef __SWITCH__
-        setBindingFromTuple(PA_ACCEL, actions_map.at(SDL_CONTROLLER_BUTTON_A));
-        setBindingFromTuple(PA_BRAKE, actions_map.at(SDL_CONTROLLER_BUTTON_B));
-        setBindingFromTuple(PA_FIRE, actions_map.at(SDL_CONTROLLER_BUTTON_X));
-        setBindingFromTuple(PA_LOOK_BACK, actions_map.at(SDL_CONTROLLER_BUTTON_Y));
+        setBindingFromTuple(PA_ACCEL, actions_map.at(SDL_GAMEPAD_BUTTON_SOUTH));
+        setBindingFromTuple(PA_BRAKE, actions_map.at(SDL_GAMEPAD_BUTTON_EAST));
+        setBindingFromTuple(PA_FIRE, actions_map.at(SDL_GAMEPAD_BUTTON_WEST));
+        setBindingFromTuple(PA_LOOK_BACK, actions_map.at(SDL_GAMEPAD_BUTTON_NORTH));
         // Split joycons will only have one minus button (left joycon)
-        setBindingFromTuple(PA_RESCUE, actions_map.at(SDL_CONTROLLER_BUTTON_LEFTSTICK));
+        setBindingFromTuple(PA_RESCUE, actions_map.at(SDL_GAMEPAD_BUTTON_LEFT_STICK));
 #else
-        setBindingFromTuple(PA_ACCEL, actions_map.at(SDL_CONTROLLER_BUTTON_Y));
-        setBindingFromTuple(PA_BRAKE, actions_map.at(SDL_CONTROLLER_BUTTON_X));
-        setBindingFromTuple(PA_FIRE, actions_map.at(SDL_CONTROLLER_BUTTON_B));
-        setBindingFromTuple(PA_LOOK_BACK, actions_map.at(SDL_CONTROLLER_BUTTON_A));
-        setBindingFromTuple(PA_RESCUE, actions_map.at(SDL_CONTROLLER_BUTTON_BACK));
+        setBindingFromTuple(PA_ACCEL, actions_map.at(SDL_GAMEPAD_BUTTON_NORTH));
+        setBindingFromTuple(PA_BRAKE, actions_map.at(SDL_GAMEPAD_BUTTON_WEST));
+        setBindingFromTuple(PA_FIRE, actions_map.at(SDL_GAMEPAD_BUTTON_EAST));
+        setBindingFromTuple(PA_LOOK_BACK, actions_map.at(SDL_GAMEPAD_BUTTON_SOUTH));
+        setBindingFromTuple(PA_RESCUE, actions_map.at(SDL_GAMEPAD_BUTTON_BACK));
 #endif
-        setBindingFromTuple(PA_NITRO, actions_map.at(SDL_CONTROLLER_BUTTON_LEFTSHOULDER));
-        setBindingFromTuple(PA_DRIFT, actions_map.at(SDL_CONTROLLER_BUTTON_RIGHTSHOULDER));
-        setBindingFromTuple(PA_PAUSE_RACE, actions_map.at(SDL_CONTROLLER_BUTTON_START));
-        setBindingFromTuple(PA_MENU_SELECT, actions_map.at(SDL_CONTROLLER_BUTTON_A));
-        setBindingFromTuple(PA_MENU_CANCEL, actions_map.at(SDL_CONTROLLER_BUTTON_B));
+        setBindingFromTuple(PA_NITRO, actions_map.at(SDL_GAMEPAD_BUTTON_LEFT_SHOULDER));
+        setBindingFromTuple(PA_DRIFT, actions_map.at(SDL_GAMEPAD_BUTTON_RIGHT_SHOULDER));
+        setBindingFromTuple(PA_PAUSE_RACE, actions_map.at(SDL_GAMEPAD_BUTTON_START));
+        setBindingFromTuple(PA_MENU_SELECT, actions_map.at(SDL_GAMEPAD_BUTTON_SOUTH));
+        setBindingFromTuple(PA_MENU_CANCEL, actions_map.at(SDL_GAMEPAD_BUTTON_EAST));
     }
     else
     {
-        setBindingFromTuple(PA_FIRE, actions_map.at(SDL_CONTROLLER_BUTTON_B));
-        setBindingFromTuple(PA_NITRO, actions_map.at(SDL_CONTROLLER_BUTTON_A));
-        setBindingFromTuple(PA_DRIFT, actions_map.at(SDL_CONTROLLER_BUTTON_X));
-        setBindingFromTuple(PA_LOOK_BACK, actions_map.at(SDL_CONTROLLER_BUTTON_Y));
-        setBindingFromTuple(PA_RESCUE, actions_map.at(SDL_CONTROLLER_BUTTON_BACK));
-        setBindingFromTuple(PA_PAUSE_RACE, actions_map.at(SDL_CONTROLLER_BUTTON_START));
-        setBindingFromTuple(PA_MENU_SELECT, actions_map.at(SDL_CONTROLLER_BUTTON_A));
-        setBindingFromTuple(PA_MENU_CANCEL, actions_map.at(SDL_CONTROLLER_BUTTON_B));
+        setBindingFromTuple(PA_FIRE, actions_map.at(SDL_GAMEPAD_BUTTON_EAST));
+        setBindingFromTuple(PA_NITRO, actions_map.at(SDL_GAMEPAD_BUTTON_SOUTH));
+        setBindingFromTuple(PA_DRIFT, actions_map.at(SDL_GAMEPAD_BUTTON_WEST));
+        setBindingFromTuple(PA_LOOK_BACK, actions_map.at(SDL_GAMEPAD_BUTTON_NORTH));
+        setBindingFromTuple(PA_RESCUE, actions_map.at(SDL_GAMEPAD_BUTTON_BACK));
+        setBindingFromTuple(PA_PAUSE_RACE, actions_map.at(SDL_GAMEPAD_BUTTON_START));
+        setBindingFromTuple(PA_MENU_SELECT, actions_map.at(SDL_GAMEPAD_BUTTON_SOUTH));
+        setBindingFromTuple(PA_MENU_CANCEL, actions_map.at(SDL_GAMEPAD_BUTTON_EAST));
     }
     return;
 
@@ -579,7 +579,7 @@ fallback:
     actions_map.clear();
     for (auto& p : m_sdl_mapping)
     {
-        if (p.second >= SDL_CONTROLLER_BUTTON_MAX)
+        if (p.second >= SDL_GAMEPAD_BUTTON_COUNT)
             continue;
         actions_map[p.second] = p.first;
     }
@@ -587,7 +587,7 @@ fallback:
     if (it != actions_map.end())
     {
         // Prefer start and back button if exist
-        auto start_bind = actions_map.find(SDL_CONTROLLER_BUTTON_START);
+        auto start_bind = actions_map.find(SDL_GAMEPAD_BUTTON_START);
         if (start_bind != actions_map.end())
             it = start_bind;
         setBindingFromTuple(PA_MENU_SELECT, it->second);
@@ -595,7 +595,7 @@ fallback:
         it = actions_map.begin();
         if (it != actions_map.end())
         {
-            auto back_bind = actions_map.find(SDL_CONTROLLER_BUTTON_BACK);
+            auto back_bind = actions_map.find(SDL_GAMEPAD_BUTTON_BACK);
             if (back_bind != actions_map.end())
                 it = back_bind;
             setBindingFromTuple(PA_MENU_CANCEL, it->second);

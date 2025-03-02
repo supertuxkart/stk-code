@@ -581,10 +581,10 @@ struct SEvent
 	// Application state event
 	struct SSDLTextEvent
 	{
-		u32 Type; // SDL_TEXTEDITING or SDL_TEXTINPUT
+		u32 Type; // SDL_EVENT_TEXT_EDITING or SDL_EVENT_TEXT_INPUT
 		c8 Text[32];
-		s32 Start; // SDL_TEXTEDITING usage
-		s32 Length; // SDL_TEXTEDITING usage
+		s32 Start; // SDL_EVENT_TEXT_EDITING usage
+		s32 Length; // SDL_EVENT_TEXT_EDITING usage
 	};
 
 	EEVENT_TYPE EventType;

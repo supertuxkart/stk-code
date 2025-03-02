@@ -118,7 +118,7 @@ InputManager::InputManager() : m_mode(BOOTSTRAP),
         "53776974636820436F6E74726F6C6C65,Switch Controller,a:b0,b:b1,back:b11,dpdown:b15,dpleft:b12,dpright:b14,dpup:b13,leftshoulder:b6,leftstick:b4,lefttrigger:b8,leftx:a0,lefty:a1,rightshoulder:b7,rightstick:b5,righttrigger:b9,rightx:a2,righty:a3,start:b10,x:b2,y:b3,\n"
     );
 #endif // __SWITCH__
-    if (SDL_InitSubSystem(SDL_INIT_GAMECONTROLLER) != 0)
+    if (SDL_InitSubSystem(SDL_INIT_GAMEPAD) != 0)
     {
         Log::error("InputManager", "Failed to init SDL game controller: %s",
             SDL_GetError());
@@ -138,14 +138,17 @@ void InputManager::addJoystick()
 #ifndef SERVER_ONLY
     // When irrlicht device is reinitialized the joystick added event may be
     // lost, we look for them and add it back
-    for (int i = 0; i < SDL_NumJoysticks(); i++)
+    int count = 0;
+    SDL_JoystickID* joysticks = SDL_GetJoysticks(&count);
+
+    for (int i = 0; i < count; i++)
     {
         try
         {
-            SDL_Joystick* joystick = SDL_JoystickOpen(i);
+            SDL_Joystick* joystick = SDL_OpenJoystick(joysticks[i]);
             if (!joystick)
                 continue;
-            SDL_JoystickID id = SDL_JoystickInstanceID(joystick);
+            SDL_JoystickID id = SDL_GetJoystickID(joystick);
             if (m_sdl_controller.find(id) != m_sdl_controller.end())
                 continue;
             std::unique_ptr<SDLController> c(
@@ -158,6 +161,8 @@ void InputManager::addJoystick()
             Log::error("SDLController", "Error in addJoystick %s", e.what());
         }
     }
+    
+    SDL_free(joysticks);
 #endif
 }
 
@@ -177,7 +182,7 @@ void InputManager::handleJoystick(SDL_Event& event)
     {
         switch (event.type)
         {
-        case SDL_JOYDEVICEADDED:
+        case SDL_EVENT_JOYSTICK_ADDED:
         {
             std::unique_ptr<SDLController> c(
                 new SDLController(event.jdevice.which));
@@ -185,14 +190,14 @@ void InputManager::handleJoystick(SDL_Event& event)
             m_sdl_controller[id] = std::move(c);
             break;
         }
-        case SDL_JOYDEVICEREMOVED:
+        case SDL_EVENT_JOYSTICK_REMOVED:
         {
             m_gamepads_timer.erase(
                 m_sdl_controller.at(event.jdevice.which)->getInstanceID());
             m_sdl_controller.erase(event.jdevice.which);
             break;
         }
-        case SDL_JOYAXISMOTION:
+        case SDL_EVENT_JOYSTICK_AXIS_MOTION:
         {
             auto& controller = m_sdl_controller.at(event.jaxis.which);
             if (m_mode == INPUT_SENSE_GAMEPAD)
@@ -202,7 +207,7 @@ void InputManager::handleJoystick(SDL_Event& event)
                 input(controller->getEvent());
             break;
         }
-        case SDL_JOYHATMOTION:
+        case SDL_EVENT_JOYSTICK_HAT_MOTION:
         {
             auto& controller = m_sdl_controller.at(event.jhat.which);
             if (controller->handleHat(event) &&
@@ -210,8 +215,8 @@ void InputManager::handleJoystick(SDL_Event& event)
                 input(controller->getEvent());
             break;
         }
-        case SDL_JOYBUTTONUP:
-        case SDL_JOYBUTTONDOWN:
+        case SDL_EVENT_JOYSTICK_BUTTON_UP:
+        case SDL_EVENT_JOYSTICK_BUTTON_DOWN:
         {
             auto& controller = m_sdl_controller.at(event.jbutton.which);
             if (controller->handleButton(event) &&

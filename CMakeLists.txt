@@ -332,21 +332,21 @@ else()
 endif()
 
 if (NOT SERVER_ONLY)
-    # SDL2
-    find_library(SDL2_LIBRARY NAMES SDL2 libSDL2)
-    find_path(SDL2_INCLUDEDIR NAMES SDL.h PATH_SUFFIXES SDL2 include/SDL2 include PATHS)
-    if (NOT SDL2_LIBRARY OR NOT SDL2_INCLUDEDIR)
-        message(FATAL_ERROR "SDL2 not found. "
-            "SDL2 is required to handle gamepad in SuperTuxKart.")
+    # SDL3
+    find_library(SDL3_LIBRARY NAMES SDL3 libSDL3)
+    find_path(SDL3_INCLUDEDIR NAMES SDL.h PATH_SUFFIXES SDL3 include/SDL3 include PATHS)
+    if (NOT SDL3_LIBRARY OR NOT SDL3_INCLUDEDIR)
+        message(FATAL_ERROR "SDL3 not found. "
+            "SDL3 is required to handle gamepad in SuperTuxKart.")
     else()
-        include_directories("${SDL2_INCLUDEDIR}")
-        MESSAGE(STATUS "Use system SDL2: ${SDL2_LIBRARY}")
+        include_directories("${SDL3_INCLUDEDIR}")
+        MESSAGE(STATUS "Use system SDL3: ${SDL3_LIBRARY}")
     endif()
-    # DirectFB. Necessary if system SDL2 is built with DirectFB support.
+    # DirectFB. Necessary if system SDL3 is built with DirectFB support.
     find_path(DIRECTFB_INCLUDEDIR NAMES directfb.h directfb++.h PATH_SUFFIXES directfb include/directfb include PATHS)
     if (DIRECTFB_INCLUDEDIR)
         include_directories("${DIRECTFB_INCLUDEDIR}")
-        message(STATUS "Adding DirectFB include directories for DirectFB support in SDL2")
+        message(STATUS "Adding DirectFB include directories for DirectFB support in SDL3")
     endif()
 endif()
 
@@ -695,7 +695,7 @@ if (USE_SWITCH)
     ${FREETYPE_LIBRARIES}
     -logg
     -lvorbis
-    ${SDL2_LIBRARY}
+    ${SDL3_LIBRARY}
     ${PNG_LIBRARY}
     ${BZ2_LIBRARY}
     ${HARFBUZZ_LIBRARY}
@@ -766,7 +766,7 @@ if(NOT SERVER_ONLY)
         ${SHEENBIDI_LIBRARY}
         graphics_utils
         graphics_engine
-        ${SDL2_LIBRARY}
+        ${SDL3_LIBRARY}
         tinygettext)
     if (NOT NO_SHADERC)
         target_link_libraries(supertuxkart ${SHADERC_LIBRARY})

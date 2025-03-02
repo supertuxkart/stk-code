@@ -21,7 +21,7 @@
 #ifndef SERVER_ONLY
 
 #include <SDL_events.h>
-#include <SDL_gamecontroller.h>
+#include <SDL_gamepad.h>
 #include <SDL_joystick.h>
 #include <IEventReceiver.h>
 #include <bitset>
@@ -35,7 +35,7 @@ class GamePadDevice;
 class SDLController
 {
 private:
-    SDL_GameController* m_game_controller;
+    SDL_Gamepad* m_game_controller;
 
     SDL_Joystick* m_joystick;
 
@@ -148,16 +148,15 @@ public:
 #endif
             return false;
         }
-        bool pressed = event.jbutton.state == SDL_PRESSED;
         std::bitset<irr::SEvent::SJoystickEvent::NUMBER_OF_BUTTONS> states
             (m_irr_event.JoystickEvent.ButtonStates);
-        states[event.jbutton.button] = pressed;
+        states[event.jbutton.button] = event.jbutton.down;
         m_irr_event.JoystickEvent.ButtonStates = (irr::u32)states.to_ulong();
         m_irr_event.JoystickEvent.AxisChanged = 0;
         return true;
     }   // handleButton
     // ------------------------------------------------------------------------
-    SDL_GameController* getGameController() const { return m_game_controller; }
+    SDL_Gamepad* getGameController() const { return m_game_controller; }
     // ------------------------------------------------------------------------
     void checkPowerLevel();
     // ------------------------------------------------------------------------

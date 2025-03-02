@@ -513,19 +513,19 @@ void NetworkConfig::fillStunList(std::vector<std::pair<std::string, int> >* l,
     }
 
 #elif defined(ANDROID)
-    JNIEnv* env = (JNIEnv*)SDL_AndroidGetJNIEnv();
+    JNIEnv* env = (JNIEnv*)SDL_GetAndroidJNIEnv();
     if (env == NULL)
     {
         Log::error("NetworkConfig",
-            "getDNSSrvRecords unable to SDL_AndroidGetJNIEnv.");
+            "getDNSSrvRecords unable to SDL_GetAndroidJNIEnv.");
         return;
     }
 
-    jobject native_activity = (jobject)SDL_AndroidGetActivity();
+    jobject native_activity = (jobject)SDL_GetAndroidActivity();
     if (native_activity == NULL)
     {
         Log::error("NetworkConfig",
-            "getDNSSrvRecords unable to SDL_AndroidGetActivity.");
+            "getDNSSrvRecords unable to SDL_GetAndroidActivity.");
         return;
     }
 
