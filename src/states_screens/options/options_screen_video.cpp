@@ -358,7 +358,8 @@ void OptionsScreenVideo::updateGfxSlider()
             m_presets[l].degraded_ibl == UserConfigParams::m_degraded_IBL &&
             m_presets[l].geometry_detail == (UserConfigParams::m_geometry_level == 0 ? 2 :
                                              UserConfigParams::m_geometry_level == 2 ? 0 :
-                                             UserConfigParams::m_geometry_level))
+                                             UserConfigParams::m_geometry_level) &&
+            UserConfigParams::m_pcss_threshold == 2048)
         {
             gfx->setValue(l + 1);
             found = true;
@@ -605,6 +606,7 @@ void OptionsScreenVideo::eventCallback(Widget* widget, const std::string& name,
         UserConfigParams::m_geometry_level     = (m_presets[level].geometry_detail == 0 ? 2 :
                                                   m_presets[level].geometry_detail == 2 ? 0 :
                                                   m_presets[level].geometry_detail);
+        UserConfigParams::m_pcss_threshold     = 2048;
 
         updateGfxSlider();
     }

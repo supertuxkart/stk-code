@@ -29,7 +29,7 @@
             <div layout="horizontal-row" proportion="1" height="fit">
                 <label text="Shadows" I18N="Video settings"/>
                 <spacer width="10" height="10"/>
-                <gauge id="shadows" min_value="0" max_value="3" proportion="1"/>
+                <gauge id="shadows" min_value="0" max_value="4" proportion="1"/>
             </div>
         </div>
 
