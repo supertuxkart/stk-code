@@ -58,6 +58,8 @@ class OptionsScreenUI : public GUIEngine::Screen, public GUIEngine::ScreenSingle
     GUIEngine::SpinnerWidget* m_base_skin_selector;
     GUIEngine::SpinnerWidget* m_variant_skin_selector;
 
+    void updateCamera();
+
     void loadSkins(const std::set<std::string>& files, bool addon);
     void loadCurrentSkinVariants();
     int getBaseID(SkinID skin);
@@ -82,6 +84,8 @@ public:
 
     /** \brief implement optional callback from parent class GUIEngine::Screen */
     virtual void unloaded() OVERRIDE;
+
+    void         updateCameraPresetSpinner();
 
     virtual void onUpdate(float delta) OVERRIDE;
 

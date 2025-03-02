@@ -68,7 +68,7 @@ private:
 
     void updateResolutionsList();
     void configResolutionsList();
-    void initPresets();
+
     static void onScrollResolutionsList(void* data);
 public:
     friend class GUIEngine::ScreenSingleton<OptionsScreenDisplay>;
@@ -92,6 +92,8 @@ public:
     virtual bool onEscapePressed() OVERRIDE;
 
     virtual void onResize() OVERRIDE;
+
+    void updateCamera();
 };
 
 #endif

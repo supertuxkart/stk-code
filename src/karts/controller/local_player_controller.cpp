@@ -272,7 +272,6 @@ void LocalPlayerController::update(int ticks)
             if (camera->getMode() == Camera::CM_REVERSE)
             {
                 camera->setMode(Camera::CM_NORMAL);
-                dynamic_cast<CameraNormal*>(camera)->snapToPosition();
             }
         }
         if (m_sky_particles_emitter)

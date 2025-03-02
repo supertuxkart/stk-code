@@ -51,9 +51,12 @@ private:
 
     Vec3            m_camera_offset;
 
+    Mode            m_last_smooth_mode;
+
     void moveCamera(float dt, bool smooth, float cam_angle, float distance);
-    void handleEndCamera(float dt);
-    void getCameraSettings(float *above_kart, float *cam_angle,
+
+    void getCameraSettings(Mode mode,
+                           float *above_kart, float *cam_angle,
                            float *side_way, float *distance,
                            bool *smoothing, float *cam_roll_angle);
     
@@ -73,8 +76,8 @@ private:
     virtual ~CameraNormal() {}
 public:
 
-    void snapToPosition();
-     // ------------------------------------------------------------------------
+    void restart();
+    // ------------------------------------------------------------------------
     bool isDebug() { return false; }
     // ------------------------------------------------------------------------
     bool isFPS() { return false; }
