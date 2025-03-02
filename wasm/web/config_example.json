@@ -1,0 +1,4 @@
+{
+  "ws_enabled": false,
+  "ws_proxy": "wss://example.com/"
+}

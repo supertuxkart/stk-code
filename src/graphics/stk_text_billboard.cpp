@@ -381,6 +381,7 @@ void STKTextBillboard::initLegacy(const core::stringw& text, FontWithFace* face)
 
     if (SceneManager->getVideoDriver()->getDriverType() == video::EDT_VULKAN)
     {
+        #ifdef _IRR_COMPILE_WITH_VULKAN_
         GE::GESPM* spm = new GE::GESPM();
         for (auto& p : irr_tbs)
         {
@@ -420,6 +421,7 @@ void STKTextBillboard::initLegacy(const core::stringw& text, FontWithFace* face)
         SceneManager->getMeshCache()->addMesh(oss.str().c_str(), spm);
         spm->drop();
         m_ge_node = SceneManager->addMeshSceneNode(spm, this);
+        #endif
     }
     else
     {

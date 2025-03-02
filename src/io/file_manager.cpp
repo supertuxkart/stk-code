@@ -213,6 +213,10 @@ FileManager::FileManager()
 #endif
     }
 
+#ifdef __EMSCRIPTEN__
+    root_dir = "/data/";
+#endif
+
     if (!m_file_system->existFile((root_dir + version).c_str()))
     {
         Log::error("FileManager", "Could not find file '%s'in any "
