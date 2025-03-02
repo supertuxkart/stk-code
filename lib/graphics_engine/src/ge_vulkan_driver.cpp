@@ -1960,10 +1960,22 @@ bool GEVulkanDriver::endScene()
 }   // endScene
 
 // ----------------------------------------------------------------------------
+void GEVulkanDriver::setTransform(E_TRANSFORMATION_STATE state, 
+                                const core::matrix4& mat)
+{
+    m_irrlicht_matrices[state] = mat;
+}
+
+// ----------------------------------------------------------------------------
+const core::matrix4& GEVulkanDriver::getTransform(E_TRANSFORMATION_STATE state) const
+{
+    return m_irrlicht_matrices[state];
+}
+
+// ----------------------------------------------------------------------------
 void GEVulkanDriver::addOcclusionQuery(scene::ISceneNode* node,
                                     const scene::IMesh* mesh)
 { 
-
     CNullDriver::addOcclusionQuery(node);
 }
 

@@ -62,7 +62,7 @@ CameraNormal::CameraNormal(Camera::CameraType type,  int camera_index,
     m_kart_position = btVector3(0, 0, 0);
     m_kart_rotation = btQuaternion(0, 0, 0, 1);
     reset();
-    m_camera->setNearValue(0.1f);
+    m_camera->setNearValue(0.5f);
 
     if (kart)
     {
@@ -333,7 +333,7 @@ void CameraNormal::update(float dt)
     Camera::update(dt);
     if(!m_kart) return;
 
-    m_camera->setNearValue(0.1f);
+    m_camera->setNearValue(0.5f);
 
     // If an explosion is happening, stop moving the camera,
     // but keep it target on the kart.

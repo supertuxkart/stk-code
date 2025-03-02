@@ -152,6 +152,8 @@ private:
 
     const VkPhysicalDeviceLimits& m_limits;
 
+    size_t m_cluster_data_padded_size;
+
     size_t m_object_data_padded_size;
 
     size_t m_skinning_data_padded_size;
@@ -159,10 +161,6 @@ private:
     size_t m_materials_padded_size;
 
     size_t m_dynamic_spm_padded_size;
-
-    size_t m_clusters_xz_added_size;
-
-    size_t m_clusters_yz_padded_size;
 
     bool m_update_data_descriptor_sets;
 

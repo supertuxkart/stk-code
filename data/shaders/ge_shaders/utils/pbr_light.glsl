@@ -180,15 +180,15 @@ vec3 getNormalBias(vec3 normal, vec3 lightdir, float texel)
 
 float getShadowFactor(sampler2DArrayShadow map, vec3 world_position, float view_depth, float NdotL, vec3 normal, vec3 lightdir)
 {
-    float end_factor = smoothstep(135., 150., view_depth);
-    if (view_depth >= 150. || NdotL <= 0.001)
+    float end_factor = smoothstep(130., 150., view_depth);
+    if (view_depth >= 200. || NdotL <= 0.001)
     {
         return end_factor;
     }
 
     float shadow = 1.0;
     float size = 1024.;
-    float factor = smoothstep(9.0, 10.0, view_depth) + smoothstep(45.0, 50.0, view_depth);
+    float factor = smoothstep(9.0, 10.0, view_depth) + smoothstep(40.0, 45.0, view_depth);
     int level = int(factor);
 
     vec2 base_normal_bias = (u_camera.m_shadow_view_matrix * vec4(normal, 0.)).xy;

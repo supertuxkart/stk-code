@@ -80,7 +80,10 @@ namespace GE
         virtual bool queryFeature(E_VIDEO_DRIVER_FEATURE feature) const  { return true; }
 
         //! sets transformation
-        virtual void setTransform(E_TRANSFORMATION_STATE state, const core::matrix4& mat) {}
+        virtual void setTransform(E_TRANSFORMATION_STATE state, const core::matrix4& mat);
+
+        //! Returns the transformation set by setTransform
+        virtual const core::matrix4& getTransform(E_TRANSFORMATION_STATE state) const;
 
         //! sets a material
         virtual void setMaterial(const SMaterial& material) { Material = material; }
@@ -568,6 +571,8 @@ namespace GE
         VkDescriptorSetLayout m_global_ubo_descriptor_layout;
         VkDescriptorPool m_global_ubo_descriptor_pool;
         std::vector<VkDescriptorSet> m_global_ubo_descriptor_sets;
+
+        core::matrix4 m_irrlicht_matrices[ETS_COUNT];
 
         void createInstance(SDL_Window* window);
         void findPhysicalDevice();
