@@ -35,16 +35,16 @@ body:
         - Installation source (official website, package manager, etc.)
         - Operating system and version
         - CPU/GPU specifications
-        - Input device details (if relevant)
-      values: |
-        SuperTuxKart version: 
-        Installation source: 
-        OS: 
-        CPU: 
-        GPU:
-        Input device:
-      validations:
-        required: true
+        - Controller/keyboard type (if relevant)
+      placeholder: |
+        SuperTuxKart version: 1.4
+        Installation source: Official repository
+        OS: Ubuntu 24.04
+        CPU: i5-10400
+        GPU: GTX 1660
+        Input device: USB keyboard
+    validations:
+      required: true
   
   - type: textarea
     id: error_msg
@@ -52,7 +52,7 @@ body:
       label: Error message
       description: |
         If an error message was shown, please paste the complete error message, or a screenshot of it.
-      values: |
+      value: |
         ```
         [Paste error message here]
         ```
@@ -68,9 +68,8 @@ body:
         - macOS: ~/Library/Application Support/supertuxkart/config-0.10/stdout.log
         - Linux and other Unix-based systems: 
           $XDG_CONFIG_HOME/supertuxkart/config-0.10/stdout.log 
-          or 
-          ~/.config/supertuxkart/config-0.10/stdout.log
-      values: |
+          or ~/.config/supertuxkart/config-0.10/stdout.log
+      value: |
         ```
         [Paste contents of stdout.log here]
         ```
@@ -82,7 +81,7 @@ body:
       description: |
         If your issue is related to the input config (gamepads, keyboards), 
         please provide your file input.xml located in the same directory as stdout.log.
-      values: |
+      value: |
         ```
         [Paste contents of input.xml here]
         ```
