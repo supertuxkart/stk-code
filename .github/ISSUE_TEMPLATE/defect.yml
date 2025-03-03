@@ -63,7 +63,7 @@ body:
       label: Log File (stdout.log)
       description: |
         Attach the log file (stdout.log) from your latest session where the issue occurred.
-        File location
+        File locations:
         - Windows: %appdata%\supertuxkart\config-0.10\stdout.log
         - macOS: ~/Library/Application Support/supertuxkart/config-0.10/stdout.log
         - Linux and other Unix-based systems: 
