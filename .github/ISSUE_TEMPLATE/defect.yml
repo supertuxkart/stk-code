@@ -41,7 +41,7 @@ body:
         Installation source: Official repository
         OS: Ubuntu 24.04
         CPU: i5-10400
-        GPU: GTX 1660
+        GPU: RX 580
         Input device: USB keyboard
     validations:
       required: true
