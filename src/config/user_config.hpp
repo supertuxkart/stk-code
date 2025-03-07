@@ -1183,12 +1183,12 @@ namespace UserConfigParams
                         "Saved custom camera settings for player.") );
 
     PARAM_PREFIX FloatUserConfigParam         m_saved_camera_distance
-            PARAM_DEFAULT(  FloatUserConfigParam(1.5, "distance",
+            PARAM_DEFAULT(  FloatUserConfigParam(1.8, "distance",
             &m_saved_camera_settings,
             "Distance between kart and camera"));
 
     PARAM_PREFIX FloatUserConfigParam         m_saved_camera_forward_up_angle
-            PARAM_DEFAULT(  FloatUserConfigParam(25, "forward-up-angle",
+            PARAM_DEFAULT(  FloatUserConfigParam(20, "forward-up-angle",
             &m_saved_camera_settings,
             "Angle between camera and plane of kart (pitch) when the camera is pointing forward"));
 

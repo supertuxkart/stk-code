@@ -104,7 +104,8 @@ void CameraNormal::moveCamera(float dt, bool smooth, float cam_angle, float dist
     ratio = ratio > -0.12f ? ratio : -0.12f;
 
     // distance of camera from kart in x and z plane
-    float camera_distance = -1.25f - 2.5f * ratio;
+    float camera_distance = -2.8f - 5.6f * ratio;
+    camera_distance *= sqrtf(UserConfigParams::m_camera_forward_smooth_position);
     float min_distance = (distance * 2.0f);
     if (distance > 0) camera_distance += distance + 1; // note that distance < 0
     if (camera_distance > min_distance) camera_distance = min_distance; // don't get too close to the kart
@@ -173,7 +174,10 @@ void CameraNormal::restart()
         m_camera->setUpVector(up.toIrrVector());
         m_kart_position = btt.getOrigin();
         m_kart_rotation = btt.getRotation();
-        m_camera_offset = irr::core::vector3df(0., 1., -15.);
+
+        float offset_z = -33.f * sqrtf(UserConfigParams::m_camera_forward_smooth_position);
+        float offset_y = -offset_z * tanf(UserConfigParams::m_camera_forward_up_angle * DEGREE_TO_RAD);
+        m_camera_offset = irr::core::vector3df(0., offset_y + 1.0f, offset_z);
     }
 }   // snapToPosition
 
