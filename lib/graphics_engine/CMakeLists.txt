@@ -63,6 +63,7 @@ endif()
 
 set(GE_SOURCES
     src/gl.c
+    src/ge_cluster_data_generator.cpp
     src/ge_compressor_astc_4x4.cpp
     src/ge_compressor_bptc_bc7.cpp
     src/ge_compressor_s3tc_bc3.cpp

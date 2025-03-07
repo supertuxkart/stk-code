@@ -181,7 +181,7 @@ vec3 getNormalBias(vec3 normal, vec3 lightdir, float texel)
 float getShadowFactor(sampler2DArrayShadow map, vec3 world_position, float view_depth, float NdotL, vec3 normal, vec3 lightdir)
 {
     float end_factor = smoothstep(130., 150., view_depth);
-    if (view_depth >= 200. || NdotL <= 0.001)
+    if (view_depth >= 150. || NdotL <= 0.001)
     {
         return end_factor;
     }

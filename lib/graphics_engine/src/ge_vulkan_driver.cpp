@@ -2414,7 +2414,12 @@ s32 GEVulkanDriver::addDynamicLight(const SLight& light)
     else
     {
         std::fill(m_global_ubo_dirty.begin(), m_global_ubo_dirty.end(), true);
-        return CNullDriver::addDynamicLight(light);
+        if (Lights.empty())
+        {
+            Lights.push_back(irr::video::SLight());
+        }
+        Lights.push_back(light);
+	    return Lights.size() - 1;
     }
 }
 

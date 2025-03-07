@@ -247,13 +247,6 @@ namespace GE
         //! Returns type of video driver
         virtual E_DRIVER_TYPE getDriverType() const { return video::EDT_VULKAN; }
 
-        //! Returns the transformation set by setTransform
-        virtual const core::matrix4& getTransform(E_TRANSFORMATION_STATE state) const
-        {
-            static core::matrix4 unused;
-            return unused;
-        }
-
         //! Creates a render target texture.
         virtual ITexture* addRenderTargetTexture(const core::dimension2d<u32>& size,
                 const io::path& name, const ECOLOR_FORMAT format = ECF_UNKNOWN, const bool useStencil = false);

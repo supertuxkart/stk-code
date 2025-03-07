@@ -12,6 +12,7 @@
 
 #include <IImageLoader.h>
 #include <cassert>
+#include <future>
 #include <stdexcept>
 
 namespace GE
@@ -258,24 +259,15 @@ void GEVulkanArrayTexture::reloadInternal(const std::vector<io::path>& list,
         {
             goto destroy;
         }
-        std::vector<GESpinLock*> mani_locks;
+        std::vector<std::future<void> > futures;
 
         for (int i = 0; i < mipmap_levels.size(); i++)
         {
-            mani_locks.push_back(new GESpinLock());
-            mani_locks[i]->lock();
-            GEVulkanCommandLoader::addMultiThreadingCommand(
-                [mipmap_mani, mipmap_levels, src_levels, mani_locks, i](){
-                mipmap_mani(mipmap_levels[i], src_levels, i);
-                mani_locks[i]->unlock();
-            });
+            futures.push_back(std::async(mipmap_mani, mipmap_levels[i], src_levels, i));
         }
         for (int i = 0; i < mipmap_levels.size(); i++)
         {
-            mani_locks[i]->lock();
-            mani_locks[i]->unlock();
-            delete mani_locks[i];
-
+            futures[i].wait();
             for (GEImageLevel& level : mipmap_levels[i])
             {
                 memcpy(mapped, level.m_data, level.m_size);

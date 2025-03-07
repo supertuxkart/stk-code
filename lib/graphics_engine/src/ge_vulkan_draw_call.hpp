@@ -37,6 +37,7 @@ enum GEVulkanShadowCameraCascade : unsigned;
 class GEVulkanCameraUBO;
 class GEVulkanShadowUBO;
 
+class GEClusterDataGenerator;
 class GECullingTool;
 class GESPMBuffer;
 class GEVulkanAnimatedMeshSceneNode;
@@ -129,6 +130,8 @@ private:
     GEVulkanSunSceneNode *m_sun;
 
     GECullingTool* m_culling_tool;
+
+    GEClusterDataGenerator* m_cluster_data_generator;
 
     std::map<TexturesList, GESPMBuffer*> m_billboard_buffers;
 

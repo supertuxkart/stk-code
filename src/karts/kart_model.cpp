@@ -530,14 +530,16 @@ scene::ISceneNode* KartModel::attachModel(bool animated_models, bool human_playe
             scene::ISceneNode* headlight_model =
                 irr_driver->addMesh(obj.getModel(), "kart_headlight",
                 parent, getRenderInfo());
+
+            configNode(headlight_model, obj.getLocation(), bone_attachment ?
+                getInverseBoneMatrix(obj.getBoneName()) : core::matrix4());
+            
 #ifndef SERVER_ONLY
             if (human_player && CVS->isDeferredEnabled())
             {
                 obj.setLight(headlight_model, each_energy, each_radius);
             }
 #endif
-            configNode(headlight_model, obj.getLocation(), bone_attachment ?
-                getInverseBoneMatrix(obj.getBoneName()) : core::matrix4());
         }
     }
 
@@ -584,14 +586,13 @@ void HeadlightObject::setLight(scene::ISceneNode* parent,
     }
     else
     {
-        energy *= 10.;
+        energy *= 10.f;
         scene::ILightSceneNode* light = irr_driver->getSceneManager()
-                ->addLightSceneNode(parent, core::vector3df(0.0f, 0.0f, 0.0f), 
+                ->addLightSceneNode(parent->getParent(), parent->getPosition(), 
                                     video::SColorf(m_headlight_color.getRed() / 255.f * energy,
                                                    m_headlight_color.getGreen() / 255.f * energy, 
                                                    m_headlight_color.getBlue() / 255.f * energy, 1.0f));
-        light->setRadius(radius * 100.);
-        light->setRotation(irr::core::vector3df(0., 0., 0.));
+        light->setRadius(radius);
         light->setLightType(irr::video::ELT_SPOT);
         irr::video::SLight &data = light->getLightData();
         data.InnerCone = 30. / 180. * 3.14;
