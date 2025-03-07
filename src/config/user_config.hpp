@@ -1050,10 +1050,15 @@ namespace UserConfigParams
             &m_camera_normal,
             "Angle between camera and plane of kart (pitch) when the camera is pointing forward"));
 
-    PARAM_PREFIX BoolUserConfigParam         m_camera_forward_smoothing
-            PARAM_DEFAULT(  BoolUserConfigParam(true, "forward-smoothing",
+    PARAM_PREFIX FloatUserConfigParam         m_camera_forward_smooth_position
+            PARAM_DEFAULT(  FloatUserConfigParam(0.2, "forward-smooth-position",
             &m_camera_normal,
-            "if true, use smoothing (forward-up-angle become relative to speed) when pointing forward"));
+            "The strength of smoothness of the position of the camera"));
+
+    PARAM_PREFIX FloatUserConfigParam         m_camera_forward_smooth_rotation
+            PARAM_DEFAULT(  FloatUserConfigParam(0.125, "forward-smooth-rotation",
+            &m_camera_normal,
+            "The strength of smoothness of the rotation of the camera"));
 
     PARAM_PREFIX FloatUserConfigParam         m_camera_backward_distance
             PARAM_DEFAULT(  FloatUserConfigParam(2.0, "backward-distance",
@@ -1095,10 +1100,15 @@ namespace UserConfigParams
             &m_standard_camera_settings,
             "Angle between camera and plane of kart (pitch) when the camera is pointing forward"));
 
-    PARAM_PREFIX BoolUserConfigParam         m_standard_camera_forward_smoothing
-            PARAM_DEFAULT(  BoolUserConfigParam(true, "forward-smoothing",
+    PARAM_PREFIX FloatUserConfigParam         m_standard_camera_forward_smooth_position
+            PARAM_DEFAULT(  FloatUserConfigParam(0.2, "forward-smooth-position",
             &m_standard_camera_settings,
-            "if true, use smoothing (forward-up-angle become relative to speed) when pointing forward"));
+            "The strength of smoothness of the position of the camera"));
+
+    PARAM_PREFIX FloatUserConfigParam         m_standard_camera_forward_smooth_rotation
+            PARAM_DEFAULT(  FloatUserConfigParam(0.125, "forward-smooth-rotation",
+            &m_standard_camera_settings,
+            "The strength of smoothness of the rotation of the camera"));
 
     PARAM_PREFIX FloatUserConfigParam         m_standard_camera_backward_distance
             PARAM_DEFAULT(  FloatUserConfigParam(2.0, "backward-distance",
@@ -1136,10 +1146,15 @@ namespace UserConfigParams
             &m_drone_camera_settings,
             "Angle between camera and plane of kart (pitch) when the camera is pointing forward"));
 
-    PARAM_PREFIX BoolUserConfigParam         m_drone_camera_forward_smoothing
-            PARAM_DEFAULT(  BoolUserConfigParam(false, "forward-smoothing",
+    PARAM_PREFIX FloatUserConfigParam         m_drone_camera_forward_smooth_position
+            PARAM_DEFAULT(  FloatUserConfigParam(0.0, "forward-smooth-position",
             &m_drone_camera_settings,
-            "if true, use smoothing (forward-up-angle become relative to speed) when pointing forward"));
+            "The strength of smoothness of the position of the camera"));
+
+    PARAM_PREFIX FloatUserConfigParam         m_drone_camera_forward_smooth_rotation
+            PARAM_DEFAULT(  FloatUserConfigParam(0.0, "forward-smooth-rotation",
+            &m_drone_camera_settings,
+            "The strength of smoothness of the rotation of the camera"));
 
     PARAM_PREFIX FloatUserConfigParam         m_drone_camera_backward_distance
             PARAM_DEFAULT(  FloatUserConfigParam(2.0, "backward-distance",
@@ -1168,19 +1183,24 @@ namespace UserConfigParams
                         "Saved custom camera settings for player.") );
 
     PARAM_PREFIX FloatUserConfigParam         m_saved_camera_distance
-            PARAM_DEFAULT(  FloatUserConfigParam(1.0, "distance",
+            PARAM_DEFAULT(  FloatUserConfigParam(1.5, "distance",
             &m_saved_camera_settings,
             "Distance between kart and camera"));
 
     PARAM_PREFIX FloatUserConfigParam         m_saved_camera_forward_up_angle
-            PARAM_DEFAULT(  FloatUserConfigParam(0, "forward-up-angle",
+            PARAM_DEFAULT(  FloatUserConfigParam(25, "forward-up-angle",
             &m_saved_camera_settings,
             "Angle between camera and plane of kart (pitch) when the camera is pointing forward"));
 
-    PARAM_PREFIX BoolUserConfigParam         m_saved_camera_forward_smoothing
-            PARAM_DEFAULT(  BoolUserConfigParam(true, "forward-smoothing",
+    PARAM_PREFIX FloatUserConfigParam         m_saved_camera_forward_smooth_position
+            PARAM_DEFAULT(  FloatUserConfigParam(0.1, "forward-smooth-position",
             &m_saved_camera_settings,
-            "if true, use smoothing (forward-up-angle become relative to speed) when pointing forward"));
+            "The strength of smoothness of the position of the camera"));
+
+    PARAM_PREFIX FloatUserConfigParam         m_saved_camera_forward_smooth_rotation
+            PARAM_DEFAULT(  FloatUserConfigParam(0.125, "forward-smooth-rotation",
+            &m_saved_camera_settings,
+            "The strength of smoothness of the rotation of the camera"));
 
     PARAM_PREFIX FloatUserConfigParam         m_saved_camera_backward_distance
             PARAM_DEFAULT(  FloatUserConfigParam(2.0, "backward-distance",
@@ -1193,7 +1213,7 @@ namespace UserConfigParams
             "Angle between camera and plane of kart (pitch) when the camera is pointing backwards. This is usually larger than the forward-up-angle, since the kart itself otherwise obstricts too much of the view"));
 
     PARAM_PREFIX IntUserConfigParam         m_saved_camera_fov
-            PARAM_DEFAULT(  IntUserConfigParam(80, "fov",
+            PARAM_DEFAULT(  IntUserConfigParam(85, "fov",
             &m_saved_camera_settings,
             "Focal distance (single player)"));
 

@@ -117,17 +117,11 @@ void CameraNormal::moveCamera(float dt, bool smooth, float cam_angle, float dist
         (0.85f + ratio / 2.5f) - tan_up,
         camera_distance * cosf(skid_angle / 2));
 
-    float delta = (dt*5.0f);
-    if (delta < 0.0f)
-        delta = 0.0f;
-    else if (delta > 1.0f)
-        delta = 1.0f;
+    float delta = dt / std::max(dt, float(UserConfigParams::m_camera_forward_smooth_position));
+    float delta2 = dt / std::max(dt, float(UserConfigParams::m_camera_forward_smooth_rotation));
 
-    float delta2 = dt * 8.0f;
-    if (delta2 < 0)
-        delta2 = 0;
-    else if (delta2 > 1)
-        delta2 = 1;
+    delta = irr::core::clamp(delta, 0.0f, 1.0f);
+    delta2 = irr::core::clamp(delta2, 0.0f, 1.0f);
 
     btTransform btt = m_kart->getSmoothedTrans();
     m_kart_position = btt.getOrigin();
@@ -210,7 +204,8 @@ void CameraNormal::getCameraSettings(Mode mode,
             // quadratically to dampen small variations (but keep sign)
             float dampened_steer = fabsf(steering) * steering;
             *sideway             = -m_rotation_range*dampened_steer*0.5f;
-            *smoothing           = UserConfigParams::m_camera_forward_smoothing;
+            *smoothing           = UserConfigParams::m_camera_forward_smooth_position != 0.
+                                || UserConfigParams::m_camera_forward_smooth_rotation != 0.;
             *cam_roll_angle      = 0.0f;
             if (UserConfigParams::m_multitouch_controls == MULTITOUCH_CONTROLS_GYROSCOPE)
             {

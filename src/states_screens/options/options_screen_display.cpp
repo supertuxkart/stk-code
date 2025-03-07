@@ -449,32 +449,35 @@ void OptionsScreenDisplay::eventCallback(Widget* widget, const std::string& name
         assert( camera_preset != NULL );
         unsigned int i = camera_preset->getValue();
         UserConfigParams::m_camera_present = i;
-        if (i == 1) //Standard
+        if (i == 1) // Standard
         {
             UserConfigParams::m_camera_fov = UserConfigParams::m_standard_camera_fov;
             UserConfigParams::m_camera_distance = UserConfigParams::m_standard_camera_distance;
             UserConfigParams::m_camera_forward_up_angle = UserConfigParams::m_standard_camera_forward_up_angle;
-            UserConfigParams::m_camera_forward_smoothing = UserConfigParams::m_standard_camera_forward_smoothing;
+            UserConfigParams::m_camera_forward_smooth_position = UserConfigParams::m_standard_camera_forward_smooth_position;
+            UserConfigParams::m_camera_forward_smooth_rotation = UserConfigParams::m_standard_camera_forward_smooth_rotation;
             UserConfigParams::m_camera_backward_distance = UserConfigParams::m_standard_camera_backward_distance;
             UserConfigParams::m_camera_backward_up_angle = UserConfigParams::m_standard_camera_backward_up_angle;
             UserConfigParams::m_reverse_look_use_soccer_cam = UserConfigParams::m_standard_reverse_look_use_soccer_cam;
         }
-        else if (i == 2) //Drone chase
+        else if (i == 2) // Drone chase
         {
             UserConfigParams::m_camera_fov = UserConfigParams::m_drone_camera_fov;
             UserConfigParams::m_camera_distance = UserConfigParams::m_drone_camera_distance;
             UserConfigParams::m_camera_forward_up_angle = UserConfigParams::m_drone_camera_forward_up_angle;
-            UserConfigParams::m_camera_forward_smoothing = UserConfigParams::m_drone_camera_forward_smoothing;
+            UserConfigParams::m_camera_forward_smooth_position = UserConfigParams::m_drone_camera_forward_smooth_position;
+            UserConfigParams::m_camera_forward_smooth_rotation = UserConfigParams::m_drone_camera_forward_smooth_rotation;
             UserConfigParams::m_camera_backward_distance = UserConfigParams::m_drone_camera_backward_distance;
             UserConfigParams::m_camera_backward_up_angle = UserConfigParams::m_drone_camera_backward_up_angle;
             UserConfigParams::m_reverse_look_use_soccer_cam = UserConfigParams::m_drone_reverse_look_use_soccer_cam;
         }
-        else //Custom
+        else // Custom
         {
             UserConfigParams::m_camera_fov = UserConfigParams::m_saved_camera_fov;
             UserConfigParams::m_camera_distance = UserConfigParams::m_saved_camera_distance;
             UserConfigParams::m_camera_forward_up_angle = UserConfigParams::m_saved_camera_forward_up_angle;
-            UserConfigParams::m_camera_forward_smoothing = UserConfigParams::m_saved_camera_forward_smoothing;
+            UserConfigParams::m_camera_forward_smooth_position = UserConfigParams::m_saved_camera_forward_smooth_position;
+            UserConfigParams::m_camera_forward_smooth_rotation = UserConfigParams::m_saved_camera_forward_smooth_rotation;
             UserConfigParams::m_camera_backward_distance = UserConfigParams::m_saved_camera_backward_distance;
             UserConfigParams::m_camera_backward_up_angle = UserConfigParams::m_saved_camera_backward_up_angle;
             UserConfigParams::m_reverse_look_use_soccer_cam = UserConfigParams::m_saved_reverse_look_use_soccer_cam;
