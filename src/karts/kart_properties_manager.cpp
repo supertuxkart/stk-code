@@ -26,6 +26,7 @@
 #include "config/user_config.hpp"
 #include "graphics/irr_driver.hpp"
 #include "guiengine/engine.hpp"
+#include <IFileSystem.h>
 #include "io/file_manager.hpp"
 #include "karts/kart_properties.hpp"
 #include "karts/xml_characteristic.hpp"
@@ -707,12 +708,14 @@ void KartPropertiesManager::onDemandLoadKartTextures(
 #ifndef SERVER_ONLY
     if (STKProcess::getType() != PT_MAIN || kart_list.empty())
         return;
-
+    
+    #ifdef _IRR_COMPILE_WITH_VULKAN_
     GE::GEVulkanDriver* gevd = GE::getVKDriver();
     if (!gevd)
         return;
     gevd->waitIdle();
     gevd->setDisableWaitIdle(true);
+    #endif
 
     std::set<std::string> karts_folder;
     for (auto& dir : m_kart_search_path)
@@ -771,9 +774,11 @@ void KartPropertiesManager::onDemandLoadKartTextures(
         }
     }
 
+    #ifdef _IRR_COMPILE_WITH_VULKAN_
     gevd->setDisableWaitIdle(false);
     if (unloaded_unused)
         gevd->handleDeletedTextures();
+    #endif
 #endif
 }   // onDemandLoadKartTextures
 

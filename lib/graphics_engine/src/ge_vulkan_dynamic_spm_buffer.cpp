@@ -1,3 +1,5 @@
+#ifdef _IRR_COMPILE_WITH_VULKAN_
+
 #include "ge_vulkan_dynamic_spm_buffer.hpp"
 
 #include "ge_main.hpp"
@@ -130,3 +132,5 @@ void GEVulkanDynamicSPMBuffer::setDirtyOffset(irr::u32 offset,
 }   // setDirtyOffset
 
 } // end namespace GE
+
+#endif

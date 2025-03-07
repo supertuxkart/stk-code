@@ -392,6 +392,7 @@ void OptionsScreenDisplay::eventCallback(Widget* widget, const std::string& name
 
         rememberWinpos->setActive(!fullscreen->getState());
 #ifndef SERVER_ONLY
+        #ifdef _IRR_COMPILE_WITH_VULKAN_
         GE::GEVulkanDriver* gevk = GE::getVKDriver();
         if (gevk && GE::getGEConfig()->m_fullscreen_desktop)
         {
@@ -400,6 +401,7 @@ void OptionsScreenDisplay::eventCallback(Widget* widget, const std::string& name
             OptionsScreenDisplay::m_fullscreen_checkbox_focus = true;
         }
         else
+        #endif
             updateResolutionsList();
 #endif
     } // fullscreen
