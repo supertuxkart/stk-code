@@ -326,8 +326,6 @@ void CameraNormal::update(float dt)
         // above the kart).
         // Note: this code is replicated from smoothMoveCamera so that
         // the camera keeps on pointing to the same spot.
-        smoothing = false;
-
         core::vector3df current_target = (m_kart->getSmoothedXYZ().toIrrVector()
                                        +  core::vector3df(0, above_kart, 0));
         m_camera->setTarget(current_target);
