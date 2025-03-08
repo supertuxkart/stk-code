@@ -18,8 +18,6 @@
                         I18N="Section in the settings menu" text="Audio"/>
                 <icon-button id="tab_ui" width="128" height="128" icon="gui/icons/options_ui.png"
                         I18N="Section in the settings menu" text="Interface"/>
-                <icon-button id="tab_camera" width="128" height="128" icon="gui/icons/options_camera.png"
-                        I18N="Section in the settings menu" text="Camera"/>
                 <icon-button id="tab_players" width="128" height="128" icon="gui/icons/options_players.png"
                         I18N="Section in the settings menu" text="Players"/>
                 <icon-button id="tab_controls" width="128" height="128" icon="gui/icons/options_input.png"
@@ -63,8 +61,6 @@
                 </div>
 
                 <spacer width="5" height="2%"/>
-
-                <!-- ************ EXTRA UI ELEMENTS SETTINGS ************ -->
 
                 <div layout="horizontal-row" width="100%" height="fit">
                     <checkbox id="showfps"/>

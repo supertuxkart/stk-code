@@ -20,8 +20,10 @@
 #include "states_screens/options/options_common.hpp"
 
 #include "graphics/camera/camera.hpp"
+#include "graphics/camera/camera_normal.hpp"
 #include "graphics/irr_driver.hpp"
 #include "modes/world.hpp"
+#include "states_screens/dialogs/custom_camera_settings.hpp"
 
 #ifndef SERVER_ONLY
 #include <ge_main.hpp>
@@ -59,6 +61,22 @@ void OptionsScreenDisplay::loadedFromFile()
     splitscreen_method->addLabel( core::stringw(_("Horizontal")));
     splitscreen_method->m_properties[GUIEngine::PROP_MIN_VALUE] = "0";
     splitscreen_method->m_properties[GUIEngine::PROP_MAX_VALUE] = "1";
+
+    // Setup camera spinner
+    GUIEngine::SpinnerWidget* camera_preset = getWidget<GUIEngine::SpinnerWidget>("camera_preset");
+    assert( camera_preset != NULL );
+
+    camera_preset->m_properties[PROP_WRAP_AROUND] = "true";
+    camera_preset->clearLabels();
+    //I18N: In the UI options, Camera setting: Custom
+    camera_preset->addLabel( core::stringw(_("Custom")));
+    //I18N: In the UI options, Camera setting: Standard
+    camera_preset->addLabel( core::stringw(_("Standard")));
+    //I18N: In the UI options, Camera setting: Drone chase
+    camera_preset->addLabel( core::stringw(_("Drone chase")));
+    camera_preset->m_properties[GUIEngine::PROP_MIN_VALUE] = "0";
+    camera_preset->m_properties[GUIEngine::PROP_MAX_VALUE] = "2";
+    updateCamera();
 }   // loadedFromFile
 
 // --------------------------------------------------------------------------------------------
@@ -126,6 +144,13 @@ void OptionsScreenDisplay::init()
 #endif
 
     updateResolutionsList();
+
+    // --- select the right camera in the spinner
+    GUIEngine::SpinnerWidget* camera_preset = getWidget<GUIEngine::SpinnerWidget>("camera_preset");
+    assert( camera_preset != NULL );
+
+    camera_preset->setValue(UserConfigParams::m_camera_present); // use the saved camera
+    updateCamera();
 
     // ---- splitscreen mode
     GUIEngine::SpinnerWidget* splitscreen_method = getWidget<GUIEngine::SpinnerWidget>("splitscreen_method");
@@ -298,6 +323,21 @@ void OptionsScreenDisplay::configResolutionsList()
 
 }   // configResolutionsList
 
+// -----------------------------------------------------------------------------
+void OptionsScreenDisplay::updateCamera()
+{
+    bool in_game = StateManager::get()->getGameState() == GUIEngine::INGAME_MENU;
+    if (in_game)
+    {
+        (Camera::getActiveCamera()->getCameraSceneNode())->setFOV(DEGREE_TO_RAD * UserConfigParams::m_camera_fov);
+        CameraNormal *camera = dynamic_cast<CameraNormal*>(Camera::getActiveCamera());
+        if (camera)
+        {
+            camera->setDistanceToKart(UserConfigParams::m_camera_distance);
+        }
+    }
+} // updateCamera
+
 // --------------------------------------------------------------------------------------------
 
 void OptionsScreenDisplay::updateResolutionsList()
@@ -403,6 +443,51 @@ void OptionsScreenDisplay::eventCallback(Widget* widget, const std::string& name
             updateResolutionsList();
 #endif
     } // fullscreen
+    else if (name == "camera_preset")
+    {
+        GUIEngine::SpinnerWidget* camera_preset = getWidget<GUIEngine::SpinnerWidget>("camera_preset");
+        assert( camera_preset != NULL );
+        unsigned int i = camera_preset->getValue();
+        UserConfigParams::m_camera_present = i;
+        if (i == 1) // Standard
+        {
+            UserConfigParams::m_camera_fov = UserConfigParams::m_standard_camera_fov;
+            UserConfigParams::m_camera_distance = UserConfigParams::m_standard_camera_distance;
+            UserConfigParams::m_camera_forward_up_angle = UserConfigParams::m_standard_camera_forward_up_angle;
+            UserConfigParams::m_camera_forward_smooth_position = UserConfigParams::m_standard_camera_forward_smooth_position;
+            UserConfigParams::m_camera_forward_smooth_rotation = UserConfigParams::m_standard_camera_forward_smooth_rotation;
+            UserConfigParams::m_camera_backward_distance = UserConfigParams::m_standard_camera_backward_distance;
+            UserConfigParams::m_camera_backward_up_angle = UserConfigParams::m_standard_camera_backward_up_angle;
+            UserConfigParams::m_reverse_look_use_soccer_cam = UserConfigParams::m_standard_reverse_look_use_soccer_cam;
+        }
+        else if (i == 2) // Drone chase
+        {
+            UserConfigParams::m_camera_fov = UserConfigParams::m_drone_camera_fov;
+            UserConfigParams::m_camera_distance = UserConfigParams::m_drone_camera_distance;
+            UserConfigParams::m_camera_forward_up_angle = UserConfigParams::m_drone_camera_forward_up_angle;
+            UserConfigParams::m_camera_forward_smooth_position = UserConfigParams::m_drone_camera_forward_smooth_position;
+            UserConfigParams::m_camera_forward_smooth_rotation = UserConfigParams::m_drone_camera_forward_smooth_rotation;
+            UserConfigParams::m_camera_backward_distance = UserConfigParams::m_drone_camera_backward_distance;
+            UserConfigParams::m_camera_backward_up_angle = UserConfigParams::m_drone_camera_backward_up_angle;
+            UserConfigParams::m_reverse_look_use_soccer_cam = UserConfigParams::m_drone_reverse_look_use_soccer_cam;
+        }
+        else // Custom
+        {
+            UserConfigParams::m_camera_fov = UserConfigParams::m_saved_camera_fov;
+            UserConfigParams::m_camera_distance = UserConfigParams::m_saved_camera_distance;
+            UserConfigParams::m_camera_forward_up_angle = UserConfigParams::m_saved_camera_forward_up_angle;
+            UserConfigParams::m_camera_forward_smooth_position = UserConfigParams::m_saved_camera_forward_smooth_position;
+            UserConfigParams::m_camera_forward_smooth_rotation = UserConfigParams::m_saved_camera_forward_smooth_rotation;
+            UserConfigParams::m_camera_backward_distance = UserConfigParams::m_saved_camera_backward_distance;
+            UserConfigParams::m_camera_backward_up_angle = UserConfigParams::m_saved_camera_backward_up_angle;
+            UserConfigParams::m_reverse_look_use_soccer_cam = UserConfigParams::m_saved_reverse_look_use_soccer_cam;
+        }
+        updateCamera();
+    }
+    else if(name == "custom_camera")
+    {
+        new CustomCameraSettingsDialog(0.8f, 0.95f);
+    }
     else if (name == "splitscreen_method")
     {
         GUIEngine::SpinnerWidget* splitscreen_method = getWidget<GUIEngine::SpinnerWidget>("splitscreen_method");
