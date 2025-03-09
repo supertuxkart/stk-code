@@ -55,6 +55,10 @@ private:
     // ----------------------------------------------------------------------------
     /** Compute the time at which the ghost finished the race */
     void          computeFinishTime();
+    // ----------------------------------------------------------------------------
+    /** Update sound effect upon ghost replay data */
+    void          updateSound(float dt);
+
 public:
                   GhostKart(const std::string& ident, unsigned int world_kart_id,
                             int position, float color_hue,
@@ -83,6 +87,9 @@ public:
     // ------------------------------------------------------------------------
     /** Ghost can't be hunted. */
     virtual bool  isInvulnerable() const OVERRIDE { return true; }
+    // ------------------------------------------------------------------------
+    /** Ghost are not on the ground if flying. */
+    virtual bool  isOnGround() const OVERRIDE { return !m_flying; }
     // ------------------------------------------------------------------------
     /** Returns the speed of the kart in meters/second. */
     virtual float getSpeed() const OVERRIDE;
