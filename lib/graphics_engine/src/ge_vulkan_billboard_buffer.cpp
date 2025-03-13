@@ -1,3 +1,5 @@
+#ifdef _IRR_COMPILE_WITH_VULKAN_
+
 #include "ge_vulkan_billboard_buffer.hpp"
 
 #include "ge_main.hpp"
@@ -15,3 +17,5 @@ GEVulkanBillboardBuffer::GEVulkanBillboardBuffer(
 }   // GEVulkanBillboardBuffer
 
 }
+
+#endif
