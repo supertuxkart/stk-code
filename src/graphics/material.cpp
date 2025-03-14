@@ -941,6 +941,11 @@ void  Material::setMaterialProperties(video::SMaterial *m, scene::IMeshBuffer* m
         if (is_vk)
             m->MaterialType = video::EMT_SOLID_2_LAYER;
     }
+    else if (m_shader_name == "normalmap")
+    {
+        if (is_vk)
+            m->MaterialType = video::EMT_NORMAL_MAP_SOLID;
+    }
 
     if (isTransparent())
     {
