@@ -64,7 +64,7 @@ void OptionsScreenVideo::initPresets()
 
     m_presets.push_back // Level 4
     ({
-        true /* light */, 0 /* shadow */, false /* bloom */, false /* lightshaft */,
+        true /* light */, 0 /* shadow */, false /* bloom */, true /* lightshaft */,
         true /* glow */, true /* mlaa */, false /* ssao */, true /* light scatter */,
         true /* animatedCharacters */, 2 /* particles */, 2 /* image_quality */,
         false /* degraded IBL */, 3 /* Geometry Detail */
@@ -81,7 +81,7 @@ void OptionsScreenVideo::initPresets()
     m_presets.push_back // Level 6
     ({
         true /* light */, 1024 /* shadow */, true /* bloom */, true /* lightshaft */,
-        true /* glow */, true /* mlaa */, false /* ssao */, true /* light scatter */,
+        true /* glow */, true /* mlaa */, true /* ssao */, true /* light scatter */,
         true /* animatedCharacters */, 2 /* particles */, 3 /* image_quality */,
         false /* degraded IBL */, 4 /* Geometry Detail */
     });
@@ -94,25 +94,17 @@ void OptionsScreenVideo::initPresets()
         false /* degraded IBL */, 5 /* Geometry Detail */
     });
 
-    m_presets.push_back // Level 8
-    ({
-        true /* light */, 4096 /* shadow */, true /* bloom */, true /* lightshaft */,
-        true /* glow */, true /* mlaa */, true /* ssao */, true /* light scatter */,
-        true /* animatedCharacters */, 2 /* particles */, 3 /* image_quality */,
-        false /* degraded IBL */, 5 /* Geometry Detail */
-    });
-
-    m_blur_presets.push_back // Level 0
+    m_blur_presets.push_back
     ({
         false /* motionblur */, false /* depth of field */
     });
 
-    m_blur_presets.push_back // Level 1
+    m_blur_presets.push_back
     ({
         true  /* motionblur */, false /* depth of field */
     });
 
-    m_blur_presets.push_back // Level 2
+    m_blur_presets.push_back
     ({
         true  /* motionblur */, true  /* depth of field */
     });
@@ -220,7 +212,7 @@ OptionsScreenVideo::OptionsScreenVideo() : Screen("options/options_video.stkgui"
 void OptionsScreenVideo::loadedFromFile()
 {
     m_inited = false;
-    assert(m_presets.size() == 8);
+    assert(m_presets.size() == 7);
     assert(m_blur_presets.size() == 3);
 
     GUIEngine::SpinnerWidget* gfx =
@@ -366,7 +358,8 @@ void OptionsScreenVideo::updateGfxSlider()
             m_presets[l].degraded_ibl == UserConfigParams::m_degraded_IBL &&
             m_presets[l].geometry_detail == (UserConfigParams::m_geometry_level == 0 ? 2 :
                                              UserConfigParams::m_geometry_level == 2 ? 0 :
-                                             UserConfigParams::m_geometry_level))
+                                             UserConfigParams::m_geometry_level) &&
+            UserConfigParams::m_pcss_threshold == 2048)
         {
             gfx->setValue(l + 1);
             found = true;
@@ -477,45 +470,43 @@ void OptionsScreenVideo::updateTooltip()
     const core::stringw very_high = _("Very High");
     //I18N: in the graphical options tooltip;
     const core::stringw ultra = _("Ultra");
-
+    
     //I18N: in graphical options
-    tooltip = _("Particles Effects: %s",
-        UserConfigParams::m_particles_effects == 2 ? enabled :
-        UserConfigParams::m_particles_effects == 1 ? important_only :
-        disabled);
-
-    //I18N: in graphical options
-    tooltip = tooltip + L"\n" + _("Animated Characters: %s",
-        UserConfigParams::m_animated_characters ? enabled : disabled);
-    //I18N: in graphical options
-    tooltip = tooltip + L"\n" + _("Dynamic lights: %s",
+    tooltip = _("Dynamic lights: %s",
         UserConfigParams::m_dynamic_lights ? enabled : disabled);
-    //I18N: in graphical options
-    tooltip = tooltip + L"\n" + _("Light scattering: %s",
-        UserConfigParams::m_light_scatter ? enabled : disabled);
-    //I18N: in graphical options
-    tooltip = tooltip + L"\n" + _("Anti-aliasing: %s",
-        UserConfigParams::m_mlaa ? enabled : disabled);
-    //I18N: in graphical options
-    tooltip = tooltip + L"\n" + _("Ambient occlusion: %s",
-        UserConfigParams::m_ssao ? enabled : disabled);
+
     //I18N: in graphical options
     if (UserConfigParams::m_shadows_resolution == 0)
         tooltip = tooltip + L"\n" + _("Shadows: %s", disabled);
     else
         tooltip = tooltip + L"\n" + _("Shadows: %i", UserConfigParams::m_shadows_resolution);
-
     //I18N: in graphical options
-    tooltip = tooltip + L"\n" + _("Bloom: %s",
-        UserConfigParams::m_bloom ? enabled : disabled);
-
+    tooltip = tooltip + L"\n" + _("Anti-aliasing: %s",
+        UserConfigParams::m_mlaa ? enabled : disabled);
+    //I18N: in graphical options
+    tooltip = tooltip + L"\n" + _("Light scattering: %s",
+        UserConfigParams::m_light_scatter ? enabled : disabled);
     //I18N: in graphical options
     tooltip = tooltip + L"\n" + _("Glow (outlines): %s",
         UserConfigParams::m_glow ? enabled : disabled);
-
     //I18N: in graphical options
     tooltip = tooltip + L"\n" + _("Light shaft (God rays): %s",
         UserConfigParams::m_light_shaft ? enabled : disabled);
+    //I18N: in graphical options
+    tooltip = tooltip + L"\n" + _("Bloom: %s",
+        UserConfigParams::m_bloom ? enabled : disabled);
+    //I18N: in graphical options
+    tooltip = tooltip + L"\n" + _("Ambient occlusion: %s",
+        UserConfigParams::m_ssao ? enabled : disabled);
+
+    //I18N: in graphical options
+    tooltip = tooltip + L"\n" + _("Animated Characters: %s",
+        UserConfigParams::m_animated_characters ? enabled : disabled);
+    //I18N: in graphical options
+    tooltip = tooltip + L"\n" + _("Particles Effects: %s",
+        UserConfigParams::m_particles_effects == 2 ? enabled :
+        UserConfigParams::m_particles_effects == 1 ? important_only :
+        disabled);
 
     //I18N: in graphical options
     int quality = getImageQuality();
@@ -615,6 +606,7 @@ void OptionsScreenVideo::eventCallback(Widget* widget, const std::string& name,
         UserConfigParams::m_geometry_level     = (m_presets[level].geometry_detail == 0 ? 2 :
                                                   m_presets[level].geometry_detail == 2 ? 0 :
                                                   m_presets[level].geometry_detail);
+        UserConfigParams::m_pcss_threshold     = 2048;
 
         updateGfxSlider();
     }

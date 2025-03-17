@@ -145,6 +145,11 @@ KartProperties::~KartProperties()
 void KartProperties::copyForPlayer(const KartProperties *source,
                                    HandicapLevel h)
 {
+    if (!source)
+    {
+        return;
+    }
+    
     *this = *source;
 
     // After the memcpy any pointers will be shared.

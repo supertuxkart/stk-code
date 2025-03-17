@@ -1,0 +1,89 @@
+name: Defect
+description: Report bugs, crashes, or unintended behavior
+labels: ['T: defect']
+
+body:
+
+  - type: textarea
+    id: description
+    attributes:
+      label: Description
+      description: Provide a clear and concise explanation of the problem encountered.
+    validations:
+      required: true
+  
+  - type: textarea
+    id: to_reproduce
+    attributes:
+      label: Steps to reproduce
+      description: Outline the exact sequence of actions required to reproduce the issue.
+      placeholder: |
+        1. Launch SuperTuxKart
+        2. Navigate to [specific menu/location]
+        3. Perform [specific action]
+        4. Observe unexpected behavior
+    validations:
+      required: true
+
+  - type: textarea
+    id: config
+    attributes:
+      label: Configuration
+      description: |
+        Include the following details to help us diagnose the issue:
+        - SuperTuxKart version (visible in the "About" menu)
+        - Installation source (official website, package manager, etc.)
+        - Operating system and version
+        - CPU/GPU specifications
+        - Controller/keyboard type (if relevant)
+      placeholder: |
+        SuperTuxKart version: 1.4
+        Installation source: Official repository
+        OS: Ubuntu 24.04
+        CPU: i5-10400
+        GPU: RX 580
+        Input device: USB keyboard
+    validations:
+      required: true
+  
+  - type: textarea
+    id: error_msg
+    attributes:
+      label: Error message
+      description: |
+        If an error message was shown, please paste the complete error message, or a screenshot of it.
+      value: |
+        ```
+        [Paste error message here]
+        ```
+
+  - type: textarea
+    id: stdout
+    attributes:
+      label: Log File (stdout.log)
+      description: |
+        Attach the log file (stdout.log) from your latest session where the issue occurred.
+        File locations:
+        - Windows: %appdata%\supertuxkart\config-0.10\stdout.log
+        - macOS: ~/Library/Application Support/supertuxkart/config-0.10/stdout.log
+        - Linux and other Unix-based systems: 
+          $XDG_CONFIG_HOME/supertuxkart/config-0.10/stdout.log 
+          or ~/.config/supertuxkart/config-0.10/stdout.log
+      value: |
+        ```
+        [Paste contents of stdout.log here]
+        ```
+    
+  - type: textarea
+    id: input
+    attributes:
+      label: Input Configuration (input.xml)
+      description: |
+        If your issue is related to the input config (gamepads, keyboards), 
+        please provide your file input.xml located in the same directory as stdout.log.
+      value: |
+        ```
+        [Paste contents of input.xml here]
+        ```
+
+      

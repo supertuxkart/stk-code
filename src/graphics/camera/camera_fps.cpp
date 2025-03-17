@@ -122,7 +122,7 @@ void CameraFPS::update(float dt)
     Camera::update(dt);
     
     // To view inside tunnels in top mode, increase near value
-    m_camera->setNearValue(0.5f);
+    m_camera->setNearValue(1.0f);
 
     core::vector3df direction(m_camera->getTarget() - m_camera->getPosition());
     core::vector3df up(m_camera->getUpVector());

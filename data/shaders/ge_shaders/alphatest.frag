@@ -9,9 +9,13 @@ layout(location = 5) in vec3 f_normal;
 layout(location = 0) out vec4 o_color;
 
 #include "utils/camera.glsl"
+<<<<<<< HEAD
 #include "utils/fog.glsl"
 #include "utils/get_pos_from_frag_coord.glsl"
 #include "utils/global_light_data.glsl"
+=======
+#include "utils/get_pos_from_frag_coord.glsl"
+>>>>>>> 9c7e342fb699f4d8c36dc3e43b122e7cbcb4b4d8
 #include "utils/pbr_light.glsl"
 #include "utils/sample_mesh_texture.glsl"
 #include "utils/sun_direction.glsl"

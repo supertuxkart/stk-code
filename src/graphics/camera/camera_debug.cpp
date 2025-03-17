@@ -93,7 +93,7 @@ void CameraDebug::update(float dt)
 {
     Camera::update(dt);
 
-    m_camera->setNearValue(0.5f);
+    m_camera->setNearValue(1.0f);
 
     float above_kart, cam_angle, side_way, distance;
 

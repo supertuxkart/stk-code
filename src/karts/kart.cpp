@@ -2679,7 +2679,15 @@ void Kart::updateEngineSFX(float dt)
 {
     // Only update SFX during the last substep (otherwise too many SFX commands
     // in one frame), and if sfx are enabled
-    if(!m_engine_sound || !SFXManager::get()->sfxAllowed()  )
+    if(!SFXManager::get()->sfxAllowed())
+        return;
+    
+    if (m_skid_sound)
+        m_skid_sound->setPosition(getSmoothedXYZ());
+    if (m_nitro_sound)
+        m_nitro_sound->setPosition(getSmoothedXYZ());
+
+    if (!m_engine_sound)
         return;
 
     // when going faster, use higher pitch for engine
@@ -3265,9 +3273,6 @@ void Kart::updateGraphics(float dt)
 
     for (int i = 0; i < EMITTER_COUNT; i++)
         m_emitters[i]->setPosition(getXYZ());
-    if (m_skid_sound)
-        m_skid_sound->setPosition(getSmoothedXYZ());
-    m_nitro_sound->setPosition(getSmoothedXYZ());
 
     m_attachment->updateGraphics(dt);
 

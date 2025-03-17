@@ -105,7 +105,7 @@ void CameraEnd::readEndCamera(const XMLNode &root)
 void CameraEnd::update(float dt)
 {
     Camera::update(dt);
-    m_camera->setNearValue(0.5f);
+    m_camera->setNearValue(1.0f);
 
     // First test if the kart is close enough to the next end camera, and
     // if so activate it.

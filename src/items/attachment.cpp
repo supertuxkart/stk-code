@@ -621,9 +621,9 @@ void Attachment::updateGraphics(float dt)
             {
                 const float progress = 1.0f - scale_ratio;
 
-                const float x = 0.2f * atan(25.0f * progress - 5.0f) + 0.69f;
+                const float x = 0.2f * atan(20.0f * progress - 5.0f) + 0.7f;
                 const float y = x;
-                const float z = 1.0f - pow(2.0f, -20.f * progress);
+                const float z = 1.0f - pow(2.0f, -15.f * progress);
 
                 m_node->setScale(core::vector3df(x * wanted_node_scale,
                                                  y * wanted_node_scale,
@@ -638,7 +638,7 @@ void Attachment::updateGraphics(float dt)
                     const float x = scale_ratio;
 
                     scale_ratio = x <= 0 ? 0 : x >= 1 ? 1
-                      : -pow(2, 10 * x - 10) * sin((x * 10 - 10.75) * c4);
+                      : -pow(2, 8 * x - 8) * sin((x * 8 - 8.75) * c4);
                 }
 
                 float scale = 0.3f * scale_ratio +
