@@ -1840,7 +1840,16 @@ void Skin::drawSpinnerChild(const core::recti &rect, Widget* widget,
         return;
 
     SpinnerWidget* spinner = dynamic_cast<SpinnerWidget*>(widget->m_event_handler);
-    bool spinner_focused = spinner->isFocusedForPlayer(PLAYER_ID_GAME_MASTER);
+    
+    bool spinner_focused = false;
+    for (unsigned i = 1; i < MAX_PLAYER_COUNT + 1; i++)
+    {
+        if (spinner->isFocusedForPlayer(i - 1))
+        {
+            spinner_focused = true;
+            break;
+        }
+    }
 
     if (pressed || (spinner->isButtonSelected(right) && spinner_focused))
     {
