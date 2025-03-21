@@ -124,9 +124,11 @@ void OptionsScreenVideo::initPresets()
     m_scale_rtts_custom_presets.push_back({ 0.9f });
     m_scale_rtts_custom_presets.push_back({ 0.95f });
     m_scale_rtts_custom_presets.push_back({ 1.0f });
+#ifndef MOBILE_STK
     m_scale_rtts_custom_presets.push_back({ 1.25f });
     m_scale_rtts_custom_presets.push_back({ 1.5f });
     m_scale_rtts_custom_presets.push_back({ 2.0f });
+#endif
 
 }   // initPresets
 
@@ -252,7 +254,11 @@ void OptionsScreenVideo::init()
     vsync->clearLabels();
     //I18N: In the video options
     vsync->addLabel(_("Vertical Sync"));
+#ifdef MOBILE_STK
+    std::set<int> fps = { 30, 60, 120 };
+#else
     std::set<int> fps = { 30, 60, 120, 180, 250, 500, 1000 };
+#endif
     fps.insert(UserConfigParams::m_max_fps);
     for (auto& i : fps)
         vsync->addLabel(core::stringw(i));
@@ -295,9 +301,11 @@ void OptionsScreenVideo::init()
     scale_rtts->addLabel("90%");
     scale_rtts->addLabel("95%");
     scale_rtts->addLabel("100%");
+#ifndef MOBILE_STK
     scale_rtts->addLabel("125%");
     scale_rtts->addLabel("150%");
     scale_rtts->addLabel("200%");
+#endif
 
     // --- set gfx settings values
     updateGfxSlider();
