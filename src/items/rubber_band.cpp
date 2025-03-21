@@ -86,6 +86,7 @@ RubberBand::RubberBand(Plunger *plunger, AbstractKart *kart)
         scene::IMeshBuffer* buffer = NULL;
         if (irr_driver->getVideoDriver()->getDriverType() == video::EDT_VULKAN)
         {
+            #ifdef _IRR_COMPILE_WITH_VULKAN_
             buffer = new GE::GEVulkanDynamicSPMBuffer();
             video::S3DVertexSkinnedMesh v;
             v.m_normal = 0x1FF << 10;
@@ -94,6 +95,7 @@ RubberBand::RubberBand(Plunger *plunger, AbstractKart *kart)
                 {{ v, v, v, v }};
             buffer->append(vertices.data(), vertices.size(), indices.data(),
                 indices.size());
+            #endif
         }
         else
         {

@@ -218,7 +218,7 @@ GUIEngine::EventPropagation CustomVideoSettingsDialog::processEvent(const std::s
             ModalDialog::dismiss();
             OptionsScreenVideo::getInstance()->updateGfxSlider();
             OptionsScreenVideo::getInstance()->updateBlurSlider();
-#ifndef SERVER_ONLY
+#if !defined(SERVER_ONLY) && defined(_IRR_COMPILE_WITH_VULKAN_)
             if (update_needed && GE::getDriver()->getDriverType() == video::EDT_VULKAN)
                 GE::getVKDriver()->updateDriver(true);
 #endif

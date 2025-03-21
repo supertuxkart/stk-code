@@ -1,3 +1,5 @@
+#ifdef _IRR_COMPILE_WITH_VULKAN_
+
 #include "ge_vulkan_driver.hpp"
 
 #include "ge_compressor_astc_4x4.hpp"
@@ -2637,6 +2639,8 @@ extern "C" JNIEXPORT void JNICALL pauseRenderingJNI(JNIEnv* env, jclass cls)
         }
     }
 }   // pauseRenderingJNI
+
+#endif
 
 #endif
 

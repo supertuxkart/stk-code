@@ -1,3 +1,5 @@
+#ifdef _IRR_COMPILE_WITH_VULKAN_
+
 #include "ge_vulkan_features.hpp"
 
 #include "ge_compressor_astc_4x4.hpp"
@@ -340,3 +342,5 @@ bool GEVulkanFeatures::supportsASTC4x4()
 }   // supportsASTC4x4
 
 }
+
+#endif

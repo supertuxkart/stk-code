@@ -1,3 +1,5 @@
+#ifdef _IRR_COMPILE_WITH_VULKAN_
+
 #include "ge_vulkan_mesh_cache.hpp"
 
 #include "ge_main.hpp"
@@ -196,3 +198,5 @@ void GEVulkanMeshCache::destroy()
 }   // destroy
 
 }
+
+#endif

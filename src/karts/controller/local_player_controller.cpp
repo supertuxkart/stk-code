@@ -490,7 +490,7 @@ void LocalPlayerController::doCrashHaptics() {
 }
 
 void LocalPlayerController::rumble(float strength_low, float strength_high, uint16_t duration) {
-#ifndef SERVER_ONLY
+#if !defined(SERVER_ONLY) && !defined(__EMSCRIPTEN__)
     if (RewindManager::get()->isRewinding())
         return;
     int count = input_manager->getGamepadCount();

@@ -1,3 +1,5 @@
+#ifdef _IRR_COMPILE_WITH_VULKAN_
+
 #include "ge_spm_buffer.hpp"
 
 #include "ge_main.hpp"
@@ -117,3 +119,5 @@ void GESPMBuffer::setTCoords(u32 i, const core::vector2df& tcoords)
 }   // setTCoords
 
 }
+
+#endif

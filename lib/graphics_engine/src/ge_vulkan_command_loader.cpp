@@ -1,3 +1,5 @@
+#ifdef _IRR_COMPILE_WITH_VULKAN_
+
 #include "ge_vulkan_command_loader.hpp"
 
 #include "ge_vulkan_driver.hpp"
@@ -264,3 +266,5 @@ void GEVulkanCommandLoader::waitIdle()
 }   // waitIdle
 
 }
+
+#endif

@@ -60,6 +60,7 @@ GEGLTexture::GEGLTexture(const std::string& name, unsigned int size,
     m_size = m_orig_size;
 
     bool texture_swizzle = false;
+#ifndef __EMSCRIPTEN__
     if (m_driver_type == video::EDT_OGLES2)
     {
         int gl_major_version = 0;
@@ -74,6 +75,7 @@ GEGLTexture::GEGLTexture(const std::string& name, unsigned int size,
         texture_swizzle = irr::video::useCoreContext &&
             GE::hasGLExtension("GL_ARB_texture_swizzle");
     }
+#endif
 
     if (single_channel && texture_swizzle)
         m_single_channel = true;

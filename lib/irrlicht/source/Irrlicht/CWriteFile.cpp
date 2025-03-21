@@ -7,6 +7,11 @@
 #include "utils/file_utils.hpp"
 #include <stdio.h>
 
+
+#if defined(__EMSCRIPTEN__)
+#include <emscripten.h>
+#endif
+
 namespace irr
 {
 namespace io
@@ -48,7 +53,13 @@ s32 CWriteFile::write(const void* buffer, u32 sizeToWrite)
 	if (!isOpen())
 		return 0;
 
-	return (s32)fwrite(buffer, 1, sizeToWrite, File);
+	s32 ret = fwrite(buffer, 1, sizeToWrite, File);
+#ifdef __EMSCRIPTEN__
+	EM_ASM(
+		globalThis.sync_idbfs();
+	);
+#endif
+	return ret;
 }
 
 

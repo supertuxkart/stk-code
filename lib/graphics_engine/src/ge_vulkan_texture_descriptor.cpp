@@ -1,3 +1,5 @@
+#ifdef _IRR_COMPILE_WITH_VULKAN_
+
 #include "ge_vulkan_texture_descriptor.hpp"
 
 #include "ge_main.hpp"
@@ -237,3 +239,5 @@ int GEVulkanTextureDescriptor::getTextureID(const irr::video::ITexture** list,
 }   // getTextureID
 
 }
+
+#endif

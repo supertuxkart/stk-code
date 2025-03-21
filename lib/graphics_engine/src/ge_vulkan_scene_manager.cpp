@@ -1,3 +1,5 @@
+#ifdef _IRR_COMPILE_WITH_VULKAN_
+
 #include "ge_vulkan_scene_manager.hpp"
 
 #include "../source/Irrlicht/os.h"
@@ -274,3 +276,5 @@ void GEVulkanSceneManager::removeDrawCall(GEVulkanCameraSceneNode* cam)
 }   // removeDrawCall
 
 }
+
+#endif

@@ -1,3 +1,5 @@
+#ifdef _IRR_COMPILE_WITH_VULKAN_
+
 #include "ge_vulkan_shader_manager.hpp"
 
 #include "ge_vulkan_command_loader.hpp"
@@ -285,3 +287,5 @@ VkShaderModule GEVulkanShaderManager::getShader(const std::string& filename)
 }   // getShader
 
 }
+
+#endif

@@ -53,7 +53,7 @@
 #include <poll.h>
 #endif
 
-#ifndef HAS_SOCKLEN_T
+#if !defined(HAS_SOCKLEN_T) && !defined(__EMSCRIPTEN__)
 typedef int socklen_t;
 #endif
 

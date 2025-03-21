@@ -1,0 +1,104 @@
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width">
+
+    <title>SuperTuxKart</title>
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+    <script src="/game/supertuxkart.js"></script>
+    <script>
+      //emscripten only tells us if the runtime is ready once it starts main
+      //so cancel running main the first time around so we can store when it is ready
+      globalThis.ready = false;
+      var real_run = run;
+      run = () => {
+        if (globalThis.ready) {
+          real_run();
+        }
+        globalThis.ready = true;
+      }
+    </script>
+    <script src="/script.js" type="module" defer></script>
+
+    <style>
+      * {
+        font-family: Arial, sans-serif;
+        box-sizing: border-box;
+      }
+      p, label, select {
+        font-size: 12px;
+        margin: 4px;
+      }
+      body {
+        margin: 0px;
+      }
+      #canvas {
+        background-color: #222222;
+        position: absolute;
+        top: 0px;
+        left: 0px;
+        z-index: 1;
+        width: 100vw;
+        height: 100vh;
+      }
+      #info_container {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        width: 450px;
+        height: 290px;
+        margin-left: -220px;
+        margin-top: -145px;
+        z-index: 2;
+        background-color: white;
+        padding: 12px;
+        padding-top: 6px;
+        border-radius: 8px;
+        overflow-y: auto;
+      }
+      #header_bar {
+        display: flex;
+        align-items: center;
+        gap: 18px;
+      }
+      #status_bar {
+        display: flex;
+        align-items: center;
+        margin-top: 12px;
+        gap: 6px;
+      }
+      #start_button {
+        border: none;
+        outline: none;
+        padding: 8px;
+        padding-left: 12px;
+        padding-right: 12px;
+        border-radius: 8px;
+      }
+    </style>
+  </head>
+
+  <body>
+    <canvas id="canvas"></canvas>
+    <div id="info_container">
+      <div id="header_bar">
+        <img src="/supertuxkart_64.png">
+        <h1 style="margin: 0px;">SuperTuxKart Wasm</h1>
+      </div>
+      <p>This is an experimental port of SuperTuxKart to the browser using WebAssembly and Emscripten. Currently, everything works except for some rendering APIs and networking.</p>
+      <p>There is a 120MB initial download required to play, and the game will require around 500MB of memory.</p>
+      <p>This web port was made by <a href="https://github.com/ading2210/">ading2210</a>, and the source code is located at <a href="https://github.com/ading2210/stk-code/tree/wasm">github.com/ading2210/stk-code</a>.</p>  
+      <p>If you want to check on the status of this port, take a look at the <a href="https://github.com/supertuxkart/stk-code/pull/5106/">corresponding pull request</a> in the SuperTuxKart repository.</p>
+      <label for="quality_select">Texture quality:</label>
+      <select name="quality_select" id="quality_select" style="margin: 0px;">
+        <option value="low">Low (120MiB)</option>
+        <option value="mid">Medium (171MiB)</option>
+        <option value="high">High (249MiB)</option>
+      </select> 
+      <div id="status_bar">
+        <button id="start_button" disabled>Start Game</button>
+        <p id="status_text">Loading game code...</p>
+      </div>
+    </div>
+  </body>
+</html>

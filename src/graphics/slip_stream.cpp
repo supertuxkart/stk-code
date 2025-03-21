@@ -399,7 +399,7 @@ scene::IAnimatedMesh* SlipStream::createMesh(unsigned material_id,
     mesh->recalculateBoundingBox();
 
     buffer->drop();
-#ifndef SERVER_ONLY
+#if !defined(SERVER_ONLY) && defined(_IRR_COMPILE_WITH_VULKAN_)
     if (GE::getDriver()->getDriverType() == video::EDT_VULKAN)
     {
         amesh = GE::convertIrrlichtMeshToSPM(mesh);

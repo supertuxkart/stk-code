@@ -58,6 +58,62 @@ if(IOS)
     include(cmake/XcodeHelper.cmake)
 endif()
 
+if(EMSCRIPTEN)
+    #note: cmake fails the first few times you run it then works fine without changing anything
+    #i have no idea why this happens
+
+    set(CMAKE_PREFIX_PATH "${CMAKE_SOURCE_DIR}/wasm/prefix/")
+
+    set(JPEG_INCLUDE_DIR "${CMAKE_SOURCE_DIR}/wasm/prefix/include")
+    set(JPEG_LIBRARY "${CMAKE_SOURCE_DIR}/wasm/prefix/lib/libjpeg.a")
+
+    set(PNG_PNG_INCLUDE_DIR "${CMAKE_SOURCE_DIR}/wasm/prefix/include/")
+    set(PNG_LIBRARY "${CMAKE_SOURCE_DIR}/wasm/prefix/lib/libpng16.a")
+
+    set(ZLIB_INCLUDE_DIR "${CMAKE_SOURCE_DIR}/wasm/prefix/include")
+    set(ZLIB_LIBRARY "${CMAKE_SOURCE_DIR}/wasm/prefix/lib/libz.a")
+
+    set(HARFBUZZ_INCLUDEDIR "${CMAKE_SOURCE_DIR}/wasm/prefix/include/")
+    set(HARFBUZZ_LIBRARY "${CMAKE_SOURCE_DIR}/wasm/prefix/lib/libharfbuzz.a")
+
+    set(CURL_INCLUDE_DIR "${CMAKE_SOURCE_DIR}/wasm/prefix/include/")
+    set(CURL_LIBRARY "${CMAKE_SOURCE_DIR}/wasm/prefix/lib/libcurl.a")
+
+    set(OPENSSL_INCLUDE_DIR "${CMAKE_SOURCE_DIR}/wasm/prefix/include/")
+    set(OPENSSL_CRYPTO_LIBRARY "${CMAKE_SOURCE_DIR}/wasm/prefix/lib/libssl.a")
+
+    set(OGGVORBIS_OGG_INCLUDE_DIR "${CMAKE_SOURCE_DIR}/wasm/prefix/include/")
+    set(OGGVORBIS_VORBIS_INCLUDE_DIR "${CMAKE_SOURCE_DIR}/wasm/prefix/include/")
+    set(OGGVORBIS_OGG_LIBRARY "${CMAKE_SOURCE_DIR}/wasm/prefix/lib/libogg.a")
+    set(OGGVORBIS_VORBISFILE_LIBRARY "${CMAKE_SOURCE_DIR}/wasm/prefix/lib/libvorbisfile.a")
+    set(OGGVORBIS_VORBIS_LIBRARY "${CMAKE_SOURCE_DIR}/wasm/prefix/lib/libvorbis.a")
+
+    set(PTHREAD_LIBRARY "${CMAKE_SOURCE_DIR}/wasm/emsdk/upstream")
+
+    set(USE_WIIUSE 0)
+    set(USE_DNS_C 1)
+    set(USE_GLES2 1)
+    set(NO_SHADERC on)
+    add_definitions(-DNO_IRR_COMPILE_WITH_X11_)
+    add_definitions(-DNO_IRR_COMPILE_WITH_WAYLAND_DEVICE_)
+    add_definitions(-DNO_IRR_COMPILE_WITH_DIRECT3D_9_)
+    add_definitions(-DNO_IRR_COMPILE_WITH_VULKAN_)
+    add_definitions(-DNO_IRR_COMPILE_WITH_OPENGL_)
+    add_definitions(-D_IRR_COMPILE_WITH_OGLES2_)
+    add_definitions(-DDISABLE_RPC)
+
+    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -sUSE_SDL=2 -fwasm-exceptions -sSUPPORT_LONGJMP=wasm -pthread")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -sUSE_SDL=2 -fwasm-exceptions -sSUPPORT_LONGJMP=wasm -pthread")
+    set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -L${CMAKE_SOURCE_DIR}/wasm/prefix/lib/ -sENVIRONMENT=web,worker -lidbfs.js -lwebsocket.js -sASSERTIONS=1 -sSTACK_SIZE=30000000 -sMIN_WEBGL_VERSION=2 -sFULL_ES2 -sFULL_ES3 -sGL_FFP_ONLY -sUSE_SDL_MIXER=2 -lopenal -sINITIAL_MEMORY=768MB -sWASM_BIGINT -lcrypto -fwasm-exceptions")
+
+    if(CMAKE_BUILD_TYPE MATCHES Debug)
+        set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} --profiling")
+        set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -g")
+        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g")
+    endif()
+
+endif()
+
 if(APPLE AND NOT IOS)
     if(${CMAKE_SYSTEM_PROCESSOR} STREQUAL "arm")
 	set(ARCHFLAGS "arm64")
@@ -331,7 +387,7 @@ else()
     MESSAGE(STATUS "Use system libmcpp: ${MCPP_LIBRARY}")
 endif()
 
-if (NOT SERVER_ONLY)
+if (NOT SERVER_ONLY AND NOT EMSCRIPTEN)
     # SDL2
     find_library(SDL2_LIBRARY NAMES SDL2 libSDL2)
     find_path(SDL2_INCLUDEDIR NAMES SDL.h PATH_SUFFIXES SDL2 include/SDL2 include PATHS)
@@ -633,7 +689,7 @@ int main() {
   return 0;
 }
 " NO_LIBATOMIC_NEEDED)
-if (NOT NO_LIBATOMIC_NEEDED)
+if (NOT NO_LIBATOMIC_NEEDED AND NOT EMSCRIPTEN)
     target_link_libraries(supertuxkart atomic)
 endif()
 
@@ -865,7 +921,6 @@ if(MINGW)
         file(COPY ${LIBPTHREAD} DESTINATION ${CMAKE_BINARY_DIR}/bin/)
     endif()
 endif()
-
 
 # Find LibGamerzilla library or build it if missing
 if (NOT APPLE)

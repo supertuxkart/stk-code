@@ -861,7 +861,7 @@ void  Material::setMaterialProperties(video::SMaterial *m, scene::IMeshBuffer* m
                         tc.X = 1 - tc.X;
                 }
             }
-#ifndef SERVER_ONLY
+#if !defined(SERVER_ONLY) && defined(_IRR_COMPILE_WITH_VULKAN_)
             if (is_vk)
             {
                 GE::GESPMBuffer* spmb = static_cast<GE::GESPMBuffer*>(mb);
