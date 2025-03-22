@@ -173,6 +173,13 @@ namespace GUIEngine
         /** Sets the ID of the selected item within the ribbon */
         void setSelection(const int i, const int playerID)
                              { m_selection[playerID] = i; updateSelection(); }
+
+        /** Sets the first active item within the ribbon as selected */
+        void setFirstSelection(const int playerID, bool reverse_order = false);
+
+        /** Sets the last active item within the ribbon as selected */
+        void setLastSelection(const int playerID)
+                             { setFirstSelection(playerID, true); }
         
         /** Select an item in the ribbon by its internal name */
         void select(std::string item, const int playerID);

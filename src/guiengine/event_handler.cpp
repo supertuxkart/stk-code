@@ -446,7 +446,7 @@ void EventHandler::sendNavigationEvent(const NavigationDirection nav, const int 
 
     if (!handled_by_widget)
     {
-        navigate(nav, playerID);
+        navigate(nav, GUIEngine::getFocusForPlayer(playerID), playerID);
     }
 } // sendNavigationEvent
 
@@ -456,11 +456,9 @@ void EventHandler::sendNavigationEvent(const NavigationDirection nav, const int 
  *
  * \param nav Determine in which direction to navigate
  */
-void EventHandler::navigate(const NavigationDirection nav, const int playerID)
+void EventHandler::navigate(const NavigationDirection nav, Widget* starting_widget, const int playerID)
 {
-    Widget* w = GUIEngine::getFocusForPlayer(playerID);
-
-    int next_id = findIDClosestWidget(nav, playerID, w, false);
+    int next_id = findIDClosestWidget(nav, playerID, starting_widget, false);
 
     if (next_id != -1)
     {
@@ -482,9 +480,10 @@ void EventHandler::navigate(const NavigationDirection nav, const int playerID)
             assert(ribbon != NULL);
             if (ribbon->getRibbonType() == GUIEngine::RibbonType::RIBBON_VERTICAL_TABS)
             {
-                int new_selection = (nav == NAV_UP) ?
-                                   ribbon->getActiveChildrenNumber(playerID) - 1 : 0;
-                ribbon->setSelection(new_selection, playerID);
+                // Some of the tabs may be disabled. So we navigate until an active tab is found
+                (nav == NAV_UP) ? ribbon->setLastSelection(playerID)
+                                : ribbon->setFirstSelection(playerID);
+
                 // The tab selection triggers an action
                 sendEventToUser(ribbon, ribbon->m_properties[PROP_ID], playerID);
             }
@@ -506,19 +505,19 @@ void EventHandler::navigate(const NavigationDirection nav, const int playerID)
 } // navigate
 
 /**
- * This function use simple heuristic to find the closest widget
- * in the requested direction,
+ * This function use simple heuristics to find the closest widget
+ * in the requested direction.
  * It prioritize widgets close vertically to widget close horizontally,
  * as it is expected behavior in any direction.
  * Several hardcoded values are used, having been found to work well
  * experimentally while keeping simple heuristics.
  */
 int EventHandler::findIDClosestWidget(const NavigationDirection nav, const int playerID,
-                                      GUIEngine::Widget* w, bool ignore_disabled, int recursion_counter)
+                                      Widget* w, bool ignore_disabled, int recursion_counter)
 {
     int closest_widget_id = -1;
     int distance = 0;
-    // So that the UI behavior don't change when it is upscaled
+    // So that the UI behavior doesn't change when it is upscaled
     const int BIG_DISTANCE = irr_driver->getActualScreenSize().Width*100;
     int smallest_distance = BIG_DISTANCE;
     // Used when there is no suitable widget in the requested direction
@@ -538,7 +537,7 @@ int EventHandler::findIDClosestWidget(const NavigationDirection nav, const int p
         // - it doesn't match a widget
         // - it doesn't match a focusable widget
         // - it corresponds to the current widget
-        // - it corresponds to an invisible or disabled widget
+        // - it corresponds to an invisible or disabled widget (while ignore_disabled is true)
         // - the player is not allowed to select it
         // - Its base coordinates are negative (such as buttons within ribbons)
         if (w_test == NULL || !Widget::isFocusableId(i) || w == w_test ||
@@ -581,16 +580,13 @@ int EventHandler::findIDClosestWidget(const NavigationDirection nav, const int p
 
         if (nav == NAV_UP || nav == NAV_DOWN)
         {
+            // Compare current top point with other widget lowest point
             if (nav == NAV_UP)
-            {
-                // Compare current top point with other widget lowest point
                 distance = w->m_y - (w_test->m_y + w_test->m_h);
-            }
+
+            // compare current lowest point with other widget top point
             else
-            {
-                // compare current lowest point with other widget top point
                 distance = w_test->m_y - (w->m_y + w->m_h);
-            }
 
             // Better select an item on the side that one much higher,
             // so make the vertical distance matter much more
@@ -612,16 +608,14 @@ int EventHandler::findIDClosestWidget(const NavigationDirection nav, const int p
         }
         else if (nav == NAV_LEFT || nav == NAV_RIGHT)
         {
+            // compare current leftmost point with other widget rightmost
             if (nav == NAV_LEFT)
-            {
-                // compare current leftmost point with other widget rightmost
                 distance = w->m_x - rightmost;
-            }
+
+            // compare current rightmost point with other widget leftmost
             else
-            {
-                // compare current rightmost point with other widget leftmost
                 distance = w_test->m_x - (w->m_x + w->m_w);
-            }
+
             wrapping_distance = distance;
 
             int down_offset = std::max(0, w_test->m_y - w->m_y);
@@ -676,6 +670,7 @@ int EventHandler::findIDClosestWidget(const NavigationDirection nav, const int p
 
     int closest_id = (smallest_distance < BIG_DISTANCE) ? closest_widget_id :
                                                           closest_wrapping_widget_id;
+
     Widget* w_test = GUIEngine::getWidget(closest_id);
     
     if (w_test == NULL)
@@ -686,20 +681,18 @@ int EventHandler::findIDClosestWidget(const NavigationDirection nav, const int p
     // This allows to skip over disabled/invisible widgets in a grid
     if (!w_test->isVisible() || !w_test->isActivated())
     {
-        // Can skip over at most 3 consecutive disabled/invisible widget
+        // Can skip over at most 3 consecutive disabled/invisible widgets
         if (recursion_counter <=2)
-        {
-            recursion_counter++;
-            return findIDClosestWidget(nav, playerID, w_test, /*ignore disabled*/ false, recursion_counter);
-        }
-        // If nothing has been found, do a search ignoring disabled/invisible widgets,
-        // restarting from the initial focused widget (otherwise, it could lead to weird results) 
+            closest_id = findIDClosestWidget(nav, playerID, w_test, /*ignore disabled*/ false, recursion_counter + 1);
+        // We have only found disabled/invisible widgets on our path
         else if (recursion_counter == 3)
-        {
-            Widget* w_focus = GUIEngine::getFocusForPlayer(playerID);
-            return findIDClosestWidget(nav, playerID, w_focus, /*ignore disabled*/ true, recursion_counter);
-        }
+            closest_id = -1;
     }
+
+    // If nothing has been found or if we looped back to the starting widget (see issue #5283),
+    // do a search ignoring disabled/invisible widgets, restarting from the initial widget
+    if (recursion_counter == 0 && (closest_id == -1 || GUIEngine::getWidget(closest_id) == w))
+        closest_id = findIDClosestWidget(nav, playerID, w, /*ignore disabled*/ true, 1 /* avoid infinite loops */);
 
     return closest_id;
 } // findIDClosestWidget

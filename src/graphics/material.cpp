@@ -589,10 +589,7 @@ void Material::install(std::function<void(video::IImage*)> image_mani,
             m_sampler_path[i]);
         GE::getGEConfig()->m_ondemand_load_texture_paths.clear();
         if (m_vk_textures[i - 2])
-        {
             m_vk_textures[i - 2]->grab();
-            m->setTexture(i, m_vk_textures[i - 2]);
-        }
     }
 #endif
 }   // install
@@ -941,6 +938,11 @@ void  Material::setMaterialProperties(video::SMaterial *m, scene::IMeshBuffer* m
         if (is_vk)
             m->MaterialType = video::EMT_SOLID_2_LAYER;
     }
+    else if (m_shader_name == "normalmap")
+    {
+        if (is_vk)
+            m->MaterialType = video::EMT_NORMAL_MAP_SOLID;
+    }
 
     if (isTransparent())
     {
@@ -1001,6 +1003,14 @@ void  Material::setMaterialProperties(video::SMaterial *m, scene::IMeshBuffer* m
         m->ColorMaterial = video::ECM_NONE; // Override one above
     }
 #endif
+    if (is_vk)
+    {
+        for (unsigned i = 2; i < m_sampler_path.size(); i++)
+        {
+            if (m_vk_textures[i - 2])
+                m->setTexture(i, m_vk_textures[i - 2]);
+        }
+    }
 
 } // setMaterialProperties
 

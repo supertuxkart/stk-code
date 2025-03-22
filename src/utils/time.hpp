@@ -62,6 +62,13 @@ public:
     /** Converts the time in this object to a human readable string. */
     static std::string toString(const TimeType &tt);
     // ------------------------------------------------------------------------
+    /** Converts the date represented by year, month, day
+     *  to a human readable string. */
+    static std::string toString(int year, int month, int day);
+    // ------------------------------------------------------------------------
+    /** Obtains the translated format of the time string. */
+    static std::string getDateFormat();
+    // ------------------------------------------------------------------------
     /** Returns the number of seconds since 1.1.1970. This function is used
      *  to compare access times of files, e.g. news, addons data etc.
      */

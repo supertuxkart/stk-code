@@ -145,6 +145,11 @@ KartProperties::~KartProperties()
 void KartProperties::copyForPlayer(const KartProperties *source,
                                    HandicapLevel h)
 {
+    if (!source)
+    {
+        return;
+    }
+    
     *this = *source;
 
     // After the memcpy any pointers will be shared.
@@ -658,8 +663,8 @@ bool KartProperties::operator<(const KartProperties &other) const
     PlayerProfile *p = PlayerManager::getCurrentPlayer();
     bool this_is_locked = p->isLocked(getIdent());
     bool other_is_locked = p->isLocked(other.getIdent());
-    bool this_is_favorite = p->isFavoriteKart(getNonTranslatedName());
-    bool other_is_favorite = p->isFavoriteKart(other.getNonTranslatedName());
+    bool this_is_favorite = p->isFavoriteKart(getIdent());
+    bool other_is_favorite = p->isFavoriteKart(other.getIdent());
 
     if (this_is_locked != other_is_locked)
     {

@@ -309,6 +309,30 @@ void RibbonWidget::removeChildNamed(const char* name)
 
 // ----------------------------------------------------------------------------
 
+ /** Sets the first active item within the ribbon as selected,
+  * or the last one if 'reverse_order' is true. */
+void RibbonWidget::setFirstSelection(const int playerID, bool reverse_order)
+{
+    // Despite the name, "active children" includes elements that have been created
+    // and disabled with setActive(false)
+    // TODO: rename it to be clearer
+    int id = (reverse_order) ? getActiveChildrenNumber(playerID) - 1 : 0;
+    while (id >= 0 && id <= (getActiveChildrenNumber(playerID) - 1))
+    {
+        if (m_active_children[id].isActivated())
+            break;
+
+        id = (reverse_order) ? id - 1 : id + 1;
+    }
+
+    // If every single element within the ribbon is desactivated, we will pick
+    // the last (first) even if disabled, but this case should not arise.
+    m_selection[playerID] = id;
+    updateSelection();
+}   // setFirstSelection
+
+// ----------------------------------------------------------------------------
+
 void RibbonWidget::select(std::string item, const int mousePlayerID)
 {
     const int subbuttons_amount = m_active_children.size();

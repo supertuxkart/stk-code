@@ -39,19 +39,21 @@
 
             <spacer height="2%" width="100%" />
 
+            <label width="100%" I18N="In the ui/camera settings" text="Smooth camera"/>
+            <spacer height="1%" width="100%" />
             <div width="100%" height="fit" layout="horizontal-row">
                 <spacer width="3%" height="100%" />
-                <div proportion="1" height="fit" layout="horizontal-row" >
-                    <checkbox id="camera_smoothing"/>
-                    <spacer width="1%" height="100%" />
-                    <label height="100%" text_align="left" I18N="In the ui/camera screen" text="Smooth camera"/>
-                </div>
+                <label width="fit" height="100%" text_align="left" I18N="In the ui/camera screen" text="Distance"/>
+                <gauge id="smooth_position" width="35%"/>
+                <spacer width="2%" height="100%" />
+                <label width="fit" height="100%" text_align="left" I18N="In the ui/camera screen" text="Angle"/>
+                <gauge id="smooth_rotation" width="35%"/>
             </div>
 
             <spacer width="5" height="2%"/>
 
             <label width="100%" I18N="In the ui/camera settings" text="Backward camera"/>
-            <spacer height="2%" width="100%" />
+            <spacer height="1%" width="100%" />
             <div width="100%" height="fit" layout="horizontal-row">
                 <spacer width="3%" height="100%" />
                 <label width="fit" height="100%" text_align="left" I18N="In the ui/camera screen" text="Distance"/>
@@ -72,7 +74,7 @@
                 </div>
             </div>
 
-            <spacer height="2%" width="100%" />
+            <spacer proportion="1" width="100%" />
 
             <buttonbar id="buttons" height="20%" width="90%" align="center">
                 <icon-button id="reset" width="128" height="128" icon="gui/icons/restart.png"

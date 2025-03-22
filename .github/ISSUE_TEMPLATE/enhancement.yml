@@ -1,0 +1,13 @@
+name: Enhancement
+description: Request for new features and other improvements
+labels: ['T: enhancement']
+
+body:
+  - type: textarea
+    id: description
+    attributes:
+      label: Description
+      description: |
+        If applicable, add screenshots or mockups to help explain your request.
+    validations:
+      required: true

@@ -617,9 +617,34 @@ void Attachment::updateGraphics(float dt)
             World::getWorld()->getTicksSinceStart()) / 0.7f;
         if (scale_ratio > 0.0f)
         {
-            float scale = 0.3f * scale_ratio +
-                wanted_node_scale * (1.0f - scale_ratio);
-            m_node->setScale(core::vector3df(scale, scale, scale));
+            if (m_type == ATTACH_PARACHUTE)
+            {
+                const float progress = 1.0f - scale_ratio;
+
+                const float x = 0.2f * atan(20.0f * progress - 5.0f) + 0.7f;
+                const float y = x;
+                const float z = 1.0f - pow(2.0f, -15.f * progress);
+
+                m_node->setScale(core::vector3df(x * wanted_node_scale,
+                                                 y * wanted_node_scale,
+                                                 z * wanted_node_scale));
+            }
+            else
+            {
+                if (is_shield)
+                {
+                    // Taken from https://easings.net/#easeInElastic
+                    const float c4 = (2.0f * PI) / 3.0f;
+                    const float x = scale_ratio;
+
+                    scale_ratio = x <= 0 ? 0 : x >= 1 ? 1
+                      : -pow(2, 8 * x - 8) * sin((x * 8 - 8.75) * c4);
+                }
+
+                float scale = 0.3f * scale_ratio +
+                    wanted_node_scale * (1.0f - scale_ratio);
+                m_node->setScale(core::vector3df(scale, scale, scale));
+            }
         }
         else
         {

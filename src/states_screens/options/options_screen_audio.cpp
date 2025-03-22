@@ -41,6 +41,8 @@ void OptionsScreenAudio::loadedFromFile()
 void OptionsScreenAudio::init()
 {
     Screen::init();
+    OptionsCommon::setTabStatus();
+
     RibbonWidget* ribbon = this->getWidget<RibbonWidget>("options_choice");
     assert(ribbon != NULL);
     ribbon->setFocusForPlayer(PLAYER_ID_GAME_MASTER);
@@ -70,7 +72,6 @@ void OptionsScreenAudio::init()
         getWidget<SpinnerWidget>("sfx_volume")->setActive(false);
     if(!UserConfigParams::m_music)
         getWidget<SpinnerWidget>("music_volume")->setActive(false);
-
 }   // init
 
 // -----------------------------------------------------------------------------

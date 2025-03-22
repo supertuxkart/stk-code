@@ -124,6 +124,11 @@ void OptionsScreenVideo::initPresets()
     m_scale_rtts_custom_presets.push_back({ 0.9f });
     m_scale_rtts_custom_presets.push_back({ 0.95f });
     m_scale_rtts_custom_presets.push_back({ 1.0f });
+#ifndef MOBILE_STK
+    m_scale_rtts_custom_presets.push_back({ 1.25f });
+    m_scale_rtts_custom_presets.push_back({ 1.5f });
+    m_scale_rtts_custom_presets.push_back({ 2.0f });
+#endif
 
 }   // initPresets
 
@@ -230,6 +235,8 @@ void OptionsScreenVideo::loadedFromFile()
 void OptionsScreenVideo::init()
 {
     Screen::init();
+    OptionsCommon::setTabStatus();
+
     m_prev_adv_pipline = UserConfigParams::m_dynamic_lights;
     m_prev_img_quality = getImageQuality();
     RibbonWidget* ribbon = getWidget<RibbonWidget>("options_choice");
@@ -247,7 +254,11 @@ void OptionsScreenVideo::init()
     vsync->clearLabels();
     //I18N: In the video options
     vsync->addLabel(_("Vertical Sync"));
+#ifdef MOBILE_STK
+    std::set<int> fps = { 30, 60, 120 };
+#else
     std::set<int> fps = { 30, 60, 120, 180, 250, 500, 1000 };
+#endif
     fps.insert(UserConfigParams::m_max_fps);
     for (auto& i : fps)
         vsync->addLabel(core::stringw(i));
@@ -290,6 +301,11 @@ void OptionsScreenVideo::init()
     scale_rtts->addLabel("90%");
     scale_rtts->addLabel("95%");
     scale_rtts->addLabel("100%");
+#ifndef MOBILE_STK
+    scale_rtts->addLabel("125%");
+    scale_rtts->addLabel("150%");
+    scale_rtts->addLabel("200%");
+#endif
 
     // --- set gfx settings values
     updateGfxSlider();
@@ -350,7 +366,8 @@ void OptionsScreenVideo::updateGfxSlider()
             m_presets[l].degraded_ibl == UserConfigParams::m_degraded_IBL &&
             m_presets[l].geometry_detail == (UserConfigParams::m_geometry_level == 0 ? 2 :
                                              UserConfigParams::m_geometry_level == 2 ? 0 :
-                                             UserConfigParams::m_geometry_level))
+                                             UserConfigParams::m_geometry_level) &&
+            UserConfigParams::m_pcss_threshold == 2048)
         {
             gfx->setValue(l + 1);
             found = true;
@@ -461,45 +478,43 @@ void OptionsScreenVideo::updateTooltip()
     const core::stringw very_high = _("Very High");
     //I18N: in the graphical options tooltip;
     const core::stringw ultra = _("Ultra");
-
+    
     //I18N: in graphical options
-    tooltip = _("Particles Effects: %s",
-        UserConfigParams::m_particles_effects == 2 ? enabled :
-        UserConfigParams::m_particles_effects == 1 ? important_only :
-        disabled);
-
-    //I18N: in graphical options
-    tooltip = tooltip + L"\n" + _("Animated Characters: %s",
-        UserConfigParams::m_animated_characters ? enabled : disabled);
-    //I18N: in graphical options
-    tooltip = tooltip + L"\n" + _("Dynamic lights: %s",
+    tooltip = _("Dynamic lights: %s",
         UserConfigParams::m_dynamic_lights ? enabled : disabled);
-    //I18N: in graphical options
-    tooltip = tooltip + L"\n" + _("Light scattering: %s",
-        UserConfigParams::m_light_scatter ? enabled : disabled);
-    //I18N: in graphical options
-    tooltip = tooltip + L"\n" + _("Anti-aliasing: %s",
-        UserConfigParams::m_mlaa ? enabled : disabled);
-    //I18N: in graphical options
-    tooltip = tooltip + L"\n" + _("Ambient occlusion: %s",
-        UserConfigParams::m_ssao ? enabled : disabled);
+
     //I18N: in graphical options
     if (UserConfigParams::m_shadows_resolution == 0)
         tooltip = tooltip + L"\n" + _("Shadows: %s", disabled);
     else
         tooltip = tooltip + L"\n" + _("Shadows: %i", UserConfigParams::m_shadows_resolution);
-
     //I18N: in graphical options
-    tooltip = tooltip + L"\n" + _("Bloom: %s",
-        UserConfigParams::m_bloom ? enabled : disabled);
-
+    tooltip = tooltip + L"\n" + _("Anti-aliasing: %s",
+        UserConfigParams::m_mlaa ? enabled : disabled);
+    //I18N: in graphical options
+    tooltip = tooltip + L"\n" + _("Light scattering: %s",
+        UserConfigParams::m_light_scatter ? enabled : disabled);
     //I18N: in graphical options
     tooltip = tooltip + L"\n" + _("Glow (outlines): %s",
         UserConfigParams::m_glow ? enabled : disabled);
-
     //I18N: in graphical options
     tooltip = tooltip + L"\n" + _("Light shaft (God rays): %s",
         UserConfigParams::m_light_shaft ? enabled : disabled);
+    //I18N: in graphical options
+    tooltip = tooltip + L"\n" + _("Bloom: %s",
+        UserConfigParams::m_bloom ? enabled : disabled);
+    //I18N: in graphical options
+    tooltip = tooltip + L"\n" + _("Ambient occlusion: %s",
+        UserConfigParams::m_ssao ? enabled : disabled);
+
+    //I18N: in graphical options
+    tooltip = tooltip + L"\n" + _("Animated Characters: %s",
+        UserConfigParams::m_animated_characters ? enabled : disabled);
+    //I18N: in graphical options
+    tooltip = tooltip + L"\n" + _("Particles Effects: %s",
+        UserConfigParams::m_particles_effects == 2 ? enabled :
+        UserConfigParams::m_particles_effects == 1 ? important_only :
+        disabled);
 
     //I18N: in graphical options
     int quality = getImageQuality();
@@ -599,6 +614,7 @@ void OptionsScreenVideo::eventCallback(Widget* widget, const std::string& name,
         UserConfigParams::m_geometry_level     = (m_presets[level].geometry_detail == 0 ? 2 :
                                                   m_presets[level].geometry_detail == 2 ? 0 :
                                                   m_presets[level].geometry_detail);
+        UserConfigParams::m_pcss_threshold     = 2048;
 
         updateGfxSlider();
     }

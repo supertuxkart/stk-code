@@ -795,6 +795,9 @@ std::string GEVulkanDrawCall::getShader(const irr::video::SMaterial& m)
     case irr::video::EMT_SOLID_2_LAYER:
         shader = "decal";
         break;
+    case irr::video::EMT_NORMAL_MAP_SOLID:
+        shader = getGEConfig()->m_pbr ? "normalmap" : "solid";
+        break;
     case irr::video::EMT_STK_GRASS:
         shader = "grass";
         break;
@@ -832,6 +835,10 @@ void GEVulkanDrawCall::createAllPipelines(GEVulkanDriver* vk)
     settings.m_skinning_vertex_shader = "spm_skinning.vert";
     settings.m_fragment_shader = "solid.frag";
     settings.m_shader_name = "solid";
+    createPipeline(vk, settings);
+
+    settings.m_fragment_shader = "normalmap.frag";
+    settings.m_shader_name = "normalmap";
     createPipeline(vk, settings);
 
     settings.m_fragment_shader = "decal.frag";
@@ -1109,7 +1116,8 @@ void GEVulkanDrawCall::createVulkanData()
     camera_layout_binding.descriptorType =
         VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER_DYNAMIC;
     camera_layout_binding.pImmutableSamplers = NULL;
-    camera_layout_binding.stageFlags = VK_SHADER_STAGE_VERTEX_BIT;
+    camera_layout_binding.stageFlags = VK_SHADER_STAGE_VERTEX_BIT
+                                     | VK_SHADER_STAGE_FRAGMENT_BIT;
 
     VkDescriptorSetLayoutBinding object_data_layout_binding = {};
     object_data_layout_binding.binding = 1;

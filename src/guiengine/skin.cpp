@@ -1424,10 +1424,11 @@ void Skin::drawRibbonChild(const core::recti &rect, Widget* widget,
         }
 
         const bool mark_focused =
-            focused || (parent_focused && parentRibbonWidget != NULL &&
+            (focused || (parent_focused && parentRibbonWidget != NULL &&
                           parentRibbonWidget->m_mouse_focus == widget) ||
                        (mark_selected && !always_show_selection &&
-                          parent_focused);
+                          parent_focused)) &&
+                        widget->m_properties[PROP_FOCUS_ICON].size() == 0;
 
         /* draw "selection bubble" if relevant */
         if (always_show_selection && mark_selected)
@@ -1839,7 +1840,16 @@ void Skin::drawSpinnerChild(const core::recti &rect, Widget* widget,
         return;
 
     SpinnerWidget* spinner = dynamic_cast<SpinnerWidget*>(widget->m_event_handler);
-    bool spinner_focused = spinner->isFocusedForPlayer(PLAYER_ID_GAME_MASTER);
+    
+    bool spinner_focused = false;
+    for (unsigned i = 1; i < MAX_PLAYER_COUNT + 1; i++)
+    {
+        if (spinner->isFocusedForPlayer(i - 1))
+        {
+            spinner_focused = true;
+            break;
+        }
+    }
 
     if (pressed || (spinner->isButtonSelected(right) && spinner_focused))
     {

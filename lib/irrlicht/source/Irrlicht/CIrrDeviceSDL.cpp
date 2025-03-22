@@ -396,8 +396,8 @@ extern "C" void update_fullscreen_desktop(int val)
 // Used in OptionsScreenVideo for live updating vertical sync config
 extern "C" void update_swap_interval(int swap_interval)
 {
-#ifndef IOS_STK
-	// iOS always use vertical sync
+#ifndef MOBILE_STK
+	// Mobile always use vertical sync
 	if (swap_interval > 1)
 		swap_interval = 1;
 

@@ -159,10 +159,6 @@ public:
     float getTimeTarget() const { return m_time_target; }
 
     // ------------------------------------------------------------------------
-    /** Returns total laps in GP */
-    int getPlayerTotalLaps() const { return m_player_total_laps; }
-
-    // ------------------------------------------------------------------------
     /** Sets the index of the last track finished. */
     void setNextTrack(int next_track) { m_next_track = next_track; }
 
