@@ -170,7 +170,7 @@ public:
 };
 
 // ============================================================================
-class IBLShader : public TextureShader<IBLShader, 6>
+class IBLShader : public TextureShader<IBLShader, 7>
 {
 public:
     IBLShader()
@@ -180,10 +180,11 @@ public:
         assignUniforms();
         assignSamplerNames(0, "ntex",  ST_NEAREST_FILTERED,
                            1, "dtex",  ST_NEAREST_FILTERED,
-                           2, "probe", ST_TRILINEAR_CUBEMAP,
-                           3, "albedo",ST_NEAREST_FILTERED,
-                           4, "ssao",  ST_NEAREST_FILTERED,
-                           5, "ctex",  ST_NEAREST_FILTERED);
+                           2, "stex",  ST_SHADOW_SAMPLER,
+                           3, "probe", ST_TRILINEAR_CUBEMAP,
+                           4, "albedo",ST_NEAREST_FILTERED,
+                           5, "ssao",  ST_NEAREST_FILTERED,
+                           6, "ctex",  ST_NEAREST_FILTERED);
     }   // IBLShader
 };   // IBLShader
 
@@ -217,7 +218,7 @@ public:
         // Use 8 to circumvent a catalyst bug when binding sampler
         assignSamplerNames(0, "ntex", ST_NEAREST_FILTERED,
                            1, "dtex", ST_NEAREST_FILTERED,
-                           8, "shadowtex", ST_SHADOW_SAMPLER);
+                           8, "shadowtex", ST_SHADOW_SAMPLER_ARRAY2D);
         assignUniforms("split0", "split1", "split2", "splitmax", "shadow_res",
             "overlap_proportion", "texel0", "texel1", "texel2", "texel3", 
             "sundirection", "sun_color");
@@ -268,7 +269,7 @@ public:
         assignSamplerNames(0, "ntex", ST_NEAREST_FILTERED,
                            1, "dtex", ST_NEAREST_FILTERED,
                            8, "shadowtexdepth", ST_NEAREST_FILTERED_ARRAY2D,
-                           16, "shadowtex", ST_SHADOW_SAMPLER);
+                           16, "shadowtex", ST_SHADOW_SAMPLER_ARRAY2D);
         assignUniforms("split0", "split1", "split2", "splitmax", "shadow_res",
             "overlap_proportion", "penumbra0", "penumbra1", "penumbra2", "penumbra3",
             "sundirection", "sun_color");
@@ -388,6 +389,7 @@ void LightingPasses::renderEnvMap(GLuint normal_depth_texture,
 
         IBLShader::getInstance()->setTextureUnits(
             normal_depth_texture,
+            depth_stencil_texture,
             depth_stencil_texture,
             specular_probe,
             albedo_buffer,

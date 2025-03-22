@@ -113,12 +113,9 @@ void main()
     vec3 world_normal = rotateVector(i_rotation, skinned_normal.xyz);
     vec3 world_tangent = rotateVector(i_rotation, skinned_tangent.xyz);
 
-    tangent = (u_view_matrix * vec4(world_tangent, 0.0)).xyz;
-    bitangent = (u_view_matrix *
-       // bitangent sign
-      vec4(cross(world_normal, world_tangent) * i_tangent.w, 0.0)
-      ).xyz;
-    normal = (u_view_matrix * vec4(world_normal, 0.0)).xyz;
+    tangent = world_tangent;
+    bitangent = cross(world_normal, world_tangent) * i_tangent.w;
+    normal = world_normal;
 
     uv = vec2(i_uv.x + (i_texture_trans.x * i_normal.w),
         i_uv.y + (i_texture_trans.y * i_normal.w));
