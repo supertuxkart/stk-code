@@ -52,7 +52,6 @@ class KartSelectionScreen : public GUIEngine::Screen,
                             public GUIEngine::ITextBoxWidgetListener
 {
     friend class KartHoverListener;
-    friend class PlayerNameSpinner;
     friend class FocusDispatcher;
 protected:
     /** Contains the custom widget shown for every player. (ref only since

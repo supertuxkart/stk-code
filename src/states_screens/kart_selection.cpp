@@ -29,7 +29,6 @@
 #include "guiengine/widgets/check_box_widget.hpp"
 #include "guiengine/widgets/kart_stats_widget.hpp"
 #include "guiengine/widgets/model_view_widget.hpp"
-#include "guiengine/widgets/player_name_spinner.hpp"
 #include "input/input_device.hpp"
 #include "input/input_manager.hpp"
 #include "input/device_manager.hpp"
@@ -1246,6 +1245,7 @@ void KartSelectionScreen::onFocusChanged(GUIEngine::Widget* previous,
     {
         return;
     }
+    // Manually skip kart class spinner
     GUIEngine::SpinnerWidget* kart_class = getWidget<GUIEngine::SpinnerWidget>("kart_class");
     DynamicRibbonWidget* w = getWidget<DynamicRibbonWidget>("karts");
 
