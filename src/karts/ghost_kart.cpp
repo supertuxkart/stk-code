@@ -256,21 +256,6 @@ void GhostKart::updateSound(float dt)
 
     updateEngineSFX(dt);
 
-    if (m_skid_sound)
-    {
-        if(m_all_replay_events[idx].m_skidding_effect)
-        {
-            if (m_skid_sound->getStatus()!=SFXBase::SFX_PLAYING)
-            {
-                m_skid_sound->play(getSmoothedXYZ());
-            }
-        }
-        else if(m_skid_sound->getStatus()==SFXBase::SFX_PLAYING)
-        {
-            m_skid_sound->stop();
-        }
-    }
-
     if (m_nitro_sound)
     {
         if(m_all_replay_events[idx].m_nitro_usage)
