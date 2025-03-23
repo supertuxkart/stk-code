@@ -27,21 +27,23 @@ void main()
 {
     vec2 texc = gl_FragCoord.xy / u_screen;
     float z = texture(dtex, texc).x;
-    vec3 norm = DecodeNormal(texture(ntex, texc).xy);
+    vec3 norm = (u_view_matrix * vec4(DecodeNormal(texture(ntex, texc).xy), 0)).xyz;
     float roughness = texture(ntex, texc).z;
 
     vec4 xpos = getPosFromUVDepth(vec3(texc, z), u_inverse_projection_matrix);
-    vec3 worldpos = (u_inverse_view_matrix * vec4(xpos.xyz, 1.0)).xyz;
-    vec3 eyedir = -normalize(worldpos);
+    vec3 eyedir = -normalize(xpos.xyz);
 
+    vec4 pseudocenter = u_view_matrix * vec4(center.xyz, 1.0);
+    pseudocenter /= pseudocenter.w;
+    vec3 light_pos = pseudocenter.xyz;
     vec3 light_col = col.xyz;
-    float d = distance(center, worldpos);
+    float d = distance(light_pos, xpos.xyz);
     float att = energy * 20. / (1. + d * d);
     att *= (radius - d) / radius;
     if (att <= 0.) discard;
 
     // Light Direction
-    vec3 L = (center - worldpos) / d;
+    vec3 L = (light_pos - xpos.xyz) / d;
 
     float NdotL = clamp(dot(norm, L), 0., 1.);
     vec3 Specular = SpecularBRDF(norm, eyedir, L, vec3(1.), roughness);

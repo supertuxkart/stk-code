@@ -44,11 +44,13 @@ vec2 RayCast(vec3 dir, vec3 hitCoord)
     hitCoord += dir;
 
     vec3 projectedCoord = CalcCoordFromPosition(hitCoord);
+    float factor = 1.0;
 
     for (int i = 0; i < 32; i++)
     {
         float direction = texture(stex, projectedCoord);
-        dir = dir * (0.5 + 0.5 * direction);
+        factor *= direction;
+        dir = dir * (0.5 + 0.5 * factor);
         hitCoord += dir * (2. * direction - 1.);
         projectedCoord = CalcCoordFromPosition(hitCoord);
     }
@@ -118,18 +120,14 @@ void main(void)
             // Disable raycasts onto another reflective surface
             float mirror = texture(ntex, coords).z;
             
-            if (mirror > 0.75) {
-                outColor = fallback;
-            } else {
-                outColor = textureLod(albedo, coords, 0.f).rgb;
-                outColor = mix(fallback, outColor, GetEdgeFade(coords));
-                outColor = mix(fallback, outColor, 1. - max(cosine * 5., 0.));
-                outColor = mix(fallback, outColor, 3. - max(mirror * 4., 2.));
-                // TODO temporary measure the lack of mipmapping for RTT albedo
-                // Implement it in proper way
-                // Use (specval - 0.5) * 2.0 to bring specval from 0.5-1.0 range to 0.0-1.0 range
-                outColor = mix(fallback, outColor, (specval - 0.5) * 2.0);
-            }
+            outColor = textureLod(albedo, coords, 0.f).rgb;
+            outColor = mix(fallback, outColor, GetEdgeFade(coords));
+            outColor = mix(fallback, outColor, 1. - max(cosine * 5., 0.));
+            outColor = mix(fallback, outColor, 4. - max(mirror * 4., 3.));
+            // TODO temporary measure the lack of mipmapping for RTT albedo
+            // Implement it in proper way
+            // Use (specval - 0.5) * 2.0 to bring specval from 0.5-1.0 range to 0.0-1.0 range
+            outColor = mix(fallback, outColor, (specval - 0.5) * 2.0);
         }
     }
 
