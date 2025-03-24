@@ -1848,7 +1848,7 @@ void IrrDriver::setAmbientLight(const video::SColorf &light, bool force_SH_compu
 {
 #ifndef SERVER_ONLY
     video::SColorf color = light;
-    if (CVS->isGLSL())
+    if (m_video_driver->getDriverType() != EDT_VULKAN)
     {
         color.r = powf(color.r, 1.0f / 2.2f);
         color.g = powf(color.g, 1.0f / 2.2f);
