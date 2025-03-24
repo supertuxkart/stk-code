@@ -23,6 +23,7 @@
 #include "utils/string_utils.hpp"
 
 #ifdef ANDROID
+#include "SDL_cpuinfo.h"
 #include "SDL_stdinc.h"
 #include "SDL_system.h"
 #include <jni.h>
@@ -200,14 +201,21 @@ void override_default_params_for_mobile()
         break;
     }
     
-    // Update rtts scale based on display DPI
-    if (ddpi < 1)
+    int total_memory = ceilf((float)(SDL_GetSystemRAM()) / 1024);
+    
+    if ((total_memory >= 8) && (SDL_GetAndroidSDKVersion() >= 31))
+    {
+        // Use 100% scale on devices with 8GB RAM and Android >= 12
+        UserConfigParams::m_scale_rtts_factor = 1.0f;
+    }    
+    else if (ddpi < 1)
     {
         Log::warn("MainAndroid", "Failed to get display DPI.");
         UserConfigParams::m_scale_rtts_factor = 0.7f;
     }
     else
     {
+        // Update rtts scale based on display DPI
         if (ddpi > 400)
             UserConfigParams::m_scale_rtts_factor = 0.6f;
         else if (ddpi > 300)
@@ -220,9 +228,10 @@ void override_default_params_for_mobile()
             UserConfigParams::m_scale_rtts_factor = 0.8f;
 
         Log::info("MainAndroid", "Display DPI: %i", ddpi);
-        Log::info("MainAndroid", "Render scale: %f", 
-                  (float)UserConfigParams::m_scale_rtts_factor);
     }
+
+    Log::info("MainAndroid", "Render scale: %f", 
+              (float)UserConfigParams::m_scale_rtts_factor);
 #endif
 
     // Enable screen keyboard
