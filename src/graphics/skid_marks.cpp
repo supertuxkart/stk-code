@@ -37,7 +37,7 @@
 #include "mini_glm.hpp"
 
 #ifndef SERVER_ONLY
-
+#include <ge_main.hpp>
 #include <ge_vulkan_dynamic_spm_buffer.hpp>
 #include <IMeshSceneNode.h>
 #include <IVideoDriver.h>
@@ -276,9 +276,9 @@ SkidMarks::SkidMarkQuads::SkidMarkQuads(const Vec3 &left,
 
     if (CVS->isDeferredEnabled())
     {
-        m_start_color.setRed(SP::srgb255ToLinear(m_start_color.getRed()));
-        m_start_color.setGreen(SP::srgb255ToLinear(m_start_color.getGreen()));
-        m_start_color.setBlue(SP::srgb255ToLinear(m_start_color.getBlue()));
+        m_start_color.setRed(GE::srgb255ToLinear(m_start_color.getRed()));
+        m_start_color.setGreen(GE::srgb255ToLinear(m_start_color.getGreen()));
+        m_start_color.setBlue(GE::srgb255ToLinear(m_start_color.getBlue()));
     }
 
     add(left, right, normal, 0.0f);

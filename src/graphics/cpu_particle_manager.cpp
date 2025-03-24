@@ -17,7 +17,6 @@
 
 
 #include "graphics/cpu_particle_manager.hpp"
-#include "graphics/sp/sp_base.hpp"
 #include "graphics/stk_particle.hpp"
 #include "graphics/irr_driver.hpp"
 #include "graphics/material.hpp"
@@ -27,6 +26,7 @@
 #include <algorithm>
 
 #ifndef SERVER_ONLY
+#include <ge_main.hpp>
 #include <ICameraSceneNode.h>
 #include <ISceneManager.h>
 #include <ITexture.h>
@@ -120,7 +120,7 @@ CPUParticle::CPUParticle(const core::vector3df& position,
     int b = core::clamp((int)(ret.Z * 255.0f), 0, 255);
     if (CVS->isDeferredEnabled() && CVS->isGLSL())
     {
-        using namespace SP;
+        using namespace GE;
         r = srgb255ToLinear(r);
         g = srgb255ToLinear(g);
         b = srgb255ToLinear(b);
@@ -146,7 +146,7 @@ CPUParticle::CPUParticle(scene::IBillboardSceneNode* node)
     node->getColor(m_color_lifetime, unused_bottom);
     if (CVS->isDeferredEnabled() && CVS->isGLSL())
     {
-        using namespace SP;
+        using namespace GE;
         m_color_lifetime.setRed(srgb255ToLinear(m_color_lifetime.getRed()));
         m_color_lifetime.setGreen(srgb255ToLinear(m_color_lifetime.getGreen()));
         m_color_lifetime.setBlue(srgb255ToLinear(m_color_lifetime.getBlue()));

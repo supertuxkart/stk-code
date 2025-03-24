@@ -35,6 +35,7 @@
 #include <IWriteFile.h>
 
 #if !defined(SERVER_ONLY)
+#include <ge_main.hpp>
 #include <squish.h>
 static_assert(squish::kColourClusterFit == (1 << 5), "Wrong header");
 static_assert(squish::kColourRangeFit == (1 << 6), "Wrong header");
@@ -221,9 +222,9 @@ std::shared_ptr<video::IImage> SPTexture::getTextureImage() const
 
         if (m_undo_srgb && (!use_tex_compress || force_undo_srgb))
         {
-            data[i * 4] = srgb255ToLinear(data[i * 4]);
-            data[i * 4 + 1] = srgb255ToLinear(data[i * 4 + 1]);
-            data[i * 4 + 2] = srgb255ToLinear(data[i * 4 + 2]);
+            data[i * 4] = GE::srgb255ToLinear(data[i * 4]);
+            data[i * 4 + 1] = GE::srgb255ToLinear(data[i * 4 + 1]);
+            data[i * 4 + 2] = GE::srgb255ToLinear(data[i * 4 + 2]);
         }
     }
 #endif

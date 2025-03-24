@@ -31,7 +31,6 @@
 #include "graphics/central_settings.hpp"
 #include "graphics/irr_driver.hpp"
 #include "graphics/particle_kind_manager.hpp"
-#include "graphics/sp/sp_base.hpp"
 #include "graphics/stk_tex_manager.hpp"
 #include "io/file_manager.hpp"
 #include "io/xml_node.hpp"
@@ -413,9 +412,9 @@ video::ITexture* Material::getTexture(bool srgb, bool premul_alpha)
             for (unsigned int i = 0; i < img->getDimension().Width *
                 img->getDimension().Height; i++)
             {
-                data[i * 4] = SP::srgb255ToLinear(data[i * 4]);
-                data[i * 4 + 1] = SP::srgb255ToLinear(data[i * 4 + 1]);
-                data[i * 4 + 2] = SP::srgb255ToLinear(data[i * 4 + 2]);
+                data[i * 4] = GE::srgb255ToLinear(data[i * 4]);
+                data[i * 4 + 1] = GE::srgb255ToLinear(data[i * 4 + 1]);
+                data[i * 4 + 2] = GE::srgb255ToLinear(data[i * 4 + 2]);
             }
             img->unlock();
         };
