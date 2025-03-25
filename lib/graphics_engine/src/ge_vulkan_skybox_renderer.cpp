@@ -270,30 +270,23 @@ void GEVulkanSkyBoxRenderer::addSkyBox(GEVulkanCameraSceneNode* cam,
             auto sample = [](const GEImageLevel& level, vector2df uv) -> SColorf
             {
                 uv = vector2df(
-                    clamp<float>(uv.X * level.m_dim.Width, 0.5f, -0.5f + level.m_dim.Width),
-                    clamp<float>(uv.Y * level.m_dim.Height, 0.5f, -0.5f + level.m_dim.Height));
+                    clamp<float>(uv.X * (level.m_dim.Width - 2.0f) + 1.0f, 1.0f, -1.0f + level.m_dim.Width),
+                    clamp<float>(uv.Y * (level.m_dim.Height - 2.0f) + 1.0f, 1.0f, -1.0f + level.m_dim.Height));
+
                 vector2di point = vector2di(uv.X - 0.5f, uv.Y - 0.5f);
                 vector2df lerp = vector2df(uv.X - (0.5f + point.X), uv.Y - (0.5f + point.Y));
+                
                 SColorf texel0 = 
-                    SColorf(((uint32_t*)level.m_data)[point.Y * level.m_dim.Width + point.X]);
-                if (lerp.Y != 0.)
-                {
-                    SColorf texel1 = 
-                        SColorf(((uint32_t*)level.m_data)[(point.Y + 1) * level.m_dim.Width + point.X]);
-                    texel0 = texel0.getInterpolated(texel1, lerp.Y);
-                }
-                if (lerp.X != 0.)
-                {
-                    SColorf texel2 = 
-                        SColorf(((uint32_t*)level.m_data)[point.Y * level.m_dim.Width + (point.X + 1)]);
-                    if (lerp.Y != 0.)
-                    {
-                        SColorf texel3 = 
-                            SColorf(((uint32_t*)level.m_data)[(point.Y + 1) * level.m_dim.Width + (point.X + 1)]);
-                        texel2 = texel2.getInterpolated(texel3, lerp.Y);
-                    }
-                    texel0 = texel0.getInterpolated(texel2, lerp.X);
-                }
+                    (((SColorf*)level.m_data)[point.Y * level.m_dim.Width + point.X]);
+                SColorf texel1 = 
+                    (((SColorf*)level.m_data)[(point.Y + 1) * level.m_dim.Width + point.X]);
+                texel0 = texel1.getInterpolated(texel0, lerp.Y);
+                SColorf texel2 = 
+                    (((SColorf*)level.m_data)[point.Y * level.m_dim.Width + (point.X + 1)]);
+                SColorf texel3 = 
+                    (((SColorf*)level.m_data)[(point.Y + 1) * level.m_dim.Width + (point.X + 1)]);
+                texel2 = texel3.getInterpolated(texel2, lerp.Y);
+                texel0 = texel2.getInterpolated(texel0, lerp.X);
                 return texel0;
             };
             lod = std::min(lod, float(mipmap.size() - 1));
@@ -313,7 +306,7 @@ void GEVulkanSkyBoxRenderer::addSkyBox(GEVulkanCameraSceneNode* cam,
         else if (ay > ax && ay > az)
         {
             return dir.Y > 0.0 ? sample_lod(cubemap[2], vector2df(dir.X / ay * 0.5 + 0.5, dir.Z / ay * 0.5 + 0.5), lod)
-                               : SColorf();
+                               : sample_lod(cubemap[3], vector2df(-dir.X / ay * 0.5 + 0.5, dir.Z / ay * 0.5 + 0.5), lod);
         }
         else
         {
@@ -321,7 +314,15 @@ void GEVulkanSkyBoxRenderer::addSkyBox(GEVulkanCameraSceneNode* cam,
                                : sample_lod(cubemap[5], vector2df(-dir.X / az * 0.5 + 0.5, -dir.Y / az * 0.5 + 0.5), lod);
         }
     };
-    auto diffuse_presample = [hammersly2d, texture_lod]
+    auto mipmap_preprocess = [](const std::vector<std::vector<GEImageLevel> > &src) -> std::vector<std::vector<GEImageLevel> > 
+    {
+        std::vector<std::vector<GEImageLevel> > src2;
+        src2.resize(6);
+
+        
+        return src2;
+    };
+    auto diffuse_presample = [hammersly2d, texture_lod, mipmap_preprocess]
                             (const std::vector<GEImageLevel> &dst, 
                              const std::vector<std::vector<GEImageLevel> > &src,
                              int tex_index)
@@ -332,41 +333,98 @@ void GEVulkanSkyBoxRenderer::addSkyBox(GEVulkanCameraSceneNode* cam,
             if (src[tex_index][i].m_dim.Width > dst[0].m_dim.Width) lodbias += 1.0;
             else break;
         }
+        std::vector<std::vector<GEImageLevel> > src2;
+        std::vector<std::vector<std::vector<SColorf> > > buff; 
+        auto fill_buf = [](GEImageLevel dst, int x1, int y1, GEImageLevel src, int x2, int y2)
+        {
+            int ind1 = dst.m_dim.Width * y1 + x1;
+            int ind2 = src.m_dim.Width * y2 + x2;
+            SColorf *conv = (SColorf*) dst.m_data;
+            uint32_t color = ((uint32_t*) src.m_data)[ind2];
+            conv[ind1] = SColorf(color);
+            conv[ind1].b = powf(conv[ind1].b, 2.2f);
+            conv[ind1].g = powf(conv[ind1].g, 2.2f);
+            conv[ind1].r = powf(conv[ind1].r, 2.2f);
+            conv[ind1].a = powf(conv[ind1].a, 2.2f);
+        };
+        auto fill_corner = [](GEImageLevel dst, int xt, int yt, int x1, int y1, int x2, int y2, int x3, int y3)
+        {
+            int ind1 = dst.m_dim.Width * y1 + x1;
+            int ind2 = dst.m_dim.Width * y2 + x2;
+            int ind3 = dst.m_dim.Width * y3 + x3;
+            int indt = dst.m_dim.Width * yt + xt;
+            SColorf *conv = (SColorf*) dst.m_data;
+            conv[indt] = conv[ind1].getInterpolated(conv[ind2].getInterpolated(conv[ind2], 0.5f), 1.f / 3.f);
+        };
+        
+        src2.resize(6);
+        buff.resize(6);
+        
+        for (int i = 0; i < 6; i++)
+        {
+            src2[i].resize(src[i].size());
+            buff[i].resize(src[i].size());
+            for (int j = 0; j < src[i].size(); j++)
+            {
+                src2[i][j].m_dim.Width = src[i][j].m_dim.Width + 2;
+                src2[i][j].m_dim.Height = src[i][j].m_dim.Height + 2;
+                src2[i][j].m_size = src2[i][j].m_dim.Width * src2[i][j].m_dim.Height;
 
-        const int sample_count = 128;
+                buff[i][j].resize(src2[i][j].m_size);
+                src2[i][j].m_data = buff[i][j].data();
+
+                for (int u = 0; u < src[i][j].m_dim.Width; u++)
+                for (int v = 0; v < src[i][j].m_dim.Height; v++)
+                {
+                    fill_buf(src2[i][j], u + 1, v + 1, src[i][j], u, v);
+                }
+            }
+        }
+        const int horizon[4] = { 0, 5, 1, 4 };
+        for (int h = 0; h < 4; h++)
+        {
+            int i = horizon[h];
+            int r = horizon[(h + 1) % 4];
+            for (int j = 0; j < src2[i].size(); j++)
+            {
+                for (int k = 0; k < src[i][j].m_dim.Height; k++)
+                {
+                    fill_buf(src2[r][j], 0, k + 1, src[i][j], src[i][j].m_dim.Width - 1, k);
+                    fill_buf(src2[i][j], src2[i][j].m_dim.Width - 1, k + 1, src[r][j], 0, k);
+                }
+                for (int k = 0; k < src[i][j].m_dim.Width; k++)
+                {
+                    int x1[4] = { (int) src[2][j].m_dim.Width - 1, (int) src[2][j].m_dim.Width - k - 1, 0, k };
+                    int y1[4] = { (int) src[2][j].m_dim.Height - k - 1, 0, k, (int) src[2][j].m_dim.Height - 1 };
+                    int x2[4] = { (int) src2[2][j].m_dim.Width - 1, (int) src2[2][j].m_dim.Width - k - 2, 0, k + 1 };
+                    int y2[4] = { (int) src2[2][j].m_dim.Height - k - 2, 0,  k + 1, (int) src2[2][j].m_dim.Height - 1 };
+                    
+                    int l = (h + 2) % 4;
+                    fill_buf(src2[i][j], k + 1, src[i][j].m_dim.Height - 1, src[3][j], x1[l], y1[h]);
+                    fill_buf(src2[i][j], k + 1, 0,                          src[2][j], x1[h], y1[h]);
+                    fill_buf(src2[3][j], x2[l], y2[h], src[i][j], k, src[i][j].m_dim.Height - 1);
+                    fill_buf(src2[2][j], x2[h], y2[h], src[i][j], k, 0);
+                }
+            }
+        }
+        for (int i = 0; i < 6; i++)
+        {
+            for (int j = 0; j < src2[i].size(); j++)
+            {
+                int w = src2[i][j].m_dim.Width;
+                int h = src2[i][j].m_dim.Height;
+                fill_corner(src2[i][j], 0, 0, 0, 1, 1, 0, 1, 1);
+                fill_corner(src2[i][j], 0, h - 1, 0, h - 2, 1, h - 1, 1, h - 2);
+                fill_corner(src2[i][j], w - 1, 0, w - 1, 1, w - 2, 0, w - 2, 1);
+                fill_corner(src2[i][j], w - 1, h - 1, w - 1, h - 2, w - 2, h - 1, w - 2, h - 2);
+            }
+        }
+        const int sample_count = 1024;
 
         for (int level = 0; level < dst.size(); level++)
-        for (int u = 0; u < dst[level].m_dim.Width; u++)
-        for (int v = 0; v < dst[level].m_dim.Height; v++)
         {
-            vector2df uv = vector2df(
-                (0.5f + u) / dst[level].m_dim.Width  * 2.0f - 1.0f,
-                (0.5f + v) / dst[level].m_dim.Height * 2.0f - 1.0f);
-            vector3df scan = vector3df();
-            switch(tex_index)
-            {
-                case 0: scan = vector3df( 1.f,  uv.Y, -uv.X); break;
-                case 1: scan = vector3df(-1.f,  uv.Y,  uv.X); break;
-                case 2: scan = vector3df( uv.X, -1.f,  uv.Y); break;
-                case 3: scan = vector3df( uv.X,  1.f, -uv.Y); break;
-                case 4: scan = vector3df( uv.X, uv.Y,  1.f ); break;
-                case 5: scan = vector3df(-uv.X, uv.Y, -1.f ); break;
-            }
-            vector3df dir = scan.normalize(); // Normal
-            dir.Y = -dir.Y;
-            vector3df bitangent = vector3df(0.0, 1.0, 0.0);
-            float ndotup = dir.dotProduct(vector3df(0.0, 1.0, 0.0));
-            if (1.0 - abs(ndotup) < 0.00001)
-            {
-                bitangent = ndotup > 0.0 ? vector3df(0.0, 0.0, 1.0)
-                                         : vector3df(0.0, 0.0, -1.0);
-            }
-            vector3df tangent = bitangent.crossProduct(dir).normalize();
-            bitangent         = dir.crossProduct(tangent);
-
-            SColorf color = SColorf();
-            float weight = 0.;
-        
+            std::array<vector3df, sample_count> local_space_dirs;
+            std::array<float, sample_count> lods;
             for (int i = 0; i < sample_count; i++)
             {
                 // Lambertian
@@ -375,46 +433,76 @@ void GEVulkanSkyBoxRenderer::addSkyBox(GEVulkanCameraSceneNode* cam,
                 float sin_theta = sqrtf(xi.Y);
                 float phi = 2.0 * PI * xi.X;
                 float pdf = cos_theta / PI;
-                vector3df local_space_dir = vector3df(
+                local_space_dirs[i] = vector3df(
                     sin_theta * cosf(phi),
                     sin_theta * sinf(phi),
                     cos_theta).normalize();
-                // TBN * local_space_dir
-                vector3df world_dir = vector3df(
-                    tangent.X * local_space_dir.X + 
-                    bitangent.X * local_space_dir.Y + 
-                    dir.X * local_space_dir.Z,
-
-                    tangent.Y * local_space_dir.X + 
-                    bitangent.Y * local_space_dir.Y + 
-                    dir.Y * local_space_dir.Z,
-
-                    tangent.Z * local_space_dir.X + 
-                    bitangent.Z * local_space_dir.Y + 
-                    dir.Z * local_space_dir.Z
-                );
-                float lod = 0.5f * log2(6.0 * dst[level].m_dim.Width
-                                            * dst[level].m_dim.Height
-                                            / (sample_count * pdf)) + lodbias;
-                SColorf samp = texture_lod(src, world_dir, lod);
-                color.a += samp.a * irr::core::clamp(world_dir.Y * 2.f + 0.2f, 0.f, 1.f);
-                color.r += samp.r * irr::core::clamp(world_dir.Y * 2.f + 0.2f, 0.f, 1.f);
-                color.g += samp.g * irr::core::clamp(world_dir.Y * 2.f + 0.2f, 0.f, 1.f);
-                color.b += samp.b * irr::core::clamp(world_dir.Y * 2.f + 0.2f, 0.f, 1.f);
-                weight += 1.0f;
+                lods[i] = 0.5f * log2(6.0 * dst[level].m_dim.Width
+                                          * dst[level].m_dim.Height
+                                          / (sample_count * pdf)) + lodbias;
             }
-            color.a /= weight;
-            color.r /= weight;
-            color.g /= weight;
-            color.b /= weight;
-            ((uint32_t*)dst[level].m_data)[v * dst[level].m_dim.Width + u]
-                = ((uint32_t)(color.b * 256.))
-                + ((uint32_t)(color.g * 256.) << 8)
-                + ((uint32_t)(color.r * 256.) << 16)
-                + ((uint32_t)(color.a * 256.) << 24);
+            for (int i = 0; i < dst[level].m_dim.Width * dst[level].m_dim.Height; i++)
+            {
+                vector2df uv = vector2df(
+                    (0.5f + i % dst[level].m_dim.Width) / dst[level].m_dim.Width  * 2.0f - 1.0f,
+                    (0.5f + i / dst[level].m_dim.Width) / dst[level].m_dim.Height * 2.0f - 1.0f);
+                vector3df scan = vector3df();
+                switch(tex_index)
+                {
+                    case 0: scan = vector3df( 1.f,  uv.Y, -uv.X); break;
+                    case 1: scan = vector3df(-1.f,  uv.Y,  uv.X); break;
+                    case 2: scan = vector3df( uv.X, -1.f,  uv.Y); break;
+                    case 3: scan = vector3df( uv.X,  1.f, -uv.Y); break;
+                    case 4: scan = vector3df( uv.X, uv.Y,  1.f ); break;
+                    case 5: scan = vector3df(-uv.X, uv.Y, -1.f ); break;
+                }
+                vector3df dir = scan.normalize(); // Normal
+                dir.Y = -dir.Y;
+                vector3df bitangent = vector3df(0.0, 1.0, 0.0);
+                float ndotup = dir.dotProduct(vector3df(0.0, 1.0, 0.0));
+                if (1.0 - abs(ndotup) < 0.00001)
+                {
+                    bitangent = ndotup > 0.0 ? vector3df(0.0, 0.0, 1.0)
+                                            : vector3df(0.0, 0.0, -1.0);
+                }
+                vector3df tangent = bitangent.crossProduct(dir).normalize();
+                bitangent         = dir.crossProduct(tangent);
+
+                SColorf color = SColorf();
+                float weight = 0.;
+            
+                for (int i = 0; i < sample_count; i++)
+                {
+                    // TBN * local_space_dir
+                    vector3df ldir = local_space_dirs[i];
+                    float lod = lods[i];
+
+                    vector3df world_dir = vector3df(
+                        tangent.X * ldir.X + bitangent.X * ldir.Y + dir.X * ldir.Z,
+                        tangent.Y * ldir.X + bitangent.Y * ldir.Y + dir.Y * ldir.Z,
+                        tangent.Z * ldir.X + bitangent.Z * ldir.Y + dir.Z * ldir.Z
+                    );
+
+                    SColorf samp = texture_lod(src2, world_dir, lod);
+                    color.a += samp.a * irr::core::clamp(world_dir.Y * 2.f + 0.2f, 0.f, 1.f);
+                    color.r += samp.r * irr::core::clamp(world_dir.Y * 2.f + 0.2f, 0.f, 1.f);
+                    color.g += samp.g * irr::core::clamp(world_dir.Y * 2.f + 0.2f, 0.f, 1.f);
+                    color.b += samp.b * irr::core::clamp(world_dir.Y * 2.f + 0.2f, 0.f, 1.f);
+                    weight += 1.0f;
+                }
+                color.a /= weight;
+                color.r /= weight;
+                color.g /= weight;
+                color.b /= weight;
+                ((uint32_t*)dst[level].m_data)[i]
+                    = ((uint32_t)(powf(color.b, 0.455f) * 255.))
+                    + ((uint32_t)(powf(color.g, 0.455f) * 255.) << 8)
+                    + ((uint32_t)(powf(color.r, 0.455f) * 255.) << 16)
+                    + ((uint32_t)(powf(color.a, 0.455f) * 255.) << 24);
+            }
         }
     };
-    auto specular_presample = [hammersly2d, texture_lod]
+    auto specular_presample = [hammersly2d, texture_lod, mipmap_preprocess]
                               (const std::vector<GEImageLevel> &dst, 
                                const std::vector<std::vector<GEImageLevel> > &src,
                                int tex_index)
@@ -426,57 +514,103 @@ void GEVulkanSkyBoxRenderer::addSkyBox(GEVulkanCameraSceneNode* cam,
             else break;
         }
 
+        std::vector<std::vector<GEImageLevel> > src2;
+        std::vector<std::vector<std::vector<SColorf> > > buff; 
+        auto fill_buf = [](GEImageLevel dst, int x1, int y1, GEImageLevel src, int x2, int y2)
+        {
+            int ind1 = dst.m_dim.Width * y1 + x1;
+            int ind2 = src.m_dim.Width * y2 + x2;
+            SColorf *conv = (SColorf*) dst.m_data;
+            uint32_t color = ((uint32_t*) src.m_data)[ind2];
+            conv[ind1] = SColorf(color);
+            conv[ind1].b = powf(conv[ind1].b, 2.2f);
+            conv[ind1].g = powf(conv[ind1].g, 2.2f);
+            conv[ind1].r = powf(conv[ind1].r, 2.2f);
+            conv[ind1].a = powf(conv[ind1].a, 2.2f);
+        };
+        auto fill_corner = [](GEImageLevel dst, int xt, int yt, int x1, int y1, int x2, int y2, int x3, int y3)
+        {
+            int ind1 = dst.m_dim.Width * y1 + x1;
+            int ind2 = dst.m_dim.Width * y2 + x2;
+            int ind3 = dst.m_dim.Width * y3 + x3;
+            int indt = dst.m_dim.Width * yt + xt;
+            SColorf *conv = (SColorf*) dst.m_data;
+            conv[indt] = conv[ind1].getInterpolated(conv[ind2].getInterpolated(conv[ind2], 0.5f), 1.f / 3.f);
+        };
+        
+        src2.resize(6);
+        buff.resize(6);
+        
+        for (int i = 0; i < 6; i++)
+        {
+            src2[i].resize(src[i].size());
+            buff[i].resize(src[i].size());
+            for (int j = 0; j < src[i].size(); j++)
+            {
+                src2[i][j].m_dim.Width = src[i][j].m_dim.Width + 2;
+                src2[i][j].m_dim.Height = src[i][j].m_dim.Height + 2;
+                src2[i][j].m_size = src2[i][j].m_dim.Width * src2[i][j].m_dim.Height;
+
+                buff[i][j].resize(src2[i][j].m_size);
+                src2[i][j].m_data = buff[i][j].data();
+
+                for (int u = 0; u < src[i][j].m_dim.Width; u++)
+                for (int v = 0; v < src[i][j].m_dim.Height; v++)
+                {
+                    fill_buf(src2[i][j], u + 1, v + 1, src[i][j], u, v);
+                }
+            }
+        }
+        const int horizon[4] = { 0, 5, 1, 4 };
+        for (int h = 0; h < 4; h++)
+        {
+            int i = horizon[h];
+            int r = horizon[(h + 1) % 4];
+            for (int j = 0; j < src2[i].size(); j++)
+            {
+                for (int k = 0; k < src[i][j].m_dim.Height; k++)
+                {
+                    fill_buf(src2[r][j], 0, k + 1, src[i][j], src[i][j].m_dim.Width - 1, k);
+                    fill_buf(src2[i][j], src2[i][j].m_dim.Width - 1, k + 1, src[r][j], 0, k);
+                }
+                for (int k = 0; k < src[i][j].m_dim.Width; k++)
+                {
+                    int x1[4] = { (int) src[2][j].m_dim.Width - 1, (int) src[2][j].m_dim.Width - k - 1, 0, k };
+                    int y1[4] = { (int) src[2][j].m_dim.Height - k - 1, 0, k, (int) src[2][j].m_dim.Height - 1 };
+                    int x2[4] = { (int) src2[2][j].m_dim.Width - 1, (int) src2[2][j].m_dim.Width - k - 2, 0, k + 1 };
+                    int y2[4] = { (int) src2[2][j].m_dim.Height - k - 2, 0,  k + 1, (int) src2[2][j].m_dim.Height - 1 };
+                    
+                    int l = (h + 2) % 4;
+                    fill_buf(src2[i][j], k + 1, src[i][j].m_dim.Height - 1, src[3][j], x1[l], y1[h]);
+                    fill_buf(src2[i][j], k + 1, 0,                          src[2][j], x1[h], y1[h]);
+                    fill_buf(src2[3][j], x2[l], y2[h], src[i][j], k, src[i][j].m_dim.Height - 1);
+                    fill_buf(src2[2][j], x2[h], y2[h], src[i][j], k, 0);
+                }
+            }
+        }
+        for (int i = 0; i < 6; i++)
+        {
+            for (int j = 0; j < src2[i].size(); j++)
+            {
+                int w = src2[i][j].m_dim.Width;
+                int h = src2[i][j].m_dim.Height;
+                fill_corner(src2[i][j], 0, 0, 0, 1, 1, 0, 1, 1);
+                fill_corner(src2[i][j], 0, h - 1, 0, h - 2, 1, h - 1, 1, h - 2);
+                fill_corner(src2[i][j], w - 1, 0, w - 1, 1, w - 2, 0, w - 2, 1);
+                fill_corner(src2[i][j], w - 1, h - 1, w - 1, h - 2, w - 2, h - 1, w - 2, h - 2);
+            }
+        }
+
         const int sample_count = 32;
 
         for (int level = 0; level < dst.size(); level++)
-        for (int u = 0; u < dst[level].m_dim.Width; u++)
-        for (int v = 0; v < dst[level].m_dim.Height; v++)
         {
-            vector2df uv = vector2df(
-                (0.5f + u) / dst[level].m_dim.Width  * 2.0f - 1.0f,
-                (0.5f + v) / dst[level].m_dim.Height * 2.0f - 1.0f);
-            vector3df scan = vector3df();
-            switch(tex_index)
-            {
-                case 0: scan = vector3df( 1.f,  uv.Y, -uv.X); break;
-                case 1: scan = vector3df(-1.f,  uv.Y,  uv.X); break;
-                case 2: scan = vector3df( uv.X, -1.f,  uv.Y); break;
-                case 3: scan = vector3df( uv.X,  1.f, -uv.Y); break;
-                case 4: scan = vector3df( uv.X, uv.Y,  1.f); break;
-                case 5: scan = vector3df(-uv.X, uv.Y, -1.f); break;
-            }
-            vector3df dir = scan.normalize(); // Normal
-            dir.Y = -dir.Y;
-
-            if (level == 0)
-            {
-                SColorf color = texture_lod(src, dir, lodbias);
-
-                ((uint32_t*)dst[level].m_data)[v * dst[level].m_dim.Width + u]
-                    = ((uint32_t)(color.b * irr::core::clamp(dir.Y * 2.f + 0.2f, 0.f, 1.f) * 255.))
-                    + ((uint32_t)(color.g * irr::core::clamp(dir.Y * 2.f + 0.2f, 0.f, 1.f) * 255.) << 8)
-                    + ((uint32_t)(color.r * irr::core::clamp(dir.Y * 2.f + 0.2f, 0.f, 1.f) * 255.) << 16)
-                    + ((uint32_t)(color.a * irr::core::clamp(dir.Y * 2.f + 0.2f, 0.f, 1.f) * 255.) << 24);
-                continue;
-            }
-            
-            
-            vector3df bitangent = vector3df(0.0, 1.0, 0.0);
-            float ndotup = dir.dotProduct(vector3df(0.0, 1.0, 0.0));
-            if (1.0 - abs(ndotup) < 0.00001)
-            {
-                bitangent = ndotup > 0.0 ? vector3df(0.0, 0.0, 1.0)
-                                         : vector3df(0.0, 0.0, -1.0);
-            }
-            vector3df tangent = bitangent.crossProduct(dir).normalize();
-            bitangent         = dir.crossProduct(tangent);
-
-            SColorf color = SColorf();
-            float weight = 1e-8;
+            std::array<vector3df, sample_count> local_space_dirs;
+            std::array<float, sample_count> lods;
 
             for (int i = 0; i < sample_count; i++)
             {
-                // Lambertian
+                // GGX
                 vector2df xi = hammersly2d(i, sample_count);
                 float roughness = 1.0f * level / (dst.size() - 1);
                 float alpha = roughness * roughness;
@@ -486,52 +620,96 @@ void GEVulkanSkyBoxRenderer::addSkyBox(GEVulkanCameraSceneNode* cam,
                 float ggx_a = cos_theta * alpha;
                 float pdf = alpha / (1.0 - cos_theta * cos_theta + ggx_a * ggx_a);
                 pdf = pdf * pdf / PI / 4.0;  // GGX + Jacobian
-                vector3df local_space_dir = vector3df(
+                local_space_dirs[i] = vector3df(
                     sin_theta * cosf(phi),
                     sin_theta * sinf(phi),
                     cos_theta).normalize();
-                // TBN * local_space_dir
-                vector3df world_dir = vector3df(
-                    tangent.X * local_space_dir.X + 
-                    bitangent.X * local_space_dir.Y + 
-                    dir.X * local_space_dir.Z,
-
-                    tangent.Y * local_space_dir.X + 
-                    bitangent.Y * local_space_dir.Y + 
-                    dir.Y * local_space_dir.Z,
-
-                    tangent.Z * local_space_dir.X + 
-                    bitangent.Z * local_space_dir.Y + 
-                    dir.Z * local_space_dir.Z
-                );
-                float lod = 0.5f * log2(6.0 * dst[level].m_dim.Width
-                                            * dst[level].m_dim.Height
-                                            / (sample_count * pdf)) + lodbias;
-                // Reflect
-                vector3df light = -dir;
-                light -= 2.0f * world_dir * light.dotProduct(world_dir);
-                light = light.normalize();
-                float NdotL = dir.dotProduct(light);
-                
-                if (NdotL > 0.0)
-                {
-                    SColorf samp = texture_lod(src, light, lod);
-                    color.a += samp.a * irr::core::clamp(light.Y * 2.f + 0.2f, 0.f, 1.f) * NdotL;
-                    color.r += samp.r * irr::core::clamp(light.Y * 2.f + 0.2f, 0.f, 1.f) * NdotL;
-                    color.g += samp.g * irr::core::clamp(light.Y * 2.f + 0.2f, 0.f, 1.f) * NdotL;
-                    color.b += samp.b * irr::core::clamp(light.Y * 2.f + 0.2f, 0.f, 1.f) * NdotL;
-                    weight += NdotL;
-                }
+                lods[i] = 0.5f * log2(6.0 * dst[level].m_dim.Width
+                                          * dst[level].m_dim.Height
+                                          / (sample_count * pdf)) + lodbias;
             }
-            color.a /= weight;
-            color.r /= weight;
-            color.g /= weight;
-            color.b /= weight;
-            ((uint32_t*)dst[level].m_data)[v * dst[level].m_dim.Width + u]
-                = ((uint32_t)(color.b * 255.))
-                + ((uint32_t)(color.g * 255.) << 8)
-                + ((uint32_t)(color.r * 255.) << 16)
-                + ((uint32_t)(color.a * 255.) << 24);
+            for (int i = 0; i < dst[level].m_dim.Width * dst[level].m_dim.Height; i++)
+            {
+                vector2df uv = vector2df(
+                    (0.5f + i % dst[level].m_dim.Width) / dst[level].m_dim.Width  * 2.0f - 1.0f,
+                    (0.5f + i / dst[level].m_dim.Width) / dst[level].m_dim.Height * 2.0f - 1.0f);
+                vector3df scan = vector3df();
+                switch(tex_index)
+                {
+                    case 0: scan = vector3df( 1.f,  uv.Y, -uv.X); break;
+                    case 1: scan = vector3df(-1.f,  uv.Y,  uv.X); break;
+                    case 2: scan = vector3df( uv.X, -1.f,  uv.Y); break;
+                    case 3: scan = vector3df( uv.X,  1.f, -uv.Y); break;
+                    case 4: scan = vector3df( uv.X, uv.Y,  1.f); break;
+                    case 5: scan = vector3df(-uv.X, uv.Y, -1.f); break;
+                }
+                vector3df dir = scan.normalize(); // Normal
+                dir.Y = -dir.Y;
+
+                if (level == 0)
+                {
+                    SColorf color = texture_lod(src2, dir, lodbias);
+
+                    ((uint32_t*)dst[level].m_data)[i]
+                        = ((uint32_t)(color.b * irr::core::clamp(dir.Y * 2.f, 0.f, 1.f) * 255.))
+                        + ((uint32_t)(color.g * irr::core::clamp(dir.Y * 2.f, 0.f, 1.f) * 255.) << 8)
+                        + ((uint32_t)(color.r * irr::core::clamp(dir.Y * 2.f, 0.f, 1.f) * 255.) << 16)
+                        + ((uint32_t)(color.a * irr::core::clamp(dir.Y * 2.f, 0.f, 1.f) * 255.) << 24);
+                    continue;
+                }
+                
+                
+                vector3df bitangent = vector3df(0.0, 1.0, 0.0);
+                float ndotup = dir.dotProduct(vector3df(0.0, 1.0, 0.0));
+                if (1.0 - abs(ndotup) < 0.00001)
+                {
+                    bitangent = ndotup > 0.0 ? vector3df(0.0, 0.0, 1.0)
+                                             : vector3df(0.0, 0.0, -1.0);
+                }
+                vector3df tangent = bitangent.crossProduct(dir).normalize();
+                bitangent         = dir.crossProduct(tangent);
+
+                SColorf color = SColorf();
+                float weight = 1e-8;
+
+                for (int i = 0; i < sample_count; i++)
+                {
+                    // TBN * local_space_dir
+                    vector3df ldir = local_space_dirs[i];
+                    float lod = lods[i];
+
+                    vector3df world_dir = vector3df(
+                        tangent.X * ldir.X + bitangent.X * ldir.Y + dir.X * ldir.Z,
+                        tangent.Y * ldir.X + bitangent.Y * ldir.Y + dir.Y * ldir.Z,
+                        tangent.Z * ldir.X + bitangent.Z * ldir.Y + dir.Z * ldir.Z
+                    );
+                    
+                    // Reflect
+                    vector3df light = -dir;
+                    light -= 2.0f * world_dir * light.dotProduct(world_dir);
+                    light = light.normalize();
+                    float NdotL = dir.dotProduct(light);
+                    
+                    if (NdotL > 0.0)
+                    {
+                        SColorf samp = texture_lod(src2, light, lod);
+                        color.a += samp.a * irr::core::clamp(light.Y * 2.f, 0.f, 1.f) * NdotL;
+                        color.r += samp.r * irr::core::clamp(light.Y * 2.f, 0.f, 1.f) * NdotL;
+                        color.g += samp.g * irr::core::clamp(light.Y * 2.f, 0.f, 1.f) * NdotL;
+                        color.b += samp.b * irr::core::clamp(light.Y * 2.f, 0.f, 1.f) * NdotL;
+                        weight += NdotL;
+                    }
+                }
+                color.a /= weight;
+                color.r /= weight;
+                color.g /= weight;
+                color.b /= weight;
+                ((uint32_t*)dst[level].m_data)[i]
+                    = ((uint32_t)(powf(color.b, 0.455f) * 255.))
+                    + ((uint32_t)(powf(color.g, 0.455f) * 255.) << 8)
+                    + ((uint32_t)(powf(color.r, 0.455f) * 255.) << 16)
+                    + ((uint32_t)(powf(color.a, 0.455f) * 255.) << 24);
+            }
         }
     };
     g_texture_cubemap = new GEVulkanArrayTexture(sky_tex,
