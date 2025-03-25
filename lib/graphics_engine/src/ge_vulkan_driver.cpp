@@ -2505,13 +2505,13 @@ bool GEVulkanDriver::setRenderTarget(video::ITexture* texture,
 }   // setRenderTarget
 
 // ----------------------------------------------------------------------------
-void GEVulkanDriver::updateDriver(bool reload_shaders)
+void GEVulkanDriver::updateDriver(bool pbr_changed)
 {
     waitIdle();
     setDisableWaitIdle(true);
     clearDrawCallsCache();
     destroySwapChainRelated(false/*handle_surface*/);
-    if (reload_shaders)
+    if (pbr_changed)
     {
         GEVulkanShaderManager::destroy();
         GEVulkanShaderManager::init(this);
@@ -2520,6 +2520,27 @@ void GEVulkanDriver::updateDriver(bool reload_shaders)
             GEVulkanShaderManager::getSamplerSize(),
             GEVulkanShaderManager::getMeshTextureLayer(),
             GEVulkanFeatures::supportsBindMeshTexturesAtOnce());
+        GEVulkanMeshCache* mc = getVulkanMeshCache();
+        if (!GEVulkanFeatures::supportsBaseVertexRendering())
+        {
+            for (unsigned i = 0; i < mc->getMeshCount(); i++)
+            {
+                scene::IAnimatedMesh* mesh = mc->getMeshByIndex(i);
+                if (mesh->getMeshType() != scene::EAMT_SPM)
+                    continue;
+                for (unsigned j = 0; j < mesh->getMeshBufferCount(); j++)
+                {
+                    GESPMBuffer* mb = static_cast<GESPMBuffer*>(
+                        mesh->getMeshBuffer(j));
+                    mb->destroyVertexIndexBuffer();
+                    mb->createVertexIndexBuffer();
+                }
+            }
+        }
+        else
+            mc->meshCacheChanged();
+        for (GEVulkanDynamicSPMBuffer* buffer : m_dynamic_spm_buffers)
+            buffer->setDirtyOffset(0, irr::scene::EBT_VERTEX);
     }
     createSwapChainRelated(false/*handle_surface*/);
     for (auto& dc : static_cast<GEVulkanSceneManager*>(

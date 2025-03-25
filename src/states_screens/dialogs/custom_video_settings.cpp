@@ -144,10 +144,10 @@ GUIEngine::EventPropagation CustomVideoSettingsDialog::processEvent(const std::s
         if (selection == "apply")
         {
             bool advanced_pipeline = getWidget<CheckBoxWidget>("dynamiclight")->getState();
-            bool update_needed = false;
+            bool pbr_changed = false;
             if (UserConfigParams::m_dynamic_lights != advanced_pipeline)
             {
-                update_needed = true;
+                pbr_changed = true;
                 GE::getGEConfig()->m_pbr = advanced_pipeline;
             }
             UserConfigParams::m_dynamic_lights = advanced_pipeline;
@@ -219,7 +219,7 @@ GUIEngine::EventPropagation CustomVideoSettingsDialog::processEvent(const std::s
             OptionsScreenVideo::getInstance()->updateGfxSlider();
             OptionsScreenVideo::getInstance()->updateBlurSlider();
 #ifndef SERVER_ONLY
-            if (update_needed && GE::getDriver()->getDriverType() == video::EDT_VULKAN)
+            if (pbr_changed && GE::getDriver()->getDriverType() == video::EDT_VULKAN)
                 GE::getVKDriver()->updateDriver(true);
 #endif
             OptionsScreenVideo::setImageQuality(quality);

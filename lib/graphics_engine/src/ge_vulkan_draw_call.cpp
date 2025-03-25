@@ -72,9 +72,21 @@ void ObjectData::init(irr::scene::ISceneNode* node, int material_id,
     else
         m_hue_change = 0.0f;
     if (ri)
-        m_custom_vertex_color = ri->getVertexColor();
+    {
+        if (getGEConfig()->m_pbr)
+        {
+            m_custom_vertex_color =
+                srgb255ToLinearFromSColor(ri->getVertexColor()).color;
+        }
+        else
+        {
+            m_custom_vertex_color = ri->getVertexColor();
+        }
+    }
     else
+    {
         m_custom_vertex_color = irr::video::SColor((uint32_t)-1);
+    }
 }   // init
 
 // ============================================================================
@@ -100,6 +112,8 @@ void ObjectData::init(irr::scene::IBillboardSceneNode* node, int material_id,
     output.setRed((top.getRed() + bottom.getRed()) / 2);
     output.setGreen((top.getGreen() + bottom.getGreen()) / 2);
     output.setBlue((top.getBlue() + bottom.getBlue()) / 2);
+    if (getGEConfig()->m_pbr)
+        output = srgb255ToLinearFromSColor(output).color;
     m_custom_vertex_color = output;
 }   // init
 
@@ -176,7 +190,10 @@ void ObjectData::init(const irr::scene::SParticle& particle, int material_id,
     m_texture_trans[0] = 0.0f;
     m_texture_trans[1] = 0.0f;
     m_hue_change = 0.0f;
-    m_custom_vertex_color = particle.color;
+    if (getGEConfig()->m_pbr)
+        m_custom_vertex_color = srgb255ToLinearFromSColor(particle.color).color;
+    else
+        m_custom_vertex_color = particle.color;
 }   // init
 
 // ----------------------------------------------------------------------------

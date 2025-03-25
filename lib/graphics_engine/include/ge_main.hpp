@@ -3,6 +3,7 @@
 
 #include <IVideoDriver.h>
 #include <matrix4.h>
+#include <SColor.h>
 
 #include <cstdint>
 #include <string>
@@ -18,6 +19,7 @@ namespace irr
 
 namespace GE
 {
+class GESPMBuffer;
 class GEVulkanDriver;
 struct GEConfig
 {
@@ -86,6 +88,15 @@ inline uint8_t srgb255ToLinear(unsigned color_srgb_255)
     };
     return uint8_t(srgb_linear_map[color_srgb_255]);
 }
+inline irr::video::SColor srgb255ToLinearFromSColor(irr::video::SColor scolor_srgb)
+{
+    irr::video::SColor out = scolor_srgb;
+    out.setRed(srgb255ToLinear(scolor_srgb.getRed()));
+    out.setGreen(srgb255ToLinear(scolor_srgb.getGreen()));
+    out.setBlue(srgb255ToLinear(scolor_srgb.getBlue()));
+    return out;
+}
+void copyToMappedBuffer(uint32_t* mapped, GESPMBuffer* spmb, size_t offset = 0);
 
 }
 #endif

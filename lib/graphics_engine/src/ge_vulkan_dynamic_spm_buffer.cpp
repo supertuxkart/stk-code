@@ -49,14 +49,9 @@ void GEVulkanDynamicSPMBuffer::updateVertexIndexBuffer(int buffer_index)
 
     uint8_t* mapped_addr = (uint8_t*)m_vertex_buffer->getMappedAddr()
         [buffer_index];
-    unsigned voffset = m_vertex_update_offsets[buffer_index] * stride;
-    mapped_addr += voffset;
-    for (unsigned i = m_vertex_update_offsets[buffer_index];
-        i < m_vertices.size(); i++)
-    {
-        memcpy(mapped_addr, &m_vertices[i], stride);
-        mapped_addr += stride;
-    }
+    mapped_addr += m_vertex_update_offsets[buffer_index] * stride;
+    copyToMappedBuffer((uint32_t*)mapped_addr, this,
+        m_vertex_update_offsets[buffer_index]);
     m_vertex_update_offsets[buffer_index] = m_vertices.size();
 
     double index_size = (double)(m_indices.size() * sizeof(uint16_t));
