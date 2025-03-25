@@ -64,6 +64,7 @@ SkidMarks::SkidMarks(const AbstractKart& kart, float width) : m_kart(kart)
             m_shader->isSrgbForTextureLayer(0), m_material->getContainerId());
     }
     m_skid_marking = false;
+    m_dt = 0.0f;
 }   // SkidMark
 
 //-----------------------------------------------------------------------------
@@ -95,7 +96,14 @@ void SkidMarks::update(float dt, bool force_skid_marks,
     if (m_kart.isWheeless())
         return;
 
-    float f = dt / stk_config->m_skid_fadeout_time;
+    // Don't add skid mark quads too frequently which breaks fade-out effect
+    const float min_dt = stk_config->ticks2Time(1);
+    m_dt += dt;
+    if (m_dt < min_dt)
+        return;
+
+    float f = m_dt / stk_config->m_skid_fadeout_time;
+    m_dt = 0.0f;
     auto it = m_left.begin();
     // Don't clean the current skidmarking
     while (it != m_left.end())
@@ -274,7 +282,7 @@ SkidMarks::SkidMarkQuads::SkidMarkQuads(const Vec3 &left,
         video::SColor(255, SkidMarks::m_start_grey, SkidMarks::m_start_grey,
         SkidMarks::m_start_grey));
 
-    if (CVS->isDeferredEnabled())
+    if (CVS->isGLSL() && CVS->isDeferredEnabled())
     {
         m_start_color.setRed(GE::srgb255ToLinear(m_start_color.getRed()));
         m_start_color.setGreen(GE::srgb255ToLinear(m_start_color.getGreen()));
