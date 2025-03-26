@@ -300,6 +300,11 @@ namespace GUIEngine
         {
             m_value_updated_callback = callback;
         }
+        virtual void elementRemoved()
+        {
+            m_incorrect = false;
+            m_red_mark_widget = NULL;
+        }
 
     };
 
