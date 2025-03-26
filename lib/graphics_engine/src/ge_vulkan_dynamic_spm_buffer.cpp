@@ -36,40 +36,42 @@ GEVulkanDynamicSPMBuffer::~GEVulkanDynamicSPMBuffer()
 // ----------------------------------------------------------------------------
 void GEVulkanDynamicSPMBuffer::updateVertexIndexBuffer(int buffer_index)
 {
-    if (m_vertex_update_offsets[buffer_index] == m_vertices.size() &&
-        m_index_update_offsets[buffer_index] == m_indices.size())
-        return;
-
     const size_t stride = sizeof(irr::video::S3DVertexSkinnedMesh) - 16;
-    double vertex_size = (double)(m_vertices.size() * stride);
-    double base = std::log2(vertex_size);
-    unsigned frame_count = GEVulkanDriver::getMaxFrameInFlight() + 1;
-    if (m_vertex_buffer->resizeIfNeeded(2 << (unsigned)base))
-        std::fill_n(m_vertex_update_offsets, frame_count, 0);
-
-    uint8_t* mapped_addr = (uint8_t*)m_vertex_buffer->getMappedAddr()
-        [buffer_index];
-    mapped_addr += m_vertex_update_offsets[buffer_index] * stride;
-    copyToMappedBuffer((uint32_t*)mapped_addr, this,
-        m_vertex_update_offsets[buffer_index]);
-    m_vertex_update_offsets[buffer_index] = m_vertices.size();
-
-    double index_size = (double)(m_indices.size() * sizeof(uint16_t));
-    base = std::log2(index_size);
-    if (m_index_buffer->resizeIfNeeded(2 << (unsigned)base))
-        std::fill_n(m_index_update_offsets, frame_count, 0);
-
-    mapped_addr = (uint8_t*)m_index_buffer->getMappedAddr()
-        [buffer_index];
-    unsigned ioffset = m_index_update_offsets[buffer_index] * sizeof(uint16_t);
-    mapped_addr += ioffset;
-    for (unsigned i = m_index_update_offsets[buffer_index];
-        i < m_indices.size(); i++)
+    const unsigned frame_count = GEVulkanDriver::getMaxFrameInFlight() + 1;
+    if (m_vertex_update_offsets[buffer_index] != m_vertices.size())
     {
-        memcpy(mapped_addr, &m_indices[i], sizeof(uint16_t));
-        mapped_addr += sizeof(uint16_t);
+        double vertex_size = (double)(m_vertices.size() * stride);
+        double base = std::log2(vertex_size);
+        if (m_vertex_buffer->resizeIfNeeded(2 << (unsigned)base))
+            std::fill_n(m_vertex_update_offsets, frame_count, 0);
+
+        uint8_t* mapped_addr = (uint8_t*)m_vertex_buffer->getMappedAddr()
+            [buffer_index];
+        mapped_addr += m_vertex_update_offsets[buffer_index] * stride;
+        copyToMappedBuffer((uint32_t*)mapped_addr, this,
+            m_vertex_update_offsets[buffer_index]);
+        m_vertex_update_offsets[buffer_index] = m_vertices.size();
     }
-    m_index_update_offsets[buffer_index] = m_indices.size();
+
+    if (m_index_update_offsets[buffer_index] != m_indices.size())
+    {
+        double index_size = (double)(m_indices.size() * sizeof(uint16_t));
+        double base = std::log2(index_size);
+        if (m_index_buffer->resizeIfNeeded(2 << (unsigned)base))
+            std::fill_n(m_index_update_offsets, frame_count, 0);
+
+        uint8_t* mapped_addr = (uint8_t*)m_index_buffer->getMappedAddr()
+            [buffer_index];
+        unsigned ioffset = m_index_update_offsets[buffer_index] * sizeof(uint16_t);
+        mapped_addr += ioffset;
+        for (unsigned i = m_index_update_offsets[buffer_index];
+            i < m_indices.size(); i++)
+        {
+            memcpy(mapped_addr, &m_indices[i], sizeof(uint16_t));
+            mapped_addr += sizeof(uint16_t);
+        }
+        m_index_update_offsets[buffer_index] = m_indices.size();
+    }
 }   // updateVertexIndexBuffer
 
 // ----------------------------------------------------------------------------
