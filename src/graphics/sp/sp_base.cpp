@@ -52,6 +52,7 @@
 #include <algorithm>
 #include <array>
 #include <cassert>
+#include <functional>
 #include <string>
 #include <unordered_map>
 #include <unordered_set>
@@ -98,7 +99,7 @@ std::unordered_map<unsigned, std::pair<core::vector3df,
 // ----------------------------------------------------------------------------
 std::unordered_set<SPMeshBuffer*> g_instances;
 // ----------------------------------------------------------------------------
-std::array<GLuint, ST_COUNT> g_samplers;
+std::array<GLuint, ST_COUNT> g_samplers = {{ }};
 // ----------------------------------------------------------------------------
 // Check sp_shader.cpp for the name
 std::array<GLuint, 1> sp_prefilled_tex;
@@ -472,6 +473,18 @@ void init()
     glBindBufferBase(GL_UNIFORM_BUFFER, 2, sp_fog_ubo);
 
     glBindBuffer(GL_UNIFORM_BUFFER, 0);
+    initSamplers();
+}   // init
+
+// ----------------------------------------------------------------------------
+void initSamplers()
+{
+    if (std::all_of(g_samplers.begin(), g_samplers.end() - 1,
+        [](int value) { return value != 0; }))
+    {
+        glDeleteSamplers((unsigned)g_samplers.size() - 1, g_samplers.data());
+        g_samplers.fill(0);
+    }
 
     for (unsigned st = ST_NEAREST; st < ST_COUNT; st++)
     {
@@ -605,7 +618,7 @@ void init()
                 break;
         }
     }
-}   // init
+}   // initSamplers
 
 // ----------------------------------------------------------------------------
 void destroy()
@@ -638,7 +651,7 @@ void destroy()
     }
     glDeleteBuffers(1, &sp_fog_ubo);
     glDeleteSamplers((unsigned)g_samplers.size() - 1, g_samplers.data());
-
+    g_samplers.fill(0);
 }   // destroy
 
 // ----------------------------------------------------------------------------
