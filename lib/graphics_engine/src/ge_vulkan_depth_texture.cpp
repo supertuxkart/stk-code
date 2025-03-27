@@ -19,7 +19,7 @@ GEVulkanDepthTexture::GEVulkanDepthTexture(GEVulkanDriver* vk,
     m_vma_allocation = VK_NULL_HANDLE;
     m_has_mipmaps = false;
     m_locked_data = NULL;
-    m_size = m_orig_size = m_max_size = size;
+    m_size = m_orig_size = size;
 
     std::vector<VkFormat> preferred =
     {
