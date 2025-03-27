@@ -147,7 +147,10 @@ std::shared_ptr<SPTexture> SPTextureManager::getTexture(const std::string& p,
     }
     std::shared_ptr<SPTexture> t =
         std::make_shared<SPTexture>(p, m, undo_srgb, cid);
-    addThreadedFunction(std::bind(&SPTexture::threadedLoad, t));
+    std::string cache_directory = t->getCacheDirectory();
+    if (!cache_directory.empty())
+        file_manager->checkAndCreateDirectoryP(cache_directory);
+    addThreadedFunction(std::bind(&SPTexture::threadedLoad, t, cache_directory));
     m_textures[p] = t;
     return t;
 }   // getTexture
@@ -191,7 +194,11 @@ core::stringw SPTextureManager::reloadTexture(const core::stringw& name)
             {
                 continue;
             }
-            addThreadedFunction(std::bind(&SPTexture::threadedLoad, p.second));
+            std::string cache_directory = p.second->getCacheDirectory();
+            if (!cache_directory.empty())
+                file_manager->checkAndCreateDirectoryP(cache_directory);
+            addThreadedFunction(std::bind(&SPTexture::threadedLoad, p.second,
+                cache_directory));
             Log::info("SPTextureManager", "%s reloaded",
                 p.second->getPath().c_str());
         }
@@ -216,8 +223,11 @@ core::stringw SPTextureManager::reloadTexture(const core::stringw& name)
             std::string tex_name = StringUtils::getBasename(tex_path);
             if (fname == tex_name || fname == tex_path)
             {
+                std::string cache_directory = p.second->getCacheDirectory();
+                if (!cache_directory.empty())
+                    file_manager->checkAndCreateDirectoryP(cache_directory);
                 addThreadedFunction(std::bind(&SPTexture::threadedLoad,
-                    p.second));
+                    p.second, cache_directory));
                 result += tex_name.c_str();
                 result += L" ";
                 break;
