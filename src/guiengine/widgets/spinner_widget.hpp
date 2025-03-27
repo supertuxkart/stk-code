@@ -304,6 +304,7 @@ namespace GUIEngine
         {
             m_incorrect = false;
             m_red_mark_widget = NULL;
+            Widget::elementRemoved();
         }
 
     };
