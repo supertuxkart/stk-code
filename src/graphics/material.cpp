@@ -1018,22 +1018,20 @@ std::function<void(irr::video::IImage*)> Material::getMaskImageMani() const
 {
 #ifndef SERVER_ONLY
     std::function<void(irr::video::IImage*)> image_mani;
-    core::dimension2du max_size = irr_driver->getVideoDriver()
-        ->getDriverAttributes().getAttributeAsDimension2d("MAX_TEXTURE_SIZE");
 
     // Material using alpha channel will be colorized as a whole
     if (CVS->supportsColorization() &&
         !useAlphaChannel() && (!m_colorization_mask.empty() ||
         m_colorization_factor > 0.0f || m_colorizable))
     {
-        std::string colorization_mask;
+        io::path colorization_mask;
         if (!m_colorization_mask.empty())
         {
-            colorization_mask = StringUtils::getPath(m_sampler_path[0]) + "/" +
-                m_colorization_mask;
+            colorization_mask = (StringUtils::getPath(m_sampler_path[0]) + "/" +
+                m_colorization_mask).c_str();
         }
         float colorization_factor = m_colorization_factor;
-        image_mani = [colorization_mask, colorization_factor, max_size]
+        image_mani = [colorization_mask, colorization_factor]
             (video::IImage* img)->void
         {
             video::IImage* mask = NULL;
@@ -1043,31 +1041,15 @@ std::function<void(irr::video::IImage*)> Material::getMaskImageMani() const
             uint8_t* mask_data = NULL;
             if (!colorization_mask.empty())
             {
-                mask = GE::getResizedImage(colorization_mask, max_size);
+                core::dimension2du max_size;
+                mask = GE::getResizedImageFullPath(colorization_mask, max_size,
+                    NULL, &img_size);
                 if (!mask)
                 {
                     Log::warn("Material",
                         "Applying colorization mask failed for '%s'!",
                         colorization_mask.c_str());
                     return;
-                }
-                core::dimension2du mask_size = mask->getDimension();
-                if (mask->getColorFormat() != video::ECF_A8R8G8B8 ||
-                    img_size != mask_size)
-                {
-                    video::IImage* new_mask = irr_driver
-                        ->getVideoDriver()->createImage(video::ECF_A8R8G8B8,
-                        img_size);
-                    if (img_size != mask_size)
-                    {
-                        mask->copyToScaling(new_mask);
-                    }
-                    else
-                    {
-                        mask->copyTo(new_mask);
-                    }
-                    mask->drop();
-                    mask = new_mask;
                 }
                 mask_data = (uint8_t*)mask->lock();
             }
@@ -1094,25 +1076,26 @@ std::function<void(irr::video::IImage*)> Material::getMaskImageMani() const
         return image_mani;
     }
 
-    std::string mask_full_path;
+    io::path mask_full_path;
     if (!m_mask.empty())
     {
-        mask_full_path = StringUtils::getPath(m_sampler_path[0]) + "/" +
-            m_mask;
+        mask_full_path = (StringUtils::getPath(m_sampler_path[0]) + "/" +
+            m_mask).c_str();
     }
     if (!mask_full_path.empty())
     {
-        image_mani = [mask_full_path, max_size](video::IImage* img)->void
+        image_mani = [mask_full_path](video::IImage* img)->void
         {
-            video::IImage* converted_mask =
-                GE::getResizedImage(mask_full_path, max_size);
+            core::dimension2du dim = img->getDimension();
+            core::dimension2du max_size;
+            video::IImage* converted_mask = GE::getResizedImageFullPath(
+                mask_full_path, max_size, NULL, &dim);
             if (converted_mask == NULL)
             {
                 Log::warn("Material", "Applying alpha mask failed for '%s'!",
                     mask_full_path.c_str());
                 return;
             }
-            const core::dimension2du& dim = img->getDimension();
             for (unsigned int x = 0; x < dim.Width; x++)
             {
                 for (unsigned int y = 0; y < dim.Height; y++)
