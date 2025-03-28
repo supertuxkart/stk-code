@@ -22,6 +22,10 @@
 #include "graphics/server_dummy_texture.hpp"
 #include "guiengine/engine.hpp"
 #include "io/file_manager.hpp"
+#include "karts/kart_properties.hpp"
+#include "karts/kart_properties_manager.hpp"
+#include "tracks/track.hpp"
+#include "tracks/track_manager.hpp"
 #include "utils/string_utils.hpp"
 #include "utils/log.hpp"
 
@@ -247,7 +251,7 @@ bool STKTexManager::hasTexture(const std::string& path)
 }   // hasTexture
 
 // ----------------------------------------------------------------------------
-void STKTexManager::reloadAllTextures()
+void STKTexManager::reloadAllTextures(bool mesh_texture_only)
 {
 #ifndef SERVER_ONLY
     GE::GEVulkanDriver* gevd = GE::getVKDriver();
@@ -258,11 +262,73 @@ void STKTexManager::reloadAllTextures()
     }
 #endif
 
+    std::set<std::string> mesh_texture_paths, icons;
+    if (mesh_texture_only)
+    {
+        io::IFileSystem* fs = file_manager->getFileSystem();
+        mesh_texture_paths.insert(fs->getAbsolutePath(
+            file_manager->getAssetDirectory(FileManager::TEXTURE).c_str())
+            .c_str());
+        mesh_texture_paths.insert(fs->getAbsolutePath(
+            file_manager->getAssetDirectory(FileManager::LIBRARY).c_str())
+            .c_str());
+        mesh_texture_paths.insert(fs->getAbsolutePath(
+            file_manager->getAssetDirectory(FileManager::MODEL).c_str())
+            .c_str());
+        for (auto d : *kart_properties_manager->getAllKartDirs())
+        {
+            if (!d.empty() && d.back() == '/')
+                d.pop_back();
+            mesh_texture_paths.insert(fs->getAbsolutePath(
+                StringUtils::getPath(d).c_str()).c_str());
+        }
+        for (unsigned i = 0; i < kart_properties_manager->getNumberOfKarts(); i++)
+        {
+            const KartProperties* kp = kart_properties_manager->getKartById(i);
+            io::path ic = kp->getAbsoluteIconFile().c_str();
+            if (!ic.empty())
+                icons.insert(fs->getAbsolutePath(ic).c_str());
+            video::ITexture* mi = kp->getMinimapIcon();
+            if (mi)
+                icons.insert(fs->getAbsolutePath(mi->getFullPath()).c_str());
+        }
+        for (auto d : *track_manager->getAllTrackDirs())
+        {
+            if (!d.empty() && d.back() == '/')
+                d.pop_back();
+            mesh_texture_paths.insert(fs->getAbsolutePath(
+                StringUtils::getPath(d).c_str()).c_str());
+        }
+        for (unsigned i = 0; i < track_manager->getNumberOfTracks(); i++)
+        {
+            io::path sc = track_manager->getTrack(i)->getScreenshotFile()
+                .c_str();
+            if (!sc.empty())
+                icons.insert(fs->getAbsolutePath(sc).c_str());
+        }
+    }
     for (auto p : m_all_textures)
     {
         if (p.second == NULL)
             continue;
-        p.second->reload();
+        if (mesh_texture_only)
+        {
+            std::string full_path = file_manager->getFileSystem()
+                ->getAbsolutePath(p.second->getFullPath()).c_str();
+            if (icons.find(full_path) != icons.end())
+                continue;
+            for (auto& mtp : mesh_texture_paths)
+            {
+                if (StringUtils::startsWith(full_path, mtp))
+                {
+                    Log::info("STKTexManager","%s reloaded", full_path.c_str());
+                    p.second->reload();
+                    break;
+                }
+            }
+        }
+        else
+            p.second->reload();
     }
 
 #ifndef SERVER_ONLY
