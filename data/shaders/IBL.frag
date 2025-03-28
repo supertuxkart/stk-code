@@ -1,5 +1,6 @@
 uniform sampler2D ntex;
 uniform sampler2D dtex;
+uniform sampler2DShadow stex;
 uniform sampler2D albedo;
 uniform sampler2D ssao;
 uniform sampler2D ctex;
@@ -13,23 +14,17 @@ out vec4 Spec;
 #endif
 
 #stk_include "utils/decodeNormal.frag"
+#stk_include "utils/encode_normal.frag"
 #stk_include "utils/getPosFromUVDepth.frag"
 #stk_include "utils/DiffuseIBL.frag"
 #stk_include "utils/SpecularIBL.frag"
 
-vec3 CalcViewPositionFromDepth(in vec2 uv)
+vec3 CalcCoordFromPosition(in vec3 pos)
 {
-    // Combine UV & depth into XY & Z (NDC)
-    float z = texture(dtex, uv).x;
-    return getPosFromUVDepth(vec3(uv, z), u_inverse_projection_matrix).xyz;
-}
-
-vec2 CalcCoordFromPosition(in vec3 pos)
-{
-    vec4 projectedCoord     = u_projection_matrix * vec4(pos, 1.0);
-    projectedCoord.xy      /= projectedCoord.w;
-    projectedCoord.xy       = projectedCoord.xy * 0.5 + 0.5;
-    return projectedCoord.xy;
+    vec4 projectedCoord      = u_projection_matrix * vec4(pos, 1.0);
+    projectedCoord.xyz      /= projectedCoord.w;
+    projectedCoord.xyz       = projectedCoord.xyz * 0.5 + 0.5;
+    return projectedCoord.xyz;
 }
 
 // Fade out edges of screen buffer tex
@@ -45,31 +40,22 @@ float GetEdgeFade(vec2 coords)
 
 vec2 RayCast(vec3 dir, vec3 hitCoord)
 {
-    vec2 projectedCoord;
-    vec3 dirstep = dir * 0.5f;
-    float depth;
-    hitCoord += dirstep;
+    dir *= 0.5;
+    hitCoord += dir;
 
-    for (int i = 1; i <= 32; i++)
+    vec3 projectedCoord = CalcCoordFromPosition(hitCoord);
+    float factor = 1.0;
+
+    for (int i = 0; i < 32; i++)
     {
-        projectedCoord          = CalcCoordFromPosition(hitCoord);
-
-        float depth             = CalcViewPositionFromDepth(projectedCoord).z;
-
-        float directionSign = sign(abs(hitCoord.z) - depth);
-        dirstep = dirstep * (1.0 - 0.5 * max(directionSign, 0.0));
-        hitCoord += dirstep * (-directionSign);
+        float direction = texture(stex, projectedCoord);
+        factor *= direction;
+        dir = dir * (0.5 + 0.5 * factor);
+        hitCoord += dir * (2. * direction - 1.);
+        projectedCoord = CalcCoordFromPosition(hitCoord);
     }
 
-    if (projectedCoord.x > 0.0 && projectedCoord.x < 1.0 &&
-        projectedCoord.y > 0.0 && projectedCoord.y < 1.0)
-    {
-        return projectedCoord.xy;
-    }
-    else
-    {
-        return vec2(0.f);
-    }
+    return projectedCoord.xy;
 }
 
 vec3 gtaoMultiBounce(float visibility, vec3 albedo)
@@ -87,7 +73,7 @@ vec3 gtaoMultiBounce(float visibility, vec3 albedo)
 void main(void)
 {
     vec2 uv = gl_FragCoord.xy / u_screen;
-    vec3 normal = DecodeNormal(texture(ntex, uv).xy);
+    vec3 normal = (u_view_matrix * vec4(DecodeNormal(texture(ntex, uv).xy), 0)).xyz;
 
     float z = texture(dtex, uv).x;
 
@@ -116,30 +102,33 @@ void main(void)
     // Fallback (if the ray can't find an intersection we display the sky)
     vec3 fallback = .25 * SpecularIBL(normal, eyedir, specval);
 
+    // Reflection vector
+    vec3 reflected              = reflect(-eyedir, normal);
+    // Disable raycasts towards camera
+    float cosine                = dot(reflected, eyedir);
+
     // Only calculate reflections if the reflectivity value is high enough,
     // otherwise just use specular IBL
-    if (specval > 0.5)
-    {
-        // Reflection vector
-        vec3 reflected              = reflect(-eyedir, normal);
-
+    if (specval < 0.5 || cosine > 0.2) {
+        outColor = fallback;
+    } else {
         vec2 coords = RayCast(reflected, xpos.xyz);
 
-        if (coords.x == 0.0 && coords.y == 0.0) {
+        if (coords.x < 0. || coords.x > 1. || coords.y < 0. || coords.y > 1.) {
             outColor = fallback;
         } else {
-            // FIXME We need to generate mipmap to take into account the gloss map
+            // Disable raycasts onto another reflective surface
+            float mirror = texture(ntex, coords).z;
+            
             outColor = textureLod(albedo, coords, 0.f).rgb;
             outColor = mix(fallback, outColor, GetEdgeFade(coords));
+            outColor = mix(fallback, outColor, 1. - max(cosine * 5., 0.));
+            outColor = mix(fallback, outColor, 4. - max(mirror * 4., 3.));
             // TODO temporary measure the lack of mipmapping for RTT albedo
             // Implement it in proper way
             // Use (specval - 0.5) * 2.0 to bring specval from 0.5-1.0 range to 0.0-1.0 range
             outColor = mix(fallback, outColor, (specval - 0.5) * 2.0);
         }
-    }
-    else
-    {
-        outColor = fallback;
     }
 
     Diff = vec4(0.25 * DiffuseIBL(normal) * ao_multi, 1.);

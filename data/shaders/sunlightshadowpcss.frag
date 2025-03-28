@@ -5,7 +5,13 @@ uniform highp sampler2D dtex;
 #else
 uniform sampler2D dtex;
 #endif
+
+#if defined(GL_ES) && defined(GL_FRAGMENT_PRECISION_HIGH)
+uniform highp sampler2DArray shadowtexdepth;
+#else
 uniform sampler2DArray shadowtexdepth;
+#endif
+
 uniform sampler2DArrayShadow shadowtex;
 
 uniform float split0;
@@ -201,7 +207,7 @@ void main() {
     float z = texture(dtex, uv).x;
     vec4 xpos = getPosFromUVDepth(vec3(uv, z), u_inverse_projection_matrix);
 
-    vec3 norm = DecodeNormal(texture(ntex, uv).xy);
+    vec3 norm = (u_view_matrix * vec4(DecodeNormal(texture(ntex, uv).xy), 0)).xyz;
     float roughness = texture(ntex, uv).z;
     vec3 eyedir = -normalize(xpos.xyz);
 
