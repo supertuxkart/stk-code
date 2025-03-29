@@ -149,7 +149,7 @@ bool GEVulkanTexture::createTextureImage(uint8_t* texture_data,
                                          bool generate_hq_mipmap)
 {
     VkDeviceSize mipmap_data_size = 0;
-    GEMipmapGenerator* mipmap_generator = NULL;
+    GEMipmap* mipmap_generator = NULL;
 
     unsigned channels = (isSingleChannel() ? 1 : 4);
     VkDeviceSize image_size = m_size.Width * m_size.Height * channels;
@@ -163,24 +163,24 @@ bool GEVulkanTexture::createTextureImage(uint8_t* texture_data,
             image_size = get4x4CompressedTextureSize(m_size.Width,
                 m_size.Height);
             m_internal_format = VK_FORMAT_ASTC_4x4_UNORM_BLOCK;
-            mipmap_generator = new GECompressorASTC4x4(texture_data, channels,
-                m_size, normal_map);
+            GEMipmapGenerator generator(texture_data, channels, m_size, normal_map);
+            mipmap_generator = new GECompressorASTC4x4(&generator);
         }
         else if (texture_compression && GEVulkanFeatures::supportsBPTCBC7())
         {
             image_size = get4x4CompressedTextureSize(m_size.Width,
                 m_size.Height);
             m_internal_format = VK_FORMAT_BC7_UNORM_BLOCK;
-            mipmap_generator = new GECompressorBPTCBC7(texture_data, channels,
-                m_size, normal_map);
+            GEMipmapGenerator generator(texture_data, channels, m_size, normal_map);
+            mipmap_generator = new GECompressorBPTCBC7(&generator);
         }
         else if (texture_compression && GEVulkanFeatures::supportsS3TCBC3())
         {
             image_size = get4x4CompressedTextureSize(m_size.Width,
                 m_size.Height);
             m_internal_format = VK_FORMAT_BC3_UNORM_BLOCK;
-            mipmap_generator = new GECompressorS3TCBC3(texture_data, channels,
-                m_size, normal_map);
+            GEMipmapGenerator generator(texture_data, channels, m_size, normal_map);
+            mipmap_generator = new GECompressorS3TCBC3(&generator);
         }
         else
         {
@@ -216,7 +216,7 @@ bool GEVulkanTexture::createTextureImage(uint8_t* texture_data,
 
     if (mipmap_generator)
     {
-        for (GEImageLevel& level : mipmap_generator->getAllLevels())
+        for (const GEImageLevel& level : mipmap_generator->getAllLevels())
         {
             memcpy(data, level.m_data, level.m_size);
             data += level.m_size;
@@ -244,10 +244,10 @@ bool GEVulkanTexture::createTextureImage(uint8_t* texture_data,
     if (mipmap_generator)
     {
         unsigned offset = 0;
-        std::vector<GEImageLevel>& levels = mipmap_generator->getAllLevels();
+        const std::vector<GEImageLevel>& levels = mipmap_generator->getAllLevels();
         for (unsigned i = 0; i < levels.size(); i++)
         {
-            GEImageLevel& level = levels[i];
+            const GEImageLevel& level = levels[i];
             copyBufferToImage(command_buffer, staging_buffer,
                 level.m_dim.Width, level.m_dim.Height, 0, 0, offset, i, 0);
             offset += level.m_size;

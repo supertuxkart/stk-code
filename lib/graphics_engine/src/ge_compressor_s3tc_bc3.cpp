@@ -58,17 +58,15 @@ extern "C" void squishCompressImage(uint8_t* rgba, int width, int height,
 namespace GE
 {
 // ----------------------------------------------------------------------------
-GECompressorS3TCBC3::GECompressorS3TCBC3(uint8_t* texture, unsigned channels,
-                                         const irr::core::dimension2d<irr::u32>& size,
-                                         bool normal_map)
-                   : GEMipmapGenerator(texture, channels, size, normal_map)
+GECompressorS3TCBC3::GECompressorS3TCBC3(GEMipmap *mipmap)
 {
-    assert(channels == 4);
+    m_mipmap_sizes = mipmap->getMipmapSizes();
+    m_channels = mipmap->getChannels();
+    assert(m_channels == 4);
     size_t total_size = 0;
-    m_mipmap_sizes = 0;
-    for (unsigned i = 0; i < m_levels.size(); i++)
+    for (unsigned i = 0; i < mipmap->getAllLevels().size(); i++)
     {
-        GEImageLevel& level = m_levels[i];
+        const GEImageLevel& level = mipmap->getAllLevels()[i];
         unsigned cur_size = get4x4CompressedTextureSize(level.m_dim.Width,
             level.m_dim.Height);
         total_size += cur_size;
@@ -76,23 +74,20 @@ GECompressorS3TCBC3::GECompressorS3TCBC3(uint8_t* texture, unsigned channels,
             m_mipmap_sizes += cur_size;
     }
 
-    std::vector<GEImageLevel> compressed_levels;
     m_compressed_data = new uint8_t[total_size];
     uint8_t* cur_offset = m_compressed_data;
     const unsigned tc_flag = squish::kDxt5 | squish::kColourRangeFit;
 
-    for (GEImageLevel& level : m_levels)
+    for (const GEImageLevel& level : mipmap->getAllLevels())
     {
         squishCompressImage((uint8_t*)level.m_data, level.m_dim.Width,
-            level.m_dim.Height, level.m_dim.Width * channels,
+            level.m_dim.Height, level.m_dim.Width * m_channels,
             cur_offset, tc_flag);
         unsigned cur_size = get4x4CompressedTextureSize(level.m_dim.Width,
             level.m_dim.Height);
-        compressed_levels.push_back({ level.m_dim, cur_size, cur_offset });
+        m_levels.push_back({ level.m_dim, cur_size, cur_offset });
         cur_offset += cur_size;
     }
-    freeMipmapCascade();
-    std::swap(compressed_levels, m_levels);
 }   // GECompressorS3TCBC3
 
 }

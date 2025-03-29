@@ -5,7 +5,7 @@
 
 namespace GE
 {
-class GECompressorASTC4x4 : public GEMipmapGenerator
+class GECompressorASTC4x4 : public GEMipmap
 {
 private:
     uint8_t* m_compressed_data;
@@ -17,9 +17,7 @@ public:
     // ------------------------------------------------------------------------
     static bool loaded();
     // ------------------------------------------------------------------------
-    GECompressorASTC4x4(uint8_t* texture, unsigned channels,
-                        const irr::core::dimension2d<irr::u32>& size,
-                        bool normal_map);
+    GECompressorASTC4x4(GEMipmap *mipmap);
     // ------------------------------------------------------------------------
     ~GECompressorASTC4x4()                     { delete [] m_compressed_data; }
 };   // GEASTCCompressor

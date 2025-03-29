@@ -21,19 +21,15 @@ void GECompressorBPTCBC7::init()
 }   // init
 
 // ----------------------------------------------------------------------------
-GECompressorBPTCBC7::GECompressorBPTCBC7(uint8_t* texture, unsigned channels,
-                                         const irr::core::dimension2d<irr::u32>& size,
-                                         bool normal_map)
-                   : GEMipmapGenerator(texture, channels, size, normal_map)
+GECompressorBPTCBC7::GECompressorBPTCBC7(GEMipmap *mipmap)
 {
-    m_compressed_data = NULL;
 #ifdef BC7_ISPC
-    assert(channels == 4);
+    m_channels = mipmap->getChannels();
+    assert(m_channels == 4);
     size_t total_size = 0;
-    m_mipmap_sizes = 0;
-    for (unsigned i = 0; i < m_levels.size(); i++)
+    for (unsigned i = 0; i < mipmap->getAllLevels().size(); i++)
     {
-        GEImageLevel& level = m_levels[i];
+        const GEImageLevel& level = mipmap->getAllLevels()[i];
         unsigned cur_size = get4x4CompressedTextureSize(level.m_dim.Width,
             level.m_dim.Height);
         total_size += cur_size;
@@ -43,11 +39,10 @@ GECompressorBPTCBC7::GECompressorBPTCBC7(uint8_t* texture, unsigned channels,
 
     ispc::bc7e_compress_block_params p = {};
     ispc::bc7e_compress_block_params_init_ultrafast(&p, true/*perceptual*/);
-    std::vector<GEImageLevel> compressed_levels;
     m_compressed_data = new uint8_t[total_size];
     uint8_t* cur_offset = m_compressed_data;
 
-    for (GEImageLevel& level : m_levels)
+    for (const GEImageLevel& level : mipmap->getAllLevels())
     {
         uint8_t* out = cur_offset;
         for (unsigned y = 0; y < level.m_dim.Height; y += 4)
@@ -82,11 +77,9 @@ GECompressorBPTCBC7::GECompressorBPTCBC7(uint8_t* texture, unsigned channels,
         }
         unsigned cur_size = get4x4CompressedTextureSize(level.m_dim.Width,
             level.m_dim.Height);
-        compressed_levels.push_back({ level.m_dim, cur_size, cur_offset });
+        m_levels.push_back({ level.m_dim, cur_size, cur_offset });
         cur_offset += cur_size;
     }
-    freeMipmapCascade();
-    std::swap(compressed_levels, m_levels);
 #endif
 }   // GECompressorBPTCBC7
 

@@ -1,5 +1,5 @@
-#ifndef HEADER_GE_MIPMAP_GENERATOR_HPP
-#define HEADER_GE_MIPMAP_GENERATOR_HPP
+#ifndef HEADER_GE_MIPMAP_HPP
+#define HEADER_GE_MIPMAP_HPP
 
 extern "C"
 {
@@ -21,15 +21,31 @@ struct GEImageLevel
     void* m_data;
 };
 
-class GEMipmapGenerator
+class GEMipmap
 {
-private:
-    imMipmapCascade* m_cascade;
-
 protected:
     unsigned m_mipmap_sizes;
 
+    unsigned m_channels;
+
     std::vector<GEImageLevel> m_levels;
+public:
+    // ------------------------------------------------------------------------
+    GEMipmap()                          { m_mipmap_sizes = 0; m_channels = 0; }
+    // ------------------------------------------------------------------------
+    virtual ~GEMipmap() = default;
+    // ------------------------------------------------------------------------
+    unsigned getChannels() const                         { return m_channels; }
+    // ------------------------------------------------------------------------
+    unsigned getMipmapSizes() const                  { return m_mipmap_sizes; }
+    // ------------------------------------------------------------------------
+    const std::vector<GEImageLevel>& getAllLevels() const  { return m_levels; }
+};
+
+class GEMipmapGenerator : public GEMipmap
+{
+protected:
+    imMipmapCascade* m_cascade;
 
     // ------------------------------------------------------------------------
     void freeMipmapCascade()
@@ -47,12 +63,12 @@ public:
                       const irr::core::dimension2d<irr::u32>& size,
                       bool normal_map)
     {
+        m_channels = channels;
         m_cascade = new imMipmapCascade();
         unsigned width = size.Width;
         unsigned height = size.Height;
         m_levels.push_back({ size, width * height * channels, texture });
 
-        m_mipmap_sizes = 0;
         while (true)
         {
             width = width < 2 ? 1 : width >> 1;
@@ -89,11 +105,7 @@ public:
     }
     // ------------------------------------------------------------------------
     virtual ~GEMipmapGenerator()                       { freeMipmapCascade(); }
-    // ------------------------------------------------------------------------
-    unsigned getMipmapSizes() const                  { return m_mipmap_sizes; }
-    // ------------------------------------------------------------------------
-    std::vector<GEImageLevel>& getAllLevels()              { return m_levels; }
-};   // GEMipmapGenerator
+};   // GEMipmap
 
 }
 

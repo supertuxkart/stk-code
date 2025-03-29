@@ -9,42 +9,21 @@ namespace GE
 class GEVulkanDriver;
 class GEVulkanArrayTexture : public GEVulkanTexture
 {
-private:
-    void reloadInternal(const std::vector<io::path>& list,
-                        std::function<void(video::IImage*, unsigned)>
-                        image_mani,
-                        // For environment map prefilter
-                        std::function<void(const std::vector<GEImageLevel>&, // dst
-                                           const std::vector<std::vector<GEImageLevel> >&, // src
-                                           int)> // Image ID
-                        mipmap_mani = nullptr,
-                        const irr::core::dimension2d<irr::u32>& 
-                        mipmap_mani_size = irr::core::dimension2d<irr::u32>());
+protected:
+    virtual void reloadInternal(const std::vector<io::path>& list,
+                                std::function<void(video::IImage*, unsigned)>
+                                image_mani);
 public:
     // ------------------------------------------------------------------------
     GEVulkanArrayTexture(const std::vector<io::path>& full_path_list,
                          VkImageViewType type,
                          std::function<void(video::IImage*, unsigned)>
-                         image_mani = nullptr,
-                         // For environment map prefilter
-                         std::function<void(const std::vector<GEImageLevel>&, // dst
-                                            const std::vector<std::vector<GEImageLevel> >&, // src
-                                            int)> // Image ID
-                         mipmap_mani = nullptr,
-                         const irr::core::dimension2d<irr::u32>& 
-                         mipmap_mani_size = irr::core::dimension2d<irr::u32>());
+                         image_mani = nullptr);
     // ------------------------------------------------------------------------
     GEVulkanArrayTexture(const std::vector<GEVulkanTexture*>& textures,
                          VkImageViewType type,
                          std::function<void(video::IImage*, unsigned)>
-                         image_mani = nullptr,
-                         // For environment map prefilter
-                         std::function<void(const std::vector<GEImageLevel>&, // dst
-                                            const std::vector<std::vector<GEImageLevel> >&, // src
-                                            int)> // Image ID
-                         mipmap_mani = nullptr,
-                         const irr::core::dimension2d<irr::u32>& 
-                         mipmap_mani_size = irr::core::dimension2d<irr::u32>());
+                         image_mani = nullptr);
     // ------------------------------------------------------------------------
     virtual ~GEVulkanArrayTexture()                                          {}
     // ------------------------------------------------------------------------

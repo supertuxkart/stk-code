@@ -5,7 +5,7 @@
 
 namespace GE
 {
-class GECompressorBPTCBC7 : public GEMipmapGenerator
+class GECompressorBPTCBC7 : public GEMipmap
 {
 private:
     uint8_t* m_compressed_data;
@@ -13,9 +13,7 @@ public:
     // ------------------------------------------------------------------------
     static void init();
     // ------------------------------------------------------------------------
-    GECompressorBPTCBC7(uint8_t* texture, unsigned channels,
-                        const irr::core::dimension2d<irr::u32>& size,
-                        bool normal_map);
+    GECompressorBPTCBC7(GEMipmap *mipmap);
     // ------------------------------------------------------------------------
     ~GECompressorBPTCBC7()                     { delete [] m_compressed_data; }
 };   // GECompressorBPTCBC7

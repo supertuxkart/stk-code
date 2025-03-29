@@ -69,6 +69,7 @@ set(GE_SOURCES
     src/ge_compressor_s3tc_bc3.cpp
     src/ge_culling_tool.cpp
     src/ge_dx9_texture.cpp
+    src/ge_environment_map.cpp
     src/ge_main.cpp
     src/ge_texture.cpp
     src/ge_vma.cpp
@@ -83,6 +84,7 @@ set(GE_SOURCES
     src/ge_vulkan_draw_call.cpp
     src/ge_vulkan_dynamic_buffer.cpp
     src/ge_vulkan_dynamic_spm_buffer.cpp
+    src/ge_vulkan_environment_map.cpp
     src/ge_vulkan_fbo_shadow_map.cpp
     src/ge_vulkan_fbo_texture.cpp
     src/ge_vulkan_features.cpp

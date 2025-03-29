@@ -1,10 +1,11 @@
-#include "ge_vulkan_array_texture.hpp"
+#include "ge_vulkan_environment_map.hpp"
 
 #include "ge_main.hpp"
 #include "ge_mipmap_generator.hpp"
 #include "ge_compressor_astc_4x4.hpp"
 #include "ge_compressor_bptc_bc7.hpp"
 #include "ge_compressor_s3tc_bc3.hpp"
+#include "ge_environment_map.hpp"
 #include "ge_texture.hpp"
 #include "ge_vulkan_command_loader.hpp"
 #include "ge_vulkan_driver.hpp"
@@ -18,20 +19,11 @@
 namespace GE
 {
 // ============================================================================
-std::vector<io::path> getPathList(const std::vector<GEVulkanTexture*>& tlist)
-{
-    std::vector<io::path> list;
-    for (GEVulkanTexture* tex : tlist)
-        list.push_back(tex->getFullPath());
-    return list;
-}   // getPathList
-
-// ============================================================================
-GEVulkanArrayTexture::GEVulkanArrayTexture(const std::vector<io::path>& list,
-                                           VkImageViewType type,
-                                           std::function<void(video::IImage*,
-                                           unsigned)> image_mani)
-                    : GEVulkanTexture()
+GEVulkanEnvironmentMap::GEVulkanEnvironmentMap(const std::vector<io::path>& list,
+                                               VkImageViewType type,
+                                               std::function<void(video::IImage*,
+                                               unsigned)> image_mani, bool diffuse)
+                    : GEVulkanArrayTexture(list, type, image_mani)
 {
     if (list.empty())
         throw std::runtime_error("empty texture list for array texture");
@@ -47,6 +39,7 @@ GEVulkanArrayTexture::GEVulkanArrayTexture(const std::vector<io::path>& list,
     m_max_size = m_vk->getDriverAttributes()
         .getAttributeAsDimension2d("MAX_TEXTURE_SIZE");
     m_internal_format = VK_FORMAT_R8G8B8A8_UNORM;
+    m_diffuse = diffuse;
 
     m_size_lock.lock();
     m_image_view_lock.lock();
@@ -59,21 +52,22 @@ GEVulkanArrayTexture::GEVulkanArrayTexture(const std::vector<io::path>& list,
 }   // GEVulkanArrayTexture
 
 // ----------------------------------------------------------------------------
-GEVulkanArrayTexture::GEVulkanArrayTexture(
+GEVulkanEnvironmentMap::GEVulkanEnvironmentMap(
                                  const std::vector<GEVulkanTexture*>& textures,
                                  VkImageViewType type,
                                  std::function<void(video::IImage*, unsigned)>
-                                 image_mani)
-                    : GEVulkanArrayTexture(getPathList(textures), type,
-                      image_mani)
+                                 image_mani, bool diffuse)
+                    : GEVulkanArrayTexture(textures, type, image_mani)
 {
+    m_diffuse = diffuse;
 }   // GEVulkanArrayTexture
 
 // ----------------------------------------------------------------------------
-void GEVulkanArrayTexture::reloadInternal(const std::vector<io::path>& list,
+void GEVulkanEnvironmentMap::reloadInternal(const std::vector<io::path>& list,
                                           std::function<void(video::IImage*,
                                           unsigned)> image_mani)
 {
+    assert(list.size() == 6);
     VkDeviceSize image_size = 0;
     VkDeviceSize mipmap_data_size = 0;
     VkDeviceSize image_total_size = 0;
@@ -93,6 +87,9 @@ void GEVulkanArrayTexture::reloadInternal(const std::vector<io::path>& list,
     unsigned offset = 0;
     unsigned width = 0;
     unsigned height = 0;
+    std::array<GEMipmap*, 6> cubemap;
+    GECubemapSampler *sampler;
+    std::vector<std::future<GEMipmap*> > futures;
 
     std::vector<std::vector<GEImageLevel> > mipmap_levels;
 
@@ -133,7 +130,6 @@ void GEVulkanArrayTexture::reloadInternal(const std::vector<io::path>& list,
     m_size = core::dimension2du(width, height);
     image_size = m_size.Width * m_size.Height * 4;
     m_orig_size = m_size;
-    m_size_lock.unlock();
 
     for (unsigned i = 0; i < list.size(); i++)
     {
@@ -150,6 +146,7 @@ void GEVulkanArrayTexture::reloadInternal(const std::vector<io::path>& list,
         const bool normal_map = (std::string(fullpath.c_str()).find(
             "_Normal.") != std::string::npos);
         bool texture_compression = getGEConfig()->m_texture_compression;
+
         if (texture_compression && GEVulkanFeatures::supportsASTC4x4())
         {
             if (i == 0)
@@ -158,8 +155,6 @@ void GEVulkanArrayTexture::reloadInternal(const std::vector<io::path>& list,
                     m_size.Height);
                 m_internal_format = VK_FORMAT_ASTC_4x4_UNORM_BLOCK;
             }
-            GEMipmapGenerator generator(texture_data, 4, m_size, normal_map);
-            mipmap_generator = new GECompressorASTC4x4(&generator);
         }
         else if (texture_compression && GEVulkanFeatures::supportsBPTCBC7())
         {
@@ -169,8 +164,6 @@ void GEVulkanArrayTexture::reloadInternal(const std::vector<io::path>& list,
                     m_size.Height);
                 m_internal_format = VK_FORMAT_BC7_UNORM_BLOCK;
             }
-            GEMipmapGenerator generator(texture_data, 4, m_size, normal_map);
-            mipmap_generator = new GECompressorBPTCBC7(&generator);
         }
         else if (texture_compression && GEVulkanFeatures::supportsS3TCBC3())
         {
@@ -180,20 +173,64 @@ void GEVulkanArrayTexture::reloadInternal(const std::vector<io::path>& list,
                     m_size.Height);
                 m_internal_format = VK_FORMAT_BC3_UNORM_BLOCK;
             }
-            GEMipmapGenerator generator(texture_data, 4, m_size, normal_map);
-            mipmap_generator = new GECompressorS3TCBC3(&generator);
         }
-        else
-        {
-            if (i == 0)
-                m_internal_format = VK_FORMAT_R8G8B8A8_UNORM;
-            
-            mipmap_generator = new GEMipmapGenerator(texture_data, 4, m_size,
-                normal_map);
-        }
+        else if (i == 0)
+            m_internal_format = VK_FORMAT_R8G8B8A8_UNORM;
+        
+        mipmap_generator = new GEMipmapGenerator(texture_data, 4, m_size,
+            normal_map);
+    
         mipmaps.push_back(mipmap_generator);
         images.push_back(texture_image);
     }
+    std::copy_n(mipmaps.begin(), 6, cubemap.begin());
+
+    sampler = new GECubemapSampler(cubemap, m_diffuse ? GEEnvironmentMap::getIrradianceResolution()
+                                                      : GEEnvironmentMap::getRadianceResolution());
+    
+    for (unsigned i = 0; i < mipmaps.size(); i++)
+    {
+        bool diffuse = m_diffuse;
+        futures.push_back(std::async([mipmaps, i, sampler, diffuse]() -> GEMipmap* {
+            GEMipmap* ret = mipmaps[i];
+            GEMipmap* mipmap_generator = new GEEnvironmentMap(ret, *sampler, i, diffuse);
+            delete ret;
+            ret = mipmap_generator;
+            
+            bool texture_compression = getGEConfig()->m_texture_compression;
+            if (texture_compression && GEVulkanFeatures::supportsASTC4x4())
+            {
+                mipmap_generator = new GECompressorASTC4x4(ret);
+                delete ret;
+                ret = mipmap_generator;
+            }
+            else if (texture_compression && GEVulkanFeatures::supportsBPTCBC7())
+            {
+                mipmap_generator = new GECompressorBPTCBC7(ret);
+                delete ret;
+                ret = mipmap_generator;
+
+            }
+            else if (texture_compression && GEVulkanFeatures::supportsS3TCBC3())
+            {
+                mipmap_generator = new GECompressorS3TCBC3(ret);
+                delete ret;
+                ret = mipmap_generator;
+            }
+            return ret;
+        }));
+    }
+
+    for (unsigned i = 0; i < mipmaps.size(); i++)
+    {
+        mipmaps[i] = futures[i].get();
+    }
+    delete sampler;
+
+    m_size = mipmaps[0]->getAllLevels()[0].m_dim;
+    image_size = m_size.Width * m_size.Height * 4;
+
+    m_size_lock.unlock();
     
     for (int i = 0; i < mipmaps.size(); i++)
     {

@@ -5,17 +5,17 @@
 
 namespace GE
 {
-class GECompressorS3TCBC3 : public GEMipmapGenerator
+class GECompressorS3TCBC3 : public GEMipmap
 {
 private:
     uint8_t* m_compressed_data;
 public:
     // ------------------------------------------------------------------------
-    GECompressorS3TCBC3(uint8_t* texture, unsigned channels,
-                        const irr::core::dimension2d<irr::u32>& size,
-                        bool normal_map);
+    GECompressorS3TCBC3(GEMipmap *mipmap);
     // ------------------------------------------------------------------------
     ~GECompressorS3TCBC3()                     { delete [] m_compressed_data; }
+    // ------------------------------------------------------------------------
+    bool isRawData()                                          { return false; }
 };   // GECompressorS3TCBC3
 
 }

@@ -81,19 +81,16 @@ bool GECompressorASTC4x4::loaded()
 }   // loaded
 
 // ----------------------------------------------------------------------------
-GECompressorASTC4x4::GECompressorASTC4x4(uint8_t* texture, unsigned channels,
-                                         const irr::core::dimension2d<irr::u32>& size,
-                                         bool normal_map)
-                   : GEMipmapGenerator(texture, channels, size, normal_map)
+
+GECompressorASTC4x4::GECompressorASTC4x4(GEMipmap *mipmap)
 {
-    m_compressed_data = NULL;
 #ifdef ENABLE_LIBASTCENC
-    assert(channels == 4);
+    m_channels = mipmap->getChannels();
+    assert(m_channels == 4);
     size_t total_size = 0;
-    m_mipmap_sizes = 0;
-    for (unsigned i = 0; i < m_levels.size(); i++)
+    for (unsigned i = 0; i < mipmap->getAllLevels().size(); i++)
     {
-        GEImageLevel& level = m_levels[i];
+        const GEImageLevel& level = mipmap->getAllLevels()[i];
         unsigned cur_size = get4x4CompressedTextureSize(level.m_dim.Width,
             level.m_dim.Height);
         total_size += cur_size;
@@ -101,18 +98,17 @@ GECompressorASTC4x4::GECompressorASTC4x4(uint8_t* texture, unsigned channels,
             m_mipmap_sizes += cur_size;
     }
 
-    std::vector<GEImageLevel> compressed_levels;
     m_compressed_data = new uint8_t[total_size];
     uint8_t* cur_offset = m_compressed_data;
 
-    for (GEImageLevel& level : m_levels)
+    for (const GEImageLevel& level : mipmap->getAllLevels())
     {
         astcenc_image img;
         img.dim_x = level.m_dim.Width;
         img.dim_y = level.m_dim.Height;
         img.dim_z = 1;
         img.data_type = ASTCENC_TYPE_U8;
-        img.data = &level.m_data;
+        img.data = const_cast<void**>(&level.m_data);
 
         astcenc_swizzle swizzle;
         swizzle.r = ASTCENC_SWZ_R;
@@ -126,12 +122,10 @@ GECompressorASTC4x4::GECompressorASTC4x4(uint8_t* texture, unsigned channels,
             g_astc_contexts[GEVulkanCommandLoader::getLoaderId()], &img,
             &swizzle, cur_offset, cur_size, 0) != ASTCENC_SUCCESS)
             printf("astcenc_compress_image failed!\n");
-        compressed_levels.push_back({ level.m_dim, cur_size, cur_offset });
+        m_levels.push_back({ level.m_dim, cur_size, cur_offset });
         cur_offset += cur_size;
     }
-    freeMipmapCascade();
-    std::swap(compressed_levels, m_levels);
 #endif
-}   // GECompressorASTC4x4
+}
 
 }
