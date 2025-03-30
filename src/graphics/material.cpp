@@ -586,7 +586,7 @@ void Material::install(std::function<void(video::IImage*)> image_mani,
             m_sampler_path[i]);
         m_vk_textures[i - 2] = STKTexManager::getInstance()->getTexture(
             m_sampler_path[i]);
-        GE::getGEConfig()->m_ondemand_load_texture_paths.clear();
+        GE::getGEConfig()->m_ondemand_load_texture_paths.erase(m_sampler_path[i]);
         if (m_vk_textures[i - 2])
             m_vk_textures[i - 2]->grab();
     }
