@@ -25,6 +25,7 @@
 #include "config/stk_config.hpp"
 #include "config/user_config.hpp"
 #include "graphics/irr_driver.hpp"
+#include "graphics/material_manager.hpp"
 #include "guiengine/engine.hpp"
 #include "io/file_manager.hpp"
 #include "karts/kart_properties.hpp"
@@ -753,7 +754,8 @@ void KartPropertiesManager::onDemandLoadKartTextures(
         {
             for (auto& dir : ingame_karts_folder)
             {
-                if (StringUtils::startsWith(full_path, dir))
+                if (StringUtils::startsWith(full_path, dir) &&
+                    material_manager->getMaterialFor(tex.second))
                 {
                     in_use = true;
                     break;
