@@ -184,10 +184,10 @@ void GEVulkanEnvironmentMap::reloadInternal(const std::vector<io::path>& list,
         images.push_back(texture_image);
     }
     std::copy_n(mipmaps.begin(), 6, cubemap.begin());
-
+    
     sampler = new GECubemapSampler(cubemap, m_diffuse ? GEEnvironmentMap::getIrradianceResolution()
                                                       : GEEnvironmentMap::getRadianceResolution());
-    
+                                                 
     for (unsigned i = 0; i < mipmaps.size(); i++)
     {
         bool diffuse = m_diffuse;

@@ -2,6 +2,8 @@
 
 #include "vector2d.h"
 
+#include <future>
+
 #include <assert.h>
 
 namespace GE
@@ -49,10 +51,12 @@ GECubemapSampler::GECubemapSampler(std::array<GEMipmap*, 6> cubemap, unsigned ma
     m_max_size = max_size;
 
     unsigned buf_size = 0;
+    std::vector<std::future<void> > futures; 
 
     for (int i = 0; i < 6; i++)
     {
         m_map[i].resize(src[i].size());
+        
         for (int j = 0; j < src[i].size(); j++)
         {
             m_map[i][j].m_dim.Width = src[i][j].m_dim.Width + 2;
@@ -67,19 +71,25 @@ GECubemapSampler::GECubemapSampler(std::array<GEMipmap*, 6> cubemap, unsigned ma
     
     for (int i = 0; i < 6; i++)
     {
-        for (int j = 0; j < src[i].size(); j++)
-        {
-            m_map[i][j].m_data = m_data + data_offset;
-            data_offset += m_map[i][j].m_size;
-
-            for (int u = 0; u < src[i][j].m_dim.Width; u++)
+        futures.push_back(std::async([this, src, i, fill_buf, data_offset]() mutable { 
+            for (int j = 0; j < src[i].size(); j++)
             {
-                for (int v = 0; v < src[i][j].m_dim.Height; v++)
+                m_map[i][j].m_data = m_data + data_offset;
+                data_offset += m_map[i][j].m_size;
+                
+                for (int u = 0; u < src[i][j].m_dim.Width; u++)
                 {
-                    fill_buf(m_map[i][j], u + 1, v + 1, src[i][j], u, v);
+                    for (int v = 0; v < src[i][j].m_dim.Height; v++)
+                    {
+                        fill_buf(m_map[i][j], u + 1, v + 1, src[i][j], u, v);
+                    }
                 }
             }
-        }
+        }));
+    }
+    for (int i = 0; i < 6; i++)
+    {
+        futures[i].wait();
     }
     const int horizon[4] = { 0, 5, 1, 4 };
     for (int h = 0; h < 4; h++)
