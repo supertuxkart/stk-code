@@ -39,6 +39,7 @@ enum SamplerTypeNew
     ST_BILINEAR_FILTERED,
     ST_NEAREST_FILTERED_ARRAY2D,
     ST_SHADOW_SAMPLER,
+    ST_SHADOW_SAMPLER_ARRAY2D,
     ST_TRILINEAR_CLAMPED_ARRAY2D,
     ST_VOLUME_LINEAR_FILTERED,
     ST_NEARED_CLAMPED_FILTERED,
@@ -71,8 +72,9 @@ protected:
     static void   bindTextureTrilinearAnisotropic(GLuint tex_unit, GLuint tex_id);
     static void   bindTextureSemiTrilinear(GLuint tex_unit, GLuint tex_id);
     static void   bindCubemapTrilinear(GLuint tex_unit, GLuint tex_id);
-    static void   bindTextureNearestArrayTexture(GLuint tex_unit, GLuint tex_id);
+    static void   bindTextureNearestArray(GLuint tex_unit, GLuint tex_id);
     static void   bindTextureShadow(GLuint tex_unit, GLuint tex_id);
+    static void   bindTextureShadowArray(GLuint tex_unit, GLuint tex_id);
     static void   bindTrilinearClampedArrayTexture(GLuint tex_unit, GLuint tex_id);
     static void   bindTextureVolume(GLuint tex_unit, GLuint tex_id);
     static void   bindTextureBuffer(GLuint tex_unit, GLuint tex_id);

@@ -106,7 +106,7 @@ void main() {
     vec3 ddy = dFdy(xpos.xyz);
     vec3 geo_norm = normalize(cross(ddy, ddx));
 
-    vec3 norm = DecodeNormal(texture(ntex, uv).xy);
+    vec3 norm = (u_view_matrix * vec4(DecodeNormal(texture(ntex, uv).xy), 0)).xyz;
     float roughness = texture(ntex, uv).z;
     vec3 eyedir = -normalize(xpos.xyz);
 
