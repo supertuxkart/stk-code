@@ -52,7 +52,7 @@ public:
     GEEnvironmentMap(GEMipmap *mipmap, GECubemapSampler &sampler,
                      int face, bool diffuse,
                      irr::core::quaternion occlusion_sh2 = 
-                     irr::core::quaternion(0.f, 2.f, 0.f, 0.f));
+                     irr::core::quaternion(0.f, 2.f, 0.f, -0.1f));
     // ------------------------------------------------------------------------
     ~GEEnvironmentMap()                                   { delete [] m_data; }
 };   // GECullingTool
