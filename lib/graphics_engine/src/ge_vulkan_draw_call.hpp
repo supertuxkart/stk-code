@@ -89,6 +89,7 @@ struct DrawCallData
     std::string m_shader;
     std::string m_sorting_key;
     GESPMBuffer* m_mb;
+    int m_material_id;
     bool m_transparent;
     uint32_t m_dynamic_offset;
 };
@@ -109,11 +110,11 @@ private:
 
     btQuaternion m_billboard_rotation;
 
-    std::unordered_map<GESPMBuffer*, std::unordered_map<std::string,
+    std::map<std::pair<GESPMBuffer*, TexturesList>, std::unordered_map<std::string,
         std::vector<std::pair<irr::scene::ISceneNode*, int> > > >
         m_visible_nodes;
 
-    std::unordered_map<GESPMBuffer*, irr::scene::IMesh*> m_mb_map;
+    std::map<std::pair<GESPMBuffer*, TexturesList>, irr::scene::IMesh*> m_mb_map;
 
     std::map<std::string, std::vector<
         std::pair<GEVulkanDynamicSPMBuffer*, irr::scene::ISceneNode*> > >
@@ -152,7 +153,7 @@ private:
     std::unordered_map<std::string, std::pair<VkPipeline, PipelineSettings> >
         m_graphics_pipelines;
 
-    std::unordered_map<GESPMBuffer*, int> m_materials;
+    std::unordered_map<GEVulkanDynamicSPMBuffer*, int> m_dyspmb_materials;
 
     GEVulkanTextureDescriptor* m_texture_descriptor;
 
@@ -248,7 +249,7 @@ public:
         m_mb_map.clear();
         m_cmds.clear();
         m_visible_objects.clear();
-        m_materials.clear();
+        m_dyspmb_materials.clear();
         m_skinning_nodes.clear();
         m_materials_data.clear();
         m_dynamic_spm_buffers.clear();

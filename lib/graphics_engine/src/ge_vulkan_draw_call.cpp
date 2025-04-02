@@ -273,8 +273,11 @@ void GEVulkanDrawCall::addNode(irr::scene::ISceneNode* node)
                 .emplace_back(dbuffer, node);
             continue;
         }
-        m_visible_nodes[buffer][shader].emplace_back(node, i);
-        m_mb_map[buffer] = mesh;
+        const irr::video::SMaterial& m = node->getMaterial(i);
+        TexturesList t = getTexturesList(m);
+        std::pair<GESPMBuffer*, TexturesList> k = std::make_pair(buffer, t);
+        m_visible_nodes[k][getShader(m)].emplace_back(node, i);
+        m_mb_map[k] = mesh;
         if (anode && !added_skinning &&
             !anode->getSkinningMatrices().empty() &&
             m_skinning_nodes.find(anode) == m_skinning_nodes.end())
@@ -301,7 +304,8 @@ void GEVulkanDrawCall::addBillboardNode(irr::scene::ISceneNode* node,
         m_billboard_buffers[textures] = new GEVulkanBillboardBuffer(m);
     GESPMBuffer* buffer = m_billboard_buffers.at(textures);
     const std::string& shader = getShader(node, 0);
-    m_visible_nodes[buffer][shader].emplace_back(node,
+    std::pair<GESPMBuffer*, TexturesList> k = std::make_pair(buffer, textures);
+    m_visible_nodes[k][shader].emplace_back(node,
         node_type == irr::scene::ESNT_BILLBOARD ? BILLBOARD_NODE :
         PARTICLE_NODE);
 }   // addBillboardNode
@@ -312,7 +316,7 @@ void GEVulkanDrawCall::generate(GEVulkanDriver* vk)
     if (!m_visible_nodes.empty() && m_data_layout == VK_NULL_HANDLE)
         createVulkanData();
 
-    using Nodes = std::pair<GESPMBuffer*, std::unordered_map<
+    using Nodes = std::pair<std::pair<GESPMBuffer*, TexturesList>, std::unordered_map<
         std::string, std::vector<std::pair<irr::scene::ISceneNode*, int
         > > > >;
     std::vector<Nodes> visible_nodes;
@@ -324,32 +328,32 @@ void GEVulkanDrawCall::generate(GEVulkanDriver* vk)
     {
         if (p.second.empty())
         {
-            nodes_area[p.first] = std::numeric_limits<float>::max();
+            nodes_area[p.first.first] = std::numeric_limits<float>::max();
             continue;
         }
         for (auto& q : p.second)
         {
             if (q.second.empty())
             {
-                nodes_area[p.first] = std::numeric_limits<float>::max();
+                nodes_area[p.first.first] = std::numeric_limits<float>::max();
                 continue;
             }
-            irr::core::aabbox3df bb = p.first->getBoundingBox();
+            irr::core::aabbox3df bb = p.first.first->getBoundingBox();
             q.second[0].first->getAbsoluteTransformation().transformBoxEx(bb);
-            nodes_area[p.first] = bb.getArea() * (float)q.second.size();
+            nodes_area[p.first.first] = bb.getArea() * (float)q.second.size();
             break;
         }
     }
     std::stable_sort(visible_nodes.begin(), visible_nodes.end(),
         [&nodes_area](const Nodes& a, const Nodes& b)
         {
-            return nodes_area.at(a.first) < nodes_area.at(b.first) ;
+            return nodes_area.at(a.first.first) < nodes_area.at(b.first.first);
         });
 
     size_t min_size = 0;
 start:
     m_cmds.clear();
-    m_materials.clear();
+    m_dyspmb_materials.clear();
     m_materials_data.clear();
 
     m_update_data_descriptor_sets = m_sbo_data->resizeIfNeeded(min_size) ||
@@ -435,7 +439,7 @@ start:
                 getShader(m));
             ObjectData* data = (ObjectData*)mapped_addr;
             data->init(node, material_id, -1, 0);
-            m_materials[q.first] = material_id;
+            m_dyspmb_materials[q.first] = material_id;
             written_size += dynamic_spm_size;
             mapped_addr += dynamic_spm_size;
         }
@@ -461,20 +465,18 @@ start:
     std::unordered_map<uint32_t, uint32_t> offset_map;
     for (auto& p : visible_nodes)
     {
-        const irr::video::SMaterial& m = p.first->getMaterial();
-        TexturesList textures = getTexturesList(m);
+        GESPMBuffer* mb = p.first.first;
+        TexturesList& textures = p.first.second;
         const irr::video::ITexture** list = &textures[0];
-        int material_id = m_texture_descriptor->getTextureID(list,
-            getShader(m));
-        m_materials[p.first] = material_id;
-
-        const bool skinning = p.first->hasSkinning();
+        const bool skinning = mb->hasSkinning();
         for (auto& q : p.second)
         {
             unsigned visible_count = q.second.size();
             if (visible_count == 0)
                 continue;
             std::string cur_shader = q.first;
+            int material_id = m_texture_descriptor->getTextureID(list,
+                cur_shader);
             if (skinning)
                 cur_shader += "_skinning";
             if (m_graphics_pipelines.find(cur_shader) ==
@@ -509,7 +511,7 @@ start:
                 }
                 key.m_nodes.push_back(node);
             }
-            irr::scene::IMesh* m = m_mb_map[p.first];
+            irr::scene::IMesh* m = m_mb_map[std::make_pair(mb, textures)];
             auto& cur_key = instance_keys[m];
             auto it = cur_key.end();
             if (!skip_instance_key)
@@ -606,10 +608,10 @@ start:
                 }
             }
             VkDrawIndexedIndirectCommand cmd;
-            cmd.indexCount = p.first->getIndexCount();
+            cmd.indexCount = mb->getIndexCount();
             cmd.instanceCount = visible_count;
-            cmd.firstIndex = use_base_vertex ? p.first->getIBOOffset() : 0;
-            cmd.vertexOffset = use_base_vertex ? p.first->getVBOOffset() : 0;
+            cmd.firstIndex = use_base_vertex ? mb->getIBOOffset() : 0;
+            cmd.vertexOffset = use_base_vertex ? mb->getVBOOffset() : 0;
             if (skip_instance_key || it == cur_key.end())
             {
                 cmd.firstInstance = accumulated_instance;
@@ -637,7 +639,7 @@ start:
                 cmd.firstInstance = it->m_first_instance;
             std::string sorting_key =
                 std::string(1, settings.m_drawing_priority) + cur_shader;
-            m_cmds.push_back({ cmd, cur_shader, sorting_key, p.first,
+            m_cmds.push_back({ cmd, cur_shader, sorting_key, mb, material_id,
                 settings.isTransparent(), offset_map[cmd.firstInstance] });
             if (!skip_instance_key && it == cur_key.end())
                  cur_key.push_back(key);
@@ -648,7 +650,7 @@ start:
         std::stable_sort(m_cmds.begin(), m_cmds.end(),
             [this](const DrawCallData& a, const DrawCallData& b)
             {
-                return m_materials[a.m_mb] < m_materials[b.m_mb];
+                return a.m_material_id < b.m_material_id;
             });
     }
 
@@ -731,7 +733,7 @@ start:
                 cur_shader = cmd.m_shader;
             }
             m_materials_data[cmd.m_shader].second
-                .push_back(m_materials[cmd.m_mb]);
+                .push_back(cmd.m_material_id);
         }
 
         auto& material = m_materials_data[m_cmds.back().m_shader];
@@ -1526,7 +1528,7 @@ void GEVulkanDrawCall::render(GEVulkanDriver* vk, GEVulkanCameraSceneNode* cam,
                     VK_PIPELINE_BIND_POINT_GRAPHICS, m_pipeline_layout,
                     1, 1, &m_data_descriptor_sets[current_buffer_idx],
                     dynamic_offsets.size(), dynamic_offsets.data());
-                int dy_mat = m_materials[buf.first];
+                int dy_mat = m_dyspmb_materials[buf.first];
                 if (dy_mat != cur_mid)
                 {
                     cur_mid = dy_mat;
@@ -1542,9 +1544,9 @@ void GEVulkanDrawCall::render(GEVulkanDriver* vk, GEVulkanCameraSceneNode* cam,
             }
             m_dynamic_spm_buffers.erase(it);
         }
-        if (cur_mid != m_materials[m_cmds[0].m_mb])
+        if (cur_mid != m_cmds[0].m_material_id)
         {
-            cur_mid = m_materials[m_cmds[0].m_mb];
+            cur_mid = m_cmds[0].m_material_id;
             vkCmdBindDescriptorSets(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS,
                 m_pipeline_layout, 0, 1,
                 &m_texture_descriptor->getDescriptorSet()[cur_mid], 0, NULL);
@@ -1580,7 +1582,7 @@ void GEVulkanDrawCall::render(GEVulkanDriver* vk, GEVulkanCameraSceneNode* cam,
                             VK_PIPELINE_BIND_POINT_GRAPHICS, m_pipeline_layout,
                             1, 1, &m_data_descriptor_sets[current_buffer_idx],
                             dynamic_offsets.size(), dynamic_offsets.data());
-                        int dy_mat = m_materials[buf.first];
+                        int dy_mat = m_dyspmb_materials[buf.first];
                         if (dy_mat != cur_mid)
                         {
                             cur_mid = dy_mat;
@@ -1597,7 +1599,7 @@ void GEVulkanDrawCall::render(GEVulkanDriver* vk, GEVulkanCameraSceneNode* cam,
                     m_dynamic_spm_buffers.erase(it);
                 }
             }
-            int mid = m_materials[m_cmds[i].m_mb];
+            int mid = m_cmds[i].m_material_id;
             if (cur_mid != mid)
             {
                 cur_mid = mid;
@@ -1654,7 +1656,7 @@ void GEVulkanDrawCall::render(GEVulkanDriver* vk, GEVulkanCameraSceneNode* cam,
             }
             else
             {
-                int dy_mat = m_materials[buf.first];
+                int dy_mat = m_dyspmb_materials[buf.first];
                 if (dy_mat != cur_mid)
                 {
                     cur_mid = dy_mat;
