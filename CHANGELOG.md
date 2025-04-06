@@ -7,6 +7,8 @@ For similar reasons, and because some features are vastly more complex than othe
 
 ## SuperTuxKart 1.5
 
+* Fix camera weird transitions when switching views
+
 ### Networking
 * Improve the track-voting logic when no majority is achieved, by kimden
 * Prevent tracks missed by spectators from limiting the choice of active players, by kimden
@@ -27,11 +29,12 @@ For similar reasons, and because some features are vastly more complex than othe
 * Fix incorrect unlock information in Story Mode after a Grand Prix, by CodingJellyfish
 * Make the progression of audio levels geometrical and increase default steps, allowing to set lower audio levels and better accuracy for low audio levels (especially useful for headphone users), by Alayan
 * Fix drive-on sound from materials being played when the game is paused, by Alayan
-* Fix incorrect unlock information in Story Mode after a Grand Prix, by CodingJellyfish
 * Fix a crash trying to read replays when the random starting position setting is enabled, by Alayan
 * Handle track names with spaces in the replay reader, by Alayan
 * Enable smooth scrolling for Irrlicht, by CodingJellyfish
 * Add launchable tag and use rDNS format for AppData file, by AsciiWolf
+* Fix the last lap music sometimes failing to play, and improvements in the last lap music transition, by Alayan
+* Tweaks to the camera, by CodingJellyfish
 * Various build system updates, by deveee, tobbi, ognevny and others
 * Various compiler fixes, by heirecka, limburgher, nyllet and others
 * Substantial changes improving code quality, by Alayan and kimden
@@ -42,8 +45,11 @@ For similar reasons, and because some features are vastly more complex than othe
 * Improve the accuracy of the framerate limiter, by Benau
 * Add more maximum framerate options to the built-in framerate limiter, by Benau
 * Add some graphical effects for legacy video drivers, by Benau
+* Improved animations for the parachute and bubblegum shield, by Semphris
 * Replace inaccurate normal compression algorithm with Octahedron Normal Vector, by CodingJellyfish
-* Fix incorrect Screen-Space Reflection shader, by CodingJellyfish
+* Fix the Screen-Space Reflection shader, by CodingJellyfish
+* Fix and improve the Screen-Space Ambiant Occlusion shader, by CodingJellyfish
+* Implement Percentage-Closer Soft Shadows, by CodingJellyfish
 * Guarantee an overall bone limit of 2048 for skinned mesh (up from 1024), by CodingJellyfish
 * Improve Cascaded Shadow Mapping, by CodingJellyfish
 * Improve the performance of scene node iteration, by CodingJellyfish
@@ -51,6 +57,7 @@ For similar reasons, and because some features are vastly more complex than othe
 * Enable new higher LoD and shadows settings, by Alayan
 * Integrate LoD (Geometry Detail) settings in the graphics presets, and add a 7th graphics preset, by Alayan
 * Prefer displaying a lower quality LoD model over switching to a higher quality one when too close, by Alayan
+* Allow to run the game's render resolution at higher than native (up to 200%), by Alayan
 * Remove the distance limit on the display of on-track items (such as gift boxes), by Alayan
 * Improve image quality on low and medium presets with better anisotropic filtering, by Alayan
 * Various bugfixes and improvements, by zmike, Icenowy and others
@@ -68,6 +75,8 @@ For similar reasons, and because some features are vastly more complex than othe
 * Various UI layout improvements (especially for 'tall' resolutions), by CodingJellyfish
 * Generate higher resolution texture for scalable fonts, by CodingJellyfish
 * Various enhancements, by QwertyChouskie, Nomagno, Nstelt and others
+
+
 
 #### In-race UI
 * Add color and sound indicators when an elimination is about to happen in Follow-The-Leader, by Alayan
@@ -476,8 +485,8 @@ For similar reasons, and because some features are vastly more complex than othe
 ### Tracks and modeling
 #### Tracks
 * Better support for driving tracks in reverse
+* New track layout and improved graphics for Oliver's Math Class, by samuncle
 * Smaller tweaks and improvements to several tracks including 
-    * Math class
     * XR591
     * Fort Magma
     * Gran Paradiso Island
@@ -517,9 +526,10 @@ For similar reasons, and because some features are vastly more complex than othe
 * Updated Beastie kart
 #### Tracks
 * STK Enterprise by Rubberduck (replace Star Track)
+* Redesign of Minigolf, by Rubberduck
+* New longer track layout and improved graphics for Lighthouse, by samuncle
 * Gameplay and graphical updates to several tracks :
     * The Old Mine
-    * Lighthouse
     * Zen Garden
 #### Miscellaneous
 * Updated nitro models
@@ -535,11 +545,11 @@ For similar reasons, and because some features are vastly more complex than othe
 #### Tracks
 * Green Valley by Wolfs (replace Tux Tollway)
 * Blackhill Mansion by samuncle (replace Crescent Crossing)
+* New track layout and improved graphics for Shifting Sands (formerly Sand)
 * Gameplay and graphical updates to several tracks :
     * XR591
     * Fort Magma
     * Jungle
-    * Sand
     
 
 ## SuperTuxKart 0.7.3 (2. November 2011)
@@ -558,6 +568,7 @@ For similar reasons, and because some features are vastly more complex than othe
 * New Suzanne kart
 #### Tracks
 * Zen Garden by samuncle (replace Secret Garden)
+* Minigolf, by Mac
 * New Subsea
 * New Island battle arena
 #### Miscellaneous
