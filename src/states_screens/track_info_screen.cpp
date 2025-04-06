@@ -95,11 +95,7 @@ void TrackInfoScreen::loadedFromFile()
     m_icon_unknown_kart = m_icon_bank->addTextureAsSprite(kart_not_found);
 
     m_highscore_label = getWidget<LabelWidget>("highscores");
-
-    for (unsigned int i=0;i<HIGHSCORE_COUNT;i++)
-    {
-        m_highscore_entries = getWidget<ListWidget>("highscore_entries");
-    }
+    m_highscore_entries = getWidget<ListWidget>("highscore_entries");
     
     GUIEngine::IconButtonWidget* screenshot = getWidget<IconButtonWidget>("screenshot");
     screenshot->setFocusable(false);
@@ -349,6 +345,7 @@ void TrackInfoScreen::init()
         m_icon_bank->setTargetIconSize(128, 128);
         m_highscore_entries->setIcons(m_icon_bank, 1.2f);
         m_highscore_entries->setVisible(has_highscores);
+        m_highscore_entries->setActive(false); // Improve keyboard navigation
 
         updateHighScores();
     } //has_highscores

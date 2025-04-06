@@ -7,8 +7,6 @@ For similar reasons, and because some features are vastly more complex than othe
 
 ## SuperTuxKart 1.5
 
-* Fix camera weird transitions when switching views
-
 ### Networking
 * Improve the track-voting logic when no majority is achieved, by kimden
 * Prevent tracks missed by spectators from limiting the choice of active players, by kimden
