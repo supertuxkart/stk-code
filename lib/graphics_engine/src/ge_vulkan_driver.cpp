@@ -45,8 +45,10 @@ extern "C" VKAPI_ATTR VkBool32 VKAPI_CALL debug_callback(
     const VkDebugUtilsMessengerCallbackDataEXT* callback_data,
     void* user_data)
 {
-    std::string msg = callback_data->pMessage;
-    if (msg.find("UNASSIGNED-CoreValidation-Shader-OutputNotConsumed") != std::string::npos)
+    std::string msg = callback_data->pMessageIdName;
+    msg += " ";
+    msg += callback_data->pMessage;
+    if (msg.find("WARNING-Shader-OutputNotConsumed") != std::string::npos)
         return VK_FALSE;
 #ifdef __ANDROID__
     android_LogPriority alp;
@@ -798,10 +800,15 @@ void GEVulkanDriver::createInstance(SDL_Window* window)
 
     VkValidationFeaturesEXT validation_features = {};
     validation_features.sType = VK_STRUCTURE_TYPE_VALIDATION_FEATURES_EXT;
-    validation_features.enabledValidationFeatureCount = 1;
-    VkValidationFeatureEnableEXT enabled_validation_features =
-        VK_VALIDATION_FEATURE_ENABLE_BEST_PRACTICES_EXT;
-    validation_features.pEnabledValidationFeatures = &enabled_validation_features;
+    std::array<VkValidationFeatureEnableEXT, 2> enabled_validation_features =
+        {
+            VK_VALIDATION_FEATURE_ENABLE_BEST_PRACTICES_EXT,
+            VK_VALIDATION_FEATURE_ENABLE_SYNCHRONIZATION_VALIDATION_EXT
+        };
+    validation_features.pEnabledValidationFeatures =
+        enabled_validation_features.data();
+    validation_features.enabledValidationFeatureCount =
+        enabled_validation_features.size();
 
     create_info.pNext = &validation_features;
     extensions.push_back(VK_EXT_DEBUG_UTILS_EXTENSION_NAME);
