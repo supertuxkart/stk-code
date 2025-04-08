@@ -592,7 +592,12 @@ bool KartSelectionScreen::joinPlayer(InputDevice* device, PlayerProfile* p)
     {
         // Give each player a different start profile
         const int num_active_players = StateManager::get()->activePlayerCount();
-        profile_to_use = PlayerManager::get()->getPlayer(num_active_players);
+        // This doesn't check for players having manually changed the name already before adding new names
+        // But it avoids the game immediately producing a duplicate if the active account is not the 1st
+        if (PlayerManager::get()->getPlayer(num_active_players) == PlayerManager::getCurrentPlayer())
+            profile_to_use = PlayerManager::get()->getPlayer(0);
+        else
+            profile_to_use = PlayerManager::get()->getPlayer(num_active_players);
 
         removeMultiplayerMessage();
     }

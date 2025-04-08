@@ -69,8 +69,6 @@ PlayerKartWidget::PlayerKartWidget(KartSelectionScreen* parent,
     target_h = m_h;
 
     // ---- Player identity spinner
-    m_player_ident_spinner = NULL;
-
     m_player_ident_spinner = new SpinnerWidget();
     m_player_ident_spinner->setUseBackgroundColor();
     m_player_ident_spinner->setSpinnerWidgetPlayerID(m_player_id);
