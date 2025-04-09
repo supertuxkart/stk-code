@@ -28,6 +28,8 @@ DEALINGS IN THE SOFTWARE.
 #ifndef UTF8_FOR_CPP_UNCHECKED_H_2675DCD0_9480_4c0c_B92A_CC14C027B731
 #define UTF8_FOR_CPP_UNCHECKED_H_2675DCD0_9480_4c0c_B92A_CC14C027B731
 
+#include <iterator>
+#include <cstdint>
 #include "core.h"
 
 namespace utf8
@@ -222,49 +224,67 @@ namespace utf8
 
         // The iterator class
         template <typename octet_iterator>
-          class iterator : public std::iterator <std::bidirectional_iterator_tag, uint32_t> {
-            octet_iterator it;
+          class iterator {
             public:
-            iterator () {};
-            explicit iterator (const octet_iterator& octet_it): it(octet_it) {}
-            // the default "big three" are OK
-            octet_iterator base () const { return it; }
-            uint32_t operator * () const
-            {
-                octet_iterator temp = it;
-                return next(temp);
-            }
-            bool operator == (const iterator& rhs) const
-            {
-                return (it == rhs.it);
-            }
-            bool operator != (const iterator& rhs) const
-            {
-                return !(operator == (rhs));
-            }
-            iterator& operator ++ ()
-            {
-                std::advance(it, internal::sequence_length(it));
-                return *this;
-            }
-            iterator operator ++ (int)
-            {
-                iterator temp = *this;
-                std::advance(it, internal::sequence_length(it));
-                return temp;
-            }
-            iterator& operator -- ()
-            {
-                prior(it);
-                return *this;
-            }
-            iterator operator -- (int)
-            {
-                iterator temp = *this;
-                prior(it);
-                return temp;
-            }
-          }; // class iterator
+              using iterator_category = std::bidirectional_iterator_tag;
+              using value_type = uint32_t;
+              using difference_type = std::ptrdiff_t;
+              using pointer = const uint32_t*;
+              using reference = const uint32_t&;
+
+            private:
+              octet_iterator it;
+
+            public:
+              iterator() = default;
+
+              explicit iterator(const octet_iterator& octet_it)
+                 : it(octet_it) {}
+
+              octet_iterator base() const { return it; }
+
+              uint32_t operator * () const
+              {
+                 octet_iterator temp = it;
+                 return next(temp);
+              }
+
+              bool operator == (const iterator& rhs) const
+              {
+                 return it == rhs.it;
+              }
+
+              bool operator != (const iterator& rhs) const
+              {
+                 return !(*this == rhs);
+              }
+
+              iterator& operator ++ ()
+              {
+                 std::advance(it, internal::sequence_length(it));
+                 return *this;
+              }
+
+              iterator operator ++ (int)
+              {
+                 iterator temp = *this;
+                 std::advance(it, internal::sequence_length(it));
+                 return temp;
+              }
+
+              iterator& operator -- ()
+              {
+                 prior(it);
+                 return *this;
+              }
+
+              iterator operator -- (int)
+              {
+                 iterator temp = *this;
+                 prior(it);
+                 return temp;
+              }
+           }; // class iterator
 
     } // namespace utf8::unchecked
 } // namespace utf8
