@@ -196,6 +196,9 @@ void GEVulkanSceneManager::drawAll(irr::u32 flags)
     GEVulkanCameraSceneNode* cam = static_cast<
         GEVulkanCameraSceneNode*>(getActiveCamera());
     std::unique_ptr<GEVulkanDrawCall>& dc = m_draw_calls.at(cam);
+    cam->setViewPort(
+        core::recti(0, 0, rtt->getSize().Width, rtt->getSize().Height));
+    cam->render();
     dc->uploadDynamicData(vk, cam, cmd);
 
     VkRenderPassBeginInfo render_pass_info = {};
@@ -209,8 +212,6 @@ void GEVulkanSceneManager::drawAll(irr::u32 flags)
     render_pass_info.pClearValues = &clear_values[0];
     vkCmdBeginRenderPass(cmd, &render_pass_info, VK_SUBPASS_CONTENTS_INLINE);
 
-    cam->setViewPort(
-        core::recti(0, 0, rtt->getSize().Width, rtt->getSize().Height));
     dc->render(vk, cam, cmd);
     vk->addRTTPolyCount(dc->getPolyCount());
     dc->reset();
