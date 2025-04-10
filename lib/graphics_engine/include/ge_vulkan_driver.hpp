@@ -25,7 +25,7 @@ using namespace video;
 namespace GE
 {
     class GESPM;
-    class GEVulkanDepthTexture;
+    class GEVulkanAttachmentTexture;
     class GEVulkanDrawCall;
     class GEVulkanDynamicSPMBuffer;
     class GEVulkanFBOTexture;
@@ -350,7 +350,8 @@ namespace GE
         void waitIdle(bool flush_command_loader = false);
         void setDisableWaitIdle(bool val)         { m_disable_wait_idle = val; }
         IrrlichtDevice* getIrrlichtDevice() const  { return m_irrlicht_device; }
-        GEVulkanDepthTexture* getDepthTexture() const { return m_depth_texture; }
+        GEVulkanAttachmentTexture* getDepthTexture() const
+                                                     { return m_depth_texture; }
         VkFormat findSupportedFormat(const std::vector<VkFormat>& candidates,
                                      VkImageTiling tiling,
                                      VkFormatFeatureFlags features);
@@ -510,7 +511,7 @@ namespace GE
         bool m_disable_wait_idle;
 
         IrrlichtDevice* m_irrlicht_device;
-        GEVulkanDepthTexture* m_depth_texture;
+        GEVulkanAttachmentTexture* m_depth_texture;
         GEVulkanSkyBoxRenderer* m_skybox_renderer;
         GEVulkanTextureDescriptor* m_mesh_texture_descriptor;
         GEVulkanFBOTexture* m_rtt_texture;

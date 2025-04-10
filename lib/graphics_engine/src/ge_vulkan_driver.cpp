@@ -7,9 +7,9 @@
 #include "ge_spm_buffer.hpp"
 
 #include "ge_vulkan_2d_renderer.hpp"
+#include "ge_vulkan_attachment_texture.hpp"
 #include "ge_vulkan_camera_scene_node.hpp"
 #include "ge_vulkan_command_loader.hpp"
-#include "ge_vulkan_depth_texture.hpp"
 #include "ge_vulkan_draw_call.hpp"
 #include "ge_vulkan_dynamic_spm_buffer.hpp"
 #include "ge_vulkan_fbo_texture.hpp"
@@ -1339,7 +1339,7 @@ found_mode:
     }
     else
     {
-        m_depth_texture = new GEVulkanDepthTexture(this,
+        m_depth_texture = GEVulkanAttachmentTexture::createDepthTexture(this,
             core::dimension2du(m_swap_chain_extent.width,
             m_swap_chain_extent.height));
     }

@@ -297,6 +297,8 @@ bool GEVulkanTexture::createImage(VkImageUsageFlags usage)
     m_vma_info = {};
     VmaAllocationCreateInfo alloc_info = {};
     alloc_info.usage = VMA_MEMORY_USAGE_AUTO_PREFER_DEVICE;
+    if ((usage & VK_IMAGE_USAGE_TRANSIENT_ATTACHMENT_BIT) != 0)
+        alloc_info.preferredFlags = VK_MEMORY_PROPERTY_LAZILY_ALLOCATED_BIT;
     VkResult result = vmaCreateImage(m_vk->getVmaAllocator(), &image_info,
         &alloc_info, &m_image, &m_vma_allocation, &m_vma_info);
 
