@@ -504,10 +504,11 @@ GEVulkanDriver::GEVulkanDriver(const SIrrlichtCreationParameters& params,
                                IrrlichtDevice* device)
               : CNullDriver(io, core::dimension2d<u32>(0, 0)),
                 m_params(params), m_irrlicht_device(device),
-                m_depth_texture(NULL), m_mesh_texture_descriptor(NULL),
-                m_rtt_texture(NULL), m_prev_rtt_texture(NULL),
-                m_separate_rtt_texture(NULL), m_rtt_polycount(0),
-                m_billboard_quad(NULL), m_current_buffer_idx(0)
+                m_depth_texture(NULL), m_skybox_renderer(NULL),
+                m_mesh_texture_descriptor(NULL), m_rtt_texture(NULL),
+                m_prev_rtt_texture(NULL), m_separate_rtt_texture(NULL),
+                m_rtt_polycount(0), m_billboard_quad(NULL),
+                m_current_buffer_idx(0)
 {
     m_vk.reset(new VK());
     m_physical_device = VK_NULL_HANDLE;
@@ -640,7 +641,7 @@ GEVulkanDriver::GEVulkanDriver(const SIrrlichtCreationParameters& params,
         GE::setVideoDriver(this);
         createUnicolorTextures();
         GEVulkan2dRenderer::init(this);
-        GEVulkanSkyBoxRenderer::init();
+        m_skybox_renderer = new GEVulkanSkyBoxRenderer();
         m_mesh_texture_descriptor = new GEVulkanTextureDescriptor(
             GEVulkanShaderManager::getSamplerSize(),
             GEVulkanShaderManager::getMeshTextureLayer(),
@@ -703,7 +704,7 @@ void GEVulkanDriver::destroyVulkan()
         m_irrlicht_device->getSceneManager()->getMeshCache())
         getVulkanMeshCache()->destroy();
     delete m_mesh_texture_descriptor;
-    GEVulkanSkyBoxRenderer::destroy();
+    delete m_skybox_renderer;
     GEVulkan2dRenderer::destroy();
     GEVulkanShaderManager::destroy();
 
@@ -2555,7 +2556,6 @@ void GEVulkanDriver::updateDriver(bool pbr_changed)
     for (auto& dc : static_cast<GEVulkanSceneManager*>(
         m_irrlicht_device->getSceneManager())->getDrawCalls())
         dc.second = std::unique_ptr<GEVulkanDrawCall>(new GEVulkanDrawCall);
-    GEVulkanSkyBoxRenderer::destroy();
     GEVulkan2dRenderer::destroy();
     GEVulkan2dRenderer::init(this);
     setDisableWaitIdle(false);

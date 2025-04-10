@@ -10,18 +10,34 @@ namespace irr
 
 namespace GE
 {
-class GEVulkanCameraSceneNode;
-class GEVulkanDriver;
-namespace GEVulkanSkyBoxRenderer
+class GEVulkanArrayTexture;
+
+class GEVulkanSkyBoxRenderer
 {
-// ----------------------------------------------------------------------------
-void init();
-// ----------------------------------------------------------------------------
-void destroy();
-// ----------------------------------------------------------------------------
-void render(VkCommandBuffer, GEVulkanCameraSceneNode*);
-// ----------------------------------------------------------------------------
-void addSkyBox(GEVulkanCameraSceneNode*, irr::scene::ISceneNode*);
+private:
+    irr::scene::ISceneNode* m_skybox;
+
+    GEVulkanArrayTexture* m_texture_cubemap;
+
+    VkDescriptorSetLayout m_descriptor_layout;
+
+    VkDescriptorPool m_descriptor_pool;
+
+    VkDescriptorSet m_descriptor_set;
+public:
+    // ------------------------------------------------------------------------
+    GEVulkanSkyBoxRenderer();
+    // ------------------------------------------------------------------------
+    ~GEVulkanSkyBoxRenderer();
+    // ------------------------------------------------------------------------
+    void addSkyBox(irr::scene::ISceneNode* node);
+    // ------------------------------------------------------------------------
+    VkDescriptorSetLayout getDescriptorSetLayout() const
+                                                { return m_descriptor_layout; }
+    // ------------------------------------------------------------------------
+    const VkDescriptorSet* getDescriptorSet() const
+                                                  { return &m_descriptor_set; }
+
 };   // GEVulkanSkyBoxRenderer
 
 }

@@ -37,6 +37,7 @@ class GEVulkanCameraSceneNode;
 class GEVulkanDriver;
 class GEVulkanDynamicBuffer;
 class GEVulkanDynamicSPMBuffer;
+class GEVulkanSkyBoxRenderer;
 class GEVulkanTextureDescriptor;
 
 struct ObjectData
@@ -79,6 +80,7 @@ struct PipelineSettings
     bool m_depth_write;
     char m_drawing_priority;
     std::function<void(uint32_t*, void**)> m_push_constants_func;
+    VkPipelineLayout m_fs_quad_pl;
 
     bool isTransparent() const { return m_alphablend || m_additive; }
 };
@@ -148,12 +150,14 @@ private:
 
     std::vector<VkDescriptorSet> m_data_descriptor_sets;
 
-    VkPipelineLayout m_pipeline_layout;
+    VkPipelineLayout m_pipeline_layout, m_skybox_layout;
 
     std::unordered_map<std::string, std::pair<VkPipeline, PipelineSettings> >
         m_graphics_pipelines;
 
     std::unordered_map<GEVulkanDynamicSPMBuffer*, int> m_dyspmb_materials;
+
+    GEVulkanSkyBoxRenderer* m_skybox_renderer;
 
     GEVulkanTextureDescriptor* m_texture_descriptor;
 
@@ -214,6 +218,9 @@ private:
     // ------------------------------------------------------------------------
     std::string getShaderFromKey(const std::string& key) const
                                                       { return key.substr(2); }
+    // ------------------------------------------------------------------------
+    void drawSkyBox(VkCommandBuffer cmd, int current_buffer_idx,
+                    std::vector<uint32_t>& dynamic_offsets);
 public:
     // ------------------------------------------------------------------------
     GEVulkanDrawCall();
@@ -253,7 +260,10 @@ public:
         m_skinning_nodes.clear();
         m_materials_data.clear();
         m_dynamic_spm_buffers.clear();
+        m_skybox_renderer = NULL;
     }
+    // ------------------------------------------------------------------------
+    void addSkyBox(irr::scene::ISceneNode* node);
 };   // GEVulkanDrawCall
 
 }

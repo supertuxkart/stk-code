@@ -42,7 +42,6 @@ void GEVulkanSceneManager::clear()
     irr::scene::CSceneManager::clear();
     static_cast<GEVulkanDriver*>(getVideoDriver())
         ->getMeshTextureDescriptor()->clear();
-    GEVulkanSkyBoxRenderer::destroy();
 }   // clear
 
 // ----------------------------------------------------------------------------
@@ -235,7 +234,7 @@ irr::u32 GEVulkanSceneManager::registerNodeForRendering(
 
     if (node->getType() == irr::scene::ESNT_SKY_BOX)
     {
-        GEVulkanSkyBoxRenderer::addSkyBox(cam, node);
+        m_draw_calls.at(cam)->addSkyBox(node);
         return 1;
     }
 
