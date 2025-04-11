@@ -150,6 +150,8 @@ private:
 
     std::vector<VkDescriptorSet> m_data_descriptor_sets;
 
+    std::unordered_map<std::string, std::vector<char> > m_push_constants;
+
     VkPipelineLayout m_pipeline_layout, m_skybox_layout;
 
     std::unordered_map<std::string, std::pair<VkPipeline, PipelineSettings> >
@@ -181,13 +183,12 @@ private:
     {
         auto& ret = m_graphics_pipelines.at(name);
         vkCmdBindPipeline(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, ret.first);
-        if (ret.second.m_push_constants_func)
+        auto it = m_push_constants.find(ret.second.m_shader_name);
+        if (it != m_push_constants.end())
         {
-            uint32_t size;
-            void* data;
-            ret.second.m_push_constants_func(&size, &data);
             vkCmdPushConstants(cmd, m_pipeline_layout,
-                VK_SHADER_STAGE_ALL_GRAPHICS, 0, size, data);
+                VK_SHADER_STAGE_ALL_GRAPHICS, 0, it->second.size(),
+                it->second.data());
         }
     }
     // ------------------------------------------------------------------------
@@ -221,6 +222,20 @@ private:
     // ------------------------------------------------------------------------
     void drawSkyBox(VkCommandBuffer cmd, int current_buffer_idx,
                     std::vector<uint32_t>& dynamic_offsets);
+    // ------------------------------------------------------------------------
+    void updatePushConstants()
+    {
+        for (auto& p : m_push_constants)
+        {
+            auto& f =
+                m_graphics_pipelines.at(p.first).second.m_push_constants_func;
+            uint32_t size;
+            void* data;
+            f(&size, &data);
+            p.second.resize(size);
+            memcpy(p.second.data(), data, size);
+        }
+    }
 public:
     // ------------------------------------------------------------------------
     GEVulkanDrawCall();

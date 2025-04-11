@@ -1292,6 +1292,14 @@ void GEVulkanDrawCall::createVulkanData()
     }
 
     createAllPipelines(vk);
+    for (auto& p : m_graphics_pipelines)
+    {
+        if (p.second.second.m_push_constants_func)
+        {
+            m_push_constants[p.second.second.m_shader_name] =
+                std::vector<char>();
+        }
+    }
 
     size_t extra_size = 0;
     const bool use_multidraw =
@@ -1409,6 +1417,7 @@ void GEVulkanDrawCall::render(GEVulkanDriver* vk, GEVulkanCameraSceneNode* cam,
     const bool use_base_vertex = GEVulkanFeatures::supportsBaseVertexRendering();
     const bool bind_mesh_textures = GEVulkanFeatures::supportsBindMeshTexturesAtOnce();
 
+    updatePushConstants();
     updateDataDescriptorSets(vk);
     m_texture_descriptor->updateDescriptor();
 
