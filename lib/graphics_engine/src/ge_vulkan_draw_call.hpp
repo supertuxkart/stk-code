@@ -4,6 +4,7 @@
 #include <array>
 #include <functional>
 #include <map>
+#include <memory>
 #include <string>
 #include <unordered_map>
 #include <unordered_set>
@@ -72,6 +73,7 @@ struct PipelineSettings
     std::string m_vertex_shader;
     std::string m_skinning_vertex_shader;
     std::string m_fragment_shader;
+    std::string m_depth_only_fragment_shader;
     std::string m_shader_name;
     bool m_alphablend;
     bool m_additive;
@@ -83,6 +85,13 @@ struct PipelineSettings
     VkPipelineLayout m_fs_quad_pl;
 
     bool isTransparent() const { return m_alphablend || m_additive; }
+};
+
+
+struct PipelineData
+{
+    PipelineSettings m_settings;
+    std::shared_ptr<VkPipeline> m_pipeline, m_depth_only_pipeline;
 };
 
 struct DrawCallData
@@ -154,8 +163,7 @@ private:
 
     VkPipelineLayout m_pipeline_layout, m_skybox_layout;
 
-    std::unordered_map<std::string, std::pair<VkPipeline, PipelineSettings> >
-        m_graphics_pipelines;
+    std::unordered_map<std::string, PipelineData> m_graphics_pipelines;
 
     std::unordered_map<GEVulkanDynamicSPMBuffer*, int> m_dyspmb_materials;
 
@@ -171,7 +179,8 @@ private:
     // ------------------------------------------------------------------------
     void createAllPipelines(GEVulkanDriver* vk);
     // ------------------------------------------------------------------------
-    void createPipeline(GEVulkanDriver* vk, const PipelineSettings& settings);
+    void createPipeline(GEVulkanDriver* vk, const PipelineSettings& settings,
+      std::unordered_map<std::string, std::shared_ptr<VkPipeline> >& dp_cache);
     // ------------------------------------------------------------------------
     void createVulkanData();
     // ------------------------------------------------------------------------
@@ -179,17 +188,29 @@ private:
     // ------------------------------------------------------------------------
     std::string getShader(irr::scene::ISceneNode* node, int material_id);
     // ------------------------------------------------------------------------
-    void bindPipeline(VkCommandBuffer cmd, const std::string& name) const
+    bool bindPipeline(VkCommandBuffer cmd, const std::string& name,
+                      bool depth_only, VkPipeline* prev_dp) const
     {
         auto& ret = m_graphics_pipelines.at(name);
-        vkCmdBindPipeline(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, ret.first);
-        auto it = m_push_constants.find(ret.second.m_shader_name);
+        VkPipeline p = *ret.m_pipeline.get();
+        if (depth_only)
+        {
+            if (!ret.m_depth_only_pipeline)
+                return false;
+            p = *ret.m_depth_only_pipeline.get();
+            if (*prev_dp == p)
+                return true;
+            *prev_dp = p;
+        }
+        vkCmdBindPipeline(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, p);
+        auto it = m_push_constants.find(ret.m_settings.m_shader_name);
         if (it != m_push_constants.end())
         {
             vkCmdPushConstants(cmd, m_pipeline_layout,
                 VK_SHADER_STAGE_ALL_GRAPHICS, 0, it->second.size(),
                 it->second.data());
         }
+        return true;
     }
     // ------------------------------------------------------------------------
     TexturesList getTexturesList(const irr::video::SMaterial& m)
@@ -212,7 +233,7 @@ private:
         const PipelineSettings* settings = &default_settings;
         auto it = m_graphics_pipelines.find(shader);
         if (it != m_graphics_pipelines.end())
-            settings = &it->second.second;
+            settings = &it->second.m_settings;
         return std::string(1, settings->isTransparent() ? (char)1 : (char)0) +
             std::string(1, settings->m_drawing_priority) + shader;
     }
@@ -228,7 +249,8 @@ private:
         for (auto& p : m_push_constants)
         {
             auto& f =
-                m_graphics_pipelines.at(p.first).second.m_push_constants_func;
+                m_graphics_pipelines.at(p.first).m_settings
+                .m_push_constants_func;
             uint32_t size;
             void* data;
             f(&size, &data);
@@ -236,6 +258,21 @@ private:
             memcpy(p.second.data(), data, size);
         }
     }
+    // ------------------------------------------------------------------------
+    void bindSingleMaterial(VkCommandBuffer cmd,
+                            const std::string& cur_pipeline,
+                            int material_id, bool depth_only);
+    // ------------------------------------------------------------------------
+    void bindDataDescriptor(VkCommandBuffer cmd, int current_buffer_idx,
+                            std::vector<uint32_t>& dynamic_offsets)
+    {
+        vkCmdBindDescriptorSets(cmd,
+            VK_PIPELINE_BIND_POINT_GRAPHICS, m_pipeline_layout, 1, 1,
+            &m_data_descriptor_sets[current_buffer_idx],
+            dynamic_offsets.size(), dynamic_offsets.data());
+    }
+    // ------------------------------------------------------------------------
+    bool doDepthOnlyRenderingFirst();
 public:
     // ------------------------------------------------------------------------
     GEVulkanDrawCall();
