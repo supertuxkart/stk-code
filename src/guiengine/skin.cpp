@@ -1143,6 +1143,7 @@ void Skin::drawRatingBar(Widget *w, const core::recti &rect,
     RatingBarWidget *ratingBar = (RatingBarWidget*)w;
 
     const ITexture *texture = SkinConfig::m_render_params["rating::neutral"].getImage();
+    int all_steps = ratingBar->getSteps();
     const int texture_w = texture->getSize().Width / 4;
     const int texture_h = texture->getSize().Height;
     const float aspect_ratio = 1.0f;
@@ -1216,9 +1217,10 @@ void Skin::drawRatingBar(Widget *w, const core::recti &rect,
         star_rect.LowerRightCorner.Y = y_from + star_h;
 
         int step = ratingBar->getStepsOfStar(i);
+        int begin = roundf(2.0f * step / (all_steps - 1)) * texture_w; // Round to the closest actual image
 
-        const core::recti source_area(texture_w * step, 0,
-                                      texture_w * (step + 1), texture_h);
+        const core::recti source_area(begin, 0,
+                                      begin + texture_w, texture_h);
 
         draw2DImage(texture,
                     star_rect, source_area,
@@ -1422,10 +1424,11 @@ void Skin::drawRibbonChild(const core::recti &rect, Widget* widget,
         }
 
         const bool mark_focused =
-            focused || (parent_focused && parentRibbonWidget != NULL &&
+            (focused || (parent_focused && parentRibbonWidget != NULL &&
                           parentRibbonWidget->m_mouse_focus == widget) ||
                        (mark_selected && !always_show_selection &&
-                          parent_focused);
+                          parent_focused)) &&
+                        widget->m_properties[PROP_FOCUS_ICON].size() == 0;
 
         /* draw "selection bubble" if relevant */
         if (always_show_selection && mark_selected)
@@ -1473,69 +1476,23 @@ void Skin::drawRibbonChild(const core::recti &rect, Widget* widget,
             }
         }
 
+        // Handle focus from players
 
-        //Handle drawing for the first player
         int nPlayersOnThisItem = 0;
 
         if (mark_focused)
         {
-            if (use_glow)
-            {
-                // don't mark filler items as focused
-                if (widget->m_properties[PROP_ID] == RibbonWidget::NO_ITEM_ID)
-                    return;
+            // Don't mark filler items as focused
+            if (widget->m_properties[PROP_ID] == RibbonWidget::NO_ITEM_ID)
+                return;
+            
+            // Hide focus when not forced
+            if (!always_show_selection && !focused && !parent_focused)
+                return;
+                
+            nPlayersOnThisItem = 1;
+        }
 
-                static float glow_effect = 0;
-
-                const float dt = GUIEngine::getLatestDt();
-                glow_effect += dt * 3;
-                if (glow_effect > 6.2832f /* 2*PI */) glow_effect -= 6.2832f;
-                float grow = 10.0f * sinf(glow_effect);
-
-                const int glow_center_x = rect.UpperLeftCorner.X
-                    + rect.getWidth() / 2;
-                const int glow_center_y = rect.LowerRightCorner.Y;
-
-                ITexture* tex_ficonhighlight =
-                    SkinConfig::m_render_params["focusHalo::neutral"]
-                    .getImage();
-                const int texture_w = tex_ficonhighlight->getSize().Width;
-                const int texture_h = tex_ficonhighlight->getSize().Height;
-
-                core::recti source_area(0, 0, texture_w, texture_h);
-
-                float scale = (float)std::min(irr_driver->getActualScreenSize().Height / 1080.0f, 
-                                            irr_driver->getActualScreenSize().Width / 1350.0f);
-                int size = (int)((90.0f + grow) * scale);
-                const core::recti rect2(glow_center_x - size,
-                                        glow_center_y - size / 2,
-                                        glow_center_x + size,
-                                        glow_center_y + size / 2);
-
-                draw2DImage(tex_ficonhighlight, rect2,
-                    source_area,
-                    /*clipping*/ 0,
-                    /*color*/ 0,
-                    /*alpha*/true);
-            }
-            // if we're not using glow, draw square focus instead
-            else
-            {
-                const bool show_focus = (focused || parent_focused);
-
-                if (!always_show_selection && !show_focus) return;
-
-                // don't mark filler items as focused
-                if (widget->m_properties[PROP_ID] == RibbonWidget::NO_ITEM_ID)
-                    return;
-
-                drawBoxFromStretchableTexture(parentRibbonWidget, rect,
-                    SkinConfig::m_render_params["squareFocusHalo1::neutral"]);
-                nPlayersOnThisItem++;
-            }
-        } // end if mark_focused
-
-        //Handle drawing for everyone else
         for (unsigned i = 1; i < MAX_PLAYER_COUNT; i++)
         {
             // ---- Draw selection for other players than player 1
@@ -1543,6 +1500,20 @@ void Skin::drawRibbonChild(const core::recti &rect, Widget* widget,
                 parentRibbon->getSelectionIDString(i) ==
                 widget->m_properties[PROP_ID])
             {
+                nPlayersOnThisItem++;
+            }
+        }
+
+        // Handle drawing for everyone else
+        for (unsigned i = MAX_PLAYER_COUNT - 1; i >= 1; i--)
+        {
+            // ---- Draw selection for other players than player 1
+            if (parentRibbon->isFocusedForPlayer(i) &&
+                parentRibbon->getSelectionIDString(i) ==
+                widget->m_properties[PROP_ID])
+            {
+                nPlayersOnThisItem--;
+                
                 short red_previous = parentRibbonWidget->m_skin_r;
                 short green_previous = parentRibbonWidget->m_skin_g;
                 short blue_previous = parentRibbonWidget->m_skin_b;
@@ -1589,9 +1560,54 @@ void Skin::drawRibbonChild(const core::recti &rect, Widget* widget,
                     parentRibbonWidget->m_skin_g = green_previous;
                     parentRibbonWidget->m_skin_b = blue_previous;
                 }
-                nPlayersOnThisItem++;
             }
         }
+
+        // Handle drawing for the first player
+        if (mark_focused)
+        {
+            if (use_glow)
+            {
+                static float glow_effect = 0;
+
+                const float dt = GUIEngine::getLatestDt();
+                glow_effect += dt * 3;
+                if (glow_effect > 6.2832f /* 2*PI */) glow_effect -= 6.2832f;
+                float grow = 10.0f * sinf(glow_effect);
+
+                const int glow_center_x = rect.UpperLeftCorner.X
+                    + rect.getWidth() / 2;
+                const int glow_center_y = rect.LowerRightCorner.Y;
+
+                ITexture* tex_ficonhighlight =
+                    SkinConfig::m_render_params["focusHalo::neutral"]
+                    .getImage();
+                const int texture_w = tex_ficonhighlight->getSize().Width;
+                const int texture_h = tex_ficonhighlight->getSize().Height;
+
+                core::recti source_area(0, 0, texture_w, texture_h);
+
+                float scale = (float)std::min(irr_driver->getActualScreenSize().Height / 1080.0f, 
+                                            irr_driver->getActualScreenSize().Width / 1350.0f);
+                int size = (int)((90.0f + grow) * scale);
+                const core::recti rect2(glow_center_x - size,
+                                        glow_center_y - size / 2,
+                                        glow_center_x + size,
+                                        glow_center_y + size / 2);
+
+                draw2DImage(tex_ficonhighlight, rect2,
+                    source_area,
+                    /*clipping*/ 0,
+                    /*color*/ 0,
+                    /*alpha*/true);
+            }
+            // if we're not using glow, draw square focus instead
+            else
+            {
+                drawBoxFromStretchableTexture(parentRibbonWidget, rect,
+                    SkinConfig::m_render_params["squareFocusHalo1::neutral"]);
+            }
+        } // end if mark_focused
 
         drawIconButton(rect, widget, pressed, focused);
 
@@ -1824,7 +1840,16 @@ void Skin::drawSpinnerChild(const core::recti &rect, Widget* widget,
         return;
 
     SpinnerWidget* spinner = dynamic_cast<SpinnerWidget*>(widget->m_event_handler);
-    bool spinner_focused = spinner->isFocusedForPlayer(PLAYER_ID_GAME_MASTER);
+    
+    bool spinner_focused = false;
+    for (unsigned i = 1; i < MAX_PLAYER_COUNT + 1; i++)
+    {
+        if (spinner->isFocusedForPlayer(i - 1))
+        {
+            spinner_focused = true;
+            break;
+        }
+    }
 
     if (pressed || (spinner->isButtonSelected(right) && spinner_focused))
     {
@@ -2560,6 +2585,20 @@ void Skin::drawBadgeOn(const Widget* widget, const core::recti& rect)
         float max_icon_size = 0.43f;
         video::ITexture* texture = irr_driver->getTexture(FileManager::GUI_ICON,
                                                           "down.png");
+        doDrawBadge(texture, rect, max_icon_size, false);
+    }
+    if (widget->m_badges & HEART_BADGE)
+    {
+        float max_icon_size = 0.43f;
+        video::ITexture* texture = irr_driver->getTexture(FileManager::GUI_ICON,
+                                                          "heart.png");
+        doDrawBadge(texture, rect, max_icon_size, false);
+    }
+    if (widget->m_badges & REDDOT_BADGE)
+    {
+        float max_icon_size = 0.43f;
+        video::ITexture* texture = irr_driver->getTexture(FileManager::GUI_ICON,
+                                                          "red_dot.png");
         doDrawBadge(texture, rect, max_icon_size, false);
     }
 }   // drawBadgeOn

@@ -47,7 +47,9 @@ private:
     void renderEnvMap(GLuint normal_depth_texture,
                       GLuint depth_stencil_texture,
                       GLuint specular_probe,
-                      GLuint albedo_buffer);
+                      GLuint albedo_buffer,
+                      GLuint ssao_buffer,
+                      GLuint diffuse_color_texture);
 
     /** Generate diffuse and specular map */
     void         renderSunlight(const core::vector3df &direction,
@@ -65,7 +67,10 @@ public:
                         GLuint depth_stencil_texture,
                         GLuint albedo_texture,
                         const FrameBuffer* shadow_framebuffer,
-                        GLuint specular_probe);
+                        GLuint ssao_texture,
+                        GLuint diffuse_color_texture,
+                        GLuint specular_probe,
+                        const core::vector3df* shadow_box_extents);
     void renderLightsScatter(GLuint depth_stencil_texture,
                              const FrameBuffer& half1_framebuffer,
                              const FrameBuffer& half2_framebuffer,

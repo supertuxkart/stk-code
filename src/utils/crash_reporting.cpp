@@ -101,9 +101,9 @@
                 getCallStack(callstack);
 
             std::string msg =   "SuperTuxKart crashed!\n"
-                                "If you continue to encounter this issue, please hit Ctrl+C to copy this error\n"
-                                "to the clipboard and report the problem to the developers on our forum:\n"
-                                "http://forum.freegamedev.net/viewforum.php?f=17\n"
+                                "If you continue to encounter this issue, please hit Ctrl+C to copy this error "
+                                "to the clipboard and report the problem to the developers on our bug tracker:\n"
+                                "https://github.com/supertuxkart/stk-code/issues\n"
                                 "\n"
                                 "Call stack:\n";
             msg += callstack;

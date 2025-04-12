@@ -105,6 +105,7 @@ HighScoreInfoDialog::HighScoreInfoDialog(Highscores* highscore, bool is_linear, 
     icon_bank->setScale(1.5f / 128.0f);
     icon_bank->setTargetIconSize(128, 128);
     m_high_score_list->setIcons(icon_bank, 1.5f);
+    m_high_score_list->setActive(false); // Improve keyboard navigation
 
     updateHighscoreEntries();
 

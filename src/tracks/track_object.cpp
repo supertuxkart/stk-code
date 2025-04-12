@@ -366,7 +366,7 @@ void TrackObject::init(const XMLNode &xml_node, scene::ISceneNode* parent,
         {
             m_animator = new ThreeDAnimation(xml_node, this);
         }
-        catch (std::exception& e)
+        catch (std::runtime_error& e)
         {
 #ifndef SERVER_ONLY
             Log::debug("TrackObject", e.what());

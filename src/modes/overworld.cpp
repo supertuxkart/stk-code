@@ -38,6 +38,10 @@
 #include "tracks/track.hpp"
 #include "tracks/track_object_manager.hpp"
 
+#ifdef ANDROID
+#include <SDL_system.h>
+#endif
+
 //-----------------------------------------------------------------------------
 OverWorld::OverWorld() : World()
 {
@@ -242,6 +246,11 @@ void OverWorld::onFirePressed(Controller* who)
         {
             if (challenges[n].m_challenge_id == "tutorial")
             {
+#ifdef ANDROID
+                if (SDL_IsAndroidTV())
+                    return;
+#endif
+
                 scheduleTutorial();
                 return;
             }

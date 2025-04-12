@@ -5,79 +5,134 @@ It should be kept in mind that some versions have a less complete changelog than
 
 For similar reasons, and because some features are vastly more complex than others, attributions of main changes should not be taken as a shortcut for overall contribution.
 
-## SuperTuxKart 1.5 (TBD, still unfinished)
+## SuperTuxKart 1.5
 
 ### Networking
-* Improve track-voting logic when no majority is achieved, by kimden
+* Improve the track-voting logic when no majority is achieved, by kimden
+* Prevent tracks missed by spectators from limiting the choice of active players, by kimden
+* Make bot indices start from one, by JipFr
+* Various bugfixes, by kimden
+
+### Gameplay
+* Fix start positions for negative sideward distances, by kimden
+* Make the rescue bird place the kart towards the ball in soccer mode, by Snoker101
 
 ### General
-* Make the game's window resizable in all the screens, by CodingJellyfish (previously, most UI screens did not support resizing)
+* Make the game's window resizable in all menu screens, by Benau and CodingJellyfish
 * New benchmark mode, by Alayan:
 - Can be run with a few clicks, allowing to easily test the performance of various settings or to compare different systems
 - Robust performance metrics that better reflect the impact of varying frametimes than Average FPS and 1% Lows.
+- Results are displayed along the active graphics settings, and detailed results can be saved to file
+* Add the benchmark mode to commandline options, by ektor5
 * Fix incorrect unlock information in Story Mode after a Grand Prix, by CodingJellyfish
 * Make the progression of audio levels geometrical and increase default steps, allowing to set lower audio levels and better accuracy for low audio levels (especially useful for headphone users), by Alayan
 * Fix drive-on sound from materials being played when the game is paused, by Alayan
 * Fix a crash trying to read replays when the random starting position setting is enabled, by Alayan
 * Handle track names with spaces in the replay reader, by Alayan
+* Enable smooth scrolling for Irrlicht, by CodingJellyfish
+* Add launchable tag and use rDNS format for AppData file, by AsciiWolf
+* Fix the last lap music sometimes failing to play, and improvements in the last lap music transition, by Alayan
+* Tweaks to the camera, by CodingJellyfish
+* Various build system updates, by deveee, tobbi, ognevny and others
+* Various compiler fixes, by heirecka, limburgher, nyllet and others
+* Substantial changes improving code quality, by Alayan and kimden
+* Update Wiiuse library to 0.15.6, SIMD-e to 0.8.2, MojoAL to latest (a9e2f30)
 * Various tweaks, bugfixes and code-quality improvements
 
 ### Graphics
 * Improve the accuracy of the framerate limiter, by Benau
-* Add more maximum framerate options to the built-in framerate limiter, by Benau (this does not affect physics, which run at 120FPs independetly of graphical FPS)
+* Add more maximum framerate options to the built-in framerate limiter, by Benau
 * Add some graphical effects for legacy video drivers, by Benau
-* Ensure fragment shaders use high precision, to avoid rendering issues with some drivers, by zmike
-* Fix a related precision issue causing black artifacts with GL_ES, by CodingJellyfish
-* Fix other shader issues that could produce black artifacts in specific situations, by CodingJellyfish
+* Improved animations for the parachute and bubblegum shield, by Semphris
+* Replace inaccurate normal compression algorithm with Octahedron Normal Vector, by CodingJellyfish
+* Fix the Screen-Space Reflection shader, by CodingJellyfish
+* Fix and improve the Screen-Space Ambiant Occlusion shader, by CodingJellyfish
+* Implement Percentage-Closer Soft Shadows, by CodingJellyfish
+* Guarantee an overall bone limit of 2048 for skinned mesh (up from 1024), by CodingJellyfish
+* Improve Cascaded Shadow Mapping, by CodingJellyfish
+* Improve the performance of scene node iteration, by CodingJellyfish
 * Various improvements to the automatic computations of Level of Detail (LoD) distances, by Alayan
-* Improve draw call performance in some situations, by CodingJellyfish
 * Enable new higher LoD and shadows settings, by Alayan
-* Integrate LoD (Geometry Detail) settings in the graphics presets, by Alayan
+* Integrate LoD (Geometry Detail) settings in the graphics presets, and add a 7th graphics preset, by Alayan
 * Prefer displaying a lower quality LoD model over switching to a higher quality one when too close, by Alayan
+* Allow to run the game's render resolution at higher than native (up to 200%), by Alayan
+* Remove the distance limit on the display of on-track items (such as gift boxes), by Alayan
+* Improve image quality on low and medium presets with better anisotropic filtering, by Alayan
+* Various bugfixes and improvements, by zmike, Icenowy and others
 
 ### User Interface
+* Allow users to select favorite karts/tracks/arenas, by Alayan and CodingJellyfish
+* Five new skin variants for Cartoon, and a new Desert skin variant for Classic, by Alayan and CrystalDaEevee
+* Improve the skin selection UX by separating "base theme" and "skin variant" selection, by Alayan
 * Add a new Display tab in the Settings, by Alayan
+* Allow users to search karts/arenas, by CodingJellyfish
+* Allow users to group karts by kart classes, by CodingJellyfish
 * Allow to rate addons with a keyboard or a controller, and notify when trying to rate an addon while not logged in, by CodingJellyfish
-* Fix an issue that prevented to go up with a scrollbar using a trackpad, by CodingJellyfish
 * Improve the typing bars, especially for the coal theme, by Alayan
-* Greatly improve UI layout for 'tall' resolutions (greater height than width), by CodingJellyfish
-* Improve font scaling, by CodingJellyfish
-* Various enhancements, by Qwertychouskie and others
+* Implement a blog announcement system in the Online screen, by CodingJellyfish
+* Various UI layout improvements (especially for 'tall' resolutions), by CodingJellyfish
+* Generate higher resolution texture for scalable fonts, by CodingJellyfish
+* Various enhancements, by QwertyChouskie, Nomagno, Nstelt and others
+
+
+
+#### In-race UI
+* Add color and sound indicators when an elimination is about to happen in Follow-The-Leader, by Alayan
+* Correctly display the remaining time in FtL when extra-time is added, by Alayan
+* Show score with color on the center of speedometer in battles, by CodingJellyfish
+* Display correctly themed attachment icons if the base theme has been changed before the last restart, by CodingJellyfish
+
+### Tracks and modeling
+* New music for Las Dunas Arena/Las Dunas Soccer, by ALBatross
+* Update Godette face texture, by ZAQraven99
+* Fix Northern Resort skybox, by CrystalDaEevee
+* Various cut/checkline fixes, by CrystalDaEevee
 
 ### Mobile
 * Don't keep the rescue button active after it stops being touched, when the finger keeps touching the screen (e. g. to handle the steering wheel), by S0nter
 
 ## SuperTuxKart 1.4 (31. October 2022)
 ### General
-* Lap trial mode, by mrkubax10
-* Fix parachute powerup, by heuchi
-* Fix gyroscope on walldriving surface, by Benau
 * Enable ARMv7 build for Windows, by Benau
 * Restore macOS <= 10.14 support, by Benau
+* Allow setting the auto-center behavior of steering wheels, by Mstrodl
+* Simplify making derivative UI skins by allowing to specify a base theme, by qwertychouskie
+* Make sure old save data is only removed after new save data is written, to avoid data losses on full drives, by Benau
+* Fixed camera rotation when using the gyroscope and driving on vertical surfaces, by Benau
+* Lap trial mode, by mrkubax10
+* Fix a parachute powerup bug, whereby karts behind the user would still lose their shield, by heuchi
+* Add an option to randomize the player starting position, by Iwoithe
 * Avoid triggering other goal lines when the goal is already scored, by kimden
+* And some other minor bugfixes and enhancements too small or specific to be detailed
 
 ### Graphics
-* Items and stars animation, by Semphris
+* Beta Vulkan renderer, by Benau
+* Add an animation to the stars displayed after a kart gets hit, by Semphris
+* Add intuitive animations for the respawn of on-track items (such as gift boxes), by Semphris
 * LOD optimization, by Benau
 * Implement HiDPI support in SDL2 properly, by Benau
-* Beta Vulkan renderer, by Benau
-* Make sky particle always fall vertically, by Benau
+* Increase the use of on-demand loading for textures, by Benau
+* Make sky particle always fall vertically (instead of perpendicularly to the player camera), by Benau
 
 ### Tracks and modeling
 * Updated Konqi, by ZAQraven99
 * New Godette kart, by ZAQraven99
+* New Hole Drop Soccer Field, by CrystalDaEevee, music by DernisNW
+* New Oasis Soccer Field, by CrystalDaEevee
 * Updated Battle Island and Cave X, by Typhon306
 * Fix broken invisible wall in Antediluvian Abyss, by Benau
 * New textures in Shifting Sands, by KartOym
-* Balanced starting positions in all official soccer fields, by Crystal
+* Balanced starting positions in all official soccer fields, by CrystalDaEevee
 
 ### Networking
-* Add track searching to network track screen, by Benau
-* Make limit of players in game configurable, by Waldlaubsaengernest
+* Make the in-server and in-game player limits independent, allowing extra slots for spectators, by Waldlaubsaengernest
 * Allow using real addon karts (same hitbox and kart type as in local game), by Benau
+* Sort the server list by number of real players in servers (ignoring AIs), by Benau
 
 ### User Interface
-* Add left side ghost replay difficulties, by ldoyenard
+* Display per-kart difficulty in the end-screen for replays, by ldoyenard
+* Add track searching to the network track screen, by Benau
+* Minor enhancements and fixes in the end race screen
 
 ## SuperTuxKart 1.3 (28. September 2021)
 ### Networking
@@ -178,7 +233,7 @@ For similar reasons, and because some features are vastly more complex than othe
 ### Tracks and modeling
 #### Karts
 * New version of Kiki, by Typhon306 and ZAQraven99
-* Improved karts, by Crystal
+* Improved karts, by CrystalDaEevee
     * Pidgin, Puffy
 * Improved beastie animation, by D_ft Kid
 
@@ -428,8 +483,8 @@ For similar reasons, and because some features are vastly more complex than othe
 ### Tracks and modeling
 #### Tracks
 * Better support for driving tracks in reverse
+* New track layout and improved graphics for Oliver's Math Class, by samuncle
 * Smaller tweaks and improvements to several tracks including 
-    * Math class
     * XR591
     * Fort Magma
     * Gran Paradiso Island
@@ -469,9 +524,10 @@ For similar reasons, and because some features are vastly more complex than othe
 * Updated Beastie kart
 #### Tracks
 * STK Enterprise by Rubberduck (replace Star Track)
+* Redesign of Minigolf, by Rubberduck
+* New longer track layout and improved graphics for Lighthouse, by samuncle
 * Gameplay and graphical updates to several tracks :
     * The Old Mine
-    * Lighthouse
     * Zen Garden
 #### Miscellaneous
 * Updated nitro models
@@ -487,11 +543,11 @@ For similar reasons, and because some features are vastly more complex than othe
 #### Tracks
 * Green Valley by Wolfs (replace Tux Tollway)
 * Blackhill Mansion by samuncle (replace Crescent Crossing)
+* New track layout and improved graphics for Shifting Sands (formerly Sand)
 * Gameplay and graphical updates to several tracks :
     * XR591
     * Fort Magma
     * Jungle
-    * Sand
     
 
 ## SuperTuxKart 0.7.3 (2. November 2011)
@@ -510,6 +566,7 @@ For similar reasons, and because some features are vastly more complex than othe
 * New Suzanne kart
 #### Tracks
 * Zen Garden by samuncle (replace Secret Garden)
+* Minigolf, by Mac
 * New Subsea
 * New Island battle arena
 #### Miscellaneous

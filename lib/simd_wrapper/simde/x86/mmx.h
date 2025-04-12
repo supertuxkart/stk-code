@@ -1467,18 +1467,17 @@ simde_mm_slli_pi16 (simde__m64 a, int count) {
     simde__m64_private r_;
     simde__m64_private a_ = simde__m64_to_private(a);
 
-    #if defined(SIMDE_VECTOR_SUBSCRIPT_SCALAR) && defined(SIMDE_BUG_CLANG_POWER9_16x4_BAD_SHIFT)
+    #if defined(SIMDE_MIPS_LOONGSON_MMI_NATIVE)
+      r_.mmi_i16 = psllh_s(a_.mmi_i16, count);
+    #elif defined(SIMDE_VECTOR_SUBSCRIPT_SCALAR) && defined(SIMDE_BUG_CLANG_POWER9_16x4_BAD_SHIFT)
       if (HEDLEY_UNLIKELY(count > 15))
         return simde_mm_setzero_si64();
 
       r_.i16 = a_.i16 << HEDLEY_STATIC_CAST(int16_t, count);
     #elif defined(SIMDE_VECTOR_SUBSCRIPT_SCALAR)
       r_.i16 = a_.i16 << count;
-    #elif defined(SIMDE_VECTOR_SUBSCRIPT_SCALAR)
     #elif defined(SIMDE_ARM_NEON_A32V7_NATIVE)
       r_.neon_i16 = vshl_s16(a_.neon_i16, vmov_n_s16((int16_t) count));
-    #elif defined(SIMDE_MIPS_LOONGSON_MMI_NATIVE)
-      r_.mmi_i16 = psllh_s(a_.mmi_i16, b_.mmi_i16);
     #else
       SIMDE_VECTORIZE
       for (size_t i = 0 ; i < (sizeof(r_.u16) / sizeof(r_.u16[0])) ; i++) {
@@ -2157,10 +2156,10 @@ simde_mm_unpackhi_pi8 (simde__m64 a, simde__m64 b) {
 
     #if defined(SIMDE_ARM_NEON_A64V8_NATIVE)
       r_.neon_i8 = vzip2_s8(a_.neon_i8, b_.neon_i8);
-    #elif defined(SIMDE_SHUFFLE_VECTOR_)
-      r_.i8 = SIMDE_SHUFFLE_VECTOR_(8, 8, a_.i8, b_.i8, 4, 12, 5, 13, 6, 14, 7, 15);
     #elif defined(SIMDE_MIPS_LOONGSON_MMI_NATIVE)
       r_.mmi_i8 = punpckhbh_s(a_.mmi_i8, b_.mmi_i8);
+    #elif defined(SIMDE_SHUFFLE_VECTOR_)
+      r_.i8 = SIMDE_SHUFFLE_VECTOR_(8, 8, a_.i8, b_.i8, 4, 12, 5, 13, 6, 14, 7, 15);
     #else
       r_.i8[0] = a_.i8[4];
       r_.i8[1] = b_.i8[4];

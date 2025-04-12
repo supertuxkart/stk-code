@@ -103,7 +103,9 @@ void CustomVideoSettingsDialog::beforeAddingWidgets()
     shadows->addLabel(_("Low"));        // 1
     shadows->addLabel(_("Medium"));     // 2
     shadows->addLabel(_("High"));       // 3
-    shadows->setValue(UserConfigParams::m_shadows_resolution == 2048 ? 3 :
+    shadows->addLabel(_("Very High"));  // 4
+    shadows->setValue(UserConfigParams::m_shadows_resolution == 2048 ? 
+                        (UserConfigParams::m_pcss_threshold == 2048 ? 4 : 3) :
                       UserConfigParams::m_shadows_resolution == 1024 ? 2 :
                       UserConfigParams::m_shadows_resolution ==  512 ? 1 : 0);
 
@@ -142,10 +144,10 @@ GUIEngine::EventPropagation CustomVideoSettingsDialog::processEvent(const std::s
         if (selection == "apply")
         {
             bool advanced_pipeline = getWidget<CheckBoxWidget>("dynamiclight")->getState();
-            bool update_needed = false;
+            bool pbr_changed = false;
             if (UserConfigParams::m_dynamic_lights != advanced_pipeline)
             {
-                update_needed = true;
+                pbr_changed = true;
                 GE::getGEConfig()->m_pbr = advanced_pipeline;
             }
             UserConfigParams::m_dynamic_lights = advanced_pipeline;
@@ -161,7 +163,9 @@ GUIEngine::EventPropagation CustomVideoSettingsDialog::processEvent(const std::s
                 UserConfigParams::m_shadows_resolution =
                     getWidget<SpinnerWidget>("shadows")->getValue() == 1 ?  512 :
                     getWidget<SpinnerWidget>("shadows")->getValue() == 2 ? 1024 :
-                    getWidget<SpinnerWidget>("shadows")->getValue() == 3 ? 2048 : 0;
+                    getWidget<SpinnerWidget>("shadows")->getValue() >= 3 ? 2048 : 0;
+                UserConfigParams::m_pcss_threshold = 
+                    getWidget<SpinnerWidget>("shadows")->getValue() == 3 ? 4096 : 2048;
             }
             else
             {
@@ -215,7 +219,7 @@ GUIEngine::EventPropagation CustomVideoSettingsDialog::processEvent(const std::s
             OptionsScreenVideo::getInstance()->updateGfxSlider();
             OptionsScreenVideo::getInstance()->updateBlurSlider();
 #ifndef SERVER_ONLY
-            if (update_needed && GE::getDriver()->getDriverType() == video::EDT_VULKAN)
+            if (pbr_changed && GE::getDriver()->getDriverType() == video::EDT_VULKAN)
                 GE::getVKDriver()->updateDriver(true);
 #endif
             OptionsScreenVideo::setImageQuality(quality);
@@ -260,4 +264,3 @@ void CustomVideoSettingsDialog::updateActivation()
     getWidget<CheckBoxWidget>("lightscattering")->setActive(light);
 #endif
 }   // updateActivation
-

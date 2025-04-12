@@ -57,6 +57,21 @@ void GEVulkanCameraSceneNode::render()
 
     m_ubo_data.m_projection_view_matrix.getInverse(
         m_ubo_data.m_inverse_projection_view_matrix);
+
+    VkViewport vp = {};
+    float scale = getGEConfig()->m_render_scale;
+    if (vk->getSeparateRTTTexture())
+        scale = 1.0f;
+    vp.x = m_viewport.UpperLeftCorner.X * scale;
+    vp.y = m_viewport.UpperLeftCorner.Y * scale;
+    vp.width = m_viewport.getWidth() * scale;
+    vp.height = m_viewport.getHeight() * scale;
+    vk->getRotatedViewport(&vp, true/*handle_rtt*/);
+
+    m_ubo_data.m_viewport.UpperLeftCorner.X = vp.x;
+    m_ubo_data.m_viewport.UpperLeftCorner.Y = vp.y;
+    m_ubo_data.m_viewport.LowerRightCorner.X = vp.width;
+    m_ubo_data.m_viewport.LowerRightCorner.Y = vp.height;
 }   // render
 
 // ----------------------------------------------------------------------------

@@ -16,8 +16,6 @@ GEDX9Texture::GEDX9Texture(const std::string& path,
              m_device_9(NULL), m_texture_9(NULL), m_texture_size(0),
              m_disable_reload(false)
 {
-    m_max_size = getDriver()->getDriverAttributes()
-        .getAttributeAsDimension2d("MAX_TEXTURE_SIZE");
     getDevice9();
     reload();
 }   // GEDX9Texture
@@ -108,8 +106,10 @@ void GEDX9Texture::reload()
         return;
     }
 
+    const core::dimension2du& max_size = getDriver()->getDriverAttributes()
+        .getAttributeAsDimension2d("MAX_TEXTURE_SIZE");
     video::IImage* texture_image = getResizedImage(NamedPath.getPtr(),
-        m_max_size, &m_orig_size);
+        max_size, &m_orig_size);
     if (texture_image == NULL)
     {
         LoadingFailed = true;

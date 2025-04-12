@@ -72,7 +72,7 @@ jobs:
             echo "cache_$number=switch-${{ github.ref }}-$id" >> $GITHUB_ENV
           done
       - name: Handle build cache
-        uses: actions/cache@v2
+        uses: actions/cache@v3
         with:
           # This is unnecessarily verbose and might break, but again ! seems broken
           # See: https://github.com/Mstrodl/stk-code/runs/2333673736?check_suite_focus=true#step:16:34

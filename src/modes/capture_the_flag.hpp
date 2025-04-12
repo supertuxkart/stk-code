@@ -32,20 +32,18 @@ namespace irr
 }
 
 class CTFFlag;
+enum FlagColor : unsigned int;
 
 class CaptureTheFlag : public FreeForAll
 {
 private:
     scene::IAnimatedMeshSceneNode* m_red_flag_node;
-
     scene::IAnimatedMeshSceneNode* m_blue_flag_node;
 
     scene::IAnimatedMesh* m_red_flag_mesh;
-
     scene::IAnimatedMesh* m_blue_flag_mesh;
 
     scene::ISceneNode* m_red_flag_indicator;
-
     scene::ISceneNode* m_blue_flag_indicator;
 
     SFXBase* m_scored_sound;
@@ -70,6 +68,8 @@ private:
     void resetBlueFlagToOrigin();
     // ------------------------------------------------------------------------
     virtual video::SColor getColor(unsigned int kart_id) const OVERRIDE;
+
+    void checkScoring(FlagColor color);
 
 public:
     // ------------------------------------------------------------------------

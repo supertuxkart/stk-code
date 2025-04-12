@@ -18,13 +18,12 @@
 // Manages includes common to all help screens
 #include "states_screens/help/help_common.hpp"
 
-#include "config/player_manager.hpp"
-#include "config/user_config.hpp"
 #include "guiengine/widgets/button_widget.hpp"
-#include "input/device_manager.hpp"
-#include "input/input_manager.hpp"
-#include "karts/kart_properties_manager.hpp"
-#include "race/race_manager.hpp"
+#include "modes/tutorial_utils.hpp"
+
+#ifdef ANDROID
+#include <SDL_system.h>
+#endif
 
 using namespace GUIEngine;
 
@@ -42,42 +41,27 @@ void HelpScreen1::loadedFromFile()
 
 // -----------------------------------------------------------------------------
 
+void HelpScreen1::beforeAddingWidget()
+{
+#ifdef ANDROID
+    if (SDL_IsAndroidTV())
+    {
+        Widget* tutorial = getWidget("startTutorial");
+        if (tutorial)
+            tutorial->setVisible(false);
+
+        Widget* tutorial_icon = getWidget("tutorialIcon");
+        if (tutorial_icon)
+            tutorial_icon->setVisible(false);
+    }
+#endif
+}
+
 void HelpScreen1::eventCallback(Widget* widget, const std::string& name, const int playerID)
 {
     if (name == "startTutorial")
     {
-        RaceManager::get()->setNumPlayers(1);
-        RaceManager::get()->setMajorMode (RaceManager::MAJOR_MODE_SINGLE);
-        RaceManager::get()->setMinorMode (RaceManager::MINOR_MODE_TUTORIAL);
-        RaceManager::get()->setNumKarts( 1 );
-        RaceManager::get()->setTrack( "tutorial" );
-        RaceManager::get()->setDifficulty(RaceManager::DIFFICULTY_EASY);
-        RaceManager::get()->setReverseTrack(false);
-
-        // Use the last used device
-        InputDevice* device = input_manager->getDeviceManager()->getLatestUsedDevice();
-
-        // Create player and associate player with keyboard
-        StateManager::get()->createActivePlayer(PlayerManager::getCurrentPlayer(),
-                                                device);
-
-        if (kart_properties_manager->getKart(UserConfigParams::m_default_kart) == NULL)
-        {
-            Log::warn("HelpScreen1", "Cannot find kart '%s', will revert to default",
-                      UserConfigParams::m_default_kart.c_str());
-            UserConfigParams::m_default_kart.revertToDefaults();
-        }
-        RaceManager::get()->setPlayerKart(0, UserConfigParams::m_default_kart);
-
-        // ASSIGN should make sure that only input from assigned devices
-        // is read.
-        input_manager->getDeviceManager()->setAssignMode(ASSIGN);
-        input_manager->getDeviceManager()
-            ->setSinglePlayer( StateManager::get()->getActivePlayer(0) );
-
-        StateManager::get()->enterGameState();
-        RaceManager::get()->setupPlayerKartInfo();
-        RaceManager::get()->startNew(false);
+        TutorialUtils::startTutorial();
     }
     else if (name == "category")
     {

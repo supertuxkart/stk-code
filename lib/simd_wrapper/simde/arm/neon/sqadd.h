@@ -30,6 +30,20 @@
 #include "types.h"
 #include <limits.h>
 
+// Workaround on ARM64 windows due to windows SDK bug
+// https://developercommunity.visualstudio.com/t/In-arm64_neonh-vsqaddb_u8-vsqaddh_u16/10271747?sort=newest
+#if (defined _MSC_VER) && (defined SIMDE_ARM_NEON_A64V8_NATIVE) && (_MSC_VER < 1938)
+#pragma message ("Due to msvc bug, current version of msvc is supported by workaround. Recommend to update msvc")
+#undef vsqaddb_u8
+#define vsqaddb_u8(src1, src2) neon_usqadds8(__uint8ToN8_v(src1), __int8ToN8_v(src2)).n8_u8[0]
+#undef vsqaddh_u16
+#define vsqaddh_u16(src1, src2) neon_usqadds16(__uint16ToN16_v(src1), __int16ToN16_v(src2)).n16_u16[0]
+#undef vsqadds_u32
+#define vsqadds_u32(src1, src2) _CopyUInt32FromFloat(neon_usqadds32(_CopyFloatFromUInt32(src1), _CopyFloatFromInt32(src2)))
+#undef vsqaddd_u64
+#define vsqaddd_u64(src1, src2) neon_usqadds64(__uint64ToN64_v(src1), __int64ToN64_v(src2)).n64_u64[0]
+#endif
+
 HEDLEY_DIAGNOSTIC_PUSH
 SIMDE_DISABLE_UNWANTED_DIAGNOSTICS
 SIMDE_BEGIN_DECLS_

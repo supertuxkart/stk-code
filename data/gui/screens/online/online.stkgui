@@ -2,21 +2,28 @@
 <stkgui>
     <div x="0" y="1%" width="100%" height="98%" layout="vertical-row" >
         <header text_align="center" height="8%" width="80%" align="center" text="Online"/>
-        <spacer height="1%" width="10"/>
 
-        <button id="user-id" width="12f" height="fit" align="center"/>
         <spacer height="2%" width="10"/>
 
-        <box width="fit" height="fit"  layout="horizontal-row" align="center" valign="center">
-            <spacer width="25"/>
-            <label I18N="In the networking menu" align="center"
-                text="Enable splitscreen or player handicaps" text_align="right"/>
-            <spacer width="25"/>
-            <checkbox id="enable-splitscreen" align="center" />
-            <spacer width="25"/>
+        <button id="user-id" width="12f" height="fit" align="center"/>
+        
+        <spacer height="2%" width="10"/>
+
+        <box proportion="4" width="85%" align="center" layout="horizontal-row" padding="6">
+            <list id="news_list" width="55%" height="100%" alternate_bg="true" word_wrap="true" />
+
+            <div width="45%" height="100%" layout="vertical-row">
+                <spacer height="1f" width="10"/>
+                <div width="90%" height="fit" layout="horizontal-row" align="center" valign="center">
+                    <label I18N="In the networking menu" align="center" proportion="1" word_wrap="true"
+                        text="Enable splitscreen or player handicaps" text_align="center"/>
+                    <checkbox id="enable-splitscreen" align="center"/>
+                </div>
+                <icon id="logo" align="center" proportion="1" width="100%" icon="gui/icons/logo.png"/>
+            </div>
         </box>
 
-        <icon id="logo" align="center" proportion="4" width="100%" icon="gui/icons/logo.png"/>
+        <spacer height="2%" width="10"/>
         
         <buttonbar id="menu_toprow" proportion="3" width="90%" align="center">
             <icon-button id="lan" width="128" height="128"

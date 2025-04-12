@@ -30,6 +30,10 @@ class ParticleEmitter;
 class ParticleKind;
 class Vec3;
 
+#ifndef SERVER_ONLY
+class ParticleEmitter;
+#endif
+
 namespace irr {
     namespace scene {
         class ISceneNode;
@@ -79,7 +83,6 @@ private:
 
     /** The particle kind for skidding bonus level 3 (purple). */
     const ParticleKind *m_skid_kind3;
-
 
     /** Vector of all particle emitters. */
     std::vector<ParticleEmitter*> m_all_emitters;

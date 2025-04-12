@@ -53,6 +53,7 @@ VoteDialog::VoteDialog(const std::string & addon_id)
     m_rating_widget = getWidget<RatingBarWidget>("rating");
     assert(m_rating_widget != NULL);
 
+    m_rating_widget->setSteps(2);
     m_rating_widget->setRating(0);
     m_rating_widget->allowVoting();
     m_options_widget = getWidget<RibbonWidget>("options");

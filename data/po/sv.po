@@ -14,7 +14,7 @@
 # Kjell Rilbe <kjell@rilbe.se>, 2016
 # Kristoffer Grundström <lovaren@gmail.com>, 2016
 # Kristoffer Grundström <lovaren@gmail.com>, 2016,2022
-# Luna Jernberg <bittin@cafe8bitar.se>, 2020
+# Luna Jernberg <droidbittin@gmail.com>, 2020
 # Marcus Larborg, 2017
 # Marcus Larborg, 2017
 # Mikael Elm <elm.micke@gmail.com>, 2021
@@ -926,7 +926,7 @@ msgstr "Användarinformation"
 #. I18N: ./data/gui/dialogs/online/user_info_dialog.stkgui
 #. I18N: User info dialog
 msgid "Remove Friend"
-msgstr ""
+msgstr "Ta bort vän"
 
 #. I18N: ./data/gui/dialogs/online/user_info_dialog.stkgui
 #. I18N: User info dialog
@@ -936,17 +936,17 @@ msgstr "Lägg till vän"
 #. I18N: ./data/gui/dialogs/online/user_info_dialog.stkgui
 #. I18N: User info dialog
 msgid "Accept Invite"
-msgstr ""
+msgstr "Acceptera inbjudan"
 
 #. I18N: ./data/gui/dialogs/online/user_info_dialog.stkgui
 #. I18N: User info dialog
 msgid "Decline Invite"
-msgstr ""
+msgstr "Avvisa inbjudan"
 
 #. I18N: ./data/gui/dialogs/online/user_info_dialog.stkgui
 #. I18N: User info dialog
 msgid "View Profile"
-msgstr ""
+msgstr "Visa profil"
 
 #. I18N: ./data/gui/dialogs/online/vote_dialog.stkgui
 #. I18N: In the vote dialog
@@ -1134,7 +1134,7 @@ msgstr "Tack till"
 
 #. I18N: ./data/gui/screens/cutscene.stkgui
 msgid "Skip"
-msgstr ""
+msgstr "Hoppa över"
 
 #. I18N: ./data/gui/screens/easter_egg.stkgui
 #. I18N: Section in easter egg tracks selection screen
@@ -2014,7 +2014,7 @@ msgid ""
 "You can play without creating an online account by selecting an offline "
 "account. Though then you can not connect to friends, vote for addons etc. "
 "Please read our privacy statement at https://privacy.supertuxkart.net"
-msgstr ""
+msgstr "Du kan spela utan att skapa ett nätkonto genom att välja ett frånkopplat konto. Men då kan du inte ansluta till vänner, rösta på tillägg o.s.v. Läs vår integritetspolicy på https://privacy.supertuxkart.net"
 
 #. I18N: ./data/gui/screens/online/server_selection.stkgui
 #: src/states_screens/online/server_selection.cpp:580

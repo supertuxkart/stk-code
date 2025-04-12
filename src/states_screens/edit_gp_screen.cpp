@@ -174,7 +174,7 @@ void EditGPScreen::init()
         EditTrackScreen* edit = EditTrackScreen::getInstance();
         assert(edit != NULL);
 
-        if (edit->getResult())
+        if (edit->getResult() && edit->getTrack())
         {
             bool reverse = edit->getTrack()->reverseAvailable() ? 
                            edit->getReverse() : false;

@@ -4,7 +4,7 @@
 # 
 # Translators:
 # Aleksandra Kurda, 2022
-# Aleksandra Kurda, 2022
+# f54d4d2f4a87a54e50d75d6c658a5020_cea22be <13d8e250d37cead4c2a433f71830c9a5_1045958>, 2022
 # Ivan Putnik <iputnik@msn.com>, 2010
 # vjeran fistric <vjeran@canelio.com>, 2020
 msgid ""

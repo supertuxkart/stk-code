@@ -151,6 +151,11 @@ KartProperties::~KartProperties()
 void KartProperties::copyForPlayer(const KartProperties *source,
                                    HandicapLevel h)
 {
+    if (!source)
+    {
+        return;
+    }
+    
     *this = *source;
 
     // After the memcpy any pointers will be shared.
@@ -190,11 +195,13 @@ void KartProperties::copyFrom(const KartProperties *source)
 }   // copyFrom
 
 //-----------------------------------------------------------------------------
-void KartProperties::handleOnDemandLoadTexture()
+std::vector<std::string> KartProperties::handleOnDemandLoadTexture()
 {
+    std::vector<std::string> odt;
 #ifndef SERVER_ONLY
     if (GE::getDriver()->getDriverType() != video::EDT_VULKAN)
-        return;
+        return odt;
+
     std::set<std::string> files;
     // Remove the last /
     m_root_absolute_path = StringUtils::getPath(m_root);
@@ -211,9 +218,13 @@ void KartProperties::handleOnDemandLoadTexture()
     {
         if (image_extensions.find(StringUtils::getExtension(f)) !=
             image_extensions.end())
+        {
             GE::getGEConfig()->m_ondemand_load_texture_paths.insert(f);
+            odt.push_back(f);
+        }
     }
 #endif
+    return odt;
 }   // handleOnDemandLoadTexture
 
 //-----------------------------------------------------------------------------
@@ -260,7 +271,7 @@ void KartProperties::load(const std::string &filename, const std::string &node)
         m_is_addon = true;
     }
 
-    handleOnDemandLoadTexture();
+    std::vector<std::string> odt = handleOnDemandLoadTexture();
     try
     {
         if(!root || root->getName()!="kart")
@@ -379,7 +390,10 @@ void KartProperties::load(const std::string &filename, const std::string &node)
 
 #ifndef SERVER_ONLY
     if (GE::getDriver()->getDriverType() == video::EDT_VULKAN)
-        GE::getGEConfig()->m_ondemand_load_texture_paths.clear();
+    {
+        for (auto& t : odt)
+            GE::getGEConfig()->m_ondemand_load_texture_paths.erase(t);
+    }
 #endif
 }   // load
 
@@ -666,12 +680,18 @@ bool KartProperties::operator<(const KartProperties &other) const
     PlayerProfile *p = PlayerManager::getCurrentPlayer();
     bool this_is_locked = p->isLocked(getIdent());
     bool other_is_locked = p->isLocked(other.getIdent());
-    if (this_is_locked == other_is_locked)
+    bool this_is_favorite = p->isFavoriteKart(getIdent());
+    bool other_is_favorite = p->isFavoriteKart(other.getIdent());
+
+    if (this_is_locked != other_is_locked)
     {
-        return getName() < other.getName();
-    }
-    else
         return other_is_locked;
+    }
+    else if (this_is_favorite != other_is_favorite)
+    {
+        return this_is_favorite;
+    }
+    else return getName() < other.getName();
 
     return true;
 }  // operator<

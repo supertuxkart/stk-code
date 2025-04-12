@@ -11,7 +11,7 @@ class GEVulkanArrayTexture : public GEVulkanTexture
 private:
     void reloadInternal(const std::vector<io::path>& list,
                         std::function<void(video::IImage*, unsigned)>
-                        image_mani);
+                        image_mani, const core::dimension2du& max_size);
 public:
     // ------------------------------------------------------------------------
     GEVulkanArrayTexture(const std::vector<io::path>& full_path_list,

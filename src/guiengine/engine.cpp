@@ -1095,6 +1095,9 @@ namespace GUIEngine
         g_is_no_graphics[PT_CHILD] = false;
     }   // resetGlobalVariables
 
+
+    int g_expected_icon_count = 0;
+
     // -----------------------------------------------------------------------
     void init(IrrlichtDevice* device_a, IVideoDriver* driver_a,
               AbstractStateManager* state_manager, bool loading)
@@ -1103,6 +1106,7 @@ namespace GUIEngine
         g_device = device_a;
         g_driver = driver_a;
         g_state_manager = state_manager;
+        g_expected_icon_count = 0;
 
         for (unsigned int n=0; n<MAX_PLAYER_COUNT; n++)
         {
@@ -1528,8 +1532,37 @@ namespace GUIEngine
         }
 
         const int icon_count = (int)g_loading_icons.size();
-        const int icon_size = (int)(std::min(screen_w, screen_h) / 12.0f);
+        const int expected_count = g_expected_icon_count;
+        int icon_size = (int)(std::min(screen_w, screen_h) / 12.0f);
         const int ICON_MARGIN = 6;
+
+        auto f = [&](int icon_size, int icon_margin) -> int {
+            int size_with_margin = (icon_size + icon_margin);
+            int rows = (y_from - text_height * 1.2f) / size_with_margin - 1;
+            int cols = (screen_w - icon_margin) / size_with_margin;
+            int max_good_rows = (rows * 4 + 9) / 10;
+            return max_good_rows * cols;
+        };
+
+        int can_have_now = f(icon_size, ICON_MARGIN);
+
+        if (can_have_now < expected_count)
+        {
+            int left = ICON_MARGIN;
+            int right = icon_size;
+            int mid;
+            while (right - left > 1)
+            {
+                mid = (right + left) / 2;
+                can_have_now = f(mid, ICON_MARGIN);
+                if (can_have_now >= expected_count)
+                    left = mid;
+                else
+                    right = mid;
+            }
+            icon_size = left;
+        }
+
         int x = ICON_MARGIN;
         int y = y_from - icon_size - ICON_MARGIN - text_height * 1.2f;
         for (int n=0; n<icon_count; n++)
@@ -1584,6 +1617,12 @@ namespace GUIEngine
 #endif
     } // flushRenderLoading
 
+    // -----------------------------------------------------------------------
+
+    void reserveLoadingIcons(int count)
+    {
+        g_expected_icon_count += count;
+    } // reserveLoadingIcons
     // -----------------------------------------------------------------------
 
     void addLoadingIcon(irr::video::ITexture* icon)

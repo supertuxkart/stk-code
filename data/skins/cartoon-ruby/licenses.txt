@@ -1,0 +1,30 @@
+Format: https://www.debian.org/doc/packaging-manuals/copyright-format/1.0/
+Upstream-Name: SuperTuxKart
+Upstream-Contact:
+ Marianne Gagnon <auria.mg@gmail.com>
+ Jean-Manuel Clémençon <sam.un@protonmail.com>
+Source: https://supertuxkart.net
+
+Files:
+ glass_iconhighlight_focus.png
+ bubble.png
+Copyright: 2010 Dakal and/or Marianne Gagnon (Auria)
+License: CC-BY-SA 3.0
+Comment: From peach skin, first found in commit 5cddb8ffb61001407ce97ee5a8c63faa18a08c2c.  It is unclear which author made these particular files.
+
+Files:
+ src/Inter-UI-Black.ttf
+Copyright: Copyright 2018 The Inter UI project authors
+License: OFL 1.1 (SIL Open Font License, Version 1.1)
+Comment: Specifically using version 2.5 of the font, later versions have a different look
+
+Files:
+ src/NotoSans*
+Copyright: Copyright 2015-2016 Google Inc. All Rights Reserved.
+License: This Font Software is licensed under the SIL Open Font License, Version 1.1. This Font Software is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the SIL Open Font License for the specific language, permissions and limitations governing your use of this Font Software.
+Comment: Bold/Black versions of the language-specific fonts used in the other skins
+
+Files: *
+Copyright: Copyright 2018-2020 LCP and QwertyChouskie
+License: CC-BY-SA 4.0
+Comment: Original style, most icons, and some elements by LCP, skin finished by QwertyChouskie

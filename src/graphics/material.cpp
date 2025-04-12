@@ -31,7 +31,6 @@
 #include "graphics/central_settings.hpp"
 #include "graphics/irr_driver.hpp"
 #include "graphics/particle_kind_manager.hpp"
-#include "graphics/sp/sp_base.hpp"
 #include "graphics/stk_tex_manager.hpp"
 #include "io/file_manager.hpp"
 #include "io/xml_node.hpp"
@@ -413,9 +412,9 @@ video::ITexture* Material::getTexture(bool srgb, bool premul_alpha)
             for (unsigned int i = 0; i < img->getDimension().Width *
                 img->getDimension().Height; i++)
             {
-                data[i * 4] = SP::srgb255ToLinear(data[i * 4]);
-                data[i * 4 + 1] = SP::srgb255ToLinear(data[i * 4 + 1]);
-                data[i * 4 + 2] = SP::srgb255ToLinear(data[i * 4 + 2]);
+                data[i * 4] = GE::srgb255ToLinear(data[i * 4]);
+                data[i * 4 + 1] = GE::srgb255ToLinear(data[i * 4 + 1]);
+                data[i * 4 + 2] = GE::srgb255ToLinear(data[i * 4 + 2]);
             }
             img->unlock();
         };
@@ -587,12 +586,9 @@ void Material::install(std::function<void(video::IImage*)> image_mani,
             m_sampler_path[i]);
         m_vk_textures[i - 2] = STKTexManager::getInstance()->getTexture(
             m_sampler_path[i]);
-        GE::getGEConfig()->m_ondemand_load_texture_paths.clear();
+        GE::getGEConfig()->m_ondemand_load_texture_paths.erase(m_sampler_path[i]);
         if (m_vk_textures[i - 2])
-        {
             m_vk_textures[i - 2]->grab();
-            m->setTexture(i, m_vk_textures[i - 2]);
-        }
     }
 #endif
 }   // install
@@ -941,6 +937,11 @@ void  Material::setMaterialProperties(video::SMaterial *m, scene::IMeshBuffer* m
         if (is_vk)
             m->MaterialType = video::EMT_SOLID_2_LAYER;
     }
+    else if (m_shader_name == "normalmap")
+    {
+        if (is_vk)
+            m->MaterialType = video::EMT_NORMAL_MAP_SOLID;
+    }
 
     if (isTransparent())
     {
@@ -1001,6 +1002,14 @@ void  Material::setMaterialProperties(video::SMaterial *m, scene::IMeshBuffer* m
         m->ColorMaterial = video::ECM_NONE; // Override one above
     }
 #endif
+    if (is_vk)
+    {
+        for (unsigned i = 2; i < m_sampler_path.size(); i++)
+        {
+            if (m_vk_textures[i - 2])
+                m->setTexture(i, m_vk_textures[i - 2]);
+        }
+    }
 
 } // setMaterialProperties
 
@@ -1009,22 +1018,20 @@ std::function<void(irr::video::IImage*)> Material::getMaskImageMani() const
 {
 #ifndef SERVER_ONLY
     std::function<void(irr::video::IImage*)> image_mani;
-    core::dimension2du max_size = irr_driver->getVideoDriver()
-        ->getDriverAttributes().getAttributeAsDimension2d("MAX_TEXTURE_SIZE");
 
     // Material using alpha channel will be colorized as a whole
     if (CVS->supportsColorization() &&
         !useAlphaChannel() && (!m_colorization_mask.empty() ||
         m_colorization_factor > 0.0f || m_colorizable))
     {
-        std::string colorization_mask;
+        io::path colorization_mask;
         if (!m_colorization_mask.empty())
         {
-            colorization_mask = StringUtils::getPath(m_sampler_path[0]) + "/" +
-                m_colorization_mask;
+            colorization_mask = (StringUtils::getPath(m_sampler_path[0]) + "/" +
+                m_colorization_mask).c_str();
         }
         float colorization_factor = m_colorization_factor;
-        image_mani = [colorization_mask, colorization_factor, max_size]
+        image_mani = [colorization_mask, colorization_factor]
             (video::IImage* img)->void
         {
             video::IImage* mask = NULL;
@@ -1034,31 +1041,15 @@ std::function<void(irr::video::IImage*)> Material::getMaskImageMani() const
             uint8_t* mask_data = NULL;
             if (!colorization_mask.empty())
             {
-                mask = GE::getResizedImage(colorization_mask, max_size);
+                core::dimension2du max_size;
+                mask = GE::getResizedImageFullPath(colorization_mask, max_size,
+                    NULL, &img_size);
                 if (!mask)
                 {
                     Log::warn("Material",
                         "Applying colorization mask failed for '%s'!",
                         colorization_mask.c_str());
                     return;
-                }
-                core::dimension2du mask_size = mask->getDimension();
-                if (mask->getColorFormat() != video::ECF_A8R8G8B8 ||
-                    img_size != mask_size)
-                {
-                    video::IImage* new_mask = irr_driver
-                        ->getVideoDriver()->createImage(video::ECF_A8R8G8B8,
-                        img_size);
-                    if (img_size != mask_size)
-                    {
-                        mask->copyToScaling(new_mask);
-                    }
-                    else
-                    {
-                        mask->copyTo(new_mask);
-                    }
-                    mask->drop();
-                    mask = new_mask;
                 }
                 mask_data = (uint8_t*)mask->lock();
             }
@@ -1085,25 +1076,26 @@ std::function<void(irr::video::IImage*)> Material::getMaskImageMani() const
         return image_mani;
     }
 
-    std::string mask_full_path;
+    io::path mask_full_path;
     if (!m_mask.empty())
     {
-        mask_full_path = StringUtils::getPath(m_sampler_path[0]) + "/" +
-            m_mask;
+        mask_full_path = (StringUtils::getPath(m_sampler_path[0]) + "/" +
+            m_mask).c_str();
     }
     if (!mask_full_path.empty())
     {
-        image_mani = [mask_full_path, max_size](video::IImage* img)->void
+        image_mani = [mask_full_path](video::IImage* img)->void
         {
-            video::IImage* converted_mask =
-                GE::getResizedImage(mask_full_path, max_size);
+            core::dimension2du dim = img->getDimension();
+            core::dimension2du max_size;
+            video::IImage* converted_mask = GE::getResizedImageFullPath(
+                mask_full_path, max_size, NULL, &dim);
             if (converted_mask == NULL)
             {
                 Log::warn("Material", "Applying alpha mask failed for '%s'!",
                     mask_full_path.c_str());
                 return;
             }
-            const core::dimension2du& dim = img->getDimension();
             for (unsigned int x = 0; x < dim.Width; x++)
             {
                 for (unsigned int y = 0; y < dim.Height; y++)

@@ -105,19 +105,19 @@ void RaceGUIMultitouch::recreate()
  */
 void RaceGUIMultitouch::close()
 {
-    if (m_device != NULL)
+    if (m_device)
     {
         m_device->clearButtons();
-    }
-    
-    if (m_device->isAccelerometerActive())
-    {
-        m_device->deactivateAccelerometer();
-    }
 
-    if (m_device->isGyroscopeActive())
-    {
-        m_device->deactivateGyroscope();
+        if (m_device->isAccelerometerActive())
+        {
+            m_device->deactivateAccelerometer();
+        }
+
+        if (m_device->isGyroscopeActive())
+        {
+            m_device->deactivateGyroscope();
+        }
     }
 }   // close
 

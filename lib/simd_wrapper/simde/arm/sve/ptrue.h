@@ -37,7 +37,7 @@ simde_svbool_t
 simde_svptrue_b8(void) {
   #if defined(SIMDE_ARM_SVE_NATIVE)
     return svptrue_b8();
-  #elif defined(SIMDE_X86_AVX512BW_NATIVE)
+  #elif defined(SIMDE_X86_AVX512BW_NATIVE) && (!defined(HEDLEY_MSVC_VERSION) || HEDLEY_MSVC_VERSION_CHECK(19,20,0))
     simde_svbool_t r;
 
     #if SIMDE_ARM_SVE_VECTOR_SIZE >= 512
@@ -67,7 +67,7 @@ simde_svbool_t
 simde_svptrue_b16(void) {
   #if defined(SIMDE_ARM_SVE_NATIVE)
     return svptrue_b16();
-  #elif defined(SIMDE_X86_AVX512BW_NATIVE)
+  #elif defined(SIMDE_X86_AVX512BW_NATIVE) && (!defined(HEDLEY_MSVC_VERSION) || HEDLEY_MSVC_VERSION_CHECK(19,20,0))
     simde_svbool_t r;
 
     #if SIMDE_ARM_SVE_VECTOR_SIZE >= 512
@@ -97,7 +97,7 @@ simde_svbool_t
 simde_svptrue_b32(void) {
   #if defined(SIMDE_ARM_SVE_NATIVE)
     return svptrue_b32();
-  #elif defined(SIMDE_X86_AVX512BW_NATIVE)
+  #elif defined(SIMDE_X86_AVX512BW_NATIVE) && (!defined(HEDLEY_MSVC_VERSION) || HEDLEY_MSVC_VERSION_CHECK(19,20,0))
     simde_svbool_t r;
 
     #if SIMDE_ARM_SVE_VECTOR_SIZE >= 512
@@ -127,7 +127,7 @@ simde_svbool_t
 simde_svptrue_b64(void) {
   #if defined(SIMDE_ARM_SVE_NATIVE)
     return svptrue_b64();
-  #elif defined(SIMDE_X86_AVX512BW_NATIVE)
+  #elif defined(SIMDE_X86_AVX512BW_NATIVE) && (!defined(HEDLEY_MSVC_VERSION) || HEDLEY_MSVC_VERSION_CHECK(19,20,0))
     simde_svbool_t r;
 
     #if SIMDE_ARM_SVE_VECTOR_SIZE >= 512

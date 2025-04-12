@@ -508,7 +508,7 @@
   which leads to crash with STK), but the fonts are to blame, what's the point of not
   using industry standard nowadays...
   -->
-  <fonts-list normal-ttf="Cantarell-Regular.otf wqy-microhei.ttf NotoSansThai-Regular.ttf NotoSansHebrew-Regular.ttf NotoNaskhArabicUI-Regular.ttf NotoSansMalayalam-Regular.ttf"
+  <fonts-list normal-ttf="Cantarell-Regular.otf wqy-microhei.ttf NotoSansThai-Regular.ttf NotoSansHebrew-Regular.ttf NotoNaskhArabicUI-Regular.ttf NotoSansMalayalam-Regular.ttf NotoSansGeorgian-Regular.ttf"
               digit-ttf="SigmarOne.otf"
               color-emoji-ttf="NotoColorEmoji.ttf"/>
 
@@ -516,7 +516,8 @@
        hardware skinning, For gles 3.0 the specification guarantees at least 2048, for
        TBO in desktop at least 65536 (max buffer size) / 64, SSBO at least 2^24 / 64.
        1024 is guaranteed to work everywhere, but can be limiting, in kart creation and
-       in the max number of karts. Most systems should support at least 2048. -->
+       in the max number of karts. Most systems should support at least 2048.
+       For cases TBO doesn't support equal or more than 2048, fallback on textures. -->
   <skinning max-bones="2048"/>
 
   <!-- For users with libsquish:

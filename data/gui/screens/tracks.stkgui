@@ -3,10 +3,10 @@
     <icon-button id="back" x="1%" y="0" height="9%" icon="gui/icons/back.png"/>
 
     <div id="all-track" x="1%" y="1%" width="60%" height="88%" layout="vertical-row" >
+        
         <header height="8%" width="80%" I18N="In the track selection screen" text="All Tracks"
                 align="center" text_align="center" />
         <spacer width="100%" height="1%" />
-
         <box proportion="1" width="100%" layout="vertical-row" padding="1">
             <ribbon_grid id="tracks" proportion="1" width="100%" square_items="true"
                 label_location="bottom" align="center"

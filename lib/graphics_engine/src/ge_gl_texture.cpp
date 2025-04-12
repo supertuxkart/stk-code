@@ -21,8 +21,6 @@ GEGLTexture::GEGLTexture(const std::string& path,
              m_driver_type(GE::getDriver()->getDriverType()),
              m_disable_reload(false), m_single_channel(false)
 {
-    m_max_size = getDriver()->getDriverAttributes()
-        .getAttributeAsDimension2d("MAX_TEXTURE_SIZE");
     reload();
 }   // GEGLTexture
 
@@ -94,8 +92,10 @@ void GEGLTexture::reload()
 {
     if (m_disable_reload)
         return;
+    const core::dimension2du & max_size = getDriver()->getDriverAttributes()
+        .getAttributeAsDimension2d("MAX_TEXTURE_SIZE");
     video::IImage* texture_image = getResizedImage(NamedPath.getPtr(),
-        m_max_size, &m_orig_size);
+        max_size, &m_orig_size);
     if (texture_image == NULL)
     {
         LoadingFailed = true;
@@ -155,7 +155,10 @@ void* GEGLTexture::lock(video::E_TEXTURE_LOCK_MODE mode, u32 mipmap_level)
 
     if (m_driver_type == video::EDT_OGLES2 || !glGetTexImage)
     {
-        video::IImage* img = getResizedImage(NamedPath.getPtr(), m_max_size);
+        const core::dimension2du & max_size = getDriver()->getDriverAttributes()
+            .getAttributeAsDimension2d("MAX_TEXTURE_SIZE");
+        video::IImage* img = getResizedImage(NamedPath.getPtr(), max_size,
+            NULL, &m_size);
         if (!img)
             return NULL;
         img->setDeleteMemory(false);

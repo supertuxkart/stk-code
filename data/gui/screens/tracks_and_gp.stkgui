@@ -24,7 +24,13 @@
         <div width="100%" height="fit" layout="horizontal-row" >
             <header width="30%" I18N="In the track and grand prix selection screen" text="All Tracks"
                     align="center" text_align="center" />
-            <textbox width="60%" id="search"/>
+            <textbox width="40%" id="search"/>
+            <spacer width="3%"/>
+            <div width="fit" height="100%" layout="horizontal-row" align="center">
+                <checkbox id="favorite"/>
+                <spacer width="5%"/>
+                <tiny-header width="fit" height="100%" I18N="In the track and grand prix selection screen" text="Edit favorite tracks"/>
+            </div>
         </div>
 
         <spacer width="100%" height="1%" />

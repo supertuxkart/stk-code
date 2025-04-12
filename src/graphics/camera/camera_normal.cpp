@@ -44,7 +44,7 @@
  */
 CameraNormal::CameraNormal(Camera::CameraType type,  int camera_index, 
                            Kart* kart)
-            : Camera(type, camera_index, kart), m_camera_offset(0, 0, -15.0f)
+            : Camera(type, camera_index, kart), m_camera_offset(0., 0., 0.)
 {
     m_distance = kart ? UserConfigParams::m_camera_distance : 1000.0f;
     m_ambient_light = Track::getCurrentTrack()->getDefaultAmbientColor();
@@ -60,21 +60,18 @@ CameraNormal::CameraNormal(Camera::CameraType type,  int camera_index,
     m_rotation_range = 0.0f;
     m_kart_position = btVector3(0, 0, 0);
     m_kart_rotation = btQuaternion(0, 0, 0, 1);
+    m_last_smooth_mode = Mode::CM_NORMAL;
     reset();
     m_camera->setNearValue(1.0f);
 
-    if (kart)
-    {
-        btTransform btt = kart->getSmoothedTrans();
-        m_kart_position = btt.getOrigin();
-        m_kart_rotation = btt.getRotation();
-    }
+    restart();
 }   // Camera
 
 //-----------------------------------------------------------------------------
 /** Moves the camera smoothly from the current camera position (and target)
  *  to the new position and target.
  *  \param dt Delta time, 
+ *  \param smooth Updates the camera if true, only calculate smooth state parameter if false
  *  \param if false, the camera instantly moves to the endpoint, or else it smoothly moves
  */
 void CameraNormal::moveCamera(float dt, bool smooth, float cam_angle, float distance)
@@ -82,7 +79,7 @@ void CameraNormal::moveCamera(float dt, bool smooth, float cam_angle, float dist
     if(!m_kart) return;
 
     Kart *kart = dynamic_cast<Kart*>(m_kart);
-    if (kart->isFlying())
+    if (smooth && kart->isFlying())
     {
         Vec3 vec3 = m_kart->getSmoothedXYZ() + Vec3(sinf(m_kart->getHeading()) * -4.0f,
             0.5f,
@@ -107,7 +104,8 @@ void CameraNormal::moveCamera(float dt, bool smooth, float cam_angle, float dist
     ratio = ratio > -0.12f ? ratio : -0.12f;
 
     // distance of camera from kart in x and z plane
-    float camera_distance = -1.25f - 2.5f * ratio;
+    float camera_distance = -2.8f - 5.6f * ratio;
+    camera_distance *= sqrtf(UserConfigParams::m_camera_forward_smooth_position);
     float min_distance = (distance * 2.0f);
     if (distance > 0) camera_distance += distance + 1; // note that distance < 0
     if (camera_distance > min_distance) camera_distance = min_distance; // don't get too close to the kart
@@ -120,22 +118,11 @@ void CameraNormal::moveCamera(float dt, bool smooth, float cam_angle, float dist
         (0.85f + ratio / 2.5f) - tan_up,
         camera_distance * cosf(skid_angle / 2));
 
-    float delta = 1;
-    float delta2 = 1;
-    if (smooth)
-    {
-        delta = (dt*5.0f);
-        if (delta < 0.0f)
-            delta = 0.0f;
-        else if (delta > 1.0f)
-            delta = 1.0f;
+    float delta = dt / std::max(dt, float(UserConfigParams::m_camera_forward_smooth_position));
+    float delta2 = dt / std::max(dt, float(UserConfigParams::m_camera_forward_smooth_rotation));
 
-        delta2 = dt * 8.0f;
-        if (delta2 < 0)
-            delta2 = 0;
-        else if (delta2 > 1)
-            delta2 = 1;
-    }
+    delta = irr::core::clamp(delta, 0.0f, 1.0f);
+    delta2 = irr::core::clamp(delta2, 0.0f, 1.0f);
 
     btTransform btt = m_kart->getSmoothedTrans();
     m_kart_position = btt.getOrigin();
@@ -164,10 +151,12 @@ void CameraNormal::moveCamera(float dt, bool smooth, float cam_angle, float dist
     //    kart_camera_position_with_offset.z(), current_target.x(), current_target.y(),
     //    current_target.z());
 
-    if(getMode()!=CM_FALLING)
-        m_camera->setPosition(current_position);
-    m_camera->setTarget(current_target.toIrrVector());//set new target
-
+    if (smooth)
+    {
+        if(getMode()!=CM_FALLING)
+            m_camera->setPosition(current_position);
+        m_camera->setTarget(current_target.toIrrVector());//set new target
+    }
     assert(!std::isnan(m_camera->getPosition().X));
     assert(!std::isnan(m_camera->getPosition().Y));
     assert(!std::isnan(m_camera->getPosition().Z));
@@ -175,9 +164,21 @@ void CameraNormal::moveCamera(float dt, bool smooth, float cam_angle, float dist
 }   // moveCamera
 
 //-----------------------------------------------------------------------------
-void CameraNormal::snapToPosition()
+void CameraNormal::restart()
 {
-    moveCamera(1.0f, false, 0, 0);
+    if (m_kart)
+    {
+        btTransform btt = m_kart->getSmoothedTrans();
+        const Vec3& up = btt.getBasis().getColumn(1);
+
+        m_camera->setUpVector(up.toIrrVector());
+        m_kart_position = btt.getOrigin();
+        m_kart_rotation = btt.getRotation();
+
+        float offset_z = -33.f * sqrtf(UserConfigParams::m_camera_forward_smooth_position);
+        float offset_y = -offset_z * tanf(UserConfigParams::m_camera_forward_up_angle * DEGREE_TO_RAD);
+        m_camera_offset = irr::core::vector3df(0., offset_y + 1.0f, offset_z);
+    }
 }   // snapToPosition
 
 //-----------------------------------------------------------------------------
@@ -188,11 +189,12 @@ void CameraNormal::snapToPosition()
  *  \param distance Distance from kart.
  *  \param cam_roll_angle Roll camera for gyroscope steering effect.
  */
-void CameraNormal::getCameraSettings(float *above_kart, float *cam_angle,
+void CameraNormal::getCameraSettings(Mode mode,
+                                     float *above_kart, float *cam_angle,
                                      float *sideway, float *distance,
                                      bool *smoothing, float *cam_roll_angle)
 {
-    switch(getMode())
+    switch(mode)
     {
     case CM_NORMAL:
     case CM_FALLING:
@@ -206,7 +208,8 @@ void CameraNormal::getCameraSettings(float *above_kart, float *cam_angle,
             // quadratically to dampen small variations (but keep sign)
             float dampened_steer = fabsf(steering) * steering;
             *sideway             = -m_rotation_range*dampened_steer*0.5f;
-            *smoothing           = UserConfigParams::m_camera_forward_smoothing;
+            *smoothing           = UserConfigParams::m_camera_forward_smooth_position != 0.
+                                || UserConfigParams::m_camera_forward_smooth_rotation != 0.;
             *cam_roll_angle      = 0.0f;
             if (UserConfigParams::m_multitouch_controls == MULTITOUCH_CONTROLS_GYROSCOPE)
             {
@@ -304,16 +307,18 @@ void CameraNormal::update(float dt)
 
     m_camera->setNearValue(1.0f);
 
+    float above_kart, cam_angle, side_way, distance, cam_roll_angle;
+    bool  smoothing;
+
+    getCameraSettings(getMode(), &above_kart, &cam_angle, &side_way, 
+                                 &distance, &smoothing, &cam_roll_angle);
+
     // If an explosion is happening, stop moving the camera,
     // but keep it target on the kart.
     ExplosionAnimation* ea =
         dynamic_cast<ExplosionAnimation*>(m_kart->getKartAnimation());
     if (ea && !ea->hasResetAlready())
     {
-        float above_kart, cam_angle, side_way, distance, cam_roll_angle;
-        bool  smoothing;
-
-        getCameraSettings(&above_kart, &cam_angle, &side_way, &distance, &smoothing, &cam_roll_angle);
         // The camera target needs to be 'smooth moved', otherwise
         // there will be a noticable jump in the first frame
 
@@ -327,10 +332,20 @@ void CameraNormal::update(float dt)
     }
     else // no kart animation
     {
-        float above_kart, cam_angle, side_way, distance, cam_roll_angle;
-        bool  smoothing;
-        getCameraSettings(&above_kart, &cam_angle, &side_way, &distance, &smoothing, &cam_roll_angle);
+        if (smoothing)
+        {
+            m_last_smooth_mode = getMode();
+            moveCamera(dt, true, cam_angle, distance);
+        }
+
         positionCamera(dt, above_kart, cam_angle, side_way, distance, smoothing, cam_roll_angle);
+    }
+
+    if (!smoothing)
+    {
+        getCameraSettings(m_last_smooth_mode, &above_kart, &cam_angle, &side_way, 
+                                              &distance, &smoothing, &cam_roll_angle);
+        moveCamera(dt, false, cam_angle, distance);
     }
 }   // update
 
@@ -396,12 +411,8 @@ void CameraNormal::positionCamera(float dt, float above_kart, float cam_angle,
         t.setBasis(t.getBasis() * btMatrix3x3(q));
     }
     wanted_position = t(relative_position);
-
-    if (smoothing)
-    {
-        moveCamera(dt, true, cam_angle, distance);
-    }
-    else
+    
+    if (!smoothing)
     {
         if (getMode()!=CM_FALLING)
             m_camera->setPosition(wanted_position.toIrrVector());

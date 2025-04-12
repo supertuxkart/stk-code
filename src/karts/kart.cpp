@@ -231,7 +231,9 @@ Kart::Kart (const std::string& ident, unsigned int world_kart_id,
     m_initial_position     = position;
     m_race_result          = false;
     m_wheel_box            = NULL;
+#ifndef SERVER_ONLY
     m_collision_particles  = NULL;
+#endif
     m_controller           = NULL;
     m_saved_controller     = NULL;
     m_consumption_per_tick = stk_config->ticks2Time(1) *
@@ -403,7 +405,9 @@ Kart::~Kart()
     m_nitro_sound ->deleteSFX();
     if(m_terrain_sound)          m_terrain_sound->deleteSFX();
     if(m_previous_terrain_sound) m_previous_terrain_sound->deleteSFX();
+#ifndef SERVER_ONLY
     if(m_collision_particles)    delete m_collision_particles;
+#endif
 
     if (m_wheel_box) m_wheel_box->remove();
 
@@ -3085,7 +3089,15 @@ void Kart::updateEngineSFX(float dt)
 {
     // Only update SFX during the last substep (otherwise too many SFX commands
     // in one frame), and if sfx are enabled
-    if(!m_engine_sound || !SFXManager::get()->sfxAllowed()  )
+    if(!SFXManager::get()->sfxAllowed())
+        return;
+    
+    if (m_skid_sound)
+        m_skid_sound->setPosition(getSmoothedXYZ());
+    if (m_nitro_sound)
+        m_nitro_sound->setPosition(getSmoothedXYZ());
+
+    if (!m_engine_sound)
         return;
 
     // when going faster, use higher pitch for engine
@@ -3743,9 +3755,6 @@ void Kart::updateGraphics(float dt)
 
     for (int i = 0; i < EMITTER_COUNT; i++)
         m_emitters[i]->setPosition(getXYZ());
-    if (m_skid_sound)
-        m_skid_sound->setPosition(getSmoothedXYZ());
-    m_nitro_sound->setPosition(getSmoothedXYZ());
 
     m_attachment->updateGraphics(dt);
 
@@ -3765,7 +3774,10 @@ void Kart::updateGraphics(float dt)
     // Update particle effects (creation rate, and emitter size
     // depending on speed)
     m_kart_gfx->update(dt);
+
+#ifndef SERVER_ONLY
     if (m_collision_particles) m_collision_particles->update(dt);
+#endif
 
     // --------------------------------------------------------
     float nitro_frac = 0;

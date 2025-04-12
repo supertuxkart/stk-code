@@ -15,6 +15,9 @@ jobs:
       matrix:
         arch: [i686, x86_64, armv7, aarch64]
         os: [windows-latest, ubuntu-latest]
+        exclude:
+          - arch: armv7
+            os: windows-latest
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v2
@@ -56,7 +59,7 @@ jobs:
             echo "cache_$number=windows-${{ github.ref }}-${{ matrix.arch }}-${{ matrix.os }}-$id" >> $GITHUB_ENV
           done
       - name: Handle build cache
-        uses: actions/cache@v2
+        uses: actions/cache@v3
         with:
           path: |
             build
@@ -149,21 +152,21 @@ jobs:
           mv COPYING tools
       - name: Upload binaries of MinGW
         if: ${{ matrix.os == 'ubuntu-latest' }}
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v4
         with:
           name: ${{ matrix.arch }}
           path: build/bin/*
       - name: Upload stk-code/data
         # We only need to upload stk-code/data once
         if: ${{ matrix.os == 'ubuntu-latest' && matrix.arch == 'i686'}}
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v4
         with:
           name: data
           path: data
       - name: Upload stk-code/tools
         # We only need to upload stk-code/tools once
         if: ${{ matrix.os == 'ubuntu-latest' && matrix.arch == 'i686'}}
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v4
         with:
           name: tools
           path: tools
@@ -213,7 +216,7 @@ jobs:
           echo "${{ env.release_name }}"
           echo "${{ env.release_pre }}"
       - name: Download MinGW binaries and data
-        uses: actions/download-artifact@v2
+        uses: actions/download-artifact@v4
       - name: Generate .pdb files
         if: ${{ env.release_tag != '' }}
         run: |

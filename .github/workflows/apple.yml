@@ -49,7 +49,7 @@ jobs:
             echo "cache_$number=apple-${{ github.ref }}-${{ matrix.arch }}-${{ matrix.platform }}-$id" >> $GITHUB_ENV
           done
       - name: Handle build cache
-        uses: actions/cache@v2
+        uses: actions/cache@v3
         with:
           path: |
             build
@@ -93,7 +93,7 @@ jobs:
           make -j4
           mv bin ../${{ steps.sysroot.outputs.lowercase }}-${{ matrix.arch }}
       - name: Upload binaries
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v4
         with:
           name: ${{ steps.sysroot.outputs.lowercase }}-${{ matrix.arch }}
           path: ${{ steps.sysroot.outputs.lowercase }}-${{ matrix.arch }}
@@ -131,7 +131,7 @@ jobs:
           echo "${{ env.release_name }}"
           echo "${{ env.release_pre }}"
       - name: Download binaries
-        uses: actions/download-artifact@v2
+        uses: actions/download-artifact@v4
       - name: Mask developer name
         run: |
           echo "::add-mask::${{ secrets.MAC_DEVELOPER_NAME }}"
@@ -151,7 +151,8 @@ jobs:
           HOMEBREW_NO_AUTO_UPDATE=1 brew install dylibbundler
           lipo -create ./macosx-x86_64/supertuxkart.app/Contents/MacOS/supertuxkart ./macosx-arm64/supertuxkart.app/Contents/MacOS/supertuxkart -output ./macosx-arm64/supertuxkart.app/Contents/MacOS/supertuxkart
           chmod 755 ./macosx-arm64/supertuxkart.app/Contents/MacOS/supertuxkart
-          dylibbundler -od -b -x ./macosx-arm64/supertuxkart.app/Contents/MacOS/supertuxkart -d ./macosx-arm64/supertuxkart.app/Contents/libs/ -p @executable_path/../libs/ -s dependencies-macosx/lib -ns
+          install_name_tool -change libcurl.4.dylib @rpath/libcurl.4.dylib ./macosx-arm64/supertuxkart.app/Contents/MacOS/supertuxkart
+          dylibbundler -od -b -x ./macosx-arm64/supertuxkart.app/Contents/MacOS/supertuxkart -d ./macosx-arm64/supertuxkart.app/Contents/libs/ -p @executable_path/../libs/ -s ./dependencies-macosx/lib -ns
           # We use SDL_Vulkan_LoadLibrary for 10.9 compatibility, so otool -L supertuxkart has no libMoltenVK.dylib
           cp ./dependencies-macosx/lib/libMoltenVK.dylib ./macosx-arm64/supertuxkart.app/Contents/libs/
           cd ./macosx-arm64/supertuxkart.app/Contents/Resources/data

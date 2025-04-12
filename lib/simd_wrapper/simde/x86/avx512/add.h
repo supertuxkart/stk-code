@@ -402,23 +402,7 @@ simde_mm512_add_epi32 (simde__m512i a, simde__m512i b) {
       a_ = simde__m512i_to_private(a),
       b_ = simde__m512i_to_private(b);
 
-    #if defined(SIMDE_ARM_SVE_NATIVE)
-      const size_t n = sizeof(a_.i32) / sizeof(a_.i32[0]);
-      size_t i = 0;
-      svbool_t pg = svwhilelt_b32(i, n);
-      do {
-        svint32_t
-          va = svld1_s32(pg, &(a_.i32[i])),
-          vb = svld1_s32(pg, &(b_.i32[i]));
-        svst1_s32(pg, &(r_.i32[i]), svadd_s32_x(pg, va, vb));
-        i += svcntw();
-        pg = svwhilelt_b32(i, n);
-      } while (svptest_any(svptrue_b32(), pg));
-    #elif SIMDE_NATURAL_VECTOR_SIZE_LE(256)
-      for (size_t i = 0 ; i < (sizeof(r_.m256i) / sizeof(r_.m256i[0])) ; i++) {
-        r_.m256i[i] = simde_mm256_add_epi32(a_.m256i[i], b_.m256i[i]);
-      }
-    #elif defined(SIMDE_VECTOR_SUBSCRIPT_OPS)
+    #if defined(SIMDE_VECTOR_SUBSCRIPT_OPS)
       r_.i32 = a_.i32 + b_.i32;
     #else
       SIMDE_VECTORIZE

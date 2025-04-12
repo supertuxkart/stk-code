@@ -1,0 +1,282 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+
+Peach skin by Dakal and Marianne Gagnon, released under creative-commons BY-SA 3.0+
+Except background.jpg, by elisee
+Except stars, by s@f
+
+See SKIN_MAKING.md for more details on how the skin elements work.
+-->
+
+<skin base_theme_name="Classic" variant_name="Peach" author="Dakal & Marianne Gagnon (Auria)">
+
+<!--
+Here you can configure advanced theming rules for this skin
+-->
+
+<!--  Stateless -->
+<element type="background" common="y" image="background.jpg" />
+
+<element type="bottom-bar" common="y" image="bottom_bar.png" />
+
+<element type="achievement-message" image="achievement.png"
+      left_border="128" right_border="13" top_border="13" bottom_border="13"
+      preserve_h_aspect_ratios="true" hborder_out_portion="0.3" vborder_out_portion="0"/>
+
+<element type="friend-message" image="friend.png"
+      left_border="128" right_border="13" top_border="13" bottom_border="13"
+      preserve_h_aspect_ratios="true" hborder_out_portion="0" vborder_out_portion="0"/>
+
+<element type="error-message" image="error.png"
+      left_border="128" right_border="13" top_border="13" bottom_border="13"
+      preserve_h_aspect_ratios="true" hborder_out_portion="0" vborder_out_portion="0"/>
+
+<element type="generic-message" image="generic.png"
+      left_border="128" right_border="13" top_border="13" bottom_border="13"
+      preserve_h_aspect_ratios="true" hborder_out_portion="0" vborder_out_portion="0"/>
+
+<element type="button" state="neutral" image="glassbutton.png"
+      left_border="13" right_border="13" top_border="13" bottom_border="13"
+      hborder_out_portion="0" vborder_out_portion="0"/>
+
+<element type="button" state="focused" image="glassbutton_focused.png"
+      left_border="13" right_border="13" top_border="13" bottom_border="13"
+      hborder_out_portion="0" vborder_out_portion="0"/>
+
+<element type="button" state="deactivated" common="y" image="glassbutton_deactivated.png"
+      left_border="13" right_border="13" top_border="13" bottom_border="13"
+      hborder_out_portion="0" vborder_out_portion="0"/>
+
+<!-- TODO : buttons could support 'pressed' state -->
+
+<element type="textbubble" state="neutral" image="textbubble.png"
+      left_border="13" right_border="13" top_border="13" bottom_border="13"
+      hborder_out_portion="0.7" vborder_out_portion="0.3" />
+
+<element type="textbubble" state="focused" image="textbubble2.png"
+      left_border="13" right_border="13" top_border="13" bottom_border="13"
+      hborder_out_portion="0.7" vborder_out_portion="0.3" />
+
+<element type="progress" state="fill" image="glasssgauge_fill.png"
+      left_border="10" right_border="10" top_border="10" bottom_border="10" />
+
+<element type="progress" state="neutral" common="y" image="progress_bg.png"
+      left_border="31" right_border="31" top_border="15" bottom_border="15" />
+      
+      
+<element type="tab" state="neutral" image="glasstab.png"
+      left_border="11" right_border="11" top_border="6" bottom_border="10"
+      preserve_h_aspect_ratios="false" hborder_out_portion="0.0" vborder_out_portion="0.0"
+      h_inner_padding="0" v_inner_padding="0" h_margin="0" v_margin="0" />
+      
+<element type="tab" state="focused" image="glasstab_focus.png"
+      left_border="11" right_border="11" top_border="6" bottom_border="10"
+      preserve_h_aspect_ratios="false" hborder_out_portion="0.0" vborder_out_portion="0.0"
+      h_inner_padding="0" v_inner_padding="0" h_margin="0" v_margin="0" />
+
+<element type="tab" state="down" image="glasstab_down.png"
+      left_border="11" right_border="11" top_border="6" bottom_border="10"
+      preserve_h_aspect_ratios="false" hborder_out_portion="0.0" vborder_out_portion="0.0"
+      h_inner_padding="0" v_inner_padding="0" h_margin="0" v_margin="0" />
+
+
+<element type="verticalTab" state="neutral" image="glasstab_vert.png"
+      left_border="10" right_border="10" top_border="10" bottom_border="10"
+      preserve_h_aspect_ratios="false" hborder_out_portion="0.0" vborder_out_portion="0.0"
+      h_inner_padding="0" v_inner_padding="0" h_margin="0" v_margin="0" />
+      
+<element type="verticalTab" state="focused" image="glasstab_vert_focus.png"
+      left_border="10" right_border="10" top_border="10" bottom_border="10"
+      preserve_h_aspect_ratios="false" hborder_out_portion="0.0" vborder_out_portion="0.0"
+      h_inner_padding="0" v_inner_padding="0" h_margin="0" v_margin="0" />
+
+<element type="verticalTab" state="down" image="glasstab_vert_down.png"
+      left_border="10" right_border="10" top_border="10" bottom_border="10"
+      preserve_h_aspect_ratios="false" hborder_out_portion="0.0" vborder_out_portion="0.0"
+      h_inner_padding="0" v_inner_padding="0" h_margin="0" v_margin="0" />
+
+<!-- Stateless -->
+<element type="squareFocusHaloBW" common="y" image="glass_square_focused_bw.png"
+      left_border="6" right_border ="6" top_border="6" bottom_border="6"
+      hborder_out_portion="1.0" />
+<element type="squareFocusHalo1" common="y" image="glass_square_focused_red.png"
+      left_border="6" right_border ="6" top_border="6" bottom_border="6"
+      hborder_out_portion="1.0" />
+<element type="squareFocusHalo2" common="y" image="glass_square_focused_cyan.png"
+      left_border="6" right_border ="6" top_border="6" bottom_border="6"
+      hborder_out_portion="1.0" />
+<element type="squareFocusHalo3" common="y" image="glass_square_focused_green.png"
+      left_border="6" right_border ="6" top_border="6" bottom_border="6"
+      hborder_out_portion="1.0" />
+<element type="squareFocusHalo4" common="y" image="glass_square_focused_yellow.png"
+      left_border="6" right_border ="6" top_border="6" bottom_border="6"
+      hborder_out_portion="1.0" />
+<element type="squareFocusHalo5" common="y" image="glass_square_focused_pink.png"
+      left_border="6" right_border ="6" top_border="6" bottom_border="6"
+      hborder_out_portion="1.0" />
+      
+<!-- Stateless. No splitting into 9 areas is done; the image is just resized. -->
+<element type="selectionHalo" image="bubble.png"  />
+<element type="focusHalo" image="glass_iconhighlight_focus.png"  />
+
+<element type="spinner" state="neutral" common="y" image="glassspinner.png"
+    left_border="110" right_border="110" top_border="0" bottom_border="36"
+    preserve_h_aspect_ratios="true" hborder_out_portion="0.0" />
+
+<element type="spinner" state="focused" image="glassspinner_focus.png"
+    left_border="110" right_border="110" top_border="0" bottom_border="36"
+    preserve_h_aspect_ratios="true" hborder_out_portion="0.0" />
+
+<element type="spinner" state="deactivated" common="y" image="glassspinner_deactivated.png"
+    left_border="110" right_border="110" top_border="0" bottom_border="36"
+    preserve_h_aspect_ratios="true" hborder_out_portion="0.0" />
+
+<!-- color spinner in kart color selection -->
+<element type="spinner_rainbow" state="neutral" image="spinner_rainbow.png"
+      left_border="104" right_border="104" top_border="0" bottom_border="36"
+      preserve_h_aspect_ratios="true" hborder_out_portion="0.0" common="y"/>
+
+<element type="spinner_rainbow" state="focused" image="spinner_rainbow_focus.png"
+      left_border="104" right_border="104" top_border="0" bottom_border="36"
+      preserve_h_aspect_ratios="true" hborder_out_portion="0.0" common="y"/>
+
+<element type="spinner_rainbow" state="deactivated" image="spinner_rainbow_deactivated.png"
+      left_border="104" right_border="104" top_border="0" bottom_border="36"
+      preserve_h_aspect_ratios="true" hborder_out_portion="0.0" common="y"/>
+
+<!-- player name spinner color in multiplayer-->
+<element type="spinner1" state="neutral" common="y" image="glass_square_red.png"
+      left_border="110" right_border="110" top_border="0" bottom_border="36"
+    preserve_h_aspect_ratios="true" hborder_out_portion="0.0" />
+<element type="spinner2" state="neutral" common="y" image="glass_square_cyan.png"
+      left_border="110" right_border="110" top_border="0" bottom_border="36"
+    preserve_h_aspect_ratios="true" hborder_out_portion="0.0" />
+<element type="spinner3" state="neutral" common="y" image="glass_square_green.png"
+      left_border="110" right_border="110" top_border="0" bottom_border="36"
+    preserve_h_aspect_ratios="true" hborder_out_portion="0.0" />
+<element type="spinner4" state="neutral" common="y" image="glass_square_yellow.png"
+      left_border="110" right_border="110" top_border="0" bottom_border="36"
+    preserve_h_aspect_ratios="true" hborder_out_portion="0.0" />
+<element type="spinner5" state="neutral" common="y" image="glass_square_pink.png"
+      left_border="110" right_border="110" top_border="0" bottom_border="36"
+    preserve_h_aspect_ratios="true" hborder_out_portion="0.0" />
+
+<!-- This one is a bit special. Only area(s) LEFT and/or RIGHT will be rendered. They will be overlaid
+     on top of the spinner's background -->
+<element type="spinner" state="down" image="glassspinner_down.png"
+    left_border="110" right_border="110" top_border="0" bottom_border="36"
+    preserve_h_aspect_ratios="true" hborder_out_portion="0.0" />
+
+<!-- For checkboxes, no splitting into 9 areas is done; the image is just stretched -->
+<element type="checkbox" state="neutral+unchecked" image="glasscheckbox.png"/>
+<element type="checkbox" state="neutral+checked" image="glasscheckbox_checked.png"/>
+<element type="checkbox" state="focused+unchecked" image="glasscheckbox_focus.png"/>
+<element type="checkbox" state="focused+checked" image="glasscheckbox_checked_focus.png"/>
+<element type="checkbox" state="deactivated+unchecked" common="y" image="glasscheckbox_deactivated.png"/>
+<element type="checkbox" state="deactivated+checked" common="y" image="glasscheckbox_checked_deactivated.png"/>
+
+<!-- are always in neutral state for now. No splitting into 9 areas is done; the image is just stretched.
+     Note: the body of a guage is the same as for for spinners. -->
+<element type="gaugefill" image="glasssgauge_fill.png" />
+<element type="gaugefillrainbow" common="y" image="gauge_fill_rainbow.png" />
+
+<!-- Lists are always in neutral state for now -->
+<element type="list" common="y" image="glass_section.png"
+    left_border="15" right_border="15" top_border="7" bottom_border="7"
+    hborder_out_portion="0.0" vborder_out_portion="0.0" />
+    
+<element type="listitem" state="focused" image="select.png"
+    left_border="0" right_border="0" top_border="0" bottom_border="0"
+    hborder_out_portion="0.0" vborder_out_portion="0.0" />
+    
+<!-- Scrollbars. Background and thumb have no state (always neutral state).
+     The buttons are the top and bottom arrows. Image must be top arrow, will
+     be mirrorred for bottom. Buttons can be in neutral or down state.
+     Advanced stretching is only used for the background and thumb. -->
+<element type="scrollbar_background"          common="y" image="scrollbar_bg.png"
+    left_border="7" right_border="7" top_border="7" bottom_border="7"
+    hborder_out_portion="0.0" vborder_out_portion="0.0" />
+<element type="scrollbar_thumb"               image="scrollbar_thumb.png"
+    left_border="7" right_border="7" top_border="7" bottom_border="7"
+    hborder_out_portion="-1.0" vborder_out_portion="-1.0" />
+<element type="scrollbar_button"              common="y" image="scrollbar_btn.png" />
+<element type="scrollbar_button" state="down" image="scrollbar_btn_down.png" />
+
+<element type="left_arrow"  state="neutral" common="y" image="left_arrow.png" />
+<element type="right_arrow" state="neutral" common="y" image="right_arrow.png" />
+<element type="left_arrow"  state="focus"   image="left_arrow_focus.png" />
+<element type="right_arrow" state="focus"   image="right_arrow_focus.png" />
+
+<element type="list_header"  state="neutral" common="y" image="table_header.png" />
+<element type="list_sort_up" state="neutral" common="y" image="list_sort_up.png" />
+<element type="list_sort_down" state="neutral" common="y" image="list_sort_down.png" />
+<element type="list_header"  state="down"    image="table_header_down.png" />
+
+<!-- Stateless -->
+<element type="section" common="y" image="glass_section.png"
+      left_border="15" right_border="15" top_border="15" bottom_border="15"
+      hborder_out_portion="0.0" vborder_out_portion="0.0" />
+
+<element type="section" state="selected" image="glassbutton_focused.png"
+      left_border="15" right_border="15" top_border="15" bottom_border="15"
+      hborder_out_portion="0.0" vborder_out_portion="0.0" />
+
+<!-- Stateless -->
+<element type="rounded_section" common="y" image="glass_rsection.png"
+      left_border="15" right_border="15" top_border="15" bottom_border="15"
+      hborder_out_portion="0.0" vborder_out_portion="0.0" />
+
+<!-- Stateless -->
+<element type="window" common="y" image="dialog.png"
+      left_border="7" right_border="7" top_border="7" bottom_border="7"
+      hborder_out_portion="1.0" vborder_out_portion="0.2" />
+
+<!-- Stateless -->
+<element type="tooltip" common="y" image="tooltip.png"
+    left_border="10" right_border="10" top_border="10" bottom_border="10"
+    hborder_out_portion="1.0" vborder_out_portion="1.0" />
+    
+<!--                   Colors                  -->
+<color type="text" state="neutral" r="0" g="0" b="0" />
+<color type="brighttext" state="neutral" r="255" g="145" b="0" />
+
+<!-- For highlighted items, e.g. in list -->
+<color type="text" state="focused" r="255" g="255" b="255" />
+
+<!-- Color used in the credits -->
+<color type="credits_text" state="neutral" r="65" g="15" b="0" />
+
+<!-- Color used for emphasized items in e.g. lists -->
+<color type="emphasis_text" state="neutral" r="0" g="0" b="180" />
+<color type="emphasis_text" state="focused" r="0" g="0" b="160" />
+
+<!-- Color used for red/blue items in list (e.g. player team color in networking) -->
+<color type="list_blue" state="neutral" r="0" g="0" b="255" />
+<color type="list_blue" state="focused" r="0" g="0" b="255" />
+<color type="list_red" state="neutral" r="255" g="0" b="0" />
+<color type="list_red" state="focused" r="255" g="0" b="0" />
+
+<!-- Color used to fade out background when a dialog is shown -->
+<color type="dialog_background" state="neutral" a="120" r="0" g="0" b="0" />
+
+<!-- Color used for tips in the loading screen -->
+<color type="tips_background" state="neutral" a="120" r="0" g="0" b="0" />
+
+<!-- Text field color -->
+<color type="text_field" state="background" a="255" r="200" g="200" b="200" />
+<color type="text_field" state="background_focused" a="255" r="236" g="226" b="201" />
+<color type="text_field" state="background_deactivated" a="255" r="200" g="200" b="200" />
+<color type="text_field" state="background_marked" a="128" r="90" g="55" b="25" />
+<color type="text_field" state="neutral" a="255" r="138" g="138" b="138" />
+<color type="text_field" state="focused" a="255" r="243" g="164" b="80" />
+<color type="text_field" state="deactivated" a="255" r="138" g="138" b="138" />
+
+<!-- Rating star image -->
+<element type="rating" state="neutral" common="y" image="rating_star.png" />
+
+<!-- Font color -->
+<color type="font" state="top" a="255" r="255" g="128" b="0" />
+<color type="font" state="bottom" a="255" r="255" g="220" b="15" />
+<color type="font" state="normal" a="255" r="210" g="100" b="50" />
+
+</skin>

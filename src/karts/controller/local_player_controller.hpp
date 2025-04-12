@@ -30,6 +30,10 @@ class SFXBase;
 class SFXBuffer;
 class btTransform;
 
+#ifndef SERVER_ONLY
+class ParticleEmitter;
+#endif
+
 /** PlayerKart manages control events from the player and moves
   * them to the Kart
   *
@@ -46,7 +50,9 @@ private:
     bool           m_has_started;
     bool           m_is_above_nitro_target;
 
+#ifndef SERVER_ONLY
     std::unique_ptr<ParticleEmitter> m_sky_particles_emitter;
+#endif
 
     /** The index of the camera attached to the kart for this controller. The
      *  camera object is managed in the Camera class, so no need to free it. */

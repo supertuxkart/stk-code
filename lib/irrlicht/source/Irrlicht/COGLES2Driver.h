@@ -48,6 +48,7 @@ namespace irr
 #include "EDriverFeatures.h"
 #include "fast_atof.h"
 #include "COGLES2ExtensionHandler.h"
+#include "COGLES2Renderer2D.h"
 
 class ContextManagerEGL;
 
@@ -396,6 +397,15 @@ namespace video
 #if defined(_IRR_COMPILE_WITH_EGL_)
 		ContextManagerEGL* getEGLContext() {return EglContext;}
 #endif
+
+		void cleanUp() {
+			deleteMaterialRenders();
+			if (MaterialRenderer2D) {
+				delete MaterialRenderer2D;
+				MaterialRenderer2D = NULL;
+			}
+			deleteAllTextures();
+		}
 
 	private:
 		// Bridge calls.

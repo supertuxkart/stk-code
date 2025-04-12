@@ -267,7 +267,8 @@ KartModel::~KartModel()
         if(m_is_master && m_wheel_model[i])
         {
             irr_driver->dropAllTextures(m_wheel_model[i]);
-            irr_driver->removeMeshFromCache(m_wheel_model[i]);
+            if (m_wheel_model[i]->getReferenceCount() == 1)
+                irr_driver->removeMeshFromCache(m_wheel_model[i]);
         }
     }
 
@@ -1322,7 +1323,7 @@ void KartModel::initInverseBoneMatrices()
     float striaght_frame = (float)m_animation_frame[AF_STRAIGHT];
     if (m_animation_frame[AF_STRAIGHT] == -1)
     {
-        Log::warn("KartModel", "%s has no striaght frame defined.",
+        Log::warn("KartModel", "%s has no straight frame defined.",
             m_model_filename.c_str());
         striaght_frame = 0.0f;
     }

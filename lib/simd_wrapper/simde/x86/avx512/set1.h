@@ -325,6 +325,27 @@ simde_mm512_set1_pd (simde_float64 a) {
   #define _mm512_set1_pd(a) simde_mm512_set1_pd(a)
 #endif
 
+SIMDE_FUNCTION_ATTRIBUTES
+simde__m512h
+simde_mm512_set1_ph (simde_float16 a) {
+  #if defined(SIMDE_X86_AVX512FP16_NATIVE)
+    return _mm512_set1_ph(a);
+  #else
+    simde__m512h_private r_;
+
+    SIMDE_VECTORIZE
+    for (size_t i = 0 ; i < (sizeof(r_.f16) / sizeof(r_.f16[0])) ; i++) {
+      r_.f16[i] = a;
+    }
+
+    return simde__m512h_from_private(r_);
+  #endif
+}
+#if defined(SIMDE_X86_AVX512FP16_ENABLE_NATIVE_ALIASES)
+  #undef _mm512_set1_ph
+  #define _mm512_set1_ph(a) simde_mm512_set1_ph(a)
+#endif
+
 SIMDE_END_DECLS_
 HEDLEY_DIAGNOSTIC_POP
 

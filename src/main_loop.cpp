@@ -708,28 +708,31 @@ void MainLoop::run()
             }
         }
 
-        TimePoint frame_end = std::chrono::steady_clock::now();
-        double frame_time = convertToTime(frame_end, frame_start) * 0.001;
-        const double current_fps = 1.0 / frame_time;
-        const double max_fps =
-            (irr_driver->isRecording() && UserConfigParams::m_limit_game_fps) ?
-            UserConfigParams::m_record_fps : UserConfigParams::m_max_fps;
-
-        // Throttle fps if more than maximum, which can reduce
-        // the noise the fan on a graphics card makes.
-        // No need to throttle if vsync is on (m_swap_interval == 1) as
-        // endScene handles fps according to monitor refresh rate
-        if ((UserConfigParams::m_swap_interval == 0 ||
-            GUIEngine::isNoGraphics()) &&
-            m_throttle_fps && !ProfileWorld::isProfileMode() &&
-            current_fps > max_fps)
+        if (!UserConfigParams::m_benchmark)
         {
-            double wait_time = 1.0 / max_fps - 1.0 / current_fps;
-            std::chrono::nanoseconds wait_time_ns(
-                (uint64_t)(wait_time * 1000.0 * 1000.0 * 1000.0));
-            PROFILER_PUSH_CPU_MARKER("Throttle framerate", 0, 0, 0);
-            std::this_thread::sleep_for(wait_time_ns);
-            PROFILER_POP_CPU_MARKER();
+            TimePoint frame_end = std::chrono::steady_clock::now();
+            double frame_time = convertToTime(frame_end, frame_start) * 0.001;
+            const double current_fps = 1.0 / frame_time;
+            const double max_fps = 
+                (irr_driver->isRecording() && UserConfigParams::m_limit_game_fps) ?
+                UserConfigParams::m_record_fps : UserConfigParams::m_max_fps;
+
+            // Throttle fps if more than maximum, which can reduce
+            // the noise the fan on a graphics card makes.
+            // No need to throttle if vsync is on (m_swap_interval == 1) as
+            // endScene handles fps according to monitor refresh rate
+            if ((UserConfigParams::m_swap_interval == 0 ||
+                GUIEngine::isNoGraphics()) &&
+                m_throttle_fps && !ProfileWorld::isProfileMode() &&
+                current_fps > max_fps)
+            {
+                double wait_time = 1.0 / max_fps - 1.0 / current_fps;
+                std::chrono::nanoseconds wait_time_ns(
+                    (uint64_t)(wait_time * 1000.0 * 1000.0 * 1000.0));
+                PROFILER_PUSH_CPU_MARKER("Throttle framerate", 0, 0, 0);
+                std::this_thread::sleep_for(wait_time_ns);
+                PROFILER_POP_CPU_MARKER();
+            }
         }
 
         PROFILER_POP_CPU_MARKER();   // MainLoop pop

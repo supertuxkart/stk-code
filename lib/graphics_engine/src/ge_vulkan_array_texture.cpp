@@ -43,7 +43,7 @@ GEVulkanArrayTexture::GEVulkanArrayTexture(const std::vector<io::path>& list,
     m_vma_allocation = VK_NULL_HANDLE;
     m_has_mipmaps = true;
     m_locked_data = NULL;
-    m_max_size = m_vk->getDriverAttributes()
+    core::dimension2du max_size = m_vk->getDriverAttributes()
         .getAttributeAsDimension2d("MAX_TEXTURE_SIZE");
     m_internal_format = VK_FORMAT_R8G8B8A8_UNORM;
 
@@ -51,9 +51,9 @@ GEVulkanArrayTexture::GEVulkanArrayTexture(const std::vector<io::path>& list,
     m_image_view_lock.lock();
     m_thread_loading_lock.lock();
     GEVulkanCommandLoader::addMultiThreadingCommand(
-        [list, image_mani, this]()
+        [list, image_mani, max_size, this]()
         {
-            reloadInternal(list, image_mani);
+            reloadInternal(list, image_mani, max_size);
         });
 }   // GEVulkanArrayTexture
 
@@ -71,7 +71,8 @@ GEVulkanArrayTexture::GEVulkanArrayTexture(
 // ----------------------------------------------------------------------------
 void GEVulkanArrayTexture::reloadInternal(const std::vector<io::path>& list,
                                           std::function<void(video::IImage*,
-                                          unsigned)> image_mani)
+                                          unsigned)> image_mani,
+                                          const core::dimension2du& max_size)
 {
     VkDeviceSize image_size = 0;
     VkDeviceSize mipmap_data_size = 0;
@@ -136,7 +137,7 @@ void GEVulkanArrayTexture::reloadInternal(const std::vector<io::path>& list,
     {
         const io::path& fullpath = list[i];
         video::IImage* texture_image = getResizedImageFullPath(fullpath,
-            m_max_size, NULL, &m_size);
+            max_size, NULL, &m_size);
         if (texture_image == NULL)
             goto destroy;
         if (image_mani)

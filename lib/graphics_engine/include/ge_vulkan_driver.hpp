@@ -30,6 +30,7 @@ namespace GE
     class GEVulkanDynamicSPMBuffer;
     class GEVulkanFBOTexture;
     class GEVulkanMeshCache;
+    class GEVulkanSkyBoxRenderer;
     class GEVulkanTextureDescriptor;
     enum GEVulkanSampler : unsigned
     {
@@ -341,7 +342,7 @@ namespace GE
             destroySwapChainRelated(false/*handle_surface*/);
             createSwapChainRelated(false/*handle_surface*/);
         }
-        void updateDriver(bool reload_shaders = false);
+        void updateDriver(bool pbr_changed = false);
         uint32_t getGraphicsFamily() const         { return m_graphics_family; }
         unsigned getGraphicsQueueCount() const
                                               { return m_graphics_queue_count; }
@@ -355,6 +356,8 @@ namespace GE
                                      VkFormatFeatureFlags features);
         VmaAllocator getVmaAllocator() const         { return m_vk->allocator; }
         GEVulkanMeshCache* getVulkanMeshCache() const;
+        GEVulkanSkyBoxRenderer* getSkyBoxRenderer() const
+                                                   { return m_skybox_renderer; }
         GEVulkanTextureDescriptor* getMeshTextureDescriptor() const
                                            { return m_mesh_texture_descriptor; }
         GEVulkanFBOTexture* getRTTTexture() const      { return m_rtt_texture; }
@@ -508,6 +511,7 @@ namespace GE
 
         IrrlichtDevice* m_irrlicht_device;
         GEVulkanDepthTexture* m_depth_texture;
+        GEVulkanSkyBoxRenderer* m_skybox_renderer;
         GEVulkanTextureDescriptor* m_mesh_texture_descriptor;
         GEVulkanFBOTexture* m_rtt_texture;
         GEVulkanFBOTexture* m_prev_rtt_texture;

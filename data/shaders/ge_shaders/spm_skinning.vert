@@ -1,5 +1,7 @@
-#include "utils/spm_layout.h"
-#include "utils/get_vertex_color.h"
+#include "utils/camera.glsl"
+#include "utils/get_vertex_color.glsl"
+#include "utils/spm_data.glsl"
+#include "utils/spm_layout.vert"
 #include "../utils/get_world_location.vert"
 
 void main()
@@ -27,4 +29,15 @@ void main()
         f_material_id = u_material_ids.m_material_id[gl_DrawIDARB];
 #endif
     f_hue_change = u_object_buffer.m_objects[gl_InstanceIndex].m_hue_change;
+#ifdef PBR_ENABLED
+    vec4 skinned_normal = joint_matrix * v_normal;
+    vec4 skinned_tangent = joint_matrix * v_tangent;
+    vec3 world_normal = rotateVector(u_object_buffer.m_objects[gl_InstanceIndex].m_rotation, skinned_normal.xyz);
+    vec3 world_tangent = rotateVector(u_object_buffer.m_objects[gl_InstanceIndex].m_rotation, skinned_tangent.xyz);
+
+    f_tangent = (u_camera.m_view_matrix * vec4(world_tangent, 0.0)).xyz;
+    f_bitangent = (u_camera.m_view_matrix *
+      vec4(cross(world_normal, world_tangent) * v_tangent.w, 0.0)).xyz;
+    f_normal = (u_camera.m_view_matrix * vec4(world_normal, 0.0)).xyz;
+#endif
 }

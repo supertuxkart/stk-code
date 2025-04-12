@@ -70,6 +70,36 @@ std::string StkTime::toString(const TimeType &tt)
 {
     const struct tm *t = gmtime(&tt);
 
+    std::string date_format = getDateFormat();
+
+    char s[64];
+    strftime(s, 64, date_format.c_str(), t);
+    return s;
+}   // toString(1)
+
+// ----------------------------------------------------------------------------
+
+/** Converts the date represented by year, month, day
+ *  to a human readable string. */
+std::string StkTime::toString(int year, int month, int day)
+{
+    struct tm *t = new tm();
+    t->tm_year = year - 1900;
+    t->tm_mon  = month - 1;
+    t->tm_mday = day;
+
+    std::string date_format = getDateFormat();
+
+    char s[64];
+    strftime(s, 64, date_format.c_str(), t);
+    return s;
+}   // toString(3)
+
+// ----------------------------------------------------------------------------
+
+/** Obtains the translated format of the time string. */
+std::string StkTime::getDateFormat()
+{
     //I18N: Format for dates (%d = day, %m = month, %Y = year). See http://www.cplusplus.com/reference/ctime/strftime/ for more info about date formats.
     core::stringw w_date_format = translations->w_gettext(N_("%d/%m/%Y"));
     core::stringc c_date_format(w_date_format.c_str());
@@ -82,9 +112,7 @@ std::string StkTime::toString(const TimeType &tt)
         date_format = "%d/%m/%Y";
     }
 
-    char s[64];
-    strftime(s, 64, date_format.c_str(), t);
-    return s;
+    return date_format;
 }   // toString
 
 // ----------------------------------------------------------------------------

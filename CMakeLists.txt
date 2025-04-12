@@ -1,14 +1,10 @@
-cmake_minimum_required(VERSION 2.8.4)
+cmake_minimum_required(VERSION 3.6.0)
 
 # root CMakeLists for the SuperTuxKart project
 project(SuperTuxKart)
 set(PROJECT_VERSION "2.0-git")
 
 add_definitions( -DSUPERTUXKART_VERSION="${PROJECT_VERSION}" )
-
-if(NOT (CMAKE_MAJOR_VERSION VERSION_LESS 3))
-  cmake_policy(SET CMP0043 OLD)
-endif()
 
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${PROJECT_SOURCE_DIR}/cmake")
 include(CMakeDependentOption)
@@ -115,6 +111,7 @@ endif()
 if(UNIX AND NOT APPLE)
     option(USE_ASAN   "Build with Leak/Address sanitizer" OFF)
     option(USE_TSAN   "Build with Thread sanitizer" OFF)
+    option(USE_USAN   "Build with Undefined Behaviour sanitizer" OFF)
     option(USE_LIBBFD "Use libbfd for crash reporting and leak check" OFF)
 endif()
 
@@ -125,6 +122,10 @@ endif()
 if(USE_TSAN)
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fsanitize=thread -fno-omit-frame-pointer")
     set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fsanitize=thread -fno-omit-frame-pointer")
+endif()
+if(USE_USAN)
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fsanitize=undefined -fno-omit-frame-pointer")
+    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fsanitize=undefined -fno-omit-frame-pointer")
 endif()
 
 set(STK_SOURCE_DIR "src")
@@ -523,6 +524,7 @@ endif()
 if(MSVC)
     # VS will automatically add NDEBUG for release mode, but only _DEBUG in debug mode.
     # Since STK uses DEBUG, this is added for debug compilation only:
+    cmake_policy(SET CMP0043 OLD)
     set_property(DIRECTORY PROPERTY COMPILE_DEFINITIONS_DEBUG DEBUG)
 else()
     # All non VS generators used create only a single compile mode, so
@@ -784,6 +786,9 @@ if(UNIX AND NOT APPLE)
     if(USE_TSAN)
         target_link_libraries(supertuxkart "-fsanitize=thread")
     endif()
+    if(USE_USAN)
+        target_link_libraries(supertuxkart "-fsanitize=undefined")
+    endif()
 endif()
 
 if(BUILD_RECORDER)
@@ -826,6 +831,20 @@ if(MSVC OR MINGW)
         "${PROJECT_SOURCE_DIR}/${DEPENDENCIES}/bin"
         $<TARGET_FILE_DIR:supertuxkart>)
   add_custom_target(stkshaders SOURCES ${STK_SHADERS})
+endif()
+
+if(MSVC)
+  SET(CMAKE_SHARED_LINKER_FLAGS /MANIFEST:NO)
+  add_custom_command(
+    TARGET supertuxkart POST_BUILD COMMAND "mt.exe" 
+    -manifest \"${PROJECT_SOURCE_DIR}\\windows\\dpi_aware.manifest\" 
+    -inputresource:\"$<TARGET_FILE:supertuxkart>\"\;\#1
+    -outputresource:\"$<TARGET_FILE:supertuxkart>\"\;\#1)
+endif()
+
+if(MINGW)
+  SET(CMAKE_SHARED_LINKER_FLAGS /MANIFEST:NO)
+  target_sources(supertuxkart PRIVATE windows/windows_config.rc)
 endif()
 
 if(MINGW)
@@ -905,7 +924,7 @@ install(FILES data/supertuxkart_128.png DESTINATION share/icons/hicolor/128x128/
 install(FILES data/supertuxkart_256.png DESTINATION share/icons/hicolor/256x256/apps RENAME supertuxkart.png)
 install(FILES data/supertuxkart_512.png DESTINATION share/icons/hicolor/512x512/apps RENAME supertuxkart.png)
 install(FILES data/supertuxkart_1024.png DESTINATION share/icons/hicolor/1024x1024/apps RENAME supertuxkart.png)
-install(FILES data/supertuxkart.appdata.xml DESTINATION share/metainfo)
+install(FILES data/net.supertuxkart.SuperTuxKart.metainfo.xml DESTINATION share/metainfo)
 
 if(MINGW)
     install(DIRECTORY ${CMAKE_BINARY_DIR}/bin/ DESTINATION ${STK_INSTALL_BINARY_DIR}

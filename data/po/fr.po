@@ -4,7 +4,7 @@
 # 
 # Translators:
 # adrien vigneron <adrien.v@ml1.net>, 2015
-# Alayan <alayan.feh@gmail.com>, 2018-2019
+# Alayan, 2018-2019,2024
 # alfu5, 2022
 # Anard0 <anard@free.fr>, 2020
 # Anard0 <anard@free.fr>, 2020
@@ -13,8 +13,9 @@
 # Benau, 2020-2021
 # Clément Escude--Cotinat, 2022
 # Clément Escude--Cotinat, 2022
+# Cwpute BipBoup, 2024
 # devnoname120 <devnoname120+gh@gmail.com>, 2015
-# Alayan <alayan.feh@gmail.com>, 2018
+# Alayan, 2018
 # Éfrit, 2015
 # Éfrit, 2015
 # Éfrit, 2015
@@ -37,7 +38,7 @@ msgstr ""
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-06-16 01:41+0800\n"
 "PO-Revision-Date: 2015-02-15 01:58+0000\n"
-"Last-Translator: Jérôme HERBINET, 2023\n"
+"Last-Translator: Alayan, 2018-2019,2024\n"
 "Language-Team: French (http://app.transifex.com/supertuxkart/supertuxkart/language/fr/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -111,7 +112,7 @@ msgstr "Un vrai pilote de Formule 1 !"
 msgid ""
 "Win against at least 3 AIs in normal race, time-trial, and follow the "
 "leader."
-msgstr "Gagne contre au moins 3 intelligences artificielles dans une Course normale, Course contre la montre et Suis le meneur."
+msgstr "Gagne contre au moins 3 IA dans les modes Course normale, Course contre la montre et Suivez-le-Chef."
 
 #. I18N: ./data/achievements.xml
 msgid "Powerup Love"
@@ -936,7 +937,7 @@ msgstr "Informations sur l’utilisateur"
 #. I18N: ./data/gui/dialogs/online/user_info_dialog.stkgui
 #. I18N: User info dialog
 msgid "Remove Friend"
-msgstr ""
+msgstr "Retirer un ami"
 
 #. I18N: ./data/gui/dialogs/online/user_info_dialog.stkgui
 #. I18N: User info dialog
@@ -946,17 +947,17 @@ msgstr "Ajouter un ami"
 #. I18N: ./data/gui/dialogs/online/user_info_dialog.stkgui
 #. I18N: User info dialog
 msgid "Accept Invite"
-msgstr ""
+msgstr "Accepter l'invitation"
 
 #. I18N: ./data/gui/dialogs/online/user_info_dialog.stkgui
 #. I18N: User info dialog
 msgid "Decline Invite"
-msgstr ""
+msgstr "Refuser l'invitation"
 
 #. I18N: ./data/gui/dialogs/online/user_info_dialog.stkgui
 #. I18N: User info dialog
 msgid "View Profile"
-msgstr ""
+msgstr "Voir le profil"
 
 #. I18N: ./data/gui/dialogs/online/vote_dialog.stkgui
 #. I18N: In the vote dialog
@@ -1144,7 +1145,7 @@ msgstr "Générique"
 
 #. I18N: ./data/gui/screens/cutscene.stkgui
 msgid "Skip"
-msgstr ""
+msgstr "Passer"
 
 #. I18N: ./data/gui/screens/easter_egg.stkgui
 #. I18N: Section in easter egg tracks selection screen
@@ -1428,7 +1429,7 @@ msgstr "Débuter le tutoriel"
 #. I18N: ./data/gui/screens/help1.stkgui
 #. I18N: In the help menu
 msgid "Collect blue gift boxes, they will give you powerups."
-msgstr "Ramasse les boîtes bleues : elles contiennent des armes et divers bonus."
+msgstr "Ramasse les cadeaux bleus, ils te donneront des bonus."
 
 #. I18N: ./data/gui/screens/help1.stkgui
 #. I18N: In the help menu
@@ -1493,7 +1494,7 @@ msgid ""
 "Follow the leader: Run for second place, as the last kart will be "
 "disqualified every time the counter hits zero. Beware: going in front of the"
 " leader will get you eliminated too!"
-msgstr "Suis le meneur de course : vise le second rang, car le dernier kart sera éliminé à chaque fois que le décompte atteint zéro. Attention : dépasser le meneur de cours va aussi conduire à l'élimination !"
+msgstr "Suivez-le-Chef : vise la deuxième place, car le dernier kart sera éliminé à chaque fois que le décompte atteint zéro. Attention : dépasser le chef (le meneur) vous éliminera également !"
 
 #. I18N: ./data/gui/screens/help2.stkgui
 #. I18N: In the help menu
@@ -1526,7 +1527,7 @@ msgstr "Course contre un enregistrement : Faites la course contre des enregistre
 #. I18N: In the help menu
 msgid ""
 "Lap Trial: Complete as many laps as possible in a given amount of time."
-msgstr ""
+msgstr "Tours contre-la-montre : terminer autant de tours que possible en un temps donné"
 
 #. I18N: ./data/gui/screens/help2.stkgui
 #. I18N: In the help menu
@@ -1535,12 +1536,12 @@ msgid ""
 "instead of playing a single race, you play many in a row. The better you "
 "rank, the more points you get. In the end, the player with the most points "
 "wins the cup."
-msgstr "* Plusieurs de ces modes de jeu sont disponibles en mode Grand Prix: plusieurs courses sont disputées au lieu d’une seule. Plus votre position est bonne, plus vous gagnez de points. À la fin, le joueur ayant le plus de points remporte la coupe."
+msgstr "* Beaucoup de ces modes de jeux peuvent être joués à la manière du Grand Prix: au lieu d’une seule course, vous en disputez plusieurs à la suite. Plus vous atteignez une place élevée du classement, et plus vous gagnez de points. À la fin, le joueur ayant le plus de points remporte la coupe."
 
 #. I18N: ./data/gui/screens/help3.stkgui
 #. I18N: In the help menu
 msgid "To help you win, there are some powerups you can collect:"
-msgstr "Afin de vous aider à obtenir la victoire, des bonus peuvent être collectés :"
+msgstr "Pour t'aider à gagner, il y a des bonus que tu peux ramasser :"
 
 #. I18N: ./data/gui/screens/help3.stkgui
 msgid ""
@@ -1580,13 +1581,13 @@ msgstr "Parachute - ralentit tous les karts en meilleure position."
 msgid ""
 "Swapper - gift boxes are transformed into bananas, nitro cans into "
 "bubblegums, and vice versa for a short time."
-msgstr "Échangeur - pour une courte durée, les coffrets cadeaux sont transformés en bananes et vice-versa, et les nitros, en chewing-gums."
+msgstr "Échangeur - pour une courte durée, les cadeaux sont transformés en bananes, les nitros sont transformées en chewing-gums, et vice-versa."
 
 #. I18N: ./data/gui/screens/help3.stkgui
 msgid ""
 "Basket Ball - bounces after the leader, and might squash and slow down karts"
 " down on the way."
-msgstr "Balle de basket - poursuit le premier joueur, et peut écraser et ralentir les karts sur son passage."
+msgstr "Balle de basket - poursuit le meneur en rebondissant, et peut écraser et ralentir les karts sur son passage."
 
 #. I18N: ./data/gui/screens/help3.stkgui
 msgid ""
@@ -1645,7 +1646,7 @@ msgstr "Quand vous complétez un défi, vous obtenez une coupe. Chaque coupe vau
 msgid ""
 "When you get the number of points indicated below this icon, you'll be "
 "gifted a surprise. There are several to collect."
-msgstr "Quand vous obtenez le nombre de points indiqué sous cette icône, vous recevrez une surprise. Il y en a plusieurs à collecter."
+msgstr "Quand tu obtiendras le nombre de points indiqué sous cette icône, tu recevras une surprise. Il y en a plusieurs à collectionner."
 
 #. I18N: ./data/gui/screens/help6.stkgui
 msgid ""
@@ -1945,7 +1946,7 @@ msgstr "Amis"
 #. I18N: ./data/gui/screens/online/profile_friends.stkgui
 #. I18N: In the profile screen
 msgid "Look for more friends:"
-msgstr "Chercher des amis :"
+msgstr "Chercher plus d'amis :"
 
 #. I18N: ./data/gui/screens/online/profile_friends.stkgui
 #. I18N: ./data/gui/screens/online/user_search.stkgui
@@ -2024,7 +2025,7 @@ msgid ""
 "You can play without creating an online account by selecting an offline "
 "account. Though then you can not connect to friends, vote for addons etc. "
 "Please read our privacy statement at https://privacy.supertuxkart.net"
-msgstr ""
+msgstr "Tu peux jouer sans créer de compte en ligne en sélectionnant un compte hors-ligne. Toutefois, tu ne pourras pas communiquer avec tes amis, noter les extensions, etc. Merci de lire notre déclaration de confidentialité sur https://privacy.supertuxkart.net"
 
 #. I18N: ./data/gui/screens/online/server_selection.stkgui
 #: src/states_screens/online/server_selection.cpp:580
@@ -2460,7 +2461,7 @@ msgstr "L´interface graphique peut être modifiée dans le menu des options d'i
 
 #. I18N: ./data/tips.xml
 msgid "You can see other karts' powerups by enabling it in the UI options."
-msgstr "Vous pouvez voir les bonus des autres karts en l´activant dans les options de l´interface."
+msgstr "Tu peux voir les bonus des autres karts en l´activant dans les options de l´interface."
 
 #. I18N: ./data/tips.xml
 msgid "The font size can be changed in the UI options."
@@ -2537,7 +2538,7 @@ msgstr "Les ballons de basket peuvent être détruits avec un tir précis vers l
 msgid ""
 "Try to avoid crashing into the backs of other karts as this will slow you "
 "down."
-msgstr ""
+msgstr "Essaies de ne pas percuter l'arrière des autres karts pour ne pas être ralenti."
 
 #. I18N: ./data/tips.xml
 msgid "You can use bowling balls to push and block the ball."
@@ -2551,7 +2552,7 @@ msgstr "Dans le football, travaillez en équipe pour réussir."
 msgid ""
 "If you miss the ball and an opponent is approaching, try hitting them with a"
 " powerup or block their way."
-msgstr "Si vous ratez la balle et qu´un adversaire approche, essayez de le toucher avec un bonus ou bloquer leur la voie."
+msgstr "Si tu rates la balle et qu´un adversaire approche, essaies de le toucher avec un bonus ou mets-toi en travers de son chemin."
 
 #. I18N: ./data/tips.xml
 msgid "Good rotation of positions (attack and defense) is essential."
@@ -2625,7 +2626,7 @@ msgstr "Pepper"
 
 #. I18N: ../stk-assets/karts/sara_the_wizard/kart.xml
 msgid "Sara"
-msgstr "Sata"
+msgstr "Sara"
 
 #. I18N: ../stk-assets/karts/suzanne/kart.xml
 msgid "Suzanne"
@@ -2694,7 +2695,7 @@ msgstr "Hacienda"
 
 #. I18N: ../stk-assets/tracks/hole_drop/track.xml
 msgid "Hole Drop"
-msgstr ""
+msgstr "Trou de Chute"
 
 #. I18N: ../stk-assets/tracks/icy_soccer_field/track.xml
 msgid "Icy Soccer Field"
@@ -2703,7 +2704,7 @@ msgstr "Terrain de football glacé"
 #. I18N: Cutscene subtitle from ../stk-assets/tracks/introcutscene2/scene.xml
 #. I18N: ../stk-assets/tracks/introcutscene2/scene.xml
 msgid "What's wrong, little hippies? Your great gnu leader is missing?"
-msgstr "Qu’y a-t-il, petits hippies ? Votre chef le grand gnu est absent ?"
+msgstr "Qu’est-ce qui se passe les petits hippies ? Votre grand chef gnou a disparu ?"
 
 #. I18N: Cutscene subtitle from ../stk-assets/tracks/introcutscene2/scene.xml
 #. I18N: ../stk-assets/tracks/introcutscene2/scene.xml
@@ -2749,7 +2750,7 @@ msgstr "Minigolf"
 
 #. I18N: ../stk-assets/tracks/oasis/track.xml
 msgid "Oasis"
-msgstr ""
+msgstr "Oasis"
 
 #. I18N: ../stk-assets/tracks/olivermath/track.xml
 msgid "Oliver's Math Class"
@@ -2847,7 +2848,7 @@ msgstr "Contre la montre (course simple)"
 
 #: src/challenges/challenge_data.cpp:318
 msgid "Follow the Leader (single race)"
-msgstr "Suivre le meneur de course (course simple)"
+msgstr "Suivez-le-Chef (course simple)"
 
 #. I18N: In the Select challenge dialog, tell user this challenge has reversed
 #. laps
@@ -4041,13 +4042,13 @@ msgstr "%s est sur le serveur \"%s\"."
 #, c-format
 msgid "You have %d new friend request!"
 msgid_plural "You have %d new friend requests!"
-msgstr[0] "Tu as %d nouvelle demande d'amitié !"
-msgstr[1] "Tu as %d nouvelles demandes d’amitié !"
-msgstr[2] "Tu as %d nouvelles demandes d’amitié !"
+msgstr[0] "Tu as %d nouvelle demande d'ami !"
+msgstr[1] "Tu as %d nouvelles demandes d’ami !"
+msgstr[2] "Tu as %d nouvelles demandes d’ami !"
 
 #: src/online/online_player_profile.cpp:556
 msgid "You have a new friend request!"
-msgstr "Tu as une nouvelle demande d'amitié !"
+msgstr "Tu as une nouvelle demande d'ami !"
 
 #: src/online/xml_request.cpp:83
 msgid ""
@@ -4076,7 +4077,7 @@ msgstr "Le fichier des meilleurs scores était trop vieux,\n il a donc été sup
 #. I18N: Game mode
 #: src/race/race_manager.cpp:1286
 msgid "Follow the Leader"
-msgstr "Suis le meneur"
+msgstr "Suivez-le-Chef"
 
 #. I18N: Game mode
 #: src/race/race_manager.cpp:1290 src/states_screens/track_info_screen.cpp:251
@@ -4236,7 +4237,7 @@ msgstr "Courses contre-la-montre remportées"
 #. added to multiple different goals.
 #: src/states_screens/dialogs/achievement_progress_dialog.cpp:176
 msgid "Follow-the-Leader races won"
-msgstr "Courses Suis le meneur gagnées"
+msgstr "Courses Suivez-le-Chef gagnées"
 
 #. I18N: A goal for achievements. If this text is in (), it's a precision
 #. added to multiple different goals.
@@ -4326,13 +4327,13 @@ msgstr "Courses contre-la-montre complétées"
 #. added to multiple different goals.
 #: src/states_screens/dialogs/achievement_progress_dialog.cpp:206
 msgid "Follow-the-Leader races started"
-msgstr "Courses Suis le meneur commencées"
+msgstr "Courses Suivez-le-Chef commencées"
 
 #. I18N: A goal for achievements. If this text is in (), it's a precision
 #. added to multiple different goals.
 #: src/states_screens/dialogs/achievement_progress_dialog.cpp:208
 msgid "Follow-the-Leader races finished"
-msgstr "Courses Suis le meneur complétées"
+msgstr "Courses Suivez-le-Chef complétées"
 
 #. I18N: A goal for achievements. If this text is in (), it's a precision
 #. added to multiple different goals.
@@ -5133,15 +5134,15 @@ msgstr "Aujourd’hui"
 
 #: src/states_screens/dialogs/user_info_dialog.cpp:164
 msgid "Friend request sent!"
-msgstr "Requête d’amitié envoyée !"
+msgstr "Demande d'ami envoyée !"
 
 #: src/states_screens/dialogs/user_info_dialog.cpp:221
 msgid "Friend request accepted!"
-msgstr "Requête d’amitié acceptée !"
+msgstr "Demande d'ami acceptée !"
 
 #: src/states_screens/dialogs/user_info_dialog.cpp:273
 msgid "Friend request declined!"
-msgstr "Requête d’amitié déclinée !"
+msgstr "Demande d'ami refusée !"
 
 #: src/states_screens/dialogs/user_info_dialog.cpp:319
 msgid "Friend removed!"
@@ -5149,7 +5150,7 @@ msgstr "Ami retiré !"
 
 #: src/states_screens/dialogs/user_info_dialog.cpp:370
 msgid "Friend request cancelled!"
-msgstr "Requête d’amitié annulée !"
+msgstr "Demande d'ami annulée !"
 
 #: src/states_screens/dialogs/user_info_dialog.cpp:480
 msgid "Processing"
@@ -6123,7 +6124,7 @@ msgstr "Ramasse de la nitro !"
 
 #: src/states_screens/race_gui_base.cpp:771
 msgid "Follow the leader!"
-msgstr "Suis le meneur !"
+msgstr "Suivez le chef !"
 
 #. I18N: When some GlobalPlayerIcons are hidden, write "Top 10" to show it
 #: src/states_screens/race_gui_base.cpp:954
@@ -6212,7 +6213,7 @@ msgstr "Éliminé"
 #: src/states_screens/race_result_gui.cpp:1608
 #: src/states_screens/race_result_gui.cpp:1670
 msgid "(Own Goal)"
-msgstr "(dans son propre but)"
+msgstr "(contre son camp)"
 
 #: src/states_screens/race_result_gui.cpp:1749
 #, c-format
@@ -6257,12 +6258,12 @@ msgstr "Tous les coups sont permis, alors collecte des armes et utilise-les judi
 
 #: src/states_screens/race_setup_screen.cpp:96
 msgid "Contains no powerups, so only your driving skills matter!"
-msgstr "Pas de bonus - seuls tes talents de conduite comptent !"
+msgstr "Ne contiens aucun bonus, alors seuls tes talents de conduite comptent !"
 
 #. I18N: short definition for follow-the-leader game mode
 #: src/states_screens/race_setup_screen.cpp:109
 msgid "Keep up with the leader kart but don't overtake it!"
-msgstr "Talonne le meneur, mais sans le dépasser !"
+msgstr "Talonne le meneur de course, mais sans le dépasser !"
 
 #: src/states_screens/race_setup_screen.cpp:115
 msgid "Hit others with weapons until they lose all their lives."
@@ -6372,7 +6373,7 @@ msgstr "Accélère en déplaçant l'accélérateur vers le haut, et dirige le ka
 #, c-format
 msgid ""
 "Collect gift boxes, and fire the weapon with <%s> to blow away these boxes!"
-msgstr "Récolte les coffrets cadeaux, et utilise l’arme grâce à la touche <%s> pour détruire ces boîtes !"
+msgstr "Ramasse des cadeaux, et utilise ton arme avec la touche <%s> pour détruire ces caisses !"
 
 #: ../stk-assets/tracks/tutorial/scripting.as:67
 msgid ""
@@ -6474,7 +6475,7 @@ msgid ""
 "battle mode against the computer or your friends, and more! For a greater "
 "challenge, join online and meet players from all over the world and prove "
 "your racing skills!"
-msgstr "Vous pouvez faire une simple course contre d'autres karts, compétitionner dans un de nos Grands Prix, tenter de battre le score au contre la montre, faire la bataille contre l'ordinateur ou vous amis, et plus ! Pour un plus grand défi, rejoignez le jeu en ligne et rencontrez des joueurs des quatre coins du monde et prouvez vos talents de conducteur !"
+msgstr "Vous pouvez faire une simple course contre d'autres karts, faire la compétition sur l'un de nos Grands Prix, essayer de battre le record au contre la montre, faire une bataille contre l'ordinateur ou vous amis, et plus encore ! Si vous cherchez le défi, rejoignez le mode en ligne, rencontrez des joueurs des quatre coins du monde et prouvez vos talents de pilote !"
 
 #: supertuxkart.appdata.xml:17
 msgid "This game has no ads."

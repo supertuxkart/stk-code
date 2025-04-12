@@ -74,6 +74,7 @@ private:
     /** Shader(alphablend) to use for the skid marks. */
     std::shared_ptr<SP::SPShader> m_shader;
 
+    float m_dt;
     // ------------------------------------------------------------------------
     class SkidMarkQuads : public NoCopy
     {

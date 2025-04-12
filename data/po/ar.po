@@ -3,6 +3,7 @@
 # This file is distributed under the same license as the supertuxkart package.
 # 
 # Translators:
+# Ahmed Mohammed, 2024
 # A.Karim S., 2018
 # Benamara Mohamed <mohamedsdev@gmail.com>, 2015
 # FIRST AUTHOR <EMAIL@ADDRESS>, 2011
@@ -22,7 +23,7 @@ msgstr ""
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-06-16 01:41+0800\n"
 "PO-Revision-Date: 2015-02-15 01:58+0000\n"
-"Last-Translator: Hasan Nahleh <hasanznahleh@mailfence.com>, 2019,2022\n"
+"Last-Translator: Ahmed Mohammed, 2024\n"
 "Language-Team: Arabic (http://app.transifex.com/supertuxkart/supertuxkart/language/ar/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -921,7 +922,7 @@ msgstr "معلومات المستخدم"
 #. I18N: ./data/gui/dialogs/online/user_info_dialog.stkgui
 #. I18N: User info dialog
 msgid "Remove Friend"
-msgstr ""
+msgstr "أزِل صديقًا"
 
 #. I18N: ./data/gui/dialogs/online/user_info_dialog.stkgui
 #. I18N: User info dialog
@@ -931,17 +932,17 @@ msgstr "أضف صديقًا"
 #. I18N: ./data/gui/dialogs/online/user_info_dialog.stkgui
 #. I18N: User info dialog
 msgid "Accept Invite"
-msgstr ""
+msgstr "اقبل الدعوة"
 
 #. I18N: ./data/gui/dialogs/online/user_info_dialog.stkgui
 #. I18N: User info dialog
 msgid "Decline Invite"
-msgstr ""
+msgstr "ارفض الدعوة"
 
 #. I18N: ./data/gui/dialogs/online/user_info_dialog.stkgui
 #. I18N: User info dialog
 msgid "View Profile"
-msgstr ""
+msgstr "اعرض الملفّ الشّخصيّ"
 
 #. I18N: ./data/gui/dialogs/online/vote_dialog.stkgui
 #. I18N: In the vote dialog
@@ -1129,7 +1130,7 @@ msgstr "إشادات"
 
 #. I18N: ./data/gui/screens/cutscene.stkgui
 msgid "Skip"
-msgstr ""
+msgstr "تخطى"
 
 #. I18N: ./data/gui/screens/easter_egg.stkgui
 #. I18N: Section in easter egg tracks selection screen
@@ -1511,7 +1512,7 @@ msgstr "شبح الإعادة: تسابق ضد شبح الإعادة في ضدّ
 #. I18N: In the help menu
 msgid ""
 "Lap Trial: Complete as many laps as possible in a given amount of time."
-msgstr ""
+msgstr "لفّة تجريبية: أكمل أكبر عدد ممكن من اللفّات في فترة زمنية المحددة."
 
 #. I18N: ./data/gui/screens/help2.stkgui
 #. I18N: In the help menu
@@ -1739,7 +1740,7 @@ msgstr "اختيار نتيجة عالية"
 #. time.
 #: src/race/race_manager.cpp:1288 src/states_screens/race_setup_screen.cpp:142
 msgid "Lap Trial"
-msgstr "جولة تجريبية"
+msgstr "لفّة تجريبية"
 
 #. I18N: ./data/gui/screens/high_score_selection.stkgui
 #. I18N: In the high score selection screen
@@ -2009,7 +2010,7 @@ msgid ""
 "You can play without creating an online account by selecting an offline "
 "account. Though then you can not connect to friends, vote for addons etc. "
 "Please read our privacy statement at https://privacy.supertuxkart.net"
-msgstr ""
+msgstr "يمكنك اللعب دون إنشاء حساب شبكيّ من خلال تحديد حساب بلا اتّصال. لكنك لن تتمكن من الاتّصال بالأصدقاء، أو التصويت على الإضافات، أو إلخ. من فضلك طالع بيان الخصوصية الخاص بنا على https://privacy.supertuxkart.net"
 
 #. I18N: ./data/gui/screens/online/server_selection.stkgui
 #: src/states_screens/online/server_selection.cpp:580
@@ -2522,7 +2523,7 @@ msgstr "يمكن تدمير كرات السلة باستخدام تسديدات 
 msgid ""
 "Try to avoid crashing into the backs of other karts as this will slow you "
 "down."
-msgstr ""
+msgstr "حاول تجنب الاصطدام بدعائم العربات الأخرى، لأن ذلك سيبطئك."
 
 #. I18N: ./data/tips.xml
 msgid "You can use bowling balls to push and block the ball."
@@ -2566,7 +2567,7 @@ msgstr "اماندا"
 
 #. I18N: ../stk-assets/karts/beastie/kart.xml
 msgid "Godette"
-msgstr ""
+msgstr "غوديت"
 
 #. I18N: ../stk-assets/karts/emule/kart.xml
 msgid "Emule"
@@ -2590,7 +2591,7 @@ msgstr "كيكي"
 
 #. I18N: ../stk-assets/karts/konqi/kart.xml
 msgid "Konqi"
-msgstr "كونقي"
+msgstr "كونكي"
 
 #. I18N: ../stk-assets/karts/nolok/kart.xml
 msgid "Nolok"
@@ -2679,7 +2680,7 @@ msgstr "المزرعة"
 
 #. I18N: ../stk-assets/tracks/hole_drop/track.xml
 msgid "Hole Drop"
-msgstr ""
+msgstr "سقوط الحفرة"
 
 #. I18N: ../stk-assets/tracks/icy_soccer_field/track.xml
 msgid "Icy Soccer Field"
@@ -2734,7 +2735,7 @@ msgstr "الغولف المصغّر"
 
 #. I18N: ../stk-assets/tracks/oasis/track.xml
 msgid "Oasis"
-msgstr ""
+msgstr "الواحة"
 
 #. I18N: ../stk-assets/tracks/olivermath/track.xml
 msgid "Oliver's Math Class"
@@ -3612,7 +3613,7 @@ msgstr "وقت جزاء!!"
 
 #: src/karts/controller/local_player_controller.cpp:332
 msgid "Don't accelerate before 'Set!'"
-msgstr "لا تتسارع قبل \"تعيين!\""
+msgstr "لا تتسارع قبل «استعدّ!»"
 
 #: src/karts/controller/spare_tire_ai.cpp:150
 msgid "You can have at most 3 lives!"
@@ -4180,7 +4181,7 @@ msgstr[5] "%d حلبة غير متوفرة عند اللعب الإنفرادي.
 
 #: src/states_screens/credits.cpp:184
 msgid "translator-credits"
-msgstr "Launchpad Contributions:\nA.Karim S., 2018\nBenamara Mohamed, 2015\nHasan Nahleh, 2022\nHasan Nahleh, 2019\nIbrahim Al-Darra, 2017\nmahmoudtark25, 2020\nMoaaz Mohamed, 2017\nخليل مراطلة, 2021\nصفا الفليج, 2015,2019\nHasan Nahleh, 2019,2022\nصفا الفليج,\nالمترجمون السابقون (منصّة لنشباد):\nBenjamin Kerensa - Dawid Gan - Hichem Razgallah - Majid Al-Dharrab\nSAKOUM Yassine - STK-team - abdXelrhman - محمد الحرقان"
+msgstr "فريق عرب‌آيز للتّرجمة http://www.arabeyes.org (سابقًا)\nصفا الفليج، 2015–2019\nBenamara Mohamed, 2015\nMoaaz Mohamed, 2017\nIbrahim Al-Darra, 2017\nA.Karim S., 2018\nHasan Nahleh, 2019–2022\nmahmoudtark25, 2020\nخليل مراطلة، 2021\nأحمد محمد، 2024\nالمترجمون السابقون (منصّة لنشباد):\nBenjamin Kerensa - Dawid Gan - Hichem Razgallah - Majid Al-Dharrab\nSAKOUM Yassine - STK-team - abdXelrhman - محمد الحرقان"
 
 #: src/states_screens/dialogs/achievement_progress_dialog.cpp:65
 msgctxt "achievement_info"
@@ -5609,7 +5610,7 @@ msgstr "البُرد الإلكترونيّة لا تتطابق!"
 msgid ""
 "Online username can only contain alphanumeric (ASCII) characters, periods, "
 "dashes and underscores!"
-msgstr ""
+msgstr "يمكن لأسماء المستخدم الشّبكيّة أن تحوي محارف أبجديّة عدديّة (ASCII)، ونقاط، وشرطات، وشرطات سفلية حصرًا!"
 
 #: src/states_screens/online/register_screen.cpp:374
 msgid "Online username has to be between 3 and 30 characters long!"

@@ -173,4 +173,21 @@ irr::scene::IAnimatedMesh* convertIrrlichtMeshToSPM(irr::scene::IMesh* mesh)
     return spm;
 }
 
+void copyToMappedBuffer(uint32_t* mapped, GESPMBuffer* spmb, size_t offset)
+{
+    for (unsigned i = offset; i < spmb->getVertexCount(); i++)
+    {
+        auto& vv = spmb->getVerticesVector();
+        memcpy(mapped, &vv[i], 4 * sizeof(uint32_t));
+        mapped += 4;
+        if (getGEConfig()->m_pbr)
+            *mapped = srgb255ToLinearFromSColor(vv[i].m_color).color;
+        else
+            memcpy(mapped, &vv[i].m_color, sizeof(video::SColor));
+        mapped += 1;
+        memcpy(mapped, vv[i].m_all_uvs, 3 * sizeof(uint32_t));
+        mapped += 3;
+    }
+}
+
 }

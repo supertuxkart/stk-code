@@ -53,8 +53,6 @@ namespace GUIEngine
         
         RatingBarWidget();
         virtual ~RatingBarWidget() {}
-        
-
 
         void add() OVERRIDE;
         
@@ -69,6 +67,11 @@ namespace GUIEngine
         
         /** Get the current number of stars of the widget. */
         int getStarNumber() {return m_stars; };
+
+        /** Set steps in each star. Interpolate steps-2 values between 0 star and 1 star. */
+        void setSteps(int steps) { m_steps = steps; }
+
+        int getSteps() { return m_steps; }
         
         int getStepsOfStar(int index);
 

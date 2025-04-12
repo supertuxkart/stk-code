@@ -17,16 +17,17 @@
 
         <box proportion="1" width="100%" layout="vertical-row">
             <div x="1%" y="2%" width="98%" height="96%" layout="vertical-row" >
+                <spacer height="2%" width="20"/>
                 <div width="100%" height="fit" layout="horizontal-row" >
                     <label width="fit" height="fit" text_align="left" I18N="In the online account settings screen" text="Password:"/>
                     <spacer width="20" height="1"/>
-                    <button id="change_password_button" height="100%" width="fit" text="Change" />
+                    <button id="change_password_button" text="Change" />
                 </div>
                 <spacer height="5%" width="20"/>
                 <div width="100%" height="fit" layout="horizontal-row" >
                     <label width="fit" height="fit" text_align="left" I18N="In the online account settings screen" text="E-mail:"/>
                     <spacer width="20" height="1"/>
-                    <button id="change_email_button" height="100%" width="fit" text="Change" />
+                    <button id="change_email_button" text="Change" />
                 </div>
             </div>
         </box>

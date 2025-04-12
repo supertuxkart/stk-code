@@ -98,16 +98,9 @@ void GEVulkanMeshCache::updateCache()
     size_t offset = 0;
     for (GESPMBuffer* spm_buffer : buffers)
     {
-        size_t real_size = spm_buffer->getVertexCount() * total_pitch;
-        size_t copy_size = spm_buffer->getVertexCount() * static_pitch;
-        uint8_t* loc = mapped + offset;
-        for (unsigned i = 0; i < real_size; i += total_pitch)
-        {
-            uint8_t* vertices = ((uint8_t*)spm_buffer->getVertices()) + i;
-            memcpy(loc, vertices, static_pitch);
-            loc += static_pitch;
-        }
+        copyToMappedBuffer((uint32_t*)(mapped + offset), spm_buffer);
         spm_buffer->setVBOOffset(offset / static_pitch);
+        size_t copy_size = spm_buffer->getVertexCount() * static_pitch;
         offset += copy_size;
     }
     m_ibo_offset = offset;

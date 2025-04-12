@@ -150,8 +150,10 @@ int wiiuse_wait_report(struct wiimote_t *wm, int report, byte *buffer, int buffe
         if (elapsed > timeout_ms && timeout_ms > 0)
         {
             result = -1;
+            WIIUSE_DEBUG("(id %i) timeout waiting for report 0x%x, aborting!", wm->unid, report);
             break;
         }
+        wiiuse_millisleep(10);
     }
 
     return result;
@@ -328,7 +330,7 @@ void wiiuse_handshake(struct wiimote_t *wm, byte *data, uint16_t len)
             wiiuse_status(wm);
             rc = wiiuse_wait_report(wm, WM_RPT_CTRL_STATUS, buf, MAX_PAYLOAD, WIIUSE_READ_TIMEOUT);
 
-            if (buf[3] != 0)
+            if (rc && buf[3] != 0)
                 break;
 
             wiiuse_millisleep(500);

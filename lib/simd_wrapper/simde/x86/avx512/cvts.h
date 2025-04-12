@@ -31,6 +31,8 @@
 
 #include "types.h"
 #include "mov.h"
+#include "storeu.h"
+#include "loadu.h"
 
 HEDLEY_DIAGNOSTIC_PUSH
 SIMDE_DISABLE_UNWANTED_DIAGNOSTICS
@@ -363,6 +365,34 @@ simde_mm512_mask_cvtsepi32_epi8 (simde__m128i src, simde__mmask16 k, simde__m512
 #endif
 
 SIMDE_FUNCTION_ATTRIBUTES
+void
+simde_mm512_mask_cvtsepi32_storeu_epi8 (void* base_addr, simde__mmask16 k, simde__m512i a) {
+  #if defined(SIMDE_X86_AVX512F_NATIVE)
+    _mm512_mask_cvtsepi32_storeu_epi8(base_addr, k, a);
+  #else
+    simde__m256i_private r_ = simde__m256i_to_private(simde_mm256_loadu_epi8(base_addr));
+    simde__m512i_private a_ = simde__m512i_to_private(a);
+
+    SIMDE_VECTORIZE
+    for (size_t i = 0 ; i < (sizeof(a_.i32) / sizeof(a_.i32[0])) ; i++) {
+      r_.i8[i] = ((k>>i) &1 ) ?
+        ((a_.i32[i] < INT8_MIN)
+        ? (INT8_MIN)
+        : ((a_.i32[i] > INT8_MAX)
+          ? (INT8_MAX)
+          : HEDLEY_STATIC_CAST(int8_t, a_.i32[i]))) : r_.i8[i];
+    }
+
+    simde_mm256_storeu_epi8(base_addr, simde__m256i_from_private(r_));
+  #endif
+}
+#if defined(SIMDE_X86_AVX512F_ENABLE_NATIVE_ALIASES)
+  #undef _mm512_mask_cvtsepi32_storeu_epi8
+  #define _mm512_mask_cvtsepi32_storeu_epi8(base_addr, k, a) simde_mm512_mask_cvtsepi32_storeu_epi8(base_addr, k, a)
+#endif
+
+
+SIMDE_FUNCTION_ATTRIBUTES
 simde__m128i
 simde_mm512_maskz_cvtsepi32_epi8 (simde__mmask16 k, simde__m512i a) {
   #if defined(SIMDE_X86_AVX512F_NATIVE)
@@ -442,6 +472,34 @@ simde_mm512_mask_cvtsepi32_epi16 (simde__m256i src, simde__mmask16 k, simde__m51
 #if defined(SIMDE_X86_AVX512F_ENABLE_NATIVE_ALIASES)
   #undef _mm512_mask_cvtsepi32_epi16
   #define _mm512_mask_cvtsepi32_epi16(src, k, a) simde_mm512_mask_cvtsepi32_epi16(src, k, a)
+#endif
+
+SIMDE_FUNCTION_ATTRIBUTES
+void
+simde_mm512_mask_cvtsepi32_storeu_epi16 (void* base_addr, simde__mmask16 k, simde__m512i a) {
+  #if defined(SIMDE_X86_AVX512F_NATIVE)
+    _mm512_mask_cvtsepi32_storeu_epi16(base_addr, k, a);
+  #else
+    simde__m256i_private r_;
+    simde__m256i_private src_ = simde__m256i_to_private(simde_mm256_loadu_epi16(base_addr));
+    simde__m512i_private a_ = simde__m512i_to_private(a);
+
+    SIMDE_VECTORIZE
+    for (size_t i = 0 ; i < (sizeof(a_.i32) / sizeof(a_.i32[0])) ; i++) {
+      r_.i16[i] = ((k>>i) &1 ) ?
+        ((a_.i32[i] < INT16_MIN)
+        ? (INT16_MIN)
+        : ((a_.i32[i] > INT16_MAX)
+          ? (INT16_MAX)
+          : HEDLEY_STATIC_CAST(int16_t, a_.i32[i]))) : src_.i16[i];
+    }
+
+    simde_mm256_storeu_epi16(base_addr, simde__m256i_from_private(r_));
+  #endif
+}
+#if defined(SIMDE_X86_AVX512F_ENABLE_NATIVE_ALIASES)
+  #undef _mm512_mask_cvtsepi32_storeu_epi16
+  #define _mm512_mask_cvtsepi32_storeu_epi16(base_addr, k, a) simde_mm512_mask_cvtsepi32_storeu_epi16(base_addr, k, a)
 #endif
 
 SIMDE_FUNCTION_ATTRIBUTES

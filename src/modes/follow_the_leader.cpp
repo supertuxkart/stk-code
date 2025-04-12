@@ -47,6 +47,7 @@ FollowTheLeaderRace::FollowTheLeaderRace() : LinearWorld()
     m_use_highscores   = false;  // disable high scores
     setClockMode(WorldStatus::CLOCK_COUNTDOWN, m_leader_intervals[0]);
     m_is_over_delay = 5.0f;
+    m_leader_hit_count = 0;
 }
 
 //-----------------------------------------------------------------------------
@@ -89,6 +90,7 @@ void FollowTheLeaderRace::reset(bool restart)
                               m_leader_intervals[0]);
     
     m_is_over_delay = 2.0f;
+    m_leader_hit_count = 0;
 }   // reset
 
 //-----------------------------------------------------------------------------
@@ -122,7 +124,8 @@ const btTransform &FollowTheLeaderRace::getStartTransform(int index)
  */
 void FollowTheLeaderRace::countdownReachedZero()
 {
-    m_last_eliminated_time += m_leader_intervals[0];
+    m_last_eliminated_time += m_leader_intervals[0] + m_leader_hit_count * LEADER_HIT_TIME;
+    m_leader_hit_count = 0; // Reset the hit counter
     if(m_leader_intervals.size()>1)
         m_leader_intervals.erase(m_leader_intervals.begin());
     WorldStatus::setTime(m_leader_intervals[0]);
@@ -146,7 +149,7 @@ void FollowTheLeaderRace::countdownReachedZero()
     {
         if(UserConfigParams::m_ftl_debug)
         {
-            Log::debug("[FTL", "Eliminiating kart '%s' at position %d.",
+            Log::debug("[FTL", "Eliminating kart '%s' at position %d.",
                 kart->getIdent().c_str(), position_to_remove);
         }
         eliminateKart(kart->getWorldKartId());
@@ -227,8 +230,9 @@ bool FollowTheLeaderRace::isRaceOver()
 void FollowTheLeaderRace::leaderHit()
 {
     int countdown = getTimeTicks();
-    countdown += stk_config->time2Ticks(5.0f);
+    countdown += stk_config->time2Ticks(LEADER_HIT_TIME);
     setTicks(countdown);
+    m_leader_hit_count++;
 } // leaderHit
 
 //-----------------------------------------------------------------------------

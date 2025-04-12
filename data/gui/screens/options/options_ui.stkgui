@@ -34,12 +34,20 @@
 
                 <!-- ************ SKIN CHOICE ************ -->
                 <div width="100%" height="fit" layout="horizontal-row">
-                    <spinner id="skinchoice" width="10f" align="center" />
+                    <spinner id="base_skinchoice" width="10f" align="center" />
                     <label height="100%" x="0" y="0" I18N="In the ui settings" text="Skin"/>
                 </div>
 
                 <spacer width="5" height="2%"/>
 
+                <div width="100%" height="fit" layout="horizontal-row">
+                    <spinner id="variant_skinchoice" width="10f" align="center" />
+                    <label height="100%" x="0" y="0" I18N="In the ui settings" text="Skin variant"/>
+                </div>
+
+                <spacer width="5" height="2%"/>
+
+                <!-- ************ MISC. CHOICE ************ -->
                 <div width="100%" height="fit" layout="horizontal-row">
                     <spinner id="minimap" width="10f" align="center" />
                     <label height="100%" x="0" y="0" I18N="In the ui settings" text="Minimap"/>
@@ -50,16 +58,6 @@
                 <div width="100%" height="fit" layout="horizontal-row">
                     <gauge id="font_size" width="10f" align="center" />
                     <label height="100%" x="0" y="0" I18N="In the ui settings" text="Font size"/>
-                </div>
-
-                <spacer width="5" height="2%"/>
-
-                <!-- ************ GRAPHICAL EFFECTS SETTINGS ************ -->
-                <div width="100%" height="fit" layout="horizontal-row">
-                    <spinner id="camera_preset" width="10f" align="center" />
-                    <label height="100%" x="0" y="0" I18N="In the ui settings" text="Camera"/>
-                    <spacer width="2%" height="100%" />
-                    <button id="custom_camera" text="Custom..." I18N="In the ui settings" align="center"/>
                 </div>
 
                 <spacer width="5" height="2%"/>

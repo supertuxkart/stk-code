@@ -35,7 +35,7 @@ void main()
         i_rotation, i_scale.xyz, i_position);
     vec3 world_normal = rotateVector(i_rotation, i_normal.xyz);
 
-    normal = (u_view_matrix * vec4(world_normal, 0.0)).xyz;
+    normal = world_normal;
     uv = i_uv;
     hue_change = float(i_misc_data.y) * 0.01;
     gl_Position = u_projection_view_matrix * world_position;

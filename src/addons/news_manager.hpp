@@ -38,6 +38,15 @@ class XMLNode;
   */
 class NewsManager : public CanBeDeleted
 {
+public:
+    // Means the exact place the news being shown
+    enum NewsType : uint8_t
+    {
+        NTYPE_MAINMENU,
+        NTYPE_LIST,
+        NTYPE_COUNT
+    };
+
 private:
     static NewsManager *m_news_manager;
 
@@ -47,6 +56,9 @@ private:
     {
         /** The actual news message. */
         core::stringw m_news;
+        /** Additional data*/
+        std::string   m_date;
+        std::string   m_link;
         /** A message id used to store some information in the
          *  user config file. */
         int           m_message_id;
@@ -56,39 +68,51 @@ private:
         bool          m_important;
 
     public:
-        NewsMessage(const core::stringw &m, int id, bool important=false)
+        NewsMessage(const core::stringw &m, int id, const std::string &date="", 
+                    const std::string &link="", bool important=false)
         {
             m_news          = m;
+            m_date          = date;
+            m_link          = link;
             m_message_id    = id;
             m_display_count = 0;
             m_important     = important;
         }   // NewsMessage
         /** Returns the news message. */
-        const core::stringw& getNews() const {return m_news;}
+        const core::stringw& getNews() const { return m_news; }
+        /** Returns the date of the news. */
+        const std::string& getDate() const { return m_date; }
+        /** Returns the link of the news. */
+        const std::string& getLink() const { return m_link; }
         /** Increases how often this message was being displayed. */
-        void increaseDisplayCount() {m_display_count++;}
+        void increaseDisplayCount() { m_display_count++; }
         /** Returns the news id. */
-        int  getMessageId() const {return m_message_id;}
+        int  getMessageId() const { return m_message_id; }
         /** Returns the display count. */
-        int getDisplayCount() const {return m_display_count; }
+        int getDisplayCount() const { return m_display_count; }
         /** Sets the display count for this message. */
-        void setDisplayCount(int n) {m_display_count = n; }
+        void setDisplayCount(int n) { m_display_count = n; }
         /** Returns if this is an important message. */
         bool isImportant() const { return m_important; }
+        /** For sorting the news */
+        bool operator<(NewsMessage other) const
+        {
+            return m_important == other.m_important
+                 ? m_message_id > other.m_message_id
+                 : m_important;
+        }
     };   // NewsMessage
 
     /** The name of the news file on the remote server */
     static std::string m_news_filename;
 
-    mutable Synchronised< std::vector<NewsMessage> > m_news;
+    /** m_news[NewsType] means all news within this type. */
+    mutable Synchronised< std::vector<NewsMessage> > m_news[NTYPE_COUNT];
 
     /** Index of the current news message that is being displayed. */
-    int             m_current_news_message;
-
-    /** A single string that concatenats all news messages, separated
-     *  by "  +++  ". Using this to display the news message avoids
-     *  the delay between messages. */
-    core::stringw   m_all_news_messages;
+    int             m_current_news_ptr[NTYPE_COUNT];
+    /** News after this ID would be shown on the top regardless of importance. */
+    int             m_news_prioritize_after_id[NTYPE_COUNT];
 
     /** Stores the news message display count from the user config file.
     */
@@ -107,7 +131,7 @@ private:
     void          updateNews(const XMLNode *xml,
                              const std::string &filename);
     bool          conditionFulfilled(const std::string &cond);
-    void  downloadNews();
+    void          downloadNews();
     NewsManager();
     ~NewsManager();
 
@@ -131,13 +155,30 @@ public:
         }
     }   // deallocate
     // ------------------------------------------------------------------------
+    /** News are stored in an array, it would iterate to
+     * the next one when calling this function and
+     * would go back to the first one when the iteration ends. */
+    const int     getNextNewsID(NewsType type);
     const core::stringw
-                  getNextNewsMessage();
-    const core::stringw
-                  getImportantMessage();
-    void          init(bool force_refresh);
-    void          addNewsMessage(const core::stringw &s);
+                  getCurrentNewsMessage(NewsType type);
+    const std::string
+                  getCurrentNewsDate(NewsType type);
+    const std::string
+                  getCurrentNewsLink(NewsType type);
+    const bool    isCurrentNewsImportant(NewsType type);
+    const int     getNewsCount(NewsType type);
 
+    /** Set id = -1 to disable it */
+    void          prioritizeNewsAfterID(NewsType type, int id);
+    
+    void          init(bool force_refresh);
+    void          addNewsMessage(NewsType type, const core::stringw &s);
+
+    // ------------------------------------------------------------------------
+    /** Goes back to the place before first message when called. */
+    void          resetNewsPtr(NewsType type) { m_current_news_ptr[type] = -1; }
+    /** Check if this type of news is on the way of fetching */
+    bool          isNewsFetching(NewsType type) { return m_current_news_ptr[type] != -1; }
     // ------------------------------------------------------------------------
     /** Sets an error message that is displayed instead of any news message. */
     void          setErrorMessage(const core::stringw &s)
@@ -146,9 +187,9 @@ public:
     }   // setErrorMessage
     // ------------------------------------------------------------------------
     /** Clears the error message. */
-    void          clearErrorMessage() {m_error_message.setAtomic(""); }
+    void          clearErrorMessage() { m_error_message.setAtomic(""); }
     // ------------------------------------------------------------------------
-    void joinDownloadThreadIfExit()
+    void          joinDownloadThreadIfExit()
     {
         if (CanBeDeleted::canBeDeletedNow() && m_download_thread.joinable())
             m_download_thread.join();

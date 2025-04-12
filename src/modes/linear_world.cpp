@@ -443,6 +443,14 @@ void LinearWorld::newLap(unsigned int kart_index)
                 m_last_lap_sfx_playing = false;
             }
         }
+        // Switch on faster music if not already done so, if the
+        // first kart is doing its last lap.
+        if(!m_faster_music_active &&
+            useFastMusicNearEnd())
+        {
+            music_manager->switchToFastMusic();
+            m_faster_music_active=true;
+        }
     }
     else if (raceHasLaps() && kart_info.m_finished_laps > 0 &&
              kart_info.m_finished_laps+1 < lap_count && !isLiveJoinWorld() && m_race_gui)
@@ -955,17 +963,6 @@ void LinearWorld::updateRacePosition()
             assert(false);
         }
 #endif
-
-        // Switch on faster music if not already done so, if the
-        // first kart is doing its last lap.
-        if(!m_faster_music_active                                  &&
-            p == 1                                                 &&
-            kart_info.m_finished_laps == RaceManager::get()->getNumLaps() - 1 &&
-            useFastMusicNearEnd()                                       )
-        {
-            music_manager->switchToFastMusic();
-            m_faster_music_active=true;
-        }
     }   // for i<kart_amount
 
     // Define this to get a detailled analyses each time a race position

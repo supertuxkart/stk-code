@@ -23,7 +23,7 @@ class GEVulkanDriver;
 class GEVulkanTexture : public video::ITexture
 {
 protected:
-    core::dimension2d<u32> m_size, m_orig_size, m_max_size;
+    core::dimension2d<u32> m_size, m_orig_size;
 
     std::function<void(video::IImage*)> m_image_mani;
 
@@ -99,7 +99,7 @@ protected:
     // ------------------------------------------------------------------------
     void clearVulkanData();
     // ------------------------------------------------------------------------
-    void reloadInternal();
+    void reloadInternal(const core::dimension2du& max_size);
     // ------------------------------------------------------------------------
     void bgraConversion(uint8_t* img_data);
     // ------------------------------------------------------------------------

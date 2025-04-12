@@ -124,7 +124,7 @@ simde_x_mm_gf2p8matrix_multiply_epi64_epi8 (simde__m128i x, simde__m128i A) {
       SIMDE_VECTORIZE
     #endif
     for (int i = 0 ; i < 8 ; i++) {
-      p = _mm_set1_epi16(_mm_movemask_epi8(a));
+      p = _mm_set1_epi16(HEDLEY_STATIC_CAST(short, _mm_movemask_epi8(a)));
       p = _mm_and_si128(p, _mm_cmpgt_epi8(zero, X));
       r = _mm_xor_si128(r, p);
       a = _mm_add_epi8(a, a);
@@ -267,7 +267,7 @@ simde_x_mm_gf2p8matrix_multiply_epi64_epi8 (simde__m128i x, simde__m128i A) {
     for (int i = 0 ; i < 8 ; i++) {
       #if defined(SIMDE_BUG_CLANG_50932)
         p = HEDLEY_REINTERPRET_CAST(SIMDE_POWER_ALTIVEC_VECTOR(unsigned char),
-                                    vec_bperm(HEDLEY_STATIC_CAST(SIMDE_POWER_ALTIVEC_VECTOR(unsigned __int128), a), bit_select));
+                                    vec_bperm(HEDLEY_REINTERPRET_CAST(SIMDE_POWER_ALTIVEC_VECTOR(unsigned __int128), a), bit_select));
       #else
         p = vec_bperm(a, bit_select);
       #endif
