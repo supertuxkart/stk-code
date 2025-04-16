@@ -190,7 +190,8 @@
           delta-steering="0.26" />
 
   <!-- Special urls -->
-  <urls donate="https://supertuxkart.net/Donate"
+  <urls stk-website="https://supertuxkart.net/Main_Page"
+		donate="https://supertuxkart.net/Donate"
         password-reset="https://online.supertuxkart.net/password-reset.php"
         assets-download="https://github.com/supertuxkart/stk-assets-mobile/releases/download/"/>
 

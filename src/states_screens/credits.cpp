@@ -409,6 +409,11 @@ void CreditsScreen::eventCallback(GUIEngine::Widget* widget,
         // Open donation page
         Online::LinkHelper::openURL(stk_config->m_donate_url);
     }
+    if (name == "stk-website")
+    {
+        // Open stk website main page
+        Online::LinkHelper::openURL(stk_config->m_stk_website_url);
+    }
 }
 
 // ----------------------------------------------------------------------------
