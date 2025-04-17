@@ -51,6 +51,23 @@ static const char ALL_TRACK_GROUPS_ID[] = "all";
 void TracksAndGPScreen::eventCallback(Widget* widget, const std::string& name,
                                  const int playerID)
 {
+    // -- hacky solution for random_track button
+    if (name == "random_track") {
+        if (m_random_track_list.empty()) return;
+
+        std::string selection = m_random_track_list.front();
+        m_random_track_list.pop_front();
+        m_random_track_list.push_back(selection);
+
+        Track *track = track_manager->getTrack(selection);
+
+        if (track)
+        {
+            TrackInfoScreen::getInstance()->setTrack(track);
+            TrackInfoScreen::getInstance()->push();
+        }
+    }
+
     // -- track selection screen
     if (name == "tracks")
     {

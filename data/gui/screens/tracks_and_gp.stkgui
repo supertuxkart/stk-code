@@ -24,8 +24,9 @@
         <div width="100%" height="fit" layout="horizontal-row" >
             <header width="30%" I18N="In the track and grand prix selection screen" text="All Tracks"
                     align="center" text_align="center" />
-            <textbox width="40%" id="search"/>
+            <textbox width="30%" id="search"/>
             <spacer width="3%"/>
+            <icon-button id="random_track" width="10%" height="50%" icon="gui/icons/track_random.png" I18N="In the track and grand prix selection screen" text="Random track"/>
             <div width="fit" height="100%" layout="horizontal-row" align="center">
                 <checkbox id="favorite"/>
                 <spacer width="5%"/>
