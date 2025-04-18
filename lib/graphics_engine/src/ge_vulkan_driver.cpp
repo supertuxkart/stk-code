@@ -673,7 +673,7 @@ void GEVulkanDriver::destroyVulkan()
         m_depth_texture->drop();
         m_depth_texture = NULL;
     }
-    if (m_rtt_texture)
+    if (m_rtt_texture && m_rtt_texture != m_separate_rtt_texture)
     {
         m_rtt_texture->drop();
         m_rtt_texture = NULL;
@@ -694,15 +694,16 @@ void GEVulkanDriver::destroyVulkan()
         m_billboard_quad = NULL;
     }
 
-    if (m_irrlicht_device->getSceneManager() &&
-        m_irrlicht_device->getSceneManager()->getActiveCamera())
+    if (m_irrlicht_device->getSceneManager())
     {
-        m_irrlicht_device->getSceneManager()->setActiveCamera(NULL);
+        getGEConfig()->m_enable_draw_call_cache = false;
+        m_irrlicht_device->getSceneManager()->clear();
+        if (m_irrlicht_device->getSceneManager()->getActiveCamera())
+            m_irrlicht_device->getSceneManager()->setActiveCamera(NULL);
+        if (m_irrlicht_device->getSceneManager()->getMeshCache())
+            getVulkanMeshCache()->destroy();
     }
 
-    if (m_irrlicht_device->getSceneManager() &&
-        m_irrlicht_device->getSceneManager()->getMeshCache())
-        getVulkanMeshCache()->destroy();
     delete m_mesh_texture_descriptor;
     delete m_skybox_renderer;
     GEVulkan2dRenderer::destroy();
