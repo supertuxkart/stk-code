@@ -58,7 +58,10 @@ GhostReplayInfoDialog::GhostReplayInfoDialog(unsigned int replay_id,
     loadFromFile("ghost_replay_info_dialog.stkgui");
 
     m_info_widget = getWidget<BubbleWidget>("info");
-    m_info_widget->setText(m_rd.m_info);
+    if (m_rd.m_info == "")
+        m_info_widget->setVisible(false);
+    else
+        m_info_widget->setText(m_rd.m_info);
 
     Track* track = track_manager->getTrack(m_rd.m_track_name);
 
