@@ -82,14 +82,15 @@ Significant bug fixes & misc. contributions for 1.2 to 1.5
 - CodedOre
 - Riso
 - mrkubax10
+- Kimden
 
 = Visual art =
 
 Tracks
-- Sven Andreas Belting : Black Forest
-- Mac_DMH : Minigolf
-- Rubberduck : STK Enterprise
-- Ponzino : Volcan Island
+- Sven Andreas Belting : 'Black Forest' & Overworld improvements
+- Mac_DMH : 'Minigolf'
+- Rubberduck : 'STK Enterprise'
+- Ponzino : 'Volcan Island'
 
 Tracks
 - Canis Lupus : Original 'Northern Resort' & 'Scotland'
@@ -99,6 +100,7 @@ Tracks
 
 Tracks
 - Typhon306 : 'Ancient Colosseum Labyrinth', updated 'Battle Island' & 'Cave X'
+- CrystalDaEvee: 'Oasis', 'Hole Drop' and 'XR-4R3N4' soccer fields
 
 Karts
 - JunglePenguin : Xue
@@ -116,8 +118,9 @@ Karts
 Objects
 - GeekPenguinBR, TuxKartDriver : Models from Las Dunas Stadium
 
-Miscellaneous
-- Semphris : Item respawn animations
+Semphris
+- Item respawn animations,
+- Improved spawn animations for the bubble gum shields and parachutes
 
 Jymis
 - Karts and icons
@@ -230,23 +233,26 @@ Development Babies
 Software used
 - Irrlicht
 - Bullet
+- SDL2
+- Blender
 - enet
 - curl
-- freetype2
-- OpenAL
+
 
 Software used
+- OpenAL
 - ogg
 - vorbis
 - SheenBidi
-- blender
+- freetype2
 - wiiuse
-- harfbuzz
 
 Software used
+- harfbuzz
 - sqlite
 - openssl
 - mcpp
+- MojoAL
 
 
 = Previous contributors =
