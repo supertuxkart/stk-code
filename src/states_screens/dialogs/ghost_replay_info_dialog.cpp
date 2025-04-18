@@ -120,10 +120,11 @@ GhostReplayInfoDialog::GhostReplayInfoDialog(unsigned int replay_id,
     if (m_compare_ghost)
     {
         m_watch_only = true;
+        m_watch_widget->setActive(false);
         m_record_race = false;
         m_record_widget->setState(false);
-        m_record_widget->setVisible(!m_watch_only);
-        getWidget<LabelWidget>("record-race-text")->setVisible(!m_watch_only);
+        m_record_widget->setVisible(false);
+        getWidget<LabelWidget>("record-race-text")->setVisible(false);
     }
 
     // Display this checkbox only if there is another replay file to compare with
@@ -342,6 +343,11 @@ GUIEngine::EventPropagation
         {
             m_watch_only = true;
             m_watch_widget->setState(true);
+            m_watch_widget->setActive(false);
+        }
+        else
+        {
+            m_watch_widget->setActive(true);
         }
         m_record_widget->setVisible(!m_watch_only);
         getWidget<LabelWidget>("record-race-text")->setVisible(!m_watch_only);
@@ -349,6 +355,7 @@ GUIEngine::EventPropagation
         refreshMainScreen();
 
         m_replay_id = ReplayPlay::get()->getReplayIdByUID(m_rd.m_replay_uid);
+        updateReplayDisplayedInfo();
     }
 
     return GUIEngine::EVENT_LET;
