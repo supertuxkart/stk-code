@@ -2673,7 +2673,7 @@ int main(int argc, char *argv[])
     {
         Log::closeOutputFiles();
 #endif
-#ifndef ANDROID
+#if !defined(ANDROID) && !defined(ASAN_STK)
         fclose(stderr);
         fclose(stdout);
 #endif
