@@ -19,9 +19,10 @@ namespace GE
 // ============================================================================
 GEVulkanArrayTexture::ThreadLoader::ThreadLoader(GEVulkanArrayTexture* texture,
                                              const std::vector<io::path>& list,
-                      std::function<void(video::IImage*, unsigned)> image_mani)
+                      std::function<void(video::IImage*, unsigned)> image_mani,
+                                                        video::SColor unicolor)
                     : m_texture(texture), m_list(list),
-                      m_image_mani(image_mani)
+                      m_image_mani(image_mani), m_unicolor(unicolor)
 {
     m_images.resize(m_texture->m_layer_count);
     m_mipmaps.resize(m_texture->m_layer_count);
@@ -32,6 +33,7 @@ GEVulkanArrayTexture::ThreadLoader::ThreadLoader(GEVulkanArrayTexture* texture,
 // ----------------------------------------------------------------------------
 GEVulkanArrayTexture::ThreadLoader::~ThreadLoader()
 {
+    bool storage_image = m_list[0].empty();
     VkDeviceSize image_size = 0;
     switch (m_texture->m_internal_format)
     {
@@ -61,6 +63,10 @@ GEVulkanArrayTexture::ThreadLoader::~ThreadLoader()
     unsigned offset = 0;
     VkCommandBuffer command_buffer = VK_NULL_HANDLE;
     GEVulkanDriver* vk = m_texture->m_vk;
+    VkImageUsageFlags usage_flags = VK_IMAGE_USAGE_TRANSFER_SRC_BIT |
+        VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_SAMPLED_BIT;
+    if (storage_image)
+        usage_flags |= VK_IMAGE_USAGE_STORAGE_BIT;
 
     if (!vk->createBuffer(image_total_size,
         VK_BUFFER_USAGE_TRANSFER_SRC_BIT, staging_buffer_create_info,
@@ -86,8 +92,7 @@ GEVulkanArrayTexture::ThreadLoader::~ThreadLoader()
     vmaFlushAllocation(vk->getVmaAllocator(), staging_buffer_allocation, 0,
         image_total_size);
 
-    if (!m_texture->createImage(VK_IMAGE_USAGE_TRANSFER_SRC_BIT |
-        VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_SAMPLED_BIT))
+    if (!m_texture->createImage(usage_flags))
         goto destroy;
 
     command_buffer = GEVulkanCommandLoader::beginSingleTimeCommands();
@@ -108,11 +113,12 @@ GEVulkanArrayTexture::ThreadLoader::~ThreadLoader()
     }
     m_texture->transitionImageLayout(command_buffer,
         VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL,
-        VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
+        storage_image ?
+        VK_IMAGE_LAYOUT_GENERAL : VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
 
     GEVulkanCommandLoader::endSingleTimeCommands(command_buffer);
 
-    m_texture->createImageView(VK_IMAGE_ASPECT_COLOR_BIT);
+    m_texture->createImageView(VK_IMAGE_ASPECT_COLOR_BIT, !storage_image);
 
 destroy:
     m_texture->m_image_view_lock.unlock();
@@ -133,8 +139,15 @@ void GEVulkanArrayTexture::ThreadLoader::load(unsigned layer)
 {
     const io::path& fullpath = m_list[layer];
     core::dimension2du size = m_texture->m_size;
-    video::IImage* texture_image = getResizedImageFullPath(fullpath, size,
-        NULL, &size);
+    video::IImage* texture_image;
+    if (fullpath.empty())
+    {
+        std::vector<video::SColor> data(size.Width * size.Height, m_unicolor);
+        texture_image = m_texture->m_vk->createImageFromData(
+            video::ECF_A8R8G8B8, size, data.data(), false/*ownForeignMemory*/);
+    }
+    else
+       texture_image = getResizedImageFullPath(fullpath, size, NULL, &size);
     if (texture_image == NULL)
     {
         throw std::runtime_error(
@@ -148,7 +161,8 @@ void GEVulkanArrayTexture::ThreadLoader::load(unsigned layer)
     GEMipmapGenerator* mipmap_generator = NULL;
     const bool normal_map = (std::string(fullpath.c_str()).find(
         "_Normal.") != std::string::npos);
-    bool texture_compression = getGEConfig()->m_texture_compression;
+    bool texture_compression = getGEConfig()->m_texture_compression &&
+        !fullpath.empty();
     if (texture_compression && GEVulkanFeatures::supportsASTC4x4())
     {
         if (layer == 0)
@@ -270,6 +284,56 @@ GEVulkanArrayTexture::GEVulkanArrayTexture(
                     : GEVulkanArrayTexture(getPathList(textures), type,
                       image_mani)
 {
+}   // GEVulkanArrayTexture
+
+// ----------------------------------------------------------------------------
+GEVulkanArrayTexture::GEVulkanArrayTexture(VkFormat internal_format,
+                                           VkImageViewType type,
+                                           const core::dimension2du& size,
+                                           unsigned layer_count,
+                                           video::SColor unicolor)
+{
+    m_layer_count = layer_count;
+    m_image_view_type = type;
+    m_vk = getVKDriver();
+    m_vulkan_device = m_vk->getDevice();
+    m_image = VK_NULL_HANDLE;
+    m_vma_allocation = VK_NULL_HANDLE;
+    m_has_mipmaps = true;
+    m_locked_data = NULL;
+    m_internal_format = internal_format;
+    if (size.Width < 4 || size.Height < 4)
+        throw std::runtime_error("Minimum width and height of 4 is required.");
+    m_orig_size = m_size = size;
+
+    if (m_internal_format == VK_FORMAT_R8G8B8A8_UNORM)
+    {
+        std::vector<io::path> list;
+        for (unsigned i = 0; i < m_layer_count; i++)
+            list.push_back("");
+        std::shared_ptr<ThreadLoader> tl = std::make_shared<ThreadLoader>(this,
+            list, nullptr, unicolor);
+        for (unsigned i = 0; i < list.size(); i++)
+        {
+            GEVulkanCommandLoader::addMultiThreadingCommand(
+                [tl, i](){ tl->load(i); });
+        }
+    }
+    else
+    {
+        if (!createImage(VK_IMAGE_USAGE_STORAGE_BIT |
+            VK_IMAGE_USAGE_SAMPLED_BIT))
+        {
+            throw std::runtime_error(
+                "createImage failed in storage array texture creation");
+        }
+        VkCommandBuffer command_buffer =
+            GEVulkanCommandLoader::beginSingleTimeCommands();
+        transitionImageLayout(command_buffer, VK_IMAGE_LAYOUT_UNDEFINED,
+            VK_IMAGE_LAYOUT_GENERAL);
+        GEVulkanCommandLoader::endSingleTimeCommands(command_buffer);
+        createImageView(VK_IMAGE_ASPECT_COLOR_BIT);
+    }
 }   // GEVulkanArrayTexture
 
 }

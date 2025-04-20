@@ -25,11 +25,14 @@ private:
         core::dimension2du m_max_size;
 
         std::function<void(video::IImage*, unsigned)> m_image_mani;
+
+        video::SColor m_unicolor;
     public:
         // --------------------------------------------------------------------
         ThreadLoader(GEVulkanArrayTexture* texture,
                      const std::vector<io::path>& list,
-                     std::function<void(video::IImage*, unsigned)> image_mani);
+                     std::function<void(video::IImage*, unsigned)> image_mani,
+                     video::SColor unicolor = video::SColor());
         // --------------------------------------------------------------------
         ~ThreadLoader();
         // --------------------------------------------------------------------
@@ -46,6 +49,10 @@ public:
                          VkImageViewType type,
                          std::function<void(video::IImage*, unsigned)>
                          image_mani = nullptr);
+    // ------------------------------------------------------------------------
+    GEVulkanArrayTexture(VkFormat internal_format,
+                         VkImageViewType type, const core::dimension2du& size,
+                         unsigned layer_count, video::SColor unicolor);
     // ------------------------------------------------------------------------
     virtual ~GEVulkanArrayTexture()                                          {}
     // ------------------------------------------------------------------------

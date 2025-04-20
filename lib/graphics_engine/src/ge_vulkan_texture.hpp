@@ -85,7 +85,8 @@ protected:
     // ------------------------------------------------------------------------
     bool createImage(VkImageUsageFlags usage);
     // ------------------------------------------------------------------------
-    bool createImageView(VkImageAspectFlags aspect_flags);
+    bool createImageView(VkImageAspectFlags aspect_flags,
+                         bool create_srgb_view = true);
     // ------------------------------------------------------------------------
     void transitionImageLayout(VkCommandBuffer command_buffer,
                                VkImageLayout old_layout,
