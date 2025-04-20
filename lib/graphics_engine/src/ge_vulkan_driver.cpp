@@ -2526,11 +2526,13 @@ void GEVulkanDriver::updateDriver(bool pbr_changed)
     {
         GEVulkanShaderManager::destroy();
         GEVulkanShaderManager::init(this);
+        GEVulkanSampler sampler = m_mesh_texture_descriptor->getSamplerUse();
         delete m_mesh_texture_descriptor;
         m_mesh_texture_descriptor = new GEVulkanTextureDescriptor(
             GEVulkanShaderManager::getSamplerSize(),
             GEVulkanShaderManager::getMeshTextureLayer(),
             GEVulkanFeatures::supportsBindMeshTexturesAtOnce());
+        m_mesh_texture_descriptor->setSamplerUse(sampler);
         GEVulkanMeshCache* mc = getVulkanMeshCache();
         if (!GEVulkanFeatures::supportsBaseVertexRendering())
         {
