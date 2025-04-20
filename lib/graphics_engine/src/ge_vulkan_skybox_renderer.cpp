@@ -11,7 +11,7 @@
 namespace GE
 {
 // ----------------------------------------------------------------------------
-GEVulkanSkyBoxRenderer::GEVulkanSkyBoxRenderer()
+GEVulkanSkyBoxRenderer::GEVulkanSkyBoxRenderer() : m_skybox_loading(false)
 {
     m_skybox = NULL;
     m_texture_cubemap = NULL;
@@ -81,6 +81,7 @@ GEVulkanSkyBoxRenderer::~GEVulkanSkyBoxRenderer()
         return;
     vk->waitIdle();
 
+    while (m_skybox_loading.load());
     if (m_texture_cubemap != NULL)
         m_texture_cubemap->drop();
     vkDestroyDescriptorPool(vk->getDevice(), m_descriptor_pool, NULL);
@@ -96,6 +97,7 @@ void GEVulkanSkyBoxRenderer::addSkyBox(irr::scene::ISceneNode* skybox)
     if (m_skybox == skybox)
         return;
 
+    while (m_skybox_loading.load());
     m_skybox = skybox;
     std::vector<GEVulkanTexture*> sky_tex;
     std::array<int, 6> order = {{ 1, 3, 4, 5, 2, 0}};
@@ -108,47 +110,75 @@ void GEVulkanSkyBoxRenderer::addSkyBox(irr::scene::ISceneNode* skybox)
         sky_tex.push_back(static_cast<GEVulkanTexture*>(tex));
     }
 
-    auto swap_pixels = [](video::IImage* img, unsigned idx)
+    class ImageManipulator
     {
-        if (!(idx == 2 || idx == 3))
-            return;
-        unsigned width = img->getDimension().Width;
-        uint8_t* tmp = new uint8_t[width * width * 4];
-        uint32_t* tmp_array = (uint32_t*)tmp;
-        uint32_t* img_data = (uint32_t*)img->lock();
-        for (unsigned i = 0; i < width; i++)
-        {
-            for (unsigned j = 0; j < width; j++)
-                tmp_array[j * width + i] = img_data[i * width + (width - j - 1)];
-        }
-        uint8_t* u8_data = (uint8_t*)img->lock();
-        delete [] u8_data;
-        img->setMemory(tmp);
+        private:
+            GEVulkanSkyBoxRenderer* m_sky;
+        public:
+            // ----------------------------------------------------------------
+            ImageManipulator(GEVulkanSkyBoxRenderer* sky) : m_sky(sky)
+            {
+                m_sky->m_skybox_loading.store(true);
+            }
+            // ----------------------------------------------------------------
+            ~ImageManipulator()
+            {
+                GEVulkanDriver* vk = getVKDriver();
+                VkDescriptorImageInfo info;
+                info.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
+                info.sampler = vk->getSampler(GVS_SKYBOX);
+                info.imageView = (VkImageView)
+                    m_sky->m_texture_cubemap->getTextureHandler();
+
+                VkWriteDescriptorSet write_descriptor_set = {};
+                write_descriptor_set.sType =
+                    VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+                write_descriptor_set.dstBinding = 0;
+                write_descriptor_set.dstArrayElement = 0;
+                write_descriptor_set.descriptorType =
+                    VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
+                write_descriptor_set.descriptorCount = 1;
+                write_descriptor_set.pBufferInfo = 0;
+                write_descriptor_set.dstSet = m_sky->m_descriptor_set;
+                write_descriptor_set.pImageInfo = &info;
+
+                vkUpdateDescriptorSets(vk->getDevice(), 1,
+                    &write_descriptor_set, 0, NULL);
+                m_sky->m_skybox_loading.store(false);
+            }
+            // ----------------------------------------------------------------
+            void swapPixels(video::IImage* img, unsigned idx)
+            {
+                if (!(idx == 2 || idx == 3))
+                    return;
+                unsigned width = img->getDimension().Width;
+                uint8_t* tmp = new uint8_t[width * width * 4];
+                uint32_t* tmp_array = (uint32_t*)tmp;
+                uint32_t* img_data = (uint32_t*)img->lock();
+                for (unsigned i = 0; i < width; i++)
+                {
+                    for (unsigned j = 0; j < width; j++)
+                    {
+                        tmp_array[j * width + i] =
+                            img_data[i * width + (width - j - 1)];
+                    }
+                }
+                uint8_t* u8_data = (uint8_t*)img->lock();
+                delete [] u8_data;
+                img->setMemory(tmp);
+            }
+    };
+
+    std::shared_ptr<ImageManipulator> image_manipulator =
+        std::make_shared<ImageManipulator>(this);
+    auto real_mani = [image_manipulator](video::IImage* img, unsigned idx)
+    {
+        image_manipulator->swapPixels(img, idx);
     };
     if (m_texture_cubemap)
         m_texture_cubemap->drop();
     m_texture_cubemap = new GEVulkanArrayTexture(sky_tex,
-        VK_IMAGE_VIEW_TYPE_CUBE, swap_pixels);
-
-    GEVulkanDriver* vk = getVKDriver();
-    VkDescriptorImageInfo info;
-    info.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
-    info.sampler = vk->getSampler(GVS_SKYBOX);
-    info.imageView = (VkImageView)m_texture_cubemap->getTextureHandler();
-
-    VkWriteDescriptorSet write_descriptor_set = {};
-    write_descriptor_set.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
-    write_descriptor_set.dstBinding = 0;
-    write_descriptor_set.dstArrayElement = 0;
-    write_descriptor_set.descriptorType =
-        VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
-    write_descriptor_set.descriptorCount = 1;
-    write_descriptor_set.pBufferInfo = 0;
-    write_descriptor_set.dstSet = m_descriptor_set;
-    write_descriptor_set.pImageInfo = &info;
-
-    vkUpdateDescriptorSets(vk->getDevice(), 1, &write_descriptor_set, 0,
-        NULL);
+        VK_IMAGE_VIEW_TYPE_CUBE, real_mani);
 }   // addSkyBox
 
 }

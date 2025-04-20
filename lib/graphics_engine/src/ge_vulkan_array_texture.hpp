@@ -5,13 +5,36 @@
 
 namespace GE
 {
+class GEMipmapGenerator;
 class GEVulkanDriver;
 class GEVulkanArrayTexture : public GEVulkanTexture
 {
 private:
-    void reloadInternal(const std::vector<io::path>& list,
-                        std::function<void(video::IImage*, unsigned)>
-                        image_mani, const core::dimension2du& max_size);
+
+    class ThreadLoader
+    {
+    private:
+        GEVulkanArrayTexture* m_texture;
+
+        std::vector<video::IImage*> m_images;
+
+        std::vector<GEMipmapGenerator*> m_mipmaps;
+
+        std::vector<io::path> m_list;
+
+        core::dimension2du m_max_size;
+
+        std::function<void(video::IImage*, unsigned)> m_image_mani;
+    public:
+        // --------------------------------------------------------------------
+        ThreadLoader(GEVulkanArrayTexture* texture,
+                     const std::vector<io::path>& list,
+                     std::function<void(video::IImage*, unsigned)> image_mani);
+        // --------------------------------------------------------------------
+        ~ThreadLoader();
+        // --------------------------------------------------------------------
+        void load(unsigned layer);
+    };
 public:
     // ------------------------------------------------------------------------
     GEVulkanArrayTexture(const std::vector<io::path>& full_path_list,

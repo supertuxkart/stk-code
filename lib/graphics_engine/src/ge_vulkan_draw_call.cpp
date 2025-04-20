@@ -1977,7 +1977,7 @@ void GEVulkanDrawCall::addSkyBox(scene::ISceneNode* node)
 void GEVulkanDrawCall::drawSkyBox(VkCommandBuffer cmd, int current_buffer_idx,
                                   std::vector<uint32_t>& dynamic_offsets)
 {
-    if (!m_skybox_renderer)
+    if (!m_skybox_renderer || !m_skybox_renderer->getDescriptorSet())
         return;
     vkCmdBindPipeline(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS,
         *m_graphics_pipelines["skybox"].m_pipeline.get());

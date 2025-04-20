@@ -2,6 +2,7 @@
 #define HEADER_GE_VULKAN_SKYBOX_RENDERER_HPP
 
 #include "vulkan_wrapper.h"
+#include <atomic>
 
 namespace irr
 {
@@ -24,6 +25,8 @@ private:
     VkDescriptorPool m_descriptor_pool;
 
     VkDescriptorSet m_descriptor_set;
+
+    std::atomic_bool m_skybox_loading;
 public:
     // ------------------------------------------------------------------------
     GEVulkanSkyBoxRenderer();
@@ -36,7 +39,11 @@ public:
                                                 { return m_descriptor_layout; }
     // ------------------------------------------------------------------------
     const VkDescriptorSet* getDescriptorSet() const
-                                                  { return &m_descriptor_set; }
+    {
+        if (m_skybox_loading.load() == true)
+            return NULL;
+        return &m_descriptor_set;
+    }
 
 };   // GEVulkanSkyBoxRenderer
 
