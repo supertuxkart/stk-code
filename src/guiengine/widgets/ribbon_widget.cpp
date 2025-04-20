@@ -110,8 +110,8 @@ void RibbonWidget::add()
     //        so care must be taken to not break things
     for (int i=0; i<subbuttons_amount; i++)
     {
-        // ---- tab ribbons
-        if (getRibbonType() == RIBBON_TABS)
+        // ---- tab and vertical tab ribbons
+        if (getRibbonType() == RIBBON_TABS || getRibbonType() == RIBBON_VERTICAL_TABS)
         {
             stringw& message = m_active_children[i].m_text;
 
@@ -163,61 +163,7 @@ void RibbonWidget::add()
             }
 
             m_active_children[i].m_element = tab;
-        } // tabs
-
-
-        // ---- vertical tab ribbons
-        else if (getRibbonType() == RIBBON_VERTICAL_TABS)
-        {
-            stringw& message = m_active_children[i].m_text;
-
-            IGUIButton * tab = NULL;
-
-            // TODO Add support for BUTTON type when needed
-            if (m_active_children[i].m_type == WTYPE_ICON_BUTTON)
-            {
-                // use the same ID for all subcomponents; since event handling
-                // is done per-ID, no matter which one your hover, this
-                // widget will get it
-                int same_id = getNewNoFocusID();
-                tab = GUIEngine::getGUIEnv()->addButton(init_rect, btn,
-                                                           same_id, L"", L"");
-
-                IGUIButton* icon =
-                    GUIEngine::getGUIEnv()->addButton(init_rect, tab,
-                                                      same_id, L"");
-                icon->setScaleImage(true);
-                std::string filename = GUIEngine::getSkin()->getThemedIcon(
-                                     m_active_children[i].m_properties[PROP_ICON]);
-                icon->setImage( irr_driver->getTexture(filename.c_str()) );
-                icon->setUseAlphaChannel(true);
-                icon->setDrawBorder(false);
-                icon->setTabStop(false);
-
-                IGUIStaticText* label =
-                    GUIEngine::getGUIEnv()->addStaticText(message.c_str(),
-                                                          init_rect,
-                                                          false /* border */,
-                                                          true /* word wrap */,
-                                                          tab, same_id);
-
-                label->setTextAlignment(EGUIA_CENTER, EGUIA_CENTER);
-                label->setTabStop(false);
-                label->setNotClipped(true);
-                m_labels.push_back(label);
-                m_child_data[i] = std::make_pair(label, icon);
-
-                tab->setTabStop(false);
-                tab->setTabGroup(false);
-            }
-            else
-            {
-                Log::error("RibbonWidget", "Invalid tab bar contents");
-            }
-
-            m_active_children[i].m_element = tab;
-        } // vertical-tabs
-
+        } // tabs and vertical tabs
 
         // ---- icon ribbons
         else if (m_active_children[i].m_type == WTYPE_ICON_BUTTON)
