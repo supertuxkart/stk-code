@@ -1,6 +1,8 @@
 uniform sampler2D ntex;
 uniform sampler2D dtex;
+#if !defined(GL_ES)
 uniform sampler2DShadow stex;
+#endif
 uniform sampler2D albedo;
 uniform sampler2D ssao;
 uniform sampler2D ctex;
@@ -19,6 +21,7 @@ out vec4 Spec;
 #stk_include "utils/DiffuseIBL.frag"
 #stk_include "utils/SpecularIBL.frag"
 
+#if !defined(GL_ES)
 vec3 CalcCoordFromPosition(in vec3 pos)
 {
     vec4 projectedCoord      = u_projection_matrix * vec4(pos, 1.0);
@@ -67,6 +70,7 @@ vec3 gtaoMultiBounce(float visibility, vec3 albedo)
 
     return max(vec3(visibility), ((visibility * a + b) * visibility + c) * visibility);
 }
+#endif
 
 // Main ===================================================================
 
