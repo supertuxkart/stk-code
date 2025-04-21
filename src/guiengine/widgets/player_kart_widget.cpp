@@ -80,14 +80,12 @@ PlayerKartWidget::PlayerKartWidget(KartSelectionScreen* parent,
 
     // --- Kart Player Icone (GameMaster or normal Player)
     m_icon_player = new IconButtonWidget(IconButtonWidget::SCALE_MODE_KEEP_CUSTOM_ASPECT_RATIO, false, false, IconButtonWidget::ICON_PATH_TYPE_ABSOLUTE);
-    m_icon_player->setImage("crown.png", GUIEngine::IconButtonWidget::IconPathType::ICON_PATH_TYPE_ABSOLUTE);
-    //video::ITexture* icon_1 = irr_driver->getTexture
-    //(file_manager->getAsset(FileManager::GUI_ICON, "crown.png"));
+    m_icon_player->setImage(file_manager->getAsset(FileManager::GUI_ICON, "crown.png"), IconButtonWidget::ICON_PATH_TYPE_ABSOLUTE);
     
-    m_icon_player->m_x = player_name_x;
-    m_icon_player->m_y = player_name_y;
-    m_icon_player->m_w = player_name_w;
-    m_icon_player->m_h = player_name_h;
+    m_icon_player->m_x = icon_player_x;
+    m_icon_player->m_y = icon_player_y;
+    m_icon_player->m_w = icon_player_w;
+    m_icon_player->m_h = icon_player_h;
     m_children.push_back(m_icon_player);
 
     // ---- KartStatsWidget
@@ -416,6 +414,7 @@ void PlayerKartWidget::add()
     {
         m_player_ident_spinner->addLabel(label);
         m_player_ident_spinner->setVisible(false);
+        m_icon_player->setVisible(false);
     }
 
     assert(m_player_ident_spinner->getStringValue() == label);
@@ -699,11 +698,11 @@ void PlayerKartWidget::setSize(const int x, const int y, const int w, const int 
     else
         player_name_w = std::min(GUIEngine::getFontHeight() * 10, w);
 
-    kart_name_w = w;
-    kart_name_h = GUIEngine::getFontHeight();
-
     icon_player_w = w;
     icon_player_h = GUIEngine::getFontHeight();
+
+    kart_name_w = w;
+    kart_name_h = GUIEngine::getFontHeight();
 
     // for shrinking effect
     if (h < 175)
@@ -716,6 +715,9 @@ void PlayerKartWidget::setSize(const int x, const int y, const int w, const int 
     // --- layout
     player_name_x = x + w/2 - player_name_w/2;
     player_name_y = y;
+
+    icon_player_x = x + w / 2 - player_name_w / 2 - icon_player_w / 2; // Pas 100% correct 
+    icon_player_y = player_name_y;
 
     if (m_parent_screen->m_multiplayer)
     {
@@ -751,9 +753,6 @@ void PlayerKartWidget::setSize(const int x, const int y, const int w, const int 
 
     kart_name_x = x;
     kart_name_y = y + h - kart_name_h;
-
-    icon_player_x = player_name_x;
-    icon_player_y = player_name_y;
 }   // setSize
 
 // -------------------------------------------------------------------------
