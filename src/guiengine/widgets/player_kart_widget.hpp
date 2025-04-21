@@ -34,6 +34,7 @@ namespace GUIEngine
     class ModelViewWidget;
     class LabelWidget;
     class SpinnerWidget;
+    class IconButtonWidget;
 
     /** A widget representing the kart selection for a player (i.e. the player's
      *  number, name, the kart view, the kart's name) */
@@ -49,6 +50,7 @@ namespace GUIEngine
         int player_name_x, player_name_y, player_name_w, player_name_h;
         int model_x, model_y, model_w, model_h;
         int kart_name_x, kart_name_y, kart_name_w, kart_name_h;
+        int icon_player_x, icon_player_y, icon_player_w, icon_player_h;
         int m_kart_stats_x, m_kart_stats_y, m_kart_stats_w, m_kart_stats_h;
 
         /** A reserved ID for this widget if any, -1 otherwise.  (If no ID is
@@ -83,6 +85,7 @@ namespace GUIEngine
         KartStatsWidget* m_kart_stats;
         ModelViewWidget* m_model_view;
         LabelWidget* m_kart_name;
+        IconButtonWidget* m_icon_player;
 
         KartSelectionScreen* m_parent_screen;
 

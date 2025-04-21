@@ -78,6 +78,18 @@ PlayerKartWidget::PlayerKartWidget(KartSelectionScreen* parent,
     m_player_ident_spinner->m_w = player_name_w;
     m_player_ident_spinner->m_h = player_name_h;
 
+    // --- Kart Player Icone (GameMaster or normal Player)
+    m_icon_player = new IconButtonWidget(IconButtonWidget::SCALE_MODE_KEEP_CUSTOM_ASPECT_RATIO, false, false, IconButtonWidget::ICON_PATH_TYPE_ABSOLUTE);
+    m_icon_player->setImage("crown.png", GUIEngine::IconButtonWidget::IconPathType::ICON_PATH_TYPE_ABSOLUTE);
+    //video::ITexture* icon_1 = irr_driver->getTexture
+    //(file_manager->getAsset(FileManager::GUI_ICON, "crown.png"));
+    
+    m_icon_player->m_x = player_name_x;
+    m_icon_player->m_y = player_name_y;
+    m_icon_player->m_w = player_name_w;
+    m_icon_player->m_h = player_name_h;
+    m_children.push_back(m_icon_player);
+
     // ---- KartStatsWidget
     m_kart_stats = NULL;
 
@@ -277,6 +289,9 @@ PlayerKartWidget::~PlayerKartWidget()
 
     if (m_kart_name->getIrrlichtElement() != NULL)
         m_kart_name->getIrrlichtElement()->remove();
+
+    if (m_icon_player->getIrrlichtElement() != NULL)
+        m_icon_player->getIrrlichtElement()->remove();
         
     if (getCurrentScreen() != NULL)
         getCurrentScreen()->manualRemoveWidget(this);
@@ -366,6 +381,7 @@ void PlayerKartWidget::add()
     m_kart_stats->add();
     m_model_view->add();
     m_kart_name->add();
+    m_icon_player->add();
 
     m_model_view->update(0);
 
@@ -597,6 +613,11 @@ void PlayerKartWidget::updateSize()
                       kart_name_y,
                       kart_name_w,
                       kart_name_h);
+
+    m_icon_player->move(icon_player_x,
+                        icon_player_y,
+                        icon_player_w,
+                        icon_player_h);
 }   // updateSize
 
 // -------------------------------------------------------------------------
@@ -681,6 +702,9 @@ void PlayerKartWidget::setSize(const int x, const int y, const int w, const int 
     kart_name_w = w;
     kart_name_h = GUIEngine::getFontHeight();
 
+    icon_player_w = w;
+    icon_player_h = GUIEngine::getFontHeight();
+
     // for shrinking effect
     if (h < 175)
     {
@@ -727,6 +751,9 @@ void PlayerKartWidget::setSize(const int x, const int y, const int w, const int 
 
     kart_name_x = x;
     kart_name_y = y + h - kart_name_h;
+
+    icon_player_x = player_name_x;
+    icon_player_y = player_name_y;
 }   // setSize
 
 // -------------------------------------------------------------------------
