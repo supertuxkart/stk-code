@@ -323,11 +323,20 @@ bool handleContextMenuAction(s32 cmd_id)
     {
     case DEBUG_GRAPHICS_RELOAD_SHADERS:
 #ifndef SERVER_ONLY
+    {
         Log::info("Debug", "Reloading shaders...");
-        SP::SPShaderManager::get()->unloadAll();
-        ShaderBase::killShaders();
-        ShaderFilesManager::getInstance()->removeAllShaderFiles();
-        SP::SPShaderManager::get()->initAll();
+        GE::GEVulkanDriver* vk = GE::getVKDriver();
+        if (vk)
+            vk->reloadShaders();
+        else
+        {
+            SP::SPShaderManager::get()->unloadAll();
+            ShaderBase::killShaders();
+            ShaderFilesManager::getInstance()->removeAllShaderFiles();
+            SP::SPShaderManager::get()->initAll();
+        }
+        break;
+    }
 #endif
         break;
     case DEBUG_GRAPHICS_RELOAD_TEXTURES:

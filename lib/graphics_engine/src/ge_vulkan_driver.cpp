@@ -2565,6 +2565,22 @@ void GEVulkanDriver::updateDriver(bool pbr_changed)
 }   // updateDriver
 
 // ----------------------------------------------------------------------------
+void GEVulkanDriver::reloadShaders()
+{
+    waitIdle();
+    setDisableWaitIdle(true);
+    clearDrawCallsCache();
+    GEVulkanShaderManager::destroy();
+    GEVulkanShaderManager::init(this);
+    for (auto& dc : static_cast<GEVulkanSceneManager*>(
+        m_irrlicht_device->getSceneManager())->getDrawCalls())
+        dc.second = std::unique_ptr<GEVulkanDrawCall>(new GEVulkanDrawCall);
+    GEVulkan2dRenderer::destroy();
+    GEVulkan2dRenderer::init(this);
+    setDisableWaitIdle(false);
+}   // reloadShaders
+
+// ----------------------------------------------------------------------------
 void GEVulkanDriver::clearDrawCallsCache()
 {
     m_draw_calls_cache.clear();
