@@ -78,7 +78,7 @@ PlayerKartWidget::PlayerKartWidget(KartSelectionScreen* parent,
     m_player_ident_spinner->m_w = player_name_w;
     m_player_ident_spinner->m_h = player_name_h;
 
-    // --- Kart Player Icone (GameMaster or normal Player)
+    // --- Kart Player Icone (Only for GameMaster)
     m_icon_player = new IconButtonWidget(IconButtonWidget::SCALE_MODE_KEEP_CUSTOM_ASPECT_RATIO, false, false, IconButtonWidget::ICON_PATH_TYPE_ABSOLUTE);
     m_icon_player->setImage(file_manager->getAsset(FileManager::GUI_ICON, "crown.png"), IconButtonWidget::ICON_PATH_TYPE_ABSOLUTE);
     
@@ -393,7 +393,7 @@ void PlayerKartWidget::add()
     if (m_parent_screen->m_multiplayer)
     {
         const int player_amount = PlayerManager::get()->getNumPlayers();
-        for (int n=0; n<player_amount; n++)
+        for (int n = 0; n < player_amount; n++)
         {
             core::stringw name = PlayerManager::get()->getPlayer(n)->getName();
             core::stringw label = name;
@@ -409,6 +409,11 @@ void PlayerKartWidget::add()
 
         // select the right player profile in the spinner
         m_player_ident_spinner->setValue(label);
+
+        if (m_associated_player->getID() != PLAYER_ID_GAME_MASTER)
+        {
+            m_icon_player->setVisible(false);
+        }
     }
     else
     {
