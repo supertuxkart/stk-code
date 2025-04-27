@@ -854,6 +854,8 @@ void GEVulkanDrawCall::createAllPipelines(GEVulkanDriver* vk)
     settings.m_depth_test = true;
     settings.m_depth_write = true;
     settings.m_backface_culling = true;
+    settings.m_depth_op = VK_COMPARE_OP_LESS;
+    settings.m_vertex_description = getDefaultVertexDescription();
 
     settings.m_vertex_shader = "spm.vert";
     settings.m_skinning_vertex_shader = "spm_skinning.vert";
@@ -920,7 +922,9 @@ void GEVulkanDrawCall::createAllPipelines(GEVulkanDriver* vk)
 
     settings.m_alphablend = false;
     settings.m_additive = false;
-    settings.m_fs_quad_pl = m_skybox_layout;
+    settings.m_custom_pl = m_skybox_layout;
+    settings.m_depth_op = VK_COMPARE_OP_EQUAL;
+    settings.m_vertex_description = {};
     settings.m_backface_culling = true;
     settings.m_skinning_vertex_shader = "";
     settings.m_vertex_shader = "fullscreen_quad.vert";
@@ -951,58 +955,15 @@ void GEVulkanDrawCall::createPipeline(GEVulkanDriver* vk,
         frag_shader_stage_info
     }};
 
-    size_t bone_pitch = sizeof(int16_t) * 8;
-    size_t static_pitch = sizeof(irr::video::S3DVertexSkinnedMesh) - bone_pitch;
-    std::array<VkVertexInputBindingDescription, 2> binding_descriptions;
-    binding_descriptions[0].binding = 0;
-    binding_descriptions[0].stride = static_pitch;
-    binding_descriptions[0].inputRate = VK_VERTEX_INPUT_RATE_VERTEX;
-    binding_descriptions[1].binding = 1;
-    binding_descriptions[1].stride = bone_pitch;
-    binding_descriptions[1].inputRate = VK_VERTEX_INPUT_RATE_VERTEX;
-
-    std::array<VkVertexInputAttributeDescription, 8> attribute_descriptions = {};
-    attribute_descriptions[0].binding = 0;
-    attribute_descriptions[0].location = 0;
-    attribute_descriptions[0].format = VK_FORMAT_R32G32B32_SFLOAT;
-    attribute_descriptions[0].offset = offsetof(irr::video::S3DVertexSkinnedMesh, m_position);
-    attribute_descriptions[1].binding = 0;
-    attribute_descriptions[1].location = 1;
-    attribute_descriptions[1].format = VK_FORMAT_A2B10G10R10_SNORM_PACK32;
-    attribute_descriptions[1].offset = offsetof(irr::video::S3DVertexSkinnedMesh, m_normal);
-    attribute_descriptions[2].binding = 0;
-    attribute_descriptions[2].location = 2;
-    attribute_descriptions[2].format = VK_FORMAT_A8B8G8R8_UNORM_PACK32;
-    attribute_descriptions[2].offset = offsetof(irr::video::S3DVertexSkinnedMesh, m_color);
-    attribute_descriptions[3].binding = 0;
-    attribute_descriptions[3].location = 3;
-    attribute_descriptions[3].format = VK_FORMAT_R16G16_SFLOAT;
-    attribute_descriptions[3].offset = offsetof(irr::video::S3DVertexSkinnedMesh, m_all_uvs);
-    attribute_descriptions[4].binding = 0;
-    attribute_descriptions[4].location = 4;
-    attribute_descriptions[4].format = VK_FORMAT_R16G16_SFLOAT;
-    attribute_descriptions[4].offset = offsetof(irr::video::S3DVertexSkinnedMesh, m_all_uvs) + (sizeof(int16_t) * 2);
-    attribute_descriptions[5].binding = 0;
-    attribute_descriptions[5].location = 5;
-    attribute_descriptions[5].format = VK_FORMAT_A2B10G10R10_SNORM_PACK32;
-    attribute_descriptions[5].offset = offsetof(irr::video::S3DVertexSkinnedMesh, m_tangent);
-    attribute_descriptions[6].binding = 1;
-    attribute_descriptions[6].location = 6;
-    attribute_descriptions[6].format = VK_FORMAT_R16G16B16A16_SINT;
-    attribute_descriptions[6].offset = 0;
-    attribute_descriptions[7].binding = 1;
-    attribute_descriptions[7].location = 7;
-    attribute_descriptions[7].format = VK_FORMAT_R16G16B16A16_SFLOAT;
-    attribute_descriptions[7].offset = sizeof(int16_t) * 4;
-
     VkPipelineVertexInputStateCreateInfo vertex_input_info = {};
     vertex_input_info.sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO;
-    if (settings.m_fs_quad_pl == VK_NULL_HANDLE)
+    auto& vertex_desc = settings.m_vertex_description;
+    if (!vertex_desc.first.empty())
     {
-        vertex_input_info.vertexBindingDescriptionCount = 2;
-        vertex_input_info.vertexAttributeDescriptionCount = 8;
-        vertex_input_info.pVertexBindingDescriptions = binding_descriptions.data();
-        vertex_input_info.pVertexAttributeDescriptions = attribute_descriptions.data();
+        vertex_input_info.vertexBindingDescriptionCount = vertex_desc.first.size();
+        vertex_input_info.vertexAttributeDescriptionCount = vertex_desc.second.size();
+        vertex_input_info.pVertexBindingDescriptions = vertex_desc.first.data();
+        vertex_input_info.pVertexAttributeDescriptions = vertex_desc.second.data();
     }
 
     VkPipelineInputAssemblyStateCreateInfo input_assembly = {};
@@ -1049,8 +1010,7 @@ void GEVulkanDrawCall::createPipeline(GEVulkanDriver* vk,
     depth_stencil.sType = VK_STRUCTURE_TYPE_PIPELINE_DEPTH_STENCIL_STATE_CREATE_INFO;
     depth_stencil.depthTestEnable = settings.m_depth_test;
     depth_stencil.depthWriteEnable = settings.m_depth_write;
-    depth_stencil.depthCompareOp = settings.m_fs_quad_pl == VK_NULL_HANDLE ?
-        VK_COMPARE_OP_LESS : VK_COMPARE_OP_EQUAL;
+    depth_stencil.depthCompareOp = settings.m_depth_op;
     depth_stencil.depthBoundsTestEnable = VK_FALSE;
     depth_stencil.stencilTestEnable = VK_FALSE;
 
@@ -1111,8 +1071,8 @@ void GEVulkanDrawCall::createPipeline(GEVulkanDriver* vk,
     pipeline_info.pDepthStencilState = &depth_stencil;
     pipeline_info.pColorBlendState = &color_blending;
     pipeline_info.pDynamicState = &dynamic_state_info;
-    pipeline_info.layout = settings.m_fs_quad_pl == VK_NULL_HANDLE ?
-        m_pipeline_layout : settings.m_fs_quad_pl;
+    pipeline_info.layout = settings.m_custom_pl == VK_NULL_HANDLE ?
+        m_pipeline_layout : settings.m_custom_pl;
     pipeline_info.renderPass = vk->getRTTTexture() ?
         vk->getRTTTexture()->getRTTRenderPass() : vk->getRenderPass();
     pipeline_info.subpass = 0;
@@ -2095,5 +2055,58 @@ bool GEVulkanDrawCall::doDepthOnlyRenderingFirst()
     }
     return status == ENABLED;
 }   // doDepthOnlyRenderingFirst
+
+// ----------------------------------------------------------------------------
+VertexDescription GEVulkanDrawCall::getDefaultVertexDescription() const
+{
+    VertexDescription vertex_description;
+    auto& binding_descriptions = vertex_description.first;
+    binding_descriptions.resize(2);
+    size_t bone_pitch = sizeof(int16_t) * 8;
+    size_t static_pitch = sizeof(irr::video::S3DVertexSkinnedMesh) - bone_pitch;
+    binding_descriptions[0].binding = 0;
+    binding_descriptions[0].stride = static_pitch;
+    binding_descriptions[0].inputRate = VK_VERTEX_INPUT_RATE_VERTEX;
+    binding_descriptions[1].binding = 1;
+    binding_descriptions[1].stride = bone_pitch;
+    binding_descriptions[1].inputRate = VK_VERTEX_INPUT_RATE_VERTEX;
+
+    auto& attribute_descriptions = vertex_description.second;
+    attribute_descriptions.resize(8);
+    attribute_descriptions[0].binding = 0;
+    attribute_descriptions[0].location = 0;
+    attribute_descriptions[0].format = VK_FORMAT_R32G32B32_SFLOAT;
+    attribute_descriptions[0].offset = offsetof(irr::video::S3DVertexSkinnedMesh, m_position);
+    attribute_descriptions[1].binding = 0;
+    attribute_descriptions[1].location = 1;
+    attribute_descriptions[1].format = VK_FORMAT_A2B10G10R10_SNORM_PACK32;
+    attribute_descriptions[1].offset = offsetof(irr::video::S3DVertexSkinnedMesh, m_normal);
+    attribute_descriptions[2].binding = 0;
+    attribute_descriptions[2].location = 2;
+    attribute_descriptions[2].format = VK_FORMAT_A8B8G8R8_UNORM_PACK32;
+    attribute_descriptions[2].offset = offsetof(irr::video::S3DVertexSkinnedMesh, m_color);
+    attribute_descriptions[3].binding = 0;
+    attribute_descriptions[3].location = 3;
+    attribute_descriptions[3].format = VK_FORMAT_R16G16_SFLOAT;
+    attribute_descriptions[3].offset = offsetof(irr::video::S3DVertexSkinnedMesh, m_all_uvs);
+    attribute_descriptions[4].binding = 0;
+    attribute_descriptions[4].location = 4;
+    attribute_descriptions[4].format = VK_FORMAT_R16G16_SFLOAT;
+    attribute_descriptions[4].offset = offsetof(irr::video::S3DVertexSkinnedMesh, m_all_uvs) + (sizeof(int16_t) * 2);
+    attribute_descriptions[5].binding = 0;
+    attribute_descriptions[5].location = 5;
+    attribute_descriptions[5].format = VK_FORMAT_A2B10G10R10_SNORM_PACK32;
+    attribute_descriptions[5].offset = offsetof(irr::video::S3DVertexSkinnedMesh, m_tangent);
+    attribute_descriptions[6].binding = 1;
+    attribute_descriptions[6].location = 6;
+    attribute_descriptions[6].format = VK_FORMAT_R16G16B16A16_SINT;
+    attribute_descriptions[6].offset = 0;
+    attribute_descriptions[7].binding = 1;
+    attribute_descriptions[7].location = 7;
+    attribute_descriptions[7].format = VK_FORMAT_R16G16B16A16_SFLOAT;
+    attribute_descriptions[7].offset = sizeof(int16_t) * 4;
+
+    return vertex_description;
+}   // getDefaultVertexDescription
 
 }

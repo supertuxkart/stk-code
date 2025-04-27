@@ -41,6 +41,9 @@ class GEVulkanDynamicSPMBuffer;
 class GEVulkanSkyBoxRenderer;
 class GEVulkanTextureDescriptor;
 
+typedef std::pair<std::vector<VkVertexInputBindingDescription>,
+    std::vector<VkVertexInputAttributeDescription> > VertexDescription;
+
 struct ObjectData
 {
     float m_translation_x;
@@ -82,7 +85,9 @@ struct PipelineSettings
     bool m_depth_write;
     char m_drawing_priority;
     std::function<void(uint32_t*, void**)> m_push_constants_func;
-    VkPipelineLayout m_fs_quad_pl;
+    VkPipelineLayout m_custom_pl;
+    VkCompareOp m_depth_op;
+    VertexDescription m_vertex_description;
 
     bool isTransparent() const { return m_alphablend || m_additive; }
 };
@@ -273,6 +278,8 @@ private:
     }
     // ------------------------------------------------------------------------
     bool doDepthOnlyRenderingFirst();
+    // ------------------------------------------------------------------------
+    VertexDescription getDefaultVertexDescription() const;
 public:
     // ------------------------------------------------------------------------
     GEVulkanDrawCall();
