@@ -1,68 +1,3 @@
-vec2 F_AB(float perceptual_roughness, float NdotV)
-{
-    vec4 c0 = vec4(-1.0, -0.0275, -0.572, 0.022);
-    vec4 c1 = vec4(1.0, 0.0425, 1.04, -0.04);
-    vec4 r = perceptual_roughness * c0 + c1;
-    float a004 = min(r.x * r.x, pow(2.0, -9.28 * NdotV)) * r.x + r.y;
-    return vec2(-1.04, 1.04) * a004 + r.zw;
-}
-
-// Lambert model
-float F_Schlick(float f0, float f90, float VdotH)
-{
-    return mix(f0, f90, pow(1.0 - VdotH, 5.0));
-}
-
-float Fd_Burley(float roughness, float NdotV, float NdotL, float LdotH)
-{
-    // Don't divide by Pi to avoid light being too dim.
-    float f90 = 0.5 + 2.0 * roughness * LdotH * LdotH;
-    float lightScatter = F_Schlick(1.0, f90, NdotL);
-    float viewScatter = F_Schlick(1.0, f90, NdotV);
-    return lightScatter * viewScatter;
-}
-
-// Calculate distribution.
-// Based on https://google.github.io/filament/Filament.html#citation-walter07
-// D_GGX(h,α) = α^2 / { π ((n⋅h)^2 (α2−1) + 1)^2 }
-// Simple implementation, has precision problems when using fp16 instead of fp32
-// see https://google.github.io/filament/Filament.html#listing_speculardfp16
-float D_GGX(float roughness, float NdotH)
-{
-    // Don't divide by Pi to avoid light being too dim.
-    float oneMinusNdotHSquared = 1.0 - NdotH * NdotH;
-    float a = NdotH * roughness;
-    float k = roughness / (oneMinusNdotHSquared + a * a);
-    return k * k;
-}
-
-// Calculate visibility.
-// Hammon 2017, "PBR Diffuse Lighting for GGX+Smith Microsurfaces"
-// see https://google.github.io/filament/Filament.html#listing_approximatedspecularv
-float V_Smith_GGX_Correlated(float roughness, float NdotV, float NdotL)
-{
-    return 0.5 / mix(2.0 * NdotL * NdotV, NdotL + NdotV, roughness);
-}
-
-// Fresnel function
-// see https://google.github.io/filament/Filament.html#citation-schlick94
-// F_Schlick(v,h,f_0,f_90) = f_0 + (f_90 − f_0) (1 − v⋅h)^5
-vec3 fresnel(vec3 f0, float f90, float VdotH)
-{
-    return f0 + (f90 - f0) * pow(1.0 - VdotH, 5.0);
-}
-
-vec3 envBRDFApprox(vec3 F0, vec2 F_ab)
-{
-    return F0 * F_ab.x + F_ab.y;
-}
-
-float perceptualRoughnessToRoughness(float perceptual_roughness)
-{
-    float roughness = clamp(perceptual_roughness, 0.089, 1.0);
-    return roughness * roughness;
-}
-
 vec3 PBRLight(
     vec3 normal,
     vec3 eyedir,
@@ -104,6 +39,8 @@ vec3 PBRSunAmbientEmitLight(
     vec3 eyedir,
     vec3 sundir,
     vec3 color,
+    vec3 irradiance,
+    vec3 radiance,
     vec3 sun_color,
     vec3 ambient_color,
     float perceptual_roughness,
@@ -142,7 +79,18 @@ vec3 PBRSunAmbientEmitLight(
 
     vec3 specular_ambient = F90 * envBRDFApprox(F0, F_ab);
 
+    // Other 0.6 comes from skybox
+    ambient_color *= 0.4;
+    vec3 environment = vec3(0.325, 0.35, 0.375) * ambient_color * diffuse_color;
+    if (u_ibl)
+    {
+        environment = environmentLight(irradiance, radiance, roughness,
+            diffuse_color, F_ab, F0, F90, NdotV);
+    }
+
     vec3 emit = emissive * color * 4.0;
 
-    return sun_color * sunlight + ambient_color * (diffuse_ambient + specular_ambient) + emit;
+    return sun_color * sunlight
+          + environment + emit
+          + (diffuse_ambient + specular_ambient) * ambient_color;
 }

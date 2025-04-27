@@ -75,6 +75,8 @@ void GEVulkanShaderManager::init(GEVulkanDriver* vk)
     }
     else
         oss << "#define GE_SAMPLE_TEX_INDEX int\n";
+    if (GEVulkanFeatures::supportsShaderStorageImageExtendedFormats())
+        oss << "#define SHADER_STORAGE_IMAGE_EXTENDED_FORMATS\n";
     g_predefines = oss.str();
 
     loadAllShaders();

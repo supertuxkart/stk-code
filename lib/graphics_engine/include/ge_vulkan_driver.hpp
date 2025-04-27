@@ -342,7 +342,8 @@ namespace GE
             destroySwapChainRelated(false/*handle_surface*/);
             createSwapChainRelated(false/*handle_surface*/);
         }
-        void updateDriver(bool pbr_changed = false);
+        void updateDriver(bool scale_changed = true, bool pbr_changed = false,
+                          bool ibl_changed = false);
         void reloadShaders();
         uint32_t getGraphicsFamily() const         { return m_graphics_family; }
         unsigned getGraphicsQueueCount() const

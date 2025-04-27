@@ -2516,12 +2516,14 @@ bool GEVulkanDriver::setRenderTarget(video::ITexture* texture,
 }   // setRenderTarget
 
 // ----------------------------------------------------------------------------
-void GEVulkanDriver::updateDriver(bool pbr_changed)
+void GEVulkanDriver::updateDriver(bool scale_changed, bool pbr_changed,
+                                  bool ibl_changed)
 {
     waitIdle();
     setDisableWaitIdle(true);
     clearDrawCallsCache();
-    destroySwapChainRelated(false/*handle_surface*/);
+    if (scale_changed)
+        destroySwapChainRelated(false/*handle_surface*/);
     if (pbr_changed)
     {
         GEVulkanShaderManager::destroy();
@@ -2555,12 +2557,18 @@ void GEVulkanDriver::updateDriver(bool pbr_changed)
         for (GEVulkanDynamicSPMBuffer* buffer : m_dynamic_spm_buffers)
             buffer->setDirtyOffset(0, irr::scene::EBT_VERTEX);
     }
-    createSwapChainRelated(false/*handle_surface*/);
+    if (pbr_changed || ibl_changed)
+        m_skybox_renderer->reset();
+    if (scale_changed)
+        createSwapChainRelated(false/*handle_surface*/);
     for (auto& dc : static_cast<GEVulkanSceneManager*>(
         m_irrlicht_device->getSceneManager())->getDrawCalls())
         dc.second = std::unique_ptr<GEVulkanDrawCall>(new GEVulkanDrawCall);
-    GEVulkan2dRenderer::destroy();
-    GEVulkan2dRenderer::init(this);
+    if (scale_changed || pbr_changed)
+    {
+        GEVulkan2dRenderer::destroy();
+        GEVulkan2dRenderer::init(this);
+    }
     setDisableWaitIdle(false);
 }   // updateDriver
 

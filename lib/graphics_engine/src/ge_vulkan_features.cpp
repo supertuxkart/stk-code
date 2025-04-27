@@ -32,6 +32,7 @@ bool g_supports_shader_draw_parameters = false;
 bool g_supports_s3tc_bc3 = false;
 bool g_supports_bptc_bc7 = false;
 bool g_supports_astc_4x4 = false;
+bool g_supports_shader_storage_image_extended_format = false;
 }   // GEVulkanFeatures
 
 // ============================================================================
@@ -89,6 +90,7 @@ void GEVulkanFeatures::init(GEVulkanDriver* vk)
     vkGetPhysicalDeviceFormatProperties(vk->getPhysicalDevice(),
         VK_FORMAT_ASTC_4x4_UNORM_BLOCK, &format_properties);
     g_supports_astc_4x4 = format_properties.optimalTilingFeatures & VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT;
+    g_supports_shader_storage_image_extended_format = vk->getPhysicalDeviceFeatures().shaderStorageImageExtendedFormats;
 
     uint32_t extension_count;
     vkEnumerateDeviceExtensionProperties(vk->getPhysicalDevice(), NULL,
@@ -235,6 +237,8 @@ void GEVulkanFeatures::printStats()
     os::Printer::log(
         "Vulkan supports adaptive scalable texture compression (4x4 block)",
         supportsASTC4x4() ? "true" : "false");
+    os::Printer::log("Vulkan supports shader storage image extended formats",
+        supportsShaderStorageImageExtendedFormats() ? "true" : "false");
     os::Printer::log(
         "Vulkan descriptor indexes can be dynamically non-uniform",
         g_supports_non_uniform_indexing ? "true" : "false");
@@ -338,5 +342,11 @@ bool GEVulkanFeatures::supportsASTC4x4()
 {
     return g_supports_astc_4x4 && GECompressorASTC4x4::loaded();
 }   // supportsASTC4x4
+
+// ----------------------------------------------------------------------------
+bool GEVulkanFeatures::supportsShaderStorageImageExtendedFormats()
+{
+    return g_supports_shader_storage_image_extended_format;
+}   // supportsShaderStorageImageExtendedFormats
 
 }

@@ -4,6 +4,7 @@ layout(location = 3) flat in int f_material_id;
 
 layout(location = 0) out vec4 o_color;
 
+#include "utils/constants_utils.glsl"
 #include "utils/sample_mesh_texture.glsl"
 
 void main()
@@ -12,7 +13,7 @@ void main()
     vec3 mixed_color = color.xyz;
     float alpha = color.w;
 #ifdef PBR_ENABLED
-    mixed_color = (mixed_color * (6.9 * mixed_color + 0.5)) / (mixed_color * (5.2 * mixed_color + 1.7) + 0.06);
+    mixed_color = convertColor(mixed_color);
 #endif
     o_color = vec4(mixed_color * alpha, alpha);
 }

@@ -29,6 +29,7 @@ bool m_texture_compression;
 bool m_fullscreen_desktop;
 bool m_enable_draw_call_cache;
 bool m_pbr;
+bool m_ibl;
 std::unordered_set<std::string> m_ondemand_load_texture_paths;
 float m_render_scale;
 };

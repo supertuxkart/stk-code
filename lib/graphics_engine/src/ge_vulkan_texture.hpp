@@ -244,6 +244,12 @@ public:
     virtual const io::path& getFullPath() const         { return m_full_path; }
     // ------------------------------------------------------------------------
     VkFormat getInternalFormat() const            { return m_internal_format; }
+    // ------------------------------------------------------------------------
+    VkImage getImage() const
+    {
+        waitImageView();
+        return m_image;
+    }
 };   // GEVulkanTexture
 
 }

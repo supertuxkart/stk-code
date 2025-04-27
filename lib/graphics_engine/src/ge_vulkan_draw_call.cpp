@@ -10,6 +10,7 @@
 #include "ge_vulkan_driver.hpp"
 #include "ge_vulkan_dynamic_buffer.hpp"
 #include "ge_vulkan_dynamic_spm_buffer.hpp"
+#include "ge_vulkan_environment_map.hpp"
 #include "ge_vulkan_fbo_texture.hpp"
 #include "ge_vulkan_features.hpp"
 #include "ge_vulkan_mesh_cache.hpp"
@@ -1117,6 +1118,36 @@ void GEVulkanDrawCall::createPipeline(GEVulkanDriver* vk,
     pipeline_info.subpass = 0;
     pipeline_info.basePipelineHandle = VK_NULL_HANDLE;
 
+    struct Constants
+    {
+        VkBool32 m_ibl;
+        float m_specular_levels_minus_one;
+    };
+    Constants constants = {};
+    constants.m_ibl = getGEConfig()->m_pbr && getGEConfig()->m_ibl &&
+        GEVulkanFeatures::supportsComputeInMainQueue() &&
+        m_skybox_renderer != NULL;
+    float ts = GEVulkanEnvironmentMap::getSpecularEnvironmentMapSize().Width;
+    constants.m_specular_levels_minus_one = std::floor(std::log2(ts));
+    std::array<VkSpecializationMapEntry, 2> specialization_entries = {};
+    specialization_entries[0].constantID = 0;
+    specialization_entries[0].offset = offsetof(Constants, m_ibl);
+    specialization_entries[0].size = sizeof(VkBool32);
+    specialization_entries[1].constantID = 1;
+    specialization_entries[1].offset = offsetof(Constants,
+        m_specular_levels_minus_one);
+    specialization_entries[1].size = sizeof(float);
+    VkSpecializationInfo specialization_info = {};
+    specialization_info.mapEntryCount = specialization_entries.size();
+    specialization_info.pMapEntries = specialization_entries.data();
+    specialization_info.dataSize = sizeof(Constants);
+    specialization_info.pData = &constants;
+    if (getGEConfig()->m_pbr)
+    {
+        shader_stages[0].pSpecializationInfo = &specialization_info;
+        shader_stages[1].pSpecializationInfo = &specialization_info;
+    }
+
     shader_stages[0].module = GEVulkanShaderManager::getShader(
         settings.m_vertex_shader);
     shader_stages[1].module = GEVulkanShaderManager::getShader(
@@ -1360,11 +1391,16 @@ void GEVulkanDrawCall::createVulkanData()
     }
 
     // m_pipeline_layout
-    std::array<VkDescriptorSetLayout, 2> all_layouts =
-    {{
+    std::vector<VkDescriptorSetLayout> all_layouts =
+    {
         *m_texture_descriptor->getDescriptorSetLayout(),
         m_data_layout
-    }};
+    };
+    if (getGEConfig()->m_pbr)
+    {
+        all_layouts.push_back(
+            vk->getSkyBoxRenderer()->getEnvDescriptorSetLayout());
+    }
 
     VkPipelineLayoutCreateInfo pipeline_layout_info = {};
     pipeline_layout_info.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
@@ -1389,6 +1425,8 @@ void GEVulkanDrawCall::createVulkanData()
             "vkCreatePipelineLayout failed for m_pipeline_layout");
     }
 
+    all_layouts.resize(2);
+    pipeline_layout_info.setLayoutCount = all_layouts.size();
     all_layouts[0] = vk->getSkyBoxRenderer()->getDescriptorSetLayout();
     result = vkCreatePipelineLayout(vk->getDevice(), &pipeline_layout_info,
         NULL, &m_skybox_layout);
@@ -1570,6 +1608,12 @@ start:
         0u,
         0u,
     };
+    if (getGEConfig()->m_pbr)
+    {
+        vkCmdBindDescriptorSets(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS,
+            m_pipeline_layout, 2, 1,
+            vk->getSkyBoxRenderer()->getEnvDescriptorSet(), 0, NULL);
+    }
     if (bind_mesh_textures)
     {
         if (!bound_mesh_textures_once)
