@@ -38,7 +38,7 @@
         <box proportion="8" width="100%" layout="vertical-row" padding="1">
             <ribbon_grid id="tracks" proportion="1" width="100%" square_items="true"
                 label_location="bottom" align="center"
-                child_width="160" child_height="120" />
+                child_width="176" child_height="132" />
             <spacer width="20" height="5%" />
         </box>
 

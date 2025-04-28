@@ -365,12 +365,6 @@ void KartSelectionScreen::beforeAddingWidget()
         kart_class->addLabel(_(class_str.c_str()));
     }
     kart_class->addLabel(_("All"));
-
-    DynamicRibbonWidget* w = getWidget<DynamicRibbonWidget>("karts");
-    assert( w != NULL );
-
-    // Avoid too many items shown at the same time
-    w->setItemCountHint(std::min((int)kart_properties_manager->getNumberOfKarts(), 20));
 }   // beforeAddingWidget
 
 // ----------------------------------------------------------------------------

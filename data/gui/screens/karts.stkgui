@@ -31,6 +31,7 @@
                     <ribbon_grid id="karts" square_items="true" width="100%" height="100%" align="center"
                             child_width="90" child_height="90"/>
                     <spacer width="3%">
+                    <!-- This is only used when a touchscreen is active, to allow previewing a kart without validating the pick. -->
                     <icon-button id="continue" y="10%" icon="gui/icons/green_check.png" text="Continue"/>
                 </div>
             </box>

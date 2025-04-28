@@ -195,10 +195,7 @@ void TracksAndGPScreen::beforeAddingWidget()
             tabs->addTextChild( _(groups[n].c_str()) , groups[n]);
     } // for n<group_amount
 
-    DynamicRibbonWidget* tracks_widget = getWidget<DynamicRibbonWidget>("tracks");
-
-    // Avoid too many items shown at the same time
-    tracks_widget->setItemCountHint(std::min((int)track_manager->getNumberOfTracks()+1, 20));
+    // Don't give a hint as to how many tracks should be displayed and trust the ribbon logic
 }   // beforeAddingWidget
 
 // -----------------------------------------------------------------------------
