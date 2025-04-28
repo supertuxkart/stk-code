@@ -52,6 +52,8 @@ IconButtonWidget::IconButtonWidget(ScaleMode scale_mode, const bool tab_stop,
     m_highlight_texture = NULL;
 
     m_custom_aspect_ratio = 1.0f;
+    m_target_width        = -1.0f;
+    m_target_height       = -1.0f;
 
     m_texture_w = 0;
     m_texture_h = 0;
@@ -383,14 +385,20 @@ void IconButtonWidget::updateIconRect()
         useAspectRatio = m_custom_aspect_ratio;
     }
 
-    int suggested_h = m_h;
+    int suggested_h = (int)m_h;
     int suggested_w = (int)((useAspectRatio < 0 ? m_w : useAspectRatio * suggested_h));
+
+    if (m_target_width > 0.0f)
+    {
+        suggested_h = (int)m_target_height;
+        suggested_w = (int)m_target_width;
+    }
 
     if (suggested_w > m_w)
     {
         const float needed_scale_factor = (float)m_w / (float)suggested_w;
-        suggested_w = (int)(suggested_w*needed_scale_factor);
-        suggested_h = (int)(suggested_h*needed_scale_factor);
+        suggested_w = (int)(suggested_w * needed_scale_factor);
+        suggested_h = (int)(suggested_h * needed_scale_factor);
     }
 
     bool left_horizontal = m_properties[PROP_ICON_ALIGN] == "left";
