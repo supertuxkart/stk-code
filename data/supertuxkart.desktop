@@ -1,6 +1,7 @@
 [Desktop Entry]
 Name=SuperTuxKart
 Icon=supertuxkart
+StartupWMClass=supertuxkart
 #I18N: Generic name in desktop file entry, summary in AppData and short description in Google Play
 GenericName[ar]=لعبة سباق سيارات ثلاثية الأبعاد مفتوحة المصدر
 GenericName[be]=3D-гульня для гонак на картах з адкрытым зыходным кодам
