@@ -155,7 +155,7 @@ void MaxSpeed::increaseMaxSpeed(unsigned int category, float add_speed,
  *  (e.g. a zipper can give an instant boost of 5 m/s, but over time would
  *  allow the speed to go up by 10 m/s). Note that bullet does not restrict
  *  speed (e.g. by simulating air resistance), so without capping the speed
- *  (which is done my this object) the speed would go arbitrary high over time
+ *  (which is done by this object) the speed would go arbitrary high over time
  *  \param category The category for which the speed is increased.
  *  \param add_max_speed Increase of the maximum allowed speed.
  *  \param speed_boost An instant speed increase for this kart.
