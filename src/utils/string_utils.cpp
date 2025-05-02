@@ -1093,7 +1093,7 @@ namespace StringUtils
                 utf8::utf32to16(chars, chars + input.size(),
                     back_inserter(wchar_line));
             }
-            else if (sizeof(wchar_t) == sizeof(char32_t))
+            else if (sizeof(wchar_t) == sizeof(char32_t) && !input.empty())
             {
                 wchar_line.resize(input.size());
                 memcpy(wchar_line.data(), input.c_str(),
