@@ -207,6 +207,11 @@ void	btCollisionWorld::updateAabbs()
 }
 
 
+void	btCollisionWorld::computeOverlappingPairs()
+{
+	BT_PROFILE("calculateOverlappingPairs");
+	m_broadphasePairCache->calculateOverlappingPairs(m_dispatcher1);
+}
 
 void	btCollisionWorld::performDiscreteCollisionDetection()
 {
@@ -216,11 +221,7 @@ void	btCollisionWorld::performDiscreteCollisionDetection()
 
 	updateAabbs();
 
-	{
-		BT_PROFILE("calculateOverlappingPairs");
-		m_broadphasePairCache->calculateOverlappingPairs(m_dispatcher1);
-	}
-
+	computeOverlappingPairs();
 
 	btDispatcher* dispatcher = getDispatcher();
 	{
@@ -446,6 +447,7 @@ void	btCollisionWorld::rayTestSingle(const btTransform& rayFromTrans,const btTra
 						: m_userCallback(user), m_i(i)
 					{ 
 						m_closestHitFraction = m_userCallback->m_closestHitFraction;
+						m_flags = m_userCallback->m_flags;
 					}
 					virtual bool needsCollision(btBroadphaseProxy* p) const
 					{
