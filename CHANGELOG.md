@@ -64,6 +64,7 @@ For similar reasons, and because some features are vastly more complex than othe
 ### User Interface
 * Allow users to select favorite karts/tracks/arenas, by Alayan and CodingJellyfish
 * Five new skin variants for Cartoon, and a new Desert skin variant for Classic, by Alayan and CrystalDaEevee
+* Allow displaying more elements in kart and track selection, and ensure there is no need to scroll to pick a game mode, by Alayan
 * Improve the skin selection UX by separating "base theme" and "skin variant" selection, by Alayan
 * Add a new Display tab in the Settings, by Alayan
 * Allow users to search karts/arenas, by CodingJellyfish
@@ -73,6 +74,7 @@ For similar reasons, and because some features are vastly more complex than othe
 * Implement a blog announcement system in the Online screen, by CodingJellyfish
 * Various UI layout improvements (especially for 'tall' resolutions), by CodingJellyfish
 * Generate higher resolution texture for scalable fonts, by CodingJellyfish
+* Fix for multiple keyboard navigation issues, by Alayan
 * Various enhancements, by QwertyChouskie, Nomagno, Nstelt and others
 
 #### In-race UI
@@ -90,6 +92,8 @@ For similar reasons, and because some features are vastly more complex than othe
 #### Tracks
 * Fix Northern Resort skybox, by CrystalDaEevee
 * Various cut/checkline fixes, by CrystalDaEevee
+* Fix a cut in Hacienda, by Sven Andreas Belting
+* Add egg hunts for Black Forest, Gran Paradisio Island and Old Mine, by Sven Andreas Belting and Alayan
 
 #### Karts
 * Update Godette face texture, by ZAQraven99
