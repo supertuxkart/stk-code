@@ -2,6 +2,7 @@
 #define HEADER_GE_VULKAN_SKYBOX_RENDERER_HPP
 
 #include "vulkan_wrapper.h"
+#include <SColor.h>
 #include <array>
 #include <atomic>
 
@@ -33,6 +34,8 @@ private:
     std::array<VkDescriptorSet, 2> m_env_descriptor_set;
 
     std::atomic_bool m_skybox_loading, m_env_cubemap_loading;
+
+    std::atomic<uint32_t> m_skytop_color;
 public:
     // ------------------------------------------------------------------------
     GEVulkanSkyBoxRenderer();
@@ -61,6 +64,15 @@ public:
         while (m_skybox_loading.load());
         while (m_env_cubemap_loading.load());
         m_skybox = NULL;
+    }
+    // ------------------------------------------------------------------------
+    irr::video::SColor getSkytopColor() const
+    {
+        irr::video::SColor c(0);
+        if (m_skybox_loading.load() == true)
+            return c;
+        c.color = m_skytop_color.load();
+        return c;
     }
 
 };   // GEVulkanSkyBoxRenderer

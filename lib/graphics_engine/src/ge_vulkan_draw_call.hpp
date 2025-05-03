@@ -25,7 +25,7 @@ namespace irr
     namespace scene
     {
         class ISceneNode; class IBillboardSceneNode; struct SParticle;
-        class IMesh;
+        class IMesh; class ILightSceneNode;
     }
 }
 
@@ -38,6 +38,7 @@ class GEVulkanCameraSceneNode;
 class GEVulkanDriver;
 class GEVulkanDynamicBuffer;
 class GEVulkanDynamicSPMBuffer;
+class GEVulkanLightHandler;
 class GEVulkanSkyBoxRenderer;
 class GEVulkanTextureDescriptor;
 
@@ -137,6 +138,8 @@ private:
         m_dynamic_spm_buffers;
 
     GECullingTool* m_culling_tool;
+
+    GEVulkanLightHandler* m_light_handler;
 
     std::vector<DrawCallData> m_cmds;
 
@@ -280,6 +283,8 @@ private:
     bool doDepthOnlyRenderingFirst();
     // ------------------------------------------------------------------------
     VertexDescription getDefaultVertexDescription() const;
+    // ------------------------------------------------------------------------
+    size_t getLightDataOffset() const;
 public:
     // ------------------------------------------------------------------------
     GEVulkanDrawCall();
@@ -323,6 +328,8 @@ public:
     }
     // ------------------------------------------------------------------------
     void addSkyBox(irr::scene::ISceneNode* node);
+    // ------------------------------------------------------------------------
+    void addLightNode(irr::scene::ILightSceneNode* node);
 };   // GEVulkanDrawCall
 
 }

@@ -16,6 +16,18 @@ void GECullingTool::init(GEVulkanCameraSceneNode* cam)
 }   // init
 
 // ----------------------------------------------------------------------------
+bool GECullingTool::isCulled(const irr::core::vector3df& center, float radius)
+{
+    for (int i = 0; i < 6; i++)
+    {
+        irr::core::quaternion q(center.X, center.Y, center.Z, 1.0f);
+        if (m_frustum[i].dotProduct(q) < -radius)
+            return true;
+    }
+    return false;
+}   // isCulled
+
+// ----------------------------------------------------------------------------
 bool GECullingTool::isCulled(irr::core::aabbox3df& bb)
 {
     if (!m_cam_bbox.intersectsWithBox(bb))

@@ -58,6 +58,7 @@
 #include <IMeshSceneNode.h>
 #include <IParticleSystemSceneNode.h>
 #include <ISceneManager.h>
+#include <IVideoDriver.h>
 
 // ----------------------------------------------------------------------------
 TrackObjectPresentation::TrackObjectPresentation(const XMLNode& xml_node)
@@ -1028,7 +1029,8 @@ TrackObjectPresentationLight::TrackObjectPresentationLight(
     m_distance = 20.f * m_energy;
     xml_node.get("distance", &m_distance);
 #ifndef SERVER_ONLY
-    if (CVS->isGLSL())
+    if (CVS->isGLSL() ||
+        irr_driver->getVideoDriver()->getDriverType() == video::EDT_VULKAN)
     {
         m_node = irr_driver->addLight(m_init_xyz, m_energy, m_distance,
                                       colorf.r, colorf.g, colorf.b, false,
@@ -1053,6 +1055,14 @@ void TrackObjectPresentationLight::setEnergy(float energy)
     if (lnode != NULL)
     {
         lnode->setEnergy(energy);
+        return;
+    }
+    scene::ILightSceneNode* irr_node = dynamic_cast<scene::ILightSceneNode*>(
+        m_node);
+    if (irr_node != NULL)
+    {
+        video::SLight& data = irr_node->getLightData();
+        data.Attenuation.X = energy;
     }
 }
 // ----------------------------------------------------------------------------

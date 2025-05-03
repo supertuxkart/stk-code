@@ -24,7 +24,7 @@ layout(std140, set = 1, binding = 2) readonly buffer SkinningMatrices
 } u_skinning_matrices;
 
 #ifdef BIND_MESH_TEXTURES_AT_ONCE
-layout(std430, set = 1, binding = 3) readonly buffer MaterialIDs
+layout(std430, set = 1, binding = 4) readonly buffer MaterialIDs
 {
     int m_material_id[];
 } u_material_ids;

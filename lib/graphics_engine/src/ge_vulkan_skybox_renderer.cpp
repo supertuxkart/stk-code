@@ -21,7 +21,8 @@ GEVulkanSkyBoxRenderer::GEVulkanSkyBoxRenderer()
                         m_descriptor_layout(VK_NULL_HANDLE),
                         m_env_descriptor_layout(VK_NULL_HANDLE),
                         m_descriptor_pool(VK_NULL_HANDLE),
-                        m_skybox_loading(false), m_env_cubemap_loading(false)
+                        m_skybox_loading(false), m_env_cubemap_loading(false),
+                        m_skytop_color(0)
 {
     m_dummy_env_cubemap = new GEVulkanArrayTexture(VK_FORMAT_R8G8B8A8_UNORM,
         VK_IMAGE_VIEW_TYPE_CUBE, core::dimension2du(4, 4), 6,
@@ -230,6 +231,14 @@ void GEVulkanSkyBoxRenderer::addSkyBox(irr::scene::ISceneNode* skybox)
             {
                 if (!(idx == 2 || idx == 3))
                     return;
+                if (idx == 2)
+                {
+                    video::IImage* pixel = getDriver()->createImage(
+                        video::ECF_A8R8G8B8, core::dimension2du(1, 1));
+                    img->copyToScaling(pixel);
+                    m_sky->m_skytop_color.store(*(uint32_t*)pixel->lock());
+                    pixel->drop();
+                }
                 unsigned width = img->getDimension().Width;
                 uint8_t* tmp = new uint8_t[width * width * 4];
                 uint32_t* tmp_array = (uint32_t*)tmp;

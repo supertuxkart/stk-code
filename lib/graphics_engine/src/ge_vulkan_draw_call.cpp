@@ -13,6 +13,7 @@
 #include "ge_vulkan_environment_map.hpp"
 #include "ge_vulkan_fbo_texture.hpp"
 #include "ge_vulkan_features.hpp"
+#include "ge_vulkan_light_handler.hpp"
 #include "ge_vulkan_mesh_cache.hpp"
 #include "ge_vulkan_mesh_scene_node.hpp"
 #include "ge_vulkan_shader_manager.hpp"
@@ -21,6 +22,7 @@
 
 #include "mini_glm.hpp"
 #include "IBillboardSceneNode.h"
+#include "ILightSceneNode.h"
 #include "IParticleSystemSceneNode.h"
 
 #include <algorithm>
@@ -203,6 +205,7 @@ GEVulkanDrawCall::GEVulkanDrawCall()
                 : m_limits(getVKDriver()->getPhysicalDeviceProperties().limits)
 {
     m_culling_tool = new GECullingTool;
+    m_light_handler = NULL;
     m_dynamic_data = NULL;
     m_sbo_data = NULL;
     m_object_data_padded_size = 0;
@@ -222,6 +225,7 @@ GEVulkanDrawCall::GEVulkanDrawCall()
 GEVulkanDrawCall::~GEVulkanDrawCall()
 {
     delete m_culling_tool;
+    delete m_light_handler;
     delete m_dynamic_data;
     delete m_sbo_data;
     for (auto& p : m_billboard_buffers)
@@ -319,6 +323,9 @@ void GEVulkanDrawCall::generate(GEVulkanDriver* vk)
 {
     if (!m_visible_nodes.empty() && m_data_layout == VK_NULL_HANDLE)
         createVulkanData();
+
+    if (m_light_handler)
+         m_light_handler->generate(m_view_position, m_skybox_renderer);
 
     using Nodes = std::pair<std::pair<GESPMBuffer*, TexturesList>, std::unordered_map<
         std::string, std::vector<std::pair<irr::scene::ISceneNode*, int
@@ -841,8 +848,12 @@ std::string GEVulkanDrawCall::getShader(const irr::video::SMaterial& m)
 void GEVulkanDrawCall::prepare(GEVulkanCameraSceneNode* cam)
 {
     reset();
+    if (getGEConfig()->m_pbr && m_light_handler == NULL)
+        m_light_handler = new GEVulkanLightHandler(getVKDriver());
+    if (m_light_handler)
+        m_light_handler->prepare();
     m_culling_tool->init(cam);
-    m_view_position = cam->getPosition();
+    m_view_position = cam->getAbsolutePosition();
     m_billboard_rotation = MiniGLM::getBulletQuaternion(cam->getViewMatrix());
 }   // prepare
 
@@ -1272,16 +1283,26 @@ void GEVulkanDrawCall::createVulkanData()
     skinning_layout_binding.pImmutableSamplers = NULL;
     skinning_layout_binding.stageFlags = VK_SHADER_STAGE_VERTEX_BIT;
 
+    VkDescriptorSetLayoutBinding light_layout_binding = {};
+    light_layout_binding.binding = 3;
+    light_layout_binding.descriptorCount = 1;
+    light_layout_binding.descriptorType =
+        VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER_DYNAMIC;
+    light_layout_binding.pImmutableSamplers = NULL;
+    light_layout_binding.stageFlags = VK_SHADER_STAGE_VERTEX_BIT |
+        VK_SHADER_STAGE_FRAGMENT_BIT;
+
     std::vector<VkDescriptorSetLayoutBinding> bindings =
     {
          camera_layout_binding,
          object_data_layout_binding,
-         skinning_layout_binding
+         skinning_layout_binding,
+         light_layout_binding
     };
     if (GEVulkanFeatures::supportsBindMeshTexturesAtOnce())
     {
         VkDescriptorSetLayoutBinding material_binding = {};
-        material_binding.binding = 3;
+        material_binding.binding = 4;
         material_binding.descriptorCount = 1;
         material_binding.descriptorType =
             VK_DESCRIPTOR_TYPE_STORAGE_BUFFER_DYNAMIC;
@@ -1310,7 +1331,7 @@ void GEVulkanDrawCall::createVulkanData()
     {
         {
             VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER_DYNAMIC,
-            vk->getMaxFrameInFlight() + 1
+            (vk->getMaxFrameInFlight() + 1) * 2
         },
         {
             VK_DESCRIPTOR_TYPE_STORAGE_BUFFER_DYNAMIC,
@@ -1318,7 +1339,7 @@ void GEVulkanDrawCall::createVulkanData()
         }
     };
     if (GEVulkanFeatures::supportsBindMeshTexturesAtOnce())
-        sizes.push_back(sizes.back());
+        sizes.back().descriptorCount = (vk->getMaxFrameInFlight() + 1) * 3;
 
     VkDescriptorPoolCreateInfo pool_info = {};
     pool_info.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO;
@@ -1419,7 +1440,7 @@ void GEVulkanDrawCall::createVulkanData()
     // Use VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT | VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT
     // or a staging buffer when buffer is small
     m_dynamic_data = new GEVulkanDynamicBuffer(flags,
-        extra_size + sizeof(GEVulkanCameraUBO),
+        extra_size + sizeof(GEVulkanCameraUBO) + sizeof(GEGlobalLightBuffer),
         GEVulkanDriver::getMaxFrameInFlight() + 1,
         GEVulkanDynamicBuffer::supportsHostTransfer() ? 0 :
         GEVulkanDriver::getMaxFrameInFlight() + 1);
@@ -1451,6 +1472,15 @@ void GEVulkanDrawCall::uploadDynamicData(GEVulkanDriver* vk,
     std::vector<std::pair<void*, size_t> > data_uploading;
     data_uploading.emplace_back((void*)cam->getUBOData(),
         sizeof(GEVulkanCameraUBO));
+
+    size_t sbo_padding = getLightDataOffset() - sizeof(GEVulkanCameraUBO);
+    if (sbo_padding > 0)
+        data_uploading.emplace_back((void*)NULL, sbo_padding);
+    if (m_light_handler)
+    {
+        data_uploading.emplace_back(m_light_handler->getData(),
+            m_light_handler->getSize());
+    }
 
     const bool use_multidraw =
         GEVulkanFeatures::supportsBindMeshTexturesAtOnce();
@@ -1567,6 +1597,7 @@ start:
         0u,
         0u,
         0u,
+        0u,
     };
     if (getGEConfig()->m_pbr)
     {
@@ -1583,7 +1614,9 @@ start:
                 m_texture_descriptor->getDescriptorSet(), 0, NULL);
             bound_mesh_textures_once = true;
         }
-        size_t indirect_offset = sizeof(GEVulkanCameraUBO);
+        size_t indirect_offset = getLightDataOffset();
+        if (m_light_handler)
+            indirect_offset += m_light_handler->getSize();
         const size_t indirect_size = sizeof(VkDrawIndexedIndirectCommand);
         unsigned draw_count = 0;
         VkBuffer indirect_buffer =
@@ -1623,7 +1656,7 @@ start:
                 if (bound)
                 {
                     dynamic_offsets[1] = m_dynamic_spm_padded_size;
-                    dynamic_offsets[3] = m_materials_data[cur_pipeline].first;
+                    dynamic_offsets[4] = m_materials_data[cur_pipeline].first;
                     bindDataDescriptor(cmd, current_buffer_idx,
                         dynamic_offsets);
                     vkCmdDrawIndexedIndirect(cmd, indirect_buffer,
@@ -1678,7 +1711,7 @@ start:
         if (bound)
         {
             dynamic_offsets[1] = m_dynamic_spm_padded_size;
-            dynamic_offsets[3] = m_materials_data[m_cmds.back().m_shader].first;
+            dynamic_offsets[4] = m_materials_data[m_cmds.back().m_shader].first;
             bindDataDescriptor(cmd, current_buffer_idx, dynamic_offsets);
             vkCmdDrawIndexedIndirect(cmd, indirect_buffer, indirect_offset,
                 draw_count, indirect_size);
@@ -1686,7 +1719,7 @@ start:
     }
     else
     {
-        dynamic_offsets.resize(3);
+        dynamic_offsets.resize(4);
         bool rebind_base_vertex = true;
         bound = bindPipeline(cmd, cur_pipeline, depth_only, &prev_dp);
         auto it = dynamic_spm_buffers.find(
@@ -1946,6 +1979,26 @@ void GEVulkanDrawCall::updateDataDescriptorSets(GEVulkanDriver* vk)
         data_set[2].descriptorCount = 1;
         data_set[2].pBufferInfo = &sbo_info_skinning;
 
+        VkDescriptorBufferInfo sbo_info_light;
+        if (m_light_handler != NULL)
+        {
+            sbo_info_light.buffer =
+                GEVulkanDynamicBuffer::supportsHostTransfer() ?
+                m_dynamic_data->getHostBuffer()[i] :
+                m_dynamic_data->getLocalBuffer()[i];
+            sbo_info_light.offset = getLightDataOffset();
+            sbo_info_light.range = sizeof(GEGlobalLightBuffer);
+            data_set.push_back({});
+            VkWriteDescriptorSet& ds = data_set.back();
+            ds.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+            ds.dstSet = m_data_descriptor_sets[i];
+            ds.dstBinding = 3;
+            ds.dstArrayElement = 0;
+            ds.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER_DYNAMIC;
+            ds.descriptorCount = 1;
+            ds.pBufferInfo = &sbo_info_light;
+        }
+
         VkDescriptorBufferInfo sbo_info_material;
         sbo_info_material.buffer =
             m_sbo_data->getHostBuffer()[i];
@@ -1954,15 +2007,15 @@ void GEVulkanDrawCall::updateDataDescriptorSets(GEVulkanDriver* vk)
         sbo_info_material.range = m_materials_padded_size;
         if (bind_mesh_textures)
         {
-            data_set.resize(4, {});
-            data_set[3].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
-            data_set[3].dstSet = m_data_descriptor_sets[i];
-            data_set[3].dstBinding = 3;
-            data_set[3].dstArrayElement = 0;
-            data_set[3].descriptorType =
-                VK_DESCRIPTOR_TYPE_STORAGE_BUFFER_DYNAMIC;
-            data_set[3].descriptorCount = 1;
-            data_set[3].pBufferInfo = &sbo_info_material;
+            data_set.push_back({});
+            VkWriteDescriptorSet& ds = data_set.back();
+            ds.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+            ds.dstSet = m_data_descriptor_sets[i];
+            ds.dstBinding = 4;
+            ds.dstArrayElement = 0;
+            ds.descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER_DYNAMIC;
+            ds.descriptorCount = 1;
+            ds.pBufferInfo = &sbo_info_material;
         }
 
         vkUpdateDescriptorSets(vk->getDevice(), data_set.size(),
@@ -2108,5 +2161,32 @@ VertexDescription GEVulkanDrawCall::getDefaultVertexDescription() const
 
     return vertex_description;
 }   // getDefaultVertexDescription
+
+// ----------------------------------------------------------------------------
+void GEVulkanDrawCall::addLightNode(irr::scene::ILightSceneNode* node)
+{
+    if (!m_light_handler)
+        return;
+    if (node->getLightType() == irr::video::ELT_DIRECTIONAL)
+    {
+        // Sun node
+        m_light_handler->addLightNode(node);
+    }
+    else
+    {
+        const video::SLight& l = node->getLightData();
+        if (m_culling_tool->isCulled(l.Position, l.Radius))
+            return;
+        m_light_handler->addLightNode(node);
+    }
+}   // addLightNode
+
+// ----------------------------------------------------------------------------
+size_t GEVulkanDrawCall::getLightDataOffset() const
+{
+    size_t ubo_size = sizeof(GEVulkanCameraUBO);
+    return ubo_size +
+        getPadding(ubo_size, m_limits.minUniformBufferOffsetAlignment);
+}   // getLightDataOffset
 
 }

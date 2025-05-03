@@ -15,6 +15,7 @@
 #include "ge_vulkan_texture_descriptor.hpp"
 
 #include "IBillboardSceneNode.h"
+#include "ILightSceneNode.h"
 #include <sstream>
 
 namespace GE
@@ -235,6 +236,13 @@ irr::u32 GEVulkanSceneManager::registerNodeForRendering(
     if (node->getType() == irr::scene::ESNT_SKY_BOX)
     {
         m_draw_calls.at(cam)->addSkyBox(node);
+        return 1;
+    }
+
+    if (node->getType() == irr::scene::ESNT_LIGHT)
+    {
+        m_draw_calls.at(cam)->addLightNode(
+            static_cast<irr::scene::ILightSceneNode*>(node));
         return 1;
     }
 
