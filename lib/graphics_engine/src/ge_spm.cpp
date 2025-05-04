@@ -99,4 +99,14 @@ s32 GESPM::getJointIDWithArm(const c8* name, unsigned* arm_id) const
     return -1;
 }   // getJointIDWithArm
 
+// ----------------------------------------------------------------------------
+void GESPM::removeMeshBuffer(u32 nr)
+{
+    if (nr < m_buffer.size())
+    {
+        m_buffer[nr]->drop();
+        m_buffer.erase(m_buffer.begin() + nr);
+    }
+}   // removeMeshBuffer
+
 }
