@@ -532,15 +532,6 @@ GEVulkanDriver::GEVulkanDriver(const SIrrlichtCreationParameters& params,
     g_paused_rendering.store(false);
     g_device_created.store(true);
 
-#if defined(__APPLE__)
-    MVKConfiguration cfg = {};
-    size_t cfg_size = sizeof(MVKConfiguration);
-    vkGetMoltenVKConfigurationMVK(VK_NULL_HANDLE, &cfg, &cfg_size);
-    // Enable to allow binding all textures at once
-    cfg.useMetalArgumentBuffers = MVK_CONFIG_USE_METAL_ARGUMENT_BUFFERS_ALWAYS;
-    vkSetMoltenVKConfigurationMVK(VK_NULL_HANDLE, &cfg, &cfg_size);
-#endif
-
     createInstance(window);
 
 #if !defined(__APPLE__) || defined(DLOPEN_MOLTENVK)
@@ -789,8 +780,8 @@ void GEVulkanDriver::createInstance(SDL_Window* window)
     std::vector<VkLayerProperties> available_layers(layer_count);
     vkEnumerateInstanceLayerProperties(&layer_count, available_layers.data());
 
-    VkInstanceCreateInfo create_info = {};
     std::vector<const char*> enabled_validation_layers;
+    void* next_chain = NULL;
 
 #ifdef ENABLE_VALIDATION
     g_debug_print = true;
@@ -812,8 +803,27 @@ void GEVulkanDriver::createInstance(SDL_Window* window)
     validation_features.enabledValidationFeatureCount =
         enabled_validation_features.size();
 
-    create_info.pNext = &validation_features;
+    next_chain = &validation_features;
     extensions.push_back(VK_EXT_DEBUG_UTILS_EXTENSION_NAME);
+#endif
+
+#if defined(__APPLE__)
+    // We need these to persist until after vkCreateInstance
+    static VkLayerSettingsCreateInfoEXT layer_settings_create_info = {};
+    static VkBool32 setting_false = VK_FALSE;
+    static VkLayerSettingEXT setting = {};
+    setting.pLayerName = "MoltenVK";
+    setting.pSettingName = "MVK_CONFIG_USE_METAL_ARGUMENT_BUFFERS";
+    setting.type = VK_LAYER_SETTING_TYPE_BOOL32_EXT;
+    setting.pValues = &setting_false;
+    setting.valueCount = 1;
+
+    layer_settings_create_info.sType = VK_STRUCTURE_TYPE_LAYER_SETTINGS_CREATE_INFO_EXT;
+    layer_settings_create_info.settingCount = 1;
+    layer_settings_create_info.pSettings = &setting;
+    layer_settings_create_info.pNext = next_chain;
+    next_chain = &layer_settings_create_info;
+    extensions.push_back(VK_EXT_LAYER_SETTINGS_EXTENSION_NAME);
 #endif
 
     VkApplicationInfo app_info = {};
@@ -823,9 +833,11 @@ void GEVulkanDriver::createInstance(SDL_Window* window)
         // Implementations that support Vulkan 1.1 or later must not return VK_ERROR_INCOMPATIBLE_DRIVER for any value of apiVersion.
         app_info.apiVersion = VK_API_VERSION_1_2;
     }
+    VkInstanceCreateInfo create_info = {};
     create_info.sType = VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO;
     create_info.enabledExtensionCount = extensions.size();
     create_info.ppEnabledExtensionNames = extensions.data();
+    create_info.pNext = next_chain;
     create_info.pApplicationInfo = &app_info;
     create_info.enabledLayerCount = enabled_validation_layers.size();
     create_info.ppEnabledLayerNames = enabled_validation_layers.data();
