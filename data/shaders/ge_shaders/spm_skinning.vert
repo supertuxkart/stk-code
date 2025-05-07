@@ -31,7 +31,7 @@ void main()
     f_hue_change = u_object_buffer.m_objects[gl_InstanceIndex].m_hue_change;
 #ifdef PBR_ENABLED
     vec4 skinned_normal = joint_matrix * v_normal;
-    vec4 skinned_tangent = joint_matrix * v_tangent;
+    vec4 skinned_tangent = joint_matrix * vec4(v_tangent.xyz, 0.0);
     vec3 world_normal = rotateVector(u_object_buffer.m_objects[gl_InstanceIndex].m_rotation, skinned_normal.xyz);
     vec3 world_tangent = rotateVector(u_object_buffer.m_objects[gl_InstanceIndex].m_rotation, skinned_tangent.xyz);
 
