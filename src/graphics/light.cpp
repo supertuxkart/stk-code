@@ -31,6 +31,7 @@ LightNode::LightNode(scene::ISceneManager* mgr, scene::ISceneNode* parent, float
     m_color[0] = r;
     m_color[1] = g;
     m_color[2] = b;
+    m_spotlight = {};
 
 #ifdef __LIGHT_NODE_VISUALISATION__
     m_viz_added = false;

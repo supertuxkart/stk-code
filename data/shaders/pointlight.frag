@@ -9,6 +9,7 @@ flat in vec3 center;
 flat in float energy;
 flat in vec3 col;
 flat in float radius;
+flat in vec4 direction_scale_offset;
 
 #ifdef GL_ES
 layout (location = 0) out vec4 Diff;
@@ -40,6 +41,21 @@ void main()
     float d = distance(light_pos, xpos.xyz);
     float att = energy * 20. / (1. + d * d);
     att *= (radius - d) / radius;
+    if (att <= 0.) discard;
+
+    // Spotlight
+    float sscale = direction_scale_offset.z;
+    if (sscale != 0.)
+    {
+        vec3 sdir = vec3(direction_scale_offset.xy, 0.);
+        sdir.z = sqrt(1. - dot(sdir, sdir)) * sign(sscale);
+        sdir = (u_view_matrix * vec4(sdir, 0.0)).xyz;
+        vec3 light_to_frag = light_pos - xpos.xyz;
+        float offset = direction_scale_offset.w;
+        float sattenuation = clamp(dot(-sdir, normalize(light_to_frag)) *
+            abs(sscale) + offset, 0.0, 1.0);
+        att *= sattenuation * sattenuation;
+    }
     if (att <= 0.) discard;
 
     // Light Direction

@@ -28,6 +28,7 @@
 #include "graphics/b3d_mesh_loader.hpp"
 #include "graphics/irr_driver.hpp"
 #include "graphics/lod_node.hpp"
+#include "graphics/light.hpp"
 #include "graphics/material.hpp"
 #include "graphics/material_manager.hpp"
 #include "graphics/mesh_tools.hpp"
@@ -581,7 +582,7 @@ void HeadlightObject::setLight(scene::ISceneNode* parent,
                                           float energy, float radius)
 {
     bool is_vk = irr_driver->getVideoDriver()->getDriverType() == video::EDT_VULKAN;
-    if (is_vk && m_spotlight == 1)
+    if (m_spotlight == 1)
         energy *= 2.0f;
     m_node = irr_driver->addLight(core::vector3df(0.0f, 0.0f, 0.0f),
         energy, radius, m_headlight_color.getRed() / 255.f,
@@ -594,6 +595,13 @@ void HeadlightObject::setLight(scene::ISceneNode* parent,
         video::SLight& data = ln->getLightData();
         data.InnerCone = 30.0f / 180.0f * M_PI;
         data.OuterCone = 45.0f / 180.0f * M_PI;
+    }
+    else if (m_spotlight == 1)
+    {
+        LightNode* ln = static_cast<LightNode*>(m_node);
+        Spotlight& sl = ln->getSpotlightData();
+        sl.m_inner_cone = 30.0f / 180.0f * M_PI;
+        sl.m_outer_cone = 45.0f / 180.0f * M_PI;
     }
     m_node->grab();
 }   // setLight
@@ -733,12 +741,24 @@ bool KartModel::loadModels(const KartProperties &kart_properties)
 #ifndef SERVER_ONLY
         bool spotlight = spotlight_meshes.find(mesh) != spotlight_meshes.end();
         GE::GESPM* spm = dynamic_cast<GE::GESPM*>(mesh);
+        SP::SPMesh* spspm = dynamic_cast<SP::SPMesh*>(mesh);
         if (obj.getSpotlight() == -1)
         {
-            if (!spotlight && spm && handleSpotlight(spm))
+            if (spm)
             {
-                spotlight_meshes.insert(spm);
-                spotlight = true;
+                if (!spotlight && handleSpotlight(spm))
+                {
+                    spotlight_meshes.insert(spm);
+                    spotlight = true;
+                }
+            }
+            else if (spspm)
+            {
+                if (!spotlight && handleSPSpotlight(spspm))
+                {
+                    spotlight_meshes.insert(spspm);
+                    spotlight = true;
+                }
             }
             obj.setSpotlight(spotlight);
         }
@@ -1466,3 +1486,25 @@ bool KartModel::handleSpotlight(GE::GESPM* spm)
     return spotlight;
 #endif
 }   // handleSpotlight
+
+// ----------------------------------------------------------------------------
+bool KartModel::handleSPSpotlight(SP::SPMesh* spm)
+{
+    unsigned count = spm->getMeshBufferCount();
+    bool spotlight = false;
+    for (int i = count - 1; i >= 0; i--)
+    {
+        SP::SPMeshBuffer* b = static_cast<SP::SPMeshBuffer*>(spm->getMeshBuffer(i));
+        const auto& materials = b->getAllSTKMaterials();
+        for (unsigned i = 0; i < materials.size(); i++)
+        {
+            Material* m = materials[i];
+            if (m && m->getSamplerPath(0).find("stk_conelight_a.png") != std::string::npos)
+            {
+                spotlight = true;
+                b->disableForMaterial(i);
+            }
+        }
+    }
+    return spotlight;
+}   // handleSPSpotlight

@@ -6,6 +6,7 @@ flat in vec3 center;
 flat in float energy;
 flat in vec3 col;
 flat in float radius;
+flat in vec4 direction_scale_offset;
 
 out vec4 Fog;
 
@@ -34,11 +35,33 @@ void main()
     vec3 fog_factor = light_col * density * stepsize * energy * 20.;
     vec3 xpos_step = eyedir * stepsize;
 
+    // Spotlight direction calculation
+    float sscale = direction_scale_offset.z;
+    vec3 sdir;
+    if (sscale != 0.)
+    {
+        sdir = vec3(direction_scale_offset.xy, 0.);
+        sdir.z = sqrt(1. - dot(sdir, sdir)) * sign(sscale);
+        sdir = (u_view_matrix * vec4(sdir, 0.0)).xyz;
+    }
+
     for (int i = 0; i < 16; i++)
     {
-        float d = distance(light_pos, xpos);
+        vec3 light_to_pos = light_pos - xpos;
+        float d = length(light_to_pos);
         float l = (16. - float(i)) * stepsize;
-        fog += fog_factor / (1. + d * d) * max((radius - d) / radius, 0.) * exp(- density * d) * exp(- density * l);
+        vec3 base_att = fog_factor / (1. + d * d) * max((radius - d) / radius, 0.) * exp(- density * d) * exp(- density * l);
+
+        // Apply spotlight attenuation
+        if (sscale != 0.)
+        {
+            float offset = direction_scale_offset.w;
+            float sattenuation = clamp(dot(-sdir, normalize(light_to_pos)) *
+                                 abs(sscale) + offset, 0.0, 1.0);
+            base_att *= sattenuation * sattenuation;
+        }
+
+        fog += base_att;
         xpos += xpos_step;
     }
 

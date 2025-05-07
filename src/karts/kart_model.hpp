@@ -32,6 +32,7 @@ namespace irr
 }
 using namespace irr;
 namespace GE { class GERenderInfo; class GESPM; }
+namespace SP { class SPMesh; }
 
 #include "utils/no_copy.hpp"
 #include "utils/vec3.hpp"
@@ -349,6 +350,8 @@ private:
     }
     // ------------------------------------------------------------------------
     bool handleSpotlight(GE::GESPM* spm);
+    // ------------------------------------------------------------------------
+    bool handleSPSpotlight(SP::SPMesh* spm);
 
 public:
                   KartModel(bool is_master);
