@@ -173,7 +173,7 @@ void MaxSpeed::instantSpeedIncrease(unsigned int category,
     // This will result in all max speed settings updated, but no
     // changes to any slow downs since dt=0
     update(0);
-    float speed = std::min(m_kart->getSpeed()+ speed_boost,
+    float speed = std::min(m_kart->getSpeed() + speed_boost,
                            getCurrentMaxSpeed() );
 
     // If there is a min_speed defined, make sure that the kart is still
@@ -182,7 +182,6 @@ void MaxSpeed::instantSpeedIncrease(unsigned int category,
     if(speed < m_min_speed) speed = m_min_speed;
 
     m_kart->getVehicle()->setMinSpeed(speed);
-
 }   // instantSpeedIncrease
 
 // ----------------------------------------------------------------------------
@@ -441,6 +440,10 @@ void MaxSpeed::update(int ticks)
     {
         m_kart->getVehicle()->setMinSpeed(m_min_speed);
     }
+    // FIXME: setMinSpeed only updates the value if the new value is greater,
+    // so the following code doesn't really do anything?
+    // There is probably a reason for the behavior of setMinSpeed, but the code
+    // should be redesigned to make it less confusing...
     else 
         m_kart->getVehicle()->setMinSpeed(0);   // no additional acceleration
 
