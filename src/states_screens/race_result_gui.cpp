@@ -1945,7 +1945,7 @@ int RaceResultGUI::displayHighscores(int x, int y, bool increase_density)
         scores->getEntry(i, kart_name, player_name, &time);
         if (player_name.size() > max_characters)
         {
-            int begin = (int(m_timer / 0.4f)) % (player_name.size() - max_characters);
+            int begin = (int(m_timer / 0.4f)) % (player_name.size() - max_characters + 1);
             player_name = player_name.subString(begin, max_characters, false);
         }
 
