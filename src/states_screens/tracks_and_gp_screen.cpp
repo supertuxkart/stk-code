@@ -51,31 +51,35 @@ static const char ALL_TRACK_GROUPS_ID[] = "all";
 void TracksAndGPScreen::eventCallback(Widget* widget, const std::string& name,
                                  const int playerID)
 {
-    // -- track selection screen
-    if (name == "tracks")
+    // -- track selection screen / random track button
+    if (name == "tracks" || name == "random_track")
     {
-        DynamicRibbonWidget* w2 = dynamic_cast<DynamicRibbonWidget*>(widget);
-        if(!w2) return;
-
-        std::string selection = w2->getSelectionIDString(PLAYER_ID_GAME_MASTER);
-        if (UserConfigParams::logGUI())
+        std::string selection;
+        if (name == "tracks")
         {
-            Log::info("TracksAndGPScreen", "Clicked on track '%s'.",
-                       selection.c_str());
+            DynamicRibbonWidget* w2 = dynamic_cast<DynamicRibbonWidget*>(widget);
+            if(!w2) return;
+
+            selection = w2->getSelectionIDString(PLAYER_ID_GAME_MASTER);
+            if (UserConfigParams::logGUI())
+            {
+                Log::info("TracksAndGPScreen", "Clicked on track '%s'.",
+                           selection.c_str());
+            }
+
+            UserConfigParams::m_last_track = selection;
+            if (selection == "locked" && RaceManager::get()->getNumLocalPlayers() == 1)
+            {
+                unlock_manager->playLockSound();
+                return;
+            }
+            else if (selection == RibbonWidget::NO_ITEM_ID)
+            {
+                return;
+            }
         }
 
-        UserConfigParams::m_last_track = selection;
-        if (selection == "locked" && RaceManager::get()->getNumLocalPlayers() == 1)
-        {
-            unlock_manager->playLockSound();
-            return;
-        }
-        else if (selection == RibbonWidget::NO_ITEM_ID)
-        {
-            return;
-        }
-
-        if (selection == "random_track")
+        if (selection == "random_track" || name == "random_track")
         {
             if (m_random_track_list.empty()) return;
 
