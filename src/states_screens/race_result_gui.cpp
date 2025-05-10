@@ -1952,7 +1952,7 @@ int RaceResultGUI::displayHighscores(int x, int y, bool increase_density)
             find_length_start:
             int substring_test_length = (int)((float)player_name.size() / width_ratio);
             unsigned int max_substring_width = 0;
-            for (uint i=0; i<(player_name.size() - substring_test_length + 1); i++)
+            for (unsigned int i=0; i<(player_name.size() - substring_test_length + 1); i++)
             {
                 irr::core::stringw test_substring = player_name.subString(i, substring_test_length, false);
                 max_substring_width = std::max(max_substring_width,
