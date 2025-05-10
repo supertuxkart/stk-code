@@ -1931,21 +1931,50 @@ int RaceResultGUI::displayHighscores(int x, int y, bool increase_density)
     std::string kart_name;
     irr::core::stringw player_name;
 
-    // prevent excessive long name
-    unsigned int max_characters = 15;
-    unsigned int max_width = (UserConfigParams::m_width / 2 - 200) / 10;
-    if (max_width < 15)
-        max_characters = max_width;
-
+    const float SCORE_X_RATIO = 0.85f;
     int width_icon_adjusted = increase_density ? m_width_icon * 0.8f : m_width_icon;
+
+    // Used to prevent excessively long names
+    unsigned int max_width = (int)((float)UserConfigParams::m_width * (SCORE_X_RATIO - 0.65f))
+                             - width_icon_adjusted - 20;
 
     float time;
     for (int i = 0; i < scores->getNumberEntries(); i++)
     {
         scores->getEntry(i, kart_name, player_name, &time);
-        if (player_name.size() > max_characters)
+        float width_ratio = (float)GUIEngine::getSmallFont()->getDimension(player_name.c_str()).Width / (float)max_width;
+        unsigned int max_characters = 30;
+        if (player_name.size() > max_characters || width_ratio >= 1.0f)
         {
-            int begin = (int(m_timer / 0.4f)) % (player_name.size() - max_characters + 1);
+            // Different parts of a name can have different width properties:
+            // - We could assume all the characters are large, but that can waste a lot of space
+            // - Instead, we do some extra computations to use more space while avoiding overflows
+            find_length_start:
+            int substring_test_length = (int)((float)player_name.size() / width_ratio);
+            unsigned int max_substring_width = 0;
+            for (uint i=0; i<(player_name.size() - substring_test_length + 1); i++)
+            {
+                irr::core::stringw test_substring = player_name.subString(i, substring_test_length, false);
+                max_substring_width = std::max(max_substring_width,
+                                        GUIEngine::getSmallFont()->getDimension(test_substring.c_str()).Width);
+            }
+            float substring_overflow_factor = ((float)max_substring_width / (float)max_width);
+            // If the initial estimate was really off, we refine our estimate
+            if (substring_overflow_factor > 1.1f)
+            {
+                width_ratio *= substring_overflow_factor;
+                goto find_length_start;
+            }
+
+            float overflow_factor = substring_overflow_factor * width_ratio * 1.01f;
+            max_characters = (unsigned int)((float)player_name.size() / overflow_factor);
+            int overflow_chars = player_name.size() - max_characters;
+
+            // Add 1 to the divisor to ensure the last character is displayed, and add 2 for pauses
+            int begin = (int(m_timer / 0.4f)) % (overflow_chars + 3) - 1;
+            if (begin == -1) begin = 0; // Pause at the start
+            if (begin == overflow_chars + 1) begin = overflow_chars; // Pause at the end
+
             player_name = player_name.subString(begin, max_characters, false);
         }
 
@@ -1986,7 +2015,7 @@ int RaceResultGUI::displayHighscores(int x, int y, bool increase_density)
             core::recti(current_x, current_y, current_x + 150, current_y + 10),
                 text_color, false, false, NULL, true /* ignoreRTL */);
 
-        current_x = (int)(UserConfigParams::m_width * 0.85f);
+        current_x = (int)(UserConfigParams::m_width * SCORE_X_RATIO);
 
         // Finally draw the time
         std::string highscore_string;
