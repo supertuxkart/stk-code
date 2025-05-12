@@ -51,8 +51,21 @@ static const char ALL_TRACK_GROUPS_ID[] = "all";
 void TracksAndGPScreen::eventCallback(Widget* widget, const std::string& name,
                                  const int playerID)
 {
-    // -- track selection screen / random track button
-    if (name == "tracks" || name == "random_track")
+    // random track button
+    if (name == "random_track")
+    {
+        if (m_random_track_list.empty()) return;
+
+        std::string selection = m_random_track_list.front();
+        m_random_track_list.pop_front();
+        m_random_track_list.push_back(selection);
+
+        TrackInfoScreen::getInstance()->setTrack(track_manager->getTrack(selection));
+        TrackInfoScreen::getInstance()->push();  
+    }   // name=="random_track"
+
+    // -- track selection screen
+    else if (name == "tracks")
     {
         std::string selection;
         if (name == "tracks")
@@ -79,15 +92,6 @@ void TracksAndGPScreen::eventCallback(Widget* widget, const std::string& name,
             }
         }
 
-        if (selection == "random_track" || name == "random_track")
-        {
-            if (m_random_track_list.empty()) return;
-
-            selection = m_random_track_list.front();
-            m_random_track_list.pop_front();
-            m_random_track_list.push_back(selection);
-
-        }   // selection=="random_track"
         Track *track = track_manager->getTrack(selection);
 
         if (track)
@@ -365,10 +369,6 @@ void TracksAndGPScreen::buildTrackList()
             m_random_track_list.push_back(curr->getIdent());
         }
     }
-
-    tracks_widget->addItem(_("Random Track"), "random_track",
-                           "/gui/icons/track_random.png", 0 /* no badge */,
-                           IconButtonWidget::ICON_PATH_TYPE_RELATIVE);
 
     tracks_widget->updateItemDisplay();
     std::random_shuffle( m_random_track_list.begin(), m_random_track_list.end() );
