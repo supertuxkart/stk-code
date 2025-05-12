@@ -43,6 +43,7 @@ LabelWidget::LabelWidget(LabelType type) : Widget(WTYPE_LABEL)
     m_per_character_size = 0;
     m_scroll_offset = 0;
     m_expand_if_needed = false;
+    m_word_wrap = false;
 
     if (m_type == BRIGHT)
     {
@@ -61,7 +62,7 @@ LabelWidget::LabelWidget(LabelType type) : Widget(WTYPE_LABEL)
 void LabelWidget::add()
 {
     rect<s32> widget_size = rect<s32>(m_x, m_y, m_x + m_w, m_y + m_h);
-    const bool word_wrap = m_properties[PROP_WORD_WRAP] == "true";
+    m_word_wrap = m_properties[PROP_WORD_WRAP] == "true";
     stringw message = getText();
 
     EGUI_ALIGNMENT align = EGUIA_UPPERLEFT;
@@ -78,12 +79,12 @@ void LabelWidget::add()
         IGUIElement* container = GUIEngine::getGUIEnv()->addButton(widget_size, m_parent, -1);
         core::rect<s32> r(core::position2di(0,0), widget_size.getSize());
         irrwidget = GUIEngine::getGUIEnv()->addStaticText(message.c_str(), r,
-                                                          false, word_wrap, /*m_parent*/ container, -1);
+                                                          false, m_word_wrap, /*m_parent*/ container, -1);
     }
     else
     {
         irrwidget = GUIEngine::getGUIEnv()->addStaticText(message.c_str(), widget_size,
-                                                          false, word_wrap, m_parent, -1);
+                                                          false, m_word_wrap, m_parent, -1);
         irrwidget->setTextRestrainedInside(false);
     }
 
@@ -126,6 +127,8 @@ void LabelWidget::add()
 
     if (!m_is_visible)
         m_element->setVisible(false);
+
+    resize();
 }   // add
 
 // ----------------------------------------------------------------------------
@@ -200,7 +203,24 @@ void LabelWidget::setScrollSpeed(float speed)
 
 void LabelWidget::resize()
 {
+    // Reduce the font size of normal text if it overflows
+    if ((m_type != TITLE && m_type != SMALL_TITLE && m_type != TINY_TITLE))
+    {
+        if( ((int)GUIEngine::getFont()->getDimension(m_text.c_str()).Width      >
+                            this->m_w) &&
+            ((int)GUIEngine::getFont()->getDimension(m_text.c_str()).Height * 2 > 
+                            this->m_h || !m_word_wrap) )
+        {
+            ((IGUIStaticText*)m_element)->setOverrideFont(GUIEngine::getSmallFont());
+        }
+        else
+        {
+            ((IGUIStaticText*)m_element)->setOverrideFont(NULL);
+        }
+    }
+
     m_per_character_size = getCurrentFont()->getDimension(L"X").Height;
+
     if (m_scroll_speed != 0)
     {
         rect<s32> widget_size = rect<s32>(m_x, m_y, m_x + m_w, m_y + m_h);
