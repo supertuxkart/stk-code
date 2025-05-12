@@ -118,6 +118,9 @@ namespace GUIEngine
         
         /** Call only if this spinner is graphical. Returns the current texture to display */
         irr::video::ITexture* getTexture();
+
+        /** Pick the appropriate font size to display the current spinner label */
+        void resizeLabel();
        
     public:
 
