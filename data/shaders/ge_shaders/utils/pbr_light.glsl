@@ -113,27 +113,30 @@ vec3 accumulateLights(vec3 diffuse_color, vec3 normal, vec3 xpos, vec3 eyedir,
         float distance_sq = dot(light_to_frag, light_to_frag);
         if (distance_sq * invrange > 1.)
             continue;
+        // SpotLight
+        float sattenuation = 1.;
+        float sscale = u_global_light.m_lights[i].m_direction_scale_offset.z;
         float distance = sqrt(distance_sq);
         float distance_inverse = 1. / distance;
         vec3 L = light_to_frag * distance_inverse;
-        vec3 diffuse_specular = PBRLight(normal, eyedir, L, diffuse_color,
-            perceptual_roughness, metallic);
-        float attenuation = 20. / (1. + distance_sq);
-        float radius = u_global_light.m_lights[i].m_position_radius.w;
-        attenuation *= (radius - distance) / radius;
-        // SpotLight
-        float sscale = u_global_light.m_lights[i].m_direction_scale_offset.z;
         if (sscale != 0.)
         {
             vec3 sdir =
                 vec3(u_global_light.m_lights[i].m_direction_scale_offset.xy, 0.);
             sdir.z = sqrt(1. - dot(sdir, sdir)) * sign(sscale);
             sdir = (u_camera.m_view_matrix * vec4(sdir, 0.0)).xyz;
-            float sattenuation = clamp(dot(-sdir, normalize(light_to_frag)) *
+            sattenuation = clamp(dot(-sdir, L) *
                 abs(sscale) +
                 u_global_light.m_lights[i].m_direction_scale_offset.w, 0.0, 1.0);
-            attenuation *= sattenuation * sattenuation;
+            if (sattenuation == 0.)
+                continue;
         }
+        vec3 diffuse_specular = PBRLight(normal, eyedir, L, diffuse_color,
+            perceptual_roughness, metallic);
+        float attenuation = 20. / (1. + distance_sq);
+        float radius = u_global_light.m_lights[i].m_position_radius.w;
+        attenuation *= (radius - distance) / radius;
+        attenuation *= sattenuation * sattenuation;
         vec3 light_color =
             u_global_light.m_lights[i].m_color_inverse_square_range.xyz;
         accumulated_color += light_color * attenuation * diffuse_specular;

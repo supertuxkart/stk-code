@@ -38,11 +38,14 @@ void main()
     pseudocenter /= pseudocenter.w;
     vec3 light_pos = pseudocenter.xyz;
     vec3 light_col = col.xyz;
-    float d = distance(light_pos, xpos.xyz);
+    vec3 light_to_frag = light_pos - xpos.xyz;
+    float d = length(light_to_frag);
     float att = energy * 20. / (1. + d * d);
     att *= (radius - d) / radius;
     if (att <= 0.) discard;
 
+    // Light Direction
+    vec3 L = light_to_frag / d;
     // Spotlight
     float sscale = direction_scale_offset.z;
     if (sscale != 0.)
@@ -50,16 +53,13 @@ void main()
         vec3 sdir = vec3(direction_scale_offset.xy, 0.);
         sdir.z = sqrt(1. - dot(sdir, sdir)) * sign(sscale);
         sdir = (u_view_matrix * vec4(sdir, 0.0)).xyz;
-        vec3 light_to_frag = light_pos - xpos.xyz;
         float offset = direction_scale_offset.w;
-        float sattenuation = clamp(dot(-sdir, normalize(light_to_frag)) *
+        float sattenuation = clamp(dot(-sdir, L) *
             abs(sscale) + offset, 0.0, 1.0);
+        if (sattenuation == 0.)
+            discard;
         att *= sattenuation * sattenuation;
     }
-    if (att <= 0.) discard;
-
-    // Light Direction
-    vec3 L = (light_pos - xpos.xyz) / d;
 
     float NdotL = clamp(dot(norm, L), 0., 1.);
     vec3 Specular = SpecularBRDF(norm, eyedir, L, vec3(1.), roughness);
