@@ -18,13 +18,13 @@
                 <div width="95%" height="1f" layout="horizontal-row" align="center">
                     <label text="Kart Class" align="center" I18N="In karts selection screen, determine the kart group shown on the list"/>
                     <spacer width="1%" />
-                    <spinner id="kart_class" proportion="2" align="center" min_value="0" wrap_around="true"/>
-                    <spacer width="3%"/>
-                    <textbox proportion="3" id="search" align="center"/>
-                    <spacer width="3%"/>
+                    <spinner id="kart_class" proportion="23" align="center" min_value="0" wrap_around="true"/>
+                    <spacer width="2%"/>
+                    <textbox proportion="16" id="search" align="center"/>
+                    <spacer width="2%"/>
                     <checkbox id="favorite"/>
                     <spacer width="1%"/>
-                    <label width="fit" height="100%" I18N="In the track and grand prix selection screen" text="Edit favorite karts"/>
+                    <label proportion="31" height="100%" I18N="In the track and grand prix selection screen" text="Edit favorite karts"/>
                 </div>
                 <spacer height="3%"/>
                 <div width="100%" proportion="1" layout="horizontal-row" align="center">

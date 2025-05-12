@@ -18,39 +18,39 @@
                 <spacer width="100%" height="1%" />
 
                 <div width="100%" height="16%" layout="horizontal-row" >
-                    <header width="35%" height="100%" I18N="In the track and grand prix selection screen" text="All Tracks"
+                    <small-header width="35%" height="100%" I18N="In the track and grand prix selection screen" text="All Tracks"
                             align="center" text_align="center" />
-                    <textbox width="30%" align="center" id="search"/>
+                    <textbox width="22%" align="center" id="search"/>
 
-                    <spacer width="3%"/>
+                    <spacer width="2%"/>
 
-                    <div width="fit" height="100%" layout="horizontal-row" align="center">
-                        <checkbox id="favorite" align="center"/>
-                        <spacer width="5%"/>
-                        <tiny-header width="fit" height="100%" I18N="In the track and grand prix selection screen" text="Edit favorite tracks"/>
-                    </div>
+                    <checkbox id="favorite" align="center"/>
+                    <spacer width="1%"/>
+                    <tiny-header width="36%" height="100%" I18N="In the track and grand prix selection screen" text="Edit favorite tracks"/>
                 </div>
             </div>
 
-            <spacer width="2%" height="20" />
+            <spacer width="1%" height="20" />
 
-            <div width="16%" height="100%" layout="vertical-row">
+            <div width="17%" height="100%" layout="vertical-row">
                 <spacer width="20" height="2%" />
                 <box width="100%" height="48%" layout="vertical-row" padding="0">
+                    <spacer width="20" height="2%" />
                     <!-- The icon-button doesn't properly reserve space for the label, so we use a separate label -->
-                    <icon-button id="rand-gp" width="100%" height="70%" icon="gui/icons/gp_new.png" align="center">
-                    <spacer width="20" height="1%" />
-                    <label width="100%" height="25%" I18N="In the track and grand prix selection screen"
+                    <icon-button id="rand-gp" width="100%" height="66%" icon="gui/icons/gp_new.png" align="center">
+                    <spacer width="20" height="2%" />
+                    <label width="96%" height="25%" I18N="In the track and grand prix selection screen"
                                 text="Random Grand Prix" word_wrap="true" align="center" text_align="center"/>
-                    <spacer width="20" height="4%" />
+                    <spacer width="20" height="5%" />
                 </box>
                 <spacer width="20" height="2%" />
                 <box width="100%" height="48%" layout="vertical-row" padding="0">
-                    <icon-button id="random_track" width="100%" height="70%" icon="gui/icons/track_random.png"/>
-                    <spacer width="20" height="1%" />
-                    <label width="100%" height="25%" I18N="In the track and grand prix selection screen"
+                    <spacer width="20" height="2%" />
+                    <icon-button id="random_track" width="100%" height="66%" icon="gui/icons/track_random.png"/>
+                    <spacer width="20" height="2%" />
+                    <label width="96%" height="25%" I18N="In the track and grand prix selection screen"
                                 text="Random Track" word_wrap="true" align="center" text_align="center"/>
-                    <spacer width="20" height="4%" />
+                    <spacer width="20" height="5%" />
                 </box>
             </div>
         </div>
