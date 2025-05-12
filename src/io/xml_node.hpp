@@ -99,6 +99,7 @@ public:
     int getHPR(Vec3 *value) const;
 
     bool hasChildNamed(const char* name) const;
+    const std::string& getFilename() const { return m_file_name; }
 
     /** Handy functions to test the bit pattern returned by get(vector3df*).*/
     static bool hasX(int b) { return (b&1)==1; }

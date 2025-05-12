@@ -1041,6 +1041,33 @@ TrackObjectPresentationLight::TrackObjectPresentationLight(
     {
         m_node = NULL; // lights require shaders to work
     }
+
+    std::string type = "point";
+    xml_node.get("type", &type);
+    float inner_cone = 0.0f;
+    float outer_cone = 0.0f;
+    xml_node.get("inner-cone", &inner_cone);
+    xml_node.get("outer-cone", &outer_cone);
+    if (type != "spot" || (inner_cone == 0.0f && outer_cone == 0.0f))
+        return;
+
+    LightNode* lnode = dynamic_cast<LightNode*>(m_node);
+    if (lnode != NULL)
+    {
+        Spotlight& sl = lnode->getSpotlightData();
+        sl.m_inner_cone = inner_cone;
+        sl.m_outer_cone = outer_cone;
+        return;
+    }
+    scene::ILightSceneNode* irr_node = dynamic_cast<scene::ILightSceneNode*>(
+        m_node);
+    if (irr_node != NULL)
+    {
+        irr_node->setLightType(video::ELT_SPOT);
+        video::SLight& data = irr_node->getLightData();
+        data.InnerCone = inner_cone;
+        data.OuterCone = outer_cone;
+    }
 }   // TrackObjectPresentationLight
 
 // ----------------------------------------------------------------------------
