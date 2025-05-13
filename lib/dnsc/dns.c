@@ -4063,129 +4063,19 @@ static const struct dns_rrtype {
 	size_t (*print)();
 	size_t (*cname)();
 } dns_rrtypes[]	= {
-	{
-		DNS_T_A,
-		"A",
-		0,
-		(int (*)(void))&dns_a_parse,
-		(int (*)(void))&dns_a_push,
-		(int (*)(void))&dns_a_cmp,
-		(size_t (*)(void))&dns_a_print,
-		0
-	},
-	{
-		DNS_T_AAAA,
-		"AAAA",
-		0,
-		(int (*)(void))&dns_aaaa_parse,
-		(int (*)(void))&dns_aaaa_push,
-		(int (*)(void))&dns_aaaa_cmp,
-		(size_t (*)(void))&dns_aaaa_print,
-		0
-	},
-	{
-		DNS_T_MX,
-		"MX",
-		0,
-		(int (*)(void))&dns_mx_parse,
-		(int (*)(void))&dns_mx_push,
-		(int (*)(void))&dns_mx_cmp,
-		(size_t (*)(void))&dns_mx_print,
-		(size_t (*)(void))&dns_mx_cname
-	},
-	{
-		DNS_T_NS,
-		"NS",
-		0,
-		(int (*)(void))&dns_ns_parse,
-		(int (*)(void))&dns_ns_push,
-		(int (*)(void))&dns_ns_cmp,
-		(size_t (*)(void))&dns_ns_print,
-		(size_t (*)(void))&dns_ns_cname
-	},
-	{
-		DNS_T_CNAME,
-		"CNAME",
-		0,
-		(int (*)(void))&dns_cname_parse,
-		(int (*)(void))&dns_cname_push,
-		(int (*)(void))&dns_cname_cmp,
-		(size_t (*)(void))&dns_cname_print,
-		(size_t (*)(void))&dns_cname_cname
-	},
-	{
-		DNS_T_SOA,
-		"SOA",
-		0,
-		(int (*)(void))&dns_soa_parse,
-		(int (*)(void))&dns_soa_push,
-		(int (*)(void))&dns_soa_cmp,
-		(size_t (*)(void))&dns_soa_print,
-		0
-	},
-	{
-		DNS_T_SRV,
-		"SRV",
-		0,
-		(int (*)(void))&dns_srv_parse,
-		(int (*)(void))&dns_srv_push,
-		(int (*)(void))&dns_srv_cmp,
-		(size_t (*)(void))&dns_srv_print,
-		(size_t (*)(void))&dns_srv_cname
-	},
-	{
-		DNS_T_OPT,
-		"OPT",
-		&dns_opt_initany,
-		(int (*)(void))&dns_opt_parse,
-		(int (*)(void))&dns_opt_push,
-		(int (*)(void))&dns_opt_cmp,
-		(size_t (*)(void))&dns_opt_print,
-		0
-	},
-	{
-		DNS_T_PTR,
-		"PTR",
-		0,
-		(int (*)(void))&dns_ptr_parse,
-		(int (*)(void))&dns_ptr_push,
-		(int (*)(void))&dns_ptr_cmp,
-		(size_t (*)(void))&dns_ptr_print,
-		(size_t (*)(void))&dns_ptr_cname
-	},
-	{
-		DNS_T_TXT,
-		"TXT",
-		&dns_txt_initany,
-		(int (*)(void))&dns_txt_parse,
-		(int (*)(void))&dns_txt_push,
-		(int (*)(void))&dns_txt_cmp,
-		(size_t (*)(void))&dns_txt_print,
-		0
-	},
-	{
-		DNS_T_SPF,
-		"SPF",
-		&dns_txt_initany,
-		(int (*)(void))&dns_txt_parse,
-		(int (*)(void))&dns_txt_push,
-		(int (*)(void))&dns_txt_cmp,
-		(size_t (*)(void))&dns_txt_print,
-		0
-	},
-	{
-		DNS_T_SSHFP,
-		"SSHFP",
-		0,
-		(int (*)(void))&dns_sshfp_parse,
-		(int (*)(void))&dns_sshfp_push,
-		(int (*)(void))&dns_sshfp_cmp,
-		(size_t (*)(void))&dns_sshfp_print,
-		0
-	},
-	{
-		DNS_T_AXFR, "AXFR", 0, 0, 0, 0, 0, 0
-	}
+	{ DNS_T_A,      "A",      0,                 &dns_a_parse,      &dns_a_push,      &dns_a_cmp,      &dns_a_print,      0,                },
+	{ DNS_T_AAAA,   "AAAA",   0,                 &dns_aaaa_parse,   &dns_aaaa_push,   &dns_aaaa_cmp,   &dns_aaaa_print,   0,                },
+	{ DNS_T_MX,     "MX",     0,                 &dns_mx_parse,     &dns_mx_push,     &dns_mx_cmp,     &dns_mx_print,     &dns_mx_cname,    },
+	{ DNS_T_NS,     "NS",     0,                 &dns_ns_parse,     &dns_ns_push,     &dns_ns_cmp,     &dns_ns_print,     &dns_ns_cname,    },
+	{ DNS_T_CNAME,  "CNAME",  0,                 &dns_cname_parse,  &dns_cname_push,  &dns_cname_cmp,  &dns_cname_print,  &dns_cname_cname, },
+	{ DNS_T_SOA,    "SOA",    0,                 &dns_soa_parse,    &dns_soa_push,    &dns_soa_cmp,    &dns_soa_print,    0,                },
+	{ DNS_T_SRV,    "SRV",    0,                 &dns_srv_parse,    &dns_srv_push,    &dns_srv_cmp,    &dns_srv_print,    &dns_srv_cname,   },
+	{ DNS_T_OPT,    "OPT",    &dns_opt_initany,  &dns_opt_parse,    &dns_opt_push,    &dns_opt_cmp,    &dns_opt_print,    0,                },
+	{ DNS_T_PTR,    "PTR",    0,                 &dns_ptr_parse,    &dns_ptr_push,    &dns_ptr_cmp,    &dns_ptr_print,    &dns_ptr_cname,   },
+	{ DNS_T_TXT,    "TXT",    &dns_txt_initany,  &dns_txt_parse,    &dns_txt_push,    &dns_txt_cmp,    &dns_txt_print,    0,                },
+	{ DNS_T_SPF,    "SPF",    &dns_txt_initany,  &dns_txt_parse,    &dns_txt_push,    &dns_txt_cmp,    &dns_txt_print,    0,                },
+	{ DNS_T_SSHFP,  "SSHFP",  0,                 &dns_sshfp_parse,  &dns_sshfp_push,  &dns_sshfp_cmp,  &dns_sshfp_print,  0,                },
+	{ DNS_T_AXFR,   "AXFR",   0,                 0,                 0,                0,               0,                 0,                },
 }; /* dns_rrtypes[] */
 
 static const struct dns_rrtype *dns_rrtype(enum dns_type type) {
