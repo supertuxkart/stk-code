@@ -455,7 +455,12 @@ void DynamicRibbonWidget::buildInternalStructure()
         m_left_widget->m_element->setVisible(true);
         m_right_widget->m_element->setVisible(true);
         // Reserve space for the scrolling arrows
-        target_width = target_width * 0.92f;
+        float arrows_width_ratio = 2.0f * ((float)m_arrows_w / col_width) / (float)m_col_amount;
+        if (arrows_width_ratio < 0.05f)
+            arrows_width_ratio = 0.05f;
+        if (arrows_width_ratio > 0.3f)
+            arrows_width_ratio = 0.3f;
+        target_width = target_width * (1.0f - arrows_width_ratio);
     }
 
     float target_height = target_width / aspect_ratio;
