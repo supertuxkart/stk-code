@@ -241,7 +241,7 @@ void DynamicRibbonWidget::updateForResizing()
   * \param[out] heightRatio   the proportion of max height that should be used
   */
 float DynamicRibbonWidget::estimateRowScore(const int rowCount, const int width, const int height,
-                         const float iconAspectRatio, const int maxIcons, float* heightRatio)
+                         const float iconAspectRatio, const int maxIcons, float* heightRatio, float capSize)
 {
     assert(height > 0);
 
@@ -307,6 +307,8 @@ float DynamicRibbonWidget::estimateRowScore(const int rowCount, const int width,
         }
 
         test_height_ratio -= 0.05f;
+        if (test_height_ratio < capSize)
+            break;
     } // while icon height > greatest icon height possible with another row
 
     return max_score_so_far;
@@ -319,6 +321,11 @@ void DynamicRibbonWidget::buildInternalStructure()
     // FIXME: The height of the tabs that are associated with a ribbon widget
     // don't change smoothly, as a result the available areas for the ribbon
     // icons may decrease when increasing screen height
+    int item_shown_target = m_item_count_hint;
+
+    if (item_shown_target < 1)
+        item_shown_target = (int) m_items.size();
+
     if (m_multi_row)
     {
         // determine row amount
@@ -333,21 +340,17 @@ void DynamicRibbonWidget::buildInternalStructure()
         else
         {
             float max_score_so_far = -1;
-            int item_count = m_item_count_hint;
-
-            if (item_count < 1)
-                item_count = (int) m_items.size();
 
             // No hint or actual number, so make assumptions
-            if (item_count < 1)      
-                item_count = 20;
+            if (item_shown_target < 1)      
+                item_shown_target = 20;
 
             for (int row_count = 1; row_count < 10; row_count++)
             {
                 float height_ratio;
                 // Get the best score for this number of rows
                 float score = estimateRowScore(row_count, m_w, m_h - m_label_height,
-                                               aspect_ratio, item_count, &height_ratio);
+                                               aspect_ratio, item_shown_target, &height_ratio);
 
                 if (score > max_score_so_far)
                 {
@@ -374,9 +377,16 @@ void DynamicRibbonWidget::buildInternalStructure()
             }
         }
     }
-    else
+    else // single-row
     {
-        // TODO: use the estimateRowScore logic to potentially downscale slightly the ribbon elements
+        // No hint or actual number, so make assumptions
+        if (item_shown_target < 1)      
+            item_shown_target = 5;
+
+        // Get the best score for this number of rows
+        estimateRowScore(1, m_w, m_h - m_label_height,
+                            aspect_ratio, item_shown_target, &m_size_ratio, 0.68f /* min size ratio */);
+        //Log::info("DynamicRibbonWidget", "The size ratio of the best score is %f.", m_size_ratio);
         m_row_amount = 1;
     }
 
@@ -411,8 +421,7 @@ void DynamicRibbonWidget::buildInternalStructure()
     // ---- determine column amount
     const float row_height = (float)(m_h - m_label_height)/(float)m_row_amount;
     float col_width = (float)(row_height * m_child_width / m_child_height);
-    if (m_multi_row) // not properly defined otherwise
-        col_width *= m_size_ratio;
+    col_width *= m_size_ratio;
 
     float target_width = col_width;
     
@@ -473,6 +482,14 @@ void DynamicRibbonWidget::buildInternalStructure()
         ribbon->m_h = (int)(row_height);
         ribbon->m_type = WTYPE_RIBBON;
 
+        // Do partial vertical centering for single-row ribbon icons
+        if (!m_multi_row)
+        {
+            float vertical_shift_factor = (1.0f - m_size_ratio) / 5.0f;
+            int vertical_shift = (int)(vertical_shift_factor * (float)row_height);
+            ribbon->m_y += vertical_shift;
+        }
+
         std::stringstream name;
         name << this->m_properties[PROP_ID] << "_row" << n;
         ribbon->m_properties[PROP_ID] = name.str();
@@ -489,8 +506,7 @@ void DynamicRibbonWidget::buildInternalStructure()
             // set size to get proper ratio (as most textures are saved scaled down to 256x256)
             icon->m_properties[PROP_WIDTH] = m_properties[PROP_CHILD_WIDTH];
             icon->m_properties[PROP_HEIGHT] = m_properties[PROP_CHILD_HEIGHT];
-            if (m_multi_row) // not properly defined otherwise
-                icon->setTargetSize(target_width, target_height);
+            icon->setTargetSize(target_width, target_height);
 
             // If we want each icon to have its own label, we must make it non-empty, otherwise
             // it will assume there is no label and none will be created (FIXME: that's ugly)

@@ -170,7 +170,8 @@ namespace GUIEngine
         /** Computes a score based on multiple icon properties
             (used to estimate the best number of rows) */
         float estimateRowScore(const int rowCount, const int width, const int height,
-                              const float iconAspectRatio, const int maxIcons, float* heightRatio);
+                              const float iconAspectRatio, const int maxIcons, float* heightRatio,
+                              float capSize = 0.5f);
 
         /** Removes all previously added contents icons, and re-adds them (calculating the new amount) */
         void buildInternalStructure();
