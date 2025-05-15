@@ -53,8 +53,6 @@ private:
 public:
 	static PowerupAudio* getInstance();
 
-	 ~PowerupAudio();
-
 	void onUseAudio(Kart* kart, PowerupManager::PowerupType type, int sound_type,
 		PowerupManager::MiniState mini_state = PowerupManager::NOT_MINI);
 	void update(Kart* kart, int ticks);

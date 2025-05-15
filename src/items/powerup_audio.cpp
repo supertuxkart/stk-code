@@ -47,20 +47,6 @@ PowerupAudio::PowerupAudio()
 } // PowerupAudio
 
 //-----------------------------------------------------------------------------
-/** Frees the memory for the sound effects.
- */
-PowerupAudio::~PowerupAudio()
-{
-	m_sudo_good->deleteSFX();
-	m_sudo_bad->deleteSFX();
-   for (int i=0; i<POWERUP_SOUND_SOURCES;i++)
-	{
-		if (m_powerup_sound[i])
-			m_powerup_sound[i]->deleteSFX();
-	}
-} // ~PowerupAudio
-
-//-----------------------------------------------------------------------------
 /** Does the sound configuration.
  */
 void PowerupAudio::adjustSound(Kart* kart)
