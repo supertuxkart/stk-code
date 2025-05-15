@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.6.0)
+cmake_minimum_required(VERSION 3.6.0...4.0)
 
 # root CMakeLists for the SuperTuxKart project
 project(SuperTuxKart)
