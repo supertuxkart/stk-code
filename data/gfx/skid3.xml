@@ -12,16 +12,16 @@
     <!-- Amount of particles emitted per second. The minimum rate
          is used to show that the skidding bonus is now available,
          the maximum is used when the skid bonus is applied to the kart -->
-    <rate      min="2500"
-               max="2500"          />
+    <rate      min="3000"
+               max="3000"          />
     
     <!-- Minimal and maximal lifetime of a particle, in milliseconds. -->
-    <lifetime  min="65"
-               max="75"          />
+    <lifetime  min="75"
+               max="90"          />
     
     <!-- Size of the particles -->
-    <size      min="0.17"
-               max="0.17"         />
+    <size      min="0.19"
+               max="0.19"         />
     
     <color     min="225 160 255"
                max="180 60 255"  />
