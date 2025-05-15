@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.6.0...4.0)
+cmake_minimum_required(VERSION 3.12...4.0)
 
 # root CMakeLists for the SuperTuxKart project
 project(SuperTuxKart)
@@ -525,8 +525,7 @@ endif()
 if(MSVC)
     # VS will automatically add NDEBUG for release mode, but only _DEBUG in debug mode.
     # Since STK uses DEBUG, this is added for debug compilation only:
-    cmake_policy(SET CMP0043 OLD)
-    set_property(DIRECTORY PROPERTY COMPILE_DEFINITIONS_DEBUG DEBUG)
+    add_compile_definitions($<$<CONFIG:Debug>:DEBUG>)
 else()
     # All non VS generators used create only a single compile mode, so
     # compile flags can be simplye be added
@@ -853,15 +852,15 @@ if(MINGW)
     if (NOT CMAKE_BUILD_TYPE MATCHES Debug)
         target_link_libraries(supertuxkart -mwindows)
     endif()
-    find_library(LIBGCC NAMES "libgcc_s_dw2-1.dll" "libgcc_s_sjlj-1.dll" "libgcc_s_seh-1.dll" PATHS ${CMAKE_FIND_ROOT_PATH})
+    find_file(LIBGCC NAMES "libgcc_s_dw2-1.dll" "libgcc_s_sjlj-1.dll" "libgcc_s_seh-1.dll" PATHS ${CMAKE_FIND_ROOT_PATH})
     if (LIBGCC)
         file(COPY ${LIBGCC} DESTINATION ${CMAKE_BINARY_DIR}/bin/)
     endif()
-    find_library(LIBSTDCPP NAMES "libstdc++-6.dll" PATHS ${CMAKE_FIND_ROOT_PATH})
+    find_file(LIBSTDCPP NAMES "libstdc++-6.dll" PATHS ${CMAKE_FIND_ROOT_PATH})
     if (LIBSTDCPP)
         file(COPY ${LIBSTDCPP} DESTINATION ${CMAKE_BINARY_DIR}/bin/)
     endif()
-    find_library(LIBPTHREAD NAMES "winpthread-1.dll" "libwinpthread-1.dll" "pthreadGC2.dll" PATHS ${CMAKE_FIND_ROOT_PATH})
+    find_file(LIBPTHREAD NAMES "winpthread-1.dll" "libwinpthread-1.dll" "pthreadGC2.dll" PATHS ${CMAKE_FIND_ROOT_PATH})
     if(LIBPTHREAD)
         file(COPY ${LIBPTHREAD} DESTINATION ${CMAKE_BINARY_DIR}/bin/)
     endif()

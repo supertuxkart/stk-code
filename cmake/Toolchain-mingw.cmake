@@ -13,7 +13,7 @@ SET(CMAKE_RC_COMPILER i686-w64-mingw32-windres)
 execute_process(COMMAND sh -c "ls /usr/lib/gcc/i686-w64-mingw32/ | grep posix | tr -d '\n'" OUTPUT_VARIABLE MINGW_DEPS_FOLDER)
 
 # here is the target environment located
-SET(CMAKE_FIND_ROOT_PATH /usr/i686-w64-mingw32 /usr/lib/gcc/i686-w64-mingw32/${MINGW_DEPS_FOLDER}/ ${PROJECT_SOURCE_DIR}/dependencies-win-i686)
+SET(CMAKE_FIND_ROOT_PATH /usr/i686-w64-mingw32 /usr/i686-w64-mingw32/lib /usr/lib/gcc/i686-w64-mingw32/${MINGW_DEPS_FOLDER}/ ${PROJECT_SOURCE_DIR}/dependencies-win-i686)
 
 # adjust the default behaviour of the FIND_XXX() commands:
 # search headers and libraries in the target environment, search
