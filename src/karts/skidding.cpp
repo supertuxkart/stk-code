@@ -73,8 +73,7 @@ void Skidding::reset()
     m_visual_rotation     = 0.0f;
     m_skid_bonus_ready    = false;
     m_remaining_jump_time = 0.0f;
-    m_kart->getKartGFX()->setCreationRateAbsolute(KartGFX::KGFX_SKIDL, 0);
-    m_kart->getKartGFX()->setCreationRateAbsolute(KartGFX::KGFX_SKIDR, 0);
+    resetParticles();
     m_kart->getKartGFX()->updateSkidLight(0);
     m_kart->getControls().setSkidControl(KartControl::SC_NONE);
     m_prev_visual_rotation = 0.0f;
@@ -87,6 +86,16 @@ void Skidding::reset()
     if (!m_kart->isGhostKart())
         m_kart->getVehicle()->setTimedRotation(0, 0);
 }   // reset
+
+// ----------------------------------------------------------------------------
+/** Stops the emission of skidding-particles */
+void Skidding::resetParticles()
+{
+    m_kart->getKartGFX()->setCreationRateAbsolute(KartGFX::KGFX_SKIDL, 0);
+    m_kart->getKartGFX()->setCreationRateAbsolute(KartGFX::KGFX_SKIDR, 0);
+    m_kart->getKartGFX()->setCreationRateAbsolute(KartGFX::KGFX_SKIDL2, 0);
+    m_kart->getKartGFX()->setCreationRateAbsolute(KartGFX::KGFX_SKIDR2, 0);
+}   // resetParticles
 
 // ----------------------------------------------------------------------------
 /** Save the skidding state of a kart. It only saves the important physics
@@ -244,43 +253,36 @@ float Skidding::getSteeringWhenSkidding(float steering) const
  */
 float Skidding::updateGraphics(float dt)
 {
-    m_kart->getKartGFX()->setCreationRateAbsolute(KartGFX::KGFX_SKIDL, 0);
-    m_kart->getKartGFX()->setCreationRateAbsolute(KartGFX::KGFX_SKIDR, 0);
+    resetParticles();
     m_kart->getKartGFX()->updateSkidLight(0);
 
     unsigned int level = getSkidLevel(m_kart->getKartProperties());
+    unsigned int upcoming_level = getSkidLevel(m_kart->getKartProperties(), 0.18f /* delay */);
 
     // Get the type of the last triggered skid level,
     // if in the period after bonus trigger where particles are still shown
     if (m_skid_bonus_end_ticks > World::getWorld()->getTicksSinceStart())
+    {
         level = m_kart->m_max_speed->getLatestSkidLevel();
+        upcoming_level = level;
+    }
 
     // If at least level 1 bonus is reached, show appropriate gfx
     if (level >= 1)
     {
-        m_kart->getKartGFX()->setSkidLevel(level);
+        m_kart->getKartGFX()->setSkidLevel(level, upcoming_level);
         m_kart->getKartGFX()->updateSkidLight(level);        
     }
     // Show tiny sparks if bonus not yet reached
     else if ( m_graphical_remaining_jump_time <= 0.0f && m_skid_state != SKID_NONE)
     {
-        m_kart->getKartGFX()->setSkidLevel(level);
+        m_kart->getKartGFX()->setSkidLevel(level, upcoming_level);
     }
 
-    if (level >= 1)
+    if (level == 0 && (m_skid_state == SKID_BREAK || m_skid_state == SKID_SHOW_GFX_LEFT
+                    || m_skid_state == SKID_SHOW_GFX_RIGHT))
     {
-        m_kart->getKartGFX()->setCreationRateRelative(KartGFX::KGFX_SKIDL,
-            1.0f);
-        m_kart->getKartGFX()->setCreationRateRelative(KartGFX::KGFX_SKIDR,
-            1.0f);
-    }
-    else if (m_skid_state == SKID_BREAK || m_skid_state == SKID_SHOW_GFX_LEFT
-        || m_skid_state == SKID_SHOW_GFX_RIGHT)
-    {
-        m_kart->getKartGFX()->setCreationRateAbsolute(KartGFX::KGFX_SKIDL,
-            0.0f);
-        m_kart->getKartGFX()->setCreationRateAbsolute(KartGFX::KGFX_SKIDR,
-            0.0f);
+        resetParticles();
     }
 
     if (m_smoothing_dt >= 0.0f)
@@ -581,12 +583,13 @@ unsigned int Skidding::getSkidBonus(float *bonus_time,
 /** Determines the level of the currently accumulating skid.
  *  \return The bonus level: 0 = no bonus, 1 = first entry in bonus array etc.
  */
-unsigned int Skidding::getSkidLevel(const KartProperties *kp) const
+unsigned int Skidding::getSkidLevel(const KartProperties *kp, float ready_delay) const
 {
     unsigned int level = 0;
     for (level = 0; level < kp->getSkidBonusSpeed().size(); level++)
     {
-        if (stk_config->ticks2Time(m_skid_time) <=
+        int test_ticks = m_skid_time + stk_config->time2Ticks(ready_delay);
+        if (stk_config->ticks2Time(test_ticks) <=
             kp->getSkidTimeTillBonus()[level])
             break;
     }

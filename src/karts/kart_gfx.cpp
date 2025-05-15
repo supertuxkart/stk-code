@@ -218,9 +218,9 @@ void KartGFX::addEffect(KartGFXType type, const std::string &file_name,
             throw std::runtime_error(err);
         }
         //kind    = new ParticleKind(file_manager->getGfxFile(file_name));
-        // Skid0, Skid2 and Skid3 are only used to store the emitter type,
+        // Skid0 and Skid3 are only used to store the emitter type,
         // and a wheeless kart has no terrain effects.
-        if(type==KGFX_SKID0L || type==KGFX_SKID0R || type==KGFX_SKID2L || type==KGFX_SKID2R ||
+        if(type==KGFX_SKID0L || type==KGFX_SKID0R ||
             type==KGFX_SKID3L || type==KGFX_SKID3R ||
             (type==KGFX_TERRAIN && m_kart->isWheeless()) )
             emitter = NULL;
@@ -282,42 +282,54 @@ void KartGFX::reset()
 /** Selects the correct skidding particle type depending on skid bonus level.
  *  \param level Must be 0 (no bonus, showing tiny sparks), 1 (accumulated enough
  *         for level 1 bonus), 2 (accumulated enough for level 2 bonus) or 3.
+  *  \param upcoming_level Must be 0 (no bonus, showing tiny sparks), 1 (accumulated enough
+ *         for level 1 bonus), 2 (accumulated enough for level 2 bonus) or 3.
  */
-void KartGFX::setSkidLevel(const unsigned int level)
+void KartGFX::setSkidLevel(const unsigned int level, const unsigned int upcoming_level)
 {
     assert(level >= 0);
     assert(level <= 3);
     m_skid_level = level;
-    const ParticleKind *pk;
+    const ParticleKind *pk, *pk2;
     if (level == 0)
-    {
         pk = m_skid_kind0;
-    }
     else if (level == 1)
-    {
         pk = m_skid_kind1;
-    }
     else if (level == 2)
-    {
         pk = m_skid_kind2;
-    }
     else
-    {
         pk = m_skid_kind3;
-    }
+
+    if (upcoming_level == 0)
+        pk2 = m_skid_kind0;
+    else if (upcoming_level == 1)
+        pk2 = m_skid_kind1;
+    else if (upcoming_level == 2)
+        pk2 = m_skid_kind2;
+    else
+        pk2 = m_skid_kind3;
+
+
 //    const ParticleKind *pk = level==1 ? m_skid_kind1 : m_skid_kind2;
 #ifndef SERVER_ONLY
     if (GUIEngine::isNoGraphics())
         return;
 
-    if(m_all_emitters[KGFX_SKID1L])
-        m_all_emitters[KGFX_SKID1L]->setParticleType(pk);
-    if(m_all_emitters[KGFX_SKID1R])
-        m_all_emitters[KGFX_SKID1R]->setParticleType(pk);
-    // Relative 0 means it will emitt the minimum rate, i.e. the rate
-    // set to indicate that the bonus is now available.
-    setCreationRateRelative(KartGFX::KGFX_SKIDL, 0.0f);
-    setCreationRateRelative(KartGFX::KGFX_SKIDR, 0.0f);
+    if(m_all_emitters[KGFX_SKIDL])
+        m_all_emitters[KGFX_SKIDL]->setParticleType(pk);
+    if(m_all_emitters[KGFX_SKIDR])
+        m_all_emitters[KGFX_SKIDR]->setParticleType(pk);
+    if(m_all_emitters[KGFX_SKIDL2])
+        m_all_emitters[KGFX_SKIDL2]->setParticleType(pk2);
+    if(m_all_emitters[KGFX_SKIDR2])
+        m_all_emitters[KGFX_SKIDR2]->setParticleType(pk2);
+    // Relative 1 means it will emit the maximum rate,
+    // relative 0 means it will emit at the minimum rate.
+    // This is used to determine the mixing ratios when the levels are different.
+    setCreationRateRelative(KartGFX::KGFX_SKIDL, 1.0f);
+    setCreationRateRelative(KartGFX::KGFX_SKIDR, 1.0f);
+    setCreationRateRelative(KartGFX::KGFX_SKIDL2, 0.0f);
+    setCreationRateRelative(KartGFX::KGFX_SKIDR2, 0.0f);
 #endif
 }   // setSkidLevel
 

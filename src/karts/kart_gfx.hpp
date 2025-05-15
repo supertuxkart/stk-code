@@ -59,10 +59,12 @@ public:
                        KGFX_TERRAIN,
                        KGFX_SKIDL,
                        KGFX_SKIDR,
+                       KGFX_SKIDL2,
+                       KGFX_SKIDR2,
                        KGFX_SKID1L = KGFX_SKIDL,
                        KGFX_SKID1R = KGFX_SKIDR,
-                       KGFX_SKID2L,
-                       KGFX_SKID2R,
+                       KGFX_SKID2L = KGFX_SKIDL2,
+                       KGFX_SKID2R = KGFX_SKIDR2,
                        KGFX_SKID3L,
                        KGFX_SKID3R,
                        KGFX_SKID0L,
@@ -119,7 +121,7 @@ public:
          KartGFX(const Kart *kart, bool is_day);
         ~KartGFX();
     void reset();
-    void setSkidLevel(const unsigned int level);
+    void setSkidLevel(const unsigned int level, const unsigned int upcoming_level);
     void setParticleKind(const KartGFXType type, const ParticleKind *pk);
     void setXYZ(const KartGFXType type, const Vec3 &xyz);
     void setCreationRateAbsolute(const KartGFXType type, float f);

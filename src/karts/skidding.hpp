@@ -102,9 +102,10 @@ private:
     ShowCurve *m_actual_curve;
 #endif
 
+    void resetParticles();
     unsigned int getSkidBonus(float *bonus_time, float *fade_out_time,
                               float *bonus_speed, float *bonus_force) const;
-    unsigned int getSkidLevel(const KartProperties *kp) const;
+    unsigned int getSkidLevel(const KartProperties *kp, float ready_delay = 0.0f) const;
     float updateSteering(float steer, int ticks);
 public:
          Skidding(Kart *kart);
