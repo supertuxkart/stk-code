@@ -30,6 +30,7 @@ namespace irr
 #include "guiengine/widget.hpp"
 #include "utils/leak_check.hpp"
 #include "utils/ptr_vector.hpp"
+#include "graphics/irr_driver.hpp"
 
 #include <IGUIImage.h>
 
@@ -91,6 +92,9 @@ namespace GUIEngine
 
         /** \brief Whether the right arrow is the currently selected one  */
         bool m_right_selected;
+
+        /** \the arrow of the spinner  */
+        core::rect<s32> m_left_arrow;
 
         /** \brief Keeps track of the custom text in spinner (a text which isn't related to a value)
         *   to remember it and set it back (example : when we deactivate the widget)
@@ -269,6 +273,8 @@ namespace GUIEngine
             m_min = n;
             if(getValue()<m_min) setValue(m_min);
         }   // setMin
+
+        core::rect<s32> getLeftArrow() const { return m_left_arrow; }
 
         // ------------------------------------------------------------------------
         /** Add a red mark on the spinner to mean "invalid choice" */

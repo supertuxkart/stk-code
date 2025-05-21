@@ -50,8 +50,9 @@ namespace GUIEngine
         int player_name_x, player_name_y, player_name_w, player_name_h;
         int model_x, model_y, model_w, model_h;
         int kart_name_x, kart_name_y, kart_name_w, kart_name_h;
-        int icon_player_x, icon_player_y, icon_player_w, icon_player_h;
+        int m_icon_player_x, m_icon_player_y, m_icon_player_w, m_icon_player_h;
         int m_kart_stats_x, m_kart_stats_y, m_kart_stats_w, m_kart_stats_h;
+        int m_left_arrow_width;
 
         /** A reserved ID for this widget if any, -1 otherwise.  (If no ID is
          *  reserved, widget will not be in the regular tabbing order */

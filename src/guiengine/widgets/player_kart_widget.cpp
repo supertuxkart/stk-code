@@ -82,10 +82,10 @@ PlayerKartWidget::PlayerKartWidget(KartSelectionScreen* parent,
     m_icon_player = new IconButtonWidget(IconButtonWidget::SCALE_MODE_KEEP_CUSTOM_ASPECT_RATIO, false, false, IconButtonWidget::ICON_PATH_TYPE_ABSOLUTE);
     m_icon_player->setImage(file_manager->getAsset(FileManager::GUI_ICON, "crown.png"), IconButtonWidget::ICON_PATH_TYPE_ABSOLUTE);
     
-    m_icon_player->m_x = icon_player_x;
-    m_icon_player->m_y = icon_player_y;
-    m_icon_player->m_w = icon_player_w;
-    m_icon_player->m_h = icon_player_h;
+    m_icon_player->m_x = m_icon_player_x;
+    m_icon_player->m_y = m_icon_player_y;
+    m_icon_player->m_w = m_icon_player_w;
+    m_icon_player->m_h = m_icon_player_h;
     m_children.push_back(m_icon_player);
 
     // ---- KartStatsWidget
@@ -587,6 +587,7 @@ void PlayerKartWidget::updateSize()
                                      player_name_y,
                                      player_name_w,
                                      player_name_h );
+        m_left_arrow_width = m_player_ident_spinner->getLeftArrow().getWidth();
     }
     if (m_ready_text != NULL)
     {
@@ -618,10 +619,10 @@ void PlayerKartWidget::updateSize()
                       kart_name_w,
                       kart_name_h);
 
-    m_icon_player->move(icon_player_x,
-                        icon_player_y,
-                        icon_player_w,
-                        icon_player_h);
+    m_icon_player->move(m_icon_player_x,
+                        m_icon_player_y,
+                        m_icon_player_w,
+                        m_icon_player_h);
 }   // updateSize
 
 // -------------------------------------------------------------------------
@@ -703,8 +704,8 @@ void PlayerKartWidget::setSize(const int x, const int y, const int w, const int 
     else
         player_name_w = std::min(GUIEngine::getFontHeight() * 10, w);
 
-    icon_player_w = w;
-    icon_player_h = GUIEngine::getFontHeight();
+    m_icon_player_w = w;
+    m_icon_player_h = GUIEngine::getFontHeight();
 
     kart_name_w = w;
     kart_name_h = GUIEngine::getFontHeight();
@@ -721,8 +722,13 @@ void PlayerKartWidget::setSize(const int x, const int y, const int w, const int 
     player_name_x = x + w/2 - player_name_w/2;
     player_name_y = y;
 
-    icon_player_x = x + w / 2 - player_name_w / 2 - icon_player_w / 2; // Pas 100% correct 
-    icon_player_y = player_name_y;
+    m_icon_player_x = x + w / 2 - (player_name_w / 2) - (m_icon_player_w / 2);
+    if (!m_ready && m_left_arrow_width != NULL)
+        m_icon_player_x -= m_left_arrow_width / 2;
+    else 
+        m_icon_player_x += m_left_arrow_width / 2;
+
+    m_icon_player_y = player_name_y;
 
     if (m_parent_screen->m_multiplayer)
     {
