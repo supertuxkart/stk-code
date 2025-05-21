@@ -211,7 +211,7 @@ void RaceResultGUI::init()
             unsigned int racePowerupTipCount = TipsManager::get()->getTipCount("race-powerup");
             unsigned int raceTipCount = racePowerupTipCount + TipsManager::get()->getTipCount("time-trial");
             unsigned int randvalue = randgen.get(raceTipCount);
-            tipset = (randvalue <= racePowerupTipCount) ? "race-powerup" : "time-trial";
+            tipset = (randvalue < racePowerupTipCount) ? "race-powerup" : "time-trial";
         }
         else if (RaceManager::get()->isSoccerMode())
         {

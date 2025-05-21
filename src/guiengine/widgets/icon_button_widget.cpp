@@ -15,6 +15,7 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
+#include "font/font_manager.hpp"
 #include "guiengine/widgets/icon_button_widget.hpp"
 #include "graphics/central_settings.hpp"
 #include "graphics/irr_driver.hpp"
@@ -334,18 +335,32 @@ void IconButtonWidget::setLabelFont()
         const bool word_wrap = (m_properties[PROP_WORD_WRAP] == "true");
         const int max_w = m_label->getAbsolutePosition().getWidth();
 
-        if (!word_wrap &&
-            (int)GUIEngine::getFont()->getDimension(m_label->getText()).Width
-                        > max_w + 4) // arbitrarily allow for 4 pixels
+        if (!word_wrap)
         {
-            m_label->setOverrideFont( GUIEngine::getSmallFont() );
+            if (max_w < (int)GUIEngine::getFont()->getDimension(m_label->getText()).Width)
+                m_label->setOverrideFont( GUIEngine::getSmallFont() );
         }
-        else
+        // If the string doesn't fit in 2 lines after word-wrap is applied, use the small font
+        else if (max_w < (int)GUIEngine::getFont()->getDimension(m_label->getText()).Width)
         {
-            m_label->setOverrideFont( NULL );
+            core::stringw test_string = m_label->getText();
+            core::stringw temp_string = test_string;
+            while (temp_string.size() > 0)
+            {
+                temp_string.erase(temp_string.size() - 1);
+                if ((unsigned int)max_w > GUIEngine::getFont()->getDimension(temp_string.c_str()).Width
+                    && LineBreakingRules::breakable((char32_t) temp_string.lastChar()))
+                    break;
+            }
+            test_string = test_string.subString(temp_string.size(), test_string.size() - temp_string.size());
+
+            if (max_w < (int)GUIEngine::getFont()->getDimension(test_string.c_str()).Width)
+                m_label->setOverrideFont( GUIEngine::getSmallFont() ); 
+            else
+                m_label->setOverrideFont( NULL );
         }
     }
-}
+} // setLabelFont
 
 // -----------------------------------------------------------------------------
 void IconButtonWidget::setVisible(bool visible)
