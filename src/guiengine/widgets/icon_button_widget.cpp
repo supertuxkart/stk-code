@@ -326,6 +326,7 @@ void IconButtonWidget::setTexture(video::ITexture* texture)
 // -----------------------------------------------------------------------------
 void IconButtonWidget::setLabelFont()
 {
+#ifndef SERVER_ONLY
     if (m_font != NULL)
     {
         m_label->setOverrideFont( m_font );
@@ -360,6 +361,7 @@ void IconButtonWidget::setLabelFont()
                 m_label->setOverrideFont( NULL );
         }
     }
+#endif
 } // setLabelFont
 
 // -----------------------------------------------------------------------------
