@@ -459,6 +459,13 @@ void PlayerKartWidget::markAsReady()
 
     m_ready = true;
 
+    // Correctly replace the game master icon as the spinner arrow is no longer there (the player is ready)
+    m_icon_player_x += m_left_arrow_width;
+    m_icon_player->move(m_icon_player_x,
+        m_icon_player_y,
+        m_icon_player_w,
+        m_icon_player_h);
+
     stringw playerNameString = m_player_ident_spinner->getStringValue();
     core::rect<s32> rect(core::position2di(m_player_ident_spinner->m_x,
                                            m_player_ident_spinner->m_y),
@@ -723,10 +730,14 @@ void PlayerKartWidget::setSize(const int x, const int y, const int w, const int 
     player_name_y = y;
 
     m_icon_player_x = x + w / 2 - (player_name_w / 2) - (m_icon_player_w / 2);
-    if (!m_ready && m_left_arrow_width != NULL)
+    if (!m_ready && m_left_arrow_width != NULL) 
+    {
         m_icon_player_x -= m_left_arrow_width / 2;
+    }
     else 
+    {
         m_icon_player_x += m_left_arrow_width / 2;
+    }
 
     m_icon_player_y = player_name_y;
 
