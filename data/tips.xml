@@ -8,19 +8,21 @@
         <tip text="In single-player, you can watch and challenge recorded time-trials."/>
         <tip text="You can visit https://supertuxkart.net/ for more information about the game."/>
     </tipset>
-    <tipset id="race">
+    <tipset id="race-powerup">
+        <tip text="The swatter can be used to remove bombs or parachutes."/>
+        <tip text="Braking allows to get rid of parachutes quicker."/>
+        <tip text="Be careful when close to other karts, they may attack you!"/>
+        <tip text="Basketballs can be destroyed using precise backward shots with a bowling ball, cake, or plunger."/>
+    </tipset>
+    <tipset id="time-trial">
         <tip text="Short nitro boosts are more efficient."/>
         <tip text="Only use zippers when it is safe. Long straight lines are ideal."/>
         <tip text="Don't use multiple zippers quickly in row, instead, wait until the speed boost wears off."/>
         <tip text="Skidding makes you much faster, do it whenever safe."/>
-        <tip text="The swatter can be used to remove bombs or parachutes."/>
         <tip text="You can't stop turning while skidding. Good kart orientation at the skid's start is paramount."/>
         <tip text="You get a startup boost if you start accelerating during &quot;Set&quot;."/>
-        <tip text="Braking allows to get rid of parachutes quicker."/>
         <tip text="First and foremost, focus on where your kart is going."/>
         <tip text="The rescue key (button) is very useful."/>
-        <tip text="Be careful when close to other karts, they may attack you!"/>
-        <tip text="Basketballs can be destroyed using precise backward shots with a bowling ball, cake, or plunger."/>
         <tip text="Try to avoid crashing into the backs of other karts as this will slow you down."/>
     </tipset>
     <tipset id="soccer">

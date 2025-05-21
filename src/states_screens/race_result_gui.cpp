@@ -68,6 +68,7 @@
 #include "tracks/track.hpp"
 #include "tracks/track_manager.hpp"
 #include "utils/profiler.hpp"
+#include "utils/random_generator.hpp"
 #include "utils/string_utils.hpp"
 #include "utils/translation.hpp"
 #include "main_loop.hpp"
@@ -199,9 +200,32 @@ void RaceResultGUI::init()
     if (!human_win && !NetworkConfig::get()->isNetworking() &&
         !TipsManager::get()->isEmpty())
     {
-        std::string tipset = "race";
-        if (RaceManager::get()->isSoccerMode())
+        std::string tipset;
+        // For races with powerups, pick at random
+        // between the race-powerup and time-trial tipsets.
+        if (RaceManager::get()->isLinearRaceMode() &&
+            !RaceManager::get()->isTimeTrialMode())
+        {
+            RandomGenerator randgen;
+            randgen.seed((int)StkTime::getTimeSinceEpoch());
+            unsigned int racePowerupTipCount = TipsManager::get()->getTipCount("race-powerup");
+            unsigned int raceTipCount = racePowerupTipCount + TipsManager::get()->getTipCount("time-trial");
+            unsigned int randvalue = randgen.get(raceTipCount);
+            tipset = (randvalue <= racePowerupTipCount) ? "race-powerup" : "time-trial";
+        }
+        else if (RaceManager::get()->isSoccerMode())
+        {
             tipset = "soccer";
+        }
+        else if (RaceManager::get()->isTimeTrialMode())
+        {
+            tipset = "time-trial";
+        }
+        else
+        {
+            return; // Don't show irrelevant tips
+        }
+
         core::stringw tip = TipsManager::get()->getTip(tipset);
         core::stringw tips_string = _("Tip: %s", tip);
         MessageQueue::add(MessageQueue::MT_GENERIC, tips_string);

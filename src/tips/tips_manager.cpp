@@ -87,7 +87,7 @@ void TipsManager::addTipSet(const XMLNode *input)
         Log::error("TipSet",
             "Incorrect tips for the entries of tipset \"%s\".", id.c_str());
     }
-}
+} // addTipSet
 
 // ----------------------------------------------------------------------------
 const irr::core::stringw& TipsManager::getTip(const std::string& id) const
@@ -102,6 +102,18 @@ const irr::core::stringw& TipsManager::getTip(const std::string& id) const
     RandomGenerator randgen;
     unsigned pos = randgen.get(ret->second.size());
     return ret->second.at(pos);
-} // getTipSet
+} // getTip
+
+// ----------------------------------------------------------------------------
+const unsigned int TipsManager::getTipCount(const std::string& id) const
+{
+    auto ret = m_all_tip_sets.find(id);
+    if (ret == m_all_tip_sets.end())
+    {
+        // Should not happen
+        return 0;
+    }
+    return ret->second.size();
+} // getTipCount
 
 #endif
