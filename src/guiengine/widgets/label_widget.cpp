@@ -204,7 +204,7 @@ void LabelWidget::setScrollSpeed(float speed)
 void LabelWidget::resize()
 {
     // Reduce the font size of normal text if it overflows
-    if ((m_type != TITLE && m_type != SMALL_TITLE && m_type != TINY_TITLE))
+    if (m_scroll_speed == 0 && m_type != TITLE && m_type != SMALL_TITLE && m_type != TINY_TITLE)
     {
         if( ((int)GUIEngine::getFont()->getDimension(m_text.c_str()).Width      >
                             this->m_w) &&

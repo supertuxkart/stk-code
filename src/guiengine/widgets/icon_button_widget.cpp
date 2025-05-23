@@ -333,6 +333,7 @@ void IconButtonWidget::setLabelFont()
     }
     else
     {
+        m_label->setOverrideFont(NULL);
         const bool word_wrap = (m_properties[PROP_WORD_WRAP] == "true");
         const int max_w = m_label->getAbsolutePosition().getWidth();
 
