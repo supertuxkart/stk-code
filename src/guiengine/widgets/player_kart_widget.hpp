@@ -50,7 +50,7 @@ namespace GUIEngine
         int player_name_x, player_name_y, player_name_w, player_name_h;
         int model_x, model_y, model_w, model_h;
         int kart_name_x, kart_name_y, kart_name_w, kart_name_h;
-        int m_icon_player_x, m_icon_player_y, m_icon_player_w, m_icon_player_h;
+        int m_crown_icon_x, m_crown_icon_y, m_crown_icon_w, m_crown_icon_h;
         int m_kart_stats_x, m_kart_stats_y, m_kart_stats_w, m_kart_stats_h;
         int m_left_arrow_width;
 
@@ -86,7 +86,7 @@ namespace GUIEngine
         KartStatsWidget* m_kart_stats;
         ModelViewWidget* m_model_view;
         LabelWidget* m_kart_name;
-        IconButtonWidget* m_icon_player;
+        IconButtonWidget* m_crown_icon;
 
         KartSelectionScreen* m_parent_screen;
 

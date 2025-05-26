@@ -78,15 +78,15 @@ PlayerKartWidget::PlayerKartWidget(KartSelectionScreen* parent,
     m_player_ident_spinner->m_w = player_name_w;
     m_player_ident_spinner->m_h = player_name_h;
 
-    // --- Kart Player Icone (Only for GameMaster)
-    m_icon_player = new IconButtonWidget(IconButtonWidget::SCALE_MODE_KEEP_CUSTOM_ASPECT_RATIO, false, false, IconButtonWidget::ICON_PATH_TYPE_ABSOLUTE);
-    m_icon_player->setImage(file_manager->getAsset(FileManager::GUI_ICON, "crown.png"), IconButtonWidget::ICON_PATH_TYPE_ABSOLUTE);
+    // --- Crown icon (Only for the game master)
+    m_crown_icon = new IconButtonWidget(IconButtonWidget::SCALE_MODE_KEEP_CUSTOM_ASPECT_RATIO, false, false, IconButtonWidget::ICON_PATH_TYPE_ABSOLUTE);
+    m_crown_icon->setImage(file_manager->getAsset(FileManager::GUI_ICON, "crown.png"), IconButtonWidget::ICON_PATH_TYPE_ABSOLUTE);
     
-    m_icon_player->m_x = m_icon_player_x;
-    m_icon_player->m_y = m_icon_player_y;
-    m_icon_player->m_w = m_icon_player_w;
-    m_icon_player->m_h = m_icon_player_h;
-    m_children.push_back(m_icon_player);
+    m_crown_icon->m_x = m_crown_icon_x;
+    m_crown_icon->m_y = m_crown_icon_y;
+    m_crown_icon->m_w = m_crown_icon_w;
+    m_crown_icon->m_h = m_crown_icon_h;
+    m_children.push_back(m_crown_icon);
 
     // ---- KartStatsWidget
     m_kart_stats = NULL;
@@ -288,8 +288,8 @@ PlayerKartWidget::~PlayerKartWidget()
     if (m_kart_name->getIrrlichtElement() != NULL)
         m_kart_name->getIrrlichtElement()->remove();
 
-    if (m_icon_player->getIrrlichtElement() != NULL)
-        m_icon_player->getIrrlichtElement()->remove();
+    if (m_crown_icon->getIrrlichtElement() != NULL)
+        m_crown_icon->getIrrlichtElement()->remove();
         
     if (getCurrentScreen() != NULL)
         getCurrentScreen()->manualRemoveWidget(this);
@@ -379,7 +379,7 @@ void PlayerKartWidget::add()
     m_kart_stats->add();
     m_model_view->add();
     m_kart_name->add();
-    m_icon_player->add();
+    m_crown_icon->add();
 
     m_model_view->update(0);
 
@@ -412,14 +412,14 @@ void PlayerKartWidget::add()
 
         if (m_associated_player->getID() != PLAYER_ID_GAME_MASTER)
         {
-            m_icon_player->setVisible(false);
+            m_crown_icon->setVisible(false);
         }
     }
     else
     {
         m_player_ident_spinner->addLabel(label);
         m_player_ident_spinner->setVisible(false);
-        m_icon_player->setVisible(false);
+        m_crown_icon->setVisible(false);
     }
 
     assert(m_player_ident_spinner->getStringValue() == label);
@@ -460,11 +460,11 @@ void PlayerKartWidget::markAsReady()
     m_ready = true;
 
     // Correctly replace the game master icon as the spinner arrow is no longer there (the player is ready)
-    m_icon_player_x += m_left_arrow_width;
-    m_icon_player->move(m_icon_player_x,
-        m_icon_player_y,
-        m_icon_player_w,
-        m_icon_player_h);
+    m_crown_icon_x += m_left_arrow_width;
+    m_crown_icon->move(m_crown_icon_x,
+        m_crown_icon_y,
+        m_crown_icon_w,
+        m_crown_icon_h);
 
     stringw playerNameString = m_player_ident_spinner->getStringValue();
     core::rect<s32> rect(core::position2di(m_player_ident_spinner->m_x,
@@ -626,10 +626,10 @@ void PlayerKartWidget::updateSize()
                       kart_name_w,
                       kart_name_h);
 
-    m_icon_player->move(m_icon_player_x,
-                        m_icon_player_y,
-                        m_icon_player_w,
-                        m_icon_player_h);
+    m_crown_icon->move(m_crown_icon_x,
+                        m_crown_icon_y,
+                        m_crown_icon_w,
+                        m_crown_icon_h);
 }   // updateSize
 
 // -------------------------------------------------------------------------
@@ -711,8 +711,8 @@ void PlayerKartWidget::setSize(const int x, const int y, const int w, const int 
     else
         player_name_w = std::min(GUIEngine::getFontHeight() * 10, w);
 
-    m_icon_player_w = w;
-    m_icon_player_h = GUIEngine::getFontHeight();
+    m_crown_icon_w = w;
+    m_crown_icon_h = GUIEngine::getFontHeight();
 
     kart_name_w = w;
     kart_name_h = GUIEngine::getFontHeight();
@@ -729,17 +729,14 @@ void PlayerKartWidget::setSize(const int x, const int y, const int w, const int 
     player_name_x = x + w/2 - player_name_w/2;
     player_name_y = y;
 
-    m_icon_player_x = x + w / 2 - (player_name_w / 2) - (m_icon_player_w / 2);
-    if (!m_ready && m_left_arrow_width != NULL) 
-    {
-        m_icon_player_x -= m_left_arrow_width / 2;
-    }
-    else 
-    {
-        m_icon_player_x += m_left_arrow_width / 2;
-    }
+    m_crown_icon_x = x + w / 2 - (player_name_w / 2) - (m_crown_icon_w / 2);
 
-    m_icon_player_y = player_name_y;
+    if (!m_ready && m_left_arrow_width > 0) 
+        m_crown_icon_x -= m_left_arrow_width / 2;
+    else 
+        m_crown_icon_x += m_left_arrow_width / 2;
+
+    m_crown_icon_y = player_name_y;
 
     if (m_parent_screen->m_multiplayer)
     {
