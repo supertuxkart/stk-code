@@ -5,7 +5,8 @@ layout(location = 4) in float f_hue_change;
 
 layout(location = 0) out vec4 o_color;
 
-#include "utils/sample_mesh_texture.h"
+#include "utils/constants_utils.glsl"
+#include "utils/sample_mesh_texture.glsl"
 #include "../utils/rgb_conversion.frag"
 
 void main()
@@ -30,5 +31,9 @@ void main()
     }
 
     vec3 mixed_color = tex_color.xyz * f_vertex_color.xyz;
-    o_color = vec4(mixed_color * 0.5, 0.5);
+    mixed_color *= 0.5;
+#ifdef PBR_ENABLED
+    mixed_color = convertColor(mixed_color);
+#endif
+    o_color = vec4(mixed_color, 0.5);
 }

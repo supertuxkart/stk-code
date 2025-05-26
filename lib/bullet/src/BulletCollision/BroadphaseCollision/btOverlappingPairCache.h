@@ -49,9 +49,6 @@ struct btOverlapFilterCallback
 
 
 
-extern int gRemovePairs;
-extern int gAddedPairs;
-extern int gFindPairs;
 
 const int BT_NULL_PAIR=0xffffffff;
 
@@ -121,8 +118,6 @@ public:
 	// no new pair is created and the old one is returned.
 	virtual btBroadphasePair* 	addOverlappingPair(btBroadphaseProxy* proxy0,btBroadphaseProxy* proxy1)
 	{
-		//gAddedPairs++;
-
 		if (!needsBroadphaseCollision(proxy0,proxy1))
 			return 0;
 
@@ -207,10 +202,9 @@ private:
 	*/
 
 
-	
-	SIMD_FORCE_INLINE	unsigned int getHash(unsigned int proxyId1, unsigned int proxyId2)
+	SIMD_FORCE_INLINE unsigned int getHash(unsigned int proxyId1, unsigned int proxyId2)
 	{
-		int key = static_cast<int>(((unsigned int)proxyId1) | (((unsigned int)proxyId2) <<16));
+		unsigned int key = proxyId1 | (proxyId2 << 16);
 		// Thomas Wang's hash
 
 		key += ~(key << 15);
@@ -219,11 +213,9 @@ private:
 		key ^=  (key >> 6);
 		key += ~(key << 11);
 		key ^=  (key >> 16);
-		return static_cast<unsigned int>(key);
+		return key;
 	}
 	
-
-
 
 
 	SIMD_FORCE_INLINE btBroadphasePair* internalFindPair(btBroadphaseProxy* proxy0, btBroadphaseProxy* proxy1, int hash)

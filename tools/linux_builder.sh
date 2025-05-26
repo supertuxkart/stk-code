@@ -55,6 +55,7 @@ export SCHROOT_32BIT_NAME="chroot-buster32"
 export SCHROOT_64BIT_NAME="chroot-buster64"
 export SCHROOT_ARMV7_NAME="chroot-buster-armhf"
 export SCHROOT_ARM64_NAME="chroot-buster-arm64"
+export SCHROOT_RISCV_NAME="chroot-trixie-riscv64"
 
 export STKCODE_DIR="$DIRNAME/.."
 export STKASSETS_DIR="$STKCODE_DIR/../supertuxkart-assets"
@@ -395,13 +396,17 @@ build_stk()
     # Shaderc
     if [ ! -f "$DEPENDENCIES_DIR/shaderc.stamp" ]; then
         echo "Compiling shaderc"
-        
-        "$DEPENDENCIES_DIR/../lib/shaderc/utils/git-sync-deps"
-        
         mkdir -p "$DEPENDENCIES_DIR/shaderc"
         cp -a -f "$DEPENDENCIES_DIR/../lib/shaderc/"* "$DEPENDENCIES_DIR/shaderc"
-
+        
         cd "$DEPENDENCIES_DIR/shaderc"
+
+        if [ ! -f "$DEPENDENCIES_DIR/shaderc-deps.stamp" ]; then
+            ./utils/git-sync-deps
+            check_error
+            touch "$DEPENDENCIES_DIR/shaderc-deps.stamp"
+        fi
+
         cmake . -DCMAKE_FIND_ROOT_PATH="$INSTALL_DIR" \
                 -DCMAKE_INSTALL_PREFIX="$INSTALL_DIR" \
                 -DCMAKE_C_FLAGS="-fpic -O3"           \
@@ -479,7 +484,7 @@ build_stk()
         cp -a -f "$DEPENDENCIES_DIR/../lib/sdl2/"* "$DEPENDENCIES_DIR/sdl2"
     
         cd "$DEPENDENCIES_DIR/sdl2"
-        ./configure --prefix="$INSTALL_DIR" &&
+        ./configure --prefix="$INSTALL_DIR" --disable-audio &&
         make -j$THREADS_NUMBER &&
         make install
         check_error
@@ -574,6 +579,8 @@ build_stk()
              -DUSE_SYSTEM_ANGELSCRIPT=0 \
              -DUSE_SYSTEM_ENET=0 \
              -DUSE_SYSTEM_WIIUSE=0 \
+             -DUSE_SYSTEM_SQUISH=0 \
+             -DUSE_SYSTEM_MCPP=0 \
              -DUSE_CRYPTO_OPENSSL=0 \
              -DENABLE_WAYLAND_DEVICE=0 \
              -DBC7_ISPC=$HAS_ISPC \
@@ -782,5 +789,6 @@ create_package "$SCHROOT_32BIT_NAME" "x86" "elf32-i386"
 create_package "$SCHROOT_64BIT_NAME" "x86_64" "elf64-x86-64"
 create_package "$SCHROOT_ARMV7_NAME" "armv7" "elf32-littlearm"
 create_package "$SCHROOT_ARM64_NAME" "arm64" "elf64-littleaarch64"
+create_package "$SCHROOT_RISCV_NAME" "riscv64" "elf64-littleriscv"
 
 echo "Success."

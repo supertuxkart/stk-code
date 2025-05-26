@@ -644,6 +644,8 @@ void SlipStream::updateBonusTexture()
     if (!CVS->isGLSL())
     {
         float a = m_bonus_time * 255.0f;
+        if (a < 0.0f)
+            a = 0.0f;
         if (a > 255.0f)
             a = 255.0f;
         m_bonus_node->getMaterial(0).getRenderInfo()->getVertexColor()

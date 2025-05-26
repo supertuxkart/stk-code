@@ -1,4 +1,5 @@
 #include "ge_main.hpp"
+#include "ge_occlusion_culling.hpp"
 #include "ge_spm.hpp"
 #include "ge_spm_buffer.hpp"
 #include "ge_vulkan_driver.hpp"
@@ -10,6 +11,7 @@
 
 #include <algorithm>
 #include <chrono>
+#include <memory>
 
 namespace GE
 {
@@ -22,12 +24,14 @@ GEConfig g_config =
     true,
     false,
     false,
+    true,
     {},
     1.0f
 };
 std::string g_shader_folder = "";
 std::chrono::steady_clock::time_point g_mono_start =
     std::chrono::steady_clock::now();
+std::unique_ptr<GEOcclusionCulling> g_occulsion_culling;
 
 void setVideoDriver(irr::video::IVideoDriver* driver)
 {
@@ -171,6 +175,45 @@ irr::scene::IAnimatedMesh* convertIrrlichtMeshToSPM(irr::scene::IMesh* mesh)
     }
     spm->finalize();
     return spm;
+}
+
+void copyToMappedBuffer(uint32_t* mapped, GESPMBuffer* spmb, size_t offset)
+{
+    for (unsigned i = offset; i < spmb->getVertexCount(); i++)
+    {
+        auto& vv = spmb->getVerticesVector();
+        memcpy(mapped, &vv[i], 4 * sizeof(uint32_t));
+        mapped += 4;
+        if (getGEConfig()->m_pbr)
+            *mapped = srgb255ToLinearFromSColor(vv[i].m_color).color;
+        else
+            memcpy(mapped, &vv[i].m_color, sizeof(video::SColor));
+        mapped += 1;
+        memcpy(mapped, vv[i].m_all_uvs, 3 * sizeof(uint32_t));
+        mapped += 3;
+    }
+}
+
+GEOcclusionCulling* getOcclusionCulling()
+{
+    if (!g_occulsion_culling)
+    {
+        g_occulsion_culling = std::unique_ptr<GEOcclusionCulling>(
+            new GEOcclusionCulling());
+    }
+    return g_occulsion_culling.get();
+}
+
+void resetOcclusionCulling()
+{
+    g_occulsion_culling.reset();
+}
+
+bool hasOcclusionCulling()
+{
+    if (g_occulsion_culling)
+        return true;
+    return false;
 }
 
 }

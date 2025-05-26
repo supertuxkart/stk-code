@@ -72,12 +72,12 @@ namespace SkinConfig
     static std::vector<std::string> m_icon_theme_paths;
     static bool m_font;
 
-    static void parseElement(const XMLNode* node)
+    static void parseElement(const XMLNode* node, std::vector<std::string>& skin_paths)
     {
         std::string type;
         std::string state = "neutral";
         std::string image;
-        bool common_img = false;
+        bool common_img = false, parent_img = false;
         int leftborder = 0, rightborder=0, topborder=0, bottomborder=0;
         float hborder_out_portion = 0.5f, vborder_out_portion = 1.0f;
         float horizontal_inner_padding = 0.0f, vertical_inner_padding = 0.0f;
@@ -116,6 +116,7 @@ namespace SkinConfig
 
         node->get("areas", &areas);
         node->get("common", &common_img);
+        node->get("parent", &parent_img);
 
         BoxRenderParams new_param;
         new_param.m_left_border = leftborder;
@@ -130,12 +131,23 @@ namespace SkinConfig
         new_param.m_vertical_margin = vertical_margin;
         new_param.m_preserve_h_aspect_ratios = preserve_h_aspect_ratios;
 
-        // call last since it calculates coords considering all other
-        // parameters
+        // The call to an image in the parent folder only allows to go one level higher.
+        // Having a child skin rely on how many levels deeper it is in a chain of base themes
+        // to fetch a texture would bring its own issues, although this code could be
+        // easily adapted to allow it if truly needed.
+        if (parent_img && skin_paths.size() == 1)
+        {
+            parent_img = false;
+            Log::error("skin", "Requesting images from the base theme folder without a base theme\n");
+        }
+
         new_param.setTexture(common_img ?
             irr_driver->getTexture(FileManager::SKIN, std::string("common/") + image) :
+            parent_img ? irr_driver->getTexture(skin_paths[skin_paths.size() - 2] + "/" + image) :
             irr_driver->getTexture(m_data_path + image));
 
+        // call last since it calculates coords considering all other
+        // parameters
         if (areas.size() > 0)
         {
             new_param.areas = 0;
@@ -184,7 +196,7 @@ namespace SkinConfig
       * \brief loads skin information from a STK skin file
       * \throw std::runtime_error if file cannot be read
       */
-    static void loadFromFile(std::string file, bool clear_prev_params)
+    static void loadFromFile(std::string file, bool clear_prev_params, std::vector<std::string>& skin_paths)
     {
         m_data_path.clear();
         if (clear_prev_params)
@@ -231,7 +243,7 @@ namespace SkinConfig
 
             if (node->getName() == "element")
             {
-                parseElement(node);
+                parseElement(node, skin_paths);
             }
             else if (node->getName() == "color")
             {
@@ -559,42 +571,18 @@ Skin::Skin(IGUISkin* fallback_skin)
 
     try
     {
-        std::vector<std::string> load_chain = SkinConfig::getDependencyChain(skin_id);
-
-        bool reset = true;
-        for (auto skin_id : load_chain)
-        {
-            std::string skin_name = skin_id.find("addon_") != std::string::npos ?
-                file_manager->getAddonsFile(
-                    std::string("skins/") + skin_id.substr(6) + "/stkskin.xml") :
-                file_manager->getAsset(FileManager::SKIN, skin_id + "/stkskin.xml");
-
-            Log::info("GUI", "Loading skin data from file: %s", skin_name.c_str());
-            SkinConfig::loadFromFile(skin_name, reset);
-            reset = false;
-        }
+        chainLoad(skin_id);
     }
     catch (std::runtime_error& e)
     {
         (void)e;   // avoid compiler warning
         // couldn't load skin. Try to revert to default
+
         Log::error("GUI", "Could not load skin, reverting to default.");
         UserConfigParams::m_skin_file.revertToDefaults();
         skin_id = UserConfigParams::m_skin_file;
-        std::vector<std::string> load_chain = SkinConfig::getDependencyChain(skin_id);
 
-        bool reset = true;
-        for (auto skin_id : load_chain)
-        {
-            std::string skin_name = skin_id.find("addon_") != std::string::npos ?
-                file_manager->getAddonsFile(
-                    std::string("skins/") + skin_id.substr(6) + "/stkskin.xml") :
-                file_manager->getAsset(FileManager::SKIN, skin_id + "/stkskin.xml");
-
-            Log::info("GUI", "Loading skin data from file: %s", skin_name.c_str());
-            SkinConfig::loadFromFile(skin_name, reset);
-            reset = false;
-        }
+        chainLoad(skin_id);
     }
 
     m_bg_image = NULL;
@@ -613,6 +601,27 @@ Skin::~Skin()
     if (m_fallback_skin)
         m_fallback_skin->drop();
 }   // ~Skin
+
+void Skin::chainLoad(std::string skin_id)
+{
+    m_skin_paths.clear();
+    std::vector<std::string> load_chain = SkinConfig::getDependencyChain(skin_id);
+
+    bool reset = true;
+    for (auto skin_id : load_chain)
+    {
+        std::string skin_path = skin_id.find("addon_") != std::string::npos ?
+            file_manager->getAddonsFile(std::string("skins/") + skin_id.substr(6)) :
+            file_manager->getAsset(FileManager::SKIN, skin_id);
+        m_skin_paths.push_back(skin_path);
+
+        skin_path += "/stkskin.xml";
+
+        Log::info("GUI", "Loading skin data from file: %s", skin_path.c_str());
+        SkinConfig::loadFromFile(skin_path, reset, m_skin_paths);
+        reset = false;
+    }
+} // chainLoad
 
 // ----------------------------------------------------------------------------
 void Skin::drawBgImage()
@@ -1424,10 +1433,11 @@ void Skin::drawRibbonChild(const core::recti &rect, Widget* widget,
         }
 
         const bool mark_focused =
-            focused || (parent_focused && parentRibbonWidget != NULL &&
+            (focused || (parent_focused && parentRibbonWidget != NULL &&
                           parentRibbonWidget->m_mouse_focus == widget) ||
                        (mark_selected && !always_show_selection &&
-                          parent_focused);
+                          parent_focused)) &&
+                        widget->m_properties[PROP_FOCUS_ICON].size() == 0;
 
         /* draw "selection bubble" if relevant */
         if (always_show_selection && mark_selected)
@@ -1839,7 +1849,16 @@ void Skin::drawSpinnerChild(const core::recti &rect, Widget* widget,
         return;
 
     SpinnerWidget* spinner = dynamic_cast<SpinnerWidget*>(widget->m_event_handler);
-    bool spinner_focused = spinner->isFocusedForPlayer(PLAYER_ID_GAME_MASTER);
+    
+    bool spinner_focused = false;
+    for (unsigned i = 1; i < MAX_PLAYER_COUNT + 1; i++)
+    {
+        if (spinner->isFocusedForPlayer(i - 1))
+        {
+            spinner_focused = true;
+            break;
+        }
+    }
 
     if (pressed || (spinner->isButtonSelected(right) && spinner_focused))
     {

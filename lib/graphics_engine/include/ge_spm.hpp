@@ -83,6 +83,8 @@ public:
     unsigned getJointCount() const                    { return m_joint_using; }
     // ------------------------------------------------------------------------
     void addMeshBuffer(GESPMBuffer* mb)             { m_buffer.push_back(mb); }
+    // ------------------------------------------------------------------------
+    void removeMeshBuffer(u32 nr);
 
 };
 

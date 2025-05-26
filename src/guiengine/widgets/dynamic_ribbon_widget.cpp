@@ -36,6 +36,8 @@ using namespace GUIEngine;
 using namespace irr::core;
 using namespace irr::gui;
 
+const float READABILITY_FACTOR = 1.15f;
+
 DynamicRibbonWidget::DynamicRibbonWidget(const bool combo, const bool multi_row) : Widget(WTYPE_DYNAMIC_RIBBON)
 {
     m_scroll_offset        = 0;
@@ -77,34 +79,6 @@ DynamicRibbonWidget::~DynamicRibbonWidget()
     {
         GUIEngine::needsUpdate.remove(this);
     }
-}
-
-// -----------------------------------------------------------------------------
-
-/** Function that estimates the area (in squared pixels) that ribbon icons
-  * would take given a number of rows (used to estimate the best number of
-  * rows)
-  * \param[out] visibleItems number of items that can be displayed in this
-  *                          configuration
-  * \param[out] takenArea    how many square pixels are taken by the icons
-  * \param[out] itemHeight   how high each item would be in this configuration
-  */
-void estimateIconAreaFor(const int rowCount, const int wantedIconWidth,
-                         const int width, const int height,
-                         const float iconAspectRatio, const int maxIcons,
-                         int* visibleItems, int* takenArea, int* itemHeight)
-{
-    assert(height > 0);
-    const int row_height = height / rowCount;
-
-    float icon_height = (float)row_height;
-    float icon_width = row_height * iconAspectRatio;
-    *itemHeight = int(icon_height);
-
-    const int icons_per_row = std::min(int(width / icon_width), int(width / wantedIconWidth));
-
-    *visibleItems = std::min(maxIcons, icons_per_row * rowCount);
-    *takenArea = int(*visibleItems * icon_width * icon_height);
 }
 
 void DynamicRibbonWidget::add()
@@ -254,18 +228,109 @@ void DynamicRibbonWidget::updateForResizing()
     m_left_widget->m_w = left_arrow_location.getWidth();
     m_left_widget->m_h = left_arrow_location.getHeight();
     m_left_widget->resize();
-}
+}   // updateForResizing
+
+// -----------------------------------------------------------------------------
+
+/** Computes a score based on multiple icon properties
+  * (used to estimate the best number of rows)
+  *  There are three parameters we try to optimize for:
+  * 1 - Showing as many items as possible ;
+  * 2 - having icons sufficiently big ;
+  * 3 - Using the available area (least important)
+  * \param[out] heightRatio   the proportion of max height that should be used
+  */
+float DynamicRibbonWidget::estimateRowScore(const int rowCount, const int width, const int height,
+                         const float iconAspectRatio, const int maxIcons, float* heightRatio, float capSize)
+{
+    assert(height > 0);
+
+    const float row_height = (float)height / (float)rowCount;
+    float test_height_ratio = 1.0f;
+    float max_score_so_far = -1;
+    float nextRowRatio = (float)(rowCount)/(float)(rowCount + 1);
+
+    // We test multiple icons heights, as a smaller height might
+    // be better than full height or an additional row
+    while (test_height_ratio > nextRowRatio)
+    {
+        float icon_height = row_height * test_height_ratio;
+        float icon_width = icon_height * iconAspectRatio * READABILITY_FACTOR;
+
+        // FIXME - this doesn't account for the space that is lost to scrolling arrows,
+        // if there are scrolling arrows
+        const int icons_per_row = int(width / icon_width);
+        int visible_items = std::min(maxIcons, icons_per_row * rowCount);
+        // Screens with a huge amount of icons lose readability,
+        // so items beyond the 30th count less
+        float visible_items_score = std::min((float)visible_items, 18.0f + 0.4f * visible_items);
+
+        // Used to penalize layouts where the icons are smaller than requested in XML
+        // The penalty starts as less than quadratic, but becomes quickly more than
+        // quadratic, to avoid layouts with tiny icons
+        // Icons above the requested size don't receive a penalty
+        // TODO: check how this interacts with high-dpi
+        // TODO: properly account for the margins between rows, which reduce the true available height
+        float icon_size_ratio = std::min(1.0f, icon_height / (float)m_child_height);
+        icon_size_ratio = (icon_size_ratio * icon_size_ratio * icon_size_ratio * sqrtf(icon_size_ratio)) * 
+                        (2.0f - icon_size_ratio) * (2.0f - icon_size_ratio) * std::min(1.0f, icon_size_ratio * 1.5f);
+
+        // We slightly penalize layouts that don't cover well the available area,
+        // this mostly acts as a tie-breaker when all items can be displayed
+        // at the requested icon size
+        int taken_area = int(visible_items * icon_width * icon_height);
+        float total_area = (float)(width * height);    
+        float area_factor = std::min(taken_area/total_area, 1.0f);
+        area_factor = 0.9f + area_factor * 0.1f;
+
+        // We compute the final score by combining the three elements,
+        // with an extra penalty for missing the target number of icons
+        // (which helps to avoid layouts that barely miss the target)
+        float score = visible_items_score * icon_size_ratio * area_factor;
+        if (visible_items < maxIcons)
+            score *= 0.7f;
+        if (visible_items < (maxIcons/2))
+            score *= 0.9f;
+        if (visible_items < (maxIcons/3))
+            score *= 0.9f;
+        if (visible_items < (maxIcons/4))
+            score *= 0.9f;
+        
+        /*Log::info("DynamicRibbonWidget", "rows = %d; height ratio = %f; visible items = %d; area factor = %f; "
+            "icon_height = %f; icon size ratio = %f; score = %f", rowCount, visible_items, test_height_ratio,
+            area_factor, icon_height, icon_size_ratio, score);*/
+
+        if (score > max_score_so_far)
+        {
+            *heightRatio = test_height_ratio;
+            max_score_so_far = score;
+        }
+
+        test_height_ratio -= 0.05f;
+        if (test_height_ratio < capSize)
+            break;
+    } // while icon height > greatest icon height possible with another row
+
+    return max_score_so_far;
+}   // estimateRowScore
 
 // -----------------------------------------------------------------------------
 void DynamicRibbonWidget::buildInternalStructure()
 {
+    const float aspect_ratio = (float)m_child_width / (float)m_child_height;
+    // FIXME: The height of the tabs that are associated with a ribbon widget
+    // don't change smoothly, as a result the available areas for the ribbon
+    // icons may decrease when increasing screen height
+    int item_shown_target = m_item_count_hint;
+
+    if (item_shown_target < 1)
+        item_shown_target = (int) m_items.size();
+
     if (m_multi_row)
     {
         // determine row amount
-        const float aspect_ratio = (float)m_child_width / (float)m_child_height;
-        // const int count = m_items.size();
-
         m_row_amount = -1;
+        m_size_ratio = 1.0f;
 
         if (m_h - m_label_height < 0)
         {
@@ -275,57 +340,26 @@ void DynamicRibbonWidget::buildInternalStructure()
         else
         {
             float max_score_so_far = -1;
+
+            // No hint or actual number, so make assumptions
+            if (item_shown_target < 1)      
+                item_shown_target = 20;
+
             for (int row_count = 1; row_count < 10; row_count++)
             {
-                int visible_items;
-                int taken_area;
-                int item_height;
-
-                int item_count = m_item_count_hint;
-
-                if (item_count < 1)
-                {
-                    item_count = (int) m_items.size();
-                }
-
-                if (item_count < 1)
-                {
-                    // No idea so make assumptions
-                    item_count = 20;
-                }
-
-                estimateIconAreaFor(row_count, m_child_width, m_w, m_h - m_label_height,
-                                    aspect_ratio, item_count, &visible_items, &taken_area, &item_height);
-
-                // FIXME: this system to determine the best number of columns is really complicated!
-                // the score is computed from taken screen area AND visible item count.
-                // A number of rows that allows for the screen space to be used a lot will
-                // get a better score. A number of rows that allows showing very few items
-                // will be penalized. A configuration that makes items much smaller than
-                // requested in the XML file will also be penalized.
-                float ratio = (float)item_height / (float)m_child_height;
-
-                // huge icons not so good either
-                if (ratio > 1.0f)
-                {
-                    ratio = 1.0f - ratio/5.0f;
-                    if (ratio < 0.0f) ratio = 0.0f;
-                }
-
-                float total_area = (float)(m_w * m_h);
-                const float score = log(2.0f*visible_items) *
-                                      std::min(ratio, 1.0f) * std::min(taken_area/total_area, 1.0f);
-
-                //Log::info("DynamicRibbonWidget", "%d rown: %d visible items; area = %f; "
-                //    "size penalty = %f; score = %f", row_count, visible_items, taken_area,
-                //    std::min((float)item_height / (float)m_child_height, 1.0f), score);
+                float height_ratio;
+                // Get the best score for this number of rows
+                float score = estimateRowScore(row_count, m_w, m_h - m_label_height,
+                                               aspect_ratio, item_shown_target, &height_ratio);
 
                 if (score > max_score_so_far)
                 {
                     m_row_amount = row_count;
+                    m_size_ratio = height_ratio;
                     max_score_so_far = score;
                 }
             }
+            //Log::info("DynamicRibbonWidget", "The size ratio of the best score is %f.", m_size_ratio);
             assert(m_row_amount != -1);
         }
 
@@ -343,8 +377,16 @@ void DynamicRibbonWidget::buildInternalStructure()
             }
         }
     }
-    else
+    else // single-row
     {
+        // No hint or actual number, so make assumptions
+        if (item_shown_target < 1)      
+            item_shown_target = 5;
+
+        // Get the best score for this number of rows
+        estimateRowScore(1, m_w, m_h - m_label_height,
+                            aspect_ratio, item_shown_target, &m_size_ratio, 0.68f /* min size ratio */);
+        //Log::info("DynamicRibbonWidget", "The size ratio of the best score is %f.", m_size_ratio);
         m_row_amount = 1;
     }
 
@@ -379,9 +421,12 @@ void DynamicRibbonWidget::buildInternalStructure()
     // ---- determine column amount
     const float row_height = (float)(m_h - m_label_height)/(float)m_row_amount;
     float col_width = (float)(row_height * m_child_width / m_child_height);
+    col_width *= m_size_ratio;
+
+    float target_width = col_width;
     
     // Give some margin for columns for better readability
-    col_width *= 1.2f;
+    col_width *= READABILITY_FACTOR;
     
     m_col_amount = std::max((int)floor( m_w / col_width ), 1);
 
@@ -409,7 +454,16 @@ void DynamicRibbonWidget::buildInternalStructure()
         m_scrolling_enabled = true;
         m_left_widget->m_element->setVisible(true);
         m_right_widget->m_element->setVisible(true);
+        // Reserve space for the scrolling arrows
+        float arrows_width_ratio = 2.0f * ((float)m_arrows_w / col_width) / (float)m_col_amount;
+        if (arrows_width_ratio < 0.05f)
+            arrows_width_ratio = 0.05f;
+        if (arrows_width_ratio > 0.3f)
+            arrows_width_ratio = 0.3f;
+        target_width = target_width * (1.0f - arrows_width_ratio);
     }
+
+    float target_height = target_width / aspect_ratio;
 
     // ---- add rows
     int added_item_count = 0;
@@ -433,6 +487,14 @@ void DynamicRibbonWidget::buildInternalStructure()
         ribbon->m_h = (int)(row_height);
         ribbon->m_type = WTYPE_RIBBON;
 
+        // Do partial vertical centering for single-row ribbon icons
+        if (!m_multi_row)
+        {
+            float vertical_shift_factor = (1.0f - m_size_ratio) / 5.0f;
+            int vertical_shift = (int)(vertical_shift_factor * (float)row_height);
+            ribbon->m_y += vertical_shift;
+        }
+
         std::stringstream name;
         name << this->m_properties[PROP_ID] << "_row" << n;
         ribbon->m_properties[PROP_ID] = name.str();
@@ -449,8 +511,7 @@ void DynamicRibbonWidget::buildInternalStructure()
             // set size to get proper ratio (as most textures are saved scaled down to 256x256)
             icon->m_properties[PROP_WIDTH] = m_properties[PROP_CHILD_WIDTH];
             icon->m_properties[PROP_HEIGHT] = m_properties[PROP_CHILD_HEIGHT];
-            icon->m_w = atoi(icon->m_properties[PROP_WIDTH].c_str());
-            icon->m_h = atoi(icon->m_properties[PROP_HEIGHT].c_str());
+            icon->setTargetSize(target_width, target_height);
 
             // If we want each icon to have its own label, we must make it non-empty, otherwise
             // it will assume there is no label and none will be created (FIXME: that's ugly)
@@ -473,6 +534,7 @@ void DynamicRibbonWidget::buildInternalStructure()
                 break;
             }
         }
+
         m_children.push_back( ribbon );
         m_rows.push_back( ribbon );
         ribbon->add();
@@ -975,7 +1037,6 @@ void DynamicRibbonWidget::updateItemDisplay()
     const int row_amount = (int)m_rows.size();
     const int item_amount = (int)m_items.size();
 
-    //FIXME: isn't this set by 'buildInternalStructure' already?
     m_needed_cols = (int)ceil( (float)item_amount / (float)row_amount );
 
     //const int max_scroll = std::max(m_col_amount, m_needed_cols) - 1;

@@ -522,6 +522,8 @@ begin:
                 UserConfigParams::m_scale_rtts_factor;
             GE::getGEConfig()->m_pbr =
                 UserConfigParams::m_dynamic_lights;
+            GE::getGEConfig()->m_ibl =
+                !UserConfigParams::m_degraded_IBL;
 #endif
         }
         else
@@ -803,7 +805,7 @@ begin:
 
     if (UserConfigParams::m_shadows_resolution != 0 &&
         (UserConfigParams::m_shadows_resolution < 512 ||
-         UserConfigParams::m_shadows_resolution > 2048))
+         UserConfigParams::m_shadows_resolution > 4096))
     {
         Log::warn("irr_driver",
                "Invalid value for UserConfigParams::m_shadows_resolution : %i",
@@ -1140,6 +1142,7 @@ void IrrDriver::applyResolutionSettings(bool recreate_device)
     // Input manager set first so it recieves SDL joystick event
     // Re-init GUI engine
     GUIEngine::init(m_device, m_video_driver, StateManager::get());
+    GUIEngine::reserveLoadingIcons(3);
     // If not recreate device we need to add the previous joystick manually
     if (!recreate_device)
         input_manager->addJoystick();
@@ -1848,10 +1851,12 @@ void IrrDriver::setAmbientLight(const video::SColorf &light, bool force_SH_compu
 {
 #ifndef SERVER_ONLY
     video::SColorf color = light;
-    color.r = powf(color.r, 1.0f / 2.2f);
-    color.g = powf(color.g, 1.0f / 2.2f);
-    color.b = powf(color.b, 1.0f / 2.2f);
-    
+    if (m_video_driver->getDriverType() != EDT_VULKAN)
+    {
+        color.r = powf(color.r, 1.0f / 2.2f);
+        color.g = powf(color.g, 1.0f / 2.2f);
+        color.b = powf(color.b, 1.0f / 2.2f);
+    }
     m_scene_manager->setAmbientLight(color);
     m_renderer->setAmbientLight(light, force_SH_computation);    
 #endif
@@ -2380,9 +2385,9 @@ scene::ISceneNode *IrrDriver::addLight(const core::vector3df &pos,
                                        bool sun_, scene::ISceneNode* parent)
 {
 #ifndef SERVER_ONLY
+    if (parent == NULL) parent = m_scene_manager->getRootSceneNode();
     if (CVS->isGLSL())
     {
-        if (parent == NULL) parent = m_scene_manager->getRootSceneNode();
         LightNode *light = NULL;
 
         if (!sun_)
@@ -2404,10 +2409,25 @@ scene::ISceneNode *IrrDriver::addLight(const core::vector3df &pos,
     }
     else
     {
-        scene::ILightSceneNode* light = m_scene_manager
-               ->addLightSceneNode(m_scene_manager->getRootSceneNode(),
-                                   pos, video::SColorf(r, g, b, 1.0f));
-        light->setRadius(radius);
+        scene::ILightSceneNode* light;
+        if (m_video_driver->getDriverType() == EDT_VULKAN && sun_)
+        {
+            light = m_scene_manager->addLightSceneNode(parent, pos,
+                video::SColorf(r, g, b, 0.2f), 0.26f * M_PI / 180.0f);
+            light->setRotation(-pos);
+            light->setLightType(video::ELT_DIRECTIONAL);
+        }
+        else
+        {
+            video::SColorf color(r, g, b, 1.0f);
+            light = m_scene_manager->addLightSceneNode(parent, pos, color);
+            light->setRadius(radius);
+            if (m_video_driver->getDriverType() == EDT_VULKAN)
+            {
+                video::SLight& data = light->getLightData();
+                data.Attenuation.X = energy;
+            }
+        }
         return light;
     }
 #else

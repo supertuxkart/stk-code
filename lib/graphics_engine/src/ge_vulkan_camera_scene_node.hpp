@@ -15,6 +15,7 @@ irr::core::matrix4 m_inverse_view_matrix;
 irr::core::matrix4 m_inverse_projection_matrix;
 irr::core::matrix4 m_projection_view_matrix;
 irr::core::matrix4 m_inverse_projection_view_matrix;
+irr::core::rectf   m_viewport;
 };
 
 class GEVulkanCameraSceneNode : public irr::scene::CCameraSceneNode

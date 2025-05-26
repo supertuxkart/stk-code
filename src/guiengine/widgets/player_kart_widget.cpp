@@ -24,7 +24,6 @@
 #include <ge_render_info.hpp>
 #include "guiengine/widgets/kart_stats_widget.hpp"
 #include "guiengine/widgets/model_view_widget.hpp"
-#include "guiengine/widgets/player_name_spinner.hpp"
 #include "input/input_device.hpp"
 #include "karts/kart_model.hpp"
 #include "karts/kart_properties.hpp"
@@ -70,9 +69,10 @@ PlayerKartWidget::PlayerKartWidget(KartSelectionScreen* parent,
     target_h = m_h;
 
     // ---- Player identity spinner
-    m_player_ident_spinner = NULL;
-
-    m_player_ident_spinner = new PlayerNameSpinner(parent, m_player_id);
+    m_player_ident_spinner = new SpinnerWidget();
+    m_player_ident_spinner->setUseBackgroundColor();
+    m_player_ident_spinner->setSpinnerWidgetPlayerID(m_player_id);
+    
     m_player_ident_spinner->m_x = player_name_x;
     m_player_ident_spinner->m_y = player_name_y;
     m_player_ident_spinner->m_w = player_name_w;
@@ -310,14 +310,14 @@ void PlayerKartWidget::setPlayerID(const int newPlayerID)
     // Change the player ID
     m_player_id = newPlayerID;
     if (!m_ready)
-        m_player_ident_spinner->setID(m_player_id);
+        m_player_ident_spinner->setSpinnerWidgetPlayerID(m_player_id);
     m_kart_stats->setDisplayIcons(m_player_id == 0);
     // restore previous focus, but with new player ID
     if (focus != NULL) focus->setFocusForPlayer(m_player_id);
 
     if (m_player_ident_spinner != NULL)
     {
-        m_player_ident_spinner->setID(m_player_id);
+        m_player_ident_spinner->setSpinnerWidgetPlayerID(m_player_id);
     }
 }   // setPlayerID
 

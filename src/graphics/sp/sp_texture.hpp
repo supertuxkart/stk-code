@@ -50,7 +50,7 @@ class SPTexture : public NoCopy
 private:
     std::string m_path;
 
-    std::string m_cache_directory;
+    std::string m_container_id;
 
     GLuint m_texture_name = 0;
 
@@ -153,7 +153,9 @@ private:
     std::vector<std::pair<core::dimension2du, unsigned> >
                       compressTexture(std::shared_ptr<video::IImage>& texture);
     // ------------------------------------------------------------------------
-    bool useTextureCache(const std::string& full_path, std::string* cache_loc);
+    bool useTextureCache(const std::string& full_path,
+                         const std::string& cache_directory,
+                         std::string* cache_loc);
     // ------------------------------------------------------------------------
     std::shared_ptr<video::IImage> getTextureCache(const std::string& path,
         std::vector<std::pair<core::dimension2du, unsigned> >* sizes);
@@ -191,8 +193,9 @@ public:
     // ------------------------------------------------------------------------
     unsigned getHeight() const                      { return m_height.load(); }
     // ------------------------------------------------------------------------
-    bool threadedLoad();
-
+    bool threadedLoad(const std::string& cache_directory);
+    // ------------------------------------------------------------------------
+    std::string getCacheDirectory();
 
 };
 

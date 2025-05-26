@@ -859,14 +859,17 @@ bool Kart::isInRest() const
 }  // isInRest
 
 //-----------------------------------------------------------------------------
-/** Multiplies the velocity of the kart by a factor f (both linear
- *  and angular). This is used by anvils, which suddenly slow down the kart
- *  when they are attached.
+/** Multiplies the velocity of the kart by a factor f (both linear and angular).
+ * This is used by anchors, which suddenly slow down the kart when they are attached.
  */
 void Kart::adjustSpeed(float f)
 {
     m_body->setLinearVelocity(m_body->getLinearVelocity()*f);
     m_body->setAngularVelocity(m_body->getAngularVelocity()*f);
+    // Avoid instant speed increase on the same frame ignoring the adjustment, see #5411
+    float new_min_speed = m_vehicle->getMinSpeed()*f;
+    m_vehicle->resetMinSpeed(); // setMinSpeed only update if the new one is greater... See btKart.hpp
+    m_vehicle->setMinSpeed(new_min_speed);
 }   // adjustSpeed
 
 //-----------------------------------------------------------------------------
@@ -1375,8 +1378,9 @@ void Kart::update(int ticks)
 
     m_powerup->update(ticks);
 
-    // Reset any instant speed increase in the bullet kart
+    // Reset any instant speed increase or speed floor in the bullet kart
     m_vehicle->resetMaxSpeed();
+    m_vehicle->resetMinSpeed();
 
     if (m_bubblegum_ticks > 0)
         m_bubblegum_ticks -= ticks;
@@ -2679,7 +2683,15 @@ void Kart::updateEngineSFX(float dt)
 {
     // Only update SFX during the last substep (otherwise too many SFX commands
     // in one frame), and if sfx are enabled
-    if(!m_engine_sound || !SFXManager::get()->sfxAllowed()  )
+    if(!SFXManager::get()->sfxAllowed())
+        return;
+    
+    if (m_skid_sound)
+        m_skid_sound->setPosition(getSmoothedXYZ());
+    if (m_nitro_sound)
+        m_nitro_sound->setPosition(getSmoothedXYZ());
+
+    if (!m_engine_sound)
         return;
 
     // when going faster, use higher pitch for engine
@@ -3265,9 +3277,6 @@ void Kart::updateGraphics(float dt)
 
     for (int i = 0; i < EMITTER_COUNT; i++)
         m_emitters[i]->setPosition(getXYZ());
-    if (m_skid_sound)
-        m_skid_sound->setPosition(getSmoothedXYZ());
-    m_nitro_sound->setPosition(getSmoothedXYZ());
 
     m_attachment->updateGraphics(dt);
 

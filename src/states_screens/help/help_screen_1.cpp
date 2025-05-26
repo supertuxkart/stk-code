@@ -21,6 +21,10 @@
 #include "guiengine/widgets/button_widget.hpp"
 #include "modes/tutorial_utils.hpp"
 
+#ifdef ANDROID
+#include <SDL_system.h>
+#endif
+
 using namespace GUIEngine;
 
 // -----------------------------------------------------------------------------
@@ -36,6 +40,22 @@ void HelpScreen1::loadedFromFile()
 }   // loadedFromFile
 
 // -----------------------------------------------------------------------------
+
+void HelpScreen1::beforeAddingWidget()
+{
+#ifdef ANDROID
+    if (SDL_IsAndroidTV())
+    {
+        Widget* tutorial = getWidget("startTutorial");
+        if (tutorial)
+            tutorial->setVisible(false);
+
+        Widget* tutorial_icon = getWidget("tutorialIcon");
+        if (tutorial_icon)
+            tutorial_icon->setVisible(false);
+    }
+#endif
+}
 
 void HelpScreen1::eventCallback(Widget* widget, const std::string& name, const int playerID)
 {

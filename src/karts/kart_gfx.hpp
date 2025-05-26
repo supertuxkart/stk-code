@@ -103,6 +103,7 @@ private:
                    const Vec3 &position, bool important);
     void resizeBox(const KartGFXType type, float new_size);
 
+    bool supportsLight() const;
 public:
          KartGFX(const AbstractKart *kart, bool is_day);
         ~KartGFX();

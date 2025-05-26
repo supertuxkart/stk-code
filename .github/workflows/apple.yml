@@ -49,7 +49,7 @@ jobs:
             echo "cache_$number=apple-${{ github.ref }}-${{ matrix.arch }}-${{ matrix.platform }}-$id" >> $GITHUB_ENV
           done
       - name: Handle build cache
-        uses: actions/cache@v2
+        uses: actions/cache@v3
         with:
           path: |
             build
@@ -152,6 +152,8 @@ jobs:
           lipo -create ./macosx-x86_64/supertuxkart.app/Contents/MacOS/supertuxkart ./macosx-arm64/supertuxkart.app/Contents/MacOS/supertuxkart -output ./macosx-arm64/supertuxkart.app/Contents/MacOS/supertuxkart
           chmod 755 ./macosx-arm64/supertuxkart.app/Contents/MacOS/supertuxkart
           install_name_tool -change libcurl.4.dylib @rpath/libcurl.4.dylib ./macosx-arm64/supertuxkart.app/Contents/MacOS/supertuxkart
+          install_name_tool -delete_rpath @loader_path/Frameworks ./dependencies-macosx/lib/libSDL2.dylib
+          install_name_tool -delete_rpath @executable_path/Frameworks ./dependencies-macosx/lib/libSDL2.dylib
           dylibbundler -od -b -x ./macosx-arm64/supertuxkart.app/Contents/MacOS/supertuxkart -d ./macosx-arm64/supertuxkart.app/Contents/libs/ -p @executable_path/../libs/ -s ./dependencies-macosx/lib -ns
           # We use SDL_Vulkan_LoadLibrary for 10.9 compatibility, so otool -L supertuxkart has no libMoltenVK.dylib
           cp ./dependencies-macosx/lib/libMoltenVK.dylib ./macosx-arm64/supertuxkart.app/Contents/libs/

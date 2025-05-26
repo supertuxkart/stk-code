@@ -5,11 +5,11 @@
 
 namespace GE
 {
-class GEVulkanDepthTexture;
+class GEVulkanAttachmentTexture;
 class GEVulkanFBOTexture : public GEVulkanTexture
 {
 private:
-    GEVulkanDepthTexture* m_depth_texture;
+    GEVulkanAttachmentTexture* m_depth_texture;
 
     VkRenderPass m_rtt_render_pass;
 

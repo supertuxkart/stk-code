@@ -52,6 +52,7 @@
 #include <algorithm>
 #include <array>
 #include <cassert>
+#include <functional>
 #include <string>
 #include <unordered_map>
 #include <unordered_set>
@@ -98,7 +99,7 @@ std::unordered_map<unsigned, std::pair<core::vector3df,
 // ----------------------------------------------------------------------------
 std::unordered_set<SPMeshBuffer*> g_instances;
 // ----------------------------------------------------------------------------
-std::array<GLuint, ST_COUNT> g_samplers;
+std::array<GLuint, ST_COUNT> g_samplers = {{ }};
 // ----------------------------------------------------------------------------
 // Check sp_shader.cpp for the name
 std::array<GLuint, 1> sp_prefilled_tex;
@@ -123,7 +124,7 @@ unsigned g_skinning_offset = 0;
 // ----------------------------------------------------------------------------
 std::vector<SPMeshNode*> g_skinning_mesh;
 // ----------------------------------------------------------------------------
-int g_skinning_tbo_limit = 0;
+bool g_skinning_use_tbo = false;
 // ----------------------------------------------------------------------------
 int sp_cur_shadow_cascade = 0;
 // ----------------------------------------------------------------------------
@@ -319,12 +320,13 @@ void initSkinning()
     else
     {
 #ifndef USE_GLES2
-        glGetIntegerv(GL_MAX_TEXTURE_BUFFER_SIZE, &g_skinning_tbo_limit);
-        if (stk_config->m_max_skinning_bones << 6 > (unsigned)g_skinning_tbo_limit)
+        int skinning_tbo_limit;
+        glGetIntegerv(GL_MAX_TEXTURE_BUFFER_SIZE, &skinning_tbo_limit);
+        if (stk_config->m_max_skinning_bones << 6 > (unsigned)skinning_tbo_limit)
         {
             Log::warn("SharedGPUObjects", "Too many bones for skinning, max: %d",
-                      g_skinning_tbo_limit >> 6);
-            stk_config->m_max_skinning_bones = g_skinning_tbo_limit >> 6;
+                      skinning_tbo_limit >> 6);
+            stk_config->m_max_skinning_bones = skinning_tbo_limit >> 6;
         }
         Log::info("SharedGPUObjects", "Hardware Skinning enabled, method: TBO, "
                   "max bones: %u", stk_config->m_max_skinning_bones);
@@ -444,7 +446,14 @@ void init()
 
     if (CVS->isARBTextureBufferObjectUsable())
     {
-        glGetIntegerv(GL_MAX_TEXTURE_BUFFER_SIZE_ARB, &g_skinning_tbo_limit);
+        int skinning_tbo_limit;
+        glGetIntegerv(GL_MAX_TEXTURE_BUFFER_SIZE_ARB, &skinning_tbo_limit);
+        
+        g_skinning_use_tbo = skinning_tbo_limit >= stk_config->m_max_skinning_bones << 6;
+    }
+    else
+    {
+        g_skinning_use_tbo = false;
     }
 
     initSkinning();
@@ -464,6 +473,18 @@ void init()
     glBindBufferBase(GL_UNIFORM_BUFFER, 2, sp_fog_ubo);
 
     glBindBuffer(GL_UNIFORM_BUFFER, 0);
+    initSamplers();
+}   // init
+
+// ----------------------------------------------------------------------------
+void initSamplers()
+{
+    if (std::all_of(g_samplers.begin(), g_samplers.end() - 1,
+        [](int value) { return value != 0; }))
+    {
+        glDeleteSamplers((unsigned)g_samplers.size() - 1, g_samplers.data());
+        g_samplers.fill(0);
+    }
 
     for (unsigned st = ST_NEAREST; st < ST_COUNT; st++)
     {
@@ -597,7 +618,7 @@ void init()
                 break;
         }
     }
-}   // init
+}   // initSamplers
 
 // ----------------------------------------------------------------------------
 void destroy()
@@ -630,7 +651,7 @@ void destroy()
     }
     glDeleteBuffers(1, &sp_fog_ubo);
     glDeleteSamplers((unsigned)g_samplers.size() - 1, g_samplers.data());
-
+    g_samplers.fill(0);
 }   // destroy
 
 // ----------------------------------------------------------------------------
@@ -655,8 +676,7 @@ SPShader* getNormalVisualizer()
 // ----------------------------------------------------------------------------
 bool skinningUseTBO()
 {
-    return CVS->isARBTextureBufferObjectUsable()
-        && g_skinning_tbo_limit >= 64 * stk_config->m_max_skinning_bones;
+    return g_skinning_use_tbo;
 }
 
 

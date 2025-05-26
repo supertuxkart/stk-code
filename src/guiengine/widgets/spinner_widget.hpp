@@ -31,6 +31,8 @@ namespace irr
 #include "utils/leak_check.hpp"
 #include "utils/ptr_vector.hpp"
 
+#include <IGUIImage.h>
+
 namespace GUIEngine
 {
     
@@ -52,12 +54,15 @@ namespace GUIEngine
             virtual EventPropagation onSpinnerConfirmed() = 0;
         };
         
-    protected:
+    private:
         std::function<void(SpinnerWidget* spinner)> m_value_updated_callback;
         ISpinnerConfirmListener* m_listener;
         
         int m_value, m_min, m_max;
         float m_step;
+
+        bool m_incorrect;
+        irr::gui::IGUIImage* m_red_mark_widget;
         
         int m_spinner_widget_player_id;
         bool m_use_background_color;
@@ -113,6 +118,9 @@ namespace GUIEngine
         
         /** Call only if this spinner is graphical. Returns the current texture to display */
         irr::video::ITexture* getTexture();
+
+        /** Pick the appropriate font size to display the current spinner label */
+        void resizeLabel();
        
     public:
 
@@ -126,11 +134,11 @@ namespace GUIEngine
         void clearLabels();
 
     // next four functions are for background colour behind playername in multikart screen selection
-        void setUseBackgroundColor()                {m_use_background_color=true;        }
-        bool getUseBackgroundColor()                {return m_use_background_color;      }
-        void setSpinnerWidgetPlayerID(int playerID) {m_spinner_widget_player_id=playerID;}
-        int getSpinnerWidgetPlayerID()              {return m_spinner_widget_player_id;  }
-        void unsetUseBackgroundColor()              {m_use_background_color=false;       }
+        void setUseBackgroundColor()                { m_use_background_color=true;         }
+        bool getUseBackgroundColor() const          { return m_use_background_color;       }
+        void setSpinnerWidgetPlayerID(int playerID) { m_spinner_widget_player_id=playerID; }
+        int getSpinnerWidgetPlayerID() const        { return m_spinner_widget_player_id;   }
+        void unsetUseBackgroundColor()              { m_use_background_color=false;        }
 
         void activateSelectedButton();
         void setSelectedButton(bool right)
@@ -264,6 +272,13 @@ namespace GUIEngine
             m_min = n;
             if(getValue()<m_min) setValue(m_min);
         }   // setMin
+
+        // ------------------------------------------------------------------------
+        /** Add a red mark on the spinner to mean "invalid choice" */
+        void markAsIncorrect();
+        // ------------------------------------------------------------------------
+        /** Remove any red mark set with 'markAsIncorrect' */
+        void markAsCorrect();
         
         // --------------------------------------------------------------------
         /** Override method from base class Widget */
@@ -287,6 +302,12 @@ namespace GUIEngine
             std::function<void(SpinnerWidget* spinner)> callback)
         {
             m_value_updated_callback = callback;
+        }
+        virtual void elementRemoved()
+        {
+            m_incorrect = false;
+            m_red_mark_widget = NULL;
+            Widget::elementRemoved();
         }
 
     };

@@ -112,7 +112,7 @@ void GhostReplaySelection::loadedFromFile()
 
     m_replay_version_toggle_widget =
         getWidget<GUIEngine::CheckBoxWidget>("replay_version_toggle");
-    m_replay_version_toggle_widget->setState(/* default value */ true);
+    m_replay_version_toggle_widget->setState(/* default value */ false);
     m_same_version = m_replay_version_toggle_widget->getState();
 
     m_best_times_toggle_widget =

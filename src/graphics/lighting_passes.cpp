@@ -33,6 +33,7 @@
 #include "utils/profiler.hpp"
 
 #include <ICameraSceneNode.h>
+#include <cmath>
 
 class LightBaseClass
 {
@@ -47,6 +48,10 @@ public:
         float green;
         float blue;
         float radius;
+        float direction_x;
+        float direction_y;
+        float scale;
+        float offset;
     };
 public:
     static const unsigned int MAXLIGHT = 32;
@@ -86,6 +91,7 @@ public:
         GLuint attrib_Color = glGetAttribLocation(m_program, "Color");
         GLuint attrib_Energy = glGetAttribLocation(m_program, "Energy");
         GLuint attrib_Radius = glGetAttribLocation(m_program, "Radius");
+        GLuint attrib_DSO = glGetAttribLocation(m_program, "Direction_scale_offset");
 
         glEnableVertexAttribArray(attrib_Position);
         glVertexAttribPointer(attrib_Position, 3, GL_FLOAT, GL_FALSE,
@@ -102,11 +108,16 @@ public:
         glVertexAttribPointer(attrib_Radius, 1, GL_FLOAT, GL_FALSE,
                               sizeof(LightBaseClass::PointLightInfo),
                               (GLvoid*)(7 * sizeof(float)));
+        glEnableVertexAttribArray(attrib_DSO);
+        glVertexAttribPointer(attrib_DSO, 4, GL_FLOAT, GL_FALSE,
+                              sizeof(LightBaseClass::PointLightInfo),
+                              (GLvoid*)(8 * sizeof(float)));
 
         glVertexAttribDivisor(attrib_Position, 1);
         glVertexAttribDivisor(attrib_Energy, 1);
         glVertexAttribDivisor(attrib_Color, 1);
         glVertexAttribDivisor(attrib_Radius, 1);
+        glVertexAttribDivisor(attrib_DSO, 1);
     }   // PointLightShader
     ~PointLightShader()
     {
@@ -141,6 +152,7 @@ public:
         GLuint attrib_Color = glGetAttribLocation(m_program, "Color");
         GLuint attrib_Energy = glGetAttribLocation(m_program, "Energy");
         GLuint attrib_Radius = glGetAttribLocation(m_program, "Radius");
+        GLuint attrib_DSO = glGetAttribLocation(m_program, "Direction_scale_offset");
 
         glEnableVertexAttribArray(attrib_Position);
         glVertexAttribPointer(attrib_Position, 3, GL_FLOAT, GL_FALSE,
@@ -157,11 +169,16 @@ public:
         glVertexAttribPointer(attrib_Radius, 1, GL_FLOAT, GL_FALSE,
                               sizeof(LightBaseClass::PointLightInfo),
                               (GLvoid*)(7 * sizeof(float)));
+        glEnableVertexAttribArray(attrib_DSO);
+        glVertexAttribPointer(attrib_DSO, 4, GL_FLOAT, GL_FALSE,
+                              sizeof(LightBaseClass::PointLightInfo),
+                              (GLvoid*)(8 * sizeof(float)));
 
         glVertexAttribDivisor(attrib_Position, 1);
         glVertexAttribDivisor(attrib_Energy, 1);
         glVertexAttribDivisor(attrib_Color, 1);
         glVertexAttribDivisor(attrib_Radius, 1);
+        glVertexAttribDivisor(attrib_DSO, 1);
     }   // PointLightScatterShader
     ~PointLightScatterShader()
     {
@@ -170,7 +187,7 @@ public:
 };
 
 // ============================================================================
-class IBLShader : public TextureShader<IBLShader, 4>
+class IBLShader : public TextureShader<IBLShader, 7>
 {
 public:
     IBLShader()
@@ -180,13 +197,16 @@ public:
         assignUniforms();
         assignSamplerNames(0, "ntex",  ST_NEAREST_FILTERED,
                            1, "dtex",  ST_NEAREST_FILTERED,
-                           2, "probe", ST_TRILINEAR_CUBEMAP,
-                           3, "albedo",ST_NEAREST_FILTERED);
+                           2, "stex",  ST_SHADOW_SAMPLER,
+                           3, "probe", ST_TRILINEAR_CUBEMAP,
+                           4, "albedo",ST_NEAREST_FILTERED,
+                           5, "ssao",  ST_NEAREST_FILTERED,
+                           6, "ctex",  ST_NEAREST_FILTERED);
     }   // IBLShader
 };   // IBLShader
 
 // ============================================================================
-class DegradedIBLShader : public TextureShader<DegradedIBLShader, 1>
+class DegradedIBLShader : public TextureShader<DegradedIBLShader, 2>
 {
 public:
     DegradedIBLShader()
@@ -194,7 +214,8 @@ public:
         loadProgram(OBJECT, GL_VERTEX_SHADER, "screenquad.vert",
                             GL_FRAGMENT_SHADER, "degraded_ibl.frag");
         assignUniforms();
-        assignSamplerNames(0, "ntex", ST_NEAREST_FILTERED);
+        assignSamplerNames(0, "ntex", ST_NEAREST_FILTERED,
+                           1, "ssao", ST_NEAREST_FILTERED);
     }   // DegradedIBLShader
 };   // DegradedIBLShader
 
@@ -202,6 +223,7 @@ public:
 class ShadowedSunLightShaderPCF : public TextureShader<ShadowedSunLightShaderPCF,
                                                        3,  float, float, float,
                                                        float, float, float,
+                                                       float, float, float, float,
                                                        core::vector3df, video::SColorf>
 {
 public:
@@ -213,30 +235,91 @@ public:
         // Use 8 to circumvent a catalyst bug when binding sampler
         assignSamplerNames(0, "ntex", ST_NEAREST_FILTERED,
                            1, "dtex", ST_NEAREST_FILTERED,
-                           8, "shadowtex", ST_SHADOW_SAMPLER);
+                           8, "shadowtex", ST_SHADOW_SAMPLER_ARRAY2D);
         assignUniforms("split0", "split1", "split2", "splitmax", "shadow_res",
-            "overlap_proportion", "sundirection", "sun_color");
+            "overlap_proportion", "texel0", "texel1", "texel2", "texel3", 
+            "sundirection", "sun_color");
     }   // ShadowedSunLightShaderPCF
     // ------------------------------------------------------------------------
     void render(GLuint normal_depth_texture,
                 GLuint depth_stencil_texture,
                 const FrameBuffer* shadow_framebuffer,
                 const core::vector3df &direction,
-                const video::SColorf &col)
+                const video::SColorf &col,
+                const core::vector3df* shadow_box_extents)
     {
         setTextureUnits(normal_depth_texture,
                         depth_stencil_texture,
                         shadow_framebuffer->getDepthTexture()                );
-       drawFullScreenEffect(ShadowMatrices::m_shadow_split[1],
-                            ShadowMatrices::m_shadow_split[2],
-                            ShadowMatrices::m_shadow_split[3],
-                            ShadowMatrices::m_shadow_split[4],
-                            float(UserConfigParams::m_shadows_resolution),
-                            ShadowMatrices::m_shadow_overlap_proportion,
-                            direction, col);
+        std::array<float, 4> texel;
+        for (int i = 0; i < 4; i++)
+        {
+            texel[i] = std::max(shadow_box_extents[i].X, shadow_box_extents[i].Y);
+        }
+        drawFullScreenEffect(ShadowMatrices::m_shadow_split[1],
+                             ShadowMatrices::m_shadow_split[2],
+                             ShadowMatrices::m_shadow_split[3],
+                             ShadowMatrices::m_shadow_split[4],
+                             float(UserConfigParams::m_shadows_resolution),
+                             ShadowMatrices::m_shadow_overlap_proportion,
+                             texel[0], texel[1], texel[2], texel[3],
+                             direction, col);
 
     }    // render
 };   // ShadowedSunLightShaderPCF
+
+// ============================================================================
+class ShadowedSunLightShaderPCSS : public TextureShader<ShadowedSunLightShaderPCSS,
+                                                        4,  float, float, float,
+                                                        float, float, float,
+                                                        core::vector2df, core::vector2df,
+                                                        core::vector2df, core::vector2df,
+                                                        core::vector3df, video::SColorf>
+{
+public:
+    ShadowedSunLightShaderPCSS()
+    {
+        loadProgram(OBJECT, GL_VERTEX_SHADER, "screenquad.vert",
+                            GL_FRAGMENT_SHADER, "sunlightshadowpcss.frag");
+
+        // Use 8 to circumvent a catalyst bug when binding sampler
+        assignSamplerNames(0, "ntex", ST_NEAREST_FILTERED,
+                           1, "dtex", ST_NEAREST_FILTERED,
+                           8, "shadowtexdepth", ST_NEAREST_FILTERED_ARRAY2D,
+                           16, "shadowtex", ST_SHADOW_SAMPLER_ARRAY2D);
+        assignUniforms("split0", "split1", "split2", "splitmax", "shadow_res",
+            "overlap_proportion", "penumbra0", "penumbra1", "penumbra2", "penumbra3",
+            "sundirection", "sun_color");
+    }   // ShadowedSunLightShaderPCF
+    // ------------------------------------------------------------------------
+    void render(GLuint normal_depth_texture,
+                GLuint depth_stencil_texture,
+                const FrameBuffer* shadow_framebuffer,
+                const core::vector3df &direction,
+                const video::SColorf &col,
+                const core::vector3df* shadow_box_extents)
+    {
+        setTextureUnits(normal_depth_texture,
+                        depth_stencil_texture,
+                        shadow_framebuffer->getDepthTexture(),
+                        shadow_framebuffer->getDepthTexture()                );
+        std::array<core::vector2df, 4> penumbra;
+        for (int i = 0; i < 4; i++)
+        {
+            float size = tan(core::PI64 * 0.54 / 360.) * shadow_box_extents[i].Z;
+            penumbra[i] = core::vector2df(size / shadow_box_extents[i].X, size / shadow_box_extents[i].Y);
+        }
+        drawFullScreenEffect(ShadowMatrices::m_shadow_split[1],
+                             ShadowMatrices::m_shadow_split[2],
+                             ShadowMatrices::m_shadow_split[3],
+                             ShadowMatrices::m_shadow_split[4],
+                             float(UserConfigParams::m_shadows_resolution),
+                             ShadowMatrices::m_shadow_overlap_proportion,
+                             penumbra[0], penumbra[1], penumbra[2], penumbra[3],
+                             direction, col);
+
+    }    // render
+};   // ShadowedSunLightShaderPCSS
 
 // ============================================================================
 class SunLightShader : public TextureShader<SunLightShader, 2,
@@ -298,7 +381,9 @@ static void renderPointLights(unsigned count,
 void LightingPasses::renderEnvMap(GLuint normal_depth_texture,
                                   GLuint depth_stencil_texture,
                                   GLuint specular_probe,
-                                  GLuint albedo_buffer)
+                                  GLuint albedo_buffer,
+                                  GLuint ssao_texture,
+                                  GLuint diffuse_color_texture)
 {
     glDisable(GL_DEPTH_TEST);
     glEnable(GL_BLEND);
@@ -311,7 +396,7 @@ void LightingPasses::renderEnvMap(GLuint normal_depth_texture,
         glBindVertexArray(SharedGPUObjects::getFullScreenQuadVAO());
 
         DegradedIBLShader::getInstance()
-            ->setTextureUnits(normal_depth_texture);
+            ->setTextureUnits(normal_depth_texture, ssao_texture);
         DegradedIBLShader::getInstance()->setUniforms();
     }
     else
@@ -322,8 +407,11 @@ void LightingPasses::renderEnvMap(GLuint normal_depth_texture,
         IBLShader::getInstance()->setTextureUnits(
             normal_depth_texture,
             depth_stencil_texture,
+            depth_stencil_texture,
             specular_probe,
-            albedo_buffer);
+            albedo_buffer,
+            ssao_texture,
+            diffuse_color_texture);
         IBLShader::getInstance()->setUniforms();
     }
 
@@ -416,6 +504,24 @@ void LightingPasses::updateLightsInfo(scene::ICameraSceneNode * const camnode,
 
                 // Light radius
                 m_point_lights_info[m_point_light_count].radius = light_node->getRadius();
+                float ic = light_node->getSpotlightData().m_inner_cone;
+                float oc = light_node->getSpotlightData().m_outer_cone;
+                if (ic != 0.0f && oc != 0.0f)
+                {
+                    core::vector3df dir(0.0f, 0.0f, 1.0f);
+                    light_node->getAbsoluteTransformation().rotateVect(dir);
+                    dir.normalize();
+                    m_point_lights_info[m_point_light_count].direction_x = dir.X;
+                    m_point_lights_info[m_point_light_count].direction_y = dir.Y;
+                    float cos_outer = cosf(oc);
+                    m_point_lights_info[m_point_light_count].scale = 1.0f / std::max(cosf(ic) - cos_outer, 1e-4f);
+                    m_point_lights_info[m_point_light_count].offset = -cos_outer * m_point_lights_info[m_point_light_count].scale;
+                    m_point_lights_info[m_point_light_count].scale *= dir.Z > 0.f ? 1.f : -1.f;
+                }
+                else
+                {
+                    m_point_lights_info[m_point_light_count].scale = 0.0f;
+                }
             }
         }
         if (m_point_light_count > LightBaseClass::MAXLIGHT)
@@ -434,14 +540,19 @@ void LightingPasses::renderLights(  bool has_shadow,
                                     GLuint depth_stencil_texture,
                                     GLuint albedo_texture,
                                     const FrameBuffer* shadow_framebuffer,
-                                    GLuint specular_probe)
+                                    GLuint ssao_texture,
+                                    GLuint diffuse_color_texture,
+                                    GLuint specular_probe,
+                                    const core::vector3df* shadow_box_extents)
 {
     {
         ScopedGPUTimer timer(irr_driver->getGPUTimer(Q_ENVMAP));
         renderEnvMap(normal_depth_texture,
                      depth_stencil_texture,
                      specular_probe,
-                     albedo_texture);
+                     albedo_texture,
+                     ssao_texture,
+                     diffuse_color_texture);
     }
 
     // Render sunlight if and only if track supports shadow
@@ -455,11 +566,24 @@ void LightingPasses::renderLights(  bool has_shadow,
             glDisable(GL_DEPTH_TEST);
             glBlendFunc(GL_ONE, GL_ONE);
             glBlendEquation(GL_FUNC_ADD);
-            ShadowedSunLightShaderPCF::getInstance()->render(normal_depth_texture,
-                                                             depth_stencil_texture,
-                                                             shadow_framebuffer,
-                                                             irr_driver->getSunDirection(),
-                                                             irr_driver->getSunColor());
+            if (UserConfigParams::m_pcss_threshold <= UserConfigParams::m_shadows_resolution)
+            {
+                ShadowedSunLightShaderPCSS::getInstance()->render(normal_depth_texture,
+                                                                  depth_stencil_texture,
+                                                                  shadow_framebuffer,
+                                                                  irr_driver->getSunDirection(),
+                                                                  irr_driver->getSunColor(),
+                                                                  shadow_box_extents);
+            }
+            else
+            {
+                ShadowedSunLightShaderPCF::getInstance()->render(normal_depth_texture,
+                                                                 depth_stencil_texture,
+                                                                 shadow_framebuffer,
+                                                                 irr_driver->getSunDirection(),
+                                                                 irr_driver->getSunColor(),
+                                                                 shadow_box_extents);
+            }
         }
         else
             renderSunlight(irr_driver->getSunDirection(),

@@ -1,0 +1,53 @@
+layout (local_size_x = 16, local_size_y = 16, local_size_z = 1) in;
+
+// Binding for the input skybox cubemap.
+layout(set = 0, binding = 0) uniform samplerCube uSkybox;
+// Binding for the output irradiance (diffuse) cube map stored as a 2D array (each layer is one face).
+#ifdef SHADER_STORAGE_IMAGE_EXTENDED_FORMATS
+layout(set = 0, binding = 1, rgb10_a2) uniform restrict writeonly image2DArray uIrradianceMap;
+#else
+layout(set = 0, binding = 1, rgba8) uniform restrict writeonly image2DArray uIrradianceMap;
+#endif
+
+#include "utils/environment_map.glsl"
+
+void main()
+{
+    ivec2 pix = ivec2(gl_GlobalInvocationID.xy);
+    if (pix.x >= pc.size || pix.y >= pc.size) return;
+
+    // Get normalized UV for current pixel.
+    vec2 uv = (vec2(pix) + 0.5) / vec2(pc.size, pc.size);
+    int face = int(gl_GlobalInvocationID.z);
+    vec3 normal = FaceUVtoDir(face, uv);
+
+    // Establish a tangent space basis.
+    vec3 up = abs(normal.y) < 0.999 ? vec3(0.0, 1.0, 0.0) : vec3(1.0, 0.0, 0.0);
+    vec3 right = normalize(cross(up, normal));
+    vec3 tangent = cross(normal, right);
+
+    vec3 irradiance = vec3(0.0);
+    float weight = 0.0;
+    uint sampleCount = uint(pc.sampleCount);
+
+    for (uint i = 0u; i < sampleCount; i++)
+    {
+        vec2 xi = Hammersley(i, sampleCount);
+        // Cosine-weighted hemisphere sampling.
+        float phi = 2.0 * PI * xi.x;
+        float cosTheta = sqrt(1.0 - xi.y); // weight factor equals cos(theta)
+        float sinTheta = sqrt(xi.y);
+        vec3 sampleDir = vec3(cos(phi) * sinTheta, sin(phi) * sinTheta, cosTheta);
+
+        // Transform sample direction from tangent space to world space.
+        vec3 sampleVec = normalize(right * sampleDir.x + tangent * sampleDir.y + normal * sampleDir.z);
+
+        vec3 sampleColor = texture(uSkybox, sampleVec).rgb;
+        irradiance += sampleColor * cosTheta;
+        weight += cosTheta;
+    }
+    irradiance /= weight;
+
+    imageStore(uIrradianceMap, ivec3(pix, face), vec4(irradiance, 1.0));
+
+}

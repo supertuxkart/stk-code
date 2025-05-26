@@ -601,7 +601,7 @@ public:
     Difficulty getDifficulty() const { return m_difficulty; }
     // ----------------------------------------------------------------------------------------
     /** Returns the specified difficulty as a string. */
-    std::string getDifficultyAsString(Difficulty diff) const
+    static std::string getDifficultyAsString(Difficulty diff)
     {
         switch(diff)
         {
@@ -935,10 +935,6 @@ public:
     void addSkippedTrackInGP() { m_skipped_tracks_in_gp++; }
     // ----------------------------------------------------------------------------------------
     void setGPTimeTarget(float time_target) { m_gp_time_target = time_target; }
-    // ----------------------------------------------------------------------------------------
-    int getGPTotalLaps() const { return m_gp_total_laps; }
-    // ----------------------------------------------------------------------------------------
-    void addGPTotalLaps(int laps) { m_gp_total_laps += laps; }
     // ----------------------------------------------------------------------------------------
     /** Whether the current game mode allow live joining even the current game
      *. started in network*/

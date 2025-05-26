@@ -174,6 +174,8 @@ protected:
 
     Phase m_scheduled_pause_phase;
 
+    bool m_restart_camera;
+
     /** Set when the world needs to be deleted but you can't do it immediately
      * because you are e.g. within World::update()
      */

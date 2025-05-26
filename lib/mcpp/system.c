@@ -3435,7 +3435,7 @@ search:
     if (! fullname)                 /* Non-existent or directory    */
         return  FALSE;
     if (standard && included( fullname))        /* Once included    */
-        goto  true;
+        goto  case_true;
         
     if ((max_open != 0 && max_open <= include_nest)
                             /* Exceed the known limit of open files */
@@ -3462,12 +3462,12 @@ search:
         if ((fp = fopen( fullname, "r")) == NULL) {
             file->fp = fopen( cur_fullname, "r");
             fseek( file->fp, file->pos, SEEK_SET);
-            goto  false;
+            goto  case_false;
         }
         if (max_open == 0)      /* Remember the limit of the system */
             max_open = include_nest;
     } else if (fp == NULL)                  /* No read permission   */ 
-        goto  false;
+        goto  case_false;
     /* Truncate buffer of the includer to save memory   */
     len = (int) (file->bptr - file->buffer);
     if (len) {
@@ -3514,9 +3514,9 @@ search:
     if (mkdep && ((mkdep & MD_SYSHEADER) || ! infile->sys_header))
         put_depend( fullname);          /* Output dependency line   */
 
-true:
+case_true:
     return  TRUE;
-false:
+case_false:
     free( fullname);
     return  FALSE;
 }

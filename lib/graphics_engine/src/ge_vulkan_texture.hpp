@@ -23,7 +23,7 @@ class GEVulkanDriver;
 class GEVulkanTexture : public video::ITexture
 {
 protected:
-    core::dimension2d<u32> m_size, m_orig_size, m_max_size;
+    core::dimension2d<u32> m_size, m_orig_size;
 
     std::function<void(video::IImage*)> m_image_mani;
 
@@ -85,7 +85,8 @@ protected:
     // ------------------------------------------------------------------------
     bool createImage(VkImageUsageFlags usage);
     // ------------------------------------------------------------------------
-    bool createImageView(VkImageAspectFlags aspect_flags);
+    bool createImageView(VkImageAspectFlags aspect_flags,
+                         bool create_srgb_view = true);
     // ------------------------------------------------------------------------
     void transitionImageLayout(VkCommandBuffer command_buffer,
                                VkImageLayout old_layout,
@@ -99,7 +100,7 @@ protected:
     // ------------------------------------------------------------------------
     void clearVulkanData();
     // ------------------------------------------------------------------------
-    void reloadInternal();
+    void reloadInternal(const core::dimension2du& max_size);
     // ------------------------------------------------------------------------
     void bgraConversion(uint8_t* img_data);
     // ------------------------------------------------------------------------
@@ -243,6 +244,12 @@ public:
     virtual const io::path& getFullPath() const         { return m_full_path; }
     // ------------------------------------------------------------------------
     VkFormat getInternalFormat() const            { return m_internal_format; }
+    // ------------------------------------------------------------------------
+    VkImage getImage() const
+    {
+        waitImageView();
+        return m_image;
+    }
 };   // GEVulkanTexture
 
 }

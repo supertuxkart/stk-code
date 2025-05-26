@@ -52,7 +52,6 @@ class KartSelectionScreen : public GUIEngine::Screen,
                             public GUIEngine::ITextBoxWidgetListener
 {
     friend class KartHoverListener;
-    friend class PlayerNameSpinner;
     friend class FocusDispatcher;
 protected:
     /** Contains the custom widget shown for every player. (ref only since
@@ -91,6 +90,10 @@ protected:
 
     /** Called when all players selected their kart */
     virtual void allPlayersDone();
+
+    /** When kart list has been changed, make sure all players have valid
+     *  focus */
+    void handleKartListFocus();
 
     /** Called when number/order of karts changed, so that all will keep
      *  an up-to-date ID */
@@ -182,7 +185,12 @@ public:
         setKartsFromCurrentGroup();
         // After setKartsFromCurrentGroup the m_search_box may be unfocused
         m_search_box->focused(PLAYER_ID_GAME_MASTER);
+
+        handleKartListFocus();
     }
+
+    virtual void onFocusChanged(GUIEngine::Widget* previous,
+                                GUIEngine::Widget* focus, int playerID) OVERRIDE;
 
     /** \brief implement optional callback from parent
      *  class GUIEngine::Screen */

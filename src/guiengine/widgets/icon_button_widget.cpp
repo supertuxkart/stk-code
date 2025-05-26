@@ -15,6 +15,7 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
+#include "font/font_manager.hpp"
 #include "guiengine/widgets/icon_button_widget.hpp"
 #include "graphics/central_settings.hpp"
 #include "graphics/irr_driver.hpp"
@@ -52,6 +53,8 @@ IconButtonWidget::IconButtonWidget(ScaleMode scale_mode, const bool tab_stop,
     m_highlight_texture = NULL;
 
     m_custom_aspect_ratio = 1.0f;
+    m_target_width        = -1.0f;
+    m_target_height       = -1.0f;
 
     m_texture_w = 0;
     m_texture_h = 0;
@@ -323,27 +326,44 @@ void IconButtonWidget::setTexture(video::ITexture* texture)
 // -----------------------------------------------------------------------------
 void IconButtonWidget::setLabelFont()
 {
+#ifndef SERVER_ONLY
     if (m_font != NULL)
     {
         m_label->setOverrideFont( m_font );
     }
     else
     {
+        m_label->setOverrideFont(NULL);
         const bool word_wrap = (m_properties[PROP_WORD_WRAP] == "true");
         const int max_w = m_label->getAbsolutePosition().getWidth();
 
-        if (!word_wrap &&
-            (int)GUIEngine::getFont()->getDimension(m_label->getText()).Width
-                        > max_w + 4) // arbitrarily allow for 4 pixels
+        if (!word_wrap)
         {
-            m_label->setOverrideFont( GUIEngine::getSmallFont() );
+            if (max_w < (int)GUIEngine::getFont()->getDimension(m_label->getText()).Width)
+                m_label->setOverrideFont( GUIEngine::getSmallFont() );
         }
-        else
+        // If the string doesn't fit in 2 lines after word-wrap is applied, use the small font
+        else if (max_w < (int)GUIEngine::getFont()->getDimension(m_label->getText()).Width)
         {
-            m_label->setOverrideFont( NULL );
+            core::stringw test_string = m_label->getText();
+            core::stringw temp_string = test_string;
+            while (temp_string.size() > 0)
+            {
+                temp_string.erase(temp_string.size() - 1);
+                if ((unsigned int)max_w > GUIEngine::getFont()->getDimension(temp_string.c_str()).Width
+                    && LineBreakingRules::breakable((char32_t) temp_string.lastChar()))
+                    break;
+            }
+            test_string = test_string.subString(temp_string.size(), test_string.size() - temp_string.size());
+
+            if (max_w < (int)GUIEngine::getFont()->getDimension(test_string.c_str()).Width)
+                m_label->setOverrideFont( GUIEngine::getSmallFont() ); 
+            else
+                m_label->setOverrideFont( NULL );
         }
     }
-}
+#endif
+} // setLabelFont
 
 // -----------------------------------------------------------------------------
 void IconButtonWidget::setVisible(bool visible)
@@ -383,14 +403,20 @@ void IconButtonWidget::updateIconRect()
         useAspectRatio = m_custom_aspect_ratio;
     }
 
-    int suggested_h = m_h;
+    int suggested_h = (int)m_h;
     int suggested_w = (int)((useAspectRatio < 0 ? m_w : useAspectRatio * suggested_h));
+
+    if (m_target_width > 0.0f)
+    {
+        suggested_h = (int)m_target_height;
+        suggested_w = (int)m_target_width;
+    }
 
     if (suggested_w > m_w)
     {
         const float needed_scale_factor = (float)m_w / (float)suggested_w;
-        suggested_w = (int)(suggested_w*needed_scale_factor);
-        suggested_h = (int)(suggested_h*needed_scale_factor);
+        suggested_w = (int)(suggested_w * needed_scale_factor);
+        suggested_h = (int)(suggested_h * needed_scale_factor);
     }
 
     bool left_horizontal = m_properties[PROP_ICON_ALIGN] == "left";

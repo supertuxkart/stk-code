@@ -105,6 +105,8 @@ public:
     // ------------------------------------------------------------------------
     VkDescriptorSet* getDescriptorSet()
                                            { return m_descriptor_sets.data(); }
+    // ------------------------------------------------------------------------
+    GEVulkanSampler getSamplerUse() const             { return m_sampler_use; }
 };   // GEVulkanTextureDescriptor
 
 }

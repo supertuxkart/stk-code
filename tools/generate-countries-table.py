@@ -6,7 +6,7 @@
 # .mode csv
 # .headers off
 # .separator ";"
-# .import `full path to countries.csv` `v(database_version)_countries`
+# .import 'full path to countries.csv' 'v(database_version)_countries'
 #
 
 import csv

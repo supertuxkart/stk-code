@@ -165,7 +165,8 @@ bool GEVulkanDynamicBuffer::setCurrentData(const std::vector<
     uint8_t* addr = (uint8_t*)m_mapped_addr[cur_frame];
     for (auto& p : data)
     {
-        memcpy(addr, p.first, p.second);
+        if (p.first != NULL)
+            memcpy(addr, p.first, p.second);
         addr += p.second;
     }
     vmaFlushAllocation(vk->getVmaAllocator(), m_host_memory[cur_frame], 0,

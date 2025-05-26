@@ -16,6 +16,8 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
+#include "audio/sfx_manager.hpp"
+#include "audio/sfx_base.hpp"
 #include "items/attachment.hpp"
 #include "items/powerup.hpp"
 #include "karts/ghost_kart.hpp"
@@ -26,6 +28,7 @@
 #include "modes/linear_world.hpp"
 #include "modes/world.hpp"
 #include "replay/replay_recorder.hpp"
+#include "tracks/terrain_info.hpp"
 #include "tracks/track.hpp"
 
 #include "LinearMath/btQuaternion.h"
@@ -99,6 +102,8 @@ void GhostKart::updateGraphics(float dt)
     Moveable::updateGraphics(center_shift, btQuaternion(0, 0, 0, 1));
     // Also update attachment's graphics
     m_attachment->updateGraphics(dt);
+
+    updateSound(dt);
 }   // updateGraphics
 
 // ----------------------------------------------------------------------------
@@ -219,6 +224,8 @@ void GhostKart::update(int ticks)
                                    m_all_replay_events[idx].m_red_skidding);
     getKartGFX()->update(dt);
 
+    m_speed = getSpeed();
+
     Vec3 front(0, 0, getKartLength()*0.5f);
     m_xyz_front = getTrans()(front);
 
@@ -233,22 +240,58 @@ void GhostKart::update(int ticks)
         getKartModel()->setAnimation(KartModel::AF_DEFAULT);
     }
 
+    m_terrain_info->update(getTrans().getBasis(),
+            getXYZ() + getTrans().getBasis().getColumn(1) * 0.1f);
 }   // update
+
+// ----------------------------------------------------------------------------
+void GhostKart::updateSound(float dt)
+{
+    if (!getController()) return;
+
+    GhostController* gc = dynamic_cast<GhostController*>(getController());
+    if (gc == NULL) return;
+
+    const unsigned int idx = gc->getCurrentReplayIndex();
+
+    updateEngineSFX(dt);
+
+    if (m_nitro_sound)
+    {
+        if(m_all_replay_events[idx].m_nitro_usage)
+        {
+            if (m_nitro_sound->getStatus()!=SFXBase::SFX_PLAYING)
+            {
+                m_nitro_sound->play(getSmoothedXYZ());
+            }
+        }
+        else if(m_nitro_sound->getStatus()==SFXBase::SFX_PLAYING)
+        {
+            m_nitro_sound->stop();
+        }
+    }
+}
 
 // ----------------------------------------------------------------------------
 /** Returns the speed of the kart in meters/second. */
 float GhostKart::getSpeed() const
 {
+    if (!getController())
+    {
+        return 0.f;
+    }
+
     const GhostController* gc =
         dynamic_cast<const GhostController*>(getController());
 
     unsigned int current_index = gc->getCurrentReplayIndex();
-    const float rd             = gc->getReplayDelta();
-
-    assert(gc->getCurrentReplayIndex() < m_all_physic_info.size());
 
     if (current_index >= m_all_physic_info.size() - 1)
         return m_all_physic_info.back().m_speed;
+
+    const float rd             = gc->getReplayDelta();
+
+    assert(gc->getCurrentReplayIndex() < m_all_physic_info.size());
 
     return (1-rd)*m_all_physic_info[current_index    ].m_speed
            +  rd *m_all_physic_info[current_index + 1].m_speed;

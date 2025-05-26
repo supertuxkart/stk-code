@@ -55,13 +55,8 @@ void GESPMBuffer::createVertexIndexBuffer()
         throw std::runtime_error("createVertexIndexBuffer vmaMapMemory failed");
 
     size_t real_size = getVertexCount() * total_pitch;
-    uint8_t* loc = mapped;
-    for (unsigned i = 0; i < real_size; i += total_pitch)
-    {
-        uint8_t* vertices = ((uint8_t*)getVertices()) + i;
-        memcpy(loc, vertices, static_pitch);
-        loc += static_pitch;
-    }
+    copyToMappedBuffer((uint32_t*)mapped, this);
+    uint8_t* loc = mapped + getVertexCount() * static_pitch;
     memcpy(loc, m_indices.data(), m_indices.size() * sizeof(uint16_t));
 
     if (m_has_skinning)

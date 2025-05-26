@@ -7,9 +7,9 @@
 #include "ge_spm_buffer.hpp"
 
 #include "ge_vulkan_2d_renderer.hpp"
+#include "ge_vulkan_attachment_texture.hpp"
 #include "ge_vulkan_camera_scene_node.hpp"
 #include "ge_vulkan_command_loader.hpp"
-#include "ge_vulkan_depth_texture.hpp"
 #include "ge_vulkan_draw_call.hpp"
 #include "ge_vulkan_dynamic_spm_buffer.hpp"
 #include "ge_vulkan_fbo_texture.hpp"
@@ -45,8 +45,10 @@ extern "C" VKAPI_ATTR VkBool32 VKAPI_CALL debug_callback(
     const VkDebugUtilsMessengerCallbackDataEXT* callback_data,
     void* user_data)
 {
-    std::string msg = callback_data->pMessage;
-    if (msg.find("UNASSIGNED-CoreValidation-Shader-OutputNotConsumed") != std::string::npos)
+    std::string msg = callback_data->pMessageIdName;
+    msg += " ";
+    msg += callback_data->pMessage;
+    if (msg.find("WARNING-Shader-OutputNotConsumed") != std::string::npos)
         return VK_FALSE;
 #ifdef __ANDROID__
     android_LogPriority alp;
@@ -502,10 +504,11 @@ GEVulkanDriver::GEVulkanDriver(const SIrrlichtCreationParameters& params,
                                IrrlichtDevice* device)
               : CNullDriver(io, core::dimension2d<u32>(0, 0)),
                 m_params(params), m_irrlicht_device(device),
-                m_depth_texture(NULL), m_mesh_texture_descriptor(NULL),
-                m_rtt_texture(NULL), m_prev_rtt_texture(NULL),
-                m_separate_rtt_texture(NULL), m_rtt_polycount(0),
-                m_billboard_quad(NULL), m_current_buffer_idx(0)
+                m_depth_texture(NULL), m_skybox_renderer(NULL),
+                m_mesh_texture_descriptor(NULL), m_rtt_texture(NULL),
+                m_prev_rtt_texture(NULL), m_separate_rtt_texture(NULL),
+                m_rtt_polycount(0), m_billboard_quad(NULL),
+                m_current_buffer_idx(0)
 {
     m_vk.reset(new VK());
     m_physical_device = VK_NULL_HANDLE;
@@ -528,15 +531,6 @@ GEVulkanDriver::GEVulkanDriver(const SIrrlichtCreationParameters& params,
     g_schedule_pausing_rendering.store(false);
     g_paused_rendering.store(false);
     g_device_created.store(true);
-
-#if defined(__APPLE__)
-    MVKConfiguration cfg = {};
-    size_t cfg_size = sizeof(MVKConfiguration);
-    vkGetMoltenVKConfigurationMVK(VK_NULL_HANDLE, &cfg, &cfg_size);
-    // Enable to allow binding all textures at once
-    cfg.useMetalArgumentBuffers = MVK_CONFIG_USE_METAL_ARGUMENT_BUFFERS_ALWAYS;
-    vkSetMoltenVKConfigurationMVK(VK_NULL_HANDLE, &cfg, &cfg_size);
-#endif
 
     createInstance(window);
 
@@ -638,7 +632,7 @@ GEVulkanDriver::GEVulkanDriver(const SIrrlichtCreationParameters& params,
         GE::setVideoDriver(this);
         createUnicolorTextures();
         GEVulkan2dRenderer::init(this);
-        GEVulkanSkyBoxRenderer::init();
+        m_skybox_renderer = new GEVulkanSkyBoxRenderer();
         m_mesh_texture_descriptor = new GEVulkanTextureDescriptor(
             GEVulkanShaderManager::getSamplerSize(),
             GEVulkanShaderManager::getMeshTextureLayer(),
@@ -670,7 +664,7 @@ void GEVulkanDriver::destroyVulkan()
         m_depth_texture->drop();
         m_depth_texture = NULL;
     }
-    if (m_rtt_texture)
+    if (m_rtt_texture && m_rtt_texture != m_separate_rtt_texture)
     {
         m_rtt_texture->drop();
         m_rtt_texture = NULL;
@@ -691,17 +685,18 @@ void GEVulkanDriver::destroyVulkan()
         m_billboard_quad = NULL;
     }
 
-    if (m_irrlicht_device->getSceneManager() &&
-        m_irrlicht_device->getSceneManager()->getActiveCamera())
+    if (m_irrlicht_device->getSceneManager())
     {
-        m_irrlicht_device->getSceneManager()->setActiveCamera(NULL);
+        getGEConfig()->m_enable_draw_call_cache = false;
+        m_irrlicht_device->getSceneManager()->clear();
+        if (m_irrlicht_device->getSceneManager()->getActiveCamera())
+            m_irrlicht_device->getSceneManager()->setActiveCamera(NULL);
+        if (m_irrlicht_device->getSceneManager()->getMeshCache())
+            getVulkanMeshCache()->destroy();
     }
 
-    if (m_irrlicht_device->getSceneManager() &&
-        m_irrlicht_device->getSceneManager()->getMeshCache())
-        getVulkanMeshCache()->destroy();
     delete m_mesh_texture_descriptor;
-    GEVulkanSkyBoxRenderer::destroy();
+    delete m_skybox_renderer;
     GEVulkan2dRenderer::destroy();
     GEVulkanShaderManager::destroy();
 
@@ -785,8 +780,8 @@ void GEVulkanDriver::createInstance(SDL_Window* window)
     std::vector<VkLayerProperties> available_layers(layer_count);
     vkEnumerateInstanceLayerProperties(&layer_count, available_layers.data());
 
-    VkInstanceCreateInfo create_info = {};
     std::vector<const char*> enabled_validation_layers;
+    void* next_chain = NULL;
 
 #ifdef ENABLE_VALIDATION
     g_debug_print = true;
@@ -798,13 +793,37 @@ void GEVulkanDriver::createInstance(SDL_Window* window)
 
     VkValidationFeaturesEXT validation_features = {};
     validation_features.sType = VK_STRUCTURE_TYPE_VALIDATION_FEATURES_EXT;
-    validation_features.enabledValidationFeatureCount = 1;
-    VkValidationFeatureEnableEXT enabled_validation_features =
-        VK_VALIDATION_FEATURE_ENABLE_BEST_PRACTICES_EXT;
-    validation_features.pEnabledValidationFeatures = &enabled_validation_features;
+    std::array<VkValidationFeatureEnableEXT, 2> enabled_validation_features =
+        {
+            VK_VALIDATION_FEATURE_ENABLE_BEST_PRACTICES_EXT,
+            VK_VALIDATION_FEATURE_ENABLE_SYNCHRONIZATION_VALIDATION_EXT
+        };
+    validation_features.pEnabledValidationFeatures =
+        enabled_validation_features.data();
+    validation_features.enabledValidationFeatureCount =
+        enabled_validation_features.size();
 
-    create_info.pNext = &validation_features;
+    next_chain = &validation_features;
     extensions.push_back(VK_EXT_DEBUG_UTILS_EXTENSION_NAME);
+#endif
+
+#if defined(__APPLE__)
+    // We need these to persist until after vkCreateInstance
+    static VkLayerSettingsCreateInfoEXT layer_settings_create_info = {};
+    static VkBool32 setting_false = VK_FALSE;
+    static VkLayerSettingEXT setting = {};
+    setting.pLayerName = "MoltenVK";
+    setting.pSettingName = "MVK_CONFIG_USE_METAL_ARGUMENT_BUFFERS";
+    setting.type = VK_LAYER_SETTING_TYPE_BOOL32_EXT;
+    setting.pValues = &setting_false;
+    setting.valueCount = 1;
+
+    layer_settings_create_info.sType = VK_STRUCTURE_TYPE_LAYER_SETTINGS_CREATE_INFO_EXT;
+    layer_settings_create_info.settingCount = 1;
+    layer_settings_create_info.pSettings = &setting;
+    layer_settings_create_info.pNext = next_chain;
+    next_chain = &layer_settings_create_info;
+    extensions.push_back(VK_EXT_LAYER_SETTINGS_EXTENSION_NAME);
 #endif
 
     VkApplicationInfo app_info = {};
@@ -814,9 +833,11 @@ void GEVulkanDriver::createInstance(SDL_Window* window)
         // Implementations that support Vulkan 1.1 or later must not return VK_ERROR_INCOMPATIBLE_DRIVER for any value of apiVersion.
         app_info.apiVersion = VK_API_VERSION_1_2;
     }
+    VkInstanceCreateInfo create_info = {};
     create_info.sType = VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO;
     create_info.enabledExtensionCount = extensions.size();
     create_info.ppEnabledExtensionNames = extensions.data();
+    create_info.pNext = next_chain;
     create_info.pApplicationInfo = &app_info;
     create_info.enabledLayerCount = enabled_validation_layers.size();
     create_info.ppEnabledLayerNames = enabled_validation_layers.data();
@@ -1331,7 +1352,7 @@ found_mode:
     }
     else
     {
-        m_depth_texture = new GEVulkanDepthTexture(this,
+        m_depth_texture = GEVulkanAttachmentTexture::createDepthTexture(this,
             core::dimension2du(m_swap_chain_extent.width,
             m_swap_chain_extent.height));
     }
@@ -1553,13 +1574,15 @@ void GEVulkanDriver::createRenderPass()
     dependency.dstSubpass = 0;
     dependency.srcStageMask = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
     if (m_depth_texture)
-        dependency.srcStageMask |= VK_PIPELINE_STAGE_EARLY_FRAGMENT_TESTS_BIT;
-    dependency.srcAccessMask = 0;
+        dependency.srcStageMask |= VK_PIPELINE_STAGE_LATE_FRAGMENT_TESTS_BIT;
+    if (m_depth_texture)
+        dependency.srcAccessMask = VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE_BIT;
+    else
+        dependency.srcAccessMask = 0;
     dependency.dstStageMask = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
     if (m_depth_texture)
         dependency.dstStageMask |= VK_PIPELINE_STAGE_EARLY_FRAGMENT_TESTS_BIT;
-    dependency.dstAccessMask = VK_ACCESS_COLOR_ATTACHMENT_READ_BIT |
-        VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT;
+    dependency.dstAccessMask = VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT;
     if (m_depth_texture)
         dependency.dstAccessMask |= VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE_BIT;
 
@@ -2505,31 +2528,77 @@ bool GEVulkanDriver::setRenderTarget(video::ITexture* texture,
 }   // setRenderTarget
 
 // ----------------------------------------------------------------------------
-void GEVulkanDriver::updateDriver(bool reload_shaders)
+void GEVulkanDriver::updateDriver(bool scale_changed, bool pbr_changed,
+                                  bool ibl_changed)
 {
     waitIdle();
     setDisableWaitIdle(true);
     clearDrawCallsCache();
-    destroySwapChainRelated(false/*handle_surface*/);
-    if (reload_shaders)
+    if (scale_changed)
+        destroySwapChainRelated(false/*handle_surface*/);
+    if (pbr_changed)
     {
         GEVulkanShaderManager::destroy();
         GEVulkanShaderManager::init(this);
+        GEVulkanSampler sampler = m_mesh_texture_descriptor->getSamplerUse();
         delete m_mesh_texture_descriptor;
         m_mesh_texture_descriptor = new GEVulkanTextureDescriptor(
             GEVulkanShaderManager::getSamplerSize(),
             GEVulkanShaderManager::getMeshTextureLayer(),
             GEVulkanFeatures::supportsBindMeshTexturesAtOnce());
+        m_mesh_texture_descriptor->setSamplerUse(sampler);
+        GEVulkanMeshCache* mc = getVulkanMeshCache();
+        if (!GEVulkanFeatures::supportsBaseVertexRendering())
+        {
+            for (unsigned i = 0; i < mc->getMeshCount(); i++)
+            {
+                scene::IAnimatedMesh* mesh = mc->getMeshByIndex(i);
+                if (mesh->getMeshType() != scene::EAMT_SPM)
+                    continue;
+                for (unsigned j = 0; j < mesh->getMeshBufferCount(); j++)
+                {
+                    GESPMBuffer* mb = static_cast<GESPMBuffer*>(
+                        mesh->getMeshBuffer(j));
+                    mb->destroyVertexIndexBuffer();
+                    mb->createVertexIndexBuffer();
+                }
+            }
+        }
+        else
+            mc->meshCacheChanged();
+        for (GEVulkanDynamicSPMBuffer* buffer : m_dynamic_spm_buffers)
+            buffer->setDirtyOffset(0, irr::scene::EBT_VERTEX);
     }
-    createSwapChainRelated(false/*handle_surface*/);
+    if (pbr_changed || ibl_changed)
+        m_skybox_renderer->reset();
+    if (scale_changed)
+        createSwapChainRelated(false/*handle_surface*/);
     for (auto& dc : static_cast<GEVulkanSceneManager*>(
         m_irrlicht_device->getSceneManager())->getDrawCalls())
         dc.second = std::unique_ptr<GEVulkanDrawCall>(new GEVulkanDrawCall);
-    GEVulkanSkyBoxRenderer::destroy();
+    if (scale_changed || pbr_changed)
+    {
+        GEVulkan2dRenderer::destroy();
+        GEVulkan2dRenderer::init(this);
+    }
+    setDisableWaitIdle(false);
+}   // updateDriver
+
+// ----------------------------------------------------------------------------
+void GEVulkanDriver::reloadShaders()
+{
+    waitIdle();
+    setDisableWaitIdle(true);
+    clearDrawCallsCache();
+    GEVulkanShaderManager::destroy();
+    GEVulkanShaderManager::init(this);
+    for (auto& dc : static_cast<GEVulkanSceneManager*>(
+        m_irrlicht_device->getSceneManager())->getDrawCalls())
+        dc.second = std::unique_ptr<GEVulkanDrawCall>(new GEVulkanDrawCall);
     GEVulkan2dRenderer::destroy();
     GEVulkan2dRenderer::init(this);
     setDisableWaitIdle(false);
-}   // updateDriver
+}   // reloadShaders
 
 // ----------------------------------------------------------------------------
 void GEVulkanDriver::clearDrawCallsCache()

@@ -291,6 +291,13 @@ build_deps()
         cp -a -f "$DIRNAME/../lib/shaderc/"* "$DIRNAME/deps-$ARCH_OPTION/shaderc"
 
         cd "$DIRNAME/deps-$ARCH_OPTION/shaderc"
+        
+        if [ ! -f "$DIRNAME/deps-$ARCH_OPTION/shaderc-deps.stamp" ]; then
+            ./utils/git-sync-deps
+            check_error
+            touch "$DIRNAME/deps-$ARCH_OPTION/shaderc-deps.stamp"
+        fi
+        
         cmake . -DCMAKE_TOOLCHAIN_FILE=../../../cmake/Toolchain-android.cmake  \
                 -DHOST=$HOST -DARCH=$ARCH -DCMAKE_C_FLAGS="-fpic -O3"          \
                 -DCMAKE_CXX_FLAGS="-fpic -O3" -DSHADERC_SKIP_INSTALL=1         \
