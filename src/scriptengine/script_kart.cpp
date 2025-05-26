@@ -18,6 +18,7 @@
 
 #include "script_kart.hpp"
 
+#include "karts/explosion_animation.hpp"
 #include "karts/kart.hpp"
 #include "karts/kart_model.hpp"
 #include "karts/kart_properties.hpp"
@@ -49,7 +50,21 @@ namespace Scripting
         {
             AbstractKart* kart = World::getWorld()->getKart(idKart);
             kart->setSquash(time, 0.5);  //0.5 * max speed is new max for squashed duration
-        }
+        }   // squash
+        //---------------------------------------------------------------------
+
+        /** Explodes the specified kart */
+        void explode(int idKart)
+        {
+            AbstractKart* kart = World::getWorld()->getKart(idKart);
+
+            ExplosionAnimation::create(kart);
+            if (kart->getKartAnimation() != NULL)
+            {
+                World::getWorld()->kartHit(idKart);
+            }
+        }   // explode
+        //---------------------------------------------------------------------
 
         /** Teleports the kart to the specified Vec3 location */
         void teleport(int idKart, SimpleVec3* position)
@@ -163,6 +178,10 @@ namespace Scripting
             r = engine->RegisterGlobalFunction("void squash(int id, float time)", 
                                                mp ? WRAP_FN(squash) : asFUNCTION(squash), 
                                                call_conv); assert(r >= 0);
+
+            r = engine->RegisterGlobalFunction("void explode(int id)",
+                                                mp ? WRAP_FN(explode) : asFUNCTION(explode),
+                                                call_conv); assert(r >= 0);
                                                
             r = engine->RegisterGlobalFunction("void teleport(int id, const Vec3 &in)", 
                                                mp ? WRAP_FN(teleport) : asFUNCTION(teleport), 
