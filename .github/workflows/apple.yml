@@ -165,14 +165,6 @@ jobs:
           mv ./macosx-arm64/supertuxkart.app SuperTuxKart.app
           codesign --force --sign "$developer_id" SuperTuxKart.app/Contents/libs/*.dylib
           codesign --force --options=runtime --deep --sign "$developer_id" SuperTuxKart.app
-      - name: "Notarize release build"
-        if: ${{ env.release_tag != '' && github.ref != 'refs/heads/master' }}
-        run: |
-          ditto -c -k --sequesterRsrc --keepParent SuperTuxKart.app tmp.zip
-          xcrun notarytool submit tmp.zip --apple-id ${{ secrets.STK_NOTARIZATION_USERNAME }} \
-                                          --password ${{ secrets.STK_NOTARIZATION_PASSWORD }} \
-                                          --team-id ${{ secrets.MAC_DEVELOPER_TEAM }} --wait
-          xcrun stapler staple SuperTuxKart.app
       - name: Archive
         if: ${{ env.release_tag != '' }}
         run: |
