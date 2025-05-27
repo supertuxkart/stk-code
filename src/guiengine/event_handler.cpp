@@ -518,7 +518,7 @@ int EventHandler::findIDClosestWidget(const NavigationDirection nav, const int p
     int closest_widget_id = -1;
     int distance = 0;
     // So that the UI behavior doesn't change when it is upscaled
-    const int BIG_DISTANCE = irr_driver->getActualScreenSize().Width*100;
+    const int BIG_DISTANCE = irr_driver->getActualScreenSize().Width*500;
     int smallest_distance = BIG_DISTANCE;
     // Used when there is no suitable widget in the requested direction
     int closest_wrapping_widget_id = -1;

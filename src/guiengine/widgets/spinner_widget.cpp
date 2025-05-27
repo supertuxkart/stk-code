@@ -17,7 +17,7 @@
 
 #include <iostream>
 
-#include "graphics/irr_driver.hpp"
+// #include "graphics/irr_driver.hpp"
 #include "guiengine/engine.hpp"
 #include "guiengine/scalable_font.hpp"
 #include "guiengine/widgets/spinner_widget.hpp"
@@ -107,6 +107,7 @@ SpinnerWidget::SpinnerWidget(const bool gauge) : Widget(WTYPE_SPINNER)
     m_right_selected = false;
     m_incorrect       = false;
     m_red_mark_widget = NULL;
+    m_left_arrow = rect<s32>(0, 0, m_h, m_h);
 }
 
 // ------------------------------------------------------------------------
@@ -290,6 +291,7 @@ void SpinnerWidget::resize()
     Widget::resize();
 
     rect<s32> subsize_left_arrow = rect<s32>(0 ,0, m_h, m_h);
+    m_left_arrow = subsize_left_arrow;
     m_children[0].m_element->setRelativePosition(subsize_left_arrow);
     m_badge_x_shift = subsize_left_arrow.getWidth();
 

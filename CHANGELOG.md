@@ -16,6 +16,7 @@ For similar reasons, and because some features are vastly more complex than othe
 ### Gameplay
 * Fix start positions for negative sideward distances, by kimden
 * Make the rescue bird place the kart towards the ball in soccer mode, by Snoker101
+* Fix a very rare bug where the anchor slowdown was ignored if triggering an instant speed boost on the same physics frame, by Alayan
 
 ### General
 * Make the game's window resizable in all menu screens, by Benau and CodingJellyfish
@@ -37,6 +38,7 @@ For similar reasons, and because some features are vastly more complex than othe
 * Various build system updates, by deveee, tobbi, ognevny and others
 * Various compiler fixes, by heirecka, limburgher, nyllet and others
 * Substantial changes improving code quality, by Alayan and kimden
+* Ensure proper compilation with newer build environments, especially with cmake 4.0, by deveee
 * Update Wiiuse library to 0.15.6, SIMD-e to 0.8.2, MojoAL to latest (a9e2f30)
 * Various tweaks, bugfixes and code-quality improvements
 
@@ -45,6 +47,7 @@ For similar reasons, and because some features are vastly more complex than othe
 * Add more maximum framerate options to the built-in framerate limiter, by Benau
 * Add some graphical effects for legacy video drivers, by Benau
 * Improved animations for the parachute and bubblegum shield, by Semphris
+* Add spotlights, by CodingJellyfish
 * Replace inaccurate normal compression algorithm with Octahedron Normal Vector, by CodingJellyfish
 * Fix the Screen-Space Reflection shader, by CodingJellyfish
 * Fix and improve the Screen-Space Ambiant Occlusion shader, by CodingJellyfish
@@ -73,6 +76,8 @@ For similar reasons, and because some features are vastly more complex than othe
 * Improve the typing bars, especially for the coal theme, by Alayan
 * Implement a blog announcement system in the Online screen, by CodingJellyfish
 * Various UI layout improvements (especially for 'tall' resolutions), by CodingJellyfish
+* Improve the spinner, label and icon-button text-sizing logic to avoid overflows with some language/font size combinations, by Alayan
+* Add an always visible random track button in track selection, by Hanuko33 and Alayan
 * Generate higher resolution texture for scalable fonts, by CodingJellyfish
 * Fix for multiple keyboard navigation issues, by Alayan
 * Various enhancements, by QwertyChouskie, Nomagno, Nstelt and others
@@ -97,6 +102,7 @@ For similar reasons, and because some features are vastly more complex than othe
 
 #### Karts
 * Update Godette face texture, by ZAQraven99
+* Update karts with headlights to use spotlights, by Benau and CodingJellyfish
 
 #### Arenas
 * XR-4R3N4 (soccer field), by CrystalDaEevee
