@@ -17,7 +17,7 @@
 
 #include <iostream>
 
-// #include "graphics/irr_driver.hpp"
+#include "graphics/irr_driver.hpp"
 #include "guiengine/engine.hpp"
 #include "guiengine/scalable_font.hpp"
 #include "guiengine/widgets/spinner_widget.hpp"

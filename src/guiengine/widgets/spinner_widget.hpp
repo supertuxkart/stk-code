@@ -25,14 +25,14 @@
 namespace irr
 {
     namespace video { class ITexture; }
+    namespace gui { class IGUIImage; }
 }
 
 #include "guiengine/widget.hpp"
 #include "utils/leak_check.hpp"
 #include "utils/ptr_vector.hpp"
-#include "graphics/irr_driver.hpp"
 
-#include <IGUIImage.h>
+#include <rect.h>
 
 namespace GUIEngine
 {
