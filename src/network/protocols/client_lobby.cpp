@@ -1488,6 +1488,7 @@ void ClientLobby::sendChat(irr::core::stringw text, KartTeam team)
         // Make message look better by aligning to left or right side depends
         // on name and text
         // (LTR: RTL text always right; RTL : LTR text always left)
+        core::stringw name_suffix (": ");
 #ifndef SERVER_ONLY
         if (!name.empty() && !text.empty())
         {
@@ -1516,12 +1517,12 @@ void ClientLobby::sendChat(irr::core::stringw text, KartTeam team)
             SBParagraphRelease(first_paragraph);
             SBAlgorithmRelease(bidi_algorithm);
             if (name_level % 2 == 0 && text_level % 2 != 0)
-                name = core::stringw(L"\u200F") + name;
+                name_suffix += core::stringw(L"\u200F");
             else if (name_level % 2 != 0 && text_level % 2 == 0)
-                name = core::stringw(L"\u200E") + name;
+                name_suffix += core::stringw(L"\u200E");
         }
 #endif
-        chat->encodeString16(name + L": " + text, 1000/*max_len*/);
+        chat->encodeString16(name + name_suffix + text, 1000/*max_len*/);
 
         if (team != KART_TEAM_NONE)
             chat->addUInt8(team);
