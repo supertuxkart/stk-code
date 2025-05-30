@@ -92,6 +92,7 @@ std::string StkTime::toString(int year, int month, int day)
 
     char s[64];
     strftime(s, 64, date_format.c_str(), t);
+    delete t;
     return s;
 }   // toString(3)
 
