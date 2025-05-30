@@ -59,8 +59,15 @@ namespace StringUtils
     {
         if (str.length() < prefix.length())
             return false;
+        else if (strncmp(str.c_str(), prefix.c_str(), prefix.size())==0)
+            return true;
+        // Ignore left-to-right markers for the purpose of string comparison
+        else if (strncmp(str.c_str(), ("\u200F" + prefix).c_str(), prefix.size() + 1)==0)
+            return true;
+        else if (strncmp(str.c_str(), ("\u200E" + prefix).c_str(), prefix.size() + 1)==0)
+            return true;
         else
-            return strncmp(str.c_str(), prefix.c_str(), prefix.size())==0;
+            return false;
     }
 
     //-------------------------------------------------------------------------
