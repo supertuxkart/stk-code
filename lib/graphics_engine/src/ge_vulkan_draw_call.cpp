@@ -1626,7 +1626,26 @@ start:
         bool rebind_base_vertex = true;
         for (unsigned i = 0; i < m_cmds.size(); i++)
         {
-            if (m_cmds[i].m_shader != cur_pipeline)
+            if (m_cmds[i].m_transparent && !drawn_skybox)
+            {
+                drawn_skybox = true;
+                if (!depth_only)
+                {
+                    drawSkyBox(cmd, current_buffer_idx, dynamic_offsets);
+
+                    bindDataDescriptor(cmd, current_buffer_idx,
+                        dynamic_offsets);
+                    vkCmdBindDescriptorSets(cmd,
+                        VK_PIPELINE_BIND_POINT_GRAPHICS, m_pipeline_layout,
+                        0, 1, m_texture_descriptor->getDescriptorSet(), 0,
+                        NULL);
+                }
+            }
+            bool is_last_cmd = (i == m_cmds.size() - 1);
+            bool pipeline_change =
+                !is_last_cmd && m_cmds[i + 1].m_shader != cur_pipeline;
+            draw_count++;
+            if (pipeline_change || is_last_cmd)
             {
                 bound = bindPipeline(cmd, cur_pipeline, depth_only, &prev_dp);
                 auto it = dynamic_spm_buffers.find(
@@ -1663,58 +1682,12 @@ start:
                         indirect_offset, draw_count, indirect_size);
                 }
                 indirect_offset += draw_count * indirect_size;
-                draw_count = 1;
-                cur_pipeline = m_cmds[i].m_shader;
-
-                if (m_cmds[i].m_transparent && !drawn_skybox)
+                if (!is_last_cmd)
                 {
-                    drawn_skybox = true;
-                    if (!depth_only)
-                    {
-                        drawSkyBox(cmd, current_buffer_idx, dynamic_offsets);
-
-                        bindDataDescriptor(cmd, current_buffer_idx,
-                            dynamic_offsets);
-                        vkCmdBindDescriptorSets(cmd,
-                            VK_PIPELINE_BIND_POINT_GRAPHICS, m_pipeline_layout,
-                            0, 1, m_texture_descriptor->getDescriptorSet(), 0,
-                            NULL);
-                    }
+                    draw_count = 0;
+                    cur_pipeline = m_cmds[i + 1].m_shader;
                 }
-                continue;
             }
-            draw_count++;
-        }
-        bound = bindPipeline(cmd, m_cmds.back().m_shader, depth_only,
-            &prev_dp);
-        auto it = dynamic_spm_buffers.find(
-            getDynamicBufferKey(m_cmds.back().m_shader));
-        if (it != dynamic_spm_buffers.end())
-        {
-            for (auto& buf : it->second)
-            {
-                if (bound)
-                {
-                    dynamic_offsets[1] = dynamic_spm_offset;
-                    rebind_base_vertex = true;
-                    bindDataDescriptor(cmd, current_buffer_idx,
-                        dynamic_offsets);
-                    buf.first->drawDynamicVertexIndexBuffer(cmd,
-                        current_buffer_idx);
-                }
-                dynamic_spm_offset += dynamic_spm_size;
-            }
-            dynamic_spm_buffers.erase(it);
-        }
-        if (rebind_base_vertex)
-            bindBaseVertex(vk, cmd);
-        if (bound)
-        {
-            dynamic_offsets[1] = m_dynamic_spm_padded_size;
-            dynamic_offsets[4] = m_materials_data[m_cmds.back().m_shader].first;
-            bindDataDescriptor(cmd, current_buffer_idx, dynamic_offsets);
-            vkCmdDrawIndexedIndirect(cmd, indirect_buffer, indirect_offset,
-                draw_count, indirect_size);
         }
     }
     else
