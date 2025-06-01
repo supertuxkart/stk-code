@@ -11,16 +11,16 @@ layout (set = 2, binding = 1) uniform samplerCube u_specular;
 #include "pbr_light.glsl"
 #include "sun_direction.glsl"
 
-vec3 handlePBR(vec3 diffuse_color, vec3 pbr, vec3 normal)
+vec3 handlePBR(vec3 diffuse_color, vec3 pbr, vec3 world_normal)
 {
     vec3 xpos = getPosFromFragCoord(gl_FragCoord, u_camera.m_viewport,
         u_camera.m_inverse_projection_matrix);
     vec3 eyedir = -normalize(xpos);
+    vec3 normal = (u_camera.m_view_matrix * vec4(world_normal, 0.0)).xyz;
     vec3 reflection = reflect(-eyedir, normal);
 
     float perceptual_roughness = 1.0 - pbr.x;
     float radiance_level = perceptual_roughness * u_specular_levels_minus_one;
-    vec3 world_normal = (u_camera.m_inverse_view_matrix * vec4(normal, 0.0)).xyz;
     vec3 world_reflection = (u_camera.m_inverse_view_matrix * vec4(reflection, 0.0)).xyz;
 
     vec3 irradiance = vec3(0.0);
