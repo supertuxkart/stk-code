@@ -33,6 +33,7 @@ CameraFPS::CameraFPS(int camera_index, AbstractKart* kart)
          : Camera(Camera::CM_TYPE_FPS, camera_index, kart)
 {
     m_attached      = false;
+    m_smooth        = false;
 
     // TODO: Put these values into a config file
     //       Global or per split screen zone?
