@@ -374,16 +374,20 @@ void RaceGUI::renderPlayerView(const Camera *camera, float dt)
 
     if (!isSpectatorCam) drawPlungerInFace(camera, dt);
 
+    // Scale race GUI along screen size
+    scaling *= sqrtf(float(viewport.getWidth()) / 800.0f);
+    scaling *= sqrtf(float(viewport.getHeight()) / 450.0f); 
+
+    // Scale X and Y separately in splitscreen for proper relative positioning
     if (viewport.getWidth() != (int)irr_driver->getActualScreenSize().Width ||
         viewport.getHeight() != (int)irr_driver->getActualScreenSize().Height)
     {
-        scaling.X *= float(viewport.getWidth()) / float(irr_driver->getActualScreenSize().Width); // scale race GUI along screen size
-        scaling.Y *= float(viewport.getHeight()) / float(irr_driver->getActualScreenSize().Height); // scale race GUI along screen size
+        // This is tuned so that in 2-way splitscreen, the UI elements have a size
+        // close to the icons without splitscreen.
+        scaling.X *= 1.35f * float(viewport.getWidth()) / float(irr_driver->getActualScreenSize().Width);
+        scaling.Y *= 1.35f * float(viewport.getHeight()) / float(irr_driver->getActualScreenSize().Height);
     }
-    else
-    {
-        scaling *= float(viewport.getWidth()) / 800.0f; // scale race GUI along screen size
-    }
+
     
     drawAllMessages(kart, viewport, scaling);
 
