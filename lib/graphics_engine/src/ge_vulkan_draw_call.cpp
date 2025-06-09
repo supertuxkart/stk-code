@@ -33,9 +33,18 @@
 #include "../source/Irrlicht/os.h"
 #include "quaternion.h"
 #define DEPTH_ONLY_FRAG_SHADER "depth_only.frag"
+#define SKINNING_PIPELINE "_skinning"
 
 namespace GE
 {
+// ============================================================================
+static void destroyPipeline(VkPipeline* p)
+{
+    vkDestroyPipeline(static_cast<GEVulkanDriver*>(getDriver())->getDevice(),
+        *p, NULL);
+    delete p;
+}   // destroyPipeline
+
 // ============================================================================
 void ObjectData::init(irr::scene::ISceneNode* node, int material_id,
                       int skinning_offset, int irrlicht_material_id)
@@ -489,7 +498,7 @@ start:
             int material_id = m_texture_descriptor->getTextureID(list,
                 cur_shader);
             if (skinning)
-                cur_shader += "_skinning";
+                cur_shader += SKINNING_PIPELINE;
             if (m_graphics_pipelines.find(cur_shader) ==
                 m_graphics_pipelines.end())
                 continue;
@@ -912,13 +921,34 @@ void GEVulkanDrawCall::createAllPipelines(GEVulkanDriver* vk)
     settings.m_backface_culling = true;
     settings.m_alphablend = true;
     settings.m_drawing_priority = (char)9;
-    settings.m_fragment_shader = "ghost.frag";
+    settings.m_fragment_shader = DEPTH_ONLY_FRAG_SHADER;
     settings.m_shader_name = "ghost";
+    if (doDepthOnlyRenderingFirst())
+    {
+        m_graphics_pipelines["ghost"] = {};
+        m_graphics_pipelines["ghost"].m_settings = settings;
+        m_graphics_pipelines["ghost"].m_pipeline =
+            dp_cache.at(settings.m_vertex_shader + settings.m_fragment_shader);
+        m_graphics_pipelines["ghost" SKINNING_PIPELINE] = {};
+        m_graphics_pipelines["ghost" SKINNING_PIPELINE].m_settings = settings;
+        m_graphics_pipelines["ghost" SKINNING_PIPELINE].m_pipeline =
+            dp_cache.at(settings.m_skinning_vertex_shader +
+            settings.m_fragment_shader);
+    }
+    else
+    {
+        createPipeline(vk, settings, dp_cache);
+    }
+
+    settings.m_fragment_shader = "ghost.frag";
+    settings.m_depth_write = false;
+    settings.m_shader_name = "ghost_color";
+    settings.m_depth_op = VK_COMPARE_OP_EQUAL;
     createPipeline(vk, settings, dp_cache);
 
-    settings.m_depth_write = false;
     settings.m_backface_culling = false;
     settings.m_drawing_priority = (char)10;
+    settings.m_depth_op = VK_COMPARE_OP_LESS;
 
     settings.m_fragment_shader = "transparent.frag";
     settings.m_shader_name = "alphablend";
@@ -1145,7 +1175,7 @@ void GEVulkanDrawCall::createPipeline(GEVulkanDriver* vk,
             return false;
         std::string key = s.m_shader_name;
         if (skinning)
-            key += "_skinning";
+            key += SKINNING_PIPELINE;
         if (m_graphics_pipelines.find(key) == m_graphics_pipelines.end())
         {
             m_graphics_pipelines[key] = {};
@@ -1162,20 +1192,16 @@ void GEVulkanDrawCall::createPipeline(GEVulkanDriver* vk,
     {
         std::string key = s.m_shader_name;
         if (skinning)
-            key += "_skinning";
+            key += SKINNING_PIPELINE;
         if (m_graphics_pipelines.find(key) == m_graphics_pipelines.end())
         {
             m_graphics_pipelines[key] = {};
             m_graphics_pipelines[key].m_settings = s;
         }
-        auto dp = [vk](VkPipeline* p)
-        {
-            vkDestroyPipeline(vk->getDevice(), *p, NULL);
-            delete p;
-        };
         if (depth_only)
         {
-            auto sp = std::shared_ptr<VkPipeline>(new VkPipeline(p), dp);
+            auto sp = std::shared_ptr<VkPipeline>(new VkPipeline(p),
+                destroyPipeline);
             m_graphics_pipelines[key].m_depth_only_pipeline = sp;
             std::string vs = skinning ?
                 s.m_skinning_vertex_shader : s.m_vertex_shader;
@@ -1183,7 +1209,8 @@ void GEVulkanDrawCall::createPipeline(GEVulkanDriver* vk,
         }
         else
             m_graphics_pipelines[key].m_pipeline =
-                std::shared_ptr<VkPipeline>(new VkPipeline(p), dp);
+                std::shared_ptr<VkPipeline>(new VkPipeline(p),
+                destroyPipeline);
     };
 
     VkPipeline graphics_pipeline;
@@ -1680,6 +1707,17 @@ start:
                         dynamic_offsets);
                     vkCmdDrawIndexedIndirect(cmd, indirect_buffer,
                         indirect_offset, draw_count, indirect_size);
+                    if (cur_pipeline.rfind("ghost", 0) == 0)
+                    {
+                        std::string gc = "ghost_color";
+                        if (cur_pipeline.find(SKINNING_PIPELINE) !=
+                            std::string::npos)
+                            gc += SKINNING_PIPELINE;
+                        vkCmdBindPipeline(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS,
+                            *m_graphics_pipelines.at(gc).m_pipeline);
+                        vkCmdDrawIndexedIndirect(cmd, indirect_buffer,
+                            indirect_offset, draw_count, indirect_size);
+                    }
                 }
                 indirect_offset += draw_count * indirect_size;
                 if (!is_last_cmd)
@@ -1804,6 +1842,25 @@ start:
                     cur_cmd.instanceCount, cur_cmd.firstIndex,
                     cur_cmd.vertexOffset,
                     use_base_vertex ? cur_cmd.firstInstance : 0);
+                if (cur_pipeline.rfind("ghost", 0) == 0)
+                {
+                    std::string gc = "ghost_color";
+                    if (cur_pipeline.find(SKINNING_PIPELINE) !=
+                        std::string::npos)
+                        gc += SKINNING_PIPELINE;
+                    vkCmdBindPipeline(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS,
+                        *m_graphics_pipelines.at(gc).m_pipeline);
+                    vkCmdDrawIndexed(cmd, cur_cmd.indexCount,
+                        cur_cmd.instanceCount, cur_cmd.firstIndex,
+                        cur_cmd.vertexOffset,
+                        use_base_vertex ? cur_cmd.firstInstance : 0);
+                    if (i != m_cmds.size() - 1 &&
+                        m_cmds[i + 1].m_shader.rfind("ghost", 0) == 0)
+                    {
+                        vkCmdBindPipeline(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS,
+                            *m_graphics_pipelines.at(cur_pipeline).m_pipeline);
+                    }
+                }
             }
         }
     }

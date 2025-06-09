@@ -123,9 +123,16 @@ SPShaderManager::SPShaderManager()
                 glEnable(GL_DEPTH_TEST);
                 glDepthMask(GL_TRUE);
                 glEnable(GL_CULL_FACE);
-                glEnable(GL_BLEND);
-                glBlendEquation(GL_FUNC_ADD);
-                glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
+                glColorMask(GL_FALSE, GL_FALSE, GL_FALSE, GL_FALSE);
+            }
+        }
+    };
+
+    m_official_unuse_functions =
+    {
+        { "ghostUnuse", []()
+            {
+                glColorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
             }
         }
     };
