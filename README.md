@@ -18,7 +18,7 @@ To run SuperTuxKart, make sure that your computer's specifications are equal or 
 * You should have a dual-core CPU that's running at 1 GHz or faster.
 * You'll need at least 512 MB of free VRAM (video memory).
 * System memory: 1 GB
-* Minimum disk space: 700 MB
+* Minimum storage space: 800 MB
 * Ideally, you'll want a joystick with at least 6 buttons.
 
 ## License
