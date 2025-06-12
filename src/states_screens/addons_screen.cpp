@@ -92,8 +92,7 @@ void AddonsScreen::loadedFromFile()
     m_icon_loading = m_icon_bank->addTextureAsSprite(icon6);
     m_icon_needs_update  = m_icon_bank->addTextureAsSprite(icon3);
 
-    GUIEngine::ListWidget* w_list =
-        getWidget<GUIEngine::ListWidget>("list_addons");
+    GUIEngine::ListWidget* w_list = getWidget<GUIEngine::ListWidget>("list_addons");
     w_list->setColumnListener(this);
 }   // loadedFromFile
 
@@ -102,8 +101,7 @@ void AddonsScreen::loadedFromFile()
 
 void AddonsScreen::beforeAddingWidget()
 {
-    GUIEngine::ListWidget* w_list =
-        getWidget<GUIEngine::ListWidget>("list_addons");
+    GUIEngine::ListWidget* w_list = getWidget<GUIEngine::ListWidget>("list_addons");
     assert(w_list != NULL);
     w_list->clearColumns();
     w_list->addColumn( _("Add-on name"), 3 );
@@ -153,14 +151,12 @@ void AddonsScreen::init()
     if(UserConfigParams::logAddons())
         Log::info("addons", "Using directory <%s>", file_manager->getAddonsDir().c_str());
 
-    GUIEngine::ListWidget* w_list =
-        getWidget<GUIEngine::ListWidget>("list_addons");
+    GUIEngine::ListWidget* w_list = getWidget<GUIEngine::ListWidget>("list_addons");
 
-    // This defines the row height !
-    m_icon_bank->setScale(1.0f / 72.0f);
+    m_icon_bank->setScale(1.0f / 96.0f);
     // 128 is the height of the image file
     m_icon_bank->setTargetIconSize(128, 128);
-    w_list->setIcons(m_icon_bank, 2.0f);
+    w_list->setIcons(m_icon_bank, 1.5f /* defines line height relative to text size */);
 
     m_type = "kart";
 
@@ -272,8 +268,7 @@ void AddonsScreen::loadList()
     }
     sorted_list.insertionSort(/*start=*/0, m_sort_desc);
 
-    GUIEngine::ListWidget* w_list =
-        getWidget<GUIEngine::ListWidget>("list_addons");
+    GUIEngine::ListWidget* w_list = getWidget<GUIEngine::ListWidget>("list_addons");
     w_list->clear();
 
     for(unsigned int i=0; i<sorted_list.size(); i++)
@@ -439,8 +434,7 @@ void AddonsScreen::eventCallback(GUIEngine::Widget* widget,
             m_reloading = true;
             NewsManager::get()->init(true);
 
-            GUIEngine::ListWidget* w_list =
-                       getWidget<GUIEngine::ListWidget>("list_addons");
+            GUIEngine::ListWidget* w_list = getWidget<GUIEngine::ListWidget>("list_addons");
             w_list->clear();
 
             w_list->addItem("spacer", L"");
@@ -450,8 +444,7 @@ void AddonsScreen::eventCallback(GUIEngine::Widget* widget,
 
     else if (name == "list_addons")
     {
-        GUIEngine::ListWidget* list =
-            getWidget<GUIEngine::ListWidget>("list_addons");
+        GUIEngine::ListWidget* list = getWidget<GUIEngine::ListWidget>("list_addons");
         std::string id = list->getSelectionInternalName();
 
         if (!id.empty() && addons_manager->getAddon(id) != NULL)
@@ -498,8 +491,7 @@ void AddonsScreen::setLastSelected()
 {
     if(m_selected_index>-1)
     {
-        GUIEngine::ListWidget* list =
-            getWidget<GUIEngine::ListWidget>("list_addons");
+        GUIEngine::ListWidget* list = getWidget<GUIEngine::ListWidget>("list_addons");
         list->setFocusForPlayer(PLAYER_ID_GAME_MASTER);
         list->setSelectionID(m_selected_index);
     }
