@@ -212,7 +212,7 @@ void GEVulkanSceneManager::drawAll(irr::u32 flags)
     render_pass_info.pClearValues = &clear_values[0];
     vkCmdBeginRenderPass(cmd, &render_pass_info, VK_SUBPASS_CONTENTS_INLINE);
 
-    dc->render(vk, cam, cmd);
+    vk->renderDrawCalls({{ dc.get(), cam }}, cmd);
     vk->addRTTPolyCount(dc->getPolyCount());
     dc->reset();
 

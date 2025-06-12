@@ -72,6 +72,15 @@ struct ObjectData
               bool sky_particle, bool backface_culling);
 };
 
+enum GEVulkanPipelineType : unsigned
+{
+    GVPT_DEPTH = 1,
+    GVPT_SOLID,
+    GVPT_GHOST_DEPTH,
+    GVPT_TRANSPARENT,
+    GVPT_SKYBOX
+};
+
 struct PipelineSettings
 {
     std::string m_vertex_shader;
@@ -89,15 +98,15 @@ struct PipelineSettings
     VkPipelineLayout m_custom_pl;
     VkCompareOp m_depth_op;
     VertexDescription m_vertex_description;
+    GEVulkanPipelineType m_pipeline_type;
 
     bool isTransparent() const { return m_alphablend || m_additive; }
 };
 
-
 struct PipelineData
 {
     PipelineSettings m_settings;
-    std::shared_ptr<VkPipeline> m_pipeline, m_depth_only_pipeline;
+    std::unordered_map<GEVulkanPipelineType, std::shared_ptr<VkPipeline> > m_pipelines;
 };
 
 struct DrawCallData
@@ -107,7 +116,6 @@ struct DrawCallData
     std::string m_sorting_key;
     GESPMBuffer* m_mb;
     int m_material_id;
-    bool m_transparent;
     uint32_t m_dynamic_offset;
 };
 
@@ -173,7 +181,7 @@ private:
 
     std::unordered_map<std::string, PipelineData> m_graphics_pipelines;
 
-    std::unordered_map<GEVulkanDynamicSPMBuffer*, int> m_dyspmb_materials;
+    std::unordered_map<GEVulkanDynamicSPMBuffer*, std::pair<int, size_t> > m_dyspmb_materials;
 
     GEVulkanSkyBoxRenderer* m_skybox_renderer;
 
@@ -197,19 +205,15 @@ private:
     std::string getShader(irr::scene::ISceneNode* node, int material_id);
     // ------------------------------------------------------------------------
     bool bindPipeline(VkCommandBuffer cmd, const std::string& name,
-                      bool depth_only, VkPipeline* prev_dp) const
+                      VkPipeline* prev_pipeline, GEVulkanPipelineType pt) const
     {
         auto& ret = m_graphics_pipelines.at(name);
-        VkPipeline p = *ret.m_pipeline.get();
-        if (depth_only)
-        {
-            if (!ret.m_depth_only_pipeline)
-                return false;
-            p = *ret.m_depth_only_pipeline.get();
-            if (*prev_dp == p)
-                return true;
-            *prev_dp = p;
-        }
+        if (ret.m_pipelines.find(pt) == ret.m_pipelines.end())
+            return false;
+        VkPipeline p = *ret.m_pipelines.at(pt);
+        if (*prev_pipeline == p)
+            return true;
+        *prev_pipeline = p;
         vkCmdBindPipeline(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, p);
         auto it = m_push_constants.find(ret.m_settings.m_shader_name);
         if (it != m_push_constants.end())
@@ -249,9 +253,6 @@ private:
     std::string getShaderFromKey(const std::string& key) const
                                                       { return key.substr(2); }
     // ------------------------------------------------------------------------
-    void drawSkyBox(VkCommandBuffer cmd, int current_buffer_idx,
-                    std::vector<uint32_t>& dynamic_offsets);
-    // ------------------------------------------------------------------------
     void updatePushConstants()
     {
         for (auto& p : m_push_constants)
@@ -269,7 +270,7 @@ private:
     // ------------------------------------------------------------------------
     void bindSingleMaterial(VkCommandBuffer cmd,
                             const std::string& cur_pipeline,
-                            int material_id, bool depth_only);
+                            int material_id, GEVulkanPipelineType pt);
     // ------------------------------------------------------------------------
     void bindDataDescriptor(VkCommandBuffer cmd, int current_buffer_idx,
                             std::vector<uint32_t>& dynamic_offsets)
@@ -280,11 +281,11 @@ private:
             dynamic_offsets.size(), dynamic_offsets.data());
     }
     // ------------------------------------------------------------------------
-    bool doDepthOnlyRenderingFirst();
-    // ------------------------------------------------------------------------
     VertexDescription getDefaultVertexDescription() const;
     // ------------------------------------------------------------------------
     size_t getLightDataOffset() const;
+    // ------------------------------------------------------------------------
+    std::vector<uint32_t> getDefaultDynamicOffsets() const;
 public:
     // ------------------------------------------------------------------------
     GEVulkanDrawCall();
@@ -303,8 +304,19 @@ public:
     void uploadDynamicData(GEVulkanDriver* vk, GEVulkanCameraSceneNode* cam,
                            VkCommandBuffer custom_cmd = VK_NULL_HANDLE);
     // ------------------------------------------------------------------------
-    void render(GEVulkanDriver* vk, GEVulkanCameraSceneNode* cam,
-                VkCommandBuffer custom_cmd = VK_NULL_HANDLE);
+    bool doDepthOnlyRenderingFirst();
+    // ------------------------------------------------------------------------
+    void bindAllMaterials(VkCommandBuffer cmd);
+    // ------------------------------------------------------------------------
+    void prepareRendering(GEVulkanDriver* vk);
+    // ------------------------------------------------------------------------
+    void prepareViewport(GEVulkanDriver* vk, GEVulkanCameraSceneNode* cam,
+                         VkCommandBuffer cmd);
+    // ------------------------------------------------------------------------
+    void renderPipeline(GEVulkanDriver* vk, VkCommandBuffer cmd,
+                        GEVulkanPipelineType pt, bool& rebind_base_vertex);
+    // ------------------------------------------------------------------------
+    bool renderSkyBox(GEVulkanDriver* vk, VkCommandBuffer cmd);
     // ------------------------------------------------------------------------
     unsigned getPolyCount() const
     {

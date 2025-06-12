@@ -26,6 +26,7 @@ namespace GE
 {
     class GESPM;
     class GEVulkanAttachmentTexture;
+    class GEVulkanCameraSceneNode;
     class GEVulkanDrawCall;
     class GEVulkanDynamicSPMBuffer;
     class GEVulkanFBOTexture;
@@ -378,6 +379,8 @@ namespace GE
                                        { m_dynamic_spm_buffers.insert(buffer); }
         void removeDynamicSPMBuffer(GEVulkanDynamicSPMBuffer* buffer)
                                         { m_dynamic_spm_buffers.erase(buffer); }
+        void renderDrawCalls(const std::vector<std::pair<GEVulkanDrawCall*, GEVulkanCameraSceneNode*> >& p,
+                             VkCommandBuffer cmd);
     private:
         struct SwapChainSupportDetails
         {
