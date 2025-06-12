@@ -964,11 +964,8 @@ void RibbonWidget::resize()
 
             IconButtonWidget* icon = ((IconButtonWidget*)m_active_children.get(i));
 
-            if (icon->m_properties[PROP_EXTEND_LABEL].size() == 0)
-            {
-                icon->m_properties[PROP_EXTEND_LABEL] =
-                    StringUtils::toString(one_button_width - icon->m_w);
-            }
+            // Update the extra size for the icon label
+            icon->m_properties[PROP_EXTEND_LABEL] = StringUtils::toString(one_button_width - icon->m_w);
             m_active_children.get(i)->resize();
 
             // restore backuped size and location (see above for more info)
