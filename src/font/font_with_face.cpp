@@ -395,16 +395,19 @@ void FontWithFace::dumpGlyphPage()
 }   // dumpGlyphPage
 
 // ----------------------------------------------------------------------------
-/** Set the face dpi which is resolution-dependent.
- *  Normal text will range from 0.8, in 640x* resolutions (won't scale below
- *  that) to 1.0, in 1024x* resolutions, and linearly up.
- *  Bold text will range from 0.2, in 640x* resolutions (won't scale below
- *  that) to 0.4, in 1024x* resolutions, and linearly up.
+/** Set the face size which is resolution-dependent.
  */
 void FontWithFace::setDPI()
 {
-    float scale = std::min(irr_driver->getActualScreenSize().Height / 720.0f,
-                             irr_driver->getActualScreenSize().Width  / 900.0f);
+    float width_factor  = irr_driver->getActualScreenSize().Width  / 1280.0f;
+    float height_factor = irr_driver->getActualScreenSize().Height / 720.0f;
+    float min_factor = std::min(width_factor, height_factor);
+    float base_factor = width_factor * width_factor * width_factor
+                      * height_factor * height_factor * height_factor
+                      * min_factor * min_factor;
+    // Scale increases linearly when the aspect ratio remains identical
+    float scale = sqrtf(sqrtf(sqrtf(base_factor)));
+
     int factorTwo = getScalingFactorTwo();
     
     if (UserConfigParams::m_font_size < 0)
