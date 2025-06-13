@@ -737,14 +737,13 @@ EventPropagation DynamicRibbonWidget::rightPressed(const int playerID)
     if (w != NULL)
     {
         updateLabel();
-
         propagateSelection();
 
         const int listenerAmount = m_hover_listeners.size();
         for (int n=0; n<listenerAmount; n++)
         {
-            m_hover_listeners[n].onSelectionChanged(this, getSelectedRibbon(playerID)->getSelectionIDString(playerID),
-                                                    getSelectedRibbon(playerID)->getSelectionText(playerID), playerID);
+            m_hover_listeners[n].onSelectionChanged(this, w->getSelectionIDString(playerID),
+                                                    w->getSelectionText(playerID), playerID);
         }
     }
     //Log::info("DynamicRibbonWidget", "Rightpressed %s", m_properties[PROP_ID].c_str());
@@ -755,30 +754,16 @@ EventPropagation DynamicRibbonWidget::rightPressed(const int playerID)
     //Log::info("DynamicRibbonWidget", "Rightpressed returning EVENT_LET");
 
     return EVENT_LET;
-}
+} // rightPressed
+
 // -----------------------------------------------------------------------------
 EventPropagation DynamicRibbonWidget::leftPressed(const int playerID)
 {
-    if (m_deactivated) return EVENT_LET;
+    // Left and right key presses use exactly the same propagation rules
+    // in dynamic ribbon widgets, we can avoid duplicating the code.
+    return rightPressed(playerID);
+} // leftPressed
 
-    RibbonWidget* w = getSelectedRibbon(playerID);
-    if (w != NULL)
-    {
-        updateLabel();
-        propagateSelection();
-
-        for_var_in (DynamicRibbonHoverListener*, listener, m_hover_listeners)
-        {
-            listener->onSelectionChanged(this, w->getSelectionIDString(playerID),
-                                         w->getSelectionText(playerID), playerID);
-        }
-    }
-
-    assert(m_rows.size() >= 1);
-    if (m_rows[0].m_ribbon_type == RIBBON_TOOLBAR) return EVENT_BLOCK;
-
-    return EVENT_LET;
-}
 // -----------------------------------------------------------------------------
 EventPropagation DynamicRibbonWidget::transmitEvent(Widget* w,
                                                  const std::string& originator,
@@ -963,10 +948,6 @@ void DynamicRibbonWidget::propagateSelection()
         if (selected_ribbon->m_children.size() > 1)
         {
             where = (float)relative_selection / (float)(selected_ribbon->m_children.size() - 1);
-        }
-        else
-        {
-            where = 0.0f;
         }
 
         if (where < 0.0f)      where = 0.0f;

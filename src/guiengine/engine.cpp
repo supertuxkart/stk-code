@@ -1238,12 +1238,9 @@ namespace GUIEngine
         Private::font_height = g_font->getDimension( L"X" ).Height;
         Private::large_font_height = g_large_font->getDimension( L"X" ).Height;
         Private::small_font_height = g_small_font->getDimension( L"X" ).Height;
-        Private::title_font_height =
-            g_title_font->getDimension( L"X" ).Height;
-        Private::small_title_font_height =
-            g_small_title_font->getDimension( L"X" ).Height;
-        Private::tiny_title_font_height =
-            g_tiny_title_font->getDimension( L"X" ).Height;
+        Private::title_font_height = g_title_font->getDimension( L"X" ).Height;
+        Private::small_title_font_height = g_small_title_font->getDimension( L"X" ).Height;
+        Private::tiny_title_font_height = g_tiny_title_font->getDimension( L"X" ).Height;
         if (ScreenKeyboard::isActive())
             ScreenKeyboard::getCurrent()->onResize();
         if (ModalDialog::isADialogActive())
