@@ -81,32 +81,26 @@ enum GEVulkanPipelineType : unsigned
     GVPT_SKYBOX
 };
 
+struct GEMaterial;
+
 struct PipelineSettings
 {
-    std::string m_vertex_shader;
-    std::string m_skinning_vertex_shader;
-    std::string m_fragment_shader;
-    std::string m_depth_only_fragment_shader;
     std::string m_shader_name;
-    bool m_alphablend;
-    bool m_additive;
-    bool m_backface_culling;
-    bool m_depth_test;
-    bool m_depth_write;
+    std::shared_ptr<const GEMaterial> m_material;
     char m_drawing_priority;
-    std::function<void(uint32_t*, void**)> m_push_constants_func;
     VkPipelineLayout m_custom_pl;
     VkCompareOp m_depth_op;
     VertexDescription m_vertex_description;
     GEVulkanPipelineType m_pipeline_type;
 
-    bool isTransparent() const { return m_alphablend || m_additive; }
+    PipelineSettings();
+    void loadMaterial(const GEMaterial& m);
 };
 
 struct PipelineData
 {
     PipelineSettings m_settings;
-    std::unordered_map<GEVulkanPipelineType, std::shared_ptr<VkPipeline> > m_pipelines;
+    std::map<GEVulkanPipelineType, std::shared_ptr<VkPipeline> > m_pipelines;
 };
 
 struct DrawCallData
@@ -175,8 +169,6 @@ private:
 
     std::vector<VkDescriptorSet> m_data_descriptor_sets;
 
-    std::unordered_map<std::string, std::vector<char> > m_push_constants;
-
     VkPipelineLayout m_pipeline_layout, m_skybox_layout;
 
     std::unordered_map<std::string, PipelineData> m_graphics_pipelines;
@@ -205,25 +197,8 @@ private:
     std::string getShader(irr::scene::ISceneNode* node, int material_id);
     // ------------------------------------------------------------------------
     bool bindPipeline(VkCommandBuffer cmd, const std::string& name,
-                      VkPipeline* prev_pipeline, GEVulkanPipelineType pt) const
-    {
-        auto& ret = m_graphics_pipelines.at(name);
-        if (ret.m_pipelines.find(pt) == ret.m_pipelines.end())
-            return false;
-        VkPipeline p = *ret.m_pipelines.at(pt);
-        if (*prev_pipeline == p)
-            return true;
-        *prev_pipeline = p;
-        vkCmdBindPipeline(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, p);
-        auto it = m_push_constants.find(ret.m_settings.m_shader_name);
-        if (it != m_push_constants.end())
-        {
-            vkCmdPushConstants(cmd, m_pipeline_layout,
-                VK_SHADER_STAGE_ALL_GRAPHICS, 0, it->second.size(),
-                it->second.data());
-        }
-        return true;
-    }
+                      VkPipeline* prev_pipeline,
+                      GEVulkanPipelineType pt) const;
     // ------------------------------------------------------------------------
     TexturesList getTexturesList(const irr::video::SMaterial& m)
     {
@@ -241,32 +216,15 @@ private:
     // ------------------------------------------------------------------------
     std::string getDynamicBufferKey(const std::string& shader) const
     {
-        static PipelineSettings default_settings = {};
-        const PipelineSettings* settings = &default_settings;
+        char drawing_priority = (char)1;
         auto it = m_graphics_pipelines.find(shader);
         if (it != m_graphics_pipelines.end())
-            settings = &it->second.m_settings;
-        return std::string(1, settings->isTransparent() ? (char)1 : (char)0) +
-            std::string(1, settings->m_drawing_priority) + shader;
+            drawing_priority = it->second.m_settings.m_drawing_priority;
+        return std::string(1, drawing_priority) + shader;
     }
     // ------------------------------------------------------------------------
     std::string getShaderFromKey(const std::string& key) const
-                                                      { return key.substr(2); }
-    // ------------------------------------------------------------------------
-    void updatePushConstants()
-    {
-        for (auto& p : m_push_constants)
-        {
-            auto& f =
-                m_graphics_pipelines.at(p.first).m_settings
-                .m_push_constants_func;
-            uint32_t size;
-            void* data;
-            f(&size, &data);
-            p.second.resize(size);
-            memcpy(p.second.data(), data, size);
-        }
-    }
+                                                      { return key.substr(1); }
     // ------------------------------------------------------------------------
     void bindSingleMaterial(VkCommandBuffer cmd,
                             const std::string& cur_pipeline,

@@ -2,6 +2,7 @@
 
 #include "ge_culling_tool.hpp"
 #include "ge_main.hpp"
+#include "ge_material_manager.hpp"
 #include "ge_render_info.hpp"
 #include "ge_spm.hpp"
 #include "ge_vulkan_animated_mesh_scene_node.hpp"
@@ -32,7 +33,6 @@
 
 #include "../source/Irrlicht/os.h"
 #include "quaternion.h"
-#define DEPTH_ONLY_FRAG_SHADER "depth_only.frag"
 #define SKINNING_PIPELINE "_skinning"
 
 namespace GE
@@ -44,6 +44,23 @@ static void destroyPipeline(VkPipeline* p)
         *p, NULL);
     delete p;
 }   // destroyPipeline
+
+// ============================================================================
+PipelineSettings::PipelineSettings()
+{
+    m_drawing_priority = (char)0;
+    m_custom_pl = VK_NULL_HANDLE;
+    m_depth_op = VK_COMPARE_OP_LESS;
+    m_pipeline_type = GVPT_SOLID;
+    GEMaterial default_material;
+    loadMaterial(default_material);
+}   // PipelineSettings::PipelineSettings
+
+// ============================================================================
+void PipelineSettings::loadMaterial(const GEMaterial& m)
+{
+    m_material = std::make_shared<const GEMaterial>(m);
+}   // PipelineSettings::loadMaterial
 
 // ============================================================================
 void ObjectData::init(irr::scene::ISceneNode* node, int material_id,
@@ -605,7 +622,8 @@ start:
                         {
                             obj[i].init(particles[i], material_id,
                                 m_billboard_rotation, m_view_position, flips,
-                                sky_particle, settings.m_backface_culling);
+                                sky_particle,
+                                settings.m_material->m_backface_culling);
                             written_size += sizeof(ObjectData);
                             mapped_addr += sizeof(ObjectData);
                         }
@@ -816,36 +834,16 @@ std::string GEVulkanDrawCall::getShader(irr::scene::ISceneNode* node,
 // ----------------------------------------------------------------------------
 std::string GEVulkanDrawCall::getShader(const irr::video::SMaterial& m)
 {
-    std::string shader;
-    switch (m.MaterialType)
+    std::string shader = GEMaterialManager::getShader(m.MaterialType);
+    auto material = GEMaterialManager::getMaterial(shader);
+    if (!getGEConfig()->m_pbr && !material->m_nonpbr_fallback.empty())
     {
-    case irr::video::EMT_TRANSPARENT_ADD_COLOR:
-        shader = "additive";
-        break;
-    case irr::video::EMT_TRANSPARENT_ALPHA_CHANNEL_REF:
-        shader = "alphatest";
-        break;
-    case irr::video::EMT_ONETEXTURE_BLEND:
-        shader = "alphablend";
-        break;
-    case irr::video::EMT_SOLID_2_LAYER:
-        shader = "decal";
-        break;
-    case irr::video::EMT_NORMAL_MAP_SOLID:
-        shader = getGEConfig()->m_pbr ? "normalmap" : "solid";
-        break;
-    case irr::video::EMT_STK_GRASS:
-        shader = "grass";
-        break;
-    default:
-        shader = "solid";
-        break;
+        shader = material->m_nonpbr_fallback;
+        material = GEMaterialManager::getMaterial(shader);
     }
     auto& ri = m.getRenderInfo();
     // Use real transparent shader first
-    if (m.MaterialType != irr::video::EMT_TRANSPARENT_ADD_COLOR &&
-        m.MaterialType != irr::video::EMT_ONETEXTURE_BLEND &&
-        ri && ri->isTransparent())
+    if (!material->isTransparent() && ri && ri->isTransparent())
         return "ghost";
     return shader;
 }   // getShader
@@ -866,113 +864,84 @@ void GEVulkanDrawCall::prepare(GEVulkanCameraSceneNode* cam)
 // ----------------------------------------------------------------------------
 void GEVulkanDrawCall::createAllPipelines(GEVulkanDriver* vk)
 {
-    PipelineSettings settings = {};
-    std::unordered_map<std::string, std::shared_ptr<VkPipeline> > dp_cache;
-    settings.m_depth_test = true;
-    settings.m_depth_write = true;
-    settings.m_backface_culling = true;
-    settings.m_depth_op = VK_COMPARE_OP_LESS;
+    PipelineSettings settings;
+    GEMaterial def_mat = *GEMaterialManager::getMaterial("solid");
     settings.m_vertex_description = getDefaultVertexDescription();
-    settings.m_pipeline_type = GVPT_SOLID;
-
-    settings.m_vertex_shader = "spm.vert";
-    settings.m_skinning_vertex_shader = "spm_skinning.vert";
-    settings.m_fragment_shader = "solid.frag";
-    settings.m_depth_only_fragment_shader = DEPTH_ONLY_FRAG_SHADER;
-    settings.m_shader_name = "solid";
-    createPipeline(vk, settings, dp_cache);
-
-    settings.m_fragment_shader = "normalmap.frag";
-    settings.m_shader_name = "normalmap";
-    createPipeline(vk, settings, dp_cache);
-
-    settings.m_fragment_shader = "decal.frag";
-    settings.m_shader_name = "decal";
-    createPipeline(vk, settings, dp_cache);
-
-    settings.m_fragment_shader = "alphatest.frag";
-    settings.m_shader_name = "alphatest";
-    settings.m_depth_only_fragment_shader = "alphatest_depth.frag";
-    settings.m_drawing_priority = (char)5;
-    createPipeline(vk, settings, dp_cache);
-
-    settings.m_vertex_shader = "grass.vert";
-    settings.m_skinning_vertex_shader = "";
-    settings.m_shader_name = "grass";
-    settings.m_drawing_priority = (char)5;
-    settings.m_push_constants_func = [](uint32_t* size, void** data)
+    std::unordered_map<std::string, std::shared_ptr<VkPipeline> > dp_cache;
+    int drawing_order = 1;
+    for (auto& p : GEMaterialManager::g_materials)
     {
-        static irr::core::vector3df wind_direction;
-        wind_direction = irr::core::vector3df(1.0f, 0.0f, 0.0f) *
-            (getMonoTimeMs() / 1000.0f) * 1.5f;
-        *size = sizeof(irr::core::vector3df);
-        *data = &wind_direction;
-    };
-    createPipeline(vk, settings, dp_cache);
+        if (p.second->isTransparent())
+            continue;
+        if (!getGEConfig()->m_pbr && !p.second->m_nonpbr_fallback.empty())
+            continue;
+        settings.m_drawing_priority = (char)drawing_order;
+        drawing_order = drawing_order + 1;
+        settings.m_shader_name = p.first;
+        settings.m_material = p.second;
+        createPipeline(vk, settings, dp_cache);
+    }
 
-    settings.m_vertex_shader = "spm.vert";
-    settings.m_skinning_vertex_shader = "spm_skinning.vert";
-    settings.m_depth_only_fragment_shader = "";
-    settings.m_push_constants_func = nullptr;
-    settings.m_pipeline_type = GVPT_GHOST_DEPTH;
+    def_mat.m_fragment_shader = "depth_only.frag";
+    def_mat.m_depth_only_fragment_shader = "";
+    def_mat.m_alphablend = true;
+    settings.loadMaterial(def_mat);
 
-    settings.m_depth_write = true;
-    settings.m_backface_culling = true;
-    settings.m_alphablend = true;
-    settings.m_drawing_priority = (char)9;
-    settings.m_fragment_shader = DEPTH_ONLY_FRAG_SHADER;
     settings.m_shader_name = "ghost";
+    settings.m_drawing_priority = (char)drawing_order;
+    settings.m_pipeline_type = GVPT_GHOST_DEPTH;
     if (doDepthOnlyRenderingFirst())
     {
         m_graphics_pipelines["ghost"] = {};
         m_graphics_pipelines["ghost"].m_settings = settings;
         m_graphics_pipelines["ghost"].m_pipelines[GVPT_GHOST_DEPTH] =
-            dp_cache.at(settings.m_vertex_shader + settings.m_fragment_shader);
+            dp_cache.at(def_mat.m_vertex_shader + def_mat.m_fragment_shader);
         m_graphics_pipelines["ghost" SKINNING_PIPELINE] = {};
         m_graphics_pipelines["ghost" SKINNING_PIPELINE].m_settings = settings;
         m_graphics_pipelines["ghost" SKINNING_PIPELINE]
             .m_pipelines[GVPT_GHOST_DEPTH] = dp_cache.at(
-            settings.m_skinning_vertex_shader + settings.m_fragment_shader);
+            def_mat.m_skinning_vertex_shader + def_mat.m_fragment_shader);
     }
     else
     {
         createPipeline(vk, settings, dp_cache);
     }
 
+    def_mat.m_fragment_shader = "ghost.frag";
+    def_mat.m_depth_write = false;
+    settings.loadMaterial(def_mat);
+
     settings.m_pipeline_type = GVPT_TRANSPARENT;
-    settings.m_fragment_shader = "ghost.frag";
-    settings.m_depth_write = false;
     settings.m_depth_op = VK_COMPARE_OP_EQUAL;
     createPipeline(vk, settings, dp_cache);
-
-    settings.m_backface_culling = false;
-    settings.m_drawing_priority = (char)10;
+    drawing_order = drawing_order + 1;
     settings.m_depth_op = VK_COMPARE_OP_LESS;
 
-    settings.m_fragment_shader = "transparent.frag";
-    settings.m_shader_name = "alphablend";
-    createPipeline(vk, settings, dp_cache);
+    for (auto& p : GEMaterialManager::g_materials)
+    {
+        if (!p.second->isTransparent())
+            continue;
+        if (!getGEConfig()->m_pbr && !p.second->m_nonpbr_fallback.empty())
+            continue;
+        settings.m_drawing_priority = (char)drawing_order;
+        drawing_order = drawing_order + 1;
+        settings.m_shader_name = p.first;
+        settings.m_material = p.second;
+        createPipeline(vk, settings, dp_cache);
+    }
 
-    settings.m_alphablend = false;
-    settings.m_additive = true;
-    settings.m_fragment_shader = "transparent.frag";
-    settings.m_shader_name = "additive";
-    settings.m_drawing_priority = (char)11;
-    createPipeline(vk, settings, dp_cache);
+    def_mat.m_alphablend = false;
+    def_mat.m_skinning_vertex_shader = "";
+    def_mat.m_vertex_shader = "fullscreen_quad.vert";
+    def_mat.m_fragment_shader = "skybox.frag";
+    settings.loadMaterial(def_mat);
 
     settings.m_pipeline_type = GVPT_SKYBOX;
-    settings.m_alphablend = false;
-    settings.m_additive = false;
     settings.m_custom_pl = m_skybox_layout;
     settings.m_depth_op = VK_COMPARE_OP_EQUAL;
     settings.m_vertex_description = {};
-    settings.m_backface_culling = true;
-    settings.m_skinning_vertex_shader = "";
-    settings.m_vertex_shader = "fullscreen_quad.vert";
-    settings.m_fragment_shader = "skybox.frag";
     settings.m_shader_name = "skybox";
     createPipeline(vk, settings, dp_cache);
-
 }   // createAllPipelines
 
 // ----------------------------------------------------------------------------
@@ -1037,7 +1006,7 @@ void GEVulkanDrawCall::createPipeline(GEVulkanDriver* vk,
     rasterizer.rasterizerDiscardEnable = VK_FALSE;
     rasterizer.polygonMode = VK_POLYGON_MODE_FILL;
     rasterizer.lineWidth = 1.0f;
-    rasterizer.cullMode = settings.m_backface_culling ?
+    rasterizer.cullMode = settings.m_material->m_backface_culling ?
         VK_CULL_MODE_BACK_BIT : VK_CULL_MODE_NONE;
     rasterizer.frontFace = VK_FRONT_FACE_CLOCKWISE;
     rasterizer.depthBiasEnable = VK_FALSE;
@@ -1049,8 +1018,8 @@ void GEVulkanDrawCall::createPipeline(GEVulkanDriver* vk,
 
     VkPipelineDepthStencilStateCreateInfo depth_stencil = {};
     depth_stencil.sType = VK_STRUCTURE_TYPE_PIPELINE_DEPTH_STENCIL_STATE_CREATE_INFO;
-    depth_stencil.depthTestEnable = settings.m_depth_test;
-    depth_stencil.depthWriteEnable = settings.m_depth_write;
+    depth_stencil.depthTestEnable = settings.m_material->m_depth_test;
+    depth_stencil.depthWriteEnable = settings.m_material->m_depth_write;
     depth_stencil.depthCompareOp = settings.m_depth_op;
     depth_stencil.depthBoundsTestEnable = VK_FALSE;
     depth_stencil.stencilTestEnable = VK_FALSE;
@@ -1059,8 +1028,8 @@ void GEVulkanDrawCall::createPipeline(GEVulkanDriver* vk,
     color_blend_attachment.colorWriteMask = VK_COLOR_COMPONENT_R_BIT |
         VK_COLOR_COMPONENT_G_BIT | VK_COLOR_COMPONENT_B_BIT |
         VK_COLOR_COMPONENT_A_BIT;
-    color_blend_attachment.blendEnable = settings.isTransparent();
-    if (settings.m_alphablend)
+    color_blend_attachment.blendEnable = settings.m_material->isTransparent();
+    if (settings.m_material->m_alphablend)
     {
         color_blend_attachment.srcColorBlendFactor = VK_BLEND_FACTOR_ONE;
         color_blend_attachment.dstColorBlendFactor = VK_BLEND_FACTOR_ONE_MINUS_SRC_ALPHA;
@@ -1069,7 +1038,7 @@ void GEVulkanDrawCall::createPipeline(GEVulkanDriver* vk,
         color_blend_attachment.dstAlphaBlendFactor = VK_BLEND_FACTOR_ONE_MINUS_SRC_ALPHA;
         color_blend_attachment.alphaBlendOp = VK_BLEND_OP_ADD;
     }
-    if (settings.m_additive)
+    if (settings.m_material->m_additive)
     {
         color_blend_attachment.srcColorBlendFactor = VK_BLEND_FACTOR_ONE;
         color_blend_attachment.dstColorBlendFactor = VK_BLEND_FACTOR_ONE;
@@ -1150,12 +1119,12 @@ void GEVulkanDrawCall::createPipeline(GEVulkanDriver* vk,
     }
 
     shader_stages[0].module = GEVulkanShaderManager::getShader(
-        settings.m_vertex_shader);
+        settings.m_material->m_vertex_shader);
     shader_stages[1].module = GEVulkanShaderManager::getShader(
-        settings.m_fragment_shader);
+        settings.m_material->m_fragment_shader);
 
     bool depth_only = false;
-    std::string depth_only_fs = settings.m_depth_only_fragment_shader;
+    std::string depth_only_fs = settings.m_material->m_depth_only_fragment_shader;
     if (!doDepthOnlyRenderingFirst())
         depth_only_fs = "";
     if (!depth_only_fs.empty())
@@ -1169,8 +1138,9 @@ void GEVulkanDrawCall::createPipeline(GEVulkanDriver* vk,
                                                bool skinning)
     {
         std::string vs = skinning ?
-            s.m_skinning_vertex_shader : s.m_vertex_shader;
-        auto it = dp_cache.find(vs + s.m_depth_only_fragment_shader);
+            s.m_material->m_skinning_vertex_shader :
+            s.m_material->m_vertex_shader;
+        auto it = dp_cache.find(vs + s.m_material->m_depth_only_fragment_shader);
         if (it == dp_cache.end())
             return false;
         std::string key = s.m_shader_name;
@@ -1204,8 +1174,9 @@ void GEVulkanDrawCall::createPipeline(GEVulkanDriver* vk,
                 destroyPipeline);
             m_graphics_pipelines[key].m_pipelines[GVPT_DEPTH] = sp;
             std::string vs = skinning ?
-                s.m_skinning_vertex_shader : s.m_vertex_shader;
-            dp_cache[vs + s.m_depth_only_fragment_shader] = sp;
+                s.m_material->m_skinning_vertex_shader :
+                s.m_material->m_vertex_shader;
+            dp_cache[vs + s.m_material->m_depth_only_fragment_shader] = sp;
         }
         else
         {
@@ -1230,11 +1201,11 @@ void GEVulkanDrawCall::createPipeline(GEVulkanDriver* vk,
         insert_pipeline(graphics_pipeline, settings, depth_only, false);
     }
 
-    if (!settings.m_skinning_vertex_shader.empty() &&
+    if (!settings.m_material->m_skinning_vertex_shader.empty() &&
         !insert_from_cache(settings, true))
     {
         shader_stages[0].module = GEVulkanShaderManager::getShader(
-            settings.m_skinning_vertex_shader);
+            settings.m_material->m_skinning_vertex_shader);
         VkResult result = vkCreateGraphicsPipelines(vk->getDevice(),
             VK_NULL_HANDLE, 1, &pipeline_info, NULL, &graphics_pipeline);
         if (result != VK_SUCCESS)
@@ -1253,9 +1224,9 @@ void GEVulkanDrawCall::createPipeline(GEVulkanDriver* vk,
     color_after_depth.depthCompareOp = VK_COMPARE_OP_EQUAL;
     pipeline_info.pDepthStencilState = &color_after_depth;
     shader_stages[0].module = GEVulkanShaderManager::getShader(
-        settings.m_vertex_shader);
+        settings.m_material->m_vertex_shader);
     shader_stages[1].module = GEVulkanShaderManager::getShader(
-        settings.m_fragment_shader);
+        settings.m_material->m_fragment_shader);
 
     VkResult result = vkCreateGraphicsPipelines(vk->getDevice(),
         VK_NULL_HANDLE, 1, &pipeline_info, NULL, &graphics_pipeline);
@@ -1266,11 +1237,11 @@ void GEVulkanDrawCall::createPipeline(GEVulkanDriver* vk,
     }
     insert_pipeline(graphics_pipeline, settings, depth_only, false);
 
-    if (settings.m_skinning_vertex_shader.empty())
+    if (settings.m_material->m_skinning_vertex_shader.empty())
         return;
 
     shader_stages[0].module = GEVulkanShaderManager::getShader(
-        settings.m_skinning_vertex_shader);
+        settings.m_material->m_skinning_vertex_shader);
     result = vkCreateGraphicsPipelines(vk->getDevice(),
         VK_NULL_HANDLE, 1, &pipeline_info, NULL, &graphics_pipeline);
     if (result != VK_SUCCESS)
@@ -1448,14 +1419,6 @@ void GEVulkanDrawCall::createVulkanData()
     }
 
     createAllPipelines(vk);
-    for (auto& p : m_graphics_pipelines)
-    {
-        if (p.second.m_settings.m_push_constants_func)
-        {
-            m_push_constants[p.second.m_settings.m_shader_name] =
-                std::vector<char>();
-        }
-    }
 
     size_t extra_size = 0;
     const bool use_multidraw =
@@ -1571,7 +1534,6 @@ void GEVulkanDrawCall::bindBaseVertex(GEVulkanDriver* vk, VkCommandBuffer cmd)
 // ----------------------------------------------------------------------------
 void GEVulkanDrawCall::prepareRendering(GEVulkanDriver* vk)
 {
-    updatePushConstants();
     updateDataDescriptorSets(vk);
     m_texture_descriptor->updateDescriptor();
 }   // prepareRendering
@@ -1984,9 +1946,8 @@ void GEVulkanDrawCall::bindSingleMaterial(VkCommandBuffer cmd,
     if (data.m_pipelines.find(pt) == data.m_pipelines.end())
         return;
     const PipelineSettings& s = data.m_settings;
-    if (pt == GVPT_GHOST_DEPTH || (pt == GVPT_DEPTH &&
-        (s.m_depth_only_fragment_shader == DEPTH_ONLY_FRAG_SHADER ||
-        s.m_depth_only_fragment_shader.empty())))
+    if (pt == GVPT_GHOST_DEPTH ||(pt == GVPT_DEPTH &&
+        s.m_material->texturelessDepth()))
         return;
     vkCmdBindDescriptorSets(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS,
         m_pipeline_layout, 0, 1,
@@ -2118,5 +2079,30 @@ size_t GEVulkanDrawCall::getLightDataOffset() const
     return ubo_size +
         getPadding(ubo_size, m_limits.minUniformBufferOffsetAlignment);
 }   // getLightDataOffset
+
+// ----------------------------------------------------------------------------
+bool GEVulkanDrawCall::bindPipeline(VkCommandBuffer cmd,
+                                    const std::string& name,
+                                    VkPipeline* prev_pipeline,
+                                    GEVulkanPipelineType pt) const
+{
+    auto& ret = m_graphics_pipelines.at(name);
+    if (ret.m_pipelines.find(pt) == ret.m_pipelines.end())
+        return false;
+    VkPipeline p = *ret.m_pipelines.at(pt);
+    if (*prev_pipeline == p)
+        return true;
+    *prev_pipeline = p;
+    vkCmdBindPipeline(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, p);
+    if (ret.m_settings.m_material->m_push_constants)
+    {
+        uint32_t size;
+        void* data;
+        ret.m_settings.m_material->m_push_constants(&size, &data);
+        vkCmdPushConstants(cmd, m_pipeline_layout,
+            VK_SHADER_STAGE_ALL_GRAPHICS, 0, size, data);
+    }
+    return true;
+}   // bindPipeline
 
 }
