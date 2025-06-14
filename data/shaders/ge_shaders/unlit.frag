@@ -2,21 +2,18 @@ layout(location = 0) in vec4 f_vertex_color;
 layout(location = 1) in vec2 f_uv;
 layout(location = 3) flat in int f_material_id;
 layout(location = 4) in float f_hue_change;
-#ifdef PBR_ENABLED
 layout(location = 5) in vec3 f_normal;
 layout(location = 8) in vec4 f_world_position;
-#endif
 
 layout(location = 0) out vec4 o_color;
 
 #include "utils/sample_mesh_texture.glsl"
 #include "../utils/rgb_conversion.frag"
-#ifdef PBR_ENABLED
 #include "utils/handle_pbr.glsl"
-#endif
 
 void main()
 {
+#ifdef PBR_ENABLED
     vec4 tex_color = sampleMeshTexture0(f_material_id, f_uv);
     if (tex_color.a * f_vertex_color.a < 0.5)
         discard;
@@ -28,13 +25,9 @@ void main()
         vec3 new_color = hsvToRgb(vec3(new_xy.x, new_xy.y, old_hsv.z));
         tex_color = vec4(new_color.r, new_color.g, new_color.b, tex_color.a);
     }
-#ifndef PBR_ENABLED
-    vec3 mixed_color = tex_color.xyz * f_vertex_color.xyz;
-    o_color = vec4(mixed_color, 1.0);
-#else
     vec3 diffuse_color = tex_color.xyz * f_vertex_color.xyz;
     vec3 normal = normalize(f_normal.xyz);
-    vec3 pbr = sampleMeshTexture2(f_material_id, f_uv).xyz;
+    vec3 pbr = vec3(0.0, 0.0, 0.4);
     o_color = vec4(handlePBR(diffuse_color, pbr, f_world_position, normal), 1.0);
 #endif
 }

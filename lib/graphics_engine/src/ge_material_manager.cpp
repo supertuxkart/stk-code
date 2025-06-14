@@ -5,6 +5,7 @@
 
 #include "vector3d.h"
 
+#include <algorithm>
 #include <cstring>
 #include <stdexcept>
 #include <unordered_map>
@@ -108,6 +109,15 @@ void GEMaterialManager::init()
                                     settings.m_alphablend = readBool(xml);
                                 else if (!strcmp(node_name, "additive"))
                                     settings.m_additive = readBool(xml);
+                                else if (!strcmp(node_name, "srgb-settings"))
+                                {
+                                    std::string srgb_str = readString(xml);
+                                    for (unsigned i = 0; i < std::min(srgb_str.size(),
+                                        settings.m_srgb_settings.size()); i++)
+                                    {
+                                        settings.m_srgb_settings[i] = (srgb_str[i] == 'Y');
+                                    }
+                                }
                             }
                             else if (xml->getNodeType() == io::EXN_ELEMENT_END &&
                                 !strcmp(xml->getNodeName(), "properties"))

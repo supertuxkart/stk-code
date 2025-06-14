@@ -27,6 +27,7 @@ struct GEMaterial
     bool m_backface_culling;
     bool m_depth_test;
     bool m_depth_write;
+    std::vector<bool> m_srgb_settings;
     // ------------------------------------------------------------------------
     GEMaterial()
     {
@@ -35,6 +36,8 @@ struct GEMaterial
         m_backface_culling = true;
         m_depth_test = true;
         m_depth_write = true;
+        m_srgb_settings =
+            { true, true, false, false, false, false, false, false };
     }
     // ------------------------------------------------------------------------
     bool texturelessDepth() const

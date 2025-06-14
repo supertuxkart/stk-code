@@ -23,6 +23,7 @@
 #include "graphics/graphics_restrictions.hpp"
 
 #include <ge_main.hpp>
+#include <ge_material_manager.hpp>
 #include <ge_spm.hpp>
 #include <ge_spm_buffer.hpp>
 #include <sstream>
@@ -387,7 +388,7 @@ void STKTextBillboard::initLegacy(const core::stringw& text, FontWithFace* face)
             GE::GESPMBuffer* spm_mb = new GE::GESPMBuffer();
             spm_mb->getMaterial().setTexture(0, p.first);
             spm_mb->getMaterial().MaterialType =
-                video::EMT_TRANSPARENT_ALPHA_CHANNEL_REF;
+                GE::GEMaterialManager::getIrrMaterialType("unlit");
             spm_mb->getMaterial().Lighting = false;
             for (auto& q : p.second)
             {

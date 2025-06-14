@@ -4,6 +4,7 @@ layout(location = 3) flat in int f_material_id;
 layout(location = 4) in float f_hue_change;
 #ifdef PBR_ENABLED
 layout(location = 5) in vec3 f_normal;
+layout(location = 8) in vec4 f_world_position;
 #endif
 
 layout(location = 0) out vec4 o_color;
@@ -41,6 +42,6 @@ void main()
     vec3 diffuse_color = tex_color.xyz * f_vertex_color.xyz;
     vec3 normal = normalize(f_normal.xyz);
     vec3 pbr = sampleMeshTexture2(f_material_id, f_uv).xyz;
-    o_color = vec4(handlePBR(diffuse_color, pbr, normal), 1.0);
+    o_color = vec4(handlePBR(diffuse_color, pbr, f_world_position, normal), 1.0);
 #endif
 }

@@ -30,10 +30,34 @@
         </shaders>
     </setting>
 
+    <setting name="splatting">
+        <properties>
+            <nonpbr-fallback>solid</nonpbr-fallback>
+            <srgb-settings>YNYYYY</srgb-settings>
+        </properties>
+        <shaders>
+            <vertex>spm.vert</vertex>
+            <fragment>splatting.frag</fragment>
+            <depth>depth_only.frag</depth>
+        </shaders>
+    </setting>
+
     <setting name="alphatest">
         <shaders>
             <vertex>spm.vert</vertex>
             <fragment>alphatest.frag</fragment>
+            <depth>alphatest_depth.frag</depth>
+            <skinning-vertex>spm_skinning.vert</skinning-vertex>
+        </shaders>
+    </setting>
+
+    <setting name="unlit">
+        <properties>
+            <nonpbr-fallback>alphatest</nonpbr-fallback>
+        </properties>
+        <shaders>
+            <vertex>spm.vert</vertex>
+            <fragment>unlit.frag</fragment>
             <depth>alphatest_depth.frag</depth>
             <skinning-vertex>spm_skinning.vert</skinning-vertex>
         </shaders>
