@@ -2576,8 +2576,7 @@ void GEVulkanDriver::updateDriver(bool scale_changed, bool pbr_changed,
         destroySwapChainRelated(false/*handle_surface*/);
     if (pbr_changed)
     {
-        GEVulkanShaderManager::destroy();
-        GEVulkanShaderManager::init(this);
+        GEVulkanShaderManager::loadAllShaders();
         GEVulkanSampler sampler = m_mesh_texture_descriptor->getSamplerUse();
         delete m_mesh_texture_descriptor;
         m_mesh_texture_descriptor = new GEVulkanTextureDescriptor(
@@ -2628,8 +2627,7 @@ void GEVulkanDriver::reloadShaders()
     waitIdle();
     setDisableWaitIdle(true);
     clearDrawCallsCache();
-    GEVulkanShaderManager::destroy();
-    GEVulkanShaderManager::init(this);
+    GEVulkanShaderManager::loadAllShaders();
     for (auto& dc : static_cast<GEVulkanSceneManager*>(
         m_irrlicht_device->getSceneManager())->getDrawCalls())
         dc.second = std::unique_ptr<GEVulkanDrawCall>(new GEVulkanDrawCall);
