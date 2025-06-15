@@ -17,10 +17,6 @@
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include "items/powerup_manager.hpp"
-
-#include <cinttypes>
-#include <stdexcept>
-
 #include "config/stk_config.hpp"
 #include "graphics/irr_driver.hpp"
 #include "graphics/sp/sp_base.hpp"
@@ -41,7 +37,7 @@
 
 #include <IMesh.h>
 
-PowerupManager* powerup_manager=0;
+PowerupManager* powerup_manager = nullptr;
 
 //-----------------------------------------------------------------------------
 /** The constructor initialises everything to zero. */
@@ -50,8 +46,8 @@ PowerupManager::PowerupManager()
     m_random_seed.store(0);
     for(int i=0; i<POWERUP_MAX; i++)
     {
-        m_all_meshes[i] = NULL;
-        m_all_icons[i]  = (Material*)NULL;
+        m_all_meshes[i] = nullptr;
+        m_all_icons[i]  = (Material*)nullptr;
     }
 }   // PowerupManager
 
@@ -94,7 +90,7 @@ void PowerupManager::unloadPowerups()
 
         //FIXME: I'm not sure if this is OK or if I need to ->drop(),
         //       or delete them, or...
-        m_all_icons[i]  = (Material*)NULL;
+        m_all_icons[i]  = (Material*)nullptr;
     }
 }   // removeTextures
 
@@ -107,7 +103,7 @@ PowerupManager::PowerupType
     PowerupManager::getPowerupType(const std::string &name) const
 {
     // Must match the order of PowerupType in powerup_manager.hpp!!
-    static std::string powerup_names[] = {
+    static const std::string powerup_names[] = {
         "",            /* Nothing */
         "bubblegum", "cake", "bowling", "zipper", "plunger", "switch",
         "swatter", "rubber-ball", "parachute", "anchor"
@@ -185,6 +181,7 @@ void PowerupManager::loadWeights(const XMLNode *powerup_node,
         Log::fatal("PowerupManager",
                    "Cannot find node '%s' in powerup.xml file.",
                    class_name.c_str());
+        return;
     }
 
     for (unsigned int i = 0; i < node->getNumNodes(); i++)
@@ -219,7 +216,7 @@ void PowerupManager::WeightsData::reset()
 void PowerupManager::WeightsData::readData(int num_karts, const XMLNode *node)
 {
     m_num_karts = num_karts;
-    for (unsigned int i = 0; i < node->getNumNodes(); i++)
+    for (unsigned int i = 0; i < node->getNumNodes(); ++i)
     {
         m_weights_for_section.emplace_back();
         const XMLNode *w = node->getNode(i);
@@ -232,12 +229,19 @@ void PowerupManager::WeightsData::readData(int num_karts, const XMLNode *node)
 
         // Keep a reference for shorter access to the list
         std::vector<int> &l = m_weights_for_section.back();
-        for(unsigned int i=0; i<l_string.size(); i++)
+        for(unsigned int j=0; j < l_string.size(); ++j)
         {
-            if(l_string[i]=="") continue;
+           if(l_string[j].empty()) continue;
             int n;
-            StringUtils::fromString(l_string[i], n);
-            l.push_back(n);
+            if (StringUtils::fromString(l_string[j], n))
+            {
+               l.push_back(n);
+            } else
+            {
+               Log::warn("PowerupManager",
+                         "Invalid integer value '%s' in powerup.xml for '%s'",
+                         l_string[j].c_str(), node->getName().c_str());
+            }
         }
         // Make sure we have the right number of entries
         if (l.size() < 2 * (int)POWERUP_LAST)
@@ -472,8 +476,8 @@ void PowerupManager::loadPowerup(PowerupType type, const XMLNode &node)
                                   /*strip_path*/ false);
 
 
-    assert(m_all_icons[type] != NULL);
-    assert(m_all_icons[type]->getTexture() != NULL);
+    assert(m_all_icons[type] != nullptr);
+    assert(m_all_icons[type]->getTexture() != nullptr);
 
     std::string model("");
     node.get("model", &model);
