@@ -29,12 +29,15 @@ jobs:
         uses: ASzc/change-string-case-action@v1
         with:
           string: ${{ matrix.platform }}
-      - name: Download cctools
+      - name: Download cctools and ISPC
         run: |
           cd /opt
           wget https://github.com/supertuxkart/dependencies/releases/download/cctools/cctools-14.1.tar.xz
           tar xf cctools-14.1.tar.xz
           rm cctools-14.1.tar.xz
+          wget https://github.com/supertuxkart/dependencies/releases/download/preview/ispc-cross-1.26.0.tar.xz
+          tar xf ispc-cross-1.26.0.tar.xz
+          rm ispc-cross-1.26.0.tar.xz
       - name: Restore timestamps
         run: |
           wget https://github.com/MestreLion/git-tools/archive/refs/heads/main.zip
@@ -86,7 +89,8 @@ jobs:
           mkdir -p build
           cd build
           cmake .. -DCCTOOLS_PREFIX=/opt/cctools -DCCTOOLS_ARCH=${{ matrix.arch }} -DCCTOOLS_PLATFORM=${{ matrix.platform }} \
-          -DRT=/opt/cctools/darwin/libclang_rt.${{ env.rt }}.a -DCMAKE_TOOLCHAIN_FILE=../cmake/Toolchain-cctools.cmake -DCHECK_ASSETS=OFF
+          -DRT=/opt/cctools/darwin/libclang_rt.${{ env.rt }}.a -DCMAKE_TOOLCHAIN_FILE=../cmake/Toolchain-cctools.cmake -DCHECK_ASSETS=OFF \
+          -DBC7_ISPC=ON -DCMAKE_ISPC_COMPILER=/opt/ispc/bin/ispc
       - name: Build
         run: |
           cd build
@@ -132,26 +136,25 @@ jobs:
           echo "${{ env.release_pre }}"
       - name: Download binaries
         uses: actions/download-artifact@v4
-      - name: Mask developer name
-        run: |
-          echo "::add-mask::${{ secrets.MAC_DEVELOPER_NAME }}"
-      - name: Import certificates
-        if: ${{ env.release_tag != '' }}
-        uses: apple-actions/import-codesign-certs@v1
-        with:
-          p12-file-base64: ${{ secrets.MAC_DEVELOPER_ID_P12_FILE }}
-          p12-password: ${{ secrets.MAC_DEVELOPER_ID_P12_PASSWORD }}
+      #- name: Mask developer name
+      #  run: |
+      #    echo "::add-mask::${{ secrets.MAC_DEVELOPER_NAME }}"
+      #- name: Import certificates
+      #  if: ${{ env.release_tag != '' }}
+      #  uses: apple-actions/import-codesign-certs@v1
+      #  with:
+      #    p12-file-base64: ${{ secrets.MAC_DEVELOPER_ID_P12_FILE }}
+      #    p12-password: ${{ secrets.MAC_DEVELOPER_ID_P12_PASSWORD }}
       - name: Run dylibbundler and sign STK
         if: ${{ env.release_tag != '' }}
-        env:
-          developer_id: "Developer ID Application: ${{ secrets.MAC_DEVELOPER_NAME }} (${{ secrets.MAC_DEVELOPER_TEAM }})"
+      #  env:
+      #    developer_id: "Developer ID Application: ${{ secrets.MAC_DEVELOPER_NAME }} (${{ secrets.MAC_DEVELOPER_TEAM }})"
         run: |
           wget https://github.com/supertuxkart/dependencies/releases/download/preview/dependencies-macosx.tar.xz
           tar xf dependencies-macosx.tar.xz
           HOMEBREW_NO_AUTO_UPDATE=1 brew install dylibbundler
           lipo -create ./macosx-x86_64/supertuxkart.app/Contents/MacOS/supertuxkart ./macosx-arm64/supertuxkart.app/Contents/MacOS/supertuxkart -output ./macosx-arm64/supertuxkart.app/Contents/MacOS/supertuxkart
           chmod 755 ./macosx-arm64/supertuxkart.app/Contents/MacOS/supertuxkart
-          install_name_tool -change libcurl.4.dylib @rpath/libcurl.4.dylib ./macosx-arm64/supertuxkart.app/Contents/MacOS/supertuxkart
           install_name_tool -delete_rpath @loader_path/Frameworks ./dependencies-macosx/lib/libSDL2.dylib
           install_name_tool -delete_rpath @executable_path/Frameworks ./dependencies-macosx/lib/libSDL2.dylib
           dylibbundler -od -b -x ./macosx-arm64/supertuxkart.app/Contents/MacOS/supertuxkart -d ./macosx-arm64/supertuxkart.app/Contents/libs/ -p @executable_path/../libs/ -s ./dependencies-macosx/lib -ns
@@ -163,16 +166,19 @@ jobs:
           rm stk-assets-full.zip
           cd ../../../../..
           mv ./macosx-arm64/supertuxkart.app SuperTuxKart.app
-          codesign --force --sign "$developer_id" SuperTuxKart.app/Contents/libs/*.dylib
-          codesign --force --options=runtime --deep --sign "$developer_id" SuperTuxKart.app
-      - name: "Notarize release build"
-        if: ${{ env.release_tag != '' && github.ref != 'refs/heads/master' }}
-        run: |
-          ditto -c -k --sequesterRsrc --keepParent SuperTuxKart.app tmp.zip
-          xcrun notarytool submit tmp.zip --apple-id ${{ secrets.STK_NOTARIZATION_USERNAME }} \
-                                          --password ${{ secrets.STK_NOTARIZATION_PASSWORD }} \
-                                          --team-id ${{ secrets.MAC_DEVELOPER_TEAM }} --wait
-          xcrun stapler staple SuperTuxKart.app
+          # Use Ad Hoc certificate for now, previous certificate has been expired.
+          codesign --force -s - SuperTuxKart.app/Contents/libs/*.dylib
+          codesign --force --deep -s - SuperTuxKart.app
+          #codesign --force --sign "$developer_id" SuperTuxKart.app/Contents/libs/*.dylib
+          #codesign --force --options=runtime --deep --sign "$developer_id" SuperTuxKart.app
+      #- name: "Notarize release build"
+      #  if: ${{ env.release_tag != '' && github.ref != 'refs/heads/master' }}
+      #  run: |
+      #    ditto -c -k --sequesterRsrc --keepParent SuperTuxKart.app tmp.zip
+      #    xcrun notarytool submit tmp.zip --apple-id ${{ secrets.STK_NOTARIZATION_USERNAME }} \
+      #                                    --password ${{ secrets.STK_NOTARIZATION_PASSWORD }} \
+      #                                    --team-id ${{ secrets.MAC_DEVELOPER_TEAM }} --wait
+      #    xcrun stapler staple SuperTuxKart.app
       - name: Archive
         if: ${{ env.release_tag != '' }}
         run: |
