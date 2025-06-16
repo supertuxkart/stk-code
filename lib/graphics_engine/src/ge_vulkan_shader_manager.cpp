@@ -288,6 +288,11 @@ unsigned GEVulkanShaderManager::getMeshTextureLayer()
 // ----------------------------------------------------------------------------
 VkShaderModule GEVulkanShaderManager::getShader(const std::string& filename)
 {
+    if (g_shaders.empty())
+    {
+        throw std::runtime_error("No vulkan shaders compiled, perhaps shaderc "
+            "is not enabled.");
+    }
     auto& it = g_shaders.at(filename);
     it->m_lock.lock();
     it->m_lock.unlock();
