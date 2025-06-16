@@ -242,8 +242,8 @@ void GEVulkanEnvironmentMap::load()
     compute_info.stage.module =
         GEVulkanShaderManager::getShader("diffuse_irradiance.comp");
     compute_info.layout = pipeline_layout;
-    if (vkCreateComputePipelines(vk->getDevice(), NULL, 1, &compute_info,
-        NULL, &diffuse_pipeline) != VK_SUCCESS)
+    if (vkCreateComputePipelines(vk->getDevice(), VK_NULL_HANDLE, 1,
+        &compute_info, NULL, &diffuse_pipeline) != VK_SUCCESS)
     {
         printf("vkCreateComputePipelines failed for "
             "GEVulkanEnvironmentMap::load");
@@ -252,8 +252,8 @@ void GEVulkanEnvironmentMap::load()
 
     compute_info.stage.module =
         GEVulkanShaderManager::getShader("specular_prefilter.comp");
-    if (vkCreateComputePipelines(vk->getDevice(), NULL, 1, &compute_info,
-        NULL, &specular_pipeline) != VK_SUCCESS)
+    if (vkCreateComputePipelines(vk->getDevice(), VK_NULL_HANDLE, 1,
+        &compute_info, NULL, &specular_pipeline) != VK_SUCCESS)
     {
         printf("vkCreateComputePipelines failed for "
             "GEVulkanEnvironmentMap::load");
