@@ -3,6 +3,7 @@ layout(location = 2) in vec2 f_uv_two;
 layout(location = 3) flat in int f_material_id;
 #ifdef PBR_ENABLED
 layout(location = 5) in vec3 f_normal;
+layout(location = 8) in vec4 f_world_position;
 #endif
 
 layout(location = 0) out vec4 o_color;
@@ -23,6 +24,6 @@ void main()
 #else
     vec3 normal = normalize(f_normal.xyz);
     vec3 pbr = sampleMeshTexture2(f_material_id, f_uv).xyz;
-    o_color = vec4(handlePBR(final_color, vec3(0.0), normal), 1.0);
+    o_color = vec4(handlePBR(final_color, vec3(0.0), f_world_position, normal), 1.0);
 #endif
 }

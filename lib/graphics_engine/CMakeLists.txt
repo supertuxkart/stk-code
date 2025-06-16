@@ -69,6 +69,7 @@ set(GE_SOURCES
     src/ge_culling_tool.cpp
     src/ge_dx9_texture.cpp
     src/ge_main.cpp
+    src/ge_material_manager.cpp
     src/ge_occlusion_culling.cpp
     src/ge_texture.cpp
     src/ge_vma.cpp

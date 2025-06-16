@@ -8,6 +8,7 @@
 
 #include <algorithm>
 #include <map>
+#include <memory>
 #include <sstream>
 #include <string>
 #include <stdexcept>
@@ -29,7 +30,21 @@ uint32_t g_mesh_texture_layer = 2;
 
 uint32_t g_sampler_size = 512;
 
-std::map<std::string, std::pair<GESpinLock, VkShaderModule>* > g_shaders;
+struct ShaderHolder
+{
+    GESpinLock m_lock;
+    VkShaderModule m_shader_module;
+    ShaderHolder() : m_shader_module(VK_NULL_HANDLE) {}
+    ~ShaderHolder()
+    {
+        m_lock.lock();
+        m_lock.unlock();
+        if (g_vk && m_shader_module != VK_NULL_HANDLE)
+            vkDestroyShaderModule(g_vk->getDevice(), m_shader_module, NULL);
+    }
+};
+
+std::map<std::string, std::unique_ptr<ShaderHolder> > g_shaders;
 }   // GEVulkanShaderManager
 
 // ============================================================================
@@ -51,7 +66,21 @@ void GEVulkanShaderManager::init(GEVulkanDriver* vk)
 {
     g_vk = vk;
     g_file_system = vk->getFileSystem();
+    loadAllShaders();
+}   // init
 
+// ----------------------------------------------------------------------------
+void GEVulkanShaderManager::destroy()
+{
+    g_shaders.clear();
+    g_vk = NULL;
+    g_file_system = NULL;
+}   // destroy
+
+// ----------------------------------------------------------------------------
+void GEVulkanShaderManager::loadAllShaders(const std::string& match_filename)
+{
+#ifndef DISABLE_SHADERC
     std::ostringstream oss;
     oss << "#version 450\n";
     if (getGEConfig()->m_pbr)
@@ -79,28 +108,6 @@ void GEVulkanShaderManager::init(GEVulkanDriver* vk)
         oss << "#define SHADER_STORAGE_IMAGE_EXTENDED_FORMATS\n";
     g_predefines = oss.str();
 
-    loadAllShaders();
-}   // init
-
-// ----------------------------------------------------------------------------
-void GEVulkanShaderManager::destroy()
-{
-    if (!g_vk)
-        return;
-    for (auto& p : g_shaders)
-    {
-        p.second->first.lock();
-        p.second->first.unlock();
-        vkDestroyShaderModule(g_vk->getDevice(), p.second->second, NULL);
-        delete p.second;
-    }
-    g_shaders.clear();
-}   // destroy
-
-// ----------------------------------------------------------------------------
-void GEVulkanShaderManager::loadAllShaders()
-{
-#ifndef DISABLE_SHADERC
     irr::io::IFileList* files = g_file_system->createFileList(
         getShaderFolder().c_str());
     for (unsigned i = 0; i < files->getFileCount(); i++)
@@ -108,6 +115,9 @@ void GEVulkanShaderManager::loadAllShaders()
         if (files->isDirectory(i))
             continue;
         std::string filename = files->getFileName(i).c_str();
+        if (!match_filename.empty() &&
+            filename.find(match_filename) == std::string::npos)
+            continue;
         std::string ext = filename.substr(filename.find_last_of(".") + 1);
         shaderc_shader_kind kind;
         if (ext == "vert")
@@ -122,21 +132,21 @@ void GEVulkanShaderManager::loadAllShaders()
             kind = shaderc_tess_evaluation_shader;
         else
             continue;
-        auto pair = new std::pair<GESpinLock, VkShaderModule>();
-        g_shaders[filename] = pair;
-        pair->first.lock();
+        g_shaders[filename] = std::unique_ptr<ShaderHolder>(new ShaderHolder);
+        auto holder = g_shaders.at(filename).get();
+        holder->m_lock.lock();
         GEVulkanCommandLoader::addMultiThreadingCommand(
-            [pair, kind, filename]()
+            [holder, kind, filename]()
             {
                 try
                 {
-                    pair->second = loadShader(kind, filename);
+                    holder->m_shader_module = loadShader(kind, filename);
                 }
                 catch (std::exception& e)
                 {
                     printf("%s", e.what());
                 }
-                pair->first.unlock();
+                holder->m_lock.unlock();
             });
     }
     files->drop();
@@ -278,12 +288,12 @@ unsigned GEVulkanShaderManager::getMeshTextureLayer()
 // ----------------------------------------------------------------------------
 VkShaderModule GEVulkanShaderManager::getShader(const std::string& filename)
 {
-    auto it = g_shaders.at(filename);
-    it->first.lock();
-    it->first.unlock();
-    if (it->second == VK_NULL_HANDLE)
+    auto& it = g_shaders.at(filename);
+    it->m_lock.lock();
+    it->m_lock.unlock();
+    if (it->m_shader_module == VK_NULL_HANDLE)
         throw std::runtime_error(std::string("Missing shader ") + filename);
-    return it->second;
+    return it->m_shader_module;
 }   // getShader
 
 }

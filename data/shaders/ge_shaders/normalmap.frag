@@ -6,6 +6,7 @@ layout(location = 4) in float f_hue_change;
 layout(location = 5) in vec3 f_normal;
 layout(location = 6) in vec3 f_tangent;
 layout(location = 7) in vec3 f_bitangent;
+layout(location = 8) in vec4 f_world_position;
 #endif
 
 layout(location = 0) out vec4 o_color;
@@ -51,6 +52,6 @@ void main()
 
     vec3 normal = normalize(t_b_n * tangent_space_normal);
     vec3 pbr = sampleMeshTexture2(f_material_id, f_uv).xyz;
-    o_color = vec4(handlePBR(diffuse_color, pbr, normal), 1.0);
+    o_color = vec4(handlePBR(diffuse_color, pbr, f_world_position, normal), 1.0);
 #endif
 }

@@ -3,6 +3,7 @@
 #include "ge_compressor_astc_4x4.hpp"
 #include "ge_compressor_bptc_bc7.hpp"
 #include "ge_main.hpp"
+#include "ge_material_manager.hpp"
 #include "ge_spm.hpp"
 #include "ge_spm_buffer.hpp"
 
@@ -639,6 +640,7 @@ GEVulkanDriver::GEVulkanDriver(const SIrrlichtCreationParameters& params,
             GEVulkanFeatures::supportsBindMeshTexturesAtOnce());
         GECompressorASTC4x4::init();
         GECompressorBPTCBC7::init();
+        GEMaterialManager::init();
         GEVulkanFeatures::printStats();
     }
     catch (std::exception& e)
@@ -1689,6 +1691,7 @@ bool GEVulkanDriver::beginScene(bool backBuffer, bool zBuffer, SColor color,
                                 const SExposedVideoData& videoData,
                                 core::rect<s32>* sourceRect)
 {
+    GEMaterialManager::update();
     if (m_billboard_quad == NULL && m_irrlicht_device->getSceneManager() &&
         m_irrlicht_device->getSceneManager()->getMeshCache())
         createBillboardQuad();
@@ -2573,8 +2576,7 @@ void GEVulkanDriver::updateDriver(bool scale_changed, bool pbr_changed,
         destroySwapChainRelated(false/*handle_surface*/);
     if (pbr_changed)
     {
-        GEVulkanShaderManager::destroy();
-        GEVulkanShaderManager::init(this);
+        GEVulkanShaderManager::loadAllShaders();
         GEVulkanSampler sampler = m_mesh_texture_descriptor->getSamplerUse();
         delete m_mesh_texture_descriptor;
         m_mesh_texture_descriptor = new GEVulkanTextureDescriptor(
@@ -2625,8 +2627,7 @@ void GEVulkanDriver::reloadShaders()
     waitIdle();
     setDisableWaitIdle(true);
     clearDrawCallsCache();
-    GEVulkanShaderManager::destroy();
-    GEVulkanShaderManager::init(this);
+    GEVulkanShaderManager::loadAllShaders();
     for (auto& dc : static_cast<GEVulkanSceneManager*>(
         m_irrlicht_device->getSceneManager())->getDrawCalls())
         dc.second = std::unique_ptr<GEVulkanDrawCall>(new GEVulkanDrawCall);

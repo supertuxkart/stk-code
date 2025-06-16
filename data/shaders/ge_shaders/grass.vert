@@ -18,6 +18,7 @@ void main()
         v_color.r,
         u_object_buffer.m_objects[gl_InstanceIndex].m_rotation,
         u_object_buffer.m_objects[gl_InstanceIndex].m_scale, v_position);
+    f_world_position = v_world_position;
     gl_Position = u_camera.m_projection_view_matrix * v_world_position;
     f_vertex_color = vec4(1.0);
     f_uv = v_uv;

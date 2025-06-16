@@ -48,6 +48,7 @@
 
 #ifndef SERVER_ONLY
 #include <ge_main.hpp>
+#include <ge_material_manager.hpp>
 #include <ge_spm_buffer.hpp>
 #include <ge_texture.hpp>
 #endif
@@ -575,7 +576,7 @@ void Material::install(std::function<void(video::IImage*)> image_mani,
     m_texture->grab();
 
 #ifndef SERVER_ONLY
-    if (!m && irr_driver->getVideoDriver()->getDriverType() != EDT_VULKAN)
+    if (irr_driver->getVideoDriver()->getDriverType() != EDT_VULKAN)
         return;
 
     for (unsigned i = 2; i < m_sampler_path.size(); i++)
@@ -906,8 +907,6 @@ void  Material::setMaterialProperties(video::SMaterial *m, scene::IMeshBuffer* m
             video::EMFN_MODULATE_1X,
             video::EAS_TEXTURE |
             video::EAS_VERTEX_COLOR);
-        if (is_vk)
-            m->MaterialType = video::EMT_TRANSPARENT_ADD_COLOR;
     }
     else if (m_shader_name == "grass")
     {
@@ -926,21 +925,9 @@ void  Material::setMaterialProperties(video::SMaterial *m, scene::IMeshBuffer* m
             m->EmissiveColor = video::SColor(255, 150, 150, 150);
             m->SpecularColor = video::SColor(255, 150, 150, 150);
         }
-        if (is_vk)
-            m->MaterialType = video::EMT_STK_GRASS;
 #endif
 
 #endif
-    }
-    else if (m_shader_name == "decal")
-    {
-        if (is_vk)
-            m->MaterialType = video::EMT_SOLID_2_LAYER;
-    }
-    else if (m_shader_name == "normalmap")
-    {
-        if (is_vk)
-            m->MaterialType = video::EMT_NORMAL_MAP_SOLID;
     }
 
     if (isTransparent())
@@ -1002,15 +989,20 @@ void  Material::setMaterialProperties(video::SMaterial *m, scene::IMeshBuffer* m
         m->ColorMaterial = video::ECM_NONE; // Override one above
     }
 #endif
+#ifndef SERVER_ONLY
     if (is_vk)
     {
+        m->MaterialType =
+            GE::GEMaterialManager::getIrrMaterialType(m_shader_name);
+        if (m_shader_name == "displace")
+            m->MaterialType = video::EMT_TRANSPARENT_ALPHA_CHANNEL;
         for (unsigned i = 2; i < m_sampler_path.size(); i++)
         {
             if (m_vk_textures[i - 2])
                 m->setTexture(i, m_vk_textures[i - 2]);
         }
     }
-
+#endif
 } // setMaterialProperties
 
 //-----------------------------------------------------------------------------
