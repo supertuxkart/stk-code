@@ -216,7 +216,7 @@ void PowerupManager::WeightsData::reset()
 void PowerupManager::WeightsData::readData(int num_karts, const XMLNode *node)
 {
     m_num_karts = num_karts;
-    for (unsigned int i = 0; i < node->getNumNodes(); ++i)
+    for (unsigned int i = 0; i < node->getNumNodes(); i++)
     {
         m_weights_for_section.emplace_back();
         const XMLNode *w = node->getNode(i);
@@ -229,7 +229,7 @@ void PowerupManager::WeightsData::readData(int num_karts, const XMLNode *node)
 
         // Keep a reference for shorter access to the list
         std::vector<int> &l = m_weights_for_section.back();
-        for(unsigned int j=0; j < l_string.size(); ++j)
+        for(unsigned int j=0; j < l_string.size(); j++)
         {
            if(l_string[j].empty()) continue;
             int n;
