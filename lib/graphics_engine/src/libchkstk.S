@@ -1,3 +1,5 @@
+// From https://github.com/skeeto/w64devkit/blob/master/src/libchkstk.S
+
 #if 0
 # Implementations of ___chkstk_ms (GCC) and __chkstk (MSVC). Unlike
 # libgcc, no work happens if the stack is already committed. Execute
