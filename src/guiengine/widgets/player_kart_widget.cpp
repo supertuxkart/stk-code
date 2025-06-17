@@ -49,6 +49,7 @@ PlayerKartWidget::PlayerKartWidget(KartSelectionScreen* parent,
 #endif
     m_ready_text = NULL;
     m_parent_screen = parent;
+    m_left_arrow_width = 0;
 
     m_associated_player = associated_player;
     x_speed = y_speed = w_speed = h_speed = 1.0f;
@@ -352,18 +353,18 @@ void PlayerKartWidget::add()
            ->m_kart_widgets.contains(this));
     if (m_associated_player) // if player is local
     {
+#ifdef DEBUG
         bool mineInList = false;
         for (unsigned int p=0; p<StateManager::get()->activePlayerCount(); p++)
         {
-#ifdef DEBUG
             assert(StateManager::get()->getActivePlayer(p)->ok());
-#endif
             if (StateManager::get()->getActivePlayer(p) == m_associated_player)
             {
                 mineInList = true;
             }
         }
         assert(mineInList);
+#endif
     }
 
     // the first player will have an ID of its own to allow for keyboard
