@@ -81,6 +81,7 @@ btWheelInfo& btKart::addWheel(const btVector3& connectionPointCS,
     ci.m_frictionSlip             = tuning.m_frictionSlip;
     ci.m_maxSuspensionTravel      = tuning.m_maxSuspensionTravel;
     ci.m_maxSuspensionForce       = tuning.m_maxSuspensionForce;
+    ci.m_worldTransform           = getChassisWorldTransform();
 
     m_wheelInfo.push_back( btWheelInfo(ci));
 
@@ -618,8 +619,7 @@ void btKart::pushVehicleUpright()
             {
                 const btVector3& raycastStart = chassis_trans(m_wheelInfo[i].m_chassisConnectionPointCS * 1.0f) + extraHeight;
                 const btVector3& raycastStart2 = chassis_trans(m_wheelInfo[i].m_chassisConnectionPointCS * 0.95f) + extraHeight;
-                min_depth = std::min(uprightRayCast(raycastStart), uprightRayCast(raycastStart2));
-                current_depth += min_depth;
+                current_depth += std::min(uprightRayCast(raycastStart), uprightRayCast(raycastStart2));
             }
         }
         /*Log::info("BtKart","Some wheels are in the air and some are on the ground, "
@@ -676,7 +676,7 @@ float btKart::uprightRayCast(const btVector3& raycastStart)
 
     btAssert(m_vehicleRaycaster);
 
-    void* object = m_vehicleRaycaster->castRay(raycastStart, target, rayResults);
+    m_vehicleRaycaster->castRay(raycastStart, target, rayResults);
     btScalar depth = raylen * rayResults.m_distFraction;
 
     if(m_chassisBody->getBroadphaseHandle())
@@ -1000,13 +1000,8 @@ void btKart::updateFriction(btScalar timeStep)
         {
             m_chassisBody->applyImpulse(
                                   m_forwardWS[wheel]*(m_forwardImpulse[wheel]),
-#define COMPATIBLE_0_7_3
-#ifdef COMPATIBLE_0_7_3
                                   // This was apparently done to help hexley
                                   btVector3(0,0,0));
-#else
-                                  rel_pos);
-#endif
         }
         if (m_sideImpulse[wheel] != btScalar(0.))
         {
@@ -1025,26 +1020,13 @@ void btKart::updateFriction(btScalar timeStep)
             }
 
             btVector3 sideImp = m_axle[wheel] * m_sideImpulse[wheel];
-
-#if defined ROLLING_INFLUENCE_FIX && !defined COMPATIBLE_0_7_3
-            // fix. It only worked if car's up was along Y - VT.
-            btVector3 vChassisWorldUp =
-                                    getRigidBody()->getCenterOfMassTransform()
-                                   .getBasis().getColumn(m_indexUpAxis);
-            rel_pos -= vChassisWorldUp * (vChassisWorldUp.dot(rel_pos) *
-                                          (1.f-wheelInfo.m_rollInfluence) );
-#else
             rel_pos[m_indexUpAxis] *= wheelInfo.m_rollInfluence;
-#endif
             m_chassisBody->applyImpulse(sideImp,rel_pos);
 
             //apply friction impulse on the ground
             groundObject->applyImpulse(-sideImp,rel_pos2);
         }   // if (m_sideImpulse[wheel] != btScalar(0.))
     }   // for wheel<getNumWheels()
-
-
-
 }   // updateFriction
 
 // ----------------------------------------------------------------------------
