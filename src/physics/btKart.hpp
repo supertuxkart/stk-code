@@ -141,6 +141,8 @@ private:
                                      btTransform chassis_trans,
                                      bool interpolatedTransform=true,
                                      float fraction = 1.0f);
+    void     pushVehicleUpright();
+    float    uprightRayCast(const btVector3& raycastStart);
 
 public:
 

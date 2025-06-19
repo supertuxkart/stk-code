@@ -222,7 +222,7 @@ void btKart::updateAllWheelTransformsWS()
     m_visual_wheels_touch_ground = true;
     for (int i=0;i<m_wheelInfo.size();i++)
     {
-        rayCast( i);
+        rayCast(i);
         if(m_wheelInfo[i].m_raycastInfo.m_isInContact)
             m_num_wheels_on_ground++;
         else
@@ -430,31 +430,10 @@ void btKart::updateVehicle( btScalar step )
 
 
     // If the kart is flying, try to keep it parallel to the ground.
+    // If the kart is only on one or two wheels, try to bring it back on all four
     // -------------------------------------------------------------
-    if(m_num_wheels_on_ground==0)
-    {
-        btVector3 kart_up    = getChassisWorldTransform().getBasis().getColumn(1);
-        btVector3 terrain_up = -m_chassisBody->getGravity();
-        terrain_up = terrain_up.normalize();
-        // Length of axis depends on the angle - i.e. the further awat
-        // the kart is from being upright, the larger the applied impulse
-        // will be, resulting in fast changes when the kart is on its
-        // side, but not overcompensating (and therefore shaking) when
-        // the kart is not much away from being upright.
-        btVector3 axis = kart_up.cross(terrain_up);
-
-        // To avoid the kart going backwards/forwards (or rolling sideways),
-        // set the pitch/roll to 0 before applying the 'straightening' impulse.
-        // TODO: make this works if gravity is changed.
-        btVector3 av = m_chassisBody->getAngularVelocity();
-        av.setX(0);
-        av.setZ(0);
-        m_chassisBody->setAngularVelocity(av);
-        // Give a nicely balanced feeling for rebalancing the kart
-        float smoothing = m_kart->getKartProperties()
-                                ->getStabilitySmoothFlyingImpulse();
-        m_chassisBody->applyTorqueImpulse(axis * smoothing);
-    }
+    if(m_num_wheels_on_ground <= 2)
+        pushVehicleUpright();
 
     // Apply suspension forcen (i.e. upwards force)
     // --------------------------------------------
@@ -555,6 +534,161 @@ void btKart::updateVehicle( btScalar step )
     }
     adjustSpeed(m_min_speed, m_max_speed);
 }   // updateVehicle
+
+// ----------------------------------------------------------------------------
+void btKart::pushVehicleUpright()
+{
+    btVector3 kart_up    = getChassisWorldTransform().getBasis().getColumn(1);
+    btVector3 terrain_up = -m_chassisBody->getGravity();
+    terrain_up = terrain_up.normalize();
+
+    // If there is at least a wheel on the ground, check if the parallel impulse
+    // would bring the flying wheels closer to the ground or farther away,
+    if (m_num_wheels_on_ground >= 1)
+    {
+        // To limit raycasts starting below the ground on slopes,
+        // start raycasts with this much extraHeight.
+        btVector3 extraHeight = 0.25f * terrain_up;
+        float current_depth = 0.0f;
+        float simulated_depth = 0.0f;
+        const btTransform& chassis_trans = getChassisWorldTransform();
+        for(int i=0; i < m_wheelInfo.size(); i++)
+        {
+            // If the wheel is flying, we check how far it is from the ground
+            // (looking down in the direction gravity pulls the kart towards)
+            // If the wheel is on the ground, we check how far the flying wheels
+            // would be from the ground if the wheel on the ground's position was
+            // unchanged and the kart was properly oriented with regards to gravity.
+            //
+            // In both cases, we take the minimum depth from two raycasts,
+            // in order to limit sensitivity to tiny cracks in the terrain
+
+            if (m_wheelInfo[i].m_was_on_ground)
+            {
+                float local_sim_depth = 0.0f;
+                for(int j=0; j < m_wheelInfo.size(); j++)
+                {
+                    if (!m_wheelInfo[j].m_was_on_ground)
+                    {
+                        // == Simulate new wheel positions ==
+                        // 1 - We get the relative position of the target wheel
+                        //     compared to the reference wheel.
+                        //     Because we do later two slightly different raycasts,
+                        //     we also compute two slightly different offsets.
+                        btVector3 wheelOffset = m_wheelInfo[j].m_chassisConnectionPointCS
+                                              - m_wheelInfo[i].m_chassisConnectionPointCS;
+                        btVector3 wheelOffset2 = m_wheelInfo[j].m_chassisConnectionPointCS
+                                               - (m_wheelInfo[i].m_chassisConnectionPointCS * 0.95f);
+
+                        btScalar vector_len = wheelOffset.length();
+                        btScalar vector_len2 = wheelOffset2.length();
+
+                        // 2 - We apply the kart rotation, to point in the right direction
+                        //     from the reference wheel.
+                        wheelOffset = chassis_trans.getBasis() * wheelOffset;
+                        wheelOffset2 = chassis_trans.getBasis() * wheelOffset2;
+
+                        // 3 - Now, we project this offset on the plane perpendicular to
+                        //     the gravity direction. It gives us the direction towards
+                        //     which the wheel would be if the kart was upright.
+                        //     For the computations, we make use of terrain_up, which is the
+                        //     normalized (i. e. length 1) vector that is normal (i. e. perpendicular)
+                        //     to the plane.
+                        wheelOffset = wheelOffset - ((wheelOffset * terrain_up) * terrain_up);
+                        wheelOffset2 = wheelOffset2 - ((wheelOffset2 * terrain_up) * terrain_up);
+
+                        // 4 - Finally, to properly simulate the new wheel position, we also
+                        //     need to correct back the length of the offsets
+                        //     (as projection will have reduced the vector's length)
+                        wheelOffset = wheelOffset * vector_len / wheelOffset.length();
+                        wheelOffset2 = wheelOffset2 * vector_len2 / wheelOffset2.length();
+
+                        const btVector3& raycastStart = chassis_trans(m_wheelInfo[i].m_chassisConnectionPointCS) + wheelOffset + extraHeight;
+                        //Log::info("BtKart","Raycast started at %f x, %f y, %f z", raycastStart.getX(), raycastStart.getY(), raycastStart.getZ());
+                        float min_depth = uprightRayCast(raycastStart);
+                        const btVector3& raycastStart2 = chassis_trans(m_wheelInfo[i].m_chassisConnectionPointCS) + wheelOffset2 + extraHeight;
+                        //Log::info("BtKart","Depth of Raycast is %f, depth of Raycast2 is %f", min_depth, uprightRayCast(raycastStart2));
+                        min_depth = std::min(min_depth, uprightRayCast(raycastStart2));
+                        local_sim_depth += min_depth;
+                    }
+                }
+                simulated_depth = std::max(simulated_depth, local_sim_depth);
+            } // if (m_wheelInfo[i].m_was_on_ground)
+            else // wheel flying
+            {
+                const btVector3& raycastStart = chassis_trans(m_wheelInfo[i].m_chassisConnectionPointCS * 1.0f) + extraHeight;
+                const btVector3& raycastStart2 = chassis_trans(m_wheelInfo[i].m_chassisConnectionPointCS * 0.95f) + extraHeight;
+                min_depth = std::min(uprightRayCast(raycastStart), uprightRayCast(raycastStart2));
+                current_depth += min_depth;
+            }
+        }
+        /*Log::info("BtKart","Some wheels are in the air and some are on the ground, "
+                "simulated flying wheel depth is %f, current depth is %f",
+                simulated_depth, current_depth);*/
+
+        // If the torque would bring the flying wheels farther from the ground,
+        // or if it wouldn't change much, don't do anything.
+        if (simulated_depth + 0.1f > current_depth)
+            return;
+    }
+
+    // The length of axis depends on the angle - i.e. the further away
+    // the kart is from being upright, the larger the applied impulse
+    // will be, resulting in fast changes when the kart is on its
+    // side, but not overcompensating (and therefore shaking) when
+    // the kart is not much away from being upright.
+    btVector3 axis = kart_up.cross(terrain_up);
+
+    // To avoid the kart going backwards/forwards (or rolling sideways),
+    // set the pitch/roll to 0 before applying the 'straightening' impulse.
+    // TODO: make this works if gravity is changed.
+    //FIXME : I think the comment above is wrong. From the kart's perspective,
+    //        the torque only applies roll, but no yaw and no pitch.
+    btVector3 av = m_chassisBody->getAngularVelocity();
+    av.setX(0);
+    av.setZ(0);
+    m_chassisBody->setAngularVelocity(av);
+    // Give a nicely balanced feeling for rebalancing the kart
+    float smoothing = m_kart->getKartProperties()->getStabilitySmoothFlyingImpulse();
+    m_chassisBody->applyTorqueImpulse(axis * smoothing);
+}   // pushVehicleUpright
+
+// ----------------------------------------------------------------------------
+float btKart::uprightRayCast(const btVector3& raycastStart)
+{
+    // Work around a bullet problem: when using a convex hull the raycast
+    // would sometimes hit the chassis (which does not happen when using a
+    // box shape). Therefore set the collision mask in the chassis body so
+    // that it is not hit anymore.
+    short int old_group=0;
+    if(m_chassisBody->getBroadphaseHandle())
+    {
+        old_group = m_chassisBody->getBroadphaseHandle()->m_collisionFilterGroup;
+        m_chassisBody->getBroadphaseHandle()->m_collisionFilterGroup = 0;
+    }
+
+    btVector3 rayDirection = m_chassisBody->getGravity();
+    rayDirection = rayDirection.normalize();
+    btScalar raylen = 100.0f;
+    btVector3 rayvector = rayDirection * raylen;
+    const btVector3& target = raycastStart + rayvector;
+    btVehicleRaycaster::btVehicleRaycasterResult rayResults;
+
+    btAssert(m_vehicleRaycaster);
+
+    void* object = m_vehicleRaycaster->castRay(raycastStart, target, rayResults);
+    btScalar depth = raylen * rayResults.m_distFraction;
+
+    if(m_chassisBody->getBroadphaseHandle())
+        m_chassisBody->getBroadphaseHandle()->m_collisionFilterGroup = old_group;
+
+    // If the raycast fails to make contact, depth is negative,
+    // which it shouldn't be: we correct it back to be positve.
+    if (depth < 0.0f)
+        depth = -depth;
+
+    return (float)depth;
+}   // uprightRayCast
 
 // ----------------------------------------------------------------------------
 float btKart::getCollisionLean() const
