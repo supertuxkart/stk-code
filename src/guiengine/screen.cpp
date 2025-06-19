@@ -152,12 +152,13 @@ void Screen::loadFromFile()
 void Screen::unload()
 {
     assert(m_magic_number == 0xCAFEC001);
+#ifndef NDEBUG
     Widget* w;
     for_in (w, m_widgets)
     {
         assert(w->m_magic_number == 0xCAFEC001);
     }
-
+#endif
     m_loaded = false;
     m_widgets.clearAndDeleteAll();
 

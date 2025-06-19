@@ -900,7 +900,6 @@ void LinearWorld::updateRacePosition()
             setKartPosition(i, kart->getPosition());
             continue;
         }
-        KartInfo& kart_info = m_kart_info[i];
 
         int p = 1 ;
 

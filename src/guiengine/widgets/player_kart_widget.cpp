@@ -350,14 +350,13 @@ void PlayerKartWidget::add()
 
     assert(KartSelectionScreen::getRunningInstance()
            ->m_kart_widgets.contains(this));
+#ifdef DEBUG
     if (m_associated_player) // if player is local
     {
         bool mineInList = false;
         for (unsigned int p=0; p<StateManager::get()->activePlayerCount(); p++)
         {
-#ifdef DEBUG
             assert(StateManager::get()->getActivePlayer(p)->ok());
-#endif
             if (StateManager::get()->getActivePlayer(p) == m_associated_player)
             {
                 mineInList = true;
@@ -365,7 +364,7 @@ void PlayerKartWidget::add()
         }
         assert(mineInList);
     }
-
+#endif
     // the first player will have an ID of its own to allow for keyboard
     // navigation despite this widget being added last
     if (m_irrlicht_widget_id != -1)

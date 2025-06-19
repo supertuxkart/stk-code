@@ -350,8 +350,8 @@ private:
     int                              m_skipped_tracks_in_gp;
     /** Time target for GP, used in Lap Trial mode */
     float                            m_gp_time_target;
-    /** Total laps from every track, used in Lap Trial mode */
-    int                              m_gp_total_laps;
+    /** Total laps from every track, used in Lap Trial mode
+        int                              m_gp_total_laps;*/
     void startNextRace();    // start a next race
 
     friend bool operator< (const KartStatus& left, const KartStatus& right)

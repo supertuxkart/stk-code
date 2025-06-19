@@ -1552,16 +1552,17 @@ void SkiddingAI::handleRaceStart()
         // smaller depending on the difficulty.
         m_start_delay = stk_config->time2Ticks(
                         m_ai_properties->m_min_start_delay
-                      + (float) rand() / RAND_MAX
-                      * (m_ai_properties->m_max_start_delay -
-                         m_ai_properties->m_min_start_delay)   );
+                        + static_cast<float>(
+                           static_cast<double>(rand()) / static_cast<double>(RAND_MAX)
+                           * (m_ai_properties->m_max_start_delay -
+                              m_ai_properties->m_min_start_delay)));
 
         float false_start_probability =
                m_superpower == RaceManager::SUPERPOWER_NOLOK_BOSS
                ? 0.0f  : m_ai_properties->m_false_start_probability;
 
         // Now check for a false start. If so, add 1 second penalty time.
-        if (rand() < RAND_MAX * false_start_probability)
+        if (static_cast<double>(rand()) < static_cast<double>(RAND_MAX) * false_start_probability)
         {
             m_start_delay+=stk_config->m_penalty_ticks;
             return;

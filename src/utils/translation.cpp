@@ -96,7 +96,10 @@ constexpr bool isThaiCP(char32_t c)
 
 // ============================================================================
 
+#if TRANSLATE_VERBOSE
 const bool REMOVE_BOM = false;
+#endif
+
 /** The list of available languages; this is global so that it is cached (and remains
     even if the translations object is deleted and re-created) */
 typedef std::vector<std::string> LanguageList;
@@ -620,10 +623,9 @@ irr::core::stringw Translations::w_gettext(const char* original, const char* con
     // print
     //for (int n=0;; n+=4)
     const irr::core::stringw wide = StringUtils::utf8ToWide(original_t);
+#if TRANSLATE_VERBOSE
     const wchar_t* out_ptr = wide.c_str();
     if (REMOVE_BOM) out_ptr++;
-
-#if TRANSLATE_VERBOSE
     std::wcout << L"  translation : " << out_ptr << std::endl;
 #endif
 
@@ -699,10 +701,9 @@ irr::core::stringw Translations::w_ngettext(const char* singular, const char* pl
                               m_dictionary->translate_ctxt_plural(context, singular, plural, num));
 
     const irr::core::stringw wide = StringUtils::utf8ToWide(res);
+#if TRANSLATE_VERBOSE
     const wchar_t* out_ptr = wide.c_str();
     if (REMOVE_BOM) out_ptr++;
-
-#if TRANSLATE_VERBOSE
     std::wcout << L"  translation : " << out_ptr << std::endl;
 #endif
 
