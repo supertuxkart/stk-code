@@ -18,6 +18,7 @@ void main()
         v_color.r,
         u_object_buffer.m_objects[gl_InstanceIndex].m_rotation,
         u_object_buffer.m_objects[gl_InstanceIndex].m_scale, v_position);
+    f_world_position = v_world_position;
     gl_Position = u_camera.m_projection_view_matrix * v_world_position;
     f_vertex_color = vec4(1.0);
     f_uv = v_uv;
@@ -29,7 +30,6 @@ void main()
 #endif
     f_hue_change = u_object_buffer.m_objects[gl_InstanceIndex].m_hue_change;
 #ifdef PBR_ENABLED
-    vec3 world_normal = rotateVector(u_object_buffer.m_objects[gl_InstanceIndex].m_rotation, v_normal.xyz);
-    f_normal = (u_camera.m_view_matrix * vec4(world_normal, 0.0)).xyz;
+    f_normal = rotateVector(u_object_buffer.m_objects[gl_InstanceIndex].m_rotation, v_normal.xyz);
 #endif
 }

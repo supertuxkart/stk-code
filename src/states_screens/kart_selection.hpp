@@ -139,6 +139,7 @@ private:
     PtrVector<const KartProperties, REF> getUsableKarts(
         const std::string& selected_kart_group);
     bool useContinueButton() const;
+    void configureChooseKarts(bool enable);
 public:
     /** Returns the current instance */
     static KartSelectionScreen* getRunningInstance();

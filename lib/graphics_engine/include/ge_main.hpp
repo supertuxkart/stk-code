@@ -19,6 +19,7 @@ namespace irr
 
 namespace GE
 {
+class GEOcclusionCulling;
 class GESPMBuffer;
 class GEVulkanDriver;
 struct GEConfig
@@ -29,6 +30,7 @@ bool m_texture_compression;
 bool m_fullscreen_desktop;
 bool m_enable_draw_call_cache;
 bool m_pbr;
+bool m_ibl;
 std::unordered_set<std::string> m_ondemand_load_texture_paths;
 float m_render_scale;
 };
@@ -97,6 +99,9 @@ inline irr::video::SColor srgb255ToLinearFromSColor(irr::video::SColor scolor_sr
     return out;
 }
 void copyToMappedBuffer(uint32_t* mapped, GESPMBuffer* spmb, size_t offset = 0);
+GEOcclusionCulling* getOcclusionCulling();
+void resetOcclusionCulling();
+bool hasOcclusionCulling();
 
 }
 #endif

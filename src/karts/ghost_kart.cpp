@@ -250,7 +250,9 @@ void GhostKart::update(int ticks)
 // ----------------------------------------------------------------------------
 void GhostKart::updateSound(float dt)
 {
-    if (!getController()) return;
+    if (!getController() ||
+        World::getWorld()->getPhase() == World::IN_GAME_MENU_PHASE)
+        return;
 
     GhostController* gc = dynamic_cast<GhostController*>(getController());
     if (gc == NULL) return;
@@ -288,12 +290,13 @@ float GhostKart::getSpeed() const
         dynamic_cast<const GhostController*>(getController());
 
     unsigned int current_index = gc->getCurrentReplayIndex();
-    const float rd             = gc->getReplayDelta();
-
-    assert(gc->getCurrentReplayIndex() < m_all_physic_info.size());
 
     if (current_index >= m_all_physic_info.size() - 1)
         return m_all_physic_info.back().m_speed;
+
+    const float rd             = gc->getReplayDelta();
+
+    assert(gc->getCurrentReplayIndex() < m_all_physic_info.size());
 
     return (1-rd)*m_all_physic_info[current_index    ].m_speed
            +  rd *m_all_physic_info[current_index + 1].m_speed;

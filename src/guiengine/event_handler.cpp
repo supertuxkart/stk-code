@@ -518,7 +518,7 @@ int EventHandler::findIDClosestWidget(const NavigationDirection nav, const int p
     int closest_widget_id = -1;
     int distance = 0;
     // So that the UI behavior doesn't change when it is upscaled
-    const int BIG_DISTANCE = irr_driver->getActualScreenSize().Width*100;
+    const int BIG_DISTANCE = irr_driver->getActualScreenSize().Width*500;
     int smallest_distance = BIG_DISTANCE;
     // Used when there is no suitable widget in the requested direction
     int closest_wrapping_widget_id = -1;
@@ -592,9 +592,9 @@ int EventHandler::findIDClosestWidget(const NavigationDirection nav, const int p
             // Better select an item on the side that one much higher,
             // so make the vertical distance matter much more
             // than the horizontal offset.
-            // The multiplicator of 100 is meant so that the offset will matter
+            // The multiplicator of 500 is meant so that the offset will matter
             // only if there are two or more widget with a (nearly) equal vertical height.
-            distance *= 100;
+            distance *= 500;
 
             wrapping_distance = distance;
             // if the two widgets are not well aligned, consider them farther
@@ -603,8 +603,8 @@ int EventHandler::findIDClosestWidget(const NavigationDirection nav, const int p
             // If w_test's are between w's,
             // we subtract the smaller from the bigger
             // else, the smaller is 0 and we keep the bigger
-            int right_offset = std::max(0, w_test->m_x - w->m_x);
-            int left_offset  = std::max(0, (w->m_x + w->m_w) - rightmost);
+            int left_offset = 10 * std::max(0, w_test->m_x - w->m_x);
+            int right_offset  = std::max(0, (w->m_x + w->m_w) - rightmost);
             offset = std::max (right_offset - left_offset, left_offset - right_offset);
         }
         else if (nav == NAV_LEFT || nav == NAV_RIGHT)

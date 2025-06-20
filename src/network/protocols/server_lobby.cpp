@@ -488,6 +488,11 @@ void ServerLobby::handleChat(Event* event)
     {
         NetworkString* chat = getNetworkString();
         chat->setSynchronous(true);
+        // This string is not set to be translatable, because it is
+        // currently written by the server. The server would have
+        // to send a warning for interpretation by the client to
+        // allow proper translation. Also, this string can only be
+        // triggered with modified STK clients anyways.
         core::stringw warn = "Don't try to impersonate others!";
         chat->addUInt8(LE_CHAT).encodeString16(warn);
         event->getPeer()->sendPacket(chat, true/*reliable*/);

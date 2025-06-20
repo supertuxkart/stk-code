@@ -198,7 +198,7 @@ void BaseOnlineProfileAchievements::displayResults()
             all_achievements_list.push_back(it->second);
         }
 
-        auto compAchievement = [=](Achievement *a, Achievement *b)
+        auto compAchievement = [this](Achievement *a, Achievement *b)
         {
             // Sort by name
             if (m_sort_column == 0)

@@ -1,7 +1,7 @@
 #include "ge_vulkan_fbo_texture.hpp"
 
 #include "ge_main.hpp"
-#include "ge_vulkan_depth_texture.hpp"
+#include "ge_vulkan_attachment_texture.hpp"
 #include "ge_vulkan_driver.hpp"
 
 #include <array>
@@ -35,7 +35,10 @@ GEVulkanFBOTexture::GEVulkanFBOTexture(GEVulkanDriver* vk,
     m_rtt_render_pass = VK_NULL_HANDLE;
     m_rtt_frame_buffer = VK_NULL_HANDLE;
     if (create_depth)
-        m_depth_texture = new GEVulkanDepthTexture(m_vk, size);
+    {
+        m_depth_texture = GEVulkanAttachmentTexture::createDepthTexture(
+            m_vk, size);
+    }
 }   // GEVulkanFBOTexture
 
 // ----------------------------------------------------------------------------

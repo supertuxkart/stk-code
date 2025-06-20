@@ -67,8 +67,11 @@ public:
         m_tips_manager = NULL;
     }   // destroy
     // ========================================================================
-    /** Get a tip by ID. */
+    /** Get a tip by tipset ID. */
     const irr::core::stringw& getTip(const std::string& id) const;
+    // ------------------------------------------------------------------------
+    /** Get the number of tips by tipset ID. */
+    const unsigned int getTipCount(const std::string& id) const;
     // ------------------------------------------------------------------------
     bool isEmpty() const { return m_all_tip_sets.empty(); }
     // ------------------------------------------------------------------------

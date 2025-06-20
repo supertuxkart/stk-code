@@ -107,6 +107,7 @@ SpinnerWidget::SpinnerWidget(const bool gauge) : Widget(WTYPE_SPINNER)
     m_right_selected = false;
     m_incorrect       = false;
     m_red_mark_widget = NULL;
+    m_left_arrow = rect<s32>(0, 0, m_h, m_h);
 }
 
 // ------------------------------------------------------------------------
@@ -290,6 +291,7 @@ void SpinnerWidget::resize()
     Widget::resize();
 
     rect<s32> subsize_left_arrow = rect<s32>(0 ,0, m_h, m_h);
+    m_left_arrow = subsize_left_arrow;
     m_children[0].m_element->setRelativePosition(subsize_left_arrow);
     m_badge_x_shift = subsize_left_arrow.getWidth();
 
@@ -306,22 +308,36 @@ void SpinnerWidget::resize()
     }
     else
     {
-        rect<s32> subsize_label = rect<s32>(m_h, 0, m_w-m_h, m_h);
-        IGUIStaticText* label = static_cast<IGUIStaticText*>(m_children[1].m_element);
-        label->setRelativePosition(subsize_label);
-        if (m_h < GUIEngine::getFontHeight())
-        {
-            label->setOverrideFont(GUIEngine::getSmallFont());
-        }
-        else
-        {
-            label->setOverrideFont(NULL);
-        }
+        resizeLabel();
     }
 
     rect<s32> subsize_right_arrow = rect<s32>(m_w-m_h, 0, m_w, m_h);
     m_children[2].m_element->setRelativePosition(subsize_right_arrow);
-}
+} // resize
+
+// -----------------------------------------------------------------------------
+
+/** Pick the appropriate font size to display the current spinner label */
+void SpinnerWidget::resizeLabel()
+{
+    // Don't proceed further if this spinner doesn't use labels
+    // or if this spinner's children haven't been set yet
+    if (m_graphical || m_children.size() < 2) 
+        return;
+
+    rect<s32> subsize_label = rect<s32>(m_h, 0, m_w - m_h, m_h);
+    IGUIStaticText* label = static_cast<IGUIStaticText*>(m_children[1].m_element);
+    label->setRelativePosition(subsize_label);
+    if ( (m_h < GUIEngine::getFontHeight()) ||
+         ((int)GUIEngine::getFont()->getDimension(label->getText()).Width > (m_w - 2 * m_h)) )
+    {
+        label->setOverrideFont(GUIEngine::getSmallFont());
+    }
+    else
+    {
+        label->setOverrideFont(NULL);
+    }
+} // resizeLabel
 
 // -----------------------------------------------------------------------------
 
@@ -383,6 +399,9 @@ void SpinnerWidget::activateSelectedButton()
             setValue(m_max);
         }
     }
+
+    // Update the label font size if needed
+    resizeLabel();
 } // activateSelectedButton
 
 // -----------------------------------------------------------------------------
@@ -461,6 +480,7 @@ void SpinnerWidget::setValue(const int new_value)
         assert(new_value < (int)m_labels.size());
 
         m_children[1].m_element->setText(m_labels[new_value].c_str());
+        resizeLabel();
     }
     else if (m_text.size() > 0 && m_children.size() > 0)
     {
@@ -510,6 +530,7 @@ void SpinnerWidget::setValue(irr::core::stringw new_value)
         if (m_labels[n] == new_value)
         {
             setValue(n);
+            resizeLabel();
             return;
         }
     }

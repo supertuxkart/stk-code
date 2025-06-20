@@ -1,19 +1,21 @@
-#ifndef HEADER_GE_VULKAN_DEPTH_TEXTURE_HPP
-#define HEADER_GE_VULKAN_DEPTH_TEXTURE_HPP
+#ifndef HEADER_GE_VULKAN_ATTACHMENT_TEXTURE_HPP
+#define HEADER_GE_VULKAN_ATTACHMENT_TEXTURE_HPP
 
 #include "ge_vulkan_texture.hpp"
 
 namespace GE
 {
 class GEVulkanDriver;
-class GEVulkanDepthTexture : public GEVulkanTexture
+class GEVulkanAttachmentTexture : public GEVulkanTexture
 {
 public:
     // ------------------------------------------------------------------------
-    GEVulkanDepthTexture(GEVulkanDriver* vk,
-                         const core::dimension2d<u32>& size);
+    GEVulkanAttachmentTexture(GEVulkanDriver* vk,
+                              const core::dimension2d<u32>& size,
+                              VkFormat format, VkImageUsageFlags iu,
+                              VkImageAspectFlags ia);
     // ------------------------------------------------------------------------
-    virtual ~GEVulkanDepthTexture()                                          {}
+    virtual ~GEVulkanAttachmentTexture()                                     {}
     // ------------------------------------------------------------------------
     virtual void* lock(video::E_TEXTURE_LOCK_MODE mode =
                        video::ETLM_READ_WRITE, u32 mipmap_level = 0)
@@ -49,7 +51,11 @@ public:
     virtual std::shared_ptr<std::atomic<VkImageView> > getImageView(
                                                        bool srgb = false) const
                                                        { return m_image_view; }
-};   // GEVulkanDepthTexture
+    // ------------------------------------------------------------------------
+    static GEVulkanAttachmentTexture* createDepthTexture(
+                       GEVulkanDriver* vk, const core::dimension2d<u32>& size);
+
+};   // GEVulkanAttachmentTexture
 
 }
 

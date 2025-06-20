@@ -14,16 +14,6 @@
 #include "matrix4.h"
 #include "quaternion.h"
 
-class JointInfluence
-{
-public:
-	int joint_idx;
-	float weight;
-};
-
-typedef irr::core::array<irr::core::array
-		<irr::core::array<JointInfluence> > > WeightInfluence;
-
 namespace irr
 {
 namespace scene
@@ -166,10 +156,6 @@ namespace scene
 				IAnimatedMeshSceneNode* node,
 				ISceneManager* smgr);
 
-		void convertForSkinning();
-
-		void computeWeightInfluence(SJoint *joint, size_t &index, WeightInfluence& wi);
-
 		void buildAllGlobalAnimatedMatrices(SJoint *Joint=0, SJoint *ParentJoint=0);
 
 		f32 AnimationFrames;
@@ -195,14 +181,6 @@ private:
 		void calculateGlobalMatrices(SJoint *Joint,SJoint *ParentJoint);
 
 		void skinJoint(SJoint *Joint, SJoint *ParentJoint, f32 strength=1.f);
-
-		void calculateTangents(core::vector3df& normal,
-			core::vector3df& tangent, core::vector3df& binormal,
-			core::vector3df& vt1, core::vector3df& vt2, core::vector3df& vt3,
-			core::vector2df& tc1, core::vector2df& tc2, core::vector2df& tc3);
-			
-		static bool sortJointInfluenceFunc(const JointInfluence& a, 
-										   const JointInfluence& b);
 
 		core::array<SSkinMeshBuffer*> *SkinningBuffers; //Meshbuffer to skin, default is to skin localBuffers
 

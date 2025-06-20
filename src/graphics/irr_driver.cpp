@@ -522,6 +522,8 @@ begin:
                 UserConfigParams::m_scale_rtts_factor;
             GE::getGEConfig()->m_pbr =
                 UserConfigParams::m_dynamic_lights;
+            GE::getGEConfig()->m_ibl =
+                !UserConfigParams::m_degraded_IBL;
 #endif
         }
         else
@@ -2383,9 +2385,9 @@ scene::ISceneNode *IrrDriver::addLight(const core::vector3df &pos,
                                        bool sun_, scene::ISceneNode* parent)
 {
 #ifndef SERVER_ONLY
+    if (parent == NULL) parent = m_scene_manager->getRootSceneNode();
     if (CVS->isGLSL())
     {
-        if (parent == NULL) parent = m_scene_manager->getRootSceneNode();
         LightNode *light = NULL;
 
         if (!sun_)
@@ -2407,10 +2409,25 @@ scene::ISceneNode *IrrDriver::addLight(const core::vector3df &pos,
     }
     else
     {
-        scene::ILightSceneNode* light = m_scene_manager
-               ->addLightSceneNode(m_scene_manager->getRootSceneNode(),
-                                   pos, video::SColorf(r, g, b, 1.0f));
-        light->setRadius(radius);
+        scene::ILightSceneNode* light;
+        if (m_video_driver->getDriverType() == EDT_VULKAN && sun_)
+        {
+            light = m_scene_manager->addLightSceneNode(parent, pos,
+                video::SColorf(r, g, b, 0.2f), 0.26f * M_PI / 180.0f);
+            light->setRotation(-pos);
+            light->setLightType(video::ELT_DIRECTIONAL);
+        }
+        else
+        {
+            video::SColorf color(r, g, b, 1.0f);
+            light = m_scene_manager->addLightSceneNode(parent, pos, color);
+            light->setRadius(radius);
+            if (m_video_driver->getDriverType() == EDT_VULKAN)
+            {
+                video::SLight& data = light->getLightData();
+                data.Attenuation.X = energy;
+            }
+        }
         return light;
     }
 #else

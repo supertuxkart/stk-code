@@ -124,6 +124,10 @@ namespace GUIEngine
         int m_row_amount;
         int m_col_amount;
 
+        /** The ratio between the targeted child height and the maximum height that would fit with
+            with the current row amount. It is applied to both height and width. */
+        float m_size_ratio;
+
         /** The total number of columns given item count and row count (even counting not visible with current scrolling) */
         int m_needed_cols;
 
@@ -162,6 +166,12 @@ namespace GUIEngine
 
         /** Callback called widget is focused */
         EventPropagation focused(const int playerID);
+
+        /** Computes a score based on multiple icon properties
+            (used to estimate the best number of rows) */
+        float estimateRowScore(const int rowCount, const int width, const int height,
+                              const float iconAspectRatio, const int maxIcons, float* heightRatio,
+                              float capSize = 0.5f);
 
         /** Removes all previously added contents icons, and re-adds them (calculating the new amount) */
         void buildInternalStructure();

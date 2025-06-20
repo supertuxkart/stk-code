@@ -33,6 +33,7 @@
 #include "utils/profiler.hpp"
 
 #include <ICameraSceneNode.h>
+#include <cmath>
 
 class LightBaseClass
 {
@@ -47,6 +48,10 @@ public:
         float green;
         float blue;
         float radius;
+        float direction_x;
+        float direction_y;
+        float scale;
+        float offset;
     };
 public:
     static const unsigned int MAXLIGHT = 32;
@@ -86,6 +91,7 @@ public:
         GLuint attrib_Color = glGetAttribLocation(m_program, "Color");
         GLuint attrib_Energy = glGetAttribLocation(m_program, "Energy");
         GLuint attrib_Radius = glGetAttribLocation(m_program, "Radius");
+        GLuint attrib_DSO = glGetAttribLocation(m_program, "Direction_scale_offset");
 
         glEnableVertexAttribArray(attrib_Position);
         glVertexAttribPointer(attrib_Position, 3, GL_FLOAT, GL_FALSE,
@@ -102,11 +108,16 @@ public:
         glVertexAttribPointer(attrib_Radius, 1, GL_FLOAT, GL_FALSE,
                               sizeof(LightBaseClass::PointLightInfo),
                               (GLvoid*)(7 * sizeof(float)));
+        glEnableVertexAttribArray(attrib_DSO);
+        glVertexAttribPointer(attrib_DSO, 4, GL_FLOAT, GL_FALSE,
+                              sizeof(LightBaseClass::PointLightInfo),
+                              (GLvoid*)(8 * sizeof(float)));
 
         glVertexAttribDivisor(attrib_Position, 1);
         glVertexAttribDivisor(attrib_Energy, 1);
         glVertexAttribDivisor(attrib_Color, 1);
         glVertexAttribDivisor(attrib_Radius, 1);
+        glVertexAttribDivisor(attrib_DSO, 1);
     }   // PointLightShader
     ~PointLightShader()
     {
@@ -141,6 +152,7 @@ public:
         GLuint attrib_Color = glGetAttribLocation(m_program, "Color");
         GLuint attrib_Energy = glGetAttribLocation(m_program, "Energy");
         GLuint attrib_Radius = glGetAttribLocation(m_program, "Radius");
+        GLuint attrib_DSO = glGetAttribLocation(m_program, "Direction_scale_offset");
 
         glEnableVertexAttribArray(attrib_Position);
         glVertexAttribPointer(attrib_Position, 3, GL_FLOAT, GL_FALSE,
@@ -157,11 +169,16 @@ public:
         glVertexAttribPointer(attrib_Radius, 1, GL_FLOAT, GL_FALSE,
                               sizeof(LightBaseClass::PointLightInfo),
                               (GLvoid*)(7 * sizeof(float)));
+        glEnableVertexAttribArray(attrib_DSO);
+        glVertexAttribPointer(attrib_DSO, 4, GL_FLOAT, GL_FALSE,
+                              sizeof(LightBaseClass::PointLightInfo),
+                              (GLvoid*)(8 * sizeof(float)));
 
         glVertexAttribDivisor(attrib_Position, 1);
         glVertexAttribDivisor(attrib_Energy, 1);
         glVertexAttribDivisor(attrib_Color, 1);
         glVertexAttribDivisor(attrib_Radius, 1);
+        glVertexAttribDivisor(attrib_DSO, 1);
     }   // PointLightScatterShader
     ~PointLightScatterShader()
     {
@@ -487,6 +504,24 @@ void LightingPasses::updateLightsInfo(scene::ICameraSceneNode * const camnode,
 
                 // Light radius
                 m_point_lights_info[m_point_light_count].radius = light_node->getRadius();
+                float ic = light_node->getSpotlightData().m_inner_cone;
+                float oc = light_node->getSpotlightData().m_outer_cone;
+                if (ic != 0.0f && oc != 0.0f)
+                {
+                    core::vector3df dir(0.0f, 0.0f, 1.0f);
+                    light_node->getAbsoluteTransformation().rotateVect(dir);
+                    dir.normalize();
+                    m_point_lights_info[m_point_light_count].direction_x = dir.X;
+                    m_point_lights_info[m_point_light_count].direction_y = dir.Y;
+                    float cos_outer = cosf(oc);
+                    m_point_lights_info[m_point_light_count].scale = 1.0f / std::max(cosf(ic) - cos_outer, 1e-4f);
+                    m_point_lights_info[m_point_light_count].offset = -cos_outer * m_point_lights_info[m_point_light_count].scale;
+                    m_point_lights_info[m_point_light_count].scale *= dir.Z > 0.f ? 1.f : -1.f;
+                }
+                else
+                {
+                    m_point_lights_info[m_point_light_count].scale = 0.0f;
+                }
             }
         }
         if (m_point_light_count > LightBaseClass::MAXLIGHT)

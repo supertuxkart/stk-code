@@ -167,6 +167,8 @@ namespace scene
 		/** Warning: If you have pointers to meshes that were loaded with ISceneManager::getMesh()
 		and you did not grab them, then they may become invalid. */
 		virtual void clearUnusedMeshes() = 0;
+
+		virtual void meshCacheChanged() {}
 	};
 
 

@@ -10,6 +10,7 @@ void main()
         u_object_buffer.m_objects[gl_InstanceIndex].m_translation,
         u_object_buffer.m_objects[gl_InstanceIndex].m_rotation,
         u_object_buffer.m_objects[gl_InstanceIndex].m_scale, v_position);
+    f_world_position = v_world_position;
     gl_Position = u_camera.m_projection_view_matrix * v_world_position;
     f_vertex_color = v_color.zyxw * getVertexColor(
         u_object_buffer.m_objects[gl_InstanceIndex].m_custom_vertex_color);
@@ -24,10 +25,8 @@ void main()
 #ifdef PBR_ENABLED
     vec3 world_normal = rotateVector(u_object_buffer.m_objects[gl_InstanceIndex].m_rotation, v_normal.xyz);
     vec3 world_tangent = rotateVector(u_object_buffer.m_objects[gl_InstanceIndex].m_rotation, v_tangent.xyz);
-
-    f_tangent = (u_camera.m_view_matrix * vec4(world_tangent, 0.0)).xyz;
-    f_bitangent = normalize((u_camera.m_view_matrix *
-      vec4(cross(world_normal, world_tangent) * v_tangent.w, 0.0)).xyz);
-    f_normal = (u_camera.m_view_matrix * vec4(world_normal, 0.0)).xyz;
+    f_bitangent = cross(world_normal, world_tangent) * v_tangent.w;
+    f_tangent = world_tangent;
+    f_normal = world_normal;
 #endif
 }

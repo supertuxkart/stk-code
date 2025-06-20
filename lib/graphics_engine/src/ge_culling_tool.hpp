@@ -27,6 +27,8 @@ public:
     // ------------------------------------------------------------------------
     bool isCulled(irr::core::aabbox3df& bb);
     // ------------------------------------------------------------------------
+    bool isCulled(const irr::core::vector3df& center, float radius);
+    // ------------------------------------------------------------------------
     bool isCulled(GESPMBuffer* buffer, irr::scene::ISceneNode* node);
 };   // GECullingTool
 

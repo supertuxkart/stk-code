@@ -6,16 +6,16 @@ layout(location = 4) in float f_hue_change;
 layout(location = 5) in vec3 f_normal;
 layout(location = 6) in vec3 f_tangent;
 layout(location = 7) in vec3 f_bitangent;
+layout(location = 8) in vec4 f_world_position;
 #endif
 
 layout(location = 0) out vec4 o_color;
 
-#include "utils/camera.glsl"
-#include "utils/get_pos_from_frag_coord.glsl"
-#include "utils/pbr_light.glsl"
 #include "utils/sample_mesh_texture.glsl"
-#include "utils/sun_direction.glsl"
 #include "../utils/rgb_conversion.frag"
+#ifdef PBR_ENABLED
+#include "utils/handle_pbr.glsl"
+#endif
 
 void main()
 {
@@ -51,25 +51,7 @@ void main()
     mat3 t_b_n = mat3(frag_tangent, frag_bitangent, frag_normal);
 
     vec3 normal = normalize(t_b_n * tangent_space_normal);
-
-    vec4 pbr = sampleMeshTexture2(f_material_id, f_uv);
-    vec3 xpos = getPosFromFragCoord(gl_FragCoord, u_camera.m_viewport, u_camera.m_inverse_projection_matrix);
-    vec3 eyedir = -normalize(xpos);
-
-    vec3 sun = sunDirection(normal, eyedir, vec3(-642.22, 673.75, -219.26));
-    vec3 lightdir = normalize(sun.xyz);
-
-    vec3 mixed_color = PBRSunAmbientEmitLight(
-        normal, eyedir, lightdir, diffuse_color,
-        vec3(211./256., 235./256., 110./256.),
-        vec3(120./256., 120./256., 120./256.),
-        1.0 - pbr.x, pbr.y, pbr.z);
-
-    float factor = (1.0 - exp(length(xpos) * -0.0001));
-    mixed_color = mixed_color + vec3(0.5) * factor;
-
-    mixed_color = (mixed_color * (6.9 * mixed_color + 0.5)) / (mixed_color * (5.2 * mixed_color + 1.7) + 0.06);
-
-    o_color = vec4(mixed_color, 1.0);
+    vec3 pbr = sampleMeshTexture2(f_material_id, f_uv).xyz;
+    o_color = vec4(handlePBR(diffuse_color, pbr, f_world_position, normal), 1.0);
 #endif
 }

@@ -138,6 +138,8 @@ void Profiler::reset()
     m_current_frame       = 0;
     m_has_wrapped_around  = false;
     m_freeze_state        = UNFROZEN;
+    
+    init();
 }   // reset
 
 //-----------------------------------------------------------------------------

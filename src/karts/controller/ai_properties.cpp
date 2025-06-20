@@ -28,7 +28,7 @@ float AIProperties::UNDEFINED = -99.9f;
  */
 AIProperties::AIProperties(RaceManager::Difficulty difficulty)
 {
-    m_ident = RaceManager::get()->getDifficultyAsString(difficulty);
+    m_ident = RaceManager::getDifficultyAsString(difficulty);
 
     m_max_item_angle             = UNDEFINED;
     m_max_item_angle_high_speed  = UNDEFINED;

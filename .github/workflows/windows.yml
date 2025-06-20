@@ -78,6 +78,13 @@ jobs:
         run: |
           ${{ env.wget }} https://github.com/supertuxkart/dependencies/releases/download/preview/dependencies-win-${{ matrix.arch }}.zip
           ${{ env.unzip }} dependencies-win-${{ matrix.arch }}.zip
+      - name: Download ISPC for MinGW
+        if: ${{ matrix.os == 'ubuntu-latest' }}
+        run: |
+          cd /opt
+          wget https://github.com/supertuxkart/dependencies/releases/download/preview/ispc-cross-1.26.0.tar.xz
+          tar xf ispc-cross-1.26.0.tar.xz
+          rm ispc-cross-1.26.0.tar.xz
       - name: Install MinGW for i686 or x86_64
         if: ${{ matrix.os == 'ubuntu-latest' && ( matrix.arch == 'i686' || matrix.arch == 'x86_64' ) }}
         run: |
@@ -108,6 +115,7 @@ jobs:
           echo "set(CMAKE_FIND_ROOT_PATH_MODE_PROGRAM NEVER)" >> toolchain.cmake
           echo "set(CMAKE_FIND_ROOT_PATH_MODE_LIBRARY ALWAYS)" >> toolchain.cmake
           echo "set(CMAKE_FIND_ROOT_PATH_MODE_INCLUDE ONLY)" >> toolchain.cmake
+          echo 'set(ISPC_ARCH "x86")' >> toolchain.cmake
       - name: Set up MinGW Toolchain for x86_64
         if: ${{ matrix.os == 'ubuntu-latest' && matrix.arch == 'x86_64' }}
         run: |
@@ -119,6 +127,7 @@ jobs:
           echo "set(CMAKE_FIND_ROOT_PATH_MODE_PROGRAM NEVER)" >> toolchain.cmake
           echo "set(CMAKE_FIND_ROOT_PATH_MODE_LIBRARY ALWAYS)" >> toolchain.cmake
           echo "set(CMAKE_FIND_ROOT_PATH_MODE_INCLUDE ONLY)" >> toolchain.cmake
+          echo 'set(ISPC_ARCH "x86-64")' >> toolchain.cmake
       # Manually specify CMAKE_SYSTEM_PROCESSOR, it can only be set together with -DDCMAKE_SYSTEM_NAME
       - name: Configure bulid for MSVC
         if: ${{ matrix.os == 'windows-latest' }}
@@ -131,13 +140,13 @@ jobs:
         run: |
           mkdir -p build
           cd build
-          cmake .. -DCMAKE_TOOLCHAIN_FILE=../toolchain.cmake -DCMAKE_BUILD_TYPE=RelWithDebInfo -DCHECK_ASSETS=OFF -DUSE_DIRECTX=ON
+          cmake .. -DCMAKE_TOOLCHAIN_FILE=../toolchain.cmake -DCMAKE_BUILD_TYPE=RelWithDebInfo -DCHECK_ASSETS=OFF -DUSE_DIRECTX=ON -DBC7_ISPC=ON -DCMAKE_ISPC_COMPILER=/opt/ispc/bin/ispc
       - name: Configure bulid for MinGW (armv7 or aarch64)
         if: ${{ matrix.os == 'ubuntu-latest' && ( matrix.arch == 'armv7' || matrix.arch == 'aarch64' ) }}
         run: |
           mkdir -p build
           cd build
-          cmake .. -DLLVM_ARCH=${{ matrix.arch }} -DLLVM_PREFIX=/llvm-mingw -DCMAKE_TOOLCHAIN_FILE=../cmake/Toolchain-llvm-mingw.cmake -DCHECK_ASSETS=OFF -DUSE_DIRECTX=ON
+          cmake .. -DLLVM_ARCH=${{ matrix.arch }} -DLLVM_PREFIX=/llvm-mingw -DCMAKE_TOOLCHAIN_FILE=../cmake/Toolchain-llvm-mingw.cmake -DCHECK_ASSETS=OFF -DUSE_DIRECTX=ON -DBC7_ISPC=ON -DCMAKE_ISPC_COMPILER=/opt/ispc/bin/ispc
       - name: Build for MSVC
         if: ${{ matrix.os == 'windows-latest' }}
         working-directory: build

@@ -25,7 +25,8 @@ using namespace video;
 namespace GE
 {
     class GESPM;
-    class GEVulkanDepthTexture;
+    class GEVulkanAttachmentTexture;
+    class GEVulkanCameraSceneNode;
     class GEVulkanDrawCall;
     class GEVulkanDynamicSPMBuffer;
     class GEVulkanFBOTexture;
@@ -198,7 +199,7 @@ namespace GE
         //! Sets the dynamic ambient light color. The default color is
         //! (0,0,0,0) which means it is dark.
         //! \param color: New color of the ambient light.
-        virtual void setAmbientLight(const SColorf& color) {}
+        virtual void setAmbientLight(const SColorf& color) { CNullDriver::setAmbientLight(color); }
 
         //! Draws a shadow volume into the stencil buffer.
         virtual void drawStencilShadowVolume(const core::array<core::vector3df>& triangles, bool zfail=true, u32 debugDataVisible=0) {}
@@ -342,7 +343,9 @@ namespace GE
             destroySwapChainRelated(false/*handle_surface*/);
             createSwapChainRelated(false/*handle_surface*/);
         }
-        void updateDriver(bool pbr_changed = false);
+        void updateDriver(bool scale_changed = true, bool pbr_changed = false,
+                          bool ibl_changed = false);
+        void reloadShaders();
         uint32_t getGraphicsFamily() const         { return m_graphics_family; }
         unsigned getGraphicsQueueCount() const
                                               { return m_graphics_queue_count; }
@@ -350,7 +353,8 @@ namespace GE
         void waitIdle(bool flush_command_loader = false);
         void setDisableWaitIdle(bool val)         { m_disable_wait_idle = val; }
         IrrlichtDevice* getIrrlichtDevice() const  { return m_irrlicht_device; }
-        GEVulkanDepthTexture* getDepthTexture() const { return m_depth_texture; }
+        GEVulkanAttachmentTexture* getDepthTexture() const
+                                                     { return m_depth_texture; }
         VkFormat findSupportedFormat(const std::vector<VkFormat>& candidates,
                                      VkImageTiling tiling,
                                      VkFormatFeatureFlags features);
@@ -375,6 +379,8 @@ namespace GE
                                        { m_dynamic_spm_buffers.insert(buffer); }
         void removeDynamicSPMBuffer(GEVulkanDynamicSPMBuffer* buffer)
                                         { m_dynamic_spm_buffers.erase(buffer); }
+        void renderDrawCalls(const std::vector<std::pair<GEVulkanDrawCall*, GEVulkanCameraSceneNode*> >& p,
+                             VkCommandBuffer cmd);
     private:
         struct SwapChainSupportDetails
         {
@@ -510,7 +516,7 @@ namespace GE
         bool m_disable_wait_idle;
 
         IrrlichtDevice* m_irrlicht_device;
-        GEVulkanDepthTexture* m_depth_texture;
+        GEVulkanAttachmentTexture* m_depth_texture;
         GEVulkanSkyBoxRenderer* m_skybox_renderer;
         GEVulkanTextureDescriptor* m_mesh_texture_descriptor;
         GEVulkanFBOTexture* m_rtt_texture;

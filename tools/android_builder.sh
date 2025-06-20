@@ -193,9 +193,11 @@ cp ./android/build/outputs/apk/release/android-release.apk \
 cp ./android/build/outputs/bundle/release/android-release.aab \
    ./android-output/SuperTuxKart-$PROJECT_VERSION.aab
 
-for arch in $(ls ./android/build/intermediates/merged_native_libs/release/out/lib); do
-    cp ./android/build/intermediates/merged_native_libs/release/out/lib/$arch/libmain.so \
+SYMBOLS_PATH="./android/build/intermediates/merged_native_libs/release/mergeReleaseNativeLibs/out/lib"
+
+for arch in $(ls "$SYMBOLS_PATH"); do
+    cp "$SYMBOLS_PATH/$arch/libmain.so" \
     ./android-output/SuperTuxKart-$PROJECT_VERSION-$arch-libmain.so
-    cp ./android/build/intermediates/merged_native_libs/release/out/lib/$arch/libSDL2.so \
+    cp "$SYMBOLS_PATH/$arch/libSDL2.so" \
     ./android-output/SuperTuxKart-$PROJECT_VERSION-$arch-libSDL2.so
 done

@@ -297,6 +297,8 @@ bool GEVulkanTexture::createImage(VkImageUsageFlags usage)
     m_vma_info = {};
     VmaAllocationCreateInfo alloc_info = {};
     alloc_info.usage = VMA_MEMORY_USAGE_AUTO_PREFER_DEVICE;
+    if ((usage & VK_IMAGE_USAGE_TRANSIENT_ATTACHMENT_BIT) != 0)
+        alloc_info.preferredFlags = VK_MEMORY_PROPERTY_LAZILY_ALLOCATED_BIT;
     VkResult result = vmaCreateImage(m_vk->getVmaAllocator(), &image_info,
         &alloc_info, &m_image, &m_vma_allocation, &m_vma_info);
 
@@ -390,6 +392,24 @@ void GEVulkanTexture::transitionImageLayout(VkCommandBuffer command_buffer,
         source_stage = VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT;
         destination_stage = VK_PIPELINE_STAGE_EARLY_FRAGMENT_TESTS_BIT;
     }
+    else if (old_layout == VK_IMAGE_LAYOUT_UNDEFINED &&
+        new_layout == VK_IMAGE_LAYOUT_GENERAL)
+    {
+        barrier.srcAccessMask = 0;
+        barrier.dstAccessMask = VK_ACCESS_SHADER_READ_BIT;
+
+        source_stage = VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT;
+        destination_stage = VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT;
+    }
+    else if (old_layout == VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL &&
+        new_layout == VK_IMAGE_LAYOUT_GENERAL)
+    {
+        barrier.srcAccessMask = VK_ACCESS_TRANSFER_WRITE_BIT;
+        barrier.dstAccessMask = VK_ACCESS_SHADER_READ_BIT;
+
+        source_stage = VK_PIPELINE_STAGE_TRANSFER_BIT;
+        destination_stage = VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT;
+    }
     else
     {
         return;
@@ -421,7 +441,8 @@ void GEVulkanTexture::copyBufferToImage(VkCommandBuffer command_buffer,
 }   // copyBufferToImage
 
 // ----------------------------------------------------------------------------
-bool GEVulkanTexture::createImageView(VkImageAspectFlags aspect_flags)
+bool GEVulkanTexture::createImageView(VkImageAspectFlags aspect_flags,
+                                      bool create_srgb_view)
 {
     VkImageViewCreateInfo view_info = {};
     view_info.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
@@ -450,7 +471,7 @@ bool GEVulkanTexture::createImageView(VkImageAspectFlags aspect_flags)
         image_view.get()->store(view_ptr);
         m_image_view = image_view;
         VkFormat srgb_format = getSRGBformat(m_internal_format);
-        if (m_internal_format != srgb_format)
+        if (create_srgb_view && m_internal_format != srgb_format)
         {
             image_view = std::make_shared<std::atomic<VkImageView> >();
             view_info.format = srgb_format;

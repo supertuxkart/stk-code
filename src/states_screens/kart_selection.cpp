@@ -365,13 +365,17 @@ void KartSelectionScreen::beforeAddingWidget()
         kart_class->addLabel(_(class_str.c_str()));
     }
     kart_class->addLabel(_("All"));
-
-    DynamicRibbonWidget* w = getWidget<DynamicRibbonWidget>("karts");
-    assert( w != NULL );
-
-    // Avoid too many items shown at the same time
-    w->setItemCountHint(std::min((int)kart_properties_manager->getNumberOfKarts(), 20));
 }   // beforeAddingWidget
+
+// ----------------------------------------------------------------------------
+
+void KartSelectionScreen::configureChooseKarts(bool enable)
+{
+    // Only allow keyboard and gamepad to choose kart without continue button in
+    // multitouch GUI, so mouse (touch) clicking can be used as previewing karts
+    getWidget("karts")->setEventCallbackActive(Input::IT_MOUSEBUTTON,
+        enable ? !useContinueButton() : true);
+}   // configureChooseKarts
 
 // ----------------------------------------------------------------------------
 
@@ -415,9 +419,9 @@ void KartSelectionScreen::init()
     m_search_box->clearListeners();
     m_search_box->addListener(this);
 
+    configureChooseKarts(true);
     DynamicRibbonWidget* w = getWidget<DynamicRibbonWidget>("karts");
     assert( w != NULL );
-
     KartHoverListener* karthoverListener = new KartHoverListener(this);
     w->registerHoverListener(karthoverListener);
 
@@ -1158,31 +1162,47 @@ void KartSelectionScreen::eventCallback(Widget* widget,
 
         handleKartListFocus();
     }
+    else if (name == "favorite")
+    {
+        bool state = getWidget<CheckBoxWidget>("favorite")->getState();
+        getWidget("continue")->setVisible(!state);
+        configureChooseKarts(!state);
+    }
     else if (name == "karts")
     {
         DynamicRibbonWidget* w = getWidget<DynamicRibbonWidget>("karts");
         assert(w != NULL);
         const std::string selection = w->getSelectionIDString(player_id);
-
         if (getWidget<CheckBoxWidget>("favorite")->getState() &&
             player_id == PLAYER_ID_GAME_MASTER && !m_game_master_confirmed &&
-            selection != RANDOM_KART_ID && !selection.empty())
+            !selection.empty())
         {
-            const KartProperties *kp = kart_properties_manager->getKart(selection);
-
-            if (PlayerManager::getCurrentPlayer()->isFavoriteKart(kp->getIdent()))
+            if (selection != RANDOM_KART_ID)
             {
-                PlayerManager::getCurrentPlayer()->removeFavoriteKart(kp->getIdent());
-            }
-            else
-            {
-                PlayerManager::getCurrentPlayer()->addFavoriteKart(kp->getIdent());
-            }
-            setKartsFromCurrentGroup();
+                // Locked karts can't be set as favorites
+                if (StringUtils::startsWith(selection, ID_LOCKED))
+                {
+                    unlock_manager->playLockSound();
+                }
+                else
+                {
+                    const KartProperties *kp = kart_properties_manager->getKart(selection);
 
-            handleKartListFocus();
+                    if (PlayerManager::getCurrentPlayer()->isFavoriteKart(kp->getIdent()))
+                    {
+                        PlayerManager::getCurrentPlayer()->removeFavoriteKart(kp->getIdent());
+                    }
+                    else
+                    {
+                        PlayerManager::getCurrentPlayer()->addFavoriteKart(kp->getIdent());
+                    }
+                    setKartsFromCurrentGroup();
+
+                    handleKartListFocus();
+                }
+            }
         }
-        else if (m_kart_widgets.size() > unsigned(player_id) && !useContinueButton())
+        else if (m_kart_widgets.size() > unsigned(player_id))
             playerConfirm(player_id);
     }
     else if (name == "kart_class" && !m_game_master_confirmed)
@@ -1256,7 +1276,7 @@ void KartSelectionScreen::onFocusChanged(GUIEngine::Widget* previous,
 
     if (GUIEngine::isFocusedForPlayer(kart_class, playerID))
     {
-        for (int i = 0; i < m_kart_widgets.size(); i++)
+        for (unsigned int i = 0; i < m_kart_widgets.size(); i++)
         {
             if (m_kart_widgets[i].getPlayerID() == playerID)
             {

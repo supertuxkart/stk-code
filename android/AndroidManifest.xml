@@ -4,6 +4,8 @@
 
     <application android:label="@string/app_name"
                  android:icon="@drawable/icon"
+                 android:allowBackup="true"
+                 android:appCategory="game"
                  android:banner="@drawable/banner"
                  android:hasCode="true"
                  android:isGame="true"
@@ -14,8 +16,9 @@
         <activity android:name=".SuperTuxKartActivity"
                   android:label="@string/app_name"
                   android:launchMode="singleTask"
-                  android:configChanges="fontScale|keyboard|keyboardHidden|locale|mcc|mnc|navigation|orientation|screenLayout|screenSize|uiMode"
+                  android:configChanges="fontScale|keyboard|keyboardHidden|locale|mcc|mnc|navigation|orientation|screenLayout|screenSize|uiMode|layoutDirection|grammaticalGender|fontWeightAdjustment|smallestScreenSize"
                   android:screenOrientation="sensorLandscape"
+                  android:preferMinimalPostProcessing="true"
                   android:exported="true">
 
             <intent-filter>

@@ -15,3 +15,4 @@ layout(location = 4) out float f_hue_change;
 layout(location = 5) out vec3 f_normal;
 layout(location = 6) out vec3 f_tangent;
 layout(location = 7) out vec3 f_bitangent;
+layout(location = 8) out vec4 f_world_position;

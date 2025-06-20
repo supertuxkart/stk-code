@@ -85,7 +85,8 @@ protected:
     // ------------------------------------------------------------------------
     bool createImage(VkImageUsageFlags usage);
     // ------------------------------------------------------------------------
-    bool createImageView(VkImageAspectFlags aspect_flags);
+    bool createImageView(VkImageAspectFlags aspect_flags,
+                         bool create_srgb_view = true);
     // ------------------------------------------------------------------------
     void transitionImageLayout(VkCommandBuffer command_buffer,
                                VkImageLayout old_layout,
@@ -243,6 +244,12 @@ public:
     virtual const io::path& getFullPath() const         { return m_full_path; }
     // ------------------------------------------------------------------------
     VkFormat getInternalFormat() const            { return m_internal_format; }
+    // ------------------------------------------------------------------------
+    VkImage getImage() const
+    {
+        waitImageView();
+        return m_image;
+    }
 };   // GEVulkanTexture
 
 }

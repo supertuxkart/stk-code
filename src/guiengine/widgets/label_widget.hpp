@@ -57,6 +57,7 @@ namespace GUIEngine
         irr::video::SColor m_color;
         bool               m_has_color;
         bool               m_expand_if_needed;
+        bool               m_word_wrap;
 
         irr::gui::IGUIFont* getCurrentFont() const;
         void updateExpandedText(const irr::core::stringw& text);

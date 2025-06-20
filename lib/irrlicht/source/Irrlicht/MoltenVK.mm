@@ -6,8 +6,6 @@
 #import <AppKit/NSApplication.h>
 
 #ifdef DLOPEN_MOLTENVK
-PFN_vkGetMoltenVKConfigurationMVK vkGetMoltenVKConfigurationMVK = NULL;
-PFN_vkSetMoltenVKConfigurationMVK vkSetMoltenVKConfigurationMVK = NULL;
 PFN_vkGetPhysicalDeviceMetalFeaturesMVK vkGetPhysicalDeviceMetalFeaturesMVK = NULL;
 
 namespace irr
@@ -39,15 +37,9 @@ MoltenVK::MoltenVK()
                 SDL_Vulkan_UnloadLibrary();
                 return;
             }
-            vkGetMoltenVKConfigurationMVK = (PFN_vkGetMoltenVKConfigurationMVK)
-                dlsym(m_handle, "vkGetMoltenVKConfigurationMVK");
-            vkSetMoltenVKConfigurationMVK = (PFN_vkSetMoltenVKConfigurationMVK)
-                dlsym(m_handle, "vkSetMoltenVKConfigurationMVK");
             vkGetPhysicalDeviceMetalFeaturesMVK = (PFN_vkGetPhysicalDeviceMetalFeaturesMVK)
                 dlsym(m_handle, "vkGetPhysicalDeviceMetalFeaturesMVK");
-            if (!vkGetMoltenVKConfigurationMVK ||
-                !vkSetMoltenVKConfigurationMVK ||
-                !vkGetPhysicalDeviceMetalFeaturesMVK)
+            if (!vkGetPhysicalDeviceMetalFeaturesMVK)
             {
                 SDL_Vulkan_UnloadLibrary();
                 return;

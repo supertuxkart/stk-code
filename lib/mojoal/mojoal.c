@@ -1432,12 +1432,15 @@ static ALboolean mix_source_buffer(ALCcontext *ctx, ALsource *src, BufferQueueIt
         if (src->stream) {  /* resampling? */
             int mixframes, mixlen, remainingmixframes;
             while ( (((mixlen = SDL_AudioStreamAvailable(src->stream)) / bufferframesize) < framesneeded) && (src->offset < buffer->len) ) {
-                const int framesput = (buffer->len - src->offset) / bufferframesize;
-                const int bytesput = SDL_min(framesput, 1024) * bufferframesize;
+                const int bytesleft = (buffer->len - src->offset);
+                /* workaround in case remains are less than bufferframesize */
+                const int framesput = (bytesleft + (bufferframesize - 1)) / bufferframesize;
+                const int bytesput = SDL_min(SDL_min(framesput, 1024) * bufferframesize, bytesleft);
                 FIXME("dynamically adjust frames here?");  /* we hardcode 1024 samples when opening the audio device, too. */
                 SDL_AudioStreamPut(src->stream, data, bytesput);
                 src->offset += bytesput;
-                data += bytesput / sizeof (float);
+                /* workaround in case remains are not evenly divided by sizeof (float) */
+                data += (bytesput + (sizeof (float) - 1)) / sizeof (float);
             }
 
             mixframes = SDL_min(mixlen / bufferframesize, framesneeded);
@@ -1812,9 +1815,13 @@ static void calculate_channel_gains(const ALCcontext *ctx, const ALsource *src, 
         V_sse = _mm_sub_ps(position_sse, _mm_mul_ps(_mm_set1_ps(a), up_sse));
 
         mags = magnitude_sse(at_sse) * magnitude_sse(V_sse);
-        cosangle = (mags == 0.0f) ? 0.0f : (dotproduct_sse(at_sse, V_sse) / mags);
-        cosangle = SDL_clamp(cosangle, -1.0f, 1.0f);
-        radians = SDL_acosf(cosangle);
+        if (mags == 0.0f) {
+            radians = 0.0f;
+        } else {
+            cosangle = dotproduct_sse(at_sse, V_sse) / mags;
+            cosangle = SDL_clamp(cosangle, -1.0f, 1.0f);
+            radians = SDL_acosf(cosangle);   
+        }
 
         R_sse = xyzzy_sse(at_sse, up_sse);
 
@@ -1838,9 +1845,13 @@ static void calculate_channel_gains(const ALCcontext *ctx, const ALsource *src, 
         V_neon = vsubq_f32(position_neon, vmulq_f32(vdupq_n_f32(a), up_neon));
 
         mags = magnitude_neon(at_neon) * magnitude_neon(V_neon);
-        cosangle = (mags == 0.0f) ? 0.0f : (dotproduct_neon(at_neon, V_neon) / mags);
-        cosangle = SDL_clamp(cosangle, -1.0f, 1.0f);
-        radians = SDL_acosf(cosangle);
+        if (mags == 0.0f) {
+            radians = 0.0f;
+        } else {
+            cosangle = dotproduct_neon(at_neon, V_neon) / mags;
+            cosangle = SDL_clamp(cosangle, -1.0f, 1.0f);
+            radians = SDL_acosf(cosangle);
+        }
 
         R_neon = xyzzy_neon(at_neon, up_neon);
 
@@ -1867,9 +1878,13 @@ static void calculate_channel_gains(const ALCcontext *ctx, const ALsource *src, 
 
         /* Calculate angle */
         mags = magnitude(at) * magnitude(V);
-        cosangle = (mags == 0.0f) ? 0.0f : (dotproduct(at, V) / mags);
-        cosangle = SDL_clamp(cosangle, -1.0f, 1.0f);
-        radians = SDL_acosf(cosangle);
+        if (mags == 0.0f) {
+            radians = 0.0f;
+        } else {
+            cosangle = dotproduct(at, V) / mags;
+            cosangle = SDL_clamp(cosangle, -1.0f, 1.0f);
+            radians = SDL_acosf(cosangle);
+        }
 
         /* Get "right" vector */
         xyzzy(R, at, up);

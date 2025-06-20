@@ -1,6 +1,7 @@
 #include "ge_vulkan_texture_descriptor.hpp"
 
 #include "ge_main.hpp"
+#include "ge_material_manager.hpp"
 #include "ge_vulkan_driver.hpp"
 #include "ge_vulkan_texture.hpp"
 
@@ -204,14 +205,14 @@ int GEVulkanTextureDescriptor::getTextureID(const irr::video::ITexture** list,
         m_transparent_image,
         m_transparent_image
     }};
+    const auto& material = GEMaterialManager::getMaterial(shader);
     for (unsigned i = 0; i < m_max_layer; i++)
     {
-        // Assume 0, 1 layer is srgb for pbr enabled currently
         if (list[i])
         {
             key[i] = static_cast<const GEVulkanTexture*>(
-                list[i])->getImageView(getGEConfig()->m_pbr &&
-                !shader.empty() && i <= 1 ? true : false);
+                list[i])->getImageView(getGEConfig()->m_pbr && material ?
+                material->m_srgb_settings[i] : false);
         }
     }
     auto it = m_texture_list.find(key);

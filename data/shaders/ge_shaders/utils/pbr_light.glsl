@@ -1,68 +1,3 @@
-vec2 F_AB(float perceptual_roughness, float NdotV)
-{
-    vec4 c0 = vec4(-1.0, -0.0275, -0.572, 0.022);
-    vec4 c1 = vec4(1.0, 0.0425, 1.04, -0.04);
-    vec4 r = perceptual_roughness * c0 + c1;
-    float a004 = min(r.x * r.x, pow(2.0, -9.28 * NdotV)) * r.x + r.y;
-    return vec2(-1.04, 1.04) * a004 + r.zw;
-}
-
-// Lambert model
-float F_Schlick(float f0, float f90, float VdotH)
-{
-    return mix(f0, f90, pow(1.0 - VdotH, 5.0));
-}
-
-float Fd_Burley(float roughness, float NdotV, float NdotL, float LdotH)
-{
-    // Don't divide by Pi to avoid light being too dim.
-    float f90 = 0.5 + 2.0 * roughness * LdotH * LdotH;
-    float lightScatter = F_Schlick(1.0, f90, NdotL);
-    float viewScatter = F_Schlick(1.0, f90, NdotV);
-    return lightScatter * viewScatter;
-}
-
-// Calculate distribution.
-// Based on https://google.github.io/filament/Filament.html#citation-walter07
-// D_GGX(h,α) = α^2 / { π ((n⋅h)^2 (α2−1) + 1)^2 }
-// Simple implementation, has precision problems when using fp16 instead of fp32
-// see https://google.github.io/filament/Filament.html#listing_speculardfp16
-float D_GGX(float roughness, float NdotH)
-{
-    // Don't divide by Pi to avoid light being too dim.
-    float oneMinusNdotHSquared = 1.0 - NdotH * NdotH;
-    float a = NdotH * roughness;
-    float k = roughness / (oneMinusNdotHSquared + a * a);
-    return k * k;
-}
-
-// Calculate visibility.
-// Hammon 2017, "PBR Diffuse Lighting for GGX+Smith Microsurfaces"
-// see https://google.github.io/filament/Filament.html#listing_approximatedspecularv
-float V_Smith_GGX_Correlated(float roughness, float NdotV, float NdotL)
-{
-    return 0.5 / mix(2.0 * NdotL * NdotV, NdotL + NdotV, roughness);
-}
-
-// Fresnel function
-// see https://google.github.io/filament/Filament.html#citation-schlick94
-// F_Schlick(v,h,f_0,f_90) = f_0 + (f_90 − f_0) (1 − v⋅h)^5
-vec3 fresnel(vec3 f0, float f90, float VdotH)
-{
-    return f0 + (f90 - f0) * pow(1.0 - VdotH, 5.0);
-}
-
-vec3 envBRDFApprox(vec3 F0, vec2 F_ab)
-{
-    return F0 * F_ab.x + F_ab.y;
-}
-
-float perceptualRoughnessToRoughness(float perceptual_roughness)
-{
-    float roughness = clamp(perceptual_roughness, 0.089, 1.0);
-    return roughness * roughness;
-}
-
 vec3 PBRLight(
     vec3 normal,
     vec3 eyedir,
@@ -104,6 +39,8 @@ vec3 PBRSunAmbientEmitLight(
     vec3 eyedir,
     vec3 sundir,
     vec3 color,
+    vec3 irradiance,
+    vec3 radiance,
     vec3 sun_color,
     vec3 ambient_color,
     float perceptual_roughness,
@@ -142,7 +79,67 @@ vec3 PBRSunAmbientEmitLight(
 
     vec3 specular_ambient = F90 * envBRDFApprox(F0, F_ab);
 
+    // Other 0.6 comes from skybox
+    ambient_color *= 0.4;
+    vec3 environment;
+    if (u_ibl)
+    {
+        environment = environmentLight(irradiance, radiance, roughness,
+            diffuse_color, F_ab, F0, F90, NdotV);
+    }
+    else
+    {
+        environment = u_global_light.m_skytop_color * ambient_color *
+            diffuse_color;
+    }
+
     vec3 emit = emissive * color * 4.0;
 
-    return sun_color * sunlight + ambient_color * (diffuse_ambient + specular_ambient) + emit;
+    return sun_color * sunlight
+          + environment + emit
+          + (diffuse_ambient + specular_ambient) * ambient_color;
+}
+
+vec3 accumulateLights(vec3 diffuse_color, vec3 normal, vec3 xpos, vec3 eyedir,
+                      float perceptual_roughness, float metallic)
+{
+    vec3 accumulated_color = vec3(0.0);
+    for (int i = 0; i < u_global_light.m_light_count; i++)
+    {
+        vec3 light_to_frag = (u_camera.m_view_matrix *
+            vec4(u_global_light.m_lights[i].m_position_radius.xyz,
+            1.0)).xyz - xpos;
+        float invrange = u_global_light.m_lights[i].m_color_inverse_square_range.w;
+        float distance_sq = dot(light_to_frag, light_to_frag);
+        if (distance_sq * invrange > 1.)
+            continue;
+        // SpotLight
+        float sattenuation = 1.;
+        float sscale = u_global_light.m_lights[i].m_direction_scale_offset.z;
+        float distance = sqrt(distance_sq);
+        float distance_inverse = 1. / distance;
+        vec3 L = light_to_frag * distance_inverse;
+        if (sscale != 0.)
+        {
+            vec3 sdir =
+                vec3(u_global_light.m_lights[i].m_direction_scale_offset.xy, 0.);
+            sdir.z = sqrt(1. - dot(sdir, sdir)) * sign(sscale);
+            sdir = (u_camera.m_view_matrix * vec4(sdir, 0.0)).xyz;
+            sattenuation = clamp(dot(-sdir, L) *
+                abs(sscale) +
+                u_global_light.m_lights[i].m_direction_scale_offset.w, 0.0, 1.0);
+            if (sattenuation == 0.)
+                continue;
+        }
+        vec3 diffuse_specular = PBRLight(normal, eyedir, L, diffuse_color,
+            perceptual_roughness, metallic);
+        float attenuation = 20. / (1. + distance_sq);
+        float radius = u_global_light.m_lights[i].m_position_radius.w;
+        attenuation *= (radius - distance) / radius;
+        attenuation *= sattenuation * sattenuation;
+        vec3 light_color =
+            u_global_light.m_lights[i].m_color_inverse_square_range.xyz;
+        accumulated_color += light_color * attenuation * diffuse_specular;
+    }
+    return accumulated_color;
 }

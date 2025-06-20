@@ -58,7 +58,10 @@ GhostReplayInfoDialog::GhostReplayInfoDialog(unsigned int replay_id,
     loadFromFile("ghost_replay_info_dialog.stkgui");
 
     m_info_widget = getWidget<BubbleWidget>("info");
-    m_info_widget->setText(m_rd.m_info);
+    if (m_rd.m_info == "")
+        m_info_widget->setVisible(false);
+    else
+        m_info_widget->setText(m_rd.m_info);
 
     Track* track = track_manager->getTrack(m_rd.m_track_name);
 
@@ -120,10 +123,11 @@ GhostReplayInfoDialog::GhostReplayInfoDialog(unsigned int replay_id,
     if (m_compare_ghost)
     {
         m_watch_only = true;
+        m_watch_widget->setActive(false);
         m_record_race = false;
         m_record_widget->setState(false);
-        m_record_widget->setVisible(!m_watch_only);
-        getWidget<LabelWidget>("record-race-text")->setVisible(!m_watch_only);
+        m_record_widget->setVisible(false);
+        getWidget<LabelWidget>("record-race-text")->setVisible(false);
     }
 
     // Display this checkbox only if there is another replay file to compare with
@@ -342,6 +346,11 @@ GUIEngine::EventPropagation
         {
             m_watch_only = true;
             m_watch_widget->setState(true);
+            m_watch_widget->setActive(false);
+        }
+        else
+        {
+            m_watch_widget->setActive(true);
         }
         m_record_widget->setVisible(!m_watch_only);
         getWidget<LabelWidget>("record-race-text")->setVisible(!m_watch_only);
@@ -349,6 +358,7 @@ GUIEngine::EventPropagation
         refreshMainScreen();
 
         m_replay_id = ReplayPlay::get()->getReplayIdByUID(m_rd.m_replay_uid);
+        updateReplayDisplayedInfo();
     }
 
     return GUIEngine::EVENT_LET;

@@ -41,7 +41,15 @@ class CreditsSection;
 class CreditsScreen : public GUIEngine::Screen,
                       public GUIEngine::ScreenSingleton<CreditsScreen>
 {
-    float m_time_element;
+    // ----------------------------------------------------------------------------------------
+    /** Used to track the current stage of credit display. */
+    enum CreditStage
+    {
+        SECTION_FADE_IN        = 0,
+        ELEMENTS_DISPLAY       = 1,
+        SECTION_FADE_OUT       = 2,
+        PAUSE_BETWEEN_SECTIONS = 3
+    };
 
     PtrVector<CreditsSection, HOLD> m_sections;
     CreditsSection* getCurrentSection();
@@ -52,11 +60,15 @@ class CreditsScreen : public GUIEngine::Screen,
     int m_curr_section;
     int m_curr_element;
 
-    float time_before_next_step;
+    CreditStage m_current_stage;
+
+    float m_time_til_next_step;
 
     friend class GUIEngine::ScreenSingleton<CreditsScreen>;
     CreditsScreen();
     bool getLineAsWide(std::ifstream& file, core::stringw* out);
+    float displayTimeForElement(int element_id);
+    void drawEntries();
 
     bool m_is_victory_music;
     void updateAreaSize();

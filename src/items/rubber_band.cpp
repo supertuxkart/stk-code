@@ -37,6 +37,7 @@
 #ifndef SERVER_ONLY
 #include <array>
 #include <ge_main.hpp>
+#include <ge_material_manager.hpp>
 #include <ge_vulkan_dynamic_spm_buffer.hpp>
 #endif
 #include <IMeshSceneNode.h>
@@ -97,6 +98,8 @@ RubberBand::RubberBand(Plunger *plunger, Kart *kart)
                 {{ v, v, v, v }};
             buffer->append(vertices.data(), vertices.size(), indices.data(),
                 indices.size());
+            buffer->getMaterial().MaterialType =
+                GE::GEMaterialManager::getIrrMaterialType("unlit");
         }
         else
         {

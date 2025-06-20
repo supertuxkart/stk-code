@@ -657,7 +657,8 @@ void KartPropertiesManager::getRandomKartList(int count,
             std::vector<int> karts_in_group =
                 getKartsInGroup(UserConfigParams::m_last_used_kart_group);
 
-            assert(karts_in_group.size() > 0);
+            if (karts_in_group.empty())
+                karts_in_group = getKartsInGroup(DEFAULT_GROUP_NAME);
 
             // first try not to use a kart already used by a player
             for (unsigned int i=0; i<karts_in_group.size(); i++)

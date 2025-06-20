@@ -105,6 +105,7 @@ enum DebugMenuCommand
     DEBUG_FONT_DUMP_GLYPH_PAGE,
     DEBUG_FONT_RELOAD,
     DEBUG_GE_PBR,
+    DEBUG_GE_IBL,
     DEBUG_SP_RESET,
     DEBUG_SP_TOGGLE_CULLING,
     DEBUG_SP_WN_VIZ,
@@ -325,11 +326,20 @@ bool handleContextMenuAction(s32 cmd_id)
     {
     case DEBUG_GRAPHICS_RELOAD_SHADERS:
 #ifndef SERVER_ONLY
+    {
         Log::info("Debug", "Reloading shaders...");
-        SP::SPShaderManager::get()->unloadAll();
-        ShaderBase::killShaders();
-        ShaderFilesManager::getInstance()->removeAllShaderFiles();
-        SP::SPShaderManager::get()->initAll();
+        GE::GEVulkanDriver* vk = GE::getVKDriver();
+        if (vk)
+            vk->reloadShaders();
+        else
+        {
+            SP::SPShaderManager::get()->unloadAll();
+            ShaderBase::killShaders();
+            ShaderFilesManager::getInstance()->removeAllShaderFiles();
+            SP::SPShaderManager::get()->initAll();
+        }
+        break;
+    }
 #endif
         break;
     case DEBUG_GRAPHICS_RELOAD_TEXTURES:
@@ -387,7 +397,21 @@ bool handleContextMenuAction(s32 cmd_id)
         {
             UserConfigParams::m_dynamic_lights = !UserConfigParams::m_dynamic_lights;
             GE::getGEConfig()->m_pbr = UserConfigParams::m_dynamic_lights;
-            vk->updateDriver(true);
+            vk->updateDriver(false/*scale_changed*/, true/*pbr_changed*/);
+        }
+        break;
+    }
+#endif
+    case DEBUG_GE_IBL:
+#ifndef SERVER_ONLY
+    {
+        GE::GEVulkanDriver* vk = GE::getVKDriver();
+        if (vk)
+        {
+            UserConfigParams::m_degraded_IBL = !UserConfigParams::m_degraded_IBL;
+            GE::getGEConfig()->m_ibl = !UserConfigParams::m_degraded_IBL;
+            vk->updateDriver(false/*scale_changed*/, false/*pbr_changed*/,
+                true/*ibl_changed*/);
         }
         break;
     }
@@ -1308,6 +1332,7 @@ bool onEvent(const SEvent &event)
             mnu->addItem(L"SP / GE debug >",-1,true, true);
             sub = mnu->getSubMenu(6);
             sub->addItem(L"Toggle GE PBR", DEBUG_GE_PBR);
+            sub->addItem(L"Toggle GE IBL", DEBUG_GE_IBL);
             sub->addItem(L"Reset SP debug", DEBUG_SP_RESET);
             sub->addItem(L"Toggle culling", DEBUG_SP_TOGGLE_CULLING);
             sub->addItem(L"Draw world normal in texture", DEBUG_SP_WN_VIZ);
