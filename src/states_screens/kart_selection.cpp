@@ -1514,6 +1514,7 @@ bool KartSelectionScreen::validateIdentChoices()
             m_kart_widgets[n].m_player_ident_spinner->markAsCorrect();
 
             // verify internal consistency in debug mode
+#ifndef NDEBUG
             if (m_multiplayer)
             {
                 int spinner_value = m_kart_widgets[n].m_player_ident_spinner->getValue();
@@ -1522,6 +1523,7 @@ bool KartSelectionScreen::validateIdentChoices()
                 assert(m_kart_widgets[n].getAssociatedPlayer()->getProfile() ==
                     PlayerManager::get()->getPlayer(spinner_value));
             }
+#endif
         }
     }
 
