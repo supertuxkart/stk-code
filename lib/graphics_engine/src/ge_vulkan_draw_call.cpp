@@ -1962,7 +1962,7 @@ bool GEVulkanDrawCall::doDepthOnlyRenderingFirst()
         UNDEFINED,
         ENABLED,
         DISABLED_NOT_PBR,
-        DISABLED_ARM,
+        DISABLED_TILED_GPU,
     };
     static Status status = UNDEFINED;
     auto ret = []()
@@ -1970,8 +1970,8 @@ bool GEVulkanDrawCall::doDepthOnlyRenderingFirst()
         if (!getGEConfig()->m_pbr)
             return DISABLED_NOT_PBR;
         // https://developer.arm.com/documentation/101897/0304/Optimizing-application-logic/Avoid-using-depth-prepasses
-#if defined(__arm__) || defined(__aarch64__) || defined(_M_ARM) || defined (_M_ARM64)
-        return DISABLED_ARM;
+#if defined(TILED_GPU)
+        return DISABLED_TILED_GPU;
 #else
         return ENABLED;
 #endif
@@ -1989,7 +1989,7 @@ bool GEVulkanDrawCall::doDepthOnlyRenderingFirst()
             printf("Disabled depth prepass because it will make non-PBR"
                 " rendering slower.\n");
             break;
-        case DISABLED_ARM:
+        case DISABLED_TILED_GPU:
             printf("Disabled depth prepass because it isn't necessary for"
                 " tile-based GPU.\n");
             break;
