@@ -46,10 +46,14 @@ extern "C" VKAPI_ATTR VkBool32 VKAPI_CALL debug_callback(
     const VkDebugUtilsMessengerCallbackDataEXT* callback_data,
     void* user_data)
 {
-    std::string msg = callback_data->pMessageIdName;
+    const char* msg_ptr = callback_data->pMessageIdName;
+    if (!msg_ptr)
+        return VK_FALSE;
+    std::string msg = msg_ptr;
     msg += " ";
     msg += callback_data->pMessage;
-    if (msg.find("WARNING-Shader-OutputNotConsumed") != std::string::npos)
+    if (msg.find("OutputNotConsumed") != std::string::npos ||
+        msg.find("BestPractices-PushConstants") != std::string::npos)
         return VK_FALSE;
 #ifdef __ANDROID__
     android_LogPriority alp;
@@ -550,7 +554,8 @@ GEVulkanDriver::GEVulkanDriver(const SIrrlichtCreationParameters& params,
     debug_create_info.sType = VK_STRUCTURE_TYPE_DEBUG_UTILS_MESSENGER_CREATE_INFO_EXT;
     debug_create_info.messageSeverity =
         VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT |
-        VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT;
+        VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT |
+        VK_DEBUG_UTILS_MESSAGE_SEVERITY_INFO_BIT_EXT;
     debug_create_info.messageType =
         VK_DEBUG_UTILS_MESSAGE_TYPE_GENERAL_BIT_EXT |
         VK_DEBUG_UTILS_MESSAGE_TYPE_VALIDATION_BIT_EXT |
@@ -795,10 +800,11 @@ void GEVulkanDriver::createInstance(SDL_Window* window)
 
     VkValidationFeaturesEXT validation_features = {};
     validation_features.sType = VK_STRUCTURE_TYPE_VALIDATION_FEATURES_EXT;
-    std::array<VkValidationFeatureEnableEXT, 2> enabled_validation_features =
+    std::array<VkValidationFeatureEnableEXT, 3> enabled_validation_features =
         {
             VK_VALIDATION_FEATURE_ENABLE_BEST_PRACTICES_EXT,
-            VK_VALIDATION_FEATURE_ENABLE_SYNCHRONIZATION_VALIDATION_EXT
+            VK_VALIDATION_FEATURE_ENABLE_SYNCHRONIZATION_VALIDATION_EXT,
+            VK_VALIDATION_FEATURE_ENABLE_DEBUG_PRINTF_EXT
         };
     validation_features.pEnabledValidationFeatures =
         enabled_validation_features.data();
