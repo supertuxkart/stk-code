@@ -80,6 +80,7 @@
 #include "states_screens/state_manager.hpp"
 #include "tracks/track_manager.hpp"
 #include "tracks/track.hpp"
+#include "utils/command_line.hpp"
 #include "utils/constants.hpp"
 #include "utils/file_utils.hpp"
 #include "utils/log.hpp"
@@ -103,6 +104,7 @@
 #include <ge_main.hpp>
 #include <ge_vulkan_driver.hpp>
 #include <ge_vulkan_texture_descriptor.hpp>
+#include <SDL_stdinc.h>
 #endif
 
 #ifdef ENABLE_RECORDER
@@ -512,9 +514,19 @@ begin:
         {
             driver_created = video::EDT_DIRECT3D9;
         }
-        else if (std::string(UserConfigParams::m_render_driver) == "vulkan")
+        else if (std::string(UserConfigParams::m_render_driver) == "vulkan" ||
+            std::string(UserConfigParams::m_render_driver) == "directx12")
         {
             driver_created = video::EDT_VULKAN;
+#if defined(WIN32) && !defined(SERVER_ONLY)
+            if (std::string(UserConfigParams::m_render_driver) == "directx12")
+            {
+                std::string dozen_path = StringUtils::getPath(
+                    CommandLine::getExecName());
+                SDL_setenv("VK_DRIVER_FILES",
+                    (dozen_path + "\\dzn_icd.json").c_str(), 1);
+            }
+#endif
 #ifndef SERVER_ONLY
             GE::getGEConfig()->m_texture_compression =
                 UserConfigParams::m_texture_compression;
