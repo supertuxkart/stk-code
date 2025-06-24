@@ -1030,6 +1030,7 @@ int handleCmdLinePreliminary()
     if (CommandLine::has("--seed", &n))
     {
         srand(n);
+        RandomGenerator::seed(n);
         Log::info("main", "STK using random seed (%d)", n);
     }
 

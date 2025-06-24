@@ -55,6 +55,7 @@ using namespace irr;
 
 #include "utils/aligned_array.hpp"
 #include "utils/log.hpp"
+#include "utils/random_generator.hpp"
 #include "utils/vec3.hpp"
 #include "utils/stk_process.hpp"
 
@@ -563,7 +564,8 @@ public:
     */
     void shuffleStartTransforms()
     {
-        std::random_shuffle(m_start_transforms.begin(), m_start_transforms.end());
+       std::shuffle(m_start_transforms.begin(), m_start_transforms.end(),
+                    RandomGenerator::getGenerator());
     }
     // ------------------------------------------------------------------------
     /** Sets pointer to the aabb of this track. */

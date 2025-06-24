@@ -19,9 +19,8 @@
 #ifndef HEADER_RANDOM_GENERATOR_HPP
 #define HEADER_RANDOM_GENERATOR_HPP
 
-#include <algorithm>
+#include <random>
 #include <vector>
-#include <stdlib.h>
 
 /** A random number generator. Each objects that needs a random number uses
     its own number random generator. They are all seeded with number provided
@@ -33,17 +32,19 @@
 class RandomGenerator
 {
 private:
-    unsigned int m_random_value;
+    static unsigned int m_random_value;
+    static constexpr unsigned int default_seed = 3141591;
     unsigned int m_a, m_c;
     static std::vector<RandomGenerator*> m_all_random_generators;
 
 public:
     RandomGenerator();
-
+    /** Return a reference to the thread-local generator */
+    static std::mt19937& getGenerator();
     //std::vector<int> generateAllSeeds();
     /** Returns a pseudo random number between 0 and n-1 inclusive */
     int  get(int n)  {return rand() % n; }
-    void seed(int s) {m_random_value = s;}
+    static void seed(int s) {m_random_value = s;}
 };  // RandomGenerator
 
 #endif // HEADER_RANDOM_GENERATOR_HPP
