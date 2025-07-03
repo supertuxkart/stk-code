@@ -32,18 +32,24 @@
 class RandomGenerator
 {
 private:
-    static unsigned int m_random_value;
-    static constexpr unsigned int default_seed = 3141591;
-    unsigned int m_a, m_c;
-    static std::vector<RandomGenerator*> m_all_random_generators;
+   static unsigned int m_random_value;
+   static constexpr unsigned int default_seed = 3141591;
+#ifdef NOT_USED_ATM
+   unsigned int m_a = 1103515245;
+   unsigned int m_c = 12345;
+#endif
+//    static std::vector<RandomGenerator*> m_all_random_generators;
 
 public:
-    RandomGenerator();
+    RandomGenerator() = default;
     /** Return a reference to the thread-local generator */
     static std::mt19937& getGenerator();
     //std::vector<int> generateAllSeeds();
     /** Returns a pseudo random number between 0 and n-1 inclusive */
-    int  get(int n)  {return rand() % n; }
+    int get(int n)  {
+       std::uniform_int_distribution<int> dist(0, n - 1);
+       return dist(getGenerator());
+    }
     static void seed(int s) {m_random_value = s;}
 };  // RandomGenerator
 

@@ -20,13 +20,7 @@
 
 //std::vector<RandomGenerator*> RandomGenerator::m_all_random_generators;
 
-RandomGenerator::RandomGenerator()
-{
-    m_a = 1103515245;
-    m_c = 12345;
-    //m_all_random_generators.push_back(this);
-    m_random_value = default_seed;
-}   // RandomGenerator
+unsigned int RandomGenerator::m_random_value = RandomGenerator::default_seed;
 
 std::mt19937& RandomGenerator::getGenerator() {
    static thread_local std::mt19937 generator = [] {
@@ -37,8 +31,6 @@ std::mt19937& RandomGenerator::getGenerator() {
    }();
    return generator;
 }
-
-unsigned int RandomGenerator::m_random_value = RandomGenerator::default_seed;
 
 // ----------------------------------------------------------------------------
 #if 0
