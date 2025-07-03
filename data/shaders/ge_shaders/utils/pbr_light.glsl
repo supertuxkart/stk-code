@@ -128,8 +128,11 @@ vec3 accumulateLights(vec3 diffuse_color, vec3 normal, vec3 xpos, vec3 eyedir,
             sattenuation = clamp(dot(-sdir, L) *
                 abs(sscale) +
                 u_global_light.m_lights[i].m_direction_scale_offset.w, 0.0, 1.0);
+#ifndef TILED_GPU
+            // Reduce branching in tiled GPU
             if (sattenuation == 0.)
                 continue;
+#endif
         }
         vec3 diffuse_specular = PBRLight(normal, eyedir, L, diffuse_color,
             perceptual_roughness, metallic);
