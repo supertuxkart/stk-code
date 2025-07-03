@@ -371,7 +371,8 @@ void TracksAndGPScreen::buildTrackList()
     }
 
     tracks_widget->updateItemDisplay();
-    std::random_shuffle( m_random_track_list.begin(), m_random_track_list.end() );
+    std::shuffle( m_random_track_list.begin(), m_random_track_list.end(),
+                  RandomGenerator::getGenerator());
 }   // buildTrackList
 
 // -----------------------------------------------------------------------------
