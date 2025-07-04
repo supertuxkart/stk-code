@@ -76,6 +76,10 @@ protected:
     /** Stores if this check structure is active (for a given kart). */
     std::vector<bool> m_is_active;
 
+    /** Stores if this check structure has to be checked to prevent
+     * lap completion going backwards (for a given kart). */
+    std::vector<bool> m_backwards_active;
+
     /** True if this check structure should be activated at a reset. */
     bool              m_active_at_reset;
 
@@ -91,7 +95,11 @@ private:
 
     /** Contains the indices of the corresponding check structures that
      *  get their state changed (activated or switched). */
-    std::vector<int> m_check_structures_to_change_state;
+    std::vector<int> m_next_check_structures;
+
+    /** Contains the indices of the previous check structures that
+     *  have to be set to backwards_active. */
+    std::vector<int> m_previous_check_structures;
 
     /** A list of check lines that should be activated/switched when this
      *  lines is activated/switched. I.e. can be used if more than one lap
@@ -100,7 +108,8 @@ private:
      *  as huge shortcuts. */
     std::vector<int> m_same_group;
 
-    enum ChangeState {CS_DEACTIVATE, CS_ACTIVATE, CS_TOGGLE};
+    enum ChangeState {CS_DEACTIVATE, CS_ACTIVATE, CS_ACTIVATE_EXCLUSIVE,
+                      CS_TOGGLE, CS_BACKWARDS_DEACTIVATE, CS_BACKWARDS_ACTIVATE};
 
     void changeStatus(const std::vector<int> &indices, int kart_index,
                       ChangeState change_state);
@@ -111,7 +120,7 @@ public:
     virtual void update(float dt);
     virtual void resetAfterKartMove(unsigned int kart_index) {}
     virtual void resetAfterRewind(unsigned int kart_index) {}
-    virtual void changeDebugColor(bool is_active) {}
+    virtual void changeDebugColor(bool is_active, bool prevent_backwards = false) {}
     /** True if going from old_pos to new_pos crosses this checkline. This function
      *  is called from update (of the checkline structure).
      *  \param old_pos  Position in previous frame.
@@ -132,8 +141,14 @@ public:
      *  by this check structure. */
     void addSuccessor(unsigned int i)
     {
-        m_check_structures_to_change_state.push_back(i);
+        m_next_check_structures.push_back(i);
     }   // addSuccessor
+    // ------------------------------------------------------------------------
+    /** Adds the index of a predecessor check structure. */
+    void addPredecessor(unsigned int i)
+    {
+        m_previous_check_structures.push_back(i);
+    }   // addPredecessor
     // ------------------------------------------------------------------------
     virtual bool triggeringCheckline() const { return false; }
     // ------------------------------------------------------------------------

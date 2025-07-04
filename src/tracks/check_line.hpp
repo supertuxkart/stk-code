@@ -78,7 +78,7 @@ public:
     virtual void resetAfterKartMove(unsigned int kart_index) OVERRIDE;
     virtual void resetAfterRewind(unsigned int kart_index) OVERRIDE
                                             { resetAfterKartMove(kart_index); }
-    virtual void changeDebugColor(bool is_active) OVERRIDE;
+    virtual void changeDebugColor(bool is_active, bool prevent_backwards = false) OVERRIDE;
     virtual bool triggeringCheckline() const OVERRIDE { return true; }
     // ------------------------------------------------------------------------
     /** Sets if this check line should not do a height test for testing

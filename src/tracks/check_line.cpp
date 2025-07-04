@@ -175,12 +175,13 @@ void CheckLine::resetAfterKartMove(unsigned int kart_index)
 }   // resetAfterKartMove
 
 // ----------------------------------------------------------------------------
-void CheckLine::changeDebugColor(bool is_active)
+void CheckLine::changeDebugColor(bool is_active, bool prevents_backwards)
 {
     if (!m_debug_dy_dc)
         return;
-    video::SColor color = is_active ? video::SColor(192, 255, 0, 0)
-                                    : video::SColor(192, 128, 128, 128);
+    video::SColor color = is_active          ? video::SColor(192, 255, 0, 0) :
+                          prevents_backwards ? video::SColor(192, 0, 128, 255)
+                                             : video::SColor(192, 128, 128, 128);
     for(unsigned int i = 0; i < 4; i++)
     {
         m_debug_dy_dc->getVerticesVector()[i].m_color = color;

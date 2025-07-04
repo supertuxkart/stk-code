@@ -86,9 +86,15 @@ void CheckManager::load(const XMLNode &node)
             it != check_structures_to_change_state.end(); it++)
         {
             if(DriveGraph::get()->isReverse())
+            {
                 m_all_checks[*it]->addSuccessor(i);
+                m_all_checks[i]->addPredecessor(*it);
+            }
             else
+            {
                 m_all_checks[i]->addSuccessor(*it);
+                m_all_checks[*it]->addPredecessor(i);
+            }
         }
 
     }

@@ -39,7 +39,8 @@ CheckStructure::CheckStructure(const XMLNode &node, unsigned int index)
 
     // This structure is actually filled by the check manager (necessary
     // in order to support track reversing).
-    m_check_structures_to_change_state.clear();
+    m_next_check_structures.clear();
+    m_previous_check_structures.clear();
     m_same_group.clear();
 
     std::string kind;
@@ -92,6 +93,7 @@ void CheckStructure::reset(const Track &track)
 {
     m_previous_position.clear();
     m_is_active.clear();
+    m_backwards_active.clear();
 
     World *world = World::getWorld();
     for(unsigned int i=0; i<world->getNumKarts(); i++)
@@ -99,8 +101,9 @@ void CheckStructure::reset(const Track &track)
         const Vec3 &xyz = world->getKart(i)->getXYZ();
         m_previous_position.push_back(xyz);
 
-        // Activate all checkline
+        // Activate all relevant checklines
         m_is_active.push_back(m_active_at_reset);
+        m_backwards_active.push_back(false);
     }   // for i<getNumKarts
 }   // reset
 
@@ -116,8 +119,11 @@ void CheckStructure::update(float dt)
     {
         const Vec3 &xyz = world->getKart(i)->getFrontXYZ();
         if(world->getKart(i)->getKartAnimation()) continue;
-        // Only check active checklines.
-        if(m_is_active[i] && isTriggered(m_previous_position[i], xyz, i))
+
+        // Check active checklines that the kart needs to cross to progress,
+        // and also the previous checkline to prevent lap completion going backwards
+        if((m_is_active[i] || m_backwards_active[i])
+            && isTriggered(m_previous_position[i], xyz, i))
         {
             if(UserConfigParams::m_check_debug)
                 Log::info("CheckStructure",
@@ -133,6 +139,10 @@ void CheckStructure::update(float dt)
 }   // update
 
 // ----------------------------------------------------------------------------
+// TODO : a lot of this code is specific to checklines, but it's in a class
+//        which also serves as a parent for many other objects.
+//        Evaluate the opportunity of getting rid of inheritance here to
+//        consolidate things.
 /** Changes the status (active/inactive) of all check structures contained
  *  in the index list indices.
  *  \param indices List of index of check structures in the CheckManager that
@@ -141,8 +151,7 @@ void CheckStructure::update(float dt)
  *  \param change_state How to change the state (active, deactivate, toggle).
  */
 void CheckStructure::changeStatus(const std::vector<int> &indices,
-                                  int kart_index,
-                                  ChangeState change_state)
+                                  int kart_index, ChangeState change_state)
 {
     int player_kart_index = 0;
     if (World::getWorld()->getPlayerKart(0))
@@ -150,6 +159,7 @@ void CheckStructure::changeStatus(const std::vector<int> &indices,
     bool update_debug_colors =
         UserConfigParams::m_check_debug && RaceManager::get()->getNumPlayers()>0 &&
         kart_index == player_kart_index;
+    bool activate_exclusive_done = false;
 
     CheckManager* cm = Track::getCurrentTrack()->getCheckManager();
     for(unsigned int i=0; i<indices.size(); i++)
@@ -161,6 +171,9 @@ void CheckStructure::changeStatus(const std::vector<int> &indices,
         {
         case CS_DEACTIVATE:
             cs->m_is_active[kart_index] = false;
+            // Fall-through
+        case CS_BACKWARDS_DEACTIVATE:
+            cs->m_backwards_active[kart_index] = false;
             if(UserConfigParams::m_check_debug)
             {
                 Log::info("CheckStructure", "Deactivating %d for %s.",
@@ -168,6 +181,18 @@ void CheckStructure::changeStatus(const std::vector<int> &indices,
                           World::getWorld()->getKart(kart_index)->getIdent().c_str());
             }
             break;
+        case CS_ACTIVATE_EXCLUSIVE:
+            // Say checkline 2 was triggered then checkline 1 was triggered backwards,
+            // we want to activate checkline 2 back but also ensure that checkline 3
+            // is properly desactivated.
+            // As all the checklines in a group should share the same successors,
+            // we only need to do this once
+            if (!activate_exclusive_done)
+            {
+                changeStatus(cs->m_next_check_structures, kart_index, CS_DEACTIVATE);
+                activate_exclusive_done = true;
+            }
+            // Fall-through
         case CS_ACTIVATE:
             cs->m_is_active[kart_index] = true;
             if(UserConfigParams::m_check_debug)
@@ -175,6 +200,27 @@ void CheckStructure::changeStatus(const std::vector<int> &indices,
                 Log::info("CheckStructure", "Activating %d for %s.",
                           indices[i],
                           World::getWorld()->getKart(kart_index)->getIdent().c_str());
+            }
+            break;
+        case CS_BACKWARDS_ACTIVATE:
+            // We don't want to call CheckLap's isTriggered function to avoid
+            // incorrect lap validations. Laplines also don't check for being crossed
+            // physically like other checklines do.
+            if (cs->m_check_type == CT_NEW_LAP)
+                break;
+
+            cs->m_backwards_active[kart_index] = true;
+            if(UserConfigParams::m_check_debug)
+            {
+                Log::info("CheckStructure", "Activating backward driving monitoring at %d for %s.",
+                          indices[i],
+                          World::getWorld()->getKart(kart_index)->getIdent().c_str());
+            }
+            // Stop backwards driving monitoring for the checkline group even before the one we just activated
+            if (!activate_exclusive_done)
+            {
+                changeStatus(cs->m_previous_check_structures, kart_index, CS_BACKWARDS_DEACTIVATE);
+                activate_exclusive_done = true;
             }
             break;
         case CS_TOGGLE:
@@ -194,22 +240,22 @@ void CheckStructure::changeStatus(const std::vector<int> &indices,
         }   // switch
         if(update_debug_colors)
         {
-            cs->changeDebugColor(cs->m_is_active[kart_index]);
+            cs->changeDebugColor(cs->m_is_active[kart_index], cs->m_backwards_active[kart_index]);
         }
     }   // for i<indices.size()
 
-    /*
-    printf("--------\n");
-    for (int n=0; n<m->getCheckStructureCount(); n++)
+    if(UserConfigParams::m_check_debug)
     {
-        CheckStructure *cs = cm->getCheckStructure(n);
-        if (dynamic_cast<CheckLap*>(cs) != NULL)
-            printf("Checkline %i (LAP) : %i\n", n, (int)cs->m_is_active[kart_index]);
-        else
-            printf("Checkline %i : %i\n", n, (int)cs->m_is_active[kart_index]);
-
+        printf("--------\n");
+        for (unsigned int n=0; n<cm->getCheckStructureCount(); n++)
+        {
+            CheckStructure *cs = cm->getCheckStructure(n);
+            if (dynamic_cast<CheckLap*>(cs) != NULL)
+                printf("Checkline %i (LAP) : %i\n", n, (int)cs->m_is_active[kart_index] + 2*(int)cs->m_backwards_active[kart_index]);
+            else
+                printf("Checkline %i : %i\n", n, (int)cs->m_is_active[kart_index] + 2*(int)cs->m_backwards_active[kart_index]);
+        }
     }
-    */
 
 }   //changeStatus
 
@@ -229,17 +275,34 @@ void CheckStructure::trigger(unsigned int kart_index)
                       World::getWorld()->getKart(kart_index)->getIdent().c_str(),
                       m_index);
         }
-        changeStatus(m_check_structures_to_change_state,
-                     kart_index, CS_ACTIVATE);
+        changeStatus(m_next_check_structures, kart_index, CS_ACTIVATE);
+        // Remove any backward-active status remaining
+        // (the lapline doesn't have a predecessor)
+        for (unsigned int n=0; n < Track::getCurrentTrack()->getCheckManager()->getCheckStructureCount(); n++)
+        {
+            CheckStructure *cs = Track::getCurrentTrack()->getCheckManager()->getCheckStructure(n);
+            if (cs->m_backwards_active[kart_index])
+            {
+                std::vector<int> indice;
+                indice.push_back(n);
+                changeStatus(indice, kart_index, CS_BACKWARDS_DEACTIVATE);
+            }
+        }
         break;
+
     case CT_ACTIVATE:
-        changeStatus(m_check_structures_to_change_state,
-                     kart_index, CS_ACTIVATE);
+        if (m_backwards_active[kart_index])
+            changeStatus(m_next_check_structures, kart_index, CS_ACTIVATE_EXCLUSIVE);
+        else
+            changeStatus(m_next_check_structures, kart_index, CS_ACTIVATE);
+
+        changeStatus(m_previous_check_structures, kart_index, CS_BACKWARDS_ACTIVATE);
         break;
+
     case CT_TOGGLE:
-        changeStatus(m_check_structures_to_change_state,
-                     kart_index, CS_TOGGLE);
+        changeStatus(m_next_check_structures, kart_index, CS_TOGGLE);
         break;
+
     default:
         break;
     }   // switch m_check_type
@@ -251,7 +314,8 @@ void CheckStructure::saveCompleteState(BareNetworkString* bns)
 {
     World* world = World::getWorld();
     for (unsigned int i = 0; i < world->getNumKarts(); i++)
-        bns->add(m_previous_position[i]).addUInt8(m_is_active[i] ? 1 : 0);
+        bns->add(m_previous_position[i]).addUInt8(m_is_active[i]      ? 1 :
+                                                  m_backwards_active[i] ? 2 : 0);
 }   // saveCompleteState
 
 // ----------------------------------------------------------------------------
@@ -259,25 +323,29 @@ void CheckStructure::restoreCompleteState(const BareNetworkString& b)
 {
     m_previous_position.clear();
     m_is_active.clear();
+    m_backwards_active.clear();
     World* world = World::getWorld();
     for (unsigned int i = 0; i < world->getNumKarts(); i++)
     {
         Vec3 xyz = b.getVec3();
-        bool is_active = b.getUInt8() == 1;
         m_previous_position.push_back(xyz);
-        m_is_active.push_back(is_active);
+        uint8_t active_value = b.getUInt8();
+        m_is_active.push_back(active_value == 1);
+        m_backwards_active.push_back(active_value == 2);
     }
 }   // restoreCompleteState
 
 // ----------------------------------------------------------------------------
 void CheckStructure::saveIsActive(int kart_id, BareNetworkString* bns)
 {
-    bns->addUInt8(m_is_active[kart_id] ? 1 : 0);
+    bns->addUInt8(m_is_active[kart_id]      ? 1 :
+                  m_backwards_active[kart_id] ? 2 : 0);
 }   // saveIsActive
 
 // ----------------------------------------------------------------------------
 void CheckStructure::restoreIsActive(int kart_id, const BareNetworkString& b)
 {
-    bool is_active = b.getUInt8() == 1;
-    m_is_active.at(kart_id) = is_active;
+    uint8_t active_value = b.getUInt8();
+    m_is_active.at(kart_id) = (active_value == 1);
+    m_backwards_active.at(kart_id) = (active_value == 2);
 }   // restoreIsActive
