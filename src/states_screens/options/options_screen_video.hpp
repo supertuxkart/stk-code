@@ -101,7 +101,7 @@ public:
     void         updateBlurSlider();
     void         updateScaleRTTsSlider();
     static int getImageQuality();
-    static void setImageQuality(int quality);
+    static void setImageQuality(int quality, bool force_reload_texture);
 };
 
 #endif

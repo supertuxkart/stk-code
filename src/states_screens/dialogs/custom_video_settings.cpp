@@ -199,6 +199,8 @@ GUIEngine::EventPropagation CustomVideoSettingsDialog::processEvent(const std::s
             UserConfigParams::m_light_scatter =
                 advanced_pipeline && getWidget<CheckBoxWidget>("lightscattering")->getState();
 
+            bool force_reload_texture = getWidget<CheckBoxWidget>("texture_compression")->getState() !=
+                UserConfigParams::m_texture_compression;
             UserConfigParams::m_texture_compression =
                 getWidget<CheckBoxWidget>("texture_compression")->getState();
             GE::getGEConfig()->m_texture_compression = UserConfigParams::m_texture_compression;
@@ -224,7 +226,9 @@ GUIEngine::EventPropagation CustomVideoSettingsDialog::processEvent(const std::s
             OptionsScreenVideo::getInstance()->updateBlurSlider();
             if ((pbr_changed || ibl_changed) && GE::getDriver()->getDriverType() == video::EDT_VULKAN)
                 GE::getVKDriver()->updateDriver(false/*scale_changed*/, pbr_changed, ibl_changed);
-            OptionsScreenVideo::setImageQuality(quality);
+            // sameRestart will have the same effect
+            if (!(CVS->isGLSL() && pbr_changed))
+                OptionsScreenVideo::setImageQuality(quality, force_reload_texture);
             return GUIEngine::EVENT_BLOCK;
         }
         else if (selection == "cancel")

@@ -159,7 +159,7 @@ int OptionsScreenVideo::getImageQuality()
 }   // getImageQuality
 
 // --------------------------------------------------------------------------------------------
-void OptionsScreenVideo::setImageQuality(int quality)
+void OptionsScreenVideo::setImageQuality(int quality, bool force_reload_texture)
 {
 #ifndef SERVER_ONLY
     core::dimension2du prev_max_size = irr_driver->getVideoDriver()
@@ -210,10 +210,10 @@ void OptionsScreenVideo::setImageQuality(int quality)
     {
         ShaderBase::killShaders();
         SP::initSamplers();
-        if (prev_max_size != cur_max_size)
+        if (prev_max_size != cur_max_size || force_reload_texture)
             SP::SPTextureManager::get()->reloadTexture("");
     }
-    else if (prev_max_size != cur_max_size)
+    else if (prev_max_size != cur_max_size || force_reload_texture)
         STKTexManager::getInstance()->reloadAllTextures(true/*mesh_texture_only*/);
 #endif
 }   // setImageQuality
@@ -624,7 +624,7 @@ void OptionsScreenVideo::eventCallback(Widget* widget, const std::string& name,
 #endif
         UserConfigParams::m_animated_characters = m_presets[level].animatedCharacters;
         UserConfigParams::m_particles_effects = m_presets[level].particles;
-        setImageQuality(m_presets[level].image_quality);
+        setImageQuality(m_presets[level].image_quality, false/*force_reload_texture*/);
         UserConfigParams::m_bloom              = m_presets[level].bloom;
         UserConfigParams::m_glow               = m_presets[level].glow;
         UserConfigParams::m_dynamic_lights     = m_presets[level].lights;
