@@ -182,7 +182,7 @@ class MoltenVK;
 			//! Sets the new position of the cursor.
 			virtual void setPosition(f32 x, f32 y)
 			{
-				setPosition((s32)(x*Device->Width), (s32)(y*Device->Height));
+				setPosition((s32)(x*Device->getRealScreenSize().Width), (s32)(y*Device->getRealScreenSize().Height));
 			}
 
 			//! Sets the new position of the cursor.
@@ -208,8 +208,8 @@ class MoltenVK;
 			virtual core::position2d<f32> getRelativePosition()
 			{
 				updateCursorPos();
-				return core::position2d<f32>(CursorPos.X / (f32)Device->Width,
-					CursorPos.Y / (f32)Device->Height);
+				return core::position2d<f32>(CursorPos.X / (f32)Device->getRealScreenSize().Width,
+					CursorPos.Y / (f32)Device->getRealScreenSize().Height);
 			}
 
 			virtual void setReferenceRect(core::rect<s32>* rect=0)
@@ -225,12 +225,12 @@ class MoltenVK;
 
 				if (CursorPos.X < 0)
 					CursorPos.X = 0;
-				if (CursorPos.X > (s32)Device->Width)
-					CursorPos.X = Device->Width;
+				if (CursorPos.X > (s32)Device->getRealScreenSize().Width)
+					CursorPos.X = Device->getRealScreenSize().Width;
 				if (CursorPos.Y < 0)
 					CursorPos.Y = 0;
-				if (CursorPos.Y > (s32)Device->Height)
-					CursorPos.Y = Device->Height;
+				if (CursorPos.Y > (s32)Device->getRealScreenSize().Height)
+					CursorPos.Y = Device->getRealScreenSize().Height;
 			}
 
 			CIrrDeviceSDL* Device;
@@ -305,8 +305,6 @@ class MoltenVK;
 		s32 GyroscopeIndex;
 		s32 GyroscopeInstance;
 
-		f32 NativeScaleX, NativeScaleY;
-
 		struct SKeyMap
 		{
 			SKeyMap() {}
@@ -332,7 +330,7 @@ class MoltenVK;
 		MoltenVK* m_moltenvk;
 #endif
 		void createGUIAndVulkanScene();
-		void updateNativeScale(u32* saving_width = NULL, u32* saving_height = NULL);
+		const core::dimension2du& getRealScreenSize() const;
 	};
 
 } // end namespace irr

@@ -531,7 +531,6 @@ GEVulkanDriver::GEVulkanDriver(const SIrrlichtCreationParameters& params,
     m_transparent_texture = NULL;
     m_pre_rotation_matrix = core::matrix4(core::matrix4::EM4CONST_IDENTITY);
 
-    m_window = window;
     m_disable_wait_idle = false;
     g_schedule_pausing_rendering.store(false);
     g_paused_rendering.store(false);
@@ -569,10 +568,6 @@ GEVulkanDriver::GEVulkanDriver(const SIrrlichtCreationParameters& params,
 
     if (SDL_Vulkan_CreateSurface(window, m_vk->instance, &m_vk->surface) == SDL_FALSE)
         throw std::runtime_error("SDL_Vulkan_CreateSurface failed");
-    int w, h = 0;
-    SDL_Vulkan_GetDrawableSize(window, &w, &h);
-    ScreenSize.Width = w;
-    ScreenSize.Height = h;
 
     m_device_extensions.push_back(VK_KHR_SWAPCHAIN_EXTENSION_NAME);
     findPhysicalDevice();
@@ -1242,7 +1237,7 @@ found_mode:
     }
 
     int w, h = 0;
-    SDL_Vulkan_GetDrawableSize(m_window, &w, &h);
+    SDL_Vulkan_GetDrawableSize(m_params.m_sdl_window, &w, &h);
     VkExtent2D max_extent = m_surface_capabilities.maxImageExtent;
     VkExtent2D min_extent = m_surface_capabilities.minImageExtent;
     VkExtent2D actual_extent =
@@ -1252,6 +1247,11 @@ found_mode:
         std::max(
             std::min((unsigned)h, max_extent.height), min_extent.height)
     };
+#if defined(__APPLE__)
+    // MoltenVK stores the correctly rounded, high-dpi screen size in
+    // currentExtent using half-to-even rounding
+    actual_extent = m_surface_capabilities.currentExtent;
+#endif
 
     VkSwapchainCreateInfoKHR create_info = {};
     create_info.sType = VK_STRUCTURE_TYPE_SWAPCHAIN_CREATE_INFO_KHR;
@@ -1684,6 +1684,7 @@ void GEVulkanDriver::copyBuffer(VkBuffer src_buffer, VkBuffer dst_buffer,
 // ----------------------------------------------------------------------------
 void GEVulkanDriver::OnResize(const core::dimension2d<u32>& size)
 {
+    m_params.WindowSize = size;
     CNullDriver::OnResize(size);
     if (g_paused_rendering.load() == false)
     {
@@ -2210,7 +2211,7 @@ void GEVulkanDriver::setViewPort(const core::rect<s32>& area)
     vp.clipAgainst(rendert);
     if (vp.getHeight() > 0 && vp.getWidth() > 0)
     {
-        m_viewport = vp;
+        ViewPort = vp;
         if (m_irrlicht_device->getSceneManager() &&
             m_irrlicht_device->getSceneManager()->getActiveCamera())
         {
@@ -2363,7 +2364,7 @@ void GEVulkanDriver::createSwapChainRelated(bool handle_surface)
     waitIdle();
     if (handle_surface)
     {
-        if (SDL_Vulkan_CreateSurface(m_window, m_vk->instance, &m_vk->surface) == SDL_FALSE)
+        if (SDL_Vulkan_CreateSurface(m_params.m_sdl_window, m_vk->instance, &m_vk->surface) == SDL_FALSE)
             throw std::runtime_error("SDL_Vulkan_CreateSurface failed");
     }
     updateSurfaceInformation(m_physical_device, &m_surface_capabilities,
