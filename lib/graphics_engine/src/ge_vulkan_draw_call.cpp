@@ -894,10 +894,13 @@ void GEVulkanDrawCall::createAllPipelines(GEVulkanDriver* vk)
     {
         m_graphics_pipelines["ghost"] = {};
         m_graphics_pipelines["ghost"].m_settings = settings;
+        m_graphics_pipelines["ghost"].m_settings.m_vertex_description = {};
         m_graphics_pipelines["ghost"].m_pipelines[GVPT_GHOST_DEPTH] =
             dp_cache.at(def_mat.m_vertex_shader + def_mat.m_fragment_shader);
         m_graphics_pipelines["ghost" SKINNING_PIPELINE] = {};
         m_graphics_pipelines["ghost" SKINNING_PIPELINE].m_settings = settings;
+        m_graphics_pipelines["ghost" SKINNING_PIPELINE]
+            .m_settings.m_vertex_description = {};
         m_graphics_pipelines["ghost" SKINNING_PIPELINE]
             .m_pipelines[GVPT_GHOST_DEPTH] = dp_cache.at(
             def_mat.m_skinning_vertex_shader + def_mat.m_fragment_shader);
@@ -1150,6 +1153,7 @@ void GEVulkanDrawCall::createPipeline(GEVulkanDriver* vk,
         {
             m_graphics_pipelines[key] = {};
             m_graphics_pipelines[key].m_settings = s;
+            m_graphics_pipelines[key].m_settings.m_vertex_description = {};
         }
         m_graphics_pipelines[key].m_pipelines[GVPT_DEPTH] = it->second;
         return true;
@@ -1167,6 +1171,7 @@ void GEVulkanDrawCall::createPipeline(GEVulkanDriver* vk,
         {
             m_graphics_pipelines[key] = {};
             m_graphics_pipelines[key].m_settings = s;
+            m_graphics_pipelines[key].m_settings.m_vertex_description = {};
         }
         if (depth_only)
         {
