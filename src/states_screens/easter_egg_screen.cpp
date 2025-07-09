@@ -258,7 +258,7 @@ void EasterEggScreen::buildTrackList()
     }
     tracks.insertionSort();
 
-    for (int n=0; n<tracks.size(); n++)
+    for (unsigned int n=0; n<tracks.size(); n++)
     {
         Track* curr = tracks.get(n);
 
@@ -288,7 +288,8 @@ void EasterEggScreen::buildTrackList()
                            0 /* no badge */, IconButtonWidget::ICON_PATH_TYPE_RELATIVE);
 
     tracks_widget->updateItemDisplay();
-    std::random_shuffle( m_random_track_list.begin(), m_random_track_list.end() );
+    std::shuffle( m_random_track_list.begin(), m_random_track_list.end(),
+                  RandomGenerator::getGenerator());
 }
 
 // -----------------------------------------------------------------------------
