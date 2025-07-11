@@ -22,6 +22,12 @@ namespace GE
 class GEOcclusionCulling;
 class GESPMBuffer;
 class GEVulkanDriver;
+enum GEAutoDeferredType : unsigned
+{
+    GADT_DISABLED = 0,
+    GADT_SINGLE_PASS
+};
+
 struct GEConfig
 {
 bool m_disable_npot_texture;
@@ -31,6 +37,8 @@ bool m_fullscreen_desktop;
 bool m_enable_draw_call_cache;
 bool m_pbr;
 bool m_ibl;
+GEAutoDeferredType m_auto_deferred_type;
+bool m_force_deferred;
 std::unordered_set<std::string> m_ondemand_load_texture_paths;
 float m_render_scale;
 };
@@ -102,6 +110,7 @@ void copyToMappedBuffer(uint32_t* mapped, GESPMBuffer* spmb, size_t offset = 0);
 GEOcclusionCulling* getOcclusionCulling();
 void resetOcclusionCulling();
 bool hasOcclusionCulling();
+bool needsDeferredRendering(bool auto_deferred = true);
 
 }
 #endif

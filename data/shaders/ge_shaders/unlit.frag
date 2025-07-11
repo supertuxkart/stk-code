@@ -6,10 +6,12 @@ layout(location = 5) in vec3 f_normal;
 layout(location = 8) in vec4 f_world_position;
 
 layout(location = 0) out vec4 o_color;
+layout(location = 1) out vec4 o_normal;
 
 #include "utils/sample_mesh_texture.glsl"
 #include "../utils/rgb_conversion.frag"
 #include "utils/handle_pbr.glsl"
+#include "../utils/encode_normal.frag"
 
 void main()
 {
@@ -27,7 +29,17 @@ void main()
     }
     vec3 diffuse_color = tex_color.xyz * f_vertex_color.xyz;
     vec3 normal = normalize(f_normal.xyz);
-    vec3 pbr = vec3(0.0, 0.0, 0.4);
-    o_color = vec4(handlePBR(diffuse_color, pbr, f_world_position, normal), 1.0);
+    if (u_deferred)
+    {
+        o_color = vec4(diffuse_color, 0.4);
+        o_normal.xy = EncodeNormal(normal);
+        o_normal.zw = vec2(0.0);
+    }
+    else
+    {
+        vec3 pbr = vec3(0.0, 0.0, 0.4);
+        o_color = vec4(handlePBR(diffuse_color, pbr, f_world_position, normal),
+            1.0);
+    }
 #endif
 }

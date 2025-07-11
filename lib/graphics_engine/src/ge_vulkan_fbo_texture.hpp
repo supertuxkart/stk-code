@@ -8,16 +8,16 @@ namespace GE
 class GEVulkanAttachmentTexture;
 class GEVulkanFBOTexture : public GEVulkanTexture
 {
-private:
+protected:
     GEVulkanAttachmentTexture* m_depth_texture;
 
-    VkRenderPass m_rtt_render_pass;
+    std::vector<VkRenderPass> m_rtt_render_pass;
 
-    VkFramebuffer m_rtt_frame_buffer;
+    std::vector<VkFramebuffer> m_rtt_frame_buffer;
 public:
     // ------------------------------------------------------------------------
     GEVulkanFBOTexture(GEVulkanDriver* vk, const core::dimension2d<u32>& size,
-                       bool create_depth);
+                       bool lazy_depth = true);
     // ------------------------------------------------------------------------
     virtual ~GEVulkanFBOTexture();
     // ------------------------------------------------------------------------
@@ -48,11 +48,29 @@ public:
                                                        bool srgb = false) const
                                                        { return m_image_view; }
     // ------------------------------------------------------------------------
-    void createRTT();
+    virtual void createRTT();
     // ------------------------------------------------------------------------
-    VkRenderPass getRTTRenderPass() const         { return m_rtt_render_pass; }
+    virtual void createOutputImage(VkImageUsageFlags usage =
+        VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT | VK_IMAGE_USAGE_SAMPLED_BIT);
     // ------------------------------------------------------------------------
-    VkFramebuffer getRTTFramebuffer() const      { return m_rtt_frame_buffer; }
+    VkRenderPass getRTTRenderPass(unsigned id = 0) const
+                                           { return m_rtt_render_pass.at(id); }
+    // ------------------------------------------------------------------------
+    VkFramebuffer getRTTFramebuffer(unsigned id = 0) const
+                                          { return m_rtt_frame_buffer.at(id); }
+    // ------------------------------------------------------------------------
+    virtual bool isDeferredFBO() const                        { return false; }
+    // ------------------------------------------------------------------------
+    virtual bool useSwapChainOutput() const                   { return false; }
+    // ------------------------------------------------------------------------
+    virtual unsigned getZeroClearCountForPass(unsigned pass) const
+                                                                  { return 0; }
+    // ------------------------------------------------------------------------
+    virtual VkDescriptorSetLayout getDescriptorSetLayout(unsigned id) const
+                                                     { return VK_NULL_HANDLE; }
+    // ------------------------------------------------------------------------
+    virtual const VkDescriptorSet* getDescriptorSet(unsigned id) const
+                                                               { return NULL; }
 
 };   // GEVulkanFBOTexture
 

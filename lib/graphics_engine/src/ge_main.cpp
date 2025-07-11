@@ -25,6 +25,8 @@ GEConfig g_config =
     false,
     false,
     true,
+    GADT_DISABLED,
+    false,
     {},
     1.0f
 };
@@ -214,6 +216,13 @@ bool hasOcclusionCulling()
     if (g_occulsion_culling)
         return true;
     return false;
+}
+
+bool needsDeferredRendering(bool auto_deferred)
+{
+    return g_config.m_pbr &&
+        ((auto_deferred && g_config.m_auto_deferred_type != GADT_DISABLED) ||
+        g_config.m_force_deferred);
 }
 
 }

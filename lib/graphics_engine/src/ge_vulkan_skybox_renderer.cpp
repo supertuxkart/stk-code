@@ -3,6 +3,7 @@
 #include "ge_main.hpp"
 #include "ge_vulkan_array_texture.hpp"
 #include "ge_vulkan_driver.hpp"
+#include "ge_vulkan_fbo_texture.hpp"
 #include "ge_vulkan_environment_map.hpp"
 #include "ge_vulkan_features.hpp"
 
@@ -182,6 +183,8 @@ void GEVulkanSkyBoxRenderer::addSkyBox(irr::scene::ISceneNode* skybox)
     {
         private:
             GEVulkanSkyBoxRenderer* m_sky;
+
+            const bool m_srgb;
             // ----------------------------------------------------------------
             void updateDescriptor()
             {
@@ -189,8 +192,8 @@ void GEVulkanSkyBoxRenderer::addSkyBox(irr::scene::ISceneNode* skybox)
                 VkDescriptorImageInfo info;
                 info.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
                 info.sampler = vk->getSampler(GVS_SKYBOX);
-                info.imageView = (VkImageView)
-                    m_sky->m_texture_cubemap->getTextureHandler();
+                info.imageView = (VkImageView)m_sky->m_texture_cubemap
+                    ->getImageView(m_srgb)->load();
 
                 VkWriteDescriptorSet write_descriptor_set = {};
                 write_descriptor_set.sType =
@@ -210,7 +213,8 @@ void GEVulkanSkyBoxRenderer::addSkyBox(irr::scene::ISceneNode* skybox)
             }
         public:
             // ----------------------------------------------------------------
-            ImageManipulator(GEVulkanSkyBoxRenderer* sky) : m_sky(sky)
+            ImageManipulator(GEVulkanSkyBoxRenderer* sky, bool srgb)
+                : m_sky(sky), m_srgb(srgb)
             {
                 m_sky->m_skybox_loading.store(true);
             }
@@ -257,8 +261,10 @@ void GEVulkanSkyBoxRenderer::addSkyBox(irr::scene::ISceneNode* skybox)
             }
     };
 
+    GEVulkanDriver* vk = getVKDriver();
+    bool srgb = vk->getRTTTexture() && vk->getRTTTexture()->isDeferredFBO();
     std::shared_ptr<ImageManipulator> image_manipulator =
-        std::make_shared<ImageManipulator>(this);
+        std::make_shared<ImageManipulator>(this, srgb);
     auto real_mani = [image_manipulator](video::IImage* img, unsigned idx)
     {
         image_manipulator->swapPixels(img, idx);

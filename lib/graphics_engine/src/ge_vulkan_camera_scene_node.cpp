@@ -2,6 +2,7 @@
 
 #include "ge_main.hpp"
 #include "ge_vulkan_driver.hpp"
+#include "ge_vulkan_fbo_texture.hpp"
 #include "ge_vulkan_scene_manager.hpp"
 
 namespace GE
@@ -38,7 +39,7 @@ void GEVulkanCameraSceneNode::render()
     clip[14] = 0.5f;
     m_ubo_data.m_projection_matrix = clip * m_ubo_data.m_projection_matrix;
     GEVulkanDriver* vk = getVKDriver();
-    if (!vk->getRTTTexture())
+    if (!vk->getRTTTexture() || vk->getRTTTexture()->useSwapChainOutput())
     {
         m_ubo_data.m_projection_matrix = vk->getPreRotationMatrix() *
             m_ubo_data.m_projection_matrix;

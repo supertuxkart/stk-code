@@ -3,6 +3,7 @@
 #include "ge_main.hpp"
 #include "ge_occlusion_culling.hpp"
 #include "ge_vulkan_driver.hpp"
+#include "ge_vulkan_fbo_texture.hpp"
 #include "ge_vulkan_skybox_renderer.hpp"
 
 #include "ILightSceneNode.h"
@@ -12,6 +13,7 @@
 #include <algorithm>
 #include <cmath>
 #include <functional>
+#include <iterator>
 
 namespace GE
 {
@@ -21,6 +23,7 @@ void GEVulkanLightHandler::prepare()
 {
     m_buffer = {};
     m_lights.clear();
+    m_fullscreen_light_count = 0;
     video::SColorf c = m_vk->getIrrlichtDevice()->getSceneManager()
         ->getAmbientLight();
     m_buffer.m_ambient_color.X = c.r * c.a;
@@ -61,7 +64,21 @@ void GEVulkanLightHandler::generate(const irr::core::vector3df& cam_pos,
     if (m_lights.empty())
         return;
 
-    if (hasOcclusionCulling())
+    GEVulkanFBOTexture* t =
+        static_cast<GEVulkanDriver*>(getDriver())->getRTTTexture();
+    if (t && t->isDeferredFBO())
+    {
+        auto i = std::partition(m_lights.begin(), m_lights.end(),
+        [cam_pos](const GELight& l)
+        {
+            float radius_2 = l.m_radius * l.m_radius;
+            float distance_2 = (cam_pos - l.m_position).getLengthSQ();
+            return distance_2 <= radius_2;
+        });
+        m_fullscreen_light_count = std::distance(m_lights.begin(), i);
+    }
+    // Deferred fbo supports light culling using depth test
+    if (hasOcclusionCulling() && (!t || !t->isDeferredFBO()))
     {
         auto l = m_lights.begin();
         auto rl = m_buffer.m_rendering_lights.begin();

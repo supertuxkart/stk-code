@@ -8,11 +8,11 @@
 #include "ge_vulkan_animated_mesh_scene_node.hpp"
 #include "ge_vulkan_billboard_buffer.hpp"
 #include "ge_vulkan_camera_scene_node.hpp"
+#include "ge_vulkan_deferred_fbo.hpp"
 #include "ge_vulkan_driver.hpp"
 #include "ge_vulkan_dynamic_buffer.hpp"
 #include "ge_vulkan_dynamic_spm_buffer.hpp"
 #include "ge_vulkan_environment_map.hpp"
-#include "ge_vulkan_fbo_texture.hpp"
 #include "ge_vulkan_features.hpp"
 #include "ge_vulkan_light_handler.hpp"
 #include "ge_vulkan_mesh_cache.hpp"
@@ -51,6 +51,7 @@ PipelineSettings::PipelineSettings()
     m_drawing_priority = (char)0;
     m_custom_pl = VK_NULL_HANDLE;
     m_depth_op = VK_COMPARE_OP_LESS;
+    m_topology = VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST;
     m_pipeline_type = GVPT_SOLID;
     GEMaterial default_material;
     loadMaterial(default_material);
@@ -264,6 +265,11 @@ GEVulkanDrawCall::~GEVulkanDrawCall()
         m_graphics_pipelines.clear();
         vkDestroyPipelineLayout(vk->getDevice(), m_pipeline_layout, NULL);
         vkDestroyPipelineLayout(vk->getDevice(), m_skybox_layout, NULL);
+        for (VkPipelineLayout layout : m_deferred_layouts)
+        {
+            if (layout != VK_NULL_HANDLE)
+                vkDestroyPipelineLayout(vk->getDevice(), layout, NULL);
+        }
     }
 }   // ~GEVulkanDrawCall
 
@@ -890,7 +896,7 @@ void GEVulkanDrawCall::createAllPipelines(GEVulkanDriver* vk)
     settings.m_shader_name = "ghost";
     settings.m_drawing_priority = (char)drawing_order;
     settings.m_pipeline_type = GVPT_GHOST_DEPTH;
-    if (doDepthOnlyRenderingFirst())
+    if (doDepthOnlyRenderingFirst() && m_deferred_layouts.empty())
     {
         m_graphics_pipelines["ghost"] = {};
         m_graphics_pipelines["ghost"].m_settings = settings;
@@ -945,6 +951,38 @@ void GEVulkanDrawCall::createAllPipelines(GEVulkanDriver* vk)
     settings.m_vertex_description = {};
     settings.m_shader_name = "skybox";
     createPipeline(vk, settings, dp_cache);
+
+    if (m_deferred_layouts.empty())
+        return;
+
+    def_mat.m_depth_test = false;
+    def_mat.m_fragment_shader = "deferred_pbr.frag";
+    settings.loadMaterial(def_mat);
+    settings.m_pipeline_type = GVPT_DEFERRED_LIGHTING;
+    settings.m_custom_pl = m_deferred_layouts[GVDFP_HDR];
+    settings.m_shader_name = "deferred_pbr";
+    createPipeline(vk, settings, dp_cache);
+
+    def_mat.m_depth_test = true;
+    def_mat.m_additive = true;
+    def_mat.m_vertex_shader = "deferred_pointlight.vert";
+    def_mat.m_fragment_shader = "deferred_pointlight.frag";
+    settings.loadMaterial(def_mat);
+    settings.m_depth_op = VK_COMPARE_OP_LESS;
+    settings.m_topology = VK_PRIMITIVE_TOPOLOGY_TRIANGLE_STRIP;
+    settings.m_shader_name = "deferred_pointlight";
+    createPipeline(vk, settings, dp_cache);
+
+    def_mat.m_depth_test = false;
+    def_mat.m_additive = false;
+    def_mat.m_vertex_shader = "fullscreen_quad.vert";
+    def_mat.m_fragment_shader = "deferred_convert_color.frag";
+    settings.loadMaterial(def_mat);
+    settings.m_topology = VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST;
+    settings.m_shader_name = "deferred_convert_color";
+    settings.m_pipeline_type = GVPT_DEFERRED_CONVERT_COLOR;
+    settings.m_custom_pl = m_deferred_layouts[GVDFP_CONVERT_COLOR];
+    createPipeline(vk, settings, dp_cache);
 }   // createAllPipelines
 
 // ----------------------------------------------------------------------------
@@ -981,7 +1019,7 @@ void GEVulkanDrawCall::createPipeline(GEVulkanDriver* vk,
 
     VkPipelineInputAssemblyStateCreateInfo input_assembly = {};
     input_assembly.sType = VK_STRUCTURE_TYPE_PIPELINE_INPUT_ASSEMBLY_STATE_CREATE_INFO;
-    input_assembly.topology = VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST;
+    input_assembly.topology = settings.m_topology;
     input_assembly.primitiveRestartEnable = VK_FALSE;
 
     VkViewport viewport = {};
@@ -1027,35 +1065,43 @@ void GEVulkanDrawCall::createPipeline(GEVulkanDriver* vk,
     depth_stencil.depthBoundsTestEnable = VK_FALSE;
     depth_stencil.stencilTestEnable = VK_FALSE;
 
-    VkPipelineColorBlendAttachmentState color_blend_attachment = {};
-    color_blend_attachment.colorWriteMask = VK_COLOR_COMPONENT_R_BIT |
+    std::vector<VkPipelineColorBlendAttachmentState> color_blend_attachment(1);
+    color_blend_attachment[0].colorWriteMask = VK_COLOR_COMPONENT_R_BIT |
         VK_COLOR_COMPONENT_G_BIT | VK_COLOR_COMPONENT_B_BIT |
         VK_COLOR_COMPONENT_A_BIT;
-    color_blend_attachment.blendEnable = settings.m_material->isTransparent();
+    color_blend_attachment[0].blendEnable = settings.m_material->isTransparent();
     if (settings.m_material->m_alphablend)
     {
-        color_blend_attachment.srcColorBlendFactor = VK_BLEND_FACTOR_ONE;
-        color_blend_attachment.dstColorBlendFactor = VK_BLEND_FACTOR_ONE_MINUS_SRC_ALPHA;
-        color_blend_attachment.colorBlendOp = VK_BLEND_OP_ADD;
-        color_blend_attachment.srcAlphaBlendFactor = VK_BLEND_FACTOR_ONE;
-        color_blend_attachment.dstAlphaBlendFactor = VK_BLEND_FACTOR_ONE_MINUS_SRC_ALPHA;
-        color_blend_attachment.alphaBlendOp = VK_BLEND_OP_ADD;
+        color_blend_attachment[0].srcColorBlendFactor = VK_BLEND_FACTOR_ONE;
+        color_blend_attachment[0].dstColorBlendFactor = VK_BLEND_FACTOR_ONE_MINUS_SRC_ALPHA;
+        color_blend_attachment[0].colorBlendOp = VK_BLEND_OP_ADD;
+        color_blend_attachment[0].srcAlphaBlendFactor = VK_BLEND_FACTOR_ONE;
+        color_blend_attachment[0].dstAlphaBlendFactor = VK_BLEND_FACTOR_ONE_MINUS_SRC_ALPHA;
+        color_blend_attachment[0].alphaBlendOp = VK_BLEND_OP_ADD;
     }
     if (settings.m_material->m_additive)
     {
-        color_blend_attachment.srcColorBlendFactor = VK_BLEND_FACTOR_ONE;
-        color_blend_attachment.dstColorBlendFactor = VK_BLEND_FACTOR_ONE;
-        color_blend_attachment.colorBlendOp = VK_BLEND_OP_ADD;
-        color_blend_attachment.srcAlphaBlendFactor = VK_BLEND_FACTOR_ONE;
-        color_blend_attachment.dstAlphaBlendFactor = VK_BLEND_FACTOR_ONE;
-        color_blend_attachment.alphaBlendOp = VK_BLEND_OP_ADD;
+        color_blend_attachment[0].srcColorBlendFactor = VK_BLEND_FACTOR_ONE;
+        color_blend_attachment[0].dstColorBlendFactor = VK_BLEND_FACTOR_ONE;
+        color_blend_attachment[0].colorBlendOp = VK_BLEND_OP_ADD;
+        color_blend_attachment[0].srcAlphaBlendFactor = VK_BLEND_FACTOR_ONE;
+        color_blend_attachment[0].dstAlphaBlendFactor = VK_BLEND_FACTOR_ONE;
+        color_blend_attachment[0].alphaBlendOp = VK_BLEND_OP_ADD;
+    }
+    if (vk->getRTTTexture() &&
+        vk->getRTTTexture()->getZeroClearCountForPass(GVDFP_HDR) > 1 &&
+        settings.m_pipeline_type <= GVPT_SOLID)
+    {
+        color_blend_attachment.resize(
+            vk->getRTTTexture()->getZeroClearCountForPass(GVDFP_HDR),
+            color_blend_attachment[0]);
     }
     VkPipelineColorBlendStateCreateInfo color_blending = {};
     color_blending.sType = VK_STRUCTURE_TYPE_PIPELINE_COLOR_BLEND_STATE_CREATE_INFO;
     color_blending.logicOpEnable = VK_FALSE;
     color_blending.logicOp = VK_LOGIC_OP_COPY;
-    color_blending.attachmentCount = 1;
-    color_blending.pAttachments = &color_blend_attachment;
+    color_blending.attachmentCount = color_blend_attachment.size();
+    color_blending.pAttachments = color_blend_attachment.data();
     color_blending.blendConstants[0] = 0.0f;
     color_blending.blendConstants[1] = 0.0f;
     color_blending.blendConstants[2] = 0.0f;
@@ -1086,15 +1132,18 @@ void GEVulkanDrawCall::createPipeline(GEVulkanDriver* vk,
     pipeline_info.pDynamicState = &dynamic_state_info;
     pipeline_info.layout = settings.m_custom_pl == VK_NULL_HANDLE ?
         m_pipeline_layout : settings.m_custom_pl;
-    pipeline_info.renderPass = vk->getRTTTexture() ?
-        vk->getRTTTexture()->getRTTRenderPass() : vk->getRenderPass();
-    pipeline_info.subpass = 0;
+    pipeline_info.renderPass = getRenderPassForPipelineCreation(vk,
+        settings.m_pipeline_type);
+    pipeline_info.subpass = getSubpassForPipelineCreation(vk,
+        settings.m_pipeline_type);
     pipeline_info.basePipelineHandle = VK_NULL_HANDLE;
 
     struct Constants
     {
         VkBool32 m_ibl;
         float m_specular_levels_minus_one;
+        VkBool32 m_deferred;
+        VkBool32 m_skybox;
     };
     Constants constants = {};
     constants.m_ibl = getGEConfig()->m_pbr && getGEConfig()->m_ibl &&
@@ -1102,7 +1151,9 @@ void GEVulkanDrawCall::createPipeline(GEVulkanDriver* vk,
         m_skybox_renderer != NULL;
     float ts = GEVulkanEnvironmentMap::getSpecularEnvironmentMapSize().Width;
     constants.m_specular_levels_minus_one = std::floor(std::log2(ts));
-    std::array<VkSpecializationMapEntry, 2> specialization_entries = {};
+    constants.m_deferred = !m_deferred_layouts.empty();
+    constants.m_skybox = m_skybox_renderer != NULL;
+    std::array<VkSpecializationMapEntry, 4> specialization_entries = {};
     specialization_entries[0].constantID = 0;
     specialization_entries[0].offset = offsetof(Constants, m_ibl);
     specialization_entries[0].size = sizeof(VkBool32);
@@ -1110,6 +1161,12 @@ void GEVulkanDrawCall::createPipeline(GEVulkanDriver* vk,
     specialization_entries[1].offset = offsetof(Constants,
         m_specular_levels_minus_one);
     specialization_entries[1].size = sizeof(float);
+    specialization_entries[2].constantID = 2;
+    specialization_entries[2].offset = offsetof(Constants, m_deferred);
+    specialization_entries[2].size = sizeof(VkBool32);
+    specialization_entries[3].constantID = 3;
+    specialization_entries[3].offset = offsetof(Constants, m_skybox);
+    specialization_entries[3].size = sizeof(VkBool32);
     VkSpecializationInfo specialization_info = {};
     specialization_info.mapEntryCount = specialization_entries.size();
     specialization_info.pMapEntries = specialization_entries.data();
@@ -1412,8 +1469,9 @@ void GEVulkanDrawCall::createVulkanData()
     }
 
     all_layouts.resize(2);
-    pipeline_layout_info.setLayoutCount = all_layouts.size();
     all_layouts[0] = vk->getSkyBoxRenderer()->getDescriptorSetLayout();
+    pipeline_layout_info.setLayoutCount = all_layouts.size();
+    pipeline_layout_info.pSetLayouts = all_layouts.data();
     result = vkCreatePipelineLayout(vk->getDevice(), &pipeline_layout_info,
         NULL, &m_skybox_layout);
 
@@ -1423,6 +1481,26 @@ void GEVulkanDrawCall::createVulkanData()
             "vkCreatePipelineLayout failed for m_skybox_layout");
     }
 
+    if (vk->getRTTTexture() && vk->getRTTTexture()->isDeferredFBO())
+    {
+        m_deferred_layouts.resize(GVDFP_COUNT);
+        all_layouts.resize(3);
+        all_layouts[2] = vk->getSkyBoxRenderer()->getEnvDescriptorSetLayout();
+    }
+    for (unsigned i = 0; i < m_deferred_layouts.size(); i++)
+    {
+        all_layouts[0] = vk->getRTTTexture()->getDescriptorSetLayout(i);
+        if (all_layouts[0] == VK_NULL_HANDLE)
+            continue;
+        pipeline_layout_info.setLayoutCount = all_layouts.size();
+        pipeline_layout_info.pSetLayouts = all_layouts.data();
+        if (vkCreatePipelineLayout(vk->getDevice(), &pipeline_layout_info,
+            NULL, &m_deferred_layouts[i]) != VK_SUCCESS)
+        {
+            throw std::runtime_error(
+                "vkCreatePipelineLayout failed for m_deferred_layouts");
+        }
+    }
     createAllPipelines(vk);
 
     size_t extra_size = 0;
@@ -1941,12 +2019,70 @@ bool GEVulkanDrawCall::renderSkyBox(GEVulkanDriver* vk, VkCommandBuffer cmd)
 }   // renderSkyBox
 
 // ----------------------------------------------------------------------------
+void GEVulkanDrawCall::renderDeferredLighting(GEVulkanDriver* vk,
+                                              VkCommandBuffer cmd)
+{
+    if (m_deferred_layouts.empty())
+        return;
+    auto& pl = m_graphics_pipelines.at("deferred_pbr").m_pipelines;
+    vkCmdBindPipeline(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS,
+        *pl[GVPT_DEFERRED_LIGHTING]);
+    vkCmdBindDescriptorSets(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS,
+        m_deferred_layouts[GVDFP_HDR], 0, 1,
+        vk->getRTTTexture()->getDescriptorSet(GVDFP_HDR), 0, NULL);
+    int current_buffer_idx = vk->getCurrentBufferIdx();
+    std::vector<uint32_t> dynamic_offsets = getDefaultDynamicOffsets();
+    vkCmdBindDescriptorSets(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS,
+        m_deferred_layouts[GVDFP_HDR],
+        1, 1, &m_data_descriptor_sets[current_buffer_idx],
+        dynamic_offsets.size(), dynamic_offsets.data());
+    vkCmdBindDescriptorSets(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS,
+        m_deferred_layouts[GVDFP_HDR], 2, 1,
+        vk->getSkyBoxRenderer()->getEnvDescriptorSet(), 0, NULL);
+    unsigned fullscreen_light = m_light_handler ?
+        m_light_handler->getFullscreenLightCount() : 0;
+    vkCmdPushConstants(cmd, m_deferred_layouts[GVDFP_HDR],
+        VK_SHADER_STAGE_ALL_GRAPHICS, 0, sizeof(unsigned),
+        &fullscreen_light);
+    vkCmdDraw(cmd, 3, 1, 0, 0);
+
+    if (m_light_handler &&
+        m_light_handler->getLightCount() - fullscreen_light > 0)
+    {
+        auto& pl = m_graphics_pipelines.at("deferred_pointlight")
+            .m_pipelines;
+        vkCmdBindPipeline(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS,
+            *pl[GVPT_DEFERRED_LIGHTING]);
+        vkCmdPushConstants(cmd, m_deferred_layouts[GVDFP_HDR],
+            VK_SHADER_STAGE_ALL_GRAPHICS, 0, sizeof(btQuaternion),
+            &m_billboard_rotation);
+        vkCmdDraw(cmd, 4,
+            m_light_handler->getLightCount() - fullscreen_light,
+            0, fullscreen_light);
+    }
+}   // renderDeferredLighting
+
+// ----------------------------------------------------------------------------
+void GEVulkanDrawCall::renderDeferredConvertColor(GEVulkanDriver* vk,
+                                                  VkCommandBuffer cmd)
+{
+    if (m_deferred_layouts.empty())
+        return;
+    auto& pl = m_graphics_pipelines.at("deferred_convert_color").m_pipelines;
+    vkCmdBindPipeline(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS,
+        *pl[GVPT_DEFERRED_CONVERT_COLOR]);
+    vkCmdBindDescriptorSets(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS,
+        m_deferred_layouts[GVDFP_CONVERT_COLOR], 0, 1,
+        vk->getRTTTexture()->getDescriptorSet(GVDFP_CONVERT_COLOR), 0, NULL);
+    vkCmdDraw(cmd, 3, 1, 0, 0);
+}   // renderDeferredConvertColor
+
+// ----------------------------------------------------------------------------
 void GEVulkanDrawCall::bindSingleMaterial(VkCommandBuffer cmd,
                                           const std::string& cur_pipeline,
                                           int material_id,
                                           GEVulkanPipelineType pt)
 {
-    
     const PipelineData& data = m_graphics_pipelines.at(cur_pipeline);
     if (data.m_pipelines.find(pt) == data.m_pipelines.end())
         return;
@@ -2109,5 +2245,27 @@ bool GEVulkanDrawCall::bindPipeline(VkCommandBuffer cmd,
     }
     return true;
 }   // bindPipeline
+
+// ----------------------------------------------------------------------------
+VkRenderPass GEVulkanDrawCall::getRenderPassForPipelineCreation(
+                                                            GEVulkanDriver* vk,
+                                                     GEVulkanPipelineType type)
+{
+    return vk->getRTTTexture() ?
+        vk->getRTTTexture()->getRTTRenderPass() : vk->getRenderPass();
+}   // getRenderPassForPipelineCreation
+
+// ----------------------------------------------------------------------------
+uint32_t GEVulkanDrawCall::getSubpassForPipelineCreation(
+                                                            GEVulkanDriver* vk,
+                                                     GEVulkanPipelineType type)
+{
+    if (vk->getRTTTexture() && vk->getRTTTexture()->isDeferredFBO())
+    {
+        return type == GVPT_DEFERRED_LIGHTING || type == GVPT_SKYBOX ? 1 :
+            type >= GVPT_DEFERRED_CONVERT_COLOR ? 2 : 0;
+    }
+    return 0;
+}   // getSubpassForPipelineCreation
 
 }

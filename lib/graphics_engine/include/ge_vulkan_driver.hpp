@@ -314,6 +314,9 @@ namespace GE
                               { return m_vk->command_buffers[m_current_frame]; }
         std::vector<VkImage>& getSwapChainImages()
                                              { return m_vk->swap_chain_images; }
+        std::vector<VkImageView>& getSwapChainImageViews()
+                                        { return m_vk->swap_chain_image_views; }
+        VkFormat getSwapChainImageFormat() { return m_swap_chain_image_format; }
         std::vector<VkFramebuffer>& getSwapChainFramebuffers()
                                        { return m_vk->swap_chain_framebuffers; }
 
