@@ -198,6 +198,8 @@ private:
     std::vector<irr::scene::IAnimatedMeshSceneNode*> m_debug_meshes;
 #endif
     // ------------------------------------------------------------------------
+    void updateDisplace(float dt);
+    // ------------------------------------------------------------------------
     void resizeWindow();
 public:
     void doScreenShot();    

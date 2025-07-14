@@ -45,7 +45,6 @@
 #include "guiengine/engine.hpp"
 #include "tracks/track.hpp"
 #include "utils/log.hpp"
-#include "utils/helpers.hpp"
 #include "utils/profiler.hpp"
 #include "utils/string_utils.hpp"
 
@@ -151,36 +150,6 @@ ShaderBasedRenderer* getRenderer()
 }   // getRenderer
 
 // ----------------------------------------------------------------------------
-void displaceUniformAssigner(SP::SPUniformAssigner* ua)
-{
-    static std::array<float, 4> g_direction = {{ 0, 0, 0, 0 }};
-    if (!Track::getCurrentTrack())
-    {
-        ua->setValue(g_direction);
-        return;
-    }
-    const float time = irr_driver->getDevice()->getTimer()->getTime() /
-        1000.0f;
-    const float speed = Track::getCurrentTrack()->getDisplacementSpeed();
-
-    float strength = time;
-    strength = fabsf(noise2d(strength / 10.0f)) * 0.006f + 0.002f;
-
-    core::vector3df wind = irr_driver->getWind() * strength * speed;
-    g_direction[0] += wind.X;
-    g_direction[1] += wind.Z;
-
-    strength = time * 0.56f + sinf(time);
-    strength = fabsf(noise2d(0.0, strength / 6.0f)) * 0.0095f + 0.0025f;
-
-    wind = irr_driver->getWind() * strength * speed;
-    wind.rotateXZBy(cosf(time));
-    g_direction[2] += wind.X;
-    g_direction[3] += wind.Z;
-    ua->setValue(g_direction);
-}   // displaceUniformAssigner
-
-// ----------------------------------------------------------------------------
 void displaceShaderInit(SPShader* shader)
 {
     shader->addShaderFile("sp_pass.vert", GL_VERTEX_SHADER, RP_1ST);
@@ -245,7 +214,10 @@ void displaceShaderInit(SPShader* shader)
             glDisable(GL_STENCIL_TEST);
         }, RP_RESERVED);
     static_cast<SPPerObjectUniform*>(shader)
-        ->addAssignerFunction("direction", displaceUniformAssigner);
+        ->addAssignerFunction("direction", [](SP::SPUniformAssigner* ua)->void
+        {
+            ua->setValue(GE::getDisplaceDirection());
+        });
 }   // displaceShaderInit
 
 // ----------------------------------------------------------------------------

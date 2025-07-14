@@ -80,7 +80,9 @@ enum GEVulkanPipelineType : unsigned
     GVPT_DEFERRED_CONVERT_COLOR,
     GVPT_GHOST_DEPTH,
     GVPT_TRANSPARENT,
-    GVPT_SKYBOX
+    GVPT_SKYBOX,
+    GVPT_DISPLACE_MASK,
+    GVPT_DISPLACE_COLOR,
 };
 
 struct GEMaterial;
@@ -292,6 +294,9 @@ public:
     // ------------------------------------------------------------------------
     void renderDeferredConvertColor(GEVulkanDriver* vk, VkCommandBuffer cmd);
     // ------------------------------------------------------------------------
+    void renderDisplaceColor(GEVulkanDriver* vk, VkCommandBuffer cmd,
+                             VkBool32 has_displace);
+    // ------------------------------------------------------------------------
     unsigned getPolyCount() const
     {
         unsigned result = 0;
@@ -316,6 +321,14 @@ public:
     void addSkyBox(irr::scene::ISceneNode* node);
     // ------------------------------------------------------------------------
     void addLightNode(irr::scene::ILightSceneNode* node);
+    // ------------------------------------------------------------------------
+    bool hasShaderForRendering(const std::string& shader)
+    {
+        const std::string& dbk = getDynamicBufferKey(shader);
+        if (m_dynamic_spm_buffers.find(dbk) != m_dynamic_spm_buffers.end())
+            return true;
+        return m_materials_data.find(shader) != m_materials_data.end();
+    }
 };   // GEVulkanDrawCall
 
 }

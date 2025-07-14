@@ -818,6 +818,9 @@ start:
     }
     else
     {
+        // For hasShaderForRendering
+        for (unsigned i = 0; i < m_cmds.size(); i++)
+            m_materials_data[m_cmds[i].m_shader] = {};
         // Make sure dynamic offset of objects won't become invalid
         if (skinning_data_padded_size + (object_data_padded_size * 2) >
             m_sbo_data->getSize())
@@ -842,7 +845,10 @@ std::string GEVulkanDrawCall::getShader(const irr::video::SMaterial& m)
 {
     std::string shader = GEMaterialManager::getShader(m.MaterialType);
     auto material = GEMaterialManager::getMaterial(shader);
-    if (!getGEConfig()->m_pbr && !material->m_nonpbr_fallback.empty())
+    if ((!getGEConfig()->m_pbr && !material->m_nonpbr_fallback.empty()) ||
+        ((m_deferred_layouts.empty() ||
+        m_deferred_layouts[GVDFP_DISPLACE_COLOR] == VK_NULL_HANDLE) &&
+        shader == "displace"))
     {
         shader = material->m_nonpbr_fallback;
         material = GEMaterialManager::getMaterial(shader);
@@ -926,20 +932,40 @@ void GEVulkanDrawCall::createAllPipelines(GEVulkanDriver* vk)
     drawing_order = drawing_order + 1;
     settings.m_depth_op = VK_COMPARE_OP_LESS;
 
+    bool has_displace = getGEConfig()->m_pbr && !m_deferred_layouts.empty() &&
+        m_deferred_layouts[GVDFP_DISPLACE_COLOR] != VK_NULL_HANDLE;
     for (auto& p : GEMaterialManager::g_materials)
     {
         if (!p.second->isTransparent())
             continue;
         if (!getGEConfig()->m_pbr && !p.second->m_nonpbr_fallback.empty())
             continue;
+        bool is_displace = p.first == "displace";
+        if (!has_displace && is_displace)
+            continue;
         settings.m_drawing_priority = (char)drawing_order;
         drawing_order = drawing_order + 1;
         settings.m_shader_name = p.first;
         settings.m_material = p.second;
+        if (is_displace)
+            settings.m_pipeline_type = GVPT_DISPLACE_COLOR;
+        createPipeline(vk, settings, dp_cache);
+    }
+
+    if (has_displace)
+    {
+        def_mat.m_alphablend = false;
+        def_mat.m_fragment_shader = "displace_mask.frag";
+        def_mat.m_backface_culling = false;
+        settings.loadMaterial(def_mat);
+
+        settings.m_shader_name = "displace";
+        settings.m_pipeline_type = GVPT_DISPLACE_MASK;
         createPipeline(vk, settings, dp_cache);
     }
 
     def_mat.m_alphablend = false;
+    def_mat.m_backface_culling = true;
     def_mat.m_skinning_vertex_shader = "";
     def_mat.m_vertex_shader = "fullscreen_quad.vert";
     def_mat.m_fragment_shader = "skybox.frag";
@@ -983,6 +1009,16 @@ void GEVulkanDrawCall::createAllPipelines(GEVulkanDriver* vk)
     settings.m_pipeline_type = GVPT_DEFERRED_CONVERT_COLOR;
     settings.m_custom_pl = m_deferred_layouts[GVDFP_CONVERT_COLOR];
     createPipeline(vk, settings, dp_cache);
+
+    if (has_displace)
+    {
+        def_mat.m_fragment_shader = "displace_color.frag";
+        settings.loadMaterial(def_mat);
+        settings.m_shader_name = "displace_color";
+        settings.m_pipeline_type = GVPT_DISPLACE_COLOR;
+        settings.m_custom_pl = m_deferred_layouts[GVDFP_DISPLACE_COLOR];
+        createPipeline(vk, settings, dp_cache);
+    }
 }   // createAllPipelines
 
 // ----------------------------------------------------------------------------
@@ -1088,13 +1124,29 @@ void GEVulkanDrawCall::createPipeline(GEVulkanDriver* vk,
         color_blend_attachment[0].dstAlphaBlendFactor = VK_BLEND_FACTOR_ONE;
         color_blend_attachment[0].alphaBlendOp = VK_BLEND_OP_ADD;
     }
-    if (vk->getRTTTexture() &&
-        vk->getRTTTexture()->getZeroClearCountForPass(GVDFP_HDR) > 1 &&
-        settings.m_pipeline_type <= GVPT_SOLID)
+    if (vk->getRTTTexture() && vk->getRTTTexture()->isDeferredFBO())
     {
-        color_blend_attachment.resize(
-            vk->getRTTTexture()->getZeroClearCountForPass(GVDFP_HDR),
-            color_blend_attachment[0]);
+        switch (settings.m_pipeline_type)
+        {
+        case GVPT_DEPTH:
+        case GVPT_SOLID:
+            color_blend_attachment.resize(vk->getRTTTexture()
+                ->getZeroClearCountForPass(GVDFP_HDR),
+                color_blend_attachment[0]);
+            break;
+        case GVPT_DISPLACE_MASK:
+            color_blend_attachment.resize(vk->getRTTTexture()
+                ->getZeroClearCountForPass(GVDFP_DISPLACE_MASK),
+                color_blend_attachment[0]);
+            break;
+        case GVPT_DISPLACE_COLOR:
+            color_blend_attachment.resize(vk->getRTTTexture()
+                ->getZeroClearCountForPass(GVDFP_DISPLACE_COLOR),
+                color_blend_attachment[0]);
+            break;
+        default:
+            break;
+        }
     }
     VkPipelineColorBlendStateCreateInfo color_blending = {};
     color_blending.sType = VK_STRUCTURE_TYPE_PIPELINE_COLOR_BLEND_STATE_CREATE_INFO;
@@ -2078,6 +2130,30 @@ void GEVulkanDrawCall::renderDeferredConvertColor(GEVulkanDriver* vk,
 }   // renderDeferredConvertColor
 
 // ----------------------------------------------------------------------------
+void GEVulkanDrawCall::renderDisplaceColor(GEVulkanDriver* vk,
+                                           VkCommandBuffer cmd,
+                                           VkBool32 has_displace)
+{
+    if (m_deferred_layouts.empty())
+        return;
+    auto& pl = m_graphics_pipelines.at("displace_color").m_pipelines;
+    vkCmdBindPipeline(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS,
+        *pl[GVPT_DISPLACE_COLOR]);
+    vkCmdBindDescriptorSets(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS,
+        m_deferred_layouts[GVDFP_DISPLACE_COLOR], 0, 1,
+        vk->getRTTTexture()->getDescriptorSet(GVDFP_DISPLACE_COLOR), 0, NULL);
+    int current_buffer_idx = vk->getCurrentBufferIdx();
+    std::vector<uint32_t> dynamic_offsets = getDefaultDynamicOffsets();
+    vkCmdBindDescriptorSets(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS,
+        m_deferred_layouts[GVDFP_DISPLACE_COLOR],
+        1, 1, &m_data_descriptor_sets[current_buffer_idx],
+        dynamic_offsets.size(), dynamic_offsets.data());
+    vkCmdPushConstants(cmd, m_deferred_layouts[GVDFP_DISPLACE_COLOR],
+        VK_SHADER_STAGE_ALL_GRAPHICS, 0, sizeof(VkBool32), &has_displace);
+    vkCmdDraw(cmd, 3, 1, 0, 0);
+}   // renderDisplaceColor
+
+// ----------------------------------------------------------------------------
 void GEVulkanDrawCall::bindSingleMaterial(VkCommandBuffer cmd,
                                           const std::string& cur_pipeline,
                                           int material_id,
@@ -2251,8 +2327,26 @@ VkRenderPass GEVulkanDrawCall::getRenderPassForPipelineCreation(
                                                             GEVulkanDriver* vk,
                                                      GEVulkanPipelineType type)
 {
-    return vk->getRTTTexture() ?
-        vk->getRTTTexture()->getRTTRenderPass() : vk->getRenderPass();
+    GEVulkanFBOTexture* fbo = vk->getRTTTexture();
+    if (fbo)
+    {
+        if (fbo->getRTTRenderPassCount() == 1)
+            return fbo->getRTTRenderPass();
+        else
+        {
+            switch (type)
+            {
+            case GVPT_DISPLACE_MASK:
+                return fbo->getRTTRenderPass(GVDFP_DISPLACE_MASK);
+            case GVPT_DISPLACE_COLOR:
+                return fbo->getRTTRenderPass(GVDFP_DISPLACE_COLOR);
+            default:
+                return fbo->getRTTRenderPass(0);
+            }
+        }
+    }
+    else
+        return vk->getRenderPass();
 }   // getRenderPassForPipelineCreation
 
 // ----------------------------------------------------------------------------
@@ -2262,6 +2356,12 @@ uint32_t GEVulkanDrawCall::getSubpassForPipelineCreation(
 {
     if (vk->getRTTTexture() && vk->getRTTTexture()->isDeferredFBO())
     {
+        auto* dfbo = static_cast<GEVulkanDeferredFBO*>(vk->getRTTTexture());
+        if (dfbo->getAttachment<GVDFT_DISPLACE_COLOR>())
+        {
+            if (type == GVPT_DISPLACE_MASK || type == GVPT_DISPLACE_COLOR)
+                return 0;
+        }
         return type == GVPT_DEFERRED_LIGHTING || type == GVPT_SKYBOX ? 1 :
             type >= GVPT_DEFERRED_CONVERT_COLOR ? 2 : 0;
     }

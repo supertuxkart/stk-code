@@ -581,6 +581,17 @@ void Material::install(std::function<void(video::IImage*)> image_mani,
 
     for (unsigned i = 2; i < m_sampler_path.size(); i++)
     {
+        if (m_shader_name == "displace" && i == 2 && m_sampler_path[i].empty())
+        {
+            const std::string& displace_mask_path =
+                file_manager->searchTexture("displace.png");
+            if (!displace_mask_path.empty())
+            {
+                m_sampler_path[2] =
+                    file_manager->getFileSystem()->getAbsolutePath(
+                    displace_mask_path.c_str()).c_str();
+            }
+        }
         if (m_sampler_path[i].empty())
             continue;
         GE::getGEConfig()->m_ondemand_load_texture_paths.insert(
@@ -994,8 +1005,6 @@ void  Material::setMaterialProperties(video::SMaterial *m, scene::IMeshBuffer* m
     {
         m->MaterialType =
             GE::GEMaterialManager::getIrrMaterialType(m_shader_name);
-        if (m_shader_name == "displace")
-            m->MaterialType = video::EMT_TRANSPARENT_ALPHA_CHANNEL;
         for (unsigned i = 2; i < m_sampler_path.size(); i++)
         {
             if (m_vk_textures[i - 2])

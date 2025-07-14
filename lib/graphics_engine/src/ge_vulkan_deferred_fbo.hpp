@@ -12,6 +12,8 @@ enum GEVulkanDeferredFBOType : unsigned
     GVDFT_COLOR = 0,
     GVDFT_NORMAL,
     GVDFT_HDR,
+    GVDFT_DISPLACE_MASK,
+    GVDFT_DISPLACE_COLOR,
     GVDFT_COUNT,
 };
 
@@ -19,6 +21,8 @@ enum GEVulkanDeferredFBOPass : unsigned
 {
     GVDFP_HDR = 0,
     GVDFP_CONVERT_COLOR,
+    GVDFP_DISPLACE_MASK,
+    GVDFP_DISPLACE_COLOR,
     GVDFP_COUNT,
 };
 
@@ -36,6 +40,10 @@ private:
     const bool m_swapchain_output;
     // ------------------------------------------------------------------------
     void initConvertColorDescriptor(GEVulkanDriver* vk);
+    // ------------------------------------------------------------------------
+    void initDisplaceDescriptor(GEVulkanDriver* vk);
+    // ------------------------------------------------------------------------
+    void createDisplacePasses();
 public:
     // ------------------------------------------------------------------------
     GEVulkanDeferredFBO(GEVulkanDriver* vk, const core::dimension2d<u32>& size,
@@ -66,6 +74,9 @@ public:
             }
             return count;
         }
+        case GVDFP_DISPLACE_MASK:
+        case GVDFP_DISPLACE_COLOR:
+            return 1;
         default:
             return GEVulkanFBOTexture::getZeroClearCountForPass(pass);
         }
@@ -76,6 +87,12 @@ public:
     // ------------------------------------------------------------------------
     virtual const VkDescriptorSet* getDescriptorSet(unsigned id) const
                                            { return &m_descriptor_set.at(id); }
+    // ------------------------------------------------------------------------
+    template<unsigned AttachmentType>
+    GEVulkanAttachmentTexture* getAttachment() const
+    {
+        return std::get<AttachmentType>(m_attachments);
+    }
 };   // GEVulkanDeferredFBO
 
 }

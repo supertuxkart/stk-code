@@ -83,6 +83,7 @@
 #include "utils/command_line.hpp"
 #include "utils/constants.hpp"
 #include "utils/file_utils.hpp"
+#include "utils/helpers.hpp"
 #include "utils/log.hpp"
 #include "utils/profiler.hpp"
 #include "utils/string_utils.hpp"
@@ -2137,6 +2138,33 @@ void IrrDriver::handleWindowResize()
 }   // handleWindowResize
 
 // ----------------------------------------------------------------------------
+void IrrDriver::updateDisplace(float dt)
+{
+#ifndef SERVER_ONLY
+    if (!Track::getCurrentTrack())
+        return;
+
+    const float time = m_device->getTimer()->getTime() / 1000.0f;
+    const float speed = Track::getCurrentTrack()->getDisplacementSpeed();
+
+    float strength = time;
+    strength = fabsf(noise2d(strength / 10.0f)) * 0.006f + 0.002f;
+
+    core::vector3df wind = m_wind->getWind() * strength * speed;
+    GE::getDisplaceDirection()[0] += wind.X * dt;
+    GE::getDisplaceDirection()[1] += wind.Z * dt;
+
+    strength = time * 0.56f + sinf(time);
+    strength = fabsf(noise2d(0.0, strength / 6.0f)) * 0.0095f + 0.0025f;
+
+    wind = m_wind->getWind() * strength * speed;
+    wind.rotateXZBy(cosf(time));
+    GE::getDisplaceDirection()[2] += wind.X * dt;
+    GE::getDisplaceDirection()[3] += wind.Z * dt;
+#endif
+}   // updateDisplace
+
+// ----------------------------------------------------------------------------
 /** Update, called once per frame.
  *  \param dt Time since last update
  *  \param is_loading True if the rendering is called during loading of world,
@@ -2175,6 +2203,7 @@ void IrrDriver::update(float dt, bool is_loading)
     if (world)
     {
 #ifndef SERVER_ONLY
+        updateDisplace(dt);
         m_renderer->render(dt, is_loading);
 
         GUIEngine::Screen* current_screen = GUIEngine::getCurrentScreen();

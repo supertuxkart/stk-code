@@ -3,6 +3,7 @@
 #include "../source/Irrlicht/os.h"
 
 #include "ge_main.hpp"
+#include "ge_material_manager.hpp"
 #include "ge_vulkan_animated_mesh_scene_node.hpp"
 #include "ge_vulkan_camera_scene_node.hpp"
 #include "ge_vulkan_command_loader.hpp"
@@ -286,6 +287,17 @@ void GEVulkanSceneManager::detectDeferred(irr::scene::ISceneNode* node)
                 m_spotlight_count++;
             break;
         }
+        case irr::scene::ESNT_ANIMATED_MESH:
+        case irr::scene::ESNT_MESH:
+        {
+            for (unsigned i = 0; i < node->getMaterialCount(); i++)
+            {
+                irr::video::SMaterial& m = node->getMaterial(i);
+                if (GEMaterialManager::getShader(m.MaterialType) == "displace")
+                    m_displace_count++;
+            }
+            break;
+        }
         default:
             break;
         }
@@ -297,6 +309,8 @@ void GEVulkanSceneManager::detectDeferred(irr::scene::ISceneNode* node)
 // ----------------------------------------------------------------------------
 GEAutoDeferredType GEVulkanSceneManager::getDetectDeferredResult() const
 {
+    if (m_displace_count > 0)
+        return GADT_DISPLACE;
 #if defined(TILED_GPU)
     if (m_spotlight_count > 0 ||
         m_pointlight_count > MAX_RENDERING_LIGHT / 2)
@@ -312,10 +326,13 @@ void GEVulkanSceneManager::addDrawCall(GEVulkanCameraSceneNode* cam)
     if (!gevk->getSeparateRTTTexture())
     {
         bool prev_deferred = needsDeferredRendering();
+        GEAutoDeferredType prev_deferred_type =
+            getGEConfig()->m_auto_deferred_type;
         resetDetectDeferred();
         detectDeferred(this);
         getGEConfig()->m_auto_deferred_type = getDetectDeferredResult();
-        if (needsDeferredRendering() != prev_deferred)
+        if (needsDeferredRendering() != prev_deferred ||
+            prev_deferred_type != getGEConfig()->m_auto_deferred_type)
             gevk->updateDriver();
     }
     m_draw_calls[cam] = gevk->getDrawCallFromCache();

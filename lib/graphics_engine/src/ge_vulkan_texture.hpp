@@ -20,9 +20,12 @@ using namespace irr;
 namespace GE
 {
 class GEVulkanDriver;
+class GEVulkanDeferredFBO;
 class GEVulkanTexture : public video::ITexture
 {
 protected:
+    friend class GEVulkanDeferredFBO;
+
     core::dimension2d<u32> m_size, m_orig_size;
 
     std::function<void(video::IImage*)> m_image_mani;

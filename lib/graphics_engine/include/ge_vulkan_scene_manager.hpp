@@ -14,7 +14,7 @@ enum GEAutoDeferredType : unsigned;
 class GEVulkanSceneManager : public irr::scene::CSceneManager
 {
 private:
-    unsigned m_pointlight_count, m_spotlight_count;
+    unsigned m_pointlight_count, m_spotlight_count, m_displace_count;
 
     std::map<GEVulkanCameraSceneNode*, std::unique_ptr<GEVulkanDrawCall> > m_draw_calls;
 
@@ -23,7 +23,7 @@ private:
     // ------------------------------------------------------------------------
     void resetDetectDeferred()
     {
-        m_pointlight_count = m_spotlight_count = 0;
+        m_pointlight_count = m_spotlight_count = m_displace_count = 0;
     }
     // ------------------------------------------------------------------------
     GEAutoDeferredType getDetectDeferredResult() const;

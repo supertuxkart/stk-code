@@ -236,9 +236,18 @@ void GEVulkan2dRenderer::createGraphicsPipeline()
     pipeline_info.pDynamicState = &dynamic_state_info;
     pipeline_info.layout = g_pipeline_layout;
     GEVulkanFBOTexture* rtt = g_vk->getRTTTexture();
+    bool rpc1 = rtt && rtt->getRTTRenderPassCount() == 1;
     bool sco = rtt && rtt->useSwapChainOutput();
-    pipeline_info.renderPass = sco ? rtt->getRTTRenderPass() : g_vk->getRenderPass();
-    pipeline_info.subpass = sco ? 2 : 0;
+    if (sco)
+    {
+        if (rpc1)
+            pipeline_info.renderPass = rtt->getRTTRenderPass();
+        else
+            pipeline_info.renderPass = rtt->getRTTRenderPass(rtt->getRTTRenderPassCount() - 1);
+    }
+    else
+        pipeline_info.renderPass = g_vk->getRenderPass();
+    pipeline_info.subpass = sco && rpc1 ? 2 : 0;
     pipeline_info.basePipelineHandle = VK_NULL_HANDLE;
 
     VkResult result = vkCreateGraphicsPipelines(g_vk->getDevice(),

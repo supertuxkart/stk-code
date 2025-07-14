@@ -38,6 +38,14 @@ std::unordered_map<std::string, std::function<void(uint32_t*, void**)> >
                 *size = sizeof(irr::core::vector3df);
                 *data = &g_wind_direction;
             }
+        },
+        {
+            "displace",
+            [](uint32_t* size, void** data)
+            {
+                *size = sizeof(getDisplaceDirection());
+                *data = getDisplaceDirection().data();
+            }
         }
     };
 // ============================================================================

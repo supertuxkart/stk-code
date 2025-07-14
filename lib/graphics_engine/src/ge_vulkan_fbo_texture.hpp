@@ -56,6 +56,9 @@ public:
     VkRenderPass getRTTRenderPass(unsigned id = 0) const
                                            { return m_rtt_render_pass.at(id); }
     // ------------------------------------------------------------------------
+    unsigned getRTTRenderPassCount() const
+                                           { return m_rtt_render_pass.size(); }
+    // ------------------------------------------------------------------------
     VkFramebuffer getRTTFramebuffer(unsigned id = 0) const
                                           { return m_rtt_frame_buffer.at(id); }
     // ------------------------------------------------------------------------

@@ -5,6 +5,7 @@
 #include <matrix4.h>
 #include <SColor.h>
 
+#include <array>
 #include <cstdint>
 #include <string>
 #include <unordered_set>
@@ -25,7 +26,8 @@ class GEVulkanDriver;
 enum GEAutoDeferredType : unsigned
 {
     GADT_DISABLED = 0,
-    GADT_SINGLE_PASS
+    GADT_SINGLE_PASS,
+    GADT_DISPLACE
 };
 
 struct GEConfig
@@ -111,6 +113,7 @@ GEOcclusionCulling* getOcclusionCulling();
 void resetOcclusionCulling();
 bool hasOcclusionCulling();
 bool needsDeferredRendering(bool auto_deferred = true);
+std::array<float, 4>& getDisplaceDirection();
 
 }
 #endif

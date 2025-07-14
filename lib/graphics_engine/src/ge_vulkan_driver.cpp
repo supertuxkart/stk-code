@@ -2438,7 +2438,8 @@ void GEVulkanDriver::buildCommandBuffers()
     if (m_rtt_texture)
     {
         render_pass_info.renderPass = m_rtt_texture->getRTTRenderPass();
-        if (m_rtt_texture->useSwapChainOutput())
+        if (m_rtt_texture->useSwapChainOutput() &&
+            m_rtt_texture->getRTTRenderPassCount() == 1)
         {
             render_pass_info.framebuffer =
                 m_rtt_texture->getRTTFramebuffer(getCurrentImageIndex());
@@ -2517,6 +2518,16 @@ void GEVulkanDriver::renderDrawCalls(
     if (m_rtt_texture && m_rtt_texture->isDeferredFBO())
     {
         bool multiple_viewports = p.size() > 1;
+        auto* dfbo = static_cast<GEVulkanDeferredFBO*>(m_rtt_texture);
+
+        std::array<VkClearValue, GVDFT_COUNT> zeros = {};
+        VkRenderPassBeginInfo render_pass_info = {};
+        render_pass_info.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
+        render_pass_info.pClearValues = zeros.data();
+        render_pass_info.renderArea.offset = {0, 0};
+        render_pass_info.renderArea.extent = {
+            m_rtt_texture->getSize().Width, m_rtt_texture->getSize().Height };
+
         for (auto& q : p)
         {
             if (bind_mesh_textures)
@@ -2555,6 +2566,75 @@ void GEVulkanDriver::renderDrawCalls(
                 rebind_base_vertex);
             q.first->renderPipeline(this, cmd, GVPT_TRANSPARENT,
                 rebind_base_vertex);
+        }
+        if (dfbo->getAttachment<GVDFT_DISPLACE_COLOR>())
+        {
+            bool has_displace = false;
+            for (auto& q : p)
+            {
+                if (q.first->hasShaderForRendering("displace") ||
+                    q.first->hasShaderForRendering("displace_skinning"))
+                {
+                    has_displace = true;
+                    break;
+                }
+            }
+            if (has_displace)
+            {
+                vkCmdEndRenderPass(cmd);
+                render_pass_info.clearValueCount = m_rtt_texture
+                    ->getZeroClearCountForPass(GVDFP_DISPLACE_MASK);
+                render_pass_info.renderPass = m_rtt_texture
+                    ->getRTTRenderPass(GVDFP_DISPLACE_MASK);
+                render_pass_info.framebuffer = m_rtt_texture
+                    ->getRTTFramebuffer(GVDFP_DISPLACE_MASK);
+                vkCmdBeginRenderPass(cmd, &render_pass_info,
+                    VK_SUBPASS_CONTENTS_INLINE);
+                for (auto& q : p)
+                {
+                    if (multiple_viewports)
+                        q.first->prepareViewport(this, q.second, cmd);
+                    if (bind_mesh_textures)
+                        q.first->bindAllMaterials(cmd);
+                    else
+                        rebind_base_vertex = true;
+                    q.first->renderPipeline(this, cmd, GVPT_DISPLACE_MASK,
+                        rebind_base_vertex);
+                }
+            }
+            vkCmdEndRenderPass(cmd);
+            render_pass_info.clearValueCount =
+                m_rtt_texture->getZeroClearCountForPass(GVDFP_DISPLACE_COLOR);
+            render_pass_info.renderPass =
+                m_rtt_texture->getRTTRenderPass(GVDFP_DISPLACE_COLOR);
+            if (m_rtt_texture->useSwapChainOutput())
+            {
+                render_pass_info.framebuffer =
+                    m_rtt_texture->getRTTFramebuffer(
+                    GVDFP_DISPLACE_COLOR + getCurrentImageIndex());
+            }
+            else
+            {
+                render_pass_info.framebuffer =
+                    m_rtt_texture->getRTTFramebuffer(GVDFP_DISPLACE_COLOR);
+            }
+            vkCmdBeginRenderPass(cmd, &render_pass_info,
+                VK_SUBPASS_CONTENTS_INLINE);
+            for (auto& q : p)
+            {
+                if (multiple_viewports)
+                    q.first->prepareViewport(this, q.second, cmd);
+                q.first->renderDisplaceColor(this, cmd, has_displace);
+                if (has_displace)
+                {
+                    if (bind_mesh_textures)
+                        q.first->bindAllMaterials(cmd);
+                    else
+                        rebind_base_vertex = true;
+                    q.first->renderPipeline(this, cmd, GVPT_DISPLACE_COLOR,
+                        rebind_base_vertex);
+                }
+            }
         }
     }
     else

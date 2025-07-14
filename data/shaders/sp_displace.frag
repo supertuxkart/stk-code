@@ -7,23 +7,16 @@ uniform sampler2D color_tex;
 uniform vec4 direction;
 
 in vec2 uv;
-in float camdist;
 
 out vec4 o_diffuse_color;
 
-const float maxlen = 0.02;
-
 void main()
 {
-    float horiz = texture(displacement_tex, uv + direction.xy).x;
-    float vert = texture(displacement_tex, (uv.yx + direction.zw) * vec2(0.9)).x;
+    float horiz = texture(displacement_tex, uv + direction.xy * 150.).x;
+    float vert = texture(displacement_tex, (uv.yx + direction.zw * 150.) * vec2(0.9)).x;
 
     vec2 offset = vec2(horiz, vert);
-    offset *= 2.0;
-    offset -= 1.0;
-
-    // Fade according to distance to cam
-    float fade = 1.0 - smoothstep(1.0, 100.0, camdist);
+    offset = 2.0 * offset - 1.0;
 
     vec4 shiftval;
     shiftval.r = step(offset.x, 0.0) * -offset.x;
