@@ -227,9 +227,13 @@ void World::init()
     main_loop->renderGUI(6998);
     if (gk > 0)
     {
-        StateManager::ActivePlayer* p = StateManager::get()->getActivePlayer(0);
-        if (p)
-            p->setKart(NULL);
+        unsigned player_count = StateManager::get()->getActivePlayers().size();
+        for (unsigned p = 0; p < player_count; p++)
+        {
+            StateManager::ActivePlayer* pl = StateManager::get()->getActivePlayer(p);
+            if (pl)
+                pl->setKart(NULL);
+        }
         ReplayPlay::get()->load();
         for (unsigned int k = 0; k < gk; k++)
             m_karts.push_back(ReplayPlay::get()->getGhostKart(k));
