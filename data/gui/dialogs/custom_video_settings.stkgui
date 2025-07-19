@@ -67,9 +67,9 @@
             <spacer height="4" width="10" />
 
             <div layout="horizontal-row" proportion="1" height="fit">
-                <checkbox id="lightshaft"/>
+                <checkbox id="ibl"/>
                 <spacer width="10" height="10"/>
-                <label text="Light shaft (God rays)" I18N="Video settings"/>
+                <label text="Image-based lighting" I18N="Video settings"/>
             </div>
         </div>
 
@@ -79,9 +79,9 @@
             <spacer width="70" height="10"/>
 
             <div layout="horizontal-row" proportion="1" height="fit">
-                <checkbox id="ibl"/>
+                <checkbox id="lightshaft"/>
                 <spacer width="10" height="10"/>
-                <label text="Image-based lighting" I18N="Video settings"/>
+                <label text="Light shaft (God rays)" I18N="Video settings"/>
             </div>
 
             <spacer height="4" width="10" />
