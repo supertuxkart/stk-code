@@ -363,16 +363,6 @@ enum AnimType {ANIMS_NONE         = 0,
                ANIMS_PLAYERS_ONLY = 1,
                ANIMS_ALL          = 2 };
 
-enum GeometryLevel
-{
-    /** Display everything */
-    GEOLEVEL_0    = 0,
-    /** a few details are displayed */
-    GEOLEVEL_1    = 1,
-    /** Lowest level, no details are displayed. */
-    GEOLEVEL_2    = 2
-};
-
 enum MultitouchControls
 {
     MULTITOUCH_CONTROLS_UNDEFINED = 0,
@@ -689,13 +679,13 @@ namespace UserConfigParams
         &m_video_group, "Enable high definition textures. Bit flag: "
                         "bit 0 = enabled/disabled; bit 1 = set by user/set as default"));
     PARAM_PREFIX BoolUserConfigParam        m_glow
-        PARAM_DEFAULT(BoolUserConfigParam(false, "enable_glow",
+        PARAM_DEFAULT(BoolUserConfigParam(true, "enable_glow",
         &m_video_group, "Enable Glow"));
     PARAM_PREFIX BoolUserConfigParam        m_bloom
-        PARAM_DEFAULT(BoolUserConfigParam(false, "enable_bloom",
+        PARAM_DEFAULT(BoolUserConfigParam(true, "enable_bloom",
         &m_video_group, "Enable Bloom"));
     PARAM_PREFIX BoolUserConfigParam        m_light_shaft
-        PARAM_DEFAULT(BoolUserConfigParam(false, "enable_light_shaft",
+        PARAM_DEFAULT(BoolUserConfigParam(true, "enable_light_shaft",
         &m_video_group, "Enable Light Shafts"));
     PARAM_PREFIX BoolUserConfigParam        m_dynamic_lights
         PARAM_DEFAULT(BoolUserConfigParam(true, "enable_dynamic_lights",
@@ -716,7 +706,7 @@ namespace UserConfigParams
                         "disabled"));
 
     PARAM_PREFIX BoolUserConfigParam        m_hq_mipmap
-        PARAM_DEFAULT(BoolUserConfigParam(false, "hq_mipmap",
+        PARAM_DEFAULT(BoolUserConfigParam(true, "hq_mipmap",
         &m_video_group, "Generate mipmap for textures using "
                         "high quality method with SSE"));
     PARAM_PREFIX FloatUserConfigParam         m_font_size
@@ -983,13 +973,14 @@ namespace UserConfigParams
                 "Whether to display animated characters") );
 
     PARAM_PREFIX IntUserConfigParam        m_geometry_level
-            PARAM_DEFAULT(  IntUserConfigParam(GEOLEVEL_0,
+            PARAM_DEFAULT(  IntUserConfigParam(3,
                             "geometry_level", &m_graphics_quality,
-                "Geometry quality 0=everything is displayed; "
-                "1=a few details are displayed; 2=lowest level, no details") );
+                "Geometry quality ; determines level-of-detail distances and the maximum quality of models "
+                "if the switching distance would be too close. For backwards compatibility 2 means lowest level,"
+                "1 is then better than 2 and 0 than 1. Then levels 3 to 5 work normally with higher being better.") );
 
     PARAM_PREFIX IntUserConfigParam         m_anisotropic
-            PARAM_DEFAULT( IntUserConfigParam(4, "anisotropic",
+            PARAM_DEFAULT( IntUserConfigParam(16, "anisotropic",
                            &m_graphics_quality,
                            "Quality of anisotropic filtering (usual values include 2-4-8-16; 0 to disable)") );
 
@@ -1002,7 +993,7 @@ namespace UserConfigParams
                            "motionblur_enabled", &m_graphics_quality,
                            "Whether motion blur should be enabled") );
     PARAM_PREFIX BoolUserConfigParam         m_mlaa
-            PARAM_DEFAULT( BoolUserConfigParam(false,
+            PARAM_DEFAULT( BoolUserConfigParam(true,
                            "mlaa", &m_graphics_quality,
                            "Whether MLAA anti-aliasing should be enabled") );
     PARAM_PREFIX BoolUserConfigParam          m_ssao
@@ -1014,7 +1005,7 @@ namespace UserConfigParams
                            "light_scatter", &m_graphics_quality,
                            "Enable light scattering shaders") );
     PARAM_PREFIX IntUserConfigParam          m_shadows_resolution
-            PARAM_DEFAULT( IntUserConfigParam(0,
+            PARAM_DEFAULT( IntUserConfigParam(512,
                            "shadows_resolution", &m_graphics_quality,
                            "Shadow resolution (0 = disabled") );
     PARAM_PREFIX BoolUserConfigParam          m_pcss
@@ -1022,7 +1013,7 @@ namespace UserConfigParams
                            "pcss", &m_graphics_quality,
                            "Enable Percentage Closer Soft Shadows") );
     PARAM_PREFIX BoolUserConfigParam          m_degraded_IBL
-        PARAM_DEFAULT(BoolUserConfigParam(true,
+        PARAM_DEFAULT(BoolUserConfigParam(false,
         "Degraded_IBL", &m_graphics_quality,
         "Disable specular IBL"));
 
