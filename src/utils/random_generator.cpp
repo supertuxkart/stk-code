@@ -18,18 +18,19 @@
 
 #include "utils/random_generator.hpp"
 
-#include <stdlib.h>
-#include <ctime>
-
 //std::vector<RandomGenerator*> RandomGenerator::m_all_random_generators;
 
-RandomGenerator::RandomGenerator()
-{
-    m_a = 1103515245;
-    m_c = 12345;
-    //m_all_random_generators.push_back(this);
-    m_random_value = 3141591;
-}   // RandomGenerator
+unsigned int RandomGenerator::m_random_value = RandomGenerator::default_seed;
+
+std::mt19937& RandomGenerator::getGenerator() {
+   static thread_local std::mt19937 generator = [] {
+      if (m_random_value == default_seed)
+         return std::mt19937{std::random_device{}()};
+      else
+         return std::mt19937{m_random_value};
+   }();
+   return generator;
+}
 
 // ----------------------------------------------------------------------------
 #if 0
