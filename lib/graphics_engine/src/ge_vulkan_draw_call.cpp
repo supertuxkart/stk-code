@@ -1521,7 +1521,7 @@ void GEVulkanDrawCall::createVulkanData()
     }
 
     all_layouts.resize(2);
-    all_layouts[0] = vk->getSkyBoxRenderer()->getDescriptorSetLayout();
+    all_layouts[0] = vk->getSkyBoxRenderer()->getEnvDescriptorSetLayout();
     pipeline_layout_info.setLayoutCount = all_layouts.size();
     pipeline_layout_info.pSetLayouts = all_layouts.data();
     result = vkCreatePipelineLayout(vk->getDevice(), &pipeline_layout_info,
@@ -2054,12 +2054,13 @@ void GEVulkanDrawCall::addSkyBox(scene::ISceneNode* node)
 // ----------------------------------------------------------------------------
 bool GEVulkanDrawCall::renderSkyBox(GEVulkanDriver* vk, VkCommandBuffer cmd)
 {
-    if (!m_skybox_renderer || !m_skybox_renderer->getDescriptorSet())
+    if (!m_skybox_renderer)
         return false;
     vkCmdBindPipeline(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS,
         *m_graphics_pipelines["skybox"].m_pipelines[GVPT_SKYBOX].get());
     vkCmdBindDescriptorSets(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS,
-        m_skybox_layout, 0, 1, m_skybox_renderer->getDescriptorSet(), 0, NULL);
+        m_skybox_layout, 0, 1, m_skybox_renderer->getEnvDescriptorSet(), 0,
+        NULL);
     int current_buffer_idx = vk->getCurrentBufferIdx();
     std::vector<uint32_t> dynamic_offsets = getDefaultDynamicOffsets();
     vkCmdBindDescriptorSets(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS,
