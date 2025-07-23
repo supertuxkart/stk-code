@@ -356,7 +356,7 @@ public:
                                     int fade_out_time) OVERRIDE;
     // ----------------------------------------------------------------------------------------
     virtual void   instantSpeedIncrease(unsigned int category, float add_max_speed,
-                                    float speed_boost, float engine_force, 
+                                    float speed_boost, float engine_force,
                                     int duration, int fade_out_time) OVERRIDE;
     // ----------------------------------------------------------------------------------------
     virtual void   setSlowdown(unsigned int category, float max_speed_fraction,
@@ -438,6 +438,10 @@ public:
     // ========================================================================================
     // SPECIAL-STATUS related functions (plunger, squash, shield, immunity).
     // ----------------------------------------------------------------------------------------
+
+    /** Removes all status effects */
+    virtual void removeStatusEffects() OVERRIDE;
+
     /** Makes a kart invulnerable for a certain amount of time. */
     virtual void setInvulnerableTicks(int ticks) OVERRIDE
     {
