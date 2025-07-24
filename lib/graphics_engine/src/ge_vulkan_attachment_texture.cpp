@@ -50,6 +50,8 @@ GEVulkanAttachmentTexture* GEVulkanAttachmentTexture::createDepthTexture(
         VK_IMAGE_USAGE_INPUT_ATTACHMENT_BIT;
     if (lazy_allocation)
         iu |= VK_IMAGE_USAGE_TRANSIENT_ATTACHMENT_BIT;
+    else
+        iu |= VK_IMAGE_USAGE_SAMPLED_BIT;
     return new GEVulkanAttachmentTexture(vk, size, format, iu,
         VK_IMAGE_ASPECT_DEPTH_BIT);
 }   // createDepthTexture

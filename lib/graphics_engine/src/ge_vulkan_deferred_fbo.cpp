@@ -61,11 +61,26 @@ GEVulkanDeferredFBO::GEVulkanDeferredFBO(GEVulkanDriver* vk,
             size, displace_mask_format, VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT |
             VK_IMAGE_USAGE_SAMPLED_BIT, VK_IMAGE_ASPECT_COLOR_BIT);
 
+        if (getGEConfig()->m_screen_space_reflection_type != GSSRT_DISABLED)
+        {
+            m_attachments[GVDFT_DISPLACE_SSR] =
+                new GEVulkanAttachmentTexture(vk, size,
+                VK_FORMAT_B8G8R8A8_UNORM,
+                VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT |
+                VK_IMAGE_USAGE_SAMPLED_BIT, VK_IMAGE_ASPECT_COLOR_BIT);
+        }
+
         VkCommandBuffer command_buffer =
             GEVulkanCommandLoader::beginSingleTimeCommands();
         m_attachments[GVDFT_DISPLACE_MASK]->transitionImageLayout(
             command_buffer, VK_IMAGE_LAYOUT_UNDEFINED,
             VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
+        if (getAttachment<GVDFT_DISPLACE_SSR>())
+        {
+            getAttachment<GVDFT_DISPLACE_SSR>()->transitionImageLayout(
+                command_buffer, VK_IMAGE_LAYOUT_UNDEFINED,
+                VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
+        }
         GEVulkanCommandLoader::endSingleTimeCommands(command_buffer);
 
         m_attachments[GVDFT_DISPLACE_COLOR] = new GEVulkanAttachmentTexture(vk,
@@ -270,7 +285,7 @@ void GEVulkanDeferredFBO::initConvertColorDescriptor(GEVulkanDriver* vk)
 void GEVulkanDeferredFBO::initDisplaceDescriptor(GEVulkanDriver* vk)
 {
     // m_descriptor_layout[GVDFP_DISPLACE_COLOR]
-    std::array<VkDescriptorSetLayoutBinding, 2> texture_layout_binding = {};
+    std::array<VkDescriptorSetLayoutBinding, 4> texture_layout_binding = {};
     texture_layout_binding[0].binding = 0;
     texture_layout_binding[0].descriptorCount = 1;
     texture_layout_binding[0].descriptorType =
@@ -279,6 +294,10 @@ void GEVulkanDeferredFBO::initDisplaceDescriptor(GEVulkanDriver* vk)
     texture_layout_binding[0].stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT;
     texture_layout_binding[1] = texture_layout_binding[0];
     texture_layout_binding[1].binding = 1;
+    texture_layout_binding[2] = texture_layout_binding[0];
+    texture_layout_binding[2].binding = 2;
+    texture_layout_binding[3] = texture_layout_binding[0];
+    texture_layout_binding[3].binding = 3;
 
     VkDescriptorSetLayoutCreateInfo setinfo = {};
     setinfo.flags = 0;
@@ -335,9 +354,18 @@ void GEVulkanDeferredFBO::initDisplaceDescriptor(GEVulkanDriver* vk)
         (VkImageView)m_attachments[GVDFT_DISPLACE_MASK]->getTextureHandler();
     image_infos[0].sampler = m_vk->getSampler(GVS_NEAREST);
     image_infos[1].imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
-    image_infos[1].imageView =
-        (VkImageView)m_attachments[GVDFT_DISPLACE_COLOR]->getTextureHandler();
+    image_infos[1].imageView = m_attachments[GVDFT_DISPLACE_SSR] ?
+        (VkImageView)m_attachments[GVDFT_DISPLACE_SSR]->getTextureHandler() :
+        (VkImageView)m_vk->getTransparentTexture()->getTextureHandler();
     image_infos[1].sampler = m_vk->getSampler(GVS_NEAREST);
+    image_infos[2].imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
+    image_infos[2].imageView =
+        (VkImageView)m_attachments[GVDFT_DISPLACE_COLOR]->getTextureHandler();
+    image_infos[2].sampler = m_vk->getSampler(GVS_NEAREST);
+    image_infos[3].imageLayout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_READ_ONLY_OPTIMAL;
+    image_infos[3].imageView =
+        (VkImageView)m_depth_texture->getTextureHandler();
+    image_infos[3].sampler = m_vk->getSampler(GVS_SHADOW);
 
     VkWriteDescriptorSet write_descriptor_set = {};
     write_descriptor_set.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
@@ -599,7 +627,7 @@ void GEVulkanDeferredFBO::createDisplacePasses()
 
     // m_rtt_render_pass[GVDFP_DISPLACE_MASK]
     {
-        std::array<VkAttachmentDescription, 2> attachment_desc = {};
+        std::vector<VkAttachmentDescription> attachment_desc(1);
         attachment_desc[0].format = m_attachments[GVDFT_DISPLACE_MASK]->getInternalFormat();
         attachment_desc[0].samples = VK_SAMPLE_COUNT_1_BIT;
         attachment_desc[0].loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR;
@@ -608,22 +636,36 @@ void GEVulkanDeferredFBO::createDisplacePasses()
         attachment_desc[0].stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
         attachment_desc[0].initialLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
         attachment_desc[0].finalLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
-        attachment_desc[1].format = m_depth_texture->getInternalFormat();
-        attachment_desc[1].samples = VK_SAMPLE_COUNT_1_BIT;
-        attachment_desc[1].loadOp = VK_ATTACHMENT_LOAD_OP_LOAD;
-        attachment_desc[1].storeOp = VK_ATTACHMENT_STORE_OP_STORE;
-        attachment_desc[1].stencilLoadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
-        attachment_desc[1].stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
-        attachment_desc[1].initialLayout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_READ_ONLY_OPTIMAL;
-        attachment_desc[1].finalLayout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_READ_ONLY_OPTIMAL;
+        if (getAttachment<GVDFT_DISPLACE_SSR>())
+        {
+            attachment_desc.push_back(attachment_desc[0]);
+            attachment_desc.back().format =
+                getAttachment<GVDFT_DISPLACE_SSR>()->getInternalFormat();
+        }
+        VkAttachmentDescription depth_desc = {};
+        depth_desc.format = m_depth_texture->getInternalFormat();
+        depth_desc.samples = VK_SAMPLE_COUNT_1_BIT;
+        depth_desc.loadOp = VK_ATTACHMENT_LOAD_OP_LOAD;
+        depth_desc.storeOp = VK_ATTACHMENT_STORE_OP_STORE;
+        depth_desc.stencilLoadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
+        depth_desc.stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
+        depth_desc.initialLayout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_READ_ONLY_OPTIMAL;
+        depth_desc.finalLayout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_READ_ONLY_OPTIMAL;
+        attachment_desc.push_back(depth_desc);
 
-        VkAttachmentReference color_reference = { 0, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL };
         VkAttachmentReference depth_reference = { 1, VK_IMAGE_LAYOUT_DEPTH_STENCIL_READ_ONLY_OPTIMAL };
+        std::vector<VkAttachmentReference> color_references =
+            {{ 0, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL }};
+        if (getAttachment<GVDFT_DISPLACE_SSR>())
+        {
+            color_references.push_back({ 1, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL });
+            depth_reference.attachment = 2;
+        }
 
         VkSubpassDescription subpass = {};
         subpass.pipelineBindPoint = VK_PIPELINE_BIND_POINT_GRAPHICS;
-        subpass.colorAttachmentCount = 1;
-        subpass.pColorAttachments = &color_reference;
+        subpass.colorAttachmentCount = color_references.size();
+        subpass.pColorAttachments = color_references.data();
         subpass.pDepthStencilAttachment = &depth_reference;
 
         std::array<VkSubpassDependency, 1> dependencies = {};
@@ -719,11 +761,16 @@ void GEVulkanDeferredFBO::createDisplacePasses()
 
     // m_rtt_frame_buffer[GVDFP_DISPLACE_MASK]
     {
-        std::array<VkImageView, 2> attachments =
-        {{
-            (VkImageView)m_attachments[GVDFT_DISPLACE_MASK]->getTextureHandler(),
-            (VkImageView)m_depth_texture->getTextureHandler()
-        }};
+        std::vector<VkImageView> attachments =
+        {
+            (VkImageView)m_attachments[GVDFT_DISPLACE_MASK]->getTextureHandler()
+        };
+        if (getAttachment<GVDFT_DISPLACE_SSR>())
+        {
+            attachments.push_back((VkImageView)
+                m_attachments[GVDFT_DISPLACE_SSR]->getTextureHandler());
+        }
+        attachments.push_back((VkImageView)m_depth_texture->getTextureHandler());
 
         VkFramebufferCreateInfo framebuffer_info = {};
         framebuffer_info.sType = VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO;

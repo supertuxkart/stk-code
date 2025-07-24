@@ -2,6 +2,7 @@ uniform sampler2D displacement_tex;
 uniform sampler2D mask_tex;
 uniform sampler2D color_tex;
 
+#stk_include "utils/displace_utils.frag"
 #stk_include "utils/sp_texture_sampling.frag"
 
 uniform vec4 direction;
@@ -14,19 +15,7 @@ void main()
 {
     float horiz = texture(displacement_tex, uv + direction.xy * 150.).x;
     float vert = texture(displacement_tex, (uv.yx + direction.zw * 150.) * vec2(0.9)).x;
-
-    vec2 offset = vec2(horiz, vert);
-    offset = 2.0 * offset - 1.0;
-
-    vec4 shiftval;
-    shiftval.r = step(offset.x, 0.0) * -offset.x;
-    shiftval.g = step(0.0, offset.x) * offset.x;
-    shiftval.b = step(offset.y, 0.0) * -offset.y;
-    shiftval.a = step(0.0, offset.y) * offset.y;
-
-    vec2 shift;
-    shift.x = -shiftval.x + shiftval.y;
-    shift.y = -shiftval.z + shiftval.w;
+    vec2 shift = getDisplaceShift(horiz, vert);
     shift *= 0.02;
 
     vec2 tc = gl_FragCoord.xy / u_screen;

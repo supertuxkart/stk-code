@@ -106,7 +106,7 @@
         </properties>
         <shaders>
             <vertex>spm.vert</vertex>
-            <fragment>transparent.frag</fragment>
+            <fragment>displace_transparent.frag</fragment>
         </shaders>
     </setting>
 

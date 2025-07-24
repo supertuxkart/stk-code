@@ -1,5 +1,5 @@
 layout(binding = 0) uniform sampler2D u_displace_mask;
-layout(binding = 1) uniform sampler2D u_displace_color;
+layout(binding = 2) uniform sampler2D u_displace_color;
 
 layout(location = 0) in vec2 f_uv;
 
@@ -11,6 +11,7 @@ layout(push_constant) uniform Constants
 } u_push_constants;
 
 #include "utils/camera.glsl"
+#include "../utils/displace_utils.frag"
 
 void main()
 {
@@ -22,13 +23,7 @@ void main()
         if (!(mask.x == 0.0 && mask.y == 0.0))
         {
             vec2 shift = 2.0 * mask - 1.0;
-            shift *= 0.02 * u_camera.m_viewport.zw;
-            ivec2 lo = ivec2(u_camera.m_viewport.xy);
-            ivec2 hi = ivec2(u_camera.m_viewport.xy + u_camera.m_viewport.zw);
-            ivec2 suv = clamp(ivec2(gl_FragCoord.xy) + ivec2(shift), lo, hi);
-            vec2 new_mask = texelFetch(u_displace_mask, suv, 0).xy;
-            if (!(new_mask.x == 0.0 && new_mask.y == 0.0))
-                uv = suv;
+            uv = getDisplaceUV(shift, u_camera.m_viewport, u_displace_mask);
         }
     }
     o_color = texelFetch(u_displace_color, uv, 0);

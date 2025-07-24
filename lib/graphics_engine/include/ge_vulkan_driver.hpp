@@ -42,6 +42,7 @@ namespace GE
         GVS_3D_MESH_MIPMAP_4,
         GVS_3D_MESH_MIPMAP_16,
         GVS_2D_RENDER,
+        GVS_SHADOW,
         GVS_COUNT,
     };
     class GEVulkanDriver : public video::CNullDriver

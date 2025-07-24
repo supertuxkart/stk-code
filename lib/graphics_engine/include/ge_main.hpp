@@ -29,6 +29,11 @@ enum GEAutoDeferredType : unsigned
     GADT_SINGLE_PASS,
     GADT_DISPLACE
 };
+enum GEScreenSpaceReflectionType : unsigned
+{
+    GSSRT_DISABLED = 0,
+    GSSRT_FAST,
+};
 
 struct GEConfig
 {
@@ -40,6 +45,7 @@ bool m_enable_draw_call_cache;
 bool m_pbr;
 bool m_ibl;
 GEAutoDeferredType m_auto_deferred_type;
+GEScreenSpaceReflectionType m_screen_space_reflection_type;
 bool m_force_deferred;
 std::unordered_set<std::string> m_ondemand_load_texture_paths;
 float m_render_scale;

@@ -1540,6 +1540,21 @@ void GEVulkanDriver::createSamplers()
     if (result != VK_SUCCESS)
         throw std::runtime_error("vkCreateSampler failed for GVS_2D_RENDER");
     m_vk->samplers[GVS_2D_RENDER] = sampler;
+
+    sampler_info.anisotropyEnable = false;
+    sampler_info.maxLod = VK_LOD_CLAMP_NONE;
+    sampler_info.mipmapMode = VK_SAMPLER_MIPMAP_MODE_LINEAR;
+    sampler_info.addressModeU = VK_SAMPLER_ADDRESS_MODE_CLAMP_TO_EDGE;
+    sampler_info.addressModeV = VK_SAMPLER_ADDRESS_MODE_CLAMP_TO_EDGE;
+    sampler_info.addressModeW = VK_SAMPLER_ADDRESS_MODE_CLAMP_TO_EDGE;
+    sampler_info.compareEnable = VK_TRUE;
+    sampler_info.compareOp = VK_COMPARE_OP_LESS_OR_EQUAL;
+    result = vkCreateSampler(m_vk->device, &sampler_info, NULL,
+        &sampler);
+
+    if (result != VK_SUCCESS)
+        throw std::runtime_error("vkCreateSampler failed for GVS_SHADOW");
+    m_vk->samplers[GVS_SHADOW] = sampler;
 }   // createSamplers
 
 // ----------------------------------------------------------------------------

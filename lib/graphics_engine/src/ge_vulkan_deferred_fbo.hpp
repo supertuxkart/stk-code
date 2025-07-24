@@ -13,6 +13,7 @@ enum GEVulkanDeferredFBOType : unsigned
     GVDFT_NORMAL,
     GVDFT_HDR,
     GVDFT_DISPLACE_MASK,
+    GVDFT_DISPLACE_SSR,
     GVDFT_DISPLACE_COLOR,
     GVDFT_COUNT,
 };
@@ -75,6 +76,7 @@ public:
             return count;
         }
         case GVDFP_DISPLACE_MASK:
+            return getAttachment<GVDFT_DISPLACE_SSR>() ? 2 : 1;
         case GVDFP_DISPLACE_COLOR:
             return 1;
         default:

@@ -2,6 +2,7 @@ layout (constant_id = 0) const bool u_ibl = true;
 layout (constant_id = 1) const float u_specular_levels_minus_one = 0.0;
 layout (constant_id = 2) const bool u_deferred = false;
 layout (constant_id = 3) const bool u_has_skybox = true;
+layout (constant_id = 4) const bool u_ssr = false;
 
 vec3 convertColor(vec3 input_color)
 {

@@ -26,6 +26,7 @@ GEConfig g_config =
     false,
     true,
     GADT_DISABLED,
+    GSSRT_DISABLED,
     false,
     {},
     1.0f
