@@ -63,16 +63,20 @@ void main()
         // fallback to skybox
         vec4 fallback = texture(u_skybox_texture, world_reflection);
         vec4 result;
+        vec2 viewport_scale = u_camera.m_viewport.zw / u_camera.m_screensize;
+        vec2 viewport_offset = u_camera.m_viewport.xy / u_camera.m_screensize;
         vec2 coords = RayCast(reflected, xpos, u_camera.m_projection_matrix,
-            u_depth);
-        if (coords.x < 0. || coords.x > 1. || coords.y < 0. || coords.y > 1.)
+            viewport_scale, viewport_offset, u_depth);
+        vec2 viewport_coords = (coords - viewport_offset) / viewport_scale;
+        if (viewport_coords.x < 0. || viewport_coords.x > 1. ||
+            viewport_coords.y < 0. || viewport_coords.y > 1.)
         {
             result = fallback;
         }
         else
         {
             result = texture(u_displace_color, coords);
-            float edge = GetEdgeFade(coords);
+            float edge = GetEdgeFade(coords, viewport_scale, viewport_offset);
             //float fresnel = pow(1.0 - NdotV, 2.0);
             float fresnel = (1.0 - NdotV) * (1.0 - NdotV);
             float blend_weight = edge * fresnel;

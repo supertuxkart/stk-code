@@ -79,7 +79,10 @@ void main(void)
     if (specval < 0.5 || cosine > 0.2) {
         outColor = fallback;
     } else {
-        vec2 coords = RayCast(reflected, xpos.xyz, u_projection_matrix, stex);
+        vec2 viewport_scale = vec2(1.0);
+        vec2 viewport_offset = vec2(0.0);
+        vec2 coords = RayCast(reflected, xpos.xyz, u_projection_matrix,
+            viewport_scale, viewport_offset, stex);
 
         if (coords.x < 0. || coords.x > 1. || coords.y < 0. || coords.y > 1.) {
             outColor = fallback;
@@ -88,7 +91,8 @@ void main(void)
             float mirror = texture(ntex, coords).z;
             
             outColor = textureLod(albedo, coords, 0.f).rgb;
-            outColor = mix(fallback, outColor, GetEdgeFade(coords));
+            outColor = mix(fallback, outColor, GetEdgeFade(coords,
+                viewport_scale, viewport_offset));
             outColor = mix(fallback, outColor, 1. - max(cosine * 5., 0.));
             outColor = mix(fallback, outColor, 4. - max(mirror * 4., 3.));
             // TODO temporary measure the lack of mipmapping for RTT albedo
