@@ -814,16 +814,21 @@ void GEVulkanDriver::createInstance(SDL_Window* window)
     // We need these to persist until after vkCreateInstance
     static VkLayerSettingsCreateInfoEXT layer_settings_create_info = {};
     static VkBool32 setting_false = VK_FALSE;
-    static VkLayerSettingEXT setting = {};
-    setting.pLayerName = "MoltenVK";
-    setting.pSettingName = "MVK_CONFIG_USE_METAL_ARGUMENT_BUFFERS";
-    setting.type = VK_LAYER_SETTING_TYPE_BOOL32_EXT;
-    setting.pValues = &setting_false;
-    setting.valueCount = 1;
+    static VkBool32 setting_true = VK_TRUE;
+
+    static std::array<VkLayerSettingEXT, 2> settings = {};
+    settings[0].pLayerName = "MoltenVK";
+    settings[0].pSettingName = "MVK_CONFIG_USE_METAL_ARGUMENT_BUFFERS";
+    settings[0].type = VK_LAYER_SETTING_TYPE_BOOL32_EXT;
+    settings[0].pValues = &setting_false;
+    settings[0].valueCount = 1;
+    settings[1] = settings[0];
+    settings[1].pSettingName = "MVK_CONFIG_FULL_IMAGE_VIEW_SWIZZLE";
+    settings[1].pValues = &setting_true;
 
     layer_settings_create_info.sType = VK_STRUCTURE_TYPE_LAYER_SETTINGS_CREATE_INFO_EXT;
-    layer_settings_create_info.settingCount = 1;
-    layer_settings_create_info.pSettings = &setting;
+    layer_settings_create_info.settingCount = settings.size();
+    layer_settings_create_info.pSettings = settings.data();
     layer_settings_create_info.pNext = next_chain;
     next_chain = &layer_settings_create_info;
     extensions.push_back(VK_EXT_LAYER_SETTINGS_EXTENSION_NAME);

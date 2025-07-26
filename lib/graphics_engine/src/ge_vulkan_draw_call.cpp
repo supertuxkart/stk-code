@@ -2143,12 +2143,19 @@ void GEVulkanDrawCall::renderDeferredLighting(GEVulkanDriver* vk,
             .m_pipelines;
         vkCmdBindPipeline(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS,
             *pl[GVPT_DEFERRED_LIGHTING]);
+        struct PushConstants
+        {
+            btQuaternion m_rotation;
+            int m_fullscreen_light;
+        };
+        PushConstants pc;
+        pc.m_rotation = m_billboard_rotation;
+        pc.m_fullscreen_light = fullscreen_light;
         vkCmdPushConstants(cmd, m_deferred_layouts[GVDFP_HDR],
-            VK_SHADER_STAGE_ALL_GRAPHICS, 0, sizeof(btQuaternion),
-            &m_billboard_rotation);
+            VK_SHADER_STAGE_ALL_GRAPHICS, 0, sizeof(PushConstants),
+            &pc);
         vkCmdDraw(cmd, 4,
-            m_light_handler->getLightCount() - fullscreen_light,
-            0, fullscreen_light);
+            m_light_handler->getLightCount() - fullscreen_light, 0, 0);
     }
 }   // renderDeferredLighting
 

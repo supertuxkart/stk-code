@@ -6,6 +6,7 @@
 layout(push_constant) uniform Constants
 {
     vec4 m_billboard_rotation;
+    int m_fullscreen_light;
 } u_push_constants;
 
 layout(location = 0) flat out int light_idx;
@@ -22,7 +23,7 @@ const vec3 g_vertices[4] =
 void main()
 {
     // Get the light index from the instance ID
-    light_idx = gl_InstanceIndex;
+    light_idx = gl_InstanceIndex + u_push_constants.m_fullscreen_light;
     LightData light = u_global_light.m_lights[light_idx];
     vec4 pos_radius = light.m_position_radius;
 
