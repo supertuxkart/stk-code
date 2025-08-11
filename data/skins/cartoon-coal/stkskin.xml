@@ -54,7 +54,7 @@ Here you can configure advanced theming rules for this skin
 
 <!-- TODO : buttons could support 'pressed' state -->
 
- Provided by base theme
+
 <element type="textbubble" state="neutral" image="textbubble.png"
       left_border="13" right_border="13" top_border="13" bottom_border="13"
       hborder_out_portion="0.7" vborder_out_portion="0.3" />
