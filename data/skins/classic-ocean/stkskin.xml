@@ -15,7 +15,7 @@ Here you can configure advanced theming rules for this skin
 -->
 
 <!--  Stateless -->
-<element type="background" common="y" image="background.jpg" />
+<element type="background" common="y" image="background.jpg" horizontal-cut="true" vertical-cut="false"/>
 
 <element type="bottom-bar" common="y" image="bottom_bar.png" />
 

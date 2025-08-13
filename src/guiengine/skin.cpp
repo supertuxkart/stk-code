@@ -71,6 +71,8 @@ namespace SkinConfig
     static std::string m_color_emoji_ttf;
     static std::vector<std::string> m_icon_theme_paths;
     static bool m_font;
+    static bool m_horizontal_cut;
+    static bool m_vertical_cut;
 
     static void parseElement(const XMLNode* node, std::vector<std::string>& skin_paths)
     {
@@ -96,6 +98,16 @@ namespace SkinConfig
         {
             Log::error("skin", "All elements must have an image\n");
             return;
+        }
+
+        // We use these parameters to know if the background image should be
+        // stretched or cut when its aspect ratio is different from the screen's
+        if (type == "background")
+        {
+            m_horizontal_cut = false;
+            m_vertical_cut = false;
+            node->get("horizontal-cut", &m_horizontal_cut);
+            node->get("vertical-cut", &m_vertical_cut);
         }
 
         node->get("left_border", &leftborder);
@@ -635,11 +647,10 @@ void Skin::drawBgImage()
     static core::recti dest;
     static core::recti source_area;
 
-    if(m_bg_image == NULL)
+    if (m_bg_image == NULL)
     {
         int texture_w, texture_h;
-        m_bg_image =
-            SkinConfig::m_render_params["background::neutral"].getImage();
+        m_bg_image = SkinConfig::m_render_params["background::neutral"].getImage();
         assert(m_bg_image != NULL);
         texture_w = m_bg_image->getSize().Width;
         texture_h = m_bg_image->getSize().Height;
@@ -650,25 +661,69 @@ void Skin::drawBgImage()
         const int screen_w = frame_size.Width;
         const int screen_h = frame_size.Height;
 
-        // stretch image vertically to fit
-        float ratio = (float)screen_h / texture_h;
+        // Calculate aspect ratios for the image and the screen
+        float image_ratio = (float)texture_w / texture_h;
+        float screen_ratio = (float)screen_w / screen_h;
 
-        // check that with the vertical stretching, it still fits horizontally
-        while(texture_w*ratio < screen_w) ratio += 0.1f;
+        float factor_h, factor_w;
 
-        texture_w = (int)(texture_w*ratio);
-        texture_h = (int)(texture_h*ratio);
+        // ----------------------------------------------------------
+        // Fill the screen without distorting the image.
+        //
+        // The dimension (horizontal or vertical) furthest away is scaled to be able
+        // to cover the entire screen.
+        // Then the other dimension is either scaled uniformly (if cropping is preferred
+        // over stretching) or non-uniformly (if stretching is preferred over cropping)
+        // ----------------------------------------------------------
 
-        const int clipped_x_space = (texture_w - screen_w);
+        if (screen_ratio > image_ratio) // Screen has a wider ratio than the bg image
+        {
+            if (SkinConfig::m_vertical_cut)
+            {
+                // Scale to fit width, allow vertical crop
+                factor_w = (float)screen_w / texture_w;
+                factor_h = factor_w;
+            }
+            else 
+            {
+                // Cannot crop vertically → stretch both width and height to fit
+                factor_h = (float)screen_h / texture_h;
+                factor_w = (float)screen_w / texture_w;
+            }
+        }
+        else // Screen has taller ratio than the bg image
+        {
+            if (SkinConfig::m_horizontal_cut)
+            {
+                // Scale to fit height, allow horizontal crop
+                factor_h = (float)screen_h / texture_h;
+                factor_w = factor_h;
+            }
+            else
+            {
+                // Cannot crop horizontally → stretch both width and height to fit
+                factor_h = (float)screen_h / texture_h;
+                factor_w = (float)screen_w / texture_w;
+            }
+        }
 
-        dest = core::recti(-clipped_x_space/2, 0,
-                               screen_w+clipped_x_space/2, screen_h);
+        // Scale the original image dimensions
+        int scaled_w = (int)(texture_w * factor_w);
+        int scaled_h = (int)(texture_h * factor_h);
+
+        // Center the image on screen
+        int offset_x = (screen_w - scaled_w) / 2;
+        int offset_y = (screen_h - scaled_h) / 2;
+
+        dest = core::recti(offset_x, offset_y,
+                           offset_x + scaled_w, offset_y + scaled_h);
     }
 
+    // Render the background image to the screen
     irr_driver->getVideoDriver()->enableMaterial2D();
     draw2DImage(m_bg_image, dest, source_area,
-                                        /* no clipping */0, /*color*/ 0,
-                                        /*alpha*/false);
+                /* no clipping */0, /*color*/ 0,
+                /*alpha*/false);
     irr_driver->getVideoDriver()->enableMaterial2D(false);
 #endif
 }   // drawBgImage
