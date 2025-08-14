@@ -14,6 +14,7 @@
 #include "ge_vulkan_dynamic_spm_buffer.hpp"
 #include "ge_vulkan_environment_map.hpp"
 #include "ge_vulkan_features.hpp"
+#include "ge_vulkan_hiz_depth.hpp"
 #include "ge_vulkan_light_handler.hpp"
 #include "ge_vulkan_mesh_cache.hpp"
 #include "ge_vulkan_mesh_scene_node.hpp"
@@ -245,7 +246,13 @@ GEVulkanDrawCall::GEVulkanDrawCall()
     m_pipeline_layout = VK_NULL_HANDLE;
     m_skybox_layout = VK_NULL_HANDLE;
     m_skybox_renderer = NULL;
-    m_texture_descriptor = getVKDriver()->getMeshTextureDescriptor();
+    GEVulkanDriver* vk = static_cast<GEVulkanDriver*>(getDriver());
+    m_texture_descriptor = vk->getMeshTextureDescriptor();
+    if (vk->getRTTTexture() && vk->getRTTTexture()->isDeferredFBO() &&
+        getGEConfig()->m_screen_space_reflection_type >= GSSRT_HIZ)
+        m_hiz_depth = new GEVulkanHiZDepth(vk);
+    else
+        m_hiz_depth = NULL;
 }   // GEVulkanDrawCall
 
 // ----------------------------------------------------------------------------
@@ -271,6 +278,7 @@ GEVulkanDrawCall::~GEVulkanDrawCall()
                 vkDestroyPipelineLayout(vk->getDevice(), layout, NULL);
         }
     }
+    delete m_hiz_depth;
 }   // ~GEVulkanDrawCall
 
 // ----------------------------------------------------------------------------
@@ -871,6 +879,8 @@ void GEVulkanDrawCall::prepare(GEVulkanCameraSceneNode* cam)
     m_culling_tool->init(cam);
     m_view_position = cam->getAbsolutePosition();
     m_billboard_rotation = MiniGLM::getBulletQuaternion(cam->getViewMatrix());
+    if (m_hiz_depth)
+        m_hiz_depth->prepare(cam);
 }   // prepare
 
 // ----------------------------------------------------------------------------
@@ -1197,6 +1207,7 @@ void GEVulkanDrawCall::createPipeline(GEVulkanDriver* vk,
         VkBool32 m_deferred;
         VkBool32 m_skybox;
         VkBool32 m_ssr;
+        uint32_t m_hiz_iterations;
     };
     Constants constants = {};
     constants.m_ibl = getGEConfig()->m_pbr && getGEConfig()->m_ibl &&
@@ -1208,7 +1219,22 @@ void GEVulkanDrawCall::createPipeline(GEVulkanDriver* vk,
     constants.m_skybox = m_skybox_renderer != NULL;
     constants.m_ssr = getGEConfig()->m_screen_space_reflection_type !=
         GSSRT_DISABLED;
-    std::array<VkSpecializationMapEntry, 5> specialization_entries = {};
+    if (m_hiz_depth)
+    {
+        switch (getGEConfig()->m_screen_space_reflection_type)
+        {
+        case GSSRT_HIZ400:
+            constants.m_hiz_iterations = 400;
+            break;
+        case GSSRT_HIZ200:
+            constants.m_hiz_iterations = 200;
+            break;
+        default:
+            constants.m_hiz_iterations = 100;
+            break;
+        }
+    }
+    std::array<VkSpecializationMapEntry, 6> specialization_entries = {};
     specialization_entries[0].constantID = 0;
     specialization_entries[0].offset = offsetof(Constants, m_ibl);
     specialization_entries[0].size = sizeof(VkBool32);
@@ -1225,6 +1251,9 @@ void GEVulkanDrawCall::createPipeline(GEVulkanDriver* vk,
     specialization_entries[4].constantID = 4;
     specialization_entries[4].offset = offsetof(Constants, m_ssr);
     specialization_entries[4].size = sizeof(VkBool32);
+    specialization_entries[5].constantID = 5;
+    specialization_entries[5].offset = offsetof(Constants, m_hiz_iterations);
+    specialization_entries[5].size = sizeof(uint32_t);
     VkSpecializationInfo specialization_info = {};
     specialization_info.mapEntryCount = specialization_entries.size();
     specialization_info.pMapEntries = specialization_entries.data();
@@ -1761,7 +1790,6 @@ void GEVulkanDrawCall::renderPipeline(GEVulkanDriver* vk, VkCommandBuffer cmd,
                 vk->getSkyBoxRenderer()->getEnvDescriptorSet(), 0, NULL);
             break;
         case GVPT_DISPLACE_MASK:
-        case GVPT_DISPLACE_COLOR:
         {
             auto* dfbo = static_cast<GEVulkanDeferredFBO*>(vk->getRTTTexture());
             if (dfbo && dfbo->getAttachment<GVDFT_DISPLACE_COLOR>())
@@ -1769,6 +1797,18 @@ void GEVulkanDrawCall::renderPipeline(GEVulkanDriver* vk, VkCommandBuffer cmd,
                 vkCmdBindDescriptorSets(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS,
                     m_pipeline_layout, 2, 1,
                     vk->getSkyBoxRenderer()->getEnvDescriptorSet(), 0, NULL);
+                vkCmdBindDescriptorSets(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS,
+                    m_pipeline_layout, 3, 1, m_hiz_depth ?
+                    m_hiz_depth->getRenderingDescriptorSet() :
+                    dfbo->getDescriptorSet(GVDFP_DISPLACE_MASK), 0, NULL);
+            }
+            break;
+        }
+        case GVPT_DISPLACE_COLOR:
+        {
+            auto* dfbo = static_cast<GEVulkanDeferredFBO*>(vk->getRTTTexture());
+            if (dfbo && dfbo->getAttachment<GVDFT_DISPLACE_COLOR>())
+            {
                 vkCmdBindDescriptorSets(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS,
                     m_pipeline_layout, 3, 1,
                     dfbo->getDescriptorSet(GVDFP_DISPLACE_COLOR), 0, NULL);

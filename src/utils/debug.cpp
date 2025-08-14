@@ -106,6 +106,7 @@ enum DebugMenuCommand
     DEBUG_FONT_RELOAD,
     DEBUG_GE_PBR,
     DEBUG_GE_IBL,
+    DEBUG_GE_SSR,
     DEBUG_SP_RESET,
     DEBUG_SP_TOGGLE_CULLING,
     DEBUG_SP_WN_VIZ,
@@ -410,6 +411,21 @@ bool handleContextMenuAction(s32 cmd_id)
             GE::getGEConfig()->m_ibl = !UserConfigParams::m_degraded_IBL;
             vk->updateDriver(false/*scale_changed*/, false/*pbr_changed*/,
                 true/*ibl_changed*/);
+        }
+        break;
+    }
+#endif
+    case DEBUG_GE_SSR:
+#ifndef SERVER_ONLY
+    {
+        GE::GEVulkanDriver* vk = GE::getVKDriver();
+        if (vk)
+        {
+            GE::getGEConfig()->m_screen_space_reflection_type =
+                GE::GEScreenSpaceReflectionType(
+                (GE::getGEConfig()->m_screen_space_reflection_type + 1) %
+                GE::GSSRT_COUNT);
+            vk->updateDriver(true/*scale_changed*/);
         }
         break;
     }
@@ -1319,10 +1335,8 @@ bool onEvent(const SEvent &event)
             sub->addItem(L"Clear nitro (Delete)", DEBUG_NITRO_CLEAR );
             sub->addItem(L"Clear attachment (Delete)", DEBUG_ATTACHMENT_NOTHING);
 
-            mnu->addItem(L"SP / GE debug >",-1,true, true);
+            mnu->addItem(L"SP debug >",-1,true, true);
             sub = mnu->getSubMenu(6);
-            sub->addItem(L"Toggle GE PBR", DEBUG_GE_PBR);
-            sub->addItem(L"Toggle GE IBL", DEBUG_GE_IBL);
             sub->addItem(L"Reset SP debug", DEBUG_SP_RESET);
             sub->addItem(L"Toggle culling", DEBUG_SP_TOGGLE_CULLING);
             sub->addItem(L"Draw world normal in texture", DEBUG_SP_WN_VIZ);
@@ -1332,13 +1346,19 @@ bool onEvent(const SEvent &event)
             sub->addItem(L"Toggle wireframe visualization", DEBUG_SP_WIREFRAME_VIZ);
             sub->addItem(L"Toggle triangle normals visualization", DEBUG_SP_TN_VIZ);
 
-            mnu->addItem(L"Keypress actions >",-1,true, true);
+            mnu->addItem(L"GE debug >",-1,true, true);
             sub = mnu->getSubMenu(7);
+            sub->addItem(L"Toggle GE PBR", DEBUG_GE_PBR);
+            sub->addItem(L"Toggle GE IBL", DEBUG_GE_IBL);
+            sub->addItem(L"Toggle GE SSR", DEBUG_GE_SSR);
+
+            mnu->addItem(L"Keypress actions >",-1,true, true);
+            sub = mnu->getSubMenu(8);
             sub->addItem(L"Rescue", DEBUG_RESCUE_KART);
             sub->addItem(L"Pause", DEBUG_PAUSE);
 
             mnu->addItem(L"Output >",-1,true, true);
-            sub = mnu->getSubMenu(8);
+            sub = mnu->getSubMenu(9);
             sub->addItem(L"Print kart positions", DEBUG_PRINT_START_POS);
             sub->addSeparator();
             sub->addItem(L"Save screenshot (Print Screen)", DEBUG_SAVE_SCREENSHOT);
@@ -1353,7 +1373,7 @@ bool onEvent(const SEvent &event)
             }
 
             mnu->addItem(L"Recording >",-1,true, true);
-            sub = mnu->getSubMenu(9);
+            sub = mnu->getSubMenu(10);
 
 #ifdef ENABLE_RECORDER
             sub->addItem(L"Start recording (Ctrl + Print Screen)", DEBUG_START_RECORDING);
@@ -1368,23 +1388,23 @@ bool onEvent(const SEvent &event)
 #endif
 
             mnu->addItem(L"Consoles >",-1,true, true);
-            sub = mnu->getSubMenu(10);
+            sub = mnu->getSubMenu(11);
             sub->addItem(L"Scripting console (Shift + F7)", DEBUG_SCRIPT_CONSOLE);
             sub->addItem(L"Texture console (Shift + F8)", DEBUG_TEXTURE_CONSOLE);
             sub->addItem(L"Run cutscene(s) (Shift + F9)", DEBUG_RUN_CUTSCENE);
 
             mnu->addItem(L"Font >",-1,true, true);
-            sub = mnu->getSubMenu(11);
+            sub = mnu->getSubMenu(12);
             sub->addItem(L"Dump glyph pages of fonts", DEBUG_FONT_DUMP_GLYPH_PAGE);
             sub->addItem(L"Reload all fonts", DEBUG_FONT_RELOAD);
 
             mnu->addItem(L"Lighting >",-1,true, true);
-            sub = mnu->getSubMenu(12);
+            sub = mnu->getSubMenu(13);
             sub->addItem(L"Adjust values (Shift + ~)", DEBUG_VISUAL_VALUES);
             sub->addItem(L"Adjust lights (Ctrl + ~)", DEBUG_ADJUST_LIGHTS);
 
             mnu->addItem(L"FPS >",-1,true, true);
-            sub = mnu->getSubMenu(13);
+            sub = mnu->getSubMenu(14);
             sub->addItem(L"Do not limit FPS", DEBUG_THROTTLE_FPS);
             sub->addItem(L"Toggle FPS (F12)", DEBUG_FPS);
 

@@ -1,0 +1,62 @@
+layout(local_size_x = 16, local_size_y = 16, local_size_z = 1) in;
+
+layout(binding = 0) uniform sampler2D u_depth;
+layout(binding = 1, r32f) uniform writeonly image2D u_hiz_depth;
+
+layout(push_constant) uniform PushConstants
+{
+    ivec3 u_offset_miplevel;
+} pc;
+
+void main()
+{
+    ivec2 dst = ivec2(gl_GlobalInvocationID.xy);
+    ivec2 current_size = imageSize(u_hiz_depth);
+
+    if (dst.x >= current_size.x || dst.y >= current_size.y)
+        return;
+
+    if (pc.u_offset_miplevel.z == 0)
+    {
+        // at level 0, do a 1:1 copy
+        float d = texelFetch(u_depth, dst + pc.u_offset_miplevel.xy, 0).r;
+        imageStore(u_hiz_depth, dst, vec4(d));
+    }
+    else
+    {
+        // at higher mip levels, read a 2×2 block from previous level
+        ivec2 src = dst * 2;
+        int prev_level = pc.u_offset_miplevel.z - 1;
+        ivec2 prev_size = textureSize(u_depth, prev_level);
+        float d0 = texelFetch(u_depth, src + ivec2(0, 0), prev_level).r;
+        float d1 = texelFetch(u_depth, src + ivec2(1, 0), prev_level).r;
+        float d2 = texelFetch(u_depth, src + ivec2(0, 1), prev_level).r;
+        float d3 = texelFetch(u_depth, src + ivec2(1, 1), prev_level).r;
+        float min_depth = min(min(d0, d1), min(d2, d3));
+        //float max_depth = max(max(d0, d1), max(d2, d3));
+        bool extra_sample_x = (current_size.x * 2) < prev_size.x;
+        bool extra_sample_y = (current_size.y * 2) < prev_size.y;
+        if (extra_sample_x)
+        {
+            float d4 = texelFetch(u_depth, src + ivec2(2, 0), prev_level).r;
+            float d5 = texelFetch(u_depth, src + ivec2(2, 1), prev_level).r;
+            min_depth = min(min_depth, min(d4, d5));
+            //max_depth = max(max_depth, max(d4, d5));
+        }
+        if (extra_sample_y)
+        {
+            float d6 = texelFetch(u_depth, src + ivec2(0, 2), prev_level).r;
+            float d7 = texelFetch(u_depth, src + ivec2(1, 2), prev_level).r;
+            min_depth = min(min_depth, min(d6, d7));
+            //max_depth = max(max_depth, max(d6, d7));
+        }
+        if (extra_sample_x && extra_sample_y)
+        {
+            float d8 = texelFetch(u_depth, src + ivec2(2, 2), prev_level).r;
+            min_depth = min(min_depth, d8);
+            //max_depth = max(max_depth, d8);
+        }
+        imageStore(u_hiz_depth, dst, vec4(min_depth));
+        //imageStore(u_hiz_depth, dst, vec4(min_depth, max_depth, 0.0, 0.0));
+    }
+}

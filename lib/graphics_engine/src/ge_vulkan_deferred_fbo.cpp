@@ -285,7 +285,7 @@ void GEVulkanDeferredFBO::initConvertColorDescriptor(GEVulkanDriver* vk)
 void GEVulkanDeferredFBO::initDisplaceDescriptor(GEVulkanDriver* vk)
 {
     // m_descriptor_layout[GVDFP_DISPLACE_COLOR]
-    std::array<VkDescriptorSetLayoutBinding, 4> texture_layout_binding = {};
+    std::array<VkDescriptorSetLayoutBinding, 3> texture_layout_binding = {};
     texture_layout_binding[0].binding = 0;
     texture_layout_binding[0].descriptorCount = 1;
     texture_layout_binding[0].descriptorType =
@@ -296,8 +296,6 @@ void GEVulkanDeferredFBO::initDisplaceDescriptor(GEVulkanDriver* vk)
     texture_layout_binding[1].binding = 1;
     texture_layout_binding[2] = texture_layout_binding[0];
     texture_layout_binding[2].binding = 2;
-    texture_layout_binding[3] = texture_layout_binding[0];
-    texture_layout_binding[3].binding = 3;
 
     VkDescriptorSetLayoutCreateInfo setinfo = {};
     setinfo.flags = 0;
@@ -312,15 +310,17 @@ void GEVulkanDeferredFBO::initDisplaceDescriptor(GEVulkanDriver* vk)
             "GVDFP_DISPLACE_COLOR in GEVulkanDeferredFBO");
     }
 
+    int hiz_multi =
+        getGEConfig()->m_screen_space_reflection_type <= GSSRT_FAST ? 2 : 1;
     // m_descriptor_pool[GVDFP_DISPLACE_COLOR]
     VkDescriptorPoolSize pool_size;
     pool_size.type = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
-    pool_size.descriptorCount = texture_layout_binding.size();
+    pool_size.descriptorCount = texture_layout_binding.size() * hiz_multi;
 
     VkDescriptorPoolCreateInfo pool_info = {};
     pool_info.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO;
     pool_info.flags = 0;
-    pool_info.maxSets = 1;
+    pool_info.maxSets = hiz_multi;
     pool_info.poolSizeCount = 1;
     pool_info.pPoolSizes = &pool_size;
     if (vkCreateDescriptorPool(vk->getDevice(), &pool_info, NULL,
@@ -330,8 +330,8 @@ void GEVulkanDeferredFBO::initDisplaceDescriptor(GEVulkanDriver* vk)
             "GVDFP_DISPLACE_COLOR in GEVulkanDeferredFBO");
     }
 
-    // m_descriptor_set[GVDFP_DISPLACE_COLOR]
-    std::vector<VkDescriptorSetLayout> layouts(1,
+    // m_descriptor_set[GVDFP_DISPLACE_MASK + GVDFP_DISPLACE_COLOR]
+    std::vector<VkDescriptorSetLayout> layouts(hiz_multi,
         m_descriptor_layout[GVDFP_DISPLACE_COLOR]);
 
     VkDescriptorSetAllocateInfo alloc_info = {};
@@ -341,10 +341,12 @@ void GEVulkanDeferredFBO::initDisplaceDescriptor(GEVulkanDriver* vk)
     alloc_info.pSetLayouts = layouts.data();
 
     if (vkAllocateDescriptorSets(vk->getDevice(), &alloc_info,
-        &m_descriptor_set[GVDFP_DISPLACE_COLOR]) != VK_SUCCESS)
+        hiz_multi == 1 ? &m_descriptor_set[GVDFP_DISPLACE_COLOR] :
+        &m_descriptor_set[GVDFP_DISPLACE_MASK]) != VK_SUCCESS)
     {
         throw std::runtime_error("vkAllocateDescriptorSets failed for "
-            "GVDFP_DISPLACE_COLOR in GEVulkanDeferredFBO");
+            "GVDFP_DISPLACE_MASK + GVDFP_DISPLACE_COLOR in "
+            "GEVulkanDeferredFBO");
     }
 
     std::array<VkDescriptorImageInfo, texture_layout_binding.size()>
@@ -362,10 +364,6 @@ void GEVulkanDeferredFBO::initDisplaceDescriptor(GEVulkanDriver* vk)
     image_infos[2].imageView =
         (VkImageView)m_attachments[GVDFT_DISPLACE_COLOR]->getTextureHandler();
     image_infos[2].sampler = m_vk->getSampler(GVS_NEAREST);
-    image_infos[3].imageLayout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_READ_ONLY_OPTIMAL;
-    image_infos[3].imageView =
-        (VkImageView)m_depth_texture->getTextureHandler();
-    image_infos[3].sampler = m_vk->getSampler(GVS_SHADOW);
 
     VkWriteDescriptorSet write_descriptor_set = {};
     write_descriptor_set.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
@@ -377,6 +375,22 @@ void GEVulkanDeferredFBO::initDisplaceDescriptor(GEVulkanDriver* vk)
     write_descriptor_set.pBufferInfo = 0;
     write_descriptor_set.dstSet = m_descriptor_set[GVDFP_DISPLACE_COLOR];
     write_descriptor_set.pImageInfo = image_infos.data();
+
+    vkUpdateDescriptorSets(vk->getDevice(), 1, &write_descriptor_set, 0,
+        NULL);
+
+    if (hiz_multi == 1)
+        return;
+    image_infos[0] = image_infos[2];
+    image_infos[1].imageLayout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_READ_ONLY_OPTIMAL;
+    image_infos[1].imageView =
+        (VkImageView)m_depth_texture->getTextureHandler();
+    image_infos[1].sampler = m_vk->getSampler(GVS_SHADOW);
+    image_infos[2].imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
+    image_infos[2].imageView =
+        (VkImageView)m_vk->getTransparentTexture()->getTextureHandler();
+    write_descriptor_set.dstSet = m_descriptor_set[GVDFP_DISPLACE_MASK];
+    image_infos[2].sampler = m_vk->getSampler(GVS_SKYBOX);
 
     vkUpdateDescriptorSets(vk->getDevice(), 1, &write_descriptor_set, 0,
         NULL);

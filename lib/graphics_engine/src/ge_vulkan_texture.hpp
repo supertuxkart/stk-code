@@ -109,13 +109,6 @@ protected:
     // ------------------------------------------------------------------------
     uint8_t* getTextureData();
     // ------------------------------------------------------------------------
-    unsigned getMipmapLevels() const
-    {
-        if (!m_has_mipmaps)
-            return 1;
-        return std::floor(std::log2(std::max(m_size.Width, m_size.Height))) + 1;
-    }
-    // ------------------------------------------------------------------------
     bool isSingleChannel() const
                             { return m_internal_format == VK_FORMAT_R8_UNORM; }
     // ------------------------------------------------------------------------
@@ -252,6 +245,13 @@ public:
     {
         waitImageView();
         return m_image;
+    }
+    // ------------------------------------------------------------------------
+    unsigned getMipmapLevels() const
+    {
+        if (!m_has_mipmaps)
+            return 1;
+        return std::floor(std::log2(std::max(m_size.Width, m_size.Height))) + 1;
     }
 };   // GEVulkanTexture
 

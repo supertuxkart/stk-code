@@ -62,6 +62,9 @@ public:
     VkFramebuffer getRTTFramebuffer(unsigned id = 0) const
                                           { return m_rtt_frame_buffer.at(id); }
     // ------------------------------------------------------------------------
+    GEVulkanAttachmentTexture* getDepthTexture() const
+                                                    { return m_depth_texture; }
+    // ------------------------------------------------------------------------
     virtual bool isDeferredFBO() const                        { return false; }
     // ------------------------------------------------------------------------
     virtual bool useSwapChainOutput() const                   { return false; }
