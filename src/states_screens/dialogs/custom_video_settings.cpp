@@ -83,13 +83,7 @@ void CustomVideoSettingsDialog::beforeAddingWidgets()
     geometry_level->addLabel(_("Very High"));
     //I18N: Geometry level ultra : everything is displayed, Level-of-Details distances are extremely high
     geometry_level->addLabel(_("Ultra"));
-    // This strange code is needed because a lower geometry level value
-    // used to be better. The values are now from best to worst: 5, 4, 3, 0, 1, 2.
-    // This keeps compatibility with 1.X installs.
-    // FIXME when profile-compatibility is not a concern.
-    geometry_level->setValue(
-        UserConfigParams::m_geometry_level == 2 ? 0 :
-        UserConfigParams::m_geometry_level == 0 ? 2 : UserConfigParams::m_geometry_level);
+    geometry_level->setValue(UserConfigParams::m_geometry_level);
 
     SpinnerWidget* filtering = getWidget<SpinnerWidget>("image_quality");
     filtering->addLabel(_("Very Low"));
@@ -116,6 +110,7 @@ void CustomVideoSettingsDialog::beforeAddingWidgets()
     getWidget<CheckBoxWidget>("mlaa")->setState(UserConfigParams::m_mlaa);
     getWidget<CheckBoxWidget>("glow")->setState(UserConfigParams::m_glow);
     getWidget<CheckBoxWidget>("ssao")->setState(UserConfigParams::m_ssao);
+    getWidget<CheckBoxWidget>("ssr")->setState(UserConfigParams::m_ssr);
     getWidget<CheckBoxWidget>("bloom")->setState(UserConfigParams::m_bloom);
     getWidget<CheckBoxWidget>("lightscattering")->setState(UserConfigParams::m_light_scatter);
     if (CVS->isEXTTextureCompressionS3TCUsable())
@@ -178,7 +173,8 @@ GUIEngine::EventPropagation CustomVideoSettingsDialog::processEvent(const std::s
 
             UserConfigParams::m_ssao =
                 advanced_pipeline && getWidget<CheckBoxWidget>("ssao")->getState();
-
+            UserConfigParams::m_ssr =
+                advanced_pipeline && getWidget<CheckBoxWidget>("ssr")->getState();
             UserConfigParams::m_light_shaft =
                 advanced_pipeline && getWidget<CheckBoxWidget>("lightshaft")->getState();
 
@@ -211,12 +207,8 @@ GUIEngine::EventPropagation CustomVideoSettingsDialog::processEvent(const std::s
             UserConfigParams::m_animated_characters =
                 getWidget<CheckBoxWidget>("animated_characters")->getState();
 
-            const int val =
-                getWidget<SpinnerWidget>("geometry_detail")->getValue();
-            // This strange code is needed because a lower geometry level value
-            // used to be better. This keeps compatibility with 1.X installs.
-            UserConfigParams::m_geometry_level = val == 2 ? 0 : 
-                                                 val == 0 ? 2 : val;
+            UserConfigParams::m_geometry_level =
+                getWidget<SpinnerWidget>("geometry_detail")->getValue();;
             int quality = getWidget<SpinnerWidget>("image_quality")->getValue();
 
             user_config->saveConfig();
@@ -224,8 +216,14 @@ GUIEngine::EventPropagation CustomVideoSettingsDialog::processEvent(const std::s
             ModalDialog::dismiss();
             OptionsScreenVideo::getInstance()->updateGfxSlider();
             OptionsScreenVideo::getInstance()->updateBlurSlider();
-            if ((pbr_changed || ibl_changed) && GE::getDriver()->getDriverType() == video::EDT_VULKAN)
-                GE::getVKDriver()->updateDriver(false/*scale_changed*/, pbr_changed, ibl_changed);
+            GE::GEScreenSpaceReflectionType prev_gssrt = GE::getGEConfig()->m_screen_space_reflection_type;
+            OptionsScreenVideo::setSSR();
+            if (GE::getDriver()->getDriverType() == video::EDT_VULKAN)
+            {
+                bool need_recreate_swapchain = GE::getGEConfig()->m_screen_space_reflection_type != prev_gssrt;
+                if (need_recreate_swapchain || pbr_changed || ibl_changed)
+                    GE::getVKDriver()->updateDriver(need_recreate_swapchain, pbr_changed, ibl_changed);
+            }
             // sameRestart will have the same effect
             if (!(CVS->isGLSL() && pbr_changed))
                 OptionsScreenVideo::setImageQuality(quality, force_reload_texture);
@@ -265,6 +263,7 @@ void CustomVideoSettingsDialog::updateActivation()
     getWidget<SpinnerWidget>("shadows")->setActive(light);
     getWidget<CheckBoxWidget>("mlaa")->setActive(light);
     getWidget<CheckBoxWidget>("ssao")->setActive(light);
+    getWidget<CheckBoxWidget>("ssr")->setActive(light || (vk && real_light));
     getWidget<CheckBoxWidget>("lightshaft")->setActive(light);
     getWidget<CheckBoxWidget>("ibl")->setActive(light || (vk && real_light));
     getWidget<CheckBoxWidget>("glow")->setActive(light);

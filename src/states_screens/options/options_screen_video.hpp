@@ -41,6 +41,7 @@ struct GFXPreset
     bool degraded_ibl;
     int geometry_detail;
     bool pc_soft_shadows;
+    bool ssr;
 };
 
 struct BlurPreset
@@ -103,6 +104,7 @@ public:
     void         updateScaleRTTsSlider();
     static int getImageQuality();
     static void setImageQuality(int quality, bool force_reload_texture);
+    static void setSSR();
 };
 
 #endif

@@ -702,9 +702,7 @@ void Profiler::writeToFile()
     std::ofstream f(FileUtils::getPortableWritingPath(base_name +
         ".perf-report-" + (Track::getCurrentTrack() != NULL ? Track::getCurrentTrack()->getIdent() : "menu") + ".csv"));
 
-    int effective_LoD_level = (UserConfigParams::m_geometry_level == 0 ? 2 :
-                                    UserConfigParams::m_geometry_level == 2 ? 0 :
-                                    UserConfigParams::m_geometry_level);
+    int effective_LoD_level = UserConfigParams::m_geometry_level;
 
     f << "Total frame count, Total profiling time (ms),";
     f << std::endl;

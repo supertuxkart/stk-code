@@ -103,6 +103,14 @@
                 <spacer width="10" height="10"/>
                 <label text="Ambient occlusion" I18N="Video settings"/>
             </div>
+
+            <spacer height="4" width="10" />
+
+            <div layout="horizontal-row" proportion="1" height="fit">
+                <checkbox id="ssr"/>
+                <spacer width="10" height="10"/>
+                <label text="Screen space reflection" I18N="Video settings"/>
+            </div>
         </div>
         
         <spacer height="4" width="10" />
