@@ -505,6 +505,7 @@ namespace GE
 
         unsigned int m_current_frame;
         uint32_t m_image_index;
+        unsigned int m_current_semaphore;
         video::SColor m_clear_color, m_rtt_clear_color;
         core::rect<s32> m_clip;
         core::matrix4 m_pre_rotation_matrix;
