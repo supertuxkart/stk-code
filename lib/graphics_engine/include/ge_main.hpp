@@ -33,6 +33,11 @@ enum GEScreenSpaceReflectionType : unsigned
 {
     GSSRT_DISABLED = 0,
     GSSRT_FAST,
+    GSSRT_HIZ,
+    GSSRT_HIZ100 = GSSRT_HIZ,
+    GSSRT_HIZ200,
+    GSSRT_HIZ400,
+    GSSRT_COUNT,
 };
 
 struct GEConfig

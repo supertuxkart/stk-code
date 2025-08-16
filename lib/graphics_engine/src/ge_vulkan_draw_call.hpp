@@ -118,6 +118,7 @@ struct DrawCallData
     uint32_t m_dynamic_offset;
 };
 
+class GEVulkanHiZDepth;
 class GEVulkanDrawCall
 {
 private:
@@ -190,6 +191,8 @@ private:
 
     std::unordered_map<std::string, std::pair<uint32_t, std::vector<int> > >
         m_materials_data;
+
+    GEVulkanHiZDepth* m_hiz_depth;
 
     // ------------------------------------------------------------------------
     void createAllPipelines(GEVulkanDriver* vk);
@@ -329,6 +332,8 @@ public:
             return true;
         return m_materials_data.find(shader) != m_materials_data.end();
     }
+    // ------------------------------------------------------------------------
+    GEVulkanHiZDepth* getHiZDepth() const               { return m_hiz_depth; }
 };   // GEVulkanDrawCall
 
 }

@@ -49,6 +49,14 @@ void main()
 
     // fallback to skybox
     vec4 fallback = texture(u_skybox_texture, world_reflection);
+
+    // early exit if normal is facing camera too directly (no meaningful reflection)
+    if (normal.z < -0.75)
+    {
+        o_displace_ssr = fallback;
+        return;
+    }
+
     vec4 result;
     vec2 viewport_scale = vec2(1.0);
     vec2 viewport_offset = vec2(0.0);

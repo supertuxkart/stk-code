@@ -15,6 +15,7 @@
 #include "ge_vulkan_draw_call.hpp"
 #include "ge_vulkan_dynamic_spm_buffer.hpp"
 #include "ge_vulkan_features.hpp"
+#include "ge_vulkan_hiz_depth.hpp"
 #include "ge_vulkan_mesh_cache.hpp"
 #include "ge_vulkan_scene_manager.hpp"
 #include "ge_vulkan_shader_manager.hpp"
@@ -53,7 +54,8 @@ extern "C" VKAPI_ATTR VkBool32 VKAPI_CALL debug_callback(
     msg += " ";
     msg += callback_data->pMessage;
     if (msg.find("OutputNotConsumed") != std::string::npos ||
-        msg.find("BestPractices-PushConstants") != std::string::npos)
+        msg.find("BestPractices-PushConstants") != std::string::npos ||
+        msg.find("TransitionUndefinedToReadOnly") != std::string::npos)
         return VK_FALSE;
 #ifdef __ANDROID__
     android_LogPriority alp;
@@ -2602,6 +2604,12 @@ void GEVulkanDriver::renderDrawCalls(
             if (has_displace)
             {
                 vkCmdEndRenderPass(cmd);
+                for (auto& q : p)
+                {
+                    GEVulkanHiZDepth* hiz = q.first->getHiZDepth();
+                    if (hiz)
+                        hiz->generate(cmd);
+                }
                 render_pass_info.clearValueCount = m_rtt_texture
                     ->getZeroClearCountForPass(GVDFP_DISPLACE_MASK);
                 render_pass_info.renderPass = m_rtt_texture

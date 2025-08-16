@@ -88,6 +88,7 @@ set(GE_SOURCES
     src/ge_vulkan_environment_map.cpp
     src/ge_vulkan_fbo_texture.cpp
     src/ge_vulkan_features.cpp
+    src/ge_vulkan_hiz_depth.cpp
     src/ge_vulkan_light_handler.cpp
     src/ge_vulkan_mesh_cache.cpp
     src/ge_vulkan_mesh_scene_node.cpp
