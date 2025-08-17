@@ -425,6 +425,7 @@ private:
     void freeCachedMeshVertexBuffer();
     void copyFromMainProcess();
     video::IImage* getSkyTexture(std::string path) const;
+    scene::IMesh* getClonedMesh(const std::string& filename) const;
 public:
 
     /** Static function to get the current track. NULL if no current
