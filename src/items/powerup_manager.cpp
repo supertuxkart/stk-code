@@ -917,6 +917,7 @@ PowerupManager::PowerupType PowerupManager::getRandomPowerup(unsigned int pos,
     //   basketball, the parachute and the nitro-hack unwelcome
     // - The swatter and the bowling ball make the start too random
     if (World::getWorld() && 
+        RaceManager::get()->isLinearRaceMode() &&
         stk_config->ticks2Time(World::getWorld()->getTicksSinceStart()) <
                                       stk_config->m_limited_items_timeout)
     {
