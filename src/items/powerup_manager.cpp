@@ -933,6 +933,20 @@ PowerupManager::PowerupType PowerupManager::getRandomPowerup(unsigned int pos,
             *n = 1;        
         }
     }
+
+    // Prevent basketballs from being received when at least a kart has
+    // already finished:
+    // - Avoids the first remaining kart receiving a basket ball
+    // - Avoids having a very small space between the player getting the
+    //   basket ball and the kart ahead that will be targeted.
+    if (powerup == POWERUP_RUBBERBALL &&
+        RaceManager::get()->isLinearRaceMode() &&
+        RaceManager::get()->getFinishedKarts() >= 1)
+    {
+        powerup = POWERUP_ZIPPER;
+        *n = 1;            
+    }
+    
     return (PowerupType)powerup;
 }   // getRandomPowerup
 
