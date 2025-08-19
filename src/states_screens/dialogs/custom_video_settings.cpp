@@ -161,7 +161,7 @@ GUIEngine::EventPropagation CustomVideoSettingsDialog::processEvent(const std::s
                     getWidget<SpinnerWidget>("shadows")->getValue() == 2 ? 1024 :
                     getWidget<SpinnerWidget>("shadows")->getValue() >= 3 ? 2048 : 0;
                 UserConfigParams::m_pcss = 
-                    getWidget<SpinnerWidget>("shadows")->getValue() == 3 ? false : true;
+                    getWidget<SpinnerWidget>("shadows")->getValue() == 4 ? true : false;
             }
             else
             {
