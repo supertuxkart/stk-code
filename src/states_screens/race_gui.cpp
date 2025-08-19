@@ -1018,6 +1018,8 @@ void RaceGUI::drawSpeedEnergyRank(const AbstractKart* kart,
                                  float dt)
 {
 #ifndef SERVER_ONLY
+	if (UserConfigParams::m_speedmeter == 0) return; //speedmeter hidden
+	
     float min_ratio         = std::min(scaling.X, scaling.Y);
     const int SPEEDWIDTH   = 128;
     int meter_width        = (int)(SPEEDWIDTH*min_ratio);
@@ -1039,7 +1041,7 @@ void RaceGUI::drawSpeedEnergyRank(const AbstractKart* kart,
     }
     else
     {
-        offset.X = (float)(viewport.LowerRightCorner.X-meter_width) - 250.0f*scaling.X;
+        offset.X = (float)(viewport.LowerRightCorner.X-meter_width) - 220.0f*scaling.X;
         offset.Y = viewport.LowerRightCorner.Y-60.0f*scaling.Y;
     }
     const core::rect<s32> meter_pos((int)offset.X,
