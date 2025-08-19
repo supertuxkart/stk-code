@@ -27,6 +27,7 @@
 #include "modes/world.hpp"
 #include "states_screens/dialogs/message_dialog.hpp"
 #include "states_screens/main_menu_screen.hpp"
+#include "states_screens/race_gui.hpp"
 
 #include <IrrlichtDevice.h>
 
@@ -269,6 +270,19 @@ void OptionsScreenUI::init()
         }
     }
     speedrun_timer->setState( UserConfigParams::m_speedrun_mode );
+	
+	CheckBoxWidget* speedmeter = getWidget<CheckBoxWidget>("speedmeter");
+    assert( speedmeter != NULL );
+	
+    speedmeter->setState( UserConfigParams::m_speedmeter);
+	if (multitouch_enabled)
+    {
+        UserConfigParams::m_speedmeter = 0;
+    }
+	else
+	{
+		UserConfigParams::m_speedmeter = 1;
+	}
 }   // init
 
 // -----------------------------------------------------------------------------
@@ -498,6 +512,12 @@ void OptionsScreenUI::eventCallback(Widget* widget, const std::string& name, con
             }
         }
         UserConfigParams::m_speedrun_mode = speedrun_timer->getState();
+    }
+	else if (name == "speedmeter")
+		{
+        CheckBoxWidget* speedmeter = getWidget<CheckBoxWidget>("speedmeter");
+        assert( speedmeter != NULL );
+        UserConfigParams::m_speedmeter = speedmeter->getState();
     }
 #endif
 }   // eventCallback
