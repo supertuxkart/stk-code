@@ -34,6 +34,7 @@
 
 #include <ICameraSceneNode.h>
 #include <cmath>
+#include <ge_main.hpp>
 
 class LightBaseClass
 {
@@ -187,14 +188,14 @@ public:
 };
 
 // ============================================================================
-class IBLShader : public TextureShader<IBLShader, 7>
+class IBLShader : public TextureShader<IBLShader, 7, int>
 {
 public:
     IBLShader()
     {
         loadProgram(OBJECT, GL_VERTEX_SHADER, "screenquad.vert",
                             GL_FRAGMENT_SHADER, "IBL.frag");
-        assignUniforms();
+        assignUniforms("ssr");
         assignSamplerNames(0, "ntex",  ST_NEAREST_FILTERED,
                            1, "dtex",  ST_NEAREST_FILTERED,
                            2, "stex",  ST_SHADOW_SAMPLER,
@@ -412,7 +413,8 @@ void LightingPasses::renderEnvMap(GLuint normal_depth_texture,
             albedo_buffer,
             ssao_texture,
             diffuse_color_texture);
-        IBLShader::getInstance()->setUniforms();
+        IBLShader::getInstance()->setUniforms(int(
+            GE::getGEConfig()->m_screen_space_reflection_type != GE::GSSRT_DISABLED));
     }
 
     glDrawArrays(GL_TRIANGLES, 0, 3);

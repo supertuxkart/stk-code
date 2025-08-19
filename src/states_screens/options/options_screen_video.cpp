@@ -47,7 +47,7 @@ void OptionsScreenVideo::initPresets()
         false /* light */, 0 /* shadow */, false /* bloom */, false /* lightshaft */,
         false /* glow */, false /* mlaa */, false /* ssao */, false /* light scatter */,
         false /* animatedCharacters */, 1 /* particles */, 0 /* image_quality */,
-        true /* degraded IBL */, 0 /* Geometry Detail */, false /* PCSS */
+        true /* degraded IBL */, 0 /* Geometry Detail */, false /* PCSS */, false /* ssr */
     });
 
     m_presets.push_back // Level 2
@@ -55,15 +55,15 @@ void OptionsScreenVideo::initPresets()
         false /* light */, 0 /* shadow */, false /* bloom */, false /* lightshaft */,
         false /* glow */, false /* mlaa */, false /* ssao */, false /* light scatter */,
         true /* animatedCharacters */, 2 /* particles */, 1 /* image_quality */,
-        true /* degraded IBL */, 1 /* Geometry Detail */, false /* PCSS */
+        true /* degraded IBL */, 1 /* Geometry Detail */, false /* PCSS */, false /* ssr */
     });
 
     m_presets.push_back // Level 3
     ({
         true /* light */, 0 /* shadow */, false /* bloom */, false /* lightshaft */,
         false /* glow */, false /* mlaa */, false /* ssao */, false /* light scatter */,
-        true /* animatedCharacters */, 2 /* particles */, 1 /* image_quality */,
-        true /* degraded IBL */, 2 /* Geometry Detail */, false /* PCSS */
+        true /* animatedCharacters */, 2 /* particles */, 2 /* image_quality */,
+        true /* degraded IBL */, 2 /* Geometry Detail */, false /* PCSS */, false /* ssr */
     });
 
     m_presets.push_back // Level 4
@@ -71,7 +71,7 @@ void OptionsScreenVideo::initPresets()
         true /* light */, 0 /* shadow */, false /* bloom */, false /* lightshaft */,
         true /* glow */, true /* mlaa */, false /* ssao */, true /* light scatter */,
         true /* animatedCharacters */, 2 /* particles */, 2 /* image_quality */,
-        false /* degraded IBL */, 3 /* Geometry Detail */, false /* PCSS */
+        true /* degraded IBL */, 2 /* Geometry Detail */, false /* PCSS */, true /* ssr */
     });
 
     m_presets.push_back // Level 5
@@ -79,7 +79,7 @@ void OptionsScreenVideo::initPresets()
         true /* light */, 512 /* shadow */, true /* bloom */, true /* lightshaft */,
         true /* glow */, true /* mlaa */, false /* ssao */, true /* light scatter */,
         true /* animatedCharacters */, 2 /* particles */, 3 /* image_quality */,
-        false /* degraded IBL */, 3 /* Geometry Detail */, false /* PCSS */
+        false /* degraded IBL */, 3 /* Geometry Detail */, false /* PCSS */, true /* ssr */
     });
 
     m_presets.push_back // Level 6
@@ -87,7 +87,7 @@ void OptionsScreenVideo::initPresets()
         true /* light */, 1024 /* shadow */, true /* bloom */, true /* lightshaft */,
         true /* glow */, true /* mlaa */, true /* ssao */, true /* light scatter */,
         true /* animatedCharacters */, 2 /* particles */, 3 /* image_quality */,
-        false /* degraded IBL */, 4 /* Geometry Detail */, false /* PCSS */
+        false /* degraded IBL */, 4 /* Geometry Detail */, false /* PCSS */, true /* ssr */
     });
 
     m_presets.push_back // Level 7
@@ -95,7 +95,7 @@ void OptionsScreenVideo::initPresets()
         true /* light */, 2048 /* shadow */, true /* bloom */, true /* lightshaft */,
         true /* glow */, true /* mlaa */, true /* ssao */, true /* light scatter */,
         true /* animatedCharacters */, 2 /* particles */, 3 /* image_quality */,
-        false /* degraded IBL */, 5 /* Geometry Detail */, true /* PCSS */
+        false /* degraded IBL */, 5 /* Geometry Detail */, true /* PCSS */, true /* ssr */
     });
 
     m_blur_presets.push_back
@@ -147,7 +147,7 @@ int OptionsScreenVideo::getImageQuality()
         (UserConfigParams::m_high_definition_textures & 0x01) == 0x00 &&
         UserConfigParams::m_hq_mipmap == false)
         return 1;
-    if (UserConfigParams::m_anisotropic == 16 &&
+    if (UserConfigParams::m_anisotropic == 4 &&
         (UserConfigParams::m_high_definition_textures & 0x01) == 0x01 &&
         UserConfigParams::m_hq_mipmap == false)
         return 2;
@@ -184,11 +184,11 @@ void OptionsScreenVideo::setImageQuality(int quality, bool force_reload_texture)
                 td->setSamplerUse(GE::GVS_3D_MESH_MIPMAP_16);
             break;
         case 2:
-            UserConfigParams::m_anisotropic = 16;
+            UserConfigParams::m_anisotropic = 4;
             UserConfigParams::m_high_definition_textures = 0x03;
             UserConfigParams::m_hq_mipmap = false;
             if (td)
-                td->setSamplerUse(GE::GVS_3D_MESH_MIPMAP_16);
+                td->setSamplerUse(GE::GVS_3D_MESH_MIPMAP_4);
             break;
         case 3:
             UserConfigParams::m_anisotropic = 16;
@@ -379,10 +379,9 @@ void OptionsScreenVideo::updateGfxSlider()
             m_presets[l].ssao == UserConfigParams::m_ssao &&
             m_presets[l].light_scatter == UserConfigParams::m_light_scatter &&
             m_presets[l].degraded_ibl == UserConfigParams::m_degraded_IBL &&
-            m_presets[l].geometry_detail == (UserConfigParams::m_geometry_level == 0 ? 2 :
-                                             UserConfigParams::m_geometry_level == 2 ? 0 :
-                                             UserConfigParams::m_geometry_level) &&
-            m_presets[l].pc_soft_shadows == UserConfigParams::m_pcss)
+            m_presets[l].geometry_detail == UserConfigParams::m_geometry_level &&
+            m_presets[l].pc_soft_shadows == UserConfigParams::m_pcss &&
+            m_presets[l].ssr == UserConfigParams::m_ssr)
         {
             gfx->setValue(l + 1);
             found = true;
@@ -529,7 +528,8 @@ void OptionsScreenVideo::updateTooltip()
     //I18N: in graphical options
     tooltip = tooltip + L"\n" + _("Ambient occlusion: %s",
         UserConfigParams::m_ssao ? enabled : disabled);
-
+    tooltip = tooltip + L"\n" + _("Screen space reflection: %s",
+        UserConfigParams::m_ssr ? enabled : disabled);
     //I18N: in graphical options
     tooltip = tooltip + L"\n" + _("Animated Characters: %s",
         UserConfigParams::m_animated_characters ? enabled : disabled);
@@ -547,9 +547,7 @@ void OptionsScreenVideo::updateTooltip()
         quality == 2 ? medium   : high);
 
     //I18N: in graphical options
-    int geometry_detail = (UserConfigParams::m_geometry_level == 0 ? 2 :
-                           UserConfigParams::m_geometry_level == 2 ? 0 :
-                           UserConfigParams::m_geometry_level);
+    int geometry_detail = UserConfigParams::m_geometry_level;
     tooltip = tooltip + L"\n" + _("Geometry detail: %s",
         geometry_detail == 0 ? very_low  :
         geometry_detail == 1 ? low       :
@@ -634,12 +632,12 @@ void OptionsScreenVideo::eventCallback(Widget* widget, const std::string& name,
         UserConfigParams::m_ssao               = m_presets[level].ssao;
         UserConfigParams::m_light_scatter      = m_presets[level].light_scatter;
         UserConfigParams::m_degraded_IBL       = m_presets[level].degraded_ibl;
-        UserConfigParams::m_geometry_level     = (m_presets[level].geometry_detail == 0 ? 2 :
-                                                  m_presets[level].geometry_detail == 2 ? 0 :
-                                                  m_presets[level].geometry_detail);
+        UserConfigParams::m_geometry_level     = m_presets[level].geometry_detail;
         UserConfigParams::m_pcss               = m_presets[level].pc_soft_shadows;
+        UserConfigParams::m_ssr                = m_presets[level].ssr;
 
         updateGfxSlider();
+        setSSR();
     }
     else if (name == "blur_level")
     {
@@ -760,3 +758,31 @@ void OptionsScreenVideo::unloaded()
 }   // unloaded
 
 // --------------------------------------------------------------------------------------------
+
+void OptionsScreenVideo::setSSR()
+{
+#ifndef SERVER_ONLY
+    if (!UserConfigParams::m_ssr)
+        GE::getGEConfig()->m_screen_space_reflection_type = GE::GSSRT_DISABLED;
+    else
+    {
+        int val = UserConfigParams::m_geometry_level;
+        switch (val)
+        {
+        case 3:
+            GE::getGEConfig()->m_screen_space_reflection_type = GE::GSSRT_HIZ100;
+            break;
+        case 4:
+            GE::getGEConfig()->m_screen_space_reflection_type = GE::GSSRT_HIZ200;
+            break;
+        case 5:
+            GE::getGEConfig()->m_screen_space_reflection_type = GE::GSSRT_HIZ400;
+            break;
+        default:
+            GE::getGEConfig()->m_screen_space_reflection_type = GE::GSSRT_FAST;
+            break;
+        }
+    }
+#endif
+}   // setSSR
+
