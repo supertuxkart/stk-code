@@ -510,7 +510,7 @@ begin:
 #endif
 
         video::E_DRIVER_TYPE driver_created = video::EDT_NULL;
-        if (std::string(UserConfigParams::m_render_driver) == "gl")
+        if (std::string(UserConfigParams::m_render_driver) == "opengl")
         {
 #if defined(USE_GLES2)
             driver_created = video::EDT_OGLES2;
@@ -548,14 +548,11 @@ begin:
         }
         else
         {
-            Log::warn("IrrDriver", "Unknown driver %s, revert to gl",
-                UserConfigParams::m_render_driver.c_str());
+            std::string unknown = UserConfigParams::m_render_driver;
             UserConfigParams::m_render_driver.revertToDefaults();
-#if defined(USE_GLES2)
-            driver_created = video::EDT_OGLES2;
-#else
-            driver_created = video::EDT_OPENGL;
-#endif
+            Log::warn("IrrDriver", "Unknown driver %s, revert to %s",
+                unknown.c_str(), UserConfigParams::m_render_driver.c_str());
+            goto begin;
         }
 
 #ifndef SERVER_ONLY

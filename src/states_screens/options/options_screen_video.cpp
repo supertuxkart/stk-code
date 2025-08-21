@@ -298,6 +298,35 @@ void OptionsScreenVideo::init()
 
     vsync->setTooltip(vsync_tooltip);
 
+    GUIEngine::SpinnerWidget* rds = getWidget<GUIEngine::SpinnerWidget>("render_driver");
+    assert( rds != NULL );
+
+    rds->clearLabels();
+    rds->addLabel("OpenGL");
+    rds->addLabel("Vulkan");
+#ifndef WIN32
+    const int rd_count = 2;
+#else
+    const int rd_count = 3;
+    rds->addLabel("DirectX9");
+#endif
+    bool found = false;
+    for (int i = 0; i < rd_count; i++)
+    {
+        std::string rd = StringUtils::wideToUtf8(rds->getStringValueFromID(i).make_lower());
+        if (std::string(UserConfigParams::m_render_driver) == rd)
+        {
+            rds->setValue(i);
+            found = true;
+            break;
+        }
+    }
+    if (!found)
+    {
+        rds->addLabel(StringUtils::utf8ToWide(UserConfigParams::m_render_driver));
+        rds->setValue(rd_count);
+    }
+
     // Setup Render Resolution (scale_rtts) spinner
     GUIEngine::SpinnerWidget* scale_rtts = getWidget<GUIEngine::SpinnerWidget>("scale_rtts");
     assert( scale_rtts != NULL );
@@ -334,6 +363,7 @@ void OptionsScreenVideo::init()
 
 #ifndef SERVER_ONLY
     gfx->setActive(!in_game && CVS->isGLSL());
+    rds->setActive(!in_game);
     getWidget<ButtonWidget>("custom")->setActive(!in_game || !CVS->isGLSL());
     if (getWidget<SpinnerWidget>("scale_rtts")->isActivated())
     {
@@ -722,6 +752,13 @@ void OptionsScreenVideo::tearDown()
 {
 #ifndef SERVER_ONLY
     applySettings();
+    std::string rd = StringUtils::wideToUtf8(
+        getWidget<GUIEngine::SpinnerWidget>("render_driver")->getStringValue().make_lower());
+    if (std::string(UserConfigParams::m_render_driver) != rd)
+    {
+        UserConfigParams::m_render_driver = rd;
+        irr_driver->fullRestart();
+    }
     Screen::tearDown();
     // save changes when leaving screen
     user_config->saveConfig();

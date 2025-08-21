@@ -1857,7 +1857,7 @@ void ClientLobby::handleClientCommand(const std::string& cmd)
     }
     else if (argv[0] == "opengl")
     {
-        UserConfigParams::m_render_driver = "gl";
+        UserConfigParams::m_render_driver = "opengl";
         user_config->saveConfig();
     }
     else if (argv[0] == "vulkan")

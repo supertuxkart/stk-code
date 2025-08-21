@@ -83,6 +83,20 @@
 
                 <spacer width="5" height="2%"/>
 
+                <!-- ************ Render Driver ************ -->
+                <div width="100%" height="fit" layout="horizontal-row" id="outer_box" >
+                    <spacer width="3%" height="100%" />
+                    <div layout="vertical-row" width="10f" height="fit" id="inner_box">
+                        <spinner id="render_driver" width="100%" align="center" />
+                    </div>
+                    <div layout="vertical-row" proportion="1" height="100%">
+                        <label id="render_driver_label" height="100%" I18N="In the video options" text="Render Driver" align="left"/>
+                    </div>
+                </div>
+
+                <spacer width="5" height="2%"/>
+
+
                 <!-- ************ CUSTOM SETTINGS ************ -->
                 <div width="100%" height="fit" layout="horizontal-row" id="outer_box" >
                     <spacer width="5%" height="100%" />

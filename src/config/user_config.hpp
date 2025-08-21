@@ -718,11 +718,11 @@ namespace UserConfigParams
 #if defined(_IRR_COMPILE_WITH_DIRECT3D_9_) && defined(_M_ARM)
     PARAM_PREFIX StringUserConfigParam         m_render_driver
         PARAM_DEFAULT(  StringUserConfigParam("directx9", "render_driver",
-        &m_video_group, "Render video driver to use, at the moment gl, vulkan or directx9 is supported.") );
+        &m_video_group, "Render video driver to use, at the moment opengl, vulkan or directx9 is supported.") );
 #else
     PARAM_PREFIX StringUserConfigParam         m_render_driver
-        PARAM_DEFAULT(  StringUserConfigParam("gl", "render_driver",
-        &m_video_group, "Render video driver to use, at the moment gl, vulkan or directx9 is supported.") );
+        PARAM_DEFAULT(  StringUserConfigParam("opengl", "render_driver",
+        &m_video_group, "Render video driver to use, at the moment opengl, vulkan or directx9 is supported.") );
 #endif
 
 #if defined(MOBILE_STK)
