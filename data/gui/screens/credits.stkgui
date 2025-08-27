@@ -2,7 +2,7 @@
 <stkgui>
     <icon-button id="back" x="1%" y="0" height="9%" icon="gui/icons/back.png"/>
     <div x="0%" y="1%" width="99%" height="fit" layout="vertical-row">
-        <button id="stk-website" height="fit" align="right" text="supertuxkart.net"/>
+        <button id="stk-website" height="fit" align="right" text="supertuxkart-evolution.com"/>
     </div>
 
     <div x="2%" y="2%" width="96%" height="96%" layout="vertical-row" >
