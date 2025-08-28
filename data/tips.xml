@@ -6,7 +6,7 @@
         <tip text="The font size can be changed in the UI options."/>
         <tip text="The help menu has lots of useful information."/>
         <tip text="In single-player, you can watch and challenge recorded time-trials."/>
-        <tip text="You can visit https://supertuxkart.net/ for more information about the game."/>
+        <tip text="You can visit https://supertuxkart-evolution.com/ for more information about the game."/>
     </tipset>
     <tipset id="race-powerup">
         <tip text="The swatter can be used to remove bombs or parachutes."/>

@@ -7,7 +7,7 @@
 
 SuperTuxKart is a free kart racing game. It focuses on fun and not on realistic kart physics. Instructions can be found on the in-game help page.
 
-The SuperTuxKart homepage can be found at <https://supertuxkart.net/>. There is also our [FAQ](https://supertuxkart.net/FAQ) and information on how get in touch with the [community](https://supertuxkart.net/Community).
+The SuperTuxKart homepage can be found at <https://supertuxkart-evolution.com/>. There is also our [FAQ](https://supertuxkart-evolution.com/FAQ) and information on how get in touch with the [community](https://supertuxkart-evolution.com/Community).
 
 Latest release binaries can be found [here](https://github.com/supertuxkart/stk-code/releases/latest), and preview release [here](https://github.com/supertuxkart/stk-code/releases/preview).
 

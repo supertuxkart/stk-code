@@ -175,7 +175,7 @@
   </description>
   <screenshots>
     <screenshot type="default">
-      <image>https://supertuxkart.net/assets/wiki/STK1.3_1.jpg</image>
+      <image>https://supertuxkart-evolution.com/assets/wiki/STK1.3_1.jpg</image>
       <caption>Normal Race</caption>
       <caption xml:lang="zh_TW">正常比賽</caption>
       <caption xml:lang="zh_HK">正常比賽</caption>
@@ -242,7 +242,7 @@
       <caption xml:lang="ar">سباق عاديّ</caption>
     </screenshot>
     <screenshot>
-      <image>https://supertuxkart.net/assets/wiki/STK1.3_5.jpg</image>
+      <image>https://supertuxkart-evolution.com/assets/wiki/STK1.3_5.jpg</image>
       <caption>Battle</caption>
       <caption xml:lang="zh_TW">對戰</caption>
       <caption xml:lang="zh_HK">對戰</caption>
@@ -302,7 +302,7 @@
       <caption xml:lang="ar">معركة</caption>
     </screenshot>
     <screenshot>
-      <image>https://supertuxkart.net/assets/wiki/STK1.3_6.jpg</image>
+      <image>https://supertuxkart-evolution.com/assets/wiki/STK1.3_6.jpg</image>
       <caption>Soccer</caption>
       <caption xml:lang="zh_TW">足球</caption>
       <caption xml:lang="zh_HK">足球</caption>
@@ -421,24 +421,24 @@
   <developer_name xml:lang="be">Каманда SuperTuxKart</developer_name>
   <developer_name xml:lang="ar">فريق سوبر تكس كارت</developer_name>
   <update_contact>supertuxkart-devel@lists.sourceforge.net</update_contact>
-  <url type="homepage">https://supertuxkart.net</url>
+  <url type="homepage">https://supertuxkart-evolution.com</url>
   <url type="bugtracker">https://github.com/supertuxkart/stk-code/issues</url>
-  <url type="donation">https://supertuxkart.net/Donate</url>
-  <url type="help">https://supertuxkart.net/Community</url>
-  <url type="translate">https://supertuxkart.net/Translating_STK</url>
-  <url type="faq">https://supertuxkart.net/FAQ</url>
+  <url type="donation">https://supertuxkart-evolution.com/Donate</url>
+  <url type="help">https://supertuxkart-evolution.com/Community</url>
+  <url type="translate">https://supertuxkart-evolution.com/Translating_STK</url>
+  <url type="faq">https://supertuxkart-evolution.com/FAQ</url>
   <url type="vcs-browser">https://github.com/supertuxkart/stk-code</url>
-  <url type="contribute">https://supertuxkart.net/Community</url>
+  <url type="contribute">https://supertuxkart-evolution.com/Community</url>
   <content_rating type="oars-1.1">
     <content_attribute id="violence-cartoon">mild</content_attribute>
     <content_attribute id="social-chat">intense</content_attribute>
   </content_rating>
   <releases>
     <release version="1.4" date="2022-10-31">
-      <url>https://blog.supertuxkart.net/2022/11/supertuxkart-14-release.html</url>
+      <url>https://blog.supertuxkart-evolution.com/2022/11/supertuxkart-14-release.html</url>
     </release>
     <release version="1.3" date="2021-09-28">
-      <url>https://blog.supertuxkart.net/2021/09/supertuxkart-13-release.html</url>
+      <url>https://blog.supertuxkart-evolution.com/2021/09/supertuxkart-13-release.html</url>
     </release>
     <release version="1.2" date="2020-08-27"/>
     <release version="1.1" date="2020-01-05"/>

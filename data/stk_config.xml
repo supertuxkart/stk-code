@@ -20,13 +20,13 @@
 
   <!-- Everything related to hardware configuration.
             url : The server used for reporting statistics to. -->
-  <HardwareReportServer url="https://stats.supertuxkart.net" />
+  <HardwareReportServer url="https://stats.supertuxkart-evolution.com" />
 
   <!-- Everything related to online play.
             url: The server used for online multiplayer.
             server-version : Version of the server API to use. -->
   <OnlineServer
-    url="https://online.supertuxkart.net/api/"
+    url="https://online.supertuxkart-evolution.com/api/"
     server-version="2"
   />
 
@@ -34,7 +34,7 @@
             url : The server used for addon.
             allow-news-redirects : If true we allow all the server urls to be redirected by the addons news.xml file-->
   <AddonServer
-    url="https://online.supertuxkart.net/dl/xml"
+    url="https://online.supertuxkart-evolution.com/dl/xml"
     allow-news-redirects="true"
   />
 
@@ -190,15 +190,15 @@
           delta-steering="0.26" />
 
   <!-- Special urls -->
-  <urls stk-website="https://supertuxkart.net/Main_Page"
-		donate="https://supertuxkart.net/Donate"
-        password-reset="https://online.supertuxkart.net/password-reset.php"
+  <urls stk-website="https://supertuxkart-evolution.com/Main_Page"
+		donate="https://supertuxkart-evolution.com/Donate"
+        password-reset="https://online.supertuxkart-evolution.com/password-reset.php"
         assets-download="https://github.com/supertuxkart/stk-assets-mobile/releases/download/"/>
 
   <!-- STK will use dns query of the SRV records with these domains to get the list of
        stun servers to use for IPv4 and IPv6. -->
-  <stun ipv4="_stunv4._udp.supertuxkart.net"
-        ipv6="_stunv6._udp.supertuxkart.net"/>
+  <stun ipv4="_stunv4._udp.supertuxkart-evolution.com"
+        ipv6="_stunv6._udp.supertuxkart-evolution.com"/>
 
   <!-- Skidmark data: maximum number of skid marks, and
        time for skidmarks to fade out. Maximum number will over
