@@ -5,9 +5,11 @@ layout(location = 5) in vec3 f_normal;
 layout(location = 8) in vec4 f_world_position;
 
 layout(location = 0) out vec4 o_color;
+layout(location = 1) out vec4 o_normal;
 
 #include "utils/sample_mesh_texture.glsl"
 #include "utils/handle_pbr.glsl"
+#include "../utils/encode_normal.frag"
 
 #define HIGH_RES_SAMPLER 1.0f
 #define LOW_RES_SAMPLER 0.5f
@@ -54,6 +56,16 @@ void main()
         max(0.0, (1.0 - splatting.r - splatting.g - splatting.b)) * detail3;
 
     vec3 normal = normalize(f_normal.xyz);
-    o_color = vec4(handlePBR(splatted.xyz, vec3(0.0), f_world_position, normal), 1.0);
+    if (u_deferred)
+    {
+        o_color = vec4(splatted.xyz, 0.0);
+        o_normal.xy = EncodeNormal(normal);
+        o_normal.zw = vec2(0.0);
+    }
+    else
+    {
+        o_color = vec4(handlePBR(splatted.xyz, vec3(0.0), f_world_position,
+            normal), 1.0);
+    }
 #endif
 }

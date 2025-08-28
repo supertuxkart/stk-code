@@ -106,6 +106,10 @@ void GEVulkanShaderManager::loadAllShaders(const std::string& match_filename)
         oss << "#define GE_SAMPLE_TEX_INDEX int\n";
     if (GEVulkanFeatures::supportsShaderStorageImageExtendedFormats())
         oss << "#define SHADER_STORAGE_IMAGE_EXTENDED_FORMATS\n";
+
+#if defined(TILED_GPU)
+    oss << "#define TILED_GPU\n";
+#endif
     g_predefines = oss.str();
 
     irr::io::IFileList* files = g_file_system->createFileList(

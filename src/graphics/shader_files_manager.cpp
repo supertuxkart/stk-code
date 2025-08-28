@@ -202,12 +202,16 @@ ShaderFilesManager::SharedShader ShaderFilesManager::loadShader
         code << "precision highp float;\n";
         code << "precision highp sampler2DArrayShadow;\n";
         code << "precision highp sampler2DArray;\n";
+        code << "precision highp sampler2DShadow;\n";
+        code << "precision highp sampler2D;\n";
     }
     else
     {
         code << "precision mediump float;\n";
         code << "precision mediump sampler2DArrayShadow;\n";
         code << "precision mediump sampler2DArray;\n";
+        code << "precision mediump sampler2DShadow;\n";
+        code << "precision mediump sampler2D;\n";
     }
 #endif
     code << "#define MAX_BONES " << stk_config->m_max_skinning_bones << "\n";

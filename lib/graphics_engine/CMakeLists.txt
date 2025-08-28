@@ -80,6 +80,7 @@ set(GE_SOURCES
     src/ge_vulkan_billboard_buffer.cpp
     src/ge_vulkan_camera_scene_node.cpp
     src/ge_vulkan_command_loader.cpp
+    src/ge_vulkan_deferred_fbo.cpp
     src/ge_vulkan_driver.cpp
     src/ge_vulkan_draw_call.cpp
     src/ge_vulkan_dynamic_buffer.cpp
@@ -87,6 +88,7 @@ set(GE_SOURCES
     src/ge_vulkan_environment_map.cpp
     src/ge_vulkan_fbo_texture.cpp
     src/ge_vulkan_features.cpp
+    src/ge_vulkan_hiz_depth.cpp
     src/ge_vulkan_light_handler.cpp
     src/ge_vulkan_mesh_cache.cpp
     src/ge_vulkan_mesh_scene_node.cpp

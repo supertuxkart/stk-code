@@ -3,6 +3,7 @@
 #include "ge_main.hpp"
 #include "ge_vulkan_driver.hpp"
 #include "ge_vulkan_dynamic_buffer.hpp"
+#include "ge_vulkan_fbo_texture.hpp"
 #include "ge_vulkan_features.hpp"
 #include "ge_vulkan_shader_manager.hpp"
 #include "ge_vulkan_texture_descriptor.hpp"
@@ -234,8 +235,19 @@ void GEVulkan2dRenderer::createGraphicsPipeline()
     pipeline_info.pColorBlendState = &color_blending;
     pipeline_info.pDynamicState = &dynamic_state_info;
     pipeline_info.layout = g_pipeline_layout;
-    pipeline_info.renderPass = g_vk->getRenderPass();
-    pipeline_info.subpass = 0;
+    GEVulkanFBOTexture* rtt = g_vk->getRTTTexture();
+    bool rpc1 = rtt && rtt->getRTTRenderPassCount() == 1;
+    bool sco = rtt && rtt->useSwapChainOutput();
+    if (sco)
+    {
+        if (rpc1)
+            pipeline_info.renderPass = rtt->getRTTRenderPass();
+        else
+            pipeline_info.renderPass = rtt->getRTTRenderPass(rtt->getRTTRenderPassCount() - 1);
+    }
+    else
+        pipeline_info.renderPass = g_vk->getRenderPass();
+    pipeline_info.subpass = sco && rpc1 ? 2 : 0;
     pipeline_info.basePipelineHandle = VK_NULL_HANDLE;
 
     VkResult result = vkCreateGraphicsPipelines(g_vk->getDevice(),

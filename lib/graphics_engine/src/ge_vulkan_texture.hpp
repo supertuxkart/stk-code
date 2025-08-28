@@ -20,9 +20,12 @@ using namespace irr;
 namespace GE
 {
 class GEVulkanDriver;
+class GEVulkanDeferredFBO;
 class GEVulkanTexture : public video::ITexture
 {
 protected:
+    friend class GEVulkanDeferredFBO;
+
     core::dimension2d<u32> m_size, m_orig_size;
 
     std::function<void(video::IImage*)> m_image_mani;
@@ -105,13 +108,6 @@ protected:
     void bgraConversion(uint8_t* img_data);
     // ------------------------------------------------------------------------
     uint8_t* getTextureData();
-    // ------------------------------------------------------------------------
-    unsigned getMipmapLevels() const
-    {
-        if (!m_has_mipmaps)
-            return 1;
-        return std::floor(std::log2(std::max(m_size.Width, m_size.Height))) + 1;
-    }
     // ------------------------------------------------------------------------
     bool isSingleChannel() const
                             { return m_internal_format == VK_FORMAT_R8_UNORM; }
@@ -249,6 +245,13 @@ public:
     {
         waitImageView();
         return m_image;
+    }
+    // ------------------------------------------------------------------------
+    unsigned getMipmapLevels() const
+    {
+        if (!m_has_mipmaps)
+            return 1;
+        return std::floor(std::log2(std::max(m_size.Width, m_size.Height))) + 1;
     }
 };   // GEVulkanTexture
 

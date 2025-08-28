@@ -88,6 +88,7 @@
 #include <IFileSystem.h>
 #include <ILightSceneNode.h>
 #include <IMeshCache.h>
+#include <IMeshLoader.h>
 #include <IMeshManipulator.h>
 #include <IMeshSceneNode.h>
 #include <ISceneManager.h>
@@ -1445,8 +1446,17 @@ bool Track::loadMainTrack(const XMLNode &root)
         }
         else
         {
+            bool load_cloned_mesh = false;
+            bool has_challenge = !challenge.empty() && challenge != "tutorial";
+            const ChallengeData* c = NULL;
+            if (has_challenge)
+                c = unlock_manager->getChallengeData(challenge);
+#ifndef SERVER_ONLY
+            load_cloned_mesh = CVS->isGLSL() && c && !c->isGrandPrix();
+#endif
             // TODO: check if mesh is animated or not
-            scene::IMesh *a_mesh = irr_driver->getMesh(full_path);
+            scene::IMesh *a_mesh = load_cloned_mesh ?
+                getClonedMesh(full_path) : irr_driver->getMesh(full_path);
             if(!a_mesh)
             {
                 Log::error("track", "Object model '%s' not found, ignored.\n",
@@ -1480,11 +1490,8 @@ bool Track::loadMainTrack(const XMLNode &root)
             // TODO: this is hardcoded for the overworld, convert to scripting
             if (challenge.size() > 0)
             {
-                const ChallengeData* c = NULL;
-
                 if (challenge != "tutorial")
                 {
-                    c = unlock_manager->getChallengeData(challenge);
                     if (c == NULL)
                     {
                         Log::error("track", "Cannot find challenge named <%s>\n",
@@ -1513,16 +1520,30 @@ bool Track::loadMainTrack(const XMLNode &root)
                         }
 
                         std::string sshot = t->getScreenshotFile();
-                        video::ITexture* screenshot = irr_driver->getTexture(sshot);
-
-                        if (screenshot == NULL)
+                        if (load_cloned_mesh)
                         {
-                            Log::error("track",
-                                       "Cannot find track screenshot <%s>",
-                                       sshot.c_str());
-                            continue;
+                            SP::SPMeshBuffer* spmb = dynamic_cast<SP::SPMeshBuffer*>(a_mesh->getMeshBuffer(0));
+                            if (spmb)
+                            {
+                                std::string fp = file_manager->getFileSystem()->getAbsolutePath
+                                    (sshot.c_str()).c_str();
+                                spmb->setSTKMaterial(
+                                    material_manager->getDefaultSPMaterial("alphablend", fp, true/*full_path*/));
+                            }
                         }
-                        scene_node->getMaterial(0).setTexture(0, screenshot);
+                        else
+                        {
+                            video::ITexture* screenshot = irr_driver->getTexture(sshot);
+
+                            if (screenshot == NULL)
+                            {
+                                Log::error("track",
+                                           "Cannot find track screenshot <%s>",
+                                           sshot.c_str());
+                                continue;
+                            }
+                            scene_node->getMaterial(0).setTexture(0, screenshot);
+                        }
                     }
                 }
 
@@ -3109,3 +3130,33 @@ video::IImage* Track::getSkyTexture(std::string path) const
         ->getDriverAttributes().getAttributeAsDimension2d("MAX_TEXTURE_SIZE"));
 #endif
 }   // getSkyTexture
+
+//-----------------------------------------------------------------------------
+scene::IMesh* Track::getClonedMesh(const std::string& filename) const
+{
+    scene::ISceneManager* sm = irr_driver->getSceneManager();
+    scene::IAnimatedMesh* msh = NULL;
+    io::IReadFile* file = file_manager->getFileSystem()->createAndOpenFile(filename.c_str());
+    if (!file)
+        return NULL;
+
+    int count = sm->getMeshLoaderCount();
+    for (int i = count - 1; i >= 0; i--)
+    {
+        if (sm->getMeshLoader(i)->isALoadableFileExtension(filename.c_str()))
+        {
+            file->seek(0);
+            msh = sm->getMeshLoader(i)->createMesh(file);
+            if (msh)
+            {
+                sm->getMeshCache()->addMesh(
+                    (filename + StringUtils::toString(size_t(msh))).c_str(), msh);
+                msh->drop();
+                break;
+            }
+        }
+    }
+
+    file->drop();
+    return msh;
+}   // getClonedMesh

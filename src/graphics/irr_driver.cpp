@@ -77,11 +77,14 @@
 #include "scriptengine/property_animator.hpp"
 #include "states_screens/dialogs/confirm_resolution_dialog.hpp"
 #include "states_screens/dialogs/message_dialog.hpp"
+#include "states_screens/options/options_screen_video.hpp"
 #include "states_screens/state_manager.hpp"
 #include "tracks/track_manager.hpp"
 #include "tracks/track.hpp"
+#include "utils/command_line.hpp"
 #include "utils/constants.hpp"
 #include "utils/file_utils.hpp"
+#include "utils/helpers.hpp"
 #include "utils/log.hpp"
 #include "utils/profiler.hpp"
 #include "utils/string_utils.hpp"
@@ -103,6 +106,7 @@
 #include <ge_main.hpp>
 #include <ge_vulkan_driver.hpp>
 #include <ge_vulkan_texture_descriptor.hpp>
+#include <SDL_stdinc.h>
 #endif
 
 #ifdef ENABLE_RECORDER
@@ -512,9 +516,19 @@ begin:
         {
             driver_created = video::EDT_DIRECT3D9;
         }
-        else if (std::string(UserConfigParams::m_render_driver) == "vulkan")
+        else if (std::string(UserConfigParams::m_render_driver) == "vulkan" ||
+            std::string(UserConfigParams::m_render_driver) == "directx12")
         {
             driver_created = video::EDT_VULKAN;
+#if defined(WIN32) && !defined(SERVER_ONLY)
+            if (std::string(UserConfigParams::m_render_driver) == "directx12")
+            {
+                std::string dozen_path = StringUtils::getPath(
+                    CommandLine::getExecName());
+                SDL_setenv("VK_DRIVER_FILES",
+                    (dozen_path + "\\dzn_icd.json").c_str(), 1);
+            }
+#endif
 #ifndef SERVER_ONLY
             GE::getGEConfig()->m_texture_compression =
                 UserConfigParams::m_texture_compression;
@@ -547,6 +561,7 @@ begin:
         if (UserConfigParams::m_swap_interval > 1)
             UserConfigParams::m_swap_interval = 1;
 
+        OptionsScreenVideo::setSSR();
         // Try 32 and, upon failure, 24 then 16 bit per pixels
         for (int bits=32; bits>15; bits -=8)
         {
@@ -2125,6 +2140,33 @@ void IrrDriver::handleWindowResize()
 }   // handleWindowResize
 
 // ----------------------------------------------------------------------------
+void IrrDriver::updateDisplace(float dt)
+{
+#ifndef SERVER_ONLY
+    if (!Track::getCurrentTrack())
+        return;
+
+    const float time = m_device->getTimer()->getTime() / 1000.0f;
+    const float speed = Track::getCurrentTrack()->getDisplacementSpeed();
+
+    float strength = time;
+    strength = fabsf(noise2d(strength / 10.0f)) * 0.006f + 0.002f;
+
+    core::vector3df wind = m_wind->getWind() * strength * speed;
+    GE::getDisplaceDirection()[0] += wind.X * dt;
+    GE::getDisplaceDirection()[1] += wind.Z * dt;
+
+    strength = time * 0.56f + sinf(time);
+    strength = fabsf(noise2d(0.0, strength / 6.0f)) * 0.0095f + 0.0025f;
+
+    wind = m_wind->getWind() * strength * speed;
+    wind.rotateXZBy(cosf(time));
+    GE::getDisplaceDirection()[2] += wind.X * dt;
+    GE::getDisplaceDirection()[3] += wind.Z * dt;
+#endif
+}   // updateDisplace
+
+// ----------------------------------------------------------------------------
 /** Update, called once per frame.
  *  \param dt Time since last update
  *  \param is_loading True if the rendering is called during loading of world,
@@ -2163,6 +2205,7 @@ void IrrDriver::update(float dt, bool is_loading)
     if (world)
     {
 #ifndef SERVER_ONLY
+        updateDisplace(dt);
         m_renderer->render(dt, is_loading);
 
         GUIEngine::Screen* current_screen = GUIEngine::getCurrentScreen();

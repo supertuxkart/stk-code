@@ -1294,7 +1294,9 @@ void RaceResultGUI::renderGlobal(float dt)
                 break;
             case RR_INCREASE_POINTS:
             {
+#ifndef NDEBUG
                 WorldWithRank *wwr = dynamic_cast<WorldWithRank*>(World::getWorld());
+#endif
                 assert(wwr);
                 ri->m_current_displayed_points += dt * m_most_points / time_for_points;
                 if (ri->m_current_displayed_points > ri->m_new_overall_points)

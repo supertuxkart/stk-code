@@ -290,7 +290,7 @@ namespace StringUtils
     /**
      * Returns the hostname part of an url (if any)
      *
-     * Example https://online.supertuxkart.net/
+     * Example https://online.supertuxkart-evolution.com/
      *
      */
     std::string getHostNameFromURL(const std::string& url);

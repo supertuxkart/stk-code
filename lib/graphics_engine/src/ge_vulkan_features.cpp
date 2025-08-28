@@ -6,6 +6,7 @@
 
 #include <algorithm>
 #include <set>
+#include <stdexcept>
 #include <string>
 #include <vector>
 
@@ -91,6 +92,25 @@ void GEVulkanFeatures::init(GEVulkanDriver* vk)
         VK_FORMAT_ASTC_4x4_UNORM_BLOCK, &format_properties);
     g_supports_astc_4x4 = format_properties.optimalTilingFeatures & VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT;
     g_supports_shader_storage_image_extended_format = vk->getPhysicalDeviceFeatures().shaderStorageImageExtendedFormats;
+    if (g_supports_shader_storage_image_extended_format)
+    {
+        // iOS simulator doesn't support writing to VK_FORMAT_A2B10G10R10_UNORM_PACK32
+        try
+        {
+            std::vector<VkFormat> a2b10g10r10 =
+            {
+                VK_FORMAT_A2B10G10R10_UNORM_PACK32,
+            };
+            VkFormat format = vk->findSupportedFormat(a2b10g10r10,
+                VK_IMAGE_TILING_OPTIMAL, VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT |
+                VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT |
+                VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT);
+        }
+        catch (std::runtime_error& e)
+        {
+            g_supports_shader_storage_image_extended_format = false;
+        }
+    }
 
     uint32_t extension_count;
     vkEnumerateDeviceExtensionProperties(vk->getPhysicalDevice(), NULL,

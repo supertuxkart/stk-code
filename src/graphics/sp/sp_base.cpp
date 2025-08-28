@@ -28,9 +28,9 @@
 #include "graphics/shared_gpu_objects.hpp"
 #include "graphics/shader_based_renderer.hpp"
 #include "graphics/post_processing.hpp"
-#include <ge_render_info.hpp>
 #include "graphics/rtts.hpp"
 #include "graphics/shaders.hpp"
+#include "graphics/skybox.hpp"
 #include "graphics/sp/sp_dynamic_draw_call.hpp"
 #include "graphics/sp/sp_instanced_data.hpp"
 #include "graphics/sp/sp_per_object_uniform.hpp"
@@ -45,7 +45,6 @@
 #include "guiengine/engine.hpp"
 #include "tracks/track.hpp"
 #include "utils/log.hpp"
-#include "utils/helpers.hpp"
 #include "utils/profiler.hpp"
 #include "utils/string_utils.hpp"
 
@@ -59,6 +58,7 @@
 #include <vector>
 
 #include <ge_main.hpp>
+#include <ge_render_info.hpp>
 
 #include <IrrlichtDevice.h>
 
@@ -151,43 +151,14 @@ ShaderBasedRenderer* getRenderer()
 }   // getRenderer
 
 // ----------------------------------------------------------------------------
-void displaceUniformAssigner(SP::SPUniformAssigner* ua)
-{
-    static std::array<float, 4> g_direction = {{ 0, 0, 0, 0 }};
-    if (!Track::getCurrentTrack())
-    {
-        ua->setValue(g_direction);
-        return;
-    }
-    const float time = irr_driver->getDevice()->getTimer()->getTime() /
-        1000.0f;
-    const float speed = Track::getCurrentTrack()->getDisplacementSpeed();
-
-    float strength = time;
-    strength = fabsf(noise2d(strength / 10.0f)) * 0.006f + 0.002f;
-
-    core::vector3df wind = irr_driver->getWind() * strength * speed;
-    g_direction[0] += wind.X;
-    g_direction[1] += wind.Z;
-
-    strength = time * 0.56f + sinf(time);
-    strength = fabsf(noise2d(0.0, strength / 6.0f)) * 0.0095f + 0.0025f;
-
-    wind = irr_driver->getWind() * strength * speed;
-    wind.rotateXZBy(cosf(time));
-    g_direction[2] += wind.X;
-    g_direction[3] += wind.Z;
-    ua->setValue(g_direction);
-}   // displaceUniformAssigner
-
-// ----------------------------------------------------------------------------
 void displaceShaderInit(SPShader* shader)
 {
     shader->addShaderFile("sp_pass.vert", GL_VERTEX_SHADER, RP_1ST);
-    shader->addShaderFile("white.frag", GL_FRAGMENT_SHADER, RP_1ST);
+    shader->addShaderFile("sp_displace_ssr.frag", GL_FRAGMENT_SHADER, RP_1ST);
     shader->linkShaderFiles(RP_1ST);
     shader->use(RP_1ST);
     shader->addBasicUniforms(RP_1ST);
+    shader->addAllUniforms(RP_1ST);
     shader->setUseFunction([]()->void
         {
             assert(g_stk_sbr->getRTTs() != NULL);
@@ -199,8 +170,24 @@ void displaceShaderInit(SPShader* shader)
             glEnable(GL_STENCIL_TEST);
             glStencilFunc(GL_ALWAYS, 1, 0xFF);
             glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
-            g_stk_sbr->getRTTs()->getFBO(FBO_RGBA_1).bind(),
+            g_stk_sbr->getRTTs()->getFBO(FBO_DISPLACE_SSR).bind(),
             glClear(GL_COLOR_BUFFER_BIT);
+        }, RP_1ST);
+    shader->addCustomPrefilledTextures(ST_BILINEAR,
+        GL_TEXTURE_2D, "u_displace_color", []()->GLuint
+        {
+            return g_stk_sbr->getRTTs()->getFBO(FBO_COLORS).getRTT()[0];
+        }, RP_1ST);
+    shader->addCustomPrefilledTextures(ST_SHADOW,
+        GL_TEXTURE_2D, "u_depth", []()->GLuint
+        {
+            return g_stk_sbr->getRTTs()->getDepthStencilTexture();
+        }, RP_1ST);
+    shader->addCustomPrefilledTextures(ST_TRILINEAR_CLAMPED,
+        GL_TEXTURE_CUBE_MAP, "u_skybox_texture", []()->GLuint
+        {
+            return g_stk_sbr->getSkybox() ?
+                g_stk_sbr->getSkybox()->getCubeMap() : 0;
         }, RP_1ST);
     shader->addShaderFile("sp_pass.vert", GL_VERTEX_SHADER, RP_RESERVED);
     shader->addShaderFile("sp_displace.frag", GL_FRAGMENT_SHADER, RP_RESERVED);
@@ -226,12 +213,20 @@ void displaceShaderInit(SPShader* shader)
     shader->addCustomPrefilledTextures(ST_BILINEAR,
         GL_TEXTURE_2D, "mask_tex", []()->GLuint
         {
-            return g_stk_sbr->getRTTs()->getFBO(FBO_RGBA_1).getRTT()[0];
+            return g_stk_sbr->getRTTs()->getFBO(FBO_DISPLACE_SSR).getRTT()[0];
         }, RP_RESERVED);
     shader->addCustomPrefilledTextures(ST_BILINEAR,
         GL_TEXTURE_2D, "color_tex", []()->GLuint
         {
             return g_stk_sbr->getRTTs()->getFBO(FBO_COLORS).getRTT()[0];
+        }, RP_RESERVED);
+    shader->addCustomPrefilledTextures(ST_BILINEAR,
+        GL_TEXTURE_2D, "ssr_tex", []()->GLuint
+        {
+            auto& r = g_stk_sbr->getRTTs()->getFBO(FBO_DISPLACE_SSR).getRTT();
+            if (r.size() > 1)
+                return r[1];
+            return 0;
         }, RP_RESERVED);
     shader->addAllTextures(RP_RESERVED);
     shader->setUnuseFunction([]()->void
@@ -245,7 +240,16 @@ void displaceShaderInit(SPShader* shader)
             glDisable(GL_STENCIL_TEST);
         }, RP_RESERVED);
     static_cast<SPPerObjectUniform*>(shader)
-        ->addAssignerFunction("direction", displaceUniformAssigner);
+        ->addAssignerFunction("direction", [](SP::SPUniformAssigner* ua)->void
+        {
+            ua->setValue(GE::getDisplaceDirection());
+        });
+    static_cast<SPPerObjectUniform*>(shader)
+        ->addAssignerFunction("u_ssr", [](SP::SPUniformAssigner* ua)->void
+        {
+            ua->setValue(GE::getGEConfig()->m_screen_space_reflection_type !=
+                GE::GSSRT_DISABLED ? 1 : 0);
+        });
 }   // displaceShaderInit
 
 // ----------------------------------------------------------------------------
@@ -548,6 +552,7 @@ void initSamplers()
                     GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
                 glSamplerParameteri(id, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
                 glSamplerParameteri(id, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+                glSamplerParameteri(id, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
                 if (CVS->isEXTTextureFilterAnisotropicUsable())
                 {
                     int aniso = UserConfigParams::m_anisotropic;

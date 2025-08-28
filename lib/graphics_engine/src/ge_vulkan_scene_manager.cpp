@@ -3,12 +3,14 @@
 #include "../source/Irrlicht/os.h"
 
 #include "ge_main.hpp"
+#include "ge_material_manager.hpp"
 #include "ge_vulkan_animated_mesh_scene_node.hpp"
 #include "ge_vulkan_camera_scene_node.hpp"
 #include "ge_vulkan_command_loader.hpp"
+#include "ge_vulkan_deferred_fbo.hpp"
 #include "ge_vulkan_draw_call.hpp"
 #include "ge_vulkan_driver.hpp"
-#include "ge_vulkan_fbo_texture.hpp"
+#include "ge_vulkan_light_handler.hpp"
 #include "ge_vulkan_mesh_cache.hpp"
 #include "ge_vulkan_mesh_scene_node.hpp"
 #include "ge_vulkan_skybox_renderer.hpp"
@@ -28,6 +30,7 @@ GEVulkanSceneManager::GEVulkanSceneManager(irr::video::IVideoDriver* driver,
                     : CSceneManager(driver, fs, cursor_control,
                                     new GEVulkanMeshCache(), gui_environment)
 {
+    resetDetectDeferred();
     // CSceneManager grabbed it
     getMeshCache()->drop();
 }   // GEVulkanSceneManager
@@ -183,13 +186,18 @@ void GEVulkanSceneManager::drawAll(irr::u32 flags)
     if (!rtt)
         return;
 
-    std::array<VkClearValue, 2> clear_values = {};
+    std::vector<VkClearValue> clear_values(2);
     video::SColorf cf(vk->getRTTClearColor());
     clear_values[0].color =
     {
         cf.getRed(), cf.getGreen(), cf.getBlue(), cf.getAlpha()
     };
     clear_values[1].depthStencil = {1.0f, 0};
+    unsigned count = rtt->getZeroClearCountForPass(GVDFP_HDR);
+    VkClearValue zero;
+    zero.color = {0, 0, 0, 0};
+    for (unsigned c = 0; c < count; c++)
+        clear_values.push_back(zero);
 
     VkCommandBuffer cmd = GEVulkanCommandLoader::beginSingleTimeCommands();
 
@@ -264,9 +272,69 @@ irr::u32 GEVulkanSceneManager::registerNodeForRendering(
 }   // registerNodeForRendering
 
 // ----------------------------------------------------------------------------
+void GEVulkanSceneManager::detectDeferred(irr::scene::ISceneNode* node)
+{
+    if (node->isVisible())
+    {
+        switch (node->getType())
+        {
+        case irr::scene::ESNT_LIGHT:
+        {
+            auto l = static_cast<irr::scene::ILightSceneNode*>(node);
+            if (l->getLightType() == irr::video::ELT_POINT)
+                m_pointlight_count++;
+            else if (l->getLightType() == irr::video::ELT_SPOT)
+                m_spotlight_count++;
+            break;
+        }
+        case irr::scene::ESNT_ANIMATED_MESH:
+        case irr::scene::ESNT_MESH:
+        {
+            for (unsigned i = 0; i < node->getMaterialCount(); i++)
+            {
+                irr::video::SMaterial& m = node->getMaterial(i);
+                if (GEMaterialManager::getShader(m.MaterialType) == "displace")
+                    m_displace_count++;
+            }
+            break;
+        }
+        default:
+            break;
+        }
+    }
+    for (unsigned i = 0; i < node->getChildren().size(); i++)
+        detectDeferred(node->getChildren()[i]);
+}   // detectDeferred
+
+// ----------------------------------------------------------------------------
+GEAutoDeferredType GEVulkanSceneManager::getDetectDeferredResult() const
+{
+    if (m_displace_count > 0)
+        return GADT_DISPLACE;
+#if defined(TILED_GPU)
+    if (m_spotlight_count > 0 ||
+        m_pointlight_count > MAX_RENDERING_LIGHT / 2)
+        return GADT_SINGLE_PASS;
+#endif
+    return GADT_DISABLED;
+}   // getDetectDeferredResult
+
+// ----------------------------------------------------------------------------
 void GEVulkanSceneManager::addDrawCall(GEVulkanCameraSceneNode* cam)
 {
     GEVulkanDriver* gevk = static_cast<GEVulkanDriver*>(getVideoDriver());
+    if (!gevk->getSeparateRTTTexture())
+    {
+        bool prev_deferred = needsDeferredRendering();
+        GEAutoDeferredType prev_deferred_type =
+            getGEConfig()->m_auto_deferred_type;
+        resetDetectDeferred();
+        detectDeferred(this);
+        getGEConfig()->m_auto_deferred_type = getDetectDeferredResult();
+        if (needsDeferredRendering() != prev_deferred ||
+            prev_deferred_type != getGEConfig()->m_auto_deferred_type)
+            gevk->updateDriver();
+    }
     m_draw_calls[cam] = gevk->getDrawCallFromCache();
 }   // addDrawCall
 

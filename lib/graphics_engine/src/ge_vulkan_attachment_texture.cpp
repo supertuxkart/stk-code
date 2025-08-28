@@ -34,20 +34,25 @@ GEVulkanAttachmentTexture::GEVulkanAttachmentTexture(GEVulkanDriver* vk,
 
 // ----------------------------------------------------------------------------
 GEVulkanAttachmentTexture* GEVulkanAttachmentTexture::createDepthTexture(
-                        GEVulkanDriver* vk, const core::dimension2d<u32>& size)
+                        GEVulkanDriver* vk, const core::dimension2d<u32>& size,
+                        bool lazy_allocation)
 {
     std::vector<VkFormat> preferred =
     {
         VK_FORMAT_D32_SFLOAT,
-        VK_FORMAT_D32_SFLOAT_S8_UINT,
-        VK_FORMAT_D24_UNORM_S8_UINT
+        VK_FORMAT_D24_UNORM_S8_UINT,
+        VK_FORMAT_D16_UNORM
     };
     VkFormat format = vk->findSupportedFormat(preferred,
         VK_IMAGE_TILING_OPTIMAL,
         VK_FORMAT_FEATURE_DEPTH_STENCIL_ATTACHMENT_BIT);
-    return new GEVulkanAttachmentTexture(vk, size, format,
-        VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT |
-        VK_IMAGE_USAGE_TRANSIENT_ATTACHMENT_BIT,
+    VkImageUsageFlags iu = VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT |
+        VK_IMAGE_USAGE_INPUT_ATTACHMENT_BIT;
+    if (lazy_allocation)
+        iu |= VK_IMAGE_USAGE_TRANSIENT_ATTACHMENT_BIT;
+    else
+        iu |= VK_IMAGE_USAGE_SAMPLED_BIT;
+    return new GEVulkanAttachmentTexture(vk, size, format, iu,
         VK_IMAGE_ASPECT_DEPTH_BIT);
 }   // createDepthTexture
 

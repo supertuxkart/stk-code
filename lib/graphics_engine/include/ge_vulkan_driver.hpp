@@ -42,6 +42,7 @@ namespace GE
         GVS_3D_MESH_MIPMAP_4,
         GVS_3D_MESH_MIPMAP_16,
         GVS_2D_RENDER,
+        GVS_SHADOW,
         GVS_COUNT,
     };
     class GEVulkanDriver : public video::CNullDriver
@@ -85,9 +86,6 @@ namespace GE
 
         //! sets a viewport
         virtual void setViewPort(const core::rect<s32>& area);
-
-        //! gets the area of the current viewport
-        virtual const core::rect<s32>& getViewPort() const { return m_viewport; }
 
         //! updates hardware buffer if needed
         virtual bool updateHardwareBuffer(SHWBufferLink *HWBuffer) { return false; }
@@ -317,6 +315,9 @@ namespace GE
                               { return m_vk->command_buffers[m_current_frame]; }
         std::vector<VkImage>& getSwapChainImages()
                                              { return m_vk->swap_chain_images; }
+        std::vector<VkImageView>& getSwapChainImageViews()
+                                        { return m_vk->swap_chain_image_views; }
+        VkFormat getSwapChainImageFormat() { return m_swap_chain_image_format; }
         std::vector<VkFramebuffer>& getSwapChainFramebuffers()
                                        { return m_vk->swap_chain_framebuffers; }
 
@@ -369,7 +370,7 @@ namespace GE
                                               { return m_separate_rtt_texture; }
         void handleDeletedTextures();
         void addRTTPolyCount(unsigned count)       { m_rtt_polycount += count; }
-        SDL_Window* getSDLWindow() const                    { return m_window; }
+        SDL_Window* getSDLWindow() const       { return m_params.m_sdl_window; }
         void clearDrawCallsCache();
         void addDrawCallToCache(std::unique_ptr<GEVulkanDrawCall>& dc);
         std::unique_ptr<GEVulkanDrawCall> getDrawCallFromCache();
@@ -504,15 +505,14 @@ namespace GE
 
         unsigned int m_current_frame;
         uint32_t m_image_index;
+        unsigned int m_current_semaphore;
         video::SColor m_clear_color, m_rtt_clear_color;
         core::rect<s32> m_clip;
-        core::rect<s32> m_viewport;
         core::matrix4 m_pre_rotation_matrix;
 
         video::ITexture* m_white_texture;
         video::ITexture* m_transparent_texture;
 
-        SDL_Window* m_window;
         bool m_disable_wait_idle;
 
         IrrlichtDevice* m_irrlicht_device;

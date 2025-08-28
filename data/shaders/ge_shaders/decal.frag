@@ -11,6 +11,8 @@ layout(location = 0) out vec4 o_color;
 #include "utils/sample_mesh_texture.glsl"
 #ifdef PBR_ENABLED
 #include "utils/handle_pbr.glsl"
+#include "../utils/encode_normal.frag"
+layout(location = 1) out vec4 o_normal;
 #endif
 
 void main()
@@ -24,6 +26,16 @@ void main()
 #else
     vec3 normal = normalize(f_normal.xyz);
     vec3 pbr = sampleMeshTexture2(f_material_id, f_uv).xyz;
-    o_color = vec4(handlePBR(final_color, vec3(0.0), f_world_position, normal), 1.0);
+    if (u_deferred)
+    {
+        o_color = vec4(final_color, pbr.z);
+        o_normal.xy = EncodeNormal(normal);
+        o_normal.zw = pbr.xy;
+    }
+    else
+    {
+        o_color = vec4(handlePBR(final_color, pbr, f_world_position, normal),
+            1.0);
+    }
 #endif
 }

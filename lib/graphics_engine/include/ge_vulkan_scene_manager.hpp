@@ -9,14 +9,26 @@ namespace GE
 {
 class GEVulkanCameraSceneNode;
 class GEVulkanDrawCall;
+enum GEAutoDeferredType : unsigned;
 
 class GEVulkanSceneManager : public irr::scene::CSceneManager
 {
 private:
+    unsigned m_pointlight_count, m_spotlight_count, m_displace_count;
+
     std::map<GEVulkanCameraSceneNode*, std::unique_ptr<GEVulkanDrawCall> > m_draw_calls;
 
     // ------------------------------------------------------------------------
     void drawAllInternal();
+    // ------------------------------------------------------------------------
+    void resetDetectDeferred()
+    {
+        m_pointlight_count = m_spotlight_count = m_displace_count = 0;
+    }
+    // ------------------------------------------------------------------------
+    GEAutoDeferredType getDetectDeferredResult() const;
+    // ------------------------------------------------------------------------
+    void detectDeferred(irr::scene::ISceneNode* node);
 public:
     // ------------------------------------------------------------------------
     GEVulkanSceneManager(irr::video::IVideoDriver* driver,

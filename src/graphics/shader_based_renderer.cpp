@@ -288,7 +288,8 @@ void ShaderBasedRenderer::renderSceneDeferred(scene::ICameraSceneNode * const ca
         m_lighting_passes.renderLights( hasShadow,
                                         m_rtts->getRenderTarget(RTT_NORMAL_AND_DEPTH),
                                         m_rtts->getDepthStencilTexture(),
-                                        m_rtts->getRenderTarget(RTT_COLOR),
+                                        // FIXME don't use previous frame for SSR
+                                        Camera::getNumCameras() == 1 ? m_rtts->getRenderTarget(RTT_COLOR) : m_rtts->getRenderTarget(RTT_SP_DIFF_COLOR),
                                         m_rtts->getShadowFrameBuffer(),
                                         m_rtts->getRenderTarget(RTT_HALF1_R),
                                         m_rtts->getRenderTarget(RTT_SP_DIFF_COLOR),

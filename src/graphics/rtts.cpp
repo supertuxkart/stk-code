@@ -25,6 +25,7 @@
 #include "utils/log.hpp"
 
 #include <dimension2d.h>
+#include <ge_main.hpp>
 
 using namespace irr;
 static GLuint generateRTT3D(GLenum target, unsigned int w, unsigned int h, 
@@ -126,6 +127,7 @@ RTT::RTT(unsigned int width, unsigned int height, float rtt_scale,
         m_render_target_textures[RTT_HALF1] = generateRTT(half, rgba_internal_format, rgba_format, type);
         m_render_target_textures[RTT_HALF1_R] = generateRTT(half, red_internal_format, red_format, type);
         m_render_target_textures[RTT_HALF2] = generateRTT(half, rgba_internal_format, rgba_format, type);
+        m_render_target_textures[RTT_R] = generateRTT(res, GL_R8, GL_RED, GL_UNSIGNED_BYTE);
 
         if (UserConfigParams::m_mlaa)
         {
@@ -193,6 +195,12 @@ RTT::RTT(unsigned int width, unsigned int height, float rtt_scale,
         somevector.push_back(m_render_target_textures[RTT_DIFFUSE]);
         somevector.push_back(m_render_target_textures[RTT_SPECULAR]);
         m_frame_buffers[FBO_COMBINED_DIFFUSE_SPECULAR] = new FrameBuffer(somevector, m_depth_stencil_tex, res.Width, res.Height);
+
+        somevector.clear();
+        somevector.push_back(m_render_target_textures[RTT_R]);
+        if (GE::getGEConfig()->m_screen_space_reflection_type != GE::GSSRT_DISABLED)
+            somevector.push_back(m_render_target_textures[RTT_DIFFUSE]);
+        m_frame_buffers[FBO_DISPLACE_SSR] = new FrameBuffer(somevector, m_depth_stencil_tex, res.Width, res.Height);
 
         somevector.clear();
         somevector.push_back(m_render_target_textures[RTT_TMP1]);

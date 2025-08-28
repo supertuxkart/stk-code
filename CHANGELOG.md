@@ -43,6 +43,7 @@ For similar reasons, and because some features are vastly more complex than othe
 * Various tweaks, bugfixes and code-quality improvements
 
 ### Graphics
+* Many many improvements to the Vulkan renderer, by Benau and CodingJellyfish
 * Improve the accuracy of the framerate limiter, by Benau
 * Add more maximum framerate options to the built-in framerate limiter, by Benau
 * Add some graphical effects for legacy video drivers, by Benau
@@ -80,6 +81,7 @@ For similar reasons, and because some features are vastly more complex than othe
 * Add an always visible random track button in track selection, by Hanuko33 and Alayan
 * Generate higher resolution texture for scalable fonts, by CodingJellyfish
 * Fix for multiple keyboard navigation issues, by Alayan
+* Better scaling for font size and for race UI elements across different aspect ratios, by Alayan
 * Various enhancements, by QwertyChouskie, Nomagno, Nstelt and others
 
 #### In-race UI
@@ -698,6 +700,11 @@ Too many to list them all. Main points:
 * Bugfix: Grass in castle arena slowed down the kart.
 * Bugfix: GP result showed kart identifier instead of name.
 * Improvement: there is now 1 1 sec. wait period for the race result screen, avoiding the problem that someone presses space/enter at the end of a race, immediately quitting the menu before it can be read.
+
+### Tracks and modeling
+#### Karts
+- New Pidgin kart
+- New Nolok kart
 
 
 ## SuperTuxKart 0.6.1a (February 2009)

@@ -54,6 +54,8 @@ private:
     GEGlobalLightBuffer m_buffer;
 
     std::vector<GELight> m_lights;
+
+    unsigned m_fullscreen_light_count;
 public:
     // ------------------------------------------------------------------------
     GEVulkanLightHandler(GEVulkanDriver* vk)
@@ -78,6 +80,11 @@ public:
         return sizeof(GEGlobalLightBuffer) -
             (sizeof(GELight) * (MAX_RENDERING_LIGHT - m_buffer.m_light_count));
     }
+    // ------------------------------------------------------------------------
+    unsigned getLightCount() const           { return m_buffer.m_light_count; }
+    // ------------------------------------------------------------------------
+    unsigned getFullscreenLightCount() const
+                                           { return m_fullscreen_light_count; }
 };   // GEVulkanLightHandler
 
 }

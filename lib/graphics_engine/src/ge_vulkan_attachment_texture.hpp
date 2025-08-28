@@ -53,7 +53,8 @@ public:
                                                        { return m_image_view; }
     // ------------------------------------------------------------------------
     static GEVulkanAttachmentTexture* createDepthTexture(
-                       GEVulkanDriver* vk, const core::dimension2d<u32>& size);
+                       GEVulkanDriver* vk, const core::dimension2d<u32>& size,
+                       bool lazy_allocation = true);
 
 };   // GEVulkanAttachmentTexture
 

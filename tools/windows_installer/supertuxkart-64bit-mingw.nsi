@@ -46,9 +46,9 @@
 
   # These will be displayed by the "Click here for support information" link in "Add/Remove Programs"
   # It is possible to use "mailto:" links in here to open the email client
-  !define HELPURL "https://supertuxkart.net/" # "Support Information" link
-  !define UPDATEURL "https://supertuxkart.net/" # "Product Updates" link
-  !define ABOUTURL "https://supertuxkart.net/" # "Publisher" link
+  !define HELPURL "https://supertuxkart-evolution.com/" # "Support Information" link
+  !define UPDATEURL "https://supertuxkart-evolution.com/" # "Product Updates" link
+  !define ABOUTURL "https://supertuxkart-evolution.com/" # "Publisher" link
 
   RequestExecutionLevel admin
 
@@ -68,8 +68,8 @@
   !define MUI_WELCOMEFINISHPAGE_BITMAP "stk_installer.bmp"
   !define MUI_WELCOMEFINISHPAGE_BITMAP_NOSTRETCH
   !define MUI_HEADERIMAGE_BITMAP "logo_slim.bmp"
-  ;!define MUI_TEXT_INSTALLING_SUBTITLE "Please vote for SuperTuxKart to become SourceForge's Project of the month at vote.supertuxkart.net"
-  ;!define MUI_TEXT_FINISH_INFO_TEXT "Please vote for SuperTuxKart to become $\"Project of the Month$\" at vote.supertuxkart.net"
+  ;!define MUI_TEXT_INSTALLING_SUBTITLE "Please vote for SuperTuxKart to become SourceForge's Project of the month at vote.supertuxkart-evolution.com"
+  ;!define MUI_TEXT_FINISH_INFO_TEXT "Please vote for SuperTuxKart to become $\"Project of the Month$\" at vote.supertuxkart-evolution.com"
 
   ; Sets the compressor to /SOLID lzma which when I (hiker) tested was the best.
   ; Between LZMA and zlib there is only a 20 MB difference.
@@ -125,7 +125,7 @@ FunctionEnd
 
   !insertmacro MUI_PAGE_INSTFILES
   ;!define MUI_FINISHPAGE_LINK "Please vote for SuperTuxkart here"
-  ;!define MUI_FINISHPAGE_LINK_LOCATION "http://vote.supertuxkart.net"
+  ;!define MUI_FINISHPAGE_LINK_LOCATION "http://vote.supertuxkart-evolution.com"
   !insertmacro MUI_PAGE_FINISH
 
 

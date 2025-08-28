@@ -25,6 +25,9 @@ GEConfig g_config =
     false,
     false,
     true,
+    GADT_DISABLED,
+    GSSRT_DISABLED,
+    false,
     {},
     1.0f
 };
@@ -32,6 +35,7 @@ std::string g_shader_folder = "";
 std::chrono::steady_clock::time_point g_mono_start =
     std::chrono::steady_clock::now();
 std::unique_ptr<GEOcclusionCulling> g_occulsion_culling;
+std::array<float, 4> g_displace_direction = {};
 
 void setVideoDriver(irr::video::IVideoDriver* driver)
 {
@@ -214,6 +218,18 @@ bool hasOcclusionCulling()
     if (g_occulsion_culling)
         return true;
     return false;
+}
+
+bool needsDeferredRendering(bool auto_deferred)
+{
+    return g_config.m_pbr &&
+        ((auto_deferred && g_config.m_auto_deferred_type != GADT_DISABLED) ||
+        g_config.m_force_deferred);
+}
+
+std::array<float, 4>& getDisplaceDirection()
+{
+    return g_displace_direction;
 }
 
 }

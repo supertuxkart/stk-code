@@ -20,9 +20,11 @@ namespace GE
 GEVulkanArrayTexture::ThreadLoader::ThreadLoader(GEVulkanArrayTexture* texture,
                                              const std::vector<io::path>& list,
                       std::function<void(video::IImage*, unsigned)> image_mani,
-                                                        video::SColor unicolor)
+                                                        video::SColor unicolor,
+                                                    VkImageLayout first_layout)
                     : m_texture(texture), m_list(list),
-                      m_image_mani(image_mani), m_unicolor(unicolor)
+                      m_image_mani(image_mani), m_unicolor(unicolor),
+                      m_first_layout(first_layout)
 {
     m_images.resize(m_texture->m_layer_count);
     m_mipmaps.resize(m_texture->m_layer_count);
@@ -111,10 +113,15 @@ GEVulkanArrayTexture::ThreadLoader::~ThreadLoader()
             offset += level.m_size;
         }
     }
+    if (m_first_layout == VK_IMAGE_LAYOUT_UNDEFINED)
+    {
+        if (storage_image)
+            m_first_layout = VK_IMAGE_LAYOUT_GENERAL;
+        else
+            m_first_layout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
+    }
     m_texture->transitionImageLayout(command_buffer,
-        VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL,
-        storage_image ?
-        VK_IMAGE_LAYOUT_GENERAL : VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
+        VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, m_first_layout);
 
     GEVulkanCommandLoader::endSingleTimeCommands(command_buffer);
 
@@ -291,7 +298,8 @@ GEVulkanArrayTexture::GEVulkanArrayTexture(VkFormat internal_format,
                                            VkImageViewType type,
                                            const core::dimension2du& size,
                                            unsigned layer_count,
-                                           video::SColor unicolor)
+                                           video::SColor unicolor,
+                                           VkImageLayout first_layout)
 {
     m_layer_count = layer_count;
     m_image_view_type = type;
@@ -312,7 +320,7 @@ GEVulkanArrayTexture::GEVulkanArrayTexture(VkFormat internal_format,
         for (unsigned i = 0; i < m_layer_count; i++)
             list.push_back("");
         std::shared_ptr<ThreadLoader> tl = std::make_shared<ThreadLoader>(this,
-            list, nullptr, unicolor);
+            list, nullptr, unicolor, first_layout);
         for (unsigned i = 0; i < list.size(); i++)
         {
             GEVulkanCommandLoader::addMultiThreadingCommand(
@@ -329,8 +337,16 @@ GEVulkanArrayTexture::GEVulkanArrayTexture(VkFormat internal_format,
         }
         VkCommandBuffer command_buffer =
             GEVulkanCommandLoader::beginSingleTimeCommands();
-        transitionImageLayout(command_buffer, VK_IMAGE_LAYOUT_UNDEFINED,
-            VK_IMAGE_LAYOUT_GENERAL);
+        if (first_layout != VK_IMAGE_LAYOUT_UNDEFINED)
+        {
+            transitionImageLayout(command_buffer, VK_IMAGE_LAYOUT_UNDEFINED,
+                first_layout);
+        }
+        else
+        {
+            transitionImageLayout(command_buffer, VK_IMAGE_LAYOUT_UNDEFINED,
+                VK_IMAGE_LAYOUT_GENERAL);
+        }
         GEVulkanCommandLoader::endSingleTimeCommands(command_buffer);
         createImageView(VK_IMAGE_ASPECT_COLOR_BIT);
     }

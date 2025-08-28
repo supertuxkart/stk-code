@@ -55,6 +55,7 @@ using namespace irr;
 
 #include "utils/aligned_array.hpp"
 #include "utils/log.hpp"
+#include "utils/random_generator.hpp"
 #include "utils/vec3.hpp"
 #include "utils/stk_process.hpp"
 
@@ -424,6 +425,7 @@ private:
     void freeCachedMeshVertexBuffer();
     void copyFromMainProcess();
     video::IImage* getSkyTexture(std::string path) const;
+    scene::IMesh* getClonedMesh(const std::string& filename) const;
 public:
 
     /** Static function to get the current track. NULL if no current
@@ -560,7 +562,8 @@ public:
     */
     void shuffleStartTransforms()
     {
-        std::random_shuffle(m_start_transforms.begin(), m_start_transforms.end());
+       std::shuffle(m_start_transforms.begin(), m_start_transforms.end(),
+                    RandomGenerator::getGenerator());
     }
     // ------------------------------------------------------------------------
     /** Sets pointer to the aabb of this track. */
