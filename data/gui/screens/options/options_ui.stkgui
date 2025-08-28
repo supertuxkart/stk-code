@@ -93,6 +93,12 @@
                 </div>
 
                 <spacer width="5" height="2%"/>
+				
+				<div layout="horizontal-row" width="100%" height="fit">
+                    <checkbox id="speedmeter"/>
+                    <spacer width="1%" height="100%" />
+                    <label id="speedmeter-text" height="100%" I18N="In the ui settings" text="Enable the speedmeter" word_wrap="true"/>
+                </div>
             </box>
         </div>
     </div>
