@@ -16,7 +16,7 @@ export NDK_BUILD_SCRIPT="$DIRNAME/Android.mk"
 export CPU_CORE="-j$(($(nproc) + 1))"
 
 if [ -z "$STK_MIN_ANDROID_SDK" ]; then
-    export STK_MIN_ANDROID_SDK=16
+    export STK_MIN_ANDROID_SDK=21
 fi
 
 if [ -z "$STK_TARGET_ANDROID_SDK" ]; then
@@ -24,7 +24,7 @@ if [ -z "$STK_TARGET_ANDROID_SDK" ]; then
 fi
 
 if [ -z "$STK_NDK_VERSION" ]; then
-    export STK_NDK_VERSION=23.1.7779620
+    export STK_NDK_VERSION="28.1.13356709"
 fi
 
 export APP_NAME_RELEASE="SuperTuxKart"
