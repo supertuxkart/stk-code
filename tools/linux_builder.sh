@@ -302,6 +302,9 @@ build_stk()
         cp -a -f "$DEPENDENCIES_DIR/../lib/mbedtls/"* "$DEPENDENCIES_DIR/mbedtls"
     
         cd "$DEPENDENCIES_DIR/mbedtls"
+        if [ "$ARCH_OPTION" = "x86" ]; then
+            sed -i 's/#define MBEDTLS_AESNI_C//g' "$DEPENDENCIES_DIR/mbedtls/include/mbedtls/mbedtls_config.h"
+        fi
         cmake . -DCMAKE_FIND_ROOT_PATH="$INSTALL_DIR" \
                 -DCMAKE_INSTALL_PREFIX="$INSTALL_DIR" \
                 -DUSE_SHARED_MBEDTLS_LIBRARY=1 \
