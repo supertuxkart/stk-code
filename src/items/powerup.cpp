@@ -149,10 +149,6 @@ void Powerup::set(PowerupManager::PowerupType type, int n)
 
     m_number=n;
 
-    // Don't re-create sound sound during rewinding
-    if (RewindManager::get()->isRewinding())
-        return;
-
     if (m_sound_use != NULL)
     {
         m_sound_use->deleteSFX();
