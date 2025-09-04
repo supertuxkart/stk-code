@@ -46,7 +46,7 @@ RegistrationDialog::RegistrationDialog() :
         "If you have any questions or comments regarding these "
         "terms, one of the members of the development team would gladly "
         "assist you.",
-        "https://terms.supertuxkart-evolution.com");
+        "https://terms.supertuxkart.net");
     terms_widget->setText(terms, false);
 
    // showRegistrationTerms();
