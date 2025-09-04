@@ -363,6 +363,16 @@ enum AnimType {ANIMS_NONE         = 0,
                ANIMS_PLAYERS_ONLY = 1,
                ANIMS_ALL          = 2 };
 
+enum GeometryLevel
+{
+    /** Display everything */
+    GEOLEVEL_0    = 0,
+    /** a few details are displayed */
+    GEOLEVEL_1    = 1,
+    /** Lowest level, no details are displayed. */
+    GEOLEVEL_2    = 2
+};
+
 enum MultitouchControls
 {
     MULTITOUCH_CONTROLS_UNDEFINED = 0,
@@ -657,6 +667,9 @@ namespace UserConfigParams
     PARAM_PREFIX BoolUserConfigParam        m_speedrun_mode
             PARAM_DEFAULT(  BoolUserConfigParam(false, "show_speedrun_timer",
                             &m_video_group, "Display the speedrun timer") );
+	    PARAM_PREFIX BoolUserConfigParam        m_speedmeter
+            PARAM_DEFAULT(  BoolUserConfigParam(false, "show_speedmeter",
+                            &m_video_group, "Display the speedmeter") );
     PARAM_PREFIX IntUserConfigParam         m_max_fps
             PARAM_DEFAULT(  IntUserConfigParam(120, "max_fps",
                        &m_video_group, "Maximum fps, should be at least 60") );
@@ -704,9 +717,7 @@ namespace UserConfigParams
         PARAM_DEFAULT(IntUserConfigParam(512, "max_texture_size",
         &m_video_group, "Max texture size when high definition textures are "
                         "disabled"));
-    PARAM_PREFIX BoolUserConfigParam        m_ssr
-        PARAM_DEFAULT(BoolUserConfigParam(false, "ssr",
-        &m_video_group, "Enable screen space reflection"));
+
     PARAM_PREFIX BoolUserConfigParam        m_hq_mipmap
         PARAM_DEFAULT(BoolUserConfigParam(false, "hq_mipmap",
         &m_video_group, "Generate mipmap for textures using "
@@ -975,10 +986,10 @@ namespace UserConfigParams
                 "Whether to display animated characters") );
 
     PARAM_PREFIX IntUserConfigParam        m_geometry_level
-            PARAM_DEFAULT(  IntUserConfigParam(2,
-                            "geometry-level", &m_graphics_quality,
-                "Geometry quality 0=lowest level, no details; "
-                "5=everything is displayed") );
+            PARAM_DEFAULT(  IntUserConfigParam(GEOLEVEL_0,
+                            "geometry_level", &m_graphics_quality,
+                "Geometry quality 0=everything is displayed; "
+                "1=a few details are displayed; 2=lowest level, no details") );
 
     PARAM_PREFIX IntUserConfigParam         m_anisotropic
             PARAM_DEFAULT( IntUserConfigParam(4, "anisotropic",
@@ -1002,17 +1013,17 @@ namespace UserConfigParams
                            "ssao", &m_graphics_quality,
                            "Enable Screen Space Ambient Occlusion") );
     PARAM_PREFIX BoolUserConfigParam         m_light_scatter
-            PARAM_DEFAULT(BoolUserConfigParam(false,
+            PARAM_DEFAULT(BoolUserConfigParam(true,
                            "light_scatter", &m_graphics_quality,
                            "Enable light scattering shaders") );
     PARAM_PREFIX IntUserConfigParam          m_shadows_resolution
             PARAM_DEFAULT( IntUserConfigParam(0,
                            "shadows_resolution", &m_graphics_quality,
                            "Shadow resolution (0 = disabled") );
-    PARAM_PREFIX BoolUserConfigParam          m_pcss
-            PARAM_DEFAULT( BoolUserConfigParam(false,
-                           "pcss", &m_graphics_quality,
-                           "Enable Percentage Closer Soft Shadows") );
+    PARAM_PREFIX IntUserConfigParam          m_pcss_threshold
+            PARAM_DEFAULT( IntUserConfigParam(2048,
+                           "pcss_threshold", &m_graphics_quality,
+                           "Enable Percentage Closer Soft Shadows when shadow resolution is higher than this value") );
     PARAM_PREFIX BoolUserConfigParam          m_degraded_IBL
         PARAM_DEFAULT(BoolUserConfigParam(true,
         "Degraded_IBL", &m_graphics_quality,
