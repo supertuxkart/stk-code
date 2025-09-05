@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.12...4.0)
 
 # root CMakeLists for the SuperTuxKart project
 project(SuperTuxKart)
-set(PROJECT_VERSION "git")
+set(PROJECT_VERSION "1.5-rc2")
 
 add_definitions( -DSUPERTUXKART_VERSION="${PROJECT_VERSION}" )
 
