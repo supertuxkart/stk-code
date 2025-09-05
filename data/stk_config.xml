@@ -536,7 +536,7 @@
   which leads to crash with STK), but the fonts are to blame, what's the point of not
   using industry standard nowadays...
   -->
-  <fonts-list normal-ttf="Cantarell-Regular.otf wqy-microhei.ttf NotoSansThai-Regular.ttf NotoSansHebrew-Regular.ttf NotoNaskhArabicUI-Regular.ttf NotoSansMalayalam-Regular.ttf NotoSansGeorgian-Regular.ttf NotoSansDevanagari-Regular.ttf"
+  <fonts-list normal-ttf="Cantarell-Regular.otf wqy-microhei.ttf NotoSansThai-Regular.ttf NotoSansHebrew-Regular.ttf NotoNaskhArabicUI-Regular.ttf NotoSansMalayalam-Regular.ttf NotoSansGeorgian-Regular.ttf NotoSansDevanagari-Regular.ttf NotoSansBengali-Regular.ttf"
               digit-ttf="SigmarOne.otf"
               color-emoji-ttf="NotoColorEmoji.ttf"/>
 
