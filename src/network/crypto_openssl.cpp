@@ -26,6 +26,7 @@
 #include <openssl/buffer.h>
 #include <openssl/hmac.h>
 #include <openssl/sha.h>
+#include <stdexcept>
 
 // ============================================================================
 // AES GCM modes never writes anything when finalize, it only handles the tag
@@ -96,17 +97,17 @@ std::string Crypto::m_client_iv;
 // ============================================================================
 bool Crypto::encryptConnectionRequest(BareNetworkString& ns)
 {
-    std::vector<uint8_t> cipher(ns.m_buffer.size() + 4, 0);
+    std::vector<uint8_t> cipher(ns.m_buffer.size() + m_tag_size, 0);
 
     int elen;
     if (EVP_EncryptInit_ex(m_encrypt, NULL, NULL, NULL, NULL) != 1)
         return false;
-    if (EVP_EncryptUpdate(m_encrypt, cipher.data() + 4, &elen,
+    if (EVP_EncryptUpdate(m_encrypt, cipher.data() + m_tag_size, &elen,
         ns.m_buffer.data(), (int)ns.m_buffer.size()) != 1)
         return false;
     if (EVP_EncryptFinal_ex(m_encrypt, unused_16_blocks.data(), &elen) != 1)
         return false;
-    if (EVP_CIPHER_CTX_ctrl(m_encrypt, EVP_CTRL_GCM_GET_TAG, 4, cipher.data())
+    if (EVP_CIPHER_CTX_ctrl(m_encrypt, EVP_CTRL_GCM_GET_TAG, m_tag_size, cipher.data())
         != 1)
         return false;
 
@@ -117,18 +118,18 @@ bool Crypto::encryptConnectionRequest(BareNetworkString& ns)
 // ----------------------------------------------------------------------------
 bool Crypto::decryptConnectionRequest(BareNetworkString& ns)
 {
-    std::vector<uint8_t> pt(ns.m_buffer.size() - 4, 0);
+    std::vector<uint8_t> pt(ns.m_buffer.size() - m_tag_size, 0);
 
     if (EVP_DecryptInit_ex(m_decrypt, NULL, NULL, NULL, NULL) != 1)
         return false;
 
     int dlen;
-    if (!EVP_CIPHER_CTX_ctrl(m_decrypt, EVP_CTRL_GCM_SET_TAG, 4,
+    if (!EVP_CIPHER_CTX_ctrl(m_decrypt, EVP_CTRL_GCM_SET_TAG, m_tag_size,
         ns.m_buffer.data()))
         return false;
 
-    if (EVP_DecryptUpdate(m_decrypt, pt.data(), &dlen, ns.m_buffer.data() + 4,
-        (int)(ns.m_buffer.size() - 4)) != 1)
+    if (EVP_DecryptUpdate(m_decrypt, pt.data(), &dlen, ns.m_buffer.data() + m_tag_size,
+        (int)(ns.m_buffer.size() - m_tag_size)) != 1)
         return false;
 
     if (EVP_DecryptFinal_ex(m_decrypt, unused_16_blocks.data(), &dlen) > 0)
@@ -144,8 +145,8 @@ bool Crypto::decryptConnectionRequest(BareNetworkString& ns)
 // ----------------------------------------------------------------------------
 ENetPacket* Crypto::encryptSend(BareNetworkString& ns, bool reliable)
 {
-    // 4 bytes counter and 4 bytes tag
-    ENetPacket* p = enet_packet_create(NULL, ns.m_buffer.size() + 8,
+    // 4 bytes counter and configurable tag size
+    ENetPacket* p = enet_packet_create(NULL, ns.m_buffer.size() + 4 + m_tag_size,
         (reliable ? ENET_PACKET_FLAG_RELIABLE :
         (ENET_PACKET_FLAG_UNSEQUENCED | ENET_PACKET_FLAG_UNRELIABLE_FRAGMENT))
         );
@@ -171,7 +172,7 @@ ENetPacket* Crypto::encryptSend(BareNetworkString& ns, bool reliable)
         iv[7] = val & 0xff;
     }
 
-    uint8_t* packet_start = p->data + 8;
+    uint8_t* packet_start = p->data + 4 + m_tag_size;
 
     if (EVP_EncryptInit_ex(m_encrypt, NULL, NULL, NULL, iv.data()) != 1)
     {
@@ -191,7 +192,7 @@ ENetPacket* Crypto::encryptSend(BareNetworkString& ns, bool reliable)
         enet_packet_destroy(p);
         return NULL;
     }
-    if (EVP_CIPHER_CTX_ctrl(m_encrypt, EVP_CTRL_GCM_GET_TAG, 4, p->data + 4)
+    if (EVP_CIPHER_CTX_ctrl(m_encrypt, EVP_CTRL_GCM_GET_TAG, m_tag_size, p->data + 4)
         != 1)
     {
         enet_packet_destroy(p);
@@ -209,7 +210,7 @@ ENetPacket* Crypto::encryptSend(BareNetworkString& ns, bool reliable)
 // ----------------------------------------------------------------------------
 NetworkString* Crypto::decryptRecieve(ENetPacket* p)
 {
-    int clen = (int)(p->dataLength - 8);
+    int clen = (int)(p->dataLength - 4 - m_tag_size);
     auto ns = std::unique_ptr<NetworkString>(new NetworkString(p->data, clen));
 
     std::array<uint8_t, 12> iv = {};
@@ -218,13 +219,13 @@ NetworkString* Crypto::decryptRecieve(ENetPacket* p)
     else
         memcpy(iv.data(), p->data, 4);
 
-    uint8_t* packet_start = p->data + 8;
+    uint8_t* packet_start = p->data + 4 + m_tag_size;
     uint8_t* tag = p->data + 4;
     if (EVP_DecryptInit_ex(m_decrypt, NULL, NULL, NULL, iv.data()) != 1)
     {
         throw std::runtime_error("Failed to set IV.");
     }
-    if (!EVP_CIPHER_CTX_ctrl(m_decrypt, EVP_CTRL_GCM_SET_TAG, 4, tag))
+    if (!EVP_CIPHER_CTX_ctrl(m_decrypt, EVP_CTRL_GCM_SET_TAG, m_tag_size, tag))
     {
         throw std::runtime_error("Failed to set tag.");
     }

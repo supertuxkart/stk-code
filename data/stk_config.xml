@@ -583,5 +583,6 @@
       <capabilities name="soccer_fixes"/>
       <capabilities name="ranking_changes"/>
       <capabilities name="real_addon_karts"/>
+      <capabilities name="aes_gcm_128bit_tag"/>
   </network-capabilities>
 </config>

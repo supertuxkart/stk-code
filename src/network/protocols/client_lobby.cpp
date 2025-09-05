@@ -542,13 +542,19 @@ void ClientLobby::finalizeConnectionRequest(NetworkString* header,
 {
     if (encrypt)
     {
-        auto crypto = Crypto::getClientCrypto();
+        size_t tag_size = 16;
+#ifdef CRYPTO_AES_GCM_32BIT_TAG
+        if (!m_server->supportsAESGCM128BitTag())
+            tag_size = 4;
+#endif
+        auto crypto = Crypto::getClientCrypto(tag_size);
         Crypto::resetClientAES();
         BareNetworkString* result = new BareNetworkString();
         if (!crypto->encryptConnectionRequest(*rest))
         {
             // Failed
-            result->addUInt32(0);
+            result->addUInt32(0).encodeString(
+                PlayerManager::getCurrentOnlineProfile()->getUserName());
             *result += BareNetworkString(rest->getData(), rest->getTotalSize());
             encrypt = false;
         }
