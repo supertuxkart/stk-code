@@ -3,7 +3,7 @@
 # This file is distributed under the same license as the supertuxkart package.
 # 
 # Translators:
-# Andrei Stepanov, 2015-2024
+# Andrei Stepanov, 2015-2025
 # Benau, 2018-2020
 # cda3b49fcd26cff178434c994782573e_67b0153 <f126a7d8ac866d9b5ea61e063f1eaf74_660325>, 2018
 # Dmitry Dubrov <dimprogpro@hotmail.ru>, 2015
@@ -23,7 +23,7 @@ msgstr ""
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2024-10-29 22:11+0100\n"
 "PO-Revision-Date: 2015-02-15 01:58+0000\n"
-"Last-Translator: Andrei Stepanov, 2015-2024\n"
+"Last-Translator: Andrei Stepanov, 2015-2025\n"
 "Language-Team: Russian (http://app.transifex.com/supertuxkart/supertuxkart/language/ru/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -2403,7 +2403,7 @@ msgstr "* Выбор схемы будет зависеть от того, с к
 #. I18N: ./data/gui/screens/options/options_ui.stkgui
 #. I18N: In the ui settings
 msgid "Skin"
-msgstr "Тема"
+msgstr "Оболочка"
 
 #. I18N: ./data/gui/screens/options/options_ui.stkgui
 #. I18N: In the ui settings

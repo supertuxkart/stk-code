@@ -5,6 +5,7 @@
 # Translators:
 # FIRST AUTHOR <EMAIL@ADDRESS>, 2011
 # Luu Tuyen, 2025
+# Luu Tuyen, 2025
 # Thanh Bách 6/1, 2022
 # Thanh Bách 6/1, 2022
 msgid ""
@@ -81,7 +82,7 @@ msgstr ""
 
 #. I18N: ./data/achievements.xml
 msgid "Gold driver"
-msgstr ""
+msgstr "Tài xế vàng"
 
 #. I18N: ./data/achievements.xml
 msgid ""
@@ -194,7 +195,7 @@ msgstr ""
 #. I18N: In the multitouch settings screen
 #: src/states_screens/dialogs/race_paused_dialog.cpp:572
 msgid "Accelerometer"
-msgstr ""
+msgstr "Gia tốc"
 
 #. I18N: ./data/gui/dialogs/android/init_android.stkgui
 #. I18N: Control type
@@ -208,7 +209,7 @@ msgstr ""
 #. I18N: Race paused button
 #: src/states_screens/dialogs/race_paused_dialog.cpp:577
 msgid "Gyroscope"
-msgstr ""
+msgstr "Con quay hồi chuyển"
 
 #. I18N: ./data/gui/dialogs/android/init_android.stkgui
 #. I18N: Control type
@@ -220,7 +221,7 @@ msgstr "Vô lăng"
 #. I18N: ./data/gui/dialogs/android/multitouch_settings.stkgui
 #. I18N: In the multitouch settings screen
 msgid "Auto acceleration"
-msgstr ""
+msgstr "Tự động gia tốc"
 
 #. I18N: ./data/gui/dialogs/android/init_android.stkgui
 msgid "You can change it later in touch device settings."
@@ -281,7 +282,7 @@ msgstr "Chung"
 #. I18N: ./data/gui/dialogs/android/multitouch_settings.stkgui
 #. I18N: In the multitouch settings screen
 msgid "Device enabled"
-msgstr ""
+msgstr "Thiết bị đã bật"
 
 #. I18N: ./data/gui/dialogs/android/multitouch_settings.stkgui
 #. I18N: In the multitouch settings screen
@@ -291,7 +292,7 @@ msgstr ""
 #. I18N: ./data/gui/dialogs/android/multitouch_settings.stkgui
 #. I18N: In the multitouch settings screen
 msgid "Buttons scale"
-msgstr ""
+msgstr "Tỷ lệ nút "
 
 #. I18N: ./data/gui/dialogs/android/multitouch_settings.stkgui
 #. I18N: In the multitouch settings screen
@@ -376,7 +377,7 @@ msgstr "Có"
 #. I18N: In the 'confirm resolution' dialog, that's shown when switching
 #. resoluton
 msgid "Revert"
-msgstr ""
+msgstr "Trở lại"
 
 #. I18N: ./data/gui/dialogs/confirm_resolution_dialog.stkgui
 #. I18N: In the 'confirm resolution' dialog, that's shown when switching
@@ -639,7 +640,7 @@ msgstr "Xác nhận"
 #. I18N: ./data/gui/dialogs/online/recovery_input.stkgui
 #. I18N: In the recovery dialog
 msgid "Submit"
-msgstr ""
+msgstr "Gửi"
 
 #. I18N: ./data/gui/dialogs/online/network_ingame_dialog.stkgui
 #. I18N: Race paused button
@@ -650,7 +651,7 @@ msgstr "Quay về vòng đua"
 #. I18N: ./data/gui/dialogs/online/network_ingame_dialog.stkgui
 #. I18N: Race paused button
 msgid "Quit Server"
-msgstr ""
+msgstr "Thoát máy chủ"
 
 #. I18N: ./data/gui/dialogs/online/network_ingame_dialog.stkgui
 #. I18N: Show in network ingame dialog to allow user to go back to lobby to
@@ -707,7 +708,7 @@ msgstr "Làm mới"
 #. I18N: ./data/gui/dialogs/online/recovery_input.stkgui
 #. I18N: In the recovery dialog
 msgid "Account Recovery"
-msgstr ""
+msgstr "Phục hồi tài khoản"
 
 #. I18N: ./data/gui/dialogs/online/recovery_info.stkgui
 #. I18N: In the recovery dialog
@@ -738,7 +739,7 @@ msgstr "Tên người dùng"
 #. I18N: ./data/gui/screens/online/register.stkgui
 #. I18N: In the registration dialog
 msgid "Email"
-msgstr ""
+msgstr "Email"
 
 #. I18N: ./data/gui/dialogs/online/registration_terms.stkgui
 #. I18N: In the registration dialog
@@ -938,12 +939,12 @@ msgstr ""
 #. I18N: ./data/gui/dialogs/online/user_info_dialog.stkgui
 #. I18N: User info dialog
 msgid "View Profile"
-msgstr ""
+msgstr "Xem hồ sơ"
 
 #. I18N: ./data/gui/dialogs/online/vote_dialog.stkgui
 #. I18N: In the vote dialog
 msgid "Vote"
-msgstr ""
+msgstr "Bình chọn"
 
 #. I18N: ./data/gui/dialogs/overworld_dialog.stkgui
 #. I18N: ./data/gui/dialogs/race_paused_dialog.stkgui
@@ -1007,7 +1008,7 @@ msgstr ""
 #. I18N: ./data/gui/dialogs/recommend_video_settings.stkgui
 #. I18N: Recommend video settings dialog
 msgid "Graphics quality"
-msgstr ""
+msgstr "Chất lượng đồ họa"
 
 #. I18N: ./data/gui/dialogs/recommend_video_settings.stkgui
 #. I18N: Recommend video settings dialog
@@ -1054,7 +1055,7 @@ msgstr "Tiện Ích Tải Về SuperTuxKart"
 #. I18N: In addons screen, in the filtering bar, to enable a filter that will
 #. show only recently updated items
 msgid "Updated"
-msgstr ""
+msgstr "Đã cập nhật"
 
 #. I18N: ./data/gui/screens/addons_screen.stkgui
 #. I18N: In addons screen, in the filtering bar, to enable a filter that will
@@ -1176,7 +1177,7 @@ msgstr "Các đóng góp"
 
 #. I18N: ./data/gui/screens/cutscene.stkgui
 msgid "Skip"
-msgstr ""
+msgstr "Bỏ qua"
 
 #. I18N: ./data/gui/screens/easter_egg.stkgui
 #. I18N: Section in easter egg tracks selection screen
@@ -1216,7 +1217,7 @@ msgstr "Thêm"
 #. I18N: ./data/gui/screens/grand_prix_editor.stkgui
 #. I18N: Menu item
 msgid "Edit"
-msgstr ""
+msgstr "Chỉnh sửa"
 
 #. I18N: ./data/gui/screens/edit_gp.stkgui
 #. I18N: Menu item
@@ -1316,12 +1317,12 @@ msgstr ""
 #. I18N: ./data/gui/screens/grand_prix_editor.stkgui
 #. I18N: Menu item
 msgid "New"
-msgstr ""
+msgstr "Mới"
 
 #. I18N: ./data/gui/screens/grand_prix_editor.stkgui
 #. I18N: Menu item
 msgid "Copy"
-msgstr ""
+msgstr "Sao chép"
 
 #. I18N: ./data/gui/screens/grand_prix_editor.stkgui
 #. I18N: Menu item
@@ -1397,7 +1398,7 @@ msgstr ""
 #. I18N: ./data/gui/screens/help/help7.stkgui
 #. I18N: Tab in help menu
 msgid "Bananas"
-msgstr ""
+msgstr "Chuối"
 
 #. I18N: ./data/gui/screens/help/help1.stkgui
 #. I18N: Tab in help menu
@@ -1451,7 +1452,7 @@ msgstr ""
 #. I18N: ./data/gui/screens/help/help7.stkgui
 #. I18N: Tab in help menu
 msgid "Multiplayer"
-msgstr ""
+msgstr "Nhiều Người Chơi"
 
 #. I18N: ./data/gui/screens/help/help1.stkgui
 msgid "Start the tutorial"
@@ -1823,7 +1824,7 @@ msgstr ""
 #. I18N: ./data/gui/screens/main_menu.stkgui
 #. I18N: Main menu button
 msgid "Singleplayer"
-msgstr ""
+msgstr "Chơi đơn"
 
 #. I18N: ./data/gui/screens/main_menu.stkgui
 #. I18N: Main menu button
@@ -1839,7 +1840,7 @@ msgstr ""
 #. I18N: In the user screen
 #: src/states_screens/online/online_profile_friends.cpp:245
 msgid "Online"
-msgstr ""
+msgstr "Trực tuyến"
 
 #. I18N: ./data/gui/screens/main_menu.stkgui
 #. I18N: Main menu button
@@ -1856,7 +1857,7 @@ msgstr "Hướng dẫn"
 #. I18N: In the main screen
 #: src/states_screens/track_info_screen.cpp:343
 msgid "High Scores"
-msgstr ""
+msgstr "Điểm Cao"
 
 #. I18N: ./data/gui/screens/main_menu.stkgui
 #. I18N: In the main screen
@@ -1899,7 +1900,7 @@ msgstr ""
 #. I18N: ./data/gui/screens/online/create_server.stkgui
 #. I18N: In the server creation screen
 msgid "Create"
-msgstr ""
+msgstr "Tạo"
 
 #. I18N: ./data/gui/screens/online/lan.stkgui
 msgid "Local Networking"
@@ -1997,11 +1998,11 @@ msgstr ""
 #. I18N: ./data/gui/screens/online/profile_friends.stkgui
 #. I18N: ./data/gui/screens/online/user_search.stkgui
 msgid "Search"
-msgstr ""
+msgstr "Tìm kiếm"
 
 #. I18N: ./data/gui/screens/online/profile_servers.stkgui
 msgid "Global Networking"
-msgstr ""
+msgstr "Mạng toàn cầu"
 
 #. I18N: ./data/gui/screens/online/profile_servers.stkgui
 #. I18N: In the online multiplayer screen
@@ -2012,27 +2013,27 @@ msgstr ""
 #. I18N: Section in the profile screen
 #: src/states_screens/online/online_profile_base.cpp:114
 msgid "Account Settings"
-msgstr ""
+msgstr "Cài đặt tài khoản"
 
 #. I18N: ./data/gui/screens/online/profile_settings.stkgui
 #. I18N: In the online account settings screen
 msgid "Password:"
-msgstr ""
+msgstr "Mật khẩu:"
 
 #. I18N: ./data/gui/screens/online/profile_settings.stkgui
 msgid "Change"
-msgstr ""
+msgstr "Thay đổi"
 
 #. I18N: ./data/gui/screens/online/profile_settings.stkgui
 #. I18N: In the online account settings screen
 msgid "E-mail:"
-msgstr ""
+msgstr "E-mail:"
 
 #. I18N: ./data/gui/screens/online/register.stkgui
 #. I18N: In the registration dialog
 #: src/states_screens/online/register_screen.cpp:73
 msgid "Create User"
-msgstr ""
+msgstr "Tạo người dùng"
 
 #. I18N: ./data/gui/screens/online/register.stkgui
 #. I18N: Section in the register screen
@@ -2047,7 +2048,7 @@ msgstr ""
 #. I18N: ./data/gui/screens/online/register.stkgui
 #. I18N: Section in the register screen
 msgid "Offline Account"
-msgstr ""
+msgstr "Tài khoản ngoại tuyến"
 
 #. I18N: ./data/gui/screens/online/register.stkgui
 #. I18N: In the registration dialog
@@ -2063,7 +2064,7 @@ msgstr ""
 #. I18N: ./data/gui/screens/options/user_screen_tab.stkgui
 #. I18N: ./data/gui/screens/user_screen.stkgui
 msgid "Reset password"
-msgstr ""
+msgstr "Đặt lại mật khẩu"
 
 #. I18N: ./data/gui/screens/online/register.stkgui
 #. I18N: In the registration dialog
@@ -2251,7 +2252,7 @@ msgstr "Điều khiển"
 #. I18N: ./data/gui/screens/options/user_screen_tab.stkgui
 #. I18N: Section in the settings menu
 msgid "Language"
-msgstr ""
+msgstr "Ngôn ngữ"
 
 #. I18N: ./data/gui/screens/options/options_audio.stkgui
 #. I18N: In the audio options screen
@@ -2334,7 +2335,7 @@ msgstr ""
 #. I18N: ./data/gui/screens/options/options_general.stkgui
 #. I18N: In the general settings
 msgid "Internet options"
-msgstr ""
+msgstr "Tùy chọn mạng"
 
 #. I18N: ./data/gui/screens/options/options_general.stkgui
 #. I18N: In the general settings
@@ -2408,7 +2409,7 @@ msgstr ""
 #. I18N: ./data/gui/screens/options/options_ui.stkgui
 #. I18N: In the ui settings
 msgid "Font size"
-msgstr ""
+msgstr "Kích thước phông chữ"
 
 #. I18N: ./data/gui/screens/options/options_ui.stkgui
 #. I18N: In the ui settings
@@ -2487,7 +2488,7 @@ msgstr ""
 #. I18N: ./data/gui/screens/user_screen.stkgui
 #. I18N: In the user screen
 msgid "Delete"
-msgstr ""
+msgstr "Xóa"
 
 #. I18N: ./data/gui/screens/options/user_screen_tab.stkgui
 #. I18N: In the user screen
@@ -2512,12 +2513,12 @@ msgstr ""
 #. I18N: ./data/gui/screens/soccer_setup.stkgui
 #. I18N: In soccer setup screen
 msgid "Red Team"
-msgstr ""
+msgstr "Đội màu đỏ"
 
 #. I18N: ./data/gui/screens/soccer_setup.stkgui
 #. I18N: In soccer setup screen
 msgid "Blue Team"
-msgstr ""
+msgstr "Đội màu xanh"
 
 #. I18N: ./data/gui/screens/track_info.stkgui
 #. I18N: In the track info screen
@@ -2553,7 +2554,7 @@ msgstr ""
 #. I18N: Used as a verb, appears on the main networking menu (login button)
 #: src/states_screens/online/online_screen.cpp:69
 msgid "Login"
-msgstr ""
+msgstr "Đăng nhập"
 
 #. I18N: ./data/tips.xml
 msgid "The UI skin can be changed in the UI options."
@@ -2802,7 +2803,7 @@ msgstr "Hang X"
 #. I18N: ../stk-assets/tracks/cocoa_temple/track.xml
 #. I18N: ../supertuxkart-assets/tracks/cocoa_temple/track.xml
 msgid "Cocoa Temple"
-msgstr ""
+msgstr "Đền Cocoa"
 
 #. I18N: ../stk-assets/tracks/cornfield_crossing/track.xml
 #. I18N: ../supertuxkart-assets/tracks/cornfield_crossing/track.xml
@@ -4662,7 +4663,7 @@ msgstr ""
 #: src/states_screens/dialogs/achievement_progress_dialog.cpp:274
 #: src/states_screens/dialogs/achievement_progress_dialog.cpp:299
 msgid "Races finished"
-msgstr ""
+msgstr "Cuộc đua đã hoàn thành "
 
 #. I18N: A goal for achievements. If this text is in (), it's a precision
 #. added to multiple different goals.
@@ -5599,7 +5600,7 @@ msgstr "Xin chờ trong khi tiện ích đang được tải"
 
 #: src/states_screens/main_menu_screen.cpp:699
 msgid "Are you sure you want to quit STK?"
-msgstr ""
+msgstr "Bạn có chắc bạn muốn thoát STK?"
 
 #: src/states_screens/online/create_server_screen.cpp:107
 msgid "Create LAN Server"

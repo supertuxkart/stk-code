@@ -3,14 +3,15 @@
 # This file is distributed under the same license as the supertuxkart package.
 # 
 # Translators:
+# Anders Jonsson <transifex@norsjovallen.se>, 2025
 # Edvin Nilsson <edvinn.nilsson@gmail.com>, 2015
 # efef6ec5b435a041fce803c7f8af77d2_2341d43, 2020
 # Edvin Nilsson <edvinn.nilsson@gmail.com>, 2015
 # Johan R. <jreinhed@protonmail.com>, 2017
 # Johan R. <jreinhed@protonmail.com>, 2017-2018
 # efef6ec5b435a041fce803c7f8af77d2_2341d43, 2020
-# Jonatan Nyberg, 2021-2024
-# Jonatan Nyberg, 2020-2021
+# Daniel, 2021-2025
+# Daniel, 2020-2021
 # Kjell Rilbe <kjell@rilbe.se>, 2016
 # Kristoffer Grundström <lovaren@gmail.com>, 2016
 # Kristoffer Grundström <lovaren@gmail.com>, 2016,2022
@@ -27,7 +28,7 @@ msgstr ""
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2024-10-29 22:11+0100\n"
 "PO-Revision-Date: 2015-02-15 01:58+0000\n"
-"Last-Translator: Jonatan Nyberg, 2021-2024\n"
+"Last-Translator: Anders Jonsson <transifex@norsjovallen.se>, 2025\n"
 "Language-Team: Swedish (http://app.transifex.com/supertuxkart/supertuxkart/language/sv/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -1818,7 +1819,7 @@ msgstr "Grand Prix"
 #. I18N: ./data/gui/screens/online/network_karts.stkgui
 #. I18N: In the kart selection (player setup) screen
 msgid "Choose a Kart"
-msgstr "Välj en kart"
+msgstr "Välj kart"
 
 #. I18N: ./data/gui/screens/karts.stkgui
 #. I18N: In karts selection screen, determine the kart group shown on the list
@@ -2348,7 +2349,7 @@ msgstr "Delad skärm flerspelarläge layout"
 #. I18N: ./data/gui/screens/options/options_general.stkgui
 #. I18N: In the general settings
 msgid "Internet options"
-msgstr "Internet-alternativ"
+msgstr "Alternativ för Internet"
 
 #. I18N: ./data/gui/screens/options/options_general.stkgui
 #. I18N: In the general settings
@@ -2512,11 +2513,11 @@ msgstr "Kartfärg"
 
 #. I18N: ./data/gui/screens/race_setup.stkgui
 msgid "Select a difficulty"
-msgstr "Välj en svårighetsgrad"
+msgstr "Välj svårighetsgrad"
 
 #. I18N: ./data/gui/screens/race_setup.stkgui
 msgid "Select a game mode"
-msgstr "Välj ett spelläge"
+msgstr "Välj spelläge"
 
 #. I18N: ./data/gui/screens/soccer_setup.stkgui
 #. I18N: In soccer setup screen
@@ -5085,7 +5086,7 @@ msgstr "Använd originalfärg"
 #. I18N: In kart color choosing dialog
 #: src/states_screens/dialogs/kart_color_slider_dialog.cpp:49
 msgid "Pick a color from slider"
-msgstr "Välj en färg från reglaget"
+msgstr "Välj färg från reglaget"
 
 #: src/states_screens/dialogs/message_dialog.cpp:145
 msgid "Don't show again"
@@ -5435,7 +5436,7 @@ msgstr "Ett fel uppstod när du försökte spara din grand prix."
 
 #: src/states_screens/edit_track_screen.cpp:317
 msgid "Select a track"
-msgstr "Välj en bana"
+msgstr "Välj bana"
 
 #: src/states_screens/feature_unlocked.cpp:254
 #, c-format
@@ -5501,7 +5502,7 @@ msgstr "Ange namnet på grand prix"
 
 #: src/states_screens/grand_prix_editor_screen.cpp:168
 msgid "Please select a Grand Prix"
-msgstr "Välj en Grand Prix"
+msgstr "Välj Grand Prix"
 
 #: src/states_screens/grand_prix_editor_screen.cpp:338
 msgid "User defined"
@@ -5821,7 +5822,7 @@ msgstr "Söker"
 #: src/states_screens/online/register_screen.cpp:169
 #: src/states_screens/options/user_screen.cpp:114
 msgid "Exit game"
-msgstr "Avsluta spelat"
+msgstr "Avsluta spelet"
 
 #: src/states_screens/online/register_screen.cpp:282
 #: src/states_screens/online/register_screen.cpp:289

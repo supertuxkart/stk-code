@@ -88,7 +88,7 @@ msgstr "Pilot de aur"
 msgid ""
 "Win against at least 3 AIs in normal race, time-trial, and follow the "
 "leader."
-msgstr "Câștigă împotriva a cel puțin 3 oponenți roboți în cursa normală, în cursa cronometrată, și în urmărirea liderului."
+msgstr "Câștigă împotriva a cel puțin 3 oponenți roboți în cursa normală, în cursa contra-timp, și în urmărirea liderului."
 
 #. I18N: ./data/achievements.xml
 msgid "Powerup Love"
@@ -604,7 +604,7 @@ msgstr "Începe cursa"
 #. I18N: ./data/gui/dialogs/online/achievement_progress_dialog.stkgui
 #. I18N: Objective shown in achievement dialog
 msgid "Goal"
-msgstr "Gol"
+msgstr "Obiectiv"
 
 #. I18N: ./data/gui/dialogs/online/achievement_progress_dialog.stkgui
 #. I18N: Progress shown in achievement dialog
@@ -964,7 +964,7 @@ msgstr "Înapoi la meniu"
 #. I18N: ./data/gui/dialogs/overworld_dialog.stkgui
 #. I18N: In the in-game dialog
 msgid "Select kart"
-msgstr "Selectați cartul"
+msgstr "Selectează cartul"
 
 #. I18N: ./data/gui/dialogs/press_a_key_dialog.stkgui
 #. I18N: When changing input configurations
@@ -1066,7 +1066,7 @@ msgstr "Evaluare >="
 #. I18N: ./data/gui/screens/addons_screen.stkgui
 #. I18N: In the addons screen
 msgid "Karts"
-msgstr "Cart-uri"
+msgstr "Carturi"
 
 #. I18N: ./data/gui/screens/addons_screen.stkgui
 #. I18N: In the addons screen
@@ -1186,12 +1186,12 @@ msgstr "Omite"
 #. I18N: ./data/gui/screens/tracks.stkgui
 #. I18N: In the track selection screen
 msgid "All Tracks"
-msgstr "Toate piesele"
+msgstr "Toate pistele"
 
 #. I18N: ./data/gui/screens/edit_gp.stkgui
 #. I18N: Title in edit grand prix screen
 msgid "Edit Grand Prix"
-msgstr "Editați marele premiu"
+msgstr "Editați Grand Prix"
 
 #. I18N: ./data/gui/screens/edit_gp.stkgui
 #. I18N: Menu item
@@ -1281,12 +1281,12 @@ msgstr "Înregistrează o reluare fantomă"
 #. I18N: ./data/gui/screens/gp_info.stkgui
 #. I18N: In the grand prix info screen
 msgid "AI karts"
-msgstr "Cart-uri robot"
+msgstr "Carturi robot"
 
 #. I18N: ./data/gui/screens/gp_info.stkgui
 #. I18N: In the grand prix info screen
 msgid "Reverse"
-msgstr "Înapoi"
+msgstr "Invers"
 
 #. I18N: ./data/gui/screens/gp_info.stkgui
 #. I18N: In the grand prix info screen
@@ -1456,7 +1456,7 @@ msgstr "Jucători multipli"
 
 #. I18N: ./data/gui/screens/help/help1.stkgui
 msgid "Start the tutorial"
-msgstr "Începe practica"
+msgstr "Începe ghidul"
 
 #. I18N: ./data/gui/screens/help/help1.stkgui
 #. I18N: In the help menu
@@ -1537,7 +1537,7 @@ msgid ""
 "player who hits others the most will win in a given hit or time limit. In "
 "Capture The Flag, your team needs to bring the flag of the other team to "
 "your own flag base, as long as your flag is not captured by the other team."
-msgstr ""
+msgstr "Există trei tipuri în modul de bătălie: În „Bătălia din 3 lovituri”, trebuie să îi lovești pe ceilalți oponenți cu arme până când își pierd toate viețile. În „Toți împotriva tuturor”, jucătorul care îi lovește cel mai mult pe ceilalți într-o anumită limită de lovituri sau de timp va câștiga. În „Capturează steagul”, echipa voastră trebuie să aducă steagul celeilalte echipe la propria bază, atât timp cât steagul vostru nu este capturat de echipa adversă."
 
 #. I18N: ./data/gui/screens/help/help2.stkgui
 #. I18N: In the help menu
@@ -1569,7 +1569,7 @@ msgid ""
 "instead of playing a single race, you play many in a row. The better you "
 "rank, the more points you get. In the end, the player with the most points "
 "wins the cup."
-msgstr ""
+msgstr "* Multe dintre aceste moduri de joc pot fi jucate într-un Grand Prix: în loc de a juca o singură cursă, veți juca mai multe la rând. Cu cât vă clasați mai bine, cu atât veți obține mai multe puncte. La final, jucătorul cu cele mai multe puncte va câștiga cupa."
 
 #. I18N: ./data/gui/screens/help/help3.stkgui
 #. I18N: In the help menu
@@ -1608,7 +1608,7 @@ msgstr "Mingea de popice - va merge drept înainte până va lovi, poate ricoșa
 
 #. I18N: ./data/gui/screens/help/help3.stkgui
 msgid "Parachute - slows down all karts in a better position."
-msgstr "Parasuta - incetinește toate karturile in poziții bune"
+msgstr "Parașuta - încetinește toate carturile din poziții mai bune"
 
 #. I18N: ./data/gui/screens/help/help3.stkgui
 msgid ""
@@ -1632,7 +1632,7 @@ msgstr "Paleta de țânțari - va strivi carturile din apropiere, încetinindu-l
 msgid ""
 "Hitting a banana can result in one of the following being attached to the "
 "kart:"
-msgstr "Lovirea unei banane poate duce la atașarea la kart a unuia dintre următoarele:"
+msgstr "Atingerea unei banane poate atașa cartului una dintre următoarele:"
 
 #. I18N: ./data/gui/screens/help/help4.stkgui
 #. I18N: In the help menu
@@ -1716,7 +1716,7 @@ msgstr "Viteza maximă - cu cât este mai mare, cu atât mai rapid poate avansa 
 msgid ""
 "Nitro efficiency - The higher it is, the more speed you get from a can of "
 "nitro. A lighter kart will have higher nitro efficiency."
-msgstr "Eficiența nitro - Cu cât este mai ridicat, cu atât puteți obține o viteză mai mare de la nitro. Un cart mai ușor va avea o eficiență nitro mai mare."
+msgstr "Eficiența nitro - Cu cât este mai ridicată, cu atât puteți obține o viteză mai mare de la nitro. Un cart mai ușor va avea o eficiență nitro mai mare."
 
 #. I18N: ./data/gui/screens/help/help6.stkgui
 #. I18N: In the help menu
@@ -1724,7 +1724,7 @@ msgid ""
 "If you follow closely another kart for a few seconds, you'll get a "
 "slipstream speed bonus when you overtake it. The lighter your kart, the "
 "easier it is."
-msgstr "Dacă urmați îndeaproape un alt kart timp de câteva secunde, veți primi un bonus de viteză pentru rezistența aerodinamică atunci când îl depășiți. Cu cât cartul este mai ușor, cu atât va fi mai ușor să obțineți bonusul."
+msgstr "Dacă urmați îndeaproape un alt cart timp de câteva secunde, veți primi un bonus de viteză pentru rezistența aerodinamică atunci când îl depășiți. Cu cât cartul este mai ușor, cu atât va fi mai ușor să obțineți bonusul."
 
 #. I18N: ./data/gui/screens/help/help7.stkgui
 #. I18N: In the help menu
@@ -1779,7 +1779,7 @@ msgstr "Când dispozitivele de intrare sunt configurate, selectați iconița „
 #. I18N: ./data/gui/screens/high_score_selection.stkgui
 #. I18N: In the high score selection screen
 msgid "High Score Selection"
-msgstr ""
+msgstr "Selecția de scoruri mari"
 
 #. I18N: ./data/gui/screens/high_score_selection.stkgui
 #. I18N: In the high score selection screen
@@ -1857,7 +1857,7 @@ msgstr "Ghid"
 #. I18N: In the main screen
 #: src/states_screens/track_info_screen.cpp:343
 msgid "High Scores"
-msgstr "Scoruri ridicate"
+msgstr "Scoruri mari"
 
 #. I18N: ./data/gui/screens/main_menu.stkgui
 #. I18N: In the main screen
@@ -2048,7 +2048,7 @@ msgstr "Cont online existent"
 #. I18N: ./data/gui/screens/online/register.stkgui
 #. I18N: Section in the register screen
 msgid "Offline Account"
-msgstr "Cont offline"
+msgstr "Cont local"
 
 #. I18N: ./data/gui/screens/online/register.stkgui
 #. I18N: In the registration dialog
@@ -2103,7 +2103,7 @@ msgstr "Căutare de utilizator"
 #. I18N: ./data/gui/screens/options/options_video.stkgui
 #. I18N: ./data/gui/screens/options/user_screen_tab.stkgui
 msgid "SuperTuxKart Options"
-msgstr "Opțiuni de SuperTuxKart"
+msgstr "Opțiuni SuperTuxKart"
 
 #. I18N: ./data/gui/screens/options/options_audio.stkgui
 #. I18N: Section in the settings menu
@@ -2267,7 +2267,7 @@ msgstr "Muzică"
 #: src/states_screens/options/options_screen_video.cpp:445
 #: src/states_screens/options/options_screen_video.cpp:534
 msgid "Enabled"
-msgstr "Activat"
+msgstr "Activată"
 
 #. I18N: ./data/gui/screens/options/options_audio.stkgui
 #. I18N: In the audio options screen
@@ -2330,12 +2330,12 @@ msgstr "Aplică noua rezoluție"
 #. I18N: ./data/gui/screens/options/options_display.stkgui
 #. I18N: In the display settings
 msgid "Splitscreen Multiplayer layout"
-msgstr "Aranjament de ecran divizat pentru jucători multipli"
+msgstr "Aranjament de ecran divizat"
 
 #. I18N: ./data/gui/screens/options/options_general.stkgui
 #. I18N: In the general settings
 msgid "Internet options"
-msgstr "Opțiuni de internet"
+msgstr "Opțiuni pentru Internet"
 
 #. I18N: ./data/gui/screens/options/options_general.stkgui
 #. I18N: In the general settings
@@ -2345,7 +2345,7 @@ msgstr "Arată întotdeauna ecranul de autentificare"
 #. I18N: ./data/gui/screens/options/options_general.stkgui
 #. I18N: In the general settings
 msgid "Connect to the Internet"
-msgstr "Conectare la Internet"
+msgstr "Conectat la Internet"
 
 #. I18N: ./data/gui/screens/options/options_general.stkgui
 #. I18N: In the general settings
@@ -2419,7 +2419,7 @@ msgstr "Cameră"
 #. I18N: ./data/gui/screens/options/options_ui.stkgui
 #. I18N: In the ui settings
 msgid "Custom..."
-msgstr "Personalizat..."
+msgstr "Personalizează..."
 
 #. I18N: ./data/gui/screens/options/options_ui.stkgui
 #. I18N: In the ui settings
@@ -2439,7 +2439,7 @@ msgstr "Activează temporizatorul în modul poveste"
 #. I18N: ./data/gui/screens/options/options_ui.stkgui
 #. I18N: In the ui settings
 msgid "Enable the speedrun timer"
-msgstr ""
+msgstr "Activează cronometrul pentru parcurgerea rapidă"
 
 #. I18N: ./data/gui/screens/options/options_video.stkgui
 #. I18N: In the video settings
@@ -2574,7 +2574,7 @@ msgstr "Meniul ajutor conține multe informații folositoare."
 
 #. I18N: ./data/tips.xml
 msgid "In single-player, you can watch and challenge recorded time-trials."
-msgstr ""
+msgstr "În modul singur, puteți vedea și contesta cursele contra-timp înregistrate."
 
 #. I18N: ./data/tips.xml
 msgid ""
@@ -2607,71 +2607,71 @@ msgstr "Paleta de țânțari poate fi folosită pentru a elimina bombe sau para�
 msgid ""
 "You can't stop turning while skidding. Good kart orientation at the skid's "
 "start is paramount."
-msgstr ""
+msgstr "Nu puteți opri virajul în timpul derapării. Orientarea bună a cartului la începutul derapării este esențială."
 
 #. I18N: ./data/tips.xml
 msgid "You get a startup boost if you start accelerating during \"Set\"."
-msgstr ""
+msgstr "Puteți primi un avans de start dacă apăsați butonul de accelerare la comanda „Pregătiți!”."
 
 #. I18N: ./data/tips.xml
 msgid "Braking allows to get rid of parachutes quicker."
-msgstr ""
+msgstr "Trăgând frâna vă va permite să scăpați mai rapid de parașute."
 
 #. I18N: ./data/tips.xml
 msgid "First and foremost, focus on where your kart is going."
-msgstr ""
+msgstr "În primul rând, concentrați-vă pe direcția în care se îndreaptă cartul."
 
 #. I18N: ./data/tips.xml
 msgid "The rescue key (button) is very useful."
-msgstr ""
+msgstr "Butonul de recuperare este foarte util."
 
 #. I18N: ./data/tips.xml
 msgid "Be careful when close to other karts, they may attack you!"
-msgstr ""
+msgstr "Aveți grijă când vă apropiați de alte carturi, ele vă pot ataca!"
 
 #. I18N: ./data/tips.xml
 msgid ""
 "Basketballs can be destroyed using precise backward shots with a bowling "
 "ball, cake, or plunger."
-msgstr ""
+msgstr "Mingiile de baschet pot fi distruse folosind lovituri precise în direcția din spate folosind mingii de popice, prăjituri sau un desfundător."
 
 #. I18N: ./data/tips.xml
 msgid ""
 "Try to avoid crashing into the backs of other karts as this will slow you "
 "down."
-msgstr ""
+msgstr "Încercați să evitați lovirea spatelui altor carturi pentru că asta vă va încetini."
 
 #. I18N: ./data/tips.xml
 msgid "You can use bowling balls to push and block the ball."
-msgstr ""
+msgstr "Puteți folosi mingii de popice pentru a împinge sau bloca mingea."
 
 #. I18N: ./data/tips.xml
 msgid "In soccer, always work as a team for good results."
-msgstr ""
+msgstr "La fotbal, jucați mereu în echipă pentru a avea rezultate bune."
 
 #. I18N: ./data/tips.xml
 msgid ""
 "If you miss the ball and an opponent is approaching, try hitting them with a"
 " powerup or block their way."
-msgstr ""
+msgstr "Dacă pierdeți mingea și un adversar se apropie, încercați să-i loviți cu unul dintre bonusuri sau blocați-le calea."
 
 #. I18N: ./data/tips.xml
 msgid "Good rotation of positions (attack and defense) is essential."
-msgstr ""
+msgstr "Comutarea pozițiilor (dintre atac și apărare) este esențială."
 
 #. I18N: ./data/tips.xml
 msgid "Make sure to store at least 2 big cans worth of nitro."
-msgstr ""
+msgstr "Asigurați-vă să stocați cel puțin două canistre mari de nitro."
 
 #. I18N: ./data/tips.xml
 msgid "Never use the three bowling balls all at the same time."
-msgstr ""
+msgstr "Nu folosiți niciodată toate cele trei mingi de popice deodată."
 
 #. I18N: ./data/tips.xml
 msgid ""
 "Don't get in the way of a teammate carrying the ball, though you can try to "
 "hit opponents attempting to stop them from scoring."
-msgstr ""
+msgstr "Nu intrați în calea unui coleg de echipă ce are minge, în schimb puteți încerca să loviți adversarii și să-i împiedicați din a înscrie."
 
 #. I18N: ../stk-assets/karts/adiumy/kart.xml
 #. I18N: ../supertuxkart-assets/karts/adiumy/kart.xml
@@ -2841,7 +2841,7 @@ msgstr "Câmpul de fotbal înghețat"
 #. assets/tracks/introcutscene2/scene.xml
 #. I18N: ../supertuxkart-assets/tracks/introcutscene2/scene.xml
 msgid "What's wrong, little hippies? Your great gnu leader is missing?"
-msgstr ""
+msgstr "Ce s-a întâmplat, maniacilor? Liderul vostru suprem, gnu, a dispărut?"
 
 #. I18N: Cutscene subtitle from ../stk-assets/tracks/introcutscene2/scene.xml
 #. I18N: ../stk-assets/tracks/introcutscene2/scene.xml
@@ -2849,7 +2849,7 @@ msgstr ""
 #. assets/tracks/introcutscene2/scene.xml
 #. I18N: ../supertuxkart-assets/tracks/introcutscene2/scene.xml
 msgid "Oh yes, see, he's in my castle now and will be served for supper..."
-msgstr ""
+msgstr "O da, vedeți voi, el este în castelul meu acum și va fi servit drept cină..."
 
 #. I18N: Cutscene subtitle from ../stk-assets/tracks/introcutscene2/scene.xml
 #. I18N: ../stk-assets/tracks/introcutscene2/scene.xml
@@ -2857,7 +2857,7 @@ msgstr ""
 #. assets/tracks/introcutscene2/scene.xml
 #. I18N: ../supertuxkart-assets/tracks/introcutscene2/scene.xml
 msgid "But I'm a fair creature, so I'll make you a deal."
-msgstr ""
+msgstr "Dar sunt o creatură dreaptă, așa că vom face o înțelegere."
 
 #. I18N: Cutscene subtitle from ../stk-assets/tracks/introcutscene2/scene.xml
 #. I18N: ../stk-assets/tracks/introcutscene2/scene.xml
@@ -2865,7 +2865,7 @@ msgstr ""
 #. assets/tracks/introcutscene2/scene.xml
 #. I18N: ../supertuxkart-assets/tracks/introcutscene2/scene.xml
 msgid "If you can beat me at racing, I will free the old codger."
-msgstr ""
+msgstr "Dacă mă puteți învinge la curse, îl voi elibera pe moșneag."
 
 #. I18N: Cutscene subtitle from ../stk-assets/tracks/introcutscene2/scene.xml
 #. I18N: ../stk-assets/tracks/introcutscene2/scene.xml
@@ -2955,7 +2955,7 @@ msgstr "Stadionul"
 #. I18N: ../stk-assets/tracks/stk_enterprise/track.xml
 #. I18N: ../supertuxkart-assets/tracks/stk_enterprise/track.xml
 msgid "STK Enterprise"
-msgstr ""
+msgstr "Firma STK"
 
 #. I18N: ../stk-assets/tracks/temple/track.xml
 #. I18N: ../supertuxkart-assets/tracks/temple/track.xml
@@ -3039,7 +3039,7 @@ msgstr "Nou mod de joc „%s” este disponibil"
 #: src/challenges/challenge_data.cpp:615
 #, c-format
 msgid "New Grand Prix '%s' now available"
-msgstr "Nou Grand Prix „%s” este dispobil"
+msgstr "Noul Grand Prix „%s” este disponibil"
 
 #: src/challenges/challenge_data.cpp:619
 #, c-format
@@ -3059,7 +3059,7 @@ msgid ""
 "Closing the game before the story mode's completion invalidates the timer.\n"
 "\n"
 "To use the speedrun mode, please use a new profile."
-msgstr ""
+msgstr "Modul „parcurgere rapidă” este dezactivat. Poate fi activat numai dacă jocul nu a fost închis de la lansarea modului poveste.\n\nÎnchiderea jocului înainte de completarea modului poveste invalidează cronometrul de viteză.\n\nPentru a folosi modul „parcurgere rapidă”, utilizați un nou profil."
 
 #. I18N: Name of first guest player (without number)
 #: src/config/player_manager.cpp:396
@@ -3076,13 +3076,13 @@ msgstr "Oaspete %d"
 msgid ""
 "Your config file was malformed, so it was deleted and a new one will be "
 "created."
-msgstr ""
+msgstr "Fișierul de configurare a fost malformat, așa că a fost șters și unul nou va fi creeat."
 
 #: src/config/user_config.cpp:699
 msgid ""
 "Your config file was too old, so it was deleted and a new one will be "
 "created."
-msgstr ""
+msgstr "Fișierul de configurare a fost prea vechi, așa că a fost șters și unul nou va fi creeat."
 
 #: src/graphics/irr_driver.cpp:738
 msgid "Video recording started."
@@ -3589,13 +3589,13 @@ msgstr "Pa1"
 #: src/input/binding.cpp:303
 msgctxt "input_key"
 msgid "Oem Clear"
-msgstr ""
+msgstr "Oem Clear"
 
 #. I18N: to appear in input configuration screen, for gamepad hats
 #: src/input/binding.cpp:343 src/input/binding.cpp:348
 #, c-format
 msgid "Gamepad hat %d"
-msgstr ""
+msgstr "Joystick de direcție %d"
 
 #. I18N: to appear in input configuration screen, for gamepad axes
 #: src/input/binding.cpp:355
@@ -3607,7 +3607,7 @@ msgstr "Axa %d %s"
 #: src/input/binding.cpp:362
 #, c-format
 msgid "Axis %d inverted"
-msgstr ""
+msgstr "Axa %d inversată"
 
 #. I18N: to appear in input configuration screen, for gamepad axes
 #: src/input/binding.cpp:367
@@ -3619,7 +3619,7 @@ msgstr "Axa %d"
 #: src/input/binding.cpp:374
 #, c-format
 msgid "Gamepad button %d"
-msgstr ""
+msgstr "Butonul %d de pe gamepad"
 
 #. I18N: to appear in input configuration screen, for mouse (might not be used
 #. at all)
@@ -3642,7 +3642,7 @@ msgstr "Reconfigurați asocierile de butoane."
 
 #: src/input/device_manager.cpp:497
 msgid "Your input config file is not compatible with this version of STK."
-msgstr ""
+msgstr "Fișierul de configurare a intrărilor nu este compatibil cu această versiune de STK."
 
 #. I18N: name of buttons on gamepads
 #: src/input/gamepad_config.cpp:159
@@ -3769,7 +3769,7 @@ msgid ""
 "Press the buttons 1+2 simultaneously on your wiimote to put it in discovery "
 "mode, then click on Ok. Detailed instructions at "
 "https://supertuxkart.net/Wiimote"
-msgstr ""
+msgstr "Apăsați butoanele 1+2 simultan pe wiimote pentru a-l pune în modul de descoperire, apoi apăsați OK. Instrucțiuni detaliate puteți găsi la https://supertuxkart.net/Wiimote"
 
 #: src/input/wiimote_manager.cpp:405
 #, c-format
@@ -3818,7 +3818,7 @@ msgstr "Ați câștigat cursa!"
 #: src/karts/kart.cpp:1035
 #, c-format
 msgid "You finished the race in rank %d!"
-msgstr "Ați finalizat cursa pe poziția %d!"
+msgstr "Ați finalizat cursa clasificat ca %d!"
 
 #. I18N: Message shown in game to tell player left the game in network
 #: src/karts/kart_rewinder.cpp:126 src/network/protocols/client_lobby.cpp:1173
@@ -3833,7 +3833,7 @@ msgid ""
 " Would you like this feature to be enabled? (To change this setting at a "
 "later time, go to options, select tab 'General', and edit \"Connect to the "
 "Internet\")."
-msgstr ""
+msgstr "SuperTuxKart poate să se conecteze la server pentru a descărca suplimente și notificări de actualizări. Consultați politica de confidențialitate de la https://supertuxkart.net/Privacy. Doriți să activați această funcționalitate? (Pentru a modifica această opțiune mai târziu, intrați la opțiuni, selectați tabul „Generale” și editați „Conectat la Internet”)."
 
 #: src/main.cpp:2393
 msgid "Your screen resolution is too low to run STK."
@@ -3918,7 +3918,7 @@ msgstr "O noua tură record"
 
 #: src/modes/linear_world.cpp:1100
 msgid "WRONG WAY!"
-msgstr "DRUM GREȘIT!"
+msgstr "DIRECȚIE GREȘITĂ!"
 
 #: src/modes/soccer_world.cpp:533 src/modes/soccer_world.cpp:660
 #, c-format
@@ -3979,7 +3979,7 @@ msgstr "%s s-a deconectat."
 #: src/network/protocols/client_lobby.cpp:673
 msgid ""
 "Press player name in the list for player management and ranking information."
-msgstr ""
+msgstr "Apăsați pe numele jucătorului din listă pentru informații despre administrare și clasare."
 
 #. I18N: In the networking lobby
 #. I18N: In server info dialog
@@ -4050,71 +4050,71 @@ msgstr "Conexiune refuzată: serverul este ocupat."
 
 #: src/network/protocols/client_lobby.cpp:972
 msgid "Connection refused: You are banned from the server."
-msgstr ""
+msgstr "Conexiune refuzată: Aveți interdicție pe acest server."
 
 #: src/network/protocols/client_lobby.cpp:987
 msgid "Connection refused: Server password is incorrect."
-msgstr ""
+msgstr "Conexiune refuzată: Parola serverului a fost incorectă."
 
 #: src/network/protocols/client_lobby.cpp:991
 msgid "Connection refused: Game data is incompatible."
-msgstr ""
+msgstr "Conexiune refuzată: Datele jocului sunt incompatibile."
 
 #: src/network/protocols/client_lobby.cpp:995
 msgid "Connection refused: Server is full."
-msgstr ""
+msgstr "Conexiune refuzată: serverul este plin."
 
 #: src/network/protocols/client_lobby.cpp:999
 msgid "Connection refused: Invalid player connecting."
-msgstr ""
+msgstr "Conexiune refuzată: se conectează un jucător nevalid."
 
 #: src/network/protocols/client_lobby.cpp:1027
 msgid "Failed to start the network game."
-msgstr ""
+msgstr "Eșec la pornirea jocului în rețea."
 
 #. I18N: Error message shown if live join or spectate failed in network
 #: src/network/protocols/client_lobby.cpp:1242
 msgid "The game has ended, you can't live join or spectate anymore."
-msgstr ""
+msgstr "Jocul s-a încheiat, nu mai puteți să vă alăturați sau să fiți spectator."
 
 #. I18N: Error message shown if live join failed in network
 #: src/network/protocols/client_lobby.cpp:1246
 msgid "No remaining place in the arena - live join disabled."
-msgstr ""
+msgstr "Nu a mai rămas spațiu în arenă - alăturarea este dezactivată."
 
 #. I18N: Error message shown if only 1 player remains in network
 #: src/network/protocols/client_lobby.cpp:1250
 msgid "Only 1 player remaining, returning to lobby."
-msgstr ""
+msgstr "Doar un jucător rămas, ne întoarcem la lobby."
 
 #: src/network/protocols/client_lobby.cpp:1256
 msgid "Server owner quit the game."
-msgstr ""
+msgstr "Deținătorul serverului a închis jocul."
 
 #. I18N: Status shown to player when he will be spectating the next game
 #: src/network/protocols/client_lobby.cpp:1260
 msgid "You will be spectating the next game."
-msgstr ""
+msgstr "Veți fi spectator la următorul joc."
 
 #. I18N: Show when player join red team of the started game in
 #. network
 #: src/network/protocols/client_lobby.cpp:1436
 #, c-format
 msgid "%s joined the red team."
-msgstr ""
+msgstr "%s s-a alăturat echipei roșii."
 
 #. I18N: Show when player join blue team of the started game in
 #. network
 #: src/network/protocols/client_lobby.cpp:1442
 #, c-format
 msgid "%s joined the blue team."
-msgstr ""
+msgstr "%s s-a alăturat echipei albastre."
 
 #. I18N: Show when player join the started game in network
 #: src/network/protocols/client_lobby.cpp:1448
 #, c-format
 msgid "%s joined the game."
-msgstr ""
+msgstr "%s s-a alăturat jocului."
 
 #. I18N: Message shown in game to tell the player it's possible to change
 #. the camera target in spectate mode of network
@@ -4123,13 +4123,13 @@ msgstr ""
 msgid ""
 "Press <%s> or <%s> to change the targeted player, <%s> or <%s> for the "
 "camera position."
-msgstr ""
+msgstr "Apăsați <%s> sau <%s> pentru a schimba jucătorul țină, <%s> sau <%s> pentru a schimba poziția camerei."
 
 #. I18N: Tell player he has successfully report this named player
 #: src/network/protocols/client_lobby.cpp:1655
 #, c-format
 msgid "Successfully reported %s."
-msgstr ""
+msgstr "Raportat %s cu succes."
 
 #. I18N: Shown when there is download error for assets download
 #. in the first run
@@ -4138,30 +4138,30 @@ msgstr ""
 msgid ""
 "Failed to download assets, check your storage space or internet connection "
 "and try again later."
-msgstr ""
+msgstr "Eșec la descărcarea resurselor, verificați dacă aveți spațiu de stocare sau conexiune la internet și încercați din nou mai târziu."
 
 #: src/network/protocols/connect_to_server.cpp:230
 msgid "No quick play server available."
-msgstr ""
+msgstr "Niciun server de joc rapid disponibil."
 
 #: src/network/protocols/connect_to_server.cpp:380
 #, c-format
 msgid "Cannot connect to server %s."
-msgstr ""
+msgstr "Nu s-a putut conecta la serverul %s."
 
 #. I18N: Show the failed detect port server name
 #: src/network/protocols/connect_to_server.cpp:883
 #, c-format
 msgid "Failed to detect port number for server %s."
-msgstr ""
+msgstr "Eșec la detectarea numărului de port pentru serverul %s."
 
 #: src/network/protocols/lobby_protocol.cpp:294
 msgid "Network grand prix has been finished."
-msgstr ""
+msgstr "Grand Prix în rețea s-a încheiat."
 
 #: src/network/server_config.cpp:263
 msgid "Time Trial (Grand Prix)"
-msgstr ""
+msgstr "Contra timp (Grand Prix)"
 
 #. I18N: Game mode
 #. I18N: In the create server screen for battle server
@@ -4170,7 +4170,7 @@ msgstr ""
 #: src/states_screens/online/create_server_screen.cpp:242
 #: src/states_screens/track_info_screen.cpp:254
 msgid "Free-For-All"
-msgstr ""
+msgstr "Toți împotriva tuturor"
 
 #. I18N: Game mode
 #. I18N: In the create server screen for battle server
@@ -4178,7 +4178,7 @@ msgstr ""
 #: src/states_screens/dialogs/server_configuration_dialog.cpp:162
 #: src/states_screens/online/create_server_screen.cpp:244
 msgid "Capture The Flag"
-msgstr ""
+msgstr "Capturează steagul"
 
 #: src/online/online_player_profile.cpp:456
 #, c-format
@@ -4200,51 +4200,51 @@ msgstr "%s, %s și %s sunt acum conectați."
 #, c-format
 msgid "%d friend is now online."
 msgid_plural "%d friends are now online."
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "%d prieten este acum online."
+msgstr[1] "%d prieteni sunt acum online."
+msgstr[2] "%d de prieteni sunt acum online."
 
 #. I18N: Tell your friend if he is on any server in game
 #: src/online/online_player_profile.cpp:520
 #, c-format
 msgid "%s is now on server \"%s\"."
-msgstr ""
+msgstr "%s este acum pe server „%s”."
 
 #: src/online/online_player_profile.cpp:551
 #, c-format
 msgid "You have %d new friend request!"
 msgid_plural "You have %d new friend requests!"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "Aveți %d nouă cerere de prietenie!"
+msgstr[1] "Aveți %d noi cereri de prietenie!"
+msgstr[2] "Aveți %d de noi cereri de prietenie!"
 
 #: src/online/online_player_profile.cpp:557
 msgid "You have a new friend request!"
-msgstr ""
+msgstr "Aveți o nouă cerere de prietenie!"
 
 #: src/online/xml_request.cpp:83
 msgid ""
 "Unable to connect to the server. Check your internet connection or try again"
 " later."
-msgstr ""
+msgstr "Nu s-a putut conecta la server. Verificați conexiunea la internet și încercați mai târziu."
 
 #: src/race/grand_prix_data.cpp:639 src/states_screens/gp_info_screen.cpp:77
 msgid "Default"
-msgstr ""
+msgstr "Implicit"
 
 #: src/race/grand_prix_data.cpp:641 src/states_screens/gp_info_screen.cpp:78
 msgid "None"
-msgstr ""
+msgstr "Niciunul"
 
 #: src/race/grand_prix_data.cpp:645 src/states_screens/gp_info_screen.cpp:80
 msgid "Random"
-msgstr ""
+msgstr "Aleator"
 
 #: src/race/highscore_manager.cpp:102
 msgid ""
 "The highscore file was too old,\n"
 "all highscores have been erased."
-msgstr ""
+msgstr "Fișierul cu scorurile mari era prea vechi,\ntoate scorurile mari au fost șterse."
 
 #. I18N: Game mode
 #: src/race/race_manager.cpp:1294
@@ -4254,16 +4254,16 @@ msgstr "Urmează liderul"
 #. I18N: Game mode
 #: src/race/race_manager.cpp:1298 src/states_screens/track_info_screen.cpp:253
 msgid "3 Strikes Battle"
-msgstr "Luptă cu 3 lovituri"
+msgstr "Bătălia din 3 lovituri"
 
 #: src/replay/replay_recorder.cpp:358
 msgid "Incomplete replay file will not be saved."
-msgstr ""
+msgstr "Fișierul de reluare incomplet nu va fi salvat."
 
 #: src/replay/replay_recorder.cpp:394
 #, c-format
 msgid "Replay saved in \"%s\"."
-msgstr ""
+msgstr "Reluarea a fost salvată în „%s”."
 
 #: src/states_screens/addons_screen.cpp:51
 msgid "1 week"
@@ -4299,27 +4299,27 @@ msgstr "2 ani"
 
 #: src/states_screens/addons_screen.cpp:109
 msgid "Add-on name"
-msgstr ""
+msgstr "Nume supliment"
 
 #: src/states_screens/addons_screen.cpp:110
 msgid "Updated date"
-msgstr ""
+msgstr "Data actualizării"
 
 #. I18N: Addon not installed for fillter
 #: src/states_screens/addons_screen.cpp:140
 msgid "Not installed"
-msgstr ""
+msgstr "Neinstalat"
 
 #. I18N: as in: The Old Island by Johannes Sjolund
 #: src/states_screens/addons_screen.cpp:326
 #, c-format
 msgctxt "addons"
 msgid "%s by %s"
-msgstr ""
+msgstr "%s de %s"
 
 #: src/states_screens/addons_screen.cpp:447
 msgid "Please wait while addons are updated"
-msgstr ""
+msgstr "Așteptați până când suplimentele sunt actualizate"
 
 #: src/states_screens/addons_screen.cpp:527
 #: src/states_screens/main_menu_screen.cpp:671
@@ -4327,13 +4327,13 @@ msgid ""
 "Sorry, an error occurred while contacting the add-ons website. Make sure you"
 " are connected to the Internet and that SuperTuxKart is not blocked by a "
 "firewall"
-msgstr ""
+msgstr "A apărut o eroare în timpul contactării sitului cu suplimente. Asigurați-vă că sunteți conectați la Internet și că SuperTuxKart nu este blocat de un firewall"
 
 #. I18N: track group name
 #: src/states_screens/arenas_screen.cpp:89
 #: src/states_screens/tracks_and_gp_screen.cpp:183
 msgid "Favorites"
-msgstr ""
+msgstr "Favorite"
 
 #: src/states_screens/arenas_screen.cpp:331
 #: src/states_screens/easter_egg_screen.cpp:267
@@ -4341,45 +4341,45 @@ msgstr ""
 #: src/states_screens/kart_selection.cpp:1675
 #: src/states_screens/race_setup_screen.cpp:101
 msgid "Locked : solve active challenges to gain access to more!"
-msgstr ""
+msgstr "Blocat : completați provocări pentru a avea acces la mai multe!"
 
 #: src/states_screens/arenas_screen.cpp:351
 msgid "Random Arena"
-msgstr ""
+msgstr "Arenă aleatoare"
 
 #: src/states_screens/credits.cpp:184
 msgid "translator-credits"
-msgstr "Launchpad Contributions:\nHar Gosmos, 2019\nNicolae Crefelean, 2015,2017-2018\nSorin Ingeaua, 2020\nAlexandru Guduleasa\nDaniel Butum\nDimStar\nDominique Leuenberger aka DimStar\nMatus Michael\nNicolae Crefelean\nSTK-team\nVitalie Ciubotaru\nDaniel Șerbănescu, 2025"
+msgstr "Contribuții prin Launchpad:\nHar Gosmos, 2019\nNicolae Crefelean, 2015,2017-2018\nSorin Ingeaua, 2020\nAlexandru Guduleasa\nDaniel Butum\nDimStar\nDominique Leuenberger aka DimStar\nMatus Michael\nNicolae Crefelean\nSTK-team\nVitalie Ciubotaru\nDaniel Șerbănescu, 2025"
 
 #: src/states_screens/dialogs/achievement_progress_dialog.cpp:65
 msgctxt "achievement_info"
 msgid "Subgoals"
-msgstr ""
+msgstr "Subobiective"
 
 #: src/states_screens/dialogs/achievement_progress_dialog.cpp:67
 msgctxt "achievement_info"
 msgid "Progress"
-msgstr ""
+msgstr "Progres"
 
 #. I18N: For achievements, a parent goal linking logically several subgoals
 #: src/states_screens/dialogs/achievement_progress_dialog.cpp:162
 msgid "Fulfill all the subgoals"
-msgstr ""
+msgstr "Îndepliniți toate subobiectivele"
 
 #. I18N: For achievements, a parent goal linking logically several subgoals
 #: src/states_screens/dialogs/achievement_progress_dialog.cpp:164
 msgid "Fulfill all the subgoals at the same time"
-msgstr ""
+msgstr "Îndepliniți toate subobiectivele simultan"
 
 #. I18N: For achievements, a parent goal linking logically several subgoals
 #: src/states_screens/dialogs/achievement_progress_dialog.cpp:166
 msgid "Fulfill at least one subgoal"
-msgstr ""
+msgstr "Îndepliniți cel puțin un subobiectiv"
 
 #. I18N: For achievements, a parent goal linking logically several subgoals
 #: src/states_screens/dialogs/achievement_progress_dialog.cpp:168
 msgid "The sum of the subgoals must reach the indicated value"
-msgstr ""
+msgstr "Suma subobiectivelor trebuie să ajungă la valoarea indicată"
 
 #. I18N: A goal for achievements. If this text is in (), it's a precision
 #. added to multiple different goals.
@@ -4387,200 +4387,200 @@ msgstr ""
 #: src/states_screens/dialogs/achievement_progress_dialog.cpp:276
 #: src/states_screens/dialogs/achievement_progress_dialog.cpp:301
 msgid "Races won"
-msgstr ""
+msgstr "Curse câștigate"
 
 #. I18N: A goal for achievements. If this text is in (), it's a precision
 #. added to multiple different goals.
 #: src/states_screens/dialogs/achievement_progress_dialog.cpp:172
 msgid "Normal races won"
-msgstr ""
+msgstr "Curse normale câștigate"
 
 #. I18N: A goal for achievements. If this text is in (), it's a precision
 #. added to multiple different goals.
 #: src/states_screens/dialogs/achievement_progress_dialog.cpp:174
 msgid "Time-trial races won"
-msgstr ""
+msgstr "Curse „Contra timp” câștigate"
 
 #. I18N: A goal for achievements. If this text is in (), it's a precision
 #. added to multiple different goals.
 #: src/states_screens/dialogs/achievement_progress_dialog.cpp:176
 msgid "Follow-the-Leader races won"
-msgstr ""
+msgstr "Curse „Urmează liderul” câștigate"
 
 #. I18N: A goal for achievements. If this text is in (), it's a precision
 #. added to multiple different goals.
 #: src/states_screens/dialogs/achievement_progress_dialog.cpp:178
 msgid "Consecutive won races"
-msgstr ""
+msgstr "Curse consecutive câștigate"
 
 #. I18N: A goal for achievements. If this text is in (), it's a precision
 #. added to multiple different goals.
 #: src/states_screens/dialogs/achievement_progress_dialog.cpp:180
 msgid "Consecutive won races in Expert or SuperTux"
-msgstr ""
+msgstr "Curse consecutive câștigate la Expert sau SuperTux"
 
 #. I18N: A goal for achievements. If this text is in (), it's a precision
 #. added to multiple different goals.
 #: src/states_screens/dialogs/achievement_progress_dialog.cpp:182
 msgid "Novice races started"
-msgstr ""
+msgstr "Curse de începător începute"
 
 #. I18N: A goal for achievements. If this text is in (), it's a precision
 #. added to multiple different goals.
 #: src/states_screens/dialogs/achievement_progress_dialog.cpp:184
 msgid "Novice races finished"
-msgstr ""
+msgstr "Curse de începător completate"
 
 #. I18N: A goal for achievements. If this text is in (), it's a precision
 #. added to multiple different goals.
 #: src/states_screens/dialogs/achievement_progress_dialog.cpp:186
 msgid "Intermediate races started"
-msgstr ""
+msgstr "Curse de intermediar începute"
 
 #. I18N: A goal for achievements. If this text is in (), it's a precision
 #. added to multiple different goals.
 #: src/states_screens/dialogs/achievement_progress_dialog.cpp:188
 msgid "Intermediate races finished"
-msgstr ""
+msgstr "Curse de intermediar completate"
 
 #. I18N: A goal for achievements. If this text is in (), it's a precision
 #. added to multiple different goals.
 #: src/states_screens/dialogs/achievement_progress_dialog.cpp:190
 msgid "Expert races started"
-msgstr ""
+msgstr "Curse de expert începute"
 
 #. I18N: A goal for achievements. If this text is in (), it's a precision
 #. added to multiple different goals.
 #: src/states_screens/dialogs/achievement_progress_dialog.cpp:192
 msgid "Expert races finished"
-msgstr ""
+msgstr "Curse de expert completate"
 
 #. I18N: A goal for achievements. If this text is in (), it's a precision
 #. added to multiple different goals.
 #: src/states_screens/dialogs/achievement_progress_dialog.cpp:194
 msgid "SuperTux races started"
-msgstr ""
+msgstr "Curse SuperTux începute"
 
 #. I18N: A goal for achievements. If this text is in (), it's a precision
 #. added to multiple different goals.
 #: src/states_screens/dialogs/achievement_progress_dialog.cpp:196
 msgid "SuperTux races finished"
-msgstr ""
+msgstr "Curse de SuperTux completate"
 
 #. I18N: A goal for achievements. If this text is in (), it's a precision
 #. added to multiple different goals.
 #: src/states_screens/dialogs/achievement_progress_dialog.cpp:198
 msgid "Normal races started"
-msgstr ""
+msgstr "Curse normale începute"
 
 #. I18N: A goal for achievements. If this text is in (), it's a precision
 #. added to multiple different goals.
 #: src/states_screens/dialogs/achievement_progress_dialog.cpp:200
 msgid "Normal races finished"
-msgstr ""
+msgstr "Curse normale completate"
 
 #. I18N: A goal for achievements. If this text is in (), it's a precision
 #. added to multiple different goals.
 #: src/states_screens/dialogs/achievement_progress_dialog.cpp:202
 msgid "Time-trial races started"
-msgstr ""
+msgstr "Curse „Contra timp” începute"
 
 #. I18N: A goal for achievements. If this text is in (), it's a precision
 #. added to multiple different goals.
 #: src/states_screens/dialogs/achievement_progress_dialog.cpp:204
 msgid "Time-trial races finished"
-msgstr ""
+msgstr "Curse „Contra timp” completate"
 
 #. I18N: A goal for achievements. If this text is in (), it's a precision
 #. added to multiple different goals.
 #: src/states_screens/dialogs/achievement_progress_dialog.cpp:206
 msgid "Follow-the-Leader races started"
-msgstr ""
+msgstr "Curse „Urmează liderul” începute"
 
 #. I18N: A goal for achievements. If this text is in (), it's a precision
 #. added to multiple different goals.
 #: src/states_screens/dialogs/achievement_progress_dialog.cpp:208
 msgid "Follow-the-Leader races finished"
-msgstr ""
+msgstr "Curse „Urmează liderul” completate"
 
 #. I18N: A goal for achievements. If this text is in (), it's a precision
 #. added to multiple different goals.
 #: src/states_screens/dialogs/achievement_progress_dialog.cpp:210
 msgid "3 Strikes battles started"
-msgstr ""
+msgstr "„Bătălii din 3 lovituri” începute"
 
 #. I18N: A goal for achievements. If this text is in (), it's a precision
 #. added to multiple different goals.
 #: src/states_screens/dialogs/achievement_progress_dialog.cpp:212
 msgid "3 Strikes battles finished"
-msgstr ""
+msgstr "„Bătălii din 3 lovituri” completate"
 
 #. I18N: A goal for achievements. If this text is in (), it's a precision
 #. added to multiple different goals.
 #: src/states_screens/dialogs/achievement_progress_dialog.cpp:214
 msgid "Soccer matches started"
-msgstr ""
+msgstr "Meciuri de fotbal începute"
 
 #. I18N: A goal for achievements. If this text is in (), it's a precision
 #. added to multiple different goals.
 #: src/states_screens/dialogs/achievement_progress_dialog.cpp:216
 msgid "Soccer matches finished"
-msgstr ""
+msgstr "Meciuri de fotbal completate"
 
 #. I18N: A goal for achievements. If this text is in (), it's a precision
 #. added to multiple different goals.
 #: src/states_screens/dialogs/achievement_progress_dialog.cpp:218
 msgid "Egg Hunts started"
-msgstr ""
+msgstr "Vânători de ouă începute"
 
 #. I18N: A goal for achievements. If this text is in (), it's a precision
 #. added to multiple different goals.
 #: src/states_screens/dialogs/achievement_progress_dialog.cpp:220
 msgid "Egg Hunts finished"
-msgstr ""
+msgstr "Vânători de ouă completate"
 
 #. I18N: A goal for achievements. If this text is in (), it's a precision
 #. added to multiple different goals.
 #: src/states_screens/dialogs/achievement_progress_dialog.cpp:222
 msgid "Races started with a ghost replay"
-msgstr ""
+msgstr "Curse începute cu o derulare fantomă"
 
 #. I18N: A goal for achievements. If this text is in (), it's a precision
 #. added to multiple different goals.
 #: src/states_screens/dialogs/achievement_progress_dialog.cpp:224
 msgid "Races finished with a ghost replay"
-msgstr ""
+msgstr "Curse completate cu o rulare de fantomă"
 
 #. I18N: A goal for achievements. If this text is in (), it's a precision
 #. added to multiple different goals.
 #: src/states_screens/dialogs/achievement_progress_dialog.cpp:226
 msgid "Capture-the-Flag matches started"
-msgstr ""
+msgstr "Meciuri „Capturează steagul” începute"
 
 #. I18N: A goal for achievements. If this text is in (), it's a precision
 #. added to multiple different goals.
 #: src/states_screens/dialogs/achievement_progress_dialog.cpp:228
 msgid "Capture-the-Flag matches finished"
-msgstr ""
+msgstr "Meciuri „Capturează steagul” completate"
 
 #. I18N: A goal for achievements. If this text is in (), it's a precision
 #. added to multiple different goals.
 #: src/states_screens/dialogs/achievement_progress_dialog.cpp:230
 msgid "Free-for-All matches started"
-msgstr ""
+msgstr "Meciuri „Toți împotriva tuturor” începute"
 
 #. I18N: A goal for achievements. If this text is in (), it's a precision
 #. added to multiple different goals.
 #: src/states_screens/dialogs/achievement_progress_dialog.cpp:232
 msgid "Free-for-All matches finished"
-msgstr ""
+msgstr "Meciuri „Toți împotriva tuturor” completate"
 
 #. I18N: A goal for achievements. If this text is in (), it's a precision
 #. added to multiple different goals.
 #: src/states_screens/dialogs/achievement_progress_dialog.cpp:234
 #: src/states_screens/dialogs/achievement_progress_dialog.cpp:236
 msgid "Powerups used"
-msgstr ""
+msgstr "Bonusuri folosite"
 
 #. I18N: A goal for achievements. If this text is in (), it's a precision
 #. added to multiple different goals.
@@ -4592,41 +4592,41 @@ msgstr ""
 #: src/states_screens/dialogs/achievement_progress_dialog.cpp:254
 #: src/states_screens/dialogs/achievement_progress_dialog.cpp:262
 msgid " (1 race)"
-msgstr ""
+msgstr " (o cursă)"
 
 #. I18N: A goal for achievements. If this text is in (), it's a precision
 #. added to multiple different goals.
 #: src/states_screens/dialogs/achievement_progress_dialog.cpp:238
 #: src/states_screens/dialogs/achievement_progress_dialog.cpp:240
 msgid "Bowling ball hits"
-msgstr ""
+msgstr "Lovituri cu mingea de popice"
 
 #. I18N: A goal for achievements. If this text is in (), it's a precision
 #. added to multiple different goals.
 #: src/states_screens/dialogs/achievement_progress_dialog.cpp:242
 #: src/states_screens/dialogs/achievement_progress_dialog.cpp:244
 msgid "Swatter hits"
-msgstr ""
+msgstr "Lovituri cu paleta de țânțari"
 
 #. I18N: A goal for achievements. If this text is in (), it's a precision
 #. added to multiple different goals.
 #: src/states_screens/dialogs/achievement_progress_dialog.cpp:246
 #: src/states_screens/dialogs/achievement_progress_dialog.cpp:248
 msgid "All hits"
-msgstr ""
+msgstr "Toate loviturile"
 
 #. I18N: A goal for achievements. If this text is in (), it's a precision
 #. added to multiple different goals.
 #: src/states_screens/dialogs/achievement_progress_dialog.cpp:250
 msgid "Hits against the same kart"
-msgstr ""
+msgstr "Lovituri împotriva aceluiași cart"
 
 #. I18N: A goal for achievements. If this text is in (), it's a precision
 #. added to multiple different goals.
 #: src/states_screens/dialogs/achievement_progress_dialog.cpp:252
 #: src/states_screens/dialogs/achievement_progress_dialog.cpp:254
 msgid "Bananas collected"
-msgstr ""
+msgstr "Banane colectate"
 
 #. I18N: A goal for achievements. If this text is in (), it's a precision
 #. added to multiple different goals.
@@ -4636,20 +4636,20 @@ msgstr ""
 #: src/states_screens/dialogs/achievement_progress_dialog.cpp:267
 #: src/states_screens/options/options_screen_device.cpp:264
 msgid "Skidding"
-msgstr ""
+msgstr "Derapaje"
 
 #. I18N: A goal for achievements. If this text is in (), it's a precision
 #. added to multiple different goals.
 #: src/states_screens/dialogs/achievement_progress_dialog.cpp:269
 msgid " (1 lap)"
-msgstr ""
+msgstr "(1 tură)"
 
 #. I18N: A goal for achievements. If this text is in (), it's a precision
 #. added to multiple different goals.
 #: src/states_screens/dialogs/achievement_progress_dialog.cpp:272
 #: src/states_screens/dialogs/achievement_progress_dialog.cpp:297
 msgid "Races started"
-msgstr ""
+msgstr "Curse începute"
 
 #. I18N: A goal for achievements. If this text is in (), it's a precision
 #. added to multiple different goals.
@@ -4664,63 +4664,63 @@ msgstr ""
 #: src/states_screens/dialogs/achievement_progress_dialog.cpp:288
 #: src/states_screens/dialogs/achievement_progress_dialog.cpp:294
 msgid " (maximum on one official track)"
-msgstr ""
+msgstr "(maxima la una dintre cursele oficiale)"
 
 #. I18N: A goal for achievements. If this text is in (), it's a precision
 #. added to multiple different goals.
 #: src/states_screens/dialogs/achievement_progress_dialog.cpp:274
 #: src/states_screens/dialogs/achievement_progress_dialog.cpp:299
 msgid "Races finished"
-msgstr ""
+msgstr "Curse completate"
 
 #. I18N: A goal for achievements. If this text is in (), it's a precision
 #. added to multiple different goals.
 #: src/states_screens/dialogs/achievement_progress_dialog.cpp:278
 #: src/states_screens/dialogs/achievement_progress_dialog.cpp:303
 msgid "Reverse direction races finished"
-msgstr ""
+msgstr "Curse finalizate în direcție inversă"
 
 #. I18N: A goal for achievements. If this text is in (), it's a precision
 #. added to multiple different goals.
 #: src/states_screens/dialogs/achievement_progress_dialog.cpp:280
 #: src/states_screens/dialogs/achievement_progress_dialog.cpp:305
 msgid "Races finished alone"
-msgstr ""
+msgstr "Curse completate singur"
 
 #. I18N: A goal for achievements. If this text is in (), it's a precision
 #. added to multiple different goals.
 #: src/states_screens/dialogs/achievement_progress_dialog.cpp:282
 #: src/states_screens/dialogs/achievement_progress_dialog.cpp:307
 msgid "Races with less than the default lap number"
-msgstr ""
+msgstr "Curse cu mai puține ture decât numărul implicit"
 
 #. I18N: A goal for achievements. If this text is in (), it's a precision
 #. added to multiple different goals.
 #: src/states_screens/dialogs/achievement_progress_dialog.cpp:284
 #: src/states_screens/dialogs/achievement_progress_dialog.cpp:309
 msgid "Races with more than the default lap number"
-msgstr ""
+msgstr "Curse cu mai multe ture decât numărul implicit"
 
 #. I18N: A goal for achievements. If this text is in (), it's a precision
 #. added to multiple different goals.
 #: src/states_screens/dialogs/achievement_progress_dialog.cpp:286
 #: src/states_screens/dialogs/achievement_progress_dialog.cpp:311
 msgid "Races with at least twice as much as the default lap number"
-msgstr ""
+msgstr "Curse cu număr de ture cel puțin dublu decât numărul implicit"
 
 #. I18N: A goal for achievements. If this text is in (), it's a precision
 #. added to multiple different goals.
 #: src/states_screens/dialogs/achievement_progress_dialog.cpp:288
 #: src/states_screens/dialogs/achievement_progress_dialog.cpp:313
 msgid "Egg hunts started"
-msgstr ""
+msgstr "Vânători de ouă începute"
 
 #. I18N: A goal for achievements. If this text is in (), it's a precision
 #. added to multiple different goals.
 #: src/states_screens/dialogs/achievement_progress_dialog.cpp:292
 #: src/states_screens/dialogs/achievement_progress_dialog.cpp:317
 msgid "Egg hunts finished"
-msgstr ""
+msgstr "Vânători de ouă completate"
 
 #. I18N: A goal for achievements. If this text is in (), it's a precision
 #. added to multiple different goals.
@@ -4735,24 +4735,24 @@ msgstr ""
 #: src/states_screens/dialogs/achievement_progress_dialog.cpp:313
 #: src/states_screens/dialogs/achievement_progress_dialog.cpp:319
 msgid " (official tracks matching the goal)"
-msgstr ""
+msgstr " (cursele oficiale ce se încadrează obiectivului)"
 
 #: src/states_screens/dialogs/add_device_dialog.cpp:48
 msgid ""
 "New gamepads and joysticks will automatically appear in the list when you connect them to this device.\n"
 "\n"
 "To add a keyboard config, you can use the button below, HOWEVER please note that most keyboards only support a limited amount of simultaneous keypresses and are thus inappropriate for multiplayer gameplay. (You can, however, connect multiple keyboards to this device. Remember that everyone still needs different keybindings in this case.)"
-msgstr ""
+msgstr "Noile gamepad-uri și joystick-uri vor apărea automat în listă când le conectați.\n\nPentru a adăuga o configurație de tastatură, puteți folosi butonul de mai jos, DAR luați aminte că majoritatea tastaturilor suportă apăsări de taste simultane limitate deci sunt neadecvate pentru jucători multipli. (Puteți, oricum, conecta tastaturi multiple la acest dispozitiv. Țineți minte că toți jucătorii trebuie să aibă taste diferite în cazul acesta.)"
 
 #. I18N: In the 'add new input device' dialog
 #: src/states_screens/dialogs/add_device_dialog.cpp:71
 msgid "Add Wiimote"
-msgstr ""
+msgstr "Adaugă Wiimote"
 
 #. I18N: In the 'add new input device' dialog
 #: src/states_screens/dialogs/add_device_dialog.cpp:88
 msgid "Add Keyboard Configuration"
-msgstr ""
+msgstr "Adaugă o configurație de tastatură"
 
 #: src/states_screens/dialogs/addons_loading.cpp:126
 msgid "Update"
@@ -4777,24 +4777,24 @@ msgstr "Mărime: %s"
 
 #: src/states_screens/dialogs/addons_loading.cpp:295
 msgid "You must be logged in to rate this addon."
-msgstr ""
+msgstr "Trebuie să fiți conectați pentru a evalua acest supliment."
 
 #: src/states_screens/dialogs/addons_loading.cpp:315
 #: src/states_screens/dialogs/addons_pack.cpp:225
 #: src/states_screens/dialogs/download_assets.cpp:206
 msgid "Sorry, downloading the add-on failed"
-msgstr ""
+msgstr "Descărcarea suplimentului a eșuat"
 
 #: src/states_screens/dialogs/addons_loading.cpp:391
 #, c-format
 msgid "Problems installing the addon '%s'."
-msgstr ""
+msgstr "Probleme la instalarea suplimentului „%s”."
 
 #: src/states_screens/dialogs/addons_loading.cpp:402
 #: src/states_screens/dialogs/addons_loading.cpp:453
 #: src/states_screens/dialogs/download_assets.cpp:271
 msgid "Try again"
-msgstr ""
+msgstr "Încercați din nou"
 
 #: src/states_screens/dialogs/addons_loading.cpp:442
 #, c-format
@@ -4803,39 +4803,39 @@ msgstr "Probleme la îndepărtarea suplimentului „%s”"
 
 #: src/states_screens/dialogs/addons_pack.cpp:71
 msgid "Background download completed."
-msgstr ""
+msgstr "Descărcare în fundal completată."
 
 #: src/states_screens/dialogs/addons_pack.cpp:132
 msgid "Background download"
-msgstr ""
+msgstr "Descarcă în fundal"
 
 #: src/states_screens/dialogs/addons_pack.cpp:141
 msgid "Background download has already started."
-msgstr ""
+msgstr "Descărcarea în fundal a început deja."
 
 #: src/states_screens/dialogs/change_password_dialog.cpp:140
 msgid "Current password invalid."
-msgstr ""
+msgstr "Parola curentă este nevalidă."
 
 #: src/states_screens/dialogs/change_password_dialog.cpp:146
 #: src/states_screens/online/register_screen.cpp:382
 msgid "Password has to be between 8 and 30 characters long!"
-msgstr ""
+msgstr "Parola trebuie să fie între 8 și 30 de caractere!"
 
 #: src/states_screens/dialogs/change_password_dialog.cpp:153
 #: src/states_screens/online/register_screen.cpp:358
 msgid "Passwords don't match!"
-msgstr ""
+msgstr "Parolele nu se potrivesc!"
 
 #: src/states_screens/dialogs/change_password_dialog.cpp:238
 #: src/states_screens/dialogs/recovery_dialog.cpp:211
 #: src/states_screens/online/register_screen.cpp:448
 msgid "Validating info"
-msgstr ""
+msgstr "Se validează informațiile"
 
 #: src/states_screens/dialogs/change_password_dialog.cpp:250
 msgid "Password successfully changed."
-msgstr ""
+msgstr "Parola a fost schimbată cu succes."
 
 #. I18N: In the 'confirm resolution' dialog, that's shown when switching
 #. resoluton
@@ -4843,21 +4843,21 @@ msgstr ""
 #, c-format
 msgid "Confirm resolution within %i second"
 msgid_plural "Confirm resolution within %i seconds"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "Confirmați rezoluția în %i secundă"
+msgstr[1] "Confirmați rezoluția în %i secunde"
+msgstr[2] "Confirmați rezoluția în %i de secunde"
 
 #: src/states_screens/dialogs/confirm_resolution_dialog.cpp:93
 msgid ""
 "Resolutions smaller than 1024x768 or 1280x720 are unsupported. Some parts of"
 " the UI may not work correctly."
-msgstr ""
+msgstr "Rezoluțiile mai mici de 1024x768 sau 1280x720 nu sunt suportate. Unele părți ale interfeței pot să nu funcționeze corect."
 
 #. I18N: In the UI options, Camera setting: Drone chase
 #: src/states_screens/dialogs/custom_camera_settings.cpp:86
 #: src/states_screens/options/options_screen_ui.cpp:126
 msgid "Drone chase"
-msgstr ""
+msgstr "Dronă urmăritoare"
 
 #. I18N: In the UI options, Camera setting: Custom
 #. I18N: custom video settings
@@ -4883,7 +4883,7 @@ msgstr "Dezactivat"
 #: src/states_screens/dialogs/custom_video_settings.cpp:69
 #: src/states_screens/options/options_screen_video.cpp:450
 msgid "Important only"
-msgstr ""
+msgstr "Numai importante"
 
 #. I18N: Geometry level disabled : lowest level, Level-of-Details distances
 #. are very low
@@ -4892,7 +4892,7 @@ msgstr ""
 #: src/states_screens/dialogs/custom_video_settings.cpp:95
 #: src/states_screens/options/options_screen_video.cpp:453
 msgid "Very Low"
-msgstr ""
+msgstr "Foarte scăzut"
 
 #. I18N: Geometry level low : everything is displayed, Level-of-Details
 #. distances are low
@@ -4902,7 +4902,7 @@ msgstr ""
 #: src/states_screens/dialogs/custom_video_settings.cpp:103
 #: src/states_screens/options/options_screen_video.cpp:455
 msgid "Low"
-msgstr ""
+msgstr "Scăzut"
 
 #. I18N: Geometry level medium : everything is displayed, Level-of-Details
 #. distances are medium
@@ -4916,7 +4916,7 @@ msgstr ""
 #: src/states_screens/options/options_screen_ui.cpp:96
 #: src/states_screens/options/options_screen_video.cpp:457
 msgid "Medium"
-msgstr ""
+msgstr "Mediu"
 
 #. I18N: Geometry level high : everything is displayed, Level-of-Details
 #. distances are high
@@ -4926,7 +4926,7 @@ msgstr ""
 #: src/states_screens/dialogs/custom_video_settings.cpp:105
 #: src/states_screens/options/options_screen_video.cpp:459
 msgid "High"
-msgstr ""
+msgstr "Ridicată"
 
 #. I18N: Geometry level very high : everything is displayed, Level-of-Details
 #. distances are very high
@@ -4934,7 +4934,7 @@ msgstr ""
 #: src/states_screens/dialogs/custom_video_settings.cpp:83
 #: src/states_screens/options/options_screen_video.cpp:461
 msgid "Very High"
-msgstr ""
+msgstr "Foarte ridicată"
 
 #. I18N: Geometry level ultra : everything is displayed, Level-of-Details
 #. distances are extremely high
@@ -4942,7 +4942,7 @@ msgstr ""
 #: src/states_screens/dialogs/custom_video_settings.cpp:85
 #: src/states_screens/options/options_screen_video.cpp:463
 msgid "Ultra"
-msgstr ""
+msgstr "Ultra"
 
 #. I18N: In download assets dialog
 #: src/states_screens/dialogs/download_assets.cpp:113
@@ -4950,32 +4950,32 @@ msgid ""
 "SuperTuxKart will download full assets (including high quality textures and "
 "music) for better gaming experience, this will use your mobile data if you "
 "don't have a wifi connection."
-msgstr ""
+msgstr "SuperTuxKart va descărca resurse complete (incluzând texturi și muzică de înaltă calitate) pentru o experiență mai bună a jocului, aceasta va folosi datele mobile dacă nu aveți o conexiune wifi."
 
 #. I18N: In download assets dialog
 #: src/states_screens/dialogs/download_assets.cpp:121
 msgid ""
 "SuperTuxKart will download full assets (including high quality textures and "
 "music) for better gaming experience."
-msgstr ""
+msgstr "SuperTuxKart va descărca resurse complete (incluzând texturi și muzică de înaltă calitate) pentru o experiență mai bună a jocului."
 
 #: src/states_screens/dialogs/enter_address_dialog.cpp:42
 msgid ""
 "Enter the server address optionally followed by : and then port or select "
 "address from list."
-msgstr ""
+msgstr "Introduceți adresa serverului urmată opțional de două puncte și apoi portul sau selectați adresa din listă."
 
 #: src/states_screens/dialogs/enter_address_dialog.cpp:124
 #, c-format
 msgid "Invalid server address: %s."
-msgstr ""
+msgstr "Adresă de server nevalidă: %s."
 
 #: src/states_screens/dialogs/ghost_replay_info_dialog.cpp:150
 #: src/states_screens/ghost_replay_selection.cpp:159
 #: src/states_screens/high_score_selection.cpp:157
 msgctxt "column_name"
 msgid "Reverse"
-msgstr ""
+msgstr "Invers"
 
 #: src/states_screens/dialogs/ghost_replay_info_dialog.cpp:152
 #: src/states_screens/ghost_replay_selection.cpp:161
@@ -4983,38 +4983,38 @@ msgstr ""
 #: src/states_screens/online/server_selection.cpp:135
 msgctxt "column_name"
 msgid "Difficulty"
-msgstr ""
+msgstr "Dificultate"
 
 #: src/states_screens/dialogs/ghost_replay_info_dialog.cpp:155
 #: src/states_screens/ghost_replay_selection.cpp:163
 #: src/states_screens/high_score_selection.cpp:155
 msgctxt "column_name"
 msgid "Laps"
-msgstr ""
+msgstr "Ture"
 
 #: src/states_screens/dialogs/ghost_replay_info_dialog.cpp:157
 #: src/states_screens/ghost_replay_selection.cpp:164
 msgctxt "column_name"
 msgid "Time"
-msgstr ""
+msgstr "Timp"
 
 #: src/states_screens/dialogs/ghost_replay_info_dialog.cpp:159
 #: src/states_screens/ghost_replay_selection.cpp:165
 msgctxt "column_name"
 msgid "Kart"
-msgstr ""
+msgstr "Cart"
 
 #: src/states_screens/dialogs/ghost_replay_info_dialog.cpp:161
 #: src/states_screens/ghost_replay_selection.cpp:166
 msgctxt "column_name"
 msgid "User"
-msgstr ""
+msgstr "Utilizator"
 
 #: src/states_screens/dialogs/ghost_replay_info_dialog.cpp:163
 #: src/states_screens/ghost_replay_selection.cpp:170
 msgctxt "column_name"
 msgid "Version"
-msgstr ""
+msgstr "Versiune"
 
 #: src/states_screens/dialogs/ghost_replay_info_dialog.cpp:204
 #: src/states_screens/dialogs/high_score_info_dialog.cpp:138
@@ -5024,43 +5024,43 @@ msgstr ""
 #: src/states_screens/ghost_replay_selection.cpp:394
 #: src/states_screens/high_score_selection.cpp:265
 msgid "No"
-msgstr ""
+msgstr "Nu"
 
 #: src/states_screens/dialogs/high_score_info_dialog.cpp:82
 #: src/states_screens/edit_gp_screen.cpp:151
 #: src/states_screens/high_score_selection.cpp:141
 msgid "Track"
-msgstr ""
+msgstr "Cursă"
 
 #: src/states_screens/dialogs/high_score_info_dialog.cpp:113
 #, c-format
 msgid "Top %d High Scores"
-msgstr ""
+msgstr "Top %d scoruri înalte"
 
 #: src/states_screens/dialogs/high_score_info_dialog.cpp:115
 #, c-format
 msgid "%s: %s"
-msgstr ""
+msgstr "%s: %s"
 
 #: src/states_screens/dialogs/high_score_info_dialog.cpp:128
 #, c-format
 msgid "Number of karts: %d"
-msgstr ""
+msgstr "Număr de carturi: %d"
 
 #: src/states_screens/dialogs/high_score_info_dialog.cpp:140
 #, c-format
 msgid "Time target: %s"
-msgstr ""
+msgstr "Timpul țintă: %s"
 
 #: src/states_screens/dialogs/high_score_info_dialog.cpp:142
 #, c-format
 msgid "Laps: %d"
-msgstr ""
+msgstr "Ture: %d"
 
 #: src/states_screens/dialogs/high_score_info_dialog.cpp:146
 #, c-format
 msgid "Reverse: %s"
-msgstr ""
+msgstr "Inverse: %s"
 
 #. I18N: for empty highscores entries
 #: src/states_screens/dialogs/high_score_info_dialog.cpp:229
@@ -5072,60 +5072,60 @@ msgstr "(gol)"
 #. I18N: In kart color choosing dialog
 #: src/states_screens/dialogs/kart_color_slider_dialog.cpp:47
 msgid "Use original color"
-msgstr ""
+msgstr "Folosește culoarea originală"
 
 #. I18N: In kart color choosing dialog
 #: src/states_screens/dialogs/kart_color_slider_dialog.cpp:49
 msgid "Pick a color from slider"
-msgstr ""
+msgstr "Alegeți o culoare folosind glisorul"
 
 #: src/states_screens/dialogs/message_dialog.cpp:145
 msgid "Don't show again"
-msgstr ""
+msgstr "Nu afișa din nou"
 
 #. I18N: In the network player dialog
 #: src/states_screens/dialogs/network_player_dialog.cpp:50
 msgid "Player info"
-msgstr ""
+msgstr "Informații jucător"
 
 #. I18N: In the network player dialog
 #: src/states_screens/dialogs/network_player_dialog.cpp:55
 #, c-format
 msgid "Player name: %s"
-msgstr ""
+msgstr "Nume jucător: %s"
 
 #. I18N: In the network player dialog, show the player location with
 #. country name (based on IP geolocation)
 #: src/states_screens/dialogs/network_player_dialog.cpp:64
 #, c-format
 msgid "Player location: %s"
-msgstr ""
+msgstr "Locație jucător: %s"
 
 #. I18N: In the network player dialog
 #: src/states_screens/dialogs/network_player_dialog.cpp:108
 msgid "Kick"
-msgstr ""
+msgstr "Dă afară"
 
 #. I18N: In the network player dialog
 #: src/states_screens/dialogs/network_player_dialog.cpp:124
 msgid "Change team"
-msgstr ""
+msgstr "Schimbă echipa"
 
 #. I18N: In the network player dialog
 #: src/states_screens/dialogs/network_player_dialog.cpp:139
 msgid "Enable handicap"
-msgstr ""
+msgstr "Activează handicap"
 
 #. I18N: In the network player dialog
 #: src/states_screens/dialogs/network_player_dialog.cpp:144
 msgid "Disable handicap"
-msgstr ""
+msgstr "Dezactivează handicap"
 
 #. I18N: In the network player dialog,
 #. report player about for example abusive behaviour in game
 #: src/states_screens/dialogs/network_player_dialog.cpp:159
 msgid "Report player"
-msgstr ""
+msgstr "Raportează jucătorul"
 
 #. I18N: In the network player dialog, showing when waiting for
 #. the result of the ranking info of a player
@@ -5133,54 +5133,54 @@ msgstr ""
 #: src/states_screens/dialogs/player_rankings_dialog.cpp:141
 #, c-format
 msgid "Fetching ranking info for %s"
-msgstr ""
+msgstr "Se preia informațiile clasificării pentru %s"
 
 #. I18N: In the network player dialog, instruction for reporting player
 #: src/states_screens/dialogs/network_player_dialog.cpp:194
 #, c-format
 msgid "Tell server administrator about this player (%s):"
-msgstr ""
+msgstr "Raportează acest jucător administratorului serverului (%s):"
 
 #. I18N: In press a key dialog, tell user to press a key to bind configuration
 #: src/states_screens/dialogs/press_a_key_dialog.cpp:43
 msgid ""
 "Press any key...\n"
 "(Press ESC to cancel)"
-msgstr ""
+msgstr "Apăsați orice tastă...\n(Apăsați ESC pentru a anula)"
 
 #: src/states_screens/dialogs/press_a_key_dialog.cpp:49
 msgid "Press any key..."
-msgstr ""
+msgstr "Apăsați orice tastă..."
 
 #: src/states_screens/dialogs/race_paused_dialog.cpp:117
 #: src/states_screens/online/networking_lobby.cpp:250
 #: src/states_screens/online/networking_lobby.cpp:1044
 msgid "Chat is disabled, enable in options menu."
-msgstr ""
+msgstr "Chat-ul este dezactivat, activați-l din meniul opțiuni."
 
 #: src/states_screens/dialogs/race_paused_dialog.cpp:134
 msgid "Back to the Performance Test"
-msgstr ""
+msgstr "Înapoi la Testul de performanță"
 
 #: src/states_screens/dialogs/race_paused_dialog.cpp:135
 msgid "Exit the Performance Test"
-msgstr ""
+msgstr "Închide Testul de performanță"
 
 #: src/states_screens/dialogs/race_paused_dialog.cpp:139
 msgid "Back to Battle"
-msgstr ""
+msgstr "Înapoi la bătălie"
 
 #: src/states_screens/dialogs/race_paused_dialog.cpp:142
 msgid "Setup New Game"
-msgstr ""
+msgstr "Configurează un nou joc"
 
 #: src/states_screens/dialogs/race_paused_dialog.cpp:144
 msgid "Restart Battle"
-msgstr ""
+msgstr "Repornește bătălia"
 
 #: src/states_screens/dialogs/race_paused_dialog.cpp:146
 msgid "Exit Battle"
-msgstr ""
+msgstr "Ieșire din bătălie"
 
 #: src/states_screens/dialogs/race_paused_dialog.cpp:153
 #: src/states_screens/race_result_gui.cpp:370
@@ -5196,16 +5196,16 @@ msgstr "Ieșire din cursă"
 #: src/states_screens/dialogs/ranking_callback.hpp:44
 #, c-format
 msgid "%s has no ranking yet."
-msgstr ""
+msgstr "%s nu are o clasificare încă."
 
 #: src/states_screens/dialogs/ranking_callback.hpp:56
 #, c-format
 msgid "%s is number %d in the rankings with a score of %f."
-msgstr ""
+msgstr "%s este numărul %d în clasificare cu un scor de %f."
 
 #: src/states_screens/dialogs/recovery_dialog.cpp:124
 msgid "Username and/or email address invalid."
-msgstr ""
+msgstr "Numele de utilizator și/sau adresa de email este nevalidă."
 
 #: src/states_screens/dialogs/registration_dialog.cpp:43
 #, c-format
@@ -5214,302 +5214,302 @@ msgid ""
 "agree to these terms in order to register an account for STK. If you have "
 "any questions or comments regarding these terms, one of the members of the "
 "development team would gladly assist you."
-msgstr ""
+msgstr "Consultați termenii și condițiile SuperTuxKart la „%s”. Trebuie să fiți de acord cu acești termeni pentru a înregistra un cont pentru STK. Dacă aveți întrebări sau comentarii în privința acestor termeni, unul dintre membrii echipei de dezvoltare vă va asista cu bucurie."
 
 #. I18N: In the Select challenge dialog
 #: src/states_screens/dialogs/select_challenge.cpp:60
 msgid "Nitro challenge"
-msgstr ""
+msgstr "Provocarea nitro"
 
 #. I18N: In the Select challenge dialog
 #: src/states_screens/dialogs/select_challenge.cpp:65
 #: src/states_screens/race_setup_screen.cpp:137
 msgid "Ghost replay race"
-msgstr ""
+msgstr "Cursă de reluare a fantomei"
 
 #. I18N: In the Select challenge dialog
 #: src/states_screens/dialogs/select_challenge.cpp:72
 #: src/states_screens/race_result_gui.cpp:2074
 #, c-format
 msgid "Laps: %i"
-msgstr ""
+msgstr "Ture: %i"
 
 #. I18N: In the Select challenge dialog, type of this challenge
 #: src/states_screens/dialogs/select_challenge.cpp:82
 #, c-format
 msgid "Type: %s"
-msgstr ""
+msgstr "Tip: %s"
 
 #. I18N: In the Select challenge dialog
 #: src/states_screens/dialogs/select_challenge.cpp:90
 #: src/states_screens/race_result_gui.cpp:2249
 #, c-format
 msgid "Required Rank: %i"
-msgstr ""
+msgstr "Clasificare necesară: %i"
 
 #. I18N: In the Select challenge dialog
 #: src/states_screens/dialogs/select_challenge.cpp:96
 #: src/states_screens/race_result_gui.cpp:2258
 #, c-format
 msgid "Required Time: %i"
-msgstr ""
+msgstr "Timp necesar: %i"
 
 #. I18N: In the Select challenge dialog
 #: src/states_screens/dialogs/select_challenge.cpp:103
 #: src/states_screens/race_result_gui.cpp:2270
 #, c-format
 msgid "Required Nitro Points: %i"
-msgstr ""
+msgstr "Puncte nitro necesare: %i"
 
 #. I18N: In the Select challenge dialog
 #: src/states_screens/dialogs/select_challenge.cpp:109
 #, c-format
 msgid "Number of AI Karts: %i"
-msgstr ""
+msgstr "Număr de carturi robot: %i"
 
 #. I18N: In the create server screen, show various battle mode available
 #: src/states_screens/dialogs/server_configuration_dialog.cpp:158
 #: src/states_screens/online/create_server_screen.cpp:238
 msgid "Battle mode"
-msgstr ""
+msgstr "Modul bătălie"
 
 #. I18N: In the create server screen
 #: src/states_screens/dialogs/server_configuration_dialog.cpp:171
 #: src/states_screens/online/create_server_screen.cpp:254
 #: src/states_screens/track_info_screen.cpp:363
 msgid "Soccer game type"
-msgstr ""
+msgstr "Tip de joc de fotbal"
 
 #. I18N: In the server info dialog, show the server location with
 #. country name (based on IP geolocation)
 #: src/states_screens/dialogs/server_info_dialog.cpp:111
 #, c-format
 msgid "Server location: %s"
-msgstr ""
+msgstr "Locația serverului: %s"
 
 #. I18N: In server info dialog, showing the current track playing in server
 #: src/states_screens/dialogs/server_info_dialog.cpp:120
 #, c-format
 msgid "Current track: %s"
-msgstr ""
+msgstr "Cursa curentă: %s"
 
 #: src/states_screens/dialogs/server_info_dialog.cpp:130
 msgid "Rank"
-msgstr ""
+msgstr "Clasificare"
 
 #. I18N: Show above the player list in server info dialog, tell
 #. the user name on server
 #: src/states_screens/dialogs/server_info_dialog.cpp:133
 msgid "Player"
-msgstr ""
+msgstr "Jucător"
 
 #. I18N: Show above the player list in server info dialog, tell
 #. the scores of user calculated by player rankings
 #: src/states_screens/dialogs/server_info_dialog.cpp:136
 msgid "Scores"
-msgstr ""
+msgstr "Scoruri"
 
 #. I18N: Show above the player list in server info dialog, tell
 #. the user time played on server
 #: src/states_screens/dialogs/server_info_dialog.cpp:139
 msgid "Time played"
-msgstr ""
+msgstr "Timp jucat"
 
 #: src/states_screens/dialogs/server_info_dialog.cpp:282
 #: src/states_screens/dialogs/server_info_dialog.cpp:297
 msgid "Remove from bookmarks"
-msgstr ""
+msgstr "Elimină de la favorite"
 
 #: src/states_screens/dialogs/splitscreen_player_dialog.cpp:130
 msgid "Input device already exists."
-msgstr ""
+msgstr "Dispozitivul de intrare există deja."
 
 #: src/states_screens/dialogs/splitscreen_player_dialog.cpp:147
 msgid "No player available for connecting to server."
-msgstr ""
+msgstr "Niciun jucător disponibil pentru conectarea la server."
 
 #. I18N: In the user info dialog
 #: src/states_screens/dialogs/user_info_dialog.cpp:61
 #, c-format
 msgid "Username: %s"
-msgstr ""
+msgstr "Nume de utilizator: %s"
 
 #: src/states_screens/dialogs/user_info_dialog.cpp:65
 msgid "Cancel Request"
-msgstr ""
+msgstr "Anulează cererea"
 
 #: src/states_screens/dialogs/user_info_dialog.cpp:165
 #: src/states_screens/dialogs/user_info_dialog.cpp:222
 msgid "Today"
-msgstr ""
+msgstr "Astăzi"
 
 #: src/states_screens/dialogs/user_info_dialog.cpp:169
 msgid "Friend request sent!"
-msgstr ""
+msgstr "Cerere de prietenie trimisă!"
 
 #: src/states_screens/dialogs/user_info_dialog.cpp:226
 msgid "Friend request accepted!"
-msgstr ""
+msgstr "Cerere de prietenie acceptată!"
 
 #: src/states_screens/dialogs/user_info_dialog.cpp:278
 msgid "Friend request declined!"
-msgstr ""
+msgstr "Cerere de prietenie refuzată!"
 
 #: src/states_screens/dialogs/user_info_dialog.cpp:324
 msgid "Friend removed!"
-msgstr ""
+msgstr "Prieten eliminat!"
 
 #: src/states_screens/dialogs/user_info_dialog.cpp:375
 msgid "Friend request cancelled!"
-msgstr ""
+msgstr "Cerere de prietenie anulată!"
 
 #: src/states_screens/dialogs/user_info_dialog.cpp:485
 msgid "Processing"
-msgstr ""
+msgstr "Se procesează"
 
 #: src/states_screens/dialogs/vote_dialog.cpp:178
 msgid "Fetching last vote"
-msgstr ""
+msgstr "Se obține ultimul vot"
 
 #: src/states_screens/dialogs/vote_dialog.cpp:197
 msgid "You can adapt your previous rating by clicking the stars beneath."
-msgstr ""
+msgstr "Puteți adapta evaluarea anterioară apăsând pe stelele de mai jos."
 
 #: src/states_screens/dialogs/vote_dialog.cpp:202
 msgid ""
 "You have not yet voted for this addon. Select your desired rating by "
 "clicking the stars beneath"
-msgstr ""
+msgstr "Nu ați votat încă pentru acest supliment. Selectați evaluarea dorită apăsând pe stelele de mai jos"
 
 #: src/states_screens/dialogs/vote_dialog.cpp:236
 msgid "Vote successful! You can now close the window."
-msgstr ""
+msgstr "Vot cu succes! Puteți închide fereastra acum."
 
 #: src/states_screens/dialogs/vote_dialog.cpp:253
 msgid "Performing vote"
-msgstr ""
+msgstr "Se votează"
 
 #: src/states_screens/easter_egg_screen.cpp:287
 #: src/states_screens/online/tracks_screen.cpp:696
 #: src/states_screens/tracks_and_gp_screen.cpp:368
 msgid "Random Track"
-msgstr ""
+msgstr "Pistă aleatoare"
 
 #: src/states_screens/edit_gp_screen.cpp:117
 #: src/states_screens/ghost_replay_selection.cpp:513
 #: src/states_screens/grand_prix_editor_screen.cpp:111
 #, c-format
 msgid "Are you sure you want to remove '%s'?"
-msgstr ""
+msgstr "Sigur doriți să eliminați „%s”?"
 
 #: src/states_screens/edit_gp_screen.cpp:134
 #: src/states_screens/edit_gp_screen.cpp:382
 msgid "Do you want to save your changes?"
-msgstr ""
+msgstr "Doriți să salvați modificările?"
 
 #: src/states_screens/edit_gp_screen.cpp:152
 msgid "Laps"
-msgstr ""
+msgstr "Ture"
 
 #: src/states_screens/edit_gp_screen.cpp:153
 msgid "Reversed"
-msgstr ""
+msgstr "Inversată"
 
 #. I18N: Indicate that the grand prix is modified and not saved
 #: src/states_screens/edit_gp_screen.cpp:290
 #, c-format
 msgid "%s (+)"
-msgstr ""
+msgstr "%s (+)"
 
 #: src/states_screens/edit_gp_screen.cpp:330
 msgid "An error occurred while trying to save your grand prix."
-msgstr ""
+msgstr "A apărut o eroare la încercare de a salva cupa Grand Prix."
 
 #: src/states_screens/edit_track_screen.cpp:317
 msgid "Select a track"
-msgstr ""
+msgstr "Selectați o cursă"
 
 #: src/states_screens/feature_unlocked.cpp:254
 #, c-format
 msgid "You completed the easy challenge! Points earned on this level: %i/%i"
-msgstr ""
+msgstr "Ați completat provocarea ușoară! Puncte câștigate la acest nivel: %i/%i"
 
 #: src/states_screens/feature_unlocked.cpp:260
 #, c-format
 msgid ""
 "You completed the intermediate challenge! Points earned on this level: %i/%i"
-msgstr ""
+msgstr "Ați completat provocarea intermediară! Puncte câștigate la acest nivel: %i/%i"
 
 #: src/states_screens/feature_unlocked.cpp:266
 #, c-format
 msgid ""
 "You completed the difficult challenge! Points earned on this level: %i/%i"
-msgstr ""
+msgstr "Ați completat provocarea dificilă! Puncte câștigate la acest nivel: %i/%i"
 
 #: src/states_screens/feature_unlocked.cpp:272
 #, c-format
 msgid ""
 "You completed the SuperTux challenge! Points earned on this level: %i/%i"
-msgstr ""
+msgstr "Ați completat provocarea SuperTux! Puncte câștigate la acest nivel: %i/%i"
 
 #: src/states_screens/feature_unlocked.cpp:315
 #, c-format
 msgid "You unlocked %s!"
-msgstr ""
+msgstr "Ați deblocat %s!"
 
 #: src/states_screens/feature_unlocked.cpp:645
 msgid "Challenge Completed"
-msgstr ""
+msgstr "Provocare completată"
 
 #: src/states_screens/feature_unlocked.cpp:684
 msgid "You unlocked track %0"
-msgstr ""
+msgstr "Ați deblocat pista %0"
 
 #: src/states_screens/feature_unlocked.cpp:730
 msgid "You unlocked grand prix %0"
-msgstr ""
+msgstr "Ați deblocat Grand Prix %0"
 
 #: src/states_screens/ghost_replay_selection.cpp:157
 msgctxt "column_name"
 msgid "Track"
-msgstr ""
+msgstr "Pistă"
 
 #: src/states_screens/ghost_replay_selection.cpp:168
 #: src/states_screens/online/server_selection.cpp:134
 msgctxt "column_name"
 msgid "Players"
-msgstr ""
+msgstr "Jucători"
 
 #: src/states_screens/gp_info_screen.cpp:172
 #: src/states_screens/gp_info_screen.cpp:230
 msgid "Reload"
-msgstr ""
+msgstr "Reîncarcă"
 
 #: src/states_screens/grand_prix_cutscene.cpp:77
 #: src/states_screens/grand_prix_editor_screen.cpp:100
 #: src/states_screens/grand_prix_editor_screen.cpp:117
 msgid "Please enter the name of the grand prix"
-msgstr ""
+msgstr "Introduceți numele pentru Grand Prix"
 
 #: src/states_screens/grand_prix_editor_screen.cpp:168
 msgid "Please select a Grand Prix"
-msgstr ""
+msgstr "Selectați un Grand Prix"
 
 #: src/states_screens/grand_prix_editor_screen.cpp:338
 msgid "User defined"
-msgstr ""
+msgstr "Definit de utilizator"
 
 #: src/states_screens/grand_prix_editor_screen.cpp:351
 msgid "Name is empty."
-msgstr ""
+msgstr "Numele este gol."
 
 #: src/states_screens/grand_prix_editor_screen.cpp:359
 msgid "Another grand prix with this name already exists."
-msgstr ""
+msgstr "Un alt Grand Prix cu același nume există deja."
 
 #: src/states_screens/grand_prix_editor_screen.cpp:365
 msgid "Name is too long."
-msgstr ""
+msgstr "Numele este prea lung."
 
 #. I18N: when failing a GP
 #: src/states_screens/grand_prix_lose.cpp:157
@@ -5518,103 +5518,103 @@ msgstr "Mai mult noroc data viitoare!"
 
 #: src/states_screens/grand_prix_win.cpp:169
 msgid "You completed a challenge!"
-msgstr ""
+msgstr "Ați completat o provocare!"
 
 #: src/states_screens/grand_prix_win.cpp:325
 msgid "You won the Grand Prix!"
-msgstr ""
+msgstr "Ați câștigat acest Grand Prix!"
 
 #: src/states_screens/grand_prix_win.cpp:326
 msgid "You completed the Grand Prix!"
-msgstr ""
+msgstr "Ați completat acest Grand Prix!"
 
 #: src/states_screens/high_score_selection.cpp:147
 msgctxt "column_name"
 msgid "Number of karts"
-msgstr ""
+msgstr "Număr de carturi"
 
 #: src/states_screens/high_score_selection.cpp:352
 msgid "Are you sure you want to remove this high score entry?"
-msgstr ""
+msgstr "Sigur eliminați aceast scor înalt?"
 
 #: src/states_screens/high_score_selection.cpp:360
 msgid "Are you sure you want to remove all of your high scores?"
-msgstr ""
+msgstr "Sigur eliminați toate scorurile înalte?"
 
 #. I18N: kart group name
 #: src/states_screens/kart_selection.cpp:329
 msgid "Favorite"
-msgstr ""
+msgstr "Favorite"
 
 #. I18N: kart class name
 #: src/states_screens/kart_selection.cpp:335
 msgid "Light"
-msgstr ""
+msgstr "Ușor"
 
 #. I18N: kart class name
 #: src/states_screens/kart_selection.cpp:339
 msgid "Heavy"
-msgstr ""
+msgstr "Greu"
 
 #: src/states_screens/kart_selection.cpp:490
 msgid "Connect a keyboard or gamepad to play splitscreen multiplayer"
-msgstr ""
+msgstr "Conectați o tastatură sau un gamepad pentru a juca în ecran divizat"
 
 #: src/states_screens/kart_selection.cpp:984
 #: src/states_screens/kart_selection.cpp:1697
 msgid "Random Kart"
-msgstr ""
+msgstr "Cart aleatoriu"
 
 #: src/states_screens/kart_selection.cpp:1003
 msgid "Locked"
-msgstr ""
+msgstr "Blocat"
 
 #: src/states_screens/kart_selection.cpp:1104
 #: src/states_screens/online/networking_lobby.cpp:707
 msgid ""
 "Everyone:\n"
 "Press the 'Select' button to join the game"
-msgstr ""
+msgstr "Pentru toți:\nApăsați butonul „Select” pentru a vă alătura jocului"
 
 #: src/states_screens/main_menu_screen.cpp:343
 msgid "Would you like to play the tutorial of the game?"
-msgstr ""
+msgstr "Doriți să jucați ghidul jocului?"
 
 #: src/states_screens/main_menu_screen.cpp:604
 #: src/states_screens/online/online_screen.cpp:327
 msgid ""
 "You can not play online without internet access. If you want to play online,"
 " go in the options menu, and check \"Connect to the Internet\"."
-msgstr ""
+msgstr "Nu puteți juca online fără acces la internet. Dacă doriți să jucați online, navigați la meniul opțiuni, și bifați „Conectat la Internet”."
 
 #: src/states_screens/main_menu_screen.cpp:619
 msgid ""
 "You can not download addons without internet access. If you want to download"
 " addons, go in the options menu, and check \"Connect to the Internet\"."
-msgstr ""
+msgstr "Nu puteți descărca suplimente fără acces la internet. Dacă doriți să descărcați suplimente, navigați la meniul opțiuni, și bifați „Conectat la Internet”."
 
 #: src/states_screens/main_menu_screen.cpp:627
 msgid ""
 "You can not download addons without internet access. If you want to download addons, go in the options menu, and check \"Connect to the Internet\".\n"
 "\n"
 "You can however delete already downloaded addons."
-msgstr ""
+msgstr "Nu puteți descărca suplimente fără acces la internet. Dacă doriți să descărcați suplimente, navigați la meniul opțiuni, și bifați „Conectat la Internet”.\n\nDar puteți șterge suplimente descărcate deja."
 
 #: src/states_screens/main_menu_screen.cpp:666
 msgid "The add-ons module is currently disabled in the Options screen"
-msgstr ""
+msgstr "Modulul de suplimente este momentan dezactivat din meniul Opțiuni"
 
 #: src/states_screens/main_menu_screen.cpp:678
 msgid "Please wait while the add-ons are loading"
-msgstr ""
+msgstr "Așteptați în timp ce suplimentele se încarcă"
 
 #: src/states_screens/main_menu_screen.cpp:699
 msgid "Are you sure you want to quit STK?"
-msgstr ""
+msgstr "Sigur închideți STK?"
 
 #: src/states_screens/online/create_server_screen.cpp:107
 msgid "Create LAN Server"
-msgstr ""
+msgstr "Creează server pe LAN"
 
 #: src/states_screens/online/create_server_screen.cpp:112
 #, c-format
@@ -5624,37 +5624,37 @@ msgstr "serverul lui %s"
 #. I18N: In the create server screen
 #: src/states_screens/online/create_server_screen.cpp:220
 msgid "No. of grand prix track(s)"
-msgstr ""
+msgstr "Nr. de curse Grand Prix"
 
 #: src/states_screens/online/create_server_screen.cpp:303
 msgid "Name has to be between 4 and 30 characters long!"
-msgstr ""
+msgstr "Numele trebuie să aibă între 4 și 30 de caractere!"
 
 #: src/states_screens/online/create_server_screen.cpp:320
 msgid "Incorrect characters in password!"
-msgstr ""
+msgstr "Caractere incorecte în parolă!"
 
 #. I18N: In the networking lobby, ready button is to allow player to tell
 #. server that he is ready for next game for owner less server
 #: src/states_screens/online/networking_lobby.cpp:196
 msgid "Ready"
-msgstr ""
+msgstr "Pregătit"
 
 #. I18N: Live join is displayed in networking lobby to allow players
 #. to join the current started in-progress game
 #: src/states_screens/online/networking_lobby.cpp:199
 msgid "Live join"
-msgstr ""
+msgstr "Alătură-te cursei în progres"
 
 #. I18N: Spectate is displayed in networking lobby to allow players
 #. to join the current started in-progress game
 #: src/states_screens/online/networking_lobby.cpp:204
 msgid "Spectate"
-msgstr ""
+msgstr "Fii spectator"
 
 #: src/states_screens/online/networking_lobby.cpp:205
 msgid "Install addon"
-msgstr ""
+msgstr "Instalează supliment"
 
 #. I18N: In the networking lobby, show when player is required to
 #. wait before the current game finish with remaining time,
@@ -5663,42 +5663,42 @@ msgstr ""
 #, c-format
 msgid ""
 "Please wait for the current game's (%s) end, estimated remaining time: %s."
-msgstr ""
+msgstr "Așteptați până la finalul jocului curent (%s), progresul estimativ este: %s%. "
 
 #. I18N: In the networking lobby, show when player is required
 #. to wait before the current game finish with remaining time
 #: src/states_screens/online/networking_lobby.cpp:580
 #, c-format
 msgid "Please wait for the current game's end, estimated remaining time: %s."
-msgstr ""
+msgstr "Așteptați până la finalul jocului curent, progresul estimativ este: %s%. "
 
 #. I18N: In the networking lobby, show when player is required
 #. to wait before the current game finish with progress in
 #. percent, showing the current track name inside bracket
 #: src/states_screens/online/networking_lobby.cpp:592
 msgid "Please wait for the current game's (%s) end, estimated progress: %s%."
-msgstr ""
+msgstr "Așteptați până la finalul jocului curent (%s), progresul estimativ este: %s%. "
 
 #. I18N: In the networking lobby, show when player is required
 #. to wait before the current game finish with progress in
 #. percent
 #: src/states_screens/online/networking_lobby.cpp:601
 msgid "Please wait for the current game's end, estimated progress: %d%."
-msgstr ""
+msgstr "Așteptați până la finalul jocului curent, progresul estimativ este: %d%."
 
 #. I18N: In the networking lobby, show when player is required to
 #. wait before the current game finish
 #: src/states_screens/online/networking_lobby.cpp:609
 msgid "Please wait for the current game's end."
-msgstr ""
+msgstr "Așteptați până la finalul jocului curent."
 
 #: src/states_screens/online/networking_lobby.cpp:676
 #, c-format
 msgid "Game will start if there is more than %d player."
 msgid_plural "Game will start if there are more than %d players."
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "Jocul va începe dacă sunt mai mult de %d jucător."
+msgstr[1] "Jocul va începe dacă sunt mai mult de %d jucători."
+msgstr[2] "Jocul va începe dacă sunt mai mult de %d de jucători."
 
 #. I18N: In the networking lobby, display the starting timeout
 #. for owner-less server to begin a game
@@ -5708,35 +5708,35 @@ msgid ""
 "Starting after %d second, or once everyone has pressed the 'Ready' button."
 msgid_plural ""
 "Starting after %d seconds, or once everyone has pressed the 'Ready' button."
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "Se începe după %d secundă, sau după ce toți au apăsat butonul „Pregătit”."
+msgstr[1] "Se începe după %d secunde, sau după ce toți au apăsat butonul „Pregătit”."
+msgstr[2] "Se începe după %d de secunde, sau după ce toți au apăsat butonul „Pregătit”."
 
 #: src/states_screens/online/networking_lobby.cpp:727
 #, c-format
 msgid "Connecting to server %s"
-msgstr ""
+msgstr "Se conectează la serverul %s"
 
 #: src/states_screens/online/networking_lobby.cpp:732
 msgid "Finding a quick play server"
-msgstr ""
+msgstr "Se caută un server de joc rapid"
 
 #. I18N: In kart screen, show before the voting period in network ends.
 #: src/states_screens/online/network_kart_selection.cpp:218
 #: src/states_screens/online/tracks_screen.cpp:952
 #, c-format
 msgid "Remaining time: %d"
-msgstr ""
+msgstr "Timp rămas: %d"
 
 #. I18N: Goals in achievement
 #: src/states_screens/online/online_profile_achievements.cpp:85
 msgid "Goals"
-msgstr ""
+msgstr "Obiective"
 
 #: src/states_screens/online/online_profile_achievements.cpp:118
 #: src/states_screens/online/online_profile_achievements.cpp:317
 msgid "Fetching achievements"
-msgstr ""
+msgstr "Se obțin realizările"
 
 #: src/states_screens/online/online_profile_base.cpp:121
 #, c-format
@@ -5745,184 +5745,184 @@ msgstr "profilul lui %s"
 
 #: src/states_screens/online/online_profile_friends.cpp:80
 msgid "Since"
-msgstr ""
+msgstr "Din"
 
 #: src/states_screens/online/online_profile_friends.cpp:81
 msgid "Status"
-msgstr ""
+msgstr "Stare"
 
 #: src/states_screens/online/online_profile_friends.cpp:99
 #: src/states_screens/online/online_profile_friends.cpp:279
 msgid "Fetching friends"
-msgstr ""
+msgstr "Se obțin prietenii"
 
 #: src/states_screens/online/online_profile_friends.cpp:241
 msgid "New Request"
-msgstr ""
+msgstr "Cerere nouă"
 
 #: src/states_screens/online/online_profile_friends.cpp:242
 msgid "Pending"
-msgstr ""
+msgstr "În așteptare"
 
 #: src/states_screens/online/online_profile_friends.cpp:246
 msgid "Offline"
-msgstr ""
+msgstr "Deconectat"
 
 #: src/states_screens/online/online_profile_settings.cpp:83
 msgid "Enter new E-mail below"
-msgstr ""
+msgstr "Introduceți un nou email mai jos"
 
 #: src/states_screens/online/online_profile_settings.cpp:88
 msgid "New Email has to be between 5 and 254 characters long!"
-msgstr ""
+msgstr "Noul email trebuie să aibă între 5 și 254 de caractere!"
 
 #: src/states_screens/online/online_profile_settings.cpp:97
 msgid "New Email is invalid!"
-msgstr ""
+msgstr "Noul email este nevalid!"
 
 #: src/states_screens/online/online_profile_settings.cpp:122
 msgid "E-mail changed!"
-msgstr ""
+msgstr "Emailul a fost schimbat!"
 
 #: src/states_screens/online/online_profile_settings.cpp:124
 #, c-format
 msgid "Failed to change E-mail: %s"
-msgstr ""
+msgstr "Eșec la schimbarea email-ului: %s"
 
 #: src/states_screens/online/online_screen.cpp:109
 msgid "News from STK Blog"
-msgstr ""
+msgstr "Noutăți de pe blogul STK"
 
 #: src/states_screens/online/online_screen.cpp:110
 msgid "Date"
-msgstr ""
+msgstr "Data"
 
 #: src/states_screens/online/online_screen.cpp:166
 msgid "There are currently no news available."
-msgstr ""
+msgstr "Momentan nu sunt noutăți disponibilei."
 
 #. I18N: Shown to players when he is not is not logged in
 #: src/states_screens/online/online_screen.cpp:317
 msgid ""
 "You must be logged in to play Global networking. Click your username above."
-msgstr ""
+msgstr "Trebuie să fiți autentificați pentru a juca în rețeaua globală. Clic pe numele de utilizator de deasupra."
 
 #: src/states_screens/online/online_user_search.cpp:184
 #: src/states_screens/online/online_user_search.cpp:247
 msgid "Searching"
-msgstr ""
+msgstr "Se caută"
 
 #: src/states_screens/online/register_screen.cpp:169
 #: src/states_screens/options/user_screen.cpp:114
 msgid "Exit game"
-msgstr ""
+msgstr "Închide jocul"
 
 #: src/states_screens/online/register_screen.cpp:282
 #: src/states_screens/online/register_screen.cpp:289
 #, c-format
 msgid "Could not create player '%s'."
-msgstr ""
+msgstr "Nu s-a putut crea jucătorul „%s”."
 
 #: src/states_screens/online/register_screen.cpp:306
 msgid "User name cannot be empty."
-msgstr ""
+msgstr "Numele de utilizator nu poate fi gol."
 
 #: src/states_screens/online/register_screen.cpp:362
 msgid "Online username and password must not be the same!"
-msgstr ""
+msgstr "Numele de utilizator și parola utilizatorului online nu trebuie să fie aceleași!"
 
 #: src/states_screens/online/register_screen.cpp:366
 msgid "Emails don't match!"
-msgstr ""
+msgstr "Email-urile nu se potrivesc!"
 
 #: src/states_screens/online/register_screen.cpp:370
 msgid ""
 "Online username can only contain alphanumeric (ASCII) characters, periods, "
 "dashes and underscores!"
-msgstr ""
+msgstr "Numele de utilizator online poate conține numai caractere alfanumerice (ASCII), puncte, cratime și underscore!"
 
 #: src/states_screens/online/register_screen.cpp:374
 msgid "Online username has to be between 3 and 30 characters long!"
-msgstr ""
+msgstr "Numele de utilizator online trebuie să fie între 3 și 30 de caractere!"
 
 #: src/states_screens/online/register_screen.cpp:378
 msgid "Online username must not start with a number!"
-msgstr ""
+msgstr "Numele de utilizator online nu trebuie să înceapă cu un număr!"
 
 #: src/states_screens/online/register_screen.cpp:386
 msgid "Email has to be between 5 and 254 characters long!"
-msgstr ""
+msgstr "Emailul trebuie să fie între 5 și 254 caractere!"
 
 #: src/states_screens/online/register_screen.cpp:392
 msgid "Email is invalid!"
-msgstr ""
+msgstr "Emailul este nevalid!"
 
 #: src/states_screens/online/register_screen.cpp:456
 msgid ""
 "You will receive an email with further instructions regarding account "
 "activation. Please be patient and be sure to check your spam folder."
-msgstr ""
+msgstr "Veți primi un email cu instrucțiuni adiționale pentru activarea contului. Aveți răbdare și verificați și dosarul spam."
 
 #: src/states_screens/online/register_screen.cpp:495
 msgid "Internet access is disabled, please enable it in the options"
-msgstr ""
+msgstr "Accesul la Internet este dezactivat, activați-l din meniul opțiuni"
 
 #: src/states_screens/online/server_selection.cpp:132
 msgctxt "column_name"
 msgid "Name"
-msgstr ""
+msgstr "Nume"
 
 #: src/states_screens/online/server_selection.cpp:133
 msgctxt "column_name"
 msgid "Game mode"
-msgstr ""
+msgstr "Mod de joc"
 
 #. I18N: In server selection screen, owner of server, only displayed
 #. if it's localhost or friends'
 #: src/states_screens/online/server_selection.cpp:140
 msgctxt "column_name"
 msgid "Owner"
-msgstr ""
+msgstr "Deținățor"
 
 #. I18N: In server selection screen, distance to server
 #: src/states_screens/online/server_selection.cpp:142
 msgctxt "column_name"
 msgid "Distance (km)"
-msgstr ""
+msgstr "Distanță (km)"
 
 #. I18N: In server selection screen, unknown distance to server
 #: src/states_screens/online/server_selection.cpp:316
 msgid "Unknown"
-msgstr ""
+msgstr "Necunoscută"
 
 #. I18N: Message shown to user if no IPv4 detected by STK
 #: src/states_screens/online/server_selection.cpp:361
 msgid "No IPv4 detected, you may not be able to join any servers."
-msgstr ""
+msgstr "Niciun IPv4 detectat, este posibil să nu vă puteți alătura unui server."
 
 #. I18N: Message shown to user if no IPv6 detected by STK
 #: src/states_screens/online/server_selection.cpp:363
 msgid "No IPv6 detected, you may not be able to join any servers."
-msgstr ""
+msgstr "Niciun IPv6 detectat, este posibil să nu vă puteți alătura unui server."
 
 #: src/states_screens/online/server_selection.cpp:502
 msgid "No server is available."
-msgstr ""
+msgstr "Niciun server disponibil."
 
 #: src/states_screens/online/server_selection.cpp:510
 msgid "Fetching servers"
-msgstr ""
+msgstr "Se obțin serverele"
 
 #: src/states_screens/online/server_selection.cpp:576
 msgid "Server Bookmarks"
-msgstr ""
+msgstr "Servere favorite"
 
 #. I18N: In track screen for networking, clarify voting phase
 #: src/states_screens/online/tracks_screen.cpp:322
 msgid ""
 "If a majority of players all select the same track and race settings, voting"
 " will end early."
-msgstr ""
+msgstr "Dacă majoritatea jucătorilor selectează aceleași configurări de pistă și cursă, votul se va concluziona timpuriu."
 
 #. I18N: In track screen
 #. I18N: In the track info screen
@@ -5930,32 +5930,32 @@ msgstr ""
 #: src/states_screens/online/tracks_screen.cpp:527
 #: src/states_screens/track_info_screen.cpp:305
 msgid "Random item location"
-msgstr ""
+msgstr "Locație aleatoare de obiecte"
 
 #. I18N: In track screen
 #: src/states_screens/online/tracks_screen.cpp:509
 #: src/states_screens/track_info_screen.cpp:454
 msgid "Number of goals to win"
-msgstr ""
+msgstr "Numărul de goluri pentru victorie"
 
 #. I18N: In the track info screen
 #: src/states_screens/online/tracks_screen.cpp:557
 #: src/states_screens/track_info_screen.cpp:300
 msgid "Drive in reverse"
-msgstr ""
+msgstr "Condu invers"
 
 #: src/states_screens/online/tracks_screen.cpp:675
 #: src/states_screens/tracks_and_gp_screen.cpp:348
 msgid "Locked: solve active challenges to gain access to more!"
-msgstr ""
+msgstr "Blocat: completați provocările active pentru a avea acces la mai multe!"
 
 #: src/states_screens/options/options_screen_device.cpp:56
 msgid "Action"
-msgstr ""
+msgstr "Acțiune"
 
 #: src/states_screens/options/options_screen_device.cpp:57
 msgid "Key binding"
-msgstr ""
+msgstr "Asociere taste"
 
 #. I18N: button to disable a gamepad configuration
 #: src/states_screens/options/options_screen_device.cpp:88
@@ -5973,27 +5973,27 @@ msgstr "Activează dispozitiv"
 #: src/states_screens/options/options_screen_device.cpp:107
 #: src/states_screens/options/options_screen_device.cpp:598
 msgid "Enable Configuration"
-msgstr ""
+msgstr "Activează configurația"
 
 #. I18N: Key binding section
 #: src/states_screens/options/options_screen_device.cpp:156
 msgid "Game Keys"
-msgstr ""
+msgstr "Taste pentru joc"
 
 #. I18N: Key binding section
 #: src/states_screens/options/options_screen_device.cpp:170
 msgid "Menu Keys"
-msgstr ""
+msgstr "Taste pentru meniu"
 
 #. I18N: Key binding name
 #: src/states_screens/options/options_screen_device.cpp:246
 msgid "Steer Left"
-msgstr ""
+msgstr "Virează stânga"
 
 #. I18N: Key binding name
 #: src/states_screens/options/options_screen_device.cpp:249
 msgid "Steer Right"
-msgstr ""
+msgstr "Virează dreapta"
 
 #. I18N: Key binding name
 #: src/states_screens/options/options_screen_device.cpp:252
@@ -6003,7 +6003,7 @@ msgstr "Accelereație"
 #. I18N: Key binding name
 #: src/states_screens/options/options_screen_device.cpp:255
 msgid "Brake / Reverse"
-msgstr ""
+msgstr "Frână / Marșarier"
 
 #. I18N: Key binding name
 #: src/states_screens/options/options_screen_device.cpp:258
@@ -6018,7 +6018,7 @@ msgstr "Nitro"
 #. I18N: Key binding name
 #: src/states_screens/options/options_screen_device.cpp:267
 msgid "Look Back"
-msgstr ""
+msgstr "Privește înapoi"
 
 #. I18N: Key binding name
 #: src/states_screens/options/options_screen_device.cpp:270
@@ -6028,7 +6028,7 @@ msgstr "Salvare"
 #. I18N: Key binding name
 #: src/states_screens/options/options_screen_device.cpp:273
 msgid "Pause Game"
-msgstr ""
+msgstr "Pune pauză"
 
 #. I18N: Key binding name
 #: src/states_screens/options/options_screen_device.cpp:278
@@ -6053,7 +6053,7 @@ msgstr "Dreapta"
 #. I18N: Key binding name
 #: src/states_screens/options/options_screen_device.cpp:290
 msgid "Select"
-msgstr ""
+msgstr "Select"
 
 #. I18N: Key binding name
 #: src/states_screens/options/options_screen_device.cpp:293
@@ -6073,26 +6073,26 @@ msgid ""
 "Warning: The 'Shift' is not a recommended key. When 'Shift' is pressed down,"
 " all keys that contain a character that is different in upper-case will stop"
 " working."
-msgstr ""
+msgstr "Atenție: Tasta „Shift” nu este recomandată. Când „Shift” este apăsată, toate tastele care conțin un caracter diferit în modul de majuscule nu vor mai funcționa."
 
 #. I18N: shown before deleting an input configuration
 #: src/states_screens/options/options_screen_device.cpp:578
 msgid "Are you sure you want to permanently delete this configuration?"
-msgstr ""
+msgstr "Sigur ștergeți permanent această configurație?"
 
 #: src/states_screens/options/options_screen_device.cpp:606
 msgid "Enter new configuration name, leave empty to revert default value."
-msgstr ""
+msgstr "Introduceți un nume de configurație, lăsați gol pentru a reveni la valoarea implicită."
 
 #. I18N: In the UI options, splitscreen_method in the race UI
 #: src/states_screens/options/options_screen_display.cpp:57
 msgid "Vertical"
-msgstr ""
+msgstr "Vertical"
 
 #. I18N: In the UI options, splitscreen_method position in the race UI
 #: src/states_screens/options/options_screen_display.cpp:59
 msgid "Horizontal"
-msgstr ""
+msgstr "Orizontal"
 
 #. I18N: Tooltip in the UI menu. Use enough linebreaks to make sure the text
 #. fits the screen in low resolutions.
@@ -6100,31 +6100,31 @@ msgstr ""
 msgid ""
 "In multiplayer mode, players can select handicapped\n"
 "(more difficult) profiles on the kart selection screen"
-msgstr ""
+msgstr "În modul jucători multipli, jucătorii pot selecta profile\ncu handicap (mai dificile) din ecranul de selecție al carturilor"
 
 #. I18N: For mobile version for STK, install the full game assets which
 #. will download from stk server
 #: src/states_screens/options/options_screen_general.cpp:85
 msgid "Install full game assets"
-msgstr ""
+msgstr "Instalează resursele complete"
 
 #: src/states_screens/options/options_screen_general.cpp:189
 msgid "Are you sure to uninstall full game assets?"
-msgstr ""
+msgstr "Sigur dezinstalați resursele complete ale jocului?"
 
 #: src/states_screens/options/options_screen_input.cpp:98
 #, c-format
 msgid "Keyboard %i"
-msgstr ""
+msgstr "Tastatură %i"
 
 #: src/states_screens/options/options_screen_input.cpp:149
 msgid "Touch Device"
-msgstr ""
+msgstr "Dispozitiv tactil"
 
 #. I18N: In the input configuration screen, help for touch device
 #: src/states_screens/options/options_screen_input.cpp:186
 msgid "Tap on a device to configure it"
-msgstr ""
+msgstr "Atingeți un dispozitiv pentru a-l configura"
 
 #. I18N: in the language choice, to select the same language as the OS
 #: src/states_screens/options/options_screen_language.cpp:62
@@ -6134,42 +6134,42 @@ msgstr "Limba sistemului"
 #. I18N: In the UI options, minimap position in the race UI
 #: src/states_screens/options/options_screen_ui.cpp:67
 msgid "In the bottom-left"
-msgstr ""
+msgstr "Stânga jos"
 
 #. I18N: In the UI options, minimap position in the race UI
 #: src/states_screens/options/options_screen_ui.cpp:69
 msgid "On the right side"
-msgstr ""
+msgstr "Pe partea dreaptă"
 
 #. I18N: In the UI options, minimap position in the race UI
 #: src/states_screens/options/options_screen_ui.cpp:71
 msgid "Hidden"
-msgstr ""
+msgstr "Ascunsă"
 
 #. I18N: In the UI options, minimap position in the race UI
 #: src/states_screens/options/options_screen_ui.cpp:73
 msgid "Centered"
-msgstr ""
+msgstr "Centrată"
 
 #. I18N: In the UI options, Very small font size
 #: src/states_screens/options/options_screen_ui.cpp:92
 msgid "Very small"
-msgstr ""
+msgstr "Foarte mic"
 
 #. I18N: In the UI options, Small font size
 #: src/states_screens/options/options_screen_ui.cpp:94
 msgid "Small"
-msgstr ""
+msgstr "Mic"
 
 #. I18N: In the UI options, Large font size
 #: src/states_screens/options/options_screen_ui.cpp:98
 msgid "Large"
-msgstr ""
+msgstr "Mare"
 
 #. I18N: In the UI options, Very large font size
 #: src/states_screens/options/options_screen_ui.cpp:100
 msgid "Very large"
-msgstr ""
+msgstr "Foarte mare"
 
 #: src/states_screens/options/options_screen_ui.cpp:537
 msgid ""
@@ -6178,12 +6178,12 @@ msgid ""
 "Closing the game before the story mode's completion invalidates the timer.\n"
 "\n"
 "To use the speedrun mode, please use a new profile."
-msgstr ""
+msgstr "Modul „parcurgere rapidă” poate fi activat numai dacă jocul nu a fost închis de la lansarea modului poveste.\n\nÎnchiderea jocului înainte de completarea modului poveste invalidează cronometrul de viteză.\n\nPentru a utiliza modul „parcurgere rapidă”, utilizați un nou profil."
 
 #. I18N: In the video options
 #: src/states_screens/options/options_screen_video.cpp:249
 msgid "Vertical Sync"
-msgstr ""
+msgstr "Sincronizare verticală"
 
 #. I18N: in graphical options. The \n is a newline character, place it where
 #. appropriate, two can be used if required.
@@ -6191,126 +6191,126 @@ msgstr ""
 msgid ""
 "Vsync forces the graphics card to supply a new frame\n"
 "only when the monitor is ready to display it."
-msgstr ""
+msgstr "Sincronizarea verticală forțează placa grafică să furnizeze\nun cadru numai când monitorul este gata de a-l afișa."
 
 #. I18N: in graphical options.
 #: src/states_screens/options/options_screen_video.cpp:269
 msgid "Vsync will not work if your drivers don't support it."
-msgstr ""
+msgstr "Sincronizarea verticală nu va funcționa dacă driverele nu o suportă."
 
 #. I18N: in graphical options
 #: src/states_screens/options/options_screen_video.cpp:466
 #, c-format
 msgid "Particles Effects: %s"
-msgstr ""
+msgstr "Efecte asupra particulelor: %s"
 
 #. I18N: in graphical options
 #: src/states_screens/options/options_screen_video.cpp:472
 #, c-format
 msgid "Animated Characters: %s"
-msgstr ""
+msgstr "Caractere animate: %s"
 
 #. I18N: in graphical options
 #: src/states_screens/options/options_screen_video.cpp:475
 #, c-format
 msgid "Dynamic lights: %s"
-msgstr ""
+msgstr "Lumini dinamice: %s"
 
 #. I18N: in graphical options
 #: src/states_screens/options/options_screen_video.cpp:478
 #, c-format
 msgid "Light scattering: %s"
-msgstr ""
+msgstr "Dispersarea luminii: %s"
 
 #. I18N: in graphical options
 #: src/states_screens/options/options_screen_video.cpp:481
 #, c-format
 msgid "Anti-aliasing: %s"
-msgstr ""
+msgstr "Anti-aliasing: %s"
 
 #. I18N: in graphical options
 #: src/states_screens/options/options_screen_video.cpp:484
 #, c-format
 msgid "Ambient occlusion: %s"
-msgstr ""
+msgstr "Ocluzie ambientală: %s"
 
 #: src/states_screens/options/options_screen_video.cpp:488
 #, c-format
 msgid "Shadows: %s"
-msgstr ""
+msgstr "Umbre: %s"
 
 #: src/states_screens/options/options_screen_video.cpp:490
 #, c-format
 msgid "Shadows: %i"
-msgstr ""
+msgstr "Umbre: %i"
 
 #. I18N: in graphical options
 #: src/states_screens/options/options_screen_video.cpp:493
 #, c-format
 msgid "Bloom: %s"
-msgstr ""
+msgstr "Lumină difuză: %s"
 
 #. I18N: in graphical options
 #: src/states_screens/options/options_screen_video.cpp:497
 #, c-format
 msgid "Glow (outlines): %s"
-msgstr ""
+msgstr "Strălucire (contururi): %s"
 
 #. I18N: in graphical options
 #: src/states_screens/options/options_screen_video.cpp:501
 #, c-format
 msgid "Light shaft (God rays): %s"
-msgstr ""
+msgstr "Raze de lumină (raze divine): %s"
 
 #: src/states_screens/options/options_screen_video.cpp:506
 #, c-format
 msgid "Rendered image quality: %s"
-msgstr ""
+msgstr "Calitatea imaginii randate: %s"
 
 #: src/states_screens/options/options_screen_video.cpp:515
 #, c-format
 msgid "Geometry detail: %s"
-msgstr ""
+msgstr "Detalii geometrice: %s"
 
 #. I18N: in graphical options
 #: src/states_screens/options/options_screen_video.cpp:538
 #, c-format
 msgid "Motion blur: %s"
-msgstr ""
+msgstr "Neclaritate în mișcare: %s"
 
 #. I18N: in graphical options
 #: src/states_screens/options/options_screen_video.cpp:542
 #, c-format
 msgid "Depth of field: %s"
-msgstr ""
+msgstr "Adâncimea câmpului: %s"
 
 #: src/states_screens/options/user_screen.cpp:353
 msgid "Internet access is disabled. Do you want to enable it?"
-msgstr ""
+msgstr "Accesul la internet este dezactivat. Doriți să-l activați?"
 
 #: src/states_screens/options/user_screen.cpp:541
 msgid "You need to enter a password."
-msgstr ""
+msgstr "Trebuie să introduceți o parolă."
 
 #: src/states_screens/options/user_screen.cpp:562
 #, c-format
 msgid "Logging out '%s'"
-msgstr ""
+msgstr "Se deconectează „%s”"
 
 #: src/states_screens/options/user_screen.cpp:563
 #, c-format
 msgid "Logging in '%s'"
-msgstr ""
+msgstr "Se conectează „%s”"
 
 #: src/states_screens/options/user_screen.cpp:646
 msgid "You can't delete the only player."
-msgstr ""
+msgstr "Nu puteți șterge singurul jucător rămas."
 
 #. I18N: In the player info dialog (when deleting)
 #: src/states_screens/options/user_screen.cpp:654
 #, c-format
 msgid "Do you really want to delete player '%s'?"
-msgstr ""
+msgstr "Sigur doriți să ștergeți jucătorul „%s”?"
 
 #. I18N: as in "ready, set, go", shown at the beginning of the race
 #: src/states_screens/race_gui_base.cpp:73
@@ -6330,25 +6330,25 @@ msgstr "Start!"
 #. I18N: Shown when a goal is scored
 #: src/states_screens/race_gui_base.cpp:79
 msgid "GOAL!"
-msgstr ""
+msgstr "GOL!"
 
 #. I18N: Shown waiting for other players in network to finish loading or
 #. waiting
 #: src/states_screens/race_gui_base.cpp:82
 #: src/states_screens/race_result_gui.cpp:429
 msgid "Waiting for others"
-msgstr ""
+msgstr "Se așteaptă după ceilalți"
 
 #. I18N: Shown waiting for the server in network if live join or spectate
 #: src/states_screens/race_gui_base.cpp:84
 msgid "Waiting for the server"
-msgstr ""
+msgstr "Se așteaptă după server"
 
 #. I18N: string used to show the song title (e.g. "Sunny Song")
 #: src/states_screens/race_gui_base.cpp:646
 #, c-format
 msgid "\"%s\""
-msgstr ""
+msgstr "\"%s\""
 
 #. I18N: string used to show the author of the music. (e.g. "Sunny Song" by
 #. "John Doe")
@@ -6358,73 +6358,73 @@ msgstr "de"
 
 #: src/states_screens/race_gui_base.cpp:769
 msgid "Collect nitro!"
-msgstr ""
+msgstr "Colecționați nitro!"
 
 #: src/states_screens/race_gui_base.cpp:771
 msgid "Follow the leader!"
-msgstr "Urmăreşte liderul"
+msgstr "Urmează liderul!"
 
 #. I18N: When some GlobalPlayerIcons are hidden, write "Top 10" to show it
 #: src/states_screens/race_gui_base.cpp:954
 #, c-format
 msgid "Top %i"
-msgstr ""
+msgstr "Top %i"
 
 #: src/states_screens/race_gui.cpp:445
 msgid "Challenge Failed"
-msgstr ""
+msgstr "Provocare eșuată"
 
 #. I18N: Shown when multitouch GUI exists
 #. and press the podium (2, 1, 3 like) icon instead of fire button
 #: src/states_screens/race_gui_overworld.cpp:541
 msgid "Press podium icon to start tutorial"
-msgstr ""
+msgstr "Apăsați iconița podium pentru a începe ghidul"
 
 #: src/states_screens/race_gui_overworld.cpp:547
 msgid "Press fire to start the tutorial"
-msgstr ""
+msgstr "Apăsați „trage” pentru a începe ghidul"
 
 #. I18N: Shown when multitouch GUI exists
 #. and press the podium (2, 1, 3 like) icon instead of fire button
 #: src/states_screens/race_gui_overworld.cpp:623
 msgid "Press podium icon to start the challenge"
-msgstr ""
+msgstr "Apăsați iconița podium pentru a începe o provocare"
 
 #: src/states_screens/race_gui_overworld.cpp:629
 msgid "Press fire to start the challenge"
-msgstr ""
+msgstr "Apăsați „trage” pentru a începe o provocare"
 
 #: src/states_screens/race_result_gui.cpp:268
 msgid "Back to video settings"
-msgstr ""
+msgstr "Înapoi la configurările video"
 
 #: src/states_screens/race_result_gui.cpp:272
 msgid "Save the test results"
-msgstr ""
+msgstr "Salvează rezultatele testelor"
 
 #: src/states_screens/race_result_gui.cpp:275
 msgid "Back to main menu"
-msgstr ""
+msgstr "Înapoi la meniul principal"
 
 #: src/states_screens/race_result_gui.cpp:289
 msgid "Quit the server"
-msgstr ""
+msgstr "Ieșire din server"
 
 #: src/states_screens/race_result_gui.cpp:330
 msgid "Abort Grand Prix"
-msgstr "Anulează Marele Premiu"
+msgstr "Anulează Grand Prix"
 
 #: src/states_screens/race_result_gui.cpp:350
 msgid "Restart"
-msgstr ""
+msgstr "Repornește"
 
 #: src/states_screens/race_result_gui.cpp:357
 msgid "Back to challenge selection"
-msgstr ""
+msgstr "Înapoi la selecția provocărilor"
 
 #: src/states_screens/race_result_gui.cpp:365
 msgid "Race against the new ghost replay"
-msgstr ""
+msgstr "Concurați împotriva noii reluări a fantomei"
 
 #: src/states_screens/race_result_gui.cpp:373
 msgid "Back to the menu"
@@ -6432,225 +6432,225 @@ msgstr "Înapoi la meniu"
 
 #: src/states_screens/race_result_gui.cpp:556
 msgid "Do you really want to abort the Grand Prix?"
-msgstr ""
+msgstr "Sigur anulați acest Grand Prix?"
 
 #: src/states_screens/race_result_gui.cpp:578
 #, c-format
 msgid "Performance report saved in \"%s\"."
-msgstr ""
+msgstr "Raportul performanței a fost salvat în „%s”."
 
 #: src/states_screens/race_result_gui.cpp:690
 #: src/states_screens/race_result_gui.cpp:1590
 msgid "Red Team Wins"
-msgstr ""
+msgstr "Echipa roșie câștigă"
 
 #: src/states_screens/race_result_gui.cpp:692
 #: src/states_screens/race_result_gui.cpp:1592
 msgid "Blue Team Wins"
-msgstr ""
+msgstr "Echipa albastră câștigă"
 
 #: src/states_screens/race_result_gui.cpp:694
 #: src/states_screens/race_result_gui.cpp:1594
 msgid "It's a draw"
-msgstr ""
+msgstr "La egalitate"
 
 #: src/states_screens/race_result_gui.cpp:935
 #, c-format
 msgid "Eliminated after %s"
-msgstr ""
+msgstr "Eliminat după %s"
 
 #: src/states_screens/race_result_gui.cpp:940
 #: src/states_screens/race_result_gui.cpp:1396
 msgid "Eliminated"
-msgstr ""
+msgstr "Eliminat"
 
 #. I18N: indicates a player that scored in their own goal in result screen
 #: src/states_screens/race_result_gui.cpp:1681
 msgid "(Own Goal)"
-msgstr ""
+msgstr "(Autogol)"
 
 #: src/states_screens/race_result_gui.cpp:1770
 #, c-format
 msgid "Track %i/%i"
-msgstr ""
+msgstr "Tura %i/%i"
 
 #: src/states_screens/race_result_gui.cpp:1889
 msgid "Grand Prix progress:"
-msgstr ""
+msgstr "Progres Grand Prix:"
 
 #: src/states_screens/race_result_gui.cpp:1975
 msgid "Highscores"
-msgstr "Cele mai bune rezultate"
+msgstr "Scoruri mari"
 
 #: src/states_screens/race_result_gui.cpp:2142
 #, c-format
 msgid "Best lap time: %s"
-msgstr ""
+msgstr "Cel mai bun timp de tură: %s"
 
 #. I18N: is used to indicate who has the bast laptime (best laptime "by
 #. kart_name")
 #: src/states_screens/race_result_gui.cpp:2155
 #, c-format
 msgid "by %s"
-msgstr ""
+msgstr "de %s"
 
 #: src/states_screens/race_result_gui.cpp:2229
 msgid "You completed the challenge!"
-msgstr ""
+msgstr "Ați completat provocarea!"
 
 #: src/states_screens/race_result_gui.cpp:2229
 msgid "You failed the challenge!"
-msgstr ""
+msgstr "Ați eșuat provocarea!"
 
 #: src/states_screens/race_result_gui.cpp:2282
 msgid "Reached Requirements of SuperTux"
-msgstr ""
+msgstr "S-au atins cerințele lui SuperTux"
 
 #: src/states_screens/race_result_gui.cpp:2353
 msgid "Performance Test Results"
-msgstr ""
+msgstr "Rezultatele testului de performanță"
 
 #: src/states_screens/race_result_gui.cpp:2369
 #, c-format
 msgid "Test duration: %s"
-msgstr ""
+msgstr "Durata testului: %s"
 
 #: src/states_screens/race_result_gui.cpp:2371
 #, c-format
 msgid "Number of frames: %s"
-msgstr ""
+msgstr "Număr de cadre: %s"
 
 #: src/states_screens/race_result_gui.cpp:2373
 #, c-format
 msgid "Steady FPS: %s"
-msgstr ""
+msgstr "FPS stabil: %s"
 
 #: src/states_screens/race_result_gui.cpp:2375
 #, c-format
 msgid "Mostly Steady FPS: %s"
-msgstr ""
+msgstr "FPS stabil în mare parte: %s"
 
 #: src/states_screens/race_result_gui.cpp:2377
 #, c-format
 msgid "Typical FPS: %s"
-msgstr ""
+msgstr "FPS tipic: %s"
 
 #: src/states_screens/race_result_gui.cpp:2391
 #, c-format
 msgid "Horizontal resolution: %s"
-msgstr ""
+msgstr "Rezoluție orizontală: %s"
 
 #: src/states_screens/race_result_gui.cpp:2393
 #, c-format
 msgid "Vertical resolution: %s"
-msgstr ""
+msgstr "Rezoluție verticală: %s"
 
 #: src/states_screens/race_result_gui.cpp:2394
 msgid "Dynamic lighting: ON"
-msgstr ""
+msgstr "Lumină dinamică: PORNITĂ"
 
 #: src/states_screens/race_result_gui.cpp:2395
 msgid "Dynamic lighting: OFF"
-msgstr ""
+msgstr "Lumină dinamică: OPRITĂ"
 
 #: src/states_screens/race_result_gui.cpp:2398
 #, c-format
 msgid "Render resolution: %s%%"
-msgstr ""
+msgstr "Rezoluția de randare: %s%%"
 
 #: src/states_screens/race_result_gui.cpp:2399
 msgid "Anti-aliasing: ON"
-msgstr ""
+msgstr "Anti-aliasing: PORNIT"
 
 #: src/states_screens/race_result_gui.cpp:2400
 msgid "Anti-aliasing : OFF"
-msgstr ""
+msgstr "Anti-aliasing: OPRIT"
 
 #: src/states_screens/race_result_gui.cpp:2401
 msgid "Image-based lighting: OFF"
-msgstr ""
+msgstr "Iluminare bazată pe imagine: OPRITĂ"
 
 #: src/states_screens/race_result_gui.cpp:2402
 msgid "Image-based lighting: ON"
-msgstr ""
+msgstr "Iluminare bazată pe imagine: PORNITĂ"
 
 #: src/states_screens/race_result_gui.cpp:2403
 msgid "Ambient occlusion: ON"
-msgstr ""
+msgstr "Ocluzie ambientală: PORNITĂ"
 
 #: src/states_screens/race_result_gui.cpp:2404
 msgid "Ambient occlusion: OFF"
-msgstr ""
+msgstr "Ocluzie ambientală: OPRITĂ"
 
 #: src/states_screens/race_result_gui.cpp:2406
 #, c-format
 msgid "Shadow resolution: %s"
-msgstr ""
+msgstr "Rezoluția umbrelor: %s"
 
 #: src/states_screens/race_setup_screen.cpp:89
 msgid "All blows allowed, so catch weapons and make clever use of them!"
-msgstr ""
+msgstr "Toate tipurile de lovituri sunt permise, deci prindeți arme și utilizați-le ingenios!"
 
 #: src/states_screens/race_setup_screen.cpp:96
 msgid "Contains no powerups, so only your driving skills matter!"
-msgstr ""
+msgstr "Nu conține bonusuri, doar abilitățile de condus contează!"
 
 #. I18N: short definition for follow-the-leader game mode
 #: src/states_screens/race_setup_screen.cpp:109
 msgid "Keep up with the leader kart but don't overtake it!"
-msgstr ""
+msgstr "Țineți pasul cu cartul lider dar nu-l depășiți!"
 
 #: src/states_screens/race_setup_screen.cpp:115
 msgid "Hit others with weapons until they lose all their lives."
-msgstr ""
+msgstr "Loviți-ii pe ceilalți cu arme până vor pierde toate viețile."
 
 #: src/states_screens/race_setup_screen.cpp:120
 msgid "Push the ball into the opposite cage to score goals."
-msgstr ""
+msgstr "Împingeți mingea în poarta opusă pentru a înscrie goluri."
 
 #: src/states_screens/race_setup_screen.cpp:130
 msgid "Explore tracks to find all hidden eggs"
-msgstr ""
+msgstr "Explorați cursele pentru a găsi toate ouăle ascunse"
 
 #: src/states_screens/race_setup_screen.cpp:138
 msgid "Race against ghost karts and try to beat them!"
-msgstr ""
+msgstr "Concurați împotriva carturilor fantomă și încercați să îi depășiți!"
 
 #: src/states_screens/race_setup_screen.cpp:143
 msgid "Complete as many laps as possible in a given amount of time."
-msgstr ""
+msgstr "Completați cât de multe ture posibile în intervalul de timp dat."
 
 #. I18N: In soccer setup screen
 #: src/states_screens/soccer_setup_screen.cpp:120
 msgid "Press red or blue soccer icon to change team"
-msgstr ""
+msgstr "Apăsați iconița de fotbal roșie sau albastră pentru a schimba echipa"
 
 #. I18N: when showing who is the author of track '%s'
 #. I18N: (place %s where the name of the author should appear)
 #: src/states_screens/track_info_screen.cpp:151
 #, c-format
 msgid "Track by %s"
-msgstr ""
+msgstr "Cursă de %s"
 
 #. I18N: the max players supported by an arena.
 #: src/states_screens/track_info_screen.cpp:159
 #, c-format
 msgid "Max players supported: %d"
-msgstr ""
+msgstr "Nr. maxim de jucători: %d"
 
 #: src/states_screens/track_info_screen.cpp:389
 msgid "Number of red team AI karts"
-msgstr ""
+msgstr "Numărul de carturi robot în echipa roșie"
 
 #: src/states_screens/tracks_and_gp_screen.cpp:124
 msgid ""
 "You cannot play this Grand Prix because it contains tracks that aren't "
 "unlocked!"
-msgstr ""
+msgstr "Nu puteți juca acest Grand Prix pentru că conține piste care încă nu sunt deblocate!"
 
 #: src/states_screens/tracks_and_gp_screen.cpp:245
 msgid "Locked!"
-msgstr ""
+msgstr "Blocat!"
 
 #: src/utils/string_utils.cpp:1242
 #, c-format
@@ -6667,12 +6667,12 @@ msgstr "%s KO"
 #. formats.
 #: src/utils/time.cpp:74
 msgid "%d/%m/%Y"
-msgstr ""
+msgstr "%d-%m-%Y"
 
 #: ../stk-assets/tracks/overworld/scripting.as:15
 #: ../supertuxkart-assets/tracks/overworld/scripting.as:15
 msgid "Complete all challenges to unlock the big door!"
-msgstr ""
+msgstr "Completați toate provocările pentru a debloca ușa cea mare!"
 
 #: ../stk-assets/tracks/overworld/scripting.as:63
 #: ../supertuxkart-assets/tracks/overworld/scripting.as:63
@@ -6681,48 +6681,48 @@ msgid ""
 "to enter this challenge!\n"
 "Check the minimap for\n"
 "available challenges."
-msgstr ""
+msgstr "Aveți nevoie de mai multe puncte\npentru această provocare!\nVerificați harta miniatură pentru\nprovocările disponibile."
 
 #: ../stk-assets/tracks/tutorial/scripting.as:8
 #: ../supertuxkart-assets/tracks/tutorial/scripting.as:8
 #, c-format
 msgid "Accelerate with <%s>, and steer with <%s> and <%s>."
-msgstr ""
+msgstr "Accelerați cu <%s>, și virați cu <%s> și <%s>."
 
 #: ../stk-assets/tracks/tutorial/scripting.as:17
 #: ../supertuxkart-assets/tracks/tutorial/scripting.as:17
 msgid ""
 "Accelerate by touching the upper part of the wheel, and steer by moving left"
 " or right."
-msgstr ""
+msgstr "Accelerați atingând partea superioară a volanului, și virați mișcând la stânga sau la dreapta."
 
 #: ../stk-assets/tracks/tutorial/scripting.as:22
 #: ../supertuxkart-assets/tracks/tutorial/scripting.as:22
 msgid ""
 "Accelerate by moving the accelerator upwards, and steer by tilting your "
 "device."
-msgstr ""
+msgstr "Accelerați mișcând acceleratorul în sus, și virați înclinând dispozitivul."
 
 #: ../stk-assets/tracks/tutorial/scripting.as:27
 #: ../supertuxkart-assets/tracks/tutorial/scripting.as:27
 msgid ""
 "Accelerate by moving the accelerator upwards, and steer by rotating your "
 "device."
-msgstr ""
+msgstr "Accelerați mișcând acceleratorul în sus, și virați rotind dispozitivul."
 
 #: ../stk-assets/tracks/tutorial/scripting.as:59
 #: ../supertuxkart-assets/tracks/tutorial/scripting.as:59
 #, c-format
 msgid ""
 "Collect gift boxes, and fire the weapon with <%s> to blow away these boxes!"
-msgstr ""
+msgstr "Colectați cutii de cadouri, și lansați arma cu <%s> pentru a distruge aceste cutii!-"
 
 #: ../stk-assets/tracks/tutorial/scripting.as:67
 #: ../supertuxkart-assets/tracks/tutorial/scripting.as:67
 msgid ""
 "Collect gift boxes, and fire by pressing the bowling icon to blow away these"
 " boxes!"
-msgstr ""
+msgstr "Colectați cutii de cadouri, și lansați apăsând iconița de distrugere pentru a distruge aceste cutii!"
 
 #: ../stk-assets/tracks/tutorial/scripting.as:78
 #: ../supertuxkart-assets/tracks/tutorial/scripting.as:78
@@ -6730,14 +6730,14 @@ msgstr ""
 msgid ""
 "Press <%s> to look behind.\n"
 "Fire the weapon with <%s> while pressing <%s> to fire behind!"
-msgstr ""
+msgstr "Apăsați <%s> pentru a privi în spate.\nLansați arma cu <%s> în timp ce apăsați <%s> pentru a lansa în spate!"
 
 #: ../stk-assets/tracks/tutorial/scripting.as:88
 #: ../supertuxkart-assets/tracks/tutorial/scripting.as:88
 msgid ""
 "Press the mirror icon to look behind.\n"
 "Fire the weapon behind by holding the mirror icon and then swiping to the bowling icon!"
-msgstr ""
+msgstr "Apăsați iconița oglindă pentru a privi în spate.\nLansați arma în spate menținând iconița oglindă și apoi swipe pe iconița de minge de popice!"
 
 #: ../stk-assets/tracks/tutorial/scripting.as:98
 #: ../supertuxkart-assets/tracks/tutorial/scripting.as:98
@@ -6748,23 +6748,23 @@ msgstr "Folosiți nitro-ul pe care l-ați colectat apăsând <%s>!"
 #: ../stk-assets/tracks/tutorial/scripting.as:104
 #: ../supertuxkart-assets/tracks/tutorial/scripting.as:104
 msgid "Use the nitro you collected by pressing the nitro icon"
-msgstr ""
+msgstr "Folosiți nitro-ul colectat apăsând pe iconița nitro"
 
 #: ../stk-assets/tracks/tutorial/scripting.as:112
 #: ../supertuxkart-assets/tracks/tutorial/scripting.as:112
 msgid "Collect nitro bottles (we will use them after the curve)."
-msgstr ""
+msgstr "Colectați canistre de nitro (le vom folosi după curbă)."
 
 #: ../stk-assets/tracks/tutorial/scripting.as:121
 #: ../supertuxkart-assets/tracks/tutorial/scripting.as:121
 #, c-format
 msgid "Oops! When you're in trouble, press <%s> to be rescued."
-msgstr "Ups! Când ai probleme, apasă <%s> pentru a fi salvat."
+msgstr "Ups! Când aveți probleme, apăsați <%s> pentru a fi salvat."
 
 #: ../stk-assets/tracks/tutorial/scripting.as:127
 #: ../supertuxkart-assets/tracks/tutorial/scripting.as:127
 msgid "Oops! When you're in trouble, press the bird icon to be rescued."
-msgstr "Ups! Când ai probleme, apasă pictograma pasăre pentru a fi salvat."
+msgstr "Ups! Când aveți probleme, apăsați iconița pasăre pentru a fi salvat."
 
 #: ../stk-assets/tracks/tutorial/scripting.as:137
 #: ../supertuxkart-assets/tracks/tutorial/scripting.as:137
@@ -6772,32 +6772,32 @@ msgstr "Ups! Când ai probleme, apasă pictograma pasăre pentru a fi salvat."
 msgid ""
 "Accelerate and press the <%s> key while turning to skid.\n"
 "Skidding for a short while can help you turn faster to take sharp turns."
-msgstr ""
+msgstr "Accelerați și apăsați tasta <%s> în timp ce virați pentru a derapa.\nDeraparea pentru o scurtă vreme vă poate ajuta să virați mai rapid în curbele strânse."
 
 #: ../stk-assets/tracks/tutorial/scripting.as:145
 #: ../supertuxkart-assets/tracks/tutorial/scripting.as:145
 msgid ""
 "Accelerate and press the skid icon while turning to skid.\n"
 "Skidding for a short while can help you turn faster to take sharp turns."
-msgstr ""
+msgstr "Accelerați și apăsați iconița derapare în timp ce virați pentru a derapa.\nDeraparea pentru o scurtă vreme vă poate ajuta să virați mai rapid în curbele strânse."
 
 #: ../stk-assets/tracks/tutorial/scripting.as:156
 #: ../supertuxkart-assets/tracks/tutorial/scripting.as:156
 msgid ""
 "Note that if you manage to skid for several seconds, you will receive a "
 "bonus speedup as a reward!"
-msgstr ""
+msgstr "Luați aminte că dacă derapați pentru câteva secunde veți primi un bonus de viteză drept recompensă!"
 
 #: ../stk-assets/tracks/tutorial/scripting.as:164
 #: ../supertuxkart-assets/tracks/tutorial/scripting.as:164
 msgid "You are now ready to race. Good luck!"
-msgstr "Acum esti gata de cursa. Mult Noroc!"
+msgstr "Sunteți pregătiți de cursă. Mult noroc!"
 
 #. I18N: Generic name in desktop file entry, summary in AppData and short
 #. description in Google Play
 #: supertuxkart.desktop:4 net.supertuxkart.SuperTuxKart.metainfo.xml:7
 msgid "A 3D open-source kart racing game"
-msgstr "Un joc de curse 3D open-source"
+msgstr "Un joc open-source de curse 3D"
 
 #. I18N: Keywords in desktop entry, translators please keep it separated with
 #. semicolons
@@ -6811,7 +6811,7 @@ msgid ""
 "variety of characters, tracks, and modes to play. Our aim is to create a "
 "game that is more fun than realistic, and provide an enjoyable experience "
 "for all ages."
-msgstr ""
+msgstr "Carturi. Nitro. Acțiune! SuperTuxKart este un joc de curse 3D cu sursa deschisă și conține o varietate de caractere, piste, și moduri de joc. Scopul nostru este să creăm un joc care este mai amuzant decât realistic, și să oferim o experiență agreabilă pentru toate vârstele."
 
 #: net.supertuxkart.SuperTuxKart.metainfo.xml:12
 msgid ""
@@ -6820,7 +6820,7 @@ msgid ""
 " while avoiding other karts as they may overtake you, but don't eat the "
 "bananas! Watch for bowling balls, plungers, bubble gum, and cakes thrown by "
 "your opponents."
-msgstr ""
+msgstr "Avem câteva piste cu teme diferite pentru distracția jucătorilor, de la condusul pe sub apă, prin fermele rurale, jungle și chiar în spațiu! Încercați pe cât posibil să evitați alte carturi în timp ce vă depășesc, dar nu mâncați banane! Atenție la mingile de popice, desfundătoarele, gumele de mestecat, sau prăjiturile aruncate de oponenții voștri."
 
 #: net.supertuxkart.SuperTuxKart.metainfo.xml:15
 msgid ""
@@ -6829,28 +6829,28 @@ msgid ""
 "battle mode against the computer or your friends, and more! For a greater "
 "challenge, join online and meet players from all over the world and prove "
 "your racing skills!"
-msgstr ""
+msgstr "Vă puteți înrola într-o cursă contra timp împotriva altor carturi, participând în una sau mai multe cupe Grand Prix, încerca să vă doborâți recordul în cursele contra timp, juca în modul bătălie împotriva calculatorului sau prietenilor, și mult mai multe! Pentru o provocare mai mare, conectați-vă online și întâlniți jucători din toată lumea pentru a vă dovedi aptitudinile de condus!"
 
 #: net.supertuxkart.SuperTuxKart.metainfo.xml:18
 msgid "This game has no ads."
-msgstr ""
+msgstr "Acest joc nu are reclame."
 
 #: net.supertuxkart.SuperTuxKart.metainfo.xml:21
 msgid ""
 "This is an unstable version of SuperTuxKart that contains latest "
 "improvements. It is released mainly for testing, to make stable STK as good "
 "as possible."
-msgstr ""
+msgstr "Aceasta este o versiune instabilă de SuperTuxKart care conține ultimele îmbunătățiri. Este lansată în principal pentru testare, pentru a face STK pe cât de bun și stabil posibil."
 
 #: net.supertuxkart.SuperTuxKart.metainfo.xml:24
 msgid ""
 "This version can be installed in parallel with the stable version on the "
 "device."
-msgstr ""
+msgstr "Această versiune poate fi instalată pe dispozitiv în paralel cu versiunea stabilă."
 
 #: net.supertuxkart.SuperTuxKart.metainfo.xml:27
 msgid "If you need more stability, consider using the stable version: %s"
-msgstr ""
+msgstr "Dacă aveți nevoie de mai multă stabilitate, considerați utilizarea versiunii stabile: %s"
 
 #: net.supertuxkart.SuperTuxKart.metainfo.xml:45
 msgid "SuperTuxKart Team"

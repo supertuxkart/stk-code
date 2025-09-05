@@ -5,6 +5,7 @@
 # Translators:
 # A. Cem Hanoğlu <cem.hanoglu@yahoo.com>, 2024-2025
 # A. Cem Hanoğlu <cem.hanoglu@yahoo.com>, 2024
+# A. Cem Hanoğlu <cem.hanoglu@yahoo.com>, 2025
 # FIRST AUTHOR <EMAIL@ADDRESS>, 2010
 # Rover, 2022
 # Rover, 2022
@@ -18,7 +19,7 @@ msgstr ""
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2024-10-29 22:11+0100\n"
 "PO-Revision-Date: 2015-02-15 01:58+0000\n"
-"Last-Translator: A. Cem Hanoğlu <cem.hanoglu@yahoo.com>, 2024-2025\n"
+"Last-Translator: A. Cem Hanoğlu <cem.hanoglu@yahoo.com>, 2025\n"
 "Language-Team: Turkish (http://app.transifex.com/supertuxkart/supertuxkart/language/tr/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -992,22 +993,22 @@ msgstr "Tavsiye Edilen Görüntü Ayarları "
 #. I18N: ./data/gui/dialogs/recommend_video_settings.stkgui
 #. I18N: Recommend video settings dialog
 msgid "The recommended settings will be valid for the current resolution."
-msgstr ""
+msgstr "Tavsiye edilen ayarlar geçerli çözünürlük için uygulanacak"
 
 #. I18N: ./data/gui/dialogs/recommend_video_settings.stkgui
 #. I18N: Recommend video settings dialog
 msgid "What should the settings prioritize?"
-msgstr ""
+msgstr "Ayarlar neyi ön planda tutmalı?"
 
 #. I18N: ./data/gui/dialogs/recommend_video_settings.stkgui
 #. I18N: Recommend video settings dialog
 msgid "Performance"
-msgstr ""
+msgstr "Performans"
 
 #. I18N: ./data/gui/dialogs/recommend_video_settings.stkgui
 #. I18N: Recommend video settings dialog
 msgid "Balance performance and graphics quality"
-msgstr ""
+msgstr "Performans ve görsel kaliteyi dengele"
 
 #. I18N: ./data/gui/dialogs/recommend_video_settings.stkgui
 #. I18N: Recommend video settings dialog
@@ -1017,12 +1018,12 @@ msgstr "Görüntü Kalitesi"
 #. I18N: ./data/gui/dialogs/recommend_video_settings.stkgui
 #. I18N: Recommend video settings dialog
 msgid "Sparing energy"
-msgstr ""
+msgstr "Enerji harcama"
 
 #. I18N: ./data/gui/dialogs/recommend_video_settings.stkgui
 #. I18N: Recommend video settings dialog
 msgid "Do you like graphics effects creating blur?"
-msgstr ""
+msgstr "Görsel efektlerin bulanıklık oluşturmasını ister misin?"
 
 #. I18N: ./data/gui/dialogs/recommend_video_settings.stkgui
 #. I18N: Recommend video settings dialog
@@ -1095,7 +1096,7 @@ msgstr "Kurulmuş"
 #. I18N: ./data/gui/screens/arenas.stkgui
 #. I18N: Section in arena tracksselection screen
 msgid "Edit favorite arenas"
-msgstr ""
+msgstr "Favori arenaları düzenle"
 
 #. I18N: ./data/gui/screens/arenas.stkgui
 #. I18N: track group
@@ -2128,7 +2129,7 @@ msgstr "SuperTuxKart Seçenekler"
 #. I18N: ./data/gui/screens/options/user_screen_tab.stkgui
 #. I18N: Section in the settings menu
 msgid "Display"
-msgstr ""
+msgstr "Ekran"
 
 #. I18N: ./data/gui/screens/options/options_audio.stkgui
 #. I18N: Section in the settings menu
@@ -2403,7 +2404,7 @@ msgstr "Görünüm"
 #. I18N: ./data/gui/screens/options/options_ui.stkgui
 #. I18N: In the ui settings
 msgid "Skin variant"
-msgstr ""
+msgstr "Kaplama çeşidi"
 
 #. I18N: ./data/gui/screens/options/options_ui.stkgui
 #. I18N: In the ui settings
@@ -3038,22 +3039,22 @@ msgstr "Yeni pist '%s' açıldı"
 #: src/challenges/challenge_data.cpp:605
 #, c-format
 msgid "New game mode '%s' now available"
-msgstr "Yeni oyun kipi '%s' şimdi uygun"
+msgstr "Yeni oyun modu '%s' açıldı"
 
 #: src/challenges/challenge_data.cpp:615
 #, c-format
 msgid "New Grand Prix '%s' now available"
-msgstr "Yeni Grand Prix '%s' şimdi uygun"
+msgstr "Yeni Grand Prix '%s' açıldı"
 
 #: src/challenges/challenge_data.cpp:619
 #, c-format
 msgid "New difficulty '%s' now available"
-msgstr "Yeni zorluk '%s' şimdi uygun"
+msgstr "Yeni zorluk '%s' açıldı"
 
 #: src/challenges/challenge_data.cpp:629
 #, c-format
 msgid "New kart '%s' now available"
-msgstr "Yeni araç '%s' şimdi uygun"
+msgstr "Yeni araç '%s' açıldı"
 
 #: src/challenges/story_mode_timer.cpp:281
 #: src/states_screens/options/options_screen_ui.cpp:280
@@ -3063,7 +3064,7 @@ msgid ""
 "Closing the game before the story mode's completion invalidates the timer.\n"
 "\n"
 "To use the speedrun mode, please use a new profile."
-msgstr "Hızlı koşu kipi devre dışı. Yalnızca hikaye kipinin başlatılmasından bu yana oyun kapatılmadıysa etkinleştirilebilir.\n\nOyunun hikaye kipinin tamamlanmasından önce kapatılması zamanlayıcıyı geçersiz kılar.\n\nHızlı koşu kipini kullanmak için lütfen yeni bir profil kullanın."
+msgstr "Speedrun modu devre dışı. Yalnızca hikaye kipinin başlatılmasından bu yana oyun kapatılmadıysa etkinleştirilebilir.\n\nOyunun hikaye modunun tamamlanmasından önce kapatılması zamanlayıcıyı geçersiz kılar.\n\nSpeedrun modunu  kullanmak için lütfen yeni bir profil kullanın."
 
 #. I18N: Name of first guest player (without number)
 #: src/config/player_manager.cpp:396
@@ -3095,7 +3096,7 @@ msgstr "Video kaydı başladı."
 #: src/graphics/irr_driver.cpp:745
 #, c-format
 msgid "Video saved in \"%s\"."
-msgstr "Video kaydedildi \"%s\"."
+msgstr "Video \"%s\" adlı yere kaydedildi."
 
 #: src/graphics/irr_driver.cpp:749
 msgid "Encoding progress:"
@@ -3119,7 +3120,7 @@ msgstr "Yükleniyor"
 
 #: src/guiengine/widgets/kart_stats_widget.cpp:104
 msgid "Mass"
-msgstr "Ağırlık"
+msgstr "Kütle"
 
 #: src/guiengine/widgets/kart_stats_widget.cpp:110
 msgid "Maximum speed"
@@ -4263,7 +4264,7 @@ msgstr "Tamamlanmamış tekrar dosyası kaydedilmeyecek."
 #: src/replay/replay_recorder.cpp:394
 #, c-format
 msgid "Replay saved in \"%s\"."
-msgstr "Tekrar kaydedildi \"%s\""
+msgstr "Tekrar kaydı \"%s\" adlı yere kaydedildi. "
 
 #: src/states_screens/addons_screen.cpp:51
 msgid "1 week"
@@ -5788,7 +5789,7 @@ msgstr "E-postayı değiştirirken hata oldu: %s"
 
 #: src/states_screens/online/online_screen.cpp:109
 msgid "News from STK Blog"
-msgstr ""
+msgstr "STK Blog'dan Haberler"
 
 #: src/states_screens/online/online_screen.cpp:110
 msgid "Date"
@@ -5796,7 +5797,7 @@ msgstr "Tarih"
 
 #: src/states_screens/online/online_screen.cpp:166
 msgid "There are currently no news available."
-msgstr ""
+msgstr "Şu an yeni haber bulunmamakta."
 
 #. I18N: Shown to players when he is not is not logged in
 #: src/states_screens/online/online_screen.cpp:317
@@ -6397,7 +6398,7 @@ msgstr "Görüntü ayarlarına geri dön"
 
 #: src/states_screens/race_result_gui.cpp:272
 msgid "Save the test results"
-msgstr ""
+msgstr "Test sonuçlarını kaydet"
 
 #: src/states_screens/race_result_gui.cpp:275
 msgid "Back to main menu"
@@ -6434,7 +6435,7 @@ msgstr "Gerçekten Büyük Yarış'ı iptal etmek istiyor musun?"
 #: src/states_screens/race_result_gui.cpp:578
 #, c-format
 msgid "Performance report saved in \"%s\"."
-msgstr ""
+msgstr "Performans raporu \"%s\" adlı yere kaydedildi."
 
 #: src/states_screens/race_result_gui.cpp:690
 #: src/states_screens/race_result_gui.cpp:1590
@@ -6510,79 +6511,79 @@ msgstr "Performans Testi Sonuçları"
 #: src/states_screens/race_result_gui.cpp:2369
 #, c-format
 msgid "Test duration: %s"
-msgstr ""
+msgstr "Test süresi: %s"
 
 #: src/states_screens/race_result_gui.cpp:2371
 #, c-format
 msgid "Number of frames: %s"
-msgstr ""
+msgstr "Kare sayıısı: %s"
 
 #: src/states_screens/race_result_gui.cpp:2373
 #, c-format
 msgid "Steady FPS: %s"
-msgstr ""
+msgstr "Sabit FPS: %s"
 
 #: src/states_screens/race_result_gui.cpp:2375
 #, c-format
 msgid "Mostly Steady FPS: %s"
-msgstr ""
+msgstr "Çoğunlukla Sabit FPS: %s"
 
 #: src/states_screens/race_result_gui.cpp:2377
 #, c-format
 msgid "Typical FPS: %s"
-msgstr ""
+msgstr "Normal FPS: %s"
 
 #: src/states_screens/race_result_gui.cpp:2391
 #, c-format
 msgid "Horizontal resolution: %s"
-msgstr ""
+msgstr "Yatay çözünürlük: %s"
 
 #: src/states_screens/race_result_gui.cpp:2393
 #, c-format
 msgid "Vertical resolution: %s"
-msgstr ""
+msgstr "Dikey çözünürlük: %s"
 
 #: src/states_screens/race_result_gui.cpp:2394
 msgid "Dynamic lighting: ON"
-msgstr ""
+msgstr "Dinamik aydınlatma: AÇIK"
 
 #: src/states_screens/race_result_gui.cpp:2395
 msgid "Dynamic lighting: OFF"
-msgstr ""
+msgstr "Dinamik aydınlatma: KAPALI"
 
 #: src/states_screens/race_result_gui.cpp:2398
 #, c-format
 msgid "Render resolution: %s%%"
-msgstr ""
+msgstr "İşleme çözünürlüğü: %s%%"
 
 #: src/states_screens/race_result_gui.cpp:2399
 msgid "Anti-aliasing: ON"
-msgstr ""
+msgstr "Kenar yumuşatma: AÇIK"
 
 #: src/states_screens/race_result_gui.cpp:2400
 msgid "Anti-aliasing : OFF"
-msgstr ""
+msgstr "Kenar yumuşatma: KAPALI"
 
 #: src/states_screens/race_result_gui.cpp:2401
 msgid "Image-based lighting: OFF"
-msgstr ""
+msgstr "Görüntü tabanlı aydınlatma: KAPALI"
 
 #: src/states_screens/race_result_gui.cpp:2402
 msgid "Image-based lighting: ON"
-msgstr ""
+msgstr "Görüntü tabanlı aydınlatma: AÇIK"
 
 #: src/states_screens/race_result_gui.cpp:2403
 msgid "Ambient occlusion: ON"
-msgstr ""
+msgstr "Çevresel perdeleme: AÇIK"
 
 #: src/states_screens/race_result_gui.cpp:2404
 msgid "Ambient occlusion: OFF"
-msgstr ""
+msgstr "Çevresel perdeleme: KAPALI"
 
 #: src/states_screens/race_result_gui.cpp:2406
 #, c-format
 msgid "Shadow resolution: %s"
-msgstr ""
+msgstr "Gölge çözünürlüğü: %s"
 
 #: src/states_screens/race_setup_screen.cpp:89
 msgid "All blows allowed, so catch weapons and make clever use of them!"
