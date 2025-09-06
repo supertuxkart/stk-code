@@ -95,8 +95,10 @@
 #include <cmath>
 #include <irrlicht.h>
 
-#if !defined(SERVER_ONLY) && defined(ANDROID)
+#ifndef SERVER_ONLY
 #include <SDL.h>
+#endif
+#if !defined(SERVER_ONLY) && defined(ANDROID)
 #if SDL_VERSION_ATLEAST(2, 0, 9)
 #define ENABLE_SCREEN_ORIENTATION_HANDLING 1
 #endif
@@ -247,6 +249,10 @@ IrrDriver::~IrrDriver()
     m_device->drop();
     m_device = NULL;
     m_modes.clear();
+
+#ifndef SERVER_ONLY
+    SDL_Quit();
+#endif
 }   // ~IrrDriver
 
 // ----------------------------------------------------------------------------
