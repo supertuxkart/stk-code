@@ -2489,7 +2489,7 @@ int main(int argc, char *argv[])
                 }
                 Log::warn("OpenGL", "Driver is too old!");
             }
-            else if (!CVS->isGLSL())
+            else if (!CVS->isGLSL() && irr_driver->getVideoDriver()->getDriverType() != video::EDT_VULKAN)
             {
                 #if !defined(MOBILE_STK)
                 if (UserConfigParams::m_old_driver_popup)

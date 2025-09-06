@@ -177,6 +177,15 @@
 
         <spacer height="10" width="10"/>
 
+        <!-- ************ Render Driver ************ -->
+        <div layout="horizontal-row" width="100%" proportion="1">
+            <label text="Render Driver" I18N="Video settings" id="render_driver_label" width="40%"/>
+            <spacer width="10" height="10"/>
+            <spinner id="render_driver" width="50%" />
+        </div>
+
+        <spacer height="10" width="10"/>
+
         <buttonbar id="buttons" height="15%" width="30%" align="center">
             <icon-button id="cancel" width="128" height="128" icon="gui/icons/red_x.png"
                 I18N="Video settings" text="Cancel" align="center"/>
