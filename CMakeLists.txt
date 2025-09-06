@@ -547,6 +547,18 @@ endif()
 # Provides list of source and header files (STK_SOURCES and STK_HEADERS)
 include(sources.cmake)
 
+if (USE_APPLE_NETWORK_LIBRARIES)
+    add_definitions(-DAPPLE_NETWORK_LIBRARIES)
+    set(STK_SOURCES
+        ${STK_SOURCES}
+        src/online/http_request_urlsession.mm)
+    set_source_files_properties(src/online/http_request_urlsession.mm PROPERTIES COMPILE_FLAGS "-x objective-c++")
+    set_source_files_properties(src/online/http_request_urlsession.mm PROPERTIES LANGUAGE CXX)
+else()
+    find_package(CURL REQUIRED)
+    include_directories(${CURL_INCLUDE_DIRS})
+endif()
+
 # Generate source groups useful for MSVC project explorer
 include(cmake/SourceGroupFunctions.cmake)
 source_group_hierarchy(STK_SOURCES STK_HEADERS)
@@ -644,9 +656,6 @@ endif()
 # 1.0.1d for compatible AES GCM handling
 SET(OPENSSL_MINIMUM_VERSION "1.0.1d")
 
-find_package(CURL REQUIRED)
-include_directories(${CURL_INCLUDE_DIRS})
-
 find_path(MBEDTLS_INCLUDE_DIRS mbedtls/version.h)
 find_library(MBEDCRYPTO_LIBRARY NAMES mbedcrypto libmbedcrypto)
 
@@ -680,9 +689,14 @@ target_link_libraries(supertuxkart
     ${ENET_LIBRARIES}
     stkirrlicht
     ${Angelscript_LIBRARIES}
-    ${CURL_LIBRARIES}
     ${MCPP_LIBRARY}
     )
+
+if (USE_APPLE_NETWORK_LIBRARIES)
+    target_link_libraries(supertuxkart "-framework Foundation")
+else()
+    target_link_libraries(supertuxkart ${CURL_LIBRARIES})
+endif()
 
 if (USE_SWITCH)
   include(cmake/FindEGL.cmake)

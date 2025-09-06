@@ -23,6 +23,7 @@
 #include "config/player_manager.hpp"
 #include "config/user_config.hpp"
 #include "states_screens/state_manager.hpp"
+#include "online/http_request.hpp"
 #include "utils/vs.hpp"
 
 #include <functional>
@@ -74,7 +75,7 @@ namespace Online
         m_menu_polling_interval = 60;  // Default polling: every 60 seconds.
         m_game_polling_interval = 60;  // same for game polling
         m_time_since_poll       = m_menu_polling_interval;
-        curl_global_init(CURL_GLOBAL_DEFAULT);
+        Online::globalHTTPRequestInit();
         m_abort.setAtomic(false);
     }   // RequestManager
 
@@ -82,7 +83,7 @@ namespace Online
     RequestManager::~RequestManager()
     {
         m_thread.join();
-        curl_global_cleanup();
+        Online::globalHTTPRequestCleanup();
     }   // ~RequestManager
 
     // ------------------------------------------------------------------------
