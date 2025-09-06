@@ -45,7 +45,7 @@ CustomVideoSettingsDialog::CustomVideoSettingsDialog(const float w, const float 
         ModalDialog(w, h)
 {
     loadFromFile("custom_video_settings.stkgui");
-    updateActivation();
+    updateActivation("");
 }
 
 // -----------------------------------------------------------------------------
@@ -161,6 +161,17 @@ void CustomVideoSettingsDialog::beforeAddingWidgets()
 GUIEngine::EventPropagation CustomVideoSettingsDialog::processEvent(const std::string& eventSource)
 {
 #ifndef SERVER_ONLY
+    if (eventSource == "render_driver")
+    {
+        // We will only update settings if the changed renderer is
+        // kept when the players chooses to apply the new config
+        // However, we immediately update the GUI to show which
+        // advanced settings are available or not with the chosen renderer
+        std::string rd = StringUtils::wideToUtf8(
+            getWidget<GUIEngine::SpinnerWidget>("render_driver")->getStringValue().make_lower());
+
+        updateActivation(rd);
+    }
     if (eventSource == "buttons")
     {
         const std::string& selection = getWidget<RibbonWidget>("buttons")->
@@ -243,7 +254,6 @@ GUIEngine::EventPropagation CustomVideoSettingsDialog::processEvent(const std::s
 
             std::string rd = StringUtils::wideToUtf8(
                 getWidget<GUIEngine::SpinnerWidget>("render_driver")->getStringValue().make_lower());
-            printf("Renderer string is %s\n", rd.c_str());
 
             bool need_restart = false;
             if (std::string(UserConfigParams::m_render_driver) != rd)
@@ -282,7 +292,7 @@ GUIEngine::EventPropagation CustomVideoSettingsDialog::processEvent(const std::s
     }
     else if (eventSource == "dynamiclight")
     {
-        updateActivation();
+        updateActivation("");
     }
 #endif
     return GUIEngine::EVENT_LET;
@@ -290,19 +300,43 @@ GUIEngine::EventPropagation CustomVideoSettingsDialog::processEvent(const std::s
 
 // -----------------------------------------------------------------------------
 
-void CustomVideoSettingsDialog::updateActivation()
+void CustomVideoSettingsDialog::updateActivation(const std::string& renderer)
 {
 #ifndef SERVER_ONLY
     bool light = getWidget<CheckBoxWidget>("dynamiclight")->getState();
     bool real_light = light;
-    if (!CVS->isGLSL())
+    bool vk = GE::getDriver()->getDriverType() == video::EDT_VULKAN;
+    bool modern_gl = CVS->isGLSL();
+
+    // If showing enabled options for a specific renderer has
+    // been requested, prioritize that
+    if (renderer == "vulkan")
+    {
+        vk = true;
+        modern_gl = false;
+    }
+    else if (renderer != "") // OpenGL or DirectX
+    {
+        vk = false;
+
+        if (renderer == "opengl" && !UserConfigParams::m_force_legacy_device)
+            modern_gl = true;
+        else
+            modern_gl = false;
+    }
+
+    // Disable the options for advanced lighting if unavailable for this renderer
+    if (!vk && !modern_gl)
     {
         getWidget<CheckBoxWidget>("dynamiclight")->setActive(false);
         light = false;
     }
-    bool vk = GE::getDriver()->getDriverType() == video::EDT_VULKAN;
+
     if (vk)
+    {
         getWidget<CheckBoxWidget>("dynamiclight")->setActive(true);
+        light = false;
+    }
     getWidget<CheckBoxWidget>("motionblur")->setActive(light);
     getWidget<CheckBoxWidget>("dof")->setActive(light);
     getWidget<SpinnerWidget>("shadows")->setActive(light);
