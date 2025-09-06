@@ -123,8 +123,38 @@ void CustomVideoSettingsDialog::beforeAddingWidgets()
         cb_tex_cmp->setState(false);
         cb_tex_cmp->setActive(false);
     }
+
+    GUIEngine::SpinnerWidget* rds = getWidget<GUIEngine::SpinnerWidget>("render_driver");
+    assert( rds != NULL );
+
+    rds->m_properties[PROP_WRAP_AROUND] = "true";
+    rds->clearLabels();
+    rds->addLabel("OpenGL");
+    rds->addLabel("Vulkan");
+#ifndef WIN32
+    const int rd_count = 2;
+#else
+    const int rd_count = 3;
+    rds->addLabel("DirectX9");
 #endif
-}
+    bool found = false;
+    for (int i = 0; i < rd_count; i++)
+    {
+        std::string rd = StringUtils::wideToUtf8(rds->getStringValueFromID(i).make_lower());
+        if (std::string(UserConfigParams::m_render_driver) == rd)
+        {
+            rds->setValue(i);
+            found = true;
+            break;
+        }
+    }
+    if (!found)
+    {
+        rds->addLabel(StringUtils::utf8ToWide(UserConfigParams::m_render_driver));
+        rds->setValue(rd_count);
+    }
+#endif
+} // beforeAddingWidgets
 
 // -----------------------------------------------------------------------------
 
@@ -211,6 +241,17 @@ GUIEngine::EventPropagation CustomVideoSettingsDialog::processEvent(const std::s
                 getWidget<SpinnerWidget>("geometry_detail")->getValue();;
             int quality = getWidget<SpinnerWidget>("image_quality")->getValue();
 
+            std::string rd = StringUtils::wideToUtf8(
+                getWidget<GUIEngine::SpinnerWidget>("render_driver")->getStringValue().make_lower());
+            printf("Renderer string is %s\n", rd.c_str());
+
+            bool need_restart = false;
+            if (std::string(UserConfigParams::m_render_driver) != rd)
+            {
+                UserConfigParams::m_render_driver = rd;
+                need_restart = true;
+            }
+
             user_config->saveConfig();
 
             ModalDialog::dismiss();
@@ -227,6 +268,10 @@ GUIEngine::EventPropagation CustomVideoSettingsDialog::processEvent(const std::s
             // sameRestart will have the same effect
             if (!(CVS->isGLSL() && pbr_changed))
                 OptionsScreenVideo::setImageQuality(quality, force_reload_texture);
+
+            if (need_restart)
+                irr_driver->fullRestart();
+
             return GUIEngine::EVENT_BLOCK;
         }
         else if (selection == "cancel")
