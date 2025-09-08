@@ -27,7 +27,6 @@
 #include "modes/world.hpp"
 #include "states_screens/dialogs/message_dialog.hpp"
 #include "states_screens/main_menu_screen.hpp"
-#include "states_screens/race_gui.hpp"
 
 #include <IrrlichtDevice.h>
 
