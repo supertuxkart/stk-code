@@ -92,7 +92,7 @@ RaceGUI::RaceGUI()
 
     m_is_tutorial = (RaceManager::get()->getTrackName() == "tutorial");
 
-    // Load speedmeter texture before rendering the first frame
+    // Load speedometer texture before rendering the first frame
     m_speed_meter_icon = irr_driver->getTexture(FileManager::GUI_ICON, "speedback.png");
     m_speed_bar_icon   = irr_driver->getTexture(FileManager::GUI_ICON, "speedfore.png");
     //createMarkerTexture();
@@ -399,6 +399,10 @@ void RaceGUI::renderPlayerView(const Camera *camera, float dt)
         if (m_multitouch_gui == NULL || m_multitouch_gui->isSpectatorMode())
         {
             drawPowerupIcons(kart, viewport, scaling);
+            drawSpeedEnergyRank(kart, viewport, scaling, dt);
+        }
+        else
+        {
             drawSpeedEnergyRank(kart, viewport, scaling, dt);
         }
     }
@@ -1014,21 +1018,32 @@ void RaceGUI::drawSpeedEnergyRank(const AbstractKart* kart,
                                  float dt)
 {
 #ifndef SERVER_ONLY
+	if (UserConfigParams::m_speedometer == 0) return; //speedometer hidden
+	
     float min_ratio         = std::min(scaling.X, scaling.Y);
     const int SPEEDWIDTH   = 128;
     int meter_width        = (int)(SPEEDWIDTH*min_ratio);
     int meter_height       = (int)(SPEEDWIDTH*min_ratio);
-
-    drawEnergyMeter(viewport.LowerRightCorner.X ,
-                    (int)(viewport.LowerRightCorner.Y),
-                    kart, viewport, scaling);
+    if (m_multitouch_gui == NULL || m_multitouch_gui->isSpectatorMode())
+    {
+        drawEnergyMeter(viewport.LowerRightCorner.X ,
+                       (int)(viewport.LowerRightCorner.Y),
+                       kart, viewport, scaling);
+    }
 
     // First draw the meter (i.e. the background )
     // -------------------------------------------------------------------------
     core::vector2df offset;
-    offset.X = (float)(viewport.LowerRightCorner.X-meter_width) - 24.0f*scaling.X;
-    offset.Y = viewport.LowerRightCorner.Y-10.0f*scaling.Y;
-
+    if (m_multitouch_gui == NULL || m_multitouch_gui->isSpectatorMode())
+    {
+        offset.X = (float)(viewport.LowerRightCorner.X-meter_width) - 24.0f*scaling.X;
+        offset.Y = viewport.LowerRightCorner.Y-10.0f*scaling.Y;
+    }
+    else
+    {
+        offset.X = (float)(viewport.LowerRightCorner.X-meter_width) - 220.0f*scaling.X;
+        offset.Y = viewport.LowerRightCorner.Y-60.0f*scaling.Y;
+    }
     const core::rect<s32> meter_pos((int)offset.X,
                                     (int)(offset.Y-meter_height),
                                     (int)(offset.X+meter_width),
@@ -1124,7 +1139,6 @@ void RaceGUI::drawSpeedEnergyRank(const AbstractKart* kart,
 
     unsigned int count = computeVerticesForMeter(position, threshold, vertices, vertices_count, 
                                                      speed_ratio, meter_width, meter_height, offset);
-
 
     drawMeterTexture(m_speed_bar_icon, vertices, count);
 #endif
