@@ -19,7 +19,7 @@ jobs:
         exclude:
           - platform: iPhoneOS
             arch: x86_64
-    runs-on: depot-ubuntu-latest
+    runs-on: depot-ubuntu-latest-4
     steps:
       - uses: actions/checkout@v2
         with:

@@ -12,7 +12,7 @@ on:
 jobs:
   build_switch:
     name: Build Switch
-    runs-on: depot-ubuntu-latest
+    runs-on: depot-ubuntu-latest-4
     container:
       image: 'devkitpro/devkita64:20241023'
     steps:
