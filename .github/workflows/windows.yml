@@ -26,7 +26,7 @@ jobs:
           submodules: false
       - name: Set up environment for windows-2022
         shell : bash
-        if: ${{ matrix.os == 'windows-2022' }}
+        if: ${{ matrix.os == 'depot-windows-2022-4' }}
         run: |
           echo "wget=C:\msys64\usr\bin\wget.exe" >> $GITHUB_ENV
           echo "unzip=unzip" >> $GITHUB_ENV
@@ -130,7 +130,7 @@ jobs:
           echo 'set(ISPC_ARCH "x86-64")' >> toolchain.cmake
       # Manually specify CMAKE_SYSTEM_PROCESSOR, it can only be set together with -DDCMAKE_SYSTEM_NAME
       - name: Configure bulid for MSVC
-        if: ${{ matrix.os == 'windows-2022' }}
+        if: ${{ matrix.os == 'depot-windows-2022-4' }}
         run: |
           mkdir -Force build
           cd build
@@ -148,7 +148,7 @@ jobs:
           cd build
           cmake .. -DLLVM_ARCH=${{ matrix.arch }} -DLLVM_PREFIX=/llvm-mingw -DCMAKE_TOOLCHAIN_FILE=../cmake/Toolchain-llvm-mingw.cmake -DCHECK_ASSETS=OFF -DUSE_DIRECTX=ON -DBC7_ISPC=ON -DCMAKE_ISPC_COMPILER=/opt/ispc/bin/ispc
       - name: Build for MSVC
-        if: ${{ matrix.os == 'windows-2022' }}
+        if: ${{ matrix.os == 'depot-windows-2022-4' }}
         working-directory: build
         run: |
           cmake --build . --config Debug
@@ -188,7 +188,7 @@ jobs:
   packaging:
     name: Packaging STK
     needs: build
-    runs-on: windows-2022
+    runs-on: depot-windows-2022-4
     steps:
       - name: Configure packaging name for git master branch
         shell : bash
