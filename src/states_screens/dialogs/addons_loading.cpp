@@ -62,6 +62,7 @@ AddonsLoading::AddonsLoading(const std::string &id)
              , m_addon(*(addons_manager->getAddon(id)) )
 #endif
 {
+    m_cancelled         = false;
     m_message_shown    = false;
     m_icon_shown       = false;
 #ifdef SERVER_ONLY
@@ -208,6 +209,17 @@ bool AddonsLoading::onEscapePressed()
     ModalDialog::dismiss();
     return true;
 }   // onEscapePressed
+
+bool AddonsLoading::isDone()
+{
+    if (!m_download_request)
+        return true;
+    return m_download_request->isDone();
+}
+bool AddonsLoading::wasCancelled()
+{
+    return m_cancelled;
+}
 
 // ----------------------------------------------------------------------------
 void AddonsLoading::tryInstall()
@@ -370,6 +382,7 @@ void AddonsLoading::stopDownload()
     if (m_download_request)
     {
         m_download_request->cancel();
+        m_cancelled = true;
         m_download_request = nullptr;
     }
 }   // startDownload
