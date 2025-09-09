@@ -40,7 +40,7 @@ jobs:
             echo "cmake_arch=ARM64" >> $GITHUB_ENV
           fi
       - name: Set up environment for ubuntu-latest
-        if: ${{ matrix.os == 'ubuntu-latest' }}
+        if: ${{ matrix.os == 'depot-ubuntu-latest-4' }}
         run: |
           echo "wget=wget" >> $GITHUB_ENV
           echo "unzip=unzip" >> $GITHUB_ENV
@@ -79,14 +79,14 @@ jobs:
           ${{ env.wget }} https://github.com/supertuxkart/dependencies/releases/download/preview/dependencies-win-${{ matrix.arch }}.zip
           ${{ env.unzip }} dependencies-win-${{ matrix.arch }}.zip
       - name: Download ISPC for MinGW
-        if: ${{ matrix.os == 'ubuntu-latest' }}
+        if: ${{ matrix.os == 'depot-ubuntu-latest-4' }}
         run: |
           cd /opt
           wget https://github.com/supertuxkart/dependencies/releases/download/preview/ispc-cross-1.26.0.tar.xz
           tar xf ispc-cross-1.26.0.tar.xz
           rm ispc-cross-1.26.0.tar.xz
       - name: Install MinGW for i686 or x86_64
-        if: ${{ matrix.os == 'ubuntu-latest' && ( matrix.arch == 'i686' || matrix.arch == 'x86_64' ) }}
+        if: ${{ matrix.os == 'depot-ubuntu-latest-4' && ( matrix.arch == 'i686' || matrix.arch == 'x86_64' ) }}
         run: |
           cd /
           sudo mkdir -p /data/mxe/usr
@@ -98,14 +98,14 @@ jobs:
           # For libfl.so.2
           sudo apt install -y libfl-dev
       - name: Install MinGW for armv7 or aarch64
-        if: ${{ matrix.os == 'ubuntu-latest' && ( matrix.arch == 'armv7' || matrix.arch == 'aarch64' ) }}
+        if: ${{ matrix.os == 'depot-ubuntu-latest-4' && ( matrix.arch == 'armv7' || matrix.arch == 'aarch64' ) }}
         run: |
           cd /
           sudo wget https://github.com/mstorsjo/llvm-mingw/releases/download/20210423/llvm-mingw-20210423-msvcrt-ubuntu-18.04-x86_64.tar.xz
           sudo tar xf llvm-mingw-20210423-msvcrt-ubuntu-18.04-x86_64.tar.xz
           sudo mv llvm-mingw-20210423-msvcrt-ubuntu-18.04-x86_64 llvm-mingw
       - name: Set up MinGW Toolchain for i686
-        if: ${{ matrix.os == 'ubuntu-latest' && matrix.arch == 'i686' }}
+        if: ${{ matrix.os == 'depot-ubuntu-latest-4' && matrix.arch == 'i686' }}
         run: |
           echo "SET(CMAKE_SYSTEM_NAME Windows)" > toolchain.cmake
           echo "SET(CMAKE_C_COMPILER /data/mxe/usr/bin/i686-w64-mingw32.static.posix.dw2-gcc)" >> toolchain.cmake
@@ -117,7 +117,7 @@ jobs:
           echo "set(CMAKE_FIND_ROOT_PATH_MODE_INCLUDE ONLY)" >> toolchain.cmake
           echo 'set(ISPC_ARCH "x86")' >> toolchain.cmake
       - name: Set up MinGW Toolchain for x86_64
-        if: ${{ matrix.os == 'ubuntu-latest' && matrix.arch == 'x86_64' }}
+        if: ${{ matrix.os == 'depot-ubuntu-latest-4' && matrix.arch == 'x86_64' }}
         run: |
           echo "SET(CMAKE_SYSTEM_NAME Windows)" > toolchain.cmake
           echo "SET(CMAKE_C_COMPILER /data/mxe/usr/bin/x86_64-w64-mingw32.static.posix.seh-gcc)" >> toolchain.cmake
@@ -136,13 +136,13 @@ jobs:
           cd build
           cmake .. -G "Visual Studio 17 2022" -DCMAKE_SYSTEM_NAME=Windows -DCMAKE_SYSTEM_PROCESSOR=${{ matrix.arch }} -A ${{ env.cmake_arch }} -DCHECK_ASSETS=OFF
       - name: Configure bulid for MinGW (i686 or x86_64)
-        if: ${{ matrix.os == 'ubuntu-latest' && matrix.arch != 'armv7' && matrix.arch != 'aarch64' }}
+        if: ${{ matrix.os == 'depot-ubuntu-latest-4' && matrix.arch != 'armv7' && matrix.arch != 'aarch64' }}
         run: |
           mkdir -p build
           cd build
           cmake .. -DCMAKE_TOOLCHAIN_FILE=../toolchain.cmake -DCMAKE_BUILD_TYPE=RelWithDebInfo -DCHECK_ASSETS=OFF -DUSE_DIRECTX=ON -DBC7_ISPC=ON -DCMAKE_ISPC_COMPILER=/opt/ispc/bin/ispc
       - name: Configure bulid for MinGW (armv7 or aarch64)
-        if: ${{ matrix.os == 'ubuntu-latest' && ( matrix.arch == 'armv7' || matrix.arch == 'aarch64' ) }}
+        if: ${{ matrix.os == 'depot-ubuntu-latest-4' && ( matrix.arch == 'armv7' || matrix.arch == 'aarch64' ) }}
         run: |
           mkdir -p build
           cd build
@@ -153,28 +153,28 @@ jobs:
         run: |
           cmake --build . --config Debug
       - name: Build for MinGW
-        if: ${{ matrix.os == 'ubuntu-latest' }}
+        if: ${{ matrix.os == 'depot-ubuntu-latest-4' }}
         working-directory: build
         run: |
           make -j4
           cd ..
           mv COPYING tools
       - name: Upload binaries of MinGW
-        if: ${{ matrix.os == 'ubuntu-latest' }}
+        if: ${{ matrix.os == 'depot-ubuntu-latest-4' }}
         uses: actions/upload-artifact@v4
         with:
           name: ${{ matrix.arch }}
           path: build/bin/*
       - name: Upload stk-code/data
         # We only need to upload stk-code/data once
-        if: ${{ matrix.os == 'ubuntu-latest' && matrix.arch == 'i686'}}
+        if: ${{ matrix.os == 'depot-ubuntu-latest-4' && matrix.arch == 'i686'}}
         uses: actions/upload-artifact@v4
         with:
           name: data
           path: data
       - name: Upload stk-code/tools
         # We only need to upload stk-code/tools once
-        if: ${{ matrix.os == 'ubuntu-latest' && matrix.arch == 'i686'}}
+        if: ${{ matrix.os == 'depot-ubuntu-latest-4' && matrix.arch == 'i686'}}
         uses: actions/upload-artifact@v4
         with:
           name: tools

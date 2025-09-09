@@ -75,7 +75,7 @@ jobs:
           echo "${{ env.release_name }}"
           echo "${{ env.release_pre }}"
       - name: Install linux dependencies
-        if: ${{ matrix.os == 'ubuntu-latest-4' }}
+        if: ${{ matrix.os == 'depot-ubuntu-latest-4' }}
         run: |
           sudo apt-get update 
           sudo apt install -y build-essential cmake libbluetooth-dev libcurl4-gnutls-dev \
@@ -99,12 +99,12 @@ jobs:
           tar xf dependencies-mac.tar.xz -C /usr/local
           rm dependencies-mac.tar.xz
       - name: Set compiler (gcc)
-        if: ${{ matrix.os == 'ubuntu-latest-4' && matrix.compiler == 'gcc' }}
+        if: ${{ matrix.os == 'depot-ubuntu-latest-4' && matrix.compiler == 'gcc' }}
         run: |
           echo "CXX=g++" >> $GITHUB_ENV
           echo "CC=gcc" >> $GITHUB_ENV
       - name: Set compiler (clang)
-        if: ${{ matrix.os == 'ubuntu-latest-4' && matrix.compiler == 'clang' }}
+        if: ${{ matrix.os == 'depot-ubuntu-latest-4' && matrix.compiler == 'clang' }}
         run: |
           echo "CXX=clang++" >> $GITHUB_ENV
           echo "CC=clang" >> $GITHUB_ENV
