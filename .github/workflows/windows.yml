@@ -14,7 +14,7 @@ jobs:
       fail-fast: true
       matrix:
         arch: [i686, x86_64, armv7, aarch64]
-        os: [windows-2022, ubuntu-latest]
+        os: [depot-windows-2022, depot-ubuntu-latest]
         exclude:
           - arch: armv7
             os: windows-2022

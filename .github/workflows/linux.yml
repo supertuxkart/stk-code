@@ -26,7 +26,7 @@ jobs:
     strategy:
       fail-fast: true
       matrix:
-        os: [ubuntu-latest]
+        os: [depot-ubuntu-latest]
         compiler: [gcc, clang]
         build_type: [Debug, Release]
         server_only: [ON, OFF]
