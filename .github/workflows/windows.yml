@@ -17,7 +17,7 @@ jobs:
         os: [depot-windows-2022-4, depot-ubuntu-latest-4]
         exclude:
           - arch: armv7
-            os: windows-2022
+            os: depot-windows-2022-4
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v2
