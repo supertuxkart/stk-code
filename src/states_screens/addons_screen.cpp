@@ -136,6 +136,14 @@ void AddonsScreen::beforeAddingWidget()
     w_filter_installation->addLabel(_("Installed"));
     //I18N: Addon not installed for fillter
     w_filter_installation->addLabel(_("Not installed"));
+
+    GUIEngine::SpinnerWidget* w_filter_featured =
+                        getWidget<GUIEngine::SpinnerWidget>("filter_featured");
+    w_filter_featured->m_properties[GUIEngine::PROP_MIN_VALUE] = "0";
+    w_filter_featured->m_properties[GUIEngine::PROP_MAX_VALUE] = "2";
+    w_filter_featured->addLabel(_("All"));
+    w_filter_featured->addLabel(_("Featured"));
+    w_filter_featured->addLabel(_("Not featured"));
 }
 // ----------------------------------------------------------------------------
 
@@ -180,6 +188,10 @@ void AddonsScreen::init()
     GUIEngine::SpinnerWidget* w_filter_installation =
                         getWidget<GUIEngine::SpinnerWidget>("filter_installation");
     w_filter_installation->setValue(0);
+
+    GUIEngine::SpinnerWidget* w_filter_featured =
+                        getWidget<GUIEngine::SpinnerWidget>("filter_featured");
+    w_filter_featured->setValue(0);
 
     // Set the default sort order
     Addon::setSortOrder(Addon::SO_DEFAULT);
@@ -230,12 +242,18 @@ void AddonsScreen::loadList()
     GUIEngine::SpinnerWidget* w_filter_installation =
                         getWidget<GUIEngine::SpinnerWidget>("filter_installation");
 
+    GUIEngine::SpinnerWidget* w_filter_featured =
+                        getWidget<GUIEngine::SpinnerWidget>("filter_featured");
+
     // First create a list of sorted entries
     PtrVector<const Addon, REF> sorted_list;
     for(unsigned int i=0; i<addons_manager->getNumAddons(); i++)
     {
         const Addon & addon = addons_manager->getAddon(i);
         // Ignore not installed addons if the checkbox is enabled
+        if(   (w_filter_featured->getValue() == 1 && !addon.testStatus(Addon::AS_FEATURED))
+           || (w_filter_featured->getValue() == 2 && addon.testStatus(Addon::AS_FEATURED)))
+            continue;
         if(   (w_filter_installation->getValue() == 1 && !addon.isInstalled())
            || (w_filter_installation->getValue() == 2 &&  addon.isInstalled()))
             continue;
@@ -473,7 +491,7 @@ void AddonsScreen::eventCallback(GUIEngine::Widget* widget,
             loadList();
         }
     }
-    else if (name == "filter_search" || name == "filter_installation")
+    else if (name == "filter_search" || name == "filter_installation" || name == "filter_featured")
     {
         loadList();
     }

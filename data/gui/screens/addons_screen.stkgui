@@ -42,7 +42,10 @@
                 <label text="Installed" align="center" I18N="In addons screen, above the list of addons to be installed"/>
                 <spacer width="1%" />
                 <spinner id="filter_installation" proportion="5" align="center" min_value="0" wrap_around="true"/>
-                <spacer width="50%" />
+                <spacer width="10%" />
+                <label text="Featured" align="center"/>
+                <spacer width="1%" />
+                <spinner id="filter_featured" proportion="5" align="center" min_value="0" wrap_around="true"/>
             </div>
             <list id="list_addons" x="0" y="0" width="100%" height="88%" word_wrap="true" alternate_bg="true"/>
         </box>
