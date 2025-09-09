@@ -23,6 +23,8 @@
 #include "guiengine/widgets/list_widget.hpp"
 #include "guiengine/widgets/text_box_widget.hpp"
 
+#include <list>
+
 /* used for the installed/unsinstalled icons*/
 namespace irr { namespace gui { class STKModifiedSpriteBank; } }
 
@@ -58,6 +60,9 @@ private:
     int              m_icon_not_installed;
     /** Icon for 'loading' */
     int              m_icon_loading;
+
+    std::list<std::string> m_addon_queue;
+    AddonsLoading * m_addons_loading;
 
     irr::gui::STKModifiedSpriteBank
                     *m_icon_bank;

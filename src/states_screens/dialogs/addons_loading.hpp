@@ -49,6 +49,8 @@ private:
     void doInstall();
     void doUninstall();
 
+    bool m_cancelled;
+
     /** True if the icon is being displayed. */
     bool m_icon_shown;
     /** True if the error message has shown once. */
@@ -75,6 +77,8 @@ public:
     void onUpdate(float delta) OVERRIDE;
     void voteClicked();
     void tryInstall();
+    bool isDone();
+    bool wasCancelled();
     virtual bool onEscapePressed() OVERRIDE;
     
 };   // AddonsLoading
