@@ -434,6 +434,7 @@ void AddonsScreen::eventCallback(GUIEngine::Widget* widget,
         int item_count = list->getItemCount();
         irr::gui::CGUISTKListBox *listbox =
             list->getIrrlichtElement<irr::gui::CGUISTKListBox>();
+        m_cancelled = false;
 
         for (int i = 0; i < item_count; i++) {
             std::string id = listbox->getItem(i).m_internal_name;
@@ -521,10 +522,8 @@ void AddonsScreen::onUpdate(float dt)
 {
 #ifndef SERVER_ONLY
     NewsManager::get()->joinDownloadThreadIfExit();
-
-    if (m_addons_loading && m_addons_loading->wasCancelled())
+    if (m_cancelled)
     {
-        m_addons_loading = NULL;
         m_addon_queue.clear();
     }
 
@@ -533,11 +532,7 @@ void AddonsScreen::onUpdate(float dt)
         m_addons_loading = new AddonsLoading(m_addon_queue.front());
         m_addon_queue.pop_front();
         m_addons_loading->tryInstall();
-    }
-
-    if (m_addons_loading && m_addons_loading->isDone())
-    {
-        //delete m_addons_loading; // FIXME: This crashes? Without it the memory leaks. =/
+        m_addons_loading->m_cancelled = &m_cancelled;
         m_addons_loading = NULL;
     }
 

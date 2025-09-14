@@ -49,8 +49,6 @@ private:
     void doInstall();
     void doUninstall();
 
-    bool m_cancelled;
-
     /** True if the icon is being displayed. */
     bool m_icon_shown;
     /** True if the error message has shown once. */
@@ -62,6 +60,7 @@ private:
     std::shared_ptr<Online::HTTPRequest> m_download_request;
 
 public:
+    bool * m_cancelled;
     AddonsLoading(const std::string &addon_name);
 
    ~AddonsLoading();
@@ -77,8 +76,6 @@ public:
     void onUpdate(float delta) OVERRIDE;
     void voteClicked();
     void tryInstall();
-    bool isDone();
-    bool wasCancelled();
     virtual bool onEscapePressed() OVERRIDE;
     
 };   // AddonsLoading
