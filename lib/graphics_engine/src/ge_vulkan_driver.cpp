@@ -2580,7 +2580,7 @@ void GEVulkanDriver::renderDrawCalls(
             if (multiple_viewports)
                 q.first->prepareViewport(this, q.second, cmd);
             q.first->renderDeferredLighting(this, cmd);
-            q.first->renderSkyBox(this, cmd);
+            q.first->renderSkyBox(this, cmd, true/*srgb*/);
         }
         vkCmdNextSubpass(cmd, VK_SUBPASS_CONTENTS_INLINE);
         for (auto& q : p)
@@ -2689,7 +2689,7 @@ void GEVulkanDriver::renderDrawCalls(
                     rebind_base_vertex);
             }
             q.first->renderPipeline(this, cmd, GVPT_SOLID, rebind_base_vertex);
-            if (q.first->renderSkyBox(this, cmd))
+            if (q.first->renderSkyBox(this, cmd, false/*srgb*/))
             {
                 if (bind_mesh_textures)
                     q.first->bindAllMaterials(cmd);

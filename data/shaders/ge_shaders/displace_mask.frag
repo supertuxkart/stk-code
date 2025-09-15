@@ -18,7 +18,7 @@ layout(push_constant) uniform Constants
 #include "../utils/displace_utils.frag"
 #include "../utils/screen_space_reflection.frag"
 
-layout (set = 2, binding = 2) uniform samplerCube u_skybox_texture;
+layout (set = 2, binding = 0) uniform samplerCube u_skybox_texture;
 layout (set = 3, binding = 0) uniform sampler2D u_displace_color;
 layout (set = 3, binding = 1) uniform sampler2DShadow u_depth;
 layout (set = 3, binding = 2) uniform sampler2D u_hiz_depth;
