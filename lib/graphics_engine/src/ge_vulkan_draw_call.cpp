@@ -251,7 +251,9 @@ GEVulkanDrawCall::GEVulkanDrawCall()
     m_skybox_renderer = NULL;
     GEVulkanDriver* vk = static_cast<GEVulkanDriver*>(getDriver());
     m_texture_descriptor = vk->getMeshTextureDescriptor();
-    if (vk->getRTTTexture() && vk->getRTTTexture()->isDeferredFBO() &&
+    GEVulkanDeferredFBO* dfbo =
+        dynamic_cast<GEVulkanDeferredFBO*>(vk->getRTTTexture());
+    if (dfbo && dfbo->getAttachment<GVDFT_DISPLACE_COLOR>() &&
         getGEConfig()->m_screen_space_reflection_type >= GSSRT_HIZ)
         m_hiz_depth = new GEVulkanHiZDepth(vk);
     else
