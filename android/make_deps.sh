@@ -1,5 +1,5 @@
 #!/bin/sh
-# Tested with NDK 22.1.7171670
+# Tested with NDK 28.1.13356709
 
 export DIRNAME=$(realpath "$(dirname "$0")")
 
@@ -16,6 +16,9 @@ export HOST_X86=i686-linux-android
 
 export ARCH_X86_64=x86_64
 export HOST_X86_64=x86_64-linux-android
+
+# For cmake 4.0 until stk dependencies are updated
+export CMAKE_POLICY_VERSION_MINIMUM=3.5
 
 # A helper function that checks if error ocurred
 check_error()
