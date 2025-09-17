@@ -657,6 +657,9 @@ namespace UserConfigParams
     PARAM_PREFIX BoolUserConfigParam        m_speedrun_mode
             PARAM_DEFAULT(  BoolUserConfigParam(false, "show_speedrun_timer",
                             &m_video_group, "Display the speedrun timer") );
+	PARAM_PREFIX BoolUserConfigParam        m_speedometer
+            PARAM_DEFAULT(  BoolUserConfigParam(false, "show_speedometer",
+                            &m_video_group, "Display the speedometer") );
     PARAM_PREFIX IntUserConfigParam         m_max_fps
             PARAM_DEFAULT(  IntUserConfigParam(120, "max_fps",
                        &m_video_group, "Maximum fps, should be at least 60") );
