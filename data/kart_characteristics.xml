@@ -94,7 +94,9 @@
             time-full-brake: The brake force will be applied progressively until
                 time-full-brake.
             max-speed-reverse-ratio is the percentage of max speed for reverse
-                gear.
+                gear. This value is only used exactly in the absence of overall
+                max speed penalties. It is otherwise adjusted in code to dampen
+                the effects of e.g. terrain penalties.
           -->
         <engine power="975" max-speed="27.75" generic-max-speed="27.75" brake-factor="36"
                 time-full-brake="0.35" max-speed-reverse-ratio="0.48" />

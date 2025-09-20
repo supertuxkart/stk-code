@@ -3283,10 +3283,29 @@ void Kart::updateEnginePowerAndBrakes(int ticks)
         else if (!m_controls.getAccel())
         {
             m_vehicle->setAllBrakes(0);
-            // going backward, apply reverse gear ratio (unless he goes
-            // too fast backwards)
-            if ( -m_speed <  m_max_speed->getCurrentMaxSpeed()
-                             *m_kart_properties->getEngineMaxSpeedReverseRatio())
+
+            // To determine what is the allowable max speed in reverse,
+            // we do some additional math to avoid ultra-slow-reverse (see #5021).
+            // This dampens the effect of max-speed penalties.
+            float max_speed_ratio = m_max_speed->getCurrentMaxSpeed()
+                                    / m_kart_properties->getEngineMaxSpeed();
+            float reverse_speed_ratio = m_kart_properties->getEngineMaxSpeedReverseRatio();
+            if (max_speed_ratio < 1.0f && reverse_speed_ratio < 1.0f)
+            {
+                // We want to ensure that reverse speed at a given slowdown level cannot
+                // exceed the forward max speed (limit A) and that it cannot exceed reverse speed
+                // at lower slowdown levels (limit B).
+                // We use two formulas. One guarantees the respect of limit A, and of limit B
+                // for values >= 0.5f ; the other formula guarantees the respect of limit B, and
+                // of limit A for values <= 0.5f. Both formulas transition smoothly at 0.5f.
+                float soft_ratio = reverse_speed_ratio * max_speed_ratio + (1.0f - max_speed_ratio);
+                float hard_ratio = reverse_speed_ratio * (2.0f - max_speed_ratio);
+                reverse_speed_ratio = std::min(soft_ratio, hard_ratio);
+            }
+
+            // When going backward, we apply the reverse gear ratio, unless
+            // the velocity is too high.
+            if ( -m_speed < m_max_speed->getCurrentMaxSpeed() * reverse_speed_ratio)
                 engine_power = -2 * base_engine_power;
             else  // -m_speed >= max speed on this terrain
                 engine_power = 0;
