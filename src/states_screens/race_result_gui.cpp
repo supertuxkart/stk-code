@@ -2199,6 +2199,7 @@ int RaceResultGUI::displayChallengeInfo(int x, int y, bool increase_density)
         return current_y;
     RaceManager::Difficulty difficulty = RaceManager::get()->getDifficulty();
     video::SColor win_color = video::SColor(255, 0, 255, 0);
+    video::SColor gp_neutral_color = video::SColor(255, 255, 255, 0);
     video::SColor lose_color = video::SColor(255, 255, 0, 0);
     video::SColor special_color = video::SColor(255, 0, 255, 255);
     AbstractKart* kart = World::getWorld()->getPlayerKart(0);
@@ -2206,14 +2207,20 @@ int RaceResultGUI::displayChallengeInfo(int x, int y, bool increase_density)
     bool position_passed = false;
     bool time_passed = false;
     bool energy_passed = false;
+    bool lower_rank_gp = false;
 
     if (is_gp)
     {
         // GP has no best while slower
         lose_all = true;
-        if (c_data->isGPFulfilled())
+
+        if (c_data->isGPFulfilled() != ChallengeData::GP_NONE)
         {
-            position_passed = true;
+            // If the player is first overall
+            if (RaceManager::get()->getLocalPlayerGPRank(0) == 0)
+                position_passed = true;
+            else
+                lower_rank_gp = true;
             time_passed = true;
             energy_passed = true;
         }
@@ -2233,7 +2240,8 @@ int RaceResultGUI::displayChallengeInfo(int x, int y, bool increase_density)
     bool all_passed = position_passed && time_passed && energy_passed;
 
     core::stringw text_string = all_passed ? _("You completed the challenge!") : _("You failed the challenge!");
-    video::SColor text_color = all_passed ? win_color : lose_color;
+    video::SColor text_color = all_passed    ? win_color :
+                               lower_rank_gp ? gp_neutral_color : lose_color;
 
     current_y += int(m_distance_between_meta_rows);
     
@@ -2253,7 +2261,8 @@ int RaceResultGUI::displayChallengeInfo(int x, int y, bool increase_density)
             r --;
 
         text_string = _("Required Rank: %i", r);
-        text_color = position_passed ? win_color : lose_color;
+        text_color = position_passed ? win_color :
+                     lower_rank_gp   ? gp_neutral_color : lose_color;
         
         the_font->draw(text_string, core::recti(x, current_y, UserConfigParams::m_width * 0.96f,
                        y + line_height), text_color, false, false, nullptr, true);
