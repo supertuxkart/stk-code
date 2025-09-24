@@ -283,6 +283,7 @@ bool ReplayPlay::addReplayFile(const std::string& fn, bool custom_replay, int ca
 
     rd.m_track = t;
 
+    rd.m_info = "";
     fgets(s, 1023, fd);
     if (sscanf(s, "info: %1023s", s1) == 1)
     {
@@ -370,6 +371,7 @@ void ReplayPlay::loadFile(bool second_replay)
                                                             .m_kart_list.size();
     unsigned int lines_to_skip = (rd.m_replay_version == 3) ? 7 : 10;
     lines_to_skip += (rd.m_replay_version == 3) ? num_kart : 2*num_kart;
+    lines_to_skip += (rd.m_info != "") ? 1 : 0;
 
     for (unsigned int i = 0; i < lines_to_skip; i++)
         fgets(s, 1023, fd);
