@@ -1383,11 +1383,9 @@ void Kart::setStartupBoost(uint8_t boost_level)
  */
 float Kart::getActualWheelForce()
 {
+    float gear_factor = 1.0;
     float extra_force = m_max_speed->getCurrentAdditionalEngineForce();
     assert(!std::isnan(extra_force));
-    const std::vector<float>& gear_ratio = m_kart_properties->getGearSwitchRatio();
-
-    float gear_factor = 1.0;
 
     // If the kart is reversing, 
     if (m_speed < 0 && m_controls.getBrake())
@@ -1397,6 +1395,7 @@ float Kart::getActualWheelForce()
     }
     else // Kart going forward, we use gears
     {
+        const std::vector<float>& gear_ratio = m_kart_properties->getGearSwitchRatio();
         for(unsigned int i=0; i<gear_ratio.size(); i++)
         {
             if(m_speed <= m_kart_properties->getEngineMaxSpeed() * gear_ratio[i])
@@ -1408,7 +1407,17 @@ float Kart::getActualWheelForce()
         }
     }
     assert(!std::isnan(m_kart_properties->getEnginePower()));
-    return m_kart_properties->getEnginePower() * gear_factor + extra_force;
+    float engine_power = m_kart_properties->getEnginePower() * gear_factor + extra_force;
+
+    // apply nitro boost if relevant
+    if(getSpeedIncreaseTicksLeft(MaxSpeed::MS_INCREASE_NITRO) > 0)
+        engine_power*= m_kart_properties->getNitroEngineMult();
+
+    // apply electro-shield engine boost if relevant
+    if(getSpeedIncreaseTicksLeft(MaxSpeed::MS_INCREASE_ELECTRO) > 0)
+        engine_power*= m_kart_properties->getElectroEngineMult();
+
+    return engine_power;
 }   // getActualWheelForce
 
 //-----------------------------------------------------------------------------
@@ -3197,9 +3206,8 @@ float Kart::applyAirFriction(float engine_power)
     // 1)This is the logical behavior
     // 2)That way, engine boosts remain useful at high speed
     // 3)It helps heavier karts, who have an higher engine power
-
     float sign = (getSpeed() < 0) ? -1.0f : 1.0f;
-    engine_power-=friction_intensity*sign;
+    engine_power -= friction_intensity*sign;
 
     return engine_power;
 } //applyAirFriction
@@ -3213,18 +3221,6 @@ void Kart::updateEnginePowerAndBrakes(int ticks)
     updateWeight();
     updateNitro(ticks);
     float engine_power = getActualWheelForce();
-
-    // apply nitro boost if relevant
-    if(getSpeedIncreaseTicksLeft(MaxSpeed::MS_INCREASE_NITRO) > 0)
-    {
-        engine_power*= m_kart_properties->getNitroEngineMult();
-    }
-
-    // apply electro-shield engine boost if relevant
-    if(getSpeedIncreaseTicksLeft(MaxSpeed::MS_INCREASE_ELECTRO) > 0)
-    {
-        engine_power*= m_kart_properties->getElectroEngineMult();
-    }
 
     // apply bubblegum physics if relevant
     if (m_bubblegum_ticks > 0)
@@ -3249,13 +3245,6 @@ void Kart::updateEnginePowerAndBrakes(int ticks)
         // going backwards)
         else if(m_speed < 0.0f)
             engine_power *= 4.0f;
-
-        // Lose some traction when skidding, to balance the advantage
-        if (m_controls.getSkidControl() &&
-            m_kart_properties->getSkidVisualTime() == 0)
-        {
-            engine_power *= 0.5f;
-        }
 
         // In case the acceleration value is analog,
         // moderate the engine power accordingly
@@ -3329,7 +3318,7 @@ void Kart::updateEnginePowerAndBrakes(int ticks)
 
         // If not giving power (forward or reverse gear) or braking, and speed is low
         // we are "parking" the kart, so in battle mode we can ambush people
-        if (!m_controls.getAccel() && std::abs(m_speed) < 5.0f)
+        if (!m_controls.getAccel() && std::abs(m_speed) < 3.0f)
             m_vehicle->setAllBrakes(20.0f);
         // Either all or no brake is set, so test only one to avoid
         // resetting all brakes most of the time.
@@ -3343,7 +3332,6 @@ void Kart::updateEnginePowerAndBrakes(int ticks)
     // An engine power of 0 keeps the kart speed constant
     // after correcting for the linear slowdown.
     engine_power = compensateLinearSlowdown(engine_power);
-
 
     applyEngineForce(engine_power);
 }   // updateEnginePowerAndBrakes
