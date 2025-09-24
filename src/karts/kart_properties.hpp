@@ -412,6 +412,7 @@ public:
 
     std::vector<float> getGearSwitchRatio() const;
     std::vector<float> getGearPowerIncrease() const;
+    float getGearReversePower() const;
 
     float getMass() const;
 

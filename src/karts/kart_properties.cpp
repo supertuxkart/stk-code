@@ -894,6 +894,12 @@ std::vector<float> KartProperties::getGearPowerIncrease() const
 }  // getGearPowerIncrease
 
 // ----------------------------------------------------------------------------
+float KartProperties::getGearReversePower() const
+{
+    return m_cached_characteristic->getGearReversePower();
+}  // getGearReversePower
+
+// ----------------------------------------------------------------------------
 float KartProperties::getMass() const
 {
     return m_cached_characteristic->getMass();

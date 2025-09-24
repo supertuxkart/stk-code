@@ -379,6 +379,8 @@ void XmlCharacteristic::load(const XMLNode *node)
             &m_values[GEAR_SWITCH_RATIO]);
         sub_node->get("power-increase",
             &m_values[GEAR_POWER_INCREASE]);
+        sub_node->get("reverse-power",
+            &m_values[GEAR_REVERSE_POWER]);
     }
 
     if (const XMLNode *sub_node = node->getNode("mass"))

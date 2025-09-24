@@ -1379,27 +1379,36 @@ void Kart::setStartupBoost(uint8_t boost_level)
 
 //-----------------------------------------------------------------------------
 /** Simulates gears by adjusting the force of the engine. It also takes the
- *  effect of the zipper into account.
+ *  effect of additional engine boost sources into account.
  */
 float Kart::getActualWheelForce()
 {
-    float add_force = m_max_speed->getCurrentAdditionalEngineForce();
-    assert(!std::isnan(add_force));
-    const std::vector<float>& gear_ratio=m_kart_properties->getGearSwitchRatio();
-    for(unsigned int i=0; i<gear_ratio.size(); i++)
+    float extra_force = m_max_speed->getCurrentAdditionalEngineForce();
+    assert(!std::isnan(extra_force));
+    const std::vector<float>& gear_ratio = m_kart_properties->getGearSwitchRatio();
+
+    float gear_factor = 1.0;
+
+    // If the kart is reversing, 
+    if (m_speed < 0 && m_controls.getBrake())
     {
-        if(m_speed <= m_kart_properties->getEngineMaxSpeed() * gear_ratio[i])
+        assert(!std::isnan(m_kart_properties->getGearReversePower()));
+        gear_factor = m_kart_properties->getGearReversePower();
+    }
+    else // Kart going forward, we use gears
+    {
+        for(unsigned int i=0; i<gear_ratio.size(); i++)
         {
-            assert(!std::isnan(m_kart_properties->getEnginePower()));
-            assert(!std::isnan(m_kart_properties->getGearPowerIncrease()[i]));
-            return m_kart_properties->getEnginePower()
-                 * m_kart_properties->getGearPowerIncrease()[i]
-                 + add_force;
+            if(m_speed <= m_kart_properties->getEngineMaxSpeed() * gear_ratio[i])
+            {
+                assert(!std::isnan(m_kart_properties->getGearPowerIncrease()[i]));
+                gear_factor = m_kart_properties->getGearPowerIncrease()[i];
+                break;
+            }
         }
     }
     assert(!std::isnan(m_kart_properties->getEnginePower()));
-    return m_kart_properties->getEnginePower() + add_force * 2;
-
+    return m_kart_properties->getEnginePower() * gear_factor + extra_force;
 }   // getActualWheelForce
 
 //-----------------------------------------------------------------------------
@@ -3244,7 +3253,9 @@ void Kart::updateEnginePowerAndBrakes(int ticks)
         // Lose some traction when skidding, to balance the advantage
         if (m_controls.getSkidControl() &&
             m_kart_properties->getSkidVisualTime() == 0)
+        {
             engine_power *= 0.5f;
+        }
 
         // In case the acceleration value is analog,
         // moderate the engine power accordingly
@@ -3303,10 +3314,11 @@ void Kart::updateEnginePowerAndBrakes(int ticks)
                 reverse_speed_ratio = std::min(soft_ratio, hard_ratio);
             }
 
-            // When going backward, we apply the reverse gear ratio, unless
-            // the velocity is too high.
+            // When going backward, we apply the reverse gear, unless exceeding the max reverse speed
+            // The reverse gear ratio is already applied to engine power in getActualWheelForce(),
+            // so we just make it negative so that it makes the kart go backwards.
             if ( -m_speed < m_max_speed->getCurrentMaxSpeed() * reverse_speed_ratio)
-                engine_power = -2 * base_engine_power;
+                engine_power = -base_engine_power;
             else  // -m_speed >= max speed on this terrain
                 engine_power = 0;
         }   // m_speed <00

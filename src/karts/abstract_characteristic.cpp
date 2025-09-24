@@ -101,6 +101,8 @@ AbstractCharacteristic::ValueType AbstractCharacteristic::getType(
         return TYPE_FLOAT_VECTOR;
     case GEAR_POWER_INCREASE:
         return TYPE_FLOAT_VECTOR;
+    case GEAR_REVERSE_POWER:
+        return TYPE_FLOAT;
     case MASS:
         return TYPE_FLOAT;
     case WHEELS_DAMPING_RELAXATION:
@@ -357,6 +359,8 @@ std::string AbstractCharacteristic::getName(CharacteristicType type)
         return "GEAR_SWITCH_RATIO";
     case GEAR_POWER_INCREASE:
         return "GEAR_POWER_INCREASE";
+    case GEAR_REVERSE_POWER:
+        return "GEAR_REVERSE_POWER";
     case MASS:
         return "MASS";
     case WHEELS_DAMPING_RELAXATION:
@@ -834,6 +838,18 @@ std::vector<float> AbstractCharacteristic::getGearPowerIncrease() const
                     getName(GEAR_POWER_INCREASE).c_str());
     return result;
 }  // getGearPowerIncrease
+
+// ----------------------------------------------------------------------------
+float AbstractCharacteristic::getGearReversePower() const
+{
+    float result;
+    bool is_set = false;
+    process(GEAR_REVERSE_POWER, &result, &is_set);
+    if (!is_set)
+        Log::fatal("AbstractCharacteristic", "Can't get characteristic %s",
+                    getName(GEAR_REVERSE_POWER).c_str());
+    return result;
+}  // getGearReversePower
 
 // ----------------------------------------------------------------------------
 float AbstractCharacteristic::getMass() const

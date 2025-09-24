@@ -102,15 +102,16 @@
                 time-full-brake="0.35" max-speed-reverse-ratio="0.48" />
 
         <!-- Simulated gears
-            switch-ratio defines at what ratio of the maximum
-                speed what gear is selected, e.g. 0.25 means that if the speed is
-                inferior or equal to 0.25 * maxSpeed then use gear 1, 0.5 means if
+            switch-ratio: defines at what ratio of the maximum
+                speed what gear is selected, e.g. "0.25 0.5" means that if the speed is
+                inferior or equal to 0.25 * maxSpeed then use gear 1, and if
                 the speed is inferior or equal to 0.5 x maxSpeed then gear 2.
-                gear-power-increase contains the increase in max power (to simulate
+            power-increase: contains the increase in max power (to simulate
                 different gears), e.g. 2.5 as first entry means: 2.5 * maxPower in gear 1
-                | first  | second |  third | . -->
-        <gear switch-ratio="0.2 0.45 0.7 1 1.25"
-              power-increase="2.5 2.1 1.7 1.4 1.2" />
+            reverse-power: contains the increase in max power in reverse gear -->
+        <gear switch-ratio="0.1 0.25 0.45 0.7 1 4"
+              power-increase="2.05 1.74 1.53 1.32 1.16 1"
+              reverse-power="4.1"/>
 
         <!-- Mass of a kart -->
         <mass value="350" />
@@ -416,7 +417,8 @@
             <engine power="*0.8" max-speed="*0.896"
                     max-speed-reverse-ratio="*1.15" />
             <gear switch-ratio="0.1 0.25 0.45 0.7 1.0 4.0"
-                  power-increase="2.95 2.42 1.99 1.56 1.28 1.0" />
+                  power-increase="2.95 2.42 1.99 1.56 1.28 1.0"
+                  reverse-power="5.9"/>
             <mass value="*0.6" />
             <skid reduce-turn-min="0.2" reduce-turn-max="0.895" bonus-force="*0.8 *0.8 *0.8" />
             <startup boost="*1 *1" />
@@ -432,7 +434,8 @@
             <engine power="*0.875" max-speed="*0.927"
                     max-speed-reverse-ratio="*1.075"/>
             <gear switch-ratio="0.1 0.25 0.45 0.7 1 4"
-                  power-increase="2.5 2.08 1.76 1.44 1.22 1" />
+                  power-increase="2.5 2.08 1.76 1.44 1.22 1"
+                  reverse-power="5.0"/>
             <mass value="*0.75" />
             <skid reduce-turn-min="0.2" reduce-turn-max="0.895" bonus-force="*0.875 *0.875 *0.875" 
                   time-till-bonus="*0.9 *0.9 *0.9" />
@@ -448,7 +451,8 @@
             <engine power="*0.875" max-speed="*0.948"
                     max-speed-reverse-ratio="*1.05"/>
             <gear switch-ratio="0.1 0.25 0.45 0.7 1 4"
-                  power-increase="2.5 2.08 1.76 1.44 1.22 1" />
+                  power-increase="2.5 2.08 1.76 1.44 1.22 1"
+                  reverse-power="5.0"/>
             <mass value="*0.75" />
             <skid reduce-turn-min="0.2475" reduce-turn-max="0.895" bonus-force="*0.875 *0.875 *0.875" />
             <startup boost="*0.875 *0.875" />
@@ -463,7 +467,8 @@
             <engine power="*1" max-speed="*1"
                     max-speed-reverse-ratio="*1" />
             <gear switch-ratio="0.1 0.25 0.45 0.7 1 4"
-                  power-increase="2.05 1.74 1.53 1.32 1.16 1" />
+                  power-increase="2.05 1.74 1.53 1.32 1.16 1"
+                  reverse-power="4.1"/>
             <mass value="*1" />
             <skid reduce-turn-min="0.285" reduce-turn-max="0.895" bonus-force="*1.0 *1.0 *1.0" />
             <startup boost="*0.8 *0.8" />

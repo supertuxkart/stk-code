@@ -103,6 +103,7 @@ public:
         // Gear
         GEAR_SWITCH_RATIO,
         GEAR_POWER_INCREASE,
+        GEAR_REVERSE_POWER,
 
         // Mass
         MASS,
@@ -300,6 +301,7 @@ public:
 
     std::vector<float> getGearSwitchRatio() const;
     std::vector<float> getGearPowerIncrease() const;
+    float getGearReversePower() const;
 
     float getMass() const;
 
