@@ -98,7 +98,7 @@
                 max speed penalties. It is otherwise adjusted in code to dampen
                 the effects of e.g. terrain penalties.
           -->
-        <engine power="975" max-speed="27.75" generic-max-speed="27.75" brake-factor="36"
+        <engine power="1175" max-speed="27.75" generic-max-speed="27.75" brake-factor="36"
                 time-full-brake="0.35" max-speed-reverse-ratio="0.48" />
 
         <!-- Simulated gears
@@ -174,7 +174,7 @@
               visual="1.25" visual-time="0.7" revert-visual-time="0.7"
               min-speed="10"  time-till-bonus="1.0 2.7 4.0"
               bonus-speed="4.0 6.0 8.0" bonus-time="3.2 4.2 5.6"
-              fade-out-time="0.9 1.1 1.3" bonus-force="300 420 600"
+              fade-out-time="0.9 1.1 1.3" bonus-force="100 220 400"
               physical-jump-time="0" graphical-jump-time="0.4"
               post-skid-rotate-factor="1"
               reduce-turn-min="0.2" reduce-turn-max="0.895" enabled="true" />
@@ -417,8 +417,8 @@
             <engine power="*0.8" max-speed="*0.896"
                     max-speed-reverse-ratio="*1.15" />
             <gear switch-ratio="0.1 0.25 0.45 0.7 1.0 4.0"
-                  power-increase="2.95 2.42 1.99 1.56 1.28 1.0"
-                  reverse-power="5.9"/>
+                  power-increase="2.4 2.18 1.82 1.47 1.24 1.0"
+                  reverse-power="5.0"/>
             <mass value="*0.6" />
             <skid reduce-turn-min="0.2" reduce-turn-max="0.895" bonus-force="*0.8 *0.8 *0.8" />
             <startup boost="*1 *1" />
@@ -434,8 +434,8 @@
             <engine power="*0.875" max-speed="*0.927"
                     max-speed-reverse-ratio="*1.075"/>
             <gear switch-ratio="0.1 0.25 0.45 0.7 1 4"
-                  power-increase="2.5 2.08 1.76 1.44 1.22 1"
-                  reverse-power="5.0"/>
+                  power-increase="2.27 1.9 1.63 1.37 1.18 1"
+                  reverse-power="4.25"/>
             <mass value="*0.75" />
             <skid reduce-turn-min="0.2" reduce-turn-max="0.895" bonus-force="*0.875 *0.875 *0.875" 
                   time-till-bonus="*0.9 *0.9 *0.9" />
@@ -451,8 +451,8 @@
             <engine power="*0.875" max-speed="*0.948"
                     max-speed-reverse-ratio="*1.05"/>
             <gear switch-ratio="0.1 0.25 0.45 0.7 1 4"
-                  power-increase="2.5 2.08 1.76 1.44 1.22 1"
-                  reverse-power="5.0"/>
+                  power-increase="2.27 1.9 1.63 1.37 1.18 1"
+                  reverse-power="4.25"/>
             <mass value="*0.75" />
             <skid reduce-turn-min="0.2475" reduce-turn-max="0.895" bonus-force="*0.875 *0.875 *0.875" />
             <startup boost="*0.875 *0.875" />
@@ -467,8 +467,8 @@
             <engine power="*1" max-speed="*1"
                     max-speed-reverse-ratio="*1" />
             <gear switch-ratio="0.1 0.25 0.45 0.7 1 4"
-                  power-increase="2.05 1.74 1.53 1.32 1.16 1"
-                  reverse-power="4.1"/>
+                  power-increase="2.05 1.62 1.44 1.27 1.14 1"
+                  reverse-power="3.5"/>
             <mass value="*1" />
             <skid reduce-turn-min="0.285" reduce-turn-max="0.895" bonus-force="*1.0 *1.0 *1.0" />
             <startup boost="*0.8 *0.8" />
