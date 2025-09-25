@@ -163,6 +163,7 @@ void ItemState::collected(const Kart *kart)
                 break;
             case ITEM_NITRO_BIG:
             case ITEM_NITRO_SMALL:
+            case ITEM_NITRO_AIR:
                 m_ticks_till_return = stk_config->m_nitro_item_return_ticks;
                 break;
             case ITEM_BANANA:

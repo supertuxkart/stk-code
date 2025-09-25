@@ -571,6 +571,8 @@ void XmlCharacteristic::load(const XMLNode *node)
             &m_values[NITRO_SMALL_CONTAINER]);
         sub_node->get("big-container",
             &m_values[NITRO_BIG_CONTAINER]);
+        sub_node->get("air-container",
+            &m_values[NITRO_AIR_CONTAINER]);
         sub_node->get("max-speed-increase",
             &m_values[NITRO_MAX_SPEED_INCREASE]);
         sub_node->get("min-burst",

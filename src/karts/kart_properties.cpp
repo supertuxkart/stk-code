@@ -1266,6 +1266,12 @@ float KartProperties::getNitroBigContainer() const
 }  // getNitroBigContainer
 
 // ----------------------------------------------------------------------------
+float KartProperties::getNitroAirContainer() const
+{
+    return m_cached_characteristic->getNitroAirContainer();
+}  // getNitroAirContainer
+
+// ----------------------------------------------------------------------------
 float KartProperties::getNitroMaxSpeedIncrease() const
 {
     return m_cached_characteristic->getNitroMaxSpeedIncrease();

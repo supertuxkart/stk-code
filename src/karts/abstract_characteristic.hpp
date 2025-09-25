@@ -199,6 +199,7 @@ public:
         NITRO_CONSUMPTION,
         NITRO_SMALL_CONTAINER,
         NITRO_BIG_CONTAINER,
+        NITRO_AIR_CONTAINER,
         NITRO_MAX_SPEED_INCREASE,
         NITRO_MIN_BURST,
         NITRO_FADE_OUT_TIME,
@@ -380,6 +381,7 @@ public:
     float getNitroConsumption() const;
     float getNitroSmallContainer() const;
     float getNitroBigContainer() const;
+    float getNitroAirContainer() const;
     float getNitroMaxSpeedIncrease() const;
     float getNitroMinBurst() const;
     float getNitroFadeOutTime() const;

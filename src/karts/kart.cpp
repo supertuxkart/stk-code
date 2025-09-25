@@ -1290,6 +1290,9 @@ void Kart::collectedItem(ItemState *item_state)
     case Item::ITEM_NITRO_SMALL:
         m_collected_energy += m_kart_properties->getNitroSmallContainer();
         break;
+    case Item::ITEM_NITRO_AIR:
+        m_collected_energy += m_kart_properties->getNitroAirContainer();
+        break;
     case Item::ITEM_NITRO_BIG:
         m_collected_energy += m_kart_properties->getNitroBigContainer();
         break;

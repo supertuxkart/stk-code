@@ -225,6 +225,8 @@ AbstractCharacteristic::ValueType AbstractCharacteristic::getType(
         return TYPE_FLOAT;
     case NITRO_BIG_CONTAINER:
         return TYPE_FLOAT;
+    case NITRO_AIR_CONTAINER:
+        return TYPE_FLOAT;
     case NITRO_MAX_SPEED_INCREASE:
         return TYPE_FLOAT;
     case NITRO_MIN_BURST:
@@ -483,6 +485,8 @@ std::string AbstractCharacteristic::getName(CharacteristicType type)
         return "NITRO_SMALL_CONTAINER";
     case NITRO_BIG_CONTAINER:
         return "NITRO_BIG_CONTAINER";
+    case NITRO_AIR_CONTAINER:
+        return "NITRO_AIR_CONTAINER";
     case NITRO_MAX_SPEED_INCREASE:
         return "NITRO_MAX_SPEED_INCREASE";
     case NITRO_MIN_BURST:
@@ -1582,6 +1586,18 @@ float AbstractCharacteristic::getNitroBigContainer() const
                     getName(NITRO_BIG_CONTAINER).c_str());
     return result;
 }  // getNitroBigContainer
+
+// ----------------------------------------------------------------------------
+float AbstractCharacteristic::getNitroAirContainer() const
+{
+    float result;
+    bool is_set = false;
+    process(NITRO_AIR_CONTAINER, &result, &is_set);
+    if (!is_set)
+        Log::fatal("AbstractCharacteristic", "Can't get characteristic %s",
+                    getName(NITRO_AIR_CONTAINER).c_str());
+    return result;
+}  // getNitroAirContainer
 
 // ----------------------------------------------------------------------------
 float AbstractCharacteristic::getNitroMaxSpeedIncrease() const

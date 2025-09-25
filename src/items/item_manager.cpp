@@ -79,6 +79,7 @@ void ItemManager::loadDefaultItemMeshes()
     item_names[ItemState::ITEM_BONUS_BOX      ] = "bonus-box";
     item_names[ItemState::ITEM_NITRO_BIG      ] = "nitro-big";
     item_names[ItemState::ITEM_NITRO_SMALL    ] = "nitro-small";
+    item_names[ItemState::ITEM_NITRO_AIR      ] = "nitro-air";
     item_names[ItemState::ITEM_BUBBLEGUM      ] = "bubblegum";
     item_names[ItemState::ITEM_BUBBLEGUM_NOLOK] = "bubblegum-nolok";
     item_names[ItemState::ITEM_BUBBLEGUM_SMALL] = "bubblegum-small";

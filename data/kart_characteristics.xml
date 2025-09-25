@@ -330,6 +330,7 @@
                 to need more nitro than lighter character.
             small-container: how much energy a small container gives.
             big-container: how much energy a big container gives.
+            air-container: how much energy an air container gives.
             max-speed-increase: How much the speed of a kart might exceed
                 its maximum speed (in m/s).
             min-burst: The minimum duration of a nitro burst,
@@ -340,7 +341,7 @@
                 speed due to nitro fades out.
             max: How much nitro a kart can store. -->
         <nitro engine-force="350" engine-mult="1.2" consumption="1"
-               small-container="1" big-container="2.5"
+               small-container="1" big-container="2.5" air-container="1.5"
                max-speed-increase="5" min-burst="0.5" duration="0.9"
                fade-out-time="1.45" max="20" />
 

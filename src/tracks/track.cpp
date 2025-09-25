@@ -2334,9 +2334,9 @@ void Track::loadTrackModel(bool reverse_track, unsigned int mode_id)
         {
             const XMLNode *node = root->getNode(i);
             const std::string &name = node->getName();
-            if (name=="banana"      || name=="item"      ||
-                name=="small-nitro" || name=="big-nitro" ||
-                name=="easter-egg"                           )
+            if (name == "banana"      || name == "item"      ||
+                name == "small-nitro" || name == "big-nitro" ||
+                name == "air-nitro"   || name == "easter-egg")
             {
                 itemCommand(node);
             }
@@ -2446,8 +2446,8 @@ void Track::loadObjects(const XMLNode* root, const std::string& path,
         }
         else if (name == "banana"      || name == "item" ||
                  name == "small-nitro" || name == "big-nitro" ||
-                 name == "easter-egg"  || name == "red-flag" ||
-                 name == "blue-flag")
+                 name == "air-nitro"   || name == "easter-egg" ||
+                 name == "red-flag"    || name == "blue-flag")
         {
             // will be handled later
         }
@@ -2762,6 +2762,7 @@ void Track::itemCommand(const XMLNode *node)
     if     (name=="banana"     ) type = Item::ITEM_BANANA;
     else if(name=="item"       ) type = Item::ITEM_BONUS_BOX;
     else if(name=="small-nitro") type = Item::ITEM_NITRO_SMALL;
+    else if(name=="air-nitro")   type = Item::ITEM_NITRO_AIR;
     else if(name=="easter-egg" ) type = Item::ITEM_EASTER_EGG;
     else                         type = Item::ITEM_NITRO_BIG;
     Vec3 xyz;

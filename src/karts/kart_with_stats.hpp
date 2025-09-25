@@ -52,6 +52,9 @@ private:
     /** How many small nitro tanks were taken */
     unsigned int m_small_nitro_count;
 
+    /** How many small nitro tanks were taken */
+    unsigned int m_air_nitro_count;
+
     /** How many large nitro tanks were taken */
     unsigned int m_large_nitro_count;
 
@@ -107,6 +110,9 @@ public:
     // ------------------------------------------------------------------------
     /** Returns the number of small nitro tanks that were taken */
     unsigned int getSmallNitroCount() const { return m_small_nitro_count; }
+    // ------------------------------------------------------------------------
+    /** Returns the number of air nitro tanks that were taken */
+    unsigned int getAirNitroCount() const { return m_air_nitro_count; }
     // ------------------------------------------------------------------------
     /** Returns the number of large nitro tanks that were taken */
     unsigned int getLargeNitroCount() const { return m_large_nitro_count; }

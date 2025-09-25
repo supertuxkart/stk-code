@@ -491,6 +491,7 @@ public:
     float getNitroConsumption() const;
     float getNitroSmallContainer() const;
     float getNitroBigContainer() const;
+    float getNitroAirContainer() const;
     float getNitroMaxSpeedIncrease() const;
     float getNitroMinBurst() const; 
     float getNitroFadeOutTime() const;

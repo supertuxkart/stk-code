@@ -66,6 +66,7 @@ public:
         ITEM_BANANA,
         ITEM_NITRO_BIG,
         ITEM_NITRO_SMALL,
+        ITEM_NITRO_AIR,
         ITEM_BUBBLEGUM,
         ITEM_BUBBLEGUM_NOLOK,
         ITEM_BUBBLEGUM_SMALL,
