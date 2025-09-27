@@ -43,6 +43,7 @@ void setVideoDriver(irr::video::IVideoDriver* driver)
     {
         // Reset everytime driver is recreated
         g_config.m_ondemand_load_texture_paths.clear();
+        g_config.m_auto_deferred_type = GADT_DISABLED;
         g_driver = driver;
     }
 }
