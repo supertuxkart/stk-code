@@ -1613,7 +1613,7 @@ void GEVulkanDrawCall::createVulkanData()
     // Use VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT | VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT
     // or a staging buffer when buffer is small
     m_dynamic_data = new GEVulkanDynamicBuffer(flags,
-        extra_size + sizeof(GEVulkanCameraUBO) + sizeof(GEGlobalLightBuffer),
+        extra_size + getLightDataOffset() + sizeof(GEGlobalLightBuffer),
         GEVulkanDriver::getMaxFrameInFlight() + 1,
         GEVulkanDynamicBuffer::supportsHostTransfer() ? 0 :
         GEVulkanDriver::getMaxFrameInFlight() + 1);
