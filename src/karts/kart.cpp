@@ -1372,11 +1372,17 @@ void Kart::setStartupBoostFromStartTicks(int ticks)
 void Kart::setStartupBoost(uint8_t boost_level)
 {
     std::vector<float> startup_times = m_kart_properties->getStartupTime();
-    int index = m_kart_properties->getStartupTime().size() - boost_level + 1;
-    assert(index >= 0 && index <= (int)m_kart_properties->getStartupTime().size());
 
-    m_startup_boost = m_kart_properties->getStartupBoost()[index];
-    m_startup_engine_force = m_kart_properties->getStartupEngineForce()[index];
+    if (boost_level >= 2) {
+        int index = m_kart_properties->getStartupTime().size() - boost_level + 1;
+        assert(index >= 0 && index < (int)m_kart_properties->getStartupTime().size());
+        m_startup_boost = m_kart_properties->getStartupBoost()[index];
+        m_startup_engine_force = m_kart_properties->getStartupEngineForce()[index];
+    } else {
+        m_startup_boost = 0;
+        m_startup_engine_force = 0;
+    }
+
     m_startup_boost_level = boost_level;
 }   // setStartupBoost
 
