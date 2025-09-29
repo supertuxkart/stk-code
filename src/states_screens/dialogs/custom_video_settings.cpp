@@ -45,7 +45,7 @@ CustomVideoSettingsDialog::CustomVideoSettingsDialog(const float w, const float 
         ModalDialog(w, h)
 {
     loadFromFile("custom_video_settings.stkgui");
-    updateActivation();
+    updateActivation("");
 }
 
 // -----------------------------------------------------------------------------
@@ -123,14 +123,56 @@ void CustomVideoSettingsDialog::beforeAddingWidgets()
         cb_tex_cmp->setState(false);
         cb_tex_cmp->setActive(false);
     }
+
+    GUIEngine::SpinnerWidget* rds = getWidget<GUIEngine::SpinnerWidget>("render_driver");
+    assert( rds != NULL );
+
+    rds->m_properties[PROP_WRAP_AROUND] = "true";
+    rds->clearLabels();
+    rds->addLabel("OpenGL");
+    rds->addLabel("Vulkan");
+#ifndef WIN32
+    const int rd_count = 2;
+#else
+    const int rd_count = 3;
+    rds->addLabel("DirectX9");
 #endif
-}
+    bool found = false;
+    for (int i = 0; i < rd_count; i++)
+    {
+        std::string rd = StringUtils::wideToUtf8(rds->getStringValueFromID(i).make_lower());
+        if (std::string(UserConfigParams::m_render_driver) == rd)
+        {
+            rds->setValue(i);
+            found = true;
+            break;
+        }
+    }
+    if (!found)
+    {
+        rds->addLabel(StringUtils::utf8ToWide(UserConfigParams::m_render_driver));
+        rds->setValue(rd_count);
+    }
+    rds->setActive(StateManager::get()->getGameState() != GUIEngine::INGAME_MENU);
+#endif
+} // beforeAddingWidgets
 
 // -----------------------------------------------------------------------------
 
 GUIEngine::EventPropagation CustomVideoSettingsDialog::processEvent(const std::string& eventSource)
 {
 #ifndef SERVER_ONLY
+    if (eventSource == "render_driver")
+    {
+        // We will only update settings if the changed renderer is
+        // kept when the players chooses to apply the new config
+        // However, we immediately update the GUI to show which
+        // advanced settings are available or not with the chosen renderer
+        std::string rd = StringUtils::wideToUtf8(
+            getWidget<GUIEngine::SpinnerWidget>("render_driver")->getStringValue().make_lower());
+
+        updateActivation(rd);
+    }
     if (eventSource == "buttons")
     {
         const std::string& selection = getWidget<RibbonWidget>("buttons")->
@@ -161,7 +203,7 @@ GUIEngine::EventPropagation CustomVideoSettingsDialog::processEvent(const std::s
                     getWidget<SpinnerWidget>("shadows")->getValue() == 2 ? 1024 :
                     getWidget<SpinnerWidget>("shadows")->getValue() >= 3 ? 2048 : 0;
                 UserConfigParams::m_pcss = 
-                    getWidget<SpinnerWidget>("shadows")->getValue() == 3 ? false : true;
+                    getWidget<SpinnerWidget>("shadows")->getValue() == 4 ? true : false;
             }
             else
             {
@@ -211,6 +253,16 @@ GUIEngine::EventPropagation CustomVideoSettingsDialog::processEvent(const std::s
                 getWidget<SpinnerWidget>("geometry_detail")->getValue();;
             int quality = getWidget<SpinnerWidget>("image_quality")->getValue();
 
+            std::string rd = StringUtils::wideToUtf8(
+                getWidget<GUIEngine::SpinnerWidget>("render_driver")->getStringValue().make_lower());
+
+            bool need_restart = false;
+            if (std::string(UserConfigParams::m_render_driver) != rd)
+            {
+                UserConfigParams::m_render_driver = rd;
+                need_restart = true;
+            }
+
             user_config->saveConfig();
 
             ModalDialog::dismiss();
@@ -227,6 +279,10 @@ GUIEngine::EventPropagation CustomVideoSettingsDialog::processEvent(const std::s
             // sameRestart will have the same effect
             if (!(CVS->isGLSL() && pbr_changed))
                 OptionsScreenVideo::setImageQuality(quality, force_reload_texture);
+
+            if (need_restart)
+                irr_driver->fullRestart();
+
             return GUIEngine::EVENT_BLOCK;
         }
         else if (selection == "cancel")
@@ -237,7 +293,7 @@ GUIEngine::EventPropagation CustomVideoSettingsDialog::processEvent(const std::s
     }
     else if (eventSource == "dynamiclight")
     {
-        updateActivation();
+        updateActivation("");
     }
 #endif
     return GUIEngine::EVENT_LET;
@@ -245,19 +301,43 @@ GUIEngine::EventPropagation CustomVideoSettingsDialog::processEvent(const std::s
 
 // -----------------------------------------------------------------------------
 
-void CustomVideoSettingsDialog::updateActivation()
+void CustomVideoSettingsDialog::updateActivation(const std::string& renderer)
 {
 #ifndef SERVER_ONLY
     bool light = getWidget<CheckBoxWidget>("dynamiclight")->getState();
     bool real_light = light;
-    if (!CVS->isGLSL())
+    bool vk = GE::getDriver()->getDriverType() == video::EDT_VULKAN;
+    bool modern_gl = CVS->isGLSL();
+
+    // If showing enabled options for a specific renderer has
+    // been requested, prioritize that
+    if (renderer == "vulkan")
+    {
+        vk = true;
+        modern_gl = false;
+    }
+    else if (renderer != "") // OpenGL or DirectX
+    {
+        vk = false;
+
+        if (renderer == "opengl" && !UserConfigParams::m_force_legacy_device)
+            modern_gl = true;
+        else
+            modern_gl = false;
+    }
+
+    // Disable the options for advanced lighting if unavailable for this renderer
+    if (!vk && !modern_gl)
     {
         getWidget<CheckBoxWidget>("dynamiclight")->setActive(false);
         light = false;
     }
-    bool vk = GE::getDriver()->getDriverType() == video::EDT_VULKAN;
+
     if (vk)
+    {
         getWidget<CheckBoxWidget>("dynamiclight")->setActive(true);
+        light = false;
+    }
     getWidget<CheckBoxWidget>("motionblur")->setActive(light);
     getWidget<CheckBoxWidget>("dof")->setActive(light);
     getWidget<SpinnerWidget>("shadows")->setActive(light);

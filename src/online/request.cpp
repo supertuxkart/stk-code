@@ -19,10 +19,6 @@
 #include "config/user_config.hpp"
 #include "online/request_manager.hpp"
 
-#ifdef WIN32
-#  include <winsock2.h>
-#endif
-
 #include <assert.h>
 
 namespace Online

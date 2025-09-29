@@ -1774,6 +1774,7 @@ void ServerLobby::registerServer(bool first_time)
     const std::string& pw = ServerConfig::m_private_server_password;
     request->addParameter("password", (unsigned)(!pw.empty()));
     request->addParameter("version", (unsigned)ServerConfig::m_server_version);
+    request->addParameter("aes_gcm_128bit_tag", 1);
 
     bool ipv6_only = addr.isUnset();
     if (!ipv6_only)
@@ -2708,6 +2709,16 @@ void ServerLobby::connectionRequested(Event* event)
     bool duplicated_ranked_player =
         all_online_ids.find(online_id) != all_online_ids.end();
 
+    bool unsupported_aes_mode = false;
+#ifndef CRYPTO_AES_GCM_32BIT_TAG
+    const std::set<std::string>& peer_caps = event->getPeer()->getClientCapabilities();
+    if (encrypted_size != 0 && peer_caps.find("aes_gcm_128bit_tag") == peer_caps.end())
+    {
+        unsupported_aes_mode = true;
+        Log::verbose("ServerLobby", "This binary doesn't support AES GCM 32bit tag");
+    }
+#endif
+
     if (((encrypted_size == 0 || online_id == 0) &&
         !(peer->getAddress().isPublicAddressLocalhost() ||
         peer->getAddress().isLAN()) &&
@@ -2717,7 +2728,8 @@ void ServerLobby::connectionRequested(Event* event)
         (player_count != 1 || online_id == 0 || duplicated_ranked_player)) ||
         (peer->isAIPeer() && !peer->getAddress().isLAN() &&!ServerConfig::m_ai_anywhere) ||
         (peer->isAIPeer() &&
-        ServerConfig::m_ai_handling && !m_ai_peer.expired()))
+        ServerConfig::m_ai_handling && !m_ai_peer.expired()) ||
+        unsupported_aes_mode)
     {
         NetworkString* message = getNetworkString(2);
         message->setSynchronous(true);
@@ -3549,8 +3561,10 @@ bool ServerLobby::decryptConnectionRequest(std::shared_ptr<STKPeer> peer,
     uint32_t online_id, const core::stringw& online_name,
     const std::string& country_code)
 {
+    const std::set<std::string>& caps = peer->getClientCapabilities();
+    const size_t tag_size = caps.find("aes_gcm_128bit_tag") == caps.end() ? 4 : 16;
     auto crypto = std::unique_ptr<Crypto>(new Crypto(
-        Crypto::decode64(key), Crypto::decode64(iv)));
+        Crypto::decode64(key), Crypto::decode64(iv), tag_size));
     if (crypto->decryptConnectionRequest(data))
     {
         peer->setCrypto(std::move(crypto));

@@ -1,5 +1,5 @@
 layout(binding = 0) uniform sampler2D u_displace_mask;
-layout(binding = 2) uniform sampler2D u_displace_color;
+layout(binding = 1) uniform sampler2D u_displace_color;
 
 layout(location = 0) in vec2 f_uv;
 

@@ -281,7 +281,8 @@ void resizeSkinning(unsigned number)
             g_joint_ptr = (std::array<float, 16>*)glMapBufferRange(
                 GL_TEXTURE_BUFFER, 0, 64,
                 GL_MAP_WRITE_BIT | GL_MAP_PERSISTENT_BIT | GL_MAP_COHERENT_BIT);
-            memcpy(g_joint_ptr, m.pointer(), 64);
+            if (g_joint_ptr)
+                memcpy(g_joint_ptr, m.pointer(), 64);
             glUnmapBuffer(GL_TEXTURE_BUFFER);
             g_joint_ptr = (std::array<float, 16>*)glMapBufferRange(
                 GL_TEXTURE_BUFFER, 64, (number - 1) << 6,
@@ -1174,20 +1175,23 @@ void uploadSkinningMatrices()
     }
 #endif
 
-    for (unsigned i = 0; i < g_skinning_mesh.size(); i++)
+    if (g_joint_ptr)
     {
-        memcpy(g_joint_ptr + buffer_offset,
-            g_skinning_mesh[i]->getSkinningMatrices(),
-            g_skinning_mesh[i]->getTotalJoints() * 64);
-        buffer_offset += g_skinning_mesh[i]->getTotalJoints();
-    }
-
-    if (!skinningUseTBO())
-    {
-        glBindTexture(GL_TEXTURE_2D, g_skinning_tex);
-        glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 1, 4, buffer_offset, GL_RGBA,
-            GL_FLOAT, g_joint_ptr);
-        glBindTexture(GL_TEXTURE_2D, 0);
+        for (unsigned i = 0; i < g_skinning_mesh.size(); i++)
+        {
+            memcpy(g_joint_ptr + buffer_offset,
+                g_skinning_mesh[i]->getSkinningMatrices(),
+                g_skinning_mesh[i]->getTotalJoints() * 64);
+            buffer_offset += g_skinning_mesh[i]->getTotalJoints();
+        }
+    
+        if (!skinningUseTBO())
+        {
+            glBindTexture(GL_TEXTURE_2D, g_skinning_tex);
+            glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 1, 4, buffer_offset, GL_RGBA,
+                GL_FLOAT, g_joint_ptr);
+            glBindTexture(GL_TEXTURE_2D, 0);
+        }
     }
     
 #ifndef USE_GLES2

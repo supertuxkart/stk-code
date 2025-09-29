@@ -25,11 +25,11 @@ private:
     GEVulkanArrayTexture *m_texture_cubemap, *m_diffuse_env_cubemap,
         *m_specular_env_cubemap, *m_dummy_env_cubemap;
 
-    VkDescriptorSetLayout m_env_descriptor_layout;
+    VkDescriptorSetLayout m_descriptor_layout;
 
     VkDescriptorPool m_descriptor_pool;
 
-    std::array<VkDescriptorSet, 2> m_env_descriptor_set;
+    std::array<VkDescriptorSet, 4> m_descriptor_sets;
 
     std::atomic_bool m_skybox_loading, m_env_cubemap_loading;
 
@@ -42,10 +42,23 @@ public:
     // ------------------------------------------------------------------------
     void addSkyBox(irr::scene::ISceneNode* node);
     // ------------------------------------------------------------------------
-    VkDescriptorSetLayout getEnvDescriptorSetLayout() const
-                                            { return m_env_descriptor_layout; }
+    VkDescriptorSetLayout getDescriptorSetLayout() const
+                                                { return m_descriptor_layout; }
     // ------------------------------------------------------------------------
-    const VkDescriptorSet* getEnvDescriptorSet() const;
+    const VkDescriptorSet* getIBLDescriptorSet() const
+    {
+        if (m_skybox == NULL || m_skybox_loading.load() == true ||
+            m_env_cubemap_loading.load() == true)
+            return &m_descriptor_sets[0];
+        return &m_descriptor_sets[1];
+    }
+    // ------------------------------------------------------------------------
+    const VkDescriptorSet* getSkyBoxDescriptorSet(bool srgb = false) const
+    {
+        if (m_skybox == NULL || m_skybox_loading.load())
+            return &m_descriptor_sets[0];
+        return srgb ? &m_descriptor_sets[3] : &m_descriptor_sets[2];
+    }
     // ------------------------------------------------------------------------
     void reset()
     {

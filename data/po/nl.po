@@ -6,7 +6,7 @@
 # David Blaszyk <david@sudomail.ne.jp>, 2017
 # Dennis Holierhoek <dennis.hh@hotmail.com>, 2016
 # Frans van Rijn <asciimonster@yahoo.co.uk>, 2015-2016
-# Heimen Stoffels <vistausss@fastmail.com>, 2021-2024
+# Heimen Stoffels <vistausss@fastmail.com>, 2021-2025
 # Heimen Stoffels <vistausss@fastmail.com>, 2019-2021
 # Steven van Tetering <steven.van.tetering@gmail.com>, 2019
 # Ward Muylaert <ward.muylaert@gmail.com>, 2015-2017
@@ -18,7 +18,7 @@ msgstr ""
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2024-10-29 22:11+0100\n"
 "PO-Revision-Date: 2015-02-15 01:58+0000\n"
-"Last-Translator: Heimen Stoffels <vistausss@fastmail.com>, 2021-2024\n"
+"Last-Translator: Heimen Stoffels <vistausss@fastmail.com>, 2021-2025\n"
 "Language-Team: Dutch (http://app.transifex.com/supertuxkart/supertuxkart/language/nl/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -130,7 +130,7 @@ msgstr "Echt waar… een geheim."
 
 #. I18N: ./data/achievements.xml
 msgid "Mosquito Hunter"
-msgstr "Muggenjager"
+msgstr "Muggenverdelger"
 
 #. I18N: ./data/achievements.xml
 msgid ""
@@ -1512,7 +1512,7 @@ msgstr "* Bekijk en/of wijzig de huidige toetsinstellingen in het instellingenme
 
 #. I18N: ./data/gui/screens/help/help2.stkgui
 msgid "SuperTuxKart features several game modes:"
-msgstr "SuperTuxKart bevat meerdere spelvormen:"
+msgstr "SuperTuxKart kent meerdere spelvormen:"
 
 #. I18N: ./data/gui/screens/help/help2.stkgui
 #. I18N: In the help menu
@@ -1584,13 +1584,13 @@ msgstr "Om je te helpen, kun je deze bonusitems verzamelen en gebruiken:"
 msgid ""
 "BubbleGum - protect yourself with a shield, or use while looking back to "
 "leave a sticky pink puddle behind you."
-msgstr "Kauwgom: bescherm jezelf met een schild, of gebruik het terwijl je achterom kijkt om een kleverige plakboel achter te laten."
+msgstr "Kauwgom: bescherm jezelf met een schild of gebruik terwijl je achterom kijkt om een kleverige plakboel achter te laten."
 
 #. I18N: ./data/gui/screens/help/help3.stkgui
 msgid ""
 "Zipper - will give you a strong speed boost. But beware of not losing "
 "control of your kart!"
-msgstr "Rits: geeft je een enorme snelheidsverhoging. Maar zorg dat je niet de controle over je kart verliest!"
+msgstr "Rits: geeft je een enorme snelheidsverhoging, maar zorg dat je niet de controle over je kart verliest!"
 
 #. I18N: ./data/gui/screens/help/help3.stkgui
 msgid ""
@@ -1602,7 +1602,7 @@ msgstr "Muffin: wordt naar de dichtstbijzijnde kart gegooid. Handig op rechte st
 msgid ""
 "Plunger - throw straight to pull an opponent back, or throw while looking "
 "back to make one lose sight."
-msgstr "Plopper: gooi vooruit om je aan je tegenstander op te trekken of achteruit om zijn zicht te benemen."
+msgstr "Plopper: gooi vooruit om je aan je tegenstander op te trekken of achteruit om diens zicht te benemen."
 
 #. I18N: ./data/gui/screens/help/help3.stkgui
 msgid ""
@@ -1636,7 +1636,7 @@ msgstr "Vliegenmepper: plet karts naast je, waardoor ze langzamer gaan rijden, o
 msgid ""
 "Hitting a banana can result in one of the following being attached to the "
 "kart:"
-msgstr "Als je op een bananenschil terechtkomt, dan kan er één van de volgende voorwerpen aan je kart worden gehangen:"
+msgstr "Als je op een bananenschil terechtkomt, dan kan er een van de volgende voorwerpen aan je kart worden gehangen:"
 
 #. I18N: ./data/gui/screens/help/help4.stkgui
 #. I18N: In the help menu
@@ -1655,7 +1655,7 @@ msgstr "Parachute: vertraagt de kart, maar minder dan het anker. Hoe harder je r
 msgid ""
 "Bomb - detonates after some amount of time, throwing the kart up in the air."
 " Bump into another kart to transfer the bomb to it."
-msgstr "Dynamiet: ontploft na een tijdje en gooit je kart de lucht in. Bots tegen een andere kart om de bom aan een andere speler te geven."
+msgstr "Dynamiet: ontploft na een tijdje en gooit je kart de lucht in. Bots tegen een andere kart om de bom door te geven aan een andere speler."
 
 #. I18N: ./data/gui/screens/help/help5.stkgui
 msgid "The evil Nolok has captured Gnu! Here are a few tips to help you:"
@@ -1668,7 +1668,7 @@ msgid ""
 "completed. In the top-right of the screen, it also tells you how many points"
 " you currently have. Complete as many challenges as possible, and Nolok will"
 " accept to race against you. Win to liberate Gnu!"
-msgstr "Dit pictogram op de minikaart laat zien welke uitdagingen je nog niet volbracht hebt. Rechtsbovenin zie je hoeveel punten je al hebt verzameld. Volbreng zoveel mogelijk uitdagingen; Nolok gaat dan de strijd met je aan. Win die wedstrijd om Gnu te bevrijden!"
+msgstr "Dit pictogram op de minikaart laat zien welke uitdagingen je nog niet hebt volbracht. Rechts bovenin zie je hoeveel punten je al hebt verzameld. Volbreng zoveel mogelijk uitdagingen; Nolok gaat dan de strijd met je aan. Win die wedstrijd om Gnu te bevrijden!"
 
 #. I18N: ./data/gui/screens/help/help5.stkgui
 #. I18N: In the help menu
@@ -1676,7 +1676,7 @@ msgid ""
 "When you complete a challenge, you get a cup. Each cup is worth several "
 "points. The higher the difficulty you completed the challenge in, the better"
 " the cup and the more points it is worth."
-msgstr "Als je een uitdaging volbrengt, dan krijg je een beker. Elke beker is punten waard. Hoe hoger het niveau, hoe beter de beker en hoe meer punten hij waard is."
+msgstr "Als je een uitdaging volbrengt, krijg je een beker. Elke beker is punten waard. Hoe hoger het niveau, hoe beter de beker en hoe meer punten hij waard is."
 
 #. I18N: ./data/gui/screens/help/help5.stkgui
 #. I18N: In the help menu
@@ -2319,7 +2319,7 @@ msgstr "Resolutie"
 #. I18N: ./data/gui/screens/options/options_display.stkgui
 #. I18N: In the display settings
 msgid "Fullscreen"
-msgstr "Beeldvullend"
+msgstr "Schermvullend"
 
 #. I18N: ./data/gui/screens/options/options_display.stkgui
 #. I18N: In the display settings
@@ -2463,7 +2463,7 @@ msgstr "Niveau van de vervagingseffecten"
 #. I18N: ./data/gui/screens/options/options_video.stkgui
 #. I18N: In the video options, maximum frame per second
 msgid "Maximum FPS"
-msgstr "Maximumaantal FPS"
+msgstr "Maximumaantal fps"
 
 #. I18N: ./data/gui/screens/options/options_video.stkgui
 #. I18N: In the video settings
@@ -2770,7 +2770,7 @@ msgstr "Xue"
 #. I18N: ../stk-assets/tracks/abyss/track.xml
 #. I18N: ../supertuxkart-assets/tracks/abyss/track.xml
 msgid "Antediluvian Abyss"
-msgstr "De afgrond van Atlantis"
+msgstr "Afgrond van Atlantis"
 
 #. I18N: ../stk-assets/tracks/alien_signal/track.xml
 #. I18N: ../supertuxkart-assets/tracks/alien_signal/track.xml
@@ -2792,7 +2792,7 @@ msgstr "Candela-Stad"
 #. I18N: ../stk-assets/tracks/battleisland/track.xml
 #. I18N: ../supertuxkart-assets/tracks/battleisland/track.xml
 msgid "Battle Island"
-msgstr "Oorlogseiland"
+msgstr "Krijgseiland"
 
 #. I18N: ../stk-assets/tracks/black_forest/track.xml
 #. I18N: ../supertuxkart-assets/tracks/black_forest/track.xml
@@ -2807,12 +2807,12 @@ msgstr "Grot X"
 #. I18N: ../stk-assets/tracks/cocoa_temple/track.xml
 #. I18N: ../supertuxkart-assets/tracks/cocoa_temple/track.xml
 msgid "Cocoa Temple"
-msgstr "De cacaotempel"
+msgstr "Cacaotempel"
 
 #. I18N: ../stk-assets/tracks/cornfield_crossing/track.xml
 #. I18N: ../supertuxkart-assets/tracks/cornfield_crossing/track.xml
 msgid "Cornfield Crossing"
-msgstr "Maïsveldkruispunt"
+msgstr "Maïsveldtocht"
 
 #. I18N: ../stk-assets/tracks/fortmagma/track.xml
 #. I18N: ../supertuxkart-assets/tracks/fortmagma/track.xml
@@ -2845,7 +2845,7 @@ msgstr "IJzig voetbalveld"
 #. assets/tracks/introcutscene2/scene.xml
 #. I18N: ../supertuxkart-assets/tracks/introcutscene2/scene.xml
 msgid "What's wrong, little hippies? Your great gnu leader is missing?"
-msgstr "Wat scheelt er, kleine hippies? Is jullie grote gnoe-leider verdwenen?"
+msgstr "Wat scheelt er, pietepeuterige hippies? Is jullie grote gnoeleider verdwenen?"
 
 #. I18N: Cutscene subtitle from ../stk-assets/tracks/introcutscene2/scene.xml
 #. I18N: ../stk-assets/tracks/introcutscene2/scene.xml
@@ -2853,7 +2853,7 @@ msgstr "Wat scheelt er, kleine hippies? Is jullie grote gnoe-leider verdwenen?"
 #. assets/tracks/introcutscene2/scene.xml
 #. I18N: ../supertuxkart-assets/tracks/introcutscene2/scene.xml
 msgid "Oh yes, see, he's in my castle now and will be served for supper..."
-msgstr "Jazeker! Die zit nu in mijn kasteel en wordt opgediend als diner…"
+msgstr "Jawel, hoor! Die zit nu in mijn kasteel en wordt opgediend als diner…"
 
 #. I18N: Cutscene subtitle from ../stk-assets/tracks/introcutscene2/scene.xml
 #. I18N: ../stk-assets/tracks/introcutscene2/scene.xml
@@ -2869,7 +2869,7 @@ msgstr "Maar ik ben een eerlijk wezen, dus doe ik je een voorstel."
 #. assets/tracks/introcutscene2/scene.xml
 #. I18N: ../supertuxkart-assets/tracks/introcutscene2/scene.xml
 msgid "If you can beat me at racing, I will free the old codger."
-msgstr "Als je me kunt verslaan, dan laat ik die oude mopperpot vrij."
+msgstr "Als je me kunt verslaan, laat ik die oude mopperpot vrij."
 
 #. I18N: Cutscene subtitle from ../stk-assets/tracks/introcutscene2/scene.xml
 #. I18N: ../stk-assets/tracks/introcutscene2/scene.xml
@@ -2899,7 +2899,7 @@ msgstr "Vuurtoren van Urk"
 #. I18N: ../stk-assets/tracks/mines/track.xml
 #. I18N: ../supertuxkart-assets/tracks/mines/track.xml
 msgid "Old Mine"
-msgstr "De oude mijn"
+msgstr "Oude mijn"
 
 #. I18N: ../stk-assets/tracks/minigolf/track.xml
 #. I18N: ../supertuxkart-assets/tracks/minigolf/track.xml
@@ -2929,17 +2929,17 @@ msgstr "Het Ravensburg-landhuis"
 #. I18N: ../stk-assets/tracks/sandtrack/track.xml
 #. I18N: ../supertuxkart-assets/tracks/sandtrack/track.xml
 msgid "Shifting Sands"
-msgstr "Vloek van de Farao"
+msgstr "Vloek van de farao"
 
 #. I18N: ../stk-assets/tracks/scotland/track.xml
 #. I18N: ../supertuxkart-assets/tracks/scotland/track.xml
 msgid "Nessie's Pond"
-msgstr "Nessie's vijver"
+msgstr "Nessies vijver"
 
 #. I18N: ../stk-assets/tracks/snowmountain/track.xml
 #. I18N: ../supertuxkart-assets/tracks/snowmountain/track.xml
 msgid "Northern Resort"
-msgstr "Noordelijk oord"
+msgstr "Noordoord"
 
 #. I18N: ../stk-assets/tracks/snowtuxpeak/track.xml
 #. I18N: ../supertuxkart-assets/tracks/snowtuxpeak/track.xml
@@ -3063,7 +3063,7 @@ msgid ""
 "Closing the game before the story mode's completion invalidates the timer.\n"
 "\n"
 "To use the speedrun mode, please use a new profile."
-msgstr "De snellerondemodus is uitgeschakeld. Deze kan alleen worden gestart als het spel niet is afgesloten nadat de verhaalmodus is gestart.\n\nDe tijdklok wordt afgekeurd als het spel wordt afgesloten voordat de verhaalmodus is afgerond.\n\nMaak een nieuw profiel aan om de snellerondemodus te gebruiken."
+msgstr "De snellerondemodus is uitgeschakeld. Deze kan alléén worden gestart als het spel niet is afgesloten na het beginnen aan de verhaalmodus.\n\nDe tijdklok wordt afgekeurd als het spel wordt afgesloten voordat de verhaalmodus is afgerond.\n\nMaak een nieuw profiel aan om de snellerondemodus te kunnen gebruiken."
 
 #. I18N: Name of first guest player (without number)
 #: src/config/player_manager.cpp:396
@@ -3080,7 +3080,7 @@ msgstr "Gast %d"
 msgid ""
 "Your config file was malformed, so it was deleted and a new one will be "
 "created."
-msgstr "Je configuratiebestand was beschadigd. Het is verwijderd en er wordt een nieuw bestand aangemaakt."
+msgstr "Je instellingenbestand was beschadigd. Het is daarom verwijderd en er wordt een nieuw bestand aangemaakt."
 
 #: src/config/user_config.cpp:699
 msgid ""
@@ -3105,7 +3105,7 @@ msgstr "Omzetproces:"
 #: src/graphics/irr_driver.cpp:1968
 #, c-format
 msgid "FPS: %d/%d/%d - %d KTris, Ping: %dms"
-msgstr "FPS: %d/%d/%d - %d KTris, Ping: %dms"
+msgstr "Fps: %d/%d/%d - %d KTris, Ping: %dms"
 
 #. I18N: Tip shown in gui for giving player hints
 #: src/guiengine/engine.cpp:1466 src/states_screens/race_result_gui.cpp:206
@@ -3646,7 +3646,7 @@ msgstr "Stel de toetstoewijzingen opnieuw in."
 
 #: src/input/device_manager.cpp:497
 msgid "Your input config file is not compatible with this version of STK."
-msgstr "Je invoerconfiguratiebestand is niet compatibel met deze versie van STK."
+msgstr "Je invoerinstellingenbestand is niet compatibel met deze versie van STK."
 
 #. I18N: name of buttons on gamepads
 #: src/input/gamepad_config.cpp:159
@@ -3766,14 +3766,14 @@ msgstr "%s heeft een laag accuniveau."
 msgid ""
 "Connect your wiimote to the Bluetooth manager, then click on Ok. Detailed "
 "instructions at https://supertuxkart.net/Wiimote"
-msgstr "Koppel je wiimote via bluetoothbeheer en druk dan op ‘Oké’. Uitgebreide instructies zijn te vinden op supertuxkart.net/Wiimote (Engels)"
+msgstr "Koppel je wiimote via bluetoothbeheer en druk dan op oké. Uitgebreide instructies zijn te vinden op https://supertuxkart.net/Wiimote (Engels)"
 
 #: src/input/wiimote_manager.cpp:382
 msgid ""
 "Press the buttons 1+2 simultaneously on your wiimote to put it in discovery "
 "mode, then click on Ok. Detailed instructions at "
 "https://supertuxkart.net/Wiimote"
-msgstr "Druk de knoppen 1+2 op je wiimote tegelijkertijd in om hem in de ontdekkingsmodus te zetten en druk dan op ‘Oké’. Uitgebreide instructies zijn te vinden op supertuxkart.net/Wiimote (Engels)"
+msgstr "Druk de knoppen 1+2 op je wiimote tegelijkertijd in om hem in de ontdekkingsmodus te zetten en druk dan op oké. Uitgebreide instructies zijn te vinden op https://supertuxkart.net/Wiimote (Engels)"
 
 #: src/input/wiimote_manager.cpp:405
 #, c-format
@@ -3836,7 +3836,7 @@ msgid ""
 " Would you like this feature to be enabled? (To change this setting at a "
 "later time, go to options, select tab 'General', and edit \"Connect to the "
 "Internet\")."
-msgstr "SuperTuxKart kan verbinding maken met het internet om add-ons te downloaden en updatemeldingen te tonen. Wij verzamelen ook geanonimiseerde gegevens over hardwareprestaties t.b.v. productverbetering. Lees onze privacyverklaring op https://supertuxkart.net/Privacy Wil je deze optie activeren? (Als je dit later wilt aanpassen, ga dan naar Instellingen -> Algemeen en pas ‘Verbinden met het internet’ aan.)"
+msgstr "SuperTuxKart kan verbinding maken met het internet om add-ons te downloaden en updatemeldingen te tonen. Wij verzamelen ook geanonimiseerde gegevens over hardwareprestaties t.b.v. productverbetering. Lees onze privacyverklaring op https://supertuxkart.net/Privacy Wil je deze optie inschakelen? (Als je dit later wilt aanpassen, ga dan naar Instellingen → Algemeen en pas ‘Verbinden met het internet’ aan.)"
 
 #: src/main.cpp:2393
 msgid "Your screen resolution is too low to run STK."
@@ -3853,7 +3853,7 @@ msgid ""
 "Your graphics driver appears to be very old. Please check if an update is "
 "available. SuperTuxKart recommends a driver supporting %s or better. The "
 "game will likely still run, but in a reduced-graphics mode."
-msgstr "Je grafische stuurprogramma lijkt verouderd; controleer of er een update beschikbaar is. SuperTuxKart raadt je aan om een stuurprogramma te gebruiken met ondersteuning voor %s of hoger. Het spel draait waarschijnlijk nog wel, maar met lagere grafische instellingen."
+msgstr "Je grafische stuurprogramma lijkt verouderd; controleer of er een update beschikbaar is. SuperTuxKart raadt je aan om een stuurprogramma te gebruiken met ondersteuning voor %s of hoger. Het spel draait waarschijnlijk wel, maar met lagere grafische instellingen."
 
 #: src/main_loop.cpp:480 src/network/protocols/client_lobby.cpp:129
 msgid "Server connection timed out."
@@ -6837,7 +6837,7 @@ msgid ""
 "This is an unstable version of SuperTuxKart that contains latest "
 "improvements. It is released mainly for testing, to make stable STK as good "
 "as possible."
-msgstr "Dit is een vroegtijdig vrijgegeven versie die alle recente verbeteringen bevat en is voornamelijk gericht op testers, zodat ze kunnen helpen de aankomende versie zo stabiel mogelijk te maken."
+msgstr "Dit is een vroegtijdig vrijgegeven versie die alle recente verbeteringen bevat en voornamelijk gericht is op testers, zodat zij kunnen helpen de aankomende versie zo stabiel mogelijk te maken."
 
 #: net.supertuxkart.SuperTuxKart.metainfo.xml:24
 msgid ""

@@ -2811,7 +2811,7 @@ msgstr "Templo do cacao"
 #. I18N: ../stk-assets/tracks/cornfield_crossing/track.xml
 #. I18N: ../supertuxkart-assets/tracks/cornfield_crossing/track.xml
 msgid "Cornfield Crossing"
-msgstr "Travesia do Milleiral"
+msgstr "Cruzamento do Milleiral"
 
 #. I18N: ../stk-assets/tracks/fortmagma/track.xml
 #. I18N: ../supertuxkart-assets/tracks/fortmagma/track.xml

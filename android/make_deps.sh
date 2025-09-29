@@ -1,5 +1,5 @@
 #!/bin/sh
-# Tested with NDK 22.1.7171670
+# Tested with NDK 28.1.13356709
 
 export DIRNAME=$(realpath "$(dirname "$0")")
 
@@ -16,6 +16,9 @@ export HOST_X86=i686-linux-android
 
 export ARCH_X86_64=x86_64
 export HOST_X86_64=x86_64-linux-android
+
+# For cmake 4.0 until stk dependencies are updated
+export CMAKE_POLICY_VERSION_MINIMUM=3.5
 
 # A helper function that checks if error ocurred
 check_error()
@@ -40,7 +43,7 @@ if [ -z "$NDK_PATH" ]; then
 fi
 
 if [ -z "$STK_NDK_VERSION" ]; then
-    export STK_NDK_VERSION=23.1.7779620
+    export STK_NDK_VERSION="28.1.13356709"
 fi
 
 NDK_PATH="$(realpath "$NDK_PATH")/${STK_NDK_VERSION}"
@@ -62,7 +65,7 @@ build_deps()
         ARCH_OPTION="armeabi-v7a"
         export ARCH=$ARCH_ARMV7
         # Special case
-        export HOST=armv7a-linux-androideabi16
+        export HOST=armv7a-linux-androideabi21
         export HOST_DIR=$HOST_ARMV7
     elif [ "$ARCH_OPTION" = "aarch64" ]; then
         ARCH_OPTION="arm64-v8a"
@@ -72,7 +75,7 @@ build_deps()
     elif [ "$ARCH_OPTION" = "x86" ]; then
         export ARCH=$ARCH_X86
         export HOST_DIR=$HOST_X86
-        export HOST="${HOST_DIR}16"
+        export HOST="${HOST_DIR}21"
     elif [ "$ARCH_OPTION" = "x86_64" ]; then
         export ARCH=$ARCH_X86_64
         export HOST_DIR=$HOST_X86_64
@@ -91,7 +94,7 @@ build_deps()
 
         cd "$DIRNAME/deps-$ARCH_OPTION/zlib"
         cmake . -DCMAKE_TOOLCHAIN_FILE=../../../cmake/Toolchain-android.cmake \
-                -DHOST=$HOST -DARCH=$ARCH -DCMAKE_C_FLAGS="-fpic -O3 -g" &&
+                -DHOST=$HOST -DARCH=$ARCH -DCMAKE_C_FLAGS=" -Wl,--undefined-version -fpic -O3 -g" &&
         make -j $(($(nproc) + 1))
         check_error
         touch "$DIRNAME/deps-$ARCH_OPTION/zlib.stamp"
@@ -203,6 +206,9 @@ build_deps()
         echo "Compiling $ARCH_OPTION mbedtls"
         mkdir -p "$DIRNAME/deps-$ARCH_OPTION/mbedtls"
         cp -a -f "$DIRNAME/../lib/mbedtls/"* "$DIRNAME/deps-$ARCH_OPTION/mbedtls"
+        if [ "$ARCH_OPTION" = "x86" ]; then
+            sed -i 's/#define MBEDTLS_AESNI_C//g' "$DIRNAME/deps-$ARCH_OPTION/mbedtls/include/mbedtls/mbedtls_config.h"
+        fi
 
         cd "$DIRNAME/deps-$ARCH_OPTION/mbedtls"
         cmake . -DCMAKE_TOOLCHAIN_FILE=../../../cmake/Toolchain-android.cmake \

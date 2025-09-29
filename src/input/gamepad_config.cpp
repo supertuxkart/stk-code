@@ -587,7 +587,11 @@ fallback:
     if (it != actions_map.end())
     {
         // Prefer start and back button if exist
+#ifdef ANDROID
+        auto start_bind = actions_map.find(SDL_CONTROLLER_BUTTON_A);
+#else
         auto start_bind = actions_map.find(SDL_CONTROLLER_BUTTON_START);
+#endif
         if (start_bind != actions_map.end())
             it = start_bind;
         setBindingFromTuple(PA_MENU_SELECT, it->second);
@@ -595,7 +599,11 @@ fallback:
         it = actions_map.begin();
         if (it != actions_map.end())
         {
+#ifdef ANDROID
+            auto back_bind = actions_map.find(SDL_CONTROLLER_BUTTON_B);
+#else
             auto back_bind = actions_map.find(SDL_CONTROLLER_BUTTON_BACK);
+#endif
             if (back_bind != actions_map.end())
                 it = back_bind;
             setBindingFromTuple(PA_MENU_CANCEL, it->second);

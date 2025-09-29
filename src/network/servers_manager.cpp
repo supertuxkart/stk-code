@@ -240,7 +240,7 @@ std::shared_ptr<ServerList> ServersManager::getLANRefreshRequest() const
             const std::vector<SocketAddress> &all_bcast =
                 ServersManager::get()->getBroadcastAddresses(
                 UserConfigParams::m_ipv6_lan);
-            for (auto &bcast_addr : all_bcast)
+            for (auto bcast_addr : all_bcast)
             {
                 Log::info("Server Discovery", "Broadcasting to %s",
                           bcast_addr.toString().c_str());

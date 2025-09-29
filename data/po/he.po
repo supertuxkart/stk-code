@@ -8,7 +8,7 @@
 # FIRST AUTHOR <EMAIL@ADDRESS>, 2010
 # gk <genghiskhan@gmx.ca>, 2015-2016
 # Liran Vaknin <liranvaknin@gmail.com>, 2016-2017
-# Omer I.S., 2020-2022,2024
+# Omer I.S., 2020-2022,2024-2025
 # 63f334ffc0709ba0fc2361b80bf3c0f0_00ffd1e <ab96c93ca0ac55ba7fa06385427e60dd_878890>, 2020-2021
 # 63f334ffc0709ba0fc2361b80bf3c0f0_00ffd1e <ab96c93ca0ac55ba7fa06385427e60dd_878890>, 2020
 # עומר רוזנר, 2018
@@ -26,7 +26,7 @@ msgstr ""
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2024-10-29 22:11+0100\n"
 "PO-Revision-Date: 2015-02-15 01:58+0000\n"
-"Last-Translator: Omer I.S., 2020-2022,2024\n"
+"Last-Translator: Omer I.S., 2020-2022,2024-2025\n"
 "Language-Team: Hebrew (http://app.transifex.com/supertuxkart/supertuxkart/language/he/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -58,7 +58,7 @@ msgstr "כּריסטוֹפֶל קולומבוס"
 
 #. I18N: ./data/achievements.xml
 msgid "Play every official track at least once."
-msgstr "סיבוב אחד לפחות בכל מסלול רשמי."
+msgstr "התחרות אחת לפחות בכל מסלול רשמי."
 
 #. I18N: ./data/achievements.xml
 msgid "Strike!"
@@ -82,7 +82,7 @@ msgstr "מרתון מכוניות"
 
 #. I18N: ./data/achievements.xml
 msgid "Finish a race with at least twice the track's default lap number."
-msgstr "השלמה של מסלול אחד עם מספר הקפות הגדול פי שניים לפחות ממספר ההקפות המקורי."
+msgstr "השלמה של מסלול עם מספר הקפות הגדול פי שניים או יותר מבמקור."
 
 #. I18N: ./data/achievements.xml
 msgid "Skid-row"
@@ -100,7 +100,7 @@ msgstr "מקום ראשון"
 msgid ""
 "Win against at least 3 AIs in normal race, time-trial, and follow the "
 "leader."
-msgstr "ניצחון על 3 מתחרים לפחות במרוץ רגיל, מרוץ נגד השעון ומרוץ בעקבות המכונית המובילה."
+msgstr "ניצחון על 3 מתחרים או יותר במרוץ רגיל, מרוץ נגד השעון ומרוץ בעקבות המכונית המובילה."
 
 #. I18N: ./data/achievements.xml
 msgid "Powerup Love"
@@ -118,7 +118,7 @@ msgstr "בלי מעצורים"
 msgid ""
 "Win 5 single races in a row against at least 3 AIs. Beware, restarting a "
 "race counts as a loss."
-msgstr "ניצחון ב־5 מרוצים בודדים ברצף, נגד 3 מתחרים מדומים לפחות. זהירות, התחלת מרוץ מחדש נחשבת כהפסד."
+msgstr "ניצחון ב־5 מרוצים בודדים ברצף, נגד 3 מתחרים מדומים או יותר. זהירות, התחלת מרוץ מחדש נחשבת כהפסד."
 
 #. I18N: ./data/achievements.xml
 msgid "Banana Lover"
@@ -144,7 +144,7 @@ msgstr "צֵיד יתושים"
 msgid ""
 "Take your opponents for mosquitos! With the swatter, squash them at least 5 "
 "times in a race."
-msgstr "מוחצים את היריבים כמו יתושים! מוחצים אותם לפחות 5 פעמים במרוץ, בעזרת מחבט היתושים."
+msgstr "מחיצה של מתחרים אחרים עם מחבט היתושים, לפחות 5 פעמים במרוץ. מוחצים את היריבים כמו יתושים!"
 
 #. I18N: ./data/achievements.xml
 msgid "Beyond Luck"
@@ -154,7 +154,7 @@ msgstr "מעבר למזל"
 msgid ""
 "Win 10 single races in a row in Expert or SuperTux against at least 5 AIs. "
 "Beware, restarting a race counts as a loss."
-msgstr "ניצחון ב־10 מרוצים בודדים ברצף, נגד 5 מתחרים מדומים לפחות, ברמה „למומחים” או „סופר־טַקס”. זהירות, התחלת מרוץ מחדש נחשבת כהפסד."
+msgstr "ניצחון רצוף ב־10 מרוצים בודדים, נגד 5 מתחרים מדומים או יותר, ברמה „למומחים” או „סופר־טַקס”. זהירות, התחלת מרוץ מחדש נחשבת כהפסד."
 
 #. I18N: ./data/grandprix/1_penguinplayground.grandprix
 msgid "Penguin Playground"
@@ -1604,7 +1604,7 @@ msgstr "מאיצן - נותן לך האצת מהירות עצומה. אך יש �
 msgid ""
 "Cake - thrown at the closest rival, best on short ranges and long straights."
 " It also affects other karts close to the explosion."
-msgstr "עוגה - נזרקת על המתחרה הכי קרוב, הכי יעילה בירייה לטווחים קצרים ולמרחקים ארוכים בקווים ישרים. היא משפיעה גם על מכוניות אחרות שסמוכות לפיצוץ."
+msgstr "עוגה - נועדה לירייה על היריב הקרוב, יעילה ביותר לטווחים קצרים ומרחקים ארוכים בקו ישר. העוגה משפיעה גם על מכוניות אחרות הסמוכות לפיצוץ."
 
 #. I18N: ./data/gui/screens/help/help3.stkgui
 msgid ""
@@ -1626,7 +1626,7 @@ msgstr "מצנח – מאט את כל המכוניות מלפנים."
 msgid ""
 "Swapper - gift boxes are transformed into bananas, nitro cans into "
 "bubblegums, and vice versa for a short time."
-msgstr "מחליפן - מחליף את כל קופסאות המתנה בבננות, פחיות של גז טורבו בגומי לעיסה ולהפך, למשך זמן קצר."
+msgstr "מחליפן - מחליף את כל קופסאות המתנה בבננות, פחיות של גז טורבו במסטיק ולהפך, למשך זמן קצר."
 
 #. I18N: ./data/gui/screens/help/help3.stkgui
 msgid ""
@@ -1684,7 +1684,7 @@ msgid ""
 "When you complete a challenge, you get a cup. Each cup is worth several "
 "points. The higher the difficulty you completed the challenge in, the better"
 " the cup and the more points it is worth."
-msgstr "כשמשלימים אתגר, מקבלים גביע. כל גביע שווה מספר נקודות. ככל שהרמה שבה סיימת את האתגר גבוהה יותר, רמת הגביע עולה וגם מספר הנקודות שהוא שווה."
+msgstr "כשמשלימים אתגר, מקבלים גביע. כל גביע שווה כמה נקודות. ככל שהרמה שבה סיימת את האתגר גבוהה יותר, רמת הגביע עולה וגם מספר הנקודות שהוא שווה."
 
 #. I18N: ./data/gui/screens/help/help5.stkgui
 #. I18N: In the help menu
@@ -1697,7 +1697,7 @@ msgstr "לאחר שצוברים את כמות הנקודות המופיעה מת
 msgid ""
 "Not all karts drive the same! They belong to classes with several "
 "differences:"
-msgstr "לא כל המכוניות זהות! יש להן דרגות שונות עם מספר הבדלים:"
+msgstr "לא כל המכוניות זהות! יש להן דרגות שונות עם כמה הבדלים:"
 
 #. I18N: ./data/gui/screens/help/help6.stkgui
 #. I18N: In the help menu
@@ -1751,7 +1751,7 @@ msgid ""
 "options). Then, you can either create your own server with custom options, "
 "or search among a list of existing servers to join. Some of them are "
 "recommended servers with optionally ranked races."
-msgstr "תחילה, יש לבחור בסמל „משחק ברשת” שנמצא בתפריט הראשי. אפשר לבחור בין משחק ברשת המקומית או העולמית (יש צורך בחיבור לאינטרנט). לאחר מכן אפשר ליצור שרת מותאם אישית משלך, או לבחור להצטרף לשרת קיים מתוך הרשימה. חלק מהשרתים הם שרתים מומלצים, עם דירוגי מרוץ שונים."
+msgstr "תחילה, יש לבחור בסמל „משחק ברשת” שנמצא בתפריט הראשי. אפשר לבחור בין משחק ברשת המקומית או העולמית (יש צורך בחיבור לאינטרנט). לאחר מכן יהיה אפשר ליצור שרת משלך עם הגדרות אישיות, או להצטרף לשרת קיים מהרשימה. חלק מהשרתים הם שרתים מומלצים, עם דירוגי מרוץ שונים."
 
 #. I18N: ./data/gui/screens/help/help7.stkgui
 #. I18N: In the help menu
@@ -1761,7 +1761,7 @@ msgid ""
 " enough players. Then, you can choose your kart and vote for the next track "
 "to race on. An addon track is allowed only if it exists on all joined "
 "players and the server."
-msgstr "לאחר שהתחברת לשרת, המרוץ יתחיל לפי ההחלטה של המנהל/ת (עם הסימן של הכתר). בשרתים רשמיים המרוץ עשוי להתחיל אוטומטית כאשר יש מספיק שחקנים. אז, תהיה לך אפשרות לבחור מכונית ולהצביע בנוגע למסלול שיהיה בסיבוב הבא. ניתן לבחור מכוניות מהתוספים אך ורק אם הן מותקנות אצל כל השחקנים שהצטרפו וגם בשרת."
+msgstr "לאחר ההתחברות לשרת, יש להמתין עד שהמרוץ יתחיל לפי ההחלטה של המנהל/ת (עם הסימן של הכתר). בשרתים רשמיים המרוץ עשוי להתחיל אוטומטית כאשר יש מספיק שחקנים. אז, יהיה אפשר לבחור מכונית ולהצביע בנוגע למסלול שיהיה בסיבוב הבא. ניתן לבחור מכוניות מהתוספים אך ורק אם הן מותקנות אצל כל השחקנים שהצטרפו וגם בשרת."
 
 #. I18N: ./data/gui/screens/help/help7.stkgui
 #. I18N: In the help menu
@@ -3845,7 +3845,7 @@ msgid ""
 " Would you like this feature to be enabled? (To change this setting at a "
 "later time, go to options, select tab 'General', and edit \"Connect to the "
 "Internet\")."
-msgstr "באפשרות SuperTuxKart להתחבר לשרת כדי להוריד תוספים ולהודיע לך על עדכונים. נא לקרוא את מדיניות הפרטיות בכתובת https://supertuxkart.net/Privacy. להפעיל את האפשרות הזאת? (כדי לשנות את ההגדרה הזאת מאוחר יותר, יש לעבור למסך האפשרויות, לבחור בלשונית \"ממשק\" ולערוך את הסימון של \"התחברות לאינטרנט\")."
+msgstr "באפשרות SuperTuxKart להתחבר לשרת כדי להוריד תוספים ולהודיע לך על עדכונים. כדאי לקרוא את מדיניות הפרטיות בכתובת https://supertuxkart.net/Privacy. להפעיל אפשרות זו? (כדי לשנות את ההגדרה הזאת מאוחר יותר, יש לעבור למסך האפשרויות, לבחור בלשונית \"ממשק\" ולערוך את הסימון של \"התחברות לאינטרנט\")."
 
 #: src/main.cpp:2393
 msgid "Your screen resolution is too low to run STK."
@@ -4962,14 +4962,14 @@ msgid ""
 "SuperTuxKart will download full assets (including high quality textures and "
 "music) for better gaming experience, this will use your mobile data if you "
 "don't have a wifi connection."
-msgstr "תתבצע הורדה של משאבי המשחק המלאים של SuperTuxKart (לרבות מרקמים ומוזיקה באיכות גבוהה) בשביל לספק חוויית משחק מיטבית, ייעשה שימוש בחבילת הנתונים הניידים אם אין חיבור פעיל לרשת אלחוטית."
+msgstr "תתבצע הורדה של משאבי המשחק המלאים של SuperTuxKart (לרבות מרקמים ומוזיקה באיכות גבוהה) בשביל חוויית משחק מיטבית, ייעשה שימוש בחבילת הנתונים הניידים אם אין חיבור פעיל לרשת אלחוטית."
 
 #. I18N: In download assets dialog
 #: src/states_screens/dialogs/download_assets.cpp:121
 msgid ""
 "SuperTuxKart will download full assets (including high quality textures and "
 "music) for better gaming experience."
-msgstr "תתבצע הורדה של משאבי המשחק המלאים של SuperTuxKart (כולל מרקמים ומוזיקה באיכות גבוהה) בשביל לספק חוויית משחק מיטבית."
+msgstr "תתבצע הורדה של משאבי המשחק המלאים של SuperTuxKart (כולל מרקמים ומוזיקה באיכות גבוהה) בשביל חוויית משחק מיטבית."
 
 #: src/states_screens/dialogs/enter_address_dialog.cpp:42
 msgid ""
@@ -5696,13 +5696,13 @@ msgstr "נא להמתין עד סוף המשחק הנוכחי (%s), התקדמו
 #. percent
 #: src/states_screens/online/networking_lobby.cpp:601
 msgid "Please wait for the current game's end, estimated progress: %d%."
-msgstr "נא להמתין עד סוף המשחק הנוכחי, התקדמות משוערת: %d%."
+msgstr "נא להמתין עד שהמשחק הנוכחי יסתיים, התקדמות משוערת: %d%."
 
 #. I18N: In the networking lobby, show when player is required to
 #. wait before the current game finish
 #: src/states_screens/online/networking_lobby.cpp:609
 msgid "Please wait for the current game's end."
-msgstr "נא להמתין עד סוף המשחק הנוכחי."
+msgstr "נא להמתין עד שהמשחק הנוכחי יסתיים."
 
 #: src/states_screens/online/networking_lobby.cpp:676
 #, c-format
@@ -5817,7 +5817,7 @@ msgstr "אין חדשות זמינות כרגע."
 #: src/states_screens/online/online_screen.cpp:317
 msgid ""
 "You must be logged in to play Global networking. Click your username above."
-msgstr "יש להתחבר לחשבון כדי לשחק ברשת העולמית. לשם כך, יש ללחוץ על שם המשתמש שלך למעלה."
+msgstr "למשחק ברשת העולמית נחוץ חשבון מקוון. נא ללחוץ על שם המשתמש שלך למעלה לצורך התחברות."
 
 #: src/states_screens/online/online_user_search.cpp:184
 #: src/states_screens/online/online_user_search.cpp:247
@@ -6832,7 +6832,7 @@ msgid ""
 " while avoiding other karts as they may overtake you, but don't eat the "
 "bananas! Watch for bowling balls, plungers, bubble gum, and cakes thrown by "
 "your opponents."
-msgstr "יש לנו מגוון מסלולים מהנים בנושאים שונים, החל מצלילה במצולות, חוות חקלאיות, ג׳ונגלים, ועד לחלל! מטרת המשחק היא לנסוע הכי טוב שאפשר, להתחמק ממכוניות אחרות שעלולות לעקוף אותך, ולא לאכול את הבננות! זהירות מכדורי באולינג, פומפות, מסטיקים, ועוגות שזורקים היריבים."
+msgstr "יש לנו מגוון מסלולים מהנים בנושאים שונים, החל מצלילה במצולות, חוות חקלאיות, ג׳ונגלים, ועד לחלל! מטרת המשחק היא לנסוע הכי טוב שאפשר, להתחמק ממכוניות אחרות שעלולות לעקוף אותך, ולא לאכול את הבננות! יש להיזהר מכדורי באולינג, פומפות, מסטיקים, ועוגות שזורקים היריבים."
 
 #: net.supertuxkart.SuperTuxKart.metainfo.xml:15
 msgid ""

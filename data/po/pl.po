@@ -8,7 +8,7 @@
 # jano2137, 2021
 # Jakub Wojtkowiak <ctrahg123@gmail.com>, 2016,2021
 # Marcin Węclewski, 2022
-# Marcin Węclewski, 2022-2023,2025
+# Marcin, 2022-2023,2025
 # Michał Wijas, 2025
 # mrkubax10 _ <mrkubax10@onet.pl>, 2022-2023
 # Patryk Wychowaniec <patryk1303@gmail.com>, 2015-2016
@@ -19,7 +19,7 @@ msgstr ""
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2024-10-29 22:11+0100\n"
 "PO-Revision-Date: 2015-02-15 01:58+0000\n"
-"Last-Translator: Marcin Węclewski, 2022-2023,2025\n"
+"Last-Translator: Marcin, 2022-2023,2025\n"
 "Language-Team: Polish (http://app.transifex.com/supertuxkart/supertuxkart/language/pl/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"

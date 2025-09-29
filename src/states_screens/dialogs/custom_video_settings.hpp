@@ -37,7 +37,7 @@ public:
     virtual void beforeAddingWidgets();
 
     /** Updates the activation state of the advanced pipeline checkboxes. */
-    void updateActivation();
+    void updateActivation(const std::string& renderer);
 
     GUIEngine::EventPropagation processEvent(const std::string& eventSource);
     

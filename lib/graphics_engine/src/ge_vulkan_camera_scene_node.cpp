@@ -80,13 +80,17 @@ void GEVulkanCameraSceneNode::render()
         vp.width = vk->getCurrentRenderTargetSize().Width;
         vp.height = vk->getCurrentRenderTargetSize().Height;
         vk->getRotatedViewport(&vp, true/*handle_rtt*/);
-        m_ubo_data.m_screensize.X = vp.width;
-        m_ubo_data.m_screensize.Y = vp.height;
+        m_ubo_data.m_screensize.UpperLeftCorner.X = vp.width;
+        m_ubo_data.m_screensize.UpperLeftCorner.Y = vp.height;
+        m_ubo_data.m_screensize.LowerRightCorner.X = 0.0;
+        m_ubo_data.m_screensize.LowerRightCorner.Y = 0.0;
     }
     else
     {
-        m_ubo_data.m_screensize.X = vk->getRTTTexture()->getSize().Width;
-        m_ubo_data.m_screensize.Y = vk->getRTTTexture()->getSize().Height;
+        m_ubo_data.m_screensize.UpperLeftCorner.X = vk->getRTTTexture()->getSize().Width;
+        m_ubo_data.m_screensize.UpperLeftCorner.Y = vk->getRTTTexture()->getSize().Height;
+        m_ubo_data.m_screensize.LowerRightCorner.X = 0.0;
+        m_ubo_data.m_screensize.LowerRightCorner.Y = 0.0;
     }
 }   // render
 

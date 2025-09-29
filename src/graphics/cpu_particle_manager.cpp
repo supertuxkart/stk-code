@@ -307,7 +307,8 @@ void CPUParticleManager::uploadAll()
         void* ptr = glMapBufferRange(GL_ARRAY_BUFFER, 0, vbo_size * 20,
             GL_MAP_WRITE_BIT | GL_MAP_UNSYNCHRONIZED_BIT |
             GL_MAP_INVALIDATE_BUFFER_BIT);
-        memcpy(ptr, m_particles_generated[p.first].data(), vbo_size * 20);
+        if (ptr)
+            memcpy(ptr, m_particles_generated[p.first].data(), vbo_size * 20);
         glUnmapBuffer(GL_ARRAY_BUFFER);
         glBindBuffer(GL_ARRAY_BUFFER, 0);
     }

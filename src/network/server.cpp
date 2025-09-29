@@ -22,6 +22,7 @@
 #include "online/online_player_profile.hpp"
 #include "online/online_profile.hpp"
 #include "online/profile_manager.hpp"
+#include "network/crypto.hpp"
 #include "network/network_config.hpp"
 #include "network/socket_address.hpp"
 #include "states_screens/online/online_screen.hpp"
@@ -79,6 +80,12 @@ Server::Server(const XMLNode& server_info) : m_supports_encrytion(true)
     xml.get("private_port", &m_private_port);
     xml.get("password", &m_password_protected);
     xml.get("game_started", &m_game_started);
+    m_aes_gcm_128bit_tag = false;
+    xml.get("aes_gcm_128bit_tag", &m_aes_gcm_128bit_tag);
+#ifndef CRYPTO_AES_GCM_32BIT_TAG
+    if (!m_aes_gcm_128bit_tag)
+        m_supports_encrytion = false;
+#endif
     xml.get("distance", &m_distance);
     xml.get("country_code", &m_country_code);
     m_server_owner_name = L"-";
@@ -227,6 +234,7 @@ Server::Server(unsigned server_id, const core::stringw &name, int max_players,
     m_game_started = game_started;
     m_current_track = current_track;
     m_current_ai = m_bookmark_id = 0;
+    m_aes_gcm_128bit_tag = false;
 }   // server(server_id, ...)
 
 // ----------------------------------------------------------------------------

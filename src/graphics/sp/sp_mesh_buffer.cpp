@@ -161,43 +161,46 @@ void SPMeshBuffer::uploadGLMesh()
     char* ptr = (char*)glMapBufferRange(GL_ARRAY_BUFFER, 0, v_size,
         GL_MAP_WRITE_BIT | GL_MAP_UNSYNCHRONIZED_BIT |
         GL_MAP_INVALIDATE_BUFFER_BIT);
-    v_size = 0;
-    for (unsigned i = 0 ; i < m_vertices.size(); i++)
+    if (ptr)
     {
-        offset = 0;
-        memcpy(ptr + v_size + offset, &m_vertices[i].m_position.X, 12);
-        offset += 12;
-
-        memcpy(ptr + v_size + offset, &m_vertices[i].m_normal, 12);
-        offset += 4;
-
-        video::SColor vc = m_vertices[i].m_color;
-        if (CVS->isDeferredEnabled())
+        v_size = 0;
+        for (unsigned i = 0 ; i < m_vertices.size(); i++)
         {
-            vc.setRed(GE::srgb255ToLinear(vc.getRed()));
-            vc.setGreen(GE::srgb255ToLinear(vc.getGreen()));
-            vc.setBlue(GE::srgb255ToLinear(vc.getBlue()));
-        }
-        memcpy(ptr + v_size + offset, &vc, 4);
-        offset += 4;
-
-        memcpy(ptr + v_size + offset, &m_vertices[i].m_all_uvs[0], 4);
-        offset += 4;
-        if (use_2_uv)
-        {
-            memcpy(ptr + v_size + offset, &m_vertices[i].m_all_uvs[2], 4);
+            offset = 0;
+            memcpy(ptr + v_size + offset, &m_vertices[i].m_position.X, 12);
+            offset += 12;
+    
+            memcpy(ptr + v_size + offset, &m_vertices[i].m_normal, 12);
             offset += 4;
-        }
-        if (use_tangents)
-        {
-            memcpy(ptr + v_size + offset, &m_vertices[i].m_tangent, 4);
+    
+            video::SColor vc = m_vertices[i].m_color;
+            if (CVS->isDeferredEnabled())
+            {
+                vc.setRed(GE::srgb255ToLinear(vc.getRed()));
+                vc.setGreen(GE::srgb255ToLinear(vc.getGreen()));
+                vc.setBlue(GE::srgb255ToLinear(vc.getBlue()));
+            }
+            memcpy(ptr + v_size + offset, &vc, 4);
             offset += 4;
+    
+            memcpy(ptr + v_size + offset, &m_vertices[i].m_all_uvs[0], 4);
+            offset += 4;
+            if (use_2_uv)
+            {
+                memcpy(ptr + v_size + offset, &m_vertices[i].m_all_uvs[2], 4);
+                offset += 4;
+            }
+            if (use_tangents)
+            {
+                memcpy(ptr + v_size + offset, &m_vertices[i].m_tangent, 4);
+                offset += 4;
+            }
+            if (m_skinned)
+            {
+                memcpy(ptr + v_size + offset, &m_vertices[i].m_joint_idx[0], 16);
+            }
+            v_size += pitch;
         }
-        if (m_skinned)
-        {
-            memcpy(ptr + v_size + offset, &m_vertices[i].m_joint_idx[0], 16);
-        }
-        v_size += pitch;
     }
     glUnmapBuffer(GL_ARRAY_BUFFER);
 
@@ -401,8 +404,9 @@ void SPMeshBuffer::uploadInstanceData()
         }
         if (CVS->isARBBufferStorageUsable())
         {
-            memcpy(m_ins_dat_mapped_ptr[i], m_ins_dat[i].data(),
-                m_ins_dat[i].size() * 44);
+            if (m_ins_dat_mapped_ptr[i])
+                memcpy(m_ins_dat_mapped_ptr[i], m_ins_dat[i].data(),
+                    m_ins_dat[i].size() * 44);
         }
         else
         {
@@ -410,7 +414,8 @@ void SPMeshBuffer::uploadInstanceData()
             void* ptr = glMapBufferRange(GL_ARRAY_BUFFER, 0,
                 m_ins_dat[i].size() * 44, GL_MAP_WRITE_BIT |
                 GL_MAP_UNSYNCHRONIZED_BIT | GL_MAP_INVALIDATE_BUFFER_BIT);
-            memcpy(ptr, m_ins_dat[i].data(), m_ins_dat[i].size() * 44);
+            if (ptr)
+                memcpy(ptr, m_ins_dat[i].data(), m_ins_dat[i].size() * 44);
             glUnmapBuffer(GL_ARRAY_BUFFER);
             glBindBuffer(GL_ARRAY_BUFFER, 0);
         }
