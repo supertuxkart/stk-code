@@ -1373,14 +1373,19 @@ void Kart::setStartupBoost(uint8_t boost_level)
 {
     std::vector<float> startup_times = m_kart_properties->getStartupTime();
 
-    if (boost_level >= 2) {
+    // Only access the startup boost arrays if the boost level indicates
+    // a startup boost (0 indicates a penalty, 1 a normal start)
+    if (boost_level >= 2)
+    {
         int index = m_kart_properties->getStartupTime().size() - boost_level + 1;
         assert(index >= 0 && index < (int)m_kart_properties->getStartupTime().size());
         m_startup_boost = m_kart_properties->getStartupBoost()[index];
         m_startup_engine_force = m_kart_properties->getStartupEngineForce()[index];
-    } else {
-        m_startup_boost = 0;
-        m_startup_engine_force = 0;
+    }
+    else
+    {
+        m_startup_boost = 0.0f;
+        m_startup_engine_force = 0.0f;
     }
 
     m_startup_boost_level = boost_level;
@@ -3249,11 +3254,14 @@ void Kart::updateEnginePowerAndBrakes(int ticks)
         // so that the karts can bounce back a bit from the obstacle.
         if (m_bounce_back_ticks > 0)
             engine_power = 0.0f;
-        // let a player going backwards accelerate quickly (e.g. if a player
+
+        // Let a player going backwards accelerate quickly (e.g. if a player
         // hits a wall, he needs to be able to start again quickly after
         // going backwards)
-        else if(m_speed < 0.0f)
-            engine_power *= 4.0f;
+        // We set the threshold somewhat below 0 to avoid it triggering
+        // too quickly when two karts are pushing against each other (e.g. in soccer)
+        else if(m_speed < -3.0f)
+            engine_power *= 3.0f;
 
         // In case the acceleration value is analog,
         // moderate the engine power accordingly

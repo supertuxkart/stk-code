@@ -418,7 +418,7 @@
             <engine power="*0.8" max-speed="*0.896"
                     max-speed-reverse-ratio="*1.15" />
             <gear switch-ratio="0.1 0.25 0.45 0.7 1.0 4.0"
-                  power-increase="2.4 2.18 1.82 1.47 1.24 1.0"
+                  power-increase="2.34 2.1 1.8 1.47 1.24 1.0"
                   reverse-power="5.0"/>
             <mass value="*0.6" />
             <skid reduce-turn-min="0.2" reduce-turn-max="0.895" bonus-force="*0.8 *0.8 *0.8" />
@@ -435,7 +435,7 @@
             <engine power="*0.875" max-speed="*0.927"
                     max-speed-reverse-ratio="*1.075"/>
             <gear switch-ratio="0.1 0.25 0.45 0.7 1 4"
-                  power-increase="2.27 1.9 1.63 1.37 1.18 1"
+                  power-increase="2.27 1.84 1.58 1.37 1.18 1"
                   reverse-power="4.25"/>
             <mass value="*0.75" />
             <skid reduce-turn-min="0.2" reduce-turn-max="0.895" bonus-force="*0.875 *0.875 *0.875" 
@@ -452,7 +452,7 @@
             <engine power="*0.875" max-speed="*0.948"
                     max-speed-reverse-ratio="*1.05"/>
             <gear switch-ratio="0.1 0.25 0.45 0.7 1 4"
-                  power-increase="2.27 1.9 1.63 1.37 1.18 1"
+                  power-increase="2.27 1.84 1.58 1.37 1.18 1"
                   reverse-power="4.25"/>
             <mass value="*0.75" />
             <skid reduce-turn-min="0.2475" reduce-turn-max="0.895" bonus-force="*0.875 *0.875 *0.875" />
@@ -468,7 +468,7 @@
             <engine power="*1" max-speed="*1"
                     max-speed-reverse-ratio="*1" />
             <gear switch-ratio="0.1 0.25 0.45 0.7 1 4"
-                  power-increase="2.05 1.62 1.44 1.27 1.14 1"
+                  power-increase="2.1 1.56 1.39 1.27 1.14 1"
                   reverse-power="3.5"/>
             <mass value="*1" />
             <skid reduce-turn-min="0.285" reduce-turn-max="0.895" bonus-force="*1.0 *1.0 *1.0" />
