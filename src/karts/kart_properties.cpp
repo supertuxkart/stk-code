@@ -834,16 +834,16 @@ InterpolationArray KartProperties::getTurnRadius() const
 }  // getTurnRadius
 
 // ----------------------------------------------------------------------------
-float KartProperties::getTurnTimeResetSteer() const
-{
-    return m_cached_characteristic->getTurnTimeResetSteer();
-}  // getTurnTimeResetSteer
-
-// ----------------------------------------------------------------------------
 InterpolationArray KartProperties::getTurnTimeFullSteer() const
 {
     return m_cached_characteristic->getTurnTimeFullSteer();
 }  // getTurnTimeFullSteer
+
+// ----------------------------------------------------------------------------
+float KartProperties::getTurnSpeedFactor() const
+{
+    return m_cached_characteristic->getTurnSpeedFactor();
+}  // getTurnSpeedFactor
 
 // ----------------------------------------------------------------------------
 float KartProperties::getEnginePower() const

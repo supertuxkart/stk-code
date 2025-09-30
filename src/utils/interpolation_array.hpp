@@ -82,6 +82,23 @@ public:
     /** Returns the X value for a specified point. */
     float getX(unsigned int i) const { return m_x[i]; }
     // ------------------------------------------------------------------------
+    /** Multiplies all the X values by a specific factor.
+     * This operation keeps the order of the X correct. */
+    void adjustX(float x_factor)
+    {
+        if (x_factor > 0.0f)
+        {
+            for (unsigned int i = 0; i < m_x.size(); i++)
+                m_x[i] = m_x[i] * x_factor;
+        }
+        // Recompute the deltas
+        for (unsigned int i = 0; i < m_delta.size(); i++)
+        {
+            m_delta[i] = (m_y[i+1] - m_y[i])
+                       / (m_x[i+1] - m_x[i]);
+        }
+    }   // adjustX
+    // ------------------------------------------------------------------------
     /** Returns the Y value for a specified point. */
     float getY(unsigned int i) const { return m_y[i]; }
     // ------------------------------------------------------------------------

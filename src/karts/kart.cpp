@@ -1038,12 +1038,19 @@ void Kart::updateWeight()
  *  \param radius The radius for which the speed needs to be computed. */
 float Kart::getSpeedForTurnRadius(float radius) const
 {
+    // TODO - Compute once and save the result for the kart until the end of the race
+    //        instead of recomputing this interpolation array every frame
     InterpolationArray turn_angle_at_speed = m_kart_properties->getTurnRadius();
+    float angle = sinf(1.0f / radius);
+
+    // Adjust the reference speeds in the array
+    float speed_factor = std::max(0.1f, 1.0f / m_kart_properties->getTurnSpeedFactor());
+    turn_angle_at_speed.adjustX(speed_factor);
+
     // Convert the turn radius into turn angle
     for(int i = 0; i < (int)turn_angle_at_speed.size(); i++)
         turn_angle_at_speed.setY(i, sinf( 1.0f / turn_angle_at_speed.getY(i)));
 
-    float angle = sinf(1.0f / radius);
     return turn_angle_at_speed.getReverse(angle);
 }   // getSpeedForTurnRadius
 
@@ -1067,7 +1074,7 @@ float Kart::getMaxSteerAngle(float speed) const
     if (speed < 0.0f)
         speed = -speed;
 
-    return turn_angle_at_speed.get(speed);
+    return turn_angle_at_speed.get(speed * m_kart_properties->getTurnSpeedFactor());
 }   // getMaxSteerAngle
 
 //-----------------------------------------------------------------------------

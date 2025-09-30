@@ -89,8 +89,8 @@ public:
 
         // Turn
         TURN_RADIUS,
-        TURN_TIME_RESET_STEER,
         TURN_TIME_FULL_STEER,
+        TURN_SPEED_FACTOR,
 
         // Engine
         ENGINE_POWER,
@@ -290,8 +290,8 @@ public:
     float getStabilitySmoothFlyingImpulse() const;
 
     InterpolationArray getTurnRadius() const;
-    float getTurnTimeResetSteer() const;
     InterpolationArray getTurnTimeFullSteer() const;
+    float getTurnSpeedFactor() const;
 
     float getEnginePower() const;
     float getEngineMaxSpeed() const;

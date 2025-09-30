@@ -81,10 +81,10 @@ AbstractCharacteristic::ValueType AbstractCharacteristic::getType(
         return TYPE_FLOAT;
     case TURN_RADIUS:
         return TYPE_INTERPOLATION_ARRAY;
-    case TURN_TIME_RESET_STEER:
-        return TYPE_FLOAT;
     case TURN_TIME_FULL_STEER:
         return TYPE_INTERPOLATION_ARRAY;
+    case TURN_SPEED_FACTOR:
+        return TYPE_FLOAT;
     case ENGINE_POWER:
         return TYPE_FLOAT;
     case ENGINE_MAX_SPEED:
@@ -341,10 +341,10 @@ std::string AbstractCharacteristic::getName(CharacteristicType type)
         return "STABILITY_SMOOTH_FLYING_IMPULSE";
     case TURN_RADIUS:
         return "TURN_RADIUS";
-    case TURN_TIME_RESET_STEER:
-        return "TURN_TIME_RESET_STEER";
     case TURN_TIME_FULL_STEER:
         return "TURN_TIME_FULL_STEER";
+    case TURN_SPEED_FACTOR:
+        return "TURN_SPEED_FACTOR";
     case ENGINE_POWER:
         return "ENGINE_POWER";
     case ENGINE_MAX_SPEED:
@@ -724,18 +724,6 @@ InterpolationArray AbstractCharacteristic::getTurnRadius() const
 }  // getTurnRadius
 
 // ----------------------------------------------------------------------------
-float AbstractCharacteristic::getTurnTimeResetSteer() const
-{
-    float result;
-    bool is_set = false;
-    process(TURN_TIME_RESET_STEER, &result, &is_set);
-    if (!is_set)
-        Log::fatal("AbstractCharacteristic", "Can't get characteristic %s",
-                    getName(TURN_TIME_RESET_STEER).c_str());
-    return result;
-}  // getTurnTimeResetSteer
-
-// ----------------------------------------------------------------------------
 InterpolationArray AbstractCharacteristic::getTurnTimeFullSteer() const
 {
     InterpolationArray result;
@@ -746,6 +734,18 @@ InterpolationArray AbstractCharacteristic::getTurnTimeFullSteer() const
                     getName(TURN_TIME_FULL_STEER).c_str());
     return result;
 }  // getTurnTimeFullSteer
+
+// ----------------------------------------------------------------------------
+float AbstractCharacteristic::getTurnSpeedFactor() const
+{
+    float result;
+    bool is_set = false;
+    process(TURN_SPEED_FACTOR, &result, &is_set);
+    if (!is_set)
+        Log::fatal("AbstractCharacteristic", "Can't get characteristic %s",
+                    getName(TURN_SPEED_FACTOR).c_str());
+    return result;
+}  // getTurnSpeedFactor
 
 // ----------------------------------------------------------------------------
 float AbstractCharacteristic::getEnginePower() const

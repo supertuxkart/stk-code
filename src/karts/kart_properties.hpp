@@ -400,8 +400,8 @@ public:
     float getStabilitySmoothFlyingImpulse() const;
 
     InterpolationArray getTurnRadius() const;
-    float getTurnTimeResetSteer() const;
     InterpolationArray getTurnTimeFullSteer() const;
+    float getTurnSpeedFactor() const;
 
     float getEnginePower() const;
     float getEngineMaxSpeed() const;
