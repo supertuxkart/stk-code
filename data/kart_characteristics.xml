@@ -104,8 +104,8 @@
                 max speed penalties. It is otherwise adjusted in code to dampen
                 the effects of e.g. terrain penalties.
           -->
-        <engine power="1175" max-speed="27.75" generic-max-speed="27.75" brake-factor="36"
-                time-full-brake="0.35" max-speed-reverse-ratio="0.48" />
+        <engine power="1175" max-speed="28" generic-max-speed="28" brake-factor="36"
+                time-full-brake="0.35" max-speed-reverse-ratio="0.45" />
 
         <!-- Simulated gears
             switch-ratio: defines at what ratio of the maximum
@@ -317,7 +317,7 @@
                 releasing them on the ground after a rescue. Used to avoid
                 resetting karts into the track. Not sure if this is still
                 necessary. -->
-        <rescue vert-offset="0.0" duration="1.0" height="2" />
+        <rescue vert-offset="0.0" duration="1.1" height="2" />
 
         <!-- Explosion
             duration: how long it takes before the kart can drive again (this
@@ -326,7 +326,7 @@
                 after being hit by an explosion.
             radius: Karts closer to this value will be affected by
                 an explosion as well.  -->
-        <explosion duration="1.5" radius="6"
+        <explosion duration="1.65" radius="6"
                    invulnerability-time="7" />
 
         <!-- Nitro
@@ -379,29 +379,29 @@
     <difficulties>
         <characteristic name="easy">
             <engine power="*0.75" max-speed="*0.6" generic-max-speed="*0.6" 
-                    max-speed-reverse-ratio="0.65"/>
+                    max-speed-reverse-ratio="0.6"/>
             <zipper max-speed-increase="*0.6" />
             <rescue duration="*1.2" />
             <nitro engine-force="*0.8" consumption="*0.7" max-speed-increase="*0.7" />
             <skid bonus-speed="*0.5 *0.5 *0.5" bonus-force="*0.5 *0.5 *0.5" />
-            <turn time-full-steer="0:0.18 0.3:0.18 0.3:0.28 0.6:0.28 0.6:0.42 1.0:0.42" 
+            <turn time-full-steer="0:0.16 0.3:0.16 0.3:0.25 0.6:0.25 0.6:0.37 1.0:0.37" 
                   speed-factor="*1.28" />
             <plunger in-face-time="3" />
         </characteristic>
         <characteristic name="casual">
             <engine power="*0.82" max-speed="*0.75" generic-max-speed="*0.75"
-                    max-speed-reverse-ratio="0.6"/>
+                    max-speed-reverse-ratio="0.535"/>
             <zipper max-speed-increase="*0.8" />
             <rescue duration="*1.2" />
             <nitro engine-force="*0.83" consumption="*0.78" max-speed-increase="*0.78" />
             <skid bonus-speed="*0.7 *0.7 *0.7" bonus-force="*0.7 *0.7 *0.7" />
-            <turn time-full-steer="0:0.14 0.3:0.14 0.3:0.22 0.6:0.22 0.6:0.33 1.0:0.33" 
+            <turn time-full-steer="0:0.13 0.3:0.13 0.3:0.2 0.6:0.2 0.6:0.3 1.0:0.3" 
                   speed-factor="*1.15" />
             <plunger in-face-time="3.5" />
         </characteristic>
         <characteristic name="medium">
             <engine power="*0.88" max-speed="*0.85" generic-max-speed="*0.85"
-                    max-speed-reverse-ratio="0.55"/>
+                    max-speed-reverse-ratio="0.5"/>
             <rescue duration="*1.2" />
             <nitro engine-force="*0.88" consumption="*0.85" max-speed-increase="*0.85" />
             <skid bonus-speed="*0.85 *0.85 *0.85" bonus-force="*0.85 *0.85 *0.85" />
@@ -410,7 +410,7 @@
         </characteristic>
         <characteristic name="hard">
             <engine power="*0.95" max-speed="*0.95" generic-max-speed="*0.95" 
-                    max-speed-reverse-ratio="0.5"/>
+                    max-speed-reverse-ratio="0.465"/>
             <nitro engine-force="*0.95" consumption="*0.95" max-speed-increase="*0.95" />
             <skid bonus-speed="*0.95 *0.95 *0.95" bonus-force="*0.95 *0.95 *0.95" />
             <turn speed-factor="*1.02" />
@@ -424,9 +424,9 @@
     <kart-types>
         <characteristic name="light">
             <suspension stiffness="*0.6" />
-            <turn radius="0:2.5 5:3.6 12:7.5 20:13.6 30:21.8 50:38.2" />
+            <turn radius="0:3 4:3.6 8:5 12:7.4 16:10.4 22:15 30:21.5 50:38.2" />
             <engine power="*0.8" max-speed="*0.896"
-                    max-speed-reverse-ratio="*1.15" />
+                    max-speed-reverse-ratio="*1.12" />
             <gear switch-ratio="0.1 0.25 0.45 0.7 1.0 4.0"
                   power-increase="2.34 2.1 1.8 1.47 1.24 1.0"
                   reverse-power="5.0"/>
@@ -441,7 +441,7 @@
         </characteristic>
         <characteristic name="medium-h">
             <suspension stiffness="*0.75" />
-            <turn radius="0:2.875 5:4.068 12:8.4375 20:14.96 30:23.653 50:40.874" />
+            <turn radius="0:3.15 4:3.78 8:5.25 12:7.807 16:11.076 22:16.2 30:23.22 50:41.256" />
             <engine power="*0.875" max-speed="*0.927"
                     max-speed-reverse-ratio="*1.075"/>
             <gear switch-ratio="0.1 0.25 0.45 0.7 1 4"
@@ -451,14 +451,14 @@
             <skid reduce-turn-min="0.2" reduce-turn-max="0.895" bonus-force="*0.875 *0.875 *0.875" 
                   time-till-bonus="*0.9 *0.9 *0.9" />
             <startup boost="*0.875 *0.875" />
-            <explosion duration="*0.8" radius="*0.8" />
+            <explosion duration="*0.8" radius="*0.85" />
             <nitro engine-force="*0.825" consumption="*1.375" max-speed-increase="*1.1" />
             <slipstream duration-factor="*0.8" fade-out-time="*1" />
             <parachute lbound-fraction="0.45" ubound-fraction="0.275" />
         </characteristic>
         <characteristic name="medium">
             <suspension stiffness="*0.75" />
-            <turn radius="0:2.875 5:4.176 12:8.775 20:16.184 30:25.942 50:45.458" />
+            <turn radius="0:3.15 4:3.78 8:5.25 12:7.918 16:11.648 22:17.85 30:25.585 50:45.458" />
             <engine power="*0.875" max-speed="*0.948"
                     max-speed-reverse-ratio="*1.05"/>
             <gear switch-ratio="0.1 0.25 0.45 0.7 1 4"
@@ -467,14 +467,14 @@
             <mass value="*0.75" />
             <skid reduce-turn-min="0.2475" reduce-turn-max="0.895" bonus-force="*0.875 *0.875 *0.875" />
             <startup boost="*0.875 *0.875" />
-            <explosion duration="*0.8" radius="*0.8" />
+            <explosion duration="*0.8" radius="*0.85" />
             <nitro engine-force="*0.825" consumption="*1.375" max-speed-increase="*1.1" />
             <slipstream duration-factor="*0.8" fade-out-time="*1" />
             <parachute lbound-fraction="0.45" ubound-fraction="0.275" />
         </characteristic>
         <characteristic name="heavy">
             <suspension stiffness="*1" />
-            <turn radius="0:3.15 5:4.608 12:9.75 20:18.224 30:29.212 50:51.188" />
+            <turn radius="0:3.3 4:3.96 8:5.5 12:8.436 16:12.688 22:20.1 30:28.81 50:51.188" />
             <engine power="*1" max-speed="*1"
                     max-speed-reverse-ratio="*1" />
             <gear switch-ratio="0.1 0.25 0.45 0.7 1 4"
@@ -483,7 +483,7 @@
             <mass value="*1" />
             <skid reduce-turn-min="0.285" reduce-turn-max="0.895" bonus-force="*1.0 *1.0 *1.0" />
             <startup boost="*0.8 *0.8" />
-            <explosion duration="*0.6" radius="*0.6" />
+            <explosion duration="*0.6" radius="*0.7" />
             <nitro engine-force="*1" consumption="*1.67" max-speed-increase="*1.0" />
             <slipstream length="*1.1" collect-time="*1.1"
                    duration-factor="*0.6" fade-out-time="*1" />
