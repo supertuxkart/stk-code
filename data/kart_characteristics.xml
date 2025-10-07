@@ -170,6 +170,8 @@
             physical-jump-time: Time for a physical jump at the beginning of a skid.
                 graphical-jump-time: Time for a graphics-only jump at the beginning
                 of a skid.
+            steer-factor: The rate of steering change is multiplied by this number
+                when turning left or right during a drift.
             reduce-turn-min/max: The steering done by the controller (which is in
                 [-1,1]) is mapped to [reduce-turn-min, reduce-turn-max] when skidding
                 is active (for left turn, right turn will use [-max, -min]). The
@@ -182,7 +184,7 @@
               bonus-speed="4.0 6.0 8.0" bonus-time="3.2 4.2 5.6"
               fade-out-time="0.9 1.1 1.3" bonus-force="100 220 400"
               physical-jump-time="0" graphical-jump-time="0.4"
-              post-skid-rotate-factor="1"
+              post-skid-rotate-factor="1" steer-factor="0.6"
               reduce-turn-min="0.2" reduce-turn-max="0.895" enabled="true" />
 
         <!-- Camera

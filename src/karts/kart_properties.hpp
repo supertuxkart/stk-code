@@ -525,6 +525,7 @@ public:
     float getSkidPhysicalJumpTime() const;
     float getSkidGraphicalJumpTime() const;
     float getSkidPostSkidRotateFactor() const;
+    float getSkidSteerFactor() const;
     float getSkidReduceTurnMin() const;
     float getSkidReduceTurnMax() const;
     bool getSkidEnabled() const;

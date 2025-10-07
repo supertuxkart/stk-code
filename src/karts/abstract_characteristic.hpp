@@ -235,6 +235,7 @@ public:
         SKID_PHYSICAL_JUMP_TIME,
         SKID_GRAPHICAL_JUMP_TIME,
         SKID_POST_SKID_ROTATE_FACTOR,
+        SKID_STEER_FACTOR,
         SKID_REDUCE_TURN_MIN,
         SKID_REDUCE_TURN_MAX,
         SKID_ENABLED,
@@ -415,6 +416,7 @@ public:
     float getSkidPhysicalJumpTime() const;
     float getSkidGraphicalJumpTime() const;
     float getSkidPostSkidRotateFactor() const;
+    float getSkidSteerFactor() const;
     float getSkidReduceTurnMin() const;
     float getSkidReduceTurnMax() const;
     bool getSkidEnabled() const;

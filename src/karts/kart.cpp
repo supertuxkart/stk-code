@@ -3382,19 +3382,23 @@ void Kart::updateSteering(int ticks)
     // to full steer for a current steer of 0 (which should be
     // the highest possible value)
     float dt = stk_config->ticks2Time(ticks);
-    const float STEER_CHANGE = ( (requested_steer > m_effective_steer && m_effective_steer < 0) ||
+    float steer_change = ( (requested_steer > m_effective_steer && m_effective_steer < 0) ||
                                  (requested_steer < m_effective_steer && m_effective_steer > 0)   )
                      ? dt/getTimeFullSteer(0.0f)
                      : dt/getTimeFullSteer(fabsf(m_effective_steer));
 
+    // Reduce the steering change speed when drifting
+    if (m_skidding->isSkidding())
+        steer_change *= m_kart_properties->getSkidSteerFactor();
+
     if (requested_steer < m_effective_steer)
     {
-        m_effective_steer -= STEER_CHANGE;
+        m_effective_steer -= steer_change;
         m_effective_steer = std::max(m_effective_steer, requested_steer);
     }
     else if(requested_steer > m_effective_steer)
     {
-        m_effective_steer += STEER_CHANGE;
+        m_effective_steer += steer_change;
         m_effective_steer = std::min(m_effective_steer, requested_steer);
     }
 

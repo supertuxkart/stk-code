@@ -645,6 +645,8 @@ void XmlCharacteristic::load(const XMLNode *node)
             &m_values[SKID_GRAPHICAL_JUMP_TIME]);
         sub_node->get("post-skid-rotate-factor",
             &m_values[SKID_POST_SKID_ROTATE_FACTOR]);
+        sub_node->get("steer-factor",
+            &m_values[SKID_STEER_FACTOR]);
         sub_node->get("reduce-turn-min",
             &m_values[SKID_REDUCE_TURN_MIN]);
         sub_node->get("reduce-turn-max",

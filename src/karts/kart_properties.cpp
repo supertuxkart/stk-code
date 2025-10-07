@@ -1458,6 +1458,12 @@ float KartProperties::getSkidPostSkidRotateFactor() const
 }  // getSkidPostSkidRotateFactor
 
 // ----------------------------------------------------------------------------
+float KartProperties::getSkidSteerFactor() const
+{
+    return m_cached_characteristic->getSkidSteerFactor();
+}  // getSkidSteerFactor
+
+// ----------------------------------------------------------------------------
 float KartProperties::getSkidReduceTurnMin() const
 {
     return m_cached_characteristic->getSkidReduceTurnMin();

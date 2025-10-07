@@ -289,6 +289,8 @@ AbstractCharacteristic::ValueType AbstractCharacteristic::getType(
         return TYPE_FLOAT;
     case SKID_POST_SKID_ROTATE_FACTOR:
         return TYPE_FLOAT;
+    case SKID_STEER_FACTOR:
+        return TYPE_FLOAT;
     case SKID_REDUCE_TURN_MIN:
         return TYPE_FLOAT;
     case SKID_REDUCE_TURN_MAX:
@@ -549,6 +551,8 @@ std::string AbstractCharacteristic::getName(CharacteristicType type)
         return "SKID_GRAPHICAL_JUMP_TIME";
     case SKID_POST_SKID_ROTATE_FACTOR:
         return "SKID_POST_SKID_ROTATE_FACTOR";
+    case SKID_STEER_FACTOR:
+        return "SKID_STEER_FACTOR";
     case SKID_REDUCE_TURN_MIN:
         return "SKID_REDUCE_TURN_MIN";
     case SKID_REDUCE_TURN_MAX:
@@ -1970,6 +1974,18 @@ float AbstractCharacteristic::getSkidPostSkidRotateFactor() const
                     getName(SKID_POST_SKID_ROTATE_FACTOR).c_str());
     return result;
 }  // getSkidPostSkidRotateFactor
+
+// ----------------------------------------------------------------------------
+float AbstractCharacteristic::getSkidSteerFactor() const
+{
+    float result;
+    bool is_set = false;
+    process(SKID_STEER_FACTOR, &result, &is_set);
+    if (!is_set)
+        Log::fatal("AbstractCharacteristic", "Can't get characteristic %s",
+                    getName(SKID_STEER_FACTOR).c_str());
+    return result;
+}  // getSkidSteerFactor
 
 // ----------------------------------------------------------------------------
 float AbstractCharacteristic::getSkidReduceTurnMin() const
