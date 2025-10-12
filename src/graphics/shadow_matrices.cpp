@@ -39,8 +39,8 @@
 #define MAX2(a, b) ((a) > (b) ? (a) : (b))
 #define MIN2(a, b) ((a) > (b) ? (b) : (a))
 
-float ShadowMatrices:: m_shadow_split[5] = { 1., 5., 20., 60., 150 };
-float ShadowMatrices:: m_shadow_overlap_proportion = 0.2;
+float ShadowMatrices:: m_shadow_split[5] = { 1., 10., 25., 75., 300 };
+float ShadowMatrices:: m_shadow_overlap_proportion = 0.15;
 
 // ============================================================================
 class ViewFrustrumShader : public Shader<ViewFrustrumShader, video::SColor, int>
