@@ -120,6 +120,9 @@ void GhostKart::update(int ticks)
     {
         m_node->setVisible(false);
         getKartGFX()->setGFXInvisible();
+        if(m_engine_sound)
+            m_engine_sound->stop();
+
         return;
     }
 
@@ -252,7 +255,8 @@ void GhostKart::updateSound(float dt)
         return;
 
     GhostController* gc = dynamic_cast<GhostController*>(getController());
-    if (gc == NULL) return;
+    if (gc == NULL)
+        return;
 
     const unsigned int idx = gc->getCurrentReplayIndex();
 
@@ -262,12 +266,12 @@ void GhostKart::updateSound(float dt)
     {
         if(m_all_replay_events[idx].m_nitro_usage)
         {
-            if (m_nitro_sound->getStatus()!=SFXBase::SFX_PLAYING)
+            if (m_nitro_sound->getStatus() != SFXBase::SFX_PLAYING)
             {
                 m_nitro_sound->play(getSmoothedXYZ());
             }
         }
-        else if(m_nitro_sound->getStatus()==SFXBase::SFX_PLAYING)
+        else if(m_nitro_sound->getStatus() == SFXBase::SFX_PLAYING)
         {
             m_nitro_sound->stop();
         }
