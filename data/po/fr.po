@@ -1796,11 +1796,11 @@ msgstr "Tout d’abord, tu vas avoir besoin de plusieurs périphériques. Va dan
 #. I18N: In the help menu
 msgid ""
 "When input devices are configured, select the 'Splitscreen Multiplayer' icon"
-" in the main menu. Each player can press the 'fire' key of their gamepad or "
+" in the main menu. Each player (up to 8 players) can press the 'fire' key of their gamepad or "
 "keyboard to join the game, and use their input device to select their kart. "
 "The game continues when everyone selected their kart. Note that the mouse "
 "may not be used for this operation."
-msgstr "Lorsque plusieurs périphériques sont configurés, sélectionne 'Multijoueur écran divisé' sur le menu principal. Chaque joueur appuie sur la touche 'feu' de son périphérique pour rejoindre la partie et sélectionne son kart. La partie se poursuit lorsque tous le joueurs ont choisi leur kart. La souris ne peut pas être utilisée pour cette opération."
+msgstr "Lorsque plusieurs périphériques sont configurés, sélectionne 'Multijoueur écran divisé' sur le menu principal. Chaque joueur (jusqu’à 8 au total) appuie sur la touche 'feu' de son périphérique pour rejoindre la partie et sélectionne son kart. La partie se poursuit lorsque tous le joueurs ont choisi leur kart. La souris ne peut pas être utilisée pour cette opération."
 
 #. I18N: ./data/gui/screens/high_score_selection.stkgui
 #. I18N: In the high score selection screen
