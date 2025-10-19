@@ -2199,6 +2199,7 @@ int RaceResultGUI::displayChallengeInfo(int x, int y, bool increase_density)
         return current_y;
     RaceManager::Difficulty difficulty = RaceManager::get()->getDifficulty();
     video::SColor win_color = video::SColor(255, 0, 255, 0);
+    video::SColor gp_neutral_color = video::SColor(255, 255, 255, 0);
     video::SColor lose_color = video::SColor(255, 255, 0, 0);
     video::SColor special_color = video::SColor(255, 0, 255, 255);
     AbstractKart* kart = World::getWorld()->getPlayerKart(0);
@@ -2206,14 +2207,20 @@ int RaceResultGUI::displayChallengeInfo(int x, int y, bool increase_density)
     bool position_passed = false;
     bool time_passed = false;
     bool energy_passed = false;
+    bool lower_rank_gp = false;
 
     if (is_gp)
     {
         // GP has no best while slower
         lose_all = true;
-        if (c_data->isGPFulfilled())
+
+        if (c_data->isGPFulfilled() != ChallengeData::GP_NONE)
         {
-            position_passed = true;
+            // If the player is first overall
+            if (RaceManager::get()->getLocalPlayerGPRank(0) == 0)
+                position_passed = true;
+            else
+                lower_rank_gp = true;
             time_passed = true;
             energy_passed = true;
         }
@@ -2233,7 +2240,8 @@ int RaceResultGUI::displayChallengeInfo(int x, int y, bool increase_density)
     bool all_passed = position_passed && time_passed && energy_passed;
 
     core::stringw text_string = all_passed ? _("You completed the challenge!") : _("You failed the challenge!");
-    video::SColor text_color = all_passed ? win_color : lose_color;
+    video::SColor text_color = all_passed    ? win_color :
+                               lower_rank_gp ? gp_neutral_color : lose_color;
 
     current_y += int(m_distance_between_meta_rows);
     
@@ -2253,7 +2261,8 @@ int RaceResultGUI::displayChallengeInfo(int x, int y, bool increase_density)
             r --;
 
         text_string = _("Required Rank: %i", r);
-        text_color = position_passed ? win_color : lose_color;
+        text_color = position_passed ? win_color :
+                     lower_rank_gp   ? gp_neutral_color : lose_color;
         
         the_font->draw(text_string, core::recti(x, current_y, UserConfigParams::m_width * 0.96f,
                        y + line_height), text_color, false, false, nullptr, true);
@@ -2369,7 +2378,7 @@ void RaceResultGUI::displayBenchmarkSummary()
     font = GUIEngine::getFont();
     rect = font->getDimension(title_text.c_str());
 
-    core::stringw info_text[8];
+    core::stringw info_text[9];
     core::stringw value = StringUtils::toWString(
         StringUtils::timeToString(float(profiler.getTotalFrametime())/1000000.0f, 2, true));
     info_text[0] = _("Test duration: %s",     value);
@@ -2393,25 +2402,40 @@ void RaceResultGUI::displayBenchmarkSummary()
     current_y = info_y;
     current_x *= 3;
 
+    // Depending on the active renderer, some graphics parameters may be set
+    // but inactive. Only the modern GL renderer has direct correspondance
+    // between active parameters and what is actually used.
+    // We therefore need to check both the parameter value and the current renderer.
+    bool vk = (std::string(UserConfigParams::m_render_driver) == "vulkan");
+    bool gl = (std::string(UserConfigParams::m_render_driver) == "opengl");
+    bool modern_gl = gl && !UserConfigParams::m_force_legacy_device;
+    bool directx = (std::string(UserConfigParams::m_render_driver) == "directx9");
+
     value = StringUtils::toWString(UserConfigParams::m_real_width);
     info_text[0] = _("Horizontal resolution: %s",     value);
     value = StringUtils::toWString(UserConfigParams::m_real_height);
     info_text[1] = _("Vertical resolution: %s",  value);
-    info_text[2] = UserConfigParams::m_dynamic_lights ? _("Dynamic lighting: ON")
-                                                      : _("Dynamic lighting: OFF");
-    value = StringUtils::toWString(UserConfigParams::m_dynamic_lights ?
+    info_text[2] = (UserConfigParams::m_dynamic_lights && (modern_gl || vk)) ? _("Dynamic lighting: ON")
+                                                                             : _("Dynamic lighting: OFF");
+    value = StringUtils::toWString((UserConfigParams::m_dynamic_lights && (modern_gl || vk)) ?
                           UserConfigParams::m_scale_rtts_factor * 100 : 100);
     info_text[3] = _("Render resolution: %s%%", value);
-    info_text[4] = UserConfigParams::m_mlaa ? _("Anti-aliasing: ON")
-                                            : _("Anti-aliasing : OFF");
-    info_text[5] = UserConfigParams::m_degraded_IBL ? _("Image-based lighting: OFF")
-                                                    : _("Image-based lighting: ON");
-    info_text[6] = UserConfigParams::m_ssao ? _("Ambient occlusion: ON")
-                                            : _("Ambient occlusion: OFF");
+    info_text[4] = (UserConfigParams::m_mlaa && modern_gl) ? _("Anti-aliasing: ON")
+                                                           : _("Anti-aliasing : OFF");
+    info_text[5] = (UserConfigParams::m_degraded_IBL && (modern_gl || vk)) ? _("Image-based lighting: OFF")
+                                                                           :  _("Image-based lighting: ON");
+    info_text[6] = (UserConfigParams::m_ssao && modern_gl) ? _("Ambient occlusion: ON")
+                                                           : _("Ambient occlusion: OFF");
     value = StringUtils::toWString(UserConfigParams::m_shadows_resolution);
+    value = modern_gl ? value : StringUtils::toWString("0");
     info_text[7] = _("Shadow resolution: %s", value);
+    value = vk        ? StringUtils::toWString("Vulkan")    :
+            modern_gl ? StringUtils::toWString("OpenGL")    :
+            gl        ? StringUtils::toWString("OpenGL 2")  : 
+            directx   ? StringUtils::toWString("DirectX 9") : _("Unknown");
+    info_text[8] = value;
 
-    for (int i=0; i<8; i++)
+    for (int i = 0; i < 9; i++)
     {
         pos = core::rect<s32>(current_x, current_y, current_x, current_y);
         font->draw(info_text[i].c_str(), pos, white_color, true, false);

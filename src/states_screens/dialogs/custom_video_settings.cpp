@@ -153,6 +153,7 @@ void CustomVideoSettingsDialog::beforeAddingWidgets()
         rds->addLabel(StringUtils::utf8ToWide(UserConfigParams::m_render_driver));
         rds->setValue(rd_count);
     }
+    rds->setActive(StateManager::get()->getGameState() != GUIEngine::INGAME_MENU);
 #endif
 } // beforeAddingWidgets
 

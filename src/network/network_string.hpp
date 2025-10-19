@@ -23,7 +23,7 @@
 #ifndef NETWORK_STRING_HPP
 #define NETWORK_STRING_HPP
 
-#include "network/protocol.hpp"
+#include "network/protocol_enum.hpp"
 #include "utils/leak_check.hpp"
 #include "utils/types.hpp"
 #include "utils/vec3.hpp"
