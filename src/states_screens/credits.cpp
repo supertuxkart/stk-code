@@ -210,6 +210,17 @@ void CreditsScreen::loadedFromFile()
         // translations should be just before the last screen
         m_sections.swap( m_sections.size() - 1, m_sections.size() - 2 );
     }
+
+// The Google Play Store and Apple App Store aggressive policies to get a cut of sales
+// mean that an included donation button may cause issues.
+// We disable it for the time being on mobile.
+#ifdef MOBILE_STK
+    Widget* w = getWidget<Widget>("donate");
+    assert(w != NULL);
+    w->setVisible(false);
+    w->setActive(false);
+#endif
+
 }   // loadedFromFile
 
 // ----------------------------------------------------------------------------
