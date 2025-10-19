@@ -39,6 +39,8 @@ For similar reasons, and because some features are vastly more complex than othe
 * Various compiler fixes, by heirecka, limburgher, nyllet and others
 * Substantial changes improving code quality, by Alayan and kimden
 * Ensure proper compilation with newer build environments, especially with cmake 4.0, by deveee
+* Include glitchless world-record replays for standard tracks, by Haenschen
+* New fonts to allow rendering several new languages (Georgian, Hindi, Bengali)
 * Update Wiiuse library to 0.15.6, SIMD-e to 0.8.2, MojoAL to latest (a9e2f30)
 * Various tweaks, bugfixes and code-quality improvements
 
@@ -54,7 +56,7 @@ For similar reasons, and because some features are vastly more complex than othe
 * Fix and improve the Screen-Space Ambiant Occlusion shader, by CodingJellyfish
 * Implement Percentage-Closer Soft Shadows, by CodingJellyfish
 * Guarantee an overall bone limit of 2048 for skinned mesh (up from 1024), by CodingJellyfish
-* Improve Cascaded Shadow Mapping, by CodingJellyfish
+* Improve Cascaded Shadow Mapping, by CodingJellyfish and Alayan
 * Improve the performance of scene node iteration, by CodingJellyfish
 * Various improvements to the automatic computations of Level of Detail (LoD) distances, by Alayan
 * Enable new higher LoD and shadows settings, by Alayan
@@ -71,6 +73,7 @@ For similar reasons, and because some features are vastly more complex than othe
 * Allow displaying more elements in kart and track selection, and ensure there is no need to scroll to pick a game mode, by Alayan
 * Improve the skin selection UX by separating "base theme" and "skin variant" selection, by Alayan
 * Add a new Display tab in the Settings, by Alayan
+* Allow to switch the active rendering engine from the options menu, by Benau and Alayan
 * Allow users to search karts/arenas, by CodingJellyfish
 * Allow users to group karts by kart classes, by CodingJellyfish
 * Allow to rate addons with a keyboard or a controller, and notify when trying to rate an addon while not logged in, by CodingJellyfish
@@ -92,6 +95,7 @@ For similar reasons, and because some features are vastly more complex than othe
 
 ### Mobile
 * Don't keep the rescue button active after it stops being touched, when the finger keeps touching the screen (e. g. to handle the steering wheel), by S0nter
+* Support for Apple CryptoKit, by Benau
 
 ### Tracks and modeling
 * Visually improved overworld, by Sven Andreas Belting
@@ -99,7 +103,7 @@ For similar reasons, and because some features are vastly more complex than othe
 #### Tracks
 * Fix Northern Resort skybox, by CrystalDaEevee
 * Various cut/checkline fixes, by CrystalDaEevee
-* Fix a cut in Hacienda, by Sven Andreas Belting
+* Fix cuts in Hacienda and Gran Paradisio Island, by Sven Andreas Belting
 * Add egg hunts for Black Forest, Gran Paradisio Island and Old Mine, by Sven Andreas Belting and Alayan
 
 #### Karts
