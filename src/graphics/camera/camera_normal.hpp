@@ -49,6 +49,24 @@ private:
     /** Factor of the effects of steering in camera aim. */
     float           m_rotation_range;
 
+    /** Time, in seconds, for a single shake. */
+    float           m_shaking_frequency;
+
+    /** The intensity of the shake. */
+    float           m_shaking_magnitude;
+
+    /** Time elapsed after the single shake started, in seconds. */
+    float           m_shaking_time;
+
+    /** Displacement from the exact camera location due to shaking. */
+    Vec3            m_shaking_offset;
+
+    /** The displacement the current camera shake aims to reach. */
+    Vec3            m_shaking_target;
+
+    /** The maximum camera shake intensity. */
+    const float     MAX_SHAKING_MAGNITUDE = 0.016f;
+
     Vec3            m_camera_offset;
 
     Mode            m_last_smooth_mode;

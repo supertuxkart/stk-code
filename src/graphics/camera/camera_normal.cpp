@@ -32,6 +32,7 @@
 #include "karts/kart_properties.hpp"
 #include "karts/skidding.hpp"
 #include "tracks/track.hpp"
+#include "guiengine/modaldialog.hpp"
 
 // ============================================================================
 /** Constructor for the normal camera. This is the only camera constructor
@@ -61,6 +62,11 @@ CameraNormal::CameraNormal(Camera::CameraType type,  int camera_index,
     m_kart_position = btVector3(0, 0, 0);
     m_kart_rotation = btQuaternion(0, 0, 0, 1);
     m_last_smooth_mode = Mode::CM_NORMAL;
+    m_shaking_time = 0.0f;
+    m_shaking_frequency = 0.02f;
+    m_shaking_magnitude = 0.0f;
+    m_shaking_offset = Vec3(0., 0., 0.);
+    m_shaking_target = Vec3(0., 0., 0.);
     reset();
     m_camera->setNearValue(1.0f);
 
@@ -141,10 +147,11 @@ void CameraNormal::moveCamera(float dt, bool smooth, float cam_angle, float dist
     m_camera_offset += (wanted_camera_offset - m_camera_offset) * delta;
 
     // next target
-    Vec3 current_target = btt(Vec3(0, 0.5f, 0));
+    // shake offset applied so that the camera doesn't fully target the player during shake
+    Vec3 current_target = btt(Vec3(0, 0.5f, 0) + m_shaking_offset);
     // new required position of camera
-    current_position = kart_camera_position_with_offset.toIrrVector();
-
+    current_position = kart_camera_position_with_offset.toIrrVector() + m_shaking_offset.toIrrVector();
+    
     //Log::info("CAM_DEBUG", "OFFSET: %f %f %f TRANSFORMED %f %f %f TARGET %f %f %f",
     //    wanted_camera_offset.x(), wanted_camera_offset.y(), wanted_camera_offset.z(),
     //    kart_camera_position_with_offset.x(), kart_camera_position_with_offset.y(),
@@ -312,6 +319,33 @@ void CameraNormal::update(float dt)
 
     getCameraSettings(getMode(), &above_kart, &cam_angle, &side_way, 
                                  &distance, &smoothing, &cam_roll_angle);
+    
+    // If the kart speed is higher than engine speed, apply camera shake.
+    // The shake intensity is higher at higher speeds.
+    float kart_speed = m_kart->getSpeed();
+    m_shaking_magnitude = clamp<float>(powf((kart_speed - m_kart->getKartProperties()->getEngineMaxSpeed()) / 7.0 , 5.0) , 0.0f, 1.0f) * MAX_SHAKING_MAGNITUDE;
+    
+    bool is_game_paused = GUIEngine::GameState::GAME && GUIEngine::ModalDialog::isADialogActive() && World::getWorld();
+    bool apply_camera_shake = !is_game_paused && UserConfigParams::m_camera_use_shake && m_shaking_magnitude > 0.0f && m_kart->isOnGround();
+
+    if(apply_camera_shake)
+    {
+        if(m_shaking_time > m_shaking_frequency) 
+        {
+            m_shaking_time = 0.0f;
+            m_shaking_target = Vec3(
+                (rand() / static_cast<float>(RAND_MAX)) * 2.0f - 1.0f,
+                (rand() / static_cast<float>(RAND_MAX)) * 2.0f - 1.0f,
+                (rand() / static_cast<float>(RAND_MAX)) * 2.0f - 1.0f
+            ) * m_shaking_magnitude;
+        }
+        float t = min_<float>(m_shaking_time / m_shaking_frequency, 1.0f);
+        m_shaking_offset = m_shaking_offset.lerp(m_shaking_target, t);
+        m_shaking_time += dt;
+    }
+    else {
+        m_shaking_offset = 0.0f;
+    }
 
     // If an explosion is happening, stop moving the camera,
     // but keep it target on the kart.

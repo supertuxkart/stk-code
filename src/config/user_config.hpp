@@ -1071,6 +1071,11 @@ namespace UserConfigParams
             PARAM_DEFAULT(  BoolUserConfigParam(false, "reverse-look-use-soccer-cam",
                             "Use ball camera in soccer mode, instead of reverse") );
 
+    PARAM_PREFIX BoolUserConfigParam         m_camera_use_shake
+        PARAM_DEFAULT(BoolUserConfigParam(true, "shake",
+            &m_camera_normal,
+            "Shakes the camera when reaching high speeds on ground"));
+
     // ---- The present camera (default: Standard)
     PARAM_PREFIX IntUserConfigParam       m_camera_present
             PARAM_DEFAULT(  IntUserConfigParam(1, "camera-present",
@@ -1121,6 +1126,11 @@ namespace UserConfigParams
             PARAM_DEFAULT(  BoolUserConfigParam(false, "reverse-look-use-soccer-cam",
             &m_standard_camera_settings,
             "Use ball camera in soccer mode, instead of reverse"));
+
+    PARAM_PREFIX BoolUserConfigParam         m_standard_camera_use_shake
+        PARAM_DEFAULT(BoolUserConfigParam(false, "shake",
+            &m_standard_camera_settings,
+            "Shakes the camera when reaching high speeds on ground"));
 
     // ---- Drone chase camera settings
     PARAM_PREFIX GroupUserConfigParam        m_drone_camera_settings
@@ -1213,6 +1223,11 @@ namespace UserConfigParams
             PARAM_DEFAULT(  BoolUserConfigParam(false, "reverse-look-use-soccer-cam",
             &m_saved_camera_settings,
             "Use ball camera in soccer mode, instead of reverse"));
+
+    PARAM_PREFIX BoolUserConfigParam         m_saved_camera_use_shake
+        PARAM_DEFAULT(BoolUserConfigParam(false, "shake",
+            &m_saved_camera_settings,
+            "Shakes the camera when reaching high speeds on ground"));
 
     // camera in artist mode
     PARAM_PREFIX GroupUserConfigParam        m_camera
