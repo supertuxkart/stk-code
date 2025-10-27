@@ -1107,7 +1107,7 @@ void KartSelectionScreen::addMultiplayerMessage()
         m_multiplayer_message = new BubbleWidget();
         m_multiplayer_message->m_properties[PROP_TEXT_ALIGN] = "center";
         m_multiplayer_message->setText(_("Everyone:\n"
-            "Press the 'Select' button to join the game"));
+            "Press the 'Fire' or 'Select' button to join the game"));
         m_multiplayer_message->m_x = message_x;
         m_multiplayer_message->m_y = (int) (fullarea->m_y + fullarea->m_h * 0.3f);
         m_multiplayer_message->m_w = (int) (splitWidth * 0.6f);
