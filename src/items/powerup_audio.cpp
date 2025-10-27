@@ -77,7 +77,7 @@ void PowerupAudio::adjustSound(Kart* kart)
 //-----------------------------------------------------------------------------
 /** Apply the on-usage sound effects of powerups
  */
-void PowerupAudio::onUseAudio(Kart* kart, PowerupManager::PowerupType type, int sound_type, PowerupManager::MiniState mini_state)
+void PowerupAudio::onUseAudio(Kart* kart, PowerupManager::PowerupType type, int sound_type, Kart* player_kart, PowerupManager::MiniState mini_state)
 {
 	const int ticks = World::getWorld()->getTicksSinceStart();
 	bool has_played_sound = false;
@@ -159,15 +159,26 @@ void PowerupAudio::onUseAudio(Kart* kart, PowerupManager::PowerupType type, int 
 
 	case PowerupManager::POWERUP_PARACHUTE:
 		m_powerup_sound[m_curr_sound] = SFXManager::get()->createSoundSource("parachute");
-		// should we position the sound at the kart that is hit,
-		// or the kart "throwing" the anvil? Ideally it should be both.
-		// Meanwhile, don't play it near AI karts since they obviously
-		// don't hear anything
-		if(kart->getController()->isLocalPlayerController())
+
+		// We play the parachute sound if the kart using it is a local player
+		// or if one of the karts affected by the parachute is a local player.
+		//
+		// Although if the player kart is not affected by a nearby AI kart is,
+		// it's a bit strange to not have the sound... However, creating as many
+		// sound sources as there is karts affected is not desirable.
+		//
+		// TODO: support parachute sound in normal race replays (no local player involved)
+		//       once normal race replays are implemented
+		if (kart->getController()->isLocalPlayerController())
+		{
 			m_powerup_sound[m_curr_sound]->setPosition(kart->getXYZ());
-		// FIXME else if(player_kart)
-			//FIXME m_powerup_sound[m_curr_sound]->setPosition(player_kart->getXYZ());
-		m_powerup_sound[m_curr_sound]->play();
+			m_powerup_sound[m_curr_sound]->play();
+		}
+		else if (player_kart != NULL)
+		{
+			m_powerup_sound[m_curr_sound]->setPosition(player_kart->getXYZ());
+			m_powerup_sound[m_curr_sound]->play();
+		}
 		break;
 
 	case PowerupManager::POWERUP_NOTHING:
@@ -222,7 +233,6 @@ void PowerupAudio::update(Kart* kart, int ticks)
 
 //-----------------------------------------------------------------------------
 /** This function is used to pick which of the powerup sound sources will be
-void PowerupAudio::resetSoundSource()
  *  used and ensures we don't leak sound sources. */
 void PowerupAudio::prepareSoundSource()
 {
@@ -243,4 +253,4 @@ void PowerupAudio::prepareSoundSource()
 		m_powerup_sound[m_curr_sound]->deleteSFX();
 		m_powerup_sound[m_curr_sound] = NULL;
 	}
-} // resetSoundSource
+} // prepareSoundSource

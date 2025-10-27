@@ -209,6 +209,11 @@ void Powerup::use()
     // Some powerups can play different sounds depending on the situation
     int sound_type = 1;
     PowerupManager::MiniState audio_mini_state = m_mini_state;
+    // Some powerups can play a sound located at the target kart instead
+    // of the kart that used the powerup (e. g. parachute)
+    // To avoid using many sound sources (one per affected kart),
+    // we play the sound only if a player kart is affected.
+    Kart* player_kart = NULL;
 
     switch (m_type)
     {
@@ -329,7 +334,7 @@ void Powerup::use()
         }
     case PowerupManager::POWERUP_PARACHUTE:
         {
-            Kart* player_kart = NULL;
+
             //Attach a parachute(that last 1,3 time as long as the
             //one from the bananas and is affected by the rank multiplier)
             //to all the karts that are in front of this one.
@@ -367,7 +372,7 @@ void Powerup::use()
                               stk_config->time2Ticks(kp->getParachuteDurationOther()*rank_mult) );
 
                     if(kart->getController()->isLocalPlayerController())
-                        player_kart = kart;
+                        player_kart = kart; // This is used to play the parachute sound
                 }
             }
             break;
@@ -376,7 +381,7 @@ void Powerup::use()
     default : break;
     }
 
-    PowerupAudio::getInstance()->onUseAudio(m_kart, m_type, sound_type, audio_mini_state);
+    PowerupAudio::getInstance()->onUseAudio(m_kart, m_type, sound_type, player_kart, audio_mini_state);
 
     if ( m_number <= 0 )
     {
