@@ -2258,9 +2258,8 @@ void Kart::unsetSquash()
   */
 bool Kart::isSquashed() const
 {
-    return
-        m_max_speed->isSpeedDecreaseActive(MaxSpeed::MS_DECREASE_SQUASH) == 1;
-}   // setSquash
+    return m_max_speed->isSpeedDecreaseActive(MaxSpeed::MS_DECREASE_SQUASH) == 1;
+}   // isSquashed
 
 //-----------------------------------------------------------------------------
 /** Plays any terrain specific sound effect.
@@ -2911,6 +2910,9 @@ void Kart::applyRescue(bool auto_rescue)
     m_last_factor_engine_sound = 0.0f;
     m_effective_steer = 0.0f;
     getAttachment()->clear();
+    if (m_stars_effect)
+        m_stars_effect->reset();
+    m_max_speed->reset(/* don't affect squashing */ true);
 
     // Apply game-mode specific effects
     // In battle mode, add a hit unless it was auto-rescue

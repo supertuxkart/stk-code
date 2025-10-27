@@ -64,7 +64,7 @@ MaxSpeed::MaxSpeed(Kart *kart)
  *  newly constructed values, i.e. values that don't cause any slowdown
  *  or speedup.
  */
-void MaxSpeed::reset()
+void MaxSpeed::reset(bool leave_squash)
 {
     m_current_max_speed = m_kart->getKartProperties()->getEngineMaxSpeed();
     m_min_speed         = -1.0f;
@@ -72,6 +72,8 @@ void MaxSpeed::reset()
 
     for(unsigned int i=MS_DECREASE_MIN; i<MS_DECREASE_MAX; i++)
     {
+        if (leave_squash && i == MS_DECREASE_SQUASH)
+            continue;
         SpeedDecrease sd;
         m_speed_decrease[i] = sd;
     }

@@ -210,7 +210,7 @@ public:
     int   isSpeedDecreaseActive(unsigned int category);
     void  endSpeedIncrease(unsigned int category);
     void  update(int ticks);
-    void  reset();
+    void  reset(bool leave_squash = false);
     void  saveState(BareNetworkString *buffer) const;
     void  rewindTo(BareNetworkString *buffer);
     // ------------------------------------------------------------------------
