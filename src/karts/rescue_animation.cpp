@@ -23,8 +23,7 @@
 #include "items/attachment.hpp"
 #include "karts/kart.hpp"
 #include "karts/kart_properties.hpp"
-#include "modes/follow_the_leader.hpp"
-#include "modes/three_strikes_battle.hpp"
+#include "modes/world.hpp"
 #include "network/network_string.hpp"
 #include "mini_glm.hpp"
 
@@ -73,35 +72,6 @@ RescueAnimation::RescueAnimation(Kart* kart, bool is_auto_rescue)
     float velocity = max_height / timer;
 
     init(rescue_transform, velocity);
-    m_kart->getAttachment()->clear();
-
-    // Add a hit unless it was auto-rescue
-    if (RaceManager::get()->isBattleMode() &&
-        !is_auto_rescue)
-    {
-        World::getWorld()->kartHit(m_kart->getWorldKartId());
-        if (UserConfigParams::m_arena_ai_stats)
-        {
-            ThreeStrikesBattle* tsb = dynamic_cast<ThreeStrikesBattle*>
-                (World::getWorld());
-            if (tsb)
-                tsb->increaseRescueCount();
-        }
-    }
-
-    // Allow FTL mode to apply special action when the leader is rescued
-    if (RaceManager::get()->isFollowMode())
-    {
-        FollowTheLeaderRace *ftl_world =
-            dynamic_cast<FollowTheLeaderRace*>(World::getWorld());
-        if(ftl_world->isLeader(kart->getWorldKartId()))
-            ftl_world->leaderRescued();
-    }
-
-    // Clear powerups when rescue in CTF
-    if (RaceManager::get()->getMinorMode() ==
-        RaceManager::MINOR_MODE_CAPTURE_THE_FLAG)
-        resetPowerUp();
 }   // RescueAnimation
 
 //-----------------------------------------------------------------------------

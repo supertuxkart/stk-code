@@ -35,7 +35,6 @@
 #include "karts/controller/ai_properties.hpp"
 #include "karts/kart_properties.hpp"
 #include "karts/max_speed.hpp"
-#include "karts/rescue_animation.hpp"
 #include "karts/skidding.hpp"
 #include "modes/linear_world.hpp"
 #include "modes/profile_world.hpp"
@@ -301,7 +300,7 @@ void SkiddingAI::update(int ticks)
     // If the kart needs to be rescued, do it now (and nothing else)
     if(isStuck() && !m_kart->getKartAnimation())
     {
-        RescueAnimation::create(m_kart);
+        m_kart->applyRescue(/* auto-rescue */ false);
         AIBaseLapController::update(ticks);
         return;
     }
@@ -1585,7 +1584,7 @@ void SkiddingAI::handleRescue(const float dt)
         m_time_since_stuck += dt;
         if(m_time_since_stuck > 2.0f)
         {
-            RescueAnimation::create(m_kart);
+            m_kart->applyRescue(/* auto-rescue */ false);
             m_time_since_stuck=0.0f;
         }   // m_time_since_stuck > 2.0f
     }

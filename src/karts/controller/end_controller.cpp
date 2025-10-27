@@ -246,7 +246,7 @@ void EndController::handleRescue(const float DELTA)
         m_time_since_stuck += DELTA;
         if(m_time_since_stuck > 2.0f)
         {
-            RescueAnimation::create(m_kart);
+            m_kart->applyRescue(/* auto-rescue */ false);
             m_time_since_stuck=0.0f;
         }   // m_time_since_stuck > 2.0f
     }

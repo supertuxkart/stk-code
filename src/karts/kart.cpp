@@ -64,9 +64,11 @@
 #include "karts/skidding.hpp"
 #include "main_loop.hpp"
 #include "modes/capture_the_flag.hpp"
+#include "modes/follow_the_leader.hpp"
 #include "modes/linear_world.hpp"
 #include "modes/overworld.hpp"
 #include "modes/soccer_world.hpp"
+#include "modes/three_strikes_battle.hpp"
 #include "network/compress_network_body.hpp"
 #include "network/network_config.hpp"
 #include "network/protocols/client_lobby.hpp"
@@ -1882,7 +1884,7 @@ void Kart::update(int ticks)
             !has_animation_before && fabs(roll) > 60 * DEGREE_TO_RAD &&
             fabs(getSpeed()) < 3.0f)
         {
-            handleRescue(/*is_auto_rescue*/ true);
+            applyRescue(/*is_auto_rescue*/ true);
         }
     }
 
@@ -1972,14 +1974,14 @@ void Kart::update(int ticks)
         if((min->getY() - getXYZ().getY() > 17 || dist_to_sector > 25) && !m_flying &&
            !has_animation_before)
         {
-            handleRescue();
+            applyRescue();
         }
     }
     else
     {
         if (!has_animation_before && material->isDriveReset() && isOnGround())
         {
-            handleRescue();
+            applyRescue();
         }
         else if(material->isZipper()     && isOnGround())
         {
@@ -2880,7 +2882,7 @@ void Kart::crashed(const Material *m, const Vec3 &normal)
 #endif
         if (m->getCollisionReaction() == Material::RESCUE)
         {
-            handleRescue();
+            applyRescue();
         }
         else if (m->getCollisionReaction() == Material::PUSH_BACK)
         {
@@ -2901,12 +2903,42 @@ void Kart::crashed(const Material *m, const Vec3 &normal)
 // -----------------------------------------------------------------------------
 /** Create the rescue animation and reset some relevant variables
  *  World takes care of moving the kart to its rescue position. */
-void Kart::handleRescue(bool auto_rescue)
+void Kart::applyRescue(bool auto_rescue)
 {
     RescueAnimation::create(this, /*is_auto_rescue*/ auto_rescue);
+
+    // Reset some gameplay variables such as attachments
     m_last_factor_engine_sound = 0.0f;
     m_effective_steer = 0.0f;
-} // handleRescue
+    getAttachment()->clear();
+
+    // Apply game-mode specific effects
+    // In battle mode, add a hit unless it was auto-rescue
+    if (RaceManager::get()->isBattleMode() && !auto_rescue)
+    {
+        World::getWorld()->kartHit(getWorldKartId());
+        if (UserConfigParams::m_arena_ai_stats)
+        {
+            ThreeStrikesBattle* tsb = dynamic_cast<ThreeStrikesBattle*>
+                (World::getWorld());
+            if (tsb)
+                tsb->increaseRescueCount();
+        }
+    }
+
+    // Allow FTL mode to apply special action when the leader is rescued
+    if (RaceManager::get()->isFollowMode())
+    {
+        FollowTheLeaderRace *ftl_world =
+            dynamic_cast<FollowTheLeaderRace*>(World::getWorld());
+        if(ftl_world->isLeader(getWorldKartId()))
+            ftl_world->leaderRescued();
+    }
+
+    // Clear powerups when rescued in CTF
+    if (RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_CAPTURE_THE_FLAG)
+        getPowerup()->reset();
+} // applyRescue
 
 // -----------------------------------------------------------------------------
 /** Common code used when a kart or a material was hit.

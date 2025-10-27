@@ -35,7 +35,6 @@
 #include "karts/controller/ai_properties.hpp"
 #include "karts/kart_properties.hpp"
 #include "karts/max_speed.hpp"
-#include "karts/rescue_animation.hpp"
 #include "karts/skidding.hpp"
 #include "modes/linear_world.hpp"
 #include "modes/profile_world.hpp"
@@ -312,7 +311,7 @@ void SkiddingAI::update(int ticks)
         if (m_enabled_network_ai)
             m_controls->setRescue(true);
         else
-            RescueAnimation::create(m_kart);
+            m_kart->applyRescue(/* auto-rescue */ false);
         AIBaseLapController::update(ticks);
         return;
     }
@@ -2191,7 +2190,7 @@ void SkiddingAI::handleRescue(const float dt)
             if (m_enabled_network_ai)
                 m_controls->setRescue(true);
             else
-                RescueAnimation::create(m_kart);
+                m_kart->applyRescue(/* auto-rescue */ false);
             m_time_since_stuck=0.0f;
         }   // m_time_since_stuck > 2.0f
     }

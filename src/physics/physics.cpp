@@ -27,7 +27,6 @@
 #include "graphics/stars.hpp"
 #include "items/flyable.hpp"
 #include "karts/kart_properties.hpp"
-#include "karts/rescue_animation.hpp"
 #include "karts/controller/local_player_controller.hpp"
 #include "modes/soccer_world.hpp"
 #include "modes/world.hpp"
@@ -266,7 +265,7 @@ void Physics::update(int ticks)
             }
             if (obj->isCrashReset())
             {
-                RescueAnimation::create(kart);
+                kart->applyRescue(/* auto-rescue */ false);
             }
             else if (obj->isExplodeKartObject())
             {
@@ -303,7 +302,7 @@ void Physics::update(int ticks)
             if(anim->isCrashReset())
             {
                 Kart *kart = p->getUserPointer(1)->getPointerKart();
-                RescueAnimation::create(kart);
+                kart->applyRescue(/* auto-rescue */ false);
             }
             else if (anim->isExplodeKartObject())
             {

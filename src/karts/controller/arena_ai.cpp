@@ -25,7 +25,6 @@
 #include "karts/kart.hpp"
 #include "karts/controller/ai_properties.hpp"
 #include "karts/kart_properties.hpp"
-#include "karts/rescue_animation.hpp"
 #include "tracks/arena_graph.hpp"
 #include "tracks/arena_node.hpp"
 #include "tracks/track.hpp"
@@ -112,7 +111,7 @@ void ArenaAI::update(int ticks)
         m_kart->isOnGround()                                     )
     {
         m_ticks_since_off_road = 0;
-        RescueAnimation::create(m_kart);
+        m_kart->applyRescue(/* auto-rescue */ false);
         AIBaseController::update(ticks);
         return;
     }

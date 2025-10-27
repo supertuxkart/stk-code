@@ -395,7 +395,6 @@ protected:
     float         compensateLinearSlowdown (float engine_power);
     float         applyAirFriction (float engine_power);
     float         getActualWheelForce();
-    void          handleRescue(bool auto_rescue=false);
     void          playCrashSFX(const Material* m, Kart *k);
     void          loadData(RaceManager::KartType type, bool animatedModel);
     void          updateWeight();
@@ -519,6 +518,8 @@ public:
     virtual void   setElectroShield();
     /** This disables the kart's electro-shield */
     virtual void   unsetElectroShield();
+    /** This triggers a rescue for this kart */
+    virtual void          applyRescue(bool auto_rescue=false);
 
     // ------------------------------------------------------------------------
     /** Called when the kart crashes against another kart.

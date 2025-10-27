@@ -23,6 +23,7 @@
 #include "graphics/stars.hpp"
 #include "guiengine/engine.hpp"
 #include "items/attachment.hpp"
+#include "items/powerup.hpp"
 #include "karts/kart.hpp"
 #include "karts/kart_properties.hpp"
 #include "modes/follow_the_leader.hpp"
@@ -119,8 +120,9 @@ ExplosionAnimation::ExplosionAnimation(Kart* kart, bool direct_hit)
     m_kart->playCustomSFX(SFXManager::CUSTOM_EXPLODE);
     m_kart->getAttachment()->clear();
     // Clear powerups when direct hit in CTF
+    // TODO: move this out of this code file
     if (reset)
-        resetPowerUp();
+        m_kart->getPowerup()->reset();
 }   // ExplosionAnimation
 
 //-----------------------------------------------------------------------------

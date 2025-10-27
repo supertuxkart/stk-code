@@ -19,7 +19,6 @@
 #include "karts/abstract_kart_animation.hpp"
 
 #include "graphics/slip_stream.hpp"
-#include "items/powerup.hpp"
 #include "karts/kart.hpp"
 #include "karts/kart_model.hpp"
 #include "karts/skidding.hpp"
@@ -100,15 +99,6 @@ AbstractKartAnimation::~AbstractKartAnimation()
         Physics::get()->addKart(m_kart);
     }
 }   // ~AbstractKartAnimation
-
-// ----------------------------------------------------------------------------
-/** In CTF mode call this to reset kart powerup when get hit.
- */
-void AbstractKartAnimation::resetPowerUp()
-{
-    if (m_kart)
-        m_kart->getPowerup()->reset();
-}   // resetPowerUp
 
 // ----------------------------------------------------------------------------
 /** Updates the timer, and if it expires, the kart animation will be

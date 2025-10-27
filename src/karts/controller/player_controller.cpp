@@ -27,7 +27,6 @@
 #include "karts/kart.hpp"
 #include "karts/kart_properties.hpp"
 #include "karts/skidding.hpp"
-#include "karts/rescue_animation.hpp"
 #include "modes/world.hpp"
 #include "network/game_setup.hpp"
 #include "network/rewind_manager.hpp"
@@ -323,7 +322,7 @@ void PlayerController::update(int ticks)
     // starting any other animation).
     if ( m_controls->getRescue() && !m_kart->getKartAnimation() )
     {
-        RescueAnimation::create(m_kart);
+        m_kart->applyRescue(/* auto-rescue */ false);
         m_controls->setRescue(false);
     }
 }   // update
