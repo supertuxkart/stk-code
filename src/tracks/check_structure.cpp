@@ -250,7 +250,9 @@ void CheckStructure::changeStatus(const std::vector<int> &indices,
         for (unsigned int n=0; n<cm->getCheckStructureCount(); n++)
         {
             CheckStructure *cs = cm->getCheckStructure(n);
-            if (dynamic_cast<CheckLap*>(cs) != NULL)
+            if (cs->getType() == CT_CANNON)
+                printf("Checkline %i (CANNON) - always active, doesn't count for lap validation\n", n);
+            else if (dynamic_cast<CheckLap*>(cs) != NULL)
                 printf("Checkline %i (LAP) : %i\n", n, (int)cs->m_is_active[kart_index] + 2*(int)cs->m_backwards_active[kart_index]);
             else
                 printf("Checkline %i : %i\n", n, (int)cs->m_is_active[kart_index] + 2*(int)cs->m_backwards_active[kart_index]);
