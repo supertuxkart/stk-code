@@ -1129,12 +1129,9 @@ bool handleContextMenuAction(s32 cmd_id)
                             "* <F10> - Zipper powerup | + <Ctrl> - Powerup amount slider | + <Shift> - Toggle GUI\n"
                             "* <F11> - Save replay | + <Ctrl> - Save history | + <Shift> - Dump RTT\n"
                             "* <F12> - Show FPS | + <Ctrl> - Show other karts' powerups | + <Shift> - Show soccer player list\n"
-                            "* <Insert> - Overfilled nitro\n"
-                            "* <Delete> - Clear kart items\n"
-                            "* <Home> - First kart\n"
-                            "* <End> - Last kart\n"
-                            "* <Page Up> - Previous kart\n"
-                            "* <Page Down> - Next kart"
+                            "* <Insert> - Overfilled nitro  |  <Delete> - Clear kart items\n"
+                            "* <Home> - First kart  |  <End> - Last kart\n"
+                            "* <Page Up> - Previous kart  |  <Page Down> - Next kart\n"
                             , World::getWorld() && World::getWorld()->isNetworkWorld() ? false : true);
         }
         break;

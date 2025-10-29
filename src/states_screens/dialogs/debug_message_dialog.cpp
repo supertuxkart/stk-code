@@ -31,7 +31,7 @@ using namespace GUIEngine;
 // ------------------------------------------------------------------------------------------------------
 
 DebugMessageDialog::DebugMessageDialog(irr::core::stringw msg, bool stopGame) :
-    ModalDialog(0.85f, 0.95f, MODAL_DIALOG_LOCATION_CENTER)
+    ModalDialog(0.85f, 0.9f, MODAL_DIALOG_LOCATION_CENTER)
 {
     m_stop_game = stopGame;
 
