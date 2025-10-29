@@ -303,6 +303,10 @@ void OptionsScreenUI::loadSkins(const std::set<std::string>& files, bool addon)
                 return;
             }
 
+            // Localize the skin names
+            skin.m_base_theme_name = _(skin.m_base_theme_name.c_str());
+            skin.m_variant_name    = _(skin.m_variant_name.c_str());
+
             skin.m_folder_name = folder_name;
             m_skins.push_back(skin);
 
