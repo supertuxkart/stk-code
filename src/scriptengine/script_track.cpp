@@ -34,7 +34,6 @@
 #include "scriptengine/property_animator.hpp"
 #include "scriptengine/aswrappedcall.hpp"
 #include "scriptengine/scriptarray.hpp"
-#include "states_screens/dialogs/tutorial_message_dialog.hpp"
 #include "states_screens/dialogs/race_paused_dialog.hpp"
 #include "tracks/track.hpp"
 #include "tracks/track_object.hpp"

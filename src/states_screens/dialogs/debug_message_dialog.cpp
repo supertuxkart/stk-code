@@ -15,7 +15,7 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-#include "states_screens/dialogs/tutorial_message_dialog.hpp"
+#include "states_screens/dialogs/debug_message_dialog.hpp"
 
 #include "guiengine/engine.hpp"
 #include "guiengine/screen.hpp"
@@ -30,7 +30,7 @@ using namespace GUIEngine;
 
 // ------------------------------------------------------------------------------------------------------
 
-TutorialMessageDialog::TutorialMessageDialog(irr::core::stringw msg, bool stopGame) :
+DebugMessageDialog::DebugMessageDialog(irr::core::stringw msg, bool stopGame) :
     ModalDialog(0.85f, 0.95f, MODAL_DIALOG_LOCATION_CENTER)
 {
     m_stop_game = stopGame;
@@ -40,9 +40,7 @@ TutorialMessageDialog::TutorialMessageDialog(irr::core::stringw msg, bool stopGa
         World::getWorld()->schedulePause(World::IN_GAME_MENU_PHASE);
     }
 
-
-    loadFromFile("tutorial_message_dialog.stkgui");
-
+    loadFromFile("debug_message_dialog.stkgui");
 
     LabelWidget* message = getWidget<LabelWidget>("title");
     message->setText( msg.c_str(), false );
@@ -53,7 +51,7 @@ TutorialMessageDialog::TutorialMessageDialog(irr::core::stringw msg, bool stopGa
 
 // ------------------------------------------------------------------------------------------------------
 
-TutorialMessageDialog::~TutorialMessageDialog()
+DebugMessageDialog::~DebugMessageDialog()
 {
     if (m_stop_game && StateManager::get()->getGameState() == GUIEngine::GAME)
     {
@@ -63,13 +61,13 @@ TutorialMessageDialog::~TutorialMessageDialog()
 
 // ------------------------------------------------------------------------------------------------------
 
-void TutorialMessageDialog::onEnterPressedInternal()
+void DebugMessageDialog::onEnterPressedInternal()
 {
 }
 
 // ------------------------------------------------------------------------------------------------------
 
-GUIEngine::EventPropagation TutorialMessageDialog::processEvent(const std::string& eventSource)
+GUIEngine::EventPropagation DebugMessageDialog::processEvent(const std::string& eventSource)
 {
     if (eventSource == "continue")
     {
@@ -82,6 +80,6 @@ GUIEngine::EventPropagation TutorialMessageDialog::processEvent(const std::strin
 
 // ------------------------------------------------------------------------------------------------------
 
-void TutorialMessageDialog::onUpdate(float dt)
+void DebugMessageDialog::onUpdate(float dt)
 {
 }

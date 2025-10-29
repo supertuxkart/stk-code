@@ -58,9 +58,9 @@
 #include "main_loop.hpp"
 #include "replay/replay_recorder.hpp"
 #include "scriptengine/script_engine.hpp"
+#include "states_screens/dialogs/debug_message_dialog.hpp"
 #include "states_screens/dialogs/debug_slider.hpp"
 #include "states_screens/dialogs/general_text_field_dialog.hpp"
-#include "states_screens/dialogs/tutorial_message_dialog.hpp"
 #include "tracks/track_manager.hpp"
 #include "utils/constants.hpp"
 #include "utils/log.hpp"
@@ -1106,7 +1106,16 @@ bool handleContextMenuAction(s32 cmd_id)
         irr_driver->setRecording(false);
         break;
     case DEBUG_HELP:
-        new TutorialMessageDialog(L"Debug keyboard shortcuts (can conflict with user-defined shortcuts):\n"
+        // If the debug help dialog is already active, the debug help input toggles it off
+        if (GUIEngine::ModalDialog::isADialogActive()
+            && dynamic_cast<DebugMessageDialog*>(GUIEngine::ModalDialog::getCurrent()))
+        {
+            GUIEngine::ModalDialog::dismiss();
+        }
+        // Show the debug help dialog
+        else
+        {
+            new DebugMessageDialog(L"Debug keyboard shortcuts (can conflict with user-defined shortcuts):\n"
                             "* <~> - Show this help dialog | + <Ctrl> - Adjust lights | + <Shift> - Adjust visuals\n"
                             "* <F1> - Anchor powerup | + <Ctrl> - Normal view | + <Shift> - Bomb attachment\n"
                             "* <F2> - Basketball powerup | + <Ctrl> - First person view | + <Shift> - Anchor attachment\n"
@@ -1127,6 +1136,7 @@ bool handleContextMenuAction(s32 cmd_id)
                             "* <Page Up> - Previous kart\n"
                             "* <Page Down> - Next kart"
                             , World::getWorld() && World::getWorld()->isNetworkWorld() ? false : true);
+        }
         break;
     }
     return false;
