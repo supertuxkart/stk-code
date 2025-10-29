@@ -409,7 +409,7 @@ const core::stringw NewsManager::getCurrentNewsMessage(NewsType type)
     m_news[type].lock();
 
     if (m_current_news_ptr[type] >= 0
-     && m_current_news_ptr[type] < m_news[type].getData().size())
+     && (unsigned int) m_current_news_ptr[type] < m_news[type].getData().size())
     {
         message = m_news[type].getData()[m_current_news_ptr[type]].getNews();
     }
@@ -427,7 +427,7 @@ const std::string NewsManager::getCurrentNewsDate(NewsType type)
     m_news[type].lock();
 
     if (m_current_news_ptr[type] >= 0
-     && m_current_news_ptr[type] < m_news[type].getData().size())
+     && (unsigned int) m_current_news_ptr[type] < m_news[type].getData().size())
     {
         date = m_news[type].getData()[m_current_news_ptr[type]].getDate();
     }
@@ -445,7 +445,7 @@ const std::string NewsManager::getCurrentNewsLink(NewsType type)
     m_news[type].lock();
 
     if (m_current_news_ptr[type] >= 0
-     && m_current_news_ptr[type] < m_news[type].getData().size())
+     && (unsigned int) m_current_news_ptr[type] < m_news[type].getData().size())
     {
         link = m_news[type].getData()[m_current_news_ptr[type]].getLink();
     }
@@ -463,7 +463,7 @@ const bool NewsManager::isCurrentNewsImportant(NewsType type)
     m_news[type].lock();
 
     if (m_current_news_ptr[type] >= 0
-     && m_current_news_ptr[type] < m_news[type].getData().size())
+     && (unsigned int) m_current_news_ptr[type] < m_news[type].getData().size())
     {
         importance = m_news[type].getData()[m_current_news_ptr[type]].isImportant();
     }
