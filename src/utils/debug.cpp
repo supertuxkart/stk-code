@@ -873,10 +873,10 @@ bool handleContextMenuAction(s32 cmd_id)
         if (!world) return false;
         DebugSliderDialog *dsd = new DebugSliderDialog();
         dsd->changeLabel("Red", "Kart number");
-        dsd->setSliderHook("red_slider", 0, World::getWorld()->getNumKarts() - 1,
-            [](){ return Camera::getActiveCamera()->getKart()->getWorldKartId(); },
+        dsd->setSliderHook("red_slider", 1, World::getWorld()->getNumKarts(),
+            [](){ return Camera::getActiveCamera()->getKart()->getWorldKartId() + 1; },
             [](int new_kart_num){Camera::getActiveCamera()->
-            setKart(World::getWorld()->getKart(new_kart_num)); }
+            setKart(World::getWorld()->getKart(new_kart_num - 1)); }
         );
         dsd->changeLabel("Green", "[None]");
         dsd->toggleSlider("green_slider", false);
