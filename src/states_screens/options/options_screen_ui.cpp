@@ -269,6 +269,20 @@ void OptionsScreenUI::init()
         }
     }
     speedrun_timer->setState( UserConfigParams::m_speedrun_mode );
+	
+	CheckBoxWidget* speedometer = getWidget<CheckBoxWidget>("speedometer");
+    assert( speedometer != NULL );
+	
+    speedometer->setState( UserConfigParams::m_speedometer);
+	if (multitouch_enabled)
+    {
+        UserConfigParams::m_speedometer == 0;
+    }
+	else
+	{
+		UserConfigParams::m_speedometer == 1;
+	}
+    speedometer->setState( UserConfigParams::m_speedometer );
 }   // init
 
 // -----------------------------------------------------------------------------
@@ -502,6 +516,12 @@ void OptionsScreenUI::eventCallback(Widget* widget, const std::string& name, con
             }
         }
         UserConfigParams::m_speedrun_mode = speedrun_timer->getState();
+    }
+	else if (name == "speedometer")
+		{
+        CheckBoxWidget* speedometer = getWidget<CheckBoxWidget>("speedometer");
+        assert( speedometer != NULL );
+        UserConfigParams::m_speedometer = speedometer->getState();
     }
 #endif
 }   // eventCallback
