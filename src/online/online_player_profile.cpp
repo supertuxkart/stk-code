@@ -53,6 +53,7 @@ namespace Online
         class SignInRequest : public XMLRequest
         {
             virtual void callback();
+            irr::core::stringw getLocalizedInfo() const;
         public:
             SignInRequest()
                 : XMLRequest(/*priority*/10) {}
@@ -185,7 +186,7 @@ namespace Online
             if(isSuccess())
                 login->loginSuccessful();
             else
-                login->loginError(getInfo(), !hadDownloadError());
+                login->loginError(getLocalizedInfo(), !hadDownloadError());
         }   // if dialog
 
         // Check if failure happened during automatic (saved) signin.
@@ -198,7 +199,7 @@ namespace Online
                 // to inform user that login failed.
                 // Same thing if a dialog is active, can't navigate to other
                 // screen when a dialog is active
-                MessageQueue::add(MessageQueue::MT_ERROR, getInfo());
+                MessageQueue::add(MessageQueue::MT_ERROR, getLocalizedInfo());
                 return;
             }
 
@@ -206,12 +207,44 @@ namespace Online
             // this function is called from the main thread, so we can 
             // push screens without synchronisations.
             UserScreen::getInstance()->push();
-            UserScreen::getInstance()->loginError(getInfo(),
+            UserScreen::getInstance()->loginError(getLocalizedInfo(),
                 !hadDownloadError());
         }
 
-
     }   // SignInRequest::callback
+
+    // ------------------------------------------------------------------------
+    /** \return the info string, translated if possible.
+     */
+    irr::core::stringw PrivateRequest::SignInRequest::getLocalizedInfo() const
+    {
+        irr::core::stringw info = getInfo();
+        irr::core::stringw password_length = "The password must be between 8 and 60 characters long";
+        irr::core::stringw username_char =
+            "Your username can only contain alphanumeric characters, periods, dashes and underscores";
+        irr::core::stringw username_present = "Username required";
+        irr::core::stringw username_length = "The username must be between 3 and 30 characters long";
+        irr::core::stringw invalid_credentials = "Username or password is invalid";
+        irr::core::stringw session_expired = "Session not valid. Please sign in.";
+
+        // We localize the string from the server if possible ; a 0 from wcscmp indicates a string match
+        // TODO: it would be better to simply have the server send error codes,
+        //       however this solution doesn't require a server-side change or more importantly
+        //       doesn't prevent previous STK versions from interpreting the server message.
+        if (wcscmp(info.c_str(), password_length.c_str()) == 0)
+            info = _("The password must be between %i and %i characters long!", 8, 60);
+        else if (wcscmp(info.c_str(), username_char.c_str()) == 0)
+            info = _("The online username can only contain alphanumeric characters, periods, dashes and underscores!");
+        else if (wcscmp(info.c_str(), username_present.c_str()) == 0 ||
+                 wcscmp(info.c_str(), username_length.c_str()) == 0)
+            info = _("The online username must be between %i and %i characters long!", 3, 30);
+        else if (wcscmp(info.c_str(), invalid_credentials.c_str()) == 0)
+            info = _("The username or the password is invalid!");
+        else if (wcscmp(info.c_str(), session_expired.c_str()) == 0)
+            info = _("Your user session is invalid, please sign in.");
+
+        return info;
+    }   // getLocalizedInfo
 
     // ------------------------------------------------------------------------
     /** Checks the server respond after a login attempt. If the login

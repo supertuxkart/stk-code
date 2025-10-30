@@ -29,7 +29,7 @@ Here you can configure advanced theming rules for this skin
 
 <element type="error-message" image="error.png"
       left_border="130" right_border="13" top_border="13" bottom_border="13"
-      preserve_h_aspect_ratios="true" hborder_out_portion="0" vborder_out_portion="0"/>-->
+      preserve_h_aspect_ratios="true" hborder_out_portion="0" vborder_out_portion="0"/>
 
 <element type="generic-message" image="generic.png"
       left_border="130" right_border="13" top_border="13" bottom_border="13"
