@@ -30,6 +30,7 @@
 #include "states_screens/dialogs/message_dialog.hpp"
 #include "states_screens/dialogs/kart_color_slider_dialog.hpp"
 #include "states_screens/dialogs/recovery_dialog.hpp"
+#include "states_screens/dialogs/general_text_field_dialog.hpp"
 #include "states_screens/main_menu_screen.hpp"
 #include "states_screens/online/register_screen.hpp"
 
@@ -418,13 +419,35 @@ void BaseUserScreen::eventCallback(Widget* widget,
         else if (button == "rename")
         {
             PlayerProfile *cp = getSelectedPlayer();
-            RegisterScreen::getInstance()->setRename(cp);
-            RegisterScreen::getInstance()->push();
-            RegisterScreen::getInstance()->setParent(this);
-            m_new_registered_data = false;
-            m_auto_login          = false;
-            // Init will automatically be called, which
-            // refreshes the player list
+            core::stringw instruction = _("Enter the new name for this player");
+            
+            new GeneralTextFieldDialog(instruction,
+                [this] (const irr::core::stringw& new_name)
+                {
+                    if (new_name.size() > 0)
+                    {
+                        PlayerProfile *player = getSelectedPlayer();
+                        if (player)
+                        {
+                            player->setName(new_name);
+                            PlayerManager::get()->save();
+                            init(); // Refresh the player list
+                        }
+                    }
+                });
+            // Set the current name in the text field
+            if (cp)
+            {
+                GUIEngine::ModalDialog* dialog = GUIEngine::ModalDialog::getCurrent();
+                if (dialog)
+                {
+                    GeneralTextFieldDialog* text_dialog = dynamic_cast<GeneralTextFieldDialog*>(dialog);
+                    if (text_dialog)
+                    {
+                        text_dialog->getTextField()->setText(cp->getName());
+                    }
+                }
+            }
         }
         else if (button == "default_kart_color")
         {
