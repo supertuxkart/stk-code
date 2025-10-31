@@ -400,9 +400,7 @@ void OptionsScreenVideo::updateGfxSlider()
     getWidget<GUIEngine::SpinnerWidget>("blur_level")->
         setActive(UserConfigParams::m_dynamic_lights && CVS->isGLSL());
     // Same with Render resolution slider
-    getWidget<GUIEngine::SpinnerWidget>("scale_rtts")->
-        setActive((UserConfigParams::m_dynamic_lights && CVS->isGLSL()) ||
-        GE::getDriver()->getDriverType() == video::EDT_VULKAN);
+    updateScaleRTTsSlider();
 
     updateTooltip();
 #endif
@@ -440,25 +438,27 @@ void OptionsScreenVideo::updateBlurSlider()
 
 void OptionsScreenVideo::updateScaleRTTsSlider()
 {
-    GUIEngine::SpinnerWidget* scale_rtts_level = 
-        getWidget<GUIEngine::SpinnerWidget>("scale_rtts");
-    assert( scale_rtts_level != NULL );
+    bool rtts_on = (UserConfigParams::m_dynamic_lights && CVS->isGLSL()) ||
+        GE::getDriver()->getDriverType() == video::EDT_VULKAN;
+
+    GUIEngine::SpinnerWidget* rtts_slider = getWidget<GUIEngine::SpinnerWidget>("scale_rtts");
+    assert( rtts_slider != NULL );
+
+    rtts_slider->setActive(rtts_on);
 
     bool found = false;
+    float rtts_value = (rtts_on) ? UserConfigParams::m_scale_rtts_factor : 1.0f;
     for (unsigned int l = 0; l < m_scale_rtts_custom_presets.size(); l++)
     {
-        if (m_scale_rtts_custom_presets[l].value == UserConfigParams::m_scale_rtts_factor)
+        if (m_scale_rtts_custom_presets[l].value == rtts_value)
         {
-            scale_rtts_level->setValue(l);
+            rtts_slider->setValue(l);
             found = true;
             if (m_scale_rtts_custom_presets[l].value > 1.0f)
-            {
-                scale_rtts_level->markAsIncorrect();
-            }
+                rtts_slider->markAsIncorrect();
             else
-            {
-                scale_rtts_level->markAsCorrect();
-            }
+                rtts_slider->markAsCorrect();
+
             break;
         }
     }
@@ -466,7 +466,7 @@ void OptionsScreenVideo::updateScaleRTTsSlider()
     if (!found)
     {
         //I18N: custom video settings
-        scale_rtts_level->setCustomText( _("Custom") );
+        rtts_slider->setCustomText( _("Custom") );
     }
 } // updateScaleRTTsSlider
 
@@ -680,11 +680,11 @@ void OptionsScreenVideo::eventCallback(Widget* widget, const std::string& name,
     } // vSync
     else if (name == "scale_rtts")
     {
-        GUIEngine::SpinnerWidget* scale_rtts_level =
+        GUIEngine::SpinnerWidget* rtts_slider =
             getWidget<GUIEngine::SpinnerWidget>("scale_rtts");
-        assert( scale_rtts_level != NULL );
+        assert( rtts_slider != NULL );
 
-        const int level = scale_rtts_level->getValue();
+        const int level = rtts_slider->getValue();
         assert(level < (int)m_scale_rtts_custom_presets.size());
 
         UserConfigParams::m_scale_rtts_factor = m_scale_rtts_custom_presets[level].value;
