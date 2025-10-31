@@ -343,9 +343,8 @@ static EventHandler* event_handler_singleton = NULL;
 EventHandler* EventHandler::get()
 {
     if (event_handler_singleton == NULL)
-    {
         event_handler_singleton = new EventHandler();
-    }
+
     return event_handler_singleton;
 }
 
@@ -370,19 +369,16 @@ void EventHandler::sendNavigationEvent(const NavigationDirection nav, const int 
     
     if (w != NULL)
     {
-        if (ScreenKeyboard::isActive())
+        // Screen keyboard and modal dialogs override focus.
+        if (ScreenKeyboard::isActive() &&
+            !ScreenKeyboard::getCurrent()->isMyIrrChild(w->getIrrlichtElement()))
         {
-            if (!ScreenKeyboard::getCurrent()->isMyIrrChild(w->getIrrlichtElement()))
-            {
-                w = NULL;
-            }
+            w = NULL
         }
-        else if (ModalDialog::isADialogActive())
+        else if (ModalDialog::isADialogActive() &&
+            !ModalDialog::getCurrent()->isMyIrrChild(w->getIrrlichtElement()))
         {
-            if (!ModalDialog::getCurrent()->isMyIrrChild(w->getIrrlichtElement()))
-            {
-                w = NULL;
-            }
+            w = NULL;
         }
     }
     
@@ -391,17 +387,11 @@ void EventHandler::sendNavigationEvent(const NavigationDirection nav, const int 
         Widget* defaultWidget = NULL;
         
         if (ScreenKeyboard::isActive())
-        {
             defaultWidget = ScreenKeyboard::getCurrent()->getFirstWidget();
-        }
         else if (ModalDialog::isADialogActive())
-        {
             defaultWidget = ModalDialog::getCurrent()->getFirstWidget();
-        }
         else if (GUIEngine::getCurrentScreen() != NULL)
-        {
             defaultWidget = GUIEngine::getCurrentScreen()->getFirstWidget();
-        }
 
         if (defaultWidget != NULL)
         {
@@ -701,20 +691,16 @@ int EventHandler::findIDClosestWidget(const NavigationDirection nav, const int p
 
 void EventHandler::sendEventToUser(GUIEngine::Widget* widget, std::string& name, const int playerID)
 {
-    if (ScreenKeyboard::isActive())
+    if (ScreenKeyboard::isActive() &&
+        ScreenKeyboard::getCurrent()->processEvent(widget->m_properties[PROP_ID]) != EVENT_LET)
     {
-        if (ScreenKeyboard::getCurrent()->processEvent(widget->m_properties[PROP_ID]) != EVENT_LET)
-        {
-            return;
-        }
+        return;
     }
     
-    if (ModalDialog::isADialogActive())
+    if (ModalDialog::isADialogActive() &&
+        ModalDialog::getCurrent()->processEvent(widget->m_properties[PROP_ID]) != EVENT_LET)
     {
-        if (ModalDialog::getCurrent()->processEvent(widget->m_properties[PROP_ID]) != EVENT_LET)
-        {
-            return;
-        }
+        return;
     }
 
     if (getCurrentScreen() != NULL)
