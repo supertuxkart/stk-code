@@ -275,6 +275,7 @@ void EventHandler::processGUIAction(const PlayerAction action,
     }
 
     const bool pressedDown = value > Input::MAX_VALUE*2/3;
+    bool page_up = false;
 
     if (!pressedDown) return;
 
@@ -331,10 +332,47 @@ void EventHandler::processGUIAction(const PlayerAction action,
                 onWidgetActivated(w, playerID, type);
             }
             break;
+
+        case PA_MENU_PAGE_UP:
+            page_up = true;
+            // Fall-through
+        case PA_MENU_PAGE_DOWN:
+        {
+            Widget* w = GUIEngine::getFocusForPlayer(playerID);
+            if (w != nullptr && w->getType() == WTYPE_LIST)
+            {
+                ListWidget* list = dynamic_cast<ListWidget*>(w);
+                list->pageMove(page_up);
+            }
+            break;
+        }
+
+        case PA_MENU_END:
+        {
+            Widget* w = GUIEngine::getFocusForPlayer(playerID);
+            if (w != nullptr && w->getType() == WTYPE_LIST)
+            {
+                ListWidget* list = dynamic_cast<ListWidget*>(w);
+                list->listEnd();
+            }
+            break;
+        }
+
+        case PA_MENU_START:
+        {
+            Widget* w = GUIEngine::getFocusForPlayer(playerID);
+            if (w != nullptr && w->getType() == WTYPE_LIST)
+            {
+                ListWidget* list = dynamic_cast<ListWidget*>(w);
+                list->listStart();
+            }
+            break;
+        }
+
         default:
             return;
     }
-}
+} // processGUIAction
 
 // -----------------------------------------------------------------------------
 
@@ -373,7 +411,7 @@ void EventHandler::sendNavigationEvent(const NavigationDirection nav, const int 
         if (ScreenKeyboard::isActive() &&
             !ScreenKeyboard::getCurrent()->isMyIrrChild(w->getIrrlichtElement()))
         {
-            w = NULL
+            w = NULL;
         }
         else if (ModalDialog::isADialogActive() &&
             !ModalDialog::getCurrent()->isMyIrrChild(w->getIrrlichtElement()))

@@ -28,7 +28,7 @@ CGUISTKListBox::CGUISTKListBox(IGUIEnvironment* environment, IGUIElement* parent
             s32 id, core::rect<s32> rectangle, bool clip,
             bool drawBack, bool moveOverSelect)
 : IGUIElement(EGUIET_LIST_BOX, environment, parent, id, rectangle), Selected(-1),
-    ItemHeight(0),ItemHeightOverride(0),
+    m_item_height(0),ItemHeightOverride(0),
     TotalItemHeight(0), ItemsIconWidth(0), MousePosY(0), Font(0), IconBank(0),
     ScrollBar(0), selectTime(0), Selecting(false), Moving(false),
     DrawBack(drawBack), MoveOverSelect(moveOverSelect), AutoScroll(true),
@@ -137,10 +137,10 @@ s32 CGUISTKListBox::getItemAt(s32 xpos, s32 ypos) const
         )
         return -1;
 
-    if ( ItemHeight == 0 )
+    if ( m_item_height == 0 )
         return -1;
 
-    s32 item = ((ypos - AbsoluteRect.UpperLeftCorner.Y - 1) + ScrollBar->getPos()) / ItemHeight;
+    s32 item = ((ypos - AbsoluteRect.UpperLeftCorner.Y - 1) + ScrollBar->getPos()) / m_item_height;
     if ( item < 0 || item >= (s32)Items.size())
         return -1;
 
@@ -164,7 +164,7 @@ void CGUISTKListBox::clear()
 void CGUISTKListBox::updateDefaultItemHeight()
 {
     if (ItemHeightOverride == 0)
-        ItemHeight = Font->getHeightPerLine() + 4;
+        m_item_height = Font->getHeightPerLine() + 4;
 }
 
 
@@ -179,7 +179,7 @@ void CGUISTKListBox::recalculateItemHeight()
 
         Font = skin->getFont();
         if ( 0 == ItemHeightOverride )
-            ItemHeight = 0;
+            m_item_height = 0;
 
         if (Font)
         {
@@ -188,9 +188,9 @@ void CGUISTKListBox::recalculateItemHeight()
         }
     }
 
-    TotalItemHeight = ItemHeight * Items.size();
+    TotalItemHeight = m_item_height * Items.size();
     ScrollBar->setMax( core::max_(0, TotalItemHeight - AbsoluteRect.getHeight()) );
-    s32 minItemHeight = ItemHeight > 0 ? ItemHeight : 1;
+    s32 minItemHeight = m_item_height > 0 ? m_item_height : 1;
     ScrollBar->setSmallStep ( minItemHeight );
     ScrollBar->setLargeStep ( 2*minItemHeight );
 
@@ -289,10 +289,10 @@ bool CGUISTKListBox::OnEvent(const SEvent& event)
                         Selected = (s32)Items.size()-1;
                         break;
                     case IRR_KEY_NEXT:
-                        Selected += AbsoluteRect.getHeight() / ItemHeight;
+                        Selected += AbsoluteRect.getHeight() / m_item_height;
                         break;
                     case IRR_KEY_PRIOR:
-                        Selected -= AbsoluteRect.getHeight() / ItemHeight;
+                        Selected -= AbsoluteRect.getHeight() / m_item_height;
                         break;
                     default:
                         break;
@@ -367,7 +367,7 @@ bool CGUISTKListBox::OnEvent(const SEvent& event)
                 switch(event.MouseInput.Event)
                 {
                 case EMIE_MOUSE_WHEEL:
-                    ScrollBar->setPos(ScrollBar->getPos() + event.MouseInput.Wheel * -ItemHeight / 2);
+                    ScrollBar->setPos(ScrollBar->getPos() + event.MouseInput.Wheel * - m_item_height / 2);
                     return true;
 
                 case EMIE_LMOUSE_PRESSED_DOWN:
@@ -396,7 +396,7 @@ bool CGUISTKListBox::OnEvent(const SEvent& event)
                     }
 
                     if (Selecting &&
-                        std::abs(event.MouseInput.Y - MousePosY) > ItemHeight/3)
+                        std::abs(event.MouseInput.Y - MousePosY) > m_item_height/3)
                     {
                         Moving = true;
                         Selecting = false;
@@ -519,7 +519,7 @@ void CGUISTKListBox::draw()
     if (ScrollBar->isVisible())
         frameRect.LowerRightCorner.X -= ScrollBar->getRelativePosition().getWidth();
 
-    frameRect.LowerRightCorner.Y = AbsoluteRect.UpperLeftCorner.Y + ItemHeight;
+    frameRect.LowerRightCorner.Y = AbsoluteRect.UpperLeftCorner.Y + m_item_height;
 
     frameRect.UpperLeftCorner.Y -= ScrollBar->getPos();
     frameRect.LowerRightCorner.Y -= ScrollBar->getPos();
@@ -633,8 +633,8 @@ void CGUISTKListBox::draw()
             }
         }
 
-        frameRect.UpperLeftCorner.Y += ItemHeight;
-        frameRect.LowerRightCorner.Y += ItemHeight;
+        frameRect.UpperLeftCorner.Y += m_item_height;
+        frameRect.LowerRightCorner.Y += m_item_height;
     }
     FontDrawer::endBatching();
 #endif
@@ -670,16 +670,16 @@ void CGUISTKListBox::recalculateScrollPos()
     if (!AutoScroll)
         return;
 
-    const s32 selPos = (Selected == -1 ? TotalItemHeight : Selected * ItemHeight) - ScrollBar->getPos();
+    const s32 selPos = (Selected == -1 ? TotalItemHeight : Selected * m_item_height) - ScrollBar->getPos();
 
     if (selPos < 0)
     {
         ScrollBar->setPos(ScrollBar->getPos() + selPos);
     }
     else
-    if (selPos > AbsoluteRect.getHeight() - ItemHeight)
+    if (selPos > AbsoluteRect.getHeight() - m_item_height)
     {
-        ScrollBar->setPos(ScrollBar->getPos() + selPos - AbsoluteRect.getHeight() + ItemHeight);
+        ScrollBar->setPos(ScrollBar->getPos() + selPos - AbsoluteRect.getHeight() + m_item_height);
     }
 }
 
@@ -821,7 +821,7 @@ video::SColor CGUISTKListBox::getItemDefaultColor(EGUI_LISTBOX_COLOR colorType) 
 //! set global itemHeight
 void CGUISTKListBox::setItemHeight( s32 height )
 {
-    ItemHeight = height;
+    m_item_height = height;
     ItemHeightOverride = 1;
 }
 
