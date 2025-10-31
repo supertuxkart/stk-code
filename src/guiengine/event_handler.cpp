@@ -298,8 +298,6 @@ void EventHandler::processGUIAction(const PlayerAction action,
         case PA_ACCEL:
         case PA_MENU_UP:
         {
-            if (type == Input::IT_STICKBUTTON && !pressedDown)
-                break;
             sendNavigationEvent(NAV_UP, playerID);
             break;
         }
@@ -307,15 +305,13 @@ void EventHandler::processGUIAction(const PlayerAction action,
         case PA_BRAKE:
         case PA_MENU_DOWN:
         {
-            if (type == Input::IT_STICKBUTTON && !pressedDown)
-                break;
             sendNavigationEvent(NAV_DOWN, playerID);
             break;
         }
 
         case PA_RESCUE:
         case PA_MENU_CANCEL:
-            if (pressedDown&& !isWithinATextBox())
+            if (!isWithinATextBox())
             {
                 GUIEngine::getStateManager()->escapePressed();
             }
@@ -323,15 +319,14 @@ void EventHandler::processGUIAction(const PlayerAction action,
 
         case PA_FIRE:
         case PA_MENU_SELECT:
-            if (pressedDown)
-            {
-                Widget* w = GUIEngine::getFocusForPlayer(playerID);
-                if (w == NULL) break;
+        {
+            Widget* w = GUIEngine::getFocusForPlayer(playerID);
+            if (w == NULL) break;
 
-                // FIXME : consider returned value?
-                onWidgetActivated(w, playerID, type);
-            }
+            // FIXME : consider returned value?
+            onWidgetActivated(w, playerID, type);
             break;
+        }
 
         case PA_MENU_PAGE_UP:
             page_up = true;

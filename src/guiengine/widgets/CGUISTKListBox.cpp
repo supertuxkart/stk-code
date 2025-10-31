@@ -264,81 +264,6 @@ bool CGUISTKListBox::OnEvent(const SEvent& event)
     {
         switch(event.EventType)
         {
-        case EET_KEY_INPUT_EVENT:
-            if (event.KeyInput.PressedDown &&
-                (event.KeyInput.Key == IRR_KEY_DOWN ||
-                event.KeyInput.Key == IRR_KEY_UP   ||
-                event.KeyInput.Key == IRR_KEY_HOME ||
-                event.KeyInput.Key == IRR_KEY_END  ||
-                event.KeyInput.Key == IRR_KEY_NEXT ||
-                event.KeyInput.Key == IRR_KEY_PRIOR ) )
-            {
-                s32 oldSelected = Selected;
-                switch (event.KeyInput.Key)
-                {
-                    case IRR_KEY_DOWN:
-                        Selected += 1;
-                        break;
-                    case IRR_KEY_UP:
-                        Selected -= 1;
-                        break;
-                    case IRR_KEY_HOME:
-                        Selected = 0;
-                        break;
-                    case IRR_KEY_END:
-                        Selected = (s32)Items.size()-1;
-                        break;
-                    case IRR_KEY_NEXT:
-                        Selected += AbsoluteRect.getHeight() / m_item_height;
-                        break;
-                    case IRR_KEY_PRIOR:
-                        Selected -= AbsoluteRect.getHeight() / m_item_height;
-                        break;
-                    default:
-                        break;
-                }
-                if (Selected >= (s32)Items.size())
-                    Selected = Items.size() - 1;
-                else
-                if (Selected<0)
-                    Selected = 0;
-
-                if (m_deactivated)
-                    Selected = -1;
-                recalculateScrollPos();
-
-                // post the news
-
-                if (oldSelected != Selected && Parent && !Selecting && !MoveOverSelect)
-                {
-                    SEvent e;
-                    e.EventType = EET_GUI_EVENT;
-                    e.GUIEvent.Caller = this;
-                    e.GUIEvent.Element = 0;
-                    e.GUIEvent.EventType = EGET_LISTBOX_CHANGED;
-                    Parent->OnEvent(e);
-                }
-
-                return true;
-            }
-            else
-            if (!event.KeyInput.PressedDown && 
-                (event.KeyInput.Key == IRR_KEY_RETURN || 
-                event.KeyInput.Key == IRR_KEY_SPACE))
-            {
-                if (Parent)
-                {
-                    SEvent e;
-                    e.EventType = EET_GUI_EVENT;
-                    e.GUIEvent.Caller = this;
-                    e.GUIEvent.Element = 0;
-                    e.GUIEvent.EventType = EGET_LISTBOX_SELECTED_AGAIN;
-                    Parent->OnEvent(e);
-                }
-                return true;
-            }
-            break;
-
         case EET_GUI_EVENT:
             switch(event.GUIEvent.EventType)
             {
@@ -414,6 +339,7 @@ bool CGUISTKListBox::OnEvent(const SEvent& event)
                 }
             }
             break;
+        case EET_KEY_INPUT_EVENT: // keyboard events are captured and handled elsewhere
         case EET_LOG_TEXT_EVENT:
         case EET_USER_EVENT:
         case EET_JOYSTICK_INPUT_EVENT:
