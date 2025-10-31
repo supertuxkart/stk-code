@@ -43,4 +43,19 @@ namespace OptionsCommon
     	if(screen)
         	StateManager::get()->replaceTopMostScreen(screen);
 	}
+
+	// In the in-game pause options, disable the players and language tabs
+	void setTabStatus()
+	{
+		if (StateManager::get()->getGameState() == GUIEngine::INGAME_MENU)
+		{
+	    	GUIEngine::getWidget("tab_players")->setActive(false);
+	    	GUIEngine::getWidget("tab_language")->setActive(false);			
+		}
+		else
+		{
+			GUIEngine::getWidget("tab_players")->setActive(true);
+	    	GUIEngine::getWidget("tab_language")->setActive(true);
+	    }
+	} // setTabStatus
 }

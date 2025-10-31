@@ -54,7 +54,7 @@ void CutsceneGUI::renderGlobal(float dt)
 
     if (m_subtitle.size() > 0)
     {
-        core::rect<s32> r(0, screen_size.Height - GUIEngine::getFontHeight()*2,
+        core::rect<s32> r(0, screen_size.Height - GUIEngine::getFontHeight()*6,
                           screen_size.Width, screen_size.Height);
 
         if (GUIEngine::getFont()->getDimension(m_subtitle.c_str()).Width > screen_size.Width)

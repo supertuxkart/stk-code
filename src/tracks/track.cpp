@@ -23,6 +23,7 @@
 #include "audio/music_manager.hpp"
 #include "challenges/challenge_status.hpp"
 #include "challenges/unlock_manager.hpp"
+#include "config/favorite_status.hpp"
 #include "config/player_manager.hpp"
 #include "config/stk_config.hpp"
 #include "config/user_config.hpp"
@@ -87,6 +88,7 @@
 #include <IFileSystem.h>
 #include <ILightSceneNode.h>
 #include <IMeshCache.h>
+#include <IMeshLoader.h>
 #include <IMeshManipulator.h>
 #include <IMeshSceneNode.h>
 #include <ISceneManager.h>
@@ -101,6 +103,7 @@
 
 #ifndef SERVER_ONLY
 #include <ge_main.hpp>
+#include <ge_occlusion_culling.hpp>
 #include <ge_texture.hpp>
 #endif
 
@@ -212,12 +215,15 @@ bool Track::operator<(const Track &other) const
     PlayerProfile *p = PlayerManager::getCurrentPlayer();
     bool this_is_locked = p->isLocked(getIdent());
     bool other_is_locked = p->isLocked(other.getIdent());
-    if(this_is_locked == other_is_locked)
-    {
-        return getSortName() < other.getSortName();
-    }
-    else
+    bool this_is_favorite = p->isFavoriteTrack(getIdent());
+    bool other_is_favorite = p->isFavoriteTrack(other.getIdent());
+    // Locked tracks cannot be favorite, so favorites < normal < locked
+    if (this_is_favorite != other_is_favorite)
+        return this_is_favorite;
+    else if(this_is_locked != other_is_locked)
         return other_is_locked;
+    else
+        return getSortName() < other.getSortName();
 }   // operator<
 
 //-----------------------------------------------------------------------------
@@ -328,6 +334,8 @@ void Track::cleanup()
     Graph::destroy();
     m_item_manager = nullptr;
 #ifndef SERVER_ONLY
+    if (!GUIEngine::isNoGraphics())
+        GE::resetOcclusionCulling();
     if (CVS->isGLSL())
     {
         if (!GUIEngine::isNoGraphics())
@@ -537,8 +545,8 @@ void Track::loadTrackInfo()
     m_sun_specular_color    = video::SColor(255, 255, 255, 255);
     m_sun_diffuse_color     = video::SColor(255, 255, 255, 255);
     m_sun_position          = core::vector3df(0, 10, 10);
-    irr_driver->setSSAORadius(1.);
-    irr_driver->setSSAOK(1.5);
+    irr_driver->setSSAORadius(0.5);
+    irr_driver->setSSAOK(3.);
     irr_driver->setSSAOSigma(1.);
     XMLNode *root           = file_manager->createXMLTree(m_filename);
 
@@ -612,7 +620,7 @@ void Track::loadTrackInfo()
         m_all_modes.push_back(tm);
     }
 
-    if(m_groups.size()==0) m_groups.push_back(DEFAULT_GROUP_NAME);
+    if(m_groups.size()==0) m_groups.push_back(FavoriteStatus::DEFAULT_FAVORITE_GROUP_NAME);
     const XMLNode *xml_node = root->getNode("curves");
 
     if(xml_node) loadCurves(*xml_node);
@@ -653,10 +661,6 @@ void Track::loadTrackInfo()
         // Currently only max eight players in soccer mode
         m_max_arena_players = 8;
     }
-    // Max 10 players supported in arena
-    if (m_max_arena_players > 10)
-        m_max_arena_players = 10;
-
 }   // loadTrackInfo
 
 //-----------------------------------------------------------------------------
@@ -939,8 +943,10 @@ void Track::createPhysicsModel(unsigned int main_track_count,
 /** Convert the graphics track into its physics equivalents.
  *  \param mesh The mesh to convert.
  *  \param node The scene node.
+ *  \param occluder Optional destination for storing occluder triangles
  */
-void Track::convertTrackToBullet(scene::ISceneNode *node)
+void Track::convertTrackToBullet(scene::ISceneNode *node,
+                               std::vector<std::array<btVector3, 3> >* occluder)
 {
     if (node->getType() == scene::ESNT_TEXT)
         return;
@@ -1039,7 +1045,12 @@ void Track::convertTrackToBullet(scene::ISceneNode *node)
                         vertices[k] = v;
                         normals[k] = MiniGLM::decompressVector3(mbVertices[indx].m_normal);
                     }   // for k
-                    if (tmesh)
+                    if (occluder)
+                    {
+                        if (!material->isTransparent() && !material->isIgnore())
+                            occluder->push_back({vertices[0], vertices[1], vertices[2]});
+                    }
+                    else if (tmesh)
                     {
                         tmesh->addTriangle(vertices[0], vertices[1],
                             vertices[2], normals[0],
@@ -1098,7 +1109,12 @@ void Track::convertTrackToBullet(scene::ISceneNode *node)
                             normals[k] = mbVertices[indx].Normal;
                         }   // for k
 
-                        if (tmesh)
+                        if (occluder)
+                        {
+                            if (!material->isTransparent() && !material->isIgnore())
+                                occluder->push_back({vertices[0], vertices[1], vertices[2]});
+                        }
+                        else if (tmesh)
                         {
                             tmesh->addTriangle(vertices[0], vertices[1],
                                 vertices[2], normals[0],
@@ -1124,7 +1140,12 @@ void Track::convertTrackToBullet(scene::ISceneNode *node)
                             normals[k] = mbVertices[indx].Normal;
                         }   // for k
 
-                        if (tmesh)
+                        if (occluder)
+                        {
+                            if (!material->isTransparent() && !material->isIgnore())
+                                occluder->push_back({vertices[0], vertices[1], vertices[2]});
+                        }
+                        else if (tmesh)
                         {
                             tmesh->addTriangle(vertices[0], vertices[1],
                                 vertices[2], normals[0],
@@ -1150,7 +1171,12 @@ void Track::convertTrackToBullet(scene::ISceneNode *node)
                             normals[k] = mbVertices[indx].Normal;
                         }   // for k
 
-                        if (tmesh)
+                        if (occluder)
+                        {
+                            if (!material->isTransparent() && !material->isIgnore())
+                                occluder->push_back({vertices[0], vertices[1], vertices[2]});
+                        }
+                        else if (tmesh)
                         {
                             tmesh->addTriangle(vertices[0], vertices[1],
                                 vertices[2], normals[0],
@@ -1176,7 +1202,12 @@ void Track::convertTrackToBullet(scene::ISceneNode *node)
                             normals[k] = MiniGLM::decompressVector3(mbVertices[indx].m_normal);
                         }   // for k
 
-                        if (tmesh)
+                        if (occluder)
+                        {
+                            if (!material->isTransparent() && !material->isIgnore())
+                                occluder->push_back({vertices[0], vertices[1], vertices[2]});
+                        }
+                        else if (tmesh)
                         {
                             tmesh->addTriangle(vertices[0], vertices[1],
                                 vertices[2], normals[0],
@@ -1320,6 +1351,15 @@ bool Track::loadMainTrack(const XMLNode &root)
     scene_node->setPosition(xyz);
     scene_node->setRotation(hpr);
     handleAnimatedTextures(scene_node, *track_node);
+#ifndef SERVER_ONLY
+    if (!GUIEngine::isNoGraphics() &&
+        GE::getDriver()->getDriverType() == video::EDT_VULKAN)
+    {
+        std::vector<std::array<btVector3, 3> > tris;
+        convertTrackToBullet(scene_node, &tris);
+        GE::getOcclusionCulling()->addOccluderMesh(tris);
+    }
+#endif
     m_all_nodes.push_back(scene_node);
 
     MeshTools::minMax3D(tangent_mesh, &m_aabb_min, &m_aabb_max);
@@ -1406,8 +1446,17 @@ bool Track::loadMainTrack(const XMLNode &root)
         }
         else
         {
+            bool load_cloned_mesh = false;
+            bool has_challenge = !challenge.empty() && challenge != "tutorial";
+            const ChallengeData* c = NULL;
+            if (has_challenge)
+                c = unlock_manager->getChallengeData(challenge);
+#ifndef SERVER_ONLY
+            load_cloned_mesh = CVS->isGLSL() && c && !c->isGrandPrix();
+#endif
             // TODO: check if mesh is animated or not
-            scene::IMesh *a_mesh = irr_driver->getMesh(full_path);
+            scene::IMesh *a_mesh = load_cloned_mesh ?
+                getClonedMesh(full_path) : irr_driver->getMesh(full_path);
             if(!a_mesh)
             {
                 Log::error("track", "Object model '%s' not found, ignored.\n",
@@ -1441,11 +1490,8 @@ bool Track::loadMainTrack(const XMLNode &root)
             // TODO: this is hardcoded for the overworld, convert to scripting
             if (challenge.size() > 0)
             {
-                const ChallengeData* c = NULL;
-
                 if (challenge != "tutorial")
                 {
-                    c = unlock_manager->getChallengeData(challenge);
                     if (c == NULL)
                     {
                         Log::error("track", "Cannot find challenge named <%s>\n",
@@ -1474,16 +1520,30 @@ bool Track::loadMainTrack(const XMLNode &root)
                         }
 
                         std::string sshot = t->getScreenshotFile();
-                        video::ITexture* screenshot = irr_driver->getTexture(sshot);
-
-                        if (screenshot == NULL)
+                        if (load_cloned_mesh)
                         {
-                            Log::error("track",
-                                       "Cannot find track screenshot <%s>",
-                                       sshot.c_str());
-                            continue;
+                            SP::SPMeshBuffer* spmb = dynamic_cast<SP::SPMeshBuffer*>(a_mesh->getMeshBuffer(0));
+                            if (spmb)
+                            {
+                                std::string fp = file_manager->getFileSystem()->getAbsolutePath
+                                    (sshot.c_str()).c_str();
+                                spmb->setSTKMaterial(
+                                    material_manager->getDefaultSPMaterial("alphablend", fp, true/*full_path*/));
+                            }
                         }
-                        scene_node->getMaterial(0).setTexture(0, screenshot);
+                        else
+                        {
+                            video::ITexture* screenshot = irr_driver->getTexture(sshot);
+
+                            if (screenshot == NULL)
+                            {
+                                Log::error("track",
+                                           "Cannot find track screenshot <%s>",
+                                           sshot.c_str());
+                                continue;
+                            }
+                            scene_node->getMaterial(0).setTexture(0, screenshot);
+                        }
                     }
                 }
 
@@ -1886,6 +1946,8 @@ void Track::loadTrackModel(bool reverse_track, unsigned int mode_id)
     main_loop->renderGUI(3100);
 
 #ifndef SERVER_ONLY
+    if (!GUIEngine::isNoGraphics())
+        GE::resetOcclusionCulling();
     if (CVS->isGLSL())
     {
         SP::SPShaderManager::get()->loadSPShaders(m_root);
@@ -2523,15 +2585,16 @@ void Track::handleSky(const XMLNode &xml_node, const std::string &filename)
 #endif   // !SERVER_ONLY
             {
 #ifndef SERVER_ONLY
+                std::string fullpath;
                 if (GE::getDriver()->getDriverType() == video::EDT_VULKAN)
                 {
                     io::path p = file_manager->searchTexture(v[i]).c_str();
                     if (!p.empty())
                     {
-                        io::path fullpath = file_manager->getFileSystem()
+                        fullpath = file_manager->getFileSystem()
                             ->getAbsolutePath(p).c_str();
                         GE::getGEConfig()->m_ondemand_load_texture_paths.
-                            insert(fullpath.c_str());
+                            insert(fullpath);
                     }
                 }
 #endif
@@ -2541,6 +2604,13 @@ void Track::handleSky(const XMLNode &xml_node, const std::string &filename)
                     t->grab();
                     obj = t;
                 }
+#ifndef SERVER_ONLY
+                if (GE::getDriver()->getDriverType() == video::EDT_VULKAN)
+                {
+                    GE::getGEConfig()->m_ondemand_load_texture_paths.erase(
+                        fullpath);
+                }
+#endif
             }
             if (obj)
             {
@@ -3060,3 +3130,33 @@ video::IImage* Track::getSkyTexture(std::string path) const
         ->getDriverAttributes().getAttributeAsDimension2d("MAX_TEXTURE_SIZE"));
 #endif
 }   // getSkyTexture
+
+//-----------------------------------------------------------------------------
+scene::IMesh* Track::getClonedMesh(const std::string& filename) const
+{
+    scene::ISceneManager* sm = irr_driver->getSceneManager();
+    scene::IAnimatedMesh* msh = NULL;
+    io::IReadFile* file = file_manager->getFileSystem()->createAndOpenFile(filename.c_str());
+    if (!file)
+        return NULL;
+
+    int count = sm->getMeshLoaderCount();
+    for (int i = count - 1; i >= 0; i--)
+    {
+        if (sm->getMeshLoader(i)->isALoadableFileExtension(filename.c_str()))
+        {
+            file->seek(0);
+            msh = sm->getMeshLoader(i)->createMesh(file);
+            if (msh)
+            {
+                sm->getMeshCache()->addMesh(
+                    (filename + StringUtils::toString(size_t(msh))).c_str(), msh);
+                msh->drop();
+                break;
+            }
+        }
+    }
+
+    file->drop();
+    return msh;
+}   // getClonedMesh

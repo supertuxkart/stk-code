@@ -190,7 +190,8 @@
           delta-steering="0.26" />
 
   <!-- Special urls -->
-  <urls donate="https://supertuxkart.net/Donate"
+  <urls stk-website="https://supertuxkart.net/Main_Page"
+		donate="https://supertuxkart.net/Donate"
         password-reset="https://online.supertuxkart.net/password-reset.php"
         assets-download="https://github.com/supertuxkart/stk-assets-mobile/releases/download/"/>
 
@@ -535,15 +536,16 @@
   which leads to crash with STK), but the fonts are to blame, what's the point of not
   using industry standard nowadays...
   -->
-  <fonts-list normal-ttf="Cantarell-Regular.otf wqy-microhei.ttf NotoSansThai-Regular.ttf NotoSansHebrew-Regular.ttf NotoNaskhArabicUI-Regular.ttf NotoSansMalayalam-Regular.ttf"
+  <fonts-list normal-ttf="Cantarell-Regular.otf wqy-microhei.ttf NotoSansThai-Regular.ttf NotoSansHebrew-Regular.ttf NotoNaskhArabicUI-Regular.ttf NotoSansMalayalam-Regular.ttf NotoSansGeorgian-Regular.ttf NotoSansDevanagari-Regular.ttf NotoSansBengali-Regular.ttf"
               digit-ttf="SigmarOne.otf"
               color-emoji-ttf="NotoColorEmoji.ttf"/>
 
   <!-- Maximum bones from all animated meshes in each frame to be uploaded for
        hardware skinning, For gles 3.0 the specification guarantees at least 2048, for
        TBO in desktop at least 65536 (max buffer size) / 64, SSBO at least 2^24 / 64,
-       so 1024 will work everywhere. -->
-  <skinning max-bones="1024"/>
+       and for cases TBO doesn't support equal or more than 2048, use texture instead,
+       so 2048 will work everywhere. -->
+  <skinning max-bones="2048"/>
 
   <!-- For users with libsquish:
     Use a slow but high quality colour compressor.
@@ -581,5 +583,6 @@
       <capabilities name="soccer_fixes"/>
       <capabilities name="ranking_changes"/>
       <capabilities name="real_addon_karts"/>
+      <capabilities name="aes_gcm_128bit_tag"/>
   </network-capabilities>
 </config>

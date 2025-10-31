@@ -66,10 +66,11 @@ STK_APPDATA_P7 = 'If you need more stability, consider using the stable version:
 STK_STABLE_URL = 'https://play.google.com/store/apps/details?id=org.supertuxkart.stk'
 
 STK_APPDATA_FILE_1 = """<?xml version=\"1.0\" encoding=\"UTF-8\"?>
-<component type=\"desktop\">
-  <id>supertuxkart.desktop</id>
+<component type=\"desktop-application\">
+  <id>net.supertuxkart.SuperTuxKart</id>
   <metadata_license>CC0-1.0</metadata_license>
   <project_license>GPL-3.0+</project_license>
+  <launchable type="desktop-id">supertuxkart.desktop</launchable>
 """
 # Split it to avoid SuperTuxKart being translated
 STK_APPDATA_FILE_2 = """  <name>SuperTuxKart</name>
@@ -128,17 +129,6 @@ STK_APPDATA_FILE_5 = """  </description>
     <content_attribute id=\"violence-cartoon\">mild</content_attribute>
     <content_attribute id=\"social-chat\">intense</content_attribute>
   </content_rating>
-  <releases>
-    <release version="1.4" date="2022-10-31">
-      <url>https://blog.supertuxkart.net/2022/11/supertuxkart-14-release.html</url>
-    </release>
-    <release version="1.3" date="2021-09-28">
-      <url>https://blog.supertuxkart.net/2021/09/supertuxkart-13-release.html</url>
-    </release>
-    <release version="1.2" date="2020-08-27"/>
-    <release version="1.1" date="2020-01-05"/>
-    <release version="1.0" date="2019-04-21"/>
-  </releases>
   <languages>
 """
 STK_APPDATA_FILE_6 = """  </languages>
@@ -156,14 +146,14 @@ STK_APPDATA_FILE_6 = """  </languages>
 </component>
 """
 
-appdata_file = open('supertuxkart.appdata.xml', 'w')
+appdata_file = open('net.supertuxkart.SuperTuxKart.metainfo.xml', 'w')
 appdata_file.write(STK_APPDATA_FILE_1 + STK_APPDATA_FILE_3 + STK_APPDATA_FILE_4 \
 + STK_APPDATA_FILE_5 + STK_APPDATA_FILE_6)
 appdata_file.close()
 
 os.system('xgettext -j -d supertuxkart --add-comments=\"I18N:\" \
                     -p ./data/po -o supertuxkart.pot \
-                    --package-name=supertuxkart supertuxkart.desktop supertuxkart.appdata.xml')
+                    --package-name=supertuxkart supertuxkart.desktop net.supertuxkart.SuperTuxKart.metainfo.xml')
 
 desktop_file = open('supertuxkart.desktop', 'w')
 desktop_file.write(STK_DESKTOP_FILE_P1 + STK_DESKTOP_FILE_P2 + STK_DESKTOP_FILE_P3)
@@ -234,13 +224,13 @@ for po_filename in po_list:
 
 lingas.close()
 appdata += STK_APPDATA_FILE_6
-appdata_file = open('supertuxkart.appdata.xml', 'w')
+appdata_file = open('net.supertuxkart.SuperTuxKart.metainfo.xml', 'w')
 appdata_file.write(appdata)
 appdata_file.close()
 
 os.system('msgfmt --desktop -d data/po --template supertuxkart.desktop -o data/supertuxkart.desktop')
-os.system('msgfmt --xml -d data/po --template supertuxkart.appdata.xml -o data/supertuxkart.appdata.xml')
+os.system('msgfmt --xml -d data/po --template net.supertuxkart.SuperTuxKart.metainfo.xml -o data/net.supertuxkart.SuperTuxKart.metainfo.xml')
 os.remove('./supertuxkart.desktop')
-os.remove('./supertuxkart.appdata.xml')
+os.remove('./net.supertuxkart.SuperTuxKart.metainfo.xml')
 os.remove('./data/po/LINGUAS')
 os.remove('./data/po/zh_HK.po')

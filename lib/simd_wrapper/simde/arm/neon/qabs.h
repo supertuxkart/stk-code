@@ -162,7 +162,7 @@ simde_int8x16_t
 simde_vqabsq_s8(simde_int8x16_t a) {
   #if defined(SIMDE_ARM_NEON_A32V7_NATIVE)
     return vqabsq_s8(a);
-  #elif defined(SIMDE_X86_SSE4_1_NATIVE)
+  #elif defined(SIMDE_X86_SSE2_NATIVE)
     simde_int8x16_private
       r_,
       a_ = simde_int8x16_to_private(simde_vabsq_s8(a));

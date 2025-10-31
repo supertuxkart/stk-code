@@ -102,7 +102,7 @@ simde_mm512_maskz_sll_epi16 (simde__mmask32 k, simde__m512i a, simde__m128i coun
 }
 #if defined(SIMDE_X86_AVX512BW_ENABLE_NATIVE_ALIASES)
   #undef _mm512_maskz_sll_epi16
-  #define _mm512_maskz_sll_epi16(src, k, a, count) simde_mm512_maskz_sll_epi16(src, k, a, count)
+  #define _mm512_maskz_sll_epi16(k, a, count) simde_mm512_maskz_sll_epi16(k, a, count)
 #endif
 
 SIMDE_FUNCTION_ATTRIBUTES

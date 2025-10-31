@@ -1,4 +1,6 @@
-#include "utils/spm_layout.h"
+#include "utils/camera.glsl"
+#include "utils/spm_data.glsl"
+#include "utils/spm_layout.vert"
 #include "../utils/get_world_location.vert"
 
 layout(push_constant) uniform Constants
@@ -16,6 +18,7 @@ void main()
         v_color.r,
         u_object_buffer.m_objects[gl_InstanceIndex].m_rotation,
         u_object_buffer.m_objects[gl_InstanceIndex].m_scale, v_position);
+    f_world_position = v_world_position;
     gl_Position = u_camera.m_projection_view_matrix * v_world_position;
     f_vertex_color = vec4(1.0);
     f_uv = v_uv;
@@ -26,4 +29,7 @@ void main()
         f_material_id = u_material_ids.m_material_id[gl_DrawIDARB];
 #endif
     f_hue_change = u_object_buffer.m_objects[gl_InstanceIndex].m_hue_change;
+#ifdef PBR_ENABLED
+    f_normal = rotateVector(u_object_buffer.m_objects[gl_InstanceIndex].m_rotation, v_normal.xyz);
+#endif
 }

@@ -19,6 +19,7 @@
 
             <div width="64%" height="100%" layout="vertical-row">
                 <div width="95%" align="center" layout="vertical-row" height="50%">
+                    <bubble id="info" width="100%" proportion="1" word_wrap="true"/>
                     <div width="100%" height="fit" layout="horizontal-row" >
                         <checkbox width="fit" id="record-race" I18N="Ghost replay info action" text_align="left"/>
                         <spacer width="1%"/>

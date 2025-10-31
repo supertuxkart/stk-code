@@ -122,9 +122,7 @@ namespace video
 	//! destructor
 	COGLES2Driver::~COGLES2Driver()
 	{
-		deleteMaterialRenders();
-		delete MaterialRenderer2D;
-		deleteAllTextures();
+		cleanUp();
 
 		if (BridgeCalls)
 			delete BridgeCalls;
@@ -2223,8 +2221,13 @@ namespace video
 	//! the window was resized.
 	void COGLES2Driver::OnResize(const core::dimension2d<u32>& size)
 	{
-		CNullDriver::OnResize(size);
-		BridgeCalls->setViewport(core::rect<s32>(0, 0, size.Width, size.Height));
+		Params.WindowSize = size;
+		int real_width = Params.WindowSize.Width;
+		int real_height = Params.WindowSize.Height;
+		SDL_GL_GetDrawableSize(Params.m_sdl_window, &real_width, &real_height);
+		core::dimension2du s(real_width, real_height);
+		CNullDriver::OnResize(s);
+		BridgeCalls->setViewport(core::rect<s32>(0, 0, s.Width, s.Height));
 		testGLError();
 	}
 
@@ -2936,7 +2939,9 @@ namespace video
 			io::IFileSystem* io, CIrrDeviceSDL* device, u32 default_fb)
 	{
 #ifdef _IRR_COMPILE_WITH_OGLES2_
-		return new COGLES2Driver(params, io, device, default_fb);
+		IVideoDriver* ogles2 = new COGLES2Driver(params, io, device, default_fb);
+		ogles2->OnResize(params.WindowSize);
+		return ogles2;
 #else
 		return 0;
 #endif // _IRR_COMPILE_WITH_OGLES2_

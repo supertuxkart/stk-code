@@ -23,6 +23,7 @@
  * Copyright:
  *   2020      Evan Nemerson <evan@nemerson.com>
  *   2020      Christopher Moore <moore@free.fr>
+ *   2023      Yi-Yen Chung <eric681@andestech.com> (Copyright owned by Andes Technology)
  */
 
 #if !defined(SIMDE_ARM_NEON_TBL_H)
@@ -233,6 +234,68 @@ simde_vtbl4_s8(simde_int8x8x4_t a, simde_int8x8_t b) {
 #if defined(SIMDE_ARM_NEON_A32V7_ENABLE_NATIVE_ALIASES)
   #undef vtbl4_s8
   #define vtbl4_s8(a, b) simde_vtbl4_s8((a), (b))
+#endif
+
+SIMDE_FUNCTION_ATTRIBUTES
+simde_poly8x8_t
+simde_vtbl1_p8(simde_poly8x8_t a, simde_uint8x8_t b) {
+  #if defined(SIMDE_ARM_NEON_A32V7_NATIVE)
+    return vtbl1_p8(a, b);
+  #else
+    return simde_vreinterpret_p8_u8(simde_vtbl1_u8(simde_vreinterpret_u8_p8(a), b));
+  #endif
+}
+#if defined(SIMDE_ARM_NEON_A32V7_ENABLE_NATIVE_ALIASES)
+  #undef vtbl1_p8
+  #define vtbl1_p8(a, b) simde_vtbl1_p8((a), (b))
+#endif
+
+SIMDE_FUNCTION_ATTRIBUTES
+simde_poly8x8_t
+simde_vtbl2_p8(simde_poly8x8x2_t a, simde_uint8x8_t b) {
+  #if defined(SIMDE_ARM_NEON_A32V7_NATIVE)
+    return vtbl2_p8(a, b);
+  #else
+    simde_uint8x8x2_t a_;
+    simde_memcpy(&a_, &a, sizeof(a_));
+    return simde_vreinterpret_p8_u8(simde_vtbl2_u8(a_, b));
+  #endif
+}
+#if defined(SIMDE_ARM_NEON_A32V7_ENABLE_NATIVE_ALIASES)
+  #undef vtbl2_p8
+  #define vtbl2_p8(a, b) simde_vtbl2_p8((a), (b))
+#endif
+
+SIMDE_FUNCTION_ATTRIBUTES
+simde_poly8x8_t
+simde_vtbl3_p8(simde_poly8x8x3_t a, simde_uint8x8_t b) {
+  #if defined(SIMDE_ARM_NEON_A32V7_NATIVE)
+    return vtbl3_p8(a, b);
+  #else
+    simde_uint8x8x3_t a_;
+    simde_memcpy(&a_, &a, sizeof(a_));
+    return simde_vreinterpret_p8_u8(simde_vtbl3_u8(a_, b));
+  #endif
+}
+#if defined(SIMDE_ARM_NEON_A32V7_ENABLE_NATIVE_ALIASES)
+  #undef vtbl3_p8
+  #define vtbl3_p8(a, b) simde_vtbl3_p8((a), (b))
+#endif
+
+SIMDE_FUNCTION_ATTRIBUTES
+simde_poly8x8_t
+simde_vtbl4_p8(simde_poly8x8x4_t a, simde_uint8x8_t b) {
+  #if defined(SIMDE_ARM_NEON_A32V7_NATIVE)
+    return vtbl4_p8(a, b);
+  #else
+    simde_uint8x8x4_t a_;
+    simde_memcpy(&a_, &a, sizeof(a_));
+    return simde_vreinterpret_p8_u8(simde_vtbl4_u8(a_, b));
+  #endif
+}
+#if defined(SIMDE_ARM_NEON_A32V7_ENABLE_NATIVE_ALIASES)
+  #undef vtbl4_p8
+  #define vtbl4_p8(a, b) simde_vtbl4_p8((a), (b))
 #endif
 
 #endif /* !defined(SIMDE_BUG_INTEL_857088) */

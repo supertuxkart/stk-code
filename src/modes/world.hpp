@@ -174,6 +174,8 @@ protected:
 
     Phase m_scheduled_pause_phase;
 
+    bool m_restart_camera;
+
     /** Set when the world needs to be deleted but you can't do it immediately
      * because you are e.g. within World::update()
      */
@@ -374,6 +376,13 @@ public:
      *  whether the game mode wants a timer drawn. */
     virtual bool shouldDrawTimer() const
                     { return isActiveRacePhase() && getClockMode() != CLOCK_NONE; }
+    // ------------------------------------------------------------------------
+    /** \return whether this world should draw the digit on the center of speedometer */
+    virtual bool shouldDrawSpeedometerDigit() const { return false; }
+    // ------------------------------------------------------------------------
+    /** \return a pair consists of the digit and the color of the digit */
+    virtual std::pair<int, video::SColor> getSpeedometerDigit(const AbstractKart *kart) const 
+                { return std::make_pair(0, video::SColor(255, 255, 255, 255)); }
     // ------------------------------------------------------------------------
     /** \return whether this world can generate/have highscores */
     bool useHighScores() const { return m_use_highscores; }

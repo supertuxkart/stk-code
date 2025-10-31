@@ -231,6 +231,9 @@ License: GPL-2+
 Comment: From the Gnome icon set. Source: https://github.com/GNOME/adwaita-icon-theme/blob/gnome-2-30/src/emblem-default.svg  License: https://github.com/GNOME/adwaita-icon-theme/blob/gnome-2-30/COPYING
 
 Files:
+ news.png
+ news_headline.png
+ red_dot.png
  red_x.png
  search.png
 Copyright: Tango Desktop Project

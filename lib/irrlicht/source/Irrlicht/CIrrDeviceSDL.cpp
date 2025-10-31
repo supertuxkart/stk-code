@@ -18,6 +18,7 @@
 #include <stdlib.h>
 #include "SIrrCreationParameters.h"
 #include "COpenGLExtensionHandler.h"
+#include "COGLES2Driver.h"
 
 #include "guiengine/engine.hpp"
 #include "ge_main.hpp"
@@ -68,8 +69,7 @@ CIrrDeviceSDL::CIrrDeviceSDL(const SIrrlichtCreationParameters& param)
 	TopPadding(0), BottomPadding(0), LeftPadding(0), RightPadding(0),
 	InitialOrientation(0), WindowHasFocus(false), WindowMinimized(false),
 	Resizable(false), AccelerometerIndex(-1), AccelerometerInstance(-1),
-	GyroscopeIndex(-1), GyroscopeInstance(-1), NativeScaleX(1.0f),
-	NativeScaleY(1.0f)
+	GyroscopeIndex(-1), GyroscopeInstance(-1)
 {
 	#ifdef _DEBUG
 	setDebugName("CIrrDeviceSDL");
@@ -91,6 +91,10 @@ CIrrDeviceSDL::CIrrDeviceSDL(const SIrrlichtCreationParameters& param)
 	// Switch SDL disables this hint by default: https://github.com/devkitPro/SDL/pull/55#issuecomment-633775255
 	SDL_SetHint(SDL_HINT_TOUCH_MOUSE_EVENTS, "1");
 
+#ifdef ANDROID
+	SDL_SetHint(SDL_HINT_ORIENTATIONS, "LandscapeLeft LandscapeRight");
+#endif
+
 #ifndef MOBILE_STK
 	// Prevent fullscreen minimizes when losing focus
 	if (CreationParams.Fullscreen)
@@ -103,7 +107,7 @@ CIrrDeviceSDL::CIrrDeviceSDL(const SIrrlichtCreationParameters& param)
 #endif
 
 	u32 init_flags = SDL_INIT_TIMER | SDL_INIT_VIDEO;
-	if (SDL_Init(init_flags) < 0)
+	if (SDL_InitSubSystem(init_flags) < 0)
 	{
 		os::Printer::log("Unable to initialize SDL!", SDL_GetError());
 		Close = true;
@@ -147,6 +151,8 @@ CIrrDeviceSDL::CIrrDeviceSDL(const SIrrlichtCreationParameters& param)
 #endif
 #ifdef ANDROID
 			Android_initDisplayCutout(&TopPadding, &BottomPadding, &LeftPadding, &RightPadding, &InitialOrientation);
+#else
+                        (void)InitialOrientation;
 #endif
 			core::stringc sdlversion = "Compiled SDL Version ";
 			sdlversion += Info.version.major;
@@ -180,11 +186,6 @@ CIrrDeviceSDL::CIrrDeviceSDL(const SIrrlichtCreationParameters& param)
 		}
 		else
 			return;
-		updateNativeScale(&Width, &Height);
-		Width = (u32)((f32)Width * NativeScaleX);
-		Height = (u32)((f32)Height * NativeScaleY);
-		CreationParams.WindowSize.Width = Width;
-		CreationParams.WindowSize.Height = Height;
 	}
 
 	// create cursor control
@@ -206,30 +207,6 @@ CIrrDeviceSDL::CIrrDeviceSDL(const SIrrlichtCreationParameters& param)
 }
 
 
-void CIrrDeviceSDL::updateNativeScale(u32* saving_width, u32* saving_height)
-{
-	int width, height = 0;
-	SDL_GetWindowSize(Window, &width, &height);
-	int real_width = width;
-	int real_height = height;
-	if (CreationParams.DriverType == video::EDT_OPENGL ||
-		CreationParams.DriverType == video::EDT_OGLES2)
-	{
-		SDL_GL_GetDrawableSize(Window, &real_width, &real_height);
-	}
-	else if (CreationParams.DriverType == video::EDT_VULKAN)
-	{
-		SDL_Vulkan_GetDrawableSize(Window, &real_width, &real_height);
-	}
-	NativeScaleX = (f32)real_width / (f32)width;
-	NativeScaleY = (f32)real_height / (f32)height;
-	if (saving_width)
-		*saving_width = width;
-	if (saving_height)
-		*saving_height = height;
-}
-
-
 //! destructor
 CIrrDeviceSDL::~CIrrDeviceSDL()
 {
@@ -240,6 +217,12 @@ CIrrDeviceSDL::~CIrrDeviceSDL()
 		irr::video::COpenGLExtensionHandler* h = dynamic_cast<irr::video::COpenGLExtensionHandler*>(VideoDriver);
 		if (h)
 			h->clearGLExtensions();
+#endif
+#ifdef _IRR_COMPILE_WITH_OGLES2_
+		irr::video::COGLES2Driver* es2 = dynamic_cast<irr::video::COGLES2Driver*>(VideoDriver);
+		if (es2) {
+			es2->cleanUp();
+		}
 #endif
 		GE::GEVulkanDriver* gevk = dynamic_cast<GE::GEVulkanDriver*>(VideoDriver);
 		if (gevk)
@@ -254,7 +237,9 @@ CIrrDeviceSDL::~CIrrDeviceSDL()
 		SDL_GL_DeleteContext(Context);
 	if (Window)
 		SDL_DestroyWindow(Window);
-	SDL_Quit();
+		
+	u32 flags = SDL_INIT_TIMER | SDL_INIT_VIDEO;
+	SDL_QuitSubSystem(flags);
 }
 
 
@@ -409,6 +394,7 @@ extern "C" void update_swap_interval(int swap_interval)
 
 bool CIrrDeviceSDL::createWindow()
 {
+	CreationParams.m_sdl_window = NULL;
 	// Ignore alpha size here, this follow irr_driver.cpp:450
 	// Try 32 and, upon failure, 24 then 16 bit per pixels
 	if (CreationParams.DriverType == video::EDT_OPENGL ||
@@ -507,6 +493,7 @@ bool CIrrDeviceSDL::createWindow()
 			return false;
 		}
 	}
+	CreationParams.m_sdl_window = Window;
 	return true;
 }
 
@@ -710,10 +697,6 @@ void CIrrDeviceSDL::createDriver()
 		try
 		{
 			VideoDriver = video::createVulkanDriver(CreationParams, FileSystem, Window, this);
-			// SDL_Vulkan_GetDrawableSize only works after driver is created
-			updateNativeScale(&Width, &Height);
-			Width = (u32)((f32)Width * NativeScaleX);
-			Height = (u32)((f32)Height * NativeScaleY);
 		}
 		catch (std::exception& e)
 		{
@@ -832,8 +815,8 @@ bool CIrrDeviceSDL::run()
 			irrevent.TouchInput.ID = getTouchId(SDL_event.tfinger.fingerId);
 			if (SDL_event.type == SDL_FINGERUP)
 				removeTouchId(SDL_event.tfinger.fingerId);
-			irrevent.TouchInput.X = SDL_event.tfinger.x * Width;
-			irrevent.TouchInput.Y = SDL_event.tfinger.y * Height;
+			irrevent.TouchInput.X = SDL_event.tfinger.x * getRealScreenSize().Width;
+			irrevent.TouchInput.Y = SDL_event.tfinger.y * getRealScreenSize().Height;
 			postEventFromUser(irrevent);
 			break;
 
@@ -858,8 +841,8 @@ bool CIrrDeviceSDL::run()
 		case SDL_MOUSEMOTION:
 			irrevent.EventType = irr::EET_MOUSE_INPUT_EVENT;
 			irrevent.MouseInput.Event = irr::EMIE_MOUSE_MOVED;
-			MouseX = irrevent.MouseInput.X = SDL_event.motion.x * NativeScaleX;
-			MouseY = irrevent.MouseInput.Y = SDL_event.motion.y * NativeScaleY;
+			MouseX = irrevent.MouseInput.X = SDL_event.motion.x * getNativeScaleX();
+			MouseY = irrevent.MouseInput.Y = SDL_event.motion.y * getNativeScaleY();
 			irrevent.MouseInput.ButtonStates = MouseButtonStates;
 
 			postEventFromUser(irrevent);
@@ -869,8 +852,8 @@ bool CIrrDeviceSDL::run()
 		case SDL_MOUSEBUTTONUP:
 
 			irrevent.EventType = irr::EET_MOUSE_INPUT_EVENT;
-			irrevent.MouseInput.X = SDL_event.button.x * NativeScaleX;
-			irrevent.MouseInput.Y = SDL_event.button.y * NativeScaleY;
+			irrevent.MouseInput.X = SDL_event.button.x * getNativeScaleX();
+			irrevent.MouseInput.Y = SDL_event.button.y * getNativeScaleY();
 
 			irrevent.MouseInput.Event = irr::EMIE_MOUSE_MOVED;
 
@@ -1047,13 +1030,10 @@ bool CIrrDeviceSDL::run()
 
 void CIrrDeviceSDL::handleNewSize(u32 width, u32 height)
 {
-	updateNativeScale();
-	u32 new_width = width * NativeScaleX;
-	u32 new_height = height * NativeScaleY;
-	if (new_width != Width || new_height != Height)
+	if (width != Width || height != Height)
 	{
-		Width = new_width;
-		Height = new_height;
+		Width = width;
+		Height = height;
 		if (VideoDriver)
 			VideoDriver->OnResize(core::dimension2d<u32>(Width, Height));
 		reset_network_body();
@@ -1584,7 +1564,7 @@ extern "C" int Android_getMovedHeight();
 s32 CIrrDeviceSDL::getMovedHeight() const
 {
 #if defined(IOS_STK)
-	return SDL_GetMovedHeightByScreenKeyboard() * NativeScaleY;
+	return SDL_GetMovedHeightByScreenKeyboard() * getNativeScaleY();
 #elif defined(ANDROID)
 	return Android_getMovedHeight();
 #else
@@ -1597,7 +1577,7 @@ extern "C" int Android_getKeyboardHeight();
 u32 CIrrDeviceSDL::getOnScreenKeyboardHeight() const
 {
 #if defined(IOS_STK)
-	return SDL_GetScreenKeyboardHeight() * NativeScaleY;
+	return SDL_GetScreenKeyboardHeight() * getNativeScaleY();
 #elif defined(ANDROID)
 	return Android_getKeyboardHeight();
 #else
@@ -1608,13 +1588,17 @@ u32 CIrrDeviceSDL::getOnScreenKeyboardHeight() const
 
 f32 CIrrDeviceSDL::getNativeScaleX() const
 {
-	return NativeScaleX;
+	if (VideoDriver)
+		return (f32)VideoDriver->getScreenSize().Width / (f32)Width;
+	return 1.0f;
 }
 
 
 f32 CIrrDeviceSDL::getNativeScaleY() const
 {
-	return NativeScaleY;
+	if (VideoDriver)
+		return (f32)VideoDriver->getScreenSize().Height / (f32)Height;
+	return 1.0f;
 }
 
 
@@ -1685,6 +1669,15 @@ void CIrrDeviceSDL::createGUIAndVulkanScene()
 	SceneManager = new GE::GEVulkanSceneManager(VideoDriver, FileSystem, CursorControl, GUIEnvironment);
 
 	setEventReceiver(UserReceiver);
+}
+
+
+const core::dimension2du& CIrrDeviceSDL::getRealScreenSize() const
+{
+	static core::dimension2du ss;
+	if (VideoDriver)
+		return VideoDriver->getScreenSize();
+	return ss;
 }
 
 

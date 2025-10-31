@@ -33,6 +33,18 @@ HEDLEY_DIAGNOSTIC_PUSH
 SIMDE_DISABLE_UNWANTED_DIAGNOSTICS
 SIMDE_BEGIN_DECLS_
 
+// Workaround on ARM64 windows due to windows SDK bug
+// https://developercommunity.visualstudio.com/t/In-arm64_neonh-vsqaddb_u8-vsqaddh_u16/10271747?sort=newest
+#if (defined _MSC_VER) && (defined SIMDE_ARM_NEON_A64V8_NATIVE) && (_MSC_VER < 1938)
+#pragma message ("Due to msvc bug, current version of msvc is supported by workaround. Recommend to update msvc")
+#undef vuqaddh_s16
+#define vuqaddh_s16(src1, src2) neon_suqadds16(__int16ToN16_v(src1), __uint16ToN16_v(src2)).n16_i16[0]
+#undef vuqadds_s32
+#define vuqadds_s32(src1, src2) _CopyInt32FromFloat(neon_suqadds32(_CopyFloatFromInt32(src1), _CopyFloatFromUInt32(src2)))
+#undef vuqaddd_s64
+#define vuqaddd_s64(src1, src2) neon_suqadds64(__int64ToN64_v(src1), __uint64ToN64_v(src2)).n64_i64[0]
+#endif
+
 SIMDE_FUNCTION_ATTRIBUTES
 int8_t
 simde_vuqaddb_s8(int8_t a, uint8_t b) {

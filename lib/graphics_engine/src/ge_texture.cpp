@@ -12,13 +12,15 @@ namespace GE
 using namespace irr;
 video::IImage* getResizedImage(const std::string& path,
                                const core::dimension2du& max_size,
-                               core::dimension2d<u32>* orig_size)
+                               core::dimension2d<u32>* orig_size,
+                               const core::dimension2d<u32>* target_size)
 {
     io::IReadFile* file =
         getDriver()->getFileSystem()->createAndOpenFile(path.c_str());
     if (file == NULL)
         return NULL;
-    video::IImage* image = getResizedImage(file, max_size, orig_size);
+    video::IImage* image = getResizedImage(file, max_size, orig_size,
+        target_size);
     file->drop();
     return image;
 }   // getResizedImage

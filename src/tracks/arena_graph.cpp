@@ -458,7 +458,11 @@ void ArenaGraph::unitTesting()
 #endif
         }   // for j
     }   // for i
-
+    if (error_count > 0)
+    {
+       Log::error("ArenaGraph",
+                  "Found %d errors when comparing Dijkstra to Floyd-Warshall", error_count);
+    }
     delete ag;
 
 }   // unitTesting

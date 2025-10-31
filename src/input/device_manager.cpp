@@ -612,6 +612,24 @@ KeyboardDevice* DeviceManager::getKeyboardFromBtnID(const int button_id)
 }   // getKeyboardFromButtonID
 
 // -----------------------------------------------------------------------------
+GamePadDevice* DeviceManager::getGamePad(const int i)
+{
+    if (i>= 0 && i < (int)m_gamepads.size())
+        return m_gamepads.get(i);
+    else
+        return NULL;
+}
+
+// -----------------------------------------------------------------------------
+KeyboardDevice* DeviceManager::getKeyboard(const int i)
+{
+    if (i >= 0 && i < (int)m_keyboards.size())
+        return m_keyboards.get(i);
+    else
+        return NULL;
+}
+
+// -----------------------------------------------------------------------------
 
 void DeviceManager::shutdown()
 {

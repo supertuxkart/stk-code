@@ -6,11 +6,14 @@
 
 #include <algorithm>
 #include <set>
+#include <stdexcept>
 #include <string>
 #include <vector>
 
 #include "../source/Irrlicht/os.h"
 #include <SDL_cpuinfo.h>
+
+extern "C" const char* Android_Custom_Vulkan_Driver_In_Use();
 
 namespace GE
 {
@@ -32,6 +35,7 @@ bool g_supports_shader_draw_parameters = false;
 bool g_supports_s3tc_bc3 = false;
 bool g_supports_bptc_bc7 = false;
 bool g_supports_astc_4x4 = false;
+bool g_supports_shader_storage_image_extended_format = false;
 }   // GEVulkanFeatures
 
 // ============================================================================
@@ -89,6 +93,26 @@ void GEVulkanFeatures::init(GEVulkanDriver* vk)
     vkGetPhysicalDeviceFormatProperties(vk->getPhysicalDevice(),
         VK_FORMAT_ASTC_4x4_UNORM_BLOCK, &format_properties);
     g_supports_astc_4x4 = format_properties.optimalTilingFeatures & VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT;
+    g_supports_shader_storage_image_extended_format = vk->getPhysicalDeviceFeatures().shaderStorageImageExtendedFormats;
+    if (g_supports_shader_storage_image_extended_format)
+    {
+        // iOS simulator doesn't support writing to VK_FORMAT_A2B10G10R10_UNORM_PACK32
+        try
+        {
+            std::vector<VkFormat> a2b10g10r10 =
+            {
+                VK_FORMAT_A2B10G10R10_UNORM_PACK32,
+            };
+            VkFormat format = vk->findSupportedFormat(a2b10g10r10,
+                VK_IMAGE_TILING_OPTIMAL, VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT |
+                VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT |
+                VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT);
+        }
+        catch (std::runtime_error& e)
+        {
+            g_supports_shader_storage_image_extended_format = false;
+        }
+    }
 
     uint32_t extension_count;
     vkEnumerateDeviceExtensionProperties(vk->getPhysicalDevice(), NULL,
@@ -194,6 +218,12 @@ void GEVulkanFeatures::init(GEVulkanDriver* vk)
     // https://github.com/KhronosGroup/MoltenVK/issues/1743
     g_supports_shader_draw_parameters = false;
 #endif
+
+#if defined(__ANDROID__) && defined(__aarch64__)
+    // Freedreno is slow with bindless code
+    if (Android_Custom_Vulkan_Driver_In_Use() != NULL)
+        g_supports_multi_draw_indirect = false;
+#endif
 }   // init
 
 // ----------------------------------------------------------------------------
@@ -235,6 +265,8 @@ void GEVulkanFeatures::printStats()
     os::Printer::log(
         "Vulkan supports adaptive scalable texture compression (4x4 block)",
         supportsASTC4x4() ? "true" : "false");
+    os::Printer::log("Vulkan supports shader storage image extended formats",
+        supportsShaderStorageImageExtendedFormats() ? "true" : "false");
     os::Printer::log(
         "Vulkan descriptor indexes can be dynamically non-uniform",
         g_supports_non_uniform_indexing ? "true" : "false");
@@ -338,5 +370,11 @@ bool GEVulkanFeatures::supportsASTC4x4()
 {
     return g_supports_astc_4x4 && GECompressorASTC4x4::loaded();
 }   // supportsASTC4x4
+
+// ----------------------------------------------------------------------------
+bool GEVulkanFeatures::supportsShaderStorageImageExtendedFormats()
+{
+    return g_supports_shader_storage_image_extended_format;
+}   // supportsShaderStorageImageExtendedFormats
 
 }

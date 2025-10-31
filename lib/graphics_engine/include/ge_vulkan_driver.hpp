@@ -25,11 +25,13 @@ using namespace video;
 namespace GE
 {
     class GESPM;
-    class GEVulkanDepthTexture;
+    class GEVulkanAttachmentTexture;
+    class GEVulkanCameraSceneNode;
     class GEVulkanDrawCall;
     class GEVulkanDynamicSPMBuffer;
     class GEVulkanFBOTexture;
     class GEVulkanMeshCache;
+    class GEVulkanSkyBoxRenderer;
     class GEVulkanTextureDescriptor;
     enum GEVulkanSampler : unsigned
     {
@@ -40,6 +42,7 @@ namespace GE
         GVS_3D_MESH_MIPMAP_4,
         GVS_3D_MESH_MIPMAP_16,
         GVS_2D_RENDER,
+        GVS_SHADOW,
         GVS_COUNT,
     };
     class GEVulkanDriver : public video::CNullDriver
@@ -83,9 +86,6 @@ namespace GE
 
         //! sets a viewport
         virtual void setViewPort(const core::rect<s32>& area);
-
-        //! gets the area of the current viewport
-        virtual const core::rect<s32>& getViewPort() const { return m_viewport; }
 
         //! updates hardware buffer if needed
         virtual bool updateHardwareBuffer(SHWBufferLink *HWBuffer) { return false; }
@@ -197,7 +197,7 @@ namespace GE
         //! Sets the dynamic ambient light color. The default color is
         //! (0,0,0,0) which means it is dark.
         //! \param color: New color of the ambient light.
-        virtual void setAmbientLight(const SColorf& color) {}
+        virtual void setAmbientLight(const SColorf& color) { CNullDriver::setAmbientLight(color); }
 
         //! Draws a shadow volume into the stencil buffer.
         virtual void drawStencilShadowVolume(const core::array<core::vector3df>& triangles, bool zfail=true, u32 debugDataVisible=0) {}
@@ -315,6 +315,9 @@ namespace GE
                               { return m_vk->command_buffers[m_current_frame]; }
         std::vector<VkImage>& getSwapChainImages()
                                              { return m_vk->swap_chain_images; }
+        std::vector<VkImageView>& getSwapChainImageViews()
+                                        { return m_vk->swap_chain_image_views; }
+        VkFormat getSwapChainImageFormat() { return m_swap_chain_image_format; }
         std::vector<VkFramebuffer>& getSwapChainFramebuffers()
                                        { return m_vk->swap_chain_framebuffers; }
 
@@ -341,7 +344,9 @@ namespace GE
             destroySwapChainRelated(false/*handle_surface*/);
             createSwapChainRelated(false/*handle_surface*/);
         }
-        void updateDriver(bool reload_shaders = false);
+        void updateDriver(bool scale_changed = true, bool pbr_changed = false,
+                          bool ibl_changed = false);
+        void reloadShaders();
         uint32_t getGraphicsFamily() const         { return m_graphics_family; }
         unsigned getGraphicsQueueCount() const
                                               { return m_graphics_queue_count; }
@@ -349,12 +354,15 @@ namespace GE
         void waitIdle(bool flush_command_loader = false);
         void setDisableWaitIdle(bool val)         { m_disable_wait_idle = val; }
         IrrlichtDevice* getIrrlichtDevice() const  { return m_irrlicht_device; }
-        GEVulkanDepthTexture* getDepthTexture() const { return m_depth_texture; }
+        GEVulkanAttachmentTexture* getDepthTexture() const
+                                                     { return m_depth_texture; }
         VkFormat findSupportedFormat(const std::vector<VkFormat>& candidates,
                                      VkImageTiling tiling,
                                      VkFormatFeatureFlags features);
         VmaAllocator getVmaAllocator() const         { return m_vk->allocator; }
         GEVulkanMeshCache* getVulkanMeshCache() const;
+        GEVulkanSkyBoxRenderer* getSkyBoxRenderer() const
+                                                   { return m_skybox_renderer; }
         GEVulkanTextureDescriptor* getMeshTextureDescriptor() const
                                            { return m_mesh_texture_descriptor; }
         GEVulkanFBOTexture* getRTTTexture() const      { return m_rtt_texture; }
@@ -362,7 +370,7 @@ namespace GE
                                               { return m_separate_rtt_texture; }
         void handleDeletedTextures();
         void addRTTPolyCount(unsigned count)       { m_rtt_polycount += count; }
-        SDL_Window* getSDLWindow() const                    { return m_window; }
+        SDL_Window* getSDLWindow() const       { return m_params.m_sdl_window; }
         void clearDrawCallsCache();
         void addDrawCallToCache(std::unique_ptr<GEVulkanDrawCall>& dc);
         std::unique_ptr<GEVulkanDrawCall> getDrawCallFromCache();
@@ -372,6 +380,8 @@ namespace GE
                                        { m_dynamic_spm_buffers.insert(buffer); }
         void removeDynamicSPMBuffer(GEVulkanDynamicSPMBuffer* buffer)
                                         { m_dynamic_spm_buffers.erase(buffer); }
+        void renderDrawCalls(const std::vector<std::pair<GEVulkanDrawCall*, GEVulkanCameraSceneNode*> >& p,
+                             VkCommandBuffer cmd);
     private:
         struct SwapChainSupportDetails
         {
@@ -495,19 +505,19 @@ namespace GE
 
         unsigned int m_current_frame;
         uint32_t m_image_index;
+        unsigned int m_current_semaphore;
         video::SColor m_clear_color, m_rtt_clear_color;
         core::rect<s32> m_clip;
-        core::rect<s32> m_viewport;
         core::matrix4 m_pre_rotation_matrix;
 
         video::ITexture* m_white_texture;
         video::ITexture* m_transparent_texture;
 
-        SDL_Window* m_window;
         bool m_disable_wait_idle;
 
         IrrlichtDevice* m_irrlicht_device;
-        GEVulkanDepthTexture* m_depth_texture;
+        GEVulkanAttachmentTexture* m_depth_texture;
+        GEVulkanSkyBoxRenderer* m_skybox_renderer;
         GEVulkanTextureDescriptor* m_mesh_texture_descriptor;
         GEVulkanFBOTexture* m_rtt_texture;
         GEVulkanFBOTexture* m_prev_rtt_texture;

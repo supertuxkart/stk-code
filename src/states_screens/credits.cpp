@@ -37,8 +37,10 @@ using irr::core::stringc;
 #include "utils/translation.hpp"
 
 using namespace GUIEngine;
-const float TIME_SECTION_FADE = 0.8f;
-const float ENTRIES_FADE_TIME = 0.3f;
+const float TIME_SECTION_FADE     = 0.8f;
+const float TIME_PER_ENTRY        = 2.4f;
+const float TIME_BETWEEN_SECTIONS = 0.3f;
+const float ENTRIES_FADE_TIME     = 0.4f;
 
 // ----------------------------------------------------------------------------
 
@@ -249,43 +251,28 @@ void CreditsScreen::reset()
 {
     m_curr_section = 0;
     m_curr_element = -1;
-    time_before_next_step = TIME_SECTION_FADE;
-    m_time_element = 2.5f;
+    m_time_til_next_step = TIME_SECTION_FADE * 2; // Delay the credits roll
+    m_current_stage = SECTION_FADE_IN;
 }   // reset
 
 // ----------------------------------------------------------------------------
 
 void CreditsScreen::onDraw(float elapsed_time)
 {
-    // multiply by 0.8 to slow it down a bit as a whole
-    time_before_next_step -= elapsed_time*0.8f;
-
-    const bool before_first_elem = (m_curr_element == -1);
-    const bool after_last_elem   =
-        (m_curr_element >= (int)m_sections[m_curr_section].m_entries.size());
-
+    // TODO : make credits display speed configurable with control buttons
+    float m_speed = 1.0f;
+    m_time_til_next_step -= elapsed_time * m_speed;
 
     // ---- section name
-    video::SColor color =  GUIEngine::getSkin()->getColor("credits_text::neutral");
     video::SColor white_color( 255, 255, 255, 255 );
 
-    // manage fade-in
-    if (before_first_elem)
+    // Manage fade-in and fade-out
+    if (m_current_stage != ELEMENTS_DISPLAY)
     {
-        // I use 425 instead of 255 so that there is a little pause after
-        int alpha = 425 - (int)(time_before_next_step/TIME_SECTION_FADE * 425);
-        if      (alpha < 0) alpha = 0;
-        else if (alpha > 255) alpha = 255;
-        white_color.setAlpha( alpha );
-    }
-    // manage fade-out
-    else if (after_last_elem)
-    {
-        // I use 425 instead of 255 so that there is a little pause after
-        int alpha =
-            (int)(time_before_next_step/TIME_SECTION_FADE * 425) - (425-255);
-        if      (alpha < 0)   alpha = 0;
-        else if (alpha > 255) alpha = 255;
+        int alpha = 255 - (int)(m_time_til_next_step/TIME_SECTION_FADE * 255);
+        alpha = (m_current_stage == PAUSE_BETWEEN_SECTIONS) ? 0           :
+                (m_current_stage == SECTION_FADE_OUT      ) ? 255 - alpha : alpha;
+        alpha = std::max(0, std::min(255, alpha)); // Clamp between 0 and 255
         white_color.setAlpha( alpha );
     }
 
@@ -294,106 +281,117 @@ void CreditsScreen::onDraw(float elapsed_time)
                                     true /* center h */, true /* center v */ );
 
     // draw entries
-    if (!before_first_elem && !after_last_elem)
+    if (m_current_stage == ELEMENTS_DISPLAY)
+        drawEntries();
+
+    // Handle moving between stages
+    // If a section has multiple elements ; only one element is displayed at once
+    if (m_time_til_next_step < 0)
     {
-        int text_offset  = 0;
-
-        // fade in
-        if (time_before_next_step < ENTRIES_FADE_TIME)
+        switch(m_current_stage)
         {
-            const float fade_in = time_before_next_step / ENTRIES_FADE_TIME;
-
-            int alpha =  (int)(fade_in * 255);
-
-            if      (alpha < 0) alpha = 0;
-            else if (alpha > 255) alpha = 255;
-
-            color.setAlpha( alpha );
-
-            text_offset = (int)((1.0f - fade_in) * GUIEngine::getFontHeight());
-        }
-        // fade out
-        else if (time_before_next_step >= m_time_element - ENTRIES_FADE_TIME)
-        {
-            const float fade_out =
-                 (time_before_next_step - (m_time_element - ENTRIES_FADE_TIME))
-                / ENTRIES_FADE_TIME;
-
-            int alpha = 255 - (int)(fade_out * 255);
-            if(alpha < 0) alpha = 0;
-            else if(alpha > 255) alpha = 255;
-            color.setAlpha( alpha );
-
-            text_offset = -(int)(fade_out * GUIEngine::getFontHeight());
-        }
-
-
-        GUIEngine::getFont()->draw(
-            m_sections[m_curr_section].m_entries[m_curr_element]
-                                      .m_name.c_str(),
-            core::recti( m_x + text_offset, m_y + m_h/6,
-                         m_x + m_w + text_offset, m_y + m_h/3 ),
-            color, false /* center h */, true /* center v */, NULL,
-            true /* ignore RTL */                                   );
-
-        const int subamount = (int)m_sections[m_curr_section]
-                             .m_entries[m_curr_element].m_subentries.size();
-        int suby = m_y + m_h/3;
-        const int inc = subamount == 0 ? m_h/8
-                                       : std::min(m_h/8,
-                                                  (m_h - m_h/3)/(subamount+1));
-        for(int i=0; i<subamount; i++)
-        {
-            GUIEngine::getFont()->draw(m_sections[m_curr_section]
-                                       .m_entries[m_curr_element]
-                                       .m_subentries[i].c_str(),
-                                       core::recti( m_x + GUIEngine::getFontHeight()/2,
-                                                    suby + text_offset/(1+1),
-                                                    m_x + m_w + GUIEngine::getFontHeight()/2,
-                                                    suby + m_h/8
-                                                         + text_offset/(1+1) ),
-                                       color, false/* center h */,
-                                       true /* center v */, NULL,
-                                       true /* ignore RTL */ );
-            suby += inc;
-        }
-
-    }
-
-    // is it time to move on?
-    if (time_before_next_step < 0)
-    {
-        if (after_last_elem)
-        {
-            // switch to next element
-            m_curr_section++;
-            m_curr_element = -1;
-            time_before_next_step = TIME_SECTION_FADE;
-
-            if (m_curr_section >= (int)m_sections.size()) reset();
-        }
-        else
-        {
-            // move on
+        case SECTION_FADE_IN:
+            m_current_stage = ELEMENTS_DISPLAY;
+            m_curr_element++;
+            m_time_til_next_step = displayTimeForElement(m_curr_element);
+            break;
+        case ELEMENTS_DISPLAY:
             m_curr_element++;
 
-            if (m_curr_element >=
-                (int)m_sections[m_curr_section].m_entries.size())
+            // Fade out of the section after we have displayed all its elements
+            if (m_curr_element >= (int)m_sections[m_curr_section].m_entries.size())
             {
-                time_before_next_step = TIME_SECTION_FADE;
+                m_current_stage = SECTION_FADE_OUT;
+                m_time_til_next_step = TIME_SECTION_FADE;
+                break;
             }
-            else
-            {
-                const int count =
-                    (int)m_sections[m_curr_section].m_entries[m_curr_element]
-                                                   .m_subentries.size();
-                m_time_element = 2.0f + count*0.6f;
-                time_before_next_step = m_time_element;
-            }
+
+            m_time_til_next_step = displayTimeForElement(m_curr_element);
+            break;
+        case SECTION_FADE_OUT:
+            m_current_stage = PAUSE_BETWEEN_SECTIONS;
+            m_time_til_next_step = TIME_BETWEEN_SECTIONS;
+            break;
+        case PAUSE_BETWEEN_SECTIONS:
+            m_current_stage = SECTION_FADE_IN;
+            m_time_til_next_step = TIME_SECTION_FADE;
+
+            // Switch to the next section
+            m_curr_section++;
+            m_curr_element = -1;
+            // Loop over if we have reached the end
+            if (m_curr_section >= (int)m_sections.size())
+                reset();
+            break;
         }
     }
 
-}   // onUpdate
+}   // onDraw
+
+// ----------------------------------------------------------------------------
+
+float CreditsScreen::displayTimeForElement(int element_id)
+{
+    const int count = (int)m_sections[m_curr_section].m_entries[element_id]
+                                                     .m_subentries.size();
+    return (TIME_PER_ENTRY + (TIME_PER_ENTRY / 3) * count);
+}   // displayTimeForElement
+
+// ----------------------------------------------------------------------------
+
+void CreditsScreen::drawEntries()
+{
+    video::SColor color =  GUIEngine::getSkin()->getColor("credits_text::neutral");
+    int text_offset  = 0;
+
+    // Manage fade-in and fade-out
+    float m_fade_in_limit = displayTimeForElement(m_curr_element) - ENTRIES_FADE_TIME;
+
+    if (m_time_til_next_step >= m_fade_in_limit || m_time_til_next_step < ENTRIES_FADE_TIME)
+    {
+        float fade_factor = (m_time_til_next_step < ENTRIES_FADE_TIME) ? m_time_til_next_step :
+                                  ENTRIES_FADE_TIME - m_time_til_next_step + m_fade_in_limit;
+        fade_factor = fade_factor / ENTRIES_FADE_TIME;
+
+        int alpha = (int)(fade_factor * 255);
+        alpha = std::max(0, std::min(255, alpha)); // Clamp between 0 and 255
+        color.setAlpha(alpha);
+
+        // Have the text move from left to right on fade-in and on fade-out
+        text_offset = (int)((1.0f - fade_factor) * GUIEngine::getFontHeight());
+        if (m_time_til_next_step >= m_fade_in_limit)
+            text_offset *= -1;
+    }
+
+    GUIEngine::getFont()->draw(
+        m_sections[m_curr_section].m_entries[m_curr_element].m_name.c_str(),
+        core::recti( m_x + text_offset, m_y + m_h/6,
+                     m_x + m_w + text_offset, m_y + m_h/3 ),
+        color, false /* center h */, true /* center v */, NULL,
+        true /* ignore RTL */                                   );
+
+    const int subamount = (int)m_sections[m_curr_section]
+                         .m_entries[m_curr_element].m_subentries.size();
+    int suby = m_y + m_h/3;
+    const int inc = subamount == 0 ? m_h/8
+                                    : std::min(m_h/8,
+                                              (m_h - m_h/3)/(subamount+1));
+    for(int i=0; i<subamount; i++)
+    {
+        GUIEngine::getFont()->draw(m_sections[m_curr_section]
+                                   .m_entries[m_curr_element]
+                                   .m_subentries[i].c_str(),
+                                   core::recti( m_x + GUIEngine::getFontHeight()/2,
+                                                suby + text_offset/(1+1),
+                                                m_x + m_w + GUIEngine::getFontHeight()/2,
+                                                suby + m_h/8
+                                                     + text_offset/(1+1) ),
+                                   color, false/* center h */,
+                                   true /* center v */, NULL,
+                                   true /* ignore RTL */ );
+        suby += inc;
+    }
+}   // drawEntries
 
 // ----------------------------------------------------------------------------
 
@@ -408,6 +406,11 @@ void CreditsScreen::eventCallback(GUIEngine::Widget* widget,
     {
         // Open donation page
         Online::LinkHelper::openURL(stk_config->m_donate_url);
+    }
+    if (name == "stk-website")
+    {
+        // Open stk website main page
+        Online::LinkHelper::openURL(stk_config->m_stk_website_url);
     }
 }
 

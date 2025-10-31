@@ -646,6 +646,42 @@ EventPropagation ListWidget::moveToNextItem(const bool reverse)
 } // moveToNextItem
 
 // -----------------------------------------------------------------------------
+void ListWidget::pageMove(bool up)
+{
+    // if widget is deactivated, do nothing
+    if (m_deactivated) return;
+
+    int item_height = getIrrlichtElement<CGUISTKListBox>()->getItemHeight();
+    int items_per_page = (m_h - getHeaderHeight()) / item_height;
+    int selectionID = (up) ? getSelectionID() - items_per_page
+                           : getSelectionID() + items_per_page;
+    if (selectionID < 0)
+        selectionID = 0;
+    else if (selectionID > getItemCount() - 1)
+        selectionID = getItemCount() - 1;
+
+    setSelectionID(selectionID);
+} // pageMove
+
+// -----------------------------------------------------------------------------
+void ListWidget::listEnd()
+{
+    // if widget is deactivated, do nothing
+    if (m_deactivated) return;
+
+    setSelectionID(getItemCount() - 1);
+} // listEnd
+
+// -----------------------------------------------------------------------------
+void ListWidget::listStart()
+{
+    // if widget is deactivated, do nothing
+    if (m_deactivated) return;
+
+    setSelectionID(0);
+} // listStart
+
+// -----------------------------------------------------------------------------
 int ListWidget::getItemID(const std::string &internalName) const
 {
     const CGUISTKListBox* list = getIrrlichtElement<CGUISTKListBox>();

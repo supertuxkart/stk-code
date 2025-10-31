@@ -28,7 +28,9 @@ TextureShaderBase::BindFunction TextureShaderBase::m_all_bind_functions[] =
   /* ST_TRILINEAR_ANISOTROPIC_FILTERED */ &TextureShaderBase::bindTextureTrilinearAnisotropic,
   /* ST_TRILINEAR_CUBEMAP              */ &TextureShaderBase::bindCubemapTrilinear,
   /* ST_BILINEAR_FILTERED              */ &TextureShaderBase::bindTextureBilinear,
+  /* ST_NEAREST_FILTERED_ARRAY2D       */ &TextureShaderBase::bindTextureNearestArray,
   /* ST_SHADOW_SAMPLER                 */ &TextureShaderBase::bindTextureShadow,
+  /* ST_SHADOW_SAMPLER_ARRAY2D         */ &TextureShaderBase::bindTextureShadowArray,
   /* ST_TRILINEAR_CLAMPED_ARRAY2D      */ &TextureShaderBase::bindTrilinearClampedArrayTexture,
   /* ST_VOLUME_LINEAR_FILTERED         */ &TextureShaderBase::bindTextureVolume,
   /* ST_NEARED_CLAMPED_FILTERED        */ &TextureShaderBase::bindTextureNearestClamped,
@@ -42,7 +44,9 @@ GLuint TextureShaderBase::m_all_texture_types[] =
   /* ST_TRILINEAR_ANISOTROPIC_FILTERED */ GL_TEXTURE_2D,
   /* ST_TRILINEAR_CUBEMAP              */ GL_TEXTURE_CUBE_MAP,
   /* ST_BILINEAR_FILTERED              */ GL_TEXTURE_2D ,
-  /* ST_SHADOW_SAMPLER                 */ GL_TEXTURE_2D_ARRAY,
+  /* ST_NEAREST_FILTERED_ARRAY2D       */ GL_TEXTURE_2D_ARRAY,
+  /* ST_SHADOW_SAMPLER                 */ GL_TEXTURE_2D,
+  /* ST_SHADOW_SAMPLER_ARRAY2D         */ GL_TEXTURE_2D_ARRAY,
   /* ST_TRILINEAR_CLAMPED_ARRAY2D      */ GL_TEXTURE_2D_ARRAY,
   /* ST_VOLUME_LINEAR_FILTERED         */ GL_TEXTURE_3D,
   /* ST_NEARED_CLAMPED_FILTERED        */ GL_TEXTURE_2D,
@@ -169,7 +173,32 @@ void TextureShaderBase::bindTextureSemiTrilinear(GLuint tex_unit, GLuint tex_id)
 }   // bindTextureSemiTrilinear
 
 // ----------------------------------------------------------------------------
+void TextureShaderBase::bindTextureNearestArray(GLuint tex_unit, GLuint tex_id)
+{
+    glActiveTexture(GL_TEXTURE0 + tex_unit);
+    glBindTexture(GL_TEXTURE_2D_ARRAY, tex_id);
+    glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+}   // bindTextureShadow
+
+// ----------------------------------------------------------------------------
 void TextureShaderBase::bindTextureShadow(GLuint tex_unit, GLuint tex_id)
+{
+    glActiveTexture(GL_TEXTURE0 + tex_unit);
+    glBindTexture(GL_TEXTURE_2D, tex_id);
+    glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+    glTexParameterf(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_COMPARE_MODE, GL_COMPARE_REF_TO_TEXTURE);
+    glTexParameterf(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_COMPARE_FUNC, GL_LEQUAL);
+}   // bindTextureShadow
+
+
+// ----------------------------------------------------------------------------
+void TextureShaderBase::bindTextureShadowArray(GLuint tex_unit, GLuint tex_id)
 {
     glActiveTexture(GL_TEXTURE0 + tex_unit);
     glBindTexture(GL_TEXTURE_2D_ARRAY, tex_id);
@@ -180,7 +209,6 @@ void TextureShaderBase::bindTextureShadow(GLuint tex_unit, GLuint tex_id)
     glTexParameterf(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_COMPARE_MODE, GL_COMPARE_REF_TO_TEXTURE);
     glTexParameterf(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_COMPARE_FUNC, GL_LEQUAL);
 }   // bindTextureShadow
-
 // ----------------------------------------------------------------------------
 void TextureShaderBase::bindTrilinearClampedArrayTexture(unsigned tex_unit,
                                                           unsigned tex_id)
@@ -221,6 +249,7 @@ GLuint TextureShaderBase::createSamplers(SamplerTypeNew sampler_type)
     switch (sampler_type)
     {
     case ST_NEAREST_FILTERED:
+    case ST_NEAREST_FILTERED_ARRAY2D:
         return createNearestSampler();
     case ST_TRILINEAR_ANISOTROPIC_FILTERED:
         return createTrilinearSampler();
@@ -229,6 +258,7 @@ GLuint TextureShaderBase::createSamplers(SamplerTypeNew sampler_type)
     case ST_BILINEAR_FILTERED:
         return createBilinearSampler();
     case ST_SHADOW_SAMPLER:
+    case ST_SHADOW_SAMPLER_ARRAY2D:
         return createShadowSampler();
     case ST_TRILINEAR_CLAMPED_ARRAY2D:
         return createTrilinearClampedArray();

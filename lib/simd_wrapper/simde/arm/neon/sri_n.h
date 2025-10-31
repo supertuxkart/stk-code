@@ -23,6 +23,7 @@
  * Copyright:
  *   2021      Zhi An Ng <zhin@google.com> (Copyright owned by Google, LLC)
  *   2021      Evan Nemerson <evan@nemerson.com>
+ *   2023      Yi-Yen Chung <eric681@andestech.com> (Copyright owned by Andes Technology)
  */
 
 #if !defined(SIMDE_ARM_NEON_SRI_N_H)
@@ -264,6 +265,78 @@ SIMDE_BEGIN_DECLS_
 #if defined(SIMDE_ARM_NEON_A32V7_ENABLE_NATIVE_ALIASES)
   #undef vsriq_n_u64
   #define vsriq_n_u64(a, b, n) simde_vsriq_n_u64((a), (b), (n))
+#endif
+
+#if defined(SIMDE_ARM_NEON_A32V7_NATIVE)
+  #define simde_vsri_n_p8(a, b, n) vsri_n_p8((a), (b), (n))
+#else
+  #define simde_vsri_n_p8(a, b, n) \
+    simde_vreinterpret_p8_u8(simde_vsri_n_u8( \
+        simde_vreinterpret_u8_p8((a)), simde_vreinterpret_u8_p8((b)), (n)))
+#endif
+#if defined(SIMDE_ARM_NEON_A32V7_ENABLE_NATIVE_ALIASES)
+  #undef vsri_n_p8
+  #define vsri_n_p8(a, b, n) simde_vsri_n_p8((a), (b), (n))
+#endif
+
+#if defined(SIMDE_ARM_NEON_A32V7_NATIVE)
+  #define simde_vsri_n_p16(a, b, n) vsri_n_p16((a), (b), (n))
+#else
+  #define simde_vsri_n_p16(a, b, n) \
+    simde_vreinterpret_p16_u16(simde_vsri_n_u16( \
+        simde_vreinterpret_u16_p16((a)), simde_vreinterpret_u16_p16((b)), (n)))
+#endif
+#if defined(SIMDE_ARM_NEON_A32V7_ENABLE_NATIVE_ALIASES)
+  #undef vsri_n_p16
+  #define vsri_n_p16(a, b, n) simde_vsri_n_p16((a), (b), (n))
+#endif
+
+#if defined(SIMDE_ARM_NEON_A32V8_NATIVE)
+  #define simde_vsri_n_p64(a, b, n) vsri_n_p64((a), (b), (n))
+#else
+  #define simde_vsri_n_p64(a, b, n) \
+    simde_vreinterpret_p64_u64(simde_vsri_n_u64( \
+        simde_vreinterpret_u64_p64((a)), simde_vreinterpret_u64_p64((b)), (n)))
+#endif
+#if defined(SIMDE_ARM_NEON_A32V8_ENABLE_NATIVE_ALIASES)
+  #undef vsri_n_p64
+  #define vsri_n_p64(a, b, n) simde_vsri_n_p64((a), (b), (n))
+#endif
+
+#if defined(SIMDE_ARM_NEON_A32V7_NATIVE)
+  #define simde_vsriq_n_p8(a, b, n) vsriq_n_p8((a), (b), (n))
+#else
+  #define simde_vsriq_n_p8(a, b, n) \
+    simde_vreinterpretq_p8_u8(simde_vsriq_n_u8( \
+        simde_vreinterpretq_u8_p8((a)), simde_vreinterpretq_u8_p8((b)), (n)))
+#endif
+#if defined(SIMDE_ARM_NEON_A32V7_ENABLE_NATIVE_ALIASES)
+  #undef vsriq_n_p8
+  #define vsriq_n_p8(a, b, n) simde_vsriq_n_p8((a), (b), (n))
+#endif
+
+#if defined(SIMDE_ARM_NEON_A32V7_NATIVE)
+  #define simde_vsriq_n_p16(a, b, n) vsriq_n_p16((a), (b), (n))
+#else
+  #define simde_vsriq_n_p16(a, b, n) \
+    simde_vreinterpretq_p16_u16(simde_vsriq_n_u16( \
+        simde_vreinterpretq_u16_p16((a)), simde_vreinterpretq_u16_p16((b)), (n)))
+#endif
+#if defined(SIMDE_ARM_NEON_A32V7_ENABLE_NATIVE_ALIASES)
+  #undef vsriq_n_p16
+  #define vsriq_n_p16(a, b, n) simde_vsriq_n_p16((a), (b), (n))
+#endif
+
+#if defined(SIMDE_ARM_NEON_A32V8_NATIVE)
+  #define simde_vsriq_n_p64(a, b, n) vsriq_n_p64((a), (b), (n))
+#else
+  #define simde_vsriq_n_p64(a, b, n) \
+    simde_vreinterpretq_p64_u64(simde_vsriq_n_u64( \
+        simde_vreinterpretq_u64_p64((a)), simde_vreinterpretq_u64_p64((b)), (n)))
+#endif
+#if defined(SIMDE_ARM_NEON_A32V8_ENABLE_NATIVE_ALIASES)
+  #undef vsriq_n_p64
+  #define vsriq_n_p64(a, b, n) simde_vsriq_n_p64((a), (b), (n))
 #endif
 
 SIMDE_END_DECLS_

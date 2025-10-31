@@ -22,6 +22,7 @@
 #include "config/stk_config.hpp"
 #include "graphics/central_settings.hpp"
 #include "graphics/graphics_restrictions.hpp"
+#include "graphics/sp/sp_base.hpp"
 #include "guiengine/message_queue.hpp"
 #include "io/file_manager.hpp"
 #include "utils/file_utils.hpp"
@@ -179,8 +180,8 @@ ShaderFilesManager::SharedShader ShaderFilesManager::loadShader
     code << "//" << full_path << "\n";
     if (!CVS->isARBUniformBufferObjectUsable())
         code << "#define UBO_DISABLED\n";
-    if (!CVS->isARBTextureBufferObjectUsable())
-        code << "#define TBO_DISABLED\n";
+    if (!SP::skinningUseTBO())
+        code << "#define SKINNING_TBO_DISABLED\n";
     if (CVS->needsVertexIdWorkaround())
         code << "#define Needs_Vertex_Id_Workaround\n";
     if (CVS->isDeferredEnabled())
@@ -201,12 +202,16 @@ ShaderFilesManager::SharedShader ShaderFilesManager::loadShader
         code << "precision highp float;\n";
         code << "precision highp sampler2DArrayShadow;\n";
         code << "precision highp sampler2DArray;\n";
+        code << "precision highp sampler2DShadow;\n";
+        code << "precision highp sampler2D;\n";
     }
     else
     {
         code << "precision mediump float;\n";
         code << "precision mediump sampler2DArrayShadow;\n";
         code << "precision mediump sampler2DArray;\n";
+        code << "precision mediump sampler2DShadow;\n";
+        code << "precision mediump sampler2D;\n";
     }
 #endif
     code << "#define MAX_BONES " << stk_config->m_max_skinning_bones << "\n";

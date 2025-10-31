@@ -20,7 +20,7 @@ simde_mm_dpbf16_ps (simde__m128 src, simde__m128bh a, simde__m128bh b) {
       a_ = simde__m128bh_to_private(a),
       b_ = simde__m128bh_to_private(b);
 
-    #if defined(SIMDE_VECTOR_SUBSCRIPT_SCALAR) && defined(SIMDE_CONVERT_VECTOR_) && defined(SIMDE_SHUFFLE_VECTOR_)
+    #if ! ( defined(SIMDE_ARCH_X86) && defined(HEDLEY_GCC_VERSION) ) && defined(SIMDE_VECTOR_SUBSCRIPT_SCALAR) && defined(SIMDE_CONVERT_VECTOR_) && defined(SIMDE_SHUFFLE_VECTOR_)
       uint32_t x1 SIMDE_VECTOR(32);
       uint32_t x2 SIMDE_VECTOR(32);
       simde__m128_private
@@ -109,7 +109,7 @@ simde_mm256_dpbf16_ps (simde__m256 src, simde__m256bh a, simde__m256bh b) {
       a_ = simde__m256bh_to_private(a),
       b_ = simde__m256bh_to_private(b);
 
-    #if defined(SIMDE_VECTOR_SUBSCRIPT_SCALAR) && defined(SIMDE_CONVERT_VECTOR_) && defined(SIMDE_SHUFFLE_VECTOR_)
+    #if ! ( defined(SIMDE_ARCH_X86) && defined(HEDLEY_GCC_VERSION) ) && defined(SIMDE_VECTOR_SUBSCRIPT_SCALAR) && defined(SIMDE_CONVERT_VECTOR_) && defined(SIMDE_SHUFFLE_VECTOR_)
       uint32_t x1 SIMDE_VECTOR(64);
       uint32_t x2 SIMDE_VECTOR(64);
       simde__m256_private
@@ -198,7 +198,7 @@ simde_mm512_dpbf16_ps (simde__m512 src, simde__m512bh a, simde__m512bh b) {
       a_ = simde__m512bh_to_private(a),
       b_ = simde__m512bh_to_private(b);
 
-    #if defined(SIMDE_VECTOR_SUBSCRIPT_SCALAR) && defined(SIMDE_CONVERT_VECTOR_) && defined(SIMDE_SHUFFLE_VECTOR_)
+    #if ! ( defined(SIMDE_ARCH_X86) && defined(HEDLEY_GCC_VERSION) ) && defined(SIMDE_VECTOR_SUBSCRIPT_SCALAR) && defined(SIMDE_CONVERT_VECTOR_) && defined(SIMDE_SHUFFLE_VECTOR_)
       uint32_t x1 SIMDE_VECTOR(128);
       uint32_t x2 SIMDE_VECTOR(128);
       simde__m512_private

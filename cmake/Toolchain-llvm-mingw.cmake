@@ -26,3 +26,14 @@ SET(CMAKE_FIND_ROOT_PATH ${LLVM_PREFIX}/generic-w64-mingw32 ${LLVM_PREFIX}/${LLV
 set(CMAKE_FIND_ROOT_PATH_MODE_PROGRAM NEVER)
 set(CMAKE_FIND_ROOT_PATH_MODE_LIBRARY ALWAYS)
 set(CMAKE_FIND_ROOT_PATH_MODE_INCLUDE ONLY)
+
+if(LLVM_ARCH MATCHES "i686")
+    set(ISPC_ARCH x86)
+elseif(LLVM_ARCH MATCHES "x86_64")
+    set(ISPC_ARCH "x86-64")
+elseif(LLVM_ARCH MATCHES "armv7")
+    # ISPC doesn't support armv7 windows
+    set(ISPC_ARCH unknown)
+else()
+    set(ISPC_ARCH ${LLVM_ARCH})
+endif()

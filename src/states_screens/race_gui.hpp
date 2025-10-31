@@ -20,6 +20,7 @@
 #ifndef HEADER_RACE_GUI_HPP
 #define HEADER_RACE_GUI_HPP
 
+#include <map>
 #include <string>
 #include <vector>
 
@@ -107,13 +108,13 @@ private:
     /** Animation state: none, getting smaller (old value),
      *  getting bigger (new number). */
     enum AnimationState {AS_NONE, AS_SMALLER, AS_BIGGER};
-    std::vector<AnimationState> m_animation_states;
+    std::map<int, AnimationState> m_animation_states;
 
-    /** How long the rank animation has been shown. */
-    std::vector<float> m_rank_animation_duration;
+    /** How long the speedometer digit animation has been shown for this number. */
+    std::map<int, float> m_animation_duration;
 
-    /** Stores the previous rank for each kart. Used for the rank animation. */
-    std::vector<int> m_last_ranks;
+    /** Stores the previous digit on the center of the speedometer for each number. */
+    std::map<int, int> m_last_digit;
 
     bool m_is_tutorial;
 

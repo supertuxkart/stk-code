@@ -227,7 +227,8 @@ public:
     uint16_t m_client_port;
     uint16_t m_server_port;
 
-    /* URLs for donating and reseting the password */
+    /* URLs for the stk website, donating and reseting the password */
+    std::string m_stk_website_url;
     std::string m_donate_url;
     std::string m_password_reset_url;
     std::string m_assets_download_url;

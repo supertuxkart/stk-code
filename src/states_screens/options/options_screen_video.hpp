@@ -40,6 +40,8 @@ struct GFXPreset
     int image_quality;
     bool degraded_ibl;
     int geometry_detail;
+    bool pc_soft_shadows;
+    bool ssr;
 };
 
 struct BlurPreset
@@ -62,7 +64,6 @@ class OptionsScreenVideo : public GUIEngine::Screen, public GUIEngine::ScreenSin
 {
 private:
     bool m_prev_adv_pipline;
-    int m_prev_img_quality;
     OptionsScreenVideo();
     bool m_inited;
     std::vector<GFXPreset> m_presets;
@@ -102,7 +103,8 @@ public:
     void         updateBlurSlider();
     void         updateScaleRTTsSlider();
     static int getImageQuality();
-    static void setImageQuality(int quality);
+    static void setImageQuality(int quality, bool force_reload_texture);
+    static void setSSR();
 };
 
 #endif

@@ -10,11 +10,16 @@ uniform float split0;
 uniform float split1;
 uniform float split2;
 uniform float splitmax;
+
+uniform vec3  sundirection;
 uniform float shadow_res;
+uniform vec3  sun_color;
 uniform float overlap_proportion;
 
-uniform vec3 sundirection;
-uniform vec3 sun_color;
+uniform float texel0;
+uniform float texel1;
+uniform float texel2;
+uniform float texel3;
 
 in vec2 uv;
 #ifdef GL_ES
@@ -32,12 +37,12 @@ out vec4 Spec;
 #stk_include "utils/SunMRP.frag"
 
 // https://web.archive.org/web/20230210095515/http://the-witness.net/news/2013/09/shadow-mapping-summary-part-1
-float getShadowFactor(vec3 pos, int index, float bias)
+float getShadowFactor(vec3 pos, int index)
 {
     vec4 shadowcoord = (u_shadow_projection_view_matrices[index] * u_inverse_view_matrix * vec4(pos, 1.0));
     shadowcoord.xy /= shadowcoord.w;
     vec2 shadowtexcoord = shadowcoord.xy * 0.5 + 0.5;
-    float d = .5 * shadowcoord.z + .5 - bias;
+    float d = .5 * shadowcoord.z + .5;
 
     vec2 uv = shadowtexcoord * shadow_res;
     vec2 base_uv = floor(uv + 0.5);
@@ -83,13 +88,26 @@ float blend_start(float x) {
     return x * (1.0 - overlap_proportion);
 }
 
+vec3 getXcYcZc(int x, int y, float zC)
+{
+    // We use perspective symetric projection matrix hence P(0,2) = P(1, 2) = 0
+    float xC= (2. * (float(x)) / u_screen.x - 1.) * zC / u_projection_matrix[0][0];
+    float yC= (2. * (float(y)) / u_screen.y - 1.) * zC / u_projection_matrix[1][1];
+    return vec3(xC, yC, zC);
+}
+
 void main() {
     vec2 uv = gl_FragCoord.xy / u_screen;
     float z = texture(dtex, uv).x;
     vec4 xpos = getPosFromUVDepth(vec3(uv, z), u_inverse_projection_matrix);
 
-    vec3 norm = DecodeNormal(texture(ntex, uv).xy);
-    float roughness =texture(ntex, uv).z;
+    // get the normal of current fragment
+    vec3 ddx = dFdx(xpos.xyz);
+    vec3 ddy = dFdy(xpos.xyz);
+    vec3 geo_norm = normalize(cross(ddy, ddx));
+
+    vec3 norm = (u_view_matrix * vec4(DecodeNormal(texture(ntex, uv).xy), 0)).xyz;
+    float roughness = texture(ntex, uv).z;
     vec3 eyedir = -normalize(xpos.xyz);
 
     vec3 Lightdir = SunMRP(norm, eyedir);
@@ -100,24 +118,30 @@ void main() {
 
     // Shadows
     float factor;
-    float bias = max(1.0 - NdotL, .2) / shadow_res;
+    vec3 lbias = 40. * Lightdir / shadow_res; // Scale with blur kernel size
+    vec3 nbias = geo_norm * (1.0 - max(dot(-geo_norm, Lightdir), 0.)) / shadow_res;
+    nbias -= Lightdir * dot(nbias, Lightdir); // Slope-scaled normal bias
+
     if (xpos.z < split0) {
-        factor = getShadowFactor(xpos.xyz, 0, bias);
+        factor = getShadowFactor(xpos.xyz + lbias + nbias * texel0, 0);
         if (xpos.z > blend_start(split0)) {
-            factor = mix(factor, getShadowFactor(xpos.xyz, 1, bias), (xpos.z - blend_start(split0)) / split0 / overlap_proportion);
+            factor = mix(factor, getShadowFactor(xpos.xyz + lbias + nbias * texel1, 1), 
+                            (xpos.z - blend_start(split0)) / split0 / overlap_proportion);
         }
     } else if (xpos.z < split1) {
-        factor = getShadowFactor(xpos.xyz, 1, bias);
+        factor = getShadowFactor(xpos.xyz + lbias + nbias * texel1, 1);
         if (xpos.z > blend_start(split1)) {
-            factor = mix(factor, getShadowFactor(xpos.xyz, 2, bias), (xpos.z - blend_start(split1)) / split1 / overlap_proportion);
+            factor = mix(factor, getShadowFactor(xpos.xyz + lbias + nbias * texel2, 2), 
+                            (xpos.z - blend_start(split1)) / split1 / overlap_proportion);
         }
     } else if (xpos.z < split2) {
-        factor = getShadowFactor(xpos.xyz, 2, bias);
+        factor = getShadowFactor(xpos.xyz + lbias + nbias * texel2, 2);
         if (xpos.z > blend_start(split2)) {
-            factor = mix(factor, getShadowFactor(xpos.xyz, 3, bias), (xpos.z - blend_start(split2)) / split2 / overlap_proportion);
+            factor = mix(factor, getShadowFactor(xpos.xyz + lbias + nbias * texel3, 3), 
+                            (xpos.z - blend_start(split2)) / split2 / overlap_proportion);
         }
     } else if (xpos.z < splitmax) {
-        factor = getShadowFactor(xpos.xyz, 3, bias);
+        factor = getShadowFactor(xpos.xyz + lbias + nbias * texel3, 3);
         if (xpos.z > blend_start(splitmax)) {
             factor = mix(factor, 1.0, (xpos.z - blend_start(splitmax)) / splitmax / overlap_proportion);
         }

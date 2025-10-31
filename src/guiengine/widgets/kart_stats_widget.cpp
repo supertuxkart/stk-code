@@ -85,6 +85,10 @@ KartStatsWidget::KartStatsWidget(core::recti area, const int player_id,
 // -----------------------------------------------------------------------------
 void KartStatsWidget::setValues(const KartProperties* props, HandicapLevel h)
 {
+    // If props is NULL (e.g., when kart selection is "?" (random)),
+    // skip this function to avoid errors.
+    if( props == NULL ) return;
+	
     // Use kart properties computed for best difficulty to show the user, so
     // that properties don't change according to the the last used difficulty
     RaceManager::Difficulty previous_difficulty = RaceManager::get()->getDifficulty();

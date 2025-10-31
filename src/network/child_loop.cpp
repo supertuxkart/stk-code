@@ -58,6 +58,8 @@ float ChildLoop::getLimitedDt()
             }
             dt = (float)(m_curr_time - m_prev_time);
         }
+        if (UserConfigParams::m_benchmark)
+            break;
 
         const int current_fps = (int)(1000.0f / dt);
         const int max_fps = UserConfigParams::m_max_fps;

@@ -13,6 +13,7 @@
 
 #include "GlyphLayout.h"
 
+#include <cstdint>
 #include <string>
 #include <vector>
 

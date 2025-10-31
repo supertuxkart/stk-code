@@ -938,6 +938,7 @@ void CSkinnedMesh::finalize()
 
 	//Set array sizes...
 
+	Vertices_Moved.reallocate(LocalBuffers.size());
 	for (i=0; i<LocalBuffers.size(); ++i)
 	{
 		Vertices_Moved.push_back( core::array<bool>() );

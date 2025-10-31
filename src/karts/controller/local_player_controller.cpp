@@ -24,6 +24,7 @@
 #include "config/stk_config.hpp"
 #include "config/user_config.hpp"
 #include "graphics/camera/camera.hpp"
+#include "graphics/camera/camera_normal.hpp"
 #include "graphics/irr_driver.hpp"
 #include "graphics/particle_emitter.hpp"
 #include "graphics/particle_kind.hpp"
@@ -56,7 +57,7 @@
 
 #include "LinearMath/btTransform.h"
 
-/** The constructor for a loca player kart, i.e. a player that is playing
+/** The constructor for a local player kart, i.e. a player that is playing
  *  on this machine (non-local player would be network clients).
  *  \param kart_name Name of the kart.
  *  \param position The starting position (1 to n).
@@ -107,9 +108,9 @@ LocalPlayerController::~LocalPlayerController()
 void LocalPlayerController::initParticleEmitter()
 {
     // Attach Particle System
+#ifndef SERVER_ONLY
     m_sky_particles_emitter = nullptr;
     Track *track = Track::getCurrentTrack();
-#ifndef SERVER_ONLY
     if (!GUIEngine::isNoGraphics() &&
         UserConfigParams::m_particles_effects > 1 &&
         track->getSkyParticles() != NULL)
@@ -269,7 +270,9 @@ void LocalPlayerController::update(int ticks)
         else
         {
             if (camera->getMode() == Camera::CM_REVERSE)
+            {
                 camera->setMode(Camera::CM_NORMAL);
+            }
         }
         if (m_sky_particles_emitter)
         {

@@ -359,7 +359,7 @@ void RegisterScreen::doRegister()
     }
     else if (username == password)
     {
-        m_info_widget->setText(_("Online username and password must not be the same!"), false);
+        m_info_widget->setText(_("Online username and password must be different!"), false);
     }
     else if (email != email_confirm)
     {
@@ -367,29 +367,31 @@ void RegisterScreen::doRegister()
     }
     else if (namecheck)
     {
-        m_info_widget->setText(_("Online username can only contain alphanumeric (ASCII) characters, periods, dashes and underscores!"), false);
+        m_info_widget->setText(_("The online username can only contain alphanumeric characters, periods, dashes and underscores!"), false);
+        // TODO: When setting a text, there should automatically be a check in the widget to see if the text-size has to be reduced
+        // Currently, this string overflows with big text sizes, but any slight resizing of the window gets it to shrink back.
     }
     else if (username.size() < 3 || username.size() > 30)
     {
-        m_info_widget->setText(_("Online username has to be between 3 and 30 characters long!"), false);
+        m_info_widget->setText(_("The online username must be between %i and %i characters long!", 3, 30), false);
     }
     else if (username[0]>='0' && username[0]<='9')
     {
-        m_info_widget->setText(_("Online username must not start with a number!"), false);
+        m_info_widget->setText(_("The online username cannot start with a number!"), false);
     }
     else if (password.size() < 8 || password.size() > 30)
     {
-        m_info_widget->setText(_("Password has to be between 8 and 30 characters long!"), false);
+        m_info_widget->setText(_("The password must be between %i and %i characters long!", 8, 30), false);
     }
     else if (email.size() < 5 || email.size() > 254)
     {
-        m_info_widget->setText(_("Email has to be between 5 and 254 characters long!"), false);
+        m_info_widget->setText(_("The email address must be between %i and %i characters long!", 5, 254), false);
     }
     else if (  email.find(L"@")== -1 || email.find(L".")== -1 ||
               (email.findLast(L'.') - email.findLast(L'@') <= 1 ) ||
                 email.findLast(L'@')==0 || email[(email.size())-1]=='.')
     {
-        m_info_widget->setText(_("Email is invalid!"), false);
+        m_info_widget->setText(_("The email address is invalid!"), false);
     }
    
     else

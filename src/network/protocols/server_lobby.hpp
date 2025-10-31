@@ -34,16 +34,14 @@
 #include <mutex>
 #include <set>
 
-#ifdef ENABLE_SQLITE3
-#include <sqlite3.h>
-#endif
-
 class BareNetworkString;
+class DatabaseConnector;
 class NetworkItemManager;
 class NetworkString;
 class NetworkPlayerProfile;
 class STKPeer;
 class SocketAddress;
+class Ranking;
 
 namespace Online
 {
@@ -78,39 +76,12 @@ private:
         std::string m_country_code;
         bool m_tried = false;
     };
-    bool m_player_reports_table_exists;
 
 #ifdef ENABLE_SQLITE3
-    sqlite3* m_db;
-
-    std::string m_server_stats_table;
-
-    bool m_ip_ban_table_exists;
-
-    bool m_ipv6_ban_table_exists;
-
-    bool m_online_id_ban_table_exists;
-
-    bool m_ip_geolocation_table_exists;
-
-    bool m_ipv6_geolocation_table_exists;
-
-    uint64_t m_last_poll_db_time;
+    DatabaseConnector* m_db_connector;
 
     void pollDatabase();
-
-    bool easySQLQuery(const std::string& query,
-        std::function<void(sqlite3_stmt* stmt)> bind_function = nullptr) const;
-
-    void checkTableExists(const std::string& table, bool& result);
-
-    std::string ip2Country(const SocketAddress& addr) const;
-
-    std::string ipv62Country(const SocketAddress& addr) const;
 #endif
-    void initDatabase();
-
-    void destroyDatabase();
 
     std::atomic<ServerState> m_state;
 
@@ -184,39 +155,7 @@ private:
 
     std::map<std::string, uint64_t> m_pending_peer_connection;
 
-    /* Ranking related variables */
-    // If updating the base points, update the base points distribution in DB
-    const double BASE_RANKING_POINTS    = 4000.0; // Given to a new player on 1st connection to a ranked server
-    const double BASE_RATING_DEVIATION  = 1000.0; // Given to a new player on 1st connection to a ranked server
-    const double MIN_RATING_DEVIATION   = 100.0; // A server cron job makes RD go up if a player is inactive
-    const double BASE_RD_PER_DISCONNECT = 15.0;
-    const double VAR_RD_PER_DISCONNECT  = 3.0;
-    const double MAX_SCALING_TIME       = 360.0;
-    const double BASE_POINTS_PER_SECOND = 0.18;
-    const double HANDICAP_OFFSET        = 2000.0;
-
-    /** Online id to profile map, handling disconnection in ranked server */
-    std::map<uint32_t, std::weak_ptr<NetworkPlayerProfile> > m_ranked_players;
-
-    /** Multi-session rating for each current player */
-    std::map<uint32_t, double> m_raw_scores;
-
-    /** The rating uncertainty for each current player */
-    std::map<uint32_t, double> m_rating_deviations;
-
-    /** A single number compounding "raw score" and RD,
-      * for rating display to players and rankings */
-    std::map<uint32_t, double> m_scores;
-
-    /** The maximum rating obtained for each current player.
-      * This is based on m_scores, not m_raw_scores */
-    std::map<uint32_t, double> m_max_scores;
-
-    /** Number of disconnects in the previous 64 ranked races for each current players */
-    std::map<uint32_t, uint64_t> m_num_ranked_disconnects;
-
-    /** Number of ranked races done for each current players */
-    std::map<uint32_t, unsigned> m_num_ranked_races;
+    std::shared_ptr<Ranking> m_ranking;
 
     /* Saved the last game result */
     NetworkString* m_result_ns;
@@ -336,16 +275,6 @@ private:
     void getRankingForPlayer(std::shared_ptr<NetworkPlayerProfile> p);
     void submitRankingsToAddons();
     void computeNewRankings();
-    void clearDisconnectedRankedPlayer();
-    double getModeFactor();
-    double getModeSpread();
-    double getTimeSpread(double time);
-    double getUncertaintySpread(uint32_t online_id);
-    double scalingValueForTime(double time);
-    double computeH2HResult(double player1_time, double player2_time);
-    double computeDataAccuracy(double player1_rd, double player2_rd,
-                               double player1_scores, double player2_scores,
-                               int player_count, bool handicap_used);
     void checkRaceFinished();
     void getHitCaptureLimit();
     void configPeersStartTime();
@@ -378,7 +307,6 @@ private:
     void testBannedForIP(STKPeer* peer) const;
     void testBannedForIPv6(STKPeer* peer) const;
     void testBannedForOnlineId(STKPeer* peer, uint32_t online_id) const;
-    void writeDisconnectInfoTable(STKPeer* peer);
     void writePlayerReport(Event* event);
     bool supportsAI();
     void updateAddons();
@@ -419,6 +347,7 @@ public:
     uint32_t getServerIdOnline() const           { return m_server_id_online; }
     void setClientServerHostId(uint32_t id)   { m_client_server_host_id = id; }
     static int m_fixed_laps;
+    bool playerReportsTableExists() const;
 };   // class ServerLobby
 
 #endif // SERVER_LOBBY_HPP

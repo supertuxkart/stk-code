@@ -20,6 +20,7 @@
 #define HEADER_PLAYER_PROFILE_HPP
 
 #include "challenges/story_mode_status.hpp"
+#include "config/favorite_status.hpp"
 #include "network/remote_kart_info.hpp"
 #include "utils/leak_check.hpp"
 #include "utils/no_copy.hpp"
@@ -111,7 +112,14 @@ private:
     /** The complete challenge state. */
     StoryModeStatus *m_story_mode_status;
 
+    /** The complete achievement data. */
     AchievementsStatus *m_achievements_status;
+
+    /** The favorite tracks selected by this player. */
+    FavoriteStatus *m_favorite_track_status;
+
+    /** The favorite karts selected by this player. */
+    FavoriteStatus *m_favorite_kart_status;
 
 public:
 
@@ -288,6 +296,40 @@ public:
     bool hasSavedSession() const { return m_saved_session;  }
     // ----------------------------------------------------------------------------------------
     StoryModeStatus* getStoryModeStatus() { return m_story_mode_status; }
+    // ----------------------------------------------------------------------------------------
+    FavoriteStatus* getFavoriteTrackStatus() { return m_favorite_track_status; }
+    // ----------------------------------------------------------------------------------------
+    FavoriteStatus* getFavoriteKartStatus() { return m_favorite_kart_status; }
+    // ----------------------------------------------------------------------------------------
+    bool isFavoriteTrack(std::string ident)
+    {
+        return m_favorite_track_status->isFavorite(ident);
+    }
+    void addFavoriteTrack(std::string ident, std::string group = 
+        FavoriteStatus::DEFAULT_FAVORITE_GROUP_NAME)
+    {
+        m_favorite_track_status->addFavorite(ident, group);
+    }
+    void removeFavoriteTrack(std::string ident, std::string group = 
+        FavoriteStatus::DEFAULT_FAVORITE_GROUP_NAME)
+    {
+        m_favorite_track_status->removeFavorite(ident, group);
+    }
+    // ----------------------------------------------------------------------------------------
+    bool isFavoriteKart(std::string ident)
+    {
+        return m_favorite_kart_status->isFavorite(ident);
+    }
+    void addFavoriteKart(std::string ident, std::string group = 
+        FavoriteStatus::DEFAULT_FAVORITE_GROUP_NAME)
+    {
+        m_favorite_kart_status->addFavorite(ident, group);
+    }
+    void removeFavoriteKart(std::string ident, std::string group = 
+        FavoriteStatus::DEFAULT_FAVORITE_GROUP_NAME)
+    {
+        m_favorite_kart_status->removeFavorite(ident, group);
+    }
     // ----------------------------------------------------------------------------------------
     /** If a session was saved, return the id of the saved user. */
     int getSavedUserId() const

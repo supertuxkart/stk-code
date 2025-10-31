@@ -48,6 +48,8 @@ namespace GUIEngine
         irr::video::ITexture* m_deactivated_texture;
         irr::video::ITexture* m_highlight_texture;
         int m_texture_w, m_texture_h;
+        float m_target_width;
+        float m_target_height;
 
         video::ITexture* getDeactivatedTexture(video::ITexture* texture);
         void setLabelFont();
@@ -154,6 +156,13 @@ namespace GUIEngine
         void setHighlightedImage(irr::video::ITexture* texture)
         {
             m_highlight_texture = texture;
+        }
+
+        // --------------------------------------------------------------------
+        void setTargetSize(float width, float height)
+        {
+            m_target_width = width;
+            m_target_height = height;
         }
 
         // --------------------------------------------------------------------

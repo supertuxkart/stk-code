@@ -274,9 +274,13 @@ public:
     // ------------------------------------------------------------------------
     /** Resets the maximum so any new maximum value from the application will
      *  be accepted. */
-    virtual void resetMaxSpeed() { m_max_speed = -1.0f; m_min_speed = 0.0f; }
+    virtual void resetMaxSpeed() { m_max_speed = -1.0f; }
     // ------------------------------------------------------------------------
-    /** Sets the minimum speed for this kart. */
+    virtual void resetMinSpeed() { m_min_speed = 0.0f; }
+    // ------------------------------------------------------------------------
+    /** Sets the minimum speed for this kart, only if the new value is higher.
+     * FIXME The name of this function doesn't match its real behavior, it's confusing 
+     * Determine why it needs to work that way and make it cleaner */
     void setMinSpeed(float s)
     {
         if(s > m_min_speed) m_min_speed = s; 

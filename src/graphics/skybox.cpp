@@ -68,7 +68,6 @@ public:
     }   // bindVertexArray
 };   // SkyboxShader
 
-#if !defined(USE_GLES2)
 class SpecularIBLGenerator : public TextureShader<SpecularIBLGenerator, 2,
                                                   core::matrix4, float >
 {
@@ -79,10 +78,9 @@ public:
                             GL_FRAGMENT_SHADER, "importance_sampling_specular.frag");
         assignUniforms("PermutationMatrix", "ViewportSize");
         assignSamplerNames(0, "tex", ST_TRILINEAR_CUBEMAP,
-                           1, "samples", ST_TEXTURE_BUFFER);
+                           1, "samples", ST_NEARED_CLAMPED_FILTERED);
     }
 };   // SpecularIBLGenerator
-#endif
 
 namespace {
     // ----------------------------------------------------------------------------
@@ -305,10 +303,8 @@ void Skybox::generateSpecularCubemap()
     }
     glGenerateMipmap(GL_TEXTURE_CUBE_MAP);
 
-    if (!CVS->isDeferredEnabled() || !CVS->isARBTextureBufferObjectUsable())
+    if (!CVS->isDeferredEnabled())
         return;
-
-#if !defined(USE_GLES2)
 
     GLuint fbo;
     glGenFramebuffers(1, &fbo);
@@ -351,15 +347,15 @@ void Skybox::generateSpecularCubemap()
         }
 
         glBindVertexArray(0);
-        GLuint sample_texture, sample_buffer;
-        glGenBuffers(1, &sample_buffer);
-        glBindBuffer(GL_TEXTURE_BUFFER, sample_buffer);
-        glBufferData(GL_TEXTURE_BUFFER, 2048 * sizeof(float), tmp,
-                     GL_STATIC_DRAW);
+        GLuint sample_texture;
         glGenTextures(1, &sample_texture);
-        glBindTexture(GL_TEXTURE_BUFFER, sample_texture);
-        glTexBuffer(GL_TEXTURE_BUFFER, GL_RG32F, sample_buffer);
-        glBindTexture(GL_TEXTURE_BUFFER, 0);
+        glBindTexture(GL_TEXTURE_2D, sample_texture);
+
+        // Upload texture data as 1024x1 RG32F texture
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RG32F, 1024, 1, 0, GL_RG, GL_FLOAT, tmp);
+        glBindTexture(GL_TEXTURE_2D, 0);
+
+        delete[] tmp;
         glBindVertexArray(SharedGPUObjects::getFullScreenQuadVAO());
 
         for (unsigned face = 0; face < 6; face++)
@@ -377,17 +373,11 @@ void Skybox::generateSpecularCubemap()
 
             glDrawArrays(GL_TRIANGLES, 0, 3);
         }
-        glBindBuffer(GL_TEXTURE_BUFFER, 0);
-        glBindTexture(GL_TEXTURE_BUFFER, 0);
-
-        delete[] tmp;
         glDeleteTextures(1, &sample_texture);
-        glDeleteBuffers(1, &sample_buffer);
     }
     glBindFramebuffer(GL_FRAMEBUFFER, irr_driver->getDefaultFramebuffer());
     glDeleteFramebuffers(1, &fbo);
     glActiveTexture(GL_TEXTURE0);
-#endif
 }   // generateSpecularCubemap
 
 

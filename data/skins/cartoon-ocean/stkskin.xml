@@ -15,7 +15,7 @@ Here you can configure advanced theming rules for this skin
 -->
 
 <!--  Stateless -->
-<element type="background" image="background.jpg" />
+<element type="background" image="background.jpg" horizontal-cut="true" vertical-cut="true"/>
 
 <element type="bottom-bar" image="bottom_bar.png" />
 
@@ -105,25 +105,24 @@ Here you can configure advanced theming rules for this skin
       h_inner_padding="0" v_inner_padding="-8" h_margin="0" v_margin="4" />
 
 <!-- Stateless -->
-<!-- Provided by base theme
 <element type="squareFocusHaloBW" common="y" image="glass_square_focused_bw.png"
       left_border="6" right_border ="6" top_border="6" bottom_border="6"
       hborder_out_portion="1.0" />
-<element type="squareFocusHalo1" common="y" image="glass_square_focused_red.png"
+<element type="squareFocusHalo1" common="y" image="glass_square_focused_cyan.png"
       left_border="6" right_border ="6" top_border="6" bottom_border="6"
       hborder_out_portion="1.0" />
-<element type="squareFocusHalo2" common="y" image="glass_square_focused_cyan.png"
+<element type="squareFocusHalo2" common="y" image="glass_square_focused_yellow.png"
       left_border="6" right_border ="6" top_border="6" bottom_border="6"
       hborder_out_portion="1.0" />
-<element type="squareFocusHalo3" common="y" image="glass_square_focused_green.png"
+<element type="squareFocusHalo3" common="y" image="glass_square_focused_red.png"
       left_border="6" right_border ="6" top_border="6" bottom_border="6"
       hborder_out_portion="1.0" />
-<element type="squareFocusHalo4" common="y" image="glass_square_focused_yellow.png"
+<element type="squareFocusHalo4" common="y" image="glass_square_focused_green.png"
       left_border="6" right_border ="6" top_border="6" bottom_border="6"
       hborder_out_portion="1.0" />
 <element type="squareFocusHalo5" common="y" image="glass_square_focused_pink.png"
       left_border="6" right_border ="6" top_border="6" bottom_border="6"
-      hborder_out_portion="1.0" />-->
+      hborder_out_portion="1.0" />
       
 <!-- Stateless. No splitting into 9 areas is done; the image is just resized. -->
 <element type="selectionHalo" image="bubble.png"  />
@@ -156,23 +155,22 @@ Here you can configure advanced theming rules for this skin
       left_border="104" right_border="104" top_border="0" bottom_border="36"
       preserve_h_aspect_ratios="true" hborder_out_portion="0.0"/>-->
 
-<!-- player name spinner color in multiplayer-->
-<!-- Provided by base theme
-<element type="spinner1" state="neutral" image="spinner_red.png"
+ <!-- player name spinner color in multiplayer-->
+<element type="spinner1" state="neutral" parent="1" image="spinner_cyan.png"
       left_border="110" right_border="110" top_border="0" bottom_border="36"
     preserve_h_aspect_ratios="true" hborder_out_portion="0.0" />
-<element type="spinner2" state="neutral" image="spinner_cyan.png"
+<element type="spinner2" state="neutral" parent="1" image="spinner_yellow.png"
       left_border="110" right_border="110" top_border="0" bottom_border="36"
     preserve_h_aspect_ratios="true" hborder_out_portion="0.0" />
-<element type="spinner3" state="neutral" image="spinner_green.png"
+<element type="spinner3" state="neutral" parent="1" image="spinner_red.png"
       left_border="110" right_border="110" top_border="0" bottom_border="36"
     preserve_h_aspect_ratios="true" hborder_out_portion="0.0" />
-<element type="spinner4" state="neutral" image="spinner_yellow.png"
+<element type="spinner4" state="neutral" parent="1" image="spinner_green.png"
       left_border="110" right_border="110" top_border="0" bottom_border="36"
     preserve_h_aspect_ratios="true" hborder_out_portion="0.0" />
-<element type="spinner5" state="neutral" image="spinner_pink.png"
+<element type="spinner5" state="neutral" parent="1" image="spinner_pink.png"
       left_border="110" right_border="110" top_border="0" bottom_border="36"
-    preserve_h_aspect_ratios="true" hborder_out_portion="0.0" />-->
+    preserve_h_aspect_ratios="true" hborder_out_portion="0.0" />
 
 <!-- This one is a bit special. Only area(s) LEFT and/or RIGHT will be rendered. They will be overlaid
      on top of the spinner's background -->

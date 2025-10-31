@@ -23,6 +23,7 @@
  * Copyright:
  *   2021      Zhi An Ng <zhin@google.com> (Copyright owned by Google, LLC)
  *   2021      Evan Nemerson <evan@nemerson.com>
+ *   2023      Yi-Yen Chung <eric681@andestech.com> (Copyright owned by Andes Technology)
  */
 
 #if !defined(SIMDE_ARM_NEON_RSQRTS_H)
@@ -36,6 +37,26 @@
 HEDLEY_DIAGNOSTIC_PUSH
 SIMDE_DISABLE_UNWANTED_DIAGNOSTICS
 SIMDE_BEGIN_DECLS_
+
+SIMDE_FUNCTION_ATTRIBUTES
+simde_float16_t
+simde_vrsqrtsh_f16(simde_float16_t a, simde_float16_t b) {
+  #if defined(SIMDE_ARM_NEON_A64V8_NATIVE) && defined(SIMDE_ARM_NEON_FP16)
+    return vrsqrtsh_f16(a, b);
+  #else
+    return
+      simde_vmulh_f16(
+        simde_vsubh_f16(
+          SIMDE_FLOAT16_VALUE(3.0),
+          simde_vmulh_f16(a, b)),
+        SIMDE_FLOAT16_VALUE(0.5)
+      );
+  #endif
+}
+#if defined(SIMDE_ARM_NEON_A64V8_ENABLE_NATIVE_ALIASES)
+  #undef vrsqrtsh_f16
+  #define vrsqrtsh_f16(a, b) simde_vrsqrtsh_f16((a), (b))
+#endif
 
 SIMDE_FUNCTION_ATTRIBUTES
 simde_float32_t
@@ -63,6 +84,26 @@ simde_vrsqrtsd_f64(simde_float64_t a, simde_float64_t b) {
 #if defined(SIMDE_ARM_NEON_A64V8_ENABLE_NATIVE_ALIASES)
   #undef vrsqrtsd_f64
   #define vrsqrtsd_f64(a, b) simde_vrsqrtsd_f64((a), (b))
+#endif
+
+SIMDE_FUNCTION_ATTRIBUTES
+simde_float16x4_t
+simde_vrsqrts_f16(simde_float16x4_t a, simde_float16x4_t b) {
+  #if defined(SIMDE_ARM_NEON_A32V8_NATIVE) && defined(SIMDE_ARM_NEON_FP16)
+    return vrsqrts_f16(a, b);
+  #else
+    return
+      simde_vmul_n_f16(
+        simde_vsub_f16(
+          simde_vdup_n_f16(SIMDE_FLOAT16_VALUE(3.0)),
+          simde_vmul_f16(a, b)),
+        SIMDE_FLOAT16_VALUE(0.5)
+      );
+  #endif
+}
+#if defined(SIMDE_ARM_NEON_A32V8_ENABLE_NATIVE_ALIASES)
+  #undef vrsqrts_f16
+  #define vrsqrts_f16(a, b) simde_vrsqrts_f16((a), (b))
 #endif
 
 SIMDE_FUNCTION_ATTRIBUTES
@@ -105,6 +146,26 @@ simde_vrsqrts_f64(simde_float64x1_t a, simde_float64x1_t b) {
 #if defined(SIMDE_ARM_NEON_A64V8_ENABLE_NATIVE_ALIASES)
   #undef vrsqrts_f64
   #define vrsqrts_f64(a, b) simde_vrsqrts_f64((a), (b))
+#endif
+
+SIMDE_FUNCTION_ATTRIBUTES
+simde_float16x8_t
+simde_vrsqrtsq_f16(simde_float16x8_t a, simde_float16x8_t b) {
+  #if defined(SIMDE_ARM_NEON_A32V8_NATIVE) && defined(SIMDE_ARM_NEON_FP16)
+    return vrsqrtsq_f16(a, b);
+  #else
+    return
+      simde_vmulq_n_f16(
+        simde_vsubq_f16(
+          simde_vdupq_n_f16(SIMDE_FLOAT16_VALUE(3.0)),
+          simde_vmulq_f16(a, b)),
+        SIMDE_FLOAT16_VALUE(0.5)
+      );
+  #endif
+}
+#if defined(SIMDE_ARM_NEON_A32V8_ENABLE_NATIVE_ALIASES)
+  #undef vrsqrtsq_f16
+  #define vrsqrtsq_f16(a, b) simde_vrsqrtsq_f16((a), (b))
 #endif
 
 SIMDE_FUNCTION_ATTRIBUTES

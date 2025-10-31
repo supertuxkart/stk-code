@@ -25,6 +25,7 @@
 #include <memory>
 #include <set>
 
+#include "config/favorite_status.hpp"
 #include "network/remote_kart_info.hpp"
 #include "utils/no_copy.hpp"
 
@@ -50,11 +51,17 @@ private:
     /** List of all kart groups. */
     std::vector<std::string>                 m_all_groups;
 
+    /** Current favorite karts */
+    FavoriteStatus*                          m_current_favorite_status;
+
     /** List of all kart types. */
     std::vector<std::string>                 m_kart_types;
 
     /** Mapping of group names to list of kart indices in each group. */
     std::map<std::string, std::vector<int> > m_groups_2_indices;
+
+    /** Mapping of group names to list of kart indices in each group without customized ones. */
+    std::map<std::string, std::vector<int> > m_groups_2_indices_no_custom;
 
     /** Vector containing kart numbers that have been selected in multiplayer
      * games.  This it used to ensure the same kart can not be selected more
@@ -93,6 +100,10 @@ public:
     void                     unloadAllKarts         ();
     void                     removeKart(const std::string &id);
     const std::vector<int>   getKartsInGroup        (const std::string& g);
+    /** Adds a track to the special group of favorite tracks.
+    * We need to treat it specially, because the list of tracks in this group
+    * depends on the player-profile, not on the track data. */
+    void                     setFavoriteKartStatus(FavoriteStatus *status);
     bool                     kartAvailable(int kartid);
     std::vector<std::string> getAllAvailableKarts() const;
     void                     setUnavailableKarts(std::vector<std::string>);
@@ -112,7 +123,9 @@ public:
     /** Get a characteristic that holds the values for a kart type. */
     const AbstractCharacteristic* getKartTypeCharacteristic(const std::string &type, const std::string &name) const;
     // ------------------------------------------------------------------------
-    const std::string& getDefaultKartType() const   { return m_kart_types[0]; }
+    const std::vector<std::string>& getAllKartTypes() const { return m_kart_types; }
+    // ------------------------------------------------------------------------
+    const std::string& getDefaultKartType() const           { return m_kart_types[0]; }
     // ------------------------------------------------------------------------
     bool hasKartTypeCharacteristic(const std::string& type) const
     {
@@ -124,7 +137,7 @@ public:
     const AbstractCharacteristic* getPlayerCharacteristic(const std::string &type) const;
     // ------------------------------------------------------------------------
     /** Returns a list of all groups. */
-    const std::vector<std::string>& getAllGroups() const {return m_all_groups;}
+    const std::vector<std::string>& getAllGroups() const { return m_all_groups; }
     // ------------------------------------------------------------------------
     /** Clears all selected karts (used in networking only). */
     void clearAllSelectedKarts() { m_selected_karts.clear(); }

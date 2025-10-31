@@ -554,6 +554,7 @@ void STKConfig::getAllData(const XMLNode * root)
 
     if (const XMLNode *urls = root->getNode("urls"))
     {
+        urls->get("stk-website", &m_stk_website_url);
         urls->get("donate", &m_donate_url);
         urls->get("password-reset", &m_password_reset_url);
         urls->get("assets-download", &m_assets_download_url);

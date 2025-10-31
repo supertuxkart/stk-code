@@ -20,10 +20,13 @@ using namespace irr;
 namespace GE
 {
 class GEVulkanDriver;
+class GEVulkanDeferredFBO;
 class GEVulkanTexture : public video::ITexture
 {
 protected:
-    core::dimension2d<u32> m_size, m_orig_size, m_max_size;
+    friend class GEVulkanDeferredFBO;
+
+    core::dimension2d<u32> m_size, m_orig_size;
 
     std::function<void(video::IImage*)> m_image_mani;
 
@@ -85,7 +88,8 @@ protected:
     // ------------------------------------------------------------------------
     bool createImage(VkImageUsageFlags usage);
     // ------------------------------------------------------------------------
-    bool createImageView(VkImageAspectFlags aspect_flags);
+    bool createImageView(VkImageAspectFlags aspect_flags,
+                         bool create_srgb_view = true);
     // ------------------------------------------------------------------------
     void transitionImageLayout(VkCommandBuffer command_buffer,
                                VkImageLayout old_layout,
@@ -99,18 +103,11 @@ protected:
     // ------------------------------------------------------------------------
     void clearVulkanData();
     // ------------------------------------------------------------------------
-    void reloadInternal();
+    void reloadInternal(const core::dimension2du& max_size);
     // ------------------------------------------------------------------------
     void bgraConversion(uint8_t* img_data);
     // ------------------------------------------------------------------------
     uint8_t* getTextureData();
-    // ------------------------------------------------------------------------
-    unsigned getMipmapLevels() const
-    {
-        if (!m_has_mipmaps)
-            return 1;
-        return std::floor(std::log2(std::max(m_size.Width, m_size.Height))) + 1;
-    }
     // ------------------------------------------------------------------------
     bool isSingleChannel() const
                             { return m_internal_format == VK_FORMAT_R8_UNORM; }
@@ -243,6 +240,19 @@ public:
     virtual const io::path& getFullPath() const         { return m_full_path; }
     // ------------------------------------------------------------------------
     VkFormat getInternalFormat() const            { return m_internal_format; }
+    // ------------------------------------------------------------------------
+    VkImage getImage() const
+    {
+        waitImageView();
+        return m_image;
+    }
+    // ------------------------------------------------------------------------
+    unsigned getMipmapLevels() const
+    {
+        if (!m_has_mipmaps)
+            return 1;
+        return std::floor(std::log2(std::max(m_size.Width, m_size.Height))) + 1;
+    }
 };   // GEVulkanTexture
 
 }

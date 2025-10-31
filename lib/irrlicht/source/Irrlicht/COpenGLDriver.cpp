@@ -4051,8 +4051,13 @@ void COpenGLDriver::removeTexture(ITexture* texture)
 //! the window was resized.
 void COpenGLDriver::OnResize(const core::dimension2d<u32>& size)
 {
-	CNullDriver::OnResize(size);
-	glViewport(0, 0, size.Width, size.Height);
+	Params.WindowSize = size;
+	int real_width = Params.WindowSize.Width;
+	int real_height = Params.WindowSize.Height;
+	SDL_GL_GetDrawableSize(Params.m_sdl_window, &real_width, &real_height);
+	core::dimension2du s(real_width, real_height);
+	CNullDriver::OnResize(s);
+	glViewport(0, 0, s.Width, s.Height);
 	Transformation3DChanged = true;
 }
 
@@ -5056,7 +5061,9 @@ IVideoDriver* createOpenGLDriver(const SIrrlichtCreationParameters& params,
 		io::IFileSystem* io, CIrrDeviceSDL* device)
 {
 #ifdef _IRR_COMPILE_WITH_OPENGL_
-	return new COpenGLDriver(params, io, device);
+	IVideoDriver* ogl = new COpenGLDriver(params, io, device);
+	ogl->OnResize(params.WindowSize);
+	return ogl;
 #else
 	return 0;
 #endif //  _IRR_COMPILE_WITH_OPENGL_

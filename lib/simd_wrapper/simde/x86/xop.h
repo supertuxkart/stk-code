@@ -3727,7 +3727,7 @@ simde_mm256_permute2_pd (simde__m256d a, simde__m256d b, simde__m256i c, const i
       SIMDE_LCC_REVERT_DEPRECATED_WARNINGS \
     }))
   #else
-    #define simde_mm256_permute2_pd(a, b, c, imm8) simde_undeprecated_mm256_permute2_pd((a), (b), (c), (imm8))
+    #define simde_mm256_permute2_pd(a, b, c, imm8) _mm256_permute2_pd((a), (b), (c), (imm8))
   #endif
 #endif
 #if defined(SIMDE_X86_XOP_ENABLE_NATIVE_ALIASES)

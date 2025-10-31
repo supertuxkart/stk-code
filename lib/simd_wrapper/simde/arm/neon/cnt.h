@@ -22,6 +22,7 @@
  *
  * Copyright:
  *   2020      Evan Nemerson <evan@nemerson.com>
+ *   2023      Yi-Yen Chung <eric681@andestech.com> (Copyright owned by Andes Technology)
  */
 
 #if !defined(SIMDE_ARM_NEON_CNT_H)
@@ -162,6 +163,34 @@ simde_vcntq_u8(simde_uint8x16_t a) {
 #if defined(SIMDE_ARM_NEON_A32V7_ENABLE_NATIVE_ALIASES)
   #undef vcntq_u8
   #define vcntq_u8(a) simde_vcntq_u8((a))
+#endif
+
+SIMDE_FUNCTION_ATTRIBUTES
+simde_poly8x8_t
+simde_vcnt_p8(simde_poly8x8_t a) {
+  #if defined(SIMDE_ARM_NEON_A32V7_NATIVE)
+    return vcnt_p8(a);
+  #else
+    return simde_vreinterpret_p8_s8(simde_vcnt_s8(simde_vreinterpret_s8_p8(a)));
+  #endif
+}
+#if defined(SIMDE_ARM_NEON_A32V7_ENABLE_NATIVE_ALIASES)
+  #undef vcnt_p8
+  #define vcnt_p8(a) simde_vcnt_p8((a))
+#endif
+
+SIMDE_FUNCTION_ATTRIBUTES
+simde_poly8x16_t
+simde_vcntq_p8(simde_poly8x16_t a) {
+  #if defined(SIMDE_ARM_NEON_A32V7_NATIVE)
+    return vcntq_p8(a);
+  #else
+    return simde_vreinterpretq_p8_s8(simde_vcntq_s8(simde_vreinterpretq_s8_p8(a)));
+  #endif
+}
+#if defined(SIMDE_ARM_NEON_A32V7_ENABLE_NATIVE_ALIASES)
+  #undef vcntq_p8
+  #define vcntq_p8(a) simde_vcntq_p8((a))
 #endif
 
 SIMDE_END_DECLS_

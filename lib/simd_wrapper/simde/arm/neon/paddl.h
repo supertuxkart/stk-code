@@ -286,7 +286,7 @@ simde_vpaddlq_u16(simde_uint16x8_t a) {
     simde_uint32x4_private r_;
 
     #if defined(SIMDE_X86_XOP_NATIVE)
-      r_.sse_m128i = _mm_haddd_epu16(a_.sse_m128i);
+      r_.m128i = _mm_haddd_epu16(a_.m128i);
     #elif defined(SIMDE_X86_SSE2_NATIVE)
       r_.m128i =
         _mm_add_epi32(

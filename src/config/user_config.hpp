@@ -363,16 +363,6 @@ enum AnimType {ANIMS_NONE         = 0,
                ANIMS_PLAYERS_ONLY = 1,
                ANIMS_ALL          = 2 };
 
-enum GeometryLevel
-{
-    /** Display everything */
-    GEOLEVEL_0    = 0,
-    /** a few details are displayed */
-    GEOLEVEL_1    = 1,
-    /** Lowest level, no details are displayed. */
-    GEOLEVEL_2    = 2
-};
-
 enum MultitouchControls
 {
     MULTITOUCH_CONTROLS_UNDEFINED = 0,
@@ -714,7 +704,9 @@ namespace UserConfigParams
         PARAM_DEFAULT(IntUserConfigParam(512, "max_texture_size",
         &m_video_group, "Max texture size when high definition textures are "
                         "disabled"));
-
+    PARAM_PREFIX BoolUserConfigParam        m_ssr
+        PARAM_DEFAULT(BoolUserConfigParam(false, "ssr",
+        &m_video_group, "Enable screen space reflection"));
     PARAM_PREFIX BoolUserConfigParam        m_hq_mipmap
         PARAM_DEFAULT(BoolUserConfigParam(false, "hq_mipmap",
         &m_video_group, "Generate mipmap for textures using "
@@ -726,11 +718,11 @@ namespace UserConfigParams
 #if defined(_IRR_COMPILE_WITH_DIRECT3D_9_) && defined(_M_ARM)
     PARAM_PREFIX StringUserConfigParam         m_render_driver
         PARAM_DEFAULT(  StringUserConfigParam("directx9", "render_driver",
-        &m_video_group, "Render video driver to use, at the moment gl, vulkan or directx9 is supported.") );
+        &m_video_group, "Render video driver to use, at the moment opengl, vulkan or directx9 is supported.") );
 #else
     PARAM_PREFIX StringUserConfigParam         m_render_driver
-        PARAM_DEFAULT(  StringUserConfigParam("gl", "render_driver",
-        &m_video_group, "Render video driver to use, at the moment gl, vulkan or directx9 is supported.") );
+        PARAM_DEFAULT(  StringUserConfigParam("opengl", "render_driver",
+        &m_video_group, "Render video driver to use, at the moment opengl, vulkan or directx9 is supported.") );
 #endif
 
 #if defined(MOBILE_STK)
@@ -834,6 +826,10 @@ namespace UserConfigParams
 
     PARAM_PREFIX bool m_race_now          PARAM_DEFAULT( false );
 
+    PARAM_PREFIX int m_default_keyboard   PARAM_DEFAULT( -1 );
+
+    PARAM_PREFIX int m_default_gamepad    PARAM_DEFAULT( -1 );
+
     PARAM_PREFIX bool m_enforce_current_player PARAM_DEFAULT( false );
 
     PARAM_PREFIX bool m_enable_sound PARAM_DEFAULT( true );
@@ -848,6 +844,8 @@ namespace UserConfigParams
     PARAM_PREFIX bool m_disable_addon_karts  PARAM_DEFAULT( false );
 
     PARAM_PREFIX bool m_disable_addon_tracks  PARAM_DEFAULT( false );
+
+    PARAM_PREFIX bool m_benchmark  PARAM_DEFAULT( false );
 
     // ---- Networking
     PARAM_PREFIX StringToUIntUserConfigParam    m_server_bookmarks
@@ -977,10 +975,10 @@ namespace UserConfigParams
                 "Whether to display animated characters") );
 
     PARAM_PREFIX IntUserConfigParam        m_geometry_level
-            PARAM_DEFAULT(  IntUserConfigParam(GEOLEVEL_0,
-                            "geometry_level", &m_graphics_quality,
-                "Geometry quality 0=everything is displayed; "
-                "1=a few details are displayed; 2=lowest level, no details") );
+            PARAM_DEFAULT(  IntUserConfigParam(2,
+                            "geometry-level", &m_graphics_quality,
+                "Geometry quality 0=lowest level, no details; "
+                "5=everything is displayed") );
 
     PARAM_PREFIX IntUserConfigParam         m_anisotropic
             PARAM_DEFAULT( IntUserConfigParam(4, "anisotropic",
@@ -988,7 +986,7 @@ namespace UserConfigParams
                            "Quality of anisotropic filtering (usual values include 2-4-8-16; 0 to disable)") );
 
     PARAM_PREFIX IntUserConfigParam         m_swap_interval
-            PARAM_DEFAULT( IntUserConfigParam(0, "swap-interval",
+            PARAM_DEFAULT( IntUserConfigParam(1, "swap-interval-vsync",
                            &m_graphics_quality,
                            "Swap interval for vsync: 0 = disabled, 1 = full") );
     PARAM_PREFIX BoolUserConfigParam         m_motionblur
@@ -1004,13 +1002,17 @@ namespace UserConfigParams
                            "ssao", &m_graphics_quality,
                            "Enable Screen Space Ambient Occlusion") );
     PARAM_PREFIX BoolUserConfigParam         m_light_scatter
-            PARAM_DEFAULT(BoolUserConfigParam(true,
+            PARAM_DEFAULT(BoolUserConfigParam(false,
                            "light_scatter", &m_graphics_quality,
                            "Enable light scattering shaders") );
     PARAM_PREFIX IntUserConfigParam          m_shadows_resolution
             PARAM_DEFAULT( IntUserConfigParam(0,
                            "shadows_resolution", &m_graphics_quality,
                            "Shadow resolution (0 = disabled") );
+    PARAM_PREFIX BoolUserConfigParam          m_pcss
+            PARAM_DEFAULT( BoolUserConfigParam(false,
+                           "pcss", &m_graphics_quality,
+                           "Enable Percentage Closer Soft Shadows") );
     PARAM_PREFIX BoolUserConfigParam          m_degraded_IBL
         PARAM_DEFAULT(BoolUserConfigParam(true,
         "Degraded_IBL", &m_graphics_quality,
@@ -1040,10 +1042,15 @@ namespace UserConfigParams
             &m_camera_normal,
             "Angle between camera and plane of kart (pitch) when the camera is pointing forward"));
 
-    PARAM_PREFIX BoolUserConfigParam         m_camera_forward_smoothing
-            PARAM_DEFAULT(  BoolUserConfigParam(true, "forward-smoothing",
+    PARAM_PREFIX FloatUserConfigParam         m_camera_forward_smooth_position
+            PARAM_DEFAULT(  FloatUserConfigParam(0.2, "forward-smooth-position",
             &m_camera_normal,
-            "if true, use smoothing (forward-up-angle become relative to speed) when pointing forward"));
+            "The strength of smoothness of the position of the camera"));
+
+    PARAM_PREFIX FloatUserConfigParam         m_camera_forward_smooth_rotation
+            PARAM_DEFAULT(  FloatUserConfigParam(0.125, "forward-smooth-rotation",
+            &m_camera_normal,
+            "The strength of smoothness of the rotation of the camera"));
 
     PARAM_PREFIX FloatUserConfigParam         m_camera_backward_distance
             PARAM_DEFAULT(  FloatUserConfigParam(2.0, "backward-distance",
@@ -1085,10 +1092,15 @@ namespace UserConfigParams
             &m_standard_camera_settings,
             "Angle between camera and plane of kart (pitch) when the camera is pointing forward"));
 
-    PARAM_PREFIX BoolUserConfigParam         m_standard_camera_forward_smoothing
-            PARAM_DEFAULT(  BoolUserConfigParam(true, "forward-smoothing",
+    PARAM_PREFIX FloatUserConfigParam         m_standard_camera_forward_smooth_position
+            PARAM_DEFAULT(  FloatUserConfigParam(0.2, "forward-smooth-position",
             &m_standard_camera_settings,
-            "if true, use smoothing (forward-up-angle become relative to speed) when pointing forward"));
+            "The strength of smoothness of the position of the camera"));
+
+    PARAM_PREFIX FloatUserConfigParam         m_standard_camera_forward_smooth_rotation
+            PARAM_DEFAULT(  FloatUserConfigParam(0.125, "forward-smooth-rotation",
+            &m_standard_camera_settings,
+            "The strength of smoothness of the rotation of the camera"));
 
     PARAM_PREFIX FloatUserConfigParam         m_standard_camera_backward_distance
             PARAM_DEFAULT(  FloatUserConfigParam(2.0, "backward-distance",
@@ -1126,10 +1138,15 @@ namespace UserConfigParams
             &m_drone_camera_settings,
             "Angle between camera and plane of kart (pitch) when the camera is pointing forward"));
 
-    PARAM_PREFIX BoolUserConfigParam         m_drone_camera_forward_smoothing
-            PARAM_DEFAULT(  BoolUserConfigParam(false, "forward-smoothing",
+    PARAM_PREFIX FloatUserConfigParam         m_drone_camera_forward_smooth_position
+            PARAM_DEFAULT(  FloatUserConfigParam(0.0, "forward-smooth-position",
             &m_drone_camera_settings,
-            "if true, use smoothing (forward-up-angle become relative to speed) when pointing forward"));
+            "The strength of smoothness of the position of the camera"));
+
+    PARAM_PREFIX FloatUserConfigParam         m_drone_camera_forward_smooth_rotation
+            PARAM_DEFAULT(  FloatUserConfigParam(0.0, "forward-smooth-rotation",
+            &m_drone_camera_settings,
+            "The strength of smoothness of the rotation of the camera"));
 
     PARAM_PREFIX FloatUserConfigParam         m_drone_camera_backward_distance
             PARAM_DEFAULT(  FloatUserConfigParam(2.0, "backward-distance",
@@ -1158,19 +1175,24 @@ namespace UserConfigParams
                         "Saved custom camera settings for player.") );
 
     PARAM_PREFIX FloatUserConfigParam         m_saved_camera_distance
-            PARAM_DEFAULT(  FloatUserConfigParam(1.0, "distance",
+            PARAM_DEFAULT(  FloatUserConfigParam(1.8, "distance",
             &m_saved_camera_settings,
             "Distance between kart and camera"));
 
     PARAM_PREFIX FloatUserConfigParam         m_saved_camera_forward_up_angle
-            PARAM_DEFAULT(  FloatUserConfigParam(0, "forward-up-angle",
+            PARAM_DEFAULT(  FloatUserConfigParam(20, "forward-up-angle",
             &m_saved_camera_settings,
             "Angle between camera and plane of kart (pitch) when the camera is pointing forward"));
 
-    PARAM_PREFIX BoolUserConfigParam         m_saved_camera_forward_smoothing
-            PARAM_DEFAULT(  BoolUserConfigParam(true, "forward-smoothing",
+    PARAM_PREFIX FloatUserConfigParam         m_saved_camera_forward_smooth_position
+            PARAM_DEFAULT(  FloatUserConfigParam(0.1, "forward-smooth-position",
             &m_saved_camera_settings,
-            "if true, use smoothing (forward-up-angle become relative to speed) when pointing forward"));
+            "The strength of smoothness of the position of the camera"));
+
+    PARAM_PREFIX FloatUserConfigParam         m_saved_camera_forward_smooth_rotation
+            PARAM_DEFAULT(  FloatUserConfigParam(0.125, "forward-smooth-rotation",
+            &m_saved_camera_settings,
+            "The strength of smoothness of the rotation of the camera"));
 
     PARAM_PREFIX FloatUserConfigParam         m_saved_camera_backward_distance
             PARAM_DEFAULT(  FloatUserConfigParam(2.0, "backward-distance",
@@ -1183,7 +1205,7 @@ namespace UserConfigParams
             "Angle between camera and plane of kart (pitch) when the camera is pointing backwards. This is usually larger than the forward-up-angle, since the kart itself otherwise obstricts too much of the view"));
 
     PARAM_PREFIX IntUserConfigParam         m_saved_camera_fov
-            PARAM_DEFAULT(  IntUserConfigParam(80, "fov",
+            PARAM_DEFAULT(  IntUserConfigParam(85, "fov",
             &m_saved_camera_settings,
             "Focal distance (single player)"));
 
@@ -1361,6 +1383,12 @@ namespace UserConfigParams
                                                &m_addon_group,
                                                "Don't show important message "
                                                "with this or a lower id again") );
+
+    PARAM_PREFIX IntUserConfigParam         m_news_list_shown_id
+            PARAM_DEFAULT(  IntUserConfigParam(0, "news_list_shown_id",
+                                               &m_addon_group,
+                                               "News before this id has been "
+                                               "shown once so no red dot") );      
 
     PARAM_PREFIX TimeUserConfigParam        m_addons_last_updated
             PARAM_DEFAULT(  TimeUserConfigParam(0, "addon_last_updated",

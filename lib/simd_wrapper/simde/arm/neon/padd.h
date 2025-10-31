@@ -23,6 +23,7 @@
  * Copyright:
  *   2020-2021 Evan Nemerson <evan@nemerson.com>
  *   2020      Sean Maher <seanptmaher@gmail.com> (Copyright owned by Google, LLC)
+ *   2023      Yi-Yen Chung <eric681@andestech.com> (Copyright owned by Andes Technology)
  */
 
 #if !defined(SIMDE_ARM_NEON_PADD_H)
@@ -94,6 +95,20 @@ simde_vpadds_f32(simde_float32x2_t a) {
 #if defined(SIMDE_ARM_NEON_A64V8_ENABLE_NATIVE_ALIASES)
   #undef vpadds_f32
   #define vpadds_f32(a) simde_vpadds_f32((a))
+#endif
+
+SIMDE_FUNCTION_ATTRIBUTES
+simde_float16x4_t
+simde_vpadd_f16(simde_float16x4_t a, simde_float16x4_t b) {
+  #if defined(SIMDE_ARM_NEON_A32V8_NATIVE) && !SIMDE_DETECT_CLANG_VERSION_NOT(9,0,0) && defined(SIMDE_ARM_NEON_FP16)
+    return vpadd_f16(a, b);
+  #else
+    return simde_vadd_f16(simde_vuzp1_f16(a, b), simde_vuzp2_f16(a, b));
+  #endif
+}
+#if defined(SIMDE_ARM_NEON_A32V8_ENABLE_NATIVE_ALIASES)
+  #undef vpadd_f16
+  #define vpadd_f16(a, b) simde_vpadd_f16((a), (b))
 #endif
 
 SIMDE_FUNCTION_ATTRIBUTES
@@ -196,6 +211,20 @@ simde_vpadd_u32(simde_uint32x2_t a, simde_uint32x2_t b) {
 #if defined(SIMDE_ARM_NEON_A32V7_ENABLE_NATIVE_ALIASES)
   #undef vpadd_u32
   #define vpadd_u32(a, b) simde_vpadd_u32((a), (b))
+#endif
+
+SIMDE_FUNCTION_ATTRIBUTES
+simde_float16x8_t
+simde_vpaddq_f16(simde_float16x8_t a, simde_float16x8_t b) {
+  #if defined(SIMDE_ARM_NEON_A64V8_NATIVE) && defined(SIMDE_ARM_NEON_FP16)
+    return vpaddq_f16(a, b);
+  #else
+    return simde_vaddq_f16(simde_vuzp1q_f16(a, b), simde_vuzp2q_f16(a, b));
+  #endif
+}
+#if defined(SIMDE_ARM_NEON_A64V8_ENABLE_NATIVE_ALIASES)
+  #undef vpaddq_f16
+  #define vpaddq_f16(a, b) simde_vpaddq_f16((a), (b))
 #endif
 
 SIMDE_FUNCTION_ATTRIBUTES

@@ -72,6 +72,10 @@
 
 #include <IrrlichtDevice.h>
 
+#ifdef ANDROID
+#include <SDL_system.h>
+#endif
+
 using namespace GUIEngine;
 using namespace Online;
 
@@ -119,6 +123,15 @@ void MainMenuScreen::beforeAddingWidget()
     if (w)
         w->setVisible(false);
 #endif
+
+#ifdef ANDROID
+    if (SDL_IsAndroidTV())
+    {
+        Widget* tutorial = getWidget("startTutorial");
+        if (tutorial)
+            tutorial->setVisible(false);
+    }
+#endif
 }
 
 // ----------------------------------------------------------------------------
@@ -157,6 +170,63 @@ void MainMenuScreen::init()
         w->setActive(false);
         w->resetAllBadges();
         w->setBadge(LOADING_BADGE);
+    }
+
+    // Initialize news iteration, show dialog when there's important news
+    NewsManager::get()->resetNewsPtr(NewsManager::NTYPE_MAINMENU);
+
+    core::stringw important_message = L"";
+    int news_len = NewsManager::get()->getNewsCount(NewsManager::NTYPE_MAINMENU);
+    int chosen_id = -1;
+
+    // Iterate through every news
+    // Find the unread important message with smallest id
+    while (news_len--)
+    {
+        int id = NewsManager::get()->getNextNewsID(NewsManager::NTYPE_MAINMENU);
+
+        if (NewsManager::get()->isCurrentNewsImportant(NewsManager::NTYPE_MAINMENU)
+            && (id < chosen_id || chosen_id == -1)
+            && id > UserConfigParams::m_last_important_message_id)
+        {
+            chosen_id = id;
+            important_message = 
+                NewsManager::get()->getCurrentNewsMessage(NewsManager::NTYPE_MAINMENU);
+        }
+    }
+    if (chosen_id != -1)
+    {
+        UserConfigParams::m_last_important_message_id = chosen_id;
+        new MessageDialog(important_message,
+                        MessageDialog::MESSAGE_DIALOG_OK,
+                        NULL, true);
+    }   // if important_message
+
+    // Back to the first news
+    NewsManager::get()->getNextNewsID(NewsManager::NTYPE_MAINMENU);
+
+    // Check if there's new news
+
+    IconButtonWidget* online_icon = getWidget<IconButtonWidget>("online");
+    if (online_icon != NULL)
+    {
+        NewsManager::get()->resetNewsPtr(NewsManager::NTYPE_LIST);
+        online_icon->resetAllBadges();
+
+        int news_list_len = NewsManager::get()->getNewsCount(NewsManager::NTYPE_LIST);
+
+        while (news_list_len--)
+        {
+            int id = NewsManager::get()->getNextNewsID(NewsManager::NTYPE_LIST);
+
+            if (UserConfigParams::m_news_list_shown_id < id)
+            {
+                online_icon->setBadge(REDDOT_BADGE);
+            }
+        }
+        
+        // Back to the first news
+        NewsManager::get()->getNextNewsID(NewsManager::NTYPE_LIST);
     }
 
     m_news_text = L"";
@@ -218,16 +288,35 @@ void MainMenuScreen::onUpdate(float delta)
     }
 
     LabelWidget* w = getWidget<LabelWidget>("info_addons");
-    if (m_news_text.empty())
-        m_news_text = NewsManager::get()->getNextNewsMessage();
-    if (!m_news_text.empty())
+    
+    if (w->getText().empty() || w->scrolledOff())
     {
-        if (w->getText().empty())
-            w->setText(m_news_text, true);
-        w->update(delta);
-        if (w->scrolledOff())
-            w->setText(m_news_text, true);
+        // Show important messages seperately
+        // Concatrate adjacent unimportant messages together
+        m_news_text = L"";
+        
+        int news_count = NewsManager::get()->getNewsCount(NewsManager::NTYPE_MAINMENU);
+
+        while (news_count--)
+        {
+            bool important = NewsManager::get()->isCurrentNewsImportant(NewsManager::NTYPE_MAINMENU);
+            if (!m_news_text.empty())
+            {
+                m_news_text += "  +++  ";
+            }
+            m_news_text += NewsManager::get()->getCurrentNewsMessage(NewsManager::NTYPE_MAINMENU);
+
+            NewsManager::get()->getNextNewsID(NewsManager::NTYPE_MAINMENU);
+
+            if (important || NewsManager::get()->isCurrentNewsImportant(NewsManager::NTYPE_MAINMENU))
+            {
+                break;
+            }
+        }
+
+        w->setText(m_news_text, true);
     }
+    w->update(delta);
 
     PlayerProfile *player = PlayerManager::getCurrentPlayer();
     if (!player)
@@ -250,6 +339,12 @@ void MainMenuScreen::onUpdate(float delta)
     // Ask if user want to play tutorial when profile is newly created
     if (player->getUseFrequency() != 0)
         return;
+
+#ifdef ANDROID
+    // Don't show tutorial dialog on Android TV
+    if (SDL_IsAndroidTV())
+        return;
+#endif
 
     player->incrementUseFrequency();
     class PlayTutorial :

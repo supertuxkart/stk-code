@@ -285,14 +285,9 @@ core::stringw AchievementProgressDialog::niceGoalName(std::string internal_name)
     // I18N: A goal for achievements. If this text is in (), it's a precision added to multiple different goals.
     if(internal_name=="twice-laps") { nice_name =_("Races with at least twice as much as the default lap number"); nice_name += _(" (maximum on one official track)"); } 
     // I18N: A goal for achievements. If this text is in (), it's a precision added to multiple different goals.
-    if(internal_name=="egg-hunt-started") { nice_name =_("Egg hunts started"); nice_name += _(" (maximum on one official track)"); } 
-    if (internal_name=="egg-hunt-finished")
-    {
-        // I18N: A goal for achievements. If this text is in (), it's a precision added to multiple different goals.
-        nice_name =_("Egg hunts finished");
-        // I18N: A goal for achievements. If this text is in (), it's a precision added to multiple different goals.
-        nice_name += _(" (maximum on one official track)");
-    }
+    if(internal_name=="egg-hunt-started") { nice_name =_("Egg Hunts started"); nice_name += _(" (maximum on one official track)"); }
+    // I18N: A goal for achievements. If this text is in (), it's a precision added to multiple different goals.
+    if (internal_name=="egg-hunt-finished") { nice_name =_("Egg Hunts finished"); nice_name += _(" (maximum on one official track)"); }
     // I18N: A goal for achievements. If this text is in (), it's a precision added to multiple different goals.
     if(internal_name=="race-started-all") { nice_name =_("Races started"); nice_name += _(" (official tracks matching the goal)"); } 
     // I18N: A goal for achievements. If this text is in (), it's a precision added to multiple different goals.
@@ -310,11 +305,11 @@ core::stringw AchievementProgressDialog::niceGoalName(std::string internal_name)
     // I18N: A goal for achievements. If this text is in (), it's a precision added to multiple different goals.
     if(internal_name=="twice-laps-all") { nice_name =_("Races with at least twice as much as the default lap number"); nice_name += _(" (official tracks matching the goal)"); } 
     // I18N: A goal for achievements. If this text is in (), it's a precision added to multiple different goals.
-    if(internal_name=="egg-hunt-started-all") { nice_name =_("Egg hunts started"); nice_name += _(" (official tracks matching the goal)"); } 
+    if(internal_name=="egg-hunt-started-all") { nice_name =_("Egg Hunts started"); nice_name += _(" (official tracks matching the goal)"); } 
     if(internal_name=="egg-hunt-finished-all")
     {
         // I18N: A goal for achievements. If this text is in (), it's a precision added to multiple different goals.
-        nice_name =_("Egg hunts finished");
+        nice_name =_("Egg Hunts finished");
         // I18N: A goal for achievements. If this text is in (), it's a precision added to multiple different goals.
         nice_name += _(" (official tracks matching the goal)");
     }

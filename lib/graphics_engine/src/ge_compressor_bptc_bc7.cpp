@@ -1,3 +1,15 @@
+#ifdef LLVM_MINGW_FLTUSED
+// From https://stackoverflow.com/questions/1583196/building-visual-c-app-that-doesnt-use-crt-functions-still-references-some
+#ifdef __cplusplus
+extern "C" {
+#endif
+// It should be a single underscore since the double one is the mangled name
+int _fltused = 0;
+#ifdef __cplusplus
+}
+#endif
+#endif
+
 #include "ge_compressor_bptc_bc7.hpp"
 #include "ge_main.hpp"
 #include "ge_vulkan_features.hpp"

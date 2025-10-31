@@ -2,11 +2,13 @@ in vec3 Position;
 in float Energy;
 in vec3 Color;
 in float Radius;
+in vec4 Direction_scale_offset;
 
 flat out vec3 center;
 flat out float energy;
 flat out vec3 col;
 flat out float radius;
+flat out vec4 direction_scale_offset;
 
 const float zNear = 1.;
 
@@ -105,4 +107,5 @@ void main(void)
     center = Position;
     energy = Energy;
     radius = Radius;
+    direction_scale_offset = Direction_scale_offset;
 }

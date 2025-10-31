@@ -22,6 +22,7 @@
 #include "guiengine/scalable_font.hpp"
 #include "guiengine/widgets/spinner_widget.hpp"
 #include "io/file_manager.hpp"
+#include "states_screens/state_manager.hpp"
 #include "utils/string_utils.hpp"
 #include "utils/log.hpp"
 
@@ -98,13 +99,51 @@ SpinnerWidget::SpinnerWidget(const bool gauge) : Widget(WTYPE_SPINNER)
     m_value = -1;
     m_badge_x_shift = 0;
     m_use_background_color=false;
-    m_spinner_widget_player_id=-1;
+    m_spinner_widget_player_id=PLAYER_ID_GAME_MASTER;
     m_min = 0;
     m_max = 999;
     m_step = 1.0;
     m_left_selected = false;
     m_right_selected = false;
+    m_incorrect       = false;
+    m_red_mark_widget = NULL;
+    m_left_arrow = rect<s32>(0, 0, m_h, m_h);
 }
+
+// ------------------------------------------------------------------------
+/** Add a red mark on the spinner to mean "invalid choice" */
+void SpinnerWidget::markAsIncorrect()
+{
+    if (m_incorrect) return; // already flagged as incorrect
+
+    m_incorrect = true;
+
+    irr::video::ITexture* texture = irr_driver->getTexture(FileManager::GUI_ICON,
+                                                           "red_mark.png"   );
+    const int mark_size = m_h * 4 / 5;
+    const int mark_x = m_w - m_h * 19 / 10;
+    const int mark_y = m_h / 10;
+    core::recti red_mark_area(mark_x, mark_y, mark_x + mark_size,
+                              mark_y + mark_size);
+    m_red_mark_widget = GUIEngine::getGUIEnv()->addImage( red_mark_area,
+                        /* parent */ m_element );
+    m_red_mark_widget->setImage(texture);
+    m_red_mark_widget->setScaleImage(true);
+    m_red_mark_widget->setTabStop(false);
+    m_red_mark_widget->setUseAlphaChannel(true);
+} // markAsIncorrect
+
+// ------------------------------------------------------------------------
+/** Remove any red mark set with 'markAsIncorrect' */
+void SpinnerWidget::markAsCorrect()
+{
+    if (m_incorrect)
+    {
+        m_red_mark_widget->remove();
+        m_red_mark_widget = NULL;
+        m_incorrect = false;
+    }
+} // markAsCorrect
 
 // -----------------------------------------------------------------------------
 void SpinnerWidget::setRange(float min, float max, float step)
@@ -252,6 +291,7 @@ void SpinnerWidget::resize()
     Widget::resize();
 
     rect<s32> subsize_left_arrow = rect<s32>(0 ,0, m_h, m_h);
+    m_left_arrow = subsize_left_arrow;
     m_children[0].m_element->setRelativePosition(subsize_left_arrow);
     m_badge_x_shift = subsize_left_arrow.getWidth();
 
@@ -268,22 +308,34 @@ void SpinnerWidget::resize()
     }
     else
     {
-        rect<s32> subsize_label = rect<s32>(m_h, 0, m_w-m_h, m_h);
-        IGUIStaticText* label = static_cast<IGUIStaticText*>(m_children[1].m_element);
-        label->setRelativePosition(subsize_label);
-        if (m_h < GUIEngine::getFontHeight())
-        {
-            label->setOverrideFont(GUIEngine::getSmallFont());
-        }
-        else
-        {
-            label->setOverrideFont(NULL);
-        }
+        resizeLabel();
     }
 
     rect<s32> subsize_right_arrow = rect<s32>(m_w-m_h, 0, m_w, m_h);
     m_children[2].m_element->setRelativePosition(subsize_right_arrow);
-}
+} // resize
+
+// -----------------------------------------------------------------------------
+
+/** Pick the appropriate font size to display the current spinner label */
+void SpinnerWidget::resizeLabel()
+{
+    if (m_graphical) // Don't proceed further if this spinner doesn't use labels
+        return;
+
+    rect<s32> subsize_label = rect<s32>(m_h, 0, m_w - m_h, m_h);
+    IGUIStaticText* label = static_cast<IGUIStaticText*>(m_children[1].m_element);
+    label->setRelativePosition(subsize_label);
+    if ( (m_h < GUIEngine::getFontHeight()) ||
+         ((int)GUIEngine::getFont()->getDimension(label->getText()).Width > (m_w - 2 * m_h)) )
+    {
+        label->setOverrideFont(GUIEngine::getSmallFont());
+    }
+    else
+    {
+        label->setOverrideFont(NULL);
+    }
+} // resizeLabel
 
 // -----------------------------------------------------------------------------
 
@@ -345,6 +397,9 @@ void SpinnerWidget::activateSelectedButton()
             setValue(m_max);
         }
     }
+
+    // Update the label font size if needed
+    resizeLabel();
 } // activateSelectedButton
 
 // -----------------------------------------------------------------------------
@@ -423,6 +478,7 @@ void SpinnerWidget::setValue(const int new_value)
         assert(new_value < (int)m_labels.size());
 
         m_children[1].m_element->setText(m_labels[new_value].c_str());
+        resizeLabel();
     }
     else if (m_text.size() > 0 && m_children.size() > 0)
     {
@@ -458,11 +514,7 @@ stringw SpinnerWidget::getStringValue() const
         stringw text = StringUtils::insertValues(m_text.c_str(), m_value);
         return text;
     }
-    else
-    {
-        assert(false);
-    }
-    /** To avoid compiler warnings about missing return statements. */
+    // This can happen if the spinner has not been initialized yet.
     return "";
 }
 
@@ -476,6 +528,7 @@ void SpinnerWidget::setValue(irr::core::stringw new_value)
         if (m_labels[n] == new_value)
         {
             setValue(n);
+            resizeLabel();
             return;
         }
     }

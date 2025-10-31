@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<shader-settings>
+    <setting name="solid">
+        <shaders>
+            <vertex>spm.vert</vertex>
+            <fragment>solid.frag</fragment>
+            <depth>depth_only.frag</depth>
+            <skinning-vertex>spm_skinning.vert</skinning-vertex>
+        </shaders>
+    </setting>
+
+    <setting name="normalmap">
+        <properties>
+            <nonpbr-fallback>solid</nonpbr-fallback>
+        </properties>
+        <shaders>
+            <vertex>spm.vert</vertex>
+            <fragment>normalmap.frag</fragment>
+            <depth>depth_only.frag</depth>
+            <skinning-vertex>spm_skinning.vert</skinning-vertex>
+        </shaders>
+    </setting>
+
+    <setting name="decal">
+        <shaders>
+            <vertex>spm.vert</vertex>
+            <fragment>decal.frag</fragment>
+            <depth>depth_only.frag</depth>
+            <skinning-vertex>spm_skinning.vert</skinning-vertex>
+        </shaders>
+    </setting>
+
+    <setting name="splatting">
+        <properties>
+            <nonpbr-fallback>solid</nonpbr-fallback>
+            <srgb-settings>YNYYYY</srgb-settings>
+        </properties>
+        <shaders>
+            <vertex>spm.vert</vertex>
+            <fragment>splatting.frag</fragment>
+            <depth>depth_only.frag</depth>
+        </shaders>
+    </setting>
+
+    <setting name="alphatest">
+        <shaders>
+            <vertex>spm.vert</vertex>
+            <fragment>alphatest.frag</fragment>
+            <depth>alphatest_depth.frag</depth>
+            <skinning-vertex>spm_skinning.vert</skinning-vertex>
+        </shaders>
+    </setting>
+
+    <setting name="unlit">
+        <properties>
+            <nonpbr-fallback>alphatest</nonpbr-fallback>
+        </properties>
+        <shaders>
+            <vertex>spm.vert</vertex>
+            <fragment>unlit.frag</fragment>
+            <depth>alphatest_depth.frag</depth>
+            <skinning-vertex>spm_skinning.vert</skinning-vertex>
+        </shaders>
+    </setting>
+
+    <setting name="grass">
+        <shaders>
+            <vertex>grass.vert</vertex>
+            <fragment>alphatest.frag</fragment>
+            <depth>alphatest_depth.frag</depth>
+        </shaders>
+    </setting>
+
+    <setting name="alphablend">
+        <properties>
+            <alphablend>true</alphablend>
+            <depth-write>false</depth-write>
+            <backface-culling>false</backface-culling>
+        </properties>
+        <shaders>
+            <vertex>spm.vert</vertex>
+            <fragment>transparent.frag</fragment>
+            <skinning-vertex>spm_skinning.vert</skinning-vertex>
+        </shaders>
+    </setting>
+
+    <setting name="additive">
+        <properties>
+            <additive>true</additive>
+            <depth-write>false</depth-write>
+            <backface-culling>false</backface-culling>
+        </properties>
+        <shaders>
+            <vertex>spm.vert</vertex>
+            <fragment>transparent.frag</fragment>
+            <skinning-vertex>spm_skinning.vert</skinning-vertex>
+        </shaders>
+    </setting>
+
+    <setting name="displace">
+        <properties>
+            <alphablend>true</alphablend>
+            <depth-write>false</depth-write>
+            <backface-culling>false</backface-culling>
+            <nonpbr-fallback>alphablend</nonpbr-fallback>
+        </properties>
+        <shaders>
+            <vertex>spm.vert</vertex>
+            <fragment>displace_transparent.frag</fragment>
+        </shaders>
+    </setting>
+
+</shader-settings>

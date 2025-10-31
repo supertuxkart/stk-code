@@ -349,6 +349,9 @@ void CGUIScrollBar::setPos(s32 pos)
 {
 	Pos = core::s32_clamp ( pos, Min, Max );
 
+	if ( !core::isnotzero ( range() ) )
+		return;
+
 	if (Horizontal)
 	{
 		f32 f = (RelativeRect.getWidth() - ((f32)RelativeRect.getHeight()*3.0f)) / range();

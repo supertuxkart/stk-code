@@ -228,9 +228,9 @@ void LODNode::autoComputeLevel(float scale)
 
     // Step 2a - Distance multiplier based on the user's input
     float aggressivity = 1.0;
-    if(     UserConfigParams::m_geometry_level == 2) aggressivity = 1.0; // 2 in the params is the lowest setting
+    if(     UserConfigParams::m_geometry_level == 0) aggressivity = 1.0;
     else if(UserConfigParams::m_geometry_level == 1) aggressivity = 1.42;
-    else if(UserConfigParams::m_geometry_level == 0) aggressivity = 2.0;
+    else if(UserConfigParams::m_geometry_level == 2) aggressivity = 2.0;
     else if(UserConfigParams::m_geometry_level == 3) aggressivity = 2.84;
     else if(UserConfigParams::m_geometry_level == 4) aggressivity = 4.0;
     else if(UserConfigParams::m_geometry_level == 5) aggressivity = 5.7;
@@ -239,9 +239,9 @@ void LODNode::autoComputeLevel(float scale)
 
     // Step 2b - Determine the minimum distance for a model switch based on user input
     float temp_switch_dist = max_draw;
-    if(     UserConfigParams::m_geometry_level == 2) temp_switch_dist *= 0.75f; // 2 in the params is the lowest setting
+    if(     UserConfigParams::m_geometry_level == 0) temp_switch_dist *= 0.75f;
     else if(UserConfigParams::m_geometry_level == 1) temp_switch_dist *= 0.55f;
-    else if(UserConfigParams::m_geometry_level == 0) temp_switch_dist *= 0.4f;
+    else if(UserConfigParams::m_geometry_level == 2) temp_switch_dist *= 0.4f;
     else if(UserConfigParams::m_geometry_level == 3) temp_switch_dist *= 0.3f;
     else if(UserConfigParams::m_geometry_level == 4) temp_switch_dist *= 0.23f;
     else if(UserConfigParams::m_geometry_level == 5) temp_switch_dist *= 0.18f;

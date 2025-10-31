@@ -77,3 +77,9 @@ to specify all types of ttf.
           digit_ttf="zzz.ttf"
           color_emoji_ttf="www.ttf"/>
 ```
+
+# Skin name translation
+
+Translations for skins are handled through SuperTuxKart's main translation process.
+The base theme name and variant theme name have to be added to /data/skin_names.xml ;
+they will then be included in the .pot file when update_pot.sh is run.

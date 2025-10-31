@@ -15,10 +15,10 @@
                          left: 'Abort GP', 'Back to the menu' (or invisible)
                          Setting text=" " is important, otherwise the height of the
                          widget is incorrect.                             -->
-                <buttonbar id="operations" width="65%" height="18%" align="center">
-                    <icon-button id="left" icon="gui/icons/green_check.png" width="100" height="100" raw_text="Left" word_wrap="true"/>
-                    <icon-button id="middle" icon="gui/icons/green_check.png" width="100" height="100" raw_text="Middle" word_wrap="true"/>
-                    <icon-button id="right" icon="gui/icons/green_check.png" width="100" height="100" raw_text="Right" word_wrap="true"/>
+                <buttonbar id="operations" width="75%" height="18%" align="center">
+                    <icon-button id="left" icon="gui/icons/green_check.png" width="fit" height="100" raw_text="Left" word_wrap="true"/>
+                    <icon-button id="middle" icon="gui/icons/green_check.png" width="fit" height="100" raw_text="Middle" word_wrap="true"/>
+                    <icon-button id="right" icon="gui/icons/green_check.png" width="fit" height="100" raw_text="Right" word_wrap="true"/>
                 </buttonbar>
             </div>
         </roundedbox>

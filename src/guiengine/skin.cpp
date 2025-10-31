@@ -71,13 +71,15 @@ namespace SkinConfig
     static std::string m_color_emoji_ttf;
     static std::vector<std::string> m_icon_theme_paths;
     static bool m_font;
+    static bool m_horizontal_cut;
+    static bool m_vertical_cut;
 
-    static void parseElement(const XMLNode* node)
+    static void parseElement(const XMLNode* node, std::vector<std::string>& skin_paths)
     {
         std::string type;
         std::string state = "neutral";
         std::string image;
-        bool common_img = false;
+        bool common_img = false, parent_img = false;
         int leftborder = 0, rightborder=0, topborder=0, bottomborder=0;
         float hborder_out_portion = 0.5f, vborder_out_portion = 1.0f;
         float horizontal_inner_padding = 0.0f, vertical_inner_padding = 0.0f;
@@ -98,6 +100,16 @@ namespace SkinConfig
             return;
         }
 
+        // We use these parameters to know if the background image should be
+        // stretched or cut when its aspect ratio is different from the screen's
+        if (type == "background")
+        {
+            m_horizontal_cut = false;
+            m_vertical_cut = false;
+            node->get("horizontal-cut", &m_horizontal_cut);
+            node->get("vertical-cut", &m_vertical_cut);
+        }
+
         node->get("left_border", &leftborder);
         node->get("right_border", &rightborder);
         node->get("top_border", &topborder);
@@ -116,6 +128,7 @@ namespace SkinConfig
 
         node->get("areas", &areas);
         node->get("common", &common_img);
+        node->get("parent", &parent_img);
 
         BoxRenderParams new_param;
         new_param.m_left_border = leftborder;
@@ -130,12 +143,23 @@ namespace SkinConfig
         new_param.m_vertical_margin = vertical_margin;
         new_param.m_preserve_h_aspect_ratios = preserve_h_aspect_ratios;
 
-        // call last since it calculates coords considering all other
-        // parameters
+        // The call to an image in the parent folder only allows to go one level higher.
+        // Having a child skin rely on how many levels deeper it is in a chain of base themes
+        // to fetch a texture would bring its own issues, although this code could be
+        // easily adapted to allow it if truly needed.
+        if (parent_img && skin_paths.size() == 1)
+        {
+            parent_img = false;
+            Log::error("skin", "Requesting images from the base theme folder without a base theme\n");
+        }
+
         new_param.setTexture(common_img ?
             irr_driver->getTexture(FileManager::SKIN, std::string("common/") + image) :
+            parent_img ? irr_driver->getTexture(skin_paths[skin_paths.size() - 2] + "/" + image) :
             irr_driver->getTexture(m_data_path + image));
 
+        // call last since it calculates coords considering all other
+        // parameters
         if (areas.size() > 0)
         {
             new_param.areas = 0;
@@ -184,7 +208,7 @@ namespace SkinConfig
       * \brief loads skin information from a STK skin file
       * \throw std::runtime_error if file cannot be read
       */
-    static void loadFromFile(std::string file, bool clear_prev_params)
+    static void loadFromFile(std::string file, bool clear_prev_params, std::vector<std::string>& skin_paths)
     {
         m_data_path.clear();
         if (clear_prev_params)
@@ -231,7 +255,7 @@ namespace SkinConfig
 
             if (node->getName() == "element")
             {
-                parseElement(node);
+                parseElement(node, skin_paths);
             }
             else if (node->getName() == "color")
             {
@@ -559,42 +583,18 @@ Skin::Skin(IGUISkin* fallback_skin)
 
     try
     {
-        std::vector<std::string> load_chain = SkinConfig::getDependencyChain(skin_id);
-
-        bool reset = true;
-        for (auto skin_id : load_chain)
-        {
-            std::string skin_name = skin_id.find("addon_") != std::string::npos ?
-                file_manager->getAddonsFile(
-                    std::string("skins/") + skin_id.substr(6) + "/stkskin.xml") :
-                file_manager->getAsset(FileManager::SKIN, skin_id + "/stkskin.xml");
-
-            Log::info("GUI", "Loading skin data from file: %s", skin_name.c_str());
-            SkinConfig::loadFromFile(skin_name, reset);
-            reset = false;
-        }
+        chainLoad(skin_id);
     }
     catch (std::runtime_error& e)
     {
         (void)e;   // avoid compiler warning
         // couldn't load skin. Try to revert to default
+
         Log::error("GUI", "Could not load skin, reverting to default.");
         UserConfigParams::m_skin_file.revertToDefaults();
         skin_id = UserConfigParams::m_skin_file;
-        std::vector<std::string> load_chain = SkinConfig::getDependencyChain(skin_id);
 
-        bool reset = true;
-        for (auto skin_id : load_chain)
-        {
-            std::string skin_name = skin_id.find("addon_") != std::string::npos ?
-                file_manager->getAddonsFile(
-                    std::string("skins/") + skin_id.substr(6) + "/stkskin.xml") :
-                file_manager->getAsset(FileManager::SKIN, skin_id + "/stkskin.xml");
-
-            Log::info("GUI", "Loading skin data from file: %s", skin_name.c_str());
-            SkinConfig::loadFromFile(skin_name, reset);
-            reset = false;
-        }
+        chainLoad(skin_id);
     }
 
     m_bg_image = NULL;
@@ -614,6 +614,27 @@ Skin::~Skin()
         m_fallback_skin->drop();
 }   // ~Skin
 
+void Skin::chainLoad(std::string skin_id)
+{
+    m_skin_paths.clear();
+    std::vector<std::string> load_chain = SkinConfig::getDependencyChain(skin_id);
+
+    bool reset = true;
+    for (auto skin_id : load_chain)
+    {
+        std::string skin_path = skin_id.find("addon_") != std::string::npos ?
+            file_manager->getAddonsFile(std::string("skins/") + skin_id.substr(6)) :
+            file_manager->getAsset(FileManager::SKIN, skin_id);
+        m_skin_paths.push_back(skin_path);
+
+        skin_path += "/stkskin.xml";
+
+        Log::info("GUI", "Loading skin data from file: %s", skin_path.c_str());
+        SkinConfig::loadFromFile(skin_path, reset, m_skin_paths);
+        reset = false;
+    }
+} // chainLoad
+
 // ----------------------------------------------------------------------------
 void Skin::drawBgImage()
 {
@@ -626,11 +647,10 @@ void Skin::drawBgImage()
     static core::recti dest;
     static core::recti source_area;
 
-    if(m_bg_image == NULL)
+    if (m_bg_image == NULL)
     {
         int texture_w, texture_h;
-        m_bg_image =
-            SkinConfig::m_render_params["background::neutral"].getImage();
+        m_bg_image = SkinConfig::m_render_params["background::neutral"].getImage();
         assert(m_bg_image != NULL);
         texture_w = m_bg_image->getSize().Width;
         texture_h = m_bg_image->getSize().Height;
@@ -641,25 +661,69 @@ void Skin::drawBgImage()
         const int screen_w = frame_size.Width;
         const int screen_h = frame_size.Height;
 
-        // stretch image vertically to fit
-        float ratio = (float)screen_h / texture_h;
+        // Calculate aspect ratios for the image and the screen
+        float image_ratio = (float)texture_w / texture_h;
+        float screen_ratio = (float)screen_w / screen_h;
 
-        // check that with the vertical stretching, it still fits horizontally
-        while(texture_w*ratio < screen_w) ratio += 0.1f;
+        float factor_h, factor_w;
 
-        texture_w = (int)(texture_w*ratio);
-        texture_h = (int)(texture_h*ratio);
+        // ----------------------------------------------------------
+        // Fill the screen without distorting the image.
+        //
+        // The dimension (horizontal or vertical) furthest away is scaled to be able
+        // to cover the entire screen.
+        // Then the other dimension is either scaled uniformly (if cropping is preferred
+        // over stretching) or non-uniformly (if stretching is preferred over cropping)
+        // ----------------------------------------------------------
 
-        const int clipped_x_space = (texture_w - screen_w);
+        if (screen_ratio > image_ratio) // Screen has a wider ratio than the bg image
+        {
+            if (SkinConfig::m_vertical_cut)
+            {
+                // Scale to fit width, allow vertical crop
+                factor_w = (float)screen_w / texture_w;
+                factor_h = factor_w;
+            }
+            else 
+            {
+                // Cannot crop vertically → stretch both width and height to fit
+                factor_h = (float)screen_h / texture_h;
+                factor_w = (float)screen_w / texture_w;
+            }
+        }
+        else // Screen has taller ratio than the bg image
+        {
+            if (SkinConfig::m_horizontal_cut)
+            {
+                // Scale to fit height, allow horizontal crop
+                factor_h = (float)screen_h / texture_h;
+                factor_w = factor_h;
+            }
+            else
+            {
+                // Cannot crop horizontally → stretch both width and height to fit
+                factor_h = (float)screen_h / texture_h;
+                factor_w = (float)screen_w / texture_w;
+            }
+        }
 
-        dest = core::recti(-clipped_x_space/2, 0,
-                               screen_w+clipped_x_space/2, screen_h);
+        // Scale the original image dimensions
+        int scaled_w = (int)(texture_w * factor_w);
+        int scaled_h = (int)(texture_h * factor_h);
+
+        // Center the image on screen
+        int offset_x = (screen_w - scaled_w) / 2;
+        int offset_y = (screen_h - scaled_h) / 2;
+
+        dest = core::recti(offset_x, offset_y,
+                           offset_x + scaled_w, offset_y + scaled_h);
     }
 
+    // Render the background image to the screen
     irr_driver->getVideoDriver()->enableMaterial2D();
     draw2DImage(m_bg_image, dest, source_area,
-                                        /* no clipping */0, /*color*/ 0,
-                                        /*alpha*/false);
+                /* no clipping */0, /*color*/ 0,
+                /*alpha*/false);
     irr_driver->getVideoDriver()->enableMaterial2D(false);
 #endif
 }   // drawBgImage
@@ -1143,6 +1207,7 @@ void Skin::drawRatingBar(Widget *w, const core::recti &rect,
     RatingBarWidget *ratingBar = (RatingBarWidget*)w;
 
     const ITexture *texture = SkinConfig::m_render_params["rating::neutral"].getImage();
+    int all_steps = ratingBar->getSteps();
     const int texture_w = texture->getSize().Width / 4;
     const int texture_h = texture->getSize().Height;
     const float aspect_ratio = 1.0f;
@@ -1216,9 +1281,10 @@ void Skin::drawRatingBar(Widget *w, const core::recti &rect,
         star_rect.LowerRightCorner.Y = y_from + star_h;
 
         int step = ratingBar->getStepsOfStar(i);
+        int begin = roundf(2.0f * step / (all_steps - 1)) * texture_w; // Round to the closest actual image
 
-        const core::recti source_area(texture_w * step, 0,
-                                      texture_w * (step + 1), texture_h);
+        const core::recti source_area(begin, 0,
+                                      begin + texture_w, texture_h);
 
         draw2DImage(texture,
                     star_rect, source_area,
@@ -1422,10 +1488,11 @@ void Skin::drawRibbonChild(const core::recti &rect, Widget* widget,
         }
 
         const bool mark_focused =
-            focused || (parent_focused && parentRibbonWidget != NULL &&
+            (focused || (parent_focused && parentRibbonWidget != NULL &&
                           parentRibbonWidget->m_mouse_focus == widget) ||
                        (mark_selected && !always_show_selection &&
-                          parent_focused);
+                          parent_focused)) &&
+                        widget->m_properties[PROP_FOCUS_ICON].size() == 0;
 
         /* draw "selection bubble" if relevant */
         if (always_show_selection && mark_selected)
@@ -1473,69 +1540,23 @@ void Skin::drawRibbonChild(const core::recti &rect, Widget* widget,
             }
         }
 
+        // Handle focus from players
 
-        //Handle drawing for the first player
         int nPlayersOnThisItem = 0;
 
         if (mark_focused)
         {
-            if (use_glow)
-            {
-                // don't mark filler items as focused
-                if (widget->m_properties[PROP_ID] == RibbonWidget::NO_ITEM_ID)
-                    return;
+            // Don't mark filler items as focused
+            if (widget->m_properties[PROP_ID] == RibbonWidget::NO_ITEM_ID)
+                return;
+            
+            // Hide focus when not forced
+            if (!always_show_selection && !focused && !parent_focused)
+                return;
+                
+            nPlayersOnThisItem = 1;
+        }
 
-                static float glow_effect = 0;
-
-                const float dt = GUIEngine::getLatestDt();
-                glow_effect += dt * 3;
-                if (glow_effect > 6.2832f /* 2*PI */) glow_effect -= 6.2832f;
-                float grow = 10.0f * sinf(glow_effect);
-
-                const int glow_center_x = rect.UpperLeftCorner.X
-                    + rect.getWidth() / 2;
-                const int glow_center_y = rect.LowerRightCorner.Y;
-
-                ITexture* tex_ficonhighlight =
-                    SkinConfig::m_render_params["focusHalo::neutral"]
-                    .getImage();
-                const int texture_w = tex_ficonhighlight->getSize().Width;
-                const int texture_h = tex_ficonhighlight->getSize().Height;
-
-                core::recti source_area(0, 0, texture_w, texture_h);
-
-                float scale = (float)std::min(irr_driver->getActualScreenSize().Height / 1080.0f, 
-                                            irr_driver->getActualScreenSize().Width / 1350.0f);
-                int size = (int)((90.0f + grow) * scale);
-                const core::recti rect2(glow_center_x - size,
-                                        glow_center_y - size / 2,
-                                        glow_center_x + size,
-                                        glow_center_y + size / 2);
-
-                draw2DImage(tex_ficonhighlight, rect2,
-                    source_area,
-                    /*clipping*/ 0,
-                    /*color*/ 0,
-                    /*alpha*/true);
-            }
-            // if we're not using glow, draw square focus instead
-            else
-            {
-                const bool show_focus = (focused || parent_focused);
-
-                if (!always_show_selection && !show_focus) return;
-
-                // don't mark filler items as focused
-                if (widget->m_properties[PROP_ID] == RibbonWidget::NO_ITEM_ID)
-                    return;
-
-                drawBoxFromStretchableTexture(parentRibbonWidget, rect,
-                    SkinConfig::m_render_params["squareFocusHalo1::neutral"]);
-                nPlayersOnThisItem++;
-            }
-        } // end if mark_focused
-
-        //Handle drawing for everyone else
         for (unsigned i = 1; i < MAX_PLAYER_COUNT; i++)
         {
             // ---- Draw selection for other players than player 1
@@ -1543,6 +1564,20 @@ void Skin::drawRibbonChild(const core::recti &rect, Widget* widget,
                 parentRibbon->getSelectionIDString(i) ==
                 widget->m_properties[PROP_ID])
             {
+                nPlayersOnThisItem++;
+            }
+        }
+
+        // Handle drawing for everyone else
+        for (unsigned i = MAX_PLAYER_COUNT - 1; i >= 1; i--)
+        {
+            // ---- Draw selection for other players than player 1
+            if (parentRibbon->isFocusedForPlayer(i) &&
+                parentRibbon->getSelectionIDString(i) ==
+                widget->m_properties[PROP_ID])
+            {
+                nPlayersOnThisItem--;
+                
                 short red_previous = parentRibbonWidget->m_skin_r;
                 short green_previous = parentRibbonWidget->m_skin_g;
                 short blue_previous = parentRibbonWidget->m_skin_b;
@@ -1589,9 +1624,54 @@ void Skin::drawRibbonChild(const core::recti &rect, Widget* widget,
                     parentRibbonWidget->m_skin_g = green_previous;
                     parentRibbonWidget->m_skin_b = blue_previous;
                 }
-                nPlayersOnThisItem++;
             }
         }
+
+        // Handle drawing for the first player
+        if (mark_focused)
+        {
+            if (use_glow)
+            {
+                static float glow_effect = 0;
+
+                const float dt = GUIEngine::getLatestDt();
+                glow_effect += dt * 3;
+                if (glow_effect > 6.2832f /* 2*PI */) glow_effect -= 6.2832f;
+                float grow = 10.0f * sinf(glow_effect);
+
+                const int glow_center_x = rect.UpperLeftCorner.X
+                    + rect.getWidth() / 2;
+                const int glow_center_y = rect.LowerRightCorner.Y;
+
+                ITexture* tex_ficonhighlight =
+                    SkinConfig::m_render_params["focusHalo::neutral"]
+                    .getImage();
+                const int texture_w = tex_ficonhighlight->getSize().Width;
+                const int texture_h = tex_ficonhighlight->getSize().Height;
+
+                core::recti source_area(0, 0, texture_w, texture_h);
+
+                float scale = (float)std::min(irr_driver->getActualScreenSize().Height / 1080.0f, 
+                                            irr_driver->getActualScreenSize().Width / 1350.0f);
+                int size = (int)((90.0f + grow) * scale);
+                const core::recti rect2(glow_center_x - size,
+                                        glow_center_y - size / 2,
+                                        glow_center_x + size,
+                                        glow_center_y + size / 2);
+
+                draw2DImage(tex_ficonhighlight, rect2,
+                    source_area,
+                    /*clipping*/ 0,
+                    /*color*/ 0,
+                    /*alpha*/true);
+            }
+            // if we're not using glow, draw square focus instead
+            else
+            {
+                drawBoxFromStretchableTexture(parentRibbonWidget, rect,
+                    SkinConfig::m_render_params["squareFocusHalo1::neutral"]);
+            }
+        } // end if mark_focused
 
         drawIconButton(rect, widget, pressed, focused);
 
@@ -1824,7 +1904,16 @@ void Skin::drawSpinnerChild(const core::recti &rect, Widget* widget,
         return;
 
     SpinnerWidget* spinner = dynamic_cast<SpinnerWidget*>(widget->m_event_handler);
-    bool spinner_focused = spinner->isFocusedForPlayer(PLAYER_ID_GAME_MASTER);
+    
+    bool spinner_focused = false;
+    for (unsigned i = 1; i < MAX_PLAYER_COUNT + 1; i++)
+    {
+        if (spinner->isFocusedForPlayer(i - 1))
+        {
+            spinner_focused = true;
+            break;
+        }
+    }
 
     if (pressed || (spinner->isButtonSelected(right) && spinner_focused))
     {
@@ -2560,6 +2649,20 @@ void Skin::drawBadgeOn(const Widget* widget, const core::recti& rect)
         float max_icon_size = 0.43f;
         video::ITexture* texture = irr_driver->getTexture(FileManager::GUI_ICON,
                                                           "down.png");
+        doDrawBadge(texture, rect, max_icon_size, false);
+    }
+    if (widget->m_badges & HEART_BADGE)
+    {
+        float max_icon_size = 0.43f;
+        video::ITexture* texture = irr_driver->getTexture(FileManager::GUI_ICON,
+                                                          "heart.png");
+        doDrawBadge(texture, rect, max_icon_size, false);
+    }
+    if (widget->m_badges & REDDOT_BADGE)
+    {
+        float max_icon_size = 0.43f;
+        video::ITexture* texture = irr_driver->getTexture(FileManager::GUI_ICON,
+                                                          "red_dot.png");
         doDrawBadge(texture, rect, max_icon_size, false);
     }
 }   // drawBadgeOn

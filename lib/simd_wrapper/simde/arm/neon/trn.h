@@ -23,6 +23,7 @@
  * Copyright:
  *   2020      Evan Nemerson <evan@nemerson.com>
  *   2020      Sean Maher <seanptmaher@gmail.com> (Copyright owned by Google, LLC)
+ *   2023      Yi-Yen Chung <eric681@andestech.com> (Copyright owned by Andes Technology)
  */
 
 #if !defined(SIMDE_ARM_NEON_TRN_H) && !defined(SIMDE_BUG_INTEL_857088)
@@ -35,6 +36,21 @@
 HEDLEY_DIAGNOSTIC_PUSH
 SIMDE_DISABLE_UNWANTED_DIAGNOSTICS
 SIMDE_BEGIN_DECLS_
+
+SIMDE_FUNCTION_ATTRIBUTES
+simde_float16x4x2_t
+simde_vtrn_f16(simde_float16x4_t a, simde_float16x4_t b) {
+  #if defined(SIMDE_ARM_NEON_A32V7_NATIVE) && defined(SIMDE_ARM_NEON_FP16)
+    return vtrn_f16(a, b);
+  #else
+    simde_float16x4x2_t r = { { simde_vtrn1_f16(a, b), simde_vtrn2_f16(a, b) } };
+    return r;
+  #endif
+}
+#if defined(SIMDE_ARM_NEON_A32V7_ENABLE_NATIVE_ALIASES)
+  #undef vtrn_f16
+  #define vtrn_f16(a, b) simde_vtrn_f16((a), (b))
+#endif
 
 SIMDE_FUNCTION_ATTRIBUTES
 simde_float32x2x2_t
@@ -142,6 +158,21 @@ simde_vtrn_u32(simde_uint32x2_t a, simde_uint32x2_t b) {
 #endif
 
 SIMDE_FUNCTION_ATTRIBUTES
+simde_float16x8x2_t
+simde_vtrnq_f16(simde_float16x8_t a, simde_float16x8_t b) {
+  #if defined(SIMDE_ARM_NEON_A32V7_NATIVE) && defined(SIMDE_ARM_NEON_FP16)
+    return vtrnq_f16(a, b);
+  #else
+    simde_float16x8x2_t r = { { simde_vtrn1q_f16(a, b), simde_vtrn2q_f16(a, b) } };
+    return r;
+  #endif
+}
+#if defined(SIMDE_ARM_NEON_A32V7_ENABLE_NATIVE_ALIASES)
+  #undef vtrnq_f16
+  #define vtrnq_f16(a, b) simde_vtrnq_f16((a), (b))
+#endif
+
+SIMDE_FUNCTION_ATTRIBUTES
 simde_float32x4x2_t
 simde_vtrnq_f32(simde_float32x4_t a, simde_float32x4_t b) {
   #if defined(SIMDE_ARM_NEON_A32V7_NATIVE)
@@ -244,6 +275,66 @@ simde_vtrnq_u32(simde_uint32x4_t a, simde_uint32x4_t b) {
 #if defined(SIMDE_ARM_NEON_A32V7_ENABLE_NATIVE_ALIASES)
   #undef vtrnq_u32
   #define vtrnq_u32(a, b) simde_vtrnq_u32((a), (b))
+#endif
+
+SIMDE_FUNCTION_ATTRIBUTES
+simde_poly8x8x2_t
+simde_vtrn_p8(simde_poly8x8_t a, simde_poly8x8_t b) {
+  #if defined(SIMDE_ARM_NEON_A32V7_NATIVE)
+    return vtrn_p8(a, b);
+  #else
+    simde_poly8x8x2_t r = { { simde_vtrn1_p8(a, b), simde_vtrn2_p8(a, b) } };
+    return r;
+  #endif
+}
+#if defined(SIMDE_ARM_NEON_A32V7_ENABLE_NATIVE_ALIASES)
+  #undef vtrn_p8
+  #define vtrn_p8(a, b) simde_vtrn_p8((a), (b))
+#endif
+
+SIMDE_FUNCTION_ATTRIBUTES
+simde_poly16x4x2_t
+simde_vtrn_p16(simde_poly16x4_t a, simde_poly16x4_t b) {
+  #if defined(SIMDE_ARM_NEON_A32V7_NATIVE)
+    return vtrn_p16(a, b);
+  #else
+    simde_poly16x4x2_t r = { { simde_vtrn1_p16(a, b), simde_vtrn2_p16(a, b) } };
+    return r;
+  #endif
+}
+#if defined(SIMDE_ARM_NEON_A32V7_ENABLE_NATIVE_ALIASES)
+  #undef vtrn_p16
+  #define vtrn_p16(a, b) simde_vtrn_p16((a), (b))
+#endif
+
+SIMDE_FUNCTION_ATTRIBUTES
+simde_poly8x16x2_t
+simde_vtrnq_p8(simde_poly8x16_t a, simde_poly8x16_t b) {
+  #if defined(SIMDE_ARM_NEON_A32V7_NATIVE)
+    return vtrnq_p8(a, b);
+  #else
+    simde_poly8x16x2_t r = { { simde_vtrn1q_p8(a, b), simde_vtrn2q_p8(a, b) } };
+    return r;
+  #endif
+}
+#if defined(SIMDE_ARM_NEON_A32V7_ENABLE_NATIVE_ALIASES)
+  #undef vtrnq_p8
+  #define vtrnq_p8(a, b) simde_vtrnq_p8((a), (b))
+#endif
+
+SIMDE_FUNCTION_ATTRIBUTES
+simde_poly16x8x2_t
+simde_vtrnq_p16(simde_poly16x8_t a, simde_poly16x8_t b) {
+  #if defined(SIMDE_ARM_NEON_A32V7_NATIVE)
+    return vtrnq_p16(a, b);
+  #else
+    simde_poly16x8x2_t r = { { simde_vtrn1q_p16(a, b), simde_vtrn2q_p16(a, b) } };
+    return r;
+  #endif
+}
+#if defined(SIMDE_ARM_NEON_A32V7_ENABLE_NATIVE_ALIASES)
+  #undef vtrnq_p16
+  #define vtrnq_p16(a, b) simde_vtrnq_p16((a), (b))
 #endif
 
 SIMDE_END_DECLS_

@@ -28,6 +28,7 @@
 #include "graphics/b3d_mesh_loader.hpp"
 #include "graphics/irr_driver.hpp"
 #include "graphics/lod_node.hpp"
+#include "graphics/light.hpp"
 #include "graphics/material.hpp"
 #include "graphics/material_manager.hpp"
 #include "graphics/mesh_tools.hpp"
@@ -43,14 +44,19 @@
 #include "karts/kart_properties.hpp"
 #include "physics/btKart.hpp"
 #include "tracks/track.hpp"
-#include "utils/constants.hpp"
 #include "utils/log.hpp"
+#include "utils/string_utils.hpp"
 
+#include "IMeshCache.h"
 #include "IMeshManipulator.h"
+#include "ILightSceneNode.h"
+#include "IVideoDriver.h"
+
 #include <algorithm>
 #include <ge_animation.hpp>
 #include <ge_render_info.hpp>
 #include <ge_spm.hpp>
+#include <ge_spm_buffer.hpp>
 
 #define SKELETON_DEBUG 0
 
@@ -222,7 +228,8 @@ void KartModel::loadInfo(const XMLNode &node)
         }
         if (const XMLNode* headlights_node = node.getNode("headlights"))
         {
-            loadHeadlights(*headlights_node);
+            std::string kart_dir = StringUtils::getPath(node.getFilename())+"/";
+            loadHeadlights(*headlights_node, kart_dir);
         }
         if (const XMLNode* hat_node = node.getNode("hat"))
         {
@@ -267,7 +274,8 @@ KartModel::~KartModel()
         if(m_is_master && m_wheel_model[i])
         {
             irr_driver->dropAllTextures(m_wheel_model[i]);
-            irr_driver->removeMeshFromCache(m_wheel_model[i]);
+            if (m_wheel_model[i]->getReferenceCount() == 1)
+                irr_driver->removeMeshFromCache(m_wheel_model[i]);
         }
     }
 
@@ -512,28 +520,43 @@ scene::ISceneNode* KartModel::attachModel(bool animated_models, bool human_playe
         }
     }
 
-    const float each_energy = 0.5f / m_headlight_objects.size();
-    const float each_radius = 5.0f / m_headlight_objects.size();
+#ifdef SERVER_ONLY
+    bool supports_light = false;
+#else
+    bool supports_light = (CVS->isGLSL() && CVS->isDeferredEnabled()) ||
+        irr_driver->getVideoDriver()->getDriverType() == video::EDT_VULKAN;
+#endif
+
     for (unsigned int i = 0; i < m_headlight_objects.size(); i++)
     {
-        HeadlightObject& obj = m_headlight_objects[i];
         Track* track = Track::getCurrentTrack();
-        if (obj.getModel() && !(track == NULL || track->getIsDuringDay()))
+        if (track == NULL || track->getIsDuringDay())
+            break;
+        HeadlightObject& obj = m_headlight_objects[i];
+        const bool bone_attachment =
+            m_animated_node && !obj.getBoneName().empty();
+        scene::ISceneNode* parent = bone_attachment ?
+            m_animated_node->getJointNode(obj.getBoneName().c_str()) : node;
+        scene::ISceneNode* node = NULL;
+        if (obj.getHeadlightType() == HLT_MESH)
         {
-            const bool bone_attachment =
-                m_animated_node && !obj.getBoneName().empty();
-            scene::ISceneNode* parent = bone_attachment ?
-                m_animated_node->getJointNode(obj.getBoneName().c_str()) : node;
-            scene::ISceneNode* headlight_model =
-                irr_driver->addMesh(obj.getModel(), "kart_headlight",
+            if (!obj.getModel())
+                continue;
+            node = irr_driver->addMesh(obj.getModel(), "kart_headlight",
                 parent, getRenderInfo());
-#ifndef SERVER_ONLY
-            if (human_player && CVS->isGLSL() && CVS->isDeferredEnabled())
-            {
-                obj.setLight(headlight_model, each_energy, each_radius);
-            }
-#endif
-            configNode(headlight_model, obj.getLocation(), bone_attachment ?
+            obj.setLightNode(node);
+            node->grab();
+        }
+        else
+        {
+            if (!human_player || !supports_light)
+                continue;
+            obj.setLight(parent);
+            node = obj.getLightNode();
+        }
+        if (node)
+        {
+            configNode(node, obj.getLocation(), bone_attachment ?
                 getInverseBoneMatrix(obj.getBoneName()) : core::matrix4());
         }
     }
@@ -569,13 +592,29 @@ scene::ISceneNode* KartModel::attachModel(bool animated_models, bool human_playe
 // ----------------------------------------------------------------------------
 /** Add a light node emitted from the center mass the headlight.
  */
-void HeadlightObject::setLight(scene::ISceneNode* parent,
-                                          float energy, float radius)
+void HeadlightObject::setLight(scene::ISceneNode* parent)
 {
+    bool is_vk = irr_driver->getVideoDriver()->getDriverType() == video::EDT_VULKAN;
     m_node = irr_driver->addLight(core::vector3df(0.0f, 0.0f, 0.0f),
-        energy, radius, m_headlight_color.getRed() / 255.f,
+        m_energy, m_radius, m_headlight_color.getRed() / 255.f,
         m_headlight_color.getGreen() / 255.f,
         m_headlight_color.getBlue() / 255.f, false/*sun*/, parent);
+
+    if (is_vk && m_headlight_type == HLT_SPOT)
+    {
+        scene::ILightSceneNode* ln = static_cast<scene::ILightSceneNode*>(m_node);
+        ln->setLightType(video::ELT_SPOT);
+        video::SLight& data = ln->getLightData();
+        data.InnerCone = m_inner_cone;
+        data.OuterCone = m_outer_cone;
+    }
+    else if (m_headlight_type == HLT_SPOT)
+    {
+        LightNode* ln = static_cast<LightNode*>(m_node);
+        Spotlight& sl = ln->getSpotlightData();
+        sl.m_inner_cone = m_inner_cone;
+        sl.m_outer_cone = m_outer_cone;
+    }
     m_node->grab();
 }   // setLight
 
@@ -703,10 +742,14 @@ bool KartModel::loadModels(const KartProperties &kart_properties)
             mesh->freeMeshVertexBuffer();
     }
 
+    std::set<scene::IMesh*> spotlight_meshes;
     for (unsigned int i = 0; i < m_headlight_objects.size(); i++)
     {
         HeadlightObject& obj = m_headlight_objects[i];
-        std::string full_name = kart_properties.getKartDir() + obj.getFilename();
+        const std::string& fn = obj.getFilename();
+        if (fn.empty())
+            continue;
+        std::string full_name = kart_properties.getKartDir() + fn;
         scene::IMesh* mesh = irr_driver->getMesh(full_name);
         if (!mesh)
             continue;
@@ -864,8 +907,10 @@ void KartModel::loadWheelInfo(const XMLNode &node,
 
 // ----------------------------------------------------------------------------
 
-void KartModel::loadHeadlights(const XMLNode &node)
+void KartModel::loadHeadlights(const XMLNode &node, const std::string& kart_dir)
 {
+    std::set<scene::IMesh*> spotlight_meshes;
+    unsigned light_count = 0;
     int children = node.getNumNodes();
     for (int i = 0; i < children; i++)
     {
@@ -887,13 +932,105 @@ void KartModel::loadHeadlights(const XMLNode &node)
             child->get("model", &model);
             video::SColor headlight_color(-1);
             child->get("color", &headlight_color);
-            m_headlight_objects.push_back(HeadlightObject(model, location,
-                bone_name, headlight_color));
+            float radius = 0.0f;
+            child->get("radius", &radius);
+            float energy = 0.0f;
+            child->get("energy", &energy);
+            float inner_cone = 0.0f;
+            child->get("inner-cone", &inner_cone);
+            float outer_cone = 0.0f;
+            child->get("outer-cone", &outer_cone);
+            std::string type;
+            if (!child->get("type", &type))
+            {
+                HeadlightType hlt = HLT_UNKNOWN;
+#ifndef SERVER_ONLY
+                // Auto detection code for old karts
+                std::string full_name = kart_dir + model;
+                scene::IMesh* mesh = irr_driver->getMesh(full_name);
+                if (!mesh)
+                    continue;
+                bool spotlight =
+                    spotlight_meshes.find(mesh) != spotlight_meshes.end();
+                GE::GESPM* spm = dynamic_cast<GE::GESPM*>(mesh);
+                SP::SPMesh* spspm = dynamic_cast<SP::SPMesh*>(mesh);
+                if (spm)
+                {
+                    if (!spotlight && handleSpotlight(spm))
+                    {
+                        spotlight_meshes.insert(spm);
+                        spotlight = true;
+                    }
+                }
+                else if (spspm)
+                {
+                    if (!spotlight && handleSPSpotlight(spspm))
+                    {
+                        spotlight_meshes.insert(spspm);
+                        spotlight = true;
+                    }
+                }
+                if (spotlight)
+                    hlt = HLT_SPOT;
+                else if (!(headlight_color.getRed() == 0 &&
+                    headlight_color.getGreen() == 0 &&
+                    headlight_color.getBlue() == 0))
+                    hlt = HLT_POINT;
+                if (hlt == HLT_SPOT || hlt == HLT_POINT)
+                {
+                    m_headlight_objects.push_back(HeadlightObject("", location,
+                        bone_name, headlight_color, hlt, radius, energy,
+                        inner_cone, outer_cone));
+                    light_count++;
+                }
+#endif
+                hlt = HLT_MESH;
+                m_headlight_objects.push_back(HeadlightObject(model, location,
+                    bone_name, headlight_color, hlt, radius, energy,
+                    inner_cone, outer_cone));
+            }
+            else
+            {
+                auto hlt = HeadlightObject::getHeadlightTypeFromString(type);
+                if (hlt == HLT_UNKNOWN)
+                    continue;
+                m_headlight_objects.push_back(HeadlightObject(model, location,
+                    bone_name, headlight_color, hlt, radius, energy,
+                    inner_cone, outer_cone));
+                if (hlt == HLT_SPOT || hlt == HLT_POINT)
+                    light_count++;
+            }
         }
         else
         {
             Log::warn("KartModel", "Unknown XML node in the headlights section");
         }
+    }
+    const float init_energy = 1.5f;
+    const float init_radius = 5.0f;
+    for (HeadlightObject& obj : m_headlight_objects)
+    {
+        if (light_count == 0)
+            break;
+        if (obj.getHeadlightType() == HLT_MESH || !obj.useDefaultSettings())
+            continue;
+        float each_energy = init_energy / light_count;
+        float each_radius = init_radius / light_count;
+        if (obj.getHeadlightType() == HLT_SPOT)
+        {
+            btClamp<float>(each_energy, init_energy / 2.0f, init_energy);
+            btClamp<float>(each_radius, init_radius / 2.0f, init_radius);
+            obj.setDefaultConeValues(light_count);
+        }
+        else
+        {
+            each_energy /= 3.6f;
+            each_radius /= 1.8f;
+            each_energy = std::min(each_energy, 0.4f);
+            each_radius = std::min(each_radius, 2.0f);
+        }
+        obj.setEnergy(each_energy);
+        obj.setRadius(each_radius);
     }
 }   // loadHeadlights
 
@@ -1322,7 +1459,7 @@ void KartModel::initInverseBoneMatrices()
     float striaght_frame = (float)m_animation_frame[AF_STRAIGHT];
     if (m_animation_frame[AF_STRAIGHT] == -1)
     {
-        Log::warn("KartModel", "%s has no striaght frame defined.",
+        Log::warn("KartModel", "%s has no straight frame defined.",
             m_model_filename.c_str());
         striaght_frame = 0.0f;
     }
@@ -1403,3 +1540,51 @@ const core::matrix4& KartModel::getInverseBoneMatrix
         return unused;
     return ret->second;
 }   // getInverseBoneMatrix
+
+//-----------------------------------------------------------------------------
+bool KartModel::handleSpotlight(GE::GESPM* spm)
+{
+    bool spotlight = false;
+#ifndef SERVER_ONLY
+    unsigned count = spm->getMeshBufferCount();
+    for (int i = count - 1; i >= 0; i--)
+    {
+        GE::GESPMBuffer* b = static_cast<GE::GESPMBuffer*>(spm->getMeshBuffer(i));
+        b->destroyVertexIndexBuffer();
+        video::SMaterial& m = b->getMaterial();
+        std::string t;
+        if (m.getTexture(0))
+            t = m.getTexture(0)->getFullPath().c_str();
+        if (t.find("stk_conelight_a.png") != std::string::npos)
+        {
+            spotlight = true;
+            spm->removeMeshBuffer(i);
+        }
+    }
+    spm->finalize();
+    irr_driver->getSceneManager()->getMeshCache()->meshCacheChanged();
+#endif
+    return spotlight;
+}   // handleSpotlight
+
+// ----------------------------------------------------------------------------
+bool KartModel::handleSPSpotlight(SP::SPMesh* spm)
+{
+    unsigned count = spm->getMeshBufferCount();
+    bool spotlight = false;
+    for (int i = count - 1; i >= 0; i--)
+    {
+        SP::SPMeshBuffer* b = static_cast<SP::SPMeshBuffer*>(spm->getMeshBuffer(i));
+        const auto& materials = b->getAllSTKMaterials();
+        for (unsigned i = 0; i < materials.size(); i++)
+        {
+            Material* m = materials[i];
+            if (m && m->getSamplerPath(0).find("stk_conelight_a.png") != std::string::npos)
+            {
+                spotlight = true;
+                b->disableForMaterial(i);
+            }
+        }
+    }
+    return spotlight;
+}   // handleSPSpotlight

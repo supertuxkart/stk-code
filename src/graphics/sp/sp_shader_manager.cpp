@@ -123,9 +123,16 @@ SPShaderManager::SPShaderManager()
                 glEnable(GL_DEPTH_TEST);
                 glDepthMask(GL_TRUE);
                 glEnable(GL_CULL_FACE);
-                glEnable(GL_BLEND);
-                glBlendEquation(GL_FUNC_ADD);
-                glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
+                glColorMask(GL_FALSE, GL_FALSE, GL_FALSE, GL_FALSE);
+            }
+        }
+    };
+
+    m_official_unuse_functions =
+    {
+        { "ghostUnuse", []()
+            {
+                glColorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
             }
         }
     };
@@ -380,7 +387,7 @@ std::shared_ptr<SPShader> SPShaderManager::buildSPShader(const ShaderInfo& si,
     std::shared_ptr<SPShader> sps;
 #ifndef SERVER_ONLY
     sps = std::make_shared<SPShader>(si.m_shader_name,
-        [this, pi, ua, skinned](SPShader* shader)
+        [pi, ua, skinned](SPShader* shader)
         {
             // First pass
             assert(!pi[0].m_vertex_shader.empty() ||

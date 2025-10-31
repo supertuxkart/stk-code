@@ -121,6 +121,11 @@ public:
     // ------------------------------------------------------------------------
     virtual bool raceHasLaps() OVERRIDE                       { return false; }
     // ------------------------------------------------------------------------
+    virtual bool shouldDrawSpeedometerDigit() const OVERRIDE   { return true; }
+    // ------------------------------------------------------------------------
+    virtual std::pair<int, video::SColor> 
+                getSpeedometerDigit(const AbstractKart *kart) const OVERRIDE; 
+    // ------------------------------------------------------------------------
     virtual const std::string& getIdent() const OVERRIDE;
     // ------------------------------------------------------------------------
     virtual bool kartHit(int kart_id, int hitter = -1) OVERRIDE;

@@ -27,6 +27,7 @@
   */
 
 #include <algorithm>
+#include <array>
 #include <atomic>
 #include <memory>
 #include <string>
@@ -54,6 +55,7 @@ using namespace irr;
 
 #include "utils/aligned_array.hpp"
 #include "utils/log.hpp"
+#include "utils/random_generator.hpp"
 #include "utils/vec3.hpp"
 #include "utils/stk_process.hpp"
 
@@ -65,7 +67,6 @@ class ItemManager;
 class ModelDefinitionLoader;
 class MovingTexture;
 class MusicInformation;
-class ParticleEmitter;
 class ParticleKind;
 class PhysicalObject;
 class RenderTarget;
@@ -424,6 +425,7 @@ private:
     void freeCachedMeshVertexBuffer();
     void copyFromMainProcess();
     video::IImage* getSkyTexture(std::string path) const;
+    scene::IMesh* getClonedMesh(const std::string& filename) const;
 public:
 
     /** Static function to get the current track. NULL if no current
@@ -563,7 +565,8 @@ public:
     */
     void shuffleStartTransforms()
     {
-        std::random_shuffle(m_start_transforms.begin(), m_start_transforms.end());
+       std::shuffle(m_start_transforms.begin(), m_start_transforms.end(),
+                    RandomGenerator::getGenerator());
     }
     // ------------------------------------------------------------------------
     /** Sets pointer to the aabb of this track. */
@@ -743,7 +746,8 @@ public:
     // ------------------------------------------------------------------------
     bool isAddon() const                                 { return m_is_addon; }
     // ------------------------------------------------------------------------
-    void convertTrackToBullet(scene::ISceneNode *node);
+    void convertTrackToBullet(scene::ISceneNode *node,
+                      std::vector<std::array<btVector3, 3> >* occluder = NULL);
     // ------------------------------------------------------------------------
     CheckManager* getCheckManager() const           { return m_check_manager; }
     // ------------------------------------------------------------------------

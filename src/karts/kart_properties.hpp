@@ -210,7 +210,7 @@ private:
         m_wheel_base = fabsf(kart_length / 1.425f);
     }
 
-    void handleOnDemandLoadTexture();
+    std::vector<std::string> handleOnDemandLoadTexture();
 public:
     /** Returns the string representation of a handicap level. */
     static std::string      getHandicapAsString(HandicapLevel h);

@@ -23,6 +23,7 @@
  * Copyright:
  *   2020      Evan Nemerson <evan@nemerson.com>
  *   2021      Zhi An Ng <zhin@google.com> (Copyright owned by Google, LLC)
+ *   2023      Yi-Yen Chung <eric681@andestech.com> (Copyright owned by Andes Technology)
  */
 
 #if !defined(SIMDE_ARM_NEON_SHRN_N_H)
@@ -107,40 +108,36 @@ simde_vshrn_n_s64 (const simde_int64x2_t a, const int n)
   #define vshrn_n_s64(a, n) simde_vshrn_n_s64((a), (n))
 #endif
 
-#define simde_vshrn_n_u16(a, n) \
-  simde_vreinterpret_u8_s8(     \
-      simde_vshrn_n_s16(simde_vreinterpretq_s16_u16(a), (n)))
-
 #if defined(SIMDE_ARM_NEON_A32V7_NATIVE)
-  #undef simde_vshrn_n_u16
   #define simde_vshrn_n_u16(a, n) vshrn_n_u16((a), (n))
+#else
+  #define simde_vshrn_n_u16(a, n) \
+    simde_vreinterpret_u8_s8(     \
+        simde_vshrn_n_s16(simde_vreinterpretq_s16_u16(a), (n)))
 #endif
-
 #if defined(SIMDE_ARM_NEON_A32V7_ENABLE_NATIVE_ALIASES)
   #undef vshrn_n_u16
   #define vshrn_n_u16(a, n) simde_vshrn_n_u16((a), (n))
 #endif
 
-#define simde_vshrn_n_u32(a, n) \
-  simde_vreinterpret_u16_s16( \
-      simde_vshrn_n_s32(simde_vreinterpretq_s32_u32(a), (n)))
-
 #if defined(SIMDE_ARM_NEON_A32V7_NATIVE)
-  #undef simde_vshrn_n_u32
   #define simde_vshrn_n_u32(a, n) vshrn_n_u32((a), (n))
+#else
+  #define simde_vshrn_n_u32(a, n) \
+    simde_vreinterpret_u16_s16( \
+        simde_vshrn_n_s32(simde_vreinterpretq_s32_u32(a), (n)))
 #endif
 #if defined(SIMDE_ARM_NEON_A32V7_ENABLE_NATIVE_ALIASES)
   #undef vshrn_n_u32
   #define vshrn_n_u32(a, n) simde_vshrn_n_u32((a), (n))
 #endif
 
-#define simde_vshrn_n_u64(a, n) \
-  simde_vreinterpret_u32_s32( \
-      simde_vshrn_n_s64(simde_vreinterpretq_s64_u64(a), (n)))
-
 #if defined(SIMDE_ARM_NEON_A32V7_NATIVE)
-  #undef simde_vshrn_n_u64
   #define simde_vshrn_n_u64(a, n) vshrn_n_u64((a), (n))
+#else
+  #define simde_vshrn_n_u64(a, n) \
+    simde_vreinterpret_u32_s32( \
+        simde_vshrn_n_s64(simde_vreinterpretq_s64_u64(a), (n)))
 #endif
 #if defined(SIMDE_ARM_NEON_A32V7_ENABLE_NATIVE_ALIASES)
   #undef vshrn_n_u64

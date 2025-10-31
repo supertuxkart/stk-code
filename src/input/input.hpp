@@ -134,6 +134,10 @@ enum PlayerAction
     PA_MENU_RIGHT,
     PA_MENU_SELECT,
     PA_MENU_CANCEL,
+    PA_MENU_PAGE_UP,
+    PA_MENU_PAGE_DOWN,
+    PA_MENU_END,
+    PA_MENU_START,
 
     PA_COUNT
 };

@@ -1,12 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <stkgui>
-    <icon-button id="back" x="1%" y="0" height="9%" icon="gui/icons/back.png"/>
-
-    <div x="2%" y="1%" width="96%" height="99%" layout="vertical-row" >
-        <header height="8%" width="80%" I18N="Section in arena tracks selection screen" text="Arenas"
+    <div x="1%" y="1%" width="98%" height="8%" layout="horizontal-row" >
+        <icon-button id="back" width="8%" height="100%" icon="gui/icons/back.png"/>
+        <header width="30%" height="100%" I18N="Section in arena tracks selection screen" text="Arenas"
                 align="center" text_align="center" />
-        <spacer width="20" height="1%" />
+        <textbox width="30%" id="search" align="center"/>
+        <spacer width="5%" height="100%" />
+        <div width="fit" height="100%" layout="horizontal-row" align="center">
+            <checkbox id="favorite" align="center"/>
+            <spacer width="5%" height="100%" />
+            <tiny-header width="fit" height="100%" I18N="Section in arena tracks selection screen" text="Edit favorite arenas"/>
+        </div>
+    </div>
 
+    <div x="2%" y="9%" width="96%" height="90%" layout="vertical-row" >
         <box proportion="1" width="100%" layout="vertical-row" padding="2">
             <ribbon_grid id="tracks" proportion="1" width="100%" square_items="true"
                 label_location="bottom" align="center" child_width="160" child_height="120" />

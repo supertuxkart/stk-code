@@ -22,6 +22,7 @@
  *
  * Copyright:
  *   2021      Atharva Nimbalkar <atharvakn@gmail.com>
+ *   2023      Yi-Yen Chung <eric681@andestech.com> (Copyright owned by Andes Technology)
  */
 
 #if !defined(SIMDE_ARM_NEON_QSHLU_N_H)
@@ -54,6 +55,22 @@ simde_vqshlub_n_s8(int8_t a, const int n)
 #if defined(SIMDE_ARM_NEON_A64V8_ENABLE_NATIVE_ALIASES)
   #undef vqshlub_n_s8
   #define vqshlub_n_s8(a, n) simde_vqshlub_n_s8((a), (n))
+#endif
+
+SIMDE_FUNCTION_ATTRIBUTES
+uint16_t
+simde_vqshluh_n_s16(int16_t a, const int n)
+    SIMDE_REQUIRE_CONSTANT_RANGE(n, 0, 15) {
+  uint16_t r = HEDLEY_STATIC_CAST(uint16_t, a << n);
+  r |= (((r >> n) != HEDLEY_STATIC_CAST(uint16_t, a)) ? UINT16_MAX : 0);
+  return (a < 0) ? 0 : r;
+}
+#if defined(SIMDE_ARM_NEON_A64V8_NATIVE)
+  #define simde_vqshluh_n_s16(a, n) HEDLEY_STATIC_CAST(uint16_t, vqshluh_n_s16(a, n))
+#endif
+#if defined(SIMDE_ARM_NEON_A64V8_ENABLE_NATIVE_ALIASES)
+  #undef vqshluh_n_s16
+  #define vqshluh_n_s16(a, n) simde_vqshluh_n_s16((a), (n))
 #endif
 
 SIMDE_FUNCTION_ATTRIBUTES

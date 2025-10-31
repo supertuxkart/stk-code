@@ -77,11 +77,14 @@
 #include "scriptengine/property_animator.hpp"
 #include "states_screens/dialogs/confirm_resolution_dialog.hpp"
 #include "states_screens/dialogs/message_dialog.hpp"
+#include "states_screens/options/options_screen_video.hpp"
 #include "states_screens/state_manager.hpp"
 #include "tracks/track_manager.hpp"
 #include "tracks/track.hpp"
+#include "utils/command_line.hpp"
 #include "utils/constants.hpp"
 #include "utils/file_utils.hpp"
+#include "utils/helpers.hpp"
 #include "utils/log.hpp"
 #include "utils/profiler.hpp"
 #include "utils/string_utils.hpp"
@@ -92,8 +95,10 @@
 #include <cmath>
 #include <irrlicht.h>
 
-#if !defined(SERVER_ONLY) && defined(ANDROID)
+#ifndef SERVER_ONLY
 #include <SDL.h>
+#endif
+#if !defined(SERVER_ONLY) && defined(ANDROID)
 #if SDL_VERSION_ATLEAST(2, 0, 9)
 #define ENABLE_SCREEN_ORIENTATION_HANDLING 1
 #endif
@@ -103,6 +108,7 @@
 #include <ge_main.hpp>
 #include <ge_vulkan_driver.hpp>
 #include <ge_vulkan_texture_descriptor.hpp>
+#include <SDL_stdinc.h>
 #endif
 
 #ifdef ENABLE_RECORDER
@@ -243,6 +249,10 @@ IrrDriver::~IrrDriver()
     m_device->drop();
     m_device = NULL;
     m_modes.clear();
+
+#ifndef SERVER_ONLY
+    SDL_Quit();
+#endif
 }   // ~IrrDriver
 
 // ----------------------------------------------------------------------------
@@ -500,7 +510,7 @@ begin:
 #endif
 
         video::E_DRIVER_TYPE driver_created = video::EDT_NULL;
-        if (std::string(UserConfigParams::m_render_driver) == "gl")
+        if (std::string(UserConfigParams::m_render_driver) == "opengl")
         {
 #if defined(USE_GLES2)
             driver_created = video::EDT_OGLES2;
@@ -512,9 +522,19 @@ begin:
         {
             driver_created = video::EDT_DIRECT3D9;
         }
-        else if (std::string(UserConfigParams::m_render_driver) == "vulkan")
+        else if (std::string(UserConfigParams::m_render_driver) == "vulkan" ||
+            std::string(UserConfigParams::m_render_driver) == "directx12")
         {
             driver_created = video::EDT_VULKAN;
+#if defined(WIN32) && !defined(SERVER_ONLY)
+            if (std::string(UserConfigParams::m_render_driver) == "directx12")
+            {
+                std::string dozen_path = StringUtils::getPath(
+                    CommandLine::getExecName());
+                SDL_setenv("VK_DRIVER_FILES",
+                    (dozen_path + "\\dzn_icd.json").c_str(), 1);
+            }
+#endif
 #ifndef SERVER_ONLY
             GE::getGEConfig()->m_texture_compression =
                 UserConfigParams::m_texture_compression;
@@ -522,18 +542,17 @@ begin:
                 UserConfigParams::m_scale_rtts_factor;
             GE::getGEConfig()->m_pbr =
                 UserConfigParams::m_dynamic_lights;
+            GE::getGEConfig()->m_ibl =
+                !UserConfigParams::m_degraded_IBL;
 #endif
         }
         else
         {
-            Log::warn("IrrDriver", "Unknown driver %s, revert to gl",
-                UserConfigParams::m_render_driver.c_str());
+            std::string unknown = UserConfigParams::m_render_driver;
             UserConfigParams::m_render_driver.revertToDefaults();
-#if defined(USE_GLES2)
-            driver_created = video::EDT_OGLES2;
-#else
-            driver_created = video::EDT_OPENGL;
-#endif
+            Log::warn("IrrDriver", "Unknown driver %s, revert to %s",
+                unknown.c_str(), UserConfigParams::m_render_driver.c_str());
+            goto begin;
         }
 
 #ifndef SERVER_ONLY
@@ -545,6 +564,7 @@ begin:
         if (UserConfigParams::m_swap_interval > 1)
             UserConfigParams::m_swap_interval = 1;
 
+        OptionsScreenVideo::setSSR();
         // Try 32 and, upon failure, 24 then 16 bit per pixels
         for (int bits=32; bits>15; bits -=8)
         {
@@ -803,7 +823,7 @@ begin:
 
     if (UserConfigParams::m_shadows_resolution != 0 &&
         (UserConfigParams::m_shadows_resolution < 512 ||
-         UserConfigParams::m_shadows_resolution > 2048))
+         UserConfigParams::m_shadows_resolution > 4096))
     {
         Log::warn("irr_driver",
                "Invalid value for UserConfigParams::m_shadows_resolution : %i",
@@ -1140,6 +1160,7 @@ void IrrDriver::applyResolutionSettings(bool recreate_device)
     // Input manager set first so it recieves SDL joystick event
     // Re-init GUI engine
     GUIEngine::init(m_device, m_video_driver, StateManager::get());
+    GUIEngine::reserveLoadingIcons(3);
     // If not recreate device we need to add the previous joystick manually
     if (!recreate_device)
         input_manager->addJoystick();
@@ -1848,10 +1869,12 @@ void IrrDriver::setAmbientLight(const video::SColorf &light, bool force_SH_compu
 {
 #ifndef SERVER_ONLY
     video::SColorf color = light;
-    color.r = powf(color.r, 1.0f / 2.2f);
-    color.g = powf(color.g, 1.0f / 2.2f);
-    color.b = powf(color.b, 1.0f / 2.2f);
-    
+    if (m_video_driver->getDriverType() != EDT_VULKAN)
+    {
+        color.r = powf(color.r, 1.0f / 2.2f);
+        color.g = powf(color.g, 1.0f / 2.2f);
+        color.b = powf(color.b, 1.0f / 2.2f);
+    }
     m_scene_manager->setAmbientLight(color);
     m_renderer->setAmbientLight(light, force_SH_computation);    
 #endif
@@ -2120,6 +2143,33 @@ void IrrDriver::handleWindowResize()
 }   // handleWindowResize
 
 // ----------------------------------------------------------------------------
+void IrrDriver::updateDisplace(float dt)
+{
+#ifndef SERVER_ONLY
+    if (!Track::getCurrentTrack())
+        return;
+
+    const float time = m_device->getTimer()->getTime() / 1000.0f;
+    const float speed = Track::getCurrentTrack()->getDisplacementSpeed();
+
+    float strength = time;
+    strength = fabsf(noise2d(strength / 10.0f)) * 0.006f + 0.002f;
+
+    core::vector3df wind = m_wind->getWind() * strength * speed;
+    GE::getDisplaceDirection()[0] += wind.X * dt;
+    GE::getDisplaceDirection()[1] += wind.Z * dt;
+
+    strength = time * 0.56f + sinf(time);
+    strength = fabsf(noise2d(0.0, strength / 6.0f)) * 0.0095f + 0.0025f;
+
+    wind = m_wind->getWind() * strength * speed;
+    wind.rotateXZBy(cosf(time));
+    GE::getDisplaceDirection()[2] += wind.X * dt;
+    GE::getDisplaceDirection()[3] += wind.Z * dt;
+#endif
+}   // updateDisplace
+
+// ----------------------------------------------------------------------------
 /** Update, called once per frame.
  *  \param dt Time since last update
  *  \param is_loading True if the rendering is called during loading of world,
@@ -2158,6 +2208,7 @@ void IrrDriver::update(float dt, bool is_loading)
     if (world)
     {
 #ifndef SERVER_ONLY
+        updateDisplace(dt);
         m_renderer->render(dt, is_loading);
 
         GUIEngine::Screen* current_screen = GUIEngine::getCurrentScreen();
@@ -2380,9 +2431,9 @@ scene::ISceneNode *IrrDriver::addLight(const core::vector3df &pos,
                                        bool sun_, scene::ISceneNode* parent)
 {
 #ifndef SERVER_ONLY
+    if (parent == NULL) parent = m_scene_manager->getRootSceneNode();
     if (CVS->isGLSL())
     {
-        if (parent == NULL) parent = m_scene_manager->getRootSceneNode();
         LightNode *light = NULL;
 
         if (!sun_)
@@ -2404,10 +2455,25 @@ scene::ISceneNode *IrrDriver::addLight(const core::vector3df &pos,
     }
     else
     {
-        scene::ILightSceneNode* light = m_scene_manager
-               ->addLightSceneNode(m_scene_manager->getRootSceneNode(),
-                                   pos, video::SColorf(r, g, b, 1.0f));
-        light->setRadius(radius);
+        scene::ILightSceneNode* light;
+        if (m_video_driver->getDriverType() == EDT_VULKAN && sun_)
+        {
+            light = m_scene_manager->addLightSceneNode(parent, pos,
+                video::SColorf(r, g, b, 0.2f), 0.26f * M_PI / 180.0f);
+            light->setRotation(-pos);
+            light->setLightType(video::ELT_DIRECTIONAL);
+        }
+        else
+        {
+            video::SColorf color(r, g, b, 1.0f);
+            light = m_scene_manager->addLightSceneNode(parent, pos, color);
+            light->setRadius(radius);
+            if (m_video_driver->getDriverType() == EDT_VULKAN)
+            {
+                video::SLight& data = light->getLightData();
+                data.Attenuation.X = energy;
+            }
+        }
         return light;
     }
 #else

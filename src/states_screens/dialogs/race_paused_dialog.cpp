@@ -53,6 +53,11 @@
 
 #include <IrrlichtDevice.h>
 
+#ifndef SERVER_ONLY
+#include <ge_main.hpp>
+#include <ge_vulkan_driver.hpp>
+#endif
+
 using namespace GUIEngine;
 using namespace irr::core;
 using namespace irr::gui;
@@ -66,6 +71,7 @@ RacePausedDialog::RacePausedDialog(const float percentWidth,
     m_target_team = KART_TEAM_NONE;
     m_self_destroy = false;
     m_from_overworld = false;
+    m_vk_pbr_toggle = NULL;
 
     if (dynamic_cast<OverWorld*>(World::getWorld()) != NULL)
     {
@@ -362,8 +368,20 @@ GUIEngine::EventPropagation
         }
         else if (selection == "help")
         {
+            GE::GEVulkanDriver* vk_pbr_toggle = m_vk_pbr_toggle;
             dismiss();
-            HelpScreen1::getInstance()->push();
+#ifndef SERVER_ONLY
+            if (vk_pbr_toggle)
+            {
+                UserConfigParams::m_dynamic_lights = !UserConfigParams::m_dynamic_lights;
+                GE::getGEConfig()->m_pbr = UserConfigParams::m_dynamic_lights;
+                vk_pbr_toggle->updateDriver(false/*scale_changed*/, true/*pbr_changed*/);
+            }
+            else
+            {
+                HelpScreen1::getInstance()->push();
+            }
+#endif
             return GUIEngine::EVENT_BLOCK;
         }
         else if (selection == "options")
@@ -442,7 +460,20 @@ void RacePausedDialog::beforeAddingWidgets()
     {
         index = choice_ribbon->findItemNamed("help");
         if (index != -1)
-            choice_ribbon->setItemVisible(index, false);
+        {
+#ifndef SERVER_ONLY
+            m_vk_pbr_toggle = GE::getVKDriver();
+            if (m_vk_pbr_toggle)
+            {
+                IconButtonWidget* hw = getWidget<IconButtonWidget>("help");
+                IconButtonWidget* ew = getWidget<IconButtonWidget>("exit");
+                hw->m_properties[PROP_ID] = "exit";
+                ew->m_properties[PROP_ID] = "help";
+            }
+            else
+                choice_ribbon->setItemVisible(index, false);
+#endif
+        }
         index = choice_ribbon->findItemNamed("options");
         if (index != -1)
             choice_ribbon->setItemVisible(index, false);
@@ -519,7 +550,19 @@ void RacePausedDialog::init()
 {
     m_touch_controls = UserConfigParams::m_multitouch_controls;
     updateTouchDeviceIcon();
-    
+#ifndef SERVER_ONLY
+    if (m_vk_pbr_toggle)
+    {
+        IconButtonWidget* widget = getWidget<IconButtonWidget>("help");
+        widget->setLabel(UserConfigParams::m_dynamic_lights ?
+            _("Disable advanced pipeline") : _("Enable advanced pipeline"));
+        widget->setImage(irr_driver->getTexture(FileManager::GUI_ICON,
+            "options_video.png"));
+        widget = getWidget<IconButtonWidget>("exit");
+        widget->setImage(irr_driver->getTexture(FileManager::GUI_ICON,
+            "main_quit.png"));
+    }
+#endif
 }   // init
 
 // ----------------------------------------------------------------------------

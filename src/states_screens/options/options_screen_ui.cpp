@@ -18,15 +18,13 @@
 // Manages includes common to all options screens
 #include "states_screens/options/options_common.hpp"
 
-#include "graphics/camera/camera.hpp"
-#include "graphics/camera/camera_normal.hpp"
 #include "challenges/story_mode_timer.hpp"
 #include "config/player_manager.hpp"
 #include "font/font_manager.hpp"
 #include "graphics/irr_driver.hpp"
+#include "items/attachment_manager.hpp"
 #include "items/powerup_manager.hpp"
 #include "modes/world.hpp"
-#include "states_screens/dialogs/custom_camera_settings.hpp"
 #include "states_screens/dialogs/message_dialog.hpp"
 #include "states_screens/main_menu_screen.hpp"
 
@@ -111,22 +109,6 @@ void OptionsScreenUI::loadedFromFile()
         font_size->m_properties[GUIEngine::PROP_MAX_VALUE] = "5";
     }
 
-    // Setup camera spinner
-    GUIEngine::SpinnerWidget* camera_preset = getWidget<GUIEngine::SpinnerWidget>("camera_preset");
-    assert( camera_preset != NULL );
-
-    camera_preset->m_properties[PROP_WRAP_AROUND] = "true";
-    camera_preset->clearLabels();
-    //I18N: In the UI options, Camera setting: Custom
-    camera_preset->addLabel( core::stringw(_("Custom")));
-    //I18N: In the UI options, Camera setting: Standard
-    camera_preset->addLabel( core::stringw(_("Standard")));
-    //I18N: In the UI options, Camera setting: Drone chase
-    camera_preset->addLabel( core::stringw(_("Drone chase")));
-    camera_preset->m_properties[GUIEngine::PROP_MIN_VALUE] = "0";
-    camera_preset->m_properties[GUIEngine::PROP_MAX_VALUE] = "2";
-    updateCameraPresetSpinner();
-
     font_size->setValueUpdatedCallback([this](SpinnerWidget* spinner)
     {
         // Add a special value updated callback so font size is updated when
@@ -147,6 +129,7 @@ void OptionsScreenUI::loadedFromFile()
 void OptionsScreenUI::init()
 {
     Screen::init();
+    OptionsCommon::setTabStatus();
 
     bool in_game = StateManager::get()->getGameState() == GUIEngine::INGAME_MENU;
 
@@ -286,13 +269,6 @@ void OptionsScreenUI::init()
         }
     }
     speedrun_timer->setState( UserConfigParams::m_speedrun_mode );
-
-    // --- select the right camera in the spinner
-    GUIEngine::SpinnerWidget* camera_preset = getWidget<GUIEngine::SpinnerWidget>("camera_preset");
-    assert( camera_preset != NULL );
-
-    camera_preset->setValue(UserConfigParams::m_camera_present); // use the saved camera
-    updateCameraPresetSpinner();
 }   // init
 
 // -----------------------------------------------------------------------------
@@ -326,6 +302,10 @@ void OptionsScreenUI::loadSkins(const std::set<std::string>& files, bool addon)
                 delete root;
                 return;
             }
+
+            // Localize the skin names
+            skin.m_base_theme_name = _(skin.m_base_theme_name.c_str());
+            skin.m_variant_name    = _(skin.m_variant_name.c_str());
 
             skin.m_folder_name = folder_name;
             m_skins.push_back(skin);
@@ -420,27 +400,6 @@ std::string OptionsScreenUI::getCurrentSpinnerSkin()
 } // getCurrentSpinnerSkin
 
 // -----------------------------------------------------------------------------
-void OptionsScreenUI::updateCamera()
-{
-    bool in_game = StateManager::get()->getGameState() == GUIEngine::INGAME_MENU;
-    if (in_game)
-    {
-        (Camera::getActiveCamera()->getCameraSceneNode())->setFOV(DEGREE_TO_RAD * UserConfigParams::m_camera_fov);
-        CameraNormal *camera = dynamic_cast<CameraNormal*>(Camera::getActiveCamera());
-        if (camera)
-        {
-            camera->setDistanceToKart(UserConfigParams::m_camera_distance);
-        }
-    }
-} // updateCamera
-
-// -----------------------------------------------------------------------------
-void OptionsScreenUI::updateCameraPresetSpinner()
-{
-    updateCamera();
-} // updateCameraPresetSpinner
-
-// -----------------------------------------------------------------------------
 void OptionsScreenUI::eventCallback(Widget* widget, const std::string& name, const int playerID)
 {
 #ifndef SERVER_ONLY
@@ -460,14 +419,14 @@ void OptionsScreenUI::eventCallback(Widget* widget, const std::string& name, con
         m_active_base_skin = m_base_skin_selector->getStringValue();
         loadCurrentSkinVariants();
         UserConfigParams::m_skin_file = getCurrentSpinnerSkin();
-        onSkinChange();
+        onSkinChange(false);
         m_reload_option->m_focus_name = "base_skinchoice";
         m_reload_option->m_focus_right = m_base_skin_selector->isButtonSelected(true/*right*/);
     }
     else if (name == "variant_skinchoice")
     {
         UserConfigParams::m_skin_file = getCurrentSpinnerSkin();
-        onSkinChange();
+        onSkinChange(true);
         m_reload_option->m_focus_name = "variant_skinchoice";
         m_reload_option->m_focus_right = m_variant_skin_selector->isButtonSelected(true/*right*/);
     }
@@ -544,48 +503,6 @@ void OptionsScreenUI::eventCallback(Widget* widget, const std::string& name, con
         }
         UserConfigParams::m_speedrun_mode = speedrun_timer->getState();
     }
-    else if (name == "camera_preset")
-    {
-        GUIEngine::SpinnerWidget* camera_preset = getWidget<GUIEngine::SpinnerWidget>("camera_preset");
-        assert( camera_preset != NULL );
-        unsigned int i = camera_preset->getValue();
-        UserConfigParams::m_camera_present = i;
-        if (i == 1) //Standard
-        {
-            UserConfigParams::m_camera_fov = UserConfigParams::m_standard_camera_fov;
-            UserConfigParams::m_camera_distance = UserConfigParams::m_standard_camera_distance;
-            UserConfigParams::m_camera_forward_up_angle = UserConfigParams::m_standard_camera_forward_up_angle;
-            UserConfigParams::m_camera_forward_smoothing = UserConfigParams::m_standard_camera_forward_smoothing;
-            UserConfigParams::m_camera_backward_distance = UserConfigParams::m_standard_camera_backward_distance;
-            UserConfigParams::m_camera_backward_up_angle = UserConfigParams::m_standard_camera_backward_up_angle;
-            UserConfigParams::m_reverse_look_use_soccer_cam = UserConfigParams::m_standard_reverse_look_use_soccer_cam;
-        }
-        else if (i == 2) //Drone chase
-        {
-            UserConfigParams::m_camera_fov = UserConfigParams::m_drone_camera_fov;
-            UserConfigParams::m_camera_distance = UserConfigParams::m_drone_camera_distance;
-            UserConfigParams::m_camera_forward_up_angle = UserConfigParams::m_drone_camera_forward_up_angle;
-            UserConfigParams::m_camera_forward_smoothing = UserConfigParams::m_drone_camera_forward_smoothing;
-            UserConfigParams::m_camera_backward_distance = UserConfigParams::m_drone_camera_backward_distance;
-            UserConfigParams::m_camera_backward_up_angle = UserConfigParams::m_drone_camera_backward_up_angle;
-            UserConfigParams::m_reverse_look_use_soccer_cam = UserConfigParams::m_drone_reverse_look_use_soccer_cam;
-        }
-        else //Custom
-        {
-            UserConfigParams::m_camera_fov = UserConfigParams::m_saved_camera_fov;
-            UserConfigParams::m_camera_distance = UserConfigParams::m_saved_camera_distance;
-            UserConfigParams::m_camera_forward_up_angle = UserConfigParams::m_saved_camera_forward_up_angle;
-            UserConfigParams::m_camera_forward_smoothing = UserConfigParams::m_saved_camera_forward_smoothing;
-            UserConfigParams::m_camera_backward_distance = UserConfigParams::m_saved_camera_backward_distance;
-            UserConfigParams::m_camera_backward_up_angle = UserConfigParams::m_saved_camera_backward_up_angle;
-            UserConfigParams::m_reverse_look_use_soccer_cam = UserConfigParams::m_saved_reverse_look_use_soccer_cam;
-        }
-        updateCamera();
-    }
-    else if(name == "custom_camera")
-    {
-        new CustomCameraSettingsDialog(0.8f, 0.95f);
-    }
 #endif
 }   // eventCallback
 
@@ -640,22 +557,30 @@ void OptionsScreenUI::reloadGUIEngine()
     if (reload_skin)
     {
         irr_driver->setMaxTextureSize();
+
         delete powerup_manager;
         powerup_manager = new PowerupManager();
         powerup_manager->loadPowerupsModels();
+
+        delete attachment_manager;
+        attachment_manager = new AttachmentManager();
+        attachment_manager->loadModels();
     }
     OptionsScreenUI::getInstance()->m_reload_option = nullptr;
 }   // reloadGUIEngine
 
 // -----------------------------------------------------------------------------
-void OptionsScreenUI::onSkinChange()
+void OptionsScreenUI::onSkinChange(bool is_variant)
 {
-    bool prev_font = GUIEngine::getSkin()->hasFont();
+    bool change_font = GUIEngine::getSkin()->hasFont();
     irr_driver->unsetMaxTextureSize();
     GUIEngine::reloadSkin();
     // Reload GUIEngine will clear widgets and set max texture Size so we don't do that here
     m_reload_option = std::unique_ptr<ReloadOption>(new ReloadOption);
-    m_reload_option->m_reload_font = prev_font != GUIEngine::getSkin()->hasFont();
+    // Check either old or new skin use custom_font
+    change_font |= GUIEngine::getSkin()->hasFont();
+    // Assume skin variants use the same font set
+    m_reload_option->m_reload_font = change_font && !is_variant;
     m_reload_option->m_reload_skin = true;
 } // onSkinChange
 
