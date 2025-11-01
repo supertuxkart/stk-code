@@ -234,7 +234,7 @@ Camera::Mode Camera::getPreviousMode()
  */
 bool Camera::isSpectatorMode()
 {
-    return ((m_mode == CM_SPECTATOR_TOP_VIEW) || (m_mode == CM_SPECTATOR_SOCCER));
+    return ((m_mode == CM_SPECTATOR_TOP_VIEW) || (m_mode == CM_SPECTATOR_SOCCER) || (m_mode == CM_SPECTATOR_TV));
 }   // isSpectatorMode
 
 // ----------------------------------------------------------------------------
@@ -243,7 +243,14 @@ bool Camera::isSpectatorMode()
 void Camera::setNextSpectatorMode()
 {
     if (m_mode == CM_SPECTATOR_SOCCER) m_mode = CM_SPECTATOR_TOP_VIEW;
-    else if (m_mode == CM_SPECTATOR_TOP_VIEW) m_mode = m_previous_mode;
+    else if (m_mode == CM_SPECTATOR_TOP_VIEW)
+    {
+        if (CameraNormal::hasTVCameras())
+            m_mode = CM_SPECTATOR_TV;
+        else
+            m_mode = m_previous_mode; 
+    }
+    else if (m_mode == CM_SPECTATOR_TV && m_previous_mode != CM_SPECTATOR_TV) m_mode = m_previous_mode;
     else setMode(CM_SPECTATOR_SOCCER);
 }   // setNextSpectatorMode
 
