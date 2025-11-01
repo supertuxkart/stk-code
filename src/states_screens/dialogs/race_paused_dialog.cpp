@@ -387,7 +387,9 @@ GUIEngine::EventPropagation
         else if (selection == "options")
         {
             dismiss();
+#ifndef SERVER_ONLY
             OptionsScreenGeneral::getInstance()->push();
+#endif
             return GUIEngine::EVENT_BLOCK;
         }
         else if (selection == "restart")

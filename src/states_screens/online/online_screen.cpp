@@ -254,6 +254,7 @@ void OnlineScreen::onUpdate(float delta)
 void OnlineScreen::eventCallback(Widget* widget, const std::string& name,
                                    const int playerID)
 {
+#ifndef SERVER_ONLY
     if (name == "user-id")
     {
         NetworkConfig::get()->cleanNetworkPlayers();
@@ -343,6 +344,7 @@ void OnlineScreen::eventCallback(Widget* widget, const std::string& name,
         m_entered_server = nullptr;
         new EnterAddressDialog(&m_entered_server);
     }
+#endif
 }   // eventCallback
 
 // ----------------------------------------------------------------------------

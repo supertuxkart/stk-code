@@ -15,6 +15,8 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
+#ifndef SERVER_ONLY // No GUI files in server builds
+
 // Manages includes common to all options screens
 #include "states_screens/options/options_common.hpp"
 
@@ -60,7 +62,6 @@ void OptionsScreenLanguage::init()
 
     // I18N: in the language choice, to select the same language as the OS
     list_widget->addItem("system", _("System Language"));
-#ifndef SERVER_ONLY
     const std::vector<std::string>* lang_list = translations->getLanguageList();
     const int amount = (int)lang_list->size();
 
@@ -88,7 +89,7 @@ void OptionsScreenLanguage::init()
         list_widget->addItem(nice_name_2_id[nice_lang_list[i]],
                               nice_lang_list[i]);
     }
-#endif
+
     list_widget->setSelectionID( list_widget->getItemID(UserConfigParams::m_language) );
 
     // Forbid changing language while in-game, since this crashes (changing the language involves
@@ -102,7 +103,6 @@ void OptionsScreenLanguage::init()
 
 void OptionsScreenLanguage::eventCallback(Widget* widget, const std::string& name, const int playerID)
 {
-#ifndef SERVER_ONLY
     if (name == "options_choice")
     {
         std::string selection = ((RibbonWidget*)widget)->getSelectionIDString(PLAYER_ID_GAME_MASTER);
@@ -164,7 +164,6 @@ void OptionsScreenLanguage::eventCallback(Widget* widget, const std::string& nam
         TipsManager::destroy();
         TipsManager::create();
     }
-#endif
 }   // eventCallback
 
 // -----------------------------------------------------------------------------
@@ -183,4 +182,4 @@ void OptionsScreenLanguage::unloaded()
     m_inited = false;
 }   // unloaded
 
-// -----------------------------------------------------------------------------
+#endif // ifndef SERVER_ONLY
