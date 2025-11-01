@@ -15,6 +15,8 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
+#ifndef SERVER_ONLY // No GUI files in server builds
+
 #include "states_screens/dialogs/add_device_dialog.hpp"
 
 #include "guiengine/engine.hpp"
@@ -215,3 +217,5 @@ GUIEngine::EventPropagation AddDeviceDialog::processEvent
 
     return GUIEngine::EVENT_LET;
 }   // processEvent
+
+#endif // ifndef SERVER_ONLY

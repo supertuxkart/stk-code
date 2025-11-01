@@ -2534,6 +2534,7 @@ int main(int argc, char *argv[])
                 PlayerManager::get()->enforceCurrentPlayer();
             }
 
+#ifndef SERVER_ONLY // No GUI files in server builds
             // If there is a current player, it was saved in the config file,
             // so we immediately start the main menu (unless it was requested
             // to always show the login screen). Otherwise show the login
@@ -2555,6 +2556,7 @@ int main(int argc, char *argv[])
                     RegisterScreen::getInstance()->setParent(UserScreen::getInstance());
                 }
             }
+#endif // ifndef SERVER_ONLY
 #ifdef ENABLE_WIIUSE
             // Show a dialog to allow connection of wiimotes. */
             if(WiimoteManager::isEnabled())
