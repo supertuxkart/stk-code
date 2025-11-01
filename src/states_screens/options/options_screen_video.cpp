@@ -438,6 +438,7 @@ void OptionsScreenVideo::updateBlurSlider()
 
 void OptionsScreenVideo::updateScaleRTTsSlider()
 {
+#ifndef SERVER_ONLY
     bool rtts_on = (UserConfigParams::m_dynamic_lights && CVS->isGLSL()) ||
         GE::getDriver()->getDriverType() == video::EDT_VULKAN;
 
@@ -468,6 +469,7 @@ void OptionsScreenVideo::updateScaleRTTsSlider()
         //I18N: custom video settings
         rtts_slider->setCustomText( _("Custom") );
     }
+#endif
 } // updateScaleRTTsSlider
 
 // --------------------------------------------------------------------------------------------
