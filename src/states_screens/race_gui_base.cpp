@@ -807,10 +807,8 @@ void RaceGUIBase::drawGlobalPlayerIcons(int bottom_margin)
     unsigned int sta = RaceManager::get()->getNumSpareTireKarts();
     unsigned int total_karts = RaceManager::get()->getNumberOfKarts() - sta;
     unsigned int num_karts = 0;
-    if (NetworkConfig::get()->isNetworking())
-        num_karts = World::getWorld()->getCurrentNumKarts();
-    else
-        num_karts = RaceManager::get()->getNumberOfKarts() - sta;
+    num_karts = World::getWorld()->getCurrentNumKarts();
+
     // May happen in spectate mode if all players disconnected before server
     // reset
     if (num_karts == 0)
