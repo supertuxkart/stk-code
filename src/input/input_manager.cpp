@@ -423,6 +423,7 @@ void InputManager::inputSensing(Input::InputType type, int deviceID,
                                 int button, Input::AxisDirection axisDirection,
                                 int value)
 {
+#ifndef SERVER_ONLY
 #if INPUT_MODE_DEBUG
     Log::info("InputManager::inputSensing", "Start sensing input");
 #endif
@@ -563,6 +564,7 @@ void InputManager::inputSensing(Input::InputType type, int deviceID,
             // nothing with them, and thus to fix warnings)
             break;
     }   // switch
+#endif // SERVER_ONLY
 }   // inputSensing
 
 //-----------------------------------------------------------------------------

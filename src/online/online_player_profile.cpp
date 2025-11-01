@@ -180,6 +180,7 @@ namespace Online
         }
 
         // Test if failure while showing user login screen
+#ifndef SERVER_ONLY // No GUI files in server builds
         BaseUserScreen *login = dynamic_cast<BaseUserScreen*>(screen);
         if (login)
         {
@@ -210,7 +211,7 @@ namespace Online
             UserScreen::getInstance()->loginError(getLocalizedInfo(),
                 !hadDownloadError());
         }
-
+#endif
     }   // SignInRequest::callback
 
     // ------------------------------------------------------------------------
@@ -356,8 +357,10 @@ namespace Online
     void OnlinePlayerProfile::signOut(bool success, const XMLNode *input,
                                       const irr::core::stringw &info)
     {
+#ifndef SERVER_ONLY // No GUI files in server builds
         GUIEngine::Screen *screen = GUIEngine::getCurrentScreen();
         BaseUserScreen *user_screen = dynamic_cast<BaseUserScreen*>(screen);
+#endif
 
         // We can't do much of error handling here, no screen waits for
         // a logout to finish, so we can only log the message to screen,
@@ -368,6 +371,7 @@ namespace Online
                       "There were some connection issues while logging out. "
                       "Report a bug if this caused issues.");
             Log::warn("OnlinePlayerProfile::signOut", core::stringc(info.c_str()).c_str());
+#ifndef SERVER_ONLY // No GUI files in server builds
             if (user_screen)
                 user_screen->logoutError(info);
         }
@@ -375,6 +379,7 @@ namespace Online
         {
             if (user_screen)
                 user_screen->logoutSuccessful();
+#endif
         }
 
         ProfileManager::get()->clearPersistent();
