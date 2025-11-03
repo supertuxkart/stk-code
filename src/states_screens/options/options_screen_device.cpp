@@ -608,7 +608,7 @@ void OptionsScreenDevice::eventCallback(Widget* widget,
             _("Enter new configuration name, leave empty to revert default value.");
         DeviceConfig *the_config = m_config; //Can't give variable m_config directly
 
-        new GeneralTextFieldDialog(instruction, [] (const irr::core::stringw& text) {},
+        GeneralTextFieldDialog* dialog = new GeneralTextFieldDialog(instruction, [] (const irr::core::stringw& text) {},
             [the_config] (GUIEngine::LabelWidget* lw,
                 GUIEngine::TextBoxWidget* tb)->bool
             {
@@ -617,6 +617,9 @@ void OptionsScreenDevice::eventCallback(Widget* widget,
                 input_manager->getDeviceManager()->save();
                 return true;
             });
+        
+        // Prefill the textbox with the current configuration name
+        dialog->getTextField()->setText(the_config->getConfigName());
     }
     else if (name == "force_feedback")
     {
