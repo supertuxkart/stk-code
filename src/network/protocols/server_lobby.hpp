@@ -96,10 +96,6 @@ private:
 
     std::atomic<ResetState> m_rs_state;
 
-    /** Hold the next connected peer for server owner if current one expired
-     * (disconnected). */
-    std::weak_ptr<STKPeer> m_server_owner;
-
     /** AI peer which holds the list of reserved AI for dedicated server. */
     std::weak_ptr<STKPeer> m_ai_peer;
 
@@ -109,18 +105,6 @@ private:
     std::vector<std::shared_ptr<NetworkPlayerProfile> > m_ai_profiles;
 
     std::atomic<uint32_t> m_server_owner_id;
-
-    /** Official karts and tracks available in server. */
-    std::pair<std::set<std::string>, std::set<std::string> > m_official_kts;
-
-    /** Addon karts and tracks available in server. */
-    std::pair<std::set<std::string>, std::set<std::string> > m_addon_kts;
-
-    /** Addon arenas available in server. */
-    std::set<std::string> m_addon_arenas;
-
-    /** Addon soccers available in server. */
-    std::set<std::string> m_addon_soccers;
 
     /** Available karts and tracks for all clients, this will be initialized
      *  with data in server first. */
@@ -136,9 +120,6 @@ private:
     /** Counts how many peers have finished loading the world. */
     std::map<std::weak_ptr<STKPeer>, bool,
         std::owner_less<std::weak_ptr<STKPeer> > > m_peers_ready;
-
-    std::map<std::weak_ptr<STKPeer>, std::set<irr::core::stringw>,
-        std::owner_less<std::weak_ptr<STKPeer> > > m_peers_muted_players;
 
     std::weak_ptr<Online::Request> m_server_registering;
 
@@ -212,7 +193,6 @@ private:
     void handleChat(Event* event);
     void unregisterServer(bool now,
         std::weak_ptr<ServerLobby> sl = std::weak_ptr<ServerLobby>());
-    void updatePlayerList(bool update_when_reset_server = false);
     void updateServerOwner();
     void handleServerConfiguration(Event* event);
     void updateTracksForMode();
@@ -292,7 +272,6 @@ private:
     std::vector<std::shared_ptr<NetworkPlayerProfile> > getLivePlayers() const;
     void setPlayerKarts(const NetworkString& ns, STKPeer* peer) const;
     bool handleAssets(const NetworkString& ns, STKPeer* peer);
-    void handleServerCommand(Event* event, std::shared_ptr<STKPeer> peer);
     void liveJoinRequest(Event* event);
     void rejectLiveJoin(STKPeer* peer, BackLobbyReason blr);
     bool canLiveJoinNow() const;
@@ -311,6 +290,32 @@ private:
     bool supportsAI();
     void updateAddons();
 public:
+    // Having those variable private would just require a bunch of boilerplate
+    // code to access them... What's the point?
+
+    /** Hold the next connected peer for server owner if current one expired
+     * (disconnected). */
+    std::weak_ptr<STKPeer> m_server_owner;
+
+    /** Official karts and tracks available in server. */
+    // FIXME: We should use two different variables instead of this weird
+    //        structure that contains both a list of tracks and a list of karts
+    std::pair<std::set<std::string>, std::set<std::string> > m_official_kts;
+
+    /** Addon karts and tracks available in server. */
+    // FIXME: We should use two different variables instead of this weird
+    //        structure that contains both a list of tracks and a list of karts
+    std::pair<std::set<std::string>, std::set<std::string> > m_addon_kts;
+
+    /** Addon arenas available in server. */
+    std::set<std::string> m_addon_arenas;
+
+    /** Addon soccers available in server. */
+    std::set<std::string> m_addon_soccers;
+
+    std::map<std::weak_ptr<STKPeer>, std::set<irr::core::stringw>,
+        std::owner_less<std::weak_ptr<STKPeer> > > m_peers_muted_players;
+
              ServerLobby();
     virtual ~ServerLobby();
 
@@ -320,6 +325,7 @@ public:
     virtual void update(int ticks) OVERRIDE;
     virtual void asynchronousUpdate() OVERRIDE;
 
+    void updatePlayerList(bool update_when_reset_server = false);
     void startSelection(const Event *event=NULL);
     void checkIncomingConnectionRequests();
     void finishedLoadingWorld() OVERRIDE;
@@ -344,10 +350,13 @@ public:
         return std::find(m_ai_profiles.begin(), m_ai_profiles.end(), npp) !=
             m_ai_profiles.end();
     }
-    uint32_t getServerIdOnline() const           { return m_server_id_online; }
-    void setClientServerHostId(uint32_t id)   { m_client_server_host_id = id; }
+    uint32_t getServerIdOnline() const                 { return m_server_id_online; }
+    uint32_t getClientServerHostId() const { return m_client_server_host_id.load(); }
+    void setClientServerHostId(uint32_t id)         { m_client_server_host_id = id; }
     static int m_fixed_laps;
     bool playerReportsTableExists() const;
+    GameSetup* getGameSetup()                          { return m_game_setup; }
+    ProcessType getProcessType()                     { return m_process_type; }
 };   // class ServerLobby
 
 #endif // SERVER_LOBBY_HPP
