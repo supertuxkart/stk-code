@@ -114,9 +114,12 @@ void GrandPrixEditorScreen::eventCallback(Widget* widget, const std::string& nam
         }
         else if (m_action == "rename" && m_selection != NULL)
         {
-            new GeneralTextFieldDialog(_("Please enter the name of the grand prix"),
+            GeneralTextFieldDialog* dialog = new GeneralTextFieldDialog(_("Please enter the name of the grand prix"),
                 std::bind(&GrandPrixEditorScreen::setNewGPWithName,
                           this, std::placeholders::_1), validateName);
+            
+            // Prefill the textbox with the current grand prix name
+            dialog->getTextField()->setText(m_selection->getName());
         }
     }
     else if (name == "gpgroups")
