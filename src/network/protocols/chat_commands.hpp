@@ -46,6 +46,7 @@ class Ranking;
 
 namespace ChatCommands
 {
+    void answerCommand(std::string msg, std::shared_ptr<STKPeer> peer);
     void handleServerCommand(ServerLobby* lobby, Event* event, std::shared_ptr<STKPeer> peer);
 }
 

@@ -68,10 +68,19 @@
 #include <iostream>
 #include <iterator>
 
-using namespace ProtocolUtils;
-
 namespace ChatCommands
 {
+    //-----------------------------------------------------------------------------
+    void answerCommand(std::string msg, std::shared_ptr<STKPeer> peer)
+    {
+        NetworkString* chat = ProtocolUtils::getNetworkString(ProtocolType::PROTOCOL_LOBBY_ROOM);
+        chat->addUInt8(LobbyProtocol::LE_CHAT);
+        chat->setSynchronous(true);
+        chat->encodeString16(StringUtils::utf8ToWide(msg));
+        peer->sendPacket(chat, true/*reliable*/);
+        delete chat;
+    }
+
     //-----------------------------------------------------------------------------
     void handleServerCommand(ServerLobby* lobby, Event* event, std::shared_ptr<STKPeer> peer)
     {
@@ -87,26 +96,14 @@ namespace ChatCommands
         {
             if (lobby->getGameSetup()->isGrandPrix() || !ServerConfig::m_live_players)
             {
-                NetworkString* chat = getNetworkString(ProtocolType::PROTOCOL_LOBBY_ROOM);
-                chat->addUInt8(LobbyProtocol::LE_CHAT);
-                chat->setSynchronous(true);
-                std::string msg = "Server doesn't support spectate";
-                chat->encodeString16(StringUtils::utf8ToWide(msg));
-                peer->sendPacket(chat, true/*reliable*/);
-                delete chat;
+                answerCommand("Server doesn't support spectate", peer);
                 return;
             }
     
             if (argv.size() != 2 || (argv[1] != "0" && argv[1] != "1") ||
                 lobby->getCurrentState() != ServerLobby::ServerState::WAITING_FOR_START_GAME)
             {
-                NetworkString* chat = getNetworkString(ProtocolType::PROTOCOL_LOBBY_ROOM);
-                chat->addUInt8(LobbyProtocol::LE_CHAT);
-                chat->setSynchronous(true);
-                std::string msg = "Usage: spectate [0 or 1], before game started";
-                chat->encodeString16(StringUtils::utf8ToWide(msg));
-                peer->sendPacket(chat, true/*reliable*/);
-                delete chat;
+                answerCommand("Usage: spectate [0 or 1], before game started", peer);
                 return;
             }
     
@@ -115,13 +112,7 @@ namespace ChatCommands
                 if (lobby->getProcessType() == PT_CHILD &&
                     peer->getHostId() == lobby->getClientServerHostId())
                 {
-                    NetworkString* chat = getNetworkString(ProtocolType::PROTOCOL_LOBBY_ROOM);
-                    chat->addUInt8(LobbyProtocol::LE_CHAT);
-                    chat->setSynchronous(true);
-                    std::string msg = "Graphical client server cannot spectate";
-                    chat->encodeString16(StringUtils::utf8ToWide(msg));
-                    peer->sendPacket(chat, true/*reliable*/);
-                    delete chat;
+                    answerCommand("Graphical client server cannot spectate", peer);
                     return;
                 }
                 peer->setAlwaysSpectate(ASM_COMMAND);
@@ -132,9 +123,6 @@ namespace ChatCommands
         }
         else if (argv[0] == "listserveraddon")
         {
-            NetworkString* chat = getNetworkString(ProtocolType::PROTOCOL_LOBBY_ROOM);
-            chat->addUInt8(LobbyProtocol::LE_CHAT);
-            chat->setSynchronous(true);
             bool has_options = argv.size() > 1 &&
                 (argv[1].compare("-track") == 0 ||
                 argv[1].compare("-arena") == 0 ||
@@ -144,10 +132,9 @@ namespace ChatCommands
                 (argv.size() == 2 && (argv[1].size() < 3 || has_options)) ||
                 (argv.size() == 3 && (!has_options || argv[2].size() < 3)))
             {
-                chat->encodeString16(
-                    L"Usage: /listserveraddon [option][addon string to find "
+                answerCommand("Usage: /listserveraddon [option][addon string to find "
                     "(at least 3 characters)]. Available options: "
-                    "-track, -arena, -kart, -soccer.");
+                    "-track, -arena, -kart, -soccer.", peer);
             }
             else
             {
@@ -196,22 +183,19 @@ namespace ChatCommands
                     msg += ", ";
                 }
                 if (msg.empty())
-                    chat->encodeString16(L"Addon not found");
+                {
+                    msg = "Addon not found";
+                }
                 else
                 {
                     msg = msg.substr(0, msg.size() - 2);
-                    chat->encodeString16(StringUtils::utf8ToWide(
-                        std::string("Server addon: ") + msg));
+                    msg = "Server addon: " + msg;
                 }
+                answerCommand(msg, peer);
             }
-            peer->sendPacket(chat, true/*reliable*/);
-            delete chat;
         }
         else if (StringUtils::startsWith(cmd, "playerhasaddon"))
         {
-            NetworkString* chat = getNetworkString(ProtocolType::PROTOCOL_LOBBY_ROOM);
-            chat->addUInt8(LobbyProtocol::LE_CHAT);
-            chat->setSynchronous(true);
             std::string part;
             if (cmd.length() > 15)
                 part = cmd.substr(15);
@@ -223,8 +207,7 @@ namespace ChatCommands
                 StringUtils::utf8ToWide(player_name));
             if (player_name.empty() || !player_peer || addon_id.empty())
             {
-                chat->encodeString16(
-                    L"Usage: /playerhasaddon [addon_identity] [player name]");
+                answerCommand("Usage: /playerhasaddon [addon_identity] [player name]", peer);
             }
             else
             {
@@ -250,30 +233,20 @@ namespace ChatCommands
                         }
                     }
                 }
+                std::string msg = player_name;
                 if (found)
-                {
-                    chat->encodeString16(StringUtils::utf8ToWide
-                        (player_name + " has addon " + addon_id));
-                }
+                    msg += " has addon " + addon_id;
                 else
-                {
-                    chat->encodeString16(StringUtils::utf8ToWide
-                        (player_name + " has no addon " + addon_id));
-                }
+                    msg += " has no addon " + addon_id;
+
+                answerCommand(msg, peer);
             }
-            peer->sendPacket(chat, true/*reliable*/);
-            delete chat;
         }
         else if (StringUtils::startsWith(cmd, "kick"))
         {
             if (lobby->m_server_owner.lock() != peer)
             {
-                NetworkString* chat = getNetworkString(ProtocolType::PROTOCOL_LOBBY_ROOM);
-                chat->addUInt8(LobbyProtocol::LE_CHAT);
-                chat->setSynchronous(true);
-                chat->encodeString16(L"You are not server owner");
-                peer->sendPacket(chat, true/*reliable*/);
-                delete chat;
+                answerCommand("You are not server owner", peer);
                 return;
             }
             std::string player_name;
@@ -281,26 +254,14 @@ namespace ChatCommands
                 player_name = cmd.substr(5);
             std::shared_ptr<STKPeer> player_peer = STKHost::get()->findPeerByName(
                 StringUtils::utf8ToWide(player_name));
+
             if (player_name.empty() || !player_peer || player_peer->isAIPeer())
-            {
-                NetworkString* chat = getNetworkString(ProtocolType::PROTOCOL_LOBBY_ROOM);
-                chat->addUInt8(LobbyProtocol::LE_CHAT);
-                chat->setSynchronous(true);
-                chat->encodeString16(
-                    L"Usage: /kick [player name]");
-                peer->sendPacket(chat, true/*reliable*/);
-                delete chat;
-            }
+                answerCommand("Usage: /kick [player name]", peer);
             else
-            {
                 player_peer->kick();
-            }
         }
         else if (StringUtils::startsWith(cmd, "playeraddonscore"))
         {
-            NetworkString* chat = getNetworkString(ProtocolType::PROTOCOL_LOBBY_ROOM);
-            chat->addUInt8(LobbyProtocol::LE_CHAT);
-            chat->setSynchronous(true);
             std::string player_name;
             if (cmd.length() > 17)
                 player_name = cmd.substr(17);
@@ -308,77 +269,59 @@ namespace ChatCommands
                 StringUtils::utf8ToWide(player_name));
             if (player_name.empty() || !player_peer)
             {
-                chat->encodeString16(
-                    L"Usage: /playeraddonscore [player name] (return 0-100)");
+                answerCommand("Usage: /playeraddonscore [player name] (return 0-100)", peer);
+                return;
             }
-            else
+
+            auto& scores = player_peer->getAddonsScores();
+            if (scores[AS_KART] == -1 && scores[AS_TRACK] == -1 &&
+                scores[AS_ARENA] == -1 && scores[AS_SOCCER] == -1)
             {
-                auto& scores = player_peer->getAddonsScores();
-                if (scores[AS_KART] == -1 && scores[AS_TRACK] == -1 &&
-                    scores[AS_ARENA] == -1 && scores[AS_SOCCER] == -1)
-                {
-                    chat->encodeString16(StringUtils::utf8ToWide
-                        (player_name + " has no addon"));
-                }
-                else
-                {
-                    std::string msg = player_name;
-                    msg += " addon:";
-                    if (scores[AS_KART] != -1)
-                        msg += " kart: " + StringUtils::toString(scores[AS_KART]) + ",";
-                    if (scores[AS_TRACK] != -1)
-                        msg += " track: " + StringUtils::toString(scores[AS_TRACK]) + ",";
-                    if (scores[AS_ARENA] != -1)
-                        msg += " arena: " + StringUtils::toString(scores[AS_ARENA]) + ",";
-                    if (scores[AS_SOCCER] != -1)
-                        msg += " soccer: " + StringUtils::toString(scores[AS_SOCCER]) + ",";
-                    msg = msg.substr(0, msg.size() - 1);
-                    chat->encodeString16(StringUtils::utf8ToWide(msg));
-                }
+                answerCommand(player_name + " has no addon", peer);
+                return;
             }
-            peer->sendPacket(chat, true/*reliable*/);
-            delete chat;
+
+            std::string msg = player_name;
+            msg += " addon:";
+            if (scores[AS_KART] != -1)
+                msg += " kart: " + StringUtils::toString(scores[AS_KART]) + ",";
+            if (scores[AS_TRACK] != -1)
+                msg += " track: " + StringUtils::toString(scores[AS_TRACK]) + ",";
+            if (scores[AS_ARENA] != -1)
+                msg += " arena: " + StringUtils::toString(scores[AS_ARENA]) + ",";
+            if (scores[AS_SOCCER] != -1)
+                msg += " soccer: " + StringUtils::toString(scores[AS_SOCCER]) + ",";
+            msg = msg.substr(0, msg.size() - 1);
+            answerCommand(msg, peer);
         }
         else if (argv[0] == "serverhasaddon")
         {
-            NetworkString* chat = getNetworkString(ProtocolType::PROTOCOL_LOBBY_ROOM);
-            chat->addUInt8(LobbyProtocol::LE_CHAT);
-            chat->setSynchronous(true);
             if (argv.size() != 2)
             {
-                chat->encodeString16(
-                    L"Usage: /serverhasaddon [addon_identity]");
+                answerCommand("Usage: /serverhasaddon [addon_identity]", peer);
+                return;
             }
+
+            std::set<std::string> total_addons;
+            total_addons.insert(lobby->m_addon_kts.first.begin(), lobby->m_addon_kts.first.end());
+            total_addons.insert(lobby->m_addon_kts.second.begin(), lobby->m_addon_kts.second.end());
+            total_addons.insert(lobby->m_addon_arenas.begin(), lobby->m_addon_arenas.end());
+            total_addons.insert(lobby->m_addon_soccers.begin(), lobby->m_addon_soccers.end());
+            std::string addon_id_test = Addon::createAddonId(argv[1]);
+            bool found = total_addons.find(addon_id_test) != total_addons.end();
+
+            if (found)
+                answerCommand("Server has addon " + argv[1], peer);
             else
-            {
-                std::set<std::string> total_addons;
-                total_addons.insert(lobby->m_addon_kts.first.begin(), lobby->m_addon_kts.first.end());
-                total_addons.insert(lobby->m_addon_kts.second.begin(), lobby->m_addon_kts.second.end());
-                total_addons.insert(lobby->m_addon_arenas.begin(), lobby->m_addon_arenas.end());
-                total_addons.insert(lobby->m_addon_soccers.begin(), lobby->m_addon_soccers.end());
-                std::string addon_id_test = Addon::createAddonId(argv[1]);
-                bool found = total_addons.find(addon_id_test) != total_addons.end();
-                if (found)
-                {
-                    chat->encodeString16(StringUtils::utf8ToWide(std::string
-                        ("Server has addon ") + argv[1]));
-                }
-                else
-                {
-                    chat->encodeString16(StringUtils::utf8ToWide(std::string
-                        ("Server has no addon ") + argv[1]));
-                }
-            }
-            peer->sendPacket(chat, true/*reliable*/);
-            delete chat;
+                answerCommand("Server has no addon " + argv[1], peer);
+
         }
         else if (argv[0] == "mute")
         {
             std::shared_ptr<STKPeer> player_peer;
             std::string result_msg;
             core::stringw player_name;
-            NetworkString* result = NULL;
-    
+
             if (argv.size() != 2 || argv[1].empty())
                 goto mute_error;
     
@@ -389,31 +332,19 @@ namespace ChatCommands
                 goto mute_error;
     
             lobby->m_peers_muted_players[peer].insert(player_name);
-            result = getNetworkString(ProtocolType::PROTOCOL_LOBBY_ROOM);
-            result->addUInt8(LobbyProtocol::LE_CHAT);
-            result->setSynchronous(true);
             result_msg = "Muted player ";
             result_msg += argv[1];
-            result->encodeString16(StringUtils::utf8ToWide(result_msg));
-            peer->sendPacket(result, true/*reliable*/);
-            delete result;
+            answerCommand(result_msg, peer);
             return;
     
     mute_error:
-            NetworkString* error = getNetworkString(ProtocolType::PROTOCOL_LOBBY_ROOM);
-            error->addUInt8(LobbyProtocol::LE_CHAT);
-            error->setSynchronous(true);
-            std::string msg = "Usage: /mute player_name (not including yourself)";
-            error->encodeString16(StringUtils::utf8ToWide(msg));
-            peer->sendPacket(error, true/*reliable*/);
-            delete error;
+            answerCommand("Usage: /mute player_name (not including yourself)", peer);
         }
         else if (argv[0] == "unmute")
         {
             std::shared_ptr<STKPeer> player_peer;
             std::string result_msg;
             core::stringw player_name;
-            NetworkString* result = NULL;
     
             if (argv.size() != 2 || argv[1].empty())
                 goto unmute_error;
@@ -433,56 +364,35 @@ namespace ChatCommands
             goto unmute_error;
 
     unmute_success:
-            result = getNetworkString(ProtocolType::PROTOCOL_LOBBY_ROOM);
-            result->addUInt8(LobbyProtocol::LE_CHAT);
-            result->setSynchronous(true);
             result_msg = "Unmuted player ";
             result_msg += argv[1];
-            result->encodeString16(StringUtils::utf8ToWide(result_msg));
-            peer->sendPacket(result, true/*reliable*/);
-            delete result;
+            answerCommand(result_msg, peer);
             return;
 
     unmute_error:
-            NetworkString* error = getNetworkString(ProtocolType::PROTOCOL_LOBBY_ROOM);
-            error->addUInt8(LobbyProtocol::LE_CHAT);
-            error->setSynchronous(true);
-            std::string msg = "Usage: /unmute player_name";
-            error->encodeString16(StringUtils::utf8ToWide(msg));
-            peer->sendPacket(error, true/*reliable*/);
-            delete error;
+            answerCommand("Usage: /unmute player_name", peer);
         }
         else if (argv[0] == "listmute")
         {
-            NetworkString* chat = getNetworkString(ProtocolType::PROTOCOL_LOBBY_ROOM);
-            chat->addUInt8(LobbyProtocol::LE_CHAT);
-            chat->setSynchronous(true);
             core::stringw total;
             for (auto& name : lobby->m_peers_muted_players[peer])
             {
                 total += name;
                 total += " ";
             }
+
             if (total.empty())
-                chat->encodeString16("No player has been muted by you");
+                total = "No player has been muted by you";
             else
-            {
                 total += "muted";
-                chat->encodeString16(total);
-            }
-            peer->sendPacket(chat, true/*reliable*/);
-            delete chat;
+
+            answerCommand(StringUtils::wideToUtf8(total), peer);
         }
         else
         {
-            NetworkString* chat = getNetworkString(ProtocolType::PROTOCOL_LOBBY_ROOM);
-            chat->addUInt8(LobbyProtocol::LE_CHAT);
-            chat->setSynchronous(true);
             std::string msg = "Unknown command: ";
             msg += cmd;
-            chat->encodeString16(StringUtils::utf8ToWide(msg));
-            peer->sendPacket(chat, true/*reliable*/);
-            delete chat;
+            answerCommand(msg, peer);
         }
     }   // handleServerCommand
 } // namespace
