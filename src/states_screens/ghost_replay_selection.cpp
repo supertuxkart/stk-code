@@ -242,20 +242,12 @@ void GhostReplaySelection::loadList()
                 // no need to check this again.
                 const ReplayPlay::ReplayData& bt = ReplayPlay::get()->getReplayData(m_best_times_index[j]);
 
-                // If it's not the same track, check further in the index
-                if (rd.m_track_name != bt.m_track_name)
-                    continue;
-
-                // If it's not the same difficulty, check further in the index
-                if (rd.m_difficulty != bt.m_difficulty)
-                    continue;
-
-                // If it's not the same direction, check further in the index
-                if (rd.m_reverse != bt.m_reverse)
-                    continue;
-
-                // If it's not the same lap numbers, check further in the index
-                if (rd.m_laps != bt.m_laps)
+                // Check further in the index if it's not the same track, not the same difficulty,
+                // not the same direction or not the same laps number.
+                if (rd.m_track_name != bt.m_track_name ||
+                    rd.m_difficulty != bt.m_difficulty ||
+                    rd.m_reverse    != bt.m_reverse    ||
+                    rd.m_laps       != bt.m_laps)
                     continue;
 
                 // The replay data have the same properties, compare the times
@@ -275,13 +267,9 @@ void GhostReplaySelection::loadList()
             {
                 // Update the value
                 if (replace_old_best)
-                {
                     m_best_times_index[index_old_best] = i;
-                }
                 else
-                {
                     m_best_times_index.push_back(i);
-                }
             }
         }
     }
@@ -338,21 +326,14 @@ void GhostReplaySelection::loadList()
         // Only display replays comparable with the replay selected for comparison
         if (m_is_comparing)
         {
-                // If it's not the same track, check further in the index
-                if (rd.m_track_name != rd_compare.m_track_name)
-                    continue;
-
-                // If it's not the same direction, check further in the index
-                if (rd.m_reverse != rd_compare.m_reverse)
-                    continue;
-
-                // If it's not the same lap numbers, check further in the index
-                if (rd.m_laps != rd_compare.m_laps)
-                    continue;
-
-                // Don't compare a replay with itself
-                if (compare_index == i)
-                    continue;
+            // Check further in the index if it's not the same track,
+            // not the same direction, not the same lap number.
+            // Also prevent comparing a replay with itself.
+            if (rd.m_track_name != rd_compare.m_track_name ||
+                rd.m_reverse    != rd_compare.m_reverse    ||
+                rd.m_laps       != rd_compare.m_laps       ||
+                compare_index == i)
+                continue;
         }
         // Only display replays matching the current mode
         if (m_active_mode == RaceManager::MINOR_MODE_TIME_TRIAL &&

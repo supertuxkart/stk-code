@@ -81,6 +81,8 @@ extern "C"
 }
 #endif
 
+using namespace ProtocolUtils;
+
 // ============================================================================
 std::thread ClientLobby::m_background_download;
 std::shared_ptr<Online::HTTPRequest> ClientLobby::m_download_request;
@@ -175,7 +177,7 @@ void ClientLobby::setup()
  */
 void ClientLobby::doneWithResults()
 {
-    NetworkString* done = getNetworkString(1);
+    NetworkString* done = getNetworkString(m_type, 1);
     done->setSynchronous(true);
     done->addUInt8(LE_RACE_FINISHED_ACK);
     sendToServer(done, /*reliable*/true);
@@ -410,7 +412,7 @@ void ClientLobby::update(int ticks)
         std::string ua = StringUtils::getUserAgentString();
         if (NetworkConfig::get()->isNetworkAIInstance())
             ua = "AI";
-        NetworkString* ns = getNetworkString();
+        NetworkString* ns = getNetworkString(m_type);
         ns->addUInt8(LE_CONNECTION_REQUESTED)
             .addUInt32(ServerConfig::m_server_version).encodeString(ua)
             .addUInt16((uint16_t)stk_config->m_network_capabilities.size());
@@ -1286,7 +1288,7 @@ void ClientLobby::backToLobby(Event *event)
  */
 void ClientLobby::finishedLoadingWorld()
 {
-    NetworkString* ns = getNetworkString(1);
+    NetworkString* ns = getNetworkString(m_type, 1);
     ns->setSynchronous(m_server_send_live_load_world);
     ns->addUInt8(LE_CLIENT_LOADED_WORLD);
     sendToServer(ns, true);
@@ -1385,7 +1387,7 @@ void ClientLobby::finishLiveJoin()
 //-----------------------------------------------------------------------------
 void ClientLobby::requestKartInfo(uint8_t kart_id)
 {
-    NetworkString* ns = getNetworkString(1);
+    NetworkString* ns = getNetworkString(m_type, 1);
     ns->setSynchronous(true);
     ns->addUInt8(LE_KART_INFO).addUInt8(kart_id);
     sendToServer(ns, true/*reliable*/);
@@ -1481,7 +1483,7 @@ void ClientLobby::sendChat(irr::core::stringw text, KartTeam team)
     text = text.trim().removeChars(L"\n\r");
     if (text.size() > 0)
     {
-        NetworkString* chat = getNetworkString();
+        NetworkString* chat = getNetworkString(m_type);
         chat->addUInt8(LobbyProtocol::LE_CHAT);
 
         core::stringw name;
@@ -1874,7 +1876,7 @@ void ClientLobby::handleClientCommand(const std::string& cmd)
     else
     {
         // Send for server command
-        NetworkString* cmd_ns = getNetworkString(1);
+        NetworkString* cmd_ns = getNetworkString(m_type, 1);
         const std::string& language = UserConfigParams::m_language;
         cmd_ns->addUInt8(LE_COMMAND).encodeString(language).encodeString(cmd);
         sendToServer(cmd_ns, /*reliable*/true);
@@ -1916,7 +1918,7 @@ void ClientLobby::getKartsTracksNetworkString(BareNetworkString* ns)
 // ----------------------------------------------------------------------------
 void ClientLobby::updateAssetsToServer()
 {
-    NetworkString* ns = getNetworkString(1);
+    NetworkString* ns = getNetworkString(m_type, 1);
     ns->addUInt8(LE_ASSETS_UPDATE);
     getKartsTracksNetworkString(ns);
     sendToServer(ns, /*reliable*/true);

@@ -15,6 +15,8 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
+#ifndef SERVER_ONLY // No GUI files in server builds
+
 // Manages includes common to all options screens
 #include "states_screens/options/options_common.hpp"
 
@@ -363,3 +365,5 @@ void OptionsScreenInput::onUpdate(float dt)
     }
     //m_highlights[internal_name]
 }   // onUpdate
+
+#endif // ifndef SERVER_ONLY

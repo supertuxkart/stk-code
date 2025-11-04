@@ -3,7 +3,7 @@
     <icon-button id="back" x="1%" y="0" height="9%" icon="gui/icons/back.png"/>
 
     <div x="1%" y="1%" width="98%" height="98%" layout="vertical-row" >
-        <header width="80%" height="8%" align="center" I18N="Title in grand prix editor screen" text="Grand Prix editor" text_align="center"/>
+        <header width="80%" height="8%" align="center" I18N="Title in grand prix editor screen" text="Grand Prix Editor" text_align="center"/>
         <spacer width="100%" height="1%"/>
 
         <box proportion="5" width="100%" layout="vertical-row">

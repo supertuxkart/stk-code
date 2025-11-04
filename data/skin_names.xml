@@ -1,0 +1,19 @@
+<?xml version="1.0"?>
+<!-- The game never actually parses this file:
+     It is used by update_pot.sh to generate strings for translation.
+     It keeps the XML organization for proper parsing there and for clarity. -->
+
+<themes>
+    <base_theme>
+        <skin I18N="Base theme name" text="Classic"/>
+        <skin I18N="Base theme name" text="Cartoon"/>
+    </base_theme>
+    <theme_variant>
+        <skin I18N="Theme variant name" text="Peach"/>
+        <skin I18N="Theme variant name" text="Ocean"/>
+        <skin I18N="Theme variant name" text="Forest"/>
+        <skin I18N="Theme variant name" text="Ruby"/>
+        <skin I18N="Theme variant name" text="Coal"/>
+        <skin I18N="Theme variant name" text="Desert"/>
+    </theme_variant>
+</themes>

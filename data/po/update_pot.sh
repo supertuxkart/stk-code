@@ -18,7 +18,8 @@ XML_FILE_LIST="`find ./data                        \
                      ../supertuxkart-assets/karts  \
                      ./android/res/values          \
                      -name 'achievements.xml' -or  \
-                     -name 'tips.xml' -or  \
+                     -name 'skin_names.xml' -or    \
+                     -name 'tips.xml' -or          \
                      -name 'kart.xml' -or          \
                      -name 'track.xml' -or         \
                      -name 'scene.xml' -or         \

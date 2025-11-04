@@ -38,6 +38,7 @@
 #include "network/network_player_profile.hpp"
 #include "network/peer_vote.hpp"
 #include "network/protocol_manager.hpp"
+#include "network/protocols/chat_commands.hpp"
 #include "network/protocols/connect_to_peer.hpp"
 #include "network/protocols/game_protocol.hpp"
 #include "network/protocols/game_events_protocol.hpp"
@@ -65,6 +66,8 @@
 #include <fstream>
 #include <iostream>
 #include <iterator>
+
+using namespace ProtocolUtils;
 
 int ServerLobby::m_fixed_laps = -1;
 // ========================================================================
@@ -179,7 +182,7 @@ ServerLobby::ServerLobby() : LobbyProtocol()
 
         m_ranking = std::make_shared<Ranking>();
     }
-    m_result_ns = getNetworkString();
+    m_result_ns = getNetworkString(m_type);
     m_result_ns->setSynchronous(true);
     m_items_complete_state = new BareNetworkString();
     m_server_id_online.store(0);
@@ -466,7 +469,7 @@ void ServerLobby::handleChat(Event* event)
         event->getPeer()->getConsecutiveMessages() >
         ServerConfig::m_chat_consecutive_interval / 2)
     {
-        NetworkString* chat = getNetworkString();
+        NetworkString* chat = getNetworkString(m_type);
         chat->setSynchronous(true);
         core::stringw warn = "Spam detected";
         chat->addUInt8(LE_CHAT).encodeString16(warn);
@@ -486,7 +489,7 @@ void ServerLobby::handleChat(Event* event)
     
     if (!StringUtils::startsWith(message_utf8, prefix))
     {
-        NetworkString* chat = getNetworkString();
+        NetworkString* chat = getNetworkString(m_type);
         chat->setSynchronous(true);
         // This string is not set to be translatable, because it is
         // currently written by the server. The server would have
@@ -512,7 +515,7 @@ void ServerLobby::handleChat(Event* event)
         else if (target_team == KART_TEAM_BLUE)
             message = StringUtils::utf32ToWide({0x1f7e6, 0x20}) + message;
 
-        NetworkString* chat = getNetworkString();
+        NetworkString* chat = getNetworkString(m_type);
         chat->setSynchronous(true);
         chat->addUInt8(LE_CHAT).encodeString16(message);
         const bool game_started = m_state.load() != WAITING_FOR_START_GAME;
@@ -627,7 +630,7 @@ bool ServerLobby::notifyEventAsynchronous(Event* event)
         case LE_ASSETS_UPDATE:
             handleAssets(event->data(), event->getPeer());        break;
         case LE_COMMAND:
-            handleServerCommand(event, event->getPeerSP());       break;
+            ChatCommands::handleServerCommand(this, event, event->getPeerSP()); break;
         default:                                                  break;
         }   // switch
     } // if (event->getType() == EVENT_TYPE_MESSAGE)
@@ -766,7 +769,7 @@ void ServerLobby::writePlayerReport(Event* event)
             reporting_peer.get(), reporting_npp, info);
     if (written)
     {
-        NetworkString* success = getNetworkString();
+        NetworkString* success = getNetworkString(m_type);
         success->setSynchronous(true);
         success->addUInt8(LE_REPORT_PLAYER).addUInt8(1)
             .encodeString(reporting_npp->getName());
@@ -1128,7 +1131,7 @@ NetworkString* ServerLobby::getLoadWorldMessage(
     std::vector<std::shared_ptr<NetworkPlayerProfile> >& players,
     bool live_join) const
 {
-    NetworkString* load_world_message = getNetworkString();
+    NetworkString* load_world_message = getNetworkString(m_type);
     load_world_message->setSynchronous(true);
     load_world_message->addUInt8(LE_LOAD_WORLD);
     load_world_message->addUInt32(m_winner_peer_id);
@@ -1204,13 +1207,13 @@ bool ServerLobby::worldIsActive() const
  */
 void ServerLobby::rejectLiveJoin(STKPeer* peer, BackLobbyReason blr)
 {
-    NetworkString* reset = getNetworkString(2);
+    NetworkString* reset = getNetworkString(m_type, 2);
     reset->setSynchronous(true);
     reset->addUInt8(LE_BACK_LOBBY).addUInt8(blr);
     peer->sendPacket(reset, /*reliable*/true);
     delete reset;
     updatePlayerList();
-    NetworkString* server_info = getNetworkString();
+    NetworkString* server_info = getNetworkString(m_type);
     server_info->setSynchronous(true);
     server_info->addUInt8(LE_SERVER_INFO);
     m_game_setup->addServerInfo(server_info);
@@ -1458,7 +1461,7 @@ void ServerLobby::finishedLoadingLiveJoinClient(Event* event)
     }
 
     const uint8_t cc = (uint8_t)Track::getCurrentTrack()->getCheckManager()->getCheckStructureCount();
-    NetworkString* ns = getNetworkString(10);
+    NetworkString* ns = getNetworkString(m_type, 10);
     ns->setSynchronous(true);
     ns->addUInt8(LE_LIVE_JOIN_ACK).addUInt64(m_client_starting_time)
         .addUInt8(cc).addUInt64(live_join_start_time)
@@ -1586,7 +1589,7 @@ void ServerLobby::update(int ticks)
         {
             // Send a notification to all players who may have start live join
             // or spectate to go back to lobby
-            NetworkString* back_to_lobby = getNetworkString(2);
+            NetworkString* back_to_lobby = getNetworkString(m_type, 2);
             back_to_lobby->setSynchronous(true);
             back_to_lobby->addUInt8(LE_BACK_LOBBY).addUInt8(BLR_NONE);
             sendMessageToPeersInServer(back_to_lobby, /*reliable*/true);
@@ -1599,7 +1602,7 @@ void ServerLobby::update(int ticks)
         else if (auto ai = m_ai_peer.lock())
         {
             // Reset AI peer for empty server, which will delete world
-            NetworkString* back_to_lobby = getNetworkString(2);
+            NetworkString* back_to_lobby = getNetworkString(m_type, 2);
             back_to_lobby->setSynchronous(true);
             back_to_lobby->addUInt8(LE_BACK_LOBBY).addUInt8(BLR_NONE);
             ai->sendPacket(back_to_lobby, /*reliable*/true);
@@ -1620,7 +1623,7 @@ void ServerLobby::update(int ticks)
         m_state.load() == SELECTING &&
         STKHost::get()->getPlayersInGame() == 1)
     {
-        NetworkString* back_lobby = getNetworkString(2);
+        NetworkString* back_lobby = getNetworkString(m_type, 2);
         back_lobby->setSynchronous(true);
         back_lobby->addUInt8(LE_BACK_LOBBY)
             .addUInt8(BLR_ONE_PLAYER_IN_RANKED_MATCH);
@@ -1683,7 +1686,7 @@ void ServerLobby::update(int ticks)
         {
             // Send a notification to all clients to exit
             // the race result screen
-            NetworkString* back_to_lobby = getNetworkString(2);
+            NetworkString* back_to_lobby = getNetworkString(m_type, 2);
             back_to_lobby->setSynchronous(true);
             back_to_lobby->addUInt8(LE_BACK_LOBBY).addUInt8(BLR_NONE);
             sendMessageToPeersInServer(back_to_lobby, /*reliable*/true);
@@ -1900,7 +1903,7 @@ void ServerLobby::startSelection(const Event *event)
             Log::warn("ServerLobby", "Bad team choosing.");
             if (event)
             {
-                NetworkString* bt = getNetworkString();
+                NetworkString* bt = getNetworkString(m_type);
                 bt->setSynchronous(true);
                 bt->addUInt8(LE_BAD_TEAM);
                 event->getPeer()->sendPacket(bt, true/*reliable*/);
@@ -2097,7 +2100,7 @@ void ServerLobby::startSelection(const Event *event)
     }
 
     startVotingPeriod(ServerConfig::m_voting_timeout);
-    NetworkString *ns = getNetworkString(1);
+    NetworkString *ns = getNetworkString(m_type, 1);
     // Start selection - must be synchronous since the receiver pushes
     // a new screen, which must be done from the main thread.
     ns->setSynchronous(true);
@@ -2126,7 +2129,7 @@ void ServerLobby::startSelection(const Event *event)
     m_state = SELECTING;
     if (!always_spectate_peers.empty())
     {
-        NetworkString* back_lobby = getNetworkString(2);
+        NetworkString* back_lobby = getNetworkString(m_type, 2);
         back_lobby->setSynchronous(true);
         back_lobby->addUInt8(LE_BACK_LOBBY).addUInt8(BLR_SPECTATING_NEXT_GAME);
         STKHost::get()->sendPacketToAllPeersWith(
@@ -2421,7 +2424,7 @@ void ServerLobby::clientDisconnected(Event* event)
     if (players_on_peer.empty())
         return;
 
-    NetworkString* msg = getNetworkString(2);
+    NetworkString* msg = getNetworkString(m_type, 2);
     const bool waiting_peer_disconnected =
         event->getPeer()->isWaitingForGame();
     msg->setSynchronous(true);
@@ -2456,7 +2459,7 @@ void ServerLobby::clientDisconnected(Event* event)
 //-----------------------------------------------------------------------------
 void ServerLobby::kickPlayerWithReason(STKPeer* peer, const char* reason) const
 {
-    NetworkString *message = getNetworkString(2);
+    NetworkString *message = getNetworkString(m_type, 2);
     message->setSynchronous(true);
     message->addUInt8(LE_CONNECTION_REFUSED).addUInt8(RR_BANNED);
     message->encodeString(std::string(reason));
@@ -2533,7 +2536,7 @@ bool ServerLobby::handleAssets(const NetworkString& ns, STKPeer* peer)
         okt < ServerConfig::m_official_karts_threshold ||
         ott < ServerConfig::m_official_tracks_threshold)
     {
-        NetworkString *message = getNetworkString(2);
+        NetworkString *message = getNetworkString(m_type, 2);
         message->setSynchronous(true);
         message->addUInt8(LE_CONNECTION_REFUSED)
             .addUInt8(RR_INCOMPATIBLE_DATA);
@@ -2622,7 +2625,7 @@ void ServerLobby::connectionRequested(Event* event)
         (m_state.load() != WAITING_FOR_START_GAME ||
         m_game_setup->isGrandPrixStarted()))
     {
-        NetworkString *message = getNetworkString(2);
+        NetworkString *message = getNetworkString(m_type, 2);
         message->setSynchronous(true);
         message->addUInt8(LE_CONNECTION_REFUSED).addUInt8(RR_BUSY);
         // send only to the peer that made the request and disconnect it now
@@ -2638,7 +2641,7 @@ void ServerLobby::connectionRequested(Event* event)
     if (version < stk_config->m_min_server_version ||
         version > stk_config->m_max_server_version)
     {
-        NetworkString *message = getNetworkString(2);
+        NetworkString *message = getNetworkString(m_type, 2);
         message->setSynchronous(true);
         message->addUInt8(LE_CONNECTION_REFUSED)
                 .addUInt8(RR_INCOMPATIBLE_DATA);
@@ -2690,7 +2693,7 @@ void ServerLobby::connectionRequested(Event* event)
     if (total_players + player_count + m_ai_profiles.size() >
         (unsigned)ServerConfig::m_server_max_players)
     {
-        NetworkString *message = getNetworkString(2);
+        NetworkString *message = getNetworkString(m_type, 2);
         message->setSynchronous(true);
         message->addUInt8(LE_CONNECTION_REFUSED).addUInt8(RR_TOO_MANY_PLAYERS);
         peer->sendPacket(message, true/*reliable*/, false/*encrypted*/);
@@ -2731,7 +2734,7 @@ void ServerLobby::connectionRequested(Event* event)
         ServerConfig::m_ai_handling && !m_ai_peer.expired()) ||
         unsupported_aes_mode)
     {
-        NetworkString* message = getNetworkString(2);
+        NetworkString* message = getNetworkString(m_type, 2);
         message->setSynchronous(true);
         message->addUInt8(LE_CONNECTION_REFUSED).addUInt8(RR_INVALID_PLAYER);
         peer->sendPacket(message, true/*reliable*/, false/*encrypted*/);
@@ -2773,7 +2776,7 @@ void ServerLobby::handleUnencryptedConnection(std::shared_ptr<STKPeer> peer,
     const std::string& server_pw = ServerConfig::m_private_server_password;
     if (password != server_pw)
     {
-        NetworkString *message = getNetworkString(2);
+        NetworkString *message = getNetworkString(m_type, 2);
         message->setSynchronous(true);
         message->addUInt8(LE_CONNECTION_REFUSED)
                 .addUInt8(RR_INCORRECT_PASSWORD);
@@ -2795,7 +2798,7 @@ void ServerLobby::handleUnencryptedConnection(std::shared_ptr<STKPeer> peer,
         if (total_players + player_count >
             (unsigned)ServerConfig::m_server_max_players)
         {
-            NetworkString *message = getNetworkString(2);
+            NetworkString *message = getNetworkString(m_type, 2);
             message->setSynchronous(true);
             message->addUInt8(LE_CONNECTION_REFUSED)
                 .addUInt8(RR_TOO_MANY_PLAYERS);
@@ -2812,7 +2815,7 @@ void ServerLobby::handleUnencryptedConnection(std::shared_ptr<STKPeer> peer,
             all_online_ids.find(online_id) != all_online_ids.end();
         if (ServerConfig::m_ranked && duplicated_ranked_player)
         {
-            NetworkString* message = getNetworkString(2);
+            NetworkString* message = getNetworkString(m_type, 2);
             message->setSynchronous(true);
             message->addUInt8(LE_CONNECTION_REFUSED)
                 .addUInt8(RR_INVALID_PLAYER);
@@ -2870,7 +2873,7 @@ void ServerLobby::handleUnencryptedConnection(std::shared_ptr<STKPeer> peer,
     peer->setValidated(true);
 
     // send a message to the one that asked to connect
-    NetworkString* server_info = getNetworkString();
+    NetworkString* server_info = getNetworkString(m_type);
     server_info->setSynchronous(true);
     server_info->addUInt8(LE_SERVER_INFO);
     m_game_setup->addServerInfo(server_info);
@@ -2878,7 +2881,7 @@ void ServerLobby::handleUnencryptedConnection(std::shared_ptr<STKPeer> peer,
     delete server_info;
 
     const bool game_started = m_state.load() != WAITING_FOR_START_GAME;
-    NetworkString* message_ack = getNetworkString(4);
+    NetworkString* message_ack = getNetworkString(m_type, 4);
     message_ack->setSynchronous(true);
     // connection success -- return the host id of peer
     float auto_start_timer = 0.0f;
@@ -3036,7 +3039,7 @@ void ServerLobby::updatePlayerList(bool update_when_reset_server)
         m_state.load() > WAITING_FOR_START_GAME && !update_when_reset_server)
         return;
 
-    NetworkString* pl = getNetworkString();
+    NetworkString* pl = getNetworkString(m_type);
     pl->setSynchronous(true);
     pl->addUInt8(LE_UPDATE_PLAYER_LIST)
         .addUInt8((uint8_t)(game_started ? 1 : 0))
@@ -3133,7 +3136,7 @@ void ServerLobby::updateServerOwner()
     }
     if (owner)
     {
-        NetworkString* ns = getNetworkString();
+        NetworkString* ns = getNetworkString(m_type);
         ns->setSynchronous(true);
         ns->addUInt8(LE_SERVER_OWNERSHIP);
         owner->sendPacket(ns);
@@ -3672,7 +3675,7 @@ void ServerLobby::configPeersStartTime()
     // (due to packet loss), the start time will still ahead of current time
     uint64_t start_time = STKHost::get()->getNetworkTimer() + (uint64_t)2500;
     powerup_manager->setRandomSeed(start_time);
-    NetworkString* ns = getNetworkString(10);
+    NetworkString* ns = getNetworkString(m_type, 10);
     ns->setSynchronous(true);
     ns->addUInt8(LE_START_RACE).addUInt64(start_time);
     const uint8_t cc = (uint8_t)Track::getCurrentTrack()->getCheckManager()->getCheckStructureCount();
@@ -3756,7 +3759,7 @@ void ServerLobby::resetServer()
     addWaitingPlayersToGame();
     resetPeersReady();
     updatePlayerList(true/*update_when_reset_server*/);
-    NetworkString* server_info = getNetworkString();
+    NetworkString* server_info = getNetworkString(m_type);
     server_info->setSynchronous(true);
     server_info->addUInt8(LE_SERVER_INFO);
     m_game_setup->addServerInfo(server_info);
@@ -3985,7 +3988,7 @@ void ServerLobby::handleServerConfiguration(Event* event)
         }
         if (tracks_erase.size() == m_available_kts.second.size())
         {
-            NetworkString *message = getNetworkString(2);
+            NetworkString *message = getNetworkString(m_type, 2);
             message->setSynchronous(true);
             message->addUInt8(LE_CONNECTION_REFUSED)
                 .addUInt8(RR_INCOMPATIBLE_DATA);
@@ -3997,7 +4000,7 @@ void ServerLobby::handleServerConfiguration(Event* event)
                 "Player has incompatible tracks for new game mode.");
         }
     }
-    NetworkString* server_info = getNetworkString();
+    NetworkString* server_info = getNetworkString(m_type);
     server_info->setSynchronous(true);
     server_info->addUInt8(LE_SERVER_INFO);
     m_game_setup->addServerInfo(server_info);
@@ -4239,7 +4242,7 @@ void ServerLobby::handleKartInfo(Event* event)
 
     const RemoteKartInfo& rki = RaceManager::get()->getKartInfo(kart_id);
 
-    NetworkString* ns = getNetworkString(1);
+    NetworkString* ns = getNetworkString(m_type, 1);
     ns->setSynchronous(true);
     ns->addUInt8(LE_KART_INFO).addUInt32(live_join_util_ticks)
         .addUInt8(kart_id) .encodeString(rki.getPlayerName())
@@ -4291,7 +4294,7 @@ void ServerLobby::clientInGameWantsToBackLobby(Event* event)
         }
         else
             exitGameState();
-        NetworkString* back_to_lobby = getNetworkString(2);
+        NetworkString* back_to_lobby = getNetworkString(m_type, 2);
         back_to_lobby->setSynchronous(true);
         back_to_lobby->addUInt8(LE_BACK_LOBBY)
             .addUInt8(BLR_SERVER_ONWER_QUITED_THE_GAME);
@@ -4325,13 +4328,13 @@ void ServerLobby::clientInGameWantsToBackLobby(Event* event)
     peer->setWaitingForGame(true);
     peer->setSpectator(false);
 
-    NetworkString* reset = getNetworkString(2);
+    NetworkString* reset = getNetworkString(m_type, 2);
     reset->setSynchronous(true);
     reset->addUInt8(LE_BACK_LOBBY).addUInt8(BLR_NONE);
     peer->sendPacket(reset, /*reliable*/true);
     delete reset;
     updatePlayerList();
-    NetworkString* server_info = getNetworkString();
+    NetworkString* server_info = getNetworkString(m_type);
     server_info->setSynchronous(true);
     server_info->addUInt8(LE_SERVER_INFO);
     m_game_setup->addServerInfo(server_info);
@@ -4357,7 +4360,7 @@ void ServerLobby::clientSelectingAssetsWantsToBackLobby(Event* event)
     if (m_process_type == PT_CHILD &&
         event->getPeer()->getHostId() == m_client_server_host_id.load())
     {
-        NetworkString* back_to_lobby = getNetworkString(2);
+        NetworkString* back_to_lobby = getNetworkString(m_type, 2);
         back_to_lobby->setSynchronous(true);
         back_to_lobby->addUInt8(LE_BACK_LOBBY)
             .addUInt8(BLR_SERVER_ONWER_QUITED_THE_GAME);
@@ -4373,13 +4376,13 @@ void ServerLobby::clientSelectingAssetsWantsToBackLobby(Event* event)
     peer->setWaitingForGame(true);
     peer->setSpectator(false);
 
-    NetworkString* reset = getNetworkString(2);
+    NetworkString* reset = getNetworkString(m_type, 2);
     reset->setSynchronous(true);
     reset->addUInt8(LE_BACK_LOBBY).addUInt8(BLR_NONE);
     peer->sendPacket(reset, /*reliable*/true);
     delete reset;
     updatePlayerList();
-    NetworkString* server_info = getNetworkString();
+    NetworkString* server_info = getNetworkString(m_type);
     server_info->setSynchronous(true);
     server_info->addUInt8(LE_SERVER_INFO);
     m_game_setup->addServerInfo(server_info);
@@ -4480,423 +4483,6 @@ bool ServerLobby::checkPeersReady(bool ignore_ai_peer) const
 }   // checkPeersReady
 
 //-----------------------------------------------------------------------------
-void ServerLobby::handleServerCommand(Event* event,
-                                      std::shared_ptr<STKPeer> peer)
-{
-    NetworkString& data = event->data();
-    std::string language;
-    data.decodeString(&language);
-    std::string cmd;
-    data.decodeString(&cmd);
-    auto argv = StringUtils::split(cmd, ' ');
-    if (argv.size() == 0)
-        return;
-    if (argv[0] == "spectate")
-    {
-        if (m_game_setup->isGrandPrix() || !ServerConfig::m_live_players)
-        {
-            NetworkString* chat = getNetworkString();
-            chat->addUInt8(LE_CHAT);
-            chat->setSynchronous(true);
-            std::string msg = "Server doesn't support spectate";
-            chat->encodeString16(StringUtils::utf8ToWide(msg));
-            peer->sendPacket(chat, true/*reliable*/);
-            delete chat;
-            return;
-        }
-
-        if (argv.size() != 2 || (argv[1] != "0" && argv[1] != "1") ||
-            m_state.load() != WAITING_FOR_START_GAME)
-        {
-            NetworkString* chat = getNetworkString();
-            chat->addUInt8(LE_CHAT);
-            chat->setSynchronous(true);
-            std::string msg = "Usage: spectate [0 or 1], before game started";
-            chat->encodeString16(StringUtils::utf8ToWide(msg));
-            peer->sendPacket(chat, true/*reliable*/);
-            delete chat;
-            return;
-        }
-
-        if (argv[1] == "1")
-        {
-            if (m_process_type == PT_CHILD &&
-                peer->getHostId() == m_client_server_host_id.load())
-            {
-                NetworkString* chat = getNetworkString();
-                chat->addUInt8(LE_CHAT);
-                chat->setSynchronous(true);
-                std::string msg = "Graphical client server cannot spectate";
-                chat->encodeString16(StringUtils::utf8ToWide(msg));
-                peer->sendPacket(chat, true/*reliable*/);
-                delete chat;
-                return;
-            }
-            peer->setAlwaysSpectate(ASM_COMMAND);
-        }
-        else
-            peer->setAlwaysSpectate(ASM_NONE);
-        updatePlayerList();
-    }
-    else if (argv[0] == "listserveraddon")
-    {
-        NetworkString* chat = getNetworkString();
-        chat->addUInt8(LE_CHAT);
-        chat->setSynchronous(true);
-        bool has_options = argv.size() > 1 &&
-            (argv[1].compare("-track") == 0 ||
-            argv[1].compare("-arena") == 0 ||
-            argv[1].compare("-kart") == 0 ||
-            argv[1].compare("-soccer") == 0);
-        if (argv.size() == 1 || argv.size() > 3 || argv[1].size() < 3 ||
-            (argv.size() == 2 && (argv[1].size() < 3 || has_options)) ||
-            (argv.size() == 3 && (!has_options || argv[2].size() < 3)))
-        {
-            chat->encodeString16(
-                L"Usage: /listserveraddon [option][addon string to find "
-                "(at least 3 characters)]. Available options: "
-                "-track, -arena, -kart, -soccer.");
-        }
-        else
-        {
-            std::string type = "";
-            std::string text = "";
-            if(argv.size() > 1)
-            {
-                if(argv[1].compare("-track") == 0 ||
-                   argv[1].compare("-arena") == 0 ||
-                   argv[1].compare("-kart" ) == 0 ||
-                   argv[1].compare("-soccer" ) == 0)
-                    type = argv[1].substr(1);
-                if((argv.size() == 2 && type.empty()) || argv.size() == 3)
-                    text = argv[argv.size()-1];
-            }
-
-            std::set<std::string> total_addons;
-            if(type.empty() || // not specify addon type
-               (!type.empty() && type.compare("kart") == 0)) // list kart addon
-            {
-                total_addons.insert(m_addon_kts.first.begin(), m_addon_kts.first.end());
-            }
-            if(type.empty() || // not specify addon type
-               (!type.empty() && type.compare("track") == 0))
-            {
-                total_addons.insert(m_addon_kts.second.begin(), m_addon_kts.second.end());
-            }
-            if(type.empty() || // not specify addon type
-               (!type.empty() && type.compare("arena") == 0))
-            {
-                total_addons.insert(m_addon_arenas.begin(), m_addon_arenas.end());
-            }
-            if(type.empty() || // not specify addon type
-               (!type.empty() && type.compare("soccer") == 0))
-            {
-                total_addons.insert(m_addon_soccers.begin(), m_addon_soccers.end());
-            }
-            std::string msg = "";
-            for (auto& addon : total_addons)
-            {
-                // addon_ (6 letters)
-                if (!text.empty() && addon.find(text, 6) == std::string::npos)
-                    continue;
-
-                msg += addon.substr(6);
-                msg += ", ";
-            }
-            if (msg.empty())
-                chat->encodeString16(L"Addon not found");
-            else
-            {
-                msg = msg.substr(0, msg.size() - 2);
-                chat->encodeString16(StringUtils::utf8ToWide(
-                    std::string("Server addon: ") + msg));
-            }
-        }
-        peer->sendPacket(chat, true/*reliable*/);
-        delete chat;
-    }
-    else if (StringUtils::startsWith(cmd, "playerhasaddon"))
-    {
-        NetworkString* chat = getNetworkString();
-        chat->addUInt8(LE_CHAT);
-        chat->setSynchronous(true);
-        std::string part;
-        if (cmd.length() > 15)
-            part = cmd.substr(15);
-        std::string addon_id = part.substr(0, part.find(' '));
-        std::string player_name;
-        if (part.length() > addon_id.length() + 1)
-            player_name = part.substr(addon_id.length() + 1);
-        std::shared_ptr<STKPeer> player_peer = STKHost::get()->findPeerByName(
-            StringUtils::utf8ToWide(player_name));
-        if (player_name.empty() || !player_peer || addon_id.empty())
-        {
-            chat->encodeString16(
-                L"Usage: /playerhasaddon [addon_identity] [player name]");
-        }
-        else
-        {
-            std::string addon_id_test = Addon::createAddonId(addon_id);
-            bool found = false;
-            const auto& kt = player_peer->getClientAssets();
-            for (auto& kart : kt.first)
-            {
-                if (kart == addon_id_test)
-                {
-                    found = true;
-                    break;
-                }
-            }
-            if (!found)
-            {
-                for (auto& track : kt.second)
-                {
-                    if (track == addon_id_test)
-                    {
-                        found = true;
-                        break;
-                    }
-                }
-            }
-            if (found)
-            {
-                chat->encodeString16(StringUtils::utf8ToWide
-                    (player_name + " has addon " + addon_id));
-            }
-            else
-            {
-                chat->encodeString16(StringUtils::utf8ToWide
-                    (player_name + " has no addon " + addon_id));
-            }
-        }
-        peer->sendPacket(chat, true/*reliable*/);
-        delete chat;
-    }
-    else if (StringUtils::startsWith(cmd, "kick"))
-    {
-        if (m_server_owner.lock() != peer)
-        {
-            NetworkString* chat = getNetworkString();
-            chat->addUInt8(LE_CHAT);
-            chat->setSynchronous(true);
-            chat->encodeString16(L"You are not server owner");
-            peer->sendPacket(chat, true/*reliable*/);
-            delete chat;
-            return;
-        }
-        std::string player_name;
-        if (cmd.length() > 5)
-            player_name = cmd.substr(5);
-        std::shared_ptr<STKPeer> player_peer = STKHost::get()->findPeerByName(
-            StringUtils::utf8ToWide(player_name));
-        if (player_name.empty() || !player_peer || player_peer->isAIPeer())
-        {
-            NetworkString* chat = getNetworkString();
-            chat->addUInt8(LE_CHAT);
-            chat->setSynchronous(true);
-            chat->encodeString16(
-                L"Usage: /kick [player name]");
-            peer->sendPacket(chat, true/*reliable*/);
-            delete chat;
-        }
-        else
-        {
-            player_peer->kick();
-        }
-    }
-    else if (StringUtils::startsWith(cmd, "playeraddonscore"))
-    {
-        NetworkString* chat = getNetworkString();
-        chat->addUInt8(LE_CHAT);
-        chat->setSynchronous(true);
-        std::string player_name;
-        if (cmd.length() > 17)
-            player_name = cmd.substr(17);
-        std::shared_ptr<STKPeer> player_peer = STKHost::get()->findPeerByName(
-            StringUtils::utf8ToWide(player_name));
-        if (player_name.empty() || !player_peer)
-        {
-            chat->encodeString16(
-                L"Usage: /playeraddonscore [player name] (return 0-100)");
-        }
-        else
-        {
-            auto& scores = player_peer->getAddonsScores();
-            if (scores[AS_KART] == -1 && scores[AS_TRACK] == -1 &&
-                scores[AS_ARENA] == -1 && scores[AS_SOCCER] == -1)
-            {
-                chat->encodeString16(StringUtils::utf8ToWide
-                    (player_name + " has no addon"));
-            }
-            else
-            {
-                std::string msg = player_name;
-                msg += " addon:";
-                if (scores[AS_KART] != -1)
-                    msg += " kart: " + StringUtils::toString(scores[AS_KART]) + ",";
-                if (scores[AS_TRACK] != -1)
-                    msg += " track: " + StringUtils::toString(scores[AS_TRACK]) + ",";
-                if (scores[AS_ARENA] != -1)
-                    msg += " arena: " + StringUtils::toString(scores[AS_ARENA]) + ",";
-                if (scores[AS_SOCCER] != -1)
-                    msg += " soccer: " + StringUtils::toString(scores[AS_SOCCER]) + ",";
-                msg = msg.substr(0, msg.size() - 1);
-                chat->encodeString16(StringUtils::utf8ToWide(msg));
-            }
-        }
-        peer->sendPacket(chat, true/*reliable*/);
-        delete chat;
-    }
-    else if (argv[0] == "serverhasaddon")
-    {
-        NetworkString* chat = getNetworkString();
-        chat->addUInt8(LE_CHAT);
-        chat->setSynchronous(true);
-        if (argv.size() != 2)
-        {
-            chat->encodeString16(
-                L"Usage: /serverhasaddon [addon_identity]");
-        }
-        else
-        {
-            std::set<std::string> total_addons;
-            total_addons.insert(m_addon_kts.first.begin(), m_addon_kts.first.end());
-            total_addons.insert(m_addon_kts.second.begin(), m_addon_kts.second.end());
-            total_addons.insert(m_addon_arenas.begin(), m_addon_arenas.end());
-            total_addons.insert(m_addon_soccers.begin(), m_addon_soccers.end());
-            std::string addon_id_test = Addon::createAddonId(argv[1]);
-            bool found = total_addons.find(addon_id_test) != total_addons.end();
-            if (found)
-            {
-                chat->encodeString16(StringUtils::utf8ToWide(std::string
-                    ("Server has addon ") + argv[1]));
-            }
-            else
-            {
-                chat->encodeString16(StringUtils::utf8ToWide(std::string
-                    ("Server has no addon ") + argv[1]));
-            }
-        }
-        peer->sendPacket(chat, true/*reliable*/);
-        delete chat;
-    }
-    else if (argv[0] == "mute")
-    {
-        std::shared_ptr<STKPeer> player_peer;
-        std::string result_msg;
-        core::stringw player_name;
-        NetworkString* result = NULL;
-
-        if (argv.size() != 2 || argv[1].empty())
-            goto mute_error;
-
-        player_name = StringUtils::utf8ToWide(argv[1]);
-        player_peer = STKHost::get()->findPeerByName(player_name);
-
-        if (!player_peer || player_peer == peer)
-            goto mute_error;
-
-        m_peers_muted_players[peer].insert(player_name);
-        result = getNetworkString();
-        result->addUInt8(LE_CHAT);
-        result->setSynchronous(true);
-        result_msg = "Muted player ";
-        result_msg += argv[1];
-        result->encodeString16(StringUtils::utf8ToWide(result_msg));
-        peer->sendPacket(result, true/*reliable*/);
-        delete result;
-        return;
-
-mute_error:
-        NetworkString* error = getNetworkString();
-        error->addUInt8(LE_CHAT);
-        error->setSynchronous(true);
-        std::string msg = "Usage: /mute player_name (not including yourself)";
-        error->encodeString16(StringUtils::utf8ToWide(msg));
-        peer->sendPacket(error, true/*reliable*/);
-        delete error;
-    }
-    else if (argv[0] == "unmute")
-    {
-        std::shared_ptr<STKPeer> player_peer;
-        std::string result_msg;
-        core::stringw player_name;
-        NetworkString* result = NULL;
-
-        if (argv.size() != 2 || argv[1].empty())
-            goto unmute_error;
-
-        player_name = StringUtils::utf8ToWide(argv[1]);
-        for (auto it = m_peers_muted_players[peer].begin();
-            it != m_peers_muted_players[peer].end();)
-        {
-            if (*it == player_name)
-            {
-                it = m_peers_muted_players[peer].erase(it);
-                goto unmute_found;
-            }
-            else
-            {
-                it++;
-            }
-        }
-        goto unmute_error;
-
-unmute_found:
-        result = getNetworkString();
-        result->addUInt8(LE_CHAT);
-        result->setSynchronous(true);
-        result_msg = "Unmuted player ";
-        result_msg += argv[1];
-        result->encodeString16(StringUtils::utf8ToWide(result_msg));
-        peer->sendPacket(result, true/*reliable*/);
-        delete result;
-        return;
-
-unmute_error:
-        NetworkString* error = getNetworkString();
-        error->addUInt8(LE_CHAT);
-        error->setSynchronous(true);
-        std::string msg = "Usage: /unmute player_name";
-        error->encodeString16(StringUtils::utf8ToWide(msg));
-        peer->sendPacket(error, true/*reliable*/);
-        delete error;
-    }
-    else if (argv[0] == "listmute")
-    {
-        NetworkString* chat = getNetworkString();
-        chat->addUInt8(LE_CHAT);
-        chat->setSynchronous(true);
-        core::stringw total;
-        for (auto& name : m_peers_muted_players[peer])
-        {
-            total += name;
-            total += " ";
-        }
-        if (total.empty())
-            chat->encodeString16("No player has been muted by you");
-        else
-        {
-            total += "muted";
-            chat->encodeString16(total);
-        }
-        peer->sendPacket(chat, true/*reliable*/);
-        delete chat;
-    }
-    else
-    {
-        NetworkString* chat = getNetworkString();
-        chat->addUInt8(LE_CHAT);
-        chat->setSynchronous(true);
-        std::string msg = "Unknown command: ";
-        msg += cmd;
-        chat->encodeString16(StringUtils::utf8ToWide(msg));
-        peer->sendPacket(chat, true/*reliable*/);
-        delete chat;
-    }
-}   // handleServerCommand
-
-//-----------------------------------------------------------------------------
 bool ServerLobby::playerReportsTableExists() const
 {
 #ifdef ENABLE_SQLITE3
@@ -4904,4 +4490,4 @@ bool ServerLobby::playerReportsTableExists() const
 #else
     return false;
 #endif
-}
+} // playerReportsTableExists

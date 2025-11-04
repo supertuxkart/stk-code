@@ -15,6 +15,8 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
+#ifndef SERVER_ONLY
+
 // Manages includes common to all options screens
 #include "states_screens/options/options_common.hpp"
 
@@ -29,11 +31,11 @@
 #include "states_screens/dialogs/recommend_video_settings.hpp"
 #include "utils/profiler.hpp"
 
-#ifndef SERVER_ONLY
+
 #include <ge_main.hpp>
 #include <ge_vulkan_driver.hpp>
 #include <ge_vulkan_texture_descriptor.hpp>
-#endif
+
 
 #include <IrrlichtDevice.h>
 
@@ -161,7 +163,6 @@ int OptionsScreenVideo::getImageQuality()
 // --------------------------------------------------------------------------------------------
 void OptionsScreenVideo::setImageQuality(int quality, bool force_reload_texture)
 {
-#ifndef SERVER_ONLY
     core::dimension2du prev_max_size = irr_driver->getVideoDriver()
         ->getDriverAttributes().getAttributeAsDimension2d("MAX_TEXTURE_SIZE");
     GE::GEVulkanTextureDescriptor* td = NULL;
@@ -215,7 +216,6 @@ void OptionsScreenVideo::setImageQuality(int quality, bool force_reload_texture)
     }
     else if (prev_max_size != cur_max_size || force_reload_texture)
         STKTexManager::getInstance()->reloadAllTextures(true/*mesh_texture_only*/);
-#endif
 }   // setImageQuality
 
 // --------------------------------------------------------------------------------------------
@@ -332,7 +332,6 @@ void OptionsScreenVideo::init()
     // disabled)
     bool in_game = StateManager::get()->getGameState() == GUIEngine::INGAME_MENU;
 
-#ifndef SERVER_ONLY
     gfx->setActive(!in_game && CVS->isGLSL());
     getWidget<ButtonWidget>("custom")->setActive(!in_game || !CVS->isGLSL());
     if (getWidget<SpinnerWidget>("scale_rtts")->isActivated())
@@ -341,7 +340,6 @@ void OptionsScreenVideo::init()
             GE::getDriver()->getDriverType() == video::EDT_VULKAN);
     }
     getWidget<ButtonWidget>("benchmarkCurrent")->setActive(!in_game);
-#endif
 
     // If a benchmark was requested and the game had to reload
     // the graphics engine, start the benchmark when the
@@ -395,17 +393,13 @@ void OptionsScreenVideo::updateGfxSlider()
         gfx->setCustomText( _("Custom") );
     }
 
-#ifndef SERVER_ONLY
     // Enable the blur slider if the modern renderer is used
     getWidget<GUIEngine::SpinnerWidget>("blur_level")->
         setActive(UserConfigParams::m_dynamic_lights && CVS->isGLSL());
     // Same with Render resolution slider
-    getWidget<GUIEngine::SpinnerWidget>("scale_rtts")->
-        setActive((UserConfigParams::m_dynamic_lights && CVS->isGLSL()) ||
-        GE::getDriver()->getDriverType() == video::EDT_VULKAN);
+    updateScaleRTTsSlider();
 
     updateTooltip();
-#endif
 } // updateGfxSlider
 
 // --------------------------------------------------------------------------------------------
@@ -440,25 +434,27 @@ void OptionsScreenVideo::updateBlurSlider()
 
 void OptionsScreenVideo::updateScaleRTTsSlider()
 {
-    GUIEngine::SpinnerWidget* scale_rtts_level = 
-        getWidget<GUIEngine::SpinnerWidget>("scale_rtts");
-    assert( scale_rtts_level != NULL );
+    bool rtts_on = (UserConfigParams::m_dynamic_lights && CVS->isGLSL()) ||
+        GE::getDriver()->getDriverType() == video::EDT_VULKAN;
+
+    GUIEngine::SpinnerWidget* rtts_slider = getWidget<GUIEngine::SpinnerWidget>("scale_rtts");
+    assert( rtts_slider != NULL );
+
+    rtts_slider->setActive(rtts_on);
 
     bool found = false;
+    float rtts_value = (rtts_on) ? UserConfigParams::m_scale_rtts_factor : 1.0f;
     for (unsigned int l = 0; l < m_scale_rtts_custom_presets.size(); l++)
     {
-        if (m_scale_rtts_custom_presets[l].value == UserConfigParams::m_scale_rtts_factor)
+        if (m_scale_rtts_custom_presets[l].value == rtts_value)
         {
-            scale_rtts_level->setValue(l);
+            rtts_slider->setValue(l);
             found = true;
             if (m_scale_rtts_custom_presets[l].value > 1.0f)
-            {
-                scale_rtts_level->markAsIncorrect();
-            }
+                rtts_slider->markAsIncorrect();
             else
-            {
-                scale_rtts_level->markAsCorrect();
-            }
+                rtts_slider->markAsCorrect();
+
             break;
         }
     }
@@ -466,7 +462,7 @@ void OptionsScreenVideo::updateScaleRTTsSlider()
     if (!found)
     {
         //I18N: custom video settings
-        scale_rtts_level->setCustomText( _("Custom") );
+        rtts_slider->setCustomText( _("Custom") );
     }
 } // updateScaleRTTsSlider
 
@@ -615,11 +611,10 @@ void OptionsScreenVideo::eventCallback(Widget* widget, const std::string& name,
         getWidget<GUIEngine::SpinnerWidget>("blur_level")->setActive(level >= 2);
 
         // Same with Render resolution slider
-#ifndef SERVER_ONLY
         getWidget<GUIEngine::SpinnerWidget>("scale_rtts")->
             setActive(UserConfigParams::m_dynamic_lights ||
             GE::getDriver()->getDriverType() == video::EDT_VULKAN);
-#endif
+
         UserConfigParams::m_animated_characters = m_presets[level].animatedCharacters;
         UserConfigParams::m_particles_effects = m_presets[level].particles;
         setImageQuality(m_presets[level].image_quality, false/*force_reload_texture*/);
@@ -674,33 +669,31 @@ void OptionsScreenVideo::eventCallback(Widget* widget, const std::string& name,
             StringUtils::fromString(fps, max_fps);
             UserConfigParams::m_max_fps = max_fps;
         }
-#if !defined(SERVER_ONLY) && defined(_IRR_COMPILE_WITH_SDL_DEVICE_)
+#if defined(_IRR_COMPILE_WITH_SDL_DEVICE_)
         update_swap_interval(UserConfigParams::m_swap_interval);
 #endif
     } // vSync
     else if (name == "scale_rtts")
     {
-        GUIEngine::SpinnerWidget* scale_rtts_level =
+        GUIEngine::SpinnerWidget* rtts_slider =
             getWidget<GUIEngine::SpinnerWidget>("scale_rtts");
-        assert( scale_rtts_level != NULL );
+        assert( rtts_slider != NULL );
 
-        const int level = scale_rtts_level->getValue();
+        const int level = rtts_slider->getValue();
         assert(level < (int)m_scale_rtts_custom_presets.size());
 
         UserConfigParams::m_scale_rtts_factor = m_scale_rtts_custom_presets[level].value;
-#ifndef SERVER_ONLY
+
         GE::GEVulkanDriver* gevk = GE::getVKDriver();
         if (gevk && GE::getGEConfig()->m_render_scale != UserConfigParams::m_scale_rtts_factor)
         {
             GE::getGEConfig()->m_render_scale = UserConfigParams::m_scale_rtts_factor;
             gevk->updateDriver();
         }
-#endif
         updateScaleRTTsSlider();
     } // scale_rtts
     else if (name == "benchmarkCurrent")
     {
-#ifndef SERVER_ONLY
         // To avoid crashes and ensure the proper settings are used during the benchmark,
         // we apply the settings. If this doesn't require restarting the screen, we start
         // the benchmark immediately, otherwise we schedule it to start after the restart.
@@ -708,7 +701,6 @@ void OptionsScreenVideo::eventCallback(Widget* widget, const std::string& name,
             profiler.startBenchmark();
         else
             RaceManager::get()->scheduleBenchmark();
-#endif
     } // benchmarkCurrent
     /*else if (name == "benchmarkRecommend")
     {
@@ -720,25 +712,21 @@ void OptionsScreenVideo::eventCallback(Widget* widget, const std::string& name,
 
 void OptionsScreenVideo::tearDown()
 {
-#ifndef SERVER_ONLY
     applySettings();
     Screen::tearDown();
     // save changes when leaving screen
     user_config->saveConfig();
-#endif
 }   // tearDown
 
 // --------------------------------------------------------------------------------------------
 /* Returns 1 or 2 if a restart will be done, 0 otherwise */
 int OptionsScreenVideo::applySettings()
 {
-#ifndef SERVER_ONLY
     if (m_prev_adv_pipline != UserConfigParams::m_dynamic_lights && CVS->isGLSL())
     {
         irr_driver->sameRestart();
         return 1;
     }
-#endif
     return 0;
 }   // applySettings
 
@@ -761,7 +749,6 @@ void OptionsScreenVideo::unloaded()
 
 void OptionsScreenVideo::setSSR()
 {
-#ifndef SERVER_ONLY
     if (!UserConfigParams::m_ssr)
         GE::getGEConfig()->m_screen_space_reflection_type = GE::GSSRT_DISABLED;
     else
@@ -783,6 +770,6 @@ void OptionsScreenVideo::setSSR()
             break;
         }
     }
-#endif
 }   // setSSR
 
+#endif // ifndef SERVER_ONLY

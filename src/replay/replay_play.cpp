@@ -378,10 +378,20 @@ void ReplayPlay::loadFile(bool second_replay)
 
     // eof actually doesn't trigger here, since it requires first to try
     // reading behind eof, but still it's clearer this way.
+    unsigned int kart_counter = 0;
     while(!feof(fd))
     {
+        kart_counter++;
         if(fgets(s, 1023, fd)==NULL)  // eof reached
             break;
+        // This may happen e.g. if extra lines are added at the end of the replay file
+        // Going ahead with trying to read another kart data would cause an OOB error
+        if (kart_counter > num_kart)
+        {
+            Log::warn("Replay", "Replay file '%s' doesn't terminate properly..",
+                getReplayFilename(replay_file_number).c_str());
+            break;
+        }
         readKartData(fd, s, second_replay);
     }
 
@@ -478,7 +488,7 @@ void ReplayPlay::readKartData(FILE *fd, char *next_line, bool second_replay)
             }
         }
 
-        //version 4 replays (STK 0.9.4 and higher)
+        //version 4 replays (STK 1.0 and higher)
         else
         {
             if(sscanf(s, "%f  %f %f %f  %f %f %f %f  %f  %f  %f %f %f %f %d  %d %f %d %d %d  %f %d %d %d %d %d\n",

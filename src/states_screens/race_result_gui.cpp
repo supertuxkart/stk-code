@@ -16,6 +16,8 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
+#ifndef SERVER_ONLY // No GUI files in server builds
+
 #include "states_screens/race_result_gui.hpp"
 
 #include "audio/music_manager.hpp"
@@ -196,7 +198,6 @@ void RaceResultGUI::init()
         m_end_track = (int)tracks.size();
     }
 
-#ifndef SERVER_ONLY
     if (!human_win && !NetworkConfig::get()->isNetworking() &&
         !TipsManager::get()->isEmpty())
     {
@@ -230,7 +231,6 @@ void RaceResultGUI::init()
         core::stringw tips_string = _("Tip: %s", tip);
         MessageQueue::add(MessageQueue::MT_GENERIC, tips_string);
     }
-#endif
 }   // init
 
 //-----------------------------------------------------------------------------
@@ -677,7 +677,6 @@ void RaceResultGUI::eventCallback(GUIEngine::Widget* widget,
 //-----------------------------------------------------------------------------
 void RaceResultGUI::displayCTFResults()
 {
-#ifndef SERVER_ONLY
     //Draw win text
     core::stringw result_text;
     video::SColor color = video::SColor(255, 255, 255, 255);
@@ -749,7 +748,6 @@ void RaceResultGUI::displayCTFResults()
     drawCTFScorers(KART_TEAM_RED, current_x, current_y, height);
     current_x += UserConfigParams::m_width / 2;
     drawCTFScorers(KART_TEAM_BLUE, current_x, current_y, height);
-#endif
 } // displayCTFResults
 
 //-----------------------------------------------------------------------------
@@ -760,7 +758,6 @@ void RaceResultGUI::displayCTFResults()
  *  \param height Maximum y of the table area (??) */
 void RaceResultGUI::drawCTFScorers(KartTeam team, int x, int y, int height)
 {
-#ifndef SERVER_ONLY
     CaptureTheFlag* ctf = dynamic_cast<CaptureTheFlag*>(World::getWorld());
     gui::IGUIFont* font = GUIEngine::getSmallFont();
     irr::video::ITexture* kart_icon;
@@ -821,7 +818,6 @@ void RaceResultGUI::drawCTFScorers(KartTeam team, int x, int y, int height)
             current_x - offset_x, current_y + m_width_icon);
         draw2DImage(kart_icon, dest_rect, source_rect, NULL, NULL, true);
     }
-#endif
 } // drawCTFScorers
 
 //-----------------------------------------------------------------------------
@@ -1123,7 +1119,6 @@ void RaceResultGUI::onDraw(float dt)
  */
 void RaceResultGUI::renderGlobal(float dt)
 {
-#ifndef SERVER_ONLY
     m_timer += dt;
     assert(World::getWorld()->getPhase() == WorldStatus::RESULT_DISPLAY_PHASE);
     unsigned int num_karts = (unsigned int)m_all_row_infos.size();
@@ -1328,7 +1323,6 @@ void RaceResultGUI::renderGlobal(float dt)
     {
         displayPostRaceInfo();
     }
-#endif
 }   // renderGlobal
 
 //-----------------------------------------------------------------------------
@@ -1337,7 +1331,6 @@ void RaceResultGUI::renderGlobal(float dt)
  */
 void RaceResultGUI::determineGPLayout()
 {
-#ifndef SERVER_ONLY
     unsigned int num_karts = RaceManager::get()->getNumberOfKarts();
     std::vector<int> old_rank(num_karts, 0);
 
@@ -1412,7 +1405,6 @@ void RaceResultGUI::determineGPLayout()
         ri->m_new_gp_rank = gp_position;
         ri->m_laps = World::getWorld()->getFinishedLapsOfKart(i);
     }   // i < num_karts
-#endif
 }   // determineGPLayout
 
 //-----------------------------------------------------------------------------
@@ -1423,7 +1415,6 @@ void RaceResultGUI::determineGPLayout()
 void RaceResultGUI::displayOneEntry(unsigned int x, unsigned int y,
     unsigned int n, bool display_points)
 {
-#ifndef SERVER_ONLY
     RowInfo *ri = &(m_all_row_infos[n]);
     video::SColor color = ri->m_is_player_kart
         ? video::SColor(255, 255, 0, 0)
@@ -1541,13 +1532,11 @@ void RaceResultGUI::displayOneEntry(unsigned int x, unsigned int y,
         m_font->draw(point_inc_string, dest_rect, color, false, false, NULL,
             true /* ignoreRTL */);
     }
-#endif
 }   // displayOneEntry
 
 //-----------------------------------------------------------------------------
 void RaceResultGUI::displaySoccerResults()
 {
-#ifndef SERVER_ONLY
     //Draw win text
     core::stringw result_text;
     static video::SColor color = video::SColor(255, 255, 255, 255);
@@ -1613,8 +1602,7 @@ void RaceResultGUI::displaySoccerResults()
     // Draw the scorers for each team
     current_y += (3 * rect.Height) / 4;
     drawTeamScorers(KART_TEAM_RED, current_x, current_y, height);
-    drawTeamScorers(KART_TEAM_BLUE, current_x, current_y, height);    
-#endif
+    drawTeamScorers(KART_TEAM_BLUE, current_x, current_y, height);
 } // displaySoccerResults
 
 //-----------------------------------------------------------------------------
@@ -1625,7 +1613,6 @@ void RaceResultGUI::displaySoccerResults()
  *  \param height Maximum y of the table area (??) */
 void RaceResultGUI::drawTeamScorers(KartTeam team, int x, int y, int height)
 {
-#ifndef SERVER_ONLY
     int current_x = (team == KART_TEAM_RED) ? x : x + UserConfigParams::m_width / 2;
     int current_y = y;
     core::rect<s32> pos(current_x, current_y, current_x, current_y);
@@ -1694,7 +1681,6 @@ void RaceResultGUI::drawTeamScorers(KartTeam team, int x, int y, int height)
                 NULL, NULL, true);
         }
     } // for scorers.size()
-#endif
 } // drawTeamScorers
 
 //-----------------------------------------------------------------------------
@@ -1892,7 +1878,6 @@ void RaceResultGUI::cleanupGPProgress()
  * */
 void RaceResultGUI::displayPostRaceInfo()
 {
-#ifndef SERVER_ONLY
     // This happens in demo world
     if (!World::getWorld())
         return;
@@ -1926,7 +1911,6 @@ void RaceResultGUI::displayPostRaceInfo()
     if (RaceManager::get()->raceWasStartedFromOverworld())
         current_y = displayChallengeInfo(x, current_y,
                         size_esti_real > UserConfigParams::m_height * 0.85f);
-#endif
 } // displayPostRaceInfo
 
 //-----------------------------------------------------------------------------
@@ -1937,7 +1921,6 @@ void RaceResultGUI::displayPostRaceInfo()
  *  \param y Top limit of the highscore display area */
 int RaceResultGUI::displayHighscores(int x, int y, bool increase_density)
 {
-#ifndef SERVER_ONLY
     Highscores* scores = World::getWorld()->getHighscores();
 
     // In some case, for example FTL, there will be no highscores
@@ -2055,7 +2038,6 @@ int RaceResultGUI::displayHighscores(int x, int y, bool increase_density)
     } // for highscore entries
 
     return current_y;
-#endif
 } // displayHighscores
 
 //-----------------------------------------------------------------------------
@@ -2066,7 +2048,6 @@ int RaceResultGUI::displayHighscores(int x, int y, bool increase_density)
  *  \param y Top limit of the highscore display area */
 int RaceResultGUI::displayLapDifficulty(int x, int y, bool increase_density)
 {
-#ifndef SERVER_ONLY
     video::SColor white_color = video::SColor(255, 255, 255, 255);
     int current_y = y;
     int time_precision = RaceManager::get()->currentModeTimePrecision();
@@ -2171,7 +2152,6 @@ int RaceResultGUI::displayLapDifficulty(int x, int y, bool increase_density)
     }   // if mode has laps
 
     return current_y;
-#endif
 } // displayLapDifficulty
 
 //-----------------------------------------------------------------------------
@@ -2182,7 +2162,6 @@ int RaceResultGUI::displayLapDifficulty(int x, int y, bool increase_density)
  *  \param y Top limit of the highscore display area */
 int RaceResultGUI::displayChallengeInfo(int x, int y, bool increase_density)
 {
-#ifndef SERVER_ONLY
     int current_y = y;
     bool is_gp = (RaceManager::get()->getMajorMode() == RaceManager::MAJOR_MODE_GRAND_PRIX);
 
@@ -2314,7 +2293,6 @@ int RaceResultGUI::displayChallengeInfo(int x, int y, bool increase_density)
     }
 
     return current_y;
-#endif
 } // displayChallengeInfo
 
 // ----------------------------------------------------------------------------
@@ -2355,7 +2333,6 @@ void RaceResultGUI::displayScreenShots()
 //-----------------------------------------------------------------------------
 void RaceResultGUI::displayBenchmarkSummary()
 {
-#ifndef SERVER_ONLY
     assert(RaceManager::get()->isBenchmarking());
 
     // Draw the title
@@ -2441,7 +2418,6 @@ void RaceResultGUI::displayBenchmarkSummary()
         font->draw(info_text[i].c_str(), pos, white_color, true, false);
         current_y += (5 * rect.Height) / 4;
     }
-#endif
 } // displayBenchmarkSummary
 
 // ----------------------------------------------------------------------------
@@ -2458,3 +2434,5 @@ void RaceResultGUI::onResize()
     if (!m_gp_progress_widgets.empty())
         enableGPProgress();
 } // onResize
+
+#endif // ifndef SERVER_ONLY

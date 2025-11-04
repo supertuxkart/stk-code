@@ -25,7 +25,7 @@
 #include "modes/world.hpp"
 #include "scriptengine/aswrappedcall.hpp"
 #include "scriptengine/script_track.hpp"
-#include "states_screens/dialogs/tutorial_message_dialog.hpp"
+#include "states_screens/dialogs/debug_message_dialog.hpp"
 #include "tracks/track.hpp"
 #include "tracks/track_object.hpp"
 #include "tracks/track_object_manager.hpp"
@@ -85,7 +85,7 @@ namespace Scripting
         void displayModalMessage(std::string* input)
         {
             irr::core::stringw out = StringUtils::utf8ToWide(*input);
-            new TutorialMessageDialog((out), true);
+            new DebugMessageDialog((out), true);
         }
 
         /** Display a Message using MessageQueue (enum GUI::MsgType)*/
