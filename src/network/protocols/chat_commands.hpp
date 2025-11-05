@@ -49,6 +49,8 @@ namespace ChatCommands
     void answerCommand(std::string msg, std::shared_ptr<STKPeer> peer);
     void handleServerCommand(ServerLobby* lobby, Event* event, std::shared_ptr<STKPeer> peer);
 
+    void help(std::string cmd, std::shared_ptr<STKPeer> peer);
+    void helpMessage(std::string cmd_name, std::shared_ptr<STKPeer> peer);
     void spectate(std::string cmd, ServerLobby* lobby, std::shared_ptr<STKPeer> peer);
     void listServerAddons(std::string cmd, ServerLobby* lobby, std::shared_ptr<STKPeer> peer);
     void playerHasAddon(std::string cmd, ServerLobby* lobby, std::shared_ptr<STKPeer> peer);
@@ -58,7 +60,7 @@ namespace ChatCommands
     void mute(std::string cmd, ServerLobby* lobby, std::shared_ptr<STKPeer> peer);
     void unmute(std::string cmd, ServerLobby* lobby, std::shared_ptr<STKPeer> peer);
     void listMute(std::string cmd, ServerLobby* lobby, std::shared_ptr<STKPeer> peer);
-    void unknownCommand(std::string cmd, ServerLobby* lobby, std::shared_ptr<STKPeer> peer);
+    void unknownCommand(std::string cmd, std::shared_ptr<STKPeer> peer);
 }
 
 #endif // CHAT_COMMANDS_HPP

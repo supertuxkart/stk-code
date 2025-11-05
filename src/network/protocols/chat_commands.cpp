@@ -50,7 +50,9 @@ namespace ChatCommands
         auto argv = StringUtils::split(cmd, ' ');
         if (argv.size() == 0)
             return;
-        if (argv[0] == "spectate")
+        if (argv[0] == "help")
+            help(cmd, peer);
+        else if (argv[0] == "spectate")
             spectate(cmd, lobby, peer);
         else if (argv[0] == "listserveraddon")
             listServerAddons(cmd, lobby, peer);
@@ -69,8 +71,58 @@ namespace ChatCommands
         else if (argv[0] == "listmute")
             listMute(cmd, lobby, peer);
         else
-            unknownCommand(cmd, lobby, peer);
+            unknownCommand(cmd, peer);
     }   // handleServerCommand
+
+    void help(std::string cmd, std::shared_ptr<STKPeer> peer)
+    {
+        auto argv = StringUtils::split(cmd, ' ');
+        // A command name is supplied as an argument, give that command's help info
+        if (argv.size() == 2)
+            helpMessage(argv[1], peer);
+        // Generic help message
+        else
+            helpMessage("help", peer);
+    } // help
+
+    void helpMessage(std::string cmd_name, std::shared_ptr<STKPeer> peer)
+    {
+        if (cmd_name == "help")
+        {
+            std::string msg = "To see the usage format of a command, "
+                "use /help [command], for example '/help mute' gives "
+                "information about the /mute command.";
+            answerCommand(msg, peer);
+            msg = "This server supports the following commands: /help "
+                "/spectate /listserveraddon /playerhasaddon /serverhasaddon "
+                "/playeraddonscore /kick /mute /unmute /listmute";
+            answerCommand(msg, peer);
+            return;
+        }
+
+        if (cmd_name == "spectate")
+            answerCommand("Usage: spectate [0 or 1], before game started", peer);
+        else if (cmd_name == "listserveraddon")
+            answerCommand("Usage: /listserveraddon [option][addon string to find "
+                "(at least 3 characters)]. Available options: "
+                "-track, -arena, -kart, -soccer.", peer);
+        else if (cmd_name == "playerhasaddon")
+            answerCommand("Usage: /playerhasaddon [addon_identity] [player name]", peer);
+        else if (cmd_name == "serverhasaddon")
+            answerCommand("Usage: /serverhasaddon [addon_identity]", peer);
+        else if (cmd_name == "playeraddonscore")
+            answerCommand("Usage: /playeraddonscore [player name] (return 0-100)", peer);
+        else if (cmd_name == "kick")
+            answerCommand("Usage: /kick [player name]", peer);
+        else if (cmd_name == "mute")
+            answerCommand("Usage: /mute player_name (not including yourself)", peer);
+        else if (cmd_name == "unmute")
+            answerCommand("Usage: /unmute player_name", peer);
+        else if (cmd_name == "listmute")
+            answerCommand("Usage: /listmute", peer);
+        else
+            unknownCommand(cmd_name, peer);
+    } // helpMessage
 
     void spectate(std::string cmd, ServerLobby* lobby, std::shared_ptr<STKPeer> peer)
     {
@@ -84,7 +136,7 @@ namespace ChatCommands
         if (argv.size() != 2 || (argv[1] != "0" && argv[1] != "1") ||
             lobby->getCurrentState() != ServerLobby::ServerState::WAITING_FOR_START_GAME)
         {
-            answerCommand("Usage: spectate [0 or 1], before game started", peer);
+            helpMessage(argv[0], peer);
             return;
         }
     
@@ -115,9 +167,7 @@ namespace ChatCommands
             (argv.size() == 2 && (argv[1].size() < 3 || has_options)) ||
             (argv.size() == 3 && (!has_options || argv[2].size() < 3)))
         {
-            answerCommand("Usage: /listserveraddon [option][addon string to find "
-                "(at least 3 characters)]. Available options: "
-                "-track, -arena, -kart, -soccer.", peer);
+            helpMessage(argv[0], peer);
         }
         else
         {
@@ -192,7 +242,7 @@ namespace ChatCommands
             StringUtils::utf8ToWide(player_name));
         if (player_name.empty() || !player_peer || addon_id.empty())
         {
-            answerCommand("Usage: /playerhasaddon [addon_identity] [player name]", peer);
+            helpMessage(argv[0], peer);
         }
         else
         {
@@ -234,7 +284,7 @@ namespace ChatCommands
 
         if (argv.size() != 2)
         {
-            answerCommand("Usage: /serverhasaddon [addon_identity]", peer);
+            helpMessage(argv[0], peer);
             return;
         }
 
@@ -263,7 +313,7 @@ namespace ChatCommands
             StringUtils::utf8ToWide(player_name));
         if (player_name.empty() || !player_peer)
         {
-            answerCommand("Usage: /playeraddonscore [player name] (return 0-100)", peer);
+            helpMessage(argv[0], peer);
             return;
         }
 
@@ -305,7 +355,7 @@ namespace ChatCommands
             StringUtils::utf8ToWide(player_name));
 
         if (player_name.empty() || !player_peer || player_peer->isAIPeer())
-            answerCommand("Usage: /kick [player name]", peer);
+            helpMessage(argv[0], peer);
         else
             player_peer->kick();
     } // kick
@@ -334,7 +384,7 @@ namespace ChatCommands
         return;
 
 mute_error:
-        answerCommand("Usage: /mute player_name (not including yourself)", peer);
+        helpMessage(argv[0], peer);
     } // mute
 
     void unmute(std::string cmd, ServerLobby* lobby, std::shared_ptr<STKPeer> peer)
@@ -369,7 +419,7 @@ unmute_success:
         return;
 
 unmute_error:
-        answerCommand("Usage: /unmute player_name", peer);
+        helpMessage(argv[0], peer);
     } // unmute
 
     void listMute(std::string cmd, ServerLobby* lobby, std::shared_ptr<STKPeer> peer)
@@ -391,7 +441,7 @@ unmute_error:
         answerCommand(StringUtils::wideToUtf8(total), peer);
     } // listMute
 
-    void unknownCommand(std::string cmd, ServerLobby* lobby, std::shared_ptr<STKPeer> peer)
+    void unknownCommand(std::string cmd, std::shared_ptr<STKPeer> peer)
     {
         auto argv = StringUtils::split(cmd, ' ');
 
