@@ -700,11 +700,18 @@ void ThreeStrikesBattle::loadCustomModels()
                 int node = -1;
                 ag->findRoadSector(getRescueTransform(i).getOrigin(), &node,
                     NULL, true);
-                assert(node != -1);
-                sta_possible_nodes.erase(std::remove_if(
-                    sta_possible_nodes.begin(), sta_possible_nodes.end(),
-                    [node](const int n) { return n == node; }),
-                    sta_possible_nodes.end());
+                if (node == -1)
+                {
+                    Log::warn("ThreeStrikesBattle",
+                        "Start position %i is not a valid rescue position", i);
+                }
+                else
+                {
+                    sta_possible_nodes.erase(std::remove_if(
+                        sta_possible_nodes.begin(), sta_possible_nodes.end(),
+                        [node](const int n) { return n == node; }),
+                        sta_possible_nodes.end());
+                }
             }
 
             // Find random nodes to pre-spawn spare tire karts
