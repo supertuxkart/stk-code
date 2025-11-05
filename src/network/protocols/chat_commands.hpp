@@ -50,7 +50,7 @@ namespace ChatCommands
     void handleServerCommand(ServerLobby* lobby, Event* event, std::shared_ptr<STKPeer> peer);
 
     void help(std::string cmd, std::shared_ptr<STKPeer> peer);
-    void helpMessage(std::string cmd_name, std::shared_ptr<STKPeer> peer);
+    void helpMessage(std::string cmd_name, std::shared_ptr<STKPeer> peer, bool extra_info = false);
     void spectate(std::string cmd, ServerLobby* lobby, std::shared_ptr<STKPeer> peer);
     void listServerAddons(std::string cmd, ServerLobby* lobby, std::shared_ptr<STKPeer> peer);
     void playerHasAddon(std::string cmd, ServerLobby* lobby, std::shared_ptr<STKPeer> peer);

@@ -79,13 +79,13 @@ namespace ChatCommands
         auto argv = StringUtils::split(cmd, ' ');
         // A command name is supplied as an argument, give that command's help info
         if (argv.size() == 2)
-            helpMessage(argv[1], peer);
+            helpMessage(argv[1], peer, /* extra_info */ true);
         // Generic help message
         else
             helpMessage("help", peer);
     } // help
 
-    void helpMessage(std::string cmd_name, std::shared_ptr<STKPeer> peer)
+    void helpMessage(std::string cmd_name, std::shared_ptr<STKPeer> peer, bool extra_info)
     {
         if (cmd_name == "help")
         {
@@ -101,7 +101,7 @@ namespace ChatCommands
         }
 
         if (cmd_name == "spectate")
-            answerCommand("Usage: spectate [0 or 1], before game started", peer);
+            answerCommand("Usage: /spectate [0 or 1], before the game starts", peer);
         else if (cmd_name == "listserveraddon")
             answerCommand("Usage: /listserveraddon [option][addon string to find "
                 "(at least 3 characters)]. Available options: "
@@ -111,7 +111,7 @@ namespace ChatCommands
         else if (cmd_name == "serverhasaddon")
             answerCommand("Usage: /serverhasaddon [addon_identity]", peer);
         else if (cmd_name == "playeraddonscore")
-            answerCommand("Usage: /playeraddonscore [player name] (return 0-100)", peer);
+            answerCommand("Usage: /playeraddonscore [player name]", peer);
         else if (cmd_name == "kick")
             answerCommand("Usage: /kick [player name]", peer);
         else if (cmd_name == "mute")
@@ -122,6 +122,30 @@ namespace ChatCommands
             answerCommand("Usage: /listmute", peer);
         else
             unknownCommand(cmd_name, peer);
+
+        if (extra_info)
+        {
+            if (cmd_name == "spectate")
+                answerCommand("This command allows to enable or disable spectator mode.", peer);
+            else if (cmd_name == "listserveraddon")
+                answerCommand("This command allows to find all addons available on this server "
+                    "that contain the searched string in their name.", peer);
+            else if (cmd_name == "playerhasaddon")
+                answerCommand("This command allows to check if a player has a specific addon.", peer);
+            else if (cmd_name == "serverhasaddon")
+                answerCommand("This command allows to check if the server has a specific addon.)", peer);
+            else if (cmd_name == "playeraddonscore")
+                answerCommand("This command returns a value between 0% and 100%.)", peer);
+            else if (cmd_name == "kick")
+                answerCommand("This command kicks the named player out of the server, "
+                    "if you have the rights to do so.)", peer);
+            else if (cmd_name == "mute")
+                answerCommand("This command prevents you from seeing chat messages from the selected player.", peer);
+            else if (cmd_name == "unmute")
+                answerCommand("This command enables reading chat messages from a previously muted player.", peer);
+            else if (cmd_name == "listmute")
+                answerCommand("This command gives you the list of all players you have muted.", peer);
+        }
     } // helpMessage
 
     void spectate(std::string cmd, ServerLobby* lobby, std::shared_ptr<STKPeer> peer)
@@ -129,7 +153,7 @@ namespace ChatCommands
         auto argv = StringUtils::split(cmd, ' ');
         if (lobby->getGameSetup()->isGrandPrix() || !ServerConfig::m_live_players)
         {
-            answerCommand("Server doesn't support spectate", peer);
+            answerCommand("Spectating is not possible on this server.", peer);
             return;
         }
     
@@ -145,7 +169,7 @@ namespace ChatCommands
             if (lobby->getProcessType() == PT_CHILD &&
                 peer->getHostId() == lobby->getClientServerHostId())
             {
-                answerCommand("Graphical client server cannot spectate", peer);
+                answerCommand("Spectating is not possible for the host of a GUI server.", peer);
                 return;
             }
             peer->setAlwaysSpectate(ASM_COMMAND);
@@ -328,13 +352,13 @@ namespace ChatCommands
         std::string msg = player_name;
         msg += " addon:";
         if (scores[AS_KART] != -1)
-            msg += " kart: " + StringUtils::toString(scores[AS_KART]) + ",";
+            msg += " kart: " + StringUtils::toString(scores[AS_KART]) + "%,";
         if (scores[AS_TRACK] != -1)
-            msg += " track: " + StringUtils::toString(scores[AS_TRACK]) + ",";
+            msg += " track: " + StringUtils::toString(scores[AS_TRACK]) + "%,";
         if (scores[AS_ARENA] != -1)
-            msg += " arena: " + StringUtils::toString(scores[AS_ARENA]) + ",";
+            msg += " arena: " + StringUtils::toString(scores[AS_ARENA]) + "%,";
         if (scores[AS_SOCCER] != -1)
-            msg += " soccer: " + StringUtils::toString(scores[AS_SOCCER]) + ",";
+            msg += " soccer: " + StringUtils::toString(scores[AS_SOCCER]) + "%,";
         msg = msg.substr(0, msg.size() - 1);
         answerCommand(msg, peer);
     } // playerAddonScore
@@ -345,7 +369,7 @@ namespace ChatCommands
 
         if (lobby->m_server_owner.lock() != peer)
         {
-            answerCommand("You are not server owner", peer);
+            answerCommand("You are not server owner.", peer);
             return;
         }
         std::string player_name;
@@ -378,8 +402,7 @@ namespace ChatCommands
             goto mute_error;
 
         lobby->m_peers_muted_players[peer].insert(player_name);
-        result_msg = "Muted player ";
-        result_msg += argv[1];
+        result_msg = "Player " + argv[1] + " has been muted.";
         answerCommand(result_msg, peer);
         return;
 
@@ -413,8 +436,7 @@ mute_error:
         goto unmute_error;
 
 unmute_success:
-        result_msg = "Unmuted player ";
-        result_msg += argv[1];
+        result_msg = "Player " + argv[1] + " has been unmuted.";
         answerCommand(result_msg, peer);
         return;
 
@@ -434,7 +456,7 @@ unmute_error:
         }
 
         if (total.empty())
-            total = "No player has been muted by you";
+            total = "You have not muted any player.";
         else
             total += "muted";
 
