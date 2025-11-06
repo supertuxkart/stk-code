@@ -201,6 +201,13 @@ bool CheckLine::isTriggered(const Vec3 &old_pos, const Vec3 &new_pos,
                             int kart_index)
 {
     World* w = World::getWorld();
+    // Battle mode does not use checklines, and spare tire karts
+    // would trigger an OOB issue (see #5536)
+    // TODO: Once compatibility doesn't matter, the sign variable
+    // can be fully removed, see comment below.
+    if (RaceManager::get()->isBattleMode())
+        return false;
+
     // Sign here is for old client (<= 1.2) in networking, it's not used
     // anymore now
     bool sign = new_pos.sideofPlane(m_check_plane[0].pointA,
@@ -242,6 +249,7 @@ start:
 
     if (kart_index >= 0)
     {
+        assert(kart_index < (int)m_previous_sign.size());
         m_previous_sign[kart_index] = sign;
         if (result)
         {
