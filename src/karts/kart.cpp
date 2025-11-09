@@ -3243,11 +3243,7 @@ float Kart::compensateLinearSlowdown(float engine_power)
  */
 float Kart::applyAirFriction(float engine_power)
 {
-    // The result will always be a positive number
-    float friction_intensity = fabsf(getSpeed());
-
-    // Not a pure quadratic evolution as it would be too brutal
-    friction_intensity *= sqrt(friction_intensity)*5.0f;
+    float friction_intensity = m_vehicle->getAirFriction(getSpeed());
 
     // Apply parachute physics
     // Currently, all karts have the same base friction

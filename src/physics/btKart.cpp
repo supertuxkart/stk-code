@@ -86,7 +86,7 @@ btWheelInfo& btKart::addWheel(const btVector3& connectionPointCS,
     m_wheelInfo.push_back( btWheelInfo(ci));
 
     btWheelInfo& wheel = m_wheelInfo[getNumWheels()-1];
-    memset(&wheel.m_raycastInfo, 0, sizeof(wheel.m_raycastInfo));
+    memset((void*)&wheel.m_raycastInfo, 0, sizeof(wheel.m_raycastInfo));
 
     updateWheelTransformsWS(wheel, getChassisWorldTransform(), false);
     updateWheelTransform(getNumWheels()-1,false);
@@ -458,6 +458,37 @@ void btKart::updateVehicle( btScalar step )
 
         getRigidBody()->applyImpulse(impulse, relpos);
 
+    }
+
+    // Limit falling speeds by applying air friction to the vertical component
+    // ------------------------------------
+    if (m_num_wheels_on_ground == 0)
+    {
+        btVector3 v = btVector3(0,0,0);
+        // Engine force and friction when on the ground are also applied per-wheel
+        for (int i=0;i<m_wheelInfo.size();i++)
+        {
+            v += m_chassisBody->getVelocityInLocalPoint(m_wheelInfo[i]
+                                            .m_chassisConnectionPointCS);
+        }
+
+        btVector3 up = -m_chassisBody->getGravity();
+        up.normalize();
+        btVector3 v_up = (v * up) * up;
+
+        // The scalar product is positive if the two vectors are rather pointing
+        // in a similar direction and is negative if they are rather pointing in
+        // an opposite direction.
+        // We simulate computing per-wheel (air-friction is non-linear with speed,
+        // so using the sum of the speeds at each wheel would be incorrect)
+        float v_speed = v_up.dot(up) / m_wheelInfo.size();
+        float friction = m_wheelInfo.size() * getAirFriction(v_speed);
+
+        //Log::info("Flying friction debug", "Vspeed is %f, friction is %f", v_speed, friction);
+
+        btVector3 impulse = up * step * friction;
+        impulse *= (v_speed > 0) ? -1 : 1; 
+        m_chassisBody->applyCentralImpulse(impulse);
     }
 
     // Update friction (i.e. forward force)
@@ -1095,6 +1126,18 @@ void btKart::setSliding(bool active)
 {
     m_allow_sliding = active;
 }   // setSliding
+
+// ----------------------------------------------------------------------------
+float btKart::getAirFriction(float speed)
+{
+    // The result will always be a positive number
+    float friction_intensity = fabsf(speed);
+
+    // Not a pure quadratic evolution as it would be too brutal
+    friction_intensity *= sqrt(friction_intensity)*5.0f;
+
+    return friction_intensity;
+}   // getAirFriction
 
 // ----------------------------------------------------------------------------
 /** Adjusts the velocity of this kart to be at least the specified minimum,

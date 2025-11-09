@@ -292,6 +292,8 @@ public:
             m_max_speed = new_max_speed;
     }   // setMaxSpeed
     // ------------------------------------------------------------------------
+    float getAirFriction(float speed);
+    // ------------------------------------------------------------------------
     /** Resets the maximum so any new maximum value from the application will
      *  be accepted. */
     virtual void resetMaxSpeed() { m_max_speed = -1.0f; }
