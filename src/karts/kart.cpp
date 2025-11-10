@@ -534,6 +534,8 @@ void Kart::reset()
     }
     m_time_previous_counter = 0.0f;
 
+    computeTurnAngleArray(); 
+
     // In case that the kart was in the air, in which case its
     // linear damping is 0
     if(m_body)
@@ -1036,47 +1038,55 @@ void Kart::updateWeight()
 }   // updateWeight
 
 // ------------------------------------------------------------------------
+/** Computes this kart's turn angle arrays and store them for reuse
+ * m_turn_angle_at_speed_AI contains the theoretical values, it should
+ *   be used when trying to know what's the (max) speed for a given turn radius.
+ * m_turn_angle_at_speed values : this modified array is used to actually detemrine
+ *   kart behavior: an effect in physics give shorter karts a bigger turn radius
+ *   (see #3271). Multiplying by wheel base (kart length) allows to keep turn
+ *   radius across karts of different lengths sharing the same turn properties. */
+void Kart::computeTurnAngleArray()
+{
+    m_turn_angle_at_speed = m_kart_properties->getTurnRadius();
+
+    // Adjust the reference speeds in the array
+    float speed_factor = std::max(0.1f, 1.0f / m_kart_properties->getTurnSpeedFactor());
+    m_turn_angle_at_speed.adjustX(speed_factor);
+    m_turn_angle_at_speed_AI = m_turn_angle_at_speed;
+
+    // Convert the turn radius into turn angle. See the function's main comment for details.
+    for (int i = 0; i < (int)m_turn_angle_at_speed.size(); i++)
+    {
+        m_turn_angle_at_speed.setY(i, sinf( 1.0f / m_turn_angle_at_speed.getY(i))
+                                            * m_kart_properties->getWheelBase());
+        m_turn_angle_at_speed_AI.setY(i, sinf( 1.0f / m_turn_angle_at_speed_AI.getY(i)));
+    }
+} // computeTurnAngleArray
+
+// ------------------------------------------------------------------------
 /** Returns the (maximum) speed for a given turn radius.
  *  \param radius The radius for which the speed needs to be computed. */
 float Kart::getSpeedForTurnRadius(float radius) const
 {
-    // TODO - Compute once and save the result for the kart until the end of the race
-    //        instead of recomputing this interpolation array every frame
-    InterpolationArray turn_angle_at_speed = m_kart_properties->getTurnRadius();
+    // Avoid dividing by 0.
+    if (radius = 0.0f)
+        return 0.0f;
+
     float angle = sinf(1.0f / radius);
-
-    // Adjust the reference speeds in the array
-    float speed_factor = std::max(0.1f, 1.0f / m_kart_properties->getTurnSpeedFactor());
-    turn_angle_at_speed.adjustX(speed_factor);
-
-    // Convert the turn radius into turn angle
-    for(int i = 0; i < (int)turn_angle_at_speed.size(); i++)
-        turn_angle_at_speed.setY(i, sinf( 1.0f / turn_angle_at_speed.getY(i)));
-
-    return turn_angle_at_speed.getReverse(angle);
+    return m_turn_angle_at_speed_AI.getReverse(angle);
 }   // getSpeedForTurnRadius
 
 // ------------------------------------------------------------------------
 /** Returns the maximum steering angle (depending on speed).
-    This is proportional to kart length because physics reverse this effect,
-    the results of this function should not be used to determine the
-    real raw steer angle. */
+    The results of this function should NOT be used to determine the real
+    raw steer angle, see computeTurneAngleArray() for why. */
 float Kart::getMaxSteerAngle(float speed) const
 {
-    InterpolationArray turn_angle_at_speed = m_kart_properties->getTurnRadius();
-    // Convert the turn radius into turn angle
-    // We multiply by wheel base to keep turn radius identical
-    // across karts of different lengths sharing the same
-    // turn radius properties
-    for(int i = 0; i < (int)turn_angle_at_speed.size(); i++)
-        turn_angle_at_speed.setY(i, sinf( 1.0f / turn_angle_at_speed.getY(i))
-                                    * m_kart_properties->getWheelBase());
-
     // Make reverse mode turn the same way as forward
     if (speed < 0.0f)
         speed = -speed;
 
-    return turn_angle_at_speed.get(speed * m_kart_properties->getTurnSpeedFactor());
+    return m_turn_angle_at_speed.get(speed);
 }   // getMaxSteerAngle
 
 //-----------------------------------------------------------------------------

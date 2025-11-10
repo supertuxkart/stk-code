@@ -35,6 +35,7 @@
 #include "LinearMath/btTransform.h"
 #include "race/race_manager.hpp"
 #include "utils/cpp2011.hpp"
+#include "utils/interpolation_array.hpp"
 #include "utils/no_copy.hpp"
 
 namespace irr
@@ -354,6 +355,10 @@ protected:
     /** Reset position. */
     btTransform  m_reset_transform;
 
+    /** Arrays allowing to convert between speed and turn radius */
+    InterpolationArray m_turn_angle_at_speed;
+    InterpolationArray m_turn_angle_at_speed_AI;
+
     std::vector<SFXBase*> m_custom_sounds;
     int m_emitter_id = 0;
     static const int EMITTER_COUNT = 3;
@@ -399,6 +404,7 @@ protected:
     void          loadData(RaceManager::KartType type, bool animatedModel);
     void          updateWeight();
     void          initSound();
+    void          computeTurnAngleArray();
 public:
                    Kart(const std::string& ident, unsigned int world_kart_id,
                         int position, const btTransform& init_transform,
