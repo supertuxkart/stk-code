@@ -91,6 +91,8 @@ public:
         TURN_RADIUS,
         TURN_TIME_FULL_STEER,
         TURN_SPEED_FACTOR,
+        TURN_SPEED_FACTOR_PARTIAL_LB,
+        TURN_SPEED_FACTOR_PARTIAL_UB,
 
         // Engine
         ENGINE_POWER,
@@ -293,6 +295,8 @@ public:
     InterpolationArray getTurnRadius() const;
     InterpolationArray getTurnTimeFullSteer() const;
     float getTurnSpeedFactor() const;
+    float getTurnSpeedFactorPartialLb() const;
+    float getTurnSpeedFactorPartialUb() const;
 
     float getEnginePower() const;
     float getEngineMaxSpeed() const;

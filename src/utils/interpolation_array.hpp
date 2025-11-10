@@ -20,6 +20,8 @@
 #ifndef HEADER_INTERPOLATION_ARRAY_HPP
 #define HEADER_INTERPOLATION_ARRAY_HPP
 
+#include "utils/log.hpp"
+
 #include <assert.h>
 #include <vector>
 
@@ -84,12 +86,37 @@ public:
     // ------------------------------------------------------------------------
     /** Multiplies all the X values by a specific factor.
      * This operation keeps the order of the X correct. */
-    void adjustX(float x_factor)
+    void adjustX(float x_factor, float partial_lb, float partial_ub)
     {
+        if (partial_ub <= partial_lb)
+        {
+            partial_ub = partial_lb;
+            Log::error("InterpolationArray", "Partial_ub should not be smaller than partial_lb!");
+        }
+
         if (x_factor > 0.0f)
         {
             for (unsigned int i = 0; i < m_x.size(); i++)
-                m_x[i] = m_x[i] * x_factor;
+            {
+                // We apply the new factor fully (unless it would mess the order of the Xs)
+                if (m_x[i] > partial_ub)
+                {
+                    m_x[i] = m_x[i] * x_factor;
+                    if (i >= 1 && m_x[i] < m_x[i-1])
+                    {
+                        m_x[i] = m_x[i-1];
+                        Log::error("InterpolationArray", "The requested adjustment "
+                            "would have changed the order of the X values!");
+                    }
+                }
+                // We apply the new factor partially
+                else if (m_x[i] > partial_lb)
+                {
+                    float factor_prop = (m_x[i] - partial_lb) / (partial_ub - partial_lb);
+                    m_x[i] = factor_prop * m_x[i] * x_factor
+                            + (1.0f - factor_prop) * m_x[i];
+                }
+            }
         }
         // Recompute the deltas
         for (unsigned int i = 0; i < m_delta.size(); i++)

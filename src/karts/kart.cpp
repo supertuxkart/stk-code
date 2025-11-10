@@ -1051,7 +1051,11 @@ void Kart::computeTurnAngleArray()
 
     // Adjust the reference speeds in the array
     float speed_factor = std::max(0.1f, 1.0f / m_kart_properties->getTurnSpeedFactor());
-    m_turn_angle_at_speed.adjustX(speed_factor);
+    // Below the lower bound, we apply a factor of 1, above the upper bound
+    // we apply a factor of speed_factor, and in-between we interpolate.
+    float lower_bound = m_kart_properties->getTurnSpeedFactorPartialLb();
+    float upper_bound = m_kart_properties->getTurnSpeedFactorPartialUb();
+    m_turn_angle_at_speed.adjustX(speed_factor, lower_bound, upper_bound);
     m_turn_angle_at_speed_AI = m_turn_angle_at_speed;
 
     // Convert the turn radius into turn angle. See the function's main comment for details.
@@ -1069,7 +1073,7 @@ void Kart::computeTurnAngleArray()
 float Kart::getSpeedForTurnRadius(float radius) const
 {
     // Avoid dividing by 0.
-    if (radius = 0.0f)
+    if (radius == 0.0f)
         return 0.0f;
 
     float angle = sinf(1.0f / radius);

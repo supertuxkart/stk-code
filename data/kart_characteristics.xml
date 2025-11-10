@@ -81,15 +81,26 @@
                 If the kart is currently in the direction opposite to the
                 required steering ("negative steering"), the time-full-steer
                 at 0 is used.
-            speed-factor The real speed of the kart is multiplied by this factor
+            speed-factor: The real speed of the kart is multiplied by this factor
                 before checking the turn radius tables. This is meant to be used
                 by difficulty settings or handicap, so that differences in turning
                 abilities between kart classes keep more relevance even with
                 lower overall speeds.
+            speed-factor-partial-lb/ub: below the lower-bound, the speed-factor
+                is not applied (it's 1.0), above the upper-bound the speed-factor
+                is fully applied. It is recommended to set them to speeds which
+                serve as reference points for the radius array (otherwise, values
+                outside of the defined bounds will also be affected), and it is
+                crucial to ensure that speed-factor-partial-ub divided by the highest
+                possible speed-factor (with default speed-factor settings 1.4336)
+                is higher than speed-factor-partial-lb, preferrably significantly
+                so to avoid small speed increases having a strong effect on turn
+                radius.
                  -->
         <turn radius="0:3 4:3.6 8:5 12:7.4 16:10.4 22:15 30:21.5 50:38.2"
               time-full-steer="0:0.1 0.3:0.1 0.3:0.14 0.6:0.14 0.6:0.21 1.0:0.21"
-              speed-factor="1.0"/>
+              speed-factor="1.0" speed-factor-partial-lb="8.0"
+              speed-factor-partial-ub="16.0"/>
 
         <!-- Speed and acceleration
             power: The power of the kart (the engine power needed to accelerate

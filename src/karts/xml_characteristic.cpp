@@ -357,6 +357,10 @@ void XmlCharacteristic::load(const XMLNode *node)
             &m_values[TURN_TIME_FULL_STEER]);
         sub_node->get("speed-factor",
             &m_values[TURN_SPEED_FACTOR]);
+        sub_node->get("speed-factor-partial-lb",
+            &m_values[TURN_SPEED_FACTOR_PARTIAL_LB]);
+        sub_node->get("speed-factor-partial-ub",
+            &m_values[TURN_SPEED_FACTOR_PARTIAL_UB]);
     }
 
     if (const XMLNode *sub_node = node->getNode("engine"))

@@ -85,6 +85,10 @@ AbstractCharacteristic::ValueType AbstractCharacteristic::getType(
         return TYPE_INTERPOLATION_ARRAY;
     case TURN_SPEED_FACTOR:
         return TYPE_FLOAT;
+    case TURN_SPEED_FACTOR_PARTIAL_LB:
+        return TYPE_FLOAT;
+    case TURN_SPEED_FACTOR_PARTIAL_UB:
+        return TYPE_FLOAT;
     case ENGINE_POWER:
         return TYPE_FLOAT;
     case ENGINE_MAX_SPEED:
@@ -347,6 +351,10 @@ std::string AbstractCharacteristic::getName(CharacteristicType type)
         return "TURN_TIME_FULL_STEER";
     case TURN_SPEED_FACTOR:
         return "TURN_SPEED_FACTOR";
+    case TURN_SPEED_FACTOR_PARTIAL_LB:
+        return "TURN_SPEED_FACTOR_PARTIAL_LB";
+    case TURN_SPEED_FACTOR_PARTIAL_UB:
+        return "TURN_SPEED_FACTOR_PARTIAL_UB";
     case ENGINE_POWER:
         return "ENGINE_POWER";
     case ENGINE_MAX_SPEED:
@@ -750,6 +758,30 @@ float AbstractCharacteristic::getTurnSpeedFactor() const
                     getName(TURN_SPEED_FACTOR).c_str());
     return result;
 }  // getTurnSpeedFactor
+
+// ----------------------------------------------------------------------------
+float AbstractCharacteristic::getTurnSpeedFactorPartialLb() const
+{
+    float result;
+    bool is_set = false;
+    process(TURN_SPEED_FACTOR_PARTIAL_LB, &result, &is_set);
+    if (!is_set)
+        Log::fatal("AbstractCharacteristic", "Can't get characteristic %s",
+                    getName(TURN_SPEED_FACTOR_PARTIAL_LB).c_str());
+    return result;
+}  // getTurnSpeedFactorPartialLb
+
+// ----------------------------------------------------------------------------
+float AbstractCharacteristic::getTurnSpeedFactorPartialUb() const
+{
+    float result;
+    bool is_set = false;
+    process(TURN_SPEED_FACTOR_PARTIAL_UB, &result, &is_set);
+    if (!is_set)
+        Log::fatal("AbstractCharacteristic", "Can't get characteristic %s",
+                    getName(TURN_SPEED_FACTOR_PARTIAL_UB).c_str());
+    return result;
+}  // getTurnSpeedFactorPartialUb
 
 // ----------------------------------------------------------------------------
 float AbstractCharacteristic::getEnginePower() const

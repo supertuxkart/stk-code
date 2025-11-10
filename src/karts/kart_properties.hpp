@@ -402,6 +402,8 @@ public:
     InterpolationArray getTurnRadius() const;
     InterpolationArray getTurnTimeFullSteer() const;
     float getTurnSpeedFactor() const;
+    float getTurnSpeedFactorPartialLb() const;
+    float getTurnSpeedFactorPartialUb() const;
 
     float getEnginePower() const;
     float getEngineMaxSpeed() const;

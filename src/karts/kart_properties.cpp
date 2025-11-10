@@ -846,6 +846,18 @@ float KartProperties::getTurnSpeedFactor() const
 }  // getTurnSpeedFactor
 
 // ----------------------------------------------------------------------------
+float KartProperties::getTurnSpeedFactorPartialLb() const
+{
+    return m_cached_characteristic->getTurnSpeedFactorPartialLb();
+}  // getTurnSpeedFactorPartialLb
+
+// ----------------------------------------------------------------------------
+float KartProperties::getTurnSpeedFactorPartialUb() const
+{
+    return m_cached_characteristic->getTurnSpeedFactorPartialUb();
+}  // getTurnSpeedFactorPartialUb
+
+// ----------------------------------------------------------------------------
 float KartProperties::getEnginePower() const
 {
     return m_cached_characteristic->getEnginePower();
