@@ -77,6 +77,7 @@ void CustomCameraSettingsDialog::beforeAddingWidgets()
         getWidget<SpinnerWidget>("smooth_position")->setFloatValue(UserConfigParams::m_standard_camera_forward_smooth_position);
         getWidget<SpinnerWidget>("smooth_rotation")->setFloatValue(UserConfigParams::m_standard_camera_forward_smooth_rotation);
         getWidget<CheckBoxWidget>("use_soccer_camera")->setState(UserConfigParams::m_standard_reverse_look_use_soccer_cam);
+        getWidget<CheckBoxWidget>("use_camera_shake")->setState(UserConfigParams::m_standard_camera_use_shake);
     }
     else if (UserConfigParams::m_camera_present == 2) // Drone chase camera
     {
@@ -101,6 +102,7 @@ void CustomCameraSettingsDialog::beforeAddingWidgets()
         getWidget<SpinnerWidget>("smooth_position")->setFloatValue(UserConfigParams::m_saved_camera_forward_smooth_position);
         getWidget<SpinnerWidget>("smooth_rotation")->setFloatValue(UserConfigParams::m_saved_camera_forward_smooth_rotation);
         getWidget<CheckBoxWidget>("use_soccer_camera")->setState(UserConfigParams::m_saved_reverse_look_use_soccer_cam);
+        getWidget<CheckBoxWidget>("use_camera_shake")->setState(UserConfigParams::m_saved_camera_use_shake);
     }
 #endif
 }
@@ -125,6 +127,7 @@ GUIEngine::EventPropagation CustomCameraSettingsDialog::processEvent(const std::
             UserConfigParams::m_camera_forward_smooth_position = getWidget<SpinnerWidget>("smooth_position")->getFloatValue();
             UserConfigParams::m_camera_forward_smooth_rotation = getWidget<SpinnerWidget>("smooth_rotation")->getFloatValue();
             UserConfigParams::m_reverse_look_use_soccer_cam = getWidget<CheckBoxWidget>("use_soccer_camera")->getState();
+            UserConfigParams::m_camera_use_shake = getWidget<CheckBoxWidget>("use_camera_shake")->getState();
 
             if (UserConfigParams::m_camera_present == 1) // Standard camera, only smoothing and follow soccer is customizable
             {
@@ -136,6 +139,7 @@ GUIEngine::EventPropagation CustomCameraSettingsDialog::processEvent(const std::
                 UserConfigParams::m_standard_camera_backward_distance = UserConfigParams::m_camera_backward_distance;
                 UserConfigParams::m_standard_camera_backward_up_angle = UserConfigParams::m_camera_backward_up_angle;
                 UserConfigParams::m_standard_reverse_look_use_soccer_cam = UserConfigParams::m_reverse_look_use_soccer_cam;
+                UserConfigParams::m_standard_camera_use_shake = UserConfigParams::m_camera_use_shake;
             }
             else if (UserConfigParams::m_camera_present == 2) // Drone chase camera, only smoothing and follow soccer is customizable
             {
@@ -158,6 +162,7 @@ GUIEngine::EventPropagation CustomCameraSettingsDialog::processEvent(const std::
                 UserConfigParams::m_saved_camera_backward_distance = UserConfigParams::m_camera_backward_distance;
                 UserConfigParams::m_saved_camera_backward_up_angle = UserConfigParams::m_camera_backward_up_angle;
                 UserConfigParams::m_saved_reverse_look_use_soccer_cam = UserConfigParams::m_reverse_look_use_soccer_cam;
+                UserConfigParams::m_saved_camera_use_shake = UserConfigParams::m_camera_use_shake;
             }
             OptionsScreenDisplay::getInstance()->updateCamera();
             m_self_destroy = true;
@@ -175,6 +180,7 @@ GUIEngine::EventPropagation CustomCameraSettingsDialog::processEvent(const std::
                 UserConfigParams::m_camera_backward_distance = 2.0;
                 UserConfigParams::m_camera_backward_up_angle = 10;
                 UserConfigParams::m_reverse_look_use_soccer_cam = false;
+                UserConfigParams::m_camera_use_shake = true;
             }
             else if (UserConfigParams::m_camera_present == 2) // Drone chase camera
             {
@@ -186,6 +192,7 @@ GUIEngine::EventPropagation CustomCameraSettingsDialog::processEvent(const std::
                 UserConfigParams::m_camera_backward_distance = 2.0;
                 UserConfigParams::m_camera_backward_up_angle = 10;
                 UserConfigParams::m_reverse_look_use_soccer_cam = false;
+                UserConfigParams::m_camera_use_shake = false;
             }
             else // Custom camera
             {
@@ -197,6 +204,7 @@ GUIEngine::EventPropagation CustomCameraSettingsDialog::processEvent(const std::
                 UserConfigParams::m_camera_backward_distance = UserConfigParams::m_saved_camera_backward_distance;
                 UserConfigParams::m_camera_backward_up_angle = UserConfigParams::m_saved_camera_backward_up_angle;
                 UserConfigParams::m_reverse_look_use_soccer_cam = UserConfigParams::m_saved_reverse_look_use_soccer_cam;
+                UserConfigParams::m_camera_use_shake = UserConfigParams::m_saved_camera_use_shake;
             }
             getWidget<SpinnerWidget>("fov")->setValue(UserConfigParams::m_camera_fov);
             getWidget<SpinnerWidget>("camera_distance")->setFloatValue(UserConfigParams::m_camera_distance);
@@ -206,6 +214,7 @@ GUIEngine::EventPropagation CustomCameraSettingsDialog::processEvent(const std::
             getWidget<SpinnerWidget>("backward_camera_distance")->setFloatValue(UserConfigParams::m_camera_backward_distance);
             getWidget<SpinnerWidget>("backward_camera_angle")->setValue(UserConfigParams::m_camera_backward_up_angle);
             getWidget<CheckBoxWidget>("use_soccer_camera")->setState(UserConfigParams::m_reverse_look_use_soccer_cam);
+            getWidget<CheckBoxWidget>("use_camera_shake")->setState(UserConfigParams::m_camera_use_shake);
         }
         else if (selection == "cancel")
         {
