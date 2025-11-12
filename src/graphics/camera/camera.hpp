@@ -66,6 +66,7 @@ public:
         CM_LEADER_MODE,       //!< for deleted player karts in follow the leader
         CM_SPECTATOR_SOCCER,   //!< for spectator (in soccer mode)
         CM_SPECTATOR_TOP_VIEW, //!< for spectator (top view on ball if soccer or top view on kart)
+        CM_SPECTATOR_TV,       //!< spectator TV cameras placed in scene (soccer), always follow ball
         CM_SIMPLE_REPLAY,
         CM_FALLING
     };   // Mode

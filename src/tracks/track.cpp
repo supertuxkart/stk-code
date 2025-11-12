@@ -28,6 +28,7 @@
 #include "config/stk_config.hpp"
 #include "config/user_config.hpp"
 #include "graphics/camera/camera_end.hpp"
+#include "graphics/camera/camera_normal.hpp"
 #include "graphics/CBatchingMesh.hpp"
 #include "graphics/central_settings.hpp"
 #include "graphics/cpu_particle_manager.hpp"
@@ -2495,6 +2496,10 @@ void Track::loadObjects(const XMLNode* root, const std::string& path,
         else if (name == "end-cameras")
         {
             CameraEnd::readEndCamera(*node);
+        }
+        else if (name == "tv-cameras")
+        {
+            CameraNormal::readTVCameras(*node);
         }
         else if (name == "light")
         {
