@@ -193,9 +193,9 @@ void KartModel::loadInfo(const XMLNode &node)
             animation_node->get("start-losing-loop",  &m_animation_frame[AF_LOSE_LOOP_START]);
             animation_node->get("end-losing",         &m_animation_frame[AF_LOSE_LOOP_END]  );
 
-            animation_node->get("start-jump",     &m_animation_frame[AF_JUMP_START]           );
-            animation_node->get("start-jump-loop",&m_animation_frame[AF_JUMP_LOOP_START]      );
-            animation_node->get("end-jump",       &m_animation_frame[AF_JUMP_LOOP_END]        );
+            animation_node->get("start-jump",      &m_animation_frame[AF_JUMP_START]          );
+            animation_node->get("start-jump-loop", &m_animation_frame[AF_JUMP_LOOP_START]     );
+            animation_node->get("end-jump",        &m_animation_frame[AF_JUMP_LOOP_END]       );
             animation_node->get("selection-start", &m_animation_frame[AF_SELECTION_LOOP_START]);
             animation_node->get("selection-end",   &m_animation_frame[AF_SELECTION_LOOP_END]  );
 
@@ -237,7 +237,9 @@ void KartModel::loadInfo(const XMLNode &node)
             animation_node->get("bump-back",   &m_animation_frame[AF_BUMP_BACK]   );
             animation_node->get("happy",       &m_animation_frame[AF_HAPPY]       );
             animation_node->get("hit",         &m_animation_frame[AF_HIT]         );
-            animation_node->get("false-accel", &m_animation_frame[AF_FALSE_ACCEL] );
+
+            animation_node->get("false-accel-start", &m_animation_frame[AF_FALSE_ACCEL_START] );
+            animation_node->get("false-accel-end",   &m_animation_frame[AF_FALSE_ACCEL_END]   );
 
             animation_node->get("speed",          &m_animation_speed               );
         }
@@ -1232,6 +1234,24 @@ void KartModel::setAnimation(AnimationFrameType type, bool play_non_loop)
 }   // setAnimation
 
 // ----------------------------------------------------------------------------
+/** Starts an animation loop.
+ *  \param type The type of animation to play.
+ */
+void KartModel::setAnimationLoop(AnimationFrameType start)
+{
+    // loop-start + 1 corresponds to the matching loop-end type
+    AnimationFrameType end = (AnimationFrameType)(start + 1);
+
+    if(m_animation_frame[start] > -1 && m_animation_frame[end] > -1)
+    {
+        m_animated_node->setAnimationSpeed(m_animation_speed);
+        m_animated_node->setFrameLoop(m_animation_frame[start],
+                                      m_animation_frame[end]   );
+        m_animated_node->setLoopMode(true);
+    }
+} // setAnimationLoop
+
+// ----------------------------------------------------------------------------
 /** Called from irrlicht when a non-looped animation ends. This is used to
  *  implement an introductory frame sequence before the actual loop can
  *  start: first a non-looped version from the first frame to the last
@@ -1242,28 +1262,18 @@ void KartModel::setAnimation(AnimationFrameType type, bool play_non_loop)
  */
 void KartModel::OnAnimationEnd(scene::IAnimatedMeshSceneNode *node)
 {
-    // It should only be called for the animated node of this
-    // kart_model
-    assert(node==m_animated_node);
+    // It should only be called for the animated node of this kart_model
+    assert(node == m_animated_node);
 
     // 'type' is the start frame of the animation, type + 1 the frame
     // to begin the loop with, type + 2 to end the frame with
-    AnimationFrameType start = (AnimationFrameType)(m_current_animation+1);
+    AnimationFrameType start = (AnimationFrameType)(m_current_animation + 1);
     // If there is no loop-start defined (i.e. no 'introductory' sequence)
     // use the normal start frame.
-    if(m_animation_frame[start]==-1)
+    if(m_animation_frame[start] == -1)
         start = m_current_animation;
-    AnimationFrameType end   = (AnimationFrameType)(m_current_animation+2);
 
-    // Switch to loop mode if the current animation has a loop defined
-    // (else just disable the callback, and the last frame will be shown).
-    if(m_animation_frame[end]>-1)
-    {
-        m_animated_node->setAnimationSpeed(m_animation_speed);
-        m_animated_node->setFrameLoop(m_animation_frame[start],
-                                      m_animation_frame[end]   );
-        m_animated_node->setLoopMode(true);
-    }
+    setAnimationLoop(start);
     m_animated_node->setAnimationEndCallback(NULL);
 }   // OnAnimationEnd
 

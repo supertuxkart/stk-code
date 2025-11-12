@@ -242,6 +242,8 @@ public:
             AF_BACK_STRAIGHT,        // Going back straight
             AF_BACK_RIGHT,           // Going back right
 
+            // The "loop_end" values here MUST be the "start" value + 2
+            // for setAnimation to work as intended.
             AF_WIN_START,            // Begin of win animation
             AF_WIN_LOOP_START,       // Begin of win loop animation
             AF_WIN_LOOP_END,         // End of the winning loop
@@ -270,9 +272,11 @@ public:
             AF_BUMP_BACK,   // Played if the kart hits something in front
             AF_HAPPY,       // Played when hitting a rival (or some overtaking)
             AF_HIT,         // Played when being hit
-            AF_FALSE_ACCEL, // Played if there is a penalty for early accel
 
-            AF_END=AF_FALSE_ACCEL,   // Last animation frame
+            AF_FALSE_ACCEL_START, // Played if there is a penalty for early accel
+            AF_FALSE_ACCEL_END,   // Played if there is a penalty for early accel
+
+            AF_END=AF_FALSE_ACCEL_END,   // Last animation frame
             AF_COUNT};               // Number of entries here
 
 private:
@@ -513,6 +517,9 @@ public:
     // ------------------------------------------------------------------------
     /** Enables- or disables the end animation. */
     void  setAnimation(AnimationFrameType type, bool play_non_loop = false);
+    // ------------------------------------------------------------------------
+    /** Starts an animation loop with the specified loop-start type. */
+    void setAnimationLoop(AnimationFrameType start);
     // ------------------------------------------------------------------------
     /** Sets the kart this model is currently used for */
     void  setKart(Kart* k) { m_kart = k; }

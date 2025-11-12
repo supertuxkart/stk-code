@@ -386,18 +386,13 @@ void GrandPrixWin::setKarts(const std::pair<std::string, float> idents_arg[3])
             }
             else // Standard happy animations
             {
-                const unsigned start_frame =
-                    kart_model->getFrame(KartModel::AF_WIN_LOOP_START) > -1 ?
-                    kart_model->getFrame(KartModel::AF_WIN_LOOP_START) :
-                    kart_model->getFrame(KartModel::AF_WIN_START) > -1 ?
-                    kart_model->getFrame(KartModel::AF_WIN_START) :
-                    kart_model->getFrame(KartModel::AF_STRAIGHT);
-                const unsigned end_frame =
-                    kart_model->getFrame(KartModel::AF_WIN_LOOP_END) > -1 ?
-                    kart_model->getFrame(KartModel::AF_WIN_LOOP_END) :
-                    kart_model->getFrame(KartModel::AF_STRAIGHT);
-                a_node->setLoopMode(true);
-                a_node->setFrameLoop(start_frame, end_frame);
+                // The animations will auto-loop
+                if (kart_model->getFrame(KartModel::AF_PODIUM_START) > -1)
+                    kart_model->setAnimation(KartModel::AF_PODIUM_START);
+                else if (kart_model->getFrame(KartModel::AF_WIN_LOOP_START) > -1)
+                    kart_model->setAnimationLoop(KartModel::AF_WIN_LOOP_START);
+                else
+                    kart_model->setAnimation(KartModel::AF_STRAIGHT);
             }
         }
 
