@@ -167,32 +167,84 @@ KartModel::KartModel(bool is_master)
 void KartModel::loadInfo(const XMLNode &node)
 {
     node.get("model-file", &m_model_filename);
+
+    int version = 1;
+    if(const XMLNode *format_node=node.getNode("format"))
+        format_node->get("version", &version);
+
+    //Log::verbose("Kart_Model", "Kart %s is using format version %i", m_model_filename.c_str(), version);
+
     if(const XMLNode *animation_node=node.getNode("animations"))
     {
-        animation_node->get("left",           &m_animation_frame[AF_LEFT]      );
-        animation_node->get("straight",       &m_animation_frame[AF_STRAIGHT]  );
-        animation_node->get("right",          &m_animation_frame[AF_RIGHT]     );
-        animation_node->get("start-winning",  &m_animation_frame[AF_WIN_START] );
-        animation_node->get("start-winning-loop",
-                                              &m_animation_frame[AF_WIN_LOOP_START] );
-        animation_node->get("end-winning",    &m_animation_frame[AF_WIN_END]   );
-        animation_node->get("end-winning-straight", &m_animation_frame[AF_WIN_END_STRAIGHT]  );
-        animation_node->get("start-losing",   &m_animation_frame[AF_LOSE_START]);
-        animation_node->get("start-losing-loop",
-                                             &m_animation_frame[AF_LOSE_LOOP_START]);
-        animation_node->get("end-losing",     &m_animation_frame[AF_LOSE_END]  );
-        animation_node->get("end-losing-straight", &m_animation_frame[AF_LOSE_END_STRAIGHT]  );
-        animation_node->get("start-explosion",&m_animation_frame[AF_LOSE_START]);
-        animation_node->get("end-explosion",  &m_animation_frame[AF_LOSE_END]  );
-        animation_node->get("start-jump",     &m_animation_frame[AF_JUMP_START]);
-        animation_node->get("start-jump-loop",&m_animation_frame[AF_JUMP_LOOP] );
-        animation_node->get("end-jump",       &m_animation_frame[AF_JUMP_END]  );
-        animation_node->get("selection-start", &m_animation_frame[AF_SELECTION_START]);
-        animation_node->get("selection-end",   &m_animation_frame[AF_SELECTION_END]  );
-        animation_node->get("backpedal-left", &m_animation_frame[AF_BACK_LEFT]);
-        animation_node->get("backpedal",      &m_animation_frame[AF_BACK_STRAIGHT]);
-        animation_node->get("backpedal-right",&m_animation_frame[AF_BACK_RIGHT]);
-        animation_node->get("speed",          &m_animation_speed               );
+        // Compatibility-layer for 1.x and older karts
+        if (version == 1)
+        {
+            animation_node->get("left",           &m_animation_frame[AF_LEFT]         );
+            animation_node->get("straight",       &m_animation_frame[AF_STRAIGHT]     );
+            animation_node->get("right",          &m_animation_frame[AF_RIGHT]        );
+            animation_node->get("backpedal-left", &m_animation_frame[AF_BACK_LEFT]    );
+            animation_node->get("backpedal",      &m_animation_frame[AF_BACK_STRAIGHT]);
+            animation_node->get("backpedal-right",&m_animation_frame[AF_BACK_RIGHT]   );
+
+            animation_node->get("start-winning",      &m_animation_frame[AF_WIN_START]      );
+            animation_node->get("start-winning-loop", &m_animation_frame[AF_WIN_LOOP_START] );
+            animation_node->get("end-winning",        &m_animation_frame[AF_WIN_LOOP_END]   );
+            animation_node->get("start-losing",       &m_animation_frame[AF_LOSE_START]     );
+            animation_node->get("start-losing-loop",  &m_animation_frame[AF_LOSE_LOOP_START]);
+            animation_node->get("end-losing",         &m_animation_frame[AF_LOSE_LOOP_END]  );
+
+            animation_node->get("start-jump",     &m_animation_frame[AF_JUMP_START]           );
+            animation_node->get("start-jump-loop",&m_animation_frame[AF_JUMP_LOOP_START]      );
+            animation_node->get("end-jump",       &m_animation_frame[AF_JUMP_LOOP_END]        );
+            animation_node->get("selection-start", &m_animation_frame[AF_SELECTION_LOOP_START]);
+            animation_node->get("selection-end",   &m_animation_frame[AF_SELECTION_LOOP_END]  );
+
+            animation_node->get("speed",          &m_animation_speed               );
+        }
+        // Version used for SuperTuxKart Evolution
+        else if (version == 2)
+        {
+            animation_node->get("left",           &m_animation_frame[AF_LEFT]         );
+            animation_node->get("straight",       &m_animation_frame[AF_STRAIGHT]     );
+            animation_node->get("right",          &m_animation_frame[AF_RIGHT]        );
+            animation_node->get("backpedal-left", &m_animation_frame[AF_BACK_LEFT]    );
+            animation_node->get("backpedal",      &m_animation_frame[AF_BACK_STRAIGHT]);
+            animation_node->get("backpedal-right",&m_animation_frame[AF_BACK_RIGHT]   );
+
+            animation_node->get("winning-start",      &m_animation_frame[AF_WIN_START]         );
+            animation_node->get("winning-loop-start", &m_animation_frame[AF_WIN_LOOP_START]    );
+            animation_node->get("winning-loop-end",   &m_animation_frame[AF_WIN_LOOP_END]      );
+            animation_node->get("neutral-start",      &m_animation_frame[AF_NEUTRAL_START]     );
+            animation_node->get("neutral-loop-start", &m_animation_frame[AF_NEUTRAL_LOOP_START]);
+            animation_node->get("neutral-loop-end",   &m_animation_frame[AF_NEUTRAL_LOOP_END]  );
+            animation_node->get("losing-start",       &m_animation_frame[AF_LOSE_START]        );
+            animation_node->get("losing-loop-start",  &m_animation_frame[AF_LOSE_LOOP_START]   );
+            animation_node->get("losing-loop-end",    &m_animation_frame[AF_LOSE_LOOP_END]     );
+            animation_node->get("podium-start",       &m_animation_frame[AF_PODIUM_START]      );
+            animation_node->get("podium-loop-start",  &m_animation_frame[AF_PODIUM_LOOP_START] );
+            animation_node->get("podium-loop-end",    &m_animation_frame[AF_PODIUM_LOOP_END]   );
+
+            animation_node->get("jump-start",      &m_animation_frame[AF_JUMP_START]               );
+            animation_node->get("jump-loop-start", &m_animation_frame[AF_JUMP_LOOP_START]          );
+            animation_node->get("jump-loop-end",   &m_animation_frame[AF_JUMP_LOOP_END]            );
+            animation_node->get("selection-start",      &m_animation_frame[AF_SELECTION_START]     );
+            animation_node->get("selection-loop-start", &m_animation_frame[AF_SELECTION_LOOP_START]);
+            animation_node->get("selection-loop-end",   &m_animation_frame[AF_SELECTION_LOOP_END]  );
+
+            animation_node->get("bump-front",  &m_animation_frame[AF_BUMP_FRONT]  );
+            animation_node->get("bump-left",   &m_animation_frame[AF_BUMP_LEFT]   );
+            animation_node->get("bump-right",  &m_animation_frame[AF_BUMP_RIGHT]  );
+            animation_node->get("bump-back",   &m_animation_frame[AF_BUMP_BACK]   );
+            animation_node->get("happy",       &m_animation_frame[AF_HAPPY]       );
+            animation_node->get("hit",         &m_animation_frame[AF_HIT]         );
+            animation_node->get("false-accel", &m_animation_frame[AF_FALSE_ACCEL] );
+
+            animation_node->get("speed",          &m_animation_speed               );
+        }
+        else
+        {
+            Log::error("Kart_Model", "Unsupported kart.xml format version %i!", version);
+        }
     }
 
     if(const XMLNode *wheels_node=node.getNode("wheels"))

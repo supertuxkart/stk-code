@@ -233,31 +233,47 @@ class KartModel : public scene::IAnimationEndCallBack, public NoCopy
 {
 public:
     enum   AnimationFrameType
-           {AF_BEGIN,              // First animation frame
-            AF_DEFAULT = AF_BEGIN, // Default, i.e. steering animation
-            AF_LEFT,               // Steering to the left
-            AF_STRAIGHT,           // Going straight
-            AF_RIGHT,              // Steering to the right
-            AF_LOSE_START,         // Begin losing animation
-            AF_LOSE_LOOP_START,    // Begin of the losing loop
-            AF_LOSE_END,           // End losing animation
-            AF_LOSE_END_STRAIGHT,  // End losing animation to straight frame
-            AF_BEGIN_EXPLOSION,    // Begin explosion animation
-            AF_END_EXPLOSION,      // End explosion animation
-            AF_JUMP_START,         // Begin of jump
-            AF_JUMP_LOOP,          // Begin of jump loop
-            AF_JUMP_END,           // End of jump
-            AF_WIN_START,          // Begin of win animation
-            AF_WIN_LOOP_START,     // Begin of win loop animation
-            AF_WIN_END,            // End of win animation
-            AF_WIN_END_STRAIGHT,   // End of win animation to straight frame
-            AF_SELECTION_START,    // Start frame in kart selection screen
-            AF_SELECTION_END,      // End frame in kart selection screen
-            AF_BACK_LEFT,          // Going back left
-            AF_BACK_STRAIGHT,      // Going back straight
-            AF_BACK_RIGHT,         // Going back right
-            AF_END=AF_BACK_RIGHT,  // Last animation frame
-            AF_COUNT};             // Number of entries here
+           {AF_BEGIN,                // First animation frame
+            AF_DEFAULT = AF_BEGIN,   // Default, i.e. steering animation
+            AF_LEFT,                 // Steering to the left
+            AF_STRAIGHT,             // Going straight
+            AF_RIGHT,                // Steering to the right
+            AF_BACK_LEFT,            // Going back left
+            AF_BACK_STRAIGHT,        // Going back straight
+            AF_BACK_RIGHT,           // Going back right
+
+            AF_WIN_START,            // Begin of win animation
+            AF_WIN_LOOP_START,       // Begin of win loop animation
+            AF_WIN_LOOP_END,         // End of the winning loop
+            AF_NEUTRAL_START,        // Begin of the neutral animation
+            AF_NEUTRAL_LOOP_START,   // Begin of the neutral loop animation
+            AF_NEUTRAL_LOOP_END,     // End of the neutral loop animation
+            AF_LOSE_START,           // Begin losing animation
+            AF_LOSE_LOOP_START,      // Begin of the losing loop
+            AF_LOSE_LOOP_END,        // End of the losing loop
+            AF_PODIUM_START,         // Start of the podium animation
+            AF_PODIUM_LOOP_START,    // Start of the podium loop
+            AF_PODIUM_LOOP_END,      // End of the podium loop
+
+            AF_JUMP_START,           // Begin of jump
+            // Note: Although already defined previously, the jump loop
+            //       animations appear unused.
+            AF_JUMP_LOOP_START,      // Begin of the jump loop
+            AF_JUMP_LOOP_END,        // End of the jump loop
+            AF_SELECTION_START,      // Start frame in the kart selection screen
+            AF_SELECTION_LOOP_START, // Start of the kart selection screen loop
+            AF_SELECTION_LOOP_END,   // End of the kart selection screen loop
+
+            AF_BUMP_FRONT,  // Played if the kart hits something in front
+            AF_BUMP_LEFT,   // Played if the kart hits something in front
+            AF_BUMP_RIGHT,  // Played if the kart hits something in front
+            AF_BUMP_BACK,   // Played if the kart hits something in front
+            AF_HAPPY,       // Played when hitting a rival (or some overtaking)
+            AF_HIT,         // Played when being hit
+            AF_FALSE_ACCEL, // Played if there is a penalty for early accel
+
+            AF_END=AF_FALSE_ACCEL,   // Last animation frame
+            AF_COUNT};               // Number of entries here
 
 private:
     /** Which frame number starts/end which animation. */

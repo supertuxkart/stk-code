@@ -201,8 +201,8 @@ void GrandPrixLose::setKarts(std::vector<std::pair<std::string, float> > ident_a
                     kart_model->getFrame(KartModel::AF_LOSE_START) :
                     kart_model->getFrame(KartModel::AF_STRAIGHT);
                 const unsigned end_frame =
-                    kart_model->getFrame(KartModel::AF_LOSE_END) > -1 ?
-                    kart_model->getFrame(KartModel::AF_LOSE_END) :
+                    kart_model->getFrame(KartModel::AF_LOSE_LOOP_END) > -1 ?
+                    kart_model->getFrame(KartModel::AF_LOSE_LOOP_END) :
                     kart_model->getFrame(KartModel::AF_STRAIGHT);
                 a_node->setLoopMode(true);
                 a_node->setFrameLoop(start_frame, end_frame);

@@ -239,21 +239,21 @@ PlayerKartWidget::PlayerKartWidget(KartSelectionScreen* parent,
         UserConfigParams::m_animated_characters &&
         (((kart_model.getFrame(KartModel::AF_WIN_LOOP_START) > -1 ||
         kart_model.getFrame(KartModel::AF_WIN_START) > -1) &&
-        kart_model.getFrame(KartModel::AF_WIN_END) > -1) ||
-        (kart_model.getFrame(KartModel::AF_SELECTION_START) > -1 &&
-        kart_model.getFrame(KartModel::AF_SELECTION_END) > -1));
+        kart_model.getFrame(KartModel::AF_WIN_LOOP_END) > -1) ||
+        (kart_model.getFrame(KartModel::AF_SELECTION_LOOP_START) > -1 &&
+        kart_model.getFrame(KartModel::AF_SELECTION_LOOP_END) > -1));
     m_model_view->addModel( kart_model.getModel(), model_location,
         has_win_anime ?
-        kart_model.getFrame(KartModel::AF_SELECTION_START) > -1 ?
-        kart_model.getFrame(KartModel::AF_SELECTION_START) :
+        kart_model.getFrame(KartModel::AF_SELECTION_LOOP_START) > -1 ?
+        kart_model.getFrame(KartModel::AF_SELECTION_LOOP_START) :
         kart_model.getFrame(KartModel::AF_WIN_LOOP_START) > -1 ?
         kart_model.getFrame(KartModel::AF_WIN_LOOP_START) :
         kart_model.getFrame(KartModel::AF_WIN_START) :
         kart_model.getBaseFrame(),
         has_win_anime ?
-        kart_model.getFrame(KartModel::AF_SELECTION_END) > -1 ?
-        kart_model.getFrame(KartModel::AF_SELECTION_END) :
-        kart_model.getFrame(KartModel::AF_WIN_END) :
+        kart_model.getFrame(KartModel::AF_SELECTION_LOOP_END) > -1 ?
+        kart_model.getFrame(KartModel::AF_SELECTION_LOOP_END) :
+        kart_model.getFrame(KartModel::AF_WIN_LOOP_END) :
         kart_model.getBaseFrame(),
         kart_model.getAnimationSpeed());
     m_model_view->getModelViewRenderInfo()->setHue(
