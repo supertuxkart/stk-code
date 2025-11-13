@@ -392,7 +392,7 @@ void GrandPrixWin::setKarts(const std::pair<std::string, float> idents_arg[3])
                 else if (kart_model->getFrame(KartModel::AF_WIN_LOOP_START) > -1)
                     kart_model->setAnimationLoop(KartModel::AF_WIN_LOOP_START);
                 else
-                    kart_model->setAnimation(KartModel::AF_STRAIGHT);
+                    kart_model->setAnimation(KartModel::AF_DEFAULT);
             }
         }
 

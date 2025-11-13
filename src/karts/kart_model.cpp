@@ -245,7 +245,30 @@ void KartModel::loadInfo(const XMLNode &node)
         }
         else
         {
-            Log::error("Kart_Model", "Unsupported kart.xml format version %i!", version);
+            Log::error("Kart_Model", "The kart.xml format of %s (version %i) is unsupported!",
+                m_model_filename.c_str(), version);
+        }
+
+        // Extra-logging in artist-debug mode to easily check for missing animations
+        if (UserConfigParams::m_artist_debug_mode)
+        {
+            std::vector<int> missing_animations;
+            for (unsigned int i = AF_BEGIN + 1; i <= AF_END; i++)
+            {
+                if (m_animation_frame[i] == -1)
+                    missing_animations.push_back(i);
+            }
+            if (!missing_animations.empty())
+            {
+                printf("Kart Model - Kart %s is missing animation number", m_model_filename.c_str());
+                for (auto it : missing_animations)
+                    printf(" %i", it);
+                printf("\n");
+            }
+            else
+            {
+                Log::verbose("Kart Model", "Kart %s supports all animations.", m_model_filename.c_str());
+            }
         }
     }
 
@@ -499,7 +522,7 @@ scene::ISceneNode* KartModel::attachModel(bool animated_models, bool human_playe
     {
         // If no animations are shown, make sure to pick the frame
         // with a straight ahead animation (if exist).
-        int straight_frame = m_animation_frame[AF_STRAIGHT]>=0
+        int straight_frame = m_animation_frame[AF_STRAIGHT] >= 0
                            ? m_animation_frame[AF_STRAIGHT]
                            : 0;
 
@@ -1268,10 +1291,6 @@ void KartModel::OnAnimationEnd(scene::IAnimatedMeshSceneNode *node)
     // 'type' is the start frame of the animation, type + 1 the frame
     // to begin the loop with, type + 2 to end the frame with
     AnimationFrameType start = (AnimationFrameType)(m_current_animation + 1);
-    // If there is no loop-start defined (i.e. no 'introductory' sequence)
-    // use the normal start frame.
-    if(m_animation_frame[start] == -1)
-        start = m_current_animation;
 
     setAnimationLoop(start);
     m_animated_node->setAnimationEndCallback(NULL);
