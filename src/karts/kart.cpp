@@ -1368,6 +1368,7 @@ bool Kart::hasHeldMini() const
 void Kart::enablePenaltyTicks()
 {
     m_penalty_ticks = stk_config->m_penalty_ticks;
+    m_startup_boost_level = 0;
     if (LocalPlayerController* lpc = dynamic_cast<LocalPlayerController*>(getController()))
         lpc->displayPenaltyWarning();
 }   // enablePenaltyTicks
@@ -3140,10 +3141,14 @@ bool Kart::playCustomSFX(unsigned int type)
  */
 void Kart::updatePhysics(int ticks)
 {
-    if (m_controls.getAccel() > 0.0f &&
-        World::getWorld()->getTicksSinceStart() == 1)
+    if (World::getWorld()->getTicksSinceStart() == 1)
     {
-        if (m_startup_boost > 0.0f)
+        // Penalty for accelerating during the ready phase
+        // The AF after FALSE_ACCEL_START is not set so there is no looping
+        if (m_startup_boost_level == 0)
+            m_kart_model->setAnimation(KartModel::AF_FALSE_ACCEL_START);
+
+        if (m_controls.getAccel() > 0.0f && m_startup_boost > 0.0f)
         {
             m_kart_gfx->setCreationRateAbsolute(KartGFX::KGFX_ZIPPER,
                 100.0f * m_startup_boost);

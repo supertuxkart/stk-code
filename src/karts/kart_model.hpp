@@ -275,6 +275,7 @@ public:
         AF_HIT,         // Played when being hit
 
         AF_FALSE_ACCEL_START, // Played if there is a penalty for early accel
+        AF_PLACEHOLDER,       // A placeholder so that the assumption end = (start + 2) holds
         AF_FALSE_ACCEL_END,   // Played if there is a penalty for early accel
 
         AF_END=AF_FALSE_ACCEL_END,   // Last animation frame
@@ -518,7 +519,7 @@ public:
     AnimationFrameType getAnimation() { return m_current_animation; }
     // ------------------------------------------------------------------------
     /** Enables- or disables the end animation. */
-    void  setAnimation(AnimationFrameType type, bool play_non_loop = false);
+    void  setAnimation(AnimationFrameType type, bool no_loop = false);
     // ------------------------------------------------------------------------
     /** Starts an animation loop with the specified loop-start type. */
     void setAnimationLoop(AnimationFrameType start);

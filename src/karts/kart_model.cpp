@@ -1155,7 +1155,7 @@ void KartModel::finishedRace()
 /** Enables- or disables the end animation.
  *  \param type The type of animation to play.
  */
-void KartModel::setAnimation(AnimationFrameType type, bool play_non_loop)
+void KartModel::setAnimation(AnimationFrameType type, bool no_loop)
 {
     // if animations disabled, give up
     if (m_animated_node == NULL) return;
@@ -1169,7 +1169,7 @@ void KartModel::setAnimation(AnimationFrameType type, bool play_non_loop)
 
     m_current_animation = type;
     if ((type == AF_WIN_START || type == AF_LOSE_START) &&
-        m_animation_frame[type] > -1 && play_non_loop)
+        m_animation_frame[type] > -1 && no_loop)
     {
         // Special handling for soccer goal animation
         class SmoothTransition : public IAnimationEndCallBack
