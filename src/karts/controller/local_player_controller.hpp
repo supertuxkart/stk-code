@@ -47,7 +47,6 @@ private:
     StateManager::ActivePlayer *m_player;
 
     bool           m_sound_schedule;
-    bool           m_has_started;
     bool           m_is_above_nitro_target;
 
 #ifndef SERVER_ONLY
@@ -71,7 +70,6 @@ private:
 
 
     virtual void steer(int) OVERRIDE;
-    virtual void displayPenaltyWarning() OVERRIDE;
     void         nitroNotFullSound();
 
     void doCrashHaptics();
@@ -104,6 +102,9 @@ public:
     virtual bool isPlayerController() const OVERRIDE {return true;}
     // ------------------------------------------------------------------------
     virtual bool isLocalPlayerController() const OVERRIDE {return true;}
+    // ------------------------------------------------------------------------
+    /** Called when this kart started too early and got a start penalty. */
+    virtual void displayPenaltyWarning();
     // ------------------------------------------------------------------------
     /** Returns the name of the player profile. */
     core::stringw getName(bool include_handicap_string = true) const OVERRIDE;

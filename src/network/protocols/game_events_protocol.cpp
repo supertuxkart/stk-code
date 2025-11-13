@@ -126,14 +126,7 @@ bool GameEventsProtocol::notifyEvent(Event* event)
             uint8_t kart_id = data.getUInt8();
             uint8_t boost_level = data.getUInt8();
             Kart* k = World::getWorld()->getKart(kart_id);
-            if (boost_level == 0)
-            {
-                PlayerController* pc =
-                    dynamic_cast<PlayerController*>(k->getController());
-                pc->displayPenaltyWarning();
-            }
-            else
-                k->setStartupBoost(boost_level);
+            k->setStartupBoost(boost_level);
         }
         break;
     }

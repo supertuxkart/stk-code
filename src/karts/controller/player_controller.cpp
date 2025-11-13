@@ -45,7 +45,6 @@
 PlayerController::PlayerController(Kart *kart)
                 : Controller(kart)
 {
-    m_penalty_ticks = 0;
 }   // PlayerController
 
 //-----------------------------------------------------------------------------
@@ -66,7 +65,6 @@ void PlayerController::reset()
     m_prev_brake    = 0;
     m_prev_accel    = 0;
     m_prev_nitro    = false;
-    m_penalty_ticks = 0;
 }   // reset
 
 // ----------------------------------------------------------------------------
@@ -290,33 +288,6 @@ void PlayerController::update(int ticks)
 {
     steer(m_steer_val);
 
-    if (World::getWorld()->isStartPhase())
-    {
-        if ((m_controls->getAccel() || m_controls->getBrake()||
-            m_controls->getNitro()) && !NetworkConfig::get()->isNetworking())
-        {
-            // Only give penalty time in READY_PHASE.
-            // Penalty time check makes sure it doesn't get rendered on every
-            // update.
-            if (m_penalty_ticks == 0 &&
-                World::getWorld()->getPhase() == WorldStatus::READY_PHASE)
-            {
-                displayPenaltyWarning();
-            }   // if penalty_time = 0
-            m_controls->setBrake(false);
-        }   // if key pressed
-
-        return;
-    }   // if isStartPhase
-
-    if (m_penalty_ticks != 0 &&
-        World::getWorld()->getTicksSinceStart() < m_penalty_ticks)
-    {
-        m_controls->setBrake(false);
-        m_controls->setAccel(0.0f);
-        return;
-    }
-
     // Only accept rescue if there is no kart animation is already playing
     // (e.g. if an explosion happens, wait till the explosion is over before
     // starting any other animation).
@@ -378,9 +349,3 @@ core::stringw PlayerController::getName(bool include_handicap_string) const
     }
     return name;
 }   // getName
-
-// ----------------------------------------------------------------------------
-void PlayerController::displayPenaltyWarning()
-{
-    m_penalty_ticks = stk_config->m_penalty_ticks;
-}   // displayPenaltyWarning

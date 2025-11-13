@@ -318,18 +318,20 @@ protected:
 
     /** Used to display stolen nitro in the UI **/
     int16_t       m_stolen_nitro_ticks;
-
     float         m_stolen_nitro_amount;
 
     float           m_startup_boost;
-
     float           m_startup_engine_force;
+    bool            m_has_started;
 
     // boost-level 0 corresponds to a start penalty
     // boost-level 1 corresponds to a start without boost or penalty
     // boost-level 2 or more corresponds to a start with boost
     // This is only used for networking
     uint8_t         m_startup_boost_level;
+
+    // The number of penalty ticks if boost-level was 0
+    int             m_penalty_ticks;
 
     float           m_falling_time;
 
@@ -483,13 +485,14 @@ public:
     // ------------------------------------------------------------------------
     /** Sets the stolen nitro info of this kart. */
     virtual void  setStolenNitro(float amount, float duration);
-    virtual bool  hasStolenNitro() const { return m_stolen_nitro_ticks > 0; }
-    virtual float getStolenNitro() const  { return m_stolen_nitro_amount; }
-    virtual float getEffectiveSteer() const { return m_effective_steer; }
+    virtual bool  hasStolenNitro() const   { return m_stolen_nitro_ticks > 0; }
+    virtual float getStolenNitro() const      { return m_stolen_nitro_amount; }
+    virtual float getEffectiveSteer() const       { return m_effective_steer; }
     virtual bool  hasHeldMini() const;
     virtual void setStartupBoostFromStartTicks(int ticks);
-    virtual float getStartupBoost() const { return m_startup_boost; }
+    virtual float getStartupBoost() const              { return m_startup_boost; }
     virtual uint8_t getStartupBoostLevel() const { return m_startup_boost_level; }
+    virtual void enablePenaltyTicks();
     virtual void setStartupBoost(uint8_t boost_level);
     // ------------------------------------------------------------------------
     /** Returns the current material the kart is on. */

@@ -165,8 +165,10 @@ public:
     void         setTicks(int ticks);
     void         setTicksForRewind(int ticks);
     // ------------------------------------------------------------------------
-    // Note: GO_PHASE is both: start phase and race phase
-    bool     isStartPhase() const  { return m_phase<GO_PHASE;               }
+    bool     isCountdownPhase() const  { return m_phase >= READY_PHASE &&
+                                                m_phase < GO_PHASE;         }
+    // ------------------------------------------------------------------------
+    bool     isStartPhase() const  { return m_phase < GO_PHASE;             }
     // ------------------------------------------------------------------------
     bool     isRacePhase()  const  { return m_phase>=GO_PHASE &&
                                             m_phase<FINISH_PHASE;           }

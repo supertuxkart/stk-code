@@ -3874,13 +3874,13 @@ void ServerLobby::listBanTable()
 }   // listBanTable
 
 //-----------------------------------------------------------------------------
+// FIXME : This shouldn't be in ServerLobby!!!
 uint8_t ServerLobby::getStartupBoostOrPenaltyForKart(uint32_t ping,
                                                    unsigned kart_id)
 {
     // boost-level 0 corresponds to a start penalty
     // boost-level 1 corresponds to a start without boost or penalty
     // boost-level 2 or more corresponds to a start with boost
-
     Kart* k = World::getWorld()->getKart(kart_id);
     // If a boost already exists, return it
     if (k->getStartupBoostLevel() >= 2)
@@ -3892,10 +3892,8 @@ uint8_t ServerLobby::getStartupBoostOrPenaltyForKart(uint32_t ping,
         (float)(server_time - m_server_started_at) / 1000.0f);
     if (ticks < stk_config->time2Ticks(1.0f))
     {
-        PlayerController* pc =
-            dynamic_cast<PlayerController*>(k->getController());
-        pc->displayPenaltyWarning();
-        return 0;
+        k->enablePenaltyTicks();
+        return 0; // Penalty
     }
     k->setStartupBoostFromStartTicks(ticks);
     return k->getStartupBoostLevel();

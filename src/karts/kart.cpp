@@ -72,6 +72,7 @@
 #include "network/compress_network_body.hpp"
 #include "network/network_config.hpp"
 #include "network/protocols/client_lobby.hpp"
+#include "network/protocols/game_events_protocol.hpp"
 #include "network/race_event_manager.hpp"
 #include "network/rewind_info.hpp"
 #include "network/rewind_manager.hpp"
@@ -523,6 +524,8 @@ void Kart::reset()
     m_startup_boost        = 0.0f;
     m_startup_engine_force = 0.0f;
     m_startup_boost_level  = 1; // 0 penalty, 1 nothing, 2+ boost
+    m_has_started          = false;
+    m_penalty_ticks        = 0;
 
     if (m_node)
         m_node->setScale(core::vector3df(1.0f, 1.0f, 1.0f));
@@ -1355,10 +1358,19 @@ void Kart::collectedItem(ItemState *item_state)
 
 }   // collectedItem
 
+//-----------------------------------------------------------------------------
 bool Kart::hasHeldMini() const
 {
     return (m_powerup->getType() == PowerupManager::POWERUP_MINI);
 }   // hasHeldMini
+
+//-----------------------------------------------------------------------------
+void Kart::enablePenaltyTicks()
+{
+    m_penalty_ticks = stk_config->m_penalty_ticks;
+    if (LocalPlayerController* lpc = dynamic_cast<LocalPlayerController*>(getController()))
+        lpc->displayPenaltyWarning();
+}   // enablePenaltyTicks
 
 //-----------------------------------------------------------------------------
 /** Called the first time a kart accelerates after 'ready'. It searches
@@ -1409,6 +1421,8 @@ void Kart::setStartupBoost(uint8_t boost_level)
     {
         m_startup_boost = 0.0f;
         m_startup_engine_force = 0.0f;
+        if (boost_level == 0) // Penalty
+            enablePenaltyTicks();
     }
 
     m_startup_boost_level = boost_level;
@@ -1658,6 +1672,27 @@ void Kart::update(int ticks)
         delete m_controller;
         m_controller = m_saved_controller;
         m_saved_controller = NULL;
+    }
+
+    // Setup the start boost or penalty as appropriate
+    if (World::getWorld()->isCountdownPhase() && m_controls.getAccel() && !m_has_started)
+    {
+        m_has_started = true;
+
+        if(!NetworkConfig::get()->isNetworking())
+        {
+            // We give a penalty if accelerating during the READY phase
+            if (World::getWorld()->getPhase() == WorldStatus::READY_PHASE)
+                enablePenaltyTicks();
+            else
+                setStartupBoostFromStartTicks(World::getWorld()->getAuxiliaryTicks());
+        }
+        else if (NetworkConfig::get()->isClient())
+        {
+            auto ge = RaceEventManager::get()->getProtocol();
+            assert(ge);
+            ge->sendStartupBoost((uint8_t)getWorldKartId());
+        }
     }
 
     m_powerup->update(ticks);
@@ -3301,6 +3336,10 @@ void Kart::updateEnginePowerAndBrakes(int ticks)
 
     if(m_controls.getAccel())   // accelerating
     {
+        // Prevent acceleration if there is an active start penalty
+        if (World::getWorld()->getTicksSinceStart() <= m_penalty_ticks)
+            engine_power = 0.0f;
+
         // For a short time after a collision disable the engine,
         // so that the karts can bounce back a bit from the obstacle.
         if (m_bounce_back_ticks > 0)
@@ -3320,7 +3359,7 @@ void Kart::updateEnginePowerAndBrakes(int ticks)
     } // if getAccel
     else
     {
-        engine_power = 0;
+        engine_power = 0.0f;
     }
 
     if(m_controls.getBrake())   // braking

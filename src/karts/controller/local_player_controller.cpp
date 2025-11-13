@@ -39,7 +39,6 @@
 #include "karts/rescue_animation.hpp"
 #include "modes/world.hpp"
 #include "network/network_config.hpp"
-#include "network/protocols/game_events_protocol.hpp"
 #include "network/protocols/game_protocol.hpp"
 #include "network/race_event_manager.hpp"
 #include "network/rewind_manager.hpp"
@@ -70,7 +69,6 @@ LocalPlayerController::LocalPlayerController(Kart *kart,
                      : PlayerController(kart)
 {
     m_last_crash = 0;
-    m_has_started = false;
     m_handicap = h;
     m_player = StateManager::get()->getActivePlayer(local_player_id);
     if(m_player)
@@ -138,7 +136,6 @@ void LocalPlayerController::reset()
     PlayerController::reset();
     m_last_crash = 0;
     m_sound_schedule = false;
-    m_has_started = false;
 }   // reset
 
 // ----------------------------------------------------------------------------
@@ -177,22 +174,6 @@ bool LocalPlayerController::action(PlayerAction action, int value,
     {
         PlayerController::action(action, value);
         return true;
-    }
-
-    if (action == PA_ACCEL && value != 0 && !m_has_started)
-    {
-        m_has_started = true;
-        if (!NetworkConfig::get()->isNetworking())
-        {
-            m_kart->setStartupBoostFromStartTicks(
-                World::getWorld()->getAuxiliaryTicks());
-        }
-        else if (NetworkConfig::get()->isClient())
-        {
-            auto ge = RaceEventManager::get()->getProtocol();
-            assert(ge);
-            ge->sendStartupBoost((uint8_t)m_kart->getWorldKartId());
-        }
     }
 
     // If this event does not change the control state (e.g.
@@ -320,11 +301,10 @@ void LocalPlayerController::setParticleEmitterPosition(const btTransform& t)
 
 //-----------------------------------------------------------------------------
 /** Displays a penalty warning for player controlled karts. Called from
- *  LocalPlayerKart::update() if necessary.
+ *  Kart::enablePenaltyTime() if necessary.
  */
 void LocalPlayerController::displayPenaltyWarning()
 {
-    PlayerController::displayPenaltyWarning();
     RaceGUIBase* m=World::getWorld()->getRaceGUI();
     if (m)
     {
@@ -345,7 +325,6 @@ void LocalPlayerController::displayPenaltyWarning()
 void LocalPlayerController::setPosition(int p)
 {
     PlayerController::setPosition(p);
-
 
     if(m_kart->getPosition()<p)
     {
