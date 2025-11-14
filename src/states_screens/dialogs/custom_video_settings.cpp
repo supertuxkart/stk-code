@@ -70,18 +70,30 @@ void CustomVideoSettingsDialog::beforeAddingWidgets()
     particles_effects->addLabel(_("Enabled"));
     particles_effects->setValue(UserConfigParams::m_particles_effects);
 
+    SpinnerWidget* kart_lights = getWidget<SpinnerWidget>("kart_lights");
+    //I18N: No kart headlights
+    kart_lights->addLabel(_("Disabled"));
+    //I18N: Kart headlights for human players only
+    kart_lights->addLabel(_("Player kart only"));
+    //I18N: Kart headlights enabled for all karts
+    kart_lights->addLabel(_("All karts"));
+    // TODO: ideally, we should turn this off and show the value as disabled when
+    //       dynamic lights are off. However, because a full UI rework is coming,
+    //       there is little point in doing it now and redoing it later.
+    kart_lights->setValue(UserConfigParams::m_kart_lights);
+
     SpinnerWidget* geometry_level = getWidget<SpinnerWidget>("geometry_detail");
-    //I18N: Geometry level disabled : lowest level, Level-of-Details distances are very low
+    //I18N: Geometry level very low : lowest level, Level-of-Details distances are very low
     geometry_level->addLabel(_("Very Low"));
-    //I18N: Geometry level low : everything is displayed, Level-of-Details distances are low
+    //I18N: Geometry level low : Level-of-Details distances are low
     geometry_level->addLabel(_("Low"));
-    //I18N: Geometry level medium : everything is displayed, Level-of-Details distances are medium
+    //I18N: Geometry level medium : Level-of-Details distances are medium
     geometry_level->addLabel(_("Medium"));
-    //I18N: Geometry level high : everything is displayed, Level-of-Details distances are high
+    //I18N: Geometry level high : Level-of-Details distances are high
     geometry_level->addLabel(_("High"));
-    //I18N: Geometry level very high : everything is displayed, Level-of-Details distances are very high
+    //I18N: Geometry level very high : Level-of-Details distances are very high
     geometry_level->addLabel(_("Very High"));
-    //I18N: Geometry level ultra : everything is displayed, Level-of-Details distances are extremely high
+    //I18N: Geometry level ultra : Level-of-Details distances are extremely high
     geometry_level->addLabel(_("Ultra"));
     geometry_level->setValue(UserConfigParams::m_geometry_level);
 
@@ -249,8 +261,11 @@ GUIEngine::EventPropagation CustomVideoSettingsDialog::processEvent(const std::s
             UserConfigParams::m_animated_characters =
                 getWidget<CheckBoxWidget>("animated_characters")->getState();
 
+            UserConfigParams::m_kart_lights =
+                getWidget<SpinnerWidget>("kart_lights")->getValue();
+
             UserConfigParams::m_geometry_level =
-                getWidget<SpinnerWidget>("geometry_detail")->getValue();;
+                getWidget<SpinnerWidget>("geometry_detail")->getValue();
             int quality = getWidget<SpinnerWidget>("image_quality")->getValue();
 
             std::string rd = StringUtils::wideToUtf8(

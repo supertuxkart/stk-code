@@ -632,7 +632,8 @@ scene::ISceneNode* KartModel::attachModel(bool animated_models, bool human_playe
         }
         else
         {
-            if (!human_player || !supports_light)
+            if ((UserConfigParams::m_kart_lights == 0) || !supports_light ||
+                (UserConfigParams::m_kart_lights == 1 && !human_player))
                 continue;
             obj.setLight(parent);
             node = obj.getLightNode();
