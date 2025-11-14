@@ -270,16 +270,15 @@ public:
         AF_SELECTION_LOOP_END,   // End of the kart selection screen loop
 
         AF_BUMP_FRONT,  // Played if the kart hits something in front
-        AF_BUMP_LEFT,   // Played if the kart hits something in front
-        AF_BUMP_RIGHT,  // Played if the kart hits something in front
-        AF_BUMP_BACK,   // Played if the kart hits something in front
+        AF_BUMP_LEFT,   // Played if the kart hits something to the left
+        AF_BUMP_RIGHT,  // Played if the kart hits something to the right
+        AF_BUMP_BACK,   // Played if the kart hits something to the back
         AF_HAPPY_START, // Start of the happy animation, played when hitting a rival (or overtaking)
         AF_HAPPY_END,   // Last frame of the happy animation
         AF_HIT_START,   // Start of the hit animation, played when being hit
         AF_HIT_END,     // Last frame of the hit animation
 
         AF_FALSE_ACCEL_START, // Played if there is a penalty for early accel
-        AF_PLACEHOLDER,       // A placeholder so that the assumption end = (start + 2) holds
         AF_FALSE_ACCEL_END,   // Played if there is a penalty for early accel
 
         AF_END=AF_FALSE_ACCEL_END,   // Last animation frame
@@ -463,6 +462,50 @@ public:
     /** Since karts might be animated, we might need to know which base frame
      *  to use. */
     int  getBaseFrame() const   { return m_animation_frame[AF_STRAIGHT];  }
+    // ------------------------------------------------------------------------
+    /* Returns the AnimationFrameType which corresponds to the end of
+     * the animation passed as parameter.
+     * Returns AF_BEGIN if there is no valid end frame type. */
+    AnimationFrameType getEndFrameType(AnimationFrameType f)
+    {
+        if (f == AF_WIN_START)            return AF_WIN_LOOP_END;
+        if (f == AF_WIN_LOOP_START)       return AF_WIN_LOOP_END;
+        if (f == AF_NEUTRAL_START)        return AF_NEUTRAL_LOOP_END;
+        if (f == AF_NEUTRAL_LOOP_START)   return AF_NEUTRAL_LOOP_END;
+        if (f == AF_LOSE_START)           return AF_LOSE_LOOP_END;
+        if (f == AF_LOSE_LOOP_START)      return AF_LOSE_LOOP_END;
+        if (f == AF_PODIUM_START)         return AF_PODIUM_LOOP_END;
+        if (f == AF_PODIUM_LOOP_START)    return AF_PODIUM_LOOP_END;
+        if (f == AF_JUMP_START)           return AF_JUMP_LOOP_END;
+        if (f == AF_JUMP_LOOP_START)      return AF_JUMP_LOOP_END;
+        if (f == AF_SELECTION_START)      return AF_SELECTION_LOOP_END;
+        if (f == AF_SELECTION_LOOP_START) return AF_SELECTION_LOOP_END;
+        if (f == AF_HAPPY_START)          return AF_HAPPY_END;
+        if (f == AF_HIT_START)            return AF_HIT_END;
+        if (f == AF_FALSE_ACCEL_START)    return AF_FALSE_ACCEL_END;
+
+        // No valid end animation for this frame type
+        // m_animation_frame[AF_BEGIN] is legal to access but always -1.
+        return AF_BEGIN;
+    }   // getEndFrameType
+    // ------------------------------------------------------------------------
+    /* Returns the AnimationFrameType which corresponds to the start
+     * of the loop for the animation type passed as parameter.
+     * There is a valid result only if the parameter frame type serves
+     * as an introductory sequence to the loop.
+     * Returns AF_BEGIN if there is no valid loop start frame type. */
+    AnimationFrameType getLoopStartFrameType(AnimationFrameType f)
+    {
+        if (f == AF_WIN_START)            return AF_WIN_LOOP_START;
+        if (f == AF_NEUTRAL_START)        return AF_NEUTRAL_LOOP_START;
+        if (f == AF_LOSE_START)           return AF_LOSE_LOOP_START;
+        if (f == AF_PODIUM_START)         return AF_PODIUM_LOOP_START;
+        if (f == AF_JUMP_START)           return AF_JUMP_LOOP_START;
+        if (f == AF_SELECTION_START)      return AF_SELECTION_LOOP_START;
+
+        // No valid loop start animation for this frame type
+        return AF_BEGIN;
+    }   // getLoopStartFrameType
     // ------------------------------------------------------------------------
     int  getFrame(AnimationFrameType f) const  { return m_animation_frame[f]; }
     // ------------------------------------------------------------------------

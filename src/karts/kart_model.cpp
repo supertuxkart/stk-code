@@ -264,7 +264,7 @@ void KartModel::loadInfo(const XMLNode &node)
             std::vector<int> missing_animations;
             for (unsigned int i = AF_BEGIN + 1; i <= AF_END; i++)
             {
-                if (i != AF_PLACEHOLDER && m_animation_frame[i] == -1)
+                if (m_animation_frame[i] == -1)
                     missing_animations.push_back(i);
             }
             if (!missing_animations.empty())
@@ -1196,8 +1196,7 @@ void KartModel::setAnimation(AnimationFrameType type, bool no_loop)
                 m_kart_model->setAnimation(AF_DEFAULT);
             }
         };
-        AnimationFrameType end = (type == AF_WIN_START) ? AF_WIN_LOOP_END
-                                                        : AF_LOSE_LOOP_END;
+        AnimationFrameType end = getEndFrameType(type);
         if (m_animation_frame[end] == -1)
             return; // If the end isn't correctly defined, don't play the animation
         AnimationFrameType to_straight = (type == AF_WIN_START) ? AF_WIN_TO_STRAIGHT
@@ -1246,11 +1245,9 @@ void KartModel::setAnimation(AnimationFrameType type, bool no_loop)
     }
     else if(m_animation_frame[type]>-1)
     {
-        // 'type' is the start frame of the animation, type + 1 the frame
-        // to begin the loop with, type + 2 to end the frame with
-        AnimationFrameType end = (AnimationFrameType)(type+2);
+        AnimationFrameType end = getEndFrameType(type);
         if(m_animation_frame[end]==-1)
-            end = (AnimationFrameType)((int)end-1);
+            return; // If the end isn't correctly defined, don't play the animation
         m_animated_node->setAnimationSpeed(m_animation_speed);
         m_animated_node->setFrameLoop(m_animation_frame[type],
                                       m_animation_frame[end]    );
@@ -1273,8 +1270,7 @@ void KartModel::setAnimation(AnimationFrameType type, bool no_loop)
  */
 void KartModel::setAnimationLoop(AnimationFrameType start)
 {
-    // loop-start + 1 corresponds to the matching loop-end type
-    AnimationFrameType end = (AnimationFrameType)(start + 1);
+    AnimationFrameType end = getEndFrameType(start);
 
     if(m_animation_frame[start] > -1 && m_animation_frame[end] > -1)
     {
@@ -1299,11 +1295,8 @@ void KartModel::OnAnimationEnd(scene::IAnimatedMeshSceneNode *node)
     // It should only be called for the animated node of this kart_model
     assert(node == m_animated_node);
 
-    // 'type' is the start frame of the animation, type + 1 the frame
-    // to begin the loop with, type + 2 to end the frame with
-    AnimationFrameType start = (AnimationFrameType)(m_current_animation + 1);
-
-    setAnimationLoop(start);
+    AnimationFrameType loop_start = getLoopStartFrameType(m_current_animation);
+    setAnimationLoop(loop_start);
     m_animated_node->setAnimationEndCallback(NULL);
 }   // OnAnimationEnd
 
