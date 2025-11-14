@@ -2,10 +2,10 @@
 
 <config>
   <!--  Minimum and maximum kart versions that can be used by this binary.
-        Older version will be ignored. -->
-  <kart-version min="2" max="3"/>
+        Older versions will be ignored. -->
+  <kart-version min="2" max="4"/>
 
-  <!-- Minimum and maximum track versions that be be read by this binary.
+  <!-- Minimum and maximum track versions that can be read by this binary.
        Older versions will be ignored. -->
   <track-version min="6" max="7"/>
 

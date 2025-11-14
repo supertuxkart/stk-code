@@ -167,17 +167,20 @@ KartModel::KartModel(bool is_master)
 void KartModel::loadInfo(const XMLNode &node)
 {
     node.get("model-file", &m_model_filename);
+    // Version 2 corresponds to old .b3d karts. Animations may have some issues (see #5477).
+    //           This format is deprecated and support will be dropped at some point.
+    // Version 3 corresponds to .spm karts, compared to version 2
+    //           it also supports headlights and speed-weighted objets.
+    // Version 4 corresponds to .spm karts, compared to version 3
+    //           it uses Evolution's animation markers.
+    node.get("version", &m_version);
 
-    int version = 1;
-    if(const XMLNode *format_node=node.getNode("format"))
-        format_node->get("version", &version);
-
-    //Log::verbose("Kart_Model", "Kart %s is using format version %i", m_model_filename.c_str(), version);
+    //Log::verbose("Kart_Model", "Kart %s is using format version %i", m_model_filename.c_str(), m_version);
 
     if(const XMLNode *animation_node=node.getNode("animations"))
     {
         // Compatibility-layer for 1.x and older karts
-        if (version == 1)
+        if (m_version == 2 || m_version == 3)
         {
             animation_node->get("left",           &m_animation_frame[AF_LEFT]         );
             animation_node->get("straight",       &m_animation_frame[AF_STRAIGHT]     );
@@ -204,7 +207,7 @@ void KartModel::loadInfo(const XMLNode &node)
             animation_node->get("speed",          &m_animation_speed               );
         }
         // Version used for SuperTuxKart Evolution
-        else if (version == 2)
+        else if (m_version == 4)
         {
             animation_node->get("left",           &m_animation_frame[AF_LEFT]         );
             animation_node->get("straight",       &m_animation_frame[AF_STRAIGHT]     );
@@ -250,7 +253,7 @@ void KartModel::loadInfo(const XMLNode &node)
         else
         {
             Log::error("Kart_Model", "The kart.xml format of %s (version %i) is unsupported!",
-                m_model_filename.c_str(), version);
+                m_model_filename.c_str(), m_version);
         }
 
         // Extra-logging in artist-debug mode to easily check for missing animations
@@ -259,7 +262,7 @@ void KartModel::loadInfo(const XMLNode &node)
             std::vector<int> missing_animations;
             for (unsigned int i = AF_BEGIN + 1; i <= AF_END; i++)
             {
-                if (m_animation_frame[i] == -1)
+                if (i != AF_PLACEHOLDER && m_animation_frame[i] == -1)
                     missing_animations.push_back(i);
             }
             if (!missing_animations.empty())
@@ -295,7 +298,6 @@ void KartModel::loadInfo(const XMLNode &node)
         m_has_nitro_emitter = true;
     }
 
-    node.get("version", &m_version);
     if (m_version > 2)
     {
         if (const XMLNode *speed_weighted_objects_node = node.getNode("speed-weighted-objects"))
