@@ -113,7 +113,7 @@ void RaceResultGUI::init()
         if (kart->getController()->isLocalPlayerController())
         {
             has_human_players = true;
-            human_win = human_win && kart->getRaceResult();
+            human_win = human_win && kart->hasGoodResult();
 
             if (RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_FOLLOW_LEADER)
             {

@@ -18,6 +18,7 @@
 #ifndef FREE_FOR_ALL_HPP
 #define FREE_FOR_ALL_HPP
 
+#include "karts/kart.hpp"
 #include "modes/world_with_rank.hpp"
 #include "states_screens/race_gui_base.hpp"
 
@@ -74,7 +75,7 @@ public:
     // ------------------------------------------------------------------------
     int getKartScore(int kart_id) const        { return m_scores.at(kart_id); }
     // ------------------------------------------------------------------------
-    bool getKartFFAResult(int kart_id) const;
+    Kart::RaceResultType getKartFFAResult(int kart_id) const;
     // ------------------------------------------------------------------------
     virtual std::pair<uint32_t, uint32_t> getGameStartedProgress() const
         OVERRIDE;

@@ -16,7 +16,6 @@
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include "modes/free_for_all.hpp"
-#include "karts/kart.hpp"
 #include "karts/controller/controller.hpp"
 #include "network/network_config.hpp"
 #include "network/network_string.hpp"
@@ -284,14 +283,23 @@ video::SColor FreeForAll::getColor(unsigned int kart_id) const
 }   // getColor
 
 // ----------------------------------------------------------------------------
-bool FreeForAll::getKartFFAResult(int kart_id) const
+Kart::RaceResultType FreeForAll::getKartFFAResult(int kart_id) const
 {
-    // the kart(s) which has the top score wins
+    // If the kart's score matches the top score, it's a good result
     Kart* k = getKartAtPosition(1);
-    if (!k)
-        return false;
     int top_score = getKartScore(k->getWorldKartId());
-    return getKartScore(kart_id) == top_score;
+    if (getKartScore(kart_id) == top_score)
+        return Kart::RACE_RESULT_GOOD;
+    
+    int num_karts = World::getWorld()->getCurrentNumKarts();
+    k = getKartAtPosition((num_karts / 2) + 1);
+    int middle_score = getKartScore(k->getWorldKartId());
+    // Else if the kart's score is better than the score of anyone
+    // in the bottom half, it's an average result
+    if (getKartScore(kart_id) > middle_score)
+        return Kart::RACE_RESULT_AVERAGE;
+    else
+        return Kart::RACE_RESULT_BAD;
 }   // getKartFFAResult
 
 // ----------------------------------------------------------------------------

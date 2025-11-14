@@ -542,6 +542,23 @@ const std::string& CaptureTheFlag::getIdent() const
     return IDENT_CTF;
 }   // getIdent
 
+// ------------------------------------------------------------------------
+Kart::RaceResultType CaptureTheFlag::getKartCTFResult(unsigned int kart_id) const
+{
+    // In case of a draw, both teams display the neutral animation
+    if (m_red_scores == m_blue_scores)
+        return Kart::RACE_RESULT_AVERAGE;
+
+    bool red_win = m_red_scores > m_blue_scores;
+    KartTeam team = getKartTeam(kart_id);
+
+    if ((red_win && team == KART_TEAM_RED) ||
+        (!red_win && team == KART_TEAM_BLUE))
+        return Kart::RACE_RESULT_GOOD;
+    else // the draw case was already handled, so the other team won
+        return Kart::RACE_RESULT_BAD;
+} // getKartCTFResult
+
 // ----------------------------------------------------------------------------
 void CaptureTheFlag::saveCompleteState(BareNetworkString* bns, STKPeer* peer)
 {

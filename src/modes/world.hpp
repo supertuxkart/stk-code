@@ -346,7 +346,7 @@ public:
     /** Returns all karts. */
     const KartList & getKarts() const { return m_karts; }
     // ------------------------------------------------------------------------
-    /** Returns the number of currently active (i.e.non-elikminated) karts. */
+    /** Returns the number of currently active (i.e.non-eliminated) karts. */
     unsigned int    getCurrentNumKarts() const { return (int)m_karts.size() -
                                                          m_eliminated_karts; }
     // ------------------------------------------------------------------------

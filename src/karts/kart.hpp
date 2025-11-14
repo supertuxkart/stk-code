@@ -89,6 +89,15 @@ class ParticleEmitter;
 class Kart : public Moveable
 {
     friend class Skidding;
+public:
+    // ----------------------------------------------------------------------------------------
+    /** This enum is used to pick an animation to play for the kart. */
+    enum RaceResultType
+    {
+        RACE_RESULT_GOOD,
+        RACE_RESULT_AVERAGE,
+        RACE_RESULT_BAD
+    };
 private:
     /** Length of the kart, copy of the data from KartModel. */
     float m_kart_length;
@@ -255,7 +264,7 @@ protected:
     bool m_has_caught_nolok_bubblegum;
 
     /** True if the kart wins, false otherwise. */
-    bool m_race_result;
+    RaceResultType m_race_result;
 
     /** True if the kart is eliminated. */
     bool m_eliminated;
@@ -913,7 +922,7 @@ public:
     virtual void setOnScreenText(const core::stringw& text);
     // ----------------------------------------------------------------------------------------
     /** Returns whether this kart wins or loses. */
-    virtual bool getRaceResult() const { return m_race_result;  }
+    virtual bool hasGoodResult() const { return (m_race_result == RACE_RESULT_GOOD);  }
     // ----------------------------------------------------------------------------------------
     /** Set this kart race result. */
     void setRaceResult();

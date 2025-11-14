@@ -771,19 +771,20 @@ void SoccerWorld::countdownReachedZero()
 }   // countdownReachedZero
 
 //-----------------------------------------------------------------------------
-bool SoccerWorld::getKartSoccerResult(unsigned int kart_id) const
+Kart::RaceResultType SoccerWorld::getKartSoccerResult(unsigned int kart_id) const
 {
-    if (m_red_scorers.size() == m_blue_scorers.size()) return true;
+    // In case of a draw, both teams display the neutral animation
+    if (m_red_scorers.size() == m_blue_scorers.size())
+        return Kart::RACE_RESULT_AVERAGE;
 
     bool red_win = m_red_scorers.size() > m_blue_scorers.size();
     KartTeam team = getKartTeam(kart_id);
 
     if ((red_win && team == KART_TEAM_RED) ||
         (!red_win && team == KART_TEAM_BLUE))
-        return true;
-    else
-        return false;
-
+        return Kart::RACE_RESULT_GOOD;
+    else // the draw case was already handled, so the other team won
+        return Kart::RACE_RESULT_BAD;
 }   // getKartSoccerResult
 
 //-----------------------------------------------------------------------------

@@ -95,20 +95,7 @@ public:
     // ------------------------------------------------------------------------
     virtual const std::string& getIdent() const OVERRIDE;
     // ------------------------------------------------------------------------
-    bool getKartCTFResult(unsigned int kart_id) const
-    {
-        if (m_red_scores == m_blue_scores)
-            return true;
-
-        bool red_win = m_red_scores > m_blue_scores;
-        KartTeam team = getKartTeam(kart_id);
-
-        if ((red_win && team == KART_TEAM_RED) ||
-            (!red_win && team == KART_TEAM_BLUE))
-            return true;
-        else
-            return false;
-    }
+    Kart::RaceResultType getKartCTFResult(unsigned int kart_id) const;
     // ------------------------------------------------------------------------
     int getRedScore() const                            { return m_red_scores; }
     // ------------------------------------------------------------------------

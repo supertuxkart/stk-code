@@ -232,7 +232,7 @@ Kart::Kart (const std::string& ident, unsigned int world_kart_id,
     m_terrain_info         = new TerrainInfo();
     m_powerup              = new Powerup(this);
     m_initial_position     = position;
-    m_race_result          = false;
+    m_race_result          = RACE_RESULT_BAD;
     m_wheel_box            = NULL;
 #ifndef SERVER_ONLY
     m_collision_particles  = NULL;
@@ -1229,8 +1229,12 @@ void Kart::finishedRace(float time, bool from_server)
         // Skip animation if this kart is eliminated
         if (m_eliminated || isGhostKart()) return;
 
-        m_kart_model->setAnimation(m_race_result ?
-            KartModel::AF_WIN_START : KartModel::AF_LOSE_START);
+        if (m_race_result == RACE_RESULT_GOOD)
+            m_kart_model->setAnimation(KartModel::AF_WIN_START);
+        else if (m_race_result == RACE_RESULT_AVERAGE)
+            m_kart_model->setAnimation(KartModel::AF_NEUTRAL_START);
+        else
+            m_kart_model->setAnimation(KartModel::AF_LOSE_START);
     }
 }   // finishedRace
 
@@ -1251,27 +1255,33 @@ void Kart::setRaceResult()
             {
                 standard_result_animation = false;
                 if (challenge->getData()->isChallengeFulfilled())
-                    m_race_result = true;
+                    m_race_result = RACE_RESULT_GOOD;
                 else
-                    m_race_result = false;
+                    m_race_result = RACE_RESULT_BAD;
             }
         }
-        // Display a happy animation if in the first half, sad otherwise
+        // Display a happy animation if in the first 30%,
+        // a neutral animation in the next 30%, sad in the last 40%
         if (standard_result_animation)
         {
-            if (this->getPosition() <= 0.5f *
-                World::getWorld()->getCurrentNumKarts() ||
+            int num_karts = World::getWorld()->getCurrentNumKarts();
+            if (this->getPosition() <= 0.3f * num_karts ||
                 this->getPosition() == 1)
-                m_race_result = true;
+                m_race_result = RACE_RESULT_GOOD;
+            // We also display a neutral animation if we lost to a ghost replay
+            else if (this->getPosition() <= 0.6f * num_karts ||
+                RaceManager::get()->getNumNonGhostKarts() == 1)
+                m_race_result = RACE_RESULT_AVERAGE;
             else
-                m_race_result = false;
+                m_race_result = RACE_RESULT_BAD;
         }
     }
     else if (RaceManager::get()->isFollowMode() ||
              RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_3_STRIKES)
     {
         // the kart wins if it isn't eliminated
-        m_race_result = !this->isEliminated();
+        if (!this->isEliminated())
+            m_race_result = RACE_RESULT_GOOD;
     }
     else if (RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_FREE_FOR_ALL)
     {
@@ -1291,7 +1301,7 @@ void Kart::setRaceResult()
     else if (RaceManager::get()->isEggHuntMode())
     {
         // Easter egg mode only has one player, so always win
-        m_race_result = true;
+        m_race_result = RACE_RESULT_GOOD;
     }
     else
         Log::warn("Kart", "Unknown game mode given.");

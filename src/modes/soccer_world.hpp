@@ -162,7 +162,7 @@ public:
     void setBallHitter(unsigned int kart_id);
     // ------------------------------------------------------------------------
     /** Get the soccer result of kart in soccer world (including AIs) */
-    bool getKartSoccerResult(unsigned int kart_id) const;
+    Kart::RaceResultType getKartSoccerResult(unsigned int kart_id) const;
     // ------------------------------------------------------------------------
     int getScore(KartTeam team) const
     {
