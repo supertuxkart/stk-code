@@ -248,12 +248,14 @@ public:
         AF_WIN_START,            // Begin of win animation
         AF_WIN_LOOP_START,       // Begin of win loop animation
         AF_WIN_LOOP_END,         // End of the winning loop
+        AF_WIN_TO_STRAIGHT,      // Transition to the straight position (after soccer goals)
         AF_NEUTRAL_START,        // Begin of the neutral animation
         AF_NEUTRAL_LOOP_START,   // Begin of the neutral loop animation
         AF_NEUTRAL_LOOP_END,     // End of the neutral loop animation
         AF_LOSE_START,           // Begin losing animation
         AF_LOSE_LOOP_START,      // Begin of the losing loop
         AF_LOSE_LOOP_END,        // End of the losing loop
+        AF_LOSE_TO_STRAIGHT,     // Transition to the straight position (after soccer goals)
         AF_PODIUM_START,         // Start of the podium animation
         AF_PODIUM_LOOP_START,    // Start of the podium loop
         AF_PODIUM_LOOP_END,      // End of the podium loop

@@ -189,9 +189,11 @@ void KartModel::loadInfo(const XMLNode &node)
             animation_node->get("start-winning",      &m_animation_frame[AF_WIN_START]      );
             animation_node->get("start-winning-loop", &m_animation_frame[AF_WIN_LOOP_START] );
             animation_node->get("end-winning",        &m_animation_frame[AF_WIN_LOOP_END]   );
+            animation_node->get("end-winning-straight", &m_animation_frame[AF_WIN_TO_STRAIGHT]);
             animation_node->get("start-losing",       &m_animation_frame[AF_LOSE_START]     );
             animation_node->get("start-losing-loop",  &m_animation_frame[AF_LOSE_LOOP_START]);
             animation_node->get("end-losing",         &m_animation_frame[AF_LOSE_LOOP_END]  );
+            animation_node->get("end-losing-straight", &m_animation_frame[AF_LOSE_TO_STRAIGHT]);
 
             animation_node->get("start-jump",      &m_animation_frame[AF_JUMP_START]          );
             animation_node->get("start-jump-loop", &m_animation_frame[AF_JUMP_LOOP_START]     );
@@ -214,12 +216,14 @@ void KartModel::loadInfo(const XMLNode &node)
             animation_node->get("winning-start",      &m_animation_frame[AF_WIN_START]         );
             animation_node->get("winning-loop-start", &m_animation_frame[AF_WIN_LOOP_START]    );
             animation_node->get("winning-loop-end",   &m_animation_frame[AF_WIN_LOOP_END]      );
+            animation_node->get("winning-to-straight", &m_animation_frame[AF_WIN_TO_STRAIGHT]  );
             animation_node->get("neutral-start",      &m_animation_frame[AF_NEUTRAL_START]     );
             animation_node->get("neutral-loop-start", &m_animation_frame[AF_NEUTRAL_LOOP_START]);
             animation_node->get("neutral-loop-end",   &m_animation_frame[AF_NEUTRAL_LOOP_END]  );
             animation_node->get("losing-start",       &m_animation_frame[AF_LOSE_START]        );
             animation_node->get("losing-loop-start",  &m_animation_frame[AF_LOSE_LOOP_START]   );
             animation_node->get("losing-loop-end",    &m_animation_frame[AF_LOSE_LOOP_END]     );
+            animation_node->get("losing-to-straight", &m_animation_frame[AF_LOSE_TO_STRAIGHT]  );
             animation_node->get("podium-start",       &m_animation_frame[AF_PODIUM_START]      );
             animation_node->get("podium-loop-start",  &m_animation_frame[AF_PODIUM_LOOP_START] );
             animation_node->get("podium-loop-end",    &m_animation_frame[AF_PODIUM_LOOP_END]   );
@@ -1168,10 +1172,11 @@ void KartModel::setAnimation(AnimationFrameType type, bool no_loop)
     }
 
     m_current_animation = type;
+
+    // Special handling used after soccer goals
     if ((type == AF_WIN_START || type == AF_LOSE_START) &&
         m_animation_frame[type] > -1 && no_loop)
     {
-        // Special handling for soccer goal animation
         class SmoothTransition : public IAnimationEndCallBack
         {
             KartModel* m_kart_model;
@@ -1186,16 +1191,17 @@ void KartModel::setAnimation(AnimationFrameType type, bool no_loop)
                 m_kart_model->setAnimation(AF_DEFAULT);
             }
         };
-        AnimationFrameType end = (AnimationFrameType)(type + 2);
-        if (m_animation_frame [end] == -1)
-            end = (AnimationFrameType)((int)end - 1);
-        AnimationFrameType to_straight = (AnimationFrameType)(type + 3);
+        AnimationFrameType end = (type == AF_WIN_START) ? AF_WIN_LOOP_END
+                                                        : AF_LOSE_LOOP_END;
+        if (m_animation_frame[end] == -1)
+            return; // If the end isn't correctly defined, don't play the animation
+        AnimationFrameType to_straight = (type == AF_WIN_START) ? AF_WIN_TO_STRAIGHT
+                                                                : AF_LOSE_TO_STRAIGHT;
         bool has_to_straight = m_animation_frame[to_straight] > -1;
         if (has_to_straight)
             end = to_straight;
         m_animated_node->setAnimationSpeed(m_animation_speed);
-        m_animated_node->setFrameLoop(m_animation_frame[type],
-            m_animation_frame[end]);
+        m_animated_node->setFrameLoop(m_animation_frame[type], m_animation_frame[end]);
         m_animated_node->setLoopMode(false);
         SmoothTransition* st = new SmoothTransition(this, !has_to_straight);
         m_animated_node->setAnimationEndCallback(st);
