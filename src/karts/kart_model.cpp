@@ -242,8 +242,10 @@ void KartModel::loadInfo(const XMLNode &node)
             animation_node->get("bump-left",   &m_animation_frame[AF_BUMP_LEFT]   );
             animation_node->get("bump-right",  &m_animation_frame[AF_BUMP_RIGHT]  );
             animation_node->get("bump-back",   &m_animation_frame[AF_BUMP_BACK]   );
-            animation_node->get("happy",       &m_animation_frame[AF_HAPPY]       );
-            animation_node->get("hit",         &m_animation_frame[AF_HIT]         );
+            animation_node->get("happy-start", &m_animation_frame[AF_HAPPY_START] );
+            animation_node->get("happy-end",   &m_animation_frame[AF_HAPPY_END]   );
+            animation_node->get("hit-start",   &m_animation_frame[AF_HIT_START]   );
+            animation_node->get("hit-end",     &m_animation_frame[AF_HIT_END]     );
 
             animation_node->get("false-accel-start", &m_animation_frame[AF_FALSE_ACCEL_START] );
             animation_node->get("false-accel-end",   &m_animation_frame[AF_FALSE_ACCEL_END]   );

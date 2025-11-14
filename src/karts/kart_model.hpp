@@ -273,8 +273,10 @@ public:
         AF_BUMP_LEFT,   // Played if the kart hits something in front
         AF_BUMP_RIGHT,  // Played if the kart hits something in front
         AF_BUMP_BACK,   // Played if the kart hits something in front
-        AF_HAPPY,       // Played when hitting a rival (or some overtaking)
-        AF_HIT,         // Played when being hit
+        AF_HAPPY_START, // Start of the happy animation, played when hitting a rival (or overtaking)
+        AF_HAPPY_END,   // Last frame of the happy animation
+        AF_HIT_START,   // Start of the hit animation, played when being hit
+        AF_HIT_END,     // Last frame of the hit animation
 
         AF_FALSE_ACCEL_START, // Played if there is a penalty for early accel
         AF_PLACEHOLDER,       // A placeholder so that the assumption end = (start + 2) holds
