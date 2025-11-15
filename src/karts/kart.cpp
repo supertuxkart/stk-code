@@ -2964,6 +2964,10 @@ void Kart::crashed(const Material *m, const Vec3 &normal)
  *  World takes care of moving the kart to its rescue position. */
 void Kart::applyRescue(bool auto_rescue)
 {
+    // Don't allow triggering a rescue before the race starts
+    if (World::getWorld()->getTicksSinceStart() <= 0)
+        return;
+
     RescueAnimation::create(this, /*is_auto_rescue*/ auto_rescue);
 
     // Reset some gameplay variables such as attachments
