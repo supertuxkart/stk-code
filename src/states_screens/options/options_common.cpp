@@ -42,7 +42,7 @@ namespace OptionsCommon
         	screen = OptionsScreenLanguage::getInstance();
     	if(screen)
         	StateManager::get()->replaceTopMostScreen(screen);
-	}
+	} // switchTab
 
 	// In the in-game pause options, disable the players and language tabs
 	void setTabStatus()

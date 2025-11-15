@@ -115,6 +115,8 @@ private:
     /** Sound for exploding bubble gum shield */
     SFXBase          *m_bubble_explode_sound;
 
+    void bombExplode();
+
 public:
           Attachment(Kart* kart);
          ~Attachment();

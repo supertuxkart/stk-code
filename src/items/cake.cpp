@@ -69,6 +69,7 @@ bool Cake::hit(Kart* kart, PhysicalObject* obj)
         if(kart && kart->isShielded())
         {
             kart->decreaseShieldTime();
+            // FIXME This is inconsistent with bowling.cpp handling of shielded targets
             return false; //Not sure if a shield hit is a real hit.
         }
         if (!m_mini)

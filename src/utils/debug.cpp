@@ -706,7 +706,8 @@ bool handleContextMenuAction(s32 cmd_id)
         for (unsigned int i = 0; i < RaceManager::get()->getNumLocalPlayers(); i++)
         {
             Kart* kart = world->getLocalPlayerKart(i);
-            ExplosionAnimation::create(kart, kart->getXYZ(), true);
+            // Most conditions that might usually prevent an explosion are bypassed
+            ExplosionAnimation::create(kart, true);
         }
         break;
     case DEBUG_ATTACHMENT_NOTHING:

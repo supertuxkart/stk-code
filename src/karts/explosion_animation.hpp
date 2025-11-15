@@ -74,10 +74,7 @@ friend class KartRewinder;
     ExplosionAnimation(Kart* kart, bool direct_hit);
 public:
     // ------------------------------------------------------------------------
-    static ExplosionAnimation *create(Kart* kart, const Vec3 &pos,
-                                      bool direct_hit);
-    // ------------------------------------------------------------------------
-    static ExplosionAnimation *create(Kart *kart);
+    static ExplosionAnimation *create(Kart* kart, bool direct_hit);
     // ------------------------------------------------------------------------
     virtual ~ExplosionAnimation();
     // ------------------------------------------------------------------------

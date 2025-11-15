@@ -58,6 +58,7 @@
 #include "karts/kart_properties.hpp"
 #include "karts/kart_properties_manager.hpp"
 #include "karts/kart_rewinder.hpp"
+#include "karts/kart_utils.hpp"
 #include "karts/max_speed.hpp"
 #include "karts/official_karts.hpp"
 #include "karts/rescue_animation.hpp"
@@ -1488,6 +1489,8 @@ float Kart::getActualWheelForce()
  */
 bool Kart::isOnGround() const
 {
+    // getKartAnimation refers to KartAnimation objects like the explode or rescue
+    // animations, not to animations of the kart model like the win animation.
     return ((int)m_vehicle->getNumWheelsOnGround() == m_vehicle->getNumWheels()
           && !getKartAnimation());
 }   // isOnGround
@@ -2130,8 +2133,7 @@ void Kart::update(int ticks)
 
         if (!GUIEngine::isNoGraphics() && !has_animation_before)
         {
-            HitEffect *effect =  new Explosion(getXYZ(), "jump",
-                                              "jump_explosion.xml");
+            HitEffect *effect =  new Explosion(getXYZ(), "jump", "jump_explosion.xml");
             ProjectileManager::get()->addHitEffect(effect);
         }
     }
@@ -2253,7 +2255,8 @@ bool Kart::setSquash(float time, float slowdown)
 
     if(m_attachment->getType()==Attachment::ATTACH_BOMB && time>0)
     {
-        ExplosionAnimation::create(this);
+        // TODO : check how the world kart hit notification should be handled
+        KartUtils::createExplosion(this);
         return true;
     }
 

@@ -33,6 +33,7 @@
 #include "items/projectile_manager.hpp"
 #include "items/swatter.hpp"
 #include "karts/kart.hpp"
+#include "karts/kart_utils.hpp"
 #include "karts/controller/controller.hpp"
 #include "karts/explosion_animation.hpp"
 #include "karts/kart_properties.hpp"
@@ -282,7 +283,7 @@ void Attachment::hitBanana(ItemState *item_state)
         if (RaceManager::get()->isLinearRaceMode())
             PlayerManager::increaseAchievement(AchievementsStatus::BANANA_1RACE, 1);
     }
-    //Shield effect: protect but is used
+    // Shield effect: protect but is used
     if(m_kart->isShielded())
     {
         m_kart->decreaseShieldTime();
@@ -295,9 +296,7 @@ void Attachment::hitBanana(ItemState *item_state)
 
     if (RaceManager::get()->isBattleMode())
     {
-        World::getWorld()->kartHit(m_kart->getWorldKartId());
-        if (m_kart->getKartAnimation() == NULL)
-            ExplosionAnimation::create(m_kart);
+        KartUtils::createExplosion(m_kart);
         return;
     }
 
@@ -312,30 +311,15 @@ void Attachment::hitBanana(ItemState *item_state)
     case ATTACH_BOMB:
         {
         add_a_new_item = false;
-        if (!GUIEngine::isNoGraphics() && !RewindManager::get()->isRewinding())
-        {
-            HitEffect* he = new Explosion(m_kart->getXYZ(), "explosion",
-                "explosion_bomb.xml");
-            // Rumble!
-            Controller* controller = m_kart->getController();
-            if (controller && controller->isLocalPlayerController())
-            {
-                controller->rumble(0, 0.8f, 500);
-            }
-            if (m_kart->getController()->isLocalPlayerController())
-                he->setLocalPlayerKartHit();
-            ProjectileManager::get()->addHitEffect(he);
-        }
-        if (m_kart->getKartAnimation() == NULL)
-            ExplosionAnimation::create(m_kart);
+        bombExplode();
         clear();
         new_attachment = AttachmentType(ticks % 3);
+
         // Disable the banana on which the kart just is for more than the
         // default time. This is necessary to avoid that a kart lands on the
         // same banana again once the explosion animation is finished, giving
         // the kart the same penalty twice.
-        int ticks = 
-            std::max(item_state->getTicksTillReturn(), 
+        int ticks = std::max(item_state->getTicksTillReturn(), 
                      stk_config->time2Ticks(kp->getExplosionDuration() + 2.0f));
         item_state->setTicksTillReturn(ticks);
         break;
@@ -528,24 +512,7 @@ void Attachment::update(int ticks)
     {
         m_initial_speed = 0;
         if (m_ticks_left <= 0)
-        {
-            if (!GUIEngine::isNoGraphics() && !RewindManager::get()->isRewinding())
-            {
-                HitEffect* he = new Explosion(m_kart->getXYZ(), "explosion",
-                    "explosion_bomb.xml");
-                // Rumble!
-                Controller* controller = m_kart->getController();
-                if (controller && controller->isLocalPlayerController())
-                {
-                    controller->rumble(0, 0.8f, 500);
-                }
-                if (m_kart->getController()->isLocalPlayerController())
-                    he->setLocalPlayerKartHit();
-                ProjectileManager::get()->addHitEffect(he);
-            }
-            if (m_kart->getKartAnimation() == NULL)
-                ExplosionAnimation::create(m_kart);
-        }
+            bombExplode();
         break;
     }
     case ATTACH_BUBBLEGUM_SHIELD:
@@ -733,6 +700,21 @@ float Attachment::weightAdjust() const
            ? m_kart->getKartProperties()->getAnvilWeight() 
           : 0.0f;
 }   // weightAdjust
+
+// ----------------------------------------------------------------------------
+/** Creates an explosion animation and explosion graphics. The explosion 
+ * animation takes care of rumble and registering the hit with world. */
+void Attachment::bombExplode()
+{
+    KartUtils::createExplosion(m_kart);
+    if (!GUIEngine::isNoGraphics() && !RewindManager::get()->isRewinding())
+    {
+        HitEffect* he = new Explosion(m_kart->getXYZ(), "explosion", "explosion_bomb.xml");
+        if (m_kart->getController()->isLocalPlayerController())
+            he->setLocalPlayerKartHit();
+        ProjectileManager::get()->addHitEffect(he);
+    }
+} // bombExplode
 
 // ----------------------------------------------------------------------------
 /** Performs all actions necessary for a gum shield to leave a ground gum behind.

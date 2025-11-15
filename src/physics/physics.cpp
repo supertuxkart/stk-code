@@ -23,6 +23,7 @@
 #include "config/player_profile.hpp"
 #include "config/user_config.hpp"
 #include "karts/kart.hpp"
+#include "karts/kart_utils.hpp"
 #include "graphics/irr_driver.hpp"
 #include "graphics/stars.hpp"
 #include "items/flyable.hpp"
@@ -31,7 +32,6 @@
 #include "modes/soccer_world.hpp"
 #include "modes/world.hpp"
 #include "network/network_config.hpp"
-#include "karts/explosion_animation.hpp"
 #include "physics/btKart.hpp"
 #include "physics/irr_debug_drawer.hpp"
 #include "physics/physical_object.hpp"
@@ -269,11 +269,7 @@ void Physics::update(int ticks)
             }
             else if (obj->isExplodeKartObject())
             {
-                ExplosionAnimation::create(kart);
-                if (kart->getKartAnimation() != NULL)
-                {
-                    World::getWorld()->kartHit(kart->getWorldKartId());
-                }
+                KartUtils::createExplosion(kart);
             }
             else if (obj->isFlattenKartObject())
             {
@@ -307,11 +303,7 @@ void Physics::update(int ticks)
             else if (anim->isExplodeKartObject())
             {
                 Kart *kart = p->getUserPointer(1)->getPointerKart();
-                ExplosionAnimation::create(kart);
-                if (kart->getKartAnimation() != NULL)
-                {
-                    World::getWorld()->kartHit(kart->getWorldKartId());
-                }
+                KartUtils::createExplosion(kart);
             }
             else if (anim->isFlattenKartObject())
             {

@@ -35,58 +35,16 @@
 
 #include <cstring>
 
-/** A static create function that does only create an explosion if
- *  the explosion happens to be close enough to affect the kart.
- *  Otherwise, NULL is returned.
+/** A static create function that creates an explosion animation
  *  \param kart The kart that is exploded.
- *  \param pos The position where the explosion happened.
  *  \param direct_hit If the kart was hit directly.
  */
-ExplosionAnimation *ExplosionAnimation::create(Kart *kart,
-                                               const Vec3 &pos,
-                                               bool direct_hit)
+ExplosionAnimation *ExplosionAnimation::create(Kart *kart, bool direct_hit)
 {
-    // When goal phase is happening karts is made stationary, so no animation
-    // will be created
-    if (kart->isInvulnerable() || World::getWorld()->isGoalPhase())
-        return NULL;
-
-    float r = kart->getKartProperties()->getExplosionRadius();
-
-    // Ignore explosion that are too far away.
-    if(!direct_hit && pos.distance2(kart->getXYZ())>r*r) return NULL;
-
-    if(kart->isShielded())
-    {
-        kart->decreaseShieldTime();
-        return NULL;
-    }
-
-    if (RaceManager::get()->isFollowMode())
-    {
-        FollowTheLeaderRace *ftl_world =
-            dynamic_cast<FollowTheLeaderRace*>(World::getWorld());
-        if(ftl_world->isLeader(kart->getWorldKartId()))
-            ftl_world->leaderHit();
-    }
+    if (kart->getKartAnimation() != nullptr)
+        return nullptr;
 
     return new ExplosionAnimation(kart, direct_hit);
-}   // create
-
-// ----------------------------------------------------------------------------
-/** A static create function that does only create an explosion if
- *  the explosion happens to be close enough to affect the kart.
- *  Otherwise, NULL is returned. */
-ExplosionAnimation *ExplosionAnimation::create(Kart *kart)
-{
-    if (kart->isInvulnerable() || World::getWorld()->isGoalPhase())
-        return NULL;
-    else if (kart->isShielded())
-    {
-        kart->decreaseShieldTime();
-        return NULL;
-    }
-    return new ExplosionAnimation(kart, /*direct hit*/true);
 }   // create
 
 // ----------------------------------------------------------------------------

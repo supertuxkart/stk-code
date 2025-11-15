@@ -37,6 +37,7 @@
 #include "io/xml_node.hpp"
 #include "items/projectile_manager.hpp"
 #include "karts/kart.hpp"
+#include "karts/kart_utils.hpp"
 #include "karts/cannon_animation.hpp"
 #include "karts/controller/controller.hpp"
 #include "karts/explosion_animation.hpp"
@@ -567,6 +568,7 @@ bool Flyable::hit(Kart *kart_hit, PhysicalObject* object)
  *  \param object If non-NULL a physical item that was hit directly.
  *  \param secondary_hits True if items that are not directly hit should
  *         also be affected.
+ *  \param indirect_damage If true, a direct hit will do indirect hit damages
  */
 void Flyable::explode(Kart *kart_hit, PhysicalObject *object,
                       bool secondary_hits, bool indirect_damage)
@@ -592,33 +594,13 @@ void Flyable::explode(Kart *kart_hit, PhysicalObject *object,
 
         // Handle the actual explosion. The kart that fired a flyable will
         // only be affected if it's a direct hit. This allows karts to use
-        // rockets on short distance.
-        if( (m_owner!=kart || m_owner==kart_hit) && !kart->getKartAnimation())
+        // cakes on short distance.
+        if( (m_owner != kart || m_owner == kart_hit) && !kart->getKartAnimation())
         {
             // The explosion animation will register itself with the kart
             // and will free it later.
-            ExplosionAnimation::create(kart, getXYZ(), indirect_damage ? false : kart==kart_hit);
-            if (kart == kart_hit)
-            {
-                world->kartHit(kart->getWorldKartId(),
-                    m_owner->getWorldKartId());
-
-                if (m_owner->getController()->canGetAchievements())
-                {
-                    if (m_owner->getWorldKartId() != kart->getWorldKartId())
-                        PlayerManager::addKartHit(kart->getWorldKartId());
-                    PlayerManager::increaseAchievement(AchievementsStatus::ALL_HITS, 1);
-                    if (RaceManager::get()->isLinearRaceMode())
-                        PlayerManager::increaseAchievement(AchievementsStatus::ALL_HITS_1RACE, 1);
-                }
-
-                // Rumble!
-                Controller* controller = kart->getController();
-                if (controller && controller->isLocalPlayerController())
-                {
-                    controller->rumble(0, 0.8f, 500);
-                }
-            }
+            bool direct_hit = indirect_damage ? false : kart == kart_hit;
+            KartUtils::createExplosion(kart, getXYZ(), direct_hit, m_owner);
         }
     }
     Track::getCurrentTrack()->handleExplosion(getXYZ(), object,secondary_hits);
