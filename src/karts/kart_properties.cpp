@@ -282,6 +282,13 @@ void KartProperties::load(const std::string &filename, const std::string &node)
     }
     catch(std::exception& err)
     {
+        if(root) delete root;
+        // Special-case when aborting due to a kart version mismatch.
+        // This allows us to display a simple warning instead of spurious errors.
+        char ver[] = "version";
+        if (strcmp(err.what(), ver) == 0)
+            throw std::runtime_error("version");
+
         Log::error("[KartProperties]", "Error while parsing KartProperties '%s':",
                    filename.c_str());
         Log::error("[KartProperties]", "%s", err.what());
@@ -347,17 +354,12 @@ void KartProperties::load(const std::string &filename, const std::string &node)
     else
         m_minimap_icon = NULL;
 
-    // Only load the model if the .kart file has the appropriate version,
-    // otherwise warnings are printed.
-    if (m_version >= 1)
+    const bool success = m_kart_model->loadModels(*this);
+    if (!success)
     {
-        const bool success = m_kart_model->loadModels(*this);
-        if (!success)
-        {
-            file_manager->popTextureSearchPath();
-            file_manager->popModelSearchPath();
-            throw std::runtime_error("Cannot load kart models");
-        }
+        file_manager->popTextureSearchPath();
+        file_manager->popModelSearchPath();
+        throw std::runtime_error("Cannot load kart models");
     }
 
     if(m_gravity_center_shift.getX()==UNDEFINED)
@@ -463,10 +465,22 @@ void KartProperties::combineCharacteristics(HandicapLevel handicap)
 //-----------------------------------------------------------------------------
 /** Actually reads in the data from the xml file.
  *  \param root Root of the xml tree.
+ *  \param called_from_stk_config This function can be called in different contexts.
+ * When it's called from stk_config to load default parameters, there is no point
+ * in performing a version check, and trying to check stk_config while it's still
+ * being initialized would cause issues. On the other hand, when we load a kart's XML,
+ * we need to check in stk_config the min and max supported versions.
  */
-void KartProperties::getAllData(const XMLNode * root)
+void KartProperties::getAllData(const XMLNode * root, bool called_from_stk_config)
 {
     root->get("version",           &m_version);
+
+    // If the version of the kart file is not supported, ignore this .kart file 
+    if (!called_from_stk_config && (m_version < stk_config->m_min_kart_version ||
+                                    m_version > stk_config->m_max_kart_version))
+    {
+        throw std::runtime_error("version");
+    }
 
     root->get("name",              &m_name             );
 

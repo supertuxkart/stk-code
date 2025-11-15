@@ -228,7 +228,7 @@ public:
         setWheelBase(kart_length);
     }
     void  copyFrom          (const KartProperties *source);
-    void  getAllData        (const XMLNode * root);
+    void  getAllData        (const XMLNode * root, bool called_from_stk_config = false);
     void  checkAllSet       (const std::string &filename);
     bool  isInGroup         (const std::string &group) const;
     bool operator<(const KartProperties &other) const;
