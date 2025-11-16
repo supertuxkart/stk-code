@@ -515,6 +515,7 @@ public:
     virtual float getTerrainPitch(float heading) const;
 
     virtual void   reset            ();
+    virtual void   partialReset     (bool affect_squash = true);
     // ------------------------------------------------------------------------
     /** Sets zipper time, and apply one time additional speed boost. It can be
      *  used with a specific material, in which case the zipper parmaters are

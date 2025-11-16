@@ -467,10 +467,6 @@ void Kart::reset()
     m_powerup_mask = 0;
     m_powerup_buckets.clear();
 
-    // Reset star effect in case that it is currently being shown.
-    if (m_stars_effect)
-        m_stars_effect->reset();
-    m_max_speed->reset();
     m_powerup->reset();
 
     // Reset animations and wheels
@@ -485,7 +481,6 @@ void Kart::reset()
         m_saved_controller = NULL;
     }
     m_kart_model->setAnimation(KartModel::AF_DEFAULT);
-    m_attachment->reset();
     m_kart_gfx->reset();
     m_skidding->reset();
 
@@ -497,7 +492,9 @@ void Kart::reset()
         m_collision_particles->setCreationRateAbsolute(0.0f);
 #endif
 
-    unsetSquash();
+    // Various elements that are also reset after a rescue or
+    // a soccer goal: invulnerability, attachment, speed boosts...
+    partialReset();
 
     m_last_used_powerup    = PowerupManager::POWERUP_NOTHING;
     m_race_position        = m_initial_position;
@@ -506,10 +503,7 @@ void Kart::reset()
     m_finish_time          = 0.0f;
     m_bubblegum_ticks      = 0;
     m_bubblegum_torque_sign = true;
-    m_invulnerable_ticks   = 0;
     m_basket_squash_invulnerable_ticks = 0;
-    m_min_nitro_ticks      = 0;
-    m_energy_to_min_ratio  = 0;
     m_collected_energy     = 0;
     m_bounce_back_ticks    = 0;
     m_brake_ticks          = 0;
@@ -561,8 +555,6 @@ void Kart::reset()
         m_engine_sound->stop();
 
     m_controls.reset();
-    m_effective_steer      = 0.0f;
-    m_slipstream->reset();
     
     if(m_vehicle)
     {
@@ -617,6 +609,29 @@ void Kart::reset()
     if(wheels[3]) wheels[3]->setVisible(true);
 
 }   // reset
+
+// -----------------------------------------------------------------------------
+/** A partial reset applied after rescues and in soccer mode after goals */
+void Kart::partialReset(bool affect_squash)
+{
+    // Reset star effect in case that it is currently being shown.
+    if (m_stars_effect)
+        m_stars_effect->reset();
+    m_invulnerable_ticks = 0;
+
+    // Reset speed boosts and penalties
+    m_max_speed->reset(affect_squash);
+    if (affect_squash)
+        unsetSquash();
+
+    // Remove any leftover attachment
+    m_attachment->reset();
+
+    // Misc.
+    m_slipstream->reset();
+    m_last_factor_engine_sound = 0.0f;
+    m_effective_steer = 0.0f;
+}   // partialReset
 
 // -----------------------------------------------------------------------------
 void Kart::setXYZ(const Vec3& a)
@@ -2973,13 +2988,8 @@ void Kart::applyRescue(bool auto_rescue)
 
     RescueAnimation::create(this, /*is_auto_rescue*/ auto_rescue);
 
-    // Reset some gameplay variables such as attachments
-    m_last_factor_engine_sound = 0.0f;
-    m_effective_steer = 0.0f;
-    getAttachment()->clear();
-    if (m_stars_effect)
-        m_stars_effect->reset();
-    m_max_speed->reset(/* don't affect squashing */ true);
+    // Reset some gameplay variables such as attachments and speed boosts
+    partialReset(/* affect squashing */ false);
 
     // Apply game-mode specific effects
     // In battle mode, add a hit unless it was auto-rescue
@@ -3005,7 +3015,7 @@ void Kart::applyRescue(bool auto_rescue)
     }
 
     // Clear powerups when rescued in CTF
-    if (RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_CAPTURE_THE_FLAG)
+    if (RaceManager::get()->isCTFMode())
         getPowerup()->reset();
 } // applyRescue
 

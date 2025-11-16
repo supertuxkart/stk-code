@@ -726,6 +726,8 @@ void SoccerWorld::resetKartsToSelfGoals()
         unsigned index = m_kart_position_map.at(kart->getWorldKartId());
         btTransform t = Track::getCurrentTrack()->getStartTransform(index);
         moveKartTo(kart.get(), t);
+        // Reset attachments, speed boosts, invulnerability and misc.
+        kart->partialReset();
     }
 }   // resetKartsToSelfGoals
 
