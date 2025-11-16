@@ -19,6 +19,7 @@
 #include "script_kart.hpp"
 
 #include "karts/kart.hpp"
+#include "karts/kart_utils.hpp"
 #include "karts/kart_model.hpp"
 #include "karts/kart_properties.hpp"
 #include "modes/world.hpp"
@@ -48,8 +49,15 @@ namespace Scripting
         void squash(int idKart, float time)
         {
             ::Kart* kart = World::getWorld()->getKart(idKart);
-            kart->setSquash(time, 0.5);  //0.5 * max speed is new max for squashed duration
-        }
+            kart->setSquash(time, 0.6);  //0.6 * max speed is new max for squashed duration
+        }   // squash
+
+        /** Explodes the specified kart, using either a small or normal explosion */
+        void explode(int idKart, bool small)
+        {
+            ::Kart* kart = World::getWorld()->getKart(idKart);
+            KartUtils::createExplosion(kart, small);
+        }   // explode
 
         /** Teleports the kart to the specified Vec3 location */
         void teleport(int idKart, SimpleVec3* position)
@@ -61,7 +69,7 @@ namespace Scripting
             btTransform s = World::getWorld()->getRescueTransform(index);
             s.setRotation(btQuaternion(btVector3(0.0f, 1.0f, 0.0f), 0.0f));
             World::getWorld()->moveKartTo(kart, s);
-        }
+        }   // teleport
         
         /** Teleports the kart to the specified Vec3 location */
         void teleportExact(int idKart, SimpleVec3* position)
@@ -73,7 +81,7 @@ namespace Scripting
             s.setRotation(kart->getRotation());
             s.setOrigin(v);
             World::getWorld()->moveKartTo(kart, s);
-        }
+        }   // teleportExact
 
         /** Attempts to project kart to the given 2D location, to the position
           * with height 0, at a 45 degree angle.
@@ -162,6 +170,10 @@ namespace Scripting
             
             r = engine->RegisterGlobalFunction("void squash(int id, float time)", 
                                                mp ? WRAP_FN(squash) : asFUNCTION(squash), 
+                                               call_conv); assert(r >= 0);
+
+            r = engine->RegisterGlobalFunction("void explode(int id, bool small)", 
+                                               mp ? WRAP_FN(explode) : asFUNCTION(explode), 
                                                call_conv); assert(r >= 0);
                                                
             r = engine->RegisterGlobalFunction("void teleport(int id, const Vec3 &in)", 
