@@ -1015,71 +1015,10 @@ void KartSelectionScreen::updateKartWidgetModel(int widget_id,
     }
     else
     {
-        const KartProperties *kp =
-            kart_properties_manager->getKart(selection);
+        const KartProperties *kp = kart_properties_manager->getKart(selection);
         if (kp != NULL)
         {
-            const KartModel &kart_model = kp->getMasterKartModel();
-
-            float scale = 35.0f;
-            if (kart_model.getLength() > 1.45f)
-            {
-                // if kart is too long, size it down a bit so that it fits
-                scale = 30.0f;
-            }
-
-            core::matrix4 model_location;
-            model_location.setScale(core::vector3df(scale, scale, scale));
-            w3->clearModels();
-            // FIXME - Identical code appears in player_kart_widget.cpp
-            //         Avoid this duplication!
-            const bool has_win_anime =
-                UserConfigParams::m_animated_characters &&
-                (((kart_model.getFrame(KartModel::AF_WIN_LOOP_START) > -1 ||
-                kart_model.getFrame(KartModel::AF_WIN_START) > -1) &&
-                kart_model.getFrame(KartModel::AF_WIN_LOOP_END) > -1) ||
-                (kart_model.getFrame(KartModel::AF_SELECTION_LOOP_START) > -1 &&
-                kart_model.getFrame(KartModel::AF_SELECTION_LOOP_END) > -1));
-            w3->addModel( kart_model.getModel(), model_location,
-                has_win_anime ?
-                kart_model.getFrame(KartModel::AF_SELECTION_LOOP_START) > -1 ?
-                kart_model.getFrame(KartModel::AF_SELECTION_LOOP_START) :
-                kart_model.getFrame(KartModel::AF_WIN_LOOP_START) > -1 ?
-                kart_model.getFrame(KartModel::AF_WIN_LOOP_START) :
-                kart_model.getFrame(KartModel::AF_WIN_START) :
-                kart_model.getBaseFrame(),
-                has_win_anime ?
-                kart_model.getFrame(KartModel::AF_SELECTION_LOOP_END) > -1 ?
-                kart_model.getFrame(KartModel::AF_SELECTION_LOOP_END) :
-                kart_model.getFrame(KartModel::AF_WIN_LOOP_END) :
-                kart_model.getBaseFrame(),
-                kart_model.getAnimationSpeed());
-
-            w3->getModelViewRenderInfo()->setHue(kart_color);
-            model_location.setScale(core::vector3df(1.0f, 1.0f, 1.0f));
-            for (unsigned i = 0; i < 4; i++)
-            {
-                model_location.setTranslation(kart_model
-                    .getWheelGraphicsPosition(i).toIrrVector());
-                w3->addModel(kart_model.getWheelModel(i), model_location);
-            }
-
-            for (unsigned i = 0;
-                 i < kart_model.getSpeedWeightedObjectsCount(); i++)
-            {
-                const SpeedWeightedObject& obj =
-                    kart_model.getSpeedWeightedObject(i);
-                core::matrix4 swol = obj.m_location;
-                if (!obj.m_bone_name.empty())
-                {
-                    core::matrix4 inv =
-                        kart_model.getInverseBoneMatrix(obj.m_bone_name);
-                    swol = inv * obj.m_location;
-                }
-                w3->addModel(obj.m_model, swol, -1, -1, 0.0f, obj.m_bone_name);
-            }
-            //w3->update(0);
-
+            m_kart_widgets[widget_id].setupKartModel(kp),
             m_kart_widgets[widget_id].m_kart_name
                 ->setText( selectionText.c_str(), false );
         }

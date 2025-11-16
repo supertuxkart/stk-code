@@ -109,6 +109,9 @@ namespace GUIEngine
         ~PlayerKartWidget();
 
         // ------------------------------------------------------------------------
+        /** Called to update the displayed kart model. */
+        void setupKartModel(const KartProperties* properties);
+        // ------------------------------------------------------------------------
         /** Called when players are renumbered (changes the player ID) */
         void setPlayerID(const int newPlayerID);
         // ------------------------------------------------------------------------

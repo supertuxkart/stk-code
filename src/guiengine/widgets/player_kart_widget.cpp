@@ -198,8 +198,7 @@ PlayerKartWidget::PlayerKartWidget(KartSelectionScreen* parent,
 
     // Init kart model
     const std::string default_kart = UserConfigParams::m_default_kart;
-    const KartProperties* props =
-        kart_properties_manager->getKart(default_kart);
+    const KartProperties* props = kart_properties_manager->getKart(default_kart);
 
     if(!props)
     {
@@ -224,62 +223,7 @@ PlayerKartWidget::PlayerKartWidget(KartSelectionScreen* parent,
     }
     m_kart_internal_name = props->getIdent();
 
-    const KartModel &kart_model = props->getMasterKartModel();
-    
-    float scale = 35.0f;
-    if (kart_model.getLength() > 1.45f)
-    {
-        // if kart is too long, size it down a bit so that it fits
-        scale = 30.0f;
-    }
-
-    core::matrix4 model_location;
-    model_location.setScale(core::vector3df(scale, scale, scale));
-    const bool has_win_anime =
-        UserConfigParams::m_animated_characters &&
-        (((kart_model.getFrame(KartModel::AF_WIN_LOOP_START) > -1 ||
-        kart_model.getFrame(KartModel::AF_WIN_START) > -1) &&
-        kart_model.getFrame(KartModel::AF_WIN_LOOP_END) > -1) ||
-        (kart_model.getFrame(KartModel::AF_SELECTION_LOOP_START) > -1 &&
-        kart_model.getFrame(KartModel::AF_SELECTION_LOOP_END) > -1));
-    m_model_view->addModel( kart_model.getModel(), model_location,
-        has_win_anime ?
-        kart_model.getFrame(KartModel::AF_SELECTION_LOOP_START) > -1 ?
-        kart_model.getFrame(KartModel::AF_SELECTION_LOOP_START) :
-        kart_model.getFrame(KartModel::AF_WIN_LOOP_START) > -1 ?
-        kart_model.getFrame(KartModel::AF_WIN_LOOP_START) :
-        kart_model.getFrame(KartModel::AF_WIN_START) :
-        kart_model.getBaseFrame(),
-        has_win_anime ?
-        kart_model.getFrame(KartModel::AF_SELECTION_LOOP_END) > -1 ?
-        kart_model.getFrame(KartModel::AF_SELECTION_LOOP_END) :
-        kart_model.getFrame(KartModel::AF_WIN_LOOP_END) :
-        kart_model.getBaseFrame(),
-        kart_model.getAnimationSpeed());
-    m_model_view->getModelViewRenderInfo()->setHue(
-        m_associated_player->getConstProfile()->getDefaultKartColor());
-    model_location.setScale(core::vector3df(1.0f, 1.0f, 1.0f));
-    for (unsigned i = 0; i < 4; i++)
-    {
-        model_location.setTranslation(kart_model
-            .getWheelGraphicsPosition(i).toIrrVector());
-        m_model_view->addModel(kart_model.getWheelModel(i), model_location);
-    }
-
-    for (unsigned i = 0; i < kart_model.getSpeedWeightedObjectsCount(); i++)
-    {
-        const SpeedWeightedObject& obj = kart_model.getSpeedWeightedObject(i);
-        core::matrix4 swol = obj.m_location;
-        if (!obj.m_bone_name.empty())
-        {
-            core::matrix4 inv =
-                kart_model.getInverseBoneMatrix(obj.m_bone_name);
-            swol = inv * obj.m_location;
-        }
-        m_model_view->addModel(obj.m_model, swol, -1, -1, 0.0f,
-            obj.m_bone_name);
-    }
-    m_model_view->setRotateContinuously( 35.0f );
+    setupKartModel(props);
 
     // ---- Kart name label
     m_kart_name = new LabelWidget(
@@ -338,6 +282,69 @@ PlayerKartWidget::~PlayerKartWidget()
     m_magic_number = 0xDEADBEEF;
 #endif
 }   // ~PlayerKartWidget
+
+// ------------------------------------------------------------------------
+/** Handles all the operations for the display of the kart model */
+void PlayerKartWidget::setupKartModel(const KartProperties* properties)
+{
+    const KartModel &kart_model = properties->getMasterKartModel();
+
+    float scale = 35.0f;
+    if (kart_model.getLength() > 1.45f)
+    {
+        // If the kart is too long, size it down a bit so that it fits
+        scale = 30.0f;
+    }
+
+    core::matrix4 model_location;
+    model_location.setScale(core::vector3df(scale, scale, scale));
+    m_model_view->clearModels();
+    const bool has_win_anime =
+        UserConfigParams::m_animated_characters &&
+        (((kart_model.getFrame(KartModel::AF_WIN_LOOP_START) > -1 ||
+        kart_model.getFrame(KartModel::AF_WIN_START) > -1) &&
+        kart_model.getFrame(KartModel::AF_WIN_LOOP_END) > -1) ||
+        (kart_model.getFrame(KartModel::AF_SELECTION_LOOP_START) > -1 &&
+        kart_model.getFrame(KartModel::AF_SELECTION_LOOP_END) > -1));
+    m_model_view->addModel( kart_model.getModel(), model_location,
+        has_win_anime ?
+        kart_model.getFrame(KartModel::AF_SELECTION_LOOP_START) > -1 ?
+        kart_model.getFrame(KartModel::AF_SELECTION_LOOP_START) :
+        kart_model.getFrame(KartModel::AF_WIN_LOOP_START) > -1 ?
+        kart_model.getFrame(KartModel::AF_WIN_LOOP_START) :
+        kart_model.getFrame(KartModel::AF_WIN_START) :
+        kart_model.getBaseFrame(),
+        has_win_anime ?
+        kart_model.getFrame(KartModel::AF_SELECTION_LOOP_END) > -1 ?
+        kart_model.getFrame(KartModel::AF_SELECTION_LOOP_END) :
+        kart_model.getFrame(KartModel::AF_WIN_LOOP_END) :
+        kart_model.getBaseFrame(),
+        kart_model.getAnimationSpeed());
+    m_model_view->getModelViewRenderInfo()->setHue(
+        m_associated_player->getConstProfile()->getDefaultKartColor());
+    model_location.setScale(core::vector3df(1.0f, 1.0f, 1.0f));
+    for (unsigned i = 0; i < 4; i++)
+    {
+        model_location.setTranslation(kart_model
+            .getWheelGraphicsPosition(i).toIrrVector());
+        m_model_view->addModel(kart_model.getWheelModel(i), model_location);
+    }
+
+    for (unsigned i = 0; i < kart_model.getSpeedWeightedObjectsCount(); i++)
+    {
+        const SpeedWeightedObject& obj = kart_model.getSpeedWeightedObject(i);
+        core::matrix4 swol = obj.m_location;
+        if (!obj.m_bone_name.empty())
+        {
+            core::matrix4 inv =
+                kart_model.getInverseBoneMatrix(obj.m_bone_name);
+            swol = inv * obj.m_location;
+        }
+        m_model_view->addModel(obj.m_model, swol, -1, -1, 0.0f,
+            obj.m_bone_name);
+    }
+    m_model_view->setRotateContinuously(35.0f);
+}   // setupKartModel
 
 // ------------------------------------------------------------------------
 /** Called when players are renumbered (changes the player ID) */
