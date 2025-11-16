@@ -1069,10 +1069,12 @@ void LinearWorld::checkForWrongDirection(unsigned int i, float dt)
         angle_diff += 2*M_PI;
 
     // Display a warning message if the kart is going back way, i.e. if angle
-    // is too big(unless the kart has already finished the race).
+    // is too big (unless the kart has already finished the race).
+    // We also avoid displaying the message if the kart is almost not moving.
     if ((angle_diff > DEGREE_TO_RAD * 120.0f ||
         angle_diff < -DEGREE_TO_RAD * 120.0f) &&
         kart->getVelocityLC().getY() > 0.0f &&
+        fabsf(kart->getSpeed()) > 2.0f &&
         !kart->hasFinishedRace())
     {
         ki.m_wrong_way_timer += dt;
