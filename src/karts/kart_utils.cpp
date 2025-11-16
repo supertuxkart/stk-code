@@ -22,6 +22,7 @@
 #include "config/player_manager.hpp"
 #include "items/powerup.hpp"
 #include "karts/explosion_animation.hpp"
+#include "karts/kart_model.hpp"
 #include "karts/kart_properties.hpp"
 #include "karts/controller/controller.hpp"
 #include "modes/follow_the_leader.hpp"
@@ -59,6 +60,15 @@ namespace KartUtils
         if (controller && controller->isLocalPlayerController())
             controller->rumble(0, 0.8f, 500);
 
+        // Play a hurt kart-model animation for the kart that was hit
+        // TODO : because of the heavy kart movement due to the main explosion
+        //        animation, little is visible from the kart model movement.
+        //        Either the main explosion animation should move less, or
+        //        the kart hurt animation should last long enough to exceed the
+        //        kart animation, or the start of the kart-model animation should
+        //        be delayed, or some mix of all three solutions.
+        kart->getKartModel()->setAnimation(KartModel::AF_HIT_START);
+
         if (RaceManager::get()->isFollowMode())
         {
             FollowTheLeaderRace *ftl_world = dynamic_cast<FollowTheLeaderRace*>(world);
@@ -70,14 +80,20 @@ namespace KartUtils
         if (direct_hit)
         {
             // Register the hit with the world (for example for battle scoring)
-            if (author != nullptr)
-                world->kartHit(kart->getWorldKartId(), author->getWorldKartId());
-            else
-                world->kartHit(kart->getWorldKartId());
+            int author_id = (author != nullptr) ? author->getWorldKartId() : -1;
+            world->kartHit(kart->getWorldKartId(), author_id);
 
+            // Play a happy kart-model animation for the kart that hit the other kart
+            // TODO : prevent the interruption of another kart model animation
+            //        The interruption is easily reproducible by simply bowling two
+            //        karts in a short time interval.
+            if (author != nullptr)
+                author->getKartModel()->setAnimation(KartModel::AF_HAPPY_START);
+
+            // Increase achievement counters as appropriate
             if (author != nullptr && author->getController()->canGetAchievements())
             {
-                if (author->getWorldKartId() != kart->getWorldKartId())
+                if (author_id != (int)kart->getWorldKartId())
                     PlayerManager::addKartHit(kart->getWorldKartId());
                 PlayerManager::increaseAchievement(AchievementsStatus::ALL_HITS, 1);
                 if (RaceManager::get()->isLinearRaceMode())

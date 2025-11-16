@@ -201,7 +201,7 @@ public:
     bool                      isOwnerImmunity(const Kart *kart_hit) const;
     virtual bool              hit(Kart* kart, PhysicalObject* obj=NULL);
     void                      explode(Kart* kart, PhysicalObject* obj=NULL,
-                                      bool secondary_hits=true, bool indirect_damage=false);
+                                      bool secondary_hits=true, bool small_damage=false);
     unsigned int              getOwnerId();
     // ------------------------------------------------------------------------
     /** Returns if this flyable has an animation playing (e.g. cannon). */

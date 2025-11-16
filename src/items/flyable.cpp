@@ -568,10 +568,10 @@ bool Flyable::hit(Kart *kart_hit, PhysicalObject* object)
  *  \param object If non-NULL a physical item that was hit directly.
  *  \param secondary_hits True if items that are not directly hit should
  *         also be affected.
- *  \param indirect_damage If true, a direct hit will do indirect hit damages
+ *  \param small_damage If true, a direct hit will do reduced (indirect hit) damage
  */
 void Flyable::explode(Kart *kart_hit, PhysicalObject *object,
-                      bool secondary_hits, bool indirect_damage)
+                      bool secondary_hits, bool small_damage)
 {
     // Apply explosion effect
     // ----------------------
@@ -587,9 +587,9 @@ void Flyable::explode(Kart *kart_hit, PhysicalObject *object,
 
         if (kart->isGhostKart()) continue;
 
-        // If no secondary hits should be done, only hit the
-        // direct hit kart.
-        if(!secondary_hits && kart!=kart_hit)
+        // If no secondary hits should be done, only hit the directly hit kart.
+        bool direct_hit = (kart == kart_hit);
+        if(!secondary_hits && !direct_hit)
             continue;
 
         // Handle the actual explosion. The kart that fired a flyable will
@@ -599,8 +599,7 @@ void Flyable::explode(Kart *kart_hit, PhysicalObject *object,
         {
             // The explosion animation will register itself with the kart
             // and will free it later.
-            bool direct_hit = indirect_damage ? false : kart == kart_hit;
-            KartUtils::createExplosion(kart, getXYZ(), direct_hit, m_owner);
+            KartUtils::createExplosion(kart, small_damage, getXYZ(), direct_hit, m_owner);
         }
     }
     Track::getCurrentTrack()->handleExplosion(getXYZ(), object,secondary_hits);
