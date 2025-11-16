@@ -23,7 +23,6 @@
 #include "graphics/stars.hpp"
 #include "guiengine/engine.hpp"
 #include "items/attachment.hpp"
-#include "items/powerup.hpp"
 #include "karts/kart.hpp"
 #include "karts/kart_properties.hpp"
 #include "modes/follow_the_leader.hpp"
@@ -39,24 +38,22 @@
  *  \param kart The kart that is exploded.
  *  \param direct_hit If the kart was hit directly.
  */
-ExplosionAnimation *ExplosionAnimation::create(Kart *kart, bool direct_hit)
+ExplosionAnimation *ExplosionAnimation::create(Kart *kart, bool direct_hit, bool small)
 {
     if (kart->getKartAnimation() != nullptr)
         return nullptr;
 
-    return new ExplosionAnimation(kart, direct_hit);
+    return new ExplosionAnimation(kart, direct_hit, small);
 }   // create
 
 // ----------------------------------------------------------------------------
-ExplosionAnimation::ExplosionAnimation(Kart* kart, bool direct_hit)
+ExplosionAnimation::ExplosionAnimation(Kart* kart, bool direct_hit, bool small)
                   : AbstractKartAnimation(kart, "ExplosionAnimation")
 {
     memset(m_reset_trans_compressed, 0, 16);
     Vec3 normal = m_created_transform.getBasis().getColumn(1).normalized();
     // Put the kart back to its own flag base like rescue if direct hit in CTF
-    bool reset = RaceManager::get()->getMinorMode() ==
-        RaceManager::MINOR_MODE_CAPTURE_THE_FLAG && direct_hit;
-    if (reset)
+    if (direct_hit && RaceManager::get()->isCTFMode())
     {
         btTransform prev_trans = m_kart->getTrans();
         World::getWorld()->moveKartAfterRescue(m_kart);
@@ -65,11 +62,11 @@ ExplosionAnimation::ExplosionAnimation(Kart* kart, bool direct_hit)
         m_kart->setTrans(prev_trans);
         MiniGLM::compressbtTransform(reset_trans,
             m_reset_trans_compressed);
-        init(direct_hit, normal, reset_trans);
+        init(direct_hit, small, normal, reset_trans);
     }
     else
     {
-        init(direct_hit, normal,
+        init(direct_hit, small, normal,
              btTransform(btQuaternion(0.0f, 0.0f, 0.0f, 1.0f)));
     }
 
@@ -77,10 +74,6 @@ ExplosionAnimation::ExplosionAnimation(Kart* kart, bool direct_hit)
     m_kart->setInvulnerableTicks(stk_config->time2Ticks(t));
     m_kart->playCustomSFX(SFXManager::CUSTOM_EXPLODE);
     m_kart->getAttachment()->clear();
-    // Clear powerups when direct hit in CTF
-    // TODO: move this out of this code file
-    if (reset)
-        m_kart->getPowerup()->reset();
 }   // ExplosionAnimation
 
 //-----------------------------------------------------------------------------
@@ -90,27 +83,6 @@ ExplosionAnimation::ExplosionAnimation(Kart* kart, BareNetworkString* b)
     restoreBasicState(b);
     restoreData(b);
 }   // RescueAnimation
-
-//-----------------------------------------------------------------------------
-void ExplosionAnimation::restoreData(BareNetworkString* b)
-{
-    bool direct_hit = b->getUInt8() == 1;
-    Vec3 normal = m_created_transform.getBasis().getColumn(1).normalized();
-    btTransform reset_transform =
-        btTransform(btQuaternion(0.0f, 0.0f, 0.0f, 1.0f));
-
-    if (RaceManager::get()->getMinorMode() ==
-        RaceManager::MINOR_MODE_CAPTURE_THE_FLAG && direct_hit)
-    {
-        m_reset_trans_compressed[0] = b->getInt24();
-        m_reset_trans_compressed[1] = b->getInt24();
-        m_reset_trans_compressed[2] = b->getInt24();
-        m_reset_trans_compressed[3] = b->getUInt32();
-        reset_transform =
-            MiniGLM::decompressbtTransform(m_reset_trans_compressed);
-    }
-    init(direct_hit, normal, reset_transform);
-}   // restoreData
 
 //-----------------------------------------------------------------------------
 ExplosionAnimation::~ExplosionAnimation()
@@ -138,27 +110,23 @@ ExplosionAnimation::~ExplosionAnimation()
 }   // ~ExplosionAnimation
 
 // ----------------------------------------------------------------------------
-void ExplosionAnimation::init(bool direct_hit, const Vec3& normal,
+void ExplosionAnimation::init(bool direct_hit, bool small, const Vec3& normal,
                               const btTransform& reset_trans)
 {
     m_direct_hit = direct_hit;
+    m_small = small;
     m_reset_ticks = -1;
     float timer = m_kart->getKartProperties()->getExplosionDuration();
     m_normal = normal;
 
-    // Non-direct hits will be only affected half as much.
-    if (!direct_hit)
-    {
+    // If the hit is small or indirect, the duration is halved
+    if (small || !direct_hit)
         timer *= 0.5f;
-    }
 
     // Put the kart back to its own flag base like rescue if direct hit in CTF
-    if (RaceManager::get()->getMinorMode() ==
-        RaceManager::MINOR_MODE_CAPTURE_THE_FLAG && direct_hit)
-    {
-        m_reset_ticks = m_created_ticks +
-            stk_config->time2Ticks(timer * 0.8f);
-    }
+    if (RaceManager::get()->isCTFMode() && direct_hit)
+        m_reset_ticks = m_created_ticks + stk_config->time2Ticks(timer * 0.8f);
+
     m_end_ticks = m_created_ticks + stk_config->time2Ticks(timer);
 
     if (m_reset_ticks != -1)
@@ -166,13 +134,12 @@ void ExplosionAnimation::init(bool direct_hit, const Vec3& normal,
     else
         m_reset_trans = btTransform(btQuaternion(0.0f, 0.0f, 0.0f, 1.0f));
 
-    // Half of the overall time is spent in raising, so only use
-    // half of the explosion time here.
+    // Half of the overall time is spent in raising, so only use half of the
+    // explosion time here.
     // Velocity after t seconds is:
     // v(t) = m_velocity + t*gravity
-    // Since v(explosion_time*0.5) = 0, the following forumla computes
-    // the right initial velocity for a kart to land back after
-    // the specified time.
+    // Since v(explosion_time*0.5) = 0, the following forumla computes the
+    // right initial velocity for a kart to land back after the specified time.
     m_velocity = 0.5f * timer * Track::getCurrentTrack()->getGravity();
 
     // From moveable::updatePosition
@@ -267,13 +234,35 @@ bool ExplosionAnimation::hasResetAlready() const
         World::getWorld()->getTicksSinceStart() > m_reset_ticks;
 }   // update
 
+//-----------------------------------------------------------------------------
+void ExplosionAnimation::restoreData(BareNetworkString* b)
+{
+    uint8_t small_and_hit = b->getUInt8();
+    bool direct_hit = (small_and_hit % 2) == 1;
+    bool small = small_and_hit >= 2;
+    Vec3 normal = m_created_transform.getBasis().getColumn(1).normalized();
+    btTransform reset_transform =
+        btTransform(btQuaternion(0.0f, 0.0f, 0.0f, 1.0f));
+
+    if (RaceManager::get()->isCTFMode() && direct_hit)
+    {
+        m_reset_trans_compressed[0] = b->getInt24();
+        m_reset_trans_compressed[1] = b->getInt24();
+        m_reset_trans_compressed[2] = b->getInt24();
+        m_reset_trans_compressed[3] = b->getUInt32();
+        reset_transform =
+            MiniGLM::decompressbtTransform(m_reset_trans_compressed);
+    }
+    init(direct_hit, small, normal, reset_transform);
+}   // restoreData
+
 // ----------------------------------------------------------------------------
 void ExplosionAnimation::saveState(BareNetworkString* buffer)
 {
     AbstractKartAnimation::saveState(buffer);
-    buffer->addUInt8(m_direct_hit ? 1 : 0);
-    if (RaceManager::get()->getMinorMode() ==
-        RaceManager::MINOR_MODE_CAPTURE_THE_FLAG && m_direct_hit)
+    int small_and_hit = (m_small ? 2 : 0) + (m_direct_hit ? 1 : 0);
+    buffer->addUInt8(small_and_hit);
+    if (RaceManager::get()->isCTFMode() && m_direct_hit)
     {
         buffer->addInt24(m_reset_trans_compressed[0])
             .addInt24(m_reset_trans_compressed[1])

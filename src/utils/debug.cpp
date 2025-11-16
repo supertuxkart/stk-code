@@ -707,7 +707,7 @@ bool handleContextMenuAction(s32 cmd_id)
         {
             Kart* kart = world->getLocalPlayerKart(i);
             // Most conditions that might usually prevent an explosion are bypassed
-            ExplosionAnimation::create(kart, true);
+            ExplosionAnimation::create(kart, /* direct hit */ true, /* small */ false);
         }
         break;
     case DEBUG_ATTACHMENT_NOTHING:

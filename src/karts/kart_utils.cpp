@@ -20,6 +20,7 @@
 
 #include "achievements/achievements_status.hpp"
 #include "config/player_manager.hpp"
+#include "items/powerup.hpp"
 #include "karts/explosion_animation.hpp"
 #include "karts/kart_properties.hpp"
 #include "karts/controller/controller.hpp"
@@ -28,7 +29,7 @@
 
 namespace KartUtils
 {
-    void createExplosion(Kart *kart, const Vec3 &pos, bool direct_hit, Kart *author)
+    void createExplosion(Kart *kart, bool small, const Vec3 &pos, bool direct_hit, Kart *author)
     {
         World *world = World::getWorld();
         // No explosion on invulnerable karts or during the goal phase
@@ -46,11 +47,11 @@ namespace KartUtils
             return;
         }
 
-        // If the kart is already being exploded or rescued, do nothing
+        // If the kart is already being exploded or rescued, or in a cannon, do nothing
         if (kart->getKartAnimation() != nullptr)
             return;
 
-        ExplosionAnimation::create(kart, direct_hit);
+        ExplosionAnimation::create(kart, direct_hit, small);
 
         // Rumble!
         // TODO : different rumble strength on direct_hit?
@@ -65,12 +66,16 @@ namespace KartUtils
                 ftl_world->leaderHit();
         }
 
-        // Register the hit with the world (for example for battle scoring)
-        if (direct_hit && author != nullptr)
+        // Special actions when there is a direct hit
+        if (direct_hit)
         {
-            world->kartHit(kart->getWorldKartId(), author->getWorldKartId());
+            // Register the hit with the world (for example for battle scoring)
+            if (author != nullptr)
+                world->kartHit(kart->getWorldKartId(), author->getWorldKartId());
+            else
+                world->kartHit(kart->getWorldKartId());
 
-            if (author->getController()->canGetAchievements())
+            if (author != nullptr && author->getController()->canGetAchievements())
             {
                 if (author->getWorldKartId() != kart->getWorldKartId())
                     PlayerManager::addKartHit(kart->getWorldKartId());
@@ -78,10 +83,10 @@ namespace KartUtils
                 if (RaceManager::get()->isLinearRaceMode())
                     PlayerManager::increaseAchievement(AchievementsStatus::ALL_HITS_1RACE, 1);
             }
-        }
-        else if (direct_hit)
-        {
-            world->kartHit(kart->getWorldKartId());
-        }
+
+            // Clear the powerups of the exploding kart in CTF
+            if (RaceManager::get()->isCTFMode())
+                 kart->getPowerup()->reset();
+        } // direct_hit
     } // createExplosion
-}
+}   // namespace KartUtils

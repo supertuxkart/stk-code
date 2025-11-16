@@ -23,7 +23,7 @@
 
 namespace KartUtils
 {
-    void createExplosion(Kart *kart,  const Vec3 &pos = Vec3(0,0,0),
+    void createExplosion(Kart *kart, bool small = false, const Vec3 &pos = Vec3(0,0,0),
                     bool direct_hit = true, Kart *author = nullptr);
 }
 
