@@ -44,6 +44,7 @@ IconButtonWidget(IconButtonWidget::SCALE_MODE_KEEP_TEXTURE_ASPECT_RATIO, false, 
 m_rtt_size(rtt_size)
 {
     m_rtt_main_node = NULL;
+    m_main_node_animated = false;
     m_camera = NULL;
     m_light = NULL;
     m_type = WTYPE_MODEL_VIEW;
@@ -91,16 +92,22 @@ void ModelViewWidget::clearModels()
     m_model_frames.clear();
     m_model_animation_speed.clear();
     m_bone_attached.clear();
+    clearMainCameraLights();
+}   // clearModels
 
+// -----------------------------------------------------------------------------
+void ModelViewWidget::clearMainCameraLights()
+{
     if (m_rtt_main_node != NULL) m_rtt_main_node->remove();
     if (m_light != NULL) m_light->remove();
     if (m_camera != NULL) m_camera->remove();
     irr_driver->clearLights();
 
     m_rtt_main_node = NULL;
+    m_main_node_animated = false;
     m_camera = NULL;
     m_light = NULL;
-}   // clearModels
+}   // clearMainCameraLights
 
 // -----------------------------------------------------------------------------
 
@@ -209,41 +216,9 @@ void ModelViewWidget::setupRTTScene()
 {
 #ifndef SERVER_ONLY
     irr_driver->suppressSkyBox();
+    clearMainCameraLights();
 
-    if (m_rtt_main_node != NULL) m_rtt_main_node->remove();
-    if (m_light != NULL) m_light->remove();
-    if (m_camera != NULL) m_camera->remove();
-
-    m_rtt_main_node = NULL;
-    m_camera = NULL;
-    m_light = NULL;
-
-    irr_driver->clearLights();
-    scene::IAnimatedMeshSceneNode* animated_node = NULL;
-
-    if (m_model_frames[0].first == -1)
-    {
-        scene::ISceneNode* node = irr_driver->addMesh(m_models.get(0), "rtt_mesh",
-            NULL, m_render_info);
-        node->setPosition(m_model_location[0].getTranslation());
-        node->setRotation(m_model_location[0].getRotationDegrees());
-        node->setScale(m_model_location[0].getScale());
-        node->setMaterialFlag(video::EMF_FOG_ENABLE, false);
-        m_rtt_main_node = node;
-    }
-    else
-    {
-        animated_node =
-        irr_driver->addAnimatedMesh((scene::IAnimatedMesh*)m_models.get(0), "rtt_mesh",
-            NULL, m_render_info);
-        animated_node->setPosition(m_model_location[0].getTranslation());
-        animated_node->setRotation(m_model_location[0].getRotationDegrees());
-        animated_node->setScale(m_model_location[0].getScale());
-        animated_node->setFrameLoop(m_model_frames[0].first, m_model_frames[0].second);
-        animated_node->setAnimationSpeed(m_model_animation_speed[0]);
-        animated_node->setMaterialFlag(video::EMF_FOG_ENABLE, false);
-        m_rtt_main_node = animated_node;
-    }
+    setupNode(0, /* main */ true, /* animated */ m_model_frames[0].first != -1);
 
     assert(m_rtt_main_node != NULL);
     assert(m_models.size() == m_model_location.size());
@@ -253,36 +228,7 @@ void ModelViewWidget::setupRTTScene()
     const int mesh_amount = m_models.size();
     for (int n = 1; n < mesh_amount; n++)
     {
-        const bool bone_attachment =
-            animated_node && !m_bone_attached[n].empty();
-        scene::ISceneNode* parent = bone_attachment ?
-            animated_node->getJointNode(m_bone_attached[n].c_str()) :
-            m_rtt_main_node;
-        if (!parent)
-            continue;
-        if (m_model_frames[n].first == -1)
-        {
-            scene::ISceneNode* node =
-            irr_driver->addMesh(m_models.get(n), "rtt_node", parent,
-                m_render_info);
-            node->setPosition(m_model_location[n].getTranslation());
-            node->setRotation(m_model_location[n].getRotationDegrees());
-            node->setScale(m_model_location[n].getScale());
-            node->updateAbsolutePosition();
-        }
-        else
-        {
-            scene::IAnimatedMeshSceneNode* node =
-            irr_driver->addAnimatedMesh((scene::IAnimatedMesh*)m_models.get(n),
-                "modelviewrtt", parent, m_render_info);
-            node->setPosition(m_model_location[n].getTranslation());
-            node->setRotation(m_model_location[n].getRotationDegrees());
-            node->setScale(m_model_location[n].getScale());
-            node->setFrameLoop(m_model_frames[n].first, m_model_frames[n].second);
-            node->setAnimationSpeed(m_model_animation_speed[n]);
-            node->updateAbsolutePosition();
-            //Log::info("ModelViewWidget", "Set frame %d", m_model_frames[n]);
-        }
+        setupNode(n, /* main */false, /* animated */ (m_model_frames[n].first != -1));
     }
 
     irr_driver->setAmbientLight(video::SColor(255, 35, 35, 35));
@@ -332,6 +278,42 @@ void ModelViewWidget::setupRTTScene()
 
 #endif
 }   // setupRTTScene
+
+// ----------------------------------------------------------------------------
+void ModelViewWidget::setupNode(int index, bool main, bool animated)
+{
+    const bool bone_attachment = m_main_node_animated && !m_bone_attached[index].empty();
+    scene::ISceneNode* parent = (main) ? NULL : bone_attachment ?
+            m_rtt_main_node->getJointNode(m_bone_attached[index].c_str()) :
+            (scene::ISceneNode*)m_rtt_main_node;
+
+    if (!main && !parent)
+        return;
+
+    scene::IAnimatedMeshSceneNode* node = // It's fine even if the mesh is not animated
+        irr_driver->addAnimatedMesh((scene::IAnimatedMesh*)m_models.get(index),
+            main ? "rtt_mesh" : animated ? "modelviewrtt" : "rtt_node",
+            main ? NULL : parent, m_render_info);
+
+    node->setPosition(m_model_location[index].getTranslation());
+    node->setRotation(m_model_location[index].getRotationDegrees());
+    node->setScale(m_model_location[index].getScale());
+    node->updateAbsolutePosition();
+
+    if (animated)
+    {
+        node->setAnimationSpeed(m_model_animation_speed[index]);
+        node->setFrameLoop(m_model_frames[index].first, m_model_frames[index].second);
+    }
+
+    if (main)
+    {
+        node->setMaterialFlag(video::EMF_FOG_ENABLE, false);
+        m_rtt_main_node = node;
+        m_main_node_animated = animated;
+    }
+    //Log::info("ModelViewWidget", "Set frame %d", m_model_frames[index]);
+}   // setupNode
 
 // ----------------------------------------------------------------------------
 void ModelViewWidget::setRotateOff()

@@ -55,7 +55,8 @@ namespace GUIEngine
 
         bool m_rtt_unsupported;
 
-        scene::ISceneNode          *m_rtt_main_node;
+        scene::IAnimatedMeshSceneNode *m_rtt_main_node;
+        bool m_main_node_animated;
 
         scene::ICameraSceneNode    *m_camera;
 
@@ -74,6 +75,7 @@ namespace GUIEngine
 
         void add();
         void clearModels();
+        void clearMainCameraLights();
         void addModel(irr::scene::IMesh* mesh,
                       const core::matrix4& location = core::matrix4(),
                       const int start_loop_frame=-1,
@@ -102,6 +104,8 @@ namespace GUIEngine
         void clearRttProvider();
 
         void setupRTTScene();
+
+        void setupNode(int index, bool main, bool animated);
 
         void drawRTTScene(const irr::core::rect<s32>& dest_rect) const;
 
