@@ -466,7 +466,7 @@ public:
     /* Returns the AnimationFrameType which corresponds to the end of
      * the animation passed as parameter.
      * Returns AF_BEGIN if there is no valid end frame type. */
-    AnimationFrameType getEndFrameType(AnimationFrameType f)
+    AnimationFrameType getEndFrameType(AnimationFrameType f) const
     {
         if (f == AF_WIN_START)            return AF_WIN_LOOP_END;
         if (f == AF_WIN_LOOP_START)       return AF_WIN_LOOP_END;
@@ -494,7 +494,7 @@ public:
      * There is a valid result only if the parameter frame type serves
      * as an introductory sequence to the loop.
      * Returns AF_BEGIN if there is no valid loop start frame type. */
-    AnimationFrameType getLoopStartFrameType(AnimationFrameType f)
+    AnimationFrameType getLoopStartFrameType(AnimationFrameType f) const
     {
         if (f == AF_WIN_START)            return AF_WIN_LOOP_START;
         if (f == AF_NEUTRAL_START)        return AF_NEUTRAL_LOOP_START;

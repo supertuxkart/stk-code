@@ -299,30 +299,36 @@ void PlayerKartWidget::setupKartModel(const KartProperties* properties)
     core::matrix4 model_location;
     model_location.setScale(core::vector3df(scale, scale, scale));
     m_model_view->clearModels();
-    const bool has_win_anime =
-        UserConfigParams::m_animated_characters &&
-        (((kart_model.getFrame(KartModel::AF_WIN_LOOP_START) > -1 ||
-        kart_model.getFrame(KartModel::AF_WIN_START) > -1) &&
-        kart_model.getFrame(KartModel::AF_WIN_LOOP_END) > -1) ||
-        (kart_model.getFrame(KartModel::AF_SELECTION_LOOP_START) > -1 &&
-        kart_model.getFrame(KartModel::AF_SELECTION_LOOP_END) > -1));
+
+    int start_frame = kart_model.getBaseFrame();
+    int loop_frame = kart_model.getBaseFrame();
+    int end_frame = kart_model.getBaseFrame();
+
+    // Use the selection animations if possible
+    if (UserConfigParams::m_animated_characters)
+    {
+        KartModel::AnimationFrameType st_type = KartModel::AF_SELECTION_START;
+        if (kart_model.getFrame(st_type) < 0)
+            st_type = KartModel::AF_SELECTION_LOOP_START;
+        if (kart_model.getFrame(st_type) < 0)
+            st_type = KartModel::AF_WIN_LOOP_START;
+        int start = kart_model.getFrame(st_type);
+        int end   = kart_model.getFrame(kart_model.getEndFrameType(st_type));
+        if (start > -1 && end > -1)
+        {
+            start_frame = start;
+            end_frame = end;
+        }
+        int loop = kart_model.getFrame(kart_model.getLoopStartFrameType(st_type));
+        loop_frame = (loop > -1) ? loop : start_frame;
+    }
+
     m_model_view->addModel( kart_model.getModel(), model_location,
-        has_win_anime ?
-        kart_model.getFrame(KartModel::AF_SELECTION_LOOP_START) > -1 ?
-        kart_model.getFrame(KartModel::AF_SELECTION_LOOP_START) :
-        kart_model.getFrame(KartModel::AF_WIN_LOOP_START) > -1 ?
-        kart_model.getFrame(KartModel::AF_WIN_LOOP_START) :
-        kart_model.getFrame(KartModel::AF_WIN_START) :
-        kart_model.getBaseFrame(),
-        has_win_anime ?
-        kart_model.getFrame(KartModel::AF_SELECTION_LOOP_END) > -1 ?
-        kart_model.getFrame(KartModel::AF_SELECTION_LOOP_END) :
-        kart_model.getFrame(KartModel::AF_WIN_LOOP_END) :
-        kart_model.getBaseFrame(),
-        kart_model.getAnimationSpeed());
+        start_frame, loop_frame, end_frame, kart_model.getAnimationSpeed());
     m_model_view->getModelViewRenderInfo()->setHue(
         m_associated_player->getConstProfile()->getDefaultKartColor());
     model_location.setScale(core::vector3df(1.0f, 1.0f, 1.0f));
+
     for (unsigned i = 0; i < 4; i++)
     {
         model_location.setTranslation(kart_model
@@ -336,11 +342,10 @@ void PlayerKartWidget::setupKartModel(const KartProperties* properties)
         core::matrix4 swol = obj.m_location;
         if (!obj.m_bone_name.empty())
         {
-            core::matrix4 inv =
-                kart_model.getInverseBoneMatrix(obj.m_bone_name);
+            core::matrix4 inv = kart_model.getInverseBoneMatrix(obj.m_bone_name);
             swol = inv * obj.m_location;
         }
-        m_model_view->addModel(obj.m_model, swol, -1, -1, 0.0f,
+        m_model_view->addModel(obj.m_model, swol, -1, -1, -1, 0.0f,
             obj.m_bone_name);
     }
     m_model_view->setRotateContinuously(35.0f);

@@ -89,7 +89,9 @@ void ModelViewWidget::clearModels()
     m_render_info->setHue(0.0f);
     m_models.clearWithoutDeleting();
     m_model_location.clear();
-    m_model_frames.clear();
+    m_model_start_frames.clear();
+    m_model_loop_start_frames.clear();
+    m_model_loop_end_frames.clear();
     m_model_animation_speed.clear();
     m_bone_attached.clear();
     clearMainCameraLights();
@@ -113,6 +115,7 @@ void ModelViewWidget::clearMainCameraLights()
 
 void ModelViewWidget::addModel(irr::scene::IMesh* mesh,
                                const core::matrix4& location,
+                               const int start_frame,
                                const int start_loop_frame,
                                const int end_loop_frame, float animation_speed,
                                const std::string& bone_name)
@@ -121,7 +124,9 @@ void ModelViewWidget::addModel(irr::scene::IMesh* mesh,
 
     m_models.push_back(mesh);
     m_model_location.push_back(location);
-    m_model_frames.emplace_back(start_loop_frame, end_loop_frame);
+    m_model_start_frames.push_back(start_frame);
+    m_model_loop_start_frames.push_back(start_loop_frame);
+    m_model_loop_end_frames.push_back(end_loop_frame);
     m_model_animation_speed.push_back(animation_speed);
     m_bone_attached.push_back(bone_name);
 #ifndef SERVER_ONLY
@@ -218,17 +223,16 @@ void ModelViewWidget::setupRTTScene()
     irr_driver->suppressSkyBox();
     clearMainCameraLights();
 
-    setupNode(0, /* main */ true, /* animated */ m_model_frames[0].first != -1);
+    setupNode(0, /* main */ true, /* animated */ m_model_start_frames[0] != -1);
 
     assert(m_rtt_main_node != NULL);
     assert(m_models.size() == m_model_location.size());
-    assert(m_models.size() == m_model_frames.size());
     assert(m_models.size() == m_model_animation_speed.size());
     assert(m_models.size() == m_bone_attached.size());
     const int mesh_amount = m_models.size();
     for (int n = 1; n < mesh_amount; n++)
     {
-        setupNode(n, /* main */false, /* animated */ (m_model_frames[n].first != -1));
+        setupNode(n, /* main */false, /* animated */ (m_model_start_frames[n] != -1));
     }
 
     irr_driver->setAmbientLight(video::SColor(255, 35, 35, 35));
@@ -303,7 +307,14 @@ void ModelViewWidget::setupNode(int index, bool main, bool animated)
     if (animated)
     {
         node->setAnimationSpeed(m_model_animation_speed[index]);
-        node->setFrameLoop(m_model_frames[index].first, m_model_frames[index].second);
+        node->setFrameLoop(m_model_start_frames[index], m_model_loop_end_frames[index]);
+        // Special case if we have an introductory sequence
+        // Loop mode must be set to false so that we get a callback
+        if (main && (m_model_start_frames[0] != m_model_loop_start_frames[0]))
+        {
+            node->setLoopMode(false);
+            node->setAnimationEndCallback(this);
+        }
     }
 
     if (main)
@@ -312,8 +323,20 @@ void ModelViewWidget::setupNode(int index, bool main, bool animated)
         m_rtt_main_node = node;
         m_main_node_animated = animated;
     }
-    //Log::info("ModelViewWidget", "Set frame %d", m_model_frames[index]);
+    //Log::info("ModelViewWidget", "Set frame %d", m_model_start_frames[index]);
 }   // setupNode
+
+// ----------------------------------------------------------------------------
+/** Called from irrlicht when a non-looped animation ends. This is used to
+ *  implement an introductory frame sequence before the actual loop can start.
+ *  \param node The node for which the animation ended.
+ */
+void ModelViewWidget::OnAnimationEnd(scene::IAnimatedMeshSceneNode *node)
+{
+    node->setFrameLoop(m_model_loop_start_frames[0], m_model_loop_end_frames[0]);
+    node->setLoopMode(true);
+    node->setAnimationEndCallback(NULL);
+}   // OnAnimationEnd
 
 // ----------------------------------------------------------------------------
 void ModelViewWidget::setRotateOff()

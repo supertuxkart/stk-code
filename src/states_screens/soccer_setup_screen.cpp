@@ -158,7 +158,7 @@ void SoccerSetupScreen::beforeAddingWidget()
         core::matrix4 model_location;
         model_location.setScale(core::vector3df(35.0f, 35.0f, 35.0f));
         // Add the kart model (including wheels and speed weight objects)
-        kart_view->addModel(kart_model.getModel(), model_location,
+        kart_view->addModel(kart_model.getModel(), model_location, kart_model.getBaseFrame(),
             kart_model.getBaseFrame(), kart_model.getBaseFrame());
 
         model_location.setScale(core::vector3df(1.0f, 1.0f, 1.0f));
@@ -181,7 +181,7 @@ void SoccerSetupScreen::beforeAddingWidget()
                     kart_model.getInverseBoneMatrix(obj.m_bone_name);
                 swol = inv * obj.m_location;
             }
-            kart_view->addModel(obj.m_model, swol, -1, -1, 0.0f,
+            kart_view->addModel(obj.m_model, swol, -1, -1, -1, 0.0f,
                 obj.m_bone_name);
         }
 

@@ -998,7 +998,7 @@ void KartSelectionScreen::updateKartWidgetModel(int widget_id,
             (file_manager->getAsset(FileManager::MODEL,""), "models");
         w3->addModel(irr_driver->getAnimatedMesh(
             file_manager->getAsset(FileManager::MODEL, "chest.spm")),
-            model_location, 20, 20, 0);
+            model_location, 20, 20, 20, 0);
         file_manager->popTextureSearchPath();
         w3->update(0);
 
