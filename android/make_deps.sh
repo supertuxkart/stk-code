@@ -20,11 +20,11 @@ export HOST_X86_64=x86_64-linux-android
 # For cmake 4.0 until stk dependencies are updated
 export CMAKE_POLICY_VERSION_MINIMUM=3.5
 
-# A helper function that checks if error ocurred
+# A helper function that checks if error occurred
 check_error()
 {
     if [ $? -gt 0 ]; then
-        echo "Error ocurred."
+        echo "Error occurred."
         exit
     fi
 }
