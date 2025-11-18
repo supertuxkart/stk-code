@@ -21,6 +21,7 @@
 #include "guiengine/screen.hpp"
 #include "guiengine/widgets/text_box_widget.hpp"
 #include "GlyphLayout.h"
+#include <IGUIScrollBar.h>
 #include <map>
 #include <memory>
 #include <utility>
@@ -73,6 +74,12 @@ private:
 
     std::vector<gui::GlyphLayout> m_server_info;
     int m_server_info_height, m_header_text_width;
+    
+    // Chat scrollbar support
+    irr::gui::IGUIScrollBar* m_chat_scrollbar;
+    s32 m_chat_scroll_pos;
+    bool m_chat_auto_scroll;
+    std::vector<gui::GlyphLayout> m_server_info_full; // Full chat history (not trimmed)
 
     core::stringw m_start_text, m_ready_text, m_live_join_text,
         m_configuration_text, m_spectate_text, m_install_addon_text,
@@ -150,6 +157,23 @@ public:
     void setHeader(const core::stringw& header)     { m_header_text = header; }
     void setAssignedPlayers(bool val)             { m_assigned_players = val; }
     virtual void onResize() OVERRIDE;
+    
+    /** \brief Override to handle scroll events */
+    virtual void filterInput(Input::InputType type,
+                             int deviceID,
+                             int btnID,
+                             int axisDir,
+                             int value) OVERRIDE;
+    
+    // Chat scrollbar functions
+    s32 getChatScrollbarWidth() const;
+    void initChatScrollbar();
+    void updateChatScrollbar();
+    void updateChatScrollPosition();
+    bool isChatAtBottom() const;
+    void scrollChatToBottom();
+    bool handleChatScrollEvent(const irr::SEvent& event);
+    void filterGlyphLayoutsForScroll();
 };   // class NetworkingLobby
 
 #endif
