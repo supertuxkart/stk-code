@@ -23,6 +23,7 @@
 #include "config/user_config.hpp"
 #include "io/file_manager.hpp"
 #include "graphics/irr_driver.hpp"
+#include "graphics/camera/camera_normal.hpp"
 #include "karts/abstract_kart_animation.hpp"
 #include "karts/kart_model.hpp"
 #include "karts/kart_properties.hpp"
@@ -264,6 +265,9 @@ SoccerWorld::~SoccerWorld()
 
     delete m_ball_track_sector;
     m_ball_track_sector = NULL;
+
+    // clear TV camera
+    CameraNormal::clearTVCameras();
 }   // ~SoccerWorld
 
 //-----------------------------------------------------------------------------

@@ -32,6 +32,12 @@
 #include "karts/kart_properties.hpp"
 #include "karts/skidding.hpp"
 #include "tracks/track.hpp"
+#include <string>
+#include <vector>
+
+std::vector<Vec3> CameraNormal::m_tv_cameras;
+float CameraNormal::m_tv_min_delta2 = 9.0f;  // distance min to change camera
+float CameraNormal::m_tv_cooldown_default = 0.4f;  // time to change camera
 
 // ============================================================================
 /** Constructor for the normal camera. This is the only camera constructor
@@ -54,6 +60,10 @@ CameraNormal::CameraNormal(Camera::CameraType type,  int camera_index,
     //       Either global or per user (for instance, some users may not like
     //       the extra camera rotation so they could set m_rotation_range to
     //       zero to disable it for themselves).
+    m_tv_current_index = -1;
+    m_tv_switch_cooldown = 0.0f;
+    m_tv_min_delta2 = 9.0f;
+    m_tv_cooldown_default = 0.4f;
     m_position_speed = 8.0f;
     m_target_speed   = 10.0f;
     m_rotation_range = 0.4f;
@@ -162,6 +172,12 @@ void CameraNormal::moveCamera(float dt, bool smooth, float cam_angle, float dist
     assert(!std::isnan(m_camera->getPosition().Z));
 
 }   // moveCamera
+
+//-----------------------------------------------------------------------------
+bool CameraNormal::hasTVCameras()
+{
+    return !m_tv_cameras.empty();
+}
 
 //-----------------------------------------------------------------------------
 void CameraNormal::restart()
@@ -289,6 +305,16 @@ void CameraNormal::getCameraSettings(Mode mode,
             *cam_roll_angle = 0.0f;
             break;
         }
+    case CM_SPECTATOR_TV:
+        {
+            *above_kart = 0.0f;
+            *cam_angle  = UserConfigParams::m_spectator_camera_angle*DEGREE_TO_RAD;
+            *sideway    = 0;
+            *distance   = -UserConfigParams::m_spectator_camera_distance;
+            *smoothing  = true;
+            *cam_roll_angle = 0.0f;
+            break;
+        }
     case CM_SIMPLE_REPLAY:
         // TODO: Implement
         break;
@@ -367,6 +393,10 @@ void CameraNormal::positionCamera(float dt, float above_kart, float cam_angle,
 
     float tan_up = tanf(cam_angle);
 
+    // Protection: Ensure TV camera variables are in valid state
+    if (m_tv_current_index < 0) m_tv_current_index = 0;
+    if (m_tv_switch_cooldown < 0) m_tv_switch_cooldown = 0.0f;
+
     Camera::Mode mode = getMode();
     if (UserConfigParams::m_reverse_look_use_soccer_cam && getMode() == CM_REVERSE) mode=CM_SPECTATOR_SOCCER;
 
@@ -394,6 +424,55 @@ void CameraNormal::positionCamera(float dt, float above_kart, float cam_angle,
             m_camera->setPosition(wanted_position.toIrrVector());
             m_camera->setTarget(wanted_target.toIrrVector());
             return;
+        }
+    case CM_SPECTATOR_TV:
+        {
+            SoccerWorld *soccer_world = dynamic_cast<SoccerWorld*> (World::getWorld());
+            if (soccer_world && !m_tv_cameras.empty())
+            {
+                Vec3 ball_pos = soccer_world->getBallPosition();
+                // decrement cooldown
+                if (m_tv_switch_cooldown > 0.0f)
+                    m_tv_switch_cooldown = std::max(0.0f, m_tv_switch_cooldown - dt);
+
+                // choose the TV camera closest to the ball
+                unsigned best = 0;
+                float best_d2 = (m_tv_cameras[0] - ball_pos).length2();
+                for (unsigned i = 1; i < m_tv_cameras.size(); i++)
+                {
+                    float d2 = (m_tv_cameras[i] - ball_pos).length2();
+                    if (d2 < best_d2)
+                    {
+                        best = i;
+                        best_d2 = d2;
+                    }
+                }
+
+                // initialize current index on first use
+                if (m_tv_current_index < 0 || (unsigned)m_tv_current_index >= m_tv_cameras.size())
+                {
+                    m_tv_current_index = (int)best;
+                    m_tv_switch_cooldown = m_tv_cooldown_default;
+                }
+                else
+                {
+                    float current_d2 = (m_tv_cameras[(unsigned)m_tv_current_index] - ball_pos).length2();
+                    // Switch only if cooldown elapsed and best is sufficiently better than current
+                    if (m_tv_switch_cooldown <= 0.0f && best != (unsigned)m_tv_current_index
+                        && best_d2 + m_tv_min_delta2 < current_d2)
+                    {
+                        m_tv_current_index = (int)best;
+                        m_tv_switch_cooldown = m_tv_cooldown_default;
+                    }
+                }
+
+                wanted_position = m_tv_cameras[(unsigned)m_tv_current_index];
+                wanted_target = ball_pos;
+                m_camera->setPosition(wanted_position.toIrrVector());
+                m_camera->setTarget(wanted_target.toIrrVector());
+                return;
+            }
+            break;
         }
     default: break;
     }
@@ -450,3 +529,68 @@ void CameraNormal::positionCamera(float dt, float above_kart, float cam_angle,
         m_camera->setUpVector(((Vec3)m.getColumn(1)).toIrrVector());
     }
 }   // positionCamera
+
+//-----------------------------------------------------------------------------
+void CameraNormal::readTVCameras(const XMLNode &root)
+{
+    m_tv_cameras.clear();
+    // Optional configuration on root node
+    float min_delta = -1.0f;
+    float cooldown = -1.0f;
+    root.get("min-delta", &min_delta);     // units; we'll square it for comparisons
+    root.get("cooldown", &cooldown);       // seconds
+    if (min_delta > 0.0f)
+        m_tv_min_delta2 = min_delta * min_delta;
+    if (cooldown > 0.0f)
+        m_tv_cooldown_default = cooldown;
+
+    for (unsigned int i = 0; i < root.getNumNodes(); i++)
+    {
+        const XMLNode* n = root.getNode(i);
+        if (!n) continue;
+        bool is_tv_camera_node = false;
+        if (n->getName() == std::string("tv-camera"))
+        {
+            is_tv_camera_node = true; // legacy child name
+        }
+        else if (n->getName() == std::string("camera"))
+        {
+            std::string ctype;
+            n->get("type", &ctype);
+            if (ctype == "tv-camera")
+                is_tv_camera_node = true;
+        }
+        if (is_tv_camera_node)
+        {
+            float child_min_delta = -1.0f;
+            float child_cooldown = -1.0f;
+            n->get("min-delta", &child_min_delta);
+            n->get("cooldown", &child_cooldown);
+            if (child_min_delta > 0.0f)
+                m_tv_min_delta2 = child_min_delta * child_min_delta;
+            if (child_cooldown > 0.0f)
+                m_tv_cooldown_default = child_cooldown;
+
+            Vec3 p(0,0,0);
+            n->get("xyz", &p);
+            m_tv_cameras.push_back(p);
+        }
+    }
+} // readTVCameras
+
+void CameraNormal::clearTVCameras()
+{
+    m_tv_cameras.clear();  // Nettoie les caméras statiques
+    
+    // Remet à zéro l'état de TOUTES les caméras existantes
+    for(unsigned int i = 0; i < Camera::getNumCameras(); i++)
+    {
+        Camera* camera = Camera::getCamera(i);
+        if(camera && camera->getType() == Camera::CM_TYPE_NORMAL)
+        {
+            CameraNormal* normal_cam = static_cast<CameraNormal*>(camera);
+            normal_cam->m_tv_current_index = -1;
+            normal_cam->m_tv_switch_cooldown = 0.0f;
+        }
+    }
+} // clearTVCameras
