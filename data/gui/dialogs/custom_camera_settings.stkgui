@@ -71,6 +71,10 @@
                     <checkbox id="use_soccer_camera"/>
                     <spacer width="1%" height="100%" />
                     <label height="100%" text_align="left" I18N="In the ui/camera screen" text="Follow ball in soccer mode"/>
+		    <spacer width="3%" height="100%" />
+		    <checkbox id="use_camera_shake"/>
+                    <spacer width="1%" height="100%" />
+                    <label height="100%" text_align="left" I18N="In the ui/camera screen" text="Enable camera shake"/>
                 </div>
             </div>
 
