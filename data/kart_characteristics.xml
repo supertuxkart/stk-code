@@ -393,14 +393,14 @@
     <!-- The different difficulties (like easy, medium, hard) -->
     <difficulties>
         <characteristic name="easy">
-            <engine power="*0.75" max-speed="*0.6" generic-max-speed="*0.6" 
-                    max-speed-reverse-ratio="0.6"/>
-            <zipper max-speed-increase="*0.6" />
+            <engine power="*0.75" max-speed="*0.625" generic-max-speed="*0.625" 
+                    max-speed-reverse-ratio="0.625"/>
+            <zipper max-speed-increase="*0.625" />
             <rescue duration="*1.2" />
             <nitro engine-force="*0.8" consumption="*0.7" max-speed-increase="*0.7" />
-            <skid bonus-speed="*0.5 *0.5 *0.5" bonus-force="*0.5 *0.5 *0.5" />
+            <skid bonus-speed="*0.4 *0.4 *0.4" bonus-force="*0.4 *0.4 *0.4" />
             <turn time-full-steer="0:0.16 0.3:0.16 0.3:0.25 0.6:0.25 0.6:0.37 1.0:0.37" 
-                  speed-factor="*1.28" />
+                  speed-factor="*1.26" />
             <plunger in-face-time="3" />
         </characteristic>
         <characteristic name="casual">
@@ -409,7 +409,7 @@
             <zipper max-speed-increase="*0.8" />
             <rescue duration="*1.2" />
             <nitro engine-force="*0.83" consumption="*0.78" max-speed-increase="*0.78" />
-            <skid bonus-speed="*0.7 *0.7 *0.7" bonus-force="*0.7 *0.7 *0.7" />
+            <skid bonus-speed="*0.65 *0.65 *0.65" bonus-force="*0.65 *0.65 *0.65" />
             <turn time-full-steer="0:0.13 0.3:0.13 0.3:0.2 0.6:0.2 0.6:0.3 1.0:0.3" 
                   speed-factor="*1.15" />
             <plunger in-face-time="3.5" />
