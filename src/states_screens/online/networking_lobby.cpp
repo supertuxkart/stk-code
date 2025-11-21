@@ -1447,7 +1447,7 @@ void NetworkingLobby::updateChatScrollbar()
     {
         m_chat_scrollbar->setVisible(true);
         m_chat_scrollbar->setSmallStep(line_height * 3);
-        m_chat_scrollbar->setLargeStep((s32)(visible_height * 0.1f));
+        m_chat_scrollbar->setLargeStep((s32)(visible_height * 0.9f));
     }
     else
     {
@@ -1512,7 +1512,7 @@ bool NetworkingLobby::handleChatScrollEvent(const irr::SEvent& event)
     
     irr::core::rect<s32> text_rect = m_text_bubble->getIrrlichtElement()->getAbsolutePosition();
     
-    // Check if mouse is over chat area
+    // Check if the mouse is over the chat area
     if (event.EventType == irr::EET_MOUSE_INPUT_EVENT)
     {
         irr::core::position2di mouse_pos(event.MouseInput.X, event.MouseInput.Y);
@@ -1525,38 +1525,6 @@ bool NetworkingLobby::handleChatScrollEvent(const irr::SEvent& event)
                 s32 line_height = GUIEngine::getFont()->getHeightPerLine();
                 s32 scroll_delta = (s32)(event.MouseInput.Wheel * -line_height * 3);
                 s32 new_pos = core::clamp(m_chat_scrollbar->getPos() + scroll_delta,
-                    m_chat_scrollbar->getMin(), m_chat_scrollbar->getMax());
-                m_chat_scrollbar->setPos(new_pos);
-                m_chat_scroll_pos = m_chat_scrollbar->getPos();
-                // Disable auto-scroll, but updateChatScrollPosition will re-enable if at bottom
-                m_chat_auto_scroll = false;
-                updateChatScrollPosition();
-                return true;
-            }
-        }
-    }
-    else if (event.EventType == irr::EET_KEY_INPUT_EVENT && event.KeyInput.PressedDown)
-    {
-        // Handle Page Up/Down when chat box has focus
-        if (m_chat_box && (GUIEngine::getGUIEnv()->getFocus() == m_chat_box->getIrrlichtElement() ||
-            m_chat_box->isFocusedForPlayer(PLAYER_ID_GAME_MASTER)))
-        {
-            if (event.KeyInput.Key == irr::IRR_KEY_PRIOR) // Page Up
-            {
-                s32 large_step = m_chat_scrollbar->getLargeStep();
-                s32 new_pos = core::clamp(m_chat_scrollbar->getPos() - large_step,
-                    m_chat_scrollbar->getMin(), m_chat_scrollbar->getMax());
-                m_chat_scrollbar->setPos(new_pos);
-                m_chat_scroll_pos = m_chat_scrollbar->getPos();
-                // Disable auto-scroll, but updateChatScrollPosition will re-enable if at bottom
-                m_chat_auto_scroll = false;
-                updateChatScrollPosition();
-                return true;
-            }
-            else if (event.KeyInput.Key == irr::IRR_KEY_NEXT) // Page Down
-            {
-                s32 large_step = m_chat_scrollbar->getLargeStep();
-                s32 new_pos = core::clamp(m_chat_scrollbar->getPos() + large_step,
                     m_chat_scrollbar->getMin(), m_chat_scrollbar->getMax());
                 m_chat_scrollbar->setPos(new_pos);
                 m_chat_scroll_pos = m_chat_scrollbar->getPos();
@@ -1586,32 +1554,22 @@ bool NetworkingLobby::handleChatScrollEvent(const irr::SEvent& event)
 }   // handleChatScrollEvent
 
 // ----------------------------------------------------------------------------
-void NetworkingLobby::filterInput(Input::InputType type,
-                                  int deviceID,
-                                  int btnID,
-                                  int axisDir,
-                                  int value)
+/** Handle Page Up/Down events to scroll the chat
+ * We don't check what is the currently focused element, as the chat is the
+ * only thing in the screen for which paging input makes sense. This makes
+ * it more convenient for players. */
+void NetworkingLobby::handlePaging(bool page_up)
 {
 #ifndef SERVER_ONLY
-    // Handle Page Up/Down keys for chat scrolling
-    if (type == Input::IT_KEYBOARD && m_chat_box && 
-        (GUIEngine::getGUIEnv()->getFocus() == m_chat_box->getIrrlichtElement() ||
-         m_chat_box->isFocusedForPlayer(PLAYER_ID_GAME_MASTER)))
-    {
-        irr::SEvent event;
-        event.EventType = irr::EET_KEY_INPUT_EVENT;
-        event.KeyInput.PressedDown = (value != 0);
-        event.KeyInput.Char = 0;
-        event.KeyInput.Control = false;
-        event.KeyInput.Shift = false;
-        
-        if (btnID == irr::IRR_KEY_PRIOR || btnID == irr::IRR_KEY_NEXT)
-        {
-            event.KeyInput.Key = (irr::EKEY_CODE)btnID;
-            if (handleChatScrollEvent(event))
-                return; // Event handled
-        }
-    }
+    s32 large_step = m_chat_scrollbar->getLargeStep();
+    s32 new_pos = core::clamp((page_up) ? m_chat_scrollbar->getPos() - large_step :
+                                          m_chat_scrollbar->getPos() + large_step,
+                              m_chat_scrollbar->getMin(), m_chat_scrollbar->getMax());
+    m_chat_scrollbar->setPos(new_pos);
+    m_chat_scroll_pos = m_chat_scrollbar->getPos();
+
+    // Disable auto-scroll, but updateChatScrollPosition will re-enable if at bottom
+    m_chat_auto_scroll = false;
+    updateChatScrollPosition();
 #endif
-    Screen::filterInput(type, deviceID, btnID, axisDir, value);
-}   // filterInput
+}   // handlePaging

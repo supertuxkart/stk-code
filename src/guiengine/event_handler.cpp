@@ -339,6 +339,10 @@ void EventHandler::processGUIAction(const PlayerAction action,
                 ListWidget* list = dynamic_cast<ListWidget*>(w);
                 list->pageMove(page_up);
             }
+            else
+            {
+                screen->handlePaging(page_up);
+            }
             break;
         }
 

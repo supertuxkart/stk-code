@@ -158,12 +158,8 @@ public:
     void setAssignedPlayers(bool val)             { m_assigned_players = val; }
     virtual void onResize() OVERRIDE;
     
-    /** \brief Override to handle scroll events */
-    virtual void filterInput(Input::InputType type,
-                             int deviceID,
-                             int btnID,
-                             int axisDir,
-                             int value) OVERRIDE;
+    /** \brief Override to handle page up/down events */
+    virtual void handlePaging(bool page_up) OVERRIDE;
     
     // Chat scrollbar functions
     s32 getChatScrollbarWidth() const;

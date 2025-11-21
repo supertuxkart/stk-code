@@ -316,10 +316,13 @@ namespace GUIEngine
          *        subclasses.
          */
         virtual void filterInput(Input::InputType type,
-                                 int deviceID,
-                                 int btnID,
-                                 int axisDir,
-                                 int value) {}
+                                 int deviceID, int btnID,
+                                 int axisDir, int value) {}
+
+        /**
+         * \brief Override this to handle page up/down in a subclass outside of lists
+         */
+        virtual void handlePaging(bool page_up) {}
 
         /** Callback that gets called when a dialog is closed.
          *  Can be used to set focus for instance.
