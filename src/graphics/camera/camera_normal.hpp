@@ -102,15 +102,15 @@ public:
     // ------------------------------------------------------------------------
     /** Returns the current ambient light. */
     const video::SColor &getAmbientLight() const {return m_ambient_light; }
-
+    // ------------------------------------------------------------------------
     // Load TV cameras from XML section <tv-cameras> in scene.xml
     static void readTVCameras(const XMLNode &root);
-
+    // ------------------------------------------------------------------------
     // clean all TV camera
     static void clearTVCameras();
-    
+    // ------------------------------------------------------------------------    
     // Returns true if at least one TV camera was loaded
-    static bool hasTVCameras();
+    static bool hasTVCameras() { return !m_tv_cameras.empty(); }
 
 };   // class CameraNormal
 

@@ -57,18 +57,23 @@ public:
         CM_TYPE_END            //!< End camera
     };   // CameraType
 
+    // Quick method to tell the difference between cameras meant to
+    // be used by a player and those exclusively used for spectating.
+#define PLAYER_CAMERA(ID) (1000+ID)
+#define SPECTATING_CAMERA(ID) (2000+ID)
+
     /* Only used for the normal camera. */
     enum Mode
     {
-        CM_NORMAL,            //!< Normal camera mode
-        CM_CLOSEUP,           //!< Closer to kart
-        CM_REVERSE,           //!< Looking backwards
-        CM_LEADER_MODE,       //!< for deleted player karts in follow the leader
-        CM_SPECTATOR_SOCCER,   //!< for spectator (in soccer mode)
-        CM_SPECTATOR_TOP_VIEW, //!< for spectator (top view on ball if soccer or top view on kart)
-        CM_SPECTATOR_TV,       //!< spectator TV cameras placed in scene (soccer), always follow ball
-        CM_SIMPLE_REPLAY,
-        CM_FALLING
+        CM_NORMAL             = PLAYER_CAMERA(0),     // Normal camera mode
+        CM_CLOSEUP            = PLAYER_CAMERA(1),     // Closer to the kart
+        CM_REVERSE            = PLAYER_CAMERA(2),     // Looking backwards
+        CM_LEADER_MODE        = PLAYER_CAMERA(3),     // for deleted player karts in follow the leader
+        CM_FALLING            = PLAYER_CAMERA(4),     // Used when a kart is detected as falling off-track
+        CM_SPECTATOR_SOCCER   = SPECTATING_CAMERA(0), // Camera oriented towards the soccer ball
+        CM_SPECTATOR_TOP_VIEW = SPECTATING_CAMERA(1), // Top view of the ball if soccer or top view on kart
+        CM_SPECTATOR_TV       = SPECTATING_CAMERA(2), // Cameras placed in the scene (soccer), always follow ball
+        CM_SIMPLE_REPLAY, // Currently unused
     };   // Mode
 
 
@@ -80,7 +85,7 @@ private:
 
     /** Camera's mode. */
     Mode            m_mode;
-    Mode            m_previous_mode;
+    Mode            m_last_non_spectating_mode;
 
     /** The type of the camera. */
     CameraType      m_type;
@@ -173,10 +178,21 @@ public:
 
     // ========================================================================
 
+    // ------------------------------------------------------------------------
+    Mode getMode() const { return m_mode; }
+    // ------------------------------------------------------------------------
+    /** Returns true if the camera is a spectator-only camera.
+     *  The enum ID of the mode tells us if it's a spectator camera or not. */
+    bool isSpectatorMode() const
+    {
+        const int id = (int)m_mode;
+        if(id >= 2000 && id < 3000)
+            return true;
+        else
+            return false;
+    }   // isSpectatorMode
+    // ------------------------------------------------------------------------
     void setMode(Mode mode);    /** Set the camera to the given mode */
-    Mode getMode();
-    Mode getPreviousMode();
-    bool isSpectatorMode();
     void setNextSpectatorMode();
     void setKart(AbstractKart *new_kart);
     virtual void setInitialTransform();

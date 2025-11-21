@@ -1540,6 +1540,7 @@ void ClientLobby::sendChat(irr::core::stringw text, KartTeam team)
 }   // sendChat
 
 // ----------------------------------------------------------------------------
+// FIXME : This should not be in client lobby !!!!
 void ClientLobby::changeSpectateTarget(PlayerAction action, int value,
                                        Input::InputType type) const
 {

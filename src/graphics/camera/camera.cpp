@@ -194,7 +194,12 @@ void Camera::setupCamera()
  */
 void Camera::setMode(Mode mode)
 {
-    if (mode == m_mode) return;
+    if (mode == m_mode)
+        return;
+
+    if (!isSpectatorMode())
+        m_last_non_spectating_mode = m_mode;
+
     // If we switch from reverse view, move the camera immediately to the
     // correct position.
     if( (m_mode==CM_REVERSE && mode==CM_NORMAL) || 
@@ -209,49 +214,22 @@ void Camera::setMode(Mode mode)
         m_camera->setTarget(target_position.toIrrVector());
     }
 
-    m_previous_mode = m_mode;
     m_mode = mode;
 }   // setMode
 
 // ----------------------------------------------------------------------------
-/** Returns the current mode of the camera.
- */
-Camera::Mode Camera::getMode()
-{
-    return m_mode;
-}   // getMode
-
-// ----------------------------------------------------------------------------
-/** Returns the last known mode of the camera.
- */
-Camera::Mode Camera::getPreviousMode()
-{
-    return m_previous_mode;
-}   // getPreviousMode
-
-// ----------------------------------------------------------------------------
-/** Returns true if camera is a spectator camera
- */
-bool Camera::isSpectatorMode()
-{
-    return ((m_mode == CM_SPECTATOR_TOP_VIEW) || (m_mode == CM_SPECTATOR_SOCCER) || (m_mode == CM_SPECTATOR_TV));
-}   // isSpectatorMode
-
-// ----------------------------------------------------------------------------
-/** Switch to next spectator mode  (a -> soccer -> top view -> a)
+/** Switch to the next spectator mode.
  */
 void Camera::setNextSpectatorMode()
 {
-    if (m_mode == CM_SPECTATOR_SOCCER) m_mode = CM_SPECTATOR_TOP_VIEW;
-    else if (m_mode == CM_SPECTATOR_TOP_VIEW)
-    {
-        if (CameraNormal::hasTVCameras())
-            m_mode = CM_SPECTATOR_TV;
-        else
-            m_mode = m_previous_mode; 
-    }
-    else if (m_mode == CM_SPECTATOR_TV && m_previous_mode != CM_SPECTATOR_TV) m_mode = m_previous_mode;
-    else setMode(CM_SPECTATOR_SOCCER);
+    // FIXME : the "spectator soccer" camera also works outside of soccer,
+    //         although it's pretty ugly (far away view from the kart)
+    //         It should either be renamed or disabled outside soccer.
+    Mode mode = (!isSpectatorMode())      ? CM_SPECTATOR_SOCCER   :
+        (m_mode == CM_SPECTATOR_SOCCER)   ? CM_SPECTATOR_TOP_VIEW :
+        (m_mode == CM_SPECTATOR_TOP_VIEW) && CameraNormal::hasTVCameras() ?
+            CM_SPECTATOR_TV : m_last_non_spectating_mode;
+    setMode(mode);
 }   // setNextSpectatorMode
 
 //-----------------------------------------------------------------------------

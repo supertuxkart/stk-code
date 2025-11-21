@@ -174,12 +174,6 @@ void CameraNormal::moveCamera(float dt, bool smooth, float cam_angle, float dist
 }   // moveCamera
 
 //-----------------------------------------------------------------------------
-bool CameraNormal::hasTVCameras()
-{
-    return !m_tv_cameras.empty();
-}
-
-//-----------------------------------------------------------------------------
 void CameraNormal::restart()
 {
     if (m_kart)
@@ -195,7 +189,7 @@ void CameraNormal::restart()
         float offset_y = -offset_z * tanf(UserConfigParams::m_camera_forward_up_angle * DEGREE_TO_RAD);
         m_camera_offset = irr::core::vector3df(0., offset_y + 1.0f, offset_z);
     }
-}   // snapToPosition
+}   // restart
 
 //-----------------------------------------------------------------------------
 /** Determine the camera settings for the current frame.
@@ -374,7 +368,6 @@ void CameraNormal::update(float dt)
         moveCamera(dt, false, cam_angle, distance);
     }
 }   // update
-
 
 // ----------------------------------------------------------------------------
 /** Actually sets the camera based on the given parameter.
