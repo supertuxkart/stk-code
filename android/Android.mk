@@ -114,6 +114,24 @@ include $(PREBUILT_STATIC_LIBRARY)
 include $(CLEAR_VARS)
 
 
+# libadrenotools
+ifeq ($(TARGET_ARCH_ABI), arm64-v8a)
+LOCAL_MODULE       := libadrenotools
+LOCAL_SRC_FILES    := deps-$(TARGET_ARCH_ABI)/libadrenotools/libadrenotools.a
+include $(PREBUILT_STATIC_LIBRARY)
+include $(CLEAR_VARS)
+endif
+
+
+# liblinkernsbypass
+ifeq ($(TARGET_ARCH_ABI), arm64-v8a)
+LOCAL_MODULE       := liblinkernsbypass
+LOCAL_SRC_FILES    := deps-$(TARGET_ARCH_ABI)/libadrenotools/lib/linkernsbypass/liblinkernsbypass.a
+include $(PREBUILT_STATIC_LIBRARY)
+include $(CLEAR_VARS)
+endif
+
+
 # ifaddrs
 LOCAL_MODULE    := ifaddrs
 LOCAL_PATH      := .
@@ -313,9 +331,13 @@ LOCAL_SRC_FILES    := $(wildcard ../lib/sdl2/src/*.c) \
                       $(wildcard ../lib/sdl2/src/video/*.c) \
                       $(wildcard ../lib/sdl2/src/video/android/*.c) \
                       $(wildcard ../lib/sdl2/src/video/yuv2rgb/*.c)
-LOCAL_CFLAGS       := -I../lib/sdl2/include/ -DGL_GLEXT_PROTOTYPES
+LOCAL_CFLAGS       := -I../lib/sdl2/include/ -DGL_GLEXT_PROTOTYPES  \
+                      -I../lib/libadrenotools/include
 LOCAL_LDLIBS       := -ldl -lGLESv1_CM -lGLESv2 -lOpenSLES -llog -landroid
 LOCAL_STATIC_LIBRARIES := cpufeatures
+ifeq ($(TARGET_ARCH_ABI), arm64-v8a)
+LOCAL_STATIC_LIBRARIES += libadrenotools liblinkernsbypass
+endif
 
 #ifeq ($(TARGET_ARCH_ABI), armeabi-v7a)
 #LOCAL_ARM_NEON     := false

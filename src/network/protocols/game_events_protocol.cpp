@@ -115,7 +115,7 @@ bool GameEventsProtocol::notifyEvent(Event* event)
             uint8_t boost_level = LobbyProtocol::get<ServerLobby>()
                 ->getStartupBoostOrPenaltyForKart(
                 event->getPeer()->getAveragePing(), kart_id);
-            NetworkString *ns = getNetworkString();
+            NetworkString *ns = ProtocolUtils::getNetworkString(m_type);
             ns->setSynchronous(true);
             ns->addUInt8(GE_STARTUP_BOOST).addUInt8(kart_id).addUInt8(boost_level);
             sendMessageToPeers(ns, true);
@@ -153,7 +153,7 @@ bool GameEventsProtocol::notifyEvent(Event* event)
  */
 void GameEventsProtocol::kartFinishedRace(Kart *kart, float time)
 {
-    NetworkString *ns = getNetworkString(20);
+    NetworkString *ns = ProtocolUtils::getNetworkString(m_type, 20);
     ns->setSynchronous(true);
     ns->addUInt8(GE_KART_FINISHED_RACE).addUInt8(kart->getWorldKartId())
        .addFloat(time);
@@ -188,7 +188,7 @@ void GameEventsProtocol::kartFinishedRace(const NetworkString &ns)
 // ----------------------------------------------------------------------------
 void GameEventsProtocol::sendStartupBoost(uint8_t kart_id)
 {
-    NetworkString *ns = getNetworkString();
+    NetworkString *ns = ProtocolUtils::getNetworkString(m_type);
     ns->setSynchronous(true);
     ns->addUInt8(GE_STARTUP_BOOST).addUInt8(kart_id);
     sendToServer(ns, /*reliable*/true);

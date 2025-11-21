@@ -50,7 +50,10 @@ void WorldWithRank::init()
     m_position_used.resize(m_karts.size());
     m_position_setting_initialised = false;
 #endif
-    stk_config->getAllScores(&m_score_for_position, getNumKarts());
+    // 3SB now uses WorldWithRank too, so we have to account for spare tire karts
+    int sta = RaceManager::get()->getNumSpareTireKarts();
+    int kart_num = RaceManager::get()->getNumberOfKarts() - sta;
+    stk_config->getAllScores(&m_score_for_position, kart_num);
 
     Track *track = Track::getCurrentTrack();
     // Don't init track sector if navmesh is not found in arena

@@ -16,33 +16,29 @@
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 
-#ifndef HEADER_TUTORIAL_DIALOG_HPP
-#define HEADER_TUTORIAL_DIALOG_HPP
+#ifndef HEADER_DEBUG_DIALOG_HPP
+#define HEADER_DEBUG_DIALOG_HPP
 
 #include "guiengine/modaldialog.hpp"
 #include "utils/cpp2011.hpp"
 #include "utils/leak_check.hpp"
 
 /**
- * \brief Messages shown during tutorial
+ * \brief For dialogs shown by the artist debug mode and similar utilities
  * \ingroup states_screens
  */
-class TutorialMessageDialog : public GUIEngine::ModalDialog
+class DebugMessageDialog : public GUIEngine::ModalDialog
 {
 private:
-
     bool m_stop_game;
 
 public:
-
-
-    TutorialMessageDialog(irr::core::stringw msg, bool stopGame);
+    DebugMessageDialog(irr::core::stringw msg, bool stopGame);
     
-    ~TutorialMessageDialog();
+    ~DebugMessageDialog();
     
     virtual void onEnterPressedInternal() OVERRIDE;
     virtual void onUpdate(float dt) OVERRIDE;
-
     
     GUIEngine::EventPropagation processEvent(const std::string& eventSource) OVERRIDE;
 };

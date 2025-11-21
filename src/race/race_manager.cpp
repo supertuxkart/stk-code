@@ -1056,6 +1056,9 @@ void RaceManager::exitRace(bool delete_world)
  */
 void RaceManager::kartFinishedRace(const Kart *kart, float time)
 {
+    if (kart->getType() == RaceManager::KartType::KT_SPARE_TIRE)
+        return;
+
     unsigned int id = kart->getWorldKartId();
     int pos = kart->getPosition();
 

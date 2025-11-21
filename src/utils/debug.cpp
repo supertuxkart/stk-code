@@ -58,9 +58,9 @@
 #include "main_loop.hpp"
 #include "replay/replay_recorder.hpp"
 #include "scriptengine/script_engine.hpp"
+#include "states_screens/dialogs/debug_message_dialog.hpp"
 #include "states_screens/dialogs/debug_slider.hpp"
 #include "states_screens/dialogs/general_text_field_dialog.hpp"
-#include "states_screens/dialogs/tutorial_message_dialog.hpp"
 #include "tracks/track_manager.hpp"
 #include "utils/constants.hpp"
 #include "utils/log.hpp"
@@ -882,10 +882,10 @@ bool handleContextMenuAction(s32 cmd_id)
         if (!world) return false;
         DebugSliderDialog *dsd = new DebugSliderDialog();
         dsd->changeLabel("Red", "Kart number");
-        dsd->setSliderHook("red_slider", 0, World::getWorld()->getNumKarts() - 1,
-            [](){ return Camera::getActiveCamera()->getKart()->getWorldKartId(); },
+        dsd->setSliderHook("red_slider", 1, World::getWorld()->getNumKarts(),
+            [](){ return Camera::getActiveCamera()->getKart()->getWorldKartId() + 1; },
             [](int new_kart_num){Camera::getActiveCamera()->
-            setKart(World::getWorld()->getKart(new_kart_num)); }
+            setKart(World::getWorld()->getKart(new_kart_num - 1)); }
         );
         dsd->changeLabel("Green", "[None]");
         dsd->toggleSlider("green_slider", false);
@@ -1115,7 +1115,16 @@ bool handleContextMenuAction(s32 cmd_id)
         irr_driver->setRecording(false);
         break;
     case DEBUG_HELP:
-        new TutorialMessageDialog(L"Debug keyboard shortcuts (can conflict with user-defined shortcuts):\n"
+        // If the debug help dialog is already active, the debug help input toggles it off
+        if (GUIEngine::ModalDialog::isADialogActive()
+            && dynamic_cast<DebugMessageDialog*>(GUIEngine::ModalDialog::getCurrent()))
+        {
+            GUIEngine::ModalDialog::dismiss();
+        }
+        // Show the debug help dialog
+        else
+        {
+            new DebugMessageDialog(L"Debug keyboard shortcuts (can conflict with user-defined shortcuts):\n"
                             "* <~> - Show this help dialog | + <Ctrl> - Adjust lights | + <Shift> - Adjust visuals\n"
                             "* <F1> - Anchor powerup | + <Ctrl> - Normal view | + <Shift> - Bomb attachment\n"
                             "* <F2> - Basketball powerup | + <Ctrl> - First person view | + <Shift> - Anchor attachment\n"
@@ -1129,13 +1138,11 @@ bool handleContextMenuAction(s32 cmd_id)
                             "* <F10> - Zipper powerup | + <Ctrl> - Powerup amount slider | + <Shift> - Toggle GUI\n"
                             "* <F11> - Save replay | + <Ctrl> - Save history | + <Shift> - Dump RTT\n"
                             "* <F12> - Show FPS | + <Ctrl> - Show other karts' powerups | + <Shift> - Show soccer player list\n"
-                            "* <Insert> - Overfilled nitro\n"
-                            "* <Delete> - Clear kart items\n"
-                            "* <Home> - First kart\n"
-                            "* <End> - Last kart\n"
-                            "* <Page Up> - Previous kart\n"
-                            "* <Page Down> - Next kart"
+                            "* <Insert> - Overfilled nitro  |  <Delete> - Clear kart items\n"
+                            "* <Home> - First kart  |  <End> - Last kart\n"
+                            "* <Page Up> - Previous kart  |  <Page Down> - Next kart\n"
                             , World::getWorld() && World::getWorld()->isNetworkWorld() ? false : true);
+        }
         break;
     }
     return false;

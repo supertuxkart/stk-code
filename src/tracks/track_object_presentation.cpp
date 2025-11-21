@@ -40,7 +40,6 @@
 #include "karts/kart.hpp"
 #include "modes/world.hpp"
 #include "scriptengine/script_engine.hpp"
-#include "states_screens/dialogs/tutorial_message_dialog.hpp"
 #include "tracks/check_cylinder.hpp"
 #include "tracks/check_manager.hpp"
 #include "tracks/check_trigger.hpp"

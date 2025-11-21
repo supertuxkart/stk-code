@@ -165,10 +165,13 @@ void  EndController::newLap(int lap)
 bool EndController::action(PlayerAction action, int value, bool dry_run)
 {
     if(action!=PA_FIRE) return true;
+
+#ifndef SERVER_ONLY
     RaceResultGUI *race_result_gui =
         dynamic_cast<RaceResultGUI*>(World::getWorld()->getRaceGUI());
     if(!race_result_gui) return true;
     race_result_gui->nextPhase();
+#endif
     return true;
 }   // action
 

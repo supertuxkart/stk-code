@@ -629,7 +629,7 @@ void STKConfig::getAllData(const XMLNode * root)
         msg << "Couldn't load general-kart-defaults: no node.";
         throw std::runtime_error(msg.str());
     }
-    m_default_kart_properties->getAllData(node);
+    m_default_kart_properties->getAllData(node, true /* from stk_config */);
 }   // getAllData
 
 // ----------------------------------------------------------------------------

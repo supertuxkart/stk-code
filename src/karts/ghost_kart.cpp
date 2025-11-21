@@ -120,6 +120,9 @@ void GhostKart::update(int ticks)
     {
         m_node->setVisible(false);
         getKartGFX()->setGFXInvisible();
+        if(m_engine_sound)
+            m_engine_sound->stop();
+
         return;
     }
 
@@ -255,7 +258,8 @@ void GhostKart::updateSound(float dt)
         return;
 
     GhostController* gc = dynamic_cast<GhostController*>(getController());
-    if (gc == NULL) return;
+    if (gc == NULL)
+        return;
 
     const unsigned int idx = gc->getCurrentReplayIndex();
 
@@ -265,12 +269,12 @@ void GhostKart::updateSound(float dt)
     {
         if(m_all_replay_events[idx].m_nitro_usage)
         {
-            if (m_nitro_sound->getStatus()!=SFXBase::SFX_PLAYING)
+            if (m_nitro_sound->getStatus() != SFXBase::SFX_PLAYING)
             {
                 m_nitro_sound->play(getSmoothedXYZ());
             }
         }
-        else if(m_nitro_sound->getStatus()==SFXBase::SFX_PLAYING)
+        else if(m_nitro_sound->getStatus() == SFXBase::SFX_PLAYING)
         {
             m_nitro_sound->stop();
         }
@@ -311,7 +315,7 @@ void GhostKart::computeFinishTime()
     {
         EasterEggHunt *world = dynamic_cast<EasterEggHunt*>(World::getWorld());
         assert(world);
-        int max_eggs = world->numberOfEggsToFind(); 
+        int max_eggs = world->numberOfEggsToFind();
         m_finish_time = getTimeForEggs(max_eggs);
     }
     else // linear races
@@ -427,7 +431,11 @@ float GhostKart::getTimeForEggs(int egg_number)
     // This determines in which direction we will search a matching frame
     bool search_forward = (current_eggs < egg_number);
 
-    // This used to compute the time
+    // These variables are used to compute the time. We ensure that the
+    // lower frame index cannot be negative. It's not as if we expect
+    // any eggs to be caught right as the kart starts anyways.
+    if (current_index == 0)
+        current_index = 1;
     int lower_frame_index = current_index-1;
     unsigned int upper_frame_index = current_index;
 
@@ -436,12 +444,12 @@ float GhostKart::getTimeForEggs(int egg_number)
     while (1)
     {
         // If we have reached the end of the replay file without finding the
-        // searched distance, break
-        if (upper_frame_index >= m_all_bonus_info.size() ||
-            lower_frame_index < 0 )
+        // searched number of eggs, break
+        if ((upper_frame_index >= m_all_bonus_info.size() && search_forward) ||
+            (lower_frame_index < 0))
             break;
 
-        // The target distance was reached between those two frames
+        // The target egg number was reached between those two frames
         if (m_all_bonus_info[lower_frame_index].m_special_value <  egg_number &&
             m_all_bonus_info[upper_frame_index].m_special_value == egg_number)
         {

@@ -38,7 +38,6 @@ extern "C"
 #include "scriptengine/scriptvec3.hpp"
 #include "scriptengine/scriptarray.hpp"
 #include <string.h>
-#include "states_screens/dialogs/tutorial_message_dialog.hpp"
 #include "tracks/track_object_manager.hpp"
 #include "tracks/track.hpp"
 #include "utils/file_utils.hpp"

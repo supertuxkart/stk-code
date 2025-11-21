@@ -15,6 +15,8 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
+#ifndef SERVER_ONLY // No GUI files in server builds
+
 // Manages includes common to all options screens
 #include "states_screens/options/options_common.hpp"
 
@@ -98,10 +100,8 @@ void BaseUserScreen::beforeAddingWidget()
  */
 void BaseUserScreen::init()
 {
-#ifndef SERVER_ONLY
     getWidget<IconButtonWidget>("default_kart_color")
         ->setVisible(CVS->supportsColorization());
-#endif
 
     m_password_tb->setPasswordBox(true, L'*');
 
@@ -362,9 +362,7 @@ void BaseUserScreen::eventCallback(Widget* widget,
                     {
                         UserConfigParams::m_internet_status =
                             Online::RequestManager::IPERM_ALLOWED;
-#ifndef SERVER_ONLY
                         NewsManager::get()->init(false);
-#endif
                         m_parent_screen->makeEntryFieldsVisible();
                         ModalDialog::dismiss();
                     }   // onConfirm
@@ -735,3 +733,5 @@ void TabbedUserScreen::eventCallback(GUIEngine::Widget* widget,
         BaseUserScreen::eventCallback(widget, name, player_id);
 
 }   // eventCallback
+
+#endif // ifndef SERVER_ONLY

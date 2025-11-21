@@ -251,7 +251,7 @@ void FeatureUnlockedCutScene::addTrophy(RaceManager::Difficulty difficulty,
     switch (difficulty)
     {
         case RaceManager::DIFFICULTY_EASY:
-            msg = _("You completed the easy challenge! "
+            msg = _("You completed the novice challenge! "
                     "Points earned on this level: %i/%i",
                     CHALLENGE_POINTS[RaceManager::DIFFICULTY_EASY]*gp_factor, 
                     CHALLENGE_POINTS[max_unlocked_difficulty]*gp_factor);
@@ -269,7 +269,7 @@ void FeatureUnlockedCutScene::addTrophy(RaceManager::Difficulty difficulty,
                     CHALLENGE_POINTS[max_unlocked_difficulty]*gp_factor);
             break;
         case RaceManager::DIFFICULTY_HARD:
-            msg = _("You completed the difficult challenge! "
+            msg = _("You completed the expert challenge! "
                     "Points earned on this level: %i/%i",
                     CHALLENGE_POINTS[RaceManager::DIFFICULTY_HARD]*gp_factor,
                     CHALLENGE_POINTS[max_unlocked_difficulty]*gp_factor);

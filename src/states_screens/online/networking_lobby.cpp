@@ -60,6 +60,7 @@
 
 #include <IGUIEnvironment.h>
 #include <IGUIStaticText.h>
+#include <IGUIScrollBar.h>
 
 using namespace Online;
 using namespace GUIEngine;
@@ -94,6 +95,11 @@ NetworkingLobby::NetworkingLobby() : Screen("online/networking_lobby.stkgui")
     m_icon_bank = NULL;
     m_reload_server_info = false;
     m_addon_install = NULL;
+    
+    // Chat scrollbar initialization
+    m_chat_scrollbar = NULL;
+    m_chat_scroll_pos = 0;
+    m_chat_auto_scroll = true;
 
     // Allows one to update chat and counter even if dialog window is opened
     setUpdateInBackground(true);
@@ -159,6 +165,9 @@ void NetworkingLobby::loadedFromFile()
 
     m_icon_bank->setScale(1.0f / 96.0f);
     m_icon_bank->setTargetIconSize(128, 128);
+    
+    // Initialize chat scrollbar after text bubble is loaded
+    initChatScrollbar();
 }   // loadedFromFile
 
 // ---------------------------------------------------------------------------
@@ -262,10 +271,50 @@ void NetworkingLobby::init()
         }
     }
 #ifndef SERVER_ONLY
+    if (m_text_bubble && !m_chat_scrollbar)
+    {
+        initChatScrollbar();
+    }
+    
+    // If we have chat content, restore scroll position (scroll to bottom if auto-scroll enabled)
+    // This handles both new scrollbar creation and existing scrollbar restoration
+    // This is called when returning from a game, so we want to preserve chat history
+    if (m_chat_scrollbar && !m_server_info_full.empty())
+    {
+        // Re-break layouts with current dimensions (in case window was resized)
+        updateChatScrollbar();
+        // Always scroll to bottom when returning from game (auto-scroll enabled)
+        m_chat_auto_scroll = true;
+        scrollChatToBottom();
+    }
+    // If scrollbar exists but we have no content, ensure it's hidden
+    else if (m_chat_scrollbar && m_server_info_full.empty())
+    {
+        m_chat_scrollbar->setVisible(false);
+        m_chat_scroll_pos = 0;
+        m_chat_auto_scroll = true;
+    }
+    
     gui::IGUIStaticText* st =
         m_text_bubble->getIrrlichtElement<gui::IGUIStaticText>();
-    st->setMouseCallback([](gui::IGUIStaticText* text, SEvent::SMouseInput mouse)->bool
+    NetworkingLobby* lobby = this;
+    st->setMouseCallback([lobby](gui::IGUIStaticText* text, SEvent::SMouseInput mouse)->bool
     {
+        // Handle mouse wheel scrolling
+        if (mouse.Event == EMIE_MOUSE_WHEEL)
+        {
+            if (lobby->m_chat_scrollbar && lobby->m_chat_scrollbar->isVisible() && 
+                lobby->m_text_bubble)
+            {
+                irr::SEvent scroll_event;
+                scroll_event.EventType = irr::EET_MOUSE_INPUT_EVENT;
+                scroll_event.MouseInput = mouse;
+                lobby->handleChatScrollEvent(scroll_event);
+                return true;
+            }
+            return false;
+        }
+        
         if (mouse.Event == EMIE_LMOUSE_PRESSED_DOWN)
         {
             std::shared_ptr<std::u32string> s;
@@ -343,8 +392,10 @@ handle_player_message_copy:
 void NetworkingLobby::addMoreServerInfo(core::stringw info)
 {
 #ifndef SERVER_ONLY
-    const unsigned box_width = m_text_bubble->getDimension().Width;
-    const float box_height = m_text_bubble->getDimension().Height;
+    // Reserve space for scrollbar when breaking layouts
+    s32 scrollbar_width = getChatScrollbarWidth();
+    const unsigned box_width = core::max_(1u, 
+        (unsigned)core::max_(1, (s32)m_text_bubble->getDimension().Width - scrollbar_width));
     std::vector<GlyphLayout> cur_info;
     font_manager->initGlyphLayouts(info, cur_info, gui::SF_DISABLE_CACHE |
         gui::SF_ENABLE_CLUSTER_TEST);
@@ -408,16 +459,40 @@ break_glyph_layouts:
     gui::IGUIFont* font = GUIEngine::getFont();
     gui::breakGlyphLayouts(cur_info, box_width,
         font->getInverseShaping(), font->getScale());
-    m_server_info.insert(m_server_info.end(), cur_info.begin(),
+    
+    // Add to full history (for scrolling)
+    m_server_info_full.insert(m_server_info_full.end(), cur_info.begin(),
         cur_info.end());
-    gui::eraseTopLargerThan(m_server_info, font->getHeightPerLine(),
-        box_height);
-
-    // Don't take the newly added newline marker int layouts for linebreaking
-    // height calculation
     gui::GlyphLayout new_line = { 0 };
     new_line.flags = gui::GLF_NEWLINE;
-    m_server_info.push_back(new_line);
+    m_server_info_full.push_back(new_line);
+    
+    // Check if we should auto-scroll BEFORE updating scrollbar
+    // (we need to check the old position before new content is added)
+    bool was_at_bottom = isChatAtBottom();
+    
+    // Update scrollbar with new content (only if scrollbar exists)
+    if (m_chat_scrollbar)
+    {
+        updateChatScrollbar();
+        
+        // If auto-scroll is enabled and we were at bottom, scroll to bottom
+        // This must happen AFTER updateChatScrollbar() so the max is updated
+        if (m_chat_auto_scroll && was_at_bottom)
+        {
+            scrollChatToBottom();
+        }
+        else
+        {
+            // Maintain the current scroll position, clamp to valid range
+            s32 max_pos = m_chat_scrollbar->getMax();
+            m_chat_scroll_pos = core::clamp(m_chat_scroll_pos, 0, max_pos);
+            m_chat_scrollbar->setPos(m_chat_scroll_pos);
+        }
+    }
+    
+    filterGlyphLayoutsForScroll();
+    
     updateServerInfos();
 #endif
 }   // addMoreServerInfo
@@ -426,13 +501,55 @@ break_glyph_layouts:
 void NetworkingLobby::onResize()
 {
     Screen::onResize();
-    const unsigned box_width = m_text_bubble->getDimension().Width;
-    const float box_height = m_text_bubble->getDimension().Height;
+    
+    // Preserve relative scroll position
+    float relative_pos = 0.0f;
+    if (m_chat_scrollbar && m_chat_scrollbar->getMax() > 0)
+    {
+        relative_pos = (float)m_chat_scroll_pos / (float)m_chat_scrollbar->getMax();
+    }
+    
+    // Reserve space for scrollbar when breaking layouts
+    s32 scrollbar_width = getChatScrollbarWidth();
+    const unsigned box_width = core::max_(1u, 
+        (unsigned)core::max_(1, (s32)m_text_bubble->getDimension().Width - scrollbar_width));
     gui::IGUIFont* font = GUIEngine::getFont();
-    gui::breakGlyphLayouts(m_server_info, box_width,
+    
+    if (!font || font->getHeightPerLine() <= 0)
+        return;
+    
+    // Re-break full history with new width
+    gui::breakGlyphLayouts(m_server_info_full, box_width,
         font->getInverseShaping(), font->getScale());
-    gui::eraseTopLargerThan(m_server_info, font->getHeightPerLine(),
-        box_height);
+    
+    // Update scrollbar with new dimensions
+    updateChatScrollbar();
+    
+    // Restore relative scroll position
+    if (m_chat_scrollbar && m_chat_scrollbar->getMax() > 0)
+    {
+        m_chat_scroll_pos = (s32)(relative_pos * m_chat_scrollbar->getMax());
+        m_chat_scrollbar->setPos(m_chat_scroll_pos);
+    }
+    
+    // Update scrollbar position
+    if (m_chat_scrollbar && m_text_bubble && m_text_bubble->getIrrlichtElement())
+    {
+        irr::core::rect<s32> text_rect = m_text_bubble->getIrrlichtElement()->getAbsolutePosition();
+        irr::gui::IGUISkin* skin = GUIEngine::getGUIEnv()->getSkin();
+        s32 scrollbar_width = skin ? skin->getSize(irr::gui::EGDS_SCROLLBAR_SIZE) : 20;
+        
+        irr::core::rect<s32> scrollbar_rect(
+            text_rect.LowerRightCorner.X - scrollbar_width,
+            text_rect.UpperLeftCorner.Y,
+            text_rect.LowerRightCorner.X,
+            text_rect.LowerRightCorner.Y
+        );
+        m_chat_scrollbar->setRelativePosition(scrollbar_rect);
+    }
+    
+    // Filter glyph layouts for current scroll position
+    filterGlyphLayoutsForScroll();
     updateServerInfos();
 
     int header_text_width =
@@ -461,8 +578,121 @@ void NetworkingLobby::updateServerInfos()
         m_text_bubble->getIrrlichtElement<gui::IGUIStaticText>();
     st->setUseGlyphLayoutsOnly(true);
     st->setGlyphLayouts(m_server_info);
+    
+    // Update scrollbar position
+    if (m_chat_scrollbar)
+    {
+        updateChatScrollbar();
+    }
 #endif
 }   // updateServerInfos
+
+// ----------------------------------------------------------------------------
+s32 NetworkingLobby::getChatScrollbarWidth() const
+{
+    irr::gui::IGUISkin* skin = GUIEngine::getGUIEnv()->getSkin();
+    return skin ? skin->getSize(irr::gui::EGDS_SCROLLBAR_SIZE) : 20;
+}   // getChatScrollbarWidth
+
+// ----------------------------------------------------------------------------
+void NetworkingLobby::filterGlyphLayoutsForScroll()
+{
+#ifndef SERVER_ONLY
+    if (!m_text_bubble || !m_chat_scrollbar || m_server_info_full.empty())
+    {
+        m_server_info.clear();
+        return;
+    }
+    
+    gui::IGUIFont* font = GUIEngine::getFont();
+    if (!font)
+    {
+        m_server_info.clear();
+        return;
+    }
+    
+    // Reserve space for scrollbar when breaking layouts
+    s32 scrollbar_width = getChatScrollbarWidth();
+    const unsigned box_width = core::max_(1u, 
+        (unsigned)core::max_(1, (s32)m_text_bubble->getDimension().Width - scrollbar_width));
+    const float box_height = m_text_bubble->getDimension().Height;
+    s32 line_height = font->getHeightPerLine();
+    
+    if (box_height <= 0.0f || line_height <= 0)
+    {
+        m_server_info.clear();
+        return;
+    }
+    
+    s32 scroll_offset = m_chat_scroll_pos;
+    
+    std::vector<gui::GlyphLayout> temp_layouts = m_server_info_full;
+    gui::breakGlyphLayouts(temp_layouts, box_width,
+        font->getInverseShaping(), font->getScale());
+    
+    // Group glyphs by line (lines end with NEWLINE flag)
+    struct LineInfo {
+        size_t start_idx;
+        size_t end_idx;  // inclusive
+        s32 line_top;
+        s32 line_bottom;
+    };
+    std::vector<LineInfo> lines;
+    s32 current_height = 0;
+    size_t line_start = 0;
+    
+    for (size_t i = 0; i < temp_layouts.size(); i++)
+    {
+        if ((temp_layouts[i].flags & gui::GLF_NEWLINE) != 0)
+        {
+            // End of line
+            LineInfo line;
+            line.start_idx = line_start;
+            line.end_idx = i;  // inclusive
+            line.line_top = current_height;
+            line.line_bottom = current_height + line_height;
+            lines.push_back(line);
+            
+            current_height = line.line_bottom;
+            line_start = i + 1;
+        }
+    }
+    
+    // If there's content after the last newline, add it as a line
+    if (line_start < temp_layouts.size())
+    {
+        LineInfo line;
+        line.start_idx = line_start;
+        line.end_idx = temp_layouts.size() - 1;
+        line.line_top = current_height;
+        line.line_bottom = current_height + line_height;
+        lines.push_back(line);
+    }
+    
+    // Find visible lines based on scroll offset
+    m_server_info.clear();
+    s32 visible_top = scroll_offset;
+    s32 visible_bottom = scroll_offset + (s32)box_height;
+    
+    for (const LineInfo& line : lines)
+    {
+        // Check if line overlaps with visible area
+        if (line.line_bottom > visible_top && line.line_top < visible_bottom)
+        {
+            // Include all glyphs for this line
+            for (size_t j = line.start_idx; j <= line.end_idx; j++)
+            {
+                m_server_info.push_back(temp_layouts[j]);
+            }
+        }
+        // If we've passed the visible area, we can stop
+        else if (line.line_top >= visible_bottom)
+        {
+            break;
+        }
+    }
+#endif
+}   // filterGlyphLayoutsForScroll
 
 // ----------------------------------------------------------------------------
 void NetworkingLobby::onUpdate(float delta)
@@ -503,6 +733,18 @@ void NetworkingLobby::onUpdate(float delta)
     {
         m_reload_server_info = false;
         updateServerInfos();
+    }
+    
+    // Check if scrollbar position changed
+    if (m_chat_scrollbar && m_chat_scrollbar->isVisible())
+    {
+        s32 current_pos = m_chat_scrollbar->getPos();
+        if (current_pos != m_chat_scroll_pos)
+        {
+            m_chat_scroll_pos = current_pos;
+            m_chat_auto_scroll = false;
+            updateChatScrollPosition();
+        }
     }
 
     if (m_has_auto_start_in_server)
@@ -924,6 +1166,17 @@ void NetworkingLobby::tearDown()
     if (m_header)
         m_header->setText(m_header_text, true);
     m_header_text_width = 0;
+    
+    // Cleanup scrollbar
+    if (m_chat_scrollbar)
+    {
+        m_chat_scrollbar->remove();
+        m_chat_scrollbar->drop();
+        m_chat_scrollbar = NULL;
+    }
+    m_chat_scroll_pos = 0;
+    m_chat_auto_scroll = true;
+    
     // Server has a dummy network lobby too
     if (!NetworkConfig::get()->isClient())
         return;
@@ -940,6 +1193,14 @@ bool NetworkingLobby::onEscapePressed()
     m_joined_server.reset();
     m_header_text = _("Lobby");
     m_header_text_width = 0;
+    
+    // Reset chat scroll on disconnect
+    m_server_info_full.clear();
+    m_chat_scroll_pos = 0;
+    m_chat_auto_scroll = true;
+    if (m_chat_scrollbar)
+        m_chat_scrollbar->setPos(0);
+    
     input_manager->getDeviceManager()->mapFireToSelect(false);
     input_manager->getDeviceManager()->setAssignMode(NO_ASSIGN);
     STKHost::get()->shutdown();
@@ -1087,5 +1348,228 @@ void NetworkingLobby::setJoinedServer(std::shared_ptr<Server> server)
 {
     m_joined_server = server;
     m_server_info.clear();
+    m_server_info_full.clear();
     m_header_text = _("Lobby");
+    // Reset scroll position when joining new server
+    m_chat_scroll_pos = 0;
+    m_chat_auto_scroll = true;
+    if (m_chat_scrollbar)
+        m_chat_scrollbar->setPos(0);
 }   // setJoinedServer
+
+// ----------------------------------------------------------------------------
+void NetworkingLobby::initChatScrollbar()
+{
+#ifndef SERVER_ONLY
+    if (!m_text_bubble)
+        return;
+    
+    if (m_chat_scrollbar)
+    {
+        m_chat_scrollbar->remove();
+        m_chat_scrollbar->drop();
+    }
+    
+    if (!m_text_bubble->getIrrlichtElement())
+        return;
+    
+    irr::core::rect<s32> text_rect = m_text_bubble->getIrrlichtElement()->getAbsolutePosition();
+    s32 scrollbar_width = getChatScrollbarWidth();
+    
+    // Position scrollbar on the right side of text bubble
+    irr::core::rect<s32> scrollbar_rect(
+        text_rect.LowerRightCorner.X - scrollbar_width,
+        text_rect.UpperLeftCorner.Y,
+        text_rect.LowerRightCorner.X,
+        text_rect.LowerRightCorner.Y
+    );
+    
+    // Use a unique ID for the chat scrollbar so we can identify it in events
+    const s32 CHAT_SCROLLBAR_ID = -1000;
+    irr::gui::IGUIElement* parent = m_text_bubble->getIrrlichtElement()->getParent();
+    if (!parent)
+        return;
+    
+    m_chat_scrollbar = GUIEngine::getGUIEnv()->addScrollBar(false, scrollbar_rect,
+        parent, CHAT_SCROLLBAR_ID);
+    if (m_chat_scrollbar)
+    {
+        m_chat_scrollbar->grab();
+        m_chat_scrollbar->setSubElement(true);
+        m_chat_scrollbar->setTabStop(false);
+        m_chat_scrollbar->setVisible(false);
+        // Restore scroll position if we have content, otherwise start at top
+        // After updateChatScrollbar() is called, the position will be properly set
+        m_chat_scrollbar->setPos(0);
+    }
+#endif
+}   // initChatScrollbar
+
+// ----------------------------------------------------------------------------
+void NetworkingLobby::updateChatScrollbar()
+{
+#ifndef SERVER_ONLY
+    if (!m_chat_scrollbar || !m_text_bubble)
+        return;
+    
+    gui::IGUIFont* font = GUIEngine::getFont();
+    if (!font)
+        return;
+    
+    // Reserve space for scrollbar when breaking layouts
+    s32 scrollbar_width = getChatScrollbarWidth();
+    const unsigned box_width = core::max_(1u, 
+        (unsigned)core::max_(1, (s32)m_text_bubble->getDimension().Width - scrollbar_width));
+    const float box_height = m_text_bubble->getDimension().Height;
+    s32 line_height = font->getHeightPerLine();
+    
+    if (box_height <= 0.0f || line_height <= 0)
+        return;
+    
+    // Re-break layouts with current width to get accurate dimensions
+    std::vector<gui::GlyphLayout> temp_layouts = m_server_info_full;
+    gui::breakGlyphLayouts(temp_layouts, box_width,
+        font->getInverseShaping(), font->getScale());
+    
+    // Calculate total height of all chat messages with correct line breaks
+    core::dimension2du total_dim = gui::getGlyphLayoutsDimension(
+        temp_layouts, line_height,
+        font->getInverseShaping(), font->getScale());
+    
+    s32 total_height = total_dim.Height;
+    s32 visible_height = (s32)box_height;
+    
+    // Update scrollbar max and visibility
+    s32 max_scroll = core::max_(0, total_height - visible_height);
+    m_chat_scrollbar->setMax(max_scroll);
+    
+    if (max_scroll > 0)
+    {
+        m_chat_scrollbar->setVisible(true);
+        m_chat_scrollbar->setSmallStep(line_height * 3);
+        m_chat_scrollbar->setLargeStep((s32)(visible_height * 0.9f));
+    }
+    else
+    {
+        m_chat_scrollbar->setVisible(false);
+    }
+#endif
+}   // updateChatScrollbar
+
+// ----------------------------------------------------------------------------
+void NetworkingLobby::updateChatScrollPosition()
+{
+#ifndef SERVER_ONLY
+    if (!m_chat_scrollbar || !m_text_bubble)
+        return;
+    
+    m_chat_scroll_pos = m_chat_scrollbar->getPos();
+    
+    // If user manually scrolled to bottom, re-enable auto-scroll
+    if (isChatAtBottom())
+        m_chat_auto_scroll = true;
+    
+    filterGlyphLayoutsForScroll();
+    updateServerInfos();
+#endif
+}   // updateChatScrollPosition
+
+// ----------------------------------------------------------------------------
+bool NetworkingLobby::isChatAtBottom() const
+{
+    if (!m_chat_scrollbar)
+        return true;
+    
+    s32 max_pos = m_chat_scrollbar->getMax();
+    if (max_pos <= 0)
+        return true;
+    
+    s32 current_pos = m_chat_scrollbar->getPos();
+    // Consider at bottom if within 5 pixels of bottom
+    return (max_pos - current_pos) <= 5;
+}   // isChatAtBottom
+
+// ----------------------------------------------------------------------------
+void NetworkingLobby::scrollChatToBottom()
+{
+    if (m_chat_scrollbar)
+    {
+        m_chat_scrollbar->setPos(m_chat_scrollbar->getMax());
+        m_chat_scroll_pos = m_chat_scrollbar->getPos();
+        m_chat_auto_scroll = true;
+        // Update the display to show the bottom content
+        filterGlyphLayoutsForScroll();
+        updateServerInfos();
+    }
+}   // scrollChatToBottom
+
+// ----------------------------------------------------------------------------
+bool NetworkingLobby::handleChatScrollEvent(const irr::SEvent& event)
+{
+#ifndef SERVER_ONLY
+    if (!m_chat_scrollbar || !m_text_bubble)
+        return false;
+    
+    irr::core::rect<s32> text_rect = m_text_bubble->getIrrlichtElement()->getAbsolutePosition();
+    
+    // Check if the mouse is over the chat area
+    if (event.EventType == irr::EET_MOUSE_INPUT_EVENT)
+    {
+        irr::core::position2di mouse_pos(event.MouseInput.X, event.MouseInput.Y);
+        
+        if (text_rect.isPointInside(mouse_pos))
+        {
+            if (event.MouseInput.Event == irr::EMIE_MOUSE_WHEEL)
+            {
+                // Scroll with mouse wheel
+                s32 line_height = GUIEngine::getFont()->getHeightPerLine();
+                s32 scroll_delta = (s32)(event.MouseInput.Wheel * -line_height * 3);
+                s32 new_pos = core::clamp(m_chat_scrollbar->getPos() + scroll_delta,
+                    m_chat_scrollbar->getMin(), m_chat_scrollbar->getMax());
+                m_chat_scrollbar->setPos(new_pos);
+                m_chat_scroll_pos = m_chat_scrollbar->getPos();
+                // Disable auto-scroll, but updateChatScrollPosition will re-enable if at bottom
+                m_chat_auto_scroll = false;
+                updateChatScrollPosition();
+                return true;
+            }
+        }
+    }
+    else if (event.EventType == irr::EET_GUI_EVENT)
+    {
+        if (event.GUIEvent.EventType == irr::gui::EGET_SCROLL_BAR_CHANGED)
+        {
+            if (event.GUIEvent.Caller == m_chat_scrollbar)
+            {
+                m_chat_scroll_pos = m_chat_scrollbar->getPos();
+                // Disable auto-scroll, but updateChatScrollPosition will re-enable if at bottom
+                m_chat_auto_scroll = false;
+                updateChatScrollPosition();
+                return true;
+            }
+        }
+    }
+#endif
+    return false;
+}   // handleChatScrollEvent
+
+// ----------------------------------------------------------------------------
+/** Handle Page Up/Down events to scroll the chat
+ * We don't check what is the currently focused element, as the chat is the
+ * only thing in the screen for which paging input makes sense. This makes
+ * it more convenient for players. */
+void NetworkingLobby::handlePaging(bool page_up)
+{
+#ifndef SERVER_ONLY
+    s32 large_step = m_chat_scrollbar->getLargeStep();
+    s32 new_pos = core::clamp((page_up) ? m_chat_scrollbar->getPos() - large_step :
+                                          m_chat_scrollbar->getPos() + large_step,
+                              m_chat_scrollbar->getMin(), m_chat_scrollbar->getMax());
+    m_chat_scrollbar->setPos(new_pos);
+    m_chat_scroll_pos = m_chat_scrollbar->getPos();
+
+    // Disable auto-scroll, but updateChatScrollPosition will re-enable if at bottom
+    m_chat_auto_scroll = false;
+    updateChatScrollPosition();
+#endif
+}   // handlePaging

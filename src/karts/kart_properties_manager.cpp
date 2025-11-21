@@ -199,6 +199,11 @@ void KartPropertiesManager::loadAllKarts(bool loading_icon)
 {
     m_all_kart_dirs.clear();
     std::vector<std::string>::const_iterator dir;
+    if (stk_config->m_min_kart_version > stk_config->m_max_kart_version)
+    {
+        Log::fatal("KartPropertiesManager", "The max kart version "
+            "is smaller than the min kart version!");
+    }
     for(dir = m_kart_search_path.begin(); dir!=m_kart_search_path.end(); dir++)
     {
         // First check if there is a kart in the current directory
@@ -300,20 +305,17 @@ bool KartPropertiesManager::loadKart(const std::string &dir)
     }
     catch (std::runtime_error& err)
     {
-        Log::error("[KartPropertiesManager]", "Giving up loading '%s': %s",
-                    config_filename.c_str(), err.what());
-        return false;
-    }
-
-    // If the version of the kart file is not supported,
-    // ignore this .kart file
-    if (kart_properties->getVersion() < stk_config->m_min_kart_version ||
-        kart_properties->getVersion() > stk_config->m_max_kart_version)
-    {
-        Log::warn("[KartPropertiesManager]", "Warning: kart '%s' is not "
-                  "supported by this binary, ignored.",
-                  kart_properties->getIdent().c_str());
-        delete kart_properties;
+        char ver[] = "version";
+        if (strcmp(err.what(), ver) == 0)
+        {
+            Log::warn("[KartPropertiesManager]", "Warning: kart '%s' is not "
+                        "supported by this binary, ignored.", config_filename.c_str());
+        }
+        else
+        {
+            Log::error("[KartPropertiesManager]", "Giving up loading '%s': %s",
+                        config_filename.c_str(), err.what());
+        }
         return false;
     }
 

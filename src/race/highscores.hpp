@@ -44,11 +44,14 @@ public:
     enum SortOrder
     {
         SO_DEFAULT,
-        SO_TRACK = SO_DEFAULT,  // Sorted by internal track name
+        SO_TRACK,               // Sorted by track name
         SO_KART_NUM,            // Sorted by amount of karts used
         SO_DIFF,                // Sorted by difficulty level
         SO_LAPS,                // Sorted by number of laps
-        SO_REV                  // Sorted by if using reverse mode
+        SO_REV,                 // Sorted by reverse mode status
+        SO_REV_GP,              // Sorted by reverse mode status (GP)
+        SO_GP_NAME,             // Sorted by name (GP)
+        SO_MODE                 // Sorted by game mode (GP)
     };
 
     typedef std::string HighscoreType;

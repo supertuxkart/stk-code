@@ -42,6 +42,10 @@ android
             path 'Android.mk'
         }
     }
+    packagingOptions
+    {
+        jniLibs.useLegacyPackaging = true
+    }
 
     defaultConfig
     {
@@ -148,6 +152,11 @@ android
             manifest.srcFile 'AndroidManifest.xml'
             res.srcDirs = ['res']
             assets.srcDirs = ['assets']
+            if (project.getProperty('compile_arch') == 'all' ||
+                project.getProperty('compile_arch') == 'arm64-v8a')
+            {
+                jniLibs.srcDirs = ['mesa']
+            }
         }
     }
 }

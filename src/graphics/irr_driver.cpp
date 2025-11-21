@@ -564,7 +564,9 @@ begin:
         if (UserConfigParams::m_swap_interval > 1)
             UserConfigParams::m_swap_interval = 1;
 
+#ifndef SERVER_ONLY // No GUI files in server builds
         OptionsScreenVideo::setSSR();
+#endif
         // Try 32 and, upon failure, 24 then 16 bit per pixels
         for (int bits=32; bits>15; bits -=8)
         {

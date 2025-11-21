@@ -20,6 +20,7 @@
 
 #include "io/utf_writer.hpp"
 #include "io/xml_node.hpp"
+#include "race/grand_prix_manager.hpp"
 #include "race/race_manager.hpp"
 #include "tracks/track.hpp"
 #include "tracks/track_manager.hpp"
@@ -325,14 +326,14 @@ bool Highscores::operator < (const Highscores& hi) const
     {
         case SO_TRACK:
         {
+            std::wstring sort_name_a, sort_name_b;
             Track* a = track_manager->getTrack(m_track);
             Track* b = track_manager->getTrack(hi.m_track);
-            std::wstring sort_name_a, sort_name_b;
-            if (a)
+            if (a != nullptr)
                 sort_name_a = a->getSortName().c_str();
-            if (b)
+            if (b != nullptr)
                 sort_name_b = b->getSortName().c_str();
-            return sort_name_a > sort_name_b;
+            return sort_name_a < sort_name_b;
         }
         case SO_KART_NUM:
             return m_number_of_karts < hi.m_number_of_karts;
@@ -342,6 +343,23 @@ bool Highscores::operator < (const Highscores& hi) const
             return m_number_of_laps < hi.m_number_of_laps;
         case SO_REV:
             return m_reverse < hi.m_reverse;
+        // None < All < Random < Default
+        case SO_REV_GP:
+            return m_gp_reverse_type < hi.m_gp_reverse_type;
+        // Normal race < Time-trial
+        case SO_MODE:
+            return m_gp_minor_mode < hi.m_gp_minor_mode;
+        case SO_GP_NAME:
+        {
+            std::wstring sort_name_a, sort_name_b;
+            const GrandPrixData* gp_a = grand_prix_manager->getGrandPrix(m_track);
+            const GrandPrixData* gp_b = grand_prix_manager->getGrandPrix(hi.m_track);
+            if (gp_a != nullptr)
+                sort_name_a = gp_a->getName().c_str();
+            if (gp_b != nullptr)
+                sort_name_b = gp_b->getName().c_str();
+            return sort_name_a < sort_name_b;
+        }
     }   // switch
     return true;
 }   // operator <

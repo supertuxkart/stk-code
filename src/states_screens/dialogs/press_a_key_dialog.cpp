@@ -15,6 +15,7 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
+#ifndef SERVER_ONLY // No GUI files in server builds
 
 #include "guiengine/engine.hpp"
 #include "guiengine/widgets/icon_button_widget.hpp"
@@ -83,4 +84,4 @@ GUIEngine::EventPropagation PressAKeyDialog::processEvent(const std::string& eve
     return GUIEngine::EVENT_LET;
 }
 
-// ------------------------------------------------------------------------------------------------------
+#endif // ifndef SERVER_ONLY

@@ -23,6 +23,7 @@
 #include "input/device_manager.hpp"
 #include "guiengine/engine.hpp"
 #include "guiengine/message_queue.hpp"
+#include "guiengine/modaldialog.hpp"
 #include "guiengine/screen_keyboard.hpp"
 #include <ge_render_info.hpp>
 #include "karts/kart.hpp"
@@ -288,7 +289,9 @@ void LobbyProtocol::exitGameState()
 
     GUIEngine::ModalDialog::dismiss();
     GUIEngine::ScreenKeyboard::dismiss();
+#ifndef SERVER_ONLY
     RaceResultGUI::getInstance()->cleanupGPProgress();
+#endif
     if (create_gp_msg)
     {
         core::stringw msg = _("Network grand prix has been finished.");

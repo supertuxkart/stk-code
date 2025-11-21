@@ -49,6 +49,11 @@ public:
     virtual void callback(Protocol *protocol) = 0;
 };   // CallbackObject
 
+namespace ProtocolUtils
+{
+    NetworkString* getNetworkString(ProtocolType type, size_t capacity = 16);
+}
+
 // ============================================================================
 /** \class Protocol
  *  \brief Abstract class used to define the global protocol functions.
@@ -88,7 +93,6 @@ public:
     virtual void asynchronousUpdate() = 0;
 
     /// functions to check incoming data easily
-    NetworkString* getNetworkString(size_t capacity = 16) const;
     bool checkDataSize(Event* event, unsigned int minimum_size);
     void sendMessageToPeers(NetworkString *message, bool reliable = true);
     void sendMessageToPeersInServer(NetworkString *message,
