@@ -426,10 +426,8 @@ void Physics::update(int ticks)
  *  \param contact_point_b Location of collision at second kart (in kart
  *         coordinates).
  */
-void Physics::KartKartCollision(Kart *kart_a,
-                                const Vec3 &contact_point_a,
-                                Kart *kart_b,
-                                const Vec3 &contact_point_b)
+void Physics::KartKartCollision(Kart *kart_a, const Vec3 &contact_point_a,
+                                Kart *kart_b, const Vec3 &contact_point_b)
 {
     // Only one kart needs to handle the attachments, it will
     // fix the attachments for the other kart.
@@ -445,8 +443,7 @@ void Physics::KartKartCollision(Kart *kart_a,
     // push to right), but that can lead to both karts being pushed in the
     // same direction (front left of kart hits rear left).
     // So we just use a simple test (which does the right thing in ideal
-    // crashes, but avoids pushing both karts in corner cases
-    // - pun intended ;) ).
+    // crashes, but avoids pushing both karts in corner cases - pun intended ;) ).
 
     if(contact_point_a.getX() < contact_point_b.getX())
     {
@@ -476,29 +473,23 @@ void Physics::KartKartCollision(Kart *kart_a,
                      ? left_kart->getKartProperties()->getMass()
                        / right_kart->getKartProperties()->getMass()
                      : 2.0f;
+    f_right = std::min(2.0f, std::max(0.5f, f_right));
 
-    if (f_right > 2.0f)
-        f_right = 2.0f;
-    if (f_right < 0.5f)
-        f_right = 0.5f;
-
-    // Add a scaling factor depending on speed (avoid div by 0)
-    // The impulse is weaker for the kart going faster,
-    // stronger for the kart going slower.
-    float speed_impulse_factor = right_kart->getSpeed() > 0                     ?
-                                 left_kart->getSpeed() / right_kart->getSpeed() : 1.6f;
-    if (speed_impulse_factor > 1.6f)
-        speed_impulse_factor = 1.6f;
-    if (speed_impulse_factor < 0.625f)
-        speed_impulse_factor = 0.625f;
+    // Add a scaling factor depending on speed, making the impulse
+    // weaker for the kart going faster and stronger for the kart going slower.
+    // Negative speeds (going backwards) count as 0 speed.
+    // We compute the speed difference and clamp it to [-18, 18].
+    // We then obtain the strength of the effect in the [1, 2] range,
+    // and invert the result if the right kart is the faster one.
+    // The final result is in the [0.5, 2] range.
+    float left_ref_speed  = std::max(0.0f, left_kart->getSpeed());
+    float right_ref_speed = std::max(0.0f, right_kart->getSpeed());
+    float speed_diff = std::min(18.0f, std::max(-18.0f, (left_ref_speed - right_ref_speed)));
+    float speed_impulse_factor = fabsf(speed_diff / 18.0f) + 1.0f;
+    if (speed_diff < 0)
+        speed_impulse_factor = 1 / speed_impulse_factor;
 
     f_right *= speed_impulse_factor;
-
-    // Because of the caps on the mass and speed factors,
-    // f_right is effectively capped to the interval [0.3125, 3.2]
-    // f_left is capped in the same interval as 3.2*0.3125 = 1 
-
-    float f_left = 1/f_right;
 
     // Check if a kart is more 'actively' trying to push another kart
     // To do this we check two things:
@@ -540,18 +531,17 @@ void Physics::KartKartCollision(Kart *kart_a,
     // Now heading difference is in the range [0, pi/2] (approximately)
     // With 0 indicating parallel karts and pi/2 perpendicular karts
     // We set ramming_factor in the [1, 1+pi/2] range
-    float ramming_factor = 1.0f + (heading_difference * 1.0f);
+    float ramming_factor = 1.0f + (heading_difference);
 
     if (left_kart_ramming)
-    {
-        f_left = f_left / ramming_factor;
         f_right = f_right * ramming_factor;
-    }
     else if (right_kart_ramming)
-    {
         f_right = f_right / ramming_factor;
-        f_left = f_left * ramming_factor;
-    }
+
+    // Because the speed, mass and ramming factors are
+    // each in an interval of the form [1/x; x] (with x > 1),
+    // f_left is capped in the same interval as f_right
+    float f_left = 1/f_right;
 
     // Reduce the bouncing if relative velocity is low
     const Vec3 right_velocity = right_kart->getVelocity();
