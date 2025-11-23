@@ -192,11 +192,12 @@ void Physics::update(int ticks)
     // fixed frequency necessary for the physics update, we need to do exactly
     // one physic step only.
     double start;
-    if(UserConfigParams::m_physics_debug) start = StkTime::getRealTime();
+    bool const physics_debug = UserConfigParams::m_physics_debug; // Used to silence a warning
+    if (physics_debug) start = StkTime::getRealTime();
 
     m_dynamics_world->stepSimulation(stk_config->ticks2Time(1), 1,
                                      stk_config->ticks2Time(1)      );
-    if (UserConfigParams::m_physics_debug)
+    if (physics_debug)
     {
         Log::verbose("Physics", "At %d physics duration %12.8f",
                      World::getWorld()->getTicksSinceStart(),
@@ -544,6 +545,7 @@ void Physics::KartKartCollision(Kart *kart_a, const Vec3 &contact_point_a,
     float f_left = 1/f_right;
 
     // Reduce the bouncing if relative velocity is low
+    // Relative velocity accounts for both speed and direction
     const Vec3 right_velocity = right_kart->getVelocity();
     const Vec3 left_velocity = left_kart->getVelocity();
     const Vec3 velocity_difference = right_velocity - left_velocity;
@@ -560,40 +562,33 @@ void Physics::KartKartCollision(Kart *kart_a, const Vec3 &contact_point_a,
 
     float lean_factor = std::min(1.25f, std::max(f_right, f_left)) * 0.8f;
 
-    // First push one kart to the left (if there is not already
+    // First push one kart to the right (if there is not already
     // an impulse happening - one collision might cause more
     // than one impulse otherwise)
     if(right_kart->getVehicle()->getCentralImpulseTicks()<=0)
-    {
-        const KartProperties *kp = left_kart->getKartProperties();
-        Vec3 impulse(kp->getCollisionImpulse()*f_right, 0, 0);
-        impulse = right_kart->getTrans().getBasis() * impulse;
-        right_kart->getVehicle()
-            ->setTimedCentralImpulse(
-            (uint16_t)stk_config->time2Ticks(kp->getCollisionImpulseTime() * impulse_time_factor),
-            impulse);
-        right_kart->getVehicle()->setCollisionLean(/* towards the right*/ true);
-        right_kart->getVehicle()->setCollisionLeanFactor(lean_factor);
-        // The kart rotation will be prevented as the impulse is applied
-    }
-
-    // Then push the other kart to the right (if there is no
-    // impulse happening atm).
+        applyKartCollisionImpulse(right_kart, true, f_right, lean_factor, impulse_time_factor);
+ 
+    // Then push the other kart to the left (if there is no impulse happening atm).
+    // The force is made negative to obtain the opposite impulse direction.
     if(left_kart->getVehicle()->getCentralImpulseTicks()<=0)
-    {
-        const KartProperties *kp = right_kart->getKartProperties();
-        Vec3 impulse = Vec3(-kp->getCollisionImpulse()*f_left, 0, 0);
-        impulse = left_kart->getTrans().getBasis() * impulse;
-        left_kart->getVehicle()
-            ->setTimedCentralImpulse(
-            (uint16_t)stk_config->time2Ticks(kp->getCollisionImpulseTime() * impulse_time_factor),
-            impulse);
-        left_kart->getVehicle()->setCollisionLean(/* towards the right*/ false);
-        left_kart->getVehicle()->setCollisionLeanFactor(lean_factor);
-        // The kart rotation will be prevented as the impulse is applied
-    }
-
+        applyKartCollisionImpulse(left_kart, false, -f_left, lean_factor, impulse_time_factor);
 }   // KartKartCollision
+
+//-----------------------------------------------------------------------------
+/** This function applies the impulse for a collision between karts
+ * */
+void Physics::applyKartCollisionImpulse(Kart *kart, bool right, float force,
+                                        float lean_factor, float time_factor)
+{
+    const KartProperties *kp = kart->getKartProperties();
+    Vec3 impulse(kp->getCollisionImpulse() * force, 0, 0);
+    impulse = kart->getTrans().getBasis() * impulse;
+    uint16_t duration = (uint16_t)stk_config->time2Ticks(kp->getCollisionImpulseTime() * time_factor);
+    kart->getVehicle()->setTimedCentralImpulse(duration, impulse);
+    kart->getVehicle()->setCollisionLean(/* towards the right*/ right);
+    kart->getVehicle()->setCollisionLeanFactor(lean_factor);
+    // The kart rotation will be prevented as the impulse is applied
+}   // applyKartCollisionImpulse
 
 //-----------------------------------------------------------------------------
 /** This function is called at each internal bullet timestep. It is used
