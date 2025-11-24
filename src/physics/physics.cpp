@@ -473,20 +473,29 @@ void Physics::KartKartCollision(Kart *kart_a, const Vec3 &contact_point_a,
     float f_right =  right_kart->getKartProperties()->getMass() > 0
                      ? left_kart->getKartProperties()->getMass()
                        / right_kart->getKartProperties()->getMass()
-                     : 2.0f;
+                     : 4.0f;
+    // The impulse being X times stronger for one kart means it will
+    // be 1/X times stronger for the other kart, leading to a X² ratio.
+    // To keep impulse strength ratio and mass ratio equal, we should
+    // take the square root.
+    // However, with the current kart classes, that would make differences
+    // feel too weak, and changing masses would require a lot of adjustments.
+    // We currently take a middle ground approach for gameplay reasons.
+    float sqrt_right = sqrtf(f_right);
+    f_right = sqrt_right * sqrtf(sqrt_right);
     f_right = std::min(2.0f, std::max(0.5f, f_right));
 
     // Add a scaling factor depending on speed, making the impulse
     // weaker for the kart going faster and stronger for the kart going slower.
     // Negative speeds (going backwards) count as 0 speed.
-    // We compute the speed difference and clamp it to [-18, 18].
+    // We compute the speed difference and clamp it to [-21, 21].
     // We then obtain the strength of the effect in the [1, 2] range,
     // and invert the result if the right kart is the faster one.
     // The final result is in the [0.5, 2] range.
     float left_ref_speed  = std::max(0.0f, left_kart->getSpeed());
     float right_ref_speed = std::max(0.0f, right_kart->getSpeed());
-    float speed_diff = std::min(18.0f, std::max(-18.0f, (left_ref_speed - right_ref_speed)));
-    float speed_impulse_factor = fabsf(speed_diff / 18.0f) + 1.0f;
+    float speed_diff = std::min(21.0f, std::max(-21.0f, (left_ref_speed - right_ref_speed)));
+    float speed_impulse_factor = fabsf(speed_diff / 21.0f) + 1.0f;
     if (speed_diff < 0)
         speed_impulse_factor = 1 / speed_impulse_factor;
 
