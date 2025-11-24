@@ -117,6 +117,7 @@ void btKart::reset()
     m_additional_impulse         = btVector3(0,0,0);
     m_ticks_additional_impulse   = 0;
     m_ticks_total_impulse        = 0;
+    m_ticks_lock_impulse         = 0;
     m_additional_rotation        = 0;
     m_ticks_additional_rotation  = 0;
     m_max_speed                  = -1.0f;
@@ -540,6 +541,8 @@ void btKart::updateVehicle( btScalar step )
         // Prevent the kart from getting rotated
         m_kart->getBody()->setAngularVelocity(btVector3(0,0,0));
         m_ticks_additional_impulse--;
+        if (m_ticks_lock_impulse != 0)
+            m_ticks_lock_impulse--;
     }
 
     // Apply additional rotation set by supertuxkart

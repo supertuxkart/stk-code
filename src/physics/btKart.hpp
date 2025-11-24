@@ -94,6 +94,13 @@ private:
      * impulse suddenly stopping is very noticeable with strong impulses. */
     uint16_t            m_ticks_total_impulse;
 
+    /** The duration during which the active impulse cannot be replaced by another.
+     * When two karts collide, they keep touching for several consecutive frames
+     * and reapplying the impulse after the first touch would be wrong.
+     * But if a kart got an impulse from one kart, we don't want a contact with
+     * another kart soon after to not generate any impulse.*/
+    uint16_t            m_ticks_lock_impulse;
+
     /** Additional rotation in y-axis that is applied over a certain amount of time. */
     float               m_additional_rotation;
 
@@ -240,12 +247,13 @@ public:
     void setTimedCentralImpulse(uint16_t t, const btVector3 &imp,
                                 bool rewind = false)
     {
-        // Only add impulse if no other impulse is active.
-        if (m_ticks_additional_impulse > 0 && !rewind) return;
+        // Only add impulse if the impulse lock is not on.
+        if (isImpulseLocked() && !rewind) return;
         m_additional_impulse      = imp;
         m_ticks_total_impulse      = t;
         m_ticks_additional_impulse = t;
-    }   // setTimedImpulse
+        m_ticks_lock_impulse       = std::min(t, (uint16_t)stk_config->time2Ticks(0.075f));
+    }   // setTimedCentralImpulse
     // ------------------------------------------------------------------------
     void setCollisionLean(bool lean_right) { m_leaning_right = lean_right; }
     // ------------------------------------------------------------------------
@@ -253,6 +261,8 @@ public:
     // ------------------------------------------------------------------------
     /** Returns the time an additional impulse is activated. */
     uint16_t getCentralImpulseTicks() const { return m_ticks_additional_impulse; }
+    // ------------------------------------------------------------------------
+    bool isImpulseLocked() const { return m_ticks_lock_impulse > 0; }
     // ------------------------------------------------------------------------
     /** Returns the collision (visual) lean. */
     float getCollisionLean() const;

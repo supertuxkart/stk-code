@@ -150,8 +150,7 @@ private:
              Physics();
     virtual ~Physics();
 
-    void applyKartCollisionImpulse(Kart *kart, bool right, float force,
-                                        float lean_factor, float time_factor);
+    void applyKartCollisionImpulse(Kart *kart, bool right, float force, float lean_factor);
 
 public:
     // ----------------------------------------------------------------------------------------

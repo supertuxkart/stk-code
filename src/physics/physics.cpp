@@ -461,9 +461,9 @@ void Physics::KartKartCollision(Kart *kart_a, const Vec3 &contact_point_a,
         right_kart_contact_Z = (kart_b->getKartLength()/2 + contact_point_b.getZ()) / kart_b->getKartLength();
     }
 
-    // If both karts have an active impulse, we can return immediately
-    if(right_kart->getVehicle()->getCentralImpulseTicks() > 0 &&
-       left_kart->getVehicle()->getCentralImpulseTicks()  > 0)
+    // If both karts are impulse-locked, we can return immediately
+    if(right_kart->getVehicle()->isImpulseLocked() &&
+       left_kart->getVehicle()->isImpulseLocked())
         return;
 
     // Add a scaling factor depending on the mass (avoid div by zero).
@@ -553,42 +553,51 @@ void Physics::KartKartCollision(Kart *kart_a, const Vec3 &contact_point_a,
     // f_left is capped in the same interval as f_right
     float f_left = 1/f_right;
 
-    // Reduce the bouncing if relative velocity is low
-    // Relative velocity accounts for both speed and direction
-    const Vec3 right_velocity = right_kart->getVelocity();
-    const Vec3 left_velocity = left_kart->getVelocity();
-    const Vec3 velocity_difference = right_velocity - left_velocity;
-    const float velocity_value = velocity_difference.length();
+    // Reduce the bouncing under some conditions
+    // 1 - If the other kart is still under the influence of a bounce
+    if(left_kart->getVehicle()->getCentralImpulseTicks() > 0)
+        f_right *= 0.5f;
+    if(right_kart->getVehicle()->getCentralImpulseTicks() > 0)
+        f_left *= 0.5f; 
 
-    float impulse_time_factor = 1.0f;
+    // 2 - If relative velocity is low
+    // Relative velocity accounts for both speed and direction
+    const Vec3 velocity_difference = right_kart->getVelocity() - left_kart->getVelocity();
+    const float velocity_value = velocity_difference.length();
 
     if (velocity_value < 8.0f) // velocity_value is never negative
     {
         f_right *= 0.375f + velocity_value / 12.8f;
         f_left  *= 0.375f + velocity_value / 12.8f;
-        impulse_time_factor = 0.6875f + velocity_value / 25.6f;
     }
 
     float lean_factor = std::min(1.25f, std::max(f_right, f_left)) * 0.8f;
 
-    // First push one kart to the right (if there is not already
-    // an impulse happening - one collision might cause more
-    // than one impulse otherwise)
-    if(right_kart->getVehicle()->getCentralImpulseTicks()<=0)
-        applyKartCollisionImpulse(right_kart, true, f_right, lean_factor, impulse_time_factor);
+    // First push one kart to the right
+    applyKartCollisionImpulse(right_kart, true, f_right, lean_factor);
  
-    // Then push the other kart to the left (if there is no impulse happening atm).
+    // Then push the other kart to the left.
     // The force is made negative to obtain the opposite impulse direction.
-    if(left_kart->getVehicle()->getCentralImpulseTicks()<=0)
-        applyKartCollisionImpulse(left_kart, false, -f_left, lean_factor, impulse_time_factor);
+    applyKartCollisionImpulse(left_kart, false, -f_left, lean_factor);
 }   // KartKartCollision
 
 //-----------------------------------------------------------------------------
 /** This function applies the impulse for a collision between karts
  * */
-void Physics::applyKartCollisionImpulse(Kart *kart, bool right, float force,
-                                        float lean_factor, float time_factor)
+void Physics::applyKartCollisionImpulse(Kart *kart, bool right, float force, float lean_factor)
 {
+    if(kart->getVehicle()->isImpulseLocked())
+        return;
+
+    // If the force is weak, we increase the intensity but decrease the duration
+    float time_factor = 1.0f;
+    if (fabsf(force) < 2.0f)
+    {
+        float shorten_factor = (4.0f - fabsf(force)) / 2.0f;
+        force = force * shorten_factor;
+        time_factor = time_factor / shorten_factor;
+    }
+
     const KartProperties *kp = kart->getKartProperties();
     Vec3 impulse(kp->getCollisionImpulse() * force, 0, 0);
     impulse = kart->getTrans().getBasis() * impulse;
