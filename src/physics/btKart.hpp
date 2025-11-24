@@ -252,14 +252,12 @@ public:
     void setCollisionLeanFactor(float lean_factor) { m_leaning_factor = lean_factor; }
     // ------------------------------------------------------------------------
     /** Returns the time an additional impulse is activated. */
-    uint16_t getCentralImpulseTicks() const
-                                         { return m_ticks_additional_impulse; }
+    uint16_t getCentralImpulseTicks() const { return m_ticks_additional_impulse; }
     // ------------------------------------------------------------------------
     /** Returns the collision (visual) lean. */
     float getCollisionLean() const;
     // ------------------------------------------------------------------------
-    const btVector3& getAdditionalImpulse() const
-                                               { return m_additional_impulse; }
+    const btVector3& getAdditionalImpulse() const { return m_additional_impulse; }
     // ------------------------------------------------------------------------
     /** Sets a rotation that is applied over a certain amount of time (to avoid
      *  a too rapid changes in the kart).

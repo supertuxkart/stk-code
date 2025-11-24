@@ -2866,61 +2866,6 @@ void Kart::crashed(const Material *m, const Vec3 &normal)
     }
 #endif
 
-    const LinearWorld *lw = dynamic_cast<LinearWorld*>(World::getWorld());
-    if(m_kart_properties->getTerrainImpulseType()
-                             ==KartProperties::IMPULSE_NORMAL &&
-        m_vehicle->getCentralImpulseTicks()<=0                     )
-    {
-        // Restrict impule to plane defined by gravity (i.e. X/Z plane).
-        // This avoids the problem that karts can be pushed up, e.g. above
-        // a fence.
-        btVector3 gravity = m_body->getGravity();
-        gravity.normalize();
-        Vec3 impulse =  normal - gravity* btDot(normal, gravity);
-        if(impulse.getX() || impulse.getZ())
-            impulse.normalize();
-        else
-            impulse = Vec3(0, 0, -1); // Arbitrary
-        // Impulse depends of kart speed - and speed can be negative
-        // If the speed is too low, karts can still get stuck into a wall
-        // so make sure there is always enough impulse to avoid this
-        float abs_speed = fabsf(getSpeed());
-        impulse *= ( abs_speed<10 ? 10.0f : sqrt(abs_speed) )
-                 * m_kart_properties->getCollisionTerrainImpulse();
-        m_bounce_back_ticks = 0;
-        impulse = Vec3(0, 0, 0);
-        //m_vehicle->setTimedCentralImpulse(0.1f, impulse);
-        m_vehicle->setTimedCentralImpulse(0, impulse);
-    }
-    // If there is a quad graph, push the kart towards the previous
-    // graph node center (we have to use the previous point since the
-    // kart might have only now reached the new quad, meaning the kart
-    // would be pushed forward).
-    else if(m_kart_properties->getTerrainImpulseType()
-                                 ==KartProperties::IMPULSE_TO_DRIVELINE &&
-            lw && m_vehicle->getCentralImpulseTicks()<=0 &&
-            Track::getCurrentTrack()->isPushBackEnabled())
-    {
-        int sector = lw->getSectorForKart(this);
-        if(sector!=Graph::UNKNOWN_SECTOR)
-        {
-            // Use the first predecessor node, which is the most
-            // natural one (i.e. the one on the main driveline).
-            const DriveNode* dn = DriveGraph::get()->getNode(
-                DriveGraph::get()->getNode(sector)->getPredecessor(0));
-            Vec3 impulse = dn->getCenter() - getXYZ();
-            impulse.setY(0);
-            if(impulse.getX() || impulse.getZ())
-                impulse.normalize();
-            else
-                impulse = Vec3(0, 0, -1); // Arbitrary
-            impulse *= m_kart_properties->getCollisionTerrainImpulse();
-            m_bounce_back_ticks = (uint8_t)stk_config->time2Ticks(0.2f);
-            m_vehicle->setTimedCentralImpulse(
-                (uint16_t)stk_config->time2Ticks(0.1f), impulse);
-        }
-
-    }
     /** If a kart is crashing against the track, the collision is often
      *  reported more than once, resulting in a machine gun effect, and too
      *  long disabling of the engine. Therefore, this reaction is disabled

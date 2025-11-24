@@ -454,18 +454,6 @@
     <friction slip="10000000"/>
 
     <!-- collision
-         impulse-type: STK can apply an additional impulse in case of
-           kart-track collision:
-             'none' : no additional impulse
-             'normal': impulse along the normal
-             'driveline': impulse towards the nearest driveline.
-           An impulse towards the driveline works nice when the kart is
-           driving more or less correctly on the track - it pushes the
-           kart in the right direction. But if the kart is significanlty
-           off track, it has severe problems (since an incorrect
-           driveline point can be selected, pusing the kart in the
-           wrong direction, sometimes even causing a 'zip-along-obstacle'
-           effect.
          impulse: an additional impulse to be applied in a non-frontal
            collision to push two karts away from each other.
          impulse-time: The kart-on-kart collision impulse will be applied
@@ -494,8 +482,7 @@
            physics settings are used which places the raycast wheels
            outside of the chassis and results in more stable physical
            behaviour of the karts. -->
-    <collision impulse-type="normal"
-               impulse="7000" impulse-time="0.3" terrain-impulse="160"
+    <collision impulse="7000" impulse-time="0.3"
                restitution="0:1.0 4:0.65 10:0.44 18:0.3 30:0.21 45:0.16" bevel-factor="0.5 0.0 0.3"
                physical-wheel-position="0" />
 

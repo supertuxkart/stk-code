@@ -166,21 +166,6 @@ private:
     /** Shift of center of gravity. */
     Vec3  m_gravity_center_shift;
 
-public:
-    /** STK can add an impulse to push karts away from the track in case
-     *  of a kart-track collision. This can be done in two ways: either
-     *  apply the impulse in the direction of the normal, or towards the
-     *  driveline. The later works nice as long as the kart is driving
-     *  on the main track, but can work very bad if the kart is drivling
-     *  off-track (and a wrong driveline is selected). */
-    enum TerrainImpulseType {IMPULSE_NONE, IMPULSE_NORMAL,
-                             IMPULSE_TO_DRIVELINE};
-private:
-    TerrainImpulseType m_terrain_impulse_type;
-
-    /** An additional impulse to push a kart away if it hits terrain */
-    float m_collision_terrain_impulse;
-
     /** An additiojnal artificial impulse that pushes two karts in a
      *  side-side collision away from each other. */
     float m_collision_impulse;
@@ -324,18 +309,6 @@ public:
     /** Returns a shift of the center of mass (lowering the center of mass
      *  makes the karts more stable. */
     const Vec3&getGravityCenterShift() const {return m_gravity_center_shift;  }
-
-    // ------------------------------------------------------------------------
-    /** Returns an artificial impulse to push karts away from the terrain
-     *  it hits. */
-    float getCollisionTerrainImpulse() const
-                                          {return m_collision_terrain_impulse;}
-
-    // ------------------------------------------------------------------------
-    /** Returns what kind of impulse STK should use in case of a kart-track
-     *  collision. */
-    TerrainImpulseType getTerrainImpulseType() const
-                                             { return m_terrain_impulse_type; }
     // ------------------------------------------------------------------------
     /** Returns the (artificial) collision impulse this kart will apply
      *  to another kart in case of a non-frontal collision. */

@@ -94,11 +94,10 @@ KartProperties::KartProperties(const std::string &filename)
 
     // Set all other values to undefined, so that it can later be tested
     // if everything is defined properly.
-    m_wheel_base = m_friction_slip = m_collision_terrain_impulse =
+    m_wheel_base = m_friction_slip =
         m_collision_impulse = m_collision_impulse_time =
         m_physical_wheel_position = UNDEFINED;
 
-    m_terrain_impulse_type       = IMPULSE_NONE;
     m_gravity_center_shift       = Vec3(UNDEFINED);
     m_bevel_factor               = Vec3(UNDEFINED);
     m_version                    = 0;
@@ -526,25 +525,9 @@ void KartProperties::getAllData(const XMLNode * root, bool called_from_stk_confi
     {
         collision_node->get("impulse",         &m_collision_impulse        );
         collision_node->get("impulse-time",    &m_collision_impulse_time   );
-        collision_node->get("terrain-impulse", &m_collision_terrain_impulse);
         collision_node->get("restitution",     &m_restitution              );
         collision_node->get("bevel-factor",    &m_bevel_factor             );
         collision_node->get("physical-wheel-position",&m_physical_wheel_position);
-        std::string s;
-        collision_node->get("impulse-type",    &s                          );
-        s = StringUtils::toLowerCase(s);
-        if(s=="none")
-            m_terrain_impulse_type = IMPULSE_NONE;
-        else if(s=="normal")
-            m_terrain_impulse_type = IMPULSE_NORMAL;
-        else if(s=="driveline")
-            m_terrain_impulse_type = IMPULSE_TO_DRIVELINE;
-        else
-        {
-            Log::fatal("[KartProperties]",
-                       "Missing or incorrect value for impulse-type: '%s'.",
-                       s.c_str());
-        }
     }
 
     //TODO: wheel front right and wheel front left is not loaded, yet is
@@ -676,7 +659,6 @@ void KartProperties::checkAllSet(const std::string &filename)
     }
 
     CHECK_NEG(m_friction_slip,              "friction slip"                 );
-    CHECK_NEG(m_collision_terrain_impulse,  "collision terrain-impulse"     );
     CHECK_NEG(m_collision_impulse,          "collision impulse"             );
     CHECK_NEG(m_collision_impulse_time,     "collision impulse-time"        );
     CHECK_NEG(m_physical_wheel_position,    "collision physical-wheel-position");
