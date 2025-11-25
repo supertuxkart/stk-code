@@ -43,7 +43,7 @@ public:
     {
         /** World ID of kart which scores. */
         unsigned int  m_id;
-        /** Whether this goal is socred correctly (identify for own goal). */
+        /** Whether this goal is scored correctly (identify for own goal). */
         bool          m_correct_goal;
         /** Time goal. */
         float         m_time;

@@ -514,11 +514,13 @@ void SoccerWorld::onCheckGoalTriggered(bool first_goal)
         sd.m_player = getKart(m_ball_hitter)->getController()
             ->getName(false/*include_handicap_string*/);
         sd.m_handicap_level = getKart(m_ball_hitter)->getHandicap();
+        sd.m_country_code = "";
         if (RaceManager::get()->getKartGlobalPlayerId(m_ball_hitter) > -1)
         {
             sd.m_country_code =
                 RaceManager::get()->getKartInfo(m_ball_hitter).getCountryCode();
         }
+
         if (sd.m_correct_goal)
         {
             m_karts[m_ball_hitter]->getKartModel()
@@ -545,28 +547,22 @@ void SoccerWorld::onCheckGoalTriggered(bool first_goal)
         }
 #endif
 
+        if (RaceManager::get()->hasTimeTarget())
+            sd.m_time = RaceManager::get()->getTimeTarget() - getTime();
+       else
+            sd.m_time = getTime();
+
+// Shut up GCC complaining incorrectly about sd.m_country_code
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wmaybe-uninitialized"
+        // First goal being true means that the ball entered the
+        // blue goal, meaning that the red team scored.
         if (first_goal)
-        {
-            if (RaceManager::get()->hasTimeTarget())
-            {
-                sd.m_time = RaceManager::get()->getTimeTarget() - getTime();
-            }
-            else
-                sd.m_time = getTime();
-            // Notice: true first_goal means it's blue goal being shoot,
-            // so red team can score
             m_red_scorers.push_back(sd);
-        }
         else
-        {
-            if (RaceManager::get()->hasTimeTarget())
-            {
-                sd.m_time = RaceManager::get()->getTimeTarget() - getTime();
-            }
-            else
-                sd.m_time = getTime();
             m_blue_scorers.push_back(sd);
-        }
+#pragma GCC diagnostic pop
+
         if (NetworkConfig::get()->isNetworking() &&
             NetworkConfig::get()->isServer())
         {
@@ -576,26 +572,14 @@ void SoccerWorld::onCheckGoalTriggered(bool first_goal)
                 .addUInt8((uint8_t)sd.m_id).addUInt8(sd.m_correct_goal)
                 .addUInt8(first_goal).addFloat(sd.m_time)
                 .addTime(m_ticks_back_to_own_goal)
-                .encodeString(sd.m_kart).encodeString(sd.m_player);
-            // Added in 1.1, add missing handicap info and country code
-            NetworkString p_1_1 = p;
-            p_1_1.encodeString(sd.m_country_code)
+                .encodeString(sd.m_kart).encodeString(sd.m_player)
+                .encodeString(sd.m_country_code)
                 .addUInt8(sd.m_handicap_level);
             auto peers = STKHost::get()->getPeers();
             for (auto& peer : peers)
             {
                 if (peer->isValidated() && !peer->isWaitingForGame())
-                {
-                    if (peer->getClientCapabilities().find("soccer_fixes") !=
-                        peer->getClientCapabilities().end())
-                    {
-                        peer->sendPacket(&p_1_1, true/*reliable*/);
-                    }
-                    else
-                    {
-                        peer->sendPacket(&p, true/*reliable*/);
-                    }
-                }
+                    peer->sendPacket(&p, true/*reliable*/);
             }
         }
     }
@@ -634,22 +618,17 @@ void SoccerWorld::handlePlayerGoalFromServer(const NetworkString& ns)
     int ticks_back_to_own_goal = ns.getTime();
     ns.decodeString(&sd.m_kart);
     ns.decodeStringW(&sd.m_player);
-    // Added in 1.1, add missing handicap info and country code
-    if (NetworkConfig::get()->getServerCapabilities().find("soccer_fixes")
-        != NetworkConfig::get()->getServerCapabilities().end())
-    {
-        ns.decodeString(&sd.m_country_code);
-        sd.m_handicap_level = (HandicapLevel)ns.getUInt8();
-    }
+    ns.decodeString(&sd.m_country_code);
+    sd.m_handicap_level = (HandicapLevel)ns.getUInt8();
 
+// Shut up GCC complaining incorrectly about sd.m_country_code
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wmaybe-uninitialized"
     if (first_goal)
-    {
         m_red_scorers.push_back(sd);
-    }
     else
-    {
         m_blue_scorers.push_back(sd);
-    }
+#pragma GCC diagnostic pop
 
     if (ticks_now >= ticks_back_to_own_goal && !isStartPhase())
     {
@@ -1069,38 +1048,31 @@ void SoccerWorld::enterRaceOverState()
 // ----------------------------------------------------------------------------
 void SoccerWorld::saveCompleteState(BareNetworkString* bns, STKPeer* peer)
 {
-    const unsigned red_scorers = (unsigned)m_red_scorers.size();
-    bns->addUInt32(red_scorers);
+    const uint8_t red_scorers = (uint8_t) m_red_scorers.size();
+    bns->addUInt8(red_scorers);
+    const uint8_t blue_scorers = (uint8_t)m_blue_scorers.size();
+    bns->addUInt8(blue_scorers);
+
     for (unsigned i = 0; i < red_scorers; i++)
     {
         bns->addUInt8((uint8_t)m_red_scorers[i].m_id)
             .addUInt8(m_red_scorers[i].m_correct_goal)
             .addFloat(m_red_scorers[i].m_time)
             .encodeString(m_red_scorers[i].m_kart)
-            .encodeString(m_red_scorers[i].m_player);
-        if (peer->getClientCapabilities().find("soccer_fixes") !=
-            peer->getClientCapabilities().end())
-        {
-            bns->encodeString(m_red_scorers[i].m_country_code)
-                .addUInt8(m_red_scorers[i].m_handicap_level);
-        }
+            .encodeString(m_red_scorers[i].m_player)
+            .encodeString(m_red_scorers[i].m_country_code)
+            .addUInt8(m_red_scorers[i].m_handicap_level);
     }
 
-    const unsigned blue_scorers = (unsigned)m_blue_scorers.size();
-    bns->addUInt32(blue_scorers);
     for (unsigned i = 0; i < blue_scorers; i++)
     {
         bns->addUInt8((uint8_t)m_blue_scorers[i].m_id)
             .addUInt8(m_blue_scorers[i].m_correct_goal)
             .addFloat(m_blue_scorers[i].m_time)
             .encodeString(m_blue_scorers[i].m_kart)
-            .encodeString(m_blue_scorers[i].m_player);
-        if (peer->getClientCapabilities().find("soccer_fixes") !=
-            peer->getClientCapabilities().end())
-        {
-            bns->encodeString(m_blue_scorers[i].m_country_code)
-                .addUInt8(m_blue_scorers[i].m_handicap_level);
-        }
+            .encodeString(m_blue_scorers[i].m_player)
+            .encodeString(m_blue_scorers[i].m_country_code)
+            .addUInt8(m_blue_scorers[i].m_handicap_level);
     }
     bns->addTime(m_reset_ball_ticks).addTime(m_ticks_back_to_own_goal);
 }   // saveCompleteState
@@ -1111,8 +1083,10 @@ void SoccerWorld::restoreCompleteState(const BareNetworkString& b)
     m_red_scorers.clear();
     m_blue_scorers.clear();
 
-    const unsigned red_size = b.getUInt32();
-    for (unsigned i = 0; i < red_size; i++)
+    const unsigned red_size = (unsigned)b.getUInt8();
+    const unsigned blue_size = (unsigned)b.getUInt8();
+    const unsigned total_size = red_size + blue_size;
+    for (unsigned i = 0; i < total_size; i++)
     {
         ScorerData sd;
         sd.m_id = b.getUInt8();
@@ -1120,32 +1094,18 @@ void SoccerWorld::restoreCompleteState(const BareNetworkString& b)
         sd.m_time = b.getFloat();
         b.decodeString(&sd.m_kart);
         b.decodeStringW(&sd.m_player);
-        if (NetworkConfig::get()->getServerCapabilities().find("soccer_fixes")
-            != NetworkConfig::get()->getServerCapabilities().end())
-        {
-            b.decodeString(&sd.m_country_code);
-            sd.m_handicap_level = (HandicapLevel)b.getUInt8();
-        }
-        m_red_scorers.push_back(sd);
+        b.decodeString(&sd.m_country_code);
+        sd.m_handicap_level = (HandicapLevel)b.getUInt8();
+// Shut up GCC complaining incorrectly about sd.m_country_code
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wmaybe-uninitialized"
+        if (i < red_size)
+            m_red_scorers.push_back(sd);
+        else
+            m_blue_scorers.push_back(sd);
+#pragma GCC diagnostic pop
     }
 
-    const unsigned blue_size = b.getUInt32();
-    for (unsigned i = 0; i < blue_size; i++)
-    {
-        ScorerData sd;
-        sd.m_id = b.getUInt8();
-        sd.m_correct_goal = b.getUInt8() == 1;
-        sd.m_time = b.getFloat();
-        b.decodeString(&sd.m_kart);
-        b.decodeStringW(&sd.m_player);
-        if (NetworkConfig::get()->getServerCapabilities().find("soccer_fixes")
-            != NetworkConfig::get()->getServerCapabilities().end())
-        {
-            b.decodeString(&sd.m_country_code);
-            sd.m_handicap_level = (HandicapLevel)b.getUInt8();
-        }
-        m_blue_scorers.push_back(sd);
-    }
     m_reset_ball_ticks = b.getTime();
     m_ticks_back_to_own_goal = b.getTime();
 }   // restoreCompleteState
