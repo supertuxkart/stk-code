@@ -7,7 +7,7 @@
 
   <!-- Minimum and maximum track versions that can be read by this binary.
        Older versions will be ignored. -->
-  <track-version min="6" max="7"/>
+  <track-version min="6" max="8"/>
 
   <!-- Minimum and maximum server versions that be be read by this binary.
        Older versions will be ignored. -->

@@ -1738,7 +1738,7 @@ void World::updateAchievementDataEndRace()
                 if (RaceManager::get()->modeHasLaps())
                 {
                     Track* track = track_manager->getTrack(RaceManager::get()->getTrackName());
-                    int default_lap_num = track->getDefaultNumberOfLaps();
+                    int default_lap_num = track->getDefaultNumberOfLaps(RaceManager::get()->getDifficulty());
                     if (RaceManager::get()->getNumLaps() < default_lap_num)
                     {
                         PlayerManager::trackEvent(RaceManager::get()->getTrackName(), ACS::TR_LESS_LAPS);

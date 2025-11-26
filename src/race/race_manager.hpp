@@ -227,7 +227,8 @@ public:
 #undef BATTLE_ARENA
 #undef MISC
 
-    /** Game difficulty. */
+    /** Game difficulty.
+     * The values need to start at 0 and be consecutive. */
     enum Difficulty     { DIFFICULTY_EASY = 0,
                           DIFFICULTY_FIRST = DIFFICULTY_EASY,
                           DIFFICULTY_CASUAL,

@@ -68,7 +68,6 @@
 #include "physics/physical_object.hpp"
 #include "physics/physics.hpp"
 #include "physics/triangle_mesh.hpp"
-#include "race/race_manager.hpp"
 #include "scriptengine/script_engine.hpp"
 #include "tracks/arena_graph.hpp"
 #include "tracks/bezier_curve.hpp"
@@ -188,6 +187,10 @@ Track::Track(const std::string &filename)
     m_red_flag = m_blue_flag =
         btTransform(btQuaternion(0.0f, 0.0f, 0.0f, 1.0f));
     m_default_number_of_laps = 3;
+    m_dynamic_laps           = true;
+    for (unsigned i = 0 ; i < (int)RaceManager::DIFFICULTY_COUNT ; i++)
+        m_actual_number_of_laps.push_back(-1);
+
     m_all_nodes.clear();
     m_static_physics_only_nodes.clear();
     m_all_cached_meshes.clear();
@@ -579,6 +582,7 @@ void Track::loadTrackInfo()
     root->get("internal",              &m_internal);
     root->get("reverse",               &m_reverse_available);
     root->get("default-number-of-laps",&m_default_number_of_laps);
+    root->get("dynamic-laps",          &m_dynamic_laps);
     root->get("push-back",             &m_enable_push_back);
     root->get("bloom",                 &m_bloom);
     root->get("bloom-threshold",       &m_bloom_threshold);
@@ -591,7 +595,9 @@ void Track::loadTrackInfo()
     getMusicInformation(filenames, m_music);
     if (m_default_number_of_laps <= 0)
         m_default_number_of_laps = 3;
-    m_actual_number_of_laps = m_default_number_of_laps;
+
+    for (unsigned i = 0 ; i < (int)RaceManager::DIFFICULTY_COUNT ; i++)
+        m_actual_number_of_laps[i] = getDefaultNumberOfLaps((RaceManager::Difficulty) i);
 
     // Make the default for auto-rescue in battle mode and soccer mode to be false
     if(m_is_arena || m_is_soccer)
@@ -3075,6 +3081,38 @@ void Track::copyFromMainProcess()
     }
     m_item_manager = nim;
 }   // copyFromMainProcess
+
+//-----------------------------------------------------------------------------
+const int Track::getDefaultNumberOfLaps(RaceManager::Difficulty difficulty)
+{
+    if (!m_dynamic_laps || difficulty == RaceManager::DIFFICULTY_HARD
+                        || difficulty == RaceManager::DIFFICULTY_BEST)
+        return m_default_number_of_laps;
+
+    // If dynamic adjustment of the default lap number is on for this track
+    // and the difficulty is low, we reduce the lap numbers proportionally.
+    // This allows race duration to be neither too short at high difficulties
+    // nor too long at low difficulties.
+    auto lowerDefault
+    {
+        [](int default_laps, int numerator, int denominator)
+        {
+            int lowered_default = (default_laps * numerator) / denominator;
+            if (lowered_default * denominator < default_laps * numerator)
+                lowered_default++;  
+            return lowered_default;
+        }
+    };
+
+    if (difficulty == RaceManager::DIFFICULTY_MEDIUM)
+        return lowerDefault(m_default_number_of_laps, 7, 8);
+    else if (difficulty == RaceManager::DIFFICULTY_CASUAL)
+        return lowerDefault(m_default_number_of_laps, 3, 4);
+    else if (difficulty == RaceManager::DIFFICULTY_EASY)
+        return lowerDefault(m_default_number_of_laps, 2, 3);
+
+    return m_default_number_of_laps;
+}   // getDefaultNumberOfLaps
 
 //-----------------------------------------------------------------------------
 void Track::initChildTrack()
