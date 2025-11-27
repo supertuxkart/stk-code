@@ -157,6 +157,8 @@ namespace GraphicalPresets
     // --------------------------------------------------------------------------------------------
     void applyGFXPreset(int level)
     {
+        level--;
+        level = std::min((int)gfx_presets.size(), std::max(0, level));
         UserConfigParams::m_animated_characters = gfx_presets[level].animatedCharacters;
         UserConfigParams::m_particles_effects = gfx_presets[level].particles;
         setImageQuality(gfx_presets[level].image_quality);

@@ -429,10 +429,10 @@ void OptionsScreenVideo::eventCallback(Widget* widget, const std::string& name,
             getWidget<GUIEngine::SpinnerWidget>("gfx_level");
         assert( gfx_level != NULL );
 
-        const int level = gfx_level->getValue() - 1;
+        const int level = gfx_level->getValue();
 
         // Enable the blur spinner only if the new renderer is on
-        getWidget<GUIEngine::SpinnerWidget>("blur_level")->setActive(level >= 2);
+        getWidget<GUIEngine::SpinnerWidget>("blur_level")->setActive(level >= 3);
 
         // Same with Render resolution slider
         getWidget<GUIEngine::SpinnerWidget>("scale_rtts")->

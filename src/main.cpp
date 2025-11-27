@@ -687,6 +687,9 @@ void cmdLineHelp()
     "                          with colons (:).\n"
     "       --cutscene=NAME    Launch the specified track as a cutscene.\n"
     "                          This is for internal debugging use only.\n"
+    "       --gfx-preset=n     Set the graphics settings to the selected preset.\n"
+    "                          Valid values for this STK version are between 1 and 7.\n"
+    "                          Other graphic command-line parameters will override the preset.\n"
     "       --enable-glow      Enable glow effect.\n"
     "       --disable-glow     Disable glow effect.\n"
     "       --enable-bloom     Enable bloom effect.\n"
@@ -936,6 +939,32 @@ int handleCmdLinePreliminary()
     if(CommandLine::has("--windowed") || CommandLine::has("-w"))
         UserConfigParams::m_fullscreen = false;
 
+    int n;
+    if (CommandLine::has("--gfx-preset", &n))
+    {
+        if (n <= 0 || n > (int)GraphicalPresets::gfx_presets.size())
+        {
+            Log::warn("main", "Invalid graphical preset (%i), ignored", n);
+        }
+        else
+        {
+            if ((strcmp(UserConfigParams::m_render_driver.c_str(), "vulkan")   == 0 && n >= 4) ||
+                (strcmp(UserConfigParams::m_render_driver.c_str(), "directx9") == 0 && n >= 3))
+            {
+                Log::warn("main", "Some settings of the selected preset (%i) are not "
+                    "supported by the current renderer!");
+            }
+
+            // Apply the chosen graphical presets
+            if (strcmp(UserConfigParams::m_render_driver.c_str(), "vulkan") == 0 && n <= 2)
+                Log::error("main", "The vulkan renderer does not support the very low presets!");
+            else if (UserConfigParams::m_force_legacy_device)
+                Log::error("main", "The legacy renderer cannot use any of the gfx presets!");
+            else
+                GraphicalPresets::applyGFXPreset(n);
+        }
+    }
+
     // toggle graphical options
     if (CommandLine::has("--enable-glow"))
         UserConfigParams::m_glow = true;
@@ -997,6 +1026,11 @@ int handleCmdLinePreliminary()
     else if (CommandLine::has("--disable-hd-textures"))
         UserConfigParams::m_high_definition_textures = 2;
 
+    if (CommandLine::has("--shadows", &n))
+        UserConfigParams::m_shadows_resolution = n;
+    if (CommandLine::has("--anisotropic", &n))
+        UserConfigParams::m_anisotropic = n;
+
     // Enable loading grand prix from local directory
     if(CommandLine::has("--add-gp-dir", &s))
     {
@@ -1010,15 +1044,11 @@ int handleCmdLinePreliminary()
                            UserConfigParams::m_additional_gp_directory.c_str());
     }
 
-    int n;
+
     if(CommandLine::has("--xmas", &n))
         UserConfigParams::m_xmas_mode = n;
     if (CommandLine::has("--easter", &n))
         UserConfigParams::m_easter_ear_mode = n;
-    if (CommandLine::has("--shadows", &n))
-        UserConfigParams::m_shadows_resolution = n;
-    if (CommandLine::has("--anisotropic", &n))
-        UserConfigParams::m_anisotropic = n;
 
     // Useful for debugging: the temple navmesh needs 12 minutes in debug
     // mode to compute the distance matrix!!
