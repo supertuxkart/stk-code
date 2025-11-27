@@ -18,6 +18,7 @@
 #include "states_screens/dialogs/custom_video_settings.hpp"
 
 #include "config/user_config.hpp"
+#include "graphics/graphical_presets.hpp"
 #include "guiengine/widgets/check_box_widget.hpp"
 #include "guiengine/widgets/ribbon_widget.hpp"
 #include "guiengine/widgets/spinner_widget.hpp"
@@ -90,7 +91,7 @@ void CustomVideoSettingsDialog::beforeAddingWidgets()
     filtering->addLabel(_("Low"));
     filtering->addLabel(_("Medium"));
     filtering->addLabel(_("High"));
-    filtering->setValue(OptionsScreenVideo::getImageQuality());
+    filtering->setValue(GraphicalPresets::getImageQuality());
 
     SpinnerWidget* shadows = getWidget<SpinnerWidget>("shadows");
     shadows->addLabel(_("Disabled"));   // 0
@@ -278,7 +279,10 @@ GUIEngine::EventPropagation CustomVideoSettingsDialog::processEvent(const std::s
             }
             // sameRestart will have the same effect
             if (!(CVS->isGLSL() && pbr_changed))
-                OptionsScreenVideo::setImageQuality(quality, force_reload_texture);
+            {
+                GraphicalPresets::setImageQuality(quality);
+                OptionsScreenVideo::updateImageQuality(force_reload_texture);
+            }
 
             if (need_restart)
                 irr_driver->fullRestart();

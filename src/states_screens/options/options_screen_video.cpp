@@ -44,69 +44,20 @@ using namespace GUIEngine;
 using namespace GraphicalPresets;
 
 // --------------------------------------------------------------------------------------------
-int OptionsScreenVideo::getImageQuality()
-{
-    // applySettings assumes that only the first image quality preset has a different
-    // level of anisotropic filtering from others
-    if (UserConfigParams::m_anisotropic == 4 &&
-        (UserConfigParams::m_high_definition_textures & 0x01) == 0x00 &&
-        UserConfigParams::m_hq_mipmap == false)
-        return 0;
-    if (UserConfigParams::m_anisotropic == 16 &&
-        (UserConfigParams::m_high_definition_textures & 0x01) == 0x00 &&
-        UserConfigParams::m_hq_mipmap == false)
-        return 1;
-    if (UserConfigParams::m_anisotropic == 4 &&
-        (UserConfigParams::m_high_definition_textures & 0x01) == 0x01 &&
-        UserConfigParams::m_hq_mipmap == false)
-        return 2;
-    if (UserConfigParams::m_anisotropic == 16 &&
-        (UserConfigParams::m_high_definition_textures & 0x01) == 0x01 &&
-        UserConfigParams::m_hq_mipmap == true)
-        return 3;
-    return 1;
-}   // getImageQuality
-
-// --------------------------------------------------------------------------------------------
-void OptionsScreenVideo::setImageQuality(int quality, bool force_reload_texture)
+void OptionsScreenVideo::updateImageQuality(bool force_reload_texture)
 {
     core::dimension2du prev_max_size = irr_driver->getVideoDriver()
         ->getDriverAttributes().getAttributeAsDimension2d("MAX_TEXTURE_SIZE");
     GE::GEVulkanTextureDescriptor* td = NULL;
     if (GE::getVKDriver())
         td = GE::getVKDriver()->getMeshTextureDescriptor();
-    switch (quality)
+
+    if (td)
     {
-        case 0:
-            UserConfigParams::m_anisotropic = 4;
-            UserConfigParams::m_high_definition_textures = 0x02;
-            UserConfigParams::m_hq_mipmap = false;
-            if (td)
-                td->setSamplerUse(GE::GVS_3D_MESH_MIPMAP_4);
-            break;
-        case 1:
-            UserConfigParams::m_anisotropic = 16;
-            UserConfigParams::m_high_definition_textures = 0x02;
-            UserConfigParams::m_hq_mipmap = false;
-            if (td)
-                td->setSamplerUse(GE::GVS_3D_MESH_MIPMAP_16);
-            break;
-        case 2:
-            UserConfigParams::m_anisotropic = 4;
-            UserConfigParams::m_high_definition_textures = 0x03;
-            UserConfigParams::m_hq_mipmap = false;
-            if (td)
-                td->setSamplerUse(GE::GVS_3D_MESH_MIPMAP_4);
-            break;
-        case 3:
-            UserConfigParams::m_anisotropic = 16;
-            UserConfigParams::m_high_definition_textures = 0x03;
-            UserConfigParams::m_hq_mipmap = true;
-            if (td)
-                td->setSamplerUse(GE::GVS_3D_MESH_MIPMAP_16);
-            break;
-        default:
-            assert(false);
+        if (UserConfigParams::m_anisotropic == 4)
+            td->setSamplerUse(GE::GVS_3D_MESH_MIPMAP_4);
+        if (UserConfigParams::m_anisotropic == 16)
+            td->setSamplerUse(GE::GVS_3D_MESH_MIPMAP_16);
     }
 
     irr_driver->setMaxTextureSize();
@@ -123,7 +74,7 @@ void OptionsScreenVideo::setImageQuality(int quality, bool force_reload_texture)
     }
     else if (prev_max_size != cur_max_size || force_reload_texture)
         STKTexManager::getInstance()->reloadAllTextures(true/*mesh_texture_only*/);
-}   // setImageQuality
+}   // updateImageQuality
 
 // --------------------------------------------------------------------------------------------
 OptionsScreenVideo::OptionsScreenVideo() : Screen("options/options_video.stkgui"),
@@ -259,35 +210,15 @@ void OptionsScreenVideo::updateGfxSlider()
 {
     GUIEngine::SpinnerWidget* gfx = getWidget<GUIEngine::SpinnerWidget>("gfx_level");
     assert( gfx != NULL );
-    bool found = false;
-    for (unsigned int l = 0; l < gfx_presets.size(); l++)
-    {
-        if (gfx_presets[l].animatedCharacters == UserConfigParams::m_animated_characters &&
-            gfx_presets[l].particles == UserConfigParams::m_particles_effects &&
-            gfx_presets[l].image_quality == getImageQuality() &&
-            gfx_presets[l].bloom == UserConfigParams::m_bloom &&
-            gfx_presets[l].glow == UserConfigParams::m_glow &&
-            gfx_presets[l].lights == UserConfigParams::m_dynamic_lights &&
-            gfx_presets[l].lightshaft == UserConfigParams::m_light_shaft &&
-            gfx_presets[l].mlaa == UserConfigParams::m_mlaa &&
-            gfx_presets[l].shadows == UserConfigParams::m_shadows_resolution &&
-            gfx_presets[l].ssao == UserConfigParams::m_ssao &&
-            gfx_presets[l].light_scatter == UserConfigParams::m_light_scatter &&
-            gfx_presets[l].degraded_ibl == UserConfigParams::m_degraded_IBL &&
-            gfx_presets[l].geometry_detail == UserConfigParams::m_geometry_level &&
-            gfx_presets[l].pc_soft_shadows == UserConfigParams::m_pcss &&
-            gfx_presets[l].ssr == UserConfigParams::m_ssr)
-        {
-            gfx->setValue(l + 1);
-            found = true;
-            break;
-        }
-    }
-
-    if (!found)
+    int preset = findCurrentGFXPreset();
+    if (preset == -1) // Current settings don't match a preset
     {
         //I18N: custom video settings
         gfx->setCustomText( _("Custom") );
+    }
+    else
+    {
+        gfx->setValue(preset);
     }
 
     // Enable the blur slider if the modern renderer is used
@@ -508,22 +439,8 @@ void OptionsScreenVideo::eventCallback(Widget* widget, const std::string& name,
             setActive(UserConfigParams::m_dynamic_lights ||
             GE::getDriver()->getDriverType() == video::EDT_VULKAN);
 
-        UserConfigParams::m_animated_characters = gfx_presets[level].animatedCharacters;
-        UserConfigParams::m_particles_effects = gfx_presets[level].particles;
-        setImageQuality(gfx_presets[level].image_quality, false/*force_reload_texture*/);
-        UserConfigParams::m_bloom              = gfx_presets[level].bloom;
-        UserConfigParams::m_glow               = gfx_presets[level].glow;
-        UserConfigParams::m_dynamic_lights     = gfx_presets[level].lights;
-        UserConfigParams::m_light_shaft        = gfx_presets[level].lightshaft;
-        UserConfigParams::m_mlaa               = gfx_presets[level].mlaa;
-        UserConfigParams::m_shadows_resolution = gfx_presets[level].shadows;
-        UserConfigParams::m_ssao               = gfx_presets[level].ssao;
-        UserConfigParams::m_light_scatter      = gfx_presets[level].light_scatter;
-        UserConfigParams::m_degraded_IBL       = gfx_presets[level].degraded_ibl;
-        UserConfigParams::m_geometry_level     = gfx_presets[level].geometry_detail;
-        UserConfigParams::m_pcss               = gfx_presets[level].pc_soft_shadows;
-        UserConfigParams::m_ssr                = gfx_presets[level].ssr;
-
+        applyGFXPreset(level);
+        updateImageQuality(false /* force reload textures */);
         updateGfxSlider();
         setSSR();
     }

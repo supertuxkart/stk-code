@@ -59,6 +59,11 @@ namespace GraphicalPresets
     extern std::vector<ScaleRttsCustomPreset> scale_rtts_presets;
 
     void initPresets();
+    /* The find and apply preset do NOT check for the active renderer! */
+    int findCurrentGFXPreset();
+    void applyGFXPreset(int preset);
+    int getImageQuality();
+    void setImageQuality(int quality);
 }
 
 #endif

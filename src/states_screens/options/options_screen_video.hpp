@@ -64,8 +64,7 @@ public:
     void         updateGfxSlider();
     void         updateBlurSlider();
     void         updateScaleRTTsSlider();
-    static int getImageQuality();
-    static void setImageQuality(int quality, bool force_reload_texture);
+    static void updateImageQuality(bool force_reload_texture);
     static void setSSR();
 };
 

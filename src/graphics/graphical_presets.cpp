@@ -17,6 +17,8 @@
 
 #include "graphics/graphical_presets.hpp"
 
+#include "config/user_config.hpp"
+
 namespace GraphicalPresets
 {
     bool init_done = false;
@@ -122,4 +124,109 @@ namespace GraphicalPresets
 
         init_done = true;
     }   // initPresets
+
+    // --------------------------------------------------------------------------------------------
+    /* This function returns the currently active GFX preset, if any. If custom settings are
+    * currently used, it returns -1. It does NOT check the active renderer. */
+    int findCurrentGFXPreset()
+    {
+        for (unsigned int l = 0; l < gfx_presets.size(); l++)
+        {
+            if (gfx_presets[l].animatedCharacters == UserConfigParams::m_animated_characters &&
+                gfx_presets[l].particles          == UserConfigParams::m_particles_effects   &&
+                gfx_presets[l].image_quality      == getImageQuality()                       &&
+                gfx_presets[l].bloom              == UserConfigParams::m_bloom               &&
+                gfx_presets[l].glow               == UserConfigParams::m_glow                &&
+                gfx_presets[l].lights             == UserConfigParams::m_dynamic_lights      &&
+                gfx_presets[l].lightshaft         == UserConfigParams::m_light_shaft         &&
+                gfx_presets[l].mlaa               == UserConfigParams::m_mlaa                &&
+                gfx_presets[l].shadows            == UserConfigParams::m_shadows_resolution  &&
+                gfx_presets[l].ssao               == UserConfigParams::m_ssao                &&
+                gfx_presets[l].light_scatter      == UserConfigParams::m_light_scatter       &&
+                gfx_presets[l].degraded_ibl       == UserConfigParams::m_degraded_IBL        &&
+                gfx_presets[l].geometry_detail    == UserConfigParams::m_geometry_level      &&
+                gfx_presets[l].pc_soft_shadows    == UserConfigParams::m_pcss                &&
+                gfx_presets[l].ssr                == UserConfigParams::m_ssr)
+            {
+                return (l + 1);
+            }
+        }
+        return -1;
+    }   // findCurrentGFXPreset
+
+    // --------------------------------------------------------------------------------------------
+    void applyGFXPreset(int level)
+    {
+        UserConfigParams::m_animated_characters = gfx_presets[level].animatedCharacters;
+        UserConfigParams::m_particles_effects = gfx_presets[level].particles;
+        setImageQuality(gfx_presets[level].image_quality);
+        UserConfigParams::m_bloom              = gfx_presets[level].bloom;
+        UserConfigParams::m_glow               = gfx_presets[level].glow;
+        UserConfigParams::m_dynamic_lights     = gfx_presets[level].lights;
+        UserConfigParams::m_light_shaft        = gfx_presets[level].lightshaft;
+        UserConfigParams::m_mlaa               = gfx_presets[level].mlaa;
+        UserConfigParams::m_shadows_resolution = gfx_presets[level].shadows;
+        UserConfigParams::m_ssao               = gfx_presets[level].ssao;
+        UserConfigParams::m_light_scatter      = gfx_presets[level].light_scatter;
+        UserConfigParams::m_degraded_IBL       = gfx_presets[level].degraded_ibl;
+        UserConfigParams::m_geometry_level     = gfx_presets[level].geometry_detail;
+        UserConfigParams::m_pcss               = gfx_presets[level].pc_soft_shadows;
+        UserConfigParams::m_ssr                = gfx_presets[level].ssr;
+    }   // applyGFXPreset
+
+    // --------------------------------------------------------------------------------------------
+    int getImageQuality()
+    {
+        // applySettings assumes that only the first image quality preset has a different
+        // level of anisotropic filtering from others
+        if (UserConfigParams::m_anisotropic == 4 &&
+            (UserConfigParams::m_high_definition_textures & 0x01) == 0x00 &&
+            UserConfigParams::m_hq_mipmap == false)
+            return 0;
+        if (UserConfigParams::m_anisotropic == 16 &&
+            (UserConfigParams::m_high_definition_textures & 0x01) == 0x00 &&
+            UserConfigParams::m_hq_mipmap == false)
+            return 1;
+        if (UserConfigParams::m_anisotropic == 4 &&
+            (UserConfigParams::m_high_definition_textures & 0x01) == 0x01 &&
+            UserConfigParams::m_hq_mipmap == false)
+            return 2;
+        if (UserConfigParams::m_anisotropic == 16 &&
+            (UserConfigParams::m_high_definition_textures & 0x01) == 0x01 &&
+            UserConfigParams::m_hq_mipmap == true)
+            return 3;
+        return 1;
+    }   // getImageQuality
+
+    // --------------------------------------------------------------------------------------------
+    /* This function updates the user config parameters to a new config level.
+    * It does NOT ensure that the new parameters are properly applied. */
+    void setImageQuality(int quality)
+    {
+        switch (quality)
+        {
+            case 0:
+                UserConfigParams::m_anisotropic = 4;
+                UserConfigParams::m_high_definition_textures = 0x02;
+                UserConfigParams::m_hq_mipmap = false;
+                break;
+            case 1:
+                UserConfigParams::m_anisotropic = 16;
+                UserConfigParams::m_high_definition_textures = 0x02;
+                UserConfigParams::m_hq_mipmap = false;
+                break;
+            case 2:
+                UserConfigParams::m_anisotropic = 4;
+                UserConfigParams::m_high_definition_textures = 0x03;
+                UserConfigParams::m_hq_mipmap = false;
+                break;
+            case 3:
+                UserConfigParams::m_anisotropic = 16;
+                UserConfigParams::m_high_definition_textures = 0x03;
+                UserConfigParams::m_hq_mipmap = true;
+                break;
+            default:
+                assert(false);
+        }
+    }   // setImageQuality
 }   // GraphicalPresets
