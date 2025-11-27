@@ -25,37 +25,6 @@
 
 namespace GUIEngine { class Widget; }
 
-struct GFXPreset
-{
-    bool lights;
-    int shadows;
-    bool bloom;
-    bool lightshaft;
-    bool glow;
-    bool mlaa;
-    bool ssao;
-    bool light_scatter;
-    bool animatedCharacters;
-    int particles;
-    int image_quality;
-    bool degraded_ibl;
-    int geometry_detail;
-    bool pc_soft_shadows;
-    bool ssr;
-};
-
-struct BlurPreset
-{
-    bool motionblur;
-    /** Depth of field */
-    bool dof;
-};
-
-struct ScaleRttsCustomPreset
-{
-    float value;
-};
-
 /**
   * \brief Graphics options screen
   * \ingroup states_screens
@@ -66,13 +35,9 @@ private:
     bool m_prev_adv_pipline;
     OptionsScreenVideo();
     bool m_inited;
-    std::vector<GFXPreset> m_presets;
-    std::vector<BlurPreset> m_blur_presets;
-    std::vector<ScaleRttsCustomPreset> m_scale_rtts_custom_presets;
 
     void updateTooltip();
     void updateBlurTooltip();
-    void initPresets();
     static void onScrollResolutionsList(void* data);
     /* Returns 1 or 2 if a restart will be done, 0 otherwise */
     int applySettings();
@@ -91,9 +56,6 @@ public:
 
     /** \brief implement callback from parent class GUIEngine::Screen */
     virtual void tearDown() OVERRIDE;
-
-    /** \brief implement optional callback from parent class GUIEngine::Screen */
-    virtual void unloaded() OVERRIDE;
 
     virtual bool onEscapePressed() OVERRIDE;
 

@@ -214,6 +214,7 @@ extern "C" {
 #include "graphics/camera/camera.hpp"
 #include "graphics/camera/camera_debug.hpp"
 #include "graphics/central_settings.hpp"
+#include "graphics/graphical_presets.hpp"
 #include "graphics/graphics_restrictions.hpp"
 #include "graphics/irr_driver.hpp"
 #include "graphics/material_manager.hpp"
@@ -2207,6 +2208,9 @@ int main(int argc, char *argv[])
         });
 #endif
     srand(( unsigned ) time( 0 ));
+
+    // Init the graphical presets
+    GraphicalPresets::initPresets();
 
     try
     {
