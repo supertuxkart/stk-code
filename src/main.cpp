@@ -714,12 +714,18 @@ void cmdLineHelp()
     "       --disable-ibl      Disable image based lighting.\n"
     "       --enable-hd-textures Enable high definition textures.\n"
     "       --disable-hd-textures Disable high definition textures.\n"
+    "       --enable-pcss      Enable percentage-closer soft shadows.\n"
+    "       --disable-pcss     Disable percentage-closer soft-shadows.\n"
+    "       --enable-ssr       Enable screen space reflections.\n"
+    "       --disable-ssr      Disable screen space reflections.\n"
+    "       --enable-light-scatter  Enable light scattering.\n"
+    "       --disable-light-scatter Disable light scattering.\n"  
     "       --enable-dynamic-lights Enable advanced pipeline.\n"
     "       --disable-dynamic-lights Disable advanced pipeline.\n"
     "       --anisotropic=n     Anisotropic filtering quality (0 to disable).\n"
-    "                           Takes precedence over trilinear or bilinear\n"
-    "                           texture filtering.\n"
+    "                           Takes precedence over trilinear or bilinear texture filtering.\n"
     "       --shadows=n         Set resolution of shadows (0 to disable).\n"
+    "       --geometry-level=n  Sets the LoD distances. Supported values range from 0 to 5."
     "       --render-driver=n   Render driver to use (gl or directx9).\n"
     "       --disable-addon-karts Disable loading of addon karts.\n"
     "       --disable-addon-tracks Disable loading of addon tracks.\n"
@@ -1025,11 +1031,28 @@ int handleCmdLinePreliminary()
         UserConfigParams::m_high_definition_textures =  2 | 1;
     else if (CommandLine::has("--disable-hd-textures"))
         UserConfigParams::m_high_definition_textures = 2;
+    // percentage-closer soft shadows
+    if (CommandLine::has("--enable-pcss"))
+        UserConfigParams::m_pcss = true;
+    else if (CommandLine::has("--disable-pcss"))
+        UserConfigParams::m_pcss = false;
+    // screen space reflections
+    if (CommandLine::has("--enable-ssr"))
+        UserConfigParams::m_ssr = true;
+    else if (CommandLine::has("--disable-ssr"))
+        UserConfigParams::m_ssr = false;
+    // light scattering
+    if (CommandLine::has("--enable-light-scatter"))
+        UserConfigParams::m_light_scatter = true;
+    else if (CommandLine::has("--disable-light-scatter"))
+        UserConfigParams::m_light_scatter = false;
 
     if (CommandLine::has("--shadows", &n))
         UserConfigParams::m_shadows_resolution = n;
     if (CommandLine::has("--anisotropic", &n))
         UserConfigParams::m_anisotropic = n;
+    if (CommandLine::has("--geometry-level", &n))
+        UserConfigParams::m_geometry_level = n;
 
     // Enable loading grand prix from local directory
     if(CommandLine::has("--add-gp-dir", &s))
