@@ -177,8 +177,6 @@ namespace GraphicalPresets
     // --------------------------------------------------------------------------------------------
     int getImageQuality()
     {
-        // applySettings assumes that only the first image quality preset has a different
-        // level of anisotropic filtering from others
         if (UserConfigParams::m_anisotropic == 4 &&
             (UserConfigParams::m_high_definition_textures & 0x01) == 0x00 &&
             UserConfigParams::m_hq_mipmap == false)
@@ -187,7 +185,7 @@ namespace GraphicalPresets
             (UserConfigParams::m_high_definition_textures & 0x01) == 0x00 &&
             UserConfigParams::m_hq_mipmap == false)
             return 1;
-        if (UserConfigParams::m_anisotropic == 4 &&
+        if (UserConfigParams::m_anisotropic == 16 &&
             (UserConfigParams::m_high_definition_textures & 0x01) == 0x01 &&
             UserConfigParams::m_hq_mipmap == false)
             return 2;
@@ -203,30 +201,9 @@ namespace GraphicalPresets
     * It does NOT ensure that the new parameters are properly applied. */
     void setImageQuality(int quality)
     {
-        switch (quality)
-        {
-            case 0:
-                UserConfigParams::m_anisotropic = 4;
-                UserConfigParams::m_high_definition_textures = 0x02;
-                UserConfigParams::m_hq_mipmap = false;
-                break;
-            case 1:
-                UserConfigParams::m_anisotropic = 16;
-                UserConfigParams::m_high_definition_textures = 0x02;
-                UserConfigParams::m_hq_mipmap = false;
-                break;
-            case 2:
-                UserConfigParams::m_anisotropic = 4;
-                UserConfigParams::m_high_definition_textures = 0x03;
-                UserConfigParams::m_hq_mipmap = false;
-                break;
-            case 3:
-                UserConfigParams::m_anisotropic = 16;
-                UserConfigParams::m_high_definition_textures = 0x03;
-                UserConfigParams::m_hq_mipmap = true;
-                break;
-            default:
-                assert(false);
-        }
+        assert (quality >= 0 && quality <= 3);
+        UserConfigParams::m_anisotropic              = (quality >= 1) ? 16   : 4;
+        UserConfigParams::m_high_definition_textures = (quality >= 2) ? 0x03 : 0x02;
+        UserConfigParams::m_hq_mipmap                = (quality >= 3) ? true : false;
     }   // setImageQuality
 }   // GraphicalPresets
