@@ -107,7 +107,7 @@ void KartStatsWidget::setValues(const KartProperties* props, HandicapLevel h)
                    (kp_computed.getCombinedCharacteristic()->getMass() - 100.0f)/2.78f,
                    "mass.png", "mass", _("Mass"));
     
-    // The base speed is of 27.75
+    // The base speed is of 28
     // Speed is the characteristics most affected by handicap, but it is also
     // important to display the base differences between classes as significant,
     // as small differences matter a lot.
@@ -127,11 +127,11 @@ void KartStatsWidget::setValues(const KartProperties* props, HandicapLevel h)
                    kp_computed.getAccelerationEfficiency()*9.0f,
                    "power.png", "acceleration", _("Acceleration"));
 
-    // The base nitro consumption is 1, higher for heavier karts.
+    // The base nitro consumption is 0.72, higher for heavier karts.
     // The base max speed increase is 5, higher for lighter karts
-    // Nitro efficiency is hence computed as 18 * max_speed_increase / nitro_consumption
+    // Nitro efficiency is hence computed as 13 * max_speed_increase / nitro_consumption
     setSkillValues(SKILL_NITRO_EFFICIENCY,
-                    18.0f * kp_computed.getCombinedCharacteristic()->getNitroMaxSpeedIncrease()
+                    13.0f * kp_computed.getCombinedCharacteristic()->getNitroMaxSpeedIncrease()
                           / kp_computed.getCombinedCharacteristic()->getNitroConsumption(),
                    "nitro.png", "nitro", _("Nitro efficiency"));
 

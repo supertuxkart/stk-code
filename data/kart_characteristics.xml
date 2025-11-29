@@ -361,10 +361,10 @@
             fade-out-time: Duration during which the increased maximum
                 speed due to nitro fades out.
             max: How much nitro a kart can store. -->
-        <nitro engine-force="350" engine-mult="1.2" consumption="1"
+        <nitro engine-force="350" engine-mult="1.2" consumption="0.72"
                small-container="1" big-container="2.5" air-container="1.5"
-               max-speed-increase="5" min-burst="0.5" duration="0.9"
-               fade-out-time="1.45" max="20" />
+               max-speed-increase="5" min-burst="0.55" duration="0.45"
+               fade-out-time="1.45" max="15" />
 
         <!-- Slipstream
             base-speed: the speed for which length and width are valid.
