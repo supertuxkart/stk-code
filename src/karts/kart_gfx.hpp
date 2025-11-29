@@ -129,7 +129,7 @@ public:
     void setCreationRateRelative(const KartGFXType type, float f);
     void updateTerrain(const ParticleKind *pk);
     void update(float dt);
-    void updateNitroGraphics(float f, bool isNitroHackOn);
+    void updateNitroGraphics(float f, bool isNitroHackOn, bool activeNitro);
     void updateSkidLight(unsigned int level);
     void getGFXStatus(int* nitro, bool* zipper,
                       int* skidding, bool* red_skidding, bool* purple_skidding) const;

@@ -3900,9 +3900,10 @@ void Kart::updateGraphics(float dt)
         nitro_frac = fabsf(getSpeed()) / (m_kart_properties->getEngineMaxSpeed());
         // The speed of the kart can be higher (due to powerups) than
         // the normal maximum speed of the kart.
-        if(nitro_frac>1.0f) nitro_frac = 1.0f;
+        if(nitro_frac > 1.0f) nitro_frac = 1.0f;
     }
-    m_kart_gfx->updateNitroGraphics(nitro_frac, m_nitro_hack_ticks > 0);
+    bool active_nitro = getSpeedIncreaseTicksLeft(MaxSpeed::MS_INCREASE_NITRO) > 0;
+    m_kart_gfx->updateNitroGraphics(nitro_frac, m_nitro_hack_ticks > 0, active_nitro);
 
     // Handle leaning of karts
     // -----------------------

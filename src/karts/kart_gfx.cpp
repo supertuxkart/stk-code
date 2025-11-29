@@ -505,7 +505,7 @@ void KartGFX::update(float dt)
 /** Updates nitro dependent particle effects.
  *  \param nitro_frac Nitro fraction/
  */
-void KartGFX::updateNitroGraphics(float nitro_frac, bool isNitroHackOn)
+void KartGFX::updateNitroGraphics(float nitro_frac, bool isNitroHackOn, bool activeNitro)
 {
 #ifndef SERVER_ONLY
     if (GUIEngine::isNoGraphics())
@@ -514,7 +514,7 @@ void KartGFX::updateNitroGraphics(float nitro_frac, bool isNitroHackOn)
     // Upate particle effects (creation rate, and emitter size
     // depending on speed)
     // --------------------------------------------------------
-    if (nitro_frac > 0)
+    if (nitro_frac > 0) // There is an input to use nitro
     {
         if(isNitroHackOn)
         {
@@ -522,11 +522,6 @@ void KartGFX::updateNitroGraphics(float nitro_frac, bool isNitroHackOn)
             setCreationRateAbsolute(KartGFX::KGFX_NITRO2,      0);
             setCreationRateRelative(KartGFX::KGFX_NITROHACK1, nitro_frac);
             setCreationRateRelative(KartGFX::KGFX_NITROHACK2, nitro_frac);
-            if (supportsLight())
-            {
-                m_nitro_light->setVisible(false);
-                m_nitro_hack_light->setVisible(true);
-            }
         }
         else
         {
@@ -534,11 +529,6 @@ void KartGFX::updateNitroGraphics(float nitro_frac, bool isNitroHackOn)
             setCreationRateRelative(KartGFX::KGFX_NITRO2, nitro_frac);
             setCreationRateAbsolute(KartGFX::KGFX_NITROHACK1,  0);
             setCreationRateAbsolute(KartGFX::KGFX_NITROHACK2,  0);
-            if (supportsLight())
-            {
-                m_nitro_light->setVisible(true);
-                m_nitro_hack_light->setVisible(false);
-            }
         }
         setCreationRateRelative(KartGFX::KGFX_NITROSMOKE1, nitro_frac);
         setCreationRateRelative(KartGFX::KGFX_NITROSMOKE2, nitro_frac);
@@ -551,19 +541,20 @@ void KartGFX::updateNitroGraphics(float nitro_frac, bool isNitroHackOn)
         setCreationRateAbsolute(KartGFX::KGFX_NITROHACK2,  0);
         setCreationRateAbsolute(KartGFX::KGFX_NITROSMOKE1, 0);
         setCreationRateAbsolute(KartGFX::KGFX_NITROSMOKE2, 0);
-        
-        if (supportsLight())
-        {
-            m_nitro_light->setVisible(false);
-            m_nitro_hack_light->setVisible(false);
-        }
+    }
+    
+    // Add a colored light effect if the kart has an active nitro boost
+    if (supportsLight())
+    {
+        m_nitro_light->setVisible(activeNitro && !isNitroHackOn);
+        m_nitro_hack_light->setVisible(activeNitro && isNitroHackOn);
     }
     
     // Exhaust is always emitting
     setCreationRateRelative(KartGFX::KGFX_EXHAUST1, 1.0);
     setCreationRateRelative(KartGFX::KGFX_EXHAUST2, 1.0);
 #endif
-}  // updateGraphics
+}  // updateNitroGraphics
 
 // ----------------------------------------------------------------------------
 /** Updates the skiddng light (including disabling it).
