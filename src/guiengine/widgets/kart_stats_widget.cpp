@@ -116,8 +116,8 @@ void KartStatsWidget::setValues(const KartProperties* props, HandicapLevel h)
     speed_power_four *= speed_power_four; // squaring
     speed_power_four *= speed_power_four; // squaring again
     speed_power_four *= 0.001f; // divide by 1000 to improve readbility of the formula
-    setSkillValues(SKILL_SPEED,
-                   (speed_power_four - 100.0f) * 0.1924f,
+    float speed_composite = (speed_power_four - 100.0f) * 0.1924f;
+    setSkillValues(SKILL_SPEED, speed_composite,
                    "speed.png", "speed", _("Maximum speed"));
     
     // The acceleration depend on power and mass, and it changes depending on speed
@@ -135,22 +135,33 @@ void KartStatsWidget::setValues(const KartProperties* props, HandicapLevel h)
     // and the nitro bonus time from a minimum burst (with the extra duration)
     efficiency *= (kpc->getNitroMinBurst() + kpc->getNitroDuration())
                   / kpc->getNitroMinBurst();
+    // Magnify the differences
+    efficiency = (efficiency - 25.0f) * 1.333f;
     setSkillValues(SKILL_NITRO_EFFICIENCY, efficiency,
                    "nitro.png", "nitro", _("Nitro efficiency"));
 
-    // The base time for the skidding bonuses is 1, 2.7 and 4
+    // The base time for the skidding bonuses are 1, 2.7 and 4
     // The lower, the better. We add 4 times level 1, 2 times level 2 and 1 time level 3
     // to obtain an aggregate value.
     // We proceed similarly for the skid bonuses (4.0, 6.0, 8.0 by default)
     float aggregate_skid_time = 4 * kpc->getSkidTimeTillBonus()[0] +
                                 2 * kpc->getSkidTimeTillBonus()[1] +
                                     kpc->getSkidTimeTillBonus()[2];
+    aggregate_skid_time *= sqrtf(aggregate_skid_time);
 
     float aggregate_bonus_speed = 4 * kpc->getSkidBonusSpeed()[0] +
                                   2 * kpc->getSkidBonusSpeed()[1] +
                                       kpc->getSkidBonusSpeed()[2];
-    setSkillValues(SKILL_SKIDDING,
-                    (56.0f * aggregate_bonus_speed / aggregate_skid_time) - 90.0f,
+
+    // Lower turn radiuses make it easier to start and keep drifts going
+    float aggregate_turn_radius = kpc->getTurnRadius().get(kpc->getEngineMaxSpeed() - 5.0f) +
+                                  kpc->getTurnRadius().get(kpc->getEngineMaxSpeed())        +
+                                  kpc->getTurnRadius().get(kpc->getEngineMaxSpeed() + 5.0f);
+
+    float drift_composite = -30.0f + (1100.0f * aggregate_bonus_speed)
+                                     / (aggregate_skid_time * sqrtf(aggregate_turn_radius));
+
+    setSkillValues(SKILL_SKIDDING, drift_composite,
                    "android/drift.png", "skidding", _("Drifting bonuses"));
     
     RaceManager::get()->setDifficulty(previous_difficulty);
@@ -160,6 +171,9 @@ void KartStatsWidget::setValues(const KartProperties* props, HandicapLevel h)
 void KartStatsWidget::setSkillValues(Stats skill_type, float value, const std::string icon_name,
                                      const std::string skillbar_propID, const irr::core::stringw icon_tooltip)
 {
+    // Beautify the display by limiting the possibility of very close values
+    // that don't quite match in different skill bars.
+    value = 1.5f * std::round(value * 0.6667f);
     m_skills[skill_type]->setValue(value);
     m_skills[skill_type]->setIcon(irr::core::stringc(
             file_manager->getAsset(FileManager::GUI_ICON, icon_name).c_str()));    
