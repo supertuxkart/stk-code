@@ -95,6 +95,7 @@ void KartStatsWidget::setValues(const KartProperties* props, HandicapLevel h)
     RaceManager::get()->setDifficulty(RaceManager::DIFFICULTY_BEST);
     KartProperties kp_computed;
     kp_computed.copyForPlayer(props, h);
+    const AbstractCharacteristic* kpc = kp_computed.getCombinedCharacteristic();
     for (SkillLevelWidget* skills : m_skills)
         skills->setVisible(true);
 
@@ -103,8 +104,7 @@ void KartStatsWidget::setValues(const KartProperties* props, HandicapLevel h)
     // So values should be in the 0-99 range
 
     // The base mass is of 350 ; 250/2.78 ~= 90
-    setSkillValues(SKILL_MASS,
-                   (kp_computed.getCombinedCharacteristic()->getMass() - 100.0f)/2.78f,
+    setSkillValues(SKILL_MASS, (kpc->getMass() - 100.0f)/2.78f,
                    "mass.png", "mass", _("Mass"));
     
     // The base speed is of 28
@@ -112,7 +112,7 @@ void KartStatsWidget::setValues(const KartProperties* props, HandicapLevel h)
     // important to display the base differences between classes as significant,
     // as small differences matter a lot.
     // Therefore, a non-linear formula is used.
-    float speed_power_four = kp_computed.getCombinedCharacteristic()->getEngineMaxSpeed();
+    float speed_power_four = kpc->getEngineMaxSpeed();
     speed_power_four *= speed_power_four; // squaring
     speed_power_four *= speed_power_four; // squaring again
     speed_power_four *= 0.001f; // divide by 1000 to improve readbility of the formula
@@ -127,25 +127,28 @@ void KartStatsWidget::setValues(const KartProperties* props, HandicapLevel h)
                    kp_computed.getAccelerationEfficiency()*9.0f,
                    "power.png", "acceleration", _("Acceleration"));
 
-    // The base nitro consumption is 0.72, higher for heavier karts.
+    // The base nitro consumption is 1.17, lower for lighter karts.
     // The base max speed increase is 5, higher for lighter karts
-    // Nitro efficiency is hence computed as 13 * max_speed_increase / nitro_consumption
-    setSkillValues(SKILL_NITRO_EFFICIENCY,
-                    13.0f * kp_computed.getCombinedCharacteristic()->getNitroMaxSpeedIncrease()
-                          / kp_computed.getCombinedCharacteristic()->getNitroConsumption(),
+    float efficiency = 7.0f * kpc->getNitroMaxSpeedIncrease()
+                            / kpc->getNitroConsumption();
+    // We also take into account the ratio between the minimum burst duration
+    // and the nitro bonus time from a minimum burst (with the extra duration)
+    efficiency *= (kpc->getNitroMinBurst() + kpc->getNitroDuration())
+                  / kpc->getNitroMinBurst();
+    setSkillValues(SKILL_NITRO_EFFICIENCY, efficiency,
                    "nitro.png", "nitro", _("Nitro efficiency"));
 
     // The base time for the skidding bonuses is 1, 2.7 and 4
     // The lower, the better. We add 4 times level 1, 2 times level 2 and 1 time level 3
     // to obtain an aggregate value.
     // We proceed similarly for the skid bonuses (4.0, 6.0, 8.0 by default)
-    float aggregate_skid_time = 4 * kp_computed.getCombinedCharacteristic()->getSkidTimeTillBonus()[0] +
-                                2 * kp_computed.getCombinedCharacteristic()->getSkidTimeTillBonus()[1] +
-                                    kp_computed.getCombinedCharacteristic()->getSkidTimeTillBonus()[2];
+    float aggregate_skid_time = 4 * kpc->getSkidTimeTillBonus()[0] +
+                                2 * kpc->getSkidTimeTillBonus()[1] +
+                                    kpc->getSkidTimeTillBonus()[2];
 
-    float aggregate_bonus_speed = 4 * kp_computed.getCombinedCharacteristic()->getSkidBonusSpeed()[0] +
-                                  2 * kp_computed.getCombinedCharacteristic()->getSkidBonusSpeed()[1] +
-                                      kp_computed.getCombinedCharacteristic()->getSkidBonusSpeed()[2];
+    float aggregate_bonus_speed = 4 * kpc->getSkidBonusSpeed()[0] +
+                                  2 * kpc->getSkidBonusSpeed()[1] +
+                                      kpc->getSkidBonusSpeed()[2];
     setSkillValues(SKILL_SKIDDING,
                     (56.0f * aggregate_bonus_speed / aggregate_skid_time) - 90.0f,
                    "android/drift.png", "skidding", _("Drifting bonuses"));
