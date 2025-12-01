@@ -725,7 +725,9 @@ void cmdLineHelp()
     "       --anisotropic=n     Anisotropic filtering quality (0 to disable).\n"
     "                           Takes precedence over trilinear or bilinear texture filtering.\n"
     "       --shadows=n         Set resolution of shadows (0 to disable).\n"
-    "       --geometry-level=n  Sets the LoD distances. Supported values range from 0 to 5."
+    "       --geometry-level=n  Sets the LoD distances. Supported values range from 0 to 5.\n"
+    "       --rtt-scale=n       Sets the render resolution as a percentage of the base resolution.\n"
+    "                           Only works if dynamic lights are active."
     "       --render-driver=n   Render driver to use (gl or directx9).\n"
     "       --disable-addon-karts Disable loading of addon karts.\n"
     "       --disable-addon-tracks Disable loading of addon tracks.\n"
@@ -1053,6 +1055,8 @@ int handleCmdLinePreliminary()
         UserConfigParams::m_anisotropic = n;
     if (CommandLine::has("--geometry-level", &n))
         UserConfigParams::m_geometry_level = n;
+    if (CommandLine::has("--rtt-scale", &n))
+        UserConfigParams::m_scale_rtts_factor = ((float) n) / 100.0f;
 
     // Enable loading grand prix from local directory
     if(CommandLine::has("--add-gp-dir", &s))
