@@ -364,8 +364,7 @@ void OptionsScreenVideo::updateTooltip()
     int quality = getImageQuality();
     tooltip = tooltip + L"\n" + _("Rendered image quality: %s",
         quality == 0 ? very_low :
-        quality == 1 ? low      :
-        quality == 2 ? medium   : high);
+        quality == 1 ? low      : high);
 
     //I18N: in graphical options
     int geometry_detail = UserConfigParams::m_geometry_level;

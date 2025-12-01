@@ -68,7 +68,7 @@ namespace GraphicalPresets
         ({
             true /* light */, 512 /* shadow */, true /* bloom */, true /* lightshaft */,
             true /* glow */, true /* mlaa */, false /* ssao */, true /* light scatter */,
-            true /* animatedCharacters */, 2 /* particles */, 3 /* image_quality */,
+            true /* animatedCharacters */, 2 /* particles */, 2 /* image_quality */,
             false /* degraded IBL */, 3 /* Geometry Detail */, false /* PCSS */, true /* ssr */
         });
     
@@ -76,7 +76,7 @@ namespace GraphicalPresets
         ({
             true /* light */, 1024 /* shadow */, true /* bloom */, true /* lightshaft */,
             true /* glow */, true /* mlaa */, true /* ssao */, true /* light scatter */,
-            true /* animatedCharacters */, 2 /* particles */, 3 /* image_quality */,
+            true /* animatedCharacters */, 2 /* particles */, 2 /* image_quality */,
             false /* degraded IBL */, 4 /* Geometry Detail */, false /* PCSS */, true /* ssr */
         });
     
@@ -84,7 +84,7 @@ namespace GraphicalPresets
         ({
             true /* light */, 2048 /* shadow */, true /* bloom */, true /* lightshaft */,
             true /* glow */, true /* mlaa */, true /* ssao */, true /* light scatter */,
-            true /* animatedCharacters */, 2 /* particles */, 3 /* image_quality */,
+            true /* animatedCharacters */, 2 /* particles */, 2 /* image_quality */,
             false /* degraded IBL */, 5 /* Geometry Detail */, true /* PCSS */, true /* ssr */
         });
     
@@ -189,12 +189,8 @@ namespace GraphicalPresets
             return 1;
         if (UserConfigParams::m_anisotropic == 16 &&
             (UserConfigParams::m_high_definition_textures & 0x01) == 0x01 &&
-            UserConfigParams::m_hq_mipmap == false)
-            return 2;
-        if (UserConfigParams::m_anisotropic == 16 &&
-            (UserConfigParams::m_high_definition_textures & 0x01) == 0x01 &&
             UserConfigParams::m_hq_mipmap == true)
-            return 3;
+            return 2;
         return 1;
     }   // getImageQuality
 
@@ -203,9 +199,9 @@ namespace GraphicalPresets
     * It does NOT ensure that the new parameters are properly applied. */
     void setImageQuality(int quality)
     {
-        assert (quality >= 0 && quality <= 3);
+        assert (quality >= 0 && quality <= 2);
         UserConfigParams::m_anisotropic              = (quality >= 1) ? 16   : 4;
         UserConfigParams::m_high_definition_textures = (quality >= 2) ? 0x03 : 0x02;
-        UserConfigParams::m_hq_mipmap                = (quality >= 3) ? true : false;
+        UserConfigParams::m_hq_mipmap                = (quality >= 2) ? true : false;
     }   // setImageQuality
 }   // GraphicalPresets
