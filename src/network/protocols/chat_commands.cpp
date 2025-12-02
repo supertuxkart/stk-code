@@ -72,6 +72,8 @@ namespace ChatCommands
             case CA_UNKNOWN:
                 return _("Unknown command: %s. Use /help to list the available commands",
                         StringUtils::utf8ToWide(args));
+
+            // Start of the help commands
             case CA_HELP_HELP:
                 return _("To see the usage format of a command, "
                 "use /help [command], for example '/help mute' gives "
@@ -81,64 +83,48 @@ namespace ChatCommands
                 "/spectate /listserveraddon /playerhasaddon /serverhasaddon "
                 "/playeraddonscore /kick /mute /unmute /listmute");
             case CA_HELP_SPECTATE_EXTRA:
-                msg = _("This command allows to enable or disable spectator mode.");
-                break;
+                return _("This command allows to enable or disable spectator mode.");
             case CA_HELP_SPECTATE:
-                msg = _("Usage: /spectate [0 or 1], before the game starts");
-                break;
+                return _("Usage: /spectate [0 or 1], before the game starts");
             case CA_HELP_LISTADDONS_EXTRA:
-                msg = _("This command allows to find all addons available on this server "
+                return _("This command allows to find all addons available on this server "
                         "that contain the searched string in their name.");
-                break;
             case CA_HELP_LISTADDONS:
-                msg = _("Usage: /listserveraddon [option] [addon string to find "
+                return _("Usage: /listserveraddon [option] [addon string to find "
                         "(at least 3 characters)]. Available options: "
                         "-track, -arena, -kart, -soccer.");
-                break;
             case CA_HELP_PLAYER_HAS_ADDON_EXTRA:
-                msg = _("This command allows to check if a player has a specific addon.");
-                break;
+                return _("This command allows to check if a player has a specific addon.");
             case CA_HELP_PLAYER_HAS_ADDON:
-                msg = _("Usage: /playerhasaddon [addon_identity] [player name]");
-                break;
+                return _("Usage: /playerhasaddon [addon_identity] [player name]");
             case CA_HELP_SERVER_HAS_ADDON_EXTRA:
-                msg = _("This command allows to check if the server has a specific addon.");
-                break;
+                return _("This command allows to check if the server has a specific addon.");
             case CA_HELP_SERVER_HAS_ADDON:
-                msg = _("Usage: /serverhasaddon [addon_identity]");
-                break;
+                return _("Usage: /serverhasaddon [addon_identity]");
             case CA_HELP_ADDON_SCORE_EXTRA:
-                msg = _("This command tells what share of the addons available "
+                return _("This command tells what share of the addons available "
                         "in this server a player has installed.");
-                break;
             case CA_HELP_ADDON_SCORE:
-                msg = _("Usage: /playeraddonscore [player name]");
-                break;
+                return _("Usage: /playeraddonscore [player name]");
             case CA_HELP_KICK_EXTRA:
-                msg = _("This command kicks the named player out of the server, "
+                return _("This command kicks the named player out of the server, "
                         "if you have the rights to do so.");
-                break;
             case CA_HELP_KICK:
-                msg = _("Usage: /kick [player name]");
-                break;
+                return _("Usage: /kick [player name]");
             case CA_HELP_MUTE_EXTRA:
-                msg = _("This command prevents you from seeing chat messages from the selected player.");
-                break;
+                return _("This command prevents you from seeing chat messages from the selected player.");
             case CA_HELP_MUTE:
-                msg = _("Usage: /mute player_name (not including yourself)");
-                break;
+                return _("Usage: /mute player_name (not including yourself)");
             case CA_HELP_UNMUTE_EXTRA:
-                msg = _("This command enables reading chat messages from a previously muted player.");
-                break;
+                return _("This command enables reading chat messages from a previously muted player.");
             case CA_HELP_UNMUTE:
-                msg = _("Usage: /unmute player_name");
-                break;
+                return _("Usage: /unmute player_name");
             case CA_HELP_LISTMUTE_EXTRA:
-                msg = _("This command gives you the list of all players you have muted.");
-                break;
+                return _("This command gives you the list of all players you have muted.");
             case CA_HELP_LISTMUTE:
-                msg = _("Usage: /listmute");
-                break;
+                return _("Usage: /listmute");
+            // End of the help commands
+
             case CA_SPECTATE_UNAVAILABLE:
                 return _("Spectating is not possible on this server.");
             case CA_SPECTATE_GUI_HOST:
@@ -204,7 +190,7 @@ namespace ChatCommands
                         "You have muted the following players: %s",
                         /* to pick the plural form */ argv.size(), StringUtils::utf8ToWide(args));
             default:
-                msg = _("Unknown command answer! The server is probably misconfigured.");
+                return _("Unknown command answer! The server is probably misconfigured.");
         }
         return msg;
     }   // getAnswerString
@@ -266,28 +252,7 @@ namespace ChatCommands
             return;
         }
 
-        // TODO : simplify this code
-        if (cmd_name == "spectate")
-            answerCommand(CA_HELP_SPECTATE, peer);
-        else if (cmd_name == "listserveraddon")
-            answerCommand(CA_HELP_LISTADDONS, peer);
-        else if (cmd_name == "playerhasaddon")
-            answerCommand(CA_HELP_PLAYER_HAS_ADDON, peer);
-        else if (cmd_name == "serverhasaddon")
-            answerCommand(CA_HELP_SERVER_HAS_ADDON, peer);
-        else if (cmd_name == "playeraddonscore")
-            answerCommand(CA_HELP_ADDON_SCORE, peer);
-        else if (cmd_name == "kick")
-            answerCommand(CA_HELP_KICK, peer);
-        else if (cmd_name == "mute")
-            answerCommand(CA_HELP_MUTE, peer);
-        else if (cmd_name == "unmute")
-            answerCommand(CA_HELP_UNMUTE, peer);
-        else if (cmd_name == "listmute")
-            answerCommand(CA_HELP_LISTMUTE, peer);
-        else
-            answerCommand(CA_UNKNOWN, peer, cmd_name);
-
+        // These messages explain the purpose of the command
         if (extra_info)
         {
             if (cmd_name == "spectate")
@@ -309,6 +274,28 @@ namespace ChatCommands
             else if (cmd_name == "listmute")
                 answerCommand(CA_HELP_LISTMUTE_EXTRA, peer);
         }
+
+        // These messages explain the format to use the command
+        if (cmd_name == "spectate")
+            answerCommand(CA_HELP_SPECTATE, peer);
+        else if (cmd_name == "listserveraddon")
+            answerCommand(CA_HELP_LISTADDONS, peer);
+        else if (cmd_name == "playerhasaddon")
+            answerCommand(CA_HELP_PLAYER_HAS_ADDON, peer);
+        else if (cmd_name == "serverhasaddon")
+            answerCommand(CA_HELP_SERVER_HAS_ADDON, peer);
+        else if (cmd_name == "playeraddonscore")
+            answerCommand(CA_HELP_ADDON_SCORE, peer);
+        else if (cmd_name == "kick")
+            answerCommand(CA_HELP_KICK, peer);
+        else if (cmd_name == "mute")
+            answerCommand(CA_HELP_MUTE, peer);
+        else if (cmd_name == "unmute")
+            answerCommand(CA_HELP_UNMUTE, peer);
+        else if (cmd_name == "listmute")
+            answerCommand(CA_HELP_LISTMUTE, peer);
+        else
+            answerCommand(CA_UNKNOWN, peer, cmd_name);
     } // helpMessage
 
     // ----------------------------------------------------------------------------------------
