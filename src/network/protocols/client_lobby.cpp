@@ -46,6 +46,7 @@
 #include "network/network_player_profile.hpp"
 #include "network/network_timer_synchronizer.hpp"
 #include "network/peer_vote.hpp"
+#include "network/protocols/chat_commands.hpp"
 #include "network/protocols/connect_to_server.hpp"
 #include "network/protocols/game_protocol.hpp"
 #include "network/protocols/game_events_protocol.hpp"
@@ -204,6 +205,7 @@ bool ClientLobby::notifyEvent(Event* event)
         case LE_BACK_LOBBY:            backToLobby(event);         break;
         case LE_UPDATE_PLAYER_LIST:    updatePlayerList(event);    break;
         case LE_CHAT:                  handleChat(event);          break;
+        case LE_COMMAND_ANSWER:        handleChat(event, true);    break;
         case LE_CONNECTION_ACCEPTED:   connectionAccepted(event);  break;
         case LE_SERVER_INFO:           handleServerInfo(event);    break;
         case LE_PLAYER_DISCONNECTED :  disconnectedPlayer(event);  break;
@@ -934,13 +936,26 @@ void ClientLobby::becomingServerOwner()
 }   // becomingServerOwner
 
 //-----------------------------------------------------------------------------
-void ClientLobby::handleChat(Event* event)
+void ClientLobby::handleChat(Event* event, bool command_answer)
 {
     if (!UserConfigParams::m_lobby_chat)
         return;
     SFXManager::get()->quickSound("plopp");
     core::stringw message;
-    event->data().decodeString16(&message);
+
+    if (command_answer)
+    {
+        ChatCommands::CommandAnswers command_id =
+            (ChatCommands::CommandAnswers)event->data().getUInt16();
+        event->data().decodeString16(&message);
+        std::string args = StringUtils::wideToUtf8(message);
+        message = ChatCommands::getAnswerString(command_id, args);
+    }
+    else
+    {
+        event->data().decodeString16(&message);
+    }
+
     Log::info("ClientLobby", "%s", StringUtils::wideToUtf8(message).c_str());
     if (GUIEngine::isNoGraphics())
         return;

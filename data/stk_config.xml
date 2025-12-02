@@ -584,5 +584,6 @@
       <capabilities name="ranking_changes"/>
       <capabilities name="real_addon_karts"/>
       <capabilities name="aes_gcm_128bit_tag"/>
+      <capabilities name="command_messages"/>
   </network-capabilities>
 </config>

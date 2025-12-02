@@ -31,15 +31,32 @@
 namespace ChatCommands
 {
     // ----------------------------------------------------------------------------------------
-    /* This function answers a player's chat command. */
+    /* This function answers a player's chat command. It supports 2 types of answers:
+    * - Sending a command ID with arguments, for standard commands. This allows
+    *   to support localization of answer messages without client-side string-analysis.
+    * - Sending the answer as a normal chat message. This is used with compatibilities
+    *   for older clients and for custom commands (i.e. for servers using custom commands) */
     void answerCommand(CommandAnswers command_id, std::shared_ptr<STKPeer> peer, std::string args)
     {
-        NetworkString* chat = ProtocolUtils::getNetworkString(ProtocolType::PROTOCOL_LOBBY_ROOM);
-        chat->addUInt8(LobbyProtocol::LE_CHAT);
-        chat->setSynchronous(true);
-        chat->encodeString16(getAnswerString(command_id, args));
-        peer->sendPacket(chat, true/*reliable*/);
-        delete chat;
+        NetworkString* answer = ProtocolUtils::getNetworkString(ProtocolType::PROTOCOL_LOBBY_ROOM);
+
+        if (command_id != CA_CHAT &&
+            peer->getClientCapabilities().find("command_messages") !=
+            peer->getClientCapabilities().end())
+        {
+            answer->addUInt8(LobbyProtocol::LE_COMMAND_ANSWER);
+            answer->addUInt16((uint16_t) command_id);
+            answer->setSynchronous(true);
+            answer->encodeString16(StringUtils::utf8ToWide(args));
+        }
+        else
+        {
+            answer->addUInt8(LobbyProtocol::LE_CHAT);
+            answer->setSynchronous(true);
+            answer->encodeString16(getAnswerString(command_id, args));
+        }
+        peer->sendPacket(answer, true/*reliable*/);
+        delete answer;
     }   // answerCommand
 
     // ----------------------------------------------------------------------------------------

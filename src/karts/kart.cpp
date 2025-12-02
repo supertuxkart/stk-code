@@ -84,7 +84,7 @@
 #include "tracks/track_sector.hpp"
 #include "utils/constants.hpp"
 #include "utils/helpers.hpp"
-#include "utils/log.hpp" //TODO: remove after debugging is done
+#include "utils/log.hpp"
 #include "utils/profiler.hpp"
 #include "utils/string_utils.hpp"
 #include "utils/translation.hpp"
