@@ -42,9 +42,12 @@
 #  define _(String, ...)        (StringUtils::insertValues(translations->STK_GETTEXT(String), ##__VA_ARGS__))
 #undef _C
 #undef _P
+// Allows to use different translations for the same string in different contexts
 #  define _C(Ctx, String, ...)  (StringUtils::insertValues(translations->STK_GETTEXT(String, Ctx), ##__VA_ARGS__))
-#  define _P(Singular, Plural, Num, ...) (StringUtils::insertValues(translations->STK_NGETTEXT(Singular, Plural, Num), Num, ##__VA_ARGS__))
-#  define _CP(Ctx, Singular, Plural, Num, ...) (StringUtils::insertValues(translations->STK_NGETTEXT(Singular, Plural, Num, Ctx), Num, ##__VA_ARGS__))
+// Allows to use different plural forms based on the number of things being talked about
+#  define _P(Singular, Plural, Num, ...) (StringUtils::insertValues(translations->STK_NGETTEXT(Singular, Plural, Num), ##__VA_ARGS__))
+// Allows to combine contextual translation and plural forms
+#  define _CP(Ctx, Singular, Plural, Num, ...) (StringUtils::insertValues(translations->STK_NGETTEXT(Singular, Plural, Num, Ctx), ##__VA_ARGS__))
 #  define gettext_noop(String)  (String)
 #  define N_(String)            (gettext_noop (String))
 // libintl defines its own fprintf, which doesn't work properly

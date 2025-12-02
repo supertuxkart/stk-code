@@ -403,7 +403,7 @@ void WiimoteManager::WiimoteDialogListener::onConfirm()
     if(nb_wiimotes > 0)
     {
         new MessageDialog(_P("Found %d wiimote", "Found %d wiimotes",
-                             nb_wiimotes));
+            /* to pick the plural form */ nb_wiimotes, /* to insert in the final string */ nb_wiimotes));
     }
     else
     {
