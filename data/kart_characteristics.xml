@@ -92,7 +92,7 @@
                 serve as reference points for the radius array (otherwise, values
                 outside of the defined bounds will also be affected), and it is
                 crucial to ensure that speed-factor-partial-ub divided by the highest
-                possible speed-factor (with default speed-factor settings 1.4336)
+                possible speed-factor (with default speed-factor settings 1.4112)
                 is higher than speed-factor-partial-lb, preferrably significantly
                 so to avoid small speed increases having a strong effect on turn
                 radius.
@@ -395,40 +395,45 @@
         <characteristic name="easy">
             <engine power="*0.75" max-speed="*0.625" generic-max-speed="*0.625" 
                     max-speed-reverse-ratio="0.58"/>
-            <zipper max-speed-increase="*0.625" />
+            <zipper force="*0.75" max-speed-increase="*0.625" />
             <rescue duration="*1.2" />
-            <nitro engine-force="*0.8" consumption="*0.7" max-speed-increase="*0.7" />
-            <skid bonus-speed="*0.45 *0.383 *0.35" bonus-force="*0.45 *0.383 *0.35" />
-            <turn time-full-steer="0:0.16 0.3:0.16 0.3:0.25 0.6:0.25 0.6:0.37 1.0:0.37" 
+            <nitro engine-force="*0.75" consumption="*0.75" max-speed-increase="*0.75" />
+            <skid time-till-bonus="*1.0 *1.15 *1.225" bonus-time="*1.225 *1.225 *1.0"
+                  bonus-speed="*0.45 *0.383 *0.35" bonus-force="*0.57 *0.503 *0.47" />
+            <turn time-full-steer="0:0.14 0.3:0.14 0.3:0.22 0.6:0.22 0.6:0.32 1.0:0.32" 
                   speed-factor="*1.26" />
             <plunger in-face-time="3" />
         </characteristic>
         <characteristic name="casual">
-            <engine power="*0.82" max-speed="*0.75" generic-max-speed="*0.75"
-                    max-speed-reverse-ratio="0.535"/>
-            <zipper max-speed-increase="*0.8" />
+            <engine power="*0.82" max-speed="*0.7375" generic-max-speed="*0.7375"
+                    max-speed-reverse-ratio="0.5425"/>
+            <zipper force="*0.82" max-speed-increase="*0.7375" />
             <rescue duration="*1.2" />
-            <nitro engine-force="*0.83" consumption="*0.78" max-speed-increase="*0.78" />
-            <skid bonus-speed="*0.6 *0.533 *0.5" bonus-force="*0.6 *0.533 *0.5" />
-            <turn time-full-steer="0:0.13 0.3:0.13 0.3:0.2 0.6:0.2 0.6:0.3 1.0:0.3" 
-                  speed-factor="*1.15" />
+            <nitro engine-force="*0.82" consumption="*0.82" max-speed-increase="*0.82" />
+            <skid time-till-bonus="*1.0 *1.1 *1.15" bonus-time="*1.15 *1.15 *1.0"
+                  bonus-speed="*0.62 *0.553 *0.52" bonus-force="*0.7 *0.633 *0.6" />
+            <turn time-full-steer="0:0.12 0.3:0.12 0.3:0.18 0.6:0.18 0.6:0.26 1.0:0.26" 
+                  speed-factor="*1.16" />
             <plunger in-face-time="3.5" />
         </characteristic>
         <characteristic name="medium">
-            <engine power="*0.88" max-speed="*0.85" generic-max-speed="*0.85"
-                    max-speed-reverse-ratio="0.5"/>
+            <engine power="*0.88" max-speed="*0.8375" generic-max-speed="*0.8375"
+                    max-speed-reverse-ratio="0.5075"/>
+            <zipper force="*0.88" max-speed-increase="*0.8375" />
             <rescue duration="*1.2" />
-            <nitro engine-force="*0.88" consumption="*0.85" max-speed-increase="*0.85" />
-            <skid bonus-speed="*0.8 *0.733 *0.7" bonus-force="*0.8 *0.733 *0.7" />
-            <turn speed-factor="*1.08" />
+            <nitro engine-force="*0.88" consumption="*0.88" max-speed-increase="*0.88" />
+            <skid time-till-bonus="*1.0 *1.05 *1.075" bonus-time="*1.075 *1.075 *1.0"
+                  bonus-speed="*0.8 *0.733 *0.7" bonus-force="*0.84 *0.773 *0.74" />
+            <turn speed-factor="*1.09" />
             <plunger in-face-time="4" />
         </characteristic>
         <characteristic name="hard">
-            <engine power="*0.95" max-speed="*0.95" generic-max-speed="*0.95" 
-                    max-speed-reverse-ratio="0.465"/>
-            <nitro engine-force="*0.95" consumption="*0.95" max-speed-increase="*0.95" />
-            <skid bonus-speed="*0.95 *0.95 *0.95" bonus-force="*0.95 *0.95 *0.95" />
-            <turn speed-factor="*1.02" />
+            <engine power="*0.94" max-speed="*0.9375" generic-max-speed="*0.9375" 
+                    max-speed-reverse-ratio="0.475"/>
+            <zipper force="*0.94" max-speed-increase="*0.9375" />
+            <nitro engine-force="*0.94" consumption="*0.94" max-speed-increase="*0.94" />
+            <skid bonus-speed="*0.9375 *0.9375 *0.9375" bonus-force="*0.94 *0.94 *0.94" />
+            <turn speed-factor="*1.03" />
         </characteristic>
         <!-- This doesn't need to be changed because the most fast/heavy/extreme
             values should also be the default ones. -->
