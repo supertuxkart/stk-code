@@ -456,27 +456,26 @@
             <explosion duration="*1" radius="*1" />
             <nitro engine-force="*0.72" consumption="*0.72" max-speed-increase="*1.3"
                    min-burst="*1.2" />
-            <slipstream length="*0.9" collect-time="*0.9"
-                        duration-factor="*1" fade-out-time="*1" />
+            <slipstream length="*0.9" collect-time="*0.9" duration-factor="*1" />
             <parachute lbound-fraction="0.35" ubound-fraction="0.2" />
         </characteristic>
         <characteristic name="medium-h">
-            <suspension stiffness="*0.75" />
+            <suspension stiffness="*0.7" />
             <turn radius="0:3.15 4:3.78 8:5.25 12:7.807 16:11.076 22:16.2 30:23.22 50:41.256" />
-            <engine power="*0.875" max-speed="*0.927"
+            <engine power="*0.817" max-speed="*0.927"
                     max-speed-reverse-ratio="*1.075"/>
             <gear switch-ratio="0.1 0.25 0.45 0.7 1 4"
                   power-increase="2.27 1.84 1.58 1.37 1.18 1"
                   reverse-power="4.25"/>
-            <mass value="*0.75" />
-            <skid reduce-turn-min="0.2" reduce-turn-max="0.895" bonus-force="*0.875 *0.875 *0.875" 
+            <mass value="*0.7" />
+            <skid reduce-turn-min="0.2" reduce-turn-max="0.895" bonus-force="*0.817 *0.817 *0.817" 
                   time-till-bonus="*0.9 *0.9 *0.9" />
             <startup boost="*0.875 *0.875" />
-            <explosion duration="*0.8" radius="*0.85" />
-            <nitro engine-force="*0.825" consumption="*0.825" max-speed-increase="*1.15"
-                   min-burst="*1.1" />
-            <slipstream duration-factor="*0.8" fade-out-time="*1" />
-            <parachute lbound-fraction="0.45" ubound-fraction="0.275" />
+            <explosion duration="*0.867" radius="*0.9" />
+            <nitro engine-force="*0.735" consumption="*0.735" max-speed-increase="*1.075"
+                   min-burst="*1.235" />
+            <slipstream length="*0.967" collect-time="*0.967" duration-factor="*0.867" />
+            <parachute lbound-fraction="0.4167" ubound-fraction="0.25" />
         </characteristic>
         <characteristic name="medium">
             <suspension stiffness="*0.75" />
@@ -492,7 +491,7 @@
             <explosion duration="*0.8" radius="*0.85" />
             <nitro engine-force="*0.825" consumption="*0.825" max-speed-increase="*1.15"
                    min-burst="*1.1" />
-            <slipstream duration-factor="*0.8" fade-out-time="*1" />
+            <slipstream duration-factor="*0.8" />
             <parachute lbound-fraction="0.45" ubound-fraction="0.275" />
         </characteristic>
         <characteristic name="heavy">
@@ -508,8 +507,7 @@
             <startup boost="*0.8 *0.8" />
             <explosion duration="*0.6" radius="*0.7" />
             <nitro engine-force="*1" consumption="*1" max-speed-increase="*1.0" />
-            <slipstream length="*1.1" collect-time="*1.1"
-                   duration-factor="*0.6" fade-out-time="*1" />
+            <slipstream length="*1.1" collect-time="*1.1" duration-factor="*0.6"/>
             <parachute lbound-fraction="0.55" ubound-fraction="0.35" />
         </characteristic>
     </kart-types>
