@@ -71,7 +71,7 @@ namespace GUIEngine
 
         std::vector<SkillLevelWidget*> m_skills;
 
-        void setSkillValues(Stats skill_type, float value, const std::string icon_name,
+        float setSkillValues(Stats skill_type, float value, const std::string icon_name,
                             const std::string skillbar_propID, const irr::core::stringw icon_tooltip);
 
 
