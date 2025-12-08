@@ -305,13 +305,26 @@ void OptionsScreenVideo::updateTooltip()
                                                    _("Dynamic lights: Disabled");
     //I18N: in the graphical options
     if (UserConfigParams::m_shadows_resolution == 0)
+    {
         tooltip = tooltip + L"\n" + _("Shadows: %s", _C("Shadows", "Disabled"));
+        tooltip = tooltip + L"\n" + _("Soft shadows: Disabled");
+    }
     else
+    {
         tooltip = tooltip + L"\n" + _("Shadows: %i", UserConfigParams::m_shadows_resolution);
+        tooltip = tooltip + L"\n" + 
+            (UserConfigParams::m_pcss ?  _("Soft shadows: Enabled") :
+                                         _("Soft shadows: Disabled"));
+    }
+
     //I18N: in the graphical options
     tooltip = tooltip + L"\n" + 
         (UserConfigParams::m_mlaa ? _("Anti-aliasing: Enabled") :
                                     _("Anti-aliasing: Disabled"));
+    //I18N: in the graphical options
+    tooltip = tooltip + L"\n" +
+        (!UserConfigParams::m_degraded_IBL ? _("Image-based lighting: Enabled") :
+                                             _("Image-based lighting: Disabled"));
     //I18N: in the graphical options
     tooltip = tooltip + L"\n" +
         (UserConfigParams::m_light_scatter ? _("Light scattering: Enabled") :

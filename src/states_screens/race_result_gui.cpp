@@ -2355,20 +2355,24 @@ void RaceResultGUI::displayBenchmarkSummary()
     font = GUIEngine::getFont();
     rect = font->getDimension(title_text.c_str());
 
-    core::stringw info_text[9];
+    core::stringw info_text[11];
     core::stringw value = StringUtils::toWString(
         StringUtils::timeToString(float(profiler.getTotalFrametime())/1000000.0f, 2, true));
-    info_text[0] = _("Test duration: %s",     value);
+    info_text[0] = _("Test duration: %s",         value);
     value = StringUtils::toWString(profiler.getTotalFrames());
-    info_text[1] = _("Number of frames: %s",  value);
+    info_text[1] = _("Number of frames: %s",      value);
+    value = StringUtils::toWString(UserConfigParams::m_real_width);
+    info_text[2] = _("Horizontal resolution: %s", value);
+    value = StringUtils::toWString(UserConfigParams::m_real_height);
+    info_text[3] = _("Vertical resolution: %s",   value);
     value = StringUtils::toWString(profiler.getFPSMetricsLow());
-    info_text[2] = _("Steady FPS: %s",        value);
+    info_text[4] = _("Steady FPS: %s",            value);
     value = StringUtils::toWString(profiler.getFPSMetricsMid());
-    info_text[3] = _("Mostly Steady FPS: %s", value); // TODO - better name
+    info_text[5] = _("Mostly Steady FPS: %s",     value); // TODO - better name
     value = StringUtils::toWString(profiler.getFPSMetricsHigh());
-    info_text[4] = _("Typical FPS: %s",       value);
+    info_text[6] = _("Typical FPS: %s",           value);
 
-    for (int i=0; i<5; i++)
+    for (int i=0; i<7; i++)
     {
         pos = core::rect<s32>(current_x, current_y, current_x, current_y);
         font->draw(info_text[i].c_str(), pos, white_color, true, false);
@@ -2388,31 +2392,42 @@ void RaceResultGUI::displayBenchmarkSummary()
     bool modern_gl = gl && !UserConfigParams::m_force_legacy_device;
     bool directx = (std::string(UserConfigParams::m_render_driver) == "directx9");
 
-    value = StringUtils::toWString(UserConfigParams::m_real_width);
-    info_text[0] = _("Horizontal resolution: %s",     value);
-    value = StringUtils::toWString(UserConfigParams::m_real_height);
-    info_text[1] = _("Vertical resolution: %s",  value);
-    info_text[2] = (UserConfigParams::m_dynamic_lights && (modern_gl || vk)) ? _("Dynamic lighting: ON")
-                                                                             : _("Dynamic lighting: OFF");
     value = StringUtils::toWString((UserConfigParams::m_dynamic_lights && (modern_gl || vk)) ?
                           UserConfigParams::m_scale_rtts_factor * 100 : 100);
-    info_text[3] = _("Render resolution: %s%%", value);
-    info_text[4] = (UserConfigParams::m_mlaa && modern_gl) ? _("Anti-aliasing: ON")
-                                                           : _("Anti-aliasing : OFF");
-    info_text[5] = (UserConfigParams::m_degraded_IBL && (modern_gl || vk)) ? _("Image-based lighting: OFF")
-                                                                           :  _("Image-based lighting: ON");
-    info_text[6] = (UserConfigParams::m_ssao && modern_gl) ? _("Ambient occlusion: ON")
-                                                           : _("Ambient occlusion: OFF");
+    info_text[0] = _("Render resolution: %s%%", value);
+    info_text[1] = (UserConfigParams::m_dynamic_lights && (modern_gl || vk)) ? _("Dynamic lights: Enabled") :
+                                                                               _("Dynamic lights: Disabled");
+    info_text[2] = (!UserConfigParams::m_degraded_IBL && (modern_gl || vk)) ? _("Image-based lighting: Enabled") :
+                                                                              _("Image-based lighting: Disabled");
+    info_text[3] = (UserConfigParams::m_mlaa && modern_gl) ? _("Anti-aliasing: Enabled") :
+                                                             _("Anti-aliasing: Disabled");
+    int geometry_detail = UserConfigParams::m_geometry_level;
+    info_text[4] = _("Geometry detail: %s",
+        geometry_detail == 0 ? _C("Geometry level", "Very low")  :
+        geometry_detail == 1 ? _C("Geometry level", "Low")       :
+        geometry_detail == 2 ? _C("Geometry level", "Medium")    :
+        geometry_detail == 3 ? _C("Geometry level", "High")      :
+        geometry_detail == 4 ? _C("Geometry level", "Very high") :
+                               _C("Geometry level", "Ultra high"));
+    info_text[5] = (UserConfigParams::m_light_shaft && modern_gl) ? _("Light shaft (God rays): Enabled") :
+                                                                    _("Light shaft (God rays): Disabled");
+    info_text[6] = (UserConfigParams::m_ssao && modern_gl) ?  _("Ambient occlusion: Enabled") :
+                                                              _("Ambient occlusion: Disabled");
     value = StringUtils::toWString(UserConfigParams::m_shadows_resolution);
     value = modern_gl ? value : StringUtils::toWString("0");
     info_text[7] = _("Shadow resolution: %s", value);
+    bool has_pcss = (UserConfigParams::m_shadows_resolution > 0 && UserConfigParams::m_pcss && modern_gl);
+    info_text[8] = has_pcss ? _("Soft shadows: Enabled") :
+                              _("Soft shadows: Disabled");
+    info_text[9] = UserConfigParams::m_dof ? _("Depth of field: Enabled") :
+                                              _("Depth of field: Disabled");
     value = vk        ? StringUtils::toWString("Vulkan")    :
-            modern_gl ? StringUtils::toWString("OpenGL")    :
-            gl        ? StringUtils::toWString("OpenGL 2")  : 
+            modern_gl ? _("OpenGL (modern)")                :
+            gl        ? _("OpenGL (legacy)")                : 
             directx   ? StringUtils::toWString("DirectX 9") : _("Unknown");
-    info_text[8] = value;
+    info_text[10] = value;
 
-    for (int i = 0; i < 9; i++)
+    for (int i = 0; i < 11; i++)
     {
         pos = core::rect<s32>(current_x, current_y, current_x, current_y);
         font->draw(info_text[i].c_str(), pos, white_color, true, false);
