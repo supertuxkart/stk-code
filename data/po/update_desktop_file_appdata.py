@@ -24,6 +24,7 @@ STK_DESKTOP_FILE_P1 = """[Desktop Entry]
 # Split it to avoid SuperTuxKart being translated
 STK_DESKTOP_FILE_P2 = """Name=SuperTuxKart
 Icon=supertuxkart
+StartupWMClass=supertuxkart
 """
 STK_DESKTOP_FILE_P3 = """#I18N: Generic name in desktop file entry, summary in AppData and short description in Google Play
 GenericName=""" + STK_DESCRIPTION + """
@@ -101,6 +102,10 @@ STK_APPDATA_FILE_4 = """    <p>
     </p>
 """
 STK_APPDATA_FILE_5 = """  </description>
+  <branding>
+    <color type="primary" scheme_preference="light">#7c6e6e</color>
+    <color type="primary" scheme_preference="dark">#392828</color>
+  </branding>
   <screenshots>
     <screenshot type=\"default\">
       <image>https://supertuxkart.net/assets/wiki/STK1.3_1.jpg</image>
