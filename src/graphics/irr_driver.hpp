@@ -202,7 +202,8 @@ private:
     // ------------------------------------------------------------------------
     void resizeWindow();
 public:
-    void doScreenShot();    
+    void doScreenShot();
+    void commonInit();
 public:
          IrrDriver();
         ~IrrDriver();

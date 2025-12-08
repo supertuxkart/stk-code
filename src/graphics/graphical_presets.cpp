@@ -179,6 +179,7 @@ namespace GraphicalPresets
     // --------------------------------------------------------------------------------------------
     int getImageQuality()
     {
+        // If high definition texture is true, the max texture size is 2048. Else, it's 512.
         if (UserConfigParams::m_anisotropic == 4 &&
             (UserConfigParams::m_high_definition_textures & 0x01) == 0x00 &&
             UserConfigParams::m_hq_mipmap == false)
