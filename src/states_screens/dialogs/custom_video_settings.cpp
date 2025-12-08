@@ -66,38 +66,32 @@ void CustomVideoSettingsDialog::beforeAddingWidgets()
     
     SpinnerWidget* particles_effects = getWidget<SpinnerWidget>("particles_effects");
     assert(particles_effects != NULL);
-    particles_effects->addLabel(_("Disabled"));
-    particles_effects->addLabel(_("Important only"));
-    particles_effects->addLabel(_("Enabled"));
+    particles_effects->addLabel(_C("Particle effects", "Disabled"));
+    particles_effects->addLabel(_C("Particle effects", "Important only"));
+    particles_effects->addLabel(_C("Particle effects", "Enabled"));
     particles_effects->setValue(UserConfigParams::m_particles_effects);
 
     SpinnerWidget* geometry_level = getWidget<SpinnerWidget>("geometry_detail");
-    //I18N: Geometry level disabled : lowest level, Level-of-Details distances are very low
-    geometry_level->addLabel(_("Very Low"));
-    //I18N: Geometry level low : everything is displayed, Level-of-Details distances are low
-    geometry_level->addLabel(_("Low"));
-    //I18N: Geometry level medium : everything is displayed, Level-of-Details distances are medium
-    geometry_level->addLabel(_("Medium"));
-    //I18N: Geometry level high : everything is displayed, Level-of-Details distances are high
-    geometry_level->addLabel(_("High"));
-    //I18N: Geometry level very high : everything is displayed, Level-of-Details distances are very high
-    geometry_level->addLabel(_("Very High"));
-    //I18N: Geometry level ultra : everything is displayed, Level-of-Details distances are extremely high
-    geometry_level->addLabel(_("Ultra"));
+    geometry_level->addLabel(_C("Geometry level", "Very low"));
+    geometry_level->addLabel(_C("Geometry level", "Low"));
+    geometry_level->addLabel(_C("Geometry level", "Medium"));
+    geometry_level->addLabel(_C("Geometry level", "High"));
+    geometry_level->addLabel(_C("Geometry level", "Very high"));
+    geometry_level->addLabel(_C("Geometry level", "Ultra high"));
     geometry_level->setValue(UserConfigParams::m_geometry_level);
 
     SpinnerWidget* filtering = getWidget<SpinnerWidget>("image_quality");
-    filtering->addLabel(_("Very Low"));
-    filtering->addLabel(_("Low"));
-    filtering->addLabel(_("High"));
+    filtering->addLabel(_C("Image quality", "Very low"));
+    filtering->addLabel(_C("Image quality", "Low"));
+    filtering->addLabel(_C("Image quality", "High"));
     filtering->setValue(GraphicalPresets::getImageQuality());
 
     SpinnerWidget* shadows = getWidget<SpinnerWidget>("shadows");
-    shadows->addLabel(_("Disabled"));   // 0
-    shadows->addLabel(_("Low"));        // 1
-    shadows->addLabel(_("Medium"));     // 2
-    shadows->addLabel(_("High"));       // 3
-    shadows->addLabel(_("Very High"));  // 4
+    shadows->addLabel(_C("Shadows", "Disabled"));   // 0
+    shadows->addLabel(_C("Shadows", "Low"));        // 1
+    shadows->addLabel(_C("Shadows", "Medium"));     // 2
+    shadows->addLabel(_C("Shadows", "High"));       // 3
+    shadows->addLabel(_C("Shadows", "Very high"));  // 4
     shadows->setValue(UserConfigParams::m_shadows_resolution == 2048 ? 
                       (UserConfigParams::m_pcss ? 4 : 3) :
                       UserConfigParams::m_shadows_resolution == 1024 ? 2 :

@@ -88,15 +88,15 @@ void OptionsScreenUI::loadedFromFile()
     font_size->clearLabels();
     font_size->addLabel(L"Extremely small");
     //I18N: In the UI options, Very small font size
-    font_size->addLabel(_("Very small"));
+    font_size->addLabel(_C("Font size", "Very small"));
     //I18N: In the UI options, Small font size
-    font_size->addLabel(_("Small"));
+    font_size->addLabel(_C("Font size", "Small"));
     //I18N: In the UI options, Medium font size
-    font_size->addLabel(_("Medium"));
+    font_size->addLabel(_C("Font size", "Medium"));
     //I18N: In the UI options, Large font size
-    font_size->addLabel(_("Large"));
+    font_size->addLabel(_C("Font size", "Large"));
     //I18N: In the UI options, Very large font size
-    font_size->addLabel(_("Very large"));
+    font_size->addLabel(_C("Font size", "Very large"));
     font_size->addLabel(L"Extremely large");
 
     if (UserConfigParams::m_artist_debug_mode)

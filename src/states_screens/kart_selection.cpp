@@ -331,11 +331,11 @@ void KartSelectionScreen::beforeAddingWidget()
     //I18N: kart group name
     FOR_GETTEXT_ONLY( _("Add-Ons") )
     //I18N: kart class name
-    FOR_GETTEXT_ONLY( _("Light") )
+    FOR_GETTEXT_ONLY( _C("Kart class", "Light") )
     //I18N: kart class name
-    FOR_GETTEXT_ONLY( _("Medium") )
+    FOR_GETTEXT_ONLY( _C("Kart class", "Medium") )
     //I18N: kart class name
-    FOR_GETTEXT_ONLY( _("Heavy") )
+    FOR_GETTEXT_ONLY( _C("Kart class", "Heavy") )
 
 
     // Add other groups after
@@ -362,9 +362,9 @@ void KartSelectionScreen::beforeAddingWidget()
         {
             class_str[0] += 'A' - 'a';
         }
-        kart_class->addLabel(_(class_str.c_str()));
+        kart_class->addLabel(_C("Kart class", class_str.c_str()));
     }
-    kart_class->addLabel(_("All"));
+    kart_class->addLabel(_C("Kart class", "All"));
 }   // beforeAddingWidget
 
 // ----------------------------------------------------------------------------

@@ -141,10 +141,10 @@ void OptionsScreenVideo::init()
         assert(it != fps.end());
         vsync->setValue(1 + std::distance(fps.begin(), it));
     }
-    //I18N: in graphical options. The \n is a newline character, place it where appropriate, two can be used if required.
+    //I18N: in the graphical options. The \n is a newline character, place it where appropriate, two can be used if required.
     core::stringw vsync_tooltip = _("Vsync forces the graphics card to supply a new frame\nonly when the monitor is ready to display it.");
 
-    //I18N: in graphical options.
+    //I18N: in the graphical options.
     vsync_tooltip = vsync_tooltip + L"\n" + _("Vsync will not work if your drivers don't support it.");
 
     vsync->setTooltip(vsync_tooltip);
@@ -300,80 +300,67 @@ void OptionsScreenVideo::updateTooltip()
 
     core::stringw tooltip;
 
-    //I18N: in the graphical options tooltip;
-    // indicates a graphical feature is enabled
-    const core::stringw enabled = _("Enabled");
-    //I18N: in the graphical options tooltip;
-    // indicates a graphical feature is disabled
-    const core::stringw disabled = _("Disabled");
-    //I18N: if only important particles effects is enabled
-    const core::stringw important_only = _("Important only");
-
-    //I18N: in the graphical options tooltip;
-    const core::stringw very_low = _("Very Low");
-    //I18N: in the graphical options tooltip;
-    const core::stringw low = _("Low");
-    //I18N: in the graphical options tooltip;
-    const core::stringw medium = _("Medium");
-    //I18N: in the graphical options tooltip;
-    const core::stringw high = _("High");
-    //I18N: in the graphical options tooltip;
-    const core::stringw very_high = _("Very High");
-    //I18N: in the graphical options tooltip;
-    const core::stringw ultra = _("Ultra");
-    
-    //I18N: in graphical options
-    tooltip = _("Dynamic lights: %s",
-        UserConfigParams::m_dynamic_lights ? enabled : disabled);
-
-    //I18N: in graphical options
+    //I18N: in the graphical options
+    tooltip = UserConfigParams::m_dynamic_lights ? _("Dynamic lights: Enabled") :
+                                                   _("Dynamic lights: Disabled");
+    //I18N: in the graphical options
     if (UserConfigParams::m_shadows_resolution == 0)
-        tooltip = tooltip + L"\n" + _("Shadows: %s", disabled);
+        tooltip = tooltip + L"\n" + _("Shadows: %s", _C("Shadows", "Disabled"));
     else
         tooltip = tooltip + L"\n" + _("Shadows: %i", UserConfigParams::m_shadows_resolution);
-    //I18N: in graphical options
-    tooltip = tooltip + L"\n" + _("Anti-aliasing: %s",
-        UserConfigParams::m_mlaa ? enabled : disabled);
-    //I18N: in graphical options
-    tooltip = tooltip + L"\n" + _("Light scattering: %s",
-        UserConfigParams::m_light_scatter ? enabled : disabled);
-    //I18N: in graphical options
-    tooltip = tooltip + L"\n" + _("Glow (outlines): %s",
-        UserConfigParams::m_glow ? enabled : disabled);
-    //I18N: in graphical options
-    tooltip = tooltip + L"\n" + _("Light shaft (God rays): %s",
-        UserConfigParams::m_light_shaft ? enabled : disabled);
-    //I18N: in graphical options
-    tooltip = tooltip + L"\n" + _("Bloom: %s",
-        UserConfigParams::m_bloom ? enabled : disabled);
-    //I18N: in graphical options
-    tooltip = tooltip + L"\n" + _("Ambient occlusion: %s",
-        UserConfigParams::m_ssao ? enabled : disabled);
-    tooltip = tooltip + L"\n" + _("Screen space reflection: %s",
-        UserConfigParams::m_ssr ? enabled : disabled);
-    //I18N: in graphical options
-    tooltip = tooltip + L"\n" + _("Animated Characters: %s",
-        UserConfigParams::m_animated_characters ? enabled : disabled);
-    //I18N: in graphical options
-    tooltip = tooltip + L"\n" + _("Particles Effects: %s",
-        UserConfigParams::m_particles_effects == 2 ? enabled :
-        UserConfigParams::m_particles_effects == 1 ? important_only :
-        disabled);
+    //I18N: in the graphical options
+    tooltip = tooltip + L"\n" + 
+        (UserConfigParams::m_mlaa ? _("Anti-aliasing: Enabled") :
+                                    _("Anti-aliasing: Disabled"));
+    //I18N: in the graphical options
+    tooltip = tooltip + L"\n" +
+        (UserConfigParams::m_light_scatter ? _("Light scattering: Enabled") :
+                                             _("Light scattering: Disabled"));
+    //I18N: in the graphical options
+    tooltip = tooltip + L"\n" +
+        (UserConfigParams::m_glow ? _("Glow (outlines): Enabled") :
+                                    _("Glow (outlines): Disabled"));
+    //I18N: in the graphical options
+    tooltip = tooltip + L"\n" +
+        (UserConfigParams::m_light_shaft ? _("Light shaft (God rays): Enabled") :
+                                           _("Light shaft (God rays): Disabled"));
+    //I18N: in the graphical options
+    tooltip = tooltip + L"\n" +
+        (UserConfigParams::m_bloom ? _("Bloom: Enabled") :
+                                     _("Bloom: Disabled"));
+    //I18N: in the graphical options
+    tooltip = tooltip + L"\n" +
+        (UserConfigParams::m_ssao ? _("Ambient occlusion: Enabled") :
+                                    _("Ambient occlusion: Disabled"));
+    tooltip = tooltip + L"\n" +
+        (UserConfigParams::m_ssr ? _("Screen space reflection: Enabled") :
+                                   _("Screen space reflection: Disabled"));
+    //I18N: in the graphical options
+    tooltip = tooltip + L"\n" +
+        (UserConfigParams::m_animated_characters ? _("Animated characters: Enabled") :
+                                                   _("Animated characters: Disabled"));
+    //I18N: in the graphical options
+    tooltip = tooltip + L"\n" + _("Particle effects: %s",
+        UserConfigParams::m_particles_effects == 2 ? _C("Particle effects", "Enabled")        :
+        UserConfigParams::m_particles_effects == 1 ? _C("Particle effects", "Important only") :
+                                                     _C("Particle effects", "Disabled"));
 
-    //I18N: in graphical options
+    //I18N: in the graphical options
     int quality = getImageQuality();
     tooltip = tooltip + L"\n" + _("Rendered image quality: %s",
-        quality == 0 ? very_low :
-        quality == 1 ? low      : high);
+        quality == 0 ? _C("Image quality", "Very low") :
+        quality == 1 ? _C("Image quality", "Low")      :
+                       _C("Image quality", "High"));
 
-    //I18N: in graphical options
+    //I18N: in the graphical options
     int geometry_detail = UserConfigParams::m_geometry_level;
     tooltip = tooltip + L"\n" + _("Geometry detail: %s",
-        geometry_detail == 0 ? very_low  :
-        geometry_detail == 1 ? low       :
-        geometry_detail == 2 ? medium    :
-        geometry_detail == 3 ? high      :
-        geometry_detail == 4 ? very_high : ultra);
+        geometry_detail == 0 ?  _C("Geometry level", "Very low")  :
+        geometry_detail == 1 ?  _C("Geometry level", "Low")       :
+        geometry_detail == 2 ?  _C("Geometry level", "Medium")    :
+        geometry_detail == 3 ?  _C("Geometry level", "High")      :
+        geometry_detail == 4 ?  _C("Geometry level", "Very high") :
+                                _C("Geometry level", "Ultra high"));
 
     gfx->setTooltip(tooltip);
 }   // updateTooltip
@@ -386,16 +373,14 @@ void OptionsScreenVideo::updateBlurTooltip()
 
     core::stringw tooltip;
 
-    const core::stringw enabled = _("Enabled");
-    const core::stringw disabled = _("Disabled");
+    //I18N: in the graphical options
+    tooltip = UserConfigParams::m_motionblur ? _("Motion blur: Enabled") :
+                                               _("Motion blur: Disabled");
 
-    //I18N: in graphical options
-    tooltip = tooltip + _("Motion blur: %s",
-        UserConfigParams::m_motionblur ? enabled : disabled);
-
-    //I18N: in graphical options
-    tooltip = tooltip + L"\n" + _("Depth of field: %s",
-        UserConfigParams::m_dof ? enabled : disabled);
+    //I18N: in the graphical options
+    tooltip = tooltip + L"\n" +
+        (UserConfigParams::m_dof ? _("Depth of field: Enabled") :
+                                   _("Depth of field: Disabled"));
 
     blur->setTooltip(tooltip);
 }   // updateBlurTooltip
