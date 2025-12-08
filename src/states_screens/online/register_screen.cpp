@@ -195,8 +195,9 @@ void RegisterScreen::onDialogClose()
     }
     else
     {
-        m_account_mode = ACCOUNT_OFFLINE;
         ribbon->select("tab_offline", PLAYER_ID_GAME_MASTER);
+        // Set the account mode and the info text
+        eventCallback(ribbon, "mode_tabs", PLAYER_ID_GAME_MASTER);
     }
     makeEntryFieldsVisible();
 }   // onDialogClose
@@ -500,6 +501,18 @@ void RegisterScreen::eventCallback(Widget* widget, const std::string& name,
             m_info_widget->setErrorColor();
             m_info_widget->setText(_("Internet access is disabled, please enable it in the options"), false);
             return;
+        }
+        else if (selection == "tab_offline")
+        {
+            m_info_widget->setDefaultColor();
+            m_info_widget->setText(_("You can play without creating an online account.")
+                + L"\n\n" + _("An online account is required for online multiplayer, "
+                    "to be notified when friends are online, etc."), false);
+            m_info_widget->setVisible(true);
+        }
+        else
+        {
+            m_info_widget->setVisible(false);
         }
         if (selection == "tab_new_online")
             m_account_mode = ACCOUNT_NEW_ONLINE;

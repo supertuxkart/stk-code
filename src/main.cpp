@@ -2136,12 +2136,11 @@ void askForInternetPermission()
 
     MessageDialog *dialog =
     new MessageDialog(_("SuperTuxKart may connect to a server "
-        "to download add-ons and notify you of updates. "
-        "Please read our privacy policy at https://supertuxkart.net/Privacy. "
-        "Would you like this feature to be enabled? (To change this setting "
+        "to download add-ons and notify you of updates.") + L"\n\n"
+        + _("Please read our privacy policy at %s.", "https://supertuxkart.net/Privacy")
+        + L"\n\n" + _("Would you like this feature to be enabled? (To change this setting "
         "at a later time, go to options, select tab "
-        "'General', and edit \"Connect to the "
-        "Internet\")."),
+        "'General', and edit \"Connect to the Internet\")."),
         MessageDialog::MESSAGE_DIALOG_YESNO,
         new ConfirmServer(), true, true, 0.85f, 0.85f);
 
