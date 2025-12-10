@@ -5,12 +5,53 @@ It should be kept in mind that some versions have a less complete changelog than
 
 For similar reasons, and because some features are vastly more complex than others, attributions of main changes should not be taken as a shortcut for overall contribution.
 
-## SuperTuxKart 1.5
+## SuperTuxKart 1.5.1
+
+### Networking
+* Add TV cameras as a camera option when watching soccer games in spectator mode, by LLS
+* Add a 'help' command for use in server lobbies, by Alayan
+
+### General
+* Many improvements for localization:
+    * Make the name of skins translatable, by Alayan
+    * Make the server messages when signing in translatable, by Alayan
+    * Use context to allow for different translations of the same English string when relevant, by Alayan
+    * Full translation support for server answers to chat commands, and greatly improved base English messages, by Alayan
+    * Move all URLs out of translatable strings, by Alayan
+    * Minor improvements to some English source strings, by Alayan and others
+* Support using the command line to set the user-adjustable graphical parameters that were missing as command line options, by Alayan
+* Add a command line option to directly set a graphical preset, by Alayan
+* Various code quality improvements and minor bugfixes, by Alayan and others
+
+### Graphics
+* Fix a regression where an increase of the 'Image Quality' setting would decrease the anisotropic filtering level, by Alayan
+* Enable high-quality mipmaps as soon as high-quality
+
+### User Interface
+* Add support for page-up, page-down, home and end keys in lists, by Alayan
+* Add a scrollbar to the server lobby chat, by Bcfworld
+* Better paging support in the server lobby chat, by Alayan
+* Resize kart icons on the left if the number of karts change, by Wilmaster
+* When renaming, prefill the textbox with the current name, by Brice Albiol
+* Display more settings in the benchmark end-screen, by Alayan
+* Prevent showing a render resolution factor in UI that's unsupported with the current renderer, by Alayan
+* Various minor UI fixes, by Alayan
+
+### Tracks and modeling
+
+#### Tracks
+* Fix an egg that was very difficult to collect (due to collision issues) in the Black Forest intermediate egg hunt, by Sven
+
+#### Arenas
+* TV spectator ameras for all soccer fields, by LLS and Sven
+
+## SuperTuxKart 1.5 (20. October 2025)
 
 ### Networking
 * Improve the track-voting logic when no majority is achieved, by kimden
 * Prevent tracks missed by spectators from limiting the choice of active players, by kimden
 * Make bot indices start from one, by JipFr
+* Improvements to the rating formula for ranked play, by Alayan
 * Various bugfixes, by kimden
 
 ### Gameplay
@@ -438,6 +479,7 @@ For similar reasons, and because some features are vastly more complex than othe
 * New coal skin by Alayan
 * Support for collapsing widgets in UI by Mrxx99
 * Multidirectional keyboard navigation in menus by Alayan
+* Allow the disabling of keyboard configurations (making them inactive without deleting them), by Alayan
 * Alternating background darkness in lists to enhance readability by Benau
 * Support text breaks into multiple line in lists, e.g. in the addons menu, by Alayan
 * Improved help menu with lateral tabs and a lot more information by Alayan

@@ -159,7 +159,7 @@ namespace ChatCommands
             case CA_SERVER_HAS_ADDON_NOT_FOUND:
                 return _("This server doesn't have the addon '%s'", StringUtils::utf8ToWide(args));
             case CA_SERVER_HAS_ADDON_FOUND:
-                return _("This server has the adddon '%s'", StringUtils::utf8ToWide(args));
+                return _("This server has the addon '%s'", StringUtils::utf8ToWide(args));
             case CA_ADDON_SCORE:
                 if (argv.size() < 5)
                 {
