@@ -2383,6 +2383,14 @@ int main(int argc, char *argv[])
         else
             main_loop = new MainLoop(0/*parent_pid*/);
 
+        // Set of loading steps common between the first game launch and
+        // reloading to apply a new resolution.
+        irr_driver->commonInit();
+
+        OfficialKarts::load();
+        handleXmasMode();
+        handleEasterEarMode();
+
         // Needs the kart and track directories to load potential challenges
         // in those dirs, so it can only be created after reading tracks
         // and karts.
@@ -2396,14 +2404,6 @@ int main(int argc, char *argv[])
 
         GUIEngine::addLoadingIcon( irr_driver->getTexture(FileManager::GUI_ICON,
                                                           "gui_lock.png"  ) );
-
-        // Set of loading steps common between the first game launch and
-        // reloading to apply a new resolution.
-        irr_driver->commonInit();
-
-        OfficialKarts::load();
-        handleXmasMode();
-        handleEasterEarMode();
 
         //handleCmdLine() needs InitTuxkart() so it can't be called first
         if (!handleCmdLine(!server_config.empty(), has_parent_process))
