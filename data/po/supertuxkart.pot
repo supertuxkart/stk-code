@@ -1168,10 +1168,6 @@ msgid "All"
 msgstr ""
 
 #. I18N: ./data/gui/screens/credits.stkgui
-msgid "supertuxkart.net"
-msgstr ""
-
-#. I18N: ./data/gui/screens/credits.stkgui
 #. I18N: Title in credits screen
 msgid "Credits"
 msgstr ""
@@ -4076,7 +4072,7 @@ msgstr ""
 
 #: src/network/protocols/chat_commands.cpp:162
 #, c-format
-msgid "This server has the adddon '%s'"
+msgid "This server has the addon '%s'"
 msgstr ""
 
 #: src/network/protocols/chat_commands.cpp:169
