@@ -2077,7 +2077,7 @@ void ServerLobby::startSelection(const Event *event)
             else
             {
                 m_default_vote->m_num_laps =
-                    (uint8_t)(UserConfigParams::m_soccer_time_limit);
+                    (uint16_t)(UserConfigParams::m_soccer_time_limit);
                 if (m_default_vote->m_num_laps > 15)
                     m_default_vote->m_num_laps = (uint16_t)7;
             }
