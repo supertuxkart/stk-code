@@ -254,10 +254,21 @@ void RegisterScreen::makeEntryFieldsVisible()
 /** If necessary creates the local user.
  *  \param local_name Name of the local user.
  */
-void RegisterScreen::handleLocalName(const stringw &local_name)
+bool RegisterScreen::handleLocalName(const stringw &local_name)
 {
-    if (local_name.size() == 0)
-        return;
+    if (local_name.empty())
++    {
++        m_info_widget->setErrorColor();
++        m_info_widget->setText(_("User name cannot be empty."), false);
++        return false;
++    }
++
++    if (local_name.size() > 50){
++        m_info_widget->setErrorColor();
++        m_info_widget->setText(_("Username is too long '%s'.", local_name),
++                               false);
++        return false;
++    }
 
     // If a local player with that name does not exist, create one
     if(!PlayerManager::get()->getPlayer(local_name))
@@ -283,6 +294,7 @@ void RegisterScreen::handleLocalName(const stringw &local_name)
             m_info_widget->setErrorColor();
             m_info_widget->setText(_("Could not create player '%s'.", local_name),
                                    false);
+            return false;
         }
     }
     else
@@ -290,7 +302,9 @@ void RegisterScreen::handleLocalName(const stringw &local_name)
         m_info_widget->setErrorColor();
         m_info_widget->setText(_("Could not create player '%s'.", local_name),
                                false);
+        return false;
     }
+    return true;
 }   // handleLocalName
 
 // -----------------------------------------------------------------------------
@@ -301,15 +315,9 @@ void RegisterScreen::doRegister()
 {
     stringw local_name = getWidget<TextBoxWidget>("local_username")
                        ->getText().trim();
-                       
-    if (local_name.empty())
-    {
-        m_info_widget->setErrorColor();
-        m_info_widget->setText(_("User name cannot be empty."), false);
-        return;
-    }
 
-    handleLocalName(local_name);
+    if (!handleLocalName(local_name))
+        return;
 
     // If no online account is requested, don't register
     if(m_account_mode==ACCOUNT_EXISTING_ONLINE)
