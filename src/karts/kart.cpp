@@ -1632,7 +1632,13 @@ void Kart::update(int ticks)
         if (material && material->hasGravity())
         {
             Vec3 normal = m_terrain_info->getNormal();
-            gravity = normal * -g;
+            // Only apply surface gravity if normal has sufficient vertical
+            // component (|Y| > 0.3). Edge faces have near-horizontal normals
+            // that would incorrectly flip gravity direction.
+            if (fabsf(normal.getY()) > 0.3f)
+            {
+                gravity = normal * -g;
+            }
         }
 
         body->setGravity(gravity);

@@ -98,6 +98,11 @@ private:
     /** Number of wheels that touch the ground. */
     int                 m_num_wheels_on_ground;
 
+    /** Last known gravity direction when wheels were on the ground.
+     *  Used in flying mode to prevent incorrect orientation when
+     *  gravity was set by an edge surface with unusual normal. */
+    btVector3           m_last_grounded_gravity;
+
     /** Index of the right axis. */
     int                 m_indexRightAxis;
     /** Index of the up axis. */
