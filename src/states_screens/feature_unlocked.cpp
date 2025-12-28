@@ -34,6 +34,7 @@
 #include "graphics/sp/sp_texture_manager.hpp"
 #include "guiengine/engine.hpp"
 #include "guiengine/scalable_font.hpp"
+#include "guiengine/widgets/button_widget.hpp"
 #include "io/file_manager.hpp"
 #include "karts/kart_model.hpp"
 #include "karts/kart_properties.hpp"
@@ -476,6 +477,8 @@ void FeatureUnlockedCutScene::init()
             Log::error("FeatureUnlockedCutScene::init", "Malformed unlocked goody");
         }
     }
+
+    getWidget<GUIEngine::ButtonWidget>("continue")->setFocusForPlayer(PLAYER_ID_GAME_MASTER);
 }   // init
 
 // ----------------------------------------------------------------------------
