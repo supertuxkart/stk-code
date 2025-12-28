@@ -123,6 +123,10 @@ void btKart::reset()
     m_max_speed                  = -1.0f;
     m_min_speed                  = 0.0f;
     m_leaning_right              = true;
+    // Initialize to default downward gravity - will be updated when grounded
+    m_last_grounded_gravity      = btVector3(0, -(Track::getCurrentTrack()
+                                              ? Track::getCurrentTrack()->getGravity()
+                                              : 9.80665f), 0);
 
     // Set the brakes so that karts don't slide downhill
     setAllBrakes(20.0f);
@@ -431,6 +435,14 @@ void btKart::updateVehicle( btScalar step )
         m_wheelInfo[i].m_was_on_ground = m_wheelInfo[i].m_raycastInfo.m_isInContact;
 
 
+    // Store gravity when grounded for use in flying mode.
+    // This prevents incorrect orientation when gravity was set by an edge
+    // surface with unusual normal just before the kart became airborne.
+    if(m_num_wheels_on_ground > 0)
+    {
+        m_last_grounded_gravity = m_chassisBody->getGravity();
+    }
+
     // If the kart is flying, try to keep it parallel to the ground.
     // If the kart is only on one or two wheels, try to bring it back on all four
     // -------------------------------------------------------------
@@ -574,7 +586,9 @@ void btKart::updateVehicle( btScalar step )
 void btKart::pushVehicleUpright()
 {
     btVector3 kart_up    = getChassisWorldTransform().getBasis().getColumn(1);
-    btVector3 terrain_up = -m_chassisBody->getGravity();
+    // Use last grounded gravity instead of current gravity to prevent
+    // flipping when gravity was set incorrectly by an edge surface.
+    btVector3 terrain_up = -m_last_grounded_gravity;
     terrain_up = terrain_up.normalize();
 
     // If there is at least a wheel on the ground, check if the parallel impulse
