@@ -22,6 +22,7 @@
 #include <string>
 
 #include "guiengine/screen.hpp"
+#include "generated/gui/screens/options/options_audio_widgets.hpp"
 
 namespace GUIEngine { class Widget; }
 
@@ -36,6 +37,7 @@ class OptionsScreenAudio : public GUIEngine::Screen, public GUIEngine::ScreenSin
     OptionsScreenAudio();
 
 private:
+    GUIEngine::OptionsAudioWidgets m_widgets;
     float computeVolume(int numerator, int denominator);
 
 public:
