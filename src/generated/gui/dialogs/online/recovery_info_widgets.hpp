@@ -2,7 +2,7 @@
 // Do not edit manually - regenerate with tools/generate_gui_headers.py
 #pragma once
 
-#include "guiengine/screen.hpp"
+#include "guiengine/abstract_top_level_container.hpp"
 #include "guiengine/widgets/icon_button_widget.hpp"
 #include "guiengine/widgets/label_widget.hpp"
 #include "guiengine/widgets/ribbon_widget.hpp"
@@ -16,12 +16,12 @@ struct RecoveryInfoWidgets
     RibbonWidget* options = nullptr;
     IconButtonWidget* cancel = nullptr;
 
-    void bind(Screen* screen)
+    void bind(AbstractTopLevelContainer* container)
     {
-        title = screen->getWidget<LabelWidget>("title");
-        info = screen->getWidget<LabelWidget>("info");
-        options = screen->getWidget<RibbonWidget>("options");
-        cancel = screen->getWidget<IconButtonWidget>("cancel");
+        title = container->getWidget<LabelWidget>("title");
+        info = container->getWidget<LabelWidget>("info");
+        options = container->getWidget<RibbonWidget>("options");
+        cancel = container->getWidget<IconButtonWidget>("cancel");
     }
 };
 

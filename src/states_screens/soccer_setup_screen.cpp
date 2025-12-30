@@ -55,6 +55,7 @@ SoccerSetupScreen::SoccerSetupScreen() : Screen("soccer_setup.stkgui")
 
 void SoccerSetupScreen::loadedFromFile()
 {
+    m_widgets.bind(this);
 }
 
 // ----------------------------------------------------------------------------
@@ -64,7 +65,7 @@ void SoccerSetupScreen::eventCallback(Widget* widget, const std::string& name,
     if(m_schedule_continue)
         return;
 
-    if(name == "continue")
+    if(widget == m_widgets.continue_)
     {
         int nb_players = (int)m_kart_view_info.size();
 
@@ -87,18 +88,18 @@ void SoccerSetupScreen::eventCallback(Widget* widget, const std::string& name,
             m_schedule_continue = true;
         }
     }
-    else if (name == "back")
+    else if (widget == m_widgets.back)
     {
         StateManager::get()->escapePressed();
     }
-    else if (name == "red_team")
+    else if (widget == m_widgets.red_team)
     {
         if (m_kart_view_info.size() == 1)
         {
             changeTeam(0, KART_TEAM_RED);
         }
     }
-    else if (name == "blue_team")
+    else if (widget == m_widgets.blue_team)
     {
         if (m_kart_view_info.size() == 1)
         {
@@ -115,9 +116,8 @@ void SoccerSetupScreen::beforeAddingWidget()
         UserConfigParams::m_multitouch_active > 1;
     if (multitouch_enabled)
     {
-        Widget* team = getWidget<Widget>("choose_team");
         //I18N: In soccer setup screen
-        team->setText(_("Press red or blue soccer icon to change team"));
+        m_widgets.choose_team->setText(_("Press red or blue soccer icon to change team"));
     }
     Widget* central_div = getWidget<Widget>("central_div");
 
@@ -208,8 +208,7 @@ void SoccerSetupScreen::init()
     Screen::init();
 
     // Set focus on "continue"
-    ButtonWidget* bt_continue = getWidget<ButtonWidget>("continue");
-    bt_continue->setFocusForPlayer(PLAYER_ID_GAME_MASTER);
+    m_widgets.continue_->setFocusForPlayer(PLAYER_ID_GAME_MASTER);
 
     // We need players to be able to choose their teams
     input_manager->setMasterPlayerOnly(false);
@@ -287,14 +286,11 @@ GUIEngine::EventPropagation SoccerSetupScreen::filterActions(PlayerAction action
         return EVENT_BLOCK;
     
 
-    ButtonWidget* bt_continue = getWidget<ButtonWidget>("continue");
-    BubbleWidget* bubble = getWidget<BubbleWidget>("choose_team");
-
     switch (action)
     {
     case PA_MENU_LEFT:
-        if (bt_continue->isFocusedForPlayer(PLAYER_ID_GAME_MASTER) ||
-            bubble->isFocusedForPlayer(PLAYER_ID_GAME_MASTER))
+        if (m_widgets.continue_->isFocusedForPlayer(PLAYER_ID_GAME_MASTER) ||
+            m_widgets.choose_team->isFocusedForPlayer(PLAYER_ID_GAME_MASTER))
         {
             if (m_kart_view_info[playerId].confirmed == false)
                 changeTeam(playerId, KART_TEAM_RED);
@@ -303,8 +299,8 @@ GUIEngine::EventPropagation SoccerSetupScreen::filterActions(PlayerAction action
         }
         break;
     case PA_MENU_RIGHT:
-        if (bt_continue->isFocusedForPlayer(PLAYER_ID_GAME_MASTER) ||
-            bubble->isFocusedForPlayer(PLAYER_ID_GAME_MASTER))
+        if (m_widgets.continue_->isFocusedForPlayer(PLAYER_ID_GAME_MASTER) ||
+            m_widgets.choose_team->isFocusedForPlayer(PLAYER_ID_GAME_MASTER))
         {
             if (m_kart_view_info[playerId].confirmed == false)
                 changeTeam(playerId, KART_TEAM_BLUE);
@@ -322,8 +318,8 @@ GUIEngine::EventPropagation SoccerSetupScreen::filterActions(PlayerAction action
         break;
     case PA_MENU_SELECT:
     {
-        if (!bt_continue->isFocusedForPlayer(PLAYER_ID_GAME_MASTER) &&
-            !bubble->isFocusedForPlayer(PLAYER_ID_GAME_MASTER) &&
+        if (!m_widgets.continue_->isFocusedForPlayer(PLAYER_ID_GAME_MASTER) &&
+            !m_widgets.choose_team->isFocusedForPlayer(PLAYER_ID_GAME_MASTER) &&
             playerId == PLAYER_ID_GAME_MASTER)
         {
             return EVENT_LET;
@@ -348,14 +344,14 @@ GUIEngine::EventPropagation SoccerSetupScreen::filterActions(PlayerAction action
     }
     case PA_MENU_CANCEL:
     {
-        if (!bt_continue->isFocusedForPlayer(PLAYER_ID_GAME_MASTER) &&
-            !bubble->isFocusedForPlayer(PLAYER_ID_GAME_MASTER) &&
+        if (!m_widgets.continue_->isFocusedForPlayer(PLAYER_ID_GAME_MASTER) &&
+            !m_widgets.choose_team->isFocusedForPlayer(PLAYER_ID_GAME_MASTER) &&
             playerId == PLAYER_ID_GAME_MASTER)
         {
             return EVENT_LET;
         }
-        
-        if ((!m_kart_view_info[playerId].confirmed) && 
+
+        if ((!m_kart_view_info[playerId].confirmed) &&
             (playerId == PLAYER_ID_GAME_MASTER))
         {
             return EVENT_LET;

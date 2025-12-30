@@ -2,7 +2,7 @@
 // Do not edit manually - regenerate with tools/generate_gui_headers.py
 #pragma once
 
-#include "guiengine/screen.hpp"
+#include "guiengine/abstract_top_level_container.hpp"
 #include "guiengine/widgets/check_box_widget.hpp"
 #include "guiengine/widgets/icon_button_widget.hpp"
 #include "guiengine/widgets/label_widget.hpp"
@@ -36,29 +36,29 @@ struct TrackInfoWidgets
     RibbonWidget* buttons = nullptr;
     IconButtonWidget* start = nullptr;
 
-    void bind(Screen* screen)
+    void bind(AbstractTopLevelContainer* container)
     {
-        back = screen->getWidget<IconButtonWidget>("back");
-        name = screen->getWidget<LabelWidget>("name");
-        highscores = screen->getWidget<LabelWidget>("highscores");
-        highscore_entries = screen->getWidget<ListWidget>("highscore_entries");
-        target_type_spinner = screen->getWidget<SpinnerWidget>("target-type-spinner");
-        target_type_text = screen->getWidget<LabelWidget>("target-type-text");
-        target_value_spinner = screen->getWidget<SpinnerWidget>("target-value-spinner");
-        target_value_text = screen->getWidget<LabelWidget>("target-value-text");
-        ai_spinner = screen->getWidget<SpinnerWidget>("ai-spinner");
-        ai_text = screen->getWidget<LabelWidget>("ai-text");
-        ai_blue_spinner = screen->getWidget<SpinnerWidget>("ai-blue-spinner");
-        ai_blue_text = screen->getWidget<LabelWidget>("ai-blue-text");
-        option = screen->getWidget<CheckBoxWidget>("option");
-        option_text = screen->getWidget<LabelWidget>("option-text");
-        record = screen->getWidget<CheckBoxWidget>("record");
-        record_race_text = screen->getWidget<LabelWidget>("record-race-text");
-        screenshot = screen->getWidget<IconButtonWidget>("screenshot");
-        author = screen->getWidget<LabelWidget>("author");
-        max_arena_players = screen->getWidget<LabelWidget>("max-arena-players");
-        buttons = screen->getWidget<RibbonWidget>("buttons");
-        start = screen->getWidget<IconButtonWidget>("start");
+        back = container->getWidget<IconButtonWidget>("back");
+        name = container->getWidget<LabelWidget>("name");
+        highscores = container->getWidget<LabelWidget>("highscores");
+        highscore_entries = container->getWidget<ListWidget>("highscore_entries");
+        target_type_spinner = container->getWidget<SpinnerWidget>("target-type-spinner");
+        target_type_text = container->getWidget<LabelWidget>("target-type-text");
+        target_value_spinner = container->getWidget<SpinnerWidget>("target-value-spinner");
+        target_value_text = container->getWidget<LabelWidget>("target-value-text");
+        ai_spinner = container->getWidget<SpinnerWidget>("ai-spinner");
+        ai_text = container->getWidget<LabelWidget>("ai-text");
+        ai_blue_spinner = container->getWidget<SpinnerWidget>("ai-blue-spinner");
+        ai_blue_text = container->getWidget<LabelWidget>("ai-blue-text");
+        option = container->getWidget<CheckBoxWidget>("option");
+        option_text = container->getWidget<LabelWidget>("option-text");
+        record = container->getWidget<CheckBoxWidget>("record");
+        record_race_text = container->getWidget<LabelWidget>("record-race-text");
+        screenshot = container->getWidget<IconButtonWidget>("screenshot");
+        author = container->getWidget<LabelWidget>("author");
+        max_arena_players = container->getWidget<LabelWidget>("max-arena-players");
+        buttons = container->getWidget<RibbonWidget>("buttons");
+        start = container->getWidget<IconButtonWidget>("start");
     }
 };
 

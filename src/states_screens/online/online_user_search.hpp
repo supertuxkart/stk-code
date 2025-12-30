@@ -19,6 +19,7 @@
 #define HEADER_ONLINE_USER_SEARCH_HPP
 
 #include "guiengine/screen.hpp"
+#include "generated/gui/screens/online/user_search_widgets.hpp"
 #include "online/online_profile.hpp"
 #include "utils/ptr_vector.hpp"
 
@@ -43,14 +44,7 @@ private:
     OnlineUserSearch();
     ~OnlineUserSearch();
 
-    /** Pointer to the back widget. */
-    GUIEngine::IconButtonWidget *               m_back_widget;
-    /** Pointer to the search button. */
-    GUIEngine::ButtonWidget *                   m_search_button_widget;
-    /** Pointer to the search box. */
-    GUIEngine::TextBoxWidget *                  m_search_box_widget;
-    /** Pointer to the result list. */
-    GUIEngine::ListWidget *                     m_user_list_widget;
+    GUIEngine::UserSearchWidgets m_widgets;
 
     /** Seach string entered in the search widget. */
     irr::core::stringw                          m_search_string;

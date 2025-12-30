@@ -2,7 +2,7 @@
 // Do not edit manually - regenerate with tools/generate_gui_headers.py
 #pragma once
 
-#include "guiengine/screen.hpp"
+#include "guiengine/abstract_top_level_container.hpp"
 #include "guiengine/widgets/icon_button_widget.hpp"
 #include "guiengine/widgets/label_widget.hpp"
 #include "guiengine/widgets/ribbon_widget.hpp"
@@ -18,14 +18,14 @@ struct RegistrationTermsWidgets
     IconButtonWidget* cancel = nullptr;
     IconButtonWidget* accept = nullptr;
 
-    void bind(Screen* screen)
+    void bind(AbstractTopLevelContainer* container)
     {
-        title = screen->getWidget<LabelWidget>("title");
-        terms = screen->getWidget<LabelWidget>("terms");
-        info = screen->getWidget<LabelWidget>("info");
-        options = screen->getWidget<RibbonWidget>("options");
-        cancel = screen->getWidget<IconButtonWidget>("cancel");
-        accept = screen->getWidget<IconButtonWidget>("accept");
+        title = container->getWidget<LabelWidget>("title");
+        terms = container->getWidget<LabelWidget>("terms");
+        info = container->getWidget<LabelWidget>("info");
+        options = container->getWidget<RibbonWidget>("options");
+        cancel = container->getWidget<IconButtonWidget>("cancel");
+        accept = container->getWidget<IconButtonWidget>("accept");
     }
 };
 

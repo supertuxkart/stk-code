@@ -2,7 +2,7 @@
 // Do not edit manually - regenerate with tools/generate_gui_headers.py
 #pragma once
 
-#include "guiengine/screen.hpp"
+#include "guiengine/abstract_top_level_container.hpp"
 #include "guiengine/widgets/button_widget.hpp"
 #include "guiengine/widgets/icon_button_widget.hpp"
 #include "guiengine/widgets/label_widget.hpp"
@@ -24,18 +24,18 @@ struct NetworkingLobbyWidgets
     IconButtonWidget* start = nullptr;
     IconButtonWidget* back = nullptr;
 
-    void bind(Screen* screen)
+    void bind(AbstractTopLevelContainer* container)
     {
-        lobby_text = screen->getWidget<LabelWidget>("lobby-text");
-        text = screen->getWidget<LabelWidget>("text");
-        players = screen->getWidget<ListWidget>("players");
-        chat = screen->getWidget<TextBoxWidget>("chat");
-        send = screen->getWidget<ButtonWidget>("send");
-        emoji = screen->getWidget<ButtonWidget>("emoji");
-        timeout_message = screen->getWidget<LabelWidget>("timeout-message");
-        config = screen->getWidget<IconButtonWidget>("config");
-        start = screen->getWidget<IconButtonWidget>("start");
-        back = screen->getWidget<IconButtonWidget>("back");
+        lobby_text = container->getWidget<LabelWidget>("lobby-text");
+        text = container->getWidget<LabelWidget>("text");
+        players = container->getWidget<ListWidget>("players");
+        chat = container->getWidget<TextBoxWidget>("chat");
+        send = container->getWidget<ButtonWidget>("send");
+        emoji = container->getWidget<ButtonWidget>("emoji");
+        timeout_message = container->getWidget<LabelWidget>("timeout-message");
+        config = container->getWidget<IconButtonWidget>("config");
+        start = container->getWidget<IconButtonWidget>("start");
+        back = container->getWidget<IconButtonWidget>("back");
     }
 };
 

@@ -19,6 +19,7 @@
 #define HEADER_CREATE_SERVER_SCREEN_HPP
 
 #include "guiengine/screen.hpp"
+#include "generated/gui/screens/online/create_server_widgets.hpp"
 
 namespace GUIEngine
 {
@@ -42,18 +43,7 @@ private:
 
     CreateServerScreen();
 
-    GUIEngine::TextBoxWidget * m_name_widget;
-    GUIEngine::SpinnerWidget * m_max_players_widget;
-    GUIEngine::SpinnerWidget* m_more_options_spinner;
-
-    GUIEngine::LabelWidget * m_more_options_text;
-    GUIEngine::LabelWidget * m_info_widget;
-
-    GUIEngine::RibbonWidget * m_game_mode_widget;
-    GUIEngine::RibbonWidget * m_options_widget;
-    GUIEngine::IconButtonWidget * m_create_widget;
-    GUIEngine::IconButtonWidget * m_cancel_widget;
-    GUIEngine::IconButtonWidget * m_back_widget;
+    GUIEngine::CreateServerWidgets m_widgets;
 
     void createServer();
     void updateMoreOption(int game_mode);

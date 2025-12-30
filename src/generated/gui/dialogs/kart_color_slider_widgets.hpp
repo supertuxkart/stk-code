@@ -2,7 +2,7 @@
 // Do not edit manually - regenerate with tools/generate_gui_headers.py
 #pragma once
 
-#include "guiengine/screen.hpp"
+#include "guiengine/abstract_top_level_container.hpp"
 #include "guiengine/widgets/icon_button_widget.hpp"
 #include "guiengine/widgets/model_view_widget.hpp"
 #include "guiengine/widgets/ribbon_widget.hpp"
@@ -19,14 +19,14 @@ struct KartColorSliderWidgets
     IconButtonWidget* cancel = nullptr;
     IconButtonWidget* apply = nullptr;
 
-    void bind(Screen* screen)
+    void bind(AbstractTopLevelContainer* container)
     {
-        model = screen->getWidget<ModelViewWidget>("model");
-        toggle_slider = screen->getWidget<SpinnerWidget>("toggle-slider");
-        color_slider = screen->getWidget<SpinnerWidget>("color-slider");
-        buttons = screen->getWidget<RibbonWidget>("buttons");
-        cancel = screen->getWidget<IconButtonWidget>("cancel");
-        apply = screen->getWidget<IconButtonWidget>("apply");
+        model = container->getWidget<ModelViewWidget>("model");
+        toggle_slider = container->getWidget<SpinnerWidget>("toggle-slider");
+        color_slider = container->getWidget<SpinnerWidget>("color-slider");
+        buttons = container->getWidget<RibbonWidget>("buttons");
+        cancel = container->getWidget<IconButtonWidget>("cancel");
+        apply = container->getWidget<IconButtonWidget>("apply");
     }
 };
 

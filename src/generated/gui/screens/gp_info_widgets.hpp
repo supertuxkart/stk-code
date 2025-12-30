@@ -2,7 +2,7 @@
 // Do not edit manually - regenerate with tools/generate_gui_headers.py
 #pragma once
 
-#include "guiengine/screen.hpp"
+#include "guiengine/abstract_top_level_container.hpp"
 #include "guiengine/widgets/icon_button_widget.hpp"
 #include "guiengine/widgets/label_widget.hpp"
 #include "guiengine/widgets/list_widget.hpp"
@@ -32,26 +32,26 @@ struct GpInfoWidgets
     IconButtonWidget* continue_ = nullptr;
     IconButtonWidget* start = nullptr;
 
-    void bind(Screen* screen)
+    void bind(AbstractTopLevelContainer* container)
     {
-        back = screen->getWidget<IconButtonWidget>("back");
-        name = screen->getWidget<LabelWidget>("name");
-        screenshot = screen->getWidget<IconButtonWidget>("screenshot");
-        ai_spinner = screen->getWidget<SpinnerWidget>("ai-spinner");
-        ai_text = screen->getWidget<LabelWidget>("ai-text");
-        reverse_spinner = screen->getWidget<SpinnerWidget>("reverse-spinner");
-        reverse_text = screen->getWidget<LabelWidget>("reverse-text");
-        track_spinner = screen->getWidget<SpinnerWidget>("track-spinner");
-        track_text = screen->getWidget<LabelWidget>("track-text");
-        group_spinner = screen->getWidget<SpinnerWidget>("group-spinner");
-        group_text = screen->getWidget<LabelWidget>("group-text");
-        time_target_spinner = screen->getWidget<SpinnerWidget>("time-target-spinner");
-        time_target_text = screen->getWidget<LabelWidget>("time-target-text");
-        tracks = screen->getWidget<ListWidget>("tracks");
-        highscore_entries = screen->getWidget<ListWidget>("highscore-entries");
-        buttons = screen->getWidget<RibbonWidget>("buttons");
-        continue_ = screen->getWidget<IconButtonWidget>("continue");
-        start = screen->getWidget<IconButtonWidget>("start");
+        back = container->getWidget<IconButtonWidget>("back");
+        name = container->getWidget<LabelWidget>("name");
+        screenshot = container->getWidget<IconButtonWidget>("screenshot");
+        ai_spinner = container->getWidget<SpinnerWidget>("ai-spinner");
+        ai_text = container->getWidget<LabelWidget>("ai-text");
+        reverse_spinner = container->getWidget<SpinnerWidget>("reverse-spinner");
+        reverse_text = container->getWidget<LabelWidget>("reverse-text");
+        track_spinner = container->getWidget<SpinnerWidget>("track-spinner");
+        track_text = container->getWidget<LabelWidget>("track-text");
+        group_spinner = container->getWidget<SpinnerWidget>("group-spinner");
+        group_text = container->getWidget<LabelWidget>("group-text");
+        time_target_spinner = container->getWidget<SpinnerWidget>("time-target-spinner");
+        time_target_text = container->getWidget<LabelWidget>("time-target-text");
+        tracks = container->getWidget<ListWidget>("tracks");
+        highscore_entries = container->getWidget<ListWidget>("highscore-entries");
+        buttons = container->getWidget<RibbonWidget>("buttons");
+        continue_ = container->getWidget<IconButtonWidget>("continue");
+        start = container->getWidget<IconButtonWidget>("start");
     }
 };
 

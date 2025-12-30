@@ -2,7 +2,7 @@
 // Do not edit manually - regenerate with tools/generate_gui_headers.py
 #pragma once
 
-#include "guiengine/screen.hpp"
+#include "guiengine/abstract_top_level_container.hpp"
 #include "guiengine/widgets/button_widget.hpp"
 #include "guiengine/widgets/icon_button_widget.hpp"
 #include "guiengine/widgets/list_widget.hpp"
@@ -17,12 +17,12 @@ struct UserSearchWidgets
     ButtonWidget* search_button = nullptr;
     ListWidget* user_list = nullptr;
 
-    void bind(Screen* screen)
+    void bind(AbstractTopLevelContainer* container)
     {
-        back = screen->getWidget<IconButtonWidget>("back");
-        search_box = screen->getWidget<TextBoxWidget>("search_box");
-        search_button = screen->getWidget<ButtonWidget>("search_button");
-        user_list = screen->getWidget<ListWidget>("user_list");
+        back = container->getWidget<IconButtonWidget>("back");
+        search_box = container->getWidget<TextBoxWidget>("search_box");
+        search_button = container->getWidget<ButtonWidget>("search_button");
+        user_list = container->getWidget<ListWidget>("user_list");
     }
 };
 

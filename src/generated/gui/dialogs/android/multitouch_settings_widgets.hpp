@@ -2,7 +2,7 @@
 // Do not edit manually - regenerate with tools/generate_gui_headers.py
 #pragma once
 
-#include "guiengine/screen.hpp"
+#include "guiengine/abstract_top_level_container.hpp"
 #include "guiengine/widgets/button_widget.hpp"
 #include "guiengine/widgets/check_box_widget.hpp"
 #include "guiengine/widgets/label_widget.hpp"
@@ -25,20 +25,20 @@ struct MultitouchSettingsWidgets
     ButtonWidget* restore = nullptr;
     ButtonWidget* close = nullptr;
 
-    void bind(Screen* screen)
+    void bind(AbstractTopLevelContainer* container)
     {
-        title = screen->getWidget<LabelWidget>("title");
-        buttons_enabled = screen->getWidget<CheckBoxWidget>("buttons_enabled");
-        buttons_inverted = screen->getWidget<CheckBoxWidget>("buttons_inverted");
-        scale = screen->getWidget<SpinnerWidget>("scale");
-        auto_acceleration = screen->getWidget<CheckBoxWidget>("auto_acceleration");
-        accelerometer = screen->getWidget<CheckBoxWidget>("accelerometer");
-        gyroscope = screen->getWidget<CheckBoxWidget>("gyroscope");
-        deadzone = screen->getWidget<SpinnerWidget>("deadzone");
-        sensitivity_x = screen->getWidget<SpinnerWidget>("sensitivity_x");
-        sensitivity_y = screen->getWidget<SpinnerWidget>("sensitivity_y");
-        restore = screen->getWidget<ButtonWidget>("restore");
-        close = screen->getWidget<ButtonWidget>("close");
+        title = container->getWidget<LabelWidget>("title");
+        buttons_enabled = container->getWidget<CheckBoxWidget>("buttons_enabled");
+        buttons_inverted = container->getWidget<CheckBoxWidget>("buttons_inverted");
+        scale = container->getWidget<SpinnerWidget>("scale");
+        auto_acceleration = container->getWidget<CheckBoxWidget>("auto_acceleration");
+        accelerometer = container->getWidget<CheckBoxWidget>("accelerometer");
+        gyroscope = container->getWidget<CheckBoxWidget>("gyroscope");
+        deadzone = container->getWidget<SpinnerWidget>("deadzone");
+        sensitivity_x = container->getWidget<SpinnerWidget>("sensitivity_x");
+        sensitivity_y = container->getWidget<SpinnerWidget>("sensitivity_y");
+        restore = container->getWidget<ButtonWidget>("restore");
+        close = container->getWidget<ButtonWidget>("close");
     }
 };
 

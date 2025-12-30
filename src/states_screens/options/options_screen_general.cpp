@@ -52,27 +52,23 @@ void OptionsScreenGeneral::loadedFromFile()
 void OptionsScreenGeneral::init()
 {
     Screen::init();
-    RibbonWidget* ribbon = getWidget<RibbonWidget>("options_choice");
-    assert(ribbon != NULL);
-    ribbon->setFocusForPlayer(PLAYER_ID_GAME_MASTER);
-    ribbon->select( "tab_general", PLAYER_ID_GAME_MASTER );
 
-    CheckBoxWidget* internet_enabled = getWidget<CheckBoxWidget>("enable-internet");
-    assert( internet_enabled != NULL );
-    internet_enabled->setState( UserConfigParams::m_internet_status
+    // Bind typed widget pointers (one-time lookup)
+    m_widgets.bind(this);
+
+    m_widgets.options_choice->setFocusForPlayer(PLAYER_ID_GAME_MASTER);
+    m_widgets.options_choice->select( "tab_general", PLAYER_ID_GAME_MASTER );
+
+    m_widgets.enable_internet->setState( UserConfigParams::m_internet_status
                                      ==RequestManager::IPERM_ALLOWED );
 
-    setInternetCheckboxes(internet_enabled->getState());
+    setInternetCheckboxes(m_widgets.enable_internet->getState());
 
-    CheckBoxWidget* handicap = getWidget<CheckBoxWidget>("enable-handicap");
-    assert( handicap != NULL );
-    handicap->setState( UserConfigParams::m_per_player_difficulty );
+    m_widgets.enable_handicap->setState( UserConfigParams::m_per_player_difficulty );
     // I18N: Tooltip in the UI menu. Use enough linebreaks to make sure the text fits the screen in low resolutions.
-    handicap->setTooltip(_("In multiplayer mode, players can select handicapped\n(more difficult) profiles on the kart selection screen"));
+    m_widgets.enable_handicap->setTooltip(_("In multiplayer mode, players can select handicapped\n(more difficult) profiles on the kart selection screen"));
 
-    CheckBoxWidget* show_login = getWidget<CheckBoxWidget>("show-login");
-    assert( show_login!= NULL );
-    show_login->setState( UserConfigParams::m_always_show_login_screen);
+    m_widgets.show_login->setState( UserConfigParams::m_always_show_login_screen);
 
     OptionsCommon::setTabStatus();
 
@@ -80,21 +76,21 @@ void OptionsScreenGeneral::init()
     if (ExtractMobileAssets::hasFullAssets())
     {
         // I18N: For mobile version for STK, uninstall the downloaded assets
-        getWidget("assets_settings")->setText(_("Uninstall full game assets"));
+        m_widgets.assets_settings->setText(_("Uninstall full game assets"));
     }
     else
     {
         // I18N: For mobile version for STK, install the full game assets which
         // will download from stk server
-        getWidget("assets_settings")->setText(_("Install full game assets"));
+        m_widgets.assets_settings->setText(_("Install full game assets"));
     }
     if (UserConfigParams::m_internet_status != RequestManager::IPERM_ALLOWED ||
         StateManager::get()->getGameState() == GUIEngine::INGAME_MENU)
-        getWidget("assets_settings")->setActive(false);
+        m_widgets.assets_settings->setActive(false);
     else
-        getWidget("assets_settings")->setActive(true);
+        m_widgets.assets_settings->setActive(true);
 #else
-    getWidget("assets_settings")->setVisible(false);
+    m_widgets.assets_settings->setVisible(false);
 #endif
 }   // init
 
@@ -102,25 +98,22 @@ void OptionsScreenGeneral::init()
 
 void OptionsScreenGeneral::eventCallback(Widget* widget, const std::string& name, const int playerID)
 {
-    if (name == "options_choice")
+    if (widget == m_widgets.options_choice)
     {
-        std::string selection = ((RibbonWidget*)widget)->getSelectionIDString(PLAYER_ID_GAME_MASTER);
+        std::string selection = m_widgets.options_choice->getSelectionIDString(PLAYER_ID_GAME_MASTER);
 
         if (selection != "tab_general")
             OptionsCommon::switchTab(selection);
     }
-    else if(name == "back")
+    else if (widget == m_widgets.back)
     {
         StateManager::get()->escapePressed();
     }
-    else if (name=="enable-internet")
+    else if (widget == m_widgets.enable_internet)
     {
-        CheckBoxWidget* internet = getWidget<CheckBoxWidget>("enable-internet");
-        assert( internet != NULL );
-
         // If internet is being activated, enable immediately. If it's being disabled,
         // we'll disable later after logout.
-        if (internet->getState())
+        if (m_widgets.enable_internet->getState())
         {
             UserConfigParams::m_internet_status = RequestManager::IPERM_ALLOWED;
 
@@ -131,51 +124,43 @@ void OptionsScreenGeneral::eventCallback(Widget* widget, const std::string& name
         // If internet gets enabled, re-initialise the addon manager (which
         // happens in a separate thread) so that news.xml etc can be
         // downloaded if necessary.
-        setInternetCheckboxes(internet->getState());
+        setInternetCheckboxes(m_widgets.enable_internet->getState());
         PlayerProfile* profile = PlayerManager::getCurrentPlayer();
-        if(internet->getState())
+        if(m_widgets.enable_internet->getState())
             NewsManager::get()->init(false);
         else if (profile != NULL && profile->isLoggedIn())
             profile->requestSignOut();
 
         // Deactivate internet after 'requestSignOut' so that the sign out request is allowed
-        if (!internet->getState())
+        if (!m_widgets.enable_internet->getState())
             UserConfigParams::m_internet_status = RequestManager::IPERM_NOT_ALLOWED;
     }
-    /*else if (name=="enable-hw-report")
+    /*else if (widget == m_widgets.enable_hw_report)
     {
-        CheckBoxWidget* stats = getWidget<CheckBoxWidget>("enable-hw-report");
-        UserConfigParams::m_hw_report_enable = stats->getState();
-        if(stats->getState())
+        UserConfigParams::m_hw_report_enable = m_widgets.enable_hw_report->getState();
+        if(m_widgets.enable_hw_report->getState())
             HardwareStats::reportHardwareStats();
     }
     */
-    else if (name=="enable-lobby-chat")
+    else if (widget == m_widgets.enable_lobby_chat)
     {
-        CheckBoxWidget* chat = getWidget<CheckBoxWidget>("enable-lobby-chat");
-        UserConfigParams::m_lobby_chat = chat->getState();
-        CheckBoxWidget* race_chat = getWidget<CheckBoxWidget>("enable-race-chat");
-        race_chat->setActive(UserConfigParams::m_lobby_chat);
+        UserConfigParams::m_lobby_chat = m_widgets.enable_lobby_chat->getState();
+        m_widgets.enable_race_chat->setActive(UserConfigParams::m_lobby_chat);
     }
-    else if (name=="enable-race-chat")
+    else if (widget == m_widgets.enable_race_chat)
     {
-        CheckBoxWidget* chat = getWidget<CheckBoxWidget>("enable-race-chat");
-        UserConfigParams::m_race_chat = chat->getState();
+        UserConfigParams::m_race_chat = m_widgets.enable_race_chat->getState();
     }
-    else if (name=="show-login")
+    else if (widget == m_widgets.show_login)
     {
-        CheckBoxWidget* show_login = getWidget<CheckBoxWidget>("show-login");
-        assert( show_login != NULL );
-        UserConfigParams::m_always_show_login_screen = show_login->getState();
+        UserConfigParams::m_always_show_login_screen = m_widgets.show_login->getState();
     }
-    else if (name=="enable-handicap")
+    else if (widget == m_widgets.enable_handicap)
     {
-        CheckBoxWidget* handicap = getWidget<CheckBoxWidget>("enable-handicap");
-        assert( handicap != NULL );
-        UserConfigParams::m_per_player_difficulty = handicap->getState();
+        UserConfigParams::m_per_player_difficulty = m_widgets.enable_handicap->getState();
     }
 #ifdef MOBILE_STK
-    else if (name=="assets_settings")
+    else if (widget == m_widgets.assets_settings)
     {
         if (ExtractMobileAssets::hasFullAssets())
         {
@@ -202,28 +187,26 @@ void OptionsScreenGeneral::eventCallback(Widget* widget, const std::string& name
 void OptionsScreenGeneral::setInternetCheckboxes(bool activate)
 {
     //CheckBoxWidget* stats = getWidget<CheckBoxWidget>("enable-hw-report");
-    CheckBoxWidget* chat = getWidget<CheckBoxWidget>("enable-lobby-chat");
-    CheckBoxWidget* race_chat = getWidget<CheckBoxWidget>("enable-race-chat");
 
     if (activate)
     {
         //stats->setActive(true);
         //stats->setState(UserConfigParams::m_hw_report_enable);
-        chat->setActive(true);
-        chat->setState(UserConfigParams::m_lobby_chat);
-        race_chat->setActive(UserConfigParams::m_lobby_chat);
-        race_chat->setState(UserConfigParams::m_race_chat);
+        m_widgets.enable_lobby_chat->setActive(true);
+        m_widgets.enable_lobby_chat->setState(UserConfigParams::m_lobby_chat);
+        m_widgets.enable_race_chat->setActive(UserConfigParams::m_lobby_chat);
+        m_widgets.enable_race_chat->setState(UserConfigParams::m_race_chat);
 #ifdef MOBILE_STK
-        getWidget("assets_settings")->setActive(true);
+        m_widgets.assets_settings->setActive(true);
 #endif
         }
     else
     {
-        chat->setActive(false);
+        m_widgets.enable_lobby_chat->setActive(false);
         //stats->setActive(false);
-        race_chat->setActive(false);
+        m_widgets.enable_race_chat->setActive(false);
 #ifdef MOBILE_STK
-        getWidget("assets_settings")->setActive(false);
+        m_widgets.assets_settings->setActive(false);
 #endif
         // Disable this, so that the user has to re-check this if
         // enabled later (for GDPR compliance).

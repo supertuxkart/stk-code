@@ -2,7 +2,7 @@
 // Do not edit manually - regenerate with tools/generate_gui_headers.py
 #pragma once
 
-#include "guiengine/screen.hpp"
+#include "guiengine/abstract_top_level_container.hpp"
 #include "guiengine/widgets/button_widget.hpp"
 #include "guiengine/widgets/check_box_widget.hpp"
 #include "guiengine/widgets/icon_button_widget.hpp"
@@ -24,18 +24,18 @@ struct OnlineWidgets
     IconButtonWidget* online = nullptr;
     IconButtonWidget* back = nullptr;
 
-    void bind(Screen* screen)
+    void bind(AbstractTopLevelContainer* container)
     {
-        user_id = screen->getWidget<ButtonWidget>("user-id");
-        news_list = screen->getWidget<ListWidget>("news_list");
-        enable_splitscreen = screen->getWidget<CheckBoxWidget>("enable-splitscreen");
-        logo = screen->getWidget<IconButtonWidget>("logo");
-        menu_toprow = screen->getWidget<RibbonWidget>("menu_toprow");
-        lan = screen->getWidget<IconButtonWidget>("lan");
-        wan = screen->getWidget<IconButtonWidget>("wan");
-        enter_address = screen->getWidget<IconButtonWidget>("enter-address");
-        online = screen->getWidget<IconButtonWidget>("online");
-        back = screen->getWidget<IconButtonWidget>("back");
+        user_id = container->getWidget<ButtonWidget>("user-id");
+        news_list = container->getWidget<ListWidget>("news_list");
+        enable_splitscreen = container->getWidget<CheckBoxWidget>("enable-splitscreen");
+        logo = container->getWidget<IconButtonWidget>("logo");
+        menu_toprow = container->getWidget<RibbonWidget>("menu_toprow");
+        lan = container->getWidget<IconButtonWidget>("lan");
+        wan = container->getWidget<IconButtonWidget>("wan");
+        enter_address = container->getWidget<IconButtonWidget>("enter-address");
+        online = container->getWidget<IconButtonWidget>("online");
+        back = container->getWidget<IconButtonWidget>("back");
     }
 };
 

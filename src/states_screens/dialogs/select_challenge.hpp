@@ -21,6 +21,7 @@
 #include "challenges/challenge_status.hpp"
 #include "guiengine/event_handler.hpp"
 #include "guiengine/modaldialog.hpp"
+#include "generated/gui/dialogs/select_challenge_widgets.hpp"
 #include "race/race_manager.hpp"
 
 /**
@@ -30,6 +31,7 @@
 class SelectChallengeDialog : public GUIEngine::ModalDialog
 {
 private:
+    GUIEngine::SelectChallengeWidgets m_widgets;
     bool  m_self_destroy = false;
     std::string m_challenge_id;
     void updateSolvedIcon(const ChallengeStatus* c, RaceManager::Difficulty diff,

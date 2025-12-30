@@ -2,7 +2,7 @@
 // Do not edit manually - regenerate with tools/generate_gui_headers.py
 #pragma once
 
-#include "guiengine/screen.hpp"
+#include "guiengine/abstract_top_level_container.hpp"
 #include "guiengine/widgets/icon_button_widget.hpp"
 #include "guiengine/widgets/label_widget.hpp"
 #include "guiengine/widgets/list_widget.hpp"
@@ -26,20 +26,20 @@ struct ServerInfoDialogWidgets
     IconButtonWidget* bookmark = nullptr;
     IconButtonWidget* join = nullptr;
 
-    void bind(Screen* screen)
+    void bind(AbstractTopLevelContainer* container)
     {
-        title = screen->getWidget<LabelWidget>("title");
-        server_info_1 = screen->getWidget<LabelWidget>("server-info-1");
-        server_info_2 = screen->getWidget<LabelWidget>("server-info-2");
-        server_info_3 = screen->getWidget<LabelWidget>("server-info-3");
-        server_info_4 = screen->getWidget<LabelWidget>("server-info-4");
-        player_list = screen->getWidget<ListWidget>("player-list");
-        label_password = screen->getWidget<LabelWidget>("label_password");
-        password = screen->getWidget<TextBoxWidget>("password");
-        options = screen->getWidget<RibbonWidget>("options");
-        cancel = screen->getWidget<IconButtonWidget>("cancel");
-        bookmark = screen->getWidget<IconButtonWidget>("bookmark");
-        join = screen->getWidget<IconButtonWidget>("join");
+        title = container->getWidget<LabelWidget>("title");
+        server_info_1 = container->getWidget<LabelWidget>("server-info-1");
+        server_info_2 = container->getWidget<LabelWidget>("server-info-2");
+        server_info_3 = container->getWidget<LabelWidget>("server-info-3");
+        server_info_4 = container->getWidget<LabelWidget>("server-info-4");
+        player_list = container->getWidget<ListWidget>("player-list");
+        label_password = container->getWidget<LabelWidget>("label_password");
+        password = container->getWidget<TextBoxWidget>("password");
+        options = container->getWidget<RibbonWidget>("options");
+        cancel = container->getWidget<IconButtonWidget>("cancel");
+        bookmark = container->getWidget<IconButtonWidget>("bookmark");
+        join = container->getWidget<IconButtonWidget>("join");
     }
 };
 

@@ -2,7 +2,7 @@
 // Do not edit manually - regenerate with tools/generate_gui_headers.py
 #pragma once
 
-#include "guiengine/screen.hpp"
+#include "guiengine/abstract_top_level_container.hpp"
 #include "guiengine/widgets/check_box_widget.hpp"
 #include "guiengine/widgets/dynamic_ribbon_widget.hpp"
 #include "guiengine/widgets/icon_button_widget.hpp"
@@ -22,16 +22,16 @@ struct TracksAndGpWidgets
     DynamicRibbonWidget* tracks = nullptr;
     RibbonWidget* trackgroups = nullptr;
 
-    void bind(Screen* screen)
+    void bind(AbstractTopLevelContainer* container)
     {
-        back = screen->getWidget<IconButtonWidget>("back");
-        gps = screen->getWidget<DynamicRibbonWidget>("gps");
-        search = screen->getWidget<TextBoxWidget>("search");
-        favorite = screen->getWidget<CheckBoxWidget>("favorite");
-        rand_gp = screen->getWidget<IconButtonWidget>("rand-gp");
-        random_track = screen->getWidget<IconButtonWidget>("random_track");
-        tracks = screen->getWidget<DynamicRibbonWidget>("tracks");
-        trackgroups = screen->getWidget<RibbonWidget>("trackgroups");
+        back = container->getWidget<IconButtonWidget>("back");
+        gps = container->getWidget<DynamicRibbonWidget>("gps");
+        search = container->getWidget<TextBoxWidget>("search");
+        favorite = container->getWidget<CheckBoxWidget>("favorite");
+        rand_gp = container->getWidget<IconButtonWidget>("rand-gp");
+        random_track = container->getWidget<IconButtonWidget>("random_track");
+        tracks = container->getWidget<DynamicRibbonWidget>("tracks");
+        trackgroups = container->getWidget<RibbonWidget>("trackgroups");
     }
 };
 

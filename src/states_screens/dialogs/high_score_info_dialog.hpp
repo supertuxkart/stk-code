@@ -20,6 +20,7 @@
 #define HEADER_HIGH_SCORE_INFO_DIALOG_HPP
 
 #include "guiengine/modaldialog.hpp"
+#include "generated/gui/dialogs/high_score_info_dialog_widgets.hpp"
 #include "race/grand_prix_data.hpp"
 #include "race/highscores.hpp"
 
@@ -36,6 +37,7 @@ class HighScoreInfoDialog : public GUIEngine::ModalDialog
 {
 
 private:
+    GUIEngine::HighScoreInfoDialogWidgets m_widgets;
     Highscores* m_hs;
 
     GUIEngine::RibbonWidget*      m_action_widget;

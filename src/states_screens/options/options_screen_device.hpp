@@ -23,6 +23,7 @@
 #include <irrString.h>
 
 #include "guiengine/screen.hpp"
+#include "generated/gui/screens/options/options_device_widgets.hpp"
 #include "states_screens/dialogs/message_dialog.hpp"
 
 namespace GUIEngine { class Widget; class ListWidget; }
@@ -50,6 +51,8 @@ class OptionsScreenDevice : public GUIEngine::Screen,
 
     /** The configuration to use. */
     DeviceConfig* m_config;
+
+    GUIEngine::OptionsDeviceWidgets m_widgets;
 
     void renameRow(GUIEngine::ListWidget* actions,
         int idRow,

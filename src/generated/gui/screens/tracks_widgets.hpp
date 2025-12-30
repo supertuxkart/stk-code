@@ -2,7 +2,7 @@
 // Do not edit manually - regenerate with tools/generate_gui_headers.py
 #pragma once
 
-#include "guiengine/screen.hpp"
+#include "guiengine/abstract_top_level_container.hpp"
 #include "guiengine/widgets/check_box_widget.hpp"
 #include "guiengine/widgets/dynamic_ribbon_widget.hpp"
 #include "guiengine/widgets/icon_button_widget.hpp"
@@ -28,18 +28,18 @@ struct TracksWidgets
     TextBoxWidget* search_track = nullptr;
     ProgressBarWidget* timer = nullptr;
 
-    void bind(Screen* screen)
+    void bind(AbstractTopLevelContainer* container)
     {
-        back = screen->getWidget<IconButtonWidget>("back");
-        tracks = screen->getWidget<DynamicRibbonWidget>("tracks");
-        trackgroups = screen->getWidget<RibbonWidget>("trackgroups");
-        lap_spinner = screen->getWidget<SpinnerWidget>("lap-spinner");
-        lap_text = screen->getWidget<LabelWidget>("lap-text");
-        reverse = screen->getWidget<CheckBoxWidget>("reverse");
-        reverse_text = screen->getWidget<LabelWidget>("reverse-text");
-        vote_list = screen->getWidget<ListWidget>("vote-list");
-        search_track = screen->getWidget<TextBoxWidget>("search_track");
-        timer = screen->getWidget<ProgressBarWidget>("timer");
+        back = container->getWidget<IconButtonWidget>("back");
+        tracks = container->getWidget<DynamicRibbonWidget>("tracks");
+        trackgroups = container->getWidget<RibbonWidget>("trackgroups");
+        lap_spinner = container->getWidget<SpinnerWidget>("lap-spinner");
+        lap_text = container->getWidget<LabelWidget>("lap-text");
+        reverse = container->getWidget<CheckBoxWidget>("reverse");
+        reverse_text = container->getWidget<LabelWidget>("reverse-text");
+        vote_list = container->getWidget<ListWidget>("vote-list");
+        search_track = container->getWidget<TextBoxWidget>("search_track");
+        timer = container->getWidget<ProgressBarWidget>("timer");
     }
 };
 

@@ -2,7 +2,7 @@
 // Do not edit manually - regenerate with tools/generate_gui_headers.py
 #pragma once
 
-#include "guiengine/screen.hpp"
+#include "guiengine/abstract_top_level_container.hpp"
 #include "guiengine/widgets/icon_button_widget.hpp"
 #include "guiengine/widgets/ribbon_widget.hpp"
 
@@ -15,12 +15,12 @@ struct RaceResultWidgets
     IconButtonWidget* middle = nullptr;
     IconButtonWidget* right = nullptr;
 
-    void bind(Screen* screen)
+    void bind(AbstractTopLevelContainer* container)
     {
-        operations = screen->getWidget<RibbonWidget>("operations");
-        left = screen->getWidget<IconButtonWidget>("left");
-        middle = screen->getWidget<IconButtonWidget>("middle");
-        right = screen->getWidget<IconButtonWidget>("right");
+        operations = container->getWidget<RibbonWidget>("operations");
+        left = container->getWidget<IconButtonWidget>("left");
+        middle = container->getWidget<IconButtonWidget>("middle");
+        right = container->getWidget<IconButtonWidget>("right");
     }
 };
 

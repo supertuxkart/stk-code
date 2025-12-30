@@ -71,6 +71,8 @@ AddonsScreen::AddonsScreen() : Screen("addons_screen.stkgui")
 
 void AddonsScreen::loadedFromFile()
 {
+    m_widgets.bind(this);
+
     video::ITexture* icon1 = irr_driver->getTexture( file_manager->getAsset(FileManager::GUI_ICON,
                                                      "package.png"         ));
     video::ITexture* icon2 = irr_driver->getTexture( file_manager->getAsset(FileManager::GUI_ICON,
@@ -92,8 +94,7 @@ void AddonsScreen::loadedFromFile()
     m_icon_loading = m_icon_bank->addTextureAsSprite(icon6);
     m_icon_needs_update  = m_icon_bank->addTextureAsSprite(icon3);
 
-    GUIEngine::ListWidget* w_list = getWidget<GUIEngine::ListWidget>("list_addons");
-    w_list->setColumnListener(this);
+    m_widgets.list_addons->setColumnListener(this);
 }   // loadedFromFile
 
 
@@ -101,49 +102,39 @@ void AddonsScreen::loadedFromFile()
 
 void AddonsScreen::beforeAddingWidget()
 {
-    GUIEngine::ListWidget* w_list = getWidget<GUIEngine::ListWidget>("list_addons");
-    assert(w_list != NULL);
-    w_list->clearColumns();
-    w_list->addColumn( _("Add-on name"), 3 );
-    w_list->addColumn( _("Updated date"), 1 );
-    
-    GUIEngine::SpinnerWidget* w_filter_date =
-                        getWidget<GUIEngine::SpinnerWidget>("filter_date");
-    w_filter_date->m_properties[GUIEngine::PROP_MIN_VALUE] = "0";
-    w_filter_date->m_properties[GUIEngine::PROP_MAX_VALUE] =
+    m_widgets.list_addons->clearColumns();
+    m_widgets.list_addons->addColumn( _("Add-on name"), 3 );
+    m_widgets.list_addons->addColumn( _("Updated date"), 1 );
+
+    m_widgets.filter_date->m_properties[GUIEngine::PROP_MIN_VALUE] = "0";
+    m_widgets.filter_date->m_properties[GUIEngine::PROP_MAX_VALUE] =
                             StringUtils::toString(m_date_filters.size() - 1);
-    
+
     for (unsigned int n = 0; n < m_date_filters.size(); n++)
     {
-        w_filter_date->addLabel(m_date_filters[n].label);
+        m_widgets.filter_date->addLabel(m_date_filters[n].label);
     }
 
-    GUIEngine::SpinnerWidget* w_filter_rating =
-                        getWidget<GUIEngine::SpinnerWidget>("filter_rating");
-    w_filter_rating->m_properties[GUIEngine::PROP_MIN_VALUE] = "0";
-    w_filter_rating->m_properties[GUIEngine::PROP_MAX_VALUE] = "6";
-    
+    m_widgets.filter_rating->m_properties[GUIEngine::PROP_MIN_VALUE] = "0";
+    m_widgets.filter_rating->m_properties[GUIEngine::PROP_MAX_VALUE] = "6";
+
     for (int n = 0; n < 7; n++)
     {
-        w_filter_rating->addLabel(StringUtils::toWString(n / 2.0));
+        m_widgets.filter_rating->addLabel(StringUtils::toWString(n / 2.0));
     }
 
-    GUIEngine::SpinnerWidget* w_filter_installation =
-                        getWidget<GUIEngine::SpinnerWidget>("filter_installation");
-    w_filter_installation->m_properties[GUIEngine::PROP_MIN_VALUE] = "0";
-    w_filter_installation->m_properties[GUIEngine::PROP_MAX_VALUE] = "2";
-    w_filter_installation->addLabel(_("All"));
-    w_filter_installation->addLabel(_("Installed"));
+    m_widgets.filter_installation->m_properties[GUIEngine::PROP_MIN_VALUE] = "0";
+    m_widgets.filter_installation->m_properties[GUIEngine::PROP_MAX_VALUE] = "2";
+    m_widgets.filter_installation->addLabel(_("All"));
+    m_widgets.filter_installation->addLabel(_("Installed"));
     //I18N: Addon not installed for fillter
-    w_filter_installation->addLabel(_("Not installed"));
+    m_widgets.filter_installation->addLabel(_("Not installed"));
 
-    GUIEngine::SpinnerWidget* w_filter_featured =
-                        getWidget<GUIEngine::SpinnerWidget>("filter_featured");
-    w_filter_featured->m_properties[GUIEngine::PROP_MIN_VALUE] = "0";
-    w_filter_featured->m_properties[GUIEngine::PROP_MAX_VALUE] = "2";
-    w_filter_featured->addLabel(_("All"));
-    w_filter_featured->addLabel(_("Featured"));
-    w_filter_featured->addLabel(_("Not featured"));
+    m_widgets.filter_featured->m_properties[GUIEngine::PROP_MIN_VALUE] = "0";
+    m_widgets.filter_featured->m_properties[GUIEngine::PROP_MAX_VALUE] = "2";
+    m_widgets.filter_featured->addLabel(_("All"));
+    m_widgets.filter_featured->addLabel(_("Featured"));
+    m_widgets.filter_featured->addLabel(_("Not featured"));
 }
 // ----------------------------------------------------------------------------
 
@@ -154,44 +145,30 @@ void AddonsScreen::init()
     m_sort_desc = false;
     m_reloading = false;
 
-    getWidget<GUIEngine::RibbonWidget>("category")->setActive(false);
+    m_widgets.category->setActive(false);
 
     if(UserConfigParams::logAddons())
         Log::info("addons", "Using directory <%s>", file_manager->getAddonsDir().c_str());
 
-    GUIEngine::ListWidget* w_list = getWidget<GUIEngine::ListWidget>("list_addons");
-
     m_icon_bank->setScale(1.0f / 96.0f);
     // 128 is the height of the image file
     m_icon_bank->setTargetIconSize(128, 128);
-    w_list->setIcons(m_icon_bank, 1.5f /* defines line height relative to text size */);
+    m_widgets.list_addons->setIcons(m_icon_bank, 1.5f /* defines line height relative to text size */);
 
     m_type = "kart";
 
     bool ip = UserConfigParams::m_internet_status == RequestManager::IPERM_ALLOWED;
-    getWidget<GUIEngine::IconButtonWidget>("reload")->setActive(ip);
+    m_widgets.reload->setActive(ip);
 
     // Reset filter.
-    GUIEngine::TextBoxWidget* w_filter_name =
-                        getWidget<GUIEngine::TextBoxWidget>("filter_name");
-    w_filter_name->setText(L"");
+    m_widgets.filter_name->setText(L"");
     // Add listener for incremental update when search text is changed
-    w_filter_name->clearListeners();
-    w_filter_name->addListener(this);
-    GUIEngine::SpinnerWidget* w_filter_date =
-                        getWidget<GUIEngine::SpinnerWidget>("filter_date");
-    w_filter_date->setValue(0);
-    GUIEngine::SpinnerWidget* w_filter_rating =
-                        getWidget<GUIEngine::SpinnerWidget>("filter_rating");
-    w_filter_rating->setValue(0);
-
-    GUIEngine::SpinnerWidget* w_filter_installation =
-                        getWidget<GUIEngine::SpinnerWidget>("filter_installation");
-    w_filter_installation->setValue(0);
-
-    GUIEngine::SpinnerWidget* w_filter_featured =
-                        getWidget<GUIEngine::SpinnerWidget>("filter_featured");
-    w_filter_featured->setValue(0);
+    m_widgets.filter_name->clearListeners();
+    m_widgets.filter_name->addListener(this);
+    m_widgets.filter_date->setValue(0);
+    m_widgets.filter_rating->setValue(0);
+    m_widgets.filter_installation->setValue(0);
+    m_widgets.filter_featured->setValue(0);
 
     // Set the default sort order
     Addon::setSortOrder(Addon::SO_DEFAULT);
@@ -220,14 +197,10 @@ void AddonsScreen::loadList()
 {
 #ifndef SERVER_ONLY
     // Get the filter by words.
-    GUIEngine::TextBoxWidget* w_filter_name =
-                        getWidget<GUIEngine::TextBoxWidget>("filter_name");
-    core::stringw words = w_filter_name->getText();
+    core::stringw words = m_widgets.filter_name->getText();
 
     // Get the filter by date.
-    GUIEngine::SpinnerWidget* w_filter_date =
-                        getWidget<GUIEngine::SpinnerWidget>("filter_date");
-    int date_index = w_filter_date->getValue();
+    int date_index = m_widgets.filter_date->getValue();
     StkTime::TimeType date = StkTime::getTimeSinceEpoch();
     date = StkTime::addInterval(date,
                 -m_date_filters[date_index].year,
@@ -235,15 +208,7 @@ void AddonsScreen::loadList()
                 -m_date_filters[date_index].day);
 
     // Get the filter by rating.
-    GUIEngine::SpinnerWidget* w_filter_rating =
-                        getWidget<GUIEngine::SpinnerWidget>("filter_rating");
-    float rating = w_filter_rating->getValue() / 2.0f;
-    
-    GUIEngine::SpinnerWidget* w_filter_installation =
-                        getWidget<GUIEngine::SpinnerWidget>("filter_installation");
-
-    GUIEngine::SpinnerWidget* w_filter_featured =
-                        getWidget<GUIEngine::SpinnerWidget>("filter_featured");
+    float rating = m_widgets.filter_rating->getValue() / 2.0f;
 
     // First create a list of sorted entries
     PtrVector<const Addon, REF> sorted_list;
@@ -251,11 +216,11 @@ void AddonsScreen::loadList()
     {
         const Addon & addon = addons_manager->getAddon(i);
         // Ignore not installed addons if the checkbox is enabled
-        if(   (w_filter_featured->getValue() == 1 && !addon.testStatus(Addon::AS_FEATURED))
-           || (w_filter_featured->getValue() == 2 && addon.testStatus(Addon::AS_FEATURED)))
+        if(   (m_widgets.filter_featured->getValue() == 1 && !addon.testStatus(Addon::AS_FEATURED))
+           || (m_widgets.filter_featured->getValue() == 2 && addon.testStatus(Addon::AS_FEATURED)))
             continue;
-        if(   (w_filter_installation->getValue() == 1 && !addon.isInstalled())
-           || (w_filter_installation->getValue() == 2 &&  addon.isInstalled()))
+        if(   (m_widgets.filter_installation->getValue() == 1 && !addon.isInstalled())
+           || (m_widgets.filter_installation->getValue() == 2 &&  addon.isInstalled()))
             continue;
         // Ignore addons of a different type
         if(addon.getType()!=m_type) continue;
@@ -286,8 +251,7 @@ void AddonsScreen::loadList()
     }
     sorted_list.insertionSort(/*start=*/0, m_sort_desc);
 
-    GUIEngine::ListWidget* w_list = getWidget<GUIEngine::ListWidget>("list_addons");
-    w_list->clear();
+    m_widgets.list_addons->clear();
 
     for(unsigned int i=0; i<sorted_list.size(); i++)
     {
@@ -394,26 +358,23 @@ void AddonsScreen::loadList()
         std::vector<GUIEngine::ListWidget::ListCell> row;
         row.push_back(GUIEngine::ListWidget::ListCell(s.c_str(), icon, 3, false));
         row.push_back(GUIEngine::ListWidget::ListCell(addon->getDateAsString().c_str(), -1, 1, true));
-        w_list->addItem(addon->getId(), row);
+        m_widgets.list_addons->addItem(addon->getId(), row);
 
         // Highlight if it's not approved in artists debug mode.
         if(UserConfigParams::m_artist_debug_mode &&
             !addon->testStatus(Addon::AS_APPROVED))
         {
-            w_list->markItemRed(addon->getId(), true);
+            m_widgets.list_addons->markItemRed(addon->getId(), true);
         }
     }
 
-    getWidget<GUIEngine::RibbonWidget>("category")->setActive(true);
+    m_widgets.category->setActive(true);
     if(m_type == "kart")
-        getWidget<GUIEngine::RibbonWidget>("category")->select("tab_kart",
-                                                        PLAYER_ID_GAME_MASTER);
+        m_widgets.category->select("tab_kart", PLAYER_ID_GAME_MASTER);
     else if(m_type == "track")
-        getWidget<GUIEngine::RibbonWidget>("category")->select("tab_track",
-                                                        PLAYER_ID_GAME_MASTER);
+        m_widgets.category->select("tab_track", PLAYER_ID_GAME_MASTER);
     else
-        getWidget<GUIEngine::RibbonWidget>("category")->select("tab_update",
-                                                        PLAYER_ID_GAME_MASTER);
+        m_widgets.category->select("tab_update", PLAYER_ID_GAME_MASTER);
 #endif
 }   // loadList
 
@@ -440,41 +401,36 @@ void AddonsScreen::eventCallback(GUIEngine::Widget* widget,
                                  const std::string& name, const int playerID)
 {
 #ifndef SERVER_ONLY
-    if (name == "back")
+    if (widget == m_widgets.back)
     {
         StateManager::get()->escapePressed();
     }
-
-    else if (name == "reload")
+    else if (widget == m_widgets.reload)
     {
         if (!m_reloading)
         {
             m_reloading = true;
             NewsManager::get()->init(true);
 
-            GUIEngine::ListWidget* w_list = getWidget<GUIEngine::ListWidget>("list_addons");
-            w_list->clear();
+            m_widgets.list_addons->clear();
 
-            w_list->addItem("spacer", L"");
-            w_list->addItem("loading",_("Please wait while addons are updated"), m_icon_loading);
+            m_widgets.list_addons->addItem("spacer", L"");
+            m_widgets.list_addons->addItem("loading",_("Please wait while addons are updated"), m_icon_loading);
         }
     }
-
-    else if (name == "list_addons")
+    else if (widget == m_widgets.list_addons)
     {
-        GUIEngine::ListWidget* list = getWidget<GUIEngine::ListWidget>("list_addons");
-        std::string id = list->getSelectionInternalName();
+        std::string id = m_widgets.list_addons->getSelectionInternalName();
 
         if (!id.empty() && addons_manager->getAddon(id) != NULL)
         {
-            m_selected_index = list->getSelectionID();
+            m_selected_index = m_widgets.list_addons->getSelectionID();
             new AddonsLoading(id);
         }
     }
-    if (name == "category")
+    else if (widget == m_widgets.category)
     {
-        std::string selection = ((GUIEngine::RibbonWidget*)widget)
-                         ->getSelectionIDString(PLAYER_ID_GAME_MASTER).c_str();
+        std::string selection = m_widgets.category->getSelectionIDString(PLAYER_ID_GAME_MASTER).c_str();
         if (selection == "tab_track")
         {
             m_type = "track";
@@ -491,7 +447,9 @@ void AddonsScreen::eventCallback(GUIEngine::Widget* widget,
             loadList();
         }
     }
-    else if (name == "filter_search" || name == "filter_installation" || name == "filter_featured")
+    else if (widget == m_widgets.filter_search ||
+             widget == m_widgets.filter_installation ||
+             widget == m_widgets.filter_featured)
     {
         loadList();
     }
@@ -509,9 +467,8 @@ void AddonsScreen::setLastSelected()
 {
     if(m_selected_index>-1)
     {
-        GUIEngine::ListWidget* list = getWidget<GUIEngine::ListWidget>("list_addons");
-        list->setFocusForPlayer(PLAYER_ID_GAME_MASTER);
-        list->setSelectionID(m_selected_index);
+        m_widgets.list_addons->setFocusForPlayer(PLAYER_ID_GAME_MASTER);
+        m_widgets.list_addons->setSelectionID(m_selected_index);
     }
 }   // setLastSelected
 

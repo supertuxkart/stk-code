@@ -2,7 +2,7 @@
 // Do not edit manually - regenerate with tools/generate_gui_headers.py
 #pragma once
 
-#include "guiengine/screen.hpp"
+#include "guiengine/abstract_top_level_container.hpp"
 #include "guiengine/widgets/icon_button_widget.hpp"
 #include "guiengine/widgets/label_widget.hpp"
 #include "guiengine/widgets/list_widget.hpp"
@@ -23,18 +23,18 @@ struct EditGpWidgets
     IconButtonWidget* remove = nullptr;
     IconButtonWidget* save = nullptr;
 
-    void bind(Screen* screen)
+    void bind(AbstractTopLevelContainer* container)
     {
-        back = screen->getWidget<IconButtonWidget>("back");
-        title = screen->getWidget<LabelWidget>("title");
-        tracks = screen->getWidget<ListWidget>("tracks");
-        menu = screen->getWidget<RibbonWidget>("menu");
-        up = screen->getWidget<IconButtonWidget>("up");
-        down = screen->getWidget<IconButtonWidget>("down");
-        add = screen->getWidget<IconButtonWidget>("add");
-        edit = screen->getWidget<IconButtonWidget>("edit");
-        remove = screen->getWidget<IconButtonWidget>("remove");
-        save = screen->getWidget<IconButtonWidget>("save");
+        back = container->getWidget<IconButtonWidget>("back");
+        title = container->getWidget<LabelWidget>("title");
+        tracks = container->getWidget<ListWidget>("tracks");
+        menu = container->getWidget<RibbonWidget>("menu");
+        up = container->getWidget<IconButtonWidget>("up");
+        down = container->getWidget<IconButtonWidget>("down");
+        add = container->getWidget<IconButtonWidget>("add");
+        edit = container->getWidget<IconButtonWidget>("edit");
+        remove = container->getWidget<IconButtonWidget>("remove");
+        save = container->getWidget<IconButtonWidget>("save");
     }
 };
 

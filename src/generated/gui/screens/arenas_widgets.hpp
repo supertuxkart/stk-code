@@ -2,7 +2,7 @@
 // Do not edit manually - regenerate with tools/generate_gui_headers.py
 #pragma once
 
-#include "guiengine/screen.hpp"
+#include "guiengine/abstract_top_level_container.hpp"
 #include "guiengine/widgets/button_widget.hpp"
 #include "guiengine/widgets/check_box_widget.hpp"
 #include "guiengine/widgets/dynamic_ribbon_widget.hpp"
@@ -23,16 +23,16 @@ struct ArenasWidgets
     ButtonWidget* addons = nullptr;
     ButtonWidget* all = nullptr;
 
-    void bind(Screen* screen)
+    void bind(AbstractTopLevelContainer* container)
     {
-        back = screen->getWidget<IconButtonWidget>("back");
-        search = screen->getWidget<TextBoxWidget>("search");
-        favorite = screen->getWidget<CheckBoxWidget>("favorite");
-        tracks = screen->getWidget<DynamicRibbonWidget>("tracks");
-        trackgroups = screen->getWidget<RibbonWidget>("trackgroups");
-        standard = screen->getWidget<ButtonWidget>("standard");
-        addons = screen->getWidget<ButtonWidget>("addons");
-        all = screen->getWidget<ButtonWidget>("all");
+        back = container->getWidget<IconButtonWidget>("back");
+        search = container->getWidget<TextBoxWidget>("search");
+        favorite = container->getWidget<CheckBoxWidget>("favorite");
+        tracks = container->getWidget<DynamicRibbonWidget>("tracks");
+        trackgroups = container->getWidget<RibbonWidget>("trackgroups");
+        standard = container->getWidget<ButtonWidget>("standard");
+        addons = container->getWidget<ButtonWidget>("addons");
+        all = container->getWidget<ButtonWidget>("all");
     }
 };
 

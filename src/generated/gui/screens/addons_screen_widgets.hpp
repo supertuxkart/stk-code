@@ -2,7 +2,7 @@
 // Do not edit manually - regenerate with tools/generate_gui_headers.py
 #pragma once
 
-#include "guiengine/screen.hpp"
+#include "guiengine/abstract_top_level_container.hpp"
 #include "guiengine/widgets/icon_button_widget.hpp"
 #include "guiengine/widgets/list_widget.hpp"
 #include "guiengine/widgets/ribbon_widget.hpp"
@@ -27,21 +27,21 @@ struct AddonsScreenWidgets
     SpinnerWidget* filter_featured = nullptr;
     ListWidget* list_addons = nullptr;
 
-    void bind(Screen* screen)
+    void bind(AbstractTopLevelContainer* container)
     {
-        back = screen->getWidget<IconButtonWidget>("back");
-        reload = screen->getWidget<IconButtonWidget>("reload");
-        filter_name = screen->getWidget<TextBoxWidget>("filter_name");
-        filter_date = screen->getWidget<SpinnerWidget>("filter_date");
-        filter_rating = screen->getWidget<SpinnerWidget>("filter_rating");
-        filter_search = screen->getWidget<IconButtonWidget>("filter_search");
-        category = screen->getWidget<RibbonWidget>("category");
-        tab_kart = screen->getWidget<IconButtonWidget>("tab_kart");
-        tab_track = screen->getWidget<IconButtonWidget>("tab_track");
-        tab_arena = screen->getWidget<IconButtonWidget>("tab_arena");
-        filter_installation = screen->getWidget<SpinnerWidget>("filter_installation");
-        filter_featured = screen->getWidget<SpinnerWidget>("filter_featured");
-        list_addons = screen->getWidget<ListWidget>("list_addons");
+        back = container->getWidget<IconButtonWidget>("back");
+        reload = container->getWidget<IconButtonWidget>("reload");
+        filter_name = container->getWidget<TextBoxWidget>("filter_name");
+        filter_date = container->getWidget<SpinnerWidget>("filter_date");
+        filter_rating = container->getWidget<SpinnerWidget>("filter_rating");
+        filter_search = container->getWidget<IconButtonWidget>("filter_search");
+        category = container->getWidget<RibbonWidget>("category");
+        tab_kart = container->getWidget<IconButtonWidget>("tab_kart");
+        tab_track = container->getWidget<IconButtonWidget>("tab_track");
+        tab_arena = container->getWidget<IconButtonWidget>("tab_arena");
+        filter_installation = container->getWidget<SpinnerWidget>("filter_installation");
+        filter_featured = container->getWidget<SpinnerWidget>("filter_featured");
+        list_addons = container->getWidget<ListWidget>("list_addons");
     }
 };
 

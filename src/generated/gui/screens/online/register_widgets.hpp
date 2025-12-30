@@ -2,7 +2,7 @@
 // Do not edit manually - regenerate with tools/generate_gui_headers.py
 #pragma once
 
-#include "guiengine/screen.hpp"
+#include "guiengine/abstract_top_level_container.hpp"
 #include "guiengine/widgets/button_widget.hpp"
 #include "guiengine/widgets/icon_button_widget.hpp"
 #include "guiengine/widgets/label_widget.hpp"
@@ -34,28 +34,28 @@ struct RegisterWidgets
     IconButtonWidget* next = nullptr;
     IconButtonWidget* back = nullptr;
 
-    void bind(Screen* screen)
+    void bind(AbstractTopLevelContainer* container)
     {
-        create_user = screen->getWidget<LabelWidget>("create_user");
-        mode_tabs = screen->getWidget<RibbonWidget>("mode_tabs");
-        tab_new_online = screen->getWidget<IconButtonWidget>("tab_new_online");
-        tab_existing_online = screen->getWidget<IconButtonWidget>("tab_existing_online");
-        tab_offline = screen->getWidget<IconButtonWidget>("tab_offline");
-        local_username = screen->getWidget<TextBoxWidget>("local_username");
-        label_username = screen->getWidget<LabelWidget>("label_username");
-        username = screen->getWidget<TextBoxWidget>("username");
-        label_password = screen->getWidget<LabelWidget>("label_password");
-        password = screen->getWidget<TextBoxWidget>("password");
-        label_password_confirm = screen->getWidget<LabelWidget>("label_password_confirm");
-        password_confirm = screen->getWidget<TextBoxWidget>("password_confirm");
-        label_email = screen->getWidget<LabelWidget>("label_email");
-        email = screen->getWidget<TextBoxWidget>("email");
-        password_reset = screen->getWidget<ButtonWidget>("password_reset");
-        info = screen->getWidget<LabelWidget>("info");
-        options = screen->getWidget<RibbonWidget>("options");
-        cancel = screen->getWidget<IconButtonWidget>("cancel");
-        next = screen->getWidget<IconButtonWidget>("next");
-        back = screen->getWidget<IconButtonWidget>("back");
+        create_user = container->getWidget<LabelWidget>("create_user");
+        mode_tabs = container->getWidget<RibbonWidget>("mode_tabs");
+        tab_new_online = container->getWidget<IconButtonWidget>("tab_new_online");
+        tab_existing_online = container->getWidget<IconButtonWidget>("tab_existing_online");
+        tab_offline = container->getWidget<IconButtonWidget>("tab_offline");
+        local_username = container->getWidget<TextBoxWidget>("local_username");
+        label_username = container->getWidget<LabelWidget>("label_username");
+        username = container->getWidget<TextBoxWidget>("username");
+        label_password = container->getWidget<LabelWidget>("label_password");
+        password = container->getWidget<TextBoxWidget>("password");
+        label_password_confirm = container->getWidget<LabelWidget>("label_password_confirm");
+        password_confirm = container->getWidget<TextBoxWidget>("password_confirm");
+        label_email = container->getWidget<LabelWidget>("label_email");
+        email = container->getWidget<TextBoxWidget>("email");
+        password_reset = container->getWidget<ButtonWidget>("password_reset");
+        info = container->getWidget<LabelWidget>("info");
+        options = container->getWidget<RibbonWidget>("options");
+        cancel = container->getWidget<IconButtonWidget>("cancel");
+        next = container->getWidget<IconButtonWidget>("next");
+        back = container->getWidget<IconButtonWidget>("back");
     }
 };
 

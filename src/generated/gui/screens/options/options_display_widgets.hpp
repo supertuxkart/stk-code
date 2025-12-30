@@ -2,7 +2,7 @@
 // Do not edit manually - regenerate with tools/generate_gui_headers.py
 #pragma once
 
-#include "guiengine/screen.hpp"
+#include "guiengine/abstract_top_level_container.hpp"
 #include "guiengine/widgets/button_widget.hpp"
 #include "guiengine/widgets/check_box_widget.hpp"
 #include "guiengine/widgets/dynamic_ribbon_widget.hpp"
@@ -35,27 +35,27 @@ struct OptionsDisplayWidgets
     ButtonWidget* custom_camera = nullptr;
     SpinnerWidget* splitscreen_method = nullptr;
 
-    void bind(Screen* screen)
+    void bind(AbstractTopLevelContainer* container)
     {
-        back = screen->getWidget<IconButtonWidget>("back");
-        options_choice = screen->getWidget<RibbonWidget>("options_choice");
-        tab_general = screen->getWidget<IconButtonWidget>("tab_general");
-        tab_display = screen->getWidget<IconButtonWidget>("tab_display");
-        tab_video = screen->getWidget<IconButtonWidget>("tab_video");
-        tab_audio = screen->getWidget<IconButtonWidget>("tab_audio");
-        tab_ui = screen->getWidget<IconButtonWidget>("tab_ui");
-        tab_players = screen->getWidget<IconButtonWidget>("tab_players");
-        tab_controls = screen->getWidget<IconButtonWidget>("tab_controls");
-        tab_language = screen->getWidget<IconButtonWidget>("tab_language");
-        fullscreen = screen->getWidget<CheckBoxWidget>("fullscreen");
-        fullscreenText = screen->getWidget<LabelWidget>("fullscreenText");
-        rememberWinpos = screen->getWidget<CheckBoxWidget>("rememberWinpos");
-        rememberWinposText = screen->getWidget<LabelWidget>("rememberWinposText");
-        resolutions = screen->getWidget<DynamicRibbonWidget>("resolutions");
-        apply_resolution = screen->getWidget<ButtonWidget>("apply_resolution");
-        camera_preset = screen->getWidget<SpinnerWidget>("camera_preset");
-        custom_camera = screen->getWidget<ButtonWidget>("custom_camera");
-        splitscreen_method = screen->getWidget<SpinnerWidget>("splitscreen_method");
+        back = container->getWidget<IconButtonWidget>("back");
+        options_choice = container->getWidget<RibbonWidget>("options_choice");
+        tab_general = container->getWidget<IconButtonWidget>("tab_general");
+        tab_display = container->getWidget<IconButtonWidget>("tab_display");
+        tab_video = container->getWidget<IconButtonWidget>("tab_video");
+        tab_audio = container->getWidget<IconButtonWidget>("tab_audio");
+        tab_ui = container->getWidget<IconButtonWidget>("tab_ui");
+        tab_players = container->getWidget<IconButtonWidget>("tab_players");
+        tab_controls = container->getWidget<IconButtonWidget>("tab_controls");
+        tab_language = container->getWidget<IconButtonWidget>("tab_language");
+        fullscreen = container->getWidget<CheckBoxWidget>("fullscreen");
+        fullscreenText = container->getWidget<LabelWidget>("fullscreenText");
+        rememberWinpos = container->getWidget<CheckBoxWidget>("rememberWinpos");
+        rememberWinposText = container->getWidget<LabelWidget>("rememberWinposText");
+        resolutions = container->getWidget<DynamicRibbonWidget>("resolutions");
+        apply_resolution = container->getWidget<ButtonWidget>("apply_resolution");
+        camera_preset = container->getWidget<SpinnerWidget>("camera_preset");
+        custom_camera = container->getWidget<ButtonWidget>("custom_camera");
+        splitscreen_method = container->getWidget<SpinnerWidget>("splitscreen_method");
     }
 };
 

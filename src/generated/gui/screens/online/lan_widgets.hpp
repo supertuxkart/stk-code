@@ -2,7 +2,7 @@
 // Do not edit manually - regenerate with tools/generate_gui_headers.py
 #pragma once
 
-#include "guiengine/screen.hpp"
+#include "guiengine/abstract_top_level_container.hpp"
 #include "guiengine/widgets/icon_button_widget.hpp"
 #include "guiengine/widgets/label_widget.hpp"
 #include "guiengine/widgets/ribbon_widget.hpp"
@@ -18,14 +18,14 @@ struct LanWidgets
     IconButtonWidget* find_lan_server = nullptr;
     IconButtonWidget* create_lan_server = nullptr;
 
-    void bind(Screen* screen)
+    void bind(AbstractTopLevelContainer* container)
     {
-        back = screen->getWidget<IconButtonWidget>("back");
-        title = screen->getWidget<LabelWidget>("title");
-        logo = screen->getWidget<IconButtonWidget>("logo");
-        lan = screen->getWidget<RibbonWidget>("lan");
-        find_lan_server = screen->getWidget<IconButtonWidget>("find_lan_server");
-        create_lan_server = screen->getWidget<IconButtonWidget>("create_lan_server");
+        back = container->getWidget<IconButtonWidget>("back");
+        title = container->getWidget<LabelWidget>("title");
+        logo = container->getWidget<IconButtonWidget>("logo");
+        lan = container->getWidget<RibbonWidget>("lan");
+        find_lan_server = container->getWidget<IconButtonWidget>("find_lan_server");
+        create_lan_server = container->getWidget<IconButtonWidget>("create_lan_server");
     }
 };
 

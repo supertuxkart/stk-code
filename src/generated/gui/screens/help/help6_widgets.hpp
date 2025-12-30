@@ -2,7 +2,7 @@
 // Do not edit manually - regenerate with tools/generate_gui_headers.py
 #pragma once
 
-#include "guiengine/screen.hpp"
+#include "guiengine/abstract_top_level_container.hpp"
 #include "guiengine/widgets/icon_button_widget.hpp"
 #include "guiengine/widgets/ribbon_widget.hpp"
 
@@ -20,17 +20,17 @@ struct Help6Widgets
     IconButtonWidget* page6 = nullptr;
     IconButtonWidget* page7 = nullptr;
 
-    void bind(Screen* screen)
+    void bind(AbstractTopLevelContainer* container)
     {
-        back = screen->getWidget<IconButtonWidget>("back");
-        category = screen->getWidget<RibbonWidget>("category");
-        page1 = screen->getWidget<IconButtonWidget>("page1");
-        page2 = screen->getWidget<IconButtonWidget>("page2");
-        page3 = screen->getWidget<IconButtonWidget>("page3");
-        page4 = screen->getWidget<IconButtonWidget>("page4");
-        page5 = screen->getWidget<IconButtonWidget>("page5");
-        page6 = screen->getWidget<IconButtonWidget>("page6");
-        page7 = screen->getWidget<IconButtonWidget>("page7");
+        back = container->getWidget<IconButtonWidget>("back");
+        category = container->getWidget<RibbonWidget>("category");
+        page1 = container->getWidget<IconButtonWidget>("page1");
+        page2 = container->getWidget<IconButtonWidget>("page2");
+        page3 = container->getWidget<IconButtonWidget>("page3");
+        page4 = container->getWidget<IconButtonWidget>("page4");
+        page5 = container->getWidget<IconButtonWidget>("page5");
+        page6 = container->getWidget<IconButtonWidget>("page6");
+        page7 = container->getWidget<IconButtonWidget>("page7");
     }
 };
 

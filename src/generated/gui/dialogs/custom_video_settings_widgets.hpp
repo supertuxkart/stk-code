@@ -2,7 +2,7 @@
 // Do not edit manually - regenerate with tools/generate_gui_headers.py
 #pragma once
 
-#include "guiengine/screen.hpp"
+#include "guiengine/abstract_top_level_container.hpp"
 #include "guiengine/widgets/check_box_widget.hpp"
 #include "guiengine/widgets/icon_button_widget.hpp"
 #include "guiengine/widgets/label_widget.hpp"
@@ -37,31 +37,31 @@ struct CustomVideoSettingsWidgets
     IconButtonWidget* cancel = nullptr;
     IconButtonWidget* apply = nullptr;
 
-    void bind(Screen* screen)
+    void bind(AbstractTopLevelContainer* container)
     {
-        title = screen->getWidget<LabelWidget>("title");
-        dynamiclight = screen->getWidget<CheckBoxWidget>("dynamiclight");
-        shadows = screen->getWidget<SpinnerWidget>("shadows");
-        mlaa = screen->getWidget<CheckBoxWidget>("mlaa");
-        lightscattering = screen->getWidget<CheckBoxWidget>("lightscattering");
-        glow = screen->getWidget<CheckBoxWidget>("glow");
-        ibl = screen->getWidget<CheckBoxWidget>("ibl");
-        lightshaft = screen->getWidget<CheckBoxWidget>("lightshaft");
-        bloom = screen->getWidget<CheckBoxWidget>("bloom");
-        ssao = screen->getWidget<CheckBoxWidget>("ssao");
-        ssr = screen->getWidget<CheckBoxWidget>("ssr");
-        motionblur = screen->getWidget<CheckBoxWidget>("motionblur");
-        dof = screen->getWidget<CheckBoxWidget>("dof");
-        animated_characters = screen->getWidget<CheckBoxWidget>("animated_characters");
-        texture_compression = screen->getWidget<CheckBoxWidget>("texture_compression");
-        particles_effects = screen->getWidget<SpinnerWidget>("particles_effects");
-        image_quality = screen->getWidget<SpinnerWidget>("image_quality");
-        geometry_detail = screen->getWidget<SpinnerWidget>("geometry_detail");
-        render_driver_label = screen->getWidget<LabelWidget>("render_driver_label");
-        render_driver = screen->getWidget<SpinnerWidget>("render_driver");
-        buttons = screen->getWidget<RibbonWidget>("buttons");
-        cancel = screen->getWidget<IconButtonWidget>("cancel");
-        apply = screen->getWidget<IconButtonWidget>("apply");
+        title = container->getWidget<LabelWidget>("title");
+        dynamiclight = container->getWidget<CheckBoxWidget>("dynamiclight");
+        shadows = container->getWidget<SpinnerWidget>("shadows");
+        mlaa = container->getWidget<CheckBoxWidget>("mlaa");
+        lightscattering = container->getWidget<CheckBoxWidget>("lightscattering");
+        glow = container->getWidget<CheckBoxWidget>("glow");
+        ibl = container->getWidget<CheckBoxWidget>("ibl");
+        lightshaft = container->getWidget<CheckBoxWidget>("lightshaft");
+        bloom = container->getWidget<CheckBoxWidget>("bloom");
+        ssao = container->getWidget<CheckBoxWidget>("ssao");
+        ssr = container->getWidget<CheckBoxWidget>("ssr");
+        motionblur = container->getWidget<CheckBoxWidget>("motionblur");
+        dof = container->getWidget<CheckBoxWidget>("dof");
+        animated_characters = container->getWidget<CheckBoxWidget>("animated_characters");
+        texture_compression = container->getWidget<CheckBoxWidget>("texture_compression");
+        particles_effects = container->getWidget<SpinnerWidget>("particles_effects");
+        image_quality = container->getWidget<SpinnerWidget>("image_quality");
+        geometry_detail = container->getWidget<SpinnerWidget>("geometry_detail");
+        render_driver_label = container->getWidget<LabelWidget>("render_driver_label");
+        render_driver = container->getWidget<SpinnerWidget>("render_driver");
+        buttons = container->getWidget<RibbonWidget>("buttons");
+        cancel = container->getWidget<IconButtonWidget>("cancel");
+        apply = container->getWidget<IconButtonWidget>("apply");
     }
 };
 

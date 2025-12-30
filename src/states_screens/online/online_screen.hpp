@@ -20,6 +20,7 @@
 
 #include "guiengine/screen.hpp"
 #include "guiengine/widgets/list_widget.hpp"
+#include "generated/gui/screens/online/online_widgets.hpp"
 
 #include <memory>
 #include <unordered_map>
@@ -41,19 +42,11 @@ class OnlineScreen : public GUIEngine::Screen,
 private:
     friend class GUIEngine::ScreenSingleton<OnlineScreen>;
 
+    GUIEngine::OnlineWidgets m_widgets;
+
     core::stringw m_online_string;
 
     core::stringw m_login_string;
-
-    /** Keep the widget to to the user name. */
-    GUIEngine::ButtonWidget *m_user_id;
-
-    /** Keep the widget to avoid looking it up every frame. */
-    GUIEngine::IconButtonWidget* m_online;
-
-    GUIEngine::CheckBoxWidget* m_enable_splitscreen;
-
-    GUIEngine::ListWidget* m_news_list;
 
     std::shared_ptr<Server> m_entered_server;
 

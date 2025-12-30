@@ -2,7 +2,7 @@
 // Do not edit manually - regenerate with tools/generate_gui_headers.py
 #pragma once
 
-#include "guiengine/screen.hpp"
+#include "guiengine/abstract_top_level_container.hpp"
 #include "guiengine/widgets/button_widget.hpp"
 #include "guiengine/widgets/check_box_widget.hpp"
 #include "guiengine/widgets/icon_button_widget.hpp"
@@ -28,21 +28,21 @@ struct GhostReplaySelectionWidgets
     CheckBoxWidget* replay_multiplayer_toggle = nullptr;
     ButtonWidget* record_ghost = nullptr;
 
-    void bind(Screen* screen)
+    void bind(AbstractTopLevelContainer* container)
     {
-        back = screen->getWidget<IconButtonWidget>("back");
-        reload = screen->getWidget<IconButtonWidget>("reload");
-        replay_list = screen->getWidget<ListWidget>("replay_list");
-        race_mode = screen->getWidget<RibbonWidget>("race_mode");
-        tab_time_trial = screen->getWidget<IconButtonWidget>("tab_time_trial");
-        tab_egg_hunt = screen->getWidget<IconButtonWidget>("tab_egg_hunt");
-        best_times_toggle = screen->getWidget<CheckBoxWidget>("best_times_toggle");
-        compare_toggle = screen->getWidget<CheckBoxWidget>("compare_toggle");
-        compare_toggle_text = screen->getWidget<LabelWidget>("compare-toggle-text");
-        replay_difficulty_toggle = screen->getWidget<CheckBoxWidget>("replay_difficulty_toggle");
-        replay_version_toggle = screen->getWidget<CheckBoxWidget>("replay_version_toggle");
-        replay_multiplayer_toggle = screen->getWidget<CheckBoxWidget>("replay_multiplayer_toggle");
-        record_ghost = screen->getWidget<ButtonWidget>("record-ghost");
+        back = container->getWidget<IconButtonWidget>("back");
+        reload = container->getWidget<IconButtonWidget>("reload");
+        replay_list = container->getWidget<ListWidget>("replay_list");
+        race_mode = container->getWidget<RibbonWidget>("race_mode");
+        tab_time_trial = container->getWidget<IconButtonWidget>("tab_time_trial");
+        tab_egg_hunt = container->getWidget<IconButtonWidget>("tab_egg_hunt");
+        best_times_toggle = container->getWidget<CheckBoxWidget>("best_times_toggle");
+        compare_toggle = container->getWidget<CheckBoxWidget>("compare_toggle");
+        compare_toggle_text = container->getWidget<LabelWidget>("compare-toggle-text");
+        replay_difficulty_toggle = container->getWidget<CheckBoxWidget>("replay_difficulty_toggle");
+        replay_version_toggle = container->getWidget<CheckBoxWidget>("replay_version_toggle");
+        replay_multiplayer_toggle = container->getWidget<CheckBoxWidget>("replay_multiplayer_toggle");
+        record_ghost = container->getWidget<ButtonWidget>("record-ghost");
     }
 };
 

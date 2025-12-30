@@ -23,6 +23,7 @@
 #include <irrString.h>
 
 #include "guiengine/screen.hpp"
+#include "generated/gui/screens/online/lan_widgets.hpp"
 
 namespace GUIEngine { class Widget; }
 
@@ -36,11 +37,13 @@ class OnlineLanScreen : public GUIEngine::Screen, public GUIEngine::ScreenSingle
 protected:
     OnlineLanScreen();
 
+    GUIEngine::LanWidgets m_widgets;
+
 public:
     friend class GUIEngine::ScreenSingleton<OnlineLanScreen>;
 
     /** \brief implement callback from parent class GUIEngine::Screen */
-    virtual void loadedFromFile() OVERRIDE {}
+    virtual void loadedFromFile() OVERRIDE { m_widgets.bind(this); }
 
     /** \brief implement callback from parent class GUIEngine::Screen */
     virtual void eventCallback(GUIEngine::Widget* widget, const std::string& name,

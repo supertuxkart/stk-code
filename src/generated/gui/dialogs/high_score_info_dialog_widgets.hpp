@@ -2,7 +2,7 @@
 // Do not edit manually - regenerate with tools/generate_gui_headers.py
 #pragma once
 
-#include "guiengine/screen.hpp"
+#include "guiengine/abstract_top_level_container.hpp"
 #include "guiengine/widgets/icon_button_widget.hpp"
 #include "guiengine/widgets/label_widget.hpp"
 #include "guiengine/widgets/list_widget.hpp"
@@ -25,20 +25,20 @@ struct HighScoreInfoDialogWidgets
     IconButtonWidget* remove = nullptr;
     IconButtonWidget* start = nullptr;
 
-    void bind(Screen* screen)
+    void bind(AbstractTopLevelContainer* container)
     {
-        name = screen->getWidget<LabelWidget>("name");
-        high_score_list = screen->getWidget<ListWidget>("high_score_list");
-        track_name = screen->getWidget<LabelWidget>("track-name");
-        difficulty = screen->getWidget<LabelWidget>("difficulty");
-        num_karts = screen->getWidget<LabelWidget>("num-karts");
-        num_laps = screen->getWidget<LabelWidget>("num-laps");
-        reverse = screen->getWidget<LabelWidget>("reverse");
-        track_screenshot = screen->getWidget<IconButtonWidget>("track_screenshot");
-        actions = screen->getWidget<RibbonWidget>("actions");
-        back = screen->getWidget<IconButtonWidget>("back");
-        remove = screen->getWidget<IconButtonWidget>("remove");
-        start = screen->getWidget<IconButtonWidget>("start");
+        name = container->getWidget<LabelWidget>("name");
+        high_score_list = container->getWidget<ListWidget>("high_score_list");
+        track_name = container->getWidget<LabelWidget>("track-name");
+        difficulty = container->getWidget<LabelWidget>("difficulty");
+        num_karts = container->getWidget<LabelWidget>("num-karts");
+        num_laps = container->getWidget<LabelWidget>("num-laps");
+        reverse = container->getWidget<LabelWidget>("reverse");
+        track_screenshot = container->getWidget<IconButtonWidget>("track_screenshot");
+        actions = container->getWidget<RibbonWidget>("actions");
+        back = container->getWidget<IconButtonWidget>("back");
+        remove = container->getWidget<IconButtonWidget>("remove");
+        start = container->getWidget<IconButtonWidget>("start");
     }
 };
 

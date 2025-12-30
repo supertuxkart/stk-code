@@ -22,6 +22,7 @@
 #include <string>
 
 #include "guiengine/screen.hpp"
+#include "generated/gui/screens/options/options_video_widgets.hpp"
 
 namespace GUIEngine { class Widget; }
 
@@ -35,6 +36,7 @@ private:
     bool m_prev_adv_pipline;
     OptionsScreenVideo();
     bool m_inited;
+    GUIEngine::OptionsVideoWidgets m_widgets;
 
     void updateTooltip();
     void updateBlurTooltip();

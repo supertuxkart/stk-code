@@ -2,7 +2,7 @@
 // Do not edit manually - regenerate with tools/generate_gui_headers.py
 #pragma once
 
-#include "guiengine/screen.hpp"
+#include "guiengine/abstract_top_level_container.hpp"
 #include "guiengine/widgets/icon_button_widget.hpp"
 #include "guiengine/widgets/label_widget.hpp"
 #include "guiengine/widgets/list_widget.hpp"
@@ -20,15 +20,15 @@ struct AchievementProgressDialogWidgets
     RibbonWidget* options = nullptr;
     IconButtonWidget* ok = nullptr;
 
-    void bind(Screen* screen)
+    void bind(AbstractTopLevelContainer* container)
     {
-        title = screen->getWidget<LabelWidget>("title");
-        description = screen->getWidget<LabelWidget>("description");
-        main_goal_description = screen->getWidget<LabelWidget>("main-goal-description");
-        main_goal_progress = screen->getWidget<LabelWidget>("main-goal-progress");
-        progress_tree = screen->getWidget<ListWidget>("progress-tree");
-        options = screen->getWidget<RibbonWidget>("options");
-        ok = screen->getWidget<IconButtonWidget>("ok");
+        title = container->getWidget<LabelWidget>("title");
+        description = container->getWidget<LabelWidget>("description");
+        main_goal_description = container->getWidget<LabelWidget>("main-goal-description");
+        main_goal_progress = container->getWidget<LabelWidget>("main-goal-progress");
+        progress_tree = container->getWidget<ListWidget>("progress-tree");
+        options = container->getWidget<RibbonWidget>("options");
+        ok = container->getWidget<IconButtonWidget>("ok");
     }
 };
 

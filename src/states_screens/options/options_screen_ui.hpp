@@ -23,6 +23,7 @@
 #include <string>
 
 #include "guiengine/screen.hpp"
+#include "generated/gui/screens/options/options_ui_widgets.hpp"
 
 namespace GUIEngine { class Widget; }
 
@@ -57,6 +58,7 @@ class OptionsScreenUI : public GUIEngine::Screen, public GUIEngine::ScreenSingle
 
     GUIEngine::SpinnerWidget* m_base_skin_selector;
     GUIEngine::SpinnerWidget* m_variant_skin_selector;
+    GUIEngine::OptionsUiWidgets m_widgets;
 
     void updateCamera();
 

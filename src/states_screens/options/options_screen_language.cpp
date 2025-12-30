@@ -52,16 +52,16 @@ void OptionsScreenLanguage::loadedFromFile()
 void OptionsScreenLanguage::init()
 {
     Screen::init();
-    RibbonWidget* ribbon = getWidget<RibbonWidget>("options_choice");
-    assert(ribbon != NULL);
-    ribbon->setFocusForPlayer(PLAYER_ID_GAME_MASTER);
-    ribbon->select( "tab_language", PLAYER_ID_GAME_MASTER );
+
+    // Bind typed widget pointers (one-time lookup)
+    m_widgets.bind(this);
+
+    m_widgets.options_choice->setFocusForPlayer(PLAYER_ID_GAME_MASTER);
+    m_widgets.options_choice->select( "tab_language", PLAYER_ID_GAME_MASTER );
 
     // --- language
-    ListWidget* list_widget = getWidget<ListWidget>("language");
-
     // I18N: in the language choice, to select the same language as the OS
-    list_widget->addItem("system", _("System Language"));
+    m_widgets.language->addItem("system", _("System Language"));
     const std::vector<std::string>* lang_list = translations->getLanguageList();
     const int amount = (int)lang_list->size();
 
@@ -86,16 +86,16 @@ void OptionsScreenLanguage::init()
     std::sort(nice_lang_list.begin(), nice_lang_list.end());
     for(unsigned int i=0; i<nice_lang_list.size(); i++)
     {
-        list_widget->addItem(nice_name_2_id[nice_lang_list[i]],
+        m_widgets.language->addItem(nice_name_2_id[nice_lang_list[i]],
                               nice_lang_list[i]);
     }
 
-    list_widget->setSelectionID( list_widget->getItemID(UserConfigParams::m_language) );
+    m_widgets.language->setSelectionID( m_widgets.language->getItemID(UserConfigParams::m_language) );
 
     // Forbid changing language while in-game, since this crashes (changing the language involves
     // tearing down and rebuilding the menu stack. not good when in-game)
-    list_widget->setActive(StateManager::get()->getGameState() != GUIEngine::INGAME_MENU);
-    
+    m_widgets.language->setActive(StateManager::get()->getGameState() != GUIEngine::INGAME_MENU);
+
 
 }   // init
 
@@ -103,24 +103,23 @@ void OptionsScreenLanguage::init()
 
 void OptionsScreenLanguage::eventCallback(Widget* widget, const std::string& name, const int playerID)
 {
-    if (name == "options_choice")
+    if (widget == m_widgets.options_choice)
     {
-        std::string selection = ((RibbonWidget*)widget)->getSelectionIDString(PLAYER_ID_GAME_MASTER);
+        std::string selection = m_widgets.options_choice->getSelectionIDString(PLAYER_ID_GAME_MASTER);
 
         if (selection != "tab_language")
             OptionsCommon::switchTab(selection);
     }
-    else if(name == "back")
+    else if (widget == m_widgets.back)
     {
         StateManager::get()->escapePressed();
     }
-    else if (name == "language")
+    else if (widget == m_widgets.language)
     {
-        ListWidget* list_widget = getWidget<ListWidget>("language");
         irr::gui::CGUISTKListBox* box =
-            list_widget->getIrrlichtElement<irr::gui::CGUISTKListBox>();
+            m_widgets.language->getIrrlichtElement<irr::gui::CGUISTKListBox>();
         int old_pos = box->getScrollBar()->getPos();
-        std::string selection = list_widget->getSelectionInternalName();
+        std::string selection = m_widgets.language->getSelectionInternalName();
 
         delete translations;
 
@@ -157,7 +156,8 @@ void OptionsScreenLanguage::eventCallback(Widget* widget, const std::string& nam
         OptionsScreenLanguage::getInstance()->push();
         // Menu is deleted so we need a new screen instance
         OptionsScreenLanguage* os = OptionsScreenLanguage::getInstance();
-        list_widget = os->getWidget<ListWidget>("language");
+        // Note: use getWidget here because we're accessing the new screen instance
+        ListWidget* list_widget = os->getWidget<ListWidget>("language");
         box = list_widget->getIrrlichtElement<irr::gui::CGUISTKListBox>();
         box->getScrollBar()->setPos(old_pos);
         // Update tips for new translation

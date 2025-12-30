@@ -2,7 +2,7 @@
 // Do not edit manually - regenerate with tools/generate_gui_headers.py
 #pragma once
 
-#include "guiengine/screen.hpp"
+#include "guiengine/abstract_top_level_container.hpp"
 #include "guiengine/widgets/button_widget.hpp"
 #include "guiengine/widgets/icon_button_widget.hpp"
 #include "guiengine/widgets/label_widget.hpp"
@@ -24,17 +24,17 @@ struct ProfileFriendsWidgets
     TextBoxWidget* search_box = nullptr;
     ButtonWidget* search_button = nullptr;
 
-    void bind(Screen* screen)
+    void bind(AbstractTopLevelContainer* container)
     {
-        back = screen->getWidget<IconButtonWidget>("back");
-        title = screen->getWidget<LabelWidget>("title");
-        profile_tabs = screen->getWidget<RibbonWidget>("profile_tabs");
-        tab_achievements = screen->getWidget<IconButtonWidget>("tab_achievements");
-        tab_friends = screen->getWidget<IconButtonWidget>("tab_friends");
-        tab_settings = screen->getWidget<IconButtonWidget>("tab_settings");
-        friends_list = screen->getWidget<ListWidget>("friends_list");
-        search_box = screen->getWidget<TextBoxWidget>("search_box");
-        search_button = screen->getWidget<ButtonWidget>("search_button");
+        back = container->getWidget<IconButtonWidget>("back");
+        title = container->getWidget<LabelWidget>("title");
+        profile_tabs = container->getWidget<RibbonWidget>("profile_tabs");
+        tab_achievements = container->getWidget<IconButtonWidget>("tab_achievements");
+        tab_friends = container->getWidget<IconButtonWidget>("tab_friends");
+        tab_settings = container->getWidget<IconButtonWidget>("tab_settings");
+        friends_list = container->getWidget<ListWidget>("friends_list");
+        search_box = container->getWidget<TextBoxWidget>("search_box");
+        search_button = container->getWidget<ButtonWidget>("search_button");
     }
 };
 

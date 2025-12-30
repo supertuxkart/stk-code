@@ -2,7 +2,7 @@
 // Do not edit manually - regenerate with tools/generate_gui_headers.py
 #pragma once
 
-#include "guiengine/screen.hpp"
+#include "guiengine/abstract_top_level_container.hpp"
 #include "guiengine/widgets/icon_button_widget.hpp"
 #include "guiengine/widgets/label_widget.hpp"
 #include "guiengine/widgets/ribbon_widget.hpp"
@@ -23,19 +23,19 @@ struct RacePausedDialogWidgets
     IconButtonWidget* options = nullptr;
     IconButtonWidget* help = nullptr;
 
-    void bind(Screen* screen)
+    void bind(AbstractTopLevelContainer* container)
     {
-        title = screen->getWidget<LabelWidget>("title");
-        backbtnribbon = screen->getWidget<RibbonWidget>("backbtnribbon");
-        backbtn = screen->getWidget<IconButtonWidget>("backbtn");
-        touch_device = screen->getWidget<IconButtonWidget>("touch_device");
-        choiceribbon = screen->getWidget<RibbonWidget>("choiceribbon");
-        exit = screen->getWidget<IconButtonWidget>("exit");
-        newrace = screen->getWidget<IconButtonWidget>("newrace");
-        restart = screen->getWidget<IconButtonWidget>("restart");
-        endrace = screen->getWidget<IconButtonWidget>("endrace");
-        options = screen->getWidget<IconButtonWidget>("options");
-        help = screen->getWidget<IconButtonWidget>("help");
+        title = container->getWidget<LabelWidget>("title");
+        backbtnribbon = container->getWidget<RibbonWidget>("backbtnribbon");
+        backbtn = container->getWidget<IconButtonWidget>("backbtn");
+        touch_device = container->getWidget<IconButtonWidget>("touch_device");
+        choiceribbon = container->getWidget<RibbonWidget>("choiceribbon");
+        exit = container->getWidget<IconButtonWidget>("exit");
+        newrace = container->getWidget<IconButtonWidget>("newrace");
+        restart = container->getWidget<IconButtonWidget>("restart");
+        endrace = container->getWidget<IconButtonWidget>("endrace");
+        options = container->getWidget<IconButtonWidget>("options");
+        help = container->getWidget<IconButtonWidget>("help");
     }
 };
 

@@ -101,8 +101,11 @@ def snake_to_pascal(name: str) -> str:
 
 def make_safe_identifier(name: str) -> str:
     """Convert widget ID to a safe C++ identifier."""
-    # Replace hyphens with underscores
-    safe_name = name.replace("-", "_")
+    # Replace hyphens and spaces with underscores
+    safe_name = name.replace("-", "_").replace(" ", "_")
+    # If starts with a digit, prefix with underscore
+    if safe_name and safe_name[0].isdigit():
+        safe_name = "_" + safe_name
     # Append suffix if it's a C++ keyword
     if safe_name in CPP_KEYWORDS:
         safe_name = safe_name + "_"
@@ -175,7 +178,7 @@ def generate_header(
         "// Do not edit manually - regenerate with tools/generate_gui_headers.py",
         "#pragma once",
         "",
-        '#include "guiengine/screen.hpp"',
+        '#include "guiengine/abstract_top_level_container.hpp"',
     ]
 
     # Add widget headers
@@ -197,14 +200,14 @@ def generate_header(
 
     lines.extend([
         "",
-        "    void bind(Screen* screen)",
+        "    void bind(AbstractTopLevelContainer* container)",
         "    {",
     ])
 
     # Add bind statements
     for widget_id, _, cpp_type in widgets:
         member_name = make_safe_identifier(widget_id)
-        lines.append(f'        {member_name} = screen->getWidget<{cpp_type}>("{widget_id}");')
+        lines.append(f'        {member_name} = container->getWidget<{cpp_type}>("{widget_id}");')
 
     lines.extend([
         "    }",

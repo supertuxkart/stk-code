@@ -82,20 +82,12 @@ NetworkingLobby::NetworkingLobby() : Screen("online/networking_lobby.stkgui")
     m_server_info_height = 0;
     m_header_text_width = 0;
 
-    m_back_widget = NULL;
     //I18N: In the networking lobby
     m_header_text = _("Lobby");
-    m_header = NULL;
-    m_text_bubble = NULL;
-    m_timeout_message = NULL;
-    m_start_button = NULL;
-    m_player_list = NULL;
-    m_chat_box = NULL;
-    m_send_button = NULL;
     m_icon_bank = NULL;
     m_reload_server_info = false;
     m_addon_install = NULL;
-    
+
     // Chat scrollbar initialization
     m_chat_scrollbar = NULL;
     m_chat_scroll_pos = 0;
@@ -109,32 +101,7 @@ NetworkingLobby::NetworkingLobby() : Screen("online/networking_lobby.stkgui")
 
 void NetworkingLobby::loadedFromFile()
 {
-    m_header = getWidget<LabelWidget>("lobby-text");
-    assert(m_header != NULL);
-
-    m_back_widget = getWidget<IconButtonWidget>("back");
-    assert(m_back_widget != NULL);
-
-    m_start_button = getWidget<IconButtonWidget>("start");
-    assert(m_start_button!= NULL);
-
-    m_config_button = getWidget<IconButtonWidget>("config");
-    assert(m_config_button!= NULL);
-
-    m_text_bubble = getWidget<LabelWidget>("text");
-    assert(m_text_bubble != NULL);
-
-    m_timeout_message = getWidget<LabelWidget>("timeout-message");
-    assert(m_timeout_message != NULL);
-
-    m_chat_box = getWidget<TextBoxWidget>("chat");
-    assert(m_chat_box != NULL);
-
-    m_send_button = getWidget<ButtonWidget>("send");
-    assert(m_send_button != NULL);
-
-    m_emoji_button = getWidget<ButtonWidget>("emoji");
-    assert(m_emoji_button != NULL);
+    m_widgets.bind(this);
 
     m_icon_bank = new irr::gui::STKModifiedSpriteBank(GUIEngine::getGUIEnv());
     video::ITexture* icon_1 = irr_driver->getTexture
@@ -184,8 +151,7 @@ void NetworkingLobby::init()
 {
     Screen::init();
 
-    m_player_list = getWidget<ListWidget>("players");
-    assert(m_player_list!= NULL);
+    // m_widgets.players is already bound via m_widgets.bind()
 
     m_server_configurable = false;
     m_player_names.clear();
@@ -197,7 +163,7 @@ void NetworkingLobby::init()
     m_start_timeout = std::numeric_limits<float>::max();
     m_cur_starting_timer = std::numeric_limits<int64_t>::max();
     m_min_start_game_players = 0;
-    m_timeout_message->setVisible(false);
+    m_widgets.timeout_message->setVisible(false);
 
     m_start_text = _("Start race");
     //I18N: In the networking lobby, ready button is to allow player to tell
@@ -215,20 +181,20 @@ void NetworkingLobby::init()
 
     setHeader(m_header_text);
     m_server_info_height = GUIEngine::getFont()->getDimension(L"X").Height;
-    m_start_button->setVisible(false);
-    m_config_button->setVisible(false);
+    m_widgets.start->setVisible(false);
+    m_widgets.config->setVisible(false);
     m_state = LS_CONNECTING;
-    m_chat_box->setVisible(false);
-    m_chat_box->setActive(false);
-    m_chat_box->setTextBoxType(TBT_CAP_SENTENCES);
-    m_send_button->setVisible(false);
-    m_send_button->setActive(false);
+    m_widgets.chat->setVisible(false);
+    m_widgets.chat->setActive(false);
+    m_widgets.chat->setTextBoxType(TBT_CAP_SENTENCES);
+    m_widgets.send->setVisible(false);
+    m_widgets.send->setActive(false);
     // Unicode enter arrow
-    m_send_button->setText(L"\u21B2");
-    m_emoji_button->setVisible(false);
-    m_emoji_button->setActive(false);
+    m_widgets.send->setText(L"\u21B2");
+    m_widgets.emoji->setVisible(false);
+    m_widgets.emoji->setActive(false);
     // Unicode smile emoji
-    m_emoji_button->setText(L"\u263A");
+    m_widgets.emoji->setText(L"\u263A");
 
     // Connect to server now if we have saved players and not disconnected
     if (!LobbyProtocol::get<LobbyProtocol>() &&
@@ -241,28 +207,28 @@ void NetworkingLobby::init()
     }
     else if (NetworkConfig::get()->isClient())
     {
-        m_chat_box->clearListeners();
+        m_widgets.chat->clearListeners();
         if (UserConfigParams::m_lobby_chat)
         {
-            m_chat_box->addListener(this);
-            m_chat_box->setText("");
-            m_chat_box->setVisible(true);
-            m_chat_box->setActive(true);
-            m_send_button->setVisible(true);
-            m_send_button->setActive(true);
-            m_emoji_button->setVisible(true);
-            m_emoji_button->setActive(true);
+            m_widgets.chat->addListener(this);
+            m_widgets.chat->setText("");
+            m_widgets.chat->setVisible(true);
+            m_widgets.chat->setActive(true);
+            m_widgets.send->setVisible(true);
+            m_widgets.send->setActive(true);
+            m_widgets.emoji->setVisible(true);
+            m_widgets.emoji->setActive(true);
         }
         else
         {
-            m_chat_box->setText(
+            m_widgets.chat->setText(
                 _("Chat is disabled, enable in options menu."));
-            m_chat_box->setVisible(true);
-            m_chat_box->setActive(false);
-            m_send_button->setVisible(true);
-            m_send_button->setActive(false);
-            m_emoji_button->setVisible(true);
-            m_emoji_button->setActive(false);
+            m_widgets.chat->setVisible(true);
+            m_widgets.chat->setActive(false);
+            m_widgets.send->setVisible(true);
+            m_widgets.send->setActive(false);
+            m_widgets.emoji->setVisible(true);
+            m_widgets.emoji->setActive(false);
         }
         if (auto cl = LobbyProtocol::get<ClientLobby>())
         {
@@ -271,7 +237,7 @@ void NetworkingLobby::init()
         }
     }
 #ifndef SERVER_ONLY
-    if (m_text_bubble && !m_chat_scrollbar)
+    if (m_widgets.text && !m_chat_scrollbar)
     {
         initChatScrollbar();
     }
@@ -296,7 +262,7 @@ void NetworkingLobby::init()
     }
     
     gui::IGUIStaticText* st =
-        m_text_bubble->getIrrlichtElement<gui::IGUIStaticText>();
+        m_widgets.text->getIrrlichtElement<gui::IGUIStaticText>();
     NetworkingLobby* lobby = this;
     st->setMouseCallback([lobby](gui::IGUIStaticText* text, SEvent::SMouseInput mouse)->bool
     {
@@ -304,7 +270,7 @@ void NetworkingLobby::init()
         if (mouse.Event == EMIE_MOUSE_WHEEL)
         {
             if (lobby->m_chat_scrollbar && lobby->m_chat_scrollbar->isVisible() && 
-                lobby->m_text_bubble)
+                lobby->m_widgets.text)
             {
                 irr::SEvent scroll_event;
                 scroll_event.EventType = irr::EET_MOUSE_INPUT_EVENT;
@@ -395,7 +361,7 @@ void NetworkingLobby::addMoreServerInfo(core::stringw info)
     // Reserve space for scrollbar when breaking layouts
     s32 scrollbar_width = getChatScrollbarWidth();
     const unsigned box_width = core::max_(1u, 
-        (unsigned)core::max_(1, (s32)m_text_bubble->getDimension().Width - scrollbar_width));
+        (unsigned)core::max_(1, (s32)m_widgets.text->getDimension().Width - scrollbar_width));
     std::vector<GlyphLayout> cur_info;
     font_manager->initGlyphLayouts(info, cur_info, gui::SF_DISABLE_CACHE |
         gui::SF_ENABLE_CLUSTER_TEST);
@@ -512,7 +478,7 @@ void NetworkingLobby::onResize()
     // Reserve space for scrollbar when breaking layouts
     s32 scrollbar_width = getChatScrollbarWidth();
     const unsigned box_width = core::max_(1u, 
-        (unsigned)core::max_(1, (s32)m_text_bubble->getDimension().Width - scrollbar_width));
+        (unsigned)core::max_(1, (s32)m_widgets.text->getDimension().Width - scrollbar_width));
     gui::IGUIFont* font = GUIEngine::getFont();
     
     if (!font || font->getHeightPerLine() <= 0)
@@ -533,9 +499,9 @@ void NetworkingLobby::onResize()
     }
     
     // Update scrollbar position
-    if (m_chat_scrollbar && m_text_bubble && m_text_bubble->getIrrlichtElement())
+    if (m_chat_scrollbar && m_widgets.text && m_widgets.text->getIrrlichtElement())
     {
-        irr::core::rect<s32> text_rect = m_text_bubble->getIrrlichtElement()->getAbsolutePosition();
+        irr::core::rect<s32> text_rect = m_widgets.text->getIrrlichtElement()->getAbsolutePosition();
         irr::gui::IGUISkin* skin = GUIEngine::getGUIEnv()->getSkin();
         s32 scrollbar_width = skin ? skin->getSize(irr::gui::EGDS_SCROLLBAR_SIZE) : 20;
         
@@ -554,14 +520,14 @@ void NetworkingLobby::onResize()
 
     int header_text_width =
         GUIEngine::getTitleFont()->getDimension(m_header_text.c_str()).Width;
-    if ((m_header->m_w < header_text_width && m_header->getScrollSpeed() == 0.0f) ||
-        (m_header->m_w >= header_text_width && m_header->getScrollSpeed() != 0.0f))
+    if ((m_widgets.lobby_text->m_w < header_text_width && m_widgets.lobby_text->getScrollSpeed() == 0.0f) ||
+        (m_widgets.lobby_text->m_w >= header_text_width && m_widgets.lobby_text->getScrollSpeed() != 0.0f))
     {
-        m_header->getIrrlichtElement()->remove();
-        GUIEngine::getGUIEnv()->getRootGUIElement()->setChildEnd(m_back_widget->getIrrlichtElement());
-        m_header->setScrollSpeed(m_header->m_w < header_text_width ? 0.5f: 0.0f);
-        m_header->add();
-        m_header->setText(m_header_text, true);
+        m_widgets.lobby_text->getIrrlichtElement()->remove();
+        GUIEngine::getGUIEnv()->getRootGUIElement()->setChildEnd(m_widgets.back->getIrrlichtElement());
+        m_widgets.lobby_text->setScrollSpeed(m_widgets.lobby_text->m_w < header_text_width ? 0.5f: 0.0f);
+        m_widgets.lobby_text->add();
+        m_widgets.lobby_text->setText(m_header_text, true);
         GUIEngine::getGUIEnv()->getRootGUIElement()->setChildEnd(NULL);
     }
     m_header_text_width = header_text_width;
@@ -575,7 +541,7 @@ void NetworkingLobby::updateServerInfos()
         return;
 
     gui::IGUIStaticText* st =
-        m_text_bubble->getIrrlichtElement<gui::IGUIStaticText>();
+        m_widgets.text->getIrrlichtElement<gui::IGUIStaticText>();
     st->setUseGlyphLayoutsOnly(true);
     st->setGlyphLayouts(m_server_info);
     
@@ -598,7 +564,7 @@ s32 NetworkingLobby::getChatScrollbarWidth() const
 void NetworkingLobby::filterGlyphLayoutsForScroll()
 {
 #ifndef SERVER_ONLY
-    if (!m_text_bubble || !m_chat_scrollbar || m_server_info_full.empty())
+    if (!m_widgets.text || !m_chat_scrollbar || m_server_info_full.empty())
     {
         m_server_info.clear();
         return;
@@ -614,8 +580,8 @@ void NetworkingLobby::filterGlyphLayoutsForScroll()
     // Reserve space for scrollbar when breaking layouts
     s32 scrollbar_width = getChatScrollbarWidth();
     const unsigned box_width = core::max_(1u, 
-        (unsigned)core::max_(1, (s32)m_text_bubble->getDimension().Width - scrollbar_width));
-    const float box_height = m_text_bubble->getDimension().Height;
+        (unsigned)core::max_(1, (s32)m_widgets.text->getDimension().Width - scrollbar_width));
+    const float box_height = m_widgets.text->getDimension().Height;
     s32 line_height = font->getHeightPerLine();
     
     if (box_height <= 0.0f || line_height <= 0)
@@ -701,32 +667,32 @@ void NetworkingLobby::onUpdate(float delta)
     if (NetworkConfig::get()->isServer() || !STKHost::existHost())
         return;
 
-    if (m_header->getText() != m_header_text)
+    if (m_widgets.lobby_text->getText() != m_header_text)
     {
         m_header_text_width =
             GUIEngine::getTitleFont()->getDimension(m_header_text.c_str()).Width;
-        m_header->getIrrlichtElement()->remove();
-        if (m_header_text_width > m_header->m_w)
+        m_widgets.lobby_text->getIrrlichtElement()->remove();
+        if (m_header_text_width > m_widgets.lobby_text->m_w)
         {
-            m_header->setScrollSpeed(0.5f);
-            m_header->add();
-            m_header->setText(m_header_text, true);
+            m_widgets.lobby_text->setScrollSpeed(0.5f);
+            m_widgets.lobby_text->add();
+            m_widgets.lobby_text->setText(m_header_text, true);
         }
         else
         {
-            m_header->setScrollSpeed(0);
-            m_header->add();
-            m_header->setText(m_header_text, true);
+            m_widgets.lobby_text->setScrollSpeed(0);
+            m_widgets.lobby_text->add();
+            m_widgets.lobby_text->setText(m_header_text, true);
         }
         // Make sure server name is not clickable for URL
-        m_header->getIrrlichtElement<IGUIStaticText>()->setMouseCallback(nullptr);
+        m_widgets.lobby_text->getIrrlichtElement<IGUIStaticText>()->setMouseCallback(nullptr);
     }
 
-    if (m_header_text_width > m_header->m_w)
+    if (m_header_text_width > m_widgets.lobby_text->m_w)
     {
-        m_header->update(delta);
-        if (m_header->scrolledOff())
-            m_header->setText(m_header->getText(), true);
+        m_widgets.lobby_text->update(delta);
+        if (m_widgets.lobby_text->scrolledOff())
+            m_widgets.lobby_text->setText(m_widgets.lobby_text->getText(), true);
     }
 
     if (m_reload_server_info)
@@ -749,19 +715,19 @@ void NetworkingLobby::onUpdate(float delta)
 
     if (m_has_auto_start_in_server)
     {
-        m_start_button->setLabel(m_ready_text);
+        m_widgets.start->setLabel(m_ready_text);
     }
     else
-        m_start_button->setLabel(m_start_text);
+        m_widgets.start->setLabel(m_start_text);
 
-    m_start_button->setVisible(false);
+    m_widgets.start->setVisible(false);
 
-    m_config_button->setLabel(m_configuration_text);
-    m_config_button->setVisible(false);
-    m_config_button->setImage(m_config_texture);
+    m_widgets.config->setLabel(m_configuration_text);
+    m_widgets.config->setVisible(false);
+    m_widgets.config->setImage(m_config_texture);
     m_client_live_joinable = false;
 
-    if (m_player_list && StkTime::getMonoTimeMs() > m_ping_update_timer)
+    if (m_widgets.players && StkTime::getMonoTimeMs() > m_ping_update_timer)
     {
         m_ping_update_timer = StkTime::getMonoTimeMs() + 2000;
         updatePlayerPings();
@@ -770,23 +736,23 @@ void NetworkingLobby::onUpdate(float delta)
     auto cl = LobbyProtocol::get<ClientLobby>();
     if (cl && UserConfigParams::m_lobby_chat)
     {
-        if (cl->serverEnabledChat() && !m_send_button->isActivated())
+        if (cl->serverEnabledChat() && !m_widgets.send->isActivated())
         {
-            m_chat_box->setActive(true);
-            m_send_button->setActive(true);
-            m_emoji_button->setActive(true);
+            m_widgets.chat->setActive(true);
+            m_widgets.send->setActive(true);
+            m_widgets.emoji->setActive(true);
         }
-        else if (!cl->serverEnabledChat() && m_send_button->isActivated())
+        else if (!cl->serverEnabledChat() && m_widgets.send->isActivated())
         {
-            m_chat_box->setActive(false);
-            m_send_button->setActive(false);
-            m_emoji_button->setActive(false);
+            m_widgets.chat->setActive(false);
+            m_widgets.send->setActive(false);
+            m_widgets.emoji->setActive(false);
         }
     }
     if (cl && cl->isWaitingForGame())
     {
-        m_start_button->setVisible(false);
-        m_timeout_message->setVisible(true);
+        m_widgets.start->setVisible(false);
+        m_widgets.timeout_message->setVisible(true);
         auto progress = cl->getGameStartedProgress();
         core::stringw msg;
         core::stringw current_track;
@@ -865,7 +831,7 @@ void NetworkingLobby::onUpdate(float delta)
         else
             m_client_live_joinable = false;
 
-        m_timeout_message->setText(msg, false);
+        m_widgets.timeout_message->setText(msg, false);
         m_cur_starting_timer = std::numeric_limits<int64_t>::max();
 #ifndef SERVER_ONLY
         if (!GUIEngine::ModalDialog::isADialogActive() &&
@@ -875,9 +841,9 @@ void NetworkingLobby::onUpdate(float delta)
                 Addon::createAddonId(missing_addon_track_id));
             if (m_addon_install)
             {
-                m_config_button->setLabel(m_install_addon_text);
-                m_config_button->setImage(m_addon_texture);
-                m_config_button->setVisible(true);
+                m_widgets.config->setLabel(m_install_addon_text);
+                m_widgets.config->setImage(m_addon_texture);
+                m_widgets.config->setVisible(true);
                 return;
             }
         }
@@ -887,22 +853,22 @@ void NetworkingLobby::onUpdate(float delta)
         {
             if (RaceManager::get()->supportsLiveJoining())
             {
-                m_start_button->setVisible(true);
-                m_start_button->setLabel(m_live_join_text);
+                m_widgets.start->setVisible(true);
+                m_widgets.start->setLabel(m_live_join_text);
             }
             else
-                m_start_button->setVisible(false);
-            m_config_button->setLabel(m_spectate_text);
-            m_config_button->setImage(m_spectate_texture);
-            m_config_button->setVisible(true);
+                m_widgets.start->setVisible(false);
+            m_widgets.config->setLabel(m_spectate_text);
+            m_widgets.config->setImage(m_spectate_texture);
+            m_widgets.config->setVisible(true);
         }
         return;
     }
 
-    if (m_has_auto_start_in_server && m_player_list)
+    if (m_has_auto_start_in_server && m_widgets.players)
     {
-        m_timeout_message->setVisible(true);
-        unsigned cur_player = m_player_list->getItemCount();
+        m_widgets.timeout_message->setVisible(true);
+        unsigned cur_player = m_widgets.players->getItemCount();
         if (cur_player >= m_min_start_game_players &&
             m_cur_starting_timer == std::numeric_limits<int64_t>::max())
         {
@@ -919,7 +885,7 @@ void NetworkingLobby::onUpdate(float delta)
                "Game will start if there are more than %i players.",
                /* to pick the plural form */       (int)(m_min_start_game_players - 1),
                /* to insert in the final string */ (int)(m_min_start_game_players - 1));
-            m_timeout_message->setText(msg, false);
+            m_widgets.timeout_message->setText(msg, false);
         }
 
         if (m_cur_starting_timer != std::numeric_limits<int64_t>::max())
@@ -936,21 +902,21 @@ void NetworkingLobby::onUpdate(float delta)
                 "or once everyone has pressed the 'Ready' button.",
                 /* to pick the plural form */       (int)remain,
                 /* to insert in the final string */ (int)remain);
-            m_timeout_message->setText(msg, false);
+            m_widgets.timeout_message->setText(msg, false);
         }
     }
     else
     {
-        m_timeout_message->setVisible(false);
+        m_widgets.timeout_message->setVisible(false);
     }
 
     if (m_state == LS_ADD_PLAYERS)
     {
-        m_text_bubble->getIrrlichtElement<gui::IGUIStaticText>()
+        m_widgets.text->getIrrlichtElement<gui::IGUIStaticText>()
             ->setUseGlyphLayoutsOnly(false);
-        m_text_bubble->setText(_("Everyone:\nPress the 'Select' button to "
+        m_widgets.text->setText(_("Everyone:\nPress the 'Select' button to "
                                           "join the game"), false);
-        m_start_button->setVisible(false);
+        m_widgets.start->setVisible(false);
         if (!GUIEngine::ModalDialog::isADialogActive())
         {
             input_manager->getDeviceManager()->setAssignMode(DETECT_NEW);
@@ -959,10 +925,10 @@ void NetworkingLobby::onUpdate(float delta)
         return;
     }
 
-    m_start_button->setVisible(false);
+    m_widgets.start->setVisible(false);
     if (!cl || !cl->isLobbyReady())
     {
-        m_text_bubble->getIrrlichtElement<gui::IGUIStaticText>()
+        m_widgets.text->getIrrlichtElement<gui::IGUIStaticText>()
             ->setUseGlyphLayoutsOnly(false);
         core::stringw connect_msg;
         if (m_joined_server)
@@ -975,18 +941,18 @@ void NetworkingLobby::onUpdate(float delta)
             connect_msg =
                 StringUtils::loadingDots(_("Finding a quick play server"));
         }
-        m_text_bubble->setText(connect_msg, false);
-        m_start_button->setVisible(false);
+        m_widgets.text->setText(connect_msg, false);
+        m_widgets.start->setVisible(false);
     }
 
-    m_config_button->setVisible(STKHost::get()->isAuthorisedToControl() &&
+    m_widgets.config->setVisible(STKHost::get()->isAuthorisedToControl() &&
         m_server_configurable);
 
     if (STKHost::get()->isAuthorisedToControl() ||
         (m_has_auto_start_in_server &&
         m_cur_starting_timer != std::numeric_limits<int64_t>::max()))
     {
-        m_start_button->setVisible(true);
+        m_widgets.start->setVisible(true);
     }
 
 }   // onUpdate
@@ -1019,17 +985,17 @@ void NetworkingLobby::updatePlayerPings()
         }
         else
             continue;
-        int id = m_player_list->getItemID(p.first);
+        int id = m_widgets.players->getItemID(p.first);
         if (id != -1)
         {
-            m_player_list->renameItem(id, name_with_ping, p.second.m_icon_id);
+            m_widgets.players->renameItem(id, name_with_ping, p.second.m_icon_id);
             // Don't show chosen team color for spectator
             if (p.second.isSpectator())
-                m_player_list->markItemRed(id, false/*red*/);
+                m_widgets.players->markItemRed(id, false/*red*/);
             else if (p.second.m_kart_team == KART_TEAM_RED)
-                m_player_list->markItemRed(id);
+                m_widgets.players->markItemRed(id);
             else if (p.second.m_kart_team == KART_TEAM_BLUE)
-                m_player_list->markItemBlue(id);
+                m_widgets.players->markItemBlue(id);
         }
     }
 }   // updatePlayerPings
@@ -1057,21 +1023,21 @@ bool NetworkingLobby::onEnterPressed(const irr::core::stringw& text)
 void NetworkingLobby::eventCallback(Widget* widget, const std::string& name,
                                     const int playerID)
 {
-    if (name == m_back_widget->m_properties[PROP_ID])
+    if (widget == m_widgets.back)
     {
         StateManager::get()->escapePressed();
         return;
     }
-    else if (name == m_player_list->m_properties[GUIEngine::PROP_ID])
+    else if (widget == m_widgets.players)
     {
         auto host_online_local_ids = StringUtils::splitToUInt
-            (m_player_list->getSelectionInternalName(), '_');
+            (m_widgets.players->getSelectionInternalName(), '_');
         if (host_online_local_ids.size() != 3)
         {
             return;
         }
         LobbyPlayer& lp =
-            m_player_names.at(m_player_list->getSelectionInternalName());
+            m_player_names.at(m_widgets.players->getSelectionInternalName());
         // For client server AI it doesn't make any sense to open the dialog
         // There is no way to kick or add handicap to them
         if (STKHost::get()->isClientServer() > 0 && lp.isAI())
@@ -1081,20 +1047,19 @@ void NetworkingLobby::eventCallback(Widget* widget, const std::string& name,
             lp.m_user_name, lp.m_country_code, lp.m_kart_team != KART_TEAM_NONE,
             lp.m_handicap);
     }   // click on a user
-    else if (name == m_send_button->m_properties[PROP_ID])
+    else if (widget == m_widgets.send)
     {
-        onEnterPressed(m_chat_box->getText());
-        m_chat_box->setText("");
-        m_chat_box->setFocusForPlayer(PLAYER_ID_GAME_MASTER);
+        onEnterPressed(m_widgets.chat->getText());
+        m_widgets.chat->setText("");
+        m_widgets.chat->setFocusForPlayer(PLAYER_ID_GAME_MASTER);
     }   // send chat message
-    else if (name == m_emoji_button->m_properties[PROP_ID] &&
-        !ScreenKeyboard::isActive())
+    else if (widget == m_widgets.emoji && !ScreenKeyboard::isActive())
     {
         EmojiKeyboard* ek = new EmojiKeyboard(1.0f, 0.40f,
-            m_chat_box->getIrrlichtElement<CGUIEditBox>());
+            m_widgets.chat->getIrrlichtElement<CGUIEditBox>());
         ek->init();
     }
-    else if (name == m_start_button->m_properties[PROP_ID])
+    else if (widget == m_widgets.start)
     {
         if (m_client_live_joinable)
         {
@@ -1110,7 +1075,7 @@ void NetworkingLobby::eventCallback(Widget* widget, const std::string& name,
             STKHost::get()->sendToServer(&start, true);
         }
     }
-    else if (name == m_config_button->m_properties[PROP_ID])
+    else if (widget == m_widgets.config)
     {
 #ifndef SERVER_ONLY
         if (m_addon_install)
@@ -1160,13 +1125,13 @@ void NetworkingLobby::tearDown()
     }
 
     gui::IGUIStaticText* st =
-        m_text_bubble->getIrrlichtElement<gui::IGUIStaticText>();
+        m_widgets.text->getIrrlichtElement<gui::IGUIStaticText>();
     st->setMouseCallback(nullptr);
-    m_player_list = NULL;
+    m_widgets.players = NULL;
     m_joined_server.reset();
     m_header_text = _("Lobby");
-    if (m_header)
-        m_header->setText(m_header_text, true);
+    if (m_widgets.lobby_text)
+        m_widgets.lobby_text->setText(m_header_text, true);
     m_header_text_width = 0;
     
     // Cleanup scrollbar
@@ -1214,11 +1179,11 @@ void NetworkingLobby::updatePlayers()
 {
     // In GUI-less server this function will be called without proper
     // initialisation
-    if (!m_player_list)
+    if (!m_widgets.players)
         return;
 
-    std::string selected_name = m_player_list->getSelectionInternalName();
-    m_player_list->clear();
+    std::string selected_name = m_widgets.players->getSelectionInternalName();
+    m_widgets.players->clear();
     m_player_names.clear();
 
     auto cl = LobbyProtocol::get<ClientLobby>();
@@ -1235,7 +1200,7 @@ void NetworkingLobby::updatePlayers()
         const LobbyPlayer& player = players[i];
         if (icon_bank)
         {
-            m_player_list->setIcons(icon_bank);
+            m_widgets.players->setIcons(icon_bank);
             icon_bank = NULL;
         }
         KartTeam cur_team = player.m_kart_team;
@@ -1251,23 +1216,23 @@ void NetworkingLobby::updatePlayers()
             player_name += L" ";
             player_name += flag;
         }
-        m_player_list->addItem(internal_name, player_name,
+        m_widgets.players->addItem(internal_name, player_name,
             player.m_icon_id);
         // Don't show chosen team color for spectator
         if (player.isSpectator())
-            m_player_list->markItemRed(i, false/*red*/);
+            m_widgets.players->markItemRed(i, false/*red*/);
         else if (cur_team == KART_TEAM_RED)
-            m_player_list->markItemRed(i);
+            m_widgets.players->markItemRed(i);
         else if (cur_team == KART_TEAM_BLUE)
-            m_player_list->markItemBlue(i);
+            m_widgets.players->markItemBlue(i);
         m_player_names[internal_name] = player;
     }
     updatePlayerPings();
     if (!selected_name.empty())
     {
-        int id = m_player_list->getItemID(selected_name);
+        int id = m_widgets.players->getItemID(selected_name);
         if (id != -1)
-            m_player_list->setSelectionID(id);
+            m_widgets.players->setSelectionID(id);
     }
 }   // updatePlayers
 
@@ -1280,10 +1245,10 @@ void NetworkingLobby::openSplitscreenDialog(InputDevice* device)
 // ----------------------------------------------------------------------------
 void NetworkingLobby::addSplitscreenPlayer(irr::core::stringw name)
 {
-    if (!m_player_list)
+    if (!m_widgets.players)
         return;
-    m_player_list->setIcons(m_icon_bank);
-    m_player_list->addItem(StringUtils::wideToUtf8(name), name, 1);
+    m_widgets.players->setIcons(m_icon_bank);
+    m_widgets.players->addItem(StringUtils::wideToUtf8(name), name, 1);
 }   // addSplitscreenPlayer
 
 // ----------------------------------------------------------------------------
@@ -1291,36 +1256,36 @@ void NetworkingLobby::finishAddingPlayers()
 {
     m_state = LS_CONNECTING;
     std::make_shared<ConnectToServer>(m_joined_server)->requestStart();
-    m_start_button->setVisible(false);
-    m_chat_box->clearListeners();
+    m_widgets.start->setVisible(false);
+    m_widgets.chat->clearListeners();
     if (UserConfigParams::m_lobby_chat)
     {
-        m_chat_box->addListener(this);
-        m_chat_box->setVisible(true);
-        m_chat_box->setActive(true);
-        m_send_button->setVisible(true);
-        m_send_button->setActive(true);
-        m_emoji_button->setVisible(true);
-        m_emoji_button->setActive(true);
+        m_widgets.chat->addListener(this);
+        m_widgets.chat->setVisible(true);
+        m_widgets.chat->setActive(true);
+        m_widgets.send->setVisible(true);
+        m_widgets.send->setActive(true);
+        m_widgets.emoji->setVisible(true);
+        m_widgets.emoji->setActive(true);
     }
     else
     {
-        m_chat_box->setText(_("Chat is disabled, enable in options menu."));
-        m_chat_box->setVisible(true);
-        m_chat_box->setActive(false);
-        m_send_button->setVisible(true);
-        m_send_button->setActive(false);
-        m_emoji_button->setVisible(true);
-        m_emoji_button->setActive(false);
+        m_widgets.chat->setText(_("Chat is disabled, enable in options menu."));
+        m_widgets.chat->setVisible(true);
+        m_widgets.chat->setActive(false);
+        m_widgets.send->setVisible(true);
+        m_widgets.send->setActive(false);
+        m_widgets.emoji->setVisible(true);
+        m_widgets.emoji->setActive(false);
     }
 }   // finishAddingPlayers
 
 // ----------------------------------------------------------------------------
 void NetworkingLobby::cleanAddedPlayers()
 {
-    if (!m_player_list)
+    if (!m_widgets.players)
         return;
-    m_player_list->clear();
+    m_widgets.players->clear();
     m_player_names.clear();
 }   // cleanAddedPlayers
 
@@ -1363,7 +1328,7 @@ void NetworkingLobby::setJoinedServer(std::shared_ptr<Server> server)
 void NetworkingLobby::initChatScrollbar()
 {
 #ifndef SERVER_ONLY
-    if (!m_text_bubble)
+    if (!m_widgets.text)
         return;
     
     if (m_chat_scrollbar)
@@ -1372,10 +1337,10 @@ void NetworkingLobby::initChatScrollbar()
         m_chat_scrollbar->drop();
     }
     
-    if (!m_text_bubble->getIrrlichtElement())
+    if (!m_widgets.text->getIrrlichtElement())
         return;
     
-    irr::core::rect<s32> text_rect = m_text_bubble->getIrrlichtElement()->getAbsolutePosition();
+    irr::core::rect<s32> text_rect = m_widgets.text->getIrrlichtElement()->getAbsolutePosition();
     s32 scrollbar_width = getChatScrollbarWidth();
     
     // Position scrollbar on the right side of text bubble
@@ -1388,7 +1353,7 @@ void NetworkingLobby::initChatScrollbar()
     
     // Use a unique ID for the chat scrollbar so we can identify it in events
     const s32 CHAT_SCROLLBAR_ID = -1000;
-    irr::gui::IGUIElement* parent = m_text_bubble->getIrrlichtElement()->getParent();
+    irr::gui::IGUIElement* parent = m_widgets.text->getIrrlichtElement()->getParent();
     if (!parent)
         return;
     
@@ -1411,7 +1376,7 @@ void NetworkingLobby::initChatScrollbar()
 void NetworkingLobby::updateChatScrollbar()
 {
 #ifndef SERVER_ONLY
-    if (!m_chat_scrollbar || !m_text_bubble)
+    if (!m_chat_scrollbar || !m_widgets.text)
         return;
     
     gui::IGUIFont* font = GUIEngine::getFont();
@@ -1421,8 +1386,8 @@ void NetworkingLobby::updateChatScrollbar()
     // Reserve space for scrollbar when breaking layouts
     s32 scrollbar_width = getChatScrollbarWidth();
     const unsigned box_width = core::max_(1u, 
-        (unsigned)core::max_(1, (s32)m_text_bubble->getDimension().Width - scrollbar_width));
-    const float box_height = m_text_bubble->getDimension().Height;
+        (unsigned)core::max_(1, (s32)m_widgets.text->getDimension().Width - scrollbar_width));
+    const float box_height = m_widgets.text->getDimension().Height;
     s32 line_height = font->getHeightPerLine();
     
     if (box_height <= 0.0f || line_height <= 0)
@@ -1462,7 +1427,7 @@ void NetworkingLobby::updateChatScrollbar()
 void NetworkingLobby::updateChatScrollPosition()
 {
 #ifndef SERVER_ONLY
-    if (!m_chat_scrollbar || !m_text_bubble)
+    if (!m_chat_scrollbar || !m_widgets.text)
         return;
     
     m_chat_scroll_pos = m_chat_scrollbar->getPos();
@@ -1509,10 +1474,10 @@ void NetworkingLobby::scrollChatToBottom()
 bool NetworkingLobby::handleChatScrollEvent(const irr::SEvent& event)
 {
 #ifndef SERVER_ONLY
-    if (!m_chat_scrollbar || !m_text_bubble)
+    if (!m_chat_scrollbar || !m_widgets.text)
         return false;
     
-    irr::core::rect<s32> text_rect = m_text_bubble->getIrrlichtElement()->getAbsolutePosition();
+    irr::core::rect<s32> text_rect = m_widgets.text->getIrrlichtElement()->getAbsolutePosition();
     
     // Check if the mouse is over the chat area
     if (event.EventType == irr::EET_MOUSE_INPUT_EVENT)

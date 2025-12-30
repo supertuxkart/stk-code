@@ -20,6 +20,7 @@
 #define HEADER_KART_COLOR_SLIDER_HPP
 
 #include "guiengine/modaldialog.hpp"
+#include "generated/gui/dialogs/kart_color_slider_widgets.hpp"
 #include "utils/cpp2011.hpp"
 
 class PlayerProfile;
@@ -37,6 +38,7 @@ namespace GUIEngine
 class KartColorSliderDialog : public GUIEngine::ModalDialog
 {
 private:
+    GUIEngine::KartColorSliderWidgets m_widgets;
     PlayerProfile* m_player_profile;
 
     GUIEngine::SpinnerWidget* m_toggle_slider;

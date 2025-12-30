@@ -22,6 +22,7 @@
 #include <string>
 
 #include "guiengine/screen.hpp"
+#include "generated/gui/screens/options/options_language_widgets.hpp"
 
 namespace GUIEngine { class Widget; }
 
@@ -35,6 +36,7 @@ class OptionsScreenLanguage : public GUIEngine::Screen, public GUIEngine::Screen
 {
     OptionsScreenLanguage();
     bool m_inited;
+    GUIEngine::OptionsLanguageWidgets m_widgets;
 
 public:
     friend class GUIEngine::ScreenSingleton<OptionsScreenLanguage>;

@@ -20,6 +20,7 @@
 #define HEADER_GHOST_REPLAY_INFO_DIALOG_HPP
 
 #include "guiengine/modaldialog.hpp"
+#include "generated/gui/dialogs/ghost_replay_info_dialog_widgets.hpp"
 #include "replay/replay_play.hpp"
 
 namespace GUIEngine
@@ -36,6 +37,7 @@ class GhostReplayInfoDialog : public GUIEngine::ModalDialog
 {
 
 private:
+    GUIEngine::GhostReplayInfoDialogWidgets m_widgets;
 
     bool  m_self_destroy;
 

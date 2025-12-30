@@ -2,7 +2,7 @@
 // Do not edit manually - regenerate with tools/generate_gui_headers.py
 #pragma once
 
-#include "guiengine/screen.hpp"
+#include "guiengine/abstract_top_level_container.hpp"
 #include "guiengine/widgets/icon_button_widget.hpp"
 #include "guiengine/widgets/label_widget.hpp"
 #include "guiengine/widgets/ribbon_widget.hpp"
@@ -21,7 +21,7 @@ struct ServerConfigurationDialogWidgets
     RibbonWidget* gamemode = nullptr;
     IconButtonWidget* normal = nullptr;
     IconButtonWidget* timetrial = nullptr;
-    IconButtonWidget* 3strikes = nullptr;
+    IconButtonWidget* _3strikes = nullptr;
     IconButtonWidget* soccer = nullptr;
     LabelWidget* more_options = nullptr;
     SpinnerWidget* more_options_spinner = nullptr;
@@ -29,24 +29,24 @@ struct ServerConfigurationDialogWidgets
     IconButtonWidget* cancel = nullptr;
     IconButtonWidget* ok = nullptr;
 
-    void bind(Screen* screen)
+    void bind(AbstractTopLevelContainer* container)
     {
-        title = screen->getWidget<LabelWidget>("title");
-        difficulty = screen->getWidget<RibbonWidget>("difficulty");
-        novice = screen->getWidget<IconButtonWidget>("novice");
-        intermediate = screen->getWidget<IconButtonWidget>("intermediate");
-        expert = screen->getWidget<IconButtonWidget>("expert");
-        best = screen->getWidget<IconButtonWidget>("best");
-        gamemode = screen->getWidget<RibbonWidget>("gamemode");
-        normal = screen->getWidget<IconButtonWidget>("normal");
-        timetrial = screen->getWidget<IconButtonWidget>("timetrial");
-        3strikes = screen->getWidget<IconButtonWidget>("3strikes");
-        soccer = screen->getWidget<IconButtonWidget>("soccer");
-        more_options = screen->getWidget<LabelWidget>("more-options");
-        more_options_spinner = screen->getWidget<SpinnerWidget>("more-options-spinner");
-        options = screen->getWidget<RibbonWidget>("options");
-        cancel = screen->getWidget<IconButtonWidget>("cancel");
-        ok = screen->getWidget<IconButtonWidget>("ok");
+        title = container->getWidget<LabelWidget>("title");
+        difficulty = container->getWidget<RibbonWidget>("difficulty");
+        novice = container->getWidget<IconButtonWidget>("novice");
+        intermediate = container->getWidget<IconButtonWidget>("intermediate");
+        expert = container->getWidget<IconButtonWidget>("expert");
+        best = container->getWidget<IconButtonWidget>("best");
+        gamemode = container->getWidget<RibbonWidget>("gamemode");
+        normal = container->getWidget<IconButtonWidget>("normal");
+        timetrial = container->getWidget<IconButtonWidget>("timetrial");
+        _3strikes = container->getWidget<IconButtonWidget>("3strikes");
+        soccer = container->getWidget<IconButtonWidget>("soccer");
+        more_options = container->getWidget<LabelWidget>("more-options");
+        more_options_spinner = container->getWidget<SpinnerWidget>("more-options-spinner");
+        options = container->getWidget<RibbonWidget>("options");
+        cancel = container->getWidget<IconButtonWidget>("cancel");
+        ok = container->getWidget<IconButtonWidget>("ok");
     }
 };
 

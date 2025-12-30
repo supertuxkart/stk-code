@@ -2,7 +2,7 @@
 // Do not edit manually - regenerate with tools/generate_gui_headers.py
 #pragma once
 
-#include "guiengine/screen.hpp"
+#include "guiengine/abstract_top_level_container.hpp"
 #include "guiengine/widgets/check_box_widget.hpp"
 #include "guiengine/widgets/dynamic_ribbon_widget.hpp"
 #include "guiengine/widgets/icon_button_widget.hpp"
@@ -22,15 +22,15 @@ struct KartsWidgets
     RibbonWidget* kartgroups = nullptr;
     IconButtonWidget* back = nullptr;
 
-    void bind(Screen* screen)
+    void bind(AbstractTopLevelContainer* container)
     {
-        kart_class = screen->getWidget<SpinnerWidget>("kart_class");
-        search = screen->getWidget<TextBoxWidget>("search");
-        favorite = screen->getWidget<CheckBoxWidget>("favorite");
-        karts = screen->getWidget<DynamicRibbonWidget>("karts");
-        continue_ = screen->getWidget<IconButtonWidget>("continue");
-        kartgroups = screen->getWidget<RibbonWidget>("kartgroups");
-        back = screen->getWidget<IconButtonWidget>("back");
+        kart_class = container->getWidget<SpinnerWidget>("kart_class");
+        search = container->getWidget<TextBoxWidget>("search");
+        favorite = container->getWidget<CheckBoxWidget>("favorite");
+        karts = container->getWidget<DynamicRibbonWidget>("karts");
+        continue_ = container->getWidget<IconButtonWidget>("continue");
+        kartgroups = container->getWidget<RibbonWidget>("kartgroups");
+        back = container->getWidget<IconButtonWidget>("back");
     }
 };
 

@@ -2,7 +2,7 @@
 // Do not edit manually - regenerate with tools/generate_gui_headers.py
 #pragma once
 
-#include "guiengine/screen.hpp"
+#include "guiengine/abstract_top_level_container.hpp"
 #include "guiengine/widgets/icon_button_widget.hpp"
 #include "guiengine/widgets/label_widget.hpp"
 #include "guiengine/widgets/ribbon_widget.hpp"
@@ -22,18 +22,18 @@ struct UserInfoDialogWidgets
     IconButtonWidget* decline = nullptr;
     IconButtonWidget* enter = nullptr;
 
-    void bind(Screen* screen)
+    void bind(AbstractTopLevelContainer* container)
     {
-        title = screen->getWidget<LabelWidget>("title");
-        desc = screen->getWidget<LabelWidget>("desc");
-        info = screen->getWidget<LabelWidget>("info");
-        options = screen->getWidget<RibbonWidget>("options");
-        cancel = screen->getWidget<IconButtonWidget>("cancel");
-        remove = screen->getWidget<IconButtonWidget>("remove");
-        friend_ = screen->getWidget<IconButtonWidget>("friend");
-        accept = screen->getWidget<IconButtonWidget>("accept");
-        decline = screen->getWidget<IconButtonWidget>("decline");
-        enter = screen->getWidget<IconButtonWidget>("enter");
+        title = container->getWidget<LabelWidget>("title");
+        desc = container->getWidget<LabelWidget>("desc");
+        info = container->getWidget<LabelWidget>("info");
+        options = container->getWidget<RibbonWidget>("options");
+        cancel = container->getWidget<IconButtonWidget>("cancel");
+        remove = container->getWidget<IconButtonWidget>("remove");
+        friend_ = container->getWidget<IconButtonWidget>("friend");
+        accept = container->getWidget<IconButtonWidget>("accept");
+        decline = container->getWidget<IconButtonWidget>("decline");
+        enter = container->getWidget<IconButtonWidget>("enter");
     }
 };
 

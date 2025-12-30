@@ -2,7 +2,7 @@
 // Do not edit manually - regenerate with tools/generate_gui_headers.py
 #pragma once
 
-#include "guiengine/screen.hpp"
+#include "guiengine/abstract_top_level_container.hpp"
 #include "guiengine/widgets/dynamic_ribbon_widget.hpp"
 #include "guiengine/widgets/icon_button_widget.hpp"
 #include "guiengine/widgets/label_widget.hpp"
@@ -24,19 +24,19 @@ struct GrandPrixEditorWidgets
     IconButtonWidget* remove = nullptr;
     IconButtonWidget* rename = nullptr;
 
-    void bind(Screen* screen)
+    void bind(AbstractTopLevelContainer* container)
     {
-        back = screen->getWidget<IconButtonWidget>("back");
-        gplist = screen->getWidget<DynamicRibbonWidget>("gplist");
-        gpgroups = screen->getWidget<RibbonWidget>("gpgroups");
-        gpname = screen->getWidget<LabelWidget>("gpname");
-        tracks = screen->getWidget<DynamicRibbonWidget>("tracks");
-        menu = screen->getWidget<RibbonWidget>("menu");
-        new_ = screen->getWidget<IconButtonWidget>("new");
-        copy = screen->getWidget<IconButtonWidget>("copy");
-        edit = screen->getWidget<IconButtonWidget>("edit");
-        remove = screen->getWidget<IconButtonWidget>("remove");
-        rename = screen->getWidget<IconButtonWidget>("rename");
+        back = container->getWidget<IconButtonWidget>("back");
+        gplist = container->getWidget<DynamicRibbonWidget>("gplist");
+        gpgroups = container->getWidget<RibbonWidget>("gpgroups");
+        gpname = container->getWidget<LabelWidget>("gpname");
+        tracks = container->getWidget<DynamicRibbonWidget>("tracks");
+        menu = container->getWidget<RibbonWidget>("menu");
+        new_ = container->getWidget<IconButtonWidget>("new");
+        copy = container->getWidget<IconButtonWidget>("copy");
+        edit = container->getWidget<IconButtonWidget>("edit");
+        remove = container->getWidget<IconButtonWidget>("remove");
+        rename = container->getWidget<IconButtonWidget>("rename");
     }
 };
 

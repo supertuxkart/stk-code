@@ -2,7 +2,7 @@
 // Do not edit manually - regenerate with tools/generate_gui_headers.py
 #pragma once
 
-#include "guiengine/screen.hpp"
+#include "guiengine/abstract_top_level_container.hpp"
 #include "guiengine/widgets/icon_button_widget.hpp"
 #include "guiengine/widgets/label_widget.hpp"
 #include "guiengine/widgets/ribbon_widget.hpp"
@@ -22,18 +22,18 @@ struct SelectChallengeWidgets
     IconButtonWidget* back = nullptr;
     IconButtonWidget* start = nullptr;
 
-    void bind(Screen* screen)
+    void bind(AbstractTopLevelContainer* container)
     {
-        title = screen->getWidget<LabelWidget>("title");
-        difficulty = screen->getWidget<RibbonWidget>("difficulty");
-        novice = screen->getWidget<IconButtonWidget>("novice");
-        intermediate = screen->getWidget<IconButtonWidget>("intermediate");
-        expert = screen->getWidget<IconButtonWidget>("expert");
-        supertux = screen->getWidget<IconButtonWidget>("supertux");
-        challenge_info = screen->getWidget<LabelWidget>("challenge_info");
-        actions = screen->getWidget<RibbonWidget>("actions");
-        back = screen->getWidget<IconButtonWidget>("back");
-        start = screen->getWidget<IconButtonWidget>("start");
+        title = container->getWidget<LabelWidget>("title");
+        difficulty = container->getWidget<RibbonWidget>("difficulty");
+        novice = container->getWidget<IconButtonWidget>("novice");
+        intermediate = container->getWidget<IconButtonWidget>("intermediate");
+        expert = container->getWidget<IconButtonWidget>("expert");
+        supertux = container->getWidget<IconButtonWidget>("supertux");
+        challenge_info = container->getWidget<LabelWidget>("challenge_info");
+        actions = container->getWidget<RibbonWidget>("actions");
+        back = container->getWidget<IconButtonWidget>("back");
+        start = container->getWidget<IconButtonWidget>("start");
     }
 };
 

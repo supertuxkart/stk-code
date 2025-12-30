@@ -2,7 +2,7 @@
 // Do not edit manually - regenerate with tools/generate_gui_headers.py
 #pragma once
 
-#include "guiengine/screen.hpp"
+#include "guiengine/abstract_top_level_container.hpp"
 #include "guiengine/widgets/dynamic_ribbon_widget.hpp"
 #include "guiengine/widgets/icon_button_widget.hpp"
 #include "guiengine/widgets/ribbon_widget.hpp"
@@ -19,15 +19,15 @@ struct RaceSetupWidgets
     DynamicRibbonWidget* gamemode = nullptr;
     IconButtonWidget* back = nullptr;
 
-    void bind(Screen* screen)
+    void bind(AbstractTopLevelContainer* container)
     {
-        difficulty = screen->getWidget<RibbonWidget>("difficulty");
-        novice = screen->getWidget<IconButtonWidget>("novice");
-        intermediate = screen->getWidget<IconButtonWidget>("intermediate");
-        expert = screen->getWidget<IconButtonWidget>("expert");
-        best = screen->getWidget<IconButtonWidget>("best");
-        gamemode = screen->getWidget<DynamicRibbonWidget>("gamemode");
-        back = screen->getWidget<IconButtonWidget>("back");
+        difficulty = container->getWidget<RibbonWidget>("difficulty");
+        novice = container->getWidget<IconButtonWidget>("novice");
+        intermediate = container->getWidget<IconButtonWidget>("intermediate");
+        expert = container->getWidget<IconButtonWidget>("expert");
+        best = container->getWidget<IconButtonWidget>("best");
+        gamemode = container->getWidget<DynamicRibbonWidget>("gamemode");
+        back = container->getWidget<IconButtonWidget>("back");
     }
 };
 

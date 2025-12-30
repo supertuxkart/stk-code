@@ -2,7 +2,7 @@
 // Do not edit manually - regenerate with tools/generate_gui_headers.py
 #pragma once
 
-#include "guiengine/screen.hpp"
+#include "guiengine/abstract_top_level_container.hpp"
 #include "guiengine/widgets/bubble_widget.hpp"
 #include "guiengine/widgets/icon_button_widget.hpp"
 #include "guiengine/widgets/label_widget.hpp"
@@ -27,20 +27,20 @@ struct AddonsLoadingWidgets
     IconButtonWidget* install = nullptr;
     IconButtonWidget* uninstall = nullptr;
 
-    void bind(Screen* screen)
+    void bind(AbstractTopLevelContainer* container)
     {
-        icon = screen->getWidget<IconButtonWidget>("icon");
-        name = screen->getWidget<LabelWidget>("name");
-        size = screen->getWidget<LabelWidget>("size");
-        revision = screen->getWidget<LabelWidget>("revision");
-        rating = screen->getWidget<RatingBarWidget>("rating");
-        flags = screen->getWidget<LabelWidget>("flags");
-        description = screen->getWidget<BubbleWidget>("description");
-        progress = screen->getWidget<ProgressBarWidget>("progress");
-        actions = screen->getWidget<RibbonWidget>("actions");
-        back = screen->getWidget<IconButtonWidget>("back");
-        install = screen->getWidget<IconButtonWidget>("install");
-        uninstall = screen->getWidget<IconButtonWidget>("uninstall");
+        icon = container->getWidget<IconButtonWidget>("icon");
+        name = container->getWidget<LabelWidget>("name");
+        size = container->getWidget<LabelWidget>("size");
+        revision = container->getWidget<LabelWidget>("revision");
+        rating = container->getWidget<RatingBarWidget>("rating");
+        flags = container->getWidget<LabelWidget>("flags");
+        description = container->getWidget<BubbleWidget>("description");
+        progress = container->getWidget<ProgressBarWidget>("progress");
+        actions = container->getWidget<RibbonWidget>("actions");
+        back = container->getWidget<IconButtonWidget>("back");
+        install = container->getWidget<IconButtonWidget>("install");
+        uninstall = container->getWidget<IconButtonWidget>("uninstall");
     }
 };
 

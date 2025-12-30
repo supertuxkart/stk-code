@@ -88,6 +88,7 @@ void OptionsScreenVideo::loadedFromFile()
     assert(gfx_presets.size() == 7);
     assert(blur_presets.size() == 3);
 
+    // Note: m_widgets.bind() is called later in init(), so use getWidget here
     GUIEngine::SpinnerWidget* gfx =
         getWidget<GUIEngine::SpinnerWidget>("gfx_level");
     gfx->m_properties[GUIEngine::PROP_MAX_VALUE] =
@@ -107,21 +108,16 @@ void OptionsScreenVideo::init()
     Screen::init();
     OptionsCommon::setTabStatus();
 
+    // Bind typed widget pointers (one-time lookup)
+    m_widgets.bind(this);
+
     m_prev_adv_pipline = UserConfigParams::m_dynamic_lights;
-    RibbonWidget* ribbon = getWidget<RibbonWidget>("options_choice");
-    assert(ribbon != NULL);
-    ribbon->setFocusForPlayer(PLAYER_ID_GAME_MASTER);
-    ribbon->select( "tab_video", PLAYER_ID_GAME_MASTER );
+    m_widgets.options_choice->setFocusForPlayer(PLAYER_ID_GAME_MASTER);
+    m_widgets.options_choice->select( "tab_video", PLAYER_ID_GAME_MASTER );
 
-    GUIEngine::SpinnerWidget* gfx = getWidget<GUIEngine::SpinnerWidget>("gfx_level");
-    assert( gfx != NULL );
-    
-    GUIEngine::SpinnerWidget* vsync = getWidget<GUIEngine::SpinnerWidget>("vsync");
-    assert( vsync != NULL );
-
-    vsync->clearLabels();
+    m_widgets.vsync->clearLabels();
     //I18N: In the video options
-    vsync->addLabel(_("Vertical Sync"));
+    m_widgets.vsync->addLabel(_("Vertical Sync"));
 #ifdef MOBILE_STK
     std::set<int> fps = { 30, 60, 120 };
 #else
@@ -129,17 +125,17 @@ void OptionsScreenVideo::init()
 #endif
     fps.insert(UserConfigParams::m_max_fps);
     for (auto& i : fps)
-        vsync->addLabel(core::stringw(i));
+        m_widgets.vsync->addLabel(core::stringw(i));
     if (UserConfigParams::m_swap_interval > 1)
         UserConfigParams::m_swap_interval = 1;
 
     if (UserConfigParams::m_swap_interval == 1)
-        vsync->setValue(0);
+        m_widgets.vsync->setValue(0);
     else
     {
         auto it = fps.find(UserConfigParams::m_max_fps);
         assert(it != fps.end());
-        vsync->setValue(1 + std::distance(fps.begin(), it));
+        m_widgets.vsync->setValue(1 + std::distance(fps.begin(), it));
     }
     //I18N: in the graphical options. The \n is a newline character, place it where appropriate, two can be used if required.
     core::stringw vsync_tooltip = _("Vsync forces the graphics card to supply a new frame\nonly when the monitor is ready to display it.");
@@ -147,31 +143,28 @@ void OptionsScreenVideo::init()
     //I18N: in the graphical options.
     vsync_tooltip = vsync_tooltip + L"\n" + _("Vsync will not work if your drivers don't support it.");
 
-    vsync->setTooltip(vsync_tooltip);
+    m_widgets.vsync->setTooltip(vsync_tooltip);
 
     // Setup Render Resolution (scale_rtts) spinner
-    GUIEngine::SpinnerWidget* scale_rtts = getWidget<GUIEngine::SpinnerWidget>("scale_rtts");
-    assert( scale_rtts != NULL );
-
-    scale_rtts->clearLabels();
-    scale_rtts->addLabel("30%");
-    scale_rtts->addLabel("35%");
-    scale_rtts->addLabel("40%");
-    scale_rtts->addLabel("45%");
-    scale_rtts->addLabel("50%");
-    scale_rtts->addLabel("55%");
-    scale_rtts->addLabel("60%");
-    scale_rtts->addLabel("65%");
-    scale_rtts->addLabel("70%");
-    scale_rtts->addLabel("75%");
-    scale_rtts->addLabel("80%");
-    scale_rtts->addLabel("85%");
-    scale_rtts->addLabel("90%");
-    scale_rtts->addLabel("95%");
-    scale_rtts->addLabel("100%");
-    scale_rtts->addLabel("125%");
-    scale_rtts->addLabel("150%");
-    scale_rtts->addLabel("200%");
+    m_widgets.scale_rtts->clearLabels();
+    m_widgets.scale_rtts->addLabel("30%");
+    m_widgets.scale_rtts->addLabel("35%");
+    m_widgets.scale_rtts->addLabel("40%");
+    m_widgets.scale_rtts->addLabel("45%");
+    m_widgets.scale_rtts->addLabel("50%");
+    m_widgets.scale_rtts->addLabel("55%");
+    m_widgets.scale_rtts->addLabel("60%");
+    m_widgets.scale_rtts->addLabel("65%");
+    m_widgets.scale_rtts->addLabel("70%");
+    m_widgets.scale_rtts->addLabel("75%");
+    m_widgets.scale_rtts->addLabel("80%");
+    m_widgets.scale_rtts->addLabel("85%");
+    m_widgets.scale_rtts->addLabel("90%");
+    m_widgets.scale_rtts->addLabel("95%");
+    m_widgets.scale_rtts->addLabel("100%");
+    m_widgets.scale_rtts->addLabel("125%");
+    m_widgets.scale_rtts->addLabel("150%");
+    m_widgets.scale_rtts->addLabel("200%");
 
     // --- set gfx settings values
     updateGfxSlider();
@@ -183,14 +176,14 @@ void OptionsScreenVideo::init()
     // disabled)
     bool in_game = StateManager::get()->getGameState() == GUIEngine::INGAME_MENU;
 
-    gfx->setActive(!in_game && CVS->isGLSL());
-    getWidget<ButtonWidget>("custom")->setActive(!in_game || !CVS->isGLSL());
-    if (getWidget<SpinnerWidget>("scale_rtts")->isActivated())
+    m_widgets.gfx_level->setActive(!in_game && CVS->isGLSL());
+    m_widgets.custom->setActive(!in_game || !CVS->isGLSL());
+    if (m_widgets.scale_rtts->isActivated())
     {
-        getWidget<SpinnerWidget>("scale_rtts")->setActive(!in_game ||
+        m_widgets.scale_rtts->setActive(!in_game ||
             GE::getDriver()->getDriverType() == video::EDT_VULKAN);
     }
-    getWidget<ButtonWidget>("benchmarkCurrent")->setActive(!in_game);
+    m_widgets.benchmarkCurrent->setActive(!in_game);
 
     // If a benchmark was requested and the game had to reload
     // the graphics engine, start the benchmark when the
@@ -208,22 +201,19 @@ void OptionsScreenVideo::onResize()
 // --------------------------------------------------------------------------------------------
 void OptionsScreenVideo::updateGfxSlider()
 {
-    GUIEngine::SpinnerWidget* gfx = getWidget<GUIEngine::SpinnerWidget>("gfx_level");
-    assert( gfx != NULL );
     int preset = findCurrentGFXPreset();
     if (preset == -1) // Current settings don't match a preset
     {
         //I18N: custom video settings
-        gfx->setCustomText( _("Custom") );
+        m_widgets.gfx_level->setCustomText( _("Custom") );
     }
     else
     {
-        gfx->setValue(preset);
+        m_widgets.gfx_level->setValue(preset);
     }
 
     // Enable the blur slider if the modern renderer is used
-    getWidget<GUIEngine::SpinnerWidget>("blur_level")->
-        setActive(UserConfigParams::m_dynamic_lights && CVS->isGLSL());
+    m_widgets.blur_level->setActive(UserConfigParams::m_dynamic_lights && CVS->isGLSL());
     // Same with Render resolution slider
     updateScaleRTTsSlider();
 
@@ -233,16 +223,13 @@ void OptionsScreenVideo::updateGfxSlider()
 // --------------------------------------------------------------------------------------------
 void OptionsScreenVideo::updateBlurSlider()
 {
-    GUIEngine::SpinnerWidget* blur = getWidget<GUIEngine::SpinnerWidget>("blur_level");
-    assert( blur != NULL );
-
     bool found = false;
     for (unsigned int l = 0; l < blur_presets.size(); l++)
     {
         if (blur_presets[l].motionblur == UserConfigParams::m_motionblur &&
             blur_presets[l].dof == UserConfigParams::m_dof)
         {
-            blur->setValue(l);
+            m_widgets.blur_level->setValue(l);
             found = true;
             break;
         }
@@ -251,7 +238,7 @@ void OptionsScreenVideo::updateBlurSlider()
     if (!found)
     {
         //I18N: custom video settings
-        blur->setCustomText( _("Custom") );
+        m_widgets.blur_level->setCustomText( _("Custom") );
     }
 
     updateBlurTooltip();
@@ -263,10 +250,7 @@ void OptionsScreenVideo::updateScaleRTTsSlider()
     bool rtts_on = (UserConfigParams::m_dynamic_lights && CVS->isGLSL()) ||
         GE::getDriver()->getDriverType() == video::EDT_VULKAN;
 
-    GUIEngine::SpinnerWidget* rtts_slider = getWidget<GUIEngine::SpinnerWidget>("scale_rtts");
-    assert( rtts_slider != NULL );
-
-    rtts_slider->setActive(rtts_on);
+    m_widgets.scale_rtts->setActive(rtts_on);
 
     bool found = false;
     float rtts_value = (rtts_on) ? UserConfigParams::m_scale_rtts_factor : 1.0f;
@@ -274,12 +258,12 @@ void OptionsScreenVideo::updateScaleRTTsSlider()
     {
         if (scale_rtts_presets[l].value == rtts_value)
         {
-            rtts_slider->setValue(l);
+            m_widgets.scale_rtts->setValue(l);
             found = true;
             if (scale_rtts_presets[l].value > 1.0f)
-                rtts_slider->markAsIncorrect();
+                m_widgets.scale_rtts->markAsIncorrect();
             else
-                rtts_slider->markAsCorrect();
+                m_widgets.scale_rtts->markAsCorrect();
 
             break;
         }
@@ -288,16 +272,13 @@ void OptionsScreenVideo::updateScaleRTTsSlider()
     if (!found)
     {
         //I18N: custom video settings
-        rtts_slider->setCustomText( _("Custom") );
+        m_widgets.scale_rtts->setCustomText( _("Custom") );
     }
 } // updateScaleRTTsSlider
 
 // --------------------------------------------------------------------------------------------
 void OptionsScreenVideo::updateTooltip()
 {
-    GUIEngine::SpinnerWidget* gfx = getWidget<GUIEngine::SpinnerWidget>("gfx_level");
-    assert( gfx != NULL );
-
     core::stringw tooltip;
 
     //I18N: in the graphical options
@@ -375,15 +356,12 @@ void OptionsScreenVideo::updateTooltip()
         geometry_detail == 4 ?  _C("Geometry level", "Very high") :
                                 _C("Geometry level", "Ultra high"));
 
-    gfx->setTooltip(tooltip);
+    m_widgets.gfx_level->setTooltip(tooltip);
 }   // updateTooltip
 
 // --------------------------------------------------------------------------------------------
 void OptionsScreenVideo::updateBlurTooltip()
 {
-    GUIEngine::SpinnerWidget* blur = getWidget<GUIEngine::SpinnerWidget>("blur_level");
-    assert( blur != NULL );
-
     core::stringw tooltip;
 
     //I18N: in the graphical options
@@ -395,7 +373,7 @@ void OptionsScreenVideo::updateBlurTooltip()
         (UserConfigParams::m_dof ? _("Depth of field: Enabled") :
                                    _("Depth of field: Disabled"));
 
-    blur->setTooltip(tooltip);
+    m_widgets.blur_level->setTooltip(tooltip);
 }   // updateBlurTooltip
 
 // --------------------------------------------------------------------------------------------
@@ -405,35 +383,30 @@ extern "C" void reset_network_body();
 void OptionsScreenVideo::eventCallback(Widget* widget, const std::string& name,
                                        const int playerID)
 {
-    if (name == "options_choice")
+    if (widget == m_widgets.options_choice)
     {
-        std::string selection = ((RibbonWidget*)widget)->getSelectionIDString(PLAYER_ID_GAME_MASTER);
+        std::string selection = m_widgets.options_choice->getSelectionIDString(PLAYER_ID_GAME_MASTER);
 
         if (selection != "tab_video")
             OptionsCommon::switchTab(selection);
     }
-    else if(name == "back")
+    else if (widget == m_widgets.back)
     {
         StateManager::get()->escapePressed();
     }
-    else if(name == "custom")
+    else if (widget == m_widgets.custom)
     {
         new CustomVideoSettingsDialog(0.8f, 0.9f);
     }
-    else if (name == "gfx_level")
+    else if (widget == m_widgets.gfx_level)
     {
-        GUIEngine::SpinnerWidget* gfx_level =
-            getWidget<GUIEngine::SpinnerWidget>("gfx_level");
-        assert( gfx_level != NULL );
-
-        const int level = gfx_level->getValue();
+        const int level = m_widgets.gfx_level->getValue();
 
         // Enable the blur spinner only if the new renderer is on
-        getWidget<GUIEngine::SpinnerWidget>("blur_level")->setActive(level >= 3);
+        m_widgets.blur_level->setActive(level >= 3);
 
         // Same with Render resolution slider
-        getWidget<GUIEngine::SpinnerWidget>("scale_rtts")->
-            setActive(UserConfigParams::m_dynamic_lights ||
+        m_widgets.scale_rtts->setActive(UserConfigParams::m_dynamic_lights ||
             GE::getDriver()->getDriverType() == video::EDT_VULKAN);
 
         applyGFXPreset(level);
@@ -441,13 +414,9 @@ void OptionsScreenVideo::eventCallback(Widget* widget, const std::string& name,
         updateGfxSlider();
         setSSR();
     }
-    else if (name == "blur_level")
+    else if (widget == m_widgets.blur_level)
     {
-        GUIEngine::SpinnerWidget* blur_level =
-            getWidget<GUIEngine::SpinnerWidget>("blur_level");
-        assert( blur_level != NULL );
-
-        const int level = blur_level->getValue();
+        const int level = m_widgets.blur_level->getValue();
 
         if (UserConfigParams::m_dynamic_lights)
         {
@@ -457,11 +426,9 @@ void OptionsScreenVideo::eventCallback(Widget* widget, const std::string& name,
 
         updateBlurSlider();
     }
-    else if (name == "vsync") // Also handles the FPS limiter
+    else if (widget == m_widgets.vsync) // Also handles the FPS limiter
     {
-        GUIEngine::SpinnerWidget* vsync = getWidget<GUIEngine::SpinnerWidget>("vsync");
-        assert( vsync != NULL );
-        int swap = vsync->getValue();
+        int swap = m_widgets.vsync->getValue();
         if (swap == 0)
         {
             UserConfigParams::m_swap_interval = 1;
@@ -470,7 +437,7 @@ void OptionsScreenVideo::eventCallback(Widget* widget, const std::string& name,
         else
         {
             UserConfigParams::m_swap_interval = 0;
-            std::string fps = StringUtils::wideToUtf8(vsync->getStringValue());
+            std::string fps = StringUtils::wideToUtf8(m_widgets.vsync->getStringValue());
             UserConfigParams::m_max_fps.revertToDefaults();
             int max_fps = UserConfigParams::m_max_fps;
             StringUtils::fromString(fps, max_fps);
@@ -480,13 +447,9 @@ void OptionsScreenVideo::eventCallback(Widget* widget, const std::string& name,
         update_swap_interval(UserConfigParams::m_swap_interval);
 #endif
     } // vSync
-    else if (name == "scale_rtts")
+    else if (widget == m_widgets.scale_rtts)
     {
-        GUIEngine::SpinnerWidget* rtts_slider =
-            getWidget<GUIEngine::SpinnerWidget>("scale_rtts");
-        assert( rtts_slider != NULL );
-
-        const int level = rtts_slider->getValue();
+        const int level = m_widgets.scale_rtts->getValue();
         assert(level < (int)scale_rtts_presets.size());
 
         UserConfigParams::m_scale_rtts_factor = scale_rtts_presets[level].value;
@@ -499,7 +462,7 @@ void OptionsScreenVideo::eventCallback(Widget* widget, const std::string& name,
         }
         updateScaleRTTsSlider();
     } // scale_rtts
-    else if (name == "benchmarkCurrent")
+    else if (widget == m_widgets.benchmarkCurrent)
     {
         // To avoid crashes and ensure the proper settings are used during the benchmark,
         // we apply the settings. If this doesn't require restarting the screen, we start
@@ -509,7 +472,7 @@ void OptionsScreenVideo::eventCallback(Widget* widget, const std::string& name,
         else
             RaceManager::get()->scheduleBenchmark();
     } // benchmarkCurrent
-    /*else if (name == "benchmarkRecommend")
+    /*else if (widget == m_widgets.benchmarkRecommend)
     {
         new RecommendVideoSettingsDialog(0.8f, 0.9f);
     }*/ // benchmarkRecommend

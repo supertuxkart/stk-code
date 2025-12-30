@@ -2,7 +2,7 @@
 // Do not edit manually - regenerate with tools/generate_gui_headers.py
 #pragma once
 
-#include "guiengine/screen.hpp"
+#include "guiengine/abstract_top_level_container.hpp"
 #include "guiengine/widgets/check_box_widget.hpp"
 #include "guiengine/widgets/icon_button_widget.hpp"
 #include "guiengine/widgets/label_widget.hpp"
@@ -25,19 +25,19 @@ struct SplitscreenPlayerDialogWidgets
     IconButtonWidget* add = nullptr;
     IconButtonWidget* connect = nullptr;
 
-    void bind(Screen* screen)
+    void bind(AbstractTopLevelContainer* container)
     {
-        title = screen->getWidget<LabelWidget>("title");
-        name_spinner = screen->getWidget<SpinnerWidget>("name-spinner");
-        name_text = screen->getWidget<LabelWidget>("name-text");
-        handicap = screen->getWidget<CheckBoxWidget>("handicap");
-        handicap_text = screen->getWidget<LabelWidget>("handicap-text");
-        message_label = screen->getWidget<LabelWidget>("message-label");
-        options = screen->getWidget<RibbonWidget>("options");
-        cancel = screen->getWidget<IconButtonWidget>("cancel");
-        reset = screen->getWidget<IconButtonWidget>("reset");
-        add = screen->getWidget<IconButtonWidget>("add");
-        connect = screen->getWidget<IconButtonWidget>("connect");
+        title = container->getWidget<LabelWidget>("title");
+        name_spinner = container->getWidget<SpinnerWidget>("name-spinner");
+        name_text = container->getWidget<LabelWidget>("name-text");
+        handicap = container->getWidget<CheckBoxWidget>("handicap");
+        handicap_text = container->getWidget<LabelWidget>("handicap-text");
+        message_label = container->getWidget<LabelWidget>("message-label");
+        options = container->getWidget<RibbonWidget>("options");
+        cancel = container->getWidget<IconButtonWidget>("cancel");
+        reset = container->getWidget<IconButtonWidget>("reset");
+        add = container->getWidget<IconButtonWidget>("add");
+        connect = container->getWidget<IconButtonWidget>("connect");
     }
 };
 

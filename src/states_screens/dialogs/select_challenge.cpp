@@ -121,12 +121,12 @@ SelectChallengeDialog::SelectChallengeDialog(const float percentWidth,
     ModalDialog(percentWidth, percentHeight)
 {
     loadFromFile("select_challenge.stkgui");
-    
+    m_widgets.bind(this);
+
     m_challenge_id = challenge_id;
     World::getWorld()->schedulePause(WorldStatus::IN_GAME_MENU_PHASE);
-    
-    GUIEngine::RibbonWidget* difficulty =
-        getWidget<GUIEngine::RibbonWidget>("difficulty");
+
+    GUIEngine::RibbonWidget* difficulty = m_widgets.difficulty;
     
     if (UserConfigParams::m_difficulty == RaceManager::DIFFICULTY_BEST &&
         PlayerManager::getCurrentPlayer()->isLocked("difficulty_best"))
@@ -140,7 +140,7 @@ SelectChallengeDialog::SelectChallengeDialog(const float percentWidth,
 
     const ChallengeStatus* c = PlayerManager::getCurrentPlayer()
                              ->getChallengeStatus(challenge_id);
-    LabelWidget* challenge_info = getWidget<LabelWidget>("challenge_info");
+    LabelWidget* challenge_info = m_widgets.challenge_info;
     
     switch (UserConfigParams::m_difficulty)
     {
@@ -170,34 +170,32 @@ SelectChallengeDialog::SelectChallengeDialog(const float percentWidth,
     updateSolvedIcon(c, RaceManager::DIFFICULTY_MEDIUM, "intermediate", "cup_silver.png");
     updateSolvedIcon(c, RaceManager::DIFFICULTY_HARD,   "expert",       "cup_gold.png");
     updateSolvedIcon(c, RaceManager::DIFFICULTY_BEST,   "supertux",     "cup_platinum.png");
-    
+
     if (c->getData()->isGrandPrix())
     {
         const GrandPrixData* gp = grand_prix_manager->getGrandPrix(c->getData()->getGPId());
-        getWidget<LabelWidget>("title")->setText(gp->getName(), true);
+        m_widgets.title->setText(gp->getName(), true);
     }
     else
     {
         const core::stringw track_name =
             track_manager->getTrack(c->getData()->getTrackId())->getName();
-        getWidget<LabelWidget>("title")->setText(track_name, true);
+        m_widgets.title->setText(track_name, true);
     }
 
-    
+
     if (PlayerManager::getCurrentPlayer()->isLocked("difficulty_best"))
     {
-        getWidget<IconButtonWidget>("supertux")->setBadge(LOCKED_BADGE);
-        getWidget<IconButtonWidget>("supertux")->setActive(false);
+        m_widgets.supertux->setBadge(LOCKED_BADGE);
+        m_widgets.supertux->setActive(false);
     }
     else
     {
-        getWidget<IconButtonWidget>("supertux")->unsetBadge(LOCKED_BADGE);
-        getWidget<IconButtonWidget>("supertux")->setActive(true);
+        m_widgets.supertux->unsetBadge(LOCKED_BADGE);
+        m_widgets.supertux->setActive(true);
     }
 
-    GUIEngine::RibbonWidget* actions =
-            getWidget<GUIEngine::RibbonWidget>("actions");
-     actions->setFocusForPlayer(PLAYER_ID_GAME_MASTER);
+    m_widgets.actions->setFocusForPlayer(PLAYER_ID_GAME_MASTER);
 }
 
 // ----------------------------------------------------------------------------
@@ -236,13 +234,11 @@ void SelectChallengeDialog::onUpdate(float dt)
 GUIEngine::EventPropagation SelectChallengeDialog::processEvent(const std::string& eventSourceParam)
 {
     std::string eventSource = eventSourceParam;
-    
-    GUIEngine::RibbonWidget* actions =
-            getWidget<GUIEngine::RibbonWidget>("actions");
-    GUIEngine::RibbonWidget* difficulty =
-            getWidget<GUIEngine::RibbonWidget>("difficulty");
-    
-    LabelWidget* challenge_info = getWidget<LabelWidget>("challenge_info");
+
+    GUIEngine::RibbonWidget* actions = m_widgets.actions;
+    GUIEngine::RibbonWidget* difficulty = m_widgets.difficulty;
+
+    LabelWidget* challenge_info = m_widgets.challenge_info;
     
     const ChallengeData* c_data = unlock_manager->getChallengeData(m_challenge_id);
     

@@ -2,7 +2,7 @@
 // Do not edit manually - regenerate with tools/generate_gui_headers.py
 #pragma once
 
-#include "guiengine/screen.hpp"
+#include "guiengine/abstract_top_level_container.hpp"
 #include "guiengine/widgets/check_box_widget.hpp"
 #include "guiengine/widgets/icon_button_widget.hpp"
 #include "guiengine/widgets/label_widget.hpp"
@@ -28,22 +28,22 @@ struct CustomCameraSettingsWidgets
     IconButtonWidget* cancel = nullptr;
     IconButtonWidget* apply = nullptr;
 
-    void bind(Screen* screen)
+    void bind(AbstractTopLevelContainer* container)
     {
-        title = screen->getWidget<LabelWidget>("title");
-        camera_name = screen->getWidget<LabelWidget>("camera_name");
-        fov = screen->getWidget<SpinnerWidget>("fov");
-        camera_distance = screen->getWidget<SpinnerWidget>("camera_distance");
-        camera_angle = screen->getWidget<SpinnerWidget>("camera_angle");
-        smooth_position = screen->getWidget<SpinnerWidget>("smooth_position");
-        smooth_rotation = screen->getWidget<SpinnerWidget>("smooth_rotation");
-        backward_camera_distance = screen->getWidget<SpinnerWidget>("backward_camera_distance");
-        backward_camera_angle = screen->getWidget<SpinnerWidget>("backward_camera_angle");
-        use_soccer_camera = screen->getWidget<CheckBoxWidget>("use_soccer_camera");
-        buttons = screen->getWidget<RibbonWidget>("buttons");
-        reset = screen->getWidget<IconButtonWidget>("reset");
-        cancel = screen->getWidget<IconButtonWidget>("cancel");
-        apply = screen->getWidget<IconButtonWidget>("apply");
+        title = container->getWidget<LabelWidget>("title");
+        camera_name = container->getWidget<LabelWidget>("camera_name");
+        fov = container->getWidget<SpinnerWidget>("fov");
+        camera_distance = container->getWidget<SpinnerWidget>("camera_distance");
+        camera_angle = container->getWidget<SpinnerWidget>("camera_angle");
+        smooth_position = container->getWidget<SpinnerWidget>("smooth_position");
+        smooth_rotation = container->getWidget<SpinnerWidget>("smooth_rotation");
+        backward_camera_distance = container->getWidget<SpinnerWidget>("backward_camera_distance");
+        backward_camera_angle = container->getWidget<SpinnerWidget>("backward_camera_angle");
+        use_soccer_camera = container->getWidget<CheckBoxWidget>("use_soccer_camera");
+        buttons = container->getWidget<RibbonWidget>("buttons");
+        reset = container->getWidget<IconButtonWidget>("reset");
+        cancel = container->getWidget<IconButtonWidget>("cancel");
+        apply = container->getWidget<IconButtonWidget>("apply");
     }
 };
 

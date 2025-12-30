@@ -2,7 +2,7 @@
 // Do not edit manually - regenerate with tools/generate_gui_headers.py
 #pragma once
 
-#include "guiengine/screen.hpp"
+#include "guiengine/abstract_top_level_container.hpp"
 #include "guiengine/widgets/button_widget.hpp"
 #include "guiengine/widgets/label_widget.hpp"
 #include "guiengine/widgets/spinner_widget.hpp"
@@ -17,29 +17,29 @@ struct DebugSliderWidgets
     SpinnerWidget* green_slider = nullptr;
     LabelWidget* Blue = nullptr;
     SpinnerWidget* blue_slider = nullptr;
-    LabelWidget* SSAO radius = nullptr;
+    LabelWidget* SSAO_radius = nullptr;
     SpinnerWidget* ssao_radius = nullptr;
-    LabelWidget* SSAO k = nullptr;
+    LabelWidget* SSAO_k = nullptr;
     SpinnerWidget* ssao_k = nullptr;
-    LabelWidget* SSAO Sigma = nullptr;
+    LabelWidget* SSAO_Sigma = nullptr;
     SpinnerWidget* ssao_sigma = nullptr;
     ButtonWidget* close = nullptr;
 
-    void bind(Screen* screen)
+    void bind(AbstractTopLevelContainer* container)
     {
-        Red = screen->getWidget<LabelWidget>("Red");
-        red_slider = screen->getWidget<SpinnerWidget>("red_slider");
-        Green = screen->getWidget<LabelWidget>("Green");
-        green_slider = screen->getWidget<SpinnerWidget>("green_slider");
-        Blue = screen->getWidget<LabelWidget>("Blue");
-        blue_slider = screen->getWidget<SpinnerWidget>("blue_slider");
-        SSAO radius = screen->getWidget<LabelWidget>("SSAO radius");
-        ssao_radius = screen->getWidget<SpinnerWidget>("ssao_radius");
-        SSAO k = screen->getWidget<LabelWidget>("SSAO k");
-        ssao_k = screen->getWidget<SpinnerWidget>("ssao_k");
-        SSAO Sigma = screen->getWidget<LabelWidget>("SSAO Sigma");
-        ssao_sigma = screen->getWidget<SpinnerWidget>("ssao_sigma");
-        close = screen->getWidget<ButtonWidget>("close");
+        Red = container->getWidget<LabelWidget>("Red");
+        red_slider = container->getWidget<SpinnerWidget>("red_slider");
+        Green = container->getWidget<LabelWidget>("Green");
+        green_slider = container->getWidget<SpinnerWidget>("green_slider");
+        Blue = container->getWidget<LabelWidget>("Blue");
+        blue_slider = container->getWidget<SpinnerWidget>("blue_slider");
+        SSAO_radius = container->getWidget<LabelWidget>("SSAO radius");
+        ssao_radius = container->getWidget<SpinnerWidget>("ssao_radius");
+        SSAO_k = container->getWidget<LabelWidget>("SSAO k");
+        ssao_k = container->getWidget<SpinnerWidget>("ssao_k");
+        SSAO_Sigma = container->getWidget<LabelWidget>("SSAO Sigma");
+        ssao_sigma = container->getWidget<SpinnerWidget>("ssao_sigma");
+        close = container->getWidget<ButtonWidget>("close");
     }
 };
 

@@ -2,7 +2,7 @@
 // Do not edit manually - regenerate with tools/generate_gui_headers.py
 #pragma once
 
-#include "guiengine/screen.hpp"
+#include "guiengine/abstract_top_level_container.hpp"
 #include "guiengine/widgets/button_widget.hpp"
 #include "guiengine/widgets/check_box_widget.hpp"
 #include "guiengine/widgets/dynamic_ribbon_widget.hpp"
@@ -28,19 +28,19 @@ struct EditTrackWidgets
     CheckBoxWidget* reverse = nullptr;
     ButtonWidget* cancel = nullptr;
 
-    void bind(Screen* screen)
+    void bind(AbstractTopLevelContainer* container)
     {
-        selected_track = screen->getWidget<LabelWidget>("selected_track");
-        search = screen->getWidget<TextBoxWidget>("search");
-        tracks = screen->getWidget<DynamicRibbonWidget>("tracks");
-        trackgroups = screen->getWidget<RibbonWidget>("trackgroups");
-        screenshot = screen->getWidget<IconButtonWidget>("screenshot");
-        laps_label = screen->getWidget<LabelWidget>("laps_label");
-        laps = screen->getWidget<SpinnerWidget>("laps");
-        ok = screen->getWidget<ButtonWidget>("ok");
-        reverse_label = screen->getWidget<LabelWidget>("reverse_label");
-        reverse = screen->getWidget<CheckBoxWidget>("reverse");
-        cancel = screen->getWidget<ButtonWidget>("cancel");
+        selected_track = container->getWidget<LabelWidget>("selected_track");
+        search = container->getWidget<TextBoxWidget>("search");
+        tracks = container->getWidget<DynamicRibbonWidget>("tracks");
+        trackgroups = container->getWidget<RibbonWidget>("trackgroups");
+        screenshot = container->getWidget<IconButtonWidget>("screenshot");
+        laps_label = container->getWidget<LabelWidget>("laps_label");
+        laps = container->getWidget<SpinnerWidget>("laps");
+        ok = container->getWidget<ButtonWidget>("ok");
+        reverse_label = container->getWidget<LabelWidget>("reverse_label");
+        reverse = container->getWidget<CheckBoxWidget>("reverse");
+        cancel = container->getWidget<ButtonWidget>("cancel");
     }
 };
 

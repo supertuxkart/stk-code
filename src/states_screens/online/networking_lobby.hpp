@@ -20,6 +20,7 @@
 
 #include "guiengine/screen.hpp"
 #include "guiengine/widgets/text_box_widget.hpp"
+#include "generated/gui/screens/online/networking_lobby_widgets.hpp"
 #include "GlyphLayout.h"
 #include <IGUIScrollBar.h>
 #include <map>
@@ -33,7 +34,7 @@ enum KartTeam : int8_t;
 struct LobbyPlayer;
 
 namespace GUIEngine
-{ 
+{
     class ButtonWidget;
     class LabelWidget;
     class ListWidget;
@@ -98,16 +99,7 @@ private:
     video::ITexture* m_spectate_texture;
     video::ITexture* m_addon_texture;
 
-    GUIEngine::IconButtonWidget* m_back_widget;
-    GUIEngine::LabelWidget* m_header;
-    GUIEngine::LabelWidget* m_text_bubble;
-    GUIEngine::LabelWidget* m_timeout_message;
-    GUIEngine::IconButtonWidget* m_start_button;
-    GUIEngine::IconButtonWidget* m_config_button;
-    GUIEngine::ListWidget* m_player_list;
-    GUIEngine::TextBoxWidget* m_chat_box;
-    GUIEngine::ButtonWidget* m_send_button;
-    GUIEngine::ButtonWidget* m_emoji_button;
+    GUIEngine::NetworkingLobbyWidgets m_widgets;
 
     irr::gui::STKModifiedSpriteBank* m_icon_bank;
 

@@ -2,7 +2,7 @@
 // Do not edit manually - regenerate with tools/generate_gui_headers.py
 #pragma once
 
-#include "guiengine/screen.hpp"
+#include "guiengine/abstract_top_level_container.hpp"
 #include "guiengine/widgets/icon_button_widget.hpp"
 #include "guiengine/widgets/list_widget.hpp"
 #include "guiengine/widgets/ribbon_widget.hpp"
@@ -21,17 +21,17 @@ struct HighScoreSelectionWidgets
     IconButtonWidget* tab_lap_trial = nullptr;
     IconButtonWidget* tab_grand_prix = nullptr;
 
-    void bind(Screen* screen)
+    void bind(AbstractTopLevelContainer* container)
     {
-        back = screen->getWidget<IconButtonWidget>("back");
-        remove_all = screen->getWidget<IconButtonWidget>("remove-all");
-        high_scores_list = screen->getWidget<ListWidget>("high_scores_list");
-        race_mode = screen->getWidget<RibbonWidget>("race_mode");
-        tab_normal_race = screen->getWidget<IconButtonWidget>("tab_normal_race");
-        tab_time_trial = screen->getWidget<IconButtonWidget>("tab_time_trial");
-        tab_egg_hunt = screen->getWidget<IconButtonWidget>("tab_egg_hunt");
-        tab_lap_trial = screen->getWidget<IconButtonWidget>("tab_lap_trial");
-        tab_grand_prix = screen->getWidget<IconButtonWidget>("tab_grand_prix");
+        back = container->getWidget<IconButtonWidget>("back");
+        remove_all = container->getWidget<IconButtonWidget>("remove-all");
+        high_scores_list = container->getWidget<ListWidget>("high_scores_list");
+        race_mode = container->getWidget<RibbonWidget>("race_mode");
+        tab_normal_race = container->getWidget<IconButtonWidget>("tab_normal_race");
+        tab_time_trial = container->getWidget<IconButtonWidget>("tab_time_trial");
+        tab_egg_hunt = container->getWidget<IconButtonWidget>("tab_egg_hunt");
+        tab_lap_trial = container->getWidget<IconButtonWidget>("tab_lap_trial");
+        tab_grand_prix = container->getWidget<IconButtonWidget>("tab_grand_prix");
     }
 };
 

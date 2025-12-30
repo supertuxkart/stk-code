@@ -22,6 +22,7 @@
 #include "addons/addon.hpp"
 #include "addons/addons_manager.hpp"
 #include "guiengine/modaldialog.hpp"
+#include "generated/gui/dialogs/addons_loading_widgets.hpp"
 #include "utils/cpp2011.hpp"
 #include "utils/synchronised.hpp"
 
@@ -34,6 +35,8 @@ namespace Online { class HTTPRequest; }
 class AddonsLoading : public GUIEngine::ModalDialog
 {
 private:
+    GUIEngine::AddonsLoadingWidgets m_widgets;
+
     GUIEngine::ProgressBarWidget *m_progress;
     GUIEngine::IconButtonWidget  *m_back_button;
     GUIEngine::IconButtonWidget  *m_install_button;
