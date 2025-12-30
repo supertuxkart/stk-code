@@ -46,6 +46,15 @@ private:
      *  have a stronger effect. */
     std::vector<float>  m_boost_time;
 
+    /** Speed lines intensity per camera [0.0, 1.0]. Based on acceleration. */
+    std::vector<float>  m_speed_intensity;
+
+    /** Speed lines boost intensity per camera [0.0, 1.0]. For nitro/zipper effects. */
+    std::vector<float>  m_speed_boost_intensity;
+
+    /** Time accumulator for speed lines animation. */
+    float m_speed_lines_time;
+
     video::ITexture* m_areamap;
 
 public:
@@ -87,11 +96,17 @@ public:
     void renderMotionBlur(const FrameBuffer &in_fbo,
                           FrameBuffer &out_fbo,
                           GLuint depth_stencil_texture);
+    void renderSpeedLines(const FrameBuffer &in_fbo,
+                          FrameBuffer &out_fbo,
+                          unsigned int cam_index);
     void renderGlow(const FrameBuffer& quarter_framebuffer) const;
     void renderLightning(core::vector3df intensity);
 
     /** Use motion blur for a short time */
     void         giveBoost(unsigned int cam_index);
+
+    /** Set speed lines intensity for a camera. Called every frame based on kart speed. */
+    void         setSpeedIntensity(unsigned int cam_index, float speed_intensity, float boost_intensity);
     
     /** Render the post-processed scene */
     FrameBuffer *render(scene::ICameraSceneNode * const camnode, bool isRace,

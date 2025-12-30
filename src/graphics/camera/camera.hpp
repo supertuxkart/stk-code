@@ -132,6 +132,36 @@ protected:
     */
     Kart   *m_kart;
 
+    // ========================================================================
+    // Camera shake effect state
+    // ========================================================================
+    /** Current shake intensity magnitude [0.0, 1.0]. */
+    float m_shake_intensity;
+
+    /** Remaining shake duration in seconds. */
+    float m_shake_duration;
+
+    /** Initial shake duration for normalized decay calculation. */
+    float m_shake_initial_duration;
+
+    /** Shake oscillation frequency (higher = faster shake). */
+    float m_shake_frequency;
+
+    /** Current frame's shake offset applied to camera position. */
+    Vec3 m_shake_offset;
+
+    // ========================================================================
+    // Dynamic FOV effect state
+    // ========================================================================
+    /** Base FOV from configuration (in radians). */
+    float m_base_fov;
+
+    /** Current smoothly-interpolated FOV (in radians). */
+    float m_current_fov;
+
+    /** Target FOV based on speed (in radians). */
+    float m_target_fov;
+
     static Camera* createCamera(unsigned int index, CameraType type,
                                 Kart* kart);
 
@@ -247,6 +277,41 @@ public:
     Vec3 getXYZ() { return Vec3(m_camera->getPosition()); }
     // ------------------------------------------------------------------------
     void setupCamera();
+
+    // ========================================================================
+    // Camera shake methods
+    // ========================================================================
+    /** Trigger a camera shake effect.
+     *  \param intensity Shake magnitude [0.0, 1.0], will be clamped.
+     *  \param duration How long the shake lasts in seconds.
+     *  \param frequency Oscillation speed (default 25.0f).
+     */
+    void triggerShake(float intensity, float duration, float frequency = 25.0f);
+
+    /** Update shake state and compute current frame's offset.
+     *  \param dt Delta time since last frame.
+     */
+    void updateShake(float dt);
+
+    /** Returns the current shake offset to be applied to camera position. */
+    const Vec3& getShakeOffset() const { return m_shake_offset; }
+
+    /** Returns true if camera is currently shaking. */
+    bool isShaking() const { return m_shake_duration > 0.0f; }
+
+    // ========================================================================
+    // Dynamic FOV methods
+    // ========================================================================
+
+    /** Update dynamic FOV based on speed and boost state.
+     *  \param dt Delta time since last frame.
+     *  \param speed_ratio Current speed as ratio of max speed [0.0, 1.0+].
+     *  \param boost_active True if boost (nitro/zipper) is active.
+     */
+    void updateDynamicFOV(float dt, float speed_ratio, bool boost_active);
+
+    /** Returns the current dynamic FOV in radians. */
+    float getCurrentFOV() const { return m_current_fov; }
 };   // class Camera
 
 #endif

@@ -31,6 +31,7 @@
 #include "karts/kart.hpp"
 #include "karts/kart_model.hpp"
 #include "karts/kart_properties.hpp"
+#include "karts/max_speed.hpp"
 #include "karts/skidding.hpp"
 #include "physics/btKart.hpp"
 #include "utils/log.hpp"
@@ -160,6 +161,13 @@ KartGFX::KartGFX(const Kart *kart, bool is_day)
 #endif
     }
 
+    // Dedicated speed contrail particles (triggered on nitro/zipper/skid boost)
+    // Positioned at rear center for a centered contrail effect
+    addEffect(KGFX_BOOST_BURST1, "boost_burst.xml", rear_center, true);
+    addEffect(KGFX_BOOST_BURST2, "boost_burst.xml", rear_center, true);
+
+    // Register as observer to receive boost activation events from MaxSpeed
+    MaxSpeed::addBoostObserver(this);
 }   // KartGFX
 
 // ----------------------------------------------------------------------------
@@ -167,6 +175,9 @@ KartGFX::KartGFX(const Kart *kart, bool is_day)
  */
 KartGFX::~KartGFX()
 {
+    // Unregister from MaxSpeed observer before destruction
+    MaxSpeed::removeBoostObserver(this);
+
 #ifndef SERVER_ONLY
     for(unsigned int i=0; i<KGFX_COUNT; i++)
     {
@@ -265,6 +276,12 @@ void KartGFX::addEffect(KartGFXType type, const std::string &file_name,
 void KartGFX::reset()
 {
     m_wheel_toggle = 1;
+
+    // Reset boost effect timers (edge detection is now handled by MaxSpeed)
+    m_nitro_effect_timer = 0.0f;
+    m_zipper_effect_timer = 0.0f;
+    m_skid_bonus_effect_timer = 0.0f;
+
 #ifndef SERVER_ONLY
     if (GUIEngine::isNoGraphics())
         return;
@@ -555,6 +572,102 @@ void KartGFX::updateNitroGraphics(float nitro_frac, bool isNitroHackOn, bool act
     setCreationRateRelative(KartGFX::KGFX_EXHAUST2, 1.0);
 #endif
 }  // updateNitroGraphics
+
+// ----------------------------------------------------------------------------
+/** Called by MaxSpeed when a boost activates on ANY kart.
+ *  This triggers particle bursts that are visible on ALL karts (opponents too).
+ *  \param kart The kart that activated the boost.
+ *  \param category The boost type (MS_INCREASE_*).
+ *  \param add_speed The speed increase value.
+ *  \param duration_ticks How long the boost lasts in game ticks.
+ */
+void KartGFX::onBoostActivated(Kart* kart, unsigned int category,
+                                float add_speed, int duration_ticks)
+{
+#ifndef SERVER_ONLY
+    // Only handle boosts for THIS kart's GFX instance
+    if (kart != m_kart) return;
+
+    if (GUIEngine::isNoGraphics())
+        return;
+
+    // Trigger particle effect timers based on boost category
+    switch (category)
+    {
+        case MaxSpeed::MS_INCREASE_NITRO:
+            m_nitro_effect_timer = NITRO_EFFECT_DURATION;
+            break;
+
+        case MaxSpeed::MS_INCREASE_ZIPPER:
+        case MaxSpeed::MS_INCREASE_GROUND_ZIPPER:
+            m_zipper_effect_timer = ZIPPER_EFFECT_DURATION;
+            break;
+
+        case MaxSpeed::MS_INCREASE_SKIDDING:
+        case MaxSpeed::MS_INCREASE_RED_SKIDDING:
+        case MaxSpeed::MS_INCREASE_PURPLE_SKIDDING:
+            m_skid_bonus_effect_timer = SKID_BONUS_EFFECT_DURATION;
+            break;
+
+        default:
+            // Other boost types (slipstream, rubber, electro) - no special particles
+            break;
+    }
+#endif
+}   // onBoostActivated
+
+// ----------------------------------------------------------------------------
+/** Updates boost particle effects. Timers are set by onBoostActivated() and
+ *  decay over time here, creating punchy visual feedback for speed boosts.
+ *  NOTE: This does NOT modify existing nitro/zipper particles - those are
+ *  handled by updateNitroGraphics(). This only controls dedicated boost burst
+ *  particles (KGFX_BOOST_BURST*).
+ *  \param dt Delta time since last frame.
+ */
+void KartGFX::updateBoostParticleEffects(float dt)
+{
+#ifndef SERVER_ONLY
+    if (GUIEngine::isNoGraphics())
+        return;
+
+    // Decay effect timers
+    if (m_nitro_effect_timer > 0.0f)
+        m_nitro_effect_timer -= dt;
+    if (m_zipper_effect_timer > 0.0f)
+        m_zipper_effect_timer -= dt;
+    if (m_skid_bonus_effect_timer > 0.0f)
+        m_skid_bonus_effect_timer -= dt;
+
+    // Calculate particle intensities with smooth decay (ease-out curve)
+    auto calcIntensity = [](float timer, float duration) -> float {
+        if (timer <= 0.0f) return 0.0f;
+        float decay = timer / duration;
+        return decay * decay;  // Ease-out: starts full, decays smoothly
+    };
+
+    // Combine all boost types into a single intensity for the burst effect
+    float boost_intensity = std::max({
+        calcIntensity(m_nitro_effect_timer, NITRO_EFFECT_DURATION),
+        calcIntensity(m_zipper_effect_timer, ZIPPER_EFFECT_DURATION),
+        calcIntensity(m_skid_bonus_effect_timer, SKID_BONUS_EFFECT_DURATION)
+    });
+
+    // Control dedicated boost burst particles
+    // These are separate from the normal nitro/zipper particles
+    if (boost_intensity > 0.0f)
+    {
+        setCreationRateRelative(KartGFX::KGFX_BOOST_BURST1, boost_intensity);
+        setCreationRateRelative(KartGFX::KGFX_BOOST_BURST2, boost_intensity);
+    }
+    else
+    {
+        // Turn off boost burst particles when not in activation effect
+        setCreationRateAbsolute(KartGFX::KGFX_BOOST_BURST1, 0);
+        setCreationRateAbsolute(KartGFX::KGFX_BOOST_BURST2, 0);
+    }
+
+#endif
+}  // updateBoostParticleEffects
 
 // ----------------------------------------------------------------------------
 /** Updates the skiddng light (including disabling it).

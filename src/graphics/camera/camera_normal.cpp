@@ -22,6 +22,8 @@
 #include "audio/sfx_manager.hpp"
 #include "config/stk_config.hpp"
 #include "config/user_config.hpp"
+#include "graphics/irr_driver.hpp"
+#include "karts/max_speed.hpp"
 #include "input/device_manager.hpp"
 #include "input/input_manager.hpp"
 #include "input/multitouch_device.hpp"
@@ -48,12 +50,16 @@ float CameraNormal::m_tv_cooldown_default = 0.4f;  // time to change camera
  *  \param camera_index Index of this camera.
  *  \param Kart Pointer to the kart for which this camera is used.
  */
-CameraNormal::CameraNormal(Camera::CameraType type,  int camera_index, 
+CameraNormal::CameraNormal(Camera::CameraType type,  int camera_index,
                            Kart* kart)
             : Camera(type, camera_index, kart), m_camera_offset(0., 0., 0.)
 {
     m_distance = kart ? UserConfigParams::m_camera_distance : 1000.0f;
-    m_ambient_light = Track::getCurrentTrack()->getDefaultAmbientColor();
+    Track* track = Track::getCurrentTrack();
+    if (track)
+        m_ambient_light = track->getDefaultAmbientColor();
+    else
+        m_ambient_light = video::SColor(255, 255, 255, 255);
 
     // TODO: Put these values into a config file
     //       Global or per split screen zone?
@@ -74,8 +80,23 @@ CameraNormal::CameraNormal(Camera::CameraType type,  int camera_index,
     reset();
     m_camera->setNearValue(1.0f);
 
+    // Register as boost observer to receive activation events
+    MaxSpeed::addBoostObserver(this);
+
+    // Register as crash observer to receive collision events for camera shake
+    Kart::addCrashObserver(this);
+
     restart();
 }   // Camera
+
+//-----------------------------------------------------------------------------
+/** Destructor - unregisters from observer systems.
+ */
+CameraNormal::~CameraNormal()
+{
+    MaxSpeed::removeBoostObserver(this);
+    Kart::removeCrashObserver(this);
+}   // ~CameraNormal
 
 //-----------------------------------------------------------------------------
 /** Moves the camera smoothly from the current camera position (and target)
@@ -164,7 +185,13 @@ void CameraNormal::moveCamera(float dt, bool smooth, float cam_angle, float dist
     if (smooth)
     {
         if(getMode()!=CM_FALLING)
-            m_camera->setPosition(current_position);
+        {
+            // Apply camera shake offset if active
+            Vec3 shake = getShakeOffset();
+            core::vector3df shaken_position = current_position +
+                core::vector3df(shake.getX(), shake.getY(), shake.getZ());
+            m_camera->setPosition(shaken_position);
+        }
         m_camera->setTarget(current_target.toIrrVector());//set new target
     }
     assert(!std::isnan(m_camera->getPosition().X));
@@ -211,7 +238,8 @@ void CameraNormal::getCameraSettings(Mode mode,
         {
             *above_kart = 0.75f;
             *cam_angle = UserConfigParams::m_camera_forward_up_angle * DEGREE_TO_RAD;
-            *distance = -m_distance;
+            // Include pull-back distance boost for dynamic effect during boosts
+            *distance = -(m_distance + getCurrentDistanceBoost());
             float steering = m_kart->getSteerPercent()
                            * (1.0f + (m_kart->getSkidding()->getSkidFactor()
                                       - 1.0f)/2.3f );
@@ -325,6 +353,9 @@ void CameraNormal::update(float dt)
     Camera::update(dt);
     if(!m_kart) return;
 
+    // Update camera shake effect
+    updateShake(dt);
+
     m_camera->setNearValue(1.0f);
 
     float above_kart, cam_angle, side_way, distance, cam_roll_angle;
@@ -363,10 +394,68 @@ void CameraNormal::update(float dt)
 
     if (!smoothing)
     {
-        getCameraSettings(m_last_smooth_mode, &above_kart, &cam_angle, &side_way, 
+        getCameraSettings(m_last_smooth_mode, &above_kart, &cam_angle, &side_way,
                                               &distance, &smoothing, &cam_roll_angle);
         moveCamera(dt, false, cam_angle, distance);
     }
+
+#ifndef SERVER_ONLY
+    // Update speed lines and camera pull-back effects
+    // NOTE: Effect TRIGGERING is now handled by onBoostActivated() observer callback
+    // This section only handles decay of existing effects and FOV updates
+    if (!GUIEngine::isNoGraphics() && m_kart != NULL)
+    {
+        const KartProperties *kp = m_kart->getKartProperties();
+        float max_speed = kp->getEngineMaxSpeed();
+        float current_speed = m_kart->getSpeed();
+        float speed_ratio = current_speed / max_speed;
+
+        // Effect duration for decay calculation (must match onBoostActivated)
+        const float EFFECT_DURATION = 2.0f;
+
+        // Decay speed lines over time
+        if (m_speed_lines_timer > 0.0f)
+        {
+            m_speed_lines_timer -= dt;
+
+            // Smooth decay using remaining timer ratio (ease-out curve)
+            float decay = std::max(0.0f, m_speed_lines_timer / EFFECT_DURATION);
+            float display_intensity = m_speed_lines_intensity * decay;
+            float display_boost = m_speed_lines_boost_intensity * decay;
+
+            irr_driver->setSpeedIntensity(getIndex(), display_intensity, display_boost);
+        }
+        else
+        {
+            // Effect has ended - reset intensities
+            m_speed_lines_intensity = 0.0f;
+            m_speed_lines_boost_intensity = 0.0f;
+            irr_driver->setSpeedIntensity(getIndex(), 0.0f, 0.0f);
+        }
+
+        // Decay camera pull-back over time
+        if (m_distance_boost_timer > 0.0f)
+        {
+            m_distance_boost_timer -= dt;
+        }
+
+        // Update dynamic FOV based on speed and any active boost
+        // Still need to poll for active boosts (not just activations) for FOV
+        Kart* kart = dynamic_cast<Kart*>(m_kart);
+        bool any_boost_active = false;
+        if (kart)
+        {
+            any_boost_active =
+                kart->getSpeedIncreaseTicksLeft(MaxSpeed::MS_INCREASE_NITRO) > 0 ||
+                kart->getSpeedIncreaseTicksLeft(MaxSpeed::MS_INCREASE_ZIPPER) > 0 ||
+                kart->getSpeedIncreaseTicksLeft(MaxSpeed::MS_INCREASE_GROUND_ZIPPER) > 0 ||
+                kart->getSpeedIncreaseTicksLeft(MaxSpeed::MS_INCREASE_SKIDDING) > 0 ||
+                kart->getSpeedIncreaseTicksLeft(MaxSpeed::MS_INCREASE_RED_SKIDDING) > 0 ||
+                kart->getSpeedIncreaseTicksLeft(MaxSpeed::MS_INCREASE_PURPLE_SKIDDING) > 0;
+        }
+        updateDynamicFOV(dt, speed_ratio, any_boost_active);
+    }
+#endif
 }   // update
 
 // ----------------------------------------------------------------------------
@@ -487,7 +576,11 @@ void CameraNormal::positionCamera(float dt, float above_kart, float cam_angle,
     if (!smoothing)
     {
         if (getMode()!=CM_FALLING)
-            m_camera->setPosition(wanted_position.toIrrVector());
+        {
+            // Apply camera shake offset if active
+            Vec3 final_position = wanted_position + getShakeOffset();
+            m_camera->setPosition(final_position.toIrrVector());
+        }
         m_camera->setTarget(wanted_target.toIrrVector());
 
         if (RaceManager::get()->getNumLocalPlayers() < 2)
@@ -570,6 +663,113 @@ void CameraNormal::readTVCameras(const XMLNode &root)
         }
     }
 } // readTVCameras
+
+//-----------------------------------------------------------------------------
+/** IBoostObserver callback - triggered when any kart activates a boost.
+ *  Only acts if the kart matches this camera's kart (current player only).
+ *  Triggers speed lines shader and camera pull-back effect.
+ *  \param kart The kart that activated the boost
+ *  \param category The boost type (MS_INCREASE_*)
+ *  \param add_speed The speed increase value
+ *  \param duration_ticks How long the boost lasts
+ */
+void CameraNormal::onBoostActivated(Kart* kart, unsigned int category,
+                                    float add_speed, int duration_ticks)
+{
+#ifndef SERVER_ONLY
+    // Only trigger effects for THIS camera's kart (current player)
+    if (kart != m_kart) return;
+    if (GUIEngine::isNoGraphics()) return;
+
+    // Effect duration settings
+    const float EFFECT_DURATION = 2.0f;      // Speed lines last 2 seconds
+    const float PULLBACK_DISTANCE = 0.4f;    // Max extra distance (camera units)
+
+    // Determine intensity based on boost type (strongest takes priority)
+    float intensity = 0.0f;
+    switch (category)
+    {
+        case MaxSpeed::MS_INCREASE_ZIPPER:
+        case MaxSpeed::MS_INCREASE_GROUND_ZIPPER:
+            intensity = 1.0f;   // Strongest (zipper)
+            break;
+        case MaxSpeed::MS_INCREASE_NITRO:
+            intensity = 0.8f;   // Strong (nitro)
+            break;
+        case MaxSpeed::MS_INCREASE_SKIDDING:
+        case MaxSpeed::MS_INCREASE_RED_SKIDDING:
+        case MaxSpeed::MS_INCREASE_PURPLE_SKIDDING:
+            intensity = 0.6f;   // Medium (skid bonus)
+            break;
+        default:
+            // Other boost types (slipstream, rubber band, etc.) don't trigger effects
+            return;
+    }
+
+    // Only trigger if intensity would be stronger than current effect
+    if (intensity > m_speed_lines_intensity)
+    {
+        // Trigger speed lines effect
+        m_speed_lines_intensity = intensity;
+        m_speed_lines_boost_intensity = intensity;
+        m_speed_lines_timer = EFFECT_DURATION;
+
+        // Trigger camera pull-back effect
+        m_distance_boost = PULLBACK_DISTANCE * intensity;
+        m_distance_boost_timer = PULLBACK_DURATION;
+    }
+#endif
+}   // onBoostActivated
+
+// ----------------------------------------------------------------------------
+/** Called when a kart collides with another kart.
+ *  Triggers camera shake for THIS camera's kart only.
+ *  \param kart The kart that crashed
+ *  \param other_kart The kart that was hit
+ *  \param intensity Collision intensity [0.0, 1.0]
+ */
+void CameraNormal::onKartCrash(Kart* kart, Kart* other_kart, float intensity)
+{
+#ifndef SERVER_ONLY
+    // Only trigger effects for THIS camera's kart (current player)
+    if (kart != m_kart) return;
+    if (GUIEngine::isNoGraphics()) return;
+
+    // Kart-kart collisions: moderate shake
+    // Scale intensity down slightly since these are common
+    const float KART_SHAKE_SCALE = 0.6f;
+    const float SHAKE_DURATION = 0.3f;
+    const float SHAKE_FREQUENCY = 30.0f;
+
+    float shake_intensity = intensity * KART_SHAKE_SCALE;
+    triggerShake(shake_intensity, SHAKE_DURATION, SHAKE_FREQUENCY);
+#endif
+}   // onKartCrash
+
+// ----------------------------------------------------------------------------
+/** Called when a kart collides with track/wall.
+ *  Triggers camera shake for THIS camera's kart only.
+ *  \param kart The kart that crashed
+ *  \param material The material hit (may be NULL)
+ *  \param intensity Collision intensity [0.0, 1.0]
+ */
+void CameraNormal::onTrackCrash(Kart* kart, const Material* material, float intensity)
+{
+#ifndef SERVER_ONLY
+    // Only trigger effects for THIS camera's kart (current player)
+    if (kart != m_kart) return;
+    if (GUIEngine::isNoGraphics()) return;
+
+    // Wall/track collisions: stronger shake than kart collisions
+    // These are more jarring impacts
+    const float WALL_SHAKE_SCALE = 0.8f;
+    const float SHAKE_DURATION = 0.4f;
+    const float SHAKE_FREQUENCY = 25.0f;
+
+    float shake_intensity = intensity * WALL_SHAKE_SCALE;
+    triggerShake(shake_intensity, SHAKE_DURATION, SHAKE_FREQUENCY);
+#endif
+}   // onTrackCrash
 
 void CameraNormal::clearTVCameras()
 {

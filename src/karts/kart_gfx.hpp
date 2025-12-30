@@ -22,6 +22,8 @@
 /** \defgroup karts
  *  This class implements all particle effects for a kart. */
 
+#include "karts/boost_observer.hpp"
+
 #include <vector>
 #include <string>
 
@@ -40,7 +42,11 @@ namespace irr {
     }
 }
 
-class KartGFX
+/** Implements all particle effects for a kart.
+ *  Also implements IBoostObserver to receive boost activation events
+ *  from MaxSpeed for event-driven particle bursts.
+ */
+class KartGFX : public IBoostObserver
 {
 public:
     /** All particle effects supported by this object.
@@ -71,6 +77,8 @@ public:
                        KGFX_SKID0R,
                        KGFX_EXHAUST1,
                        KGFX_EXHAUST2,
+                       KGFX_BOOST_BURST1,  // Dedicated boost activation particles
+                       KGFX_BOOST_BURST2,
                        KGFX_COUNT};
 
 private:
@@ -104,6 +112,20 @@ private:
     /** A light that's shown when the kart uses nitro with "nitro-hack" on. */
     irr::scene::ISceneNode* m_nitro_hack_light;
 
+    // ========================================================================
+    // Boost-triggered particle effect timers
+    // Set by onBoostActivated(), decay to 0.0 over time for particle bursts
+    // NOTE: Edge detection is now handled by MaxSpeed observer notifications
+    // ========================================================================
+    float m_nitro_effect_timer = 0.0f;
+    float m_zipper_effect_timer = 0.0f;
+    float m_skid_bonus_effect_timer = 0.0f;
+
+    // Effect durations in seconds
+    static constexpr float NITRO_EFFECT_DURATION = 1.5f;
+    static constexpr float ZIPPER_EFFECT_DURATION = 2.0f;
+    static constexpr float SKID_BONUS_EFFECT_DURATION = 1.2f;
+
     /** Light that is shown when the kart is skidding. */
     irr::scene::ISceneNode* m_skidding_light_1;
 
@@ -130,6 +152,7 @@ public:
     void updateTerrain(const ParticleKind *pk);
     void update(float dt);
     void updateNitroGraphics(float f, bool isNitroHackOn, bool activeNitro);
+    void updateBoostParticleEffects(float dt);
     void updateSkidLight(unsigned int level);
     void getGFXStatus(int* nitro, bool* zipper,
                       int* skidding, bool* red_skidding, bool* purple_skidding) const;
@@ -137,5 +160,18 @@ public:
                           int skidding, bool red_skidding, bool purple_skidding);
     void setGFXInvisible();
 
-};   // KartWGFX
+    // ========================================================================
+    // IBoostObserver implementation
+    // ========================================================================
+    /** Called by MaxSpeed when a boost activates.
+     *  Triggers particle burst effects for ALL karts (particles visible to everyone).
+     *  @param kart The kart that activated the boost
+     *  @param category The boost type (MS_INCREASE_*)
+     *  @param add_speed The speed increase value
+     *  @param duration_ticks How long the boost lasts
+     */
+    void onBoostActivated(Kart* kart, unsigned int category,
+                          float add_speed, int duration_ticks) override;
+
+};   // KartGFX
 #endif

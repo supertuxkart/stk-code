@@ -22,14 +22,22 @@
 #define HEADER_CAMERA_NORMAL_HPP
 
 #include "graphics/camera/camera.hpp"
+#include "karts/boost_observer.hpp"
+#include "karts/crash_observer.hpp"
 
 #include "utils/cpp2011.hpp"
+
+class Kart;
+class Material;
 
 /**
   * \brief Handles the normal racing camera
   * \ingroup graphics
+  * Also implements IBoostObserver to receive boost activation events
+  * for triggering speed lines shader + camera pull-back effect.
+  * Also implements ICrashObserver for camera shake on collisions.
   */
-class CameraNormal : public Camera
+class CameraNormal : public Camera, public IBoostObserver, public ICrashObserver
 {
 
 private:
@@ -76,13 +84,26 @@ private:
     static float m_tv_min_delta2;       // required improvement (squared distance) to switch
     static float m_tv_cooldown_default; // default cooldown after a switch (seconds)
 
+    // Speed lines effect state (triggered by boost activation events)
+    float m_speed_lines_intensity = 0.0f;   // Current effect intensity (decays over time)
+    float m_speed_lines_boost_intensity = 0.0f; // Boost-specific intensity for color shifting
+    float m_speed_lines_timer = 0.0f;       // Remaining effect duration
+
+    // NOTE: Edge detection (rising edge) is now handled by MaxSpeed observer pattern
+    // The onBoostActivated() callback is called on activation, eliminating polling
+
+    // Camera pull-back effect state
+    float m_distance_boost = 0.0f;          // Additional distance during boost (0.0 to ~0.4)
+    float m_distance_boost_timer = 0.0f;    // Decay timer for pull-back effect
+    static constexpr float PULLBACK_DURATION = 1.5f;  // Effect lasts 1.5 seconds
+
     // Give a few classes access to the constructor (mostly for inheritance)
     friend class Camera;
     friend class CameraDebug;
     friend class CameraEnd;
              CameraNormal(Camera::CameraType type, int camera_index,
                           Kart* kart);
-    virtual ~CameraNormal() {}
+    virtual ~CameraNormal();
 public:
 
     void restart();
@@ -100,6 +121,14 @@ public:
     // ------------------------------------------------------------------------
     float getDistanceToKart() const { return m_distance; }
     // ------------------------------------------------------------------------
+    /** Returns the current pull-back distance boost (decays over time). */
+    float getCurrentDistanceBoost() const
+    {
+        if (m_distance_boost_timer <= 0.0f) return 0.0f;
+        float decay = m_distance_boost_timer / PULLBACK_DURATION;
+        return m_distance_boost * decay * decay;  // Ease-out curve
+    }
+    // ------------------------------------------------------------------------
     /** Returns the current ambient light. */
     const video::SColor &getAmbientLight() const {return m_ambient_light; }
     // ------------------------------------------------------------------------
@@ -108,9 +137,41 @@ public:
     // ------------------------------------------------------------------------
     // clean all TV camera
     static void clearTVCameras();
-    // ------------------------------------------------------------------------    
+    // ------------------------------------------------------------------------
     // Returns true if at least one TV camera was loaded
     static bool hasTVCameras() { return !m_tv_cameras.empty(); }
+
+    // ========================================================================
+    // IBoostObserver implementation
+    // ========================================================================
+    /** Called by MaxSpeed when a boost activates.
+     *  Triggers speed lines shader + camera pull-back for THIS camera's kart only.
+     *  @param kart The kart that activated the boost
+     *  @param category The boost type (MS_INCREASE_*)
+     *  @param add_speed The speed increase value
+     *  @param duration_ticks How long the boost lasts
+     */
+    void onBoostActivated(Kart* kart, unsigned int category,
+                          float add_speed, int duration_ticks) override;
+
+    // ========================================================================
+    // ICrashObserver implementation
+    // ========================================================================
+    /** Called when a kart collides with another kart.
+     *  Triggers camera shake for THIS camera's kart only.
+     *  @param kart The kart that crashed
+     *  @param other_kart The kart that was hit
+     *  @param intensity Collision intensity [0.0, 1.0]
+     */
+    void onKartCrash(Kart* kart, Kart* other_kart, float intensity) override;
+
+    /** Called when a kart collides with track/wall.
+     *  Triggers camera shake for THIS camera's kart only.
+     *  @param kart The kart that crashed
+     *  @param material The material hit (may be NULL)
+     *  @param intensity Collision intensity [0.0, 1.0]
+     */
+    void onTrackCrash(Kart* kart, const Material* material, float intensity) override;
 
 };   // class CameraNormal
 

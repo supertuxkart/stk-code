@@ -24,6 +24,7 @@
 #include "config/user_config.hpp"
 #include "karts/kart.hpp"
 #include "karts/kart_utils.hpp"
+#include "graphics/camera/camera.hpp"
 #include "graphics/irr_driver.hpp"
 #include "graphics/stars.hpp"
 #include "items/flyable.hpp"
@@ -606,6 +607,25 @@ void Physics::applyKartCollisionImpulse(Kart *kart, bool right, float force, flo
     kart->getVehicle()->setCollisionLean(/* towards the right*/ right);
     kart->getVehicle()->setCollisionLeanFactor(lean_factor);
     // The kart rotation will be prevented as the impulse is applied
+
+    // Trigger camera shake for local player karts based on collision force
+    // Force typically ranges from ~0.5 to 4.0+, we map to shake intensity 0-1
+    for (unsigned int i = 0; i < Camera::getNumCameras(); i++)
+    {
+        Camera* camera = Camera::getCamera(i);
+        if (camera && camera->getKart() == kart)
+        {
+            // Map collision force to shake intensity (0-1 range)
+            // fabsf(force) is typically 0.5 to 4.0, we normalize to 0-1
+            float shake_intensity = std::min(1.0f, fabsf(force) / 4.0f);
+            // Stronger collisions get longer shake duration
+            float shake_duration = 0.15f + shake_intensity * 0.25f;
+            // Higher frequency for harder hits
+            float shake_frequency = 20.0f + shake_intensity * 15.0f;
+            camera->triggerShake(shake_intensity, shake_duration, shake_frequency);
+            break;
+        }
+    }
 }   // applyKartCollisionImpulse
 
 //-----------------------------------------------------------------------------

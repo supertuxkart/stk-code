@@ -57,6 +57,7 @@ class Item;
 class ItemState;
 class KartGFX;
 class KartModel;
+class ICrashObserver;
 class KartProperties;
 class KartRewinder;
 class Material;
@@ -951,6 +952,29 @@ public:
     /** Return the confirmed finish ticks (sent by the server)
      *  indicating that this kart has really finished the race. */
     int getNetworkConfirmedFinishTicks() const { return m_network_confirmed_finish_ticks; }
+
+    // ========================================================================
+    // Crash Observer Pattern - for camera shake, etc.
+    // ------------------------------------------------------------------------
+    /** Adds an observer to receive crash notifications.
+     *  Observers are notified when any kart crashes. */
+    static void addCrashObserver(ICrashObserver* observer);
+
+    /** Removes a crash observer. */
+    static void removeCrashObserver(ICrashObserver* observer);
+
+    /** Clears all crash observers. Called on race end. */
+    static void clearCrashObservers();
+
+private:
+    /** List of observers to notify on crash events. */
+    static std::vector<ICrashObserver*> m_crash_observers;
+
+    /** Notify all crash observers of a kart-kart collision. */
+    void notifyKartCrash(Kart* other_kart, float intensity);
+
+    /** Notify all crash observers of a track/wall collision. */
+    void notifyTrackCrash(const Material* material, float intensity);
 
 };   // Kart
 

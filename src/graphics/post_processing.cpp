@@ -577,6 +577,34 @@ public:
 };   // MotionBlurShader
 
 // ============================================================================
+class SpeedLinesShader : public TextureShader<SpeedLinesShader, 1,
+                                              float, float, float,
+                                              core::vector2df, float>
+{
+public:
+    SpeedLinesShader()
+    {
+        loadProgram(OBJECT, GL_VERTEX_SHADER, "screenquad.vert",
+                            GL_FRAGMENT_SHADER, "speed_lines.frag");
+        assignUniforms("speed_intensity", "boost_intensity", "time",
+                       "center", "inner_radius");
+        assignSamplerNames(0, "color_buffer", ST_BILINEAR_CLAMPED_FILTERED);
+    }   // SpeedLinesShader
+    // ------------------------------------------------------------------------
+    void render(const FrameBuffer &fb, float speed_intensity, float boost_intensity,
+                float time)
+    {
+        setTextureUnits(fb.getRTT()[0]);
+        // Center is slightly below middle (where driver sits)
+        core::vector2df center(0.5f, 0.55f);
+        // Inner radius where lines start to appear
+        float inner_radius = 0.25f;
+        drawFullScreenEffect(speed_intensity, boost_intensity, time,
+                            center, inner_radius);
+    }   // render
+};   // SpeedLinesShader
+
+// ============================================================================
 class GodFadeShader : public TextureShader<GodFadeShader, 1, video::SColorf>
 {
 public:
@@ -724,6 +752,9 @@ PostProcessing::PostProcessing()
     STKTexManager::getInstance()->addTexture(m_areamap);
     areamap->drop();
 
+    // Initialize speed lines time
+    m_speed_lines_time = 0.0f;
+
     // For preloading shaders
     MotionBlurShader::getInstance();
     LightningShader::getInstance();
@@ -736,10 +767,15 @@ PostProcessing::PostProcessing()
 void PostProcessing::reset()
 {
     m_boost_time.resize(Camera::getNumCameras());
+    m_speed_intensity.resize(Camera::getNumCameras());
+    m_speed_boost_intensity.resize(Camera::getNumCameras());
     for (unsigned int i = 0; i < Camera::getNumCameras(); i++)
     {
         m_boost_time[i] = 0.0f;
+        m_speed_intensity[i] = 0.0f;
+        m_speed_boost_intensity[i] = 0.0f;
     }  // for i <number of cameras
+    m_speed_lines_time = 0.0f;
 }   // reset
 
 // ----------------------------------------------------------------------------
@@ -768,7 +804,25 @@ void PostProcessing::update(float dt)
             if (m_boost_time[i] < 0.0f) m_boost_time[i] = 0.0f;
         }
     }
+    // Update speed lines animation time
+    m_speed_lines_time += dt;
 }   // update
+
+// ----------------------------------------------------------------------------
+/** Set the speed lines intensity for a camera.
+ *  \param cam_index Index of the camera.
+ *  \param speed_intensity Speed-based intensity [0.0, 1.0].
+ *  \param boost_intensity Boost-based intensity [0.0, 1.0] for nitro/zipper.
+ */
+void PostProcessing::setSpeedIntensity(unsigned int cam_index,
+                                       float speed_intensity,
+                                       float boost_intensity)
+{
+    if (!CVS->isGLSL() || cam_index >= m_speed_intensity.size())
+        return;
+    m_speed_intensity[cam_index] = speed_intensity;
+    m_speed_boost_intensity[cam_index] = boost_intensity;
+}   // setSpeedIntensity
 
 // ----------------------------------------------------------------------------
 void PostProcessing::renderBloom(GLuint in)
@@ -1019,6 +1073,19 @@ void PostProcessing::renderMotionBlur(const FrameBuffer &in_fbo,
     MotionBlurShader::getInstance()->render(in_fbo, boost_time, depth_stencil_texture);
 }   // renderMotionBlur
 
+// ----------------------------------------------------------------------------
+void PostProcessing::renderSpeedLines(const FrameBuffer &in_fbo,
+                                      FrameBuffer &out_fbo,
+                                      unsigned int cam_index)
+{
+    out_fbo.bind();
+    glClear(GL_COLOR_BUFFER_BIT);
+
+    float speed_intensity = m_speed_intensity.at(cam_index);
+    float boost_intensity = m_speed_boost_intensity.at(cam_index);
+    SpeedLinesShader::getInstance()->render(in_fbo, speed_intensity,
+                                            boost_intensity, m_speed_lines_time);
+}   // renderSpeedLines
 
 // ----------------------------------------------------------------------------
 void PostProcessing::renderDoF(const FrameBuffer &framebuffer, GLuint color_texture, GLuint depth_stencil_texture)
@@ -1280,6 +1347,24 @@ FrameBuffer *PostProcessing::render(scene::ICameraSceneNode * const camnode,
             in_fbo = &rtts->getFBO(FBO_RGBA_1);
             out_fbo = &rtts->getFBO(FBO_RGBA_2);
             renderMotionBlur(*in_fbo, *out_fbo, irr_driver->getDepthStencilTexture());
+        }
+        PROFILER_POP_CPU_MARKER();
+    }
+
+    // Speed lines effect during acceleration
+    {
+        PROFILER_PUSH_CPU_MARKER("- Speed lines", 0xFF, 0x80, 0x00);
+        Camera* active_cam = Camera::getActiveCamera();
+        if (active_cam && isRace && World::getWorld())
+        {
+            unsigned int cam_idx = active_cam->getIndex();
+            if (cam_idx < m_speed_intensity.size() &&
+                (m_speed_intensity.at(cam_idx) > 0.01f || m_speed_boost_intensity.at(cam_idx) > 0.01f))
+            {
+                // Swap buffers for speed lines pass
+                std::swap(in_fbo, out_fbo);
+                renderSpeedLines(*in_fbo, *out_fbo, cam_idx);
+            }
         }
         PROFILER_POP_CPU_MARKER();
     }

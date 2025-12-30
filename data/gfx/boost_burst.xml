@@ -1,0 +1,35 @@
+<?xml version="1.0"?>
+<!-- Speed contrail effect - subtle streaks that convey velocity on boost activation -->
+<particles emitter="box" box_x="0.6" box_y="0.15" box_z="0.05">
+
+    <!-- Narrow spreading for streaky contrail look -->
+    <spreading angle="8" />
+
+    <!-- Particles stream backward quickly, creating trail effect -->
+    <velocity  x="0.0"
+               y="0.0005"
+               z="-0.012" />
+
+    <!-- Subtle smoke texture for contrail feel -->
+    <material  file="smoke.png" />
+
+    <!-- Moderate rate - not too intense -->
+    <rate      min="150"
+               max="250"
+               decay_rate="200" />
+
+    <!-- Medium lifetime so trails stretch out behind -->
+    <lifetime  min="150"
+               max="300" />
+
+    <!-- Small, elongated particles that stretch as they move -->
+    <size      min="0.08"
+               max="0.18"
+               x-increase-factor="0.8"
+               y-increase-factor="2.5" />
+
+    <!-- Subtle white/light gray - not attention-grabbing -->
+    <color     min="220 220 230"
+               max="255 255 255" />
+
+</particles>

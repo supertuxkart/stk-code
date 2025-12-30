@@ -74,6 +74,22 @@ ExplosionAnimation::ExplosionAnimation(Kart* kart, bool direct_hit, bool small)
     m_kart->setInvulnerableTicks(stk_config->time2Ticks(t));
     m_kart->playCustomSFX(SFXManager::CUSTOM_EXPLODE);
     m_kart->getAttachment()->clear();
+
+    // Trigger camera shake for item hits (explosions)
+    // Direct hits get stronger shake, small explosions get less shake
+    for (unsigned int i = 0; i < Camera::getNumCameras(); i++)
+    {
+        Camera* camera = Camera::getCamera(i);
+        if (camera && camera->getKart() == kart)
+        {
+            float shake_intensity = direct_hit ? 0.9f : 0.5f;
+            if (small) shake_intensity *= 0.6f;
+            float shake_duration = direct_hit ? 0.4f : 0.25f;
+            float shake_frequency = direct_hit ? 30.0f : 25.0f;
+            camera->triggerShake(shake_intensity, shake_duration, shake_frequency);
+            break;
+        }
+    }
 }   // ExplosionAnimation
 
 //-----------------------------------------------------------------------------

@@ -49,6 +49,7 @@
 #include "karts/abstract_characteristic.hpp"
 #include "karts/abstract_kart_animation.hpp"
 #include "karts/cached_characteristic.hpp"
+#include "karts/crash_observer.hpp"
 #include "karts/controller/local_player_controller.hpp"
 #include "karts/controller/end_controller.hpp"
 #include "karts/controller/spare_tire_ai.hpp"
@@ -109,6 +110,65 @@
    // Disable warning for using 'this' in base member initializer list
 #  pragma warning(disable:4355)
 #endif
+
+// Static crash observer list
+std::vector<ICrashObserver*> Kart::m_crash_observers;
+
+// ----------------------------------------------------------------------------
+/** Adds a crash observer to receive notifications.
+ *  \param observer The observer to add.
+ */
+void Kart::addCrashObserver(ICrashObserver* observer)
+{
+    m_crash_observers.push_back(observer);
+}   // addCrashObserver
+
+// ----------------------------------------------------------------------------
+/** Removes a crash observer.
+ *  \param observer The observer to remove.
+ */
+void Kart::removeCrashObserver(ICrashObserver* observer)
+{
+    auto it = std::find(m_crash_observers.begin(), m_crash_observers.end(), observer);
+    if (it != m_crash_observers.end())
+        m_crash_observers.erase(it);
+}   // removeCrashObserver
+
+// ----------------------------------------------------------------------------
+/** Clears all crash observers. Called on race end.
+ */
+void Kart::clearCrashObservers()
+{
+    m_crash_observers.clear();
+}   // clearCrashObservers
+
+// ----------------------------------------------------------------------------
+/** Notifies all crash observers of a kart-kart collision.
+ *  \param other_kart The kart that was hit.
+ *  \param intensity Collision intensity [0.0, 1.0].
+ */
+void Kart::notifyKartCrash(Kart* other_kart, float intensity)
+{
+    for (ICrashObserver* observer : m_crash_observers)
+    {
+        observer->onKartCrash(this, other_kart, intensity);
+    }
+}   // notifyKartCrash
+
+// ----------------------------------------------------------------------------
+/** Notifies all crash observers of a track/wall collision.
+ *  \param material The material that was hit (may be NULL).
+ *  \param intensity Collision intensity [0.0, 1.0].
+ */
+void Kart::notifyTrackCrash(const Material* material, float intensity)
+{
+    for (ICrashObserver* observer : m_crash_observers)
+    {
+        observer->onTrackCrash(this, material, intensity);
+    }
+}   // notifyTrackCrash
+
+// ============================================================================
 
 void Kart::loadKartProperties(const std::string& new_ident,
                                       HandicapLevel handicap,
@@ -2988,9 +3048,12 @@ void Kart::playCrashSFX(const Material* m, Kart *k)
             
             float volume; //The volume the crash sound will be played at
             
+            float intensity;  // Collision intensity for observers [0.0, 1.0]
+
             if (k == NULL) //Collision with wall
             {
                 volume = sqrt( abs(m_speed / speed_for_max_volume));
+                intensity = std::min(1.0f, volume);  // Use same calculation, clamped
             }
             else
             {
@@ -2998,13 +3061,20 @@ void Kart::playCrashSFX(const Material* m, Kart *k)
                 const Vec3 OtherKartVelocity = k->getVelocity();
                 const Vec3 VelocityDifference = ThisKartVelocity - OtherKartVelocity;
                 const float LengthOfDifference = VelocityDifference.length();
-            
+
                 volume = sqrt( abs(LengthOfDifference / speed_for_max_volume));
+                intensity = std::min(1.0f, volume);  // Use same calculation, clamped
                 // temporary fix for kart collision sounds being annoying
                 // TODO : find a new sound for kart-on-kart collisions
                 volume *= 0.5f;
             }
-            
+
+            // Notify crash observers (for camera shake, etc.)
+            if (k == NULL)
+                notifyTrackCrash(m, intensity);
+            else
+                notifyKartCrash(k, intensity);
+
             if (volume > max_volume) { volume = max_volume; }
             else if (volume < min_volume) { volume = min_volume; }
 
@@ -3904,6 +3974,10 @@ void Kart::updateGraphics(float dt)
     }
     bool active_nitro = getSpeedIncreaseTicksLeft(MaxSpeed::MS_INCREASE_NITRO) > 0;
     m_kart_gfx->updateNitroGraphics(nitro_frac, m_nitro_hack_ticks > 0, active_nitro);
+
+    // Update boost particle effects (decay only - activation is handled by observer)
+    // KartGFX::onBoostActivated() is called by MaxSpeed when boosts activate
+    m_kart_gfx->updateBoostParticleEffects(dt);
 
     // Handle leaning of karts
     // -----------------------

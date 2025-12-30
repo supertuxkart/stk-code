@@ -129,6 +129,13 @@ Camera::Camera(CameraType type, int camera_index, Kart* kart)
     m_camera        = irr_driver->addCameraSceneNode();
     m_previous_pv_matrix = core::matrix4();
 
+    // Initialize camera shake state
+    m_shake_intensity = 0.0f;
+    m_shake_duration  = 0.0f;
+    m_shake_initial_duration = 0.0f;
+    m_shake_frequency = 25.0f;
+    m_shake_offset    = Vec3(0.0f, 0.0f, 0.0f);
+
     if (RaceManager::get()->getNumLocalPlayers() > 1)
     {
         m_fov = DEGREE_TO_RAD * stk_config->m_camera_fov
@@ -139,9 +146,19 @@ Camera::Camera(CameraType type, int camera_index, Kart* kart)
         m_fov = DEGREE_TO_RAD * UserConfigParams::m_camera_fov;
     }
     m_camera->setFOV(m_fov);
+
+    // Initialize dynamic FOV state
+    m_base_fov    = m_fov;
+    m_current_fov = m_fov;
+    m_target_fov  = m_fov;
+
     setupCamera();
     setKart(kart);
-    m_ambient_light = Track::getCurrentTrack()->getDefaultAmbientColor();
+    Track* track = Track::getCurrentTrack();
+    if (track)
+        m_ambient_light = track->getDefaultAmbientColor();
+    else
+        m_ambient_light = video::SColor(255, 255, 255, 255);
 
     reset();
 }   // Camera
@@ -311,4 +328,115 @@ void Camera::activate(bool alsoActivateInIrrlicht)
         irr_driver->getVideoDriver()->setViewPort(m_viewport);
     }
 }   // activate
+
+//-----------------------------------------------------------------------------
+/** Triggers a camera shake effect.
+ *  \param intensity Shake magnitude [0.0, 1.0], will be clamped.
+ *  \param duration How long the shake lasts in seconds.
+ *  \param frequency Oscillation speed (default 25.0f).
+ */
+void Camera::triggerShake(float intensity, float duration, float frequency)
+{
+    // Clamp intensity to valid range
+    intensity = std::max(0.0f, std::min(1.0f, intensity));
+
+    // Only override if new shake is stronger or current shake has ended
+    if (intensity > m_shake_intensity || m_shake_duration <= 0.0f)
+    {
+        m_shake_intensity = intensity;
+        m_shake_duration  = duration;
+        m_shake_initial_duration = duration;  // Store initial for normalized decay
+        m_shake_frequency = frequency;
+    }
+}   // triggerShake
+
+//-----------------------------------------------------------------------------
+/** Updates shake state and computes current frame's offset.
+ *  Called every frame to decay the shake and calculate position offset.
+ *  \param dt Delta time since last frame.
+ */
+void Camera::updateShake(float dt)
+{
+    if (m_shake_duration <= 0.0f)
+    {
+        m_shake_offset = Vec3(0.0f, 0.0f, 0.0f);
+        m_shake_intensity = 0.0f;
+        return;
+    }
+
+    // Decay duration
+    m_shake_duration -= dt;
+
+    // Calculate NORMALIZED decay factor (1.0 at start, 0.0 at end)
+    // This ensures shake starts at full intensity and fades smoothly
+    float decay = 1.0f;
+    if (m_shake_initial_duration > 0.0f)
+    {
+        decay = std::max(0.0f, m_shake_duration / m_shake_initial_duration);
+    }
+    float current_intensity = m_shake_intensity * decay;
+
+    // Generate pseudo-random shake using sin waves at different frequencies
+    // This creates a more organic shake than pure random
+    static float shake_time = 0.0f;
+    shake_time += dt * m_shake_frequency;
+
+    // Use multiple sine waves for more chaotic but smooth motion
+    float shake_x = sinf(shake_time * 1.0f) * 0.7f +
+                    sinf(shake_time * 2.3f) * 0.3f;
+    float shake_y = sinf(shake_time * 1.1f + 0.5f) * 0.6f +
+                    sinf(shake_time * 2.7f) * 0.4f;
+    float shake_z = sinf(shake_time * 0.9f + 1.0f) * 0.3f;
+
+    // Scale shake offset by current intensity
+    // Max displacement of ~0.5 units at full intensity (increased for visibility)
+    const float max_displacement = 0.5f;
+    m_shake_offset = Vec3(shake_x * current_intensity * max_displacement,
+                          shake_y * current_intensity * max_displacement,
+                          shake_z * current_intensity * max_displacement * 0.5f);
+}   // updateShake
+
+// ----------------------------------------------------------------------------
+/** Updates the dynamic FOV based on current speed and boost state.
+ *  The FOV increases slightly during high-speed moments for a sense of speed.
+ *  \param dt Delta time since last frame.
+ *  \param speed_ratio Current speed as a ratio of max speed [0.0, 1.0+].
+ *  \param boost_active True if any boost (nitro, zipper, etc.) is active.
+ */
+void Camera::updateDynamicFOV(float dt, float speed_ratio, bool boost_active)
+{
+    // Maximum additional FOV in degrees during speed effects
+    const float max_fov_increase = 8.0f;  // degrees
+    // Speed threshold where FOV starts increasing (as ratio of max speed)
+    const float speed_threshold = 0.7f;
+    // Interpolation speed (higher = faster response)
+    const float lerp_speed = 4.0f;
+
+    // Calculate target FOV increase based on speed
+    float speed_factor = 0.0f;
+    if (speed_ratio > speed_threshold)
+    {
+        // Scale from 0 at threshold to 1 at 100%+ speed
+        speed_factor = (speed_ratio - speed_threshold) / (1.0f - speed_threshold);
+        speed_factor = std::min(speed_factor, 1.5f);  // Allow slight overshoot
+    }
+
+    // Add extra FOV increase during boost
+    float boost_factor = boost_active ? 1.0f : 0.0f;
+
+    // Combine factors (boost adds on top of speed)
+    float total_factor = speed_factor + boost_factor * 0.3f;
+    total_factor = std::min(total_factor, 1.5f);
+
+    // Calculate target FOV
+    float fov_increase = total_factor * DEGREE_TO_RAD * max_fov_increase;
+    m_target_fov = m_base_fov + fov_increase;
+
+    // Smoothly interpolate current FOV towards target
+    float lerp_factor = 1.0f - expf(-lerp_speed * dt);
+    m_current_fov = m_current_fov + (m_target_fov - m_current_fov) * lerp_factor;
+
+    // Apply the FOV to the camera
+    m_camera->setFOV(m_current_fov);
+}   // updateDynamicFOV
 
