@@ -28,6 +28,8 @@
 #include "items/rubber_ball.hpp"
 #include "karts/abstract_kart.hpp"
 #include "karts/controller/controller.hpp"
+#include "karts/controller/rocket_controller.hpp"
+#include "karts/kart.hpp"
 #include "karts/kart_properties.hpp"
 #include "modes/world.hpp"
 #include "network/network_config.hpp"
@@ -476,6 +478,30 @@ void Powerup::use()
                     m_sound_use->setPosition(player_kart->getXYZ());
                 m_sound_use->play();
             }
+        }
+        break;
+
+    case PowerupManager::POWERUP_ROCKET:
+        {
+            // Rocket boost - autopilot catch-up for trailing players
+            // Swap the kart's controller to RocketController
+            Kart* kart = dynamic_cast<Kart*>(m_kart);
+            if (!kart)
+                break;
+
+            // Can't activate rocket if another controller swap is in progress
+            // (e.g., EndController active after crossing finish line).
+            // Fall back to regular zipper boost so player still gets feedback.
+            if (kart->getSavedController() != NULL)
+            {
+                m_kart->handleZipper(NULL, true);
+                break;
+            }
+
+            Controller* current = kart->getController();
+            RocketController* rocket = new RocketController(m_kart, current);
+            kart->setController(rocket);
+            m_kart->handleZipper(NULL, true);
         }
         break;
 

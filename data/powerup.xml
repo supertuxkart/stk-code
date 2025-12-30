@@ -81,12 +81,14 @@
         max-offset-distance="250.0"
         interval="1"
         max-height="4.0"      min-height="0"
-        fast-ping-distance="50" 
+        fast-ping-distance="50"
         early-target-factor="1"
         target-distance="15"  target-max-angle = "90"
         min-interpolation-distance="5"
         squash-slowdown="0.5" squash-duration="2"
         delete-time="5.0"     max-height-difference="10" />
+  <!-- Rocket boost: autopilot catch-up for trailing players -->
+  <item name="rocket"         icon="rocket-icon.png" />
   <item name="parachute"      icon="parachute-icon.png"
         model="parachute.spm"                           />
   <item name="plunger"        icon="plunger-icon.png"
@@ -155,112 +157,112 @@
       <!-- The entry for '1' kart lists more than a single weight
            because the others are used for interpolation when
            there are two karts or more. -->
-      <!--            bubble   cake  bowl zipper  plunger  switch swattr rubber para  anvil -->
-      <weight single  ="140      0   300   100      225      75     160     0     0     0"
-              multi   ="  0      0     0     0        0       0       0     0     0     0" />
-      <weight single  ="150      0   295   130      200      70     135     0     0     0"
-              multi   ="  0      0    20     0        0       0       0     0     0     0" />
-      <weight single  ="150      0   310   135      180      65     135     0     0     0"
-              multi   ="  0      0    25     0        0       0       0     0     0     0" />
-      <weight single  ="155      0   280   180      170      60     125     0     0     0"
-              multi   ="  0      0    30     0        0       0       0     0     0     0" />
-      <weight single  ="170      0   180   275      150      50      85     0     0     0"
-              multi   ="  0      0    90     0        0       0       0     0     0     0" />
+      <!--            bubble   cake  bowl zipper  plunger  switch swattr rubber rocket para  anvil -->
+      <weight single  ="140      0   300   100      225      75     160     0     0     0     0"
+              multi   ="  0      0     0     0        0       0       0     0     0     0     0" />
+      <weight single  ="150      0   295   130      200      70     135     0     0     0     0"
+              multi   ="  0      0    20     0        0       0       0     0     0     0     0" />
+      <weight single  ="150      0   310   135      180      65     135     0     0     0     0"
+              multi   ="  0      0    25     0        0       0       0     0     0     0     0" />
+      <weight single  ="155      0   280   180      170      60     125     0     0     0     0"
+              multi   ="  0      0    30     0        0       0       0     0     0     0     0" />
+      <weight single  ="170      0   180   275      150      50      85     0    90     0     0"
+              multi   ="  0      0    90     0        0       0       0     0     0     0     0" />
     </weights>
     <weights num-karts="5">
-      <!--            bubble   cake  bowl zipper  plunger  switch swattr rubber para  anvil -->
-      <weight single  ="130     80   260    75      230      60     165     0     0     0"
-              multi   ="  0      0     0     0        0       0       0     0     0     0" />
-      <weight single  ="150    135   240   125      145      45     135     0     0     0"
-              multi   ="  0      0    25     0        0       0       0     0     0     0" />
-      <weight single  ="150    135   225   144      135      36     135    15     0     0"
-              multi   ="  0      0    25     0        0       0       0     0     0     0" />
-      <weight single  ="160    120   140   205      110      30     100    70    30     0"
-              multi   ="  0      0    35     0        0       0       0     0     0     0" />
-      <weight single  ="145    105    45   240        0      24       0    40    80     0"
-              multi   =" 40      0    80   175       26       0       0     0     0     0" />
+      <!--            bubble   cake  bowl zipper  plunger  switch swattr rubber rocket para  anvil -->
+      <weight single  ="130     80   260    75      230      60     165     0     0     0     0"
+              multi   ="  0      0     0     0        0       0       0     0     0     0     0" />
+      <weight single  ="150    135   240   125      145      45     135     0     0     0     0"
+              multi   ="  0      0    25     0        0       0       0     0     0     0     0" />
+      <weight single  ="150    135   225   144      135      36     135    15     0     0     0"
+              multi   ="  0      0    25     0        0       0       0     0     0     0     0" />
+      <weight single  ="160    120   140   205      110      30     100    70     0    30     0"
+              multi   ="  0      0    35     0        0       0       0     0     0     0     0" />
+      <weight single  ="145    105    45   240        0      24       0    40   100    80     0"
+              multi   =" 40      0    80   175       26       0       0     0     0     0     0" />
     </weights>
     <weights num-karts="9">
-      <!--            bubble   cake  bowl zipper  plunger  switch swattr rubber para  anvil -->
-      <weight single  ="120     60   290    50      270      40     170     0     0     0"
-              multi   ="  0      0     0     0        0       0       0     0     0     0" />
-      <weight single  ="145    150   230   120      160      30     135     0     0     0"
-              multi   ="  0      0    30     0        0       0       0     0     0     0" />
-      <weight single  ="150    130   205   152      130      24     130    44     0     0"
-              multi   ="  0      0    35     0        0       0       0     0     0     0" />
-      <weight single  ="165    115   130   245       70      18      84    50    30     0"
-              multi   ="  0      0    60     0       33       0       0     0     0     0" />
-      <weight single  ="100     80    35   200        0      12       0    16    67     0"
-              multi   =" 90      0    90   290       20       0       0     0     0     0" />
+      <!--            bubble   cake  bowl zipper  plunger  switch swattr rubber rocket para  anvil -->
+      <weight single  ="120     60   290    50      270      40     170     0     0     0     0"
+              multi   ="  0      0     0     0        0       0       0     0     0     0     0" />
+      <weight single  ="145    150   230   120      160      30     135     0     0     0     0"
+              multi   ="  0      0    30     0        0       0       0     0     0     0     0" />
+      <weight single  ="150    130   205   152      130      24     130    44     0     0     0"
+              multi   ="  0      0    35     0        0       0       0     0     0     0     0" />
+      <weight single  ="165    115   130   245       70      18      84    50     0    30     0"
+              multi   ="  0      0    60     0       33       0       0     0     0     0     0" />
+      <weight single  ="100     80    35   200        0      12       0    16   120    67     0"
+              multi   =" 90      0    90   290       20       0       0     0     0     0     0" />
     </weights>
     <weights num-karts="14">
-      <!--            bubble   cake  bowl zipper  plunger  switch swattr rubber para  anvil -->
-      <weight single  ="110     40   320    25      300      30     175     0     0     0"
-              multi   ="  0      0     0     0        0       0       0     0     0     0" />
-      <weight single  ="140    155   240   110      170      20     135     0     0     0"
-              multi   ="  0      0    30     0        0       0       0     0     0     0" />
-      <weight single  ="150    125   210   159      145      15     120    36     0     0"
-              multi   ="  0      0    40     0        0       0       0     0     0     0" />
-      <weight single  ="135    105   115   234       60      12      70    35    24     0"
-              multi   =" 40      0    80    40       50       0       0     0     0     0" />
-      <weight single  =" 90     70    15   175        0       0       0     0    50     0"
-              multi   ="120      0   125   325       30       0       0     0     0     0" />
+      <!--            bubble   cake  bowl zipper  plunger  switch swattr rubber rocket para  anvil -->
+      <weight single  ="110     40   320    25      300      30     175     0     0     0     0"
+              multi   ="  0      0     0     0        0       0       0     0     0     0     0" />
+      <weight single  ="140    155   240   110      170      20     135     0     0     0     0"
+              multi   ="  0      0    30     0        0       0       0     0     0     0     0" />
+      <weight single  ="150    125   210   159      145      15     120    36     0     0     0"
+              multi   ="  0      0    40     0        0       0       0     0     0     0     0" />
+      <weight single  ="135    105   115   234       60      12      70    35     0    24     0"
+              multi   =" 40      0    80    40       50       0       0     0     0     0     0" />
+      <weight single  =" 90     70    15   175        0       0       0     0   150    50     0"
+              multi   ="120      0   125   325       30       0       0     0     0     0     0" />
     </weights>
     <weights num-karts="20">
-      <!--            bubble   cake  bowl zipper  plunger  switch swattr rubber para  anvil -->
-      <weight single  ="100      0   370     0      330      20     180     0     0     0"
-              multi   ="  0      0     0     0        0       0       0     0     0     0" />
-      <weight single  ="135    160   240   100      185      15     135     0     0     0"
-              multi   ="  0      0    30     0        0       0       0     0     0     0" />
-      <weight single  ="150    120   200   165      148      10     105    27     0     0"
-              multi   ="  0      0    50     0       25       0       0     0     0     0" />
-      <weight single  ="125     90   100   262       50       8      50    20    15     0"
-              multi   =" 50      0   100    50       80       0       0     0     0     0" />
-      <weight single  =" 75     60     0   125        0       0       0     0    35     0"
-              multi   ="150      0   155   400        0       0       0     0     0     0" />
+      <!--            bubble   cake  bowl zipper  plunger  switch swattr rubber rocket para  anvil -->
+      <weight single  ="100      0   370     0      330      20     180     0     0     0     0"
+              multi   ="  0      0     0     0        0       0       0     0     0     0     0" />
+      <weight single  ="135    160   240   100      185      15     135     0     0     0     0"
+              multi   ="  0      0    30     0        0       0       0     0     0     0     0" />
+      <weight single  ="150    120   200   165      148      10     105    27     0     0     0"
+              multi   ="  0      0    50     0       25       0       0     0     0     0     0" />
+      <weight single  ="125     90   100   262       50       8      50    20     0    15     0"
+              multi   =" 50      0   100    50       80       0       0     0     0     0     0" />
+      <weight single  =" 75     60     0   125        0       0       0     0   200    35     0"
+              multi   ="150      0   155   400        0       0       0     0     0     0     0" />
     </weights>
   </race-weight-list>
 
   <ftl-weight-list>
     <weights num-karts="1">
-      <!--              bubble  cake  bowl  zipper  plunger  switch swattr rubber para  anvil -->
+      <!--              bubble  cake  bowl  zipper  plunger  switch swattr rubber rocket para  anvil -->
       <!-- This is the entry for the leader: -->
-      <weight single  ="35       0    25    35      25       15      25     0     0     0"
-              multi   ="20       0     0    20       0        0       0     0     0     0" />
+      <weight single  ="35       0    25    35      25       15      25     0     0     0     0"
+              multi   ="20       0     0    20       0        0       0     0     0     0     0" />
       <!-- This is the entry for the first non-leader karts: -->
-      <weight single  ="25       0    60    25      58        2      30     0     0     0"
-              multi   =" 0       0     0     0       0        0       0     0     0     0" />
-      <weight single  ="35       0    55    35      25        3      25     0     0     0"
-              multi   =" 0       0    10     0      12        0       0     0     0     0" />
-      <weight single  ="25       0    40    45      15        5      15    10     5     0"
-              multi   ="10       0    15    15       0        0       0     0     0     0" />
+      <weight single  ="25       0    60    25      58        2      30     0     0     0     0"
+              multi   =" 0       0     0     0       0        0       0     0     0     0     0" />
+      <weight single  ="35       0    55    35      25        3      25     0     0     0     0"
+              multi   =" 0       0    10     0      12        0       0     0     0     0     0" />
+      <weight single  ="25       0    40    45      15        5      15    10     0     5     0"
+              multi   ="10       0    15    15       0        0       0     0     0     0     0" />
       <!-- This is the entry for the last kart: -->
-      <weight single  ="20       0    15    25       0        0       0     0    15     0"
-              multi   ="20       0    25    80       0        0       0     0     0     0" />
+      <weight single  ="20       0    15    25       0        0       0     0    80    15     0"
+              multi   ="20       0    25    80       0        0       0     0     0     0     0" />
     </weights>
   </ftl-weight-list>
   
   <battle-weight-list>
     <weights num-karts="1">
-      <!--              bubble  cake  bowl  zipper  plunger  switch swattr rubber para  anvil -->
-      <weight single  ="10      30    60     0       0       10      30     0     0     0"
-              multi   =" 0       0     5     0       0        0       0     0     0     0"    />
+      <!--              bubble  cake  bowl  zipper  plunger  switch swattr rubber rocket para  anvil -->
+      <weight single  ="10      30    60     0       0       10      30     0     0     0     0"
+              multi   =" 0       0     5     0       0        0       0     0     0     0     0"    />
     </weights>
   </battle-weight-list>
 
   <soccer-weight-list>
     <weights num-karts="1">
-      <!--               bubble  cake  bowl  zipper  plunger switch swattr rubber para  anvil -->
-      <weight single  =" 0      30    60     0       0       10      30     0     0     0"
-              multi   =" 0       0     5     0       0        0       0     0     0     0"    />
+      <!--               bubble  cake  bowl  zipper  plunger switch swattr rubber rocket para  anvil -->
+      <weight single  =" 0      30    60     0       0       10      30     0     0     0     0"
+              multi   =" 0       0     5     0       0        0       0     0     0     0     0"    />
     </weights>
   </soccer-weight-list>
 
   <tutorial-weight-list>
     <weights num-karts="1">
-      <!--               bubble  cake  bowl  zipper  plunger switch swattr rubber para  anvil -->
-      <weight single  =" 0       0     0     0       0        0       0     0     0     0"
-              multi   =" 0       0   100     0       0        0       0     0     0     0" />
+      <!--               bubble  cake  bowl  zipper  plunger switch swattr rubber rocket para  anvil -->
+      <weight single  =" 0       0     0     0       0        0       0     0     0     0     0"
+              multi   =" 0       0   100     0       0        0       0     0     0     0     0" />
     </weights>
   </tutorial-weight-list>
 

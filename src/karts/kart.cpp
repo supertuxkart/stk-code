@@ -51,6 +51,7 @@
 #include "karts/cached_characteristic.hpp"
 #include "karts/controller/local_player_controller.hpp"
 #include "karts/controller/end_controller.hpp"
+#include "karts/controller/rocket_controller.hpp"
 #include "karts/controller/spare_tire_ai.hpp"
 #include "karts/explosion_animation.hpp"
 #include "karts/kart_gfx.hpp"
@@ -1377,6 +1378,16 @@ void Kart::update(int ticks)
     }
 
     m_powerup->update(ticks);
+
+    // Check if RocketController has finished and restore original controller
+    RocketController* rocket = dynamic_cast<RocketController*>(m_controller);
+    if (rocket && !rocket->isActive())
+    {
+        Controller* original = rocket->getOriginalController();
+        delete m_controller;
+        m_controller = original;
+        m_saved_controller = NULL;
+    }
 
     // Reset any instant speed increase or speed floor in the bullet kart
     m_vehicle->resetMaxSpeed();

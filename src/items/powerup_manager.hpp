@@ -134,6 +134,7 @@ public:
                       POWERUP_CAKE,
                       POWERUP_BOWLING, POWERUP_ZIPPER, POWERUP_PLUNGER,
                       POWERUP_SWITCH, POWERUP_SWATTER, POWERUP_RUBBERBALL,
+                      POWERUP_ROCKET,     // Autopilot catch-up boost for trailing players
                       POWERUP_PARACHUTE,
                       POWERUP_ANVIL,      //powerup.cpp assumes these two come last
                       POWERUP_LAST=POWERUP_ANVIL,

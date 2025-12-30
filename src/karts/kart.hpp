@@ -485,6 +485,10 @@ public:
     // ----------------------------------------------------------------------------------------
     /** Returns the controller of this kart (const version). */
     const Controller* getController() const OVERRIDE { return m_controller; }
+    // ----------------------------------------------------------------------------------------
+    /** Returns the saved controller (used during controller swaps like EndController).
+     *  Returns NULL if no controller swap is in progress. */
+    Controller* getSavedController() const { return m_saved_controller; }
 
     // ========================================================================================
     // LOCATION ON-TRACK related functions
