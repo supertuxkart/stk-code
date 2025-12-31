@@ -150,6 +150,9 @@ protected:
     /** Current frame's shake offset applied to camera position. */
     Vec3 m_shake_offset;
 
+    /** Accumulated shake time for sine wave generation (per-camera instance). */
+    float m_shake_time;
+
     // ========================================================================
     // Dynamic FOV effect state
     // ========================================================================
@@ -198,13 +201,8 @@ public:
     /** Returns the currently active camera. */
     static Camera* getActiveCamera() { return s_active_camera; }
     // ------------------------------------------------------------------------
-    /** Remove all cameras. */
-    static void removeAllCameras()
-    {
-        for(unsigned int i=0; i<m_all_cameras.size(); i++)
-            delete m_all_cameras[i];
-        m_all_cameras.clear();
-    }   // removeAllCameras
+    /** Remove all cameras and clean up observer registrations. */
+    static void removeAllCameras();   // Implemented in camera.cpp
 
     // ========================================================================
 

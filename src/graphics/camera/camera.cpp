@@ -31,6 +31,7 @@
 #include "karts/kart.hpp"
 #include "karts/explosion_animation.hpp"
 #include "karts/kart.hpp"
+#include "karts/max_speed.hpp"
 #include "karts/skidding.hpp"
 #include "physics/btKart.hpp"
 #include "race/race_manager.hpp"
@@ -119,6 +120,25 @@ void Camera::resetAllCameras()
 }   // resetAllCameras
 
 // ----------------------------------------------------------------------------
+/** Removes all cameras and cleans up observer registrations.
+ *  This should be called at race end to prevent dangling observer pointers.
+ */
+void Camera::removeAllCameras()
+{
+    // Clean up observer registrations to prevent dangling pointers
+    Kart::clearCrashObservers();
+    MaxSpeed::clearBoostObservers();
+
+    // Delete all cameras
+    for (Camera* camera : m_all_cameras)
+    {
+        delete camera;
+    }
+    m_all_cameras.clear();
+    s_active_camera = NULL;
+}   // removeAllCameras
+
+// ----------------------------------------------------------------------------
 Camera::Camera(CameraType type, int camera_index, Kart* kart)
       : m_kart(NULL)
 {
@@ -135,6 +155,7 @@ Camera::Camera(CameraType type, int camera_index, Kart* kart)
     m_shake_initial_duration = 0.0f;
     m_shake_frequency = 25.0f;
     m_shake_offset    = Vec3(0.0f, 0.0f, 0.0f);
+    m_shake_time      = 0.0f;  // Per-camera shake phase
 
     if (RaceManager::get()->getNumLocalPlayers() > 1)
     {
@@ -337,6 +358,10 @@ void Camera::activate(bool alsoActivateInIrrlicht)
  */
 void Camera::triggerShake(float intensity, float duration, float frequency)
 {
+    // Skip if camera shake is disabled for accessibility
+    if (!UserConfigParams::m_camera_shake_enabled)
+        return;
+
     // Clamp intensity to valid range
     intensity = std::max(0.0f, std::min(1.0f, intensity));
 
@@ -378,15 +403,14 @@ void Camera::updateShake(float dt)
 
     // Generate pseudo-random shake using sin waves at different frequencies
     // This creates a more organic shake than pure random
-    static float shake_time = 0.0f;
-    shake_time += dt * m_shake_frequency;
+    m_shake_time += dt * m_shake_frequency;
 
     // Use multiple sine waves for more chaotic but smooth motion
-    float shake_x = sinf(shake_time * 1.0f) * 0.7f +
-                    sinf(shake_time * 2.3f) * 0.3f;
-    float shake_y = sinf(shake_time * 1.1f + 0.5f) * 0.6f +
-                    sinf(shake_time * 2.7f) * 0.4f;
-    float shake_z = sinf(shake_time * 0.9f + 1.0f) * 0.3f;
+    float shake_x = sinf(m_shake_time * 1.0f) * 0.7f +
+                    sinf(m_shake_time * 2.3f) * 0.3f;
+    float shake_y = sinf(m_shake_time * 1.1f + 0.5f) * 0.6f +
+                    sinf(m_shake_time * 2.7f) * 0.4f;
+    float shake_z = sinf(m_shake_time * 0.9f + 1.0f) * 0.3f;
 
     // Scale shake offset by current intensity
     // Max displacement of ~0.5 units at full intensity (increased for visibility)
@@ -414,10 +438,11 @@ void Camera::updateDynamicFOV(float dt, float speed_ratio, bool boost_active)
 
     // Calculate target FOV increase based on speed
     float speed_factor = 0.0f;
-    if (speed_ratio > speed_threshold)
+    const float threshold_range = 1.0f - speed_threshold;
+    if (speed_ratio > speed_threshold && threshold_range > 0.001f)
     {
         // Scale from 0 at threshold to 1 at 100%+ speed
-        speed_factor = (speed_ratio - speed_threshold) / (1.0f - speed_threshold);
+        speed_factor = (speed_ratio - speed_threshold) / threshold_range;
         speed_factor = std::min(speed_factor, 1.5f);  // Allow slight overshoot
     }
 

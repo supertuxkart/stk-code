@@ -1070,6 +1070,11 @@ namespace UserConfigParams
             &m_camera_normal,
             "Focal distance (single player)"));
 
+    PARAM_PREFIX BoolUserConfigParam         m_camera_shake_enabled
+            PARAM_DEFAULT(  BoolUserConfigParam(true, "camera-shake",
+            &m_camera_normal,
+            "Enable camera shake effects (can be disabled for accessibility)"));
+
     PARAM_PREFIX BoolUserConfigParam       m_reverse_look_use_soccer_cam
             PARAM_DEFAULT(  BoolUserConfigParam(false, "reverse-look-use-soccer-cam",
                             "Use ball camera in soccer mode, instead of reverse") );

@@ -97,6 +97,21 @@ private:
     float m_distance_boost_timer = 0.0f;    // Decay timer for pull-back effect
     static constexpr float PULLBACK_DURATION = 1.5f;  // Effect lasts 1.5 seconds
 
+    // Camera shake constants for crash events
+    static constexpr float KART_CRASH_SHAKE_SCALE = 0.6f;     // Moderate shake for kart collisions
+    static constexpr float KART_CRASH_SHAKE_DURATION = 0.3f;  // Duration in seconds
+    static constexpr float KART_CRASH_SHAKE_FREQ = 30.0f;     // Higher frequency for rapid impacts
+    static constexpr float WALL_CRASH_SHAKE_SCALE = 0.8f;     // Stronger shake for wall impacts
+    static constexpr float WALL_CRASH_SHAKE_DURATION = 0.4f;  // Longer duration for heavier feel
+    static constexpr float WALL_CRASH_SHAKE_FREQ = 25.0f;     // Lower frequency for jarring effect
+
+    /** Helper to apply crash shake effects for this camera. */
+    void applyCrashShake(Kart* kart, float intensity,
+                         float scale, float duration, float frequency);
+
+    /** Get gyroscope-based camera roll angle if gyroscope controls enabled. */
+    float getGyroscopeRollAngle(bool invert_sign) const;
+
     // Give a few classes access to the constructor (mostly for inheritance)
     friend class Camera;
     friend class CameraDebug;

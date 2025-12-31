@@ -72,8 +72,7 @@ CameraNormal::CameraNormal(Camera::CameraType type,  int camera_index,
     m_tv_cooldown_default = 0.4f;
     m_position_speed = 8.0f;
     m_target_speed   = 10.0f;
-    m_rotation_range = 0.4f;
-    m_rotation_range = 0.0f;
+    m_rotation_range = 0.0f;  // Camera rotation on steering disabled (0.4f to enable)
     m_kart_position = btVector3(0, 0, 0);
     m_kart_rotation = btQuaternion(0, 0, 0, 1);
     m_last_smooth_mode = Mode::CM_NORMAL;
@@ -219,6 +218,24 @@ void CameraNormal::restart()
 }   // restart
 
 //-----------------------------------------------------------------------------
+/** Get gyroscope-based camera roll angle if gyroscope controls enabled.
+ *  \param invert_sign If true, inverts the orientation (for reverse views).
+ *  \return Roll angle from gyroscope, or 0.0f if not available/enabled.
+ */
+float CameraNormal::getGyroscopeRollAngle(bool invert_sign) const
+{
+    if (UserConfigParams::m_multitouch_controls != MULTITOUCH_CONTROLS_GYROSCOPE)
+        return 0.0f;
+
+    MultitouchDevice* device = input_manager->getDeviceManager()->getMultitouchDevice();
+    if (!device)
+        return 0.0f;
+
+    float orientation = device->getOrientation();
+    return invert_sign ? -orientation : orientation;
+}   // getGyroscopeRollAngle
+
+//-----------------------------------------------------------------------------
 /** Determine the camera settings for the current frame.
  *  \param above_kart How far above the camera should aim at.
  *  \param cam_angle  Angle above the kart plane for the camera.
@@ -248,15 +265,7 @@ void CameraNormal::getCameraSettings(Mode mode,
             *sideway             = -m_rotation_range*dampened_steer*0.5f;
             *smoothing           = UserConfigParams::m_camera_forward_smooth_position != 0.
                                 || UserConfigParams::m_camera_forward_smooth_rotation != 0.;
-            *cam_roll_angle      = 0.0f;
-            if (UserConfigParams::m_multitouch_controls == MULTITOUCH_CONTROLS_GYROSCOPE)
-            {
-                MultitouchDevice* device = input_manager->getDeviceManager()->getMultitouchDevice();
-                if (device)
-                {
-                    *cam_roll_angle = device->getOrientation();
-                }
-            }
+            *cam_roll_angle      = getGyroscopeRollAngle(false);
             break;
         }   // CM_FALLING
     case CM_REVERSE: // Same as CM_NORMAL except it looks backwards
@@ -266,15 +275,7 @@ void CameraNormal::getCameraSettings(Mode mode,
             *sideway    = 0;
             *distance   = UserConfigParams::m_camera_backward_distance;
             *smoothing  = false;
-            *cam_roll_angle = 0.0f;
-            if (UserConfigParams::m_multitouch_controls == MULTITOUCH_CONTROLS_GYROSCOPE)
-            {
-                MultitouchDevice* device = input_manager->getDeviceManager()->getMultitouchDevice();
-                if (device)
-                {
-                    *cam_roll_angle = -device->getOrientation();
-                }
-            }
+            *cam_roll_angle = getGyroscopeRollAngle(true);
             break;
         }
     case CM_CLOSEUP: // Lower to the ground and closer to the kart
@@ -286,15 +287,7 @@ void CameraNormal::getCameraSettings(Mode mode,
                         * m_kart->getSkidding()->getSkidFactor();
             *distance   = -0.5f*m_distance;
             *smoothing  = false;
-            *cam_roll_angle = 0.0f;
-            if (UserConfigParams::m_multitouch_controls == MULTITOUCH_CONTROLS_GYROSCOPE)
-            {
-                MultitouchDevice* device = input_manager->getDeviceManager()->getMultitouchDevice();
-                if (device)
-                {
-                    *cam_roll_angle = -device->getOrientation();
-                }
-            }
+            *cam_roll_angle = getGyroscopeRollAngle(true);
             break;
         }
     case CM_LEADER_MODE:
@@ -722,6 +715,27 @@ void CameraNormal::onBoostActivated(Kart* kart, unsigned int category,
 }   // onBoostActivated
 
 // ----------------------------------------------------------------------------
+/** Helper to apply crash shake effects for this camera.
+ *  \param kart The kart that crashed
+ *  \param intensity Collision intensity [0.0, 1.0]
+ *  \param scale Shake scale factor
+ *  \param duration Shake duration in seconds
+ *  \param frequency Shake frequency
+ */
+void CameraNormal::applyCrashShake(Kart* kart, float intensity,
+                                   float scale, float duration, float frequency)
+{
+#ifndef SERVER_ONLY
+    // Only trigger effects for THIS camera's kart (current player)
+    if (kart != m_kart) return;
+    if (GUIEngine::isNoGraphics()) return;
+
+    float shake_intensity = intensity * scale;
+    triggerShake(shake_intensity, duration, frequency);
+#endif
+}   // applyCrashShake
+
+// ----------------------------------------------------------------------------
 /** Called when a kart collides with another kart.
  *  Triggers camera shake for THIS camera's kart only.
  *  \param kart The kart that crashed
@@ -730,20 +744,8 @@ void CameraNormal::onBoostActivated(Kart* kart, unsigned int category,
  */
 void CameraNormal::onKartCrash(Kart* kart, Kart* other_kart, float intensity)
 {
-#ifndef SERVER_ONLY
-    // Only trigger effects for THIS camera's kart (current player)
-    if (kart != m_kart) return;
-    if (GUIEngine::isNoGraphics()) return;
-
-    // Kart-kart collisions: moderate shake
-    // Scale intensity down slightly since these are common
-    const float KART_SHAKE_SCALE = 0.6f;
-    const float SHAKE_DURATION = 0.3f;
-    const float SHAKE_FREQUENCY = 30.0f;
-
-    float shake_intensity = intensity * KART_SHAKE_SCALE;
-    triggerShake(shake_intensity, SHAKE_DURATION, SHAKE_FREQUENCY);
-#endif
+    applyCrashShake(kart, intensity, KART_CRASH_SHAKE_SCALE,
+                    KART_CRASH_SHAKE_DURATION, KART_CRASH_SHAKE_FREQ);
 }   // onKartCrash
 
 // ----------------------------------------------------------------------------
@@ -755,27 +757,15 @@ void CameraNormal::onKartCrash(Kart* kart, Kart* other_kart, float intensity)
  */
 void CameraNormal::onTrackCrash(Kart* kart, const Material* material, float intensity)
 {
-#ifndef SERVER_ONLY
-    // Only trigger effects for THIS camera's kart (current player)
-    if (kart != m_kart) return;
-    if (GUIEngine::isNoGraphics()) return;
-
-    // Wall/track collisions: stronger shake than kart collisions
-    // These are more jarring impacts
-    const float WALL_SHAKE_SCALE = 0.8f;
-    const float SHAKE_DURATION = 0.4f;
-    const float SHAKE_FREQUENCY = 25.0f;
-
-    float shake_intensity = intensity * WALL_SHAKE_SCALE;
-    triggerShake(shake_intensity, SHAKE_DURATION, SHAKE_FREQUENCY);
-#endif
+    applyCrashShake(kart, intensity, WALL_CRASH_SHAKE_SCALE,
+                    WALL_CRASH_SHAKE_DURATION, WALL_CRASH_SHAKE_FREQ);
 }   // onTrackCrash
 
 void CameraNormal::clearTVCameras()
 {
-    m_tv_cameras.clear();  // Nettoie les caméras statiques
-    
-    // Remet à zéro l'état de TOUTES les caméras existantes
+    m_tv_cameras.clear();
+
+    // Reset state for ALL existing cameras
     for(unsigned int i = 0; i < Camera::getNumCameras(); i++)
     {
         Camera* camera = Camera::getCamera(i);
