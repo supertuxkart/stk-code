@@ -661,6 +661,15 @@ void ShaderBasedRenderer::giveBoost(unsigned int cam_index)
 }
 
 // ----------------------------------------------------------------------------
+void ShaderBasedRenderer::setSpeedIntensity(unsigned int cam_index,
+                                            float speed_intensity,
+                                            float boost_intensity)
+{
+    m_post_processing->setSpeedIntensity(cam_index, speed_intensity,
+                                         boost_intensity);
+}
+
+// ----------------------------------------------------------------------------
 void ShaderBasedRenderer::addSkyBox(const std::vector<video::IImage*> &texture,
                                     const std::vector<video::IImage*> &spherical_harmonics_textures)
 {
