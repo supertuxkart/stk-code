@@ -9,22 +9,29 @@ SuperTuxKart is a free kart racing game. It focuses on fun and not on realistic 
 
 The SuperTuxKart homepage can be found at <https://supertuxkart.net/>. There is also our [FAQ](https://supertuxkart.net/FAQ) and information on how get in touch with the [community](https://supertuxkart.net/Community).
 
-Latest release binaries can be found [here](https://github.com/supertuxkart/stk-code/releases/latest), and preview release [here](https://github.com/supertuxkart/stk-code/releases/preview).
+The latest release binaries can be found [here](https://github.com/supertuxkart/stk-code/releases/latest), and those of preview releases [here](https://github.com/supertuxkart/stk-code/releases/preview).
 
 ## Hardware Requirements
-To run SuperTuxKart, make sure that your computer's specifications are equal or higher than the following specifications:
+Any hardware that supports OpenGL >= 3.3 or OpenGL ES >= 3.0 should be able to run SuperTuxKart. For Android, Android 5.0 or greater is required.
 
-* A graphics card capable of 3D rendering - NVIDIA GeForce 470 GTX, AMD Radeon 6870 HD series card or Intel HD Graphics 4000 and newer. OpenGL >= 3.3
-* You should have a dual-core CPU that's running at 1 GHz or faster.
-* You'll need at least 512 MB of free VRAM (video memory).
-* System memory: 1 GB
-* Minimum disk space: 700 MB
-* Ideally, you'll want a joystick with at least 6 buttons.
+This includes dedicated GPUs from Nvidia or AMD released after 2010, integrated GPUs released after 2012 and Android phones released after 2014.
+
+The game will run on some very weak devices, but a better GPU allows to run smoothly using higher quality graphics and a higher resolution, and a better CPU helps to keep a smooth playing experience in online multiplayer.
+
+Please check the "What are the hardware requirements?" question in our [FAQ](https://supertuxkart.net/FAQ) for more information.
 
 ## License
 The software is released under the GNU General Public License (GPL) which can be found in the file [`COPYING`](/COPYING) in the same directory as this file.
 
 ---
+
+## Building from source
+
+Building instructions can be found in [`INSTALL.md`](/INSTALL.md)
+
+## Contributing code
+
+**To contribute code to the official STK repository, please review the ['How to contribute code'](https://supertuxkart.net/How_to_contribute_code) guide.** It contains important guidelines to make the process smoother and maximize the chances that your contribution is accepted.
 
 ## 3D coordinates
 A reminder for those who are looking at the code and 3D models:
@@ -33,8 +40,4 @@ SuperTuxKart: X right, Y up, Z forwards
 
 Blender: X right, Y forwards, Z up
 
-The export utilities  perform the needed transformation, so in Blender you just work with the XY plane as ground, and things will appear fine in STK (using XZ as ground in the code, obviously).
-
-## Building from source
-
-Building instructions can be found in [`INSTALL.md`](/INSTALL.md)
+The export utilities perform the needed transformation, so in Blender you just work with the XY plane as ground, and things will appear fine in STK (using XZ as ground in the code, obviously).
