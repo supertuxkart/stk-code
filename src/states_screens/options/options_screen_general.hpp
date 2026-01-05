@@ -22,6 +22,7 @@
 #include <string>
 
 #include "guiengine/screen.hpp"
+#include "generated/gui/screens/options/options_general_widgets.hpp"
 
 namespace GUIEngine { class Widget; }
 
@@ -37,6 +38,7 @@ class OptionsScreenGeneral : public GUIEngine::Screen, public GUIEngine::ScreenS
     bool m_inited;
 
     std::vector<std::string> m_skins;
+    GUIEngine::OptionsGeneralWidgets m_widgets;
 
     void setInternetCheckboxes(bool activate);
 

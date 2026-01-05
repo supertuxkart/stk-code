@@ -57,14 +57,7 @@ OnlineUserSearch::~OnlineUserSearch()
  */
 void OnlineUserSearch::loadedFromFile()
 {
-    m_back_widget = getWidget<GUIEngine::IconButtonWidget>("back");
-    assert(m_back_widget != NULL);
-    m_search_button_widget = getWidget<GUIEngine::ButtonWidget>("search_button");
-    assert(m_search_button_widget != NULL);
-    m_search_box_widget = getWidget<GUIEngine::TextBoxWidget>("search_box");
-    assert(m_search_box_widget != NULL);
-    m_user_list_widget = getWidget<GUIEngine::ListWidget>("user_list");
-    assert(m_user_list_widget != NULL);
+    m_widgets.bind(this);
 }   // loadedFromFile
 
 // ----------------------------------------------------------------------------
@@ -72,8 +65,8 @@ void OnlineUserSearch::loadedFromFile()
  */
 void OnlineUserSearch::beforeAddingWidget()
 {
-    m_user_list_widget->clearColumns();
-    m_user_list_widget->addColumn(_("Username"), 3);
+    m_widgets.user_list->clearColumns();
+    m_widgets.user_list->addColumn(_("Username"), 3);
 }
 // ----------------------------------------------------------------------------
 /** Called when entering this menu (before widgets are added).
@@ -82,7 +75,7 @@ void OnlineUserSearch::init()
 {
     Screen::init();
     search();
-    m_search_box_widget->setText(m_search_string);
+    m_widgets.search_box->setText(m_search_string);
 }   // init
 
 // ----------------------------------------------------------------------------
@@ -146,7 +139,7 @@ void OnlineUserSearch::parseResult(const XMLNode * input)
  */
 void OnlineUserSearch::showList()
 {
-    m_user_list_widget->clear();
+    m_widgets.user_list->clear();
 
     for (unsigned int i = 0; i < m_users.size(); i++)
     {
@@ -161,7 +154,7 @@ void OnlineUserSearch::showList()
         }
 
         row.push_back(GUIEngine::ListWidget::ListCell(profile->getUserName(),-1,3));
-        m_user_list_widget->addItem("user", row);
+        m_widgets.user_list->addItem("user", row);
     }
 }   // showList
 
@@ -179,12 +172,12 @@ void OnlineUserSearch::search()
         m_search_request->addParameter("search-string", m_search_string);
         m_search_request->queue();
 
-        m_user_list_widget->clear();
-        m_user_list_widget->addItem("spacer", L"");
-        m_user_list_widget->addItem("loading", StringUtils::loadingDots(_("Searching")));
-        m_back_widget->setActive(false);
-        m_search_box_widget->setActive(false);
-        m_search_button_widget->setActive(false);
+        m_widgets.user_list->clear();
+        m_widgets.user_list->addItem("spacer", L"");
+        m_widgets.user_list->addItem("loading", StringUtils::loadingDots(_("Searching")));
+        m_widgets.back->setActive(false);
+        m_widgets.search_box->setActive(false);
+        m_widgets.search_button->setActive(false);
     }
 }   // search
 
@@ -196,20 +189,20 @@ void OnlineUserSearch::eventCallback(GUIEngine::Widget* widget,
                                      const std::string& name,
                                      const int player_id)
 {
-    if (name == m_back_widget->m_properties[GUIEngine::PROP_ID])
+    if (widget == m_widgets.back)
     {
         StateManager::get()->escapePressed();
     }
-    else if (name == m_user_list_widget->m_properties[GUIEngine::PROP_ID])
+    else if (widget == m_widgets.user_list)
     {
-        int selected_index = m_user_list_widget->getSelectionID();
+        int selected_index = m_widgets.user_list->getSelectionID();
         if (selected_index != -1 && selected_index < (int)m_users.size())
             new UserInfoDialog(m_users[selected_index]);
     }
-    else if (name == m_search_button_widget->m_properties[GUIEngine::PROP_ID])
+    else if (widget == m_widgets.search_button)
     {
         m_last_search_string = m_search_string;
-        m_search_string = m_search_box_widget->getText().trim();
+        m_search_string = m_widgets.search_box->getText().trim();
         search();
     }
 
@@ -237,13 +230,13 @@ void OnlineUserSearch::onUpdate(float dt)
             }
 
             m_search_request = nullptr;
-            m_back_widget->setActive(true);
-            m_search_box_widget->setActive(true);
-            m_search_button_widget->setActive(true);
+            m_widgets.back->setActive(true);
+            m_widgets.search_box->setActive(true);
+            m_widgets.search_button->setActive(true);
         }
         else
         {
-            m_user_list_widget->renameItem("loading",
+            m_widgets.user_list->renameItem("loading",
                                     StringUtils::loadingDots(_("Searching")) );
         }
     }

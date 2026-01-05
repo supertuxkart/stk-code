@@ -41,6 +41,7 @@ KartColorSliderDialog::KartColorSliderDialog(PlayerProfile* pp)
                      : ModalDialog(0.75f, 0.75f, MODAL_DIALOG_LOCATION_CENTER)
 {
     loadFromFile("kart_color_slider.stkgui");
+    m_widgets.bind(this);
     m_player_profile = pp;
 
     // I18N: In kart color choosing dialog
@@ -52,7 +53,7 @@ KartColorSliderDialog::KartColorSliderDialog(PlayerProfile* pp)
     m_toggle_slider->addLabel(original_color);
     m_toggle_slider->addLabel(choose_color);
 
-    m_buttons_widget = getWidget<RibbonWidget>("buttons");
+    m_buttons_widget = m_widgets.buttons;
 
     if (m_player_profile->getDefaultKartColor() != 0.0f)
     {
@@ -86,7 +87,7 @@ KartColorSliderDialog::~KartColorSliderDialog()
 // ----------------------------------------------------------------------------
 void KartColorSliderDialog::beforeAddingWidgets()
 {
-    m_model_view = getWidget<ModelViewWidget>("model");
+    m_model_view = m_widgets.model;
 
     const core::dimension2du screen_size = irr_driver->getActualScreenSize();
     bool need_hd_rtt = (screen_size.Width > 1280 || screen_size.Height > 1280);
@@ -143,8 +144,8 @@ void KartColorSliderDialog::beforeAddingWidgets()
 
     m_model_view->setRotateContinuously(35.0f);
     m_model_view->update(0);
-    m_toggle_slider = getWidget<SpinnerWidget>("toggle-slider");
-    m_color_slider = getWidget<SpinnerWidget>("color-slider");
+    m_toggle_slider = m_widgets.toggle_slider;
+    m_color_slider = m_widgets.color_slider;
 }   // beforeAddingWidgets
 
 // ----------------------------------------------------------------------------

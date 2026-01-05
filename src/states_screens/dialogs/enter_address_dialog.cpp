@@ -37,19 +37,18 @@ EnterAddressDialog::EnterAddressDialog(std::shared_ptr<Server>* entered_server)
     m_self_destroy(false)
 {
     loadFromFile("enter_address_dialog.stkgui");
-    m_text_field = getWidget<GUIEngine::TextBoxWidget>("textfield");
-    m_title = getWidget<GUIEngine::LabelWidget>("title");
+    m_widgets.bind(this);
+    m_text_field = m_widgets.textfield;
+    m_title = m_widgets.title;
     m_title->setText(_("Enter the server address optionally followed by : and"
             " then port or select address from list."), false);
     m_entered_server = entered_server;
-    m_list = getWidget<GUIEngine::ListWidget>("list_history");
+    m_list = m_widgets.list_history;
 
     loadList();
 
-    GUIEngine::RibbonWidget* buttons_ribbon =
-        getWidget<GUIEngine::RibbonWidget>("buttons");
-    buttons_ribbon->setFocusForPlayer(PLAYER_ID_GAME_MASTER);
-    buttons_ribbon->select("cancel", PLAYER_ID_GAME_MASTER);
+    m_widgets.buttons->setFocusForPlayer(PLAYER_ID_GAME_MASTER);
+    m_widgets.buttons->select("cancel", PLAYER_ID_GAME_MASTER);
 }   // EnterAddressDialog
 
 // ------------------------------------------------------------------------
@@ -86,10 +85,8 @@ GUIEngine::EventPropagation EnterAddressDialog::processEvent(const std::string& 
 {
     if (event_source == "buttons")
     {
-        GUIEngine::RibbonWidget* buttons_ribbon =
-            getWidget<GUIEngine::RibbonWidget>("buttons");
         const std::string& button =
-            buttons_ribbon->getSelectionIDString(PLAYER_ID_GAME_MASTER);
+            m_widgets.buttons->getSelectionIDString(PLAYER_ID_GAME_MASTER);
         if (button == "cancel")
         {
             dismiss();

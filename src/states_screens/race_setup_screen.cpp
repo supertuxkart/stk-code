@@ -56,6 +56,7 @@ RaceSetupScreen::RaceSetupScreen() : Screen("race_setup.stkgui")
 
 void RaceSetupScreen::loadedFromFile()
 {
+    m_widgets.bind(this);
 }   // loadedFromFile
 
 // -----------------------------------------------------------------------------
@@ -64,23 +65,19 @@ void RaceSetupScreen::init()
 {
     Screen::init();
     input_manager->setMasterPlayerOnly(true);
-    RibbonWidget* w = getWidget<RibbonWidget>("difficulty");
-    assert( w != NULL );
 
     RaceManager::get()->setMajorMode(RaceManager::MAJOR_MODE_SINGLE);
     if (UserConfigParams::m_difficulty == RaceManager::DIFFICULTY_BEST &&
         PlayerManager::getCurrentPlayer()->isLocked("difficulty_best"))
     {
-        w->setSelection(RaceManager::DIFFICULTY_HARD, PLAYER_ID_GAME_MASTER);
+        m_widgets.difficulty->setSelection(RaceManager::DIFFICULTY_HARD, PLAYER_ID_GAME_MASTER);
     }
     else
     {
-        w->setSelection( UserConfigParams::m_difficulty, PLAYER_ID_GAME_MASTER );
+        m_widgets.difficulty->setSelection( UserConfigParams::m_difficulty, PLAYER_ID_GAME_MASTER );
     }
 
-    DynamicRibbonWidget* w2 = getWidget<DynamicRibbonWidget>("gamemode");
-    assert( w2 != NULL );
-    w2->clearItems();
+    m_widgets.gamemode->clearItems();
 
     // ---- Add game modes
     irr::core::stringw name1 = irr::core::stringw(
@@ -88,17 +85,17 @@ void RaceSetupScreen::init()
     //FIXME: avoid duplicating descriptions from the help menu!
     name1 +=  _("All blows allowed, so catch weapons and make clever use of them!");
 
-    w2->addItem( name1, IDENT_STD, RaceManager::getIconOf(RaceManager::MINOR_MODE_NORMAL_RACE));
+    m_widgets.gamemode->addItem( name1, IDENT_STD, RaceManager::getIconOf(RaceManager::MINOR_MODE_NORMAL_RACE));
 
     irr::core::stringw name2 = irr::core::stringw(
         RaceManager::getNameOf(RaceManager::MINOR_MODE_TIME_TRIAL)) + L"\n";
     //FIXME: avoid duplicating descriptions from the help menu!
     name2 += _("Contains no powerups, so only your driving skills matter!");
-    w2->addItem( name2, IDENT_TTRIAL, RaceManager::getIconOf(RaceManager::MINOR_MODE_TIME_TRIAL));
+    m_widgets.gamemode->addItem( name2, IDENT_TTRIAL, RaceManager::getIconOf(RaceManager::MINOR_MODE_TIME_TRIAL));
 
     if (PlayerManager::getCurrentPlayer()->isLocked(IDENT_FTL))
     {
-        w2->addItem( _("Locked : solve active challenges to gain access to more!"),
+        m_widgets.gamemode->addItem( _("Locked : solve active challenges to gain access to more!"),
             "locked", RaceManager::getIconOf(RaceManager::MINOR_MODE_FOLLOW_LEADER), true);
     }
     else
@@ -107,81 +104,78 @@ void RaceSetupScreen::init()
             RaceManager::getNameOf(RaceManager::MINOR_MODE_FOLLOW_LEADER)) + L"\n";
         //I18N: short definition for follow-the-leader game mode
         name3 += _("Keep up with the leader kart but don't overtake it!");
-        w2->addItem(name3, IDENT_FTL, RaceManager::getIconOf(RaceManager::MINOR_MODE_FOLLOW_LEADER), false);
+        m_widgets.gamemode->addItem(name3, IDENT_FTL, RaceManager::getIconOf(RaceManager::MINOR_MODE_FOLLOW_LEADER), false);
     }
 
     irr::core::stringw name4 = irr::core::stringw(_("Battle")) + L"\n";
     //FIXME: avoid duplicating descriptions from the help menu!
     name4 += _("Hit others with weapons until they lose all their lives.");
-    w2->addItem( name4, IDENT_STRIKES, RaceManager::getIconOf(RaceManager::MINOR_MODE_FREE_FOR_ALL));
+    m_widgets.gamemode->addItem( name4, IDENT_STRIKES, RaceManager::getIconOf(RaceManager::MINOR_MODE_FREE_FOR_ALL));
 
     irr::core::stringw name5 = irr::core::stringw(
         RaceManager::getNameOf(RaceManager::MINOR_MODE_SOCCER)) + L"\n";
     name5 += _("Push the ball into the opposite cage to score goals.");
-    w2->addItem( name5, IDENT_SOCCER, RaceManager::getIconOf(RaceManager::MINOR_MODE_SOCCER));
+    m_widgets.gamemode->addItem( name5, IDENT_SOCCER, RaceManager::getIconOf(RaceManager::MINOR_MODE_SOCCER));
 
 #define ENABLE_EASTER_EGG_MODE
 #ifdef ENABLE_EASTER_EGG_MODE
     if(RaceManager::get()->getNumLocalPlayers() == 1)
     {
-        irr::core::stringw name1 = irr::core::stringw(
+        irr::core::stringw easter_name = irr::core::stringw(
             RaceManager::getNameOf(RaceManager::MINOR_MODE_EASTER_EGG)) + L"\n";
         //FIXME: avoid duplicating descriptions from the help menu!
-        name1 +=  _("Explore tracks to find all hidden eggs");
+        easter_name +=  _("Explore tracks to find all hidden eggs");
 
-        w2->addItem( name1, IDENT_EASTER,
+        m_widgets.gamemode->addItem( easter_name, IDENT_EASTER,
             RaceManager::getIconOf(RaceManager::MINOR_MODE_EASTER_EGG));
     }
 #endif
 
     irr::core::stringw name6 = irr::core::stringw( _("Ghost replay race")) + L"\n";
     name6 += _("Race against ghost karts and try to beat them!");
-    w2->addItem( name6, IDENT_GHOST, "/gui/icons/mode_ghost.png");
+    m_widgets.gamemode->addItem( name6, IDENT_GHOST, "/gui/icons/mode_ghost.png");
 
     // I18N: Lap Trial: Complete as many laps as possible in a given amount of time.
     irr::core::stringw name7 = irr::core::stringw(_("Lap Trial")) + L"\n";
     name7 += _("Complete as many laps as possible in a given amount of time.");
-    w2->addItem(name7, IDENT_LAP_TRIAL, RaceManager::getIconOf(RaceManager::MINOR_MODE_LAP_TRIAL));
+    m_widgets.gamemode->addItem(name7, IDENT_LAP_TRIAL, RaceManager::getIconOf(RaceManager::MINOR_MODE_LAP_TRIAL));
 
-    w2->updateItemDisplay();
+    m_widgets.gamemode->updateItemDisplay();
 
     // restore saved game mode
     switch (UserConfigParams::m_game_mode)
     {
     case CONFIG_CODE_NORMAL :
-        w2->setSelection(IDENT_STD, PLAYER_ID_GAME_MASTER, true);
+        m_widgets.gamemode->setSelection(IDENT_STD, PLAYER_ID_GAME_MASTER, true);
         break;
     case CONFIG_CODE_TIMETRIAL :
-        w2->setSelection(IDENT_TTRIAL, PLAYER_ID_GAME_MASTER, true);
+        m_widgets.gamemode->setSelection(IDENT_TTRIAL, PLAYER_ID_GAME_MASTER, true);
         break;
     case CONFIG_CODE_FTL :
-        w2->setSelection(IDENT_FTL, PLAYER_ID_GAME_MASTER, true);
+        m_widgets.gamemode->setSelection(IDENT_FTL, PLAYER_ID_GAME_MASTER, true);
         break;
     case CONFIG_CODE_3STRIKES :
-        w2->setSelection(IDENT_STRIKES, PLAYER_ID_GAME_MASTER, true);
+        m_widgets.gamemode->setSelection(IDENT_STRIKES, PLAYER_ID_GAME_MASTER, true);
         break;
     case CONFIG_CODE_EASTER :
-        w2->setSelection(IDENT_EASTER, PLAYER_ID_GAME_MASTER, true);
+        m_widgets.gamemode->setSelection(IDENT_EASTER, PLAYER_ID_GAME_MASTER, true);
         break;
     case CONFIG_CODE_SOCCER :
-        w2->setSelection(IDENT_SOCCER, PLAYER_ID_GAME_MASTER, true);
+        m_widgets.gamemode->setSelection(IDENT_SOCCER, PLAYER_ID_GAME_MASTER, true);
         break;
     case CONFIG_CODE_GHOST :
-        w2->setSelection(IDENT_GHOST, PLAYER_ID_GAME_MASTER, true);
+        m_widgets.gamemode->setSelection(IDENT_GHOST, PLAYER_ID_GAME_MASTER, true);
         break;
     case CONFIG_CODE_LAP_TRIAL:
-        w2->setSelection(IDENT_LAP_TRIAL, PLAYER_ID_GAME_MASTER, true);
+        m_widgets.gamemode->setSelection(IDENT_LAP_TRIAL, PLAYER_ID_GAME_MASTER, true);
         break;
     }
 
-    w2->setItemCountHint(8);
+    m_widgets.gamemode->setItemCountHint(8);
 
     {
-        RibbonWidget* w = getWidget<RibbonWidget>("difficulty");
-        assert(w != NULL);
-
-        int index = w->findItemNamed("best");
-        Widget* hardestWidget = &w->getChildren()[index];
+        int index = m_widgets.difficulty->findItemNamed("best");
+        Widget* hardestWidget = &m_widgets.difficulty->getChildren()[index];
 
         if (PlayerManager::getCurrentPlayer()->isLocked("difficulty_best"))
         {
@@ -200,16 +194,15 @@ void RaceSetupScreen::init()
 void RaceSetupScreen::eventCallback(Widget* widget, const std::string& name,
                                     const int playerID)
 {
-    if (name == "difficulty")
+    if (widget == m_widgets.difficulty)
     {
         assignDifficulty();
     }
-    else if (name == "gamemode")
+    else if (widget == m_widgets.gamemode)
     {
         assignDifficulty();
 
-        DynamicRibbonWidget* w = dynamic_cast<DynamicRibbonWidget*>(widget);
-        const std::string& selectedMode = w->getSelectionIDString(PLAYER_ID_GAME_MASTER);
+        const std::string& selectedMode = m_widgets.gamemode->getSelectionIDString(PLAYER_ID_GAME_MASTER);
 
         if (selectedMode == IDENT_STD)
         {
@@ -269,7 +262,7 @@ void RaceSetupScreen::eventCallback(Widget* widget, const std::string& name,
             unlock_manager->playLockSound();
         }
     }
-    else if (name == "back")
+    else if (widget == m_widgets.back)
     {
         StateManager::get()->escapePressed();
     }
@@ -282,11 +275,9 @@ void RaceSetupScreen::eventCallback(Widget* widget, const std::string& name,
  */
 void RaceSetupScreen::assignDifficulty()
 {
-    RibbonWidget* difficulty_widget = getWidget<RibbonWidget>("difficulty");
-    assert(difficulty_widget != NULL);
-    const std::string& difficulty = 
-        difficulty_widget->getSelectionIDString(PLAYER_ID_GAME_MASTER);
-    
+    const std::string& difficulty =
+        m_widgets.difficulty->getSelectionIDString(PLAYER_ID_GAME_MASTER);
+
     RaceManager::Difficulty diff = RaceManager::convertDifficulty(difficulty);
     UserConfigParams::m_difficulty = diff;
     RaceManager::get()->setDifficulty(diff);

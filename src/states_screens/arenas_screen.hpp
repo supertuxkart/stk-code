@@ -20,6 +20,7 @@
 
 #include "guiengine/screen.hpp"
 #include "guiengine/widgets/text_box_widget.hpp"
+#include "generated/gui/screens/arenas_widgets.hpp"
 
 #include <queue>
 
@@ -39,9 +40,8 @@ class ArenasScreen : public GUIEngine::Screen,
     void buildTrackList();
 
 private:
+    GUIEngine::ArenasWidgets m_widgets;
     std::deque<std::string> m_random_arena_list;
-
-    GUIEngine::TextBoxWidget *m_search_box;
 
 public:
 
@@ -62,8 +62,8 @@ public:
     virtual void onTextUpdated() OVERRIDE
     {
         buildTrackList();
-        // After buildTrackList the m_search_box may be unfocused
-        m_search_box->focused(0);
+        // After buildTrackList the search box may be unfocused
+        m_widgets.search->focused(0);
     }
 
     void setFocusOnTrack(const std::string& trackName);

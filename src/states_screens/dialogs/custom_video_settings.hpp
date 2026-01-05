@@ -20,6 +20,7 @@
 #define HEADER_CUSTOM_VIDEO_SETTINGS_HPP
 
 #include "guiengine/modaldialog.hpp"
+#include "generated/gui/dialogs/custom_video_settings_widgets.hpp"
 
 /**
  * \brief Dialog that allows the player to select custom video settings
@@ -27,6 +28,8 @@
  */
 class CustomVideoSettingsDialog : public GUIEngine::ModalDialog
 {
+private:
+    GUIEngine::CustomVideoSettingsWidgets m_widgets;
 public:
     /**
      * Creates a modal dialog with given percentage of screen width and height

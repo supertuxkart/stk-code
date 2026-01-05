@@ -52,6 +52,7 @@ ArenasScreen::ArenasScreen() : Screen("arenas.stkgui")
 
 void ArenasScreen::loadedFromFile()
 {
+    m_widgets.bind(this);
 }
 
 // -----------------------------------------------------------------------------
@@ -61,15 +62,10 @@ void ArenasScreen::beforeAddingWidget()
     // Add user-defined group to track groups
     track_manager->setFavoriteTrackStatus(PlayerManager::getCurrentPlayer()->getFavoriteTrackStatus());
 
-    CheckBoxWidget* favorite_cb = getWidget<CheckBoxWidget>("favorite");
-    assert( favorite_cb != NULL );
-    favorite_cb->setState(false);
+    m_widgets.favorite->setState(false);
 
     // Dynamically add tabs
-    RibbonWidget* tabs = this->getWidget<RibbonWidget>("trackgroups");
-    assert( tabs != NULL );
-
-    tabs->clearAllChildren();
+    m_widgets.trackgroups->clearAllChildren();
 
     bool soccer_mode = RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_SOCCER;
     const std::vector<std::string>& groups = track_manager->getAllArenaGroups(soccer_mode);
@@ -78,7 +74,7 @@ void ArenasScreen::beforeAddingWidget()
     if (group_amount > 1)
     {
         //I18N: name of the tab that will show arenas from all groups
-        tabs->addTextChild( _("All"), ALL_ARENA_GROUPS_ID );
+        m_widgets.trackgroups->addTextChild( _("All"), ALL_ARENA_GROUPS_ID );
     }
 
     // Make group names being picked up by gettext
@@ -96,9 +92,9 @@ void ArenasScreen::beforeAddingWidget()
     for (int n=0; n<group_amount; n++)
     {
         if (groups[n] == "standard") // Fix capitalization (#4622)
-            tabs->addTextChild( _("Standard") , groups[n]);
+            m_widgets.trackgroups->addTextChild( _("Standard") , groups[n]);
         else // Try to translate group names
-            tabs->addTextChild( _(groups[n].c_str()) , groups[n]);
+            m_widgets.trackgroups->addTextChild( _(groups[n].c_str()) , groups[n]);
     } // for n<group_amount
 
     int num_of_arenas=0;
@@ -121,12 +117,9 @@ void ArenasScreen::beforeAddingWidget()
         }
     }
 
-    DynamicRibbonWidget* tracks_widget = this->getWidget<DynamicRibbonWidget>("tracks");
-    assert( tracks_widget != NULL );
-
     // Set the item hint to that number to prevent weird formatting
     // Avoid too many items shown at the same time
-    tracks_widget->setItemCountHint(std::min(num_of_arenas + 1, 30)); 
+    m_widgets.tracks->setItemCountHint(std::min(num_of_arenas + 1, 30));
 }
 
 // -----------------------------------------------------------------------------
@@ -136,27 +129,21 @@ void ArenasScreen::init()
     m_random_arena_list.clear();
     Screen::init();
 
-    m_search_box = getWidget<TextBoxWidget>("search");
-    m_search_box->clearListeners();
-    m_search_box->addListener(this);
+    m_widgets.search->clearListeners();
+    m_widgets.search->addListener(this);
 
     buildTrackList();
-    DynamicRibbonWidget* w = this->getWidget<DynamicRibbonWidget>("tracks");
     // select something by default for the game master
-    assert( w != NULL );
-    w->setSelection(w->getItems()[0].m_code_name, PLAYER_ID_GAME_MASTER, true);
+    m_widgets.tracks->setSelection(m_widgets.tracks->getItems()[0].m_code_name, PLAYER_ID_GAME_MASTER, true);
 }   // init
 
 // -----------------------------------------------------------------------------
 
 void ArenasScreen::eventCallback(Widget* widget, const std::string& name, const int playerID)
 {
-    if (name == "tracks")
+    if (widget == m_widgets.tracks)
     {
-        DynamicRibbonWidget* w2 = dynamic_cast<DynamicRibbonWidget*>(widget);
-        if (w2 == NULL) return;
-
-        std::string selection = w2->getSelectionIDString(PLAYER_ID_GAME_MASTER);
+        std::string selection = m_widgets.tracks->getSelectionIDString(PLAYER_ID_GAME_MASTER);
         if (UserConfigParams::logGUI())
             Log::info("ArenasScreen", "Clicked on arena %s", selection.c_str());
 
@@ -178,12 +165,12 @@ void ArenasScreen::eventCallback(Widget* widget, const std::string& name, const 
         {
             return;
         }
-        
+
         Track* clicked_track = track_manager->getTrack(selection);
         if (clicked_track)
         {
             // In favorite edit mode, switch the status of the selected track
-            if (getWidget<CheckBoxWidget>("favorite")->getState())
+            if (m_widgets.favorite->getState())
             {
                 if(PlayerManager::getCurrentPlayer()->isFavoriteTrack(clicked_track->getIdent()))
                     PlayerManager::getCurrentPlayer()->removeFavoriteTrack(clicked_track->getIdent());
@@ -200,11 +187,11 @@ void ArenasScreen::eventCallback(Widget* widget, const std::string& name, const 
         }   // clickedTrack !=  NULL
 
     }
-    else if (name == "trackgroups")
+    else if (widget == m_widgets.trackgroups)
     {
         buildTrackList();
     }
-    else if (name == "back")
+    else if (widget == m_widgets.back)
     {
         StateManager::get()->escapePressed();
     }
@@ -218,15 +205,10 @@ void ArenasScreen::buildTrackList()
     // Add user-defined group to track groups
     track_manager->setFavoriteTrackStatus(PlayerManager::getCurrentPlayer()->getFavoriteTrackStatus());
 
-    DynamicRibbonWidget* w = this->getWidget<DynamicRibbonWidget>("tracks");
-    assert( w != NULL );
-
     // Re-build track list everytime (accounts for locking changes, etc.)
-    w->clearItems();
+    m_widgets.tracks->clearItems();
 
-    RibbonWidget* tabs = this->getWidget<RibbonWidget>("trackgroups");
-    assert( tabs != NULL );
-    const std::string curr_group_name = tabs->getSelectionIDString(0);
+    const std::string curr_group_name = m_widgets.trackgroups->getSelectionIDString(0);
 
     bool soccer_mode = RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_SOCCER;
     bool arenas_have_navmesh = false;
@@ -242,7 +224,7 @@ void ArenasScreen::buildTrackList()
         {
             Track* curr = track_manager->getTrack(n);
             
-            core::stringw search_text = m_search_box->getText();
+            core::stringw search_text = m_widgets.search->getText();
             search_text.make_lower();
             if (!search_text.empty() &&
                 curr->getName().make_lower().find(search_text.c_str()) == -1)
@@ -286,7 +268,7 @@ void ArenasScreen::buildTrackList()
         {
             Track* curr = track_manager->getTrack(currArenas[n]);
 
-            core::stringw search_text = m_search_box->getText();
+            core::stringw search_text = m_widgets.search->getText();
             search_text.make_lower();
             if (!search_text.empty() &&
                 curr->getName().make_lower().find(search_text.c_str()) == -1)
@@ -328,19 +310,19 @@ void ArenasScreen::buildTrackList()
         Track *curr = tracks.get(i);
         if (PlayerManager::getCurrentPlayer()->isLocked(curr->getIdent()))
         {
-            w->addItem( _("Locked : solve active challenges to gain access to more!"),
+            m_widgets.tracks->addItem( _("Locked : solve active challenges to gain access to more!"),
                         "locked", curr->getScreenshotFile(), LOCKED_BADGE );
         }
         else if (PlayerManager::getCurrentPlayer()->isFavoriteTrack(curr->getIdent()))
         {
-            w->addItem(curr->getName(), curr->getIdent(),
+            m_widgets.tracks->addItem(curr->getName(), curr->getIdent(),
                 curr->getScreenshotFile(), HEART_BADGE,
                 IconButtonWidget::ICON_PATH_TYPE_ABSOLUTE);
             m_random_arena_list.push_back(curr->getIdent());
         }
         else
         {
-            w->addItem(curr->getName(), curr->getIdent(), curr->getScreenshotFile(), 0,
+            m_widgets.tracks->addItem(curr->getName(), curr->getIdent(), curr->getScreenshotFile(), 0,
                         IconButtonWidget::ICON_PATH_TYPE_ABSOLUTE );
             m_random_arena_list.push_back(curr->getIdent());
         }
@@ -348,8 +330,8 @@ void ArenasScreen::buildTrackList()
 
     if (arenas_have_navmesh || RaceManager::get()->getNumLocalPlayers() > 1 ||
         UserConfigParams::m_artist_debug_mode)
-        w->addItem(_("Random Arena"), "random_track", "/gui/icons/track_random.png");
-    w->updateItemDisplay();
+        m_widgets.tracks->addItem(_("Random Arena"), "random_track", "/gui/icons/track_random.png");
+    m_widgets.tracks->updateItemDisplay();
 
     std::shuffle( m_random_arena_list.begin(), m_random_arena_list.end(),
                   RandomGenerator::getGenerator());
@@ -359,12 +341,8 @@ void ArenasScreen::buildTrackList()
 
 void ArenasScreen::setFocusOnTrack(const std::string& trackName)
 {
-    DynamicRibbonWidget* w = this->getWidget<DynamicRibbonWidget>("tracks");
-    assert( w != NULL );
-
-    w->setSelection(trackName, PLAYER_ID_GAME_MASTER, true);
-
-}   // setFOxuOnTrack
+    m_widgets.tracks->setSelection(trackName, PLAYER_ID_GAME_MASTER, true);
+}   // setFocusOnTrack
 
 // ------------------------------------------------------------------------------------------------------
 

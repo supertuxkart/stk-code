@@ -51,6 +51,7 @@ void OptionsScreenDisplay::loadedFromFile()
 {
     m_inited = false;
 
+    // Note: m_widgets.bind() is called later in init(), so use getWidget here
     // Setup splitscreen spinner
     GUIEngine::SpinnerWidget* splitscreen_method = getWidget<GUIEngine::SpinnerWidget>("splitscreen_method");
     splitscreen_method->m_properties[PROP_WRAP_AROUND] = "true";
@@ -86,36 +87,19 @@ void OptionsScreenDisplay::init()
     Screen::init();
     OptionsCommon::setTabStatus();
 
-    RibbonWidget* ribbon = getWidget<RibbonWidget>("options_choice");
-    assert(ribbon != NULL);
-    ribbon->setFocusForPlayer(PLAYER_ID_GAME_MASTER);
-    ribbon->select( "tab_display", PLAYER_ID_GAME_MASTER );
+    // Bind typed widget pointers (one-time lookup)
+    m_widgets.bind(this);
 
-    GUIEngine::ButtonWidget* applyBtn =
-        getWidget<GUIEngine::ButtonWidget>("apply_resolution");
-    assert( applyBtn != NULL );
+    m_widgets.options_choice->setFocusForPlayer(PLAYER_ID_GAME_MASTER);
+    m_widgets.options_choice->select( "tab_display", PLAYER_ID_GAME_MASTER );
 
     // ---- video modes
-    DynamicRibbonWidget* res = getWidget<DynamicRibbonWidget>("resolutions");
-    assert(res != NULL);
-    res->registerScrollCallback(onScrollResolutionsList, this);
+    m_widgets.resolutions->registerScrollCallback(onScrollResolutionsList, this);
 
-    CheckBoxWidget* full = getWidget<CheckBoxWidget>("fullscreen");
-    assert( full != NULL );
-    full->setState( UserConfigParams::m_fullscreen );
-    
-    CheckBoxWidget* rememberWinpos = getWidget<CheckBoxWidget>("rememberWinpos");
-    assert( rememberWinpos != NULL );
-    rememberWinpos->setState(UserConfigParams::m_remember_window_location);
-    rememberWinpos->setActive(!UserConfigParams::m_fullscreen);
-#ifdef DEBUG
-    LabelWidget* full_text = getWidget<LabelWidget>("fullscreenText");
-    assert( full_text != NULL );
+    m_widgets.fullscreen->setState( UserConfigParams::m_fullscreen );
 
-    LabelWidget* rememberWinposText = 
-                                   getWidget<LabelWidget>("rememberWinposText");
-    assert( rememberWinposText != NULL );
-#endif
+    m_widgets.rememberWinpos->setState(UserConfigParams::m_remember_window_location);
+    m_widgets.rememberWinpos->setActive(!UserConfigParams::m_fullscreen);
 
     bool is_vulkan_fullscreen_desktop = GE::getGEConfig()->m_fullscreen_desktop &&
         GE::getDriver()->getDriverType() == video::EDT_VULKAN;
@@ -127,31 +111,26 @@ void OptionsScreenDisplay::init()
     // disabled)
     bool in_game = StateManager::get()->getGameState() == GUIEngine::INGAME_MENU;
 
-    res->setActive(!in_game || is_vulkan_fullscreen_desktop);
-    full->setActive(!in_game || is_vulkan_fullscreen_desktop);
-    applyBtn->setActive(!in_game);
+    m_widgets.resolutions->setActive(!in_game || is_vulkan_fullscreen_desktop);
+    m_widgets.fullscreen->setActive(!in_game || is_vulkan_fullscreen_desktop);
+    m_widgets.apply_resolution->setActive(!in_game);
 
 #if defined(MOBILE_STK) || defined(__SWITCH__)
-    applyBtn->setVisible(false);
-    full->setVisible(false);
-    getWidget<LabelWidget>("fullscreenText")->setVisible(false);
-    rememberWinpos->setVisible(false);
-    getWidget<LabelWidget>("rememberWinposText")->setVisible(false);
+    m_widgets.apply_resolution->setVisible(false);
+    m_widgets.fullscreen->setVisible(false);
+    m_widgets.fullscreenText->setVisible(false);
+    m_widgets.rememberWinpos->setVisible(false);
+    m_widgets.rememberWinposText->setVisible(false);
 #endif
 
     updateResolutionsList();
 
     // --- select the right camera in the spinner
-    GUIEngine::SpinnerWidget* camera_preset = getWidget<GUIEngine::SpinnerWidget>("camera_preset");
-    assert( camera_preset != NULL );
-
-    camera_preset->setValue(UserConfigParams::m_camera_present); // use the saved camera
+    m_widgets.camera_preset->setValue(UserConfigParams::m_camera_present); // use the saved camera
     updateCamera();
 
     // ---- splitscreen mode
-    GUIEngine::SpinnerWidget* splitscreen_method = getWidget<GUIEngine::SpinnerWidget>("splitscreen_method");
-    assert( splitscreen_method != NULL );
-    splitscreen_method->setValue(UserConfigParams::m_split_screen_horizontally ? 1 : 0);
+    m_widgets.splitscreen_method->setValue(UserConfigParams::m_split_screen_horizontally ? 1 : 0);
 }   // init
 
 // --------------------------------------------------------------------------------------------
@@ -163,9 +142,8 @@ void OptionsScreenDisplay::onResize()
     if (m_fullscreen_checkbox_focus)
     {
         m_fullscreen_checkbox_focus = false;
-        Widget* full = getWidget("fullscreen");
-        if (full->isActivated() && full->isVisible())
-            full->setFocusForPlayer(PLAYER_ID_GAME_MASTER);
+        if (m_widgets.fullscreen->isActivated() && m_widgets.fullscreen->isVisible())
+            m_widgets.fullscreen->setFocusForPlayer(PLAYER_ID_GAME_MASTER);
     }
 }   // onResize
 
@@ -173,13 +151,12 @@ void OptionsScreenDisplay::onResize()
 
 void OptionsScreenDisplay::configResolutionsList()
 {
-    DynamicRibbonWidget* res = getWidget<DynamicRibbonWidget>("resolutions");
-    if (res == NULL)
+    if (m_widgets.resolutions == NULL)
         return;
 
     bool is_fullscreen_desktop = GE::getGEConfig()->m_fullscreen_desktop;
 
-    res->clearItems();
+    m_widgets.resolutions->clearItems();
 
     const std::vector<IrrDriver::VideoMode>& modes =
                                             irr_driver->getVideoModes();
@@ -283,23 +260,23 @@ void OptionsScreenDisplay::configResolutionsList()
 #define ABOUT_EQUAL(a , b) (fabsf( a - b ) < 0.01)
 
         if      (ABOUT_EQUAL( ratio, (5.0f/4.0f) ))
-            res->addItem(label, name, "/gui/icons/screen54.png");
+            m_widgets.resolutions->addItem(label, name, "/gui/icons/screen54.png");
         else if (ABOUT_EQUAL( ratio, (4.0f/3.0f) ))
-            res->addItem(label, name, "/gui/icons/screen43.png");
+            m_widgets.resolutions->addItem(label, name, "/gui/icons/screen43.png");
         else if (ABOUT_EQUAL( ratio, (16.0f/10.0f)))
-            res->addItem(label, name, "/gui/icons/screen1610.png");
+            m_widgets.resolutions->addItem(label, name, "/gui/icons/screen1610.png");
         else if (ABOUT_EQUAL( ratio, (5.0f/3.0f) ))
-            res->addItem(label, name, "/gui/icons/screen53.png");
+            m_widgets.resolutions->addItem(label, name, "/gui/icons/screen53.png");
         else if (ABOUT_EQUAL( ratio, (3.0f/2.0f) ))
-            res->addItem(label, name, "/gui/icons/screen32.png");
+            m_widgets.resolutions->addItem(label, name, "/gui/icons/screen32.png");
         else if (ABOUT_EQUAL( ratio, (16.0f/9.0f) ))
-            res->addItem(label, name, "/gui/icons/screen169.png");
+            m_widgets.resolutions->addItem(label, name, "/gui/icons/screen169.png");
         else
-            res->addItem(label, name, "/gui/icons/screen_other.png");
+            m_widgets.resolutions->addItem(label, name, "/gui/icons/screen_other.png");
 #undef ABOUT_EQUAL
     } // add next resolution
 
-    res->updateItemDisplay();
+    m_widgets.resolutions->updateItemDisplay();
 
     // ---- select current resolution every time
     char searching_for[32];
@@ -307,7 +284,7 @@ void OptionsScreenDisplay::configResolutionsList()
                                          (int)UserConfigParams::m_real_height);
 
 
-    if (!res->setSelection(searching_for, PLAYER_ID_GAME_MASTER,
+    if (!m_widgets.resolutions->setSelection(searching_for, PLAYER_ID_GAME_MASTER,
                           false /* focus it */, true /* even if deactivated*/))
     {
         Log::error("OptionsScreenDisplay", "Cannot find resolution %s", searching_for);
@@ -334,21 +311,17 @@ void OptionsScreenDisplay::updateCamera()
 
 void OptionsScreenDisplay::updateResolutionsList()
 {
-    CheckBoxWidget* full = getWidget<CheckBoxWidget>("fullscreen");
-    assert(full != NULL);
-    bool fullscreen_selected = full->getState();
-    
+    bool fullscreen_selected = m_widgets.fullscreen->getState();
+
     for (auto resolution : m_resolutions)
     {
-        DynamicRibbonWidget* drw = getWidget<DynamicRibbonWidget>("resolutions");
-        assert(drw != NULL);
-        assert(drw->m_rows.size() == 1);
-        
+        assert(m_widgets.resolutions->m_rows.size() == 1);
+
         char name[128];
         sprintf(name, "%ix%i", resolution.width, resolution.height);
-        
-        Widget* w = drw->m_rows[0].findWidgetNamed(name);
-        
+
+        Widget* w = m_widgets.resolutions->m_rows[0].findWidgetNamed(name);
+
         if (w != NULL)
         {
             bool active = !fullscreen_selected || resolution.fullscreen;
@@ -372,33 +345,31 @@ extern "C" void reset_network_body();
 void OptionsScreenDisplay::eventCallback(Widget* widget, const std::string& name,
                                        const int playerID)
 {
-    if (name == "options_choice")
+    if (widget == m_widgets.options_choice)
     {
-        std::string selection = ((RibbonWidget*)widget)->getSelectionIDString(PLAYER_ID_GAME_MASTER);
+        std::string selection = m_widgets.options_choice->getSelectionIDString(PLAYER_ID_GAME_MASTER);
 
         if (selection != "tab_display")
-			OptionsCommon::switchTab(selection);
+            OptionsCommon::switchTab(selection);
     }
-    else if(name == "back")
+    else if (widget == m_widgets.back)
     {
         StateManager::get()->escapePressed();
     }
-    else if(name == "apply_resolution")
+    else if (widget == m_widgets.apply_resolution)
     {
         using namespace GUIEngine;
 
-        DynamicRibbonWidget* w1=getWidget<DynamicRibbonWidget>("resolutions");
-        assert(w1 != NULL);
-        assert(w1->m_rows.size() == 1);
-        
-        int index = w1->m_rows[0].getSelection(PLAYER_ID_GAME_MASTER);
-        Widget* selected_widget = &w1->m_rows[0].getChildren()[index];
-        
+        assert(m_widgets.resolutions->m_rows.size() == 1);
+
+        int index = m_widgets.resolutions->m_rows[0].getSelection(PLAYER_ID_GAME_MASTER);
+        Widget* selected_widget = &m_widgets.resolutions->m_rows[0].getChildren()[index];
+
         if (!selected_widget->isActivated())
             return;
 
         const std::string& res =
-            w1->getSelectionIDString(PLAYER_ID_GAME_MASTER);
+            m_widgets.resolutions->getSelectionIDString(PLAYER_ID_GAME_MASTER);
 
         int w = -1, h = -1;
         if (sscanf(res.c_str(), "%ix%i", &w, &h) != 2 || w == -1 || h == -1)
@@ -407,37 +378,28 @@ void OptionsScreenDisplay::eventCallback(Widget* widget, const std::string& name
             return;
         }
 
-        CheckBoxWidget* w2 = getWidget<CheckBoxWidget>("fullscreen");
-        assert(w2 != NULL);
-
-        irr_driver->changeResolution(w, h, w2->getState());
+        irr_driver->changeResolution(w, h, m_widgets.fullscreen->getState());
     }
-    else if (name == "rememberWinpos")
+    else if (widget == m_widgets.rememberWinpos)
     {
-        CheckBoxWidget* rememberWinpos = getWidget<CheckBoxWidget>("rememberWinpos");
-        UserConfigParams::m_remember_window_location = rememberWinpos->getState();
+        UserConfigParams::m_remember_window_location = m_widgets.rememberWinpos->getState();
     }
-    else if (name == "fullscreen")
+    else if (widget == m_widgets.fullscreen)
     {
-        CheckBoxWidget* fullscreen = getWidget<CheckBoxWidget>("fullscreen");
-        CheckBoxWidget* rememberWinpos = getWidget<CheckBoxWidget>("rememberWinpos");
-
-        rememberWinpos->setActive(!fullscreen->getState());
+        m_widgets.rememberWinpos->setActive(!m_widgets.fullscreen->getState());
         GE::GEVulkanDriver* gevk = GE::getVKDriver();
         if (gevk && GE::getGEConfig()->m_fullscreen_desktop)
         {
-            UserConfigParams::m_fullscreen = fullscreen->getState();
+            UserConfigParams::m_fullscreen = m_widgets.fullscreen->getState();
             update_fullscreen_desktop(UserConfigParams::m_fullscreen);
             OptionsScreenDisplay::m_fullscreen_checkbox_focus = true;
         }
         else
             updateResolutionsList();
     } // fullscreen
-    else if (name == "camera_preset")
+    else if (widget == m_widgets.camera_preset)
     {
-        GUIEngine::SpinnerWidget* camera_preset = getWidget<GUIEngine::SpinnerWidget>("camera_preset");
-        assert( camera_preset != NULL );
-        unsigned int i = camera_preset->getValue();
+        unsigned int i = m_widgets.camera_preset->getValue();
         UserConfigParams::m_camera_present = i;
         if (i == 1) // Standard
         {
@@ -474,15 +436,13 @@ void OptionsScreenDisplay::eventCallback(Widget* widget, const std::string& name
         }
         updateCamera();
     }
-    else if(name == "custom_camera")
+    else if (widget == m_widgets.custom_camera)
     {
         new CustomCameraSettingsDialog(0.8f, 0.95f);
     }
-    else if (name == "splitscreen_method")
+    else if (widget == m_widgets.splitscreen_method)
     {
-        GUIEngine::SpinnerWidget* splitscreen_method = getWidget<GUIEngine::SpinnerWidget>("splitscreen_method");
-        assert( splitscreen_method != NULL );
-        UserConfigParams::m_split_screen_horizontally = (splitscreen_method->getValue() == 1);
+        UserConfigParams::m_split_screen_horizontally = (m_widgets.splitscreen_method->getValue() == 1);
         if (World::getWorld())
         {
             for (unsigned i = 0; i < Camera::getNumCameras(); i++)

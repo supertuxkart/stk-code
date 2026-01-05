@@ -16,12 +16,13 @@
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #ifndef HEADER_ADDONS_SCREEN_HPP
-#define HEADER_ADDONS_SCREEN_HPP\
+#define HEADER_ADDONS_SCREEN_HPP
 
 #include "addons/addons_manager.hpp"
 #include "guiengine/screen.hpp"
 #include "guiengine/widgets/list_widget.hpp"
 #include "guiengine/widgets/text_box_widget.hpp"
+#include "generated/gui/screens/addons_screen_widgets.hpp"
 
 /* used for the installed/unsinstalled icons*/
 namespace irr { namespace gui { class STKModifiedSpriteBank; } }
@@ -48,6 +49,7 @@ class AddonsScreen : public GUIEngine::Screen,
     friend class GUIEngine::ScreenSingleton<AddonsScreen>;
 private:
     AddonsScreen();
+    GUIEngine::AddonsScreenWidgets m_widgets;
     AddonsLoading   *m_load;
     void             loadInformations();
     /** Icon for installed addon, which can be updated. */

@@ -133,6 +133,25 @@ endif()
 set(STK_SOURCE_DIR "src")
 set(STK_DATA_DIR "${PROJECT_SOURCE_DIR}/data")
 
+# Generate type-safe GUI widget headers from .stkgui files
+find_package(Python3 QUIET)
+if(Python3_FOUND)
+    message(STATUS "Generating GUI widget headers...")
+    execute_process(
+        COMMAND ${Python3_EXECUTABLE}
+                ${PROJECT_SOURCE_DIR}/tools/generate_gui_headers.py
+                --output-dir ${PROJECT_SOURCE_DIR}/src/generated/gui
+                --gui-dir ${STK_DATA_DIR}/gui
+        WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}
+        RESULT_VARIABLE GUI_GEN_RESULT
+    )
+    if(NOT GUI_GEN_RESULT EQUAL 0)
+        message(WARNING "GUI widget header generation failed")
+    endif()
+else()
+    message(STATUS "Python3 not found, skipping GUI widget header generation")
+endif()
+
 # CMAKE_RUNTIME_OUTPUT_DIRECTORY removes dSYMs in Xcode archive
 if(NOT CMAKE_GENERATOR MATCHES "Xcode")
     set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${PROJECT_BINARY_DIR}/bin")

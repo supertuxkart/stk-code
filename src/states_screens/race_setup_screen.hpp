@@ -19,6 +19,7 @@
 #define HEADER_RACE_SETUP_SCREEN_HPP
 
 #include "guiengine/screen.hpp"
+#include "generated/gui/screens/race_setup_widgets.hpp"
 
 namespace GUIEngine { class Widget; }
 
@@ -31,6 +32,8 @@ class RaceSetupScreen : public GUIEngine::Screen, public GUIEngine::ScreenSingle
     friend class GUIEngine::ScreenSingleton<RaceSetupScreen>;
 
     RaceSetupScreen();
+
+    GUIEngine::RaceSetupWidgets m_widgets;
 
     void onGameModeChanged();
 

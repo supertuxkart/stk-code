@@ -19,6 +19,7 @@
 #define HEADER_ENTER_ADDRESS_DIALOG_HPP
 
 #include "guiengine/modaldialog.hpp"
+#include "generated/gui/dialogs/enter_address_dialog_widgets.hpp"
 #include "utils/cpp2011.hpp"
 #include <memory>
 
@@ -37,6 +38,7 @@ namespace GUIEngine
 class EnterAddressDialog : public GUIEngine::ModalDialog
 {
 private:
+    GUIEngine::EnterAddressDialogWidgets m_widgets;
     GUIEngine::LabelWidget* m_title;
     GUIEngine::TextBoxWidget* m_text_field;
     std::shared_ptr<Server>* m_entered_server;

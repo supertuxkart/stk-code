@@ -24,6 +24,8 @@
 #include "guiengine/screen.hpp"
 #include "guiengine/widgets/spinner_widget.hpp"
 #include "input/input.hpp"
+#include "generated/gui/screens/options/user_screen_tab_widgets.hpp"
+
 namespace GUIEngine
 {
     class CheckBoxWidget;
@@ -154,6 +156,8 @@ class TabbedUserScreen : public BaseUserScreen,
 private:
     TabbedUserScreen() : BaseUserScreen("options/user_screen_tab.stkgui")
     {}
+
+    GUIEngine::UserScreenTabWidgets m_widgets;
 
 public:
     friend class GUIEngine::ScreenSingleton<TabbedUserScreen>;

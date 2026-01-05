@@ -85,12 +85,8 @@ void OnlineScreen::loadedFromFile()
     m_icon_news_headline = m_icon_bank->addTextureAsSprite(icon2);
     m_icon_news          = m_icon_bank->addTextureAsSprite(icon3);
 
-    m_enable_splitscreen = getWidget<CheckBoxWidget>("enable-splitscreen");
-    assert(m_enable_splitscreen);
-
-    m_news_list = getWidget<GUIEngine::ListWidget>("news_list");
-    assert(m_news_list);
-    m_news_list->setColumnListener(this);
+    m_widgets.bind(this);
+    m_widgets.news_list->setColumnListener(this);
 }   // loadedFromFile
 
 // ----------------------------------------------------------------------------
@@ -105,9 +101,9 @@ void OnlineScreen::unloaded()
 
 void OnlineScreen::beforeAddingWidget()
 {
-    m_news_list->clearColumns();
-    m_news_list->addColumn( _("News from STK Blog"), 4 );
-    m_news_list->addColumn( _("Date"), 1 );
+    m_widgets.news_list->clearColumns();
+    m_widgets.news_list->addColumn( _("News from STK Blog"), 4 );
+    m_widgets.news_list->addColumn( _("Date"), 1 );
 } // beforeAddingWidget
 
 // ----------------------------------------------------------------------------
@@ -116,23 +112,16 @@ void OnlineScreen::init()
 {
     Screen::init();
 
-    m_online = getWidget<IconButtonWidget>("online");
-    assert(m_online);
-
-    m_user_id = getWidget<ButtonWidget>("user-id");
-    assert(m_user_id);
-
     m_icon_bank->setScale(1.0f / 72.0f);
     m_icon_bank->setTargetIconSize(128, 128);
-    m_news_list->setIcons(m_icon_bank, 2.0f);
+    m_widgets.news_list->setIcons(m_icon_bank, 2.0f);
 
-    RibbonWidget* r = getWidget<RibbonWidget>("menu_toprow");
-    r->setFocusForPlayer(PLAYER_ID_GAME_MASTER);
+    m_widgets.menu_toprow->setFocusForPlayer(PLAYER_ID_GAME_MASTER);
 
-    m_enable_splitscreen->setState(
+    m_widgets.enable_splitscreen->setState(
         UserConfigParams::m_enable_network_splitscreen);
     // Pre-add a default single player profile in network
-    if (!m_enable_splitscreen->getState() &&
+    if (!m_widgets.enable_splitscreen->getState() &&
         NetworkConfig::get()->getNetworkPlayers().empty())
     {
         NetworkConfig::get()->addNetworkPlayer(
@@ -156,7 +145,7 @@ void OnlineScreen::loadList()
     NewsManager::get()->resetNewsPtr(NewsManager::NTYPE_LIST);
     NewsManager::get()->prioritizeNewsAfterID(NewsManager::NTYPE_LIST, last_shown_id);
 
-    m_news_list->clear();
+    m_widgets.news_list->clear();
     m_news_links.clear();
 
     if (news_count == 0)
@@ -164,7 +153,7 @@ void OnlineScreen::loadList()
         std::vector<GUIEngine::ListWidget::ListCell> row;
         row.push_back(GUIEngine::ListWidget::ListCell(
             _("There are currently no news available."), -1, 4, false));
-        m_news_list->addItem("-1", row);
+        m_widgets.news_list->addItem("-1", row);
     }
 
     while (news_count--)
@@ -177,7 +166,7 @@ void OnlineScreen::loadList()
         {
             std::vector<GUIEngine::ListWidget::ListCell> row;
             row.push_back(GUIEngine::ListWidget::ListCell(str.c_str(), -1, 4, false));
-            m_news_list->addItem(id_str.c_str(), row);
+            m_widgets.news_list->addItem(id_str.c_str(), row);
             continue;
         }
 
@@ -186,10 +175,10 @@ void OnlineScreen::loadList()
             m_icon_news_headline : m_icon_news;
 
         m_news_links[id_str] = NewsManager::get()->getCurrentNewsLink(NewsManager::NTYPE_LIST);
-        
+
         if (id > UserConfigParams::m_news_list_shown_id)
             icon = m_icon_red_dot;
-        
+
         last_shown_id = std::max(id, last_shown_id);
 
         // Date format
@@ -200,7 +189,7 @@ void OnlineScreen::loadList()
         std::vector<GUIEngine::ListWidget::ListCell> row;
         row.push_back(GUIEngine::ListWidget::ListCell(str.c_str(), icon, 4, false));
         row.push_back(GUIEngine::ListWidget::ListCell(date.c_str(), -1, 1, true));
-        m_news_list->addItem(id_str.c_str(), row);
+        m_widgets.news_list->addItem(id_str.c_str(), row);
     }
 
     UserConfigParams::m_news_list_shown_id = last_shown_id;
@@ -216,24 +205,24 @@ void OnlineScreen::onUpdate(float delta)
     if (PlayerManager::getCurrentOnlineState() == PlayerProfile::OS_GUEST  ||
         PlayerManager::getCurrentOnlineState() == PlayerProfile::OS_SIGNED_IN)
     {
-        m_online->setActive(true);
-        m_online->setLabel(m_online_string);
-        m_user_id->setText(player->getLastOnlineName() + "@stk");
+        m_widgets.online->setActive(true);
+        m_widgets.online->setLabel(m_online_string);
+        m_widgets.user_id->setText(player->getLastOnlineName() + "@stk");
     }
     else if (PlayerManager::getCurrentOnlineState() == PlayerProfile::OS_SIGNED_OUT)
     {
-        m_online->setActive(true);
-        m_online->setLabel(m_login_string);
-        m_user_id->setText(player->getName());
+        m_widgets.online->setActive(true);
+        m_widgets.online->setLabel(m_login_string);
+        m_widgets.user_id->setText(player->getName());
     }
     else
     {
         // now must be either logging in or logging out
-        m_online->setActive(false);
-        m_user_id->setText(player->getName());
+        m_widgets.online->setActive(false);
+        m_widgets.user_id->setText(player->getName());
     }
 
-    m_online->setLabel(PlayerManager::getCurrentOnlineId() ? m_online_string
+    m_widgets.online->setLabel(PlayerManager::getCurrentOnlineId() ? m_online_string
                                                            : m_login_string);
     // In case for entering server address finished
     if (m_entered_server)
@@ -255,7 +244,7 @@ void OnlineScreen::eventCallback(Widget* widget, const std::string& name,
                                    const int playerID)
 {
 #ifndef SERVER_ONLY
-    if (name == "user-id")
+    if (widget == m_widgets.user_id)
     {
         NetworkConfig::get()->cleanNetworkPlayers();
         UserScreen::getInstance()->push();
@@ -266,20 +255,18 @@ void OnlineScreen::eventCallback(Widget* widget, const std::string& name,
         StateManager::get()->escapePressed();
         return;
     }
-    else if (name == "news_list")
+    else if (widget == m_widgets.news_list)
     {
-        std::string id = m_news_list->getSelectionInternalName();
+        std::string id = m_widgets.news_list->getSelectionInternalName();
 
         if (!m_news_links[id].empty())
         {
             Online::LinkHelper::openURL(m_news_links[id]);
         }
     }
-    else if (name == "enable-splitscreen")
+    else if (widget == m_widgets.enable_splitscreen)
     {
-        CheckBoxWidget* splitscreen = dynamic_cast<CheckBoxWidget*>(widget);
-        assert(splitscreen);
-        if (!splitscreen->getState())
+        if (!m_widgets.enable_splitscreen->getState())
         {
             // Default single player
             NetworkConfig::get()->cleanNetworkPlayers();
@@ -293,7 +280,7 @@ void OnlineScreen::eventCallback(Widget* widget, const std::string& name,
             // Let lobby add the players
             NetworkConfig::get()->cleanNetworkPlayers();
         }
-        UserConfigParams::m_enable_network_splitscreen = splitscreen->getState();
+        UserConfigParams::m_enable_network_splitscreen = m_widgets.enable_splitscreen->getState();
         return;
     }
 

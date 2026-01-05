@@ -52,6 +52,7 @@ void OptionsScreenDevice::loadedFromFile()
 
 void OptionsScreenDevice::beforeAddingWidget()
 {
+    // Note: m_widgets.bind() hasn't been called yet, so we use getWidget here
     ListWidget* w_list = getWidget<GUIEngine::ListWidget>("actions");
     assert(w_list != NULL);
     w_list->clearColumns();
@@ -67,32 +68,29 @@ void OptionsScreenDevice::init()
     Screen::init();
     OptionsCommon::setTabStatus();
 
-    RibbonWidget* tabBar = getWidget<RibbonWidget>("options_choice");
-    assert(tabBar != NULL);
-    // Focus is set to the actions list later in the init
-    tabBar->select( "tab_controls", PLAYER_ID_GAME_MASTER );
+    // Bind typed widget pointers (one-time lookup)
+    m_widgets.bind(this);
 
-    ButtonWidget* delete_button = getWidget<ButtonWidget>("delete");
-    ButtonWidget* disable_toggle = getWidget<ButtonWidget>("disable_toggle");
+    // Focus is set to the actions list later in the init
+    m_widgets.options_choice->select( "tab_controls", PLAYER_ID_GAME_MASTER );
 
     core::stringw label;
 
-    CheckBoxWidget* ff = getWidget<CheckBoxWidget>("force_feedback");
-    ff->setVisible(!m_config->isKeyboard());
-    getWidget("force_feedback_text")->setVisible(!m_config->isKeyboard());
+    m_widgets.force_feedback->setVisible(!m_config->isKeyboard());
+    m_widgets.force_feedback_text->setVisible(!m_config->isKeyboard());
     if (!m_config->isKeyboard())
     {
         // Only allow to enable or disable a gamepad,
         // as it is only in the list when connected
-        delete_button->setActive(false);
-        disable_toggle->setActive(true);
+        m_widgets.delete_->setActive(false);
+        m_widgets.disable_toggle->setActive(true);
 
         label = (m_config->isEnabled()
                 ? //I18N: button to disable a gamepad configuration
                     _("Disable Device")
                 : //I18N: button to enable a gamepad configuration
                     _("Enable Device"));
-        ff->setState(
+        m_widgets.force_feedback->setState(
             static_cast<GamepadConfig*>(m_config)->useForceFeedback());
     }
     else
@@ -101,8 +99,8 @@ void OptionsScreenDevice::init()
         bool enable = (input_manager->getDeviceManager()
                             ->getActiveKeyboardAmount() > 1 ||
                         !m_config->isEnabled());
-        delete_button->setActive(enable);
-        disable_toggle->setActive(enable);
+        m_widgets.delete_->setActive(enable);
+        m_widgets.disable_toggle->setActive(enable);
 
         label = (m_config->isEnabled()
                 ? //I18N: button to disable a keyboard configuration
@@ -115,81 +113,76 @@ void OptionsScreenDevice::init()
     // from the original value
     core::dimension2d<u32> size =
         GUIEngine::getFont()->getDimension(label.c_str());
-    const int needed = size.Width + disable_toggle->getWidthNeededAroundLabel();
-    if (disable_toggle->m_w < needed) disable_toggle->m_w = needed;
+    const int needed = size.Width + m_widgets.disable_toggle->getWidthNeededAroundLabel();
+    if (m_widgets.disable_toggle->m_w < needed) m_widgets.disable_toggle->m_w = needed;
 
-    disable_toggle->setLabel(label);
+    m_widgets.disable_toggle->setLabel(label);
 
     // Make the three buttons the same length, not strictly needed but will
     // look nicer...
-    ButtonWidget* backBtn = getWidget<ButtonWidget>("back_to_device_list");
-    if (disable_toggle->m_w < delete_button->m_w)
+    if (m_widgets.disable_toggle->m_w < m_widgets.delete_->m_w)
     {
-        disable_toggle->m_w = delete_button->m_w;
+        m_widgets.disable_toggle->m_w = m_widgets.delete_->m_w;
     }
     else
     {
-        delete_button->m_w = disable_toggle->m_w;
+        m_widgets.delete_->m_w = m_widgets.disable_toggle->m_w;
     }
     // At this point, the delete button has the same width as the disable button.
     // One comparison is enough.
-    if (backBtn->m_w < delete_button->m_w)
+    if (m_widgets.back_to_device_list->m_w < m_widgets.delete_->m_w)
     {
-        backBtn->m_w   = delete_button->m_w;
+        m_widgets.back_to_device_list->m_w   = m_widgets.delete_->m_w;
     }
     else
     {
-        disable_toggle->m_w = backBtn->m_w;
-        delete_button->m_w  = backBtn->m_w;
+        m_widgets.disable_toggle->m_w = m_widgets.back_to_device_list->m_w;
+        m_widgets.delete_->m_w  = m_widgets.back_to_device_list->m_w;
     }
 
-    backBtn->moveIrrlichtElement();
-    delete_button->moveIrrlichtElement();
-    disable_toggle->moveIrrlichtElement();
+    m_widgets.back_to_device_list->moveIrrlichtElement();
+    m_widgets.delete_->moveIrrlichtElement();
+    m_widgets.disable_toggle->moveIrrlichtElement();
 
-    LabelWidget* label_widget = getWidget<LabelWidget>("title");
-    label_widget->setText( m_config->getName().c_str(), false );
+    m_widgets.title->setText( m_config->getName().c_str(), false );
 
     // ---- create list skeleton (right number of items, right internal names)
     //      their actualy contents will be adapted as needed after
 
-    ListWidget* actions = getWidget<GUIEngine::ListWidget>("actions");
-    assert( actions != NULL );
-
     //I18N: Key binding section
-    addListItemSubheader(actions, "game_keys_section", _("Game Keys"));
-    addListItem(actions, PA_STEER_LEFT);
-    addListItem(actions, PA_STEER_RIGHT);
-    addListItem(actions, PA_ACCEL);
-    addListItem(actions, PA_BRAKE);
-    addListItem(actions, PA_FIRE);
-    addListItem(actions, PA_NITRO);
-    addListItem(actions, PA_DRIFT);
-    addListItem(actions, PA_LOOK_BACK);
-    addListItem(actions, PA_RESCUE);
-    addListItem(actions, PA_PAUSE_RACE);
+    addListItemSubheader(m_widgets.actions, "game_keys_section", _("Game Keys"));
+    addListItem(m_widgets.actions, PA_STEER_LEFT);
+    addListItem(m_widgets.actions, PA_STEER_RIGHT);
+    addListItem(m_widgets.actions, PA_ACCEL);
+    addListItem(m_widgets.actions, PA_BRAKE);
+    addListItem(m_widgets.actions, PA_FIRE);
+    addListItem(m_widgets.actions, PA_NITRO);
+    addListItem(m_widgets.actions, PA_DRIFT);
+    addListItem(m_widgets.actions, PA_LOOK_BACK);
+    addListItem(m_widgets.actions, PA_RESCUE);
+    addListItem(m_widgets.actions, PA_PAUSE_RACE);
 
 
     //I18N: Key binding section
-    addListItemSubheader(actions, "menu_keys_section", _("Menu Keys"));
-    addListItem(actions, PA_MENU_UP);
-    addListItem(actions, PA_MENU_DOWN);
-    addListItem(actions, PA_MENU_LEFT);
-    addListItem(actions, PA_MENU_RIGHT);
-    addListItem(actions, PA_MENU_SELECT);
-    addListItem(actions, PA_MENU_CANCEL);
+    addListItemSubheader(m_widgets.actions, "menu_keys_section", _("Menu Keys"));
+    addListItem(m_widgets.actions, PA_MENU_UP);
+    addListItem(m_widgets.actions, PA_MENU_DOWN);
+    addListItem(m_widgets.actions, PA_MENU_LEFT);
+    addListItem(m_widgets.actions, PA_MENU_RIGHT);
+    addListItem(m_widgets.actions, PA_MENU_SELECT);
+    addListItem(m_widgets.actions, PA_MENU_CANCEL);
 
     updateInputButtons();
 
     // Focus the list and select its first item
-    actions->setFocusForPlayer(PLAYER_ID_GAME_MASTER);
-    actions->setSelectionID(0);
+    m_widgets.actions->setFocusForPlayer(PLAYER_ID_GAME_MASTER);
+    m_widgets.actions->setSelectionID(0);
 
     // Disable deleting or disabling configuration mid-race
     if (StateManager::get()->getGameState() == GUIEngine::INGAME_MENU)
     {
-        delete_button->setActive(false);
-        disable_toggle->setActive(false);
+        m_widgets.delete_->setActive(false);
+        m_widgets.disable_toggle->setActive(false);
     }
 }   // init
 
@@ -237,62 +230,58 @@ void OptionsScreenDevice::updateInputButtons()
 
     //TODO: detect duplicates
 
-    GUIEngine::ListWidget* actions =
-        getWidget<GUIEngine::ListWidget>("actions");
-    assert( actions != NULL );
-
     int i = 0;
     i++; // section header
 
     //I18N: Key binding name
-    renameRow(actions, i++, _("Steer Left"), PA_STEER_LEFT);
+    renameRow(m_widgets.actions, i++, _("Steer Left"), PA_STEER_LEFT);
 
     //I18N: Key binding name
-    renameRow(actions, i++, _("Steer Right"), PA_STEER_RIGHT);
+    renameRow(m_widgets.actions, i++, _("Steer Right"), PA_STEER_RIGHT);
 
     //I18N: Key binding name
-    renameRow(actions, i++, _("Accelerate"), PA_ACCEL);
+    renameRow(m_widgets.actions, i++, _("Accelerate"), PA_ACCEL);
 
     //I18N: Key binding name
-    renameRow(actions, i++, _("Brake / Reverse"), PA_BRAKE);
+    renameRow(m_widgets.actions, i++, _("Brake / Reverse"), PA_BRAKE);
 
     //I18N: Key binding name
-    renameRow(actions, i++, _("Fire"), PA_FIRE);
+    renameRow(m_widgets.actions, i++, _("Fire"), PA_FIRE);
 
     //I18N: Key binding name
-    renameRow(actions, i++, _("Nitro"), PA_NITRO);
+    renameRow(m_widgets.actions, i++, _("Nitro"), PA_NITRO);
 
     //I18N: Key binding name
-    renameRow(actions, i++, _("Skidding"), PA_DRIFT);
+    renameRow(m_widgets.actions, i++, _("Skidding"), PA_DRIFT);
 
     //I18N: Key binding name
-    renameRow(actions, i++, _("Look Back"), PA_LOOK_BACK);
+    renameRow(m_widgets.actions, i++, _("Look Back"), PA_LOOK_BACK);
 
     //I18N: Key binding name
-    renameRow(actions, i++, _("Rescue"), PA_RESCUE);
+    renameRow(m_widgets.actions, i++, _("Rescue"), PA_RESCUE);
 
     //I18N: Key binding name
-    renameRow(actions, i++, _("Pause Game"), PA_PAUSE_RACE);
+    renameRow(m_widgets.actions, i++, _("Pause Game"), PA_PAUSE_RACE);
 
     i++; // section header
 
     //I18N: Key binding name
-    renameRow(actions, i++, _("Up"), PA_MENU_UP);
+    renameRow(m_widgets.actions, i++, _("Up"), PA_MENU_UP);
 
     //I18N: Key binding name
-    renameRow(actions, i++, _("Down"), PA_MENU_DOWN);
+    renameRow(m_widgets.actions, i++, _("Down"), PA_MENU_DOWN);
 
     //I18N: Key binding name
-    renameRow(actions, i++, _("Left"), PA_MENU_LEFT);
+    renameRow(m_widgets.actions, i++, _("Left"), PA_MENU_LEFT);
 
     //I18N: Key binding name
-    renameRow(actions, i++, _("Right"), PA_MENU_RIGHT);
+    renameRow(m_widgets.actions, i++, _("Right"), PA_MENU_RIGHT);
 
     //I18N: Key binding name
-    renameRow(actions, i++, _("Select"), PA_MENU_SELECT);
+    renameRow(m_widgets.actions, i++, _("Select"), PA_MENU_SELECT);
 
     //I18N: Key binding name
-    renameRow(actions, i++, _("Cancel/Back"), PA_MENU_CANCEL);
+    renameRow(m_widgets.actions, i++, _("Cancel/Back"), PA_MENU_CANCEL);
 
 
 
@@ -314,13 +303,13 @@ void OptionsScreenDevice::updateInputButtons()
                                              PA_LAST_GAME_ACTION))
             {
                 conflicts_between = true;
-                actions->markItemBlue (KartActionStrings[action]);
+                m_widgets.actions->markItemBlue (KartActionStrings[action]);
             }
         }
         else
         {
             // binding conflict!
-            actions->markItemRed( KartActionStrings[action] );
+            m_widgets.actions->markItemRed( KartActionStrings[action] );
 
             // also mark others
             for (PlayerAction others = PA_FIRST_GAME_ACTION;
@@ -331,11 +320,11 @@ void OptionsScreenDevice::updateInputButtons()
                 if (others_item == item)
                 {
                     conflicts_inside = true;
-                    actions->markItemRed( KartActionStrings[others] );
+                    m_widgets.actions->markItemRed( KartActionStrings[others] );
                 }
             }
 
-            //actions->renameItem( KartActionStrings[action],
+            //m_widgets.actions->renameItem( KartActionStrings[action],
             //                    _("Binding Conflict!") );
         }
     }
@@ -356,13 +345,13 @@ void OptionsScreenDevice::updateInputButtons()
                                              PA_LAST_MENU_ACTION))
             {
                 conflicts_between = true;
-                actions->markItemBlue (KartActionStrings[action]);
+                m_widgets.actions->markItemBlue (KartActionStrings[action]);
             }
         }
         else   // existing key
         {
             // binding conflict!
-            actions->markItemRed( KartActionStrings[action] );
+            m_widgets.actions->markItemRed( KartActionStrings[action] );
 
             // also mark others
             for (PlayerAction others = PA_FIRST_MENU_ACTION;
@@ -373,7 +362,7 @@ void OptionsScreenDevice::updateInputButtons()
                 if (others_item == item)
                 {
                     conflicts_inside = true;
-                    actions->markItemRed( KartActionStrings[others] );
+                    m_widgets.actions->markItemRed( KartActionStrings[others] );
                 }
             }   // for others < action
 
@@ -517,29 +506,25 @@ void OptionsScreenDevice::eventCallback(Widget* widget,
     //const std::string& screen_name = getName();
 
     StateManager *sm = StateManager::get();
-    if (name == "options_choice")
+    if (widget == m_widgets.options_choice)
     {
-        std::string selection = ((RibbonWidget*)widget)->getSelectionIDString(PLAYER_ID_GAME_MASTER);
+        std::string selection = m_widgets.options_choice->getSelectionIDString(PLAYER_ID_GAME_MASTER);
 
         if (selection != "tab_controls")
             OptionsCommon::switchTab(selection);
     }
-    else if (name == "back_to_device_list")
+    else if (widget == m_widgets.back_to_device_list)
     {
         sm->replaceTopMostScreen(OptionsScreenInput::getInstance());
     }
-    else if (name == "back")
+    else if (widget == m_widgets.back)
     {
         sm->replaceTopMostScreen(OptionsScreenInput::getInstance());
     }
-    else if (name == "actions")
+    else if (widget == m_widgets.actions)
     {
-        GUIEngine::ListWidget* actions =
-            getWidget<GUIEngine::ListWidget>("actions");
-        assert( actions != NULL );
-
         // a player action in the list was clicked. find which one
-        const std::string& clicked = actions->getSelectionInternalName();
+        const std::string& clicked = m_widgets.actions->getSelectionInternalName();
         for (int n=PA_BEFORE_FIRST+1; n<PA_COUNT; n++)
         {
             if (KartActionStrings[n] == clicked)
@@ -572,7 +557,7 @@ void OptionsScreenDevice::eventCallback(Widget* widget,
             }
         }
     }
-    else if (name == "delete")
+    else if (widget == m_widgets.delete_)
     {
        // keyboard configs may be deleted
        // They should be the only one to have the button enabled
@@ -581,28 +566,27 @@ void OptionsScreenDevice::eventCallback(Widget* widget,
                              "this configuration?"),
             MessageDialog::MESSAGE_DIALOG_CONFIRM, this, false );
     }
-    else if (name == "disable_toggle")
+    else if (widget == m_widgets.disable_toggle)
     {
         // gamepad and keyboard configs may be disabled
         if (m_config->isEnabled())  m_config->setEnabled(false);
         else                        m_config->setEnabled(true);
 
         // update widget label
-        ButtonWidget* disable_toggle = getWidget<ButtonWidget>("disable_toggle");
         if (!m_config->isKeyboard())
         {
-            disable_toggle->setLabel(m_config->isEnabled() ? _("Disable Device")
+            m_widgets.disable_toggle->setLabel(m_config->isEnabled() ? _("Disable Device")
                                                           : _("Enable Device")  );
         }
         else
         {
-            disable_toggle->setLabel(m_config->isEnabled() ? _("Disable Configuration")
+            m_widgets.disable_toggle->setLabel(m_config->isEnabled() ? _("Disable Configuration")
                                                           : _("Enable Configuration")  );
         }
 
         input_manager->getDeviceManager()->save();
     }
-    else if (name == "rename_config")
+    else if (widget == m_widgets.rename_config)
     {
         core::stringw instruction =
             _("Enter new configuration name, leave empty to revert default value.");
@@ -617,17 +601,16 @@ void OptionsScreenDevice::eventCallback(Widget* widget,
                 input_manager->getDeviceManager()->save();
                 return true;
             });
-        
+
         // Prefill the textbox with the current configuration name
         dialog->getTextField()->setText(the_config->getConfigName());
     }
-    else if (name == "force_feedback")
+    else if (widget == m_widgets.force_feedback)
     {
         GamepadConfig* gc = dynamic_cast<GamepadConfig*>(m_config);
         if (gc)
         {
-            gc->setForceFeedback(
-                getWidget<CheckBoxWidget>("force_feedback")->getState());
+            gc->setForceFeedback(m_widgets.force_feedback->getState());
             input_manager->getDeviceManager()->save();
         }
     }

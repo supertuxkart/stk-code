@@ -22,6 +22,7 @@
 #include <string>
 
 #include "guiengine/screen.hpp"
+#include "generated/gui/screens/options/options_display_widgets.hpp"
 
 namespace GUIEngine { class Widget; }
 
@@ -65,6 +66,7 @@ private:
     OptionsScreenDisplay();
     bool m_inited;
     std::vector<Resolution> m_resolutions;
+    GUIEngine::OptionsDisplayWidgets m_widgets;
 
     void updateResolutionsList();
     void configResolutionsList();

@@ -56,8 +56,9 @@ GhostReplayInfoDialog::GhostReplayInfoDialog(unsigned int replay_id,
     m_rd = ReplayPlay::get()->getReplayData(m_replay_id);
 
     loadFromFile("ghost_replay_info_dialog.stkgui");
+    m_widgets.bind(this);
 
-    m_info_widget = getWidget<BubbleWidget>("info");
+    m_info_widget = m_widgets.info;
     if (m_rd.m_info == "")
         m_info_widget->setVisible(false);
     else
@@ -65,7 +66,7 @@ GhostReplayInfoDialog::GhostReplayInfoDialog(unsigned int replay_id,
 
     Track* track = track_manager->getTrack(m_rd.m_track_name);
 
-    m_track_screenshot_widget = getWidget<IconButtonWidget>("track_screenshot");
+    m_track_screenshot_widget = m_widgets.track_screenshot;
     m_track_screenshot_widget->setFocusable(false);
     m_track_screenshot_widget->m_tab_stop = false;
 
@@ -85,7 +86,7 @@ GhostReplayInfoDialog::GhostReplayInfoDialog(unsigned int replay_id,
 
     // TODO : small refinement, add the possibility to tab stops for lists
     //        to make this unselectable by keyboard/mouse
-    m_replay_info_widget = getWidget<GUIEngine::ListWidget>("current_replay_info");
+    m_replay_info_widget = m_widgets.current_replay_info;
     assert(m_replay_info_widget != NULL);
 
     /* Used to display kart icons for the selected replay(s) */
@@ -94,26 +95,24 @@ GhostReplayInfoDialog::GhostReplayInfoDialog(unsigned int replay_id,
 
     updateReplayDisplayedInfo();
 
-    LabelWidget *name = getWidget<LabelWidget>("name");
-    assert(name);
-    name->setText(stringw((m_rd.m_custom_replay_file ? StringUtils::getBasename
+    m_widgets.name->setText(stringw((m_rd.m_custom_replay_file ? StringUtils::getBasename
         (m_rd.m_filename) : m_rd.m_filename).c_str()), false);
 
-    m_back_widget = getWidget<IconButtonWidget>("back");
+    m_back_widget = m_widgets.back;
 
     // Non-deletable for custom (standard) replay file
-    getWidget<IconButtonWidget>("remove")->setActive(!m_rd.m_custom_replay_file);
+    m_widgets.remove->setActive(!m_rd.m_custom_replay_file);
 
-    m_action_widget = getWidget<RibbonWidget>("actions");
-    m_record_widget = getWidget<CheckBoxWidget>("record-race");
-    m_watch_widget = getWidget<CheckBoxWidget>("watch-only");
-    m_compare_widget = getWidget<CheckBoxWidget>("compare-ghost");
+    m_action_widget = m_widgets.actions;
+    m_record_widget = m_widgets.record_race;
+    m_watch_widget = m_widgets.watch_only;
+    m_compare_widget = m_widgets.compare_ghost;
 
     if (RaceManager::get()->getNumLocalPlayers() > 1)
     {
         // No watching replay when split-screen
         m_watch_widget->setVisible(false);
-        getWidget<LabelWidget>("watch-only-text")->setVisible(false);
+        m_widgets.watch_only_text->setVisible(false);
     }
 
     m_record_widget->setState(false);
@@ -127,11 +126,11 @@ GhostReplayInfoDialog::GhostReplayInfoDialog(unsigned int replay_id,
         m_record_race = false;
         m_record_widget->setState(false);
         m_record_widget->setVisible(false);
-        getWidget<LabelWidget>("record-race-text")->setVisible(false);
+        m_widgets.record_race_text->setVisible(false);
     }
 
     // Display this checkbox only if there is another replay file to compare with
-    getWidget<LabelWidget>("compare-ghost-text")->setVisible(m_compare_ghost);
+    m_widgets.compare_ghost_text->setVisible(m_compare_ghost);
     m_compare_widget->setVisible(m_compare_ghost);
 
 
@@ -326,7 +325,7 @@ GUIEngine::EventPropagation
         m_record_race = false;
         m_record_widget->setState(false);
         m_record_widget->setVisible(!m_watch_only);
-        getWidget<LabelWidget>("record-race-text")->setVisible(!m_watch_only);
+        m_widgets.record_race_text->setVisible(!m_watch_only);
         if (!m_watch_only && m_compare_ghost)
         {
             m_compare_ghost = false;
@@ -353,7 +352,7 @@ GUIEngine::EventPropagation
             m_watch_widget->setActive(true);
         }
         m_record_widget->setVisible(!m_watch_only);
-        getWidget<LabelWidget>("record-race-text")->setVisible(!m_watch_only);
+        m_widgets.record_race_text->setVisible(!m_watch_only);
 
         refreshMainScreen();
 

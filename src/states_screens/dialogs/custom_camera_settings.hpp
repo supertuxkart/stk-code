@@ -20,6 +20,7 @@
 #define HEADER_CUSTOM_CAMERA_SETTINGS_HPP
 
 #include "guiengine/modaldialog.hpp"
+#include "generated/gui/dialogs/custom_camera_settings_widgets.hpp"
 
 /**
  * \brief Dialog that allows the player to select custom video settings
@@ -28,6 +29,7 @@
 class CustomCameraSettingsDialog : public GUIEngine::ModalDialog
 {
 private:
+    GUIEngine::CustomCameraSettingsWidgets m_widgets;
     bool m_self_destroy;
 public:
     /**

@@ -48,6 +48,7 @@ void OptionsScreenUI::loadedFromFile()
 {
     m_inited = false;
 
+    // Note: m_widgets.bind() is called later in init(), so use getWidget here
     m_base_skin_selector = getWidget<GUIEngine::SpinnerWidget>("base_skinchoice");
     m_variant_skin_selector = getWidget<GUIEngine::SpinnerWidget>("variant_skinchoice");
     assert( m_base_skin_selector != NULL );
@@ -62,17 +63,17 @@ void OptionsScreenUI::loadedFromFile()
 
     minimap_options->m_properties[PROP_WRAP_AROUND] = "true";
     minimap_options->clearLabels();
-    //I18N: In the UI options, minimap position in the race UI 
+    //I18N: In the UI options, minimap position in the race UI
     minimap_options->addLabel( core::stringw(_("In the bottom-left")));
-    //I18N: In the UI options, minimap position in the race UI 
+    //I18N: In the UI options, minimap position in the race UI
     minimap_options->addLabel( core::stringw(_("On the right side")));
-    //I18N: In the UI options, minimap position in the race UI 
+    //I18N: In the UI options, minimap position in the race UI
     minimap_options->addLabel( core::stringw(_("Hidden")));
     //I18N: In the UI options, minimap position in the race UI
     minimap_options->addLabel( core::stringw(_("Centered")));
     minimap_options->m_properties[GUIEngine::PROP_MIN_VALUE] = "0";
 
-    bool multitouch_enabled = (UserConfigParams::m_multitouch_active == 1 && 
+    bool multitouch_enabled = (UserConfigParams::m_multitouch_active == 1 &&
                                irr_driver->getDevice()->supportsTouchDevice()) ||
                                UserConfigParams::m_multitouch_active > 1;
 
@@ -133,12 +134,13 @@ void OptionsScreenUI::init()
     Screen::init();
     OptionsCommon::setTabStatus();
 
+    // Bind typed widget pointers (one-time lookup)
+    m_widgets.bind(this);
+
     bool in_game = StateManager::get()->getGameState() == GUIEngine::INGAME_MENU;
 
-    RibbonWidget* ribbon = getWidget<RibbonWidget>("options_choice");
-    assert(ribbon != NULL);
-    ribbon->setFocusForPlayer(PLAYER_ID_GAME_MASTER);
-    ribbon->select( "tab_ui", PLAYER_ID_GAME_MASTER );
+    m_widgets.options_choice->setFocusForPlayer(PLAYER_ID_GAME_MASTER);
+    m_widgets.options_choice->select( "tab_ui", PLAYER_ID_GAME_MASTER );
 
     m_skins.clear();
     m_base_skins.clear();
@@ -201,10 +203,7 @@ void OptionsScreenUI::init()
 
     // --- Setup other spinners and checkboxes
 
-    GUIEngine::SpinnerWidget* minimap_options = getWidget<GUIEngine::SpinnerWidget>("minimap");
-    assert( minimap_options != NULL );
-
-    bool multitouch_enabled = (UserConfigParams::m_multitouch_active == 1 && 
+    bool multitouch_enabled = (UserConfigParams::m_multitouch_active == 1 &&
                                irr_driver->getDevice()->supportsTouchDevice()) ||
                                UserConfigParams::m_multitouch_active > 1;
 
@@ -213,10 +212,7 @@ void OptionsScreenUI::init()
     {
         UserConfigParams::m_minimap_display = 1;
     }
-    minimap_options->setValue(UserConfigParams::m_minimap_display);
-    
-    GUIEngine::SpinnerWidget* font_size = getWidget<GUIEngine::SpinnerWidget>("font_size");
-    assert( font_size != NULL );
+    m_widgets.minimap->setValue(UserConfigParams::m_minimap_display);
 
     int size_int = (int)roundf(UserConfigParams::m_font_size);
     if (size_int < 0 || size_int > 6)
@@ -226,35 +222,26 @@ void OptionsScreenUI::init()
         (size_int < 1 || size_int > 5))
         size_int = 3;
 
-    font_size->setValue(size_int);
-    UserConfigParams::m_font_size = font_size->getValue();
-    font_size->setActive(!in_game);
+    m_widgets.font_size->setValue(size_int);
+    UserConfigParams::m_font_size = m_widgets.font_size->getValue();
+    m_widgets.font_size->setActive(!in_game);
 
-    CheckBoxWidget* karts_powerup_gui = getWidget<CheckBoxWidget>("karts_powerup_gui");
-    assert(karts_powerup_gui != NULL);
-    karts_powerup_gui->setState(UserConfigParams::m_karts_powerup_gui);
+    m_widgets.karts_powerup_gui->setState(UserConfigParams::m_karts_powerup_gui);
 
-    CheckBoxWidget* fps = getWidget<CheckBoxWidget>("showfps");
-    assert( fps != NULL );
-    fps->setState( UserConfigParams::m_display_fps );
+    m_widgets.showfps->setState( UserConfigParams::m_display_fps );
 
-    CheckBoxWidget* story_timer = getWidget<CheckBoxWidget>("story-mode-timer");
-    assert( story_timer != NULL );
-    story_timer->setState( UserConfigParams::m_display_story_mode_timer );
-    CheckBoxWidget* speedrun_timer = getWidget<CheckBoxWidget>("speedrun-timer");
-    assert( speedrun_timer != NULL );
+    m_widgets.story_mode_timer->setState( UserConfigParams::m_display_story_mode_timer );
     if (story_mode_timer->getStoryModeTime() < 0)
     {
-        story_timer->setActive(false);
-        speedrun_timer->setActive(false);
+        m_widgets.story_mode_timer->setActive(false);
+        m_widgets.speedrun_timer->setActive(false);
     }
     else
     {
-        story_timer->setActive(true);
+        m_widgets.story_mode_timer->setActive(true);
 
-        speedrun_timer->setActive(UserConfigParams::m_display_story_mode_timer);
-        getWidget<LabelWidget>("speedrun-timer-text")
-            ->setActive(UserConfigParams::m_display_story_mode_timer);
+        m_widgets.speedrun_timer->setActive(UserConfigParams::m_display_story_mode_timer);
+        m_widgets.speedrun_timer_text->setActive(UserConfigParams::m_display_story_mode_timer);
     }
     if (UserConfigParams::m_speedrun_mode)
     {
@@ -270,7 +257,7 @@ void OptionsScreenUI::init()
                                 NULL, false, false, 0.6f, 0.7f);
         }
     }
-    speedrun_timer->setState( UserConfigParams::m_speedrun_mode );
+    m_widgets.speedrun_timer->setState( UserConfigParams::m_speedrun_mode );
 }   // init
 
 // -----------------------------------------------------------------------------
@@ -404,18 +391,18 @@ std::string OptionsScreenUI::getCurrentSpinnerSkin()
 // -----------------------------------------------------------------------------
 void OptionsScreenUI::eventCallback(Widget* widget, const std::string& name, const int playerID)
 {
-    if (name == "options_choice")
+    if (widget == m_widgets.options_choice)
     {
-        std::string selection = ((RibbonWidget*)widget)->getSelectionIDString(PLAYER_ID_GAME_MASTER);
+        std::string selection = m_widgets.options_choice->getSelectionIDString(PLAYER_ID_GAME_MASTER);
 
         if (selection != "tab_ui")
             OptionsCommon::switchTab(selection);
     }
-    else if(name == "back")
+    else if (widget == m_widgets.back)
     {
         StateManager::get()->escapePressed();
     }
-    else if (name == "base_skinchoice")
+    else if (widget == m_widgets.base_skinchoice)
     {
         m_active_base_skin = m_base_skin_selector->getStringValue();
         loadCurrentSkinVariants();
@@ -424,27 +411,23 @@ void OptionsScreenUI::eventCallback(Widget* widget, const std::string& name, con
         m_reload_option->m_focus_name = "base_skinchoice";
         m_reload_option->m_focus_right = m_base_skin_selector->isButtonSelected(true/*right*/);
     }
-    else if (name == "variant_skinchoice")
+    else if (widget == m_widgets.variant_skinchoice)
     {
         UserConfigParams::m_skin_file = getCurrentSpinnerSkin();
         onSkinChange(true);
         m_reload_option->m_focus_name = "variant_skinchoice";
         m_reload_option->m_focus_right = m_variant_skin_selector->isButtonSelected(true/*right*/);
     }
-    else if (name == "minimap")
+    else if (widget == m_widgets.minimap)
     {
-        GUIEngine::SpinnerWidget* minimap_options = getWidget<GUIEngine::SpinnerWidget>("minimap");
-        assert( minimap_options != NULL );
-        UserConfigParams::m_minimap_display = minimap_options->getValue();
+        UserConfigParams::m_minimap_display = m_widgets.minimap->getValue();
         if (World::getWorld())
             World::getWorld()->getRaceGUI()->recreateGUI();
     }
-    else if (name == "font_size")
+    else if (widget == m_widgets.font_size)
     {
-        GUIEngine::SpinnerWidget* font_size = getWidget<GUIEngine::SpinnerWidget>("font_size");
-        assert( font_size != NULL );
-        bool right = font_size->isButtonSelected(true/*right*/);
-        UserConfigParams::m_font_size = font_size->getValue();
+        bool right = m_widgets.font_size->isButtonSelected(true/*right*/);
+        UserConfigParams::m_font_size = m_widgets.font_size->getValue();
         // Reload GUIEngine will clear widgets so we don't do that in eventCallback
         m_reload_option = std::unique_ptr<ReloadOption>(new ReloadOption);
         m_reload_option->m_reload_font = true;
@@ -452,47 +435,36 @@ void OptionsScreenUI::eventCallback(Widget* widget, const std::string& name, con
         m_reload_option->m_focus_name = "font_size";
         m_reload_option->m_focus_right = right;
     }
-    else if (name == "karts_powerup_gui")
+    else if (widget == m_widgets.karts_powerup_gui)
     {
-        CheckBoxWidget* karts_powerup_gui = getWidget<CheckBoxWidget>("karts_powerup_gui");
-        assert(karts_powerup_gui != NULL);
-        UserConfigParams::m_karts_powerup_gui = karts_powerup_gui->getState();
+        UserConfigParams::m_karts_powerup_gui = m_widgets.karts_powerup_gui->getState();
     }
-    else if (name == "showfps")
+    else if (widget == m_widgets.showfps)
     {
-        CheckBoxWidget* fps = getWidget<CheckBoxWidget>("showfps");
-        assert( fps != NULL );
-        UserConfigParams::m_display_fps = fps->getState();
+        UserConfigParams::m_display_fps = m_widgets.showfps->getState();
     }
-    else if (name == "story-mode-timer")
+    else if (widget == m_widgets.story_mode_timer)
     {
-        CheckBoxWidget* story_timer = getWidget<CheckBoxWidget>("story-mode-timer");
-        assert( story_timer != NULL );
-        UserConfigParams::m_display_story_mode_timer = story_timer->getState();
+        UserConfigParams::m_display_story_mode_timer = m_widgets.story_mode_timer->getState();
 
-        CheckBoxWidget* speedrun_timer = getWidget<CheckBoxWidget>("speedrun-timer");
-        assert( speedrun_timer != NULL );
-        speedrun_timer->setActive( UserConfigParams::m_display_story_mode_timer );
-        getWidget<LabelWidget>("speedrun-timer-text")
-            ->setActive(UserConfigParams::m_display_story_mode_timer);
+        m_widgets.speedrun_timer->setActive( UserConfigParams::m_display_story_mode_timer );
+        m_widgets.speedrun_timer_text->setActive(UserConfigParams::m_display_story_mode_timer);
 
         // Disable speedrun mode if the story mode timer is disabled
         if (!UserConfigParams::m_display_story_mode_timer)
         {
             UserConfigParams::m_speedrun_mode = false;
-            speedrun_timer->setState(false);
+            m_widgets.speedrun_timer->setState(false);
         }
 
     }
-    else if (name == "speedrun-timer")
+    else if (widget == m_widgets.speedrun_timer)
     {
-        CheckBoxWidget* speedrun_timer = getWidget<CheckBoxWidget>("speedrun-timer");
-        assert( speedrun_timer != NULL );
-        if (speedrun_timer->getState())
+        if (m_widgets.speedrun_timer->getState())
         {
             if (!story_mode_timer->playerCanRun())
             {
-                speedrun_timer->setState(false);
+                m_widgets.speedrun_timer->setState(false);
                 new MessageDialog(_("Speedrun mode can only be enabled if the game has not"
                                     " been closed since the launch of the story mode.\n\n"
                                     "Closing the game before the story mode's"
@@ -502,7 +474,7 @@ void OptionsScreenUI::eventCallback(Widget* widget, const std::string& name, con
                                     NULL, false, false, 0.6f, 0.7f);
             }
         }
-        UserConfigParams::m_speedrun_mode = speedrun_timer->getState();
+        UserConfigParams::m_speedrun_mode = m_widgets.speedrun_timer->getState();
     }
 }   // eventCallback
 

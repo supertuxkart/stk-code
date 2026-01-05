@@ -20,6 +20,7 @@
 #define HEADER_CONFIRM_RES_DIALOG_HPP
 
 #include "guiengine/modaldialog.hpp"
+#include "generated/gui/dialogs/confirm_resolution_dialog_widgets.hpp"
 #include "utils/cpp2011.hpp"
 
 /**
@@ -30,6 +31,7 @@
 class ConfirmResolutionDialog : public GUIEngine::ModalDialog
 {
 private:
+    GUIEngine::ConfirmResolutionDialogWidgets m_widgets;
     /** number of seconds left before resolution is considered unplayable */
     float m_remaining_time;
 

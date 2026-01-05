@@ -89,27 +89,24 @@ MainMenuScreen::MainMenuScreen() : Screen("main_menu.stkgui")
 
 void MainMenuScreen::loadedFromFile()
 {
-    LabelWidget* w = getWidget<LabelWidget>("info_addons");
-    w->setScrollSpeed(0.5f);
-    
-    RibbonWidget* rw_top = getWidget<RibbonWidget>("menu_toprow");
-    assert(rw_top != NULL);
-    
+    m_widgets.bind(this);
+
+    m_widgets.info_addons->setScrollSpeed(0.5f);
+
     if (track_manager->getTrack("overworld") == NULL ||
         track_manager->getTrack("introcutscene") == NULL ||
         track_manager->getTrack("introcutscene2") == NULL)
     {
-        rw_top->removeChildNamed("story");
+        m_widgets.menu_toprow->removeChildNamed("story");
     }
 
 #if DEBUG_MENU_ITEM != 1
-    RibbonWidget* rw = getWidget<RibbonWidget>("menu_bottomrow");
-    rw->removeChildNamed("test_gpwin");
-    rw->removeChildNamed("test_gplose");
-    rw->removeChildNamed("test_unlocked");
-    rw->removeChildNamed("test_unlocked2");
-    rw->removeChildNamed("test_intro");
-    rw->removeChildNamed("test_outro");
+    m_widgets.menu_bottomrow->removeChildNamed("test_gpwin");
+    m_widgets.menu_bottomrow->removeChildNamed("test_gplose");
+    m_widgets.menu_bottomrow->removeChildNamed("test_unlocked");
+    m_widgets.menu_bottomrow->removeChildNamed("test_unlocked2");
+    m_widgets.menu_bottomrow->removeChildNamed("test_intro");
+    m_widgets.menu_bottomrow->removeChildNamed("test_outro");
 #endif
 }   // loadedFromFile
 
@@ -119,17 +116,15 @@ void MainMenuScreen::beforeAddingWidget()
 {
 #ifdef IOS_STK
     // iOS app doesn't like quit button in UI
-    Widget* w = getWidget("quit");
-    if (w)
-        w->setVisible(false);
+    if (m_widgets.quit)
+        m_widgets.quit->setVisible(false);
 #endif
 
 #ifdef ANDROID
     if (SDL_IsAndroidTV())
     {
-        Widget* tutorial = getWidget("startTutorial");
-        if (tutorial)
-            tutorial->setVisible(false);
+        if (m_widgets.startTutorial)
+            m_widgets.startTutorial->setVisible(false);
     }
 #endif
 }
@@ -139,9 +134,6 @@ void MainMenuScreen::beforeAddingWidget()
 void MainMenuScreen::init()
 {
     Screen::init();
-
-    m_user_id = getWidget<ButtonWidget>("user-id");
-    assert(m_user_id);
 
     // reset in case we're coming back from a race
     NetworkConfig::get()->cleanNetworkPlayers();
@@ -166,10 +158,9 @@ void MainMenuScreen::init()
 #ifndef SERVER_ONLY
     if (addons_manager && addons_manager->isLoading())
     {
-        IconButtonWidget* w = getWidget<IconButtonWidget>("addons");
-        w->setActive(false);
-        w->resetAllBadges();
-        w->setBadge(LOADING_BADGE);
+        m_widgets.addons->setActive(false);
+        m_widgets.addons->resetAllBadges();
+        m_widgets.addons->setBadge(LOADING_BADGE);
     }
 
     // Initialize news iteration, show dialog when there's important news
@@ -190,7 +181,7 @@ void MainMenuScreen::init()
             && id > UserConfigParams::m_last_important_message_id)
         {
             chosen_id = id;
-            important_message = 
+            important_message =
                 NewsManager::get()->getCurrentNewsMessage(NewsManager::NTYPE_MAINMENU);
         }
     }
@@ -207,11 +198,10 @@ void MainMenuScreen::init()
 
     // Check if there's new news
 
-    IconButtonWidget* online_icon = getWidget<IconButtonWidget>("online");
-    if (online_icon != NULL)
+    if (m_widgets.online != NULL)
     {
         NewsManager::get()->resetNewsPtr(NewsManager::NTYPE_LIST);
-        online_icon->resetAllBadges();
+        m_widgets.online->resetAllBadges();
 
         int news_list_len = NewsManager::get()->getNewsCount(NewsManager::NTYPE_LIST);
 
@@ -221,35 +211,31 @@ void MainMenuScreen::init()
 
             if (UserConfigParams::m_news_list_shown_id < id)
             {
-                online_icon->setBadge(REDDOT_BADGE);
+                m_widgets.online->setBadge(REDDOT_BADGE);
             }
         }
-        
+
         // Back to the first news
         NewsManager::get()->getNextNewsID(NewsManager::NTYPE_LIST);
     }
 
     m_news_text = L"";
-    LabelWidget* w = getWidget<LabelWidget>("info_addons");
-    w->setText(m_news_text, true);
-    w->update(0.01f);
+    m_widgets.info_addons->setText(m_news_text, true);
+    m_widgets.info_addons->update(0.01f);
 #endif
 
-    RibbonWidget* r = getWidget<RibbonWidget>("menu_bottomrow");
     // FIXME: why do I need to do this manually
-    ((IconButtonWidget*)r->getChildren().get(0))->unfocused(PLAYER_ID_GAME_MASTER, NULL);
-    ((IconButtonWidget*)r->getChildren().get(1))->unfocused(PLAYER_ID_GAME_MASTER, NULL);
-    ((IconButtonWidget*)r->getChildren().get(2))->unfocused(PLAYER_ID_GAME_MASTER, NULL);
+    ((IconButtonWidget*)m_widgets.menu_bottomrow->getChildren().get(0))->unfocused(PLAYER_ID_GAME_MASTER, NULL);
+    ((IconButtonWidget*)m_widgets.menu_bottomrow->getChildren().get(1))->unfocused(PLAYER_ID_GAME_MASTER, NULL);
+    ((IconButtonWidget*)m_widgets.menu_bottomrow->getChildren().get(2))->unfocused(PLAYER_ID_GAME_MASTER, NULL);
 
-    r = getWidget<RibbonWidget>("menu_toprow");
-    r->setFocusForPlayer(PLAYER_ID_GAME_MASTER);
+    m_widgets.menu_toprow->setFocusForPlayer(PLAYER_ID_GAME_MASTER);
     DemoWorld::resetIdleTime();
 
 #ifdef IOS_STK
     // iOS app doesn't like quit button in UI
-    Widget* quit = getWidget("quit");
-    if (quit)
-        quit->setVisible(false);
+    if (m_widgets.quit)
+        m_widgets.quit->setVisible(false);
 #endif
 }   // init
 
@@ -260,41 +246,38 @@ void MainMenuScreen::onUpdate(float delta)
 #ifndef SERVER_ONLY
     NewsManager::get()->joinDownloadThreadIfExit();
 
-    IconButtonWidget* addons_icon = getWidget<IconButtonWidget>("addons");
-    if (addons_icon != NULL)
+    if (m_widgets.addons != NULL)
     {
         if (addons_manager->wasError())
         {
-            addons_icon->setActive(true);
-            addons_icon->resetAllBadges();
-            addons_icon->setBadge(BAD_BADGE);
+            m_widgets.addons->setActive(true);
+            m_widgets.addons->resetAllBadges();
+            m_widgets.addons->setBadge(BAD_BADGE);
         }
         else if (addons_manager->isLoading() && UserConfigParams::m_internet_status
             == Online::RequestManager::IPERM_ALLOWED)
         {
             // Addons manager is still initialising/downloading.
-            addons_icon->setActive(false);
-            addons_icon->resetAllBadges();
-            addons_icon->setBadge(LOADING_BADGE);
+            m_widgets.addons->setActive(false);
+            m_widgets.addons->resetAllBadges();
+            m_widgets.addons->setBadge(LOADING_BADGE);
         }
         else
         {
-            addons_icon->setActive(true);
-            addons_icon->resetAllBadges();
+            m_widgets.addons->setActive(true);
+            m_widgets.addons->resetAllBadges();
             if (addons_manager->hasNewAddons())
-                addons_icon->setBadge(DOWN_BADGE);
+                m_widgets.addons->setBadge(DOWN_BADGE);
         }
         // maybe add a new badge when not allowed to access the net
     }
 
-    LabelWidget* w = getWidget<LabelWidget>("info_addons");
-    
-    if (w->getText().empty() || w->scrolledOff())
+    if (m_widgets.info_addons->getText().empty() || m_widgets.info_addons->scrolledOff())
     {
         // Show important messages seperately
         // Concatrate adjacent unimportant messages together
         m_news_text = L"";
-        
+
         int news_count = NewsManager::get()->getNewsCount(NewsManager::NTYPE_MAINMENU);
 
         while (news_count--)
@@ -314,9 +297,9 @@ void MainMenuScreen::onUpdate(float delta)
             }
         }
 
-        w->setText(m_news_text, true);
+        m_widgets.info_addons->setText(m_news_text, true);
     }
-    w->update(delta);
+    m_widgets.info_addons->update(delta);
 
     PlayerProfile *player = PlayerManager::getCurrentPlayer();
     if (!player)
@@ -324,16 +307,16 @@ void MainMenuScreen::onUpdate(float delta)
     if(PlayerManager::getCurrentOnlineState() == PlayerProfile::OS_GUEST  ||
        PlayerManager::getCurrentOnlineState() == PlayerProfile::OS_SIGNED_IN)
     {
-        m_user_id->setText(player->getLastOnlineName() + "@stk");
+        m_widgets.user_id->setText(player->getLastOnlineName() + "@stk");
     }
     else if (PlayerManager::getCurrentOnlineState() == PlayerProfile::OS_SIGNED_OUT)
     {
-        m_user_id->setText(player->getName());
+        m_widgets.user_id->setText(player->getName());
     }
     else
     {
         // now must be either logging in or logging out
-        m_user_id->setText(player->getName());
+        m_widgets.user_id->setText(player->getName());
     }
 
     // Ask if user want to play tutorial when profile is newly created
@@ -373,7 +356,7 @@ void MainMenuScreen::eventCallback(Widget* widget, const std::string& name,
                                    const int playerID)
 {
 #ifndef SERVER_ONLY
-    if(name=="user-id")
+    if(widget == m_widgets.user_id)
     {
         UserScreen::getInstance()->push();
         return;

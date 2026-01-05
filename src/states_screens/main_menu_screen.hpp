@@ -19,8 +19,9 @@
 #define HEADER_MAIN_MENU_SCREEN_HPP
 
 #include "guiengine/screen.hpp"
+#include "generated/gui/screens/main_menu_widgets.hpp"
 
-namespace GUIEngine { class Widget;       class ListWidget; 
+namespace GUIEngine { class Widget;       class ListWidget;
                       class ButtonWidget; class IconButtonWidget;
                       class STKModifiedSpriteBank; }
 
@@ -33,8 +34,7 @@ class MainMenuScreen : public GUIEngine::Screen, public GUIEngine::ScreenSinglet
 private:
     friend class GUIEngine::ScreenSingleton<MainMenuScreen>;
 
-    /** Keep the widget to to the user name. */
-    GUIEngine::ButtonWidget *m_user_id;
+    GUIEngine::MainMenuWidgets m_widgets;
 
     core::stringw m_news_text;
 

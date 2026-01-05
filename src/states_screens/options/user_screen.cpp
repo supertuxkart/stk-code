@@ -708,11 +708,13 @@ void BaseUserScreen::unloaded()
  */
 void TabbedUserScreen::init()
 {
-    RibbonWidget* tab_bar = getWidget<RibbonWidget>("options_choice");
-    assert(tab_bar != NULL);
-    tab_bar->setFocusForPlayer(PLAYER_ID_GAME_MASTER);
-    tab_bar->select("tab_players", PLAYER_ID_GAME_MASTER);
     BaseUserScreen::init();
+
+    // Bind typed widget pointers (one-time lookup)
+    m_widgets.bind(this);
+
+    m_widgets.options_choice->setFocusForPlayer(PLAYER_ID_GAME_MASTER);
+    m_widgets.options_choice->select("tab_players", PLAYER_ID_GAME_MASTER);
 }   // init
 
 // ----------------------------------------------------------------------------
@@ -722,9 +724,9 @@ void TabbedUserScreen::eventCallback(GUIEngine::Widget* widget,
                                      const std::string& name,
                                      const int player_id)
 {
-    if (name == "options_choice")
+    if (widget == m_widgets.options_choice)
     {
-        std::string selection = ((RibbonWidget*)widget)->getSelectionIDString(PLAYER_ID_GAME_MASTER);
+        std::string selection = m_widgets.options_choice->getSelectionIDString(PLAYER_ID_GAME_MASTER);
 
         if (selection != "tab_players")
             OptionsCommon::switchTab(selection);

@@ -72,15 +72,15 @@ AddonsLoading::AddonsLoading(const std::string &id)
         addons_manager->downloadIconForAddon(id, m_icon_downloaded);
 #endif
     loadFromFile("addons_loading.stkgui");
+    m_widgets.bind(this);
 
-    m_icon             = getWidget<IconButtonWidget> ("icon"    );
-    m_progress         = getWidget<ProgressBarWidget>("progress");
-    m_install_button   = getWidget<IconButtonWidget> ("install" );
-    m_back_button      = getWidget<IconButtonWidget> ("back"  );
-    
-    RibbonWidget* actions = getWidget<RibbonWidget>("actions");
-    actions->setFocusForPlayer(PLAYER_ID_GAME_MASTER);
-    actions->select("back", PLAYER_ID_GAME_MASTER);
+    m_icon             = m_widgets.icon;
+    m_progress         = m_widgets.progress;
+    m_install_button   = m_widgets.install;
+    m_back_button      = m_widgets.back;
+
+    m_widgets.actions->setFocusForPlayer(PLAYER_ID_GAME_MASTER);
+    m_widgets.actions->select("back", PLAYER_ID_GAME_MASTER);
 
     if(m_progress)
         m_progress->setVisible(false);
@@ -109,12 +109,12 @@ void AddonsLoading::beforeAddingWidgets()
 {
 #ifndef SERVER_ONLY
     /* Init the icon here to be able to load a single image*/
-    m_icon             = getWidget<IconButtonWidget> ("icon"    );
-    m_progress         = getWidget<ProgressBarWidget>("progress");
-    m_back_button      = getWidget<IconButtonWidget> ("back"    );
+    m_icon             = m_widgets.icon;
+    m_progress         = m_widgets.progress;
+    m_back_button      = m_widgets.back;
 
-    RibbonWidget* r = getWidget<RibbonWidget>("actions");
-    RatingBarWidget* rating = getWidget<RatingBarWidget>("rating");
+    RibbonWidget* r = m_widgets.actions;
+    RatingBarWidget* rating = m_widgets.rating;
 
     if (m_addon.isInstalled())
     {
@@ -123,7 +123,7 @@ void AddonsLoading::beforeAddingWidgets()
          */
         if (m_addon.needsUpdate() && !addons_manager->wasError()
             && UserConfigParams::m_internet_status==RequestManager::IPERM_ALLOWED)
-            getWidget<IconButtonWidget> ("install")->setText( _("Update") );
+            m_widgets.install->setText( _("Update") );
         else
             r->removeChildNamed("install");
     }
@@ -132,11 +132,10 @@ void AddonsLoading::beforeAddingWidgets()
         r->removeChildNamed("uninstall");
     }
 
-    getWidget<LabelWidget>("name")->setText(m_addon.getName().c_str(), false);
-    getWidget<BubbleWidget>("description")
-        ->setText(m_addon.getDescription().c_str());
+    m_widgets.name->setText(m_addon.getName().c_str(), false);
+    m_widgets.description->setText(m_addon.getDescription().c_str());
     core::stringw revision = _("Version: %d", m_addon.getRevision());
-    getWidget<LabelWidget>("revision")->setText(revision, false);
+    m_widgets.revision->setText(revision, false);
     rating->setRating(m_addon.getRating());
     rating->setStarNumber(3);
 
@@ -168,7 +167,7 @@ void AddonsLoading::beforeAddingWidgets()
     if(m_addon.testStatus(Addon::AS_FEATURED))
         l.push_back(_("featured"));
 
-    GUIEngine::LabelWidget *flags = getWidget<LabelWidget>("flags");
+    GUIEngine::LabelWidget *flags = m_widgets.flags;
     if(flags)
     {
         core::stringw s1("");
@@ -187,7 +186,7 @@ void AddonsLoading::beforeAddingWidgets()
     // ================
     core::stringw unit = StringUtils::getReadableFileSize(m_addon.getSize());
     core::stringw size = _("Size: %s", unit.c_str());
-    getWidget<LabelWidget>("size")->setText(size, false);
+    m_widgets.size->setText(size, false);
 #endif
 }   // AddonsLoading
 
@@ -195,7 +194,7 @@ void AddonsLoading::beforeAddingWidgets()
 
 void AddonsLoading::init()
 {
-    GUIEngine::LabelWidget* flags = getWidget<LabelWidget>("flags");
+    GUIEngine::LabelWidget* flags = m_widgets.flags;
     if (flags)
     {
         flags->getIrrlichtElement<IGUIStaticText>()->setOverrideFont(GUIEngine::getSmallFont());
@@ -218,11 +217,9 @@ void AddonsLoading::tryInstall()
     {
         m_progress->setValue(0);
         m_progress->setVisible(true);
-        GUIEngine::RibbonWidget* actions_ribbon =
-            getWidget<GUIEngine::RibbonWidget>("actions");
-        actions_ribbon->setFocusForPlayer(PLAYER_ID_GAME_MASTER);
-        actions_ribbon->select("back", PLAYER_ID_GAME_MASTER);
-        getWidget("install")->setVisible(false);
+        m_widgets.actions->setFocusForPlayer(PLAYER_ID_GAME_MASTER);
+        m_widgets.actions->select("back", PLAYER_ID_GAME_MASTER);
+        m_widgets.install->setVisible(false);
         m_back_button->setImage(file_manager->getAsset(FileManager::GUI_ICON,
             "remove.png"), IconButtonWidget::ICON_PATH_TYPE_ABSOLUTE);
         // Change the 'back' button into a 'cancel' button.
@@ -236,13 +233,10 @@ void AddonsLoading::tryInstall()
 GUIEngine::EventPropagation AddonsLoading::processEvent(const std::string& event_source)
 {
 #ifndef SERVER_ONLY
-    GUIEngine::RibbonWidget* actions_ribbon =
-            getWidget<GUIEngine::RibbonWidget>("actions");
-
     if (event_source == "actions")
     {
         const std::string& selection =
-                actions_ribbon->getSelectionIDString(PLAYER_ID_GAME_MASTER);
+                m_widgets.actions->getSelectionIDString(PLAYER_ID_GAME_MASTER);
         
         if(selection == "back")
         {
@@ -389,15 +383,14 @@ void AddonsLoading::doInstall()
     {
         const core::stringw &name = m_addon.getName();
         core::stringw msg = _("Problems installing the addon '%s'.", name);
-        getWidget<BubbleWidget>("description")->setText(msg.c_str());
+        m_widgets.description->setText(msg.c_str());
     }
 
     if(error)
     {
         m_progress->setVisible(false);
 
-        RibbonWidget* r = getWidget<RibbonWidget>("actions");
-        r->setVisible(true);
+        m_widgets.actions->setVisible(true);
 
         m_install_button->setLabel(_("Try again"));
     }
@@ -440,17 +433,15 @@ void AddonsLoading::doUninstall()
         Log::warn("Addons", "Please remove this directory manually.");
         const core::stringw &name = m_addon.getName();
         core::stringw msg = _("Problems removing the addon '%s'.", name);
-        getWidget<BubbleWidget>("description")->setText(msg.c_str());
+        m_widgets.description->setText(msg.c_str());
     }
 
     if(error)
     {
         m_progress->setVisible(false);
 
-        RibbonWidget* r = getWidget<RibbonWidget>("actions");
-        r->setVisible(true);
-        IconButtonWidget *u = getWidget<IconButtonWidget> ("uninstall" );
-        u->setLabel(_("Try again"));
+        m_widgets.actions->setVisible(true);
+        m_widgets.uninstall->setLabel(_("Try again"));
     }
     else
     {

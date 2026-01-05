@@ -35,6 +35,7 @@ using namespace irr::core;
 ConfirmResolutionDialog::ConfirmResolutionDialog(bool unsupported_res) : ModalDialog(0.6f, 0.6f)
 {
     loadFromFile("confirm_resolution_dialog.stkgui");
+    m_widgets.bind(this);
     m_remaining_time = 10.99f;
     m_unsupported_resolution = unsupported_res;
     if (m_unsupported_resolution)
@@ -95,8 +96,7 @@ void ConfirmResolutionDialog::updateMessage()
                                    "Some parts of the UI may not work correctly.");
     }
 
-    LabelWidget* countdown_message = getWidget<LabelWidget>("title");
-    countdown_message->setText( msg.c_str(), false );
+    m_widgets.title->setText( msg.c_str(), false );
 }
 
 // ------------------------------------------------------------------------------------------------------
@@ -106,7 +106,7 @@ GUIEngine::EventPropagation ConfirmResolutionDialog::processEvent(const std::str
     if (eventSource == "buttons")
     {
         const std::string& selection =
-                getWidget<RibbonWidget>("buttons")->getSelectionIDString(PLAYER_ID_GAME_MASTER);
+                m_widgets.buttons->getSelectionIDString(PLAYER_ID_GAME_MASTER);
 
         if (selection == "cancel")
         {

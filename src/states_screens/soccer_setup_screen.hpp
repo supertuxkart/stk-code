@@ -20,6 +20,7 @@
 
 #include "guiengine/screen.hpp"
 #include "network/remote_kart_info.hpp"
+#include "generated/gui/screens/soccer_setup_widgets.hpp"
 
 namespace GUIEngine { class Widget; class LabelWidget; class ModelViewWidget; }
 
@@ -33,6 +34,8 @@ class SoccerSetupScreen : public GUIEngine::Screen,
     friend class GUIEngine::ScreenSingleton<SoccerSetupScreen>;
 
     SoccerSetupScreen();
+
+    GUIEngine::SoccerSetupWidgets m_widgets;
 
     struct KartViewInfo
     {

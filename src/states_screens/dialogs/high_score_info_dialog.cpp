@@ -54,8 +54,9 @@ HighScoreInfoDialog::HighScoreInfoDialog(Highscores* highscore, bool is_linear, 
     m_curr_time = 0.0f;
 
     loadFromFile("high_score_info_dialog.stkgui");
+    m_widgets.bind(this);
 
-    m_track_screenshot_widget = getWidget<IconButtonWidget>("track_screenshot");
+    m_track_screenshot_widget = m_widgets.track_screenshot;
     m_track_screenshot_widget->setFocusable(false);
     m_track_screenshot_widget->m_tab_stop = false;
 
@@ -96,7 +97,7 @@ HighScoreInfoDialog::HighScoreInfoDialog(Highscores* highscore, bool is_linear, 
 
     // TODO : small refinement, add the possibility to tab stops for lists
     //        to make this unselectable by keyboard/mouse
-    m_high_score_list = getWidget<GUIEngine::ListWidget>("high_score_list");
+    m_high_score_list = m_widgets.high_score_list;
     assert(m_high_score_list != NULL);
 
     /* Used to display kart icons for the entries */
@@ -110,18 +111,18 @@ HighScoreInfoDialog::HighScoreInfoDialog(Highscores* highscore, bool is_linear, 
     updateHighscoreEntries();
 
     // Setup static text labels
-    m_high_score_label = getWidget<LabelWidget>("name");
+    m_high_score_label = m_widgets.name;
     m_high_score_label->setText(_("Top %d High Scores", m_hs->HIGHSCORE_LEN), true);
-    m_track_name_label = getWidget<LabelWidget>("track-name");
+    m_track_name_label = m_widgets.track_name;
     m_track_name_label->setText(_("%s: %s",
                                 track_type_name.c_str(), track_name), true);
-    m_difficulty_label = getWidget<LabelWidget>("difficulty");
+    m_difficulty_label = m_widgets.difficulty;
     m_difficulty_label->setText(_("Difficulty: %s", RaceManager::get()->
                                 getDifficultyName((RaceManager::Difficulty)
                                 m_hs->m_difficulty)), true);
-    m_num_karts_label = getWidget<LabelWidget>("num-karts");
-    m_reverse_label = getWidget<LabelWidget>("reverse");
-    m_num_laps_label = getWidget<LabelWidget>("num-laps");
+    m_num_karts_label = m_widgets.num_karts;
+    m_reverse_label = m_widgets.reverse;
+    m_num_laps_label = m_widgets.num_laps;
 
     if (is_linear)
     {
@@ -153,14 +154,14 @@ HighScoreInfoDialog::HighScoreInfoDialog(Highscores* highscore, bool is_linear, 
         m_reverse_label->setVisible(false);
     }
 
-    m_start_widget = getWidget<IconButtonWidget>("start");
+    m_start_widget = m_widgets.start;
 
     if (m_major_mode == RaceManager::MAJOR_MODE_GRAND_PRIX)
         m_start_widget->setActive(!PlayerManager::getCurrentPlayer()->isLocked(m_gp.getId()));
     else
         m_start_widget->setActive(!PlayerManager::getCurrentPlayer()->isLocked(track->getIdent()));
 
-    m_action_widget = getWidget<RibbonWidget>("actions");
+    m_action_widget = m_widgets.actions;
 
     m_action_widget->setFocusForPlayer(PLAYER_ID_GAME_MASTER);
     m_action_widget->select("back", PLAYER_ID_GAME_MASTER);
