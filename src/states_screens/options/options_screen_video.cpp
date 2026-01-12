@@ -184,13 +184,29 @@ void OptionsScreenVideo::init()
     bool in_game = StateManager::get()->getGameState() == GUIEngine::INGAME_MENU;
 
     gfx->setActive(!in_game && CVS->isGLSL());
+    if (in_game && CVS->isGLSL())
+    {
+        gfx->setTooltip(_("This option cannot be changed during a race."));
+    }
     getWidget<ButtonWidget>("custom")->setActive(!in_game || !CVS->isGLSL());
+    if (in_game && CVS->isGLSL())
+    {
+        getWidget<ButtonWidget>("custom")->setTooltip(_("This option cannot be changed during a race."));
+    }
     if (getWidget<SpinnerWidget>("scale_rtts")->isActivated())
     {
         getWidget<SpinnerWidget>("scale_rtts")->setActive(!in_game ||
             GE::getDriver()->getDriverType() == video::EDT_VULKAN);
+        if (in_game && GE::getDriver()->getDriverType() != video::EDT_VULKAN)
+        {
+            getWidget<SpinnerWidget>("scale_rtts")->setTooltip(_("This option cannot be changed during a race."));
+        }
     }
     getWidget<ButtonWidget>("benchmarkCurrent")->setActive(!in_game);
+    if (in_game)
+    {
+        getWidget<ButtonWidget>("benchmarkCurrent")->setTooltip(_("This option cannot be changed during a race."));
+    }
 
     // If a benchmark was requested and the game had to reload
     // the graphics engine, start the benchmark when the

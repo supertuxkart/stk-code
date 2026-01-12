@@ -180,6 +180,9 @@ void OptionsScreenInput::init()
     // Disable adding keyboard configurations
     bool in_game = StateManager::get()->getGameState() == GUIEngine::INGAME_MENU;
     getWidget<ButtonWidget>("add_device")->setActive(!in_game);
+    if(in_game){
+        getWidget<ButtonWidget>("add_device")->setTooltip(_("This option cannot be changed during a race."));
+    }
 
     bool multitouch_enabled = (UserConfigParams::m_multitouch_active == 1 &&
         irr_driver->getDevice()->supportsTouchDevice()) ||

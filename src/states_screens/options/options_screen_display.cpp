@@ -128,8 +128,23 @@ void OptionsScreenDisplay::init()
     bool in_game = StateManager::get()->getGameState() == GUIEngine::INGAME_MENU;
 
     res->setActive(!in_game || is_vulkan_fullscreen_desktop);
+    if (in_game && !is_vulkan_fullscreen_desktop)
+    {
+        res->setTooltip(_("This option cannot be changed during a race."));
+    }
+
     full->setActive(!in_game || is_vulkan_fullscreen_desktop);
+    if (in_game && !is_vulkan_fullscreen_desktop)
+    {
+        full->setTooltip(_("This option cannot be changed during a race."));
+    }
+
     applyBtn->setActive(!in_game);
+    if (in_game)
+    {
+        applyBtn->setTooltip(_("This option cannot be changed during a race."));
+    }
+
 
 #if defined(MOBILE_STK) || defined(__SWITCH__)
     applyBtn->setVisible(false);
