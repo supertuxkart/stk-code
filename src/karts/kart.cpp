@@ -3151,7 +3151,7 @@ void Kart::updatePhysics(int ticks)
         {
             m_kart_gfx->setCreationRateAbsolute(KartGFX::KGFX_ZIPPER,
                 100.0f * m_startup_boost);
-            m_max_speed->instantSpeedIncrease(MaxSpeed::MS_INCREASE_ZIPPER,
+            m_max_speed->instantSpeedIncrease(MaxSpeed::MS_INCREASE_GROUND_ZIPPER,
                 /*instant speed*/ m_startup_boost, /*max speed*/ m_startup_boost,
                 /*engine_force*/ m_startup_engine_force,
                 /*duration*/ stk_config->time2Ticks(m_kart_properties->getStartupDuration()),
