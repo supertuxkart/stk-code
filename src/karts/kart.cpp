@@ -2068,11 +2068,38 @@ void Kart::update(int ticks)
         }
         else
         {
-            // If a zipper boost (from the zipper item, texture or a startup boost)
-            // is active, reduce the texture penalty by half
-            float terrain_speed_fraction = material->getMaxSpeedFraction();;
+            // Some max speed boost types offer a reduction in the off-road (texture) penalty.
+            // This allows:
+            // - The design of special shortcuts that only work  having a special boost to take.
+            //   This can either be a general cut through a large off-road area or using
+            //   a jump ramp with a small off-road penalty and carefully tuned distances.
+            // - Reducing the loss of speed and time from accidental minor encroachments on
+            //   off-road areas.
+            //
+            // Only the biggest reduction value is applied, as applying multiple reductions
+            // in a row would be too powerful.
+            //
+            // We use a different reduction value for the different boost types:
+            // - Zipper gets a 50% reduction, that allows track designers to create somewhat
+            //   long shortcuts through off-road.
+            // - Electro-Shield gets a 35% reduction, that's primarily aimed at reinforcing
+            //   the powerup's nature as something that helps to attenuate mistakes from
+            //   players in the back, but also making some shortcuts viable. 
+            // - The purple drift gets a 20% reduction, which is low enough that intentionally
+            //   going through a wide off-road area is ineffective. It allows however to
+            //   calibrate jump ramps that need a pruple drift + nitro boost to take.
+            // TODO : Make the values configurable in kart_characteristics.xml
+            //        Do not forget that only the strongest effect should be applied,
+            //        and we cannot assume which is strongest when pulling from config.
+            // TODO : Add a visual effect when driving off-road with an off-road bonus
+
+            float terrain_speed_fraction = material->getMaxSpeedFraction();
             if (m_max_speed->isSpeedIncreaseActive(MaxSpeed::MS_INCREASE_ZIPPER) > 0)
-                terrain_speed_fraction += (1.0f - terrain_speed_fraction)*0.5f;
+                terrain_speed_fraction += (1.0f - terrain_speed_fraction) * 0.5f;
+            else if (m_max_speed->isSpeedIncreaseActive(MaxSpeed::MS_INCREASE_ELECTRO) > 0)
+                terrain_speed_fraction += (1.0f - terrain_speed_fraction) * 0.35f;
+            else if (m_max_speed->isSpeedIncreaseActive(MaxSpeed::MS_INCREASE_PURPLE_SKIDDING) > 0)
+                terrain_speed_fraction += (1.0f - terrain_speed_fraction) * 0.2f;
             
             m_max_speed->setSlowdown(MaxSpeed::MS_DECREASE_TERRAIN,
                                      terrain_speed_fraction,
