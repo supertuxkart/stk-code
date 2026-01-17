@@ -80,6 +80,7 @@ public:
 
     virtual void resetPostProcessing() {}
     virtual void giveBoost(unsigned int cam_index) {}
+    virtual void setSpeedIntensity(unsigned int cam_index, float speed_intensity, float boost_intensity) {}
 
     virtual void removeSkyBox() {}
     

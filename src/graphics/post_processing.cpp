@@ -689,7 +689,7 @@ public:
 };   // MLAAGatherSHader
 
 // ============================================================================
-class LightningShader : public TextureShader<LightningShader, 1, 
+class LightningShader : public TextureShader<LightningShader, 1,
                                              core::vector3df>
 {
 public:
@@ -705,6 +705,34 @@ public:
         drawFullScreenEffect(intensity);
     }   // render
 };   // LightningShader
+
+// ============================================================================
+class SpeedLinesShader : public TextureShader<SpeedLinesShader, 1,
+                                              float, float, float,
+                                              core::vector2df, float>
+{
+public:
+    SpeedLinesShader()
+    {
+        loadProgram(OBJECT, GL_VERTEX_SHADER, "screenquad.vert",
+                            GL_FRAGMENT_SHADER, "speed_lines.frag");
+        assignUniforms("speed_intensity", "boost_intensity", "time",
+                       "center", "inner_radius");
+        assignSamplerNames(0, "color_buffer", ST_BILINEAR_CLAMPED_FILTERED);
+    }   // SpeedLinesShader
+    // ------------------------------------------------------------------------
+    void render(const FrameBuffer &fb, float speed_intensity,
+                float boost_intensity, float time)
+    {
+        setTextureUnits(fb.getRTT()[0]);
+        // Center point slightly below middle (where kart typically is)
+        core::vector2df center(0.5f, 0.6f);
+        // Inner radius where lines start to fade in
+        float inner_radius = 0.15f;
+        drawFullScreenEffect(speed_intensity, boost_intensity, time,
+                             center, inner_radius);
+    }   // render
+};   // SpeedLinesShader
 
 // ============================================================================
 
@@ -735,10 +763,15 @@ PostProcessing::PostProcessing()
  */
 void PostProcessing::reset()
 {
-    m_boost_time.resize(Camera::getNumCameras());
-    for (unsigned int i = 0; i < Camera::getNumCameras(); i++)
+    const unsigned int num_cams = Camera::getNumCameras();
+    m_boost_time.resize(num_cams);
+    m_speed_intensity.resize(num_cams);
+    m_boost_intensity.resize(num_cams);
+    for (unsigned int i = 0; i < num_cams; i++)
     {
         m_boost_time[i] = 0.0f;
+        m_speed_intensity[i] = 0.0f;
+        m_boost_intensity[i] = 0.0f;
     }  // for i <number of cameras
 }   // reset
 
@@ -751,6 +784,57 @@ void PostProcessing::giveBoost(unsigned int camera_index)
         m_boost_time.at(camera_index) = 0.75f;
     }
 }   // giveBoost
+
+// ----------------------------------------------------------------------------
+/** Set the speed lines intensity for a camera.
+ *  \param cam_index Camera index
+ *  \param speed_intensity Speed-based intensity [0.0, 1.0]
+ *  \param boost_intensity Boost-based intensity for color tint [0.0, 1.0] */
+void PostProcessing::setSpeedIntensity(unsigned int cam_index,
+                                       float speed_intensity,
+                                       float boost_intensity)
+{
+    if (!CVS->isGLSL())
+        return;
+
+    if (cam_index < m_speed_intensity.size())
+    {
+        m_speed_intensity[cam_index] = speed_intensity;
+        m_boost_intensity[cam_index] = boost_intensity;
+    }
+}   // setSpeedIntensity
+
+// ----------------------------------------------------------------------------
+/** Render speed lines effect.
+ *  \param in_fbo Input framebuffer
+ *  \param out_fbo Output framebuffer */
+void PostProcessing::renderSpeedLines(const FrameBuffer &in_fbo,
+                                      FrameBuffer &out_fbo)
+{
+    Camera *cam = Camera::getActiveCamera();
+    unsigned int cam_index = cam->getIndex();
+
+    if (cam_index >= m_speed_intensity.size())
+        return;
+
+    float speed_intensity = m_speed_intensity[cam_index];
+    float boost_intensity = m_boost_intensity[cam_index];
+
+    // Skip if no effect needed
+    if (speed_intensity < 0.01f)
+        return;
+
+    out_fbo.bind();
+    glClear(GL_COLOR_BUFFER_BIT);
+
+    // Get time for animation
+    float time = 0.0f;
+    if (World::getWorld())
+        time = World::getWorld()->getTime();
+
+    SpeedLinesShader::getInstance()->render(in_fbo, speed_intensity,
+                                            boost_intensity, time);
+}   // renderSpeedLines
 
 // ----------------------------------------------------------------------------
 /** Updates the boost times for all cameras, called once per frame.
@@ -1280,6 +1364,22 @@ FrameBuffer *PostProcessing::render(scene::ICameraSceneNode * const camnode,
             in_fbo = &rtts->getFBO(FBO_RGBA_1);
             out_fbo = &rtts->getFBO(FBO_RGBA_2);
             renderMotionBlur(*in_fbo, *out_fbo, irr_driver->getDepthStencilTexture());
+        }
+        PROFILER_POP_CPU_MARKER();
+    }
+
+    // Speed lines effect
+    {
+        PROFILER_PUSH_CPU_MARKER("- Speed lines", 0xFF, 0x00, 0x00);
+        Camera *cam = Camera::getActiveCamera();
+        unsigned int cam_index = cam ? cam->getIndex() : 0;
+        if (isRace && cam_index < m_speed_intensity.size() &&
+            m_speed_intensity[cam_index] > 0.01f)
+        {
+            FrameBuffer *speed_in = out_fbo;
+            FrameBuffer *speed_out = in_fbo;
+            renderSpeedLines(*speed_in, *speed_out);
+            std::swap(in_fbo, out_fbo);
         }
         PROFILER_POP_CPU_MARKER();
     }
