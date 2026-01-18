@@ -1,0 +1,27 @@
+<?xml version="1.0"?>
+<particles emitter="box" box_x="0.35" box_y="0.2" box_z="0.2">
+
+    <spreading angle="30"         />
+
+    <velocity  x="0.0"
+               y="0.0"
+               z="-0.006"         />
+
+    <material  file="smoke_nitro_nolok.png"  />
+
+    <!-- Amount of particles emitted per second -->
+    <rate      min="500"
+               max="800"          />
+
+    <!-- Minimal and maximal lifetime of a particle, in milliseconds. -->
+    <lifetime  min="100"
+               max="150"          />
+
+    <!-- Size of the particles -->
+    <size      min="0.20"
+               max="0.40"         />
+
+    <color     min="255 255 255"
+               max="255 255 255"  />
+
+</particles>
