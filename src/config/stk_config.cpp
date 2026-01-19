@@ -265,6 +265,8 @@ void STKConfig::init_defaults()
     m_banana_item_return_ticks    = -100;
     m_bubblegum_item_return_ticks = -100;
 
+    m_max_username_length = 50;
+
     m_score_increase.clear();
     m_leader_intervals.clear();
     m_switch_items.clear();

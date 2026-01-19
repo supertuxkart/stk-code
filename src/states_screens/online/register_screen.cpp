@@ -36,6 +36,8 @@
 #include "utils/log.hpp"
 #include "utils/translation.hpp"
 
+#include "config/stk_config.hpp"
+
 #ifdef __SWITCH__
 extern "C" {
   #define u64 uint64_t
@@ -257,18 +259,18 @@ void RegisterScreen::makeEntryFieldsVisible()
 bool RegisterScreen::handleLocalName(const stringw &local_name)
 {
     if (local_name.empty())
-+    {
-+        m_info_widget->setErrorColor();
-+        m_info_widget->setText(_("User name cannot be empty."), false);
-+        return false;
-+    }
-+
-+    if (local_name.size() > 50){
-+        m_info_widget->setErrorColor();
-+        m_info_widget->setText(_("Username is too long '%s'.", local_name),
-+                               false);
-+        return false;
-+    }
+    {
+        m_info_widget->setErrorColor();
+        m_info_widget->setText(_("User name cannot be empty."), false);
+        return false;
+    }
+
+    if (local_name.size() > stk_config->m_max_username_length){
+        m_info_widget->setErrorColor();
+        m_info_widget->setText(_("Username is too long '%s'.", local_name),
+                               false);
+        return false;
+    }
 
     // If a local player with that name does not exist, create one
     if(!PlayerManager::get()->getPlayer(local_name))
