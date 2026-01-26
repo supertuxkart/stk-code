@@ -369,6 +369,7 @@ enum MultitouchControls
     MULTITOUCH_CONTROLS_STEERING_WHEEL = 1,
     MULTITOUCH_CONTROLS_ACCELEROMETER = 2,
     MULTITOUCH_CONTROLS_GYROSCOPE = 3,
+    MULTITOUCH_CONTROLS_BUTTONS = 4
 };
 
 /** Using X-macros for setting-possible values is not very pretty, but it's a
@@ -440,7 +441,7 @@ namespace UserConfigParams
             &m_race_setup_group, "Default direction of GP tracks. 0=default, 1=no reverse, 2=all reverse, 3=Random") );
     PARAM_PREFIX IntUserConfigParam          m_rand_gp_num_tracks
             PARAM_DEFAULT(  IntUserConfigParam(1, "random-gp-num-tracks",
-            &m_race_setup_group, "Default number of tracks for random GP.") );            
+            &m_race_setup_group, "Default number of tracks for random GP.") );
     PARAM_PREFIX IntUserConfigParam          m_ffa_time_limit
         PARAM_DEFAULT(IntUserConfigParam(3, "ffa-time-limit",
             &m_race_setup_group, "Time limit in ffa mode."));
@@ -557,7 +558,7 @@ namespace UserConfigParams
     PARAM_PREFIX IntUserConfigParam         m_multitouch_controls
             PARAM_DEFAULT( IntUserConfigParam(0, "multitouch_controls",
             &m_multitouch_group,
-            "Multitouch mode: 0 = undefined, 1 = steering wheel, 2 = accelerometer, 3 = gyroscope"));
+            "Multitouch mode: 0 = undefined, 1 = steering wheel, 2 = accelerometer, 3 = gyroscope, 4 = left/right buttons"));
 
     PARAM_PREFIX FloatUserConfigParam         m_multitouch_deadzone
             PARAM_DEFAULT( FloatUserConfigParam(0.1f, "multitouch_deadzone",
@@ -1388,7 +1389,7 @@ namespace UserConfigParams
             PARAM_DEFAULT(  IntUserConfigParam(0, "news_list_shown_id",
                                                &m_addon_group,
                                                "News before this id has been "
-                                               "shown once so no red dot") );      
+                                               "shown once so no red dot") );
 
     PARAM_PREFIX TimeUserConfigParam        m_addons_last_updated
             PARAM_DEFAULT(  TimeUserConfigParam(0, "addon_last_updated",

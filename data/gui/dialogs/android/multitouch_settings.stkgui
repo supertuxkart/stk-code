@@ -55,6 +55,14 @@
             </div>
         </div>
 
+        <div width="75%" layout="horizontal-row" proportion="1">
+            <label proportion="1" align="center" text_align="right" I18N="In the multitouch settings screen" text="Right/Left Buttons"/>
+            <div proportion="1" align="center" height="fit" layout="horizontal-row" >
+                <spacer width="40" height="10" />
+                <checkbox id="buttons"/>
+            </div>
+        </div>
+
         <label width="100%" I18N="In the multitouch settings screen" text="Advanced"/>
 
         <div width="75%" layout="horizontal-row" proportion="1">
