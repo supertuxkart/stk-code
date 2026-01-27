@@ -2282,7 +2282,7 @@ int RaceResultGUI::displayChallengeInfo(int x, int y, bool increase_density)
                                     the_font->getScale());
         irr::core::dimension2du dim = 
             irr::gui::getGlyphLayoutsDimension(best_while_slower_layout,
-                                               line_height,
+                                               line_height, line_height,
                                                the_font->getInverseShaping(),
                                                the_font->getScale());
         text_color = special_color;

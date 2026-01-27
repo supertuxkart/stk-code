@@ -1424,6 +1424,7 @@ void NetworkingLobby::updateChatScrollbar()
         (unsigned)core::max_(1, (s32)m_text_bubble->getDimension().Width - scrollbar_width));
     const float box_height = m_text_bubble->getDimension().Height;
     s32 line_height = font->getHeightPerLine();
+    s32 glyph_height = font->getHeightPerGlyph();
     
     if (box_height <= 0.0f || line_height <= 0)
         return;
@@ -1435,7 +1436,7 @@ void NetworkingLobby::updateChatScrollbar()
     
     // Calculate total height of all chat messages with correct line breaks
     core::dimension2du total_dim = gui::getGlyphLayoutsDimension(
-        temp_layouts, line_height,
+        temp_layouts, line_height, glyph_height, 
         font->getInverseShaping(), font->getScale());
     
     s32 total_height = total_dim.Height;

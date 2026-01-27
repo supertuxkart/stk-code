@@ -60,6 +60,8 @@ FontWithFace::FontWithFace(const std::string& name)
     m_fallback_font = NULL;
     m_fallback_font_scale = 1.0f;
     m_glyph_max_height = 0;
+    m_glyph_max_above = 0;
+    m_glyph_max_below = 0;
     m_face_ttf = new FaceTTF();
     m_face_dpi = 40;
     m_inverse_shaping = 1.0f;
@@ -86,6 +88,8 @@ FontWithFace::~FontWithFace()
 void FontWithFace::init()
 {
     m_glyph_max_height = 0;
+    m_glyph_max_above = 0;
+    m_glyph_max_below = 0;
     setDPI();
 #ifndef SERVER_ONLY
     if (GUIEngine::isNoGraphics())
@@ -99,6 +103,11 @@ void FontWithFace::init()
     FT_Face cur_face = m_face_ttf->getFace(0);
     font_manager->checkFTError(FT_Set_Pixel_Sizes(cur_face, 0, getDPI()),
         "setting DPI");
+    
+    int maxHeightAbove = (int)((cur_face->size->metrics.ascender +
+        (BEARING - 1)) / BEARING);
+    int maxHeightBelow = (int)((-cur_face->size->metrics.descender +
+        (BEARING - 1)) / BEARING);
 
     for (int i = 32; i < 128; i++)
     {
@@ -108,10 +117,26 @@ void FontWithFace::init()
         font_manager->checkFTError(FT_Load_Glyph(cur_face, idx,
             FT_LOAD_DEFAULT), "setting max height");
 
-        const int height = cur_face->glyph->metrics.height / BEARING;
-        if (height > m_glyph_max_height)
-            m_glyph_max_height = height;
+        font_manager->checkFTError(shapeOutline(&(cur_face->glyph->outline)),
+            "shaping outline");
+
+        // Height above and below the glyph baseline
+        FT_BBox bbox;
+        FT_Outline_Get_CBox(&(cur_face->glyph->outline), &bbox);
+        const int heightAbove = (int)((bbox.yMax + (BEARING - 1)) / BEARING);
+        const int heightBelow = (int)((-bbox.yMin + (BEARING - 1)) / BEARING);
+        
+        if(heightBelow > maxHeightBelow) {
+            maxHeightBelow = heightBelow;
+        }
+
+        if (heightAbove > maxHeightAbove)
+            maxHeightAbove = heightAbove;
     }
+
+    m_glyph_max_above = maxHeightAbove;
+    m_glyph_max_below = maxHeightBelow;
+    m_glyph_max_height = m_glyph_max_above + m_glyph_max_below;
 #endif
     reset();
 }   // init
@@ -324,11 +349,13 @@ void FontWithFace::insertGlyph(unsigned font_number, unsigned glyph_index)
         (cur_face->glyph->advance.x / BEARING * scale_ratio);
     a.bearing_x = (int)
         (cur_face->glyph->metrics.horiBearingX / BEARING * scale_ratio);
+    const int cur_bearing_y =
+        (int)(cur_face->glyph->metrics.horiBearingY / BEARING * scale_ratio);
     const int cur_height =
         (int)(cur_face->glyph->metrics.height / BEARING * scale_ratio);
     const int cur_offset_y = cur_height -
-        (int)(cur_face->glyph->metrics.horiBearingY / BEARING * scale_ratio);
-    a.offset_y = m_glyph_max_height - cur_height + cur_offset_y;
+        cur_bearing_y;
+    a.offset_y = m_glyph_max_above - cur_bearing_y;
     a.offset_y_bt = -cur_offset_y;
     a.spriteno = f.rectNumber;
     m_face_ttf->insertFontArea(a, font_number, glyph_index);
@@ -506,7 +533,7 @@ core::dimension2d<u32> FontWithFace::getDimension(const core::stringw& text,
     if (disableTextShaping())
     {
         return gui::getGlyphLayoutsDimension(text2GlyphsWithoutShaping(text),
-            m_font_max_height * scale, 1.0f/*inverse shaping*/, scale);
+            m_font_max_height * scale, m_glyph_max_height * scale, 1.0f/*inverse shaping*/, scale);
     }
 
     auto& gls = font_manager->getCachedLayouts(text);
@@ -514,7 +541,7 @@ core::dimension2d<u32> FontWithFace::getDimension(const core::stringw& text,
         font_manager->shape(StringUtils::wideToUtf32(text), gls);
 
     return gui::getGlyphLayoutsDimension(gls,
-        m_font_max_height * scale, m_inverse_shaping, scale);
+        m_font_max_height * scale, m_glyph_max_height * scale, m_inverse_shaping, scale);
 #endif
 }   // getDimension
                                   

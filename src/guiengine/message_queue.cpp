@@ -160,7 +160,7 @@ public:
         gui::breakGlyphLayouts(m_gls, (float)max_width,
             m_font->getInverseShaping(), m_font->getScale());
         core::dimension2du dim = gui::getGlyphLayoutsDimension(m_gls,
-            m_font->getHeightPerLine(), m_font->getInverseShaping(),
+            m_font->getHeightPerLine(), m_font->getHeightPerGlyph(), m_font->getInverseShaping(),
             m_font->getScale());
 
         if ((int)dim.Height > m_font->getHeightPerLine() * 3)

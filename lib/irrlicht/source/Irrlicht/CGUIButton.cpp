@@ -333,9 +333,15 @@ void CGUIButton::draw()
 		}
 
 		if (font)
-			font->draw(Text.c_str(), rect,
+		{
+			const core::dimension2d<u32> dim = font->getDimension(Text.c_str());
+			core::rect<s32> text_rect = rect;
+			text_rect.UpperLeftCorner.Y += (rect.getHeight() - (s32)dim.Height) / 2;
+			text_rect.LowerRightCorner.Y = text_rect.UpperLeftCorner.Y + (s32)dim.Height;
+			font->draw(Text.c_str(), text_rect,
 				skin->getColor(isEnabled() ? EGDC_BUTTON_TEXT : EGDC_GRAY_TEXT),
-				true, true, &AbsoluteClippingRect);
+				true, false, &AbsoluteClippingRect);
+		}
 	}
 
 	IGUIElement::draw();
