@@ -303,7 +303,7 @@ void NetworkingLobby::init()
         // Handle mouse wheel scrolling
         if (mouse.Event == EMIE_MOUSE_WHEEL)
         {
-            if (lobby->m_chat_scrollbar && lobby->m_chat_scrollbar->isVisible() && 
+            if (lobby->m_chat_scrollbar && lobby->m_chat_scrollbar->isVisible() &&
                 lobby->m_text_bubble)
             {
                 irr::SEvent scroll_event;
@@ -394,7 +394,7 @@ void NetworkingLobby::addMoreServerInfo(core::stringw info)
 #ifndef SERVER_ONLY
     // Reserve space for scrollbar when breaking layouts
     s32 scrollbar_width = getChatScrollbarWidth();
-    const unsigned box_width = core::max_(1u, 
+    const unsigned box_width = core::max_(1u,
         (unsigned)core::max_(1, (s32)m_text_bubble->getDimension().Width - scrollbar_width));
     std::vector<GlyphLayout> cur_info;
     font_manager->initGlyphLayouts(info, cur_info, gui::SF_DISABLE_CACHE |
@@ -511,7 +511,7 @@ void NetworkingLobby::onResize()
     
     // Reserve space for scrollbar when breaking layouts
     s32 scrollbar_width = getChatScrollbarWidth();
-    const unsigned box_width = core::max_(1u, 
+    const unsigned box_width = core::max_(1u,
         (unsigned)core::max_(1, (s32)m_text_bubble->getDimension().Width - scrollbar_width));
     gui::IGUIFont* font = GUIEngine::getFont();
     
@@ -613,7 +613,7 @@ void NetworkingLobby::filterGlyphLayoutsForScroll()
     
     // Reserve space for scrollbar when breaking layouts
     s32 scrollbar_width = getChatScrollbarWidth();
-    const unsigned box_width = core::max_(1u, 
+    const unsigned box_width = core::max_(1u,
         (unsigned)core::max_(1, (s32)m_text_bubble->getDimension().Width - scrollbar_width));
     const float box_height = m_text_bubble->getDimension().Height;
     s32 line_height = font->getHeightPerLine();
@@ -1420,7 +1420,7 @@ void NetworkingLobby::updateChatScrollbar()
     
     // Reserve space for scrollbar when breaking layouts
     s32 scrollbar_width = getChatScrollbarWidth();
-    const unsigned box_width = core::max_(1u, 
+    const unsigned box_width = core::max_(1u,
         (unsigned)core::max_(1, (s32)m_text_bubble->getDimension().Width - scrollbar_width));
     const float box_height = m_text_bubble->getDimension().Height;
     s32 line_height = font->getHeightPerLine();

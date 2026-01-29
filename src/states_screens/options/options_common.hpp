@@ -52,14 +52,14 @@
 
 namespace OptionsCommon
 {
-	void switchTab(std::string selected_tab);
+    void switchTab(std::string selected_tab);
 
-	// Set the tooltip to warn that the option is not available during a game pause,
-	// disable the tooltip if not in a pause
-	void updatePauseTooltip(GUIEngine::Widget* widget, bool is_pause);
+    // Set the tooltip to warn that the option is not available during a game pause,
+    // disable the tooltip if not in a pause
+    void updatePauseTooltip(GUIEngine::Widget* widget, bool is_pause);
 
-	// Enable or disable the players and language tabs depending on the in-game pause status
-	void setTabStatus();
+    // Enable or disable the players and language tabs depending on the in-game pause status
+    void setTabStatus();
 }
 
 #endif

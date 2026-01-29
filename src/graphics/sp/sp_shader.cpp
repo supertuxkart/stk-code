@@ -28,7 +28,7 @@
 
 namespace SP
 {
-std::map<std::string, std::pair<unsigned, SamplerType> > 
+std::map<std::string, std::pair<unsigned, SamplerType> >
                                                     SPShader::m_prefilled_names;
 bool SPShader::m_sp_shader_debug = false;
 
@@ -47,14 +47,14 @@ SPShader::SPShader(const std::string& name,
     if (skinningUseTBO())
     {
 #ifndef USE_GLES2
-        m_prefilled_names["skinning_tex"] = std::make_pair<unsigned, 
+        m_prefilled_names["skinning_tex"] = std::make_pair<unsigned,
                                             SamplerType>(0, ST_TEXTURE_BUFFER);
 #endif
     }
     else
     {
-        m_prefilled_names["skinning_tex"] = std::make_pair<unsigned, 
-                                            SamplerType>(0, ST_NEAREST_CLAMPED);        
+        m_prefilled_names["skinning_tex"] = std::make_pair<unsigned,
+                                            SamplerType>(0, ST_NEAREST_CLAMPED);
     }
 #endif
     

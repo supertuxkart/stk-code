@@ -53,7 +53,7 @@ class STKPeer;
  *  protocol and give it to this singleton. The protocols are updated in two
  *  different ways:
  *  1) Asynchronous updates:
- *     A separate threads runs that delivers asynchronous events 
+ *     A separate threads runs that delivers asynchronous events
  *     (i.e. messages), updates each protocol, and handles new requests
  *     (start/stop protocol etc). Protocols are updated using the
  *     Protocol::asynchronousUpdate() function.
@@ -61,7 +61,7 @@ class STKPeer;
  *  2) Synchronous updates:
  *     This is called from the main game thread, and will deliver synchronous
  *     events (i.e. messages), and updates each protocol using
- *     Protocol::update(). 
+ *     Protocol::update().
  *
  *  Since the STK main loop is not thread safe, any game changing events must
  *  (e.g. events that push a new screen, ...) be processed synchronoysly.
@@ -89,16 +89,16 @@ class STKPeer;
  *  Manager stores each protocol with the same protocol id in a OneProtocol
  *  structure (so in most cases this is just one protocol instance in one
  *  OneProtocol structure, but e.g. several connect_to_peer instances would
- *  be stored in one OneProtocoll instance. The OneProtocol instance is 
+ *  be stored in one OneProtocoll instance. The OneProtocol instance is
  *  responsible to forward events to all protocols with the same id.
- *  
- */ 
+ *
+ */
 class ProtocolManager : public NoCopy
 {
 private:
 
     /** A simple class that stores all protocols of a certain type. While
-     *  many protocols have at most one instance running, some (e.g. 
+     *  many protocols have at most one instance running, some (e.g.
      *  GetPublicAddress, ConntectToPeer, ...) can have several instances
      *  active at the same time. */
     class OneProtocolType
@@ -199,7 +199,7 @@ public:
     // ------------------------------------------------------------------------
     const std::thread& getThread() const
     {
-        return m_asynchronous_update_thread; 
+        return m_asynchronous_update_thread;
     }   // getThreadID
     // ------------------------------------------------------------------------
     static std::shared_ptr<ProtocolManager> createInstance();

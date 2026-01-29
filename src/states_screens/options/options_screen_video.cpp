@@ -325,13 +325,13 @@ void OptionsScreenVideo::updateTooltip()
     else
     {
         tooltip = tooltip + L"\n" + _("Shadows: %i", UserConfigParams::m_shadows_resolution);
-        tooltip = tooltip + L"\n" + 
+        tooltip = tooltip + L"\n" +
             (UserConfigParams::m_pcss ?  _("Soft shadows: Enabled") :
                                          _("Soft shadows: Disabled"));
     }
 
     //I18N: in the graphical options
-    tooltip = tooltip + L"\n" + 
+    tooltip = tooltip + L"\n" +
         (UserConfigParams::m_mlaa ? _("Anti-aliasing: Enabled") :
                                     _("Anti-aliasing: Disabled"));
     //I18N: in the graphical options

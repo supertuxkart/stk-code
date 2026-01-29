@@ -272,14 +272,14 @@ float DynamicRibbonWidget::estimateRowScore(const int rowCount, const int width,
         // TODO: check how this interacts with high-dpi
         // TODO: properly account for the margins between rows, which reduce the true available height
         float icon_size_ratio = std::min(1.0f, icon_height / (float)m_child_height);
-        icon_size_ratio = (icon_size_ratio * icon_size_ratio * icon_size_ratio * sqrtf(icon_size_ratio)) * 
+        icon_size_ratio = (icon_size_ratio * icon_size_ratio * icon_size_ratio * sqrtf(icon_size_ratio)) *
                         (2.0f - icon_size_ratio) * (2.0f - icon_size_ratio) * std::min(1.0f, icon_size_ratio * 1.5f);
 
         // We slightly penalize layouts that don't cover well the available area,
         // this mostly acts as a tie-breaker when all items can be displayed
         // at the requested icon size
         int taken_area = int(visible_items * icon_width * icon_height);
-        float total_area = (float)(width * height);    
+        float total_area = (float)(width * height);
         float area_factor = std::min(taken_area/total_area, 1.0f);
         area_factor = 0.9f + area_factor * 0.1f;
 
@@ -342,7 +342,7 @@ void DynamicRibbonWidget::buildInternalStructure()
             float max_score_so_far = -1;
 
             // No hint or actual number, so make assumptions
-            if (item_shown_target < 1)      
+            if (item_shown_target < 1)
                 item_shown_target = 20;
 
             for (int row_count = 1; row_count < 10; row_count++)
@@ -380,7 +380,7 @@ void DynamicRibbonWidget::buildInternalStructure()
     else // single-row
     {
         // No hint or actual number, so make assumptions
-        if (item_shown_target < 1)      
+        if (item_shown_target < 1)
             item_shown_target = 5;
 
         // Get the best score for this number of rows

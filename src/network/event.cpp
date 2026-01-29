@@ -82,7 +82,7 @@ Event::Event(ENetEvent* event, std::shared_ptr<STKPeer> peer)
         }
         else
         {
-            m_data = new NetworkString(event->packet->data, 
+            m_data = new NetworkString(event->packet->data,
                 (int)event->packet->dataLength);
         }
     }

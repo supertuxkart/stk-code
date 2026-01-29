@@ -45,7 +45,7 @@ private:
     bool                      m_achieved;
 
     /* When quitting the game, the achievement info is deleted before
-     * the achievement's status is saved. We need to store the id here 
+     * the achievement's status is saved. We need to store the id here
      * to prevent saving junk data.
      * FIXME: an achievement info should not be removed until all references
      *        to it have been too.*/

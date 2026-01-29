@@ -61,7 +61,7 @@ private:
     float       m_distance_increase;
 
     /** This stores the live time difference between a ghost kart
-     *  and a second kart racing against it (normal or ghost). 
+     *  and a second kart racing against it (normal or ghost).
      */
     float       m_live_time_difference;
 

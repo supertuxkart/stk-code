@@ -118,12 +118,12 @@ void OptionsScreenInput::buildDeviceList()
             {
                 // since irrLicht's list widget has the nasty tendency to put the
                 // icons very close to the text, I'm adding spaces to compensate.
-                name = (core::stringw("   ") + 
+                name = (core::stringw("   ") +
                              config->getConfigName());
             }
             else
             {
-                name = ("   " + config->getName()).c_str();   
+                name = ("   " + config->getName()).c_str();
 
                 if (config->getNumberOfDevices() > 1)
                 {
@@ -147,7 +147,7 @@ void OptionsScreenInput::buildDeviceList()
                                                         
     if (touch_device != NULL)
     {
-        devices->addItem("touch_device", (core::stringw("   ") + 
+        devices->addItem("touch_device", (core::stringw("   ") +
                                                 _("Touch Device")).c_str(), 4);
     }
 }   // buildDeviceList

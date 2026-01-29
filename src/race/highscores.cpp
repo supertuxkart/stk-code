@@ -212,7 +212,7 @@ int Highscores::matches(int num_karts,
             m_gp_minor_mode   == minor_mode         );
 }
 
-int Highscores::findHighscorePosition(const std::string& kart_name, 
+int Highscores::findHighscorePosition(const std::string& kart_name,
                               const core::stringw& name, const float time)
 {
     int position=-1;

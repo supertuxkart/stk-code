@@ -335,8 +335,8 @@ namespace GUIEngine
         void setMaxLabelLength(int length) { m_max_label_length = length; }
 
         void registerScrollCallback(void (*callback)(void* data), void* data)
-        { 
-            m_scroll_callback.callback = callback; 
+        {
+            m_scroll_callback.callback = callback;
             m_scroll_callback.data = data;
         }
     };

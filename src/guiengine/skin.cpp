@@ -684,7 +684,7 @@ void Skin::drawBgImage()
                 factor_w = (float)screen_w / texture_w;
                 factor_h = factor_w;
             }
-            else 
+            else
             {
                 // Cannot crop vertically → stretch both width and height to fit
                 factor_h = (float)screen_h / texture_h;
@@ -1275,7 +1275,7 @@ void Skin::drawRatingBar(Widget *w, const core::recti &rect,
 
         core::recti source_area = core::recti(0, 0, texture_w, texture_h);
 
-        float scale = (float)std::min(irr_driver->getActualScreenSize().Height / 1080.0f, 
+        float scale = (float)std::min(irr_driver->getActualScreenSize().Height / 1080.0f,
                                     irr_driver->getActualScreenSize().Width / 1350.0f);
         int size = (int)((90.0f + grow) * scale);
         const core::recti rect2(glow_center_x - size,
@@ -1677,7 +1677,7 @@ void Skin::drawRibbonChild(const core::recti &rect, Widget* widget,
 
                 core::recti source_area(0, 0, texture_w, texture_h);
 
-                float scale = (float)std::min(irr_driver->getActualScreenSize().Height / 1080.0f, 
+                float scale = (float)std::min(irr_driver->getActualScreenSize().Height / 1080.0f,
                                             irr_driver->getActualScreenSize().Width / 1350.0f);
                 int size = (int)((90.0f + grow) * scale);
                 const core::recti rect2(glow_center_x - size,
@@ -2018,7 +2018,7 @@ void Skin::drawIconButton(const core::recti &rect, Widget* widget,
 
         core::recti source_area = core::recti(0, 0, texture_w, texture_h);
 
-        float scale = (float)std::min(irr_driver->getActualScreenSize().Height / 1080.0f, 
+        float scale = (float)std::min(irr_driver->getActualScreenSize().Height / 1080.0f,
                                     irr_driver->getActualScreenSize().Width / 1350.0f);
         int size = (int)((90.0f + grow) * scale);
         const core::recti rect2(glow_center_x - size,
@@ -2277,7 +2277,7 @@ void Skin::drawListHeader(const irr::core::rect< irr::s32 > &rect,
 void Skin::renderSections(PtrVector<Widget>* within_vector)
 {
 #ifndef SERVER_ONLY
-    if (within_vector == NULL && getCurrentScreen()) 
+    if (within_vector == NULL && getCurrentScreen())
         within_vector = &getCurrentScreen()->m_widgets;
         
     if (!within_vector)

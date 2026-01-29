@@ -156,16 +156,16 @@ void override_default_params_for_mobile()
             if (method_id != NULL)
                 screen_size = env->CallIntMethod(activity, method_id);
                 
-            jmethodID display_dpi_id = env->GetStaticMethodID(clazz, 
+            jmethodID display_dpi_id = env->GetStaticMethodID(clazz,
                 "getDisplayDPI", "()Landroid/util/DisplayMetrics;");
                 
             if (display_dpi_id != NULL)
             {
-                jobject display_dpi_obj = env->CallStaticObjectMethod(clazz, 
+                jobject display_dpi_obj = env->CallStaticObjectMethod(clazz,
                                                                 display_dpi_id);
                 jclass display_dpi_class = env->GetObjectClass(display_dpi_obj);
             
-                jfieldID ddpi_field = env->GetFieldID(display_dpi_class, 
+                jfieldID ddpi_field = env->GetFieldID(display_dpi_class,
                                                       "densityDpi", "I");
                 ddpi = env->GetIntField(display_dpi_obj, ddpi_field);
             
@@ -207,7 +207,7 @@ void override_default_params_for_mobile()
     {
         // Use 100% scale on devices with 8GB RAM and Android >= 12
         UserConfigParams::m_scale_rtts_factor = 1.0f;
-    }    
+    }
     else if (ddpi < 1)
     {
         Log::warn("MainAndroid", "Failed to get display DPI.");
@@ -230,7 +230,7 @@ void override_default_params_for_mobile()
         Log::info("MainAndroid", "Display DPI: %i", ddpi);
     }
 
-    Log::info("MainAndroid", "Render scale: %f", 
+    Log::info("MainAndroid", "Render scale: %f",
               (float)UserConfigParams::m_scale_rtts_factor);
 #endif
 

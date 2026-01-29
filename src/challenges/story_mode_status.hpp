@@ -76,7 +76,7 @@ private:
     /* Set to true after fort magma */
     bool m_story_mode_finished;
 
-    /* Set to true after fort magma if there was a valid speedrun active 
+    /* Set to true after fort magma if there was a valid speedrun active
      * This is used to know if m_speedrun_milliseconds contain valid data */
     bool m_valid_speedrun_finished;
 

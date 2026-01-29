@@ -139,7 +139,7 @@ void KartPropertiesManager::removeKart(const std::string &ident)
             {
                 m_groups_2_indices_no_custom.erase(groups[i]);
             }
-        } 
+        }
 
         it = std::find(m_groups_2_indices[groups[i]].begin(),
                        m_groups_2_indices[groups[i]].end(),   index);

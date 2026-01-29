@@ -29,7 +29,7 @@
 using namespace irr;
 
 
-KeyboardConfig::KeyboardConfig() 
+KeyboardConfig::KeyboardConfig()
               : DeviceConfig()
 {
     setDefaultBinds();

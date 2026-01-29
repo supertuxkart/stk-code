@@ -38,13 +38,13 @@ namespace GUIEngine
     class ButtonWidget;
 
     /**
-     * \brief Class representing a screen keyboard. Only once instance at a 
-     * time (if you create a 2nd the first will be destroyed). You can call 
+     * \brief Class representing a screen keyboard. Only once instance at a
+     * time (if you create a 2nd the first will be destroyed). You can call
      * static function 'dismiss' to simply close the keyboard (so you don't
      * need to keep track of instances yourself)
      * \ingroup guiengine
      */
-    class ScreenKeyboard : public SkinWidgetContainer, 
+    class ScreenKeyboard : public SkinWidgetContainer,
                            public AbstractTopLevelContainer
     {
     protected:
@@ -63,11 +63,11 @@ namespace GUIEngine
         /** Global instance of the current screen keyboard */
         static ScreenKeyboard* m_screen_keyboard;
         
-        /** A value in range of 0.0 to 1.0 that determines width of the screen 
+        /** A value in range of 0.0 to 1.0 that determines width of the screen
          *  that is used by the keyboard */
         float m_percent_width;
         
-        /** A value in range of 0.0 to 1.0 that determines height of the screen 
+        /** A value in range of 0.0 to 1.0 that determines height of the screen
          *  that is used by the keyboard */
         float m_percent_height;
         
@@ -108,7 +108,7 @@ namespace GUIEngine
     public:
         LEAK_CHECK()
 
-        ScreenKeyboard(float percent_width, float percent_height, 
+        ScreenKeyboard(float percent_width, float percent_height,
                        CGUIEditBox* edit_box);
         ~ScreenKeyboard();
 
@@ -141,7 +141,7 @@ namespace GUIEngine
          *  \param widget A widget that should be checked
          *  \return True if keyboard is the parent
          */
-        bool isMyIrrChild(irr::gui::IGUIElement* widget) const 
+        bool isMyIrrChild(irr::gui::IGUIElement* widget) const
                                 {return m_irrlicht_window->isMyChild(widget);}
 
         /** Returns width of the screen keyboard */

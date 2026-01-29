@@ -80,7 +80,7 @@ const float KARTS_AND_PODIUMS_INITIAL_ROTATION[3] = { 90.0f, 90.0f, 90.0f };
 const float PODIUMS_INITIAL_Y[3] = { -2.51f, -2.61f, -2.51f };
 const float KARTS_INITIAL_X[3] = { 18.0f, 18.0f, 18.0f };
 //const float KARTS_INITIAL_Y[3] = { -1.73f, -1.83f, -1.73f };
-const float KARTS_INITIAL_Y[3] = { 
+const float KARTS_INITIAL_Y[3] = {
             PODIUMS_INITIAL_Y[0] + PODIUMS_HEIGHT_FROM_Y0,
             PODIUMS_INITIAL_Y[1] + PODIUMS_HEIGHT_FROM_Y0,
             PODIUMS_INITIAL_Y[2] + PODIUMS_HEIGHT_FROM_Y0
@@ -412,7 +412,7 @@ void GrandPrixWin::setKarts(const std::pair<std::string, float> idents_arg[3])
 
         //FIXME: it's not ideal that both the track object and the presentation
         // know the initial coordinates of the object
-        TrackObjectPresentationSceneNode* presentation = 
+        TrackObjectPresentationSceneNode* presentation =
             new TrackObjectPresentationSceneNode(kart_pos, kart_rot, kart_scale,
                                                  kart_main_node);
         TrackObject* tobj = new TrackObject(kart_pos, kart_rot, kart_scale,

@@ -133,7 +133,7 @@ void LinearWorld::reset(bool restart)
     // be increased to avoid negative values in estimateFinishTimeForKart
     // Increase this value somewhat in case that a kart drivess/slides
     // backwards a little bit at start.
-    m_distance_increase = Track::getCurrentTrack()->getTrackLength() 
+    m_distance_increase = Track::getCurrentTrack()->getTrackLength()
                         - m_distance_increase + 5.0f;
 
     if(m_distance_increase<0) m_distance_increase = 1.0f;  // shouldn't happen
@@ -313,7 +313,7 @@ void LinearWorld::updateGraphics(float dt)
 
     const GUIEngine::GameState gamestate = StateManager::get()->getGameState();
     
-    if (gamestate == GUIEngine::GAME && 
+    if (gamestate == GUIEngine::GAME &&
         !GUIEngine::ModalDialog::isADialogActive())
     {
         const unsigned int kart_amount = getNumKarts();
@@ -406,7 +406,7 @@ void LinearWorld::newLap(unsigned int kart_index)
         kart_info.m_ticks_at_last_lap=getTimeTicks();
         kart_info.m_finished_laps++;
         m_kart_info[kart_index].m_overall_distance =
-              m_kart_info[kart_index].m_finished_laps 
+              m_kart_info[kart_index].m_finished_laps
             * Track::getCurrentTrack()->getTrackLength()
             + getDistanceDownTrackForKart(kart->getWorldKartId(), true);
     }
@@ -1044,7 +1044,7 @@ void LinearWorld::updateRacePosition()
  */
 void LinearWorld::checkForWrongDirection(unsigned int i, float dt)
 {
-    if (!m_karts[i]->getController()->isLocalPlayerController()) 
+    if (!m_karts[i]->getController()->isLocalPlayerController())
         return;
 
     KartInfo &ki = m_kart_info[i];

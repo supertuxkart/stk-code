@@ -711,7 +711,7 @@ void Kart::createPhysics()
                     }
                     // The y position of the wheels (i.e. the points where
                     // the suspension is attached to) is just at the
-                    // bottom of the kart (independent of collision shape). 
+                    // bottom of the kart (independent of collision shape).
                     // That is half the kart height down.
                     wheel_pos[index].setY(-0.5f*kart_height);
                 }  // if y==-1
@@ -955,7 +955,7 @@ void Kart::finishedRace(float time, bool from_server)
             RaceEventManager::get()->kartFinishedRace(this, time);
         }   // isServer
 
-        // Ignore local detection of a kart finishing a race in a 
+        // Ignore local detection of a kart finishing a race in a
         // network game.
         else if (NetworkConfig::get()->isClient())
         {
@@ -1158,7 +1158,7 @@ void Kart::collectedItem(ItemState *item_state)
             break;
         }
     case Item::ITEM_BUBBLEGUM:
-        m_has_caught_nolok_bubblegum = 
+        m_has_caught_nolok_bubblegum =
             (item_state->getPreviousOwner()&&
              item_state->getPreviousOwner()->getIdent() == "nolok");
 
@@ -1443,7 +1443,7 @@ void Kart::update(int ticks)
         m_invulnerable_ticks = stk_config->time2Ticks(time);
     }
 
-    // Update the locally maintained speed of the kart (m_speed), which 
+    // Update the locally maintained speed of the kart (m_speed), which
     // is used furthermore for engine power, camera distance etc
     updateSpeed();
     // Make the restitution depend on speed: this avoids collision issues,
@@ -1827,7 +1827,7 @@ void Kart::updateSpeed()
     // In theory <0 should be sufficient, but floating point errors can cause
     // flipping from +eps to -eps and back, resulting in animation flickering
     // if the kart has backpedal animations.
-    if (forwardW.dot(getVehicle()->getRigidBody()->getLinearVelocity()) 
+    if (forwardW.dot(getVehicle()->getRigidBody()->getLinearVelocity())
         < btScalar(-0.01f))
     {
         m_speed = -m_speed;
@@ -1876,7 +1876,7 @@ bool Kart::setSquash(float time, float slowdown)
     }
 
     m_max_speed->setSlowdown(MaxSpeed::MS_DECREASE_SQUASH, slowdown,
-                             stk_config->time2Ticks(0.1f), 
+                             stk_config->time2Ticks(0.1f),
                              stk_config->time2Ticks(time));
     return true;
 }   // setSquash
@@ -1954,7 +1954,7 @@ void Kart::handleMaterialSFX()
     // entered), the oldest (previous) sfx is stopped and deleted.
 
     // FIXME: if there are already two sfx playing, don't add another
-    // one. This should reduce the performance impact when driving 
+    // one. This should reduce the performance impact when driving
     // on the bridge in Cocoa.
     const Material* material =
         isOnGround() ? m_terrain_info->getMaterial() : NULL;
@@ -2016,7 +2016,7 @@ void Kart::handleMaterialSFX()
 
     // terrain sound is not necessarily a looping sound so check its status before
     // setting its speed, to avoid 'ressuscitating' sounds that had already stopped
-    if(m_terrain_sound && 
+    if(m_terrain_sound &&
         (m_terrain_sound->getStatus()==SFXBase::SFX_PLAYING ||
          m_terrain_sound->getStatus()==SFXBase::SFX_PAUSED)    )
     {
@@ -2482,8 +2482,8 @@ void Kart::playCrashSFX(const Material* m, AbstractKart *k)
         if (getVelocity().length()> 0.555f)
         {
             const float speed_for_max_volume = 15; //The speed at which the sound plays at maximum volume
-            const float max_volume = 1; //The maximum volume a sound is played at 
-            const float min_volume = 0.2f; //The minimum volume a sound is played at 
+            const float max_volume = 1; //The maximum volume a sound is played at
+            const float min_volume = 0.2f; //The minimum volume a sound is played at
             
             float volume; //The volume the crash sound will be played at
             
@@ -2675,7 +2675,7 @@ void Kart::updatePhysics(int ticks)
 }   // updatephysics
 
 //-----------------------------------------------------------------------------
-/** Adjust the engine sound effect depending on the speed of the kart. This 
+/** Adjust the engine sound effect depending on the speed of the kart. This
  *  is called during updateGraphics, i.e. once per rendered frame only.
  *  \param dt Time step size.
  */
@@ -2728,7 +2728,7 @@ void Kart::updateEngineSFX(float dt)
 
 //-----------------------------------------------------------------------------
 /** Reduces the engine power according to speed
- *  
+ *
  *  TODO : find where the physics already apply a linear force decrease
  *  TODO : While this work fine, it should ideally be in physics
  *         However, the function use some kart properties and parachute
@@ -3340,7 +3340,7 @@ void Kart::updateGraphics(float dt)
         int max_lean_sign = extract_sign(max_lean);
         m_current_lean += max_lean_sign * dt* roll_speed;
         if(  (max_lean > 0 && m_current_lean > max_lean)
-           ||(max_lean < 0 && m_current_lean < max_lean)) 
+           ||(max_lean < 0 && m_current_lean < max_lean))
             m_current_lean = max_lean;
     }
     else if(m_current_lean!=0.0f)

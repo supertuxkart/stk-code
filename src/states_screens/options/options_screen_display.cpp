@@ -112,7 +112,7 @@ void OptionsScreenDisplay::init()
     LabelWidget* full_text = getWidget<LabelWidget>("fullscreenText");
     assert( full_text != NULL );
 
-    LabelWidget* rememberWinposText = 
+    LabelWidget* rememberWinposText =
                                    getWidget<LabelWidget>("rememberWinposText");
     assert( rememberWinposText != NULL );
 #endif
@@ -384,7 +384,7 @@ void OptionsScreenDisplay::eventCallback(Widget* widget, const std::string& name
         std::string selection = ((RibbonWidget*)widget)->getSelectionIDString(PLAYER_ID_GAME_MASTER);
 
         if (selection != "tab_display")
-			OptionsCommon::switchTab(selection);
+            OptionsCommon::switchTab(selection);
     }
     else if(name == "back")
     {

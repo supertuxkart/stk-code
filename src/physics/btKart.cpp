@@ -266,7 +266,7 @@ btScalar btKart::rayCast(unsigned int index, float fraction)
     btScalar max_susp_len = wheel.getSuspensionRestLength()
                           + wheel.m_maxSuspensionTravel;
 
-    // Do a slightly longer raycast to see if the kart might soon hit the 
+    // Do a slightly longer raycast to see if the kart might soon hit the
     // ground and some 'cushioning' is needed to avoid that the chassis
     // hits the ground.
     btScalar raylen = max_susp_len + 0.5f;
@@ -385,7 +385,7 @@ void btKart::getVisualContactPoint(const btTransform& chassis_trans,
         btScalar max_susp_len = wheel.getSuspensionRestLength()
                               + wheel.m_maxSuspensionTravel;
 
-        // Do a slightly longer raycast to see if the kart might soon hit the 
+        // Do a slightly longer raycast to see if the kart might soon hit the
         // ground and some 'cushioning' is needed to avoid that the chassis
         // hits the ground.
         btScalar raylen = max_susp_len + 0.5f;

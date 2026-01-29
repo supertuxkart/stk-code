@@ -135,7 +135,7 @@ void RaceGUIMultitouch::init()
         UserConfigParams::m_multitouch_scale = 0.8f;
     }
     
-    m_steering_wheel_tex = irr_driver->getTexture(FileManager::GUI_ICON, 
+    m_steering_wheel_tex = irr_driver->getTexture(FileManager::GUI_ICON,
                                                   "android/steering_wheel.png");
     m_accelerator_tex = irr_driver->getTexture(FileManager::GUI_ICON,
                                                "android/accelerator.png");
@@ -143,16 +143,16 @@ void RaceGUIMultitouch::init()
                                                "android/accelerator_handle.png");
     m_pause_tex = irr_driver->getTexture(FileManager::GUI_ICON, "android/pause.png");
     m_nitro_tex = irr_driver->getTexture(FileManager::GUI_ICON, "android/nitro.png");
-    m_nitro_empty_tex = irr_driver->getTexture(FileManager::GUI_ICON, 
+    m_nitro_empty_tex = irr_driver->getTexture(FileManager::GUI_ICON,
                                                      "android/nitro_empty.png");
-    m_wing_mirror_tex = irr_driver->getTexture(FileManager::GUI_ICON, 
+    m_wing_mirror_tex = irr_driver->getTexture(FileManager::GUI_ICON,
                                                      "android/wing_mirror.png");
-    m_thunderbird_reset_tex = irr_driver->getTexture(FileManager::GUI_ICON, 
+    m_thunderbird_reset_tex = irr_driver->getTexture(FileManager::GUI_ICON,
                                                "android/thunderbird_reset.png");
     m_drift_tex = irr_driver->getTexture(FileManager::GUI_ICON, "android/drift.png");
-    m_bg_button_tex = irr_driver->getTexture(FileManager::GUI_ICON, 
+    m_bg_button_tex = irr_driver->getTexture(FileManager::GUI_ICON,
                                                   "android/blur_bg_button.png");
-    m_bg_button_focus_tex = irr_driver->getTexture(FileManager::GUI_ICON, 
+    m_bg_button_focus_tex = irr_driver->getTexture(FileManager::GUI_ICON,
                                             "android/blur_bg_button_focus.png");
     m_gui_action_tex = irr_driver->getTexture(FileManager::GUI_ICON,"challenge.png");
     m_up_tex = irr_driver->getTexture(FileManager::GUI_ICON, "up.png");
@@ -316,7 +316,7 @@ void RaceGUIMultitouch::createSpectatorGUI()
 //-----------------------------------------------------------------------------
 /** Callback function when custom button is pressed
  */
-void RaceGUIMultitouch::onCustomButtonPress(unsigned int button_id, 
+void RaceGUIMultitouch::onCustomButtonPress(unsigned int button_id,
                                             bool pressed)
 {
     if (!pressed)
@@ -513,10 +513,10 @@ void RaceGUIMultitouch::draw(const AbstractKart* kart,
             if (btn_texture)
             {
                 video::ITexture* btn_bg = (can_be_pressed && button->pressed) ?
-                                                        m_bg_button_focus_tex : 
+                                                        m_bg_button_focus_tex :
                                                         m_bg_button_tex;
                 core::rect<s32> coords_bg(pos_zero, btn_bg->getSize());
-                draw2DImage(btn_bg, btn_pos_bg, coords_bg, NULL, NULL, true);                
+                draw2DImage(btn_bg, btn_pos_bg, coords_bg, NULL, NULL, true);
 
                 core::rect<s32> coords(pos_zero, btn_texture->getSize());
                 draw2DImage(btn_texture, btn_pos, coords, NULL, NULL, true);
@@ -534,7 +534,7 @@ void RaceGUIMultitouch::draw(const AbstractKart* kart,
                                             core::vector2df(scale, scale));
             }
             else if (button->type == MultitouchButtonType::BUTTON_FIRE &&
-                     kart->getPowerup()->getNum() > 1 && 
+                     kart->getPowerup()->getNum() > 1 &&
                      !kart->hasFinishedRace() &&
                      m_gui_action == false)
             {

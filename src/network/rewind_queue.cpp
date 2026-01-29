@@ -31,7 +31,7 @@
 
 /** The RewindQueue stores one TimeStepInfo for each time step done.
  *  The TimeStepInfo stores all states and events to be used at the
- *  given timestep. 
+ *  given timestep.
  *  All network events (i.e. new states or client events) are stored in a
  *  separate list m_network_events. At the very start of a new time step
  *  a new TimeStepInfo object is added. Then all network events that are
@@ -66,7 +66,7 @@ void RewindQueue::reset()
     m_network_events.lock();
 
     AllNetworkRewindInfo &info = m_network_events.getData();
-    for (AllNetworkRewindInfo::const_iterator i  = info.begin(); 
+    for (AllNetworkRewindInfo::const_iterator i  = info.begin();
                                               i != info.end(); ++i)
     {
         delete *i;
@@ -110,13 +110,13 @@ void RewindQueue::insertRewindInfo(RewindInfo *ri)
     if(m_current == m_all_rewind_info.end())
         m_current = m_all_rewind_info.insert(i, ri);
     else
-        m_all_rewind_info.insert(i, ri);  
+        m_all_rewind_info.insert(i, ri);
 }   // insertRewindInfo
 
 // ----------------------------------------------------------------------------
 /** Adds an event to the rewind data. The data to be stored must be allocated
  *  and not freed by the caller!
- *  \param buffer Pointer to the event data. 
+ *  \param buffer Pointer to the event data.
  *  \param ticks Time at which the event happened.
  */
 void RewindQueue::addLocalEvent(EventRewinder *event_rewinder,
@@ -214,7 +214,7 @@ void RewindQueue::mergeNetworkData(int world_ticks, bool *needs_rewind,
     // received state before current world time (if any)
     *rewind_ticks = -9999;
 
-    // FIXME: making m_network_events sorted would prevent the need to 
+    // FIXME: making m_network_events sorted would prevent the need to
     // go through the whole list of events
     int latest_confirmed_state = -1;
     AllNetworkRewindInfo::iterator i = m_network_events.getData().begin();
@@ -241,7 +241,7 @@ void RewindQueue::mergeNetworkData(int world_ticks, bool *needs_rewind,
             continue;
         }
 
-        // A server never rewinds (otherwise we would have to handle 
+        // A server never rewinds (otherwise we would have to handle
         // duplicated states, which in the best case would then have
         // a negative effect for every player, when in fact only one
         // player might have a network hickup).
@@ -307,8 +307,8 @@ void RewindQueue::mergeNetworkData(int world_ticks, bool *needs_rewind,
     // state, instead rewind from the latest confirmed state.
     // This should not be necessary anymore, but I'll leave it
     // in just in case.
-    if (*needs_rewind && 
-        *rewind_ticks < m_latest_confirmed_state_time && 
+    if (*needs_rewind &&
+        *rewind_ticks < m_latest_confirmed_state_time &&
         NetworkConfig::get()->isClient())
     {
         Log::verbose("rewindqueue",
@@ -359,7 +359,7 @@ bool RewindQueue::hasMoreRewindInfo() const
 // ----------------------------------------------------------------------------
 /** Rewinds the rewind queue and undos all events/states stored. It stops
  *  when the first confirmed state is reached that was recorded before the
- *  undo_time and sets the internal 'current' pointer to this state. 
+ *  undo_time and sets the internal 'current' pointer to this state.
  *  \param undo_time To what at least events need to be undone.
  *  \return The time in ticks of the confirmed state
  */
@@ -381,7 +381,7 @@ int RewindQueue::undoUntil(int undo_ticks)
             // This shouldn't happen, but add some debug info just in case
             Log::error("undoUntil",
                        "At %d rewinding to %d current = %d = begin",
-                       World::getWorld()->getTicksSinceStart(), undo_ticks, 
+                       World::getWorld()->getTicksSinceStart(), undo_ticks,
                        (*m_current)->getTicks());
         }
         m_current--;

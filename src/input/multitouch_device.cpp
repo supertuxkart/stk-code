@@ -82,7 +82,7 @@ unsigned int MultitouchDevice::getActiveTouchesCount()
  *  \param callback Pointer to a function that is executed on button event.
  */
 void MultitouchDevice::addButton(MultitouchButtonType type, int x, int y,
-                                 int width, int height, 
+                                 int width, int height,
                                  void (*callback)(unsigned int, bool))
 {
     assert(width > 0 && height > 0);
@@ -217,7 +217,7 @@ void MultitouchDevice::activateGyroscope()
 {
     if (!m_irrlicht_device->isGyroscopeActive())
     {
-        // Assume 60 FPS, some phones can do 90 and 120 FPS but we won't handle 
+        // Assume 60 FPS, some phones can do 90 and 120 FPS but we won't handle
         // them now
         m_irrlicht_device->activateGyroscope(1.0f / 60);
     }
@@ -361,7 +361,7 @@ void MultitouchDevice::updateDeviceState(unsigned int event_id)
                 
                 if (button->pressed == true)
                 {
-                    button->axis_x = 
+                    button->axis_x =
                         (float)(event.x - button->x) / (button->width/2) - 1;
                 }
                 else
@@ -382,7 +382,7 @@ void MultitouchDevice::updateDeviceState(unsigned int event_id)
                 
                 if (button->pressed == true)
                 {
-                    button->axis_y = 
+                    button->axis_y =
                         (float)(event.y - button->y) / (button->height/2) - 1;
                 }
                 else
@@ -402,7 +402,7 @@ void MultitouchDevice::updateDeviceState(unsigned int event_id)
             update_controls = true;
         }
         
-        if (button->type == MultitouchButtonType::BUTTON_UP_DOWN && 
+        if (button->type == MultitouchButtonType::BUTTON_UP_DOWN &&
             !button->pressed)
         {
             update_controls = false;
@@ -505,7 +505,7 @@ void MultitouchDevice::updateAxisY(float value)
 
 // ----------------------------------------------------------------------------
 
-/** Returns device orientation Z angle, in radians, where 0 is landscape 
+/** Returns device orientation Z angle, in radians, where 0 is landscape
  *  orientation parallel to the floor.
  */
 float MultitouchDevice::getOrientation()
@@ -523,11 +523,11 @@ float MultitouchDevice::getOrientation()
 void MultitouchDevice::updateOrientationFromAccelerometer(float x, float y)
 {
     const float ACCEL_DISCARD_THRESHOLD = 4.0f;
-    const float ACCEL_MULTIPLIER = 0.05f; // Slowly adjust the angle over time, 
+    const float ACCEL_MULTIPLIER = 0.05f; // Slowly adjust the angle over time,
                                           // this prevents shaking
     const float ACCEL_CHANGE_THRESHOLD = 0.01f; // ~0.5 degrees
 
-    // The device is flat on the table, cannot reliably determine the 
+    // The device is flat on the table, cannot reliably determine the
     // orientation
     if (fabsf(x) + fabsf(y) < ACCEL_DISCARD_THRESHOLD)
         return;
@@ -596,7 +596,7 @@ void MultitouchDevice::updateOrientationFromGyroscope(float z)
     }
 
     //Log::warn("Gyro", "Z %03.4f angular_speed %03.4f delta %03.4f "
-    //          "orientation %03.4f", z, angular_speed, 
+    //          "orientation %03.4f", z, angular_speed,
     //          angular_speed * timedelta, m_orientation);
 }
 

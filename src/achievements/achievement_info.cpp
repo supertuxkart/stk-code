@@ -171,7 +171,7 @@ int AchievementInfo::getRecursiveDepth(goalTree &parent)
     }
     else if (parent.children.size() == 1 &&
              (parent.children[0].type == "AND" ||
-              parent.children[0].type == "AND-AT-ONCE" || 
+              parent.children[0].type == "AND-AT-ONCE" ||
               parent.children[0].type == "OR"))
     {
         return getRecursiveDepth(parent.children[0]);
@@ -199,7 +199,7 @@ int AchievementInfo::recursiveGoalCount(goalTree &parent)
     }
     else if (parent.children.size() == 1 &&
              (parent.children[0].type == "AND" ||
-              parent.children[0].type == "AND-AT-ONCE" || 
+              parent.children[0].type == "AND-AT-ONCE" ||
               parent.children[0].type == "OR"))
     {
         return recursiveGoalCount(parent.children[0]);
@@ -226,7 +226,7 @@ int AchievementInfo::recursiveProgressCount(goalTree &parent)
     }
     else if (parent.children.size() == 1 &&
              (parent.children[0].type == "AND" ||
-              parent.children[0].type == "AND-AT-ONCE" || 
+              parent.children[0].type == "AND-AT-ONCE" ||
               parent.children[0].type == "OR"))
     {
         return recursiveGoalCount(parent.children[0]);

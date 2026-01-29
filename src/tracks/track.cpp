@@ -1004,7 +1004,7 @@ void Track::convertTrackToBullet(scene::ISceneNode *node,
 
     for(unsigned int i=0; i<mesh->getMeshBufferCount(); i++)
     {
-        scene::IMeshBuffer *mb = mesh->getMeshBuffer(i);    
+        scene::IMeshBuffer *mb = mesh->getMeshBuffer(i);
         // FIXME: take translation/rotation into account
         if (mb->getVertexType() != video::EVT_STANDARD &&
             mb->getVertexType() != video::EVT_2TCOORDS &&
@@ -1260,7 +1260,7 @@ void Track::updateMiniMapScale()
     else
         m_minimap_x_scale = 0;
 
-    if(mini_map_texture_size.Height) 
+    if(mini_map_texture_size.Height)
         m_minimap_y_scale = float(mini_map_size.Height) / float(mini_map_texture_size.Height);
     else
         m_minimap_y_scale = 0;
@@ -2018,7 +2018,7 @@ void Track::loadTrackModel(bool reverse_track, unsigned int mode_id)
     }
     main_loop->renderGUI(3320);
 
-    if (!m_is_arena && !m_is_soccer && !m_is_cutscene) 
+    if (!m_is_arena && !m_is_soccer && !m_is_cutscene)
         loadDriveGraph(mode_id, reverse_track);
     else if ((m_is_arena || m_is_soccer) && !m_is_cutscene && m_has_navmesh)
         loadArenaGraph(*root);

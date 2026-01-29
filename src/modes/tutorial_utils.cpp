@@ -14,7 +14,7 @@
 //
 //  You should have received a copy of the GNU General Public License
 //  along with this program; if not, write to the Free Software
-//  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA. 
+//  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include "modes/tutorial_utils.hpp"
 
@@ -27,8 +27,8 @@
 
 namespace TutorialUtils
 {
-	void startTutorial(bool from_overworld)
-	{
+    void startTutorial(bool from_overworld)
+    {
         RaceManager::get()->setNumPlayers(1);
         RaceManager::get()->setMajorMode (RaceManager::MAJOR_MODE_SINGLE);
         RaceManager::get()->setMinorMode (RaceManager::MINOR_MODE_TUTORIAL);
@@ -37,11 +37,11 @@ namespace TutorialUtils
         RaceManager::get()->setDifficulty(RaceManager::DIFFICULTY_EASY);
         RaceManager::get()->setReverseTrack(false);
 
-    	// Use the last used device
-    	InputDevice* device = input_manager->getDeviceManager()->getLatestUsedDevice();
+        // Use the last used device
+        InputDevice* device = input_manager->getDeviceManager()->getLatestUsedDevice();
 
-    	// Create player and associate player with device
-    	StateManager::get()->createActivePlayer(PlayerManager::getCurrentPlayer(), device);
+        // Create player and associate player with device
+        StateManager::get()->createActivePlayer(PlayerManager::getCurrentPlayer(), device);
 
         if (kart_properties_manager->getKart(UserConfigParams::m_default_kart) == NULL)
         {
@@ -58,5 +58,5 @@ namespace TutorialUtils
         StateManager::get()->enterGameState();
         RaceManager::get()->setupPlayerKartInfo();
         RaceManager::get()->startNew(from_overworld);
-	}
+    }
 }

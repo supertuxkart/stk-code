@@ -733,9 +733,9 @@ void PlayerKartWidget::setSize(const int x, const int y, const int w, const int 
 
     m_crown_icon_x = x + w / 2 - (player_name_w / 2) - (m_crown_icon_w / 2);
 
-    if (!m_ready && m_left_arrow_width > 0) 
+    if (!m_ready && m_left_arrow_width > 0)
         m_crown_icon_x -= m_left_arrow_width / 2;
-    else 
+    else
         m_crown_icon_x += m_left_arrow_width / 2;
 
     m_crown_icon_y = player_name_y;

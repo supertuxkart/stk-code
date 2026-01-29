@@ -123,7 +123,7 @@ void ServerSelection::loadedFromFile()
 }   // loadedFromFile
 
 // ----------------------------------------------------------------------------
-/** Clear the server list, which will be reloaded. 
+/** Clear the server list, which will be reloaded.
  */
 void ServerSelection::beforeAddingWidget()
 {

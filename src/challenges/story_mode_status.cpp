@@ -355,10 +355,10 @@ void StoryModeStatus::save(UTFWriter &out, bool current_player)
             story_mode_timer->pauseTimer(/*loading*/ false);
         }
 
-        if(m_first_time) 
+        if(m_first_time)
         {
             m_speedrun_milliseconds = 0;
-            m_story_mode_milliseconds = 0;    
+            m_story_mode_milliseconds = 0;
         }
         else
         {

@@ -114,7 +114,7 @@ private:
     /** (Unix) time when we started */
     uint64_t m_started_at;
 
-    /** The clock mode: normal counting forwards, or countdown */ 
+    /** The clock mode: normal counting forwards, or countdown */
     ClockType       m_clock_mode;
 protected:
     bool            m_play_track_intro_sound;

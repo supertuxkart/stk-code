@@ -49,7 +49,7 @@ MusicManager::MusicManager()
     if (UserConfigParams::m_enable_sound)
     {
 #if defined(__APPLE__) && !defined(NDEBUG)
-        // HACK: On OSX, when OpenAL is initialized, breaking in a debugger 
+        // HACK: On OSX, when OpenAL is initialized, breaking in a debugger
         // causes my iTunes music to stop too, which is highly annoying ;) so in
         // debug mode, require a restart to enable sound
         if (UserConfigParams::m_sfx || UserConfigParams::m_music)
@@ -171,7 +171,7 @@ void MusicManager::startMusic()
 //-----------------------------------------------------------------------------
 /** Schedules the indicated music to be played next.
  *  \param mi Music information of the music to be played.
- *  \param start_right_now 
+ *  \param start_right_now
  */
 void MusicManager::startMusic(MusicInformation* mi, bool start_right_now)
 {
@@ -242,7 +242,7 @@ void MusicManager::switchToFastMusic()
 void MusicManager::setTemporaryVolume(float gain)
 {
     if (m_current_music.load() != NULL)
-        SFXManager::get()->queue(SFXManager::SFX_MUSIC_SET_TMP_VOLUME, 
+        SFXManager::get()->queue(SFXManager::SFX_MUSIC_SET_TMP_VOLUME,
                                  m_current_music, gain);
 }   // setTemporaryVolume
 

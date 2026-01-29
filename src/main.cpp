@@ -72,11 +72,11 @@
  online_manager -> "STK Server"
  "STK Server" -> online_manager
  karts -> replay
- replay 
+ replay
  # force karts and tracks on the same level, looks better this way
- subgraph { 
-  rank = same; karts; tracks; 
- } 
+ subgraph {
+  rank = same; karts; tracks;
+ }
 
 }
  \enddot
@@ -324,7 +324,7 @@ void gamepadVisualisation()
 
                     if (evt.PressedDown)
                     {
-                        if (evt.Key == IRR_KEY_RETURN || 
+                        if (evt.Key == IRR_KEY_RETURN ||
                             evt.Key == IRR_KEY_ESCAPE ||
                             evt.Key == IRR_KEY_SPACE)
                         {
@@ -719,7 +719,7 @@ void cmdLineHelp()
     "       --enable-ssr       Enable screen space reflections.\n"
     "       --disable-ssr      Disable screen space reflections.\n"
     "       --enable-light-scatter  Enable light scattering.\n"
-    "       --disable-light-scatter Disable light scattering.\n"  
+    "       --disable-light-scatter Disable light scattering.\n"
     "       --enable-dynamic-lights Enable advanced pipeline.\n"
     "       --disable-dynamic-lights Disable advanced pipeline.\n"
     "       --anisotropic=n     Anisotropic filtering quality (0 to disable).\n"

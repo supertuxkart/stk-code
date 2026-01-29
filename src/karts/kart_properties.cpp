@@ -475,7 +475,7 @@ void KartProperties::getAllData(const XMLNode * root, bool called_from_stk_confi
 {
     root->get("version",           &m_version);
 
-    // If the version of the kart file is not supported, ignore this .kart file 
+    // If the version of the kart file is not supported, ignore this .kart file
     if (!called_from_stk_config && (m_version < stk_config->m_min_kart_version ||
                                     m_version > stk_config->m_max_kart_version))
     {

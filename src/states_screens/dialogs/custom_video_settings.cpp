@@ -92,7 +92,7 @@ void CustomVideoSettingsDialog::beforeAddingWidgets()
     shadows->addLabel(_C("Shadows", "Medium"));     // 2
     shadows->addLabel(_C("Shadows", "High"));       // 3
     shadows->addLabel(_C("Shadows", "Very high"));  // 4
-    shadows->setValue(UserConfigParams::m_shadows_resolution == 2048 ? 
+    shadows->setValue(UserConfigParams::m_shadows_resolution == 2048 ?
                       (UserConfigParams::m_pcss ? 4 : 3) :
                       UserConfigParams::m_shadows_resolution == 1024 ? 2 :
                       UserConfigParams::m_shadows_resolution ==  512 ? 1 : 0);
@@ -196,7 +196,7 @@ GUIEngine::EventPropagation CustomVideoSettingsDialog::processEvent(const std::s
                     getWidget<SpinnerWidget>("shadows")->getValue() == 1 ?  512 :
                     getWidget<SpinnerWidget>("shadows")->getValue() == 2 ? 1024 :
                     getWidget<SpinnerWidget>("shadows")->getValue() >= 3 ? 2048 : 0;
-                UserConfigParams::m_pcss = 
+                UserConfigParams::m_pcss =
                     getWidget<SpinnerWidget>("shadows")->getValue() == 4 ? true : false;
             }
             else

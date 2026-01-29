@@ -1349,7 +1349,7 @@ void SkiddingAI::handleBubblegum(int item_skill,
              m_controls->setLookBack(false);
              return;
           }
-       } 
+       }
     }
     else if (item_skill == 5) //don't protect against plungers alone
     {
@@ -1393,7 +1393,7 @@ void SkiddingAI::handleBubblegum(int item_skill,
     }
     
     // Use shield if kart is going to hit a bad item (banana or bubblegum)
-    if((item_skill == 4) || (item_skill == 5)) 
+    if((item_skill == 4) || (item_skill == 5))
     {
        if( !m_kart->isShielded() && items_to_avoid.size()>0)
        {
@@ -1421,7 +1421,7 @@ void SkiddingAI::handleBubblegum(int item_skill,
              m_controls->setLookBack(false);
              return;
           }
-       }      
+       }
     }
       
     // Avoid dropping all bubble gums one after another
@@ -1523,7 +1523,7 @@ void SkiddingAI::handleCake(int item_skill)
     // we can either save the cake for later since we will overtake
     // the kart anyway, or that this might force the kart ahead to
     // use its nitro/zipper (and then we will shoot since then the
-    // kart is faster).    
+    // kart is faster).
     if(item_skill >= 3)
     {
         if (kart_behind_is_slow) fire_behind -= 50.0f;
@@ -1546,7 +1546,7 @@ void SkiddingAI::handleCake(int item_skill)
         bool kart_ahead_has_swatter = false;
         if (m_kart_ahead)
         {
-            kart_ahead_has_swatter = (m_kart_ahead->getAttachment()->getType() 
+            kart_ahead_has_swatter = (m_kart_ahead->getAttachment()->getType()
                                       == Attachment::ATTACH_SWATTER);
         }
 
@@ -1594,7 +1594,7 @@ void SkiddingAI::handleCake(int item_skill)
              or straight behind, and not invulnerable, with a 5 second delay
  * Level 3 : Only 3 seconds of delay
  * Level 4 : Same as level 3
- * Level 5 : Level 4 and don't fire on a shielded kart if we're just behind (gum) 
+ * Level 5 : Level 4 and don't fire on a shielded kart if we're just behind (gum)
  *  \param item_skill The skill with which to use the item
  */
 void SkiddingAI::handleBowling(int item_skill)
@@ -1792,7 +1792,7 @@ void SkiddingAI::handleSwitch(int item_skill,
     //It should also be possible but complicated to discard items when a good
     //and a bad one are two close from one another
     else if(item_skill == 5)
-    {  
+    {
        //First step : identify the best available item
        int bad = 0;
        int good = 0;
@@ -1858,7 +1858,7 @@ void SkiddingAI::handleSwitch(int item_skill,
        }
     } //item_skill == 5
 
-    return;  
+    return;
 } //handleSwitch
 
 //-----------------------------------------------------------------------------
@@ -2223,11 +2223,11 @@ void SkiddingAI::handleNitroAndZipper(float max_safe_speed)
     float energy_reserve = 0;
 
     if (nitro_skill == 2)
-        energy_reserve = 4;  
+        energy_reserve = 4;
     else if (nitro_skill == 3)
-        energy_reserve = 8;  
+        energy_reserve = 8;
     else if (nitro_skill == 4)
-        energy_reserve = 12;  
+        energy_reserve = 12;
 
     // No point in building a big nitro reserve in nitro for FTL AIs,
     // just keep enough to help accelerating after an accident
@@ -2344,7 +2344,7 @@ void SkiddingAI::handleNitroAndZipper(float max_safe_speed)
     // Don't use nitro if building an energy reserve
     if (m_kart->getEnergy() <= energy_reserve)
     {
-        nitro_skill = 0;  
+        nitro_skill = 0;
     }
 
     // If basic AI, or if the kart is very slow (e.g. after rescue) but not too much (accident)
@@ -2368,7 +2368,7 @@ void SkiddingAI::handleNitroAndZipper(float max_safe_speed)
         return;
    
     // Use zipper
-    if(m_kart->getPowerup()->getType() == PowerupManager::POWERUP_ZIPPER 
+    if(m_kart->getPowerup()->getType() == PowerupManager::POWERUP_ZIPPER
         && item_skill >= 2 && m_kart->getSpeed()>1.0f &&
         m_kart->getSpeedIncreaseTicksLeft(MaxSpeed::MS_INCREASE_ZIPPER)<=0)
     {
