@@ -1115,6 +1115,19 @@ void Skin::drawButton(Widget* w, const core::recti &rect,
                                 SkinConfig::m_render_params["button::neutral"],
                                 w->m_deactivated);
         }   // if not deactivated or focused
+        
+        // Check for tooltips even on deactivated widgets
+        if (w->hasTooltip())
+        {
+            const core::position2di mouse_position =
+                irr_driver->getDevice()->getCursorControl()->getPosition();
+
+            if (sized_rect.isPointInside(mouse_position))
+            {
+                m_tooltip_at_mouse.push_back(true);
+                m_tooltips.push_back(w);
+            }
+        }
     }
     else   // not within an appearing dialog
     {
@@ -1136,6 +1149,19 @@ void Skin::drawButton(Widget* w, const core::recti &rect,
                                 SkinConfig::m_render_params["button::neutral"],
                                 w->m_deactivated);
         }   // if not deactivated or focused
+        
+        // Check for tooltips even on deactivated widgets
+        if (w->hasTooltip())
+        {
+            const core::position2di mouse_position =
+                irr_driver->getDevice()->getCursorControl()->getPosition();
+
+            if (rect.isPointInside(mouse_position))
+            {
+                m_tooltip_at_mouse.push_back(true);
+                m_tooltips.push_back(w);
+            }
+        }
     }   // not within an appearing dialog
 }   // drawButton
 
@@ -1687,6 +1713,16 @@ void Skin::drawRibbonChild(const core::recti &rect, Widget* widget,
             m_tooltips.push_back(widget);
         }
     }
+    else if (widget->hasTooltip())
+    {
+        // Check tooltips for deactivated widgets too
+        if (rect.isPointInside(irr_driver->getDevice()->getCursorControl()
+                                                      ->getPosition()))
+        {
+            m_tooltip_at_mouse.push_back(true);
+            m_tooltips.push_back(widget);
+        }
+    }
 #endif
 }   // drawRibbonChild
 
@@ -1874,6 +1910,18 @@ void Skin::drawSpinnerBody(const core::recti &rect, Widget* widget,
     {
         m_tooltip_at_mouse.push_back(false);
         m_tooltips.push_back(widget);
+    }
+    else if (widget->hasTooltip())
+    {
+        // Check tooltips for deactivated widgets too
+        const core::position2di mouse_position =
+            irr_driver->getDevice()->getCursorControl()->getPosition();
+
+        if (sized_rect.isPointInside(mouse_position))
+        {
+            m_tooltip_at_mouse.push_back(true);
+            m_tooltips.push_back(widget);
+        }
     }
 }
 
@@ -2135,6 +2183,18 @@ void Skin::drawCheckBox(const core::recti &rect, Widget* widget, bool focused)
 
     if (focused && widget->hasTooltip())
     {
+        const core::position2di mouse_position =
+            irr_driver->getDevice()->getCursorControl()->getPosition();
+
+        if (rect.isPointInside(mouse_position))
+        {
+            m_tooltip_at_mouse.push_back(true);
+            m_tooltips.push_back(widget);
+        }
+    }
+    else if (widget->hasTooltip())
+    {
+        // Check tooltips for deactivated widgets too
         const core::position2di mouse_position =
             irr_driver->getDevice()->getCursorControl()->getPosition();
 

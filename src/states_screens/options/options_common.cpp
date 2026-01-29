@@ -52,7 +52,9 @@ namespace OptionsCommon
 		if (StateManager::get()->getGameState() == GUIEngine::INGAME_MENU)
 		{
 	    	GUIEngine::getWidget("tab_players")->setActive(false);
+	    	GUIEngine::getWidget("tab_players")->setTooltip(_("This option cannot be changed during a race."));
 	    	GUIEngine::getWidget("tab_language")->setActive(false);			
+	    	GUIEngine::getWidget("tab_language")->setTooltip(_("This option cannot be changed during a race."));			
 		}
 		else
 		{
