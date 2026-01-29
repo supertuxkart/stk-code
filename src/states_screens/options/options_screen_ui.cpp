@@ -175,15 +175,10 @@ void OptionsScreenUI::init()
     bool currSkinFound = false;
     const std::string& user_skin = UserConfigParams::m_skin_file;
     m_base_skin_selector ->setActive(!in_game);
-    if (in_game)
-    {
-        m_base_skin_selector->setTooltip(_("This option cannot be changed during a race."));
-    }
+    OptionsCommon::updatePauseTooltip(m_base_skin_selector, in_game);
+
     m_variant_skin_selector->setActive(!in_game);
-    if (in_game)
-    {
-        m_variant_skin_selector->setTooltip(_("This option cannot be changed during a race."));
-    }
+    OptionsCommon::updatePauseTooltip(m_variant_skin_selector, in_game);
 
     for (unsigned int i = 0; i < m_skins.size(); i++)
     {
@@ -237,10 +232,7 @@ void OptionsScreenUI::init()
     font_size->setValue(size_int);
     UserConfigParams::m_font_size = font_size->getValue();
     font_size->setActive(!in_game);
-    if (in_game)
-    {
-        font_size->setTooltip(_("This option cannot be changed during a race."));
-    }
+    OptionsCommon::updatePauseTooltip(font_size, in_game);
 
     CheckBoxWidget* karts_powerup_gui = getWidget<CheckBoxWidget>("karts_powerup_gui");
     assert(karts_powerup_gui != NULL);

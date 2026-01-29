@@ -728,6 +728,7 @@ namespace GUIEngine
         irr::core::stringw getTooltipText() const { return m_tooltip_text; }
 
         void setTooltip(irr::core::stringw s) { m_tooltip_text = s; m_has_tooltip = true; }
+        void unsetTooltip() { m_tooltip_text = ""; m_has_tooltip = false; }
 
         /**
          * \}

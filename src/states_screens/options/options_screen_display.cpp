@@ -127,24 +127,16 @@ void OptionsScreenDisplay::init()
     // disabled)
     bool in_game = StateManager::get()->getGameState() == GUIEngine::INGAME_MENU;
 
-    res->setActive(!in_game || is_vulkan_fullscreen_desktop);
-    if (in_game && !is_vulkan_fullscreen_desktop)
-    {
-        res->setTooltip(_("This option cannot be changed during a race."));
-    }
+    bool menu_or_vulkan = !in_game || is_vulkan_fullscreen_desktop;
 
-    full->setActive(!in_game || is_vulkan_fullscreen_desktop);
-    if (in_game && !is_vulkan_fullscreen_desktop)
-    {
-        full->setTooltip(_("This option cannot be changed during a race."));
-    }
+    // Tooltips don't work for dynamic ribbon widgets
+    res->setActive(menu_or_vulkan);
+
+    full->setActive(menu_or_vulkan);
+    OptionsCommon::updatePauseTooltip(full, !menu_or_vulkan);
 
     applyBtn->setActive(!in_game);
-    if (in_game)
-    {
-        applyBtn->setTooltip(_("This option cannot be changed during a race."));
-    }
-
+    OptionsCommon::updatePauseTooltip(applyBtn, in_game);
 
 #if defined(MOBILE_STK) || defined(__SWITCH__)
     applyBtn->setVisible(false);
