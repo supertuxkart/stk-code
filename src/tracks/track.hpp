@@ -53,13 +53,14 @@ using namespace irr;
 
 #include "LinearMath/btTransform.h"
 
+#include "race/race_manager.hpp"
 #include "utils/aligned_array.hpp"
 #include "utils/log.hpp"
 #include "utils/random_generator.hpp"
 #include "utils/vec3.hpp"
 #include "utils/stk_process.hpp"
 
-class AbstractKart;
+class Kart;
 class AnimationManager;
 class BezierCurve;
 class CheckManager;
@@ -408,8 +409,12 @@ private:
      * m_actual_number_of_laps is initialised with this value.*/
     int m_default_number_of_laps;
 
+    /* If true, lower difficulties will dynamically compute the
+     * default number of laps, based on the main default value. */
+    bool m_dynamic_laps;
+
     /** The number of laps that is predefined in a track info dialog. */
-    int m_actual_number_of_laps;
+    std::vector<int> m_actual_number_of_laps;
 
     void loadTrackInfo();
     void loadDriveGraph(unsigned int mode_id, const bool reverse);
@@ -478,15 +483,12 @@ public:
     core::stringw      getSortName() const;
     bool               isInGroup(const std::string &group_name);
     const core::vector3df& getSunRotation();
-    /** Sets the current ambient color for a kart with index k. */
-    void               setAmbientColor(const video::SColor &color,
-                                       unsigned int k);
     void               handleExplosion(const Vec3 &pos,
                                        const PhysicalObject *mp,
                                        bool secondary_hits=true) const;
     void               loadTrackModel  (bool reverse_track = false,
                                         unsigned int mode_id=0);
-    bool findGround(AbstractKart *kart);
+    bool findGround(Kart *kart);
 
     std::vector< std::vector<float> > buildHeightMap();
     void               drawMiniMap(const core::rect<s32>& dest_rect) const;
@@ -726,10 +728,13 @@ public:
     // ------------------------------------------------------------------------
     const int getDefaultNumberOfLaps() const { return m_default_number_of_laps;}
     // ------------------------------------------------------------------------
-    const int getActualNumberOfLap() const { return m_actual_number_of_laps; }
+    const int getDefaultNumberOfLaps(RaceManager::Difficulty difficulty);
     // ------------------------------------------------------------------------
-    void setActualNumberOfLaps(unsigned int laps)
-                                         { m_actual_number_of_laps = laps; }
+    const int getActualNumberOfLaps(RaceManager::Difficulty difficulty) const
+        { return m_actual_number_of_laps[(int) difficulty]; }
+    // ------------------------------------------------------------------------
+    void setActualNumberOfLaps(RaceManager::Difficulty difficulty, unsigned int laps)
+        { m_actual_number_of_laps[(int) difficulty] = laps; }
     // ------------------------------------------------------------------------
     bool operator<(const Track &other) const;
     // ------------------------------------------------------------------------

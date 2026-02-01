@@ -286,6 +286,9 @@ namespace GUIEngine
         /** If a badge wouldn't look too pretty on the very side of the widget */
         int m_badge_x_shift;
 
+        /** In cases where a badge shouldn't be at the bottom */
+        int m_badge_y_up_shift;
+
         bool m_has_tooltip;
         irr::core::stringw m_tooltip_text;
 
@@ -324,6 +327,10 @@ namespace GUIEngine
             that the props are read in raw form from the XML file; PROP_WIDTH can then be e.g. "10%" and w,
             once the widget is added, will be e.g. 80.) */
         int m_x, m_y, m_w, m_h;
+
+        /** If this widget belongs to a specific player, and to which one*/
+        int m_player_id;
+        bool m_has_player_id;
 
         /** Whether to show a bounding box around this widget (used for sections) */
         bool m_show_bounding_box;
@@ -439,9 +446,9 @@ namespace GUIEngine
          * \{
          */
 
-        /** \brief Sets an widget to be either activated or deactivated
+        /** \brief Sets an widget to be either activated or deactivated 
          *  (i.e. greyed out)
-         *  \param active Active (true) or deactive (false). Defaults to
+         *  \param active Active (true) or deactive (false). Defaults to 
          *         true. */
         virtual void setActive(bool active=true);
 
@@ -707,10 +714,15 @@ namespace GUIEngine
          * \brief Get which badges are currently on this widget
          * \return a bitmask of BadgeType values
          */
-        int getBadges() const
-        {
-            return m_badges;
-        }
+        int getBadges()   const { return m_badges; }
+
+        int hasPlayerID() const { return m_has_player_id; }
+
+        int getPlayerID() const { return m_player_id; }
+
+        void setPlayerID(int playerID) { m_player_id = playerID; }
+
+        void setPlayerIDSupport(bool support) { m_has_player_id = support; }
 
         /**
          * \}
@@ -728,7 +740,6 @@ namespace GUIEngine
         irr::core::stringw getTooltipText() const { return m_tooltip_text; }
 
         void setTooltip(irr::core::stringw s) { m_tooltip_text = s; m_has_tooltip = true; }
-        void unsetTooltip() { m_tooltip_text = ""; m_has_tooltip = false; }
 
         /**
          * \}

@@ -221,7 +221,7 @@ namespace Scripting
             ::Track* track = ::Track::getCurrentTrack();
             animator->add(
                 new AnimatedProperty(FOG_MAX, 1,
-                    new double[1] { track->getFogMax() },
+                    new double[1] { track->getFogMax() }, 
                     new double[1] { maxDensity }, duration, track)
             );
             animator->add(
@@ -233,16 +233,16 @@ namespace Scripting
             video::SColor color = track->getFogColor();
             animator->add(
                 new AnimatedProperty(FOG_COLOR, 3,
-                    new double[3] {
-                        (double)color.getRed(),
-                        (double)color.getGreen(),
-                        (double)color.getBlue()
+                    new double[3] { 
+                        (double)color.getRed(), 
+                        (double)color.getGreen(), 
+                        (double)color.getBlue() 
                     },
-                    new double[3] {
+                    new double[3] { 
                         (double)r,
                         (double)g,
                         (double)b
-                    },
+                    }, 
                     duration, track)
             );
         }
@@ -523,145 +523,145 @@ namespace Scripting
             r = engine->RegisterObjectType("Animator", 0, asOBJ_REF | asOBJ_NOCOUNT); assert(r >= 0);
             r = engine->RegisterObjectType("Light", 0, asOBJ_REF | asOBJ_NOCOUNT); assert(r >= 0);
 
-            //r = engine->RegisterGlobalFunction("void disableTrackObject(const string &in)",
-            //                                   mp ? WRAP_FN(disableTrackObject) : asFUNCTION(disableTrackObject),
+            //r = engine->RegisterGlobalFunction("void disableTrackObject(const string &in)", 
+            //                                   mp ? WRAP_FN(disableTrackObject) : asFUNCTION(disableTrackObject), 
             //                                   call_conv); assert(r >= 0);
             
-            //r = engine->RegisterGlobalFunction("void enableTrackObject(const string &in)",
-            //                                   mp ? WRAP_FN(enableTrackObject) : asFUNCTION(enableTrackObject),
+            //r = engine->RegisterGlobalFunction("void enableTrackObject(const string &in)", 
+            //                                   mp ? WRAP_FN(enableTrackObject) : asFUNCTION(enableTrackObject), 
             //                                   call_conv); assert(r >= 0);
             
-            //r = engine->RegisterGlobalFunction("void enableTrigger(const string &in)",
-            //                                   mp ? WRAP_FN(enableTrigger) : asFUNCTION(enableTrigger),
+            //r = engine->RegisterGlobalFunction("void enableTrigger(const string &in)", 
+            //                                   mp ? WRAP_FN(enableTrigger) : asFUNCTION(enableTrigger), 
             //                                   call_conv); assert(r >= 0);
             
-            //r = engine->RegisterGlobalFunction("void disableTrigger(const string &in)",
-            //                                   mp ? WRAP_FN(disableTrigger) : asFUNCTION(disableTrigger),
+            //r = engine->RegisterGlobalFunction("void disableTrigger(const string &in)", 
+            //                                   mp ? WRAP_FN(disableTrigger) : asFUNCTION(disableTrigger), 
             //                                   call_conv); assert(r >= 0);
             
             r = engine->RegisterGlobalFunction("void createTrigger(const string &in, const Vec3 &in, float distance)",
-                                               mp ? WRAP_FN(createTrigger) : asFUNCTION(createTrigger),
+                                               mp ? WRAP_FN(createTrigger) : asFUNCTION(createTrigger), 
                                                call_conv); assert(r >= 0);
                                                
             r = engine->RegisterGlobalFunction("void createTextBillboard(const string &in, const Vec3 &in)",
-                                               mp ? WRAP_FN(createTextBillboard) : asFUNCTION(createTextBillboard),
+                                               mp ? WRAP_FN(createTextBillboard) : asFUNCTION(createTextBillboard), 
                                                call_conv); assert(r >= 0);
                                                
             r = engine->RegisterGlobalFunction("void setTriggerReenableTimeout(const string &in, const string &in, float reenable_time)",
-                                               mp ? WRAP_FN(setTriggerReenableTimeout) : asFUNCTION(setTriggerReenableTimeout),
+                                               mp ? WRAP_FN(setTriggerReenableTimeout) : asFUNCTION(setTriggerReenableTimeout), 
                                                call_conv); assert(r >= 0);
                                                
-            r = engine->RegisterGlobalFunction("TrackObject@ getTrackObject(const string &in, const string &in)",
-                                               mp ? WRAP_FN(getTrackObject) : asFUNCTION(getTrackObject),
+            r = engine->RegisterGlobalFunction("TrackObject@ getTrackObject(const string &in, const string &in)", 
+                                               mp ? WRAP_FN(getTrackObject) : asFUNCTION(getTrackObject), 
                                                call_conv); assert(r >= 0);
 
             r = engine->RegisterGlobalFunction("array<TrackObject@>@ getTrackObjectList()",
                                                mp ? WRAP_FN(getTrackObjectList) : asFUNCTION(getTrackObjectList),
                                                call_conv); assert(r >= 0);
 
-            r = engine->RegisterGlobalFunction("void exitRace()",
-                                               mp ? WRAP_FN(exitRace) : asFUNCTION(exitRace),
+            r = engine->RegisterGlobalFunction("void exitRace()", 
+                                               mp ? WRAP_FN(exitRace) : asFUNCTION(exitRace), 
                                                call_conv); assert(r >= 0);
                                                
-            r = engine->RegisterGlobalFunction("void pauseRace()",
-                                               mp ? WRAP_FN(pauseRace) : asFUNCTION(pauseRace),
+            r = engine->RegisterGlobalFunction("void pauseRace()", 
+                                               mp ? WRAP_FN(pauseRace) : asFUNCTION(pauseRace), 
                                                call_conv); assert(r >= 0);
                                                
-            r = engine->RegisterGlobalFunction("void setFog(float maxDensity, float start, float end, int r, int g, int b, float duration)",
-                                               mp ? WRAP_FN(setFog) : asFUNCTION(setFog),
+            r = engine->RegisterGlobalFunction("void setFog(float maxDensity, float start, float end, int r, int g, int b, float duration)", 
+                                               mp ? WRAP_FN(setFog) : asFUNCTION(setFog), 
                                                call_conv); assert(r >= 0);
                                                
-            r = engine->RegisterGlobalFunction("int getNumberOfKarts()",
-                                               mp ? WRAP_FN(getNumberOfKarts) : asFUNCTION(getNumberOfKarts),
+            r = engine->RegisterGlobalFunction("int getNumberOfKarts()", 
+                                               mp ? WRAP_FN(getNumberOfKarts) : asFUNCTION(getNumberOfKarts), 
                                                call_conv); assert(r >= 0);
                                                
-            r = engine->RegisterGlobalFunction("int getNumLocalPlayers()",
-                                               mp ? WRAP_FN(getNumLocalPlayers) : asFUNCTION(getNumLocalPlayers),
+            r = engine->RegisterGlobalFunction("int getNumLocalPlayers()", 
+                                               mp ? WRAP_FN(getNumLocalPlayers) : asFUNCTION(getNumLocalPlayers), 
                                                call_conv); assert(r >= 0);
             
-            r = engine->RegisterGlobalFunction("int getKartType(int kartId)",
-                                               mp ? WRAP_FN(getKartType) : asFUNCTION(getKartType),
+            r = engine->RegisterGlobalFunction("int getKartType(int kartId)", 
+                                               mp ? WRAP_FN(getKartType) : asFUNCTION(getKartType), 
                                                call_conv); assert(r >= 0);
                                                
-            r = engine->RegisterGlobalFunction("bool isReverse()",
-                                               mp ? WRAP_FN(isTrackReverse) : asFUNCTION(isTrackReverse),
+            r = engine->RegisterGlobalFunction("bool isReverse()", 
+                                               mp ? WRAP_FN(isTrackReverse) : asFUNCTION(isTrackReverse), 
                                                call_conv); assert(r >= 0);
             
-            r = engine->RegisterGlobalFunction("int getDifficulty()",
-                                               mp ? WRAP_FN(getDifficulty) : asFUNCTION(getDifficulty),
+            r = engine->RegisterGlobalFunction("int getDifficulty()", 
+                                               mp ? WRAP_FN(getDifficulty) : asFUNCTION(getDifficulty), 
                                                call_conv); assert(r >= 0);
                                                
-            r = engine->RegisterGlobalFunction("int getMajorRaceMode()",
-                                               mp ? WRAP_FN(getMajorRaceMode) : asFUNCTION(getMajorRaceMode),
+            r = engine->RegisterGlobalFunction("int getMajorRaceMode()", 
+                                               mp ? WRAP_FN(getMajorRaceMode) : asFUNCTION(getMajorRaceMode), 
                                                call_conv); assert(r >= 0);
                                                
             r = engine->RegisterGlobalFunction("uint getItemManagerRandomSeed()",
                                                mp ? WRAP_FN(getItemManagerRandomSeed) : asFUNCTION(getItemManagerRandomSeed),
                                                call_conv); assert(r >= 0);
 
-            r = engine->RegisterGlobalFunction("int getMinorRaceMode()",
-                                               mp ? WRAP_FN(getMinorRaceMode) : asFUNCTION(getMinorRaceMode),
+            r = engine->RegisterGlobalFunction("int getMinorRaceMode()", 
+                                               mp ? WRAP_FN(getMinorRaceMode) : asFUNCTION(getMinorRaceMode), 
                                                call_conv); assert(r >= 0);
 
             r = engine->RegisterGlobalFunction("int getGeometryLevel()",
                                                mp ? WRAP_FN(getGeometryLevel) : asFUNCTION(getGeometryLevel),
                                                call_conv); assert(r >= 0);
 
-            r = engine->RegisterGlobalFunction("bool isDuringDay()",
-                                               mp ? WRAP_FN(isDuringDay) : asFUNCTION(isDuringDay),
+            r = engine->RegisterGlobalFunction("bool isDuringDay()", 
+                                               mp ? WRAP_FN(isDuringDay) : asFUNCTION(isDuringDay), 
                                                call_conv); assert(r >= 0);
 
             // TrackObject
-            r = engine->RegisterObjectMethod("TrackObject", "void setEnabled(bool status)",
-                                             mp ? WRAP_MFN(::TrackObject, setEnabled) : asMETHOD(::TrackObject, setEnabled),
+            r = engine->RegisterObjectMethod("TrackObject", "void setEnabled(bool status)", 
+                                             mp ? WRAP_MFN(::TrackObject, setEnabled) : asMETHOD(::TrackObject, setEnabled), 
                                              call_conv_thiscall); assert(r >= 0);
                                              
-            r = engine->RegisterObjectMethod("TrackObject", "SoundEmitter@ getSoundEmitter()",
-                                             mp ? WRAP_MFN(::TrackObject, getSoundEmitter) : asMETHOD(::TrackObject, getSoundEmitter),
+            r = engine->RegisterObjectMethod("TrackObject", "SoundEmitter@ getSoundEmitter()", 
+                                             mp ? WRAP_MFN(::TrackObject, getSoundEmitter) : asMETHOD(::TrackObject, getSoundEmitter), 
                                              call_conv_thiscall); assert(r >= 0);
                                              
-            r = engine->RegisterObjectMethod("TrackObject", "Light@ getLight()",
-                                             mp ? WRAP_MFN(::TrackObject, getLight) : asMETHOD(::TrackObject, getLight),
+            r = engine->RegisterObjectMethod("TrackObject", "Light@ getLight()", 
+                                             mp ? WRAP_MFN(::TrackObject, getLight) : asMETHOD(::TrackObject, getLight), 
                                              call_conv_thiscall); assert(r >= 0);
                                              
-            r = engine->RegisterObjectMethod("TrackObject", "PhysicalObject@ getPhysics()",
-                                             mp ? WRAP_MFN(::TrackObject, getPhysics): asMETHOD(::TrackObject, getPhysics),
+            r = engine->RegisterObjectMethod("TrackObject", "PhysicalObject@ getPhysics()", 
+                                             mp ? WRAP_MFN(::TrackObject, getPhysics): asMETHOD(::TrackObject, getPhysics), 
                                              call_conv_thiscall); assert(r >= 0);
                                              
-            r = engine->RegisterObjectMethod("TrackObject", "Mesh@ getMesh()",
-                                             mp ? WRAP_MFN(::TrackObject, getMesh) : asMETHOD(::TrackObject, getMesh),
+            r = engine->RegisterObjectMethod("TrackObject", "Mesh@ getMesh()", 
+                                             mp ? WRAP_MFN(::TrackObject, getMesh) : asMETHOD(::TrackObject, getMesh), 
                                              call_conv_thiscall); assert(r >= 0);
                                              
-            r = engine->RegisterObjectMethod("TrackObject", "ParticleEmitter@ getParticleEmitter()",
-                                             mp ? WRAP_MFN(::TrackObject, getParticleEmitter) : asMETHOD(::TrackObject, getParticleEmitter),
+            r = engine->RegisterObjectMethod("TrackObject", "ParticleEmitter@ getParticleEmitter()", 
+                                             mp ? WRAP_MFN(::TrackObject, getParticleEmitter) : asMETHOD(::TrackObject, getParticleEmitter), 
                                              call_conv_thiscall); assert(r >= 0);
                                              
-            r = engine->RegisterObjectMethod("TrackObject", "Animator@ getIPOAnimator()",
-                                             mp ? WRAP_MFN(::TrackObject, getIPOAnimator): asMETHOD(::TrackObject, getIPOAnimator),
+            r = engine->RegisterObjectMethod("TrackObject", "Animator@ getIPOAnimator()", 
+                                             mp ? WRAP_MFN(::TrackObject, getIPOAnimator): asMETHOD(::TrackObject, getIPOAnimator), 
                                              call_conv_thiscall); assert(r >= 0);
                                              
-            r = engine->RegisterObjectMethod("TrackObject", "void moveTo(const Vec3 &in, bool)",
-                                             mp ? WRAP_MFN(::TrackObject, moveTo) : asMETHOD(::TrackObject, moveTo),
+            r = engine->RegisterObjectMethod("TrackObject", "void moveTo(const Vec3 &in, bool)", 
+                                             mp ? WRAP_MFN(::TrackObject, moveTo) : asMETHOD(::TrackObject, moveTo), 
                                              call_conv_thiscall); assert(r >= 0);
                                              
-            r = engine->RegisterObjectMethod("TrackObject", "void reset()",
-                                             mp ? WRAP_MFN(::TrackObject, reset) : asMETHOD(::TrackObject, reset),
+            r = engine->RegisterObjectMethod("TrackObject", "void reset()", 
+                                             mp ? WRAP_MFN(::TrackObject, reset) : asMETHOD(::TrackObject, reset), 
                                              call_conv_thiscall); assert(r >= 0);
                                              
-            r = engine->RegisterObjectMethod("TrackObject", "Vec3 getCenterPosition()",
-                                             mp ? WRAP_OBJ_LAST(TrackObject::getCenterPosition): asFUNCTION(TrackObject::getCenterPosition),
+            r = engine->RegisterObjectMethod("TrackObject", "Vec3 getCenterPosition()", 
+                                             mp ? WRAP_OBJ_LAST(TrackObject::getCenterPosition): asFUNCTION(TrackObject::getCenterPosition), 
                                              call_conv_objlast); assert(r >= 0);
                                              
-            r = engine->RegisterObjectMethod("TrackObject", "Vec3 getOrigin()",
-                                             mp ? WRAP_OBJ_LAST(TrackObject::getOrigin) : asFUNCTION(TrackObject::getOrigin),
+            r = engine->RegisterObjectMethod("TrackObject", "Vec3 getOrigin()", 
+                                             mp ? WRAP_OBJ_LAST(TrackObject::getOrigin) : asFUNCTION(TrackObject::getOrigin), 
                                              call_conv_objlast); assert(r >= 0);
                                              
-            r = engine->RegisterObjectMethod("TrackObject", "TrackObject@ getParentLibrary()",
-                                             mp ? WRAP_MFN(::TrackObject, getParentLibrary): asMETHOD(::TrackObject, getParentLibrary),
+            r = engine->RegisterObjectMethod("TrackObject", "TrackObject@ getParentLibrary()", 
+                                             mp ? WRAP_MFN(::TrackObject, getParentLibrary): asMETHOD(::TrackObject, getParentLibrary), 
                                              call_conv_thiscall); assert(r >= 0);
                                              
-            r = engine->RegisterObjectMethod("TrackObject", "string getName()",
-                                             mp ? WRAP_MFN(::TrackObject, getName) : asMETHOD(::TrackObject, getName),
+            r = engine->RegisterObjectMethod("TrackObject", "string getName()", 
+                                             mp ? WRAP_MFN(::TrackObject, getName) : asMETHOD(::TrackObject, getName), 
                                              call_conv_thiscall); assert(r >= 0);
 
             r = engine->RegisterObjectMethod("TrackObject", "string getID()",
@@ -669,33 +669,33 @@ namespace Scripting
                                              call_conv_thiscall); assert(r >= 0);
 
             // PhysicalObject
-            r = engine->RegisterObjectMethod("PhysicalObject", "bool isFlattenKartObject()",
-                                             mp ? WRAP_MFN(PhysicalObject, isFlattenKartObject) : asMETHOD(PhysicalObject,
+            r = engine->RegisterObjectMethod("PhysicalObject", "bool isFlattenKartObject()", 
+                                             mp ? WRAP_MFN(PhysicalObject, isFlattenKartObject) : asMETHOD(PhysicalObject, 
                                              isFlattenKartObject), call_conv_thiscall); assert(r >= 0);
                                              
-            r = engine->RegisterObjectMethod("PhysicalObject", "void disable()",
-                                             mp ? WRAP_MFN(PhysicalObject, disable) : asMETHOD(PhysicalObject, disable),
+            r = engine->RegisterObjectMethod("PhysicalObject", "void disable()", 
+                                             mp ? WRAP_MFN(PhysicalObject, disable) : asMETHOD(PhysicalObject, disable), 
                                              call_conv_thiscall); assert(r >= 0);
                                              
-            r = engine->RegisterObjectMethod("PhysicalObject", "void enable()",
-                                             mp ? WRAP_MFN(PhysicalObject, enable) : asMETHOD(PhysicalObject, enable),
+            r = engine->RegisterObjectMethod("PhysicalObject", "void enable()", 
+                                             mp ? WRAP_MFN(PhysicalObject, enable) : asMETHOD(PhysicalObject, enable), 
                                              call_conv_thiscall); assert(r >= 0);
 
             // Animated Mesh
-            r = engine->RegisterObjectMethod("Mesh", "void setFrameLoop(int start, int end)",
-                                             mp ? WRAP_OBJ_LAST(Mesh::setFrameLoop) : asFUNCTION(Mesh::setFrameLoop),
+            r = engine->RegisterObjectMethod("Mesh", "void setFrameLoop(int start, int end)", 
+                                             mp ? WRAP_OBJ_LAST(Mesh::setFrameLoop) : asFUNCTION(Mesh::setFrameLoop), 
                                              call_conv_objlast); assert(r >= 0);
                                              
-            r = engine->RegisterObjectMethod("Mesh", "void setFrameLoopOnce(int start, int end)",
-                                             mp ? WRAP_OBJ_LAST(Mesh::setFrameLoopOnce) : asFUNCTION(Mesh::setFrameLoopOnce),
+            r = engine->RegisterObjectMethod("Mesh", "void setFrameLoopOnce(int start, int end)", 
+                                             mp ? WRAP_OBJ_LAST(Mesh::setFrameLoopOnce) : asFUNCTION(Mesh::setFrameLoopOnce), 
                                              call_conv_objlast); assert(r >= 0);
                                              
-            r = engine->RegisterObjectMethod("Mesh", "int getFrameNr()",
-                                             mp ? WRAP_OBJ_LAST(Mesh::getFrameNr) : asFUNCTION(Mesh::getFrameNr),
+            r = engine->RegisterObjectMethod("Mesh", "int getFrameNr()", 
+                                             mp ? WRAP_OBJ_LAST(Mesh::getFrameNr) : asFUNCTION(Mesh::getFrameNr), 
                                              call_conv_objlast); assert(r >= 0);
                                              
-            r = engine->RegisterObjectMethod("Mesh", "int getAnimationSet()",
-                                             mp ? WRAP_OBJ_LAST(Mesh::getAnimationSet) : asFUNCTION(Mesh::getAnimationSet),
+            r = engine->RegisterObjectMethod("Mesh", "int getAnimationSet()", 
+                                             mp ? WRAP_OBJ_LAST(Mesh::getAnimationSet) : asFUNCTION(Mesh::getAnimationSet), 
                                              call_conv_objlast); assert(r >= 0);
 
             r = engine->RegisterObjectMethod("Mesh", "array<uint>@ getAnimationSetFrames()",
@@ -706,73 +706,73 @@ namespace Scripting
                                              mp ? WRAP_OBJ_LAST(Mesh::getAnimationSetNum) : asFUNCTION(Mesh::getAnimationSetNum),
                                              call_conv_objlast); assert(r >= 0);
 
-            r = engine->RegisterObjectMethod("Mesh", "void useAnimationSet(int set_num)",
-                                             mp ? WRAP_OBJ_LAST(Mesh::useAnimationSet) : asFUNCTION(Mesh::useAnimationSet),
+            r = engine->RegisterObjectMethod("Mesh", "void useAnimationSet(int set_num)", 
+                                             mp ? WRAP_OBJ_LAST(Mesh::useAnimationSet) : asFUNCTION(Mesh::useAnimationSet), 
                                              call_conv_objlast); assert(r >= 0);
                                              
-            r = engine->RegisterObjectMethod("Mesh", "void addAnimationSet(int start, int end)",
-                                             mp ? WRAP_OBJ_LAST(Mesh::addAnimationSet) : asFUNCTION(Mesh::addAnimationSet),
+            r = engine->RegisterObjectMethod("Mesh", "void addAnimationSet(int start, int end)", 
+                                             mp ? WRAP_OBJ_LAST(Mesh::addAnimationSet) : asFUNCTION(Mesh::addAnimationSet), 
                                              call_conv_objlast); assert(r >= 0);
                                              
-            r = engine->RegisterObjectMethod("Mesh", "void removeAllAnimationSet()",
-                                             mp ? WRAP_OBJ_LAST(Mesh::removeAllAnimationSet) : asFUNCTION(Mesh::removeAllAnimationSet),
+            r = engine->RegisterObjectMethod("Mesh", "void removeAllAnimationSet()", 
+                                             mp ? WRAP_OBJ_LAST(Mesh::removeAllAnimationSet) : asFUNCTION(Mesh::removeAllAnimationSet), 
                                              call_conv_objlast); assert(r >= 0);
                                              
-            r = engine->RegisterObjectMethod("Mesh", "void setCurrentFrame(int frame)",
-                                             mp ? WRAP_OBJ_LAST(Mesh::setCurrentFrame) : asFUNCTION(Mesh::setCurrentFrame),
+            r = engine->RegisterObjectMethod("Mesh", "void setCurrentFrame(int frame)", 
+                                             mp ? WRAP_OBJ_LAST(Mesh::setCurrentFrame) : asFUNCTION(Mesh::setCurrentFrame), 
                                              call_conv_objlast); assert(r >= 0);
                                              
-            //r = engine->RegisterObjectMethod("Mesh", "void move(Vec3 &in)",
-            //                                 mp ? WRAP_OBJ_LAST(movePresentation) : asFUNCTION(movePresentation),
+            //r = engine->RegisterObjectMethod("Mesh", "void move(Vec3 &in)", 
+            //                                 mp ? WRAP_OBJ_LAST(movePresentation) : asFUNCTION(movePresentation), 
             //                                 call_conv_objlast); assert(r >= 0);
 
             // Particle Emitter
-            r = engine->RegisterObjectMethod("ParticleEmitter", "void stop()",
-                                             mp ? WRAP_OBJ_LAST(ParticleEmitter::stop) : asFUNCTION(ParticleEmitter::stop),
+            r = engine->RegisterObjectMethod("ParticleEmitter", "void stop()", 
+                                             mp ? WRAP_OBJ_LAST(ParticleEmitter::stop) : asFUNCTION(ParticleEmitter::stop), 
                                              call_conv_objlast); assert(r >= 0);
                                              
-            r = engine->RegisterObjectMethod("ParticleEmitter", "void stopIn(float)",
-                                             mp ? WRAP_OBJ_LAST(ParticleEmitter::stopIn) : asFUNCTION(ParticleEmitter::stopIn),
+            r = engine->RegisterObjectMethod("ParticleEmitter", "void stopIn(float)", 
+                                             mp ? WRAP_OBJ_LAST(ParticleEmitter::stopIn) : asFUNCTION(ParticleEmitter::stopIn), 
                                              call_conv_objlast); assert(r >= 0);
                                              
-            r = engine->RegisterObjectMethod("ParticleEmitter", "void setEmissionRate(float)",
-                                             mp ? WRAP_OBJ_LAST(ParticleEmitter::setEmissionRate) : asFUNCTION(ParticleEmitter::setEmissionRate),
+            r = engine->RegisterObjectMethod("ParticleEmitter", "void setEmissionRate(float)", 
+                                             mp ? WRAP_OBJ_LAST(ParticleEmitter::setEmissionRate) : asFUNCTION(ParticleEmitter::setEmissionRate), 
                                              call_conv_objlast); assert(r >= 0);
 
             // Sound Effect
-            //r = engine->RegisterObjectMethod("SoundEmitter", "void move(Vec3 &in)",
-            //                                 mp ? WRAP_OBJ_LAST(movePresentation) : asFUNCTION(movePresentation),
+            //r = engine->RegisterObjectMethod("SoundEmitter", "void move(Vec3 &in)", 
+            //                                 mp ? WRAP_OBJ_LAST(movePresentation) : asFUNCTION(movePresentation), 
             //                                 call_conv_objlast); assert(r >= 0);
             
-            r = engine->RegisterObjectMethod("SoundEmitter", "void stop()",
-                                             mp ? WRAP_OBJ_LAST(SoundEmitter::stop) : asFUNCTION(SoundEmitter::stop),
+            r = engine->RegisterObjectMethod("SoundEmitter", "void stop()", 
+                                             mp ? WRAP_OBJ_LAST(SoundEmitter::stop) : asFUNCTION(SoundEmitter::stop), 
                                              call_conv_objlast); assert(r >= 0);
                                              
-            r = engine->RegisterObjectMethod("SoundEmitter", "void playOnce()",
-                                             mp ? WRAP_OBJ_LAST(SoundEmitter::playOnce) : asFUNCTION(SoundEmitter::playOnce),
+            r = engine->RegisterObjectMethod("SoundEmitter", "void playOnce()", 
+                                             mp ? WRAP_OBJ_LAST(SoundEmitter::playOnce) : asFUNCTION(SoundEmitter::playOnce), 
                                              call_conv_objlast); assert(r >= 0);
                                              
-            r = engine->RegisterObjectMethod("SoundEmitter", "void playLoop()",
-                                             mp ? WRAP_OBJ_LAST(SoundEmitter::playLoop) : asFUNCTION(SoundEmitter::playLoop),
+            r = engine->RegisterObjectMethod("SoundEmitter", "void playLoop()", 
+                                             mp ? WRAP_OBJ_LAST(SoundEmitter::playLoop) : asFUNCTION(SoundEmitter::playLoop), 
                                              call_conv_objlast); assert(r >= 0);
 
             // Light
-            r = engine->RegisterObjectMethod("Light", "void setEnergy(float)",
-                                             mp ? WRAP_OBJ_LAST(Light::setEnergy) : asFUNCTION(Light::setEnergy),
+            r = engine->RegisterObjectMethod("Light", "void setEnergy(float)", 
+                                             mp ? WRAP_OBJ_LAST(Light::setEnergy) : asFUNCTION(Light::setEnergy), 
                                              call_conv_objlast); assert(r >= 0);
                                              
-            r = engine->RegisterObjectMethod("Light", "void animateEnergy(float, float)",
-                                             mp ? WRAP_OBJ_LAST(Light::animateEnergy) : asFUNCTION(Light::animateEnergy),
+            r = engine->RegisterObjectMethod("Light", "void animateEnergy(float, float)", 
+                                             mp ? WRAP_OBJ_LAST(Light::animateEnergy) : asFUNCTION(Light::animateEnergy), 
                                              call_conv_objlast); assert(r >= 0);
 
             // Curve based Animation
             //fails due to insufficient visibility to scripts TODO : Decide whether to fix visibility or introduce wrappers
-            //r = engine->RegisterObjectMethod("Animator", "void setPaused(bool mode)",
-            //                                 mp ? WRAP_MFN(ThreeDAnimation, setPaused) : asMETHOD(ThreeDAnimation, setPaused),
+            //r = engine->RegisterObjectMethod("Animator", "void setPaused(bool mode)", 
+            //                                 mp ? WRAP_MFN(ThreeDAnimation, setPaused) : asMETHOD(ThreeDAnimation, setPaused), 
             //                                 call_conv_thiscall); assert(r >= 0);
             
-            r = engine->RegisterObjectMethod("Animator", "void setPaused(bool mode)",
-                                             mp ? WRAP_OBJ_LAST(Animator::setPaused) : asFUNCTION(Animator::setPaused),
+            r = engine->RegisterObjectMethod("Animator", "void setPaused(bool mode)", 
+                                             mp ? WRAP_OBJ_LAST(Animator::setPaused) : asFUNCTION(Animator::setPaused), 
                                              call_conv_objlast); assert(r >= 0);
                                              
             // TODO: add method to set current frame

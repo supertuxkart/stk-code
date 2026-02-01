@@ -320,7 +320,9 @@ void SpinnerWidget::resize()
 /** Pick the appropriate font size to display the current spinner label */
 void SpinnerWidget::resizeLabel()
 {
-    if (m_graphical) // Don't proceed further if this spinner doesn't use labels
+    // Don't proceed further if this spinner doesn't use labels
+    // or if this spinner's children haven't been set yet
+    if (m_graphical || m_children.size() < 2) 
         return;
 
     rect<s32> subsize_label = rect<s32>(m_h, 0, m_w - m_h, m_h);
@@ -571,15 +573,15 @@ void SpinnerWidget::setCustomText(const core::stringw& text)
 
 void SpinnerWidget::onPressed(int x, int y)
 {
-    if (m_children[1].m_deactivated ||
-        m_children[1].m_properties[PROP_ID] != "spinnerbody"  ||
-        !isGauge())
-    {
+    if (m_children[1].m_deactivated || 
+        m_children[1].m_properties[PROP_ID] != "spinnerbody"  || 
+        !isGauge()) 
+    { 
         return;
     }
 
     core::position2di mouse_position(x, y);
-    core::recti body_rect
+    core::recti body_rect 
         = m_children[1].getIrrlichtElement()->getAbsolutePosition();
 
     if (body_rect.isPointInside(mouse_position))

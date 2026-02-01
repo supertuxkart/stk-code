@@ -26,7 +26,7 @@
 #include <string>
 #include <vector>
 
-class AbstractKart;
+class Kart;
 
 /**
  * \brief An implementation of World to provide an easter egg hunt like mode
@@ -65,18 +65,17 @@ public:
     virtual void update(int ticks) OVERRIDE;
     virtual void getKartsDisplayInfo(
                  std::vector<RaceGUIBase::KartIconDisplayInfo> *info) OVERRIDE;
-    virtual void collectedItem(const AbstractKart *kart,
+    virtual void collectedItem(const Kart *kart,
                                const ItemState *item     ) OVERRIDE;
     void collectedEasterEggGhost(int world_id);
 
     const int  numberOfEggsFound() { return m_eggs_found; }
     const int  numberOfEggsToFind() { return m_number_of_eggs; }
 
-    void updateKartRanks();
     void readData(const std::string &filename);
 
     virtual void checkForWrongDirection(unsigned int i, float dt) OVERRIDE;
-    virtual float estimateFinishTimeForKart(AbstractKart* kart) OVERRIDE;
+    virtual float estimateFinishTimeForKart(Kart* kart) OVERRIDE;
 
 };   // EasterEggHunt
 

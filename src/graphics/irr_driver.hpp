@@ -66,7 +66,7 @@ namespace irr
 using namespace irr;
 
 enum TypeRTT : unsigned int;
-class AbstractKart;
+class Kart;
 class AbstractRenderer;
 class Camera;
 class FrameBuffer;
@@ -83,7 +83,7 @@ struct SHCoefficients;
   * \ingroup graphics
   */
 class IrrDriver : public IEventReceiver, public NoCopy
-{
+{    
 private:
     /** The irrlicht device. */
     IrrlichtDevice             *m_device;
@@ -148,8 +148,6 @@ private:
     int                   m_screen_orientation;
     std::vector<VideoMode> m_modes;
 
-    void                  setupViewports();
-
     /** Whether the mouse cursor is currently shown */
     bool                  m_pointer_shown;
 
@@ -202,8 +200,7 @@ private:
     // ------------------------------------------------------------------------
     void resizeWindow();
 public:
-    void doScreenShot();
-    void commonInit();
+    void doScreenShot();    
 public:
          IrrDriver();
         ~IrrDriver();
@@ -214,7 +211,6 @@ public:
     void getOpenGLData(std::string *vendor, std::string *renderer,
                        std::string *version);
 
-    void increaseObjectCount();
     core::array<video::IRenderTarget> &getMainSetup();
     void updateConfigIfRelevant();
     core::recti getSplitscreenWindow(int window_num);
@@ -266,7 +262,7 @@ public:
                          std::shared_ptr<GE::GERenderInfo> render_info = nullptr);
     scene::ICameraSceneNode
                          *addCameraSceneNode();
-    Camera               *addCamera(unsigned int index, AbstractKart *kart);
+    Camera               *addCamera(unsigned int index, Kart *kart);
     void                  removeCameraSceneNode(scene::ICameraSceneNode *camera);
     void                  removeCamera(Camera *camera);
     void                  update(float dt, bool loading=false);
@@ -411,20 +407,20 @@ public:
     void clearForcedBloom() { m_forcedbloom.clear(); }
     // ------------------------------------------------------------------------
     const std::vector<BloomData> &getForcedBloom() const
-    {
+    { 
         return m_forcedbloom;
     }
     // ------------------------------------------------------------------------
     void clearBackgroundNodes() { m_background.clear(); }
     // ------------------------------------------------------------------------
-    void addBackgroundNode(scene::ISceneNode * const n)
+    void addBackgroundNode(scene::ISceneNode * const n) 
     {
         m_background.push_back(n);
     }
     // ------------------------------------------------------------------------
     scene::ISceneNode *addLight(const core::vector3df &pos, float energy,
                                 float radius, float r, float g, float b,
-                                bool sun_ = false,
+                                bool sun_ = false, 
                                 scene::ISceneNode* parent = NULL);
     // ------------------------------------------------------------------------
     void clearLights();
@@ -453,16 +449,16 @@ public:
     // ------------------------------------------------------------------------
     const core::matrix4 &getInvProjMatrix() const { return m_InvProjMatrix; }
     // ------------------------------------------------------------------------
-    void genProjViewMatrix()
+    void genProjViewMatrix() 
     {
-        m_ProjViewMatrix = m_ProjMatrix * m_ViewMatrix;
-        m_InvProjViewMatrix = m_ProjViewMatrix;
-        m_InvProjViewMatrix.makeInverse();
+        m_ProjViewMatrix = m_ProjMatrix * m_ViewMatrix; 
+        m_InvProjViewMatrix = m_ProjViewMatrix; 
+        m_InvProjViewMatrix.makeInverse(); 
     }
     // ------------------------------------------------------------------------
     const core::matrix4 &getProjViewMatrix() const { return m_ProjViewMatrix; }
     // ------------------------------------------------------------------------
-    const core::matrix4 &getInvProjViewMatrix() const
+    const core::matrix4 &getInvProjViewMatrix() const 
     {
         return m_InvProjViewMatrix;
     }
@@ -473,7 +469,7 @@ public:
     }
     // ------------------------------------------------------------------------
     const core::dimension2du getActualScreenSize() const
-    {
+    { 
         return m_actual_screen_size;
     }
     // ------------------------------------------------------------------------
@@ -528,9 +524,6 @@ public:
 #endif
     void onLoadWorld();
     void onUnloadWorld();
-
-    void updateSplitAndLightcoordRangeFromComputeShaders(size_t width,
-                                                         size_t height);
 
     void uploadLightingData();
     void sameRestart()             { m_resolution_changing = RES_CHANGE_SAME; }

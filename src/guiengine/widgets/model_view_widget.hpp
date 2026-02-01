@@ -15,8 +15,6 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-
-
 #ifndef HEADER_MODELVIEW_HPP
 #define HEADER_MODELVIEW_HPP
 
@@ -26,6 +24,14 @@
 #include "utils/leak_check.hpp"
 #include "utils/ptr_vector.hpp"
 
+#include <IAnimatedMeshSceneNode.h>
+namespace irr
+{
+    namespace scene { class IAnimatedMesh; class IMesh;
+                      class ISceneNode; class IMeshSceneNode; }
+}
+using namespace irr;
+
 namespace GE { class GERenderInfo; }
 
 namespace GUIEngine
@@ -33,7 +39,7 @@ namespace GUIEngine
     /** \brief A model view widget.
       * \ingroup widgetsgroup
       */
-    class ModelViewWidget : public IconButtonWidget
+    class ModelViewWidget : public scene::IAnimationEndCallBack, public IconButtonWidget
     {
         enum RotationMode
         {
@@ -47,7 +53,9 @@ namespace GUIEngine
 
         PtrVector<scene::IMesh, REF> m_models;
         std::vector<core::matrix4> m_model_location;
-        std::vector<std::pair<int, int> > m_model_frames;
+        std::vector<int> m_model_start_frames;
+        std::vector<int> m_model_loop_start_frames;
+        std::vector<int> m_model_loop_end_frames;
         std::vector<float> m_model_animation_speed;
         std::vector<std::string> m_bone_attached;
         std::unique_ptr<RenderTarget> m_render_target;
@@ -55,7 +63,8 @@ namespace GUIEngine
 
         bool m_rtt_unsupported;
 
-        scene::ISceneNode          *m_rtt_main_node;
+        scene::IAnimatedMeshSceneNode *m_rtt_main_node;
+        bool m_main_node_animated;
 
         scene::ICameraSceneNode    *m_camera;
 
@@ -64,6 +73,8 @@ namespace GUIEngine
         std::shared_ptr<GE::GERenderInfo> m_render_info;
 
         unsigned m_rtt_size;
+
+        void OnAnimationEnd(scene::IAnimatedMeshSceneNode *node);
 
     public:
 
@@ -74,8 +85,10 @@ namespace GUIEngine
 
         void add();
         void clearModels();
+        void clearMainCameraLights();
         void addModel(irr::scene::IMesh* mesh,
                       const core::matrix4& location = core::matrix4(),
+                      const int start_frame=-1,
                       const int start_loop_frame=-1,
                       const int end_loop_frame=-1,
                       float animation_speed = 0.0f,
@@ -102,6 +115,8 @@ namespace GUIEngine
         void clearRttProvider();
 
         void setupRTTScene();
+
+        void setupNode(int index, bool main, bool animated);
 
         void drawRTTScene(const irr::core::rect<s32>& dest_rect) const;
 

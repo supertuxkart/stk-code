@@ -46,7 +46,7 @@ using namespace irr::gui;
 using namespace Online;
 
 // -----------------------------------------------------------------------------
-/** Dialog constructor.
+/** Dialog constructor. 
  *  \param server_id ID of the server of which to display the info.
  *  \param host_id ID of the host.
  *  \param from_server_creation: true if the dialog shows the data of this

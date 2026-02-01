@@ -26,7 +26,7 @@
 #include "graphics/particle_kind.hpp"
 #include "graphics/particle_kind_manager.hpp"
 #include "guiengine/engine.hpp"
-#include "karts/abstract_kart.hpp"
+#include "karts/kart.hpp"
 #include "karts/controller/controller.hpp"
 #include "karts/kart.hpp"
 #include "karts/kart_model.hpp"
@@ -39,11 +39,13 @@
 #include <iostream>
 #include "IVideoDriver.h"
 
-KartGFX::KartGFX(const AbstractKart *kart, bool is_day)
+KartGFX::KartGFX(const Kart *kart, bool is_day)
 {
     m_nitro_light = NULL;
+    m_nitro_hack_light = NULL;
     m_skidding_light_1 = NULL;
     m_skidding_light_2 = NULL;
+    m_skidding_light_3 = NULL;
     m_kart = kart;
     m_wheel_toggle = 0;
     m_skid_level = 0;
@@ -61,32 +63,51 @@ KartGFX::KartGFX(const AbstractKart *kart, bool is_day)
                                              /*radius*/ 5.0f, 0.0f, 0.4f, 1.0f,
                                              false, node);
         m_nitro_light->setVisible(false);
+
+        m_nitro_hack_light = irr_driver->addLight(location, /*force*/ 0.4f,
+                                             /*radius*/ 5.0f, 0.1f, 1.0f, 0.1f,
+                                             false, node);
+        m_nitro_hack_light->setVisible(false);
 #ifdef DEBUG
         m_nitro_light->setName( ("nitro emitter (" + m_kart->getIdent()
+                                                   + ")").c_str() );
+        m_nitro_hack_light->setName( ("nitro-hack emitter (" + m_kart->getIdent()
                                                    + ")").c_str() );
 #endif
 
         // Create skidding lights
         // For the first skidding level
-        m_skidding_light_1 =
-            irr_driver->addLight(core::vector3df(0.0f, 0.1f, -0.5f * length -
+        m_skidding_light_1 = 
+            irr_driver->addLight(core::vector3df(0.0f, 0.1f, -0.5f * length - 
                                  0.05f), /* force */ 0.3f, /*radius*/ 3.0f,
                                  1.0f, 0.6f, 0.0f, false, node);
         m_skidding_light_1->setVisible(false);
-        m_skidding_light_1->setName(("skidding emitter 1 (" + m_kart->getIdent()
+        m_skidding_light_1->setName(("skidding emitter 1 (" + m_kart->getIdent() 
                                                             + ")").c_str() );
 
         // For the second skidding level
         m_skidding_light_2 =
-            irr_driver->addLight(core::vector3df(0.0f, 0.1f, -0.5f * length -
+            irr_driver->addLight(core::vector3df(0.0f, 0.1f, -0.5f * length - 
                                  0.05f), /* force */0.4f, /*radius*/4.0f,
                                  1.0f, 0.1f, 0.0f, false, node);
         m_skidding_light_2->setVisible(false);
         m_skidding_light_2->setName(("skidding emitter 2 (" + m_kart->getIdent()
                                                             + ")").c_str() );
+
+        // For the second skidding level
+        m_skidding_light_3 =
+            irr_driver->addLight(core::vector3df(0.0f, 0.1f, -0.5f * length - 
+                                 0.05f), /* force */0.4f, /*radius*/5.0f,
+                                 0.7f, 0.0f, 0.8f, false, node);
+        m_skidding_light_3->setVisible(false);
+        m_skidding_light_3->setName(("skidding emitter 3 (" + m_kart->getIdent()
+                                                            + ")").c_str() );
+
         m_nitro_light->grab();
+        m_nitro_hack_light->grab();
         m_skidding_light_1->grab();
         m_skidding_light_2->grab();
+        m_skidding_light_3->grab();
     }
 #endif
 
@@ -111,6 +132,8 @@ KartGFX::KartGFX(const AbstractKart *kart, bool is_day)
     // in the order of KartGFXType.
     addEffect(KGFX_NITRO1,      "nitro.xml",       rear_nitro_right, true );
     addEffect(KGFX_NITRO2,      "nitro.xml",       rear_nitro_left,  true );
+    addEffect(KGFX_NITROHACK1,  "nitro-hack.xml",  rear_nitro_right, true );
+    addEffect(KGFX_NITROHACK2,  "nitro-hack.xml",  rear_nitro_left,  true );
     addEffect(KGFX_NITROSMOKE1, "nitro-smoke.xml", rear_nitro_left,  false);
     addEffect(KGFX_NITROSMOKE2, "nitro-smoke.xml", rear_nitro_right, false);
     addEffect(KGFX_ZIPPER,      "zipper_fire.xml", rear_center,      true );
@@ -119,6 +142,8 @@ KartGFX::KartGFX(const AbstractKart *kart, bool is_day)
     addEffect(KGFX_SKID1R,      "skid1.xml",       rear_right,       true );
     addEffect(KGFX_SKID2L,      "skid2.xml",       rear_left,        true );
     addEffect(KGFX_SKID2R,      "skid2.xml",       rear_right,       true );
+    addEffect(KGFX_SKID3L,      "skid3.xml",       rear_left,        true );
+    addEffect(KGFX_SKID3R,      "skid3.xml",       rear_right,       true );
     addEffect(KGFX_SKID0L,      "skid0.xml",       rear_left,        true );
     addEffect(KGFX_SKID0R,      "skid0.xml",       rear_right,       true );
     if (!kart->getKartModel()->getExhaustXML().empty())
@@ -152,8 +177,10 @@ KartGFX::~KartGFX()
     if (!GUIEngine::isNoGraphics() && supportsLight())
     {
         m_nitro_light->drop();
+        m_nitro_hack_light->drop();
         m_skidding_light_1->drop();
         m_skidding_light_2->drop();
+        m_skidding_light_3->drop();
     }
 #endif
 
@@ -192,9 +219,10 @@ void KartGFX::addEffect(KartGFXType type, const std::string &file_name,
             throw std::runtime_error(err);
         }
         //kind    = new ParticleKind(file_manager->getGfxFile(file_name));
-        // Skid0 and Skid2 are only used to store the emitter type, and a
-        // wheeless kart has no terrain effects.
-        if(type==KGFX_SKID0L || type==KGFX_SKID0R || type==KGFX_SKID2L || type==KGFX_SKID2R ||
+        // Skid0 and Skid3 are only used to store the emitter type,
+        // and a wheeless kart has no terrain effects.
+        if(type==KGFX_SKID0L || type==KGFX_SKID0R ||
+            type==KGFX_SKID3L || type==KGFX_SKID3R ||
             (type==KGFX_TERRAIN && m_kart->isWheeless()) )
             emitter = NULL;
         else if(type==KGFX_TERRAIN)
@@ -224,6 +252,10 @@ void KartGFX::addEffect(KartGFXType type, const std::string &file_name,
         m_skid_kind1 = kind;
     else if (type==KGFX_SKID2L || type==KGFX_SKID2R)
         m_skid_kind2 = kind;
+    else if (type==KGFX_SKID3L || type==KGFX_SKID3R)
+        m_skid_kind3 = kind;
+#else
+    m_all_emitters.push_back(NULL);
 #endif
 }   // addEffect
 
@@ -250,39 +282,55 @@ void KartGFX::reset()
 // ----------------------------------------------------------------------------
 /** Selects the correct skidding particle type depending on skid bonus level.
  *  \param level Must be 0 (no bonus, showing tiny sparks), 1 (accumulated enough
- *         for level 1 bonus), or 2 (accumulated enough for level 2 bonus).
+ *         for level 1 bonus), 2 (accumulated enough for level 2 bonus) or 3.
+  *  \param upcoming_level Must be 0 (no bonus, showing tiny sparks), 1 (accumulated enough
+ *         for level 1 bonus), 2 (accumulated enough for level 2 bonus) or 3.
  */
-void KartGFX::setSkidLevel(const unsigned int level)
+void KartGFX::setSkidLevel(const unsigned int level, const unsigned int upcoming_level)
 {
     assert(level >= 0);
-    assert(level <= 2);
+    assert(level <= 3);
     m_skid_level = level;
-    const ParticleKind *pk;
+    const ParticleKind *pk, *pk2;
     if (level == 0)
-    {
         pk = m_skid_kind0;
-    }
     else if (level == 1)
-    {
         pk = m_skid_kind1;
-    }
-    else
-    {
+    else if (level == 2)
         pk = m_skid_kind2;
-    }
+    else
+        pk = m_skid_kind3;
+
+    if (upcoming_level == 0)
+        pk2 = m_skid_kind0;
+    else if (upcoming_level == 1)
+        pk2 = m_skid_kind1;
+    else if (upcoming_level == 2)
+        pk2 = m_skid_kind2;
+    else
+        pk2 = m_skid_kind3;
+
+
 //    const ParticleKind *pk = level==1 ? m_skid_kind1 : m_skid_kind2;
 #ifndef SERVER_ONLY
     if (GUIEngine::isNoGraphics())
         return;
 
-    if(m_all_emitters[KGFX_SKID1L])
-        m_all_emitters[KGFX_SKID1L]->setParticleType(pk);
-    if(m_all_emitters[KGFX_SKID1R])
-        m_all_emitters[KGFX_SKID1R]->setParticleType(pk);
-    // Relative 0 means it will emitt the minimum rate, i.e. the rate
-    // set to indicate that the bonus is now available.
-    setCreationRateRelative(KartGFX::KGFX_SKIDL, 0.0f);
-    setCreationRateRelative(KartGFX::KGFX_SKIDR, 0.0f);
+    if(m_all_emitters[KGFX_SKIDL])
+        m_all_emitters[KGFX_SKIDL]->setParticleType(pk);
+    if(m_all_emitters[KGFX_SKIDR])
+        m_all_emitters[KGFX_SKIDR]->setParticleType(pk);
+    if(m_all_emitters[KGFX_SKIDL2])
+        m_all_emitters[KGFX_SKIDL2]->setParticleType(pk2);
+    if(m_all_emitters[KGFX_SKIDR2])
+        m_all_emitters[KGFX_SKIDR2]->setParticleType(pk2);
+    // Relative 1 means it will emit the maximum rate,
+    // relative 0 means it will emit at the minimum rate.
+    // This is used to determine the mixing ratios when the levels are different.
+    setCreationRateRelative(KartGFX::KGFX_SKIDL, 1.0f);
+    setCreationRateRelative(KartGFX::KGFX_SKIDR, 1.0f);
+    setCreationRateRelative(KartGFX::KGFX_SKIDL2, 0.0f);
+    setCreationRateRelative(KartGFX::KGFX_SKIDR2, 0.0f);
 #endif
 }   // setSkidLevel
 
@@ -421,7 +469,7 @@ void KartGFX::updateTerrain(const ParticleKind *pk)
     bool on_ground       = m_kart->isOnGround() &&
                            !m_kart->getSkidding()->isJumping();
     if (skidding > 1.0f && on_ground)
-        rate = fabsf(m_kart->getControls().getSteer()) > 0.8 ? skidding - 1 : 0;
+        rate = fabsf(m_kart->getEffectiveSteer()) > 0.8 ? skidding - 1 : 0;
     else if (speed >= 0.5f && on_ground)
         rate = speed/m_kart->getKartProperties()->getEngineMaxSpeed();
     else
@@ -457,7 +505,7 @@ void KartGFX::update(float dt)
 /** Updates nitro dependent particle effects.
  *  \param nitro_frac Nitro fraction/
  */
-void KartGFX::updateNitroGraphics(float nitro_frac)
+void KartGFX::updateNitroGraphics(float nitro_frac, bool isNitroHackOn, bool activeNitro)
 {
 #ifndef SERVER_ONLY
     if (GUIEngine::isNoGraphics())
@@ -466,37 +514,52 @@ void KartGFX::updateNitroGraphics(float nitro_frac)
     // Upate particle effects (creation rate, and emitter size
     // depending on speed)
     // --------------------------------------------------------
-    if (nitro_frac > 0)
+    if (nitro_frac > 0) // There is an input to use nitro
     {
-        setCreationRateRelative(KartGFX::KGFX_NITRO1, nitro_frac);
-        setCreationRateRelative(KartGFX::KGFX_NITRO2, nitro_frac);
+        if(isNitroHackOn)
+        {
+            setCreationRateAbsolute(KartGFX::KGFX_NITRO1,      0);
+            setCreationRateAbsolute(KartGFX::KGFX_NITRO2,      0);
+            setCreationRateRelative(KartGFX::KGFX_NITROHACK1, nitro_frac);
+            setCreationRateRelative(KartGFX::KGFX_NITROHACK2, nitro_frac);
+        }
+        else
+        {
+            setCreationRateRelative(KartGFX::KGFX_NITRO1, nitro_frac);
+            setCreationRateRelative(KartGFX::KGFX_NITRO2, nitro_frac);
+            setCreationRateAbsolute(KartGFX::KGFX_NITROHACK1,  0);
+            setCreationRateAbsolute(KartGFX::KGFX_NITROHACK2,  0);
+        }
         setCreationRateRelative(KartGFX::KGFX_NITROSMOKE1, nitro_frac);
         setCreationRateRelative(KartGFX::KGFX_NITROSMOKE2, nitro_frac);
-        
-        if (supportsLight())
-            m_nitro_light->setVisible(true);
     }
     else
     {
         setCreationRateAbsolute(KartGFX::KGFX_NITRO1,      0);
         setCreationRateAbsolute(KartGFX::KGFX_NITRO2,      0);
+        setCreationRateAbsolute(KartGFX::KGFX_NITROHACK1,  0);
+        setCreationRateAbsolute(KartGFX::KGFX_NITROHACK2,  0);
         setCreationRateAbsolute(KartGFX::KGFX_NITROSMOKE1, 0);
         setCreationRateAbsolute(KartGFX::KGFX_NITROSMOKE2, 0);
-        
-        if (supportsLight())
-            m_nitro_light->setVisible(false);
+    }
+    
+    // Add a colored light effect if the kart has an active nitro boost
+    if (supportsLight())
+    {
+        m_nitro_light->setVisible(activeNitro && !isNitroHackOn);
+        m_nitro_hack_light->setVisible(activeNitro && isNitroHackOn);
     }
     
     // Exhaust is always emitting
     setCreationRateRelative(KartGFX::KGFX_EXHAUST1, 1.0);
     setCreationRateRelative(KartGFX::KGFX_EXHAUST2, 1.0);
 #endif
-}  // updateGraphics
+}  // updateNitroGraphics
 
 // ----------------------------------------------------------------------------
 /** Updates the skiddng light (including disabling it).
  *  \param level Which level of light to display: 0 no light at all,
- *         1: level 1, 2 level 2.
+ *         1: level 1, 2 level 2, 3 level 3.
  */
 void KartGFX::updateSkidLight(unsigned int level)
 {
@@ -504,14 +567,15 @@ void KartGFX::updateSkidLight(unsigned int level)
     if (!GUIEngine::isNoGraphics() && supportsLight())
     {
         m_skidding_light_1->setVisible(level == 1);
-        m_skidding_light_2->setVisible(level > 1);
+        m_skidding_light_2->setVisible(level == 2);
+        m_skidding_light_3->setVisible(level > 2);
     }
 #endif
 }   // updateSkidLight
 
 // ----------------------------------------------------------------------------
 void KartGFX::getGFXStatus(int* nitro, bool* zipper,
-                           int* skidding, bool* red_skidding) const
+                           int* skidding, bool* red_skidding, bool* purple_skidding) const
 {
 #ifndef SERVER_ONLY
     if (GUIEngine::isNoGraphics())
@@ -521,6 +585,7 @@ void KartGFX::getGFXStatus(int* nitro, bool* zipper,
     bool z = false;
     int s = 0;
     bool r = false;
+    bool p = false;
 
     if (m_all_emitters[KGFX_NITRO1])
     {
@@ -536,18 +601,20 @@ void KartGFX::getGFXStatus(int* nitro, bool* zipper,
     {
         s = m_all_emitters[KGFX_SKIDL]->getCreationRate();
         r = m_skid_level == 2;
+        p = m_skid_level == 3;
     }
 
     *nitro = n;
     *zipper = z;
     *skidding = s;
     *red_skidding = r;
+    *purple_skidding = p;
 #endif
 }   // getGFXStatus
 
 // ----------------------------------------------------------------------------
 void KartGFX::setGFXFromReplay(int nitro, bool zipper,
-                               int skidding, bool red_skidding)
+                               int skidding, bool red_skidding, bool purple_skidding)
 {
 #ifndef SERVER_ONLY
     if (GUIEngine::isNoGraphics())
@@ -579,8 +646,9 @@ void KartGFX::setGFXFromReplay(int nitro, bool zipper,
 
     if (skidding > 0)
     {
-        const ParticleKind* skid_kind = red_skidding ? m_skid_kind2
-                                                     : m_skid_kind1;
+        const ParticleKind* skid_kind = purple_skidding ? m_skid_kind3 :
+                                        red_skidding    ? m_skid_kind2 :
+                                                          m_skid_kind1;
 
         if (m_all_emitters[KGFX_SKID1L])
             m_all_emitters[KGFX_SKID1L]->setParticleType(skid_kind);
@@ -589,8 +657,9 @@ void KartGFX::setGFXFromReplay(int nitro, bool zipper,
 
         if (supportsLight())
         {
-            m_skidding_light_1->setVisible(!red_skidding);
-            m_skidding_light_2->setVisible(red_skidding);
+            m_skidding_light_1->setVisible(!red_skidding && !purple_skidding);
+            m_skidding_light_2->setVisible(red_skidding && !purple_skidding);
+            m_skidding_light_3->setVisible(purple_skidding);
         }
         
         setCreationRateAbsolute(KartGFX::KGFX_SKIDL, (float)skidding);
@@ -605,6 +674,7 @@ void KartGFX::setGFXFromReplay(int nitro, bool zipper,
         {
             m_skidding_light_1->setVisible(false);
             m_skidding_light_2->setVisible(false);
+            m_skidding_light_3->setVisible(false);
         }
     }
 #endif
@@ -617,8 +687,10 @@ void KartGFX::setGFXInvisible()
     if (!GUIEngine::isNoGraphics() && supportsLight())
     {
         m_nitro_light->setVisible(false);
+        m_nitro_hack_light->setVisible(false);
         m_skidding_light_1->setVisible(false);
         m_skidding_light_2->setVisible(false);
+        m_skidding_light_3->setVisible(false);
         m_kart->getKartModel()->toggleHeadlights(false);
     }
 #endif

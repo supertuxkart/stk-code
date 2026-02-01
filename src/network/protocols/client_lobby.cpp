@@ -33,7 +33,7 @@
 #include "io/file_manager.hpp"
 #include "items/network_item_manager.hpp"
 #include "items/powerup_manager.hpp"
-#include "karts/abstract_kart.hpp"
+#include "karts/kart.hpp"
 #include "karts/controller/controller.hpp"
 #include "karts/kart_properties.hpp"
 #include "karts/kart_properties_manager.hpp"
@@ -46,7 +46,6 @@
 #include "network/network_player_profile.hpp"
 #include "network/network_timer_synchronizer.hpp"
 #include "network/peer_vote.hpp"
-#include "network/protocols/chat_commands.hpp"
 #include "network/protocols/connect_to_server.hpp"
 #include "network/protocols/game_protocol.hpp"
 #include "network/protocols/game_events_protocol.hpp"
@@ -100,7 +99,7 @@ void ClientLobby::destroyBackgroundDownload()
 }
 
 // ============================================================================
-/** The protocol that manages starting a race with the server. It uses a
+/** The protocol that manages starting a race with the server. It uses a 
  *  finite state machine:
 \dot
 digraph interaction {
@@ -205,7 +204,6 @@ bool ClientLobby::notifyEvent(Event* event)
         case LE_BACK_LOBBY:            backToLobby(event);         break;
         case LE_UPDATE_PLAYER_LIST:    updatePlayerList(event);    break;
         case LE_CHAT:                  handleChat(event);          break;
-        case LE_COMMAND_ANSWER:        handleChat(event, true);    break;
         case LE_CONNECTION_ACCEPTED:   connectionAccepted(event);  break;
         case LE_SERVER_INFO:           handleServerInfo(event);    break;
         case LE_PLAYER_DISCONNECTED :  disconnectedPlayer(event);  break;
@@ -241,7 +239,7 @@ bool ClientLobby::notifyEventAsynchronous(Event* event)
             default:                                                     break;
         }   // switch
     } // message
-    else if (event->getType() == EVENT_TYPE_DISCONNECTED)
+    else if (event->getType() == EVENT_TYPE_DISCONNECTED) 
     {
         // This means we left essentially.
         // We can't delete STKHost from this thread, since the main
@@ -351,7 +349,7 @@ void ClientLobby::addAllPlayers(Event* event)
         Camera* cam = Camera::getCamera(0);
         for (unsigned i = 0; i < w->getNumKarts(); i++)
         {
-            AbstractKart* k = w->getKart(i);
+            Kart* k = w->getKart(i);
             // Change spectating target to first non-eliminated kart
             if (isSpectator() && cam && !k->isEliminated())
             {
@@ -619,7 +617,7 @@ void ClientLobby::receivePlayerVote(Event* event)
  *  \param event : Event providing the information.
  *
  *  Format of the data :
- *  Byte 0
+ *  Byte 0 
  *       --------------
  *  Size |    1       |
  *  Data | player id *|
@@ -936,26 +934,13 @@ void ClientLobby::becomingServerOwner()
 }   // becomingServerOwner
 
 //-----------------------------------------------------------------------------
-void ClientLobby::handleChat(Event* event, bool command_answer)
+void ClientLobby::handleChat(Event* event)
 {
     if (!UserConfigParams::m_lobby_chat)
         return;
     SFXManager::get()->quickSound("plopp");
     core::stringw message;
-
-    if (command_answer)
-    {
-        ChatCommands::CommandAnswers command_id =
-            (ChatCommands::CommandAnswers)event->data().getUInt16();
-        event->data().decodeString16(&message);
-        std::string args = StringUtils::wideToUtf8(message);
-        message = ChatCommands::getAnswerString(command_id, args);
-    }
-    else
-    {
-        event->data().decodeString16(&message);
-    }
-
+    event->data().decodeString16(&message);
     Log::info("ClientLobby", "%s", StringUtils::wideToUtf8(message).c_str());
     if (GUIEngine::isNoGraphics())
         return;
@@ -973,7 +958,7 @@ void ClientLobby::handleChat(Event* event, bool command_answer)
  *  \param event : Event providing the information.
  *
  *  Format of the data :
- *  Byte 0
+ *  Byte 0 
  *       ----------------
  *  Size |      1       |
  *  Data | refusal code |
@@ -1189,7 +1174,7 @@ void ClientLobby::raceFinished(Event* event)
         lw->updateRacePosition();
         for (unsigned i = 0; i < lw->getNumKarts(); i++)
         {
-            AbstractKart* k = lw->getKart(i);
+            Kart* k = lw->getKart(i);
             if (!k->hasFinishedRace() && !k->isEliminated())
             {
                 core::stringw player_name = k->getController()->getName();
@@ -1330,7 +1315,7 @@ void ClientLobby::liveJoinAcknowledged(Event* event)
     m_last_live_join_util_ticks = data.getUInt32();
     for (unsigned i = 0; i < w->getNumKarts(); i++)
     {
-        AbstractKart* k = w->getKart(i);
+        Kart* k = w->getKart(i);
         if (k->getController()->isLocalPlayerController())
             k->setLiveJoinKart(m_last_live_join_util_ticks);
     }
@@ -1351,7 +1336,7 @@ void ClientLobby::liveJoinAcknowledged(Event* event)
         w->resetElimination();
         for (unsigned i = 0; i < players.size(); i++)
         {
-            AbstractKart* k = w->getKart(i);
+            Kart* k = w->getKart(i);
             if (k->getController()->isLocalPlayerController())
                 continue;
             k->reset();
@@ -1391,7 +1376,7 @@ void ClientLobby::finishLiveJoin()
     w->endLiveJoinWorld(m_last_live_join_util_ticks);
     for (unsigned i = 0; i < w->getNumKarts(); i++)
     {
-        AbstractKart* k = w->getKart(i);
+        Kart* k = w->getKart(i);
         if (!k->getController()->isLocalPlayerController() &&
             !k->isEliminated())
             k->getNode()->setVisible(true);
@@ -1602,7 +1587,7 @@ void ClientLobby::changeSpectateTarget(PlayerAction action, int value,
     WorldWithRank* wwr = dynamic_cast<WorldWithRank*>(World::getWorld());
     if (!wwr)
         return;
-    std::vector<AbstractKart*> karts;
+    std::vector<Kart*> karts;
     for (unsigned i = 0; i < wwr->getNumKarts(); i++)
         karts.push_back(wwr->getKartAtDrawingPosition(i + 1));
 

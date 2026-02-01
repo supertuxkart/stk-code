@@ -77,11 +77,29 @@ private:
      */
     bool                m_allow_sliding;
 
+    /** Used to know the direction of the visual kart-on-kart collision lean */
+    bool                m_leaning_right;
+
+    /** Used to know the strength of the visual kart-on-kart collision lean */
+    float               m_leaning_factor;    
+
     /** An additional impulse that is applied for a certain amount of time. */
     btVector3           m_additional_impulse;
 
     /** The time the additional impulse should be applied. */
     uint16_t            m_ticks_additional_impulse;
+
+    /** The total time the additional impulse should be applied.
+     * This is used to weaken the impulse progressively, as an
+     * impulse suddenly stopping is very noticeable with strong impulses. */
+    uint16_t            m_ticks_total_impulse;
+
+    /** The duration during which the active impulse cannot be replaced by another.
+     * When two karts collide, they keep touching for several consecutive frames
+     * and reapplying the impulse after the first touch would be wrong.
+     * But if a kart got an impulse from one kart, we don't want a contact with
+     * another kart soon after to not generate any impulse.*/
+    uint16_t            m_ticks_lock_impulse;
 
     /** Additional rotation in y-axis that is applied over a certain amount of time. */
     float               m_additional_rotation;
@@ -130,6 +148,8 @@ private:
                                      btTransform chassis_trans,
                                      bool interpolatedTransform=true,
                                      float fraction = 1.0f);
+    void     pushVehicleUpright();
+    float    uprightRayCast(const btVector3& raycastStart);
 
 public:
 
@@ -169,7 +189,6 @@ public:
     void               updateSuspension(btScalar deltaTime);
     virtual void       updateFriction(btScalar timeStep);
     void               setSliding(bool active);
-    void               instantSpeedIncreaseTo(btScalar speed);
     void               adjustSpeed(btScalar min_speed, btScalar max_speed);
     void               updateAllWheelPositions();
     void               getVisualContactPoint(const btTransform& chassis_trans,
@@ -228,18 +247,27 @@ public:
     void setTimedCentralImpulse(uint16_t t, const btVector3 &imp,
                                 bool rewind = false)
     {
-        // Only add impulse if no other impulse is active.
-        if (m_ticks_additional_impulse > 0 && !rewind) return;
+        // Only add impulse if the impulse lock is not on.
+        if (isImpulseLocked() && !rewind) return;
         m_additional_impulse      = imp;
+        m_ticks_total_impulse      = t;
         m_ticks_additional_impulse = t;
-    }   // setTimedImpulse
+        m_ticks_lock_impulse       = std::min(t, (uint16_t)stk_config->time2Ticks(0.075f));
+    }   // setTimedCentralImpulse
+    // ------------------------------------------------------------------------
+    void setCollisionLean(bool lean_right) { m_leaning_right = lean_right; }
+    // ------------------------------------------------------------------------
+    void setCollisionLeanFactor(float lean_factor) { m_leaning_factor = lean_factor; }
     // ------------------------------------------------------------------------
     /** Returns the time an additional impulse is activated. */
-    uint16_t getCentralImpulseTicks() const
-                                         { return m_ticks_additional_impulse; }
+    uint16_t getCentralImpulseTicks() const { return m_ticks_additional_impulse; }
     // ------------------------------------------------------------------------
-    const btVector3& getAdditionalImpulse() const
-                                               { return m_additional_impulse; }
+    bool isImpulseLocked() const { return m_ticks_lock_impulse > 0; }
+    // ------------------------------------------------------------------------
+    /** Returns the collision (visual) lean. */
+    float getCollisionLean() const;
+    // ------------------------------------------------------------------------
+    const btVector3& getAdditionalImpulse() const { return m_additional_impulse; }
     // ------------------------------------------------------------------------
     /** Sets a rotation that is applied over a certain amount of time (to avoid
      *  a too rapid changes in the kart).
@@ -261,7 +289,7 @@ public:
                                         { return m_ticks_additional_rotation; }
     // ------------------------------------------------------------------------
     /** Sets the maximum speed for this kart. */
-    void setMaxSpeed(float new_max_speed)
+    void setMaxSpeed(float new_max_speed) 
     {
         // Only change m_max_speed if it has not been set (<0), or
         // the new value is smaller than the current maximum. For example,
@@ -272,6 +300,8 @@ public:
             m_max_speed = new_max_speed;
     }   // setMaxSpeed
     // ------------------------------------------------------------------------
+    float getAirFriction(float speed);
+    // ------------------------------------------------------------------------
     /** Resets the maximum so any new maximum value from the application will
      *  be accepted. */
     virtual void resetMaxSpeed() { m_max_speed = -1.0f; }
@@ -279,11 +309,11 @@ public:
     virtual void resetMinSpeed() { m_min_speed = 0.0f; }
     // ------------------------------------------------------------------------
     /** Sets the minimum speed for this kart, only if the new value is higher.
-     * FIXME The name of this function doesn't match its real behavior, it's confusing
+     * FIXME The name of this function doesn't match its real behavior, it's confusing 
      * Determine why it needs to work that way and make it cleaner */
     void setMinSpeed(float s)
     {
-        if(s > m_min_speed) m_min_speed = s;
+        if(s > m_min_speed) m_min_speed = s; 
     }
     // ------------------------------------------------------------------------
     /** Returns the minimum speed for this kart. */

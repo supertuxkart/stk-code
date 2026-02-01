@@ -31,7 +31,7 @@ namespace irr
 }
 using namespace irr;
 
-class AbstractKart;
+class Kart;
 class MultitouchDevice;
 class RaceGUIBase;
 
@@ -76,7 +76,7 @@ public:
      RaceGUIMultitouch(RaceGUIBase* race_gui);
     ~RaceGUIMultitouch();
 
-    void draw(const AbstractKart* kart, const core::recti &viewport,
+    void draw(const Kart* kart, const core::recti &viewport,
               const core::vector2df &scaling);
                                 
     unsigned int getHeight() {return m_height;}

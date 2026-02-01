@@ -612,7 +612,7 @@ EventPropagation RibbonWidget::transmitEvent(Widget* w,
     // bring focus back to enclosing ribbon widget
     this->setFocusForPlayer( playerID );
 
-    if (m_selection[playerID] > -1 &&
+    if (m_selection[playerID] > -1 && 
         m_selection[playerID] < (int)(m_active_children.size()))
     {
         if (m_active_children[m_selection[playerID]].m_deactivated)
@@ -867,7 +867,7 @@ void RibbonWidget::resize()
 
                 // Ensure the label doesn't overlap with the icon
                 if (m_active_children[i].m_type == WTYPE_ICON_BUTTON)
-                    label_part.UpperLeftCorner.X += icon_part.getWidth() + 5;
+                    label_part.UpperLeftCorner.X += icon_part.getWidth() + 5;                
 
                 m_active_children[i].m_element->setRelativePosition(tab_rect_abs);
                 if (m_active_children[i].m_type == WTYPE_ICON_BUTTON)
@@ -881,9 +881,9 @@ void RibbonWidget::resize()
                 if (((int)GUIEngine::getFont()->getDimension(message.c_str())
                                               .Width > label_part.getWidth() &&
                     message.findFirst(L' ') == -1                            &&
-                    message.findFirst(L'\u00AD') == -1) ||
+                    message.findFirst(L'\u00AD') == -1) || 
                     ((int)GUIEngine::getFont()->getDimension(message.c_str())
-                                              .Width > label_part.getWidth() &&
+                                              .Width > label_part.getWidth() && 
                     (int)GUIEngine::getFont()->getDimension(message.c_str())
                                               .Height*2 > label_part.getHeight()))
                 {

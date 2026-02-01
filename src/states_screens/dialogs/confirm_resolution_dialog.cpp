@@ -85,8 +85,7 @@ void ConfirmResolutionDialog::updateMessage()
 
     stringw msg = _P("Confirm resolution within %i second",
         "Confirm resolution within %i seconds",
-        /* to pick the plural form */       (int)m_remaining_time,
-        /* to insert in the final string */ (int)m_remaining_time);
+        (int)m_remaining_time);
 
     if (m_unsupported_resolution)
     {

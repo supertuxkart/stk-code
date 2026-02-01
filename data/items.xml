@@ -1,14 +1,16 @@
 <?xml version="1.0"?>
 <items>
-  <bonus-box   model="gift-box.spm"        lowmodel="gift-box-low.spm"        glow="31 202 253"/>
-  <banana      model="banana.spm"          lowmodel="banana-low.spm"          glow="197 152 37"/>
-  <nitro-big   model="nitrotank-big.spm"   lowmodel="nitrotank-big-low.spm"   glow="0 70 158"/>
-  <nitro-small model="nitrotank-small.spm" lowmodel="nitrotank-small-low.spm" glow="0 70 158"/>
+  <bonus-box   model="gift-box.spm"        lowmodel="gift-box-low.spm"        glow="31 202 253" collect-distance-squared="0.3025"/> <!-- real distance 0.55 -->
+  <banana      model="banana.spm"          lowmodel="banana-low.spm"          glow="197 152 37" collect-distance-squared="0.3025"/> <!-- real distance 0.55 -->
+  <nitro-big   model="nitrotank-big.spm"   lowmodel="nitrotank-big-low.spm"   glow="0 70 158"   collect-distance-squared="0.64"/>   <!-- real distance 0.8 -->
+  <nitro-small model="nitrotank-small.spm" lowmodel="nitrotank-small-low.spm" glow="0 70 158"   collect-distance-squared="0.0625"/> <!-- real distance 0.25 -->
+  <nitro-air   model="nitro-air.spm"       lowmodel="nitro-air.spm"           glow="0 70 158"   collect-distance-squared="0.36"/>   <!-- real distance 0.6 -->
   <!-- While a bubble gum technically 
        isn't an item, it is internally 
        handled as one, so list it here    -->
-  <bubblegum   model="bubblegum.spm"       lowmodel="bubblegum-low.spm"       glow="246 150 209"/>
-  <bubblegum-nolok   model="bubblegum-nolok.spm" lowmodel="bubblegum-nolok-low.spm" glow="20 190 0"/>
-  <easter-egg  model="easter_egg.spm" glow="0 60 120" />
+  <bubblegum         model="bubblegum.spm"       lowmodel="bubblegum-low.spm"       glow="246 150 209" collect-distance-squared="0.81"/> <!-- real distance 0.9 -->
+  <bubblegum-nolok   model="bubblegum-nolok.spm" lowmodel="bubblegum-nolok-low.spm" glow="20 190 0"    collect-distance-squared="0.81"/> <!-- real distance 0.9 -->
+  <bubblegum-small   model="bubblegum.spm"       lowmodel="bubblegum-low.spm"       glow="246 150 209" collect-distance-squared="0.4556"/> <!-- real distance 0.675 -->
+  <bubblegum-small-nolok   model="bubblegum-nolok.spm" lowmodel="bubblegum-nolok-low.spm" glow="20 190 0" collect-distance-squared="0.4556"/> <!-- real distance 0.675 -->
+  <easter-egg  model="easter_egg.spm" glow="0 60 120" collect-distance-squared="0.3025" /> <!-- real distance 0.55 -->
 </items>
-

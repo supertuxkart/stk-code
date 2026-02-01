@@ -138,7 +138,7 @@ private:
     /** This is the initial position of the object for the physics. */
     btTransform           m_init_pos;
 
-    /** Save current transform to avoid frequent lookup from
+    /** Save current transform to avoid frequent lookup from 
      * world transform. */
     btTransform           m_current_transform;
 

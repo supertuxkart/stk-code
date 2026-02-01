@@ -91,14 +91,14 @@ private:
 
     /** Pointer to the closest kart ahead of this kart. NULL if this
      *  kart is first. */
-    AbstractKart *m_kart_ahead;
+    Kart *m_kart_ahead;
 
     /** Distance to the kart ahead. */
     float m_distance_ahead;
 
     /** Pointer to the closest kart behind this kart. NULL if this kart
      *  is last. */
-    AbstractKart *m_kart_behind;
+    Kart *m_kart_behind;
 
     /** Distance to the kard behind. */
     float m_distance_behind;
@@ -226,14 +226,14 @@ private:
 
     void  determineTrackDirection();
     virtual bool canSkid(float steer_fraction);
-    virtual void setSteering(float angle, float dt);
+    virtual void setSteering(float angle);
     void handleCurve();
 
 protected:
     virtual unsigned int getNextSector(unsigned int index);
 
 public:
-                 TestAI(AbstractKart *kart);
+                 TestAI(Kart *kart);
                 ~TestAI();
     virtual void update      (int ticks);
     virtual void reset       ();

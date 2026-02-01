@@ -39,6 +39,8 @@
   typedef unsigned int ALuint;
 #endif
 
+#undef DEBUG_SFX
+
 class MusicInformation;
 class SFXBase;
 class SFXBuffer;
@@ -112,7 +114,7 @@ public:
 
 private:
 
-    /** Data structure for the queue, which stores a sfx and the command to
+    /** Data structure for the queue, which stores a sfx and the command to 
      *  execute for it. */
     class SFXCommand : public NoCopy
     {
@@ -224,6 +226,11 @@ private:
 
     /** A conditional variable to wake up the main loop. */
     std::condition_variable   m_condition_variable;
+
+#ifdef DEBUG_SFX
+    unsigned int m_created_count;
+    unsigned int m_deleted_count;
+#endif
 
     void                      loadSfx();
                              SFXManager();

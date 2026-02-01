@@ -108,12 +108,12 @@ std::shared_ptr<LobbyProtocol> STKHost::create(ChildLoop* cl)
 
 // ============================================================================
 /** \class STKHost
- *  \brief Represents the local host. It is the main managing point for
+ *  \brief Represents the local host. It is the main managing point for 
  *  networking. It is responsible for sending and receiving messages,
  *  and keeping track of connected peers. It also provides some low
  *  level socket functions (i.e. to avoid that enet adds its headers
  *  to messages, useful for broadcast in LAN and for stun). It can be
- *  either instantiated as server, or as client.
+ *  either instantiated as server, or as client. 
  *  Additionally this object stores information from the various protocols,
  *  which can be queried by the GUI. The online game works
  *  closely together with the stk server: a (game) server first connects
@@ -121,7 +121,7 @@ std::shared_ptr<LobbyProtocol> STKHost::create(ChildLoop* cl)
  *  from the stk server. They insert a connections request into the stk
  *  server, which is regularly polled by the client. On detecting a new
  *  connection request the server will try to send a message to the client.
- *  This allows connections between server and client even if they are
+ *  This allows connections between server and client even if they are 
  *  sitting behind a NAT firewall. The following tables on
  *  the stk server are used:
  *  client_sessions: It stores the list of all online users (so loging in
@@ -226,7 +226,7 @@ std::shared_ptr<LobbyProtocol> STKHost::create(ChildLoop* cl)
  *  In LR::loadWorld all ActivePlayers for all non-local players are created.
  *  (on a server all karts are non-local). On a client, the ActivePlayer
  *  objects for each local players have been created (to store the device
- *  used by each player when joining), so they are used to create the
+ *  used by each player when joining), so they are used to create the 
  *  LocalPlayerController for each kart. Each remote player gets a
  *  NULL ActivePlayer (the ActivePlayer is only used for assigning the input
  *  device to each kart, achievements and highscores, so it's not needed for
@@ -1224,7 +1224,7 @@ void STKHost::mainLoop(ProcessType pt)
 }   // mainLoop
 
 // ----------------------------------------------------------------------------
-/** Handles a direct request given to a socket. This is typically a LAN
+/** Handles a direct request given to a socket. This is typically a LAN 
  *  request, but can also be used if the server is public (i.e. not behind
  *  a fire wall) to allow direct connection to the server (without using the
  *  STK server). It checks for any messages (i.e. a LAN broadcast requesting
@@ -1252,7 +1252,7 @@ void STKHost::handleDirectSocketRequest(Network* direct_socket,
     {
         Log::verbose("STKHost", "Received LAN server query");
         const std::string& name = sl->getGameSetup()->getServerNameUtf8();
-        // Send the answer, consisting of server name, max players,
+        // Send the answer, consisting of server name, max players, 
         // current players
         const std::string& pw = ServerConfig::m_private_server_password;
         BareNetworkString s((int)name.size()+1+11);

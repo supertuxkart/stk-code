@@ -891,7 +891,6 @@ bool FileManager::searchTextureContainerId(std::string& container_id,
             return true;
         }
     }
-    full_path = "";
     return false;
 }   // findFile
 
@@ -1074,7 +1073,7 @@ void FileManager::checkAndCreateConfigDir()
     if(m_user_config_dir.size()>0 && *m_user_config_dir.rbegin()!='/')
         m_user_config_dir += "/";
 
-    m_user_config_dir += "config-0.10/";
+    m_user_config_dir += "config-2.X-dev/";
     if(!checkAndCreateDirectoryP(m_user_config_dir))
     {
         Log::warn("FileManager", "Can not  create config dir '%s', "
@@ -1599,7 +1598,7 @@ bool FileManager::copyFile(const std::string &source, const std::string &dest)
         if (f_dest) fclose(f_dest);
         if (buffer) delete [] buffer;
     };
-    MemUtils::deref<decltype(scoped)> cls(scoped);
+    MemUtils::deref<decltype(scoped)> cls(scoped); 
     if(!f_source || !f_dest || !buffer) return false;
     size_t n;
     while((n=fread(buffer, 1, BUFFER_SIZE, f_source))>0)

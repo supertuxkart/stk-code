@@ -30,12 +30,11 @@
 #include "items/item_manager.hpp"
 #include "items/powerup.hpp"
 #include "items/projectile_manager.hpp"
-#include "karts/abstract_kart.hpp"
+#include "karts/kart.hpp"
 #include "karts/controller/kart_control.hpp"
 #include "karts/controller/ai_properties.hpp"
 #include "karts/kart_properties.hpp"
 #include "karts/max_speed.hpp"
-#include "karts/rescue_animation.hpp"
 #include "karts/skidding.hpp"
 #include "modes/linear_world.hpp"
 #include "modes/profile_world.hpp"
@@ -61,12 +60,12 @@
 #include <iostream>
 
 // This define is only used to make the TestAI as similar to the
-// SkiddingAI as possible. This way the two AIs can be compared
+// SkiddingAI as possible. This way the two AIs can be compared 
 // without too many false and distracing positives.
 
 #define SkiddingAI TestAI
 
-SkiddingAI::SkiddingAI(AbstractKart *kart)
+SkiddingAI::SkiddingAI(Kart *kart)
                    : AIBaseLapController(kart)
 {
     reset();
@@ -301,7 +300,7 @@ void SkiddingAI::update(int ticks)
     // If the kart needs to be rescued, do it now (and nothing else)
     if(isStuck() && !m_kart->getKartAnimation())
     {
-        RescueAnimation::create(m_kart);
+        m_kart->applyRescue(/* auto-rescue */ false);
         AIBaseLapController::update(ticks);
         return;
     }
@@ -345,7 +344,7 @@ void SkiddingAI::update(int ticks)
                 target += m_kart_ahead->getVelocity()*time_till_hit;
             }
             float steer_angle = steerToPoint(target);
-            setSteering(steer_angle, dt);
+            setSteering(steer_angle);
             commands_set = true;
         }
         handleRescue(dt);
@@ -439,7 +438,7 @@ void SkiddingAI::handleBraking()
 
         if(m_kart->getSpeed() > 1.5f*max_turn_speed  &&
             m_kart->getSpeed()>MIN_SPEED             &&
-            fabsf(m_controls->getSteer()) > 0.95f          )
+            fabsf(m_kart->getEffectiveSteer()) > 0.95f          )
         {
             m_controls->setBrake(true);
 #ifdef DEBUG
@@ -564,7 +563,7 @@ void SkiddingAI::handleSteering(float dt)
         steer_angle = steerToPoint(aim_point);
     }  // if m_current_track_direction!=LEFT/RIGHT
 
-    setSteering(steer_angle, dt);
+    setSteering(steer_angle);
 }   // handleSteering
 
 //-----------------------------------------------------------------------------
@@ -1378,7 +1377,7 @@ void SkiddingAI::handleItems(const float dt)
         // likely that this kart then gets a good iteam), otherwise use it
         // after a waiting an appropriate time
         if(m_kart->getPosition()>1 &&
-            m_time_since_last_shot
+            m_time_since_last_shot 
             > stk_config->ticks2Time(stk_config->m_item_switch_ticks)+2.0f)
             m_controls->setFire(true);
         break;   // POWERUP_SWITCH
@@ -1567,8 +1566,7 @@ void SkiddingAI::handleRaceStart()
             m_start_delay+=stk_config->m_penalty_ticks;
             return;
         }
-        m_kart->setStartupBoost(m_kart->getStartupBoostFromStartTicks(
-            m_start_delay + stk_config->time2Ticks(1.0f)));
+        m_kart->setStartupBoostFromStartTicks(m_start_delay + stk_config->time2Ticks(1.0f));
         m_start_delay = 0;
     }
 }   // handleRaceStart
@@ -1586,7 +1584,7 @@ void SkiddingAI::handleRescue(const float dt)
         m_time_since_stuck += dt;
         if(m_time_since_stuck > 2.0f)
         {
-            RescueAnimation::create(m_kart);
+            m_kart->applyRescue(/* auto-rescue */ false);
             m_time_since_stuck=0.0f;
         }   // m_time_since_stuck > 2.0f
     }
@@ -1618,11 +1616,11 @@ void SkiddingAI::handleNitroAndZipper()
     // tight corners. In some cases it would need a reasonable large 'lookahead'
     // to know that at a certain spot a zipper or skidding should not be used
     // (e.g. in xr591, left at the fork - new AI will nearly always fall off the
-    // track after the curve). Here the summarised results of 10 laps runs with
+    // track after the curve). Here the summarised results of 10 laps runs with 
     // 4 old against 4 new AIs in time trail mode. The 'gain' is the sum of all
     // (star_positions-end_positions). So a gain of -10 means that basically
     // the new AI fell from start positions 2,4,6,8 to end positions 6,7,8,9.
-    // On the other hand, +10 means the new AI took positions 1,2,3,4.
+    // On the other hand, +10 means the new AI took positions 1,2,3,4. 
     // name                gain     Time              Skid  Resc Rsc  Brake Expl Exp Itm Ban SNitLNit Bub Off Energy
     // xr591               -10      504.279           204.70 0.00  15  4011 0.00   0   0  26 135   0   0  4881 0.00
     // zengarden           -10      287.496           141.81 0.00  13  2489 0.00   0   0   7   2   0   0  5683 0.00
@@ -1817,10 +1815,10 @@ void SkiddingAI::checkCrashes(const Vec3& pos )
         {
             for( unsigned int j = 0; j < NUM_KARTS; ++j )
             {
-                const AbstractKart* kart = m_world->getKart(j);
+                const Kart* kart = m_world->getKart(j);
                 // Ignore eliminated karts
                 if(kart==m_kart||kart->isEliminated()||kart->isGhostKart()) continue;
-                const AbstractKart *other_kart = m_world->getKart(j);
+                const Kart *other_kart = m_world->getKart(j);
                 // Ignore karts ahead that are faster than this kart.
                 if(m_kart->getVelocityLC().getZ() < other_kart->getVelocityLC().getZ())
                     continue;
@@ -2391,18 +2389,12 @@ bool SkiddingAI::canSkid(float steer_fraction)
 
 //-----------------------------------------------------------------------------
 /** Converts the steering angle to a lr steering in the range of -1 to 1.
- *  If the steering angle is too great, it will also trigger skidding. This
- *  function uses a 'time till full steer' value specifying the time it takes
- *  for the wheel to reach full left/right steering similar to player karts
- *  when using a digital input device. The parameter is defined in the kart
- *  properties and helps somewhat to make AI karts more 'pushable' (since
- *  otherwise the karts counter-steer to fast).
+ *  If the steering angle is too great, it will also trigger skidding.
  *  It also takes the effect of a plunger into account by restricting the
  *  actual steer angle to 50% of the maximum.
  *  \param angle Steering angle.
- *  \param dt Time step.
  */
-void SkiddingAI::setSteering(float angle, float dt)
+void SkiddingAI::setSteering(float angle)
 {
     float steer_fraction = angle / m_kart->getMaxSteerAngle();
 
@@ -2491,20 +2483,5 @@ void SkiddingAI::setSteering(float angle, float dt)
             steer_fraction = 1.0f;
     }
 
-    float old_steer      = m_controls->getSteer();
-
-    // The AI has its own 'time full steer' value (which is the time
-    float max_steer_change = dt/m_ai_properties->m_time_full_steer;
-    if(old_steer < steer_fraction)
-    {
-        m_controls->setSteer( (old_steer+max_steer_change > steer_fraction)
-                              ? steer_fraction : old_steer+max_steer_change );
-    }
-    else
-    {
-        m_controls->setSteer( (old_steer-max_steer_change < steer_fraction)
-                               ? steer_fraction : old_steer-max_steer_change );
-    }
-
-
+    m_controls->setSteer(steer_fraction);
 }   // setSteering

@@ -320,13 +320,13 @@ private:
     /** Operators to test version numbers with. */
     enum VersionTest
     {
-        VERSION_IGNORE,
-        VERSION_EQUAL,
-        VERSION_LESS,
-        VERSION_LESS_EQUAL,
-        VERSION_MORE,
+        VERSION_IGNORE, 
+        VERSION_EQUAL, 
+        VERSION_LESS, 
+        VERSION_LESS_EQUAL, 
+        VERSION_MORE, 
         VERSION_MORE_EQUAL
-    };
+    }; 
     
     std::vector<VersionTest> m_version_tests;
     
@@ -466,7 +466,7 @@ public:
             case VERSION_IGNORE:
                 // always true
                 break;
-            case VERSION_EQUAL:
+            case VERSION_EQUAL: 
                 if (version != m_driver_versions[i])
                     return false;
                 break;
@@ -479,7 +479,7 @@ public:
                     return false;
                 break;
             case VERSION_MORE_EQUAL:
-                if (version < m_driver_versions[i])
+                if (version < m_driver_versions[i]) 
                     return false;
                 break;
             case VERSION_MORE:

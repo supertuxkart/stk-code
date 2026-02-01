@@ -9,7 +9,7 @@
 #include "config/user_config.hpp"
 #include "tracks/track_manager.hpp"
 #include "tracks/track.hpp"
-#include "karts/abstract_kart.hpp"
+#include "karts/kart.hpp"
 #include "karts/kart_model.hpp"
 #include "karts/kart_properties.hpp"
 #define STK_UTF8_GETTEXT 1
@@ -532,7 +532,7 @@ void RichPresence::update(bool force)
                        "addons" : "track_" + trackId);
         }
         assets.add("large_text", trackName);
-        AbstractKart *abstractKart = world->getLocalPlayerKart(0);
+        Kart *abstractKart = world->getLocalPlayerKart(0);
         if (abstractKart)
         {
             const KartProperties* kart = abstractKart->getKartModel()->getKartProperties();

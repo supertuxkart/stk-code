@@ -62,17 +62,17 @@ void OptionsScreenUI::loadedFromFile()
 
     minimap_options->m_properties[PROP_WRAP_AROUND] = "true";
     minimap_options->clearLabels();
-    //I18N: In the UI options, minimap position in the race UI
+    //I18N: In the UI options, minimap position in the race UI 
     minimap_options->addLabel( core::stringw(_("In the bottom-left")));
-    //I18N: In the UI options, minimap position in the race UI
+    //I18N: In the UI options, minimap position in the race UI 
     minimap_options->addLabel( core::stringw(_("On the right side")));
-    //I18N: In the UI options, minimap position in the race UI
+    //I18N: In the UI options, minimap position in the race UI 
     minimap_options->addLabel( core::stringw(_("Hidden")));
     //I18N: In the UI options, minimap position in the race UI
     minimap_options->addLabel( core::stringw(_("Centered")));
     minimap_options->m_properties[GUIEngine::PROP_MIN_VALUE] = "0";
 
-    bool multitouch_enabled = (UserConfigParams::m_multitouch_active == 1 &&
+    bool multitouch_enabled = (UserConfigParams::m_multitouch_active == 1 && 
                                irr_driver->getDevice()->supportsTouchDevice()) ||
                                UserConfigParams::m_multitouch_active > 1;
 
@@ -88,15 +88,15 @@ void OptionsScreenUI::loadedFromFile()
     font_size->clearLabels();
     font_size->addLabel(L"Extremely small");
     //I18N: In the UI options, Very small font size
-    font_size->addLabel(_C("Font size", "Very small"));
+    font_size->addLabel(_("Very small"));
     //I18N: In the UI options, Small font size
-    font_size->addLabel(_C("Font size", "Small"));
+    font_size->addLabel(_("Small"));
     //I18N: In the UI options, Medium font size
-    font_size->addLabel(_C("Font size", "Medium"));
+    font_size->addLabel(_("Medium"));
     //I18N: In the UI options, Large font size
-    font_size->addLabel(_C("Font size", "Large"));
+    font_size->addLabel(_("Large"));
     //I18N: In the UI options, Very large font size
-    font_size->addLabel(_C("Font size", "Very large"));
+    font_size->addLabel(_("Very large"));
     font_size->addLabel(L"Extremely large");
 
     if (UserConfigParams::m_artist_debug_mode)
@@ -175,10 +175,7 @@ void OptionsScreenUI::init()
     bool currSkinFound = false;
     const std::string& user_skin = UserConfigParams::m_skin_file;
     m_base_skin_selector ->setActive(!in_game);
-    OptionsCommon::updatePauseTooltip(m_base_skin_selector, in_game);
-
     m_variant_skin_selector->setActive(!in_game);
-    OptionsCommon::updatePauseTooltip(m_variant_skin_selector, in_game);
 
     for (unsigned int i = 0; i < m_skins.size(); i++)
     {
@@ -190,7 +187,7 @@ void OptionsScreenUI::init()
             m_variant_skin_selector->setValue(getVariantID(m_skins[i]));
             currSkinFound = true;
             break;
-        }
+        } 
     }
     if (!currSkinFound)
     {
@@ -207,7 +204,7 @@ void OptionsScreenUI::init()
     GUIEngine::SpinnerWidget* minimap_options = getWidget<GUIEngine::SpinnerWidget>("minimap");
     assert( minimap_options != NULL );
 
-    bool multitouch_enabled = (UserConfigParams::m_multitouch_active == 1 &&
+    bool multitouch_enabled = (UserConfigParams::m_multitouch_active == 1 && 
                                irr_driver->getDevice()->supportsTouchDevice()) ||
                                UserConfigParams::m_multitouch_active > 1;
 
@@ -232,7 +229,6 @@ void OptionsScreenUI::init()
     font_size->setValue(size_int);
     UserConfigParams::m_font_size = font_size->getValue();
     font_size->setActive(!in_game);
-    OptionsCommon::updatePauseTooltip(font_size, in_game);
 
     CheckBoxWidget* karts_powerup_gui = getWidget<CheckBoxWidget>("karts_powerup_gui");
     assert(karts_powerup_gui != NULL);

@@ -348,7 +348,7 @@ void TracksScreen::beforeAddingWidget()
     bool is_soccer = minor_mode == RaceManager::MINOR_MODE_SOCCER;
     bool is_arena = is_soccer || RaceManager::get()->isBattleMode();
     
-    const std::vector<std::string>& groups =
+    const std::vector<std::string>& groups = 
                         is_arena ? track_manager->getAllArenaGroups(is_soccer)
                                  : track_manager->getAllTrackGroups();
     const int group_amount = (int)groups.size();
@@ -584,7 +584,7 @@ void TracksScreen::buildTrackList()
 
     // First build a list of all tracks to be displayed
     // (e.g. exclude arenas, ...)
-    bool is_network = (STKHost::existHost());
+	bool is_network = (STKHost::existHost());
     std::shared_ptr<ClientLobby> clrp;
     if (is_network)
     {
@@ -842,7 +842,8 @@ void TracksScreen::setResult(uint32_t winner_host,
     if (!m_timer || winner_host == std::numeric_limits<uint32_t>::max() ||
         !m_vote_list)
         return;
-    if (m_timer) m_timer->setVisible(false);
+
+    m_timer->setVisible(false);
 
     m_winning_index = winner_host;
     if (auto lp = LobbyProtocol::get<LobbyProtocol>())

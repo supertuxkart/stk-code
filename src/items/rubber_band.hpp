@@ -38,7 +38,7 @@ namespace irr
     }
 }
 
-class AbstractKart;
+class Kart;
 class Plunger;
 
 /** This class is used together with the pluger to display a rubber band from
@@ -60,7 +60,7 @@ private:
     /** The plunger the rubber band is attached to. */
     Plunger            *m_plunger;
     /** The kart who shot this plunger. */
-    AbstractKart       *m_owner;
+    Kart       *m_owner;
 
     RubberBandTo        m_attached_state;
 
@@ -70,7 +70,7 @@ private:
     irr::scene::IMeshSceneNode* m_node;
 
     /** The kart a plunger might have hit. */
-    AbstractKart       *m_hit_kart;
+    Kart       *m_hit_kart;
     /** Stores the end of the rubber band (i.e. the side attached to the
      *  plunger. */
     Vec3                m_end_position;
@@ -79,12 +79,12 @@ private:
     void updatePosition();
 
 public:
-         RubberBand(Plunger *plunger, AbstractKart *kart);
+         RubberBand(Plunger *plunger, Kart *kart);
         ~RubberBand();
     void reset();
     void updateGraphics(float dt);
     void update(int ticks);
-    void hit(AbstractKart *kart_hit, const Vec3 *track_xyz=NULL);
+    void hit(Kart *kart_hit, const Vec3 *track_xyz=NULL);
     uint8_t get8BitState() const;
     void set8BitState(uint8_t bit_state);
     void remove();

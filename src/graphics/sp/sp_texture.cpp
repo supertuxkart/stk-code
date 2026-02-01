@@ -218,7 +218,7 @@ std::shared_ptr<video::IImage> SPTexture::getTextureImage() const
         }
 #endif
 
-        bool force_undo_srgb = use_tex_compress &&
+        bool force_undo_srgb = use_tex_compress && 
                                   !CVS->isEXTTextureCompressionS3TCSRGBUsable();
 
         if (m_undo_srgb && (!use_tex_compress || force_undo_srgb))

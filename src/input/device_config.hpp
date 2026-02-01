@@ -42,12 +42,12 @@ class DeviceConfig : public NoCopy
 {
 
 private:
-    /** If set to false, this device will be ignored.
+    /** If set to false, this device will be ignored. 
      *  Currently for gamepads only. */
     bool m_enabled;
 
     /** How many devices connected to the system which uses this config? */
-    int m_plugged;
+    int m_plugged; 
 
     /** Internal name of this configuration. */
     std::string m_name;
@@ -103,8 +103,7 @@ public:
     virtual bool load(const XMLNode *config);
 
     // ------------------------------------------------------------------------
-    /** Returns true if this device has analog axis, so that steering values
-     *  will not be affected by time-full-steer delays. */
+    /** Returns true if this device has an analog axis. */
     virtual bool isAnalog(Input::InputType type, int id) const { return false;}
     // ------------------------------------------------------------------------
     /** Returns true if this device should desensitize its input at values

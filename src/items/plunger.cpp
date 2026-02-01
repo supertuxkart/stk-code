@@ -26,7 +26,7 @@
 #include "items/rubber_band.hpp"
 #include "items/projectile_manager.hpp"
 #include "graphics/central_settings.hpp"
-#include "karts/abstract_kart.hpp"
+#include "karts/kart.hpp"
 #include "karts/controller/controller.hpp"
 #include "karts/kart_properties.hpp"
 #include "network/network_string.hpp"
@@ -39,7 +39,7 @@
 #include <ISceneNode.h>
 
 // -----------------------------------------------------------------------------
-Plunger::Plunger(AbstractKart *kart)
+Plunger::Plunger(Kart *kart)
        : Flyable(kart, PowerupManager::POWERUP_PLUNGER)
 {
     m_has_locally_played_sound = false;
@@ -73,7 +73,7 @@ void Plunger::onFireFlyable()
     m_reverse_mode = m_owner->getControls().getLookBack();
 
     // find closest kart in front of the current one
-    const AbstractKart *closest_kart=0;
+    const Kart *closest_kart=0;
     Vec3        direction;
     float       kart_dist_2;
     getClosestKart(&closest_kart, &kart_dist_2, &direction,
@@ -191,7 +191,7 @@ bool Plunger::updateAndDelete(int ticks)
  *  \returns True if there was actually a hit (i.e. not owner, and target is
  *           not immune), false otherwise.
  */
-bool Plunger::hit(AbstractKart *kart, PhysicalObject *obj)
+bool Plunger::hit(Kart *kart, PhysicalObject *obj)
 {
     if (isOwnerImmunity(kart) || m_moved_to_infinity || !m_has_server_state)
         return false;

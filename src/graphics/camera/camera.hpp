@@ -37,7 +37,7 @@
 
 #include "ICameraSceneNode.h"
 
-class AbstractKart;
+class Kart;
 
 /**
   * \brief This is the base class for all cameras. It also includes some
@@ -104,7 +104,7 @@ private:
     /** A pointer to the original kart the camera was pointing at when it
      *  was created. Used when restarting a race (since the camera might
      *  get attached to another kart if a kart is elimiated). */
-    AbstractKart   *m_original_kart;
+    Kart   *m_original_kart;
 
     /** The viewport for this camera (portion of the game window covered by this camera) */
     core::recti     m_viewport;
@@ -130,12 +130,12 @@ protected:
     *  since in profile mode the camera might change its owner.
     *  May be NULL (example: cutscene camera)
     */
-    AbstractKart   *m_kart;
+    Kart   *m_kart;
 
     static Camera* createCamera(unsigned int index, CameraType type,
-                                AbstractKart* kart);
+                                Kart* kart);
 
-             Camera(CameraType type, int camera_index, AbstractKart* kart);
+             Camera(CameraType type, int camera_index, Kart* kart);
     virtual ~Camera();
     virtual void reset();
 public:
@@ -143,7 +143,7 @@ public:
 
     // ========================================================================
     // Static functions
-    static Camera* createCamera(AbstractKart* kart, const int index);
+    static Camera* createCamera(Kart* kart, const int index);
     static void resetAllCameras();
     static void changeCamera(unsigned int camera_index, CameraType type);
 
@@ -152,14 +152,14 @@ public:
      *  command line parameters to select a debug etc camera. */
     static void setDefaultCameraType(CameraType type) { m_default_type = type;}
     // ------------------------------------------------------------------------
-    /** Returns the default type for each camera that will be created. Used
+    /** Returns the default type for each camera that will be created. Used 
      *  for command line parameters to select a debug etc camera. */
     static CameraType getDefaultCameraType() { return m_default_type;}
     // ------------------------------------------------------------------------
     /** Returns the number of cameras used. */
     static unsigned int getNumCameras()
     {
-        return (unsigned int)m_all_cameras.size();
+        return (unsigned int)m_all_cameras.size(); 
     }   // getNumCameras
     // ------------------------------------------------------------------------
     /** Returns a camera. */
@@ -194,7 +194,7 @@ public:
     // ------------------------------------------------------------------------
     void setMode(Mode mode);    /** Set the camera to the given mode */
     void setNextSpectatorMode();
-    void setKart(AbstractKart *new_kart);
+    void setKart(Kart *new_kart);
     virtual void setInitialTransform();
     virtual void activate(bool alsoActivateInIrrlicht=true);
     virtual void update(float dt);
@@ -217,11 +217,11 @@ public:
 
     // ------------------------------------------------------------------------
     /** Returns the kart to which this camera is attached. */
-    const AbstractKart* getKart() const { return m_kart; }
+    const Kart* getKart() const { return m_kart; }
 
     // ------------------------------------------------------------------------
     /** Returns the kart to which this camera is attached. */
-    AbstractKart* getKart() { return m_kart; }
+    Kart* getKart() { return m_kart; }
 
     // ------------------------------------------------------------------------
     /** Sets the ambient light for this camera. */

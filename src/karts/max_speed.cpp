@@ -19,7 +19,7 @@
 #include "karts/max_speed.hpp"
 
 #include "config/stk_config.hpp"
-#include "karts/abstract_kart.hpp"
+#include "karts/kart.hpp"
 #include "karts/kart_properties.hpp"
 #include "network/network_string.hpp"
 #include "physics/btKart.hpp"
@@ -48,7 +48,7 @@
  *  At the end the maximum is capped by a value specified in stk_config
  *  (to avoid issues with physics etc).
 */
-MaxSpeed::MaxSpeed(AbstractKart *kart)
+MaxSpeed::MaxSpeed(Kart *kart)
 {
     m_kart = kart;
     // Initialise m_add_engine_force since it might be queried before
@@ -56,6 +56,7 @@ MaxSpeed::MaxSpeed(AbstractKart *kart)
     m_add_engine_force  = 0;
     // This can be used if command line option -N is used
     m_current_max_speed = 0;
+    m_last_triggered_skid_level = 0;
 }   // MaxSpeed
 
 // ----------------------------------------------------------------------------
@@ -63,13 +64,16 @@ MaxSpeed::MaxSpeed(AbstractKart *kart)
  *  newly constructed values, i.e. values that don't cause any slowdown
  *  or speedup.
  */
-void MaxSpeed::reset()
+void MaxSpeed::reset(bool leave_squash)
 {
     m_current_max_speed = m_kart->getKartProperties()->getEngineMaxSpeed();
     m_min_speed         = -1.0f;
+    m_last_triggered_skid_level = 0;
 
     for(unsigned int i=MS_DECREASE_MIN; i<MS_DECREASE_MAX; i++)
     {
+        if (leave_squash && i == MS_DECREASE_SQUASH)
+            continue;
         SpeedDecrease sd;
         m_speed_decrease[i] = sd;
     }
@@ -105,6 +109,13 @@ void MaxSpeed::increaseMaxSpeed(unsigned int category, float add_speed,
             add_speed, engine_force);
         return;
     }
+
+    if (category == MS_INCREASE_SKIDDING)
+        m_last_triggered_skid_level = 1;
+    else if (category == MS_INCREASE_RED_SKIDDING)
+        m_last_triggered_skid_level = 2;
+    else if (category == MS_INCREASE_PURPLE_SKIDDING)
+        m_last_triggered_skid_level = 3;
 
     int add_speed_i = (int)(add_speed * 1000.0f);
     if (add_speed_i > 65535)
@@ -391,6 +402,13 @@ int MaxSpeed::isSpeedDecreaseActive(unsigned int category)
 }   // isSpeedDecreaseActive
 
 // ----------------------------------------------------------------------------
+/** Gracefully ends a max-speed increase, keeping the fade-out time active */
+void MaxSpeed::endSpeedIncrease(unsigned int category)
+{
+    m_speed_increase[category].endSpeedIncrease();
+}   // endSpeedIncrease
+
+// ----------------------------------------------------------------------------
 /** Updates all speed increase and decrease objects, and determines the
  *  current maximum speed. Note that the function can be called with
  *  dt=0, in which case the maximum speed will be updated, but no
@@ -404,6 +422,12 @@ void MaxSpeed::update(int ticks)
     // determines the overall decrease of maximum speed.
     // ---------------------------------------------------
     float slowdown_factor = 1.0f;
+    float max_skid_speed = 0.0f;
+    float max_skid_engine_force = 0.0f;
+
+    float max_zipper_speed = 0.0f;
+    float max_zipper_engine_force = 0.0f;
+
     for(unsigned int i=MS_DECREASE_MIN; i<MS_DECREASE_MAX; i++)
     {
         SpeedDecrease &slowdown = m_speed_decrease[i];
@@ -424,13 +448,43 @@ void MaxSpeed::update(int ticks)
         m_current_max_speed += speedup.getSpeedIncrease();
         m_add_engine_force  += speedup.getEngineForce();
     }
-    if (getSpeedIncreaseTicksLeft(MS_INCREASE_SKIDDING) > 0 &&
-        getSpeedIncreaseTicksLeft(MS_INCREASE_RED_SKIDDING) > 0)
+
+    // Pick the highest applicable speed boost and the highest applicable engine boost, 
+    // which may come from different effects. This approach fixes all possible "fade-out"
+    // issues.
+    for(unsigned int i=MS_INCREASE_ZIPPER; i<=MS_INCREASE_GROUND_ZIPPER; i++)
     {
-        SpeedIncrease &speedup = m_speed_increase[MS_INCREASE_SKIDDING];
+        SpeedIncrease &speedup = m_speed_increase[i];
+        if (speedup.getSpeedIncrease() > max_zipper_speed)
+            max_zipper_speed = speedup.getSpeedIncrease();
+        if (speedup.getEngineForce() > max_zipper_engine_force)
+            max_zipper_engine_force = speedup.getEngineForce();
+
         m_current_max_speed -= speedup.getSpeedIncrease();
         m_add_engine_force  -= speedup.getEngineForce();
     }
+    m_current_max_speed += max_zipper_speed;
+    m_add_engine_force  += max_zipper_engine_force;
+
+    // Prevent the different kinds of skidding speed increases from cumulating
+    // We select the highest active max-speed bonus and engine-force bonus,
+    // which may come from different skid levels, including fade-out bonuses,
+    // and remove the others.
+
+    for(unsigned int i=MS_INCREASE_SKIDDING; i<=MS_INCREASE_PURPLE_SKIDDING; i++)
+    {
+        SpeedIncrease &speedup = m_speed_increase[i];
+        if (speedup.getSpeedIncrease() > max_skid_speed)
+            max_skid_speed = speedup.getSpeedIncrease();
+        if (speedup.getEngineForce() > max_skid_engine_force)
+            max_skid_engine_force = speedup.getEngineForce();
+
+        m_current_max_speed -= speedup.getSpeedIncrease();
+        m_add_engine_force  -= speedup.getEngineForce();
+    }
+
+    m_current_max_speed += max_skid_speed;
+    m_add_engine_force  += max_skid_engine_force;
 
     m_current_max_speed *= slowdown_factor;
 
@@ -444,7 +498,7 @@ void MaxSpeed::update(int ticks)
     // so the following code doesn't really do anything?
     // There is probably a reason for the behavior of setMinSpeed, but the code
     // should be redesigned to make it less confusing...
-    else
+    else 
         m_kart->getVehicle()->setMinSpeed(0);   // no additional acceleration
 
     if (m_kart->isOnGround())
@@ -469,7 +523,7 @@ void MaxSpeed::saveState(BareNetworkString *buffer) const
         // Don't bother saving terrain, this will get updated automatically
         // each frame.
         if(i==MS_DECREASE_TERRAIN) continue;
-        if (m_speed_decrease[i].isActive())
+        if (m_speed_decrease[i].isActive()) 
             active_slowdown |= b;
     }
     buffer->addUInt8(active_slowdown);
@@ -488,13 +542,13 @@ void MaxSpeed::saveState(BareNetworkString *buffer) const
     // Now save the speedup state
     // --------------------------
     // Get the bit pattern of all active speedups
-    uint8_t active_speedups = 0;
+    uint16_t active_speedups = 0;
     for(unsigned int i=MS_INCREASE_MIN, b=1; i<MS_INCREASE_MAX; i++, b <<= 1)
     {
         if(m_speed_increase[i].isActive())
             active_speedups |= b;
     }
-    buffer->addUInt8(active_speedups);
+    buffer->addUInt16(active_speedups);
     for(unsigned int i=MS_INCREASE_MIN, b=1; i<MS_INCREASE_MAX; i++, b <<= 1)
     {
         if(active_speedups & b)
@@ -528,7 +582,7 @@ void MaxSpeed::rewindTo(BareNetworkString *buffer)
     // Restore the speedup state
     // --------------------------
     // Get the bit pattern of all active speedups
-    uint8_t active_speedups = buffer->getUInt8();
+    uint16_t active_speedups = buffer->getUInt16();
     for(unsigned int i=MS_INCREASE_MIN, b=1; i<MS_INCREASE_MAX; i++, b <<= 1)
     {
         m_speed_increase[i].rewindTo(buffer, (active_speedups & b) == b);

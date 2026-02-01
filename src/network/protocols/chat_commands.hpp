@@ -46,61 +46,7 @@ class Ranking;
 
 namespace ChatCommands
 {
-    // ----------------------------------------------------------------------------------------
-    /** The list of standard command answers.
-     * If new commands are added and backward compatibility is desired,
-     * the new commands should be inserted at the end to not change the value of the others.
-     * A client-capability check should also be used. */
-    enum CommandAnswers
-    {
-        CA_CHAT,                          // Use the chat protocol for this answer
-        CA_UNKNOWN,                       // The requested command is unknown
-        // Start of the help command answers
-        CA_HELP_HELP,
-        CA_HELP_HELP_EXTRA,
-        CA_HELP_SPECTATE,
-        CA_HELP_SPECTATE_EXTRA,
-        CA_HELP_LISTADDONS,
-        CA_HELP_LISTADDONS_EXTRA,
-        CA_HELP_PLAYER_HAS_ADDON,
-        CA_HELP_PLAYER_HAS_ADDON_EXTRA,
-        CA_HELP_SERVER_HAS_ADDON,
-        CA_HELP_SERVER_HAS_ADDON_EXTRA,
-        CA_HELP_ADDON_SCORE,
-        CA_HELP_ADDON_SCORE_EXTRA,
-        CA_HELP_KICK,
-        CA_HELP_KICK_EXTRA,
-        CA_HELP_MUTE,
-        CA_HELP_MUTE_EXTRA,
-        CA_HELP_UNMUTE,
-        CA_HELP_UNMUTE_EXTRA,
-        CA_HELP_LISTMUTE,
-        CA_HELP_LISTMUTE_EXTRA,
-        // End of the help command answers
-        CA_SPECTATE_UNAVAILABLE,
-        CA_SPECTATE_GUI_HOST,
-        CA_SPECTATE_ACTIVATED,
-        CA_SPECTATE_DISABLED,
-        CA_LISTADDONS_NOT_FOUND,
-        CA_LISTADDONS_FOUND,
-        CA_PLAYER_HAS_ADDON_NOT_FOUND,
-        CA_PLAYER_HAS_ADDON_FOUND,
-        CA_SERVER_HAS_ADDON_NOT_FOUND,
-        CA_SERVER_HAS_ADDON_FOUND,
-        CA_ADDON_SCORE,
-        CA_KICK_NO_RIGHTS,
-        CA_KICK_SUCCESS,
-        CA_MUTE_ALREADY_MUTED,
-        CA_MUTE_SUCCESS,
-        CA_UNMUTE_NOT_MUTED,
-        CA_UNMUTE_SUCCESS,
-        CA_LISTMUTE_NO_MUTE,
-        CA_LISTMUTE_FOUND
-    };
-
-
-    void answerCommand(CommandAnswers command_id, std::shared_ptr<STKPeer> peer, std::string args = "");
-    irr::core::stringw getAnswerString(CommandAnswers command_id, std::string args);
+    void answerCommand(std::string msg, std::shared_ptr<STKPeer> peer);
     void handleServerCommand(ServerLobby* lobby, Event* event, std::shared_ptr<STKPeer> peer);
 
     void help(std::string cmd, std::shared_ptr<STKPeer> peer);
@@ -114,6 +60,7 @@ namespace ChatCommands
     void mute(std::string cmd, ServerLobby* lobby, std::shared_ptr<STKPeer> peer);
     void unmute(std::string cmd, ServerLobby* lobby, std::shared_ptr<STKPeer> peer);
     void listMute(std::string cmd, ServerLobby* lobby, std::shared_ptr<STKPeer> peer);
+    void unknownCommand(std::string cmd, std::shared_ptr<STKPeer> peer);
 }
 
 #endif // CHAT_COMMANDS_HPP

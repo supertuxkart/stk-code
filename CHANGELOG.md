@@ -5,53 +5,128 @@ It should be kept in mind that some versions have a less complete changelog than
 
 For similar reasons, and because some features are vastly more complex than others, attributions of main changes should not be taken as a shortcut for overall contribution.
 
-## SuperTuxKart 1.5.1
+## SuperTuxKart Evolution (work in progress)
 
-### Networking
-* Add TV cameras as a camera option when watching soccer games in spectator mode, by LLS
-* Add a 'help' command for use in server lobbies, by Alayan
+### Gameplay
+* In lower difficulty levels, apply a relative decrease to the strength of speed boosts, by Alayan
+* In lower difficulty levels, reduce the nitro consumption rate, by Alayan
+* Add a fifth difficulty level, for more gradation between easiest and hardest, by Alayan
+* Increase the time to reach maximum steering in lower difficulties, by Alayan
+* Reduce the duration and fade-out time of the startup boost, by Alayan
+* Slightly reduce rescue duration, by Alayan
+* Allow braking while accelerating, by Alayan
+* Ensure the AI is bound by the same durations as the player to change steering, by Alayan
+* Make the boosts from ground zippers and zipper powerups distinct, only applying the better one, by Nomagno
+* New multi-level handicap system, by Alayan
+* Make handicap usable in single-player, by Alayan
+* Prevent validating laps driving backwards (provided at least two correctly placed checklines), by Alayan
+* Prevent texture slowdown and reverse speed cap from fully multiplying, by Alayan
+
+#### Physics
+* Make the restitution curves (used when a kart rebounds on something) smoother and reduce the strength of rebounds at high-speeds, by Alayan
+* Uniformize jumping characteristics of karts (previously, heavier karts would have a much easier time taking off), by Alayan
+* Push karts upright much quicker when only some wheels touch the ground, by Alayan
+* Great improvements to the kart-on-kart collision logic, by Alayan:
+- Prevent two colliding karts from locking into each other
+- Make it easier to push another kart and make kart weight more meaningful
+- Help karts keep their direction during and after a collision
+
+#### Powerups
+* Rebalance all powerup probabilities, by Alayan:
+- Account for the new powerups
+- Reduce how much karts in average and bad positions attack each other
+- Make it possible to get some powerups by 2
+- Avoid basketballs, parachutes, triple zippers with 2 or 3 karts
+* Introduce a restricted randomness system, that seamlessly reduces streaks of good or bad luck, by Alayan
+* Extend the early item timeout to parachute and nitro-hacks, give a zipper instead of a bowling ball, by Alayan
+* Don't give basketballs if some karts have already finished the race, by Alayan
+* Replace swatters and bowling balls by gums during the early item timeout phase, by Alayan
+* Don't apply the early item timeout in non-racing modes, by Alayan
+* Make the swatter less oppressive, by reducing its held duration, the time loss from squashing, and slightly its reach, by Alayan
+* Activating a swatter with a gum shield active now pops the shield into a ground gum, by Alayan
+* Reduce the bubblegum shield duration and the flashing time before it drops, by Alayan
+* Prevent the duration of bubblegum shields from stacking infinitely and fix Nolok's bubblegum duration stacking, by Alayan
+* Speed up basketballs (especially when far from the leading kart), by Alayan
+* Reduce the basketball bouncing intervall and make the transition to fast-bounce mode seamless, by Alayan
+* Prevent basketballs from squashing karts protected by a shield, by Alayan
+* Make cake speed relative to the user's kart speed, by Alayan
+* Make zippers halve the texture slowdown effect, by Alayan
+* Reduce the max speed boost from the zipper, by Alayan
+* Enable the "shield restrict weapon" mode for the gum shield: using attacking powerups will drop the shield, by Alayan
+* New nitro-hack powerup, by Alayan:
+- It can steal some nitro from karts ahead. The nitro of karts ahead can become negative as a result. If there is no karts ahead, a small amount of nitro is generated and given.
+- It activates a boosted nitro mode, represented by the nitro bar and exhaust turning green instead of blue.
+- It appears at a higher rate for players in front, but it is strongest for players at the back.
+* New electro-shield powerup, by Alayan:
+- When active, provides a small top speed boost and a huge acceleration boost.
+- Also acts as a shield against most threats (not ground gums). It gets disabled upon a hit.
+* New mini-wish powerup, by Alayan:
+- Gives the player a choice between three weaker versions of standard powerups: zipper, bubblegum and cake.
+- The mini-zipper gives less speed, the mini-gum lasts shorter and drops smaller ground gums, the mini-cake is slower and has no area-of-effect.
+- The first press locks the mini-item choice, the second uses it.
+
+#### On-track items
+* Significantly reduce the nitro and gift box respawn times, by Alayan
+* Big nitro cans give 2.5 nitro units instead of 3, by Alayan
+* Introduce a new "air nitro" can, giving 1.5 nitro units, specifically designed to be placed mid-air after jumps, by Alayan
+* Add small ground bubblegum, and make small nitro can switch into them when the swapper is used, by Alayan
+* Use the kart hitbox size when determining if an on-track item has been touched, by Alayan
+* Give a different hitbox size to different on-track items (instead of a generic collect distance) to closely match visual touching and collection, by Alayan
+* Prevent ground gums from being activated if the kart is simply flying above them, by Alayan
+
+#### Kart characteristics
+* Introduce a new kart class, similar to medium, but with lower speed, better handling and a drift bonus, by Alayan
+* Make it more difficult for all kart classes to take curves, and increase the differentiation between kart classes, by Alayan
+* Slightly increase the base maximum speed without boosts, by Alayan
+* Transfer some of the skidding engine power boost to base power, to make drifting less important for quick acceleration, by Alayan
+* Ensure heavier karts have more total power on first gear for soccer pushing-contests, by Alayan
+* Make the duration of kart explosions depend on kart class, by Alayan
+* Make the speed reduction necessary to remove a parachute depend on kart class, by Alayan
+* Reduce the turn-radius penalty of active drifting, by Alayan
+* Make the maximum turn-radius during drifting similar for all kart classes, by Alayan
+* Apply turn-radius limitations to the reverse-gear, by Alayan
+* Give a bigger speed boost from nitro the lighter the kart is, instead of the reverse, by Alayan
+* Reduce the bonus nitro and nitro fadeout durations, by Alayan
+* Reduce the speed boost from the first-level (yellow) and second-level (red) drifts, by Alayan
+* Reduce the duration necessary to trigger a second-level (red) drift, by Alayan
+* Introduce a third-level (purple) drift with longer boost and duration, by Alayan
+* Prevent skidding bonuses cumulating during fadeout, by Alayan
+* Prevent kart chassis from colliding into the ground at high speeds, by Alayan
+* Multiply all engine power boosts by a kart-class specific factor, by Alayan
+
 
 ### General
-* Many improvements for localization:
-    * Make the name of skins translatable, by Alayan
-    * Make the server messages when signing in translatable, by Alayan
-    * Use context to allow for different translations of the same English string when relevant, by Alayan
-    * Full translation support for server answers to chat commands, and greatly improved base English messages, by Alayan
-    * Move all URLs out of translatable strings, by Alayan
-    * Minor improvements to some English source strings, by Alayan and others
-* Support using the command line to set the user-adjustable graphical parameters that were missing as command line options, by Alayan
-* Add a command line option to directly set a graphical preset, by Alayan
-* Various code quality improvements and minor bugfixes, by Alayan and others
+* Double physics FPS from 120 to 240, by Alayan
+* Make various things, such as item rotation speed and the minimum nitro burst, independent from physics FPS, by Alayan
+* New powerup audio code, by Alayan:
+- Use a shared pool of audio sources to drastically reduce how many are used, and prevent running out of sources
+- Don't interrupt a kart's powerup sound effect when collecting or using a new powerup
+- Better code organization, avoiding the mixing of gameplay and audio management
+* Correctly fetch the number of relevant tracks for achievements, by Alayan
+* Add new achievements for the completion of egg hunts, by Alayan
+* Make many more parameters modifiable in configuration files, by Alayan
+* Remove AbstractKart for cleaner code, by Fouks
+* A lot of code clean-up, by Alayan
 
 ### Graphics
-* Fix a regression where an increase of the 'Image Quality' setting would decrease the anisotropic filtering level, by Alayan
-* Enable high-quality mipmaps as soon as high-quality
+* Mix skid particles to warn that the next drifting level is almost ready, by Alayan
 
 ### User Interface
-* Add support for page-up, page-down, home and end keys in lists, by Alayan
-* Add a scrollbar to the server lobby chat, by Bcfworld
-* Better paging support in the server lobby chat, by Alayan
-* Resize kart icons on the left if the number of karts change, by Wilmaster
-* When renaming, prefill the textbox with the current name, by Brice Albiol
-* Display more settings in the benchmark end-screen, by Alayan
-* Prevent showing a render resolution factor in UI that's unsupported with the current renderer, by Alayan
-* Various minor UI fixes, by Alayan
+* Update the kart skill displays (speed, etc.) to handle the new kart characteristics and handicap levels, by Alayan
+* Add a drifting skill to the kart skill display, by Alayan
 
-### Tracks and modeling
+#### In-race UI
+* Support the display of boosted nitro and negative nitro for the Nitro-Hack, by Alayan
+* New speedometer, that can display a maximum speed of up to 55 (up from 40), by Alayan
+* Support the display of wide powerup icons, for the Mini-Wish, by Alayan
 
-#### Tracks
-* Fix an egg that was very difficult to collect (due to collision issues) in the Black Forest intermediate egg hunt, by Sven
 
-#### Arenas
-* TV spectator ameras for all soccer fields, by LLS and Sven
-
-## SuperTuxKart 1.5 (20. October 2025)
+## SuperTuxKart 1.5
 
 ### Networking
 * Improve the track-voting logic when no majority is achieved, by kimden
 * Prevent tracks missed by spectators from limiting the choice of active players, by kimden
 * Make bot indices start from one, by JipFr
-* Improvements to the rating formula for ranked play, by Alayan
 * Various bugfixes, by kimden
 
 ### Gameplay
@@ -479,7 +554,6 @@ For similar reasons, and because some features are vastly more complex than othe
 * New coal skin by Alayan
 * Support for collapsing widgets in UI by Mrxx99
 * Multidirectional keyboard navigation in menus by Alayan
-* Allow the disabling of keyboard configurations (making them inactive without deleting them), by Alayan
 * Alternating background darkness in lists to enhance readability by Benau
 * Support text breaks into multiple line in lists, e.g. in the addons menu, by Alayan
 * Improved help menu with lateral tabs and a lot more information by Alayan

@@ -80,7 +80,7 @@ const float KARTS_AND_PODIUMS_INITIAL_ROTATION[3] = { 90.0f, 90.0f, 90.0f };
 const float PODIUMS_INITIAL_Y[3] = { -2.51f, -2.61f, -2.51f };
 const float KARTS_INITIAL_X[3] = { 18.0f, 18.0f, 18.0f };
 //const float KARTS_INITIAL_Y[3] = { -1.73f, -1.83f, -1.73f };
-const float KARTS_INITIAL_Y[3] = {
+const float KARTS_INITIAL_Y[3] = { 
             PODIUMS_INITIAL_Y[0] + PODIUMS_HEIGHT_FROM_Y0,
             PODIUMS_INITIAL_Y[1] + PODIUMS_HEIGHT_FROM_Y0,
             PODIUMS_INITIAL_Y[2] + PODIUMS_HEIGHT_FROM_Y0
@@ -361,43 +361,37 @@ void GrandPrixWin::setKarts(const std::pair<std::string, float> idents_arg[3])
         LODNode* lnode = dynamic_cast<LODNode*>(kart_main_node);
         if (lnode)
         {
-            // Lod node has to be animated
-            auto* a_node = static_cast<scene::IAnimatedMeshSceneNode*>
-                (lnode->getAllNodes()[0]);
-
             // If the kart is not 1st (after the reorder, the id of the winner is 1, not 0)
-            // and there are very few karts in the GP, display a sad animation rather than
-            // a happy animation
-            if ((i == 0 && m_num_gp_karts <= 3) ||
-                (i == 2 && m_num_gp_karts <= 4))
+            // and there are very few karts in the GP, display a sad or neutral
+            // animation rather than a happy animation
+            bool sad = (i == 0 && m_num_gp_karts <= 2) ||
+                       (i == 2 && m_num_gp_karts <= 4);
+            bool neutral = !sad && ((i == 0 && m_num_gp_karts <= 4) ||
+                                    (i == 2 && m_num_gp_karts <= 6));
+
+            // The animations will auto-loop when applicable
+            if (sad)
             {
-                const unsigned start_frame =
-                    kart_model->getFrame(KartModel::AF_LOSE_LOOP_START) > -1 ?
-                    kart_model->getFrame(KartModel::AF_LOSE_LOOP_START) :
-                    kart_model->getFrame(KartModel::AF_LOSE_START) > -1 ?
-                    kart_model->getFrame(KartModel::AF_LOSE_START) :
-                    kart_model->getFrame(KartModel::AF_STRAIGHT);
-                const unsigned end_frame =
-                    kart_model->getFrame(KartModel::AF_LOSE_END) > -1 ?
-                    kart_model->getFrame(KartModel::AF_LOSE_END) :
-                    kart_model->getFrame(KartModel::AF_STRAIGHT);
-                a_node->setLoopMode(true);
-                a_node->setFrameLoop(start_frame, end_frame);
+                if (kart_model->getFrame(KartModel::AF_LOSE_LOOP_START) > -1)
+                    kart_model->setAnimationLoop(KartModel::AF_LOSE_LOOP_START);
+                else
+                    kart_model->setAnimation(KartModel::AF_DEFAULT);
+            }
+            else if (neutral)
+            {
+                if (kart_model->getFrame(KartModel::AF_NEUTRAL_LOOP_START) > -1)
+                    kart_model->setAnimationLoop(KartModel::AF_NEUTRAL_LOOP_START);
+                else
+                    kart_model->setAnimation(KartModel::AF_DEFAULT);
             }
             else // Standard happy animations
             {
-                const unsigned start_frame =
-                    kart_model->getFrame(KartModel::AF_WIN_LOOP_START) > -1 ?
-                    kart_model->getFrame(KartModel::AF_WIN_LOOP_START) :
-                    kart_model->getFrame(KartModel::AF_WIN_START) > -1 ?
-                    kart_model->getFrame(KartModel::AF_WIN_START) :
-                    kart_model->getFrame(KartModel::AF_STRAIGHT);
-                const unsigned end_frame =
-                    kart_model->getFrame(KartModel::AF_WIN_END) > -1 ?
-                    kart_model->getFrame(KartModel::AF_WIN_END) :
-                    kart_model->getFrame(KartModel::AF_STRAIGHT);
-                a_node->setLoopMode(true);
-                a_node->setFrameLoop(start_frame, end_frame);
+                if (kart_model->getFrame(KartModel::AF_PODIUM_START) > -1)
+                    kart_model->setAnimation(KartModel::AF_PODIUM_START);
+                else if (kart_model->getFrame(KartModel::AF_WIN_LOOP_START) > -1)
+                    kart_model->setAnimationLoop(KartModel::AF_WIN_LOOP_START);
+                else
+                    kart_model->setAnimation(KartModel::AF_DEFAULT);
             }
         }
 
@@ -412,7 +406,7 @@ void GrandPrixWin::setKarts(const std::pair<std::string, float> idents_arg[3])
 
         //FIXME: it's not ideal that both the track object and the presentation
         // know the initial coordinates of the object
-        TrackObjectPresentationSceneNode* presentation =
+        TrackObjectPresentationSceneNode* presentation = 
             new TrackObjectPresentationSceneNode(kart_pos, kart_rot, kart_scale,
                                                  kart_main_node);
         TrackObject* tobj = new TrackObject(kart_pos, kart_rot, kart_scale,

@@ -106,7 +106,8 @@ PowerupManager::PowerupType
     static const std::string powerup_names[] = {
         "",            /* Nothing */
         "bubblegum", "cake", "bowling", "zipper", "plunger", "switch",
-        "swatter", "rubber-ball", "parachute", "anchor"
+        "swatter", "rubber-ball", "parachute", "nitro-hack", "electro-shield",
+        "mini-wish", "anchor"
     };
 
     for(unsigned int i=POWERUP_FIRST; i<=POWERUP_LAST; i++)
@@ -141,12 +142,17 @@ void PowerupManager::loadPowerupsModels()
             exit(-1);
         }
     }
-    
+
+    if (BUCKET_COUNT > 32)
+        Log::warn("Powerup", "Excessive number of powerup buckets, %i which is more than 32.", BUCKET_COUNT);
+
     loadWeights(root, "race-weight-list"    );
     loadWeights(root, "ftl-weight-list"     );
     loadWeights(root, "battle-weight-list"  );
     loadWeights(root, "soccer-weight-list"  );
     loadWeights(root, "tutorial-weight-list");
+
+    sortRaceWeights(root, "race-goodness");
 
     delete root;
 
@@ -164,6 +170,89 @@ void PowerupManager::loadPowerupsModels()
         }
     }
 }  // loadPowerupsModels
+
+//-----------------------------------------------------------------------------
+/** Loads the goodness ordering for races and use them to sort the weights.
+ *  \param node The goodness node of the powerup xml file.
+ *  \param class_name The name of the attribute with the goodness rankings
+ */
+void PowerupManager::sortRaceWeights(const XMLNode *powerup_node,
+                                 const std::string &node_name)
+{
+    const XMLNode *node = powerup_node->getNode(node_name);
+    if(!node)
+    {
+        Log::fatal("PowerupManager",
+                   "Cannot find node '%s' in powerup.xml file.",
+                   node_name.c_str());
+    }
+
+    // (1) - Extract the goodness data from the XML node
+    std::string single_string;
+    node->get("single", &single_string);
+    std::string double_string;
+    node->get("double", &double_string);
+    std::string triple_string;
+    node->get("triple", &triple_string);
+    std::vector<std::string> l_string =
+            StringUtils::split(single_string+" "+double_string+" "+triple_string, ' ');
+
+    std::vector<int> values;
+    for(unsigned int i=0; i<l_string.size(); i++)
+    {
+        if(l_string[i]=="") continue;
+        int n;
+        StringUtils::fromString(l_string[i], n);
+        values.push_back(n);
+    }
+
+    // Make sure we have the right number of entries
+    if (values.size() < 3 * (int)POWERUP_LAST)
+    {
+        Log::fatal("PowerupManager",
+                   "Not enough entries for '%s' in powerup.xml",
+                       node->getName().c_str());
+    }
+    if(values.size() > 3* (int)POWERUP_LAST)
+    {
+        Log::fatal("PowerupManager",
+                   "Too many entries for '%s' in powerup.xml.",
+                   node->getName().c_str());
+    }
+
+    // Make sure the entries are in the right range
+    for (unsigned int i=0;i< 3 * (int)POWERUP_LAST; i++)
+    {
+        if (values[i] < 0 || values[i] > 3 * (int)POWERUP_LAST)
+            Log::fatal("PowerupManager",
+               "Incorrect entries for '%s' in powerup.xml.",
+               node->getName().c_str());
+    }
+
+    // (2) - Use the goodness data to sort the races WeightData
+
+    std::vector<WeightsData*> wd = m_all_weights["race-weight-list"];
+
+    for (unsigned int i = 0; i < wd.size(); i++)
+    {
+        // Copy over the powerup ordering for later use
+        wd[i]->m_powerup_order = values;
+
+        // The WeightsData can now sort itself
+        wd[i]->sortWeights();
+    }
+
+//#ifdef ITEM_DISTRIBUTION_DEBUG
+    std::sort(values.begin(), values.end());
+    for (unsigned int i = 0; i < 3 * (int)POWERUP_LAST - 1; i++)
+    {
+        if (values[i] == values[i+1])
+            Log::error("PowerupManager", "Two powerups have an identical goodness value of %d",
+                      values[i]);
+    }
+//#endif       
+}   // sortRaceWeights
+
 
 //-----------------------------------------------------------------------------
 /** Loads the powerups weights for a given category (race, ft, ...). The data
@@ -222,10 +311,12 @@ void PowerupManager::WeightsData::readData(int num_karts, const XMLNode *node)
         const XMLNode *w = node->getNode(i);
         std::string single_item;
         w->get("single", &single_item);
-        std::string multi_item;
-        w->get("multi", &multi_item);
+        std::string double_item;
+        w->get("double", &double_item);
+        std::string triple_item;
+        w->get("triple", &triple_item);
         std::vector<std::string> l_string =
-            StringUtils::split(single_item+" "+multi_item,' ');
+            StringUtils::split(single_item+" "+double_item+" "+triple_item,' ');
 
         // Keep a reference for shorter access to the list
         std::vector<int> &l = m_weights_for_section.back();
@@ -244,14 +335,14 @@ void PowerupManager::WeightsData::readData(int num_karts, const XMLNode *node)
             }
         }
         // Make sure we have the right number of entries
-        if (l.size() < 2 * (int)POWERUP_LAST)
+        if (l.size() < 3 * (int)POWERUP_LAST)
         {
             Log::fatal("PowerupManager",
                        "Not enough entries for '%s' in powerup.xml",
                        node->getName().c_str());
-            while (l.size() < 2 * (int)POWERUP_LAST) l.push_back(0);
+            while (l.size() < 3 * (int)POWERUP_LAST) l.push_back(0);
         }
-        if(l.size()>2*(int)POWERUP_LAST)
+        if(l.size() > 3 * (int)POWERUP_LAST)
         {
             Log::fatal("PowerupManager",
                        "Too many entries for '%s' in powerup.xml.",
@@ -259,6 +350,27 @@ void PowerupManager::WeightsData::readData(int num_karts, const XMLNode *node)
         }
     }   // for i in getNumNodes()
 }   // WeightsData::readData
+
+//-----------------------------------------------------------------------------
+/** Sorts the weight according to the data contained within m_powerup_order
+ */
+void PowerupManager::WeightsData::sortWeights()
+{
+    if (m_powerup_order.size() != 3*(int)POWERUP_LAST)
+        Log::fatal("PowerupManager",
+           "SortWeights called without m_powerup_order being set.");
+
+    for (unsigned int i=0; i<m_weights_for_section.size(); i++)
+    {
+        std::vector <int> temp_weights_copy = m_weights_for_section[i];
+
+        for (unsigned int j=0; j< 3 * (int)POWERUP_LAST; j++)
+        {
+            // m_powerup_order[j] contains the new index for the j-th powerup
+            m_weights_for_section[i][m_powerup_order[j]] = temp_weights_copy[j];
+        }
+    }
+}
 
 // ----------------------------------------------------------------------------
 /** Defines the weights for this WeightsData object based on a linear
@@ -273,6 +385,7 @@ void PowerupManager::WeightsData::interpolate(WeightsData *prev,
 {
     m_num_karts = num_karts;
     m_weights_for_section.clear();
+    // f = 1 when num_karts = next->getNumKarts
     float f = float(num_karts - prev->getNumKarts())
             / (next->getNumKarts() - prev->getNumKarts());
 
@@ -292,6 +405,9 @@ void PowerupManager::WeightsData::interpolate(WeightsData *prev,
             l.push_back(int(interpolated_weight + 0.5f));
         }
     }   // for l < prev->m_weights_for_section.size()
+
+    // Copy over one m_powerup_order list
+    m_powerup_order = prev->m_powerup_order;
 }   // WeightsData::interpolate
 
 // ----------------------------------------------------------------------------
@@ -329,7 +445,7 @@ void PowerupManager::WeightsData::convertRankToSection(int rank, int *prev,
         return;
     }
 
-    // In FTL mode the first section is for the leader, the
+    // In FTL mode the first section is for the leader, the 
     // second section is used for the first non-leader kart.
     if (RaceManager::get()->isFollowMode() && rank == 2)
     {
@@ -390,15 +506,34 @@ void PowerupManager::WeightsData::precomputeWeights()
         int prev, next;
         float weight;
         convertRankToSection(i + 1, &prev, &next, &weight);
-        int sum = 0;
+        float sum_av = 0.0f;
+        std::vector<float> summed_weights;
+
         for (unsigned int j = 0;
-            j <= 2 * POWERUP_LAST - POWERUP_FIRST; j++)
+            j <= 3 * POWERUP_LAST - POWERUP_FIRST; j++)
         {
             float av = (1.0f - weight) * m_weights_for_section[prev][j]
                      +         weight  * m_weights_for_section[next][j];
-            sum += int(av + 0.5f);
-            m_summed_weights_for_rank[i].push_back(sum);
+            sum_av += av;
+            summed_weights.push_back(sum_av);
         }
+        // The pseudo-random number when getting an item will be in
+        // the range 1-32768.
+        // We make sure the total sum is 32768 / REPEAT_WEIGHTS
+        // This way max_summed_weights % max_random_number is as small
+        // as possible.
+        int target_sum = 32768 / REPEAT_WEIGHTS;
+
+        for (unsigned int j = 0;
+            j <= 3 * POWERUP_LAST - POWERUP_FIRST; j++)
+        {
+            int normalized_sum = int( (summed_weights[j]/sum_av*target_sum) + 0.5f);
+            m_summed_weights_for_rank[i].push_back(normalized_sum);
+        }
+#ifdef ITEM_DISTRIBUTION_DEBUG
+        Log::verbose("PowerupManager", "Final summed weight for rank %d is %d",
+          i, m_summed_weights_for_rank[i][3*POWERUP_LAST - POWERUP_FIRST]);
+#endif       
     }
 }   // WeightsData::precomputeWeights
 //-----------------------------------------------------------------------------
@@ -412,7 +547,7 @@ void PowerupManager::WeightsData::precomputeWeights()
  *  \param random_number A random number used to 'randomly' select the item
  *         that was picked.
  */
-int PowerupManager::WeightsData::getRandomItem(int rank, uint64_t random_number)
+int PowerupManager::WeightsData::getRandomItem(int rank, int random_number)
 {
     // E.g. for battle mode with only one entry
     if(rank>(int)m_summed_weights_for_rank.size())
@@ -421,9 +556,8 @@ int PowerupManager::WeightsData::getRandomItem(int rank, uint64_t random_number)
     const std::vector<unsigned> &summed_weights = m_summed_weights_for_rank[rank];
     // The last entry is the sum of all previous entries, i.e. the maximum
     // value
-#undef ITEM_DISTRIBUTION_DEBUG
 #ifdef ITEM_DISTRIBUTION_DEBUG
-    uint64_t original_random_number = random_number;
+    int original_random_number = random_number;
 #endif
     random_number = random_number % summed_weights.back();
     // Put the random number in range [1;max of summed weights],
@@ -433,16 +567,27 @@ int PowerupManager::WeightsData::getRandomItem(int rank, uint64_t random_number)
     // Stop at the first inferior or equal sum, before incrementing
     // So stop while powerup is such that
     // summed_weights[powerup-1] < random_number <= summed_weights[powerup]
-    while ( random_number > summed_weights[powerup] )
+    while ( (unsigned int)random_number > summed_weights[powerup] )
         powerup++;
 
     // We align with the beginning of the enum and return
     // We don't do more, because it would need to be decoded from enum later
 #ifdef ITEM_DISTRIBUTION_DEBUG
-    Log::verbose("Powerup", "World %d rank %d random %d %" PRIu64 " item %d",
+    Log::verbose("Powerup", "World %d rank %d random %d %" PRIu64 " item %d powerup order size %lu",
                  World::getWorld()->getTicksSinceStart(), rank, random_number,
-                 original_random_number, powerup);
+                 original_random_number, powerup, m_powerup_order.size());
 #endif
+
+    // The value stored in powerup is still scrambled because of the weights reordering
+    // Correct for the reordering here
+    for (unsigned int i = 0; i<m_powerup_order.size();i++)
+    {
+        if (powerup == m_powerup_order[i])
+        {
+            powerup = i;
+            break;
+        }
+    }
 
     return powerup + POWERUP_FIRST;
 }   // WeightsData::getRandomItem
@@ -464,7 +609,8 @@ void PowerupManager::loadPowerup(PowerupType type, const XMLNode &node)
     if (icon_file.size() == 0)
     {
         Log::fatal("PowerupManager",
-                   "Cannot load powerup %i, no 'icon' attribute under XML node",
+                   "Cannot load powerup %i, no 'icon' attribute under XML node"
+                   " or incorrect icon path",
                    type);
     }
 #endif
@@ -511,9 +657,149 @@ void PowerupManager::loadPowerup(PowerupType type, const XMLNode &node)
              Cake::init(node, m_all_meshes[type]);       break;
         case POWERUP_RUBBERBALL:
              RubberBall::init(node, m_all_meshes[type]); break;
+        case POWERUP_SUDO:
+             loadNitroHack(node);                        break;
+        case POWERUP_MINI:
+             loadMiniIcons(node);                        break;
         default: break;
     }   // switch
 }   // loadPowerup
+
+/** Loads global parameters for the Nitro-Hack powerup
+ */
+void PowerupManager::loadNitroHack(const XMLNode &node)
+{
+    // Default values used in case they are missing from
+    // the config file
+    m_nh_max_targets = 5;
+    m_nh_base_bonus = 0.2f;
+    m_nh_negative_multiply = 1.0f;
+
+    float stolen_max = 1.6f;
+    float stolen_add = 0.4f;
+    float stolen_multiply = 0.25f;
+
+    if(!node.get("max-targets",     &m_nh_max_targets))
+        Log::warn("powerup",
+                  "No max-targets specified for nitro-hack.");
+    if(!node.get("negative-multiply",   &m_nh_negative_multiply))
+        Log::warn("powerup",
+                  "No negative-multiply specified for nitro-hack.");
+    if(!node.get("bonus-no-kart",   &m_nh_base_bonus))
+        Log::warn("powerup",
+                  "No bonus-no-kart specified for nitro-hack.");
+    if(!node.get("stolen-max",      &stolen_max))
+        Log::warn("powerup",
+                  "No stolen-max specified for nitro-hack.");
+    if(!node.get("stolen-add",      &stolen_add))
+        Log::warn("powerup",
+                  "No stolen-add specified for nitro-hack.");
+    if(!node.get("stolen-multiply", &stolen_multiply))
+        Log::warn("powerup",
+                  "No stolen-multiply specified for nitro-hack.");
+
+    if(m_nh_max_targets > 20)
+        m_nh_max_targets = 20;
+
+    // Compute the amount to steal for each position difference,
+    // from immediately ahead [0] to most ahead
+    m_nh_stolen_amount[0] = stolen_max;
+
+    for (unsigned int i=1;i<20;i++)
+    {
+        if (i < m_nh_max_targets)
+            m_nh_stolen_amount[i] = (m_nh_stolen_amount[i-1] * stolen_multiply) + stolen_add;
+        else
+            m_nh_stolen_amount[i] = 0;
+    }
+} // loadNitroHack
+
+float PowerupManager::getNitroHackStolenDiff(unsigned int diff) const
+{
+    if (diff >= 20 || diff == 0)
+        return 0;
+    else
+        return m_nh_stolen_amount[diff-1];
+} //getNitroHackStolenDiff
+
+/** Loads the special icons of the Mini-Wish powerup
+ */
+void PowerupManager::loadMiniIcons(const XMLNode &node)
+{
+    loadMiniIconsHalf(node, false);
+    loadMiniIconsHalf(node, true);
+} // loadMiniIcons
+
+void PowerupManager::loadMiniIconsHalf(const XMLNode &node, bool wide)
+{
+    std::string icon_file("");
+    std::string wide_node("");
+    if (wide)
+        wide_node = "_w";
+    unsigned int wide_offset = wide ? 6 : 0;
+
+#ifdef DEBUG
+    long unsigned int min_size = 1;
+#endif
+
+    // Load the cycle icons
+    for (int i=0;i<3;i++)
+    {
+        std::string number = std::to_string(i+1);
+        // Load the first special icon
+        node.get("icon_cycle"+number+wide_node, &icon_file);
+        icon_file = GUIEngine::getSkin()->getThemedIcon("gui/icons/" + icon_file);
+
+        m_mini_icons[i+wide_offset] = material_manager->getMaterial(icon_file,
+                                      /* full_path */     true,
+                                      /*make_permanent */ true,
+                                      /*complain_if_not_found*/ true,
+                                      /*strip_path*/ false);
+
+#ifdef DEBUG
+        if (icon_file.size() < min_size)
+            min_size = icon_file.size();
+#endif
+    } // load the cycle icons
+
+    // Load the selected icons
+    for (int i=0;i<3;i++)
+    {
+        std::string number = std::to_string(i+1);
+        // Load the first special icon
+        node.get("icon_selected"+number+wide_node, &icon_file);
+        icon_file = GUIEngine::getSkin()->getThemedIcon("gui/icons/" + icon_file);
+
+        m_mini_icons[i+3+wide_offset] = material_manager->getMaterial(icon_file,
+                                      /* full_path */     true,
+                                      /*make_permanent */ true,
+                                      /*complain_if_not_found*/ true,
+                                      /*strip_path*/ false);
+
+#ifdef DEBUG
+        if (icon_file.size() < min_size)
+            min_size = icon_file.size();
+#endif
+    } // load the selected icons
+
+#ifdef DEBUG
+    if (icon_file.size() < min_size)
+        min_size = icon_file.size();
+
+    if (min_size == 0)
+    {
+        Log::fatal("PowerupManager",
+                   "Cannot load at least one of the special mini-icons, missing attribute under XML node"
+                   " or incorrect icon path");
+    }
+#endif
+
+    for (unsigned int i=0; i<6; i++)
+    {
+        assert(m_mini_icons[i+wide_offset] != NULL);
+        assert(m_mini_icons[i+wide_offset]->getTexture() != NULL);      
+    }
+}   // loadMiniIconsHalf
 
 // ----------------------------------------------------------------------------
 /** Create a (potentially interpolated) WeightsData objects for the current
@@ -610,19 +896,57 @@ PowerupManager::PowerupType PowerupManager::getRandomPowerup(unsigned int pos,
     if(powerup > POWERUP_LAST)
     {
         powerup -= (POWERUP_LAST-POWERUP_FIRST+1);
-        *n = 3;
+        if(powerup > POWERUP_LAST)
+        {
+            powerup -= (POWERUP_LAST-POWERUP_FIRST+1);
+            *n = 3;
+        }
+        else
+        {
+            *n = 2;
+        }
     }
     else
-        *n=1;
-
-    // Prevents early explosive items
-    if (World::getWorld() &&
-        stk_config->ticks2Time(World::getWorld()->getTicksSinceStart()) <
-                                      stk_config->m_no_explosive_items_timeout)
     {
-        if (powerup == POWERUP_CAKE || powerup == POWERUP_RUBBERBALL)
-            powerup = POWERUP_BOWLING;
+        *n = 1;
     }
+
+    // Prevents some items early on:
+    // - Cakes right after the start destroy too much and too easily
+    // - The small gap between the karts ahead and the karts in the back makes the
+    //   basketball, the parachute and the nitro-hack unwelcome
+    // - The swatter and the bowling ball make the start too random
+    if (World::getWorld() && 
+        RaceManager::get()->isLinearRaceMode() &&
+        stk_config->ticks2Time(World::getWorld()->getTicksSinceStart()) <
+                                      stk_config->m_limited_items_timeout)
+    {
+        if (powerup == POWERUP_CAKE || powerup == POWERUP_RUBBERBALL ||
+            powerup == POWERUP_PARACHUTE || powerup == POWERUP_SUDO)
+        {
+            powerup = POWERUP_ZIPPER;
+            *n = 1;            
+        }
+        else if (powerup == POWERUP_SWATTER || powerup == POWERUP_BOWLING)
+        {
+            powerup = POWERUP_BUBBLEGUM;
+            *n = 1;        
+        }
+    }
+
+    // Prevent basketballs from being received when at least a kart has
+    // already finished:
+    // - Avoids the first remaining kart receiving a basket ball
+    // - Avoids having a very small space between the player getting the
+    //   basket ball and the kart ahead that will be targeted.
+    if (powerup == POWERUP_RUBBERBALL &&
+        RaceManager::get()->isLinearRaceMode() &&
+        RaceManager::get()->getFinishedKarts() >= 1)
+    {
+        powerup = POWERUP_ZIPPER;
+        *n = 1;            
+    }
+    
     return (PowerupType)powerup;
 }   // getRandomPowerup
 
@@ -665,15 +989,17 @@ void PowerupManager::unitTesting()
     // Get the sum of all weights, which determine the number
     // of different random numbers we need to test.
     num_weights = wd.m_summed_weights_for_rank[section].back();
-    std::vector<int> count(2*POWERUP_LAST);
+    std::vector<int> count(3*POWERUP_LAST);
     for (int i = 0; i<num_weights; i++)
     {
         unsigned int n;
         int powerup = powerup_manager->getRandomPowerup(position, &n, i);
         if(n==1)
             count[powerup-1]++;
-        else
+        else if (n==2)
             count[powerup+POWERUP_LAST-POWERUP_FIRST]++;
+        else
+            count[powerup+2*POWERUP_LAST-2*POWERUP_FIRST]++;
     }
 
     // Now make sure we reproduce the original weight distribution.

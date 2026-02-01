@@ -262,7 +262,7 @@ void OnlineProfileFriends::onUpdate(float delta)
     {
         if (m_visiting_profile->hasFetchedFriends())
         {
-            // When browsing other users friends there is no Since/Status
+            // When browsing other users friends there is no Since/Status 
             // columns, so force sorting by name
             if (!m_visiting_profile->isCurrentUser() && m_sort_column != 0)
             {

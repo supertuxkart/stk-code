@@ -39,7 +39,7 @@
 #include "guiengine/engine.hpp"
 #include "io/file_manager.hpp"
 #include "io/xml_node.hpp"
-#include "karts/abstract_kart.hpp"
+#include "karts/kart.hpp"
 #include "karts/ghost_kart.hpp"
 #include "karts/kart_properties.hpp"
 #include "physics/btKart.hpp"
@@ -167,32 +167,118 @@ KartModel::KartModel(bool is_master)
 void KartModel::loadInfo(const XMLNode &node)
 {
     node.get("model-file", &m_model_filename);
+    // Version 2 corresponds to old .b3d karts. Animations may have some issues (see #5477).
+    //           This format is deprecated and support will be dropped at some point.
+    // Version 3 corresponds to .spm karts, compared to version 2
+    //           it also supports headlights and speed-weighted objets.
+    // Version 4 corresponds to .spm karts, compared to version 3
+    //           it uses Evolution's animation markers.
+    node.get("version", &m_version);
+
+    //Log::verbose("Kart_Model", "Kart %s is using format version %i", m_model_filename.c_str(), m_version);
+
     if(const XMLNode *animation_node=node.getNode("animations"))
     {
-        animation_node->get("left",           &m_animation_frame[AF_LEFT]      );
-        animation_node->get("straight",       &m_animation_frame[AF_STRAIGHT]  );
-        animation_node->get("right",          &m_animation_frame[AF_RIGHT]     );
-        animation_node->get("start-winning",  &m_animation_frame[AF_WIN_START] );
-        animation_node->get("start-winning-loop",
-                                              &m_animation_frame[AF_WIN_LOOP_START] );
-        animation_node->get("end-winning",    &m_animation_frame[AF_WIN_END]   );
-        animation_node->get("end-winning-straight", &m_animation_frame[AF_WIN_END_STRAIGHT]  );
-        animation_node->get("start-losing",   &m_animation_frame[AF_LOSE_START]);
-        animation_node->get("start-losing-loop",
-                                             &m_animation_frame[AF_LOSE_LOOP_START]);
-        animation_node->get("end-losing",     &m_animation_frame[AF_LOSE_END]  );
-        animation_node->get("end-losing-straight", &m_animation_frame[AF_LOSE_END_STRAIGHT]  );
-        animation_node->get("start-explosion",&m_animation_frame[AF_LOSE_START]);
-        animation_node->get("end-explosion",  &m_animation_frame[AF_LOSE_END]  );
-        animation_node->get("start-jump",     &m_animation_frame[AF_JUMP_START]);
-        animation_node->get("start-jump-loop",&m_animation_frame[AF_JUMP_LOOP] );
-        animation_node->get("end-jump",       &m_animation_frame[AF_JUMP_END]  );
-        animation_node->get("selection-start", &m_animation_frame[AF_SELECTION_START]);
-        animation_node->get("selection-end",   &m_animation_frame[AF_SELECTION_END]  );
-        animation_node->get("backpedal-left", &m_animation_frame[AF_BACK_LEFT]);
-        animation_node->get("backpedal",      &m_animation_frame[AF_BACK_STRAIGHT]);
-        animation_node->get("backpedal-right",&m_animation_frame[AF_BACK_RIGHT]);
-        animation_node->get("speed",          &m_animation_speed               );
+        // Compatibility-layer for 1.x and older karts
+        if (m_version == 2 || m_version == 3)
+        {
+            animation_node->get("left",           &m_animation_frame[AF_LEFT]         );
+            animation_node->get("straight",       &m_animation_frame[AF_STRAIGHT]     );
+            animation_node->get("right",          &m_animation_frame[AF_RIGHT]        );
+            animation_node->get("backpedal-left", &m_animation_frame[AF_BACK_LEFT]    );
+            animation_node->get("backpedal",      &m_animation_frame[AF_BACK_STRAIGHT]);
+            animation_node->get("backpedal-right",&m_animation_frame[AF_BACK_RIGHT]   );
+
+            animation_node->get("start-winning",      &m_animation_frame[AF_WIN_START]      );
+            animation_node->get("start-winning-loop", &m_animation_frame[AF_WIN_LOOP_START] );
+            animation_node->get("end-winning",        &m_animation_frame[AF_WIN_LOOP_END]   );
+            animation_node->get("end-winning-straight", &m_animation_frame[AF_WIN_TO_STRAIGHT]);
+            animation_node->get("start-losing",       &m_animation_frame[AF_LOSE_START]     );
+            animation_node->get("start-losing-loop",  &m_animation_frame[AF_LOSE_LOOP_START]);
+            animation_node->get("end-losing",         &m_animation_frame[AF_LOSE_LOOP_END]  );
+            animation_node->get("end-losing-straight", &m_animation_frame[AF_LOSE_TO_STRAIGHT]);
+
+            animation_node->get("start-jump",      &m_animation_frame[AF_JUMP_START]          );
+            animation_node->get("start-jump-loop", &m_animation_frame[AF_JUMP_LOOP_START]     );
+            animation_node->get("end-jump",        &m_animation_frame[AF_JUMP_LOOP_END]       );
+            animation_node->get("selection-start", &m_animation_frame[AF_SELECTION_LOOP_START]);
+            animation_node->get("selection-end",   &m_animation_frame[AF_SELECTION_LOOP_END]  );
+
+            animation_node->get("speed",          &m_animation_speed               );
+        }
+        // Version used for SuperTuxKart Evolution
+        else if (m_version == 4)
+        {
+            animation_node->get("left",           &m_animation_frame[AF_LEFT]         );
+            animation_node->get("straight",       &m_animation_frame[AF_STRAIGHT]     );
+            animation_node->get("right",          &m_animation_frame[AF_RIGHT]        );
+            animation_node->get("backpedal-left", &m_animation_frame[AF_BACK_LEFT]    );
+            animation_node->get("backpedal",      &m_animation_frame[AF_BACK_STRAIGHT]);
+            animation_node->get("backpedal-right",&m_animation_frame[AF_BACK_RIGHT]   );
+
+            animation_node->get("winning-start",      &m_animation_frame[AF_WIN_START]         );
+            animation_node->get("winning-loop-start", &m_animation_frame[AF_WIN_LOOP_START]    );
+            animation_node->get("winning-loop-end",   &m_animation_frame[AF_WIN_LOOP_END]      );
+            animation_node->get("winning-to-straight", &m_animation_frame[AF_WIN_TO_STRAIGHT]  );
+            animation_node->get("neutral-start",      &m_animation_frame[AF_NEUTRAL_START]     );
+            animation_node->get("neutral-loop-start", &m_animation_frame[AF_NEUTRAL_LOOP_START]);
+            animation_node->get("neutral-loop-end",   &m_animation_frame[AF_NEUTRAL_LOOP_END]  );
+            animation_node->get("losing-start",       &m_animation_frame[AF_LOSE_START]        );
+            animation_node->get("losing-loop-start",  &m_animation_frame[AF_LOSE_LOOP_START]   );
+            animation_node->get("losing-loop-end",    &m_animation_frame[AF_LOSE_LOOP_END]     );
+            animation_node->get("losing-to-straight", &m_animation_frame[AF_LOSE_TO_STRAIGHT]  );
+            animation_node->get("podium-start",       &m_animation_frame[AF_PODIUM_START]      );
+            animation_node->get("podium-loop-start",  &m_animation_frame[AF_PODIUM_LOOP_START] );
+            animation_node->get("podium-loop-end",    &m_animation_frame[AF_PODIUM_LOOP_END]   );
+
+            animation_node->get("jump-start",      &m_animation_frame[AF_JUMP_START]               );
+            animation_node->get("jump-loop-start", &m_animation_frame[AF_JUMP_LOOP_START]          );
+            animation_node->get("jump-loop-end",   &m_animation_frame[AF_JUMP_LOOP_END]            );
+            animation_node->get("selection-start",      &m_animation_frame[AF_SELECTION_START]     );
+            animation_node->get("selection-loop-start", &m_animation_frame[AF_SELECTION_LOOP_START]);
+            animation_node->get("selection-loop-end",   &m_animation_frame[AF_SELECTION_LOOP_END]  );
+
+            animation_node->get("bump-front",  &m_animation_frame[AF_BUMP_FRONT]  );
+            animation_node->get("bump-left",   &m_animation_frame[AF_BUMP_LEFT]   );
+            animation_node->get("bump-right",  &m_animation_frame[AF_BUMP_RIGHT]  );
+            animation_node->get("bump-back",   &m_animation_frame[AF_BUMP_BACK]   );
+            animation_node->get("happy-start", &m_animation_frame[AF_HAPPY_START] );
+            animation_node->get("happy-end",   &m_animation_frame[AF_HAPPY_END]   );
+            animation_node->get("hit-start",   &m_animation_frame[AF_HIT_START]   );
+            animation_node->get("hit-end",     &m_animation_frame[AF_HIT_END]     );
+
+            animation_node->get("false-accel-start", &m_animation_frame[AF_FALSE_ACCEL_START] );
+            animation_node->get("false-accel-end",   &m_animation_frame[AF_FALSE_ACCEL_END]   );
+
+            animation_node->get("speed",          &m_animation_speed               );
+        }
+        else
+        {
+            Log::error("Kart_Model", "The kart.xml format of %s (version %i) is unsupported!",
+                m_model_filename.c_str(), m_version);
+        }
+
+        // Extra-logging in artist-debug mode to easily check for missing animations
+        if (UserConfigParams::m_artist_debug_mode)
+        {
+            std::vector<int> missing_animations;
+            for (unsigned int i = AF_BEGIN + 1; i <= AF_END; i++)
+            {
+                if (m_animation_frame[i] == -1)
+                    missing_animations.push_back(i);
+            }
+            if (!missing_animations.empty())
+            {
+                printf("Kart Model - Kart %s is missing animation number", m_model_filename.c_str());
+                for (auto it : missing_animations)
+                    printf(" %i", it);
+                printf("\n");
+            }
+            else
+            {
+                Log::verbose("Kart Model", "Kart %s supports all animations.", m_model_filename.c_str());
+            }
+        }
     }
 
     if(const XMLNode *wheels_node=node.getNode("wheels"))
@@ -214,7 +300,6 @@ void KartModel::loadInfo(const XMLNode &node)
         m_has_nitro_emitter = true;
     }
 
-    node.get("version", &m_version);
     if (m_version > 2)
     {
         if (const XMLNode *speed_weighted_objects_node = node.getNode("speed-weighted-objects"))
@@ -445,7 +530,7 @@ scene::ISceneNode* KartModel::attachModel(bool animated_models, bool human_playe
     {
         // If no animations are shown, make sure to pick the frame
         // with a straight ahead animation (if exist).
-        int straight_frame = m_animation_frame[AF_STRAIGHT]>=0
+        int straight_frame = m_animation_frame[AF_STRAIGHT] >= 0
                            ? m_animation_frame[AF_STRAIGHT]
                            : 0;
 
@@ -500,7 +585,7 @@ scene::ISceneNode* KartModel::attachModel(bool animated_models, bool human_playe
             if (animated_models)
             {
                 // Only need to keep track of animated node for speed setting
-                obj.m_node = irr_driver->addAnimatedMesh(obj.m_model,
+                obj.m_node = irr_driver->addAnimatedMesh(obj.m_model, 
                     "speedweighted", parent, getRenderInfo());
                 swo = obj.m_node;
                 obj.m_node->grab();
@@ -549,7 +634,8 @@ scene::ISceneNode* KartModel::attachModel(bool animated_models, bool human_playe
         }
         else
         {
-            if (!human_player || !supports_light)
+            if ((UserConfigParams::m_kart_lights == 0) || !supports_light ||
+                (UserConfigParams::m_kart_lights == 1 && !human_player))
                 continue;
             obj.setLight(parent);
             node = obj.getLightNode();
@@ -1078,7 +1164,7 @@ void KartModel::finishedRace()
 /** Enables- or disables the end animation.
  *  \param type The type of animation to play.
  */
-void KartModel::setAnimation(AnimationFrameType type, bool play_non_loop)
+void KartModel::setAnimation(AnimationFrameType type, bool no_loop)
 {
     // if animations disabled, give up
     if (m_animated_node == NULL) return;
@@ -1091,10 +1177,11 @@ void KartModel::setAnimation(AnimationFrameType type, bool play_non_loop)
     }
 
     m_current_animation = type;
+
+    // Special handling used after soccer goals
     if ((type == AF_WIN_START || type == AF_LOSE_START) &&
-        m_animation_frame[type] > -1 && play_non_loop)
+        m_animation_frame[type] > -1 && no_loop)
     {
-        // Special handling for soccer goal animation
         class SmoothTransition : public IAnimationEndCallBack
         {
             KartModel* m_kart_model;
@@ -1109,16 +1196,16 @@ void KartModel::setAnimation(AnimationFrameType type, bool play_non_loop)
                 m_kart_model->setAnimation(AF_DEFAULT);
             }
         };
-        AnimationFrameType end = (AnimationFrameType)(type + 2);
-        if (m_animation_frame [end] == -1)
-            end = (AnimationFrameType)((int)end - 1);
-        AnimationFrameType to_straight = (AnimationFrameType)(type + 3);
+        AnimationFrameType end = getEndFrameType(type);
+        if (m_animation_frame[end] == -1)
+            return; // If the end isn't correctly defined, don't play the animation
+        AnimationFrameType to_straight = (type == AF_WIN_START) ? AF_WIN_TO_STRAIGHT
+                                                                : AF_LOSE_TO_STRAIGHT;
         bool has_to_straight = m_animation_frame[to_straight] > -1;
         if (has_to_straight)
             end = to_straight;
         m_animated_node->setAnimationSpeed(m_animation_speed);
-        m_animated_node->setFrameLoop(m_animation_frame[type],
-            m_animation_frame[end]);
+        m_animated_node->setFrameLoop(m_animation_frame[type], m_animation_frame[end]);
         m_animated_node->setLoopMode(false);
         SmoothTransition* st = new SmoothTransition(this, !has_to_straight);
         m_animated_node->setAnimationEndCallback(st);
@@ -1158,11 +1245,9 @@ void KartModel::setAnimation(AnimationFrameType type, bool play_non_loop)
     }
     else if(m_animation_frame[type]>-1)
     {
-        // 'type' is the start frame of the animation, type + 1 the frame
-        // to begin the loop with, type + 2 to end the frame with
-        AnimationFrameType end = (AnimationFrameType)(type+2);
+        AnimationFrameType end = getEndFrameType(type);
         if(m_animation_frame[end]==-1)
-            end = (AnimationFrameType)((int)end-1);
+            return; // If the end isn't correctly defined, don't play the animation
         m_animated_node->setAnimationSpeed(m_animation_speed);
         m_animated_node->setFrameLoop(m_animation_frame[type],
                                       m_animation_frame[end]    );
@@ -1180,6 +1265,23 @@ void KartModel::setAnimation(AnimationFrameType type, bool play_non_loop)
 }   // setAnimation
 
 // ----------------------------------------------------------------------------
+/** Starts an animation loop.
+ *  \param type The type of animation to play.
+ */
+void KartModel::setAnimationLoop(AnimationFrameType start)
+{
+    AnimationFrameType end = getEndFrameType(start);
+
+    if(m_animation_frame[start] > -1 && m_animation_frame[end] > -1)
+    {
+        m_animated_node->setAnimationSpeed(m_animation_speed);
+        m_animated_node->setFrameLoop(m_animation_frame[start],
+                                      m_animation_frame[end]   );
+        m_animated_node->setLoopMode(true);
+    }
+} // setAnimationLoop
+
+// ----------------------------------------------------------------------------
 /** Called from irrlicht when a non-looped animation ends. This is used to
  *  implement an introductory frame sequence before the actual loop can
  *  start: first a non-looped version from the first frame to the last
@@ -1190,28 +1292,11 @@ void KartModel::setAnimation(AnimationFrameType type, bool play_non_loop)
  */
 void KartModel::OnAnimationEnd(scene::IAnimatedMeshSceneNode *node)
 {
-    // It should only be called for the animated node of this
-    // kart_model
-    assert(node==m_animated_node);
+    // It should only be called for the animated node of this kart_model
+    assert(node == m_animated_node);
 
-    // 'type' is the start frame of the animation, type + 1 the frame
-    // to begin the loop with, type + 2 to end the frame with
-    AnimationFrameType start = (AnimationFrameType)(m_current_animation+1);
-    // If there is no loop-start defined (i.e. no 'introductory' sequence)
-    // use the normal start frame.
-    if(m_animation_frame[start]==-1)
-        start = m_current_animation;
-    AnimationFrameType end   = (AnimationFrameType)(m_current_animation+2);
-
-    // Switch to loop mode if the current animation has a loop defined
-    // (else just disable the callback, and the last frame will be shown).
-    if(m_animation_frame[end]>-1)
-    {
-        m_animated_node->setAnimationSpeed(m_animation_speed);
-        m_animated_node->setFrameLoop(m_animation_frame[start],
-                                      m_animation_frame[end]   );
-        m_animated_node->setLoopMode(true);
-    }
+    AnimationFrameType loop_start = getLoopStartFrameType(m_current_animation);
+    setAnimationLoop(loop_start);
     m_animated_node->setAnimationEndCallback(NULL);
 }   // OnAnimationEnd
 
@@ -1235,7 +1320,7 @@ void KartModel::setDefaultSuspension()
 
 // ----------------------------------------------------------------------------
 /** Rotates and turns the wheels appropriately, and adjust for suspension
- *  updates the speed-weighted objects' animations.
+ *  updates the speed-weighted objects' animations. 
  *
  *  \param dt time since last frame
  *  \param distance How far the wheels have rotated since last time.

@@ -28,7 +28,7 @@
 #include "graphics/camera/camera_normal.hpp"
 #include "graphics/irr_driver.hpp"
 #include "io/xml_node.hpp"
-#include "karts/abstract_kart.hpp"
+#include "karts/kart.hpp"
 #include "karts/explosion_animation.hpp"
 #include "karts/kart.hpp"
 #include "karts/skidding.hpp"
@@ -53,7 +53,7 @@ Camera::CameraType   Camera::m_default_type  = Camera::CM_TYPE_NORMAL;
  *  camera index (which determines which viewport to use in split screen)
  *  is set.
  */
-Camera* Camera::createCamera(AbstractKart* kart, const int index)
+Camera* Camera::createCamera(Kart* kart, const int index)
 {
 
     Camera *camera = createCamera(index, m_default_type, kart);
@@ -74,7 +74,7 @@ Camera* Camera::createCamera(AbstractKart* kart, const int index)
  *  \param kart To which kart the camera is attached (NULL if a free camera).
  */
 Camera* Camera::createCamera(unsigned int index, CameraType type,
-                             AbstractKart* kart)
+                             Kart* kart)
 {
     Camera *camera = NULL;
     switch (type)
@@ -119,7 +119,7 @@ void Camera::resetAllCameras()
 }   // resetAllCameras
 
 // ----------------------------------------------------------------------------
-Camera::Camera(CameraType type, int camera_index, AbstractKart* kart)
+Camera::Camera(CameraType type, int camera_index, Kart* kart)
       : m_kart(NULL)
 {
     m_mode          = CM_NORMAL;
@@ -161,7 +161,7 @@ Camera::~Camera()
 /** Changes the owner of this camera to the new kart.
  *  \param new_kart The new kart to use this camera.
  */
-void Camera::setKart(AbstractKart *new_kart)
+void Camera::setKart(Kart *new_kart)
 {
     m_kart = new_kart;
 #ifdef DEBUG
@@ -181,7 +181,7 @@ void Camera::setupCamera()
     m_viewport = irr_driver->getSplitscreenWindow(m_index);
     m_aspect = (float)((float)(m_viewport.getWidth()) / (float)(m_viewport.getHeight()));
     m_scaling = core::vector2df(
-        float(irr_driver->getActualScreenSize().Width) / m_viewport.getWidth() ,
+        float(irr_driver->getActualScreenSize().Width) / m_viewport.getWidth() , 
         float(irr_driver->getActualScreenSize().Height) / m_viewport.getHeight());
 
     m_camera->setAspectRatio(m_aspect);
@@ -202,7 +202,7 @@ void Camera::setMode(Mode mode)
 
     // If we switch from reverse view, move the camera immediately to the
     // correct position.
-    if( (m_mode==CM_REVERSE && mode==CM_NORMAL) ||
+    if( (m_mode==CM_REVERSE && mode==CM_NORMAL) || 
         (m_mode==CM_FALLING && mode==CM_NORMAL)    )
     {
         Vec3 start_offset(0, 1.6f, -3);

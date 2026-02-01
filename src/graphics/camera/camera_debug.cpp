@@ -21,18 +21,18 @@
 
 #include "config/stk_config.hpp"
 #include "config/user_config.hpp"
-#include "karts/abstract_kart.hpp"
+#include "karts/kart.hpp"
 #include "karts/explosion_animation.hpp"
 #include "karts/kart.hpp"
 #include "karts/kart_model.hpp"
 #include "karts/skidding.hpp"
 #include "physics/btKart.hpp"
 
-CameraDebug::CameraDebugType CameraDebug::m_default_debug_Type =
+CameraDebug::CameraDebugType CameraDebug::m_default_debug_Type = 
                                             CameraDebug::CM_DEBUG_TOP_OF_KART;
 
 // ============================================================================
-CameraDebug::CameraDebug(int camera_index, AbstractKart* kart)
+CameraDebug::CameraDebug(int camera_index, Kart* kart)
            : CameraNormal(Camera::CM_TYPE_DEBUG, camera_index, kart)
 {
     reset();
@@ -81,7 +81,7 @@ void CameraDebug::getCameraSettings(float *above_kart, float *cam_angle,
         *cam_angle     = UserConfigParams::m_camera_forward_up_angle * DEGREE_TO_RAD;
         *distance      = -m_distance;
         break;
-    }   // switch
+    }   // switch 
 
 }   // getCameraSettings
 

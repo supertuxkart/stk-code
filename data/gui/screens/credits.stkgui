@@ -2,9 +2,7 @@
 <stkgui>
     <icon-button id="back" x="1%" y="0" height="9%" icon="gui/icons/back.png"/>
     <div x="0%" y="1%" width="99%" height="fit" layout="vertical-row">
-        <!-- The text will be set in code to simplify potential updates of the URL
-             and avoid generating a spurious string for translators. -->
-        <button id="stk-website" height="fit" align="right" />
+        <button id="stk-website" height="fit" align="right" text="supertuxkart.net"/>
     </div>
 
     <div x="2%" y="2%" width="96%" height="96%" layout="vertical-row" >
@@ -12,11 +10,11 @@
 
         <div x="0" y="0" width="100%" proportion="1" layout="horizontal-row" >
 
-            <header proportion="2" I18N="Title in credits screen" text="Credits" />
+            <header I18N="Title in credits screen" text="Credits" />
 
-            <spacer proportion="5" />
+            <spacer proportion="1" />
 
-            <button proportion="2" id="donate" width="fit" align="center" text="Donate"/>
+            <button id="donate" width="fit" align="center" text="Donate"/>
 
         </div>
 

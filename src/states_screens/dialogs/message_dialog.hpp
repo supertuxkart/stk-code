@@ -75,7 +75,7 @@ private:
     irr::core::stringw m_msg;
     void doInit(bool from_queue);
 
-    /** If set this will set the focus on 'cancel'/'no'
+    /** If set this will set the focus on 'cancel'/'no' 
      *  instead of "yes"/"ok". */
     bool m_focus_on_cancel;
 

@@ -114,7 +114,7 @@ private:
     /** (Unix) time when we started */
     uint64_t m_started_at;
 
-    /** The clock mode: normal counting forwards, or countdown */
+    /** The clock mode: normal counting forwards, or countdown */ 
     ClockType       m_clock_mode;
 protected:
     bool            m_play_track_intro_sound;
@@ -157,7 +157,6 @@ public:
     virtual void reset(bool restart);
     virtual void updateTime(int ticks);
     virtual void update(int ticks);
-    void         startReadySetGo();
     virtual void pause(Phase phase);
     virtual void unpause();
     virtual void enterRaceOverState();
@@ -166,8 +165,10 @@ public:
     void         setTicks(int ticks);
     void         setTicksForRewind(int ticks);
     // ------------------------------------------------------------------------
-    // Note: GO_PHASE is both: start phase and race phase
-    bool     isStartPhase() const  { return m_phase<GO_PHASE;               }
+    bool     isCountdownPhase() const  { return m_phase >= READY_PHASE &&
+                                                m_phase < GO_PHASE;         }
+    // ------------------------------------------------------------------------
+    bool     isStartPhase() const  { return m_phase < GO_PHASE;             }
     // ------------------------------------------------------------------------
     bool     isRacePhase()  const  { return m_phase>=GO_PHASE &&
                                             m_phase<FINISH_PHASE;           }

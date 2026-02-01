@@ -28,7 +28,7 @@ class RenderTarget;
 class GL1RenderTarget;
 
 class FixedPipelineRenderer: public AbstractRenderer
-{
+{  
 public:
     
     void onLoadWorld() OVERRIDE;

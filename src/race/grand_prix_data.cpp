@@ -646,7 +646,6 @@ irr::core::stringw GrandPrixData::reverseTypeToString(GPReverseType reverse_type
     default:
         return "N/A";
     }
-    return "N/A";
 }
 
 /* EOF */

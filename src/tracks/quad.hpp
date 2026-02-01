@@ -107,7 +107,7 @@ public:
     /** Returns true of this quad is invisible, i.e. not to be shown in
      *  the minimap. */
     bool isInvisible() const                            { return m_invisible; }
-    // ------------------------------------------------------------------------
+	// ------------------------------------------------------------------------
     bool isIgnored() const                             { return m_is_ignored; }
     // ------------------------------------------------------------------------
     /** Returns the normal of this quad. */

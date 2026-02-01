@@ -51,11 +51,11 @@ private:
     void removeRollSfx();
 
 public:
-             Bowling(AbstractKart* kart);
+             Bowling(Kart* kart);
     virtual ~Bowling();
     static  void init(const XMLNode &node, scene::IMesh *bowling);
     virtual bool updateAndDelete(int ticks) OVERRIDE;
-    virtual bool hit(AbstractKart* kart, PhysicalObject* obj=NULL) OVERRIDE;
+    virtual bool hit(Kart* kart, PhysicalObject* obj=NULL) OVERRIDE;
     virtual HitEffect *getHitEffect() const OVERRIDE;
     // ------------------------------------------------------------------------
     virtual void onFireFlyable() OVERRIDE;

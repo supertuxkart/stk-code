@@ -47,10 +47,13 @@ private:
     /** Which kart is targeted by this projectile (NULL if none). */
     Moveable*    m_target;
 
+    /** If it is a mini-cake */
+    bool         m_mini;
+
 public:
-                 Cake (AbstractKart *kart);
+                 Cake (Kart *kart);
     static  void init     (const XMLNode &node, scene::IMesh *cake_model);
-    virtual bool hit(AbstractKart* kart, PhysicalObject* obj=NULL) OVERRIDE;
+    virtual bool hit(Kart* kart, PhysicalObject* obj=NULL) OVERRIDE;
     // ------------------------------------------------------------------------
     virtual void hitTrack () OVERRIDE
     {
@@ -73,7 +76,7 @@ public:
     virtual void setVelocity(const btVector3& v) OVERRIDE
                                                     { m_initial_velocity = v; }
     // ------------------------------------------------------------------------
-    virtual void onFireFlyable() OVERRIDE;
+    virtual void onFireFlyable(bool mini=false) OVERRIDE;
 };   // Cake
 
 #endif

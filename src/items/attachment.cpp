@@ -32,7 +32,8 @@
 #include "items/item_manager.hpp"
 #include "items/projectile_manager.hpp"
 #include "items/swatter.hpp"
-#include "karts/abstract_kart.hpp"
+#include "karts/kart.hpp"
+#include "karts/kart_utils.hpp"
 #include "karts/controller/controller.hpp"
 #include "karts/explosion_animation.hpp"
 #include "karts/kart_properties.hpp"
@@ -48,7 +49,7 @@
 
 /** Initialises the attachment each kart has.
  */
-Attachment::Attachment(AbstractKart* kart)
+Attachment::Attachment(Kart* kart)
 {
     m_type                 = ATTACH_NOTHING;
     m_ticks_left           = 0;
@@ -114,12 +115,12 @@ Attachment::~Attachment()
  *         previous owner exists.
  */
 void Attachment::set(AttachmentType type, int ticks,
-                     AbstractKart *current_kart,
+                     Kart *current_kart,
                      bool set_by_rewind_parachute)
 {
     bool was_bomb = m_type == ATTACH_BOMB;
     int16_t prev_ticks = m_ticks_left;
-    clear();
+    clear(type);
 
     // If necessary create the appropriate plugin which encapsulates
     // the associated behavior
@@ -176,8 +177,15 @@ void Attachment::set(AttachmentType type, int ticks,
  *  takes care of resetting the owner kart's physics structures to account for
  *  the updated mass.
  */
-void Attachment::clear()
+void Attachment::clear(AttachmentType type)
 {
+    // Ensure that the boost from an electro-shield is always removed when the
+    // electro-shield attachment gets cleared, except when a new electro-shield
+    // is about to be set, as this would incorrectly remove the boost.
+    if(m_ticks_left > 0 && type   != ATTACH_ELECTRO_SHIELD &&
+                           m_type == ATTACH_ELECTRO_SHIELD)
+        m_kart->unsetElectroShield();
+
     if (m_plugin)
     {
         delete m_plugin;
@@ -264,7 +272,7 @@ void Attachment::rewindTo(BareNetworkString *buffer)
 
 // -----------------------------------------------------------------------------
 /** Selects the new attachment. In order to simplify synchronisation with the
- *  server, the new item is based on the current world time.
+ *  server, the new item is based on the current world time. 
  *  \param item The item that was collected.
  */
 void Attachment::hitBanana(ItemState *item_state)
@@ -275,11 +283,10 @@ void Attachment::hitBanana(ItemState *item_state)
         if (RaceManager::get()->isLinearRaceMode())
             PlayerManager::increaseAchievement(AchievementsStatus::BANANA_1RACE, 1);
     }
-    //Bubble gum shield effect:
-    if(m_type == ATTACH_BUBBLEGUM_SHIELD ||
-       m_type == ATTACH_NOLOK_BUBBLEGUM_SHIELD)
+    // Shield effect: protect but is used
+    if(m_kart->isShielded())
     {
-        m_ticks_left = 0;
+        m_kart->decreaseShieldTime();
         return;
     }
 
@@ -289,9 +296,7 @@ void Attachment::hitBanana(ItemState *item_state)
 
     if (RaceManager::get()->isBattleMode())
     {
-        World::getWorld()->kartHit(m_kart->getWorldKartId());
-        if (m_kart->getKartAnimation() == NULL)
-            ExplosionAnimation::create(m_kart);
+        KartUtils::createExplosion(m_kart);
         return;
     }
 
@@ -306,30 +311,15 @@ void Attachment::hitBanana(ItemState *item_state)
     case ATTACH_BOMB:
         {
         add_a_new_item = false;
-        if (!GUIEngine::isNoGraphics() && !RewindManager::get()->isRewinding())
-        {
-            HitEffect* he = new Explosion(m_kart->getXYZ(), "explosion",
-                "explosion_bomb.xml");
-            // Rumble!
-            Controller* controller = m_kart->getController();
-            if (controller && controller->isLocalPlayerController())
-            {
-                controller->rumble(0, 0.8f, 500);
-            }
-            if (m_kart->getController()->isLocalPlayerController())
-                he->setLocalPlayerKartHit();
-            ProjectileManager::get()->addHitEffect(he);
-        }
-        if (m_kart->getKartAnimation() == NULL)
-            ExplosionAnimation::create(m_kart);
+        bombExplode();
         clear();
         new_attachment = AttachmentType(ticks % 3);
+
         // Disable the banana on which the kart just is for more than the
         // default time. This is necessary to avoid that a kart lands on the
         // same banana again once the explosion animation is finished, giving
         // the kart the same penalty twice.
-        int ticks =
-            std::max(item_state->getTicksTillReturn(),
+        int ticks = std::max(item_state->getTicksTillReturn(), 
                      stk_config->time2Ticks(kp->getExplosionDuration() + 2.0f));
         item_state->setTicksTillReturn(ticks);
         break;
@@ -398,7 +388,7 @@ void Attachment::hitBanana(ItemState *item_state)
  *  the attachment for both karts.
  *  \param other Pointer to the other kart hit.
  */
-void Attachment::handleCollisionWithKart(AbstractKart *other)
+void Attachment::handleCollisionWithKart(Kart *other)
 {
     Attachment *attachment_other=other->getAttachment();
 
@@ -424,7 +414,7 @@ void Attachment::handleCollisionWithKart(AbstractKart *other)
             {
                 // Don't move if this bomb was from other kart originally
                 other->getAttachment()
-                    ->set(ATTACH_BOMB,
+                    ->set(ATTACH_BOMB, 
                           getTicksLeft()+stk_config->time2Ticks(
                                            stk_config->m_bomb_time_increase),
                           m_kart);
@@ -434,7 +424,7 @@ void Attachment::handleCollisionWithKart(AbstractKart *other)
         }
     }   // type==BOMB
     else if(attachment_other->getType()==Attachment::ATTACH_BOMB &&
-             (attachment_other->getPreviousOwner()!=m_kart ||
+             (attachment_other->getPreviousOwner()!=m_kart || 
                World::getWorld()->getNumKarts() <= 2         )      )
     {
         // Don't attach a bomb when the kart is shielded
@@ -522,41 +512,33 @@ void Attachment::update(int ticks)
     {
         m_initial_speed = 0;
         if (m_ticks_left <= 0)
-        {
-            if (!GUIEngine::isNoGraphics() && !RewindManager::get()->isRewinding())
-            {
-                HitEffect* he = new Explosion(m_kart->getXYZ(), "explosion",
-                    "explosion_bomb.xml");
-                // Rumble!
-                Controller* controller = m_kart->getController();
-                if (controller && controller->isLocalPlayerController())
-                {
-                    controller->rumble(0, 0.8f, 500);
-                }
-                if (m_kart->getController()->isLocalPlayerController())
-                    he->setLocalPlayerKartHit();
-                ProjectileManager::get()->addHitEffect(he);
-            }
-            if (m_kart->getKartAnimation() == NULL)
-                ExplosionAnimation::create(m_kart);
-        }
+            bombExplode();
         break;
     }
     case ATTACH_BUBBLEGUM_SHIELD:
     case ATTACH_NOLOK_BUBBLEGUM_SHIELD:
+    case ATTACH_BUBBLEGUM_SHIELD_SMALL:
+    case ATTACH_NOLOK_BUBBLEGUM_SHIELD_SMALL:
+        m_initial_speed = 0;
+        if (m_ticks_left <= 0)
+            popGumShield();
+        break;
+
+    case ATTACH_ELECTRO_SHIELD:
         m_initial_speed = 0;
         if (m_ticks_left <= 0)
         {
+            //TODO Add a sound effect for when the electro shield stops working
+            /*
             if (!RewindManager::get()->isRewinding())
             {
-                if (m_bubble_explode_sound) m_bubble_explode_sound->deleteSFX();
-                m_bubble_explode_sound =
-                    SFXManager::get()->createSoundSource("bubblegum_explode");
-                m_bubble_explode_sound->setPosition(m_kart->getXYZ());
-                m_bubble_explode_sound->play();
+                if (m_electro_malfunction_sound) m_electro_malfunction_sound->deleteSFX();
+                m_electro_malfunction_sound =
+                    SFXManager::get()->createSoundSource("electro_malfunction");
+                m_electro_malfunction_sound->setPosition(m_kart->getXYZ());
+                m_electro_malfunction_sound->play();
             }
-            if (!m_kart->isGhostKart())
-                Track::getCurrentTrack()->getItemManager()->dropNewItem(Item::ITEM_BUBBLEGUM, m_kart);
+            */
         }
         break;
     }   // switch
@@ -609,10 +591,15 @@ void Attachment::updateGraphics(float dt)
     if (m_type != ATTACH_NOTHING)
     {
         m_node->setVisible(true);
-        bool is_shield = m_type == ATTACH_BUBBLEGUM_SHIELD ||
-                        m_type == ATTACH_NOLOK_BUBBLEGUM_SHIELD;
-        float wanted_node_scale = is_shield ?
-            std::max(1.0f, m_kart->getHighestPoint() * 1.1f) : 1.0f;
+        bool is_big_gum_shield = m_type == ATTACH_BUBBLEGUM_SHIELD ||
+                                 m_type == ATTACH_NOLOK_BUBBLEGUM_SHIELD;
+        bool is_small_gum_shield = m_type == ATTACH_BUBBLEGUM_SHIELD_SMALL ||
+                                   m_type == ATTACH_NOLOK_BUBBLEGUM_SHIELD_SMALL;
+        bool is_gum_shield = is_big_gum_shield || is_small_gum_shield;
+        // FIXME : it is wasteful to do this every frame
+        float wanted_node_scale = is_big_gum_shield   ? std::max(1.173f, m_kart->getHighestPoint() * 1.196f) :
+                                  is_small_gum_shield ? std::max( 1.02f, m_kart->getHighestPoint() * 1.04f) :
+                                                        1.0f;
         float scale_ratio = stk_config->ticks2Time(m_scaling_end_ticks -
             World::getWorld()->getTicksSinceStart()) / 0.7f;
         if (scale_ratio > 0.0f)
@@ -631,7 +618,7 @@ void Attachment::updateGraphics(float dt)
             }
             else
             {
-                if (is_shield)
+                if (is_gum_shield)
                 {
                     // Taken from https://easings.net/#easeInElastic
                     const float c4 = (2.0f * PI) / 3.0f;
@@ -651,8 +638,8 @@ void Attachment::updateGraphics(float dt)
             m_node->setScale(core::vector3df(
                 wanted_node_scale, wanted_node_scale, wanted_node_scale));
         }
-        int slow_flashes = stk_config->time2Ticks(3.0f);
-        if (is_shield && m_ticks_left < slow_flashes)
+        int slow_flashes = stk_config->time2Ticks(2.0f);
+        if (is_gum_shield && m_ticks_left < slow_flashes)
         {
             // Bubble gum flashing when close to dropping
             int ticks_per_flash = stk_config->time2Ticks(0.2f);
@@ -709,7 +696,47 @@ void Attachment::updateGraphics(float dt)
  */
 float Attachment::weightAdjust() const
 {
-    return m_type == ATTACH_ANVIL
-           ? m_kart->getKartProperties()->getAnvilWeight()
+    return m_type == ATTACH_ANVIL 
+           ? m_kart->getKartProperties()->getAnvilWeight() 
           : 0.0f;
 }   // weightAdjust
+
+// ----------------------------------------------------------------------------
+/** Creates an explosion animation and explosion graphics. The explosion 
+ * animation takes care of rumble and registering the hit with world. */
+void Attachment::bombExplode()
+{
+    KartUtils::createExplosion(m_kart);
+    if (!GUIEngine::isNoGraphics() && !RewindManager::get()->isRewinding())
+    {
+        HitEffect* he = new Explosion(m_kart->getXYZ(), "explosion", "explosion_bomb.xml");
+        if (m_kart->getController()->isLocalPlayerController())
+            he->setLocalPlayerKartHit();
+        ProjectileManager::get()->addHitEffect(he);
+    }
+} // bombExplode
+
+// ----------------------------------------------------------------------------
+/** Performs all actions necessary for a gum shield to leave a ground gum behind.
+ * The expiration of the gum shield is not managed here.
+ */
+void Attachment::popGumShield()
+{
+    // Neither sound nor actual ground gum should be left behind by a ghost kart
+    // TODO: when replay of normal races is supported, drop a "ghost ground gum"?
+    if (m_kart->isGhostKart())
+        return;
+
+    if (!RewindManager::get()->isRewinding())
+    {
+        if (m_bubble_explode_sound) m_bubble_explode_sound->deleteSFX();
+        m_bubble_explode_sound =
+            SFXManager::get()->createSoundSource("bubblegum_explode");
+        m_bubble_explode_sound->setPosition(m_kart->getXYZ());
+        m_bubble_explode_sound->play();
+    }
+    if (m_type == ATTACH_BUBBLEGUM_SHIELD || m_type == ATTACH_NOLOK_BUBBLEGUM_SHIELD)
+        Track::getCurrentTrack()->getItemManager()->dropNewItem(Item::ITEM_BUBBLEGUM, m_kart);
+    else
+        Track::getCurrentTrack()->getItemManager()->dropNewItem(Item::ITEM_BUBBLEGUM_SMALL, m_kart);
+} // popGumShield

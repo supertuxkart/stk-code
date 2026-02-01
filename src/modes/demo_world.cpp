@@ -67,9 +67,10 @@ DemoWorld::DemoWorld()
     switch (atoi(UserConfigParams::m_difficulty.toString().c_str()))
     {
         case 0: RaceManager::get()->setDifficulty(RaceManager::DIFFICULTY_EASY); break;
-        case 1: RaceManager::get()->setDifficulty(RaceManager::DIFFICULTY_MEDIUM); break;
-        case 2: RaceManager::get()->setDifficulty(RaceManager::DIFFICULTY_HARD); break;
-        case 3: RaceManager::get()->setDifficulty(RaceManager::DIFFICULTY_BEST); break;
+        case 1: RaceManager::get()->setDifficulty(RaceManager::DIFFICULTY_CASUAL); break;
+        case 2: RaceManager::get()->setDifficulty(RaceManager::DIFFICULTY_MEDIUM); break;
+        case 3: RaceManager::get()->setDifficulty(RaceManager::DIFFICULTY_HARD); break;
+        case 4: RaceManager::get()->setDifficulty(RaceManager::DIFFICULTY_BEST); break;
         default: RaceManager::get()->setDifficulty(RaceManager::DIFFICULTY_HARD); break;
     }
 

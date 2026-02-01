@@ -36,7 +36,7 @@
 #include "utils/vec3.hpp"
 #include "utils/types.hpp"
 
-class AbstractKart;
+class Kart;
 class NetworkString;
 class SavedGrandPrix;
 class Track;
@@ -62,7 +62,7 @@ static const std::string IDENT_LAP_TRIAL("LAP_TRIAL"       );
  *     manager stores the GP information, but World queries only track
  *     and number of laps, so in case of GP this information is taken from
  *     the GrandPrix object), and local player information (number of local
- *     players, and selected karts).
+ *     players, and selected karts). 
  *     Information about player karts (which player selected which kart,
  *     player ids) is stored in a RemoteKartInfo structure and used later
  *     to initialise the KartStatus array (startNew()). The KartStatus array
@@ -227,9 +227,11 @@ public:
 #undef BATTLE_ARENA
 #undef MISC
 
-    /** Game difficulty. */
+    /** Game difficulty.
+     * The values need to start at 0 and be consecutive. */
     enum Difficulty     { DIFFICULTY_EASY = 0,
                           DIFFICULTY_FIRST = DIFFICULTY_EASY,
+                          DIFFICULTY_CASUAL,
                           DIFFICULTY_MEDIUM,
                           DIFFICULTY_HARD,
                           DIFFICULTY_BEST,
@@ -407,7 +409,7 @@ public:
      *  kart exists).
      *  \param n Rank (0<=n<num_karts) to look for.
      */
-    const AbstractKart* getKartWithGPRank(unsigned int n);
+    const Kart* getKartWithGPRank(unsigned int n);
 
     /** \return the GP rank of a local player, or -1 if the given player ID
      *  doesn't exist */
@@ -436,7 +438,7 @@ public:
                           bool from_overworld);
     void startWatchingReplay(const std::string &track_ident, const int num_laps);
     void setupPlayerKartInfo();
-    void kartFinishedRace(const AbstractKart* kart, float time);
+    void kartFinishedRace(const Kart* kart, float time);
     void setNumPlayers(int players, int local_players=-1);
     void setDefaultAIKartList(const std::vector<std::string> &ai_list);
     void computeRandomKartList();
@@ -545,7 +547,7 @@ public:
     // ----------------------------------------------------------------------------------------
     unsigned int getNumberOfAIKarts() const
     {
-        return (unsigned int)m_ai_kart_list.size();
+        return (unsigned int)m_ai_kart_list.size(); 
     }   // getNumberOfAIKarts
     // ----------------------------------------------------------------------------------------
     unsigned int getNumberOfRedAIKarts() const { return m_num_red_ai; }
@@ -575,9 +577,9 @@ public:
         }
     }
     // ----------------------------------------------------------------------------------------
-    unsigned int getNumPlayers() const
+    unsigned int getNumPlayers() const 
     {
-        return (unsigned int) m_player_karts.size();
+        return (unsigned int) m_player_karts.size(); 
     }   // getNumPlayers
     // ----------------------------------------------------------------------------------------
     /** \brief Returns the number lf laps.
@@ -606,6 +608,7 @@ public:
         switch(diff)
         {
         case RaceManager::DIFFICULTY_EASY:   return "easy";   break;
+        case RaceManager::DIFFICULTY_CASUAL: return "casual"; break;    
         case RaceManager::DIFFICULTY_MEDIUM: return "medium"; break;
         case RaceManager::DIFFICULTY_HARD:   return "hard";   break;
         case RaceManager::DIFFICULTY_BEST:   return "best";   break;

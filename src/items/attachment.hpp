@@ -30,7 +30,7 @@ namespace irr
     namespace scene { class IAnimatedMeshSceneNode; }
 }
 
-class AbstractKart;
+class Kart;
 class BareNetworkString;
 class ItemState;
 class SFXBase;
@@ -71,6 +71,9 @@ public:
         ATTACH_SWATTER_ANIM,
         ATTACH_BUBBLEGUM_SHIELD,
         ATTACH_NOLOK_BUBBLEGUM_SHIELD,
+        ATTACH_BUBBLEGUM_SHIELD_SMALL,
+        ATTACH_NOLOK_BUBBLEGUM_SHIELD_SMALL,
+        ATTACH_ELECTRO_SHIELD,
         ATTACH_MAX,
         ATTACH_NOTHING
     };
@@ -83,7 +86,7 @@ private:
     AttachmentType m_graphical_type;
 
     /** Kart the attachment is attached to. */
-    AbstractKart   *m_kart;
+    Kart   *m_kart;
 
     /** Time left till attachment expires. */
     int16_t         m_ticks_left;
@@ -100,7 +103,7 @@ private:
                      *m_node;
 
     /** Used by bombs so that it's not passed back to previous owner. */
-    AbstractKart     *m_previous_owner;
+    Kart     *m_previous_owner;
 
     /** An optional attachment - additional functionality can be implemented
      *  for certain attachments. */
@@ -112,17 +115,19 @@ private:
     /** Sound for exploding bubble gum shield */
     SFXBase          *m_bubble_explode_sound;
 
+    void bombExplode();
+
 public:
-          Attachment(AbstractKart* kart);
+          Attachment(Kart* kart);
          ~Attachment();
-    void  clear();
+    void  clear(AttachmentType type = ATTACH_NOTHING);
     void  hitBanana(ItemState *item);
     void  updateGraphics(float dt);
 
     void  update(int ticks);
-    void  handleCollisionWithKart(AbstractKart *other);
+    void  handleCollisionWithKart(Kart *other);
     void  set (AttachmentType type, int ticks,
-               AbstractKart *previous_kart=NULL,
+               Kart *previous_kart=NULL,
                bool set_by_rewind_parachute = false);
     void rewindTo(BareNetworkString *buffer);
     void saveState(BareNetworkString *buffer) const;
@@ -134,7 +139,7 @@ public:
     /** Returns the type of this attachment. */
     AttachmentType getType() const { return m_type; }
     // ------------------------------------------------------------------------
-    /** Returns how much time (in ticks) is left before this attachment is
+    /** Returns how much time (in ticks) is left before this attachment is 
      *  removed. */
     int16_t getTicksLeft() const                       { return m_ticks_left; }
     // ------------------------------------------------------------------------
@@ -143,10 +148,13 @@ public:
     // ------------------------------------------------------------------------
     /** Returns the previous owner of this attachment, used in bombs that
      *  are being passed between karts. */
-    AbstractKart* getPreviousOwner() const { return m_previous_owner; }
+    Kart* getPreviousOwner() const { return m_previous_owner; }
     // ------------------------------------------------------------------------
     /** Returns additional weight for the kart. */
     float weightAdjust() const;
+    // ------------------------------------------------------------------------
+    /** Performs all actions necessary for a gum shield to leave a ground gum behind. */
+    void popGumShield();
     // ------------------------------------------------------------------------
     /** Return the currently associated scene node (used by e.g the swatter) */
     scene::IAnimatedMeshSceneNode* getNode() {return m_node;}

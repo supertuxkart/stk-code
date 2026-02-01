@@ -72,11 +72,11 @@
  online_manager -> "STK Server"
  "STK Server" -> online_manager
  karts -> replay
- replay
+ replay 
  # force karts and tracks on the same level, looks better this way
- subgraph {
-  rank = same; karts; tracks;
- }
+ subgraph { 
+  rank = same; karts; tracks; 
+ } 
 
 }
  \enddot
@@ -214,7 +214,6 @@ extern "C" {
 #include "graphics/camera/camera.hpp"
 #include "graphics/camera/camera_debug.hpp"
 #include "graphics/central_settings.hpp"
-#include "graphics/graphical_presets.hpp"
 #include "graphics/graphics_restrictions.hpp"
 #include "graphics/irr_driver.hpp"
 #include "graphics/material_manager.hpp"
@@ -324,7 +323,7 @@ void gamepadVisualisation()
 
                     if (evt.PressedDown)
                     {
-                        if (evt.Key == IRR_KEY_RETURN ||
+                        if (evt.Key == IRR_KEY_RETURN || 
                             evt.Key == IRR_KEY_ESCAPE ||
                             evt.Key == IRR_KEY_SPACE)
                         {
@@ -687,9 +686,6 @@ void cmdLineHelp()
     "                          with colons (:).\n"
     "       --cutscene=NAME    Launch the specified track as a cutscene.\n"
     "                          This is for internal debugging use only.\n"
-    "       --gfx-preset=n     Set the graphics settings to the selected preset.\n"
-    "                          Valid values for this STK version are between 1 and 7.\n"
-    "                          Other graphic command-line parameters will override the preset.\n"
     "       --enable-glow      Enable glow effect.\n"
     "       --disable-glow     Disable glow effect.\n"
     "       --enable-bloom     Enable bloom effect.\n"
@@ -714,20 +710,12 @@ void cmdLineHelp()
     "       --disable-ibl      Disable image based lighting.\n"
     "       --enable-hd-textures Enable high definition textures.\n"
     "       --disable-hd-textures Disable high definition textures.\n"
-    "       --enable-pcss      Enable percentage-closer soft shadows.\n"
-    "       --disable-pcss     Disable percentage-closer soft-shadows.\n"
-    "       --enable-ssr       Enable screen space reflections.\n"
-    "       --disable-ssr      Disable screen space reflections.\n"
-    "       --enable-light-scatter  Enable light scattering.\n"
-    "       --disable-light-scatter Disable light scattering.\n"
     "       --enable-dynamic-lights Enable advanced pipeline.\n"
     "       --disable-dynamic-lights Disable advanced pipeline.\n"
     "       --anisotropic=n     Anisotropic filtering quality (0 to disable).\n"
-    "                           Takes precedence over trilinear or bilinear texture filtering.\n"
+    "                           Takes precedence over trilinear or bilinear\n"
+    "                           texture filtering.\n"
     "       --shadows=n         Set resolution of shadows (0 to disable).\n"
-    "       --geometry-level=n  Sets the LoD distances. Supported values range from 0 to 5.\n"
-    "       --rtt-scale=n       Sets the render resolution as a percentage of the base resolution.\n"
-    "                           Only works if dynamic lights are active."
     "       --render-driver=n   Render driver to use (gl or directx9).\n"
     "       --disable-addon-karts Disable loading of addon karts.\n"
     "       --disable-addon-tracks Disable loading of addon tracks.\n"
@@ -947,32 +935,6 @@ int handleCmdLinePreliminary()
     if(CommandLine::has("--windowed") || CommandLine::has("-w"))
         UserConfigParams::m_fullscreen = false;
 
-    int n;
-    if (CommandLine::has("--gfx-preset", &n))
-    {
-        if (n <= 0 || n > (int)GraphicalPresets::gfx_presets.size())
-        {
-            Log::warn("main", "Invalid graphical preset (%i), ignored", n);
-        }
-        else
-        {
-            if ((strcmp(UserConfigParams::m_render_driver.c_str(), "vulkan")   == 0 && n >= 4) ||
-                (strcmp(UserConfigParams::m_render_driver.c_str(), "directx9") == 0 && n >= 3))
-            {
-                Log::warn("main", "Some settings of the selected preset (%i) are not "
-                    "supported by the current renderer!");
-            }
-
-            // Apply the chosen graphical presets
-            if (strcmp(UserConfigParams::m_render_driver.c_str(), "vulkan") == 0 && n <= 2)
-                Log::error("main", "The vulkan renderer does not support the very low presets!");
-            else if (UserConfigParams::m_force_legacy_device)
-                Log::error("main", "The legacy renderer cannot use any of the gfx presets!");
-            else
-                GraphicalPresets::applyGFXPreset(n);
-        }
-    }
-
     // toggle graphical options
     if (CommandLine::has("--enable-glow"))
         UserConfigParams::m_glow = true;
@@ -1033,30 +995,6 @@ int handleCmdLinePreliminary()
         UserConfigParams::m_high_definition_textures =  2 | 1;
     else if (CommandLine::has("--disable-hd-textures"))
         UserConfigParams::m_high_definition_textures = 2;
-    // percentage-closer soft shadows
-    if (CommandLine::has("--enable-pcss"))
-        UserConfigParams::m_pcss = true;
-    else if (CommandLine::has("--disable-pcss"))
-        UserConfigParams::m_pcss = false;
-    // screen space reflections
-    if (CommandLine::has("--enable-ssr"))
-        UserConfigParams::m_ssr = true;
-    else if (CommandLine::has("--disable-ssr"))
-        UserConfigParams::m_ssr = false;
-    // light scattering
-    if (CommandLine::has("--enable-light-scatter"))
-        UserConfigParams::m_light_scatter = true;
-    else if (CommandLine::has("--disable-light-scatter"))
-        UserConfigParams::m_light_scatter = false;
-
-    if (CommandLine::has("--shadows", &n))
-        UserConfigParams::m_shadows_resolution = n;
-    if (CommandLine::has("--anisotropic", &n))
-        UserConfigParams::m_anisotropic = n;
-    if (CommandLine::has("--geometry-level", &n))
-        UserConfigParams::m_geometry_level = n;
-    if (CommandLine::has("--rtt-scale", &n))
-        UserConfigParams::m_scale_rtts_factor = ((float) n) / 100.0f;
 
     // Enable loading grand prix from local directory
     if(CommandLine::has("--add-gp-dir", &s))
@@ -1071,11 +1009,15 @@ int handleCmdLinePreliminary()
                            UserConfigParams::m_additional_gp_directory.c_str());
     }
 
-
+    int n;
     if(CommandLine::has("--xmas", &n))
         UserConfigParams::m_xmas_mode = n;
     if (CommandLine::has("--easter", &n))
         UserConfigParams::m_easter_ear_mode = n;
+    if (CommandLine::has("--shadows", &n))
+        UserConfigParams::m_shadows_resolution = n;
+    if (CommandLine::has("--anisotropic", &n))
+        UserConfigParams::m_anisotropic = n;
 
     // Useful for debugging: the temple navmesh needs 12 minutes in debug
     // mode to compute the distance matrix!!
@@ -2136,11 +2078,12 @@ void askForInternetPermission()
 
     MessageDialog *dialog =
     new MessageDialog(_("SuperTuxKart may connect to a server "
-        "to download add-ons and notify you of updates.") + L"\n\n"
-        + _("Please read our privacy policy at %s.", "https://supertuxkart.net/Privacy")
-        + L"\n\n" + _("Would you like this feature to be enabled? (To change this setting "
+        "to download add-ons and notify you of updates. "
+        "Please read our privacy policy at https://supertuxkart.net/Privacy. "
+        "Would you like this feature to be enabled? (To change this setting "
         "at a later time, go to options, select tab "
-        "'General', and edit \"Connect to the Internet\")."),
+        "'General', and edit \"Connect to the "
+        "Internet\")."),
         MessageDialog::MESSAGE_DIALOG_YESNO,
         new ConfirmServer(), true, true, 0.85f, 0.85f);
 
@@ -2265,9 +2208,6 @@ int main(int argc, char *argv[])
 #endif
     srand(( unsigned ) time( 0 ));
 
-    // Init the graphical presets
-    GraphicalPresets::initPresets();
-
     try
     {
         std::string s, server_config;
@@ -2372,7 +2312,7 @@ int main(int argc, char *argv[])
         wiimote_manager = new WiimoteManager();
 #endif
 
-        GUIEngine::reserveLoadingIcons(1);
+        GUIEngine::reserveLoadingIcons(4);
         int parent_pid;
         bool has_parent_process = false;
         if (CommandLine::has("--parent-process", &parent_pid))
@@ -2382,11 +2322,19 @@ int main(int argc, char *argv[])
         }
         else
             main_loop = new MainLoop(0/*parent_pid*/);
+        material_manager->loadMaterial();
 
-        // Set of loading steps common between the first game launch and
-        // reloading to apply a new resolution.
-        irr_driver->commonInit();
+        // Preload the explosion effects (explode.png)
+        ParticleKindManager::get()->getParticles("explosion.xml");
+        ParticleKindManager::get()->getParticles("explosion_bomb.xml");
+        ParticleKindManager::get()->getParticles("explosion_cake.xml");
+        ParticleKindManager::get()->getParticles("jump_explosion.xml");
 
+        GUIEngine::addLoadingIcon( irr_driver->getTexture(FileManager::GUI_ICON,
+                                                          "options_video.png"));
+        kart_properties_manager -> loadAllKarts    ();
+        kart_properties_manager->onDemandLoadKartTextures(
+            { UserConfigParams::m_default_kart }, false/*unload_unused*/);
         OfficialKarts::load();
         handleXmasMode();
         handleEasterEarMode();
@@ -2404,6 +2352,35 @@ int main(int argc, char *argv[])
 
         GUIEngine::addLoadingIcon( irr_driver->getTexture(FileManager::GUI_ICON,
                                                           "gui_lock.png"  ) );
+        ProjectileManager::get()->loadData();
+
+        // Both item_manager and powerup_manager load models and therefore
+        // textures from the model directory. To avoid reading the
+        // materials.xml twice, we do this here once for both:
+        file_manager->pushTextureSearchPath(file_manager->getAsset(FileManager::MODEL,""), "models");
+        const std::string materials_file =
+            file_manager->getAsset(FileManager::MODEL,"materials.xml");
+        if(materials_file!="")
+        {
+            // Some of the materials might be needed later, so just add
+            // them all permanently (i.e. as shared). Adding them temporary
+            // will actually not be possible: powerup_manager adds some
+            // permanent icon materials, which would (with the current
+            // implementation) make the temporary materials permanent anyway.
+            material_manager->addSharedMaterial(materials_file);
+        }
+        Referee::init();
+        powerup_manager->loadPowerupsModels();
+        ItemManager::loadDefaultItemMeshes();
+
+        GUIEngine::addLoadingIcon( irr_driver->getTexture(FileManager::GUI_ICON,
+                                                          "gift.png")       );
+
+        attachment_manager->loadModels();
+        file_manager->popTextureSearchPath();
+
+        GUIEngine::addLoadingIcon( irr_driver->getTexture(FileManager::GUI_ICON,
+                                                          "banana.png")    );
 
         //handleCmdLine() needs InitTuxkart() so it can't be called first
         if (!handleCmdLine(!server_config.empty(), has_parent_process))

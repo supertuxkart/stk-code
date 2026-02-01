@@ -21,7 +21,7 @@
 #include "items/powerup.hpp"
 #include "graphics/irr_driver.hpp"
 #include "guiengine/engine.hpp"
-#include "karts/abstract_kart.hpp"
+#include "karts/kart.hpp"
 #include "karts/controller/controller.hpp"
 #include "karts/kart_model.hpp"
 #include "modes/ctf_flag.hpp"
@@ -184,7 +184,7 @@ void CaptureTheFlag::updateGraphics(float dt)
     {
         if (m_red_flag->getHolder() != -1)
         {
-            AbstractKart* kart = getKart(m_red_flag->getHolder());
+            Kart* kart = getKart(m_red_flag->getHolder());
             const core::stringw& name = kart->getController()->getName();
             // I18N: Show when a player gets the red flag in CTF
             msg = _("%s has the red flag!", name);
@@ -202,7 +202,7 @@ void CaptureTheFlag::updateGraphics(float dt)
     {
         if (m_blue_flag->getHolder() != -1)
         {
-            AbstractKart* kart = getKart(m_blue_flag->getHolder());
+            Kart* kart = getKart(m_blue_flag->getHolder());
             const core::stringw& name = kart->getController()->getName();
             // I18N: Show when a player gets the blue flag in CTF
             msg = _("%s has the blue flag!", name);
@@ -237,7 +237,7 @@ void CaptureTheFlag::update(int ticks)
         {
             if (it->second == getTicksSinceStart())
             {
-                AbstractKart* kart = m_karts[it->first].get();
+                Kart* kart = m_karts[it->first].get();
                 if (kart->isEliminated() || !kart->isSquashed())
                 {
                     it++;
@@ -323,7 +323,7 @@ void CaptureTheFlag::checkScoring(FlagColor color)
 
     // If a flag is held close enough to the base of the other flag,
     // while the other flag is in base, the flag has been successfully captured.
-    // If the active flag is red (blue), the scoring team is blue (red).
+    // If the active flag is red (blue), the scoring team is blue (red). 
     if (active_flag->getHolder() != -1 && other_flag->isInBase() &&
         (other_flag->getBaseOrigin() - active_flag->getOrigin()).length() <
         g_capture_length)
@@ -333,7 +333,7 @@ void CaptureTheFlag::checkScoring(FlagColor color)
         {
             int active_holder = active_flag->getHolder();
             int new_kart_score = m_scores.at(active_holder) + g_captured_score;
-            int new_red_score  = (red_active) ? m_red_scores      : m_red_scores + 1;
+            int new_red_score  = (red_active) ? m_red_scores      : m_red_scores + 1; 
             int new_blue_score = (red_active) ? m_blue_scores + 1 : m_blue_scores;
             m_scores.at(active_holder) = new_kart_score;
             if (NetworkConfig::get()->isServer())
@@ -349,7 +349,7 @@ void CaptureTheFlag::checkScoring(FlagColor color)
                 STKHost::get()->sendPacketToAllPeers(&p, true);
             }
             ctfScored(active_holder, (red_active) ? false : true /*red_team_scored*/,
-                new_kart_score, new_red_score, new_blue_score);
+                new_kart_score, new_red_score, new_blue_score); 
         }
         m_last_captured_flag_ticks = World::getWorld()->getTicksSinceStart();
         active_flag->resetToBase(RaceManager::get()->getFlagDeactivatedTicks());
@@ -398,7 +398,7 @@ void CaptureTheFlag::ctfScored(int kart_id, bool red_team_scored,
                                int new_blue_score)
 {
     m_scores.at(kart_id) = new_kart_score;
-    AbstractKart* kart = getKart(kart_id);
+    Kart* kart = getKart(kart_id);
     core::stringw scored_msg;
     const core::stringw& name = kart->getController()->getName();
     m_red_scores = new_red_score;
@@ -529,7 +529,7 @@ bool CaptureTheFlag::kartHit(int kart_id, int hitter)
 }   // kartHit
 
 //-----------------------------------------------------------------------------
-unsigned int CaptureTheFlag::getRescuePositionIndex(AbstractKart *kart)
+unsigned int CaptureTheFlag::getRescuePositionIndex(Kart *kart)
 {
     return m_kart_position_map.at(kart->getWorldKartId());
 }   // getRescuePositionIndex
@@ -541,6 +541,23 @@ const std::string& CaptureTheFlag::getIdent() const
 {
     return IDENT_CTF;
 }   // getIdent
+
+// ------------------------------------------------------------------------
+Kart::RaceResultType CaptureTheFlag::getKartCTFResult(unsigned int kart_id) const
+{
+    // In case of a draw, both teams display the neutral animation
+    if (m_red_scores == m_blue_scores)
+        return Kart::RACE_RESULT_AVERAGE;
+
+    bool red_win = m_red_scores > m_blue_scores;
+    KartTeam team = getKartTeam(kart_id);
+
+    if ((red_win && team == KART_TEAM_RED) ||
+        (!red_win && team == KART_TEAM_BLUE))
+        return Kart::RACE_RESULT_GOOD;
+    else // the draw case was already handled, so the other team won
+        return Kart::RACE_RESULT_BAD;
+} // getKartCTFResult
 
 // ----------------------------------------------------------------------------
 void CaptureTheFlag::saveCompleteState(BareNetworkString* bns, STKPeer* peer)

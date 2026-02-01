@@ -298,7 +298,7 @@ void OnlineProfile::deleteRelationalInfo()
  */
 const OnlineProfile::IDList& OnlineProfile::getFriends()
 {
-    assert(m_has_fetched_friends.load()        &&
+    assert(m_has_fetched_friends.load()        && 
            (m_state & S_FETCHING_FRIENDS) == 0);
     return m_friends;
 }    // getFriends
@@ -308,7 +308,7 @@ const OnlineProfile::IDList& OnlineProfile::getFriends()
  */
 const OnlineProfile::IDList& OnlineProfile::getAchievements()
 {
-    assert(m_has_fetched_achievements               &&
+    assert(m_has_fetched_achievements               && 
            (m_state & S_FETCHING_ACHIEVEMENTS) == 0 &&
            !m_is_current_user);
     return m_achievements;

@@ -21,11 +21,11 @@
 
 #include "modes/world_with_rank.hpp"
 #include "states_screens/race_gui_base.hpp"
-#include "karts/abstract_kart.hpp"
+#include "karts/kart.hpp"
 
 #include <string>
 
-class AbstractKart;
+class Kart;
 class BallGoalData;
 class Controller;
 class NetworkString;
@@ -43,7 +43,7 @@ public:
     {
         /** World ID of kart which scores. */
         unsigned int  m_id;
-        /** Whether this goal is socred correctly (identify for own goal). */
+        /** Whether this goal is scored correctly (identify for own goal). */
         bool          m_correct_goal;
         /** Time goal. */
         float         m_time;
@@ -140,7 +140,7 @@ public:
     // overriding World methods
     virtual void reset(bool restart=false) OVERRIDE;
 
-    virtual unsigned int getRescuePositionIndex(AbstractKart *kart) OVERRIDE;
+    virtual unsigned int getRescuePositionIndex(Kart *kart) OVERRIDE;
     virtual btTransform getRescueTransform(unsigned int rescue_pos) const
         OVERRIDE;
     virtual bool useFastMusicNearEnd() const OVERRIDE { return false; }
@@ -162,7 +162,7 @@ public:
     void setBallHitter(unsigned int kart_id);
     // ------------------------------------------------------------------------
     /** Get the soccer result of kart in soccer world (including AIs) */
-    bool getKartSoccerResult(unsigned int kart_id) const;
+    Kart::RaceResultType getKartSoccerResult(unsigned int kart_id) const;
     // ------------------------------------------------------------------------
     int getScore(KartTeam team) const
     {
@@ -246,7 +246,7 @@ public:
         return diff > 0 && diff < stk_config->time2Ticks(3.0f);
     }
     // ------------------------------------------------------------------------
-    AbstractKart* getKartAtDrawingPosition(unsigned int p) const OVERRIDE
+    Kart* getKartAtDrawingPosition(unsigned int p) const OVERRIDE
                                 { return getKart(m_team_icon_draw_id[p - 1]); }
     // ------------------------------------------------------------------------
     TrackObject* getBall() const { return m_ball; }

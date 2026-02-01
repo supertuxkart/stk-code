@@ -48,7 +48,6 @@ public:
     ParticleKind* getParticles(const std::string &name);
 
     bool   isGlobalParticleMaterial(Material* m) const;
-    void   preloadExplosions();
     void   cleanUpTrackSpecificGfx();
     void   cleanup();
 

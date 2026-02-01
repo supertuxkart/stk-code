@@ -24,7 +24,7 @@
 namespace CrashReporting
 {
     void installHandlers();
-    void getCallStack(std::string& callstack);
+    void getCallStack(std::string& callstack); 
 }
 
 

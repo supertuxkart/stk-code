@@ -67,10 +67,6 @@ protected:
      */
     float m_bad_item_closeness_2;
 
-    /** Time for  AI karts to reach full steer angle (used to reduce shaking
-     *   of karts). */
-    float m_time_full_steer;
-
     /** Minimum length of a straight in order to activate a zipper. */
     float m_straight_length_for_zipper;
 
@@ -117,7 +113,7 @@ protected:
         and 5 the best. */
     int m_item_usage_skill;
 
-    /** How the AI uses nitro. 0 correspond to no use ; 1 to immediate use
+    /** How the AI uses nitro. 0 correspond to no use ; 1 to immediate use 
         2 to 4 to various levels of mastery (the AI tries to accumulate a reserve
         and to use bursts whose size/spacing varies according to the level). */
     int m_nitro_usage;

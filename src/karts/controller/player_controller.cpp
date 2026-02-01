@@ -24,10 +24,9 @@
 #include "items/attachment.hpp"
 #include "items/item.hpp"
 #include "items/powerup.hpp"
-#include "karts/abstract_kart.hpp"
+#include "karts/kart.hpp"
 #include "karts/kart_properties.hpp"
 #include "karts/skidding.hpp"
-#include "karts/rescue_animation.hpp"
 #include "modes/world.hpp"
 #include "network/game_setup.hpp"
 #include "network/rewind_manager.hpp"
@@ -43,10 +42,9 @@
 
 #include <cstdlib>
 
-PlayerController::PlayerController(AbstractKart *kart)
+PlayerController::PlayerController(Kart *kart)
                 : Controller(kart)
 {
-    m_penalty_ticks = 0;
 }   // PlayerController
 
 //-----------------------------------------------------------------------------
@@ -67,7 +65,6 @@ void PlayerController::reset()
     m_prev_brake    = 0;
     m_prev_accel    = 0;
     m_prev_nitro    = false;
-    m_penalty_ticks = 0;
 }   // reset
 
 // ----------------------------------------------------------------------------
@@ -195,9 +192,11 @@ bool PlayerController::action(PlayerAction action, int value, bool dry_run)
         // let's consider below that to be a deadzone
         if(value > 32768/2)
         {
+            // If the player wants to stop accelerating or using nitro,
+            // he will stop pressing those keys. We allow to brake
+            // while pressing the acceleration key because this offers
+            // better control.
             SET_OR_TEST_GETTER(Brake, true);
-            SET_OR_TEST_GETTER(Accel, 0.0f);
-            SET_OR_TEST_GETTER(Nitro, false);
         }
         else
         {
@@ -264,52 +263,13 @@ void PlayerController::actionFromNetwork(PlayerAction p_action, int value,
 
 //-----------------------------------------------------------------------------
 /** Handles steering for a player kart.
+ *  Convert the integer steer val
  */
-void PlayerController::steer(int ticks, int steer_val)
+void PlayerController::steer(int steer_val)
 {
-    // Get the old value, compute the new steering value,
-    // and set it at the end of this function
-    float steer = m_controls->getSteer();
-    if(stk_config->m_disable_steer_while_unskid &&
-        m_controls->getSkidControl()==KartControl::SC_NONE &&
-       m_kart->getSkidding()->getVisualSkidRotation()!=0)
-    {
-        steer = 0;
-    }
-
-    // Amount the steering is changed for digital devices.
-    // If the steering is 'back to straight', a different steering
-    // change speed is used.
-    float dt = stk_config->ticks2Time(ticks);
-    const float STEER_CHANGE = ( (steer_val<=0 && steer<0) ||
-                                 (steer_val>=0 && steer>0)   )
-                     ? dt/m_kart->getKartProperties()->getTurnTimeResetSteer()
-                     : dt/m_kart->getTimeFullSteer(fabsf(steer));
-    if (steer_val < 0)
-    {
-        steer += STEER_CHANGE;
-        steer = std::min(steer, -steer_val/32767.0f);
-    }
-    else if(steer_val > 0)
-    {
-        steer -= STEER_CHANGE;
-        steer = std::max(steer, -steer_val/32767.0f);
-    }
-    else
-    {   // no key is pressed
-        if(steer>0.0f)
-        {
-            steer -= STEER_CHANGE;
-            if(steer<0.0f) steer=0.0f;
-        }
-        else
-        {   // steer<=0.0f;
-            steer += STEER_CHANGE;
-            if(steer>0.0f) steer=0.0f;
-        }   // if steer<=0.0f
-    }   // no key is pressed
-    m_controls->setSteer(std::min(1.0f, std::max(-1.0f, steer)) );
-
+    m_controls->setSteer(std::min(1.0f, std::max(-1.0f, -steer_val/32767.0f)) );
+    // If steer_val is 0, there is no input
+    // TODO m_controls->setActiveSteer(steer_val!=0);
 }   // steer
 
 //-----------------------------------------------------------------------------
@@ -326,41 +286,14 @@ void PlayerController::skidBonusTriggered()
  */
 void PlayerController::update(int ticks)
 {
-    steer(ticks, m_steer_val);
-
-    if (World::getWorld()->isStartPhase())
-    {
-        if ((m_controls->getAccel() || m_controls->getBrake()||
-            m_controls->getNitro()) && !NetworkConfig::get()->isNetworking())
-        {
-            // Only give penalty time in READY_PHASE.
-            // Penalty time check makes sure it doesn't get rendered on every
-            // update.
-            if (m_penalty_ticks == 0 &&
-                World::getWorld()->getPhase() == WorldStatus::READY_PHASE)
-            {
-                displayPenaltyWarning();
-            }   // if penalty_time = 0
-            m_controls->setBrake(false);
-        }   // if key pressed
-
-        return;
-    }   // if isStartPhase
-
-    if (m_penalty_ticks != 0 &&
-        World::getWorld()->getTicksSinceStart() < m_penalty_ticks)
-    {
-        m_controls->setBrake(false);
-        m_controls->setAccel(0.0f);
-        return;
-    }
+    steer(m_steer_val);
 
     // Only accept rescue if there is no kart animation is already playing
     // (e.g. if an explosion happens, wait till the explosion is over before
     // starting any other animation).
     if ( m_controls->getRescue() && !m_kart->getKartAnimation() )
     {
-        RescueAnimation::create(m_kart);
+        m_kart->applyRescue(/* auto-rescue */ false);
         m_controls->setRescue(false);
     }
 }   // update
@@ -405,7 +338,7 @@ core::stringw PlayerController::getName(bool include_handicap_string) const
         const RemoteKartInfo& rki = RaceManager::get()->getKartInfo(
             m_kart->getWorldKartId());
         name = rki.getPlayerName();
-        if (include_handicap_string && rki.getHandicap() == HANDICAP_MEDIUM)
+        if (include_handicap_string && rki.getHandicap() != HANDICAP_NONE)
         {
 #ifdef SERVER_ONLY
             name += L" (handicapped)";
@@ -416,9 +349,3 @@ core::stringw PlayerController::getName(bool include_handicap_string) const
     }
     return name;
 }   // getName
-
-// ----------------------------------------------------------------------------
-void PlayerController::displayPenaltyWarning()
-{
-    m_penalty_ticks = stk_config->m_penalty_ticks;
-}   // displayPenaltyWarning

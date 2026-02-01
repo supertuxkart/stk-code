@@ -28,7 +28,7 @@
 #include <ge_main.hpp>
 
 using namespace irr;
-static GLuint generateRTT3D(GLenum target, unsigned int w, unsigned int h,
+static GLuint generateRTT3D(GLenum target, unsigned int w, unsigned int h, 
                             unsigned int d, GLint internalFormat, GLint format,
                             GLint type, unsigned mipmaplevel = 1)
 {

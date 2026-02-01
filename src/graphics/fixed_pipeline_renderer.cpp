@@ -39,10 +39,10 @@ void FixedPipelineRenderer::onUnloadWorld()
 }
 
 void FixedPipelineRenderer::render(float dt, bool is_loading)
-{
+{    
     World *world = World::getWorld(); // Never NULL.
 
-    irr_driver->getVideoDriver()->beginScene(/*backBuffer clear*/ true,
+    irr_driver->getVideoDriver()->beginScene(/*backBuffer clear*/ true, 
                                              /*zBuffer*/ true,
                                              irr_driver->getClearColor());
     

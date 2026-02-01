@@ -25,7 +25,7 @@
 
 #include <vector>
 
-class AbstractKart;
+class Kart;
 
 namespace irr
 {
@@ -57,7 +57,7 @@ private:
     float m_remaining_time;
 
  public:
-           Stars  (AbstractKart *kart);
+           Stars  (Kart *kart);
           ~Stars  ();
     void   showFor(float time);
     void   reset();

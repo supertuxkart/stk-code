@@ -111,11 +111,11 @@ void RaceResultGUI::init()
     unsigned int num_karts = RaceManager::get()->getNumberOfKarts();
     for (unsigned int kart_id = 0; kart_id < num_karts; kart_id++)
     {
-        const AbstractKart *kart = World::getWorld()->getKart(kart_id);
+        const Kart *kart = World::getWorld()->getKart(kart_id);
         if (kart->getController()->isLocalPlayerController())
         {
             has_human_players = true;
-            human_win = human_win && kart->getRaceResult();
+            human_win = human_win && kart->hasGoodResult();
 
             if (RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_FOLLOW_LEADER)
             {
@@ -287,7 +287,7 @@ void RaceResultGUI::enableAllButtons()
         left->setLabel(_("Back to main menu"));
         left->setImage("gui/icons/back.png");
         left->setVisible(true);
-        return;
+        return;        
     }
 
     // If we're in a network world, change the buttons text
@@ -774,7 +774,7 @@ void RaceResultGUI::drawCTFScorers(KartTeam team, int x, int y, int height)
     const unsigned num_karts = ctf->getNumKarts();
     for (unsigned int i = 0; i < num_karts; i++)
     {
-        AbstractKart* kart = ctf->getKartAtPosition(i + 1);
+        Kart* kart = ctf->getKartAtPosition(i + 1);
         unsigned kart_id = kart->getWorldKartId();
         if (ctf->getKartTeam(kart_id) != team)
             continue;
@@ -886,7 +886,7 @@ void RaceResultGUI::determineTableLayout()
     for (unsigned int position = first_position;
         position <= RaceManager::get()->getNumberOfKarts() - sta; position++)
     {
-        const AbstractKart *kart = rank_world->getKartAtPosition(position);
+        const Kart *kart = rank_world->getKartAtPosition(position);
 
         if (ffa && kart->isEliminated())
             continue;
@@ -1350,7 +1350,7 @@ void RaceResultGUI::determineGPLayout()
         // In case of FTL mode: ignore the leader
         if (rank < 0) continue;
         old_rank[kart_id] = rank;
-        const AbstractKart *kart = World::getWorld()->getKart(kart_id);
+        const Kart *kart = World::getWorld()->getKart(kart_id);
         RowInfo *ri = &(m_all_row_infos[rank]);
         ri->m_kart_icon =
             kart->getKartProperties()->getIconMaterial()->getTexture();
@@ -1635,7 +1635,7 @@ void RaceResultGUI::drawTeamScorers(KartTeam team, int x, int y, int height)
         const bool own_goal = !(scorers.at(i).m_correct_goal);
 
         scorer_text = scorers.at(i).m_player;
-        if (scorers.at(i).m_handicap_level == HANDICAP_MEDIUM)
+        if (scorers.at(i).m_handicap_level != HANDICAP_NONE)
             scorer_text = _("%s (handicapped)", scorer_text);
 
         if (own_goal)
@@ -1899,12 +1899,12 @@ void RaceResultGUI::displayPostRaceInfo()
     
     int size_esti_real = size_esti * m_distance_between_meta_rows;
 
-    int current_y = displayHighscores(x, y,
+    int current_y = displayHighscores(x, y, 
                         size_esti_real > UserConfigParams::m_height * 0.7f);
 
     // Display the number of laps, difficulty, and the best lap time if applicable
     if (!RaceManager::get()->isSoccerMode())
-        current_y = displayLapDifficulty(x, current_y,
+        current_y = displayLapDifficulty(x, current_y, 
                         size_esti_real > UserConfigParams::m_height * 0.8f);
 
     // Display challenge result and goals
@@ -2181,7 +2181,7 @@ int RaceResultGUI::displayChallengeInfo(int x, int y, bool increase_density)
     video::SColor gp_neutral_color = video::SColor(255, 255, 255, 0);
     video::SColor lose_color = video::SColor(255, 255, 0, 0);
     video::SColor special_color = video::SColor(255, 0, 255, 255);
-    AbstractKart* kart = World::getWorld()->getPlayerKart(0);
+    Kart* kart = World::getWorld()->getPlayerKart(0);
     bool lose_all = false;
     bool position_passed = false;
     bool time_passed = false;
@@ -2276,11 +2276,11 @@ int RaceResultGUI::displayChallengeInfo(int x, int y, bool increase_density)
         text_string = _("Reached Requirements of SuperTux");
         the_font->initGlyphLayouts(text_string,
                                    best_while_slower_layout);
-        irr::gui::breakGlyphLayouts(best_while_slower_layout,
+        irr::gui::breakGlyphLayouts(best_while_slower_layout, 
                                     UserConfigParams::m_width * 0.93f - x,
                                     the_font->getInverseShaping(),
                                     the_font->getScale());
-        irr::core::dimension2du dim =
+        irr::core::dimension2du dim = 
             irr::gui::getGlyphLayoutsDimension(best_while_slower_layout,
                                                line_height,
                                                the_font->getInverseShaping(),
@@ -2355,28 +2355,24 @@ void RaceResultGUI::displayBenchmarkSummary()
     font = GUIEngine::getFont();
     rect = font->getDimension(title_text.c_str());
 
-    core::stringw info_text[11];
+    core::stringw info_text[9];
     core::stringw value = StringUtils::toWString(
         StringUtils::timeToString(float(profiler.getTotalFrametime())/1000000.0f, 2, true));
-    info_text[0] = _("Test duration: %s",         value);
+    info_text[0] = _("Test duration: %s",     value);
     value = StringUtils::toWString(profiler.getTotalFrames());
-    info_text[1] = _("Number of frames: %s",      value);
-    value = StringUtils::toWString(UserConfigParams::m_real_width);
-    info_text[2] = _("Horizontal resolution: %s", value);
-    value = StringUtils::toWString(UserConfigParams::m_real_height);
-    info_text[3] = _("Vertical resolution: %s",   value);
+    info_text[1] = _("Number of frames: %s",  value);
     value = StringUtils::toWString(profiler.getFPSMetricsLow());
-    info_text[4] = _("Steady FPS: %s",            value);
+    info_text[2] = _("Steady FPS: %s",        value);
     value = StringUtils::toWString(profiler.getFPSMetricsMid());
-    info_text[5] = _("Mostly Steady FPS: %s",     value); // TODO - better name
+    info_text[3] = _("Mostly Steady FPS: %s", value); // TODO - better name
     value = StringUtils::toWString(profiler.getFPSMetricsHigh());
-    info_text[6] = _("Typical FPS: %s",           value);
+    info_text[4] = _("Typical FPS: %s",       value);
 
-    for (int i=0; i<7; i++)
+    for (int i=0; i<5; i++)
     {
         pos = core::rect<s32>(current_x, current_y, current_x, current_y);
         font->draw(info_text[i].c_str(), pos, white_color, true, false);
-        current_y += (5 * rect.Height) / 4;
+        current_y += (5 * rect.Height) / 4;       
     }
 
     // Draw info on the graphical settings
@@ -2392,42 +2388,31 @@ void RaceResultGUI::displayBenchmarkSummary()
     bool modern_gl = gl && !UserConfigParams::m_force_legacy_device;
     bool directx = (std::string(UserConfigParams::m_render_driver) == "directx9");
 
+    value = StringUtils::toWString(UserConfigParams::m_real_width);
+    info_text[0] = _("Horizontal resolution: %s",     value);
+    value = StringUtils::toWString(UserConfigParams::m_real_height);
+    info_text[1] = _("Vertical resolution: %s",  value);
+    info_text[2] = (UserConfigParams::m_dynamic_lights && (modern_gl || vk)) ? _("Dynamic lighting: ON")
+                                                                             : _("Dynamic lighting: OFF");
     value = StringUtils::toWString((UserConfigParams::m_dynamic_lights && (modern_gl || vk)) ?
                           UserConfigParams::m_scale_rtts_factor * 100 : 100);
-    info_text[0] = _("Render resolution: %s%%", value);
-    info_text[1] = (UserConfigParams::m_dynamic_lights && (modern_gl || vk)) ? _("Dynamic lights: Enabled") :
-                                                                               _("Dynamic lights: Disabled");
-    info_text[2] = (!UserConfigParams::m_degraded_IBL && (modern_gl || vk)) ? _("Image-based lighting: Enabled") :
-                                                                              _("Image-based lighting: Disabled");
-    info_text[3] = (UserConfigParams::m_mlaa && modern_gl) ? _("Anti-aliasing: Enabled") :
-                                                             _("Anti-aliasing: Disabled");
-    int geometry_detail = UserConfigParams::m_geometry_level;
-    info_text[4] = _("Geometry detail: %s",
-        geometry_detail == 0 ? _C("Geometry level", "Very low")  :
-        geometry_detail == 1 ? _C("Geometry level", "Low")       :
-        geometry_detail == 2 ? _C("Geometry level", "Medium")    :
-        geometry_detail == 3 ? _C("Geometry level", "High")      :
-        geometry_detail == 4 ? _C("Geometry level", "Very high") :
-                               _C("Geometry level", "Ultra high"));
-    info_text[5] = (UserConfigParams::m_light_shaft && modern_gl) ? _("Light shaft (God rays): Enabled") :
-                                                                    _("Light shaft (God rays): Disabled");
-    info_text[6] = (UserConfigParams::m_ssao && modern_gl) ?  _("Ambient occlusion: Enabled") :
-                                                              _("Ambient occlusion: Disabled");
+    info_text[3] = _("Render resolution: %s%%", value);
+    info_text[4] = (UserConfigParams::m_mlaa && modern_gl) ? _("Anti-aliasing: ON")
+                                                           : _("Anti-aliasing : OFF");
+    info_text[5] = (UserConfigParams::m_degraded_IBL && (modern_gl || vk)) ? _("Image-based lighting: OFF")
+                                                                           :  _("Image-based lighting: ON");
+    info_text[6] = (UserConfigParams::m_ssao && modern_gl) ? _("Ambient occlusion: ON")
+                                                           : _("Ambient occlusion: OFF");
     value = StringUtils::toWString(UserConfigParams::m_shadows_resolution);
     value = modern_gl ? value : StringUtils::toWString("0");
     info_text[7] = _("Shadow resolution: %s", value);
-    bool has_pcss = (UserConfigParams::m_shadows_resolution > 0 && UserConfigParams::m_pcss && modern_gl);
-    info_text[8] = has_pcss ? _("Soft shadows: Enabled") :
-                              _("Soft shadows: Disabled");
-    info_text[9] = UserConfigParams::m_dof ? _("Depth of field: Enabled") :
-                                              _("Depth of field: Disabled");
     value = vk        ? StringUtils::toWString("Vulkan")    :
-            modern_gl ? _("OpenGL (modern)")                :
-            gl        ? _("OpenGL (legacy)")                :
+            modern_gl ? StringUtils::toWString("OpenGL")    :
+            gl        ? StringUtils::toWString("OpenGL 2")  : 
             directx   ? StringUtils::toWString("DirectX 9") : _("Unknown");
-    info_text[10] = value;
+    info_text[8] = value;
 
-    for (int i = 0; i < 11; i++)
+    for (int i = 0; i < 9; i++)
     {
         pos = core::rect<s32>(current_x, current_y, current_x, current_y);
         font->draw(info_text[i].c_str(), pos, white_color, true, false);

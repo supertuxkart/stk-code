@@ -22,7 +22,7 @@
 #include "config/user_config.hpp"
 #include "items/network_item_manager.hpp"
 #include "items/powerup_manager.hpp"
-#include "karts/abstract_kart.hpp"
+#include "karts/kart.hpp"
 #include "karts/controller/player_controller.hpp"
 #include "karts/kart_properties.hpp"
 #include "karts/kart_properties_manager.hpp"
@@ -106,12 +106,12 @@ public:
 
 /** This is the central game setup protocol running in the server. It is
  *  mostly a finite state machine. Note that all nodes in ellipses and light
- *  grey background are actual states; nodes in boxes and white background
+ *  grey background are actual states; nodes in boxes and white background 
  *  are functions triggered from a state or triggering potentially a state
  *  change.
  \dot
  digraph interaction {
- node [shape=box]; "Server Constructor"; "playerTrackVote"; "connectionRequested";
+ node [shape=box]; "Server Constructor"; "playerTrackVote"; "connectionRequested"; 
                    "signalRaceStartToClients"; "startedRaceOnClient"; "loadWorld";
  node [shape=ellipse,style=filled,color=lightgrey];
 
@@ -127,7 +127,7 @@ public:
  "playerTrackVote" -> "SELECTING" [label="Not all clients have selected"]
  "playerTrackVote" -> "LOAD_WORLD" [label="All clients have selected; signal load_world to clients"]
  "LOAD_WORLD" -> "loadWorld"
- "loadWorld" -> "WAIT_FOR_WORLD_LOADED"
+ "loadWorld" -> "WAIT_FOR_WORLD_LOADED" 
  "WAIT_FOR_WORLD_LOADED" -> "WAIT_FOR_WORLD_LOADED" [label="Client or server loaded world"]
  "WAIT_FOR_WORLD_LOADED" -> "signalRaceStartToClients" [label="All clients and server ready"]
  "signalRaceStartToClients" -> "WAIT_FOR_RACE_STARTED"
@@ -411,7 +411,7 @@ void ServerLobby::setup()
 
     m_server_has_loaded_world.store(false);
 
-    // Initialise the data structures to detect if all clients and
+    // Initialise the data structures to detect if all clients and 
     // the server are ready:
     resetPeersReady();
     m_timeout.store(std::numeric_limits<int64_t>::max());
@@ -1171,7 +1171,7 @@ bool ServerLobby::canLiveJoinNow() const
         LinearWorld* w = dynamic_cast<LinearWorld*>(World::getWorld());
         if (!w)
             return false;
-        AbstractKart* fastest_kart = NULL;
+        Kart* fastest_kart = NULL;
         for (unsigned i = 0; i < w->getNumKarts(); i++)
         {
             fastest_kart = w->getKartAtPosition(i + 1);
@@ -1703,7 +1703,7 @@ void ServerLobby::update(int ticks)
 //-----------------------------------------------------------------------------
 /** Register this server (i.e. its public address) with the STK server
  *  so that clients can find it. It blocks till a response from the
- *  stk server is received (this function is executed from the
+ *  stk server is received (this function is executed from the 
  *  ProtocolManager thread). The information about this client is added
  *  to the table 'server'.
  */
@@ -2342,7 +2342,7 @@ void ServerLobby::checkRaceFinished()
                 player->setOverallTime(overall_time);
             }
             m_result_ns->addUInt32(last_score).addUInt32(cur_score)
-                .addFloat(overall_time);
+                .addFloat(overall_time);            
         }
     }
     else if (RaceManager::get()->modeHasLaps())
@@ -3057,7 +3057,7 @@ void ServerLobby::updatePlayerList(bool update_when_reset_server)
             profile_name = StringUtils::utf32ToWide({ 0x1F4F1 }) + profile_name;
 
         // Add an hourglass emoji for players waiting because of the player limit
-        if (spectators_by_limit.find(profile->getPeer()) != spectators_by_limit.end())
+        if (spectators_by_limit.find(profile->getPeer()) != spectators_by_limit.end()) 
             profile_name = StringUtils::utf32ToWide({ 0x231B }) + profile_name;
 
         pl->addUInt32(profile->getHostId()).addUInt32(profile->getOnlineId())
@@ -3309,7 +3309,7 @@ bool ServerLobby::handleAllVotes(PeerVote* winner_vote,
         return false;
     }
 
-    // Count number of players
+    // Count number of players 
     float cur_players = 0.0f;
     auto peers = STKHost::get()->getPeers();
     for (auto peer : peers)
@@ -3877,12 +3877,17 @@ void ServerLobby::listBanTable()
 }   // listBanTable
 
 //-----------------------------------------------------------------------------
-float ServerLobby::getStartupBoostOrPenaltyForKart(uint32_t ping,
+// FIXME : This shouldn't be in ServerLobby!!!
+uint8_t ServerLobby::getStartupBoostOrPenaltyForKart(uint32_t ping,
                                                    unsigned kart_id)
 {
-    AbstractKart* k = World::getWorld()->getKart(kart_id);
-    if (k->getStartupBoost() != 0.0f)
-        return k->getStartupBoost();
+    // boost-level 0 corresponds to a start penalty
+    // boost-level 1 corresponds to a start without boost or penalty
+    // boost-level 2 or more corresponds to a start with boost
+    Kart* k = World::getWorld()->getKart(kart_id);
+    // If a boost already exists, return it
+    if (k->getStartupBoostLevel() >= 2)
+        return k->getStartupBoostLevel();
     uint64_t now = STKHost::get()->getNetworkTimer();
     uint64_t client_time = now - ping / 2;
     uint64_t server_time = client_time + m_server_delay;
@@ -3890,14 +3895,11 @@ float ServerLobby::getStartupBoostOrPenaltyForKart(uint32_t ping,
         (float)(server_time - m_server_started_at) / 1000.0f);
     if (ticks < stk_config->time2Ticks(1.0f))
     {
-        PlayerController* pc =
-            dynamic_cast<PlayerController*>(k->getController());
-        pc->displayPenaltyWarning();
-        return -1.0f;
+        k->enablePenaltyTicks();
+        return 0; // Penalty
     }
-    float f = k->getStartupBoostFromStartTicks(ticks);
-    k->setStartupBoost(f);
-    return f;
+    k->setStartupBoostFromStartTicks(ticks);
+    return k->getStartupBoostLevel();
 }   // getStartupBoostOrPenaltyForKart
 
 //-----------------------------------------------------------------------------
@@ -4078,7 +4080,7 @@ void ServerLobby::handlePlayerDisconnection() const
         else
             rki.makeReserved();
 
-        AbstractKart* k = World::getWorld()->getKart(i);
+        Kart* k = World::getWorld()->getKart(i);
         if (!k->isEliminated() && !k->hasFinishedRace())
         {
             CaptureTheFlag* ctf = dynamic_cast<CaptureTheFlag*>
@@ -4237,7 +4239,7 @@ void ServerLobby::handleKartInfo(Event* event)
     if (kart_id > RaceManager::get()->getNumPlayers())
         return;
 
-    AbstractKart* k = w->getKart(kart_id);
+    Kart* k = w->getKart(kart_id);
     int live_join_util_ticks = k->getLiveJoinUntilTicks();
 
     const RemoteKartInfo& rki = RaceManager::get()->getKartInfo(kart_id);

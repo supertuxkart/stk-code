@@ -90,7 +90,7 @@ public:
         return 0;
     }   // getNumberOfRescuePositions
     // ------------------------------------------------------------------------
-    virtual unsigned int getRescuePositionIndex(AbstractKart *kart) OVERRIDE
+    virtual unsigned int getRescuePositionIndex(Kart *kart) OVERRIDE
     {
         return 0;
     }   // getRescuePositionIndex

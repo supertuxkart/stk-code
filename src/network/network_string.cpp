@@ -109,7 +109,7 @@ int BareNetworkString::decodeString(std::string *out) const
 }    // decodeString
 
 // ----------------------------------------------------------------------------
-/** Returns an irrlicht wide string from the utf8 encoded string at the
+/** Returns an irrlicht wide string from the utf8 encoded string at the 
  *  given position.
  *  \param[out] out The decoded string.
  *  \return number of bytes read. If there are no special characters in the
@@ -204,12 +204,12 @@ std::string BareNetworkString::getLogMessage(const std::string &indent) const
     std::ostringstream oss;
     for(unsigned int line=0; line<m_buffer.size(); line+=16)
     {
-        oss << "0x" << std::hex << std::setw(3) << std::setfill('0')
+        oss << "0x" << std::hex << std::setw(3) << std::setfill('0') 
             << line << " | ";
         unsigned int upper_limit = std::min(line+16, (unsigned int)m_buffer.size());
         for(unsigned int i=line; i<upper_limit; i++)
         {
-            oss << std::hex << std::setfill('0') << std::setw(2)
+            oss << std::hex << std::setfill('0') << std::setw(2) 
                 << int(m_buffer[i])<< ' ';
             if(i%8==7) oss << " ";
         }   // for i

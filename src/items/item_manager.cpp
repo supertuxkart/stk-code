@@ -25,7 +25,7 @@
 #include "graphics/material_manager.hpp"
 #include "graphics/sp/sp_base.hpp"
 #include "io/file_manager.hpp"
-#include "karts/abstract_kart.hpp"
+#include "karts/kart.hpp"
 #include "karts/controller/spare_tire_ai.hpp"
 #include "modes/easter_egg_hunt.hpp"
 #include "modes/profile_world.hpp"
@@ -48,6 +48,7 @@
 
 std::vector<scene::IMesh *>  ItemManager::m_item_mesh;
 std::vector<scene::IMesh *>  ItemManager::m_item_lowres_mesh;
+std::vector<float>           ItemManager::m_collect_distance_squared;
 std::vector<video::SColorf>  ItemManager::m_glow_color;
 std::vector<std::string>     ItemManager::m_icon;
 bool                         ItemManager::m_disable_item_collection = false;
@@ -61,24 +62,29 @@ void ItemManager::loadDefaultItemMeshes()
 {
     m_item_mesh.clear();
     m_item_lowres_mesh.clear();
+    m_collect_distance_squared.clear();
     m_glow_color.clear();
     m_icon.clear();
+
     m_item_mesh.resize(ItemState::ITEM_LAST-ItemState::ITEM_FIRST+1, NULL);
+    m_item_lowres_mesh.resize(ItemState::ITEM_LAST-ItemState::ITEM_FIRST+1, NULL);
+    m_collect_distance_squared.resize(ItemState::ITEM_LAST-ItemState::ITEM_FIRST+1, 0.0f);
     m_glow_color.resize(ItemState::ITEM_LAST-ItemState::ITEM_FIRST+1,
                         video::SColorf(255.0f, 255.0f, 255.0f) );
     m_icon.resize(ItemState::ITEM_LAST-ItemState::ITEM_FIRST+1, "");
 
-    m_item_lowres_mesh.resize(ItemState::ITEM_LAST-ItemState::ITEM_FIRST+1, NULL);
-
     // A temporary mapping of items to names used in the XML file:
     std::map<ItemState::ItemType, std::string> item_names;
-    item_names[ItemState::ITEM_BANANA     ] = "banana";
-    item_names[ItemState::ITEM_BONUS_BOX  ] = "bonus-box";
-    item_names[ItemState::ITEM_BUBBLEGUM  ] = "bubblegum";
-    item_names[ItemState::ITEM_NITRO_BIG  ] = "nitro-big";
-    item_names[ItemState::ITEM_NITRO_SMALL] = "nitro-small";
+    item_names[ItemState::ITEM_BANANA         ] = "banana";
+    item_names[ItemState::ITEM_BONUS_BOX      ] = "bonus-box";
+    item_names[ItemState::ITEM_NITRO_BIG      ] = "nitro-big";
+    item_names[ItemState::ITEM_NITRO_SMALL    ] = "nitro-small";
+    item_names[ItemState::ITEM_NITRO_AIR      ] = "nitro-air";
+    item_names[ItemState::ITEM_BUBBLEGUM      ] = "bubblegum";
     item_names[ItemState::ITEM_BUBBLEGUM_NOLOK] = "bubblegum-nolok";
-    item_names[ItemState::ITEM_EASTER_EGG ] = "easter-egg";
+    item_names[ItemState::ITEM_BUBBLEGUM_SMALL] = "bubblegum-small";
+    item_names[ItemState::ITEM_BUBBLEGUM_SMALL_NOLOK] = "bubblegum-small-nolok";
+    item_names[ItemState::ITEM_EASTER_EGG     ] = "easter-egg";
 
     const std::string file_name = file_manager->getAsset("items.xml");
     const XMLNode *root         = file_manager->createXMLTree(file_name);
@@ -98,6 +104,7 @@ void ItemManager::loadDefaultItemMeshes()
                         "- aborting", name.c_str());
             exit(-1);
         }
+
 #ifndef SERVER_ONLY
         SP::uploadSPM(mesh);
 #endif
@@ -118,6 +125,10 @@ void ItemManager::loadDefaultItemMeshes()
 #endif
             m_item_lowres_mesh[i]->grab();
         }
+        // Load the collect distance information for this item
+        node->get("collect-distance-squared", &m_collect_distance_squared[i]);
+
+        // Load icons (?? where are these icons used ??)
         std::string icon = "icon-" + item_names[(ItemState::ItemType)i] + ".png";
         if (preloadIcon(icon))
             m_icon[i] = icon;
@@ -279,7 +290,7 @@ void ItemManager::insertItemInQuad(Item *item)
  *  \param server_normal The normal as seen on the server.
  */
 Item* ItemManager::dropNewItem(ItemState::ItemType type,
-                               const AbstractKart *kart,
+                               const Kart *kart,
                                const Vec3 *server_xyz,
                                const Vec3 *server_normal)
 {
@@ -300,7 +311,7 @@ Item* ItemManager::dropNewItem(ItemState::ItemType type,
 
         // We will get no material if the kart is 'over nothing' when dropping
         // the bubble gum. In most cases this means that the item does not need
-        // to be created (and we just return NULL).
+        // to be created (and we just return NULL). 
         if (!material_hit) return NULL;
         normal.normalize();
         pos = hit_point + kart->getTrans().getBasis() * Vec3(0, -0.05f, 0);
@@ -313,11 +324,14 @@ Item* ItemManager::dropNewItem(ItemState::ItemType type,
         pos    = *server_xyz;
     }
 
+    // TODO : determine if simplifications are possible here
+    //        Nolok gums being of the correct type depend on
+    //        getGraphicalType
     ItemState::ItemType mesh_type = type;
     if (type == ItemState::ITEM_BUBBLEGUM && kart->getIdent() == "nolok")
-    {
         mesh_type = ItemState::ITEM_BUBBLEGUM_NOLOK;
-    }
+    if (type == ItemState::ITEM_BUBBLEGUM_SMALL && kart->getIdent() == "nolok")
+        mesh_type = ItemState::ITEM_BUBBLEGUM_SMALL_NOLOK;
 
     Item* item = new Item(type, pos, normal, m_item_mesh[mesh_type],
                           m_item_lowres_mesh[mesh_type], m_icon[mesh_type],
@@ -372,7 +386,7 @@ Item* ItemManager::placeItem(ItemState::ItemType type, const Vec3& xyz,
  *  \param item The item that was collected.
  *  \param kart The kart that collected the item.
  */
-void ItemManager::collectedItem(ItemState *item, AbstractKart *kart)
+void ItemManager::collectedItem(ItemState *item, Kart *kart)
 {
     assert(item);
     item->collected(kart);
@@ -386,7 +400,7 @@ void ItemManager::collectedItem(ItemState *item, AbstractKart *kart)
  *  collectedItem if an item was collected.
  *  \param kart Pointer to the kart.
  */
-void  ItemManager::checkItemHit(AbstractKart* kart)
+void  ItemManager::checkItemHit(Kart* kart)
 {
     // We could use m_items_in_quads to to check for item hits: take the quad
     // of the graph node of the kart, and only check items in that quad. But
@@ -409,14 +423,11 @@ void  ItemManager::checkItemHit(AbstractKart* kart)
         // Ignore items that have been collected or are not available atm
         if ((!*i) || !(*i)->isAvailable() || (*i)->isUsedUp()) continue;
 
-        // Shielded karts can simply drive over bubble gums without any effect
-        if ( kart->isShielded() &&
-             ( (*i)->getType() == ItemState::ITEM_BUBBLEGUM      ||
-               (*i)->getType() == ItemState::ITEM_BUBBLEGUM_NOLOK  ) )
+        // Gum-Shielded karts can simply drive over bubble gums without any effect
+        if ( kart->isGumShielded() && (*i)->isBubblegum() )
         {
             continue;
         }
-
 
         // To allow inlining and avoid including kart.hpp in item.hpp,
         // we pass the kart and the position separately.

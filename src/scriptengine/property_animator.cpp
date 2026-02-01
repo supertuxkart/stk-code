@@ -20,7 +20,7 @@
 #include "tracks/track_object_presentation.hpp"
 #include "utils/log.hpp"
 
-AnimatedProperty::AnimatedProperty(AnimatablePropery property,
+AnimatedProperty::AnimatedProperty(AnimatablePropery property, 
     int values_count, double* values_from, double* values_to,
     double duration, void* data)
 {

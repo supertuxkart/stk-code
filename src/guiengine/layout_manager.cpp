@@ -69,7 +69,7 @@ bool LayoutManager::convertToCoord(std::string& x, int* absolute /* out */, int*
     else if( x[x.size()-1] == 'f' ) // font height
     {
         *absolute = i * GUIEngine::getFontHeight();
-        return true;
+    	return true;
     }
     else // absolute number
     {

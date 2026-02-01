@@ -81,7 +81,7 @@ private:
     friend class CameraDebug;
     friend class CameraEnd;
              CameraNormal(Camera::CameraType type, int camera_index,
-                          AbstractKart* kart);
+                          Kart* kart);
     virtual ~CameraNormal() {}
 public:
 
@@ -108,7 +108,7 @@ public:
     // ------------------------------------------------------------------------
     // clean all TV camera
     static void clearTVCameras();
-    // ------------------------------------------------------------------------
+    // ------------------------------------------------------------------------    
     // Returns true if at least one TV camera was loaded
     static bool hasTVCameras() { return !m_tv_cameras.empty(); }
 

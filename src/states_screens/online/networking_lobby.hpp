@@ -33,7 +33,7 @@ enum KartTeam : int8_t;
 struct LobbyPlayer;
 
 namespace GUIEngine
-{
+{ 
     class ButtonWidget;
     class LabelWidget;
     class ListWidget;

@@ -45,7 +45,7 @@ using namespace irr::gui;
 using namespace Online;
 
 
-OnlineProfileBase::OnlineProfileBase(const std::string &filename)
+OnlineProfileBase::OnlineProfileBase(const std::string &filename) 
                  : Screen(filename.c_str())
 {
     m_friends_tab = NULL;

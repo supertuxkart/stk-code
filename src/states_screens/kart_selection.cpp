@@ -331,11 +331,11 @@ void KartSelectionScreen::beforeAddingWidget()
     //I18N: kart group name
     FOR_GETTEXT_ONLY( _("Add-Ons") )
     //I18N: kart class name
-    FOR_GETTEXT_ONLY( _C("Kart class", "Light") )
+    FOR_GETTEXT_ONLY( _("Light") )
     //I18N: kart class name
-    FOR_GETTEXT_ONLY( _C("Kart class", "Medium") )
+    FOR_GETTEXT_ONLY( _("Medium") )
     //I18N: kart class name
-    FOR_GETTEXT_ONLY( _C("Kart class", "Heavy") )
+    FOR_GETTEXT_ONLY( _("Heavy") )
 
 
     // Add other groups after
@@ -362,9 +362,9 @@ void KartSelectionScreen::beforeAddingWidget()
         {
             class_str[0] += 'A' - 'a';
         }
-        kart_class->addLabel(_C("Kart class", class_str.c_str()));
+        kart_class->addLabel(_(class_str.c_str()));
     }
-    kart_class->addLabel(_C("Kart class", "All"));
+    kart_class->addLabel(_("All"));
 }   // beforeAddingWidget
 
 // ----------------------------------------------------------------------------
@@ -997,8 +997,8 @@ void KartSelectionScreen::updateKartWidgetModel(int widget_id,
         file_manager->pushTextureSearchPath
             (file_manager->getAsset(FileManager::MODEL,""), "models");
         w3->addModel(irr_driver->getAnimatedMesh(
-            file_manager->getAsset(FileManager::MODEL, "chest.spm"))
-            ->getMesh(20), model_location);
+            file_manager->getAsset(FileManager::MODEL, "chest.spm")),
+            model_location, 20, 20, 20, 0);
         file_manager->popTextureSearchPath();
         w3->update(0);
 
@@ -1015,69 +1015,10 @@ void KartSelectionScreen::updateKartWidgetModel(int widget_id,
     }
     else
     {
-        const KartProperties *kp =
-            kart_properties_manager->getKart(selection);
+        const KartProperties *kp = kart_properties_manager->getKart(selection);
         if (kp != NULL)
         {
-            const KartModel &kart_model = kp->getMasterKartModel();
-
-            float scale = 35.0f;
-            if (kart_model.getLength() > 1.45f)
-            {
-                // if kart is too long, size it down a bit so that it fits
-                scale = 30.0f;
-            }
-
-            core::matrix4 model_location;
-            model_location.setScale(core::vector3df(scale, scale, scale));
-            w3->clearModels();
-            const bool has_win_anime =
-                UserConfigParams::m_animated_characters &&
-                (((kart_model.getFrame(KartModel::AF_WIN_LOOP_START) > -1 ||
-                kart_model.getFrame(KartModel::AF_WIN_START) > -1) &&
-                kart_model.getFrame(KartModel::AF_WIN_END) > -1) ||
-                (kart_model.getFrame(KartModel::AF_SELECTION_START) > -1 &&
-                kart_model.getFrame(KartModel::AF_SELECTION_END) > -1));
-            w3->addModel( kart_model.getModel(), model_location,
-                has_win_anime ?
-                kart_model.getFrame(KartModel::AF_SELECTION_START) > -1 ?
-                kart_model.getFrame(KartModel::AF_SELECTION_START) :
-                kart_model.getFrame(KartModel::AF_WIN_LOOP_START) > -1 ?
-                kart_model.getFrame(KartModel::AF_WIN_LOOP_START) :
-                kart_model.getFrame(KartModel::AF_WIN_START) :
-                kart_model.getBaseFrame(),
-                has_win_anime ?
-                kart_model.getFrame(KartModel::AF_SELECTION_END) > -1 ?
-                kart_model.getFrame(KartModel::AF_SELECTION_END) :
-                kart_model.getFrame(KartModel::AF_WIN_END) :
-                kart_model.getBaseFrame(),
-                kart_model.getAnimationSpeed());
-
-            w3->getModelViewRenderInfo()->setHue(kart_color);
-            model_location.setScale(core::vector3df(1.0f, 1.0f, 1.0f));
-            for (unsigned i = 0; i < 4; i++)
-            {
-                model_location.setTranslation(kart_model
-                    .getWheelGraphicsPosition(i).toIrrVector());
-                w3->addModel(kart_model.getWheelModel(i), model_location);
-            }
-
-            for (unsigned i = 0;
-                 i < kart_model.getSpeedWeightedObjectsCount(); i++)
-            {
-                const SpeedWeightedObject& obj =
-                    kart_model.getSpeedWeightedObject(i);
-                core::matrix4 swol = obj.m_location;
-                if (!obj.m_bone_name.empty())
-                {
-                    core::matrix4 inv =
-                        kart_model.getInverseBoneMatrix(obj.m_bone_name);
-                    swol = inv * obj.m_location;
-                }
-                w3->addModel(obj.m_model, swol, -1, -1, 0.0f, obj.m_bone_name);
-            }
-            //w3->update(0);
-
+            m_kart_widgets[widget_id].setupKartModel(kp),
             m_kart_widgets[widget_id].m_kart_name
                 ->setText( selectionText.c_str(), false );
         }
@@ -1263,7 +1204,7 @@ bool KartSelectionScreen::onEscapePressed()
 
 // ----------------------------------------------------------------------------
 
-void KartSelectionScreen::onFocusChanged(GUIEngine::Widget* previous,
+void KartSelectionScreen::onFocusChanged(GUIEngine::Widget* previous, 
                                          GUIEngine::Widget* focus, int playerID)
 {
     if (playerID == PLAYER_ID_GAME_MASTER || !previous || !focus)
@@ -1409,15 +1350,15 @@ void KartSelectionScreen::allPlayersDone()
         RaceManager::get()->setPlayerKart(n, selected_kart);
 
         // Set handicap if needed
-        if (m_multiplayer && UserConfigParams::m_per_player_difficulty)
+        if (UserConfigParams::m_per_player_difficulty)
             RaceManager::get()->setPlayerHandicap(n, m_kart_widgets[n].getHandicap());
     }
 
     // ---- Switch to assign mode
     input_manager->getDeviceManager()->setAssignMode(ASSIGN);
 
-    StateManager::ActivePlayer *ap = m_multiplayer
-                                   ? NULL
+    StateManager::ActivePlayer *ap = m_multiplayer 
+                                   ? NULL 
                                    : StateManager::get()->getActivePlayer(0);
     input_manager->getDeviceManager()->setSinglePlayer(ap);
 
@@ -1518,8 +1459,6 @@ bool KartSelectionScreen::validateIdentChoices()
             if (m_multiplayer)
             {
                 int spinner_value = m_kart_widgets[n].m_player_ident_spinner->getValue();
-                if (UserConfigParams::m_per_player_difficulty)
-                    spinner_value /= 2;
                 assert(m_kart_widgets[n].getAssociatedPlayer()->getProfile() ==
                     PlayerManager::get()->getPlayer(spinner_value));
             }

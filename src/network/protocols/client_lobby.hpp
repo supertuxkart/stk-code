@@ -71,7 +71,7 @@ private:
     // race votes
     void receivePlayerVote(Event* event);
     void updatePlayerList(Event* event);
-    void handleChat(Event* event, bool command_answer=false);
+    void handleChat(Event* event);
     void handleServerInfo(Event* event);
     void reportSuccess(Event* event);
     void handleBadTeam();

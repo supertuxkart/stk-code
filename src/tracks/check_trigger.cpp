@@ -16,7 +16,7 @@
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include "tracks/check_trigger.hpp"
-#include "karts/abstract_kart.hpp"
+#include "karts/kart.hpp"
 #include "modes/world.hpp"
 #include "utils/time.hpp"
 
@@ -45,7 +45,7 @@ bool CheckTrigger::isTriggered(const Vec3 &old_pos, const Vec3 &new_pos,
         return false;
     if (m_last_triggered_time + 2000 > StkTime::getMonoTimeMs())
         return false;
-    AbstractKart* k = World::getWorld()->getKart(kart_id);
+    Kart* k = World::getWorld()->getKart(kart_id);
     if ((k->getXYZ() - m_center).length2() < m_distance2)
     {
         m_last_triggered_time = StkTime::getMonoTimeMs();

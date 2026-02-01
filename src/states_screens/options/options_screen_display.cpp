@@ -112,7 +112,7 @@ void OptionsScreenDisplay::init()
     LabelWidget* full_text = getWidget<LabelWidget>("fullscreenText");
     assert( full_text != NULL );
 
-    LabelWidget* rememberWinposText =
+    LabelWidget* rememberWinposText = 
                                    getWidget<LabelWidget>("rememberWinposText");
     assert( rememberWinposText != NULL );
 #endif
@@ -127,16 +127,9 @@ void OptionsScreenDisplay::init()
     // disabled)
     bool in_game = StateManager::get()->getGameState() == GUIEngine::INGAME_MENU;
 
-    bool menu_or_vulkan = !in_game || is_vulkan_fullscreen_desktop;
-
-    // Tooltips don't work for dynamic ribbon widgets
-    res->setActive(menu_or_vulkan);
-
-    full->setActive(menu_or_vulkan);
-    OptionsCommon::updatePauseTooltip(full, !menu_or_vulkan);
-
+    res->setActive(!in_game || is_vulkan_fullscreen_desktop);
+    full->setActive(!in_game || is_vulkan_fullscreen_desktop);
     applyBtn->setActive(!in_game);
-    OptionsCommon::updatePauseTooltip(applyBtn, in_game);
 
 #if defined(MOBILE_STK) || defined(__SWITCH__)
     applyBtn->setVisible(false);
@@ -384,7 +377,7 @@ void OptionsScreenDisplay::eventCallback(Widget* widget, const std::string& name
         std::string selection = ((RibbonWidget*)widget)->getSelectionIDString(PLAYER_ID_GAME_MASTER);
 
         if (selection != "tab_display")
-            OptionsCommon::switchTab(selection);
+			OptionsCommon::switchTab(selection);
     }
     else if(name == "back")
     {

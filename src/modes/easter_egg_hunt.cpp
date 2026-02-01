@@ -19,7 +19,7 @@
 
 #include "io/file_manager.hpp"
 #include "items/item.hpp"
-#include "karts/abstract_kart.hpp"
+#include "karts/kart.hpp"
 #include "karts/ghost_kart.hpp"
 #include "replay/replay_play.hpp"
 #include "tracks/track.hpp"
@@ -143,7 +143,7 @@ const std::string& EasterEggHunt::getIdent() const
 /** Called when a kart has collected an egg.
  *  \param kart The kart that collected an egg.
  */
-void EasterEggHunt::collectedItem(const AbstractKart *kart,
+void EasterEggHunt::collectedItem(const Kart *kart,
                                   const ItemState *item    )
 {
     if(item->getType() != ItemState::ITEM_EASTER_EGG) return;
@@ -245,7 +245,7 @@ void EasterEggHunt::terminateRace()
 /** In Easter Egg mode the finish time is just the time the race is over,
  *  since there are no AI karts and no other players, except for ghosts.
  */
-float EasterEggHunt::estimateFinishTimeForKart(AbstractKart* kart)
+float EasterEggHunt::estimateFinishTimeForKart(Kart* kart)
 {
     // For ghost karts, use the replay data
     if (kart->isGhostKart())

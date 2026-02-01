@@ -77,6 +77,9 @@ void SFXManager::destroy()
  */
 SFXManager::SFXManager()
 {
+#ifdef DEBUG_SFX
+    m_created_count = m_deleted_count = 0;
+#endif
 
     // The sound manager initialises OpenAL
     m_initialized = music_manager->initialized();
@@ -158,8 +161,8 @@ SFXManager::~SFXManager()
 }   // ~SFXManager
 
 //----------------------------------------------------------------------------
-/** Adds a sound effect command to the queue of the sfx manager. Openal
- *  commands can sometimes cause a 5ms delay, so it is done in a separate
+/** Adds a sound effect command to the queue of the sfx manager. Openal 
+ *  commands can sometimes cause a 5ms delay, so it is done in a separate 
  *  thread.
  *  \param command The command to execute.
  *  \param sfx The sound effect to be started.
@@ -296,7 +299,7 @@ void SFXManager::queueCommand(SFXCommand *command)
         RaceManager::get()->getMinorMode() != RaceManager::MINOR_MODE_CUTSCENE)
     {
         if(command->m_command==SFX_POSITION || command->m_command==SFX_LOOP ||
-           command->m_command==SFX_SPEED    ||
+           command->m_command==SFX_SPEED    || 
            command->m_command==SFX_SPEED_POSITION                               )
         {
             delete command;
@@ -496,7 +499,7 @@ void SFXManager::mainLoop(void *obj)
 
 //----------------------------------------------------------------------------
 /** Called when sound is globally switched on or off. It either pauses or
- *  resumes all sound effects.
+ *  resumes all sound effects. 
  *  \param on If sound is switched on or off.
  */
 void SFXManager::toggleSound(const bool on)
@@ -617,7 +620,7 @@ SFXBuffer* SFXManager::addSingleSfx(const std::string &sfx_name,
                                     const bool         load)
 {
 
-    SFXBuffer* buffer = new SFXBuffer(sfx_file, positional, rolloff,
+    SFXBuffer* buffer = new SFXBuffer(sfx_file, positional, rolloff, 
                                       max_dist, gain);
 
     m_all_sfx_types[sfx_name] = buffer;
@@ -692,6 +695,14 @@ SFXBase* SFXManager::createSoundSource(SFXBuffer* buffer,
                                        const bool add_to_SFX_list,
                                        const bool owns_buffer)
 {
+#ifdef DEBUG_SFX
+    m_created_count++;
+    Log::info("SFXManager", "The number of created sound sources is %u,"
+                            "the number of deleted sound sources is %u,"
+                            "the number of active sources is %u",
+                            m_created_count, m_deleted_count, m_all_sfx.getData().size());
+#endif
+
     bool positional = false;
 
     if (RaceManager::get()->getNumLocalPlayers() < 2)
@@ -720,7 +731,7 @@ SFXBase* SFXManager::createSoundSource(SFXBuffer* buffer,
 
     sfx->setMasterVolume(m_master_gain);
 
-    if (add_to_SFX_list)
+    if (add_to_SFX_list) 
     {
         m_all_sfx.lock();
         m_all_sfx.getData().push_back(sfx);
@@ -737,7 +748,7 @@ SFXBase* SFXManager::createSoundSource(const std::string &name,
     std::map<std::string, SFXBuffer*>::iterator i = m_all_sfx_types.find(name);
     if ( i == m_all_sfx_types.end() )
     {
-        Log::error("SFXManager",
+        Log::error("SFXManager", 
                    "SFXManager::createSoundSource could not find the "
                    "requested sound effect : '%s'.", name.c_str());
         return NULL;
@@ -868,6 +879,14 @@ void SFXManager::reallyUpdateNow(SFXCommand *current)
  */
 void SFXManager::deleteSFX(SFXBase *sfx)
 {
+#ifdef DEBUG_SFX
+    m_deleted_count++;
+    Log::info("SFXManager", "The number of created sound sources is %u,"
+                            "the number of deleted sound sources is %u,"
+                            "the number of active sources is %u",
+                            m_created_count, m_deleted_count, m_all_sfx.getData().size());
+#endif
+
     if(sfx) sfx->reallyStopNow();
     std::vector<SFXBase*>::iterator i;
     
@@ -878,7 +897,7 @@ void SFXManager::deleteSFX(SFXBase *sfx)
 
     if(i==m_all_sfx.getData().end())
     {
-        Log::warn("SFXManager",
+        Log::warn("SFXManager", 
                   "SFXManager::deleteSFX : Warning: sfx '%s' %lx not found in list.",
                   sfx->getBuffer()->getFileName().c_str(), sfx);
         m_all_sfx.unlock();
@@ -1100,7 +1119,7 @@ SFXBase* SFXManager::quickSound(const std::string &sound_type)
     if (!sfxAllowed()) return NULL;
 
     std::unique_lock<std::mutex> ul = m_quick_sounds.acquireMutex();
-    std::map<std::string, SFXBase*>::iterator sound =
+    std::map<std::string, SFXBase*>::iterator sound = 
                                      m_quick_sounds.getData().find(sound_type);
 
     if (sound == m_quick_sounds.getData().end())

@@ -30,12 +30,11 @@
 #include "items/item_manager.hpp"
 #include "items/powerup.hpp"
 #include "items/projectile_manager.hpp"
-#include "karts/abstract_kart.hpp"
+#include "karts/kart.hpp"
 #include "karts/controller/kart_control.hpp"
 #include "karts/controller/ai_properties.hpp"
 #include "karts/kart_properties.hpp"
 #include "karts/max_speed.hpp"
-#include "karts/rescue_animation.hpp"
 #include "karts/skidding.hpp"
 #include "modes/linear_world.hpp"
 #include "modes/profile_world.hpp"
@@ -60,7 +59,7 @@
 #include <cstdio>
 #include <iostream>
 
-SkiddingAI::SkiddingAI(AbstractKart *kart)
+SkiddingAI::SkiddingAI(Kart *kart)
                    : AIBaseLapController(kart)
 {
     m_item_manager = Track::getCurrentTrack()->getItemManager();
@@ -312,7 +311,7 @@ void SkiddingAI::update(int ticks)
         if (m_enabled_network_ai)
             m_controls->setRescue(true);
         else
-            RescueAnimation::create(m_kart);
+            m_kart->applyRescue(/* auto-rescue */ false);
         AIBaseLapController::update(ticks);
         return;
     }
@@ -392,7 +391,7 @@ void SkiddingAI::handleSteering(float dt)
                 target += m_kart_ahead->getVelocity()*time_till_hit;
             }
             float steer_angle = steerToPoint(target);
-            setSteering(steer_angle, dt);
+            setSteering(steer_angle);
             return;
         }
     }
@@ -497,7 +496,7 @@ void SkiddingAI::handleSteering(float dt)
         steer_angle = steerToPoint(aim_point);
     }  // if m_current_track_direction!=LEFT/RIGHT
 
-    setSteering(steer_angle, dt);
+    setSteering(steer_angle);
 }   // handleSteering
 
 //-----------------------------------------------------------------------------
@@ -1256,6 +1255,21 @@ void SkiddingAI::handleItems(const float dt, const Vec3 *aim_point, int last_nod
     case PowerupManager::POWERUP_ANVIL:
         break;   // POWERUP_ANVIL
 
+    case PowerupManager::POWERUP_SUDO:
+        if (m_time_since_last_shot > 3.0f) 
+            m_controls->setFire(true);
+        break;   // POWERUP_SUDO
+
+    case PowerupManager::POWERUP_ELECTRO:
+        if (m_time_since_last_shot > 1.0f) 
+            m_controls->setFire(true);
+        break;   // POWERUP_ELECTRO
+
+    case PowerupManager::POWERUP_MINI:
+        if (m_time_since_last_shot > 1.0f) 
+            m_controls->setFire(true);
+        break;   // POWERUP_MINI
+
     case PowerupManager::POWERUP_SWATTER:
         {
              // if the kart has a shield, do not break it by using a swatter.
@@ -1349,7 +1363,7 @@ void SkiddingAI::handleBubblegum(int item_skill,
              m_controls->setLookBack(false);
              return;
           }
-       }
+       } 
     }
     else if (item_skill == 5) //don't protect against plungers alone
     {
@@ -1393,7 +1407,7 @@ void SkiddingAI::handleBubblegum(int item_skill,
     }
     
     // Use shield if kart is going to hit a bad item (banana or bubblegum)
-    if((item_skill == 4) || (item_skill == 5))
+    if((item_skill == 4) || (item_skill == 5)) 
     {
        if( !m_kart->isShielded() && items_to_avoid.size()>0)
        {
@@ -1421,7 +1435,7 @@ void SkiddingAI::handleBubblegum(int item_skill,
              m_controls->setLookBack(false);
              return;
           }
-       }
+       }      
     }
       
     // Avoid dropping all bubble gums one after another
@@ -1523,7 +1537,7 @@ void SkiddingAI::handleCake(int item_skill)
     // we can either save the cake for later since we will overtake
     // the kart anyway, or that this might force the kart ahead to
     // use its nitro/zipper (and then we will shoot since then the
-    // kart is faster).
+    // kart is faster).    
     if(item_skill >= 3)
     {
         if (kart_behind_is_slow) fire_behind -= 50.0f;
@@ -1546,7 +1560,7 @@ void SkiddingAI::handleCake(int item_skill)
         bool kart_ahead_has_swatter = false;
         if (m_kart_ahead)
         {
-            kart_ahead_has_swatter = (m_kart_ahead->getAttachment()->getType()
+            kart_ahead_has_swatter = (m_kart_ahead->getAttachment()->getType() 
                                       == Attachment::ATTACH_SWATTER);
         }
 
@@ -1594,7 +1608,7 @@ void SkiddingAI::handleCake(int item_skill)
              or straight behind, and not invulnerable, with a 5 second delay
  * Level 3 : Only 3 seconds of delay
  * Level 4 : Same as level 3
- * Level 5 : Level 4 and don't fire on a shielded kart if we're just behind (gum)
+ * Level 5 : Level 4 and don't fire on a shielded kart if we're just behind (gum) 
  *  \param item_skill The skill with which to use the item
  */
 void SkiddingAI::handleBowling(int item_skill)
@@ -1792,7 +1806,7 @@ void SkiddingAI::handleSwitch(int item_skill,
     //It should also be possible but complicated to discard items when a good
     //and a bad one are two close from one another
     else if(item_skill == 5)
-    {
+    {  
        //First step : identify the best available item
        int bad = 0;
        int good = 0;
@@ -1858,7 +1872,7 @@ void SkiddingAI::handleSwitch(int item_skill,
        }
     } //item_skill == 5
 
-    return;
+    return;  
 } //handleSwitch
 
 //-----------------------------------------------------------------------------
@@ -2107,7 +2121,7 @@ void SkiddingAI::handleBraking(float max_turn_speed, float min_speed)
     {
         if(m_kart->getSpeed() > max_turn_speed  &&
             m_kart->getSpeed()>min_speed        &&
-            fabsf(m_controls->getSteer()) > 0.95f )
+            fabsf(m_kart->getEffectiveSteer()) > 0.95f )
         {
             m_controls->setBrake(true);
 #ifdef DEBUG
@@ -2154,8 +2168,7 @@ void SkiddingAI::handleRaceStart()
             m_start_delay+=stk_config->m_penalty_ticks;
             return;
         }
-        m_kart->setStartupBoost(m_kart->getStartupBoostFromStartTicks(
-            m_start_delay + stk_config->time2Ticks(1.0f)));
+        m_kart->setStartupBoostFromStartTicks(m_start_delay + stk_config->time2Ticks(1.0f));
         m_start_delay = 0;
     }
 }   // handleRaceStart
@@ -2177,7 +2190,7 @@ void SkiddingAI::handleRescue(const float dt)
             if (m_enabled_network_ai)
                 m_controls->setRescue(true);
             else
-                RescueAnimation::create(m_kart);
+                m_kart->applyRescue(/* auto-rescue */ false);
             m_time_since_stuck=0.0f;
         }   // m_time_since_stuck > 2.0f
     }
@@ -2223,11 +2236,11 @@ void SkiddingAI::handleNitroAndZipper(float max_safe_speed)
     float energy_reserve = 0;
 
     if (nitro_skill == 2)
-        energy_reserve = 4;
+        energy_reserve = 4;  
     else if (nitro_skill == 3)
-        energy_reserve = 8;
+        energy_reserve = 8;  
     else if (nitro_skill == 4)
-        energy_reserve = 12;
+        energy_reserve = 12;  
 
     // No point in building a big nitro reserve in nitro for FTL AIs,
     // just keep enough to help accelerating after an accident
@@ -2344,7 +2357,7 @@ void SkiddingAI::handleNitroAndZipper(float max_safe_speed)
     // Don't use nitro if building an energy reserve
     if (m_kart->getEnergy() <= energy_reserve)
     {
-        nitro_skill = 0;
+        nitro_skill = 0;  
     }
 
     // If basic AI, or if the kart is very slow (e.g. after rescue) but not too much (accident)
@@ -2368,7 +2381,7 @@ void SkiddingAI::handleNitroAndZipper(float max_safe_speed)
         return;
    
     // Use zipper
-    if(m_kart->getPowerup()->getType() == PowerupManager::POWERUP_ZIPPER
+    if(m_kart->getPowerup()->getType() == PowerupManager::POWERUP_ZIPPER 
         && item_skill >= 2 && m_kart->getSpeed()>1.0f &&
         m_kart->getSpeedIncreaseTicksLeft(MaxSpeed::MS_INCREASE_ZIPPER)<=0)
     {
@@ -2516,10 +2529,10 @@ void SkiddingAI::checkCrashes(const Vec3& pos )
         {
             for( unsigned int j = 0; j < NUM_KARTS; ++j )
             {
-                const AbstractKart* kart = m_world->getKart(j);
+                const Kart* kart = m_world->getKart(j);
                 // Ignore eliminated karts
                 if(kart==m_kart||kart->isEliminated()||kart->isGhostKart()) continue;
-                const AbstractKart *other_kart = m_world->getKart(j);
+                const Kart *other_kart = m_world->getKart(j);
                 // Ignore karts ahead that are faster than this kart.
                 if(m_kart->getVelocityLC().getZ() < other_kart->getVelocityLC().getZ())
                     continue;
@@ -3015,18 +3028,12 @@ bool SkiddingAI::canSkid(float steer_fraction)
 
 //-----------------------------------------------------------------------------
 /** Converts the steering angle to a lr steering in the range of -1 to 1.
- *  If the steering angle is too great, it will also trigger skidding. This
- *  function uses a 'time till full steer' value specifying the time it takes
- *  for the wheel to reach full left/right steering similar to player karts
- *  when using a digital input device. The parameter is defined in the kart
- *  properties and helps somewhat to make AI karts more 'pushable' (since
- *  otherwise the karts counter-steer to fast).
+ *  If the steering angle is too great, it will also trigger skidding.
  *  It also takes the effect of a plunger into account by restricting the
  *  actual steer angle to 50% of the maximum.
  *  \param angle Steering angle.
- *  \param dt Time step.
  */
-void SkiddingAI::setSteering(float angle, float dt)
+void SkiddingAI::setSteering(float angle)
 {
     float steer_fraction = angle / m_kart->getMaxSteerAngle();
 
@@ -3070,28 +3077,6 @@ void SkiddingAI::setSteering(float angle, float dt)
     // Restrict steering when a plunger is in the face
     // The degree of restriction depends on item_skill
 
-    //FIXME : the AI speed estimate in curves don't account for this restriction
-    if(m_kart->getBlockedByPlungerTicks()>0)
-    {
-        int item_skill = computeSkill(ITEM_SKILL);
-        float steering_limit = 0.5f;
-        if (item_skill == 0)
-            steering_limit = 0.35f;
-        else if (item_skill == 1)
-            steering_limit = 0.45f;
-        else if (item_skill == 2)
-            steering_limit = 0.55f;
-        else if (item_skill == 3)
-            steering_limit = 0.65f;
-        else if (item_skill == 4)
-            steering_limit = 0.75f;
-        else if (item_skill == 5)
-            steering_limit = 0.9f;
-
-        if     (steer_fraction >  steering_limit) steer_fraction =  steering_limit;
-        else if(steer_fraction < -steering_limit) steer_fraction = -steering_limit;
-    }
-
     const Skidding *skidding = m_kart->getSkidding();
 
     // If we are supposed to skid, but the current steering is still
@@ -3133,20 +3118,28 @@ void SkiddingAI::setSteering(float angle, float dt)
             steer_fraction = 1.0f;
     }
 
-    float old_steer      = m_controls->getSteer();
-
-    // The AI has its own 'time full steer' value (which is the time
-    float max_steer_change = dt/m_ai_properties->m_time_full_steer;
-    if(old_steer < steer_fraction)
+    // Restrict steering when a plunger is in the face
+    //FIXME : the AI speed estimate in curves don't account for this restriction
+    if(m_kart->getBlockedByPlungerTicks()>0)
     {
-        m_controls->setSteer( (old_steer+max_steer_change > steer_fraction)
-                              ? steer_fraction : old_steer+max_steer_change );
-    }
-    else
-    {
-        m_controls->setSteer( (old_steer-max_steer_change < steer_fraction)
-                               ? steer_fraction : old_steer-max_steer_change );
+        int item_skill = computeSkill(ITEM_SKILL);
+        float steering_limit = 0.5f;
+        if (item_skill == 0)
+            steering_limit = 0.35f;
+        else if (item_skill == 1)
+            steering_limit = 0.45f;
+        else if (item_skill == 2)
+            steering_limit = 0.55f;
+        else if (item_skill == 3)
+            steering_limit = 0.65f;
+        else if (item_skill == 4)
+            steering_limit = 0.75f;
+        else if (item_skill == 5)
+            steering_limit = 0.9f;
+
+        if     (steer_fraction >  steering_limit) steer_fraction =  steering_limit;
+        else if(steer_fraction < -steering_limit) steer_fraction = -steering_limit;
     }
 
-
+    m_controls->setSteer(steer_fraction);
 }   // setSteering

@@ -38,7 +38,7 @@ using namespace GUIEngine;
 using namespace irr::core;
 
 // -----------------------------------------------------------------------------
-GrandPrixEditorScreen::GrandPrixEditorScreen()
+GrandPrixEditorScreen::GrandPrixEditorScreen() 
                      : Screen("grand_prix_editor.stkgui"), m_selection(NULL),
                        m_gpgroup(GrandPrixData::GP_NONE)
 {

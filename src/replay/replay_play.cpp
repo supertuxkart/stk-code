@@ -113,7 +113,7 @@ bool ReplayPlay::addReplayFile(const std::string& fn, bool custom_replay, int ca
         file_manager->getReplayDir() + fn, "r");
     if (fd == NULL) return false;
     auto scoped = [&]() { fclose(fd); };
-    MemUtils::deref<decltype(scoped)> cls(scoped);
+    MemUtils::deref<decltype(scoped)> cls(scoped); 
     ReplayData rd;
 
     // custom_replay is true when full path of filename is given
@@ -221,6 +221,13 @@ bool ReplayPlay::addReplayFile(const std::string& fn, bool custom_replay, int ca
         return false;
     }
 
+    // Display the correct difficulty for STK 1.X (and older) replays
+    if (version <= 4)
+    {
+        if (rd.m_difficulty >= 1)
+            rd.m_difficulty++;
+    }
+
     if (version >= 4)
     {
         fgets(s, 1023, fd);
@@ -259,7 +266,7 @@ bool ReplayPlay::addReplayFile(const std::string& fn, bool custom_replay, int ca
         {
             Log::warn("Replay", "Track name is empty in replay file, '%s'.", fn.c_str());
             return false;
-        }
+        }         
     }
     else
     {
@@ -435,7 +442,7 @@ void ReplayPlay::readKartData(FILE *fd, char *next_line, bool second_replay)
         fgets(s, 1023, fd);
         float x, y, z, rx, ry, rz, rw, time, speed, steer, w1, w2, w3, w4, nitro_amount, distance;
         int skidding_state, attachment, item_amount, item_type, special_value,
-            nitro, zipper, skidding, red_skidding, jumping;
+            nitro, zipper, skidding, red_skidding, purple_skidding, jumping;
 
         // Check for EV_TRANSFORM event:
         // -----------------------------
@@ -474,6 +481,7 @@ void ReplayPlay::readKartData(FILE *fd, char *next_line, bool second_replay)
                 kre.m_zipper_usage        = zipper!=0;
                 kre.m_skidding_effect     = skidding;
                 kre.m_red_skidding        = red_skidding!=0;
+                kre.m_purple_skidding     = 0;    //not saved in version 3 replays
                 kre.m_jumping             = jumping != 0;
                 m_ghost_karts[kart_num]->addReplayEvent(time,
                     btTransform(q, xyz), pi, bi, kre);
@@ -488,8 +496,8 @@ void ReplayPlay::readKartData(FILE *fd, char *next_line, bool second_replay)
             }
         }
 
-        //version 4 replays (STK 1.0 and higher)
-        else
+        //version 4 replays (STK 1.0 to 1.5.x)
+        else if (rd.m_replay_version == 4)
         {
             if(sscanf(s, "%f  %f %f %f  %f %f %f %f  %f  %f  %f %f %f %f %d  %d %f %d %d %d  %f %d %d %d %d %d\n",
                 &time,
@@ -523,6 +531,57 @@ void ReplayPlay::readKartData(FILE *fd, char *next_line, bool second_replay)
                 kre.m_zipper_usage        = zipper!=0;
                 kre.m_skidding_effect     = skidding;
                 kre.m_red_skidding        = red_skidding!=0;
+                kre.m_purple_skidding     = 0; //not saved in version 4 replays
+                kre.m_jumping             = jumping != 0;
+                m_ghost_karts[kart_num]->addReplayEvent(time,
+                    btTransform(q, xyz), pi, bi, kre);
+            }
+            else
+            {
+                // Invalid record found
+                // ---------------------
+                Log::warn("Replay", "Can't read replay data line %d:", i);
+                Log::warn("Replay", "%s", s);
+                Log::warn("Replay", "Ignored.");
+            }
+        }
+
+        //version 5 replays (Development towards STK 2.0, definition may be changed)
+        else if (rd.m_replay_version == 5)
+        {
+            if(sscanf(s, "%f  %f %f %f  %f %f %f %f  %f  %f  %f %f %f %f %d  %d %f %d %d %d  %f %d %d %d %d %d %d\n",
+                &time,
+                &x, &y, &z,
+                &rx, &ry, &rz, &rw,
+                &speed, &steer, &w1, &w2, &w3, &w4, &skidding_state,
+                &attachment, &nitro_amount, &item_amount, &item_type, &special_value,
+                &distance, &nitro, &zipper, &skidding, &red_skidding, &purple_skidding, &jumping
+                )==27)
+            {
+                btQuaternion q(rx, ry, rz, rw);
+                btVector3 xyz(x, y, z);
+                PhysicInfo pi             = {0};
+                BonusInfo bi              = {0};
+                KartReplayEvent kre       = {0};
+
+                pi.m_speed                = speed;
+                pi.m_steer                = steer;
+                pi.m_suspension_length[0] = w1;
+                pi.m_suspension_length[1] = w2;
+                pi.m_suspension_length[2] = w3;
+                pi.m_suspension_length[3] = w4;
+                pi.m_skidding_state       = skidding_state;
+                bi.m_attachment           = attachment;
+                bi.m_nitro_amount         = nitro_amount;
+                bi.m_item_amount          = item_amount;
+                bi.m_item_type            = item_type;
+                bi.m_special_value        = special_value;
+                kre.m_distance            = distance;
+                kre.m_nitro_usage         = nitro;
+                kre.m_zipper_usage        = zipper!=0;
+                kre.m_skidding_effect     = skidding;
+                kre.m_red_skidding        = red_skidding!=0;
+                kre.m_purple_skidding     = purple_skidding!=0;
                 kre.m_jumping             = jumping != 0;
                 m_ghost_karts[kart_num]->addReplayEvent(time,
                     btTransform(q, xyz), pi, bi, kre);

@@ -148,12 +148,15 @@ SelectChallengeDialog::SelectChallengeDialog(const float percentWidth,
             challenge_info->setText(getLabel(RaceManager::DIFFICULTY_EASY,   c->getData()), false );
             break;
         case 1:
-            challenge_info->setText(getLabel(RaceManager::DIFFICULTY_MEDIUM, c->getData()), false );
+            challenge_info->setText(getLabel(RaceManager::DIFFICULTY_CASUAL, c->getData()), false );
             break;
         case 2:
-            challenge_info->setText(getLabel(RaceManager::DIFFICULTY_HARD,   c->getData()), false );
+            challenge_info->setText(getLabel(RaceManager::DIFFICULTY_MEDIUM, c->getData()), false );
             break;
         case 3:
+            challenge_info->setText(getLabel(RaceManager::DIFFICULTY_HARD,   c->getData()), false );
+            break;
+        case 4:
             if (UserConfigParams::m_difficulty == RaceManager::DIFFICULTY_BEST &&
                 PlayerManager::getCurrentPlayer()->isLocked("difficulty_best"))
             {
@@ -166,7 +169,8 @@ SelectChallengeDialog::SelectChallengeDialog(const float percentWidth,
             break;
     }
     
-    updateSolvedIcon(c, RaceManager::DIFFICULTY_EASY,   "novice",       "cup_bronze.png");
+    updateSolvedIcon(c, RaceManager::DIFFICULTY_EASY,   "novice",       "cup_chocolate.png");
+    updateSolvedIcon(c, RaceManager::DIFFICULTY_CASUAL, "casual",       "cup_bronze.png");
     updateSolvedIcon(c, RaceManager::DIFFICULTY_MEDIUM, "intermediate", "cup_silver.png");
     updateSolvedIcon(c, RaceManager::DIFFICULTY_HARD,   "expert",       "cup_gold.png");
     updateSolvedIcon(c, RaceManager::DIFFICULTY_BEST,   "supertux",     "cup_platinum.png");
@@ -272,11 +276,6 @@ GUIEngine::EventPropagation SelectChallengeDialog::processEvent(const std::strin
 
             ModalDialog::dismiss();
 
-            core::rect<s32> pos(15,
-                                10,
-                                15 + UserConfigParams::m_width/2,
-                                10 + GUIEngine::getTitleFontHeight());
-
             RaceManager::get()->exitRace();
             //StateManager::get()->resetActivePlayers();
 
@@ -308,12 +307,15 @@ GUIEngine::EventPropagation SelectChallengeDialog::processEvent(const std::strin
                     c_data->setRace(RaceManager::DIFFICULTY_EASY);
                     break;
                 case 1:
-                    c_data->setRace(RaceManager::DIFFICULTY_MEDIUM);
+                    c_data->setRace(RaceManager::DIFFICULTY_CASUAL);
                     break;
                 case 2:
-                    c_data->setRace(RaceManager::DIFFICULTY_HARD);
+                    c_data->setRace(RaceManager::DIFFICULTY_MEDIUM);
                     break;
                 case 3:
+                    c_data->setRace(RaceManager::DIFFICULTY_HARD);
+                    break;
+                case 4:
                     if (UserConfigParams::m_difficulty == RaceManager::DIFFICULTY_BEST &&
                         PlayerManager::getCurrentPlayer()->isLocked("difficulty_best"))
                     {
@@ -354,20 +356,25 @@ GUIEngine::EventPropagation SelectChallengeDialog::processEvent(const std::strin
             description = getLabel(RaceManager::DIFFICULTY_EASY,   c_stat->getData());
             UserConfigParams::m_difficulty = 0;
         }
+        else if (selected == "casual")
+        {
+            description = getLabel(RaceManager::DIFFICULTY_CASUAL, c_stat->getData());
+            UserConfigParams::m_difficulty = 1;
+        }
         else if (selected == "intermediate")
         {
             description = getLabel(RaceManager::DIFFICULTY_MEDIUM, c_stat->getData());
-            UserConfigParams::m_difficulty = 1;
+            UserConfigParams::m_difficulty = 2;
         }
         else if (selected == "expert")
         {
             description = getLabel(RaceManager::DIFFICULTY_HARD,   c_stat->getData());
-            UserConfigParams::m_difficulty = 2;
+            UserConfigParams::m_difficulty = 3;
         }
         else if (selected == "supertux")
         {
             description = getLabel(RaceManager::DIFFICULTY_BEST,   c_stat->getData());
-            UserConfigParams::m_difficulty = 3;
+            UserConfigParams::m_difficulty = 4;
         }
         else
         {

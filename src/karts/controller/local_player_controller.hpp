@@ -24,7 +24,8 @@
 #include "karts/controller/player_controller.hpp"
 #include <memory>
 
-class AbstractKart;
+class Kart;
+class ParticleEmitter;
 class SFXBase;
 class SFXBuffer;
 class btTransform;
@@ -46,7 +47,6 @@ private:
     StateManager::ActivePlayer *m_player;
 
     bool           m_sound_schedule;
-    bool           m_has_started;
     bool           m_is_above_nitro_target;
 
 #ifndef SERVER_ONLY
@@ -69,15 +69,14 @@ private:
     SFXBuffer   *m_unfull_sound;
 
 
-    virtual void steer(int, int) OVERRIDE;
-    virtual void displayPenaltyWarning() OVERRIDE;
+    virtual void steer(int) OVERRIDE;
     void         nitroNotFullSound();
 
     void doCrashHaptics();
     void setParticleEmitterPosition(const btTransform& t);
 
 public:
-                 LocalPlayerController(AbstractKart *kart,
+                 LocalPlayerController(Kart *kart,
                                        const int local_player_id,
                                        HandicapLevel h);
                 ~LocalPlayerController();
@@ -94,7 +93,7 @@ public:
     virtual void resetInputState   () OVERRIDE;
     virtual bool canGetAchievements() const OVERRIDE;
 
-    virtual void crashed(const AbstractKart *k) OVERRIDE;
+    virtual void crashed(const Kart *k) OVERRIDE;
     virtual void crashed(const Material *m) OVERRIDE;
 
     virtual void rumble(float strength_low, float strength_high, uint16_t duration) OVERRIDE;
@@ -103,6 +102,9 @@ public:
     virtual bool isPlayerController() const OVERRIDE {return true;}
     // ------------------------------------------------------------------------
     virtual bool isLocalPlayerController() const OVERRIDE {return true;}
+    // ------------------------------------------------------------------------
+    /** Called when this kart started too early and got a start penalty. */
+    virtual void displayPenaltyWarning();
     // ------------------------------------------------------------------------
     /** Returns the name of the player profile. */
     core::stringw getName(bool include_handicap_string = true) const OVERRIDE;

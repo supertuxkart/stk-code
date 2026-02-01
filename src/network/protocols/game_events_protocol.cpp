@@ -1,6 +1,6 @@
 #include "network/protocols/game_events_protocol.hpp"
 
-#include "karts/abstract_kart.hpp"
+#include "karts/kart.hpp"
 #include "karts/controller/player_controller.hpp"
 #include "modes/capture_the_flag.hpp"
 #include "modes/linear_world.hpp"
@@ -25,7 +25,7 @@
  *  in the synchronous notifyEvent function here, decode the message
  *  and call the original game code. The functions name are identical,
  *  e.g. kartFinishedRace(some parameter) is called from the GameEventManager
- *  on the server, and the received message is then handled by
+ *  on the server, and the received message is then handled by 
  *  kartFinishedRace(const NetworkString &).
  */
 GameEventsProtocol::GameEventsProtocol() : Protocol(PROTOCOL_GAME_EVENTS)
@@ -112,28 +112,21 @@ bool GameEventsProtocol::notifyEvent(Event* event)
                     kart_id, event->getPeer()->getAddress().toString().c_str());
                 return true;
             }
-            float f = LobbyProtocol::get<ServerLobby>()
+            uint8_t boost_level = LobbyProtocol::get<ServerLobby>()
                 ->getStartupBoostOrPenaltyForKart(
                 event->getPeer()->getAveragePing(), kart_id);
             NetworkString *ns = ProtocolUtils::getNetworkString(m_type);
             ns->setSynchronous(true);
-            ns->addUInt8(GE_STARTUP_BOOST).addUInt8(kart_id).addFloat(f);
+            ns->addUInt8(GE_STARTUP_BOOST).addUInt8(kart_id).addUInt8(boost_level);
             sendMessageToPeers(ns, true);
             delete ns;
         }
         else
         {
             uint8_t kart_id = data.getUInt8();
-            float boost = data.getFloat();
-            AbstractKart* k = World::getWorld()->getKart(kart_id);
-            if (boost < 0.0f)
-            {
-                PlayerController* pc =
-                    dynamic_cast<PlayerController*>(k->getController());
-                pc->displayPenaltyWarning();
-            }
-            else
-                k->setStartupBoost(boost);
+            uint8_t boost_level = data.getUInt8();
+            Kart* k = World::getWorld()->getKart(kart_id);
+            k->setStartupBoost(boost_level);
         }
         break;
     }
@@ -158,7 +151,7 @@ bool GameEventsProtocol::notifyEvent(Event* event)
  *  \param kart The kart that finished the race.
  *  \param time The time at which the kart finished.
  */
-void GameEventsProtocol::kartFinishedRace(AbstractKart *kart, float time)
+void GameEventsProtocol::kartFinishedRace(Kart *kart, float time)
 {
     NetworkString *ns = ProtocolUtils::getNetworkString(m_type, 20);
     ns->setSynchronous(true);

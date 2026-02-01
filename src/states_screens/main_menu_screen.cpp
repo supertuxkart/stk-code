@@ -190,7 +190,7 @@ void MainMenuScreen::init()
             && id > UserConfigParams::m_last_important_message_id)
         {
             chosen_id = id;
-            important_message =
+            important_message = 
                 NewsManager::get()->getCurrentNewsMessage(NewsManager::NTYPE_MAINMENU);
         }
     }

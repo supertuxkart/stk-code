@@ -53,12 +53,14 @@ void ChallengeStatus::load(const XMLNode* challenges_node)
         // Solving at a difficulty also marks lower difficulties as solved
         if (solved == "easy")
             m_solved = 0x01;
-        else if (solved == "medium")
+        else if (solved == "casual")
             m_solved = 0x03;
-        else if (solved == "hard")
+        else if (solved == "medium")
             m_solved = 0x07;
-        else if (solved == "best")
+        else if (solved == "hard")
             m_solved = 0x0F;
+        else if (solved == "best")
+            m_solved = 0x1F;
     }   // if has 'solved' attribute
     if (!node->get("best_while_slower", &m_max_req_in_lower_diff))
         m_max_req_in_lower_diff = false;
@@ -70,9 +72,9 @@ void ChallengeStatus::load(const XMLNode* challenges_node)
 // Also resets active flag.
 void ChallengeStatus::setSolved(RaceManager::Difficulty d)
 {
-    if ((int) d <= 3)
+    if ((int) d <= 4)
     {
-        m_solved |= (0x0F >> (3 - (int) d)); // Sets the last d+1 bits to 1
+        m_solved |= (0x1F >> (4 - (int) d)); // Sets the last d+1 bits to 1
         m_active &= ~m_solved; // Sets to 0 all bits which are at 1 in m_solved
     }
 } // setSolved
@@ -100,6 +102,8 @@ void ChallengeStatus::save(UTFWriter& writer)
         writer << " solved=\"hard\"";
     else if (isSolved(RaceManager::DIFFICULTY_MEDIUM))
         writer << " solved=\"medium\"";
+    else if (isSolved(RaceManager::DIFFICULTY_CASUAL))
+        writer << " solved=\"casual\"";
     else if (isSolved(RaceManager::DIFFICULTY_EASY))
         writer << " solved=\"easy\"";
     else

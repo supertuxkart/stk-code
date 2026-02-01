@@ -36,7 +36,7 @@
 #include "graphics/sp/sp_shader.hpp"
 #include "graphics/sp/sp_uniform_assigner.hpp"
 #include "io/file_manager.hpp"
-#include "karts/abstract_kart.hpp"
+#include "karts/kart.hpp"
 #include "karts/kart_model.hpp"
 #include "modes/world.hpp"
 #include "physics/physics.hpp"
@@ -330,7 +330,7 @@ private:
 public:
     BloomBlendShader()
     {
-        m_lens_dust_tex =
+		m_lens_dust_tex =
             irr_driver->getTexture(FileManager::TEXTURE, "gfx_lensDust_a.png");
 
         loadProgram(OBJECT, GL_VERTEX_SHADER, "screenquad.vert",
@@ -339,7 +339,7 @@ public:
         assignSamplerNames(0, "tex_128", ST_BILINEAR_FILTERED,
                            1, "tex_256", ST_BILINEAR_FILTERED,
                            2, "tex_512", ST_BILINEAR_FILTERED,
-                           3, "tex_dust", ST_BILINEAR_FILTERED);
+						   3, "tex_dust", ST_BILINEAR_FILTERED);
     }   // BloomBlendShader
     // ------------------------------------------------------------------------
     void render(GLuint render_target_bloom_128,
@@ -349,7 +349,7 @@ public:
         setTextureUnits(render_target_bloom_128,
                         render_target_bloom_256,
                         render_target_bloom_512,
-                        m_lens_dust_tex->getTextureHandler());
+						m_lens_dust_tex->getTextureHandler());
         drawFullScreenEffect();
     }   // render
 };   // BloomBlendShader
@@ -689,7 +689,7 @@ public:
 };   // MLAAGatherSHader
 
 // ============================================================================
-class LightningShader : public TextureShader<LightningShader, 1,
+class LightningShader : public TextureShader<LightningShader, 1, 
                                              core::vector3df>
 {
 public:
@@ -799,7 +799,7 @@ static std::vector<float> getGaussianWeight(float sigma, size_t count)
 }   // getGaussianWeight
 
 // ----------------------------------------------------------------------------
-void PostProcessing::renderGaussian3Blur(const FrameBuffer &in_fbo,
+void PostProcessing::renderGaussian3Blur(const FrameBuffer &in_fbo, 
                                          const FrameBuffer &auxiliary) const
 {
     assert(in_fbo.getWidth() == auxiliary.getWidth() &&
@@ -944,7 +944,7 @@ void PostProcessing::renderGaussian9TapBlur(const FrameBuffer &in_fbo,
         else
         {
             ComputeGaussian9TapVShader::getInstance()->render(auxiliary,
-                                                               in_fbo,
+                                                               in_fbo, 
                                                                linear_depth,
                                                                in_fbo.getWidth(),
                                                                in_fbo.getHeight());
@@ -1204,20 +1204,20 @@ FrameBuffer *PostProcessing::render(scene::ICameraSceneNode * const camnode,
 
             // Downsample
             FrameBuffer::blit(rtts->getFBO(FBO_BLOOM_512),
-                              rtts->getFBO(FBO_BLOOM_256),
+                              rtts->getFBO(FBO_BLOOM_256), 
                               GL_COLOR_BUFFER_BIT, GL_LINEAR);
             FrameBuffer::blit(rtts->getFBO(FBO_BLOOM_256),
                               rtts->getFBO(FBO_BLOOM_128),
                               GL_COLOR_BUFFER_BIT, GL_LINEAR);
 
-            // Copy for lens flare
-            FrameBuffer::blit(rtts->getFBO(FBO_BLOOM_512),
-                              rtts->getFBO(FBO_LENS_512),
+			// Copy for lens flare
+			FrameBuffer::blit(rtts->getFBO(FBO_BLOOM_512),
+                              rtts->getFBO(FBO_LENS_512), 
                               GL_COLOR_BUFFER_BIT, GL_LINEAR);
-            FrameBuffer::blit(rtts->getFBO(FBO_BLOOM_256),
+			FrameBuffer::blit(rtts->getFBO(FBO_BLOOM_256),
                               rtts->getFBO(FBO_LENS_256),
                               GL_COLOR_BUFFER_BIT, GL_LINEAR);
-            FrameBuffer::blit(rtts->getFBO(FBO_BLOOM_128),
+			FrameBuffer::blit(rtts->getFBO(FBO_BLOOM_128),
                               rtts->getFBO(FBO_LENS_128),
                               GL_COLOR_BUFFER_BIT, GL_LINEAR);
 
@@ -1230,11 +1230,11 @@ FrameBuffer *PostProcessing::render(scene::ICameraSceneNode * const camnode,
             renderGaussian6Blur(rtts->getFBO(FBO_BLOOM_128),
                                 rtts->getFBO(FBO_TMP_128), 1., 1.);
 
-            renderHorizontalBlur(rtts->getFBO(FBO_LENS_512),
+            renderHorizontalBlur(rtts->getFBO(FBO_LENS_512), 
                                  rtts->getFBO(FBO_TMP_512));
             renderHorizontalBlur(rtts->getFBO(FBO_LENS_256),
                                  rtts->getFBO(FBO_TMP_256));
-            renderHorizontalBlur(rtts->getFBO(FBO_LENS_128),
+            renderHorizontalBlur(rtts->getFBO(FBO_LENS_128), 
                                  rtts->getFBO(FBO_TMP_128));
 
             // Additively blend on top of tmp1
@@ -1261,7 +1261,7 @@ FrameBuffer *PostProcessing::render(scene::ICameraSceneNode * const camnode,
     {
         PROFILER_PUSH_CPU_MARKER("- Tonemap", 0xFF, 0x00, 0x00);
         ScopedGPUTimer Timer(irr_driver->getGPUTimer(Q_TONEMAP));
-        // only enable vignette during race
+		// only enable vignette during race
 
         out_fbo = &rtts->getFBO(FBO_RGBA_1);
         ToneMapShader::getInstance()->render(*out_fbo, in_fbo->getRTT()[0],

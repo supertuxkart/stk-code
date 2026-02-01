@@ -24,6 +24,7 @@
  *  Defines the various collectibles and weapons of STK.
  */
 
+#include "karts/kart.hpp"
 #include "utils/cpp2011.hpp"
 #include "utils/leak_check.hpp"
 #include "utils/log.hpp"
@@ -33,7 +34,7 @@
 #include <line3d.h>
 
 class BareNetworkString;
-class AbstractKart;
+class Kart;
 class LODNode;
 
 namespace irr
@@ -65,8 +66,11 @@ public:
         ITEM_BANANA,
         ITEM_NITRO_BIG,
         ITEM_NITRO_SMALL,
+        ITEM_NITRO_AIR,
         ITEM_BUBBLEGUM,
         ITEM_BUBBLEGUM_NOLOK,
+        ITEM_BUBBLEGUM_SMALL,
+        ITEM_BUBBLEGUM_SMALL_NOLOK,
 
         /** For easter egg mode only. */
         ITEM_EASTER_EGG,
@@ -99,7 +103,7 @@ private:
     /** Counts how often an item is used before it disappears. Used for
      *  bubble gum to make them disappear after a while. A value >0
      *  indicates that the item still exists, =0 that the item can be
-     *  deleted, and <0 that the item will never be deleted, i.e. it
+     *  deleted, and <0 that the item will never be deleted, i.e. it 
      *  will always reappear after a while. */
     int m_used_up_counter;
 
@@ -116,7 +120,7 @@ private:
 
     /** The 'owner' of the item, i.e. the kart that dropped this item.
     *  Is NULL if the item is part of the track. */
-    const AbstractKart *m_previous_owner;
+    const Kart *m_previous_owner;
 
 protected:
 
@@ -134,7 +138,7 @@ protected:
      *         to this item so that this item would be collected.
      */
     bool hitLine(const core::line3df &line,
-                 const AbstractKart *kart = NULL) const
+                 const Kart *kart = NULL) const
     {
         if (getPreviousOwner() == kart && getDeactivatedTicks() > 0)
             return false;
@@ -145,14 +149,14 @@ protected:
 
 public:
     // ------------------------------------------------------------------------
-         ItemState(ItemType type, const AbstractKart *owner=NULL, int id = -1);
+         ItemState(ItemType type, const Kart *owner=NULL, int id = -1);
     // ------------------------------------------------------------------------
          ItemState(const BareNetworkString& buffer);
     // ------------------------------------------------------------------------
     void initItem(ItemType type, const Vec3& xyz, const Vec3& normal);
     void update(int ticks);
     void setDisappearCounter();
-    virtual void collected(const AbstractKart *kart);
+    virtual void collected(const Kart *kart);
     // ------------------------------------------------------------------------
     virtual ~ItemState() {}
          
@@ -166,14 +170,14 @@ public:
 
     // -----------------------------------------------------------------------
     virtual bool hitKart(const Vec3 &xyz,
-                         const AbstractKart *kart = NULL) const
+                         const Kart *kart = NULL) const
     {
         Log::fatal("ItemState", "hitKart() called for ItemState.");
         return false;
     }   // hitKart
 
     // -----------------------------------------------------------------------
-    virtual int getGraphNode() const
+    virtual int getGraphNode() const 
     {
         Log::fatal("ItemState", "getGraphNode() called for ItemState.");
         return 0;
@@ -243,8 +247,14 @@ public:
     /** Returns if this item is negative, i.e. a banana or bubblegum. */
     bool isNegativeItem() const
     {
-        return m_type == ITEM_BANANA || m_type == ITEM_BUBBLEGUM ||
-               m_type == ITEM_BUBBLEGUM_NOLOK;
+        return m_type == ITEM_BANANA || isBubblegum();
+    }
+    // ------------------------------------------------------------------------
+    /** Returns if this item is a type of bubblegum. */
+    bool isBubblegum() const
+    {
+        return m_type == ITEM_BUBBLEGUM || m_type == ITEM_BUBBLEGUM_SMALL ||
+               m_type == ITEM_BUBBLEGUM_NOLOK || m_type == ITEM_BUBBLEGUM_SMALL_NOLOK;
     }
     // ------------------------------------------------------------------------
     /** Sets how long an item should be disabled. While item itself sets
@@ -266,7 +276,7 @@ public:
     /** Returns the type of this item. */
     ItemType getType() const { return m_type; }
     // ------------------------------------------------------------------------
-    ItemType getGrahpicalType() const;
+    ItemType getGraphicalType() const;
     // ------------------------------------------------------------------------
     /** Returns the original type of this item. */
     ItemType getOriginalType() const { return m_original_type; }
@@ -294,7 +304,7 @@ public:
     // ------------------------------------------------------------------------
     /** Returns the kart that dropped this item (or NULL if the item was not
      *  dropped by a kart. */
-    const AbstractKart *getPreviousOwner() const { return m_previous_owner; }
+    const Kart *getPreviousOwner() const { return m_previous_owner; }
     // ------------------------------------------------------------------------
     void setXYZ(const Vec3& xyz) { m_xyz = xyz; }
     // ------------------------------------------------------------------------
@@ -367,7 +377,7 @@ private:
 public:
                   Item(ItemType type, const Vec3& xyz, const Vec3& normal,
                        scene::IMesh* mesh, scene::IMesh* lowres_mesh,
-                       const std::string& icon, const AbstractKart *owner);
+                       const std::string& icon, const Kart *owner);
     virtual       ~Item ();
     virtual void  updateGraphics(float dt) OVERRIDE;
     virtual void  reset() OVERRIDE;
@@ -377,7 +387,7 @@ public:
      *  item has been collected, and the time to return to the parameter.
      *  \param kart The kart that collected the item.
      */
-    virtual void collected(const AbstractKart *kart)  OVERRIDE
+    virtual void collected(const Kart *kart)  OVERRIDE
     {
         ItemState::collected(kart);
     }   // isCollected
@@ -401,18 +411,9 @@ public:
      *  \param xyz Location of kart (avoiding to use kart->getXYZ() so that
      *         kart.hpp does not need to be included here).
      */
-    virtual bool hitKart(const Vec3 &xyz, const AbstractKart *kart=NULL) const
-        OVERRIDE
-    {
-        if (getPreviousOwner() == kart && getDeactivatedTicks() > 0)
-            return false;
-        Vec3 lc = quatRotate(getOriginalRotation(), xyz - getXYZ());
-        // Don't be too strict if the kart is a bit above the item
-        lc.setY(lc.getY() / 2.0f);
-        return lc.length2() < m_distance_2;
-    }   // hitKart
+    virtual bool hitKart(const Vec3 &xyz, const Kart *kart=NULL) const OVERRIDE;
     // ------------------------------------------------------------------------
-    bool rotating() const               { return getType() != ITEM_BUBBLEGUM; }
+    bool rotating() const               { return !isBubblegum(); }
 
 public:
     // ------------------------------------------------------------------------

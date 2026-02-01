@@ -73,7 +73,7 @@ void AbstractRenderer::drawDebugMeshes() const
 
             drawJoint(true, false, joints[j], smesh, j);
         }
-    }
+    }     
 }  // drawDebugMeshes
 
 // ----------------------------------------------------------------------------

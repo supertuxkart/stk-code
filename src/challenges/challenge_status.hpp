@@ -91,9 +91,10 @@ public:
      */
     RaceManager::Difficulty highestSolved() const
     {
-        return (m_solved & 0x08) ? RaceManager::DIFFICULTY_BEST   :
-               (m_solved & 0x04) ? RaceManager::DIFFICULTY_HARD   :
-               (m_solved & 0x02) ? RaceManager::DIFFICULTY_MEDIUM :
+        return (m_solved & 0x10) ? RaceManager::DIFFICULTY_BEST   :
+               (m_solved & 0x08) ? RaceManager::DIFFICULTY_HARD   :
+               (m_solved & 0x04) ? RaceManager::DIFFICULTY_MEDIUM :
+               (m_solved & 0x02) ? RaceManager::DIFFICULTY_CASUAL :
                (m_solved & 0x01) ? RaceManager::DIFFICULTY_EASY   :
                                    RaceManager::DIFFICULTY_NONE;
     }   // highestSolved

@@ -81,11 +81,12 @@ btWheelInfo& btKart::addWheel(const btVector3& connectionPointCS,
     ci.m_frictionSlip             = tuning.m_frictionSlip;
     ci.m_maxSuspensionTravel      = tuning.m_maxSuspensionTravel;
     ci.m_maxSuspensionForce       = tuning.m_maxSuspensionForce;
+    ci.m_worldTransform           = getChassisWorldTransform();
 
     m_wheelInfo.push_back( btWheelInfo(ci));
 
     btWheelInfo& wheel = m_wheelInfo[getNumWheels()-1];
-    memset(&wheel.m_raycastInfo, 0, sizeof(wheel.m_raycastInfo));
+    memset((void*)&wheel.m_raycastInfo, 0, sizeof(wheel.m_raycastInfo));
 
     updateWheelTransformsWS(wheel, getChassisWorldTransform(), false);
     updateWheelTransform(getNumWheels()-1,false);
@@ -115,13 +116,16 @@ void btKart::reset()
     m_num_wheels_on_ground       = 0;
     m_additional_impulse         = btVector3(0,0,0);
     m_ticks_additional_impulse   = 0;
+    m_ticks_total_impulse        = 0;
+    m_ticks_lock_impulse         = 0;
     m_additional_rotation        = 0;
     m_ticks_additional_rotation  = 0;
     m_max_speed                  = -1.0f;
     m_min_speed                  = 0.0f;
+    m_leaning_right              = true;
 
     // Set the brakes so that karts don't slide downhill
-    setAllBrakes(5.0f);
+    setAllBrakes(20.0f);
 
 }   // reset
 
@@ -213,12 +217,6 @@ void btKart::updateAllWheelTransformsWS()
 {
     updateAllWheelPositions();
 
-    const btTransform& chassisTrans = getChassisWorldTransform();
-
-    btVector3 forwardW(chassisTrans.getBasis()[0][m_indexForwardAxis],
-                       chassisTrans.getBasis()[1][m_indexForwardAxis],
-                       chassisTrans.getBasis()[2][m_indexForwardAxis]);
-
     // Simulate suspension
     // -------------------
 
@@ -226,7 +224,7 @@ void btKart::updateAllWheelTransformsWS()
     m_visual_wheels_touch_ground = true;
     for (int i=0;i<m_wheelInfo.size();i++)
     {
-        rayCast( i);
+        rayCast(i);
         if(m_wheelInfo[i].m_raycastInfo.m_isInContact)
             m_num_wheels_on_ground++;
         else
@@ -266,7 +264,7 @@ btScalar btKart::rayCast(unsigned int index, float fraction)
     btScalar max_susp_len = wheel.getSuspensionRestLength()
                           + wheel.m_maxSuspensionTravel;
 
-    // Do a slightly longer raycast to see if the kart might soon hit the
+    // Do a slightly longer raycast to see if the kart might soon hit the 
     // ground and some 'cushioning' is needed to avoid that the chassis
     // hits the ground.
     btScalar raylen = max_susp_len + 0.5f;
@@ -385,7 +383,7 @@ void btKart::getVisualContactPoint(const btTransform& chassis_trans,
         btScalar max_susp_len = wheel.getSuspensionRestLength()
                               + wheel.m_maxSuspensionTravel;
 
-        // Do a slightly longer raycast to see if the kart might soon hit the
+        // Do a slightly longer raycast to see if the kart might soon hit the 
         // ground and some 'cushioning' is needed to avoid that the chassis
         // hits the ground.
         btScalar raylen = max_susp_len + 0.5f;
@@ -434,31 +432,10 @@ void btKart::updateVehicle( btScalar step )
 
 
     // If the kart is flying, try to keep it parallel to the ground.
+    // If the kart is only on one or two wheels, try to bring it back on all four
     // -------------------------------------------------------------
-    if(m_num_wheels_on_ground==0)
-    {
-        btVector3 kart_up    = getChassisWorldTransform().getBasis().getColumn(1);
-        btVector3 terrain_up = -m_chassisBody->getGravity();
-        terrain_up = terrain_up.normalize();
-        // Length of axis depends on the angle - i.e. the further awat
-        // the kart is from being upright, the larger the applied impulse
-        // will be, resulting in fast changes when the kart is on its
-        // side, but not overcompensating (and therefore shaking) when
-        // the kart is not much away from being upright.
-        btVector3 axis = kart_up.cross(terrain_up);
-
-        // To avoid the kart going backwards/forwards (or rolling sideways),
-        // set the pitch/roll to 0 before applying the 'straightening' impulse.
-        // TODO: make this works if gravity is changed.
-        btVector3 av = m_chassisBody->getAngularVelocity();
-        av.setX(0);
-        av.setZ(0);
-        m_chassisBody->setAngularVelocity(av);
-        // Give a nicely balanced feeling for rebalancing the kart
-        float smoothing = m_kart->getKartProperties()
-                                ->getStabilitySmoothFlyingImpulse();
-        m_chassisBody->applyTorqueImpulse(axis * smoothing);
-    }
+    if(m_num_wheels_on_ground <= 2)
+        pushVehicleUpright();
 
     // Apply suspension forcen (i.e. upwards force)
     // --------------------------------------------
@@ -484,6 +461,37 @@ void btKart::updateVehicle( btScalar step )
 
     }
 
+    // Limit falling speeds by applying air friction to the vertical component
+    // ------------------------------------
+    if (m_num_wheels_on_ground == 0)
+    {
+        btVector3 v = btVector3(0,0,0);
+        // Engine force and friction when on the ground are also applied per-wheel
+        for (int i=0;i<m_wheelInfo.size();i++)
+        {
+            v += m_chassisBody->getVelocityInLocalPoint(m_wheelInfo[i]
+                                            .m_chassisConnectionPointCS);
+        }
+
+        btVector3 up = -m_chassisBody->getGravity();
+        up.normalize();
+        btVector3 v_up = (v * up) * up;
+
+        // The scalar product is positive if the two vectors are rather pointing
+        // in a similar direction and is negative if they are rather pointing in
+        // an opposite direction.
+        // We simulate computing per-wheel (air-friction is non-linear with speed,
+        // so using the sum of the speeds at each wheel would be incorrect)
+        float v_speed = v_up.dot(up) / m_wheelInfo.size();
+        float friction = m_wheelInfo.size() * getAirFriction(v_speed);
+
+        //Log::info("Flying friction debug", "Vspeed is %f, friction is %f", v_speed, friction);
+
+        btVector3 impulse = up * step * friction;
+        impulse *= (v_speed > 0) ? -1 : 1; 
+        m_chassisBody->applyCentralImpulse(impulse);
+    }
+
     // Update friction (i.e. forward force)
     // ------------------------------------
     updateFriction( step);
@@ -493,9 +501,20 @@ void btKart::updateVehicle( btScalar step )
     float dif = m_kart->getKartProperties()->getStabilityDownwardImpulseFactor();
     if(dif!=0 && m_num_wheels_on_ground==4)
     {
-        float f = -fabsf(m_kart->getSpeed()) * dif;
+        float f1 = fabsf(m_kart->getSpeed());
+        // Excessive downward impulse at high speeds is harmful
+        if (f1 > 35.0f)
+            f1 = 35.0f;
+        // Normalize for mass, to avoid heavier karts jumping easier
+        // than lighter karts (#5051)
+        f1 = f1 * m_kart->getKartProperties()->getMass() / 280;
+        // Adjust the impulse force for the time step,
+        // to prevent changes to physics FPS from breaking things.
+        // An increase in impulse frequency is almost equivalent to
+        // an increase in impulse strength of the same factor.
+        float f2 = -f1 * dif * step * 120.0f;
         btVector3 downwards_impulse = m_chassisBody->getWorldTransform().getBasis()
-                                    * btVector3(0, f, 0);
+                                    * btVector3(0, f2, 0);
         m_chassisBody->applyCentralImpulse(downwards_impulse);
     }
 
@@ -505,8 +524,25 @@ void btKart::updateVehicle( btScalar step )
     {
         // We have fixed timestep
         float dt = stk_config->ticks2Time(1);
-        m_chassisBody->applyCentralImpulse(m_additional_impulse*dt);
+        float impulse_strength;
+
+        float remaining_impulse_time_fraction = (float)m_ticks_additional_impulse /
+                                                (float)m_ticks_total_impulse;
+
+        // The impulse strength will increase rapidly at the beginning
+        // up to maximum strength (as (1.0f - 0.8f)*5.0f = 1.0f)
+        // Then fade away slower.
+        if (remaining_impulse_time_fraction < 0.8f)
+            impulse_strength = remaining_impulse_time_fraction*1.25f;
+        else
+            impulse_strength = (1.0f - remaining_impulse_time_fraction)*5.0f;
+
+        m_chassisBody->applyCentralImpulse(m_additional_impulse*dt*impulse_strength);
+        // Prevent the kart from getting rotated
+        m_kart->getBody()->setAngularVelocity(btVector3(0,0,0));
         m_ticks_additional_impulse--;
+        if (m_ticks_lock_impulse != 0)
+            m_ticks_lock_impulse--;
     }
 
     // Apply additional rotation set by supertuxkart
@@ -533,6 +569,174 @@ void btKart::updateVehicle( btScalar step )
     }
     adjustSpeed(m_min_speed, m_max_speed);
 }   // updateVehicle
+
+// ----------------------------------------------------------------------------
+void btKart::pushVehicleUpright()
+{
+    btVector3 kart_up    = getChassisWorldTransform().getBasis().getColumn(1);
+    btVector3 terrain_up = -m_chassisBody->getGravity();
+    terrain_up = terrain_up.normalize();
+
+    // If there is at least a wheel on the ground, check if the parallel impulse
+    // would bring the flying wheels closer to the ground or farther away,
+    if (m_num_wheels_on_ground >= 1)
+    {
+        // To limit raycasts starting below the ground on slopes,
+        // start raycasts with this much extraHeight.
+        btVector3 extraHeight = 0.25f * terrain_up;
+        float current_depth = 0.0f;
+        float simulated_depth = 0.0f;
+        const btTransform& chassis_trans = getChassisWorldTransform();
+        for(int i=0; i < m_wheelInfo.size(); i++)
+        {
+            // If the wheel is flying, we check how far it is from the ground
+            // (looking down in the direction gravity pulls the kart towards)
+            // If the wheel is on the ground, we check how far the flying wheels
+            // would be from the ground if the wheel on the ground's position was
+            // unchanged and the kart was properly oriented with regards to gravity.
+            //
+            // In both cases, we take the minimum depth from two raycasts,
+            // in order to limit sensitivity to tiny cracks in the terrain
+
+            if (m_wheelInfo[i].m_was_on_ground)
+            {
+                float local_sim_depth = 0.0f;
+                for(int j=0; j < m_wheelInfo.size(); j++)
+                {
+                    if (!m_wheelInfo[j].m_was_on_ground)
+                    {
+                        // == Simulate new wheel positions ==
+                        // 1 - We get the relative position of the target wheel
+                        //     compared to the reference wheel.
+                        //     Because we do later two slightly different raycasts,
+                        //     we also compute two slightly different offsets.
+                        btVector3 wheelOffset = m_wheelInfo[j].m_chassisConnectionPointCS
+                                              - m_wheelInfo[i].m_chassisConnectionPointCS;
+                        btVector3 wheelOffset2 = m_wheelInfo[j].m_chassisConnectionPointCS
+                                               - (m_wheelInfo[i].m_chassisConnectionPointCS * 0.95f);
+
+                        btScalar vector_len = wheelOffset.length();
+                        btScalar vector_len2 = wheelOffset2.length();
+
+                        // 2 - We apply the kart rotation, to point in the right direction
+                        //     from the reference wheel.
+                        wheelOffset = chassis_trans.getBasis() * wheelOffset;
+                        wheelOffset2 = chassis_trans.getBasis() * wheelOffset2;
+
+                        // 3 - Now, we project this offset on the plane perpendicular to
+                        //     the gravity direction. It gives us the direction towards
+                        //     which the wheel would be if the kart was upright.
+                        //     For the computations, we make use of terrain_up, which is the
+                        //     normalized (i. e. length 1) vector that is normal (i. e. perpendicular)
+                        //     to the plane.
+                        wheelOffset = wheelOffset - ((wheelOffset * terrain_up) * terrain_up);
+                        wheelOffset2 = wheelOffset2 - ((wheelOffset2 * terrain_up) * terrain_up);
+
+                        // 4 - Finally, to properly simulate the new wheel position, we also
+                        //     need to correct back the length of the offsets
+                        //     (as projection will have reduced the vector's length)
+                        wheelOffset = wheelOffset * vector_len / wheelOffset.length();
+                        wheelOffset2 = wheelOffset2 * vector_len2 / wheelOffset2.length();
+
+                        const btVector3& raycastStart = chassis_trans(m_wheelInfo[i].m_chassisConnectionPointCS) + wheelOffset + extraHeight;
+                        //Log::info("BtKart","Raycast started at %f x, %f y, %f z", raycastStart.getX(), raycastStart.getY(), raycastStart.getZ());
+                        float min_depth = uprightRayCast(raycastStart);
+                        const btVector3& raycastStart2 = chassis_trans(m_wheelInfo[i].m_chassisConnectionPointCS) + wheelOffset2 + extraHeight;
+                        //Log::info("BtKart","Depth of Raycast is %f, depth of Raycast2 is %f", min_depth, uprightRayCast(raycastStart2));
+                        min_depth = std::min(min_depth, uprightRayCast(raycastStart2));
+                        local_sim_depth += min_depth;
+                    }
+                }
+                simulated_depth = std::max(simulated_depth, local_sim_depth);
+            } // if (m_wheelInfo[i].m_was_on_ground)
+            else // wheel flying
+            {
+                const btVector3& raycastStart = chassis_trans(m_wheelInfo[i].m_chassisConnectionPointCS * 1.0f) + extraHeight;
+                const btVector3& raycastStart2 = chassis_trans(m_wheelInfo[i].m_chassisConnectionPointCS * 0.95f) + extraHeight;
+                current_depth += std::min(uprightRayCast(raycastStart), uprightRayCast(raycastStart2));
+            }
+        }
+        /*Log::info("BtKart","Some wheels are in the air and some are on the ground, "
+                "simulated flying wheel depth is %f, current depth is %f",
+                simulated_depth, current_depth);*/
+
+        // If the torque would bring the flying wheels farther from the ground,
+        // or if it wouldn't change much, don't do anything.
+        if (simulated_depth + 0.1f > current_depth)
+            return;
+    }
+
+    // The length of axis depends on the angle - i.e. the further away
+    // the kart is from being upright, the larger the applied impulse
+    // will be, resulting in fast changes when the kart is on its
+    // side, but not overcompensating (and therefore shaking) when
+    // the kart is not much away from being upright.
+    btVector3 axis = kart_up.cross(terrain_up);
+
+    // To avoid the kart going backwards/forwards (or rolling sideways),
+    // set the pitch/roll to 0 before applying the 'straightening' impulse.
+    // TODO: make this works if gravity is changed.
+    //FIXME : I think the comment above is wrong. From the kart's perspective,
+    //        the torque only applies roll, but no yaw and no pitch.
+    btVector3 av = m_chassisBody->getAngularVelocity();
+    av.setX(0);
+    av.setZ(0);
+    m_chassisBody->setAngularVelocity(av);
+    // Give a nicely balanced feeling for rebalancing the kart
+    float smoothing = m_kart->getKartProperties()->getStabilitySmoothFlyingImpulse();
+    m_chassisBody->applyTorqueImpulse(axis * smoothing);
+}   // pushVehicleUpright
+
+// ----------------------------------------------------------------------------
+float btKart::uprightRayCast(const btVector3& raycastStart)
+{
+    // Work around a bullet problem: when using a convex hull the raycast
+    // would sometimes hit the chassis (which does not happen when using a
+    // box shape). Therefore set the collision mask in the chassis body so
+    // that it is not hit anymore.
+    short int old_group=0;
+    if(m_chassisBody->getBroadphaseHandle())
+    {
+        old_group = m_chassisBody->getBroadphaseHandle()->m_collisionFilterGroup;
+        m_chassisBody->getBroadphaseHandle()->m_collisionFilterGroup = 0;
+    }
+
+    btVector3 rayDirection = m_chassisBody->getGravity();
+    rayDirection = rayDirection.normalize();
+    btScalar raylen = 100.0f;
+    btVector3 rayvector = rayDirection * raylen;
+    const btVector3& target = raycastStart + rayvector;
+    btVehicleRaycaster::btVehicleRaycasterResult rayResults;
+
+    btAssert(m_vehicleRaycaster);
+
+    m_vehicleRaycaster->castRay(raycastStart, target, rayResults);
+    btScalar depth = raylen * rayResults.m_distFraction;
+
+    if(m_chassisBody->getBroadphaseHandle())
+        m_chassisBody->getBroadphaseHandle()->m_collisionFilterGroup = old_group;
+
+    // If the raycast fails to make contact, depth is negative,
+    // which it shouldn't be: we correct it back to be positve.
+    if (depth < 0.0f)
+        depth = -depth;
+
+    return (float)depth;
+}   // uprightRayCast
+
+// ----------------------------------------------------------------------------
+float btKart::getCollisionLean() const
+{
+    float lean_factor = (float)m_ticks_additional_impulse /
+                        (float)m_ticks_total_impulse;
+    if (lean_factor > 0.5f)
+        lean_factor = 1.0f - lean_factor;
+
+    if (!m_leaning_right)
+        lean_factor = -lean_factor;
+
+    return 0.35f*m_leaning_factor*lean_factor;
+} // getCollisionLean
 
 // ----------------------------------------------------------------------------
 void btKart::setSteeringValue(btScalar steering, int wheel)
@@ -758,28 +962,19 @@ void btKart::updateFriction(btScalar timeStep)
         btScalar rollingFriction = 0.f;
 
         if (wheelInfo.m_engineForce != 0.f)
-        {
             rollingFriction = wheelInfo.m_engineForce* timeStep;
-        }
-        else
+
+        // Apply braking
+        if (wheelInfo.m_brake)
         {
-            btScalar defaultRollingFrictionImpulse = 0.f;
-            btScalar maxImpulse = wheelInfo.m_brake
-                ? wheelInfo.m_brake
-                : defaultRollingFrictionImpulse;
-            btWheelContactPoint contactPt(m_chassisBody, groundObject,
-                wheelInfo.m_raycastInfo.m_contactPointWS,
-                m_forwardWS[wheel], maxImpulse);
-            rollingFriction = calcRollingFriction(contactPt);
-            // This is a work around for the problem that a kart shakes
-            // if it is braking: we get a minor impulse forward, which
-            // bullet then tries to offset by applying a backward
-            // impulse - which is a bit too big, causing a impulse
-            // backwards, ... till the kart is shaking backwards and
-            // forwards. By only applying half of the impulse in case
-            // of low friction this goes away.
-            if (wheelInfo.m_brake && fabsf(rollingFriction) < 10)
-                rollingFriction *= 0.5f;
+            // Rolling friction gets weaker and weaker as the speed gets lower
+            // whereas braking should apply strong friction on the wheels even if
+            // the vehicle is moving at low speed
+            float speed_brake_factor = 1000 / (fabsf(m_kart->getSpeed()) + 10.0f);
+                btWheelContactPoint contactPt(m_chassisBody, groundObject,
+            wheelInfo.m_raycastInfo.m_contactPointWS,
+            m_forwardWS[wheel], wheelInfo.m_brake);
+            rollingFriction += calcRollingFriction(contactPt)*timeStep*speed_brake_factor;
         }
 
         m_forwardImpulse[wheel] = rollingFriction;
@@ -839,13 +1034,8 @@ void btKart::updateFriction(btScalar timeStep)
         {
             m_chassisBody->applyImpulse(
                                   m_forwardWS[wheel]*(m_forwardImpulse[wheel]),
-#define COMPATIBLE_0_7_3
-#ifdef COMPATIBLE_0_7_3
                                   // This was apparently done to help hexley
                                   btVector3(0,0,0));
-#else
-                                  rel_pos);
-#endif
         }
         if (m_sideImpulse[wheel] != btScalar(0.))
         {
@@ -864,26 +1054,13 @@ void btKart::updateFriction(btScalar timeStep)
             }
 
             btVector3 sideImp = m_axle[wheel] * m_sideImpulse[wheel];
-
-#if defined ROLLING_INFLUENCE_FIX && !defined COMPATIBLE_0_7_3
-            // fix. It only worked if car's up was along Y - VT.
-            btVector3 vChassisWorldUp =
-                                    getRigidBody()->getCenterOfMassTransform()
-                                   .getBasis().getColumn(m_indexUpAxis);
-            rel_pos -= vChassisWorldUp * (vChassisWorldUp.dot(rel_pos) *
-                                          (1.f-wheelInfo.m_rollInfluence) );
-#else
             rel_pos[m_indexUpAxis] *= wheelInfo.m_rollInfluence;
-#endif
             m_chassisBody->applyImpulse(sideImp,rel_pos);
 
             //apply friction impulse on the ground
             groundObject->applyImpulse(-sideImp,rel_pos2);
         }   // if (m_sideImpulse[wheel] != btScalar(0.))
     }   // for wheel<getNumWheels()
-
-
-
 }   // updateFriction
 
 // ----------------------------------------------------------------------------
@@ -952,6 +1129,18 @@ void btKart::setSliding(bool active)
 {
     m_allow_sliding = active;
 }   // setSliding
+
+// ----------------------------------------------------------------------------
+float btKart::getAirFriction(float speed)
+{
+    // The result will always be a positive number
+    float friction_intensity = fabsf(speed);
+
+    // Not a pure quadratic evolution as it would be too brutal
+    friction_intensity *= sqrt(friction_intensity)*5.0f;
+
+    return friction_intensity;
+}   // getAirFriction
 
 // ----------------------------------------------------------------------------
 /** Adjusts the velocity of this kart to be at least the specified minimum,

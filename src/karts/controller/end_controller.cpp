@@ -39,7 +39,7 @@
 #include "graphics/irr_driver.hpp"
 #endif
 
-#include "karts/abstract_kart.hpp"
+#include "karts/kart.hpp"
 #include "karts/max_speed.hpp"
 #include "karts/rescue_animation.hpp"
 #include "modes/linear_world.hpp"
@@ -51,7 +51,7 @@
 #include "utils/constants.hpp"
 #include "utils/log.hpp"
 
-EndController::EndController(AbstractKart *kart,
+EndController::EndController(Kart *kart,
                              Controller *prev_controller)
              : AIBaseLapController(kart)
 {
@@ -236,7 +236,7 @@ void EndController::handleSteering(float dt)
     m_debug_sphere->setPosition(target_point.toIrrVector());
 #endif
 
-    setSteering(steerToPoint(target_point), dt);
+    setSteering(steerToPoint(target_point));
 }   // handleSteering
 
 //-----------------------------------------------------------------------------
@@ -249,7 +249,7 @@ void EndController::handleRescue(const float DELTA)
         m_time_since_stuck += DELTA;
         if(m_time_since_stuck > 2.0f)
         {
-            RescueAnimation::create(m_kart);
+            m_kart->applyRescue(/* auto-rescue */ false);
             m_time_since_stuck=0.0f;
         }   // m_time_since_stuck > 2.0f
     }

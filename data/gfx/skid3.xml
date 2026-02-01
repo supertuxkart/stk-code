@@ -1,0 +1,29 @@
+<?xml version="1.0"?>
+<particles emitter="sphere" radius="0.03">
+
+    <spreading angle="15"          />
+    
+    <velocity  x="0.0"
+               y="0.008"
+               z="-0.015"         />
+    
+    <material  file="skid-particle2.png"  />
+    
+    <!-- Amount of particles emitted per second. The minimum rate
+         is used by the second emitter to warn that the bonus approaches,
+         the maximum is used by the main emitter. -->
+    <rate      min="1000"
+               max="2000"          />
+    
+    <!-- Minimal and maximal lifetime of a particle, in milliseconds. -->
+    <lifetime  min="75"
+               max="90"          />
+    
+    <!-- Size of the particles -->
+    <size      min="0.19"
+               max="0.19"         />
+    
+    <color     min="225 160 255"
+               max="180 60 255"  />
+
+</particles>

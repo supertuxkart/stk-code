@@ -32,14 +32,13 @@
 #include "items/attachment.hpp"
 #include "items/item.hpp"
 #include "items/powerup.hpp"
-#include "karts/abstract_kart.hpp"
+#include "karts/kart.hpp"
 #include "karts/controller/player_controller.hpp"
 #include "karts/kart_properties.hpp"
 #include "karts/skidding.hpp"
 #include "karts/rescue_animation.hpp"
 #include "modes/world.hpp"
 #include "network/network_config.hpp"
-#include "network/protocols/game_events_protocol.hpp"
 #include "network/protocols/game_protocol.hpp"
 #include "network/race_event_manager.hpp"
 #include "network/rewind_manager.hpp"
@@ -64,13 +63,12 @@
  *  \param player The player to which this kart belongs.
  *  \param init_pos The start coordinates and heading of the kart.
  */
-LocalPlayerController::LocalPlayerController(AbstractKart *kart,
+LocalPlayerController::LocalPlayerController(Kart *kart,
                                              const int local_player_id,
                                              HandicapLevel h)
                      : PlayerController(kart)
 {
     m_last_crash = 0;
-    m_has_started = false;
     m_handicap = h;
     m_player = StateManager::get()->getActivePlayer(local_player_id);
     if(m_player)
@@ -138,7 +136,6 @@ void LocalPlayerController::reset()
     PlayerController::reset();
     m_last_crash = 0;
     m_sound_schedule = false;
-    m_has_started = false;
 }   // reset
 
 // ----------------------------------------------------------------------------
@@ -179,23 +176,6 @@ bool LocalPlayerController::action(PlayerAction action, int value,
         return true;
     }
 
-    if (action == PA_ACCEL && value != 0 && !m_has_started)
-    {
-        m_has_started = true;
-        if (!NetworkConfig::get()->isNetworking())
-        {
-            float f = m_kart->getStartupBoostFromStartTicks(
-                World::getWorld()->getAuxiliaryTicks());
-            m_kart->setStartupBoost(f);
-        }
-        else if (NetworkConfig::get()->isClient())
-        {
-            auto ge = RaceEventManager::get()->getProtocol();
-            assert(ge);
-            ge->sendStartupBoost((uint8_t)m_kart->getWorldKartId());
-        }
-    }
-
     // If this event does not change the control state (e.g.
     // it's a (auto) repeat event), do nothing. This especially
     // optimises traffic to the server and other clients.
@@ -223,7 +203,7 @@ bool LocalPlayerController::action(PlayerAction action, int value,
 //-----------------------------------------------------------------------------
 /** Handles steering for a player kart.
  */
-void LocalPlayerController::steer(int ticks, int steer_val)
+void LocalPlayerController::steer(int steer_val)
 {
     RaceGUIBase* gui_base = World::getWorld()->getRaceGUI();
     if (gui_base && UserConfigParams::m_gamepad_debug)
@@ -233,7 +213,7 @@ void LocalPlayerController::steer(int ticks, int steer_val)
                              m_kart, 1.0f,
                              video::SColor(255, 255, 0, 255), false);
     }
-    PlayerController::steer(ticks, steer_val);
+    PlayerController::steer(steer_val);
 
     if(UserConfigParams::m_gamepad_debug)
     {
@@ -321,11 +301,10 @@ void LocalPlayerController::setParticleEmitterPosition(const btTransform& t)
 
 //-----------------------------------------------------------------------------
 /** Displays a penalty warning for player controlled karts. Called from
- *  LocalPlayerKart::update() if necessary.
+ *  Kart::enablePenaltyTime() if necessary.
  */
 void LocalPlayerController::displayPenaltyWarning()
 {
-    PlayerController::displayPenaltyWarning();
     RaceGUIBase* m=World::getWorld()->getRaceGUI();
     if (m)
     {
@@ -347,7 +326,6 @@ void LocalPlayerController::setPosition(int p)
 {
     PlayerController::setPosition(p);
 
-
     if(m_kart->getPosition()<p)
     {
         World *world = World::getWorld();
@@ -355,7 +333,7 @@ void LocalPlayerController::setPosition(int p)
         //I'm not sure if this method of finding the passing kart is fail-safe.
         for(unsigned int i = 0 ; i < world->getNumKarts(); i++ )
         {
-            AbstractKart *kart = world->getKart(i);
+            Kart *kart = world->getKart(i);
             if(kart->getPosition() == p + 1)
             {
                 kart->beep();
@@ -508,7 +486,7 @@ void LocalPlayerController::rumble(float strength_low, float strength_high, uint
 #endif
 }
 
-void LocalPlayerController::crashed(const AbstractKart* k) {
+void LocalPlayerController::crashed(const Kart* k) {
     doCrashHaptics();
 
     PlayerController::crashed(k);

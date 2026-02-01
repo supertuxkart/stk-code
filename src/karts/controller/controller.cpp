@@ -23,12 +23,12 @@
 #include "karts/controller/controller.hpp"
 
 #include "config/player_manager.hpp"
-#include "karts/abstract_kart.hpp"
+#include "karts/kart.hpp"
 
 /** Constructor, saves the kart pointer and a pointer to the KartControl
  *  of the kart.
  */
-Controller::Controller(AbstractKart *kart)
+Controller::Controller(Kart *kart)
 {
     m_controls = &(kart->getControls());
     m_kart     = kart;

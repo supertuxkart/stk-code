@@ -22,7 +22,7 @@
 
 #include "modes/world.hpp"
 
-class AbstractKart;
+class Kart;
 class TrackSector;
 
 /**
@@ -59,8 +59,6 @@ protected:
     bool              m_position_setting_initialised;
 #endif
 
-    unsigned int getClosestStartPoint(AbstractKart *kart);
-
     /** Stores the current graph node and track coordinates for each kart. */
     std::vector<TrackSector*> m_kart_track_sector;
 
@@ -76,22 +74,22 @@ public:
     virtual void  init() OVERRIDE;
     virtual void  reset(bool restart=false) OVERRIDE;
 
-    virtual bool  shouldDrawSpeedometerDigit() const OVERRIDE
+    virtual bool  shouldDrawSpeedometerDigit() const OVERRIDE 
                                                     { return m_display_rank; }
-    virtual std::pair<int, video::SColor>
-                  getSpeedometerDigit(const AbstractKart *kart) const OVERRIDE;
+    virtual std::pair<int, video::SColor> 
+                  getSpeedometerDigit(const Kart *kart) const OVERRIDE;
 
     void          beginSetKartPositions();
     bool          setKartPosition(unsigned int kart_id,
                                   unsigned int position);
     void          endSetKartPositions();
-    AbstractKart* getKartAtPosition(unsigned int p) const;
+    Kart* getKartAtPosition(unsigned int p) const;
     /** Returns the kart at which position (start from 1) to draw race icon
      *  \param p Position of the kart. */
-    virtual AbstractKart* getKartAtDrawingPosition(unsigned int p) const
+    virtual Kart* getKartAtDrawingPosition(unsigned int p) const
                                                { return getKartAtPosition(p); }
     virtual int   getScoreForPosition(int p);
-    virtual unsigned int getRescuePositionIndex(AbstractKart *kart) OVERRIDE;
+    virtual unsigned int getRescuePositionIndex(Kart *kart) OVERRIDE;
     // ------------------------------------------------------------------------
     /** Returns the track_sector object for the specified kart.
      *  \param kart_index World index of the kart. */
@@ -103,7 +101,7 @@ public:
     // ------------------------------------------------------------------------
     bool isOnRoad(unsigned int kart_index) const;
     // ------------------------------------------------------------------------
-    int getSectorForKart(const AbstractKart *kart) const;
+    int getSectorForKart(const Kart *kart) const;
 
 };   // WorldWithRank
 

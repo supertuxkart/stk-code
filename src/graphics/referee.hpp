@@ -35,7 +35,7 @@ using namespace irr;
 
 #include "utils/vec3.hpp"
 
-class AbstractKart;
+class Kart;
 
 /**
   * \ingroup graphics
@@ -93,7 +93,7 @@ private:
 
 public:
                 Referee();
-                Referee(const AbstractKart &kart);
+                Referee(const Kart &kart);
                ~Referee();
     void        selectReadySetGo(int rsg);
     void        attachToSceneNode();

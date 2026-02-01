@@ -21,7 +21,7 @@
 
 #include "karts/controller/controller.hpp"
 
-class AbstractKart;
+class Kart;
 class Player;
 
 class PlayerController : public Controller
@@ -33,12 +33,10 @@ protected:
     bool           m_prev_brake;
     bool           m_prev_nitro;
 
-    int            m_penalty_ticks;
-
-    virtual void  steer(int ticks, int steer_val);
+    virtual void  steer(int steer_val);
 
 public:
-                 PlayerController(AbstractKart *kart);
+                 PlayerController(Kart *kart);
     virtual     ~PlayerController  ();
     virtual void update            (int ticks) OVERRIDE;
     virtual bool action            (PlayerAction action, int value,
@@ -64,9 +62,9 @@ public:
     {
     }   // setPosition
     // ------------------------------------------------------------------------
-    virtual void crashed(const AbstractKart *k) OVERRIDE
+    virtual void crashed(const Kart *k) OVERRIDE
     {
-    }   // crashed(AbstractKart)
+    }   // crashed(Kart)
     // ------------------------------------------------------------------------
     virtual void crashed(const Material *m) OVERRIDE
     {
@@ -81,7 +79,7 @@ public:
     /** Player will always be able to get a slipstream bonus. */
     virtual bool  disableSlipstreamBonus() const OVERRIDE
     {
-        return false;
+        return false; 
     }
     // ------------------------------------------------------------------------
     /** Called when a race is finished. */
@@ -91,9 +89,6 @@ public:
     // ------------------------------------------------------------------------
     /** Returns the name of the player profile. */
     core::stringw getName(bool include_handicap_string = true) const OVERRIDE;
-    // ------------------------------------------------------------------------
-    /** Called when this kart started too early and got a start penalty. */
-    virtual void  displayPenaltyWarning();
 
 };   // class PlayerController
 

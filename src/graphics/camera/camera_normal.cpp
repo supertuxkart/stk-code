@@ -26,7 +26,7 @@
 #include "input/input_manager.hpp"
 #include "input/multitouch_device.hpp"
 #include "modes/soccer_world.hpp"
-#include "karts/abstract_kart.hpp"
+#include "karts/kart.hpp"
 #include "karts/explosion_animation.hpp"
 #include "karts/kart.hpp"
 #include "karts/kart_properties.hpp"
@@ -48,8 +48,8 @@ float CameraNormal::m_tv_cooldown_default = 0.4f;  // time to change camera
  *  \param camera_index Index of this camera.
  *  \param Kart Pointer to the kart for which this camera is used.
  */
-CameraNormal::CameraNormal(Camera::CameraType type,  int camera_index,
-                           AbstractKart* kart)
+CameraNormal::CameraNormal(Camera::CameraType type,  int camera_index, 
+                           Kart* kart)
             : Camera(type, camera_index, kart), m_camera_offset(0., 0., 0.)
 {
     m_distance = kart ? UserConfigParams::m_camera_distance : 1000.0f;
@@ -80,7 +80,7 @@ CameraNormal::CameraNormal(Camera::CameraType type,  int camera_index,
 //-----------------------------------------------------------------------------
 /** Moves the camera smoothly from the current camera position (and target)
  *  to the new position and target.
- *  \param dt Delta time,
+ *  \param dt Delta time, 
  *  \param smooth Updates the camera if true, only calculate smooth state parameter if false
  *  \param if false, the camera instantly moves to the endpoint, or else it smoothly moves
  */
@@ -330,7 +330,7 @@ void CameraNormal::update(float dt)
     float above_kart, cam_angle, side_way, distance, cam_roll_angle;
     bool  smoothing;
 
-    getCameraSettings(getMode(), &above_kart, &cam_angle, &side_way,
+    getCameraSettings(getMode(), &above_kart, &cam_angle, &side_way, 
                                  &distance, &smoothing, &cam_roll_angle);
 
     // If an explosion is happening, stop moving the camera,
@@ -363,7 +363,7 @@ void CameraNormal::update(float dt)
 
     if (!smoothing)
     {
-        getCameraSettings(m_last_smooth_mode, &above_kart, &cam_angle, &side_way,
+        getCameraSettings(m_last_smooth_mode, &above_kart, &cam_angle, &side_way, 
                                               &distance, &smoothing, &cam_roll_angle);
         moveCamera(dt, false, cam_angle, distance);
     }

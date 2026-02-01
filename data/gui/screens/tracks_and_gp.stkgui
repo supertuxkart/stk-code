@@ -37,7 +37,7 @@
                 <box width="100%" height="48%" layout="vertical-row" padding="0">
                     <spacer width="20" height="2%" />
                     <!-- The icon-button doesn't properly reserve space for the label, so we use a separate label -->
-                    <icon-button id="rand-gp" width="100%" height="66%" icon="gui/icons/gp_new.png" align="center" />
+                    <icon-button id="rand-gp" width="100%" height="66%" icon="gui/icons/gp_new.png" align="center">
                     <spacer width="20" height="2%" />
                     <label width="96%" height="25%" I18N="In the track and grand prix selection screen"
                                 text="Random Grand Prix" word_wrap="true" align="center" text_align="center"/>

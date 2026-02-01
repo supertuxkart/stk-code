@@ -62,22 +62,20 @@ friend class KartRewinder;
     int m_reset_trans_compressed[4];
 
     bool m_direct_hit;
+    bool m_small;
 
     // ------------------------------------------------------------------------
     void restoreData(BareNetworkString* b);
     // ------------------------------------------------------------------------
-    void init(bool direct_hit, const Vec3& normal,
+    void init(bool direct_hit, bool small, const Vec3& normal,
               const btTransform& reset_trans);
     // ------------------------------------------------------------------------
-    ExplosionAnimation(AbstractKart* kart, BareNetworkString* buffer);
+    ExplosionAnimation(Kart* kart, BareNetworkString* buffer);
     // ------------------------------------------------------------------------
-    ExplosionAnimation(AbstractKart* kart, bool direct_hit);
+    ExplosionAnimation(Kart* kart, bool direct_hit, bool small);
 public:
     // ------------------------------------------------------------------------
-    static ExplosionAnimation *create(AbstractKart* kart, const Vec3 &pos,
-                                      bool direct_hit);
-    // ------------------------------------------------------------------------
-    static ExplosionAnimation *create(AbstractKart *kart);
+    static ExplosionAnimation *create(Kart* kart, bool direct_hit, bool small);
     // ------------------------------------------------------------------------
     virtual ~ExplosionAnimation();
     // ------------------------------------------------------------------------

@@ -20,7 +20,7 @@
 #include "input/gamepad_device.hpp"
 
 #include "input/gamepad_config.hpp"
-#include "karts/abstract_kart.hpp"
+#include "karts/kart.hpp"
 #include "karts/controller/local_player_controller.hpp"
 
 /** Constructor for GamePadDevice from a connected gamepad for which no
@@ -99,7 +99,7 @@ void GamePadDevice::resetAxisDirection(const int axis,
     // ignore this while in menus
     if (StateManager::get()->getGameState() != GUIEngine::GAME) return;
 
-    AbstractKart* pk = getPlayer()->getKart();
+    Kart* pk = getPlayer()->getKart();
     if (!pk)
     {
         Log::error("Binding", "Trying to reset axis for an unknown player.");
@@ -145,18 +145,6 @@ bool GamePadDevice::processAndMapInput(Input::InputType type, const int id,
                                        int* value           /* inout */ )
 {
     if (!m_configuration->isEnabled()) return false;
-
-    // A digital input value is 32767 or -32768 (which then triggers
-    // time-full-steer to be used to adjust actual steering values.
-    // To prevent this delay for analog gamesticks, make sure that
-    // 32767/-32768 are never used.
-    if(m_configuration->isAnalog(type, id))
-    {
-        if(*value==32767)
-            *value = 32766;
-        else if(*value==-32768)
-            *value = -32767;
-    }
 
     // Desensitizing means to map an input in the range x in [0,1] to
     // x^2. This results in changes close to 0 to have less impact

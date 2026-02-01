@@ -27,7 +27,7 @@
 #include "graphics/sp/sp_shader_manager.hpp"
 #include "io/xml_node.hpp"
 #include "items/flyable.hpp"
-#include "karts/abstract_kart.hpp"
+#include "karts/kart.hpp"
 #include "karts/cannon_animation.hpp"
 #include "karts/skidding.hpp"
 #include "modes/world.hpp"
@@ -48,7 +48,7 @@ CheckCannon::CheckCannon(const XMLNode &node,  unsigned int index)
         p2 = "p2";
     }
 
-    if( !node.get(p1, &m_target_left ) ||
+    if( !node.get(p1, &m_target_left ) || 
         !node.get(p2, &m_target_right)    )
         Log::fatal("CheckCannon", "No target line specified.");
 
@@ -108,13 +108,13 @@ CheckCannon::~CheckCannon()
 // ----------------------------------------------------------------------------
 /** Changes the colour of a check cannon depending on state.
  */
-void CheckCannon::changeDebugColor(bool is_active)
+void CheckCannon::changeDebugColor(bool is_active, bool prevent_backwards)
 {
 #if defined(DEBUG) && !defined(SERVER_ONLY)
     CheckLine::changeDebugColor(is_active);
 
-    video::SColor color = is_active ? video::SColor(192, 255, 0, 0)
-        : video::SColor(192, 128, 128, 128);
+    video::SColor color = is_active ? video::SColor(192, 255,   0,   0)
+                                    : video::SColor(192, 128, 128, 128);
     for (unsigned int i = 0; i < 4; i++)
     {
         m_debug_target_dy_dc->getVerticesVector()[i].m_color = color;
@@ -136,7 +136,7 @@ void CheckCannon::update(float dt)
 
     for (unsigned int i = 0; i < world->getNumKarts(); i++)
     {
-        AbstractKart* kart = world->getKart(i);
+        Kart* kart = world->getKart(i);
         if (kart->getKartAnimation() || kart->isGhostKart() ||
             kart->isEliminated() || !m_is_active[i])
             continue;
@@ -145,7 +145,7 @@ void CheckCannon::update(float dt)
         Vec3 prev_xyz = xyz - kart->getVelocity() * dt;
         if (isTriggered(prev_xyz, xyz, /*kart index - ignore*/ -1))
         {
-            // The constructor AbstractKartAnimation resets the skidding to 0.
+            // The constructor KartAnimation resets the skidding to 0.
             // So in order to smooth rotate the kart, we need to keep the
             // current visual rotation and pass it to the CannonAnimation.
             float skid_rot = kart->getSkidding()->getVisualSkidRotation();

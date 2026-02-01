@@ -68,42 +68,42 @@ namespace Scripting
             
         r = engine->RegisterObjectType("Vec3", sizeof(SimpleVec3), asOBJ_VALUE | asOBJ_APP_CLASS_ALLFLOATS | asOBJ_APP_CLASS_CDA); assert(r >= 0);
         
-        r = engine->RegisterObjectBehaviour("Vec3", asBEHAVE_CONSTRUCT, "void f()",
-                                            mp ? WRAP_OBJ_LAST(Constructor) : asFUNCTION(Constructor),
+        r = engine->RegisterObjectBehaviour("Vec3", asBEHAVE_CONSTRUCT, "void f()", 
+                                            mp ? WRAP_OBJ_LAST(Constructor) : asFUNCTION(Constructor), 
                                             call_conv); assert(r >= 0);
                                             
-        r = engine->RegisterObjectBehaviour("Vec3", asBEHAVE_DESTRUCT, "void f()",
-                                            mp ? WRAP_OBJ_LAST(Destructor) : asFUNCTION(Destructor),
+        r = engine->RegisterObjectBehaviour("Vec3", asBEHAVE_DESTRUCT, "void f()", 
+                                            mp ? WRAP_OBJ_LAST(Destructor) : asFUNCTION(Destructor), 
                                             call_conv); assert(r >= 0);
                                             
-        r = engine->RegisterObjectMethod("Vec3", "Vec3 &opAssign(const Vec3 &in)",
-                                         mp ? WRAP_MFN_PR(SimpleVec3, operator =, (const SimpleVec3&), SimpleVec3&)
-                                            : asMETHODPR(SimpleVec3, operator =, (const SimpleVec3&), SimpleVec3&),
+        r = engine->RegisterObjectMethod("Vec3", "Vec3 &opAssign(const Vec3 &in)", 
+                                         mp ? WRAP_MFN_PR(SimpleVec3, operator =, (const SimpleVec3&), SimpleVec3&) 
+                                            : asMETHODPR(SimpleVec3, operator =, (const SimpleVec3&), SimpleVec3&), 
                                          mp ? asCALL_GENERIC : asCALL_THISCALL); assert(r >= 0);
                                          
-        r = engine->RegisterObjectBehaviour("Vec3", asBEHAVE_CONSTRUCT, "void f(float, float, float)",
-                                            mp ? WRAP_OBJ_LAST(ConstructVector3FromFloats)
-                                               : asFUNCTION(ConstructVector3FromFloats),
+        r = engine->RegisterObjectBehaviour("Vec3", asBEHAVE_CONSTRUCT, "void f(float, float, float)", 
+                                            mp ? WRAP_OBJ_LAST(ConstructVector3FromFloats) 
+                                               : asFUNCTION(ConstructVector3FromFloats), 
                                             call_conv); assert(r >= 0);
                                             
-        r = engine->RegisterGlobalFunction("void printVec3(Vec3 a)",
-                                           asFUNCTION(printVec3),
+        r = engine->RegisterGlobalFunction("void printVec3(Vec3 a)", 
+                                           asFUNCTION(printVec3), 
                                            asCALL_GENERIC); assert(r >= 0);
                                            
-        r = engine->RegisterObjectMethod("Vec3", "float getX()",
-                                         mp ? WRAP_OBJ_LAST(getX) : asFUNCTION(getX),
+        r = engine->RegisterObjectMethod("Vec3", "float getX()", 
+                                         mp ? WRAP_OBJ_LAST(getX) : asFUNCTION(getX), 
                                          call_conv); assert(r >= 0);
                                          
-        r = engine->RegisterObjectMethod("Vec3", "float getY()",
-                                         mp ? WRAP_OBJ_LAST(getY) : asFUNCTION(getY),
+        r = engine->RegisterObjectMethod("Vec3", "float getY()", 
+                                         mp ? WRAP_OBJ_LAST(getY) : asFUNCTION(getY), 
                                          call_conv); assert(r >= 0);
                                          
-        r = engine->RegisterObjectMethod("Vec3", "float getZ()",
-                                         mp ? WRAP_OBJ_LAST(getZ) : asFUNCTION(getZ),
+        r = engine->RegisterObjectMethod("Vec3", "float getZ()", 
+                                         mp ? WRAP_OBJ_LAST(getZ) : asFUNCTION(getZ), 
                                          call_conv); assert(r >= 0);
                                          
-        r = engine->RegisterObjectMethod("Vec3", "float getLength()",
-                                         mp ? WRAP_OBJ_LAST(getLength) : asFUNCTION(getLength),
+        r = engine->RegisterObjectMethod("Vec3", "float getLength()", 
+                                         mp ? WRAP_OBJ_LAST(getLength) : asFUNCTION(getLength), 
                                          call_conv); assert(r >= 0);
     }
 }

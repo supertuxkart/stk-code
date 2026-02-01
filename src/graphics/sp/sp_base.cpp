@@ -636,7 +636,7 @@ void destroy()
     SPTextureManager::destroy();
 
 #ifndef USE_GLES2
-    if (skinningUseTBO() &&
+    if (skinningUseTBO() && 
         CVS->isARBBufferStorageUsable())
     {
         glBindBuffer(GL_TEXTURE_BUFFER, g_skinning_buf);
@@ -1164,7 +1164,7 @@ void uploadSkinningMatrices()
 
     unsigned buffer_offset = 0;
 #ifndef USE_GLES2
-    if (skinningUseTBO() &&
+    if (skinningUseTBO() && 
         !CVS->isARBBufferStorageUsable())
     {
         glBindBuffer(GL_TEXTURE_BUFFER, g_skinning_buf);
@@ -1195,7 +1195,7 @@ void uploadSkinningMatrices()
     }
     
 #ifndef USE_GLES2
-    if (skinningUseTBO() &&
+    if (skinningUseTBO() && 
         !CVS->isARBBufferStorageUsable())
     {
         glUnmapBuffer(GL_TEXTURE_BUFFER);

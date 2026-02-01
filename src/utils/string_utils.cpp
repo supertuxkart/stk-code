@@ -924,7 +924,7 @@ namespace StringUtils
     }   // utf8ToWide
 
     // ------------------------------------------------------------------------
-    /** This functions tests if the string s contains "-WORDX", where
+    /** This functions tests if the string s contains "-WORDX", where 
      *  word is the parameter, and X is a one digit integer number. If
      *  the string is found, it is removed from s, pre-release gets the
      *  value of X, and the function returns true. If the string is not
@@ -961,7 +961,7 @@ namespace StringUtils
     int versionToInt(const std::string &version_string)
     {
         // Special case: GIT
-        if(version_string=="GIT" || version_string=="git")
+        if(version_string=="GIT" || version_string=="git" || version_string=="2.0-git")
         {
             // GIT version will be version 99.99.99i-rcJ
             return   10000000*99
@@ -1175,7 +1175,7 @@ namespace StringUtils
     }   // wideToUtf32
 
     // ------------------------------------------------------------------------
-    /** At the moment only versionToInt is tested.
+    /** At the moment only versionToInt is tested. 
      */
     void unitTesting()
     {

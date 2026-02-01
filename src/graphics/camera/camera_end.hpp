@@ -27,7 +27,7 @@
 
 /**
   * Handles the end race camera. It inherits from CameraNormal to make
-  * use of the normal camera implementation of a reverse camera.
+  * use of the normal camera implementation of a reverse camera. 
   * \ingroup graphics
   */
 class CameraEnd : public CameraNormal
@@ -101,7 +101,7 @@ private:
     void handleEndCamera(float dt);
 
     friend class Camera;   // Give Camera access to constructor
-             CameraEnd(int camera_index, AbstractKart* kart);
+             CameraEnd(int camera_index, Kart* kart);
     virtual ~CameraEnd() {}
 public:
 

@@ -23,7 +23,7 @@
 #include "audio/sfx_base.hpp"
 #include "audio/sfx_manager.hpp"
 #include "config/user_config.hpp"
-#include "karts/abstract_kart.hpp"
+#include "karts/kart.hpp"
 #include "karts/cannon_animation.hpp"
 #include "karts/controller/controller.hpp"
 #include "karts/ghost_kart.hpp"
@@ -133,7 +133,7 @@ void LinearWorld::reset(bool restart)
     // be increased to avoid negative values in estimateFinishTimeForKart
     // Increase this value somewhat in case that a kart drivess/slides
     // backwards a little bit at start.
-    m_distance_increase = Track::getCurrentTrack()->getTrackLength()
+    m_distance_increase = Track::getCurrentTrack()->getTrackLength() 
                         - m_distance_increase + 5.0f;
 
     if(m_distance_increase<0) m_distance_increase = 1.0f;  // shouldn't happen
@@ -272,7 +272,7 @@ void LinearWorld::updateTrackSectors()
     for(unsigned int n=0; n<kart_amount; n++)
     {
         KartInfo& kart_info = m_kart_info[n];
-        AbstractKart* kart = m_karts[n].get();
+        Kart* kart = m_karts[n].get();
 
         // Nothing to do for karts that are currently being
         // rescued or eliminated
@@ -313,7 +313,7 @@ void LinearWorld::updateGraphics(float dt)
 
     const GUIEngine::GameState gamestate = StateManager::get()->getGameState();
     
-    if (gamestate == GUIEngine::GAME &&
+    if (gamestate == GUIEngine::GAME && 
         !GUIEngine::ModalDialog::isADialogActive())
     {
         const unsigned int kart_amount = getNumKarts();
@@ -339,7 +339,7 @@ void LinearWorld::updateLiveDifference()
     // First check that the call requirements are verified
     assert (RaceManager::get()->hasGhostKarts() && RaceManager::get()->getNumberOfKarts() >= 2);
 
-    AbstractKart* ghost_kart = getKart(0);
+    Kart* ghost_kart = getKart(0);
 
     // Get the distance at which the second kart is
     float second_kart_distance = getOverallDistance(1);
@@ -376,7 +376,7 @@ void LinearWorld::updateLiveDifference()
 void LinearWorld::newLap(unsigned int kart_index)
 {
     KartInfo &kart_info = m_kart_info[kart_index];
-    AbstractKart *kart  = m_karts[kart_index].get();
+    Kart *kart  = m_karts[kart_index].get();
 
     // Reset reset-after-lap achievements
     PlayerProfile *p = PlayerManager::getCurrentPlayer();
@@ -406,7 +406,7 @@ void LinearWorld::newLap(unsigned int kart_index)
         kart_info.m_ticks_at_last_lap=getTimeTicks();
         kart_info.m_finished_laps++;
         m_kart_info[kart_index].m_overall_distance =
-              m_kart_info[kart_index].m_finished_laps
+              m_kart_info[kart_index].m_finished_laps 
             * Track::getCurrentTrack()->getTrackLength()
             + getDistanceDownTrackForKart(kart->getWorldKartId(), true);
     }
@@ -629,7 +629,7 @@ void LinearWorld::getKartsDisplayInfo(
     for(unsigned int i = 0; i < kart_amount ; i++)
     {
         RaceGUIBase::KartIconDisplayInfo& rank_info = (*info)[i];
-        AbstractKart* kart = m_karts[i].get();
+        Kart* kart = m_karts[i].get();
 
         // reset color
         rank_info.m_color = video::SColor(255, 255, 255, 255);
@@ -658,7 +658,7 @@ void LinearWorld::getKartsDisplayInfo(
     {
         RaceGUIBase::KartIconDisplayInfo& rank_info = (*info)[i];
         KartInfo& kart_info = m_kart_info[i];
-        AbstractKart* kart = m_karts[i].get();
+        Kart* kart = m_karts[i].get();
 
         const int position = kart->getPosition();
 
@@ -751,7 +751,7 @@ void LinearWorld::getKartsDisplayInfo(
  *       have covered.
  *  \param kart The kart for which to estimate the finishing times.
  */
-float LinearWorld::estimateFinishTimeForKart(AbstractKart* kart)
+float LinearWorld::estimateFinishTimeForKart(Kart* kart)
 {
     const KartInfo &kart_info = m_kart_info[kart->getWorldKartId()];
 
@@ -829,7 +829,7 @@ unsigned int LinearWorld::getNumberOfRescuePositions() const
 }   // getNumberOfRescuePositions
 
 // ------------------------------------------------------------------------
-unsigned int LinearWorld::getRescuePositionIndex(AbstractKart *kart)
+unsigned int LinearWorld::getRescuePositionIndex(Kart *kart)
 {
     const unsigned int kart_id = kart->getWorldKartId();
 
@@ -887,7 +887,7 @@ void LinearWorld::updateRacePosition()
     // so that debug output is still correct!!!!!!!!!!!
     for (unsigned int i=0; i<kart_amount; i++)
     {
-        AbstractKart* kart = m_karts[i].get();
+        Kart* kart = m_karts[i].get();
         // Karts that are either eliminated or have finished the
         // race already have their (final) position assigned. If
         // these karts would get their rank updated, it could happen
@@ -974,7 +974,7 @@ void LinearWorld::updateRacePosition()
         Log::debug("[LinearWorld]", "Counting laps at %u seconds.", getTime());
         for (unsigned int i=0; i<kart_amount; i++)
         {
-            AbstractKart* kart = m_karts[i].get();
+            Kart* kart = m_karts[i].get();
             Log::debug("[LinearWorld]", "counting karts ahead of %s (laps %u,"
                         " progress %u, finished %d, eliminated %d, initial position %u.",
                         kart->getIdent().c_str(),
@@ -1044,12 +1044,12 @@ void LinearWorld::updateRacePosition()
  */
 void LinearWorld::checkForWrongDirection(unsigned int i, float dt)
 {
-    if (!m_karts[i]->getController()->isLocalPlayerController())
+    if (!m_karts[i]->getController()->isLocalPlayerController()) 
         return;
 
     KartInfo &ki = m_kart_info[i];
     
-    const AbstractKart *kart=m_karts[i].get();
+    const Kart *kart=m_karts[i].get();
     // If the kart can go in more than one directions from the current track
     // don't do any reverse message handling, since it is likely that there
     // will be one direction in which it isn't going backwards anyway.
@@ -1069,10 +1069,12 @@ void LinearWorld::checkForWrongDirection(unsigned int i, float dt)
         angle_diff += 2*M_PI;
 
     // Display a warning message if the kart is going back way, i.e. if angle
-    // is too big(unless the kart has already finished the race).
+    // is too big (unless the kart has already finished the race).
+    // We also avoid displaying the message if the kart is almost not moving.
     if ((angle_diff > DEGREE_TO_RAD * 120.0f ||
         angle_diff < -DEGREE_TO_RAD * 120.0f) &&
         kart->getVelocityLC().getY() > 0.0f &&
+        fabsf(kart->getSpeed()) > 2.0f &&
         !kart->hasFinishedRace())
     {
         ki.m_wrong_way_timer += dt;
@@ -1115,7 +1117,7 @@ std::pair<uint32_t, uint32_t> LinearWorld::getGameStartedProgress() const
     std::pair<uint32_t, uint32_t> progress(
         std::numeric_limits<uint32_t>::max(),
         std::numeric_limits<uint32_t>::max());
-    AbstractKart* slowest_kart = NULL;
+    Kart* slowest_kart = NULL;
     for (unsigned i = (unsigned)m_karts.size(); i > 0; i--)
     {
         slowest_kart = getKartAtPosition(i);

@@ -28,7 +28,6 @@ using irr::core::stringc;
 #include "guiengine/scalable_font.hpp"
 #include "guiengine/screen.hpp"
 #include "guiengine/widget.hpp"
-#include "guiengine/widgets/button_widget.hpp"
 #include "io/file_manager.hpp"
 #include "online/link_helper.hpp"
 #include "states_screens/state_manager.hpp"
@@ -218,11 +217,6 @@ void CreditsScreen::loadedFromFile()
 void CreditsScreen::init()
 {
     Screen::init();
-
-    GUIEngine::ButtonWidget *link = getWidget<GUIEngine::ButtonWidget>("stk-website");
-    link->setText("supertuxkart.net");
-    onResize(); // Ensure the icon-button is properly sized
-
     reset();
     updateAreaSize();
 }   // init

@@ -93,6 +93,8 @@ protected:
         int    m_skidding_effect;
         /** Kart skidding showing red flame or not. */
         bool   m_red_skidding;
+        /** Kart skidding showing purple flame or not. */
+        bool   m_purple_skidding;
         /** True if the kart recorded is jumping. */
         bool        m_jumping;
     };   // KartReplayEvent
@@ -105,7 +107,7 @@ protected:
     // ------------------------------------------------------------------------
     /** Returns the version number of the replay file recorderd by this executable.
      *  This is also used as a maximum supported version by this exexcutable. */
-    unsigned int getCurrentReplayVersion() const { return 4; }
+    unsigned int getCurrentReplayVersion() const { return 5; }
 
     // ------------------------------------------------------------------------
     /** This is used to check that a loaded replay file can still

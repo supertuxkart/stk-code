@@ -18,7 +18,7 @@
 
 #include "items/network_item_manager.hpp"
 
-#include "karts/abstract_kart.hpp"
+#include "karts/kart.hpp"
 #include "modes/world.hpp"
 #include "network/network_config.hpp"
 #include "network/network_string.hpp"
@@ -85,7 +85,7 @@ void NetworkItemManager::reset()
  *  \param item The item that was collected.
  *  \param kart The kart that collected the item.
  */
-void NetworkItemManager::collectedItem(ItemState *item, AbstractKart *kart)
+void NetworkItemManager::collectedItem(ItemState *item, Kart *kart)
 {
     if (m_network_item_debugging)
         Log::info("NIM", "collectedItem at %d index %d type %d ttr %d",
@@ -138,7 +138,7 @@ void NetworkItemManager::switchItems()
  *  \param server_normal In case of rewind the server's normal of this item.
  */
 Item* NetworkItemManager::dropNewItem(ItemState::ItemType type,
-                                      const AbstractKart *kart,
+                                      const Kart *kart,
                                       const Vec3 *server_xyz,
                                       const Vec3 *server_normal)
 {
@@ -289,7 +289,7 @@ void NetworkItemManager::restoreState(BareNetworkString *buffer, int count)
     //
     // 1) Apply all events included in this state to the confirmed state.
     //    It is possible that the server inludes events that have happened
-    //    before the confirmed time on this client (the server keeps on
+    //    before the confirmed time on this client (the server keeps on 
     //    sending all event updates till all clients have confirmed that
     //    that they have received them!!) - which will simply be ignored/
     //    This phase will only act on the confirmed ItemState in the
@@ -305,18 +305,18 @@ void NetworkItemManager::restoreState(BareNetworkString *buffer, int count)
     //       m_confirmed_switch_ticks.
     //
     // 2) Inform the server that those item events have been received.
-    //    Once the server has received confirmation from all clients
+    //    Once the server has received confirmation from all clients 
     //    for events, they will not be resent anymore.
-    //
+    // 
     // 3) Once all new events have been applied to the confirmed state the
-    //    time must be <= world time. Forward the confirmed state to
+    //    time must be <= world time. Forward the confirmed state to 
     //    world time (i.e. all confirmed items will get their ticksTillReturn
     //    value updated), and update m_confirmed_state_time to the world time.
     //
     // 4) Finally update the ItemManager state from the confirmed state:
     //    Any items that exist in both data structures will be updated.
     //    If an item exist in the ItemManager but not in the confirmed state
-    //    of the NetworkItemManager, the item in the item manager will be
+    //    of the NetworkItemManager, the item in the item manager will be 
     //    delete - it was a predict item, which has not been confirmed by
     //    the server (e.g. a kart drops a bubble gum, and either the server
     //    has not received that event yet to confirm it, or perhaps the
@@ -333,13 +333,13 @@ void NetworkItemManager::restoreState(BareNetworkString *buffer, int count)
 
     // 1) Apply all events to current confirmed state:
     // -----------------------------------------------
-    World *world = World::getWorld();
+	World *world = World::getWorld();
 
-    // The world clock was set by the RewindManager to be the time
-    // of the state we are rewinding to. But the confirmed state of
+	// The world clock was set by the RewindManager to be the time
+	// of the state we are rewinding to. But the confirmed state of
     // the network manager is before this (we are replaying item events
     // since the last confirmed state in order to get a new confirmed state).
-    // So we need to reset the clock to the time of the confirmed state,
+	// So we need to reset the clock to the time of the confirmed state,
     // and then forward this time accordingly. Getting the world time right
     // during forwarding the item state is important since e.g. the bubble
     // gum torque depends on the time. If the world time would be incorrect
@@ -387,7 +387,7 @@ void NetworkItemManager::restoreState(BareNetworkString *buffer, int count)
         {
             int index = iei.getIndex();
             // An item on the track was collected:
-            AbstractKart *kart = world->getKart(iei.getKartId());
+            Kart *kart = world->getKart(iei.getKartId());
 
             assert(m_confirmed_state[index] != NULL);
             m_confirmed_state[index]->collected(kart); // Collect item
@@ -403,7 +403,7 @@ void NetworkItemManager::restoreState(BareNetworkString *buffer, int count)
         }
         else if(iei.isNewItem())
         {
-            AbstractKart *kart = world->getKart(iei.getKartId());
+            Kart *kart = world->getKart(iei.getKartId());
             ItemState *is = new ItemState(iei.getNewItemType(), kart,
                                           iei.getIndex()             );
             is->initItem(iei.getNewItemType(), iei.getXYZ(), iei.getNormal());
@@ -448,7 +448,7 @@ void NetworkItemManager::restoreState(BareNetworkString *buffer, int count)
     }   // while count >0
 
 
-    // 2. Update Server
+    // 2. Update Server 
     // ================
     // Inform the server which events have been received (if there has
     // been any updates - no need to send messages if nothing has changed)
@@ -470,7 +470,7 @@ void NetworkItemManager::restoreState(BareNetworkString *buffer, int count)
     // We need to test all items - and confirmed or all_items could
     // be the larger group (confirmed: when a new item was dropped
     // by a remote kart; all_items: if an item is predicted on
-    // the client, but not yet confirmed). So
+    // the client, but not yet confirmed). So 
     size_t max_index = std::max(m_confirmed_state.size(),
                                       m_all_items.size()        );
     m_all_items.resize(max_index, NULL);
@@ -478,7 +478,7 @@ void NetworkItemManager::restoreState(BareNetworkString *buffer, int count)
     for(unsigned int i=0; i<max_index; i++)
     {
         ItemState *item     = m_all_items[i];
-        const ItemState *is = i < m_confirmed_state.size()
+        const ItemState *is = i < m_confirmed_state.size() 
                             ? m_confirmed_state[i] : NULL;
         // For every *(ItemState*)item = *is, all deactivated ticks, item id
         // ... will be copied from item state to item

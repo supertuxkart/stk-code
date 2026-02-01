@@ -69,7 +69,8 @@ namespace GUIEngine
 
         /** Internal name of the spinner; useful to interpret spinner events,
          *  which contain the name of the activated object */
-        std::string spinnerID;
+        std::string playerSpinnerID;
+        std::string handicapSpinnerID;
 
 #ifdef DEBUG
         long m_magic_number;
@@ -83,6 +84,7 @@ namespace GUIEngine
 
         /** Sub-widgets created by this widget */
         SpinnerWidget* m_player_ident_spinner;
+        SpinnerWidget* m_handicap_spinner;
         KartStatsWidget* m_kart_stats;
         ModelViewWidget* m_model_view;
         LabelWidget* m_kart_name;
@@ -106,6 +108,9 @@ namespace GUIEngine
 
         ~PlayerKartWidget();
 
+        // ------------------------------------------------------------------------
+        /** Called to update the displayed kart model. */
+        void setupKartModel(const KartProperties* properties);
         // ------------------------------------------------------------------------
         /** Called when players are renumbered (changes the player ID) */
         void setPlayerID(const int newPlayerID);

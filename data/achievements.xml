@@ -57,6 +57,8 @@
     III - Race started and finished counters, by difficulty (linear races only)
         easy-started
         easy-finished
+        casual-started
+        casual-finished
         medium-started
         medium-finished
         hard-started
@@ -80,6 +82,8 @@
         soccer-finished
         egg-hunt-started
         egg-hunt-finished
+        egg-hunt-started-hard
+        egg-hunt-finished-hard
         with-ghost-started
         with-ghost-finished
         ctf-started
@@ -118,8 +122,10 @@
         less-laps
         more-laps
         twice-laps
-        egg-hunt-started
-        egg-hunt-finished
+        egg-hunt-started-tr
+        egg-hunt-finished-tr
+        egg-hunt-started-hard-tr
+        egg-hunt-finished-hard-tr
 
     VII - Per-track counters (all non-addon tracks reach the value)
 
@@ -135,44 +141,52 @@
         // For egg hunts, all non-addon tracks with egg hunt support
         // must reach the value
         egg-hunt-started-all
-        egg-hunt-finished-all    
+        egg-hunt-finished-all
+        egg-hunt-started-hard-all
+        egg-hunt-finished-hard-all
         -->
 <achievements version="1">
-    <achievement id="1" name="Christoffel Columbus" description="Play every official track at least once." >
-        <goal type="race-finished-all" value="1"/>
+    <achievement id="109" name="Banana Lover" description="Collect at least 5 bananas in one race.">
+        <goal type="banana-1race" value="5"/>
     </achievement>
-    <achievement id="2" name="Strike!" description="Hit 10 karts with a bowling-ball.">
+    <achievement id="102" name="Strike!" description="Hit 10 karts with a bowling-ball.">
         <goal type="bowling-hit" value="10"/>
     </achievement>
-    <achievement id="3" name="Arch Enemy" description="Hit the same kart at least 5 times in one race.">
+    <achievement id="107" name="Powerup Love" description="Use 10 or more powerups in a race.">
+        <goal type="powerup-used-1race" value="10"/>
+    </achievement>
+    <achievement id="103" name="Arch Enemy" description="Hit the same kart at least 5 times in one race.">
         <goal type="hit-same-kart-1race" value="5"/>
     </achievement>
-    <achievement id="4" name="Marathoner" description="Finish a race with at least twice the track's default lap number.">
+    <achievement id="104" name="Marathoner" description="Finish a race with at least twice the track's default lap number.">
         <goal type="twice-laps" value="1"/>
     </achievement>
-    <achievement id="5" name="Skid-row" description="Skid 5 times in a single lap.">
-        <goal type="skidding-1lap" value="5"/>
+    <achievement id="105" name="Skid-row" description="Skid 10 times in a single lap.">
+        <goal type="skidding-1lap" value="10"/>
     </achievement>
-    <achievement id="6" name="Gold driver" description="Win against at least 3 AIs in normal race, time-trial, and follow the leader.">
+    <achievement id="106" name="Gold driver" description="Win against at least 3 AIs in normal race, time-trial, and follow the leader.">
         <goal type="won-normal-races" value="1"/>
         <goal type="won-tt-races" value="1"/>
         <goal type="won-ftl-races" value="1"/>
     </achievement>
-    <achievement id="7" name="Powerup Love" description="Use 10 or more powerups in a race.">
-        <goal type="powerup-used-1race" value="10"/>
+    <achievement id="110" name="It's secret" description="Really ... a secret." secret="yes">
     </achievement>
-    <achievement id="8" name="Unstoppable" description="Win 5 single races in a row against at least 3 AIs. Beware, restarting a race counts as a loss.">
-        <goal type="cons-won-races" value="5"/>
-    </achievement>
-    <achievement id="9" name="Banana Lover" description="Collect at least 5 bananas in one race.">
-        <goal type="banana-1race" value="5"/>
-    </achievement>
-    <achievement id="10" name="It's secret" description="Really ... a secret." secret="yes">
-    </achievement>
-    <achievement id="11" name="Mosquito Hunter" description="Take your opponents for mosquitos! With the swatter, squash them at least 5 times in a race.">
+    <achievement id="111" name="Mosquito Hunter" description="Take your opponents for mosquitos! With the swatter, squash them at least 5 times in a race.">
         <goal type="swatter-hit-1race" value="5"/>
     </achievement>
-    <achievement id="12" name="Beyond Luck" description="Win 10 single races in a row in Expert or SuperTux against at least 5 AIs. Beware, restarting a race counts as a loss.">
+    <achievement id="108" name="Unstoppable" description="Win 5 single races in a row against at least 3 AIs. Beware, restarting a race counts as a loss.">
+        <goal type="cons-won-races" value="5"/>
+    </achievement>
+    <achievement id="101" name="Christoffel Columbus" description="Play every official track at least once." >
+        <goal type="race-finished-all" value="1"/>
+    </achievement>
+    <achievement id="112" name="Beyond Luck" description="Win 10 single races in a row in Expert or SuperTux against at least 5 AIs. Beware, restarting a race counts as a loss.">
         <goal type="cons-won-races-hard" value="10"/>
+    </achievement>
+    <achievement id="113" name="Egg-Seeker" description="Complete three egg hunts.">
+        <goal type="egg-hunt-finished" value="3"/>
+    </achievement>
+    <achievement id="114" name="Grand Explorer" description="Complete all standard egg hunt in Expert or SuperTux.">
+        <goal type="egg-hunt-finished-hard-all" value="1"/>
     </achievement>
 </achievements>

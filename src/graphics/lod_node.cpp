@@ -21,7 +21,7 @@
 #include "graphics/irr_driver.hpp"
 #include "graphics/lod_node.hpp"
 #include "config/user_config.hpp"
-#include "karts/abstract_kart.hpp"
+#include "karts/kart.hpp"
 
 #include <ISceneManager.h>
 #include <ICameraSceneNode.h>
@@ -197,7 +197,7 @@ void LODNode::OnRegisterSceneNode()
     } // if isVisible() && m_nodes.size() > 0
 }
 
-/* Each model with LoD has specific distances beyond which it is rendered at a lower
+/* Each model with LoD has specific distances beyond which it is rendered at a lower 
 * detail level. This function compute the distances associated with the various
 * LoD levels for a given model.
 * @param scale The model's scale*/

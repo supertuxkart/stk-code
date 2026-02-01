@@ -39,7 +39,7 @@
 
 namespace HelpCommon
 {
-    void switchTab(std::string selected_tab);
+	void switchTab(std::string selected_tab);
 }
 
 #endif

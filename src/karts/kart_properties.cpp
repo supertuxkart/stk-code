@@ -58,8 +58,14 @@ std::string KartProperties::getHandicapAsString(HandicapLevel h)
 {
     switch(h)
     {
-    case HANDICAP_NONE:   return "normal";   break;
-    case HANDICAP_MEDIUM: return "handicap"; break;
+    case HANDICAP_NONE: return "normal";   break;
+    case HANDICAP_4:    return "handicap-4"; break;
+    case HANDICAP_8:    return "handicap-8"; break;
+    case HANDICAP_12:   return "handicap-12"; break;
+    case HANDICAP_16:   return "handicap-16"; break;
+    case HANDICAP_20:   return "handicap-20"; break;
+    case HANDICAP_24:   return "handicap-24"; break;
+
     default:  assert(false);
     }
     return "";
@@ -88,18 +94,17 @@ KartProperties::KartProperties(const std::string &filename)
 
     // Set all other values to undefined, so that it can later be tested
     // if everything is defined properly.
-    m_wheel_base = m_friction_slip = m_collision_terrain_impulse =
+    m_wheel_base = m_friction_slip =
         m_collision_impulse = m_collision_impulse_time =
         m_physical_wheel_position = UNDEFINED;
 
-    m_terrain_impulse_type       = IMPULSE_NONE;
     m_gravity_center_shift       = Vec3(UNDEFINED);
     m_bevel_factor               = Vec3(UNDEFINED);
     m_version                    = 0;
     m_color                      = video::SColor(255, 0, 0, 0);
     m_shape                      = 32;  // close enough to a circle.
     m_engine_sfx_type            = "engine_small";
-    m_nitro_min_consumption      = 64;
+
     // The default constructor for stk_config uses filename=""
     if (filename != "")
     {
@@ -475,7 +480,7 @@ void KartProperties::getAllData(const XMLNode * root, bool called_from_stk_confi
 {
     root->get("version",           &m_version);
 
-    // If the version of the kart file is not supported, ignore this .kart file
+    // If the version of the kart file is not supported, ignore this .kart file 
     if (!called_from_stk_config && (m_version < stk_config->m_min_kart_version ||
                                     m_version > stk_config->m_max_kart_version))
     {
@@ -503,6 +508,8 @@ void KartProperties::getAllData(const XMLNode * root, bool called_from_stk_confi
     {
         const XMLNode *easy = ai_node->getNode("easy");
         m_ai_properties[RaceManager::DIFFICULTY_EASY]->load(easy);
+        const XMLNode *casual = ai_node->getNode("casual");
+        m_ai_properties[RaceManager::DIFFICULTY_CASUAL]->load(casual);
         const XMLNode *medium = ai_node->getNode("medium");
         m_ai_properties[RaceManager::DIFFICULTY_MEDIUM]->load(medium);
         const XMLNode *hard = ai_node->getNode("hard");
@@ -518,25 +525,9 @@ void KartProperties::getAllData(const XMLNode * root, bool called_from_stk_confi
     {
         collision_node->get("impulse",         &m_collision_impulse        );
         collision_node->get("impulse-time",    &m_collision_impulse_time   );
-        collision_node->get("terrain-impulse", &m_collision_terrain_impulse);
         collision_node->get("restitution",     &m_restitution              );
         collision_node->get("bevel-factor",    &m_bevel_factor             );
         collision_node->get("physical-wheel-position",&m_physical_wheel_position);
-        std::string s;
-        collision_node->get("impulse-type",    &s                          );
-        s = StringUtils::toLowerCase(s);
-        if(s=="none")
-            m_terrain_impulse_type = IMPULSE_NONE;
-        else if(s=="normal")
-            m_terrain_impulse_type = IMPULSE_NORMAL;
-        else if(s=="driveline")
-            m_terrain_impulse_type = IMPULSE_TO_DRIVELINE;
-        else
-        {
-            Log::fatal("[KartProperties]",
-                       "Missing or incorrect value for impulse-type: '%s'.",
-                       s.c_str());
-        }
     }
 
     //TODO: wheel front right and wheel front left is not loaded, yet is
@@ -668,7 +659,6 @@ void KartProperties::checkAllSet(const std::string &filename)
     }
 
     CHECK_NEG(m_friction_slip,              "friction slip"                 );
-    CHECK_NEG(m_collision_terrain_impulse,  "collision terrain-impulse"     );
     CHECK_NEG(m_collision_impulse,          "collision impulse"             );
     CHECK_NEG(m_collision_impulse_time,     "collision impulse-time"        );
     CHECK_NEG(m_physical_wheel_position,    "collision physical-wheel-position");
@@ -840,16 +830,28 @@ InterpolationArray KartProperties::getTurnRadius() const
 }  // getTurnRadius
 
 // ----------------------------------------------------------------------------
-float KartProperties::getTurnTimeResetSteer() const
-{
-    return m_cached_characteristic->getTurnTimeResetSteer();
-}  // getTurnTimeResetSteer
-
-// ----------------------------------------------------------------------------
 InterpolationArray KartProperties::getTurnTimeFullSteer() const
 {
     return m_cached_characteristic->getTurnTimeFullSteer();
 }  // getTurnTimeFullSteer
+
+// ----------------------------------------------------------------------------
+float KartProperties::getTurnSpeedFactor() const
+{
+    return m_cached_characteristic->getTurnSpeedFactor();
+}  // getTurnSpeedFactor
+
+// ----------------------------------------------------------------------------
+float KartProperties::getTurnSpeedFactorPartialLb() const
+{
+    return m_cached_characteristic->getTurnSpeedFactorPartialLb();
+}  // getTurnSpeedFactorPartialLb
+
+// ----------------------------------------------------------------------------
+float KartProperties::getTurnSpeedFactorPartialUb() const
+{
+    return m_cached_characteristic->getTurnSpeedFactorPartialUb();
+}  // getTurnSpeedFactorPartialUb
 
 // ----------------------------------------------------------------------------
 float KartProperties::getEnginePower() const
@@ -876,10 +878,10 @@ float KartProperties::getEngineBrakeFactor() const
 }  // getEngineBrakeFactor
 
 // ----------------------------------------------------------------------------
-float KartProperties::getEngineBrakeTimeIncrease() const
+float KartProperties::getEngineTimeFullBrake() const
 {
-    return m_cached_characteristic->getEngineBrakeTimeIncrease();
-}  // getEngineBrakeTimeIncrease
+    return m_cached_characteristic->getEngineTimeFullBrake();
+}  // getEngineTimeFullBrake
 
 // ----------------------------------------------------------------------------
 float KartProperties::getEngineMaxSpeedReverseRatio() const
@@ -898,6 +900,12 @@ std::vector<float> KartProperties::getGearPowerIncrease() const
 {
     return m_cached_characteristic->getGearPowerIncrease();
 }  // getGearPowerIncrease
+
+// ----------------------------------------------------------------------------
+float KartProperties::getGearReversePower() const
+{
+    return m_cached_characteristic->getGearReversePower();
+}  // getGearReversePower
 
 // ----------------------------------------------------------------------------
 float KartProperties::getMass() const
@@ -1128,6 +1136,42 @@ float KartProperties::getPlungerInFaceTime() const
 }  // getPlungerInFaceTime
 
 // ----------------------------------------------------------------------------
+float KartProperties::getNitrohackDuration() const
+{
+    return m_cached_characteristic->getNitrohackDuration();
+}  // getNitrohackDuration
+
+// ----------------------------------------------------------------------------
+float KartProperties::getNitrohackFactor() const
+{
+    return m_cached_characteristic->getNitrohackFactor();
+}  // getNitrohackFactor
+
+// ----------------------------------------------------------------------------
+float KartProperties::getElectroDuration() const
+{
+    return m_cached_characteristic->getElectroDuration();
+}  // getElectroDuration
+
+// ----------------------------------------------------------------------------
+float KartProperties::getElectroEngineMult() const
+{
+    return m_cached_characteristic->getElectroEngineMult();
+}  // getElectroEngineMult
+
+// ----------------------------------------------------------------------------
+float KartProperties::getElectroMaxSpeedIncrease() const
+{
+    return m_cached_characteristic->getElectroMaxSpeedIncrease();
+}  // getElectroMaxSpeedIncrease
+
+// ----------------------------------------------------------------------------
+float KartProperties::getElectroFadeOutTime() const
+{
+    return m_cached_characteristic->getElectroFadeOutTime();
+}  // getElectroFadeOutTime
+
+// ----------------------------------------------------------------------------
 std::vector<float> KartProperties::getStartupTime() const
 {
     return m_cached_characteristic->getStartupTime();
@@ -1138,6 +1182,24 @@ std::vector<float> KartProperties::getStartupBoost() const
 {
     return m_cached_characteristic->getStartupBoost();
 }  // getStartupBoost
+
+// ----------------------------------------------------------------------------
+std::vector<float> KartProperties::getStartupEngineForce() const
+{
+    return m_cached_characteristic->getStartupEngineForce();
+}  // getStartupEngineForce
+
+// ----------------------------------------------------------------------------
+float KartProperties::getStartupDuration() const
+{
+    return m_cached_characteristic->getStartupDuration();
+}  // getStartupDuration
+
+// ----------------------------------------------------------------------------
+float KartProperties::getStartupFadeOutTime() const
+{
+    return m_cached_characteristic->getStartupFadeOutTime();
+}  // getStartupFadeOutTime
 
 // ----------------------------------------------------------------------------
 float KartProperties::getRescueDuration() const
@@ -1212,10 +1274,22 @@ float KartProperties::getNitroBigContainer() const
 }  // getNitroBigContainer
 
 // ----------------------------------------------------------------------------
+float KartProperties::getNitroAirContainer() const
+{
+    return m_cached_characteristic->getNitroAirContainer();
+}  // getNitroAirContainer
+
+// ----------------------------------------------------------------------------
 float KartProperties::getNitroMaxSpeedIncrease() const
 {
     return m_cached_characteristic->getNitroMaxSpeedIncrease();
 }  // getNitroMaxSpeedIncrease
+
+// ----------------------------------------------------------------------------
+float KartProperties::getNitroMinBurst() const
+{
+    return m_cached_characteristic->getNitroMinBurst();
+}  // getNitroMinBurst
 
 // ----------------------------------------------------------------------------
 float KartProperties::getNitroFadeOutTime() const
@@ -1362,6 +1436,12 @@ std::vector<float> KartProperties::getSkidBonusTime() const
 }  // getSkidBonusTime
 
 // ----------------------------------------------------------------------------
+std::vector<float> KartProperties::getSkidFadeOutTime() const
+{
+    return m_cached_characteristic->getSkidFadeOutTime();
+}  // getSkidFadeOutTime
+
+// ----------------------------------------------------------------------------
 std::vector<float> KartProperties::getSkidBonusForce() const
 {
     return m_cached_characteristic->getSkidBonusForce();
@@ -1384,6 +1464,12 @@ float KartProperties::getSkidPostSkidRotateFactor() const
 {
     return m_cached_characteristic->getSkidPostSkidRotateFactor();
 }  // getSkidPostSkidRotateFactor
+
+// ----------------------------------------------------------------------------
+float KartProperties::getSkidSteerFactor() const
+{
+    return m_cached_characteristic->getSkidSteerFactor();
+}  // getSkidSteerFactor
 
 // ----------------------------------------------------------------------------
 float KartProperties::getSkidReduceTurnMin() const

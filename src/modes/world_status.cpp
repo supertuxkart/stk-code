@@ -26,7 +26,7 @@
 #include "graphics/irr_driver.hpp"
 #include "guiengine/engine.hpp"
 #include "guiengine/modaldialog.hpp"
-#include "karts/abstract_kart.hpp"
+#include "karts/kart.hpp"
 #include "modes/world.hpp"
 #include "network/network_config.hpp"
 #include "network/protocols/client_lobby.hpp"
@@ -255,7 +255,7 @@ void WorldStatus::updateTime(int ticks)
             m_auxiliary_ticks = 0;
 
             // In a networked game the client needs to wait for a notification
-            // from the server that all clients and the server are ready to
+            // from the server that all clients and the server are ready to 
             // start the game. The server will actually wait for all clients
             // to confirm that they have started the race before starting
             // itself. In a normal race, this phase is skipped and the race
@@ -376,7 +376,7 @@ void WorldStatus::updateTime(int ticks)
 
             m_auxiliary_ticks++;
 
-            // In artist debug mode, when without opponents,
+            // In artist debug mode, when without opponents, 
             // skip the ready/set/go counter faster
             if (UserConfigParams::m_artist_debug_mode &&
                 !NetworkConfig::get()->isNetworking() &&

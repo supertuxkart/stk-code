@@ -28,7 +28,7 @@
 #include "graphics/sp/sp_shader_manager.hpp"
 #include "graphics/sp/sp_uniform_assigner.hpp"
 #include "io/file_manager.hpp"
-#include "karts/abstract_kart.hpp"
+#include "karts/kart.hpp"
 #include "karts/controller/controller.hpp"
 #include "karts/kart_properties.hpp"
 #include "karts/max_speed.hpp"
@@ -59,7 +59,7 @@ const char* g_slipstream_textures[3] =
  *  \param kart Pointer to the kart to which the slip stream
  *              belongs to.
  */
-SlipStream::SlipStream(AbstractKart* kart)
+SlipStream::SlipStream(Kart* kart)
 {
     m_speed_increase_ticks = m_speed_increase_duration = -1;
     m_kart = kart;
@@ -557,7 +557,7 @@ SP::SPMesh* SlipStream::createMeshSP(unsigned material_id, bool bonus_mesh)
 }   // createMeshSP
 
 //----------------------------------------------------------------------------- */
-void SlipStream::updateSlipstreamingTextures(float f, const AbstractKart *kart)
+void SlipStream::updateSlipstreamingTextures(float f, const Kart *kart)
 {
     if (!kart || kart->isEliminated() || !m_node || !m_node_fast)
     {
@@ -737,9 +737,9 @@ void SlipStream::updateQuad()
     float vec_length = moving_xyz.x()*moving_xyz.x()
                      + moving_xyz.y()*moving_xyz.y()
                      + moving_xyz.z()*moving_xyz.z();
-    if (vec_length != 0)
+	if (vec_length != 0)
     {
-        vec_length = core::reciprocal_squareroot(vec_length);
+    	vec_length = core::reciprocal_squareroot(vec_length);
         float x,y,z;
         x = moving_xyz.x() * vec_length;
         y = moving_xyz.y() * vec_length;
@@ -906,7 +906,7 @@ void SlipStream::update(int ticks)
         if(UserConfigParams::m_slipstream_debug)
         {
             setDebugColor(video::SColor(255, 0, 0, 0),false);
-            setDebugColor(video::SColor(255, 0, 0, 0),true);
+            setDebugColor(video::SColor(255, 0, 0, 0),true);            
         }
         return;
     }

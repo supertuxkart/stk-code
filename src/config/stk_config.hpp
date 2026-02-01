@@ -92,8 +92,12 @@ public:
     bool  m_smooth_normals;            /**< If normals for raycasts for wheels
                                            should be interpolated.             */
 
-    /** Prevent early explosive items before this world time. */
-    float m_no_explosive_items_timeout;
+    /** Prevent some items before this world time. */
+    float m_limited_items_timeout;
+
+    /** Set the powerup collection mode to full random (true)
+     * or to controlled randomness with less variance (false) */
+    bool m_full_random;
 
     /** Maximum number of moveable objects in a track when networking is on. */
     int m_max_moveable_objects;
@@ -291,8 +295,6 @@ public:
     void init_defaults();
     void getAllData(const XMLNode * root);
     void load(const std::string &filename);
-    const std::string &getMainMenuPicture(int n);
-    const std::string &getBackgroundPicture(int n);
     void initMusicFiles();
     void  getAllScores(std::vector<int> *all_scores, int num_karts);
     // ------------------------------------------------------------------------

@@ -22,7 +22,7 @@
 
 #include "challenges/unlock_manager.hpp"
 #include "io/file_manager.hpp"
-#include "karts/abstract_kart.hpp"
+#include "karts/kart.hpp"
 #include "karts/kart_properties.hpp"
 #include "karts/kart_properties_manager.hpp"
 #include "modes/linear_world.hpp"
@@ -217,14 +217,16 @@ ChallengeData::ChallengeData(const std::string& filename)
 
     const XMLNode* difficulties[RaceManager::DIFFICULTY_COUNT];
     difficulties[0] = root->getNode("easy");
-    difficulties[1] = root->getNode("medium");
-    difficulties[2] = root->getNode("hard");
-    difficulties[3] = root->getNode("best");
+    difficulties[1] = root->getNode("casual");
+    difficulties[2] = root->getNode("medium");
+    difficulties[3] = root->getNode("hard");
+    difficulties[4] = root->getNode("best");
 
     if (difficulties[0] == NULL || difficulties[1] == NULL ||
-        difficulties[2] == NULL || difficulties[3] == NULL)
+        difficulties[2] == NULL || difficulties[3] == NULL ||
+        difficulties[4] == NULL)
     {
-        error("<easy> or <medium> or <hard> or <best>");
+        error("<easy> or <casual> or <medium> or <hard> or <best>");
     }
 
     for (int d=0; d<=RaceManager::DIFFICULTY_BEST; d++)
@@ -501,7 +503,7 @@ bool ChallengeData::isChallengeFulfilled(bool check_best) const
     int d = (check_best) ? RaceManager::DIFFICULTY_BEST :
                            RaceManager::get()->getDifficulty();
 
-    AbstractKart* kart = world->getPlayerKart(0);
+    Kart* kart = world->getPlayerKart(0);
 
     if (kart->isEliminated()                                               ) return false;
     if (track_name != m_track_id                                           ) return false;
@@ -574,12 +576,14 @@ ChallengeData::GPLevel ChallengeData::isGPFulfilled() const
     // getting a cup of the inferior level rather than
     // nothing at all
     int unlock_level = d - rank;
-    if (unlock_level == 3)
+    if (unlock_level == 4)
         return GP_BEST;
-    if (unlock_level == 2)
+    if (unlock_level == 3)
         return GP_HARD;
-    if (unlock_level == 1)
+    if (unlock_level == 2)
         return GP_MEDIUM;
+    if (unlock_level == 1)
+        return GP_CASUAL;
     if (unlock_level == 0)
         return GP_EASY;
     return GP_NONE;

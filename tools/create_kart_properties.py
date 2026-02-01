@@ -29,26 +29,28 @@ import sys
 # This model is used for the xml file and to access the kart properties in the code.
 characteristics = """Suspension: stiffness, rest, travel, expSpringResponse(bool), maxForce
 Stability: rollInfluence, chassisLinearDamping, chassisAngularDamping, downwardImpulseFactor, trackConnectionAccel, angularFactor(std::vector<float>/floatVector), smoothFlyingImpulse
-Turn: radius(InterpolationArray), timeResetSteer, timeFullSteer(InterpolationArray)
-Engine: power, maxSpeed, genericMaxSpeed, brakeFactor, brakeTimeIncrease, maxSpeedReverseRatio
-Gear: switchRatio(std::vector<float>/floatVector), powerIncrease(std::vector<float>/floatVector)
+Turn: radius(InterpolationArray), timeFullSteer(InterpolationArray), speedFactor, speedFactorPartialLb, speedFactorPartialUb
+Engine: power, maxSpeed, genericMaxSpeed, brakeFactor, timeFullBrake, maxSpeedReverseRatio
+Gear: switchRatio(std::vector<float>/floatVector), powerIncrease(std::vector<float>/floatVector), reversePower
 Mass
 Wheels: dampingRelaxation, dampingCompression
+Friction: kartFriction
+Skid: increase, decrease, max, timeTillMax, visual, visualTime, revertVisualTime, minSpeed, timeTillBonus(std::vector<float>/floatVector), bonusSpeed(std::vector<float>/floatVector), bonusTime(std::vector<float>/floatVector), fadeOutTime(std::vector<float>/floatVector), bonusForce(std::vector<float>/floatVector), physicalJumpTime, graphicalJumpTime, postSkidRotateFactor, steerFactor, reduceTurnMin, reduceTurnMax, enabled(bool)
 Jump: animationTime
 Lean: max, speed
 Anvil: duration, weight, speedFactor
 Parachute: friction, duration, durationOther, durationRankMult, durationSpeedMult, lboundFraction, uboundFraction, maxSpeed
-Friction: kartFriction
 Bubblegum: duration, speedFraction, torque, fadeInTime, shieldDuration
 Zipper: duration, force, speedGain, maxSpeedIncrease, fadeOutTime
 Swatter: duration, distance, squashDuration, squashSlowdown
 Plunger: bandMaxLength, bandForce, bandDuration, bandSpeedIncrease, bandFadeOutTime, inFaceTime
-Startup: time(std::vector<float>/floatVector), boost(std::vector<float>/floatVector)
+Nitro-Hack: duration, factor
+Electro: duration, engineMult, maxSpeedIncrease, fadeOutTime
+Startup: time(std::vector<float>/floatVector), boost(std::vector<float>/floatVector), engineForce(std::vector<float>/floatVector), duration, fadeOutTime
 Rescue: duration, vertOffset, height
 Explosion: duration, radius, invulnerabilityTime
-Nitro: duration, engineForce, engineMult, consumption, smallContainer, bigContainer, maxSpeedIncrease, fadeOutTime, max
-Slipstream: durationFactor, baseSpeed, length, width, innerFactor, minCollectTime, maxCollectTime, addPower, minSpeed, maxSpeedIncrease, fadeOutTime
-Skid: increase, decrease, max, timeTillMax, visual, visualTime, revertVisualTime, minSpeed, timeTillBonus(std::vector<float>/floatVector), bonusSpeed(std::vector<float>/floatVector), bonusTime(std::vector<float>/floatVector), bonusForce(std::vector<float>/floatVector), physicalJumpTime, graphicalJumpTime, postSkidRotateFactor, reduceTurnMin, reduceTurnMax, enabled(bool)"""
+Nitro: engineForce, engineMult, consumption, smallContainer, bigContainer, airContainer, maxSpeedIncrease, minBurst, duration, fadeOutTime, max
+Slipstream: baseSpeed, length, width, innerFactor, minCollectTime, maxCollectTime, addPower, minSpeed, maxSpeedIncrease, durationFactor, fadeOutTime"""
 
 """ A GroupMember is an attribute of a group.
     In the xml files, a value will be assigned to it.
@@ -235,7 +237,7 @@ def createLoadXml(groups):
                 format(nameMinus, nameUnderscore.upper()))
         print("    }\n")
 
-# Dicionary that maps an argument string to a tupel of
+# Dictionary that maps an argument string to a tupel of
 # a generator function, a help string and a filename
 functions = {
     "enum":     (createEnum,     "List the enum values for all characteristics",           "karts/abstract_characteristic.hpp"),

@@ -81,7 +81,6 @@ public:
                          // (like abusive behaviour)
         LE_ASSETS_UPDATE, // Client tell server with updated assets
         LE_COMMAND, // Command
-        LE_COMMAND_ANSWER // Server answer to a command
     };
 
     enum RejectReason : uint8_t

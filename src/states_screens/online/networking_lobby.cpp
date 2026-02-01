@@ -303,7 +303,7 @@ void NetworkingLobby::init()
         // Handle mouse wheel scrolling
         if (mouse.Event == EMIE_MOUSE_WHEEL)
         {
-            if (lobby->m_chat_scrollbar && lobby->m_chat_scrollbar->isVisible() &&
+            if (lobby->m_chat_scrollbar && lobby->m_chat_scrollbar->isVisible() && 
                 lobby->m_text_bubble)
             {
                 irr::SEvent scroll_event;
@@ -394,7 +394,7 @@ void NetworkingLobby::addMoreServerInfo(core::stringw info)
 #ifndef SERVER_ONLY
     // Reserve space for scrollbar when breaking layouts
     s32 scrollbar_width = getChatScrollbarWidth();
-    const unsigned box_width = core::max_(1u,
+    const unsigned box_width = core::max_(1u, 
         (unsigned)core::max_(1, (s32)m_text_bubble->getDimension().Width - scrollbar_width));
     std::vector<GlyphLayout> cur_info;
     font_manager->initGlyphLayouts(info, cur_info, gui::SF_DISABLE_CACHE |
@@ -511,7 +511,7 @@ void NetworkingLobby::onResize()
     
     // Reserve space for scrollbar when breaking layouts
     s32 scrollbar_width = getChatScrollbarWidth();
-    const unsigned box_width = core::max_(1u,
+    const unsigned box_width = core::max_(1u, 
         (unsigned)core::max_(1, (s32)m_text_bubble->getDimension().Width - scrollbar_width));
     gui::IGUIFont* font = GUIEngine::getFont();
     
@@ -613,7 +613,7 @@ void NetworkingLobby::filterGlyphLayoutsForScroll()
     
     // Reserve space for scrollbar when breaking layouts
     s32 scrollbar_width = getChatScrollbarWidth();
-    const unsigned box_width = core::max_(1u,
+    const unsigned box_width = core::max_(1u, 
         (unsigned)core::max_(1, (s32)m_text_bubble->getDimension().Width - scrollbar_width));
     const float box_height = m_text_bubble->getDimension().Height;
     s32 line_height = font->getHeightPerLine();
@@ -915,10 +915,9 @@ void NetworkingLobby::onUpdate(float delta)
             //I18N: In the networking lobby, display the number of players
             //required to start a game for owner-less server
             core::stringw msg =
-                _P("Game will start if there is more than %i player.",
-               "Game will start if there are more than %i players.",
-               /* to pick the plural form */       (int)(m_min_start_game_players - 1),
-               /* to insert in the final string */ (int)(m_min_start_game_players - 1));
+                _P("Game will start if there is more than %d player.",
+               "Game will start if there are more than %d players.",
+               (int)(m_min_start_game_players - 1));
             m_timeout_message->setText(msg, false);
         }
 
@@ -930,12 +929,11 @@ void NetworkingLobby::onUpdate(float delta)
                 remain = 0;
             //I18N: In the networking lobby, display the starting timeout
             //for owner-less server to begin a game
-            core::stringw msg = _P("Starting after %i second, "
+            core::stringw msg = _P("Starting after %d second, "
                 "or once everyone has pressed the 'Ready' button.",
-                "Starting after %i seconds, "
+                "Starting after %d seconds, "
                 "or once everyone has pressed the 'Ready' button.",
-                /* to pick the plural form */       (int)remain,
-                /* to insert in the final string */ (int)remain);
+                (int)remain);
             m_timeout_message->setText(msg, false);
         }
     }
@@ -1420,7 +1418,7 @@ void NetworkingLobby::updateChatScrollbar()
     
     // Reserve space for scrollbar when breaking layouts
     s32 scrollbar_width = getChatScrollbarWidth();
-    const unsigned box_width = core::max_(1u,
+    const unsigned box_width = core::max_(1u, 
         (unsigned)core::max_(1, (s32)m_text_bubble->getDimension().Width - scrollbar_width));
     const float box_height = m_text_bubble->getDimension().Height;
     s32 line_height = font->getHeightPerLine();

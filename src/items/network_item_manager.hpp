@@ -33,12 +33,12 @@ class STKPeer;
 
 /** \ingroup items
  *  The network item manager is responsible for handling all network related
- *  item manager tasks - synchronisation between clients and servers. It
+ *  item manager tasks - synchronisation between clients and servers. It 
  *  maintains one 'confirmed' state on the clients, based on the latest
  *  server update. The server sends updates that only contains the delta
  *  between the last confirmed and the current server state. Eash client
  *  confirms to the server which deltas it has received. Once all clients
- *  have received a delta, the server will remove it from the list of
+ *  have received a delta, the server will remove it from the list of 
  *  deltas.
   */
 class NetworkItemManager : public Rewinder, public ItemManager
@@ -75,10 +75,10 @@ public:
     virtual void reset() OVERRIDE;
     virtual void setItemConfirmationTime(std::weak_ptr<STKPeer> peer,
                                          int ticks) OVERRIDE;
-    virtual void  collectedItem(ItemState *item, AbstractKart *kart) OVERRIDE;
+    virtual void  collectedItem(ItemState *item, Kart *kart) OVERRIDE;
     virtual void  switchItems() OVERRIDE;
     virtual Item* dropNewItem(ItemState::ItemType type,
-                              const AbstractKart *kart,
+                              const Kart *kart,
                               const Vec3 *server_xyz = NULL,
                               const Vec3 *server_normal = NULL) OVERRIDE;
     virtual BareNetworkString* saveState(std::vector<std::string>* ru)

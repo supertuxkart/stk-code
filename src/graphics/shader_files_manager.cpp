@@ -61,7 +61,7 @@ const std::string& ShaderFilesManager::getHeader()
 }   // getHeader
 
 // ----------------------------------------------------------------------------
-void ShaderFilesManager::readFile(const std::string& file,
+void ShaderFilesManager::readFile(const std::string& file, 
                                   std::ostringstream& code, bool not_header)
 {
     std::string path = FileUtils::getPortableReadingPath(

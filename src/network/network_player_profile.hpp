@@ -57,7 +57,7 @@ private:
     std::atomic<HandicapLevel> m_handicap;
 
     /** The selected kart id. */
-    std::string m_kart_name;
+    std::string m_kart_name; 
 
     /** The local player id relative to each peer. */
     uint8_t m_local_player_id;

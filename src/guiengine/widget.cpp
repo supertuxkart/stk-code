@@ -62,6 +62,7 @@ Widget::Widget(WidgetType type, bool reserve_id)
 
     m_id = -1;
     m_badge_x_shift         = 0;
+    m_badge_y_up_shift      = 0;
     m_element               = NULL;
     m_title_font            = false;
     m_type                  = type;
@@ -92,6 +93,9 @@ Widget::Widget(WidgetType type, bool reserve_id)
     m_deactivated     = false;
     m_is_visible      = true;
     m_badges          = 0;
+    m_player_id       = 0;
+    m_has_player_id   = false;
+
 
     // set a default value, derivates can override this as they wish
     m_check_inside_me = (m_type == WTYPE_DIV);

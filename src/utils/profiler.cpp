@@ -53,7 +53,7 @@ Profiler profiler;
 #define GPU_MARKERS_NAMES_POS core::rect<s32>(50,165,150,300)
 
 // The width of the profiler corresponds to TIME_DRAWN_MS milliseconds
-#define TIME_DRAWN_MS 30.0f
+#define TIME_DRAWN_MS 30.0f 
 
 // --- Begin portable precise timer ---
 #ifdef WIN32
@@ -240,7 +240,7 @@ void Profiler::activate()
     UserConfigParams::m_profiler_enabled = true;
 
     // Would the profiler be enabled immediately, calls that have started but
-    // not finished would not be registered correctly. So set the state to
+    // not finished would not be registered correctly. So set the state to 
     // waiting, so the unfreeze started at the next sync frame (which is
     // outside of the main loop, i.e. all profiling events inside of the main
     // loop will work as expected.
@@ -715,7 +715,7 @@ void Profiler::writeToFile()
     f << std::endl;
     f << std::endl;
     // Anisotropic Filtering is one of the settings affected by the Image Quality spinner
-    f << "Graphics parameters, Resolution width, Resolution height, Render resolution,"
+    f << "Graphics parameters, Resolution width, Resolution height, Render resolution," 
       << "Dynamic lighting, Particle effects, Animated characters, Geometry Detail, "
       << "Bloom, Glow, Light Shaft, Anti-Aliasing (MLAA), SSAO,"
       << "Anisotropic Filtering, Shadow Resolution, Light scattering, Degraded IBL,"

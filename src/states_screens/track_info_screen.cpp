@@ -268,7 +268,8 @@ void TrackInfoScreen::init()
             m_target_value_spinner->setMin(0);
         else
             m_target_value_spinner->setMin(1);
-        m_target_value_spinner->setValue(m_track->getActualNumberOfLap());
+        m_target_value_spinner->setValue(
+            m_track->getActualNumberOfLaps(RaceManager::get()->getDifficulty()));
         RaceManager::get()->setNumLaps(m_target_value_spinner->getValue());
 
         m_target_value_label->setText(_("Number of laps"), false);
@@ -560,7 +561,7 @@ void TrackInfoScreen::onEnterPressedInternal()
                                                : m_option->getState();
     // Avoid negative lap numbers (after e.g. easter egg mode).
     if(num_laps>=0)
-        m_track->setActualNumberOfLaps(num_laps);
+        m_track->setActualNumberOfLaps(RaceManager::get()->getDifficulty(), num_laps);
 
     if(m_track->hasNavMesh())
         UserConfigParams::m_random_arena_item = option_state;
@@ -726,8 +727,8 @@ void TrackInfoScreen::eventCallback(Widget* widget, const std::string& name,
     else if (name=="ai-spinner")
     {
         if (m_is_soccer) // Soccer mode
-        {
-            soccerSpinnerUpdate(false /* blue spinner */);
+        {            
+            soccerSpinnerUpdate(false /* blue spinner */);            
         }
         else // Other modes
         {
@@ -739,7 +740,7 @@ void TrackInfoScreen::eventCallback(Widget* widget, const std::string& name,
     }
     else if (name == "ai-blue-spinner" && m_is_soccer)
     {
-        soccerSpinnerUpdate(true /* blue spinner */);
+        soccerSpinnerUpdate(true /* blue spinner */);  
     }
 }   // eventCallback
 

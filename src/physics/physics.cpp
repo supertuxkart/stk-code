@@ -22,17 +22,16 @@
 #include "config/player_manager.hpp"
 #include "config/player_profile.hpp"
 #include "config/user_config.hpp"
-#include "karts/abstract_kart.hpp"
+#include "karts/kart.hpp"
+#include "karts/kart_utils.hpp"
 #include "graphics/irr_driver.hpp"
 #include "graphics/stars.hpp"
 #include "items/flyable.hpp"
 #include "karts/kart_properties.hpp"
-#include "karts/rescue_animation.hpp"
 #include "karts/controller/local_player_controller.hpp"
 #include "modes/soccer_world.hpp"
 #include "modes/world.hpp"
 #include "network/network_config.hpp"
-#include "karts/explosion_animation.hpp"
 #include "physics/btKart.hpp"
 #include "physics/irr_debug_drawer.hpp"
 #include "physics/physical_object.hpp"
@@ -131,7 +130,7 @@ Physics::~Physics()
  *  \param kart The kart to add.
  *  \param vehicle The raycast vehicle object.
  */
-void Physics::addKart(const AbstractKart *kart)
+void Physics::addKart(const Kart *kart)
 {
     const btCollisionObjectArray &all_objs =
         m_dynamics_world->getCollisionObjectArray();
@@ -149,7 +148,7 @@ void Physics::addKart(const AbstractKart *kart)
  *  (and during cleanup).
  *  \param kart The kart to remove.
  */
-void Physics::removeKart(const AbstractKart *kart)
+void Physics::removeKart(const Kart *kart)
 {
     // We can't simply remove a kart from the physics world when currently
     // loops over all kart objects are active. This can happen in collision
@@ -193,11 +192,12 @@ void Physics::update(int ticks)
     // fixed frequency necessary for the physics update, we need to do exactly
     // one physic step only.
     double start;
-    if(UserConfigParams::m_physics_debug) start = StkTime::getRealTime();
+    bool const physics_debug = UserConfigParams::m_physics_debug; // Used to silence a warning
+    if (physics_debug) start = StkTime::getRealTime();
 
     m_dynamics_world->stepSimulation(stk_config->ticks2Time(1), 1,
                                      stk_config->ticks2Time(1)      );
-    if (UserConfigParams::m_physics_debug)
+    if (physics_debug)
     {
         Log::verbose("Physics", "At %d physics duration %12.8f",
                      World::getWorld()->getTicksSinceStart(),
@@ -240,7 +240,7 @@ void Physics::update(int ticks)
         {
             // Kart hits physical object
             // -------------------------
-            AbstractKart *kart = p->getUserPointer(1)->getPointerKart();
+            Kart *kart = p->getUserPointer(1)->getPointerKart();
             int kartId = kart->getWorldKartId();
             PhysicalObject* obj = p->getUserPointer(0)->getPointerPhysicalObject();
             std::string obj_id = obj->getID();
@@ -254,7 +254,7 @@ void Physics::update(int ticks)
                 lib_id = library->getID();
             lib_id_ptr = &lib_id;
 
-            if (!is_child && scripting_function.size() > 0)
+            if (!is_child && !scripting_function.empty())
             {
                 Scripting::ScriptEngine* script_engine = Scripting::ScriptEngine::getInstance();
                 script_engine->runFunction(true, "void " + scripting_function + "(int, const string, const string)",
@@ -266,15 +266,11 @@ void Physics::update(int ticks)
             }
             if (obj->isCrashReset())
             {
-                RescueAnimation::create(kart);
+                kart->applyRescue(/* auto-rescue */ false);
             }
             else if (obj->isExplodeKartObject())
             {
-                ExplosionAnimation::create(kart);
-                if (kart->getKartAnimation() != NULL)
-                {
-                    World::getWorld()->kartHit(kart->getWorldKartId());
-                }
+                KartUtils::createExplosion(kart);
             }
             else if (obj->isFlattenKartObject())
             {
@@ -287,7 +283,7 @@ void Physics::update(int ticks)
                     World::getWorld()->kartHit(kart->getWorldKartId());
                 }
             }
-            else if(obj->isSoccerBall() &&
+            else if(obj->isSoccerBall() && 
                     RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_SOCCER)
             {
                 SoccerWorld* soccerWorld = (SoccerWorld*)World::getWorld();
@@ -302,21 +298,17 @@ void Physics::update(int ticks)
             ThreeDAnimation *anim=p->getUserPointer(0)->getPointerAnimation();
             if(anim->isCrashReset())
             {
-                AbstractKart *kart = p->getUserPointer(1)->getPointerKart();
-                RescueAnimation::create(kart);
+                Kart *kart = p->getUserPointer(1)->getPointerKart();
+                kart->applyRescue(/* auto-rescue */ false);
             }
             else if (anim->isExplodeKartObject())
             {
-                AbstractKart *kart = p->getUserPointer(1)->getPointerKart();
-                ExplosionAnimation::create(kart);
-                if (kart->getKartAnimation() != NULL)
-                {
-                    World::getWorld()->kartHit(kart->getWorldKartId());
-                }
+                Kart *kart = p->getUserPointer(1)->getPointerKart();
+                KartUtils::createExplosion(kart);
             }
             else if (anim->isFlattenKartObject())
             {
-                AbstractKart *kart = p->getUserPointer(1)->getPointerKart();
+                Kart *kart = p->getUserPointer(1)->getPointerKart();
                 const KartProperties *kp = kart->getKartProperties();
 
                 // Count squash only once from original state
@@ -347,7 +339,7 @@ void Physics::update(int ticks)
             PhysicalObject* obj = p->getUserPointer(1)->getPointerPhysicalObject();
             std::string obj_id = obj->getID();
             std::string scripting_function = obj->getOnItemCollisionFunction();
-            if (!is_child && scripting_function.size() > 0)
+            if (!is_child && !scripting_function.empty())
             {
                 Scripting::ScriptEngine* script_engine = Scripting::ScriptEngine::getInstance();
                 script_engine->runFunction(true, "void " + scripting_function + "(int, int, const string)",
@@ -359,7 +351,7 @@ void Physics::update(int ticks)
             }
             flyable->hit(NULL, obj);
 
-            if (obj->isSoccerBall() &&
+            if (obj->isSoccerBall() && 
                 RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_SOCCER)
             {
                 int kartId = p->getUserPointer(0)->getPointerFlyable()->getOwnerId();
@@ -374,7 +366,7 @@ void Physics::update(int ticks)
             // --------------------
             // Only explode a bowling ball if the target is
             // not invulnerable
-            AbstractKart* target_kart = p->getUserPointer(1)->getPointerKart();
+            Kart* target_kart = p->getUserPointer(1)->getPointerKart();
             PowerupManager::PowerupType type = p->getUserPointer(0)->getPointerFlyable()->getType();
             if(type != PowerupManager::POWERUP_BOWLING || !target_kart->isInvulnerable())
             {
@@ -382,7 +374,7 @@ void Physics::update(int ticks)
                 f->hit(target_kart);
 
                 // Check for achievements
-                AbstractKart * kart = World::getWorld()->getKart(f->getOwnerId());
+                Kart * kart = World::getWorld()->getKart(f->getOwnerId());
                 LocalPlayerController *lpc =
                     dynamic_cast<LocalPlayerController*>(kart->getController());
 
@@ -435,127 +427,186 @@ void Physics::update(int ticks)
  *  \param contact_point_b Location of collision at second kart (in kart
  *         coordinates).
  */
-void Physics::KartKartCollision(AbstractKart *kart_a,
-                                const Vec3 &contact_point_a,
-                                AbstractKart *kart_b,
-                                const Vec3 &contact_point_b)
+void Physics::KartKartCollision(Kart *kart_a, const Vec3 &contact_point_a,
+                                Kart *kart_b, const Vec3 &contact_point_b)
 {
     // Only one kart needs to handle the attachments, it will
     // fix the attachments for the other kart.
     kart_a->crashed(kart_b, /*handle_attachments*/true);
     kart_b->crashed(kart_a, /*handle_attachments*/false);
 
-    AbstractKart *left_kart, *right_kart;
+    Kart *left_kart, *right_kart;
+    float left_kart_contact_Z, right_kart_contact_Z;
 
     // Determine which kart is pushed to the left, and which one to the
-    // right. Ideally the sign of the X coordinate of the local conact point
+    // right. Ideally the sign of the X coordinate of the local contact point
     // could decide the direction (negative X --> was hit on left side, gets
     // push to right), but that can lead to both karts being pushed in the
     // same direction (front left of kart hits rear left).
     // So we just use a simple test (which does the right thing in ideal
-    // crashes, but avoids pushing both karts in corner cases
-    // - pun intended ;) ).
+    // crashes, but avoids pushing both karts in corner cases - pun intended ;) ).
+
     if(contact_point_a.getX() < contact_point_b.getX())
     {
         left_kart  = kart_b;
         right_kart = kart_a;
+        left_kart_contact_Z  = (kart_b->getKartLength()/2 + contact_point_b.getZ()) / kart_b->getKartLength();
+        right_kart_contact_Z = (kart_a->getKartLength()/2 + contact_point_a.getZ()) / kart_a->getKartLength();
     }
     else
     {
         left_kart  = kart_a;
         right_kart = kart_b;
+        left_kart_contact_Z  = (kart_a->getKartLength()/2 + contact_point_a.getZ()) / kart_a->getKartLength();
+        right_kart_contact_Z = (kart_b->getKartLength()/2 + contact_point_b.getZ()) / kart_b->getKartLength();
     }
+
+    // If both karts are impulse-locked, we can return immediately
+    if(right_kart->getVehicle()->isImpulseLocked() &&
+       left_kart->getVehicle()->isImpulseLocked())
+        return;
 
     // Add a scaling factor depending on the mass (avoid div by zero).
     // The value of f_right is applied to the right kart, and f_left
     // to the left kart. f_left = 1 / f_right
+    // The max value based on mass with standard settings is 350/210 = 1.6667
     float f_right =  right_kart->getKartProperties()->getMass() > 0
                      ? left_kart->getKartProperties()->getMass()
                        / right_kart->getKartProperties()->getMass()
-                     : 1.5f;
-    // Add a scaling factor depending on speed (avoid div by 0)
-    f_right *= right_kart->getSpeed() > 0
-               ? left_kart->getSpeed()
-                  / right_kart->getSpeed()
-               : 1.5f;
-    // Cap f_right to [0.8,1.25], which results in f_left being
-    // capped in the same interval
-    if(f_right > 1.25f)
-        f_right = 1.25f;
-    else if(f_right< 0.8f)
-        f_right = 0.8f;
-    float f_left = 1/f_right;
+                     : 4.0f;
+    // The impulse being X times stronger for one kart means it will
+    // be 1/X times stronger for the other kart, leading to a X² ratio.
+    // To keep impulse strength ratio and mass ratio equal, we should
+    // take the square root.
+    // However, with the current kart classes, that would make differences
+    // feel too weak, and changing masses would require a lot of adjustments.
+    // We currently take a middle ground approach for gameplay reasons.
+    float sqrt_right = sqrtf(f_right);
+    f_right = sqrt_right * sqrtf(sqrt_right);
+    f_right = std::min(2.0f, std::max(0.5f, f_right));
+
+    // Add a scaling factor depending on speed, making the impulse
+    // weaker for the kart going faster and stronger for the kart going slower.
+    // Negative speeds (going backwards) count as 0 speed.
+    // We compute the speed difference and clamp it to [-21, 21].
+    // We then obtain the strength of the effect in the [1, 2] range,
+    // and invert the result if the right kart is the faster one.
+    // The final result is in the [0.5, 2] range.
+    float left_ref_speed  = std::max(0.0f, left_kart->getSpeed());
+    float right_ref_speed = std::max(0.0f, right_kart->getSpeed());
+    float speed_diff = std::min(21.0f, std::max(-21.0f, (left_ref_speed - right_ref_speed)));
+    float speed_impulse_factor = fabsf(speed_diff / 21.0f) + 1.0f;
+    if (speed_diff < 0)
+        speed_impulse_factor = 1 / speed_impulse_factor;
+
+    f_right *= speed_impulse_factor;
 
     // Check if a kart is more 'actively' trying to push another kart
-    // by checking its local sidewards velocity
-    float vel_left  = left_kart->getVelocityLC().getX();
-    float vel_right = right_kart->getVelocityLC().getX();
+    // To do this we check two things:
+    // - The position of the contact point on the kart body.
+    //   The active kart is touching with the front of the kart
+    // - The angle between the two karts. A higher angle indicates
+    //   ramming.
 
-    // Use the difference in speed to determine which kart gets a
-    // ramming bonus. Normally vel_right and vel_left will have
-    // a different sign: right kart will be driving to the left,
-    // and left kart to the right (both pushing at each other).
-    // By using the sum we get the intended effect: if both karts
-    // are pushing with the same speed, vel_diff is 0, if the right
-    // kart is driving faster vel_diff will be < 0. If both velocities
-    // have the same sign, one kart is trying to steer away from the
-    // other, in which case it gets an even bigger push.
-    float vel_diff = vel_right + vel_left;
+    // The "kart_contact_Z" are between 0.0f (kart touching at the very back)
+    // and 1.0f (kart touching at the very front)
+    // Note that the wheels are usually not at the very front
+    bool left_kart_ramming = false, right_kart_ramming = false;
+    if (left_kart_contact_Z > 0.7f && 
+        left_kart_contact_Z > right_kart_contact_Z + 0.15f)
+        left_kart_ramming = true;
+    else if (right_kart_contact_Z > 0.7f &&
+             right_kart_contact_Z > left_kart_contact_Z + 0.15f)
+        right_kart_ramming = true;
 
-    // More driving towards left --> left kart gets bigger impulse
-    if(vel_diff<0)
+    // Kart heading is in the range [-pi, pi]. It depends on the direction
+    // the kart is pointing at.
+    // We can assume that both karts are more or less in the same plane
+    // when they collide, in which case the heading difference indicates
+    // the angle at which they collided in this plane
+    // We use this difference to compute a "ramming factor"
+    float heading_difference = left_kart->getHeading() - right_kart->getHeading();
+
+    // The difference is in the range [-2pi, 2pi]
+    // First, we must normalize it
+    // The small inaccuracies in approximating pi are irrelevant here
+    // Ramming is maximized if one kart has a perpendicular direction to the other
+    if (heading_difference < 0.0f)
+        heading_difference += 6.2831854f;
+    if (heading_difference > 3.1415927f)
+        heading_difference -= 3.1415927f;
+    if (heading_difference > 1.57079635f)
+        heading_difference = 3.1415927f - heading_difference;
+
+    // Now heading difference is in the range [0, pi/2] (approximately)
+    // With 0 indicating parallel karts and pi/2 perpendicular karts
+    // We set ramming_factor in the [1, 1+pi/2] range
+    float ramming_factor = 1.0f + (heading_difference);
+
+    if (left_kart_ramming)
+        f_right = f_right * ramming_factor;
+    else if (right_kart_ramming)
+        f_right = f_right / ramming_factor;
+
+    // Because the speed, mass and ramming factors are
+    // each in an interval of the form [1/x; x] (with x > 1),
+    // f_left is capped in the same interval as f_right
+    float f_left = 1/f_right;
+
+    // Reduce the bouncing under some conditions
+    // 1 - If the other kart is still under the influence of a bounce
+    if(left_kart->getVehicle()->getCentralImpulseTicks() > 0)
+        f_right *= 0.5f;
+    if(right_kart->getVehicle()->getCentralImpulseTicks() > 0)
+        f_left *= 0.5f; 
+
+    // 2 - If relative velocity is low
+    // Relative velocity accounts for both speed and direction
+    const Vec3 velocity_difference = right_kart->getVelocity() - left_kart->getVelocity();
+    const float velocity_value = velocity_difference.length();
+
+    if (velocity_value < 8.0f) // velocity_value is never negative
     {
-        // Avoid too large impulse for karts that are driving
-        // slow (and division by zero)
-        if(fabsf(vel_left)>2.0f)
-            f_left *= 1.0f - vel_diff/fabsf(vel_left);
-        if(f_left > 2.0f)
-            f_left = 2.0f;
-    }
-    else
-    {
-        // Avoid too large impulse for karts that are driving
-        // slow (and division by zero)
-        if(fabsf(vel_right)>2.0f)
-            f_right *= 1.0f + vel_diff/fabsf(vel_right);
-        if(f_right > 2.0f)
-            f_right = 2.0f;
+        f_right *= 0.375f + velocity_value / 12.8f;
+        f_left  *= 0.375f + velocity_value / 12.8f;
     }
 
-    // Increase the effect somewhat by squaring the factors
-    f_left  = f_left  * f_left;
-    f_right = f_right * f_right;
+    float lean_factor = std::min(1.25f, std::max(f_right, f_left)) * 0.8f;
 
-    // First push one kart to the left (if there is not already
-    // an impulse happening - one collision might cause more
-    // than one impulse otherwise)
-    if(right_kart->getVehicle()->getCentralImpulseTicks()<=0)
-    {
-        const KartProperties *kp = left_kart->getKartProperties();
-        Vec3 impulse(kp->getCollisionImpulse()*f_right, 0, 0);
-        impulse = right_kart->getTrans().getBasis() * impulse;
-        right_kart->getVehicle()
-            ->setTimedCentralImpulse(
-            (uint16_t)stk_config->time2Ticks(kp->getCollisionImpulseTime()),
-            impulse);
-        right_kart ->getBody()->setAngularVelocity(btVector3(0,0,0));
-    }
-
-    // Then push the other kart to the right (if there is no
-    // impulse happening atm).
-    if(left_kart->getVehicle()->getCentralImpulseTicks()<=0)
-    {
-        const KartProperties *kp = right_kart->getKartProperties();
-        Vec3 impulse = Vec3(-kp->getCollisionImpulse()*f_left, 0, 0);
-        impulse = left_kart->getTrans().getBasis() * impulse;
-        left_kart->getVehicle()
-            ->setTimedCentralImpulse(
-            (uint16_t)stk_config->time2Ticks(kp->getCollisionImpulseTime()),
-            impulse);
-        left_kart->getBody()->setAngularVelocity(btVector3(0,0,0));
-    }
-
+    // First push one kart to the right
+    applyKartCollisionImpulse(right_kart, true, f_right, lean_factor);
+ 
+    // Then push the other kart to the left.
+    // The force is made negative to obtain the opposite impulse direction.
+    applyKartCollisionImpulse(left_kart, false, -f_left, lean_factor);
 }   // KartKartCollision
+
+//-----------------------------------------------------------------------------
+/** This function applies the impulse for a collision between karts
+ * */
+void Physics::applyKartCollisionImpulse(Kart *kart, bool right, float force, float lean_factor)
+{
+    if(kart->getVehicle()->isImpulseLocked())
+        return;
+
+    // If the force is weak, we increase the intensity but decrease the duration
+    float time_factor = 1.0f;
+    if (fabsf(force) < 2.0f)
+    {
+        float shorten_factor = (4.0f - fabsf(force)) / 2.0f;
+        force = force * shorten_factor;
+        time_factor = time_factor / shorten_factor;
+    }
+
+    const KartProperties *kp = kart->getKartProperties();
+    Vec3 impulse(kp->getCollisionImpulse() * force, 0, 0);
+    impulse = kart->getTrans().getBasis() * impulse;
+    uint16_t duration = (uint16_t)stk_config->time2Ticks(kp->getCollisionImpulseTime() * time_factor);
+    kart->getVehicle()->setTimedCentralImpulse(duration, impulse);
+    kart->getVehicle()->setCollisionLean(/* towards the right*/ right);
+    kart->getVehicle()->setCollisionLeanFactor(lean_factor);
+    // The kart rotation will be prevented as the impulse is applied
+}   // applyKartCollisionImpulse
 
 //-----------------------------------------------------------------------------
 /** This function is called at each internal bullet timestep. It is used
@@ -619,7 +670,7 @@ btScalar Physics::solveGroup(btCollisionObject** bodies, int numBodies,
                     upA, contact_manifold->getContactPoint(0).m_localPointA);
             else if(upB->is(UserPointer::UP_KART))
             {
-                AbstractKart *kart=upB->getPointerKart();
+                Kart *kart=upB->getPointerKart();
                 int n = contact_manifold->getContactPoint(0).m_index0;
                 const Material *m
                     = n>=0 ? upA->getPointerTriangleMesh()->getMaterial(n)
@@ -657,7 +708,7 @@ btScalar Physics::solveGroup(btCollisionObject** bodies, int numBodies,
         {
             if(upB->is(UserPointer::UP_TRACK))
             {
-                AbstractKart *kart = upA->getPointerKart();
+                Kart *kart = upA->getPointerKart();
                 int n = contact_manifold->getContactPoint(0).m_index1;
                 const Material *m
                     = n>=0 ? upB->getPointerTriangleMesh()->getMaterial(n)
@@ -686,7 +737,7 @@ btScalar Physics::solveGroup(btCollisionObject** bodies, int numBodies,
                 // overworld) add a push back to avoid that karts get stuck
                 if (objB->isStaticObject())
                 {
-                    AbstractKart *kart = upA->getPointerKart();
+                    Kart *kart = upA->getPointerKart();
                     const btVector3 &normal = contact_manifold->getContactPoint(0)
                         .m_normalWorldOnB;
                     kart->crashed((Material*)NULL, normal);

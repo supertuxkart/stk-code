@@ -126,7 +126,7 @@ void ArenasScreen::beforeAddingWidget()
 
     // Set the item hint to that number to prevent weird formatting
     // Avoid too many items shown at the same time
-    tracks_widget->setItemCountHint(std::min(num_of_arenas + 1, 30));
+    tracks_widget->setItemCountHint(std::min(num_of_arenas + 1, 30)); 
 }
 
 // -----------------------------------------------------------------------------

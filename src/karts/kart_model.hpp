@@ -38,7 +38,7 @@ namespace SP { class SPMesh; }
 #include "utils/no_copy.hpp"
 #include "utils/vec3.hpp"
 
-class AbstractKart;
+class Kart;
 class KartProperties;
 class MovingTexture;
 class XMLNode;
@@ -233,31 +233,57 @@ class KartModel : public scene::IAnimationEndCallBack, public NoCopy
 {
 public:
     enum   AnimationFrameType
-           {AF_BEGIN,              // First animation frame
-            AF_DEFAULT = AF_BEGIN, // Default, i.e. steering animation
-            AF_LEFT,               // Steering to the left
-            AF_STRAIGHT,           // Going straight
-            AF_RIGHT,              // Steering to the right
-            AF_LOSE_START,         // Begin losing animation
-            AF_LOSE_LOOP_START,    // Begin of the losing loop
-            AF_LOSE_END,           // End losing animation
-            AF_LOSE_END_STRAIGHT,  // End losing animation to straight frame
-            AF_BEGIN_EXPLOSION,    // Begin explosion animation
-            AF_END_EXPLOSION,      // End explosion animation
-            AF_JUMP_START,         // Begin of jump
-            AF_JUMP_LOOP,          // Begin of jump loop
-            AF_JUMP_END,           // End of jump
-            AF_WIN_START,          // Begin of win animation
-            AF_WIN_LOOP_START,     // Begin of win loop animation
-            AF_WIN_END,            // End of win animation
-            AF_WIN_END_STRAIGHT,   // End of win animation to straight frame
-            AF_SELECTION_START,    // Start frame in kart selection screen
-            AF_SELECTION_END,      // End frame in kart selection screen
-            AF_BACK_LEFT,          // Going back left
-            AF_BACK_STRAIGHT,      // Going back straight
-            AF_BACK_RIGHT,         // Going back right
-            AF_END=AF_BACK_RIGHT,  // Last animation frame
-            AF_COUNT};             // Number of entries here
+    {
+        AF_BEGIN,                // First animation frame
+        AF_DEFAULT = AF_BEGIN,   // Default, i.e. steering animation
+        AF_LEFT,                 // Steering to the left
+        AF_STRAIGHT,             // Going straight
+        AF_RIGHT,                // Steering to the right
+        AF_BACK_LEFT,            // Going back left
+        AF_BACK_STRAIGHT,        // Going back straight
+        AF_BACK_RIGHT,           // Going back right
+
+        // The "loop_end" values here MUST be the "start" value + 2
+        // for setAnimation to work as intended.
+        AF_WIN_START,            // Begin of win animation
+        AF_WIN_LOOP_START,       // Begin of win loop animation
+        AF_WIN_LOOP_END,         // End of the winning loop
+        AF_WIN_TO_STRAIGHT,      // Transition to the straight position (after soccer goals)
+        AF_NEUTRAL_START,        // Begin of the neutral animation
+        AF_NEUTRAL_LOOP_START,   // Begin of the neutral loop animation
+        AF_NEUTRAL_LOOP_END,     // End of the neutral loop animation
+        AF_LOSE_START,           // Begin losing animation
+        AF_LOSE_LOOP_START,      // Begin of the losing loop
+        AF_LOSE_LOOP_END,        // End of the losing loop
+        AF_LOSE_TO_STRAIGHT,     // Transition to the straight position (after soccer goals)
+        AF_PODIUM_START,         // Start of the podium animation
+        AF_PODIUM_LOOP_START,    // Start of the podium loop
+        AF_PODIUM_LOOP_END,      // End of the podium loop
+
+        AF_JUMP_START,           // Begin of jump
+        // Note: Although already defined previously, the jump loop
+        //       animations appear unused.
+        AF_JUMP_LOOP_START,      // Begin of the jump loop
+        AF_JUMP_LOOP_END,        // End of the jump loop
+        AF_SELECTION_START,      // Start frame in the kart selection screen
+        AF_SELECTION_LOOP_START, // Start of the kart selection screen loop
+        AF_SELECTION_LOOP_END,   // End of the kart selection screen loop
+
+        AF_BUMP_FRONT,  // Played if the kart hits something in front
+        AF_BUMP_LEFT,   // Played if the kart hits something to the left
+        AF_BUMP_RIGHT,  // Played if the kart hits something to the right
+        AF_BUMP_BACK,   // Played if the kart hits something to the back
+        AF_HAPPY_START, // Start of the happy animation, played when hitting a rival (or overtaking)
+        AF_HAPPY_END,   // Last frame of the happy animation
+        AF_HIT_START,   // Start of the hit animation, played when being hit
+        AF_HIT_END,     // Last frame of the hit animation
+
+        AF_FALSE_ACCEL_START, // Played if there is a penalty for early accel
+        AF_FALSE_ACCEL_END,   // Played if there is a penalty for early accel
+
+        AF_END=AF_FALSE_ACCEL_END,   // Last animation frame
+        AF_COUNT
+    };               // Number of entries here
 
 private:
     /** Which frame number starts/end which animation. */
@@ -369,7 +395,7 @@ private:
     void OnAnimationEnd(scene::IAnimatedMeshSceneNode *node);
 
     /** Pointer to the kart object belonging to this kart model. */
-    AbstractKart* m_kart;
+    Kart* m_kart;
 
     /** For our engine to get the desired hue for colorization. */
     std::shared_ptr<GE::GERenderInfo> m_render_info;
@@ -437,6 +463,50 @@ public:
      *  to use. */
     int  getBaseFrame() const   { return m_animation_frame[AF_STRAIGHT];  }
     // ------------------------------------------------------------------------
+    /* Returns the AnimationFrameType which corresponds to the end of
+     * the animation passed as parameter.
+     * Returns AF_BEGIN if there is no valid end frame type. */
+    AnimationFrameType getEndFrameType(AnimationFrameType f) const
+    {
+        if (f == AF_WIN_START)            return AF_WIN_LOOP_END;
+        if (f == AF_WIN_LOOP_START)       return AF_WIN_LOOP_END;
+        if (f == AF_NEUTRAL_START)        return AF_NEUTRAL_LOOP_END;
+        if (f == AF_NEUTRAL_LOOP_START)   return AF_NEUTRAL_LOOP_END;
+        if (f == AF_LOSE_START)           return AF_LOSE_LOOP_END;
+        if (f == AF_LOSE_LOOP_START)      return AF_LOSE_LOOP_END;
+        if (f == AF_PODIUM_START)         return AF_PODIUM_LOOP_END;
+        if (f == AF_PODIUM_LOOP_START)    return AF_PODIUM_LOOP_END;
+        if (f == AF_JUMP_START)           return AF_JUMP_LOOP_END;
+        if (f == AF_JUMP_LOOP_START)      return AF_JUMP_LOOP_END;
+        if (f == AF_SELECTION_START)      return AF_SELECTION_LOOP_END;
+        if (f == AF_SELECTION_LOOP_START) return AF_SELECTION_LOOP_END;
+        if (f == AF_HAPPY_START)          return AF_HAPPY_END;
+        if (f == AF_HIT_START)            return AF_HIT_END;
+        if (f == AF_FALSE_ACCEL_START)    return AF_FALSE_ACCEL_END;
+
+        // No valid end animation for this frame type
+        // m_animation_frame[AF_BEGIN] is legal to access but always -1.
+        return AF_BEGIN;
+    }   // getEndFrameType
+    // ------------------------------------------------------------------------
+    /* Returns the AnimationFrameType which corresponds to the start
+     * of the loop for the animation type passed as parameter.
+     * There is a valid result only if the parameter frame type serves
+     * as an introductory sequence to the loop.
+     * Returns AF_BEGIN if there is no valid loop start frame type. */
+    AnimationFrameType getLoopStartFrameType(AnimationFrameType f) const
+    {
+        if (f == AF_WIN_START)            return AF_WIN_LOOP_START;
+        if (f == AF_NEUTRAL_START)        return AF_NEUTRAL_LOOP_START;
+        if (f == AF_LOSE_START)           return AF_LOSE_LOOP_START;
+        if (f == AF_PODIUM_START)         return AF_PODIUM_LOOP_START;
+        if (f == AF_JUMP_START)           return AF_JUMP_LOOP_START;
+        if (f == AF_SELECTION_START)      return AF_SELECTION_LOOP_START;
+
+        // No valid loop start animation for this frame type
+        return AF_BEGIN;
+    }   // getLoopStartFrameType
+    // ------------------------------------------------------------------------
     int  getFrame(AnimationFrameType f) const  { return m_animation_frame[f]; }
     // ------------------------------------------------------------------------
     float  getAnimationSpeed() const              { return m_animation_speed; }
@@ -496,10 +566,13 @@ public:
     AnimationFrameType getAnimation() { return m_current_animation; }
     // ------------------------------------------------------------------------
     /** Enables- or disables the end animation. */
-    void  setAnimation(AnimationFrameType type, bool play_non_loop = false);
+    void  setAnimation(AnimationFrameType type, bool no_loop = false);
+    // ------------------------------------------------------------------------
+    /** Starts an animation loop with the specified loop-start type. */
+    void setAnimationLoop(AnimationFrameType start);
     // ------------------------------------------------------------------------
     /** Sets the kart this model is currently used for */
-    void  setKart(AbstractKart* k) { m_kart = k; }
+    void  setKart(Kart* k) { m_kart = k; }
     // ------------------------------------------------------------------------
     /**  Name of the hat mesh to use. */
     void setHatMeshName(const std::string &name) {m_hat_name = name; }

@@ -1315,7 +1315,7 @@ namespace GUIEngine
         {
             Screen* screen = getCurrentScreen();
 
-            if (screen != NULL &&
+            if (screen != NULL && 
                 (!dialog_opened || screen->getUpdateInBackground()))
             {
                 screen->onUpdate(elapsed_time);
@@ -1375,7 +1375,7 @@ namespace GUIEngine
         {
             Screen* screen = getCurrentScreen();
 
-            if (screen != NULL &&
+            if (screen != NULL && 
                 (!dialog_opened || screen->getUpdateInBackground()))
             {
                 screen->onDraw(elapsed_time);
@@ -1648,7 +1648,7 @@ namespace GUIEngine
         if (ScreenKeyboard::isActive())
         {
             Widget* widget = ScreenKeyboard::getCurrent()->getWidget(name);
-            if (widget != NULL)
+            if (widget != NULL) 
                 return widget;
         }
         
@@ -1656,7 +1656,7 @@ namespace GUIEngine
         if (ModalDialog::isADialogActive())
         {
             Widget* widget = ModalDialog::getCurrent()->getWidget(name);
-            if (widget != NULL)
+            if (widget != NULL) 
                 return widget;
         }
 
@@ -1673,7 +1673,7 @@ namespace GUIEngine
         if (ScreenKeyboard::isActive())
         {
             Widget* widget = ScreenKeyboard::getCurrent()->getWidget(id);
-            if (widget != NULL)
+            if (widget != NULL) 
                 return widget;
         }
         
@@ -1681,7 +1681,7 @@ namespace GUIEngine
         if (ModalDialog::isADialogActive())
         {
             Widget* widget = ModalDialog::getCurrent()->getWidget(id);
-            if (widget != NULL)
+            if (widget != NULL) 
                 return widget;
         }
 

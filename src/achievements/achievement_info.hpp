@@ -54,7 +54,7 @@ public:
         std::string           type;
         int                   value;
         operationType         operation;
-        std::vector<goalTree> children;
+        std::vector<goalTree> children;      
     };
 
 private:

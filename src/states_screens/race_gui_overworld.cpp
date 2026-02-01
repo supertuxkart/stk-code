@@ -41,7 +41,7 @@
 #include "items/attachment.hpp"
 #include "items/attachment_manager.hpp"
 #include "items/powerup_manager.hpp"
-#include "karts/abstract_kart.hpp"
+#include "karts/kart.hpp"
 #include "karts/controller/controller.hpp"
 #include "karts/kart_properties.hpp"
 #include "karts/kart_properties_manager.hpp"
@@ -70,9 +70,10 @@ using namespace irr;
 const int LOCKED = 0;
 const int OPEN = 1;
 const int COMPLETED_EASY = 2;
-const int COMPLETED_MEDIUM = 3;
-const int COMPLETED_HARD = 4;
-const int COMPLETED_BEST = 5;
+const int COMPLETED_CASUAL = 3;
+const int COMPLETED_MEDIUM = 4;
+const int COMPLETED_HARD = 5;
+const int COMPLETED_BEST = 6;
 
 /** The constructor is called before anything is attached to the scene node.
  *  So rendering to a texture can be done here. But world is not yet fully
@@ -88,12 +89,13 @@ RaceGUIOverworld::RaceGUIOverworld()
     m_is_minimap_initialized = false;
     m_close_to_a_challenge = false;
     m_current_challenge = NULL;
-    m_trophy[0] = irr_driver->getTexture(FileManager::GUI_ICON, "cup_bronze.png");
-    m_trophy[1] = irr_driver->getTexture(FileManager::GUI_ICON, "cup_silver.png");
-    m_trophy[2] = irr_driver->getTexture(FileManager::GUI_ICON, "cup_gold.png"  );
-    m_trophy[3] = irr_driver->getTexture(FileManager::GUI_ICON, "cup_platinum.png"  );
+    m_trophy[0] = irr_driver->getTexture(FileManager::GUI_ICON, "cup_chocolate.png");
+    m_trophy[1] = irr_driver->getTexture(FileManager::GUI_ICON, "cup_bronze.png");
+    m_trophy[2] = irr_driver->getTexture(FileManager::GUI_ICON, "cup_silver.png");
+    m_trophy[3] = irr_driver->getTexture(FileManager::GUI_ICON, "cup_gold.png"  );
+    m_trophy[4] = irr_driver->getTexture(FileManager::GUI_ICON, "cup_platinum.png"  );
 
-    bool multitouch_enabled = (UserConfigParams::m_multitouch_active == 1 &&
+    bool multitouch_enabled = (UserConfigParams::m_multitouch_active == 1 && 
                                irr_driver->getDevice()->supportsTouchDevice()) ||
                                UserConfigParams::m_multitouch_active > 1;
     
@@ -123,7 +125,8 @@ RaceGUIOverworld::RaceGUIOverworld()
     m_icons[3] = m_trophy[1];
     m_icons[4] = m_trophy[2];
     m_icons[5] = m_trophy[3];
-    m_icons[6] = m_locked_bonus;
+    m_icons[6] = m_trophy[4];
+    m_icons[7] = m_locked_bonus;
 }   // RaceGUIOverworld
 
 // ----------------------------------------------------------------------------
@@ -146,14 +149,14 @@ RaceGUIOverworld::~RaceGUIOverworld()
 //-----------------------------------------------------------------------------
 void RaceGUIOverworld::calculateMinimapSize()
 {
-    float scaling = std::min(irr_driver->getFrameSize().Height,
+    float scaling = std::min(irr_driver->getFrameSize().Height,  
         irr_driver->getFrameSize().Width) / 420.0f;
     const float map_size = 250.0f;
     
     // Check if we have enough space for minimap when touch steering is enabled
     if (m_multitouch_gui != NULL)
     {
-        const float map_bottom = (float)(irr_driver->getActualScreenSize().Height -
+        const float map_bottom = (float)(irr_driver->getActualScreenSize().Height - 
                                          m_multitouch_gui->getHeight());
         
         if ((map_size + 20.0f) * scaling > map_bottom)
@@ -161,10 +164,10 @@ void RaceGUIOverworld::calculateMinimapSize()
             scaling = map_bottom / (map_size + 20.0f);
         }
         
-        // Use some reasonable minimum scale, because minimap size can be
+        // Use some reasonable minimum scale, because minimap size can be 
         // changed during the race
         scaling = std::max(scaling,
-                           irr_driver->getActualScreenSize().Height * 0.2f /
+                           irr_driver->getActualScreenSize().Height * 0.2f / 
                            (map_size + 20.0f));
     }
 
@@ -185,7 +188,7 @@ void RaceGUIOverworld::calculateMinimapSize()
 
     if (m_multitouch_gui != NULL)
     {
-        m_map_left = (int)((irr_driver->getActualScreenSize().Width -
+        m_map_left = (int)((irr_driver->getActualScreenSize().Width - 
                                                         m_map_width) * 0.9f);
         m_map_bottom = m_map_height + int(10 * scaling);
     }
@@ -232,7 +235,7 @@ void RaceGUIOverworld::renderPlayerView(const Camera *camera, float dt)
     
     RaceGUIBase::renderPlayerView(camera, dt);
     
-    const AbstractKart *kart = camera->getKart();
+    const Kart *kart = camera->getKart();
     if(!kart) return;
     
     const core::recti &viewport = camera->getViewport();
@@ -286,20 +289,21 @@ void RaceGUIOverworld::drawTrophyPoints()
         PlayerManager::getCurrentPlayer()->isLocked("difficulty_best") ? size*2.0f : size*1.0f;
 
     // Draw trophies icon and the number of trophy obtained by type
-    for (unsigned int i=0;i<4;i++)
+    for (unsigned int i=0;i<5;i++)
     {
         if (m_close_to_a_challenge)
             break;
 
-        if (i==3 && PlayerManager::getCurrentPlayer()->isLocked("difficulty_best"))
+        if (i==4 && PlayerManager::getCurrentPlayer()->isLocked("difficulty_best"))
             break;
 
         draw2DImage(m_trophy[i], dest, source, NULL, NULL, true /* alpha */);
 
         dest += core::position2di((int)(size*1.5f), 0);
         std::string trophies = (i==0) ? StringUtils::toString(player->getNumEasyTrophies())   :
-                               (i==1) ? StringUtils::toString(player->getNumMediumTrophies()) :
-                               (i==2) ? StringUtils::toString(player->getNumHardTrophies())   :
+                               (i==1) ? StringUtils::toString(player->getNumCasualTrophies()) :
+                               (i==2) ? StringUtils::toString(player->getNumMediumTrophies()) :
+                               (i==3) ? StringUtils::toString(player->getNumHardTrophies())   :
                                         StringUtils::toString(player->getNumBestTrophies());
         core::stringw trophiesW(trophies.c_str());
         font->setBlackBorder(true);
@@ -409,7 +413,7 @@ void RaceGUIOverworld::drawGlobalMiniMap()
     // There can be only player karts on the overworld.
     for(unsigned int i=0; i<world->getNumKarts(); i++)
     {
-        const AbstractKart *kart = world->getKart(i);
+        const Kart *kart = world->getKart(i);
 
         kart_xyz= kart->getXYZ();
         Vec3 draw_at;
@@ -477,6 +481,7 @@ void RaceGUIOverworld::drawGlobalMiniMap()
         if      (c->isSolved(RaceManager::DIFFICULTY_BEST))   state = COMPLETED_BEST;
         else if (c->isSolved(RaceManager::DIFFICULTY_HARD))   state = COMPLETED_HARD;
         else if (c->isSolved(RaceManager::DIFFICULTY_MEDIUM)) state = COMPLETED_MEDIUM;
+        else if (c->isSolved(RaceManager::DIFFICULTY_CASUAL)) state = COMPLETED_CASUAL;
         else if (c->isSolved(RaceManager::DIFFICULTY_EASY))   state = COMPLETED_EASY;
 
         const core::rect<s32> source(core::position2d<s32>(0,0),

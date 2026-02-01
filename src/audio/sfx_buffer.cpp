@@ -82,7 +82,7 @@ SFXBuffer::SFXBuffer(const std::string& file,
 
 //----------------------------------------------------------------------------
 /** \brief load the buffer from file into OpenAL.
- *  \note If this buffer is already loaded, this call does nothing and
+ *  \note If this buffer is already loaded, this call does nothing and 
   *       returns false.
  *  \return Whether loading was successful.
  */
@@ -222,7 +222,7 @@ bool SFXBuffer::loadVorbisBuffer(const std::string &name, ALuint buffer)
     // duration (which is the norm), compute it:
     if(m_duration < 0)
     {
-        m_duration = float(buffer_size)
+        m_duration = float(buffer_size) 
                    / (frequency*channels*(bits_per_sample / 8));
     }
     return success;

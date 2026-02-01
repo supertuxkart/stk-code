@@ -51,6 +51,7 @@ public:
     {
         GP_NONE,
         GP_EASY,
+        GP_CASUAL,
         GP_MEDIUM,
         GP_HARD,
         GP_BEST

@@ -2,12 +2,12 @@
 
 <config>
   <!--  Minimum and maximum kart versions that can be used by this binary.
-        Older version will be ignored. -->
-  <kart-version min="2" max="3"/>
+        Older versions will be ignored. -->
+  <kart-version min="2" max="4"/>
 
-  <!-- Minimum and maximum track versions that be be read by this binary.
+  <!-- Minimum and maximum track versions that can be read by this binary.
        Older versions will be ignored. -->
-  <track-version min="6" max="7"/>
+  <track-version min="6" max="8"/>
 
   <!-- Minimum and maximum server versions that be be read by this binary.
        Older versions will be ignored. -->
@@ -144,7 +144,7 @@
       -->
   <physics smooth-normals="true"
            smooth-angle-limit="0.65"
-           fps="120"
+           fps="240"
            default-track-friction="0.5"
            default-moveable-friction="0.5"
            solver-iterations="4"
@@ -223,29 +223,32 @@
   <!-- Item return times.
        Time until an item that has been collected returns. Can be set
        differently for bonus (gift) boxes, nitro, bananas and bubble gums -->
-  <item-return-time bonusbox="2.0" nitro="2.0" banana="2.0" bubblegum="2.0"/>
+  <item-return-time bonusbox="1.25" nitro="1.0" banana="2.0" bubblegum="2.0"/>
 
   <!-- Powerup
-       collect-mode : decides what is collected if a kart has already an
-               same: get one more item of the same type.
-               new:  always get a new item.
-               only-if-same: if the random item is the same one as the
-                      one currently owned, increase the number, otherwise
-                      no more/new item s are given to the kart.
-       no-explosive-items-timeout determines if world time is less than this value
-               then no cake or basketball is given by bonus boxes. -->
-  <powerup collect-mode="new" no-explosive-items-timeout="15.0"/>
+        collect-mode : decides what is collected if a kart has already an item.
+                same: get one more item of the same type.
+                new:  check for a random item, replace the held item if different,
+                     add more if it is the same.
+                only-if-same: check for a random item, do nothing if the held item
+                     is different, add more if it is the same.
+        limited-items-timeout : if world time is less than this value, then cakes,
+                basketballs, parachutes and nitro-hacks are not given.
+        full-random : if true, powerups are (for all practical purposes) fully random,
+                if false, variance is reduced while the rate at which any given powerup
+                is collected stays the same.
+         -->
+  <powerup collect-mode="new" limited-items-timeout="15.0" full-random="false"/>
   <!-- time: How long a switch is being effective.
        items for each item list the index of the item it is switched with.
-             Order: giftbox, banana, big-nitro, small-nitro, bubble-gum, nolok-bubble-gum,
-                    easter egg-->
-  <switch time="5"  items="1 0 4 4 2 2 6"/>
+             Order: giftbox, banana, big-nitro, small-nitro, air-nitro, bubble-gum,
+                nolok-bubble-gum, small-bubble-gum, small-nolok-bubble-gum, easter egg-->
+  <switch time="5"  items="1 0 5 7 4 2 2 3 3 9"/>
 
   <!-- Bubblegum
        disappear-counter: How often bubblegum gets driven over before it disappears.
-       shield-time: How long the bubblegum shield lasts
-       restrict-weapons: If true, using weapons will destroy the user's shield -->
-  <bubblegum disappear-counter="1" shield-time="10.0" restrict-weapons="false"/>
+       restrict-weapons: If true, using weapons will destroy the user's gum shield -->
+  <bubblegum disappear-counter="1" restrict-weapons="true"/>
 
   <!-- explosion-impulse-objects is the impulse that pushes physical objects
        away if there is an explosion. -->
@@ -347,8 +350,7 @@
            collection in the first place).
     -->
     <ai>
-        <easy   time-full-steer="0.1"
-                straight-length-for-zipper="35"
+        <easy   straight-length-for-zipper="35"
                 use-slipstream="false"
                 disable-slipstream-usage="true"
                 shield-incoming-radius="0"
@@ -366,8 +368,9 @@
                 rb-skid-probability="0:0.0"
                 skidding-threshold="4.0"
                 />
-        <medium time-full-steer="0.1"
-                straight-length-for-zipper="35"
+       <!-- copy-pasted medium AI for now
+            No point tweaking until AI is redone and parametrized -->
+        <casual straight-length-for-zipper="35"
                 use-slipstream="false"
                 disable-slipstream-usage="false"
                 shield-incoming-radius="10"
@@ -385,8 +388,25 @@
                 rb-skid-probability="0:0.0"
                 skidding-threshold="3.0"
                 />
-        <hard   time-full-steer="0.1"
-                straight-length-for-zipper="35"
+        <medium straight-length-for-zipper="35"
+                use-slipstream="false"
+                disable-slipstream-usage="false"
+                shield-incoming-radius="10"
+                false-start-probability="0.04"
+                min-start-delay="0.25" max-start-delay="0.4"
+                nitro-usage="1"
+                item-skill="2"
+                collect-avoid-items="true"
+                handle-bomb="false"
+                first-speed-cap="20:1.0 60:0.9 100:0.85"
+                last-speed-cap="-50:0.94 0:0.85 100:0.75"
+                max-item-angle="0.7" max-item-angle-high-speed="0.3"
+                bad-item-closeness="6"
+                collect-item-probability="-10:1.0 0:0"
+                rb-skid-probability="0:0.0"
+                skidding-threshold="3.0"
+                />
+        <hard   straight-length-for-zipper="35"
                 use-slipstream="true"
                 disable-slipstream-usage="false"
                 shield-incoming-radius="8"
@@ -404,8 +424,7 @@
                 rb-skid-probability="-50:1.0 -20:0.7 20:0.2 50:0.0"
                 skidding-threshold="2.0"
                 />
-        <best   time-full-steer="0.1"
-                straight-length-for-zipper="35"
+        <best   straight-length-for-zipper="35"
                 use-slipstream="true"
                 disable-slipstream-usage="false"
                 shield-incoming-radius="6"
@@ -435,23 +454,11 @@
     <friction slip="10000000"/>
 
     <!-- collision
-         impulse-type: STK can apply an additional impulse in case of
-           kart-track collision:
-             'none' : no additional impulse
-             'normal': impulse along the normal
-             'driveline': impulse towards the nearest driveline.
-           An impulse towards the driveline works nice when the kart is
-           driving more or less correctly on the track - it pushes the
-           kart in the right direction. But if the kart is significanlty
-           off track, it has severe problems (since an incorrect
-           driveline point can be selected, pusing the kart in the
-           wrong direction, sometimes even causing a 'zip-along-obstacle'
-           effect.
          impulse: an additional impulse to be applied in a non-frontal
            collision to push two karts away from each other.
-         impulse-time: The impulse will be applied over a certain time
-           period, which results in less abrupt changes. If set to 0,
-           the impulse is only applied once.
+         impulse-time: The kart-on-kart collision impulse will be applied
+           over a certain time period, which results in less abrupt changes.
+           If set to 0, the impulse is only applied once.
          resitution: restitution value to be used for the kart rigid bodies.
            The restitution used depends on the speed to avoid physics issues
            (a collision with high speed and high restitution will push the
@@ -475,57 +482,10 @@
            physics settings are used which places the raycast wheels
            outside of the chassis and results in more stable physical
            behaviour of the karts. -->
-    <collision impulse-type="normal"
-               impulse="3000" impulse-time="0.1" terrain-impulse="160"
-               restitution="0:1.0 5:1.0 20:0.2" bevel-factor="0.5 0.0 0.3"
+    <collision impulse="7000" impulse-time="0.3"
+               restitution="0:1.0 4:0.65 10:0.44 18:0.3 30:0.21 45:0.16" bevel-factor="0.5 0.0 0.3"
                physical-wheel-position="0" />
 
-     <!-- Skidding
-              increase: multiplicative increase of skidding factor in each frame.
-              decrease: multiplicative decrease of skidding factor in each frame.
-              max: maximum skidding factor = maximum increase of steering angle.
-              time-till-max: Time till maximum skidding is reached.
-              visual: Additional graphical rotation of kart. The graphical rotation
-                of the kart also determines the direction the kart is driving to
-                when skidding is stopped.
-              visual-time: How long it takes for the visual skid to reach maximum.
-              revert-visual-time: how long it takes when stopping a skid to revert
-                the visual skid and bring visuals and physics in sync again.
-              min-speed: Minimum speed a kart must have before it can skid. Must be
-                >0, otherwise the kart can skid at the start of the race.
-              time-till-bonus: How long a kart needs to skid in order to get a bonus.
-              bonus-speed: A speedup applied to the kart whick skidded for a while.
-              bonus-time: How long the bonus-force is applied.
-              bonus-force: Additional engine force (this is used to offset the fact
-                that turning after skidding (e.g. to correct direction) often uses
-                up the skid bonus).
-              post-skid-rotate-factor: a factor to be used to determine how much
-                the chassis of a kart should rotate to match the graphical view.
-                A factor of 1 is identical, a smaller factor will rotate the kart
-                less (which might  feel better).
-              physical-jump-time: Time for a physical jump at the beginning of a skid.
-              graphical-jump-time: Time for a graphics-only jump at the beginning
-                of a skid.
-              reduce-turn-min/max: The steering done by the controller (which is in
-                [-1,1]) is mapped to [reduce-turn-min, reduce-turn-max] when skidding
-                is active (for left turn, right turn will use [-max, -min]). The
-                effect is that while you skid (say left) you can adjust the direction
-                of the turn the kart is doing somewhat by steering to the left and right,
-                but you will always keep on doing a left turn, just more or less. -->
-     <skid increase="1.05" decrease="0.95" max="2.5" time-till-max="0.5"
-         visual="1.25" visual-time="0.7" revert-visual-time="0.7"
-         min-speed="10"  time-till-bonus="1.0 3.0"
-         bonus-speed="4.5 6.5" bonus-time="3.0 4.0"
-         bonus-force="250 350"
-         physical-jump-time="0" graphical-jump-time="0.4"
-         post-skid-rotate-factor="1"
-         reduce-turn-min="0.2" reduce-turn-max="0.8"/>
-
-     <kart-type>
-         <light />
-         <medium />
-         <heavy />
-     </kart-type>
   </general-kart-defaults>
 
   <!-- Here are the default fonts file names for STK.
@@ -542,9 +502,10 @@
 
   <!-- Maximum bones from all animated meshes in each frame to be uploaded for
        hardware skinning, For gles 3.0 the specification guarantees at least 2048, for
-       TBO in desktop at least 65536 (max buffer size) / 64, SSBO at least 2^24 / 64,
-       and for cases TBO doesn't support equal or more than 2048, use texture instead,
-       so 2048 will work everywhere. -->
+       TBO in desktop at least 65536 (max buffer size) / 64, SSBO at least 2^24 / 64.
+       1024 is guaranteed to work everywhere, but can be limiting, in kart creation and
+       in the max number of karts. Most systems should support at least 2048.
+       For cases TBO doesn't support equal or more than 2048, fallback on textures. -->
   <skinning max-bones="2048"/>
 
   <!-- For users with libsquish:
@@ -580,10 +541,8 @@
   -->
   <network-capabilities>
       <capabilities name="report_player"/>
-      <capabilities name="soccer_fixes"/>
       <capabilities name="ranking_changes"/>
       <capabilities name="real_addon_karts"/>
       <capabilities name="aes_gcm_128bit_tag"/>
-      <capabilities name="command_messages"/>
   </network-capabilities>
 </config>

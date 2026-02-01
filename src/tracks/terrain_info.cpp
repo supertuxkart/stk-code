@@ -86,7 +86,7 @@ void TerrainInfo::update(const btMatrix3x3 &rotation, const Vec3 &from)
     tm.castRay(from, to, &m_hit_point, &m_material, &m_normal,
                /*interpolate*/true);
     // Now also raycast against all track objects (that are driveable). If
-    // there should be a closer result (than the one against the main track
+    // there should be a closer result (than the one against the main track 
     // mesh), its data will be returned.
     Track::getCurrentTrack()->getTrackObjectManager()
                             ->castRay(from, to, &m_hit_point, &m_material,

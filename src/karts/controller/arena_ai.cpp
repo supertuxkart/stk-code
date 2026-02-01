@@ -22,17 +22,16 @@
 #include "items/item_manager.hpp"
 #include "items/powerup.hpp"
 #include "items/projectile_manager.hpp"
-#include "karts/abstract_kart.hpp"
+#include "karts/kart.hpp"
 #include "karts/controller/ai_properties.hpp"
 #include "karts/kart_properties.hpp"
-#include "karts/rescue_animation.hpp"
 #include "tracks/arena_graph.hpp"
 #include "tracks/arena_node.hpp"
 #include "tracks/track.hpp"
 
 #include <algorithm>
 
-ArenaAI::ArenaAI(AbstractKart *kart)
+ArenaAI::ArenaAI(Kart *kart)
        : AIBaseController(kart)
 {
     m_item_manager = Track::getCurrentTrack()->getItemManager();
@@ -112,7 +111,7 @@ void ArenaAI::update(int ticks)
         m_kart->isOnGround()                                     )
     {
         m_ticks_since_off_road = 0;
-        RescueAnimation::create(m_kart);
+        m_kart->applyRescue(/* auto-rescue */ false);
         AIBaseController::update(ticks);
         return;
     }
@@ -158,7 +157,7 @@ void ArenaAI::update(int ticks)
     else
     {
         configSpeed();
-        setSteering(m_steering_angle, dt);
+        setSteering(m_steering_angle);
     }
 
     AIBaseController::update(ticks);
@@ -344,7 +343,7 @@ void ArenaAI::configSpeed()
     // value. This prevents a kart from going too slow (or even backwards)
     // in tight curves.
     const float MIN_SPEED = 5.0f;
-    const float handicap = (m_cur_difficulty == RaceManager::DIFFICULTY_EASY
+    const float handicap = (m_cur_difficulty == RaceManager::DIFFICULTY_EASY 
                             ? 0.7f : 1.0f                                   );
 
     const float max_turn_speed = m_kart->getSpeedForTurnRadius(m_turn_radius);
@@ -369,7 +368,7 @@ void ArenaAI::doUTurn(const float dt)
     float turn_angle = atan2f(m_target_point_lc.x(),
         fabsf(m_target_point_lc.z()));
     m_controls->setBrake(true);
-    setSteering(turn_angle > 0.0f ? -1.0f : 1.0f, dt);
+    setSteering(turn_angle > 0.0f ? -1.0f : 1.0f);
     m_time_since_uturn += dt;
 
     if ((m_target_point_lc.z() > 0 && fabsf(turn_angle) < 0.2f) ||
@@ -395,8 +394,7 @@ bool ArenaAI::gettingUnstuck(int ticks)
     if (!m_is_stuck || m_is_uturn) return false;
 
     resetAfterStop();
-    float dt = stk_config->ticks2Time(ticks);
-    setSteering(0.0f, dt);
+    setSteering(0.0f);
     m_controls->setBrake(true);
 
     m_ticks_since_reversing += ticks;
@@ -433,7 +431,8 @@ void ArenaAI::useItems(const float dt)
     m_time_since_last_shot += dt;
 
     float min_bubble_time = 2.0f;
-    const bool difficulty = m_cur_difficulty == RaceManager::DIFFICULTY_EASY ||
+    const bool difficulty = m_cur_difficulty == RaceManager::DIFFICULTY_EASY   ||
+                            m_cur_difficulty == RaceManager::DIFFICULTY_CASUAL ||
                             m_cur_difficulty == RaceManager::DIFFICULTY_MEDIUM;
 
     const bool fire_behind = closest_kart_point_lc.z() < 0 && !difficulty;
