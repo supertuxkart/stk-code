@@ -667,7 +667,7 @@ begin:
     UserConfigParams::m_real_width = (unsigned)((float)UserConfigParams::m_width / m_device->getNativeScaleX());
     UserConfigParams::m_real_height = (unsigned)((float)UserConfigParams::m_height / m_device->getNativeScaleY());
 
-#ifndef SERVER_ONLY 
+#ifndef SERVER_ONLY
 
     GE::setVideoDriver(m_device->getVideoDriver());
 
@@ -806,7 +806,7 @@ begin:
         [](unsigned int t, ptrdiff_t s, const void* d, unsigned int u)
         { glBufferData(t, s, d, u); },
         [](int n, const unsigned int* b) { glDeleteBuffers(n, b); },
-        [](unsigned int t, ptrdiff_t o, ptrdiff_t l, unsigned int a) 
+        [](unsigned int t, ptrdiff_t o, ptrdiff_t l, unsigned int a)
         { return glMapBufferRange(t, o, l, a); },
         [](unsigned int t) { return glUnmapBuffer(t); });
 #endif
@@ -1796,7 +1796,7 @@ void IrrDriver::grabAllTextures(const scene::IMesh *mesh)
 #ifndef SERVER_ONLY
     if (CVS->isGLSL())
     {
-        // SPM files has shared_ptr auto-delete texture 
+        // SPM files has shared_ptr auto-delete texture
         return;
     }
 #endif
@@ -1825,7 +1825,7 @@ void IrrDriver::dropAllTextures(const scene::IMesh *mesh)
 #ifndef SERVER_ONLY
     if (CVS->isGLSL())
     {
-        // SPM files has shared_ptr auto-delete texture 
+        // SPM files has shared_ptr auto-delete texture
         return;
     }
 #endif
@@ -1881,7 +1881,7 @@ void IrrDriver::setAmbientLight(const video::SColorf &light, bool force_SH_compu
         color.b = powf(color.b, 1.0f / 2.2f);
     }
     m_scene_manager->setAmbientLight(color);
-    m_renderer->setAmbientLight(light, force_SH_computation);    
+    m_renderer->setAmbientLight(light, force_SH_computation);
 #endif
 }   // setAmbientLight
 

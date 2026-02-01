@@ -210,7 +210,7 @@ void TrackObjectManager::resetAfterRewind()
  *  can be a physical object, and can e.g. be animated. A separate list of all
  *  driveable objects is maintained (in one case there were over 2000 bodies,
  *  but only one is driveable). The result of the raycast against the track
- *  mesh are the input parameter. It is then tested if the raycast against 
+ *  mesh are the input parameter. It is then tested if the raycast against
  *  a track object gives a 'closer' result. If so, the parameters hit_point,
  *  normal, and material will be updated.
  *  \param from/to The from and to position for the raycast.

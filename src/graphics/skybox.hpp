@@ -44,7 +44,7 @@ private:
     GLuint m_cube_map;
     
     /** The specular probe texture id */
-    GLuint m_specular_probe;   
+    GLuint m_specular_probe;
     
 
     void generateCubeMapFromTextures ();

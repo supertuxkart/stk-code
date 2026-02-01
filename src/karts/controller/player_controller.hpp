@@ -81,7 +81,7 @@ public:
     /** Player will always be able to get a slipstream bonus. */
     virtual bool  disableSlipstreamBonus() const OVERRIDE
     {
-        return false; 
+        return false;
     }
     // ------------------------------------------------------------------------
     /** Called when a race is finished. */

@@ -305,12 +305,12 @@ public:
     {
         return m_favorite_track_status->isFavorite(ident);
     }
-    void addFavoriteTrack(std::string ident, std::string group = 
+    void addFavoriteTrack(std::string ident, std::string group =
         FavoriteStatus::DEFAULT_FAVORITE_GROUP_NAME)
     {
         m_favorite_track_status->addFavorite(ident, group);
     }
-    void removeFavoriteTrack(std::string ident, std::string group = 
+    void removeFavoriteTrack(std::string ident, std::string group =
         FavoriteStatus::DEFAULT_FAVORITE_GROUP_NAME)
     {
         m_favorite_track_status->removeFavorite(ident, group);
@@ -320,12 +320,12 @@ public:
     {
         return m_favorite_kart_status->isFavorite(ident);
     }
-    void addFavoriteKart(std::string ident, std::string group = 
+    void addFavoriteKart(std::string ident, std::string group =
         FavoriteStatus::DEFAULT_FAVORITE_GROUP_NAME)
     {
         m_favorite_kart_status->addFavorite(ident, group);
     }
-    void removeFavoriteKart(std::string ident, std::string group = 
+    void removeFavoriteKart(std::string ident, std::string group =
         FavoriteStatus::DEFAULT_FAVORITE_GROUP_NAME)
     {
         m_favorite_kart_status->removeFavorite(ident, group);

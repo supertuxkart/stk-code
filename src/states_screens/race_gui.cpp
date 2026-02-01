@@ -78,7 +78,7 @@ RaceGUI::RaceGUI()
         m_enabled = false;
 
     initSize();
-    bool multitouch_enabled = (UserConfigParams::m_multitouch_active == 1 && 
+    bool multitouch_enabled = (UserConfigParams::m_multitouch_active == 1 &&
                                irr_driver->getDevice()->supportsTouchDevice()) ||
                                UserConfigParams::m_multitouch_active > 1;
     
@@ -191,7 +191,7 @@ void RaceGUI::calculateMinimapSize()
     }
 
     // Originally m_map_height was 100, and we take 480 as minimum res
-    float scaling = std::min(irr_driver->getFrameSize().Height,  
+    float scaling = std::min(irr_driver->getFrameSize().Height,
                              irr_driver->getFrameSize().Width) / 480.0f;
     const float map_size = UserConfigParams::m_minimap_size * map_size_splitscreen;
     const float top_margin = 3.5f * m_font_height;
@@ -199,7 +199,7 @@ void RaceGUI::calculateMinimapSize()
     // Check if we have enough space for minimap when touch steering is enabled
     if (m_multitouch_gui != NULL  && !m_multitouch_gui->isSpectatorMode())
     {
-        const float map_bottom = (float)(irr_driver->getActualScreenSize().Height - 
+        const float map_bottom = (float)(irr_driver->getActualScreenSize().Height -
                                          m_multitouch_gui->getHeight());
         
         if ((map_size + 20.0f) * scaling > map_bottom - top_margin)
@@ -207,10 +207,10 @@ void RaceGUI::calculateMinimapSize()
             scaling = (map_bottom - top_margin) / (map_size + 20.0f);
         }
         
-        // Use some reasonable minimum scale, because minimap size can be 
+        // Use some reasonable minimum scale, because minimap size can be
         // changed during the race
         scaling = std::max(scaling,
-                           irr_driver->getActualScreenSize().Height * 0.15f / 
+                           irr_driver->getActualScreenSize().Height * 0.15f /
                            (map_size + 20.0f));
     }
     
@@ -224,9 +224,9 @@ void RaceGUI::calculateMinimapSize()
     if ((UserConfigParams::m_minimap_display == 1 && /*map on the right side*/
        RaceManager::get()->getNumLocalPlayers() == 1) || m_multitouch_gui)
     {
-        m_map_left          = (int)(irr_driver->getActualScreenSize().Width - 
+        m_map_left          = (int)(irr_driver->getActualScreenSize().Width -
                                                         m_map_width - 10.0f*scaling);
-        m_map_bottom        = (int)(3*irr_driver->getActualScreenSize().Height/4 - 
+        m_map_bottom        = (int)(3*irr_driver->getActualScreenSize().Height/4 -
                                                         m_map_height);
     }
     else if ((UserConfigParams::m_minimap_display == 3 && /*map on the center of the screen*/
@@ -258,9 +258,9 @@ void RaceGUI::calculateMinimapSize()
     }
     else if (m_multitouch_gui != NULL  && !m_multitouch_gui->isSpectatorMode())
     {
-        m_map_left = (int)((irr_driver->getActualScreenSize().Width - 
+        m_map_left = (int)((irr_driver->getActualScreenSize().Width -
                                                         m_map_width) * 0.95f);
-        m_map_bottom = (int)(irr_driver->getActualScreenSize().Height - 
+        m_map_bottom = (int)(irr_driver->getActualScreenSize().Height -
                                                     top_margin - m_map_height);
     }
 }  // calculateMinimapSize
@@ -376,7 +376,7 @@ void RaceGUI::renderPlayerView(const Camera *camera, float dt)
 
     // Scale race GUI along screen size
     scaling *= sqrtf(float(viewport.getWidth()) / 800.0f);
-    scaling *= sqrtf(float(viewport.getHeight()) / 450.0f); 
+    scaling *= sqrtf(float(viewport.getHeight()) / 450.0f);
 
     // Scale X and Y separately in splitscreen for proper relative positioning
     if (viewport.getWidth() != (int)irr_driver->getActualScreenSize().Width ||
@@ -444,7 +444,7 @@ void RaceGUI::drawGlobalTimer()
     {
         // This assumes only challenges have a time target
         // and don't end the race when reaching the target.
-        if (elapsed_time < 0) 
+        if (elapsed_time < 0)
         {
             sw = _("Challenge Failed"); // We just overwrite the default case
             int string_width = GUIEngine::getFont()->getDimension(sw.c_str()).Width;
@@ -671,7 +671,7 @@ void RaceGUI::drawGlobalMiniMap()
             dynamic_cast<const SpareTireAI*>(kart->getController());
 
         // don't draw eliminated kart
-        if (kart->isEliminated() && !(sta && sta->isMoving())) 
+        if (kart->isEliminated() && !(sta && sta->isMoving()))
             continue;
         if (!kart->isVisible())
             continue;
@@ -894,7 +894,7 @@ void RaceGUI::drawEnergyMeter(int x, int y, const AbstractKart *kart,
 
         video::S3DVertex vertices[vertices_count];
 
-        unsigned int count = computeVerticesForMeter(position, threshold, vertices, vertices_count, 
+        unsigned int count = computeVerticesForMeter(position, threshold, vertices, vertices_count,
                                                      coin_target, gauge_width, gauge_height, offset);
 
         drawMeterTexture(m_gauge_goal, vertices, count, true);
@@ -1122,7 +1122,7 @@ void RaceGUI::drawSpeedEnergyRank(const AbstractKart* kart,
         }
     }
 
-    unsigned int count = computeVerticesForMeter(position, threshold, vertices, vertices_count, 
+    unsigned int count = computeVerticesForMeter(position, threshold, vertices, vertices_count,
                                                      speed_ratio, meter_width, meter_height, offset);
 
 
@@ -1190,7 +1190,7 @@ void RaceGUI::drawMeterTexture(video::ITexture *meter_texture, video::S3DVertex 
  *  If the measure is between the first and second thresholds, the function will create a quad ABCw,
  *  with w varying in the same way than v.
  *  If the measure exceds the higher threshold, the function will return the poly ABCDE.
- *  
+ *
  *  \param position The relative positions of the vertices.
  *  \param threshold The thresholds at which the variable point switch from a segment to the next.
  *                   The size of this array should be smaller by two than the position array.
@@ -1282,7 +1282,7 @@ void RaceGUI::drawLap(const AbstractKart* kart,
     // displayed under the time.
     if (viewport.UpperLeftCorner.Y == 0 &&
         viewport.LowerRightCorner.X == (int)(irr_driver->getActualScreenSize().Width) &&
-        !RaceManager::get()->getIfEmptyScreenSpaceExists()) 
+        !RaceManager::get()->getIfEmptyScreenSpaceExists())
     {
         pos.UpperLeftCorner.Y = irr_driver->getActualScreenSize().Height*12/100;
     }

@@ -91,7 +91,7 @@ AbstractKart* WorldWithRank::getKartAtPosition(unsigned int p) const
 //-----------------------------------------------------------------------------
 std::pair<int, video::SColor> WorldWithRank::getSpeedometerDigit(const AbstractKart *kart) const
 {
-    return std::make_pair(kart->getPosition(), video::SColor(255, 255, 255, 255)); 
+    return std::make_pair(kart->getPosition(), video::SColor(255, 255, 255, 255));
 }    // getSpeedometerDigit
 
 //-----------------------------------------------------------------------------
@@ -169,7 +169,7 @@ void WorldWithRank::endSetKartPositions()
 /** Determines the rescue position for a kart. The rescue position is the
  *  start position which is has the biggest accumulated distance to all other
  *  karts, and which has no other kart very close. The latter avoids dropping
- *  a kart on top of another kart. This is the method used 
+ *  a kart on top of another kart. This is the method used
  *  \param kart The kart that is going to be rescued.
  *  \returns The index of the start position to which the rescued kart
  *           should be moved to.

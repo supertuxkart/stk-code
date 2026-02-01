@@ -444,7 +444,7 @@ void MaxSpeed::update(int ticks)
     // so the following code doesn't really do anything?
     // There is probably a reason for the behavior of setMinSpeed, but the code
     // should be redesigned to make it less confusing...
-    else 
+    else
         m_kart->getVehicle()->setMinSpeed(0);   // no additional acceleration
 
     if (m_kart->isOnGround())
@@ -469,7 +469,7 @@ void MaxSpeed::saveState(BareNetworkString *buffer) const
         // Don't bother saving terrain, this will get updated automatically
         // each frame.
         if(i==MS_DECREASE_TERRAIN) continue;
-        if (m_speed_decrease[i].isActive()) 
+        if (m_speed_decrease[i].isActive())
             active_slowdown |= b;
     }
     buffer->addUInt8(active_slowdown);

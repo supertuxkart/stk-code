@@ -128,7 +128,7 @@ public:
     // ------------------------------------------------------------------------
     SPShader* getShader(unsigned mesh_buffer_id) const;
     // ------------------------------------------------------------------------
-    const core::matrix4* getSkinningMatrices() const 
+    const core::matrix4* getSkinningMatrices() const
                                          { return m_skinning_matrices.data(); }
     // ------------------------------------------------------------------------
     GE::GERenderInfo* getRenderInfo(unsigned mb_id) const

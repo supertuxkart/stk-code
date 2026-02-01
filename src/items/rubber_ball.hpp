@@ -205,7 +205,7 @@ private:
     void         moveTowardsTarget(Vec3 *next_xyz, int ticks);
     void         updateWeightedSpeed(int ticks);
     void         initializeControlPoints(const Vec3 &xyz);
-    float        getTunnelHeight(const Vec3 &next_xyz, 
+    float        getTunnelHeight(const Vec3 &next_xyz,
                                      const float vertical_offset) const;
     bool         checkTunneling();
     void removePingSFX();

@@ -134,7 +134,7 @@ public:
     /** Returns the type of this attachment. */
     AttachmentType getType() const { return m_type; }
     // ------------------------------------------------------------------------
-    /** Returns how much time (in ticks) is left before this attachment is 
+    /** Returns how much time (in ticks) is left before this attachment is
      *  removed. */
     int16_t getTicksLeft() const                       { return m_ticks_left; }
     // ------------------------------------------------------------------------

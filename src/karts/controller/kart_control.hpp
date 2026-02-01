@@ -80,7 +80,7 @@ public:
         m_look_back = false;
     }   // reset
     // ------------------------------------------------------------------------
-    /** Tests if two KartControls are equal. 
+    /** Tests if two KartControls are equal.
       */
     bool operator==(const KartControl &other)
     {

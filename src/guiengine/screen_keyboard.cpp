@@ -102,13 +102,13 @@ ScreenKeyboard* ScreenKeyboard::m_screen_keyboard = NULL;
 
 // ----------------------------------------------------------------------------
 /** The screen keyboard constructor
- *  \param percent_width A relative value in range of 0.0 to 1.0 that 
+ *  \param percent_width A relative value in range of 0.0 to 1.0 that
  *         determines width of the screen that will be used by the keyboard.
- *  \param percent_height A relative value in range of 0.0 to 1.0 that 
+ *  \param percent_height A relative value in range of 0.0 to 1.0 that
  *         determines height of the screen that will be used by the keyboard.
  *  \param edit_box The edit box that is assigned to the keyboard.
  */
-ScreenKeyboard::ScreenKeyboard(float percent_width, float percent_height, 
+ScreenKeyboard::ScreenKeyboard(float percent_width, float percent_height,
                                CGUIEditBox* edit_box)
 {
     if (m_screen_keyboard != NULL)
@@ -253,7 +253,7 @@ void ScreenKeyboard::initButtons()
                 m_buttons.push_back(button);
             }
 
-            float width = (float)total_width * layout_proportions[i][j] 
+            float width = (float)total_width * layout_proportions[i][j]
                                              / total_proportions - margin;
             
             char width_str[100];
@@ -389,7 +389,7 @@ void ScreenKeyboard::onUpdate(float dt)
         m_repeat_time += (unsigned int)(dt * 1000);
     }
     
-    if (!m_back_button->isPressed())  
+    if (!m_back_button->isPressed())
     {
         m_back_button_pressed = false;
         m_repeat_time = 0;

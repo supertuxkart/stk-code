@@ -290,7 +290,7 @@ public:
                                            int *amount );
     // ------------------------------------------------------------------------
     /** Receives notification if an item is collected. Used for easter eggs. */
-    virtual void collectedItem(const AbstractKart *kart, 
+    virtual void collectedItem(const AbstractKart *kart,
                                const ItemState *item    ) {}
     // ------------------------------------------------------------------------
     virtual void endRaceEarly() { return; }
@@ -320,7 +320,7 @@ public:
     // Other functions
     // ===============
     Highscores     *getHighscores() const;
-    Highscores     *getGPHighscores() const; 
+    Highscores     *getGPHighscores() const;
     void            schedulePause(Phase phase);
     void            scheduleUnpause();
     void            scheduleExitRace() { m_schedule_exit_race = true; }
@@ -381,7 +381,7 @@ public:
     virtual bool shouldDrawSpeedometerDigit() const { return false; }
     // ------------------------------------------------------------------------
     /** \return a pair consists of the digit and the color of the digit */
-    virtual std::pair<int, video::SColor> getSpeedometerDigit(const AbstractKart *kart) const 
+    virtual std::pair<int, video::SColor> getSpeedometerDigit(const AbstractKart *kart) const
                 { return std::make_pair(0, video::SColor(255, 255, 255, 255)); }
     // ------------------------------------------------------------------------
     /** \return whether this world can generate/have highscores */

@@ -27,7 +27,7 @@
 
 #include <stdexcept>
 
-ParticleKind::ParticleKind(const std::string &file) 
+ParticleKind::ParticleKind(const std::string &file)
             : m_min_start_color(255,255,255,255),
               m_max_start_color(255,255,255,255), m_name(file)
 {

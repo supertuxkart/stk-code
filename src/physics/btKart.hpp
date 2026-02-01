@@ -261,7 +261,7 @@ public:
                                         { return m_ticks_additional_rotation; }
     // ------------------------------------------------------------------------
     /** Sets the maximum speed for this kart. */
-    void setMaxSpeed(float new_max_speed) 
+    void setMaxSpeed(float new_max_speed)
     {
         // Only change m_max_speed if it has not been set (<0), or
         // the new value is smaller than the current maximum. For example,
@@ -279,11 +279,11 @@ public:
     virtual void resetMinSpeed() { m_min_speed = 0.0f; }
     // ------------------------------------------------------------------------
     /** Sets the minimum speed for this kart, only if the new value is higher.
-     * FIXME The name of this function doesn't match its real behavior, it's confusing 
+     * FIXME The name of this function doesn't match its real behavior, it's confusing
      * Determine why it needs to work that way and make it cleaner */
     void setMinSpeed(float s)
     {
-        if(s > m_min_speed) m_min_speed = s; 
+        if(s > m_min_speed) m_min_speed = s;
     }
     // ------------------------------------------------------------------------
     /** Returns the minimum speed for this kart. */

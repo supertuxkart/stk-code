@@ -323,7 +323,7 @@ void CaptureTheFlag::checkScoring(FlagColor color)
 
     // If a flag is held close enough to the base of the other flag,
     // while the other flag is in base, the flag has been successfully captured.
-    // If the active flag is red (blue), the scoring team is blue (red). 
+    // If the active flag is red (blue), the scoring team is blue (red).
     if (active_flag->getHolder() != -1 && other_flag->isInBase() &&
         (other_flag->getBaseOrigin() - active_flag->getOrigin()).length() <
         g_capture_length)
@@ -333,7 +333,7 @@ void CaptureTheFlag::checkScoring(FlagColor color)
         {
             int active_holder = active_flag->getHolder();
             int new_kart_score = m_scores.at(active_holder) + g_captured_score;
-            int new_red_score  = (red_active) ? m_red_scores      : m_red_scores + 1; 
+            int new_red_score  = (red_active) ? m_red_scores      : m_red_scores + 1;
             int new_blue_score = (red_active) ? m_blue_scores + 1 : m_blue_scores;
             m_scores.at(active_holder) = new_kart_score;
             if (NetworkConfig::get()->isServer())
@@ -349,7 +349,7 @@ void CaptureTheFlag::checkScoring(FlagColor color)
                 STKHost::get()->sendPacketToAllPeers(&p, true);
             }
             ctfScored(active_holder, (red_active) ? false : true /*red_team_scored*/,
-                new_kart_score, new_red_score, new_blue_score); 
+                new_kart_score, new_red_score, new_blue_score);
         }
         m_last_captured_flag_ticks = World::getWorld()->getTicksSinceStart();
         active_flag->resetToBase(RaceManager::get()->getFlagDeactivatedTicks());

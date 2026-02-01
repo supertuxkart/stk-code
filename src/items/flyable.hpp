@@ -237,7 +237,7 @@ public:
 
     // ------------------------------------------------------------------------
     /** Returns the owner's kart */
-    AbstractKart *getOwner() const { return m_owner;}  
+    AbstractKart *getOwner() const { return m_owner;}
     // ------------------------------------------------------------------------
     /** Sets wether Flyable should update TerrainInfo as part of its update
      *  call, or if the inheriting object will update TerrainInfo itself

@@ -76,7 +76,7 @@ public:
         m_network_events.getData().push_back(ri);
         m_network_events.unlock();
     }
-    void mergeNetworkData(int world_ticks,  bool *needs_rewind, 
+    void mergeNetworkData(int world_ticks,  bool *needs_rewind,
                           int *rewind_ticks);
     void replayAllEvents(int ticks);
     bool isEmpty() const;

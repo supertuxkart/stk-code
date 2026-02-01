@@ -1263,7 +1263,7 @@ bool KartSelectionScreen::onEscapePressed()
 
 // ----------------------------------------------------------------------------
 
-void KartSelectionScreen::onFocusChanged(GUIEngine::Widget* previous, 
+void KartSelectionScreen::onFocusChanged(GUIEngine::Widget* previous,
                                          GUIEngine::Widget* focus, int playerID)
 {
     if (playerID == PLAYER_ID_GAME_MASTER || !previous || !focus)
@@ -1416,8 +1416,8 @@ void KartSelectionScreen::allPlayersDone()
     // ---- Switch to assign mode
     input_manager->getDeviceManager()->setAssignMode(ASSIGN);
 
-    StateManager::ActivePlayer *ap = m_multiplayer 
-                                   ? NULL 
+    StateManager::ActivePlayer *ap = m_multiplayer
+                                   ? NULL
                                    : StateManager::get()->getActivePlayer(0);
     input_manager->getDeviceManager()->setSinglePlayer(ap);
 

@@ -287,7 +287,7 @@ void RaceResultGUI::enableAllButtons()
         left->setLabel(_("Back to main menu"));
         left->setImage("gui/icons/back.png");
         left->setVisible(true);
-        return;        
+        return;
     }
 
     // If we're in a network world, change the buttons text
@@ -1899,12 +1899,12 @@ void RaceResultGUI::displayPostRaceInfo()
     
     int size_esti_real = size_esti * m_distance_between_meta_rows;
 
-    int current_y = displayHighscores(x, y, 
+    int current_y = displayHighscores(x, y,
                         size_esti_real > UserConfigParams::m_height * 0.7f);
 
     // Display the number of laps, difficulty, and the best lap time if applicable
     if (!RaceManager::get()->isSoccerMode())
-        current_y = displayLapDifficulty(x, current_y, 
+        current_y = displayLapDifficulty(x, current_y,
                         size_esti_real > UserConfigParams::m_height * 0.8f);
 
     // Display challenge result and goals
@@ -2276,11 +2276,11 @@ int RaceResultGUI::displayChallengeInfo(int x, int y, bool increase_density)
         text_string = _("Reached Requirements of SuperTux");
         the_font->initGlyphLayouts(text_string,
                                    best_while_slower_layout);
-        irr::gui::breakGlyphLayouts(best_while_slower_layout, 
+        irr::gui::breakGlyphLayouts(best_while_slower_layout,
                                     UserConfigParams::m_width * 0.93f - x,
                                     the_font->getInverseShaping(),
                                     the_font->getScale());
-        irr::core::dimension2du dim = 
+        irr::core::dimension2du dim =
             irr::gui::getGlyphLayoutsDimension(best_while_slower_layout,
                                                line_height,
                                                the_font->getInverseShaping(),
@@ -2376,7 +2376,7 @@ void RaceResultGUI::displayBenchmarkSummary()
     {
         pos = core::rect<s32>(current_x, current_y, current_x, current_y);
         font->draw(info_text[i].c_str(), pos, white_color, true, false);
-        current_y += (5 * rect.Height) / 4;       
+        current_y += (5 * rect.Height) / 4;
     }
 
     // Draw info on the graphical settings
@@ -2423,7 +2423,7 @@ void RaceResultGUI::displayBenchmarkSummary()
                                               _("Depth of field: Disabled");
     value = vk        ? StringUtils::toWString("Vulkan")    :
             modern_gl ? _("OpenGL (modern)")                :
-            gl        ? _("OpenGL (legacy)")                : 
+            gl        ? _("OpenGL (legacy)")                :
             directx   ? StringUtils::toWString("DirectX 9") : _("Unknown");
     info_text[10] = value;
 

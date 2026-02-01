@@ -173,7 +173,7 @@ void ModelViewWidget::update(float delta)
         if (fabsf(m_angle - m_rotation_target) < 2.0f) m_rotation_mode = ROTATE_OFF;
     }
    
-#ifdef SERVER_ONLY 
+#ifdef SERVER_ONLY
     return;
 #else
     if (m_render_target == NULL)
@@ -186,7 +186,7 @@ void ModelViewWidget::update(float delta)
     if (m_rtt_main_node == NULL)
     {
         setupRTTScene();
-    }    
+    }
 
     m_rtt_main_node->setRotation(core::vector3df(0.0f, m_angle, 0.0f));
 

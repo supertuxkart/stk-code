@@ -102,7 +102,7 @@ namespace Scripting
         //    float normalized_dy = dy / d;
         //    float g = 9.81f;
         //    float velocity = sqrtf(d * g);
-        //    
+        //
         //    kart->setVelocity(btVector3(velocity * normalized_dx, velocity, velocity * normalized_dy));
         //}
         
@@ -160,36 +160,36 @@ namespace Scripting
             asDWORD call_conv = mp ? asCALL_GENERIC : asCALL_CDECL;
             int r; // of type asERetCodes
             
-            r = engine->RegisterGlobalFunction("void squash(int id, float time)", 
-                                               mp ? WRAP_FN(squash) : asFUNCTION(squash), 
+            r = engine->RegisterGlobalFunction("void squash(int id, float time)",
+                                               mp ? WRAP_FN(squash) : asFUNCTION(squash),
                                                call_conv); assert(r >= 0);
                                                
-            r = engine->RegisterGlobalFunction("void teleport(int id, const Vec3 &in)", 
-                                               mp ? WRAP_FN(teleport) : asFUNCTION(teleport), 
+            r = engine->RegisterGlobalFunction("void teleport(int id, const Vec3 &in)",
+                                               mp ? WRAP_FN(teleport) : asFUNCTION(teleport),
                                                call_conv); assert(r >= 0);
                                                
-            r = engine->RegisterGlobalFunction("void teleportExact(int id, const Vec3 &in)", 
-                                               mp ? WRAP_FN(teleportExact) : asFUNCTION(teleportExact), 
+            r = engine->RegisterGlobalFunction("void teleportExact(int id, const Vec3 &in)",
+                                               mp ? WRAP_FN(teleportExact) : asFUNCTION(teleportExact),
                                                call_conv); assert(r >= 0);
                                                
-            r = engine->RegisterGlobalFunction("void setVelocity(int id, const Vec3 &in)", 
-                                               mp ? WRAP_FN(setVelocity) : asFUNCTION(setVelocity), 
+            r = engine->RegisterGlobalFunction("void setVelocity(int id, const Vec3 &in)",
+                                               mp ? WRAP_FN(setVelocity) : asFUNCTION(setVelocity),
                                                call_conv); assert(r >= 0);
                                                
-            //r = engine->RegisterGlobalFunction("void jumpTo(int id, float x, float y)", 
-            //                                   mp ? WRAP_FN(jumpTo) : asFUNCTION(jumpTo), 
+            //r = engine->RegisterGlobalFunction("void jumpTo(int id, float x, float y)",
+            //                                   mp ? WRAP_FN(jumpTo) : asFUNCTION(jumpTo),
             //                                   call_conv); assert(r >= 0);
             
-            r = engine->RegisterGlobalFunction("Vec3 getLocation(int id)", 
-                                               mp ? WRAP_FN(getLocation) : asFUNCTION(getLocation), 
+            r = engine->RegisterGlobalFunction("Vec3 getLocation(int id)",
+                                               mp ? WRAP_FN(getLocation) : asFUNCTION(getLocation),
                                                call_conv); assert(r >= 0);
                                                
-            r = engine->RegisterGlobalFunction("Vec3 getVelocity(int id)", 
-                                               mp ? WRAP_FN(getVelocity) : asFUNCTION(getVelocity), 
+            r = engine->RegisterGlobalFunction("Vec3 getVelocity(int id)",
+                                               mp ? WRAP_FN(getVelocity) : asFUNCTION(getVelocity),
                                                call_conv); assert(r >= 0);
                                                
-            r = engine->RegisterGlobalFunction("float getMaxSpeed(int id)", 
-                                               mp ? WRAP_FN(getMaxSpeed) : asFUNCTION(getMaxSpeed), 
+            r = engine->RegisterGlobalFunction("float getMaxSpeed(int id)",
+                                               mp ? WRAP_FN(getMaxSpeed) : asFUNCTION(getMaxSpeed),
                                                call_conv); assert(r >= 0);
 
             r = engine->RegisterGlobalFunction("void changeKart(int id, string &in)",

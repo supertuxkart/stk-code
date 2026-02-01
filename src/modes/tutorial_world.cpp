@@ -29,7 +29,7 @@ TutorialWorld::TutorialWorld()
 
 unsigned int TutorialWorld::getRescuePositionIndex(AbstractKart *kart)
 {
-    const int start_spots_amount = 
+    const int start_spots_amount =
                          Track::getCurrentTrack()->getNumberOfStartPositions();
     assert(start_spots_amount > 0);
 

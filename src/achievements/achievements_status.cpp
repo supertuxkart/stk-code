@@ -209,7 +209,7 @@ void AchievementsStatus::load(const XMLNode * input)
                     "than there should be. Discarding.");
                 continue;
             }
-            xml_achievement_data[i]->get("counter",&m_variables[i].counter); 
+            xml_achievement_data[i]->get("counter",&m_variables[i].counter);
         }
         // Load track usage data
         std::vector<XMLNode*> xml_achievement_tracks;

@@ -329,7 +329,7 @@ void PowerupManager::WeightsData::convertRankToSection(int rank, int *prev,
         return;
     }
 
-    // In FTL mode the first section is for the leader, the 
+    // In FTL mode the first section is for the leader, the
     // second section is used for the first non-leader kart.
     if (RaceManager::get()->isFollowMode() && rank == 2)
     {
@@ -616,7 +616,7 @@ PowerupManager::PowerupType PowerupManager::getRandomPowerup(unsigned int pos,
         *n=1;
 
     // Prevents early explosive items
-    if (World::getWorld() && 
+    if (World::getWorld() &&
         stk_config->ticks2Time(World::getWorld()->getTicksSinceStart()) <
                                       stk_config->m_no_explosive_items_timeout)
     {

@@ -149,7 +149,7 @@ void SpareTireAI::crashed(const AbstractKart *k)
         if (r)
             r->addMessage(_("You can have at most 3 lives!"), k, 2.0f);
     }
-    // Otherwise add one life for that kart 
+    // Otherwise add one life for that kart
     else
     {
         m_tsb_world->addKartLife(k->getWorldKartId());

@@ -63,7 +63,7 @@ public:
 
     void renderGaussian6Blur(const FrameBuffer &in_fbo, const FrameBuffer &auxiliary,
                               float sigmaV, float sigmaH) const;
-	void renderHorizontalBlur(const FrameBuffer &in_fbo, const FrameBuffer &auxiliary) const;
+    void renderHorizontalBlur(const FrameBuffer &in_fbo, const FrameBuffer &auxiliary) const;
 
     void renderGaussian9TapBlur(const FrameBuffer &in_fbo,
                                  const FrameBuffer &auxiliary,

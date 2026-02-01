@@ -97,7 +97,7 @@ void RewindManager::reset()
     m_missing_rewinders.clear();
 }   // reset
 
-// ----------------------------------------------------------------------------    
+// ----------------------------------------------------------------------------
 /** Adds an event to the rewind data. The data to be stored must be allocated
  *  and not freed by the caller!
  *  \param time Time at which the event was recorded. If time is not specified
@@ -256,7 +256,7 @@ void RewindManager::playEventsTill(int world_ticks, bool fast_forward)
     assert(!m_is_rewinding);
     if (m_rewind_queue.isEmpty()) return;
 
-    // This is necessary to avoid that rewinding an event will store the 
+    // This is necessary to avoid that rewinding an event will store the
     // event again as a seemingly new event.
     m_is_rewinding = true;
 
@@ -285,7 +285,7 @@ bool RewindManager::addRewinder(std::shared_ptr<Rewinder> rewinder)
  *  World::getTime() is reached again: it will replay everything before
  *  World::getTime(), but not the events at World::getTime() (or later)/
  *  \param rewind_ticks Time to rewind to.
- *  \param now_ticks Up to which ticks events are replayed: up to but 
+ *  \param now_ticks Up to which ticks events are replayed: up to but
  *         EXCLUDING new_ticks (the event at now_ticks are played in
  *         the calling subroutine playEventsTill).
  *  \param fast_forward If true, then only rewinders in network will be
@@ -321,7 +321,7 @@ void RewindManager::rewindTo(int rewind_ticks, int now_ticks,
 
     // Now start the rewind with the full state. It is important that the
     // world time is set first, since e.g. the NetworkItem manager relies
-    // on having the access to the 'confirmed' state time using 
+    // on having the access to the 'confirmed' state time using
     // the world timer.
     world->setTicksForRewind(exact_rewind_ticks);
 
@@ -354,7 +354,7 @@ void RewindManager::rewindTo(int rewind_ticks, int now_ticks,
     }
 
     // A loop in case that we should split states into several smaller ones:
-    while (current && current->getTicks() == exact_rewind_ticks && 
+    while (current && current->getTicks() == exact_rewind_ticks &&
            current->isState()                                        )
     {
         current->restore();
@@ -381,7 +381,7 @@ void RewindManager::rewindTo(int rewind_ticks, int now_ticks,
 
     // Now go forward through the list of rewind infos till we reach 'now':
     while (world->getTicksSinceStart() < now_ticks)
-    { 
+    {
         m_rewind_queue.replayAllEvents(world->getTicksSinceStart());
 
         // Now simulate the next time step

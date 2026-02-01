@@ -23,43 +23,49 @@
 
 namespace OptionsCommon
 {
-	void switchTab(std::string selected_tab)
-	{
-		GUIEngine::Screen *screen = NULL;
-    	if (selected_tab == "tab_audio")
-        	screen = OptionsScreenAudio::getInstance();
-    	else if (selected_tab == "tab_display")
-        	screen = OptionsScreenDisplay::getInstance();
-    	else if (selected_tab == "tab_video")
-        	screen = OptionsScreenVideo::getInstance();
-    	else if (selected_tab == "tab_players")
-        	screen = TabbedUserScreen::getInstance();
-    	else if (selected_tab == "tab_controls")
-        	screen = OptionsScreenInput::getInstance();
-    	else if (selected_tab == "tab_ui")
-        	screen = OptionsScreenUI::getInstance();
-    	else if (selected_tab == "tab_general")
-        	screen = OptionsScreenGeneral::getInstance();
-    	else if (selected_tab == "tab_language")
-        	screen = OptionsScreenLanguage::getInstance();
-    	if(screen)
-        	StateManager::get()->replaceTopMostScreen(screen);
-	}
+    void switchTab(std::string selected_tab)
+    {
+        GUIEngine::Screen *screen = NULL;
+        if (selected_tab == "tab_audio")
+            screen = OptionsScreenAudio::getInstance();
+        else if (selected_tab == "tab_display")
+            screen = OptionsScreenDisplay::getInstance();
+        else if (selected_tab == "tab_video")
+            screen = OptionsScreenVideo::getInstance();
+        else if (selected_tab == "tab_players")
+            screen = TabbedUserScreen::getInstance();
+        else if (selected_tab == "tab_controls")
+            screen = OptionsScreenInput::getInstance();
+        else if (selected_tab == "tab_ui")
+            screen = OptionsScreenUI::getInstance();
+        else if (selected_tab == "tab_general")
+            screen = OptionsScreenGeneral::getInstance();
+        else if (selected_tab == "tab_language")
+            screen = OptionsScreenLanguage::getInstance();
+        if(screen)
+            StateManager::get()->replaceTopMostScreen(screen);
+    }
 
-	// In the in-game pause options, disable the players and language tabs
-	void setTabStatus()
-	{
-		if (StateManager::get()->getGameState() == GUIEngine::INGAME_MENU)
-		{
-	    	GUIEngine::getWidget("tab_players")->setActive(false);
-	    	GUIEngine::getWidget("tab_language")->setActive(false);			
-		}
-		else
-		{
-			GUIEngine::getWidget("tab_players")->setActive(true);
-	    	GUIEngine::getWidget("tab_language")->setActive(true);
-	    }
-	} // setTabStatus
+    void updatePauseTooltip(GUIEngine::Widget* widget, bool is_pause)
+    {
+        if (is_pause)
+            // TODO : display a different message in non-racing modes ??
+            widget->setTooltip(_("This option cannot be changed during a race."));
+        else
+            widget->unsetTooltip();
+    } // updatePauseTooltip
+
+    void setTabStatus()
+    {
+        GUIEngine::Widget* players  = GUIEngine::getWidget("tab_players");
+        GUIEngine::Widget* language = GUIEngine::getWidget("tab_language");
+        bool is_pause = StateManager::get()->getGameState() == GUIEngine::INGAME_MENU;
+
+        players->setActive(!is_pause);
+        language->setActive(!is_pause);
+        updatePauseTooltip(players, is_pause);
+        updatePauseTooltip(language, is_pause);
+    } // setTabStatus
 }
 
 #endif // ifndef SERVER_ONLY

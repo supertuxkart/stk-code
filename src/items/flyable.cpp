@@ -345,12 +345,12 @@ void Flyable::getLinearKartItemIntersection (const Vec3 &origin,
 
     // Now rotate it to the firing kart's frame of reference
     btQuaternion inv_rotate = inv_trans.getRotation();
-    target_direction = 
+    target_direction =
         target_direction.rotate(inv_rotate.getAxis(), inv_rotate.getAngle());
     
-    // Now we try to find the angle to aim at to hit the target. 
-    // Warning : Funky math stuff going on below. To understand, see answer by 
-    // Jeffrey Hantin here : 
+    // Now we try to find the angle to aim at to hit the target.
+    // Warning : Funky math stuff going on below. To understand, see answer by
+    // Jeffrey Hantin here :
     // http://stackoverflow.com/questions/2248876/2d-game-fire-at-a-moving-target-by-predicting-intersection-of-projectile-and-u
     
     float target_x_speed = target_direction.getX()*target_kart->getSpeed();

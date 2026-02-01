@@ -1599,7 +1599,7 @@ bool FileManager::copyFile(const std::string &source, const std::string &dest)
         if (f_dest) fclose(f_dest);
         if (buffer) delete [] buffer;
     };
-    MemUtils::deref<decltype(scoped)> cls(scoped); 
+    MemUtils::deref<decltype(scoped)> cls(scoped);
     if(!f_source || !f_dest || !buffer) return false;
     size_t n;
     while((n=fread(buffer, 1, BUFFER_SIZE, f_source))>0)

@@ -93,7 +93,7 @@ double getTimeMilliseconds();
 using namespace irr;
 
 // ============================================================================
-/** \brief class that allows run-time graphical profiling through the use 
+/** \brief class that allows run-time graphical profiling through the use
  *  of markers.
  * \ingroup utils
  */
@@ -126,7 +126,7 @@ private:
         }
         // --------------------------------------------------------------------
         Marker(const Marker& ref)
-            : m_start(ref.m_start), m_duration(ref.m_duration), 
+            : m_start(ref.m_start), m_duration(ref.m_duration),
               m_layer(ref.m_layer)
         {
         }

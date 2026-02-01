@@ -200,7 +200,7 @@ void GhostKart::update(int ticks)
 
     // Update item amount and type
     PowerupManager::PowerupType item_type =
-        ReplayRecorder::codeToEnumItem(m_all_bonus_info[idx].m_item_type); 
+        ReplayRecorder::codeToEnumItem(m_all_bonus_info[idx].m_item_type);
     m_powerup->set(item_type, m_all_bonus_info[idx].m_item_amount);
 
     // Update special values in easter egg and battle modes

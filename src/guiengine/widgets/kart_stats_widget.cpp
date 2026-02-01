@@ -70,13 +70,13 @@ KartStatsWidget::KartStatsWidget(core::recti area, const int player_id,
 
         SkillLevelWidget* skill_bar = NULL;
 
-        skill_bar = new SkillLevelWidget(skillArea, m_player_id, multiplayer, display_icons);       
+        skill_bar = new SkillLevelWidget(skillArea, m_player_id, multiplayer, display_icons);
 
         m_skills.push_back(skill_bar);
         m_children.push_back(skill_bar);
     }
 
-	setValues(props, HANDICAP_NONE);
+    setValues(props, HANDICAP_NONE);
 
     move(area.UpperLeftCorner.X, area.UpperLeftCorner.Y,
          area.getWidth(), area.getHeight());
@@ -88,7 +88,7 @@ void KartStatsWidget::setValues(const KartProperties* props, HandicapLevel h)
     // If props is NULL (e.g., when kart selection is "?" (random)),
     // skip this function to avoid errors.
     if( props == NULL ) return;
-	
+    
     // Use kart properties computed for best difficulty to show the user, so
     // that properties don't change according to the the last used difficulty
     RaceManager::Difficulty previous_difficulty = RaceManager::get()->getDifficulty();
@@ -135,7 +135,7 @@ void KartStatsWidget::setSkillValues(Stats skill_type, float value, const std::s
 {
     m_skills[skill_type]->setValue(value);
     m_skills[skill_type]->setIcon(irr::core::stringc(
-            file_manager->getAsset(FileManager::GUI_ICON, icon_name).c_str()));    
+            file_manager->getAsset(FileManager::GUI_ICON, icon_name).c_str()));
     m_skills[skill_type]->m_properties[PROP_ID] = StringUtils::insertValues("@p%i_"+skillbar_propID, m_player_id);
     m_skills[skill_type]->m_iconbutton->setTooltip(icon_tooltip);
 }   // setSkillValues
@@ -199,7 +199,7 @@ void KartStatsWidget::setSize(const int x, const int y, const int w, const int h
     m_h = h;
 
     // -- sizes
-    m_skill_bar_w = w - m_w / 16; // make sure the bars can't be out of screen 
+    m_skill_bar_w = w - m_w / 16; // make sure the bars can't be out of screen
     m_skill_bar_h = m_h / SKILL_COUNT / 4;
 
     m_skill_bar_x = x;

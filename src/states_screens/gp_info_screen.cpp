@@ -461,7 +461,7 @@ void GPInfoScreen::onUpdate(float dt)
     screenshot->m_properties[PROP_ICON] = file;
 }   // onUpdate
 
-/** Get number of available tracks for random GPs 
+/** Get number of available tracks for random GPs
  */
 int GPInfoScreen::getMaxNumTracks(std::string group)
 {
@@ -492,7 +492,7 @@ int GPInfoScreen::getMaxNumTracks(std::string group)
                 track_manager->getTrack(tracks[i])->isRaceTrack())
             {
                 max_num_tracks++;
-            }               
+            }
         }
     }
     

@@ -208,7 +208,7 @@ void LabelWidget::resize()
     {
         if( ((int)GUIEngine::getFont()->getDimension(m_text.c_str()).Width      >
                             this->m_w) &&
-            ((int)GUIEngine::getFont()->getDimension(m_text.c_str()).Height * 2 > 
+            ((int)GUIEngine::getFont()->getDimension(m_text.c_str()).Height * 2 >
                             this->m_h || !m_word_wrap) )
         {
             ((IGUIStaticText*)m_element)->setOverrideFont(GUIEngine::getSmallFont());
