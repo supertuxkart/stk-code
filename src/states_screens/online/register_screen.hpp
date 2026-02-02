@@ -38,7 +38,7 @@ private:
     friend class GUIEngine::ScreenSingleton<RegisterScreen>;
 
     void makeEntryFieldsVisible();
-    void handleLocalName(const irr::core::stringw &local_name);
+    bool handleLocalName(const irr::core::stringw &local_name);
     void doRegister();
     void init() OVERRIDE;
     RegisterScreen();
