@@ -72,9 +72,9 @@ private:
 
     // TV camera state
     int   m_tv_current_index = -1;
-    // Optional activation radius per TV camera (squared). 0 means disabled.
-    static std::vector<float> m_tv_radius;
-    static float m_tv_default_radius; // squared default radius if provided at root level
+    // Activation sphere radius per TV camera, stored squared; 0 disables activation radius.
+    static std::vector<float> m_tv_radius;       // per-camera squared radius
+    static float m_tv_default_radius;            // default squared radius from root
 
     // Give a few classes access to the constructor (mostly for inheritance)
     friend class Camera;

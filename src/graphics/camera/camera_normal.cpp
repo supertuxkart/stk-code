@@ -547,7 +547,7 @@ void CameraNormal::readTVCameras(const XMLNode &root)
     m_tv_radius.clear();
     // Optional configuration on root node
     float radius = -1.0f;
-    root.get("radius", &radius);           // units; we'll square it for comparisons
+    root.get("start", &radius);           // units; we'll square it for comparisons
     m_tv_default_radius = (radius > 0.0f) ? (radius * radius) : 0.0f;
 
     for (unsigned int i = 0; i < root.getNumNodes(); i++)
@@ -569,7 +569,7 @@ void CameraNormal::readTVCameras(const XMLNode &root)
         if (is_tv_camera_node)
         {
             float child_radius = -1.0f;
-            n->get("radius", &child_radius);
+            n->get("start", &child_radius);
 
             Vec3 p(0,0,0);
             n->get("xyz", &p);
