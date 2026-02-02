@@ -36,8 +36,8 @@
 #include <vector>
 
 std::vector<Vec3> CameraNormal::m_tv_cameras;
-float CameraNormal::m_tv_min_delta2 = 9.0f;  // distance min to change camera
-float CameraNormal::m_tv_cooldown_default = 0.4f;  // time to change camera
+std::vector<float> CameraNormal::m_tv_radius;
+float CameraNormal::m_tv_default_radius = 0.0f;
 
 // ============================================================================
 /** Constructor for the normal camera. This is the only camera constructor
@@ -61,9 +61,6 @@ CameraNormal::CameraNormal(Camera::CameraType type,  int camera_index,
     //       the extra camera rotation so they could set m_rotation_range to
     //       zero to disable it for themselves).
     m_tv_current_index = -1;
-    m_tv_switch_cooldown = 0.0f;
-    m_tv_min_delta2 = 9.0f;
-    m_tv_cooldown_default = 0.4f;
     m_position_speed = 8.0f;
     m_target_speed   = 10.0f;
     m_rotation_range = 0.4f;
@@ -388,7 +385,6 @@ void CameraNormal::positionCamera(float dt, float above_kart, float cam_angle,
 
     // Protection: Ensure TV camera variables are in valid state
     if (m_tv_current_index < 0) m_tv_current_index = 0;
-    if (m_tv_switch_cooldown < 0) m_tv_switch_cooldown = 0.0f;
 
     Camera::Mode mode = getMode();
     if (UserConfigParams::m_reverse_look_use_soccer_cam && getMode() == CM_REVERSE) mode=CM_SPECTATOR_SOCCER;
@@ -424,20 +420,45 @@ void CameraNormal::positionCamera(float dt, float above_kart, float cam_angle,
             if (soccer_world && !m_tv_cameras.empty())
             {
                 Vec3 ball_pos = soccer_world->getBallPosition();
-                // decrement cooldown
-                if (m_tv_switch_cooldown > 0.0f)
-                    m_tv_switch_cooldown = std::max(0.0f, m_tv_switch_cooldown - dt);
 
-                // choose the TV camera closest to the ball
+                // choose the TV camera considering optional activation radius first
                 unsigned best = 0;
                 float best_d2 = (m_tv_cameras[0] - ball_pos).length2();
-                for (unsigned i = 1; i < m_tv_cameras.size(); i++)
+                bool any_in_radius = false;
+                // Ensure radius array matches cameras size
+                if (m_tv_radius.size() != m_tv_cameras.size())
+                    m_tv_radius.assign(m_tv_cameras.size(), m_tv_default_radius);
+
+                for (unsigned i = 0; i < m_tv_cameras.size(); i++)
                 {
                     float d2 = (m_tv_cameras[i] - ball_pos).length2();
-                    if (d2 < best_d2)
+                    float r2 = 0.0f;
+                    if (i < m_tv_radius.size()) r2 = m_tv_radius[i];
+                    bool in_radius = (r2 > 0.0f && d2 <= r2);
+
+                    if (!any_in_radius)
                     {
-                        best = i;
-                        best_d2 = d2;
+                        // No candidate within radius yet: accept first, or switch if this one is closer
+                        if (in_radius)
+                        {
+                            any_in_radius = true;
+                            best = i;
+                            best_d2 = d2;
+                        }
+                        else if (i == 0 || d2 < best_d2)
+                        {
+                            best = i;
+                            best_d2 = d2;
+                        }
+                    }
+                    else
+                    {
+                        // Already have a candidate within radius: only compare among in-radius ones
+                        if (in_radius && d2 < best_d2)
+                        {
+                            best = i;
+                            best_d2 = d2;
+                        }
                     }
                 }
 
@@ -445,17 +466,13 @@ void CameraNormal::positionCamera(float dt, float above_kart, float cam_angle,
                 if (m_tv_current_index < 0 || (unsigned)m_tv_current_index >= m_tv_cameras.size())
                 {
                     m_tv_current_index = (int)best;
-                    m_tv_switch_cooldown = m_tv_cooldown_default;
                 }
                 else
                 {
-                    float current_d2 = (m_tv_cameras[(unsigned)m_tv_current_index] - ball_pos).length2();
-                    // Switch only if cooldown elapsed and best is sufficiently better than current
-                    if (m_tv_switch_cooldown <= 0.0f && best != (unsigned)m_tv_current_index
-                        && best_d2 + m_tv_min_delta2 < current_d2)
+                    // Switch immediately to best candidate (prefer in-radius); no threshold/cooldown
+                    if (best != (unsigned)m_tv_current_index)
                     {
                         m_tv_current_index = (int)best;
-                        m_tv_switch_cooldown = m_tv_cooldown_default;
                     }
                 }
 
@@ -527,15 +544,11 @@ void CameraNormal::positionCamera(float dt, float above_kart, float cam_angle,
 void CameraNormal::readTVCameras(const XMLNode &root)
 {
     m_tv_cameras.clear();
+    m_tv_radius.clear();
     // Optional configuration on root node
-    float min_delta = -1.0f;
-    float cooldown = -1.0f;
-    root.get("min-delta", &min_delta);     // units; we'll square it for comparisons
-    root.get("cooldown", &cooldown);       // seconds
-    if (min_delta > 0.0f)
-        m_tv_min_delta2 = min_delta * min_delta;
-    if (cooldown > 0.0f)
-        m_tv_cooldown_default = cooldown;
+    float radius = -1.0f;
+    root.get("radius", &radius);           // units; we'll square it for comparisons
+    m_tv_default_radius = (radius > 0.0f) ? (radius * radius) : 0.0f;
 
     for (unsigned int i = 0; i < root.getNumNodes(); i++)
     {
@@ -555,25 +568,25 @@ void CameraNormal::readTVCameras(const XMLNode &root)
         }
         if (is_tv_camera_node)
         {
-            float child_min_delta = -1.0f;
-            float child_cooldown = -1.0f;
-            n->get("min-delta", &child_min_delta);
-            n->get("cooldown", &child_cooldown);
-            if (child_min_delta > 0.0f)
-                m_tv_min_delta2 = child_min_delta * child_min_delta;
-            if (child_cooldown > 0.0f)
-                m_tv_cooldown_default = child_cooldown;
+            float child_radius = -1.0f;
+            n->get("radius", &child_radius);
 
             Vec3 p(0,0,0);
             n->get("xyz", &p);
             m_tv_cameras.push_back(p);
+            if (child_radius > 0.0f)
+                m_tv_radius.push_back(child_radius * child_radius);
+            else
+                m_tv_radius.push_back(m_tv_default_radius);
         }
     }
 } // readTVCameras
 
 void CameraNormal::clearTVCameras()
 {
-    m_tv_cameras.clear();  // Nettoie les caméras statiques
+    m_tv_cameras.clear();
+    m_tv_radius.clear();
+    m_tv_default_radius = 0.0f;
     
     // Remet à zéro l'état de TOUTES les caméras existantes
     for(unsigned int i = 0; i < Camera::getNumCameras(); i++)
@@ -583,7 +596,6 @@ void CameraNormal::clearTVCameras()
         {
             CameraNormal* normal_cam = static_cast<CameraNormal*>(camera);
             normal_cam->m_tv_current_index = -1;
-            normal_cam->m_tv_switch_cooldown = 0.0f;
         }
     }
 } // clearTVCameras
