@@ -308,6 +308,11 @@ void OptionsScreenDevice::updateInputButtons()
         const irr::core::stringw item = m_config->getMappingIdString(action);
         if (currently_used_keys.find(item) == currently_used_keys.end())
         {
+            if (item == "none") 
+            {
+                actions->markItemBlue( KartActionStrings[action] );
+                continue; 
+            }
             currently_used_keys.insert( item );
             if (m_config->isKeyboard()
                 && conflictsBetweenKbdConfig(action, PA_FIRST_GAME_ACTION,
