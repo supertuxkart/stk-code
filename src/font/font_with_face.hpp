@@ -94,6 +94,10 @@ protected:
     /** Used in top side bearing calculation. */
     int m_glyph_max_height;
 
+    int m_glyph_max_above;
+
+    int m_glyph_max_below;
+
     // ------------------------------------------------------------------------
     /** Check characters to see if they are loaded in font, if not load them.
      *  For font that doesn't need lazy loading, nothing will be done.

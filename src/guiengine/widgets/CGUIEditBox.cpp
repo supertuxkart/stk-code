@@ -1082,7 +1082,7 @@ core::dimension2du CGUIEditBox::getTextDimension()
         return core::dimension2du(0, 0);
 
     return gui::getGlyphLayoutsDimension(m_glyph_layouts,
-        font->getHeightPerLine(), font->getInverseShaping(), font->getScale());
+        font->getHeightPerLine(), font->getHeightPerGlyph(), font->getInverseShaping(), font->getScale());
 }
 
 
@@ -1222,7 +1222,7 @@ void CGUIEditBox::setTextRect(s32 line)
 
     // get text dimension
     d = gui::getGlyphLayoutsDimension(m_glyph_layouts,
-        font->getHeightPerLine(), font->getInverseShaping(), font->getScale());
+        font->getHeightPerLine(), font->getHeightPerGlyph(), font->getInverseShaping(), font->getScale());
     // justification
     switch (HAlign)
     {
@@ -1339,14 +1339,14 @@ void CGUIEditBox::updateCursorDistance()
     if (m_cursor_pos != 0)
     {
         m_cursor_distance = getGlyphLayoutsDimension(m_glyph_layouts,
-            font->getHeightPerLine(), font->getInverseShaping(),
-            font->getScale(), m_cursor_pos - 1).Width;
+            font->getHeightPerLine(), font->getHeightPerGlyph(),
+            font->getInverseShaping(), font->getScale(), m_cursor_pos - 1).Width;
     }
     else if ((m_glyph_layouts[0].flags & GLF_RTL_LINE) != 0)
     {
         // For rtl line the cursor in the begining is total width
         m_cursor_distance = getGlyphLayoutsDimension(m_glyph_layouts,
-            font->getHeightPerLine(), font->getInverseShaping(),
+            font->getHeightPerLine(), font->getHeightPerGlyph(), font->getInverseShaping(),
             font->getScale()).Width;
     }
 }
