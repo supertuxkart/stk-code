@@ -209,6 +209,7 @@ void RaceGUIMultitouch::createRaceGUI()
     const int h = irr_driver->getActualScreenSize().Height;
     const float btn_size = 0.125f * h * scale;
     const float btn2_size = 0.35f * h * scale;
+    const float btn3_size = 0.175f * h * scale;
     const float margin = 0.075f * h * scale;
     const float margin_top = 0.3f * h;
     const float col_size = (btn_size + margin);
@@ -256,11 +257,11 @@ void RaceGUIMultitouch::createRaceGUI()
                     int(steering_accel_x), int(steering_accel_y),
                     int(btn2_size / 2), int(btn2_size));
         m_device->addButton(BUTTON_RIGHT,
-                    int((steering_accel_x) * 4), int(steering_accel_y * 1.4f),
-                    int(btn_size * 1.2f), int(btn_size * 1.2f));
+                    int((steering_accel_x) * 4.0f), int(steering_accel_y * 1.4f),
+                    int(btn3_size), int(btn3_size));
         m_device->addButton(BUTTON_LEFT,
                     int((steering_accel_x) * 2.5f), int(steering_accel_y * 1.4f),
-                    int(btn_size * 1.2f), int(btn_size * 1.2f));
+                    int(btn3_size), int(btn3_size));
     }
     else
     {
