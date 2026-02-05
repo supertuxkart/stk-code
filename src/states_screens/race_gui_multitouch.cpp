@@ -469,8 +469,8 @@ void RaceGUIMultitouch::draw(const AbstractKart* kart,
             case MultitouchButtonType::BUTTON_LEFT:
                 btn_texture = m_move_left_tex;
                 break;
-            //Callback when the player slides your finger between the right/left buttons
-
+            /* TODO: Callback when the player slides your finger between 
+            *  the right/left buttons, avoiding the last touched button be stucked. */
             case MultitouchButtonType::BUTTON_ESCAPE:
                 btn_texture = m_pause_tex;
                 break;
