@@ -306,6 +306,10 @@ GUIEngine::EventPropagation
             }
             else if (m_touch_controls == MULTITOUCH_CONTROLS_GYROSCOPE)
             {
+                m_touch_controls = MULTITOUCH_CONTROLS_BUTTONS;
+            }
+            else if (m_touch_controls == MULTITOUCH_CONTROLS_BUTTONS)
+            {
                 m_touch_controls = MULTITOUCH_CONTROLS_STEERING_WHEEL;
             }
             
@@ -622,6 +626,11 @@ void RacePausedDialog::updateTouchDeviceIcon()
         widget->setLabel(_("Gyroscope"));
         widget->setImage(irr_driver->getTexture(FileManager::GUI_ICON,
                                                 "android/gyroscope_icon.png"));
+        break;
+    case MULTITOUCH_CONTROLS_BUTTONS:
+        widget->setLabel(_("Left/Right Buttons"));
+        widget->setImage(irr_driver->getTexture(FileManager::GUI_ICON,
+                                                "android/accelerator_icon.png"));
         break;
     default:
         break;

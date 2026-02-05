@@ -126,7 +126,8 @@ GUIEngine::EventPropagation MultitouchSettingsDialog::processEvent(
         CheckBoxWidget* gyroscope = getWidget<CheckBoxWidget>("gyroscope");
         assert(gyroscope != NULL);
 
-        UserConfigParams::m_multitouch_controls = MULTITOUCH_CONTROLS_STEERING_WHEEL;
+        CheckBoxWidget* buttons = getWidget<CheckBoxWidget>("buttons");
+        assert(buttons != NULL);
 
         if (accelerometer->getState())
         {
@@ -137,7 +138,10 @@ GUIEngine::EventPropagation MultitouchSettingsDialog::processEvent(
         {
             UserConfigParams::m_multitouch_controls = MULTITOUCH_CONTROLS_GYROSCOPE;
         }
-
+        if (buttons->getState())
+        {
+            UserConfigParams::m_multitouch_controls = MULTITOUCH_CONTROLS_BUTTONS;
+        }
         if (UserConfigParams::m_multitouch_controls == MULTITOUCH_CONTROLS_STEERING_WHEEL)
             UserConfigParams::m_multitouch_auto_acceleration = getWidget<CheckBoxWidget>("auto_acceleration")->getState();
 
@@ -237,6 +241,10 @@ void MultitouchSettingsDialog::updateValues()
     CheckBoxWidget* gyroscope = getWidget<CheckBoxWidget>("gyroscope");
     assert(gyroscope != NULL);
     gyroscope->setState(UserConfigParams::m_multitouch_controls == MULTITOUCH_CONTROLS_GYROSCOPE);
+
+    CheckBoxWidget* buttons = getWidget<CheckBoxWidget>("buttons");
+    assert(buttons != NULL);
+    buttons->setState(UserConfigParams::m_multitouch_controls == MULTITOUCH_CONTROLS_BUTTONS);
 
     if (UserConfigParams::m_multitouch_controls == MULTITOUCH_CONTROLS_STEERING_WHEEL)
         getWidget<CheckBoxWidget>("auto_acceleration")->setState(UserConfigParams::m_multitouch_auto_acceleration);
