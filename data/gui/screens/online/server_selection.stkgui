@@ -16,14 +16,12 @@
         </box>
         <div width="99%" align="center" layout="vertical-row" height="fit">
             <div width="100%" height="fit" layout="horizontal-row" >
-                <checkbox width="fit" id="private_server" text_align="left"/>
-                <spacer width="10"/>
-                <label proportion="1" height="100%" text_align="left"
-                       I18N="In the server selection screen" text="Show private server(s)"/>
+                <spinner id="server_type" width="250" height="100%" wrap_around="true"/>
+                <spacer width="20" height="100%"/>
                 <checkbox width="fit" id="ipv6" text_align="left"/>
                 <spacer width="10"/>
                 <label proportion="1" height="100%" text_align="left" id="ipv6_text"
-                       I18N="In the server selection screen" text="Use IPv6 connection"/>
+                        I18N="In the server selection screen" text="Use IPv6 connection"/>
             </div>
         </div>
     </div>

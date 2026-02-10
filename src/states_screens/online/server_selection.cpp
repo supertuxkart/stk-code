@@ -37,6 +37,7 @@
 #include "tracks/track_manager.hpp"
 #include "utils/translation.hpp"
 #include "utils/string_utils.hpp"
+#include "guiengine/widgets/spinner_widget.hpp"
 
 #include <algorithm>
 #include <cassert>
@@ -105,9 +106,16 @@ void ServerSelection::loadedFromFile()
     m_server_list_widget = getWidget<GUIEngine::ListWidget>("server_list");
     assert(m_server_list_widget != NULL);
     m_server_list_widget->setColumnListener(this);
-    m_private_server = getWidget<GUIEngine::CheckBoxWidget>("private_server");
-    assert(m_private_server != NULL);
-    m_private_server->setState(false);
+
+    m_server_type = getWidget<GUIEngine::SpinnerWidget>("server_type");
+    assert(m_server_type != NULL);
+    m_server_type->m_properties[GUIEngine::PROP_WRAP_AROUND] = "true";
+    m_server_type->clearLabels();
+    m_server_type->addLabel(core::stringw(_("Public servers")));
+    m_server_type->addLabel(core::stringw(_("Private servers")));
+    m_server_type->m_properties[GUIEngine::PROP_MIN_VALUE] = "0";
+    m_server_type->m_properties[GUIEngine::PROP_MAX_VALUE] = "1";
+
     m_ipv6 = getWidget<GUIEngine::CheckBoxWidget>("ipv6");
     assert(m_ipv6 != NULL);
     m_searcher = getWidget<GUIEngine::TextBoxWidget>("searcher");
@@ -375,7 +383,7 @@ void ServerSelection::eventCallback(GUIEngine::Widget* widget,
         updateHeader();
         copyFromServerList();
     }
-    else if (name == "private_server" || name == "ipv6")
+    else if (name == "server_type" || name == "ipv6")
     {
         if (!m_ip_warning_shown && m_ipv6->getState() &&
             NetworkConfig::get()->getIPType() == NetworkConfig::IP_V4)
@@ -523,7 +531,7 @@ void ServerSelection::copyFromServerList()
     m_servers.erase(std::remove_if(m_servers.begin(), m_servers.end(),
         [this](const std::shared_ptr<Server>& a)->bool
         {
-            return a->isPasswordProtected() != m_private_server->getState();
+            return a->isPasswordProtected() != (m_server_type->getValue() == 1);
         }), m_servers.end());
     m_servers.erase(std::remove_if(m_servers.begin(), m_servers.end(),
         [this](const std::shared_ptr<Server>& a)->bool
