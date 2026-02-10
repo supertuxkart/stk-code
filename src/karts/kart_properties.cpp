@@ -926,6 +926,132 @@ float KartProperties::getWheelsDampingCompression() const
 }  // getWheelsDampingCompression
 
 // ----------------------------------------------------------------------------
+float KartProperties::getFrictionKartFriction() const
+{
+    return m_cached_characteristic->getFrictionKartFriction();
+}  // getFrictionKartFriction
+
+// ----------------------------------------------------------------------------
+float KartProperties::getSkidIncrease() const
+{
+    return m_cached_characteristic->getSkidIncrease();
+}  // getSkidIncrease
+
+// ----------------------------------------------------------------------------
+float KartProperties::getSkidDecrease() const
+{
+    return m_cached_characteristic->getSkidDecrease();
+}  // getSkidDecrease
+
+// ----------------------------------------------------------------------------
+float KartProperties::getSkidMax() const
+{
+    return m_cached_characteristic->getSkidMax();
+}  // getSkidMax
+
+// ----------------------------------------------------------------------------
+float KartProperties::getSkidTimeTillMax() const
+{
+    return m_cached_characteristic->getSkidTimeTillMax();
+}  // getSkidTimeTillMax
+
+// ----------------------------------------------------------------------------
+float KartProperties::getSkidVisual() const
+{
+    return m_cached_characteristic->getSkidVisual();
+}  // getSkidVisual
+
+// ----------------------------------------------------------------------------
+float KartProperties::getSkidVisualTime() const
+{
+    return m_cached_characteristic->getSkidVisualTime();
+}  // getSkidVisualTime
+
+// ----------------------------------------------------------------------------
+float KartProperties::getSkidRevertVisualTime() const
+{
+    return m_cached_characteristic->getSkidRevertVisualTime();
+}  // getSkidRevertVisualTime
+
+// ----------------------------------------------------------------------------
+float KartProperties::getSkidMinSpeed() const
+{
+    return m_cached_characteristic->getSkidMinSpeed();
+}  // getSkidMinSpeed
+
+// ----------------------------------------------------------------------------
+std::vector<float> KartProperties::getSkidTimeTillBonus() const
+{
+    return m_cached_characteristic->getSkidTimeTillBonus();
+}  // getSkidTimeTillBonus
+
+// ----------------------------------------------------------------------------
+std::vector<float> KartProperties::getSkidBonusSpeed() const
+{
+    return m_cached_characteristic->getSkidBonusSpeed();
+}  // getSkidBonusSpeed
+
+// ----------------------------------------------------------------------------
+std::vector<float> KartProperties::getSkidBonusTime() const
+{
+    return m_cached_characteristic->getSkidBonusTime();
+}  // getSkidBonusTime
+
+// ----------------------------------------------------------------------------
+std::vector<float> KartProperties::getSkidFadeOutTime() const
+{
+    return m_cached_characteristic->getSkidFadeOutTime();
+}  // getSkidFadeOutTime
+
+// ----------------------------------------------------------------------------
+std::vector<float> KartProperties::getSkidBonusForce() const
+{
+    return m_cached_characteristic->getSkidBonusForce();
+}  // getSkidBonusForce
+
+// ----------------------------------------------------------------------------
+float KartProperties::getSkidPhysicalJumpTime() const
+{
+    return m_cached_characteristic->getSkidPhysicalJumpTime();
+}  // getSkidPhysicalJumpTime
+
+// ----------------------------------------------------------------------------
+float KartProperties::getSkidGraphicalJumpTime() const
+{
+    return m_cached_characteristic->getSkidGraphicalJumpTime();
+}  // getSkidGraphicalJumpTime
+
+// ----------------------------------------------------------------------------
+float KartProperties::getSkidPostSkidRotateFactor() const
+{
+    return m_cached_characteristic->getSkidPostSkidRotateFactor();
+}  // getSkidPostSkidRotateFactor
+
+// ----------------------------------------------------------------------------
+float KartProperties::getSkidSteerFactor() const
+{
+    return m_cached_characteristic->getSkidSteerFactor();
+}  // getSkidSteerFactor
+
+// ----------------------------------------------------------------------------
+float KartProperties::getSkidReduceTurnMin() const
+{
+    return m_cached_characteristic->getSkidReduceTurnMin();
+}  // getSkidReduceTurnMin
+
+// ----------------------------------------------------------------------------
+float KartProperties::getSkidReduceTurnMax() const
+{
+    return m_cached_characteristic->getSkidReduceTurnMax();
+}  // getSkidReduceTurnMax
+
+// ----------------------------------------------------------------------------
+bool KartProperties::getSkidEnabled() const
+{
+    return m_cached_characteristic->getSkidEnabled();
+}  // getSkidEnabled
+
+// ----------------------------------------------------------------------------
 float KartProperties::getJumpAnimationTime() const
 {
     return m_cached_characteristic->getJumpAnimationTime();
@@ -1008,12 +1134,6 @@ float KartProperties::getParachuteMaxSpeed() const
 {
     return m_cached_characteristic->getParachuteMaxSpeed();
 }  // getParachuteMaxSpeed
-
-// ----------------------------------------------------------------------------
-float KartProperties::getFrictionKartFriction() const
-{
-    return m_cached_characteristic->getFrictionKartFriction();
-}  // getFrictionKartFriction
 
 // ----------------------------------------------------------------------------
 float KartProperties::getBubblegumDuration() const
@@ -1136,16 +1256,16 @@ float KartProperties::getPlungerInFaceTime() const
 }  // getPlungerInFaceTime
 
 // ----------------------------------------------------------------------------
-float KartProperties::getNitrohackDuration() const
+float KartProperties::getNitroHackDuration() const
 {
-    return m_cached_characteristic->getNitrohackDuration();
-}  // getNitrohackDuration
+    return m_cached_characteristic->getNitroHackDuration();
+}  // getNitroHackDuration
 
 // ----------------------------------------------------------------------------
-float KartProperties::getNitrohackFactor() const
+float KartProperties::getNitroHackFactor() const
 {
-    return m_cached_characteristic->getNitrohackFactor();
-}  // getNitrohackFactor
+    return m_cached_characteristic->getNitroHackFactor();
+}  // getNitroHackFactor
 
 // ----------------------------------------------------------------------------
 float KartProperties::getElectroDuration() const
@@ -1238,12 +1358,6 @@ float KartProperties::getExplosionInvulnerabilityTime() const
 }  // getExplosionInvulnerabilityTime
 
 // ----------------------------------------------------------------------------
-float KartProperties::getNitroDuration() const
-{
-    return m_cached_characteristic->getNitroDuration();
-}  // getNitroDuration
-
-// ----------------------------------------------------------------------------
 float KartProperties::getNitroEngineForce() const
 {
     return m_cached_characteristic->getNitroEngineForce();
@@ -1292,6 +1406,12 @@ float KartProperties::getNitroMinBurst() const
 }  // getNitroMinBurst
 
 // ----------------------------------------------------------------------------
+float KartProperties::getNitroDuration() const
+{
+    return m_cached_characteristic->getNitroDuration();
+}  // getNitroDuration
+
+// ----------------------------------------------------------------------------
 float KartProperties::getNitroFadeOutTime() const
 {
     return m_cached_characteristic->getNitroFadeOutTime();
@@ -1302,12 +1422,6 @@ float KartProperties::getNitroMax() const
 {
     return m_cached_characteristic->getNitroMax();
 }  // getNitroMax
-
-// ----------------------------------------------------------------------------
-float KartProperties::getSlipstreamDurationFactor() const
-{
-    return m_cached_characteristic->getSlipstreamDurationFactor();
-}  // getSlipstreamDurationFactor
 
 // ----------------------------------------------------------------------------
 float KartProperties::getSlipstreamBaseSpeed() const
@@ -1364,130 +1478,16 @@ float KartProperties::getSlipstreamMaxSpeedIncrease() const
 }  // getSlipstreamMaxSpeedIncrease
 
 // ----------------------------------------------------------------------------
+float KartProperties::getSlipstreamDurationFactor() const
+{
+    return m_cached_characteristic->getSlipstreamDurationFactor();
+}  // getSlipstreamDurationFactor
+
+// ----------------------------------------------------------------------------
 float KartProperties::getSlipstreamFadeOutTime() const
 {
     return m_cached_characteristic->getSlipstreamFadeOutTime();
 }  // getSlipstreamFadeOutTime
-
-// ----------------------------------------------------------------------------
-float KartProperties::getSkidIncrease() const
-{
-    return m_cached_characteristic->getSkidIncrease();
-}  // getSkidIncrease
-
-// ----------------------------------------------------------------------------
-float KartProperties::getSkidDecrease() const
-{
-    return m_cached_characteristic->getSkidDecrease();
-}  // getSkidDecrease
-
-// ----------------------------------------------------------------------------
-float KartProperties::getSkidMax() const
-{
-    return m_cached_characteristic->getSkidMax();
-}  // getSkidMax
-
-// ----------------------------------------------------------------------------
-float KartProperties::getSkidTimeTillMax() const
-{
-    return m_cached_characteristic->getSkidTimeTillMax();
-}  // getSkidTimeTillMax
-
-// ----------------------------------------------------------------------------
-float KartProperties::getSkidVisual() const
-{
-    return m_cached_characteristic->getSkidVisual();
-}  // getSkidVisual
-
-// ----------------------------------------------------------------------------
-float KartProperties::getSkidVisualTime() const
-{
-    return m_cached_characteristic->getSkidVisualTime();
-}  // getSkidVisualTime
-
-// ----------------------------------------------------------------------------
-float KartProperties::getSkidRevertVisualTime() const
-{
-    return m_cached_characteristic->getSkidRevertVisualTime();
-}  // getSkidRevertVisualTime
-
-// ----------------------------------------------------------------------------
-float KartProperties::getSkidMinSpeed() const
-{
-    return m_cached_characteristic->getSkidMinSpeed();
-}  // getSkidMinSpeed
-
-// ----------------------------------------------------------------------------
-std::vector<float> KartProperties::getSkidTimeTillBonus() const
-{
-    return m_cached_characteristic->getSkidTimeTillBonus();
-}  // getSkidTimeTillBonus
-
-// ----------------------------------------------------------------------------
-std::vector<float> KartProperties::getSkidBonusSpeed() const
-{
-    return m_cached_characteristic->getSkidBonusSpeed();
-}  // getSkidBonusSpeed
-
-// ----------------------------------------------------------------------------
-std::vector<float> KartProperties::getSkidBonusTime() const
-{
-    return m_cached_characteristic->getSkidBonusTime();
-}  // getSkidBonusTime
-
-// ----------------------------------------------------------------------------
-std::vector<float> KartProperties::getSkidFadeOutTime() const
-{
-    return m_cached_characteristic->getSkidFadeOutTime();
-}  // getSkidFadeOutTime
-
-// ----------------------------------------------------------------------------
-std::vector<float> KartProperties::getSkidBonusForce() const
-{
-    return m_cached_characteristic->getSkidBonusForce();
-}  // getSkidBonusForce
-
-// ----------------------------------------------------------------------------
-float KartProperties::getSkidPhysicalJumpTime() const
-{
-    return m_cached_characteristic->getSkidPhysicalJumpTime();
-}  // getSkidPhysicalJumpTime
-
-// ----------------------------------------------------------------------------
-float KartProperties::getSkidGraphicalJumpTime() const
-{
-    return m_cached_characteristic->getSkidGraphicalJumpTime();
-}  // getSkidGraphicalJumpTime
-
-// ----------------------------------------------------------------------------
-float KartProperties::getSkidPostSkidRotateFactor() const
-{
-    return m_cached_characteristic->getSkidPostSkidRotateFactor();
-}  // getSkidPostSkidRotateFactor
-
-// ----------------------------------------------------------------------------
-float KartProperties::getSkidSteerFactor() const
-{
-    return m_cached_characteristic->getSkidSteerFactor();
-}  // getSkidSteerFactor
-
-// ----------------------------------------------------------------------------
-float KartProperties::getSkidReduceTurnMin() const
-{
-    return m_cached_characteristic->getSkidReduceTurnMin();
-}  // getSkidReduceTurnMin
-
-// ----------------------------------------------------------------------------
-float KartProperties::getSkidReduceTurnMax() const
-{
-    return m_cached_characteristic->getSkidReduceTurnMax();
-}  // getSkidReduceTurnMax
-
-// ----------------------------------------------------------------------------
-bool KartProperties::getSkidEnabled() const
-{
-    return m_cached_characteristic->getSkidEnabled();
-}  // getSkidEnabled
 
 
 /* <characteristics-end kpgetter> */

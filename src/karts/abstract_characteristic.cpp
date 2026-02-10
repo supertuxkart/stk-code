@@ -113,153 +113,7 @@ AbstractCharacteristic::ValueType AbstractCharacteristic::getType(
         return TYPE_FLOAT;
     case WHEELS_DAMPING_COMPRESSION:
         return TYPE_FLOAT;
-    case JUMP_ANIMATION_TIME:
-        return TYPE_FLOAT;
-    case LEAN_MAX:
-        return TYPE_FLOAT;
-    case LEAN_SPEED:
-        return TYPE_FLOAT;
-    case ANVIL_DURATION:
-        return TYPE_FLOAT;
-    case ANVIL_WEIGHT:
-        return TYPE_FLOAT;
-    case ANVIL_SPEED_FACTOR:
-        return TYPE_FLOAT;
-    case PARACHUTE_FRICTION:
-        return TYPE_FLOAT;
-    case PARACHUTE_DURATION:
-        return TYPE_FLOAT;
-    case PARACHUTE_DURATION_OTHER:
-        return TYPE_FLOAT;
-    case PARACHUTE_DURATION_RANK_MULT:
-        return TYPE_FLOAT;
-    case PARACHUTE_DURATION_SPEED_MULT:
-        return TYPE_FLOAT;
-    case PARACHUTE_LBOUND_FRACTION:
-        return TYPE_FLOAT;
-    case PARACHUTE_UBOUND_FRACTION:
-        return TYPE_FLOAT;
-    case PARACHUTE_MAX_SPEED:
-        return TYPE_FLOAT;
     case FRICTION_KART_FRICTION:
-        return TYPE_FLOAT;
-    case BUBBLEGUM_DURATION:
-        return TYPE_FLOAT;
-    case BUBBLEGUM_SPEED_FRACTION:
-        return TYPE_FLOAT;
-    case BUBBLEGUM_TORQUE:
-        return TYPE_FLOAT;
-    case BUBBLEGUM_FADE_IN_TIME:
-        return TYPE_FLOAT;
-    case BUBBLEGUM_SHIELD_DURATION:
-        return TYPE_FLOAT;
-    case ZIPPER_DURATION:
-        return TYPE_FLOAT;
-    case ZIPPER_FORCE:
-        return TYPE_FLOAT;
-    case ZIPPER_SPEED_GAIN:
-        return TYPE_FLOAT;
-    case ZIPPER_MAX_SPEED_INCREASE:
-        return TYPE_FLOAT;
-    case ZIPPER_FADE_OUT_TIME:
-        return TYPE_FLOAT;
-    case SWATTER_DURATION:
-        return TYPE_FLOAT;
-    case SWATTER_DISTANCE:
-        return TYPE_FLOAT;
-    case SWATTER_SQUASH_DURATION:
-        return TYPE_FLOAT;
-    case SWATTER_SQUASH_SLOWDOWN:
-        return TYPE_FLOAT;
-    case PLUNGER_BAND_MAX_LENGTH:
-        return TYPE_FLOAT;
-    case PLUNGER_BAND_FORCE:
-        return TYPE_FLOAT;
-    case PLUNGER_BAND_DURATION:
-        return TYPE_FLOAT;
-    case PLUNGER_BAND_SPEED_INCREASE:
-        return TYPE_FLOAT;
-    case PLUNGER_BAND_FADE_OUT_TIME:
-        return TYPE_FLOAT;
-    case PLUNGER_IN_FACE_TIME:
-        return TYPE_FLOAT;
-    case NITROHACK_DURATION:
-        return TYPE_FLOAT;
-    case NITROHACK_FACTOR:
-        return TYPE_FLOAT;
-    case ELECTRO_DURATION:
-        return TYPE_FLOAT;
-    case ELECTRO_ENGINE_MULT:
-        return TYPE_FLOAT;
-    case ELECTRO_MAX_SPEED_INCREASE:
-        return TYPE_FLOAT;
-    case ELECTRO_FADE_OUT_TIME:
-        return TYPE_FLOAT;
-    case STARTUP_TIME:
-        return TYPE_FLOAT_VECTOR;
-    case STARTUP_BOOST:
-        return TYPE_FLOAT_VECTOR;
-    case STARTUP_ENGINE_FORCE:
-        return TYPE_FLOAT_VECTOR;
-    case STARTUP_DURATION:
-        return TYPE_FLOAT;
-    case STARTUP_FADE_OUT_TIME:
-        return TYPE_FLOAT;
-    case RESCUE_DURATION:
-        return TYPE_FLOAT;
-    case RESCUE_VERT_OFFSET:
-        return TYPE_FLOAT;
-    case RESCUE_HEIGHT:
-        return TYPE_FLOAT;
-    case EXPLOSION_DURATION:
-        return TYPE_FLOAT;
-    case EXPLOSION_RADIUS:
-        return TYPE_FLOAT;
-    case EXPLOSION_INVULNERABILITY_TIME:
-        return TYPE_FLOAT;
-    case NITRO_DURATION:
-        return TYPE_FLOAT;
-    case NITRO_ENGINE_FORCE:
-        return TYPE_FLOAT;
-    case NITRO_ENGINE_MULT:
-        return TYPE_FLOAT;
-    case NITRO_CONSUMPTION:
-        return TYPE_FLOAT;
-    case NITRO_SMALL_CONTAINER:
-        return TYPE_FLOAT;
-    case NITRO_BIG_CONTAINER:
-        return TYPE_FLOAT;
-    case NITRO_AIR_CONTAINER:
-        return TYPE_FLOAT;
-    case NITRO_MAX_SPEED_INCREASE:
-        return TYPE_FLOAT;
-    case NITRO_MIN_BURST:
-        return TYPE_FLOAT;
-    case NITRO_FADE_OUT_TIME:
-        return TYPE_FLOAT;
-    case NITRO_MAX:
-        return TYPE_FLOAT;
-    case SLIPSTREAM_DURATION_FACTOR:
-        return TYPE_FLOAT;
-    case SLIPSTREAM_BASE_SPEED:
-        return TYPE_FLOAT;
-    case SLIPSTREAM_LENGTH:
-        return TYPE_FLOAT;
-    case SLIPSTREAM_WIDTH:
-        return TYPE_FLOAT;
-    case SLIPSTREAM_INNER_FACTOR:
-        return TYPE_FLOAT;
-    case SLIPSTREAM_MIN_COLLECT_TIME:
-        return TYPE_FLOAT;
-    case SLIPSTREAM_MAX_COLLECT_TIME:
-        return TYPE_FLOAT;
-    case SLIPSTREAM_ADD_POWER:
-        return TYPE_FLOAT;
-    case SLIPSTREAM_MIN_SPEED:
-        return TYPE_FLOAT;
-    case SLIPSTREAM_MAX_SPEED_INCREASE:
-        return TYPE_FLOAT;
-    case SLIPSTREAM_FADE_OUT_TIME:
         return TYPE_FLOAT;
     case SKID_INCREASE:
         return TYPE_FLOAT;
@@ -301,6 +155,152 @@ AbstractCharacteristic::ValueType AbstractCharacteristic::getType(
         return TYPE_FLOAT;
     case SKID_ENABLED:
         return TYPE_BOOL;
+    case JUMP_ANIMATION_TIME:
+        return TYPE_FLOAT;
+    case LEAN_MAX:
+        return TYPE_FLOAT;
+    case LEAN_SPEED:
+        return TYPE_FLOAT;
+    case ANVIL_DURATION:
+        return TYPE_FLOAT;
+    case ANVIL_WEIGHT:
+        return TYPE_FLOAT;
+    case ANVIL_SPEED_FACTOR:
+        return TYPE_FLOAT;
+    case PARACHUTE_FRICTION:
+        return TYPE_FLOAT;
+    case PARACHUTE_DURATION:
+        return TYPE_FLOAT;
+    case PARACHUTE_DURATION_OTHER:
+        return TYPE_FLOAT;
+    case PARACHUTE_DURATION_RANK_MULT:
+        return TYPE_FLOAT;
+    case PARACHUTE_DURATION_SPEED_MULT:
+        return TYPE_FLOAT;
+    case PARACHUTE_LBOUND_FRACTION:
+        return TYPE_FLOAT;
+    case PARACHUTE_UBOUND_FRACTION:
+        return TYPE_FLOAT;
+    case PARACHUTE_MAX_SPEED:
+        return TYPE_FLOAT;
+    case BUBBLEGUM_DURATION:
+        return TYPE_FLOAT;
+    case BUBBLEGUM_SPEED_FRACTION:
+        return TYPE_FLOAT;
+    case BUBBLEGUM_TORQUE:
+        return TYPE_FLOAT;
+    case BUBBLEGUM_FADE_IN_TIME:
+        return TYPE_FLOAT;
+    case BUBBLEGUM_SHIELD_DURATION:
+        return TYPE_FLOAT;
+    case ZIPPER_DURATION:
+        return TYPE_FLOAT;
+    case ZIPPER_FORCE:
+        return TYPE_FLOAT;
+    case ZIPPER_SPEED_GAIN:
+        return TYPE_FLOAT;
+    case ZIPPER_MAX_SPEED_INCREASE:
+        return TYPE_FLOAT;
+    case ZIPPER_FADE_OUT_TIME:
+        return TYPE_FLOAT;
+    case SWATTER_DURATION:
+        return TYPE_FLOAT;
+    case SWATTER_DISTANCE:
+        return TYPE_FLOAT;
+    case SWATTER_SQUASH_DURATION:
+        return TYPE_FLOAT;
+    case SWATTER_SQUASH_SLOWDOWN:
+        return TYPE_FLOAT;
+    case PLUNGER_BAND_MAX_LENGTH:
+        return TYPE_FLOAT;
+    case PLUNGER_BAND_FORCE:
+        return TYPE_FLOAT;
+    case PLUNGER_BAND_DURATION:
+        return TYPE_FLOAT;
+    case PLUNGER_BAND_SPEED_INCREASE:
+        return TYPE_FLOAT;
+    case PLUNGER_BAND_FADE_OUT_TIME:
+        return TYPE_FLOAT;
+    case PLUNGER_IN_FACE_TIME:
+        return TYPE_FLOAT;
+    case NITRO_HACK_DURATION:
+        return TYPE_FLOAT;
+    case NITRO_HACK_FACTOR:
+        return TYPE_FLOAT;
+    case ELECTRO_DURATION:
+        return TYPE_FLOAT;
+    case ELECTRO_ENGINE_MULT:
+        return TYPE_FLOAT;
+    case ELECTRO_MAX_SPEED_INCREASE:
+        return TYPE_FLOAT;
+    case ELECTRO_FADE_OUT_TIME:
+        return TYPE_FLOAT;
+    case STARTUP_TIME:
+        return TYPE_FLOAT_VECTOR;
+    case STARTUP_BOOST:
+        return TYPE_FLOAT_VECTOR;
+    case STARTUP_ENGINE_FORCE:
+        return TYPE_FLOAT_VECTOR;
+    case STARTUP_DURATION:
+        return TYPE_FLOAT;
+    case STARTUP_FADE_OUT_TIME:
+        return TYPE_FLOAT;
+    case RESCUE_DURATION:
+        return TYPE_FLOAT;
+    case RESCUE_VERT_OFFSET:
+        return TYPE_FLOAT;
+    case RESCUE_HEIGHT:
+        return TYPE_FLOAT;
+    case EXPLOSION_DURATION:
+        return TYPE_FLOAT;
+    case EXPLOSION_RADIUS:
+        return TYPE_FLOAT;
+    case EXPLOSION_INVULNERABILITY_TIME:
+        return TYPE_FLOAT;
+    case NITRO_ENGINE_FORCE:
+        return TYPE_FLOAT;
+    case NITRO_ENGINE_MULT:
+        return TYPE_FLOAT;
+    case NITRO_CONSUMPTION:
+        return TYPE_FLOAT;
+    case NITRO_SMALL_CONTAINER:
+        return TYPE_FLOAT;
+    case NITRO_BIG_CONTAINER:
+        return TYPE_FLOAT;
+    case NITRO_AIR_CONTAINER:
+        return TYPE_FLOAT;
+    case NITRO_MAX_SPEED_INCREASE:
+        return TYPE_FLOAT;
+    case NITRO_MIN_BURST:
+        return TYPE_FLOAT;
+    case NITRO_DURATION:
+        return TYPE_FLOAT;
+    case NITRO_FADE_OUT_TIME:
+        return TYPE_FLOAT;
+    case NITRO_MAX:
+        return TYPE_FLOAT;
+    case SLIPSTREAM_BASE_SPEED:
+        return TYPE_FLOAT;
+    case SLIPSTREAM_LENGTH:
+        return TYPE_FLOAT;
+    case SLIPSTREAM_WIDTH:
+        return TYPE_FLOAT;
+    case SLIPSTREAM_INNER_FACTOR:
+        return TYPE_FLOAT;
+    case SLIPSTREAM_MIN_COLLECT_TIME:
+        return TYPE_FLOAT;
+    case SLIPSTREAM_MAX_COLLECT_TIME:
+        return TYPE_FLOAT;
+    case SLIPSTREAM_ADD_POWER:
+        return TYPE_FLOAT;
+    case SLIPSTREAM_MIN_SPEED:
+        return TYPE_FLOAT;
+    case SLIPSTREAM_MAX_SPEED_INCREASE:
+        return TYPE_FLOAT;
+    case SLIPSTREAM_DURATION_FACTOR:
+        return TYPE_FLOAT;
+    case SLIPSTREAM_FADE_OUT_TIME:
+        return TYPE_FLOAT;
 
     /* <characteristics-end getType> */
     }   // switch (type)
@@ -379,154 +379,8 @@ std::string AbstractCharacteristic::getName(CharacteristicType type)
         return "WHEELS_DAMPING_RELAXATION";
     case WHEELS_DAMPING_COMPRESSION:
         return "WHEELS_DAMPING_COMPRESSION";
-    case JUMP_ANIMATION_TIME:
-        return "JUMP_ANIMATION_TIME";
-    case LEAN_MAX:
-        return "LEAN_MAX";
-    case LEAN_SPEED:
-        return "LEAN_SPEED";
-    case ANVIL_DURATION:
-        return "ANVIL_DURATION";
-    case ANVIL_WEIGHT:
-        return "ANVIL_WEIGHT";
-    case ANVIL_SPEED_FACTOR:
-        return "ANVIL_SPEED_FACTOR";
-    case PARACHUTE_FRICTION:
-        return "PARACHUTE_FRICTION";
-    case PARACHUTE_DURATION:
-        return "PARACHUTE_DURATION";
-    case PARACHUTE_DURATION_OTHER:
-        return "PARACHUTE_DURATION_OTHER";
-    case PARACHUTE_DURATION_RANK_MULT:
-        return "PARACHUTE_DURATION_RANK_MULT";
-    case PARACHUTE_DURATION_SPEED_MULT:
-        return "PARACHUTE_DURATION_SPEED_MULT";
-    case PARACHUTE_LBOUND_FRACTION:
-        return "PARACHUTE_LBOUND_FRACTION";
-    case PARACHUTE_UBOUND_FRACTION:
-        return "PARACHUTE_UBOUND_FRACTION";
-    case PARACHUTE_MAX_SPEED:
-        return "PARACHUTE_MAX_SPEED";
     case FRICTION_KART_FRICTION:
         return "FRICTION_KART_FRICTION";
-    case BUBBLEGUM_DURATION:
-        return "BUBBLEGUM_DURATION";
-    case BUBBLEGUM_SPEED_FRACTION:
-        return "BUBBLEGUM_SPEED_FRACTION";
-    case BUBBLEGUM_TORQUE:
-        return "BUBBLEGUM_TORQUE";
-    case BUBBLEGUM_FADE_IN_TIME:
-        return "BUBBLEGUM_FADE_IN_TIME";
-    case BUBBLEGUM_SHIELD_DURATION:
-        return "BUBBLEGUM_SHIELD_DURATION";
-    case ZIPPER_DURATION:
-        return "ZIPPER_DURATION";
-    case ZIPPER_FORCE:
-        return "ZIPPER_FORCE";
-    case ZIPPER_SPEED_GAIN:
-        return "ZIPPER_SPEED_GAIN";
-    case ZIPPER_MAX_SPEED_INCREASE:
-        return "ZIPPER_MAX_SPEED_INCREASE";
-    case ZIPPER_FADE_OUT_TIME:
-        return "ZIPPER_FADE_OUT_TIME";
-    case SWATTER_DURATION:
-        return "SWATTER_DURATION";
-    case SWATTER_DISTANCE:
-        return "SWATTER_DISTANCE";
-    case SWATTER_SQUASH_DURATION:
-        return "SWATTER_SQUASH_DURATION";
-    case SWATTER_SQUASH_SLOWDOWN:
-        return "SWATTER_SQUASH_SLOWDOWN";
-    case PLUNGER_BAND_MAX_LENGTH:
-        return "PLUNGER_BAND_MAX_LENGTH";
-    case PLUNGER_BAND_FORCE:
-        return "PLUNGER_BAND_FORCE";
-    case PLUNGER_BAND_DURATION:
-        return "PLUNGER_BAND_DURATION";
-    case PLUNGER_BAND_SPEED_INCREASE:
-        return "PLUNGER_BAND_SPEED_INCREASE";
-    case PLUNGER_BAND_FADE_OUT_TIME:
-        return "PLUNGER_BAND_FADE_OUT_TIME";
-    case PLUNGER_IN_FACE_TIME:
-        return "PLUNGER_IN_FACE_TIME";
-    case NITROHACK_DURATION:
-        return "NITROHACK_DURATION";
-    case NITROHACK_FACTOR:
-        return "NITROHACK_FACTOR";
-    case ELECTRO_DURATION:
-        return "ELECTRO_DURATION";
-    case ELECTRO_ENGINE_MULT:
-        return "ELECTRO_ENGINE_MULT";
-    case ELECTRO_MAX_SPEED_INCREASE:
-        return "ELECTRO_MAX_SPEED_INCREASE";
-    case ELECTRO_FADE_OUT_TIME:
-        return "ELECTRO_FADE_OUT_TIME";
-    case STARTUP_TIME:
-        return "STARTUP_TIME";
-    case STARTUP_BOOST:
-        return "STARTUP_BOOST";
-    case STARTUP_ENGINE_FORCE:
-        return "STARTUP_ENGINE_FORCE";
-    case STARTUP_DURATION:
-        return "STARTUP_DURATION";
-    case STARTUP_FADE_OUT_TIME:
-        return "STARTUP_FADE_OUT_TIME";
-    case RESCUE_DURATION:
-        return "RESCUE_DURATION";
-    case RESCUE_VERT_OFFSET:
-        return "RESCUE_VERT_OFFSET";
-    case RESCUE_HEIGHT:
-        return "RESCUE_HEIGHT";
-    case EXPLOSION_DURATION:
-        return "EXPLOSION_DURATION";
-    case EXPLOSION_RADIUS:
-        return "EXPLOSION_RADIUS";
-    case EXPLOSION_INVULNERABILITY_TIME:
-        return "EXPLOSION_INVULNERABILITY_TIME";
-    case NITRO_DURATION:
-        return "NITRO_DURATION";
-    case NITRO_ENGINE_FORCE:
-        return "NITRO_ENGINE_FORCE";
-    case NITRO_ENGINE_MULT:
-        return "NITRO_ENGINE_MULT";
-    case NITRO_CONSUMPTION:
-        return "NITRO_CONSUMPTION";
-    case NITRO_SMALL_CONTAINER:
-        return "NITRO_SMALL_CONTAINER";
-    case NITRO_BIG_CONTAINER:
-        return "NITRO_BIG_CONTAINER";
-    case NITRO_AIR_CONTAINER:
-        return "NITRO_AIR_CONTAINER";
-    case NITRO_MAX_SPEED_INCREASE:
-        return "NITRO_MAX_SPEED_INCREASE";
-    case NITRO_MIN_BURST:
-        return "NITRO_MIN_BURST";
-    case NITRO_FADE_OUT_TIME:
-        return "NITRO_FADE_OUT_TIME";
-    case NITRO_MAX:
-        return "NITRO_MAX";
-    case SLIPSTREAM_DURATION_FACTOR:
-        return "SLIPSTREAM_DURATION_FACTOR";
-    case SLIPSTREAM_BASE_SPEED:
-        return "SLIPSTREAM_BASE_SPEED";
-    case SLIPSTREAM_LENGTH:
-        return "SLIPSTREAM_LENGTH";
-    case SLIPSTREAM_WIDTH:
-        return "SLIPSTREAM_WIDTH";
-    case SLIPSTREAM_INNER_FACTOR:
-        return "SLIPSTREAM_INNER_FACTOR";
-    case SLIPSTREAM_MIN_COLLECT_TIME:
-        return "SLIPSTREAM_MIN_COLLECT_TIME";
-    case SLIPSTREAM_MAX_COLLECT_TIME:
-        return "SLIPSTREAM_MAX_COLLECT_TIME";
-    case SLIPSTREAM_ADD_POWER:
-        return "SLIPSTREAM_ADD_POWER";
-    case SLIPSTREAM_MIN_SPEED:
-        return "SLIPSTREAM_MIN_SPEED";
-    case SLIPSTREAM_MAX_SPEED_INCREASE:
-        return "SLIPSTREAM_MAX_SPEED_INCREASE";
-    case SLIPSTREAM_FADE_OUT_TIME:
-        return "SLIPSTREAM_FADE_OUT_TIME";
     case SKID_INCREASE:
         return "SKID_INCREASE";
     case SKID_DECREASE:
@@ -567,6 +421,152 @@ std::string AbstractCharacteristic::getName(CharacteristicType type)
         return "SKID_REDUCE_TURN_MAX";
     case SKID_ENABLED:
         return "SKID_ENABLED";
+    case JUMP_ANIMATION_TIME:
+        return "JUMP_ANIMATION_TIME";
+    case LEAN_MAX:
+        return "LEAN_MAX";
+    case LEAN_SPEED:
+        return "LEAN_SPEED";
+    case ANVIL_DURATION:
+        return "ANVIL_DURATION";
+    case ANVIL_WEIGHT:
+        return "ANVIL_WEIGHT";
+    case ANVIL_SPEED_FACTOR:
+        return "ANVIL_SPEED_FACTOR";
+    case PARACHUTE_FRICTION:
+        return "PARACHUTE_FRICTION";
+    case PARACHUTE_DURATION:
+        return "PARACHUTE_DURATION";
+    case PARACHUTE_DURATION_OTHER:
+        return "PARACHUTE_DURATION_OTHER";
+    case PARACHUTE_DURATION_RANK_MULT:
+        return "PARACHUTE_DURATION_RANK_MULT";
+    case PARACHUTE_DURATION_SPEED_MULT:
+        return "PARACHUTE_DURATION_SPEED_MULT";
+    case PARACHUTE_LBOUND_FRACTION:
+        return "PARACHUTE_LBOUND_FRACTION";
+    case PARACHUTE_UBOUND_FRACTION:
+        return "PARACHUTE_UBOUND_FRACTION";
+    case PARACHUTE_MAX_SPEED:
+        return "PARACHUTE_MAX_SPEED";
+    case BUBBLEGUM_DURATION:
+        return "BUBBLEGUM_DURATION";
+    case BUBBLEGUM_SPEED_FRACTION:
+        return "BUBBLEGUM_SPEED_FRACTION";
+    case BUBBLEGUM_TORQUE:
+        return "BUBBLEGUM_TORQUE";
+    case BUBBLEGUM_FADE_IN_TIME:
+        return "BUBBLEGUM_FADE_IN_TIME";
+    case BUBBLEGUM_SHIELD_DURATION:
+        return "BUBBLEGUM_SHIELD_DURATION";
+    case ZIPPER_DURATION:
+        return "ZIPPER_DURATION";
+    case ZIPPER_FORCE:
+        return "ZIPPER_FORCE";
+    case ZIPPER_SPEED_GAIN:
+        return "ZIPPER_SPEED_GAIN";
+    case ZIPPER_MAX_SPEED_INCREASE:
+        return "ZIPPER_MAX_SPEED_INCREASE";
+    case ZIPPER_FADE_OUT_TIME:
+        return "ZIPPER_FADE_OUT_TIME";
+    case SWATTER_DURATION:
+        return "SWATTER_DURATION";
+    case SWATTER_DISTANCE:
+        return "SWATTER_DISTANCE";
+    case SWATTER_SQUASH_DURATION:
+        return "SWATTER_SQUASH_DURATION";
+    case SWATTER_SQUASH_SLOWDOWN:
+        return "SWATTER_SQUASH_SLOWDOWN";
+    case PLUNGER_BAND_MAX_LENGTH:
+        return "PLUNGER_BAND_MAX_LENGTH";
+    case PLUNGER_BAND_FORCE:
+        return "PLUNGER_BAND_FORCE";
+    case PLUNGER_BAND_DURATION:
+        return "PLUNGER_BAND_DURATION";
+    case PLUNGER_BAND_SPEED_INCREASE:
+        return "PLUNGER_BAND_SPEED_INCREASE";
+    case PLUNGER_BAND_FADE_OUT_TIME:
+        return "PLUNGER_BAND_FADE_OUT_TIME";
+    case PLUNGER_IN_FACE_TIME:
+        return "PLUNGER_IN_FACE_TIME";
+    case NITRO_HACK_DURATION:
+        return "NITRO_HACK_DURATION";
+    case NITRO_HACK_FACTOR:
+        return "NITRO_HACK_FACTOR";
+    case ELECTRO_DURATION:
+        return "ELECTRO_DURATION";
+    case ELECTRO_ENGINE_MULT:
+        return "ELECTRO_ENGINE_MULT";
+    case ELECTRO_MAX_SPEED_INCREASE:
+        return "ELECTRO_MAX_SPEED_INCREASE";
+    case ELECTRO_FADE_OUT_TIME:
+        return "ELECTRO_FADE_OUT_TIME";
+    case STARTUP_TIME:
+        return "STARTUP_TIME";
+    case STARTUP_BOOST:
+        return "STARTUP_BOOST";
+    case STARTUP_ENGINE_FORCE:
+        return "STARTUP_ENGINE_FORCE";
+    case STARTUP_DURATION:
+        return "STARTUP_DURATION";
+    case STARTUP_FADE_OUT_TIME:
+        return "STARTUP_FADE_OUT_TIME";
+    case RESCUE_DURATION:
+        return "RESCUE_DURATION";
+    case RESCUE_VERT_OFFSET:
+        return "RESCUE_VERT_OFFSET";
+    case RESCUE_HEIGHT:
+        return "RESCUE_HEIGHT";
+    case EXPLOSION_DURATION:
+        return "EXPLOSION_DURATION";
+    case EXPLOSION_RADIUS:
+        return "EXPLOSION_RADIUS";
+    case EXPLOSION_INVULNERABILITY_TIME:
+        return "EXPLOSION_INVULNERABILITY_TIME";
+    case NITRO_ENGINE_FORCE:
+        return "NITRO_ENGINE_FORCE";
+    case NITRO_ENGINE_MULT:
+        return "NITRO_ENGINE_MULT";
+    case NITRO_CONSUMPTION:
+        return "NITRO_CONSUMPTION";
+    case NITRO_SMALL_CONTAINER:
+        return "NITRO_SMALL_CONTAINER";
+    case NITRO_BIG_CONTAINER:
+        return "NITRO_BIG_CONTAINER";
+    case NITRO_AIR_CONTAINER:
+        return "NITRO_AIR_CONTAINER";
+    case NITRO_MAX_SPEED_INCREASE:
+        return "NITRO_MAX_SPEED_INCREASE";
+    case NITRO_MIN_BURST:
+        return "NITRO_MIN_BURST";
+    case NITRO_DURATION:
+        return "NITRO_DURATION";
+    case NITRO_FADE_OUT_TIME:
+        return "NITRO_FADE_OUT_TIME";
+    case NITRO_MAX:
+        return "NITRO_MAX";
+    case SLIPSTREAM_BASE_SPEED:
+        return "SLIPSTREAM_BASE_SPEED";
+    case SLIPSTREAM_LENGTH:
+        return "SLIPSTREAM_LENGTH";
+    case SLIPSTREAM_WIDTH:
+        return "SLIPSTREAM_WIDTH";
+    case SLIPSTREAM_INNER_FACTOR:
+        return "SLIPSTREAM_INNER_FACTOR";
+    case SLIPSTREAM_MIN_COLLECT_TIME:
+        return "SLIPSTREAM_MIN_COLLECT_TIME";
+    case SLIPSTREAM_MAX_COLLECT_TIME:
+        return "SLIPSTREAM_MAX_COLLECT_TIME";
+    case SLIPSTREAM_ADD_POWER:
+        return "SLIPSTREAM_ADD_POWER";
+    case SLIPSTREAM_MIN_SPEED:
+        return "SLIPSTREAM_MIN_SPEED";
+    case SLIPSTREAM_MAX_SPEED_INCREASE:
+        return "SLIPSTREAM_MAX_SPEED_INCREASE";
+    case SLIPSTREAM_DURATION_FACTOR:
+        return "SLIPSTREAM_DURATION_FACTOR";
+    case SLIPSTREAM_FADE_OUT_TIME:
+        return "SLIPSTREAM_FADE_OUT_TIME";
 
     /* <characteristics-end getName> */
     }   // switch (type)
@@ -928,6 +928,258 @@ float AbstractCharacteristic::getWheelsDampingCompression() const
 }  // getWheelsDampingCompression
 
 // ----------------------------------------------------------------------------
+float AbstractCharacteristic::getFrictionKartFriction() const
+{
+    float result;
+    bool is_set = false;
+    process(FRICTION_KART_FRICTION, &result, &is_set);
+    if (!is_set)
+        Log::fatal("AbstractCharacteristic", "Can't get characteristic %s",
+                    getName(FRICTION_KART_FRICTION).c_str());
+    return result;
+}  // getFrictionKartFriction
+
+// ----------------------------------------------------------------------------
+float AbstractCharacteristic::getSkidIncrease() const
+{
+    float result;
+    bool is_set = false;
+    process(SKID_INCREASE, &result, &is_set);
+    if (!is_set)
+        Log::fatal("AbstractCharacteristic", "Can't get characteristic %s",
+                    getName(SKID_INCREASE).c_str());
+    return result;
+}  // getSkidIncrease
+
+// ----------------------------------------------------------------------------
+float AbstractCharacteristic::getSkidDecrease() const
+{
+    float result;
+    bool is_set = false;
+    process(SKID_DECREASE, &result, &is_set);
+    if (!is_set)
+        Log::fatal("AbstractCharacteristic", "Can't get characteristic %s",
+                    getName(SKID_DECREASE).c_str());
+    return result;
+}  // getSkidDecrease
+
+// ----------------------------------------------------------------------------
+float AbstractCharacteristic::getSkidMax() const
+{
+    float result;
+    bool is_set = false;
+    process(SKID_MAX, &result, &is_set);
+    if (!is_set)
+        Log::fatal("AbstractCharacteristic", "Can't get characteristic %s",
+                    getName(SKID_MAX).c_str());
+    return result;
+}  // getSkidMax
+
+// ----------------------------------------------------------------------------
+float AbstractCharacteristic::getSkidTimeTillMax() const
+{
+    float result;
+    bool is_set = false;
+    process(SKID_TIME_TILL_MAX, &result, &is_set);
+    if (!is_set)
+        Log::fatal("AbstractCharacteristic", "Can't get characteristic %s",
+                    getName(SKID_TIME_TILL_MAX).c_str());
+    return result;
+}  // getSkidTimeTillMax
+
+// ----------------------------------------------------------------------------
+float AbstractCharacteristic::getSkidVisual() const
+{
+    float result;
+    bool is_set = false;
+    process(SKID_VISUAL, &result, &is_set);
+    if (!is_set)
+        Log::fatal("AbstractCharacteristic", "Can't get characteristic %s",
+                    getName(SKID_VISUAL).c_str());
+    return result;
+}  // getSkidVisual
+
+// ----------------------------------------------------------------------------
+float AbstractCharacteristic::getSkidVisualTime() const
+{
+    float result;
+    bool is_set = false;
+    process(SKID_VISUAL_TIME, &result, &is_set);
+    if (!is_set)
+        Log::fatal("AbstractCharacteristic", "Can't get characteristic %s",
+                    getName(SKID_VISUAL_TIME).c_str());
+    return result;
+}  // getSkidVisualTime
+
+// ----------------------------------------------------------------------------
+float AbstractCharacteristic::getSkidRevertVisualTime() const
+{
+    float result;
+    bool is_set = false;
+    process(SKID_REVERT_VISUAL_TIME, &result, &is_set);
+    if (!is_set)
+        Log::fatal("AbstractCharacteristic", "Can't get characteristic %s",
+                    getName(SKID_REVERT_VISUAL_TIME).c_str());
+    return result;
+}  // getSkidRevertVisualTime
+
+// ----------------------------------------------------------------------------
+float AbstractCharacteristic::getSkidMinSpeed() const
+{
+    float result;
+    bool is_set = false;
+    process(SKID_MIN_SPEED, &result, &is_set);
+    if (!is_set)
+        Log::fatal("AbstractCharacteristic", "Can't get characteristic %s",
+                    getName(SKID_MIN_SPEED).c_str());
+    return result;
+}  // getSkidMinSpeed
+
+// ----------------------------------------------------------------------------
+std::vector<float> AbstractCharacteristic::getSkidTimeTillBonus() const
+{
+    std::vector<float> result;
+    bool is_set = false;
+    process(SKID_TIME_TILL_BONUS, &result, &is_set);
+    if (!is_set)
+        Log::fatal("AbstractCharacteristic", "Can't get characteristic %s",
+                    getName(SKID_TIME_TILL_BONUS).c_str());
+    return result;
+}  // getSkidTimeTillBonus
+
+// ----------------------------------------------------------------------------
+std::vector<float> AbstractCharacteristic::getSkidBonusSpeed() const
+{
+    std::vector<float> result;
+    bool is_set = false;
+    process(SKID_BONUS_SPEED, &result, &is_set);
+    if (!is_set)
+        Log::fatal("AbstractCharacteristic", "Can't get characteristic %s",
+                    getName(SKID_BONUS_SPEED).c_str());
+    return result;
+}  // getSkidBonusSpeed
+
+// ----------------------------------------------------------------------------
+std::vector<float> AbstractCharacteristic::getSkidBonusTime() const
+{
+    std::vector<float> result;
+    bool is_set = false;
+    process(SKID_BONUS_TIME, &result, &is_set);
+    if (!is_set)
+        Log::fatal("AbstractCharacteristic", "Can't get characteristic %s",
+                    getName(SKID_BONUS_TIME).c_str());
+    return result;
+}  // getSkidBonusTime
+
+// ----------------------------------------------------------------------------
+std::vector<float> AbstractCharacteristic::getSkidFadeOutTime() const
+{
+    std::vector<float> result;
+    bool is_set = false;
+    process(SKID_FADE_OUT_TIME, &result, &is_set);
+    if (!is_set)
+        Log::fatal("AbstractCharacteristic", "Can't get characteristic %s",
+                    getName(SKID_FADE_OUT_TIME).c_str());
+    return result;
+}  // getSkidFadeOutTime
+
+// ----------------------------------------------------------------------------
+std::vector<float> AbstractCharacteristic::getSkidBonusForce() const
+{
+    std::vector<float> result;
+    bool is_set = false;
+    process(SKID_BONUS_FORCE, &result, &is_set);
+    if (!is_set)
+        Log::fatal("AbstractCharacteristic", "Can't get characteristic %s",
+                    getName(SKID_BONUS_FORCE).c_str());
+    return result;
+}  // getSkidBonusForce
+
+// ----------------------------------------------------------------------------
+float AbstractCharacteristic::getSkidPhysicalJumpTime() const
+{
+    float result;
+    bool is_set = false;
+    process(SKID_PHYSICAL_JUMP_TIME, &result, &is_set);
+    if (!is_set)
+        Log::fatal("AbstractCharacteristic", "Can't get characteristic %s",
+                    getName(SKID_PHYSICAL_JUMP_TIME).c_str());
+    return result;
+}  // getSkidPhysicalJumpTime
+
+// ----------------------------------------------------------------------------
+float AbstractCharacteristic::getSkidGraphicalJumpTime() const
+{
+    float result;
+    bool is_set = false;
+    process(SKID_GRAPHICAL_JUMP_TIME, &result, &is_set);
+    if (!is_set)
+        Log::fatal("AbstractCharacteristic", "Can't get characteristic %s",
+                    getName(SKID_GRAPHICAL_JUMP_TIME).c_str());
+    return result;
+}  // getSkidGraphicalJumpTime
+
+// ----------------------------------------------------------------------------
+float AbstractCharacteristic::getSkidPostSkidRotateFactor() const
+{
+    float result;
+    bool is_set = false;
+    process(SKID_POST_SKID_ROTATE_FACTOR, &result, &is_set);
+    if (!is_set)
+        Log::fatal("AbstractCharacteristic", "Can't get characteristic %s",
+                    getName(SKID_POST_SKID_ROTATE_FACTOR).c_str());
+    return result;
+}  // getSkidPostSkidRotateFactor
+
+// ----------------------------------------------------------------------------
+float AbstractCharacteristic::getSkidSteerFactor() const
+{
+    float result;
+    bool is_set = false;
+    process(SKID_STEER_FACTOR, &result, &is_set);
+    if (!is_set)
+        Log::fatal("AbstractCharacteristic", "Can't get characteristic %s",
+                    getName(SKID_STEER_FACTOR).c_str());
+    return result;
+}  // getSkidSteerFactor
+
+// ----------------------------------------------------------------------------
+float AbstractCharacteristic::getSkidReduceTurnMin() const
+{
+    float result;
+    bool is_set = false;
+    process(SKID_REDUCE_TURN_MIN, &result, &is_set);
+    if (!is_set)
+        Log::fatal("AbstractCharacteristic", "Can't get characteristic %s",
+                    getName(SKID_REDUCE_TURN_MIN).c_str());
+    return result;
+}  // getSkidReduceTurnMin
+
+// ----------------------------------------------------------------------------
+float AbstractCharacteristic::getSkidReduceTurnMax() const
+{
+    float result;
+    bool is_set = false;
+    process(SKID_REDUCE_TURN_MAX, &result, &is_set);
+    if (!is_set)
+        Log::fatal("AbstractCharacteristic", "Can't get characteristic %s",
+                    getName(SKID_REDUCE_TURN_MAX).c_str());
+    return result;
+}  // getSkidReduceTurnMax
+
+// ----------------------------------------------------------------------------
+bool AbstractCharacteristic::getSkidEnabled() const
+{
+    bool result;
+    bool is_set = false;
+    process(SKID_ENABLED, &result, &is_set);
+    if (!is_set)
+        Log::fatal("AbstractCharacteristic", "Can't get characteristic %s",
+                    getName(SKID_ENABLED).c_str());
+    return result;
+}  // getSkidEnabled
+
+// ----------------------------------------------------------------------------
 float AbstractCharacteristic::getJumpAnimationTime() const
 {
     float result;
@@ -1094,18 +1346,6 @@ float AbstractCharacteristic::getParachuteMaxSpeed() const
                     getName(PARACHUTE_MAX_SPEED).c_str());
     return result;
 }  // getParachuteMaxSpeed
-
-// ----------------------------------------------------------------------------
-float AbstractCharacteristic::getFrictionKartFriction() const
-{
-    float result;
-    bool is_set = false;
-    process(FRICTION_KART_FRICTION, &result, &is_set);
-    if (!is_set)
-        Log::fatal("AbstractCharacteristic", "Can't get characteristic %s",
-                    getName(FRICTION_KART_FRICTION).c_str());
-    return result;
-}  // getFrictionKartFriction
 
 // ----------------------------------------------------------------------------
 float AbstractCharacteristic::getBubblegumDuration() const
@@ -1348,28 +1588,28 @@ float AbstractCharacteristic::getPlungerInFaceTime() const
 }  // getPlungerInFaceTime
 
 // ----------------------------------------------------------------------------
-float AbstractCharacteristic::getNitrohackDuration() const
+float AbstractCharacteristic::getNitroHackDuration() const
 {
     float result;
     bool is_set = false;
-    process(NITROHACK_DURATION, &result, &is_set);
+    process(NITRO_HACK_DURATION, &result, &is_set);
     if (!is_set)
         Log::fatal("AbstractCharacteristic", "Can't get characteristic %s",
-                    getName(NITROHACK_DURATION).c_str());
+                    getName(NITRO_HACK_DURATION).c_str());
     return result;
-}  // getNitrohackDuration
+}  // getNitroHackDuration
 
 // ----------------------------------------------------------------------------
-float AbstractCharacteristic::getNitrohackFactor() const
+float AbstractCharacteristic::getNitroHackFactor() const
 {
     float result;
     bool is_set = false;
-    process(NITROHACK_FACTOR, &result, &is_set);
+    process(NITRO_HACK_FACTOR, &result, &is_set);
     if (!is_set)
         Log::fatal("AbstractCharacteristic", "Can't get characteristic %s",
-                    getName(NITROHACK_FACTOR).c_str());
+                    getName(NITRO_HACK_FACTOR).c_str());
     return result;
-}  // getNitrohackFactor
+}  // getNitroHackFactor
 
 // ----------------------------------------------------------------------------
 float AbstractCharacteristic::getElectroDuration() const
@@ -1552,18 +1792,6 @@ float AbstractCharacteristic::getExplosionInvulnerabilityTime() const
 }  // getExplosionInvulnerabilityTime
 
 // ----------------------------------------------------------------------------
-float AbstractCharacteristic::getNitroDuration() const
-{
-    float result;
-    bool is_set = false;
-    process(NITRO_DURATION, &result, &is_set);
-    if (!is_set)
-        Log::fatal("AbstractCharacteristic", "Can't get characteristic %s",
-                    getName(NITRO_DURATION).c_str());
-    return result;
-}  // getNitroDuration
-
-// ----------------------------------------------------------------------------
 float AbstractCharacteristic::getNitroEngineForce() const
 {
     float result;
@@ -1660,6 +1888,18 @@ float AbstractCharacteristic::getNitroMinBurst() const
 }  // getNitroMinBurst
 
 // ----------------------------------------------------------------------------
+float AbstractCharacteristic::getNitroDuration() const
+{
+    float result;
+    bool is_set = false;
+    process(NITRO_DURATION, &result, &is_set);
+    if (!is_set)
+        Log::fatal("AbstractCharacteristic", "Can't get characteristic %s",
+                    getName(NITRO_DURATION).c_str());
+    return result;
+}  // getNitroDuration
+
+// ----------------------------------------------------------------------------
 float AbstractCharacteristic::getNitroFadeOutTime() const
 {
     float result;
@@ -1682,18 +1922,6 @@ float AbstractCharacteristic::getNitroMax() const
                     getName(NITRO_MAX).c_str());
     return result;
 }  // getNitroMax
-
-// ----------------------------------------------------------------------------
-float AbstractCharacteristic::getSlipstreamDurationFactor() const
-{
-    float result;
-    bool is_set = false;
-    process(SLIPSTREAM_DURATION_FACTOR, &result, &is_set);
-    if (!is_set)
-        Log::fatal("AbstractCharacteristic", "Can't get characteristic %s",
-                    getName(SLIPSTREAM_DURATION_FACTOR).c_str());
-    return result;
-}  // getSlipstreamDurationFactor
 
 // ----------------------------------------------------------------------------
 float AbstractCharacteristic::getSlipstreamBaseSpeed() const
@@ -1804,6 +2032,18 @@ float AbstractCharacteristic::getSlipstreamMaxSpeedIncrease() const
 }  // getSlipstreamMaxSpeedIncrease
 
 // ----------------------------------------------------------------------------
+float AbstractCharacteristic::getSlipstreamDurationFactor() const
+{
+    float result;
+    bool is_set = false;
+    process(SLIPSTREAM_DURATION_FACTOR, &result, &is_set);
+    if (!is_set)
+        Log::fatal("AbstractCharacteristic", "Can't get characteristic %s",
+                    getName(SLIPSTREAM_DURATION_FACTOR).c_str());
+    return result;
+}  // getSlipstreamDurationFactor
+
+// ----------------------------------------------------------------------------
 float AbstractCharacteristic::getSlipstreamFadeOutTime() const
 {
     float result;
@@ -1814,246 +2054,6 @@ float AbstractCharacteristic::getSlipstreamFadeOutTime() const
                     getName(SLIPSTREAM_FADE_OUT_TIME).c_str());
     return result;
 }  // getSlipstreamFadeOutTime
-
-// ----------------------------------------------------------------------------
-float AbstractCharacteristic::getSkidIncrease() const
-{
-    float result;
-    bool is_set = false;
-    process(SKID_INCREASE, &result, &is_set);
-    if (!is_set)
-        Log::fatal("AbstractCharacteristic", "Can't get characteristic %s",
-                    getName(SKID_INCREASE).c_str());
-    return result;
-}  // getSkidIncrease
-
-// ----------------------------------------------------------------------------
-float AbstractCharacteristic::getSkidDecrease() const
-{
-    float result;
-    bool is_set = false;
-    process(SKID_DECREASE, &result, &is_set);
-    if (!is_set)
-        Log::fatal("AbstractCharacteristic", "Can't get characteristic %s",
-                    getName(SKID_DECREASE).c_str());
-    return result;
-}  // getSkidDecrease
-
-// ----------------------------------------------------------------------------
-float AbstractCharacteristic::getSkidMax() const
-{
-    float result;
-    bool is_set = false;
-    process(SKID_MAX, &result, &is_set);
-    if (!is_set)
-        Log::fatal("AbstractCharacteristic", "Can't get characteristic %s",
-                    getName(SKID_MAX).c_str());
-    return result;
-}  // getSkidMax
-
-// ----------------------------------------------------------------------------
-float AbstractCharacteristic::getSkidTimeTillMax() const
-{
-    float result;
-    bool is_set = false;
-    process(SKID_TIME_TILL_MAX, &result, &is_set);
-    if (!is_set)
-        Log::fatal("AbstractCharacteristic", "Can't get characteristic %s",
-                    getName(SKID_TIME_TILL_MAX).c_str());
-    return result;
-}  // getSkidTimeTillMax
-
-// ----------------------------------------------------------------------------
-float AbstractCharacteristic::getSkidVisual() const
-{
-    float result;
-    bool is_set = false;
-    process(SKID_VISUAL, &result, &is_set);
-    if (!is_set)
-        Log::fatal("AbstractCharacteristic", "Can't get characteristic %s",
-                    getName(SKID_VISUAL).c_str());
-    return result;
-}  // getSkidVisual
-
-// ----------------------------------------------------------------------------
-float AbstractCharacteristic::getSkidVisualTime() const
-{
-    float result;
-    bool is_set = false;
-    process(SKID_VISUAL_TIME, &result, &is_set);
-    if (!is_set)
-        Log::fatal("AbstractCharacteristic", "Can't get characteristic %s",
-                    getName(SKID_VISUAL_TIME).c_str());
-    return result;
-}  // getSkidVisualTime
-
-// ----------------------------------------------------------------------------
-float AbstractCharacteristic::getSkidRevertVisualTime() const
-{
-    float result;
-    bool is_set = false;
-    process(SKID_REVERT_VISUAL_TIME, &result, &is_set);
-    if (!is_set)
-        Log::fatal("AbstractCharacteristic", "Can't get characteristic %s",
-                    getName(SKID_REVERT_VISUAL_TIME).c_str());
-    return result;
-}  // getSkidRevertVisualTime
-
-// ----------------------------------------------------------------------------
-float AbstractCharacteristic::getSkidMinSpeed() const
-{
-    float result;
-    bool is_set = false;
-    process(SKID_MIN_SPEED, &result, &is_set);
-    if (!is_set)
-        Log::fatal("AbstractCharacteristic", "Can't get characteristic %s",
-                    getName(SKID_MIN_SPEED).c_str());
-    return result;
-}  // getSkidMinSpeed
-
-// ----------------------------------------------------------------------------
-std::vector<float> AbstractCharacteristic::getSkidTimeTillBonus() const
-{
-    std::vector<float> result;
-    bool is_set = false;
-    process(SKID_TIME_TILL_BONUS, &result, &is_set);
-    if (!is_set)
-        Log::fatal("AbstractCharacteristic", "Can't get characteristic %s",
-                    getName(SKID_TIME_TILL_BONUS).c_str());
-    return result;
-}  // getSkidTimeTillBonus
-
-// ----------------------------------------------------------------------------
-std::vector<float> AbstractCharacteristic::getSkidBonusSpeed() const
-{
-    std::vector<float> result;
-    bool is_set = false;
-    process(SKID_BONUS_SPEED, &result, &is_set);
-    if (!is_set)
-        Log::fatal("AbstractCharacteristic", "Can't get characteristic %s",
-                    getName(SKID_BONUS_SPEED).c_str());
-    return result;
-}  // getSkidBonusSpeed
-
-// ----------------------------------------------------------------------------
-std::vector<float> AbstractCharacteristic::getSkidBonusTime() const
-{
-    std::vector<float> result;
-    bool is_set = false;
-    process(SKID_BONUS_TIME, &result, &is_set);
-    if (!is_set)
-        Log::fatal("AbstractCharacteristic", "Can't get characteristic %s",
-                    getName(SKID_BONUS_TIME).c_str());
-    return result;
-}  // getSkidBonusTime
-
-// ----------------------------------------------------------------------------
-std::vector<float> AbstractCharacteristic::getSkidFadeOutTime() const
-{
-    std::vector<float> result;
-    bool is_set = false;
-    process(SKID_FADE_OUT_TIME, &result, &is_set);
-    if (!is_set)
-        Log::fatal("AbstractCharacteristic", "Can't get characteristic %s",
-                    getName(SKID_FADE_OUT_TIME).c_str());
-    return result;
-}  // getSkidFadeOutTime
-
-// ----------------------------------------------------------------------------
-std::vector<float> AbstractCharacteristic::getSkidBonusForce() const
-{
-    std::vector<float> result;
-    bool is_set = false;
-    process(SKID_BONUS_FORCE, &result, &is_set);
-    if (!is_set)
-        Log::fatal("AbstractCharacteristic", "Can't get characteristic %s",
-                    getName(SKID_BONUS_FORCE).c_str());
-    return result;
-}  // getSkidBonusForce
-
-// ----------------------------------------------------------------------------
-float AbstractCharacteristic::getSkidPhysicalJumpTime() const
-{
-    float result;
-    bool is_set = false;
-    process(SKID_PHYSICAL_JUMP_TIME, &result, &is_set);
-    if (!is_set)
-        Log::fatal("AbstractCharacteristic", "Can't get characteristic %s",
-                    getName(SKID_PHYSICAL_JUMP_TIME).c_str());
-    return result;
-}  // getSkidPhysicalJumpTime
-
-// ----------------------------------------------------------------------------
-float AbstractCharacteristic::getSkidGraphicalJumpTime() const
-{
-    float result;
-    bool is_set = false;
-    process(SKID_GRAPHICAL_JUMP_TIME, &result, &is_set);
-    if (!is_set)
-        Log::fatal("AbstractCharacteristic", "Can't get characteristic %s",
-                    getName(SKID_GRAPHICAL_JUMP_TIME).c_str());
-    return result;
-}  // getSkidGraphicalJumpTime
-
-// ----------------------------------------------------------------------------
-float AbstractCharacteristic::getSkidPostSkidRotateFactor() const
-{
-    float result;
-    bool is_set = false;
-    process(SKID_POST_SKID_ROTATE_FACTOR, &result, &is_set);
-    if (!is_set)
-        Log::fatal("AbstractCharacteristic", "Can't get characteristic %s",
-                    getName(SKID_POST_SKID_ROTATE_FACTOR).c_str());
-    return result;
-}  // getSkidPostSkidRotateFactor
-
-// ----------------------------------------------------------------------------
-float AbstractCharacteristic::getSkidSteerFactor() const
-{
-    float result;
-    bool is_set = false;
-    process(SKID_STEER_FACTOR, &result, &is_set);
-    if (!is_set)
-        Log::fatal("AbstractCharacteristic", "Can't get characteristic %s",
-                    getName(SKID_STEER_FACTOR).c_str());
-    return result;
-}  // getSkidSteerFactor
-
-// ----------------------------------------------------------------------------
-float AbstractCharacteristic::getSkidReduceTurnMin() const
-{
-    float result;
-    bool is_set = false;
-    process(SKID_REDUCE_TURN_MIN, &result, &is_set);
-    if (!is_set)
-        Log::fatal("AbstractCharacteristic", "Can't get characteristic %s",
-                    getName(SKID_REDUCE_TURN_MIN).c_str());
-    return result;
-}  // getSkidReduceTurnMin
-
-// ----------------------------------------------------------------------------
-float AbstractCharacteristic::getSkidReduceTurnMax() const
-{
-    float result;
-    bool is_set = false;
-    process(SKID_REDUCE_TURN_MAX, &result, &is_set);
-    if (!is_set)
-        Log::fatal("AbstractCharacteristic", "Can't get characteristic %s",
-                    getName(SKID_REDUCE_TURN_MAX).c_str());
-    return result;
-}  // getSkidReduceTurnMax
-
-// ----------------------------------------------------------------------------
-bool AbstractCharacteristic::getSkidEnabled() const
-{
-    bool result;
-    bool is_set = false;
-    process(SKID_ENABLED, &result, &is_set);
-    if (!is_set)
-        Log::fatal("AbstractCharacteristic", "Can't get characteristic %s",
-                    getName(SKID_ENABLED).c_str());
-    return result;
-}  // getSkidEnabled
 
 
 /* <characteristics-end acgetter> */
