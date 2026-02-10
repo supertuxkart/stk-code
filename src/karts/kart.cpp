@@ -2741,8 +2741,8 @@ void Kart::addEnergy(float val, bool allow_negative = false)
 /** Called when the NitroHack powerup is used by the kart. **/
 void Kart::activateNitroHack()
 {
-    m_nitro_hack_ticks = stk_config->time2Ticks(m_kart_properties->getNitrohackDuration());
-    m_nitro_hack_factor = m_kart_properties->getNitrohackFactor();
+    m_nitro_hack_ticks = stk_config->time2Ticks(m_kart_properties->getNitroHackDuration());
+    m_nitro_hack_factor = m_kart_properties->getNitroHackFactor();
 }   // activateNitroHack
 
 //-----------------------------------------------------------------------------

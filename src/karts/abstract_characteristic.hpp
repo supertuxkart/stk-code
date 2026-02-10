@@ -114,6 +114,31 @@ public:
         WHEELS_DAMPING_RELAXATION,
         WHEELS_DAMPING_COMPRESSION,
 
+        // Friction
+        FRICTION_KART_FRICTION,
+
+        // Skid
+        SKID_INCREASE,
+        SKID_DECREASE,
+        SKID_MAX,
+        SKID_TIME_TILL_MAX,
+        SKID_VISUAL,
+        SKID_VISUAL_TIME,
+        SKID_REVERT_VISUAL_TIME,
+        SKID_MIN_SPEED,
+        SKID_TIME_TILL_BONUS,
+        SKID_BONUS_SPEED,
+        SKID_BONUS_TIME,
+        SKID_FADE_OUT_TIME,
+        SKID_BONUS_FORCE,
+        SKID_PHYSICAL_JUMP_TIME,
+        SKID_GRAPHICAL_JUMP_TIME,
+        SKID_POST_SKID_ROTATE_FACTOR,
+        SKID_STEER_FACTOR,
+        SKID_REDUCE_TURN_MIN,
+        SKID_REDUCE_TURN_MAX,
+        SKID_ENABLED,
+
         // Jump
         JUMP_ANIMATION_TIME,
 
@@ -135,9 +160,6 @@ public:
         PARACHUTE_LBOUND_FRACTION,
         PARACHUTE_UBOUND_FRACTION,
         PARACHUTE_MAX_SPEED,
-
-        // Friction
-        FRICTION_KART_FRICTION,
 
         // Bubblegum
         BUBBLEGUM_DURATION,
@@ -168,10 +190,10 @@ public:
         PLUNGER_IN_FACE_TIME,
 
         // Nitrohack
-        NITROHACK_DURATION,
-        NITROHACK_FACTOR,
+        NITRO_HACK_DURATION,
+        NITRO_HACK_FACTOR,
 
-        // Electro-shield
+        // Electro
         ELECTRO_DURATION,
         ELECTRO_ENGINE_MULT,
         ELECTRO_MAX_SPEED_INCREASE,
@@ -195,7 +217,6 @@ public:
         EXPLOSION_INVULNERABILITY_TIME,
 
         // Nitro
-        NITRO_DURATION,
         NITRO_ENGINE_FORCE,
         NITRO_ENGINE_MULT,
         NITRO_CONSUMPTION,
@@ -204,11 +225,11 @@ public:
         NITRO_AIR_CONTAINER,
         NITRO_MAX_SPEED_INCREASE,
         NITRO_MIN_BURST,
+        NITRO_DURATION,
         NITRO_FADE_OUT_TIME,
         NITRO_MAX,
 
         // Slipstream
-        SLIPSTREAM_DURATION_FACTOR,
         SLIPSTREAM_BASE_SPEED,
         SLIPSTREAM_LENGTH,
         SLIPSTREAM_WIDTH,
@@ -218,29 +239,8 @@ public:
         SLIPSTREAM_ADD_POWER,
         SLIPSTREAM_MIN_SPEED,
         SLIPSTREAM_MAX_SPEED_INCREASE,
+        SLIPSTREAM_DURATION_FACTOR,
         SLIPSTREAM_FADE_OUT_TIME,
-
-        // Skid
-        SKID_INCREASE,
-        SKID_DECREASE,
-        SKID_MAX,
-        SKID_TIME_TILL_MAX,
-        SKID_VISUAL,
-        SKID_VISUAL_TIME,
-        SKID_REVERT_VISUAL_TIME,
-        SKID_MIN_SPEED,
-        SKID_TIME_TILL_BONUS,
-        SKID_BONUS_SPEED,
-        SKID_BONUS_TIME,
-        SKID_FADE_OUT_TIME,
-        SKID_BONUS_FORCE,
-        SKID_PHYSICAL_JUMP_TIME,
-        SKID_GRAPHICAL_JUMP_TIME,
-        SKID_POST_SKID_ROTATE_FACTOR,
-        SKID_STEER_FACTOR,
-        SKID_REDUCE_TURN_MIN,
-        SKID_REDUCE_TURN_MAX,
-        SKID_ENABLED,
 
         /* <characteristics-end enum> */
 
@@ -314,6 +314,29 @@ public:
     float getWheelsDampingRelaxation() const;
     float getWheelsDampingCompression() const;
 
+    float getFrictionKartFriction() const;
+
+    float getSkidIncrease() const;
+    float getSkidDecrease() const;
+    float getSkidMax() const;
+    float getSkidTimeTillMax() const;
+    float getSkidVisual() const;
+    float getSkidVisualTime() const;
+    float getSkidRevertVisualTime() const;
+    float getSkidMinSpeed() const;
+    std::vector<float> getSkidTimeTillBonus() const;
+    std::vector<float> getSkidBonusSpeed() const;
+    std::vector<float> getSkidBonusTime() const;
+    std::vector<float> getSkidFadeOutTime() const;
+    std::vector<float> getSkidBonusForce() const;
+    float getSkidPhysicalJumpTime() const;
+    float getSkidGraphicalJumpTime() const;
+    float getSkidPostSkidRotateFactor() const;
+    float getSkidSteerFactor() const;
+    float getSkidReduceTurnMin() const;
+    float getSkidReduceTurnMax() const;
+    bool getSkidEnabled() const;
+
     float getJumpAnimationTime() const;
 
     float getLeanMax() const;
@@ -331,8 +354,6 @@ public:
     float getParachuteLboundFraction() const;
     float getParachuteUboundFraction() const;
     float getParachuteMaxSpeed() const;
-
-    float getFrictionKartFriction() const;
 
     float getBubblegumDuration() const;
     float getBubblegumSpeedFraction() const;
@@ -358,8 +379,8 @@ public:
     float getPlungerBandFadeOutTime() const;
     float getPlungerInFaceTime() const;
 
-    float getNitrohackDuration() const;
-    float getNitrohackFactor() const;
+    float getNitroHackDuration() const;
+    float getNitroHackFactor() const;
 
     float getElectroDuration() const;
     float getElectroEngineMult() const;
@@ -380,7 +401,6 @@ public:
     float getExplosionRadius() const;
     float getExplosionInvulnerabilityTime() const;
 
-    float getNitroDuration() const;
     float getNitroEngineForce() const;
     float getNitroEngineMult() const;
     float getNitroConsumption() const;
@@ -389,10 +409,10 @@ public:
     float getNitroAirContainer() const;
     float getNitroMaxSpeedIncrease() const;
     float getNitroMinBurst() const;
+    float getNitroDuration() const;
     float getNitroFadeOutTime() const;
     float getNitroMax() const;
 
-    float getSlipstreamDurationFactor() const;
     float getSlipstreamBaseSpeed() const;
     float getSlipstreamLength() const;
     float getSlipstreamWidth() const;
@@ -402,28 +422,8 @@ public:
     float getSlipstreamAddPower() const;
     float getSlipstreamMinSpeed() const;
     float getSlipstreamMaxSpeedIncrease() const;
+    float getSlipstreamDurationFactor() const;
     float getSlipstreamFadeOutTime() const;
-
-    float getSkidIncrease() const;
-    float getSkidDecrease() const;
-    float getSkidMax() const;
-    float getSkidTimeTillMax() const;
-    float getSkidVisual() const;
-    float getSkidVisualTime() const;
-    float getSkidRevertVisualTime() const;
-    float getSkidMinSpeed() const;
-    std::vector<float> getSkidTimeTillBonus() const;
-    std::vector<float> getSkidBonusSpeed() const;
-    std::vector<float> getSkidBonusTime() const;
-    std::vector<float> getSkidFadeOutTime() const;
-    std::vector<float> getSkidBonusForce() const;
-    float getSkidPhysicalJumpTime() const;
-    float getSkidGraphicalJumpTime() const;
-    float getSkidPostSkidRotateFactor() const;
-    float getSkidSteerFactor() const;
-    float getSkidReduceTurnMin() const;
-    float getSkidReduceTurnMax() const;
-    bool getSkidEnabled() const;
 
     /* <characteristics-end acdefs> */
 };
