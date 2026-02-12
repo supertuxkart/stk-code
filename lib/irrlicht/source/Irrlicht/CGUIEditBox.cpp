@@ -337,11 +337,7 @@ bool CGUIEditBox::processKey(const SEvent& event)
 				const s32 realmend = MarkBegin < MarkEnd ? MarkEnd : MarkBegin;
 
 				// add new character
-#ifdef _IRR_COMPILE_WITH_WINDOWS_DEVICE_
-				const wchar_t* p = Operator->getTextFromClipboard();
-#else
 				const c8* p = Operator->getTextFromClipboard();
-#endif
 				if (p)
 				{
 					if (MarkBegin == MarkEnd)
