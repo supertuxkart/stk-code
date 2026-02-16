@@ -112,6 +112,8 @@ public:
 
 	//! Returns the height per line (including padding between 2 lines)
 	virtual s32 getHeightPerLine() const = 0;
+	virtual s32 getHeightPerGlyph() const = 0;
+
 
 	//! Define which characters should not be drawn by the font.
 	/** For example " " would not draw any space which is usually blank in
