@@ -310,8 +310,9 @@ void OptionsScreenDevice::updateInputButtons()
         {
             if (item == "none") 
             {
-                actions->markItemBlue( KartActionStrings[action] );
-                continue; 
+                // Use the theme-defined emphasis-color to bring attention to the missing binding
+                actions->emphasisItem(KartActionStrings[action]);
+                continue;
             }
             currently_used_keys.insert( item );
             if (m_config->isKeyboard()
