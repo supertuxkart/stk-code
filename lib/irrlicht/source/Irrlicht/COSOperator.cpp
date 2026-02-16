@@ -54,40 +54,12 @@ const core::stringc& COSOperator::getOperatingSystemVersion() const
 }
 
 
+void COSOperator::copyToClipboard(const char* text) const{
+#if defined(_IRR_COMPILE_WITH_SDL_DEVICE_)
+	SDL_SetClipboardText(text);
+	return;
 //! copies text to the clipboard
-#if defined(_IRR_COMPILE_WITH_WINDOWS_DEVICE_)
-void COSOperator::copyToClipboard(const wchar_t* text) const
-{
-	if (wcslen(text)==0)
-		return;
-
-// Windows version
-#if defined(_IRR_XBOX_PLATFORM_)
-#elif defined(_IRR_WINDOWS_API_)
-	if (!OpenClipboard(NULL) || text == 0)
-		return;
-
-	EmptyClipboard();
-
-	HGLOBAL clipbuffer;
-	wchar_t * buffer;
-
-	clipbuffer = GlobalAlloc(GMEM_DDESHARE, wcslen(text)*sizeof(wchar_t) + sizeof(wchar_t));
-	buffer = (wchar_t*)GlobalLock(clipbuffer);
-
-	wcscpy(buffer, text);
-
-	GlobalUnlock(clipbuffer);
-	SetClipboardData(CF_UNICODETEXT, clipbuffer); //Windwos converts between CF_UNICODETEXT and CF_TEXT automatically.
-	CloseClipboard();
-
 #else
-
-#endif
-}
-#else
-void COSOperator::copyToClipboard(const c8* text) const
-{
 	if (strlen(text)==0)
 		return;
 
@@ -100,83 +72,74 @@ void COSOperator::copyToClipboard(const c8* text) const
 	EmptyClipboard();
 
 	HGLOBAL clipbuffer;
-	char * buffer;
 
-	clipbuffer = GlobalAlloc(GMEM_DDESHARE, strlen(text)+1);
-	buffer = (char*)GlobalLock(clipbuffer);
-
-	strcpy(buffer, text);
+	int widelen = MultiByteToWideChar(CP_UTF8, MB_PRECOMPOSED, text, -1, nullptr, 0);
+	if(widelen > 0)
+	{
+		clipbuffer = GlobalAlloc(GMEM_DDESHARE, widelen*sizeof(wchar_t));
+		wchar_t* buffer = (wchar_t*)GlobalLock(clipbuffer);
+		MultiByteToWideChar(CP_UTF8, MB_PRECOMPOSED, text, -1, buffer, widelen);
+		SetClipboardData(CF_UNICODETEXT, clipbuffer);
+	}
+	else
+	{	// if MultiByteToWideChar fails, fallback to the old behaviour.
+		clipbuffer = GlobalAlloc(GMEM_DDESHARE, strlen(text)+1);
+		char* buffer = (char*)GlobalLock(clipbuffer);
+		strcpy(buffer, text);
+		SetClipboardData(CF_TEXT, clipbuffer);
+	}
 
 	GlobalUnlock(clipbuffer);
-	SetClipboardData(CF_TEXT, clipbuffer);
 	CloseClipboard();
 
 // MacOSX version
 #elif defined(_IRR_COMPILE_WITH_OSX_DEVICE_)
 
 	OSXCopyToClipboard(text);
-	
-#elif defined(_IRR_COMPILE_WITH_SDL_DEVICE_)
-	SDL_SetClipboardText(text);
+#endif
 #endif
 }
-#endif
-
 
 //! gets text from the clipboard
 //! \return Returns 0 if no string is in there.
-#if defined(_IRR_COMPILE_WITH_WINDOWS_DEVICE_)
-const wchar_t* COSOperator::getTextFromClipboard() const
+const char* COSOperator::getTextFromClipboard() const
 {
-#if defined(_IRR_XBOX_PLATFORM_)
+#if defined(_IRR_COMPILE_WITH_SDL_DEVICE_)
+	return SDL_GetClipboardText();
+#elif defined(_IRR_XBOX_PLATFORM_)
 		return 0;
 #elif defined(_IRR_WINDOWS_API_)
 	if (!OpenClipboard(NULL))
 		return 0;
 
-	wchar_t * buffer = 0;
+	wchar_t * widebuffer = 0;
+	char buffer[1445];
 
 	HANDLE hData = GetClipboardData( CF_UNICODETEXT ); //Windwos converts between CF_UNICODETEXT and CF_TEXT automatically.
-	buffer = (wchar_t*)GlobalLock( hData );
+	widebuffer = (wchar_t*)GlobalLock( hData );
+	
+	int widelen = wcslen(widebuffer)+1;
+	widelen = (widelen < 360 ? widelen : 360); // limit to max user message size.
+	int bufferlen = WideCharToMultiByte(CP_UTF8, WC_DEFAULTCHAR, widebuffer, widelen, nullptr, 0, NULL, NULL);
+
+	if(bufferlen > 0)
+	{
+		bufferlen = (bufferlen < 1440 ? bufferlen : 1440);
+		WideCharToMultiByte(CP_UTF8, WC_DEFAULTCHAR, widebuffer, widelen, buffer, 1444, NULL, NULL);
+		strcpy(buffer+bufferlen, "\0\0\0");
+	}
+	char * result = buffer;
+
 	GlobalUnlock( hData );
 	CloseClipboard();
-	return buffer;
-
-#else
-
-	return 0;
-#endif
-}
-#else
-const c8* COSOperator::getTextFromClipboard() const
-{
-#if defined(_IRR_XBOX_PLATFORM_)
-		return 0;
-#elif defined(_IRR_WINDOWS_API_)
-	if (!OpenClipboard(NULL))
-		return 0;
-
-	char * buffer = 0;
-
-	HANDLE hData = GetClipboardData( CF_TEXT );
-	buffer = (char*)GlobalLock( hData );
-	GlobalUnlock( hData );
-	CloseClipboard();
-	return buffer;
+	return result;
 
 #elif defined(_IRR_COMPILE_WITH_OSX_DEVICE_)
 	return (OSXCopyFromClipboard());
-	
-	
-
-#elif defined(_IRR_COMPILE_WITH_SDL_DEVICE_)
-	return SDL_GetClipboardText();
 #else
-
 	return 0;
 #endif
 }
-#endif
 
 
 } // end namespace
