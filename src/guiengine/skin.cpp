@@ -2443,12 +2443,27 @@ void Skin::drawTooltip(Widget* widget, bool atMouse)
     irr::gui::ScalableFont* font = GUIEngine::getSmallFont();
     core::dimension2d<u32> size =
         font->getDimension(widget->getTooltipText().c_str());
+    
     core::position2di pos(widget->m_x + 15, widget->m_y + widget->m_h);
+    const core::dimension2d<u32> screen_size = irr_driver->getActualScreenSize();
+    const int margin = 10; // Space from screen edges so tooltip doesn't get cut off
 
     if (atMouse)
     {
-        pos = irr_driver->getDevice()->getCursorControl()->getPosition()
-            + core::position2di(10 - size.Width / 2, 20);
+        pos = irr_driver->getDevice()->getCursorControl()->getPosition();
+        pos.X -= size.Width / 2;
+        pos.Y += 20;
+    }
+
+    // Fix horizontal position
+    if (pos.X + (int)size.Width > (int)screen_size.Width - margin)
+    {
+        pos.X = (int)screen_size.Width - size.Width - margin;
+    }
+
+    if (pos.X < margin)
+    {
+        pos.X = margin;
     }
 
     core::recti r(pos, size);
