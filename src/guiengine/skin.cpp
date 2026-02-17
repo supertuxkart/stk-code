@@ -2446,7 +2446,9 @@ void Skin::drawTooltip(Widget* widget, bool atMouse)
     
     core::position2di pos(widget->m_x + 15, widget->m_y + widget->m_h);
     const core::dimension2d<u32> screen_size = irr_driver->getActualScreenSize();
-    const int margin = 10; // Space from screen edges so tooltip doesn't get cut off
+    const BoxRenderParams& params = SkinConfig::m_render_params["tooltip::neutral"];
+    const int margin = params.m_right_border; // Space from screen edges so tooltip doesn't get cut off
+    
 
     if (atMouse)
     {
@@ -2464,6 +2466,16 @@ void Skin::drawTooltip(Widget* widget, bool atMouse)
     if (pos.X < margin)
     {
         pos.X = margin;
+    }
+
+    if (pos.Y < margin) 
+    {
+        pos.Y = margin;
+    }
+
+    if (pos.Y + (int)size.Height > (int)screen_size.Height - margin)
+    {
+        pos.Y = (int)screen_size.Height - (int)size.Height - margin - 20;
     }
 
     core::recti r(pos, size);
