@@ -2446,9 +2446,18 @@ void Skin::drawTooltip(Widget* widget, bool atMouse)
     
     core::position2di pos(widget->m_x + 15, widget->m_y + widget->m_h);
     const core::dimension2d<u32> screen_size = irr_driver->getActualScreenSize();
-    const BoxRenderParams& params = SkinConfig::m_render_params["tooltip::neutral"];
-    const int margin = params.m_right_border; // Space from screen edges so tooltip doesn't get cut off
-    
+    BoxRenderParams& params = SkinConfig::m_render_params["tooltip::neutral"];
+    // Space from the screen's edge so the tooltip doesn't get cut off
+    int h_margin = std::max(params.m_left_border, params.m_right_border)
+                         * params.m_hborder_out_portion;
+    int v_margin = std::max(params.m_top_border, params.m_bottom_border);
+
+    // Account for the tooltip borders being potentially scaled down on small resolutions
+    // We also add 2 to have a small cushion between tooltip and screen border.
+    int texture_h = params.getImage()->getSize().Height;
+    const float yscale = std::min<float>(1.0, (float)(size.Height)/texture_h);
+    h_margin = 2 + h_margin * yscale;
+    v_margin = 2 + v_margin * yscale;
 
     if (atMouse)
     {
@@ -2457,26 +2466,19 @@ void Skin::drawTooltip(Widget* widget, bool atMouse)
         pos.Y += 20;
     }
 
-    // Fix horizontal position
-    if (pos.X + (int)size.Width > (int)screen_size.Width - margin)
-    {
-        pos.X = (int)screen_size.Width - size.Width - margin;
-    }
+    // Prevent horizontal overflows
+    if (pos.X + (int)size.Width > (int)screen_size.Width - h_margin)
+        pos.X = (int)screen_size.Width - size.Width - h_margin;
 
-    if (pos.X < margin)
-    {
-        pos.X = margin;
-    }
+    if (pos.X < h_margin)
+        pos.X = h_margin;
 
-    if (pos.Y < margin) 
-    {
-        pos.Y = margin;
-    }
+    // Prevent vertical overflows
+    if (pos.Y < v_margin) 
+        pos.Y = v_margin;
 
-    if (pos.Y + (int)size.Height > (int)screen_size.Height - margin)
-    {
-        pos.Y = (int)screen_size.Height - (int)size.Height - margin - 20;
-    }
+    if (pos.Y + (int)size.Height > (int)screen_size.Height - v_margin)
+        pos.Y = (int)screen_size.Height - (int)size.Height - v_margin - 20;
 
     core::recti r(pos, size);
     drawBoxFromStretchableTexture(widget, r,
