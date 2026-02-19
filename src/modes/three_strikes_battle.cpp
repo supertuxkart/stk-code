@@ -31,6 +31,7 @@
 #include "karts/kart_properties_manager.hpp"
 #include "physics/physics.hpp"
 #include "states_screens/race_gui_base.hpp"
+#include "states_screens/track_info_screen.hpp"
 #include "tracks/arena_graph.hpp"
 #include "tracks/arena_node.hpp"
 #include "tracks/terrain_info.hpp"
@@ -55,7 +56,7 @@ ThreeStrikesBattle::ThreeStrikesBattle() : WorldWithRank()
     m_insert_tire = 0;
 
     m_tire = irr_driver->getMesh(file_manager->getAsset(FileManager::MODEL,
-                                 "tire.spm") );
+                                "tire.spm") );
     irr_driver->grabAllTextures(m_tire);
 
     m_total_rescue = 0;
@@ -63,8 +64,36 @@ ThreeStrikesBattle::ThreeStrikesBattle() : WorldWithRank()
     m_start_time = irr_driver->getRealTime();
     m_total_hit = 0;
 
+
 }   // ThreeStrikesBattle
 
+namespace
+{
+    const int gradientLength = 9;
+    
+    const int redGradient[gradientLength + 3] =   {200,   255,   255,   255,   128,   0,     0,     0,     0,     0,    192,   200};
+    // ------------------------------------------------------------------------
+    const int greenGradient[gradientLength + 3] = {0,     100,   200,   255,   255,   255,   128,   255,   128,   0,    0,     0};
+    // ------------------------------------------------------------------------
+    const int blueGradient[gradientLength + 3] =  {0,     0,     0,     0,     0,     0,     0,     255,   255,   192,  192,   0};
+    // ------------------------------------------------------------------------
+
+    video::SColor calculateColor(int current_lives, int starting_lives)
+    {
+        float lerp_time;
+        lerp_time = float(current_lives - 1)/float(starting_lives);
+        int lerp_index = floor(lerp_time*gradientLength);
+        lerp_time = lerp_time * gradientLength - lerp_index;
+        lerp_index = lerp_index % (gradientLength + 2);
+
+        auto channelBrightness = [lerp_time, lerp_index](const int* gradient)
+        {
+            return lerp(gradient[lerp_index], gradient[lerp_index + 1], lerp_time);
+        };
+
+        return video::SColor(255, channelBrightness(redGradient), channelBrightness(greenGradient), channelBrightness(blueGradient));
+    }
+}
 //-----------------------------------------------------------------------------
 /** Initialises the three strikes battle. It sets up the data structure
  *  to keep track of points etc. for each kart.
@@ -98,11 +127,11 @@ ThreeStrikesBattle::~ThreeStrikesBattle()
 void ThreeStrikesBattle::reset(bool restart)
 {
     WorldWithRank::reset(restart);
-
+    
     float next_spawn_time =
-        RaceManager::get()->getDifficulty() == RaceManager::DIFFICULTY_BEST ? 40.0f :
-        RaceManager::get()->getDifficulty() == RaceManager::DIFFICULTY_HARD ? 30.0f :
-        RaceManager::get()->getDifficulty() == RaceManager::DIFFICULTY_MEDIUM ?
+    RaceManager::get()->getDifficulty() == RaceManager::DIFFICULTY_BEST ? 40.0f :
+    RaceManager::get()->getDifficulty() == RaceManager::DIFFICULTY_HARD ? 30.0f :
+    RaceManager::get()->getDifficulty() == RaceManager::DIFFICULTY_MEDIUM ?
         25.0f : 20.0f;
     m_next_sta_spawn_ticks = stk_config->time2Ticks(next_spawn_time);
 
@@ -116,7 +145,8 @@ void ThreeStrikesBattle::reset(bool restart)
         }
         else
         {
-            m_kart_info[n].m_lives = 3;
+            // Gets starting amount of lives straight from the config (please tell me if this is the best method)
+            m_kart_info[n].m_lives = UserConfigParams::m_ffa_time_limit;         
         }
 
         // no positions in this mode
@@ -130,11 +160,11 @@ void ThreeStrikesBattle::reset(bool restart)
 
             if (core::stringc(curr->getName()) == "tire1")
             {
-                curr->setVisible(true);
+                curr->setVisible(UserConfigParams::m_ffa_time_limit >= 3);
             }
             else if (core::stringc(curr->getName()) == "tire2")
             {
-                curr->setVisible(true);
+                curr->setVisible(UserConfigParams::m_ffa_time_limit >= 2);
             }
         }
 
@@ -229,10 +259,17 @@ bool ThreeStrikesBattle::kartHit(int kart_id, int hitter)
     assert(kart_id < (int)m_karts.size());
     // make kart lose a life, ignore if in profiling mode
     if (!UserConfigParams::m_arena_ai_stats)
+    {
         m_kart_info[kart_id].m_lives--;
-    else
-        m_total_hit++;
+        // Don't return the tire if 1. the checkbox says so or if 2. the kart hit itself or 3. if there is no hitter. That causes a crash otherwise.
+        if (hitter != -1 && hitter != kart_id && UserConfigParams::m_tire_steal)
+            addKartLife(hitter);
 
+    }  
+    else
+    {
+        m_total_hit++;
+    }
     // record event
     BattleEvent evt;
     evt.m_time = getTime();
@@ -316,6 +353,11 @@ bool ThreeStrikesBattle::kartHit(int kart_id, int hitter)
 
     // schedule a tire to be thrown away (but can't do it in this callback
     // because the caller is currently iterating the list of track objects)
+    // don't do this if the tire is getting stolen
+    
+    if (hitter != -1 && hitter != kart_id && UserConfigParams::m_tire_steal)
+        return true;
+    
     m_insert_tire++;
     core::vector3df wheel_pos(m_karts[kart_id]->getKartWidth()*0.5f,
                               0.0f, 0.0f);
@@ -512,25 +554,18 @@ void ThreeStrikesBattle::getKartsDisplayInfo(
     {
         RaceGUIBase::KartIconDisplayInfo& rank_info = (*info)[i];
 
-        // reset color
+        // Samples colours from a gradient at a regular interval. The colours get funky if it goes out of bound, i dont know why.        
+        
         rank_info.lap = -1;
-
-        switch(m_kart_info[i].m_lives)
+        
+        if (m_kart_info[i].m_lives == 0)
         {
-            case 3:
-                rank_info.m_color = video::SColor(255, 0, 255, 0);
-                break;
-            case 2:
-                rank_info.m_color = video::SColor(255, 255, 229, 0);
-                break;
-            case 1:
-                rank_info.m_color = video::SColor(255, 255, 0, 0);
-                break;
-            case 0:
-                rank_info.m_color = video::SColor(128, 128, 128, 0);
-                break;
+            rank_info.m_color = video::SColor(255,128,128,128);
         }
-
+        else
+        {    
+            rank_info.m_color = calculateColor(m_kart_info[i].m_lives, UserConfigParams::m_ffa_time_limit);
+        }
         std::ostringstream oss;
         oss << m_kart_info[i].m_lives;
 
@@ -542,22 +577,17 @@ void ThreeStrikesBattle::getKartsDisplayInfo(
 std::pair<int, video::SColor> ThreeStrikesBattle::getSpeedometerDigit(
                                                 const AbstractKart *kart) const
 {
+    // Samples colours from a gradient at a regular interval. The colours get funky if it goes out of bound, i dont know why.
+        
     video::SColor color = video::SColor(255, 255, 255, 255);
     int id = kart->getWorldKartId();
-    switch(m_kart_info[id].m_lives)
+    if (m_kart_info[id].m_lives == 0)
     {
-        case 3:
-            color = video::SColor(255, 0, 255, 0);
-            break;
-        case 2:
-            color = video::SColor(255, 255, 229, 0);
-            break;
-        case 1:
-            color = video::SColor(255, 255, 0, 0);
-            break;
-        case 0:
-            color = video::SColor(255, 128, 128, 128);
-            break;
+        color = video::SColor(255,128,128,128);
+    }
+    else
+    { 
+        color = calculateColor(m_kart_info[id].m_lives, UserConfigParams::m_ffa_time_limit);
     }
     return std::make_pair(m_kart_info[id].m_lives, color);
 }   // getSpeedometerDigit
