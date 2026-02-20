@@ -2045,7 +2045,7 @@ void ServerLobby::startSelection(const Event *event)
             if (ServerConfig::m_auto_game_time_ratio > 0.0f)
             {
                 m_default_vote->m_num_laps =
-                    (uint8_t)(fmaxf(1.0f, (float)t->getDefaultNumberOfLaps() *
+                    (uint16_t)(fmaxf(1.0f, (float)t->getDefaultNumberOfLaps() *
                     ServerConfig::m_auto_game_time_ratio));
             }
             else if (m_fixed_laps != -1)
@@ -2070,16 +2070,16 @@ void ServerLobby::startSelection(const Event *event)
             if (m_game_setup->isSoccerGoalTarget())
             {
                 m_default_vote->m_num_laps =
-                    (uint8_t)(UserConfigParams::m_num_goals);
+                    (uint16_t)(UserConfigParams::m_num_goals);
                 if (m_default_vote->m_num_laps > 10)
-                    m_default_vote->m_num_laps = (uint8_t)5;
+                    m_default_vote->m_num_laps = (uint16_t)5;
             }
             else
             {
                 m_default_vote->m_num_laps =
-                    (uint8_t)(UserConfigParams::m_soccer_time_limit);
+                    (uint16_t)(UserConfigParams::m_soccer_time_limit);
                 if (m_default_vote->m_num_laps > 15)
-                    m_default_vote->m_num_laps = (uint8_t)7;
+                    m_default_vote->m_num_laps = (uint16_t)7;
             }
             m_default_vote->m_reverse = rg.get(2) == 0;
             break;
@@ -3211,13 +3211,13 @@ void ServerLobby::handlePlayerVote(Event* event)
         if (ServerConfig::m_auto_game_time_ratio > 0.0f)
         {
             vote.m_num_laps =
-                (uint8_t)(fmaxf(1.0f, (float)t->getDefaultNumberOfLaps() *
+                (uint16_t)(fmaxf(1.0f, (float)t->getDefaultNumberOfLaps() *
                 ServerConfig::m_auto_game_time_ratio));
         }
         else if (m_fixed_laps != -1)
             vote.m_num_laps = m_fixed_laps;
         else if (vote.m_num_laps == 0 || vote.m_num_laps > 20)
-            vote.m_num_laps = (uint8_t)3;
+            vote.m_num_laps = (uint16_t)3;
         if (!t->reverseAvailable() && vote.m_reverse)
             vote.m_reverse = false;
     }
@@ -3227,21 +3227,21 @@ void ServerLobby::handlePlayerVote(Event* event)
         {
             if (ServerConfig::m_auto_game_time_ratio > 0.0f)
             {
-                vote.m_num_laps = (uint8_t)(ServerConfig::m_auto_game_time_ratio *
+                vote.m_num_laps = (uint16_t)(ServerConfig::m_auto_game_time_ratio *
                                             UserConfigParams::m_num_goals);
             }
             else if (vote.m_num_laps > 10)
-                vote.m_num_laps = (uint8_t)5;
+                vote.m_num_laps = (uint16_t)5;
         }
         else
         {
             if (ServerConfig::m_auto_game_time_ratio > 0.0f)
             {
-                vote.m_num_laps = (uint8_t)(ServerConfig::m_auto_game_time_ratio *
+                vote.m_num_laps = (uint16_t)(ServerConfig::m_auto_game_time_ratio *
                                             UserConfigParams::m_soccer_time_limit);
             }
             else if (vote.m_num_laps > 15)
-                vote.m_num_laps = (uint8_t)7;
+                vote.m_num_laps = (uint16_t)7;
         }
     }
     else if (RaceManager::get()->getMinorMode() ==
