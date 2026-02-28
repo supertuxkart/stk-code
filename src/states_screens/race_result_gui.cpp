@@ -1508,17 +1508,22 @@ void RaceResultGUI::displayOneEntry(unsigned int x, unsigned int y,
         // -------------------
         if (ri->m_new_points > 0)
         {
-            core::recti dest_rect = core::recti(current_x, y,
-                current_x + 100, y + 10);
-            core::stringw point_string = core::stringw("+")
-                + core::stringw((int)ri->m_new_points);
-            // With mono-space digits space has the same width as each digit,
-            // so we can simply fill up the string with spaces to get the
-            // right aligned.
-            while (point_string.size() < 3)
-                point_string = core::stringw(" ") + point_string;
-            m_font->draw(point_string, dest_rect, color, false, false, NULL,
-                true /* ignoreRTL */);
+            int displayed_new_points = ri->m_new_overall_points - (int)(ri->m_current_displayed_points);
+            
+            if (displayed_new_points > 0)
+            {
+                core::recti dest_rect = core::recti(current_x, y,
+                    current_x + 100, y + 10);
+                core::stringw point_string = core::stringw("+")
+                    + core::stringw(displayed_new_points);
+                // With mono-space digits space has the same width as each digit,
+                // so we can simply fill up the string with spaces to get the
+                // right aligned.
+                while (point_string.size() < 3)
+                    point_string = core::stringw(" ") + point_string;
+                m_font->draw(point_string, dest_rect, color, false, false, NULL,
+                    true /* ignoreRTL */);
+            }
         }
         current_x += m_width_new_points + m_width_column_space;
 
