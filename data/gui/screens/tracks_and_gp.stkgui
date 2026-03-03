@@ -18,7 +18,7 @@
                 <spacer width="100%" height="1%" />
 
                 <div width="100%" height="16%" layout="horizontal-row" >
-                    <small-header width="35%" height="100%" I18N="In the track and grand prix selection screen" text="All Tracks"
+                    <small-header width="35%" height="100%" I18N="In the track and grand prix selection screen" text="Tracks"
                             align="center" text_align="center" />
                     <textbox width="22%" align="center" id="search"/>
 

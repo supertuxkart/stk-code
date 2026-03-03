@@ -4,7 +4,7 @@
 
     <div id="all-track" x="1%" y="1%" width="60%" height="88%" layout="vertical-row" >
         
-        <header height="8%" width="80%" I18N="In the track selection screen" text="All Tracks"
+        <header height="8%" width="80%" I18N="In the track selection screen" text="Tracks"
                 align="center" text_align="center" />
         <spacer width="100%" height="1%" />
         <box proportion="1" width="100%" layout="vertical-row" padding="1">
