@@ -48,7 +48,7 @@ struct btWheelInfo
 		btVector3	m_wheelAxleWS; // axle in worldspace
 		bool		m_isInContact;
 		void*		m_groundObject; //could be general void* ptr
-        int         m_triangle_index; // if a triangle mesh was hit, the index of the triangle.
+        int         m_triangle_index = 0; // if a triangle mesh was hit, the index of the triangle.
 	};
 
 	RaycastInfo	m_raycastInfo;
@@ -106,11 +106,11 @@ struct btWheelInfo
 
 	void	updateWheel(const btRigidBody& chassis,RaycastInfo& raycastInfo);
 
-	btScalar	m_clippedInvContactDotSuspension;
-	btScalar	m_suspensionRelativeVelocity;
+	btScalar	m_clippedInvContactDotSuspension = 0.0f;
+	btScalar	m_suspensionRelativeVelocity = 0.0f;
 	//calculated by suspension
-	btScalar	m_wheelsSuspensionForce;
-	btScalar	m_skidInfo;
+	btScalar	m_wheelsSuspensionForce = 0.0f;
+	btScalar	m_skidInfo = 0.0f;
 
 };
 
