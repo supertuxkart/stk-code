@@ -155,6 +155,19 @@ s32 ScalableFont::getHeightPerLine() const
          * m_font_settings->getScale();
 }   // getHeightPerLine
 
+s32 ScalableFont::getHeightPerGlyph() const
+{
+    const float scale = m_face->getNativeScalingFactor() *
+        m_font_settings->getScale();
+
+    const bool border = m_font_settings->useBlackBorder() ||
+        m_font_settings->useColoredBorder();
+    const bool thin_border = m_font_settings->useThinBorder();
+    const int thickness = border ? (thin_border ? 1 : 2) : 0;
+
+    return (m_face->getGlyphMaxHeight() + thickness * 2) * scale;
+}
+
 // ----------------------------------------------------------------------------
 /** Convert text to glyph layouts for fast rendering with optional caching
  *  enabled.

@@ -95,6 +95,7 @@ public:
     virtual core::dimension2d<u32> getDimension(const wchar_t* text) const;
     // ------------------------------------------------------------------------
     virtual s32 getHeightPerLine() const;
+    virtual s32 getHeightPerGlyph() const;
     // ------------------------------------------------------------------------
     /** Calculates the index of the character in the text which is on a
      * specific position. */
@@ -127,6 +128,7 @@ public:
     virtual f32 getInverseShaping() const;
     // ------------------------------------------------------------------------
     virtual s32 getFaceFontMaxHeight() const;
+    
     // ------------------------------------------------------------------------
     virtual s32 getFaceGlyphMaxHeight() const;
 };

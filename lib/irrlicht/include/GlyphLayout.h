@@ -105,8 +105,8 @@ inline void eraseTopLargerThan(std::vector<GlyphLayout>& gls,
 }
 
 inline core::dimension2d<u32> getGlyphLayoutsDimension(
-    const std::vector<GlyphLayout>& gls, s32 height_per_line, f32 inverse_shaping,
-    f32 scale, s32 cluster = -1)
+    const std::vector<GlyphLayout>& gls, s32 height_per_line, s32 height_per_glyph, 
+    f32 inverse_shaping, f32 scale, s32 cluster = -1)
 {
     core::dimension2d<f32> dim(0.0f, 0.0f);
     core::dimension2d<f32> this_line(0.0f, (f32)height_per_line);
@@ -148,7 +148,7 @@ inline core::dimension2d<u32> getGlyphLayoutsDimension(
             break;
     }
 
-    dim.Height += this_line.Height;
+    dim.Height += height_per_glyph;
     if (dim.Width < this_line.Width)
         dim.Width = this_line.Width;
 
@@ -328,7 +328,7 @@ inline bool getDrawOffset(const core::rect<s32>& position, bool hcenter,
     if (hcenter || vcenter || clip)
     {
         text_dimension = gui::getGlyphLayoutsDimension(
-            gls, next_line_height, inverse_shaping, scale);
+            gls, next_line_height, next_line_height, inverse_shaping, scale, -1);
 
         if (hcenter)
         {

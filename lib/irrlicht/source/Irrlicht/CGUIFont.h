@@ -81,6 +81,8 @@ public:
 	virtual void setKerningHeight (s32 kerning);
 
 	virtual s32 getHeightPerLine() const { return (s32)getDimension(L"A").Height + getKerningHeight(); }
+	virtual s32 getHeightPerGlyph() const { return (s32)getDimension(L"A").Height; }
+
 
 	//! set an Pixel Offset on Drawing ( scale position on width )
 	virtual s32 getKerningWidth(const wchar_t* thisLetter=0, const wchar_t* previousLetter=0) const;

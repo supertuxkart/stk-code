@@ -298,9 +298,9 @@ s32 CGUIStaticText::getTextHeight() const
 		return 0;
 
 	auto dim = getGlyphLayoutsDimension(m_glyph_layouts,
-		font->getHeightPerLine(), font->getInverseShaping(), font->getScale());
+		font->getHeightPerLine(), font->getHeightPerGlyph(), font->getInverseShaping(), font->getScale());
 
-	return dim.Height;
+	return dim.Height + 2 * (font->getHeightPerLine() - font->getHeightPerGlyph());
 }
 
 
@@ -311,7 +311,7 @@ s32 CGUIStaticText::getTextWidth() const
 		return 0;
 
 	auto dim = getGlyphLayoutsDimension(m_glyph_layouts,
-		font->getHeightPerLine(), font->getInverseShaping(), font->getScale());
+		font->getHeightPerLine(), font->getHeightPerGlyph(), font->getInverseShaping(), font->getScale());
 
 	return dim.Width;
 }
@@ -486,7 +486,7 @@ void CGUIStaticText::getDrawPosition(core::rect<s32>* draw_pos, bool* hcenter, c
 	core::rect<s32> r = *draw_pos;
 	IGUIFont* font = getActiveFont();
 	auto dim = getGlyphLayoutsDimension(m_glyph_layouts,
-		font->getHeightPerLine(), font->getInverseShaping(), font->getScale());
+		font->getHeightPerLine(), font->getHeightPerGlyph(), font->getInverseShaping(), font->getScale());
 
 	s32 totalHeight = dim.Height;
 	if (VAlign == EGUIA_CENTER)
