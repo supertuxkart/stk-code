@@ -82,6 +82,14 @@ public:
             url.find("http://") != std::string::npos)
         {
             setURL(url);
+            std::string illegal_chars = "/\\:*\"?<>|";
+            for(unsigned i = 0; i < m_filename.size(); i++)
+            {
+                if(illegal_chars.find(m_filename[i]) != std::string::npos)
+                {
+                    m_filename[i] = '-';
+                }
+            }
             setDownloadAssetsRequest(true);
         }
         else
