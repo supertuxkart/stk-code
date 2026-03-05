@@ -425,6 +425,7 @@ void CameraNormal::positionCamera(float dt, float above_kart, float cam_angle,
                 unsigned best = 0;
                 float best_d2 = (m_tv_cameras[0] - ball_pos).length2();
                 bool any_in_radius = false;
+                std::vector<float> camera_angles(m_tv_cameras.size());
                 // Ensure radius array matches cameras size
                 if (m_tv_radius.size() != m_tv_cameras.size())
                     m_tv_radius.assign(m_tv_cameras.size(), m_tv_default_radius);
@@ -435,7 +436,12 @@ void CameraNormal::positionCamera(float dt, float above_kart, float cam_angle,
                     float r2 = 0.0f;
                     if (i < m_tv_radius.size()) r2 = m_tv_radius[i];
                     bool in_radius = (r2 > 0.0f && d2 <= r2);
-
+                    // check angle maximal camera for switch
+                    Vec3 direction = ball_pos - m_tv_cameras[i];
+                    float horiz_dist = sqrtf(direction.x() * direction.x() + direction.z() * direction.z());
+                    float pitch_rad = atan2f(direction.y(), horiz_dist);
+                    float pitch_deg = pitch_rad * (180.0f / M_PI);
+                    camera_angles[i] = pitch_deg;
                     if (!any_in_radius)
                     {
                         // No candidate within radius yet: accept first, or switch if this one is closer
@@ -476,7 +482,31 @@ void CameraNormal::positionCamera(float dt, float above_kart, float cam_angle,
                     }
                 }
 
-                wanted_position = m_tv_cameras[(unsigned)m_tv_current_index];
+                // Check if the selected camera's angle is too low, if so use second closest
+                float pitch_deg = camera_angles[m_tv_current_index];
+                if (fabsf(pitch_deg) < 65.0f && m_tv_cameras.size() > 1)
+                {
+                    // Find second closest camera
+                    unsigned second_best = (m_tv_current_index == 0) ? 1 : 0;
+                    float second_d2 = (m_tv_cameras[second_best] - ball_pos).length2();
+                    for (unsigned i = 0; i < m_tv_cameras.size(); i++)
+                    {
+                        if (i == m_tv_current_index) continue;
+                        float d2 = (m_tv_cameras[i] - ball_pos).length2();
+                        if (d2 < second_d2)
+                        {
+                            second_d2 = d2;
+                            second_best = i;
+                        }
+                    }
+                    wanted_position = m_tv_cameras[second_best];
+                    m_tv_current_index = second_best;
+                }
+                else
+                {
+                    wanted_position = m_tv_cameras[(unsigned)m_tv_current_index];
+                }
+
                 wanted_target = ball_pos;
                 m_camera->setPosition(wanted_position.toIrrVector());
                 m_camera->setTarget(wanted_target.toIrrVector());
