@@ -27,6 +27,10 @@
 #include "ge_vulkan_scene_manager.hpp"
 #include "MoltenVK.h"
 
+#include "modes/world.hpp"
+#include "modes/world_status.hpp"
+#include "network/network_config.hpp"
+
 #include <SDL_vulkan.h>
 
 extern bool GLContextDebugBit;
@@ -982,6 +986,14 @@ bool CIrrDeviceSDL::run()
 				}
 				else if (SDL_event.window.event == SDL_WINDOWEVENT_FOCUS_LOST)
 				{
+					// During a local session, pause the race when the window loses focus.
+					WorldStatus::Phase phase;
+					if (World::getWorld())
+					{
+						phase = World::getWorld()->getPhase();
+						if (!NetworkConfig::get()->isNetworking() && phase >= WorldStatus::READY_PHASE && phase <= WorldStatus::RACE_PHASE)
+							World::getWorld()->escapePressed();
+					}
 					WindowHasFocus = false;
 				}
 				else if (SDL_event.window.event == SDL_WINDOWEVENT_MOVED)
