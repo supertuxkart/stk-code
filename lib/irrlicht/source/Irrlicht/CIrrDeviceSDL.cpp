@@ -987,10 +987,9 @@ bool CIrrDeviceSDL::run()
 				else if (SDL_event.window.event == SDL_WINDOWEVENT_FOCUS_LOST)
 				{
 					// During a local session, pause the race when the window loses focus.
-					WorldStatus::Phase phase;
 					if (World::getWorld())
 					{
-						phase = World::getWorld()->getPhase();
+						WorldStatus::Phase phase = World::getWorld()->getPhase();
 						if (!NetworkConfig::get()->isNetworking() && phase >= WorldStatus::READY_PHASE && phase <= WorldStatus::RACE_PHASE)
 							World::getWorld()->escapePressed();
 					}
@@ -1696,4 +1695,5 @@ const core::dimension2du& CIrrDeviceSDL::getRealScreenSize() const
 } // end namespace irr
 
 #endif // _IRR_COMPILE_WITH_SDL_DEVICE_
+
 
