@@ -26,7 +26,7 @@
 
                     <checkbox id="favorite" align="center"/>
                     <spacer width="1%"/>
-                    <tiny-header width="36%" height="100%" I18N="In the track and grand prix selection screen" text="Edit favorite tracks"/>
+                    <tiny-header width="36%" height="100%" I18N="In the track and grand prix selection screen" text="Edit favorites"/>
                 </div>
             </div>
 
