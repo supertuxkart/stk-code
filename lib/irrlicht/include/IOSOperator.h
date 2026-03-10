@@ -26,19 +26,11 @@ public:
 	}
 
 	//! Copies text to the clipboard
-#if defined(_IRR_COMPILE_WITH_WINDOWS_DEVICE_)
-	virtual void copyToClipboard(const wchar_t* text) const = 0;
-#else
 	virtual void copyToClipboard(const c8* text) const = 0;
-#endif
 
 	//! Get text from the clipboard
 	/** \return Returns 0 if no string is in there. */
-#if defined(_IRR_COMPILE_WITH_WINDOWS_DEVICE_)
-	virtual const wchar_t* getTextFromClipboard() const = 0;
-#else
 	virtual const c8* getTextFromClipboard() const = 0;
-#endif
 };
 
 } // end namespace
