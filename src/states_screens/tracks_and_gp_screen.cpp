@@ -29,6 +29,7 @@
 #include "io/file_manager.hpp"
 #include "race/grand_prix_data.hpp"
 #include "race/grand_prix_manager.hpp"
+#include "race/highscore_manager.hpp"
 #include "states_screens/state_manager.hpp"
 #include "states_screens/track_info_screen.hpp"
 #include "states_screens/gp_info_screen.hpp"
@@ -38,6 +39,7 @@
 #include "utils/string_utils.hpp"
 #include "utils/translation.hpp"
 
+#include <cmath>
 #include <iostream>
 
 using namespace GUIEngine;
@@ -371,8 +373,34 @@ void TracksAndGPScreen::buildTrackList()
     }
 
     tracks_widget->updateItemDisplay();
-    std::shuffle( m_random_track_list.begin(), m_random_track_list.end(),
-                  RandomGenerator::getGenerator());
+
+    // Weighted shuffle: tracks with more highscore entries are less likely
+    // to appear early. Uses the Efraimidis-Spirakis algorithm where each
+    // element gets a key = uniform_random^(1/weight) and elements are sorted
+    // by descending key.
+    std::vector<std::pair<double, std::string>> weighted_tracks;
+    auto& gen = RandomGenerator::getGenerator();
+    std::uniform_real_distribution<double> dist(0.0, 1.0);
+    for (const auto& track_id : m_random_track_list)
+    {
+        int scores = highscore_manager->getNumberOfHighscoreEntries(track_id);
+        double weight = 1.0 / (1.0 + scores);
+        if (weight < 1e-10) weight = 1e-10;
+        double u = dist(gen);
+        // Avoid log(0) by clamping u away from 0
+        if (u < 1e-10) u = 1e-10;
+        double key = std::pow(u, 1.0 / weight);
+        weighted_tracks.push_back({key, track_id});
+    }
+    std::sort(weighted_tracks.begin(), weighted_tracks.end(),
+              [](const std::pair<double, std::string>& a,
+                 const std::pair<double, std::string>& b)
+              { return a.first > b.first; });
+    m_random_track_list.clear();
+    for (const auto& wt : weighted_tracks)
+    {
+        m_random_track_list.push_back(wt.second);
+    }
 }   // buildTrackList
 
 // -----------------------------------------------------------------------------
