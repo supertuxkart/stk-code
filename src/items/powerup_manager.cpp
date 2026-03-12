@@ -893,23 +893,12 @@ PowerupManager::PowerupType PowerupManager::getRandomPowerup(unsigned int pos,
                                                              uint64_t random_number)
 {
     int powerup = m_current_item_weights.getRandomItem(pos-1, random_number);
-    if(powerup > POWERUP_LAST)
-    {
-        powerup -= (POWERUP_LAST-POWERUP_FIRST+1);
-        if(powerup > POWERUP_LAST)
-        {
-            powerup -= (POWERUP_LAST-POWERUP_FIRST+1);
-            *n = 3;
-        }
-        else
-        {
-            *n = 2;
-        }
-    }
-    else
-    {
-        *n = 1;
-    }
+    // Handle multi-items.
+    int powerup_set = powerup / (POWERUP_LAST - POWERUP_FIRST + 1);
+    powerup = powerup % (POWERUP_LAST - POWERUP_FIRST + 1);
+    // This structure is used to make it easy to mod in different values.
+    *n = (powerup_set == 0) ? 1 :
+         (powerup_set == 1) ? 2 : 3;
 
     // Prevents some items early on:
     // - Cakes right after the start destroy too much and too easily
@@ -934,7 +923,7 @@ PowerupManager::PowerupType PowerupManager::getRandomPowerup(unsigned int pos,
         }
     }
 
-    // Prevent basketballs from being received when at least a kart has
+    // Prevent basketballs from being obtained when at least a kart has
     // already finished:
     // - Avoids the first remaining kart receiving a basket ball
     // - Avoids having a very small space between the player getting the

@@ -43,7 +43,6 @@ namespace irr
 struct ModelDefinition
 {
     std::string m_model_file;
-    bool m_tangent; // obsolete, TODO remove
     const XMLNode* m_xml;
 
     /** For LOD */
@@ -54,16 +53,14 @@ struct ModelDefinition
     /** Constructor to allow storing this in STL containers */
     ModelDefinition()
     {
-        m_tangent = false;
         m_skeletal_animation = false;
         m_distance = 0;
         m_xml = NULL;
     }
 
-    ModelDefinition(const XMLNode* xml, int distance, std::string& model, bool tangent, bool skeletal_animation)
+    ModelDefinition(const XMLNode* xml, int distance, std::string& model, bool skeletal_animation)
     {
         m_model_file = model;
-        m_tangent = tangent;
         m_xml = xml;
         m_distance = distance;
         m_skeletal_animation = skeletal_animation;
