@@ -111,8 +111,8 @@ void ServerSelection::loadedFromFile()
     assert(m_server_type != NULL);
     m_server_type->m_properties[GUIEngine::PROP_WRAP_AROUND] = "true";
     m_server_type->clearLabels();
-    m_server_type->addLabel(core::stringw(_("Public servers")));
-    m_server_type->addLabel(core::stringw(_("Private servers")));
+    m_server_type->addLabel(core::stringw(_("Public server")));
+    m_server_type->addLabel(core::stringw(_("Private server")));
     m_server_type->m_properties[GUIEngine::PROP_MIN_VALUE] = "0";
     m_server_type->m_properties[GUIEngine::PROP_MAX_VALUE] = "1";
 
