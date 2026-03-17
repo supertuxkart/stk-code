@@ -20,17 +20,20 @@
 #include "graphics/camera/camera_normal.hpp"
 
 #include "audio/sfx_manager.hpp"
+#include "guiengine/engine.hpp"
 #include "config/stk_config.hpp"
 #include "config/user_config.hpp"
+#include "graphics/irr_driver.hpp"
 #include "input/device_manager.hpp"
 #include "input/input_manager.hpp"
 #include "input/multitouch_device.hpp"
-#include "modes/soccer_world.hpp"
 #include "karts/kart.hpp"
 #include "karts/explosion_animation.hpp"
 #include "karts/kart.hpp"
 #include "karts/kart_properties.hpp"
+#include "karts/max_speed.hpp"
 #include "karts/skidding.hpp"
+#include "modes/soccer_world.hpp"
 #include "tracks/track.hpp"
 #include <string>
 #include <vector>
@@ -74,8 +77,75 @@ CameraNormal::CameraNormal(Camera::CameraType type,  int camera_index,
     reset();
     m_camera->setNearValue(1.0f);
 
+    // Initialize speed lines effect variables
+    m_speed_lines_intensity = 0.0f;
+    m_speed_lines_boost_intensity = 0.0f;
+    m_speed_lines_timer = 0.0f;
+
+    // Register as boost observer
+    MaxSpeed::addBoostObserver(this);
+
     restart();
 }   // Camera
+
+//-----------------------------------------------------------------------------
+/** Destructor - unregisters from boost observer list.
+ */
+CameraNormal::~CameraNormal()
+{
+    MaxSpeed::removeBoostObserver(this);
+}   // ~CameraNormal
+
+//-----------------------------------------------------------------------------
+/** IBoostObserver callback - called when any kart activates a boost.
+ *  Triggers speed lines effect for this camera's kart.
+ *  \param kart The kart that activated the boost.
+ *  \param category The boost category.
+ *  \param add_speed The speed added by the boost.
+ *  \param duration_ticks The duration of the boost in ticks.
+ */
+void CameraNormal::onBoostActivated(Kart* kart, unsigned int category,
+                                    float add_speed, int duration_ticks)
+{
+#ifndef SERVER_ONLY
+    // Only trigger effects for THIS camera's kart (current player)
+    if (kart != m_kart) return;
+    if (GUIEngine::isNoGraphics()) return;
+
+    // Effect duration settings
+    const float EFFECT_DURATION = 2.0f;      // Speed lines last 2 seconds
+
+    // Determine intensity based on boost type (strongest takes priority)
+    float intensity = 0.0f;
+    switch (category)
+    {
+        case MaxSpeed::MS_INCREASE_ZIPPER:
+        case MaxSpeed::MS_INCREASE_GROUND_ZIPPER:
+            intensity = 1.0f;   // Strongest (zipper)
+            break;
+        case MaxSpeed::MS_INCREASE_NITRO:
+            intensity = 0.8f;   // Strong (nitro)
+            break;
+        case MaxSpeed::MS_INCREASE_SKIDDING:
+        case MaxSpeed::MS_INCREASE_RED_SKIDDING:
+        case MaxSpeed::MS_INCREASE_PURPLE_SKIDDING:
+            intensity = 0.6f;   // Medium (skid bonus)
+            break;
+        default:
+            // Other boost types (slipstream, rubber band, etc.) don't trigger effects
+            return;
+    }
+
+    // Only trigger if intensity would be stronger than current effect
+    if (intensity > m_speed_lines_intensity)
+    {
+        // Trigger speed lines effect
+        m_speed_lines_intensity = intensity;
+        m_speed_lines_boost_intensity = intensity;
+        m_speed_lines_timer = EFFECT_DURATION;
+    }
+#endif
+}   // onBoostActivated
 
 //-----------------------------------------------------------------------------
 /** Moves the camera smoothly from the current camera position (and target)
@@ -363,10 +433,62 @@ void CameraNormal::update(float dt)
 
     if (!smoothing)
     {
-        getCameraSettings(m_last_smooth_mode, &above_kart, &cam_angle, &side_way, 
+        getCameraSettings(m_last_smooth_mode, &above_kart, &cam_angle, &side_way,
                                               &distance, &smoothing, &cam_roll_angle);
         moveCamera(dt, false, cam_angle, distance);
     }
+
+#ifndef SERVER_ONLY
+    // Update speed lines and dynamic FOV effects
+    // NOTE: Effect TRIGGERING is handled by onBoostActivated() observer callback
+    // This section only handles decay of existing effects and FOV updates
+    if (!GUIEngine::isNoGraphics() && m_kart != NULL)
+    {
+        const KartProperties *kp = m_kart->getKartProperties();
+        float max_speed = kp->getEngineMaxSpeed();
+        float current_speed = m_kart->getSpeed();
+        float speed_ratio = current_speed / max_speed;
+
+        // Effect duration for decay calculation (must match onBoostActivated)
+        const float EFFECT_DURATION = 2.0f;
+
+        // Decay speed lines over time
+        if (m_speed_lines_timer > 0.0f)
+        {
+            m_speed_lines_timer -= dt;
+
+            // Smooth decay using remaining timer ratio (ease-out curve)
+            float decay = std::max(0.0f, m_speed_lines_timer / EFFECT_DURATION);
+            float display_intensity = m_speed_lines_intensity * decay;
+            float display_boost = m_speed_lines_boost_intensity * decay;
+
+            irr_driver->setSpeedIntensity(getIndex(), display_intensity, display_boost);
+        }
+        else
+        {
+            // Effect has ended - reset intensities
+            m_speed_lines_intensity = 0.0f;
+            m_speed_lines_boost_intensity = 0.0f;
+            irr_driver->setSpeedIntensity(getIndex(), 0.0f, 0.0f);
+        }
+
+        // Update dynamic FOV based on speed and any active boost
+        // Still need to poll for active boosts (not just activations) for FOV
+        Kart* kart = dynamic_cast<Kart*>(m_kart);
+        bool any_boost_active = false;
+        if (kart)
+        {
+            any_boost_active =
+                kart->getSpeedIncreaseTicksLeft(MaxSpeed::MS_INCREASE_NITRO) > 0 ||
+                kart->getSpeedIncreaseTicksLeft(MaxSpeed::MS_INCREASE_ZIPPER) > 0 ||
+                kart->getSpeedIncreaseTicksLeft(MaxSpeed::MS_INCREASE_GROUND_ZIPPER) > 0 ||
+                kart->getSpeedIncreaseTicksLeft(MaxSpeed::MS_INCREASE_SKIDDING) > 0 ||
+                kart->getSpeedIncreaseTicksLeft(MaxSpeed::MS_INCREASE_RED_SKIDDING) > 0 ||
+                kart->getSpeedIncreaseTicksLeft(MaxSpeed::MS_INCREASE_PURPLE_SKIDDING) > 0;
+        }
+        updateDynamicFoV(dt, speed_ratio, any_boost_active);
+    }
+#endif
 }   // update
 
 // ----------------------------------------------------------------------------

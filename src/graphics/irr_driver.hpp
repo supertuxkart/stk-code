@@ -325,6 +325,13 @@ public:
     /** Use motion blur for a short time */
     void giveBoost(unsigned int cam_index) { m_renderer->giveBoost(cam_index);}
     // ------------------------------------------------------------------------
+    /** Set speed lines effect intensity for a camera */
+    void setSpeedIntensity(unsigned int cam_index, float speed_intensity,
+                           float boost_intensity)
+    {
+        m_renderer->setSpeedIntensity(cam_index, speed_intensity, boost_intensity);
+    }
+    // ------------------------------------------------------------------------
     inline core::vector3df getWind()  {return m_wind->getWind();}
 
     // -----------------------------------------------------------------------
