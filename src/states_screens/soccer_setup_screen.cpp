@@ -439,7 +439,8 @@ void SoccerSetupScreen::updateKartViewsLayout()
     // Compute/get some dimensions
     const int nb_columns = 2;   // two karts maximum per column
     const int kart_area_width = (int)((central_div->m_w) / 2 * 0.8f); // size of one half of the screen with some margin
-    const int kart_view_size = kart_area_width/nb_columns;  // Size (width and height) of a kart view
+    int kart_view_size = kart_area_width/nb_columns;  // Size (width and height) of a kart view
+
     const int center_x = central_div->m_x + central_div->m_w/2;
     const int center_y = central_div->m_y + central_div->m_h/2;
 
@@ -452,6 +453,19 @@ void SoccerSetupScreen::updateKartViewsLayout()
     // - number of rows displayed for each team = ceil(nb_karts_per_team[i] / nb_columns)
     const int nb_rows_per_team[2] = { (nb_karts_per_team[0] + nb_columns - 1) / nb_columns,
                                       (nb_karts_per_team[1] + nb_columns - 1) / nb_columns};
+
+    // Restrict the kart view size based on the available window height.
+    int max_rows = nb_rows_per_team[0] > nb_rows_per_team[1] ? nb_rows_per_team[0] : nb_rows_per_team[1];
+    if (max_rows > 0) 
+    {
+        const int kart_area_height = (int)(central_div->m_h * 0.8f);
+        const int max_size_by_height = kart_area_height / max_rows;
+        
+        if (max_size_by_height < kart_view_size)
+        {
+            kart_view_size = max_size_by_height;
+        }
+    }                                  
     // - where to start vertically
     const int start_y[2] = {center_y - nb_rows_per_team[0] * kart_view_size / 2,
                             center_y - nb_rows_per_team[1] * kart_view_size / 2};
