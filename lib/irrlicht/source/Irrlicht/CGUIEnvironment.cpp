@@ -544,6 +544,16 @@ bool CGUIEnvironment::postEventFromUser(const SEvent& event)
 		if (Focus && Focus->OnEvent(event))
 			return true;
 
+		// If the hovered element is different from the focused one,
+		// send mouse wheel events to the hovered element as well so
+		// that scrolling works without clicking the element first.
+		if (event.MouseInput.Event == EMIE_MOUSE_WHEEL &&
+			Hovered && Hovered != Focus)
+		{
+			if (Hovered->OnEvent(event))
+				return true;
+		}
+
 		// focus could have died in last call
 		if (!Focus && Hovered)
 		{

@@ -31,6 +31,7 @@ namespace GUIEngine
     class CheckBoxWidget;
     class IconButtonWidget;
     class LabelWidget;
+    class SpinnerWidget;
 }
 
 namespace irr
@@ -61,7 +62,7 @@ private:
 
     std::vector<std::shared_ptr<Server> > m_servers;
 
-    GUIEngine::CheckBoxWidget* m_private_server;
+    GUIEngine::SpinnerWidget* m_server_type;
     GUIEngine::CheckBoxWidget* m_ipv6;
     GUIEngine::IconButtonWidget* m_reload_widget;
     GUIEngine::IconButtonWidget* m_bookmark_widget;

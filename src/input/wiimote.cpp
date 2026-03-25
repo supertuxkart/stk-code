@@ -78,7 +78,10 @@ void Wiimote::resetIrrEvent()
  */
 void Wiimote::update()
 {
-    float normalized_angle = -(m_wiimote_handle->accel.y-128)
+    int zero_y = m_wiimote_handle->accel_calib.cal_zero.y;
+    if (zero_y == 0) zero_y = 128; 
+
+    float normalized_angle = -(m_wiimote_handle->accel.y-zero_y)
                            /  UserConfigParams::m_wiimote_raw_max;
 
     if(normalized_angle<-1.0f)
