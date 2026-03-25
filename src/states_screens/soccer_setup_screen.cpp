@@ -39,6 +39,7 @@
 #include "utils/translation.hpp"
 
 #include <IrrlichtDevice.h>
+#include <cmath>
 
 using namespace GUIEngine;
 
@@ -114,11 +115,21 @@ void SoccerSetupScreen::beforeAddingWidget()
     bool multitouch_enabled = (UserConfigParams::m_multitouch_active == 1 &&
         irr_driver->getDevice()->supportsTouchDevice()) ||
         UserConfigParams::m_multitouch_active > 1;
-    if (multitouch_enabled)
+
+    // If a device doesn't use the multitouch GUI, it supports some form of left/right input
+    // The original message is safer, as some devices are incorrectly reported as touch enabled.
+    // Additionally, splitscreen play is incompatible with touch controls.
+    Widget* team = getWidget<Widget>("choose_team");
+    if (multitouch_enabled && UserConfigParams::m_multitouch_draw_gui &&
+        RaceManager::get()->getNumLocalPlayers() == 1)
     {
-        Widget* team = getWidget<Widget>("choose_team");
         //I18N: In soccer setup screen
-        team->setText(_("Press red or blue soccer icon to change team"));
+        team->setText(_("Press the red ball or the blue ball to change team."));
+    }
+    else
+    {
+        //I18N: In soccer setup screen
+        team->setText(_("Use left/right to choose your team and press 'Fire' or 'Select'."));
     }
     Widget* central_div = getWidget<Widget>("central_div");
 
