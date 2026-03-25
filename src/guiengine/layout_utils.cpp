@@ -81,22 +81,32 @@ namespace LayoutUtils
             float area_factor = std::min(taken_area/total_area, 1.0f);
             area_factor = 0.9f + area_factor * 0.1f;
     
-            // We compute the final score by combining the three elements,
-            // with an extra penalty for missing the target number of icons
-            // (which helps to avoid layouts that barely miss the target)
-            float score = visible_items_score * icon_size_ratio * area_factor;
-            if (visible_items < maxIcons)
-                score *= 0.7f;
-            if (visible_items < (maxIcons/2))
-                score *= 0.9f;
-            if (visible_items < (maxIcons/3))
-                score *= 0.9f;
-            if (visible_items < (maxIcons/4))
-                score *= 0.9f;
+            // We compute an extra penalty for missing the target number of icons.
+            // It helps to avoid layouts that barely miss the target, or that
+            // require excessive scrolling.
+            float target_miss = 1.0f;
+
+            if (visible_items < (maxIcons))
+            {
+                target_miss *= 0.7f;
+
+                // Each time an additional scroll input is needed to go through
+                // all elements, we add a penalty.
+                // We only start when more than 2 screen-widths are required.
+                int hidden_items = maxIcons - 2 * visible_items;
+                while (hidden_items > 0)
+                {
+                    hidden_items -= rowCount;
+                    target_miss *= 0.982f;
+                }
+            }
+
+            // We compute the final score by combining all four elements.
+            float score = visible_items_score * icon_size_ratio * area_factor * target_miss;
             
-            /*Log::info("LayoutUtils", "rows = %d; height ratio = %f; visible items = %d; area factor = %f; "
-                "icon_height = %f; icon size ratio = %f; score = %f", rowCount, visible_items, test_height_ratio,
-                area_factor, icon_height, icon_size_ratio, score);*/
+            /*Log::info("LayoutUtils", "rows = %d; height ratio = %.2f; visible items = %d; area factor = %.3f; "
+                "icon_height = %.1f; icon size ratio = %.3f; target miss = %.3f, score = %f", rowCount, visible_items,
+                test_height_ratio, area_factor, icon_height, icon_size_ratio, target_miss, score);*/
     
             if (score > max_score_so_far)
             {

@@ -234,12 +234,12 @@ void DynamicRibbonWidget::buildInternalStructure()
 {
     const float aspect_ratio = (float)m_child_width / (float)m_child_height;
     // FIXME: The height of the tabs that are associated with a ribbon widget
-    // don't change smoothly, as a result the available areas for the ribbon
+    // doesn't change smoothly, as a result the available areas for the ribbon
     // icons may decrease when increasing screen height
     int item_shown_target = m_item_count_hint;
 
     if (item_shown_target < 1)
-        item_shown_target = (int) m_items.size();
+        item_shown_target = std::max(1, (int) m_items.size());
 
     if (m_multi_row)
     {
@@ -255,10 +255,6 @@ void DynamicRibbonWidget::buildInternalStructure()
         else
         {
             float max_score_so_far = -1;
-
-            // No hint or actual number, so make assumptions
-            if (item_shown_target < 1)
-                item_shown_target = 20;
 
             for (int row_count = 1; row_count < 10; row_count++)
             {
@@ -294,10 +290,6 @@ void DynamicRibbonWidget::buildInternalStructure()
     }
     else // single-row
     {
-        // No hint or actual number, so make assumptions
-        if (item_shown_target < 1)
-            item_shown_target = 5;
-
         // Get the best score for this number of rows
         LayoutUtils::estimateRowScore(1, m_w, m_h - m_label_height, aspect_ratio,
             item_shown_target, &m_size_ratio, (float)m_child_height, 0.68f /* min size ratio */);
