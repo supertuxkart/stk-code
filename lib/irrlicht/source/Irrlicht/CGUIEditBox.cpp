@@ -12,6 +12,7 @@
 #include "rect.h"
 #include "os.h"
 #include "Keycodes.h"
+#include "SDL.h"
 
 /*
 	todo:
@@ -337,11 +338,7 @@ bool CGUIEditBox::processKey(const SEvent& event)
 				const s32 realmend = MarkBegin < MarkEnd ? MarkEnd : MarkBegin;
 
 				// add new character
-#ifdef _IRR_COMPILE_WITH_WINDOWS_DEVICE_
-				const wchar_t* p = Operator->getTextFromClipboard();
-#else
 				const c8* p = Operator->getTextFromClipboard();
-#endif
 				if (p)
 				{
 					if (MarkBegin == MarkEnd)
@@ -378,6 +375,7 @@ bool CGUIEditBox::processKey(const SEvent& event)
 				newMarkBegin = 0;
 				newMarkEnd = 0;
 				textChanged = true;
+				SDL_free((c8*)p);
 			}
 			break;
 		case IRR_KEY_HOME:
