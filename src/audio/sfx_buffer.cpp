@@ -276,7 +276,6 @@ bool SFXBuffer::loadOpusBuffer(const std::string &name, ALuint buffer)
 
     // Total samples (per channel) across all links
     ogg_int64_t total_samples = op_pcm_total(of, -1);
-    long len = (long)(total_samples * channels * 2);  // 16-bit
 
     std::unique_ptr<opus_int16[]> data(new opus_int16[total_samples * channels]);
 
