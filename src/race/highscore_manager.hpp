@@ -78,6 +78,19 @@ public:
     // ------------------------------------------------------------------------
     int highscoresSize()                { return m_all_scores.size(); }
     // ------------------------------------------------------------------------
+    /** Returns the total number of highscore entries for a given track,
+     *  across all configurations (difficulty, karts, laps, reverse). */
+    int getNumberOfHighscoreEntries(const std::string &trackName) const
+    {
+        int count = 0;
+        for (const auto& hs : m_all_scores)
+        {
+            if (hs->m_track == trackName)
+                count += hs->getNumberEntries();
+        }
+        return count;
+    }
+    // ------------------------------------------------------------------------
     void sortHighscores(bool reverse)
     {
         (reverse ? std::stable_sort(m_all_scores.rbegin(),
