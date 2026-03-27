@@ -19,8 +19,11 @@ For similar reasons, and because some features are vastly more complex than othe
     * Full translation support for server answers to chat commands, and greatly improved base English messages, by Alayan
     * Move all URLs out of translatable strings, by Alayan
     * Minor improvements to some English source strings, by Alayan and others
+* Add optional support for Opus audio files, by Abedegno
 * Support using the command line to set the user-adjustable graphical parameters that were missing as command line options, by Alayan
 * Add a command line option to directly set a graphical preset, by Alayan
+* Sanitize characters that are illegal in file names when using installaddon, by Nutzboi
+* Support calibration offsets for wiimotes, by qduff
 * Various code quality improvements and minor bugfixes, by Alayan and others
 
 ### Graphics
@@ -31,11 +34,15 @@ For similar reasons, and because some features are vastly more complex than othe
 * Add support for page-up, page-down, home and end keys in lists, by Alayan
 * Add a scrollbar to the server lobby chat, by Bcfworld
 * Better paging support in the server lobby chat, by Alayan
-* Resize kart icons on the left if the number of karts change, by Wilmaster
+* Resize kart icons on the left if the number of karts changes, by Wilmaster
 * When renaming, prefill the textbox with the current name, by Brice Albiol
+* Add tooltips for disabled options during a race, by Brice Albiol and Alayan
+* Ensure tooltips don't overflow, by Brice Albiol and Alayan
+* Allow mouse wheel scrolling if the cursor hovers over a list even if another element has focus, by Alexander Klimov
 * Display more settings in the benchmark end-screen, by Alayan
 * Prevent showing a render resolution factor in UI that's unsupported with the current renderer, by Alayan
-* Various minor UI fixes, by Alayan
+* Improvement to the layout logic for track and kart selection when having many addons, by Alayan
+* Various minor UI fixes, by Alayan and others
 
 ### Tracks and modeling
 

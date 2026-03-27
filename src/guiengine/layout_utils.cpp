@@ -21,7 +21,6 @@
 
 #include "utils/log.hpp"
 
-#include <algorithm> // FIXME CHECK
 #include <assert.h>
 #include <cmath>
 

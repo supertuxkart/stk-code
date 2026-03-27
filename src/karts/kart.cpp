@@ -1347,6 +1347,9 @@ void Kart::eliminate()
     if (m_engine_sound)
         m_engine_sound->stop();
 
+    if (m_nitro_sound->getStatus() == SFXBase::SFX_PLAYING)
+        m_nitro_sound->stop();
+
     m_eliminated = true;
 
 #ifndef SERVER_ONLY

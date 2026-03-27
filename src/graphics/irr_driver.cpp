@@ -2083,29 +2083,10 @@ void IrrDriver::doScreenShot()
                      + time_buffer+".png";
 
     if (irr_driver->getVideoDriver()->writeImageToFile(image, path.c_str(), 0))
-    {
-        RaceGUIBase* base = World::getWorld()
-                          ? World::getWorld()->getRaceGUI()
-                          : NULL;
-        if (base)
-        {
-            base->addMessage(
-                      core::stringw(("Screenshot saved to\n" + path).c_str()),
-                      NULL, 2.0f, video::SColor(255,255,255,255), true, false);
-        }   // if base
-    }
-    else
-    {
-        RaceGUIBase* base = World::getWorld()->getRaceGUI();
-        if (base)
-        {
-            base->addMessage(
-                core::stringw(("FAILED saving screenshot to\n" + path +
-                              "\n:(").c_str()),
-                NULL, 2.0f, video::SColor(255,255,255,255),
-                true, false);
-        }   // if base
-    }   // if failed writing screenshot file
+        MessageQueue::add(MessageQueue::MT_GENERIC, _("Screenshot saved to %s\n", path.c_str()));
+    else // if failed writing the screenshot file
+        MessageQueue::add(MessageQueue::MT_GENERIC, _("Failed to save the screenshot to %s\n", path.c_str()));
+
     image->drop();
 }   // doScreenShot
 
