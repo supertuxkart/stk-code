@@ -71,6 +71,9 @@ private:
     float    m_duration;
 
     bool loadVorbisBuffer(const std::string &name, ALuint buffer);
+#ifdef HAVE_OPUS
+    bool loadOpusBuffer(const std::string &name, ALuint buffer);
+#endif
 
 public:
 

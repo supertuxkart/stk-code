@@ -27,6 +27,7 @@
 #include "utils/constants.hpp"
 #include "utils/file_utils.hpp"
 #include "utils/log.hpp"
+#include "utils/string_utils.hpp"
 
 MusicOggStream::MusicOggStream(float loop_start, float loop_end)
 {
@@ -38,6 +39,11 @@ MusicOggStream::MusicOggStream(float loop_start, float loop_end)
     m_play_initialized.store(false);
     m_loop_start      = loop_start;
     m_loop_end        = loop_end;
+#ifdef HAVE_OPUS
+    m_useOpus         = false;
+    m_opusFile        = NULL;
+    m_opusHead        = NULL;
+#endif
 }   // MusicOggStream
 
 //-----------------------------------------------------------------------------
@@ -56,6 +62,29 @@ bool MusicOggStream::load(const std::string& filename)
     m_fileName = filename;
     if(m_fileName=="") return false;
 
+#ifdef HAVE_OPUS
+    std::string ext = StringUtils::getExtension(m_fileName);
+    if (ext == "opus")
+    {
+        int error = 0;
+        m_opusFile = op_open_file(m_fileName.c_str(), &error);
+        if (error != 0 || m_opusFile == NULL)
+        {
+            Log::error("MusicOgg",
+                       "Loading Music: %s failed (op_open_file error %d)",
+                       m_fileName.c_str(), error);
+            return false;
+        }
+        m_opusHead = op_head(m_opusFile, -1);
+        if (m_opusHead->channel_count == 1)
+            nb_channels = AL_FORMAT_MONO16;
+        else
+            nb_channels = AL_FORMAT_STEREO16;
+        m_useOpus = true;
+    }
+    else
+    {
+#endif
     m_oggFile = FileUtils::fopenU8Path(m_fileName, "rb");
 
     if(!m_oggFile)
@@ -109,6 +138,9 @@ bool MusicOggStream::load(const std::string& filename)
 
     if (m_vorbisInfo->channels == 1) nb_channels = AL_FORMAT_MONO16;
     else                             nb_channels = AL_FORMAT_STEREO16;
+#ifdef HAVE_OPUS
+    }
+#endif
 
     alGenBuffers(2, m_soundBuffers);
     if (check("alGenBuffers") == false) return false;
@@ -163,7 +195,23 @@ bool MusicOggStream::release()
     check("alDeleteBuffers");
 
     // Handle error correctly
-    if(!m_error) ov_clear(&m_oggStream);
+    if(!m_error)
+    {
+#ifdef HAVE_OPUS
+        if (m_useOpus)
+        {
+            if (m_opusFile)
+            {
+                op_free(m_opusFile);
+                m_opusFile = NULL;
+            }
+        }
+        else
+#endif
+        {
+            ov_clear(&m_oggStream);
+        }
+    }
 
     m_soundSource = -1;
     m_playing.store(false);
@@ -273,11 +321,23 @@ void MusicOggStream::update()
         if(!check("alSourceUnqueueBuffers")) return;
 
         active = streamIntoBuffer(buffer);
-        float cur_time = (float)ov_time_tell(&m_oggStream);
+        float cur_time;
+#ifdef HAVE_OPUS
+        if (m_useOpus)
+            cur_time = (float)(op_pcm_tell(m_opusFile) / 48000.0);
+        else
+#endif
+            cur_time = (float)ov_time_tell(&m_oggStream);
         if(!active || (m_loop_end > 0 && (m_loop_end - cur_time) < 1e-3))
         {
             // No more data, or reached loop end. Seek to loop start (causes the sound to loop)
-            ov_time_seek(&m_oggStream, m_loop_start);
+#ifdef HAVE_OPUS
+            if (m_useOpus)
+                op_pcm_seek(m_opusFile,
+                            (ogg_int64_t)(m_loop_start * 48000.0));
+            else
+#endif
+                ov_time_seek(&m_oggStream, m_loop_start);
             active = streamIntoBuffer(buffer);//now there really should be data
         }
 
@@ -314,6 +374,38 @@ void MusicOggStream::update()
 //-----------------------------------------------------------------------------
 bool MusicOggStream::streamIntoBuffer(ALuint buffer)
 {
+#ifdef HAVE_OPUS
+    if (m_useOpus)
+    {
+        // Opus decodes to 16-bit PCM samples; op_read() returns
+        // samples per channel (not bytes).
+        opus_int16 pcm[m_buffer_size / 2];  // buffer_size is in bytes
+        int max_samples = m_buffer_size / 2 / m_opusHead->channel_count;
+        int total_samples = 0;
+
+        while (total_samples < max_samples)
+        {
+            int result = op_read(m_opusFile,
+                                 pcm + total_samples * m_opusHead->channel_count,
+                                 max_samples - total_samples, NULL);
+            if (result > 0)
+                total_samples += result;
+            else if (result < 0)
+                throw errorString(result);
+            else
+                break;
+        }
+
+        if (total_samples == 0) return false;
+
+        int size_bytes = total_samples * m_opusHead->channel_count * 2;
+        // Opus always decodes at 48000 Hz
+        alBufferData(buffer, nb_channels, pcm, size_bytes, 48000);
+        check("alBufferData");
+        return true;
+    }
+#endif
+
     char pcm[m_buffer_size];
     const int isBigEndian = (IS_LITTLE_ENDIAN ? 0 : 1);
 
@@ -360,6 +452,32 @@ bool MusicOggStream::check(const char* what)
 //-----------------------------------------------------------------------------
 std::string MusicOggStream::errorString(int code)
 {
+#ifdef HAVE_OPUS
+    if (m_useOpus)
+    {
+        switch(code)
+        {
+            case OP_EREAD:
+                return std::string("Read error from media.");
+            case OP_EFAULT:
+                return std::string("Internal logic fault.");
+            case OP_EIMPL:
+                return std::string("Unimplemented feature.");
+            case OP_EINVAL:
+                return std::string("Invalid argument.");
+            case OP_ENOTFORMAT:
+                return std::string("Not an Opus file.");
+            case OP_EBADHEADER:
+                return std::string("Invalid Opus header.");
+            case OP_EVERSION:
+                return std::string("Opus version mismatch.");
+            case OP_EBADLINK:
+                return std::string("Bad Opus link.");
+            default:
+                return std::string("Unknown Opus error.");
+        }
+    }
+#endif
     switch(code)
     {
         case OV_EREAD:
