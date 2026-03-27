@@ -321,8 +321,8 @@ void MusicOggStream::update()
         if(!check("alSourceUnqueueBuffers")) return;
 
         active = streamIntoBuffer(buffer);
-#ifdef HAVE_OPUS
         float cur_time;
+#ifdef HAVE_OPUS
         if (m_useOpus)
             cur_time = (float)(op_pcm_tell(m_opusFile) / 48000.0);
         else
