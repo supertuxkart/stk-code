@@ -13,6 +13,10 @@
 #include "os.h"
 #include "Keycodes.h"
 
+#if !defined(SERVER_ONLY) && defined(_IRR_COMPILE_WITH_SDL_DEVICE_)
+#include "SDL.h"
+#endif
+
 /*
 	todo:
 	optional scrollbars
@@ -254,6 +258,10 @@ bool CGUIEditBox::OnEvent(const SEvent& event)
 
 bool CGUIEditBox::processKey(const SEvent& event)
 {
+#ifdef SERVER_ONLY
+    return false;
+#else
+
 	if (!event.KeyInput.PressedDown)
 		return false;
 
@@ -337,11 +345,7 @@ bool CGUIEditBox::processKey(const SEvent& event)
 				const s32 realmend = MarkBegin < MarkEnd ? MarkEnd : MarkBegin;
 
 				// add new character
-#ifdef _IRR_COMPILE_WITH_WINDOWS_DEVICE_
-				const wchar_t* p = Operator->getTextFromClipboard();
-#else
 				const c8* p = Operator->getTextFromClipboard();
-#endif
 				if (p)
 				{
 					if (MarkBegin == MarkEnd)
@@ -378,6 +382,7 @@ bool CGUIEditBox::processKey(const SEvent& event)
 				newMarkBegin = 0;
 				newMarkEnd = 0;
 				textChanged = true;
+				SDL_free((c8*)p);
 			}
 			break;
 		case IRR_KEY_HOME:
@@ -715,6 +720,7 @@ bool CGUIEditBox::processKey(const SEvent& event)
 	}
 
 	return true;
+#endif
 }
 
 
