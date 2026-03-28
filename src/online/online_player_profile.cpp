@@ -590,7 +590,7 @@ namespace Online
             {
                 message = _P("You have %d new friend request!",
                              "You have %d new friend requests!",
-                             friend_request_count);
+                             friend_request_count, friend_request_count);
             }
             else
             {
