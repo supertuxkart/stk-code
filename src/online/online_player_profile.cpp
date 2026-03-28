@@ -590,7 +590,8 @@ namespace Online
             {
                 message = _P("You have %d new friend request!",
                              "You have %d new friend requests!",
-                             friend_request_count, friend_request_count);
+                            /* to pick the plural form */ friend_request_count,
+                            /* to insert in the final string */ friend_request_count);
             }
             else
             {
