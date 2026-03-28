@@ -280,7 +280,7 @@ void OptionsScreenDisplay::configResolutionsList()
     {
         const float ratio = it->getRatio();
         char name[32];
-        sprintf(name, "%ix%i", it->width, it->height);
+        snprintf(name, 32, "%ix%i", it->width, it->height);
 
         core::stringw label;
         label += it->width;
@@ -352,7 +352,7 @@ void OptionsScreenDisplay::updateResolutionsList()
         assert(drw->m_rows.size() == 1);
         
         char name[128];
-        sprintf(name, "%ix%i", resolution.width, resolution.height);
+        snprintf(name, 128, "%ix%i", resolution.width, resolution.height);
         
         Widget* w = drw->m_rows[0].findWidgetNamed(name);
         

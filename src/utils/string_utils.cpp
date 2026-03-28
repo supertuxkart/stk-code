@@ -1245,14 +1245,14 @@ namespace StringUtils
         {
             float f = ((int)(n/1024.0f/1024.0f*10.0f+0.5f))/10.0f;
             char s[32];
-            sprintf(s, "%.1f", f);
+            snprintf(s, 32, "%.1f", f);
             unit = _("%s MB", s);
         }
         else if(n>1024)
         {
             float f = ((int)(n/1024.0f*10.0f+0.5f))/10.0f;
             char s[32];
-            sprintf(s, "%.1f", f);
+            snprintf(s, 32, "%.1f", f);
             unit = _("%s KB", s);
         }
         else

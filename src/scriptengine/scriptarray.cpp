@@ -32,7 +32,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <assert.h>
-#include <stdio.h> // sprintf
+#include <stdio.h> // snprintf
 #include <string>
 
 #include "scriptarray.hpp"
@@ -1308,17 +1308,10 @@ int CScriptArray::Find(asUINT startAt, void *value) const
                 char tmp[512];
 
                 if( cache && cache->eqFuncReturnCode == asMULTIPLE_FUNCTIONS )
-#if defined(_MSC_VER) && _MSC_VER >= 1500 && !defined(__S3E__)
-                    sprintf_s(tmp, 512, "Type '%s' has multiple matching opEquals or opCmp methods", subType->GetName());
-#else
-                    sprintf(tmp, "Type '%s' has multiple matching opEquals or opCmp methods", subType->GetName());
-#endif
+                    snprintf(tmp, 512, "Type '%s' has multiple matching opEquals or opCmp methods", subType->GetName());
                 else
-#if defined(_MSC_VER) && _MSC_VER >= 1500 && !defined(__S3E__)
-                    sprintf_s(tmp, 512, "Type '%s' does not have a matching opEquals or opCmp method", subType->GetName());
-#else
-                    sprintf(tmp, "Type '%s' does not have a matching opEquals or opCmp method", subType->GetName());
-#endif
+                    snprintf(tmp, 512, "Type '%s' does not have a matching opEquals or opCmp method", subType->GetName());
+
                 ctx->SetException(tmp);
             }
 
@@ -1458,17 +1451,9 @@ void CScriptArray::Sort(asUINT startAt, asUINT count, bool asc)
                 char tmp[512];
 
                 if( cache && cache->cmpFuncReturnCode == asMULTIPLE_FUNCTIONS )
-#if defined(_MSC_VER) && _MSC_VER >= 1500 && !defined(__S3E__)
-                    sprintf_s(tmp, 512, "Type '%s' has multiple matching opCmp methods", subType->GetName());
-#else
-                    sprintf(tmp, "Type '%s' has multiple matching opCmp methods", subType->GetName());
-#endif
+                    snprintf(tmp, 512, "Type '%s' has multiple matching opCmp methods", subType->GetName());
                 else
-#if defined(_MSC_VER) && _MSC_VER >= 1500 && !defined(__S3E__)
-                    sprintf_s(tmp, 512, "Type '%s' does not have a matching opCmp method", subType->GetName());
-#else
-                    sprintf(tmp, "Type '%s' does not have a matching opCmp method", subType->GetName());
-#endif
+                    snprintf(tmp, 512, "Type '%s' does not have a matching opCmp method", subType->GetName());
 
                 ctx->SetException(tmp);
             }
