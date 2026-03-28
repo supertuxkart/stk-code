@@ -12,7 +12,10 @@
 #include "rect.h"
 #include "os.h"
 #include "Keycodes.h"
+
+#if !defined(SERVER_ONLY) && defined(_IRR_COMPILE_WITH_SDL_DEVICE_)
 #include "SDL.h"
+#endif
 
 /*
 	todo:
@@ -255,6 +258,10 @@ bool CGUIEditBox::OnEvent(const SEvent& event)
 
 bool CGUIEditBox::processKey(const SEvent& event)
 {
+#ifdef SERVER_ONLY
+    return false;
+#else
+
 	if (!event.KeyInput.PressedDown)
 		return false;
 
@@ -713,6 +720,7 @@ bool CGUIEditBox::processKey(const SEvent& event)
 	}
 
 	return true;
+#endif
 }
 
 
