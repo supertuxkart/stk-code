@@ -44,7 +44,7 @@ Bubblegum: duration, speedFraction, torque, fadeInTime, shieldDuration
 Zipper: duration, force, speedGain, maxSpeedIncrease, fadeOutTime
 Swatter: duration, distance, squashDuration, squashSlowdown
 Plunger: bandMaxLength, bandForce, bandDuration, bandSpeedIncrease, bandFadeOutTime, inFaceTime
-Nitro-Hack: duration, factor
+NitroHack: duration, factor
 Electro: duration, engineMult, maxSpeedIncrease, fadeOutTime
 Startup: time(std::vector<float>/floatVector), boost(std::vector<float>/floatVector), engineForce(std::vector<float>/floatVector), duration, fadeOutTime
 Rescue: duration, vertOffset, height

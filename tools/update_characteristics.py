@@ -40,8 +40,8 @@ def main():
         with open("src/" + function[2], "r") as f:
             text = f.read()
         # Replace the text by using look behinds and look forwards
-        text = re.sub("(?<=/\* \<characteristics-start " + operation +
-            "\> \*/\\n)(.|\n)*(?=\\n\s*/\* <characteristics-end " + operation + "> \*/)", result, text)
+        text = re.sub("(?<=/\\* \\<characteristics-start " + operation +
+            "\\> \\*/\\n)(.|\n)*(?=\\n\\s*/\\* <characteristics-end " + operation + "> \\*/)", result, text)
         with open("src/" + function[2], "w") as f:
             f.write(text)
 

@@ -30,6 +30,7 @@
 #include <IGUIElement.h>
 #include <IGUIButton.h>
 #include <string>
+#include <math.h>
 
 using namespace GUIEngine;
 using namespace irr::core;
@@ -110,7 +111,7 @@ void KartStatsWidget::setValues(const KartProperties* props, HandicapLevel h)
     // We use a logarithm so that a given width corresponds to a given weight ratio
     // instead of a given absolute weight difference. This allows for a more meaningful
     // display, as the gameplay effects are proportional to the weight ratio.
-    float mass_log = std::logf(kpc->getMass());
+    float mass_log = logf(kpc->getMass());
     float mass_display = (mass_log * 109.0f) - 545.0f;
     skill_pts += setSkillValues(SKILL_MASS, mass_display, "mass.png", "mass", _("Mass"));
     

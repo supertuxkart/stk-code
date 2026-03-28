@@ -299,7 +299,7 @@
          <!-- Nitro-hack
             duration: Time a nitro-hack is active.
             factor: Multiplicative factor for the engine and max-speed boosts of nitro -->
-        <nitro-hack duration="7.0" factor="1.7" />
+        <nitrohack duration="7.0" factor="1.7" />
 
         <!-- Electro-Shield
             duration: Duration during which the electro-shield is active.
