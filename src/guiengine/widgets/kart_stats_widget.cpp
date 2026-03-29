@@ -26,6 +26,7 @@
 #include "utils/translation.hpp"
 #include "io/file_manager.hpp"
 
+#include <cmath> // for logf and round
 #include <IGUIEnvironment.h>
 #include <IGUIElement.h>
 #include <IGUIButton.h>
