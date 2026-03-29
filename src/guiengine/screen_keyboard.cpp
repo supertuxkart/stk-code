@@ -227,7 +227,7 @@ void ScreenKeyboard::initButtons()
             total_width -= total_padding;
 
         char tmp[100];
-        sprintf(tmp, "%i", pos_y + (height + margin) * i);
+        snprintf(tmp, 100, "%i", pos_y + (height + margin) * i);
         std::string pos_y_str = tmp;
         
         int total_proportions = 0;
@@ -257,13 +257,13 @@ void ScreenKeyboard::initButtons()
                                              / total_proportions - margin;
             
             char width_str[100];
-            sprintf(width_str, "%i", (int)roundf(width / (SkinConfig::getHorizontalInnerPadding(button->getType(), button)+1.0f)));
+            snprintf(width_str, 100, "%i", (int)roundf(width / (SkinConfig::getHorizontalInnerPadding(button->getType(), button)+1.0f)));
 
             char height_str[100];
-            sprintf(height_str, "%i", (int)roundf(height / (SkinConfig::getVerticalInnerPadding(button->getType(), button)+1.0f)));
+            snprintf(height_str, 100, "%i", (int)roundf(height / (SkinConfig::getVerticalInnerPadding(button->getType(), button)+1.0f)));
             
             char tmp[100];
-            sprintf(tmp, "%i", (int)roundf(pos_x));
+            snprintf(tmp, 100, "%i", (int)roundf(pos_x));
             std::string pos_x_str = tmp;
             
             button->setParent(m_irrlicht_window);

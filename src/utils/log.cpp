@@ -196,8 +196,9 @@ void Log::printMessage(int level, const char *component, const char *format,
     remaining = MAX_LENGTH - index > 0 ? MAX_LENGTH - index : 0;
     va_end(args);
 
-    index = index > MAX_LENGTH - 1 ? MAX_LENGTH - 1 : index;
-    sprintf(line + index, "\n");
+    // We need to reserve an extra character for \0
+    index = index > MAX_LENGTH - 2 ? MAX_LENGTH - 2 : index;
+    snprintf(line + index, 2, "\n");
 
     // If the data is not buffered, immediately print it:
     if (m_buffer_size <= 1)

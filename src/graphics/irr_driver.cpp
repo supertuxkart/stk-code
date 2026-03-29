@@ -2072,7 +2072,7 @@ void IrrDriver::doScreenShot()
     time ( &rawtime );
     tm* timeInfo = localtime( &rawtime );
     char time_buffer[256];
-    sprintf(time_buffer, "%i.%02i.%02i_%02i.%02i.%02i",
+    snprintf(time_buffer, 256, "%i.%02i.%02i_%02i.%02i.%02i",
             timeInfo->tm_year + 1900, timeInfo->tm_mon+1,
             timeInfo->tm_mday, timeInfo->tm_hour,
             timeInfo->tm_min, timeInfo->tm_sec);
@@ -2083,9 +2083,9 @@ void IrrDriver::doScreenShot()
                      + time_buffer+".png";
 
     if (irr_driver->getVideoDriver()->writeImageToFile(image, path.c_str(), 0))
-        MessageQueue::add(MessageQueue::MT_GENERIC, _("Screenshot saved to %s\n", path.c_str()));
+        MessageQueue::add(MessageQueue::MT_GENERIC, _("Screenshot saved to %s", path.c_str()));
     else // if failed writing the screenshot file
-        MessageQueue::add(MessageQueue::MT_GENERIC, _("Failed to save the screenshot to %s\n", path.c_str()));
+        MessageQueue::add(MessageQueue::MT_GENERIC, _("Failed to save the screenshot to %s", path.c_str()));
 
     image->drop();
 }   // doScreenShot
@@ -2279,7 +2279,7 @@ void IrrDriver::renderNetworkDebug()
     s = r / 1000;
     f = r % 1000;
     char str[128];
-    sprintf(str, "%d day(s), %02d:%02d:%02d.%03d",
+    snprintf(str, 128, "%d day(s), %02d:%02d:%02d.%03d",
         (int)d, (int)h, (int)m, (int)s, (int)f);
 
     gui::IGUIFont* font = GUIEngine::getFont();
@@ -2329,7 +2329,7 @@ void IrrDriver::setRecording(bool val)
         time(&rawtime);
         tm* timeInfo = localtime(&rawtime);
         char time_buffer[256];
-        sprintf(time_buffer, "%i.%02i.%02i_%02i.%02i.%02i",
+        snprintf(time_buffer, 256, "%i.%02i.%02i_%02i.%02i.%02i",
             timeInfo->tm_year + 1900, timeInfo->tm_mon + 1,
             timeInfo->tm_mday, timeInfo->tm_hour,
             timeInfo->tm_min, timeInfo->tm_sec);

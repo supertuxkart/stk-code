@@ -207,7 +207,7 @@ stk_inet_ntop4(const u_char *src, char *dst, socklen_t size)
     static const char fmt[] = "%u.%u.%u.%u";
     char tmp[sizeof "255.255.255.255"];
 
-    if (sprintf(tmp, fmt, src[0], src[1], src[2], src[3]) >= (int)size)
+    if (snprintf(tmp, sizeof "255.255.255.255", fmt, src[0], src[1], src[2], src[3]) >= (int)size)
     {
         return NULL;
     }
@@ -241,6 +241,9 @@ stk_inet_ntop6(const uint8_t *src, char *dst, socklen_t size)
     test_nat64[6] = 0;
     test_nat64[7] = 0;
 
+    // An IPv6 address is made of 8 blocks of 4 hexadecimals
+    // The longest set of consecutive 0000 blocks can be shortend into ::
+    // Other 0000 blocks can be shortend into :0:
     best.base = -1;
     cur.base = -1;
     best.len = 0;
@@ -271,23 +274,22 @@ stk_inet_ntop6(const uint8_t *src, char *dst, socklen_t size)
     }
     if (best.base != -1 && best.len < 2)
             best.base = -1;
-    /*
-    * Format the result.
-    */
+
+    // Format the result.
     tp = tmp;
     for (i = 0; i < 8; i++)
     {
-        /* Are we inside the best run of 0x00's? */
+        // Are we inside the best run of 0x00's?
         if (best.base != -1 && i >= best.base && i < (best.base + best.len))
         {
             if (i == best.base)
                 *tp++ = ':';
             continue;
         }
-        /* Are we following an initial run of 0x00s or any real hex? */
+        // Are we following an initial run of 0x00s or any real hex?
         if (i != 0)
             *tp++ = ':';
-        /* Is this address an encapsulated IPv4? */
+        // Is this address an encapsulated IPv4?
         if (i == 6 &&
             ((best.base == 0 &&
             (best.len == 6 || (best.len == 5 && words[5] == 0xffff))) ||
@@ -298,15 +300,15 @@ stk_inet_ntop6(const uint8_t *src, char *dst, socklen_t size)
             tp += strlen(tp);
             break;
         }
+        // tp corresponds to the index of the tmp char array we are writing to
         tp += sprintf(tp, "%x", words[i]);
     }
-    /* Was it a trailing run of 0x00's? */
+    // Was it a trailing run of 0x00's?
     if (best.base != -1 && (best.base + best.len) == 8)
         *tp++ = ':';
     *tp++ = '\0';
-    /*
-     * Check for overflow, copy, and we're done.
-     */
+
+    //Check for overflow, copy, and we're done.
     if ((socklen_t)(tp - tmp) > size)
     {
         return NULL;
