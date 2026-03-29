@@ -266,6 +266,9 @@ public:
      *  version. */
     std::set<std::string> m_network_capabilities;
 
+    int m_max_username_length;
+
+
 private:
     /** True if stk_config has been loaded. This is necessary if the
      *  --stk-config command line parameter has been specified to avoid
