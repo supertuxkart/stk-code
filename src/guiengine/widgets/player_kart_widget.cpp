@@ -126,11 +126,6 @@ PlayerKartWidget::PlayerKartWidget(KartSelectionScreen* parent,
         }
     }
 
-    if (irrlicht_widget_id == -1)
-    {
-        m_player_ident_spinner->m_tab_down_root = g_root_id;
-    }
-
     spinnerID = StringUtils::insertValues("@p%i_spinner", m_player_id);
 
     m_player_ident_spinner->m_properties[PROP_ID] = spinnerID;
