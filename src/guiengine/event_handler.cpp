@@ -553,7 +553,7 @@ int EventHandler::findIDClosestWidget(const NavigationDirection nav, const int p
     int smallest_wrapping_distance = BIG_DISTANCE;
 
     // In theory, it's better to look recursively in m_widgets
-    // In practice, this is much much simpler and work equally well
+    // In practice, this is much much simpler and works equally well
     // Usual widget IDs begin at 100 and there is rarely more
     // than a few dozen of them - but it's very cheap to have some margin,
     for (int i=0;i<1000;i++)

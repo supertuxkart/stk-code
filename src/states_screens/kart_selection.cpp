@@ -24,6 +24,7 @@
 #include "config/user_config.hpp"
 #include "graphics/irr_driver.hpp"
 #include <ge_render_info.hpp>
+#include "guiengine/event_handler.hpp"
 #include "guiengine/message_queue.hpp"
 #include "guiengine/widgets/bubble_widget.hpp"
 #include "guiengine/widgets/check_box_widget.hpp"
@@ -1139,33 +1140,23 @@ void KartSelectionScreen::onFocusChanged(GUIEngine::Widget* previous,
 
     // Manually ensure that the player name spinner get selected appropriately
     GUIEngine::SpinnerWidget* kart_class = getWidget<GUIEngine::SpinnerWidget>("kart_class");
-    DynamicRibbonWidget* w = getWidget<DynamicRibbonWidget>("karts");
+    IconButtonWidget* back = getWidget<IconButtonWidget>("back");
 
-    if (!playerID == PLAYER_ID_GAME_MASTER
-        && GUIEngine::isFocusedForPlayer(kart_class, playerID))
+    for (unsigned int i = 0; i < m_kart_widgets.size(); i++)
     {
-        for (unsigned int i = 0; i < m_kart_widgets.size(); i++)
+        if (m_kart_widgets[i].getPlayerID() == playerID)
         {
-            if (m_kart_widgets[i].getPlayerID() == playerID)
+            if (!playerID == PLAYER_ID_GAME_MASTER
+                && GUIEngine::isFocusedForPlayer(kart_class, playerID))
             {
                 if (previous->getType() == WTYPE_RIBBON)
                     m_kart_widgets[i].getPlayerNameSpinner()->setFocusForPlayer(playerID);
                 else
-                    // TODO : remember which column was last used.
-                    w->setSelection(playerID, playerID, true);
-                break;
+                    GUIEngine::EventHandler::get()->sendNavigationEvent(NAV_DOWN, playerID);
             }
-        }
-    }
-
-    // For the game master, the previous/focus values indicating we jumped over
-    // the name spinners are slightly different.
-    IconButtonWidget* back = getWidget<IconButtonWidget>("back");
-    if (playerID == PLAYER_ID_GAME_MASTER)
-    {
-        for (unsigned int i = 0; i < m_kart_widgets.size(); i++)
-        {
-            if (m_kart_widgets[i].getPlayerID() == playerID)
+            // For the game master, the previous/focus values indicating we jumped over
+            // the name spinners are slightly different.
+            else if (playerID == PLAYER_ID_GAME_MASTER)
             {
                 if ((GUIEngine::isFocusedForPlayer(back, playerID) &&
                     (previous->getType() != WTYPE_SPINNER || previous == kart_class))
@@ -1173,8 +1164,8 @@ void KartSelectionScreen::onFocusChanged(GUIEngine::Widget* previous,
                 {
                     m_kart_widgets[i].getPlayerNameSpinner()->setFocusForPlayer(playerID);
                 }
-                break;
             }
+            break;
         }
     }
 }
