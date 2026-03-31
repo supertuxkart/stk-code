@@ -67,6 +67,7 @@ LinearWorld::LinearWorld() : WorldWithRank()
     m_valid_reference_time = false;
     m_live_time_difference = 0.0f;
     m_fastest_lap_kart_name = "";
+    m_finished_kart_name    = "";
     m_check_structure_compatible = false;
 }   // LinearWorld
 
@@ -86,6 +87,7 @@ void LinearWorld::init()
     m_last_lap_sfx_playing          = false;
 
     m_fastest_lap_kart_name         = "";
+    m_finished_kart_name            = "";
 
     // The values are initialised in reset()
     m_kart_info.resize(m_karts.size());
@@ -523,6 +525,20 @@ void LinearWorld::newLap(unsigned int kart_index)
             }
             kart->finishedRace(finish_time);
         }
+
+        // Message when the player finishes the race
+
+        // Store the temporary string because clang would mess this up
+        // (remove the stringw before the wchar_t* is used).
+        const core::stringw &kart_name = kart->getController()->getName();
+        m_finished_kart_name = kart_name;
+
+        //I18N: as in "Wilber finished the race"
+        if (m_race_gui)
+        {
+            m_race_gui->addMessage(_("%s finished the race", kart_name), NULL, 6.0f,
+                                   video::SColor(255, 0, 0, 255), false);
+        }
     }
     int ticks_per_lap;
     if (kart_info.m_finished_laps == 1) // just completed first lap
@@ -543,7 +559,7 @@ void LinearWorld::newLap(unsigned int kart_index)
     }
 
     // if new fastest lap
-    if(ticks_per_lap < m_fastest_lap_ticks && raceHasLaps() &&
+    if (ticks_per_lap < m_fastest_lap_ticks && raceHasLaps() &&
         kart_info.m_finished_laps>0 && !isLiveJoinWorld())
     {
         m_fastest_lap_ticks = ticks_per_lap;
@@ -567,7 +583,6 @@ void LinearWorld::newLap(unsigned int kart_index)
                 video::SColor(255, 255, 255, 255), false);
         }
     } // end if new fastest lap
-
     kart_info.m_lap_start_ticks = getTimeTicks();
     kart->getController()->newLap(kart_info.m_finished_laps);
 }   // newLap
