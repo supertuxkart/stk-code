@@ -24,6 +24,7 @@
 #include "config/user_config.hpp"
 #include "graphics/irr_driver.hpp"
 #include <ge_render_info.hpp>
+#include "guiengine/event_handler.hpp"
 #include "guiengine/message_queue.hpp"
 #include "guiengine/widgets/bubble_widget.hpp"
 #include "guiengine/widgets/check_box_widget.hpp"
@@ -65,99 +66,6 @@ static const char ID_DONT_USE[] = "x";
 static const char ID_LOCKED[] = "locked/";
 
 KartSelectionScreen* KartSelectionScreen::m_instance_ptr = NULL;
-
-int g_root_id;
-
-/** Currently, navigation for multiple players at the same time is implemented
-    in a somewhat clunky way. An invisible "dispatcher" widget is added above
-    kart icons. When a player moves up, he focuses the dispatcher, which in
-    turn moves the selection to the appropriate spinner. "tabbing roots" are
-    used to make navigation back down possible. (FIXME: maybe find a cleaner
-    way?) */
-
-// ------------------------------------------------------------------------
-FocusDispatcher::FocusDispatcher(KartSelectionScreen* parent) : Widget(WTYPE_BUTTON)
-{
-    m_parent = parent;
-    m_supports_multiplayer = true;
-    m_is_initialised = false;
-    
-    Widget* kartsAreaWidget = parent->getWidget("playerskarts");
-    assert(kartsAreaWidget);
-
-    m_x = 0;
-    m_y = kartsAreaWidget->m_y;
-    m_w = 1;
-    m_h = 1;
-
-    m_reserved_id = Widget::getNewNoFocusID();
-}   // FocusDispatcher
-// ------------------------------------------------------------------------
-void FocusDispatcher::setRootID(const int reservedID)
-{
-    assert(reservedID != -1);
-
-    m_reserved_id = reservedID;
-
-    if (m_element != NULL)
-    {
-        m_element->setID(m_reserved_id);
-    }
-
-    m_is_initialised = true;
-}   // setRootID
-
-// ------------------------------------------------------------------------
-void FocusDispatcher::add()
-{
-    core::rect<s32> widget_size(m_x, m_y, m_x + m_w, m_y + m_h);
-
-    m_element = GUIEngine::getGUIEnv()->addButton(widget_size, NULL,
-                m_reserved_id,
-                L"Dispatcher", L"");
-
-    m_id = m_element->getID();
-    m_element->setTabStop(true);
-    m_element->setTabGroup(false);
-    m_element->setTabOrder(m_id);
-}
-
-EventPropagation FocusDispatcher::focused(const int player_id)
-{
-    if (!m_is_initialised) return EVENT_LET;
-
-    if(UserConfigParams::logGUI())
-        Log::info("[KartSelectionScreen]", "FocusDispatcher focused by player %u",
-                  player_id);
-
-    // since this screen is multiplayer, redirect focus to the right widget
-    const int amount = m_parent->m_kart_widgets.size();
-    for (int n=0; n<amount; n++)
-    {
-        if (m_parent->m_kart_widgets[n].getPlayerID() == player_id)
-        {
-            // If player is done, don't do anything with focus
-            if (m_parent->m_kart_widgets[n].isReady())
-                return GUIEngine::EVENT_BLOCK;
-
-            //std::cout << "--> Redirecting focus for player " << player_id
-            //          << " from FocusDispatcher "  <<
-            //             " (ID " << m_element->getID() <<
-            //             ") to spinner " << n << " (ID " <<
-            //             m_parent->m_kart_widgets[n].m_player_ident_spinner
-            //             ->getIrrlichtElement()->getID() <<
-            //             ")" << std::endl;
-
-            m_parent->m_kart_widgets[n].m_player_ident_spinner->setFocusForPlayer(player_id);
-
-            return GUIEngine::EVENT_BLOCK;
-        }
-    }
-
-    //Log::fatal("KartSelectionScreen", "The focus dispatcher can't"
-    //    "find the widget for player %d!", player_id);
-    return GUIEngine::EVENT_LET;
-}   // focused
 
 #if 0
 #pragma mark -
@@ -240,7 +148,6 @@ bool sameKart(const PlayerKartWidget& player1, const PlayerKartWidget& player2)
 
 KartSelectionScreen::KartSelectionScreen(const char* filename) : Screen(filename)
 {
-    m_dispatcher           = NULL;
     m_removed_widget       = NULL;
     m_multiplayer_message  = NULL;
     m_from_overworld       = false;
@@ -258,8 +165,6 @@ KartSelectionScreen* KartSelectionScreen::getRunningInstance()
 
 void KartSelectionScreen::loadedFromFile()
 {
-    m_dispatcher          = new FocusDispatcher(this);
-    m_first_widget        = m_dispatcher;
     m_game_master_confirmed    = false;
     m_multiplayer_message = NULL;
     // Dynamically add tabs
@@ -286,17 +191,8 @@ void KartSelectionScreen::beforeAddingWidget()
         getWidget("karts")->m_properties[GUIEngine::PROP_WIDTH] = "100%";
         getWidget("continue")->setVisible(false);
     }
-    // Remove dispatcher from m_widgets before calculateLayout otherwise a
-    // dummy button is shown in kart screen
-    bool removed_dispatcher = false;
-    if (m_widgets.contains(m_dispatcher))
-    {
-        m_widgets.remove(m_dispatcher);
-        removed_dispatcher = true;
-    }
+
     calculateLayout();
-    if (removed_dispatcher)
-        m_widgets.push_back(m_dispatcher);
 
     CheckBoxWidget* favorite_cb = getWidget<CheckBoxWidget>("favorite");
     assert( favorite_cb != NULL );
@@ -396,19 +292,6 @@ void KartSelectionScreen::init()
     Widget* placeholder = getWidget("playerskarts");
     assert(placeholder != NULL);
 
-    m_dispatcher->setRootID(placeholder->m_reserved_id);
-
-    g_root_id = placeholder->m_reserved_id;
-    if (!m_widgets.contains(m_dispatcher))
-    {
-        m_widgets.push_back(m_dispatcher);
-
-        // this is only needed if the dispatcher wasn't already in
-        // the list of widgets. If it already was, it was added along
-        // other widgets.
-        m_dispatcher->add();
-    }
-
     m_game_master_confirmed = false;
 
     tabs->setActive(true);
@@ -433,14 +316,10 @@ void KartSelectionScreen::init()
     // Build kart list (it is built everytime, to account for .g. locking)
     setKartsFromCurrentGroup();
 
-    /*
-
-     TODO: Ultimately, it'd be nice to *not* clear m_kart_widgets so that
+    /* TODO: Ultimately, it'd be nice to *not* clear m_kart_widgets so that
      when players return to the kart selection screen, it will appear as
      it did when they left (at least when returning from the track menu).
-     Rebuilding the screen is a little tricky.
-
-     */
+     Rebuilding the screen is a little tricky. */
 
     /*
     if (m_kart_widgets.size() > 0)
@@ -478,8 +357,6 @@ void KartSelectionScreen::init()
                 // if kart from config not found, select the first instead
                 w->setSelection(0, 0, true);
             }
-
-            m_dispatcher->setVisible(false);
         }
         else
         {
@@ -532,14 +409,6 @@ void KartSelectionScreen::tearDown()
 }   // tearDown
 
 // ----------------------------------------------------------------------------
-
-void KartSelectionScreen::unloaded()
-{
-    // This pointer is no longer valid (has been deleted along other widgets)
-    m_dispatcher = NULL;
-}
-
-// ----------------------------------------------------------------------------
 // Return true if event was handled successfully
 bool KartSelectionScreen::joinPlayer(InputDevice* device, PlayerProfile* p)
 {
@@ -552,8 +421,6 @@ bool KartSelectionScreen::joinPlayer(InputDevice* device, PlayerProfile* p)
     if (UserConfigParams::logGUI())
         Log::info("KartSelectionScreen",  "joinPlayer() invoked");
     if (!m_multiplayer && !first_player) return false;
-
-    assert (m_dispatcher != NULL);
 
     DynamicRibbonWidget* w = getWidget<DynamicRibbonWidget>("karts");
     if (w == NULL)
@@ -1266,30 +1133,39 @@ bool KartSelectionScreen::onEscapePressed()
 void KartSelectionScreen::onFocusChanged(GUIEngine::Widget* previous,
                                          GUIEngine::Widget* focus, int playerID)
 {
-    if (playerID == PLAYER_ID_GAME_MASTER || !previous || !focus)
-    {
+    if (!previous || !focus)
         return;
-    }
-    // Manually skip kart class spinner
-    GUIEngine::SpinnerWidget* kart_class = getWidget<GUIEngine::SpinnerWidget>("kart_class");
-    DynamicRibbonWidget* w = getWidget<DynamicRibbonWidget>("karts");
 
-    if (GUIEngine::isFocusedForPlayer(kart_class, playerID))
+    // TODO : In the STK Evolution branch, ensure things work properly with the handicap spinner
+
+    // Manually ensure that the player name spinner get selected appropriately
+    GUIEngine::SpinnerWidget* kart_class = getWidget<GUIEngine::SpinnerWidget>("kart_class");
+    IconButtonWidget* back = getWidget<IconButtonWidget>("back");
+
+    for (unsigned int i = 0; i < m_kart_widgets.size(); i++)
     {
-        for (unsigned int i = 0; i < m_kart_widgets.size(); i++)
+        if (m_kart_widgets[i].getPlayerID() == playerID)
         {
-            if (m_kart_widgets[i].getPlayerID() == playerID)
+            if (!playerID == PLAYER_ID_GAME_MASTER
+                && GUIEngine::isFocusedForPlayer(kart_class, playerID))
             {
                 if (previous->getType() == WTYPE_RIBBON)
+                    m_kart_widgets[i].getPlayerNameSpinner()->setFocusForPlayer(playerID);
+                else
+                    GUIEngine::EventHandler::get()->sendNavigationEvent(NAV_DOWN, playerID);
+            }
+            // For the game master, the previous/focus values indicating we jumped over
+            // the name spinners are slightly different.
+            else if (playerID == PLAYER_ID_GAME_MASTER)
+            {
+                if ((GUIEngine::isFocusedForPlayer(back, playerID) &&
+                    (previous->getType() != WTYPE_SPINNER || previous == kart_class))
+                    || (previous == back && focus == kart_class))
                 {
                     m_kart_widgets[i].getPlayerNameSpinner()->setFocusForPlayer(playerID);
                 }
-                else
-                {
-                    w->setSelection(playerID, playerID, true);
-                }
-                break;
             }
+            break;
         }
     }
 }
@@ -1789,17 +1665,8 @@ bool KartSelectionScreen::useContinueButton() const
 // ----------------------------------------------------------------------------
 void KartSelectionScreen::onResize()
 {
-    // Remove dispatcher from m_widgets before calculateLayout otherwise a
-    // dummy button is shown in kart screen
-    bool removed_dispatcher = false;
-    if (m_widgets.contains(m_dispatcher))
-    {
-        m_widgets.remove(m_dispatcher);
-        removed_dispatcher = true;
-    }
     Screen::onResize();
-    if (removed_dispatcher)
-        m_widgets.push_back(m_dispatcher);
+
     if (m_multiplayer)
     {
         if (m_kart_widgets.size() < 2)

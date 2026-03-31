@@ -117,18 +117,9 @@ PlayerKartWidget::PlayerKartWidget(KartSelectionScreen* parent,
     if (parent->m_multiplayer && associated_player)
     {
         if (associated_player->getDevice()->getType() == DT_KEYBOARD)
-        {
             m_player_ident_spinner->setBadge(KEYBOARD_BADGE);
-        }
         else if (associated_player->getDevice()->getType() == DT_GAMEPAD)
-        {
             m_player_ident_spinner->setBadge(GAMEPAD_BADGE);
-        }
-    }
-
-    if (irrlicht_widget_id == -1)
-    {
-        m_player_ident_spinner->m_tab_down_root = g_root_id;
     }
 
     spinnerID = StringUtils::insertValues("@p%i_spinner", m_player_id);
@@ -354,7 +345,6 @@ void PlayerKartWidget::add()
 #ifdef DEBUG
     if (m_associated_player) // if player is local
     {
-#ifdef DEBUG
         bool mineInList = false;
         for (unsigned int p=0; p<StateManager::get()->activePlayerCount(); p++)
         {
@@ -365,7 +355,6 @@ void PlayerKartWidget::add()
             }
         }
         assert(mineInList);
-#endif
     }
 #endif
     // the first player will have an ID of its own to allow for keyboard
@@ -461,7 +450,8 @@ void PlayerKartWidget::markAsReady()
 
     m_ready = true;
 
-    // Correctly replace the game master icon as the spinner arrow is no longer there (the player is ready)
+    // Correctly reposition the game master icon as
+    // the spinner arrow is no longer there (the player is ready)
     m_crown_icon_x += m_left_arrow_width;
     m_crown_icon->move(m_crown_icon_x,
         m_crown_icon_y,
@@ -592,10 +582,8 @@ void PlayerKartWidget::updateSize()
 
     if (m_player_ident_spinner != NULL)
     {
-        m_player_ident_spinner->move(player_name_x,
-                                     player_name_y,
-                                     player_name_w,
-                                     player_name_h );
+        m_player_ident_spinner->move(player_name_x, player_name_y,
+                                     player_name_w, player_name_h );
         m_left_arrow_width = m_player_ident_spinner->getLeftArrow().getWidth();
     }
     if (m_ready_text != NULL)
@@ -606,10 +594,8 @@ void PlayerKartWidget::updateSize()
     }
     if (!m_parent_screen->m_multiplayer)
     {
-        m_kart_stats->move(m_kart_stats_x,
-                           m_kart_stats_y,
-                           m_kart_stats_w,
-                           m_kart_stats_h);
+        m_kart_stats->move(m_kart_stats_x, m_kart_stats_y,
+                           m_kart_stats_w, m_kart_stats_h);
     }
     else
     {
@@ -617,21 +603,12 @@ void PlayerKartWidget::updateSize()
                            m_w, m_h/2);
     }
 
-
-    m_model_view->move(model_x,
-                       model_y,
-                       model_w,
-                       model_h);
-
-    m_kart_name->move(kart_name_x,
-                      kart_name_y,
-                      kart_name_w,
-                      kart_name_h);
-
-    m_crown_icon->move(m_crown_icon_x,
-                        m_crown_icon_y,
-                        m_crown_icon_w,
-                        m_crown_icon_h);
+    m_model_view->move(model_x, model_y,
+                       model_w, model_h);
+    m_kart_name->move(kart_name_x, kart_name_y,
+                      kart_name_w, kart_name_h);
+    m_crown_icon->move(m_crown_icon_x, m_crown_icon_y,
+                       m_crown_icon_w, m_crown_icon_h);
 }   // updateSize
 
 // -------------------------------------------------------------------------

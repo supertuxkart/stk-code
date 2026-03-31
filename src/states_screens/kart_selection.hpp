@@ -37,7 +37,6 @@ namespace Online
     class OnlineProfile;
 }
 
-class FocusDispatcher;
 class InputDevice;
 class PlayerProfile;
 class KartHoverListener;
@@ -52,7 +51,6 @@ class KartSelectionScreen : public GUIEngine::Screen,
                             public GUIEngine::ITextBoxWidgetListener
 {
     friend class KartHoverListener;
-    friend class FocusDispatcher;
 protected:
     /** Contains the custom widget shown for every player. (ref only since
      *  we're adding them to a Screen, and the Screen will take ownership
@@ -83,8 +81,6 @@ protected:
 
     /** Message shown in multiplayer mode */
     GUIEngine::BubbleWidget* m_multiplayer_message;
-
-    FocusDispatcher  *m_dispatcher;
 
     KartSelectionScreen(const char* filename);
 
@@ -195,48 +191,11 @@ public:
 
     /** \brief implement optional callback from parent
      *  class GUIEngine::Screen */
-    virtual void unloaded() OVERRIDE;
-
-    /** \brief implement optional callback from parent
-     *  class GUIEngine::Screen */
     virtual bool onEscapePressed() OVERRIDE;
 
     virtual void onResize() OVERRIDE;
 
 };   // KartSelectionScreen
-
-//!----------------------------------------------------------------------------
-//! FocusDispatcher :
-/** Currently, navigation for multiple players at the same time is implemented
-    in a somewhat clunky way. An invisible "dispatcher" widget is added above
-    kart icons. When a player moves up, he focuses the dispatcher, which in
-    turn moves the selection to the appropriate spinner. "tabbing roots" are
-    used to make navigation back down possible. (FIXME: maybe find a cleaner
-    way?) */
-class FocusDispatcher : public GUIEngine::Widget
-{
-protected:
-    KartSelectionScreen* m_parent;
-    int m_reserved_id;
-
-    bool m_is_initialised;
-
-public:
-
-    LEAK_CHECK()
-
-    // ------------------------------------------------------------------------
-    FocusDispatcher(KartSelectionScreen* parent);
-    // ------------------------------------------------------------------------
-    void setRootID(const int reservedID);
-
-    // ------------------------------------------------------------------------
-    virtual void add();
-
-    // ------------------------------------------------------------------------
-
-    virtual GUIEngine::EventPropagation focused(const int playerID);
-};   // FocusDispatcher
 
 //!----------------------------------------------------------------------------
 //! KartHoverListener :
@@ -259,4 +218,3 @@ public:
 };   // KartHoverListener
 
 #endif
-
