@@ -2067,6 +2067,7 @@ void initRest()
     }
 
     track_manager->loadTrackList();
+    stk_config->validateBenchmarkReplays();
     music_manager->addMusicToTracks();
 
     GUIEngine::addLoadingIcon(irr_driver->getTexture(FileManager::GUI_ICON,

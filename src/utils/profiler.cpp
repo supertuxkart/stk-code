@@ -662,14 +662,13 @@ void Profiler::computeStableFPS()
 
 void Profiler::startBenchmark()
 {
-    // TODO - Add the possibility to benchmark more tracks
     if (stk_config->m_benchmark_files.empty())
     {
         Log::error("OptionsScreenVideo", "No benchmark replay available!");
         return;
     }
 
-    const std::string bench_file = stk_config->m_benchmark_files[0];
+    const std::string bench_file = stk_config->m_active_benchmark_file;
     const bool result = ReplayPlay::get()->addReplayFile(file_manager
         ->getAsset(FileManager::REPLAY, bench_file), true /*custom_replay */);
 
