@@ -266,6 +266,9 @@ public:
      *  version. */
     std::set<std::string> m_network_capabilities;
 
+    /** List of replays meant for use in benchmarking */
+    std::vector<std::string> m_benchmark_files;
+
 private:
     /** True if stk_config has been loaded. This is necessary if the
      *  --stk-config command line parameter has been specified to avoid

@@ -617,6 +617,18 @@ void STKConfig::getAllData(const XMLNode * root)
         }
     }
 
+    if (const XMLNode* bm = root->getNode("benchmark"))
+    {
+        for (unsigned int i = 0; i < bm->getNumNodes(); i++)
+        {
+            const XMLNode* name = bm->getNode(i);
+            std::string bench_file;
+            name->get("name", &bench_file);
+            if (!bench_file.empty())
+                m_benchmark_files.push_back(bench_file);
+        }
+    }
+
     // Get the default KartProperties
     // ------------------------------
     const XMLNode *node = root -> getNode("general-kart-defaults");
