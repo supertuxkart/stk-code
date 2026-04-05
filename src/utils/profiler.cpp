@@ -17,6 +17,7 @@
 
 #include "profiler.hpp"
 
+#include "config/stk_config.hpp"
 #include "config/user_config.hpp"
 #include "graphics/glwrap.hpp"
 #include "graphics/irr_driver.hpp"
@@ -661,14 +662,18 @@ void Profiler::computeStableFPS()
 
 void Profiler::startBenchmark()
 {
-    // TODO - Add the possibility to benchmark more tracks and define replay benchmarks in
-    //        a config file
-    const std::string bf_bench("benchmark_black_forest.replay");
+    if (stk_config->m_benchmark_files.empty())
+    {
+        Log::error("OptionsScreenVideo", "No benchmark replay available!");
+        return;
+    }
+
+    const std::string bench_file = stk_config->m_active_benchmark_file;
     const bool result = ReplayPlay::get()->addReplayFile(file_manager
-        ->getAsset(FileManager::REPLAY, bf_bench), true/*custom_replay*/);
+        ->getAsset(FileManager::REPLAY, bench_file), true /*custom_replay */);
 
     if (!result)
-        Log::fatal("OptionsScreenVideo", "Can't open replay for benchmark!");
+        Log::fatal("OptionsScreenVideo", "Can't open replay %s for benchmarking!", bench_file.c_str());
 
     RaceManager::get()->setRaceGhostKarts(true);
     RaceManager::get()->setMinorMode(RaceManager::MINOR_MODE_TIME_TRIAL);

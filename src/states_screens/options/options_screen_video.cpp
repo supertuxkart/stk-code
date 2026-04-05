@@ -205,6 +205,34 @@ void OptionsScreenVideo::init()
     else
         getWidget<ButtonWidget>("benchmarkCurrent")->unsetTooltip();
 
+    GUIEngine::SpinnerWidget* bench_select = getWidget<GUIEngine::SpinnerWidget>("benchmarkSelect");
+    assert( bench_select != NULL );
+
+    // Only display the scene selection widget if there are multiple valid replays
+    if (stk_config->m_benchmark_files.size() <= 1)
+    {
+        bench_select->setActive(false);
+        bench_select->setVisible(false);
+        getWidget<LabelWidget>("benchmarkSelect_label")->setVisible(false);
+        // Disable the performance test button if there is no valid replay
+        if (stk_config->m_benchmark_files.size() == 0)
+            getWidget<ButtonWidget>("benchmarkCurrent")->setActive(false);
+    }
+    // Use the replay names as labels for selection
+    // TODO: support user-friendly names for when the game come with multiple default replays
+    else
+    {
+        bench_select->clearLabels();
+        for (auto it = stk_config->m_benchmark_files.begin();
+                it != stk_config->m_benchmark_files.end(); it++)
+        {
+            core::stringw bench_name = StringUtils::utf8ToWide(*it);
+            bench_select->addLabel(bench_name);
+        }
+        // Reset the active benchmark file in case we left and reentered options after changing it
+        stk_config->m_active_benchmark_file = stk_config->m_benchmark_files[0];
+    }
+
     // If a benchmark was requested and the game had to reload
     // the graphics engine, start the benchmark when the
     // video settings screen is loaded back afterwards.
@@ -522,6 +550,16 @@ void OptionsScreenVideo::eventCallback(Widget* widget, const std::string& name,
         else
             RaceManager::get()->scheduleBenchmark();
     } // benchmarkCurrent
+    else if (name == "benchmarkSelect")
+    {
+        GUIEngine::SpinnerWidget* bench_select = getWidget<GUIEngine::SpinnerWidget>("benchmarkSelect");
+        assert( bench_select != NULL );
+
+        const unsigned int bench_id = bench_select->getValue();
+        assert(bench_id < stk_config->m_benchmark_files.size());
+
+        stk_config->m_active_benchmark_file = stk_config->m_benchmark_files[bench_id];
+    }
     /*else if (name == "benchmarkRecommend")
     {
         new RecommendVideoSettingsDialog(0.8f, 0.9f);

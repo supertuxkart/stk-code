@@ -27,6 +27,7 @@
 #include "io/xml_node.hpp"
 #include "items/item.hpp"
 #include "karts/kart_properties.hpp"
+#include "replay/replay_play.hpp"
 #include "utils/log.hpp"
 #include "utils/string_utils.hpp"
 
@@ -617,6 +618,18 @@ void STKConfig::getAllData(const XMLNode * root)
         }
     }
 
+    if (const XMLNode* bm = root->getNode("benchmark"))
+    {
+        for (unsigned int i = 0; i < bm->getNumNodes(); i++)
+        {
+            const XMLNode* name = bm->getNode(i);
+            std::string bench_file;
+            name->get("name", &bench_file);
+            if (!bench_file.empty())
+                m_benchmark_files.push_back(bench_file);
+        }
+    }
+
     // Get the default KartProperties
     // ------------------------------
     const XMLNode *node = root -> getNode("general-kart-defaults");
@@ -637,6 +650,34 @@ void STKConfig::getAllData(const XMLNode * root)
         m_kart_properties[type->getName()]->getAllData(type, true /* from stk_config */);
     }
 }   // getAllData
+
+// ----------------------------------------------------------------------------
+/** With ReplayPlay and the list of tracks loaded, check if the replay files
+ * for the benchmark list exist, have a valid and compatible replay header,
+ * and correspond to a track that's available.
+ */
+void STKConfig::validateBenchmarkReplays()
+{
+    for (auto it = m_benchmark_files.begin(); it != m_benchmark_files.end();)
+    {
+        std::string bench_file = *it;
+        const bool result = ReplayPlay::get()->addReplayFile(file_manager
+            ->getAsset(FileManager::REPLAY, bench_file), true /*custom_replay */);
+        if (!result)
+        {
+            Log::error("StkConfig", "Replay %s from the benchmark list is missing or invalid!",
+                bench_file.c_str());
+            it = m_benchmark_files.erase(it);
+            continue;
+        }
+        
+        it++;
+    }
+
+    stk_config->m_active_benchmark_file = "";
+    if(!m_benchmark_files.empty())
+        stk_config->m_active_benchmark_file = stk_config->m_benchmark_files[0];
+} // validateBenchmarkReplays
 
 // ----------------------------------------------------------------------------
 /** Init the music files after downloading assets

@@ -266,6 +266,12 @@ public:
      *  version. */
     std::set<std::string> m_network_capabilities;
 
+    /** List of replays meant for use in benchmarking */
+    std::vector<std::string> m_benchmark_files;
+
+    /** The currently selected benchmark file */
+    std::string m_active_benchmark_file;
+
 private:
     /** True if stk_config has been loaded. This is necessary if the
      *  --stk-config command line parameter has been specified to avoid
@@ -293,6 +299,7 @@ public:
     void load(const std::string &filename);
     const std::string &getMainMenuPicture(int n);
     const std::string &getBackgroundPicture(int n);
+    void validateBenchmarkReplays();
     void initMusicFiles();
     void  getAllScores(std::vector<int> *all_scores, int num_karts);
     // ------------------------------------------------------------------------
