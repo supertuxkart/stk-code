@@ -205,7 +205,7 @@ bool CheckLine::isTriggered(const Vec3 &old_pos, const Vec3 &new_pos,
     // would trigger an OOB issue (see #5536)
     // TODO: Once compatibility doesn't matter, the sign variable
     // can be fully removed, see comment below.
-    if (RaceManager::get()->isBattleMode())
+    if (RaceManager::get()->isBattleMode() && getType() != CT_CANNON)
         return false;
 
     // Sign here is for old client (<= 1.2) in networking, it's not used
