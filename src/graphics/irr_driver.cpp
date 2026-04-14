@@ -1215,6 +1215,7 @@ void IrrDriver::commonInit()
     kart_properties_manager->loadAllKarts();
     kart_properties_manager->onDemandLoadKartTextures(
         { UserConfigParams::m_default_kart }, false/*unload_unused*/);
+    kart_properties_manager->setHatMeshName();
 }   // commonInit
 
 // --------------------------------------------------------------------------------------------
