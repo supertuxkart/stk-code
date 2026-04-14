@@ -50,7 +50,7 @@ For similar reasons, and because some features are vastly more complex than othe
 * Fix an egg that was very difficult to collect (due to collision issues) in the Black Forest intermediate egg hunt, by Sven
 
 #### Arenas
-* TV spectator ameras for all soccer fields, by LLS and Sven
+* TV spectator cameras for all soccer fields, by LLS and Sven
 
 ## SuperTuxKart 1.5 (20. October 2025)
 
@@ -101,7 +101,7 @@ For similar reasons, and because some features are vastly more complex than othe
 * Add spotlights, by CodingJellyfish
 * Replace inaccurate normal compression algorithm with Octahedron Normal Vector, by CodingJellyfish
 * Fix the Screen-Space Reflection shader, by CodingJellyfish
-* Fix and improve the Screen-Space Ambiant Occlusion shader, by CodingJellyfish
+* Fix and improve the Screen-Space Ambient Occlusion shader, by CodingJellyfish
 * Implement Percentage-Closer Soft Shadows, by CodingJellyfish
 * Guarantee an overall bone limit of 2048 for skinned mesh (up from 1024), by CodingJellyfish
 * Improve Cascaded Shadow Mapping, by CodingJellyfish and Alayan
@@ -170,7 +170,7 @@ For similar reasons, and because some features are vastly more complex than othe
 * Enable ARMv7 build for Windows, by Benau
 * Restore macOS <= 10.14 support, by Benau
 * Allow setting the auto-center behavior of steering wheels, by Mary
-* Simplify making derivative UI skins by allowing to specify a base theme, by qwertychouskie
+* Simplify making derivative UI skins by allowing to specify a base theme, by QwertyChouskie
 * Make sure old save data is only removed after new save data is written, to avoid data losses on full drives, by Benau
 * Fixed camera rotation when using the gyroscope and driving on vertical surfaces, by Benau
 * Lap trial mode, by mrkubax10
@@ -200,7 +200,7 @@ For similar reasons, and because some features are vastly more complex than othe
 
 ### Tracks and modeling
 #### Tracks
-* Fix broken invisible wall in Antediluvian Abyss, by Benau
+* Fix broken invisible wall in Antediluvian Abysses, by Benau
 * New textures in Shifting Sands, by KartOym
 
 #### Karts
@@ -259,7 +259,8 @@ For similar reasons, and because some features are vastly more complex than othe
 
 #### Karts
 * Pepper (replaces Sara the Wizard), by ZAQraven99
-* Improved Adiumy, Emule, GNU and Sara karts, by ZAQraven99
+* Sara (replaces Sara the Racer), by Zaqraven99
+* Improved Adiumy, Emule and GNU karts, by ZAQraven99
 
 #### Arenas
 * Alien Signal, by Samuncle
@@ -349,13 +350,13 @@ For similar reasons, and because some features are vastly more complex than othe
 * Fix a bug that made AIs, in multiplayer and low difficulty, rubber-band towards the wrong player, by Alayan. Each player now correctly has its AIs, helping a weaker player to not be condemned to the last position.
 
 ### General
-* Screen space reflection graphical effect, by samuncle
+* Screen space reflection graphical effect, by Samuncle
 * Support unicode file paths, by Benau
 * Complex text layout support, by Benau
 * Add emoji support, by Benau
 * Avoid "this program is not responding" warnings in Windows and Mac, by Benau
 * Add a Story Mode timer, by Alayan
-* Make text billboards size consistent accross resolutions, by Benau
+* Make text billboards size consistent across resolutions, by Benau
 * Don't trigger road sounds when the kart is flying, by Benau
 * Remove an incorrect function call that could significantly hurt performance for Mac, by Benau
 * Fix a nasty bug that made several sound effects to be played at a low volume after a crash, by Alayan
@@ -420,7 +421,7 @@ For similar reasons, and because some features are vastly more complex than othe
 ### Tracks and modeling
 #### Tracks
  * A handful of minor graphical fixes and enhancements
- * Fixed checklines that could be missed too easily in XR591 and the Old Mine.
+ * Fixed checklines that could be missed too easily in XR591 and The Old Mine.
 #### Arenas
  * Pumpkin Park, by Samuncle
 
@@ -511,9 +512,9 @@ For similar reasons, and because some features are vastly more complex than othe
 ### Tracks and modeling
 #### Tracks
 * Black Forest, by Sven Andreas Belting (replacing Green Valley)
-* Ravenbridge Mansion, by Samuncle (replacing Black Hill Mansion)
+* Ravenbridge Mansion, by Samuncle (replacing Blackhill Mansion)
 * Unwanted shortcuts and exploits found by several players and fixed mostly by Auria in many tracks :
-    * Antediluvian Abyss, Around the Lighthouse, Fort Magma, Grand Paradisio Island, Hacienda, Minigolf, Nessie's Pond, Northern Resort, The Old Mine, Oliver's Math Class, Shifting Sands, STK Enterprise, XR591
+    * Antediluvian Abysses, Around the Lighthouse, Fort Magma, Grand Paradisio Island, Hacienda, Minigolf, Nessie's Pond, Northern Resort, The Old Mine, Oliver's Math Class, Shifting Sands, STK Enterprise, XR591
 * Smoothness issues causing collisions and kart slowdown fixed by Auria :
     * Nessie's Pond, Old Mine, Shifting Sands, Volcano Island, XR591
 * Item (boxes, nitro, bananas) positions improvement by Alayan and theThomasPat :
@@ -548,6 +549,7 @@ For similar reasons, and because some features are vastly more complex than othe
 * Kiki, by Benau
 * New versions of Wilber and Hexley, by Jymis
 * New version of Konqi, by Benau
+* Removal of Elephpant
 #### Tracks
 * Ensure that there is a visual representation of the start line in all tracks
 * All tracks drivable in reverse, with arrows pointing in the correct direction
@@ -595,7 +597,7 @@ For similar reasons, and because some features are vastly more complex than othe
     * Subsea
 
 
-## SupertTuxKart 0.9 (24. April 2015)
+## SuperTuxKart 0.9 (24. April 2015)
 * Fully shader-based rendering engine
 * Online login which allows to:
     * connect with friends and see when they are playing
@@ -616,6 +618,7 @@ For similar reasons, and because some features are vastly more complex than othe
 * Cocoa Temple, by Samuncle (replaces Amazonian Journey)
 * Gran Paradiso Island, by Samuncle (replaces The Island)
 * Graphical improvements to many other tracks
+* Nicer new name for a track: Nessie's Pond (previously Scotland)
 
 
 ## SuperTuxKart 0.8.1 (26. November 2013)
@@ -637,10 +640,11 @@ For similar reasons, and because some features are vastly more complex than othe
 * Xue, by JunglePenguin
 * Sara, by Samuncle
 * Updated Beastie and Konqi
+* Removal of Mozilla
 #### Tracks
 * STK Enterprise by Rubberduck (replaces Star Track)
 * Redesign of Minigolf, by Rubberduck
-* New longer track layout and improved graphics for Lighthouse, by Samuncle
+* New longer track layout and improved graphics for 'Around the Lighthouse', by Samuncle
 * Gameplay and graphical updates to several tracks :
     * The Old Mine
     * Zen Garden
@@ -659,30 +663,34 @@ For similar reasons, and because some features are vastly more complex than othe
 ### Tracks and modeling
 * New overworld for the Story Mode, by Auria
 #### Tracks
-* Green Valley, by Wolfs (replaces Tux Tollway)
-* Blackhill Mansion, by Samuncle (replaces Crescent Crossing)
-* New track layout and improved graphics for Shifting Sands (formerly Sand)
+* Green Valley, by Wolfs (replacing Tux Tollway)
+* Blackhill Mansion, by Samuncle (replacing Crescent Crossing)
+* New track layout and improved graphics for Shifting Sands, by Samuncle
 * Gameplay and graphical updates to several tracks :
     * XR591
     * Fort Magma
-    * Jungle
+    * Amazonian Journey
     
 
 ## SuperTuxKart 0.7.3 (2. November 2011)
 * New graphical effects
-* New weapons 'Swatter' and 'Rubber Ball'
 * 3 Strikes Battles now displays lives as spare tires
 * Improved bubble gum
 * See progression during Grand Prix
-* Improve physics for tall karts (e.g. Adiumy)
+* Transition track-making to blender 2.5/2.6
 * Lots of bug fixes
+
+### Race gameplay and physics
+* New powerup 'Swatter', a green fly-swatter that squashes karts nearby and can be used to remove bombs and parachutes
+* New powerup 'Rubber Ball', a giant bouncy ball that chases after the kart in first place
+* Improve physics for tall karts (e.g. Adiumy)
 * Improved kart control at high speeds
 * Better placement of rescued karts
-* Transition track-making to blender 2.5/2.6
 
 ### Tracks and modeling
 #### Karts
 * Suzanne, by Cédric Archambault
+* Removal of Gooey
 #### Tracks
 * Zen Garden, by Samuncle (replaces Secret Garden)
 * Minigolf, by Mac
@@ -742,7 +750,7 @@ For similar reasons, and because some features are vastly more complex than othe
 #### Tracks
 * New Fort Magma, by Samuncle
 * Shiny Suburbs, by Horace (based on Thomas Oppl's City track)
-* Renaming of several tracks to nicer names:
+* New names for several tracks, using nicer names:
   * Bovine Barnyard (previously Farm), Northern Resort (previously Snow Mountain), Coyote Canyon (previously Canyon)
 
 
@@ -789,7 +797,7 @@ Main points:
 * Bugfix: Items explode over void.
 * Bugfix: Grass in castle arena slowed down the kart.
 * Bugfix: GP result showed kart identifier instead of name.
-* Improvement: there is now 1 1 sec. wait period for the race result screen, avoiding the problem that someone presses space/enter at the end of a race, immediately quitting the menu before it can be read.
+* Improvement: there is now a 1 sec. wait period for the race result screen, avoiding the problem that someone presses space/enter at the end of a race, immediately quitting the menu before it can be read.
 
 ### Tracks and modeling
 #### Karts
@@ -853,13 +861,13 @@ Main points:
 * Removal of Penny
 * Removal of Skirpy
 * Removal of Yeti
-* Renaming of some karts: Mozilla (previously Dino), Gooey (previously Sushi)
+* New names for some karts: Mozilla (previously Dino), Gooey (previously Sushi)
 #### Tracks
 * Skyline, by Robert Howie
 * Snow Mountain, by Canis Lupus
 * XR591, by Canis Lupus
 * Race Track, by Thomas Oppl (replaces the previous Race Track with an entirely new track)
-* Mine, by Ivar ten Cate
+* The Old Mine, by Ivar ten Cate
 * Tux Tollway, by Ivar ten Cate (replaces the previous Tux Tollway with an entirely new track)
 * Improved Star track
 * Removal of City
@@ -904,7 +912,7 @@ Main points:
 
 #### Tracks
 * Shifting Sands
-* Improvements to 'Lighthouse'
+* Improvements to 'Around the Lighthouse'
 
 
 ## SuperTuxKart 0.3 (May 2007)
@@ -955,7 +963,7 @@ Main points:
 * Around the Lighthouse
 * BSODs Battlements
 * Geeko Peak
-* Gowns bow
+* Gown's Bow
 * Little Volcano
 * Oliver's Math Class
 * On the Beach
