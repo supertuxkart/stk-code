@@ -49,6 +49,7 @@ using namespace irr;
 #include "karts/kart_properties.hpp"
 #include "karts/kart_properties_manager.hpp"
 #include "modes/capture_the_flag.hpp"
+#include "modes/easter_egg_hunt.hpp"
 #include "modes/follow_the_leader.hpp"
 #include "modes/linear_world.hpp"
 #include "modes/world.hpp"
@@ -106,6 +107,7 @@ RaceGUI::RaceGUI()
     m_heart_icon = irr_driver->getTexture(FileManager::GUI_ICON, "heart.png");
     m_basket_ball_icon = irr_driver->getTexture(FileManager::GUI_ICON, "rubber_ball-icon.png");
     m_champion = irr_driver->getTexture(FileManager::GUI_ICON, "cup_gold.png");
+    m_egg = irr_driver->getTexture(FileManager::GUI_ICON, "egg.png");
 }   // RaceGUI
 
 // ----------------------------------------------------------------------------
@@ -592,6 +594,7 @@ void RaceGUI::drawGlobalMiniMap()
     World* world = World::getWorld();
     CaptureTheFlag *ctf_world = dynamic_cast<CaptureTheFlag*>(World::getWorld());
     SoccerWorld *soccer_world = dynamic_cast<SoccerWorld*>(World::getWorld());
+    EasterEggHunt *easter_world = dynamic_cast<EasterEggHunt*>(World::getWorld());
 
     if (ctf_world)
     {
@@ -642,6 +645,21 @@ void RaceGUI::drawGlobalMiniMap()
                                  m_map_left+(int)(draw_at.getX()+(m_minimap_player_size/1.4f)),
                                  lower_y   -(int)(draw_at.getY()-(m_minimap_player_size/2.2f)));
         draw2DImage(m_blue_flag, bp, bs, NULL, NULL, true);
+    }
+
+    if (easter_world)
+    {
+        for (int i = 0; i < (int)(easter_world->foundEggLocations().size()); i++){
+            Vec3 draw_at;
+            track->mapPoint2MiniMap(easter_world->foundEggLocations()[i], &draw_at);
+
+            core::rect<s32> source(core::position2di(0, 0), m_egg->getSize());
+            core::rect<s32> position(m_map_left+(int)(draw_at.getX()-(m_minimap_player_size/2.5f)),
+                                     lower_y   -(int)(draw_at.getY()+(m_minimap_player_size/2.5f)),
+                                     m_map_left+(int)(draw_at.getX()+(m_minimap_player_size/2.5f)),
+                                     lower_y   -(int)(draw_at.getY()-(m_minimap_player_size/2.5f)));
+            draw2DImage(m_egg, position, source, NULL, NULL, true);
+        }
     }
 
     AbstractKart* target_kart = NULL;

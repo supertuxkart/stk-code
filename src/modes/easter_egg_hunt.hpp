@@ -22,6 +22,7 @@
 #include "modes/linear_world.hpp"
 #include "states_screens/race_gui_base.hpp"
 #include "utils/cpp2011.hpp"
+#include "utils/vec3.hpp"
 
 #include <string>
 #include <vector>
@@ -37,6 +38,9 @@ class EasterEggHunt: public LinearWorld
 private:
     /** Keeps track of how many eggs each kart has found. */
     std::vector<int>  m_eggs_collected;
+
+    /** Keeps track of the location of where each egg was found. */
+    std::vector<Vec3> m_collected_eggs_location;
 
     /** Overall number of easter eggs. */
     int   m_number_of_eggs;
@@ -71,6 +75,7 @@ public:
 
     const int  numberOfEggsFound() { return m_eggs_found; }
     const int  numberOfEggsToFind() { return m_number_of_eggs; }
+    const std::vector<Vec3>  foundEggLocations() { return m_collected_eggs_location; }
 
     void updateKartRanks();
     void readData(const std::string &filename);
