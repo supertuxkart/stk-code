@@ -165,11 +165,10 @@ void Skybox::generateCubeMapFromTextures()
     }
 
     const unsigned texture_permutation[] = { 2, 3, 0, 1, 5, 4 };
-    char *rgba[6];
-    for (unsigned i = 0; i < 6; i++)
-        rgba[i] = new char[size * size * 4];
     for (unsigned i = 0; i < 6; i++)
     {
+        char *rgba = new char[size * size * 4];
+
         unsigned idx = texture_permutation[i];
         video::IImage* img = m_skybox_textures[idx];
 
@@ -189,17 +188,17 @@ void Skybox::generateCubeMapFromTextures()
             }
         }
 
-        img->copyToScaling(rgba[i], size, size);
+        img->copyToScaling(rgba, size, size);
 
         if (i == 2 || i == 3)
         {
             char *tmp = new char[size * size * 4];
-            memcpy(tmp, rgba[i], size * size * 4);
+            memcpy(tmp, rgba, size * size * 4);
             for (unsigned x = 0; x < size; x++)
             {
                 for (unsigned y = 0; y < size; y++)
                 {
-                    swapPixels(tmp, rgba[i], size, x, y, (size - y - 1), x);
+                    swapPixels(tmp, rgba, size, x, y, (size - y - 1), x);
                 }
             }
             delete[] tmp;
@@ -214,7 +213,7 @@ void Skybox::generateCubeMapFromTextures()
         {
             unsigned tex_size = GE::get4x4CompressedTextureSize(size, size);
             uint8_t* compressed = new uint8_t[tex_size];
-            squishCompressImage((uint8_t*)rgba[i], size, size, size * 4,
+            squishCompressImage((uint8_t*)rgba, size, size, size * 4,
                 compressed, tc_flag);
             GLint internal_format = needs_srgb_format ?
                 GL_COMPRESSED_SRGB_ALPHA_S3TC_DXT5_EXT :
@@ -231,7 +230,7 @@ void Skybox::generateCubeMapFromTextures()
             GLint internal_format = needs_srgb_format ? GL_SRGB8_ALPHA8 : GL_RGBA8;
             glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0,
                 internal_format, size, size, 0, format,
-                GL_UNSIGNED_BYTE, (GLvoid*)rgba[i]);
+                GL_UNSIGNED_BYTE, (GLvoid*)rgba);
         }
 
         if (CVS->isTextureCompressionEnabled())
@@ -242,11 +241,11 @@ void Skybox::generateCubeMapFromTextures()
                 2/*hopcount*/, 2.0f/*alpha*/, 1.0f/*amplifynormal*/,
                 0.0f/*normalsustainfactor*/);
 #ifdef DEBUG
-            int ret = imBuildMipmapCascade(&cascade, rgba[i], size, size,
+            int ret = imBuildMipmapCascade(&cascade, rgba, size, size,
                 1/*layercount*/, 4, size * 4, &options, 0);
             assert(ret == 1);
 #else
-            imBuildMipmapCascade(&cascade, rgba[i], size, size,
+            imBuildMipmapCascade(&cascade, rgba, size, size,
                 1/*layercount*/, 4, size * 4, &options, 0);
 #endif
             std::vector<unsigned> mipmap_sizes;
@@ -276,12 +275,12 @@ void Skybox::generateCubeMapFromTextures()
             }
             imFreeMipmapCascade(&cascade);
         }
+
+        delete[] rgba;
     }
 
     if (!CVS->isTextureCompressionEnabled())
         glGenerateMipmap(GL_TEXTURE_CUBE_MAP);
-    for (unsigned i = 0; i < 6; i++)
-        delete[] rgba[i];
 }   // generateCubeMapFromTextures
 
 
