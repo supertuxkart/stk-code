@@ -156,6 +156,7 @@ public:
     std::string       getCachedTexturesDir() const;
     std::string       getGPDir() const;
     std::string       getStdoutDir() const;
+    static std::string obfuscateUsername(const std::string &path);
     bool              checkAndCreateDirectory(const std::string &path);
     bool              checkAndCreateDirectoryP(const std::string &path);
     const std::string &getAddonsDir() const;
