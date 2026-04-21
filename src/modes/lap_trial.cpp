@@ -17,7 +17,7 @@
 
 #include "modes/lap_trial.hpp"
 
-#include "karts/abstract_kart.hpp"
+#include "karts/kart.hpp"
 #include "karts/controller/controller.hpp"
 #include "utils/string_utils.hpp"
 #include "tracks/track.hpp"
@@ -46,7 +46,7 @@ void LapTrial::getKartsDisplayInfo(std::vector<RaceGUIBase::KartIconDisplayInfo>
 
     for(unsigned int i = 0; i < numKarts; i++)
     {
-        AbstractKart* kart = m_karts[i].get();
+        Kart* kart = m_karts[i].get();
         RaceGUIBase::KartIconDisplayInfo& icon = (*icons)[i];
         int laps = getFinishedLapsOfKart(kart->getWorldKartId());
         icon.lap = -1;

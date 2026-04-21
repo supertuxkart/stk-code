@@ -19,7 +19,7 @@
 #include "physics/irr_debug_drawer.hpp"
 
 #include "graphics/irr_driver.hpp"
-#include "karts/abstract_kart.hpp"
+#include "karts/kart.hpp"
 #include "modes/world.hpp"
 
 #include <ISceneManager.h>
@@ -48,7 +48,7 @@ void IrrDebugDrawer::setDebugMode(DebugModeType mode)
     unsigned int num_karts = world->getNumKarts();
     for(unsigned int i=0; i<num_karts; i++)
     {
-        AbstractKart *kart = world->getKart(i);
+        Kart *kart = world->getKart(i);
         if(kart->isEliminated()) continue;
         kart->getNode()->setVisible(!(m_debug_mode & DM_NO_KARTS_GRAPHICS));
     }

@@ -9,6 +9,8 @@
         <ribbon id="difficulty" height="25%" width="80%" align="center">
             <icon-button id="novice" icon="gui/icons/difficulty_easy.png"
                     width="128" height="128" I18N="Difficulty" text="Novice"/>
+            <icon-button id="casual" icon="gui/icons/difficulty_casual.png"
+                    width="128" height="128" I18N="Difficulty" text="Casual"/>
             <icon-button id="intermediate" icon="gui/icons/difficulty_medium.png"
                     width="128" height="128" I18N="Difficulty" text="Intermediate"/>
             <icon-button id="expert" icon="gui/icons/difficulty_hard.png"

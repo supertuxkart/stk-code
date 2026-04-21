@@ -5,6 +5,122 @@ It should be kept in mind that some versions have a less complete changelog than
 
 For similar reasons, and because some features are vastly more complex than others, attributions of main changes should not be taken as a shortcut for overall contribution.
 
+## SuperTuxKart Evolution (work in progress)
+
+### Gameplay
+* In lower difficulty levels, apply a relative decrease to the strength of speed boosts, by Alayan
+* In lower difficulty levels, reduce the nitro consumption rate, by Alayan
+* Add a fifth difficulty level, for more gradation between easiest and hardest, by Alayan
+* Increase the time to reach maximum steering in lower difficulties, by Alayan
+* Reduce the duration and fade-out time of the startup boost, by Alayan
+* Slightly reduce rescue duration, by Alayan
+* Allow braking while accelerating, by Alayan
+* Ensure the AI is bound by the same durations as the player to change steering, by Alayan
+* Make the boosts from ground zippers and zipper powerups distinct, only applying the better one, by Nomagno
+* New multi-level handicap system, by Alayan
+* Make handicap usable in single-player, by Alayan
+* Prevent validating laps driving backwards (provided at least two correctly placed checklines), by Alayan
+* Prevent texture slowdown and reverse speed cap from fully multiplying, by Alayan
+
+#### Physics
+* Make the restitution curves (used when a kart rebounds on something) smoother and reduce the strength of rebounds at high-speeds, by Alayan
+* Uniformize jumping characteristics of karts (previously, heavier karts would have a much easier time taking off), by Alayan
+* Push karts upright much quicker when only some wheels touch the ground, by Alayan
+* Great improvements to the kart-on-kart collision logic, by Alayan:
+- Prevent two colliding karts from locking into each other
+- Make it easier to push another kart and make kart weight more meaningful
+- Help karts keep their direction during and after a collision
+
+#### Powerups
+* Rebalance all powerup probabilities, by Alayan:
+- Account for the new powerups
+- Reduce how much karts in average and bad positions attack each other
+- Make it possible to get some powerups by 2
+- Avoid basketballs, parachutes, triple zippers with 2 or 3 karts
+* Introduce a restricted randomness system, that seamlessly reduces streaks of good or bad luck, by Alayan
+* Extend the early item timeout to parachute and nitro-hacks, give a zipper instead of a bowling ball, by Alayan
+* Don't give basketballs if some karts have already finished the race, by Alayan
+* Replace swatters and bowling balls by gums during the early item timeout phase, by Alayan
+* Don't apply the early item timeout in non-racing modes, by Alayan
+* Make the swatter less oppressive, by reducing its held duration, the time loss from squashing, and slightly its reach, by Alayan
+* Activating a swatter with a gum shield active now pops the shield into a ground gum, by Alayan
+* Reduce the bubblegum shield duration and the flashing time before it drops, by Alayan
+* Prevent the duration of bubblegum shields from stacking infinitely and fix Nolok's bubblegum duration stacking, by Alayan
+* Speed up basketballs (especially when far from the leading kart), by Alayan
+* Reduce the basketball bouncing intervall and make the transition to fast-bounce mode seamless, by Alayan
+* Prevent basketballs from squashing karts protected by a shield, by Alayan
+* Make cake speed relative to the user's kart speed, by Alayan
+* Make zippers halve the texture slowdown effect, by Alayan
+* Reduce the max speed boost from the zipper, by Alayan
+* Enable the "shield restrict weapon" mode for the gum shield: using attacking powerups will drop the shield, by Alayan
+* New nitro-hack powerup, by Alayan:
+- It can steal some nitro from karts ahead. The nitro of karts ahead can become negative as a result. If there is no karts ahead, a small amount of nitro is generated and given.
+- It activates a boosted nitro mode, represented by the nitro bar and exhaust turning green instead of blue.
+- It appears at a higher rate for players in front, but it is strongest for players at the back.
+* New electro-shield powerup, by Alayan:
+- When active, provides a small top speed boost and a huge acceleration boost.
+- Also acts as a shield against most threats (not ground gums). It gets disabled upon a hit.
+* New mini-wish powerup, by Alayan:
+- Gives the player a choice between three weaker versions of standard powerups: zipper, bubblegum and cake.
+- The mini-zipper gives less speed, the mini-gum lasts shorter and drops smaller ground gums, the mini-cake is slower and has no area-of-effect.
+- The first press locks the mini-item choice, the second uses it.
+
+#### On-track items
+* Significantly reduce the nitro and gift box respawn times, by Alayan
+* Big nitro cans give 2.5 nitro units instead of 3, by Alayan
+* Introduce a new "air nitro" can, giving 1.5 nitro units, specifically designed to be placed mid-air after jumps, by Alayan
+* Add small ground bubblegum, and make small nitro can switch into them when the swapper is used, by Alayan
+* Use the kart hitbox size when determining if an on-track item has been touched, by Alayan
+* Give a different hitbox size to different on-track items (instead of a generic collect distance) to closely match visual touching and collection, by Alayan
+* Prevent ground gums from being activated if the kart is simply flying above them, by Alayan
+
+#### Kart characteristics
+* Introduce a new kart class, similar to medium, but with lower speed, better handling and a drift bonus, by Alayan
+* Make it more difficult for all kart classes to take curves, and increase the differentiation between kart classes, by Alayan
+* Slightly increase the base maximum speed without boosts, by Alayan
+* Transfer some of the skidding engine power boost to base power, to make drifting less important for quick acceleration, by Alayan
+* Ensure heavier karts have more total power on first gear for soccer pushing-contests, by Alayan
+* Make the duration of kart explosions depend on kart class, by Alayan
+* Make the speed reduction necessary to remove a parachute depend on kart class, by Alayan
+* Reduce the turn-radius penalty of active drifting, by Alayan
+* Make the maximum turn-radius during drifting similar for all kart classes, by Alayan
+* Apply turn-radius limitations to the reverse-gear, by Alayan
+* Give a bigger speed boost from nitro the lighter the kart is, instead of the reverse, by Alayan
+* Reduce the bonus nitro and nitro fadeout durations, by Alayan
+* Reduce the speed boost from the first-level (yellow) and second-level (red) drifts, by Alayan
+* Reduce the duration necessary to trigger a second-level (red) drift, by Alayan
+* Introduce a third-level (purple) drift with longer boost and duration, by Alayan
+* Prevent skidding bonuses cumulating during fadeout, by Alayan
+* Prevent kart chassis from colliding into the ground at high speeds, by Alayan
+* Multiply all engine power boosts by a kart-class specific factor, by Alayan
+
+
+### General
+* Double physics FPS from 120 to 240, by Alayan
+* Make various things, such as item rotation speed and the minimum nitro burst, independent from physics FPS, by Alayan
+* New powerup audio code, by Alayan:
+- Use a shared pool of audio sources to drastically reduce how many are used, and prevent running out of sources
+- Don't interrupt a kart's powerup sound effect when collecting or using a new powerup
+- Better code organization, avoiding the mixing of gameplay and audio management
+* Correctly fetch the number of relevant tracks for achievements, by Alayan
+* Add new achievements for the completion of egg hunts, by Alayan
+* Make many more parameters modifiable in configuration files, by Alayan
+* Remove AbstractKart for cleaner code, by Fouks
+* A lot of code clean-up, by Alayan
+
+### Graphics
+* Mix skid particles to warn that the next drifting level is almost ready, by Alayan
+
+### User Interface
+* Update the kart skill displays (speed, etc.) to handle the new kart characteristics and handicap levels, by Alayan
+* Add a drifting skill to the kart skill display, by Alayan
+
+#### In-race UI
+* Support the display of boosted nitro and negative nitro for the Nitro-Hack, by Alayan
+* New speedometer, that can display a maximum speed of up to 55 (up from 40), by Alayan
+* Support the display of wide powerup icons, for the Mini-Wish, by Alayan
+
+
 ## SuperTuxKart 1.5.1
 
 ### Networking
@@ -50,7 +166,8 @@ For similar reasons, and because some features are vastly more complex than othe
 * Fix an egg that was very difficult to collect (due to collision issues) in the Black Forest intermediate egg hunt, by Sven
 
 #### Arenas
-* TV spectator ameras for all soccer fields, by LLS and Sven
+* TV spectator cameras for all soccer fields, by LLS and Sven
+
 
 ## SuperTuxKart 1.5 (20. October 2025)
 
@@ -101,7 +218,7 @@ For similar reasons, and because some features are vastly more complex than othe
 * Add spotlights, by CodingJellyfish
 * Replace inaccurate normal compression algorithm with Octahedron Normal Vector, by CodingJellyfish
 * Fix the Screen-Space Reflection shader, by CodingJellyfish
-* Fix and improve the Screen-Space Ambiant Occlusion shader, by CodingJellyfish
+* Fix and improve the Screen-Space Ambient Occlusion shader, by CodingJellyfish
 * Implement Percentage-Closer Soft Shadows, by CodingJellyfish
 * Guarantee an overall bone limit of 2048 for skinned mesh (up from 1024), by CodingJellyfish
 * Improve Cascaded Shadow Mapping, by CodingJellyfish and Alayan
@@ -170,7 +287,7 @@ For similar reasons, and because some features are vastly more complex than othe
 * Enable ARMv7 build for Windows, by Benau
 * Restore macOS <= 10.14 support, by Benau
 * Allow setting the auto-center behavior of steering wheels, by Mary
-* Simplify making derivative UI skins by allowing to specify a base theme, by qwertychouskie
+* Simplify making derivative UI skins by allowing to specify a base theme, by QwertyChouskie
 * Make sure old save data is only removed after new save data is written, to avoid data losses on full drives, by Benau
 * Fixed camera rotation when using the gyroscope and driving on vertical surfaces, by Benau
 * Lap trial mode, by mrkubax10
@@ -200,7 +317,7 @@ For similar reasons, and because some features are vastly more complex than othe
 
 ### Tracks and modeling
 #### Tracks
-* Fix broken invisible wall in Antediluvian Abyss, by Benau
+* Fix broken invisible wall in Antediluvian Abysses, by Benau
 * New textures in Shifting Sands, by KartOym
 
 #### Karts
@@ -259,7 +376,8 @@ For similar reasons, and because some features are vastly more complex than othe
 
 #### Karts
 * Pepper (replaces Sara the Wizard), by ZAQraven99
-* Improved Adiumy, Emule, GNU and Sara karts, by ZAQraven99
+* Sara (replaces Sara the Racer), by Zaqraven99
+* Improved Adiumy, Emule and GNU karts, by ZAQraven99
 
 #### Arenas
 * Alien Signal, by Samuncle
@@ -349,13 +467,13 @@ For similar reasons, and because some features are vastly more complex than othe
 * Fix a bug that made AIs, in multiplayer and low difficulty, rubber-band towards the wrong player, by Alayan. Each player now correctly has its AIs, helping a weaker player to not be condemned to the last position.
 
 ### General
-* Screen space reflection graphical effect, by samuncle
+* Screen space reflection graphical effect, by Samuncle
 * Support unicode file paths, by Benau
 * Complex text layout support, by Benau
 * Add emoji support, by Benau
 * Avoid "this program is not responding" warnings in Windows and Mac, by Benau
 * Add a Story Mode timer, by Alayan
-* Make text billboards size consistent accross resolutions, by Benau
+* Make text billboards size consistent across resolutions, by Benau
 * Don't trigger road sounds when the kart is flying, by Benau
 * Remove an incorrect function call that could significantly hurt performance for Mac, by Benau
 * Fix a nasty bug that made several sound effects to be played at a low volume after a crash, by Alayan
@@ -420,7 +538,7 @@ For similar reasons, and because some features are vastly more complex than othe
 ### Tracks and modeling
 #### Tracks
  * A handful of minor graphical fixes and enhancements
- * Fixed checklines that could be missed too easily in XR591 and the Old Mine.
+ * Fixed checklines that could be missed too easily in XR591 and The Old Mine.
 #### Arenas
  * Pumpkin Park, by Samuncle
 
@@ -511,9 +629,9 @@ For similar reasons, and because some features are vastly more complex than othe
 ### Tracks and modeling
 #### Tracks
 * Black Forest, by Sven Andreas Belting (replacing Green Valley)
-* Ravenbridge Mansion, by Samuncle (replacing Black Hill Mansion)
+* Ravenbridge Mansion, by Samuncle (replacing Blackhill Mansion)
 * Unwanted shortcuts and exploits found by several players and fixed mostly by Auria in many tracks :
-    * Antediluvian Abyss, Around the Lighthouse, Fort Magma, Grand Paradisio Island, Hacienda, Minigolf, Nessie's Pond, Northern Resort, The Old Mine, Oliver's Math Class, Shifting Sands, STK Enterprise, XR591
+    * Antediluvian Abysses, Around the Lighthouse, Fort Magma, Grand Paradisio Island, Hacienda, Minigolf, Nessie's Pond, Northern Resort, The Old Mine, Oliver's Math Class, Shifting Sands, STK Enterprise, XR591
 * Smoothness issues causing collisions and kart slowdown fixed by Auria :
     * Nessie's Pond, Old Mine, Shifting Sands, Volcano Island, XR591
 * Item (boxes, nitro, bananas) positions improvement by Alayan and theThomasPat :
@@ -548,6 +666,7 @@ For similar reasons, and because some features are vastly more complex than othe
 * Kiki, by Benau
 * New versions of Wilber and Hexley, by Jymis
 * New version of Konqi, by Benau
+* Removal of Elephpant
 #### Tracks
 * Ensure that there is a visual representation of the start line in all tracks
 * All tracks drivable in reverse, with arrows pointing in the correct direction
@@ -595,7 +714,7 @@ For similar reasons, and because some features are vastly more complex than othe
     * Subsea
 
 
-## SupertTuxKart 0.9 (24. April 2015)
+## SuperTuxKart 0.9 (24. April 2015)
 * Fully shader-based rendering engine
 * Online login which allows to:
     * connect with friends and see when they are playing
@@ -616,6 +735,7 @@ For similar reasons, and because some features are vastly more complex than othe
 * Cocoa Temple, by Samuncle (replaces Amazonian Journey)
 * Gran Paradiso Island, by Samuncle (replaces The Island)
 * Graphical improvements to many other tracks
+* Nicer new name for a track: Nessie's Pond (previously Scotland)
 
 
 ## SuperTuxKart 0.8.1 (26. November 2013)
@@ -637,10 +757,11 @@ For similar reasons, and because some features are vastly more complex than othe
 * Xue, by JunglePenguin
 * Sara, by Samuncle
 * Updated Beastie and Konqi
+* Removal of Mozilla
 #### Tracks
 * STK Enterprise by Rubberduck (replaces Star Track)
 * Redesign of Minigolf, by Rubberduck
-* New longer track layout and improved graphics for Lighthouse, by Samuncle
+* New longer track layout and improved graphics for 'Around the Lighthouse', by Samuncle
 * Gameplay and graphical updates to several tracks :
     * The Old Mine
     * Zen Garden
@@ -659,30 +780,34 @@ For similar reasons, and because some features are vastly more complex than othe
 ### Tracks and modeling
 * New overworld for the Story Mode, by Auria
 #### Tracks
-* Green Valley, by Wolfs (replaces Tux Tollway)
-* Blackhill Mansion, by Samuncle (replaces Crescent Crossing)
-* New track layout and improved graphics for Shifting Sands (formerly Sand)
+* Green Valley, by Wolfs (replacing Tux Tollway)
+* Blackhill Mansion, by Samuncle (replacing Crescent Crossing)
+* New track layout and improved graphics for Shifting Sands, by Samuncle
 * Gameplay and graphical updates to several tracks :
     * XR591
     * Fort Magma
-    * Jungle
+    * Amazonian Journey
     
 
 ## SuperTuxKart 0.7.3 (2. November 2011)
 * New graphical effects
-* New weapons 'Swatter' and 'Rubber Ball'
 * 3 Strikes Battles now displays lives as spare tires
 * Improved bubble gum
 * See progression during Grand Prix
-* Improve physics for tall karts (e.g. Adiumy)
+* Transition track-making to blender 2.5/2.6
 * Lots of bug fixes
+
+### Race gameplay and physics
+* New powerup 'Swatter', a green fly-swatter that squashes karts nearby and can be used to remove bombs and parachutes
+* New powerup 'Rubber Ball', a giant bouncy ball that chases after the kart in first place
+* Improve physics for tall karts (e.g. Adiumy)
 * Improved kart control at high speeds
 * Better placement of rescued karts
-* Transition track-making to blender 2.5/2.6
 
 ### Tracks and modeling
 #### Karts
 * Suzanne, by Cédric Archambault
+* Removal of Gooey
 #### Tracks
 * Zen Garden, by Samuncle (replaces Secret Garden)
 * Minigolf, by Mac
@@ -742,7 +867,7 @@ For similar reasons, and because some features are vastly more complex than othe
 #### Tracks
 * New Fort Magma, by Samuncle
 * Shiny Suburbs, by Horace (based on Thomas Oppl's City track)
-* Renaming of several tracks to nicer names:
+* New names for several tracks, using nicer names:
   * Bovine Barnyard (previously Farm), Northern Resort (previously Snow Mountain), Coyote Canyon (previously Canyon)
 
 
@@ -789,7 +914,7 @@ Main points:
 * Bugfix: Items explode over void.
 * Bugfix: Grass in castle arena slowed down the kart.
 * Bugfix: GP result showed kart identifier instead of name.
-* Improvement: there is now 1 1 sec. wait period for the race result screen, avoiding the problem that someone presses space/enter at the end of a race, immediately quitting the menu before it can be read.
+* Improvement: there is now a 1 sec. wait period for the race result screen, avoiding the problem that someone presses space/enter at the end of a race, immediately quitting the menu before it can be read.
 
 ### Tracks and modeling
 #### Karts
@@ -853,13 +978,13 @@ Main points:
 * Removal of Penny
 * Removal of Skirpy
 * Removal of Yeti
-* Renaming of some karts: Mozilla (previously Dino), Gooey (previously Sushi)
+* New names for some karts: Mozilla (previously Dino), Gooey (previously Sushi)
 #### Tracks
 * Skyline, by Robert Howie
 * Snow Mountain, by Canis Lupus
 * XR591, by Canis Lupus
 * Race Track, by Thomas Oppl (replaces the previous Race Track with an entirely new track)
-* Mine, by Ivar ten Cate
+* The Old Mine, by Ivar ten Cate
 * Tux Tollway, by Ivar ten Cate (replaces the previous Tux Tollway with an entirely new track)
 * Improved Star track
 * Removal of City
@@ -904,7 +1029,7 @@ Main points:
 
 #### Tracks
 * Shifting Sands
-* Improvements to 'Lighthouse'
+* Improvements to 'Around the Lighthouse'
 
 
 ## SuperTuxKart 0.3 (May 2007)
@@ -955,7 +1080,7 @@ Main points:
 * Around the Lighthouse
 * BSODs Battlements
 * Geeko Peak
-* Gowns bow
+* Gown's Bow
 * Little Volcano
 * Oliver's Math Class
 * On the Beach

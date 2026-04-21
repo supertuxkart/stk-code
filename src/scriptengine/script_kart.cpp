@@ -19,6 +19,7 @@
 #include "script_kart.hpp"
 
 #include "karts/kart.hpp"
+#include "karts/kart_utils.hpp"
 #include "karts/kart_model.hpp"
 #include "karts/kart_properties.hpp"
 #include "modes/world.hpp"
@@ -47,33 +48,40 @@ namespace Scripting
         /** Squashes the specified kart, for the specified time */
         void squash(int idKart, float time)
         {
-            AbstractKart* kart = World::getWorld()->getKart(idKart);
-            kart->setSquash(time, 0.5);  //0.5 * max speed is new max for squashed duration
-        }
+            ::Kart* kart = World::getWorld()->getKart(idKart);
+            kart->setSquash(time, 0.6);  //0.6 * max speed is new max for squashed duration
+        }   // squash
+
+        /** Explodes the specified kart, using either a small or normal explosion */
+        void explode(int idKart, bool small)
+        {
+            ::Kart* kart = World::getWorld()->getKart(idKart);
+            KartUtils::createExplosion(kart, small);
+        }   // explode
 
         /** Teleports the kart to the specified Vec3 location */
         void teleport(int idKart, SimpleVec3* position)
         {
-            AbstractKart* kart = World::getWorld()->getKart(idKart);
+            ::Kart* kart = World::getWorld()->getKart(idKart);
             Vec3 v(position->getX(), position->getY(), position->getZ());
             kart->setXYZ(v);
             unsigned int index = World::getWorld()->getRescuePositionIndex(kart);
             btTransform s = World::getWorld()->getRescueTransform(index);
             s.setRotation(btQuaternion(btVector3(0.0f, 1.0f, 0.0f), 0.0f));
             World::getWorld()->moveKartTo(kart, s);
-        }
+        }   // teleport
         
         /** Teleports the kart to the specified Vec3 location */
         void teleportExact(int idKart, SimpleVec3* position)
         {
-            AbstractKart* kart = World::getWorld()->getKart(idKart);
+            ::Kart* kart = World::getWorld()->getKart(idKart);
             Vec3 v(position->getX(), position->getY(), position->getZ());
             kart->setXYZ(v);
             btTransform s;
             s.setRotation(kart->getRotation());
             s.setOrigin(v);
             World::getWorld()->moveKartTo(kart, s);
-        }
+        }   // teleportExact
 
         /** Attempts to project kart to the given 2D location, to the position
           * with height 0, at a 45 degree angle.
@@ -93,7 +101,7 @@ namespace Scripting
         //    //angle = pi/4 so t = v/(root 2 * g)
         //    //d = t * v/root 2 so d = v^2/(2g) => v = root(2dg)
         //    //component in x = component in y = root (dg)
-        //    AbstractKart* kart = World::getWorld()->getKart(id);
+        //    Kart* kart = World::getWorld()->getKart(id);
         //    Vec3 pos = kart->getXYZ();
         //    float dx = x - pos[0];
         //    float dy = y - pos[2]; //blender uses xyz, bullet xzy
@@ -109,7 +117,7 @@ namespace Scripting
         /** Returns the location of the corresponding kart. */
         SimpleVec3 getLocation(int idKart)
         {
-            AbstractKart* kart = World::getWorld()->getKart(idKart);
+            ::Kart* kart = World::getWorld()->getKart(idKart);
             Vec3 v = kart->getXYZ();
             return SimpleVec3(v.getX(), v.getY(), v.getZ());
         }
@@ -121,14 +129,14 @@ namespace Scripting
             float y = position->getY();
             float z = position->getZ();
 
-            AbstractKart* kart = World::getWorld()->getKart(idKart);
+            ::Kart* kart = World::getWorld()->getKart(idKart);
             kart->setVelocity(btVector3(x, y, z));
         }
 
         /** Gets the kart's velocity */
         SimpleVec3 getVelocity(int idKart)
         {
-            AbstractKart* kart = World::getWorld()->getKart(idKart);
+            ::Kart* kart = World::getWorld()->getKart(idKart);
             btVector3 velocity = kart->getVelocity();
             return SimpleVec3(velocity.getX(), velocity.getY(), velocity.getZ());
         }
@@ -136,14 +144,14 @@ namespace Scripting
         /** Gets the maximum speed (velocity) a kart can reach */
         float getMaxSpeed(int idKart)
         {
-            AbstractKart* kart = World::getWorld()->getKart(idKart);
+            ::Kart* kart = World::getWorld()->getKart(idKart);
             return kart->getKartProperties()->getEngineMaxSpeed();
         }
 
         /** Gets the maximum speed (velocity) a kart can reach */
         void changeKart(int idKart, std::string* new_id)
         {
-            AbstractKart* kart = World::getWorld()->getKart(idKart);
+            ::Kart* kart = World::getWorld()->getKart(idKart);
             HandicapLevel hl = kart->getHandicap();
             auto ri = kart->getKartModel()->getRenderInfo();
             kart->changeKart(*new_id, hl, ri);
@@ -162,6 +170,10 @@ namespace Scripting
             
             r = engine->RegisterGlobalFunction("void squash(int id, float time)",
                                                mp ? WRAP_FN(squash) : asFUNCTION(squash),
+                                               call_conv); assert(r >= 0);
+
+            r = engine->RegisterGlobalFunction("void explode(int id, bool small)", 
+                                               mp ? WRAP_FN(explode) : asFUNCTION(explode), 
                                                call_conv); assert(r >= 0);
                                                
             r = engine->RegisterGlobalFunction("void teleport(int id, const Vec3 &in)",

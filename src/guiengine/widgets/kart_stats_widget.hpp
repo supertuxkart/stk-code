@@ -49,6 +49,7 @@ namespace GUIEngine
             SKILL_SPEED,
             SKILL_ACCELERATION,
             SKILL_NITRO_EFFICIENCY,
+            SKILL_SKIDDING,
             SKILL_COUNT
         };
 
@@ -70,7 +71,7 @@ namespace GUIEngine
 
         std::vector<SkillLevelWidget*> m_skills;
 
-        void setSkillValues(Stats skill_type, float value, const std::string icon_name,
+        float setSkillValues(Stats skill_type, float value, const std::string icon_name,
                             const std::string skillbar_propID, const irr::core::stringw icon_tooltip);
 
 

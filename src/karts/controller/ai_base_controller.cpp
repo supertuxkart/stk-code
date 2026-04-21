@@ -21,7 +21,7 @@
 
 #include "config/user_config.hpp"
 #include "graphics/camera/camera.hpp"
-#include "karts/abstract_kart.hpp"
+#include "karts/kart.hpp"
 #include "karts/kart_properties.hpp"
 #include "karts/controller/ai_properties.hpp"
 #include "modes/world.hpp"
@@ -34,7 +34,7 @@
 bool AIBaseController::m_ai_debug = false;
 int  AIBaseController::m_test_ai  = 0;
 
-AIBaseController::AIBaseController(AbstractKart *kart)
+AIBaseController::AIBaseController(Kart *kart)
                 : Controller(kart)
 {
     m_kart          = kart;
@@ -171,18 +171,13 @@ float AIBaseController::normalizeAngle(float angle)
 
 //-----------------------------------------------------------------------------
 /** Converts the steering angle to a lr steering in the range of -1 to 1.
- *  If the steering angle is too great, it will also trigger skidding. This
- *  function uses a 'time till full steer' value specifying the time it takes
- *  for the wheel to reach full left/right steering similar to player karts
- *  when using a digital input device. The parameter is defined in the kart
- *  properties and helps somewhat to make AI karts more 'pushable' (since
- *  otherwise the karts counter-steer to fast).
+ *  If the steering angle is too great, it will also trigger skidding.
  *  It also takes the effect of a plunger into account by restricting the
  *  actual steer angle to 50% of the maximum.
  *  \param angle Steering angle.
  *  \param dt Time step.
  */
-void AIBaseController::setSteering(float angle, float dt)
+void AIBaseController::setSteering(float angle)
 {
     float steer_fraction = angle / m_kart->getMaxSteerAngle();
     if(!canSkid(steer_fraction))
@@ -190,7 +185,6 @@ void AIBaseController::setSteering(float angle, float dt)
     else
         m_controls->setSkidControl(steer_fraction > 0 ? KartControl::SC_RIGHT
                                                       : KartControl::SC_LEFT );
-    float old_steer      = m_controls->getSteer();
 
     if     (steer_fraction >  1.0f) steer_fraction =  1.0f;
     else if(steer_fraction < -1.0f) steer_fraction = -1.0f;
@@ -201,18 +195,7 @@ void AIBaseController::setSteering(float angle, float dt)
         else if(steer_fraction < -0.5f) steer_fraction = -0.5f;
     }
 
-    // The AI has its own 'time full steer' value (which is the time
-    float max_steer_change = dt/m_ai_properties->m_time_full_steer;
-    if(old_steer < steer_fraction)
-    {
-        m_controls->setSteer(( old_steer+max_steer_change > steer_fraction)
-                             ? steer_fraction : old_steer+max_steer_change);
-    }
-    else
-    {
-        m_controls->setSteer( (old_steer-max_steer_change < steer_fraction)
-                               ? steer_fraction : old_steer-max_steer_change );
-    }
+    m_controls->setSteer(steer_fraction);
 }   // setSteering
 
 // ------------------------------------------------------------------------

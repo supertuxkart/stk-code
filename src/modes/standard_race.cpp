@@ -19,7 +19,7 @@
 
 #include "challenges/unlock_manager.hpp"
 #include "items/powerup_manager.hpp"
-#include "karts/abstract_kart.hpp"
+#include "karts/kart.hpp"
 #include "karts/controller/controller.hpp"
 #include "karts/controller/ghost_controller.hpp"
 #include "network/network_config.hpp"
@@ -110,7 +110,7 @@ void StandardRace::endRaceEarly()
     for (unsigned int i = 1; i <= kart_amount; i++)
     {
         int kartid = m_position_index[i-1];
-        AbstractKart* kart = m_karts[kartid].get();
+        Kart* kart = m_karts[kartid].get();
 
         if (kart->hasFinishedRace())
         {

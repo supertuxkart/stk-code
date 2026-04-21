@@ -21,12 +21,12 @@ jobs:
             arch: x86_64
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v6
         with:
           fetch-depth: 0
           submodules: true
       - id: sysroot
-        uses: ASzc/change-string-case-action@v1
+        uses: ASzc/change-string-case-action@v8
         with:
           string: ${{ matrix.platform }}
       - name: Download cctools and ISPC
@@ -52,7 +52,7 @@ jobs:
             echo "cache_$number=apple-${{ github.ref }}-${{ matrix.arch }}-${{ matrix.platform }}-$id" >> $GITHUB_ENV
           done
       - name: Handle build cache
-        uses: actions/cache@v3
+        uses: actions/cache@v5
         with:
           path: |
             build
@@ -97,7 +97,7 @@ jobs:
           make -j4
           mv bin ../${{ steps.sysroot.outputs.lowercase }}-${{ matrix.arch }}
       - name: Upload binaries
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: ${{ steps.sysroot.outputs.lowercase }}-${{ matrix.arch }}
           path: ${{ steps.sysroot.outputs.lowercase }}-${{ matrix.arch }}
@@ -135,7 +135,7 @@ jobs:
           echo "${{ env.release_name }}"
           echo "${{ env.release_pre }}"
       - name: Download binaries
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v8
       #- name: Mask developer name
       #  run: |
       #    echo "::add-mask::${{ secrets.MAC_DEVELOPER_NAME }}"
@@ -185,7 +185,7 @@ jobs:
           ditto -c -k --sequesterRsrc --keepParent SuperTuxKart.app SuperTuxKart-${{ env.release_tag }}-mac.zip
       - name: Create release
         if: ${{ env.release_tag != '' }}
-        uses: ncipollo/release-action@v1.8.8
+        uses: ncipollo/release-action@v1
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           artifacts: "SuperTuxKart*.zip"

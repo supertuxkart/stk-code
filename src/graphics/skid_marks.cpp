@@ -30,7 +30,7 @@
 #include "graphics/sp/sp_shader_manager.hpp"
 #include "graphics/sp/sp_texture_manager.hpp"
 #include "graphics/sp/sp_uniform_assigner.hpp"
-#include "karts/abstract_kart.hpp"
+#include "karts/kart.hpp"
 #include "karts/skidding.hpp"
 #include "modes/world.hpp"
 #include "physics/btKart.hpp"
@@ -50,7 +50,7 @@ const int SkidMarks::m_start_alpha       = 200;
 const int SkidMarks::m_start_grey        = 32;
 
 /** Initialises empty skid marks. */
-SkidMarks::SkidMarks(const AbstractKart& kart, float width) : m_kart(kart)
+SkidMarks::SkidMarks(const Kart& kart, float width) : m_kart(kart)
 {
     m_width = width;
     m_material = material_manager->getMaterialSPM("skidmarks.png", "",

@@ -32,8 +32,6 @@ class RaceSetupScreen : public GUIEngine::Screen, public GUIEngine::ScreenSingle
 
     RaceSetupScreen();
 
-    void onGameModeChanged();
-
     void assignDifficulty();
 
 public:

@@ -34,7 +34,7 @@ class ChallengeStatus;
 class UTFWriter;
 class XMLNode;
 
-const int CHALLENGE_POINTS[] = { 6, 7, 8, 10 };
+const int CHALLENGE_POINTS[] = { 5, 6, 7, 8, 10 };
 const int GP_FACTOR = 3;
 
 /** This class contains the progression through challenges for the story mode.
@@ -69,6 +69,7 @@ private:
     bool m_first_time;
 
     int m_easy_challenges;
+    int m_casual_challenges;
     int m_medium_challenges;
     int m_hard_challenges;
     int m_best_challenges;
@@ -111,8 +112,8 @@ public:
     void clearUnlocked     () {m_unlocked_features.clear(); }
     // ----------------------------------------------------------------------------------------
     /** Returns the number of completed challenges. */
-    int getNumCompletedChallenges  () const { return (m_easy_challenges + m_medium_challenges +
-                                                      m_hard_challenges + m_best_challenges); }
+    int getNumCompletedChallenges  () const { return (m_easy_challenges + m_casual_challenges +
+                                m_medium_challenges + m_hard_challenges + m_best_challenges); }
     // ----------------------------------------------------------------------------------------
     /** Returns the number of challenges with the superTux time beaten in a lower difficulty. */
     int getNumReqMetInLowerDiff  () const;
@@ -128,6 +129,9 @@ public:
     // ----------------------------------------------------------------------------------------
     /** Returns the number of fulfilled challenges at easy level. */
     int getNumEasyTrophies  () const { return m_easy_challenges;   }
+    // ----------------------------------------------------------------------------------------
+    /** Returns the number of fulfilled challenges at casual level. */
+    int getNumCasualTrophies() const { return m_casual_challenges; }
     // ----------------------------------------------------------------------------------------
     /* Returns the number of fulfilled challenges at medium level. */
     int getNumMediumTrophies() const { return m_medium_challenges; }

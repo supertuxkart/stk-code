@@ -22,7 +22,7 @@
 
 #include "io/file_manager.hpp"
 #include "modes/world.hpp"
-#include "karts/abstract_kart.hpp"
+#include "karts/kart.hpp"
 #include "karts/controller/controller.hpp"
 #include "network/network_config.hpp"
 #include "network/rewind_manager.hpp"
@@ -100,7 +100,7 @@ void History::updateReplay(int world_ticks)
         m_all_input_events[m_event_index].m_world_ticks <= world_ticks)
     {
         const InputEvent &ie = m_all_input_events[m_event_index];
-        AbstractKart *kart = world->getKart(ie.m_kart_index);
+        Kart *kart = world->getKart(ie.m_kart_index);
         Log::verbose("history", "time %d event-time %d action %d %d",
             world->getTicksSinceStart(), ie.m_world_ticks, ie.m_action,
             ie.m_value);

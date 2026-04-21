@@ -21,7 +21,7 @@
 #include "guiengine/screen.hpp"
 #include "guiengine/widgets/button_widget.hpp"
 #include "guiengine/widgets/label_widget.hpp"
-#include "karts/abstract_kart.hpp"
+#include "karts/kart.hpp"
 #include "modes/world.hpp"
 #include "states_screens/state_manager.hpp"
 #include "utils/translation.hpp"

@@ -22,7 +22,7 @@
 #include "config/user_config.hpp"
 #include "items/network_item_manager.hpp"
 #include "items/powerup_manager.hpp"
-#include "karts/abstract_kart.hpp"
+#include "karts/kart.hpp"
 #include "karts/controller/player_controller.hpp"
 #include "karts/kart_properties.hpp"
 #include "karts/kart_properties_manager.hpp"
@@ -1171,7 +1171,7 @@ bool ServerLobby::canLiveJoinNow() const
         LinearWorld* w = dynamic_cast<LinearWorld*>(World::getWorld());
         if (!w)
             return false;
-        AbstractKart* fastest_kart = NULL;
+        Kart* fastest_kart = NULL;
         for (unsigned i = 0; i < w->getNumKarts(); i++)
         {
             fastest_kart = w->getKartAtPosition(i + 1);
@@ -3877,12 +3877,17 @@ void ServerLobby::listBanTable()
 }   // listBanTable
 
 //-----------------------------------------------------------------------------
-float ServerLobby::getStartupBoostOrPenaltyForKart(uint32_t ping,
+// FIXME : This shouldn't be in ServerLobby!!!
+uint8_t ServerLobby::getStartupBoostOrPenaltyForKart(uint32_t ping,
                                                    unsigned kart_id)
 {
-    AbstractKart* k = World::getWorld()->getKart(kart_id);
-    if (k->getStartupBoost() != 0.0f)
-        return k->getStartupBoost();
+    // boost-level 0 corresponds to a start penalty
+    // boost-level 1 corresponds to a start without boost or penalty
+    // boost-level 2 or more corresponds to a start with boost
+    Kart* k = World::getWorld()->getKart(kart_id);
+    // If a boost already exists, return it
+    if (k->getStartupBoostLevel() >= 2)
+        return k->getStartupBoostLevel();
     uint64_t now = STKHost::get()->getNetworkTimer();
     uint64_t client_time = now - ping / 2;
     uint64_t server_time = client_time + m_server_delay;
@@ -3890,14 +3895,11 @@ float ServerLobby::getStartupBoostOrPenaltyForKart(uint32_t ping,
         (float)(server_time - m_server_started_at) / 1000.0f);
     if (ticks < stk_config->time2Ticks(1.0f))
     {
-        PlayerController* pc =
-            dynamic_cast<PlayerController*>(k->getController());
-        pc->displayPenaltyWarning();
-        return -1.0f;
+        k->enablePenaltyTicks();
+        return 0; // Penalty
     }
-    float f = k->getStartupBoostFromStartTicks(ticks);
-    k->setStartupBoost(f);
-    return f;
+    k->setStartupBoostFromStartTicks(ticks);
+    return k->getStartupBoostLevel();
 }   // getStartupBoostOrPenaltyForKart
 
 //-----------------------------------------------------------------------------
@@ -4078,7 +4080,7 @@ void ServerLobby::handlePlayerDisconnection() const
         else
             rki.makeReserved();
 
-        AbstractKart* k = World::getWorld()->getKart(i);
+        Kart* k = World::getWorld()->getKart(i);
         if (!k->isEliminated() && !k->hasFinishedRace())
         {
             CaptureTheFlag* ctf = dynamic_cast<CaptureTheFlag*>
@@ -4237,7 +4239,7 @@ void ServerLobby::handleKartInfo(Event* event)
     if (kart_id > RaceManager::get()->getNumPlayers())
         return;
 
-    AbstractKart* k = w->getKart(kart_id);
+    Kart* k = w->getKart(kart_id);
     int live_join_util_ticks = k->getLiveJoinUntilTicks();
 
     const RemoteKartInfo& rki = RaceManager::get()->getKartInfo(kart_id);

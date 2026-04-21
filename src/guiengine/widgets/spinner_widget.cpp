@@ -99,7 +99,6 @@ SpinnerWidget::SpinnerWidget(const bool gauge) : Widget(WTYPE_SPINNER)
     m_value = -1;
     m_badge_x_shift = 0;
     m_use_background_color=false;
-    m_spinner_widget_player_id=PLAYER_ID_GAME_MASTER;
     m_min = 0;
     m_max = 999;
     m_step = 1.0;
@@ -320,7 +319,9 @@ void SpinnerWidget::resize()
 /** Pick the appropriate font size to display the current spinner label */
 void SpinnerWidget::resizeLabel()
 {
-    if (m_graphical) // Don't proceed further if this spinner doesn't use labels
+    // Don't proceed further if this spinner doesn't use labels
+    // or if this spinner's children haven't been set yet
+    if (m_graphical || m_children.size() < 2) 
         return;
 
     rect<s32> subsize_label = rect<s32>(m_h, 0, m_w - m_h, m_h);

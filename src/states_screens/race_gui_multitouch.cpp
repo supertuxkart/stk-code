@@ -31,7 +31,7 @@ using namespace irr;
 #include "input/device_manager.hpp"
 #include "input/multitouch_device.hpp"
 #include "items/powerup.hpp"
-#include "karts/abstract_kart.hpp"
+#include "karts/kart.hpp"
 #include "karts/controller/kart_control.hpp"
 #include "network/protocols/client_lobby.hpp"
 #include "states_screens/race_gui_base.hpp"
@@ -354,7 +354,7 @@ void RaceGUIMultitouch::onCustomButtonPress(unsigned int button_id,
  *  \param viewport The viewport to use.
  *  \param scaling Which scaling to apply to the buttons.
  */
-void RaceGUIMultitouch::draw(const AbstractKart* kart,
+void RaceGUIMultitouch::draw(const Kart* kart,
                              const core::recti &viewport,
                              const core::vector2df &scaling)
 {
@@ -383,7 +383,7 @@ void RaceGUIMultitouch::draw(const AbstractKart* kart,
             core::rect<s32> coords(pos_zero, btn_texture->getSize());
             draw2DImageRotationColor(btn_texture, btn_pos, coords, NULL,
                 (button->axis_y >= 0 ? -1 : 1) * button->axis_x, color);
-            AbstractKart* k = NULL;
+            Kart* k = NULL;
             Camera* c = Camera::getActiveCamera();
             if (c)
                 k = c->getKart();
@@ -415,7 +415,7 @@ void RaceGUIMultitouch::draw(const AbstractKart* kart,
             video::ITexture* btn_texture = m_accelerator_tex;
             core::rect<s32> coords(pos_zero, btn_texture->getSize());
             draw2DImage(btn_texture, btn_pos, coords, NULL, NULL, true);
-            AbstractKart* k = NULL;
+            Kart* k = NULL;
             Camera* c = Camera::getActiveCamera();
             if (c)
                 k = c->getKart();

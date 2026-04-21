@@ -22,7 +22,7 @@
 
 #include "items/attachment.hpp"
 #include "items/powerup.hpp"
-#include "karts/abstract_kart.hpp"
+#include "karts/kart.hpp"
 #include "karts/controller/kart_control.hpp"
 #include "karts/controller/spare_tire_ai.hpp"
 #include "modes/three_strikes_battle.hpp"
@@ -33,7 +33,7 @@
 #include "irrlicht.h"
 #endif
 
-BattleAI::BattleAI(AbstractKart *kart)
+BattleAI::BattleAI(Kart *kart)
          : ArenaAI(kart)
 {
 
@@ -82,7 +82,7 @@ void BattleAI::findClosestKart(bool consider_difficulty, bool find_sta)
         find_sta ? end - RaceManager::get()->getNumSpareTireKarts() : 0;
         start_id < end; start_id++)
     {
-        const AbstractKart* kart = m_world->getKart(start_id);
+        const Kart* kart = m_world->getKart(start_id);
         const SpareTireAI* sta =
             dynamic_cast<const SpareTireAI*>(kart->getController());
         if (kart->isEliminated() && !(find_sta && sta && sta->isMoving()))
@@ -98,7 +98,7 @@ void BattleAI::findClosestKart(bool consider_difficulty, bool find_sta)
             consider_difficulty)
         {
             // Skip human players for novice mode unless only they are left
-            const AbstractKart* temp = m_world->getKart(start_id);
+            const Kart* temp = m_world->getKart(start_id);
             if (temp->getController()->isPlayerController() &&
                (m_world->getCurrentNumKarts() -
                 m_world->getCurrentNumPlayers()) > 1)
@@ -108,7 +108,7 @@ void BattleAI::findClosestKart(bool consider_difficulty, bool find_sta)
             consider_difficulty)
         {
             // Skip AI players for supertux mode
-            const AbstractKart* temp = m_world->getKart(start_id);
+            const Kart* temp = m_world->getKart(start_id);
             if (!(temp->getController()->isPlayerController()))
                 continue;
         }
@@ -144,6 +144,7 @@ void BattleAI::findTarget()
         switch (m_cur_difficulty)
         {
             case RaceManager::DIFFICULTY_EASY:
+            case RaceManager::DIFFICULTY_CASUAL:
             case RaceManager::DIFFICULTY_MEDIUM:
             {
                 find_sta = m_tsb_world->getKartLife(m_kart->getWorldKartId()) == 1;
@@ -187,7 +188,7 @@ bool BattleAI::isWaiting() const
 }   // isWaiting
 
 //-----------------------------------------------------------------------------
-float BattleAI::getKartDistance(const AbstractKart* kart) const
+float BattleAI::getKartDistance(const Kart* kart) const
 {
     return m_graph->getDistance(getCurrentNode(),
         m_world->getSectorForKart(kart));

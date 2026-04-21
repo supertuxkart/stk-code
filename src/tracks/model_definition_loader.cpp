@@ -53,7 +53,7 @@ void ModelDefinitionLoader::addModelDefinition(const XMLNode* xml)
     std::string model_name;
     xml->get("model", &model_name);
 
-    m_lod_groups[lodgroup].push_back(ModelDefinition(xml, (int)lod_distance, model_name, false, skeletal_animation));
+    m_lod_groups[lodgroup].push_back(ModelDefinition(xml, (int)lod_distance, model_name, skeletal_animation));
 }   // addModelDefinition
 
 // ----------------------------------------------------------------------------

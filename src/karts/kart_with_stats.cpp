@@ -113,8 +113,10 @@ void KartWithStats::collectedItem(ItemState *item_state)
         m_banana_count++;
         break;
     case Item::ITEM_NITRO_SMALL:
-
         m_small_nitro_count++;
+        break;
+    case Item::ITEM_NITRO_AIR:
+        m_air_nitro_count++;
         break;
     case Item::ITEM_NITRO_BIG:
         m_large_nitro_count++;

@@ -24,7 +24,7 @@
 #include "graphics/sp/sp_dynamic_draw_call.hpp"
 #include "graphics/sp/sp_shader_manager.hpp"
 #include "io/xml_node.hpp"
-#include "karts/abstract_kart.hpp"
+#include "karts/kart.hpp"
 #include "modes/linear_world.hpp"
 #include "modes/world.hpp"
 #include "network/network_string.hpp"
@@ -170,17 +170,18 @@ void CheckLine::reset(const Track &track)
 void CheckLine::resetAfterKartMove(unsigned int kart_index)
 {
     if (m_previous_position.empty()) return;
-    AbstractKart *kart = World::getWorld()->getKart(kart_index);
+    Kart *kart = World::getWorld()->getKart(kart_index);
     m_previous_position[kart_index] = kart->getXYZ();
 }   // resetAfterKartMove
 
 // ----------------------------------------------------------------------------
-void CheckLine::changeDebugColor(bool is_active)
+void CheckLine::changeDebugColor(bool is_active, bool prevents_backwards)
 {
     if (!m_debug_dy_dc)
         return;
-    video::SColor color = is_active ? video::SColor(192, 255, 0, 0)
-                                    : video::SColor(192, 128, 128, 128);
+    video::SColor color = is_active          ? video::SColor(192, 255, 0, 0) :
+                          prevents_backwards ? video::SColor(192, 0, 128, 255)
+                                             : video::SColor(192, 128, 128, 128);
     for(unsigned int i = 0; i < 4; i++)
     {
         m_debug_dy_dc->getVerticesVector()[i].m_color = color;

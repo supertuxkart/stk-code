@@ -31,7 +31,7 @@
 #include "guiengine/message_queue.hpp"
 #include "input/device_manager.hpp"
 #include "input/input_manager.hpp"
-#include "karts/abstract_kart.hpp"
+#include "karts/kart.hpp"
 #include "karts/controller/controller.hpp"
 #include "karts/kart_properties_manager.hpp"
 #include "main_loop.hpp"
@@ -244,7 +244,7 @@ void RaceManager::setPlayerHandicap(unsigned int player_id, HandicapLevel handic
 /** Returns a pointer to the kart which has a given GP rank.
  *  \param n The rank (1 to number of karts) to look for.
  */
-const AbstractKart *RaceManager::getKartWithGPRank(unsigned int n)
+const Kart *RaceManager::getKartWithGPRank(unsigned int n)
 {
     for(unsigned int i=0; i<m_kart_status.size(); i++)
         if(m_kart_status[i].m_gp_rank == (int)n)
@@ -297,6 +297,8 @@ RaceManager::Difficulty
 {
     if (difficulty == "novice")
         return DIFFICULTY_EASY;
+    else if (difficulty == "casual")
+        return DIFFICULTY_CASUAL;
     else if (difficulty == "intermediate")
         return DIFFICULTY_MEDIUM;
     else if (difficulty == "expert")
@@ -364,9 +366,9 @@ void RaceManager::computeRandomKartList()
 
     if (m_ai_kart_override != "")
     {
-        for (unsigned int n = 0; n < m_ai_kart_list.size(); n++)
+        for (unsigned int i = 0; i < m_ai_kart_list.size(); i++)
         {
-            m_ai_kart_list[n] = m_ai_kart_override;
+            m_ai_kart_list[i] = m_ai_kart_override;
         }
     }
 
@@ -706,7 +708,7 @@ void RaceManager::startNextRace()
             const RemoteKartInfo& rki = getKartInfo(i);
             if (rki.isReserved())
             {
-                AbstractKart* k = World::getWorld()->getKart(i);
+                Kart* k = World::getWorld()->getKart(i);
                 World::getWorld()->eliminateKart(i,
                     false/*notify_of_elimination*/);
                 k->setPosition(
@@ -899,7 +901,7 @@ void RaceManager::computeGPRanks()
     {
         if(UserConfigParams::m_ftl_debug)
         {
-            const AbstractKart *kart =
+            const Kart *kart =
                 World::getWorld()->getKart(sort_data[i].m_position);
             Log::debug("Race Manager","[ftl] kart '%s' has now position %d.",
                 kart->getIdent().c_str(),
@@ -1052,7 +1054,7 @@ void RaceManager::exitRace(bool delete_world)
  *  \param kart The kart that finished the race.
  *  \param time Time at which the kart finished the race.
  */
-void RaceManager::kartFinishedRace(const AbstractKart *kart, float time)
+void RaceManager::kartFinishedRace(const Kart *kart, float time)
 {
     if (kart->getType() == RaceManager::KartType::KT_SPARE_TIRE)
         return;
@@ -1314,6 +1316,7 @@ core::stringw RaceManager::getDifficultyName(Difficulty diff) const
     switch (diff)
     {
         case RaceManager::DIFFICULTY_EASY:   return _("Novice");   break;
+        case RaceManager::DIFFICULTY_CASUAL: return _("Casual");   break;
         case RaceManager::DIFFICULTY_MEDIUM: return _("Intermediate"); break;
         case RaceManager::DIFFICULTY_HARD:   return _("Expert");   break;
         case RaceManager::DIFFICULTY_BEST:   return _("SuperTux");   break;

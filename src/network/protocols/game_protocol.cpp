@@ -19,7 +19,7 @@
 
 #include "items/item_manager.hpp"
 #include "items/network_item_manager.hpp"
-#include "karts/abstract_kart.hpp"
+#include "karts/kart.hpp"
 #include "karts/controller/player_controller.hpp"
 #include "modes/world.hpp"
 #include "network/event.hpp"

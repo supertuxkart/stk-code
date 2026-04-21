@@ -46,14 +46,14 @@ private:
     // ------------------------------------------------------------------------
     virtual void  findTarget() OVERRIDE;
     // ------------------------------------------------------------------------
-    virtual float getKartDistance(const AbstractKart* kart) const OVERRIDE;
+    virtual float getKartDistance(const Kart* kart) const OVERRIDE;
     // ------------------------------------------------------------------------
     virtual bool  isKartOnRoad() const OVERRIDE;
     // ------------------------------------------------------------------------
     virtual bool  isWaiting() const OVERRIDE;
 
 public:
-                  BattleAI(AbstractKart *kart);
+                  BattleAI(Kart *kart);
     // ------------------------------------------------------------------------
                  ~BattleAI();
 

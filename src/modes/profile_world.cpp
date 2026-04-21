@@ -104,7 +104,7 @@ void ProfileWorld::setProfileModeLaps(int laps)
  *         this player globally (i.e. including network players).
  *  \param init_pos The start XYZ coordinates.
  */
-std::shared_ptr<AbstractKart> ProfileWorld::createKart
+std::shared_ptr<Kart> ProfileWorld::createKart
     (const std::string &kart_ident, int index, int local_player_id,
     int global_player_id, RaceManager::KartType kart_type,
     HandicapLevel handicap)
@@ -226,7 +226,7 @@ void ProfileWorld::enterRaceOverState()
     Log::verbose("profile", "name start_position end_position time average_speed top_speed "
            "skid_time rescue_time rescue_count brake_count "
            "explosion_time explosion_count bonus_count banana_count "
-           "small_nitro_count large_nitro_count bubblegum_count");
+           "small_nitro_count large_nitro_count air_nitro_count bubblegum_count");
 
     std::set<std::string> all_groups;
 
@@ -253,6 +253,7 @@ void ProfileWorld::enterRaceOverState()
         ss << kart->getExplosionTime() << " " << kart->getExplosionCount() << " ";
         ss << kart->getBonusCount() << " " << kart->getBananaCount() << " ";
         ss << kart->getSmallNitroCount() << " " << kart->getLargeNitroCount() << " ";
+        ss << kart->getAirNitroCount() << " ";
         ss << kart->getBubblegumCount() << " " << kart->getOffTrackCount() << " ";
         Log::verbose("profile", ss.str().c_str());
     }
@@ -280,8 +281,8 @@ void ProfileWorld::enterRaceOverState()
     {
         int   count         = 0,    position_gain   = 0,    rescue_count = 0;
         int   brake_count   = 0,    bonus_count     = 0,    banana_count = 0;
-        int   l_nitro_count = 0,    s_nitro_count   = 0,    bubble_count = 0;
-        int   expl_count    = 0,    off_track_count = 0;
+        int   l_nitro_count = 0,    s_nitro_count   = 0,   a_nitro_count = 0;
+        int   bubble_count = 0,     expl_count      = 0, off_track_count = 0;
         float skidding_time = 0.0f, rescue_time     = 0.0f, expl_time    = 0.0f;
         float av_time       = 0.0f, energy          = 0;
         for ( unsigned int i = 0; i < (unsigned int)m_karts.size(); ++i)
@@ -313,6 +314,7 @@ void ProfileWorld::enterRaceOverState()
                    kart->getExplosionTime(),       kart->getExplosionCount(),
                    kart->getBonusCount(),          kart->getBananaCount(),
                    kart->getSmallNitroCount(),     kart->getLargeNitroCount(),
+                   kart->getAirNitroCount(),
                    kart->getBubblegumCount(),      kart->getOffTrackCount(),
                    kart->getEnergy()
                    );
@@ -325,6 +327,7 @@ void ProfileWorld::enterRaceOverState()
             banana_count    += kart->getBananaCount();
             l_nitro_count   += kart->getLargeNitroCount();
             s_nitro_count   += kart->getSmallNitroCount();
+            a_nitro_count   += kart->getAirNitroCount();
             bubble_count    += kart->getBubblegumCount();
             expl_time       += kart->getExplosionTime();
             expl_count      += kart->getExplosionCount();
@@ -343,8 +346,8 @@ void ProfileWorld::enterRaceOverState()
         Log::verbose("profile", "%s%6.2f %4.2f %3d %5d %4.2f %3d %3d %3d %3d %3d %3d %5d %4.2f",
                ss.str().c_str(), skidding_time/count, rescue_time/count,
                rescue_count,brake_count, expl_time, expl_count, bonus_count,
-               banana_count, s_nitro_count, l_nitro_count, bubble_count,
-               off_track_count, energy);
+               banana_count, s_nitro_count, l_nitro_count, a_nitro_count,
+               bubble_count, off_track_count, energy);
         Log::verbose("profile", "");
     }   // for it !=all_groups.end
     delete this;

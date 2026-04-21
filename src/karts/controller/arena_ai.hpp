@@ -47,7 +47,7 @@ protected:
     ArenaGraph* m_graph;
 
     /** Pointer to the closest kart around this kart. */
-    AbstractKart *m_closest_kart;
+    Kart *m_closest_kart;
 
     /** The \ref ArenaNode at which the closest kart located on. */
     int m_closest_kart_node;
@@ -164,8 +164,8 @@ private:
     virtual int   getCurrentNode() const = 0;
     // ------------------------------------------------------------------------
     /** Return the distance based on graph distance matrix to any kart.
-     *  \param kart \ref AbstractKart to check. */
-    virtual float getKartDistance(const AbstractKart* kart) const = 0;
+     *  \param kart \ref Kart to check. */
+    virtual float getKartDistance(const Kart* kart) const = 0;
     // ------------------------------------------------------------------------
     /** If true, AI will drive directly to target without path finding. */
     virtual bool  ignorePathFinding()                         { return false; }
@@ -182,7 +182,7 @@ private:
     virtual void  resetAfterStop() {}
 
 public:
-                 ArenaAI(AbstractKart *kart);
+                 ArenaAI(Kart *kart);
     // ------------------------------------------------------------------------
     virtual     ~ArenaAI() {}
     // ------------------------------------------------------------------------

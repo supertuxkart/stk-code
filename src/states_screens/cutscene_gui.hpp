@@ -28,7 +28,7 @@ using namespace irr;
 #include "states_screens/race_gui_base.hpp"
 #include "utils/cpp2011.hpp"
 
-class AbstractKart;
+class Kart;
 class InputMap;
 class Material;
 class RaceSetup;

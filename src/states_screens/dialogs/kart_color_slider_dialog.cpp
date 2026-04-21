@@ -114,7 +114,7 @@ void KartColorSliderDialog::beforeAddingWidgets()
     model_location.setScale(core::vector3df(scale, scale, scale));
 
     // Add the kart model (including wheels and speed weight objects)
-    m_model_view->addModel(kart_model.getModel(), model_location,
+    m_model_view->addModel(kart_model.getModel(), model_location, kart_model.getBaseFrame(),
                            kart_model.getBaseFrame(), kart_model.getBaseFrame());
 
     model_location.setScale(core::vector3df(1.0f, 1.0f, 1.0f));
@@ -137,7 +137,7 @@ void KartColorSliderDialog::beforeAddingWidgets()
                 kart_model.getInverseBoneMatrix(obj.m_bone_name);
             swol = inv * obj.m_location;
         }
-        m_model_view->addModel(obj.m_model, swol, -1, -1, 0.0f,
+        m_model_view->addModel(obj.m_model, swol, -1, -1, -1, 0.0f,
             obj.m_bone_name);
     }
 

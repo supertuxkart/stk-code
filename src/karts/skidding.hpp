@@ -20,6 +20,7 @@
 #define HEADER_SKIDDING_HPP
 
 #include "karts/controller/kart_control.hpp"
+#include "karts/kart_properties.hpp"
 #include "utils/leak_check.hpp"
 #include "utils/no_copy.hpp"
 #include "utils/types.hpp"
@@ -101,8 +102,10 @@ private:
     ShowCurve *m_actual_curve;
 #endif
 
-    unsigned int getSkidBonus(float *bonus_time, float *bonus_speed,
-                              float *bonus_force) const;
+    void resetParticles();
+    unsigned int getSkidBonus(float *bonus_time, float *fade_out_time,
+                              float *bonus_speed, float *bonus_force) const;
+    unsigned int getSkidLevel(const KartProperties *kp, float ready_delay = 0.0f) const;
     float updateSteering(float steer, int ticks);
 public:
          Skidding(Kart *kart);

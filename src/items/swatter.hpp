@@ -39,7 +39,7 @@ namespace irr
 using namespace irr;
 
 class Attachment;
-class AbstractKart;
+class Kart;
 class Item;
 class Moveable;
 class SFXBase;
@@ -65,7 +65,7 @@ private:
     AnimationPhase m_animation_phase;
 
     /** The kart the swatter is aiming at. */
-    AbstractKart      *m_closest_kart;
+    Kart      *m_closest_kart;
 
     SFXBase           *m_swat_sound;
 
@@ -94,7 +94,7 @@ private:
     /** True if the swatter animation has been played. */
     bool               m_played_swatter_animation;
 public:
-             Swatter(AbstractKart *kart, int16_t bomb_ticks, int ticks,
+             Swatter(Kart *kart, int16_t bomb_ticks, int ticks,
                      Attachment* attachment);
     virtual ~Swatter();
     void     updateGraphics(float dt) OVERRIDE;

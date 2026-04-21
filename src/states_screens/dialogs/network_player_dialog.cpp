@@ -268,7 +268,7 @@ GUIEngine::EventPropagation
             HandicapLevel new_handicap = HANDICAP_NONE;
             if (m_handicap == HANDICAP_NONE)
             {
-                new_handicap = HANDICAP_MEDIUM;
+                new_handicap = HANDICAP_4;
             }
             NetworkString change_handicap(PROTOCOL_LOBBY_ROOM);
             change_handicap.addUInt8(LobbyProtocol::LE_CHANGE_HANDICAP)

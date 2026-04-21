@@ -571,6 +571,7 @@ int EventHandler::findIDClosestWidget(const NavigationDirection nav, const int p
             (!w_test->isVisible()   && ignore_disabled) ||
             (!w_test->isActivated() && ignore_disabled) ||
             (playerID != PLAYER_ID_GAME_MASTER && !w_test->m_supports_multiplayer) ||
+            (w_test->hasPlayerID() && playerID != w_test->getPlayerID()) ||
             (w_test->m_x < 0) || (w_test->m_y < 0))
             continue;
 

@@ -22,7 +22,7 @@
 /** Some bullet objects store 'user pointers'. This is a base class
  *  that allows to easily determine the type of the user pointer.
  */
-class AbstractKart;
+class Kart;
 class Flyable;
 class Moveable;
 class PhysicalObject;
@@ -47,12 +47,12 @@ public:
     TriangleMesh*   getPointerTriangleMesh()   const {return (TriangleMesh*)m_pointer;   }
     Moveable*       getPointerMoveable()       const {return (Moveable*)m_pointer;       }
     Flyable*        getPointerFlyable()        const {return (Flyable*)m_pointer;        }
-    AbstractKart*   getPointerKart()           const {return (AbstractKart*)m_pointer;   }
+    Kart*           getPointerKart()           const {return (Kart*)m_pointer;   }
     PhysicalObject *getPointerPhysicalObject() const {return (PhysicalObject*)m_pointer; }
     ThreeDAnimation*getPointerAnimation()      const {return (ThreeDAnimation*)m_pointer;}
     void            set(PhysicalObject* p) { m_user_pointer_type=UP_PHYSICAL_OBJECT;
                                              m_pointer          =p;           }
-    void            set(AbstractKart* p)   { m_user_pointer_type=UP_KART;
+    void            set(Kart* p)   { m_user_pointer_type=UP_KART;
                                              m_pointer          =p;           }
     void            set(Flyable* p)        { m_user_pointer_type=UP_FLYABLE;
                                              m_pointer          =p;           }

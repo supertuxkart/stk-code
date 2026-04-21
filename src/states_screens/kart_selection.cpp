@@ -289,8 +289,10 @@ void KartSelectionScreen::init()
     tabs->select(UserConfigParams::m_last_used_kart_group,
                  PLAYER_ID_GAME_MASTER);
 
+#ifdef DEBUG
     Widget* placeholder = getWidget("playerskarts");
     assert(placeholder != NULL);
+#endif
 
     m_game_master_confirmed = false;
 
@@ -312,6 +314,8 @@ void KartSelectionScreen::init()
     GUIEngine::SpinnerWidget* kart_class = getWidget<GUIEngine::SpinnerWidget>("kart_class");
     assert(kart_class != NULL);
     kart_class->setValue(classes.size()); // All
+    kart_class->setPlayerID(PLAYER_ID_GAME_MASTER);
+    kart_class->setPlayerIDSupport(true);
 
     // Build kart list (it is built everytime, to account for .g. locking)
     setKartsFromCurrentGroup();
@@ -864,8 +868,8 @@ void KartSelectionScreen::updateKartWidgetModel(int widget_id,
         file_manager->pushTextureSearchPath
             (file_manager->getAsset(FileManager::MODEL,""), "models");
         w3->addModel(irr_driver->getAnimatedMesh(
-            file_manager->getAsset(FileManager::MODEL, "chest.spm"))
-            ->getMesh(20), model_location);
+            file_manager->getAsset(FileManager::MODEL, "chest.spm")),
+            model_location, 20, 20, 20, 0);
         file_manager->popTextureSearchPath();
         w3->update(0);
 
@@ -882,69 +886,10 @@ void KartSelectionScreen::updateKartWidgetModel(int widget_id,
     }
     else
     {
-        const KartProperties *kp =
-            kart_properties_manager->getKart(selection);
+        const KartProperties *kp = kart_properties_manager->getKart(selection);
         if (kp != NULL)
         {
-            const KartModel &kart_model = kp->getMasterKartModel();
-
-            float scale = 35.0f;
-            if (kart_model.getLength() > 1.45f)
-            {
-                // if kart is too long, size it down a bit so that it fits
-                scale = 30.0f;
-            }
-
-            core::matrix4 model_location;
-            model_location.setScale(core::vector3df(scale, scale, scale));
-            w3->clearModels();
-            const bool has_win_anime =
-                UserConfigParams::m_animated_characters &&
-                (((kart_model.getFrame(KartModel::AF_WIN_LOOP_START) > -1 ||
-                kart_model.getFrame(KartModel::AF_WIN_START) > -1) &&
-                kart_model.getFrame(KartModel::AF_WIN_END) > -1) ||
-                (kart_model.getFrame(KartModel::AF_SELECTION_START) > -1 &&
-                kart_model.getFrame(KartModel::AF_SELECTION_END) > -1));
-            w3->addModel( kart_model.getModel(), model_location,
-                has_win_anime ?
-                kart_model.getFrame(KartModel::AF_SELECTION_START) > -1 ?
-                kart_model.getFrame(KartModel::AF_SELECTION_START) :
-                kart_model.getFrame(KartModel::AF_WIN_LOOP_START) > -1 ?
-                kart_model.getFrame(KartModel::AF_WIN_LOOP_START) :
-                kart_model.getFrame(KartModel::AF_WIN_START) :
-                kart_model.getBaseFrame(),
-                has_win_anime ?
-                kart_model.getFrame(KartModel::AF_SELECTION_END) > -1 ?
-                kart_model.getFrame(KartModel::AF_SELECTION_END) :
-                kart_model.getFrame(KartModel::AF_WIN_END) :
-                kart_model.getBaseFrame(),
-                kart_model.getAnimationSpeed());
-
-            w3->getModelViewRenderInfo()->setHue(kart_color);
-            model_location.setScale(core::vector3df(1.0f, 1.0f, 1.0f));
-            for (unsigned i = 0; i < 4; i++)
-            {
-                model_location.setTranslation(kart_model
-                    .getWheelGraphicsPosition(i).toIrrVector());
-                w3->addModel(kart_model.getWheelModel(i), model_location);
-            }
-
-            for (unsigned i = 0;
-                 i < kart_model.getSpeedWeightedObjectsCount(); i++)
-            {
-                const SpeedWeightedObject& obj =
-                    kart_model.getSpeedWeightedObject(i);
-                core::matrix4 swol = obj.m_location;
-                if (!obj.m_bone_name.empty())
-                {
-                    core::matrix4 inv =
-                        kart_model.getInverseBoneMatrix(obj.m_bone_name);
-                    swol = inv * obj.m_location;
-                }
-                w3->addModel(obj.m_model, swol, -1, -1, 0.0f, obj.m_bone_name);
-            }
-            //w3->update(0);
-
+            m_kart_widgets[widget_id].setupKartModel(kp),
             m_kart_widgets[widget_id].m_kart_name
                 ->setText( selectionText.c_str(), false );
         }
@@ -1130,48 +1075,6 @@ bool KartSelectionScreen::onEscapePressed()
 
 // ----------------------------------------------------------------------------
 
-void KartSelectionScreen::onFocusChanged(GUIEngine::Widget* previous,
-                                         GUIEngine::Widget* focus, int playerID)
-{
-    if (!previous || !focus)
-        return;
-
-    // TODO : In the STK Evolution branch, ensure things work properly with the handicap spinner
-
-    // Manually ensure that the player name spinner get selected appropriately
-    GUIEngine::SpinnerWidget* kart_class = getWidget<GUIEngine::SpinnerWidget>("kart_class");
-    IconButtonWidget* back = getWidget<IconButtonWidget>("back");
-
-    for (unsigned int i = 0; i < m_kart_widgets.size(); i++)
-    {
-        if (m_kart_widgets[i].getPlayerID() == playerID)
-        {
-            if (!playerID == PLAYER_ID_GAME_MASTER
-                && GUIEngine::isFocusedForPlayer(kart_class, playerID))
-            {
-                if (previous->getType() == WTYPE_RIBBON)
-                    m_kart_widgets[i].getPlayerNameSpinner()->setFocusForPlayer(playerID);
-                else
-                    GUIEngine::EventHandler::get()->sendNavigationEvent(NAV_DOWN, playerID);
-            }
-            // For the game master, the previous/focus values indicating we jumped over
-            // the name spinners are slightly different.
-            else if (playerID == PLAYER_ID_GAME_MASTER)
-            {
-                if ((GUIEngine::isFocusedForPlayer(back, playerID) &&
-                    (previous->getType() != WTYPE_SPINNER || previous == kart_class))
-                    || (previous == back && focus == kart_class))
-                {
-                    m_kart_widgets[i].getPlayerNameSpinner()->setFocusForPlayer(playerID);
-                }
-            }
-            break;
-        }
-    }
-}
-
-// ----------------------------------------------------------------------------
-
 #if 0
 #pragma mark -
 #pragma mark KartSelectionScreen (private)
@@ -1239,6 +1142,11 @@ void KartSelectionScreen::allPlayersDone()
     {
         std::string selected_kart = m_kart_widgets[n].m_kart_internal_name;
 
+        if (n == PLAYER_ID_GAME_MASTER)
+        {
+            UserConfigParams::m_default_kart = selected_kart;
+        }
+
         if (selected_kart == RANDOM_KART_ID)
         {
             // don't select an already selected kart
@@ -1276,16 +1184,11 @@ void KartSelectionScreen::allPlayersDone()
                 }
             }
         }
-        
-        if (n == PLAYER_ID_GAME_MASTER)
-        {
-            UserConfigParams::m_default_kart = selected_kart;
-        }
 
         RaceManager::get()->setPlayerKart(n, selected_kart);
 
         // Set handicap if needed
-        if (m_multiplayer && UserConfigParams::m_per_player_difficulty)
+        if (UserConfigParams::m_per_player_difficulty)
             RaceManager::get()->setPlayerHandicap(n, m_kart_widgets[n].getHandicap());
     }
 
@@ -1394,8 +1297,6 @@ bool KartSelectionScreen::validateIdentChoices()
             if (m_multiplayer)
             {
                 int spinner_value = m_kart_widgets[n].m_player_ident_spinner->getValue();
-                if (UserConfigParams::m_per_player_difficulty)
-                    spinner_value /= 2;
                 assert(m_kart_widgets[n].getAssociatedPlayer()->getProfile() ==
                     PlayerManager::get()->getPlayer(spinner_value));
             }

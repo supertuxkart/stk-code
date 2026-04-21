@@ -66,7 +66,7 @@ protected:
     virtual void raceFinished() {};
 
 public:
-             AIBaseLapController(AbstractKart *kart);
+             AIBaseLapController(Kart *kart);
     virtual ~AIBaseLapController() {};
     virtual void reset();
 };   // AIBaseLapController

@@ -21,7 +21,7 @@
 #include "graphics/irr_driver.hpp"
 #include "graphics/lod_node.hpp"
 #include "config/user_config.hpp"
-#include "karts/abstract_kart.hpp"
+#include "karts/kart.hpp"
 
 #include <ISceneManager.h>
 #include <ICameraSceneNode.h>

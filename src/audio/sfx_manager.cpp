@@ -77,6 +77,9 @@ void SFXManager::destroy()
  */
 SFXManager::SFXManager()
 {
+#ifdef DEBUG_SFX
+    m_created_count = m_deleted_count = 0;
+#endif
 
     // The sound manager initialises OpenAL
     m_initialized = music_manager->initialized();
@@ -692,6 +695,14 @@ SFXBase* SFXManager::createSoundSource(SFXBuffer* buffer,
                                        const bool add_to_SFX_list,
                                        const bool owns_buffer)
 {
+#ifdef DEBUG_SFX
+    m_created_count++;
+    Log::info("SFXManager", "The number of created sound sources is %u,"
+                            "the number of deleted sound sources is %u,"
+                            "the number of active sources is %u",
+                            m_created_count, m_deleted_count, m_all_sfx.getData().size());
+#endif
+
     bool positional = false;
 
     if (RaceManager::get()->getNumLocalPlayers() < 2)
@@ -868,6 +879,14 @@ void SFXManager::reallyUpdateNow(SFXCommand *current)
  */
 void SFXManager::deleteSFX(SFXBase *sfx)
 {
+#ifdef DEBUG_SFX
+    m_deleted_count++;
+    Log::info("SFXManager", "The number of created sound sources is %u,"
+                            "the number of deleted sound sources is %u,"
+                            "the number of active sources is %u",
+                            m_created_count, m_deleted_count, m_all_sfx.getData().size());
+#endif
+
     if(sfx) sfx->reallyStopNow();
     std::vector<SFXBase*>::iterator i;
     

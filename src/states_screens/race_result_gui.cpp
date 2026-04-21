@@ -111,11 +111,11 @@ void RaceResultGUI::init()
     unsigned int num_karts = RaceManager::get()->getNumberOfKarts();
     for (unsigned int kart_id = 0; kart_id < num_karts; kart_id++)
     {
-        const AbstractKart *kart = World::getWorld()->getKart(kart_id);
+        const Kart *kart = World::getWorld()->getKart(kart_id);
         if (kart->getController()->isLocalPlayerController())
         {
             has_human_players = true;
-            human_win = human_win && kart->getRaceResult();
+            human_win = human_win && kart->hasGoodResult();
 
             if (RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_FOLLOW_LEADER)
             {
@@ -774,7 +774,7 @@ void RaceResultGUI::drawCTFScorers(KartTeam team, int x, int y, int height)
     const unsigned num_karts = ctf->getNumKarts();
     for (unsigned int i = 0; i < num_karts; i++)
     {
-        AbstractKart* kart = ctf->getKartAtPosition(i + 1);
+        Kart* kart = ctf->getKartAtPosition(i + 1);
         unsigned kart_id = kart->getWorldKartId();
         if (ctf->getKartTeam(kart_id) != team)
             continue;
@@ -886,7 +886,7 @@ void RaceResultGUI::determineTableLayout()
     for (unsigned int position = first_position;
         position <= RaceManager::get()->getNumberOfKarts() - sta; position++)
     {
-        const AbstractKart *kart = rank_world->getKartAtPosition(position);
+        const Kart *kart = rank_world->getKartAtPosition(position);
 
         if (ffa && kart->isEliminated())
             continue;
@@ -1350,7 +1350,7 @@ void RaceResultGUI::determineGPLayout()
         // In case of FTL mode: ignore the leader
         if (rank < 0) continue;
         old_rank[kart_id] = rank;
-        const AbstractKart *kart = World::getWorld()->getKart(kart_id);
+        const Kart *kart = World::getWorld()->getKart(kart_id);
         RowInfo *ri = &(m_all_row_infos[rank]);
         ri->m_kart_icon =
             kart->getKartProperties()->getIconMaterial()->getTexture();
@@ -1635,7 +1635,7 @@ void RaceResultGUI::drawTeamScorers(KartTeam team, int x, int y, int height)
         const bool own_goal = !(scorers.at(i).m_correct_goal);
 
         scorer_text = scorers.at(i).m_player;
-        if (scorers.at(i).m_handicap_level == HANDICAP_MEDIUM)
+        if (scorers.at(i).m_handicap_level != HANDICAP_NONE)
             scorer_text = _("%s (handicapped)", scorer_text);
 
         if (own_goal)
@@ -2181,7 +2181,7 @@ int RaceResultGUI::displayChallengeInfo(int x, int y, bool increase_density)
     video::SColor gp_neutral_color = video::SColor(255, 255, 255, 0);
     video::SColor lose_color = video::SColor(255, 255, 0, 0);
     video::SColor special_color = video::SColor(255, 0, 255, 255);
-    AbstractKart* kart = World::getWorld()->getPlayerKart(0);
+    Kart* kart = World::getWorld()->getPlayerKart(0);
     bool lose_all = false;
     bool position_passed = false;
     bool time_passed = false;

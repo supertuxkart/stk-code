@@ -191,21 +191,10 @@ void GrandPrixLose::setKarts(std::vector<std::pair<std::string, float> > ident_a
             LODNode* lnode = dynamic_cast<LODNode*>(kart_main_node);
             if (lnode)
             {
-                // Lod node has to be animated
-                auto* a_node = static_cast<scene::IAnimatedMeshSceneNode*>
-                    (lnode->getAllNodes()[0]);
-                const unsigned start_frame =
-                    kart_model->getFrame(KartModel::AF_LOSE_LOOP_START) > -1 ?
-                    kart_model->getFrame(KartModel::AF_LOSE_LOOP_START) :
-                    kart_model->getFrame(KartModel::AF_LOSE_START) > -1 ?
-                    kart_model->getFrame(KartModel::AF_LOSE_START) :
-                    kart_model->getFrame(KartModel::AF_STRAIGHT);
-                const unsigned end_frame =
-                    kart_model->getFrame(KartModel::AF_LOSE_END) > -1 ?
-                    kart_model->getFrame(KartModel::AF_LOSE_END) :
-                    kart_model->getFrame(KartModel::AF_STRAIGHT);
-                a_node->setLoopMode(true);
-                a_node->setFrameLoop(start_frame, end_frame);
+                if (kart_model->getFrame(KartModel::AF_LOSE_LOOP_START) > -1)
+                    kart_model->setAnimationLoop(KartModel::AF_LOSE_LOOP_START);
+                else
+                    kart_model->setAnimation(KartModel::AF_DEFAULT);
             }
 
             core::vector3df kart_pos(m_kart_x + n*DISTANCE_BETWEEN_KARTS,

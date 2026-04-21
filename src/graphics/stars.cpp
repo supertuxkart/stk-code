@@ -19,7 +19,7 @@
 #include "graphics/stars.hpp"
 
 #include "graphics/irr_driver.hpp"
-#include "karts/abstract_kart.hpp"
+#include "karts/kart.hpp"
 #include "karts/kart_model.hpp"
 #include "utils/constants.hpp"
 
@@ -33,7 +33,7 @@ const int STAR_AMOUNT = 7;
 const float RADIUS = 0.7f;
 const float STAR_SIZE = 0.4f;
 
-Stars::Stars(AbstractKart *kart)
+Stars::Stars(Kart *kart)
 {
     m_parent_kart_node = kart->getNode();
     m_enabled = false;

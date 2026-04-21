@@ -35,7 +35,7 @@ using namespace irr;
 
 #include "utils/vec3.hpp"
 
-class AbstractKart;
+class Kart;
 class Camera;
 class Material;
 class Referee;
@@ -85,7 +85,7 @@ private:
         /** Color of message. */
         video::SColor       m_color;
 
-        const AbstractKart *m_kart;
+        const Kart *m_kart;
         /** Important msgs are displayed in the middle of the screen. */
         bool                m_important;
         bool                m_big_font;
@@ -97,7 +97,7 @@ private:
         // let compiler create defaults .. they'll do the job, no
         // deep copies here ..
         TimedMessage(const irr::core::stringw &message,
-                     const AbstractKart *kart, float time,
+                     const Kart *kart, float time,
                      const video::SColor &color, const bool important,
                      bool big_font, bool outline)
         {
@@ -188,6 +188,14 @@ protected:
     video::ITexture *m_gauge_full;
     /** Highlight gauge, used when a kart uses nitro. */
     video::ITexture *m_gauge_full_bright;
+    /** Texture for nitro gauge with a nitro-hack activated. */
+    video::ITexture *m_gauge_full_hack;
+    /** Highlight gauge, used when a kart uses nitro
+     * while the nitro-hack is activated. */
+    video::ITexture *m_gauge_full_hack_bright;
+    /** Used when the nitro amount is negative,
+     * or to highlight nitro that just got stolen. */
+    video::ITexture *m_gauge_negative;
 
     video::ITexture *m_gauge_goal;
 
@@ -207,10 +215,10 @@ protected:
                               const core::vector2df &center,
                               const video::SColor &color,
                               video::S3DVertex *v, unsigned short int *index);
-    void drawAllMessages       (const AbstractKart* kart,
+    void drawAllMessages       (const Kart* kart,
                                 const core::recti &viewport,
                                 const core::vector2df &scaling);
-    void drawPowerupIcons      (const AbstractKart* kart,
+    void drawPowerupIcons      (const Kart* kart,
                                 const core::recti &viewport,
                                 const core::vector2df &scaling);
     void drawGlobalMusicDescription();
@@ -244,7 +252,7 @@ public:
     virtual void reset();
     virtual void renderPlayerView(const Camera *camera, float dt);
     virtual void addMessage(const irr::core::stringw &m,
-                            const AbstractKart *kart, float time,
+                            const Kart *kart, float time,
                             const video::SColor &color=
                                 video::SColor(255, 255, 0, 255),
                             bool important=true,
@@ -260,10 +268,10 @@ public:
     virtual void clearAllMessages() { m_messages.clear(); }
 
     void drawGlobalPlayerIcons(int bottom_margin);
-    void drawPlayerIcon(AbstractKart *kart, int x, int y, int w,
+    void drawPlayerIcon(Kart *kart, int x, int y, int w,
                         bool is_local);
     
-    virtual void drawEnergyMeter(int x, int y, const AbstractKart *kart,
+    virtual void drawEnergyMeter(int x, int y, const Kart *kart,
                                  const core::recti &viewport,
                                  const core::vector2df &scaling) {};
 

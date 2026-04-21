@@ -26,7 +26,7 @@
 #include "graphics/sp/sp_mesh_node.hpp"
 #include "guiengine/engine.hpp"
 #include "items/item_manager.hpp"
-#include "karts/abstract_kart.hpp"
+#include "karts/kart.hpp"
 #include "modes/world.hpp"
 #include "network/network_string.hpp"
 #include "network/rewind_manager.hpp"
@@ -52,7 +52,7 @@ const float SPARK_SPEED_H = 1.0f;
  *         indicates an item that's part of the track.
  *  \param id Index of this item in the array of all items.
  */
-ItemState::ItemState(ItemType type, const AbstractKart *owner, int id)
+ItemState::ItemState(ItemType type, const Kart *owner, int id)
 {
     setType(type);
     m_item_id = id;
@@ -89,7 +89,10 @@ void ItemState::setDisappearCounter()
 {
     switch (m_type)
     {
+    // The Nolok variants are stored as standard variants with special graphics,
+    // so this also applies
     case ITEM_BUBBLEGUM:
+    case ITEM_BUBBLEGUM_SMALL:
         m_used_up_counter = stk_config->m_bubblegum_counter; break;
     case ITEM_EASTER_EGG:
         m_used_up_counter = -1; break;
@@ -133,7 +136,7 @@ void ItemState::update(int ticks)
 /** Called when the item is collected.
  *  \param kart The kart that collected the item.
  */
-void ItemState::collected(const AbstractKart *kart)
+void ItemState::collected(const Kart *kart)
 {
     if (m_type == ITEM_EASTER_EGG)
     {
@@ -160,6 +163,7 @@ void ItemState::collected(const AbstractKart *kart)
                 break;
             case ITEM_NITRO_BIG:
             case ITEM_NITRO_SMALL:
+            case ITEM_NITRO_AIR:
                 m_ticks_till_return = stk_config->m_nitro_item_return_ticks;
                 break;
             case ITEM_BANANA:
@@ -167,6 +171,8 @@ void ItemState::collected(const AbstractKart *kart)
                 break;
             case ITEM_BUBBLEGUM:
             case ITEM_BUBBLEGUM_NOLOK:
+            case ITEM_BUBBLEGUM_SMALL:
+            case ITEM_BUBBLEGUM_SMALL_NOLOK:
                 m_ticks_till_return = stk_config->m_bubblegum_item_return_ticks;
                 break;
             default:
@@ -184,12 +190,13 @@ void ItemState::collected(const AbstractKart *kart)
 // ----------------------------------------------------------------------------
 /** Returns the graphical type of this item should be using (takes nolok into
  *  account). */
-Item::ItemType ItemState::getGrahpicalType() const
+Item::ItemType ItemState::getGraphicalType() const
 {
-    return m_previous_owner && m_previous_owner->getIdent() == "nolok" &&
-        getType() == ITEM_BUBBLEGUM ?
-        ITEM_BUBBLEGUM_NOLOK : getType();
-}   // getGrahpicalType
+    bool nolok_owned = (m_previous_owner && m_previous_owner->getIdent() == "nolok");
+    return nolok_owned && getType() == ITEM_BUBBLEGUM       ? ITEM_BUBBLEGUM_NOLOK       :
+           nolok_owned && getType() == ITEM_BUBBLEGUM_SMALL ? ITEM_BUBBLEGUM_SMALL_NOLOK :
+                                                              getType();
+}   // getGraphicalType
 
 //-----------------------------------------------------------------------------
 /** Save item state at current ticks in server for live join
@@ -218,16 +225,16 @@ void ItemState::saveCompleteState(BareNetworkString* buffer) const
  */
 Item::Item(ItemType type, const Vec3& xyz, const Vec3& normal,
            scene::IMesh* mesh, scene::IMesh* lowres_mesh,
-           const std::string& icon, const AbstractKart *owner)
+           const std::string& icon, const Kart *owner)
     : ItemState(type, owner)
 {
     m_icon_node = NULL;
     m_was_available_previously = true;
     // Prevent appear animation at start
     m_animation_start_ticks = -9999;
-    m_distance_2        = 1.2f;
+    m_distance_2        = ItemManager::getCollectDistanceSquared(type);
     initItem(type, xyz, normal);
-    m_graphical_type    = getGrahpicalType();
+    m_graphical_type    = getGraphicalType();
 
     m_node = NULL;
     if (mesh && !GUIEngine::isNoGraphics())
@@ -255,7 +262,7 @@ Item::Item(ItemType type, const Vec3& xyz, const Vec3& normal,
         m_appear_anime_node = irr_driver->getSceneManager()->addEmptySceneNode(m_node);
     }
     setType(type);
-    handleNewMesh(getGrahpicalType());
+    handleNewMesh(getGraphicalType());
 
     if (!m_node)
         return;
@@ -441,15 +448,15 @@ void Item::updateGraphics(float dt)
     if (m_node == NULL)
         return;
 
-    if (m_graphical_type != getGrahpicalType())
+    if (m_graphical_type != getGraphicalType())
     {
-        handleNewMesh(getGrahpicalType());
-        m_graphical_type = getGrahpicalType();
+        handleNewMesh(getGraphicalType());
+        m_graphical_type = getGraphicalType();
     }
 
     float time_till_return = stk_config->ticks2Time(getTicksTillReturn());
     bool is_visible = isAvailable() || time_till_return <= 1.0f ||
-                      (getType() == ITEM_BUBBLEGUM &&
+                      (isBubblegum() &&
                        getOriginalType() == ITEM_NONE && !isUsedUp());
 
     m_node->setVisible(is_visible);
@@ -465,9 +472,12 @@ void Item::updateGraphics(float dt)
     float time_since_return = stk_config->ticks2Time(
         World::getWorld()->getTicksSinceStart() - m_animation_start_ticks);
 
+    // Scale width and length
+    float scale_factor = (getType() == ITEM_BUBBLEGUM_SMALL ? 0.75f : 1.0f);
+
     if (is_visible)
     {
-        if (!isAvailable() && !(getType() == ITEM_BUBBLEGUM &&
+        if (!isAvailable() && !(isBubblegum() &&
                 getOriginalType() == ITEM_NONE && !isUsedUp()))
         {
             // Keep it visible so particles work, but hide the model
@@ -480,11 +490,11 @@ void Item::updateGraphics(float dt)
                             * pow(2.0f, -10.0f * p) + 1.0f;
             float factor_h = 1.0f - (f * f * f * f * f - f * f * f * sin(f * M_PI));
 
-            m_node->setScale(core::vector3df(factor_h, factor_v, factor_h));
+            m_node->setScale(core::vector3df(factor_h * scale_factor, factor_v, factor_h * scale_factor));
         }
         else
         {
-            m_node->setScale(core::vector3df(1.0f, 1.0f, 1.0f));
+            m_node->setScale(core::vector3df(scale_factor, 1.0f, scale_factor));
         }
 
         // Handle rotation of the item
@@ -493,7 +503,7 @@ void Item::updateGraphics(float dt)
         {
             // have it rotate
             float angle =
-                fmodf((float)World::getWorld()->getTicksSinceStart() / 40.0f,
+                fmodf((float)World::getWorld()->getTicksSinceStart() / (float)stk_config->time2Ticks(0.33334f),
                 M_PI * 2);
 
             btMatrix3x3 m;
@@ -560,3 +570,51 @@ void Item::updateGraphics(float dt)
 
     m_was_available_previously = isAvailable();
 }   // updateGraphics
+
+// ------------------------------------------------------------------------
+/** Returns true if the Kart is close enough to hit this item, the item is
+ *  not deactivated anymore, and it wasn't placed by this kart (this is
+ *  e.g. used to avoid that a kart hits a bubble gum it just dropped).
+ *  \param kart Kart to test.
+ *  \param xyz Location of kart (avoiding to use kart->getXYZ() so that
+ *         kart.hpp does not need to be included here).
+ */
+bool Item::hitKart(const Vec3 &xyz, const Kart *kart) const
+{
+    if (getPreviousOwner() == kart && getDeactivatedTicks() > 0)
+        return false;
+
+    // Only catch bubblegums when driving on the ground
+    if (isBubblegum() && !kart->isOnGround())
+        return false;
+
+    // Set the coordinates in the kart's frame of reference
+    // in order to properly account for kart's width and length
+    Vec3 lc = quatRotate(kart->getVisualRotation().inverse(), xyz - getXYZ());
+
+    // Since we only care about the length of the vector,
+    // we can flip the sign of its components without issue
+    if (lc.getX() < 0.0f)
+        lc.setX(-lc.getX());
+    if (lc.getZ() < 0.0f)
+        lc.setZ(-lc.getZ());
+
+    // Substract half the kart width from the sideways component
+    lc.setX(lc.getX() - kart->getKartWidth() * 0.5f);
+    if (lc.getX() < 0.0f)
+        lc.setX(0.0f);
+    // Substract half the kart length from the forward component
+    lc.setZ(lc.getZ() - kart->getKartLength() * 0.5f);
+    if (lc.getZ() < 0.0f)
+        lc.setZ(0.0f);
+
+    // Don't be too strict if the kart is a bit above the item
+    // TODO : have a per-item height value
+    if (lc.getY() < 0.0f)
+        lc.setY(-lc.getY());
+    lc.setY(lc.getY() - 1.0f);
+    if (lc.getY() < 0.0f)
+        lc.setY(0.0f);
+
+    return lc.length2() < m_distance_2;
+}   // hitKart

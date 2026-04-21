@@ -43,7 +43,7 @@ using namespace irr;
 #include "io/file_manager.hpp"
 #include "items/powerup_manager.hpp"
 #include "items/projectile_manager.hpp"
-#include "karts/abstract_kart.hpp"
+#include "karts/kart.hpp"
 #include "karts/controller/controller.hpp"
 #include "karts/controller/spare_tire_ai.hpp"
 #include "karts/kart_properties.hpp"
@@ -369,7 +369,7 @@ void RaceGUI::renderPlayerView(const Camera *camera, float dt)
     const core::recti &viewport = camera->getViewport();
 
     core::vector2df scaling = camera->getScaling();
-    const AbstractKart *kart = camera->getKart();
+    const Kart *kart = camera->getKart();
     if(!kart) return;
 
     bool isSpectatorCam = Camera::getActiveCamera()->isSpectatorMode();
@@ -647,6 +647,7 @@ void RaceGUI::drawGlobalMiniMap()
         draw2DImage(m_blue_flag, bp, bs, NULL, NULL, true);
     }
 
+<<<<<<< master
     if (easter_world)
     {
         for (int i = 0; i < (int)(easter_world->foundEggLocations().size()); i++){
@@ -663,6 +664,9 @@ void RaceGUI::drawGlobalMiniMap()
     }
 
     AbstractKart* target_kart = NULL;
+=======
+    Kart* target_kart = NULL;
+>>>>>>> BalanceSTK2
     Camera* cam = Camera::getActiveCamera();
     auto cl = LobbyProtocol::get<ClientLobby>();
     bool is_nw_spectate = cl && cl->isSpectator();
@@ -674,7 +678,7 @@ void RaceGUI::drawGlobalMiniMap()
     // are drawn above them
     World::KartList karts = world->getKarts();
     std::partition(karts.begin(), karts.end(), [target_kart, is_nw_spectate]
-        (const std::shared_ptr<AbstractKart>& k)->bool
+        (const std::shared_ptr<Kart>& k)->bool
     {
         if (is_nw_spectate)
             return k.get() != target_kart;
@@ -684,7 +688,7 @@ void RaceGUI::drawGlobalMiniMap()
 
     for (unsigned int i = 0; i < karts.size(); i++)
     {
-        const AbstractKart *kart = karts[i].get();
+        const Kart *kart = karts[i].get();
         const SpareTireAI* sta =
             dynamic_cast<const SpareTireAI*>(kart->getController());
 
@@ -810,7 +814,7 @@ void RaceGUI::drawGlobalMiniMap()
  *  \param kart Kart to display the data for.
  *  \param scaling Scaling applied (in case of split screen)
  */
-void RaceGUI::drawEnergyMeter(int x, int y, const AbstractKart *kart,
+void RaceGUI::drawEnergyMeter(int x, int y, const Kart *kart,
                               const core::recti &viewport,
                               const core::vector2df &scaling)
 {
@@ -822,8 +826,18 @@ void RaceGUI::drawEnergyMeter(int x, int y, const AbstractKart *kart,
 
     float state = (float)(kart->getEnergy())
                 / kart->getKartProperties()->getNitroMax();
-    if (state < 0.0f) state = 0.0f;
-    else if (state > 1.0f) state = 1.0f;
+    bool negative_nitro = false;
+    float stolen_nitro = kart->getStolenNitro() / kart->getKartProperties()->getNitroMax();
+    assert (stolen_nitro >= 0.0f);
+    float full_state = state + stolen_nitro;
+
+    if (state < 0.0f)
+    {
+        state = -state;
+        negative_nitro = true;
+    }
+    if (state > 1.0f)
+        state = 1.0f;
 
     core::vector2df offset;
     offset.X = (float)(x-gauge_width) - 9.5f*scaling.X;
@@ -867,8 +881,15 @@ void RaceGUI::drawEnergyMeter(int x, int y, const AbstractKart *kart,
     position[8].X = 0.94f;//G2 (margin for gauge goal)
     position[8].Y = 0.17f;//G2
 
-    // The states at which different polygons must be used.
+    core::vector2df negative_position[vertices_count];
+    negative_position[0] = position[0];
+    for (int i=1; i<vertices_count;i++)
+    {
+        negative_position[i] = position[vertices_count-i];
+    }
 
+    // The states at which different polygons must be used.
+    // We use the same threshold for position and negative_positions
     float threshold[vertices_count-2];
     threshold[0] = 0.0001f; //for gauge drawing
     threshold[1] = 0.2f;
@@ -880,27 +901,95 @@ void RaceGUI::drawEnergyMeter(int x, int y, const AbstractKart *kart,
 
     // Filling (current state)
 
-    if (state > 0.0f)
+    if (state > 0.0f || kart->hasStolenNitro())
     {
         video::S3DVertex vertices[vertices_count];
+
+        unsigned int count;
 
         //3D effect : wait for the full border to appear before drawing
         for (int i=0;i<5;i++)
         {
+            if ((full_state-0.2f*i < 0.006f && full_state-0.2f*i >= 0.0f) || (0.2f*i-full_state < 0.003f && 0.2f*i-full_state >= 0.0f) )
+            {
+                full_state = 0.2f*i-0.003f;
+            }
             if ((state-0.2f*i < 0.006f && state-0.2f*i >= 0.0f) || (0.2f*i-state < 0.003f && 0.2f*i-state >= 0.0f) )
             {
                 state = 0.2f*i-0.003f;
-                break;
             }
         }
 
-        unsigned int count = computeVerticesForMeter(position, threshold, vertices, vertices_count,
+        if (negative_nitro)
+        {
+            count = computeVerticesForMeter(negative_position, threshold, vertices, vertices_count,
                                                      state, gauge_width, gauge_height, offset);
-
-        if(kart->getControls().getNitro() || kart->isOnMinNitroTime())
-            drawMeterTexture(m_gauge_full_bright, vertices, count, true);
+            drawMeterTexture(m_gauge_negative, vertices, count, true);
+        }
         else
-            drawMeterTexture(m_gauge_full, vertices, count, true);
+        {
+            count = computeVerticesForMeter(position, threshold, vertices, vertices_count,
+                                                     state, gauge_width, gauge_height, offset);
+  
+            if(kart->isNitroHackActive())
+            {
+                if(kart->getControls().getNitro() || kart->isOnMinNitroTime())
+                    drawMeterTexture(m_gauge_full_hack_bright, vertices, count, true);
+                else
+                    drawMeterTexture(m_gauge_full_hack, vertices, count, true);
+            }
+            else
+            {
+                if(kart->getControls().getNitro() || kart->isOnMinNitroTime())
+                    drawMeterTexture(m_gauge_full_bright, vertices, count, true);
+                else
+                    drawMeterTexture(m_gauge_full, vertices, count, true);
+            }
+        }
+
+        // If some nitro was stolen from the kart, display the stolen amount
+        // If the amount of nitro we had before the steal was already negative,
+        // (case full_state <= 0.0f), there is nothing to do
+        if (kart->hasStolenNitro() && full_state > 0.0f)
+        {
+            unsigned int count_temp, count_final;
+            // We still have some nitro left
+            if (!negative_nitro && count > 0)
+            {
+                // The variable vertice is the one stored at index [1]
+                // TODO : Clean up documentation, the explanations of computeVerticesForMeter
+                //        give the wrong impression that the variable vertice is stored last
+                video::S3DVertex variable_vertice = vertices[1];
+
+                count_temp = computeVerticesForMeter(position, threshold, vertices, vertices_count,
+                                                              full_state, gauge_width, gauge_height, offset);
+
+                // Consider a case where the count is 4 with vertices A, B, C, D,
+                // and count_temp is 5 with vertices A, B, C, D', E
+                // We want to trace the gauge using vertices A, D, D', E
+                // The count of required vertices will hence follow the formula below
+                // In theory count_final is an unnecessary variable but it's easier to reason with
+                assert(count <= count_temp);
+                count_final = count_temp - count + 3;
+
+                // The first vertice is always the same, the second use the saved vertice
+                vertices[1] = variable_vertice;
+
+                // Loop over the new vertices
+                for (unsigned int i=2;i<count_final;i++)
+                {
+                    vertices[i] = vertices[count+i-3];
+                }
+            }
+            // We have gone into negative nitro or the remaining amount of nitro is negligible (case count == 0)
+            else
+            {
+                count_final = computeVerticesForMeter(position, threshold, vertices, vertices_count,
+                                                      full_state, gauge_width, gauge_height, offset);
+            }
+
+            drawMeterTexture(m_gauge_negative, vertices, count_final, true);
+        }
     }
 
     // Target
@@ -929,7 +1018,7 @@ void RaceGUI::drawEnergyMeter(int x, int y, const AbstractKart *kart,
  *  \param meter_height Height of the meter (inside which the rank is shown).
  *  \param dt Time step size.
  */
-void RaceGUI::drawRank(const AbstractKart *kart,
+void RaceGUI::drawRank(const Kart *kart,
                       const core::vector2df &offset,
                       float min_ratio, int meter_width,
                       int meter_height, float dt)
@@ -1026,7 +1115,7 @@ void RaceGUI::drawRank(const AbstractKart *kart,
  *  \param scaling Which scaling to apply to the speedometer.
  *  \param dt Time step size.
  */
-void RaceGUI::drawSpeedEnergyRank(const AbstractKart* kart,
+void RaceGUI::drawSpeedEnergyRank(const Kart* kart,
                                  const core::recti &viewport,
                                  const core::vector2df &scaling,
                                  float dt)
@@ -1044,8 +1133,8 @@ void RaceGUI::drawSpeedEnergyRank(const AbstractKart* kart,
     // First draw the meter (i.e. the background )
     // -------------------------------------------------------------------------
     core::vector2df offset;
-    offset.X = (float)(viewport.LowerRightCorner.X-meter_width) - 24.0f*scaling.X;
-    offset.Y = viewport.LowerRightCorner.Y-10.0f*scaling.Y;
+    offset.X = (float)(viewport.LowerRightCorner.X-meter_width) - 24.5f*scaling.X;
+    offset.Y = viewport.LowerRightCorner.Y-8.5f*scaling.Y;
 
     const core::rect<s32> meter_pos((int)offset.X,
                                     (int)(offset.Y-meter_height),
@@ -1062,18 +1151,16 @@ void RaceGUI::drawSpeedEnergyRank(const AbstractKart* kart,
 
     drawRank(kart, offset, min_ratio, meter_width, meter_height, dt);
 
-
-    if(speed <=0) return;  // Nothing to do if speed is negative.
-
     // Draw the actual speed bar (if the speed is >0)
     // ----------------------------------------------
-    float speed_ratio = speed/40.0f; //max displayed speed of 40
+    float speed_ratio = speed/55.0f; //max displayed speed of 55
+    if(speed_ratio<0) speed_ratio = -speed_ratio; // display negative speeds too
     if(speed_ratio>1) speed_ratio = 1;
 
     // see computeVerticesForMeter for the detail of the drawing
     // If increasing this, update drawMeterTexture
 
-    const int vertices_count = 12;
+    const int vertices_count = 13;
 
     video::S3DVertex vertices[vertices_count];
 
@@ -1081,64 +1168,57 @@ void RaceGUI::drawSpeedEnergyRank(const AbstractKart* kart,
 
     // They are calculated from speedometer.png
     // A is the center of the speedometer's circle
-    // B2, C, D, E, F, G, H, I and J1 are points on the line
-    // from A to their respective 1/8th threshold division
-    // B2 is 36,9° clockwise from the vertical (on bottom-left)
-    // J1 s 70,7° clockwise from the vertical (on upper-right)
-    // B1 and J2 are used for correct display of the 3D effect
-    // They are 1,13* further than the speedometer farther position because
-    // the lines between them would otherwise cut through the outside circle.
+    // Points B to M are points on the line
+    // from A to their respective 1/11th threshold division
+    // (There is 12 points because it goes from 0/11 to 11/11)
+    // They are further away (at a constand distance from A)
+    // than the speedometer farther position because the lines
+    // between them would otherwise cut through the outside circle.
 
     core::vector2df position[vertices_count];
 
-    position[0].X = 0.546f;//A
-    position[0].Y = 0.566f;//A
-    position[1].X = 0.216f;//B1
-    position[1].Y = 1.036f;//B1
-    position[2].X = 0.201f;//B2
-    position[2].Y = 1.023f;//B2
-    position[3].X = 0.036f;//C
-    position[3].Y = 0.831f;//C
-    position[4].X = -0.029f;//D
-    position[4].Y = 0.589f;//D
-    position[5].X = 0.018f;//E
-    position[5].Y = 0.337f;//E
-    position[6].X = 0.169f;//F
-    position[6].Y = 0.134f;//F
-    position[7].X = 0.391f;//G
-    position[7].Y = 0.014f;//G
-    position[8].X = 0.642f;//H
-    position[8].Y = 0.0f;//H
-    position[9].X = 0.878f;//I
-    position[9].Y = 0.098f;//I
-    position[10].X = 1.046f;//J1
-    position[10].Y = 0.285f;//J1
-    position[11].X = 1.052f;//J2
-    position[11].Y = 0.297f;//J2
+    position[0].X = 0.5332f;//A
+    position[0].Y = 0.5469f;//A
+    position[1].X = 0.2051f;//B
+    position[1].Y = 1.0225f;//B
+    position[2].X = 0.0674f;//C
+    position[2].Y = 0.8887f;//C
+    position[3].X = -0.0195f;//D
+    position[3].Y = 0.7168f;//D
+    position[4].X = -0.0449f;//E
+    position[4].Y = 0.5264f;//E
+    position[5].X = -0.0059f;//F
+    position[5].Y = 0.3379f;//F
+    position[6].X = 0.0928f;//G
+    position[6].Y = 0.1729f;//G
+    position[7].X = 0.2402f;//H
+    position[7].Y = 0.0488f;//H
+    position[8].X = 0.4199f;//I
+    position[8].Y = -0.0195f;//I
+    position[9].X = 0.6113f;//J
+    position[9].Y = -0.0254f;//J
+    position[10].X = 0.7949f;//K
+    position[10].Y = 0.0322f;//K
+    position[11].X = 0.9492f;//L
+    position[11].Y = 0.1465f;//L
+    position[12].X = 1.0576f;//M
+    position[12].Y = 0.3047f;//M
+
 
     // The speed ratios at which different triangles must be used.
 
     float threshold[vertices_count-2];
-    threshold[0] = 0.00001f;//for the 3D margin
-    threshold[1] = 0.125f;
-    threshold[2] = 0.25f;
-    threshold[3] = 0.375f;
-    threshold[4] = 0.50f;
-    threshold[5] = 0.625f;
-    threshold[6] = 0.750f;
-    threshold[7] = 0.875f;
-    threshold[8] = 0.99999f;//for the 3D margin
-    threshold[9] = 1.0f;
-
-    //3D effect : wait for the full border to appear before drawing
-    for (int i=0;i<8;i++)
-    {
-        if ((speed_ratio-0.125f*i < 0.00625f && speed_ratio-0.125f*i >= 0.0f) || (0.125f*i-speed_ratio < 0.0045f && 0.125f*i-speed_ratio >= 0.0f) )
-        {
-            speed_ratio = 0.125f*i-0.0045f;
-            break;
-        }
-    }
+    threshold[0] = 0.0909f;
+    threshold[1] = 0.1818f;
+    threshold[2] = 0.2727f;
+    threshold[3] = 0.3636f;
+    threshold[4] = 0.4545f;
+    threshold[5] = 0.5454f;
+    threshold[6] = 0.6363f;
+    threshold[7] = 0.7272f;
+    threshold[8] = 0.8181f;
+    threshold[9] = 0.9090f;
+    threshold[10] = 1.0f;
 
     unsigned int count = computeVerticesForMeter(position, threshold, vertices, vertices_count,
                                                      speed_ratio, meter_width, meter_height, offset);
@@ -1154,7 +1234,7 @@ void RaceGUI::drawMeterTexture(video::ITexture *meter_texture, video::S3DVertex 
     //Should be greater or equal than the greatest vertices_count used by the meter functions
     if (count < 2)
         return;
-    short int index[12];
+    short int index[15];
     for(unsigned int i=0; i<count; i++)
     {
         index[i]=i;
@@ -1181,8 +1261,6 @@ void RaceGUI::drawMeterTexture(video::ITexture *meter_texture, video::S3DVertex 
         glDisable(GL_BLEND);
 #endif
 }   // drawMeterTexture
-
-
 
 //-----------------------------------------------------------------------------
 /** This function computes a polygon used for drawing the measure for a meter (speedometer, etc.)
@@ -1281,7 +1359,7 @@ unsigned int RaceGUI::computeVerticesForMeter(core::vector2df position[], float 
 /** Displays the lap of the kart.
  *  \param info Info object c
 */
-void RaceGUI::drawLap(const AbstractKart* kart,
+void RaceGUI::drawLap(const Kart* kart,
                       const core::recti &viewport,
                       const core::vector2df &scaling)
 {

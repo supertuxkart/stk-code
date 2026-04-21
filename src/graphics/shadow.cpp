@@ -17,7 +17,7 @@
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include "graphics/shadow.hpp"
-#include "karts/abstract_kart.hpp"
+#include "karts/kart.hpp"
 #include "karts/skidding.hpp"
 #include "graphics/central_settings.hpp"
 #include "graphics/irr_driver.hpp"
@@ -37,7 +37,7 @@
 #include <SMesh.h>
 #include <SMeshBuffer.h>
 
-Shadow::Shadow(Material* shadow_mat, const AbstractKart& kart)
+Shadow::Shadow(Material* shadow_mat, const Kart& kart)
       : m_node(NULL), m_shadow_enabled(false), m_kart(kart)
 {
     if (CVS->isGLSL())

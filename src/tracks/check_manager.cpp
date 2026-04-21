@@ -22,7 +22,7 @@
 #include <algorithm>
 
 #include "io/xml_node.hpp"
-#include "karts/abstract_kart.hpp"
+#include "karts/kart.hpp"
 #include "modes/world.hpp"
 #include "tracks/check_cannon.hpp"
 #include "tracks/check_goal.hpp"
@@ -86,9 +86,15 @@ void CheckManager::load(const XMLNode &node)
             it != check_structures_to_change_state.end(); it++)
         {
             if(DriveGraph::get()->isReverse())
+            {
                 m_all_checks[*it]->addSuccessor(i);
+                m_all_checks[i]->addPredecessor(*it);
+            }
             else
+            {
                 m_all_checks[i]->addSuccessor(*it);
+                m_all_checks[*it]->addPredecessor(i);
+            }
         }
 
     }
@@ -122,7 +128,7 @@ void CheckManager::reset(const Track &track)
  *  could be triggered since a CheckLine stores the previous position).
  *  \param kart_index Index of the kart that was moved.
  */
-void CheckManager::resetAfterKartMove(AbstractKart *kart)
+void CheckManager::resetAfterKartMove(Kart *kart)
 {
     std::vector<CheckStructure*>::iterator i;
     for (i = m_all_checks.begin(); i != m_all_checks.end(); i++)

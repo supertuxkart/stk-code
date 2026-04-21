@@ -24,7 +24,7 @@
 
 /** \defgroup karts */
 
-class AbstractKart;
+class Kart;
 class BareNetworkString;
 
 class MaxSpeed
@@ -33,14 +33,17 @@ friend class KartRewinder;
 public:
     /** The categories to use for increasing the speed of a kart:
      *  Increase due to zipper, slipstream, nitro, rubber band,
-     *  skidding usage. */
+     *  skidding usage, or electro-shield. */
     enum  {MS_INCREASE_MIN,
            MS_INCREASE_ZIPPER = MS_INCREASE_MIN,
+           MS_INCREASE_GROUND_ZIPPER,
            MS_INCREASE_SLIPSTREAM,
            MS_INCREASE_NITRO,
            MS_INCREASE_RUBBER,
            MS_INCREASE_SKIDDING,
            MS_INCREASE_RED_SKIDDING,
+           MS_INCREASE_PURPLE_SKIDDING,
+           MS_INCREASE_ELECTRO,
            MS_INCREASE_MAX};
 
     /** The categories to use for decreasing the speed of a kart:
@@ -54,7 +57,7 @@ public:
 
 private:
     /** A pointer to the kart to which this speed handling object belongs. */
-    AbstractKart *m_kart;
+    Kart *m_kart;
 
     /** The current maximum speed. */
     float m_current_max_speed;
@@ -64,6 +67,10 @@ private:
 
     /** If >0 then the minimum speed a kart should have (used for zippers). */
     float m_min_speed;
+
+    /** Used for display of skid particles after triggering a skid bonus.
+    *  0 is no bonus, 1 is first-stage bonus, etc. */
+    uint8_t m_last_triggered_skid_level;
 
     // ------------------------------------------------------------------------
     /** An internal class to store and handle speed increase related data. */
@@ -118,6 +125,10 @@ private:
         {
             return m_duration > 0 ? (float)m_engine_force / 10.0f : 0;
         }   // getEngineForce
+        // --------------------------------------------------------------------
+        /** This allows to gracefully end a speed increase, keeping
+         * the fade-out time active */
+        void endSpeedIncrease() { m_duration = 0; }
         // --------------------------------------------------------------------
         /** Returns if this speed increase is active atm. */
         bool isActive() const { return m_duration > -m_fade_out_time; }
@@ -183,7 +194,7 @@ private:
 
 
 public:
-          MaxSpeed(AbstractKart *kart);
+          MaxSpeed(Kart *kart);
 
     void  increaseMaxSpeed(unsigned int category, float add_speed,
                            float engine_force, int duration,
@@ -197,8 +208,9 @@ public:
     int   getSpeedIncreaseTicksLeft(unsigned int category);
     int   isSpeedIncreaseActive(unsigned int category);
     int   isSpeedDecreaseActive(unsigned int category);
+    void  endSpeedIncrease(unsigned int category);
     void  update(int ticks);
-    void  reset();
+    void  reset(bool leave_squash = false);
     void  saveState(BareNetworkString *buffer) const;
     void  rewindTo(BareNetworkString *buffer);
     // ------------------------------------------------------------------------
@@ -210,6 +222,8 @@ public:
     // ------------------------------------------------------------------------
     /** Returns the current maximum speed for this kart. */
     float getCurrentMaxSpeed() const { return m_current_max_speed; }
+    // --------------------------------------------------------------------
+    unsigned int getLatestSkidLevel() const { return m_last_triggered_skid_level; }
     // ------------------------------------------------------------------------
     /** Returns the additional engine force. */
     float getCurrentAdditionalEngineForce() const { return m_add_engine_force;}

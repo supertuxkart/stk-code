@@ -27,7 +27,7 @@ using namespace irr;
 
 #include "items/flyable.hpp"
 
-class AbstractKart;
+class Kart;
 class PhysicalObject;
 class RubberBand;
 class XMLNode;
@@ -49,12 +49,12 @@ private:
     bool m_reverse_mode, m_has_locally_played_sound, m_moved_to_infinity;
 
 public:
-                 Plunger(AbstractKart *kart);
+                 Plunger(Kart *kart);
                 ~Plunger();
     static  void init(const XMLNode &node, scene::IMesh* missile);
     virtual bool updateAndDelete(int ticks) OVERRIDE;
     virtual void hitTrack () OVERRIDE;
-    virtual bool hit      (AbstractKart *kart, PhysicalObject *obj=NULL)
+    virtual bool hit      (Kart *kart, PhysicalObject *obj=NULL)
         OVERRIDE;
     // ------------------------------------------------------------------------
     void         updateGraphics(float dt) OVERRIDE;

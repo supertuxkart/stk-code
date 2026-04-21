@@ -64,7 +64,7 @@ void NetworkKartSelectionScreen::init()
     for (auto& p : NetworkConfig::get()->getNetworkPlayers())
     {
         joinPlayer(std::get<0>(p), std::get<1>(p));
-        if (std::get<2>(p) == HANDICAP_MEDIUM)
+        if (std::get<2>(p) == HANDICAP_4)
         {
             m_kart_widgets.get(m_kart_widgets.size() -1)
                 ->enableHandicapForNetwork();

@@ -22,7 +22,7 @@
 #include "items/attachment.hpp"
 #include "items/powerup.hpp"
 #include "guiengine/message_queue.hpp"
-#include "karts/abstract_kart.hpp"
+#include "karts/kart.hpp"
 #include "karts/cannon_animation.hpp"
 #include "karts/explosion_animation.hpp"
 #include "karts/rescue_animation.hpp"
@@ -106,7 +106,7 @@ void KartRewinder::computeError()
         m_skidding->checkSmoothing();
     }
 
-    float diff = fabsf(m_prev_steering - AbstractKart::getSteerPercent());
+    float diff = fabsf(m_prev_steering - Kart::getSteerPercent());
     if (diff > 0.05f)
     {
         m_steering_smoothing_time = getTimeFullSteer(diff) / 2.0f;
@@ -188,7 +188,7 @@ BareNetworkString* KartRewinder::saveState(std::vector<std::string>* ru)
         bool_for_each_data |= (1 << 2);
     if (m_invulnerable_ticks > 0)
         bool_for_each_data |= (1 << 3);
-    if (getEnergy() > 0.0f)
+    if (getEnergy() != 0.0f)
         bool_for_each_data |= (1 << 4);
     if (has_animation)
         bool_for_each_data |= (1 << 5);
@@ -209,7 +209,18 @@ BareNetworkString* KartRewinder::saveState(std::vector<std::string>* ru)
         bool_for_each_data_2 |= (1 << 3);
     if (m_bubblegum_torque_sign)
         bool_for_each_data_2 |= (1 << 4);
+    if (isNitroHackActive())
+        bool_for_each_data_2 |= (1 << 5);
+    if (getPowerupMask())
+        bool_for_each_data_2 |= (1 << 6);
+    if (hasHeldMini())
+        bool_for_each_data_2 |= (1 << 7);
     buffer->addUInt8(bool_for_each_data_2);
+
+    uint8_t bool_for_each_data_3 = 0;
+    if (getEffectiveSteer() != 0.0f)
+        bool_for_each_data_3 |= 1;
+    buffer->addUInt8(bool_for_each_data_3);
 
     if (m_bubblegum_ticks > 0)
         buffer->addUInt16(m_bubblegum_ticks);
@@ -217,11 +228,20 @@ BareNetworkString* KartRewinder::saveState(std::vector<std::string>* ru)
         buffer->addUInt16(m_view_blocked_by_plunger);
     if (m_invulnerable_ticks > 0)
         buffer->addUInt16(m_invulnerable_ticks);
-    if (getEnergy() > 0.0f)
+    if (isNitroHackActive())
+        buffer->addUInt16(m_nitro_hack_ticks);
+    if (getEnergy() != 0.0f)
         buffer->addFloat(getEnergy());
+    if (getPowerupMask())
+        buffer->addUInt32(m_powerup_mask);
+    if (hasHeldMini())
+        buffer->addUInt8(m_powerup->getMiniState());
 
     // 3) Kart animation status or physics values (transform and velocities)
     // -------------------------------------------
+    if(getEffectiveSteer() != 0.0f)
+        buffer->addFloat(getEffectiveSteer());
+
     if (has_animation)
     {
         buffer->addUInt8(m_kart_animation->getAnimationType());
@@ -305,6 +325,12 @@ void KartRewinder::restoreState(BareNetworkString *buffer, int count)
     bool read_attachment = ((bool_for_each_data_2 >> 2) & 1) == 1;
     bool read_powerup = ((bool_for_each_data_2 >> 3) & 1) == 1;
     m_bubblegum_torque_sign = ((bool_for_each_data_2 >> 4) & 1) == 1;
+    bool read_nitro_hack = ((bool_for_each_data_2 >> 5) & 1) == 1;
+    bool read_powerup_mask = ((bool_for_each_data_2 >> 6) & 1) == 1;
+    bool has_held_mini = ((bool_for_each_data_2 >> 7) & 1) == 1;
+
+    uint8_t bool_for_each_data_3 = buffer->getUInt8();
+    bool read_effective_steer = (bool_for_each_data_3 & 1) == 1;
 
     if (read_bubblegum)
         m_bubblegum_ticks = buffer->getUInt16();
@@ -321,6 +347,11 @@ void KartRewinder::restoreState(BareNetworkString *buffer, int count)
     else
         m_invulnerable_ticks = 0;
 
+    if (read_nitro_hack)
+        m_nitro_hack_ticks = buffer->getUInt16();
+    else
+        m_nitro_hack_ticks = 0;
+
     if (read_energy)
     {
         float nitro = buffer->getFloat();
@@ -329,8 +360,23 @@ void KartRewinder::restoreState(BareNetworkString *buffer, int count)
     else
         setEnergy(0.0f);
 
+    if (read_powerup_mask)
+        m_powerup_mask = buffer->getUInt32();
+    else
+        m_powerup_mask = 0;
+
+    if (has_held_mini)
+        m_powerup->setMiniState((PowerupManager::MiniState) buffer->getUInt8());
+    else
+        m_powerup->setMiniState(PowerupManager::NOT_MINI);
+
     // 3) Kart animation status or transform and velocities
     // -----------
+    if (read_effective_steer)
+        setEffectiveSteer(buffer->getFloat());
+    else
+        setEffectiveSteer(0.0f);
+    
     if (has_animation_in_state)
     {
         KartAnimationType kat = (KartAnimationType)(buffer->getUInt8());

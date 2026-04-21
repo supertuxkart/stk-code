@@ -81,7 +81,7 @@ private:
     int           calcSteps();
     virtual bool  canSkid(float steer_fraction) { return false; }
 public:
-                 EndController(AbstractKart *kart,
+                 EndController(Kart *kart,
                                Controller *prev_controller);
                 ~EndController();
     virtual void update      (int ticks) ;

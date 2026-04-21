@@ -24,7 +24,7 @@
 
 #include "LinearMath/btQuaternion.h"
 
-class AbstractKart;
+class Kart;
 class AnimationBase;
 class CheckCannon;
 class Flyable;
@@ -41,7 +41,7 @@ protected:
 friend class KartRewinder;
 friend class Flyable;
     // ------------------------------------------------------------------------
-    CannonAnimation(AbstractKart* kart, BareNetworkString* buffer);
+    CannonAnimation(Kart* kart, BareNetworkString* buffer);
     // ------------------------------------------------------------------------
     CannonAnimation(Flyable* flyable, BareNetworkString* buffer);
     // ------------------------------------------------------------------------
@@ -94,7 +94,7 @@ private:
     uint32_t m_current_rotation;
 
 public:
-             CannonAnimation(AbstractKart *kart, CheckCannon* cc,
+             CannonAnimation(Kart *kart, CheckCannon* cc,
                              float skid_rot);
              CannonAnimation(Flyable *flyable, CheckCannon* cc);
              virtual ~CannonAnimation();

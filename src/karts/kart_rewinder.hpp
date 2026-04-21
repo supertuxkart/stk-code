@@ -23,7 +23,7 @@
 #include "network/rewinder.hpp"
 #include "utils/cpp2011.hpp"
 
-class AbstractKart;
+class Kart;
 class BareNetworkString;
 
 class KartRewinder : public Rewinder, public Kart
@@ -51,10 +51,10 @@ public:
     {
         if (m_steering_smoothing_dt >= 0.0f)
         {
-            return m_steering_smoothing_dt * AbstractKart::getSteerPercent() +
+            return m_steering_smoothing_dt * Kart::getSteerPercent() +
                 (1.0f - m_steering_smoothing_dt) * m_prev_steering;
         }
-        return AbstractKart::getSteerPercent();
+        return Kart::getSteerPercent();
     }
     // -------------------------------------------------------------------------
     virtual void updateGraphics(float dt) OVERRIDE

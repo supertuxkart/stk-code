@@ -20,6 +20,12 @@
                replay_file="challenge_cocoa_temple_intermediate.replay"/>
         <requirements position="1"/>
     </medium>
+    <casual>
+        <karts number="1"
+               replay_file="challenge_cocoa_temple_novice.replay"/>
+        <karts number="1"/>
+        <requirements position="1"/>
+    </casual>
     <easy>
         <karts number="1"
                replay_file="challenge_cocoa_temple_novice.replay"/>

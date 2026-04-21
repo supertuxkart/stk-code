@@ -17,6 +17,10 @@
         <karts number="2" aiIdent="nolok" superPower="nolokBoss"/>
         <requirements position="1"/>
     </medium>
+    <casual>
+        <karts number="2" aiIdent="nolok" superPower="nolokBoss"/>
+        <requirements position="1"/>
+    </casual>
     <easy>
         <karts number="2" aiIdent="nolok" superPower="nolokBoss"/>
         <requirements position="1"/>

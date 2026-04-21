@@ -26,7 +26,7 @@
 #include "guiengine/modaldialog.hpp"
 #include "guiengine/screen_keyboard.hpp"
 #include <ge_render_info.hpp>
-#include "karts/abstract_kart.hpp"
+#include "karts/kart.hpp"
 #include "karts/controller/controller.hpp"
 #include "modes/world.hpp"
 #include "network/game_setup.hpp"
@@ -232,7 +232,7 @@ const PeerVote* LobbyProtocol::getVote(uint32_t host_id) const
 void LobbyProtocol::addLiveJoiningKart(int kart_id, const RemoteKartInfo& rki,
                                        int live_join_util_ticks) const
 {
-    AbstractKart* k = World::getWorld()->getKart(kart_id);
+    Kart* k = World::getWorld()->getKart(kart_id);
     k->changeKart(rki.getKartName(), rki.getHandicap(),
         rki.getKartTeam() == KART_TEAM_RED ?
         std::make_shared<GE::GERenderInfo>(1.0f) :

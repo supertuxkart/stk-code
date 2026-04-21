@@ -21,7 +21,7 @@
 
 #include "karts/controller/player_controller.hpp"
 
-class AbstractKart;
+class Kart;
 class AIBaseController;
 
 class NetworkAIController : public PlayerController
@@ -33,7 +33,7 @@ private:
     KartControl* m_ai_controls;
     void convertAIToPlayerActions();
 public:
-                 NetworkAIController(AbstractKart *kart, int local_player_id,
+                 NetworkAIController(Kart *kart, int local_player_id,
                                      AIBaseController* ai);
     virtual     ~NetworkAIController();
     virtual void update(int ticks) OVERRIDE;

@@ -217,7 +217,7 @@ fi
 
 if [ -z "$PROJECT_VERSION" ]; then
     if [ $IS_DEBUG_BUILD -ne 0 ]; then
-        export PROJECT_VERSION="git"
+        export PROJECT_VERSION="2.0-git"
     else
         echo "Error: Variable PROJECT_VERSION is not set. It must have unique" \
              "value for release build."

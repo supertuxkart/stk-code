@@ -31,7 +31,7 @@ struct btWheelInfoConstructionInfo
 	btScalar		m_frictionSlip;
 	btScalar		m_maxSuspensionForce;
 	bool m_bIsFrontWheel;
-	
+	btTransform	    m_worldTransform;
 };
 
 /// btWheelInfo contains information per wheel about friction and suspension.
@@ -102,6 +102,7 @@ struct btWheelInfo
 		m_bIsFrontWheel = ci.m_bIsFrontWheel;
 		m_maxSuspensionForce = ci.m_maxSuspensionForce;
         m_was_on_ground = true;
+        m_worldTransform = ci.m_worldTransform;
 	}
 
 	void	updateWheel(const btRigidBody& chassis,RaycastInfo& raycastInfo);

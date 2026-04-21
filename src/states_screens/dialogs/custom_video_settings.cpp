@@ -71,6 +71,18 @@ void CustomVideoSettingsDialog::beforeAddingWidgets()
     particles_effects->addLabel(_C("Particle effects", "Enabled"));
     particles_effects->setValue(UserConfigParams::m_particles_effects);
 
+    SpinnerWidget* kart_lights = getWidget<SpinnerWidget>("kart_lights");
+    //I18N: No kart headlights
+    kart_lights->addLabel(_("Disabled"));
+    //I18N: Kart headlights for human players only
+    kart_lights->addLabel(_("Player kart only"));
+    //I18N: Kart headlights enabled for all karts
+    kart_lights->addLabel(_("All karts"));
+    // TODO: ideally, we should turn this off and show the value as disabled when
+    //       dynamic lights are off. However, because a full UI rework is coming,
+    //       there is little point in doing it now and redoing it later.
+    kart_lights->setValue(UserConfigParams::m_kart_lights);
+
     SpinnerWidget* geometry_level = getWidget<SpinnerWidget>("geometry_detail");
     geometry_level->addLabel(_C("Geometry level", "Very low"));
     geometry_level->addLabel(_C("Geometry level", "Low"));
@@ -243,8 +255,11 @@ GUIEngine::EventPropagation CustomVideoSettingsDialog::processEvent(const std::s
             UserConfigParams::m_animated_characters =
                 getWidget<CheckBoxWidget>("animated_characters")->getState();
 
+            UserConfigParams::m_kart_lights =
+                getWidget<SpinnerWidget>("kart_lights")->getValue();
+
             UserConfigParams::m_geometry_level =
-                getWidget<SpinnerWidget>("geometry_detail")->getValue();;
+                getWidget<SpinnerWidget>("geometry_detail")->getValue();
             int quality = getWidget<SpinnerWidget>("image_quality")->getValue();
 
             std::string rd = StringUtils::wideToUtf8(

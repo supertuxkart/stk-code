@@ -109,8 +109,8 @@ namespace ServerConfig
 
     SERVER_CFG_PREFIX IntServerConfigParam m_server_difficulty
         SERVER_CFG_DEFAULT(IntServerConfigParam(0, "server-difficulty",
-        "Difficulty in server, 0 is beginner, 1 is intermediate, 2 is expert "
-        "and 3 is supertux (the most difficult)."));
+        "Difficulty in server, 0 is novice, 1 is causal, 2 is intermediate,"
+        "3 is expert and 4 is supertux (the most difficult)."));
 
     SERVER_CFG_PREFIX IntServerConfigParam m_gp_track_count
         SERVER_CFG_DEFAULT(IntServerConfigParam(3, "gp-track-count",

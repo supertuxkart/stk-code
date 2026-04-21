@@ -17,7 +17,7 @@
 
 #include "modes/world_with_rank.hpp"
 
-#include "karts/abstract_kart.hpp"
+#include "karts/kart.hpp"
 #include "karts/controller/spare_tire_ai.hpp"
 #include "karts/kart_properties.hpp"
 #include "race/history.hpp"
@@ -80,7 +80,7 @@ void WorldWithRank::reset(bool restart)
 /** Returns the kart with a given position.
  *  \param p The position of the kart, 1<=p<=num_karts).
  */
-AbstractKart* WorldWithRank::getKartAtPosition(unsigned int p) const
+Kart* WorldWithRank::getKartAtPosition(unsigned int p) const
 {
     if(p<1 || p>m_position_index.size())
         return NULL;
@@ -89,7 +89,7 @@ AbstractKart* WorldWithRank::getKartAtPosition(unsigned int p) const
 }   // getKartAtPosition
 
 //-----------------------------------------------------------------------------
-std::pair<int, video::SColor> WorldWithRank::getSpeedometerDigit(const AbstractKart *kart) const
+std::pair<int, video::SColor> WorldWithRank::getSpeedometerDigit(const Kart *kart) const
 {
     return std::make_pair(kart->getPosition(), video::SColor(255, 255, 255, 255));
 }    // getSpeedometerDigit
@@ -175,7 +175,7 @@ void WorldWithRank::endSetKartPositions()
  *           should be moved to.
  */
 
-unsigned int WorldWithRank::getRescuePositionIndex(AbstractKart *kart)
+unsigned int WorldWithRank::getRescuePositionIndex(Kart *kart)
 {
     const int start_spots_amount =
                          Track::getCurrentTrack()->getNumberOfStartPositions();
@@ -245,7 +245,7 @@ bool WorldWithRank::isOnRoad(unsigned int kart_index) const
  *  track designers that STK does not crash.
  *  \param kart Kart for which to return the sector.
  */
-int WorldWithRank::getSectorForKart(const AbstractKart *kart) const
+int WorldWithRank::getSectorForKart(const Kart *kart) const
 {
     if (kart->getWorldKartId() >= m_kart_track_sector.size())
         return Graph::UNKNOWN_SECTOR;

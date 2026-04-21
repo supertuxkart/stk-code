@@ -20,13 +20,13 @@
 #include "karts/controller/player_controller.hpp"
 #include "network/network_config.hpp"
 
-class AbstractKart;
+class Kart;
 class Player;
 
 class NetworkPlayerController : public PlayerController
 {
 public:
-    NetworkPlayerController(AbstractKart *kart) : PlayerController(kart)
+    NetworkPlayerController(Kart *kart) : PlayerController(kart)
     {
         Log::info("NetworkPlayerController",
                   "New network player controller.");

@@ -161,42 +161,34 @@ int Achievement::getProgress()
 
 
 // ----------------------------------------------------------------------------
-/** Should ONLY be called if the achievement has one goal (a sum counts as one goal).
-  * Returning an error code with a number is not full-proof because a sum goal can
-  * legitimately be negative (a counter can be chosen to count against the
-  * achievement's fullfilment). */
+/** Should ONLY be called if the achievement has one goal (a sum counts as one goal). */
 int Achievement::computeGoalProgress(AchievementInfo::goalTree &progress, AchievementInfo::goalTree &reference, bool same_tree)
 {
+   // This should NOT happen
     if (progress.children.size() >= 2)
-    {
-        // This should NOT happen
+    { 
+        // Returning an error code with a number is not sufficient because a sum goal can
+        // legitimately be negative (a counter can be chosen to count against the
+        // achievement's fullfilment).
         assert(false);
         return 0;
     }
+
     // Can happen when showing the progress status of all parts of the goal tree
-    else if (progress.children.size() == 0)
+    if (progress.children.size() == 0)
     {
-        //TODO : find a more automatic way ; clean up repetition
-        if (progress.type == "race-started-all" ||
-            progress.type == "race-finished-all" ||
-            progress.type == "race-won-all" ||
-            progress.type == "race-finished-reverse-all" ||
-            progress.type == "race-finished-alone-all" ||
-            progress.type == "less-laps-all" ||
-            progress.type == "more-laps-all" ||
-            progress.type == "twice-laps-all" ||
-            progress.type == "egg-hunt-started-all" ||
-            progress.type == "egg-hunt-finished-all")
+        int all_track_status = PlayerManager::getCurrentAchievementsStatus()->getAllTrackStatus(progress.type);
+        if (all_track_status >= 1)
         {
             if (same_tree)
             {
                 return PlayerManager::getCurrentAchievementsStatus()
-                    ->getNumTracksAboveValue(0, reference.type);
+                    ->getNumTracksAboveValue(0, reference.type, (all_track_status == 2));
             }
             // Compare against the target value (in the reference tree) !
             // Progress is only shown for the current local accuont, so we can use the current achievements status
             return PlayerManager::getCurrentAchievementsStatus()
-                       ->getNumTracksAboveValue(reference.value, reference.type);
+                       ->getNumTracksAboveValue(reference.value, reference.type, (all_track_status == 2));
         }
         return progress.value;
     }
@@ -209,22 +201,13 @@ int Achievement::computeGoalProgress(AchievementInfo::goalTree &progress, Achiev
     }
     else
     {
-        //TODO : find a more automatic way
-        if (progress.children[0].type == "race-started-all" ||
-            progress.children[0].type == "race-finished-all" ||
-            progress.children[0].type == "race-won-all" ||
-            progress.children[0].type == "race-finished-reverse-all" ||
-            progress.children[0].type == "race-finished-alone-all" ||
-            progress.children[0].type == "less-laps-all" ||
-            progress.children[0].type == "more-laps-all" ||
-            progress.children[0].type == "twice-laps-all" ||
-            progress.children[0].type == "egg-hunt-started-all" ||
-            progress.children[0].type == "egg-hunt-finished-all")
+        int all_track_status = PlayerManager::getCurrentAchievementsStatus()->getAllTrackStatus(progress.children[0].type);
+        if (all_track_status >= 1)
         {
             // Compare against the target value (in the reference tree) !
-            // Progress is only shown for the current local accuont, so we can use the current achievements status
+            // Progress is only shown for the current local account, so we can use the current achievements status
             return PlayerManager::getCurrentAchievementsStatus()
-                       ->getNumTracksAboveValue(reference.children[0].value, reference.children[0].type);
+                       ->getNumTracksAboveValue(reference.children[0].value, reference.children[0].type, (all_track_status == 2));
         }
         else
         {
@@ -241,7 +224,7 @@ int Achievement::computeGoalProgress(AchievementInfo::goalTree &progress, Achiev
  *  resetable counter. It is applied if the parent node is of type
  *  SUM or AND-AT-ONCE, ignored otherwise.
  *  If it is LOGM- ; the update is for the highest achieved value of a
- *  resetable counter. It is appliedif the parent node is of type
+ *  resetable counter. It is applied if the parent node is of type
  *  AND or OR, ignored otherwise.
  *  If there is no logical prefix, the new value is set in all cases.
  *

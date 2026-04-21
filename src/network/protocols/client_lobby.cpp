@@ -33,7 +33,7 @@
 #include "io/file_manager.hpp"
 #include "items/network_item_manager.hpp"
 #include "items/powerup_manager.hpp"
-#include "karts/abstract_kart.hpp"
+#include "karts/kart.hpp"
 #include "karts/controller/controller.hpp"
 #include "karts/kart_properties.hpp"
 #include "karts/kart_properties_manager.hpp"
@@ -351,7 +351,7 @@ void ClientLobby::addAllPlayers(Event* event)
         Camera* cam = Camera::getCamera(0);
         for (unsigned i = 0; i < w->getNumKarts(); i++)
         {
-            AbstractKart* k = w->getKart(i);
+            Kart* k = w->getKart(i);
             // Change spectating target to first non-eliminated kart
             if (isSpectator() && cam && !k->isEliminated())
             {
@@ -1189,7 +1189,7 @@ void ClientLobby::raceFinished(Event* event)
         lw->updateRacePosition();
         for (unsigned i = 0; i < lw->getNumKarts(); i++)
         {
-            AbstractKart* k = lw->getKart(i);
+            Kart* k = lw->getKart(i);
             if (!k->hasFinishedRace() && !k->isEliminated())
             {
                 core::stringw player_name = k->getController()->getName();
@@ -1330,7 +1330,7 @@ void ClientLobby::liveJoinAcknowledged(Event* event)
     m_last_live_join_util_ticks = data.getUInt32();
     for (unsigned i = 0; i < w->getNumKarts(); i++)
     {
-        AbstractKart* k = w->getKart(i);
+        Kart* k = w->getKart(i);
         if (k->getController()->isLocalPlayerController())
             k->setLiveJoinKart(m_last_live_join_util_ticks);
     }
@@ -1351,7 +1351,7 @@ void ClientLobby::liveJoinAcknowledged(Event* event)
         w->resetElimination();
         for (unsigned i = 0; i < players.size(); i++)
         {
-            AbstractKart* k = w->getKart(i);
+            Kart* k = w->getKart(i);
             if (k->getController()->isLocalPlayerController())
                 continue;
             k->reset();
@@ -1391,7 +1391,7 @@ void ClientLobby::finishLiveJoin()
     w->endLiveJoinWorld(m_last_live_join_util_ticks);
     for (unsigned i = 0; i < w->getNumKarts(); i++)
     {
-        AbstractKart* k = w->getKart(i);
+        Kart* k = w->getKart(i);
         if (!k->getController()->isLocalPlayerController() &&
             !k->isEliminated())
             k->getNode()->setVisible(true);
@@ -1602,7 +1602,7 @@ void ClientLobby::changeSpectateTarget(PlayerAction action, int value,
     WorldWithRank* wwr = dynamic_cast<WorldWithRank*>(World::getWorld());
     if (!wwr)
         return;
-    std::vector<AbstractKart*> karts;
+    std::vector<Kart*> karts;
     for (unsigned i = 0; i < wwr->getNumKarts(); i++)
         karts.push_back(wwr->getKartAtDrawingPosition(i + 1));
 

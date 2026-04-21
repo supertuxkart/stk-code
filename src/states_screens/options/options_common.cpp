@@ -23,28 +23,28 @@
 
 namespace OptionsCommon
 {
-    void switchTab(std::string selected_tab)
-    {
-        GUIEngine::Screen *screen = NULL;
-        if (selected_tab == "tab_audio")
-            screen = OptionsScreenAudio::getInstance();
-        else if (selected_tab == "tab_display")
-            screen = OptionsScreenDisplay::getInstance();
-        else if (selected_tab == "tab_video")
-            screen = OptionsScreenVideo::getInstance();
-        else if (selected_tab == "tab_players")
-            screen = TabbedUserScreen::getInstance();
-        else if (selected_tab == "tab_controls")
-            screen = OptionsScreenInput::getInstance();
-        else if (selected_tab == "tab_ui")
-            screen = OptionsScreenUI::getInstance();
-        else if (selected_tab == "tab_general")
-            screen = OptionsScreenGeneral::getInstance();
-        else if (selected_tab == "tab_language")
-            screen = OptionsScreenLanguage::getInstance();
-        if(screen)
-            StateManager::get()->replaceTopMostScreen(screen);
-    }
+	void switchTab(std::string selected_tab)
+	{
+		GUIEngine::Screen *screen = NULL;
+    	if (selected_tab == "tab_audio")
+        	screen = OptionsScreenAudio::getInstance();
+    	else if (selected_tab == "tab_display")
+        	screen = OptionsScreenDisplay::getInstance();
+    	else if (selected_tab == "tab_video")
+        	screen = OptionsScreenVideo::getInstance();
+    	else if (selected_tab == "tab_players")
+        	screen = TabbedUserScreen::getInstance();
+    	else if (selected_tab == "tab_controls")
+        	screen = OptionsScreenInput::getInstance();
+    	else if (selected_tab == "tab_ui")
+        	screen = OptionsScreenUI::getInstance();
+    	else if (selected_tab == "tab_general")
+        	screen = OptionsScreenGeneral::getInstance();
+    	else if (selected_tab == "tab_language")
+        	screen = OptionsScreenLanguage::getInstance();
+    	if(screen)
+        	StateManager::get()->replaceTopMostScreen(screen);
+	} // switchTab
 
     void updatePauseTooltip(GUIEngine::Widget* widget, bool is_pause)
     {

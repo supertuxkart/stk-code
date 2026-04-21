@@ -25,7 +25,7 @@
 
 #include "utils/cpp2011.hpp"
 
-class AbstractKart;
+class Kart;
 
 /**
   * \brief Handles the game camera
@@ -90,7 +90,7 @@ private:
                         float side_way, float distance, float smoothing);
 
     friend class Camera;
-             CameraFPS(int camera_index, AbstractKart* kart);
+             CameraFPS(int camera_index, Kart* kart);
     virtual ~CameraFPS();
 public:
     // ------------------------------------------------------------------------

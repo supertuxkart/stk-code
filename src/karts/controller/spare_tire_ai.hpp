@@ -43,9 +43,9 @@ private:
     void          findDefaultPath();
 
 public:
-                 SpareTireAI(AbstractKart *kart);
+                 SpareTireAI(Kart *kart);
     // ------------------------------------------------------------------------
-    virtual void crashed(const AbstractKart *k) OVERRIDE;
+    virtual void crashed(const Kart *k) OVERRIDE;
     // ------------------------------------------------------------------------
     virtual void update(int ticks) OVERRIDE;
     // ------------------------------------------------------------------------

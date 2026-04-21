@@ -89,20 +89,23 @@ public:
 
         // Turn
         TURN_RADIUS,
-        TURN_TIME_RESET_STEER,
         TURN_TIME_FULL_STEER,
+        TURN_SPEED_FACTOR,
+        TURN_SPEED_FACTOR_PARTIAL_LB,
+        TURN_SPEED_FACTOR_PARTIAL_UB,
 
         // Engine
         ENGINE_POWER,
         ENGINE_MAX_SPEED,
         ENGINE_GENERIC_MAX_SPEED,
         ENGINE_BRAKE_FACTOR,
-        ENGINE_BRAKE_TIME_INCREASE,
+        ENGINE_TIME_FULL_BRAKE,
         ENGINE_MAX_SPEED_REVERSE_RATIO,
 
         // Gear
         GEAR_SWITCH_RATIO,
         GEAR_POWER_INCREASE,
+        GEAR_REVERSE_POWER,
 
         // Mass
         MASS,
@@ -164,9 +167,22 @@ public:
         PLUNGER_BAND_FADE_OUT_TIME,
         PLUNGER_IN_FACE_TIME,
 
+        // Nitrohack
+        NITROHACK_DURATION,
+        NITROHACK_FACTOR,
+
+        // Electro-shield
+        ELECTRO_DURATION,
+        ELECTRO_ENGINE_MULT,
+        ELECTRO_MAX_SPEED_INCREASE,
+        ELECTRO_FADE_OUT_TIME,
+
         // Startup
         STARTUP_TIME,
         STARTUP_BOOST,
+        STARTUP_ENGINE_FORCE,
+        STARTUP_DURATION,
+        STARTUP_FADE_OUT_TIME,
 
         // Rescue
         RESCUE_DURATION,
@@ -185,7 +201,9 @@ public:
         NITRO_CONSUMPTION,
         NITRO_SMALL_CONTAINER,
         NITRO_BIG_CONTAINER,
+        NITRO_AIR_CONTAINER,
         NITRO_MAX_SPEED_INCREASE,
+        NITRO_MIN_BURST,
         NITRO_FADE_OUT_TIME,
         NITRO_MAX,
 
@@ -214,10 +232,12 @@ public:
         SKID_TIME_TILL_BONUS,
         SKID_BONUS_SPEED,
         SKID_BONUS_TIME,
+        SKID_FADE_OUT_TIME,
         SKID_BONUS_FORCE,
         SKID_PHYSICAL_JUMP_TIME,
         SKID_GRAPHICAL_JUMP_TIME,
         SKID_POST_SKID_ROTATE_FACTOR,
+        SKID_STEER_FACTOR,
         SKID_REDUCE_TURN_MIN,
         SKID_REDUCE_TURN_MAX,
         SKID_ENABLED,
@@ -273,18 +293,21 @@ public:
     float getStabilitySmoothFlyingImpulse() const;
 
     InterpolationArray getTurnRadius() const;
-    float getTurnTimeResetSteer() const;
     InterpolationArray getTurnTimeFullSteer() const;
+    float getTurnSpeedFactor() const;
+    float getTurnSpeedFactorPartialLb() const;
+    float getTurnSpeedFactorPartialUb() const;
 
     float getEnginePower() const;
     float getEngineMaxSpeed() const;
     float getEngineGenericMaxSpeed() const;
     float getEngineBrakeFactor() const;
-    float getEngineBrakeTimeIncrease() const;
+    float getEngineTimeFullBrake() const;
     float getEngineMaxSpeedReverseRatio() const;
 
     std::vector<float> getGearSwitchRatio() const;
     std::vector<float> getGearPowerIncrease() const;
+    float getGearReversePower() const;
 
     float getMass() const;
 
@@ -335,8 +358,19 @@ public:
     float getPlungerBandFadeOutTime() const;
     float getPlungerInFaceTime() const;
 
+    float getNitrohackDuration() const;
+    float getNitrohackFactor() const;
+
+    float getElectroDuration() const;
+    float getElectroEngineMult() const;
+    float getElectroMaxSpeedIncrease() const;
+    float getElectroFadeOutTime() const;
+
     std::vector<float> getStartupTime() const;
     std::vector<float> getStartupBoost() const;
+    std::vector<float> getStartupEngineForce() const;
+    float getStartupDuration() const;
+    float getStartupFadeOutTime() const;
 
     float getRescueDuration() const;
     float getRescueVertOffset() const;
@@ -352,7 +386,9 @@ public:
     float getNitroConsumption() const;
     float getNitroSmallContainer() const;
     float getNitroBigContainer() const;
+    float getNitroAirContainer() const;
     float getNitroMaxSpeedIncrease() const;
+    float getNitroMinBurst() const;
     float getNitroFadeOutTime() const;
     float getNitroMax() const;
 
@@ -379,10 +415,12 @@ public:
     std::vector<float> getSkidTimeTillBonus() const;
     std::vector<float> getSkidBonusSpeed() const;
     std::vector<float> getSkidBonusTime() const;
+    std::vector<float> getSkidFadeOutTime() const;
     std::vector<float> getSkidBonusForce() const;
     float getSkidPhysicalJumpTime() const;
     float getSkidGraphicalJumpTime() const;
     float getSkidPostSkidRotateFactor() const;
+    float getSkidSteerFactor() const;
     float getSkidReduceTurnMin() const;
     float getSkidReduceTurnMax() const;
     bool getSkidEnabled() const;

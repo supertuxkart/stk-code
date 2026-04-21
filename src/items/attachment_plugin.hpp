@@ -21,7 +21,7 @@
 
 #include "vector3d.h"
 
-class AbstractKart;
+class Kart;
 class Attachment;
 class BareNetworkString;
 
@@ -39,12 +39,12 @@ class AttachmentPlugin
 {
 protected:
     /** Kart the attachment is attached to. */
-    AbstractKart* m_kart;
+    Kart* m_kart;
 
     Attachment* m_attachment;
 public:
     /** Constructor for a plugin. */
-    AttachmentPlugin(AbstractKart *kart, Attachment* attachment)
+    AttachmentPlugin(Kart *kart, Attachment* attachment)
     {
         m_kart = kart;
         m_attachment = attachment;

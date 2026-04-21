@@ -35,7 +35,7 @@
 #include "io/file_manager.hpp"
 #include "items/attachment_manager.hpp"
 #include "items/projectile_manager.hpp"
-#include "karts/abstract_kart.hpp"
+#include "karts/kart.hpp"
 #include "karts/controller/controller.hpp"
 #include "karts/explosion_animation.hpp"
 #include "karts/kart_properties.hpp"
@@ -60,7 +60,7 @@
  *  \param ticks Swatter duration.
  *  \param attachment class attachment from karts.
  */
-Swatter::Swatter(AbstractKart *kart, int16_t bomb_ticks, int ticks,
+Swatter::Swatter(Kart *kart, int16_t bomb_ticks, int ticks,
                   Attachment* attachment)
        : AttachmentPlugin(kart, attachment)
 {
@@ -326,12 +326,12 @@ void Swatter::chooseTarget()
 {
     // TODO: for the moment, only handle karts...
     const World*  world         = World::getWorld();
-    AbstractKart* closest_kart  = NULL;
+    Kart* closest_kart  = NULL;
     float         min_dist2     = FLT_MAX;
 
     for(unsigned int i=0; i<world->getNumKarts(); i++)
     {
-        AbstractKart *kart = world->getKart(i);
+        Kart *kart = world->getKart(i);
         // TODO: isSwatterReady(), isSquashable()?
         if(kart->isEliminated() || kart==m_kart || kart->getKartAnimation())
             continue;

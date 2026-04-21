@@ -31,7 +31,7 @@
 #include "guiengine/abstract_state_manager.hpp"
 #include "utils/ptr_vector.hpp"
 
-class AbstractKart;
+class Kart;
 class InputDevice;
 struct Input;
 namespace Online
@@ -80,7 +80,7 @@ public:
         InputDevice   *m_device;
 
         /** Pointer to the kart of this player, only valid during the game. */
-        AbstractKart  *m_kart;
+        Kart  *m_kart;
 
         /** ID of this player within the list of active players */
         int m_id;
@@ -152,7 +152,7 @@ public:
 
         // --------------------------------------------------------------------
         /** Sets the kart for this player. */
-        void setKart(AbstractKart *kart)
+        void setKart(Kart *kart)
         {
 #ifdef DEBUG
             assert(m_magic_number == 0xAC1EF1AE);
@@ -162,7 +162,7 @@ public:
 
         // --------------------------------------------------------------------
         /** \return the kart of this player. Only valid while world exists. */
-        AbstractKart* getKart()
+        Kart* getKart()
         {
 #ifdef DEBUG
             assert(m_magic_number == 0xAC1EF1AE);

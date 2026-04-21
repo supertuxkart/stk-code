@@ -17,6 +17,10 @@
         <karts number="1"/>
         <requirements energy="15" time="190"/>
     </medium>
+    <casual>
+        <karts number="1"/>
+        <requirements energy="12" time="230"/>
+    </casual>
     <easy>
         <karts number="1"/>
         <requirements energy="10" time="260"/>

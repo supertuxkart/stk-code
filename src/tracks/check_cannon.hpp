@@ -69,7 +69,7 @@ public:
     // ------------------------------------------------------------------------
     virtual void trigger(unsigned int kart_index) OVERRIDE {}
     // ------------------------------------------------------------------------
-    virtual void changeDebugColor(bool is_active) OVERRIDE;
+    virtual void changeDebugColor(bool is_active, bool prevent_backwards = false) OVERRIDE;
     // ------------------------------------------------------------------------
     virtual void update(float dt) OVERRIDE;
     // ------------------------------------------------------------------------

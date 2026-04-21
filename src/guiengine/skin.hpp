@@ -313,10 +313,6 @@ namespace GUIEngine
                                const bool pressed, bool focused);
         void drawSpinnerBody(const core::rect< s32 > &rect, Widget* widget,
                              const bool pressed, bool focused);
-        void drawGauge(const core::rect< s32 > &rect, Widget* widget,
-                       bool focused);
-        void drawGaugeFill(const core::rect< s32 > &rect, Widget* widget,
-                           bool focused);
         void drawCheckBox(const core::rect< s32 > &rect, Widget* widget,
                           bool focused);
         void drawList(const core::rect< s32 > &rect, Widget* widget,

@@ -23,7 +23,7 @@
 #include "graphics/hit_sfx.hpp"
 #include "graphics/material.hpp"
 #include "io/xml_node.hpp"
-#include "karts/abstract_kart.hpp"
+#include "karts/kart.hpp"
 #include "modes/linear_world.hpp"
 
 #include "utils/log.hpp" //TODO: remove after debugging is done
@@ -33,7 +33,7 @@ float Bowling::m_st_max_distance_squared;
 float Bowling::m_st_force_to_target;
 
 // -----------------------------------------------------------------------------
-Bowling::Bowling(AbstractKart *kart)
+Bowling::Bowling(Kart *kart)
         : Flyable(kart, PowerupManager::POWERUP_BOWLING, 50.0f /* mass */)
 {
     m_has_hit_kart = false;
@@ -85,22 +85,6 @@ bool Bowling::updateAndDelete(int ticks)
         return true;
     }
 
-    const AbstractKart *kart=0;
-    Vec3        direction;
-    float       minDistance;
-    getClosestKart(&kart, &minDistance, &direction);
-    if(kart && minDistance<m_st_max_distance_squared)   // move bowling towards kart
-    {
-        // limit angle, so that the bowling ball does not turn
-        // around to hit a kart behind
-        if(fabs(m_body->getLinearVelocity().angle(direction)) < 1.3)
-        {
-            direction*=1/direction.length()*m_st_force_to_target;
-            m_body->applyCentralForce(direction);
-        }
-    }
-    
-   
     // Bowling balls lose energy (e.g. when hitting the track), so increase
     // the speed if the ball is too slow, but only if it's not too high (if
     // the ball is too high, it is 'pushed down', which can reduce the
@@ -119,19 +103,8 @@ bool Bowling::updateAndDelete(int ticks)
         }
     }
     btVector3 v       = m_body->getLinearVelocity();
-    float vlen        = v.length2();
-    if (hat<= m_max_height)
-    {
-        if(vlen<0.8*m_speed*m_speed)
-        {   // bowling lost energy (less than 80%), i.e. it's too slow - speed it up:
-            if(vlen==0.0f) {
-                v = btVector3(.5f, .0, 0.5f);  // avoid 0 div.
-            }
- //           m_body->setLinearVelocity(v*(m_speed/sqrt(vlen)));
-        }   // vlen < 0.8*m_speed*m_speed
-    }   // hat< m_max_height
-
-    if(vlen<0.1)
+    
+    if(v.length2() < 0.1)
     {
         hit(NULL);
         removeRollSfx();
@@ -152,7 +125,7 @@ bool Bowling::updateAndDelete(int ticks)
  *  \returns True if there was actually a hit (i.e. not owner, and target is
  *           not immune), false otherwise.
  */
-bool Bowling::hit(AbstractKart* kart, PhysicalObject* obj)
+bool Bowling::hit(Kart* kart, PhysicalObject* obj)
 {
     bool was_real_hit = Flyable::hit(kart, obj);
     if(was_real_hit)

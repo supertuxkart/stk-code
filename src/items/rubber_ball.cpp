@@ -25,7 +25,7 @@
 #include "io/xml_node.hpp"
 #include "items/attachment.hpp"
 #include "items/projectile_manager.hpp"
-#include "karts/abstract_kart.hpp"
+#include "karts/kart.hpp"
 #include "karts/kart_properties.hpp"
 #include "modes/linear_world.hpp"
 #include "network/network_string.hpp"
@@ -60,8 +60,10 @@ float RubberBall::m_st_max_offset_distance;
 
 // Debug only, so that we can get a feel on how well balls are aiming etc.
 #undef PRINT_BALL_REMOVE_INFO
+// Debug only
+#undef PRINT_BALL_TIME_TO_TARGET
 
-RubberBall::RubberBall(AbstractKart *kart)
+RubberBall::RubberBall(Kart *kart)
           : Flyable(kart, PowerupManager::POWERUP_RUBBERBALL, 0.0f /* mass */),
             TrackSector()
 {
@@ -122,6 +124,10 @@ void RubberBall::onFireFlyable()
 
     m_restoring_state = true;
     computeTarget();
+
+#ifdef PRINT_BALL_TIME_TO_TARGET
+    m_hit_timer = 0.0f;
+#endif
 
     // initialises the current graph node
     TrackSector::update(getXYZ());
@@ -284,7 +290,7 @@ void RubberBall::getNextControlPoint()
 }   // getNextControlPoint
 
 // ----------------------------------------------------------------------------
-/** Initialises this object with data from the power.xml file (this is a static
+/** Initialises this object with data from the powerup.xml file (this is a static
  *  function).
  *  \param node XML Node
  *  \param rubberball The rubber ball mesh
@@ -352,8 +358,8 @@ void RubberBall::init(const XMLNode &node, scene::IMesh *rubberball)
 
 
     //sanity checks
-    if (m_st_min_speed_offset < 10.0f)
-        m_st_min_speed_offset = 10.0f;
+    if (m_st_min_speed_offset < 1.0f)
+        m_st_min_speed_offset = 1.0f;
     if (m_st_min_speed_offset > m_st_max_speed_offset)
     {
         m_st_max_speed_offset = m_st_min_speed_offset;
@@ -446,6 +452,9 @@ bool RubberBall::updateAndDelete(int ticks)
     TerrainInfo::update(next_xyz + getNormal()*vertical_offset, -getNormal());
 
     m_height_timer += stk_config->ticks2Time(ticks);
+#ifdef PRINT_BALL_TIME_TO_TARGET
+    m_hit_timer += stk_config->ticks2Time(ticks);
+#endif
     float height    = updateHeight()+m_extend.getY()*0.5f;
     
     if(UserConfigParams::logFlyable())
@@ -529,7 +538,7 @@ void RubberBall::moveTowardsTarget(Vec3 *next_xyz, int ticks)
 
     // If ball is close to the target, then explode
     if (diff.length() < m_target->getKartLength())
-        hit((AbstractKart*)m_target);
+        hit((Kart*)m_target);
 
     assert(!std::isnan((*next_xyz)[0]));
     assert(!std::isnan((*next_xyz)[1]));
@@ -710,16 +719,23 @@ float RubberBall::updateHeight()
         if(m_fast_ping)
         {
             // Some experimental formulas
-            m_current_max_height = 0.5f*sqrt(m_distance_to_target);
+            m_current_max_height = 0.4f*sqrt(m_distance_to_target+11)-0.005f*m_distance_to_target;
             // If the ball just missed the target, m_distance_to_target
             // can be huge (close to track length) due to the order in
             // which a lost target is detected. Avoid this by clamping
             // m_current_max_height.
             if(m_current_max_height>m_max_height)
                 m_current_max_height = m_max_height;
-            m_interval           = m_current_max_height / 10.0f;
+
+            float fast_ping_ratio = 1.0f - (m_distance_to_target / m_st_fast_ping_distance);
+            // In case the ball just missed the target
+            if (fast_ping_ratio < 0.0f)
+                fast_ping_ratio = 0.0f;
+
+            m_interval           = m_st_interval * 1.2987f * // Ensure that changing the interval in powerup.xml works intuitively (this is 1 with default values)
+                                   m_current_max_height / (5.0f + 2.5f * fast_ping_ratio);
             // Avoid too small hops and esp. a division by zero
-            if(m_interval<0.01f)
+            if(m_interval<0.1f)
                 m_interval = 0.1f;
         }
         else
@@ -849,7 +865,7 @@ void RubberBall::updateDistanceToTarget()
  *  \params object The object that was hit (NULL if none).
  *  \returns True if
  */
-bool RubberBall::hit(AbstractKart* kart, PhysicalObject* object)
+bool RubberBall::hit(Kart* kart, PhysicalObject* object)
 {
     // When moved to infinity during cannon animation do nothing
     if (hasAnimation())
@@ -857,6 +873,10 @@ bool RubberBall::hit(AbstractKart* kart, PhysicalObject* object)
 #ifdef PRINT_BALL_REMOVE_INFO
     if(kart)
         Log::debug("[RuberBall]", "ball %d hit kart.", m_id);
+#endif
+#ifdef PRINT_BALL_TIME_TO_TARGET
+    if(kart && kart == m_target)
+        Log::info("[RuberBall]", "ball %d hit kart after time %f.", m_id, m_hit_timer);
 #endif
     if(kart && kart!=m_target)
     {
@@ -867,7 +887,27 @@ bool RubberBall::hit(AbstractKart* kart, PhysicalObject* object)
             kart->getAttachment()->update(10000);
             return false;
         }
-        kart->setSquash(m_st_squash_duration, m_st_squash_slowdown);
+
+        if(kart->hasBasketSquashImmunity())
+            return false;
+
+        // Don't squash shielded karts except for small gum shields
+        bool is_weak_shielded = kart->isWeakShielded();
+        bool is_shielded = kart->isShielded();
+        if (is_shielded)
+            kart->decreaseShieldTime();
+
+        if (!is_shielded || is_weak_shielded)
+            kart->setSquash(is_weak_shielded ? m_st_squash_duration * 0.5f :
+                                               m_st_squash_duration,
+                                               m_st_squash_slowdown);
+
+        // The basket ball touches the kart over several frames
+        // To avoid the shield being destroyed the first frame
+        // and the kart being squashed afterwards, we give
+        // the kart a temporary immunity to basket-ball squashing.
+        kart->setBasketSquashImmunityTicks(stk_config->time2Ticks(0.2f));
+            
         return false;
     }
     bool was_real_hit = Flyable::hit(kart, object);
@@ -875,7 +915,17 @@ bool RubberBall::hit(AbstractKart* kart, PhysicalObject* object)
     {
         if(kart && kart->isShielded())
         {
+            bool is_weak_shielded = kart->isWeakShielded();
             kart->decreaseShieldTime();
+
+            // Karts with small gum shields are not exploded, but get squashed
+            // We do it in this order, because otherwise the squash simply removes
+            // the shield.
+            // FIXME If there are two basket-balls, it can be worse to have
+            //       a weak shield as the kart doesn't get immunity for the second
+            //       basket ball
+            if (is_weak_shielded)
+                kart->setSquash(m_st_squash_duration * 1.5f, m_st_squash_slowdown);
         }
         else
             explode(kart, object);

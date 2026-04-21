@@ -97,6 +97,10 @@ public:
     /** Returns the glow color for an item. */
     static video::SColorf& getGlowColor(ItemState::ItemType type)
                                       { return m_glow_color[type]; }
+    // ------------------------------------------------------------------------
+    /** Returns the collect distance squared for an item. */
+    static float getCollectDistanceSquared(ItemState::ItemType type)
+                                      { return m_collect_distance_squared[type]; }
 
     // ========================================================================
 protected:
@@ -122,6 +126,9 @@ private:
     /** Stores all item models. */
     static std::vector<std::string> m_icon;
 
+    /** Stores all item collect distance */
+    static std::vector<float> m_collect_distance_squared;
+
 protected:
     /** Remaining time that items should remain switched. If the
      *  value is <0, it indicates that the items are not switched atm. */
@@ -139,14 +146,14 @@ public:
     virtual Item*  placeItem       (ItemState::ItemType type, const Vec3& xyz,
                                     const Vec3 &normal);
     virtual Item*  dropNewItem     (ItemState::ItemType type,
-                                    const AbstractKart* parent,
+                                    const Kart* parent,
                                     const Vec3 *server_xyz = NULL,
                                     const Vec3 *normal = NULL);
     void           update          (int ticks);
     void           updateGraphics  (float dt);
-    void           checkItemHit    (AbstractKart* kart);
+    void           checkItemHit    (Kart* kart);
     void           reset           ();
-    virtual void   collectedItem   (ItemState *item, AbstractKart *kart);
+    virtual void   collectedItem   (ItemState *item, Kart *kart);
     virtual void   switchItems     ();
     bool           randomItemsForArena(const AlignedArray<btTransform>& pos);
 

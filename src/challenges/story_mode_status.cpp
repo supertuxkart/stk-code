@@ -36,6 +36,7 @@ StoryModeStatus::StoryModeStatus(const XMLNode *node)
     m_next_unlock_points      = 0;
     m_first_time              = true;
     m_easy_challenges         = 0;
+    m_casual_challenges       = 0;
     m_medium_challenges       = 0;
     m_hard_challenges         = 0;
     m_best_challenges         = 0;
@@ -107,6 +108,7 @@ void StoryModeStatus::computeActive(bool first_call)
     m_points = 0;
     m_next_unlock_points = 0;
     m_easy_challenges = 0;
+    m_casual_challenges = 0;
     m_medium_challenges = 0;
     m_hard_challenges = 0;
     m_best_challenges = 0;
@@ -142,6 +144,11 @@ void StoryModeStatus::computeActive(bool first_call)
                 m_points += CHALLENGE_POINTS[RaceManager::DIFFICULTY_MEDIUM]*gp_factor;
                 m_medium_challenges++;
             }
+            else if (i->second->isSolved(RaceManager::DIFFICULTY_CASUAL))
+            {
+                m_points += CHALLENGE_POINTS[RaceManager::DIFFICULTY_CASUAL]*gp_factor;
+                m_casual_challenges++;
+            }
             else if (i->second->isSolved(RaceManager::DIFFICULTY_EASY))
             {
                 m_points += CHALLENGE_POINTS[RaceManager::DIFFICULTY_EASY]*gp_factor;
@@ -155,6 +162,8 @@ void StoryModeStatus::computeActive(bool first_call)
             case RaceManager::DIFFICULTY_NONE:
                 i->second->setActive(RaceManager::DIFFICULTY_EASY);
             case RaceManager::DIFFICULTY_EASY:
+                i->second->setActive(RaceManager::DIFFICULTY_CASUAL);
+            case RaceManager::DIFFICULTY_CASUAL:
                 i->second->setActive(RaceManager::DIFFICULTY_MEDIUM);
             case RaceManager::DIFFICULTY_MEDIUM:
                 i->second->setActive(RaceManager::DIFFICULTY_HARD);
@@ -318,6 +327,9 @@ void StoryModeStatus::grandPrixFinished()
             return; //No cup unlocked
         case ChallengeData::GP_EASY:
             difficulty = RaceManager::DIFFICULTY_EASY;
+            break;
+        case ChallengeData::GP_CASUAL:
+            difficulty = RaceManager::DIFFICULTY_CASUAL;
             break;
         case ChallengeData::GP_MEDIUM:
             difficulty = RaceManager::DIFFICULTY_MEDIUM;

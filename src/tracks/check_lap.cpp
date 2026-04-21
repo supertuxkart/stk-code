@@ -22,7 +22,7 @@
 
 #include "config/user_config.hpp"
 #include "io/xml_node.hpp"
-#include "karts/abstract_kart.hpp"
+#include "karts/kart.hpp"
 #include "modes/linear_world.hpp"
 #include "race/race_manager.hpp"
 #include "tracks/track.hpp"
@@ -51,10 +51,9 @@ void CheckLap::reset(const Track &track)
 }   // reset
 
 // ----------------------------------------------------------------------------
-/** True if going from old_pos to new_pos crosses this checkline. This function
- *  is called from update (of the checkline structure).
- *  \param old_pos    Position in previous frame.
- *  \param new_pos    Position in current frame.
+/** This functions ignores the old_pos and new_pos parameters, they are just
+ *  there for function call compatibility in check structures, with other
+ *  structures making use of the parameters.
  *  \param kart_index Index of the kart, can be used to store kart specific
  *                    additional data.
  */
@@ -68,6 +67,12 @@ bool CheckLap::isTriggered(const Vec3 &old_pos, const Vec3 &new_pos,
     // Can happen if a non-lap based race mode is used with a scene file that
     // has check defined.
     if(!lin_world)
+        return false;
+
+    // Before physics start to run, some values are not properly set.
+    // A spurious true here doesn't increment the lap counter, but
+    // it makes testing and validation more difficult.
+    if (w->getTimeTicks() == 0)
         return false;
 
     // the lapline is considered crossed if the kart is on the road (off-road is not accepted)

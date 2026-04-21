@@ -169,6 +169,8 @@ void GhostKart::update(int ticks)
     // properties. It also doesn't manage the case where a shield is
     // renewed. These inaccuracies are minor as it is used for
     // graphical effect only.
+    // FIXME : Support small shield and fix the limitations above
+    //         to pave the way for normal race replays
 
     Attachment::AttachmentType attach_type =
         ReplayRecorder::codeToEnumAttach(m_all_bonus_info[idx].m_attachment);
@@ -224,7 +226,8 @@ void GhostKart::update(int ticks)
     getKartGFX()->setGFXFromReplay(m_all_replay_events[idx].m_nitro_usage,
                                    m_all_replay_events[idx].m_zipper_usage,
                                    m_all_replay_events[idx].m_skidding_effect,
-                                   m_all_replay_events[idx].m_red_skidding);
+                                   m_all_replay_events[idx].m_red_skidding,
+                                   m_all_replay_events[idx].m_purple_skidding);
     getKartGFX()->update(dt);
 
     m_speed = getSpeed();

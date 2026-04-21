@@ -87,7 +87,7 @@ private:
     // ------------------------------------------------------------------------
     virtual int   getCurrentNode() const OVERRIDE;
     // ------------------------------------------------------------------------
-    virtual float getKartDistance(const AbstractKart* kart) const OVERRIDE;
+    virtual float getKartDistance(const Kart* kart) const OVERRIDE;
     // ------------------------------------------------------------------------
     virtual bool  ignorePathFinding() OVERRIDE
                                  { return  m_overtake_ball || m_chasing_ball; }
@@ -99,7 +99,7 @@ private:
     virtual void  resetAfterStop() OVERRIDE        { m_overtake_ball = false; }
 
 public:
-                 SoccerAI(AbstractKart *kart);
+                 SoccerAI(Kart *kart);
                 ~SoccerAI();
     virtual void update (int ticks) OVERRIDE;
     virtual void reset() OVERRIDE;

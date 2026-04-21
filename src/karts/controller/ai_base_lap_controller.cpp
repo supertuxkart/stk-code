@@ -21,7 +21,7 @@
 
 #include <assert.h>
 
-#include "karts/abstract_kart.hpp"
+#include "karts/kart.hpp"
 #include "karts/kart_properties.hpp"
 #include "karts/controller/ai_properties.hpp"
 #include "modes/linear_world.hpp"
@@ -83,7 +83,7 @@ in all AIs, e.g.:
    in [-1,1].
 
 */
-AIBaseLapController::AIBaseLapController(AbstractKart *kart)
+AIBaseLapController::AIBaseLapController(Kart *kart)
                    : AIBaseController(kart)
 {
 

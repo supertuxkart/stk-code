@@ -233,19 +233,11 @@ int AchievementInfo::recursiveProgressCount(goalTree &parent)
     }
     else
     {
-        //TODO : find a more automatic way
-        if (parent.children[0].type == "race-started-all" ||
-            parent.children[0].type == "race-finished-all" ||
-            parent.children[0].type == "race-won-all" ||
-            parent.children[0].type == "race-finished-reverse-all" ||
-            parent.children[0].type == "race-finished-alone-all" ||
-            parent.children[0].type == "less-laps-all" ||
-            parent.children[0].type == "more-laps-all" ||
-            parent.children[0].type == "twice-laps-all" ||
-            parent.children[0].type == "egg-hunt-started-all" ||
-            parent.children[0].type == "egg-hunt-finished-all")
+        int all_track_status = PlayerManager::getCurrentAchievementsStatus()->getAllTrackStatus(parent.children[0].type);
+
+        if (all_track_status >= 1)
         {
-            return PlayerManager::getCurrentAchievementsStatus()->getNumAchieveTracks();
+            return PlayerManager::getCurrentAchievementsStatus()->getNumAchieveTracks(all_track_status == 2);
         }
         else
         {
