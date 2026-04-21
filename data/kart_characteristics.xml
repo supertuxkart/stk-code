@@ -569,5 +569,14 @@
             <nitro engine-force="*0.76" max-speed-increase="*0.76" />
             <slipstream add-power="*0.76" max-speed-increase="*0.76"/>
         </characteristic>
+        <characteristic name="handicap-28">
+            <engine power="*0.72" max-speed="*0.72" brake-factor="*0.72" />
+            <skid bonus-speed="*0.72 *0.72 *0.72" bonus-force="*0.72 *0.72 *0.72" />
+            <turn speed-factor="*1.14" />
+            <zipper force="*0.72" speed-gain="*0.72" max-speed-increase="*0.72" />
+            <startup boost="*0.72 *0.72" />
+            <nitro engine-force="*0.72" max-speed-increase="*0.72" />
+            <slipstream add-power="*0.72" max-speed-increase="*0.72"/>
+        </characteristic>
     </player-characteristics>
 </characteristics>

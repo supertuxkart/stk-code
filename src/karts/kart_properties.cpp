@@ -65,6 +65,7 @@ std::string KartProperties::getHandicapAsString(HandicapLevel h)
     case HANDICAP_16:   return "handicap-16"; break;
     case HANDICAP_20:   return "handicap-20"; break;
     case HANDICAP_24:   return "handicap-24"; break;
+    case HANDICAP_28:   return "handicap-28"; break;
 
     default:  assert(false);
     }

@@ -647,7 +647,6 @@ void RaceGUI::drawGlobalMiniMap()
         draw2DImage(m_blue_flag, bp, bs, NULL, NULL, true);
     }
 
-<<<<<<< master
     if (easter_world)
     {
         for (int i = 0; i < (int)(easter_world->foundEggLocations().size()); i++){
@@ -663,10 +662,7 @@ void RaceGUI::drawGlobalMiniMap()
         }
     }
 
-    AbstractKart* target_kart = NULL;
-=======
     Kart* target_kart = NULL;
->>>>>>> BalanceSTK2
     Camera* cam = Camera::getActiveCamera();
     auto cl = LobbyProtocol::get<ClientLobby>();
     bool is_nw_spectate = cl && cl->isSpectator();

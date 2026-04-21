@@ -48,6 +48,7 @@ enum HandicapLevel : uint8_t
     HANDICAP_16,
     HANDICAP_20,
     HANDICAP_24,
+    HANDICAP_28,
     HANDICAP_COUNT
 };
 

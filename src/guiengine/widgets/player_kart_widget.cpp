@@ -110,6 +110,8 @@ PlayerKartWidget::PlayerKartWidget(KartSelectionScreen* parent,
         m_handicap_spinner->addLabel(label);
         label = _("Handicap (24%)");
         m_handicap_spinner->addLabel(label);
+        label = _("Handicap (28%)");
+        m_handicap_spinner->addLabel(label);
     }
 
     // --- Crown icon (Only for the game master)
@@ -739,9 +741,14 @@ GUIEngine::EventPropagation PlayerKartWidget::transmitEvent(Widget* w,
                 m_handicap = HANDICAP_20;
                 m_model_view->setBadge(ANCHOR_BADGE);
             }
-            else // spinner_value == 6
+            else if (spinner_value == 6)
             {
                 m_handicap = HANDICAP_24;
+                m_model_view->setBadge(ANCHOR_BADGE);
+            }
+            else // spinner_value == 7
+            {
+                m_handicap = HANDICAP_28;
                 m_model_view->setBadge(ANCHOR_BADGE);
             }
 
