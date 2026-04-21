@@ -150,6 +150,7 @@ void EasterEggHunt::collectedItem(const Kart *kart,
 
     m_eggs_collected[kart->getWorldKartId()]++;
     m_eggs_found++;
+    m_collected_eggs_location.push_back(kart->getSmoothedTrans().getOrigin());
 }   // collectedItem
 
 //-----------------------------------------------------------------------------
@@ -206,6 +207,7 @@ void EasterEggHunt::reset(bool restart)
         m_eggs_collected[i] = 0;
     m_eggs_found = 0;
     m_finish_time = 0;
+    m_collected_eggs_location.clear();
 }   // reset
 
 //-----------------------------------------------------------------------------
