@@ -1136,15 +1136,14 @@ void KartSelectionScreen::onFocusChanged(GUIEngine::Widget* previous,
     if (!previous || !focus)
         return;
 
-    // TODO : In the STK Evolution branch, ensure things work properly with the handicap spinner
-
     // Manually ensure that the player name spinner get selected appropriately
     GUIEngine::SpinnerWidget* kart_class = getWidget<GUIEngine::SpinnerWidget>("kart_class");
     IconButtonWidget* back = getWidget<IconButtonWidget>("back");
 
     for (unsigned int i = 0; i < m_kart_widgets.size(); i++)
     {
-        if (m_kart_widgets[i].getPlayerID() == playerID)
+        if (m_kart_widgets[i].getPlayerID() == playerID &&
+            m_kart_widgets[i].getPlayerNameSpinner())
         {
             if (!playerID == PLAYER_ID_GAME_MASTER
                 && GUIEngine::isFocusedForPlayer(kart_class, playerID))
