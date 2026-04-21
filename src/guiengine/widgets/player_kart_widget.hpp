@@ -118,6 +118,9 @@ namespace GUIEngine
         SpinnerWidget* getPlayerNameSpinner() const
                                                  { return m_player_ident_spinner; }
         // ------------------------------------------------------------------------
+        SpinnerWidget* getPlayerHandicapSpinner() const
+                                                 { return m_handicap_spinner; }
+        // ------------------------------------------------------------------------
         /** Returns the ID of this player */
         int getPlayerID() const;
 

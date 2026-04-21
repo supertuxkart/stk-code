@@ -72,7 +72,8 @@ PlayerKartWidget::PlayerKartWidget(KartSelectionScreen* parent,
     // ---- Player identity spinner
     m_player_ident_spinner = new SpinnerWidget();
     m_player_ident_spinner->setUseBackgroundColor();
-    m_player_ident_spinner->setSpinnerWidgetPlayerID(m_player_id);
+    m_player_ident_spinner->setPlayerID(m_player_id);
+    m_player_ident_spinner->setPlayerIDSupport(true);
     
     m_player_ident_spinner->m_x = player_name_x;
     m_player_ident_spinner->m_y = player_name_y;
@@ -366,14 +367,14 @@ void PlayerKartWidget::setPlayerID(const int newPlayerID)
     // Change the player ID
     m_player_id = newPlayerID;
     if (!m_ready)
-        m_player_ident_spinner->setSpinnerWidgetPlayerID(m_player_id);
+        m_player_ident_spinner->setPlayerID(m_player_id);
     m_kart_stats->setDisplayIcons(m_player_id == 0);
     // restore previous focus, but with new player ID
     if (focus != NULL) focus->setFocusForPlayer(m_player_id);
 
     if (m_player_ident_spinner != NULL)
     {
-        m_player_ident_spinner->setSpinnerWidgetPlayerID(m_player_id);
+        m_player_ident_spinner->setPlayerID(m_player_id);
     }
 }   // setPlayerID
 
@@ -408,13 +409,6 @@ void PlayerKartWidget::add()
         assert(mineInList);
     }
 #endif
-    // the first player will have an ID of its own to allow for keyboard
-    // navigation despite this widget being added last
-    if (m_irrlicht_widget_id != -1)
-        m_player_ident_spinner->m_reserved_id = m_irrlicht_widget_id;
-    else
-        m_player_ident_spinner->m_reserved_id = Widget::getNewNoFocusID();
-
     m_player_ident_spinner->add();
     m_player_ident_spinner->getIrrlichtElement()->setTabStop(false);
     m_player_ident_spinner->setListener(this);

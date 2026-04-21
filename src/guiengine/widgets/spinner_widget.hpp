@@ -64,8 +64,7 @@ namespace GUIEngine
 
         bool m_incorrect;
         irr::gui::IGUIImage* m_red_mark_widget;
-        
-        int m_spinner_widget_player_id;
+
         bool m_use_background_color;
         
         /** If each value the spinner can take has an associated text, this vector will be non-empty */
@@ -140,8 +139,6 @@ namespace GUIEngine
     // next four functions are for background colour behind playername in multikart screen selection
         void setUseBackgroundColor()                { m_use_background_color=true;         }
         bool getUseBackgroundColor() const          { return m_use_background_color;       }
-        void setSpinnerWidgetPlayerID(int playerID) { m_spinner_widget_player_id=playerID; }
-        int getSpinnerWidgetPlayerID() const        { return m_spinner_widget_player_id;   }
         void unsetUseBackgroundColor()              { m_use_background_color=false;        }
 
         void activateSelectedButton();

@@ -186,9 +186,6 @@ public:
         handleKartListFocus();
     }
 
-    virtual void onFocusChanged(GUIEngine::Widget* previous,
-                                GUIEngine::Widget* focus, int playerID) OVERRIDE;
-
     /** \brief implement optional callback from parent
      *  class GUIEngine::Screen */
     virtual bool onEscapePressed() OVERRIDE;

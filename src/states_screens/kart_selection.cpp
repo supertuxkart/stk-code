@@ -289,8 +289,10 @@ void KartSelectionScreen::init()
     tabs->select(UserConfigParams::m_last_used_kart_group,
                  PLAYER_ID_GAME_MASTER);
 
+#ifdef DEBUG
     Widget* placeholder = getWidget("playerskarts");
     assert(placeholder != NULL);
+#endif
 
     m_game_master_confirmed = false;
 
@@ -312,6 +314,8 @@ void KartSelectionScreen::init()
     GUIEngine::SpinnerWidget* kart_class = getWidget<GUIEngine::SpinnerWidget>("kart_class");
     assert(kart_class != NULL);
     kart_class->setValue(classes.size()); // All
+    kart_class->setPlayerID(PLAYER_ID_GAME_MASTER);
+    kart_class->setPlayerIDSupport(true);
 
     // Build kart list (it is built everytime, to account for .g. locking)
     setKartsFromCurrentGroup();
@@ -1066,48 +1070,6 @@ bool KartSelectionScreen::onEscapePressed()
     else
     {
         return true;
-    }
-}
-
-// ----------------------------------------------------------------------------
-
-void KartSelectionScreen::onFocusChanged(GUIEngine::Widget* previous,
-                                         GUIEngine::Widget* focus, int playerID)
-{
-    if (!previous || !focus)
-        return;
-
-    // TODO : In the STK Evolution branch, ensure things work properly with the handicap spinner
-
-    // Manually ensure that the player name spinner get selected appropriately
-    GUIEngine::SpinnerWidget* kart_class = getWidget<GUIEngine::SpinnerWidget>("kart_class");
-    IconButtonWidget* back = getWidget<IconButtonWidget>("back");
-
-    for (unsigned int i = 0; i < m_kart_widgets.size(); i++)
-    {
-        if (m_kart_widgets[i].getPlayerID() == playerID)
-        {
-            if (!playerID == PLAYER_ID_GAME_MASTER
-                && GUIEngine::isFocusedForPlayer(kart_class, playerID))
-            {
-                if (previous->getType() == WTYPE_RIBBON)
-                    m_kart_widgets[i].getPlayerNameSpinner()->setFocusForPlayer(playerID);
-                else
-                    GUIEngine::EventHandler::get()->sendNavigationEvent(NAV_DOWN, playerID);
-            }
-            // For the game master, the previous/focus values indicating we jumped over
-            // the name spinners are slightly different.
-            else if (playerID == PLAYER_ID_GAME_MASTER)
-            {
-                if ((GUIEngine::isFocusedForPlayer(back, playerID) &&
-                    (previous->getType() != WTYPE_SPINNER || previous == kart_class))
-                    || (previous == back && focus == kart_class))
-                {
-                    m_kart_widgets[i].getPlayerNameSpinner()->setFocusForPlayer(playerID);
-                }
-            }
-            break;
-        }
     }
 }
 

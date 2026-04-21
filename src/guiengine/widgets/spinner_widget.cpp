@@ -99,7 +99,6 @@ SpinnerWidget::SpinnerWidget(const bool gauge) : Widget(WTYPE_SPINNER)
     m_value = -1;
     m_badge_x_shift = 0;
     m_use_background_color=false;
-    m_spinner_widget_player_id=PLAYER_ID_GAME_MASTER;
     m_min = 0;
     m_max = 999;
     m_step = 1.0;
