@@ -108,7 +108,7 @@ public:
     // ------------------------------------------------------------------------
     // clean all TV camera
     static void clearTVCameras();
-    // ------------------------------------------------------------------------    
+    // ------------------------------------------------------------------------
     // Returns true if at least one TV camera was loaded
     static bool hasTVCameras() { return !m_tv_cameras.empty(); }
 

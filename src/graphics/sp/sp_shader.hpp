@@ -113,7 +113,7 @@ private:
 public:
     // ------------------------------------------------------------------------
     static bool m_sp_shader_debug;
-    static std::map<std::string, std::pair<unsigned, SamplerType> > 
+    static std::map<std::string, std::pair<unsigned, SamplerType> >
                                                             m_prefilled_names;
     // ------------------------------------------------------------------------
     SPShader(const std::string& name,

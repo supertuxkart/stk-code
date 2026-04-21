@@ -924,7 +924,7 @@ namespace StringUtils
     }   // utf8ToWide
 
     // ------------------------------------------------------------------------
-    /** This functions tests if the string s contains "-WORDX", where 
+    /** This functions tests if the string s contains "-WORDX", where
      *  word is the parameter, and X is a one digit integer number. If
      *  the string is found, it is removed from s, pre-release gets the
      *  value of X, and the function returns true. If the string is not
@@ -1175,7 +1175,7 @@ namespace StringUtils
     }   // wideToUtf32
 
     // ------------------------------------------------------------------------
-    /** At the moment only versionToInt is tested. 
+    /** At the moment only versionToInt is tested.
      */
     void unitTesting()
     {
@@ -1245,14 +1245,14 @@ namespace StringUtils
         {
             float f = ((int)(n/1024.0f/1024.0f*10.0f+0.5f))/10.0f;
             char s[32];
-            sprintf(s, "%.1f", f);
+            snprintf(s, 32, "%.1f", f);
             unit = _("%s MB", s);
         }
         else if(n>1024)
         {
             float f = ((int)(n/1024.0f*10.0f+0.5f))/10.0f;
             char s[32];
-            sprintf(s, "%.1f", f);
+            snprintf(s, 32, "%.1f", f);
             unit = _("%s KB", s);
         }
         else

@@ -176,7 +176,7 @@ void EditGPScreen::init()
 
         if (edit->getResult() && edit->getTrack())
         {
-            bool reverse = edit->getTrack()->reverseAvailable() ? 
+            bool reverse = edit->getTrack()->reverseAvailable() ?
                            edit->getReverse() : false;
             
             if (m_action == "add")
@@ -287,7 +287,7 @@ void EditGPScreen::setModified(const bool modified)
     LabelWidget* header = getWidget<LabelWidget>("title");
     assert(header != NULL);
     //I18N: Indicate that the grand prix is modified and not saved
-    header->setText(modified ? _(L"%s (+)", m_gp->getName()) 
+    header->setText(modified ? _(L"%s (+)", m_gp->getName())
                              : m_gp->getName(), true);
 
     enableButtons();

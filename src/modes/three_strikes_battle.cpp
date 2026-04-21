@@ -664,7 +664,8 @@ void ThreeStrikesBattle::spawnSpareTireKarts()
     {
         m_race_gui->addMessage(_P("%i spare tire kart has been spawned!",
                                 "%i spare tire karts have been spawned!",
-                                spawn_sta), NULL, 2.0f);
+                                /* to pick the plural form */ spawn_sta,
+                                /* to insert in the final string */spawn_sta), NULL, 2.0f);
     }
     for (unsigned int i = 0; i < spawn_sta; i++)
     {

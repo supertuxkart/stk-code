@@ -179,7 +179,7 @@ std::shared_ptr<ServerList> ServersManager::getWANRefreshRequest() const
 
 // ----------------------------------------------------------------------------
 /** Returns a LAN update-list-of-servers request. It uses UDP broadcasts
- *  to find LAN servers, and waits for a certain amount of time fr 
+ *  to find LAN servers, and waits for a certain amount of time fr
  *  answers.
  */
 std::shared_ptr<ServerList> ServersManager::getLANRefreshRequest() const
@@ -251,7 +251,7 @@ std::shared_ptr<ServerList> ServersManager::getLANRefreshRequest() const
 
             const int LEN=2048;
             char buffer[LEN];
-            // Wait for up to 0.5 seconds to receive an answer from 
+            // Wait for up to 0.5 seconds to receive an answer from
             // any local servers.
             uint64_t start_time = StkTime::getMonoTimeMs();
             const uint64_t DURATION = 1000;
@@ -454,7 +454,7 @@ std::vector<SocketAddress> ServersManager::getBroadcastAddresses(bool ipv6)
             // Convert mask to #bits:  SWAT algorithm
             u = u - ((u >> 1) & 0x55555555);
             u = (u & 0x33333333) + ((u >> 2) & 0x33333333);
-            u = (((u + (u >> 4)) & 0x0F0F0F0F) * 0x01010101) >> 24;            
+            u = (((u + (u >> 4)) & 0x0F0F0F0F) * 0x01010101) >> 24;
 
             Log::debug("ServerManager",
                 "Interface: %s\tAddress: %s\tmask: %x\n", p->ifa_name,

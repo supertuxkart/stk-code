@@ -42,7 +42,7 @@ class AnimatedProperty : NoCopy
 
 public:
     AnimatedProperty(AnimatablePropery property, int values_count,
-        double* values_from, double* values_to, 
+        double* values_from, double* values_to,
         double duration, void* data);
 
     ~AnimatedProperty()

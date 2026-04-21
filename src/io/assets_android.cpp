@@ -26,7 +26,7 @@
 
 #ifdef ANDROID
 #include <SDL_system.h>
-#include <sys/statfs.h> 
+#include <sys/statfs.h>
 #include <jni.h>
 #endif
 
@@ -109,7 +109,7 @@ void AssetsAndroid::init()
         }
         
         // Stk is an alias of supertuxkart for compatibility with older version.
-        if (app_dir_name == "supertuxkart" && 
+        if (app_dir_name == "supertuxkart" &&
             m_file_manager->fileExists(path + "/stk/data/" + version))
         {
             m_stk_dir = path + "/stk";
@@ -141,7 +141,7 @@ void AssetsAndroid::init()
             }
     
             // Stk is an alias of supertuxkart for compatibility with older version.
-            if (app_dir_name == "supertuxkart" && 
+            if (app_dir_name == "supertuxkart" &&
                 m_file_manager->fileExists(path + "/stk/.extracted"))
             {
                 m_stk_dir = path + "/stk";
@@ -153,7 +153,7 @@ void AssetsAndroid::init()
     
     if (m_stk_dir.size() > 0)
     {
-        Log::info("AssetsAndroid", "Data files found in: %s", 
+        Log::info("AssetsAndroid", "Data files found in: %s",
                   m_stk_dir.c_str());
     }
 
@@ -181,7 +181,7 @@ void AssetsAndroid::init()
     {
         for (std::string path : paths)
         {
-            if (m_file_manager->checkAndCreateDirectoryP(path + "/" + 
+            if (m_file_manager->checkAndCreateDirectoryP(path + "/" +
                                                         app_dir_name + "/data"))
             {
                 Log::info("AssetsAndroid", "Data directory created in: %s",
@@ -518,7 +518,7 @@ void AssetsAndroid::removeData()
     
     if (!data_path.empty())
     {
-        const std::vector<std::string> child_paths = 
+        const std::vector<std::string> child_paths =
         {
             data_path + "/files/libchildprocess.so",
             data_path + "/files/libchildprocess_ai.so"
@@ -529,7 +529,7 @@ void AssetsAndroid::removeData()
             if (!m_file_manager->fileExists(child_path))
                 continue;
                 
-            Log::info("AssetsAndroid", "Deleting old childprocess: %s", 
+            Log::info("AssetsAndroid", "Deleting old childprocess: %s",
                       child_path.c_str());
             m_file_manager->removeFile(child_path);
         }
@@ -602,7 +602,7 @@ bool AssetsAndroid::isWritable(std::string path)
  *  \param paths A list of paths that should be checked
  *  \return Best path or empty string in case of error
  */
-std::string AssetsAndroid::getPreferredPath(const std::vector<std::string>& 
+std::string AssetsAndroid::getPreferredPath(const std::vector<std::string>&
                                             paths)
 {
 #ifdef ANDROID

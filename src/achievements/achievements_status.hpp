@@ -177,7 +177,7 @@ public:
         TR_EGG_HUNT_LAST = TR_EGG_HUNT_FINISHED_HARD,
 
         TR_DATA_NUM          = 12,
-    };    
+    };
 
 private:
     // To keep track of track-specific data without hardcoding

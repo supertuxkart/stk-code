@@ -167,12 +167,6 @@ namespace GUIEngine
         /** Callback called widget is focused */
         EventPropagation focused(const int playerID);
 
-        /** Computes a score based on multiple icon properties
-            (used to estimate the best number of rows) */
-        float estimateRowScore(const int rowCount, const int width, const int height,
-                              const float iconAspectRatio, const int maxIcons, float* heightRatio,
-                              float capSize = 0.5f);
-
         /** Removes all previously added contents icons, and re-adds them (calculating the new amount) */
         void buildInternalStructure();
 
@@ -335,8 +329,8 @@ namespace GUIEngine
         void setMaxLabelLength(int length) { m_max_label_length = length; }
 
         void registerScrollCallback(void (*callback)(void* data), void* data)
-        { 
-            m_scroll_callback.callback = callback; 
+        {
+            m_scroll_callback.callback = callback;
             m_scroll_callback.data = data;
         }
     };

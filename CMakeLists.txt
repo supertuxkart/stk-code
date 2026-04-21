@@ -46,6 +46,8 @@ CMAKE_DEPENDENT_OPTION(USE_WIIUSE "Support for wiimote input devices" ON
     "NOT SERVER_ONLY;NOT CYGWIN;NOT USE_SWITCH;NOT MSVC" OFF)
 CMAKE_DEPENDENT_OPTION(USE_DNS_C "Build bundled dns resolver" OFF "NOT CYGWIN;NOT USE_SWITCH" ON)
 CMAKE_DEPENDENT_OPTION(USE_MOJOAL "Use bundled MojoAL instead of system OpenAL" OFF "NOT APPLE" ON)
+CMAKE_DEPENDENT_OPTION(HAVE_OPUS "Enable Opus audio codec support (requires libopusfile)" OFF
+    "NOT SERVER_ONLY" OFF)
 
 if (DLOPEN_MOLTENVK)
     ADD_DEFINITIONS(-DDLOPEN_MOLTENVK)
@@ -443,6 +445,21 @@ if(NOT SERVER_ONLY)
     find_package(OggVorbis REQUIRED)
     include_directories(${OGGVORBIS_INCLUDE_DIRS})
 
+    # Opus (optional)
+    if(HAVE_OPUS)
+        find_library(OPUSFILE_LIBRARY NAMES opusfile)
+        find_path(OPUSFILE_INCLUDEDIR NAMES opusfile.h PATH_SUFFIXES opus)
+        if(NOT OPUSFILE_LIBRARY OR NOT OPUSFILE_INCLUDEDIR)
+            message(FATAL_ERROR "OpusFile not found. "
+                "OpusFile is required when HAVE_OPUS is enabled. "
+                "Install libopusfile-dev or set HAVE_OPUS=OFF.")
+        else()
+            include_directories("${OPUSFILE_INCLUDEDIR}")
+            add_definitions(-DHAVE_OPUS)
+            MESSAGE(STATUS "Opus audio support: ${OPUSFILE_LIBRARY}")
+        endif()
+    endif()
+
     add_definitions(-DENABLE_SOUND)
 endif()
 
@@ -798,6 +815,9 @@ if(NOT SERVER_ONLY)
         graphics_engine
         ${SDL2_LIBRARY}
         tinygettext)
+    if(HAVE_OPUS)
+        target_link_libraries(supertuxkart ${OPUSFILE_LIBRARY})
+    endif()
     if (NOT NO_SHADERC)
         target_link_libraries(supertuxkart ${SHADERC_LIBRARY})
     endif()

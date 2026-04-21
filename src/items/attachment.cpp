@@ -272,7 +272,7 @@ void Attachment::rewindTo(BareNetworkString *buffer)
 
 // -----------------------------------------------------------------------------
 /** Selects the new attachment. In order to simplify synchronisation with the
- *  server, the new item is based on the current world time. 
+ *  server, the new item is based on the current world time.
  *  \param item The item that was collected.
  */
 void Attachment::hitBanana(ItemState *item_state)
@@ -414,7 +414,7 @@ void Attachment::handleCollisionWithKart(Kart *other)
             {
                 // Don't move if this bomb was from other kart originally
                 other->getAttachment()
-                    ->set(ATTACH_BOMB, 
+                    ->set(ATTACH_BOMB,
                           getTicksLeft()+stk_config->time2Ticks(
                                            stk_config->m_bomb_time_increase),
                           m_kart);
@@ -424,7 +424,7 @@ void Attachment::handleCollisionWithKart(Kart *other)
         }
     }   // type==BOMB
     else if(attachment_other->getType()==Attachment::ATTACH_BOMB &&
-             (attachment_other->getPreviousOwner()!=m_kart || 
+             (attachment_other->getPreviousOwner()!=m_kart ||
                World::getWorld()->getNumKarts() <= 2         )      )
     {
         // Don't attach a bomb when the kart is shielded
@@ -696,8 +696,8 @@ void Attachment::updateGraphics(float dt)
  */
 float Attachment::weightAdjust() const
 {
-    return m_type == ATTACH_ANVIL 
-           ? m_kart->getKartProperties()->getAnvilWeight() 
+    return m_type == ATTACH_ANVIL
+           ? m_kart->getKartProperties()->getAnvilWeight()
           : 0.0f;
 }   // weightAdjust
 

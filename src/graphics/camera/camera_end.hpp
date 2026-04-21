@@ -27,7 +27,7 @@
 
 /**
   * Handles the end race camera. It inherits from CameraNormal to make
-  * use of the normal camera implementation of a reverse camera. 
+  * use of the normal camera implementation of a reverse camera.
   * \ingroup graphics
   */
 class CameraEnd : public CameraNormal

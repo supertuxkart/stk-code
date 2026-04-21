@@ -18,6 +18,7 @@
 #include "states_screens/dialogs/custom_video_settings.hpp"
 
 #include "config/user_config.hpp"
+#include "graphics/graphical_presets.hpp"
 #include "guiengine/widgets/check_box_widget.hpp"
 #include "guiengine/widgets/ribbon_widget.hpp"
 #include "guiengine/widgets/spinner_widget.hpp"
@@ -65,9 +66,9 @@ void CustomVideoSettingsDialog::beforeAddingWidgets()
     
     SpinnerWidget* particles_effects = getWidget<SpinnerWidget>("particles_effects");
     assert(particles_effects != NULL);
-    particles_effects->addLabel(_("Disabled"));
-    particles_effects->addLabel(_("Important only"));
-    particles_effects->addLabel(_("Enabled"));
+    particles_effects->addLabel(_C("Particle effects", "Disabled"));
+    particles_effects->addLabel(_C("Particle effects", "Important only"));
+    particles_effects->addLabel(_C("Particle effects", "Enabled"));
     particles_effects->setValue(UserConfigParams::m_particles_effects);
 
     SpinnerWidget* kart_lights = getWidget<SpinnerWidget>("kart_lights");
@@ -83,34 +84,27 @@ void CustomVideoSettingsDialog::beforeAddingWidgets()
     kart_lights->setValue(UserConfigParams::m_kart_lights);
 
     SpinnerWidget* geometry_level = getWidget<SpinnerWidget>("geometry_detail");
-    //I18N: Geometry level very low : lowest level, Level-of-Details distances are very low
-    geometry_level->addLabel(_("Very Low"));
-    //I18N: Geometry level low : Level-of-Details distances are low
-    geometry_level->addLabel(_("Low"));
-    //I18N: Geometry level medium : Level-of-Details distances are medium
-    geometry_level->addLabel(_("Medium"));
-    //I18N: Geometry level high : Level-of-Details distances are high
-    geometry_level->addLabel(_("High"));
-    //I18N: Geometry level very high : Level-of-Details distances are very high
-    geometry_level->addLabel(_("Very High"));
-    //I18N: Geometry level ultra : Level-of-Details distances are extremely high
-    geometry_level->addLabel(_("Ultra"));
+    geometry_level->addLabel(_C("Geometry level", "Very low"));
+    geometry_level->addLabel(_C("Geometry level", "Low"));
+    geometry_level->addLabel(_C("Geometry level", "Medium"));
+    geometry_level->addLabel(_C("Geometry level", "High"));
+    geometry_level->addLabel(_C("Geometry level", "Very high"));
+    geometry_level->addLabel(_C("Geometry level", "Ultra high"));
     geometry_level->setValue(UserConfigParams::m_geometry_level);
 
     SpinnerWidget* filtering = getWidget<SpinnerWidget>("image_quality");
-    filtering->addLabel(_("Very Low"));
-    filtering->addLabel(_("Low"));
-    filtering->addLabel(_("Medium"));
-    filtering->addLabel(_("High"));
-    filtering->setValue(OptionsScreenVideo::getImageQuality());
+    filtering->addLabel(_C("Image quality", "Very low"));
+    filtering->addLabel(_C("Image quality", "Low"));
+    filtering->addLabel(_C("Image quality", "High"));
+    filtering->setValue(GraphicalPresets::getImageQuality());
 
     SpinnerWidget* shadows = getWidget<SpinnerWidget>("shadows");
-    shadows->addLabel(_("Disabled"));   // 0
-    shadows->addLabel(_("Low"));        // 1
-    shadows->addLabel(_("Medium"));     // 2
-    shadows->addLabel(_("High"));       // 3
-    shadows->addLabel(_("Very High"));  // 4
-    shadows->setValue(UserConfigParams::m_shadows_resolution == 2048 ? 
+    shadows->addLabel(_C("Shadows", "Disabled"));   // 0
+    shadows->addLabel(_C("Shadows", "Low"));        // 1
+    shadows->addLabel(_C("Shadows", "Medium"));     // 2
+    shadows->addLabel(_C("Shadows", "High"));       // 3
+    shadows->addLabel(_C("Shadows", "Very high"));  // 4
+    shadows->setValue(UserConfigParams::m_shadows_resolution == 2048 ?
                       (UserConfigParams::m_pcss ? 4 : 3) :
                       UserConfigParams::m_shadows_resolution == 1024 ? 2 :
                       UserConfigParams::m_shadows_resolution ==  512 ? 1 : 0);
@@ -214,7 +208,7 @@ GUIEngine::EventPropagation CustomVideoSettingsDialog::processEvent(const std::s
                     getWidget<SpinnerWidget>("shadows")->getValue() == 1 ?  512 :
                     getWidget<SpinnerWidget>("shadows")->getValue() == 2 ? 1024 :
                     getWidget<SpinnerWidget>("shadows")->getValue() >= 3 ? 2048 : 0;
-                UserConfigParams::m_pcss = 
+                UserConfigParams::m_pcss =
                     getWidget<SpinnerWidget>("shadows")->getValue() == 4 ? true : false;
             }
             else
@@ -293,7 +287,10 @@ GUIEngine::EventPropagation CustomVideoSettingsDialog::processEvent(const std::s
             }
             // sameRestart will have the same effect
             if (!(CVS->isGLSL() && pbr_changed))
-                OptionsScreenVideo::setImageQuality(quality, force_reload_texture);
+            {
+                GraphicalPresets::setImageQuality(quality);
+                OptionsScreenVideo::updateImageQuality(force_reload_texture);
+            }
 
             if (need_restart)
                 irr_driver->fullRestart();

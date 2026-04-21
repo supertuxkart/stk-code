@@ -77,17 +77,17 @@ KartGFX::KartGFX(const Kart *kart, bool is_day)
 
         // Create skidding lights
         // For the first skidding level
-        m_skidding_light_1 = 
-            irr_driver->addLight(core::vector3df(0.0f, 0.1f, -0.5f * length - 
+        m_skidding_light_1 =
+            irr_driver->addLight(core::vector3df(0.0f, 0.1f, -0.5f * length -
                                  0.05f), /* force */ 0.3f, /*radius*/ 3.0f,
                                  1.0f, 0.6f, 0.0f, false, node);
         m_skidding_light_1->setVisible(false);
-        m_skidding_light_1->setName(("skidding emitter 1 (" + m_kart->getIdent() 
+        m_skidding_light_1->setName(("skidding emitter 1 (" + m_kart->getIdent()
                                                             + ")").c_str() );
 
         // For the second skidding level
         m_skidding_light_2 =
-            irr_driver->addLight(core::vector3df(0.0f, 0.1f, -0.5f * length - 
+            irr_driver->addLight(core::vector3df(0.0f, 0.1f, -0.5f * length -
                                  0.05f), /* force */0.4f, /*radius*/4.0f,
                                  1.0f, 0.1f, 0.0f, false, node);
         m_skidding_light_2->setVisible(false);

@@ -21,9 +21,9 @@
 
 namespace HelpCommon
 {
-	void switchTab(std::string selected_tab)
-	{
-		GUIEngine::Screen *screen = NULL;
+    void switchTab(std::string selected_tab)
+    {
+        GUIEngine::Screen *screen = NULL;
         if (selected_tab == "page1")
             screen = HelpScreen1::getInstance();
         else if (selected_tab == "page2")
@@ -40,5 +40,5 @@ namespace HelpCommon
             screen = HelpScreen7::getInstance();
         if(screen)
             StateManager::get()->replaceTopMostScreen(screen);
-	}
+    }
 }

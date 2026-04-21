@@ -445,7 +445,7 @@ void PowerupManager::WeightsData::convertRankToSection(int rank, int *prev,
         return;
     }
 
-    // In FTL mode the first section is for the leader, the 
+    // In FTL mode the first section is for the leader, the
     // second section is used for the first non-leader kart.
     if (RaceManager::get()->isFollowMode() && rank == 2)
     {

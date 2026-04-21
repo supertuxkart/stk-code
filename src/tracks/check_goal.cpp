@@ -55,7 +55,7 @@ void CheckGoal::update(float dt)
 
     if (world)
     {
-        if (isTriggered(m_previous_ball_position, world->getBallPosition(), 
+        if (isTriggered(m_previous_ball_position, world->getBallPosition(),
                         /*kart index - ignore*/-1)                         )
         {
             if (UserConfigParams::m_check_debug)

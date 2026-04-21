@@ -125,7 +125,7 @@ SavedGrandPrix::SavedGrandPrix(const XMLNode* node)
     m_reverse_type.findYourDataInAnAttributeOf(node);
     m_skipped_tracks.findYourDataInAnAttributeOf(node);
     m_time_target.findYourDataInAnAttributeOf(node);
-    m_player_total_laps.findYourDataInAnAttributeOf(node); 
+    m_player_total_laps.findYourDataInAnAttributeOf(node);
 
     std::vector<XMLNode*> karts;
     node->getNodes("Kart", karts);

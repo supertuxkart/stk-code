@@ -104,7 +104,7 @@ void Skidding::resetParticles()
  *  state). Similarly m_real_steering is output of updateRewind() and will be
  *  recomputed every frame when update() is called, and similar for
  *  m_skid_bonus_ready
- *  \param buffer Buffer for the state information. 
+ *  \param buffer Buffer for the state information.
  */
 void Skidding::saveState(BareNetworkString *buffer)
 {
@@ -116,7 +116,7 @@ void Skidding::saveState(BareNetworkString *buffer)
 
 // ----------------------------------------------------------------------------
 /** Restores the skidding state of a kart.
- *  \param buffer Buffer with state information. 
+ *  \param buffer Buffer with state information.
  */
 void Skidding::rewindTo(BareNetworkString *buffer)
 {

@@ -309,12 +309,12 @@ GUIEngine::EventPropagation
                 m_touch_controls = MULTITOUCH_CONTROLS_STEERING_WHEEL;
             }
             
-            if (m_touch_controls == MULTITOUCH_CONTROLS_ACCELEROMETER && 
+            if (m_touch_controls == MULTITOUCH_CONTROLS_ACCELEROMETER &&
                 !accelerometer_available)
             {
                 m_touch_controls = MULTITOUCH_CONTROLS_STEERING_WHEEL;
             }
-            else if (m_touch_controls == MULTITOUCH_CONTROLS_GYROSCOPE && 
+            else if (m_touch_controls == MULTITOUCH_CONTROLS_GYROSCOPE &&
                 !gyroscope_available)
             {
                 m_touch_controls = MULTITOUCH_CONTROLS_STEERING_WHEEL;
@@ -527,7 +527,7 @@ void RacePausedDialog::beforeAddingWidgets()
         
     bool has_multitouch_gui = false;
     
-    if (World::getWorld() && World::getWorld()->getRaceGUI() && 
+    if (World::getWorld() && World::getWorld()->getRaceGUI() &&
         World::getWorld()->getRaceGUI()->getMultitouchGUI() &&
         !World::getWorld()->getRaceGUI()->getMultitouchGUI()->isSpectatorMode())
     {
@@ -610,17 +610,17 @@ void RacePausedDialog::updateTouchDeviceIcon()
     case MULTITOUCH_CONTROLS_UNDEFINED:
     case MULTITOUCH_CONTROLS_STEERING_WHEEL:
         widget->setLabel(_("Steering wheel"));
-        widget->setImage(irr_driver->getTexture(FileManager::GUI_ICON, 
+        widget->setImage(irr_driver->getTexture(FileManager::GUI_ICON,
                                                 "android/steering_wheel.png"));
         break;
     case MULTITOUCH_CONTROLS_ACCELEROMETER:
         widget->setLabel(_("Accelerometer"));
-        widget->setImage(irr_driver->getTexture(FileManager::GUI_ICON, 
+        widget->setImage(irr_driver->getTexture(FileManager::GUI_ICON,
                                                 "android/accelerator_icon.png"));
         break;
     case MULTITOUCH_CONTROLS_GYROSCOPE:
         widget->setLabel(_("Gyroscope"));
-        widget->setImage(irr_driver->getTexture(FileManager::GUI_ICON, 
+        widget->setImage(irr_driver->getTexture(FileManager::GUI_ICON,
                                                 "android/gyroscope_icon.png"));
         break;
     default:

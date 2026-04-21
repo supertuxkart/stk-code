@@ -191,7 +191,12 @@ void MusicInformation::startMusic()
     if (m_normal_filename.empty())
         return;
     
-    if (StringUtils::getExtension(m_normal_filename) != "ogg")
+    std::string normal_ext = StringUtils::getExtension(m_normal_filename);
+    if (normal_ext != "ogg"
+#ifdef HAVE_OPUS
+        && normal_ext != "opus"
+#endif
+       )
     {
         Log::warn("MusicInformation", "Music file %s is not found or file "
                   "format is not recognized.\n", m_normal_filename.c_str());
@@ -228,7 +233,12 @@ void MusicInformation::startMusic()
     if (m_fast_filename.empty())
         return;
     
-    if (StringUtils::getExtension(m_fast_filename) != "ogg")
+    std::string fast_ext = StringUtils::getExtension(m_fast_filename);
+    if (fast_ext != "ogg"
+#ifdef HAVE_OPUS
+        && fast_ext != "opus"
+#endif
+       )
     {
         Log::warn("MusicInformation",
                   "Music file %s format not recognized, fast music is ignored",
@@ -286,11 +296,11 @@ void MusicInformation::update(float dt)
         break;
                        }
     case SOUND_NORMAL:
-        if ( m_normal_music ) 
+        if ( m_normal_music )
             m_normal_music->update();
         break;
     case SOUND_FAST:
-        if ( m_fast_music ) 
+        if ( m_fast_music )
             m_fast_music->update();
         break;
     }   // switch

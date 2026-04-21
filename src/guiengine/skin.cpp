@@ -684,7 +684,7 @@ void Skin::drawBgImage()
                 factor_w = (float)screen_w / texture_w;
                 factor_h = factor_w;
             }
-            else 
+            else
             {
                 // Cannot crop vertically → stretch both width and height to fit
                 factor_h = (float)screen_h / texture_h;
@@ -1115,6 +1115,19 @@ void Skin::drawButton(Widget* w, const core::recti &rect,
                                 SkinConfig::m_render_params["button::neutral"],
                                 w->m_deactivated);
         }   // if not deactivated or focused
+        
+        // Check for tooltips even on deactivated widgets
+        if (w->hasTooltip())
+        {
+            const core::position2di mouse_position =
+                irr_driver->getDevice()->getCursorControl()->getPosition();
+
+            if (sized_rect.isPointInside(mouse_position))
+            {
+                m_tooltip_at_mouse.push_back(true);
+                m_tooltips.push_back(w);
+            }
+        }
     }
     else   // not within an appearing dialog
     {
@@ -1136,6 +1149,19 @@ void Skin::drawButton(Widget* w, const core::recti &rect,
                                 SkinConfig::m_render_params["button::neutral"],
                                 w->m_deactivated);
         }   // if not deactivated or focused
+        
+        // Check for tooltips even on deactivated widgets
+        if (w->hasTooltip())
+        {
+            const core::position2di mouse_position =
+                irr_driver->getDevice()->getCursorControl()->getPosition();
+
+            if (rect.isPointInside(mouse_position))
+            {
+                m_tooltip_at_mouse.push_back(true);
+                m_tooltips.push_back(w);
+            }
+        }
     }   // not within an appearing dialog
 }   // drawButton
 
@@ -1249,7 +1275,7 @@ void Skin::drawRatingBar(Widget *w, const core::recti &rect,
 
         core::recti source_area = core::recti(0, 0, texture_w, texture_h);
 
-        float scale = (float)std::min(irr_driver->getActualScreenSize().Height / 1080.0f, 
+        float scale = (float)std::min(irr_driver->getActualScreenSize().Height / 1080.0f,
                                     irr_driver->getActualScreenSize().Width / 1350.0f);
         int size = (int)((90.0f + grow) * scale);
         const core::recti rect2(glow_center_x - size,
@@ -1651,7 +1677,7 @@ void Skin::drawRibbonChild(const core::recti &rect, Widget* widget,
 
                 core::recti source_area(0, 0, texture_w, texture_h);
 
-                float scale = (float)std::min(irr_driver->getActualScreenSize().Height / 1080.0f, 
+                float scale = (float)std::min(irr_driver->getActualScreenSize().Height / 1080.0f,
                                             irr_driver->getActualScreenSize().Width / 1350.0f);
                 int size = (int)((90.0f + grow) * scale);
                 const core::recti rect2(glow_center_x - size,
@@ -1680,6 +1706,16 @@ void Skin::drawRibbonChild(const core::recti &rect, Widget* widget,
 
     if (parent_focused && parentRibbon->m_mouse_focus == widget)
     {
+        if (rect.isPointInside(irr_driver->getDevice()->getCursorControl()
+                                                      ->getPosition()))
+        {
+            m_tooltip_at_mouse.push_back(true);
+            m_tooltips.push_back(widget);
+        }
+    }
+    else if (widget->hasTooltip())
+    {
+        // Check tooltips for deactivated widgets too
         if (rect.isPointInside(irr_driver->getDevice()->getCursorControl()
                                                       ->getPosition()))
         {
@@ -1875,6 +1911,18 @@ void Skin::drawSpinnerBody(const core::recti &rect, Widget* widget,
         m_tooltip_at_mouse.push_back(false);
         m_tooltips.push_back(widget);
     }
+    else if (widget->hasTooltip())
+    {
+        // Check tooltips for deactivated widgets too
+        const core::position2di mouse_position =
+            irr_driver->getDevice()->getCursorControl()->getPosition();
+
+        if (sized_rect.isPointInside(mouse_position))
+        {
+            m_tooltip_at_mouse.push_back(true);
+            m_tooltips.push_back(widget);
+        }
+    }
 }
 
 // ----------------------------------------------------------------------------
@@ -1970,7 +2018,7 @@ void Skin::drawIconButton(const core::recti &rect, Widget* widget,
 
         core::recti source_area = core::recti(0, 0, texture_w, texture_h);
 
-        float scale = (float)std::min(irr_driver->getActualScreenSize().Height / 1080.0f, 
+        float scale = (float)std::min(irr_driver->getActualScreenSize().Height / 1080.0f,
                                     irr_driver->getActualScreenSize().Width / 1350.0f);
         int size = (int)((90.0f + grow) * scale);
         const core::recti rect2(glow_center_x - size,
@@ -2144,6 +2192,18 @@ void Skin::drawCheckBox(const core::recti &rect, Widget* widget, bool focused)
             m_tooltips.push_back(widget);
         }
     }
+    else if (widget->hasTooltip())
+    {
+        // Check tooltips for deactivated widgets too
+        const core::position2di mouse_position =
+            irr_driver->getDevice()->getCursorControl()->getPosition();
+
+        if (rect.isPointInside(mouse_position))
+        {
+            m_tooltip_at_mouse.push_back(true);
+            m_tooltips.push_back(widget);
+        }
+    }
 }   // drawCheckBox
 
 // ----------------------------------------------------------------------------
@@ -2217,7 +2277,7 @@ void Skin::drawListHeader(const irr::core::rect< irr::s32 > &rect,
 void Skin::renderSections(PtrVector<Widget>* within_vector)
 {
 #ifndef SERVER_ONLY
-    if (within_vector == NULL && getCurrentScreen()) 
+    if (within_vector == NULL && getCurrentScreen())
         within_vector = &getCurrentScreen()->m_widgets;
         
     if (!within_vector)
@@ -2383,13 +2443,42 @@ void Skin::drawTooltip(Widget* widget, bool atMouse)
     irr::gui::ScalableFont* font = GUIEngine::getSmallFont();
     core::dimension2d<u32> size =
         font->getDimension(widget->getTooltipText().c_str());
+    
     core::position2di pos(widget->m_x + 15, widget->m_y + widget->m_h);
+    const core::dimension2d<u32> screen_size = irr_driver->getActualScreenSize();
+    BoxRenderParams& params = SkinConfig::m_render_params["tooltip::neutral"];
+    // Space from the screen's edge so the tooltip doesn't get cut off
+    int h_margin = std::max(params.m_left_border, params.m_right_border)
+                         * params.m_hborder_out_portion;
+    int v_margin = std::max(params.m_top_border, params.m_bottom_border);
+
+    // Account for the tooltip borders being potentially scaled down on small resolutions
+    // We also add 2 to have a small cushion between tooltip and screen border.
+    int texture_h = params.getImage()->getSize().Height;
+    const float yscale = std::min<float>(1.0, (float)(size.Height)/texture_h);
+    h_margin = 2 + h_margin * yscale;
+    v_margin = 2 + v_margin * yscale;
 
     if (atMouse)
     {
-        pos = irr_driver->getDevice()->getCursorControl()->getPosition()
-            + core::position2di(10 - size.Width / 2, 20);
+        pos = irr_driver->getDevice()->getCursorControl()->getPosition();
+        pos.X -= size.Width / 2;
+        pos.Y += 20;
     }
+
+    // Prevent horizontal overflows
+    if (pos.X + (int)size.Width > (int)screen_size.Width - h_margin)
+        pos.X = (int)screen_size.Width - size.Width - h_margin;
+
+    if (pos.X < h_margin)
+        pos.X = h_margin;
+
+    // Prevent vertical overflows
+    if (pos.Y < v_margin) 
+        pos.Y = v_margin;
+
+    if (pos.Y + (int)size.Height > (int)screen_size.Height - v_margin)
+        pos.Y = (int)screen_size.Height - (int)size.Height - v_margin - 20;
 
     core::recti r(pos, size);
     drawBoxFromStretchableTexture(widget, r,

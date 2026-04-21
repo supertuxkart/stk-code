@@ -63,7 +63,7 @@ class EventRewinder;
  *     `rewindToState(char *)`.
  *     TODO: atm there is no guarantee that each object will have a state
  *     at a given time. We either need to work around that, or make sure
- *     to store at least an unconfirmed state whenever we receive a 
+ *     to store at least an unconfirmed state whenever we receive a
  *     confirmed state.
  *  3. Rerun the simulation till the current time t_current is reached:
  *     1. Determine the time `t_next` of the next frame. This is either
@@ -202,7 +202,7 @@ public:
     /** Returns the time of the latest confirmed state. */
     int getLatestConfirmedState() const
     {
-        return m_rewind_queue.getLatestConfirmedState(); 
+        return m_rewind_queue.getLatestConfirmedState();
     }   // getLatestConfirmedState
     // ------------------------------------------------------------------------
     bool useLocalEvent() const;

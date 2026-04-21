@@ -25,7 +25,7 @@
  *  in the synchronous notifyEvent function here, decode the message
  *  and call the original game code. The functions name are identical,
  *  e.g. kartFinishedRace(some parameter) is called from the GameEventManager
- *  on the server, and the received message is then handled by 
+ *  on the server, and the received message is then handled by
  *  kartFinishedRace(const NetworkString &).
  */
 GameEventsProtocol::GameEventsProtocol() : Protocol(PROTOCOL_GAME_EVENTS)

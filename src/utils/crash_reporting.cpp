@@ -190,7 +190,7 @@
                    " from hDbgHelpDll");                                           \
             FreeLibrary(hDbgHelpDll);                                              \
             return;                                                                \
-    } 
+    }
 
                 GET_FUNC_PTR(SymCleanup)
                 GET_FUNC_PTR(SymFunctionTableAccess64)
@@ -276,7 +276,7 @@
 
                     // Decode the symbol and add it to the call stack
                     DWORD64 sym_displacement;
-                    char buffer[ sizeof(SYMBOL_INFO) + 
+                    char buffer[ sizeof(SYMBOL_INFO) +
                                  MAX_SYM_NAME * sizeof(TCHAR) ];
                     PSYMBOL_INFO symbol = (PSYMBOL_INFO)buffer;
                     symbol->MaxNameLen = MAX_SYM_NAME;
@@ -436,7 +436,7 @@
 #elif defined(__NetBSD__)
             path = realpath("/proc/curproc/exe", NULL);
 #elif defined(__sun)
-	    path = realpath("/proc/self/path/a.out", NULL);
+        path = realpath("/proc/self/path/a.out", NULL);
 #elif defined(__APPLE__)
             path = (char*)malloc(PATH_MAX+1);
             uint32_t len = PATH_MAX;

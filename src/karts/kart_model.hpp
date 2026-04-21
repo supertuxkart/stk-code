@@ -303,6 +303,9 @@ private:
     /** Location of hat in object space. */
     core::matrix4* m_hat_location;
 
+    /** The mesh for the seasonal hat. */
+    scene::IAnimatedMesh* m_hat_mesh;
+
     /** Name of the bone for hat attachment. */
     std::string m_hat_bone;
 

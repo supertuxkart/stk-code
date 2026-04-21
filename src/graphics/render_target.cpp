@@ -41,7 +41,7 @@ GL1RenderTarget::GL1RenderTarget(const irr::core::dimension2du &dimension,
     }
     else
     {
-        // m_render_target_texture will be NULL if RTT doesn't work on this 
+        // m_render_target_texture will be NULL if RTT doesn't work on this
         // computer
         Log::error("GL1RenderTarget", "Cannot render to texture.");
     }

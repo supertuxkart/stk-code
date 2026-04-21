@@ -205,7 +205,7 @@ namespace Online
             }
 
             // User still at main menu screen, push user screen. Note that
-            // this function is called from the main thread, so we can 
+            // this function is called from the main thread, so we can
             // push screens without synchronisations.
             UserScreen::getInstance()->push();
             UserScreen::getInstance()->loginError(getLocalizedInfo(),
@@ -487,27 +487,29 @@ namespace Online
 
                 if (to_notify.size() > 0)
                 {
+                    int num_friends = to_notify.size();
                     core::stringw message("");
-                    if(to_notify.size() == 1)
+                    if(num_friends == 1)
                     {
                         message = _("%s is now online.", to_notify[0]);
                     }
-                    else if(to_notify.size() == 2)
+                    else if(num_friends == 2)
                     {
                         message = _("%s and %s are now online.",
                                     to_notify[0], to_notify[1]    );
                     }
-                    else if(to_notify.size() == 3)
+                    else if(num_friends == 3)
                     {
                         message = _("%s, %s and %s are now online.",
                                  to_notify[0], to_notify[1], to_notify[2]);
                     }
-                    else if(to_notify.size() > 3)
+                    else if(num_friends > 3)
                     {
                         //I18N: Only used for count > 3
-                        message = _P("%d friend is now online.",
-                                     "%d friends are now online.",
-                                     (int)to_notify.size());
+                        message = _P("%i friend is now online.",
+                                     "%i friends are now online.",
+                                     /* to pick the plural form */ num_friends,
+                                     /* to insert in the final string */ num_friends);
                     }
                     MessageQueue::add(MessageQueue::MT_FRIEND, message);
                 }
@@ -587,7 +589,8 @@ namespace Online
             {
                 message = _P("You have %d new friend request!",
                              "You have %d new friend requests!",
-                             friend_request_count);
+                            /* to pick the plural form */ friend_request_count,
+                            /* to insert in the final string */ friend_request_count);
             }
             else
             {

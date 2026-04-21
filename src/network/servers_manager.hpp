@@ -57,7 +57,7 @@ private:
     // ------------------------------------------------------------------------
     void setWanServers(bool success, const XMLNode* input);
     // ------------------------------------------------------------------------
-    void setLanServers(const std::map<irr::core::stringw, 
+    void setLanServers(const std::map<irr::core::stringw,
                                       std::shared_ptr<Server> >& servers);
                                       
     std::vector<SocketAddress> getDefaultBroadcastAddresses();

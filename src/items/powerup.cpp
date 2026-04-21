@@ -84,7 +84,7 @@ void Powerup::saveState(BareNetworkString *buffer) const
  */
 void Powerup::rewindTo(BareNetworkString *buffer)
 {
-    PowerupManager::PowerupType new_type = 
+    PowerupManager::PowerupType new_type =
         PowerupManager::PowerupType(buffer->getUInt8());
     int n=0;
     if(new_type==PowerupManager::POWERUP_NOTHING)
@@ -359,12 +359,12 @@ void Powerup::use()
                     {
                         float rank_factor;
 
-                       rank_factor = (float)(kart->getPosition()   - 1) 
+                        rank_factor = (float)(kart->getPosition()   - 1)
                                     / (float)(m_kart->getPosition() - 2);
                         position_factor = 1.0f - rank_factor;
                     }
 
-                    rank_mult = 1 + (position_factor * 
+                    rank_mult = 1 + (position_factor *
                                      (kp->getParachuteDurationRankMult() - 1));
 
                     kart->getAttachment()
@@ -540,7 +540,7 @@ void Powerup::hitBonusBox(const ItemState &item_state)
     // Determine a 'random' number based on time, index of the item,
     // and position of the kart. The idea is that this process is
     // randomly enough to get the right distribution of the powerups,
-    // does not involve additional network communication to keep 
+    // does not involve additional network communication to keep
     // client and server in sync, and is not exploitable:
     // While it is not possible for a client to determine the item
     // (the server will always finally determine which item a player
@@ -559,7 +559,7 @@ void Powerup::hitBonusBox(const ItemState &item_state)
     // (4) An extra random 64bit integer
     // Using (1) means that not all boxes at a certain time for a kart
     // will give the same box. Using (2) means that the item will
-    // change over time - even if the next item is displayed, it 
+    // change over time - even if the next item is displayed, it
     // will mean a cheater has to wait, and because of the frequency
     // of the time component it will also be difficult to get the
     // item at the right time. Using (3) adds another cheat-prevention
@@ -615,7 +615,7 @@ void Powerup::hitBonusBox(const ItemState &item_state)
         }
     }
 
-    new_powerup = powerup_manager->getRandomPowerup(position, &n, 
+    new_powerup = powerup_manager->getRandomPowerup(position, &n,
                                                     random_number);
 
     // Always add a new powerup in ITEM_MODE_NEW (or if the kart

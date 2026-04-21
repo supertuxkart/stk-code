@@ -43,7 +43,7 @@ typedef unsigned char uchar;
 
 /** \class BareNetworkString
  *  \brief Describes a chain of 8-bit unsigned integers.
- *  This class allows you to easily create and parse 8-bit strings, has 
+ *  This class allows you to easily create and parse 8-bit strings, has
  *  functions to add and read other data types (e.g. int, strings). It does
  *  not enforce any structure on the sequence (NetworkString uses this as
  *  a base class, and enforces a protocol type in the first byte)
@@ -182,7 +182,7 @@ public:
      *  string. */
     const char* getCurrentData() const
     {
-        return (char*)(m_buffer.data()+m_current_offset); 
+        return (char*)(m_buffer.data()+m_current_offset);
     }   // getCurrentData
     // ------------------------------------------------------------------------
     int getCurrentOffset() const                   { return m_current_offset; }
@@ -199,7 +199,7 @@ public:
                m_current_offset <= (int)m_buffer.size());
     }   // skip
     // ------------------------------------------------------------------------
-    /** Returns the send size, which is the full length of the buffer. A 
+    /** Returns the send size, which is the full length of the buffer. A
      *  difference to size() happens if the string to be sent was previously
      *  read, and has m_current_offset != 0. Even in this case the whole
      *  string must be sent. */
@@ -411,7 +411,7 @@ public:
  *                    manager thread.
  *          bits 6-0: The protocol ID, which identifies the receiving protocol
  *                    for this message.
- * 
+ *
  *  Otherwise this class offers template functions to add arbitrary variables,
  *  and retrieve them again. It kept the functionality of 'removing' bytes
  *  (e.g. the ProtocolManager would remove the first byte - protocol type -
@@ -423,7 +423,7 @@ class NetworkString : public BareNetworkString
 public:
     static void unitTesting();
         
-    /** Constructor for a message to be sent. It sets the 
+    /** Constructor for a message to be sent. It sets the
      *  protocol type of this message. It adds 1 byte to the capacity:
      *  1 byte for the protocol type. */
     NetworkString(ProtocolType type,  int capacity=16)
@@ -436,7 +436,7 @@ public:
     /** Constructor for a received message. It automatically ignored the first
      *  5 bytes which contain the type. Those will be accessed using
      *  special functions. */
-    NetworkString(const uint8_t *data, int len) 
+    NetworkString(const uint8_t *data, int len)
         : BareNetworkString((char*)data, len)
     {
         m_current_offset = 1;   // ignore type

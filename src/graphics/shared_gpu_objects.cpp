@@ -45,7 +45,7 @@ void SharedGPUObjects::initQuadVBO()
         -1.,  1., 0., 1.,   // LowerLeft
          1., -1., 1., 0.,   // UpperRight
          1.,  1., 1., 1.    // LowerRight
-    }; 
+    };
     glGenBuffers(1, &m_quad_vbo);
     glBindBuffer(GL_ARRAY_BUFFER, m_quad_vbo);
     glBufferData(GL_ARRAY_BUFFER, 16 * sizeof(float), QUAD_VERTEX,
@@ -81,7 +81,7 @@ void SharedGPUObjects::initQuadBuffer()
         -1., -1., -1.,  1.,   // UpperLeft
         -1.,  1., -1., -1.,   // LowerLeft
          1., -1.,  1.,  1.,   // UpperRight
-         1.,  1.,  1., -1.    // LowerRight 
+         1.,  1.,  1., -1.    // LowerRight
     };
     glGenBuffers(1, &m_quad_buffer);
     glBindBuffer(GL_ARRAY_BUFFER, m_quad_buffer);

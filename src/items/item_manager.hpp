@@ -176,7 +176,7 @@ public:
     // ------------------------------------------------------------------------
     /** Returns a pointer to the n-th item. */
     const ItemState* getItem(unsigned int n) const
-    { 
+    {
         return dynamic_cast<Item*>(m_all_items[n]);
     };
     // ------------------------------------------------------------------------
@@ -210,7 +210,7 @@ public:
         assert(m_items_in_quads);
         assert(n < m_items_in_quads->size());
         return ((*m_items_in_quads)[n]).empty()
-              ? NULL 
+              ? NULL
              : dynamic_cast<Item*>((*m_items_in_quads)[n].front());
     }   // getFirstItemInQuad
     // ------------------------------------------------------------------------

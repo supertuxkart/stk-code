@@ -32,7 +32,7 @@ class NetworkKartSelectionScreen : public KartSelectionScreen,
                   public GUIEngine::ScreenSingleton<NetworkKartSelectionScreen>
 {
 private:
-    /** Pointer to progress bar widget which is used as a timer 
+    /** Pointer to progress bar widget which is used as a timer
      *  (going backwards). */
     GUIEngine::ProgressBarWidget *m_timer;
 
@@ -45,7 +45,7 @@ private:
     uint64_t m_exit_timeout;
 protected:
     // ------------------------------------------------------------------------
-    NetworkKartSelectionScreen() 
+    NetworkKartSelectionScreen()
                         : KartSelectionScreen("online/network_karts.stkgui")
     {
         m_live_join = false;

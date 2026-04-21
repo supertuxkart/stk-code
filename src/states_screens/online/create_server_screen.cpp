@@ -110,7 +110,7 @@ void CreateServerScreen::init()
 
     // I18n: Name of the server. %s is either the online or local user name
     m_name_widget->setText(_("%s's server",
-                             NetworkConfig::get()->isLAN() 
+                             NetworkConfig::get()->isLAN()
                              ? PlayerManager::getCurrentPlayer()->getName()
                              : PlayerManager::getCurrentOnlineProfile()->getUserName()
                              )
@@ -335,7 +335,7 @@ void CreateServerScreen::createServer()
 #ifdef USE_GRAPHICS_SERVER
     NetworkConfig::get()->setIsServer(true);
     // In case of a WAN game, we register this server with the
-    // stk server, and will get the server's id when this 
+    // stk server, and will get the server's id when this
     // request is finished.
     ServerConfig::m_server_max_players = max_players;
     ServerConfig::m_server_name = StringUtils::xmlEncode(name);

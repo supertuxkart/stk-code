@@ -72,6 +72,9 @@ private:
      *  all clients or not. */
     std::vector<bool>        m_kart_available;
 
+    /** Contains the name of the seasonal hat, if any */
+    std::string m_hat_name;
+
     std::unique_ptr<AbstractCharacteristic>                         m_base_characteristic;
     std::map<std::string, std::unique_ptr<AbstractCharacteristic> > m_difficulty_characteristics;
     std::map<std::string, std::unique_ptr<AbstractCharacteristic> > m_kart_type_characteristics;
@@ -113,6 +116,7 @@ public:
                                            RemoteKartInfoList* existing_karts,
                                            std::vector<std::string> *ai_list);
     void                     setHatMeshName(const std::string &hat_name);
+    void                     setHatMeshName();
     // ------------------------------------------------------------------------
     /** Get the characteristic that holds the base values. */
     const AbstractCharacteristic* getBaseCharacteristic() const { return m_base_characteristic.get(); }

@@ -238,7 +238,7 @@ public:
                            1, "dtex", ST_NEAREST_FILTERED,
                            8, "shadowtex", ST_SHADOW_SAMPLER_ARRAY2D);
         assignUniforms("split0", "split1", "split2", "splitmax", "shadow_res",
-            "overlap_proportion", "texel0", "texel1", "texel2", "texel3", 
+            "overlap_proportion", "texel0", "texel1", "texel2", "texel3",
             "sundirection", "sun_color");
     }   // ShadowedSunLightShaderPCF
     // ------------------------------------------------------------------------

@@ -45,8 +45,8 @@ namespace Scripting
             engine->SetDefaultNamespace("Physics");
             
             int r;
-            r = engine->RegisterGlobalFunction("string createExplosion(Vec3 &in)", 
-                                               asFUNCTION(createExplosion), 
+            r = engine->RegisterGlobalFunction("string createExplosion(Vec3 &in)",
+                                               asFUNCTION(createExplosion),
                                                asCALL_GENERIC); assert(r >= 0);
         }
     }

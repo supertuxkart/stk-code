@@ -48,7 +48,7 @@ Explosion::Explosion(const Vec3& coord, const char* explosion_sound, const char 
 
 #ifdef MOBILE_STK
     // Use a lower quality effect on mobile for better performance
-    if (filename == "explosion.xml" || 
+    if (filename == "explosion.xml" ||
         filename == "explosion_bomb.xml" ||
         filename == "explosion_cake.xml")
     {

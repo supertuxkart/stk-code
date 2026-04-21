@@ -121,12 +121,61 @@ For similar reasons, and because some features are vastly more complex than othe
 * Support the display of wide powerup icons, for the Mini-Wish, by Alayan
 
 
-## SuperTuxKart 1.5
+## SuperTuxKart 1.5.1
+
+### Networking
+* Add TV cameras as a camera option when watching soccer games in spectator mode, by LLS
+* Add a 'help' command for use in server lobbies, by Alayan
+
+### General
+* Many improvements for localization:
+    * Make the name of skins translatable, by Alayan
+    * Make the server messages when signing in translatable, by Alayan
+    * Use context to allow for different translations of the same English string when relevant, by Alayan
+    * Full translation support for server answers to chat commands, and greatly improved base English messages, by Alayan
+    * Move all URLs out of translatable strings, by Alayan
+    * Minor improvements to some English source strings, by Alayan and others
+* Add optional support for Opus audio files, by Abedegno
+* Support using the command line to set the user-adjustable graphical parameters that were missing as command line options, by Alayan
+* Add a command line option to directly set a graphical preset, by Alayan
+* Sanitize characters that are illegal in file names when using installaddon, by Nutzboi
+* Support calibration offsets for wiimotes, by qduff
+* Various code quality improvements and minor bugfixes, by Alayan and others
+
+### Graphics
+* Fix a regression where an increase of the 'Image Quality' setting would decrease the anisotropic filtering level, by Alayan
+* Enable high-quality mipmaps as soon as high-quality
+
+### User Interface
+* Add support for page-up, page-down, home and end keys in lists, by Alayan
+* Add a scrollbar to the server lobby chat, by Bcfworld
+* Better paging support in the server lobby chat, by Alayan
+* Resize kart icons on the left if the number of karts changes, by Wilmaster
+* When renaming, prefill the textbox with the current name, by Brice Albiol
+* Add tooltips for disabled options during a race, by Brice Albiol and Alayan
+* Ensure tooltips don't overflow, by Brice Albiol and Alayan
+* Allow mouse wheel scrolling if the cursor hovers over a list even if another element has focus, by Alexander Klimov
+* Display more settings in the benchmark end-screen, by Alayan
+* Prevent showing a render resolution factor in UI that's unsupported with the current renderer, by Alayan
+* Improvement to the layout logic for track and kart selection when having many addons, by Alayan
+* Various minor UI fixes, by Alayan and others
+
+### Tracks and modeling
+
+#### Tracks
+* Fix an egg that was very difficult to collect (due to collision issues) in the Black Forest intermediate egg hunt, by Sven
+
+#### Arenas
+* TV spectator cameras for all soccer fields, by LLS and Sven
+
+
+## SuperTuxKart 1.5 (20. October 2025)
 
 ### Networking
 * Improve the track-voting logic when no majority is achieved, by kimden
 * Prevent tracks missed by spectators from limiting the choice of active players, by kimden
 * Make bot indices start from one, by JipFr
+* Improvements to the rating formula for ranked play, by Alayan
 * Various bugfixes, by kimden
 
 ### Gameplay
@@ -169,7 +218,7 @@ For similar reasons, and because some features are vastly more complex than othe
 * Add spotlights, by CodingJellyfish
 * Replace inaccurate normal compression algorithm with Octahedron Normal Vector, by CodingJellyfish
 * Fix the Screen-Space Reflection shader, by CodingJellyfish
-* Fix and improve the Screen-Space Ambiant Occlusion shader, by CodingJellyfish
+* Fix and improve the Screen-Space Ambient Occlusion shader, by CodingJellyfish
 * Implement Percentage-Closer Soft Shadows, by CodingJellyfish
 * Guarantee an overall bone limit of 2048 for skinned mesh (up from 1024), by CodingJellyfish
 * Improve Cascaded Shadow Mapping, by CodingJellyfish and Alayan
@@ -237,8 +286,8 @@ For similar reasons, and because some features are vastly more complex than othe
 ### General
 * Enable ARMv7 build for Windows, by Benau
 * Restore macOS <= 10.14 support, by Benau
-* Allow setting the auto-center behavior of steering wheels, by Mstrodl
-* Simplify making derivative UI skins by allowing to specify a base theme, by qwertychouskie
+* Allow setting the auto-center behavior of steering wheels, by Mary
+* Simplify making derivative UI skins by allowing to specify a base theme, by QwertyChouskie
 * Make sure old save data is only removed after new save data is written, to avoid data losses on full drives, by Benau
 * Fixed camera rotation when using the gyroscope and driving on vertical surfaces, by Benau
 * Lap trial mode, by mrkubax10
@@ -268,12 +317,12 @@ For similar reasons, and because some features are vastly more complex than othe
 
 ### Tracks and modeling
 #### Tracks
-* Fix broken invisible wall in Antediluvian Abyss, by Benau
+* Fix broken invisible wall in Antediluvian Abysses, by Benau
 * New textures in Shifting Sands, by KartOym
 
 #### Karts
 * Updated Konqi, by ZAQraven99
-* Godette kart (replaces Beastie), by ZAQraven99
+* Godette, by ZAQraven99 (replaces Beastie)
 
 #### Arenas
 * Balanced starting positions in all official soccer fields, by CrystalDaEevee
@@ -327,7 +376,8 @@ For similar reasons, and because some features are vastly more complex than othe
 
 #### Karts
 * Pepper (replaces Sara the Wizard), by ZAQraven99
-* Improved Adiumy, Emule, GNU and Sara karts, by ZAQraven99
+* Sara (replaces Sara the Racer), by Zaqraven99
+* Improved Adiumy, Emule and GNU karts, by ZAQraven99
 
 #### Arenas
 * Alien Signal, by Samuncle
@@ -377,7 +427,7 @@ For similar reasons, and because some features are vastly more complex than othe
 #### In-race UI
 * Introduce camera settings in the options screen, by luffah
 * More spectator cameras in online spectating, by luffah
-* Add a minimap indicator for basketballs, by Alayan
+* Add a minimap indicator for basket balls, by Alayan
 * Add team chat for team games, by Benau
 * Show the kart orientation on the soccer minimap, by riso
 * Show a message once a goal is made in soccer, by riso
@@ -417,13 +467,13 @@ For similar reasons, and because some features are vastly more complex than othe
 * Fix a bug that made AIs, in multiplayer and low difficulty, rubber-band towards the wrong player, by Alayan. Each player now correctly has its AIs, helping a weaker player to not be condemned to the last position.
 
 ### General
-* Screen space reflection graphical effect, by samuncle
+* Screen space reflection graphical effect, by Samuncle
 * Support unicode file paths, by Benau
 * Complex text layout support, by Benau
 * Add emoji support, by Benau
 * Avoid "this program is not responding" warnings in Windows and Mac, by Benau
 * Add a Story Mode timer, by Alayan
-* Make text billboards size consistent accross resolutions, by Benau
+* Make text billboards size consistent across resolutions, by Benau
 * Don't trigger road sounds when the kart is flying, by Benau
 * Remove an incorrect function call that could significantly hurt performance for Mac, by Benau
 * Fix a nasty bug that made several sound effects to be played at a low volume after a crash, by Alayan
@@ -488,9 +538,9 @@ For similar reasons, and because some features are vastly more complex than othe
 ### Tracks and modeling
 #### Tracks
  * A handful of minor graphical fixes and enhancements
- * Fixed checklines that could be missed too easily in XR591 and the Old Mine.
+ * Fixed checklines that could be missed too easily in XR591 and The Old Mine.
 #### Arenas
- * Pumpkin Park, by samuncle
+ * Pumpkin Park, by Samuncle
 
 
 ## SuperTuxKart 1.0 (20. April 2019)
@@ -507,19 +557,25 @@ For similar reasons, and because some features are vastly more complex than othe
 * Global rankings by Benau (communication with main server) and Alayan (ranking formula)
 
 ### Race gameplay and physics
-* New game mode Capture the Flag by Benau (online multiplayer only)
-* New game mode Free for All by Benau
+* New game mode Capture the Flag, by Benau (online multiplayer only)
+* New game mode Free for All, by Benau
 * Free for All available in offline mode with AI, by Mrxx99
 * Revised kart characteristics for better balance between light, medium and heavy karts by Alayan
-* Better random item distribution for various numbers of karts by Alayan and hiker
-* Fix position interpolation causing some incorrect lapline validation by Auria
-* Fix kart being uncontrollable and hovering when landing on some downward slopes by hiker
-* Mitigate a physics issue which could send a kart flying on collisions by hiker
-* Make kart turn radius based on kart class instead of kart model length (which made Adiumy unplayable and caused AI issues) by Alayan
-* Revisited slipstreaming with boost easier to obtain, especially in curves, but not as strong as in 0.9.3 when the zipper boost was incorrectly activated, by Alayan
-* Minor gameplay improvements (level 1 skid boost doesn't interrupt level 2 boost, fairer rubber-banding in low difficulties, boosted AI for some karts for more challenge in GPs, small balance change of GP points, more useful and consistent handicap option...)
+* Better random item distribution for various numbers of karts, by Alayan and hiker
+* Fix position interpolation causing some incorrect lapline validation, by Auria
+* Fix kart being uncontrollable and hovering when landing on some downward slopes, by hiker
+* Mitigate a physics issue which could send a kart flying on collisions, by hiker
+* Make kart turn radius based on kart class instead of kart model length (which made Adiumy unplayable and caused AI issues), by Alayan
+* Revisited slipstreaming with an easier to obtain boost, especially in curves, but not as strong as in 0.9.3 when the zipper boost was incorrectly activated, by Alayan
+* Ensure that nitro gives a boost as long as nitro is consumed even if the user's nitro input stops earlier, by Alayan
+* Start counting the minimum nitro consumption only if there is actual nitro being used (this prevents bypassing the minimum duration by pressing the nitro key shortly before collecting a nitro can), by Alayan
+* Give an engine power multiplication bonus to nitro to make it more useful at lower speeds, by Alayan
+* Redesign the way parachutes work. There is now a pseudo-friction depending on kart speed that parachutes increase, by Alayan
+* Greatly increase the speed of basket balls and add a dynamic element to the speed depending on the distance to the first player, by Alayan
+* Reduce the duration of explosions, by Alayan
+* In Follow-the-Leader, increase the countdown when the leader is affected by an explosion or is rescued, by Alayan
+* Minor gameplay improvements (halve the instant speed boost from skidding, level 1 skid boost doesn't interrupt level 2 boost, fairer rubber-banding in low difficulties, boosted AI for some karts for more challenge in GPs, small balance change of GP points, more useful and consistent handicap option...), by Alayan
 * Start boost/penalty moved to the set phase for smoother networking
-* Terrain slowdown works again as intended on several tracks where it was missing
 
 ### AI
 * Improved powerup and nitro handling in AI by Alayan
@@ -527,6 +583,7 @@ For similar reasons, and because some features are vastly more complex than othe
 ### General
 * Option to disable light scattering (for improved FPS), used in graphics level 3, by Partmedia
 * Unlockable SuperTux challenges in Story Mode by Alayan
+* Require the completion of all other challenges before the final challenges in Story Mode (fixes the 'Gate Skip'), by Alayan
 * Improvements to ghost replays (more data saved, live time difference, replay comparison, egg hunt replays) by Alayan
 * Kart color customization by Benau
 * Multithreading contention fixes by Benau
@@ -537,7 +594,8 @@ For similar reasons, and because some features are vastly more complex than othe
 * Updated standard replays by Alayan
 * Visual improvements (new skidding particles, better rescue, bubblegum flashing before ending)
 * Audio improvements (crash sound depending on speed/direction, no crash sound on rescue walls, sound cue in nitro challenges)
-* Fix STK incorrectly connecting to the server when the internet option is disabled by Auria
+* Fix STK incorrectly connecting to the server when the internet option is disabled, by Auria
+* Include a new set of standard replays, by Alayan
 * Updated WiiUse library
 * Many bugfixes
 
@@ -550,88 +608,93 @@ For similar reasons, and because some features are vastly more complex than othe
 * Wayland support and many other smaller improvements and fixes
 
 ### User Interface
-* New networking user interface by Benau and hiker
-* New coal skin by Alayan
-* Support for collapsing widgets in UI by Mrxx99
-* Multidirectional keyboard navigation in menus by Alayan
-* Alternating background darkness in lists to enhance readability by Benau
+* New networking user interface, by Benau and hiker
+* New coal skin, by Alayan
+* Support for collapsing widgets in UI, by Mrxx99
+* Multidirectional keyboard navigation in menus, by Alayan
+* Allow the disabling of keyboard configurations (making them inactive without deleting them), by Alayan
+* Alternating background darkness in lists to enhance readability, by Benau
 * Support text breaks into multiple line in lists, e.g. in the addons menu, by Alayan
-* Improved help menu with lateral tabs and a lot more information by Alayan
-* Improved option menu with lateral tabs and a separate language tab by Alayan
-* Many improvements to the ghost replay selection list (give access to egg hunt replays, kart icon shown in the list, replay's game version shown, hide player number column by default) and dialog (allow replay comparison, show track picture, show information about the selected replays) by Alayan
-* Control configurations can be disabled without being deleted by Alayan
+* Improved help menu with lateral tabs and a lot more information, by Alayan
+* Improved option menu with lateral tabs and a separate language tab, by Alayan
+* Many improvements to the ghost replay selection list (give access to egg hunt replays, kart icon shown in the list, replay's game version shown, hide player number column by default) and dialog (allow replay comparison, show track picture, show information about the selected replays), by Alayan
+* Control configurations can be disabled without being deleted, by Alayan
 * Other significant enhancements (detailed progress of multi-goal achievements, reset password button, clearer checkbox status, milliseconds displayed in time-trials and egg hunts, nitro efficiency in the kart selection screen, better track info screen, better warnings when trying to do an online action with internet access disabled, hour support for GP time, default resolutions can't be used in fullscreen if unsupported by the monitor...)
 * Many bugfixes and small enhancements mostly by deveee and Alayan
 #### In-race UI
 * New speedometer and nitro gauge, by Alayan
-* Bigger minimap and new display options, by Alayan
-* More legible text with outlines and for some bigger font, by Alayan
+* Bigger minimap and new minimap display options, by Alayan
+* More legible text with outlines and, for some, a bigger font, by Alayan
 
 ### Tracks and modeling
 #### Tracks
-* Black Forest by Sven Andreas Belting (replacing Green Valley)
-* Ravenbridge Mansion by samuncle (replacing Black Hill Mansion)
+* Black Forest, by Sven Andreas Belting (replacing Green Valley)
+* Ravenbridge Mansion, by Samuncle (replacing Blackhill Mansion)
 * Unwanted shortcuts and exploits found by several players and fixed mostly by Auria in many tracks :
-    * Antediluvian Abyss, Around the Lighthouse, Fort Magma, Grand Paradisio Island, Hacienda, Minigolf, Nessie's Pond, Northern Resort, The Old Mine, Oliver's Math Class, Shifting Sands, STK Enterprise, XR591
+    * Antediluvian Abysses, Around the Lighthouse, Fort Magma, Grand Paradisio Island, Hacienda, Minigolf, Nessie's Pond, Northern Resort, The Old Mine, Oliver's Math Class, Shifting Sands, STK Enterprise, XR591
 * Smoothness issues causing collisions and kart slowdown fixed by Auria :
     * Nessie's Pond, Old Mine, Shifting Sands, Volcano Island, XR591
 * Item (boxes, nitro, bananas) positions improvement by Alayan and theThomasPat :
     * Around the Lighthouse, Black Forest, Candela City, Hacienda, Minigolf, Northern Resort, Oliver's Math Class, STK Enterprise, The Old Mine, Volcano Island, Zen Garden
+* Terrain slowdown works again as intended on several tracks where it was missing
     
 #### Arenas
-* Las Dunas Soccer, by samuncle
-* Candela City arena by Benau, based on samuncle's track
+* Las Dunas Soccer, by Samuncle
+* Candela City arena by Benau, based on Samuncle's track
 
 #### Karts
-* New version of Beastie by Jymis
-* New version of Kiki by Benau
+* New version of Beastie, by Jymis
+* New version of Kiki, by Benau
 
 
 ## SuperTuxKart 0.9.3 (28. October 2017)
-* Reduced RAM and VRAM usage, reducing load times by Auria and Benau
+* Reduced RAM and VRAM usage, reducing load times, by Auria and Benau
 * New mesh format optimized for space and hardware skinning
-* Code refactoring of both render pipeline by Benau and Elderme
-* Physics improvements and various physics bugfixes by hiker
+* Code refactoring of both render pipeline, by Benau and Elderme
+* Physics improvements and various physics bugfixes, by hiker
 * Kart GFX improvements (exhaust and headlight)
 * In-game screen recording powered by libopenglrecorder
-* High quality mipmap generation by Stragus
-* New smoother camera by Auria
+* High quality mipmap generation, by Stragus
+* New smoother camera, by Auria
 * New grand prix win scene
 * Gamepad configuration bugfixes
 * 3 Strikes Battles : added spare tire karts
-* Visual representation of the start line in all tracks
 * Various improvements (starting boost effect, wall driving fixes, parachutes, GP points, help page for bananas, cannon fixes, colorization shader)
 
 ### Tracks and modeling
 #### Karts
-* Kiki by Benau
-* New versions of Wilber and Hexley by Jymis
-* New version of Konqi by Benau
+* Kiki, by Benau
+* New versions of Wilber and Hexley, by Jymis
+* New version of Konqi, by Benau
+* Removal of Elephpant
 #### Tracks
+* Ensure that there is a visual representation of the start line in all tracks
 * All tracks drivable in reverse, with arrows pointing in the correct direction
-* Candela City by samuncle (replaces Shiny Suburbs)
-* Cornfield Crossing by samuncle (replaces Bovine Barnyard)
-* New battle track Las Dunas Arena by samuncle
+* Candela City, by Samuncle (replaces Shiny Suburbs)
+* Cornfield Crossing, by Samuncle (replaces Bovine Barnyard)
+#### Arenas
+* Las Dunas Arena, by Samuncle
 
 
 ## SuperTuxKart 0.9.2 (1. July 2016)
 * Ghost replay races by Benau
 * Battle mode AI by Benau
 * Soccer mode AI by Benau
-* TTF font rendering by Benau
-* New ruby and forest skins by Benau
 * Kart properties refactor by Flakebi
 * Scripting work under the hood
-* Work on the track editor by mhp
 * Tweak to challenges
 * New farm track song by 0zone0ne and Krobonil
 * Bugfixes
 
+### User Interface
+* TTF font rendering, by Benau
+* New ruby and forest skins, by Benau
+
 ### Tracks and modeling
 #### Tracks
-* Antediluvian Abysses by samuncle (replaces Subsea)
-* Volcano Island by Ponzino
-* New icy soccer field by samuncle and Benau
+* Antediluvian Abysses, by Samuncle (replaces Subsea)
+* Volcano Island, by Ponzino
+* New icy soccer field, by Samuncle and Benau
 
 
 ## SuperTuxKart 0.9.1 (17. October 2015)
@@ -643,7 +706,7 @@ For similar reasons, and because some features are vastly more complex than othe
 ### Tracks and modeling
 #### Tracks
 * Better support for driving tracks in reverse
-* New track layout and improved graphics for Oliver's Math Class, by samuncle
+* New track layout and improved graphics for Oliver's Math Class, by Samuncle
 * Smaller tweaks and improvements to several tracks including 
     * XR591
     * Fort Magma
@@ -651,7 +714,7 @@ For similar reasons, and because some features are vastly more complex than othe
     * Subsea
 
 
-## SupertTuxKart 0.9 (24. April 2015)
+## SuperTuxKart 0.9 (24. April 2015)
 * Fully shader-based rendering engine
 * Online login which allows to:
     * connect with friends and see when they are playing
@@ -662,12 +725,17 @@ For similar reasons, and because some features are vastly more complex than othe
 
 ### Tracks and modeling
 #### Karts
-* New karts Amanda and Gavroche by XGhost
-* New and improved Tux, Adiumy, Sara the Wizard and the Racer, Xue
+* Amanda, by XGhost
+* Gavroche, by XGhost
+* Sara the Wizard, by Samuncle (replaces Sara)
+* Sara the Racer, by Samuncle
+* New and improved Tux, Adiumy, Xue
+* Removal of Beagle
 #### Tracks
-* Cocoa Temple by samuncle (replaces Amazonian Journey)
-* Gran Paradiso Island by samuncle (replaces The Island)
+* Cocoa Temple, by Samuncle (replaces Amazonian Journey)
+* Gran Paradiso Island, by Samuncle (replaces The Island)
 * Graphical improvements to many other tracks
+* Nicer new name for a track: Nessie's Pond (previously Scotland)
 
 
 ## SuperTuxKart 0.8.1 (26. November 2013)
@@ -676,20 +744,24 @@ For similar reasons, and because some features are vastly more complex than othe
 * Added Tutorial
 * Added new Supertux difficulty
 * New bubblegum shield weapon
-* New Speedometer and nitro meter
-* Add ability to filter addons
 * Add ability to save and resume Grand Prix
 * Improve skid marks and nitro effects
 * Wiimote support
 
+### User Interface
+* Add ability to filter addons
+* New Speedometer and nitro gauge
+
 ### Tracks and modeling
 #### Karts
-* New karts Xue and Sara
-* Updated Beastie kart
+* Xue, by JunglePenguin
+* Sara, by Samuncle
+* Updated Beastie and Konqi
+* Removal of Mozilla
 #### Tracks
 * STK Enterprise by Rubberduck (replaces Star Track)
 * Redesign of Minigolf, by Rubberduck
-* New longer track layout and improved graphics for Lighthouse, by samuncle
+* New longer track layout and improved graphics for 'Around the Lighthouse', by Samuncle
 * Gameplay and graphical updates to several tracks :
     * The Old Mine
     * Zen Garden
@@ -706,37 +778,44 @@ For similar reasons, and because some features are vastly more complex than othe
 * New music
 
 ### Tracks and modeling
-* New overworld for the Story Mode by Auria
+* New overworld for the Story Mode, by Auria
 #### Tracks
-* Green Valley by Wolfs (replaces Tux Tollway)
-* Blackhill Mansion by samuncle (replaces Crescent Crossing)
-* New track layout and improved graphics for Shifting Sands (formerly Sand)
+* Green Valley, by Wolfs (replacing Tux Tollway)
+* Blackhill Mansion, by Samuncle (replacing Crescent Crossing)
+* New track layout and improved graphics for Shifting Sands, by Samuncle
 * Gameplay and graphical updates to several tracks :
     * XR591
     * Fort Magma
-    * Jungle
+    * Amazonian Journey
     
 
 ## SuperTuxKart 0.7.3 (2. November 2011)
 * New graphical effects
-* New weapons 'Swatter' and 'Rubber Ball'
 * 3 Strikes Battles now displays lives as spare tires
 * Improved bubble gum
 * See progression during Grand Prix
-* Improve physics for tall karts (e.g. Adiumy)
+* Transition track-making to blender 2.5/2.6
 * Lots of bug fixes
+
+### Race gameplay and physics
+* New powerup 'Swatter', a green fly-swatter that squashes karts nearby and can be used to remove bombs and parachutes
+* New powerup 'Rubber Ball', a giant bouncy ball that chases after the kart in first place
+* Improve physics for tall karts (e.g. Adiumy)
 * Improved kart control at high speeds
 * Better placement of rescued karts
-* Transition track-making to blender 2.5/2.6
 
 ### Tracks and modeling
 #### Karts
-* New Suzanne kart
+* Suzanne, by Cédric Archambault
+* Removal of Gooey
 #### Tracks
-* Zen Garden by samuncle (replaces Secret Garden)
+* Zen Garden, by Samuncle (replaces Secret Garden)
 * Minigolf, by Mac
-* New Subsea
-* New Island battle arena
+* Subsea, by R. Phelippeau (entirely new track despite the shared name with an older track)
+* Removal of Coyote Canyon
+* Removal of Skyline
+#### Arenas
+* Battle Island, by qubodup
 #### Miscellaneous
 * Added Thunderbird as race referee
 
@@ -750,10 +829,10 @@ For similar reasons, and because some features are vastly more complex than othe
 
 ### Tracks and modeling
 #### Karts
-* New Beastie kart.
+* Beastie, by Funto
 #### Tracks
-* Improved Snow Peak by samuncle
-* Improved Star Track UFO by Rudy
+* Improved Snow Peak, by Samuncle
+* Improved Star Track UFO, by Rudy
 
 
 ## SuperTuxKart 0.7.1b (21. April 2011)
@@ -762,35 +841,43 @@ For similar reasons, and because some features are vastly more complex than othe
 
 
 ## SuperTuxKart 0.7.1 (15. April 2011)
-* Particle  (smoke, splash, fire) and weather effects
+* Particle (smoke, splash, fire) and weather effects
 * Added internet news
-* Support for live language switch
-* Added optional minimal race UI
 * Temporary invincibility after being hit
 * Added support for full-screen anti-aliasing
-* Clearer multiplayer setup
-* Renamed many tracks to nicer names
 * Basic level-of-detail (LOD) support
 * Debug features for track makers
 * Update to bullet 2.77
 * Replace more sounds to be DFSG-compliant
+
+
+* Various other tweaks done and glitches fixed
+
+### User Interface
+* Added an optional minimal race UI
+* Support for live language switch
 * Fixed character names that contain non-ASCII characters
 * Full RTL (right to left) support
-* Various other tweaks done and glitches fixed
+* Clearer multiplayer setup
 
 ### Tracks and modeling
 #### Karts
-* New Beagle kart by wolterh
+* Beagle, by wolterh
+* Emule, by Kinsu
 #### Tracks
-* New Fort Magma by samuncle
-* New Shiny Suburbs by Horace
+* New Fort Magma, by Samuncle
+* Shiny Suburbs, by Horace (based on Thomas Oppl's City track)
+* New names for several tracks, using nicer names:
+  * Bovine Barnyard (previously Farm), Northern Resort (previously Snow Mountain), Coyote Canyon (previously Canyon)
 
 
 ## SuperTuxKart 0.7 (December 2010)
-Too many to list them all. Main points:
+Too many to list them all. (2026 maintainer's note : ?!?)
+
+Main points:
 
 * Irrlicht:
-  - Ported from plib to irrlicht
+  - Ported from PLIB to Irrlicht
   - Added animations to karts and some tracks
 * GUI
   - Completely new designed GUI
@@ -799,11 +886,19 @@ Too many to list them all. Main points:
   - New item 'switch'
 
 ### Tracks and modeling
+#### Karts
+* Konqi, by Christian Framing
+* New Mozilla
+* Removal of Mr. Iceblock
+* Removal of EvilTux
+
 #### Tracks
-- Farm
-- Hacienda by samuncle (replaces Beach)
-- Scotland by Canis Lupus
-- Secret Garden
+* Farm, by Auria & Ville Seppanen
+* Hacienda, by Samuncle
+* Scotland, by Canis Lupus
+* Secret Garden, by Canis Lupus
+* Removal of On the Beach
+* Removal of Race Track
 
 
 ## SuperTuxKart 0.6.2a (October 2009)
@@ -819,12 +914,13 @@ Too many to list them all. Main points:
 * Bugfix: Items explode over void.
 * Bugfix: Grass in castle arena slowed down the kart.
 * Bugfix: GP result showed kart identifier instead of name.
-* Improvement: there is now 1 1 sec. wait period for the race result screen, avoiding the problem that someone presses space/enter at the end of a race, immediately quitting the menu before it can be read.
+* Improvement: there is now a 1 sec. wait period for the race result screen, avoiding the problem that someone presses space/enter at the end of a race, immediately quitting the menu before it can be read.
 
 ### Tracks and modeling
 #### Karts
-- New Pidgin kart
-- New Nolok kart
+* Adiumy, by Abejones
+* Pidgin, by cheleb
+* New Nolok
 
 
 ## SuperTuxKart 0.6.1a (February 2009)
@@ -843,24 +939,21 @@ Too many to list them all. Main points:
 
 ### Tracks and modeling
 #### Karts
-- New Puffy kart
-#### Tracks
-- New Cave battle map
+* Puffy, by Minibjorn
+#### Arenas
+* Cave
 
 
-## SuperTuxKart 0.6 (January 2009)
-* New improved physics and kart handling
-* Added sharp turns and nitro speed boost (replacing wheelies and jump)
-* Totally rewrote powerups (plunger, bowling ball, cake, bubblegum) and new look for bananas
+## SuperTuxKart 0.6 (22. January 2009)
+* New look for bananas
 * New game mode : 3-Strikes Battle
-* Major improvements to AI
 * Improved user interface
 * Karts now have a visible suspension effect
 * Fully positional audio with OpenAL
 * New music and sound effects (including engine, braking and skidding sounds)
 * Better support for mods and add-ons (kart and track groups)
 * New/updated translations (ga fi de nl sl fr it es ro sv)
-* Allowed 'Grand Prix's of Time Trial, Follow the Leader, or any other mode
+* Allowed 'Grand Prix's of Time Trial, Follow-the-Leader, or any other mode
 * Challenges are now specified and config files, and are thus easy to create by users
 * Improved build system to better detect missing dependencies
 * Improved shortcut-detection
@@ -869,43 +962,59 @@ Too many to list them all. Main points:
   - Fixed 'joystick locks' (kart would turn even if the joystick is in neutral),
     thanks to Samjam for the patch.
     
+### Race gameplay and physics
+* New improved physics and kart handling
+* Added sharp turns
+* Added collectible nitro that gives a speed boost
+* The karts can no longer do wheelies and jumps
+* Totally rewrote powerups (plunger, bowling ball, cake, bubblegum)
+* Major improvements to AI
+    
 ### Tracks and modeling
 #### Karts
+* Elephpant
 * Improved Wilber
-* Eviltux
-* Hexley
-* Some old karts have been removed
+* Improved Hexley
+* Removal of Penny
+* Removal of Skirpy
+* Removal of Yeti
+* New names for some karts: Mozilla (previously Dino), Gooey (previously Sushi)
 #### Tracks
-* Skyline
-* Snow Mountain
-* Race track
-* Old Mine
-* XR591
-* Improved track :
-    * Star track
+* Skyline, by Robert Howie
+* Snow Mountain, by Canis Lupus
+* XR591, by Canis Lupus
+* Race Track, by Thomas Oppl (replaces the previous Race Track with an entirely new track)
+* The Old Mine, by Ivar ten Cate
+* Tux Tollway, by Ivar ten Cate (replaces the previous Tux Tollway with an entirely new track)
+* Improved Star track
+* Removal of City
+* Removal of Sub Sea
+* Removal of Volcano
 
 
 ## SuperTuxKart 0.5 (May 2008)
 * Complete Challenges to unlock game modes, new tracks and a skidding preview
-* New Follow the Leader game mode
+* New Follow-the-Leader game mode
 * New Grand Prix
 * Improved User Interface
 * Improved game pad/joystick handling
 * German, French, Dutch, Spanish, Italian and Swedish translations
 * Additional music
 * Many Bugfixes including:
-	- a memory leak fix (Charlie Head)
-	- an AI crash fix (Chris Morris)
-	
+  - a memory leak fix (Charlie Head)
+  - an AI crash fix (Chris Morris)
+
 ### Tracks and modeling	
 #### Tracks
-* SnowTux Peak
-* Amazonian Journey
-* City
-* Canyon
-* BSODs Battlements renamed to Fort Magma
-* Improved Crescent Crossing, Fort Magma, and Star Track
-
+* Amazonian Journey, by Auria
+* City, by Thomas Oppl
+* Canyon, by Thomas Oppl
+* Improvements to several tracks:
+  * Crescent Crossing (previously named Little Volcano)
+  * SnowTux Peak (previously named Geeko Peak)
+  * Fort Magma (previously named BSODs Battlements)
+  * Star Track
+* Removal of Gown's Bow
 
 ## SuperTuxKart 0.4 (February 2008)
 * New physics handling using the bullet physics engine
@@ -916,10 +1025,11 @@ Too many to list them all. Main points:
 * Additional music and main theme
 ### Tracks and modeling
 #### Karts
-* New kart: Wilber
-	
+* Wilber
+
 #### Tracks
-* Improved 'Shifting Sands' and 'Lighthouse'
+* Shifting Sands
+* Improvements to 'Around the Lighthouse'
 
 
 ## SuperTuxKart 0.3 (May 2007)
@@ -927,7 +1037,6 @@ Too many to list them all. Main points:
 * Shortcut detection 	
 * Improved AI
 * Fullscreen support
-* New track: the island
 * New penalty: bomb
 * MacOSX support
 * OpenAL and ogg-vorbis support
@@ -952,6 +1061,35 @@ Too many to list them all. Main points:
   - Fixed keyboard keys unable to work on the first key press bug
   - And others
 
+### Tracks and modeling
+*As 0.3 is the first release of SuperTuxKart's proper development history that is still easily found, all available tracks and karts are listed here although they are not new to this specific version unless specifically noted.*
+
+#### Karts
+* Dino
+* EvilTux
+* Hexley
+* Mr. Ice Block
+* Nolok
+* Penny
+* Sushi
+* Skirpy
+* Tux
+* Yeti
+
+#### Tracks
+* Around the Lighthouse
+* BSODs Battlements
+* Geeko Peak
+* Gown's Bow
+* Little Volcano
+* Oliver's Math Class
+* On the Beach
+* Race Track
+* Star Track
+* Sub Sea
+* Tux Tollway
+* Volcano
+* The Island (new with 0.3)
 
 ## SuperTuxKart 0.2 (22. Sep 2006)
   * Significant performance improvement by using display lists
@@ -974,7 +1112,7 @@ Too many to list them all. Main points:
 
 ## SuperTuxKart 0.1 (04. May 2006)  (not officially released)
   * Significant speedup by using a new HOT and collision algorithm --> all tracks are now playable
-  * Removed all SDL dependencies, only plib is needed
+  * Removed all SDL dependencies, only PLIB is needed
   * Single and multi-window menu can be used
   * Code structure changes
   * Some bug fixes and small improvements

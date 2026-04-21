@@ -61,7 +61,7 @@ void TracksAndGPScreen::eventCallback(Widget* widget, const std::string& name,
         m_random_track_list.push_back(selection);
 
         TrackInfoScreen::getInstance()->setTrack(track_manager->getTrack(selection));
-        TrackInfoScreen::getInstance()->push();  
+        TrackInfoScreen::getInstance()->push();
     }   // name=="random_track"
 
     // -- track selection screen
@@ -109,7 +109,7 @@ void TracksAndGPScreen::eventCallback(Widget* widget, const std::string& name,
             else // Normal mode
             {
                 TrackInfoScreen::getInstance()->setTrack(track);
-                TrackInfoScreen::getInstance()->push();             
+                TrackInfoScreen::getInstance()->push();
             }
         }   // if clicked_track
 

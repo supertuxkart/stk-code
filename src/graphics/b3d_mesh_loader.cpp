@@ -135,12 +135,12 @@ SP::SPMesh* B3DMeshLoader::toSPM(scene::CSkinnedMesh* mesh)
     SP::SPMesh* spm = new SP::SPMesh();
     core::array<SSkinMeshBuffer*>& all_buf = mesh->getMeshBuffers();
     WeightInfluence wi;
-	for (unsigned b = 0; b < all_buf.size(); b++)
-	{
+    for (unsigned b = 0; b < all_buf.size(); b++)
+    {
         wi.push_back(core::array<core::array<JointInfluence> > ());
         for (unsigned i = 0; i < all_buf[b]->getVertexCount(); i++)
             wi[b].push_back(core::array<JointInfluence>());
-	}
+    }
 
     bool skinned_mesh = !mesh->RootJoints.empty() &&
         mesh->getFrameCount() > 0;

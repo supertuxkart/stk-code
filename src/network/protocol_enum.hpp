@@ -2,7 +2,7 @@
 #define PROTOCOL_ENUM_HPP
 
 /** \enum ProtocolType
- *  \brief The types that protocols can have. This is used to select which 
+ *  \brief The types that protocols can have. This is used to select which
  *   protocol receives which event.
  *  \ingroup network
  */

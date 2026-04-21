@@ -102,13 +102,13 @@ ScreenKeyboard* ScreenKeyboard::m_screen_keyboard = NULL;
 
 // ----------------------------------------------------------------------------
 /** The screen keyboard constructor
- *  \param percent_width A relative value in range of 0.0 to 1.0 that 
+ *  \param percent_width A relative value in range of 0.0 to 1.0 that
  *         determines width of the screen that will be used by the keyboard.
- *  \param percent_height A relative value in range of 0.0 to 1.0 that 
+ *  \param percent_height A relative value in range of 0.0 to 1.0 that
  *         determines height of the screen that will be used by the keyboard.
  *  \param edit_box The edit box that is assigned to the keyboard.
  */
-ScreenKeyboard::ScreenKeyboard(float percent_width, float percent_height, 
+ScreenKeyboard::ScreenKeyboard(float percent_width, float percent_height,
                                CGUIEditBox* edit_box)
 {
     if (m_screen_keyboard != NULL)
@@ -227,7 +227,7 @@ void ScreenKeyboard::initButtons()
             total_width -= total_padding;
 
         char tmp[100];
-        sprintf(tmp, "%i", pos_y + (height + margin) * i);
+        snprintf(tmp, 100, "%i", pos_y + (height + margin) * i);
         std::string pos_y_str = tmp;
         
         int total_proportions = 0;
@@ -253,17 +253,17 @@ void ScreenKeyboard::initButtons()
                 m_buttons.push_back(button);
             }
 
-            float width = (float)total_width * layout_proportions[i][j] 
+            float width = (float)total_width * layout_proportions[i][j]
                                              / total_proportions - margin;
             
             char width_str[100];
-            sprintf(width_str, "%i", (int)roundf(width / (SkinConfig::getHorizontalInnerPadding(button->getType(), button)+1.0f)));
+            snprintf(width_str, 100, "%i", (int)roundf(width / (SkinConfig::getHorizontalInnerPadding(button->getType(), button)+1.0f)));
 
             char height_str[100];
-            sprintf(height_str, "%i", (int)roundf(height / (SkinConfig::getVerticalInnerPadding(button->getType(), button)+1.0f)));
+            snprintf(height_str, 100, "%i", (int)roundf(height / (SkinConfig::getVerticalInnerPadding(button->getType(), button)+1.0f)));
             
             char tmp[100];
-            sprintf(tmp, "%i", (int)roundf(pos_x));
+            snprintf(tmp, 100, "%i", (int)roundf(pos_x));
             std::string pos_x_str = tmp;
             
             button->setParent(m_irrlicht_window);
@@ -389,7 +389,7 @@ void ScreenKeyboard::onUpdate(float dt)
         m_repeat_time += (unsigned int)(dt * 1000);
     }
     
-    if (!m_back_button->isPressed())  
+    if (!m_back_button->isPressed())
     {
         m_back_button_pressed = false;
         m_repeat_time = 0;

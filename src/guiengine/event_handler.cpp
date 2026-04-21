@@ -202,7 +202,7 @@ bool EventHandler::OnEvent (const SEvent &event)
         {
             Log::verbose("keyboard", "char %d key %d ctrl %d down %d shift %d",
                 event.KeyInput.Char, event.KeyInput.Key,
-                event.KeyInput.Control, event.KeyInput.PressedDown, 
+                event.KeyInput.Control, event.KeyInput.PressedDown,
                 event.KeyInput.Shift);
         }
         // FIXME? it may be a bit unclean that all input events go trough
@@ -553,7 +553,7 @@ int EventHandler::findIDClosestWidget(const NavigationDirection nav, const int p
     int smallest_wrapping_distance = BIG_DISTANCE;
 
     // In theory, it's better to look recursively in m_widgets
-    // In practice, this is much much simpler and work equally well
+    // In practice, this is much much simpler and works equally well
     // Usual widget IDs begin at 100 and there is rarely more
     // than a few dozen of them - but it's very cheap to have some margin,
     for (int i=0;i<1000;i++)
@@ -870,7 +870,7 @@ EventPropagation EventHandler::onGUIEvent(const SEvent& event)
                 if (ScreenKeyboard::isActive())
                 {
                     // check for parents too before discarding event
-                    if (!ScreenKeyboard::getCurrent()->isMyChild(w) && 
+                    if (!ScreenKeyboard::getCurrent()->isMyChild(w) &&
                         w->m_event_handler != NULL)
                     {
                         if (!ScreenKeyboard::getCurrent()->isMyChild(w->m_event_handler))
@@ -882,7 +882,7 @@ EventPropagation EventHandler::onGUIEvent(const SEvent& event)
                 else if (ModalDialog::isADialogActive())
                 {
                     // check for parents too before discarding event
-                    if (!ModalDialog::getCurrent()->isMyChild(w) && 
+                    if (!ModalDialog::getCurrent()->isMyChild(w) &&
                         w->m_event_handler != NULL)
                     {
                         if (!ModalDialog::getCurrent()->isMyChild(w->m_event_handler))
@@ -976,7 +976,7 @@ EventPropagation EventHandler::onGUIEvent(const SEvent& event)
             {
                 // currently, enter pressed in text ctrl events can only happen in dialogs.
                 // FIXME : find a cleaner way to route the event to its proper location
-                if (!ScreenKeyboard::isActive() && ModalDialog::isADialogActive()) 
+                if (!ScreenKeyboard::isActive() && ModalDialog::isADialogActive())
                     ModalDialog::onEnterPressed();
                 break;
             }

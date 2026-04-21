@@ -582,6 +582,7 @@ bool CGUIEditBox::processKey(const SEvent& event)
                     new_mark_end = 0;
                     text_changed = true;
                 }
+                SDL_free(clipboard_u8);
             }
             break;
         case IRR_KEY_HOME:

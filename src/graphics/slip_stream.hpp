@@ -107,7 +107,7 @@ private:
     /** This is the inner slipstream area if the kart is at 0,0,0 without rotation. */
     Quad         *m_slipstream_inner_quad;
 
-    /** This is the outer slipstream area if the kart is at 0,0,0 without rotation. 
+    /** This is the outer slipstream area if the kart is at 0,0,0 without rotation.
         No slipstream time is accumulated there, but it's lost slower*/
     Quad         *m_slipstream_outer_quad;
 

@@ -52,7 +52,7 @@ RaceEventManager::~RaceEventManager()
 
 // ----------------------------------------------------------------------------
 /** In network games this update function is called instead of
- *  World::updateWorld(). 
+ *  World::updateWorld().
  *  \param ticks Number of physics time steps - should be 1.
  *  \param fast_forward If true, then only rewinders in network will be
  *  updated, but not the physics.

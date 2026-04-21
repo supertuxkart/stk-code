@@ -140,7 +140,7 @@ void LobbyProtocol::configRemoteKart(
 
         // Adjust the local player id so that local players have the numbers
         // 0 to num-1; and all other karts start with num. This way the local
-        // players get the first ActivePlayers assigned (which have the 
+        // players get the first ActivePlayers assigned (which have the
         // corresponding device associated with it).
         RemoteKartInfo rki(local_player_id,
                            profile->getKartName(),

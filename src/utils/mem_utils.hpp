@@ -22,22 +22,22 @@ namespace MemUtils {
     template<typename callback>
     class deref {
         callback cb;
-	bool chg;
+    bool chg;
     public:
-	deref(callback _c) : cb(std::move(_c)), chg(true) {}
-	deref(const deref &) = delete;
-	deref& operator=(const deref &) = delete;
-	deref(deref &&other) : 
+    deref(callback _c) : cb(std::move(_c)), chg(true) {}
+    deref(const deref &) = delete;
+    deref& operator=(const deref &) = delete;
+    deref(deref &&other) :
             cb(other.cb),
-	    chg(other.chg)
-	{
+        chg(other.chg)
+    {
             other.chg = false;
-	}
-	~deref()
-	{
+    }
+    ~deref()
+    {
             if (chg)
                cb();
-	}
+    }
     };
 }
 

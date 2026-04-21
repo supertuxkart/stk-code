@@ -76,6 +76,14 @@ void TipsManager::addTipSet(const XMLNode *input)
             continue; // ignore incorrect node
 
         std::string text;
+        // Special case managed in code to avoid embedding an URL in the translatable string
+        if(node->get("type", &text) && text == "website_info")
+        {
+            m_all_tip_sets[id].push_back(
+                _("You can visit %s for more information about the game.", "https://supertuxkart.net/"));
+            continue;
+        }
+
         if(!node->get("text", &text))
             continue; // missing text, ignore node
 

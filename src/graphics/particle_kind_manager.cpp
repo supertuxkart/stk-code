@@ -73,6 +73,15 @@ void ParticleKindManager::cleanUpTrackSpecificGfx()
 }
 
 // ----------------------------------------------------------------------------
+void ParticleKindManager::preloadExplosions()
+{
+    getParticles("explosion.xml");
+    getParticles("explosion_bomb.xml");
+    getParticles("explosion_cake.xml");
+    getParticles("jump_explosion.xml");
+}   // preloadExplosions
+
+// ----------------------------------------------------------------------------
 
 ParticleKind* ParticleKindManager::getParticles(const std::string &name)
 {

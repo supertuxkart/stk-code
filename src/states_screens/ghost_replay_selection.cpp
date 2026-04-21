@@ -554,7 +554,7 @@ void GhostReplaySelection::onColumnClicked(int column_id, bool sort_desc, bool s
         ReplayPlay::setSortOrder(ReplayPlay::SO_USER);
     else if (column_id == 7)
         ReplayPlay::setSortOrder(ReplayPlay::SO_KART_NUM);
-    else if (column_id == 8)    
+    else if (column_id == 8)
         ReplayPlay::setSortOrder(ReplayPlay::SO_VERSION);
     else
         assert(0);

@@ -727,8 +727,8 @@ void TrackInfoScreen::eventCallback(Widget* widget, const std::string& name,
     else if (name=="ai-spinner")
     {
         if (m_is_soccer) // Soccer mode
-        {            
-            soccerSpinnerUpdate(false /* blue spinner */);            
+        {
+            soccerSpinnerUpdate(false /* blue spinner */);
         }
         else // Other modes
         {
@@ -740,7 +740,7 @@ void TrackInfoScreen::eventCallback(Widget* widget, const std::string& name,
     }
     else if (name == "ai-blue-spinner" && m_is_soccer)
     {
-        soccerSpinnerUpdate(true /* blue spinner */);  
+        soccerSpinnerUpdate(true /* blue spinner */);
     }
 }   // eventCallback
 

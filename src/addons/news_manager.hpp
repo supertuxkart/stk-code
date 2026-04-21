@@ -68,7 +68,7 @@ private:
         bool          m_important;
 
     public:
-        NewsMessage(const core::stringw &m, int id, const std::string &date="", 
+        NewsMessage(const core::stringw &m, int id, const std::string &date="",
                     const std::string &link="", bool important=false)
         {
             m_news          = m;

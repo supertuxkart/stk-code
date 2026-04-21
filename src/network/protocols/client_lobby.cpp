@@ -46,6 +46,7 @@
 #include "network/network_player_profile.hpp"
 #include "network/network_timer_synchronizer.hpp"
 #include "network/peer_vote.hpp"
+#include "network/protocols/chat_commands.hpp"
 #include "network/protocols/connect_to_server.hpp"
 #include "network/protocols/game_protocol.hpp"
 #include "network/protocols/game_events_protocol.hpp"
@@ -99,7 +100,7 @@ void ClientLobby::destroyBackgroundDownload()
 }
 
 // ============================================================================
-/** The protocol that manages starting a race with the server. It uses a 
+/** The protocol that manages starting a race with the server. It uses a
  *  finite state machine:
 \dot
 digraph interaction {
@@ -204,6 +205,7 @@ bool ClientLobby::notifyEvent(Event* event)
         case LE_BACK_LOBBY:            backToLobby(event);         break;
         case LE_UPDATE_PLAYER_LIST:    updatePlayerList(event);    break;
         case LE_CHAT:                  handleChat(event);          break;
+        case LE_COMMAND_ANSWER:        handleChat(event, true);    break;
         case LE_CONNECTION_ACCEPTED:   connectionAccepted(event);  break;
         case LE_SERVER_INFO:           handleServerInfo(event);    break;
         case LE_PLAYER_DISCONNECTED :  disconnectedPlayer(event);  break;
@@ -239,7 +241,7 @@ bool ClientLobby::notifyEventAsynchronous(Event* event)
             default:                                                     break;
         }   // switch
     } // message
-    else if (event->getType() == EVENT_TYPE_DISCONNECTED) 
+    else if (event->getType() == EVENT_TYPE_DISCONNECTED)
     {
         // This means we left essentially.
         // We can't delete STKHost from this thread, since the main
@@ -617,7 +619,7 @@ void ClientLobby::receivePlayerVote(Event* event)
  *  \param event : Event providing the information.
  *
  *  Format of the data :
- *  Byte 0 
+ *  Byte 0
  *       --------------
  *  Size |    1       |
  *  Data | player id *|
@@ -934,13 +936,26 @@ void ClientLobby::becomingServerOwner()
 }   // becomingServerOwner
 
 //-----------------------------------------------------------------------------
-void ClientLobby::handleChat(Event* event)
+void ClientLobby::handleChat(Event* event, bool command_answer)
 {
     if (!UserConfigParams::m_lobby_chat)
         return;
     SFXManager::get()->quickSound("plopp");
     core::stringw message;
-    event->data().decodeString16(&message);
+
+    if (command_answer)
+    {
+        ChatCommands::CommandAnswers command_id =
+            (ChatCommands::CommandAnswers)event->data().getUInt16();
+        event->data().decodeString16(&message);
+        std::string args = StringUtils::wideToUtf8(message);
+        message = ChatCommands::getAnswerString(command_id, args);
+    }
+    else
+    {
+        event->data().decodeString16(&message);
+    }
+
     Log::info("ClientLobby", "%s", StringUtils::wideToUtf8(message).c_str());
     if (GUIEngine::isNoGraphics())
         return;
@@ -958,7 +973,7 @@ void ClientLobby::handleChat(Event* event)
  *  \param event : Event providing the information.
  *
  *  Format of the data :
- *  Byte 0 
+ *  Byte 0
  *       ----------------
  *  Size |      1       |
  *  Data | refusal code |

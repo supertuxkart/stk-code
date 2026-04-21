@@ -372,7 +372,7 @@ double Ranking::computeH2HResult(double player1_time, double player2_time)
  *     strong players would go.
  *  For the purposes of this rating computation, we assume that the informational value
  *  of a race is roughly proportional to the likelihood of the weaker player winning.
- * 
+ *
  *  A downside of this method is that a legitimate loss to a much lower rated player won't
  *  change the rating much, but these are rare enough that it's better to miss them than
  *  to reward "farming" and to incorrectly reward wins due to external factors.

@@ -14,14 +14,14 @@
 //
 //  You should have received a copy of the GNU General Public License
 //  along with this program; if not, write to the Free Software
-//  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA. 
+//  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #ifndef __HEADER_TUTORIAL_UTILS_HPP__
 #define __HEADER_TUTORIAL_UTILS_HPP__
 
 namespace TutorialUtils
 {
-	void startTutorial(bool from_overworld = false);
+    void startTutorial(bool from_overworld = false);
 }
 
 #endif

@@ -46,20 +46,26 @@ namespace OptionsCommon
         	StateManager::get()->replaceTopMostScreen(screen);
 	} // switchTab
 
-	// In the in-game pause options, disable the players and language tabs
-	void setTabStatus()
-	{
-		if (StateManager::get()->getGameState() == GUIEngine::INGAME_MENU)
-		{
-	    	GUIEngine::getWidget("tab_players")->setActive(false);
-	    	GUIEngine::getWidget("tab_language")->setActive(false);			
-		}
-		else
-		{
-			GUIEngine::getWidget("tab_players")->setActive(true);
-	    	GUIEngine::getWidget("tab_language")->setActive(true);
-	    }
-	} // setTabStatus
+    void updatePauseTooltip(GUIEngine::Widget* widget, bool is_pause)
+    {
+        if (is_pause)
+            // TODO : display a different message in non-racing modes ??
+            widget->setTooltip(_("This option cannot be changed during a race."));
+        else
+            widget->unsetTooltip();
+    } // updatePauseTooltip
+
+    void setTabStatus()
+    {
+        GUIEngine::Widget* players  = GUIEngine::getWidget("tab_players");
+        GUIEngine::Widget* language = GUIEngine::getWidget("tab_language");
+        bool is_pause = StateManager::get()->getGameState() == GUIEngine::INGAME_MENU;
+
+        players->setActive(!is_pause);
+        language->setActive(!is_pause);
+        updatePauseTooltip(players, is_pause);
+        updatePauseTooltip(language, is_pause);
+    } // setTabStatus
 }
 
 #endif // ifndef SERVER_ONLY

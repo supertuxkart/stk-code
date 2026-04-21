@@ -55,6 +55,7 @@ std::vector<std::string> KartPropertiesManager::m_kart_search_path;
 KartPropertiesManager::KartPropertiesManager()
 {
     m_current_favorite_status = NULL;
+    m_hat_name = "";
     m_all_groups.clear();
 }   // KartPropertiesManager
 
@@ -139,7 +140,7 @@ void KartPropertiesManager::removeKart(const std::string &ident)
             {
                 m_groups_2_indices_no_custom.erase(groups[i]);
             }
-        } 
+        }
 
         it = std::find(m_groups_2_indices[groups[i]].begin(),
                        m_groups_2_indices[groups[i]].end(),   index);
@@ -343,9 +344,21 @@ bool KartPropertiesManager::loadKart(const std::string &dir)
   */
 void KartPropertiesManager::setHatMeshName(const std::string &hat_name)
 {
+    m_hat_name = hat_name;
+    setHatMeshName();
+}   // setHatMeshName
+
+//-----------------------------------------------------------------------------
+/** Sets the name of a mesh to use as a hat for all karts, using the stored m_hat_name
+  */
+void KartPropertiesManager::setHatMeshName()
+{
+    if (m_hat_name.empty())
+        return;
+
     for (unsigned int i=0; i<m_karts_properties.size(); i++)
     {
-        m_karts_properties[i].setHatMeshName(hat_name);
+        m_karts_properties[i].setHatMeshName(m_hat_name);
     }
 }   // setHatMeshName
 

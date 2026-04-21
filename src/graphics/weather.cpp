@@ -103,8 +103,8 @@ void Weather::playSound()
 
 irr::core::vector3df Weather::getIntensity()
 {
-    irr::core::vector3df value = {0.7f * m_lightning, 
-                                  0.7f * m_lightning, 
+    irr::core::vector3df value = {0.7f * m_lightning,
+                                  0.7f * m_lightning,
                                   0.7f * std::min(1.0f, m_lightning * 1.5f)};
                                  
     return value;
