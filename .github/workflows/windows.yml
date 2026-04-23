@@ -20,7 +20,7 @@ jobs:
             os: windows-2022
     runs-on: ${{ matrix.os }}
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v6
         with:
           fetch-depth: 0
           submodules: false
@@ -59,7 +59,7 @@ jobs:
             echo "cache_$number=windows-${{ github.ref }}-${{ matrix.arch }}-${{ matrix.os }}-$id" >> $GITHUB_ENV
           done
       - name: Handle build cache
-        uses: actions/cache@v3
+        uses: actions/cache@v5
         with:
           path: |
             build
@@ -161,21 +161,21 @@ jobs:
           mv COPYING tools
       - name: Upload binaries of MinGW
         if: ${{ matrix.os == 'ubuntu-latest' }}
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: ${{ matrix.arch }}
           path: build/bin/*
       - name: Upload stk-code/data
         # We only need to upload stk-code/data once
         if: ${{ matrix.os == 'ubuntu-latest' && matrix.arch == 'i686'}}
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: data
           path: data
       - name: Upload stk-code/tools
         # We only need to upload stk-code/tools once
         if: ${{ matrix.os == 'ubuntu-latest' && matrix.arch == 'i686'}}
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: tools
           path: tools
@@ -225,7 +225,7 @@ jobs:
           echo "${{ env.release_name }}"
           echo "${{ env.release_pre }}"
       - name: Download MinGW binaries and data
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v8
       - name: Generate .pdb files
         if: ${{ env.release_tag != '' }}
         run: |
@@ -300,7 +300,7 @@ jobs:
           & "C:\Program Files (x86)\NSIS\makensis.exe" x86_64.nsi
           & "C:\Program Files (x86)\NSIS\makensis.exe" aarch64.nsi
       - name: Create release
-        uses: ncipollo/release-action@v1.8.8
+        uses: ncipollo/release-action@v1
         if: ${{ env.release_tag != '' }}
         with:
           token: ${{ secrets.GITHUB_TOKEN }}

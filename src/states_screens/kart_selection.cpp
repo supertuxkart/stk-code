@@ -1239,6 +1239,11 @@ void KartSelectionScreen::allPlayersDone()
     {
         std::string selected_kart = m_kart_widgets[n].m_kart_internal_name;
 
+        if (n == PLAYER_ID_GAME_MASTER)
+        {
+            UserConfigParams::m_default_kart = selected_kart;
+        }
+
         if (selected_kart == RANDOM_KART_ID)
         {
             // don't select an already selected kart
@@ -1275,11 +1280,6 @@ void KartSelectionScreen::allPlayersDone()
                     break;
                 }
             }
-        }
-        
-        if (n == PLAYER_ID_GAME_MASTER)
-        {
-            UserConfigParams::m_default_kart = selected_kart;
         }
 
         RaceManager::get()->setPlayerKart(n, selected_kart);

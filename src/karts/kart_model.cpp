@@ -128,6 +128,7 @@ KartModel::KartModel(bool is_master)
     m_is_master  = is_master;
     m_kart       = NULL;
     m_mesh       = NULL;
+    m_hat_mesh   = NULL;
     m_hat_location = NULL;
 
     for(unsigned int i=0; i<4; i++)
@@ -257,6 +258,15 @@ void KartModel::loadInfo(const XMLNode &node)
  */
 KartModel::~KartModel()
 {
+    // We clean up the entry from irrlicht's mesh cache.
+    // There are 2 references when only one hat mesh associated with
+    // a kart remains, it will be cleaned up and should not be dropped here.
+    if (m_hat_mesh && m_hat_mesh->getReferenceCount() == 2)
+    {
+        irr_driver->dropAllTextures(m_hat_mesh);
+        irr_driver->removeMeshFromCache(m_hat_mesh);
+    }
+
     if (m_animated_node)
     {
         m_animated_node->setAnimationEndCallback(NULL);
@@ -527,6 +537,7 @@ scene::ISceneNode* KartModel::attachModel(bool animated_models, bool human_playe
         irr_driver->getVideoDriver()->getDriverType() == video::EDT_VULKAN;
 #endif
 
+    // Attach the headlights
     for (unsigned int i = 0; i < m_headlight_objects.size(); i++)
     {
         Track* track = Track::getCurrentTrack();
@@ -561,16 +572,18 @@ scene::ISceneNode* KartModel::attachModel(bool animated_models, bool human_playe
         }
     }
 
+    // Attach the hat
     if (m_hat_location && !m_hat_name.empty())
     {
         file_manager->pushTextureSearchPath
             (file_manager->getAsset(FileManager::MODEL,""), "models");
+        scene::IAnimatedMesh* hat_mesh = irr_driver->getAnimatedMesh
+            (file_manager->getAsset(FileManager::MODEL, m_hat_name));
+        m_hat_mesh = hat_mesh;
         const bool bone_attachment = m_animated_node && !m_hat_bone.empty();
         scene::ISceneNode* parent = bone_attachment ?
             m_animated_node->getJointNode(m_hat_bone.c_str()) : node;
-        scene::IMesh* hat_mesh = irr_driver->getAnimatedMesh
-            (file_manager->getAsset(FileManager::MODEL, m_hat_name));
-        scene::ISceneNode* node = irr_driver->addMesh(hat_mesh, "hat", parent,
+        scene::ISceneNode* node = irr_driver->addMesh(m_hat_mesh, "hat", parent,
             getRenderInfo());
         configNode(node, *m_hat_location, bone_attachment ?
                 getInverseBoneMatrix(m_hat_bone) : core::matrix4());
