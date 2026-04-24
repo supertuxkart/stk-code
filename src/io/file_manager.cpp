@@ -858,6 +858,30 @@ std::string FileManager::getStdoutDir() const
 }   // getStdoutDir
 
 //-----------------------------------------------------------------------------
+/** Obfuscates system username for common paths.
+ */
+std::string FileManager::obfuscateUsername(const std::string &path)
+{
+    std::string obfuscated_path(path), asterisks("***");
+    if (obfuscated_path.size() > 6 && obfuscated_path.substr(0, 6) == "/home/") { // Linux usual Home Dir.
+        size_t next_delimiter_pos(obfuscated_path.find('/', 6));
+        if (next_delimiter_pos != std::string::npos)
+            obfuscated_path.replace(0, next_delimiter_pos, "~");
+    }
+    else if (obfuscated_path.size() > 9 && obfuscated_path.substr(0, 9) == "C:\\Users\\") { // Windows usual User Dir.
+        size_t next_delimiter_pos(obfuscated_path.find('\\', 9));
+        if (next_delimiter_pos != std::string::npos)
+            obfuscated_path.replace(9, next_delimiter_pos - 9, asterisks);
+    }
+    else if (obfuscated_path.size() > 7 && obfuscated_path.substr(0, 7) == "/Users/") { // Mac usual User Dir.
+        size_t next_delimiter_pos(obfuscated_path.find('/', 7));
+        if (next_delimiter_pos != std::string::npos)
+            obfuscated_path.replace(0, next_delimiter_pos, "~");
+    }
+    return obfuscated_path;
+}   // obfuscateUsername
+
+//-----------------------------------------------------------------------------
 /** Returns the full path of a texture file name by searching in all
  *  directories currently in the texture search path. The difference to
  *  a call getAsset(TEXTURE,...) is that the latter will only return
