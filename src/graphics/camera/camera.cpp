@@ -312,3 +312,38 @@ void Camera::activate(bool alsoActivateInIrrlicht)
     }
 }   // activate
 
+/**
+ * Camera Lerp FOV Helper for boost
+ * use setFOV().
+ */
+void Camera::updateDynamicFoV(float dt, float speed_ratio, bool boost_active)
+{
+    
+    const float max_fov_increase = 8.0f; 
+
+    const float speed_threshold = 0.7f;
+
+    const float threshold_range = 0.3f;
+
+    const float lerp_speed = 4.0f;
+
+    // Factors
+    float speed_factor = 0.0f;
+    
+    if(speed_ratio > speed_threshold) {
+        speed_factor =
+        (speed_ratio - speed_threshold) / threshold_range;
+    }
+
+    float total_factor = speed_factor * (boost_active ? 1.3f : 1.0f);
+    total_factor = std::min(total_factor, 1.5f);
+
+    float fov_increase = total_factor * DEGREE_TO_RAD * max_fov_increase;
+    m_target_fov = m_fov + fov_increase;
+
+    float lerp_factor = 1.0f - expf(-lerp_speed * dt);
+
+    m_current_fov = m_current_fov + (m_target_fov - m_current_fov) * lerp_factor;
+
+    m_camera->setFOV(m_current_fov);
+}

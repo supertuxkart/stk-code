@@ -19,6 +19,7 @@
 #include "karts/max_speed.hpp"
 
 #include "config/stk_config.hpp"
+#include "karts/boost_observer.hpp"
 #include "karts/kart.hpp"
 #include "karts/kart_properties.hpp"
 #include "network/network_string.hpp"
@@ -27,6 +28,9 @@
 #include <algorithm>
 #include <assert.h>
 #include <cstdlib>
+
+// Static observer registry
+std::vector<IBoostObserver*> MaxSpeed::s_boost_observers;
 
 /** This class handles maximum speed for karts. Several factors can influence
  *  the maximum speed a kart can drive, some will decrease the maximum speed,
@@ -57,6 +61,10 @@ MaxSpeed::MaxSpeed(Kart *kart)
     // This can be used if command line option -N is used
     m_current_max_speed = 0;
     m_last_triggered_skid_level = 0;
+
+    // Initialize boost activation tracking for edge detection
+    for (unsigned int i = 0; i < MS_INCREASE_MAX; i++)
+        m_prev_active[i] = false;
 }   // MaxSpeed
 
 // ----------------------------------------------------------------------------
@@ -84,8 +92,62 @@ void MaxSpeed::reset(bool leave_squash)
     {
         SpeedIncrease si;
         m_speed_increase[i] = si;
+        m_prev_active[i] = false;  // Reset activation tracking
     }
 }   // reset
+
+// ============================================================================
+// Boost Observer Pattern Implementation
+// ============================================================================
+
+// ----------------------------------------------------------------------------
+/** Register an observer to receive boost activation events from all karts. */
+void MaxSpeed::addBoostObserver(IBoostObserver* observer)
+{
+    if (observer == nullptr) return;
+    // Avoid duplicate registration
+    for (auto* obs : s_boost_observers)
+    {
+        if (obs == observer) return;
+    }
+    s_boost_observers.push_back(observer);
+}   // addBoostObserver
+
+// ----------------------------------------------------------------------------
+/** Unregister an observer. Call this before destroying the observer. */
+void MaxSpeed::removeBoostObserver(IBoostObserver* observer)
+{
+    auto it = std::find(s_boost_observers.begin(), s_boost_observers.end(), observer);
+    if (it != s_boost_observers.end())
+    {
+        s_boost_observers.erase(it);
+    }
+}   // removeBoostObserver
+
+// ----------------------------------------------------------------------------
+/** Clear all observers. Called during cleanup. */
+void MaxSpeed::clearBoostObservers()
+{
+    s_boost_observers.clear();
+}   // clearBoostObservers
+
+// ----------------------------------------------------------------------------
+/** Notifies all registered observers of a boost activation.
+ *  Called on rising edge (inactive -> active) only.
+ *  \param category The boost category (MS_INCREASE_*)
+ *  \param add_speed The speed increase value
+ *  \param duration How long the boost lasts in ticks
+ */
+void MaxSpeed::notifyBoostActivation(unsigned int category, float add_speed, int duration)
+{
+    for (auto* observer : s_boost_observers)
+    {
+        if (observer != nullptr)
+        {
+            observer->onBoostActivated(m_kart, category, add_speed, duration);
+        }
+    }
+}   // notifyBoostActivation
 
 // ----------------------------------------------------------------------------
 /** Sets an increased maximum speed for a category.
@@ -109,6 +171,11 @@ void MaxSpeed::increaseMaxSpeed(unsigned int category, float add_speed,
             add_speed, engine_force);
         return;
     }
+
+    // Check if this is a NEW activation (rising edge detection)
+    // A boost is considered "new" if it wasn't previously tracked as active
+    bool was_active = m_prev_active[category];
+    bool is_activation = !was_active && add_speed > 0.0f;
 
     if (category == MS_INCREASE_SKIDDING)
         m_last_triggered_skid_level = 1;
@@ -158,6 +225,14 @@ void MaxSpeed::increaseMaxSpeed(unsigned int category, float add_speed,
     m_speed_increase[category].m_fade_out_time   = fade;
     m_speed_increase[category].m_current_speedup = add_speed;
     m_speed_increase[category].m_engine_force = (uint16_t)engine_force_i;
+
+    // Update activation tracking and notify observers on rising edge
+    m_prev_active[category] = (add_speed > 0.0f);
+
+    if (is_activation)
+    {
+        notifyBoostActivation(category, add_speed, duration);
+    }
 }   // increaseMaxSpeed
 
 // ----------------------------------------------------------------------------
@@ -447,6 +522,13 @@ void MaxSpeed::update(int ticks)
         speedup.update(ticks);
         m_current_max_speed += speedup.getSpeedIncrease();
         m_add_engine_force  += speedup.getEngineForce();
+
+        // Reset activation tracking when boost naturally expires
+        // This allows the next activation to be detected as a rising edge
+        if (m_prev_active[i] && !speedup.isActive())
+        {
+            m_prev_active[i] = false;
+        }
     }
 
     // Pick the highest applicable speed boost and the highest applicable engine boost, 

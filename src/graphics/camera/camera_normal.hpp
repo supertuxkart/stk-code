@@ -22,6 +22,7 @@
 #define HEADER_CAMERA_NORMAL_HPP
 
 #include "graphics/camera/camera.hpp"
+#include "karts/boost_observer.hpp"
 
 #include "utils/cpp2011.hpp"
 
@@ -29,8 +30,22 @@
   * \brief Handles the normal racing camera
   * \ingroup graphics
   */
-class CameraNormal : public Camera
+class CameraNormal : public Camera, public IBoostObserver
 {
+
+private:
+    // ========================================================================
+    // Speed lines effect (timer-based, triggered by onBoostActivated)
+    // ========================================================================
+
+    /** Current effect intensity (decays over time). */
+    float m_speed_lines_intensity = 0.0f;
+
+    /** Boost-specific intensity for color shifting. */
+    float m_speed_lines_boost_intensity = 0.0f;
+
+    /** Remaining effect duration. */
+    float m_speed_lines_timer = 0.0f;
 
 private:
 
@@ -82,7 +97,7 @@ private:
     friend class CameraEnd;
              CameraNormal(Camera::CameraType type, int camera_index,
                           Kart* kart);
-    virtual ~CameraNormal() {}
+    virtual ~CameraNormal();
 public:
 
     void restart();
@@ -92,6 +107,10 @@ public:
     bool isFPS() { return false; }
     // ------------------------------------------------------------------------
     virtual void update(float dt) OVERRIDE;
+    // ------------------------------------------------------------------------
+    /** IBoostObserver interface: called when any kart activates a boost. */
+    virtual void onBoostActivated(Kart* kart, unsigned int category,
+                                  float add_speed, int duration_ticks) OVERRIDE;
     // ------------------------------------------------------------------------
     /** Sets the ambient light for this camera. */
     void setAmbientLight(const video::SColor &color) { m_ambient_light=color; }
