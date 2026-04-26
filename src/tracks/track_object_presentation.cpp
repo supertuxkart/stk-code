@@ -465,7 +465,8 @@ TrackObjectPresentationMesh::TrackObjectPresentationMesh(
 
 // ----------------------------------------------------------------------------
 TrackObjectPresentationMesh::TrackObjectPresentationMesh(
-                                                 const std::string& model_file,
+                                                 scene::ISceneNode* parent,
+                                                 const std::string& model_path,
                                                  const core::vector3df& xyz,
                                                  const core::vector3df& hpr,
                                                  const core::vector3df& scale)
@@ -476,32 +477,28 @@ TrackObjectPresentationMesh::TrackObjectPresentationMesh(
     m_node         = NULL;
     m_is_in_skybox = false;
     m_render_info  = NULL;
+    m_model_file = model_path;
 
-    m_model_file = model_file;
-    file_manager->pushTextureSearchPath(StringUtils::getPath(model_file), "");
+    file_manager->pushTextureSearchPath(StringUtils::getPath(model_path), "");
 #ifndef SERVER_ONLY
     bool animated  = (UserConfigParams::m_particles_effects > 1 ||
                       World::getWorld()->getIdent() == IDENT_CUTSCENE);
-    if (file_manager->fileExists(model_file))
+    if (file_manager->fileExists(model_path))
     {
         if (animated)
-        {
-            m_mesh = irr_driver->getAnimatedMesh(model_file);
-        }
+            m_mesh = irr_driver->getAnimatedMesh(model_path);
         else
-        {
-            m_mesh = irr_driver->getMesh(model_file);
-        }
+            m_mesh = irr_driver->getMesh(model_path);
     }
 #endif
 
     if (!m_mesh)
     {
-        throw std::runtime_error("Model '" + model_file + "' cannot be found");
+        throw std::runtime_error("Model '" + model_path + "' cannot be found");
     }
 
     file_manager->popTextureSearchPath();
-    init(NULL, NULL, true);
+    init(NULL, parent, true);
 }   // TrackObjectPresentationMesh
 
 // ----------------------------------------------------------------------------
@@ -535,14 +532,16 @@ void TrackObjectPresentationMesh::init(const XMLNode* xml_node,
         {
             // Animated
             //m_node = irr_driver->getSceneManager()->addEmptySceneNode();
-            m_node = irr_driver->addMesh(m_mesh, m_model_file, parent, m_render_info);
+            m_node = irr_driver->addMesh(m_mesh, m_model_file /* debug name */,
+                parent, m_render_info);
             enabled = false;
             m_force_always_hidden = true;
         }
         else
         {
             // Static
-            m_node = irr_driver->addMesh(m_mesh, m_model_file, parent, m_render_info);
+            m_node = irr_driver->addMesh(m_mesh, m_model_file /* debug name */,
+                parent, m_render_info);
             enabled = false;
             m_force_always_hidden = true;
             Track *track = Track::getCurrentTrack();
@@ -566,7 +565,7 @@ void TrackObjectPresentationMesh::init(const XMLNode* xml_node,
     {
         scene::IAnimatedMeshSceneNode *node =
             irr_driver->addAnimatedMesh((scene::IAnimatedMesh*)m_mesh,
-                                        m_model_file, parent, m_render_info);
+                m_model_file /* debug name */, parent, m_render_info);
         m_node = node;
 
         std::vector<int> frames_start;
@@ -594,7 +593,8 @@ void TrackObjectPresentationMesh::init(const XMLNode* xml_node,
     }
     else
     {
-        m_node = irr_driver->addMesh(m_mesh, m_model_file, parent, m_render_info);
+        m_node = irr_driver->addMesh(m_mesh, m_model_file  /* debug name */,
+            parent, m_render_info);
         Track *track = Track::getCurrentTrack();
         if (track && xml_node)
             track->handleAnimatedTextures(m_node, *xml_node);
@@ -867,8 +867,7 @@ TrackObjectPresentationBillboard::~TrackObjectPresentationBillboard()
 
 // ----------------------------------------------------------------------------
 TrackObjectPresentationParticles::TrackObjectPresentationParticles(
-                                                     const XMLNode& xml_node,
-                                                     scene::ISceneNode* parent)
+                                const XMLNode& xml_node, scene::ISceneNode* parent)
                                 : TrackObjectPresentationSceneNode(xml_node)
 {
     float heading = 0;
@@ -879,19 +878,41 @@ TrackObjectPresentationParticles::TrackObjectPresentationParticles(
         m_init_hpr.Z = 0;
     }
 
+    xml_node.get("kind", &m_kind_path);
+    
+    m_clip_distance = -1;
+    xml_node.get("clip_distance", &m_clip_distance);
+    xml_node.get("conditions",    &m_trigger_condition);
+
+    m_auto_emit = true;
+    xml_node.get("auto_emit", &m_auto_emit);
+
+    init(parent);
+}   // TrackObjectPresentationParticles
+
+// ----------------------------------------------------------------------------
+TrackObjectPresentationParticles::TrackObjectPresentationParticles(scene::ISceneNode* parent,
+                            const std::string& kind_path, int clip_distance,
+                            const std::string& trigger_condition, bool auto_emit,
+                            core::vector3df xyz, core::vector3df hpr, core::vector3df scale)
+                            : TrackObjectPresentationSceneNode(xyz, hpr, scale)
+{
+    // The heading is automatically copied already
+    m_kind_path = kind_path;
+    m_clip_distance = clip_distance;
+    m_trigger_condition = trigger_condition;
+    m_auto_emit = auto_emit;
+
+    init(parent);
+}   // TrackObjectPresentationLight
+
+// ----------------------------------------------------------------------------
+void TrackObjectPresentationParticles::init(scene::ISceneNode* parent)
+{
 #ifndef SERVER_ONLY
     m_emitter = NULL;
 #endif
     m_lod_emitter_node = NULL;
-    std::string path;
-    xml_node.get("kind", &path);
-    
-    int clip_distance = -1;
-    xml_node.get("clip_distance", &clip_distance);
-    xml_node.get("conditions",    &m_trigger_condition);
-
-    bool auto_emit = true;
-    xml_node.get("auto_emit", &auto_emit);
 
     m_delayed_stop = false;
     m_delayed_stop_time = 0.0;
@@ -899,20 +920,20 @@ TrackObjectPresentationParticles::TrackObjectPresentationParticles(
 #ifndef SERVER_ONLY
     try
     {
-        ParticleKind* kind = ParticleKindManager::get()->getParticles(path);
+        ParticleKind* kind = ParticleKindManager::get()->getParticles(m_kind_path);
         if (kind == NULL)
         {
-            throw std::runtime_error(path + " could not be loaded");
+            throw std::runtime_error(m_kind_path + " could not be loaded");
         }
         ParticleEmitter* emitter = new ParticleEmitter(kind, m_init_xyz, parent);
 
 
-        if (clip_distance > 0)
+        if (m_clip_distance > 0)
         {
             scene::ISceneManager* sm = irr_driver->getSceneManager();
             scene::ISceneNode* sroot = sm->getRootSceneNode();
             LODNode* lod = new LODNode("particles", !parent ? sroot : parent, sm);
-            lod->add(clip_distance, (scene::ISceneNode*)emitter->getNode(), true);
+            lod->add(m_clip_distance, (scene::ISceneNode*)emitter->getNode(), true);
             m_node = lod;
             m_lod_emitter_node = lod;
             m_emitter = emitter;
@@ -923,7 +944,7 @@ TrackObjectPresentationParticles::TrackObjectPresentationParticles(
             m_emitter = emitter;
         }
 
-        if (m_trigger_condition.size() > 0 || !auto_emit)
+        if (m_trigger_condition.size() > 0 || !m_auto_emit)
         {
             m_emitter->setCreationRateAbsolute(0.0f);
         }
@@ -931,10 +952,10 @@ TrackObjectPresentationParticles::TrackObjectPresentationParticles(
     catch (std::runtime_error& e)
     {
         Log::warn ("Track", "Could not load particles '%s'; cause :\n    %s",
-                   path.c_str(), e.what());
+                   m_kind_path.c_str(), e.what());
     }
 #endif
-}   // TrackObjectPresentationParticles
+}   // TrackObjectPresentationParticles::init
 
 // ----------------------------------------------------------------------------
 TrackObjectPresentationParticles::~TrackObjectPresentationParticles()
@@ -1020,13 +1041,44 @@ TrackObjectPresentationLight::TrackObjectPresentationLight(
 {
     m_color.set(0);
     xml_node.get("color", &m_color);
-    const video::SColorf colorf(m_color);
 
     m_energy = 1.0f;
     xml_node.get("energy", &m_energy);
 
     m_distance = 20.f * m_energy;
     xml_node.get("distance", &m_distance);
+
+    std::string type = "point";
+    xml_node.get("type", &type);
+    float inner_cone = 0.0f;
+    float outer_cone = 0.0f;
+    xml_node.get("inner-cone", &inner_cone);
+    xml_node.get("outer-cone", &outer_cone);
+    bool is_spot = true;
+    if (type != "spot" || (inner_cone == 0.0f && outer_cone == 0.0f))
+        is_spot = false;
+
+    init(parent, is_spot, inner_cone, outer_cone);
+}   // TrackObjectPresentationLight
+
+// ----------------------------------------------------------------------------
+TrackObjectPresentationLight::TrackObjectPresentationLight(scene::ISceneNode* parent,
+        video::SColor color, float distance, float energy,
+        core::vector3df xyz, core::vector3df hpr, core::vector3df scale)
+        : TrackObjectPresentationSceneNode(xyz, hpr, scale)
+{
+    m_color = color;
+    m_distance = distance;
+    m_energy = energy;
+    // No support for spotlights here
+    init(parent, false, 0.0f, 0.0f);
+}   // TrackObjectPresentationLight
+
+// ----------------------------------------------------------------------------
+void TrackObjectPresentationLight::init(scene::ISceneNode* parent, bool is_spot,
+                                float inner_cone, float outer_cone)
+{
+    const video::SColorf colorf(m_color);
 #ifndef SERVER_ONLY
     if (CVS->isGLSL() ||
         irr_driver->getVideoDriver()->getDriverType() == video::EDT_VULKAN)
@@ -1041,13 +1093,7 @@ TrackObjectPresentationLight::TrackObjectPresentationLight(
         m_node = NULL; // lights require shaders to work
     }
 
-    std::string type = "point";
-    xml_node.get("type", &type);
-    float inner_cone = 0.0f;
-    float outer_cone = 0.0f;
-    xml_node.get("inner-cone", &inner_cone);
-    xml_node.get("outer-cone", &outer_cone);
-    if (type != "spot" || (inner_cone == 0.0f && outer_cone == 0.0f))
+    if (!is_spot)
         return;
 
     LightNode* lnode = dynamic_cast<LightNode*>(m_node);
@@ -1067,7 +1113,7 @@ TrackObjectPresentationLight::TrackObjectPresentationLight(
         data.InnerCone = inner_cone;
         data.OuterCone = outer_cone;
     }
-}   // TrackObjectPresentationLight
+}   //TrackObjectPresentationLight::init
 
 // ----------------------------------------------------------------------------
 TrackObjectPresentationLight::~TrackObjectPresentationLight()

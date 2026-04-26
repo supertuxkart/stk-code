@@ -412,7 +412,7 @@ void ThreeStrikesBattle::update(int ticks)
                                                   radius, /*mass*/15.0f);
 
         TrackObjectPresentationMesh* tire_presentation =
-            new TrackObjectPresentationMesh(tire, tire_xyz, tire_hpr, tire_scale);
+            new TrackObjectPresentationMesh(NULL, tire, tire_xyz, tire_hpr, tire_scale);
 
 #ifdef DEBUG
         tire_presentation->getNode()->setName("Tire on ground");

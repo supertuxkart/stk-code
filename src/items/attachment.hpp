@@ -27,7 +27,7 @@ using namespace irr;
 
 namespace irr
 {
-    namespace scene { class IAnimatedMeshSceneNode; }
+    namespace scene { class IAnimatedMeshSceneNode; class ISceneNode; }
 }
 
 class Kart;
@@ -99,8 +99,14 @@ private:
 
     /** Scene node of the attachment, which will be attached to the kart's
      *  scene node. */
-    scene::IAnimatedMeshSceneNode
-                     *m_node;
+    scene::IAnimatedMeshSceneNode *m_node;
+
+    /** If true, we are using a library node. */
+    bool m_has_library_node;
+
+    /** Parent node of a library node, which will be attached to the kart's
+     *  scene node. */
+    scene::ISceneNode *m_library_node;
 
     /** Used by bombs so that it's not passed back to previous owner. */
     Kart     *m_previous_owner;

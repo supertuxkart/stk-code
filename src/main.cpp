@@ -211,6 +211,7 @@ extern "C" {
 #include "config/stk_config.hpp"
 #include "config/user_config.hpp"
 #include "font/font_manager.hpp"
+#include "graphics/attachable_library_manager.hpp"
 #include "graphics/camera/camera.hpp"
 #include "graphics/camera/camera_debug.hpp"
 #include "graphics/central_settings.hpp"
@@ -2044,6 +2045,7 @@ void initRest()
     kart_properties_manager = new KartPropertiesManager();
     ProjectileManager::create();
     powerup_manager         = new PowerupManager       ();
+    AttachableLibraryManager::create();
     attachment_manager      = new AttachmentManager    ();
     highscore_manager       = new HighscoreManager     ();
 

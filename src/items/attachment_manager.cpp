@@ -18,6 +18,7 @@
 
 #include "items/attachment_manager.hpp"
 
+#include "graphics/attachable_library_manager.hpp"
 #include "graphics/irr_driver.hpp"
 #include "graphics/material.hpp"
 #include "graphics/material_manager.hpp"
@@ -32,7 +33,9 @@ AttachmentManager *attachment_manager = 0;
 
 struct  initAttachmentType {Attachment::AttachmentType attachment;
                             const char *file;
-                            const char *icon_file;};
+                            const char *icon_file;
+                            bool library_attach;
+                            const char *library_id;};
 
 /* Some explanations to the attachments:
    Parachute: This will increase the air friction, reducing the maximum speed.
@@ -53,18 +56,19 @@ struct  initAttachmentType {Attachment::AttachmentType attachment;
 
 static const initAttachmentType iat[]=
 {
-    {Attachment::ATTACH_PARACHUTE,        "parachute.spm",        "parachute-attach-icon.png"    },
-    {Attachment::ATTACH_BOMB,             "bomb.spm",             "bomb-attach-icon.png"         },
-    {Attachment::ATTACH_ANVIL,            "anchor.spm",           "anchor-attach-icon.png"       },
-    {Attachment::ATTACH_SWATTER,          "swatter.spm",          "swatter-icon.png"             },
-    {Attachment::ATTACH_NOLOKS_SWATTER,   "swatter_nolok.spm",    "swatter-icon.png"             },
-    {Attachment::ATTACH_SWATTER_ANIM,     "swatter_anim.spm",     "swatter-icon.png"             },
-    {Attachment::ATTACH_BUBBLEGUM_SHIELD, "bubblegum_shield.spm", "shield-icon.png"              },
-    {Attachment::ATTACH_NOLOK_BUBBLEGUM_SHIELD, "bubblegum_shield_nolok.spm", "shield-icon.png"  },
-    {Attachment::ATTACH_BUBBLEGUM_SHIELD_SMALL, "bubblegum_shield.spm", "shield-icon.png"              },
-    {Attachment::ATTACH_NOLOK_BUBBLEGUM_SHIELD_SMALL, "bubblegum_shield_nolok.spm", "shield-icon.png"  },
-    {Attachment::ATTACH_ELECTRO_SHIELD,   "electro_shield.spm",   "electro-shield-icon.png"      },
-    {Attachment::ATTACH_MAX,              "",                     ""                             },
+    // TODO: Move this info to a config file
+    {Attachment::ATTACH_PARACHUTE,        "parachute.spm",        "parachute-attach-icon.png",   false, "" },
+    {Attachment::ATTACH_BOMB,             "bomb.spm",             "bomb-attach-icon.png",        false, "" },
+    {Attachment::ATTACH_ANVIL,            "anchor.spm",           "anchor-attach-icon.png",      false, "" },
+    {Attachment::ATTACH_SWATTER,          "swatter.spm",          "swatter-icon.png",            false, "" },
+    {Attachment::ATTACH_NOLOKS_SWATTER,   "swatter_nolok.spm",    "swatter-icon.png",            false, "" },
+    {Attachment::ATTACH_SWATTER_ANIM,     "swatter_anim.spm",     "swatter-icon.png",            false, "" },
+    {Attachment::ATTACH_BUBBLEGUM_SHIELD, "bubblegum_shield.spm", "shield-icon.png",             false, "" },
+    {Attachment::ATTACH_NOLOK_BUBBLEGUM_SHIELD, "bubblegum_shield_nolok.spm", "shield-icon.png", false, "" },
+    {Attachment::ATTACH_BUBBLEGUM_SHIELD_SMALL, "bubblegum_shield.spm", "shield-icon.png",       false, "" },
+    {Attachment::ATTACH_NOLOK_BUBBLEGUM_SHIELD_SMALL, "bubblegum_shield_nolok.spm", "shield-icon.png", false, "" },
+    {Attachment::ATTACH_ELECTRO_SHIELD,   "stklib_electro_shield_a",   "electro-shield-icon.png", true, "electro-shield"},
+    {Attachment::ATTACH_MAX,              "",                     "",                            false, ""},
 };
 
 //-----------------------------------------------------------------------------
@@ -73,6 +77,9 @@ AttachmentManager::~AttachmentManager()
     for(int i=0; iat[i].attachment!=Attachment::ATTACH_MAX; i++)
     {
         scene::IMesh *mesh = m_attachments[iat[i].attachment];
+        if (mesh == nullptr)
+            continue;
+
         mesh->drop();
         // If the count is 1, the only reference is in the
         // irrlicht mesh cache, so the mesh can be removed
@@ -89,13 +96,28 @@ void AttachmentManager::loadModels()
 {
     for(int i=0; iat[i].attachment!=Attachment::ATTACH_MAX; i++)
     {
-        std::string full_path = file_manager->getAsset(FileManager::MODEL,iat[i].file);
-        scene::IAnimatedMesh* mesh = irr_driver->getAnimatedMesh(full_path);
-        mesh->grab();
+        if (iat[i].library_attach)
+        {
+            m_attachments[iat[i].attachment] = nullptr;
+            std::string folder = iat[i].file;
+            assert(iat[i].library_id != "");
+            std::string lib_id = iat[i].library_id;
+            AttachableLibraryManager::get()->loadLibraryNode(folder, lib_id);
+        }
+        else
+        {
+            std::string full_path = file_manager->getAsset(FileManager::MODEL,iat[i].file);
+            scene::IAnimatedMesh* mesh = irr_driver->getAnimatedMesh(full_path);
+            mesh->grab();
 #ifndef SERVER_ONLY
-        SP::uploadSPM(mesh);
+            SP::uploadSPM(mesh);
 #endif
-        m_attachments[iat[i].attachment] = mesh;
+            m_attachments[iat[i].attachment] = mesh;
+            // TODO: investigate excluding at a higher level?
+            if (GUIEngine::isNoGraphics())
+                mesh->freeMeshVertexBuffer();
+        }
+
         if(iat[i].icon_file)
         {
             std::string full_icon_path     =
@@ -108,8 +130,6 @@ void AttachmentManager::loadModels()
                                               /*complain_if_not_found*/ true,
                                               /*strip_path*/            false);
         }
-        if (GUIEngine::isNoGraphics())
-            mesh->freeMeshVertexBuffer();
     }   // for
 }   // reInit
 

@@ -24,6 +24,7 @@
 #include "config/player_manager.hpp"
 #include "config/stk_config.hpp"
 #include "config/user_config.hpp"
+#include "graphics/attachable_library_manager.hpp"
 #include "graphics/explosion.hpp"
 #include "graphics/irr_driver.hpp"
 #include <ge_render_info.hpp>
@@ -61,7 +62,9 @@ Attachment::Attachment(Kart* kart)
     m_initial_speed        = 0;
     m_graphical_type       = ATTACH_NOTHING;
     m_scaling_end_ticks    = -1;
-    m_node = NULL;
+    m_has_library_node     = false;
+    m_node                 = NULL;
+    m_library_node         = irr_driver->getSceneManager()->addEmptySceneNode();
     if (GUIEngine::isNoGraphics())
         return;
     // If we attach a NULL mesh, we get a NULL scene node back. So we
@@ -90,6 +93,10 @@ Attachment::~Attachment()
     clear();
     if(m_node)
         irr_driver->removeNode(m_node);
+
+    // TODO: likely not enough to clean up properly a library node
+    if(m_library_node)
+        irr_driver->removeNode(m_library_node);
 
     if (m_bomb_sound)
     {
@@ -195,6 +202,7 @@ void Attachment::clear(AttachmentType type)
     m_type = ATTACH_NOTHING;
     m_ticks_left = 0;
     m_initial_speed = 0;
+    m_has_library_node = false;
 }   // clear
 
 // -----------------------------------------------------------------------------
@@ -551,9 +559,16 @@ void Attachment::update(int ticks)
 // ----------------------------------------------------------------------------
 void Attachment::updateGraphics(float dt)
 {
+#ifndef SERVER_ONLY
+    // TODO : clean up the library node if set and a new node is used.
+    // TODO : do something cleaner than the attach electro shield check
+    //        but for now it allows to keep showing the shield instead
+    //        of showing a bomb when a new shield is used with one active.
     // Add the suitable graphical effects if different attachment is set
     if (m_type != m_graphical_type)
     {
+        m_has_library_node = false;
+
         // Attachement is different, reset and add suitable sfx effects
         m_node->setPosition(core::vector3df(0.0f, 0.0f, 0.0f));
         m_node->setRotation(core::vector3df(0.0f, 0.0f, 0.0f));
@@ -565,6 +580,15 @@ void Attachment::updateGraphics(float dt)
             break;
         case ATTACH_SWATTER:
             // Graphical model set in swatter class
+            break;
+        case ATTACH_ELECTRO_SHIELD:
+            m_has_library_node = true;
+            m_library_node = AttachableLibraryManager::get()->createInstance("electro-shield");
+            m_library_node->setPosition(core::vector3df(0.0f, 0.0f, 0.0f));
+            m_library_node->setRotation(core::vector3df(0.0f, 0.0f, 0.0f));
+            m_library_node->setScale(core::vector3df(1.0f, 1.0f, 1.0f));
+            m_library_node->setParent(m_kart->getNode());
+            // TODO reset animationspeed and set animation frame
             break;
         default:
             m_node->setMesh(attachment_manager->getMesh(m_type));
@@ -590,7 +614,18 @@ void Attachment::updateGraphics(float dt)
 
     if (m_type != ATTACH_NOTHING)
     {
-        m_node->setVisible(true);
+        if (m_has_library_node)
+        {
+            m_library_node->setVisible(true);
+            // TODO point at the specific thing to update
+            AttachableLibraryManager::get()->updateGraphics(dt);
+            m_node->setVisible(false);
+        }
+        else
+        {
+            m_node->setVisible(true);
+            m_library_node->setVisible(false);
+        }
         bool is_big_gum_shield = m_type == ATTACH_BUBBLEGUM_SHIELD ||
                                  m_type == ATTACH_NOLOK_BUBBLEGUM_SHIELD;
         bool is_small_gum_shield = m_type == ATTACH_BUBBLEGUM_SHIELD_SMALL ||
@@ -635,8 +670,16 @@ void Attachment::updateGraphics(float dt)
         }
         else
         {
-            m_node->setScale(core::vector3df(
-                wanted_node_scale, wanted_node_scale, wanted_node_scale));
+            if (m_has_library_node)
+            {
+                m_library_node->setScale(core::vector3df(
+                    wanted_node_scale, wanted_node_scale, wanted_node_scale));
+            }
+            else
+            {
+                m_node->setScale(core::vector3df(
+                    wanted_node_scale, wanted_node_scale, wanted_node_scale));
+            }
         }
         int slow_flashes = stk_config->time2Ticks(2.0f);
         if (is_gum_shield && m_ticks_left < slow_flashes)
@@ -655,7 +698,10 @@ void Attachment::updateGraphics(float dt)
         }
     }
     else
+    {
+        m_library_node->setVisible(false);
         m_node->setVisible(false);
+    }
 
     switch (m_type)
     {
@@ -688,6 +734,7 @@ void Attachment::updateGraphics(float dt)
         m_bomb_sound->deleteSFX();
         m_bomb_sound = NULL;
     }
+#endif // SERVER_ONLY
 }   // updateGraphics
 
 // ----------------------------------------------------------------------------

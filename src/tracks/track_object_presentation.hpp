@@ -256,7 +256,8 @@ public:
                                 scene::ISceneNode* parent,
                                 std::shared_ptr<GE::GERenderInfo> render_info);
 
-    TrackObjectPresentationMesh(const std::string& model_file,
+    TrackObjectPresentationMesh(scene::ISceneNode* parent,
+                                const std::string& model_path,
                                 const core::vector3df& xyz,
                                 const core::vector3df& hpr,
                                 const core::vector3df& scale);
@@ -342,13 +343,22 @@ private:
     ParticleEmitter* m_emitter;
 #endif
     LODNode* m_lod_emitter_node;
+    std::string m_kind_path;
     std::string m_trigger_condition;
+    int m_clip_distance;
     bool m_delayed_stop;
     double m_delayed_stop_time;
+    bool m_auto_emit;
+
+    void init(scene::ISceneNode* parent);
 
 public:
     TrackObjectPresentationParticles(const XMLNode& xml_node,
                                      scene::ISceneNode* parent);
+    TrackObjectPresentationParticles(scene::ISceneNode* parent,
+        const std::string& kind_path, int clip_distance,
+        const std::string& trigger_condition, bool auto_emit,
+        core::vector3df xyz, core::vector3df hpr, core::vector3df scale);
     virtual ~TrackObjectPresentationParticles();
 
     virtual void updateGraphics(float dt) OVERRIDE;
@@ -359,6 +369,10 @@ public:
     // ------------------------------------------------------------------------
     /** Returns the trigger condition for this object. */
     std::string& getTriggerCondition() { return m_trigger_condition; }
+
+    std::string& getKindPath() { return m_kind_path; }
+    int getClipDistance() { return m_clip_distance; }
+    bool getAutoEmit() { return m_auto_emit; }
 };   // TrackObjectPresentationParticles
 
 // ============================================================================
@@ -371,10 +385,17 @@ private:
     video::SColor m_color;
     float m_distance;
     float m_energy;
+
+    void init(scene::ISceneNode* parent, bool is_spot, float inner_cone, float outer_cone);
 public:
     TrackObjectPresentationLight(const XMLNode& xml_node,
                                  scene::ISceneNode* parent);
+    TrackObjectPresentationLight(scene::ISceneNode* parent,
+        video::SColor color, float distance, float energy,
+        core::vector3df xyz, core::vector3df hpr, core::vector3df scale);
     virtual ~TrackObjectPresentationLight();
+    video::SColor getColor() const { return m_color; }
+    float getDistance() const { return m_distance; }
     float getEnergy() const { return m_energy; }
     virtual void setEnable(bool enabled) OVERRIDE;
     void setEnergy(float energy);
