@@ -1318,6 +1318,7 @@ bool onEvent(const SEvent &event)
 
             mnu->addItem(L"Items >",-1,true,true);
             sub = mnu->getSubMenu(3);
+            sub->addItem(L"Electro-Shield (F1)", DEBUG_POWERUP_ELECTRO );
             sub->addItem(L"Basketball (F2)", DEBUG_POWERUP_RUBBERBALL );
             sub->addItem(L"Bowling ball (F3)", DEBUG_POWERUP_BOWLING );
             sub->addItem(L"Bubblegum (F4)", DEBUG_POWERUP_BUBBLEGUM );
@@ -1328,7 +1329,6 @@ bool onEvent(const SEvent &event)
             sub->addItem(L"Switch (F9)", DEBUG_POWERUP_SWITCH );
             sub->addItem(L"Zipper (F10)", DEBUG_POWERUP_ZIPPER );
             sub->addItem(L"Nitro-hack", DEBUG_POWERUP_SUDO );
-            sub->addItem(L"Electro-Shield", DEBUG_POWERUP_ELECTRO );
             sub->addItem(L"Nitro (Insert)", DEBUG_POWERUP_NITRO );
 
             mnu->addItem(L"Attachments >",-1,true, true);
@@ -1495,6 +1495,11 @@ void handleStaticAction(int key, int value, bool control_pressed, bool shift_pre
                 {
                     handleContextMenuAction(DEBUG_ATTACHMENT_BOMB);
                 }
+                else
+                {
+                    handleContextMenuAction(DEBUG_POWERUP_ELECTRO);
+                }
+                break;
             }
             case IRR_KEY_F2:
             {
