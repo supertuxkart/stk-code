@@ -1252,9 +1252,6 @@ void SkiddingAI::handleItems(const float dt, const Vec3 *aim_point, int last_nod
         break;
         }// POWERUP_PARACHUTE
 
-    case PowerupManager::POWERUP_ANVIL:
-        break;   // POWERUP_ANVIL
-
     case PowerupManager::POWERUP_SUDO:
         if (m_time_since_last_shot > 3.0f) 
             m_controls->setFire(true);
@@ -1381,7 +1378,7 @@ void SkiddingAI::handleBubblegum(int item_skill,
     // Use shield to remove bad attachments
     if( (type == Attachment::ATTACH_BOMB && item_skill != 5)
       || type == Attachment::ATTACH_PARACHUTE
-      || type == Attachment::ATTACH_ANVIL )
+      || type == Attachment::ATTACH_ANCHOR )
     {
         m_controls->setFire(true);
         m_controls->setLookBack(false);
@@ -1708,7 +1705,7 @@ void SkiddingAI::handleSwatter(int item_skill)
         if( (type == Attachment::ATTACH_BOMB
              && item_skill == 4)
              || type == Attachment::ATTACH_PARACHUTE
-             || type == Attachment::ATTACH_ANVIL )
+             || type == Attachment::ATTACH_ANCHOR )
         {
             m_controls->setFire(true);
             m_controls->setLookBack(false);
@@ -2221,7 +2218,7 @@ void SkiddingAI::handleNitroAndZipper(float max_safe_speed)
 
     //Nitro skill 0 : don't use
     //Nitro skill 1 : don't use if the kart is braking, is not on the ground, has finished the race, has no nitro,
-    //                has a parachute or an anvil attached, or has a plunger in the face.
+    //                has a parachute or an anchor attached, or has a plunger in the face.
     //                Otherwise, use it immediately
     //Nitro skill 2 : Don't use nitro if there is more than 35% of main effect left..
     //                Use it when at max speed or under 5 of speed (after rescue, etc.). Use it to pass bombs.
@@ -2274,11 +2271,11 @@ void SkiddingAI::handleNitroAndZipper(float max_safe_speed)
     if(m_kart->getSpeed() + m_kart->getKartProperties()->getZipperMaxSpeedIncrease() > max_safe_speed)
         item_skill = 0;
 
-    // If a parachute or anvil is attached, the nitro and zipper don't give much
+    // If a parachute or anchor is attached, the nitro and zipper don't give much
     // benefit. Better wait till later.
     const bool has_slowdown_attachment =
         m_kart->getAttachment()->getType()==Attachment::ATTACH_PARACHUTE ||
-        m_kart->getAttachment()->getType()==Attachment::ATTACH_ANVIL;
+        m_kart->getAttachment()->getType()==Attachment::ATTACH_ANCHOR;
     if(has_slowdown_attachment) return;
    
     // Don't compute nitro usage if we don't have nitro

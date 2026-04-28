@@ -62,7 +62,7 @@ protected:
     struct BonusInfo
     {
         /** The attachment. This is stored using a custom format
-            0 = none ; 1 = parachute ; 2 = anvil ; 3 = bomb ;
+            0 = none ; 1 = parachute ; 2 = anchor ; 3 = bomb ;
             4 = swatter ; 5 = bubblegum
             This is necessary so replay files are not broken if the
             game internal attachment format/ordering is changed. */

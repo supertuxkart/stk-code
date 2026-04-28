@@ -468,7 +468,7 @@ void KartRewinder::restoreState(BareNetworkString *buffer, int count)
         getAttachment()->rewindTo(buffer);
     else
         getAttachment()->clear();
-    // Required for going back to anvil when rewinding
+    // Required for going back to anchor when rewinding
     updateWeight();
 
     if (read_powerup)

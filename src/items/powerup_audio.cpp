@@ -152,11 +152,6 @@ void PowerupAudio::onUseAudio(Kart* kart, PowerupManager::PowerupType type, int 
 		playGumSound(kart, sound_type);
 		break;
 
-	case PowerupManager::POWERUP_ANVIL:
-		m_powerup_sound[m_curr_sound] = SFXManager::get()->createSoundSource("anvil");
-		// Not worth the effort
-		break;
-
 	case PowerupManager::POWERUP_PARACHUTE:
 		m_powerup_sound[m_curr_sound] = SFXManager::get()->createSoundSource("parachute");
 

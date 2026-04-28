@@ -380,7 +380,7 @@ void TrackObject::init(const XMLNode &xml_node, scene::ISceneNode* parent,
         setEnabled(false);
     if (parent_library != NULL && !parent_library->isEnabled())
         setEnabled(false);
-}   // TrackObject
+}   // init
 
 // ----------------------------------------------------------------------------
 
@@ -794,4 +794,4 @@ TrackObject* TrackObject::cloneToChild()
         return to_clone;
     }
     return NULL;
-}   // joinToMainTrack
+}   // cloneToChild

@@ -214,7 +214,6 @@ namespace Scripting
             // TODO: document enum in doxygen-generated scripting docs
             engine->SetDefaultNamespace("Kart");
             engine->RegisterEnum("PowerupType");
-            engine->RegisterEnumValue("PowerupType", "ANVIL", PowerupManager::PowerupType::POWERUP_ANVIL);
             engine->RegisterEnumValue("PowerupType", "BOWLING", PowerupManager::PowerupType::POWERUP_BOWLING);
             engine->RegisterEnumValue("PowerupType", "BUBBLEGUM", PowerupManager::PowerupType::POWERUP_BUBBLEGUM);
             engine->RegisterEnumValue("PowerupType", "CAKE", PowerupManager::PowerupType::POWERUP_CAKE);
@@ -224,6 +223,9 @@ namespace Scripting
             engine->RegisterEnumValue("PowerupType", "SWATTER", PowerupManager::PowerupType::POWERUP_SWATTER);
             engine->RegisterEnumValue("PowerupType", "SWITCH", PowerupManager::PowerupType::POWERUP_SWITCH);
             engine->RegisterEnumValue("PowerupType", "ZIPPER", PowerupManager::PowerupType::POWERUP_ZIPPER);
+            engine->RegisterEnumValue("PowerupType", "SUDO", PowerupManager::PowerupType::POWERUP_SUDO);
+            engine->RegisterEnumValue("PowerupType", "ELECTRO", PowerupManager::PowerupType::POWERUP_ELECTRO);
+            engine->RegisterEnumValue("PowerupType", "MINI", PowerupManager::PowerupType::POWERUP_MINI);
         }
     }
 

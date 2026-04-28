@@ -492,7 +492,7 @@ int ReplayRecorder::enumToCode (Attachment::AttachmentType type)
     int code =
         (type == Attachment::ATTACH_NOTHING)          ? 0 :
         (type == Attachment::ATTACH_PARACHUTE)        ? 1 :
-        (type == Attachment::ATTACH_ANVIL)            ? 2 :
+        (type == Attachment::ATTACH_ANCHOR)           ? 2 :
         (type == Attachment::ATTACH_BOMB)             ? 3 :
         (type == Attachment::ATTACH_SWATTER)          ? 4 :
         (type == Attachment::ATTACH_BUBBLEGUM_SHIELD) ? 5 :
@@ -521,7 +521,6 @@ int ReplayRecorder::enumToCode (PowerupManager::PowerupType type)
         (type == PowerupManager::POWERUP_SUDO)       ? 10 :
         (type == PowerupManager::POWERUP_ELECTRO)    ? 11 :
         (type == PowerupManager::POWERUP_MINI)       ? 12 :
-        (type == PowerupManager::POWERUP_ANVIL)      ? 13 :
                                                       -1 ;
 
     return code;
@@ -533,7 +532,7 @@ Attachment::AttachmentType ReplayRecorder::codeToEnumAttach (int code)
     Attachment::AttachmentType type =
         (code == 0) ? Attachment::ATTACH_NOTHING          :
         (code == 1) ? Attachment::ATTACH_PARACHUTE        :
-        (code == 2) ? Attachment::ATTACH_ANVIL            :
+        (code == 2) ? Attachment::ATTACH_ANCHOR           :
         (code == 3) ? Attachment::ATTACH_BOMB             :
         (code == 4) ? Attachment::ATTACH_SWATTER          :
         (code == 5) ? Attachment::ATTACH_BUBBLEGUM_SHIELD :
@@ -560,8 +559,7 @@ PowerupManager::PowerupType ReplayRecorder::codeToEnumItem (int code)
         (code == 10) ? PowerupManager::POWERUP_SUDO       :
         (code == 11) ? PowerupManager::POWERUP_ELECTRO    :
         (code == 12) ? PowerupManager::POWERUP_MINI       :
-        (code == 13) ? PowerupManager::POWERUP_ANVIL      :
-                      PowerupManager::POWERUP_NOTHING ;
+                       PowerupManager::POWERUP_NOTHING ;
 
     return type;
 } // codeToEnumItem

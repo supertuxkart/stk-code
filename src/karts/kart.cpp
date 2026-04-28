@@ -1039,7 +1039,7 @@ void Kart::adjustSpeed(float f)
 
 //-----------------------------------------------------------------------------
 /** This method is to be called every time the mass of the kart is updated,
- *  which includes attaching an anvil to the kart (and detaching).
+ *  which includes attaching an anchor to the kart (and detaching).
  */
 void Kart::updateWeight()
 {

@@ -121,10 +121,10 @@ public:
         LEAN_MAX,
         LEAN_SPEED,
 
-        // Anvil
-        ANVIL_DURATION,
-        ANVIL_WEIGHT,
-        ANVIL_SPEED_FACTOR,
+        // Anchor
+        ANCHOR_DURATION,
+        ANCHOR_WEIGHT,
+        ANCHOR_SPEED_FACTOR,
 
         // Parachute
         PARACHUTE_FRICTION,
@@ -319,9 +319,9 @@ public:
     float getLeanMax() const;
     float getLeanSpeed() const;
 
-    float getAnvilDuration() const;
-    float getAnvilWeight() const;
-    float getAnvilSpeedFactor() const;
+    float getAnchorDuration() const;
+    float getAnchorWeight() const;
+    float getAnchorSpeedFactor() const;
 
     float getParachuteFriction() const;
     float getParachuteDuration() const;

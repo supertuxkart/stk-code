@@ -119,11 +119,11 @@ AbstractCharacteristic::ValueType AbstractCharacteristic::getType(
         return TYPE_FLOAT;
     case LEAN_SPEED:
         return TYPE_FLOAT;
-    case ANVIL_DURATION:
+    case ANCHOR_DURATION:
         return TYPE_FLOAT;
-    case ANVIL_WEIGHT:
+    case ANCHOR_WEIGHT:
         return TYPE_FLOAT;
-    case ANVIL_SPEED_FACTOR:
+    case ANCHOR_SPEED_FACTOR:
         return TYPE_FLOAT;
     case PARACHUTE_FRICTION:
         return TYPE_FLOAT;
@@ -385,12 +385,12 @@ std::string AbstractCharacteristic::getName(CharacteristicType type)
         return "LEAN_MAX";
     case LEAN_SPEED:
         return "LEAN_SPEED";
-    case ANVIL_DURATION:
-        return "ANVIL_DURATION";
-    case ANVIL_WEIGHT:
-        return "ANVIL_WEIGHT";
-    case ANVIL_SPEED_FACTOR:
-        return "ANVIL_SPEED_FACTOR";
+    case ANCHOR_DURATION:
+        return "ANCHOR_DURATION";
+    case ANCHOR_WEIGHT:
+        return "ANCHOR_WEIGHT";
+    case ANCHOR_SPEED_FACTOR:
+        return "ANCHOR_SPEED_FACTOR";
     case PARACHUTE_FRICTION:
         return "PARACHUTE_FRICTION";
     case PARACHUTE_DURATION:
@@ -964,40 +964,40 @@ float AbstractCharacteristic::getLeanSpeed() const
 }  // getLeanSpeed
 
 // ----------------------------------------------------------------------------
-float AbstractCharacteristic::getAnvilDuration() const
+float AbstractCharacteristic::getAnchorDuration() const
 {
     float result;
     bool is_set = false;
-    process(ANVIL_DURATION, &result, &is_set);
+    process(ANCHOR_DURATION, &result, &is_set);
     if (!is_set)
         Log::fatal("AbstractCharacteristic", "Can't get characteristic %s",
-                    getName(ANVIL_DURATION).c_str());
+                    getName(ANCHOR_DURATION).c_str());
     return result;
-}  // getAnvilDuration
+}  // getAnchorDuration
 
 // ----------------------------------------------------------------------------
-float AbstractCharacteristic::getAnvilWeight() const
+float AbstractCharacteristic::getAnchorWeight() const
 {
     float result;
     bool is_set = false;
-    process(ANVIL_WEIGHT, &result, &is_set);
+    process(ANCHOR_WEIGHT, &result, &is_set);
     if (!is_set)
         Log::fatal("AbstractCharacteristic", "Can't get characteristic %s",
-                    getName(ANVIL_WEIGHT).c_str());
+                    getName(ANCHOR_WEIGHT).c_str());
     return result;
-}  // getAnvilWeight
+}  // getAnchorWeight
 
 // ----------------------------------------------------------------------------
-float AbstractCharacteristic::getAnvilSpeedFactor() const
+float AbstractCharacteristic::getAnchorSpeedFactor() const
 {
     float result;
     bool is_set = false;
-    process(ANVIL_SPEED_FACTOR, &result, &is_set);
+    process(ANCHOR_SPEED_FACTOR, &result, &is_set);
     if (!is_set)
         Log::fatal("AbstractCharacteristic", "Can't get characteristic %s",
-                    getName(ANVIL_SPEED_FACTOR).c_str());
+                    getName(ANCHOR_SPEED_FACTOR).c_str());
     return result;
-}  // getAnvilSpeedFactor
+}  // getAnchorSpeedFactor
 
 // ----------------------------------------------------------------------------
 float AbstractCharacteristic::getParachuteFriction() const

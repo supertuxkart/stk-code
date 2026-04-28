@@ -945,22 +945,22 @@ float KartProperties::getLeanSpeed() const
 }  // getLeanSpeed
 
 // ----------------------------------------------------------------------------
-float KartProperties::getAnvilDuration() const
+float KartProperties::getAnchorDuration() const
 {
-    return m_cached_characteristic->getAnvilDuration();
-}  // getAnvilDuration
+    return m_cached_characteristic->getAnchorDuration();
+}  // getAnchorDuration
 
 // ----------------------------------------------------------------------------
-float KartProperties::getAnvilWeight() const
+float KartProperties::getAnchorWeight() const
 {
-    return m_cached_characteristic->getAnvilWeight();
-}  // getAnvilWeight
+    return m_cached_characteristic->getAnchorWeight();
+}  // getAnchorWeight
 
 // ----------------------------------------------------------------------------
-float KartProperties::getAnvilSpeedFactor() const
+float KartProperties::getAnchorSpeedFactor() const
 {
-    return m_cached_characteristic->getAnvilSpeedFactor();
-}  // getAnvilSpeedFactor
+    return m_cached_characteristic->getAnchorSpeedFactor();
+}  // getAnchorSpeedFactor
 
 // ----------------------------------------------------------------------------
 float KartProperties::getParachuteFriction() const

@@ -180,7 +180,7 @@ void Attachment::set(AttachmentType type, int ticks,
 }   // set
 
 // -----------------------------------------------------------------------------
-/** Removes any attachement currently on the kart. As for the anvil attachment,
+/** Removes any attachement currently on the kart. As for the anchor attachment,
  *  takes care of resetting the owner kart's physics structures to account for
  *  the updated mass.
  */
@@ -332,10 +332,10 @@ void Attachment::hitBanana(ItemState *item_state)
         item_state->setTicksTillReturn(ticks);
         break;
         }
-    case ATTACH_ANVIL:
-        // if the kart already has an anvil, attach a new anvil,
+    case ATTACH_ANCHOR:
+        // if the kart already has an anchor, attach a new anchor,
         // and increase the overall time
-        new_attachment = ATTACH_ANVIL;
+        new_attachment = ATTACH_ANCHOR;
         leftover_ticks  = m_ticks_left;
         break;
     case ATTACH_PARACHUTE:
@@ -371,14 +371,14 @@ void Attachment::hitBanana(ItemState *item_state)
             if (m_initial_speed <= 150) m_initial_speed = 150;
             break;
         }
-        case ATTACH_ANVIL:
-            set(ATTACH_ANVIL, stk_config->time2Ticks(kp->getAnvilDuration())
+        case ATTACH_ANCHOR:
+            set(ATTACH_ANCHOR, stk_config->time2Ticks(kp->getAnchorDuration())
                 + leftover_ticks                                      );
             // if ( m_kart == m_kart[0] )
             //   sound -> playSfx ( SOUND_SHOOMF ) ;
             // Reduce speed once (see description above), all other changes are
             // handled in Kart::updatePhysics
-            m_kart->adjustSpeed(kp->getAnvilSpeedFactor());
+            m_kart->adjustSpeed(kp->getAnchorSpeedFactor());
             break;
         case ATTACH_BOMB:
             set( ATTACH_BOMB, stk_config->time2Ticks(stk_config->m_bomb_time)
@@ -501,7 +501,7 @@ void Attachment::update(int ticks)
         }
         }
         break;
-    case ATTACH_ANVIL:     // handled in Kart::updatePhysics
+    case ATTACH_ANCHOR:    // handled in Kart::updatePhysics
     case ATTACH_NOTHING:   // Nothing to do, but complete all cases for switch
     case ATTACH_MAX:
         m_initial_speed = 0;
@@ -743,8 +743,8 @@ void Attachment::updateGraphics(float dt)
  */
 float Attachment::weightAdjust() const
 {
-    return m_type == ATTACH_ANVIL
-           ? m_kart->getKartProperties()->getAnvilWeight()
+    return m_type == ATTACH_ANCHOR
+           ? m_kart->getKartProperties()->getAnchorWeight()
           : 0.0f;
 }   // weightAdjust
 

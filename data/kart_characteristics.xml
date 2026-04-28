@@ -230,10 +230,10 @@
         <!-- ********** Items ********** -->
 
         <!-- Anchor
+            duration: The time an anchor is active.
             weight: The additional weight an anchor adds to a kart.
-            speed-factor: The additional slowdown caused by the anvil.
-            duration: The time an anchor is active. -->
-        <anvil duration="2.0" weight="150"  speed-factor="0.2" />
+            speed-factor: The additional slowdown caused by the anchor. -->
+        <anchor duration="2.0" weight="150" speed-factor="0.2" />
 
         <!-- Parachute
             friction: The friction factor when a parachute is attached.

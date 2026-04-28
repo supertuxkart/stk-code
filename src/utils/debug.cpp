@@ -120,7 +120,6 @@ enum DebugMenuCommand
     DEBUG_SAVE_HISTORY,
     DEBUG_SAVE_SCREENSHOT,
     DEBUG_DUMP_RTT,
-    DEBUG_POWERUP_ANVIL,
     DEBUG_POWERUP_BOWLING,
     DEBUG_POWERUP_BUBBLEGUM,
     DEBUG_POWERUP_CAKE,
@@ -138,7 +137,7 @@ enum DebugMenuCommand
     DEBUG_POWERUP_SLIDER,
     DEBUG_ATTACHMENT_PARACHUTE,
     DEBUG_ATTACHMENT_BOMB,
-    DEBUG_ATTACHMENT_ANVIL,
+    DEBUG_ATTACHMENT_ANCHOR,
     DEBUG_ATTACHMENT_SQUASH,
     DEBUG_ATTACHMENT_PLUNGER,
     DEBUG_ATTACHMENT_EXPLOSION,
@@ -222,13 +221,13 @@ void addAttachment(Attachment::AttachmentType type)
            continue;
         //if (!kart->getController()->isLocalPlayerController())
         //    continue;
-        if (type == Attachment::ATTACH_ANVIL)
+        if (type == Attachment::ATTACH_ANCHOR)
         {
             kart->getAttachment()
                 ->set(type,
                       stk_config->time2Ticks(kart->getKartProperties()
-                                                 ->getAnvilDuration()) );
-            kart->adjustSpeed(kart->getKartProperties()->getAnvilSpeedFactor());
+                                                 ->getAnchorDuration()) );
+            kart->adjustSpeed(kart->getKartProperties()->getAnchorSpeedFactor());
         }
         else if (type == Attachment::ATTACH_PARACHUTE)
         {
@@ -604,9 +603,6 @@ bool handleContextMenuAction(s32 cmd_id)
         if (!world) return false;
         history->Save();
         break;
-    case DEBUG_POWERUP_ANVIL:
-        addPowerup(PowerupManager::POWERUP_ANVIL, 255);
-        break;
     case DEBUG_POWERUP_BOWLING:
         addPowerup(PowerupManager::POWERUP_BOWLING, 255);
         break;
@@ -678,8 +674,8 @@ bool handleContextMenuAction(s32 cmd_id)
         dsd->toggleSlider("ssao_sigma", false);
         break;
     }
-    case DEBUG_ATTACHMENT_ANVIL:
-        addAttachment(Attachment::ATTACH_ANVIL);
+    case DEBUG_ATTACHMENT_ANCHOR:
+        addAttachment(Attachment::ATTACH_ANCHOR);
         break;
     case DEBUG_ATTACHMENT_BOMB:
         addAttachment(Attachment::ATTACH_BOMB);
@@ -1322,7 +1318,6 @@ bool onEvent(const SEvent &event)
 
             mnu->addItem(L"Items >",-1,true,true);
             sub = mnu->getSubMenu(3);
-            sub->addItem(L"Anchor (F1)", DEBUG_POWERUP_ANVIL );
             sub->addItem(L"Basketball (F2)", DEBUG_POWERUP_RUBBERBALL );
             sub->addItem(L"Bowling ball (F3)", DEBUG_POWERUP_BOWLING );
             sub->addItem(L"Bubblegum (F4)", DEBUG_POWERUP_BUBBLEGUM );
@@ -1339,7 +1334,7 @@ bool onEvent(const SEvent &event)
             mnu->addItem(L"Attachments >",-1,true, true);
             sub = mnu->getSubMenu(4);
             sub->addItem(L"Bomb (Shift + F1)", DEBUG_ATTACHMENT_BOMB);
-            sub->addItem(L"Anchor (Shift + F2)", DEBUG_ATTACHMENT_ANVIL);
+            sub->addItem(L"Anchor (Shift + F2)", DEBUG_ATTACHMENT_ANCHOR);
             sub->addItem(L"Parachute (Shift + F3)", DEBUG_ATTACHMENT_PARACHUTE);
             sub->addItem(L"Flatten (Shift + F4)", DEBUG_ATTACHMENT_SQUASH);
             sub->addItem(L"Plunger (Shift + F5)", DEBUG_ATTACHMENT_PLUNGER);
@@ -1500,11 +1495,6 @@ void handleStaticAction(int key, int value, bool control_pressed, bool shift_pre
                 {
                     handleContextMenuAction(DEBUG_ATTACHMENT_BOMB);
                 }
-                else
-                {
-                    handleContextMenuAction(DEBUG_POWERUP_ANVIL);
-                }
-                break;
             }
             case IRR_KEY_F2:
             {
@@ -1514,7 +1504,7 @@ void handleStaticAction(int key, int value, bool control_pressed, bool shift_pre
                 }
                 else if (shift_pressed)
                 {
-                    handleContextMenuAction(DEBUG_ATTACHMENT_ANVIL);
+                    handleContextMenuAction(DEBUG_ATTACHMENT_ANCHOR);
                 }
                 else
                 {

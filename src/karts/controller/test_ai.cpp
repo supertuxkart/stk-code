@@ -1388,22 +1388,6 @@ void SkiddingAI::handleItems(const float dt)
             m_controls->setFire(true);
         break;   // POWERUP_PARACHUTE
 
-    case PowerupManager::POWERUP_ANVIL:
-        // Wait one second more than a previous anvil
-        if(m_time_since_last_shot < m_kart->getKartProperties()->getAnvilDuration() + 1.0f) break;
-
-        if(RaceManager::get()->getMinorMode()==RaceManager::MINOR_MODE_FOLLOW_LEADER)
-        {
-            m_controls->setFire(m_world->getTime()<1.0f &&
-                                m_kart->getPosition()>2    );
-        }
-        else
-        {
-            m_controls->setFire(m_time_since_last_shot > 3.0f &&
-                                m_kart->getPosition()>1          );
-        }
-        break;   // POWERUP_ANVIL
-
     case PowerupManager::POWERUP_SWATTER:
         {
             // Squared distance for which the swatter works
@@ -1666,11 +1650,11 @@ void SkiddingAI::handleNitroAndZipper()
         (m_kart->getEnergy()==0 ||
          m_ai_properties->m_nitro_usage == 0) )
         return;
-    // If a parachute or anvil is attached, the nitro doesn't give much
+    // If a parachute or anchor is attached, the nitro doesn't give much
     // benefit. Better wait till later.
     const bool has_slowdown_attachment =
         m_kart->getAttachment()->getType()==Attachment::ATTACH_PARACHUTE ||
-        m_kart->getAttachment()->getType()==Attachment::ATTACH_ANVIL;
+        m_kart->getAttachment()->getType()==Attachment::ATTACH_ANCHOR;
     if(has_slowdown_attachment) return;
 
     // If the kart is very slow (e.g. after rescue), use nitro

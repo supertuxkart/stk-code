@@ -399,9 +399,9 @@ public:
     float getLeanMax() const;
     float getLeanSpeed() const;
 
-    float getAnvilDuration() const;
-    float getAnvilWeight() const;
-    float getAnvilSpeedFactor() const;
+    float getAnchorDuration() const;
+    float getAnchorWeight() const;
+    float getAnchorSpeedFactor() const;
 
     float getParachuteFriction() const;
     float getParachuteDuration() const;

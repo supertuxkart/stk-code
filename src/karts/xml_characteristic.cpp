@@ -417,14 +417,14 @@ void XmlCharacteristic::load(const XMLNode *node)
             &m_values[LEAN_SPEED]);
     }
 
-    if (const XMLNode *sub_node = node->getNode("anvil"))
+    if (const XMLNode *sub_node = node->getNode("anchor"))
     {
         sub_node->get("duration",
-            &m_values[ANVIL_DURATION]);
+            &m_values[ANCHOR_DURATION]);
         sub_node->get("weight",
-            &m_values[ANVIL_WEIGHT]);
+            &m_values[ANCHOR_WEIGHT]);
         sub_node->get("speed-factor",
-            &m_values[ANVIL_SPEED_FACTOR]);
+            &m_values[ANCHOR_SPEED_FACTOR]);
     }
 
     if (const XMLNode *sub_node = node->getNode("parachute"))

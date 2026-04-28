@@ -583,7 +583,7 @@ public:
     // SPEED and speed-boost related functions
     // ----------------------------------------------------------------------------------------
     /** Multiplies the velocity of the kart by a factor f (both linear
-     *  and angular). This is used by anvils, which suddenly slow down the kart
+     *  and angular). This is used by anchors, which suddenly slow down the kart
      *  when they are attached. */
     virtual void adjustSpeed(float f);
     // ----------------------------------------------------------------------------------------

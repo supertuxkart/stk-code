@@ -312,26 +312,6 @@ void Powerup::use()
             sound_type = useBubblegum();
             break; 
         }
-    case PowerupManager::POWERUP_ANVIL:
-        {
-            //Attach an anvil(twice as good as the one given
-            //by the bananas) to the kart in the 1st position.
-            for(unsigned int i = 0 ; i < world->getNumKarts(); ++i)
-            {
-                Kart *kart=world->getKart(i);
-                if(kart->isEliminated() || kart->isInvulnerable()) continue;
-                if(kart == m_kart) continue;
-                if(kart->getPosition() == 1)
-                {
-                    kart->getAttachment()->set(Attachment::ATTACH_ANVIL,
-                                               stk_config->
-                                               time2Ticks(kp->getAnvilDuration()) );
-                    kart->adjustSpeed(kp->getAnvilSpeedFactor() * 0.5f);
-                    break;
-                }
-            }
-            break;
-        }
     case PowerupManager::POWERUP_PARACHUTE:
         {
 

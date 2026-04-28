@@ -41,7 +41,7 @@ struct  initAttachmentType {Attachment::AttachmentType attachment;
    Parachute: This will increase the air friction, reducing the maximum speed.
               It will not have too much of an effect on slow speeds, since air
               friction only becomes important at higher speeds.
-   Anvil:     It increases the weight of the kart.But this will NOT have any
+   Anchor:    It increases the weight of the kart. But this will NOT have any
               effect on karts already driving at highest speed: the accelerating
        force is independent of the mass, so it is 0 at highest speed
        (engine force = air- plus system-force) and only this value gets
@@ -49,9 +49,10 @@ struct  initAttachmentType {Attachment::AttachmentType attachment;
        effect when the mass is changed, only at lower speeds the acting
        acceleration will be lower.Reducing the power slows the kart down,
        but doesn't give the feeling of a sudden weight increase.
-       Therefore the anvil will reduce by a certain factor (see physics
+       Therefore the anchor will reduce by a certain factor (see physics
        parameters) once when it is attached. Together with the mass
        increase (lower acceleration) it's sufficient negative.
+       // TODO : rewrite the comment on anchors which is rather poorly written...
 */
 
 static const initAttachmentType iat[]=
@@ -59,7 +60,7 @@ static const initAttachmentType iat[]=
     // TODO: Move this info to a config file
     {Attachment::ATTACH_PARACHUTE,        "parachute.spm",        "parachute-attach-icon.png",   false, "" },
     {Attachment::ATTACH_BOMB,             "bomb.spm",             "bomb-attach-icon.png",        false, "" },
-    {Attachment::ATTACH_ANVIL,            "anchor.spm",           "anchor-attach-icon.png",      false, "" },
+    {Attachment::ATTACH_ANCHOR,           "anchor.spm",           "anchor-attach-icon.png",      false, "" },
     {Attachment::ATTACH_SWATTER,          "swatter.spm",          "swatter-icon.png",            false, "" },
     {Attachment::ATTACH_NOLOKS_SWATTER,   "swatter_nolok.spm",    "swatter-icon.png",            false, "" },
     {Attachment::ATTACH_SWATTER_ANIM,     "swatter_anim.spm",     "swatter-icon.png",            false, "" },
