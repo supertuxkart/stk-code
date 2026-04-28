@@ -149,7 +149,7 @@ public:
                       POWERUP_RUBBERBALL, POWERUP_PARACHUTE,
                       POWERUP_SUDO, POWERUP_ELECTRO,
                       POWERUP_MINI,
-                      POWERUP_LAST=POWERUP_MINI,
+                      POWERUP_LAST = POWERUP_MINI,
                       POWERUP_MAX
     };
 

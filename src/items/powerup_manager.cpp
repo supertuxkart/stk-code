@@ -107,7 +107,7 @@ PowerupManager::PowerupType
         "",            /* Nothing */
         "bubblegum", "cake", "bowling", "zipper", "plunger", "switch",
         "swatter", "rubber-ball", "parachute", "nitro-hack", "electro-shield",
-        "mini-wish", "anchor"
+        "mini-wish"
     };
 
     for(unsigned int i=POWERUP_FIRST; i<=POWERUP_LAST; i++)
@@ -893,9 +893,17 @@ PowerupManager::PowerupType PowerupManager::getRandomPowerup(unsigned int pos,
                                                              uint64_t random_number)
 {
     int powerup = m_current_item_weights.getRandomItem(pos-1, random_number);
-    // Handle multi-items.
-    int powerup_set = powerup / (POWERUP_LAST - POWERUP_FIRST + 1);
-    powerup = powerup % (POWERUP_LAST - POWERUP_FIRST + 1);
+    // POWERUP_FIRST is > 0 but we need powerups to start at 0 and finish
+    // at N-1 where N is the number of powerups for the maths extracting
+    // the powerup type and set to work correctly.
+    // The quotient of the integer division gives us the powerup set
+    // (important for multi-item handling) and the remainder the powerup type
+    powerup -= POWERUP_FIRST;
+    int powerup_count = POWERUP_LAST - POWERUP_FIRST + 1;
+    int powerup_set = powerup / powerup_count;
+    powerup = powerup % powerup_count;
+    powerup += POWERUP_FIRST; // Undo the earlier substraction
+
     // This structure is used to make it easy to mod in different values.
     *n = (powerup_set == 0) ? 1 :
          (powerup_set == 1) ? 2 : 3;
