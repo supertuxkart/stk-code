@@ -55,29 +55,12 @@ struct  initAttachmentType {Attachment::AttachmentType attachment;
        // TODO : rewrite the comment on anchors which is rather poorly written...
 */
 
-static const initAttachmentType iat[]=
-{
-    // TODO: Move this info to a config file
-    {Attachment::ATTACH_PARACHUTE,        "parachute.spm",        "parachute-attach-icon.png",   false, "" },
-    {Attachment::ATTACH_BOMB,             "bomb.spm",             "bomb-attach-icon.png",        false, "" },
-    {Attachment::ATTACH_ANCHOR,           "anchor.spm",           "anchor-attach-icon.png",      false, "" },
-    {Attachment::ATTACH_SWATTER,          "swatter.spm",          "swatter-icon.png",            false, "" },
-    {Attachment::ATTACH_NOLOKS_SWATTER,   "swatter_nolok.spm",    "swatter-icon.png",            false, "" },
-    {Attachment::ATTACH_SWATTER_ANIM,     "swatter_anim.spm",     "swatter-icon.png",            false, "" },
-    {Attachment::ATTACH_BUBBLEGUM_SHIELD, "bubblegum_shield.spm", "shield-icon.png",             false, "" },
-    {Attachment::ATTACH_NOLOK_BUBBLEGUM_SHIELD, "bubblegum_shield_nolok.spm", "shield-icon.png", false, "" },
-    {Attachment::ATTACH_BUBBLEGUM_SHIELD_SMALL, "bubblegum_shield.spm", "shield-icon.png",       false, "" },
-    {Attachment::ATTACH_NOLOK_BUBBLEGUM_SHIELD_SMALL, "bubblegum_shield_nolok.spm", "shield-icon.png", false, "" },
-    {Attachment::ATTACH_ELECTRO_SHIELD,   "stklib_electro_shield_a",   "electro-shield-icon.png", true, "electro-shield"},
-    {Attachment::ATTACH_MAX,              "",                     "",                            false, ""},
-};
-
 //-----------------------------------------------------------------------------
 AttachmentManager::~AttachmentManager()
 {
-    for(int i=0; iat[i].attachment!=Attachment::ATTACH_MAX; i++)
+    for(int i=0; i < Attachment::ATTACH_COUNT; i++)
     {
-        scene::IMesh *mesh = m_attachments[iat[i].attachment];
+        scene::IMesh *mesh = m_attachments[i];
         if (mesh == nullptr)
             continue;
 
@@ -93,44 +76,99 @@ AttachmentManager::~AttachmentManager()
 }   // ~AttachmentManager
 
 //-----------------------------------------------------------------------------
+/** Loads attachment models and icons from the attachment.xml file.
+ */
 void AttachmentManager::loadModels()
 {
-    for(int i=0; iat[i].attachment!=Attachment::ATTACH_MAX; i++)
+    const std::string file_name = file_manager->getAsset("attachment.xml");
+    XMLNode *root               = file_manager->createXMLTree(file_name);
+    for(unsigned int i=0; i<root->getNumNodes(); i++)
     {
-        if (iat[i].library_attach)
+        const XMLNode *node=root->getNode(i);
+        if(node->getName()!="attach-type") continue;
+        std::string name;
+        node->get("name", &name);
+        Attachment::AttachmentType type = getAttachmentType(name);
+        if(type == Attachment::ATTACH_NOTHING)
         {
-            m_attachments[iat[i].attachment] = nullptr;
-            std::string folder = iat[i].file;
-            assert(iat[i].library_id != "");
-            std::string lib_id = iat[i].library_id;
-            AttachableLibraryManager::get()->loadLibraryNode(folder, lib_id);
+            Log::fatal("AttachmentManager",
+                       "Can't find attachment '%s' from attachment.xml, entry %d.",
+                       name.c_str(), i+1);
+            exit(-1);
         }
         else
         {
-            std::string full_path = file_manager->getAsset(FileManager::MODEL,iat[i].file);
-            scene::IAnimatedMesh* mesh = irr_driver->getAnimatedMesh(full_path);
-            mesh->grab();
-#ifndef SERVER_ONLY
-            SP::uploadSPM(mesh);
-#endif
-            m_attachments[iat[i].attachment] = mesh;
-            // TODO: investigate excluding at a higher level?
-            if (GUIEngine::isNoGraphics())
-                mesh->freeMeshVertexBuffer();
+            loadAttachment(type, *node);
         }
+    }
 
-        if(iat[i].icon_file)
-        {
-            std::string full_icon_path     =
-                GUIEngine::getSkin()->getThemedIcon(std::string("gui/icons/")
-                                                    + iat[i].icon_file);
-            m_all_icons[iat[i].attachment] =
-                material_manager->getMaterial(full_icon_path,
+    delete root;
+}   // loadModels
+
+//-----------------------------------------------------------------------------
+/** Loads models and icons for one attachment type
+ */
+void AttachmentManager::loadAttachment(Attachment::AttachmentType type, const XMLNode &node)
+{
+    std::string icon_file("");
+    node.get("icon", &icon_file);
+
+    icon_file = GUIEngine::getSkin()->getThemedIcon(std::string("gui/icons/") + icon_file);
+    m_all_icons[type] = material_manager->getMaterial(icon_file,
                                               /*full_path*/             true,
                                               /*make_permanent*/        true,
                                               /*complain_if_not_found*/ true,
                                               /*strip_path*/            false);
-        }
-    }   // for
-}   // reInit
 
+    assert(m_all_icons[type] != nullptr);
+    assert(m_all_icons[type]->getTexture() != nullptr);
+
+    std::string model("");
+    node.get("model-or-lib", &model);
+
+    std::string library_id("");
+    node.get("lib-id", &library_id);
+
+    // If there is a library id, 
+    if (library_id != "")
+    {
+        m_attachments[type] = nullptr;
+        std::string folder = model;
+        AttachableLibraryManager::get()->loadLibraryNode(folder, library_id);
+    }
+    else // we only have a mesh model
+    {
+        std::string full_path = file_manager->getAsset(FileManager::MODEL,model);
+        scene::IAnimatedMesh* mesh = irr_driver->getAnimatedMesh(full_path);
+        mesh->grab();
+#ifndef SERVER_ONLY
+        SP::uploadSPM(mesh);
+#endif
+        m_attachments[type] = mesh;
+        // TODO: investigate excluding at a higher level?
+        if (GUIEngine::isNoGraphics())
+            mesh->freeMeshVertexBuffer();
+    }
+    // TODO HANDLE VAR-x, var-model-or-lib-X,, var-lib-id-X
+
+}   // loadAttachment
+
+//-----------------------------------------------------------------------------
+/** Determines the attachment type for a given name.
+ *  \param name Name of the attachment to look up.
+ *  \return The type, or ATTACHMENT_NOTHING if the name is not found
+ */
+Attachment::AttachmentType AttachmentManager::getAttachmentType(const std::string &name) const
+{
+    // Must match the order of AttachmentType in attachment.hpp!!
+    static const std::string attachment_names[] = {
+        "parachute", "anchor", "bomb", "swatter", "swatter-anim",
+        "bubblegum", "bubblegum-small", "electro-shield"
+    };
+
+    for(unsigned int i=Attachment::ATTACH_FIRST; i < Attachment::ATTACH_COUNT; i++)
+    {
+        if(attachment_names[i]==name) return(Attachment::AttachmentType)i;
+    }
+    return Attachment::ATTACH_NOTHING;
+}   // getAttachmentType

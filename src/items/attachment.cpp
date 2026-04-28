@@ -213,7 +213,7 @@ void Attachment::saveState(BareNetworkString *buffer) const
 {
     // We use bit 6 to indicate if a previous owner is defined for a bomb,
     // bit 7 to indicate if the attachment is a plugin
-    assert(ATTACH_MAX < 64);
+    assert(ATTACH_COUNT < 64);
     uint8_t bit_7 = 0;
     if (m_plugin)
     {
@@ -503,14 +503,13 @@ void Attachment::update(int ticks)
         break;
     case ATTACH_ANCHOR:    // handled in Kart::updatePhysics
     case ATTACH_NOTHING:   // Nothing to do, but complete all cases for switch
-    case ATTACH_MAX:
+    case ATTACH_COUNT:
         m_initial_speed = 0;
         break;
     case ATTACH_SWATTER:
         // Everything is done in the plugin.
         m_initial_speed = 0;
         break;
-    case ATTACH_NOLOKS_SWATTER:
     case ATTACH_SWATTER_ANIM:
         // Should never be called, these symbols are only used as an index for
         // the model, Nolok's attachment type is ATTACH_SWATTER
@@ -524,9 +523,7 @@ void Attachment::update(int ticks)
         break;
     }
     case ATTACH_BUBBLEGUM_SHIELD:
-    case ATTACH_NOLOK_BUBBLEGUM_SHIELD:
     case ATTACH_BUBBLEGUM_SHIELD_SMALL:
-    case ATTACH_NOLOK_BUBBLEGUM_SHIELD_SMALL:
         m_initial_speed = 0;
         if (m_ticks_left <= 0)
             popGumShield();
@@ -626,10 +623,8 @@ void Attachment::updateGraphics(float dt)
             m_node->setVisible(true);
             m_library_node->setVisible(false);
         }
-        bool is_big_gum_shield = m_type == ATTACH_BUBBLEGUM_SHIELD ||
-                                 m_type == ATTACH_NOLOK_BUBBLEGUM_SHIELD;
-        bool is_small_gum_shield = m_type == ATTACH_BUBBLEGUM_SHIELD_SMALL ||
-                                   m_type == ATTACH_NOLOK_BUBBLEGUM_SHIELD_SMALL;
+        bool is_big_gum_shield = m_type == ATTACH_BUBBLEGUM_SHIELD;
+        bool is_small_gum_shield = m_type == ATTACH_BUBBLEGUM_SHIELD_SMALL;
         bool is_gum_shield = is_big_gum_shield || is_small_gum_shield;
         // FIXME : it is wasteful to do this every frame
         float wanted_node_scale = is_big_gum_shield   ? std::max(1.173f, m_kart->getHighestPoint() * 1.196f) :
@@ -782,7 +777,7 @@ void Attachment::popGumShield()
         m_bubble_explode_sound->setPosition(m_kart->getXYZ());
         m_bubble_explode_sound->play();
     }
-    if (m_type == ATTACH_BUBBLEGUM_SHIELD || m_type == ATTACH_NOLOK_BUBBLEGUM_SHIELD)
+    if (m_type == ATTACH_BUBBLEGUM_SHIELD)
         Track::getCurrentTrack()->getItemManager()->dropNewItem(Item::ITEM_BUBBLEGUM, m_kart);
     else
         Track::getCurrentTrack()->getItemManager()->dropNewItem(Item::ITEM_BUBBLEGUM_SMALL, m_kart);

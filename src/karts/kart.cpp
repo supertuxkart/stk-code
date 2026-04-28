@@ -1563,9 +1563,7 @@ bool Kart::isGumShielded() const
     {
         Attachment::AttachmentType type = getAttachment()->getType();
         return type == Attachment::ATTACH_BUBBLEGUM_SHIELD ||
-               type == Attachment::ATTACH_NOLOK_BUBBLEGUM_SHIELD ||
-               type == Attachment::ATTACH_BUBBLEGUM_SHIELD_SMALL ||
-               type == Attachment::ATTACH_NOLOK_BUBBLEGUM_SHIELD_SMALL;
+               type == Attachment::ATTACH_BUBBLEGUM_SHIELD_SMALL;
     }
     else
     {
@@ -1583,8 +1581,7 @@ bool Kart::isWeakShielded() const
     if(getAttachment() != NULL && getAttachment()->getTicksLeft() > 0)
     {
         Attachment::AttachmentType type = getAttachment()->getType();
-        return type == Attachment::ATTACH_BUBBLEGUM_SHIELD_SMALL ||
-               type == Attachment::ATTACH_NOLOK_BUBBLEGUM_SHIELD_SMALL;
+        return type == Attachment::ATTACH_BUBBLEGUM_SHIELD_SMALL;
     }
     else
     {

@@ -397,19 +397,9 @@ int Powerup::useBubblegum(bool mini)
 
         // If the kart has a normal gum shield, don't change the shield type 
         if (mini && (!m_kart->isGumShielded() || m_kart->isWeakShielded() ))
-        {
-            if (m_kart->getIdent() == "nolok")
-                type = Attachment::ATTACH_NOLOK_BUBBLEGUM_SHIELD_SMALL;
-            else
-                type = Attachment::ATTACH_BUBBLEGUM_SHIELD_SMALL; 
-        }
+            type = Attachment::ATTACH_BUBBLEGUM_SHIELD_SMALL; 
         else
-        {
-            if (m_kart->getIdent() == "nolok")
-                type = Attachment::ATTACH_NOLOK_BUBBLEGUM_SHIELD;
-            else
-                type = Attachment::ATTACH_BUBBLEGUM_SHIELD;
-        }
+            type = Attachment::ATTACH_BUBBLEGUM_SHIELD;
 
         if(!m_kart->isGumShielded()) //if the previous shield had been used up.
         {

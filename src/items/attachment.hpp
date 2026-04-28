@@ -51,7 +51,7 @@ class SFXBase;
 class Attachment: public NoCopy
 {
 public:
-    // Some loop in attachment.cpp depend on ATTACH_FIRST and ATTACH_MAX.
+    // Some loop in attachment.cpp depend on ATTACH_FIRST and ATTACH_COUNT.
     // So if new elements are added, make sure to add them in between those values.
     // Also, please note that Attachment::Attachment relies on ATTACH_FIRST being 0.
     enum AttachmentType
@@ -67,14 +67,11 @@ public:
         ATTACH_SWATTER,
         // Note that the next 2 symbols are only used as an index into the mesh
         // array; it will NEVER be actually assigned as an attachment type
-        ATTACH_NOLOKS_SWATTER,
         ATTACH_SWATTER_ANIM,
         ATTACH_BUBBLEGUM_SHIELD,
-        ATTACH_NOLOK_BUBBLEGUM_SHIELD,
         ATTACH_BUBBLEGUM_SHIELD_SMALL,
-        ATTACH_NOLOK_BUBBLEGUM_SHIELD_SMALL,
         ATTACH_ELECTRO_SHIELD,
-        ATTACH_MAX,
+        ATTACH_COUNT,
         ATTACH_NOTHING
     };
 

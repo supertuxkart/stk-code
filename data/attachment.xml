@@ -1,0 +1,37 @@
+<?xml version="1.0"?>
+<attachment>
+    <!-- The name is used to identify the attachment type, the icon
+         is the one that is shown when the kart has this attachment
+         active, model-or-lib contains either the name of the model's
+         file or the name of the library folder.
+         lib-id contains the string used to identify an attachable
+         library. If not set, it means model-or-lib contains a model,
+         if there is something it means it contains the library's
+         folder name.
+
+         Alternative models for the same attachment type can be
+         loaded by giving three info:
+         (1) the variant's name (used to know when to use it)
+         (2) the variant's model-or-lib
+         (3) the variant's lib-id (if it's a library, it can be omitted otherwise)
+         The entries are suffixed with a number, and the game code
+         will check for new variants as long as consecutive integers
+         starting from 0 are found (e.g. it checks for var0, if it's
+         there it will also check for var1, etc.).
+
+         Variants do not use alternative icons as it's easier to check
+         at a glance what a kart's attachment is when it's consistent
+         for all karts.  -->
+    <attach-type name="parachute"       icon="parachute-attach-icon.png" model-or-lib="parachute.spm"        />
+    <attach-type name="bomb"            icon="bomb-attach-icon.png"      model-or-lib="bomb.spm"             />
+    <attach-type name="anchor"          icon="anchor-attach-icon.png"    model-or-lib="anchor.spm"           />
+    <attach-type name="swatter"         icon="swatter-icon.png"          model-or-lib="swatter.spm"
+        var-0="nolok"    var-model-or-lib-0="swatter_nolok.spm"                                              />
+    <attach-type name="swatter-anim"    icon="swatter-icon.png"          model-or-lib="swatter_anim.spm"     />
+    <attach-type name="bubblegum"       icon="shield-icon.png"           model-or-lib="bubblegum_shield.spm"
+        var-0="nolok"    var-model-or-lib-0="bubblegum_shield_nolok.spm"                                     />
+    <attach-type name="bubblegum-small" icon="shield-icon.png"           model-or-lib="bubblegum_shield.spm"
+        var-0="nolok"    var-model-or-lib-0="bubblegum_shield_nolok.spm"                                     />
+    <attach-type name="electro-shield"  icon="electro-shield-icon.png"   model-or-lib="stklib_electro_shield_a"
+        lib-id="electro-shield"                                                                              />
+</attachment>

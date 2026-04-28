@@ -170,16 +170,17 @@ void Swatter::updateGraphics(float dt)
         if (!m_scene_node)
         {
             m_scene_node = m_kart->getAttachment()->getNode();
+/*
             if (m_kart->getIdent() == "nolok")
             {
                 m_scene_node->setMesh(attachment_manager
                     ->getMesh(Attachment::ATTACH_NOLOKS_SWATTER));
             }
             else
-            {
+            {*/
                 m_scene_node->setMesh(attachment_manager
                     ->getMesh(Attachment::ATTACH_SWATTER));
-            }
+            //}
             m_scene_node->setPosition(SWAT_POS_OFFSET);
             m_scene_node->setLoopMode(false);
             m_scene_node->setAnimationSpeed(0.0f);

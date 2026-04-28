@@ -24,9 +24,12 @@ namespace irr
     namespace scene { class IAnimatedMesh; }
 }
 class Material;
+class XMLNode;
 
 #include "items/attachment.hpp"
 #include "utils/no_copy.hpp"
+
+#include <string>
 
 /**
   * \ingroup items
@@ -34,12 +37,16 @@ class Material;
 class AttachmentManager: public NoCopy
 {
 private:
-    scene::IAnimatedMesh *m_attachments[Attachment::ATTACH_MAX];
-    Material             *m_all_icons [Attachment::ATTACH_MAX];
+    scene::IAnimatedMesh *m_attachments[Attachment::ATTACH_COUNT];
+    Material             *m_all_icons [Attachment::ATTACH_COUNT];
+
+    void loadAttachment(Attachment::AttachmentType type, const XMLNode &node);
 public:
                AttachmentManager() {};
               ~AttachmentManager();
     void       loadModels       ();
+
+    Attachment::AttachmentType   getAttachmentType(const std::string &name) const;
     // ------------------------------------------------------------------------
     /** Returns the mest for a certain attachment.
      *  \param type Type of the attachment needed. */
