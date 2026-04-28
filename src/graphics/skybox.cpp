@@ -248,30 +248,28 @@ void Skybox::generateCubeMapFromTextures()
             imBuildMipmapCascade(&cascade, rgba, size, size,
                 1/*layercount*/, 4, size * 4, &options, 0);
 #endif
-            std::vector<unsigned> mipmap_sizes;
-            unsigned width = size;
+            unsigned mip = 0;
+            unsigned cur_width = size;
             while (true)
             {
-                width = width < 2 ? 1 : width >> 1;
-                mipmap_sizes.push_back(width);
-                if (width == 1)
-                    break;
-            }
-            for (unsigned mip = 0; mip < mipmap_sizes.size(); mip++)
-            {
-                unsigned cur_size = mipmap_sizes[mip];
-                unsigned tex_size = GE::get4x4CompressedTextureSize(cur_size,
-                    cur_size);
+                cur_width = cur_width < 2 ? 1 : cur_width >> 1;
+
+                unsigned tex_size = GE::get4x4CompressedTextureSize(cur_width,
+                    cur_width);
                 uint8_t* compressed = new uint8_t[tex_size];
                 squishCompressImage((uint8_t*)cascade.mipmap[mip + 1],
-                    cur_size, cur_size, cur_size * 4, compressed, tc_flag);
+                    cur_width, cur_width, cur_width * 4, compressed, tc_flag);
                 GLint internal_format = needs_srgb_format ?
                     GL_COMPRESSED_SRGB_ALPHA_S3TC_DXT5_EXT :
                     GL_COMPRESSED_RGBA_S3TC_DXT5_EXT;
                 glCompressedTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i,
-                    mip + 1, internal_format, cur_size, cur_size, 0, tex_size,
+                    mip + 1, internal_format, cur_width, cur_width, 0, tex_size,
                     compressed);
                 delete[] compressed;
+
+                if (cur_width == 1)
+                    break;
+                mip += 1;
             }
             imFreeMipmapCascade(&cascade);
         }
