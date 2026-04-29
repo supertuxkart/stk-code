@@ -115,7 +115,7 @@ void Swatter::updateGraphics(float dt)
             m_scene_node = m_kart->getAttachment()->getNode();
             m_scene_node->setPosition(SWAT_POS_OFFSET);
             m_scene_node->setMesh(attachment_manager
-                ->getMesh(Attachment::ATTACH_SWATTER_ANIM));
+                ->getMesh(Attachment::ATTACH_SWATTER_ANIM, m_kart->getIdent()));
             m_scene_node->setRotation(core::vector3df(0.0, -180.0, 0.0));
             m_scene_node->setAnimationSpeed(0.9f);
             m_scene_node->setCurrentFrame(0.0f);
@@ -124,7 +124,7 @@ void Swatter::updateGraphics(float dt)
         if (!m_bomb_scene_node)
         {
             m_bomb_scene_node = irr_driver->addAnimatedMesh(
-                attachment_manager->getMesh(Attachment::ATTACH_BOMB), "bomb");
+                attachment_manager->getMesh(Attachment::ATTACH_BOMB, m_kart->getIdent()), "bomb");
 #ifdef DEBUG
             std::string debug_name = m_kart->getIdent() + " (attachment)";
             m_bomb_scene_node->setName(debug_name.c_str());
@@ -170,17 +170,8 @@ void Swatter::updateGraphics(float dt)
         if (!m_scene_node)
         {
             m_scene_node = m_kart->getAttachment()->getNode();
-/*
-            if (m_kart->getIdent() == "nolok")
-            {
-                m_scene_node->setMesh(attachment_manager
-                    ->getMesh(Attachment::ATTACH_NOLOKS_SWATTER));
-            }
-            else
-            {*/
-                m_scene_node->setMesh(attachment_manager
-                    ->getMesh(Attachment::ATTACH_SWATTER));
-            //}
+            m_scene_node->setMesh(attachment_manager
+                ->getMesh(Attachment::ATTACH_SWATTER, m_kart->getIdent()));
             m_scene_node->setPosition(SWAT_POS_OFFSET);
             m_scene_node->setLoopMode(false);
             m_scene_node->setAnimationSpeed(0.0f);

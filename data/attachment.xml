@@ -21,7 +21,11 @@
 
          Variants do not use alternative icons as it's easier to check
          at a glance what a kart's attachment is when it's consistent
-         for all karts.  -->
+         for all karts.
+
+         Variants MUST use the same type as the main attachment:
+         simple model if the default attachment is a mesh, library if
+         the default attachment uses a library.  -->
     <attach-type name="parachute"       icon="parachute-attach-icon.png" model-or-lib="parachute.spm"        />
     <attach-type name="bomb"            icon="bomb-attach-icon.png"      model-or-lib="bomb.spm"             />
     <attach-type name="anchor"          icon="anchor-attach-icon.png"    model-or-lib="anchor.spm"           />

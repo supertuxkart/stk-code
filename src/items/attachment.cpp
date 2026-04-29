@@ -565,6 +565,7 @@ void Attachment::updateGraphics(float dt)
     if (m_type != m_graphical_type)
     {
         m_has_library_node = false;
+        std::string lib_id("");
 
         // Attachement is different, reset and add suitable sfx effects
         m_node->setPosition(core::vector3df(0.0f, 0.0f, 0.0f));
@@ -580,7 +581,8 @@ void Attachment::updateGraphics(float dt)
             break;
         case ATTACH_ELECTRO_SHIELD:
             m_has_library_node = true;
-            m_library_node = AttachableLibraryManager::get()->createInstance("electro-shield");
+            lib_id = attachment_manager->getLibId(m_type, m_kart->getIdent());
+            m_library_node = AttachableLibraryManager::get()->createInstance(lib_id);
             m_library_node->setPosition(core::vector3df(0.0f, 0.0f, 0.0f));
             m_library_node->setRotation(core::vector3df(0.0f, 0.0f, 0.0f));
             m_library_node->setScale(core::vector3df(1.0f, 1.0f, 1.0f));
@@ -588,7 +590,7 @@ void Attachment::updateGraphics(float dt)
             // TODO reset animationspeed and set animation frame
             break;
         default:
-            m_node->setMesh(attachment_manager->getMesh(m_type));
+            m_node->setMesh(attachment_manager->getMesh(m_type, m_kart->getIdent()));
             break;
         }   // switch(type)
 

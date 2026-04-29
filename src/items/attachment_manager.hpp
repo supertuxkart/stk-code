@@ -29,6 +29,7 @@ class XMLNode;
 #include "items/attachment.hpp"
 #include "utils/no_copy.hpp"
 
+#include <map>
 #include <string>
 
 /**
@@ -37,8 +38,9 @@ class XMLNode;
 class AttachmentManager: public NoCopy
 {
 private:
-    scene::IAnimatedMesh *m_attachments[Attachment::ATTACH_COUNT];
-    Material             *m_all_icons [Attachment::ATTACH_COUNT];
+    std::map<std::string, scene::IAnimatedMesh*> m_attachments[Attachment::ATTACH_COUNT];
+    std::map<std::string, std::string>           m_lib_id     [Attachment::ATTACH_COUNT];
+    Material                                    *m_all_icons  [Attachment::ATTACH_COUNT];
 
     void loadAttachment(Attachment::AttachmentType type, const XMLNode &node);
 public:
@@ -46,12 +48,15 @@ public:
               ~AttachmentManager();
     void       loadModels       ();
 
-    Attachment::AttachmentType   getAttachmentType(const std::string &name) const;
+    Attachment::AttachmentType getAttachmentType(const std::string &name) const;
     // ------------------------------------------------------------------------
-    /** Returns the mest for a certain attachment.
-     *  \param type Type of the attachment needed. */
-    scene::IAnimatedMesh *getMesh(Attachment::AttachmentType type) const
-        {return m_attachments[type]; }
+    /** Returns the mesh for a certain attachment.
+     *  \param type Type of the attachment needed.
+     *  \parm id Check if there is an alternate mesh for this kart */
+    scene::IAnimatedMesh *getMesh(Attachment::AttachmentType type,
+                                  const std::string& id = "default") const;
+
+    std::string getLibId(Attachment::AttachmentType type, const std::string& id) const;
     // ------------------------------------------------------------------------
     /** Returns the icon to display in the race gui if a kart
      *  has an attachment. */

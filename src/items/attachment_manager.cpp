@@ -26,6 +26,7 @@
 #include "guiengine/engine.hpp"
 #include "guiengine/skin.hpp"
 #include "io/file_manager.hpp"
+#include "utils/string_utils.hpp"
 
 #include <IAnimatedMesh.h>
 
@@ -60,18 +61,23 @@ AttachmentManager::~AttachmentManager()
 {
     for(int i=0; i < Attachment::ATTACH_COUNT; i++)
     {
-        scene::IMesh *mesh = m_attachments[i];
-        if (mesh == nullptr)
-            continue;
+        // Loop over the registered keys
+        for (auto& map_entry : m_attachments[i])
+        {
+            scene::IMesh *mesh = map_entry.second;
+            if (mesh == nullptr)
+                continue;
 
-        mesh->drop();
-        // If the count is 1, the only reference is in the
-        // irrlicht mesh cache, so the mesh can be removed
-        // from the cache.
-        // Note that this test is necessary, since some meshes
-        // are also used in powerup_manager!!!
-        if(mesh->getReferenceCount()==1)
-            irr_driver->removeMeshFromCache(mesh);
+            mesh->drop();
+            // If the count is 1, the only reference is in the irrlicht
+            // mesh cache, so the mesh can be removed from the cache.
+            // Note that this test is necessary, since some meshes
+            // are also used in powerup_manager!!!
+            if(mesh->getReferenceCount()==1)
+                irr_driver->removeMeshFromCache(mesh);
+        }
+        // Clean up the map
+        m_attachments[i].clear();
     }
 }   // ~AttachmentManager
 
@@ -107,6 +113,7 @@ void AttachmentManager::loadModels()
 
 //-----------------------------------------------------------------------------
 /** Loads models and icons for one attachment type
+ * Supports variant models
  */
 void AttachmentManager::loadAttachment(Attachment::AttachmentType type, const XMLNode &node)
 {
@@ -123,35 +130,81 @@ void AttachmentManager::loadAttachment(Attachment::AttachmentType type, const XM
     assert(m_all_icons[type] != nullptr);
     assert(m_all_icons[type]->getTexture() != nullptr);
 
-    std::string model("");
-    node.get("model-or-lib", &model);
+    int var_num = -1;
 
-    std::string library_id("");
-    node.get("lib-id", &library_id);
+    do
+    {
+        std::string var_ident("");
+        if (var_num >= 0)
+        {
+            std::string var_string = "var-" + StringUtils::toString(var_num);
+            node.get(var_string, &var_ident);
+        }
+        else
+        {
+            var_ident = "default";
+        }
 
-    // If there is a library id, 
-    if (library_id != "")
-    {
-        m_attachments[type] = nullptr;
-        std::string folder = model;
-        AttachableLibraryManager::get()->loadLibraryNode(folder, library_id);
-    }
-    else // we only have a mesh model
-    {
-        std::string full_path = file_manager->getAsset(FileManager::MODEL,model);
-        scene::IAnimatedMesh* mesh = irr_driver->getAnimatedMesh(full_path);
-        mesh->grab();
+        // Exit the loop if there is no more variation to register
+        if (var_ident == "")
+            break;
+
+        std::string model("");
+        std::string ml = var_num < 0 ? "model-or-lib"
+                                     : "var-model-or-lib-" + StringUtils::toString(var_num);
+        node.get(ml, &model);
+
+        std::string library_id("");
+        std::string ll = var_num < 0 ? "lib-id"
+                                     : "var-lib-id-" + StringUtils::toString(var_num);
+        node.get(ll, &library_id);
+
+        // If there is a library id, a library node is used instead of a simple mesh
+        // TODO : support mixed configs model/lib between default and vars
+        if (library_id != "")
+        {
+            m_attachments[type][var_ident] = nullptr;
+            m_lib_id[type][var_ident] = library_id;
+            std::string folder = model;
+            AttachableLibraryManager::get()->loadLibraryNode(folder, library_id);
+        }
+        else // we only have a mesh model
+        {
+            std::string full_path = file_manager->getAsset(FileManager::MODEL, model);
+            scene::IAnimatedMesh* mesh = irr_driver->getAnimatedMesh(full_path);
+            mesh->grab();
 #ifndef SERVER_ONLY
-        SP::uploadSPM(mesh);
+            SP::uploadSPM(mesh);
 #endif
-        m_attachments[type] = mesh;
-        // TODO: investigate excluding at a higher level?
-        if (GUIEngine::isNoGraphics())
-            mesh->freeMeshVertexBuffer();
-    }
-    // TODO HANDLE VAR-x, var-model-or-lib-X,, var-lib-id-X
+            m_attachments[type][var_ident] = mesh;
+            // TODO: investigate excluding at a higher level?
+            if (GUIEngine::isNoGraphics())
+                mesh->freeMeshVertexBuffer();
+        }
 
+        var_num++;
+    } while (true);
 }   // loadAttachment
+
+scene::IAnimatedMesh* AttachmentManager::getMesh(Attachment::AttachmentType type, const std::string& id) const
+{
+    // Check if there is a matching mesh without creating an empty map entry if this key isn't registered
+    auto it = m_attachments[type].find(id);
+    if (it != m_attachments[type].end())
+        return it->second;
+    else
+        return getMesh(type, "default");
+}   // getMesh
+
+std::string AttachmentManager::getLibId(Attachment::AttachmentType type, const std::string& id) const
+{
+    // Check if there is a matching lib-id without creating an empty map entry if this key isn't registered
+    auto it = m_lib_id[type].find(id);
+    if (it != m_lib_id[type].end())
+        return it->second;
+    else
+        return getLibId(type, "default");
+}   // getLibId
 
 //-----------------------------------------------------------------------------
 /** Determines the attachment type for a given name.
