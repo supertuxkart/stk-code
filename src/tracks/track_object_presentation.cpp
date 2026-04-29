@@ -22,6 +22,7 @@
 #include "audio/sfx_buffer.hpp"
 #include "challenges/unlock_manager.hpp"
 #include "config/user_config.hpp"
+#include "graphics/attachable_library_manager.hpp"
 #include "graphics/camera/camera.hpp"
 #include "graphics/central_settings.hpp"
 #include "graphics/irr_driver.hpp"
@@ -401,7 +402,8 @@ TrackObjectPresentationMesh::TrackObjectPresentationMesh(
                                                      const XMLNode& xml_node,
                                                      bool enabled,
                                                      scene::ISceneNode* parent,
-                                                     std::shared_ptr<GE::GERenderInfo> render_info)
+                                                     std::shared_ptr<GE::GERenderInfo> render_info,
+                                                     bool no_track)
                            : TrackObjectPresentationSceneNode(xml_node)
 {
     m_is_looped  = false;
@@ -443,7 +445,7 @@ TrackObjectPresentationMesh::TrackObjectPresentationMesh(
         throw std::runtime_error("Model '" + model_name + "' cannot be found");
     }
 
-    init(&xml_node, parent, enabled);
+    init(&xml_node, parent, enabled, no_track);
 }   // TrackObjectPresentationMesh
 
 // ----------------------------------------------------------------------------
@@ -469,7 +471,9 @@ TrackObjectPresentationMesh::TrackObjectPresentationMesh(
                                                  const std::string& model_path,
                                                  const core::vector3df& xyz,
                                                  const core::vector3df& hpr,
-                                                 const core::vector3df& scale)
+                                                 const core::vector3df& scale,
+                                                 bool no_track,
+                                                 const std::string& ident)
                            : TrackObjectPresentationSceneNode(xyz, hpr, scale)
 {
     m_is_looped    = false;
@@ -498,12 +502,12 @@ TrackObjectPresentationMesh::TrackObjectPresentationMesh(
     }
 
     file_manager->popTextureSearchPath();
-    init(NULL, parent, true);
+    init(NULL, parent, true, no_track, ident);
 }   // TrackObjectPresentationMesh
 
 // ----------------------------------------------------------------------------
-void TrackObjectPresentationMesh::init(const XMLNode* xml_node,
-                                       scene::ISceneNode* parent, bool enabled)
+void TrackObjectPresentationMesh::init(const XMLNode* xml_node, scene::ISceneNode* parent,
+                                       bool enabled, bool no_track, const std::string& ident)
 {
     // for backwards compatibility, if unspecified assume there is
     bool skeletal_animation = true;
@@ -545,7 +549,7 @@ void TrackObjectPresentationMesh::init(const XMLNode* xml_node,
             enabled = false;
             m_force_always_hidden = true;
             Track *track = Track::getCurrentTrack();
-            if (track && track && xml_node)
+            if (track && xml_node)
                 track->addPhysicsOnlyNode(m_node);
         }
     }
@@ -561,18 +565,27 @@ void TrackObjectPresentationMesh::init(const XMLNode* xml_node,
 
         m_node = node;
     }
-    else if (animated)
+    else
     {
-        scene::IAnimatedMeshSceneNode *node =
-            irr_driver->addAnimatedMesh((scene::IAnimatedMesh*)m_mesh,
+        scene::IAnimatedMeshSceneNode *node;
+        std::vector<int> frames_start;
+        std::vector<int> frames_end;
+
+        if (!animated)
+        {
+            m_node = irr_driver->addMesh(m_mesh, m_model_file  /* debug name */,
+                parent, m_render_info);
+            goto skip_mesh_anim;
+        }
+
+        node = irr_driver->addAnimatedMesh((scene::IAnimatedMesh*)m_mesh,
                 m_model_file /* debug name */, parent, m_render_info);
         m_node = node;
 
-        std::vector<int> frames_start;
+
         if (xml_node)
             xml_node->get("frame-start", &frames_start);
 
-        std::vector<int> frames_end;
         if (xml_node)
             xml_node->get("frame-end", &frames_end);
 
@@ -586,18 +599,23 @@ void TrackObjectPresentationMesh::init(const XMLNode* xml_node,
              node->addAnimationSet(frames_start[i], frames_end[i]);
         node->useAnimationSet(0);
 
+        skip_mesh_anim:
+
         Track *track = Track::getCurrentTrack();
-        if (track && track && xml_node)
+        if (no_track) // If the animated textures shouldn't be handled by the track
+        {
+            if (xml_node)
+                AttachableLibraryManager::get()->handleAnimatedTextures(m_node, *xml_node);
+            else
+                AttachableLibraryManager::get()->handleAnimatedTextures(ident);
+        }
+        else if (track && xml_node)
+        {
             track->handleAnimatedTextures(m_node, *xml_node);
-        Track::uploadNodeVertexBuffer(node);
-    }
-    else
-    {
-        m_node = irr_driver->addMesh(m_mesh, m_model_file  /* debug name */,
-            parent, m_render_info);
-        Track *track = Track::getCurrentTrack();
-        if (track && xml_node)
-            track->handleAnimatedTextures(m_node, *xml_node);
+        }
+        // This function is more of an utils function,
+        // it should be used even in the no_track case.
+        // TODO : move it out of Track into a better location
         Track::uploadNodeVertexBuffer(m_node);
     }
 

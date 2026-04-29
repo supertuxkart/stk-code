@@ -76,7 +76,7 @@ AttachableLibraryObject::AttachableLibraryObject(const std::string& name, const 
     else if (m_type == "mesh")
     {
         m_presentation = new TrackObjectPresentationMesh(parent,
-            model_path, xyz, hpr, scale);
+            model_path, xyz, hpr, scale, true /* no track */, m_name);
         // TODO some kind of function also called in init handling glow, etc.
     }
 
@@ -125,10 +125,8 @@ void AttachableLibraryObject::init(const XMLNode &xml_node, scene::ISceneNode* p
     else
     {
         m_type = "mesh";
-        m_presentation = new TrackObjectPresentationMesh(xml_node,
-                                                        m_enabled,
-                                                        parent,
-                                                        m_render_info);
+        m_presentation = new TrackObjectPresentationMesh(xml_node, m_enabled,
+            parent, m_render_info, true /* no track */);
 
 // TODO : Add those back, they can be useful according to Sven
 /*

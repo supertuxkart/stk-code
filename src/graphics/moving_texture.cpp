@@ -17,7 +17,17 @@
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include "graphics/moving_texture.hpp"
+
+#include "graphics/material.hpp"
+#include "graphics/sp/sp_base.hpp"
+#include "graphics/sp/sp_mesh.hpp"
+#include "graphics/sp/sp_mesh_buffer.hpp"
+#include "graphics/sp/sp_mesh_node.hpp"
 #include "io/xml_node.hpp"
+#include "utils/log.hpp"
+#include "utils/string_utils.hpp"
+
+#include "ITexture.h"
 
 /** Constructor for an animated texture.
  *  \param matrix The texture matrix to modify.
@@ -162,3 +172,92 @@ void MovingTexture::update(float dt)
         }
     }
 }   // update
+
+namespace MovingTextureUtils
+{
+    // The ident is used for logging reports, to know what's the source of a missing texture
+    std::vector<MovingTexture*> processTextures(scene::ISceneNode *node, const XMLNode &xml,
+                                                const std::string& ident)
+    {
+        std::vector<MovingTexture*> animated_textures;
+
+        for(unsigned int node_number = 0; node_number<xml.getNumNodes(); node_number++)
+        {
+            const XMLNode *texture_node = xml.getNode(node_number);
+            if(texture_node->getName()!="animated-texture") continue;
+            std::string name;
+            texture_node->get("name", &name);
+            if(name=="")
+            {
+                Log::error("AnimTexture",
+                    "An animated texture for '%s' has no name specified!", ident.c_str());
+                continue;
+            }
+
+            // to lower case, for case-insensitive comparison
+            name = StringUtils::toLowerCase(name);
+
+            int moving_textures_found = 0;
+            SP::SPMeshNode* spmn = dynamic_cast<SP::SPMeshNode*>(node);
+            if (spmn)
+            {
+                for (unsigned i = 0; i < spmn->getSPM()->getMeshBufferCount(); i++)
+                {
+                    SP::SPMeshBuffer* spmb = spmn->getSPM()->getSPMeshBuffer(i);
+                    const std::vector<Material*>& m = spmb->getAllSTKMaterials();
+                    bool found = false;
+                    for (unsigned j = 0; j < m.size(); j++)
+                    {
+                        Material* mat = m[j];
+                        std::string mat_name =
+                            StringUtils::getBasename(mat->getSamplerPath(0));
+                        mat_name = StringUtils::toLowerCase(mat_name);
+                        if (mat_name == name)
+                        {
+                            found = true;
+                            moving_textures_found++;
+                            spmb->enableTextureMatrix(j);
+                            MovingTexture* mt =
+                                new MovingTexture(NULL, *texture_node);
+                            mt->setSPTM(spmn->getTextureMatrix(i).data());
+                            animated_textures.push_back(mt);
+                            // For spm only 1 texture matrix per mesh buffer is possible
+                            break;
+                        }
+                    }
+                    if (found)
+                    {
+                        break;
+                    }
+                }
+            }
+            else
+            {
+                Log::warn("AnimTexture", "Non-SPM meshes are deprecated, '%s'", name.c_str());
+                for(unsigned int i=0; i<node->getMaterialCount(); i++)
+                {
+                    video::SMaterial &irrMaterial=node->getMaterial(i);
+                    for(unsigned int j=0; j<video::MATERIAL_MAX_TEXTURES; j++)
+                    {
+                        video::ITexture* t=irrMaterial.getTexture(j);
+                        if(!t) continue;
+                        std::string texture_name =
+                            StringUtils::getBasename(t->getName().getPtr());
+
+                        // to lower case, for case-insensitive comparison
+                        texture_name = StringUtils::toLowerCase(texture_name);
+
+                        if (texture_name != name) continue;
+                        core::matrix4 *m = &irrMaterial.getTextureMatrix(j);
+                        animated_textures.push_back(new MovingTexture(m, *texture_node));
+                        moving_textures_found++;
+                    }   // for j<MATERIAL_MAX_TEXTURES
+                }   // for i<getMaterialCount
+            }
+            if (moving_textures_found == 0)
+                Log::warn("AnimTexture", "Did not find animated texture '%s'", name.c_str());
+        }   // for node_number < xml->getNumNodes
+
+        return animated_textures;
+    }   // processTextures
+} // namespace

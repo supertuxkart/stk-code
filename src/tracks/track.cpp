@@ -1632,84 +1632,12 @@ void Track::freeCachedMeshVertexBuffer()
  */
 void Track::handleAnimatedTextures(scene::ISceneNode *node, const XMLNode &xml)
 {
-    for(unsigned int node_number = 0; node_number<xml.getNumNodes();
-        node_number++)
+    std::vector<MovingTexture*> new_animated_textures;
+    new_animated_textures = MovingTextureUtils::processTextures(node, xml, m_ident);
+    for (unsigned int i = 0; i < new_animated_textures.size(); i++)
     {
-        const XMLNode *texture_node = xml.getNode(node_number);
-        if(texture_node->getName()!="animated-texture") continue;
-        std::string name;
-        texture_node->get("name", &name);
-        if(name=="")
-        {
-            Log::error("Track",
-                "Animated texture: no texture name specified for track '%s'",
-                 m_ident.c_str());
-            continue;
-        }
-
-        // to lower case, for case-insensitive comparison
-        name = StringUtils::toLowerCase(name);
-
-        int moving_textures_found = 0;
-        SP::SPMeshNode* spmn = dynamic_cast<SP::SPMeshNode*>(node);
-        if (spmn)
-        {
-            for (unsigned i = 0; i < spmn->getSPM()->getMeshBufferCount(); i++)
-            {
-                SP::SPMeshBuffer* spmb = spmn->getSPM()->getSPMeshBuffer(i);
-                const std::vector<Material*>& m = spmb->getAllSTKMaterials();
-                bool found = false;
-                for (unsigned j = 0; j < m.size(); j++)
-                {
-                    Material* mat = m[j];
-                    std::string mat_name =
-                        StringUtils::getBasename(mat->getSamplerPath(0));
-                    mat_name = StringUtils::toLowerCase(mat_name);
-                    if (mat_name == name)
-                    {
-                        found = true;
-                        moving_textures_found++;
-                        spmb->enableTextureMatrix(j);
-                        MovingTexture* mt =
-                            new MovingTexture(NULL, *texture_node);
-                        mt->setSPTM(spmn->getTextureMatrix(i).data());
-                        m_animated_textures.push_back(mt);
-                        // For spm only 1 texture matrix per mesh buffer is
-                        // possible
-                        break;
-                    }
-                }
-                if (found)
-                {
-                    break;
-                }
-            }
-        }
-        else
-        {
-            for(unsigned int i=0; i<node->getMaterialCount(); i++)
-            {
-                video::SMaterial &irrMaterial=node->getMaterial(i);
-                for(unsigned int j=0; j<video::MATERIAL_MAX_TEXTURES; j++)
-                {
-                    video::ITexture* t=irrMaterial.getTexture(j);
-                    if(!t) continue;
-                    std::string texture_name =
-                        StringUtils::getBasename(t->getName().getPtr());
-
-                    // to lower case, for case-insensitive comparison
-                    texture_name = StringUtils::toLowerCase(texture_name);
-
-                    if (texture_name != name) continue;
-                    core::matrix4 *m = &irrMaterial.getTextureMatrix(j);
-                    m_animated_textures.push_back(new MovingTexture(m, *texture_node));
-                    moving_textures_found++;
-                }   // for j<MATERIAL_MAX_TEXTURES
-            }   // for i<getMaterialCount
-        }
-        if (moving_textures_found == 0)
-            Log::warn("AnimTexture", "Did not find animate texture '%s'", name.c_str());
-    }   // for node_number < xml->getNumNodes
+        m_animated_textures.push_back(new_animated_textures[i]);
+    }
 }   // handleAnimatedTextures
 
 // ----------------------------------------------------------------------------

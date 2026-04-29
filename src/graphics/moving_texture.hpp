@@ -20,8 +20,19 @@
 #define MOVING_TEXTURE_HPP
 
 #include "utils/no_copy.hpp"
-#include <string>
+
 #include <matrix4.h>
+#include <string>
+#include <vector>
+
+namespace irr
+{
+    namespace scene
+    {
+        class ISceneNode;
+    }
+}
+
 using namespace irr;
 
 class XMLNode;
@@ -67,6 +78,12 @@ public:
     float        getCurrentY() const { return m_y; }
 }
 ;   // MovingTexture
+
+namespace MovingTextureUtils
+{
+    std::vector<MovingTexture*> processTextures(scene::ISceneNode *node,
+                            const XMLNode &xml, const std::string& ident);
+}
 
 #endif
 

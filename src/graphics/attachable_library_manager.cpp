@@ -22,6 +22,7 @@
 #include "graphics/central_settings.hpp"
 #include "graphics/irr_driver.hpp"
 #include "graphics/material_manager.hpp"
+#include "graphics/moving_texture.hpp"
 #include "graphics/sp/sp_shader_manager.hpp"
 #include "io/file_manager.hpp"
 #include "utils/log.hpp"
@@ -44,13 +45,20 @@ AttachableLibraryManager::AttachableLibraryManager()
  */
 AttachableLibraryManager::~AttachableLibraryManager()
 {
+    // TODO the instances should be cleaned after use instead of waiting until here
+
     // Decrement back the reference counters so the library nodes can be cleaned
     for (auto const& node : m_attachable_lib_nodes)
     {
         if (m_attachable_lib_nodes[node.first]->getReferenceCount() > 0)
             m_attachable_lib_nodes[node.first]->drop();
     }
-    // TODO
+
+    for (unsigned int i = 0; i < m_animated_textures.size(); i++)
+    {
+        delete m_animated_textures[i];
+    }
+    m_animated_textures.clear();
 }   // ~AttachableLibraryManager
 
 // ----------------------------------------------------------------------------
@@ -182,6 +190,27 @@ scene::ISceneNode* AttachableLibraryManager::loadLibraryInstance(const std::stri
     return m_attachable_lib_nodes[unique_id];
 } // loadLibraryInstance
 
+// ----------------------------------------------------------------------------
+/** Handles animated textures. This is used when first registering a library node.
+ */
+void AttachableLibraryManager::handleAnimatedTextures(scene::ISceneNode *node, const XMLNode &xml)
+{
+    std::vector<MovingTexture*> new_animated_textures;
+    new_animated_textures = MovingTextureUtils::processTextures(node, xml, "attachable_library");
+    for (unsigned int i = 0; i < new_animated_textures.size(); i++)
+    {
+        m_animated_textures.push_back(new_animated_textures[i]);
+    }
+}   // handleAnimatedTextures
+
+// ----------------------------------------------------------------------------
+/** Handles animated textures. This is used when copying a library node
+ */
+void AttachableLibraryManager::handleAnimatedTextures(const std::string& ident)
+{
+    // TODO copy the animated texture from the reference ident
+}   // handleAnimatedTextures
+
 void AttachableLibraryManager::add(const XMLNode &xml_node, const std::string& parent_id)
 {
     try
@@ -199,10 +228,25 @@ void AttachableLibraryManager::add(const XMLNode &xml_node, const std::string& p
 
 // ----------------------------------------------------------------------------
 /** Updates all attached library objects
+ * Most objects don't need to run custom update graphics code but a few do.
  */
 void AttachableLibraryManager::updateGraphics(float dt)
 {
-    // TODO : loop over all relevant objects and update them
+    for (auto& map_entry : m_all_objects)
+    {
+        AttachableLibraryObject* curr;
+
+        for(unsigned int i = 0; i < map_entry.second.size(); i++)
+        {
+            curr = map_entry.second[i];
+            curr->updateGraphics(dt);
+        }
+    }
+
+    for (unsigned int i = 0; i<m_animated_textures.size(); i++)
+    {
+        m_animated_textures[i]->update(dt);
+    }
 }   // updateGraphics
 
 scene::ISceneNode* AttachableLibraryManager::createInstance(const std::string& name)

@@ -30,6 +30,8 @@
 
 using namespace irr;
 
+class MovingTexture;
+
 class AttachableLibraryManager: public NoCopy
 {
 protected:
@@ -49,6 +51,9 @@ private:
     std::map<std::string, scene::ISceneNode*> m_attachable_lib_nodes;
     std::map<std::string, std::string> m_folder_map;
     std::map<std::string, std::vector<AttachableLibraryObject*>> m_all_objects;
+
+    /** The list of all animated textures. */
+    std::vector<MovingTexture*> m_animated_textures;
 
     AttachableLibraryManager();
     ~AttachableLibraryManager();
@@ -81,6 +86,8 @@ public:
     }   // destroy
 
     void loadLibraryNode(const std::string& folder_name, const std::string& identifier);
+    void handleAnimatedTextures(scene::ISceneNode *node, const XMLNode &xml);
+    void handleAnimatedTextures(const std::string& ident);
     void updateGraphics(float dt);
     scene::ISceneNode* createInstance(const std::string& name);
 
