@@ -109,7 +109,7 @@ include $(CLEAR_VARS)
 
 # astc-encoder
 LOCAL_MODULE       := libastcenc
-LOCAL_SRC_FILES    := deps-$(TARGET_ARCH_ABI)/astc-encoder/Source/libastcenc.a
+LOCAL_SRC_FILES    := deps-$(TARGET_ARCH_ABI)/astc-encoder/Source/libastcenc-native-static.a
 include $(PREBUILT_STATIC_LIBRARY)
 include $(CLEAR_VARS)
 
