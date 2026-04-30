@@ -202,7 +202,6 @@ void Attachment::clear(AttachmentType type)
     m_type = ATTACH_NOTHING;
     m_ticks_left = 0;
     m_initial_speed = 0;
-    m_has_library_node = false;
 }   // clear
 
 // -----------------------------------------------------------------------------
@@ -587,7 +586,6 @@ void Attachment::updateGraphics(float dt)
             m_library_node->setRotation(core::vector3df(0.0f, 0.0f, 0.0f));
             m_library_node->setScale(core::vector3df(1.0f, 1.0f, 1.0f));
             m_library_node->setParent(m_kart->getNode());
-            // TODO reset animationspeed and set animation frame
             break;
         default:
             m_node->setMesh(attachment_manager->getMesh(m_type, m_kart->getIdent()));
@@ -616,8 +614,6 @@ void Attachment::updateGraphics(float dt)
         if (m_has_library_node)
         {
             m_library_node->setVisible(true);
-            // TODO point at the specific thing to update
-            AttachableLibraryManager::get()->updateGraphics(dt);
             m_node->setVisible(false);
         }
         else

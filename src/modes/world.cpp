@@ -24,6 +24,7 @@
 #include "config/player_manager.hpp"
 #include "challenges/unlock_manager.hpp"
 #include "config/user_config.hpp"
+#include "graphics/attachable_library_manager.hpp"
 #include "graphics/camera/camera.hpp"
 #include "graphics/camera/camera_normal.hpp"
 #include "graphics/central_settings.hpp"
@@ -1139,6 +1140,9 @@ void World::updateGraphics(float dt)
             m_karts[i]->updateGraphics(dt);
         }
     }
+
+    // Update the graphics of attachable library nodes
+    AttachableLibraryManager::get()->updateGraphics(dt);
 
     PROFILER_PUSH_CPU_MARKER("World::updateGraphics (camera)", 0x60, 0x7F, 0);
     for (unsigned int i = 0; i < Camera::getNumCameras(); i++)
