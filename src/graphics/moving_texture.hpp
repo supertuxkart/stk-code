@@ -57,6 +57,8 @@ private:
     /** The texture matrix of this texture. */
     core::matrix4       *m_matrix;
 
+    std::string m_mat_name;
+
     // For sp
     float* m_sp_tm;
 
@@ -76,6 +78,9 @@ public:
     virtual void reset   ();
     float        getCurrentX() const { return m_x; }
     float        getCurrentY() const { return m_y; }
+    std::string  getMatName() const { return m_mat_name; }
+    void         setMatName(std::string name) { m_mat_name = name; }
+    MovingTexture* clone();
 }
 ;   // MovingTexture
 

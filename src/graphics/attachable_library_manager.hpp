@@ -53,7 +53,7 @@ private:
     std::map<std::string, std::vector<AttachableLibraryObject*>> m_all_objects;
 
     /** The list of all animated textures. */
-    std::vector<MovingTexture*> m_animated_textures;
+    std::map<std::string, std::vector<MovingTexture*>> m_animated_textures;
 
     AttachableLibraryManager();
     ~AttachableLibraryManager();
@@ -86,8 +86,10 @@ public:
     }   // destroy
 
     void loadLibraryNode(const std::string& folder_name, const std::string& identifier);
-    void handleAnimatedTextures(scene::ISceneNode *node, const XMLNode &xml);
-    void handleAnimatedTextures(const std::string& ident);
+    void handleAnimatedTextures(scene::ISceneNode *node, const XMLNode &xml,
+                                const std::string& lib_ident);
+    void handleAnimatedTextures(scene::ISceneNode *node, const std::string& lib_ident,
+                                unsigned int instance);
     void updateGraphics(float dt);
     scene::ISceneNode* createInstance(const std::string& name);
 

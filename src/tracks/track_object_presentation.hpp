@@ -250,13 +250,15 @@ private:
     std::shared_ptr<GE::GERenderInfo> m_render_info;
 
     void init(const XMLNode* xml_node, scene::ISceneNode* parent, bool enabled,
-              bool no_track = false, const std::string& ident = "");
+              bool no_track = false, const std::string& mesh_ident = "",
+              unsigned int instance = 0);
 
 public:
     TrackObjectPresentationMesh(const XMLNode& xml_node, bool enabled,
                                 scene::ISceneNode* parent,
                                 std::shared_ptr<GE::GERenderInfo> render_info,
-                                bool no_track = false);
+                                bool no_track = false,
+                                const std::string& mesh_ident = "");
 
     TrackObjectPresentationMesh(scene::ISceneNode* parent,
                                 const std::string& model_path,
@@ -264,7 +266,8 @@ public:
                                 const core::vector3df& hpr,
                                 const core::vector3df& scale,
                                 bool no_track = false,
-                                const std::string& ident = "");
+                                const std::string& mesh_ident = "",
+                                unsigned int instance = 0);
     TrackObjectPresentationMesh(scene::IAnimatedMesh* mesh,
                                 const core::vector3df& xyz,
                                 const core::vector3df& hpr,

@@ -69,7 +69,8 @@ private:
         video::SColor color, float distance, float energy,
         const std::string& kind_path, int clip_distance,
         const std::string& trigger_condition, bool auto_emit,
-        const std::string& model_path);
+        const std::string& model_path, const std::string& lib_ident,
+        unsigned int instance);
 
 protected:
 
@@ -83,11 +84,12 @@ protected:
     std::string                    m_type;
     ThreeDAnimation*               m_animator;
 
-    void init(const XMLNode &xml_node, scene::ISceneNode* parent);
+    void init(const XMLNode &xml_node, scene::ISceneNode* parent,
+              const std::string& lib_ident);
 
 public:
                  AttachableLibraryObject(const XMLNode &xml_node,
-                             scene::ISceneNode* parent);
+                    scene::ISceneNode* parent, const std::string& lib_ident);
     virtual      ~AttachableLibraryObject();
     virtual void updateGraphics(float dt);
 
@@ -122,7 +124,8 @@ public:
     // ------------------------------------------------------------------------
     void setPaused(bool mode){ m_animator->setPaused(mode); }
     // ------------------------------------------------------------------------
-    AttachableLibraryObject* clone(scene::ISceneNode* parent, const std::string& lib_folder);
+    AttachableLibraryObject* clone(scene::ISceneNode* parent, const std::string& lib_folder,
+                                   const std::string& lib_ident, unsigned int instance);
     LEAK_CHECK()
 };   // AttachableLibraryObject
 

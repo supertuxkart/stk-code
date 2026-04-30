@@ -21,8 +21,12 @@
 #include "config/user_config.hpp"
 #include "graphics/central_settings.hpp"
 #include "graphics/irr_driver.hpp"
+#include "graphics/material.hpp"
 #include "graphics/material_manager.hpp"
 #include "graphics/moving_texture.hpp"
+#include "graphics/sp/sp_mesh.hpp"
+#include "graphics/sp/sp_mesh_buffer.hpp"
+#include "graphics/sp/sp_mesh_node.hpp"
 #include "graphics/sp/sp_shader_manager.hpp"
 #include "io/file_manager.hpp"
 #include "utils/log.hpp"
@@ -54,11 +58,14 @@ AttachableLibraryManager::~AttachableLibraryManager()
             m_attachable_lib_nodes[node.first]->drop();
     }
 
-    for (unsigned int i = 0; i < m_animated_textures.size(); i++)
+    for (auto pair : m_animated_textures)
     {
-        delete m_animated_textures[i];
+        for (unsigned int i = 0; i < pair.second.size(); i++)
+        {
+            delete pair.second[i];
+        }
+        pair.second.clear();
     }
-    m_animated_textures.clear();
 }   // ~AttachableLibraryManager
 
 // ----------------------------------------------------------------------------
@@ -179,7 +186,7 @@ scene::ISceneNode* AttachableLibraryManager::loadLibraryInstance(const std::stri
     {
         AttachableLibraryObject *copied_obj =
             m_all_objects[identifier][i]->clone(m_attachable_lib_nodes[unique_id],
-                                                m_folder_map[identifier]);
+                            m_folder_map[identifier], identifier, instance_count);
         m_all_objects[unique_id].push_back(copied_obj);
     }
 
@@ -193,22 +200,64 @@ scene::ISceneNode* AttachableLibraryManager::loadLibraryInstance(const std::stri
 // ----------------------------------------------------------------------------
 /** Handles animated textures. This is used when first registering a library node.
  */
-void AttachableLibraryManager::handleAnimatedTextures(scene::ISceneNode *node, const XMLNode &xml)
+void AttachableLibraryManager::handleAnimatedTextures(scene::ISceneNode *node,
+    const XMLNode &xml, const std::string& ident)
 {
     std::vector<MovingTexture*> new_animated_textures;
     new_animated_textures = MovingTextureUtils::processTextures(node, xml, "attachable_library");
     for (unsigned int i = 0; i < new_animated_textures.size(); i++)
     {
-        m_animated_textures.push_back(new_animated_textures[i]);
+        m_animated_textures[ident].push_back(new_animated_textures[i]);
     }
 }   // handleAnimatedTextures
 
 // ----------------------------------------------------------------------------
 /** Handles animated textures. This is used when copying a library node
  */
-void AttachableLibraryManager::handleAnimatedTextures(const std::string& ident)
+void AttachableLibraryManager::handleAnimatedTextures(scene::ISceneNode *node,
+    const std::string& ident, unsigned int instance)
 {
-    // TODO copy the animated texture from the reference ident
+    // Instances start at 0 so we substract 1 from the instance count
+    std::string child_ident = ident + "_" + StringUtils::toString(instance - 1);
+
+    for (unsigned int i = 0; i < m_animated_textures[ident].size(); i++)
+    {
+        MovingTexture* mt = m_animated_textures[ident][i]->clone();
+        SP::SPMeshNode* spmn = dynamic_cast<SP::SPMeshNode*>(node);
+        if (spmn)
+        {
+            for (unsigned i = 0; i < spmn->getSPM()->getMeshBufferCount(); i++)
+            {
+                SP::SPMeshBuffer* spmb = spmn->getSPM()->getSPMeshBuffer(i);
+                const std::vector<Material*>& m = spmb->getAllSTKMaterials();
+                bool found = false;
+                for (unsigned j = 0; j < m.size(); j++)
+                {
+                    Material* mat = m[j];
+                    std::string mat_name = StringUtils::getBasename(mat->getSamplerPath(0));
+                    mat_name = StringUtils::toLowerCase(mat_name);
+                    if (mat_name == m_animated_textures[ident][i]->getMatName())
+                    {
+                        found = true;
+                        spmb->enableTextureMatrix(j);
+                        mt->setSPTM(spmn->getTextureMatrix(i).data());
+                        break;
+                    }
+                }
+                if (found)
+                {
+                    break;
+                }
+            }
+        }
+        else
+        {
+            Log::error("AttachableLibraryManager",
+                "Only SP mehses are supported for animated textures in attachable libraries.");
+        }
+
+        m_animated_textures[child_ident].push_back(mt);
+    }
 }   // handleAnimatedTextures
 
 void AttachableLibraryManager::add(const XMLNode &xml_node, const std::string& parent_id)
@@ -216,7 +265,7 @@ void AttachableLibraryManager::add(const XMLNode &xml_node, const std::string& p
     try
     {
         AttachableLibraryObject *obj =
-            new AttachableLibraryObject(xml_node, m_attachable_lib_nodes[parent_id]);
+            new AttachableLibraryObject(xml_node, m_attachable_lib_nodes[parent_id], parent_id);
         m_all_objects[parent_id].push_back(obj);
     }
     catch (std::exception& e)
@@ -243,10 +292,16 @@ void AttachableLibraryManager::updateGraphics(float dt)
         }
     }
 
-    for (unsigned int i = 0; i<m_animated_textures.size(); i++)
+    int animated_counter = 0;
+    for (auto const& pair : m_animated_textures)
     {
-        m_animated_textures[i]->update(dt);
+        for (unsigned int i = 0; i < pair.second.size(); i++)
+        {
+            animated_counter++;
+            pair.second[i]->update(dt);
+        }
     }
+    Log::info("AttachableLibraryManager", "Updating %i animated textures.", animated_counter);
 }   // updateGraphics
 
 scene::ISceneNode* AttachableLibraryManager::createInstance(const std::string& name)

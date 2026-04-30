@@ -44,6 +44,7 @@ MovingTexture::MovingTexture(core::matrix4 *matrix, const XMLNode &node)
     m_y = 0.0f;
     m_count = 0.0f;
     m_sp_tm = NULL;
+    m_mat_name = "";
 
     if (m_matrix)
     {
@@ -83,6 +84,7 @@ MovingTexture::MovingTexture(core::matrix4 *matrix, float dx, float dy)
     m_count = 0.0f;
     m_dt = 0.0f;
     m_sp_tm = NULL;
+    m_mat_name = "";
 }   // MovingTexture
 
 //-----------------------------------------------------------------------------
@@ -99,6 +101,7 @@ MovingTexture::MovingTexture(float dx, float dy, float dt,
     m_dt     = dt;
     m_matrix = NULL;
     m_sp_tm = NULL;
+    m_mat_name = "";
 }   // MovingTexture
 
 //-----------------------------------------------------------------------------
@@ -173,6 +176,16 @@ void MovingTexture::update(float dt)
     }
 }   // update
 
+//-----------------------------------------------------------------------------
+/** Produces a clone of this MovingTexture object
+ *  \param dt Time step size.
+ */
+MovingTexture* MovingTexture::clone()
+{
+    MovingTexture* mt = new MovingTexture(m_dx, m_dy, m_dt, m_isAnimatedByStep);
+    return mt;
+}   // clone
+
 namespace MovingTextureUtils
 {
     // The ident is used for logging reports, to know what's the source of a missing texture
@@ -217,8 +230,8 @@ namespace MovingTextureUtils
                             found = true;
                             moving_textures_found++;
                             spmb->enableTextureMatrix(j);
-                            MovingTexture* mt =
-                                new MovingTexture(NULL, *texture_node);
+                            MovingTexture* mt = new MovingTexture(NULL, *texture_node);
+                            mt->setMatName(name);
                             mt->setSPTM(spmn->getTextureMatrix(i).data());
                             animated_textures.push_back(mt);
                             // For spm only 1 texture matrix per mesh buffer is possible

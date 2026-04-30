@@ -403,7 +403,7 @@ TrackObjectPresentationMesh::TrackObjectPresentationMesh(
                                                      bool enabled,
                                                      scene::ISceneNode* parent,
                                                      std::shared_ptr<GE::GERenderInfo> render_info,
-                                                     bool no_track)
+                                                     bool no_track, const std::string& mesh_ident)
                            : TrackObjectPresentationSceneNode(xml_node)
 {
     m_is_looped  = false;
@@ -445,7 +445,7 @@ TrackObjectPresentationMesh::TrackObjectPresentationMesh(
         throw std::runtime_error("Model '" + model_name + "' cannot be found");
     }
 
-    init(&xml_node, parent, enabled, no_track);
+    init(&xml_node, parent, enabled, no_track, mesh_ident);
 }   // TrackObjectPresentationMesh
 
 // ----------------------------------------------------------------------------
@@ -473,7 +473,8 @@ TrackObjectPresentationMesh::TrackObjectPresentationMesh(
                                                  const core::vector3df& hpr,
                                                  const core::vector3df& scale,
                                                  bool no_track,
-                                                 const std::string& ident)
+                                                 const std::string& mesh_ident,
+                                                 unsigned int instance)
                            : TrackObjectPresentationSceneNode(xyz, hpr, scale)
 {
     m_is_looped    = false;
@@ -502,12 +503,13 @@ TrackObjectPresentationMesh::TrackObjectPresentationMesh(
     }
 
     file_manager->popTextureSearchPath();
-    init(NULL, parent, true, no_track, ident);
+    init(NULL, parent, true, no_track, mesh_ident, instance);
 }   // TrackObjectPresentationMesh
 
 // ----------------------------------------------------------------------------
 void TrackObjectPresentationMesh::init(const XMLNode* xml_node, scene::ISceneNode* parent,
-                                       bool enabled, bool no_track, const std::string& ident)
+                                       bool enabled, bool no_track, const std::string& mesh_ident,
+                                       unsigned int instance)
 {
     // for backwards compatibility, if unspecified assume there is
     bool skeletal_animation = true;
@@ -605,9 +607,9 @@ void TrackObjectPresentationMesh::init(const XMLNode* xml_node, scene::ISceneNod
         if (no_track) // If the animated textures shouldn't be handled by the track
         {
             if (xml_node)
-                AttachableLibraryManager::get()->handleAnimatedTextures(m_node, *xml_node);
+                AttachableLibraryManager::get()->handleAnimatedTextures(m_node, *xml_node, mesh_ident);
             else
-                AttachableLibraryManager::get()->handleAnimatedTextures(ident);
+                AttachableLibraryManager::get()->handleAnimatedTextures(m_node, mesh_ident, instance);
         }
         else if (track && xml_node)
         {

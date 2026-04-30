@@ -40,9 +40,10 @@
  *                 for now: initial position, initial rotation, name of the
  *                 model, enable/disable status, timer information.
  */
-AttachableLibraryObject::AttachableLibraryObject(const XMLNode &xml_node, scene::ISceneNode* parent)
+AttachableLibraryObject::AttachableLibraryObject(const XMLNode &xml_node,
+                scene::ISceneNode* parent, const std::string& lib_ident)
 {
-    init(xml_node, parent);
+    init(xml_node, parent, lib_ident);
 }   // AttachableLibraryObject
 
 /** Private constructor used when copying an existing AttachableLibraryObject */
@@ -52,7 +53,8 @@ AttachableLibraryObject::AttachableLibraryObject(const std::string& name, const 
         video::SColor color, float distance, float energy,
         const std::string& kind_path, int clip_distance,
         const std::string& trigger_condition, bool auto_emit,
-        const std::string& model_path)
+        const std::string& model_path, const std::string& lib_ident,
+        unsigned int instance)
 {
     m_name = name;
     m_id = id;
@@ -75,8 +77,9 @@ AttachableLibraryObject::AttachableLibraryObject(const std::string& name, const 
     }
     else if (m_type == "mesh")
     {
+        std::string mesh_ident = lib_ident + "_" + m_name;
         m_presentation = new TrackObjectPresentationMesh(parent,
-            model_path, xyz, hpr, scale, true /* no track */, m_name);
+            model_path, xyz, hpr, scale, true /* no track */, mesh_ident, instance);
         // TODO some kind of function also called in init handling glow, etc.
     }
 
@@ -91,7 +94,8 @@ AttachableLibraryObject::AttachableLibraryObject(const std::string& name, const 
  *  \param xml_node The XML data.
  *  \param parent The parent scene node.
  */
-void AttachableLibraryObject::init(const XMLNode &xml_node, scene::ISceneNode* parent)
+void AttachableLibraryObject::init(const XMLNode &xml_node, scene::ISceneNode* parent,
+                                   const std::string& lib_ident)
 {
     m_init_xyz   = core::vector3df(0,0,0);
     m_init_hpr   = core::vector3df(0,0,0);
@@ -125,8 +129,9 @@ void AttachableLibraryObject::init(const XMLNode &xml_node, scene::ISceneNode* p
     else
     {
         m_type = "mesh";
+        std::string mesh_ident = lib_ident + "_" + m_name;
         m_presentation = new TrackObjectPresentationMesh(xml_node, m_enabled,
-            parent, m_render_info, true /* no track */);
+            parent, m_render_info, true /* no track */, mesh_ident);
 
 // TODO : Add those back, they can be useful according to Sven
 /*
@@ -221,7 +226,7 @@ void AttachableLibraryObject::updateGraphics(float dt)
 }   // updateGraphics
 
 AttachableLibraryObject* AttachableLibraryObject::clone(scene::ISceneNode* parent,
-                                                    const std::string& lib_folder)
+    const std::string& lib_folder, const std::string& lib_ident, unsigned int instance)
 {
     // TODO : Add what's needed to create m_animator
 
@@ -265,7 +270,7 @@ AttachableLibraryObject* AttachableLibraryObject::clone(scene::ISceneNode* paren
     AttachableLibraryObject *cloned_obj =
         new AttachableLibraryObject(m_name, m_id, m_init_xyz, m_init_hpr, m_init_scale,
             m_enabled, m_type, parent, color, distance, energy, kind_path, clip_distance,
-            trigger_condition, auto_emit, model_path);
+            trigger_condition, auto_emit, model_path, lib_ident, instance);
 
     return cloned_obj;
 }   // clone
