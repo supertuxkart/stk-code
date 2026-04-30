@@ -150,10 +150,10 @@ else
     MAGICK='convert'
 fi
 
-# Ensure that don't exists the assets folder in case of a user error, like wrong typed command, etc...
+# Ensure that the assets doesn't exist, in case of a user error, like a wrongly typed command, etc...
 if [ -d "./assets" ]; then
     echo "SECURITY MESSAGE: You might be trying to reset assets folder!"
-    echo "Delete or rename your assets folder to continue..."
+    echo "Delete or rename your assets folder (inside the android folder) to continue..."
     exit 1
 fi
 
@@ -727,5 +727,5 @@ echo "has_assets" > "$OUTPUT_PATH/has_assets.txt"
 touch "$OUTPUT_PATH/.nomedia"
 
 # Just the finish message
-echo "Done ;)"
+echo "Done."
 exit 0
