@@ -392,7 +392,7 @@ void ReplayRecorder::save()
     }
 
     core::stringw msg = _("Replay saved in \"%s\".",
-        StringUtils::utf8ToWide(file_manager->getReplayDir() + getReplayFilename()));
+        StringUtils::utf8ToWide(FileManager::obfuscateUsername(file_manager->getReplayDir()) + getReplayFilename()));
     MessageQueue::add(MessageQueue::MT_GENERIC, msg);
 
     fprintf(fd, "version: %d\n", getCurrentReplayVersion());
