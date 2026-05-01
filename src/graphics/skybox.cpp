@@ -189,6 +189,7 @@ void Skybox::generateCubeMapFromTextures()
         }
 
         img->copyToScaling(rgba, size, size);
+        img->drop();
 
         if (i == 2 || i == 3)
         {
@@ -203,7 +204,6 @@ void Skybox::generateCubeMapFromTextures()
             }
             delete[] tmp;
         }
-        img->drop();
 
         bool needs_srgb_format = CVS->isDeferredEnabled();
         glBindTexture(GL_TEXTURE_CUBE_MAP, m_cube_map);
@@ -232,9 +232,11 @@ void Skybox::generateCubeMapFromTextures()
             int ret = imBuildMipmapCascade(&cascade, rgba, size, size,
                 1/*layercount*/, 4, size * 4, &options, 0);
             assert(ret == 1);
+            delete[] rgba;
 #else
             imBuildMipmapCascade(&cascade, rgba, size, size,
                 1/*layercount*/, 4, size * 4, &options, 0);
+            delete[] rgba;
 #endif
             unsigned mip = 0;
             unsigned cur_width = size;
@@ -270,9 +272,8 @@ void Skybox::generateCubeMapFromTextures()
             glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0,
                 internal_format, size, size, 0, format,
                 GL_UNSIGNED_BYTE, (GLvoid*)rgba);
+            delete[] rgba;
         }
-
-        delete[] rgba;
     }
 
     if (!CVS->isTextureCompressionEnabled())
