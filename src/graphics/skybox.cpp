@@ -208,9 +208,10 @@ void Skybox::generateCubeMapFromTextures()
         bool needs_srgb_format = CVS->isDeferredEnabled();
         glBindTexture(GL_TEXTURE_CUBE_MAP, m_cube_map);
 
-        const unsigned tc_flag = squish::kDxt5 | stk_config->m_tc_quality;
         if (CVS->isTextureCompressionEnabled())
         {
+            const unsigned tc_flag = squish::kDxt5 | stk_config->m_tc_quality;
+
             unsigned tex_size = GE::get4x4CompressedTextureSize(size, size);
             uint8_t* compressed = new uint8_t[tex_size];
             squishCompressImage((uint8_t*)rgba, size, size, size * 4,
@@ -221,20 +222,7 @@ void Skybox::generateCubeMapFromTextures()
             glCompressedTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0,
                 internal_format, size, size, 0, tex_size, compressed);
             delete[] compressed;
-        }
-        else
-        {
-            GLint format = GL_BGRA;
-            if (is_gles)
-                format = GL_RGBA;
-            GLint internal_format = needs_srgb_format ? GL_SRGB8_ALPHA8 : GL_RGBA8;
-            glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0,
-                internal_format, size, size, 0, format,
-                GL_UNSIGNED_BYTE, (GLvoid*)rgba);
-        }
 
-        if (CVS->isTextureCompressionEnabled())
-        {
             imMipmapCascade cascade;
             imReduceOptions options;
             imReduceSetOptions(&options, IM_REDUCE_FILTER_LINEAR/*filter*/,
@@ -272,6 +260,16 @@ void Skybox::generateCubeMapFromTextures()
                 mip += 1;
             }
             imFreeMipmapCascade(&cascade);
+        }
+        else
+        {
+            GLint format = GL_BGRA;
+            if (is_gles)
+                format = GL_RGBA;
+            GLint internal_format = needs_srgb_format ? GL_SRGB8_ALPHA8 : GL_RGBA8;
+            glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0,
+                internal_format, size, size, 0, format,
+                GL_UNSIGNED_BYTE, (GLvoid*)rgba);
         }
 
         delete[] rgba;
