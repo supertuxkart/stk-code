@@ -424,6 +424,8 @@ public:
                                 bool sun_ = false,
                                 scene::ISceneNode* parent = NULL);
     // ------------------------------------------------------------------------
+    void clearLight(scene::ISceneNode* parent);
+    // ------------------------------------------------------------------------
     void clearLights();
     // ------------------------------------------------------------------------
     SP::SPDynamicDrawCall* getSunInterposer() { return m_sun_interposer; }

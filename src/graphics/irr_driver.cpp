@@ -2470,6 +2470,20 @@ scene::ISceneNode *IrrDriver::addLight(const core::vector3df &pos,
 
 // --------------------------------------------------------------------------------------------
 
+void IrrDriver::clearLight(scene::ISceneNode* parent)
+{
+    for (unsigned int i = 0; i < m_lights.size(); i++)
+    {
+        if (m_lights[i]->getParent() == parent)
+        {
+            m_lights[i]->remove();
+            m_lights.erase(m_lights.begin() + i);
+        }
+    }
+}   // clearLight
+
+// --------------------------------------------------------------------------------------------
+
 void IrrDriver::clearLights()
 {
     for (unsigned int i = 0; i < m_lights.size(); i++)

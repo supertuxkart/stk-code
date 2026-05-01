@@ -1138,6 +1138,8 @@ void TrackObjectPresentationLight::init(scene::ISceneNode* parent, bool is_spot,
 // ----------------------------------------------------------------------------
 TrackObjectPresentationLight::~TrackObjectPresentationLight()
 {
+    if (m_node)
+        irr_driver->clearLight(m_node->getParent());
 }   // ~TrackObjectPresentationLight
 // ----------------------------------------------------------------------------
 void TrackObjectPresentationLight::setEnergy(float energy)
