@@ -251,7 +251,7 @@ private:
 
     void init(const XMLNode* xml_node, scene::ISceneNode* parent, bool enabled,
               bool no_track = false, const std::string& mesh_ident = "",
-              unsigned int instance = 0);
+              const std::string& instance_ident = "");
 
 public:
     TrackObjectPresentationMesh(const XMLNode& xml_node, bool enabled,
@@ -267,7 +267,7 @@ public:
                                 const core::vector3df& scale,
                                 bool no_track = false,
                                 const std::string& mesh_ident = "",
-                                unsigned int instance = 0);
+                                const std::string& instance_ident = "");
     TrackObjectPresentationMesh(scene::IAnimatedMesh* mesh,
                                 const core::vector3df& xyz,
                                 const core::vector3df& hpr,

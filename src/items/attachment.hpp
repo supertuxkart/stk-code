@@ -23,6 +23,8 @@
 #include "utils/no_copy.hpp"
 #include "utils/types.hpp"
 
+#include <string>
+
 using namespace irr;
 
 namespace irr
@@ -104,6 +106,9 @@ private:
     /** Parent node of a library node, which will be attached to the kart's
      *  scene node. */
     scene::ISceneNode *m_library_node;
+
+    /* Used to request a cleanup when the library instance is not used anymore */
+    std::string m_lib_instance;
 
     /** Used by bombs so that it's not passed back to previous owner. */
     Kart     *m_previous_owner;

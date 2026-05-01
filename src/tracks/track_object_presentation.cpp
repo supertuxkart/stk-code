@@ -474,7 +474,7 @@ TrackObjectPresentationMesh::TrackObjectPresentationMesh(
                                                  const core::vector3df& scale,
                                                  bool no_track,
                                                  const std::string& mesh_ident,
-                                                 unsigned int instance)
+                                                 const std::string& instance_ident)
                            : TrackObjectPresentationSceneNode(xyz, hpr, scale)
 {
     m_is_looped    = false;
@@ -503,13 +503,13 @@ TrackObjectPresentationMesh::TrackObjectPresentationMesh(
     }
 
     file_manager->popTextureSearchPath();
-    init(NULL, parent, true, no_track, mesh_ident, instance);
+    init(NULL, parent, true, no_track, mesh_ident, instance_ident);
 }   // TrackObjectPresentationMesh
 
 // ----------------------------------------------------------------------------
 void TrackObjectPresentationMesh::init(const XMLNode* xml_node, scene::ISceneNode* parent,
                                        bool enabled, bool no_track, const std::string& mesh_ident,
-                                       unsigned int instance)
+                                       const std::string& instance_ident)
 {
     // for backwards compatibility, if unspecified assume there is
     bool skeletal_animation = true;
@@ -609,7 +609,7 @@ void TrackObjectPresentationMesh::init(const XMLNode* xml_node, scene::ISceneNod
             if (xml_node)
                 AttachableLibraryManager::get()->handleAnimatedTextures(m_node, *xml_node, mesh_ident);
             else
-                AttachableLibraryManager::get()->handleAnimatedTextures(m_node, mesh_ident, instance);
+                AttachableLibraryManager::get()->handleAnimatedTextures(m_node, mesh_ident, instance_ident);
         }
         else if (track && xml_node)
         {
@@ -924,7 +924,7 @@ TrackObjectPresentationParticles::TrackObjectPresentationParticles(scene::IScene
     m_auto_emit = auto_emit;
 
     init(parent);
-}   // TrackObjectPresentationLight
+}   // TrackObjectPresentationParticles
 
 // ----------------------------------------------------------------------------
 void TrackObjectPresentationParticles::init(scene::ISceneNode* parent)

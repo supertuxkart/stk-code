@@ -78,8 +78,10 @@ AttachableLibraryObject::AttachableLibraryObject(const std::string& name, const 
     else if (m_type == "mesh")
     {
         std::string mesh_ident = lib_ident + "_" + m_name;
+        // Instances start at 0 so we substract 1 from the instance count
+        std::string instance_ident = lib_ident + "_" + StringUtils::toString(instance - 1);
         m_presentation = new TrackObjectPresentationMesh(parent,
-            model_path, xyz, hpr, scale, true /* no track */, mesh_ident, instance);
+            model_path, xyz, hpr, scale, true /* no track */, mesh_ident, instance_ident);
         // TODO some kind of function also called in init handling glow, etc.
     }
 

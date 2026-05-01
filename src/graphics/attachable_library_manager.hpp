@@ -58,7 +58,8 @@ private:
     AttachableLibraryManager();
     ~AttachableLibraryManager();
 
-    scene::ISceneNode* loadLibraryInstance(const std::string& identifier);
+    scene::ISceneNode* loadLibraryInstance(const std::string& identifier,
+                                           std::string& lib_instance);
     void add(const XMLNode &xml_node, const std::string& parent_id);
 public:
     /** Create the singleton instance. */
@@ -89,9 +90,14 @@ public:
     void handleAnimatedTextures(scene::ISceneNode *node, const XMLNode &xml,
                                 const std::string& lib_ident);
     void handleAnimatedTextures(scene::ISceneNode *node, const std::string& lib_ident,
-                                unsigned int instance);
+                                const std::string& instance_ident);
     void updateGraphics(float dt);
-    scene::ISceneNode* createInstance(const std::string& name);
+    // ----------------------------------------------------------------
+    /** The lib_instance string is an external string object that AttachableLibraryManager
+     * sets to the instance identifier. This allows the source that requested the instance
+     * to know which instance to request clean-up for when it's done. */
+    scene::ISceneNode* createInstance(const std::string& name, std::string& lib_instance);
+    void cleanInstance(const std::string& instance_id);
 
 };  // AttachableLibraryManager
 

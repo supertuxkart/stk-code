@@ -63,12 +63,14 @@ Attachment::Attachment(Kart* kart)
     m_graphical_type       = ATTACH_NOTHING;
     m_scaling_end_ticks    = -1;
     m_has_library_node     = false;
+    m_lib_instance         = "";
     m_node                 = NULL;
     m_library_node         = irr_driver->getSceneManager()->addEmptySceneNode();
     if (GUIEngine::isNoGraphics())
         return;
     // If we attach a NULL mesh, we get a NULL scene node back. So we
     // have to attach some kind of mesh, but make it invisible.
+    // TODO : Check if the EmptySceneNode used by m_library_node would work?
     if (kart->isGhostKart())
         m_node = irr_driver->addAnimatedMesh(
             attachment_manager->getMesh(Attachment::ATTACH_BOMB), "bomb",
@@ -94,9 +96,8 @@ Attachment::~Attachment()
     if(m_node)
         irr_driver->removeNode(m_node);
 
-    // TODO: likely not enough to clean up properly a library node
-    if(m_library_node)
-        irr_driver->removeNode(m_library_node);
+    if (m_has_library_node)
+        AttachableLibraryManager::get()->cleanInstance(m_lib_instance);
 
     if (m_bomb_sound)
     {
@@ -563,6 +564,14 @@ void Attachment::updateGraphics(float dt)
     // Add the suitable graphical effects if different attachment is set
     if (m_type != m_graphical_type)
     {
+        if (m_has_library_node)
+        {
+            AttachableLibraryManager::get()->cleanInstance(m_lib_instance);
+            // m_library_node should not be NULL, so we add back an empty node
+            m_library_node = irr_driver->getSceneManager()->addEmptySceneNode();
+            m_lib_instance = "";
+        }
+
         m_has_library_node = false;
         std::string lib_id("");
 
@@ -581,7 +590,8 @@ void Attachment::updateGraphics(float dt)
         case ATTACH_ELECTRO_SHIELD:
             m_has_library_node = true;
             lib_id = attachment_manager->getLibId(m_type, m_kart->getIdent());
-            m_library_node = AttachableLibraryManager::get()->createInstance(lib_id);
+            irr_driver->removeNode(m_library_node); // Avoid leaking an empty scene node
+            m_library_node = AttachableLibraryManager::get()->createInstance(lib_id, m_lib_instance);
             m_library_node->setPosition(core::vector3df(0.0f, 0.0f, 0.0f));
             m_library_node->setRotation(core::vector3df(0.0f, 0.0f, 0.0f));
             m_library_node->setScale(core::vector3df(1.0f, 1.0f, 1.0f));

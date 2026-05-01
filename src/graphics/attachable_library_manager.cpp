@@ -149,7 +149,8 @@ void AttachableLibraryManager::loadLibraryNode(const std::string& folder_name, c
  * when we need to create a new instance of the library attachment.
  * The identifier parameter tells us which cached library node should be used
  */
-scene::ISceneNode* AttachableLibraryManager::loadLibraryInstance(const std::string& identifier)
+scene::ISceneNode* AttachableLibraryManager::loadLibraryInstance(const std::string& identifier,
+                                                                 std::string& lib_instance)
 {
     if (m_attachable_lib_nodes.count(identifier) == 0)
     {
@@ -158,43 +159,35 @@ scene::ISceneNode* AttachableLibraryManager::loadLibraryInstance(const std::stri
         return nullptr;
     }
 
-    std::string unique_id;
     unsigned int instance_count = 0;
     // We create a unique ID for this new instance
     // If an ID was used then vacated, we can reuse it.
-    // FIXME IDs are currently not vacated
     do
     {
-        unique_id = identifier + "_" + StringUtils::toString(instance_count);
+        lib_instance = identifier + "_" + StringUtils::toString(instance_count);
         instance_count++;
-    } while(m_attachable_lib_nodes.count(unique_id) > 0);
+    } while(m_attachable_lib_nodes.count(lib_instance) > 0);
 
-    Log::info("AttachableLibraryManager","Unique id selected is %s!", unique_id.c_str());
-
-    m_attachable_lib_nodes[unique_id] = irr_driver->getSceneManager()->addEmptySceneNode();
+    m_attachable_lib_nodes[lib_instance] = irr_driver->getSceneManager()->addEmptySceneNode();
 
     // This might be unnecessary
-    m_attachable_lib_nodes[unique_id]->setPosition(m_init_xyz);
-    m_attachable_lib_nodes[unique_id]->setRotation(m_init_hpr);
-    m_attachable_lib_nodes[unique_id]->setScale(m_init_scale);
-    m_attachable_lib_nodes[unique_id]->updateAbsolutePosition();
-    m_attachable_lib_nodes[unique_id]->setNeedsUpdateAbsTrans(true);
+    m_attachable_lib_nodes[lib_instance]->setPosition(m_init_xyz);
+    m_attachable_lib_nodes[lib_instance]->setRotation(m_init_hpr);
+    m_attachable_lib_nodes[lib_instance]->setScale(m_init_scale);
+    m_attachable_lib_nodes[lib_instance]->updateAbsolutePosition();
+    m_attachable_lib_nodes[lib_instance]->setNeedsUpdateAbsTrans(true);
 
     // Loop over all objects from the reference lib node and do a deep copy
     // with the correct new parent
     for (unsigned int i = 0; i < m_all_objects[identifier].size(); i++)
     {
         AttachableLibraryObject *copied_obj =
-            m_all_objects[identifier][i]->clone(m_attachable_lib_nodes[unique_id],
+            m_all_objects[identifier][i]->clone(m_attachable_lib_nodes[lib_instance],
                             m_folder_map[identifier], identifier, instance_count);
-        m_all_objects[unique_id].push_back(copied_obj);
+        m_all_objects[lib_instance].push_back(copied_obj);
     }
 
-    // Prevent it from being cleared
-    // Might not be necessary with the new structure!
-    m_attachable_lib_nodes[unique_id]->grab();
-
-    return m_attachable_lib_nodes[unique_id];
+    return m_attachable_lib_nodes[lib_instance];
 } // loadLibraryInstance
 
 // ----------------------------------------------------------------------------
@@ -215,14 +208,11 @@ void AttachableLibraryManager::handleAnimatedTextures(scene::ISceneNode *node,
 /** Handles animated textures. This is used when copying a library node
  */
 void AttachableLibraryManager::handleAnimatedTextures(scene::ISceneNode *node,
-    const std::string& ident, unsigned int instance)
+    const std::string& full_ident, const std::string& instance_ident)
 {
-    // Instances start at 0 so we substract 1 from the instance count
-    std::string child_ident = ident + "_" + StringUtils::toString(instance - 1);
-
-    for (unsigned int i = 0; i < m_animated_textures[ident].size(); i++)
+    for (unsigned int i = 0; i < m_animated_textures[full_ident].size(); i++)
     {
-        MovingTexture* mt = m_animated_textures[ident][i]->clone();
+        MovingTexture* mt = m_animated_textures[full_ident][i]->clone();
         SP::SPMeshNode* spmn = dynamic_cast<SP::SPMeshNode*>(node);
         if (spmn)
         {
@@ -236,7 +226,7 @@ void AttachableLibraryManager::handleAnimatedTextures(scene::ISceneNode *node,
                     Material* mat = m[j];
                     std::string mat_name = StringUtils::getBasename(mat->getSamplerPath(0));
                     mat_name = StringUtils::toLowerCase(mat_name);
-                    if (mat_name == m_animated_textures[ident][i]->getMatName())
+                    if (mat_name == m_animated_textures[full_ident][i]->getMatName())
                     {
                         found = true;
                         spmb->enableTextureMatrix(j);
@@ -256,7 +246,7 @@ void AttachableLibraryManager::handleAnimatedTextures(scene::ISceneNode *node,
                 "Only SP mehses are supported for animated textures in attachable libraries.");
         }
 
-        m_animated_textures[child_ident].push_back(mt);
+        m_animated_textures[instance_ident].push_back(mt);
     }
 }   // handleAnimatedTextures
 
@@ -292,26 +282,67 @@ void AttachableLibraryManager::updateGraphics(float dt)
         }
     }
 
-    int animated_counter = 0;
     for (auto const& pair : m_animated_textures)
     {
         for (unsigned int i = 0; i < pair.second.size(); i++)
         {
-            animated_counter++;
             pair.second[i]->update(dt);
         }
     }
-    Log::info("AttachableLibraryManager", "Updating %i animated textures.", animated_counter);
 }   // updateGraphics
 
-scene::ISceneNode* AttachableLibraryManager::createInstance(const std::string& name)
+scene::ISceneNode* AttachableLibraryManager::createInstance(const std::string& name,
+                                                            std::string& lib_instance)
 {
     if (m_attachable_lib_nodes.count(name) == 0)
         Log::fatal("AttachableLibraryManager", "Library for '%s' is not loaded.", name.c_str());
-    else
-        Log::info("AttachableLibraryManager", "Creating instance for '%s'.", name.c_str());
+    //else
+        //Log::info("AttachableLibraryManager", "Creating instance for '%s'.", name.c_str());
 
     // This function creates a new library instance
     // and returns the parent scene node
-    return loadLibraryInstance(name);
+    return loadLibraryInstance(name, lib_instance);
 }   // createInstance
+
+void AttachableLibraryManager::cleanInstance(const std::string& instance_id)
+{
+    if (m_attachable_lib_nodes.count(instance_id) == 0)
+    {
+        Log::error("AttachableLibraryManager",
+            "Trying to clean instance '%s', which is not loaded.", instance_id.c_str());
+        return;
+    }
+
+    // Loop over all objects linked to this lib instance and delete them
+    for (unsigned int i = 0; i < m_all_objects[instance_id].size(); i++)
+    {
+        delete m_all_objects[instance_id][i];
+    }
+
+    // Remove the parent node of the library instance
+    irr_driver->removeNode(m_attachable_lib_nodes[instance_id]);
+
+    // Delete the vector and std::map key too
+    m_all_objects[instance_id].clear();
+    auto keymatch = m_all_objects.find(instance_id);
+    m_all_objects.erase(keymatch);
+    auto keymatch_2 = m_attachable_lib_nodes.find(instance_id);
+    m_attachable_lib_nodes.erase(keymatch_2);
+
+    // Clear the animated textures associated with this lib_instance
+    for (auto pair : m_animated_textures)
+    {
+        if (pair.first == instance_id)
+        {
+            for (unsigned int i = 0; i < pair.second.size(); i++)
+            {
+                delete pair.second[i];
+            }
+            pair.second.clear();
+            break;
+        }
+    }
+    auto pair = m_animated_textures.find(instance_id);
+    if (pair != m_animated_textures.end())
+        m_animated_textures.erase(pair);
+}   // cleanInstance
