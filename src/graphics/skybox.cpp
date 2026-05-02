@@ -183,25 +183,22 @@ void Skybox::generateCubeMapFromTextures()
 
         if (i == 2 || i == 3)
         {
-            char *tmp = new char[size * size * 4];
-            for (unsigned x = 0; x < size; x++)
+            char *tmp = new char[size * size];
+            for (unsigned z = 0; z < 4; z++)
             {
-                for (unsigned y = 0; y < size; y++)
+                for (unsigned x = 0; x < size; x++)
                 {
-                    tmp[4 * (size * x + y) + 0] = rgba[4 * (size * x + y) + 0];
-                    tmp[4 * (size * x + y) + 1] = rgba[4 * (size * x + y) + 1];
-                    tmp[4 * (size * x + y) + 2] = rgba[4 * (size * x + y) + 2];
-                    tmp[4 * (size * x + y) + 3] = rgba[4 * (size * x + y) + 3];
+                    for (unsigned y = 0; y < size; y++)
+                    {
+                        tmp[size * x + y] = rgba[4 * (size * x + y) + z];
+                    }
                 }
-            }
-            for (unsigned x = 0; x < size; x++)
-            {
-                for (unsigned y = 0; y < size; y++)
+                for (unsigned x = 0; x < size; x++)
                 {
-                    rgba[4 * (size * (size - y - 1) + x) + 0] = tmp[4 * (size * x + y) + 0];
-                    rgba[4 * (size * (size - y - 1) + x) + 1] = tmp[4 * (size * x + y) + 1];
-                    rgba[4 * (size * (size - y - 1) + x) + 2] = tmp[4 * (size * x + y) + 2];
-                    rgba[4 * (size * (size - y - 1) + x) + 3] = tmp[4 * (size * x + y) + 3];
+                    for (unsigned y = 0; y < size; y++)
+                    {
+                        rgba[4 * (size * (size - y - 1) + x) + z] = tmp[size * x + y];
+                    }
                 }
             }
             delete[] tmp;
