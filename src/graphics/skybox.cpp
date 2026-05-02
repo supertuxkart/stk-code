@@ -84,16 +84,6 @@ public:
 
 namespace {
     // ----------------------------------------------------------------------------
-    void swapPixels(char *old_img, char *new_img, unsigned stride, unsigned old_i,
-                    unsigned old_j, unsigned new_i, unsigned new_j)
-    {
-        new_img[4 * (stride * new_i + new_j)] = old_img[4 * (stride * old_i + old_j)];
-        new_img[4 * (stride * new_i + new_j) + 1] = old_img[4 * (stride * old_i + old_j) + 1];
-        new_img[4 * (stride * new_i + new_j) + 2] = old_img[4 * (stride * old_i + old_j) + 2];
-        new_img[4 * (stride * new_i + new_j) + 3] = old_img[4 * (stride * old_i + old_j) + 3];
-    }   // swapPixels
-
-    // ----------------------------------------------------------------------------
     // From http://http.developer.nvidia.com/GPUGems3/gpugems3_ch20.html
     /** Returns the index-th pair from Hammersley set of pseudo random set.
         Hammersley set is a uniform distribution between 0 and 1 for 2 components.
@@ -194,12 +184,24 @@ void Skybox::generateCubeMapFromTextures()
         if (i == 2 || i == 3)
         {
             char *tmp = new char[size * size * 4];
-            memcpy(tmp, rgba, size * size * 4);
             for (unsigned x = 0; x < size; x++)
             {
                 for (unsigned y = 0; y < size; y++)
                 {
-                    swapPixels(tmp, rgba, size, x, y, (size - y - 1), x);
+                    tmp[4 * (size * x + y) + 0] = rgba[4 * (size * x + y) + 0];
+                    tmp[4 * (size * x + y) + 1] = rgba[4 * (size * x + y) + 1];
+                    tmp[4 * (size * x + y) + 2] = rgba[4 * (size * x + y) + 2];
+                    tmp[4 * (size * x + y) + 3] = rgba[4 * (size * x + y) + 3];
+                }
+            }
+            for (unsigned x = 0; x < size; x++)
+            {
+                for (unsigned y = 0; y < size; y++)
+                {
+                    rgba[4 * (size * (size - y - 1) + x) + 0] = tmp[4 * (size * x + y) + 0];
+                    rgba[4 * (size * (size - y - 1) + x) + 1] = tmp[4 * (size * x + y) + 1];
+                    rgba[4 * (size * (size - y - 1) + x) + 2] = tmp[4 * (size * x + y) + 2];
+                    rgba[4 * (size * (size - y - 1) + x) + 3] = tmp[4 * (size * x + y) + 3];
                 }
             }
             delete[] tmp;
