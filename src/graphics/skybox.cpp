@@ -183,25 +183,21 @@ void Skybox::generateCubeMapFromTextures()
 
         if (i == 2 || i == 3)
         {
-            char *tmp = new char[size * size];
             for (unsigned z = 0; z < 4; z++)
             {
-                for (unsigned x = 0; x < size; x++)
+                // TODO: if size is an odd number, this probably does not work
+                for (unsigned x = 0; x < size/2; x++)
                 {
-                    for (unsigned y = 0; y < size; y++)
+                    for (unsigned y = 0; y < size/2; y++)
                     {
-                        tmp[size * x + y] = rgba[4 * (size * x + y) + z];
-                    }
-                }
-                for (unsigned x = 0; x < size; x++)
-                {
-                    for (unsigned y = 0; y < size; y++)
-                    {
-                        rgba[4 * (size * (size - y - 1) + x) + z] = tmp[size * x + y];
+                        char tmp = rgba[4 * (size * x + y) + z];
+                        rgba[4 * (size * x + y) + z] = rgba[4 * (size * y + (size - x - 1)) + z];
+                        rgba[4 * (size * y + (size - x - 1)) + z] = rgba[4 * (size * (size - x - 1) + (size - y - 1)) + z];
+                        rgba[4 * (size * (size - x - 1) + (size - y - 1)) + z] = rgba[4 * (size * (size - y - 1) + x) + z];
+                        rgba[4 * (size * (size - y - 1) + x) + z] = tmp;
                     }
                 }
             }
-            delete[] tmp;
         }
 
         bool needs_srgb_format = CVS->isDeferredEnabled();
