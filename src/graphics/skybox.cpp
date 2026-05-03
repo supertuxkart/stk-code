@@ -183,18 +183,23 @@ void Skybox::generateCubeMapFromTextures()
 
         if (i == 2 || i == 3)
         {
-            for (unsigned z = 0; z < 4; z++)
+            // TODO: if size is an odd number, this probably does not work
+            for (unsigned x = 0; x < size/2; x++)
             {
-                // TODO: if size is an odd number, this probably does not work
-                for (unsigned x = 0; x < size/2; x++)
+                unsigned inv_x = size - x - 1;
+                for (unsigned y = 0; y < size/2; y++)
                 {
-                    for (unsigned y = 0; y < size/2; y++)
+                    unsigned inv_y = size - y - 1;
+                    for (unsigned z = 0; z < 4; z++)
                     {
                         char tmp = rgba[4 * (size * x + y) + z];
-                        rgba[4 * (size * x + y) + z] = rgba[4 * (size * y + (size - x - 1)) + z];
-                        rgba[4 * (size * y + (size - x - 1)) + z] = rgba[4 * (size * (size - x - 1) + (size - y - 1)) + z];
-                        rgba[4 * (size * (size - x - 1) + (size - y - 1)) + z] = rgba[4 * (size * (size - y - 1) + x) + z];
-                        rgba[4 * (size * (size - y - 1) + x) + z] = tmp;
+                        rgba[4 * (size * x + y) + z] =
+                            rgba[4 * (size * y + inv_x) + z];
+                        rgba[4 * (size * y + inv_x) + z] =
+                            rgba[4 * (size * inv_x + inv_y) + z];
+                        rgba[4 * (size * inv_x + inv_y) + z] =
+                            rgba[4 * (size * inv_y + x) + z];
+                        rgba[4 * (size * inv_y + x) + z] = tmp;
                     }
                 }
             }
