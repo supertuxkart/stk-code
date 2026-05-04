@@ -183,8 +183,7 @@ void Skybox::generateCubeMapFromTextures()
 
         if (i == 2 || i == 3)
         {
-            // if size is an odd number, this probably does not work
-            for (unsigned x = 0; x < size/2; x++)
+            for (unsigned x = 0; x < (size+(size%2))/2; x++)
             {
                 unsigned inv_x = size - x - 1;
                 for (unsigned y = 0; y < size/2; y++)
