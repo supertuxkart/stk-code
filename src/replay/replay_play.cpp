@@ -45,6 +45,7 @@ ReplayPlay::ReplayPlay()
     m_current_replay_file   = 0;
     m_second_replay_file    = 0;
     m_second_replay_enabled = false;
+    m_loaded_all_replays    = false;
 }   // ReplayPlay
 
 //-----------------------------------------------------------------------------
@@ -101,6 +102,7 @@ void ReplayPlay::loadAllReplayFile()
         j++;
     }
 
+    m_loaded_all_replays = true;
 }   // loadAllReplayFile
 
 //-----------------------------------------------------------------------------

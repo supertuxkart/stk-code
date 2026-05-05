@@ -74,7 +74,7 @@ void GhostReplaySelection::unloaded()
  */
 void GhostReplaySelection::refresh(bool forced_update, bool update_columns)
 {
-    if (ReplayPlay::get()->getNumReplayFile() == 0 || forced_update)
+    if (!ReplayPlay::get()->hasLoadedAllReplays() || forced_update)
         ReplayPlay::get()->loadAllReplayFile();
     defaultSort();
     loadList();
