@@ -123,10 +123,26 @@ void OptionsScreenVideo::init()
     //I18N: In the video options
     vsync->addLabel(_("Vertical Sync"));
 #ifdef MOBILE_STK
-    std::set<int> fps = { 30, 60, 120 };
+    std::set<int> fps = { 30, 60, 90, 120 };
 #else
-    std::set<int> fps = { 30, 60, 120, 180, 250, 500, 1000 };
+    std::set<int> fps = { 30, 60, 120, 180, 240, 480, 1000 };
 #endif
+
+    // We add the current refresh rate of all the available displays
+    // With std::set, duplicate values are discarded
+    int num_displays = SDL_GetNumVideoDisplays();
+    SDL_DisplayMode display_mode;
+
+    // Iterate through every connected display
+    for (int i = 0; i < num_displays; i++)
+    {
+        if (SDL_GetCurrentDisplayMode(i /* display_index */, &display_mode) == 0)
+        {
+            if (display_mode.refresh_rate > 0)
+                fps.insert(display_mode.refresh_rate);
+        }
+    }
+     
     fps.insert(UserConfigParams::m_max_fps);
     for (auto& i : fps)
         vsync->addLabel(core::stringw(i));
