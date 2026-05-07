@@ -198,7 +198,7 @@ namespace irr
             s32 TotalItemHeight;
             s32 ItemsIconWidth;
             s32 MousePosY;
-            gui::IGUIFont* Font;
+            gui::IGUIFont* m_font;
             gui::IGUISpriteBank* IconBank;
             gui::IGUIScrollBar* ScrollBar;
             u32 selectTime;

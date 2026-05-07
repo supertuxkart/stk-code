@@ -31,6 +31,7 @@
 #include "config/user_config.hpp"
 #include "graphics/2dutils.hpp"
 #include "graphics/material.hpp"
+#include "guiengine/CGUISpriteBank.hpp"
 #include "guiengine/engine.hpp"
 #include "guiengine/message_queue.hpp"
 #include "guiengine/modaldialog.hpp"
@@ -39,6 +40,7 @@
 #include "guiengine/widget.hpp"
 #include "guiengine/widgets/icon_button_widget.hpp"
 #include "guiengine/widgets/label_widget.hpp"
+#include "guiengine/widgets/list_widget.hpp"
 #include "guiengine/widgets/ribbon_widget.hpp"
 #include "io/file_manager.hpp"
 #include "karts/controller/controller.hpp"
@@ -105,6 +107,7 @@ void RaceResultGUI::init()
     m_started_race_over_music = false;
     music_manager->stopMusic();
 
+    m_has_set_goal_lists = false;
     bool human_win = true;
     bool has_human_players = false;
     bool in_first_place = false;
@@ -231,6 +234,22 @@ void RaceResultGUI::init()
         core::stringw tips_string = _("Tip: %s", tip);
         MessageQueue::add(MessageQueue::MT_GENERIC, tips_string);
     }
+
+    // Load the kart icons
+    m_icon_bank = new irr::gui::STKModifiedSpriteBank( GUIEngine::getGUIEnv());
+
+    for(unsigned int i=0; i<kart_properties_manager->getNumberOfKarts(); i++)
+    {
+        const KartProperties* prop = kart_properties_manager->getKartById(i);
+        m_icon_bank->addTextureAsSprite(prop->getIconMaterial()->getTexture());
+    }
+
+    const KartProperties* prop = kart_properties_manager->getKart("tux");
+    m_icon_default_kart = m_icon_bank->addTextureAsSprite(prop->getIconMaterial()->getTexture());
+
+    // 128 is the height of the image file
+    m_icon_bank->setScale(1.0f / 128.0f);
+    m_icon_bank->setTargetIconSize(128, 128);
 }   // init
 
 //-----------------------------------------------------------------------------
@@ -244,6 +263,11 @@ void RaceResultGUI::tearDown()
     {
         m_finish_sound->stop();
     }
+
+    if (m_blue_goal_list)
+        m_blue_goal_list->setIcons(NULL);
+    if (m_red_goal_list)
+        m_red_goal_list->setIcons(NULL);
 }   // tearDown
 
 //-----------------------------------------------------------------------------
@@ -823,6 +847,8 @@ void RaceResultGUI::drawCTFScorers(KartTeam team, int x, int y, int height)
 //-----------------------------------------------------------------------------
 void RaceResultGUI::unload()
 {
+    delete m_icon_bank;
+    m_icon_bank = NULL;
     cleanupGPProgress();
     Screen::unload();
 } // unload
@@ -1549,9 +1575,6 @@ void RaceResultGUI::displaySoccerResults()
     const int red_score = sw->getScore(KART_TEAM_RED);
     const int blue_score = sw->getScore(KART_TEAM_BLUE);
 
-    GUIEngine::Widget *table_area = getWidget("result-table");
-    int height = table_area->m_h + table_area->m_y;
-
     if (red_score > blue_score)
         result_text = _("Red Team Wins");
     else if (blue_score > red_score)
@@ -1601,34 +1624,45 @@ void RaceResultGUI::displaySoccerResults()
 
     // Draw the scorers for each team
     current_y += (3 * rect.Height) / 4;
-    drawTeamScorers(KART_TEAM_RED, current_x, current_y, height);
-    drawTeamScorers(KART_TEAM_BLUE, current_x, current_y, height);
+
+    if (!m_has_set_goal_lists)
+    {
+        setGoalList(KART_TEAM_RED);
+        setGoalList(KART_TEAM_BLUE);
+        m_has_set_goal_lists = true;
+    }
+
+    positionGoalList(KART_TEAM_RED, current_y);
+    positionGoalList(KART_TEAM_BLUE,current_y);
 } // displaySoccerResults
 
 //-----------------------------------------------------------------------------
-/** Displays the goal scorers for a team
- *  \param team The team for which to draw goal scorers
+/** Prepares the goal lists for a team.
+ *  \param team The team for which to make the goal list.
  *  \param x Left limit of the scorers lists (both blue and red)
  *  \param y Top limit of the scorers lists
- *  \param height Maximum y of the table area (??) */
-void RaceResultGUI::drawTeamScorers(KartTeam team, int x, int y, int height)
+ *  \param height Maximum y of the table area */
+void RaceResultGUI::setGoalList(KartTeam team)
 {
-    int current_x = (team == KART_TEAM_RED) ? x : x + UserConfigParams::m_width / 2;
-    int current_y = y;
-    core::rect<s32> pos(current_x, current_y, current_x, current_y);
-    int prev_y = y;
-    gui::IGUIFont* font = GUIEngine::getSmallFont();
-    core::dimension2du rect; // Filled later
+    GUIEngine::ListWidget* goal_list = new GUIEngine::ListWidget();
+
+    if (team == KART_TEAM_RED)
+        m_red_goal_list = goal_list;
+    else
+        m_blue_goal_list = goal_list;
+
+    manualAddWidget(goal_list);
+    goal_list->add();
+    goal_list->clear();
+    goal_list->clearColumns();
+    goal_list->setActive(false); // Prevent selection
+    goal_list->setIcons(m_icon_bank);
+    goal_list->setLineHeightScale(0.9f);
+
     core::stringw scorer_text;
-    static video::SColor color = video::SColor(255, 255, 255, 255);
+    core::stringw goal_time;
     SoccerWorld* sw = (SoccerWorld*)World::getWorld();
     std::vector<SoccerWorld::ScorerData> scorers = sw->getScorers(team);
-
-    // Display a maximum of 10 scorers
-    while (scorers.size() > 10)
-    {
-        scorers.erase(scorers.begin());
-    }
 
     for (unsigned int i = 0; i < scorers.size(); i++)
     {
@@ -1650,38 +1684,53 @@ void RaceResultGUI::drawTeamScorers(KartTeam team, int x, int y, int height)
             scorer_text += StringUtils::getCountryFlag(scorers.at(i).m_country_code);
         }
 
-        scorer_text.append("  ");
-        scorer_text.append(StringUtils::timeToString(scorers.at(i).m_time).c_str());
-        rect = font->getDimension(scorer_text.c_str());
+        goal_time = StringUtils::timeToString(scorers.at(i).m_time).c_str();
 
-        if (height - prev_y < ((short)scorers.size() + 1)*(short)rect.Height)
-            current_y += (height - prev_y) / ((short)scorers.size() + 1);
-        else
-            current_y += rect.Height;
+        int kart_icon = -1;
 
-        if (current_y > height) break;
-
-        pos = core::rect<s32>(current_x, current_y, current_x, current_y);
-        font->draw(scorer_text, pos, (own_goal ?
-            video::SColor(255, 255, 0, 0) : color), true, false);
-        irr::video::ITexture* scorer_icon = NULL;
-        const KartProperties* kp = kart_properties_manager->getKart(scorers.at(i).m_kart);
-        // For addon kart online
-        if (!kp)
-            kp = kart_properties_manager->getKart("tux");
-        if (kp)
-            scorer_icon = kp->getIconMaterial()->getTexture();
-        if (scorer_icon)
+        for(unsigned int j=0; j < kart_properties_manager->getNumberOfKarts(); j++)
         {
-            core::recti source_rect = core::recti(core::vector2di(0, 0), scorer_icon->getSize());
-            irr::u32 offset_x = (irr::u32)(font->getDimension(scorer_text.c_str()).Width / 1.5f);
-            core::recti r = core::recti(current_x - offset_x - m_width_icon, current_y,
-                current_x - offset_x, current_y + m_width_icon);
-            draw2DImage(scorer_icon, r, source_rect,
-                NULL, NULL, true);
+            const KartProperties* prop = kart_properties_manager->getKartById(j);
+            if (scorers.at(i).m_kart == prop->getIdent())
+            {
+                kart_icon = j;
+                break;
+            }
         }
+
+        // This may happen online when other players are using
+        // an addon kart that is not present locally
+        if (kart_icon == -1)
+            kart_icon = m_icon_default_kart;
+
+        std::vector<GUIEngine::ListWidget::ListCell> row;
+
+        row.push_back(GUIEngine::ListWidget::ListCell(goal_time, -1 /* icon */, 3, false /* center */));
+        row.push_back(GUIEngine::ListWidget::ListCell("", kart_icon, 1, false /* center */));
+        row.push_back(GUIEngine::ListWidget::ListCell(scorer_text, -1 /* icon */, 4, false /* center */));
+
+        goal_list->addItem(StringUtils::toString(i), row);
+        if (own_goal)
+            goal_list->markItemRed(i);
     } // for scorers.size()
-} // drawTeamScorers
+}   // setGoalList
+
+void RaceResultGUI::positionGoalList(KartTeam team, int starting_y)
+{
+    GUIEngine::ListWidget* goal_list = (team == KART_TEAM_RED) ? m_red_goal_list
+                                                               : m_blue_goal_list;
+    // Position the list widget in the result table
+    GUIEngine::Widget *table_area = getWidget("result-table");
+    int horizontal_margin = table_area->m_w / 36;
+    int left_limit = table_area->m_x + horizontal_margin;
+    if (team == KART_TEAM_BLUE)
+        left_limit += table_area->m_w / 2;
+    int list_width = (table_area->m_w / 2) - 2 * horizontal_margin;
+    int vertical_margin = table_area->m_h / 60;
+    int list_height = table_area->m_h + table_area->m_y - starting_y - (2 * vertical_margin);
+    goal_list->move(left_limit, starting_y + vertical_margin,
+                    list_width, list_height);
+}
 
 //-----------------------------------------------------------------------------
 
