@@ -90,7 +90,7 @@ GhostReplayInfoDialog::GhostReplayInfoDialog(unsigned int replay_id,
 
     /* Used to display kart icons for the selected replay(s) */
     irr::gui::STKModifiedSpriteBank *icon_bank = GhostReplaySelection::getInstance()->getIconBank();
-    m_replay_info_widget->setIcons(icon_bank, 1.5f);
+    m_replay_info_widget->setIcons(icon_bank);
 
     updateReplayDisplayedInfo();
 

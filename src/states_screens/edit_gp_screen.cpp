@@ -235,7 +235,7 @@ void EditGPScreen::loadList(const int selected)
     m_icons.clear();
     m_icon_bank->clear();
     m_icon_bank->setFixedScale(1.5f);
-    m_list->setIcons(m_icon_bank, 1.5f);
+    m_list->setIcons(m_icon_bank);
 
     for (unsigned int i = 0; i < m_gp->getNumberOfTracks(true); i++)
     {

@@ -293,7 +293,7 @@ void GPInfoScreen::init()
 
         m_icon_bank->setScale(1.0f / 128.0f);
         m_icon_bank->setTargetIconSize(128, 128);
-        m_highscore_list->setIcons(m_icon_bank, 1.2f);
+        m_highscore_list->setIcons(m_icon_bank);
         RaceManager::get()->setNumKarts(RaceManager::get()->getNumLocalPlayers() + m_ai_kart_spinner->getValue());
         // We don't save highscores for random gps so load highscores here
         updateHighscores();

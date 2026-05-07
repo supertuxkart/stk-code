@@ -124,7 +124,7 @@ void OnlineScreen::init()
 
     m_icon_bank->setScale(1.0f / 72.0f);
     m_icon_bank->setTargetIconSize(128, 128);
-    m_news_list->setIcons(m_icon_bank, 2.0f);
+    m_news_list->setIcons(m_icon_bank);
 
     RibbonWidget* r = getWidget<RibbonWidget>("menu_toprow");
     r->setFocusForPlayer(PLAYER_ID_GAME_MASTER);
