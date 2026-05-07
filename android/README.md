@@ -43,6 +43,7 @@ Before build, you must download dependencies-android-src.tar.xz from: https://gi
 These libraries are compiled and then statically linked with STK by the Android build script.
 
 You need to extract that packed file to stk-code/lib directory, so that the directory will have following structure:
+```
 > stk-code
   > build
   > data
@@ -55,6 +56,7 @@ You need to extract that packed file to stk-code/lib directory, so that the dire
     > ...
   > src
   > ...
+```
 
 ### Android SDK and NDK
 
@@ -103,36 +105,21 @@ export NDK_PATH=/path/to/your/android/ndk
 
 For more variables, read the .sh scripts (the lines starting with "export" specifically).
 
----------------------------------------------------------------------------------
-COMPILE_ARCH    - Allows one to choose CPU architecture for which the 
-                  package will be compiled. 
-                  Possible values: all, armv7, aarch64, x86, x86_64.
-                  Default is: all.
+**COMPILE_ARCH**    - Allows one to choose CPU architecture for which the package will be compiled. Possible values: all, armv7, aarch64, x86, x86_64. Default is: all.
 
-BUILD_TYPE      - Allows one to set build type.
-                  Possible values: debug, release, beta.
-                  Default is: debug.
+**BUILD_TYPE**      - Allows one to set build type. Possible values: debug, release, beta. Default is: debug.
 
-BUILD_TOOLS_VER - Allows to override the SDK build-tools version.
+**BUILD_TOOLS_VER** - Allows to override the SDK build-tools version.
 
-SDK_PATH        - Path to SDK directory
+**SDK_PATH**        - Path to SDK directory
 
-NDK_PATH        - Path to NDK directory, it should include a list 
-                  of installed NDK version folders
+**NDK_PATH**        - Path to NDK directory, it should include a list of installed NDK version folders
 
-PROJECT_VERSION - Set Supertuxkart version number, for example "1.5" or 
-                  "git" or whatever. The version must match with file
-                  assets/data/supertuxkart.$PROJECT_VERSION
-                  and that file must exist, because it is used for 
-                  extracting and loading game data.
-                  Default is: git.
+**PROJECT_VERSION** - Set Supertuxkart version number, for example "1.5" or "git" or whatever. The version must match with file assets/data/supertuxkart.$PROJECT_VERSION and that file must exist, because it is used for extracting and loading game data. Default is: git.
 
-PROJECT_CODE    - Set Supertuxkart version code that is used in the 
-                  manifest file.
-                  Default is: 1.
----------------------------------------------------------------------------------
+**PROJECT_CODE**    - Set Supertuxkart version code that is used in the manifest file. Default is: 1.
 
-### Building the Release build
+## Building the Release build
 
 Making a release build is similar to typical compilation, but there are few additional things to do. 
 
@@ -165,15 +152,15 @@ And then, you make standard compilation with:
     ./make.sh
 ```
 
-### Troubleshooting
+## Troubleshooting
 
-#### "The source directory '/stk-code/android/deps-arm64-v8a/libadrenotools/lib/linkernsbypass' does not contain a CMakeLists.txt file." while executing make_deps.sh
+### "The source directory '/stk-code/android/deps-arm64-v8a/libadrenotools/lib/linkernsbypass' does not contain a CMakeLists.txt file." while executing make_deps.sh
 
 For some reason, the library linkernsbypass doesn't come with the dependencies-android-src.tar.xz file, so execute this to fix this: 
 
 ```bash
 git clone https://github.com/bylaws/liblinkernsbypass.git ../lib/libadrenotools/lib/linkernsbypass
 ```
-#### "java.lang.OutOfMemoryError / Java heap space execption" while executing make.sh
+### "java.lang.OutOfMemoryError / Java heap space execption" while executing make.sh
 
 You need to add "org.gradle.jvmargs=-XX:MaxHeapSize=2048m -Xmx2048m" (without the quotes) to .gradle/gradle.properties. (or to gradle.properties in the android folder).
