@@ -58,11 +58,13 @@ ThreeStrikesBattle::ThreeStrikesBattle() : WorldWithRank()
                                  "tire.spm") );
     irr_driver->grabAllTextures(m_tire);
 
-    m_total_rescue = 0;
-    m_frame_count = 0;
-    m_start_time = irr_driver->getRealTime();
-    m_total_hit = 0;
-
+    m_total_rescue  = 0;
+    m_frame_count   = 0;
+    m_start_time    = irr_driver->getRealTime();
+    m_total_hit     = 0;
+    m_spawn_counter = 0;
+    // TODO: fetch this value and a few others from config instead
+    m_base_spawn_time = 30.0f;
 }   // ThreeStrikesBattle
 
 //-----------------------------------------------------------------------------
@@ -99,12 +101,8 @@ void ThreeStrikesBattle::reset(bool restart)
 {
     WorldWithRank::reset(restart);
 
-    float next_spawn_time =
-        RaceManager::get()->getDifficulty() == RaceManager::DIFFICULTY_BEST ? 40.0f :
-        RaceManager::get()->getDifficulty() == RaceManager::DIFFICULTY_HARD ? 30.0f :
-        RaceManager::get()->getDifficulty() == RaceManager::DIFFICULTY_MEDIUM ?
-        25.0f : 20.0f;
-    m_next_sta_spawn_ticks = stk_config->time2Ticks(next_spawn_time);
+    m_spawn_counter = 0;
+    m_next_sta_spawn_ticks = stk_config->time2Ticks(m_base_spawn_time);
 
     const unsigned int kart_amount = (unsigned int)m_karts.size();
     for(unsigned int n=0; n<kart_amount; n++)
@@ -567,7 +565,7 @@ void ThreeStrikesBattle::enterRaceOverState()
 {
     WorldWithRank::enterRaceOverState();
 
-    // Unspawn all spare tire karts if neccesary
+    // Unspawn all spare tire karts if necessary
     for (unsigned int i = 0; i < m_spare_tire_karts.size(); i++)
     {
         SpareTireAI* sta =
@@ -631,33 +629,46 @@ void ThreeStrikesBattle::spawnSpareTireKarts()
     if (m_spare_tire_karts.empty() ||
         getTicksSinceStart() < m_next_sta_spawn_ticks)
         return;
-
-    // The lifespan for sta: inc_factor / period * 1000 / 2
-    // So in easier mode the sta lasts longer than spawn period
-    float inc_factor, lifespan;
-    switch (RaceManager::get()->getDifficulty())
-    {
-    case RaceManager::DIFFICULTY_BEST: inc_factor = 0.7f;  lifespan = 17.5f;  break;
-    case RaceManager::DIFFICULTY_HARD: inc_factor = 0.65f; lifespan = 21.66f; break;
-    case RaceManager::DIFFICULTY_EASY: inc_factor = 0.6f;  lifespan = 24.0f;  break;
-    default:                           inc_factor = 0.55f; lifespan = 27.5f;  break;
-    }
-
-    int lifespan_ticks = stk_config->time2Ticks(lifespan);
-    // Spawn spare tire kart when necessary
-    m_next_sta_spawn_ticks = int( lifespan_ticks
-                                + getTicksSinceStart() * inc_factor
-                                + getTicksSinceStart()             );
-    int kart_has_few_lives = 0;
+    
+    // If not enough karts are missing lives, we delay the spawn
+    int kart_few_lives_counter = 0;
+    int kart_alive_counter = 0;
+    float minimum_damaged_kart_ratio = 0.6f;
     for (unsigned int i = 0; i < m_kart_info.size(); i++)
     {
-        if (m_kart_info[i].m_lives > 0 && m_kart_info[i].m_lives < 3)
-            kart_has_few_lives++;
+        if (m_kart_info[i].m_lives > 0)
+        {
+            kart_alive_counter++;
+            if (m_kart_info[i].m_lives < 3)
+                kart_few_lives_counter++;
+        }
     }
 
-    float ratio = kart_has_few_lives / (inc_factor * 2);
-    if (ratio < 1.5f) return;
-    unsigned int spawn_sta = unsigned(ratio);
+    float ratio = (float)kart_few_lives_counter / (float)kart_alive_counter;
+    if (ratio < minimum_damaged_kart_ratio)
+    {
+        m_next_sta_spawn_ticks += stk_config->time2Ticks(5.0f);
+        return;
+    }
+
+    m_spawn_counter++;
+
+    // We do not simply spawn spare tire karts at fixed time intervals,
+    // rather we use increasing time intervals. This factor controls
+    // how quickly the time interval increases.
+    float inc_factor = 1.0f + (0.5f * m_spawn_counter);
+    // This determines how much time will elapse before the
+    // spare tire kart will unspawn even if it has not been touched
+    int lifespan_ticks = stk_config->time2Ticks(25.0f);
+
+    int base_spawn_ticks = stk_config->time2Ticks(m_base_spawn_time);
+    // Spawn spare tire kart when necessary
+    m_next_sta_spawn_ticks = int( getTicksSinceStart()
+                                + base_spawn_ticks * inc_factor);
+
+    unsigned int spawn_sta = (2 * kart_few_lives_counter) / 3;
+    if (spawn_sta < 1)
+        spawn_sta = 1;
     if (spawn_sta > m_spare_tire_karts.size())
         spawn_sta = (int)m_spare_tire_karts.size();
     if (m_race_gui)
@@ -674,6 +685,8 @@ void ThreeStrikesBattle::spawnSpareTireKarts()
         assert(sta);
         sta->spawn(lifespan_ticks);
     }
+    // TODO: randomly shuffle the spare tire karts, so that different
+    // kart models are used when spawning less than the max number.
 }   // spawnSpareTireKarts
 
 //-----------------------------------------------------------------------------

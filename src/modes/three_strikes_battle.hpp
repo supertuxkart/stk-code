@@ -90,7 +90,9 @@ private:
     int m_total_hit;
 
     std::vector<Kart*> m_spare_tire_karts;
+    float m_base_spawn_time;
     int m_next_sta_spawn_ticks;
+    unsigned int m_spawn_counter;
 
 public:
     /** Used to show a nice graph when battle is over */
