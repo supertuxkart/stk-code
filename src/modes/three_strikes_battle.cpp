@@ -679,114 +679,112 @@ void ThreeStrikesBattle::spawnSpareTireKarts()
 //-----------------------------------------------------------------------------
 void ThreeStrikesBattle::loadCustomModels()
 {
-    // Pre-add spare tire karts if there are more than certain number of karts
+    // Pre-add spare tire karts if the arena has a graph to place them.
+    // All arenas should satisfy the number of nodes condition
     ArenaGraph* ag = ArenaGraph::get();
-    if (ag && m_karts.size() > 4)
+    if (ag && ag->getNumNodes() > 150)
     {
-        // Spare tire karts only added with large arena
         const int all_nodes = ag->getNumNodes();
-        if (all_nodes > 500)
+
+        // Don't create too many spare tire karts
+        const unsigned int max_sta_num = unsigned(m_karts.size() * 0.8f);
+        unsigned int pos_created = 0;
+        std::deque<int> sta_possible_nodes;
+        for (int i = 0; i < all_nodes; i++)
+            sta_possible_nodes.push_back(i);
+        std::vector<btTransform> pos;
+
+        // Fill all current starting position into used first
+        for (unsigned int i = 0; i < getNumberOfRescuePositions(); i++)
         {
-            // Don't create too many spare tire karts
-            const unsigned int max_sta_num = unsigned(m_karts.size() * 0.8f);
-            unsigned int pos_created = 0;
-            std::deque<int> sta_possible_nodes;
-            for (int i = 0; i < all_nodes; i++)
-                sta_possible_nodes.push_back(i);
-            std::vector<btTransform> pos;
-
-            // Fill all current starting position into used first
-            for (unsigned int i = 0; i < getNumberOfRescuePositions(); i++)
+            int node = -1;
+            ag->findRoadSector(getRescueTransform(i).getOrigin(), &node,
+                NULL, true);
+            if (node == -1)
             {
-                int node = -1;
-                ag->findRoadSector(getRescueTransform(i).getOrigin(), &node,
-                    NULL, true);
-                if (node == -1)
-                {
-                    Log::warn("ThreeStrikesBattle",
-                        "Start position %i is not a valid rescue position", i);
-                }
-                else
-                {
-                    sta_possible_nodes.erase(std::remove_if(
-                        sta_possible_nodes.begin(), sta_possible_nodes.end(),
-                        [node](const int n) { return n == node; }),
-                        sta_possible_nodes.end());
-                }
+                Log::warn("ThreeStrikesBattle",
+                    "Start position %i is not a valid rescue position", i);
             }
-
-            // Find random nodes to pre-spawn spare tire karts
-            std::shuffle(sta_possible_nodes.begin(),
-                         sta_possible_nodes.end(),
-                         RandomGenerator::getGenerator());
-
-            // Compute a random kart list
-            std::vector<std::string> sta_list;
-            kart_properties_manager->getRandomKartList(max_sta_num, NULL,
-                &sta_list);
-            if (sta_list.size() != max_sta_num)
-                return;
-
-            TerrainInfo terrain;
-            while (!sta_possible_nodes.empty())
+            else
             {
-                const int node = sta_possible_nodes.front();
-                const ArenaNode* n = ag->getNode(node);
-                btTransform t;
-                t.setOrigin(n->getCenter());
-                t.setRotation(shortestArcQuat(Vec3(0, 1, 0), n->getNormal()));
-
-                // Make sure starting position is valid for spare tire karts,
-                // see #4615
-                terrain.update(t.getBasis(),
-                    t.getOrigin() + t.getBasis() * Vec3(0, 0.3f, 0));
-                Vec3 from = (Vec3)t.getOrigin();
-                const KartProperties* kp = kart_properties_manager->getKart(
-                    sta_list[pos.size()]);
-                if (!kp)
-                    return;
-                float kh = kp->getMasterKartModel().getHeight();
-                //start projection from top of kart
-                Vec3 up_offset = terrain.getNormal() * (0.5f * kh);
-                from += up_offset;
-                Vec3 down = t.getBasis() * Vec3(0, -10000.0f, 0);
-
-                Vec3 hit_point, normal;
-                if (!Track::getCurrentTrack()->isOnGround(from, down,
-                    &hit_point, &normal, false/*print_warning*/))
-                {
-                    sta_possible_nodes.pop_front();
-                    continue;
-                }
-                pos.push_back(t);
-                pos_created++;
-                sta_possible_nodes.pop_front();
-                if (pos_created == max_sta_num) break;
+                sta_possible_nodes.erase(std::remove_if(
+                    sta_possible_nodes.begin(), sta_possible_nodes.end(),
+                    [node](const int n) { return n == node; }),
+                    sta_possible_nodes.end());
             }
-
-            if (pos_created != max_sta_num)
-                return;
-            assert(sta_list.size() == pos.size());
-            // Now add them
-            for (unsigned int i = 0; i < pos.size(); i++)
-            {
-                auto sta = std::make_shared<Kart>(sta_list[i], (int)m_karts.size(),
-                    (int)m_karts.size() + 1, pos[i], HANDICAP_NONE,
-                    std::make_shared<GE::GERenderInfo>(1.0f));
-                sta->init(RaceManager::KartType::KT_SPARE_TIRE);
-                sta->setController(new SpareTireAI(sta.get()));
-
-                m_karts.push_back(sta);
-                RaceManager::get()->addSpareTireKart(sta_list[i]);
-
-                // Copy STA pointer to m_spare_tire_karts array, allowing them
-                // to respawn easily
-                m_spare_tire_karts.push_back(sta.get());
-            }
-            unsigned int sta_num = RaceManager::get()->getNumSpareTireKarts();
-            assert(m_spare_tire_karts.size() == sta_num);
-            Log::info("ThreeStrikesBattle","%d spare tire kart(s) created.",
-                sta_num);
         }
-    }
+
+        // Find random nodes to pre-spawn spare tire karts
+        std::shuffle(sta_possible_nodes.begin(),
+                     sta_possible_nodes.end(),
+                     RandomGenerator::getGenerator());
+
+        // Compute a random kart list
+        std::vector<std::string> sta_list;
+        kart_properties_manager->getRandomKartList(max_sta_num, NULL,
+            &sta_list);
+        if (sta_list.size() != max_sta_num)
+            return;
+
+        TerrainInfo terrain;
+        while (!sta_possible_nodes.empty())
+        {
+            const int node = sta_possible_nodes.front();
+            const ArenaNode* n = ag->getNode(node);
+            btTransform t;
+            t.setOrigin(n->getCenter());
+            t.setRotation(shortestArcQuat(Vec3(0, 1, 0), n->getNormal()));
+
+            // Make sure starting position is valid for spare tire karts,
+            // see #4615
+            terrain.update(t.getBasis(),
+                t.getOrigin() + t.getBasis() * Vec3(0, 0.3f, 0));
+            Vec3 from = (Vec3)t.getOrigin();
+            const KartProperties* kp = kart_properties_manager->getKart(
+                sta_list[pos.size()]);
+            if (!kp)
+                return;
+            float kh = kp->getMasterKartModel().getHeight();
+            //start projection from top of kart
+            Vec3 up_offset = terrain.getNormal() * (0.5f * kh);
+            from += up_offset;
+            Vec3 down = t.getBasis() * Vec3(0, -10000.0f, 0);
+
+            Vec3 hit_point, normal;
+            if (!Track::getCurrentTrack()->isOnGround(from, down,
+                &hit_point, &normal, false/*print_warning*/))
+            {
+                sta_possible_nodes.pop_front();
+                continue;
+            }
+            pos.push_back(t);
+            pos_created++;
+            sta_possible_nodes.pop_front();
+            if (pos_created == max_sta_num) break;
+        }
+
+        if (pos_created != max_sta_num)
+            return;
+        assert(sta_list.size() == pos.size());
+        // Now add them
+        for (unsigned int i = 0; i < pos.size(); i++)
+        {
+            auto sta = std::make_shared<Kart>(sta_list[i], (int)m_karts.size(),
+                (int)m_karts.size() + 1, pos[i], HANDICAP_NONE,
+                std::make_shared<GE::GERenderInfo>(1.0f));
+            sta->init(RaceManager::KartType::KT_SPARE_TIRE);
+            sta->setController(new SpareTireAI(sta.get()));
+
+            m_karts.push_back(sta);
+            RaceManager::get()->addSpareTireKart(sta_list[i]);
+
+            // Copy STA pointer to m_spare_tire_karts array, allowing them
+            // to respawn easily
+            m_spare_tire_karts.push_back(sta.get());
+        }
+        unsigned int sta_num = RaceManager::get()->getNumSpareTireKarts();
+        assert(m_spare_tire_karts.size() == sta_num);
+        Log::info("ThreeStrikesBattle","%d spare tire kart(s) created.",
+            sta_num);
+    } // if ag && ag->getNumNodes() > 150
 }   // loadCustomModels
