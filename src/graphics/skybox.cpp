@@ -183,7 +183,11 @@ void Skybox::generateCubeMapFromTextures()
 
         if (i == 2 || i == 3)
         {
-            for (unsigned x = 0; x < (size+(size%2))/2; x++)
+            // The size % 2 is here to handle the case of an odd size. We only
+            // need to apply it to one of {x, y}. With integer division:
+            // (odd / 2) * (odd / 2 + 1) * 4  = (odd * odd) - 1 pixel assignations
+            // The central pixel which would swap with itself is left untouched.
+            for (unsigned x = 0; x < (size + (size % 2))/2; x++)
             {
                 unsigned inv_x = size - x - 1;
                 for (unsigned y = 0; y < size/2; y++)
