@@ -11,7 +11,7 @@
         <header id="title_header" height="9%" align="center" text_align="center" text="Server Selection"/>
         <box proportion="1" width="98%" align="center" layout="vertical-row" padding="6">
             <list id="server_list" x="0" y="0" width="100%" height="93%" word_wrap="true"
-                  alternate_bg="true" line_height="small"/>
+                  alternate_bg="true" line_height="2.0"/>
             <textbox id="searcher" width="100%" height="7%"/>
         </box>
         <div width="98%" align="center" layout="vertical-row" height="fit">

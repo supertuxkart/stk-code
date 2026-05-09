@@ -8,7 +8,7 @@
             </div>
             <!-- This is filled in programmatically -->
             <box width="100%" height="75%" align="center" layout="vertical-row" padding="1">
-                <list id="current_replay_info" x="0" y="0" width="100%" height="100%"/>
+                <list id="current_replay_info" x="0" y="0" width="100%" height="100%" line_height="1.5"/>
             </box>
         </div>
 

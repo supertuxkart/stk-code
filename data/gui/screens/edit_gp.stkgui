@@ -8,7 +8,7 @@
         <spacer width="100%" height="1%" />
 
         <box proportion="5" width="98%" align="center" layout="vertical-row" padding="6">
-            <list id="tracks" x="0" y="0" width="100%" height="100%" keep_selection="true" />
+            <list id="tracks" x="0" y="0" width="100%" height="100%" keep_selection="true" line_height="1.5" />
         </box>
 
         <spacer width="100%" height="2%" />

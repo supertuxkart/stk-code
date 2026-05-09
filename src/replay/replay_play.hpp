@@ -120,6 +120,8 @@ private:
 
     std::vector<ReplayData>  m_replay_file_list;
 
+    bool                     m_loaded_all_replays;
+
     /** All ghost karts. */
     std::vector<std::shared_ptr<GhostKart> > m_ghost_karts;
 
@@ -167,6 +169,8 @@ public:
     // ------------------------------------------------------------------------
     const unsigned int getNumReplayFile() const
                            { return (unsigned int)m_replay_file_list.size(); }
+    // ------------------------------------------------------------------------
+    const bool hasLoadedAllReplays() const { return m_loaded_all_replays; }
     // ------------------------------------------------------------------------
     std::shared_ptr<GhostKart> getGhostKart(int n) { return m_ghost_karts[n]; }
     // ------------------------------------------------------------------------
