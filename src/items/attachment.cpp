@@ -703,14 +703,17 @@ void Attachment::updateGraphics(float dt)
             m_bomb_sound->play();
         }
         m_bomb_sound->setPosition(m_kart->getXYZ());
-        // Mesh animation frames are 1 to 61 frames (60 steps)
-        // The idea is change second by second, counterclockwise 60 to 0 secs
+        // The mesh animation frames are 1 to 61 frames (60 steps)
+        // The idea is to change the clock handle position counterclockwise
+        // to indicate that time is running out.
         // If longer times needed, it should be a surprise "oh! bomb activated!"
         float time_left = stk_config->ticks2Time(m_ticks_left);
-        if (time_left <= (m_node->getEndFrame() - m_node->getStartFrame() - 1))
+        if (time_left <= (stk_config->m_bomb_clock_max))
         {
-            m_node->setCurrentFrame(m_node->getEndFrame()
-                - m_node->getStartFrame() - 1 - time_left);
+            int anim_frame_steps = m_node->getEndFrame() - m_node->getStartFrame();
+            // We rescale so the animation frames and the clock max match
+            time_left = time_left * anim_frame_steps / stk_config->m_bomb_clock_max;
+            m_node->setCurrentFrame(anim_frame_steps - time_left);
         }
         return;
     }

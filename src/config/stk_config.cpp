@@ -206,6 +206,7 @@ void STKConfig::load(const std::string &filename)
 void STKConfig::init_defaults()
 {
     m_bomb_time                  = m_bomb_time_increase          =
+        m_bomb_clock_max         =
         m_explosion_impulse_objects = m_music_credit_time        =
         m_delay_finish_time      = m_skid_fadeout_time           =
         m_near_ground            = m_solver_split_impulse_thresh =
@@ -481,6 +482,9 @@ void STKConfig::getAllData(const XMLNode * root)
     {
         bomb_node->get("time", &m_bomb_time);
         bomb_node->get("time-increase", &m_bomb_time_increase);
+        bomb_node->get("clock-max", &m_bomb_clock_max);
+        if (m_bomb_clock_max < 1.0f)
+            m_bomb_clock_max = 1.0f;
     }
 
     if(const XMLNode *item_return_node= root->getNode("item-return-time"))

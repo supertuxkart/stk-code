@@ -216,9 +216,10 @@
   <!-- How long the music credits are shown. -->
   <credits music="8"/>
 
-  <!-- time is the time till a bomb explodes. time-increase is the time added
-       to timer when bomb is passed on. -->
-  <bomb time="30.0" time-increase="0.0"/>
+  <!-- time:          the time till a bomb explodes.
+       time-increase: the time added to the timer when the bomb is passed on.
+       clock-max:     how many seconds a full circle of the clock corresponds to. -->
+  <bomb time="20.0" time-increase="0.0" clock-max="24.0"/>
 
   <!-- Item return times.
        Time until an item that has been collected returns. Can be set

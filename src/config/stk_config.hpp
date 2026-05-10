@@ -76,6 +76,7 @@ public:
     float m_bomb_time;                 /**<Time before a bomb explodes.        */
     float m_bomb_time_increase;        /**<Time added to bomb timer when it's
                                            passed on.                          */
+    float m_bomb_clock_max    ;        /**<Maximum time displayed by the bomb clock */
     int   m_item_switch_ticks;          /**< Time items will be switched.       */
     int   m_bubblegum_counter;         /**< How many times bubble gums must be
                                             driven over before they disappear. */
