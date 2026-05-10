@@ -400,60 +400,46 @@ void Attachment::handleCollisionWithKart(Kart *other)
 {
     Attachment *attachment_other=other->getAttachment();
 
-    if(getType()==Attachment::ATTACH_BOMB)
+    if (getType()==Attachment::ATTACH_BOMB)
     {
         // Don't attach a bomb when the kart is shielded
-        if(other->isShielded())
+        if (other->isShielded())
         {
             other->decreaseShieldTime();
             return;
         }
         // If both karts have a bomb, explode them immediately:
-        if(attachment_other->getType()==Attachment::ATTACH_BOMB)
+        if (attachment_other->getType()==Attachment::ATTACH_BOMB)
         {
             setTicksLeft(0);
             attachment_other->setTicksLeft(0);
         }
-        else  // only this kart has a bomb, move it to the other
+        // Only this kart has a bomb: transfer it to the other kart
+        else
         {
-            // if there are only two karts, let them switch bomb from one to other
-            if (getPreviousOwner() != other ||
-                World::getWorld()->getNumKarts() <= 2)
+            // Except if we got the bomb from the other kart.
+            // TODO: Have a transfer lock-time instead.
+            if (getPreviousOwner() != other)
             {
-                // Don't move if this bomb was from other kart originally
-                other->getAttachment()
-                    ->set(ATTACH_BOMB,
-                          getTicksLeft()+stk_config->time2Ticks(
-                                           stk_config->m_bomb_time_increase),
-                          m_kart);
+                float new_bomb_time = getTicksLeft() +
+                    stk_config->time2Ticks(stk_config->m_bomb_time_increase);
+                other->getAttachment()->set(ATTACH_BOMB, new_bomb_time, m_kart);
                 other->playCustomSFX(SFXManager::CUSTOM_ATTACH);
-                clear();
+                clear(); // Remove the bomb from this kart
             }
         }
     }   // type==BOMB
-    else if(attachment_other->getType()==Attachment::ATTACH_BOMB &&
-             (attachment_other->getPreviousOwner()!=m_kart ||
-               World::getWorld()->getNumKarts() <= 2         )      )
+    else if (attachment_other->getType()==Attachment::ATTACH_BOMB)
     {
-        // Don't attach a bomb when the kart is shielded
-        if(m_kart->isShielded())
-        {
-            m_kart->decreaseShieldTime();
-            return;
-        }
-        set(ATTACH_BOMB,
-            other->getAttachment()->getTicksLeft()+
-               stk_config->time2Ticks(stk_config->m_bomb_time_increase),
-            other);
-        other->getAttachment()->clear();
-        m_kart->playCustomSFX(SFXManager::CUSTOM_ATTACH);
+        // Avoid duplicating the code from the if check, we simply
+        // handle the collision from the other kart's perspective
+        other->getAttachment()->handleCollisionWithKart(m_kart);
     }
     else
     {
         m_kart->playCustomSFX(SFXManager::CUSTOM_CRASH);
         other->playCustomSFX(SFXManager::CUSTOM_CRASH);
     }
-
 }   // handleCollisionWithKart
 
 //-----------------------------------------------------------------------------
