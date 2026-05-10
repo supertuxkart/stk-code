@@ -311,7 +311,9 @@ void KartSelectionScreen::init()
     const std::vector<std::string> &classes = kart_properties_manager->getAllKartTypes();
     GUIEngine::SpinnerWidget* kart_class = getWidget<GUIEngine::SpinnerWidget>("kart_class");
     assert(kart_class != NULL);
-    kart_class->setValue(classes.size()); // All
+
+    const int last_class = UserConfigParams::m_last_used_kart_class;
+    kart_class->setValue(last_class < 0 ? classes.size() /* All */ : last_class);
 
     // Build kart list (it is built everytime, to account for .g. locking)
     setKartsFromCurrentGroup();
@@ -1242,6 +1244,18 @@ void KartSelectionScreen::allPlayersDone()
         if (n == PLAYER_ID_GAME_MASTER)
         {
             UserConfigParams::m_default_kart = selected_kart;
+
+            if (selected_kart == RANDOM_KART_ID)
+            {
+                SpinnerWidget* kart_class = getWidget<SpinnerWidget>("kart_class");
+                assert(kart_class != NULL);
+
+                UserConfigParams::m_last_used_kart_class = kart_class->getValue();
+            }
+            else
+            {
+                UserConfigParams::m_last_used_kart_class = -1;
+            }
         }
 
         if (selected_kart == RANDOM_KART_ID)
