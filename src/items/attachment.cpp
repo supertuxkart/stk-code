@@ -703,18 +703,7 @@ void Attachment::updateGraphics(float dt)
             m_bomb_sound->play();
         }
         m_bomb_sound->setPosition(m_kart->getXYZ());
-        // The mesh animation frames are 1 to 61 frames (60 steps)
-        // The idea is to change the clock handle position counterclockwise
-        // to indicate that time is running out.
-        // If longer times needed, it should be a surprise "oh! bomb activated!"
-        float time_left = stk_config->ticks2Time(m_ticks_left);
-        if (time_left <= (stk_config->m_bomb_clock_max))
-        {
-            int anim_frame_steps = m_node->getEndFrame() - m_node->getStartFrame();
-            // We rescale so the animation frames and the clock max match
-            time_left = time_left * anim_frame_steps / stk_config->m_bomb_clock_max;
-            m_node->setCurrentFrame(anim_frame_steps - time_left);
-        }
+        AttachmentUtils::setBombClock(m_node, m_ticks_left);
         return;
     }
     default:
@@ -779,3 +768,22 @@ void Attachment::popGumShield()
     else
         Track::getCurrentTrack()->getItemManager()->dropNewItem(Item::ITEM_BUBBLEGUM_SMALL, m_kart);
 } // popGumShield
+
+namespace AttachmentUtils
+{
+    // ----------------------------------------------------------------------------
+    /* This function animates the bomb's clock hand, changing its position
+    * counterclockwise to indicate that time is running out.
+    * If more time than clock max remains, the hand will wait before moving. */
+    void setBombClock(scene::IAnimatedMeshSceneNode* bomb_node, int bomb_ticks_left)
+    {
+        float time_left = stk_config->ticks2Time(bomb_ticks_left);
+        if (time_left <= (stk_config->m_bomb_clock_max))
+        {
+            int anim_frame_steps = bomb_node->getEndFrame() - bomb_node->getStartFrame();
+            // We rescale so the animation frames and the clock max match
+            time_left = time_left * anim_frame_steps / stk_config->m_bomb_clock_max;
+            bomb_node->setCurrentFrame(anim_frame_steps - time_left);
+        }
+    }   // setBombClock
+}

@@ -33,6 +33,7 @@
 #include "graphics/explosion.hpp"
 #include "graphics/irr_driver.hpp"
 #include "io/file_manager.hpp"
+#include "items/attachment.hpp"
 #include "items/attachment_manager.hpp"
 #include "items/projectile_manager.hpp"
 #include "karts/kart.hpp"
@@ -130,14 +131,7 @@ void Swatter::updateGraphics(float dt)
             m_bomb_scene_node->setName(debug_name.c_str());
 #endif
             m_bomb_scene_node->setParent(m_kart->getNode());
-            float time_left = stk_config->ticks2Time(m_bomb_remaining);
-            if (time_left <= (m_bomb_scene_node->getEndFrame() -
-                m_bomb_scene_node->getStartFrame() - 1))
-            {
-                m_bomb_scene_node->setCurrentFrame(
-                    m_bomb_scene_node->getEndFrame()
-                    - m_bomb_scene_node->getStartFrame() - 1 - time_left);
-            }
+            AttachmentUtils::setBombClock(m_bomb_scene_node, m_bomb_remaining);
             m_bomb_scene_node->setAnimationSpeed(0.0f);
         }
 

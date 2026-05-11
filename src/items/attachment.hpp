@@ -173,6 +173,11 @@ public:
         m_scaling_end_ticks = -1;
     }
 
-};   // Attachment
+};  // Attachment
 
+// Functions that shouldn't need an Attachment object are handled here
+namespace AttachmentUtils
+{
+    void setBombClock(scene::IAnimatedMeshSceneNode* bomb_node, int bomb_ticks_left);
+}   // AttachmentUtils
 #endif
