@@ -48,6 +48,8 @@
 #include "irrMath.h"
 #include <IAnimatedMeshSceneNode.h>
 
+#define SCALE_UP_TIME 0.7f
+
 /** Initialises the attachment each kart has.
  */
 Attachment::Attachment(Kart* kart)
@@ -135,8 +137,7 @@ void Attachment::set(AttachmentType type, int ticks,
     switch(type)
     {
     case ATTACH_SWATTER:
-        m_plugin =
-            new Swatter(m_kart, was_bomb ? prev_ticks : -1, ticks, this);
+        m_plugin = new Swatter(m_kart, was_bomb ? prev_ticks : -1, ticks, this);
         break;
     default:
         break;
@@ -146,7 +147,7 @@ void Attachment::set(AttachmentType type, int ticks,
     m_ticks_left       = ticks;
     m_previous_owner   = current_kart;
     m_scaling_end_ticks = World::getWorld()->getTicksSinceStart() +
-        stk_config->time2Ticks(0.7f);
+        stk_config->time2Ticks(SCALE_UP_TIME);
 
     m_initial_speed = 0;
     // A parachute can be attached as result of the usage of an item. In this
@@ -490,33 +491,26 @@ void Attachment::update(int ticks)
     case ATTACH_ANCHOR:    // handled in Kart::updatePhysics
     case ATTACH_NOTHING:   // Nothing to do, but complete all cases for switch
     case ATTACH_COUNT:
-        m_initial_speed = 0;
-        break;
-    case ATTACH_SWATTER:
-        // Everything is done in the plugin.
-        m_initial_speed = 0;
+    case ATTACH_SWATTER:   // Everything is done in the plugin.
         break;
     case ATTACH_SWATTER_ANIM:
         // Should never be called, these symbols are only used as an index for
-        // the model, Nolok's attachment type is ATTACH_SWATTER
+        // the model.
         assert(false);
         break;
     case ATTACH_BOMB:
     {
-        m_initial_speed = 0;
         if (m_ticks_left <= 0)
             bombExplode();
         break;
     }
     case ATTACH_BUBBLEGUM_SHIELD:
     case ATTACH_BUBBLEGUM_SHIELD_SMALL:
-        m_initial_speed = 0;
         if (m_ticks_left <= 0)
             popGumShield();
         break;
 
     case ATTACH_ELECTRO_SHIELD:
-        m_initial_speed = 0;
         if (m_ticks_left <= 0)
         {
             //TODO Add a sound effect for when the electro shield stops working
@@ -625,7 +619,7 @@ void Attachment::updateGraphics(float dt)
                                   is_small_gum_shield ? std::max( 1.02f, m_kart->getHighestPoint() * 1.04f) :
                                                         1.0f;
         float scale_ratio = stk_config->ticks2Time(m_scaling_end_ticks -
-            World::getWorld()->getTicksSinceStart()) / 0.7f;
+            World::getWorld()->getTicksSinceStart()) / SCALE_UP_TIME;
         if (scale_ratio > 0.0f)
         {
             if (m_type == ATTACH_PARACHUTE)
@@ -652,35 +646,21 @@ void Attachment::updateGraphics(float dt)
                       : -pow(2, 8 * x - 8) * sin((x * 8 - 8.75) * c4);
                 }
 
-                float scale = 0.3f * scale_ratio +
-                    wanted_node_scale * (1.0f - scale_ratio);
+                float scale = 0.3f * scale_ratio + wanted_node_scale * (1.0f - scale_ratio);
                 m_node->setScale(core::vector3df(scale, scale, scale));
             }
         }
         else
         {
-            if (m_has_library_node)
-            {
-                m_library_node->setScale(core::vector3df(
-                    wanted_node_scale, wanted_node_scale, wanted_node_scale));
-            }
-            else
-            {
-                m_node->setScale(core::vector3df(
-                    wanted_node_scale, wanted_node_scale, wanted_node_scale));
-            }
+            scene::ISceneNode* node = (m_has_library_node) ? m_library_node : m_node;
+            node->setScale(core::vector3df(wanted_node_scale, wanted_node_scale, wanted_node_scale));
         }
         int slow_flashes = stk_config->time2Ticks(2.0f);
         if (is_gum_shield && m_ticks_left < slow_flashes)
         {
             // Bubble gum flashing when close to dropping
-            int ticks_per_flash = stk_config->time2Ticks(0.2f);
-
-            int fast_flashes = stk_config->time2Ticks(0.5f);
-            if (m_ticks_left < fast_flashes)
-            {
-                ticks_per_flash = stk_config->time2Ticks(0.07f);
-            }
+            bool fast_flashes = (m_ticks_left < stk_config->time2Ticks(0.5f));
+            int ticks_per_flash = stk_config->time2Ticks(fast_flashes ? 0.07f : 0.2f);
 
             int division = (m_ticks_left / ticks_per_flash);
             m_node->setVisible((division & 0x1) == 0);
