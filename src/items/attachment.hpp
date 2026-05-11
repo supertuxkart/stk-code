@@ -110,15 +110,15 @@ private:
     /* Used to request a cleanup when the library instance is not used anymore */
     std::string m_lib_instance;
 
-    /** Used by bombs so that it's not passed back to previous owner. */
-    Kart     *m_previous_owner;
-
     /** An optional attachment - additional functionality can be implemented
      *  for certain attachments. */
     AttachmentPlugin *m_plugin;
 
     /** Ticking sound for the bomb */
     SFXBase          *m_bomb_sound;
+
+    /** Time left until the bomb transfer lock expires */
+    int16_t         m_lock_ticks_left;
 
     /** Sound for exploding bubble gum shield */
     SFXBase          *m_bubble_explode_sound;
@@ -135,7 +135,6 @@ public:
     void  update(int ticks);
     void  handleCollisionWithKart(Kart *other);
     void  set (AttachmentType type, int ticks,
-               Kart *previous_kart=NULL,
                bool set_by_rewind_parachute = false);
     void rewindTo(BareNetworkString *buffer);
     void saveState(BareNetworkString *buffer) const;
@@ -153,10 +152,6 @@ public:
     // ------------------------------------------------------------------------
     /** Sets how long this attachment will remain attached. */
     void setTicksLeft(int16_t t)                          { m_ticks_left = t; }
-    // ------------------------------------------------------------------------
-    /** Returns the previous owner of this attachment, used in bombs that
-     *  are being passed between karts. */
-    Kart* getPreviousOwner() const { return m_previous_owner; }
     // ------------------------------------------------------------------------
     /** Returns additional weight for the kart. */
     float weightAdjust() const;

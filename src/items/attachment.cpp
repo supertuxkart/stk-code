@@ -56,9 +56,9 @@ Attachment::Attachment(Kart* kart)
 {
     m_type                 = ATTACH_NOTHING;
     m_ticks_left           = 0;
+    m_lock_ticks_left      = 0;
     m_plugin               = NULL;
     m_kart                 = kart;
-    m_previous_owner       = NULL;
     m_bomb_sound           = NULL;
     m_bubble_explode_sound = NULL;
     m_initial_speed        = 0;
@@ -119,13 +119,8 @@ Attachment::~Attachment()
  *  played, e.g. when a swatter replaces a bomb.
  *  \param type The type of the new attachment.
  *  \param time How long this attachment should stay with the kart.
- *  \param current_kart The kart from which an attachment is transferred.
- *         This is currently used for the bomb (to avoid that a bomb
- *         can be passed back to the previous owner). NULL if a no
- *         previous owner exists.
  */
 void Attachment::set(AttachmentType type, int ticks,
-                     Kart *current_kart,
                      bool set_by_rewind_parachute)
 {
     bool was_bomb = m_type == ATTACH_BOMB;
@@ -145,7 +140,7 @@ void Attachment::set(AttachmentType type, int ticks,
 
     m_type             = type;
     m_ticks_left       = ticks;
-    m_previous_owner   = current_kart;
+    m_lock_ticks_left  = (type == ATTACH_BOMB) ? stk_config->time2Ticks(SCALE_UP_TIME) : 0;
     m_scaling_end_ticks = World::getWorld()->getTicksSinceStart() +
         stk_config->time2Ticks(SCALE_UP_TIME);
 
@@ -212,20 +207,17 @@ void Attachment::clear(AttachmentType type)
  */
 void Attachment::saveState(BareNetworkString *buffer) const
 {
-    // We use bit 6 to indicate if a previous owner is defined for a bomb,
-    // bit 7 to indicate if the attachment is a plugin
-    assert(ATTACH_COUNT < 64);
-    uint8_t bit_7 = 0;
+    // We use bit 6 to indicate if the attachment is a plugin
+    assert(ATTACH_COUNT < 64); // bit numbering starts at 0
+    uint8_t bit_6 = 0;
     if (m_plugin)
-    {
-        bit_7 = 1 << 7;
-    }
-    uint8_t type = m_type | (( (m_type==ATTACH_BOMB) && (m_previous_owner!=NULL) )
-                             ? (1 << 6) : 0 ) | bit_7;
+        bit_6 = 1 << 6;
+
+    uint8_t type = m_type | bit_6;
     buffer->addUInt8(type);
     buffer->addUInt16(m_ticks_left);
-    if (m_type==ATTACH_BOMB && m_previous_owner)
-        buffer->addUInt8(m_previous_owner->getWorldKartId());
+    if (m_type == ATTACH_BOMB)
+        buffer->addUInt16(m_lock_ticks_left);
     if (m_type == ATTACH_PARACHUTE)
         buffer->addUInt16(m_initial_speed);
     if (m_plugin)
@@ -239,23 +231,17 @@ void Attachment::saveState(BareNetworkString *buffer) const
 void Attachment::rewindTo(BareNetworkString *buffer)
 {
     uint8_t type = buffer->getUInt8();
-    bool is_plugin = (type >> 7 & 1) == 1;
+    bool is_plugin = (type >> 6 & 1) == 1;
 
-    // mask out bit 6 and 7
+    // mask out bit 6
     AttachmentType new_type = AttachmentType(type & 63);
-    type &= 127;
 
     int16_t ticks_left = buffer->getUInt16();
-    // Now it is a new attachment:
-    if (type == (ATTACH_BOMB | 64))   // we have previous owner information
-    {
-        uint8_t kart_id = buffer->getUInt8();
-        m_previous_owner = World::getWorld()->getKart(kart_id);
-    }
+
+    if (new_type == ATTACH_BOMB)
+        m_lock_ticks_left = buffer->getUInt16();
     else
-    {
-        m_previous_owner = NULL;
-    }
+        m_lock_ticks_left = 0;
 
     if (new_type == ATTACH_PARACHUTE)
         m_initial_speed = buffer->getUInt16();
@@ -415,19 +401,15 @@ void Attachment::handleCollisionWithKart(Kart *other)
             setTicksLeft(0);
             attachment_other->setTicksLeft(0);
         }
-        // Only this kart has a bomb: transfer it to the other kart
-        else
+        // Only this kart has a bomb: transfer it to the other kart,
+        // except if the transfer time-lock is still active.
+        else if (m_lock_ticks_left <= 0)
         {
-            // Except if we got the bomb from the other kart.
-            // TODO: Have a transfer lock-time instead.
-            if (getPreviousOwner() != other)
-            {
-                float new_bomb_time = getTicksLeft() +
-                    stk_config->time2Ticks(stk_config->m_bomb_time_increase);
-                other->getAttachment()->set(ATTACH_BOMB, new_bomb_time, m_kart);
-                other->playCustomSFX(SFXManager::CUSTOM_ATTACH);
-                clear(); // Remove the bomb from this kart
-            }
+            float new_bomb_time = getTicksLeft() +
+                stk_config->time2Ticks(stk_config->m_bomb_time_increase);
+            other->getAttachment()->set(ATTACH_BOMB, new_bomb_time);
+            other->playCustomSFX(SFXManager::CUSTOM_ATTACH);
+            clear(); // Remove the bomb from this kart
         }
     }   // type==BOMB
     else if (attachment_other->getType()==Attachment::ATTACH_BOMB)
@@ -454,6 +436,8 @@ void Attachment::update(int ticks)
         return;
 
     m_ticks_left -= ticks;
+    if (m_lock_ticks_left > 0) // Prevent overflows
+        m_lock_ticks_left -= ticks;
 
     if (m_plugin)
     {

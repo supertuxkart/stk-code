@@ -190,7 +190,7 @@ void GhostKart::update(int ticks)
     // so do so only if the type change
     else if (attach_type != m_attachment->getType())
     {
-        m_attachment->set(attach_type, attach_ticks, NULL,
+        m_attachment->set(attach_type, attach_ticks,
             /*set_by_rewind_parachute*/true);
     }
 

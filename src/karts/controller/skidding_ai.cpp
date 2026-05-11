@@ -376,8 +376,7 @@ void SkiddingAI::handleSteering(float dt)
         //TODO : add logic to allow an AI kart to pass the bomb to a kart
         //       close behind by slowing/steering slightly
         // If we are close enough and can pass the bomb, try to hit this kart
-        if ( m_kart_ahead != m_kart->getAttachment()->getPreviousOwner() &&
-            m_distance_ahead<=10)
+        if ( m_distance_ahead<=10)
         {
             Vec3 target = m_kart_ahead->getXYZ();
 
