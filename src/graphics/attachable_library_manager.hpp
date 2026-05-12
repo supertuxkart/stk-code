@@ -69,7 +69,7 @@ public:
         m_attachable_lib_manager = new AttachableLibraryManager();
     }   // create
 
-    // ----------------------------------------------------------------
+    // ----------------------------------------------------------------------------------------
     /** Returns the singleton.
      *  \pre create has been called to create the singleton.
      */
@@ -78,7 +78,7 @@ public:
         assert(m_attachable_lib_manager);
         return m_attachable_lib_manager;
     }   // get
-    // ----------------------------------------------------------------
+    // ----------------------------------------------------------------------------------------
     /** Destroys the singleton. */
     static void destroy()
     {
@@ -92,13 +92,17 @@ public:
     void handleAnimatedTextures(scene::ISceneNode *node, const std::string& lib_ident,
                                 const std::string& instance_ident);
     void updateGraphics(float dt);
-    // ----------------------------------------------------------------
+    // ----------------------------------------------------------------------------------------
     /** The lib_instance string is an external string object that AttachableLibraryManager
      * sets to the instance identifier. This allows the source that requested the instance
      * to know which instance to request clean-up for when it's done. */
     scene::ISceneNode* createInstance(const std::string& name, std::string& lib_instance);
-    void cleanInstance(const std::string& instance_id);
+    void cleanInstance(const std::string& instance_id, bool is_template = false);
 
+    // ----------------------------------------------------------------------------------------
+    void cleanAll(); // Preserves the folder map
+    void cleanTextures(std::vector<std::string> ids_to_clear);
+    void reloadAll();
 };  // AttachableLibraryManager
 
 #endif

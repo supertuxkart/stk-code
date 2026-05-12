@@ -25,6 +25,7 @@
 #include "font/font_manager.hpp"
 #include "font/regular_face.hpp"
 #include "graphics/2dutils.hpp"
+#include "graphics/attachable_library_manager.hpp"
 #include "graphics/b3d_mesh_loader.hpp"
 #include "graphics/camera/camera.hpp"
 #include "graphics/central_settings.hpp"
@@ -1089,6 +1090,7 @@ void IrrDriver::applyResolutionSettings()
         s32(m_device->getNativeScaleY() * (float)UserConfigParams::m_prev_real_height)) );
     m_video_driver->endScene();
 
+    AttachableLibraryManager::get()->cleanAll();
     track_manager->removeAllCachedData();
     delete attachment_manager;
     attachment_manager = NULL;
@@ -1148,6 +1150,7 @@ void IrrDriver::applyResolutionSettings()
     attachment_manager = new AttachmentManager();
 
     commonInit();
+    AttachableLibraryManager::get()->reloadAll();
 
     // No need to reload cached track data (track_manager->cleanAllCachedData
     // above) - this happens dynamically when the tracks are loaded.

@@ -34,7 +34,7 @@
 
 AttachableLibraryManager* AttachableLibraryManager::m_attachable_lib_manager = NULL;
 
-// ------------------------------------------------------------------------
+// --------------------------------------------------------------------------------------------
 /** Private constructor, used by the static create() function.
  */
 AttachableLibraryManager::AttachableLibraryManager()
@@ -44,49 +44,37 @@ AttachableLibraryManager::AttachableLibraryManager()
     m_init_scale = core::vector3df(1,1,1);
 }   // AttachableLibraryManager
 
-// ------------------------------------------------------------------------
+// --------------------------------------------------------------------------------------------
 /** Destructor, which frees cached data
  */
 AttachableLibraryManager::~AttachableLibraryManager()
 {
-    // TODO the instances should be cleaned after use instead of waiting until here
-
-    // Decrement back the reference counters so the library nodes can be cleaned
-    for (auto const& node : m_attachable_lib_nodes)
-    {
-        if (m_attachable_lib_nodes[node.first]->getReferenceCount() > 0)
-            m_attachable_lib_nodes[node.first]->drop();
-    }
-
-    for (auto pair : m_animated_textures)
-    {
-        for (unsigned int i = 0; i < pair.second.size(); i++)
-        {
-            delete pair.second[i];
-        }
-        pair.second.clear();
-    }
+    cleanAll();
 }   // ~AttachableLibraryManager
 
-// ----------------------------------------------------------------------------
+// --------------------------------------------------------------------------------------------
 /* This function loads a library node, which is an empty parent node to which
  * are attached a series of nodes.
  * The folder_name parameter tells us where the game should look to load the library node.
  * The identifier parameter tells us which identifier to associate it with. When the game
  * will request the loading of an attachable library node, it will give the identifier.
  */
-void AttachableLibraryManager::loadLibraryNode(const std::string& folder_name, const std::string& identifier)
+void AttachableLibraryManager::loadLibraryNode(const std::string& folder_name,
+                                               const std::string& identifier)
 {
     if (m_attachable_lib_nodes.count(identifier) > 0)
     {
-        Log::info("AttachableLibraryManager", "Attachable library '%s' is already loaded!", identifier.c_str());
+        Log::info("AttachableLibraryManager",
+            "Attachable library '%s' is already loaded!", identifier.c_str());
         return;
     }
 
     m_attachable_lib_nodes[identifier] = irr_driver->getSceneManager()->addEmptySceneNode();
 
     XMLNode* libroot;
-    m_folder_map[identifier] = folder_name;
+    // During reloads, the folder map is preserved but the attachable nodes aren't
+    if (m_folder_map.count(identifier) == 0)
+        m_folder_map[identifier] = folder_name;
     std::string lib_path = file_manager->getAsset(FileManager::LIBRARY, folder_name) + "/";
     std::string lib_node_path = lib_path + "node.xml";
 
@@ -136,15 +124,20 @@ void AttachableLibraryManager::loadLibraryNode(const std::string& folder_name, c
             Log::warn("AttachLibraryManager", "While loading library with id '%s', element '%s' was "
                       "met but is unknown.", identifier.c_str(), xml_node->getName().c_str());
         }
-
     }   // for i<libroot->getNumNodes()
 
-    // Prevent the parent node from being cleared
-    // We might need to do more so that animations, etc. work.
-    m_attachable_lib_nodes[identifier]->grab();
+    delete libroot;
+
+    // Prevent the nodes from being cleared
+    m_attachable_lib_nodes[identifier]->grab(); // parent node
+
+    for (unsigned int i = 0; i < m_all_objects[identifier].size(); i++)
+    {
+        m_all_objects[identifier][i]->grabNode();
+    }
 }   // loadLibraryNode
 
-// ----------------------------------------------------------------------------
+// --------------------------------------------------------------------------------------------
 /* This function loads the library objects corresponding with a cached library node,
  * when we need to create a new instance of the library attachment.
  * The identifier parameter tells us which cached library node should be used
@@ -190,7 +183,7 @@ scene::ISceneNode* AttachableLibraryManager::loadLibraryInstance(const std::stri
     return m_attachable_lib_nodes[lib_instance];
 } // loadLibraryInstance
 
-// ----------------------------------------------------------------------------
+// --------------------------------------------------------------------------------------------
 /** Handles animated textures. This is used when first registering a library node.
  */
 void AttachableLibraryManager::handleAnimatedTextures(scene::ISceneNode *node,
@@ -204,7 +197,7 @@ void AttachableLibraryManager::handleAnimatedTextures(scene::ISceneNode *node,
     }
 }   // handleAnimatedTextures
 
-// ----------------------------------------------------------------------------
+// --------------------------------------------------------------------------------------------
 /** Handles animated textures. This is used when copying a library node
  */
 void AttachableLibraryManager::handleAnimatedTextures(scene::ISceneNode *node,
@@ -243,7 +236,7 @@ void AttachableLibraryManager::handleAnimatedTextures(scene::ISceneNode *node,
         else
         {
             Log::error("AttachableLibraryManager",
-                "Only SP mehses are supported for animated textures in attachable libraries.");
+                "Only SP meshes are supported for animated textures in attachable libraries.");
         }
 
         m_animated_textures[instance_ident].push_back(mt);
@@ -265,7 +258,7 @@ void AttachableLibraryManager::add(const XMLNode &xml_node, const std::string& p
     }
 }   // add
 
-// ----------------------------------------------------------------------------
+// --------------------------------------------------------------------------------------------
 /** Updates all attached library objects
  * Most objects don't need to run custom update graphics code but a few do.
  */
@@ -291,6 +284,7 @@ void AttachableLibraryManager::updateGraphics(float dt)
     }
 }   // updateGraphics
 
+// --------------------------------------------------------------------------------------------
 scene::ISceneNode* AttachableLibraryManager::createInstance(const std::string& name,
                                                             std::string& lib_instance)
 {
@@ -304,7 +298,8 @@ scene::ISceneNode* AttachableLibraryManager::createInstance(const std::string& n
     return loadLibraryInstance(name, lib_instance);
 }   // createInstance
 
-void AttachableLibraryManager::cleanInstance(const std::string& instance_id)
+// --------------------------------------------------------------------------------------------
+void AttachableLibraryManager::cleanInstance(const std::string& instance_id, bool is_template)
 {
     if (m_attachable_lib_nodes.count(instance_id) == 0)
     {
@@ -316,6 +311,9 @@ void AttachableLibraryManager::cleanInstance(const std::string& instance_id)
     // Loop over all objects linked to this lib instance and delete them
     for (unsigned int i = 0; i < m_all_objects[instance_id].size(); i++)
     {
+        if (is_template)
+            m_all_objects[instance_id][i]->dropNode();
+
         delete m_all_objects[instance_id][i];
     }
 
@@ -330,19 +328,70 @@ void AttachableLibraryManager::cleanInstance(const std::string& instance_id)
     m_attachable_lib_nodes.erase(keymatch_2);
 
     // Clear the animated textures associated with this lib_instance
+    std::vector<std::string> ids_to_clear;
+    ids_to_clear.push_back(instance_id);
+    cleanTextures(ids_to_clear);
+}   // cleanInstance
+
+// --------------------------------------------------------------------------------------------
+/** Clean everything during an irr_driver reload. The folder_map is preserved.
+ * Note that while we clean many things, some data related to mesh/textures
+ * needs to be cleaned in IrrDriver before reloadAll is safe. */
+void AttachableLibraryManager::cleanAll()
+{
+    std::vector<std::string> ids_to_clear;
+    for (auto const& node : m_attachable_lib_nodes)
+    {
+        // If needed, decrement the reference counters so templates can be cleaned
+        if (m_attachable_lib_nodes[node.first]->getReferenceCount() > 1)
+            m_attachable_lib_nodes[node.first]->drop();
+        ids_to_clear.push_back(node.first);
+    }
+
+    // We can't clean instance in the previous loop
+    // because cleanInstance() directly modifies m_attachable_lib_nodes
+    for (unsigned int i = 0; i < ids_to_clear.size(); i++)
+    {
+        bool is_template = (m_folder_map.count(ids_to_clear[i]) > 0);
+        cleanInstance(ids_to_clear[i], is_template);
+    }
+
+    // The animated textures for templates still need to be cleaned
+    ids_to_clear.clear();
     for (auto pair : m_animated_textures)
     {
-        if (pair.first == instance_id)
-        {
-            for (unsigned int i = 0; i < pair.second.size(); i++)
-            {
-                delete pair.second[i];
-            }
-            pair.second.clear();
-            break;
-        }
+        ids_to_clear.push_back(pair.first);
     }
-    auto pair = m_animated_textures.find(instance_id);
-    if (pair != m_animated_textures.end())
-        m_animated_textures.erase(pair);
-}   // cleanInstance
+
+    cleanTextures(ids_to_clear);
+}   // cleanAll
+
+void AttachableLibraryManager::cleanTextures(std::vector<std::string> ids_to_clear)
+{
+    for (unsigned int i = 0; i < ids_to_clear.size(); i++)
+    {
+        if (m_animated_textures.count(ids_to_clear[i]) == 0)
+            continue;
+
+        auto tex_vector = m_animated_textures[ids_to_clear[i]];
+
+        for (unsigned int j = 0; j < tex_vector.size(); j++)
+        {
+            delete tex_vector[j];
+        }
+        tex_vector.clear();
+        m_animated_textures.erase(ids_to_clear[i]);
+    }
+}   // cleanTextures
+
+// --------------------------------------------------------------------------------------------
+/** Rebuild the library templates based on the folder map
+ * Note that by the time reloadAll is called, some other classes may have
+ * already requested some of the mapped library nodes to be loaded, this is safe.*/
+void AttachableLibraryManager::reloadAll()
+{
+    for (auto const& lib_pair : m_folder_map)
+    {
+        loadLibraryNode(lib_pair.second /* folder name */, lib_pair.first  /* identifier */);
+    }
+}   // reloadAll

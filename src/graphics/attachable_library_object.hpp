@@ -126,6 +126,13 @@ public:
     // ------------------------------------------------------------------------
     AttachableLibraryObject* clone(scene::ISceneNode* parent, const std::string& lib_folder,
                                    const std::string& lib_ident, unsigned int instance);
+
+    // ------------------------------------------------------------------------
+    /** To prevent incorrect clearing for library templates, we grab/drop
+     * the object's presentation node as needed. */
+    void grabNode();
+    void dropNode();
+
     LEAK_CHECK()
 };   // AttachableLibraryObject
 

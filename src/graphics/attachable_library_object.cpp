@@ -92,7 +92,7 @@ AttachableLibraryObject::AttachableLibraryObject(const std::string& name, const 
 }   // AttachableLibraryObject
 
 // ----------------------------------------------------------------------------
-/** Initialises the track object based on the specified XML data.
+/** Initialises the attachable library object based on the specified XML data.
  *  \param xml_node The XML data.
  *  \param parent The parent scene node.
  */
@@ -134,6 +134,7 @@ void AttachableLibraryObject::init(const XMLNode &xml_node, scene::ISceneNode* p
         std::string mesh_ident = lib_ident + "_" + m_name;
         m_presentation = new TrackObjectPresentationMesh(xml_node, m_enabled,
             parent, m_render_info, true /* no track */, mesh_ident);
+    }
 
 // TODO : Add those back, they can be useful according to Sven
 /*
@@ -175,8 +176,8 @@ void AttachableLibraryObject::init(const XMLNode &xml_node, scene::ISceneNode* p
             btClamp(power, 0.5f, 10.0f);
             irr_driver->addForcedBloomNode(glownode, power);
         }
-        */
-    } // IMPORTANT
+        
+    }*/
 
 /* TODO : Support properly, as this might be useful. We skip for now.
     if (type == "animation" || xml_node.hasChildNamed("curve"))
@@ -276,3 +277,24 @@ AttachableLibraryObject* AttachableLibraryObject::clone(scene::ISceneNode* paren
 
     return cloned_obj;
 }   // clone
+
+// ----------------------------------------------------------------------------
+/** To prevent incorrect clearing for library templates, we grab/drop
+* the object's presentation node as needed. */
+void AttachableLibraryObject::grabNode()
+{
+    TrackObjectPresentationSceneNode* scene_presentation =
+        dynamic_cast<TrackObjectPresentationSceneNode*>(m_presentation);
+    if (scene_presentation)
+        scene_presentation->getNode()->grab();
+}   // grabNode
+
+// ----------------------------------------------------------------------------
+void AttachableLibraryObject::dropNode()
+{
+    TrackObjectPresentationSceneNode* scene_presentation =
+        dynamic_cast<TrackObjectPresentationSceneNode*>(m_presentation);
+    // Drop but only if needed
+    if (scene_presentation && scene_presentation->getNode()->getReferenceCount() >= 2)
+        scene_presentation->getNode()->drop();
+}   // dropNode

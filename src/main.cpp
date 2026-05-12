@@ -2800,6 +2800,7 @@ static void cleanSuperTuxKart()
     GUIEngine::clearScreenCache();
     if(font_manager)            delete font_manager;
     if(story_mode_timer)        delete story_mode_timer;
+    AttachableLibraryManager::destroy();
 
     // Now finish shutting down objects which a separate thread. The
     // RequestManager has been signaled to shut down as early as possible,
