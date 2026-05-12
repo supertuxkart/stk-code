@@ -250,7 +250,7 @@ private:
     std::shared_ptr<GE::GERenderInfo> m_render_info;
 
     void init(const XMLNode* xml_node, scene::ISceneNode* parent, bool enabled,
-              bool no_track = false, const std::string& mesh_ident = "",
+              bool animated, bool no_track = false, const std::string& mesh_ident = "",
               const std::string& instance_ident = "");
 
 public:

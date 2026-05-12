@@ -429,11 +429,10 @@ TrackObjectPresentationMesh::TrackObjectPresentationMesh(
         m_is_in_skybox = true;
     }
 
-    bool animated = skeletal_animation && (UserConfigParams::m_animated_characters ||
-                     World::getWorld()->getIdent() == IDENT_CUTSCENE);
+    bool animated = skeletal_animation;
     bool displacing = false;
     xml_node.get("displacing", &displacing);
-    animated &= !displacing;
+    animated = animated && (!displacing);
 
     if (animated)
         m_mesh = irr_driver->getAnimatedMesh(model_name);
@@ -445,7 +444,7 @@ TrackObjectPresentationMesh::TrackObjectPresentationMesh(
         throw std::runtime_error("Model '" + model_name + "' cannot be found");
     }
 
-    init(&xml_node, parent, enabled, no_track, mesh_ident);
+    init(&xml_node, parent, enabled, animated, no_track, mesh_ident);
 }   // TrackObjectPresentationMesh
 
 // ----------------------------------------------------------------------------
@@ -462,7 +461,7 @@ TrackObjectPresentationMesh::TrackObjectPresentationMesh(
     m_node         = NULL;
     m_mesh         = model;
     m_render_info  = NULL;
-    init(NULL, NULL, true);
+    init(NULL, NULL, true, true /* animated */);
 }   // TrackObjectPresentationMesh
 
 // ----------------------------------------------------------------------------
@@ -482,12 +481,12 @@ TrackObjectPresentationMesh::TrackObjectPresentationMesh(
     m_node         = NULL;
     m_is_in_skybox = false;
     m_render_info  = NULL;
-    m_model_file = model_path;
+    m_model_file   = model_path;
+
+    bool animated = true;
 
     file_manager->pushTextureSearchPath(StringUtils::getPath(model_path), "");
 #ifndef SERVER_ONLY
-    bool animated  = (UserConfigParams::m_particles_effects > 1 ||
-                      World::getWorld()->getIdent() == IDENT_CUTSCENE);
     if (file_manager->fileExists(model_path))
     {
         if (animated)
@@ -503,29 +502,17 @@ TrackObjectPresentationMesh::TrackObjectPresentationMesh(
     }
 
     file_manager->popTextureSearchPath();
-    init(NULL, parent, true, no_track, mesh_ident, instance_ident);
+    init(NULL, parent, true, animated, no_track, mesh_ident, instance_ident);
 }   // TrackObjectPresentationMesh
 
 // ----------------------------------------------------------------------------
 void TrackObjectPresentationMesh::init(const XMLNode* xml_node, scene::ISceneNode* parent,
-                                       bool enabled, bool no_track, const std::string& mesh_ident,
+                bool enabled, bool animated, bool no_track, const std::string& mesh_ident,
                                        const std::string& instance_ident)
 {
-    // for backwards compatibility, if unspecified assume there is
-    bool skeletal_animation = true;
-    if(xml_node)
-        xml_node->get("skeletal-animation", &skeletal_animation);
-
-    bool animated = skeletal_animation && (UserConfigParams::m_particles_effects > 1 ||
-             World::getWorld()->getIdent() == IDENT_CUTSCENE);
-    bool displacing = false;
     std::string interaction;
     if (xml_node)
-    {
-        xml_node->get("displacing", &displacing);
         xml_node->get("interaction", &interaction);
-    }
-    animated &= !displacing;
 
     m_mesh->grab();
     irr_driver->grabAllTextures(m_mesh);
@@ -584,12 +571,11 @@ void TrackObjectPresentationMesh::init(const XMLNode* xml_node, scene::ISceneNod
                 m_model_file /* debug name */, parent, m_render_info);
         m_node = node;
 
-
         if (xml_node)
+        {
             xml_node->get("frame-start", &frames_start);
-
-        if (xml_node)
             xml_node->get("frame-end", &frames_end);
+        }
 
         if (frames_start.empty() && frames_end.empty())
         {
