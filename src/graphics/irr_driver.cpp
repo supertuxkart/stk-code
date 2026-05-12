@@ -1074,19 +1074,21 @@ void IrrDriver::changeResolution(const int w, const int h, const bool fullscreen
 
 // --------------------------------------------------------------------------------------------
 
-void IrrDriver::applyResolutionSettings(bool recreate_device)
+void IrrDriver::applyResolutionSettings()
 {
 #ifndef SERVER_ONLY
+    // We always recreate the device even if RES_CHANGE_SAME because AttachableLibrary
+    // needs a clean state. Changes between the legacy renderer and the modern renderer
+    // are rare and the performance difference between both reload modes is small enough.
+
     // Show black before the resolution switch so we don't see OpenGL's buffer garbage
     // during the switch.
-    if (recreate_device)
-    {
-        m_video_driver->beginScene(true, true, video::SColor(255,100,101,140));
-        GL32_draw2DRectangle( video::SColor(255, 0, 0, 0), core::rect<s32>(0, 0,
-            s32(m_device->getNativeScaleX() * (float)UserConfigParams::m_prev_real_width),
-            s32(m_device->getNativeScaleY() * (float)UserConfigParams::m_prev_real_height)) );
-        m_video_driver->endScene();
-    }
+    m_video_driver->beginScene(true, true, video::SColor(255,100,101,140));
+    GL32_draw2DRectangle( video::SColor(255, 0, 0, 0), core::rect<s32>(0, 0,
+        s32(m_device->getNativeScaleX() * (float)UserConfigParams::m_prev_real_width),
+        s32(m_device->getNativeScaleY() * (float)UserConfigParams::m_prev_real_height)) );
+    m_video_driver->endScene();
+
     track_manager->removeAllCachedData();
     delete attachment_manager;
     attachment_manager = NULL;
@@ -1104,51 +1106,32 @@ void IrrDriver::applyResolutionSettings(bool recreate_device)
     GUIEngine::clear();
     GUIEngine::cleanUp();
 
-    if (recreate_device)
-    {
-        m_device->closeDevice();
-        m_device->clearSystemMessages();
-        m_device->run();
-    }
+    m_device->closeDevice();
+    m_device->clearSystemMessages();
+    m_device->run();
+
     delete material_manager;
     material_manager = NULL;
 
     // ---- Reinit
     STKTexManager::getInstance()->kill();
 #ifdef ENABLE_RECORDER
-    if (recreate_device)
-    {
-        ogrDestroy();
-        m_recording = false;
-    }
+    ogrDestroy();
+    m_recording = false;
 #endif
     // initDevice will drop the current device.
-    if (recreate_device)
-    {
-        delete m_renderer;
-        m_renderer = NULL;
-        SharedGPUObjects::reset();
+    delete m_renderer;
+    m_renderer = NULL;
+    SharedGPUObjects::reset();
 
-        SP::setMaxTextureSize();
-        initDevice();
-    }
+    SP::setMaxTextureSize();
+    initDevice();
 
     for (unsigned i = 0; i < Q_LAST; i++)
     {
         m_perf_query[i]->reset();
     }
 
-    if (!recreate_device)
-    {
-        SP::SPTextureManager::get()->stopThreads();
-        SP::SPShaderManager::destroy();
-        SP::SPTextureManager::destroy();
-        ShaderBase::killShaders();
-        ShaderFilesManager::getInstance()->removeAllShaderFiles();
-        unsetMaxTextureSize();
-        SP::setMaxTextureSize();
-        m_renderer->createPostProcessing();
-    }
     if (CVS->isGLSL())
         SP::loadShaders();
 
@@ -1158,9 +1141,6 @@ void IrrDriver::applyResolutionSettings(bool recreate_device)
     // Input manager set first so it recieves SDL joystick event
     // Re-init GUI engine
     GUIEngine::init(m_device, m_video_driver, StateManager::get());
-    // If not recreate device we need to add the previous joystick manually
-    if (!recreate_device)
-        input_manager->addJoystick();
 
     setMaxTextureSize();
     material_manager = new MaterialManager();
@@ -2170,7 +2150,7 @@ void IrrDriver::update(float dt, bool is_loading)
     // old device and create a new one.
     if (m_resolution_changing!=RES_CHANGE_NONE)
     {
-        applyResolutionSettings(m_resolution_changing != RES_CHANGE_SAME);
+        applyResolutionSettings();
         m_resolution_changing = RES_CHANGE_NONE;
     }
 

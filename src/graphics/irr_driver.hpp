@@ -157,7 +157,7 @@ private:
     float                m_lod_multiplier;
 
     /** Internal method that applies the resolution in user settings. */
-    void                 applyResolutionSettings(bool recreate_device);
+    void                 applyResolutionSettings();
     void                 createListOfVideoModes();
 
     bool                 m_request_screenshot;
