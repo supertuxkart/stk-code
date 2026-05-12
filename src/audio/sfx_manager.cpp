@@ -619,6 +619,10 @@ SFXBuffer* SFXManager::addSingleSfx(const std::string &sfx_name,
                                     float              gain,
                                     const bool         load)
 {
+    // If the SFX is already loaded (e.g. during irr_driver reload),
+    // return early and don't create a new buffer
+    if(m_all_sfx_types.count(sfx_name) > 0)
+        return m_all_sfx_types[sfx_name];
 
     SFXBuffer* buffer = new SFXBuffer(sfx_file, positional, rolloff,
                                       max_dist, gain);
