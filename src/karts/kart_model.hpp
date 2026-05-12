@@ -450,8 +450,7 @@ public:
                          int gt_replay_index = -1);
     void          finishedRace();
     void          resetVisualWheelPosition();
-    scene::ISceneNode*
-                  attachModel(bool animatedModels, bool human_player);
+    scene::ISceneNode* attachModel(bool human_player);
     // ------------------------------------------------------------------------
     /** Returns the animated mesh of this kart model. */
     scene::IAnimatedMesh*

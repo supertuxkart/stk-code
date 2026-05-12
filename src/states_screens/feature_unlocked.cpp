@@ -385,7 +385,7 @@ void FeatureUnlockedCutScene::init()
                 m_unlocked_stuff[n].m_unlocked_kart->getKartModelCopy();
             m_all_kart_models.push_back(kart_model);
             m_unlocked_stuff[n].m_root_gift_node =
-                kart_model->attachModel(true, false);
+                kart_model->attachModel(false /* human */);
             m_unlocked_stuff[n].m_scale = 5.0f;
             kart_model->setAnimation(KartModel::AF_DEFAULT);
             // Set model current frame to "center"

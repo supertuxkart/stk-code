@@ -720,10 +720,10 @@ void Profiler::writeToFile()
     f << std::endl;
     f << std::endl;
     // Anisotropic Filtering is one of the settings affected by the Image Quality spinner
-    f << "Graphics parameters, Resolution width, Resolution height, Render resolution,"
-      << "Dynamic lighting, Particle effects, Animated characters, Geometry Detail, "
-      << "Bloom, Glow, Light Shaft, Anti-Aliasing (MLAA), SSAO,"
-      << "Anisotropic Filtering, Shadow Resolution, Light scattering, Degraded IBL,"
+    f << "Graphics parameters, Resolution width, Resolution height, Render resolution, "
+      << "Dynamic lighting, Particle effects, Geometry Detail, "
+      << "Bloom, Glow, Light Shaft, Anti-Aliasing (MLAA), SSAO, "
+      << "Anisotropic Filtering, Shadow Resolution, Light scattering, Degraded IBL, "
       << "Motion Blur, Depth of Field, Texture compression, HD Textures, HQ Mipmap,";
     f << std::endl;
     f << "Values, "
@@ -732,7 +732,6 @@ void Profiler::writeToFile()
       << (UserConfigParams::m_dynamic_lights ? UserConfigParams::m_scale_rtts_factor : 1.0f) << ", "
       << UserConfigParams::m_dynamic_lights << ", "
       << UserConfigParams::m_particles_effects << ", "
-      << UserConfigParams::m_animated_characters << ", "
       << effective_LoD_level << ", "
       << UserConfigParams::m_bloom  << ", "
       << UserConfigParams::m_glow << ", "

@@ -36,7 +36,7 @@ namespace GraphicalPresets
         ({
             false /* light */, 0 /* shadow */, false /* bloom */, false /* lightshaft */,
             false /* glow */, false /* mlaa */, false /* ssao */, false /* light scatter */,
-            false /* animatedCharacters */, 1 /* particles */, 0 /* image_quality */,
+            1 /* particles */, 0 /* image_quality */,
             true /* degraded IBL */, 0 /* Geometry Detail */, false /* PCSS */, false /* ssr */
         });
     
@@ -44,7 +44,7 @@ namespace GraphicalPresets
         ({
             false /* light */, 0 /* shadow */, false /* bloom */, false /* lightshaft */,
             false /* glow */, false /* mlaa */, false /* ssao */, false /* light scatter */,
-            true /* animatedCharacters */, 2 /* particles */, 1 /* image_quality */,
+            2 /* particles */, 1 /* image_quality */,
             true /* degraded IBL */, 1 /* Geometry Detail */, false /* PCSS */, false /* ssr */
         });
     
@@ -52,7 +52,7 @@ namespace GraphicalPresets
         ({
             true /* light */, 0 /* shadow */, false /* bloom */, false /* lightshaft */,
             false /* glow */, false /* mlaa */, false /* ssao */, false /* light scatter */,
-            true /* animatedCharacters */, 2 /* particles */, 2 /* image_quality */,
+            2 /* particles */, 2 /* image_quality */,
             true /* degraded IBL */, 2 /* Geometry Detail */, false /* PCSS */, false /* ssr */
         });
     
@@ -60,7 +60,7 @@ namespace GraphicalPresets
         ({
             true /* light */, 0 /* shadow */, false /* bloom */, false /* lightshaft */,
             true /* glow */, true /* mlaa */, false /* ssao */, true /* light scatter */,
-            true /* animatedCharacters */, 2 /* particles */, 2 /* image_quality */,
+            2 /* particles */, 2 /* image_quality */,
             true /* degraded IBL */, 2 /* Geometry Detail */, false /* PCSS */, true /* ssr */
         });
     
@@ -68,7 +68,7 @@ namespace GraphicalPresets
         ({
             true /* light */, 512 /* shadow */, true /* bloom */, true /* lightshaft */,
             true /* glow */, true /* mlaa */, false /* ssao */, true /* light scatter */,
-            true /* animatedCharacters */, 2 /* particles */, 2 /* image_quality */,
+            2 /* particles */, 2 /* image_quality */,
             false /* degraded IBL */, 3 /* Geometry Detail */, false /* PCSS */, true /* ssr */
         });
     
@@ -76,7 +76,7 @@ namespace GraphicalPresets
         ({
             true /* light */, 1024 /* shadow */, true /* bloom */, true /* lightshaft */,
             true /* glow */, true /* mlaa */, true /* ssao */, true /* light scatter */,
-            true /* animatedCharacters */, 2 /* particles */, 2 /* image_quality */,
+            2 /* particles */, 2 /* image_quality */,
             false /* degraded IBL */, 4 /* Geometry Detail */, false /* PCSS */, true /* ssr */
         });
     
@@ -84,7 +84,7 @@ namespace GraphicalPresets
         ({
             true /* light */, 2048 /* shadow */, true /* bloom */, true /* lightshaft */,
             true /* glow */, true /* mlaa */, true /* ssao */, true /* light scatter */,
-            true /* animatedCharacters */, 2 /* particles */, 2 /* image_quality */,
+            2 /* particles */, 2 /* image_quality */,
             false /* degraded IBL */, 5 /* Geometry Detail */, true /* PCSS */, true /* ssr */
         });
     
@@ -132,8 +132,7 @@ namespace GraphicalPresets
     {
         for (unsigned int l = 0; l < gfx_presets.size(); l++)
         {
-            if (gfx_presets[l].animatedCharacters == UserConfigParams::m_animated_characters &&
-                gfx_presets[l].particles          == UserConfigParams::m_particles_effects   &&
+            if (gfx_presets[l].particles          == UserConfigParams::m_particles_effects   &&
                 gfx_presets[l].image_quality      == getImageQuality()                       &&
                 gfx_presets[l].bloom              == UserConfigParams::m_bloom               &&
                 gfx_presets[l].glow               == UserConfigParams::m_glow                &&
@@ -159,7 +158,6 @@ namespace GraphicalPresets
     {
         level--;
         level = std::min((int)gfx_presets.size(), std::max(0, level));
-        UserConfigParams::m_animated_characters = gfx_presets[level].animatedCharacters;
         UserConfigParams::m_particles_effects = gfx_presets[level].particles;
         setImageQuality(gfx_presets[level].image_quality);
         UserConfigParams::m_bloom              = gfx_presets[level].bloom;

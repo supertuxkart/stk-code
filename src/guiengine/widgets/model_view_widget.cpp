@@ -206,8 +206,7 @@ void ModelViewWidget::update(float delta)
 
     m_rtt_main_node->setVisible(true);
 #ifndef SERVER_ONLY
-    if (UserConfigParams::m_animated_characters)
-        m_rtt_main_node->OnAnimate(os::Timer::getTime());
+    m_rtt_main_node->OnAnimate(os::Timer::getTime());
 #endif
 
     m_render_target->renderToTexture(m_camera, GUIEngine::getLatestDt());

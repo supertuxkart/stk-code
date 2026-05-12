@@ -969,10 +969,6 @@ namespace UserConfigParams
         PARAM_DEFAULT(IntUserConfigParam(0, "easter-ear-mode",
         &m_graphics_quality, "Easter Bunny Ears: 0 use current date, 1 always on, 2 always off"));
 
-    PARAM_PREFIX BoolUserConfigParam       m_animated_characters
-            PARAM_DEFAULT(  BoolUserConfigParam(true, "animated-characters", &m_graphics_quality,
-                "Whether to display animated characters") );
-
     PARAM_PREFIX IntUserConfigParam        m_kart_lights
             PARAM_DEFAULT(  IntUserConfigParam(1, "kart-lights", &m_graphics_quality,
                 "Kart lights: 0 = off, 1 = human only, 2 = all karts") );

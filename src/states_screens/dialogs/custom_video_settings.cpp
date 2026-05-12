@@ -60,8 +60,6 @@ CustomVideoSettingsDialog::~CustomVideoSettingsDialog()
 void CustomVideoSettingsDialog::beforeAddingWidgets()
 {
 #ifndef SERVER_ONLY
-    getWidget<CheckBoxWidget>("animated_characters")
-        ->setState(UserConfigParams::m_animated_characters);
     getWidget<CheckBoxWidget>("dof")->setState(UserConfigParams::m_dof);
     
     SpinnerWidget* particles_effects = getWidget<SpinnerWidget>("particles_effects");
@@ -251,9 +249,6 @@ GUIEngine::EventPropagation CustomVideoSettingsDialog::processEvent(const std::s
 
             UserConfigParams::m_particles_effects =
                 getWidget<SpinnerWidget>("particles_effects")->getValue();
-
-            UserConfigParams::m_animated_characters =
-                getWidget<CheckBoxWidget>("animated_characters")->getState();
 
             UserConfigParams::m_kart_lights =
                 getWidget<SpinnerWidget>("kart_lights")->getValue();

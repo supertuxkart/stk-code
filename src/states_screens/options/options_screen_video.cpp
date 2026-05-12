@@ -390,10 +390,6 @@ void OptionsScreenVideo::updateTooltip()
         (UserConfigParams::m_ssr ? _("Screen space reflection: Enabled") :
                                    _("Screen space reflection: Disabled"));
     //I18N: in the graphical options
-    tooltip = tooltip + L"\n" +
-        (UserConfigParams::m_animated_characters ? _("Animated characters: Enabled") :
-                                                   _("Animated characters: Disabled"));
-    //I18N: in the graphical options
     tooltip = tooltip + L"\n" + _("Particle effects: %s",
         UserConfigParams::m_particles_effects == 2 ? _C("Particle effects", "Enabled")        :
         UserConfigParams::m_particles_effects == 1 ? _C("Particle effects", "Important only") :

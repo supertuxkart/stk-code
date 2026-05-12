@@ -412,7 +412,7 @@ protected:
     float         applyAirFriction (float engine_power);
     float         getActualWheelForce();
     void          playCrashSFX(const Material* m, Kart *k);
-    void          loadData(RaceManager::KartType type, bool animatedModel);
+    void          loadData(RaceManager::KartType type);
     void          updateWeight();
     void          initSound();
     void          computeTurnAngleArray();

@@ -312,7 +312,7 @@ void Kart::init(RaceManager::KartType type)
 {
     m_type = type;
 
-    loadData(type, UserConfigParams::m_animated_characters);
+    loadData(type);
     // m_skid_sound is loaded in loadData
     initSound();
     reset();
@@ -352,7 +352,7 @@ void Kart::changeKart(const std::string& new_ident,
     m_kart_model->setKart(this);
 
     scene::ISceneNode* old_node = m_node;
-    loadData(m_type, UserConfigParams::m_animated_characters);
+    loadData(m_type);
     initSound();
     m_wheel_box = NULL;
 
@@ -3602,14 +3602,13 @@ void Kart::updateFlying()
 /** Attaches the right model, creates the physics and loads all special
  *  effects (particle systems etc.)
  *  \param type Type of the kart.
- *  \param is_animated_model True if the model is animated.
  */
-void Kart::loadData(RaceManager::KartType type, bool is_animated_model)
+void Kart::loadData(RaceManager::KartType type)
 {
-    bool always_animated = (type == RaceManager::KT_PLAYER &&
+    bool human_player = (type == RaceManager::KT_PLAYER &&
         RaceManager::get()->getNumLocalPlayers() == 1);
     if (!GUIEngine::isNoGraphics())
-        m_node = m_kart_model->attachModel(is_animated_model, always_animated);
+        m_node = m_kart_model->attachModel(human_player);
 
 #ifdef DEBUG
     if (m_node)

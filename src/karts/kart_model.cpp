@@ -518,49 +518,21 @@ KartModel* KartModel::makeCopy(std::shared_ptr<GE::GERenderInfo> ri)
 /** Attach the kart model and wheels to the scene node.
  *  \return the node with the model attached
  */
-scene::ISceneNode* KartModel::attachModel(bool animated_models, bool human_player)
+scene::ISceneNode* KartModel::attachModel(bool human_player)
 {
     assert(!m_is_master);
 
     scene::ISceneNode* node = NULL;
 
-    if (animated_models)
-    {
-        m_animated_node = irr_driver->addAnimatedMesh(m_mesh, "kartmesh",
-               NULL/*parent*/, getRenderInfo());
-        node = m_animated_node;
+    m_animated_node = irr_driver->addAnimatedMesh(m_mesh, "kartmesh",
+            NULL/*parent*/, getRenderInfo());
+    node = m_animated_node;
 #ifdef DEBUG
-        std::string debug_name = m_model_filename+" (animated-kart-model)";
-        node->setName(debug_name.c_str());
+    std::string debug_name = m_model_filename+" (animated-kart-model)";
+    node->setName(debug_name.c_str());
 #endif
-        m_animated_node->setLoopMode(false);
-        m_animated_node->grab();
-    }
-    else
-    {
-        // If no animations are shown, make sure to pick the frame
-        // with a straight ahead animation (if exist).
-        int straight_frame = m_animation_frame[AF_STRAIGHT] >= 0
-                           ? m_animation_frame[AF_STRAIGHT]
-                           : 0;
-
-        scene::IMesh* main_frame = m_mesh;
-        main_frame = m_mesh->getMesh(straight_frame);
-        main_frame->setHardwareMappingHint(scene::EHM_STATIC);
-        std::string debug_name;
-
-#ifdef DEBUG
-        debug_name = m_model_filename + " (kart-model)";
-#endif
-
-        node = irr_driver->addMesh(main_frame, debug_name,
-               NULL /*parent*/, getRenderInfo());
-
-#ifdef DEBUG
-        node->setName(debug_name.c_str());
-#endif
-
-    }
+    m_animated_node->setLoopMode(false);
+    m_animated_node->grab();
 
     // Attach the wheels
     for (unsigned int i = 0; i < 4; i++)
@@ -592,20 +564,14 @@ scene::ISceneNode* KartModel::attachModel(bool animated_models, bool human_playe
             scene::ISceneNode* parent = bone_attachment ?
                 m_animated_node->getJointNode(obj.m_bone_name.c_str()) : node;
             scene::ISceneNode* swo = NULL;
-            if (animated_models)
-            {
-                // Only need to keep track of animated node for speed setting
-                obj.m_node = irr_driver->addAnimatedMesh(obj.m_model,
-                    "speedweighted", parent, getRenderInfo());
-                swo = obj.m_node;
-                obj.m_node->grab();
-                obj.m_node->setFrameLoop(0, obj.m_model->getFrameCount() - 1);
-            }
-            else
-            {
-                swo = irr_driver->addMesh(obj.m_model->getMesh(0),
-                    "speedweighted", parent, getRenderInfo());
-            }
+
+            // Only need to keep track of animated node for speed setting
+            obj.m_node = irr_driver->addAnimatedMesh(obj.m_model,
+                "speedweighted", parent, getRenderInfo());
+            swo = obj.m_node;
+            obj.m_node->grab();
+            obj.m_node->setFrameLoop(0, obj.m_model->getFrameCount() - 1);
+
 #ifdef DEBUG
             std::string debug_name = obj.m_name + " (speed-weighted)";
             swo->setName(debug_name.c_str());
@@ -676,14 +642,11 @@ scene::ISceneNode* KartModel::attachModel(bool animated_models, bool human_playe
         file_manager->popTextureSearchPath();
     }
 
-    if (animated_models)
-    {
-        LODNode* lod_node = new LODNode("kart",
-            irr_driver->getSceneManager()->getRootSceneNode(),
-            irr_driver->getSceneManager());
-        lod_node->add(human_player ? 10000: 100, node, true);
-        return lod_node;
-    }
+    LODNode* lod_node = new LODNode("kart",
+        irr_driver->getSceneManager()->getRootSceneNode(),
+        irr_driver->getSceneManager());
+    lod_node->add(human_player ? 10000: 100, node, true);
+    return lod_node;
 
     return node;
 }   // attachModel

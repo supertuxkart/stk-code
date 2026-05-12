@@ -357,7 +357,7 @@ void GrandPrixWin::setKarts(const std::pair<std::string, float> idents_arg[3])
 
         KartModel* kart_model = kp->getKartModelCopy(std::make_shared<GE::GERenderInfo>(idents[i].second));
         m_all_kart_models.push_back(kart_model);
-        scene::ISceneNode* kart_main_node = kart_model->attachModel(true, false);
+        scene::ISceneNode* kart_main_node = kart_model->attachModel(false /* human */);
         LODNode* lnode = dynamic_cast<LODNode*>(kart_main_node);
         if (lnode)
         {

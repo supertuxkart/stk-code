@@ -1001,11 +1001,6 @@ int handleCmdLinePreliminary()
         UserConfigParams::m_particles_effects = 2;
     else if (CommandLine::has("--disable-particles"))
         UserConfigParams::m_particles_effects = 0;
-    // animated characters
-    if (CommandLine::has("--enable-animated-characters"))
-        UserConfigParams::m_animated_characters = true;
-    else if (CommandLine::has("--disable-animated-characters"))
-        UserConfigParams::m_animated_characters = false;
     if (CommandLine::has("--enable-motion-blur"))
         UserConfigParams::m_motionblur = true;
     else if (CommandLine::has("--disable-motion-blur"))

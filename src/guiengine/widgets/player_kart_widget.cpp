@@ -299,23 +299,20 @@ void PlayerKartWidget::setupKartModel(const KartProperties* properties)
     int end_frame = kart_model.getBaseFrame();
 
     // Use the selection animations if possible
-    if (UserConfigParams::m_animated_characters)
+    KartModel::AnimationFrameType st_type = KartModel::AF_SELECTION_START;
+    if (kart_model.getFrame(st_type) < 0)
+        st_type = KartModel::AF_SELECTION_LOOP_START;
+    if (kart_model.getFrame(st_type) < 0)
+        st_type = KartModel::AF_WIN_LOOP_START;
+    int start = kart_model.getFrame(st_type);
+    int end   = kart_model.getFrame(kart_model.getEndFrameType(st_type));
+    if (start > -1 && end > -1)
     {
-        KartModel::AnimationFrameType st_type = KartModel::AF_SELECTION_START;
-        if (kart_model.getFrame(st_type) < 0)
-            st_type = KartModel::AF_SELECTION_LOOP_START;
-        if (kart_model.getFrame(st_type) < 0)
-            st_type = KartModel::AF_WIN_LOOP_START;
-        int start = kart_model.getFrame(st_type);
-        int end   = kart_model.getFrame(kart_model.getEndFrameType(st_type));
-        if (start > -1 && end > -1)
-        {
-            start_frame = start;
-            end_frame = end;
-        }
-        int loop = kart_model.getFrame(kart_model.getLoopStartFrameType(st_type));
-        loop_frame = (loop > -1) ? loop : start_frame;
+        start_frame = start;
+        end_frame = end;
     }
+    int loop = kart_model.getFrame(kart_model.getLoopStartFrameType(st_type));
+    loop_frame = (loop > -1) ? loop : start_frame;
 
     m_model_view->addModel( kart_model.getModel(), model_location,
         start_frame, loop_frame, end_frame, kart_model.getAnimationSpeed());

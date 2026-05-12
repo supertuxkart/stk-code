@@ -32,7 +32,6 @@ namespace GraphicalPresets
         bool mlaa;
         bool ssao;
         bool light_scatter;
-        bool animatedCharacters;
         int particles;
         int image_quality;
         bool degraded_ibl;
