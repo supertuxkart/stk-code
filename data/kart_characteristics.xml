@@ -232,8 +232,9 @@
         <!-- Anchor
             duration: The time an anchor is active.
             weight: The additional weight an anchor adds to a kart.
-            speed-factor: The additional slowdown caused by the anchor. -->
-        <anchor duration="2.0" weight="150" speed-factor="0.2" />
+            speed-factor: The additional slowdown caused by the anchor. The default values
+                          are based on (kart_weight) / (kart_weight + anchor_weight) -->
+        <anchor duration="3.0" weight="275" speed-factor="0.56" />
 
         <!-- Parachute
             friction: The friction factor when a parachute is attached.
@@ -458,6 +459,7 @@
                    min-burst="*1.2" />
             <slipstream length="*0.9" collect-time="*0.9" duration-factor="*1" />
             <parachute lbound-fraction="0.35" ubound-fraction="0.2" />
+            <anchor speed-factor="*0.7732" />
         </characteristic>
         <characteristic name="medium-h">
             <suspension stiffness="*0.7" />
@@ -476,6 +478,7 @@
                    min-burst="*1.235" />
             <slipstream length="*0.967" collect-time="*0.967" duration-factor="*0.867" />
             <parachute lbound-fraction="0.4167" ubound-fraction="0.25" />
+            <anchor speed-factor="*0.8413" />
         </characteristic>
         <characteristic name="medium">
             <suspension stiffness="*0.75" />
@@ -493,6 +496,7 @@
                    min-burst="*1.1" />
             <slipstream duration-factor="*0.8" />
             <parachute lbound-fraction="0.45" ubound-fraction="0.275" />
+            <anchor speed-factor="*0.8721" />
         </characteristic>
         <characteristic name="heavy">
             <suspension stiffness="*1" />
@@ -509,6 +513,7 @@
             <nitro engine-force="*1" consumption="*1" max-speed-increase="*1.0" />
             <slipstream length="*1.1" collect-time="*1.1" duration-factor="*0.6"/>
             <parachute lbound-fraction="0.55" ubound-fraction="0.35" />
+            <anchor speed-factor="*1" />
         </characteristic>
     </kart-types>
 
