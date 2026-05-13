@@ -250,6 +250,9 @@ void RaceResultGUI::init()
     // 128 is the height of the image file
     m_icon_bank->setScale(1.0f / 128.0f);
     m_icon_bank->setTargetIconSize(128, 128);
+
+    m_red_goal_list = nullptr;
+    m_blue_goal_list = nullptr;
 }   // init
 
 //-----------------------------------------------------------------------------
