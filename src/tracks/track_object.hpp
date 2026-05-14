@@ -67,7 +67,6 @@ private:
     TrackObjectPresentation* m_presentation;
 
     std::string m_name;
-
     std::string m_id;
 
     std::shared_ptr<GE::GERenderInfo>    m_render_info;
@@ -227,14 +226,14 @@ public:
       */
     PhysicalObject* getPhysics() { return m_physical_object.get(); }
     /** Hide or show the object */
-    void setEnabled(bool mode);
+    void setEnabled(bool mode, bool reset = false);
+    void resetEnabled() { setEnabled(m_initially_visible, true); }
 
     void moveTo(const Scripting::SimpleVec3* pos, bool isAbsoluteCoord);
     /* @} */
     /* @} */
     /* @} */
 
-    void resetEnabled();
     // ------------------------------------------------------------------------
     ThreeDAnimation* getAnimator() { return m_animator; }
     // ------------------------------------------------------------------------
@@ -263,6 +262,8 @@ public:
     void addMovableChild(TrackObject* child);
     // ------------------------------------------------------------------------
     void addChild(TrackObject* child);
+    // ------------------------------------------------------------------------
+    void removeChild(TrackObject* child);
     // ------------------------------------------------------------------------
     std::vector<TrackObject*>& getMovableChildren() { return m_movable_children; }
     // ------------------------------------------------------------------------

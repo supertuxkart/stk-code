@@ -452,6 +452,8 @@ void TrackObject::onWorldReady()
  */
 TrackObject::~TrackObject()
 {
+    if (m_parent_library)
+        m_parent_library->removeChild(this);
     delete m_presentation;
     delete m_animator;
 }   // ~TrackObject
@@ -471,7 +473,7 @@ void TrackObject::reset()
  *  disabled objects will not be displayed anymore.
  *  \param mode Enable (true) or disable (false) this object.
  */
-void TrackObject::setEnabled(bool enabled)
+void TrackObject::setEnabled(bool enabled, bool reset)
 {
     m_enabled = enabled;
 
@@ -491,35 +493,12 @@ void TrackObject::setEnabled(bool enabled)
 
     for (unsigned int i = 0; i < m_movable_children.size(); i++)
     {
-        m_movable_children[i]->setEnabled(enabled);
+        if (reset)
+            m_movable_children[i]->resetEnabled();
+        else
+            m_movable_children[i]->setEnabled(enabled);
     }
-}   // setEnable
-
-// ----------------------------------------------------------------------------
-
-void TrackObject::resetEnabled()
-{
-    m_enabled = m_initially_visible;
-
-    if (m_presentation != NULL)
-        m_presentation->setEnable(m_initially_visible);
-
-    if (getType() == "mesh")
-    {
-        if (m_physical_object)
-        {
-            if (m_initially_visible)
-                m_physical_object->addBody();
-            else
-                m_physical_object->removeBody();
-        }
-    }
-
-    for (unsigned int i = 0; i < m_movable_children.size(); i++)
-    {
-        m_movable_children[i]->resetEnabled();
-    }
-}   // resetEnabled
+}   // setEnabled
 
 // ----------------------------------------------------------------------------
 /** This updates all only graphical elements. It is only called once per
@@ -691,6 +670,30 @@ void TrackObject::addChild(TrackObject* child)
         child->setEnabled(false);
     m_children.push_back(child);
 }
+
+// ----------------------------------------------------------------------------
+/* Called when a child is deleted, to avoid keeping pointers towards
+* an invalid TrackObject */
+void TrackObject::removeChild(TrackObject* child)
+{
+    for (unsigned int i = 0; i < m_children.size(); i++)
+    {
+        if (child == m_children[i])
+        {
+            m_children.erase(m_children.begin() + i);
+            return;
+        }
+    }
+
+    for (unsigned int i = 0; i < m_movable_children.size(); i++)
+    {
+        if (child == m_movable_children[i])
+        {
+            m_movable_children.erase(m_movable_children.begin() + i);
+            return;
+        }
+    }
+}   // removeChild
 
 // ----------------------------------------------------------------------------
 
