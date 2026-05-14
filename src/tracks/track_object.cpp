@@ -74,6 +74,7 @@ TrackObject::TrackObject(const core::vector3df& xyz, const core::vector3df& hpr,
     m_init_hpr        = hpr;
     m_init_scale      = scale;
     m_enabled         = true;
+    m_enabled_lock    = false;
     m_presentation    = NULL;
     m_animator        = NULL;
     m_parent_library  = NULL;
@@ -108,6 +109,7 @@ void TrackObject::init(const XMLNode &xml_node, scene::ISceneNode* parent,
     m_init_hpr   = core::vector3df(0,0,0);
     m_init_scale = core::vector3df(1,1,1);
     m_enabled    = true;
+    m_enabled_lock = false;
     m_initially_visible = false;
     m_presentation = NULL;
     m_animator = NULL;
@@ -383,7 +385,6 @@ void TrackObject::init(const XMLNode &xml_node, scene::ISceneNode* parent,
 }   // init
 
 // ----------------------------------------------------------------------------
-
 void TrackObject::onWorldReady()
 {
     if (m_visibility_condition == "false")
@@ -393,8 +394,7 @@ void TrackObject::onWorldReady()
     else if (m_visibility_condition.size() > 0)
     {
         unsigned char result = -1;
-        Scripting::ScriptEngine* script_engine =
-                                        Scripting::ScriptEngine::getInstance();
+        Scripting::ScriptEngine* script_engine = Scripting::ScriptEngine::getInstance();
 
         std::ostringstream fn_signature;
         std::vector<std::string> arguments;
@@ -441,9 +441,8 @@ void TrackObject::onWorldReady()
         if (result == 0)
             m_initially_visible = false;
     }
-    if (!m_initially_visible)
-        setEnabled(false);
-}
+    setEnabled(m_initially_visible);
+}   // onWorldReady
 
 // ----------------------------------------------------------------------------
 
@@ -471,24 +470,42 @@ void TrackObject::reset()
 // ----------------------------------------------------------------------------
 /** Enables or disables this object. This affects the visibility, i.e.
  *  disabled objects will not be displayed anymore.
- *  \param mode Enable (true) or disable (false) this object.
+ *  \param enabled - enable (true) or disable (false) this object.
+ *  \param ignore_lock - allows to modify this object even if locked
+  *  \param enabled_lock - if true, activates the enabled lock so further
+ *         changes are only possible when ignore_lock is true
+ *  \param reset - if we should call resetEnabled or setEnabled
  */
-void TrackObject::setEnabled(bool enabled, bool reset)
+void TrackObject::setEnabled(bool enabled, bool ignore_lock, bool activate_lock, bool reset)
 {
+    // FIXME : setEnabled is called from too many places.
+    //         This is bound to cause issues sooner or later.
+
+    // To avoid any dependency on load order, the enabled status of objects
+    // contained in a library instance can only be changed by their parent
+    // or in very specific cases (e.g. destructibles)
+    if (m_enabled_lock && !ignore_lock)
+        return;
+
     m_enabled = enabled;
+    if (activate_lock) // Don't set m_enabled_lock in case of ignore_lock
+        m_enabled_lock = true;
 
     if (m_presentation != NULL)
         m_presentation->setEnable(m_enabled);
 
-    if (getType() == "mesh")
+    if (getType() == "mesh" && m_physical_object)
     {
-        if (m_physical_object)
-        {
-            if (enabled)
-                m_physical_object->addBody();
-            else
-                m_physical_object->removeBody();
-        }
+        if (enabled)
+            m_physical_object->addBody();
+        else
+            m_physical_object->removeBody();
+    }
+
+    for (unsigned int i = 0; i < m_children.size(); i++)
+    {
+        // For non-moveable, reset or not are handled identically
+        m_children[i]->setEnabled(enabled, true, true);
     }
 
     for (unsigned int i = 0; i < m_movable_children.size(); i++)
@@ -496,7 +513,7 @@ void TrackObject::setEnabled(bool enabled, bool reset)
         if (reset)
             m_movable_children[i]->resetEnabled();
         else
-            m_movable_children[i]->setEnabled(enabled);
+            m_movable_children[i]->setEnabled(enabled, true, false);
     }
 }   // setEnabled
 
@@ -794,6 +811,7 @@ TrackObject* TrackObject::cloneToChild()
         to_clone->m_physical_object = m_physical_object->clone(to_clone);
         // All track objects need to be initially enabled in init
         to_clone->m_enabled = true;
+        to_clone->m_enabled_lock = false;
         return to_clone;
     }
     return NULL;

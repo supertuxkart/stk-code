@@ -63,6 +63,8 @@ class TrackObject
 private:
     /** True if the object is currently being displayed. */
     bool                     m_enabled;
+    /** True if only the object's parent can change its enabled status */
+    bool                     m_enabled_lock;
 
     TrackObjectPresentation* m_presentation;
 
@@ -226,8 +228,8 @@ public:
       */
     PhysicalObject* getPhysics() { return m_physical_object.get(); }
     /** Hide or show the object */
-    void setEnabled(bool mode, bool reset = false);
-    void resetEnabled() { setEnabled(m_initially_visible, true); }
+    void setEnabled(bool enabled, bool ignore_lock = false, bool activate_lock = false, bool reset = false);
+    void resetEnabled() { setEnabled(m_initially_visible, true, false, true); }
 
     void moveTo(const Scripting::SimpleVec3* pos, bool isAbsoluteCoord);
     /* @} */

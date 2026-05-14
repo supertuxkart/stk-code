@@ -85,7 +85,7 @@ void TrackObjectManager::init()
                 warned = true;
             }
             curr->setInitiallyVisible(false);
-            curr->setEnabled(false);
+            curr->setEnabled(false, true);
             continue;
         }
 
