@@ -1,8 +1,9 @@
 #!/bin/bash
 #
 # (C) 2016-2017 Dawid Gan, under the GPLv3
+# Edited in 2026 by Gustavo Barreira (aka GustaLOLE)
 #
-# A script that generates data files for Android apk
+# A script that generates lighter data files for Android apk
 
 
 # Below you can find some simple configuration variables.
@@ -147,6 +148,13 @@ if command -v magick > /dev/null; then
     MAGICK='magick'
 else
     MAGICK='convert'
+fi
+
+# Ensure that the assets doesn't exist, in case of a user error, like a wrongly typed command, etc...
+if [ -d "./assets" ]; then
+    echo "SECURITY MESSAGE: You might be trying to reset assets folder!"
+    echo "Delete or rename your assets folder (inside the android folder) to continue..."
+    exit 1
 fi
 
 # Clear previous assets directory
@@ -718,6 +726,6 @@ echo "has_assets" > "$OUTPUT_PATH/has_assets.txt"
 # It will be probably ignored by ant, but create it anyway...
 touch "$OUTPUT_PATH/.nomedia"
 
-
+# Just the finish message
 echo "Done."
 exit 0
