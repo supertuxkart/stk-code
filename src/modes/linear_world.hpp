@@ -51,6 +51,8 @@ private:
 
     core::stringw m_fastest_lap_kart_name;
 
+    core::stringw m_finished_kart_name;
+
     /** The track length returned by Track::getLength() only covers the
      *  distance from start line to finish line, i.e. it does not include
      *  the distance the karts actually start behind the start line (the
