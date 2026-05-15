@@ -50,7 +50,7 @@ void GECompressorASTC4x4::init()
     for (unsigned i = 0; i < GEVulkanCommandLoader::getLoaderCount(); i++)
     {
         astcenc_context* context = NULL;
-        if (astcenc_context_alloc(&cfg, 1, &context) != ASTCENC_SUCCESS)
+        if (astcenc_context_alloc(&cfg, 1, &context, nullptr) != ASTCENC_SUCCESS)
         {
             destroy();
             return;
