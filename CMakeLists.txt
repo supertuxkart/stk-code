@@ -29,6 +29,7 @@ option(USE_SYSTEM_MCPP "Use system mcpp instead of the built-in version, when av
 CMAKE_DEPENDENT_OPTION(USE_IPV6 "Allow create or connect to game server with IPv6 address, system enet will not be used." ON
   "NOT USE_SWITCH" OFF)
 option(USE_SYSTEM_WIIUSE "Use system WiiUse instead of the built-in version, when available." OFF)
+option(USE_SYSTEM_LIBASTCENC "Use system LibAstcenc instead of the built-in version, when available. If you enable this option, make sure to use a compatible version." OFF)
 option(USE_SQLITE3 "Use sqlite to manage server stats and ban list." ON)
 
 if(APPLE)
@@ -47,6 +48,8 @@ CMAKE_DEPENDENT_OPTION(USE_WIIUSE "Support for wiimote input devices" ON
 CMAKE_DEPENDENT_OPTION(USE_DNS_C "Build bundled dns resolver" OFF "NOT CYGWIN;NOT USE_SWITCH" ON)
 CMAKE_DEPENDENT_OPTION(USE_MOJOAL "Use bundled MojoAL instead of system OpenAL" OFF "NOT APPLE" ON)
 CMAKE_DEPENDENT_OPTION(HAVE_OPUS "Enable Opus audio codec support (requires libopusfile)" OFF
+    "NOT SERVER_ONLY" OFF)
+CMAKE_DEPENDENT_OPTION(USE_LIBASTCENC "Use the ASTC encoder for (de)compression of pictures in the Vulkan pipeline" OFF
     "NOT SERVER_ONLY" OFF)
 
 if (DLOPEN_MOLTENVK)
