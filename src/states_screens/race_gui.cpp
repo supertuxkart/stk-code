@@ -108,6 +108,7 @@ RaceGUI::RaceGUI()
     m_basket_ball_icon = irr_driver->getTexture(FileManager::GUI_ICON, "rubber_ball-icon.png");
     m_champion = irr_driver->getTexture(FileManager::GUI_ICON, "cup_gold.png");
     m_egg = irr_driver->getTexture(FileManager::GUI_ICON, "egg.png");
+    m_out_of_view = irr_driver->getTexture(FileManager::GUI_ICON, "icons-frame_arrow.png");
 }   // RaceGUI
 
 // ----------------------------------------------------------------------------
@@ -652,14 +653,60 @@ void RaceGUI::drawGlobalMiniMap()
         for (int i = 0; i < (int)(easter_world->foundEggLocations().size()); i++){
             Vec3 draw_at;
             track->mapPoint2MiniMap(easter_world->foundEggLocations()[i], &draw_at);
+            //checks if the egg is out of the map or not
+            if (draw_at.getX() > m_map_width || draw_at.getX() < 0 ||
+                draw_at.getY() > m_map_height || draw_at.getY() < 0)
+            {
+                core::rect<s32> source(core::position2di(0, 0), m_out_of_view->getSize());
+                float rotation = atan2f((draw_at.getY() - m_map_height*0.5f),(draw_at.getX() - m_map_width*0.5f));
+                rotation = -1.0f * rotation + 0.25f * M_PI; // icons-frame_arrow.png was rotated by 45 degrees
 
-            core::rect<s32> source(core::position2di(0, 0), m_egg->getSize());
-            core::rect<s32> position(m_map_left+(int)(draw_at.getX()-(m_minimap_player_size/2.5f)),
-                                     lower_y   -(int)(draw_at.getY()+(m_minimap_player_size/2.5f)),
-                                     m_map_left+(int)(draw_at.getX()+(m_minimap_player_size/2.5f)),
-                                     lower_y   -(int)(draw_at.getY()-(m_minimap_player_size/2.5f)));
-            draw2DImage(m_egg, position, source, NULL, NULL, true);
-        }
+                float positionX = 0.0f;
+                float positionY = 0.0f;
+                float map_half_width = m_map_width*0.5f;
+                float map_half_height = m_map_height*0.5f;
+                //uses posy to get posx if the slope of the points is higher than the map's
+                if (abs((draw_at.getY() - m_map_height*0.5f)/((draw_at.getX() - m_map_width*0.5f))) >
+                    (m_map_height*2.00f-1.414f)/(m_map_width*2.00f))
+                {
+                    positionY = map_half_height + ((map_half_height-0.414f*(m_minimap_player_size/2.0f)) *
+                    (draw_at.getY()-map_half_height)/(abs(draw_at.getY()-map_half_height)));
+
+                    positionX = (draw_at.getX()-map_half_width)/(draw_at.getY()-map_half_height) *
+                    (positionY -map_half_height)+map_half_width;
+                }
+                else
+                {
+                    positionX = map_half_width + ((map_half_width-0.414f*(m_minimap_player_size/2.0f)) *
+                    (draw_at.getX()-map_half_width)/(abs(draw_at.getX()-map_half_width)));
+
+                    positionY = (draw_at.getY()-map_half_height)/(draw_at.getX()-map_half_width) *
+                    (positionX-map_half_width)+map_half_height;
+                }
+                core::rect<s32> position(m_map_left+(int)(positionX-(m_minimap_player_size/2.0f)),
+                                         lower_y   -(int)(positionY+(m_minimap_player_size/2.0f)),
+                                         m_map_left+(int)(positionX+(m_minimap_player_size/2.0f)),
+                                         lower_y   -(int)(positionY-(m_minimap_player_size/2.0f)));
+                draw2DImageRotationColor(m_out_of_view, position, source, NULL, rotation, video::SColor(255, 255, 255, 255));
+                int distance = (pow((positionX-draw_at.getX()), 2)) + (pow(positionY-draw_at.getY(), 2));
+                float scaler = 1/((0.0001f*distance)+1);
+                source = core::rect<s32>(core::position2di(0, 0), m_egg->getSize());
+                position = core::rect<s32>(m_map_left+(int)(positionX-((scaler)*m_minimap_player_size/2.5f)),
+                                           lower_y   -(int)(positionY+((scaler)*m_minimap_player_size/2.5f)),
+                                           m_map_left+(int)(positionX+((scaler)*m_minimap_player_size/2.5f)),
+                                           lower_y   -(int)(positionY-((scaler)*m_minimap_player_size/2.5f)));
+                draw2DImage(m_egg, position, source, NULL, NULL, true);
+            }
+            else
+            {
+                core::rect<s32> source(core::position2di(0, 0), m_egg->getSize());
+                core::rect<s32> position(m_map_left+(int)(draw_at.getX()-(m_minimap_player_size/2.5f)),
+                                         lower_y   -(int)(draw_at.getY()+(m_minimap_player_size/2.5f)),
+                                         m_map_left+(int)(draw_at.getX()+(m_minimap_player_size/2.5f)),
+                                         lower_y   -(int)(draw_at.getY()-(m_minimap_player_size/2.5f)));
+                draw2DImage(m_egg, position, source, NULL, NULL, true);
+            } // if eggs are out of the map range
+        } // for i < easter_world->foundEggLocations().size()
     }
 
     Kart* target_kart = NULL;
