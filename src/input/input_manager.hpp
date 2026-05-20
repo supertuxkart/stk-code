@@ -78,9 +78,10 @@ private:
     void   handleStaticAction(int id0, int value);
     void   inputSensing(Input::InputType type, int deviceID, int btnID,
                         Input::AxisDirection axisDirection,  int value);
-    void   passActionToController(StateManager::ActivePlayer* player,
-                                PlayerAction action, int value,
-                                bool lookback_to_fireback);
+    void   passActionToController(Input::InputType type,
+                                  StateManager::ActivePlayer* player,
+                                  PlayerAction action, int value,
+                                  bool lookback_to_fireback);
 
 #ifndef SERVER_ONLY
     std::map<int, std::unique_ptr<SDLController> > m_sdl_controller;

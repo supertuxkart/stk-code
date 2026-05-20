@@ -815,7 +815,7 @@ void InputManager::dispatchInput(Input::InputType type, int deviceID,
             if (player == NULL)
                 return;
 
-            passActionToController(player, action, value, lookback_to_fireback);
+            passActionToController(type, player, action, value, lookback_to_fireback);
         }
         else if (RaceManager::get() &&
             RaceManager::get()->isWatchingReplay() && !GUIEngine::ModalDialog::isADialogActive() &&
@@ -907,7 +907,8 @@ void InputManager::dispatchInput(Input::InputType type, int deviceID,
 
 
 //-----------------------------------------------------------------------------
-void InputManager::passActionToController(StateManager::ActivePlayer* player,
+void InputManager::passActionToController(Input::InputType type,
+                                          StateManager::ActivePlayer* player,
                                           PlayerAction action, int value,
                                           bool lookback_to_fireback)
 {
