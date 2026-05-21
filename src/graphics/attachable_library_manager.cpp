@@ -95,8 +95,10 @@ void AttachableLibraryManager::loadLibraryNode(const std::string& folder_name,
     file_manager->pushTextureSearchPath(lib_path + "/", unique_path);
     file_manager->pushModelSearchPath(lib_path);
     material_manager->pushTempMaterial(lib_path + "/materials.xml");
+#ifndef SERVER_ONLY
     if (CVS->isGLSL())
         SP::SPShaderManager::get()->loadSPShaders(lib_path);
+#endif
 
     // based on Track::loadObjects
     unsigned int node_count = libroot->getNumNodes();
