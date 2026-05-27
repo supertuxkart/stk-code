@@ -369,6 +369,7 @@ enum MultitouchControls
     MULTITOUCH_CONTROLS_STEERING_WHEEL = 1,
     MULTITOUCH_CONTROLS_ACCELEROMETER = 2,
     MULTITOUCH_CONTROLS_GYROSCOPE = 3,
+    MULTITOUCH_CONTROLS_BUTTONS = 4
 };
 
 /** Using X-macros for setting-possible values is not very pretty, but it's a
@@ -557,7 +558,7 @@ namespace UserConfigParams
     PARAM_PREFIX IntUserConfigParam         m_multitouch_controls
             PARAM_DEFAULT( IntUserConfigParam(0, "multitouch_controls",
             &m_multitouch_group,
-            "Multitouch mode: 0 = undefined, 1 = steering wheel, 2 = accelerometer, 3 = gyroscope"));
+            "Multitouch mode: 0 = undefined, 1 = steering wheel, 2 = accelerometer, 3 = gyroscope, 4 = left/right buttons"));
 
     PARAM_PREFIX FloatUserConfigParam         m_multitouch_deadzone
             PARAM_DEFAULT( FloatUserConfigParam(0.1f, "multitouch_deadzone",
