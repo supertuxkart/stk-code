@@ -70,7 +70,8 @@ void AttachableLibraryManager::loadLibraryNode(const std::string& folder_name,
     }
 
     m_attachable_lib_nodes[identifier] = irr_driver->getSceneManager()->addEmptySceneNode();
-
+    m_attachable_lib_nodes[identifier]->setVisible(false);
+    
     XMLNode* libroot;
     // During reloads, the folder map is preserved but the attachable nodes aren't
     if (m_folder_map.count(identifier) == 0)
