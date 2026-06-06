@@ -160,7 +160,6 @@ namespace Online
     void PrivateRequest::SignInRequest::callback()
     {
         PlayerManager::getCurrentPlayer()->signIn(isSuccess(), getXMLData());
-        GUIEngine::Screen *screen = GUIEngine::getCurrentScreen();
 
         // If the login is successful, reset any saved session of other
         // local players using the same online account (which are now invalid)
@@ -181,6 +180,7 @@ namespace Online
 
         // Test if failure while showing user login screen
 #ifndef SERVER_ONLY // No GUI files in server builds
+        GUIEngine::Screen *screen = GUIEngine::getCurrentScreen();
         BaseUserScreen *login = dynamic_cast<BaseUserScreen*>(screen);
         if (login)
         {

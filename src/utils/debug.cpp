@@ -314,8 +314,8 @@ bool handleContextMenuAction(s32 cmd_id)
 
     World *world = World::getWorld();
     Physics *physics = Physics::get();
-    SP::SPShader* nv = NULL;
 #ifndef SERVER_ONLY
+    SP::SPShader* nv = NULL;
     if (SP::getNormalVisualizer())
     {
         nv = SP::getNormalVisualizer();

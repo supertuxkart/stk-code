@@ -2585,8 +2585,8 @@ void Skin::process3DPane(IGUIElement *element, const core::recti &rect,
     }
     else if (type == WTYPE_MODEL_VIEW)
     {
-        ModelViewWidget* mvw = dynamic_cast<ModelViewWidget*>(widget);
 #ifndef SERVER_ONLY
+        ModelViewWidget* mvw = dynamic_cast<ModelViewWidget*>(widget);
         mvw->drawRTTScene(rect);
 #endif
     }

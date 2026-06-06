@@ -53,10 +53,10 @@ KartGFX::KartGFX(const Kart *kart, bool is_day)
     const KartModel *km = m_kart->getKartModel();
     const float length = km->getLength();
 
-    scene::ISceneNode *node = m_kart->getNode();
     // Create nitro light
     core::vector3df location(0.0f, 0.5f, -0.5f*length - 0.05f);
 #ifndef SERVER_ONLY
+    scene::ISceneNode *node = m_kart->getNode();
     if (!GUIEngine::isNoGraphics() && supportsLight())
     {
         m_nitro_light = irr_driver->addLight(location, /*force*/ 0.4f,
@@ -291,6 +291,9 @@ void KartGFX::setSkidLevel(const unsigned int level, const unsigned int upcoming
     assert(level >= 0);
     assert(level <= 3);
     m_skid_level = level;
+
+//    const ParticleKind *pk = level==1 ? m_skid_kind1 : m_skid_kind2;
+#ifndef SERVER_ONLY
     const ParticleKind *pk, *pk2;
     if (level == 0)
         pk = m_skid_kind0;
@@ -310,9 +313,6 @@ void KartGFX::setSkidLevel(const unsigned int level, const unsigned int upcoming
     else
         pk2 = m_skid_kind3;
 
-
-//    const ParticleKind *pk = level==1 ? m_skid_kind1 : m_skid_kind2;
-#ifndef SERVER_ONLY
     if (GUIEngine::isNoGraphics())
         return;
 

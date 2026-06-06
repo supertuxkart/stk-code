@@ -111,9 +111,9 @@ namespace Scripting
         void createTextBillboard(std::string* text, SimpleVec3* location)
         {
             core::stringw wtext = StringUtils::utf8ToWide(*text);
-            DigitFace* digit_face = font_manager->getFont<DigitFace>();
             core::vector3df xyz(location->getX(), location->getY(), location->getZ());
 #ifndef SERVER_ONLY
+            DigitFace* digit_face = font_manager->getFont<DigitFace>();
             STKTextBillboard* tb = new STKTextBillboard(
                 GUIEngine::getSkin()->getColor("font::bottom"),
                 GUIEngine::getSkin()->getColor("font::top"),

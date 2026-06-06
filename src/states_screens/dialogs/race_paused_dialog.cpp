@@ -368,9 +368,11 @@ GUIEngine::EventPropagation
         }
         else if (selection == "help")
         {
+#ifdef SERVER_ONLY
+            dismiss();
+#else
             GE::GEVulkanDriver* vk_pbr_toggle = m_vk_pbr_toggle;
             dismiss();
-#ifndef SERVER_ONLY
             if (vk_pbr_toggle)
             {
                 UserConfigParams::m_dynamic_lights = !UserConfigParams::m_dynamic_lights;
