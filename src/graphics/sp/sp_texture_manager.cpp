@@ -184,7 +184,6 @@ void SPTextureManager::dumpAllTextures()
 core::stringw SPTextureManager::reloadTexture(const core::stringw& name)
 {
     core::stringw result;
-#ifndef SERVER_ONLY
     if (name.empty())
     {
         for (auto p : m_textures)
@@ -238,11 +237,10 @@ core::stringw SPTextureManager::reloadTexture(const core::stringw& name)
     {
         return L"Texture(s) not found!";
     }
-#endif   // !SERVER_ONLY
     return result + "reloaded.";
 }   // reloadTexture
 
 // ----------------------------------------------------------------------------
 }
 
-#endif
+#endif   // !SERVER_ONLY

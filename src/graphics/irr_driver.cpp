@@ -418,8 +418,9 @@ void IrrDriver::initDevice()
     core::stringw display_msg;
 
     m_logger_level = irr::ELL_INFORMATION;
-#ifndef __SWITCH__
+#if !defined(SERVER_ONLY) && !defined(__SWITCH__)
     // If --no-graphics option was used, the null device can still be used.
+    // No GUI files in server builds
     if (!GUIEngine::isNoGraphics())
     {
         // This code is only executed once. No need to reload the video
@@ -506,9 +507,7 @@ void IrrDriver::initDevice()
             UserConfigParams::m_gamepad_visualisation);
 
 begin:
-#if !defined(SERVER_ONLY)
         GE::setVideoDriver(NULL);
-#endif
 
         video::E_DRIVER_TYPE driver_created = video::EDT_NULL;
         if (std::string(UserConfigParams::m_render_driver) == "opengl")
@@ -527,7 +526,7 @@ begin:
             std::string(UserConfigParams::m_render_driver) == "directx12")
         {
             driver_created = video::EDT_VULKAN;
-#if defined(WIN32) && !defined(SERVER_ONLY)
+#if defined(WIN32)
             if (std::string(UserConfigParams::m_render_driver) == "directx12")
             {
                 std::string dozen_path = StringUtils::getPath(
@@ -536,7 +535,6 @@ begin:
                     (dozen_path + "\\dzn_icd.json").c_str(), 1);
             }
 #endif
-#ifndef SERVER_ONLY
             GE::getGEConfig()->m_texture_compression =
                 UserConfigParams::m_texture_compression;
             GE::getGEConfig()->m_render_scale =
@@ -545,7 +543,6 @@ begin:
                 UserConfigParams::m_dynamic_lights;
             GE::getGEConfig()->m_ibl =
                 !UserConfigParams::m_degraded_IBL;
-#endif
         }
         else
         {
@@ -556,18 +553,14 @@ begin:
             goto begin;
         }
 
-#ifndef SERVER_ONLY
         GE::getGEConfig()->m_fullscreen_desktop =
             (driver_created == video::EDT_VULKAN &&
             UserConfigParams::m_vulkan_fullscreen_desktop) ||
             UserConfigParams::m_non_ge_fullscreen_desktop;
-#endif
         if (UserConfigParams::m_swap_interval > 1)
             UserConfigParams::m_swap_interval = 1;
 
-#ifndef SERVER_ONLY // No GUI files in server builds
         OptionsScreenVideo::setSSR();
-#endif
         // Try 32 and, upon failure, 24 then 16 bit per pixels
         for (int bits=32; bits>15; bits -=8)
         {
@@ -656,7 +649,7 @@ begin:
             }
         }
     }
-#endif // __SWITCH__
+#endif // !defined(__SWITCH__) && !defined(SERVER_ONLY)
 
     if(!m_device)
     {
@@ -858,7 +851,6 @@ begin:
         Log::warn("irr_driver", "Using the fixed pipeline (old GPU, or "
                                 "shaders disabled in options)");
     }
-#endif
 
     // Only change video driver settings if we are showing graphics
     if (!GUIEngine::isNoGraphics())
@@ -875,6 +867,7 @@ begin:
         m_scene_manager->getParameters()
             ->setAttribute(scene::B3D_LOADER_IGNORE_MIPMAP_FLAG, true);
     } // If showing graphics
+#endif
 
     // Initialize material2D
     video::SMaterial& material2D = m_video_driver->getMaterial2D();
