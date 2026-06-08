@@ -1257,6 +1257,7 @@ namespace GUIEngine
     }   // addGUIFunctionBeforeRendering
 
     // -----------------------------------------------------------------------
+#ifndef SERVER_ONLY
     /** \brief called on every frame to trigger the rendering of the GUI.
      *  \param elapsed_time Time since last rendering calls (in seconds).
      *  \param is_loading True if the rendering is called during loading of world,
@@ -1264,7 +1265,6 @@ namespace GUIEngine
      */
     void render(float elapsed_time, bool is_loading)
     {
-#ifndef SERVER_ONLY
         GUIEngine::dt = elapsed_time;
 
         // Not yet initialized, or already cleaned up
@@ -1443,8 +1443,6 @@ namespace GUIEngine
         {
             DemoWorld::resetIdleTime();
         }
-
-#endif
     }   // render
 
     // -----------------------------------------------------------------------
@@ -1459,7 +1457,6 @@ namespace GUIEngine
     // -----------------------------------------------------------------------
     void renderLoading(bool clearIcons, bool launching, bool update_tips)
     {
-#ifndef SERVER_ONLY
         if (!TipsManager::get()->isEmpty() && update_tips)
         {
             core::stringw tip = TipsManager::get()->getTip("general");
@@ -1578,14 +1575,12 @@ namespace GUIEngine
                 x = ICON_MARGIN;
             }
         }
-#endif
     } // renderLoading
 
     // -----------------------------------------------------------------------
 
     void flushRenderLoading(bool launching)
     {
-#ifndef SERVER_ONLY
         // This will avoid no response in windows, also allow showing loading
         // icon in apple device, because apple device only update render
         // buffer if you poll the mainloop
@@ -1611,7 +1606,6 @@ namespace GUIEngine
             // The screen size may change when loading
             irr_driver->handleWindowResize();
         }
-#endif
     } // flushRenderLoading
 
     // -----------------------------------------------------------------------
@@ -1620,13 +1614,16 @@ namespace GUIEngine
     {
         g_expected_icon_count += count;
     } // reserveLoadingIcons
+#endif
     // -----------------------------------------------------------------------
 
     void addLoadingIcon(irr::video::ITexture* icon)
     {
         if (icon != NULL)
         {
+#ifndef SERVER_ONLY
             g_loading_icons.push_back(icon);
+#endif
 
             g_device->getVideoDriver()
                     ->beginScene(true, true, video::SColor(255,100,101,140));

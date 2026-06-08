@@ -238,6 +238,13 @@ namespace GUIEngine
     /** \brief to be called after e.g. a resolution switch */
     void reshowCurrentScreen();
 
+#ifdef SERVER_ONLY
+    inline void render(float dt, bool is_loading = false) {}
+    inline void clearLoadingTips() {}
+    inline void renderLoading(bool clearIcons = true, bool launching = false, bool update_tips = true) {}
+    inline void flushRenderLoading(bool launching) {}
+    inline void reserveLoadingIcons(int count) {}
+#else
     /**
       * \brief called on every frame to trigger the rendering of the GUI
       */
@@ -253,6 +260,7 @@ namespace GUIEngine
 
     /** \brief The engine is being told there will be more icons. */
     void reserveLoadingIcons(int count);
+#endif
 
     /** \brief to spice up a bit the loading icon : add icons to the loading screen */
     void addLoadingIcon(irr::video::ITexture* icon);
