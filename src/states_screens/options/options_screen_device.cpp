@@ -35,6 +35,9 @@
 
 using namespace GUIEngine;
 
+#define ACTION_ROW_PROP 5
+#define KEYBIND_ROW_PROP 7
+
 // ----------------------------------------------------------------------------
 
 OptionsScreenDevice::OptionsScreenDevice() : Screen("options/options_device.stkgui")
@@ -55,8 +58,8 @@ void OptionsScreenDevice::beforeAddingWidget()
     ListWidget* w_list = getWidget<GUIEngine::ListWidget>("actions");
     assert(w_list != NULL);
     w_list->clearColumns();
-    w_list->addColumn(_("Action"), 1);
-    w_list->addColumn(_("Key binding"), 1);
+    w_list->addColumn(_("Action"), ACTION_ROW_PROP);
+    w_list->addColumn(_("Key binding"), KEYBIND_ROW_PROP);
     w_list->setSortable(false);
 }
 
@@ -200,8 +203,8 @@ void OptionsScreenDevice::addListItemSubheader(GUIEngine::ListWidget* actions,
                                               const core::stringw& text)
 {
     std::vector<GUIEngine::ListWidget::ListCell> row;
-    row.push_back(GUIEngine::ListWidget::ListCell(text, -1, 1, false));
-    row.push_back(GUIEngine::ListWidget::ListCell(L"", -1, 1, false));
+    row.push_back(GUIEngine::ListWidget::ListCell(text, -1, ACTION_ROW_PROP, false));
+    row.push_back(GUIEngine::ListWidget::ListCell(L"", -1, KEYBIND_ROW_PROP, false));
     actions->addItem(id, row);
 }   // addListItemSubheader
 
@@ -212,8 +215,8 @@ void OptionsScreenDevice::addListItem(GUIEngine::ListWidget* actions,
 {
     std::vector<GUIEngine::ListWidget::ListCell> row;
     core::stringw s(KartActionStrings[pa].c_str());
-    row.push_back(GUIEngine::ListWidget::ListCell(s, -1, 1, false));
-    row.push_back(GUIEngine::ListWidget::ListCell(L"", -1, 1, false));
+    row.push_back(GUIEngine::ListWidget::ListCell(s, -1, ACTION_ROW_PROP, false));
+    row.push_back(GUIEngine::ListWidget::ListCell(L"", -1, KEYBIND_ROW_PROP, false));
     actions->addItem(KartActionStrings[pa], row);
 }   // addListItem
 
@@ -673,8 +676,10 @@ void OptionsScreenDevice::onConfirm()
 }   // onConfirm
 
 // -----------------------------------------------------------------------------
-
-
+/* Mark any key shared with an active config as a conflict (except potentially
+* for the cancel/pause keys). For single-player, extra configs are easily disabled,
+* while for splitscreen this helps to make sure the configs don't clash.
+*/
 bool OptionsScreenDevice::conflictsBetweenKbdConfig(PlayerAction action,
                                                    PlayerAction from,
                                                    PlayerAction to)
@@ -685,13 +690,16 @@ bool OptionsScreenDevice::conflictsBetweenKbdConfig(PlayerAction action,
         KeyboardConfig* other_kbd_config =
             input_manager->getDeviceManager()->getKeyboardConfig(i);
 
-        if (m_config != other_kbd_config  &&
-            other_kbd_config->hasBindingFor(id, from, to)
-            && (other_kbd_config->getBinding(action).getId() != id ||
-                 action == PA_FIRE)                                  )
-        {
+        if ((m_config == other_kbd_config) ||
+            !other_kbd_config->isEnabled())
+            continue;
+
+        // The ability to cancel in menus for additional configs is rather secondary,
+        // so multiple configs may share the same cancel button
+        if (other_kbd_config->hasBindingFor(id, from, to) &&
+            ((action != PA_PAUSE_RACE && action != PA_MENU_CANCEL) ||
+             other_kbd_config->getBinding(action).getId() != id))
             return true;
-        }
     }
     return false;
 }   // conflictsBetweenKbdConfig

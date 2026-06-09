@@ -22,6 +22,7 @@
 
 
 #include "guiengine/screen.hpp"
+#include "guiengine/widgets/list_widget.hpp"
 #include "states_screens/dialogs/message_dialog.hpp"
 #include "states_screens/race_gui_base.hpp"
 #include "states_screens/state_manager.hpp"
@@ -200,10 +201,17 @@ private:
     int m_end_track;
     int m_sshot_height;
 
+    bool m_has_set_goal_lists;
+    GUIEngine::ListWidget* m_blue_goal_list;
+    GUIEngine::ListWidget* m_red_goal_list;
+    irr::gui::STKModifiedSpriteBank *m_icon_bank;
+    int m_icon_default_kart;
+
     PtrVector<GUIEngine::Widget, HOLD>  m_gp_progress_widgets;
 
     static const int SSHOT_SEPARATION = 10;
 
+    void scheduleTip();
     void displayOneEntry(unsigned int x, unsigned int y,
                          unsigned int n, bool display_points);
     void determineTableLayout();
@@ -219,7 +227,8 @@ private:
     void displayCTFResults();
     void drawCTFScorers(KartTeam team, int x, int y, int height);
     void displaySoccerResults();
-    void drawTeamScorers(KartTeam team, int x, int y, int height);
+    void setGoalList(KartTeam team);
+    void positionGoalList(KartTeam team, int starting_y);
     void displayBenchmarkSummary();
     void displayScreenShots();
 

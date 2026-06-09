@@ -734,42 +734,30 @@ bool handleContextMenuAction(s32 cmd_id)
         break;
     case DEBUG_GUI_CAM_TOP:
         CameraDebug::setDebugType(CameraDebug::CM_DEBUG_TOP_OF_KART);
-        Camera::changeCamera(0, Camera::CM_TYPE_DEBUG);
-        Camera::getActiveCamera()->setKart(World::getWorld()->getKart(kart_num));
-        irr_driver->getDevice()->getCursorControl()->setVisible(true);
+        setDebugCamera(kart_num);
         break;
     case DEBUG_GUI_CAM_WHEEL:
         if (!(World::getWorld()->getKart(kart_num)->isGhostKart()))
         {
             CameraDebug::setDebugType(CameraDebug::CM_DEBUG_GROUND);
-            Camera::changeCamera(0, Camera::CM_TYPE_DEBUG);
-            Camera::getActiveCamera()->setKart(World::getWorld()->getKart(kart_num));
-            irr_driver->getDevice()->getCursorControl()->setVisible(true);
+            setDebugCamera(kart_num);
         }
         break;
     case DEBUG_GUI_CAM_BEHIND_KART:
         CameraDebug::setDebugType(CameraDebug::CM_DEBUG_BEHIND_KART);
-        Camera::changeCamera(0, Camera::CM_TYPE_DEBUG);
-        Camera::getActiveCamera()->setKart(World::getWorld()->getKart(kart_num));
-        irr_driver->getDevice()->getCursorControl()->setVisible(true);
+        setDebugCamera(kart_num);
         break;
     case DEBUG_GUI_CAM_SIDE_OF_KART:
         CameraDebug::setDebugType(CameraDebug::CM_DEBUG_SIDE_OF_KART);
-        Camera::changeCamera(0, Camera::CM_TYPE_DEBUG);
-        Camera::getActiveCamera()->setKart(World::getWorld()->getKart(kart_num));
-        irr_driver->getDevice()->getCursorControl()->setVisible(true);
+        setDebugCamera(kart_num);
         break;
     case DEBUG_GUI_CAM_INV_SIDE_OF_KART:
         CameraDebug::setDebugType(CameraDebug::CM_DEBUG_INV_SIDE_OF_KART);
-        Camera::changeCamera(0, Camera::CM_TYPE_DEBUG);
-        Camera::getActiveCamera()->setKart(World::getWorld()->getKart(kart_num));
-        irr_driver->getDevice()->getCursorControl()->setVisible(true);
+        setDebugCamera(kart_num);
         break;
     case DEBUG_GUI_CAM_FRONT_OF_KART:
         CameraDebug::setDebugType(CameraDebug::CM_DEBUG_FRONT_OF_KART);
-        Camera::changeCamera(0, Camera::CM_TYPE_DEBUG);
-        Camera::getActiveCamera()->setKart(World::getWorld()->getKart(kart_num));
-        irr_driver->getDevice()->getCursorControl()->setVisible(true);
+        setDebugCamera(kart_num);
         break;
     case DEBUG_GUI_CAM_FREE:
     {
@@ -1369,8 +1357,8 @@ bool onEvent(const SEvent &event)
             sub->addItem(L"Print kart positions", DEBUG_PRINT_START_POS);
             sub->addSeparator();
             sub->addItem(L"Save screenshot (Print Screen)", DEBUG_SAVE_SCREENSHOT);
-            sub->addItem(L"Save replay (Ctrl + F11)", DEBUG_SAVE_REPLAY);
-            sub->addItem(L"Save history (F11)", DEBUG_SAVE_HISTORY);
+            sub->addItem(L"Save replay (F11)", DEBUG_SAVE_REPLAY);
+            sub->addItem(L"Save history (Ctrl + F11)", DEBUG_SAVE_HISTORY);
             sub->addItem(L"Dump RTT (Shift + F11)", DEBUG_DUMP_RTT);
             sub->addSeparator();
             sub->addItem(L"Profiler", DEBUG_PROFILER);
@@ -1465,178 +1453,112 @@ void handleStaticAction(int key, int value, bool control_pressed, bool shift_pre
             case IRR_KEY_OEM_3:
             {
                 if (control_pressed)
-                {
                     handleContextMenuAction(DEBUG_ADJUST_LIGHTS);
-                }
                 else if (shift_pressed)
-                {
                     handleContextMenuAction(DEBUG_VISUAL_VALUES);
-                }
                 else
-                {
                     handleContextMenuAction(DEBUG_HELP);
-                }
                 break;
             }
             // Function key actions
             case IRR_KEY_F1:
             {
                 if (control_pressed)
-                {
                     handleContextMenuAction(DEBUG_GUI_CAM_NORMAL);
-                }
                 else if (shift_pressed)
-                {
                     handleContextMenuAction(DEBUG_ATTACHMENT_BOMB);
-                }
                 else
-                {
                     handleContextMenuAction(DEBUG_POWERUP_ANVIL);
-                }
                 break;
             }
             case IRR_KEY_F2:
             {
                 if (control_pressed)
-                {
                     handleContextMenuAction(DEBUG_GUI_CAM_FREE);
-                }
                 else if (shift_pressed)
-                {
                     handleContextMenuAction(DEBUG_ATTACHMENT_ANVIL);
-                }
                 else
-                {
                     handleContextMenuAction(DEBUG_POWERUP_RUBBERBALL);
-                }
                 break;
             }
             case IRR_KEY_F3:
             {
                 if (control_pressed)
-                {
                     handleContextMenuAction(DEBUG_GUI_CAM_TOP);
-                }
                 else if (shift_pressed)
-                {
                    handleContextMenuAction(DEBUG_ATTACHMENT_PARACHUTE);
-                }
                 else
-                {
                     handleContextMenuAction(DEBUG_POWERUP_BOWLING);
-                }
                 break;
             }
             case IRR_KEY_F4:
             {
                 if (control_pressed)
-                {
                     handleContextMenuAction(DEBUG_GUI_CAM_WHEEL);
-                }
                 else if (shift_pressed)
-                {
                     handleContextMenuAction(DEBUG_ATTACHMENT_SQUASH);
-                }
                 else
-                {
                     handleContextMenuAction(DEBUG_POWERUP_BUBBLEGUM);
-                }
                 break;
             }
             case IRR_KEY_F5:
             {
                 if (control_pressed)
-                {
                     handleContextMenuAction(DEBUG_GUI_CAM_BEHIND_KART);
-                }
                 else if (shift_pressed)
-                {
                     handleContextMenuAction(DEBUG_ATTACHMENT_PLUNGER);
-                }
                 else
-                {
                     handleContextMenuAction(DEBUG_POWERUP_CAKE);
-                }
                 break;
             }
             case IRR_KEY_F6:
             {
                 if (control_pressed)
-                {
                     handleContextMenuAction(DEBUG_GUI_CAM_SIDE_OF_KART);
-                }
                 else if (shift_pressed)
-                {
                     handleContextMenuAction(DEBUG_ATTACHMENT_EXPLOSION);
-                }
                 else
-                {
                     handleContextMenuAction(DEBUG_POWERUP_PARACHUTE);
-                }
                 break;
             }
             case IRR_KEY_F7:
             {
                 if (control_pressed)
-                {
                     handleContextMenuAction(DEBUG_GUI_CAM_INV_SIDE_OF_KART);
-                }
                 else if (shift_pressed)
-                {
                     handleContextMenuAction(DEBUG_SCRIPT_CONSOLE);
-                }
                 else
-                {
                     handleContextMenuAction(DEBUG_POWERUP_PLUNGER);
-                }
                 break;
             }
             case IRR_KEY_F8:
             {
                 if (control_pressed)
-                {
                     handleContextMenuAction(DEBUG_GUI_CAM_FRONT_OF_KART);
-                }
                 else if (shift_pressed)
-                {
                     handleContextMenuAction(DEBUG_TEXTURE_CONSOLE);
-                }
                 else
-                {
                     handleContextMenuAction(DEBUG_POWERUP_SWATTER);
-                }
                 break;
             }
             case IRR_KEY_F9:
             {
                 if (control_pressed)
-                {
                     handleContextMenuAction(DEBUG_VIEW_KART_SLIDER);
-                }
                 else if (shift_pressed)
-                {
                     handleContextMenuAction(DEBUG_RUN_CUTSCENE);
-                }
                 else
-                {
                     handleContextMenuAction(DEBUG_POWERUP_SWITCH);
-                }
                 break;
             }
             case IRR_KEY_F10:
             {
                 if (control_pressed)
-                {
                     handleContextMenuAction(DEBUG_POWERUP_SLIDER);
-                }
                 else if (shift_pressed)
-                {
                     handleContextMenuAction(DEBUG_GUI_TOGGLE);
-                }
                 else
-                {
                     handleContextMenuAction(DEBUG_POWERUP_ZIPPER);
-                }
                 break;
             }
             case IRR_KEY_INSERT:
@@ -1777,6 +1699,16 @@ void handleStaticAction(int key, int value, bool control_pressed, bool shift_pre
         default : break;
     }
 }
+
+// ----------------------------------------------------------------------------
+/** Utility function called when setting various debug cameras
+ */
+void setDebugCamera(int kart_num)
+{
+    Camera::changeCamera(0, Camera::CM_TYPE_DEBUG);
+    Camera::getActiveCamera()->setKart(World::getWorld()->getKart(kart_num));
+    irr_driver->getDevice()->getCursorControl()->setVisible(true);
+}   // setDebugCamera
 
 // ----------------------------------------------------------------------------
 /** Returns if the debug menu is visible.

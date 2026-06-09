@@ -10,6 +10,7 @@ For similar reasons, and because some features are vastly more complex than othe
 ### Networking
 * Add TV cameras as a camera option when watching soccer games in spectator mode, by LLS
 * Add a 'help' command for use in server lobbies, by Alayan
+* Update CA certificates used by cURL, by Nutzboi
 
 ### General
 * Many improvements for localization:
@@ -18,12 +19,18 @@ For similar reasons, and because some features are vastly more complex than othe
     * Use context to allow for different translations of the same English string when relevant, by Alayan
     * Full translation support for server answers to chat commands, and greatly improved base English messages, by Alayan
     * Move all URLs out of translatable strings, by Alayan
+    * Make the screenshot notification translatable, by Alayan
     * Minor improvements to some English source strings, by Alayan and others
 * Add optional support for Opus audio files, by Abedegno
 * Support using the command line to set the user-adjustable graphical parameters that were missing as command line options, by Alayan
 * Add a command line option to directly set a graphical preset, by Alayan
 * Sanitize characters that are illegal in file names when using installaddon, by Nutzboi
 * Support calibration offsets for wiimotes, by qduff
+* Avoid waiting on spectators to start games in online servers, by Bcfworld
+* Properly handle Unicode clipboard data on Windows, using SDL2's built-in functions, by Nutzboi
+* Allow the game to parse a list of benchmark replay files from config and to select which one to use at runtime or through the command-line, instead of hardcoding the file name, by Alayan
+* Fix a crash that would happen when changing resolution after having played with seasonal hats on, by Alayan
+* Reduce RAM usage when generating the skybox during track loading, by virophagesp
 * Various code quality improvements and minor bugfixes, by Alayan and others
 
 ### Graphics
@@ -42,6 +49,12 @@ For similar reasons, and because some features are vastly more complex than othe
 * Display more settings in the benchmark end-screen, by Alayan
 * Prevent showing a render resolution factor in UI that's unsupported with the current renderer, by Alayan
 * Improvement to the layout logic for track and kart selection when having many addons, by Alayan
+* On common OSes, hide the OS username when displaying the ghost replay's path, by Fouks
+* Use standard MessageQueue notifications for the screenshot notification, by Alayan
+* If the player selects the 'random kart' option, pre-select it next time rather than whichever kart was randomly picked, by Alexander Klimov
+* Always offer the monitor's refresh rate as an option in the FPS limiter, and slightly update the default limits, by Alayan
+* Display an unlimited number of goals in soccer result UI, with list scrolling if needed, by Alayan
+* Better display of conflicts between keyboard configs: only check conflicts with configs that are enabled, but show every potentially conflicting input, not just the fire input, by Alayan
 * Various minor UI fixes, by Alayan and others
 
 ### Tracks and modeling
@@ -69,9 +82,9 @@ For similar reasons, and because some features are vastly more complex than othe
 ### General
 * Make the game's window resizable in all menu screens, by Benau and CodingJellyfish
 * New benchmark mode, by Alayan:
-- Can be run with a few clicks, allowing to easily test the performance of various settings or to compare different systems
-- Robust performance metrics that better reflect the impact of varying frametimes than Average FPS and 1% Lows.
-- Results are displayed along the active graphics settings, and detailed results can be saved to file
+    * Can be run with a few clicks, allowing to easily test the performance of various settings or to compare different systems
+    * Robust performance metrics that better reflect the impact of varying frametimes than Average FPS and 1% Lows.
+    * Results are displayed along the active graphics settings, and detailed results can be saved to file
 * Add the benchmark mode to commandline options, by ektor5
 * Fix incorrect unlock information in Story Mode after a Grand Prix, by CodingJellyfish
 * Make the progression of audio levels geometrical and increase default steps, allowing to set lower audio levels and better accuracy for low audio levels (especially useful for headphone users), by Alayan
@@ -440,13 +453,13 @@ For similar reasons, and because some features are vastly more complex than othe
 * Global rankings by Benau (communication with main server) and Alayan (ranking formula)
 
 ### Race gameplay and physics
-* New game mode Capture the Flag, by Benau (online multiplayer only)
+* New game mode Capture the Flag (online multiplayer only), by Benau
 * New game mode Free for All, by Benau
 * Free for All available in offline mode with AI, by Mrxx99
 * Revised kart characteristics for better balance between light, medium and heavy karts by Alayan
 * Better random item distribution for various numbers of karts, by Alayan and hiker
 * Fix position interpolation causing some incorrect lapline validation, by Auria
-* Fix kart being uncontrollable and hovering when landing on some downward slopes, by hiker
+* Fix kart being uncontrollable and hovering when landing on some downward slopes, by hiker and Alayan
 * Mitigate a physics issue which could send a kart flying on collisions, by hiker
 * Make kart turn radius based on kart class instead of kart model length (which made Adiumy unplayable and caused AI issues), by Alayan
 * Revisited slipstreaming with an easier to obtain boost, especially in curves, but not as strong as in 0.9.3 when the zipper boost was incorrectly activated, by Alayan
@@ -532,8 +545,8 @@ For similar reasons, and because some features are vastly more complex than othe
 
 ## SuperTuxKart 0.9.3 (28. October 2017)
 * Reduced RAM and VRAM usage, reducing load times, by Auria and Benau
-* New mesh format optimized for space and hardware skinning
-* Code refactoring of both render pipeline, by Benau and Elderme
+* New mesh format (SPM) optimized for space and hardware skinning, by Benau
+* Code refactoring of both render pipelines, by Benau and Elderme
 * Physics improvements and various physics bugfixes, by hiker
 * Kart GFX improvements (exhaust and headlight)
 * In-game screen recording powered by libopenglrecorder
@@ -542,7 +555,15 @@ For similar reasons, and because some features are vastly more complex than othe
 * New grand prix win scene
 * Gamepad configuration bugfixes
 * 3 Strikes Battles : added spare tire karts
-* Various improvements (starting boost effect, wall driving fixes, parachutes, GP points, help page for bananas, cannon fixes, colorization shader)
+* Support input and pasting of CJK characters, by Benau
+* Properly display weather effects when looking backwards, by Benau
+* In the addons screen, warn if the Internet connection is disabled, by Alpt
+* Display more info in the race result GUI (best lap time, difficulty and number of laps), by LoadingPleaseWait
+* Allow to reload textures on the fly in artist debug mode, by Benau
+* Greatly improved GP point system, by Alayan
+* Make parachutes less penalizing at low speeds and more penalizing at high speeds, by Alayan
+* Make the duration of parachutes from the parachute powerup depend on kart position, by Alayan
+* Various improvements (starting boost effect, wall driving fixes, help page for bananas, cannon fixes, colorization shader)
 
 ### Tracks and modeling
 #### Karts
@@ -605,6 +626,11 @@ For similar reasons, and because some features are vastly more complex than othe
     * collect online achievements
 * Grand Prix editor, including creation of random GPs 
 * Different kart physics
+* Add support for 'cannons' which can quickly move karts along a pre-determined path, by Auria and hiker
+* Allow to leave unassigned actions when configuring inputs, by shiv05
+* Fix incorrect icon scaling in portrait resolutions, by Flakebi
+* Add a Free Camera (that can be moved independently from karts) for artist debug mode, by Flakebi
+
 
 ### Tracks and modeling
 #### Karts

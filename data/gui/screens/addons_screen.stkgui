@@ -47,7 +47,7 @@
                 <spacer width="1%" />
                 <spinner id="filter_featured" proportion="5" align="center" min_value="0" wrap_around="true"/>
             </div>
-            <list id="list_addons" x="0" y="0" width="100%" height="88%" word_wrap="true" alternate_bg="true"/>
+            <list id="list_addons" x="0" y="0" width="100%" height="88%" word_wrap="true" alternate_bg="true" line_height="1.5"/>
         </box>
     </div>
 </stkgui>

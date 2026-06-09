@@ -213,7 +213,7 @@ void ServerSelection::init()
         m_icon_bank->addTextureAsSprite(tex);
     }
     
-    m_server_list_widget->setIcons(m_icon_bank, 2.0f);
+    m_server_list_widget->setIcons(m_icon_bank);
     m_sort_desc = false;
     refresh();
     m_ipv6_only_without_nat64 = false;

@@ -343,7 +343,7 @@ void TrackInfoScreen::init()
     {
         m_icon_bank->setScale(1.0f / 128.0f);
         m_icon_bank->setTargetIconSize(128, 128);
-        m_highscore_entries->setIcons(m_icon_bank, 1.2f);
+        m_highscore_entries->setIcons(m_icon_bank);
         m_highscore_entries->setVisible(has_highscores);
         m_highscore_entries->setActive(false); // Improve keyboard navigation
 

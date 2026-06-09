@@ -29,7 +29,7 @@ CGUISTKListBox::CGUISTKListBox(IGUIEnvironment* environment, IGUIElement* parent
             bool drawBack, bool moveOverSelect)
 : IGUIElement(EGUIET_LIST_BOX, environment, parent, id, rectangle), Selected(-1),
     m_item_height(0),ItemHeightOverride(0),
-    TotalItemHeight(0), ItemsIconWidth(0), MousePosY(0), Font(0), IconBank(0),
+    TotalItemHeight(0), ItemsIconWidth(0), MousePosY(0), m_font(0), IconBank(0),
     ScrollBar(0), selectTime(0), Selecting(false), Moving(false),
     DrawBack(drawBack), MoveOverSelect(moveOverSelect), AutoScroll(true),
     HighlightWhenNotFocused(true)
@@ -68,8 +68,8 @@ CGUISTKListBox::~CGUISTKListBox()
     if (ScrollBar)
         ScrollBar->drop();
 
-    if (Font)
-        Font->drop();
+    if (m_font)
+        m_font->drop();
 
     if (IconBank)
         IconBank->drop();
@@ -164,7 +164,7 @@ void CGUISTKListBox::clear()
 void CGUISTKListBox::updateDefaultItemHeight()
 {
     if (ItemHeightOverride == 0)
-        m_item_height = Font->getHeightPerLine() + 4;
+        m_item_height = m_font->getHeightPerLine() + 4;
 }
 
 
@@ -172,19 +172,19 @@ void CGUISTKListBox::recalculateItemHeight()
 {
     IGUISkin* skin = Environment->getSkin();
 
-    if (Font != skin->getFont())
+    if (m_font != skin->getFont())
     {
-        if (Font)
-            Font->drop();
+        if (m_font)
+            m_font->drop();
 
-        Font = skin->getFont();
+        m_font = skin->getFont();
         if ( 0 == ItemHeightOverride )
             m_item_height = 0;
 
-        if (Font)
+        if (m_font)
         {
             updateDefaultItemHeight();
-            Font->grab();
+            m_font->grab();
         }
     }
 
@@ -401,7 +401,7 @@ void CGUISTKListBox::updateAbsolutePosition()
         }
     }
 
-    if (Font)
+    if (m_font)
         updateDefaultItemHeight();
     ItemsIconWidth = 0;
     if (!Items.empty())
@@ -472,7 +472,7 @@ void CGUISTKListBox::draw()
             if (!ScrollBar->isVisible())
                 textRect.LowerRightCorner.X = textRect.LowerRightCorner.X - skin->getSize(EGDS_SCROLLBAR_SIZE);
 
-            if (Font)
+            if (m_font)
             {
                 int total_proportion = 0;
                 for(unsigned int x = 0; x < Items[i].m_contents.size(); ++x)
@@ -530,18 +530,18 @@ void CGUISTKListBox::draw()
                         Items[i].m_contents[x].m_glyph_layouts.empty())
                     {
                         int text_width = (textRect.LowerRightCorner.X - textRect.UpperLeftCorner.X);
-                        Font->initGlyphLayouts(Items[i].m_contents[x].m_text,
+                        m_font->initGlyphLayouts(Items[i].m_contents[x].m_text,
                             Items[i].m_contents[x].m_glyph_layouts);
                         // Remove highlighted link if cache already has it
                         gui::removeHighlightedURL(Items[i].m_contents[x].m_glyph_layouts);
                         if (Items[i].m_word_wrap)
                         {
                             gui::breakGlyphLayouts(Items[i].m_contents[x].m_glyph_layouts,
-                                text_width, Font->getInverseShaping(), Font->getScale());
+                                text_width, m_font->getInverseShaping(), m_font->getScale());
                         }
                     }
 
-                    Font->draw(
+                    m_font->draw(
                         Items[i].m_contents[x].m_glyph_layouts,
                         textRect,
                         hasItemOverrideColor(i, font_color) ? getItemOverrideColor(i, font_color) : getItemDefaultColor(font_color),

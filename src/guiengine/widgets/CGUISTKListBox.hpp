@@ -54,7 +54,6 @@ namespace irr
                 int m_current_id;
 
                 bool m_word_wrap = false;
-                float m_line_height_scale = 0.0f;
 
                 // A multicolor extension
                 struct ListItemOverrideColor
@@ -199,7 +198,7 @@ namespace irr
             s32 TotalItemHeight;
             s32 ItemsIconWidth;
             s32 MousePosY;
-            gui::IGUIFont* Font;
+            gui::IGUIFont* m_font;
             gui::IGUISpriteBank* IconBank;
             gui::IGUIScrollBar* ScrollBar;
             u32 selectTime;

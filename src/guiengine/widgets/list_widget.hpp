@@ -98,7 +98,7 @@ namespace GUIEngine
 
         bool m_header_created;
 
-        float m_icon_scale;
+        float m_line_height_scale;
 
         void repairSortCol()
         {
@@ -111,7 +111,7 @@ namespace GUIEngine
         }
 
         void updateHeader();
-        void updateIconScale();
+        void updateScale();
         int getHeaderHeight() const;
         irr::core::rect<s32> getListBoxSize() const;
 
@@ -143,7 +143,9 @@ namespace GUIEngine
           *        you're done with it (but do not delete it when the list widget is still active)
           * \pre may only be called after the widget has been added to the screen with add()
           */
-        void setIcons(irr::gui::STKModifiedSpriteBank* icons, float scale = -1.0f);
+        void setIcons(irr::gui::STKModifiedSpriteBank* icons);
+
+        void setLineHeightScale(float scale);
         
         
         // ---- contents management
@@ -298,7 +300,7 @@ namespace GUIEngine
         void pageMove(bool up);
         void listStart();
         void listEnd();
-        
+
         void setColumnListener(IListWidgetHeaderListener* listener)
         {
             if (m_listener) delete m_listener;

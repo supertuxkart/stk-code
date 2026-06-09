@@ -621,7 +621,8 @@ void cmdLineHelp()
                               "laps.\n"
     "       --profile-time=n   Enable automatic driven profile mode for n "
                               "seconds.\n"
-    "       --benchmark        Start Benchmark Mode, save results and exit. \n"
+    "       --benchmark        Start Benchmark Mode, save results and exit.\n"
+    "       --benchmark-file=file Specify which benchmark replay file to use.\n"
     "       --unlock-all       Permanently unlock all karts and tracks for testing.\n"
     "       --no-unlock-all    Disable unlock-all (i.e. base unlocking on player achievement).\n"
     "       --xmas=n           Toggle Xmas/Christmas mode. n=0 Use current date, n=1, Always enable,\n"
@@ -1385,49 +1386,28 @@ int handleCmdLine(bool has_server_config, bool has_parent_process)
         ServerConfig::m_motd = s;
 
     if (CommandLine::has("--team-choosing"))
-    {
         ServerConfig::m_team_choosing = true;
-    }
     if (CommandLine::has("--no-team-choosing"))
-    {
         ServerConfig::m_team_choosing = false;
-    }
     if (CommandLine::has("--ranked"))
-    {
         ServerConfig::m_ranked = true;
-    }
     if (CommandLine::has("--no-ranked"))
-    {
         ServerConfig::m_ranked = false;
-    }
     if (CommandLine::has("--auto-end"))
-    {
         ServerConfig::m_auto_end = true;
-    }
     if (CommandLine::has("--no-auto-end"))
-    {
         ServerConfig::m_auto_end = false;
-    }
     if (CommandLine::has("--owner-less"))
-    {
         ServerConfig::m_owner_less = true;
-    }
     if (CommandLine::has("--no-owner-less"))
-    {
         ServerConfig::m_owner_less = false;
-    }
     if (CommandLine::has("--firewalled-server"))
-    {
         ServerConfig::m_firewalled_server = true;
-    }
     if (CommandLine::has("--no-firewalled-server"))
-    {
         ServerConfig::m_firewalled_server = false;
-    }
     if (CommandLine::has("--connection-debug"))
-    {
         Network::m_connection_debug = true;
-    }
+
     if (CommandLine::has("--server-id-file", &s))
     {
         NetworkConfig::get()->setServerIdFile(
@@ -1668,6 +1648,7 @@ int handleCmdLine(bool has_server_config, bool has_parent_process)
         const std::vector<std::string> l=StringUtils::split(std::string(s),',');
         RaceManager::get()->setDefaultAIKartList(l);
         RaceManager::get()->setNumKarts((int)l.size());
+        RaceManager::get()->setNumPlayers(0);
     }   // --aiNP
 
     if(CommandLine::has("--reverse"))
@@ -1770,38 +1751,33 @@ int handleCmdLine(bool has_server_config, bool has_parent_process)
         UserConfigParams::m_default_gamepad = n;
     } //--use-gamepad
 
-    if(CommandLine::has("--laps", &s))
+    if(CommandLine::has("--laps", &n))
     {
-        int laps = atoi(s.c_str());
-        if (laps < 0)
+        if (n <= 0)
         {
-            Log::error("main", "Invalid number of laps: %s.\n", s.c_str());
+            Log::error("main", "Invalid number of laps: %i.\n", n);
             return 0;
         }
+
+        Log::verbose("main", "You chose to have %d laps.", n);
+        if (NetworkConfig::get()->isServer())
+            ServerLobby::m_fixed_laps = n;
         else
-        {
-            Log::verbose("main", "You chose to have %d laps.", laps);
-            if (NetworkConfig::get()->isServer())
-                ServerLobby::m_fixed_laps = laps;
-            else
-                RaceManager::get()->setNumLaps(laps);
-        }
+            RaceManager::get()->setNumLaps(n);
     }   // --laps
 
     if(CommandLine::has("--profile-laps",  &n))
     {
-        if (n < 0)
+        if (n <= 0)
         {
             Log::error("main", "Invalid number of profile-laps: %i.", n );
             return 0;
         }
-        else
-        {
-            Log::verbose("main", "Profiling %d laps.",n);
-            UserConfigParams::m_no_start_screen = true;
-            ProfileWorld::setProfileModeLaps(n);
-            RaceManager::get()->setNumLaps(n);
-        }
+
+        Log::verbose("main", "Profiling %d laps.",n);
+        UserConfigParams::m_no_start_screen = true;
+        ProfileWorld::setProfileModeLaps(n);
+        RaceManager::get()->setNumLaps(n);
     }   // --profile-laps
 
     if(CommandLine::has("--benchmark"))
@@ -1810,6 +1786,33 @@ int handleCmdLine(bool has_server_config, bool has_parent_process)
         UserConfigParams::m_no_start_screen = true;
         UserConfigParams::m_benchmark = true;
     }   // --benchmark
+
+    if(CommandLine::has("--benchmark-file", &s))
+    {
+        Log::verbose("main", "File '%s' requested as benchmark file", s.c_str());
+
+        if (s.find(".replay") != std::string::npos)
+        {
+            bool found_replay = false;
+            for (unsigned int i=0; i < stk_config->m_benchmark_files.size(); i++)
+            {
+                if (stk_config->m_benchmark_files[i] == s)
+                {
+                    found_replay = true;
+                    stk_config->m_active_benchmark_file = s;
+                    break;
+                }
+            }
+            if (!found_replay)
+                Log::error("main","The requested benchmark file '%s' "
+                    "isn't registered as a benchmark file in stk_config.xml.", s.c_str());
+        }
+        else
+        {
+            Log::error("main","The requested benchmark file '%s' "
+                "is not a .replay file.", s.c_str());
+        }
+    }   // --benchmark-file
     
     if(CommandLine::has("--unlock-all"))
     {

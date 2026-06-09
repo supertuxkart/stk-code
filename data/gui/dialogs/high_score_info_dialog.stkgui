@@ -9,7 +9,7 @@
             <!-- This is filled in programmatically -->
             <div width="100%" height="85%" layout="horizontal-row">
                 <box width="50%" height="100%" layout="vertical-row" padding="1">
-                    <list id="high_score_list" x="0" y="0" width="100%" height="100%"/>
+                    <list id="high_score_list" x="0" y="0" width="100%" height="100%" line_height="1.5"/>
                 </box>
 
                 <spacer width="10" height="10%"/>

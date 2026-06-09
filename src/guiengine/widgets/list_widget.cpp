@@ -22,6 +22,8 @@
 #include "guiengine/CGUISpriteBank.hpp"
 #include "guiengine/engine.hpp"
 #include "io/file_manager.hpp"
+#include "utils/log.hpp"
+#include "utils/string_utils.hpp"
 
 #include <IGUIElement.h>
 #include <IGUISkin.h>
@@ -48,12 +50,11 @@ ListWidget::ListWidget() : Widget(WTYPE_LIST)
     m_sortable = true;
     m_header_created = false;
     m_choosing_header = false;
-    m_icon_scale = -1.0f;
 }
 
 // -----------------------------------------------------------------------------
 
-void ListWidget::setIcons(STKModifiedSpriteBank* icons, float scale)
+void ListWidget::setIcons(STKModifiedSpriteBank* icons)
 {
     m_use_icons = (icons != NULL);
     m_icons = icons;
@@ -64,40 +65,40 @@ void ListWidget::setIcons(STKModifiedSpriteBank* icons, float scale)
     if (m_use_icons)
     {
         list->setSpriteBank(m_icons);
-        m_icon_scale = scale;
-        updateIconScale();
     }
     else
     {
         list->setSpriteBank(NULL);
     }
 
-}
+}   // setIcons
 
 // -----------------------------------------------------------------------------
-void ListWidget::updateIconScale()
+void ListWidget::setLineHeightScale(float scale)
+{
+    // If the requested scale is too small, we adjust it back to something
+    // that prevents text on different lines from mashing together.
+    if (scale < 0.75f)
+        scale = 0.75f;
+    
+    m_line_height_scale = scale;
+    updateScale();
+}   // setLineHeightScale
+
+// -----------------------------------------------------------------------------
+void ListWidget::updateScale()
 {
     CGUISTKListBox* list = getIrrlichtElement<CGUISTKListBox>();
     assert(list != NULL);
 
     // determine needed height
-    int item_height = (int)(m_icon_scale * GUIEngine::getFontHeight());
-    if (m_icon_scale <= 0.0f)
-    {
-        const core::array< core::rect<s32> >& rects = m_icons->getPositions();
-        const int count = rects.size();
-        for (int n = 0; n < count; n++)
-        {
-            const int h = rects[n].getHeight();
-            if (h > item_height) item_height = h;
-        }
-    }
+    int item_height = (int)(m_line_height_scale * GUIEngine::getFontHeight());
 
     if (item_height > 0)
     {
         list->setItemHeight(item_height);
     }
-}
+}   // updateScale
 
 // -----------------------------------------------------------------------------
 int ListWidget::getHeaderHeight() const
@@ -143,6 +144,11 @@ void ListWidget::add()
 
     m_element = list_box;
     m_element->setTabOrder( list_box->getID() );
+
+    float temp_scale = 1.0f;
+    // If the properties is not a valid float, fromString will not change temp_scale
+    StringUtils::fromString(m_properties[PROP_LINE_HEIGHT], temp_scale);
+    setLineHeightScale(temp_scale);
 
     createHeader();
 }
@@ -243,10 +249,6 @@ void ListWidget::addItem(   const std::string& internal_name,
     newItem.m_internal_name = internal_name;
     newItem.m_contents.push_back(cell);
     newItem.m_word_wrap = (m_properties[PROP_WORD_WRAP] == "true");
-    newItem.m_line_height_scale = m_properties[PROP_LINE_HEIGHT] == "small"  ? 0.75f :
-                                  m_properties[PROP_LINE_HEIGHT] == "normal" ? 1.0f  :
-                                  m_properties[PROP_LINE_HEIGHT] == "big"    ? 1.25f : 1.0f;
-
 
     CGUISTKListBox* list = getIrrlichtElement<CGUISTKListBox>();
     assert(list != NULL);
@@ -275,9 +277,6 @@ void ListWidget::addItem(const std::string& internal_name,
         newItem.m_contents.push_back(contents[i]);
     }
     newItem.m_word_wrap = (m_properties[PROP_WORD_WRAP] == "true");
-    newItem.m_line_height_scale = m_properties[PROP_LINE_HEIGHT] == "small"  ? 0.75f :
-                                  m_properties[PROP_LINE_HEIGHT] == "normal" ? 1.0f  :
-                                  m_properties[PROP_LINE_HEIGHT] == "big"    ? 1.25f : 1.0f;
 
     CGUISTKListBox* list = getIrrlichtElement<CGUISTKListBox>();
     assert(list != NULL);
@@ -741,6 +740,5 @@ void ListWidget::resize()
     if (m_element)
         m_element->setRelativePosition(getListBoxSize());
     updateHeader();
-    if (m_use_icons)
-        updateIconScale();
+    updateScale();
 }

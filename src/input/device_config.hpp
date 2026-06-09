@@ -159,7 +159,6 @@ public:
     const Binding& getBinding(int i) const {return m_bindings[i];}
 
     // ------------------------------------------------------------------------
-    /** At this time only relevant for gamepads, keyboards are always enabled */
     bool isEnabled() const { return m_enabled; }
 
     // ------------------------------------------------------------------------
