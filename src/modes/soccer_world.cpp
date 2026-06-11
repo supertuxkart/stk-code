@@ -554,7 +554,6 @@ void SoccerWorld::onCheckGoalTriggered(bool first_goal)
 
 // Shut up GCC complaining incorrectly about sd.m_country_code
 #pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wmaybe-uninitialized"
         // First goal being true means that the ball entered the
         // blue goal, meaning that the red team scored.
         if (first_goal)
@@ -623,7 +622,6 @@ void SoccerWorld::handlePlayerGoalFromServer(const NetworkString& ns)
 
 // Shut up GCC complaining incorrectly about sd.m_country_code
 #pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wmaybe-uninitialized"
     if (first_goal)
         m_red_scorers.push_back(sd);
     else
@@ -1098,7 +1096,6 @@ void SoccerWorld::restoreCompleteState(const BareNetworkString& b)
         sd.m_handicap_level = (HandicapLevel)b.getUInt8();
 // Shut up GCC complaining incorrectly about sd.m_country_code
 #pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wmaybe-uninitialized"
         if (i < red_size)
             m_red_scorers.push_back(sd);
         else
