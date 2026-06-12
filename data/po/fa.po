@@ -289,7 +289,7 @@ msgstr "دکمه‌های معکوس شده"
 #. I18N: ./data/gui/dialogs/android/multitouch_settings.stkgui
 #. I18N: In the multitouch settings screen
 msgid "Buttons scale"
-msgstr ""
+msgstr "اندازه دکمه ها"
 
 #. I18N: ./data/gui/dialogs/android/multitouch_settings.stkgui
 #. I18N: In the multitouch settings screen
@@ -610,7 +610,7 @@ msgstr ""
 #. I18N: ./data/gui/dialogs/online/change_password.stkgui
 #. I18N: In the change password dialog
 msgid "Password Change"
-msgstr ""
+msgstr "تغییر گذرواژه"
 
 #. I18N: ./data/gui/dialogs/online/change_password.stkgui
 #. I18N: In the change password dialog
@@ -645,7 +645,7 @@ msgstr "بازگشت به مسابقه"
 #. I18N: ./data/gui/dialogs/online/network_ingame_dialog.stkgui
 #. I18N: Race paused button
 msgid "Quit Server"
-msgstr ""
+msgstr "خروج از سرور"
 
 #. I18N: ./data/gui/dialogs/online/network_ingame_dialog.stkgui
 #. I18N: Show in network ingame dialog to allow user to go back to lobby to
@@ -695,14 +695,14 @@ msgstr "10 بازیکن برتر"
 
 #. I18N: ./data/gui/dialogs/online/player_rankings_dialog.stkgui
 msgid "Refresh"
-msgstr ""
+msgstr "تازه سازی"
 
 #. I18N: ./data/gui/dialogs/online/recovery_info.stkgui
 #. I18N: In the recovery dialog
 #. I18N: ./data/gui/dialogs/online/recovery_input.stkgui
 #. I18N: In the recovery dialog
 msgid "Account Recovery"
-msgstr ""
+msgstr "بازیابی حساب"
 
 #. I18N: ./data/gui/dialogs/online/recovery_info.stkgui
 #. I18N: In the recovery dialog
@@ -726,7 +726,7 @@ msgstr ""
 #: src/states_screens/online/online_profile_friends.cpp:72
 #: src/states_screens/online/online_user_search.cpp:71
 msgid "Username"
-msgstr ""
+msgstr "نام کاربری"
 
 #. I18N: ./data/gui/dialogs/online/recovery_input.stkgui
 #. I18N: In the recovery dialog
@@ -922,17 +922,17 @@ msgstr "افزودن دوست"
 #. I18N: ./data/gui/dialogs/online/user_info_dialog.stkgui
 #. I18N: User info dialog
 msgid "Accept Invite"
-msgstr ""
+msgstr "قبول کردن دعوت"
 
 #. I18N: ./data/gui/dialogs/online/user_info_dialog.stkgui
 #. I18N: User info dialog
 msgid "Decline Invite"
-msgstr ""
+msgstr "رد دعوت"
 
 #. I18N: ./data/gui/dialogs/online/user_info_dialog.stkgui
 #. I18N: User info dialog
 msgid "View Profile"
-msgstr ""
+msgstr "نمایش پروفایل"
 
 #. I18N: ./data/gui/dialogs/online/vote_dialog.stkgui
 #. I18N: In the vote dialog
@@ -1120,7 +1120,7 @@ msgstr ""
 
 #. I18N: ./data/gui/screens/cutscene.stkgui
 msgid "Skip"
-msgstr ""
+msgstr "رد شدن"
 
 #. I18N: ./data/gui/screens/easter_egg.stkgui
 #. I18N: Section in easter egg tracks selection screen
@@ -1260,7 +1260,7 @@ msgstr ""
 #. I18N: ./data/gui/screens/grand_prix_editor.stkgui
 #. I18N: Menu item
 msgid "New"
-msgstr ""
+msgstr "جدید"
 
 #. I18N: ./data/gui/screens/grand_prix_editor.stkgui
 #. I18N: Menu item
@@ -1307,7 +1307,7 @@ msgstr ""
 #. I18N: ./data/gui/screens/help7.stkgui
 #. I18N: Tab in help menu
 msgid "Game Modes"
-msgstr ""
+msgstr "نوع بازی"
 
 #. I18N: ./data/gui/screens/help1.stkgui
 #. I18N: Tab in help menu
@@ -1361,7 +1361,7 @@ msgstr ""
 #. I18N: Main menu button
 #: src/io/rich_presence.cpp:501
 msgid "Story Mode"
-msgstr ""
+msgstr "بخش داستانی"
 
 #. I18N: ./data/gui/screens/help1.stkgui
 #. I18N: Tab in help menu
@@ -1395,11 +1395,11 @@ msgstr ""
 #. I18N: ./data/gui/screens/help7.stkgui
 #. I18N: Tab in help menu
 msgid "Multiplayer"
-msgstr ""
+msgstr "چند نفره"
 
 #. I18N: ./data/gui/screens/help1.stkgui
 msgid "Start the tutorial"
-msgstr ""
+msgstr "شروع آموزش"
 
 #. I18N: ./data/gui/screens/help1.stkgui
 #. I18N: In the help menu
@@ -1757,7 +1757,7 @@ msgstr ""
 #. I18N: ./data/gui/screens/main_menu.stkgui
 #. I18N: Main menu button
 msgid "Splitscreen Multiplayer"
-msgstr ""
+msgstr "چند نفره با تقسیم صفحه"
 
 #. I18N: ./data/gui/screens/main_menu.stkgui
 #. I18N: Main menu button
@@ -1768,18 +1768,18 @@ msgstr ""
 #. I18N: In the user screen
 #: src/states_screens/online/online_profile_friends.cpp:240
 msgid "Online"
-msgstr ""
+msgstr "آنلاین"
 
 #. I18N: ./data/gui/screens/main_menu.stkgui
 #. I18N: Main menu button
 msgid "Addons"
-msgstr ""
+msgstr "افزونه ها"
 
 #. I18N: ./data/gui/screens/main_menu.stkgui
 #. I18N: In the main screen
 #: src/states_screens/race_gui_overworld.cpp:530
 msgid "Tutorial"
-msgstr ""
+msgstr "اموزش"
 
 #. I18N: ./data/gui/screens/main_menu.stkgui
 #. I18N: In the main screen
@@ -1813,12 +1813,12 @@ msgstr ""
 #. I18N: ./data/gui/screens/online/create_server.stkgui
 #. I18N: In the server creation screen
 msgid "Name of the server"
-msgstr ""
+msgstr "نام سرور"
 
 #. I18N: ./data/gui/screens/online/create_server.stkgui
 #. I18N: In the server creation screen
 msgid "Max. number of players"
-msgstr ""
+msgstr "حداکثر تعداد بازیکنان"
 
 #. I18N: ./data/gui/screens/online/create_server.stkgui
 #. I18N: In the server creation screen
@@ -1828,18 +1828,18 @@ msgstr ""
 #. I18N: ./data/gui/screens/online/create_server.stkgui
 #. I18N: In the server creation screen
 msgid "Create"
-msgstr ""
+msgstr "ساخت"
 
 #. I18N: ./data/gui/screens/online/lan.stkgui
 msgid "Local Networking"
-msgstr ""
+msgstr "شبکه محلی"
 
 #. I18N: ./data/gui/screens/online/lan.stkgui
 #. I18N: In the online multiplayer screen
 #. I18N: ./data/gui/screens/online/profile_servers.stkgui
 #. I18N: In the online multiplayer screen
 msgid "Find Server"
-msgstr ""
+msgstr "پیدا کردن سرور"
 
 #. I18N: ./data/gui/screens/online/lan.stkgui
 #. I18N: In the online multiplayer screen
@@ -1847,7 +1847,7 @@ msgstr ""
 #. I18N: In the online multiplayer screen
 #: src/states_screens/online/create_server_screen.cpp:103
 msgid "Create Server"
-msgstr ""
+msgstr "ساخت سرور"
 
 #. I18N: ./data/gui/screens/online/networking_lobby.stkgui
 #. I18N: In networking lobby
@@ -1870,7 +1870,7 @@ msgstr ""
 #. I18N: In the network lobby
 #: src/states_screens/online/networking_lobby.cpp:192
 msgid "Start race"
-msgstr ""
+msgstr "شروع مسابقه"
 
 #. I18N: ./data/gui/screens/online/online.stkgui
 #. I18N: In the networking menu
@@ -1880,17 +1880,17 @@ msgstr ""
 #. I18N: ./data/gui/screens/online/online.stkgui
 #. I18N: Networking menu button
 msgid "Local networking"
-msgstr ""
+msgstr "شبکه محلی"
 
 #. I18N: ./data/gui/screens/online/online.stkgui
 #. I18N: Networking menu button
 msgid "Global networking"
-msgstr ""
+msgstr "شبکه جهانی"
 
 #. I18N: ./data/gui/screens/online/online.stkgui
 #. I18N: Networking menu button
 msgid "Enter server address"
-msgstr ""
+msgstr "آدرس سرور را وارد کنید"
 
 #. I18N: ./data/gui/screens/online/online.stkgui
 #. I18N: Networking menu button
@@ -1926,7 +1926,7 @@ msgstr ""
 #. I18N: ./data/gui/screens/online/profile_friends.stkgui
 #. I18N: ./data/gui/screens/online/user_search.stkgui
 msgid "Search"
-msgstr ""
+msgstr "جست وجو"
 
 #. I18N: ./data/gui/screens/online/profile_servers.stkgui
 msgid "Global Networking"
@@ -1946,7 +1946,7 @@ msgstr ""
 #. I18N: ./data/gui/screens/online/profile_settings.stkgui
 #. I18N: In the online account settings screen
 msgid "Password:"
-msgstr ""
+msgstr "رمز:"
 
 #. I18N: ./data/gui/screens/online/profile_settings.stkgui
 msgid "Change"
@@ -1955,7 +1955,7 @@ msgstr ""
 #. I18N: ./data/gui/screens/online/profile_settings.stkgui
 #. I18N: In the online account settings screen
 msgid "E-mail:"
-msgstr ""
+msgstr "ایمیل:"
 
 #. I18N: ./data/gui/screens/online/register.stkgui
 #. I18N: In the registration dialog
@@ -2051,7 +2051,7 @@ msgstr ""
 #. I18N: ./data/gui/screens/user_screen_tab.stkgui
 #. I18N: Section in the settings menu
 msgid "Graphics"
-msgstr ""
+msgstr "گرافیک"
 
 #. I18N: ./data/gui/screens/options_audio.stkgui
 #. I18N: Section in the settings menu
@@ -2089,7 +2089,7 @@ msgstr "صدا"
 #. I18N: ./data/gui/screens/user_screen_tab.stkgui
 #. I18N: Section in the settings menu
 msgid "Interface"
-msgstr ""
+msgstr "رابط کاربری"
 
 #. I18N: ./data/gui/screens/options_audio.stkgui
 #. I18N: Section in the settings menu
@@ -2108,7 +2108,7 @@ msgstr ""
 #. I18N: ./data/gui/screens/user_screen_tab.stkgui
 #. I18N: Section in the settings menu
 msgid "Players"
-msgstr ""
+msgstr "بازیکنان"
 
 #. I18N: ./data/gui/screens/options_audio.stkgui
 #. I18N: Section in the settings menu
@@ -2127,7 +2127,7 @@ msgstr ""
 #. I18N: ./data/gui/screens/user_screen_tab.stkgui
 #. I18N: Section in the settings menu
 msgid "Controls"
-msgstr ""
+msgstr "کنترلرها"
 
 #. I18N: ./data/gui/screens/options_audio.stkgui
 #. I18N: Section in the settings menu
@@ -2146,12 +2146,12 @@ msgstr ""
 #. I18N: ./data/gui/screens/user_screen_tab.stkgui
 #. I18N: Section in the settings menu
 msgid "Language"
-msgstr ""
+msgstr "زبان"
 
 #. I18N: ./data/gui/screens/options_audio.stkgui
 #. I18N: In the audio options screen
 msgid "Music"
-msgstr ""
+msgstr "موسیقی"
 
 #. I18N: ./data/gui/screens/options_audio.stkgui
 #. I18N: In the audio options screen
@@ -2161,17 +2161,17 @@ msgstr ""
 #: src/states_screens/options/options_screen_video.cpp:663
 #: src/states_screens/options/options_screen_video.cpp:736
 msgid "Enabled"
-msgstr ""
+msgstr "فعال"
 
 #. I18N: ./data/gui/screens/options_audio.stkgui
 #. I18N: In the audio options screen
 msgid "Volume"
-msgstr ""
+msgstr "مقدار"
 
 #. I18N: ./data/gui/screens/options_audio.stkgui
 #. I18N: In the audio options screen
 msgid "Sound Effects"
-msgstr ""
+msgstr "جلوه های صوتی"
 
 #. I18N: ./data/gui/screens/options_device.stkgui
 #. I18N: In the input configuration screen
@@ -2251,7 +2251,7 @@ msgstr ""
 #. I18N: ./data/gui/screens/options_input.stkgui
 #. I18N: In the input configuration screen
 msgid "Add a device"
-msgstr ""
+msgstr "افزودن دستگاه"
 
 #. I18N: ./data/gui/screens/options_input.stkgui
 #. I18N: In the input configuration screen
@@ -2278,12 +2278,12 @@ msgstr ""
 #. I18N: ./data/gui/screens/options_ui.stkgui
 #. I18N: In the ui settings
 msgid "Font size"
-msgstr ""
+msgstr "اندازه فونت"
 
 #. I18N: ./data/gui/screens/options_ui.stkgui
 #. I18N: In the ui settings
 msgid "Camera"
-msgstr ""
+msgstr "دوربین"
 
 #. I18N: ./data/gui/screens/options_ui.stkgui
 #. I18N: In the ui settings
@@ -2293,7 +2293,7 @@ msgstr ""
 #. I18N: ./data/gui/screens/options_ui.stkgui
 #. I18N: In the ui settings
 msgid "Display FPS"
-msgstr ""
+msgstr "نمایش فریم ریت"
 
 #. I18N: ./data/gui/screens/options_ui.stkgui
 #. I18N: In the ui settings
@@ -2328,7 +2328,7 @@ msgstr ""
 #. I18N: ./data/gui/screens/options_video.stkgui
 #. I18N: In the video options, maximum frame per second
 msgid "Maximum FPS"
-msgstr ""
+msgstr "حداکثر فریم ریت"
 
 #. I18N: ./data/gui/screens/options_video.stkgui
 #. I18N: In the video settings
@@ -2338,12 +2338,12 @@ msgstr ""
 #. I18N: ./data/gui/screens/options_video.stkgui
 #. I18N: In the video settings
 msgid "Resolution"
-msgstr ""
+msgstr "رزولوشن"
 
 #. I18N: ./data/gui/screens/options_video.stkgui
 #. I18N: In the video settings
 msgid "Fullscreen"
-msgstr ""
+msgstr "تمام صفحه"
 
 #. I18N: ./data/gui/screens/options_video.stkgui
 #. I18N: In the video settings
@@ -2371,19 +2371,19 @@ msgstr ""
 #. I18N: ./data/gui/screens/soccer_setup.stkgui
 #. I18N: In soccer setup screen
 msgid "Red Team"
-msgstr ""
+msgstr "تیم قرمز"
 
 #. I18N: ./data/gui/screens/soccer_setup.stkgui
 #. I18N: In soccer setup screen
 msgid "Blue Team"
-msgstr ""
+msgstr "تیم آبی"
 
 #. I18N: ./data/gui/screens/track_info.stkgui
 #. I18N: In the track info screen
 #: src/states_screens/online/tracks_screen.cpp:541
 #: src/states_screens/track_info_screen.cpp:276
 msgid "Number of laps"
-msgstr ""
+msgstr "تعداد دور"
 
 #. I18N: ./data/gui/screens/track_info.stkgui
 #. I18N: In the track info screen
@@ -2407,21 +2407,21 @@ msgstr ""
 #. I18N: Used as a verb, appears on the main networking menu (login button)
 #: src/states_screens/online/online_screen.cpp:62
 msgid "Login"
-msgstr ""
+msgstr "ورود"
 
 #. I18N: ./data/gui/screens/user_screen.stkgui
 #. I18N: In the user screen
 #. I18N: ./data/gui/screens/user_screen_tab.stkgui
 #. I18N: In the user screen
 msgid "Remember password"
-msgstr ""
+msgstr "یادآوری کلمه عبور"
 
 #. I18N: ./data/gui/screens/user_screen.stkgui
 #. I18N: In the user screen
 #. I18N: ./data/gui/screens/user_screen_tab.stkgui
 #. I18N: In the user screen
 msgid "Delete"
-msgstr ""
+msgstr "حذف"
 
 #. I18N: ./data/gui/screens/user_screen.stkgui
 #. I18N: In the user screen
@@ -4847,12 +4847,12 @@ msgstr ""
 
 #: src/states_screens/dialogs/message_dialog.cpp:145
 msgid "Don't show again"
-msgstr ""
+msgstr "دیگر نمایش نده"
 
 #. I18N: In the network player dialog
 #: src/states_screens/dialogs/network_player_dialog.cpp:50
 msgid "Player info"
-msgstr ""
+msgstr "اطلاعات بازیکن"
 
 #. I18N: In the network player dialog
 #: src/states_screens/dialogs/network_player_dialog.cpp:55
@@ -5353,11 +5353,11 @@ msgstr ""
 
 #: src/states_screens/main_menu_screen.cpp:659
 msgid "Are you sure you want to quit STK?"
-msgstr ""
+msgstr "مطمئنی می‌خوای STK رو ترک کنی؟"
 
 #: src/states_screens/online/create_server_screen.cpp:102
 msgid "Create LAN Server"
-msgstr ""
+msgstr "ساخت سرور محلی"
 
 #: src/states_screens/online/create_server_screen.cpp:107
 #, c-format
@@ -5381,7 +5381,7 @@ msgstr ""
 #. server that he is ready for next game for owner less server
 #: src/states_screens/online/networking_lobby.cpp:195
 msgid "Ready"
-msgstr ""
+msgstr "آماده"
 
 #. I18N: Live join is displayed in networking lobby to allow players
 #. to join the current started in-progress game
@@ -5397,7 +5397,7 @@ msgstr ""
 
 #: src/states_screens/online/networking_lobby.cpp:204
 msgid "Install addon"
-msgstr ""
+msgstr "نصب افزونه"
 
 #. I18N: In the networking lobby, show when player is required to
 #. wait before the current game finish with remaining time,
@@ -5490,7 +5490,7 @@ msgstr ""
 
 #: src/states_screens/online/online_profile_friends.cpp:76
 msgid "Status"
-msgstr ""
+msgstr "وضعیت"
 
 #: src/states_screens/online/online_profile_friends.cpp:94
 #: src/states_screens/online/online_profile_friends.cpp:274
@@ -5499,7 +5499,7 @@ msgstr ""
 
 #: src/states_screens/online/online_profile_friends.cpp:236
 msgid "New Request"
-msgstr ""
+msgstr "درخواست جدید"
 
 #: src/states_screens/online/online_profile_friends.cpp:237
 msgid "Pending"
@@ -5511,19 +5511,19 @@ msgstr ""
 
 #: src/states_screens/online/online_profile_settings.cpp:79
 msgid "Enter new E-mail below"
-msgstr ""
+msgstr "ایمیل جدید در زیر وارد کنید"
 
 #: src/states_screens/online/online_profile_settings.cpp:84
 msgid "New Email has to be between 5 and 254 characters long!"
-msgstr ""
+msgstr "طول ایمیل جدید باید بین ۵ تا ۲۵۴ کاراکتر باشد!"
 
 #: src/states_screens/online/online_profile_settings.cpp:93
 msgid "New Email is invalid!"
-msgstr ""
+msgstr "ایمیل جدید نامعتبر است!"
 
 #: src/states_screens/online/online_profile_settings.cpp:118
 msgid "E-mail changed!"
-msgstr ""
+msgstr "ایمیل عوض شد!"
 
 #: src/states_screens/online/online_profile_settings.cpp:120
 #, c-format
@@ -5554,11 +5554,11 @@ msgstr ""
 
 #: src/states_screens/online/register_screen.cpp:306
 msgid "User name cannot be empty."
-msgstr ""
+msgstr "نام کابری نمی تواند خالی باشد"
 
 #: src/states_screens/online/register_screen.cpp:362
 msgid "Online username and password must not be the same!"
-msgstr ""
+msgstr "نام کاربری آنلاین و کلمه عبور نباید مثل هم باشد!"
 
 #: src/states_screens/online/register_screen.cpp:366
 msgid "Emails don't match!"
@@ -5636,11 +5636,11 @@ msgstr ""
 
 #: src/states_screens/online/server_selection.cpp:504
 msgid "No server is available."
-msgstr ""
+msgstr "هیج سروری وجود ندارد."
 
 #: src/states_screens/online/server_selection.cpp:512
 msgid "Fetching servers"
-msgstr ""
+msgstr "دریافت سرور ها"
 
 #: src/states_screens/online/server_selection.cpp:578
 msgid "Server Bookmarks"
