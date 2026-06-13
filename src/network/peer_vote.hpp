@@ -56,7 +56,7 @@ public:
         ns.decodeStringW(&m_player_name);
         ns.decodeString(&m_track_name);
         m_num_laps = ns.getUInt16();
-        m_reverse = ns.getUInt16()!=0;
+        m_reverse = ns.getUInt8()!=0;
 
     }   // PeerVote(NetworkString &)
 
@@ -67,7 +67,7 @@ public:
         ns->encodeString(m_player_name)
             .encodeString(m_track_name)
             .addUInt16(m_num_laps)
-            .addUInt16(m_reverse);
+            .addUInt8(m_reverse);
     }   // encode
 };   // class PeerVote
 
