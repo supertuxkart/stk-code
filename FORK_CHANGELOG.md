@@ -7,7 +7,7 @@ It should be kept in mind that this changelog have only the fork changes, not th
 ## SuperTuxKart AA Milestone 1
 
 ### UI changes
-* New font sizes (under construction)
+* New font sizes (by GustaLOLE)
 * Many improvements for overflow reduction (under construction)
 * Adjust for skins (under construction)
 

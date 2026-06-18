@@ -97,18 +97,21 @@ void OptionsScreenUI::loadedFromFile()
     font_size->addLabel(_C("Font size", "Large"));
     //I18N: In the UI options, Very large font size
     font_size->addLabel(_C("Font size", "Very large"));
-    font_size->addLabel(L"Extremely large");
+    //I18N: In the UI options, Even more large font size
+    font_size->addLabel(_C("Font size", "Even more large"));
+    //I18N: In the UI options, Extremely large font size
+    font_size->addLabel(_C("Font size", "Extremely large"));
 
     if (UserConfigParams::m_artist_debug_mode)
     {
         // Only show extreme size in artist debug mode
         font_size->m_properties[GUIEngine::PROP_MIN_VALUE] = "0";
-        font_size->m_properties[GUIEngine::PROP_MAX_VALUE] = "6";
+        font_size->m_properties[GUIEngine::PROP_MAX_VALUE] = "7";
     }
     else
     {
         font_size->m_properties[GUIEngine::PROP_MIN_VALUE] = "1";
-        font_size->m_properties[GUIEngine::PROP_MAX_VALUE] = "5";
+        font_size->m_properties[GUIEngine::PROP_MAX_VALUE] = "7";
     }
 
     font_size->setValueUpdatedCallback([this](SpinnerWidget* spinner)
@@ -222,11 +225,11 @@ void OptionsScreenUI::init()
     assert( font_size != NULL );
 
     int size_int = (int)roundf(UserConfigParams::m_font_size);
-    if (size_int < 0 || size_int > 6)
+    if (size_int < 0 || size_int > 7)
         size_int = 3;
 
     if (!UserConfigParams::m_artist_debug_mode &&
-        (size_int < 1 || size_int > 5))
+        (size_int < 1 || size_int > 7))
         size_int = 3;
 
     font_size->setValue(size_int);
