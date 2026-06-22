@@ -105,17 +105,7 @@ void KartColorSliderDialog::beforeAddingWidgets()
     core::matrix4 model_location;
 
     // scaling the view basing in the kart length
-    float scale = 35.0f / kart_model.getLength();
-
-    // if the kart is too short, use a predefined scale
-    if (kart_model.getLength() < 1.45f)
-    {
-        scale = 35.0f;
-    }
-    else if (kart_model.getLength() < 1.75f)
-    {
-        scale = 30.0f;
-    }
+    float scale = 50.0f / kart_model.getLength();
 
     model_location.setScale(core::vector3df(scale, scale, scale));
 
