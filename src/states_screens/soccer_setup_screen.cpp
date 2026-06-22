@@ -167,8 +167,11 @@ void SoccerSetupScreen::beforeAddingWidget()
                 (info.team == KART_TEAM_BLUE ? 0.66f : 1.0f);
         }
 
+        // scaling the view basing in the kart length
+        float scale = 40.0f / kart_model.getLength();
+
         core::matrix4 model_location;
-        model_location.setScale(core::vector3df(35.0f, 35.0f, 35.0f));
+        model_location.setScale(core::vector3df(scale, scale, scale));
         // Add the kart model (including wheels and speed weight objects)
         kart_view->addModel(kart_model.getModel(), model_location,
             kart_model.getBaseFrame(), kart_model.getBaseFrame());
