@@ -289,6 +289,11 @@ void KartSelectionScreen::init()
     tabs->select(UserConfigParams::m_last_used_kart_group,
                  PLAYER_ID_GAME_MASTER);
 
+#ifdef DEBUG
+    Widget* placeholder = getWidget("playerskarts");
+    assert(placeholder != NULL);
+#endif
+
     m_game_master_confirmed = false;
 
     tabs->setActive(true);
