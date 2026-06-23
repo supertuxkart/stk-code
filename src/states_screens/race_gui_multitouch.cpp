@@ -34,6 +34,7 @@ using namespace irr;
 #include "karts/abstract_kart.hpp"
 #include "karts/controller/kart_control.hpp"
 #include "network/protocols/client_lobby.hpp"
+#include "race/race_manager.hpp"
 #include "states_screens/race_gui_base.hpp"
 
 #include <IrrlichtDevice.h>
@@ -46,6 +47,7 @@ RaceGUIMultitouch::RaceGUIMultitouch(RaceGUIBase* race_gui)
     m_race_gui = race_gui;
     m_gui_action = false;
     m_is_spectator_mode = false;
+    m_is_watching_replay = false;
     m_height = 0;
     m_steering_wheel_tex = NULL;
     m_steering_wheel_tex_mask_up = NULL;
@@ -164,11 +166,17 @@ void RaceGUIMultitouch::init()
                                         "android/steering_wheel_mask_down.png");
 
     auto cl = LobbyProtocol::get<ClientLobby>();
-    
+    auto rm = RaceManager::get()->isWatchingReplay();
+
     if (cl && cl->isSpectator())
     {
         createSpectatorGUI();
         m_is_spectator_mode = true;
+    }
+    else if (rm)
+    {
+        m_is_watching_replay = true;
+        createRaceGUI();
     }
     else
     {
@@ -236,39 +244,44 @@ void RaceGUIMultitouch::createRaceGUI()
     }
 
     m_height = (unsigned int)(2 * col_size + margin / 2);
-    
-    if (UserConfigParams::m_multitouch_controls == MULTITOUCH_CONTROLS_ACCELEROMETER ||
-        UserConfigParams::m_multitouch_controls == MULTITOUCH_CONTROLS_GYROSCOPE)
+    if (!m_is_watching_replay)
     {
-        m_device->addButton(BUTTON_UP_DOWN,
-                    int(steering_accel_x), int(steering_accel_y),
-                    int(btn2_size / 2), int(btn2_size));
-    }
-    else
-    {
-        m_device->addButton(BUTTON_STEERING,
-                            int(steering_wheel_x), int(steering_wheel_y),
-                            int(btn2_size), int(btn2_size));
-    }
+        if (UserConfigParams::m_multitouch_controls == MULTITOUCH_CONTROLS_ACCELEROMETER ||
+            UserConfigParams::m_multitouch_controls == MULTITOUCH_CONTROLS_GYROSCOPE)
+        {
+            m_device->addButton(BUTTON_UP_DOWN,
+                        int(steering_accel_x), int(steering_accel_y),
+                        int(btn2_size / 2), int(btn2_size));
+        }
+        else
+        {
+            m_device->addButton(BUTTON_STEERING,
+                                int(steering_wheel_x), int(steering_wheel_y),
+                                int(btn2_size), int(btn2_size));
+        }
 
-    m_device->addButton(BUTTON_ESCAPE,
-                        int(margin_top), int(margin_small),
-                        int(btn_small_size), int(btn_small_size));
-    m_device->addButton(BUTTON_RESCUE,
-                        int(margin_top + col_small_size), int(margin_small),
-                        int(btn_small_size), int(btn_small_size));
-    m_device->addButton(BUTTON_NITRO,
-                        int(second_column_x), int(h - 2 * col_size),
-                        int(btn_size), int(btn_size));
-    m_device->addButton(BUTTON_SKIDDING,
-                        int(second_column_x), int(h - 1 * col_size),
-                        int(btn_size), int(btn_size));
-    m_device->addButton(BUTTON_FIRE,
-                        int(first_column_x),  int(h - 2 * col_size),
-                        int(btn_size), int(btn_size));
-    m_device->addButton(BUTTON_LOOK_BACKWARDS,
-                        int(first_column_x), int(h - 1 * col_size),
-                        int(btn_size), int(btn_size));
+        m_device->addButton(BUTTON_ESCAPE,
+                            int(margin_top), int(margin_small),
+                            int(btn_small_size), int(btn_small_size));
+        m_device->addButton(BUTTON_RESCUE,
+                            int(margin_top + col_small_size), int(margin_small),
+                            int(btn_small_size), int(btn_small_size));
+        m_device->addButton(BUTTON_NITRO,
+                            int(second_column_x), int(h - 2 * col_size),
+                            int(btn_size), int(btn_size));
+        m_device->addButton(BUTTON_SKIDDING,
+                            int(second_column_x), int(h - 1 * col_size),
+                            int(btn_size), int(btn_size));
+        m_device->addButton(BUTTON_FIRE,
+                            int(first_column_x),  int(h - 2 * col_size),
+                            int(btn_size), int(btn_size));
+        m_device->addButton(BUTTON_LOOK_BACKWARDS,
+                            int(first_column_x), int(h - 1 * col_size),
+                            int(btn_size), int(btn_size));
+        m_device->addButton(BUTTON_ESCAPE,
+                            int(margin_top), int(margin_small),
+                            int(btn_small_size), int(btn_small_size));
+    }
 } // createRaceGUI
 
 //-----------------------------------------------------------------------------

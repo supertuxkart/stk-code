@@ -33,6 +33,7 @@ using namespace irr;
 
 class AbstractKart;
 class MultitouchDevice;
+class RaceManager;
 class RaceGUIBase;
 
 class RaceGUIMultitouch
@@ -43,6 +44,7 @@ private:
     
     bool m_gui_action;
     bool m_is_spectator_mode;
+    bool m_is_watching_replay;
     unsigned int m_height;
     
     video::ITexture* m_steering_wheel_tex;
