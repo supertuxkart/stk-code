@@ -67,6 +67,13 @@ Attachment::Attachment(Kart* kart)
     m_has_library_node     = false;
     m_lib_instance         = "";
     m_node                 = NULL;
+    // We assume that the kart model's nominal dimensions don't change
+    // (Squashing is handled automatically)
+    m_electro_height_scale = 1.25f * m_kart->getHighestPoint();
+    m_electro_lw_scale     = std::max(0.85f * m_electro_height_scale,
+        std::max(1.075f * m_kart->getKartWidth(), 0.71f * m_kart->getKartLength()));
+    m_electro_height_scale = std::max(m_electro_height_scale, 0.75f * m_electro_lw_scale);
+
     m_library_node         = irr_driver->getSceneManager()->addEmptySceneNode();
     if (GUIEngine::isNoGraphics())
         return;
@@ -558,7 +565,7 @@ void Attachment::updateGraphics(float dt)
             m_library_node = AttachableLibraryManager::get()->createInstance(lib_id, m_lib_instance);
             m_library_node->setPosition(core::vector3df(0.0f, 0.0f, 0.0f));
             m_library_node->setRotation(core::vector3df(0.0f, 0.0f, 0.0f));
-            m_library_node->setScale(core::vector3df(1.0f, 1.0f, 1.0f));
+            m_library_node->setScale(core::vector3df(m_electro_lw_scale, m_electro_height_scale, m_electro_lw_scale));
             m_library_node->setParent(m_kart->getNode());
             break;
         default:
@@ -598,10 +605,13 @@ void Attachment::updateGraphics(float dt)
         bool is_big_gum_shield = m_type == ATTACH_BUBBLEGUM_SHIELD;
         bool is_small_gum_shield = m_type == ATTACH_BUBBLEGUM_SHIELD_SMALL;
         bool is_gum_shield = is_big_gum_shield || is_small_gum_shield;
+        bool is_electro_shield = m_type == ATTACH_ELECTRO_SHIELD;
         // FIXME : it is wasteful to do this every frame
         float wanted_node_scale = is_big_gum_shield   ? std::max(1.173f, m_kart->getHighestPoint() * 1.196f) :
                                   is_small_gum_shield ? std::max( 1.02f, m_kart->getHighestPoint() * 1.04f) :
                                                         1.0f;
+        float height_scale = is_electro_shield ? m_electro_height_scale : wanted_node_scale;
+        float lw_scale = is_electro_shield ? m_electro_lw_scale : wanted_node_scale;
         float scale_ratio = stk_config->ticks2Time(m_scaling_end_ticks -
             World::getWorld()->getTicksSinceStart()) / SCALE_UP_TIME;
         if (scale_ratio > 0.0f)
@@ -637,7 +647,7 @@ void Attachment::updateGraphics(float dt)
         else
         {
             scene::ISceneNode* node = (m_has_library_node) ? m_library_node : m_node;
-            node->setScale(core::vector3df(wanted_node_scale, wanted_node_scale, wanted_node_scale));
+            node->setScale(core::vector3df(lw_scale, height_scale, lw_scale));
         }
         int slow_flashes = stk_config->time2Ticks(2.0f);
         if (is_gum_shield && m_ticks_left < slow_flashes)

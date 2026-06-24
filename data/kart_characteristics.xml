@@ -280,7 +280,7 @@
             duration: How long can the swatter be active.
             distance: How close a kart or an item must be before it can be hit.
                       This is the square of the real distance to accelerate the
-                      compution.
+                      computation.
             squash-duration: How long a kart will remain squashed.
             squash-slowdown: Percentage of max speed that a kart is
                 restricted to. -->

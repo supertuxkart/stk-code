@@ -552,16 +552,12 @@ void SoccerWorld::onCheckGoalTriggered(bool first_goal)
        else
             sd.m_time = getTime();
 
-// Shut up GCC complaining incorrectly about sd.m_country_code
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wmaybe-uninitialized"
         // First goal being true means that the ball entered the
         // blue goal, meaning that the red team scored.
         if (first_goal)
             m_red_scorers.push_back(sd);
         else
             m_blue_scorers.push_back(sd);
-#pragma GCC diagnostic pop
 
         if (NetworkConfig::get()->isNetworking() &&
             NetworkConfig::get()->isServer())
@@ -621,15 +617,11 @@ void SoccerWorld::handlePlayerGoalFromServer(const NetworkString& ns)
     ns.decodeString(&sd.m_country_code);
     sd.m_handicap_level = (HandicapLevel)ns.getUInt8();
 
-// Shut up GCC complaining incorrectly about sd.m_country_code
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wmaybe-uninitialized"
     if (first_goal)
         m_red_scorers.push_back(sd);
     else
         m_blue_scorers.push_back(sd);
-#pragma GCC diagnostic pop
-
+	
     if (ticks_now >= ticks_back_to_own_goal && !isStartPhase())
     {
         Log::warn("SoccerWorld", "Server ticks %d is too close to client ticks "
@@ -1096,14 +1088,11 @@ void SoccerWorld::restoreCompleteState(const BareNetworkString& b)
         b.decodeStringW(&sd.m_player);
         b.decodeString(&sd.m_country_code);
         sd.m_handicap_level = (HandicapLevel)b.getUInt8();
-// Shut up GCC complaining incorrectly about sd.m_country_code
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wmaybe-uninitialized"
+
         if (i < red_size)
             m_red_scorers.push_back(sd);
         else
             m_blue_scorers.push_back(sd);
-#pragma GCC diagnostic pop
     }
 
     m_reset_ball_ticks = b.getTime();

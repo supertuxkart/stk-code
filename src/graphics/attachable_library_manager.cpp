@@ -109,16 +109,8 @@ void AttachableLibraryManager::loadLibraryNode(const std::string& folder_name,
         const XMLNode *xml_node = libroot->getNode(i);
         const std::string name = xml_node->getName();
 
-        if (name == "object" || name == "library")
-        {
-            add(*xml_node, identifier);
-        }
-        else if (name == "particle-emitter" &&
-                 UserConfigParams::m_particles_effects > 1)
-        {
-            add(*xml_node, identifier);
-        }
-        else if (name == "light")
+        if (name == "object" || name == "library" ||
+            name == "light"  || name == "particle-emitter")
         {
             add(*xml_node, identifier);
         }

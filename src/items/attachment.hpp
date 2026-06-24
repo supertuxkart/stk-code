@@ -96,6 +96,9 @@ private:
     /** For zoom-in animation */
     int             m_scaling_end_ticks;
 
+    float           m_electro_height_scale;
+    float           m_electro_lw_scale;
+
     /** Scene node of the attachment, which will be attached to the kart's
      *  scene node. */
     scene::IAnimatedMeshSceneNode *m_node;

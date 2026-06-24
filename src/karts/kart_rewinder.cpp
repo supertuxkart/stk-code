@@ -220,6 +220,8 @@ BareNetworkString* KartRewinder::saveState(std::vector<std::string>* ru)
     uint8_t bool_for_each_data_3 = 0;
     if (getEffectiveSteer() != 0.0f)
         bool_for_each_data_3 |= 1;
+    if (m_vehicle->getLastOnGroundTicks() > 0)
+        bool_for_each_data_3 |= (1 << 1);
     buffer->addUInt8(bool_for_each_data_3);
 
     if (m_bubblegum_ticks > 0)
@@ -266,6 +268,9 @@ BareNetworkString* KartRewinder::saveState(std::vector<std::string>* ru)
             buffer->addUInt16(m_vehicle->getCentralImpulseTicks());
             buffer->add(m_vehicle->getAdditionalImpulse());
         }
+
+        if (m_vehicle->getLastOnGroundTicks() > 0)
+            buffer->addUInt16(m_vehicle->getLastOnGroundTicks());
     }
 
     // 4) Attachment, powerup, nitro
@@ -331,6 +336,7 @@ void KartRewinder::restoreState(BareNetworkString *buffer, int count)
 
     uint8_t bool_for_each_data_3 = buffer->getUInt8();
     bool read_effective_steer = (bool_for_each_data_3 & 1) == 1;
+    bool read_last_on_ground = ((bool_for_each_data_3 >> 1) & 1) == 1;
 
     if (read_bubblegum)
         m_bubblegum_ticks = buffer->getUInt16();
@@ -453,6 +459,11 @@ void KartRewinder::restoreState(BareNetworkString *buffer, int count)
         }
         else
             m_vehicle->setTimedCentralImpulse(0, Vec3(0.0f), true/*rewind*/);
+
+        if (read_last_on_ground)
+            m_vehicle->setLastOnGroundTicks(buffer->getUInt16());
+        else
+            m_vehicle->setLastOnGroundTicks(0);
 
         // For the raycast to determine the current material under the kart
         // the m_hardPointWS of the wheels is used. So after a rewind we

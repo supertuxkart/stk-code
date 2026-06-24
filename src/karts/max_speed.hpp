@@ -65,9 +65,6 @@ private:
     /** Additional engine force, summed from all SpeedIncrease engine forces. */
     float m_add_engine_force;
 
-    /** If >0 then the minimum speed a kart should have (used for zippers). */
-    float m_min_speed;
-
     /** Used for display of skid particles after triggering a skid bonus.
     *  0 is no bonus, 1 is first-stage bonus, etc. */
     uint8_t m_last_triggered_skid_level;
@@ -214,14 +211,10 @@ public:
     void  saveState(BareNetworkString *buffer) const;
     void  rewindTo(BareNetworkString *buffer);
     // ------------------------------------------------------------------------
-    /** Sets the minimum speed a kart should have. This is used to guarantee
-     *  that e.g. zippers on ramps will always fast enough for the karts to
-     *  reach the other end. If set to a negative number, it will have
-     *  no effect. */
-    void setMinSpeed(float s) { m_min_speed = s; }
-    // ------------------------------------------------------------------------
     /** Returns the current maximum speed for this kart. */
     float getCurrentMaxSpeed() const { return m_current_max_speed; }
+    // ------------------------------------------------------------------------
+    float computeReverseMaxSpeed() const;
     // --------------------------------------------------------------------
     unsigned int getLatestSkidLevel() const { return m_last_triggered_skid_level; }
     // ------------------------------------------------------------------------

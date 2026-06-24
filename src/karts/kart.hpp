@@ -465,7 +465,7 @@ public:
     // ------------------------------------------------------------------------
     /** Returns a unique identifier for this kart (name of the directory the
      *  kart was loaded from). */
-    virtual const std::string& getIdent() const;
+    virtual const std::string& getIdent() const OVERRIDE;
     // ------------------------------------------------------------------------
     virtual void   updateGraphics(float dt) OVERRIDE;
     virtual void   createPhysics    ();
@@ -514,7 +514,7 @@ public:
     /** Returns the pitch of the terrain depending on the heading. */
     virtual float getTerrainPitch(float heading) const;
 
-    virtual void   reset            ();
+    virtual void   reset            () OVERRIDE;
     virtual void   partialReset     (bool affect_squash = true);
     // ------------------------------------------------------------------------
     /** Sets zipper time, and apply one time additional speed boost. It can be

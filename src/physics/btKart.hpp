@@ -107,6 +107,9 @@ private:
     /** Duration over which the additional rotation is applied. */
     uint16_t            m_ticks_additional_rotation;
 
+    /** Duration since the kart was last touching the ground (max 10000 ticks) */
+    uint16_t            m_ticks_last_on_ground; 
+
     /** The rigid body that is the chassis of the kart. */
     btRigidBody        *m_chassisBody;
 
@@ -148,7 +151,7 @@ private:
                                      btTransform chassis_trans,
                                      bool interpolatedTransform=true,
                                      float fraction = 1.0f);
-    void     pushVehicleUpright();
+    void     pushVehicleUpright(btScalar step);
     float    uprightRayCast(const btVector3& raycastStart);
 
 public:
@@ -208,7 +211,10 @@ public:
         updateVehicle(step);
     }   // updateAction
     // ------------------------------------------------------------------------
-    /** Returns the number of wheels of this vehicle. */
+    /** Returns the number of wheels of this vehicle.
+     *  Note that while a lot of SuperTuxKart's code can handle various
+     *  number of wheels, some functionalities will not work as expected
+     *  with numbers different than 4 wheels. */
     inline int getNumWheels() const { return int(m_wheelInfo.size());}
     // ------------------------------------------------------------------------
     /** Returns the chassis (rigid) body. */
@@ -262,6 +268,11 @@ public:
     /** Returns the time an additional impulse is activated. */
     uint16_t getCentralImpulseTicks() const { return m_ticks_additional_impulse; }
     // ------------------------------------------------------------------------
+    /** Returns the time since the kart last touched the ground with all wheels */
+    uint16_t getLastOnGroundTicks() const { return m_ticks_last_on_ground; }
+    // ------------------------------------------------------------------------
+    void setLastOnGroundTicks(uint16_t ticks) { m_ticks_last_on_ground = ticks; }
+    // ------------------------------------------------------------------------
     bool isImpulseLocked() const { return m_ticks_lock_impulse > 0; }
     // ------------------------------------------------------------------------
     /** Returns the collision (visual) lean. */
@@ -309,8 +320,9 @@ public:
     virtual void resetMinSpeed() { m_min_speed = 0.0f; }
     // ------------------------------------------------------------------------
     /** Sets the minimum speed for this kart, only if the new value is higher.
-     * FIXME The name of this function doesn't match its real behavior, it's confusing
-     * Determine why it needs to work that way and make it cleaner */
+     * The min speed is reset every frame, we check that the new min speed is
+     * higher so that if multiple speed floors are applied, the order of
+     * operations doesn't matter. */
     void setMinSpeed(float s)
     {
         if(s > m_min_speed) m_min_speed = s;

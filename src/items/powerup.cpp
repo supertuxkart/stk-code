@@ -393,7 +393,7 @@ int Powerup::useBubblegum(bool mini)
     {
         Attachment::AttachmentType type;
 
-        float mini_factor = (mini) ? 0.5f : 1.0f;
+        float mini_factor = (mini) ? 0.625f : 1.0f;
 
         // If the kart has a normal gum shield, don't change the shield type 
         if (mini && (!m_kart->isGumShielded() || m_kart->isWeakShielded() ))
@@ -403,8 +403,8 @@ int Powerup::useBubblegum(bool mini)
 
         if(!m_kart->isGumShielded()) //if the previous shield had been used up.
         {
-                m_kart->getAttachment()->set(type,
-                    stk_config->time2Ticks(kp->getBubblegumShieldDuration() * mini_factor));
+            m_kart->getAttachment()->set(type,
+                stk_config->time2Ticks(kp->getBubblegumShieldDuration() * mini_factor));
         }
         // Using a bubble gum while still having a gum shield. In this case,
         // half of the remaining time of the active shield is added. The maximum

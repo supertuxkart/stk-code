@@ -120,6 +120,7 @@ void btKart::reset()
     m_ticks_lock_impulse         = 0;
     m_additional_rotation        = 0;
     m_ticks_additional_rotation  = 0;
+    m_ticks_last_on_ground       = 0;
     m_max_speed                  = -1.0f;
     m_min_speed                  = 0.0f;
     m_leaning_right              = true;
@@ -427,15 +428,25 @@ void btKart::updateVehicle( btScalar step )
 {
     updateAllWheelTransformsWS();
 
-    for(int i=0; i<m_wheelInfo.size(); i++)
-        m_wheelInfo[i].m_was_on_ground = m_wheelInfo[i].m_raycastInfo.m_isInContact;
+    if (m_ticks_last_on_ground < 10000)
+        m_ticks_last_on_ground++;
 
+    bool all_wheels_on_ground = true;
+    for(int i=0; i<m_wheelInfo.size(); i++)
+    {
+        m_wheelInfo[i].m_was_on_ground = m_wheelInfo[i].m_raycastInfo.m_isInContact;
+        if (!m_wheelInfo[i].m_was_on_ground)
+            all_wheels_on_ground = false;
+    }
+
+    if (all_wheels_on_ground)
+        m_ticks_last_on_ground = 0;
 
     // If the kart is flying, try to keep it parallel to the ground.
     // If the kart is only on one or two wheels, try to bring it back on all four
     // -------------------------------------------------------------
     if(m_num_wheels_on_ground <= 2)
-        pushVehicleUpright();
+        pushVehicleUpright(step);
 
     // Apply suspension forcen (i.e. upwards force)
     // --------------------------------------------
@@ -571,11 +582,12 @@ void btKart::updateVehicle( btScalar step )
 }   // updateVehicle
 
 // ----------------------------------------------------------------------------
-void btKart::pushVehicleUpright()
+void btKart::pushVehicleUpright(btScalar step)
 {
     btVector3 kart_up    = getChassisWorldTransform().getBasis().getColumn(1);
     btVector3 terrain_up = -m_chassisBody->getGravity();
     terrain_up = terrain_up.normalize();
+    bool needs_pitch_correction = false;
 
     // If there is at least a wheel on the ground, check if the parallel impulse
     // would bring the flying wheels closer to the ground or farther away,
@@ -664,6 +676,32 @@ void btKart::pushVehicleUpright()
         // or if it wouldn't change much, don't do anything.
         if (simulated_depth + 0.1f > current_depth)
             return;
+
+        // If the wheels not touching the ground are both in the front or in the back,
+        // a roll input won't fix the issue, we need a corrective pitch-force too.
+
+        bool front_wheels_off = false;
+        bool back_wheels_off = false;
+
+        // STK karts currently only have 4 wheels. If other wheel numbers are to be
+        // supported, special handling for them has to be added.
+        if (m_wheelInfo.size() == 4)
+        {
+            // With 4 wheels, the front wheels are wheels are 0 and 1, the back wheels are 2 and 3
+            if (!m_wheelInfo[0].m_was_on_ground && !m_wheelInfo[1].m_was_on_ground)
+                front_wheels_off = true;
+            else if (!m_wheelInfo[2].m_was_on_ground && !m_wheelInfo[3].m_was_on_ground)
+                back_wheels_off = true;
+        }
+
+        // We don't want to apply it when a kart is simply trying to jump off,
+        // so we only correct pitch if the back wheels are flying or
+        // if a minimum time has elapsed since all wheels last touched the ground
+        if (back_wheels_off ||
+            (front_wheels_off && (step * m_ticks_last_on_ground) >= 0.25f))
+        {
+            needs_pitch_correction = true;
+        }
     }
 
     // The length of axis depends on the angle - i.e. the further away
@@ -673,15 +711,17 @@ void btKart::pushVehicleUpright()
     // the kart is not much away from being upright.
     btVector3 axis = kart_up.cross(terrain_up);
 
-    // To avoid the kart going backwards/forwards (or rolling sideways),
-    // set the pitch/roll to 0 before applying the 'straightening' impulse.
-    // TODO: make this works if gravity is changed.
-    //FIXME : I think the comment above is wrong. From the kart's perspective,
-    //        the torque only applies roll, but no yaw and no pitch.
-    btVector3 av = m_chassisBody->getAngularVelocity();
-    av.setX(0);
-    av.setZ(0);
-    m_chassisBody->setAngularVelocity(av);
+    // XZ are relative to terrain, not to the kart's intrinsic yaw/pitch axes
+    // We set them to 0 to avoid the kart rotating in undesirable directions while flying,
+    // but we keep them active when the kart touches the ground and needs pitch correction.
+    if (!needs_pitch_correction)
+    {
+        btVector3 av = m_chassisBody->getAngularVelocity();
+        av.setX(0);
+        av.setZ(0);
+        m_chassisBody->setAngularVelocity(av);
+    }
+
     // Give a nicely balanced feeling for rebalancing the kart
     float smoothing = m_kart->getKartProperties()->getStabilitySmoothFlyingImpulse();
     m_chassisBody->applyTorqueImpulse(axis * smoothing);
@@ -1146,35 +1186,36 @@ float btKart::getAirFriction(float speed)
 /** Adjusts the velocity of this kart to be at least the specified minimum,
  *  and less than or equal to the maximum. If necessary the kart will
  *  instantaneously change its speed.
- *  \param min_speed Minimum speed, 0 means no effect.
+ *  \param min_speed Minimum speed the kart is allowed to have, 0 means no effect
  *  \param max_speed Maximum speed the kart is allowed to have.
  */
 void btKart::adjustSpeed(btScalar min_speed, btScalar max_speed)
 {
     const btVector3 &velocity = m_chassisBody->getLinearVelocity();
+    // Note that speed as considered here is directionless, i.e. the direction
+    // of movement doesn't matter and negative speeds are impossible.
     float speed = velocity.length();
 
-
-    if (speed < min_speed && min_speed > 0)
+    // Min speed takes precedence over max speed (this ensures that things
+    // work properly e.g. when a min speed is needed to jump over a gap)
+    if (speed < min_speed)
     {
-        if (speed > 0)
+        // The speedup is only for the direction of the normal.
+        const btVector3 &normal = m_kart->getNormal();
+        btVector3 upright_component = normal * normal.dot(velocity);
+        // Subtract the upright velocity component,
+        btVector3 v = velocity - upright_component;
+        if (!v.fuzzyZero())
         {
-            // The speedup is only for the direction of the normal.
-            const btVector3 &normal = m_kart->getNormal();
-            btVector3 upright_component = normal * normal.dot(velocity);
-            // Subtract the upright velocity component,
-            btVector3 v = velocity - upright_component;
-            if (!v.fuzzyZero())
-            {
-                const float velocity_ratio = min_speed / v.length();
-                // Scale the velocity in the plane, then add the upright component
-                // of the velocity back in.
-                m_chassisBody->setLinearVelocity( v*velocity_ratio
-                                                + upright_component );
-            }
+            const float velocity_ratio = min_speed / v.length();
+            // Scale the velocity in the plane, then add the upright component
+            // of the velocity back in.
+            m_chassisBody->setLinearVelocity( v*velocity_ratio
+                                            + upright_component );
         }
     }
-    else if (speed >0 && max_speed >= 0 && speed > max_speed)
+    // This is used to enforce max speed in both forward and reverse
+    else if (max_speed >= 0.0f && speed > max_speed)
     {
         const float velocity_ratio = max_speed / speed;
         m_chassisBody->setLinearVelocity(velocity * velocity_ratio);

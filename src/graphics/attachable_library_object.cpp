@@ -20,6 +20,7 @@
 #include "graphics/attachable_library_object.hpp"
 
 #include "animations/three_d_animation.hpp"
+#include "config/user_config.hpp"
 #include "graphics/central_settings.hpp"
 #include "graphics/irr_driver.hpp"
 #include "graphics/material.hpp"
@@ -127,6 +128,11 @@ void AttachableLibraryObject::init(const XMLNode &xml_node, scene::ISceneNode* p
     {
         m_type = "light";
         m_presentation = new TrackObjectPresentationLight(xml_node, parent);
+        // Ensure the template's lights are off
+        // TODO : Ensure the parent node being off properly turn lights off too
+        TrackObjectPresentationLight* light_presentation =
+            dynamic_cast<TrackObjectPresentationLight*>(m_presentation);
+        light_presentation->setEnable(false);
     }
     else
     {
@@ -253,7 +259,8 @@ AttachableLibraryObject* AttachableLibraryObject::clone(scene::ISceneNode* paren
         distance = light_presentation->getDistance();
         energy = light_presentation->getEnergy();
     }
-    else if (m_type == "particle-emitter")
+    else if (m_type == "particle-emitter" &&
+            (UserConfigParams::m_particles_effects > 1))
     {
         TrackObjectPresentationParticles* particle_presentation =
             dynamic_cast<TrackObjectPresentationParticles*>(m_presentation);

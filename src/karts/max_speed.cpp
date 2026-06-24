@@ -67,7 +67,6 @@ MaxSpeed::MaxSpeed(Kart *kart)
 void MaxSpeed::reset(bool leave_squash)
 {
     m_current_max_speed = m_kart->getKartProperties()->getEngineMaxSpeed();
-    m_min_speed         = -1.0f;
     m_last_triggered_skid_level = 0;
 
     for(unsigned int i=MS_DECREASE_MIN; i<MS_DECREASE_MAX; i++)
@@ -181,18 +180,11 @@ void MaxSpeed::instantSpeedIncrease(unsigned int category,
 {
     increaseMaxSpeed(category, add_max_speed, engine_force, duration,
                      fade_out_time);
-    // This will result in all max speed settings updated, but no
-    // changes to any slow downs since dt=0
+    // This will result in all max speed settings updated, but no changes
+    // to any slow downs since dt=0, allowing a correct use of getCurrentMaxSpeed
     update(0);
-    float speed = std::min(m_kart->getSpeed() + speed_boost,
-                           getCurrentMaxSpeed() );
-
-    // If there is a min_speed defined, make sure that the kart is still
-    // fast enough (otherwise e.g. on easy difficulty even with zipper
-    // the speed might be too low for certain jumps).
-    if(speed < m_min_speed) speed = m_min_speed;
-
-    m_kart->getVehicle()->setMinSpeed(speed);
+    float new_speed = std::min(m_kart->getSpeed() + speed_boost, getCurrentMaxSpeed());
+    m_kart->getVehicle()->setMinSpeed(new_speed);
 }   // instantSpeedIncrease
 
 // ----------------------------------------------------------------------------
@@ -490,17 +482,6 @@ void MaxSpeed::update(int ticks)
 
     // Then cap the current speed of the kart
     // --------------------------------------
-    if(m_min_speed > 0 && m_kart->getSpeed() < m_min_speed)
-    {
-        m_kart->getVehicle()->setMinSpeed(m_min_speed);
-    }
-    // FIXME: setMinSpeed only updates the value if the new value is greater,
-    // so the following code doesn't really do anything?
-    // There is probably a reason for the behavior of setMinSpeed, but the code
-    // should be redesigned to make it less confusing...
-    else
-        m_kart->getVehicle()->setMinSpeed(0);   // no additional acceleration
-
     if (m_kart->isOnGround())
         m_kart->getVehicle()->setMaxSpeed(m_current_max_speed);
     else
@@ -591,3 +572,31 @@ void MaxSpeed::rewindTo(BareNetworkString *buffer)
     update(0);
 }   // rewindoTo
 
+// ----------------------------------------------------------------------------
+/** Compute the kart's maximum speed in reverse gear. The result is positive
+ */
+float MaxSpeed::computeReverseMaxSpeed() const
+{
+    float engine_max_speed = m_kart->getKartProperties()->getEngineMaxSpeed();
+    float reverse_speed_ratio = m_kart->getKartProperties()->getEngineMaxSpeedReverseRatio();
+
+    // To determine what is the allowable max speed in reverse,
+    // we do some additional math to avoid ultra-slow-reverse (see #5021).
+    // This dampens the effect of max-speed penalties.
+    float max_speed_ratio = m_current_max_speed / engine_max_speed;
+
+    if (max_speed_ratio < 1.0f && reverse_speed_ratio < 1.0f)
+    {
+        // We want to ensure that reverse speed at a given slowdown level cannot
+        // exceed the forward max speed (limit A) and that it cannot exceed reverse speed
+        // at lower slowdown levels (limit B).
+        // We use two formulas. One guarantees the respect of limit A, and of limit B
+        // for values >= 0.5f ; the other formula guarantees the respect of limit B, and
+        // of limit A for values <= 0.5f. Both formulas transition smoothly at 0.5f.
+        float soft_ratio = reverse_speed_ratio * max_speed_ratio + (1.0f - max_speed_ratio);
+        float hard_ratio = reverse_speed_ratio * (2.0f - max_speed_ratio);
+        reverse_speed_ratio = std::min(soft_ratio, hard_ratio);
+    }
+
+    return (m_current_max_speed * reverse_speed_ratio);
+}   // computeReverseMaxSpeed

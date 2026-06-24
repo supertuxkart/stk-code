@@ -65,7 +65,7 @@ private:
     AnimationPhase m_animation_phase;
 
     /** The kart the swatter is aiming at. */
-    Kart      *m_closest_kart;
+    Kart              *m_target_kart;
 
     SFXBase           *m_swat_sound;
 
@@ -87,6 +87,11 @@ private:
     int16_t            m_bomb_remaining;
 
     int16_t            m_swatter_animation_ticks;
+
+    /** These parameters are used to control the swatter's graphical rotation.
+     * The actual squashing success is independent from the visual rotation */
+    float              m_current_rotation_angle;
+    float              m_target_dist2;
 
     /** True if the swatter will be discarded now. */
     bool               m_discard_now;
@@ -117,7 +122,7 @@ private:
     void    chooseTarget();
 
     /** If there is a current target, point to it, otherwise adopt the default position */
-    void    pointToTarget();
+    void    pointToTarget(float dt);
 
     /** Squash karts or items that are around the end position (determined using a joint) of the swatter */
     void    squashThingsAround();

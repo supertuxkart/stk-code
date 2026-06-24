@@ -47,8 +47,7 @@
 #include <IAnimatedMeshSceneNode.h>
 
 #define SWAT_POS_OFFSET        core::vector3df(0.0, 0.2f, -0.4f)
-#define SWAT_ANGLE_MIN  45
-#define SWAT_ANGLE_MAX  135
+#define SWAT_ANGLE_PER_SECOND 150.0f
 #define SWAT_ANGLE_OFFSET (90.0f + 15.0f)
 #define SWATTER_ANIMATION_SPEED 100.0f
 
@@ -67,11 +66,13 @@ Swatter::Swatter(Kart *kart, int16_t bomb_ticks, int ticks,
 {
     m_animation_phase  = SWATTER_AIMING;
     m_discard_now      = false;
-    m_closest_kart     = NULL;
+    m_target_kart     = NULL;
     m_discard_ticks    = World::getWorld()->getTicksSinceStart() + ticks;
     m_bomb_remaining   = bomb_ticks;
     m_scene_node       = NULL;
     m_bomb_scene_node  = NULL;
+    m_current_rotation_angle = 0.0f;
+    m_target_dist2     = FLT_MAX;
     m_swatter_duration = stk_config->time2Ticks(
         kart->getKartProperties()->getSwatterDuration());
     if (m_bomb_remaining != -1)
@@ -183,7 +184,7 @@ void Swatter::updateGraphics(float dt)
             {
             case SWATTER_AIMING:
                 {
-                    pointToTarget();
+                    pointToTarget(dt);
                     m_played_swatter_animation = false;
                 }
                 break;
@@ -195,12 +196,11 @@ void Swatter::updateGraphics(float dt)
                         // Setup the animation
                         m_scene_node->setCurrentFrame(0.0f);
                         m_scene_node->setAnimationSpeed(SWATTER_ANIMATION_SPEED);
-                        Vec3 swatter_pos =
-                            m_kart->getTrans()(Vec3(SWAT_POS_OFFSET));
+                        Vec3 swatter_pos = m_kart->getTrans()(Vec3(SWAT_POS_OFFSET));
                         m_swat_sound->setPosition(swatter_pos);
                         m_swat_sound->play();
                     }
-                    pointToTarget();
+                    pointToTarget(dt);
                 }
                 break;
             case SWATTER_FROM_TARGET:
@@ -241,7 +241,7 @@ bool Swatter::updateAndTestFinished()
                     return false;
 
                 chooseTarget();
-                if (!m_closest_kart)
+                if (!m_target_kart)
                     break;
 
                 // Get the node corresponding to the joint at the center of the
@@ -255,7 +255,7 @@ bool Swatter::updateAndTestFinished()
                 //Vec3 swatter_pos = swatter_node->getAbsolutePosition();
                 Vec3 swatter_pos = m_kart->getTrans()(Vec3(SWAT_POS_OFFSET));
 
-                float dist2 = (m_closest_kart->getXYZ()-swatter_pos).length2();
+                float dist2 = (m_target_kart->getXYZ()-swatter_pos).length2();
                 float min_dist2
                      = m_kart->getKartProperties()->getSwatterDistance();
 
@@ -263,6 +263,8 @@ bool Swatter::updateAndTestFinished()
                 {
                     // Start squashing
                     m_animation_phase = SWATTER_TO_TARGET;
+                    // TODO - Tie it explicitly to animation speed
+                    // TODO - Make it less likely that the swatter squashes thin air
                     m_swatter_animation_ticks =
                         m_attachment->getTicksLeft() - stk_config->time2Ticks(0.166666672f);
                 }
@@ -279,11 +281,10 @@ bool Swatter::updateAndTestFinished()
                     squashThingsAround();
                     m_animation_phase = SWATTER_FROM_TARGET;
                     const int end_ticks = ticks_start + stk_config->time2Ticks(0.5f);
-                    if (RaceManager::get()->isBattleMode() ||
-                        RaceManager::get()->isSoccerMode())
+                    // In Battle mode, the swatter gives a point / takes a life / resets
+                    // another kart, so we remove it after one successful hit
+                    if (RaceManager::get()->isBattleMode())
                     {
-                        // Remove swatter from kart in arena gameplay
-                        // after one successful hit
                         m_discard_now = true;
                         m_discard_ticks = end_ticks;
                     }
@@ -313,12 +314,11 @@ void Swatter::chooseTarget()
     // TODO: for the moment, only handle karts...
     const World*  world         = World::getWorld();
     Kart* closest_kart  = NULL;
-    float         min_dist2     = FLT_MAX;
+    m_target_dist2 = FLT_MAX;
 
     for(unsigned int i=0; i<world->getNumKarts(); i++)
     {
         Kart *kart = world->getKart(i);
-        // TODO: isSwatterReady(), isSquashable()?
         if(kart->isEliminated() || kart==m_kart || kart->getKartAnimation())
             continue;
         // don't squash an already hurt kart
@@ -332,41 +332,97 @@ void Swatter::chooseTarget()
             continue;
 
         float dist2 = (kart->getXYZ()-m_kart->getXYZ()).length2();
-        if(dist2<min_dist2)
+        if(dist2 < m_target_dist2)
         {
-            min_dist2 = dist2;
+            m_target_dist2 = dist2;
             closest_kart = kart;
         }
     }
     // Not larger than 2^5 - 1 for kart id for optimizing state saving
     if (closest_kart && closest_kart->getWorldKartId() < 31)
-        m_closest_kart = closest_kart;
+        m_target_kart = closest_kart;
     else
-        m_closest_kart = NULL;
+        m_target_kart = NULL;
+
+    // If no kart is close enough, there is no target
+    if (m_target_dist2 > 2500.0f) // 50 * 50
+        m_target_kart = NULL;
 }
 
 // ----------------------------------------------------------------------------
 /** If there is a current target, point in its direction, otherwise adopt the
  *  default position. */
-void Swatter::pointToTarget()
+void Swatter::pointToTarget(float dt)
 {
 #ifndef SERVER_ONLY
-    if (m_kart->isGhostKart() || !m_scene_node)
+    if (m_kart->isGhostKart() || !m_scene_node || dt == 0.0f)
         return;
 
-    if (!m_closest_kart)
-    {
-        m_scene_node->setRotation(core::vector3df());
-    }
-    else
+    float target_angle = 0.0f;
+
+    if (m_target_kart != NULL)
     {
         Vec3 swatter_to_target =
-            m_kart->getTrans().inverse()(m_closest_kart->getXYZ());
+            m_kart->getTrans().inverse()(m_target_kart->getXYZ());
         float dy = -swatter_to_target.getZ();
         float dx = swatter_to_target.getX();
-        float angle = SWAT_ANGLE_OFFSET + atan2f(dy, dx) * 180 / M_PI;
-        m_scene_node->setRotation(core::vector3df(0.0, angle, 0.0));
+        target_angle = SWAT_ANGLE_OFFSET + atan2f(dy, dx) * 180 / M_PI;
+        // Move into the 0-360 range for easier handling
+        // Values that need more than one 360° correction shouldn't happen
+        if (target_angle < 0.0f)
+            target_angle += 360.0f;
+        if (target_angle > 360.0f)
+            target_angle -= 360.0f;
     }
+
+    float angle_diff = target_angle - m_current_rotation_angle;
+    // If we have an angle of over 180°, then it's shorter the other way around
+    // We have to take the difference with 360, but also flip the sign
+    if (angle_diff > 180.0f)
+        angle_diff = -360.0f + angle_diff;
+    else if (angle_diff < -180.0f)
+        angle_diff = 360.0f + angle_diff;
+
+    // We can only change the angle so much in the given dt
+    float max_angle_change = dt * SWAT_ANGLE_PER_SECOND;
+
+    // Since the squash being successful is independent of these graphics, we
+    // want to avoid the swatter not turning quickly enough when rapidly
+    // approaching a target.
+    if (m_target_kart != NULL)
+    {
+        float time_to_turn = std::fabsf(angle_diff) * (1 / SWAT_ANGLE_PER_SECOND);
+        if (time_to_turn > 0.004f)
+        {
+            // TODO: the time to cover the swatter distance is fixed so we should be able to avoid
+            //       running the computationally inefficient sqrtf calls
+            float distance_to_squash = sqrtf(m_target_dist2)
+                                       - sqrtf(m_kart->getKartProperties()->getSwatterDistance());
+            distance_to_squash = std::max(0.0f, distance_to_squash);
+            float time_to_reach_at_high_speed = std::max(0.004f, distance_to_squash * 0.02f);
+            if (time_to_reach_at_high_speed < time_to_turn)
+            {
+                float extra_change_factor = std::min(3.0f, time_to_turn / time_to_reach_at_high_speed);
+                max_angle_change *= extra_change_factor;
+            }
+        }
+    }
+
+    // If we are close enough, just snap to the target angle directly
+    if ((angle_diff > 0.0f && angle_diff < max_angle_change) ||
+        (angle_diff < 0.0f && angle_diff > -max_angle_change))
+        m_current_rotation_angle = target_angle;
+    // Otherwise move by the max amount possible
+    else if (angle_diff > 0.0f)
+        m_current_rotation_angle += max_angle_change;
+    else if (angle_diff < 0.0f)
+        m_current_rotation_angle -= max_angle_change;
+
+    // Keep the value in the 0-360 range
+    if (m_current_rotation_angle < 0.0f)
+        m_current_rotation_angle += 360.0f;
+
+    m_scene_node->setRotation(core::vector3df(0.0, m_current_rotation_angle, 0.0));
 #endif
 }   // pointToTarget
 
@@ -384,26 +440,26 @@ void Swatter::squashThingsAround()
     float slowdown =  kp->getSwatterSquashSlowdown();
     // The squash attempt may fail because of invulnerability, shield, etc.
     // Making a bomb explode counts as a success
-    bool success = m_closest_kart->setSquash(duration, slowdown);
+    bool success = m_target_kart->setSquash(duration, slowdown);
     const bool has_created_explosion_animation =
-        success && m_closest_kart->getKartAnimation() != NULL;
+        success && m_target_kart->getKartAnimation() != NULL;
 
     if (success)
     {
-        World::getWorld()->kartHit(m_closest_kart->getWorldKartId(),
+        World::getWorld()->kartHit(m_target_kart->getWorldKartId(),
             m_kart->getWorldKartId());
 
         CaptureTheFlag* ctf = dynamic_cast<CaptureTheFlag*>(World::getWorld());
         if (ctf)
         {
             int reset_ticks = (ctf->getTicksSinceStart() / 10) * 10 + 80;
-            ctf->resetKartForSwatterHit(m_closest_kart->getWorldKartId(),
+            ctf->resetKartForSwatterHit(m_target_kart->getWorldKartId(),
                 reset_ticks);
         }
         // Handle achievement if the swatter is used by the current player
         if (m_kart->getController()->canGetAchievements())
         {
-            PlayerManager::addKartHit(m_closest_kart->getWorldKartId());
+            PlayerManager::addKartHit(m_target_kart->getWorldKartId());
             PlayerManager::increaseAchievement(AchievementsStatus::SWATTER_HIT, 1);
             PlayerManager::increaseAchievement(AchievementsStatus::ALL_HITS, 1);
             if (RaceManager::get()->isLinearRaceMode())
@@ -446,9 +502,9 @@ void Swatter::restoreState(BareNetworkString* buffer)
         uint8_t combined = buffer->getUInt8();
         int kart_id = combined & 31;
         if (kart_id == 31)
-            m_closest_kart = NULL;
+            m_target_kart = NULL;
         else
-            m_closest_kart = World::getWorld()->getKart(kart_id);
+            m_target_kart = World::getWorld()->getKart(kart_id);
         m_animation_phase = AnimationPhase((combined >> 5) & 3);
         m_discard_now = (combined >> 7) == 1;
         m_discard_ticks = buffer->getUInt32();
@@ -465,7 +521,7 @@ void Swatter::saveState(BareNetworkString* buffer) const
     if (m_bomb_remaining == -1)
     {
         uint8_t combined =
-            m_closest_kart ? (uint8_t)m_closest_kart->getWorldKartId() : 31;
+            m_target_kart ? (uint8_t)m_target_kart->getWorldKartId() : 31;
         combined |= m_animation_phase << 5;
         combined |= (m_discard_now ? (1 << 7) : 0);
         buffer->addUInt8(combined).addUInt32(m_discard_ticks)
