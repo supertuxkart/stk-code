@@ -175,8 +175,8 @@ void RaceGUIMultitouch::init()
     }
     else if (rm)
     {
+		createWatchingGUI();
         m_is_watching_replay = true;
-        createRaceGUI();
     }
     else
     {
@@ -244,45 +244,66 @@ void RaceGUIMultitouch::createRaceGUI()
     }
 
     m_height = (unsigned int)(2 * col_size + margin / 2);
-    if (!m_is_watching_replay)
+    
+    if (UserConfigParams::m_multitouch_controls == MULTITOUCH_CONTROLS_ACCELEROMETER ||
+        UserConfigParams::m_multitouch_controls == MULTITOUCH_CONTROLS_GYROSCOPE)
     {
-        if (UserConfigParams::m_multitouch_controls == MULTITOUCH_CONTROLS_ACCELEROMETER ||
-            UserConfigParams::m_multitouch_controls == MULTITOUCH_CONTROLS_GYROSCOPE)
-        {
-            m_device->addButton(BUTTON_UP_DOWN,
-                        int(steering_accel_x), int(steering_accel_y),
-                        int(btn2_size / 2), int(btn2_size));
-        }
-        else
-        {
-            m_device->addButton(BUTTON_STEERING,
-                                int(steering_wheel_x), int(steering_wheel_y),
-                                int(btn2_size), int(btn2_size));
-        }
-
-        m_device->addButton(BUTTON_ESCAPE,
-                            int(margin_top), int(margin_small),
-                            int(btn_small_size), int(btn_small_size));
-        m_device->addButton(BUTTON_RESCUE,
-                            int(margin_top + col_small_size), int(margin_small),
-                            int(btn_small_size), int(btn_small_size));
-        m_device->addButton(BUTTON_NITRO,
-                            int(second_column_x), int(h - 2 * col_size),
-                            int(btn_size), int(btn_size));
-        m_device->addButton(BUTTON_SKIDDING,
-                            int(second_column_x), int(h - 1 * col_size),
-                            int(btn_size), int(btn_size));
-        m_device->addButton(BUTTON_FIRE,
-                            int(first_column_x),  int(h - 2 * col_size),
-                            int(btn_size), int(btn_size));
-        m_device->addButton(BUTTON_LOOK_BACKWARDS,
-                            int(first_column_x), int(h - 1 * col_size),
-                            int(btn_size), int(btn_size));
-        m_device->addButton(BUTTON_ESCAPE,
-                            int(margin_top), int(margin_small),
-                            int(btn_small_size), int(btn_small_size));
+        m_device->addButton(BUTTON_UP_DOWN,
+                    int(steering_accel_x), int(steering_accel_y),
+                    int(btn2_size / 2), int(btn2_size));
     }
+    else
+    {
+        m_device->addButton(BUTTON_STEERING,
+                            int(steering_wheel_x), int(steering_wheel_y),
+                            int(btn2_size), int(btn2_size));
+    }
+
+    m_device->addButton(BUTTON_ESCAPE,
+                        int(margin_top), int(margin_small),
+                        int(btn_small_size), int(btn_small_size));
+    m_device->addButton(BUTTON_RESCUE,
+                        int(margin_top + col_small_size), int(margin_small),
+                        int(btn_small_size), int(btn_small_size));
+    m_device->addButton(BUTTON_NITRO,
+                        int(second_column_x), int(h - 2 * col_size),
+                        int(btn_size), int(btn_size));
+    m_device->addButton(BUTTON_SKIDDING,
+                        int(second_column_x), int(h - 1 * col_size),
+                        int(btn_size), int(btn_size));
+    m_device->addButton(BUTTON_FIRE,
+                        int(first_column_x),  int(h - 2 * col_size),
+                        int(btn_size), int(btn_size));
+    m_device->addButton(BUTTON_LOOK_BACKWARDS,
+                        int(first_column_x), int(h - 1 * col_size),
+                        int(btn_size), int(btn_size));
 } // createRaceGUI
+
+//-----------------------------------------------------------------------------
+/** Determines the look of multitouch watching GUI interface (for replay watching)
+ */
+void RaceGUIMultitouch::createWatchingGUI()
+{
+    if (m_device == NULL)
+        return;
+        
+    const float scale = UserConfigParams::m_multitouch_scale;
+
+    const int h = irr_driver->getActualScreenSize().Height;
+    const float btn_size = 0.125f * h * scale;
+    const float margin = 0.075f * h * scale;
+    const float margin_top = 0.3f * h;
+
+    const float small_ratio = 0.75f;
+    const float btn_small_size = small_ratio * btn_size;
+    const float margin_small = small_ratio * margin;
+    
+    m_height = (unsigned int)(btn_size + 2 * margin);
+    
+    m_device->addButton(BUTTON_ESCAPE,
+                        int(margin_top), int(margin_small),
+                        int(btn_small_size), int(btn_small_size));
+} // createWatchingGUI
 
 //-----------------------------------------------------------------------------
 /** Determines the look of spectator GUI interface
@@ -369,7 +390,8 @@ void RaceGUIMultitouch::onCustomButtonPress(unsigned int button_id,
  */
 void RaceGUIMultitouch::draw(const AbstractKart* kart,
                              const core::recti &viewport,
-                             const core::vector2df &scaling)
+                             const core::vector2df &scaling,
+                             float dt)
 {
 #ifndef SERVER_ONLY
     if (m_device == NULL)
@@ -563,6 +585,10 @@ void RaceGUIMultitouch::draw(const AbstractKart* kart,
                 font->setScale(1.0f);
                 font->setBlackBorder(false);
             }
+			if (m_is_watching_replay)
+			{
+				m_race_gui->drawSpeedEnergyRank(kart, viewport, scaling, dt);
+			}
         }
     }
 #endif
