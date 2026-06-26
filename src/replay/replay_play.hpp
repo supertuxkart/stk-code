@@ -50,7 +50,8 @@ public:
         SO_LAPS,
         SO_TIME,
         SO_USER,
-        SO_VERSION
+        SO_VERSION,
+        SO_KART_TYPE
     };
 
     class ReplayData
@@ -101,6 +102,10 @@ public:
                     break;
                 case SO_VERSION:
                     return m_stk_version < r.m_stk_version;
+                    break;
+                case SO_KART_TYPE:
+                    // There should be at least one kart in each replay
+                    return m_kart_list[0] < r.m_kart_list[0];
                     break;
             }   // switch
             return true;

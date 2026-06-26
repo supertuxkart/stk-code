@@ -549,7 +549,7 @@ void GhostReplaySelection::onColumnClicked(int column_id, bool sort_desc, bool s
     else if (column_id == 4)
         ReplayPlay::setSortOrder(ReplayPlay::SO_TIME);
     else if (column_id == 5)
-        return; // no sorting by kart icon (yet ?)
+        ReplayPlay::setSortOrder(ReplayPlay::SO_KART_TYPE);
     else if (column_id == 6)
         ReplayPlay::setSortOrder(ReplayPlay::SO_USER);
     else if (column_id == 7)
