@@ -48,6 +48,8 @@ private:
     video::ITexture* m_steering_wheel_tex;
     video::ITexture* m_steering_wheel_tex_mask_up;
     video::ITexture* m_steering_wheel_tex_mask_down;
+    video::ITexture* m_move_right_tex;
+    video::ITexture* m_move_left_tex;
     video::ITexture* m_accelerator_tex;
     video::ITexture* m_accelerator_handle_tex;
     video::ITexture* m_pause_tex;

@@ -150,6 +150,11 @@ GUIEngine::EventPropagation InitAndroidDialog::processEvent(
             UserConfigParams::m_multitouch_controls = MULTITOUCH_CONTROLS_GYROSCOPE;
             UserConfigParams::m_multitouch_auto_acceleration = false;
         }
+        else if (selected == "buttons")
+        {
+            UserConfigParams::m_multitouch_controls = MULTITOUCH_CONTROLS_BUTTONS;
+            UserConfigParams::m_multitouch_auto_acceleration = false;
+        }
         
         user_config->saveConfig();
         
@@ -176,6 +181,12 @@ void InitAndroidDialog::updateValues()
     else if (UserConfigParams::m_multitouch_controls == MULTITOUCH_CONTROLS_GYROSCOPE)
     {
         int id = control_type->findItemNamed("gyroscope");
+        control_type->setSelection(id, PLAYER_ID_GAME_MASTER);
+        getWidget<CheckBoxWidget>("auto_acceleration")->setActive(false);
+    }
+    else if (UserConfigParams::m_multitouch_controls == MULTITOUCH_CONTROLS_BUTTONS)
+    {
+        int id = control_type->findItemNamed("buttons");
         control_type->setSelection(id, PLAYER_ID_GAME_MASTER);
         getWidget<CheckBoxWidget>("auto_acceleration")->setActive(false);
     }

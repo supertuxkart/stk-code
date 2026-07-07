@@ -29,3 +29,11 @@ Files:
 Copyright: Copyright 2019 Benau
 License: CC-BY-SA 4.0
 Comment: License clarified/assigned in Jul 2021 via IRC.  accelerator_icon.png was committed in 2020, but is just a copy of accelerator.png with a square aspect ratio.
+
+Files:
+ move_left.png
+ move_right.png
+ buttons_control_icon.png
+Copyright: Copyright 2026 Gustavo B.
+License: CC BY-SA 4.0
+Comment: New icons made for Left/Right buttons control for SuperTuxKart UI on Android.

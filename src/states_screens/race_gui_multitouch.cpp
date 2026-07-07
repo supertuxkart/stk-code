@@ -50,6 +50,8 @@ RaceGUIMultitouch::RaceGUIMultitouch(RaceGUIBase* race_gui)
     m_steering_wheel_tex = NULL;
     m_steering_wheel_tex_mask_up = NULL;
     m_steering_wheel_tex_mask_down = NULL;
+    m_move_right_tex = NULL;
+    m_move_left_tex = NULL;
     m_accelerator_tex = NULL;
     m_accelerator_handle_tex = NULL;
     m_pause_tex = NULL;
@@ -139,6 +141,10 @@ void RaceGUIMultitouch::init()
                                                   "android/steering_wheel.png");
     m_accelerator_tex = irr_driver->getTexture(FileManager::GUI_ICON,
                                                "android/accelerator.png");
+    m_move_right_tex = irr_driver->getTexture(FileManager::GUI_ICON,
+                                              "android/move_right.png");
+    m_move_left_tex = irr_driver->getTexture(FileManager::GUI_ICON,
+                                             "android/move_left.png");
     m_accelerator_handle_tex = irr_driver->getTexture(FileManager::GUI_ICON,
                                                "android/accelerator_handle.png");
     m_pause_tex = irr_driver->getTexture(FileManager::GUI_ICON, "android/pause.png");
@@ -227,12 +233,20 @@ void RaceGUIMultitouch::createRaceGUI()
     steering_accel_x += left_padding;
     float steering_accel_y = h - steering_accel_margin - btn2_size;
 
+    const float ctrl_buttons_size = 0.15f * h * scale;
+    float left_button_x  = margin + 1 * col_size + left_padding;
+    float right_button_x = margin + 2 * col_size + left_padding;
+    float ctrl_buttons_y = h - 1.25f * col_size;
+
+
     if (UserConfigParams::m_multitouch_inverted)
     {
-        first_column_x = margin + 1 * col_size + left_padding;
-        second_column_x = margin + left_padding;
+        first_column_x   = margin + 1 * col_size + left_padding;
+        second_column_x  = margin + left_padding;
         steering_wheel_x = w - btn2_size - steering_wheel_margin;
         steering_accel_x = w - btn2_size / 2 - steering_accel_margin;
+        left_button_x    = w - 2 * col_size - (btn2_size / 2) - left_padding;
+        right_button_x   = w - 1 * col_size - (btn2_size / 2) - left_padding;
     }
 
     m_height = (unsigned int)(2 * col_size + margin / 2);
@@ -243,6 +257,18 @@ void RaceGUIMultitouch::createRaceGUI()
         m_device->addButton(BUTTON_UP_DOWN,
                     int(steering_accel_x), int(steering_accel_y),
                     int(btn2_size / 2), int(btn2_size));
+    }
+    else if (UserConfigParams::m_multitouch_controls == MULTITOUCH_CONTROLS_BUTTONS)
+    {
+        m_device->addButton(BUTTON_UP_DOWN,
+                            int(steering_accel_x), int(steering_accel_y),
+                            int(btn2_size / 2), int(btn2_size));
+        m_device->addButton(BUTTON_LEFT,
+                            int(left_button_x), int(ctrl_buttons_y),
+                            int(ctrl_buttons_size), int(ctrl_buttons_size));
+        m_device->addButton(BUTTON_RIGHT,
+                            int(right_button_x), int(ctrl_buttons_y),
+                            int(ctrl_buttons_size), int(ctrl_buttons_size));
     }
     else
     {
@@ -437,6 +463,28 @@ void RaceGUIMultitouch::draw(const AbstractKart* kart,
                 draw2DImage(m_accelerator_handle_tex, handle_pos, handle_coords, NULL, NULL, true);
             }
         }
+
+        if (button->type == MultitouchButtonType::BUTTON_RIGHT)
+        {
+            video::ITexture* btn_bg = m_bg_button_tex;
+            core::rect<s32> coords_bg(pos_zero, btn_bg->getSize());
+            draw2DImage(btn_bg, btn_pos_bg, coords_bg, NULL, NULL, true);
+
+            video::ITexture* btn_texture = m_move_right_tex;
+            core::rect<s32> coords(pos_zero, btn_texture->getSize());
+            draw2DImage(btn_texture, btn_pos, coords, NULL, NULL, true);
+        }
+        else if (button->type == MultitouchButtonType::BUTTON_LEFT)
+        {
+            video::ITexture* btn_bg = m_bg_button_tex;
+            core::rect<s32> coords_bg(pos_zero, btn_bg->getSize());
+            draw2DImage(btn_bg, btn_pos_bg, coords_bg, NULL, NULL, true);
+
+            video::ITexture* btn_texture = m_move_left_tex;
+            core::rect<s32> coords(pos_zero, btn_texture->getSize());
+            draw2DImage(btn_texture, btn_pos, coords, NULL, NULL, true);
+        }
+
         else
         {
             bool can_be_pressed = true;

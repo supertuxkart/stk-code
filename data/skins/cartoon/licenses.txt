@@ -28,3 +28,11 @@ Files: *
 Copyright: Copyright 2018-2020 LCP and QwertyChouskie
 License: CC-BY-SA 4.0
 Comment: Original style, most icons, and some elements by LCP, skin finished by QwertyChouskie
+
+Files:
+ data/gui/android/move_left.png
+ data/gui/android/move_right.png
+ data/gui/android/buttons_control_icon.png
+Copyright: Copyright 2026 Gustavo B.
+License: CC BY-SA 4.0
+Comment: New icons made for Left/Right buttons control for SuperTuxKart UI on Android.
