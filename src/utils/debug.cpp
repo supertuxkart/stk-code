@@ -738,12 +738,14 @@ bool handleContextMenuAction(s32 cmd_id)
         world->escapePressed();
         break;
     case DEBUG_GUI_CAM_TOP:
+        if (!world) return false;
         CameraDebug::setDebugType(CameraDebug::CM_DEBUG_TOP_OF_KART);
         Camera::changeCamera(0, Camera::CM_TYPE_DEBUG);
         Camera::getActiveCamera()->setKart(World::getWorld()->getKart(kart_num));
         irr_driver->getDevice()->getCursorControl()->setVisible(true);
         break;
     case DEBUG_GUI_CAM_WHEEL:
+        if (!world) return false;
         if (!(World::getWorld()->getKart(kart_num)->isGhostKart()))
         {
             CameraDebug::setDebugType(CameraDebug::CM_DEBUG_GROUND);
@@ -753,18 +755,21 @@ bool handleContextMenuAction(s32 cmd_id)
         }
         break;
     case DEBUG_GUI_CAM_BEHIND_KART:
+        if (!world) return false;
         CameraDebug::setDebugType(CameraDebug::CM_DEBUG_BEHIND_KART);
         Camera::changeCamera(0, Camera::CM_TYPE_DEBUG);
         Camera::getActiveCamera()->setKart(World::getWorld()->getKart(kart_num));
         irr_driver->getDevice()->getCursorControl()->setVisible(true);
         break;
     case DEBUG_GUI_CAM_SIDE_OF_KART:
+        if (!world) return false;
         CameraDebug::setDebugType(CameraDebug::CM_DEBUG_SIDE_OF_KART);
         Camera::changeCamera(0, Camera::CM_TYPE_DEBUG);
         Camera::getActiveCamera()->setKart(World::getWorld()->getKart(kart_num));
         irr_driver->getDevice()->getCursorControl()->setVisible(true);
         break;
     case DEBUG_GUI_CAM_INV_SIDE_OF_KART:
+        if (!world) return false;
         CameraDebug::setDebugType(CameraDebug::CM_DEBUG_INV_SIDE_OF_KART);
         Camera::changeCamera(0, Camera::CM_TYPE_DEBUG);
         Camera::getActiveCamera()->setKart(World::getWorld()->getKart(kart_num));
@@ -778,6 +783,7 @@ bool handleContextMenuAction(s32 cmd_id)
         break;
     case DEBUG_GUI_CAM_FREE:
     {
+        if (!world) return false;
         Camera *camera = Camera::getActiveCamera();
         Camera::changeCamera(camera->getIndex(), Camera::CM_TYPE_FPS);
         irr_driver->getDevice()->getCursorControl()->setVisible(false);
@@ -792,6 +798,7 @@ bool handleContextMenuAction(s32 cmd_id)
     }
     case DEBUG_GUI_CAM_NORMAL:
     {
+        if (!world) return false;
         Camera *camera = Camera::getActiveCamera();
         Camera::changeCamera(camera->getIndex(), Camera::CM_TYPE_NORMAL);
         Camera::getActiveCamera()->setKart(World::getWorld()->getKart(kart_num));
@@ -818,6 +825,7 @@ bool handleContextMenuAction(s32 cmd_id)
     }
     case DEBUG_VIEW_KART_PREVIOUS:
     {
+        if (!world) return false;
         if (kart_num == 0)
         {
             kart_num += World::getWorld()->getNumKarts() - 1;
@@ -862,6 +870,7 @@ bool handleContextMenuAction(s32 cmd_id)
         break;
     case DEBUG_VIEW_KART_NEXT:
     {
+        if (!world) return false;
         if (kart_num == World::getWorld()->getNumKarts() - 1)
         {
             kart_num = 0;
