@@ -1706,7 +1706,7 @@ void handleStaticAction(int key, int value, bool control_pressed, bool shift_pre
             if (cam)
             {
                 core::vector3df vel(cam->getLinearVelocity());
-                vel.Z = value ? cam->getMaximumVelocity() : 0;
+                vel.Z = value ? cam->getMaximumVelocity() * (shift_pressed ? 3.0f : 1.0f) : 0;
                 cam->setLinearVelocity(vel);
             }
             break;
@@ -1716,7 +1716,7 @@ void handleStaticAction(int key, int value, bool control_pressed, bool shift_pre
             if (cam)
             {
                 core::vector3df vel(cam->getLinearVelocity());
-                vel.Z = value ? -cam->getMaximumVelocity() : 0;
+                vel.Z = value ? -cam->getMaximumVelocity() * (shift_pressed ? 3.0f : 1.0f) : 0;
                 cam->setLinearVelocity(vel);
             }
             break;
@@ -1726,7 +1726,7 @@ void handleStaticAction(int key, int value, bool control_pressed, bool shift_pre
             if (cam)
             {
                 core::vector3df vel(cam->getLinearVelocity());
-                vel.X = value ? -cam->getMaximumVelocity() : 0;
+                vel.X = value ? -cam->getMaximumVelocity() * (shift_pressed ? 3.0f : 1.0f) : 0;
                 cam->setLinearVelocity(vel);
             }
             break;
@@ -1736,7 +1736,7 @@ void handleStaticAction(int key, int value, bool control_pressed, bool shift_pre
             if (cam)
             {
                 core::vector3df vel(cam->getLinearVelocity());
-                vel.X = value ? cam->getMaximumVelocity() : 0;
+                vel.X = value ? cam->getMaximumVelocity() * (shift_pressed ? 3.0f : 1.0f) : 0;
                 cam->setLinearVelocity(vel);
             }
             break;
@@ -1746,7 +1746,7 @@ void handleStaticAction(int key, int value, bool control_pressed, bool shift_pre
             if (cam)
             {
                 core::vector3df vel(cam->getLinearVelocity());
-                vel.Y = value ? cam->getMaximumVelocity() : 0;
+                vel.Y = value ? cam->getMaximumVelocity() * (shift_pressed ? 3.0f : 1.0f) : 0;
                 cam->setLinearVelocity(vel);
             }
             break;
@@ -1756,7 +1756,7 @@ void handleStaticAction(int key, int value, bool control_pressed, bool shift_pre
             if (cam)
             {
                 core::vector3df vel(cam->getLinearVelocity());
-                vel.Y = value ? -cam->getMaximumVelocity() : 0;
+                vel.Y = value ? -cam->getMaximumVelocity() * (shift_pressed ? 3.0f : 1.0f) : 0;
                 cam->setLinearVelocity(vel);
             }
             break;
