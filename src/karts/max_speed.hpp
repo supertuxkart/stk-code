@@ -44,12 +44,14 @@ public:
            MS_INCREASE_MAX};
 
     /** The categories to use for decreasing the speed of a kart:
-     *  Decrease due to terrain, different AI levels and end controller. */
+     *  Decrease due to terrain, different AI levels, end controller,
+     *  and zippers inverted into brakes while items are switched. */
     enum {MS_DECREASE_MIN,
           MS_DECREASE_TERRAIN = MS_DECREASE_MIN,
           MS_DECREASE_AI,
           MS_DECREASE_BUBBLE,
           MS_DECREASE_SQUASH,
+          MS_DECREASE_ZIPPER,
           MS_DECREASE_MAX};
 
 private:

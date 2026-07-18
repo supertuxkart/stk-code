@@ -51,6 +51,7 @@
 #include "graphics/sp/sp_mesh_node.hpp"
 #include "graphics/sp/sp_shader_manager.hpp"
 #include "graphics/sp/sp_texture_manager.hpp"
+#include <ge_render_info.hpp>
 #include "io/file_manager.hpp"
 #include "io/xml_node.hpp"
 #include "items/item.hpp"
@@ -1329,9 +1330,15 @@ bool Track::loadMainTrack(const XMLNode &root)
         tangent_mesh = mesh;
         tangent_mesh->grab();
     }
+    // Render info used to invert zipper materials' color while items are
+    // switched (see updateGraphics()); harmless no-op for tracks whose
+    // zipper textures aren't marked colorizable.
+    m_zipper_render_info = std::make_shared<GE::GERenderInfo>();
+
     // The merged mesh is grabbed by the octtree, so we don't need
     // to keep a reference to it.
-    scene_node = irr_driver->addMesh(tangent_mesh, "track_main");
+    scene_node = irr_driver->addMesh(tangent_mesh, "track_main", NULL,
+                                     m_zipper_render_info);
     // We should drop the merged mesh (since it's now referred to in the
     // scene node), but then we need to grab it since it's in the
     // m_all_cached_meshes.
@@ -1720,6 +1727,15 @@ void Track::updateGraphics(float dt)
         m_animated_textures[i]->update(dt);
     }
     m_item_manager->updateGraphics(dt);
+
+    if (m_zipper_render_info)
+    {
+        // Rotate zipper materials' hue by 180 degrees (half the hue
+        // circle) while items are switched, so street boosters read as
+        // visually inverted brakes instead of boosts.
+        m_zipper_render_info->setHue(m_item_manager->areItemsSwitched() ?
+                                     0.5f : 0.0f);
+    }
 
 }   // updateGraphics
 

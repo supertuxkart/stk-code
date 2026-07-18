@@ -396,6 +396,11 @@ Material::Material(const XMLNode *node, bool deprecated)
 
     if(m_has_gravity)
         m_high_tire_adhesion = true;
+
+    // Needed so the zipper's hue can be rotated at runtime to visually
+    // invert it into a brake while items are switched.
+    if(m_zipper)
+        m_colorizable = true;
 }   // Material
 
 //-----------------------------------------------------------------------------

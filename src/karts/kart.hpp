@@ -269,6 +269,8 @@ protected:
      *  'older' sfx can be finished and an abrupt end of the sfx is avoided. */
     SFXBase      *m_previous_terrain_sound;
     SFXBase      *m_skid_sound;
+    /** Sound played when a zipper inverted into a brake is triggered. */
+    SFXBase      *m_reverse_zipper_sound;
     SFXBuffer    *m_horn_sound;
     static const int CRASH_SOUND_COUNT = 3;
     SFXBuffer    *m_crash_sounds[CRASH_SOUND_COUNT];
@@ -281,6 +283,7 @@ protected:
     RaceManager::KartType m_type;
 
     void          updatePhysics(int ticks);
+    void          handleReverseZipper(const Material *m);
     void          handleMaterialSFX();
     void          handleMaterialGFX(float dt);
     void          updateFlying();

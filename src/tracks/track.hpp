@@ -75,6 +75,8 @@ class TrackObjectManager;
 class TriangleMesh;
 class XMLNode;
 
+namespace GE { class GERenderInfo; }
+
 const int HEIGHT_MAP_RESOLUTION = 256;
 
 // TODO: eventually remove this and fully replace with scripting
@@ -375,6 +377,10 @@ private:
     RenderTarget           *m_render_target;
     CheckManager*           m_check_manager;
     std::shared_ptr<ItemManager> m_item_manager;
+    /** Render info used to tint zipper materials on the main track mesh
+     *  while items are switched, inverting them into brakes. Null if the
+     *  track's main mesh isn't rendered through the SP pipeline. */
+    std::shared_ptr<GE::GERenderInfo> m_zipper_render_info;
     float                   m_minimap_x_scale;
     float                   m_minimap_y_scale;
 

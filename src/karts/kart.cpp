@@ -183,6 +183,7 @@ Kart::Kart (const std::string& ident, unsigned int world_kart_id,
         m_emitters[i] = SFXManager::get()->createSoundSource("crash");
 
     m_skid_sound = NULL;
+    m_reverse_zipper_sound = NULL;
     m_nitro_sound   = SFXManager::get()->createSoundSource( "nitro" );
     m_terrain_sound          = NULL;
     m_last_sound_material    = NULL;
@@ -219,6 +220,8 @@ void Kart::initSound()
             m_emitters[i]->setVolume(factor);
         if (m_skid_sound)
             m_skid_sound->setVolume(factor);
+        if (m_reverse_zipper_sound)
+            m_reverse_zipper_sound->setVolume(factor);
         m_nitro_sound->setVolume(factor);
     }   // if getNumLocalPlayers > 1
 }   // initSound
@@ -278,6 +281,8 @@ Kart::~Kart()
         m_engine_sound->deleteSFX();
     if (m_skid_sound)
         m_skid_sound->deleteSFX();
+    if (m_reverse_zipper_sound)
+        m_reverse_zipper_sound->deleteSFX();
 
     for (int i = 0; i < EMITTER_COUNT; i++)
         m_emitters[i]->deleteSFX();
@@ -1718,8 +1723,16 @@ void Kart::update(int ticks)
         }
         else if(material->isZipper()     && isOnGround())
         {
-            handleZipper(material);
-            showZipperFire();
+            ItemManager* im = Track::getCurrentTrack()->getItemManager();
+            if (im && im->areItemsSwitched())
+            {
+                handleReverseZipper(material);
+            }
+            else
+            {
+                handleZipper(material);
+                showZipperFire();
+            }
         }
         else
         {
@@ -2239,6 +2252,49 @@ void Kart::handleZipper(const Material *material, bool play_sound)
     }
 
 }   // handleZipper
+
+// -----------------------------------------------------------------------------
+/** Called when a kart drives over a zipper while items are switched
+ *  (bananas/gift boxes swapped), inverting the zipper into a brake: it
+ *  slows the kart down instead of boosting it, with no boost animation and
+ *  a brake sound instead of the boost sound/camera effect.
+ *  \param material The material of the zipper, used to reuse the track's
+ *                  authored duration/fade-out timing for the slowdown.
+ */
+void Kart::handleReverseZipper(const Material *material)
+{
+    float max_speed_increase;
+    float duration;
+    float speed_gain;
+    float fade_out_time;
+    float engine_force;
+
+    material->getZipperParameter(&max_speed_increase, &duration,
+                                 &speed_gain, &fade_out_time, &engine_force);
+    if(duration<0)
+        duration      = m_kart_properties->getZipperDuration();
+    if(fade_out_time<0)
+        fade_out_time = m_kart_properties->getZipperFadeOutTime();
+
+    if(m_speed<0) return;
+
+    const float REVERSE_ZIPPER_SLOWDOWN_FRACTION = 0.5f;
+    m_max_speed->setSlowdown(MaxSpeed::MS_DECREASE_ZIPPER,
+                             REVERSE_ZIPPER_SLOWDOWN_FRACTION,
+                             stk_config->time2Ticks(fade_out_time),
+                             stk_config->time2Ticks(duration));
+
+    // Play the brake sound once per new contact, same anti-retrigger
+    // guard used for the regular zipper boost sound.
+    int zipper_ticks = World::getWorld()->getTicksSinceStart();
+    if (zipper_ticks > m_ticks_last_zipper)
+    {
+        m_ticks_last_zipper = zipper_ticks;
+        if (m_reverse_zipper_sound &&
+            m_reverse_zipper_sound->getStatus() != SFXBase::SFX_PLAYING)
+            m_reverse_zipper_sound->play(getSmoothedXYZ());
+    }
+}   // handleReverseZipper
 
 // -----------------------------------------------------------------------------
 /** Updates the current nitro status.
@@ -3068,6 +3124,17 @@ void Kart::loadData(RaceManager::KartType type, bool is_animated_model)
     if (!m_kart_properties->getSkidSound().empty())
     {
         m_skid_sound = SFXManager::get()->createSoundSource(
+            m_kart_properties->getSkidSound());
+    }
+
+    if (m_reverse_zipper_sound)
+    {
+        m_reverse_zipper_sound->deleteSFX();
+        m_reverse_zipper_sound = NULL;
+    }
+    if (!m_kart_properties->getSkidSound().empty())
+    {
+        m_reverse_zipper_sound = SFXManager::get()->createSoundSource(
             m_kart_properties->getSkidSound());
     }
 }   // loadData
