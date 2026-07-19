@@ -246,6 +246,8 @@ void Flyable::removePhysics()
  *  All 3 parameters first are of type 'out'. 'inFrontOf' can be set if you
  *  wish to know the closest kart in front of some karts (will ignore those
  *  behind). Useful e.g. for throwing projectiles in front only.
+ *  If the owner's view is currently blocked by a plunger, no target is
+ *  returned: a blinded kart can't aim either.
  */
 
 void Flyable::getClosestKart(const AbstractKart **minKart,
@@ -253,11 +255,14 @@ void Flyable::getClosestKart(const AbstractKart **minKart,
                              const AbstractKart* inFrontOf,
                              const bool backwards) const
 {
-    btTransform trans_projectile = (inFrontOf != NULL ? inFrontOf->getTrans()
-                                                      : getTrans());
-
     *minDistSquared = 999999.9f;
     *minKart = NULL;
+
+    if (m_owner->getBlockedByPlungerTicks() > 0)
+        return;
+
+    btTransform trans_projectile = (inFrontOf != NULL ? inFrontOf->getTrans()
+                                                      : getTrans());
 
     World *world = World::getWorld();
     for(unsigned int i=0 ; i<world->getNumKarts(); i++ )
