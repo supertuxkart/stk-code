@@ -76,11 +76,11 @@
             </div>
         </div>
 
-        <buttonbar id="buttons" height="15%" width="60%" align="center">
-            <icon-button id="reset" width="128" height="128" icon="gui/icons/restart.png"
-                    I18N="In the ui/camera screen" text="Reset" align="center"/>
+        <buttonbar id="buttons" height="15%" width="70%" align="center">
+            <icon-button id="restore" width="128" height="128" icon="gui/icons/restart.png"
+                I18N="In the multitouch settings screen" text="Restore defaults" align="center"/>
             <icon-button id="apply" width="128" height="128" icon="gui/icons/green_check.png"
-                I18N="Video settings" text="Apply" align="center"/>
+                I18N="In the multitouch settings screen" text="Apply" align="center"/>
         </buttonbar>
         </div>
     </div>
