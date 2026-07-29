@@ -21,6 +21,7 @@
 #include "graphics/irr_driver.hpp"
 #include "guiengine/widgets/check_box_widget.hpp"
 #include "guiengine/widgets/spinner_widget.hpp"
+#include "guiengine/widgets/ribbon_widget.hpp"
 #include "input/device_manager.hpp"
 #include "input/input_manager.hpp"
 #include "input/multitouch_device.hpp"
@@ -64,16 +65,28 @@ void MultitouchSettingsDialog::beforeAddingWidgets()
 
     if (!accelerometer_available)
     {
-        CheckBoxWidget* accelerometer = getWidget<CheckBoxWidget>("accelerometer");
-        assert(accelerometer != NULL);
+        RibbonWidget* control_type = getWidget<RibbonWidget>("control_type");
+        assert(control_type != NULL);
+
+        int index = control_type->findItemNamed("accelerometer");
+        Widget* accelerometer = &control_type->getChildren()[index];
         accelerometer->setActive(false);
+
+        if (UserConfigParams::m_multitouch_controls == MULTITOUCH_CONTROLS_ACCELEROMETER)
+            UserConfigParams::m_multitouch_controls = MULTITOUCH_CONTROLS_STEERING_WHEEL;
     }
 
     if (!gyroscope_available)
     {
-        CheckBoxWidget* gyroscope = getWidget<CheckBoxWidget>("gyroscope");
-        assert(gyroscope != NULL);
+        RibbonWidget* control_type = getWidget<RibbonWidget>("control_type");
+        assert(control_type != NULL);
+
+        int index = control_type->findItemNamed("gyroscope");
+        Widget* gyroscope = &control_type->getChildren()[index];
         gyroscope->setActive(false);
+
+        if (UserConfigParams::m_multitouch_controls == MULTITOUCH_CONTROLS_GYROSCOPE)
+            UserConfigParams::m_multitouch_controls = MULTITOUCH_CONTROLS_STEERING_WHEEL;
     }
     
     if (StateManager::get()->getGameState() == GUIEngine::INGAME_MENU)
@@ -91,111 +104,123 @@ void MultitouchSettingsDialog::beforeAddingWidgets()
 GUIEngine::EventPropagation MultitouchSettingsDialog::processEvent(
                                                 const std::string& eventSource)
 {
-    if (eventSource == "close")
+    if (eventSource == "control_type")
     {
-        SpinnerWidget* scale = getWidget<SpinnerWidget>("scale");
-        assert(scale != NULL);
-        UserConfigParams::m_multitouch_scale = (float)scale->getValue() / 100.0f;
+        RibbonWidget* control_type = getWidget<RibbonWidget>("control_type");
+        assert(control_type != NULL);
 
-        SpinnerWidget* sensitivity_x = getWidget<SpinnerWidget>("sensitivity_x");
-        assert(sensitivity_x != NULL);
-        UserConfigParams::m_multitouch_sensitivity_x =
-                                    (float)sensitivity_x->getValue() / 100.0f;
-                                    
-        SpinnerWidget* sensitivity_y = getWidget<SpinnerWidget>("sensitivity_y");
-        assert(sensitivity_y != NULL);
-        UserConfigParams::m_multitouch_sensitivity_y =
-                                    (float)sensitivity_y->getValue() / 100.0f;
-
-        SpinnerWidget* deadzone = getWidget<SpinnerWidget>("deadzone");
-        assert(deadzone != NULL);
-        UserConfigParams::m_multitouch_deadzone =
-                                    (float)deadzone->getValue() / 100.0f;
-
-        CheckBoxWidget* buttons_en = getWidget<CheckBoxWidget>("buttons_enabled");
-        assert(buttons_en != NULL);
-        UserConfigParams::m_multitouch_draw_gui = buttons_en->getState();
-        
-        CheckBoxWidget* buttons_inv = getWidget<CheckBoxWidget>("buttons_inverted");
-        assert(buttons_inv != NULL);
-        UserConfigParams::m_multitouch_inverted = buttons_inv->getState();
-
-        CheckBoxWidget* accelerometer = getWidget<CheckBoxWidget>("accelerometer");
-        assert(accelerometer != NULL);
-
-        CheckBoxWidget* gyroscope = getWidget<CheckBoxWidget>("gyroscope");
-        assert(gyroscope != NULL);
-
-        UserConfigParams::m_multitouch_controls = MULTITOUCH_CONTROLS_STEERING_WHEEL;
-
-        if (accelerometer->getState())
+        const std::string& selected = control_type->getSelectionIDString(
+            PLAYER_ID_GAME_MASTER);
+        if (selected == "steering_wheel")
         {
-            UserConfigParams::m_multitouch_controls = MULTITOUCH_CONTROLS_ACCELEROMETER;
+            getWidget<CheckBoxWidget>("auto_acceleration")->setActive(true);
         }
-
-        if (gyroscope->getState())
+        else
         {
-            UserConfigParams::m_multitouch_controls = MULTITOUCH_CONTROLS_GYROSCOPE;
+            getWidget<CheckBoxWidget>("auto_acceleration")->setState(false);
+            getWidget<CheckBoxWidget>("auto_acceleration")->setActive(false);
         }
-
-        if (UserConfigParams::m_multitouch_controls == MULTITOUCH_CONTROLS_STEERING_WHEEL)
-            UserConfigParams::m_multitouch_auto_acceleration = getWidget<CheckBoxWidget>("auto_acceleration")->getState();
-
-        MultitouchDevice* touch_device = input_manager->getDeviceManager()->
-                                                        getMultitouchDevice();
-
-        if (touch_device != NULL)
-        {
-            touch_device->updateConfigParams();
-        }
-        
-        if (World::getWorld() && World::getWorld()->getRaceGUI())
-        {
-            World::getWorld()->getRaceGUI()->recreateGUI();
-        }
-
-        user_config->saveConfig();
-
-        ModalDialog::dismiss();
-        return GUIEngine::EVENT_BLOCK;
     }
-    else if (eventSource == "restore")
+    else if (eventSource == "buttons")
     {
-        UserConfigParams::m_multitouch_sensitivity_y.revertToDefaults();
-        UserConfigParams::m_multitouch_deadzone.revertToDefaults();
-        UserConfigParams::m_multitouch_inverted.revertToDefaults();
-        UserConfigParams::m_multitouch_controls.revertToDefaults();
-        UserConfigParams::m_multitouch_scale.revertToDefaults();
-        UserConfigParams::m_multitouch_sensitivity_x.revertToDefaults();
-    
-        if (StateManager::get()->getGameState() != GUIEngine::INGAME_MENU)
+        const std::string& selection = getWidget<RibbonWidget>("buttons")->
+        getSelectionIDString(PLAYER_ID_GAME_MASTER);
+
+        if (selection == "apply")
         {
-#ifdef MOBILE_STK
-            UserConfigParams::m_multitouch_draw_gui = true;
-#else
-            UserConfigParams::m_multitouch_draw_gui.revertToDefaults();
-#endif
+            SpinnerWidget* scale = getWidget<SpinnerWidget>("scale");
+            assert(scale != NULL);
+            UserConfigParams::m_multitouch_scale = (float)scale->getValue() / 100.0f;
+
+            SpinnerWidget* sensitivity_x = getWidget<SpinnerWidget>("sensitivity_x");
+            assert(sensitivity_x != NULL);
+            UserConfigParams::m_multitouch_sensitivity_x =
+                                        (float)sensitivity_x->getValue() / 100.0f;
+
+            SpinnerWidget* sensitivity_y = getWidget<SpinnerWidget>("sensitivity_y");
+            assert(sensitivity_y != NULL);
+            UserConfigParams::m_multitouch_sensitivity_y =
+                                        (float)sensitivity_y->getValue() / 100.0f;
+
+            SpinnerWidget* deadzone = getWidget<SpinnerWidget>("deadzone");
+            assert(deadzone != NULL);
+            UserConfigParams::m_multitouch_deadzone =
+                                        (float)deadzone->getValue() / 100.0f;
+
+            CheckBoxWidget* buttons_en = getWidget<CheckBoxWidget>("buttons_enabled");
+            assert(buttons_en != NULL);
+            UserConfigParams::m_multitouch_draw_gui = buttons_en->getState();
+
+            CheckBoxWidget* buttons_inv = getWidget<CheckBoxWidget>("buttons_inverted");
+            assert(buttons_inv != NULL);
+            UserConfigParams::m_multitouch_inverted = buttons_inv->getState();
+
+            // Control types selection ribbon.
+
+            RibbonWidget* control_type = getWidget<RibbonWidget>("control_type");
+            assert(control_type != NULL);
+
+            const std::string& control_selected = control_type->getSelectionIDString(
+                PLAYER_ID_GAME_MASTER);
+
+            if (control_selected == "steering_wheel")
+            {
+                UserConfigParams::m_multitouch_controls = MULTITOUCH_CONTROLS_STEERING_WHEEL;
+                UserConfigParams::m_multitouch_auto_acceleration = getWidget<CheckBoxWidget>("auto_acceleration")->getState();
+            }
+            else if (control_selected == "accelerometer")
+            {
+                UserConfigParams::m_multitouch_controls = MULTITOUCH_CONTROLS_ACCELEROMETER;
+                UserConfigParams::m_multitouch_auto_acceleration = false;
+            }
+            else if (control_selected == "gyroscope")
+            {
+                UserConfigParams::m_multitouch_controls = MULTITOUCH_CONTROLS_GYROSCOPE;
+                UserConfigParams::m_multitouch_auto_acceleration = false;
+            }
+
+            MultitouchDevice* touch_device = input_manager->getDeviceManager()->
+                                                            getMultitouchDevice();
+
+            if (touch_device != NULL)
+            {
+                touch_device->updateConfigParams();
+            }
+
+            if (World::getWorld() && World::getWorld()->getRaceGUI())
+            {
+                World::getWorld()->getRaceGUI()->recreateGUI();
+            }
+
+            user_config->saveConfig();
+
+            ModalDialog::dismiss();
+            return GUIEngine::EVENT_BLOCK;
+        }
+        else if (selection == "restore")
+        {
+            UserConfigParams::m_multitouch_sensitivity_y.revertToDefaults();
+            UserConfigParams::m_multitouch_deadzone.revertToDefaults();
+            UserConfigParams::m_multitouch_inverted.revertToDefaults();
+            UserConfigParams::m_multitouch_controls.revertToDefaults();
+            UserConfigParams::m_multitouch_scale.revertToDefaults();
+            UserConfigParams::m_multitouch_sensitivity_x.revertToDefaults();
+
+            if (StateManager::get()->getGameState() != GUIEngine::INGAME_MENU)
+            {
+            #ifdef MOBILE_STK
+                UserConfigParams::m_multitouch_draw_gui = true;
+            #else
+                UserConfigParams::m_multitouch_draw_gui.revertToDefaults();
+            #endif
+            }
+
+            updateValues();
+
+            return GUIEngine::EVENT_BLOCK;
         }
 
-        updateValues();
-
-        return GUIEngine::EVENT_BLOCK;
     }
-    else if (eventSource == "accelerometer")
-    {
-        CheckBoxWidget* gyroscope = getWidget<CheckBoxWidget>("gyroscope");
-        assert(gyroscope != NULL);
-        gyroscope->setState(false);
-        getWidget<CheckBoxWidget>("auto_acceleration")->setState(false);
-    }
-    else if (eventSource == "gyroscope")
-    {
-        CheckBoxWidget* accelerometer = getWidget<CheckBoxWidget>("accelerometer");
-        assert(accelerometer != NULL);
-        accelerometer->setState(false);
-        getWidget<CheckBoxWidget>("auto_acceleration")->setState(false);
-    }
-
     return GUIEngine::EVENT_LET;
 }   // processEvent
 
@@ -230,18 +255,26 @@ void MultitouchSettingsDialog::updateValues()
     assert(buttons_inv != NULL);
     buttons_inv->setState(UserConfigParams::m_multitouch_inverted);
 
-    CheckBoxWidget* accelerometer = getWidget<CheckBoxWidget>("accelerometer");
-    assert(accelerometer != NULL);
-    accelerometer->setState(UserConfigParams::m_multitouch_controls == MULTITOUCH_CONTROLS_ACCELEROMETER);
+    RibbonWidget* control_type = getWidget<RibbonWidget>("control_type");
+    assert(control_type != NULL);
 
-    CheckBoxWidget* gyroscope = getWidget<CheckBoxWidget>("gyroscope");
-    assert(gyroscope != NULL);
-    gyroscope->setState(UserConfigParams::m_multitouch_controls == MULTITOUCH_CONTROLS_GYROSCOPE);
-
-    if (UserConfigParams::m_multitouch_controls == MULTITOUCH_CONTROLS_STEERING_WHEEL)
-        getWidget<CheckBoxWidget>("auto_acceleration")->setState(UserConfigParams::m_multitouch_auto_acceleration);
+    if (UserConfigParams::m_multitouch_controls == MULTITOUCH_CONTROLS_ACCELEROMETER)
+    {
+        int id = control_type->findItemNamed("accelerometer");
+        control_type->setSelection(id, PLAYER_ID_GAME_MASTER);
+        getWidget<CheckBoxWidget>("auto_acceleration")->setActive(false);
+    }
+    else if (UserConfigParams::m_multitouch_controls == MULTITOUCH_CONTROLS_GYROSCOPE)
+    {
+        int id = control_type->findItemNamed("gyroscope");
+        control_type->setSelection(id, PLAYER_ID_GAME_MASTER);
+        getWidget<CheckBoxWidget>("auto_acceleration")->setActive(false);
+    }
     else
-        getWidget<CheckBoxWidget>("auto_acceleration")->setState(false);
+    {
+        int id = control_type->findItemNamed("steering_wheel");
+        control_type->setSelection(id, PLAYER_ID_GAME_MASTER);
+    }
 }
 
 // -----------------------------------------------------------------------------
