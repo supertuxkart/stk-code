@@ -73,9 +73,7 @@ void MultitouchSettingsDialog::beforeAddingWidgets()
         accelerometer->setActive(false);
 
         if (UserConfigParams::m_multitouch_controls == MULTITOUCH_CONTROLS_ACCELEROMETER)
-        {
             UserConfigParams::m_multitouch_controls = MULTITOUCH_CONTROLS_STEERING_WHEEL;
-        }
     }
 
     if (!gyroscope_available)
@@ -88,9 +86,7 @@ void MultitouchSettingsDialog::beforeAddingWidgets()
         gyroscope->setActive(false);
 
         if (UserConfigParams::m_multitouch_controls == MULTITOUCH_CONTROLS_GYROSCOPE)
-        {
             UserConfigParams::m_multitouch_controls = MULTITOUCH_CONTROLS_STEERING_WHEEL;
-        }
     }
     
     if (StateManager::get()->getGameState() == GUIEngine::INGAME_MENU)
@@ -201,7 +197,7 @@ GUIEngine::EventPropagation MultitouchSettingsDialog::processEvent(
             ModalDialog::dismiss();
             return GUIEngine::EVENT_BLOCK;
         }
-        else if (selection == "reset")
+        else if (selection == "restore")
         {
             UserConfigParams::m_multitouch_sensitivity_y.revertToDefaults();
             UserConfigParams::m_multitouch_deadzone.revertToDefaults();
