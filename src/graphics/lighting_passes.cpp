@@ -55,7 +55,10 @@ public:
         float offset;
     };
 public:
-    static const unsigned int MAXLIGHT = 32;
+    // TODO: Check if some old & weak hardware may need a lower limit
+    // to work properly. If so, we may need to support different values
+    // depending on graphics settings.
+    static const unsigned int MAXLIGHT = 128;
 public:
     static struct PointLightInfo m_point_lights_info[MAXLIGHT];
 };   // LightBaseClass
@@ -436,7 +439,6 @@ void LightingPasses::renderSunlight(const core::vector3df &direction,
                                           depth_stencil_texture);
 }   // renderSunlight
 
-
 // ----------------------------------------------------------------------------
 void LightingPasses::updateLightsInfo(scene::ICameraSceneNode * const camnode,
                                       float dt)
@@ -445,7 +447,12 @@ void LightingPasses::updateLightsInfo(scene::ICameraSceneNode * const camnode,
     const u32 lightcount = (u32)lights.size();
     const core::vector3df &campos = camnode->getAbsolutePosition();
 
-    std::vector<LightNode *> BucketedLN[15];
+    // We sort lights into buckets according to their distance to the camera
+    // This roughly allows to always enable the closest light sources first.
+    // This doesn't account for light strength/radius (a closer weaker light
+    // has priority over a distant stronger light that might be brighter from
+    // the camera point-of-view)
+    std::vector<LightNode *> BucketedLN[30];
     for (unsigned int i = 0; i < lightcount; i++)
     {
         if (!lights[i]->isVisible())
@@ -458,28 +465,28 @@ void LightingPasses::updateLightsInfo(scene::ICameraSceneNode * const camnode,
         }
         const core::vector3df &lightpos =
                                  (lights[i]->getAbsolutePosition() - campos);
-        unsigned idx = (unsigned)(lightpos.getLength() / 10);
-        if (idx > 14)
-            idx = 14;
+
+        unsigned idx = (unsigned)(lightpos.getLength() / 12);
+        if (idx > 29)
+            idx = 29;
         BucketedLN[idx].push_back(lights[i]);
     }
 
     m_point_light_count = 0;
     bool multiplayer = (RaceManager::get()->getNumLocalPlayers() > 1);
 
-    for (unsigned i = 0; i < 15; i++)
+    // Check the lights from closest to farthest by their bucket.
+    for (unsigned i = 0; i < 30; i++)
     {
         for (unsigned j = 0; j < BucketedLN[i].size(); j++)
         {
+            LightNode* light_node = BucketedLN[i].at(j);
             if (++m_point_light_count >= LightBaseClass::MAXLIGHT)
             {
-                LightNode* light_node = BucketedLN[i].at(j);
                 light_node->setEnergyMultiplier(0.0f);
             }
             else
             {
-                LightNode* light_node = BucketedLN[i].at(j);
-
                 float em = light_node->getEnergyMultiplier();
                 if (em < 1.0f)
                 {
@@ -496,8 +503,7 @@ void LightingPasses::updateLightsInfo(scene::ICameraSceneNode * const camnode,
                 m_point_lights_info[m_point_light_count].posY = pos.Y;
                 m_point_lights_info[m_point_light_count].posZ = pos.Z;
 
-                m_point_lights_info[m_point_light_count].energy =
-                                              light_node->getEffectiveEnergy();
+                m_point_lights_info[m_point_light_count].energy = light_node->getEffectiveEnergy();
 
                 const core::vector3df &col = light_node->getColor();
                 m_point_lights_info[m_point_light_count].red = col.X;
@@ -528,7 +534,7 @@ void LightingPasses::updateLightsInfo(scene::ICameraSceneNode * const camnode,
         }
         if (m_point_light_count > LightBaseClass::MAXLIGHT)
         {
-            irr_driver->setLastLightBucketDistance(i * 10);
+            irr_driver->setLastLightBucketDistance(i * 12);
             break;
         }
     }
