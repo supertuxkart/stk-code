@@ -440,12 +440,29 @@ void LightingPasses::renderSunlight(const core::vector3df &direction,
 }   // renderSunlight
 
 // ----------------------------------------------------------------------------
+/* We project the position of the light node onto the axis the camera is
+* looking towards. If the projected location is negative and farther than
+* the light's radius, we can safely skip this light.
+* This function expects target_direction to be normalized.
+*/
+bool LightingPasses::shouldCullLight(const core::vector3df light_relpos,
+                     core::vector3df target_direction, float radius)
+{
+    float projected_distance = light_relpos.dotProduct(target_direction);
+
+    return (projected_distance + radius) < 0.0f;
+}   // shouldCullLight
+
+// ----------------------------------------------------------------------------
 void LightingPasses::updateLightsInfo(scene::ICameraSceneNode * const camnode,
                                       float dt)
 {
     std::vector<LightNode *> lights = irr_driver->getLights();
     const u32 lightcount = (u32)lights.size();
     const core::vector3df &campos = camnode->getAbsolutePosition();
+    core::vector3df target_direction = (camnode->getTarget() - campos);
+    // Normalization is important for the radius check in shouldCullLight to work
+    target_direction.normalize();
 
     // We sort lights into buckets according to their distance to the camera
     // This roughly allows to always enable the closest light sources first.
@@ -465,6 +482,10 @@ void LightingPasses::updateLightsInfo(scene::ICameraSceneNode * const camnode,
         }
         const core::vector3df &lightpos =
                                  (lights[i]->getAbsolutePosition() - campos);
+
+
+        if (shouldCullLight(lightpos, target_direction, lights[i]->getRadius()))
+            continue;
 
         unsigned idx = (unsigned)(lightpos.getLength() / 12);
         if (idx > 29)

@@ -57,6 +57,9 @@ private:
                                 GLuint normal_depth_texture,
                                 GLuint depth_stencil_texture);
 
+    bool shouldCullLight(const core::vector3df light_relpos,
+                     core::vector3df target_direction, float radius);
+
 public:
     LightingPasses(): m_point_light_count(0){}
     
