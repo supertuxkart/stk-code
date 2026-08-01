@@ -169,7 +169,11 @@ void WorldWithRank::endSetKartPositions()
 /** Determines the rescue position for a kart. The rescue position is the
  *  start position which is has the biggest accumulated distance to all other
  *  karts, and which has no other kart very close. The latter avoids dropping
- *  a kart on top of another kart. This is the method used
+ *  a kart on top of another kart.
+ * 
+ *  IMPORTANT: This is the method used in battle mode. Linear mode use another
+ *  rescue logic.
+ * 
  *  \param kart The kart that is going to be rescued.
  *  \returns The index of the start position to which the rescued kart
  *           should be moved to.
@@ -189,23 +193,19 @@ unsigned int WorldWithRank::getRescuePositionIndex(Kart *kart)
         const btTransform &s = getStartTransform(n);
         const Vec3 &v=s.getOrigin();
         float accumulated_distance = .0f;
-        bool spawn_point_clear = true;
+
+        // If another kart is too close to this rescue position, skip it
+        if(!isRescuePointClear(v, kart))
+            continue;
 
         for(unsigned int k=0; k<getCurrentNumKarts(); k++)
         {
             if(kart->getWorldKartId()==k) continue;
             float abs_distance2 = (getKart(k)->getXYZ()-v).length2();
-            const float CLEAR_SPAWN_RANGE2 = 5*5;
-            if( abs_distance2 < CLEAR_SPAWN_RANGE2)
-            {
-                spawn_point_clear = false;
-                break;
-            }
             accumulated_distance += sqrt(abs_distance2);
         }
 
-        if(accumulated_distance > largest_accumulated_distance_found &&
-            spawn_point_clear)
+        if(accumulated_distance > largest_accumulated_distance_found)
         {
             furthest_id_found = n;
             largest_accumulated_distance_found = accumulated_distance;
@@ -215,6 +215,24 @@ unsigned int WorldWithRank::getRescuePositionIndex(Kart *kart)
     assert(furthest_id_found != -1);
     return furthest_id_found;
 }   // getRescuePositionIndex
+
+//-----------------------------------------------------------------------------
+/** Check if the considered rescue position is not too close to other karts
+ * (to avoid rescuing a kart on top of another)
+ */
+bool WorldWithRank::isRescuePointClear(Vec3 v, Kart *kart)
+{
+    const float CLEAR_SPAWN_RANGE2 = 9;
+    for(unsigned int k=0; k<getCurrentNumKarts(); k++)
+    {
+        if(kart->getWorldKartId()==k) continue;
+        float abs_distance2 = (getKart(k)->getXYZ()-v).length2();
+        if( abs_distance2 < CLEAR_SPAWN_RANGE2)
+            return false;
+    }
+
+    return true;
+}   // checkRescuePointClear
 
 //-----------------------------------------------------------------------------
 /** Returns the number of points for a kart at a specified position.

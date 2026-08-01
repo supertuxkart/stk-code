@@ -64,6 +64,7 @@ protected:
 
     // ------------------------------------------------------------------------
     void updateSectorForKarts();
+    bool isRescuePointClear(Vec3 v, Kart *kart);
 
 public:
                   WorldWithRank() : World() {}

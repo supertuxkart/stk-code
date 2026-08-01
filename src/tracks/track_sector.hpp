@@ -90,8 +90,7 @@ public:
     // ------------------------------------------------------------------------
     void setLastTriggeredCheckline(int i) { m_last_triggered_checkline = i; }
     // ------------------------------------------------------------------------
-    int getLastTriggeredCheckline() const
-                                         { return m_last_triggered_checkline; }
+    int getLastTriggeredCheckline() const { return m_last_triggered_checkline; }
     // ------------------------------------------------------------------------
     int getLastValidGraphNode() const { return m_last_valid_graph_node; }
     // ------------------------------------------------------------------------

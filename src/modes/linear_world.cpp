@@ -833,18 +833,27 @@ unsigned int LinearWorld::getRescuePositionIndex(Kart *kart)
 {
     const unsigned int kart_id = kart->getWorldKartId();
 
-    getTrackSector(kart_id)->rescue();
-    // Setting XYZ for the kart is important since otherwise the kart
-    // will not detect the right material again when doing the next
-    // raycast to detect where it is driving on (--> potential rescue loop)
-    int index = getTrackSector(kart_id)->getCurrentGraphNode();
+    bool index_found = false;
+    int index = -1;
 
-    // Do not rescue to an ignored quad, find another (non-ignored) quad
-    if (Graph::get()->getQuad(index)->isIgnored())
+    while (!index_found)
     {
-        Vec3 pos = kart->getFrontXYZ();
-        int sector = Graph::get()->findOutOfRoadSector(pos);
-        return sector;
+        // Each call goes further back on the track
+        getTrackSector(kart_id)->rescue();
+
+        // Setting XYZ for the kart is important since otherwise the kart
+        // will not detect the right material again when doing the next
+        // raycast to detect where it is driving on (--> potential rescue loop)
+        index = getTrackSector(kart_id)->getCurrentGraphNode();
+
+        // Do not rescue to an ignored quad, find another (non-ignored) quad
+        // TODO: clarify what a quad being ignored means
+        if (Graph::get()->getQuad(index)->isIgnored())
+            continue;
+
+        const Vec3 &xyz = DriveGraph::get()->getNode(index)->getCenter();
+        if(isRescuePointClear(xyz, kart))
+            index_found = true;
     }
 
     return index;
