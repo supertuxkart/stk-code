@@ -472,7 +472,7 @@ if (NOT SERVER_ONLY)
 
     # Freetype
     find_package(Freetype)
-    if(FREETYPE_FOUND)
+    if(FREETYPE_FOUND OR TARGET Freetype::Freetype)
         include_directories(${FREETYPE_INCLUDE_DIRS})
     else()
         message(FATAL_ERROR "Freetype not found. "
@@ -739,6 +739,7 @@ if (USE_SWITCH)
   target_link_libraries(supertuxkart
     ${NX_LIBRARY}
     ${ZLIB_LIBRARY}
+    Freetype::Freetype
     ${FREETYPE_LIBRARIES}
     -logg
     -lvorbis
