@@ -852,7 +852,7 @@ unsigned int LinearWorld::getRescuePositionIndex(Kart *kart)
             continue;
 
         const Vec3 &xyz = DriveGraph::get()->getNode(index)->getCenter();
-        if(isRescuePointClear(xyz, kart))
+        if(isRescuePointClear(xyz, kart, getRescueTransform(index)))
             index_found = true;
     }
 

@@ -559,7 +559,7 @@ void TrackObject::resetAfterRewind()
 /** Does a raycast against the track object. The object must have a physical
  *  object.
  *  \param from/to The from and to position for the raycast.
- *  \param xyz The position in world where the ray hit.
+ *  \param hit_point The position in world where the ray hit.
  *  \param material The material of the mesh that was hit.
  *  \param normal The intrapolated normal at that position.
  *  \param interpolate_normal If true, the returned normal is the interpolated

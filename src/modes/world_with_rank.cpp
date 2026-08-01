@@ -17,9 +17,11 @@
 
 #include "modes/world_with_rank.hpp"
 
+#include "graphics/material.hpp"
 #include "karts/kart.hpp"
 #include "karts/controller/spare_tire_ai.hpp"
 #include "karts/kart_properties.hpp"
+#include "physics/triangle_mesh.hpp"
 #include "race/history.hpp"
 #include "tracks/graph.hpp"
 #include "tracks/track.hpp"
@@ -195,7 +197,7 @@ unsigned int WorldWithRank::getRescuePositionIndex(Kart *kart)
         float accumulated_distance = .0f;
 
         // If another kart is too close to this rescue position, skip it
-        if(!isRescuePointClear(v, kart))
+        if(!isRescuePointClear(v, kart, getRescueTransform(n)))
             continue;
 
         for(unsigned int k=0; k<getCurrentNumKarts(); k++)
@@ -217,22 +219,77 @@ unsigned int WorldWithRank::getRescuePositionIndex(Kart *kart)
 }   // getRescuePositionIndex
 
 //-----------------------------------------------------------------------------
-/** Check if the considered rescue position is not too close to other karts
- * (to avoid rescuing a kart on top of another)
+/** Check if the considered rescue position is adequate:
+ * - Not too close to other karts (to avoid rescuing a kart on top of another)
+ * - Actually over some ground. The ground checks may produce false positives
+ * or negatives if the ground has small holes or tiny floating ground areas.
  */
-bool WorldWithRank::isRescuePointClear(Vec3 v, Kart *kart)
+bool WorldWithRank::isRescuePointClear(Vec3 rescue_pos, Kart *kart, btTransform rescue_trans)
 {
-    const float CLEAR_SPAWN_RANGE2 = 9;
+    // We start our raycasts slightly higher than the rescue points,
+    // to avoid situations where we cast a ray from just below the road
+    // and get a misleading result.
+    const btMatrix3x3& basis = rescue_trans.getBasis();
+    Vec3 up_vector(basis[0].y(), basis[1].y(), basis[2].y());
+    up_vector = up_vector * 0.3f;
+
+    // If there is no ground close enough below the proposed rescue position,
+    // it is an invalid rescue position.
+    if (!isPointAboveGround(rescue_pos + up_vector, rescue_trans))
+        return false;
+
+    // We build a forward vector based on the rescue transformation.
+    Vec3 forward_vector(basis[0].z(), basis[1].z(), basis[2].z());
+
+    // We also check that there is ground in front of the rescue position,
+    // both close by and a bit farther, to avoid the kart falling
+    // as soon as it starts driving.
+    Vec3 forward_point = rescue_pos + 0.5f * forward_vector + up_vector;
+    if (!isPointAboveGround(forward_point, rescue_trans)                          ||
+        !isPointAboveGround(forward_point + 0.75f * forward_vector, rescue_trans) ||
+        !isPointAboveGround(forward_point + 1.5f * forward_vector, rescue_trans)  ||
+        !isPointAboveGround(forward_point + 2.25f * forward_vector, rescue_trans))
+        return false;
+
+    // We also check that there is ground slightly behind the rescue position,
+    // to ensure the back wheels can also rest on solid ground.
+    Vec3 back_point = rescue_pos - 0.5f * forward_vector + up_vector;
+    if (!isPointAboveGround(back_point, rescue_trans))
+        return false;
+
+    // Now we check that other karts aren't too close, to avoid rescuing
+    // on top of another kart.
+    const float CLEAR_SPAWN_RANGE2 = 9; // 3^2 = 9
     for(unsigned int k=0; k<getCurrentNumKarts(); k++)
     {
         if(kart->getWorldKartId()==k) continue;
-        float abs_distance2 = (getKart(k)->getXYZ()-v).length2();
+        float abs_distance2 = (getKart(k)->getXYZ() - rescue_pos).length2();
         if( abs_distance2 < CLEAR_SPAWN_RANGE2)
             return false;
     }
 
     return true;
 }   // checkRescuePointClear
+//-----------------------------------------------------------------------------
+/** Check if the given position is sufficiently close to ground.
+ */
+bool WorldWithRank::isPointAboveGround(Vec3 pos_to_check, btTransform rescue_trans)
+{
+    const Material* material_hit;
+    Vec3 normal;
+    Vec3 to = pos_to_check + rescue_trans.getBasis() * Vec3(0, -100, 0);
+    Vec3 hit_point;
+    Track::getCurrentTrack()->getTriangleMesh().castRay(pos_to_check, to, &hit_point,
+                                                        &material_hit, &normal);
+
+    // If there is no ground close enough below the proposed rescue position,
+    // it is an invalid rescue position.
+    if (!material_hit || material_hit->isDriveReset() ||
+        (hit_point - pos_to_check).length2() > 16)
+        return false;
+
+    return true;
+}   // isPointAboveGround
 
 //-----------------------------------------------------------------------------
 /** Returns the number of points for a kart at a specified position.
