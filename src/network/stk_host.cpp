@@ -1127,12 +1127,27 @@ void STKHost::mainLoop(ProcessType pt)
                 {
                     if (!is_server)
                     {
+                        const size_t header_size = g_ping_packet.size() +
+                            sizeof(uint64_t) + sizeof(uint8_t);
+                        if (event.packet->dataLength < header_size)
+                        {
+                            Log::warn("STKHost", "Invalid ping packet size.");
+                            enet_packet_destroy(event.packet);
+                            continue;
+                        }
                         BareNetworkString ping_packet((char*)event.packet->data,
                             (int)event.packet->dataLength);
                         std::map<uint32_t, uint32_t> peer_pings;
                         ping_packet.skip((int)g_ping_packet.size());
                         uint64_t server_time = ping_packet.getUInt64();
                         unsigned peer_size = ping_packet.getUInt8();
+                        if (ping_packet.size() < peer_size *
+                            (sizeof(uint32_t) * 2))
+                        {
+                            Log::warn("STKHost", "Invalid ping peer list.");
+                            enet_packet_destroy(event.packet);
+                            continue;
+                        }
                         for (unsigned i = 0; i < peer_size; i++)
                         {
                             unsigned host_id = ping_packet.getUInt32();
