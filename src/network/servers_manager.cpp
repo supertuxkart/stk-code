@@ -36,6 +36,7 @@
 #include <assert.h>
 #include <functional>
 #include <set>
+#include <stdexcept>
 #include <string>
 #include <thread>
 
@@ -268,45 +269,53 @@ std::shared_ptr<ServerList> ServersManager::getLANRefreshRequest() const
                 int len = broadcast->receiveRawPacket(buffer, LEN, &sender, 1);
                 if (len > 0)
                 {
-                    BareNetworkString s(buffer, len);
-                    int version = s.getUInt32();
-                    if (version < stk_config->m_max_server_version ||
-                        version > stk_config->m_max_server_version)
-                    {
-                        Log::verbose("ServersManager", "Skipping a server");
-                        continue;
-                    }
-                    irr::core::stringw name;
-                    // bytes_read is the number of bytes read
-                    s.decodeStringW(&name);
-                    uint8_t max_players = s.getUInt8();
-                    uint8_t players     = s.getUInt8();
-                    uint16_t port       = s.getUInt16();
-                    uint8_t difficulty  = s.getUInt8();
-                    uint8_t mode        = s.getUInt8();
-                    sender.setPort(port);
-                    uint8_t password    = s.getUInt8();
-                    uint8_t game_started = s.getUInt8();
-                    std::string current_track;
                     try
                     {
-                        s.decodeString(&current_track);
+                        BareNetworkString s(buffer, len);
+                        int version = s.getUInt32();
+                        if (version < stk_config->m_max_server_version ||
+                            version > stk_config->m_max_server_version)
+                        {
+                            Log::verbose("ServersManager", "Skipping a server");
+                            continue;
+                        }
+                        irr::core::stringw name;
+                        // bytes_read is the number of bytes read
+                        s.decodeStringW(&name);
+                        uint8_t max_players = s.getUInt8();
+                        uint8_t players     = s.getUInt8();
+                        uint16_t port       = s.getUInt16();
+                        uint8_t difficulty  = s.getUInt8();
+                        uint8_t mode        = s.getUInt8();
+                        sender.setPort(port);
+                        uint8_t password    = s.getUInt8();
+                        uint8_t game_started = s.getUInt8();
+                        std::string current_track;
+                        try
+                        {
+                            s.decodeString(&current_track);
+                        }
+                        catch (std::exception& e)
+                        {
+                            (void)e;
+                        }
+                        auto server = std::make_shared<Server>(cur_server_id++,
+                            name, max_players, players, difficulty, mode,
+                            SocketAddress(sender.getIP(), sender.getPort()),
+                            password == 1, game_started == 1, current_track);
+                        if (sender.isIPv6())
+                        {
+                            server->setIPV6Address(sender);
+                            server->setIPV6Connection(true);
+                        }
+                        servers_now.insert(std::make_pair(name, server));
+                        //all_servers.[name] = servers_now.back();
                     }
-                    catch (std::exception& e)
+                    catch (const std::out_of_range&)
                     {
-                        (void)e;
+                        Log::verbose("ServersManager",
+                                     "Skipping malformed server reply");
                     }
-                    auto server = std::make_shared<Server>(cur_server_id++,
-                        name, max_players, players, difficulty, mode,
-                        SocketAddress(sender.getIP(), sender.getPort()),
-                        password == 1, game_started == 1, current_track);
-                    if (sender.isIPv6())
-                    {
-                        server->setIPV6Address(sender);
-                        server->setIPV6Connection(true);
-                    }
-                    servers_now.insert(std::make_pair(name, server));
-                    //all_servers.[name] = servers_now.back();
                 }   // if received_data
             }    // while still waiting
             setIPv6Socket(0);
