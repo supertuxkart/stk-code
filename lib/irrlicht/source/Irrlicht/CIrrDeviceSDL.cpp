@@ -1560,8 +1560,10 @@ bool CIrrDeviceSDL::hasHardwareKeyboard() const
 {
 #if defined(ANDROID) || defined(IOS_STK)
 	return false;
-#else
+#elif defined(__linux__)
 	return LinuxTouchDetect::hasHardwareKeyboard();
+#else
+	return true;
 #endif
 }
 

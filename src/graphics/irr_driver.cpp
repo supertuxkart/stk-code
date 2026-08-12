@@ -408,11 +408,13 @@ bool IrrDriver::isTouchOnlyDevice() const
 {
 #if defined(ANDROID) || defined(IOS_STK)
     return true;
-#else
+#elif defined(__linux__)
     if (m_device && m_device->supportsTouchDevice() &&
         !m_device->hasHardwareKeyboard())
         return true;
     return LinuxTouchDetect::isTouchOnly();
+#else
+    return false;
 #endif
 }
 
