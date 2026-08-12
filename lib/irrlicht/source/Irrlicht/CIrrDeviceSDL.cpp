@@ -26,6 +26,7 @@
 #include "ge_vulkan_driver.hpp"
 #include "ge_vulkan_scene_manager.hpp"
 #include "MoltenVK.h"
+#include "input/linux_touch_detect.hpp"
 
 #include <SDL_vulkan.h>
 
@@ -1550,7 +1551,18 @@ void CIrrDeviceSDL::createKeyMap()
 
 bool CIrrDeviceSDL::supportsTouchDevice() const
 {
-	return SDL_GetNumTouchDevices() > 0;
+	if (SDL_GetNumTouchDevices() > 0)
+		return true;
+	return LinuxTouchDetect::hasTouchscreen();
+}
+
+bool CIrrDeviceSDL::hasHardwareKeyboard() const
+{
+#if defined(ANDROID) || defined(IOS_STK)
+	return false;
+#else
+	return LinuxTouchDetect::hasHardwareKeyboard();
+#endif
 }
 
 

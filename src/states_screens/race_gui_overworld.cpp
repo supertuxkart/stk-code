@@ -93,9 +93,7 @@ RaceGUIOverworld::RaceGUIOverworld()
     m_trophy[2] = irr_driver->getTexture(FileManager::GUI_ICON, "cup_gold.png"  );
     m_trophy[3] = irr_driver->getTexture(FileManager::GUI_ICON, "cup_platinum.png"  );
 
-    bool multitouch_enabled = (UserConfigParams::m_multitouch_active == 1 &&
-                               irr_driver->getDevice()->supportsTouchDevice()) ||
-                               UserConfigParams::m_multitouch_active > 1;
+    bool multitouch_enabled = irr_driver->isMultitouchEnabled();
     
     if (multitouch_enabled && UserConfigParams::m_multitouch_draw_gui &&
         RaceManager::get()->getNumLocalPlayers() == 1)

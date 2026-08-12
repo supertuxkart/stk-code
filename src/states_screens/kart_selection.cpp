@@ -1646,9 +1646,7 @@ bool KartSelectionScreen::useContinueButton() const
 #ifdef MOBILE_STK
     if (m_multiplayer)
         return false;
-    bool multitouch_enabled = (UserConfigParams::m_multitouch_active == 1 &&
-        irr_driver->getDevice()->supportsTouchDevice()) ||
-        UserConfigParams::m_multitouch_active > 1;
+    bool multitouch_enabled = irr_driver->isMultitouchEnabled();
     return multitouch_enabled;
 #else
     return false;

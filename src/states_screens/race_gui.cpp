@@ -78,9 +78,7 @@ RaceGUI::RaceGUI()
         m_enabled = false;
 
     initSize();
-    bool multitouch_enabled = (UserConfigParams::m_multitouch_active == 1 &&
-                               irr_driver->getDevice()->supportsTouchDevice()) ||
-                               UserConfigParams::m_multitouch_active > 1;
+    bool multitouch_enabled = irr_driver->isMultitouchEnabled();
     
     if (multitouch_enabled && UserConfigParams::m_multitouch_draw_gui &&
         RaceManager::get()->getNumLocalPlayers() == 1)

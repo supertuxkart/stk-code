@@ -72,9 +72,7 @@ void OptionsScreenUI::loadedFromFile()
     minimap_options->addLabel( core::stringw(_("Centered")));
     minimap_options->m_properties[GUIEngine::PROP_MIN_VALUE] = "0";
 
-    bool multitouch_enabled = (UserConfigParams::m_multitouch_active == 1 &&
-                               irr_driver->getDevice()->supportsTouchDevice()) ||
-                               UserConfigParams::m_multitouch_active > 1;
+    bool multitouch_enabled = irr_driver->isMultitouchEnabled();
 
     if (multitouch_enabled && UserConfigParams::m_multitouch_draw_gui)
         minimap_options->m_properties[GUIEngine::PROP_MIN_VALUE] = "1";
@@ -207,9 +205,7 @@ void OptionsScreenUI::init()
     GUIEngine::SpinnerWidget* minimap_options = getWidget<GUIEngine::SpinnerWidget>("minimap");
     assert( minimap_options != NULL );
 
-    bool multitouch_enabled = (UserConfigParams::m_multitouch_active == 1 &&
-                               irr_driver->getDevice()->supportsTouchDevice()) ||
-                               UserConfigParams::m_multitouch_active > 1;
+    bool multitouch_enabled = irr_driver->isMultitouchEnabled();
 
     if (multitouch_enabled && UserConfigParams::m_multitouch_draw_gui &&
         UserConfigParams::m_minimap_display == 0)

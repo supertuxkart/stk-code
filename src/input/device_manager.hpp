@@ -141,6 +141,7 @@ public:
     MultitouchDevice*   getMultitouchDevice()    { return m_multitouch_device; }
     void                clearMultitouchDevices();
     void                updateMultitouchDevice();
+    void                updateMultitouchAvailability();
 
 
     /**

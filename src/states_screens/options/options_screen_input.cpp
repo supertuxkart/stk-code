@@ -181,9 +181,7 @@ void OptionsScreenInput::init()
     getWidget<ButtonWidget>("add_device")->setActive(!in_game);
     OptionsCommon::updatePauseTooltip(getWidget<ButtonWidget>("add_device"), in_game);
 
-    bool multitouch_enabled = (UserConfigParams::m_multitouch_active == 1 &&
-        irr_driver->getDevice()->supportsTouchDevice()) ||
-        UserConfigParams::m_multitouch_active > 1;
+    bool multitouch_enabled = irr_driver->isMultitouchEnabled();
     if (multitouch_enabled)
     {
         // I18N: In the input configuration screen, help for touch device

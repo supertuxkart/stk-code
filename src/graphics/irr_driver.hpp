@@ -312,6 +312,8 @@ public:
     // ------------------------------------------------------------------------
     /** Returns the irrlicht device. */
     IrrlichtDevice       *getDevice()       const { return m_device;        }
+    bool                  isMultitouchEnabled() const;
+    bool                  isTouchOnlyDevice() const;
     // ------------------------------------------------------------------------
     /** Returns the irrlicht video driver. */
     video::IVideoDriver  *getVideoDriver()  const { return m_video_driver;  }

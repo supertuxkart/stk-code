@@ -2476,7 +2476,7 @@ int main(int argc, char *argv[])
                 // doesn't have
                 android_tv = SDL_IsAndroidTV();
 #endif
-                if (!android_tv && irr_driver->getDevice()->supportsTouchDevice())
+                if (!android_tv && irr_driver->isMultitouchEnabled())
                 {
                     InitAndroidDialog* init_android = new InitAndroidDialog(
                                                                     0.8f, 0.8f);

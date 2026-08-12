@@ -20,6 +20,7 @@
 #include "challenges/story_mode_timer.hpp"
 #include "config/player_manager.hpp"
 #include "config/user_config.hpp"
+#include "input/linux_touch_detect.hpp"
 #include "font/bold_face.hpp"
 #include "font/digit_face.hpp"
 #include "font/font_manager.hpp"
@@ -402,6 +403,31 @@ void IrrDriver::createListOfVideoModes()
         }   // if depth >=24
     }   // for i < video modes count
 }   // createListOfVideoModes
+
+bool IrrDriver::isTouchOnlyDevice() const
+{
+#if defined(ANDROID) || defined(IOS_STK)
+    return true;
+#else
+    if (m_device && m_device->supportsTouchDevice() &&
+        !m_device->hasHardwareKeyboard())
+        return true;
+    return LinuxTouchDetect::isTouchOnly();
+#endif
+}
+
+bool IrrDriver::isMultitouchEnabled() const
+{
+    if (UserConfigParams::m_multitouch_active == 0)
+        return false;
+    if (UserConfigParams::m_multitouch_active > 1)
+        return true;
+    if (!m_device || !m_device->supportsTouchDevice())
+        return false;
+    if (UserConfigParams::m_multitouch_touch_only && !isTouchOnlyDevice())
+        return false;
+    return true;
+}
 
 // --------------------------------------------------------------------------------------------
 /** This creates the actualy OpenGL device. This is called

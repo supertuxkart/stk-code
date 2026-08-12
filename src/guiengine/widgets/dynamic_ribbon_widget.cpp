@@ -713,9 +713,7 @@ EventPropagation DynamicRibbonWidget::mouseHovered(Widget* child, const int play
 
     updateLabel();
 
-    bool multitouch_enabled = (UserConfigParams::m_multitouch_active == 1 &&
-                               irr_driver->getDevice()->supportsTouchDevice()) ||
-                               UserConfigParams::m_multitouch_active > 1;
+    bool multitouch_enabled = irr_driver->isMultitouchEnabled();
     // For now disable it to fix the weird "triangle selection" for touch
     // screen
     if (!multitouch_enabled)

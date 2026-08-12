@@ -91,9 +91,7 @@ bool DeviceManager::initialize()
         m_keyboards.push_back(new KeyboardDevice(m_keyboard_configs.get(n)));
     }
 
-    if ((UserConfigParams::m_multitouch_active == 1 &&
-        irr_driver->getDevice()->supportsTouchDevice()) ||
-        UserConfigParams::m_multitouch_active > 1)
+    if (irr_driver->isMultitouchEnabled())
     {
         m_multitouch_device = new MultitouchDevice();
     }
@@ -120,6 +118,15 @@ void DeviceManager::clearMultitouchDevices()
     delete m_multitouch_device;
     m_multitouch_device = NULL;
 }   // clearMultitouchDevices
+
+void DeviceManager::updateMultitouchAvailability()
+{
+    const bool want = irr_driver->isMultitouchEnabled();
+    if (want && m_multitouch_device == NULL)
+        m_multitouch_device = new MultitouchDevice();
+    else if (!want && m_multitouch_device != NULL)
+        clearMultitouchDevices();
+}   // updateMultitouchAvailability
 
 // -----------------------------------------------------------------------------
 void DeviceManager::setAssignMode(const PlayerAssignMode assignMode)

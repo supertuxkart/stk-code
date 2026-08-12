@@ -19,6 +19,7 @@
 
 #include "audio/sfx_manager.hpp"
 #include "config/user_config.hpp"
+#include "graphics/irr_driver.hpp"
 #include <ge_render_info.hpp>
 #include "guiengine/widgets/bubble_widget.hpp"
 #include "guiengine/widgets/button_widget.hpp"
@@ -112,9 +113,7 @@ void SoccerSetupScreen::eventCallback(Widget* widget, const std::string& name,
 // -----------------------------------------------------------------------------
 void SoccerSetupScreen::beforeAddingWidget()
 {
-    bool multitouch_enabled = (UserConfigParams::m_multitouch_active == 1 &&
-        irr_driver->getDevice()->supportsTouchDevice()) ||
-        UserConfigParams::m_multitouch_active > 1;
+    bool multitouch_enabled = irr_driver->isMultitouchEnabled();
 
     // If a device doesn't use the multitouch GUI, it supports some form of left/right input
     // The original message is safer, as some devices are incorrectly reported as touch enabled.

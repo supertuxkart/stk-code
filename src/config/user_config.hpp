@@ -539,6 +539,11 @@ namespace UserConfigParams
             &m_multitouch_group,
             "Enable multitouch support: 0 = disabled, 1 = if available, 2 = enabled") );
 
+    PARAM_PREFIX BoolUserConfigParam         m_multitouch_touch_only
+            PARAM_DEFAULT( BoolUserConfigParam(false, "multitouch_touch_only",
+            &m_multitouch_group,
+            "When multitouch_active is 1 (auto), enable only on touch-only devices (touchscreen and no physical keyboard)"));
+
     PARAM_PREFIX BoolUserConfigParam         m_multitouch_draw_gui
             PARAM_DEFAULT( BoolUserConfigParam(false, "multitouch_draw_gui",
             &m_multitouch_group,

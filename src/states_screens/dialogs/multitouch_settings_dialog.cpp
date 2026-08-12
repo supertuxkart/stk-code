@@ -96,6 +96,20 @@ void MultitouchSettingsDialog::beforeAddingWidgets()
         buttons_en->setActive(false);
     }
 
+    SpinnerWidget* mode = getWidget<SpinnerWidget>("multitouch_active");
+    if (mode != NULL)
+    {
+        mode->clearLabels();
+        //I18N: In the multitouch settings screen
+        mode->addLabel(_("Off"));
+        //I18N: In the multitouch settings screen
+        mode->addLabel(_("Auto"));
+        //I18N: In the multitouch settings screen
+        mode->addLabel(_("Always"));
+        mode->m_properties[PROP_MIN_VALUE] = "0";
+        mode->m_properties[PROP_MAX_VALUE] = "2";
+    }
+
     updateValues();
 }
 
@@ -151,6 +165,14 @@ GUIEngine::EventPropagation MultitouchSettingsDialog::processEvent(
             assert(buttons_en != NULL);
             UserConfigParams::m_multitouch_draw_gui = buttons_en->getState();
 
+            SpinnerWidget* mode = getWidget<SpinnerWidget>("multitouch_active");
+            if (mode != NULL)
+                UserConfigParams::m_multitouch_active = mode->getValue();
+
+            CheckBoxWidget* touch_only = getWidget<CheckBoxWidget>("touch_only");
+            if (touch_only != NULL)
+                UserConfigParams::m_multitouch_touch_only = touch_only->getState();
+
             CheckBoxWidget* buttons_inv = getWidget<CheckBoxWidget>("buttons_inverted");
             assert(buttons_inv != NULL);
             UserConfigParams::m_multitouch_inverted = buttons_inv->getState();
@@ -187,6 +209,8 @@ GUIEngine::EventPropagation MultitouchSettingsDialog::processEvent(
                 touch_device->updateConfigParams();
             }
 
+            input_manager->getDeviceManager()->updateMultitouchAvailability();
+
             if (World::getWorld() && World::getWorld()->getRaceGUI())
             {
                 World::getWorld()->getRaceGUI()->recreateGUI();
@@ -205,6 +229,9 @@ GUIEngine::EventPropagation MultitouchSettingsDialog::processEvent(
             UserConfigParams::m_multitouch_controls.revertToDefaults();
             UserConfigParams::m_multitouch_scale.revertToDefaults();
             UserConfigParams::m_multitouch_sensitivity_x.revertToDefaults();
+
+            UserConfigParams::m_multitouch_active.revertToDefaults();
+            UserConfigParams::m_multitouch_touch_only.revertToDefaults();
 
             if (StateManager::get()->getGameState() != GUIEngine::INGAME_MENU)
             {
@@ -254,6 +281,14 @@ void MultitouchSettingsDialog::updateValues()
     CheckBoxWidget* buttons_inv = getWidget<CheckBoxWidget>("buttons_inverted");
     assert(buttons_inv != NULL);
     buttons_inv->setState(UserConfigParams::m_multitouch_inverted);
+
+    SpinnerWidget* mode = getWidget<SpinnerWidget>("multitouch_active");
+    if (mode != NULL)
+        mode->setValue(UserConfigParams::m_multitouch_active);
+
+    CheckBoxWidget* touch_only = getWidget<CheckBoxWidget>("touch_only");
+    if (touch_only != NULL)
+        touch_only->setState(UserConfigParams::m_multitouch_touch_only);
 
     RibbonWidget* control_type = getWidget<RibbonWidget>("control_type");
     assert(control_type != NULL);

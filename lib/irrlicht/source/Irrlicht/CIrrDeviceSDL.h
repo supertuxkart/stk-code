@@ -106,6 +106,8 @@ class MoltenVK;
 
 		virtual bool supportsTouchDevice() const;
 
+		virtual bool hasHardwareKeyboard() const;
+
 		//! Get the device type
 		virtual E_DEVICE_TYPE getType() const
 		{
