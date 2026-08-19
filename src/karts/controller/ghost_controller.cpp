@@ -38,6 +38,19 @@ void GhostController::reset()
 void GhostController::update(int ticks)
 {
     m_current_time = World::getWorld()->getTime();
+
+    // This has been done to make the class keep the promise that was
+    // documented in the ghost_controller header.
+    // Consequently, this allows for replay seeking to be implemented.
+    // It is safe because it only triggers when a backwards clock
+    // movement occurs, which is impossible in regular play as forward
+    // playback only ever increases the clock.
+    while (m_current_index > 0 &&
+           m_all_times[m_current_index] > m_current_time)
+    {
+        m_current_index--;
+    }
+
     // Find (if necessary) the next index to use
     if (m_current_time != 0.0f)
     {

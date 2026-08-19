@@ -138,6 +138,13 @@ void GhostKart::update(int ticks)
             // Start showing the ghost when it start racing
             m_node->setVisible(true);
         }
+	else
+        {
+            // When a replay ends, the node is hidden and nothing in
+	    // watch-replay mode restores it. GFX and sound recover
+	    // by themselves so there's no need to restore them.
+            m_node->setVisible(true);
+        }
     }
 
     const float rd         = gc->getReplayDelta();
