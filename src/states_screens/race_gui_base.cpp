@@ -584,7 +584,7 @@ void RaceGUIBase::renderPlayerView(const Camera *camera, float dt)
     
     if (m_multitouch_gui != NULL && !GUIEngine::ModalDialog::isADialogActive())
     {
-        m_multitouch_gui->draw(kart, viewport, scaling);
+        m_multitouch_gui->draw(kart, viewport, scaling, dt);
     }
 }   // renderPlayerView
 

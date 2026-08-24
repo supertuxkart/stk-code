@@ -33,6 +33,7 @@ using namespace irr;
 
 class AbstractKart;
 class MultitouchDevice;
+class RaceManager;
 class RaceGUIBase;
 
 class RaceGUIMultitouch
@@ -43,6 +44,7 @@ private:
     
     bool m_gui_action;
     bool m_is_spectator_mode;
+    bool m_is_watching_replay;
     unsigned int m_height;
     
     video::ITexture* m_steering_wheel_tex;
@@ -65,6 +67,7 @@ private:
 
     void init();
     void createRaceGUI();
+	void createWatchingGUI();
     void createSpectatorGUI();
     void close();
     static void onCustomButtonPress(unsigned int button_id, bool pressed);
@@ -74,7 +77,7 @@ public:
     ~RaceGUIMultitouch();
 
     void draw(const AbstractKart* kart, const core::recti &viewport,
-              const core::vector2df &scaling);
+              const core::vector2df &scaling, float dt);
                                 
     unsigned int getHeight() {return m_height;}
     bool isSpectatorMode() {return m_is_spectator_mode;}

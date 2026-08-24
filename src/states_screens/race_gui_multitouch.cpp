@@ -34,6 +34,7 @@ using namespace irr;
 #include "karts/abstract_kart.hpp"
 #include "karts/controller/kart_control.hpp"
 #include "network/protocols/client_lobby.hpp"
+#include "race/race_manager.hpp"
 #include "states_screens/race_gui_base.hpp"
 
 #include <IrrlichtDevice.h>
@@ -46,6 +47,7 @@ RaceGUIMultitouch::RaceGUIMultitouch(RaceGUIBase* race_gui)
     m_race_gui = race_gui;
     m_gui_action = false;
     m_is_spectator_mode = false;
+    m_is_watching_replay = false;
     m_height = 0;
     m_steering_wheel_tex = NULL;
     m_steering_wheel_tex_mask_up = NULL;
@@ -164,11 +166,17 @@ void RaceGUIMultitouch::init()
                                         "android/steering_wheel_mask_down.png");
 
     auto cl = LobbyProtocol::get<ClientLobby>();
-    
+    auto rm = RaceManager::get()->isWatchingReplay();
+
     if (cl && cl->isSpectator())
     {
         createSpectatorGUI();
         m_is_spectator_mode = true;
+    }
+    else if (rm)
+    {
+		createWatchingGUI();
+        m_is_watching_replay = true;
     }
     else
     {
@@ -272,6 +280,32 @@ void RaceGUIMultitouch::createRaceGUI()
 } // createRaceGUI
 
 //-----------------------------------------------------------------------------
+/** Determines the look of multitouch watching GUI interface (for replay watching)
+ */
+void RaceGUIMultitouch::createWatchingGUI()
+{
+    if (m_device == NULL)
+        return;
+        
+    const float scale = UserConfigParams::m_multitouch_scale;
+
+    const int h = irr_driver->getActualScreenSize().Height;
+    const float btn_size = 0.125f * h * scale;
+    const float margin = 0.075f * h * scale;
+    const float margin_top = 0.3f * h;
+
+    const float small_ratio = 0.75f;
+    const float btn_small_size = small_ratio * btn_size;
+    const float margin_small = small_ratio * margin;
+    
+    m_height = (unsigned int)(btn_size + 2 * margin);
+    
+    m_device->addButton(BUTTON_ESCAPE,
+                        int(margin_top), int(margin_small),
+                        int(btn_small_size), int(btn_small_size));
+} // createWatchingGUI
+
+//-----------------------------------------------------------------------------
 /** Determines the look of spectator GUI interface
  */
 void RaceGUIMultitouch::createSpectatorGUI()
@@ -356,7 +390,8 @@ void RaceGUIMultitouch::onCustomButtonPress(unsigned int button_id,
  */
 void RaceGUIMultitouch::draw(const AbstractKart* kart,
                              const core::recti &viewport,
-                             const core::vector2df &scaling)
+                             const core::vector2df &scaling,
+                             float dt)
 {
 #ifndef SERVER_ONLY
     if (m_device == NULL)
@@ -550,6 +585,10 @@ void RaceGUIMultitouch::draw(const AbstractKart* kart,
                 font->setScale(1.0f);
                 font->setBlackBorder(false);
             }
+			if (m_is_watching_replay)
+			{
+				m_race_gui->drawSpeedEnergyRank(kart, viewport, scaling, dt);
+			}
         }
     }
 #endif

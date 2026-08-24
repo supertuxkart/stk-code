@@ -263,9 +263,12 @@ public:
     void drawPlayerIcon(AbstractKart *kart, int x, int y, int w,
                         bool is_local);
     
-    virtual void drawEnergyMeter(int x, int y, const AbstractKart *kart,
-                                 const core::recti &viewport,
-                                 const core::vector2df &scaling) {};
+    virtual void drawEnergyMeter    (int x, int y, const AbstractKart *kart,
+                                     const core::recti &viewport,
+                                     const core::vector2df &scaling) {};
+	virtual void drawSpeedEnergyRank(const AbstractKart* kart,
+									 const core::recti &viewport,
+								     const core::vector2df &scaling, float dt) {};
 
     void cleanupMessages(const float dt);
     void removeReferee();
