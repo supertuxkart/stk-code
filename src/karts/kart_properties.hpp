@@ -425,6 +425,7 @@ public:
     float getZipperSpeedGain() const;
     float getZipperMaxSpeedIncrease() const;
     float getZipperFadeOutTime() const;
+    float getZipperOffRoadBonus() const;
 
     float getSwatterDuration() const;
     float getSwatterDistance() const;
@@ -445,6 +446,7 @@ public:
     float getElectroEngineMult() const;
     float getElectroMaxSpeedIncrease() const;
     float getElectroFadeOutTime() const;
+    float getElectroOffRoadBonus() const;
 
     std::vector<float> getStartupTime() const;
     std::vector<float> getStartupBoost() const;
@@ -504,6 +506,7 @@ public:
     float getSkidReduceTurnMin() const;
     float getSkidReduceTurnMax() const;
     bool getSkidEnabled() const;
+    std::vector<float> getSkidOffRoadBonus() const;
 
     /* <characteristics-end kpdefs> */
     

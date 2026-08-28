@@ -152,6 +152,7 @@ public:
         ZIPPER_SPEED_GAIN,
         ZIPPER_MAX_SPEED_INCREASE,
         ZIPPER_FADE_OUT_TIME,
+        ZIPPER_OFF_ROAD_BONUS,
 
         // Swatter
         SWATTER_DURATION,
@@ -176,6 +177,7 @@ public:
         ELECTRO_ENGINE_MULT,
         ELECTRO_MAX_SPEED_INCREASE,
         ELECTRO_FADE_OUT_TIME,
+        ELECTRO_OFF_ROAD_BONUS,
 
         // Startup
         STARTUP_TIME,
@@ -241,9 +243,9 @@ public:
         SKID_REDUCE_TURN_MIN,
         SKID_REDUCE_TURN_MAX,
         SKID_ENABLED,
+        SKID_OFF_ROAD_BONUS,
 
         /* <characteristics-end enum> */
-
 
         // Count
         CHARACTERISTIC_COUNT
@@ -345,6 +347,7 @@ public:
     float getZipperSpeedGain() const;
     float getZipperMaxSpeedIncrease() const;
     float getZipperFadeOutTime() const;
+    float getZipperOffRoadBonus() const;
 
     float getSwatterDuration() const;
     float getSwatterDistance() const;
@@ -365,6 +368,7 @@ public:
     float getElectroEngineMult() const;
     float getElectroMaxSpeedIncrease() const;
     float getElectroFadeOutTime() const;
+    float getElectroOffRoadBonus() const;
 
     std::vector<float> getStartupTime() const;
     std::vector<float> getStartupBoost() const;
@@ -424,6 +428,7 @@ public:
     float getSkidReduceTurnMin() const;
     float getSkidReduceTurnMax() const;
     bool getSkidEnabled() const;
+    std::vector<float> getSkidOffRoadBonus() const;
 
     /* <characteristics-end acdefs> */
 };

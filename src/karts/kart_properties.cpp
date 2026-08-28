@@ -1077,6 +1077,12 @@ float KartProperties::getZipperFadeOutTime() const
 }  // getZipperFadeOutTime
 
 // ----------------------------------------------------------------------------
+float KartProperties::getZipperOffRoadBonus() const
+{
+    return m_cached_characteristic->getZipperOffRoadBonus();
+}  // getZipperOffRoadBonus
+
+// ----------------------------------------------------------------------------
 float KartProperties::getSwatterDuration() const
 {
     return m_cached_characteristic->getSwatterDuration();
@@ -1171,6 +1177,12 @@ float KartProperties::getElectroFadeOutTime() const
 {
     return m_cached_characteristic->getElectroFadeOutTime();
 }  // getElectroFadeOutTime
+
+// ----------------------------------------------------------------------------
+float KartProperties::getElectroOffRoadBonus() const
+{
+    return m_cached_characteristic->getElectroOffRoadBonus();
+}  // getElectroOffRoadBonus
 
 // ----------------------------------------------------------------------------
 std::vector<float> KartProperties::getStartupTime() const
@@ -1489,6 +1501,12 @@ bool KartProperties::getSkidEnabled() const
 {
     return m_cached_characteristic->getSkidEnabled();
 }  // getSkidEnabled
+
+// ----------------------------------------------------------------------------
+std::vector<float> KartProperties::getSkidOffRoadBonus() const
+{
+    return m_cached_characteristic->getSkidOffRoadBonus();
+}  // getSkidOffRoadBonus
 
 
 /* <characteristics-end kpgetter> */

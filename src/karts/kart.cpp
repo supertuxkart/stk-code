@@ -2090,18 +2090,31 @@ void Kart::update(int ticks)
             // - The purple drift gets a 20% reduction, which is low enough that intentionally
             //   going through a wide off-road area is ineffective. It allows however to
             //   calibrate jump ramps that need a pruple drift + nitro boost to take.
-            // TODO : Make the values configurable in kart_characteristics.xml
-            //        Do not forget that only the strongest effect should be applied,
-            //        and we cannot assume which is strongest when pulling from config.
+            //
+            // Yellow and red drifts do not give any off-road bonus by default, but the code
+            // checks them so that setting non-zero values in the config file (where the
+            // parameters must exist to handle purple skidding) works.
             // TODO : Add a visual effect when driving off-road with an off-road bonus
 
-            float terrain_speed_fraction = material->getMaxSpeedFraction();
+            // Note that the off-road bonus continues being applied during max-speed fade-out.
+            float off_road_bonus = 0.0f;
             if (m_max_speed->isSpeedIncreaseActive(MaxSpeed::MS_INCREASE_ZIPPER) > 0)
-                terrain_speed_fraction += (1.0f - terrain_speed_fraction) * 0.5f;
-            else if (m_max_speed->isSpeedIncreaseActive(MaxSpeed::MS_INCREASE_ELECTRO) > 0)
-                terrain_speed_fraction += (1.0f - terrain_speed_fraction) * 0.35f;
-            else if (m_max_speed->isSpeedIncreaseActive(MaxSpeed::MS_INCREASE_PURPLE_SKIDDING) > 0)
-                terrain_speed_fraction += (1.0f - terrain_speed_fraction) * 0.2f;
+                off_road_bonus = std::max(off_road_bonus, m_kart_properties->getZipperOffRoadBonus());
+            if (m_max_speed->isSpeedIncreaseActive(MaxSpeed::MS_INCREASE_ELECTRO) > 0)
+                off_road_bonus = std::max(off_road_bonus, m_kart_properties->getElectroOffRoadBonus());
+            if (m_max_speed->isSpeedIncreaseActive(MaxSpeed::MS_INCREASE_SKIDDING) > 0)
+                off_road_bonus = std::max(off_road_bonus, m_kart_properties->getSkidOffRoadBonus()[0]);
+            if (m_max_speed->isSpeedIncreaseActive(MaxSpeed::MS_INCREASE_RED_SKIDDING) > 0)
+                off_road_bonus = std::max(off_road_bonus, m_kart_properties->getSkidOffRoadBonus()[1]);
+            if (m_max_speed->isSpeedIncreaseActive(MaxSpeed::MS_INCREASE_PURPLE_SKIDDING) > 0)
+                off_road_bonus = std::max(off_road_bonus, m_kart_properties->getSkidOffRoadBonus()[2]);
+
+            // Cap the maximum off-road bonus to 100%
+            if (off_road_bonus > 1.0f)
+                off_road_bonus = 1.0f;
+
+            float terrain_speed_fraction = material->getMaxSpeedFraction();
+            terrain_speed_fraction += (1.0f - terrain_speed_fraction) * off_road_bonus;
             
             m_max_speed->setSlowdown(MaxSpeed::MS_DECREASE_TERRAIN,
                                      terrain_speed_fraction,

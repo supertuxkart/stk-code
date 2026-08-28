@@ -163,6 +163,8 @@ AbstractCharacteristic::ValueType AbstractCharacteristic::getType(
         return TYPE_FLOAT;
     case ZIPPER_FADE_OUT_TIME:
         return TYPE_FLOAT;
+    case ZIPPER_OFF_ROAD_BONUS:
+        return TYPE_FLOAT;
     case SWATTER_DURATION:
         return TYPE_FLOAT;
     case SWATTER_DISTANCE:
@@ -194,6 +196,8 @@ AbstractCharacteristic::ValueType AbstractCharacteristic::getType(
     case ELECTRO_MAX_SPEED_INCREASE:
         return TYPE_FLOAT;
     case ELECTRO_FADE_OUT_TIME:
+        return TYPE_FLOAT;
+    case ELECTRO_OFF_ROAD_BONUS:
         return TYPE_FLOAT;
     case STARTUP_TIME:
         return TYPE_FLOAT_VECTOR;
@@ -301,6 +305,8 @@ AbstractCharacteristic::ValueType AbstractCharacteristic::getType(
         return TYPE_FLOAT;
     case SKID_ENABLED:
         return TYPE_BOOL;
+    case SKID_OFF_ROAD_BONUS:
+        return TYPE_FLOAT_VECTOR;
 
     /* <characteristics-end getType> */
     }   // switch (type)
@@ -429,6 +435,8 @@ std::string AbstractCharacteristic::getName(CharacteristicType type)
         return "ZIPPER_MAX_SPEED_INCREASE";
     case ZIPPER_FADE_OUT_TIME:
         return "ZIPPER_FADE_OUT_TIME";
+    case ZIPPER_OFF_ROAD_BONUS:
+        return "ZIPPER_OFF_ROAD_BONUS";
     case SWATTER_DURATION:
         return "SWATTER_DURATION";
     case SWATTER_DISTANCE:
@@ -461,6 +469,8 @@ std::string AbstractCharacteristic::getName(CharacteristicType type)
         return "ELECTRO_MAX_SPEED_INCREASE";
     case ELECTRO_FADE_OUT_TIME:
         return "ELECTRO_FADE_OUT_TIME";
+    case ELECTRO_OFF_ROAD_BONUS:
+        return "ELECTRO_OFF_ROAD_BONUS";
     case STARTUP_TIME:
         return "STARTUP_TIME";
     case STARTUP_BOOST:
@@ -567,6 +577,8 @@ std::string AbstractCharacteristic::getName(CharacteristicType type)
         return "SKID_REDUCE_TURN_MAX";
     case SKID_ENABLED:
         return "SKID_ENABLED";
+    case SKID_OFF_ROAD_BONUS:
+        return "SKID_OFF_ROAD_BONUS";
 
     /* <characteristics-end getName> */
     }   // switch (type)
@@ -1228,6 +1240,18 @@ float AbstractCharacteristic::getZipperFadeOutTime() const
 }  // getZipperFadeOutTime
 
 // ----------------------------------------------------------------------------
+float AbstractCharacteristic::getZipperOffRoadBonus() const
+{
+    float result;
+    bool is_set = false;
+    process(ZIPPER_OFF_ROAD_BONUS, &result, &is_set);
+    if (!is_set)
+        Log::fatal("AbstractCharacteristic", "Can't get characteristic %s",
+                    getName(ZIPPER_OFF_ROAD_BONUS).c_str());
+    return result;
+}  // getZipperOffRoadBonus
+
+// ----------------------------------------------------------------------------
 float AbstractCharacteristic::getSwatterDuration() const
 {
     float result;
@@ -1418,6 +1442,18 @@ float AbstractCharacteristic::getElectroFadeOutTime() const
                     getName(ELECTRO_FADE_OUT_TIME).c_str());
     return result;
 }  // getElectroFadeOutTime
+
+// ----------------------------------------------------------------------------
+float AbstractCharacteristic::getElectroOffRoadBonus() const
+{
+    float result;
+    bool is_set = false;
+    process(ELECTRO_OFF_ROAD_BONUS, &result, &is_set);
+    if (!is_set)
+        Log::fatal("AbstractCharacteristic", "Can't get characteristic %s",
+                    getName(ELECTRO_OFF_ROAD_BONUS).c_str());
+    return result;
+}  // getElectroOffRoadBonus
 
 // ----------------------------------------------------------------------------
 std::vector<float> AbstractCharacteristic::getStartupTime() const
@@ -2054,6 +2090,19 @@ bool AbstractCharacteristic::getSkidEnabled() const
                     getName(SKID_ENABLED).c_str());
     return result;
 }  // getSkidEnabled
+
+// ----------------------------------------------------------------------------
+std::vector<float> AbstractCharacteristic::getSkidOffRoadBonus() const
+{
+    std::vector<float> result;
+    bool is_set = false;
+    process(SKID_OFF_ROAD_BONUS, &result, &is_set);
+    if (!is_set)
+        Log::fatal("AbstractCharacteristic", "Can't get characteristic %s",
+                    getName(SKID_OFF_ROAD_BONUS).c_str());
+    return result;
+}  // getSkidOffRoadBonus
+
 
 
 /* <characteristics-end acgetter> */

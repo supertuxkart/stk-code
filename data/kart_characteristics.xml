@@ -169,13 +169,21 @@
             min-speed: Minimum speed a kart must have before it can skid. Must be
                 >0, otherwise the kart can skid at the start of the race.
             time-till-bonus: How long a kart needs to skid in order to get a bonus.
+                It takes multiple values, one for each skidding level.
+                Please note that the executable also needs to support the requested
+                number of drifting bonuses for everything to work correctly.
+                Currently, the maximum number of supported levels is 3.
             bonus-speed: A speedup applied to the kart whick skidded for a while.
+                It takes multiple values, one for each skidding level.
             bonus-time: How long the bonus-force is applied.
+                It takes multiple values, one for each skidding level. 
             fade-out-time: How long will the max-speed bonus take to fade out.
                 The additional engine force is not active during fade-out.
+                It takes multiple values, one for each skidding level. 
             bonus-force: Additional engine force (this is used to offset the fact
                 that turning after skidding (e.g. to correct direction) often uses
                 up the skid bonus).
+                It takes multiple values, one for each skidding level. 
             post-skid-rotate-factor: a factor to be used to determine how much
                 the chassis of a kart should rotate to match the graphical view.
                 A factor of 1 is identical, a smaller factor will rotate the kart
@@ -190,7 +198,12 @@
                 is active (for left turn, right turn will use [-max, -min]). The
                 effect is that while you skid (say left) you can adjust the direction
                 of the turn the kart is doing somewhat by steering to the left and right,
-                but you will always keep on doing a left turn, just more or less. -->
+                but you will always keep on doing a left turn, just more or less.
+            off-road-bonus: determines how much of the off-road penalty is erased.
+                0.0 does nothing at all, 1.0 removes the entire penalty.
+                It takes multiple values, one for each skidding level.
+                Note that off-road bonuses are not cumulative, only the strongest
+                currently active one is taken into account.  -->
         <skid increase="1.05" decrease="0.95" max="2.5" time-till-max="0.5"
               visual="1.25" visual-time="0.7" revert-visual-time="0.7"
               min-speed="10"  time-till-bonus="1.0 2.7 4.0"
@@ -198,7 +211,8 @@
               fade-out-time="0.9 1.1 1.3" bonus-force="100 220 400"
               physical-jump-time="0" graphical-jump-time="0.4"
               post-skid-rotate-factor="1" steer-factor="0.6"
-              reduce-turn-min="0.2" reduce-turn-max="0.895" enabled="true" />
+              reduce-turn-min="0.2" reduce-turn-max="0.895" enabled="true"
+              off-road-bonus="0.0 0.0 0.2" />
 
         <!-- Camera
             Distance between kart and camera.
@@ -272,9 +286,14 @@
             max-speed-increase: Additional speed allowed on top of the
                 kart-specific maximum kart speed.
             fade-out-time: determines how long it takes for a zipper
-                to fade out (after 'time'). -->
+                to fade out (after 'time').
+            off-road-bonus: determines how much of the off-road penalty is erased.
+                0.0 does nothing at all, 1.0 removes the entire penalty.
+                Note that off-road bonuses are not cumulative, only the strongest
+                currently active one is taken into account.
+                Note also that ground zippers provide no off-road bonus. -->
         <zipper duration="3.2" force="350.0" speed-gain="4.0" max-speed-increase="12"
-                fade-out-time="1.2" />
+                fade-out-time="1.2" off-road-bonus="0.5"/>
 
         <!-- Swatter
             duration: How long can the swatter be active.
@@ -308,9 +327,13 @@
             max-speed-increase: Additional speed allowed on top of the
                 kart-specific maximum kart speed.
             fade-out-time: determines how long it takes for the electro-shield's
-                speed boost to fade out (after 'duration'). -->
+                speed boost to fade out (after 'duration').
+            off-road-bonus: determines how much of the off-road penalty is erased.
+                0.0 does nothing at all, 1.0 removes the entire penalty.
+                Note that off-road bonuses are not cumulative, only the strongest
+                currently active one is taken into account. -->
         <electro duration="8.0" engine-mult="1.5" max-speed-increase="3.0"
-                fade-out-time="0.5" />
+                fade-out-time="0.5" off-road-bonus="0.35" />
 
         <!-- ********** Miscellaneous ********** -->
 

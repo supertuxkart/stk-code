@@ -479,6 +479,8 @@ void XmlCharacteristic::load(const XMLNode *node)
             &m_values[ZIPPER_MAX_SPEED_INCREASE]);
         sub_node->get("fade-out-time",
             &m_values[ZIPPER_FADE_OUT_TIME]);
+        sub_node->get("off-road-bonus",
+            &m_values[ZIPPER_OFF_ROAD_BONUS]);
     }
 
     if (const XMLNode *sub_node = node->getNode("swatter"))
@@ -527,6 +529,8 @@ void XmlCharacteristic::load(const XMLNode *node)
             &m_values[ELECTRO_MAX_SPEED_INCREASE]);
         sub_node->get("fade-out-time",
             &m_values[ELECTRO_FADE_OUT_TIME]);
+        sub_node->get("off-road-bonus",
+            &m_values[ELECTRO_OFF_ROAD_BONUS]);
     }
 
     if (const XMLNode *sub_node = node->getNode("startup"))
@@ -657,6 +661,8 @@ void XmlCharacteristic::load(const XMLNode *node)
             &m_values[SKID_REDUCE_TURN_MAX]);
         sub_node->get("enabled",
             &m_values[SKID_ENABLED]);
+        sub_node->get("off-road-bonus",
+            &m_values[SKID_OFF_ROAD_BONUS]);
     }
 
 
