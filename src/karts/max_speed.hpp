@@ -21,15 +21,45 @@
 
 #include "utils/types.hpp"
 #include <limits>
+#include <vector>
 
 /** \defgroup karts */
 
 class Kart;
 class BareNetworkString;
+class IBoostObserver;
 
 class MaxSpeed
 {
 friend class KartRewinder;
+
+private:
+    // ========================================================================
+    // Boost Observer Pattern - Global observer registry
+    // ========================================================================
+    /** Global list of boost observers. All observers receive events from any kart. */
+    static std::vector<IBoostObserver*> s_boost_observers;
+
+    /** Tracks previous frame activation state for edge detection (per category). */
+    bool m_prev_active[10];  // Sized for MS_INCREASE_MAX categories
+
+    /** Notifies all registered observers of a boost activation.
+     *  Called on rising edge (inactive -> active) only. */
+    void notifyBoostActivation(unsigned int category, float add_speed, int duration);
+
+public:
+    // ========================================================================
+    // Boost Observer Registration (static - applies to all MaxSpeed instances)
+    // ========================================================================
+    /** Register an observer to receive boost activation events from all karts. */
+    static void addBoostObserver(IBoostObserver* observer);
+
+    /** Unregister an observer. Call this before destroying the observer. */
+    static void removeBoostObserver(IBoostObserver* observer);
+
+    /** Clear all observers. Called during cleanup. */
+    static void clearBoostObservers();
+
 public:
     /** The categories to use for increasing the speed of a kart:
      *  Increase due to zipper, slipstream, nitro, rubber band,

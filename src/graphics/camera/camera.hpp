@@ -122,6 +122,13 @@ private:
     /** List of all cameras. */
     static std::vector<Camera*> m_all_cameras;
 
+    // Dynamic FoV variables for speed boost effect
+    float m_base_fov;
+
+    float m_current_fov;
+    
+    float m_target_fov;
+
 protected:
     /** The camera scene node. */
     scene::ICameraSceneNode *m_camera;
@@ -247,6 +254,10 @@ public:
     Vec3 getXYZ() { return Vec3(m_camera->getPosition()); }
     // ------------------------------------------------------------------------
     void setupCamera();
+
+    void updateDynamicFoV(float dt, float speed_ratio, bool boost_active);
+
+    float getCurrentFoV() const { return m_current_fov; }
 };   // class Camera
 
 #endif
