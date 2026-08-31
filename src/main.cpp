@@ -2141,7 +2141,8 @@ void askForInternetPermission()
     MessageDialog *dialog =
     new MessageDialog(_("SuperTuxKart may connect to a server "
         "to download add-ons and notify you of updates.") + L"\n\n"
-        + _("Please read our privacy policy at %s.", "https://supertuxkart.net/Privacy")
+        + _("Please read our privacy policy at %s.",
+            StringUtils::utf8ToWide(stk_config->m_privacy_url))
         + L"\n\n" + _("Would you like this feature to be enabled? (To change this setting "
         "at a later time, go to options, select tab "
         "'General', and edit \"Connect to the Internet\")."),

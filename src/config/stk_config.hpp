@@ -231,6 +231,8 @@ public:
     std::string m_stk_website_url;
     std::string m_donate_url;
     std::string m_password_reset_url;
+    std::string m_terms_url;
+    std::string m_privacy_url;
     std::string m_assets_download_url;
 
     /* SRV records for stun server lists created */
