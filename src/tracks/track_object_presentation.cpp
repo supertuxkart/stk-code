@@ -546,7 +546,7 @@ void TrackObjectPresentationMesh::init(const XMLNode* xml_node,
             enabled = false;
             m_force_always_hidden = true;
             Track *track = Track::getCurrentTrack();
-            if (track && track && xml_node)
+            if (track && xml_node)
                 track->addPhysicsOnlyNode(m_node);
         }
     }
@@ -588,7 +588,7 @@ void TrackObjectPresentationMesh::init(const XMLNode* xml_node,
         node->useAnimationSet(0);
 
         Track *track = Track::getCurrentTrack();
-        if (track && track && xml_node)
+        if (track && xml_node)
             track->handleAnimatedTextures(m_node, *xml_node);
         Track::uploadNodeVertexBuffer(node);
     }
