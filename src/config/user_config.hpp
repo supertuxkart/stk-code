@@ -488,7 +488,7 @@ namespace UserConfigParams
             PARAM_DEFAULT(  IntUserConfigParam(0, "soccer-blue-ai-num",
             &m_race_setup_group, "Number of blue AI karts in soccer mode.") );
     PARAM_PREFIX BoolUserConfigParam          m_karts_powerup_gui
-            PARAM_DEFAULT(  BoolUserConfigParam(false, "karts-powerup-gui",
+            PARAM_DEFAULT(  BoolUserConfigParam(true, "karts-powerup-gui",
             &m_race_setup_group, "Show other karts' held powerups in race gui.") );
     PARAM_PREFIX BoolUserConfigParam          m_soccer_player_list
             PARAM_DEFAULT(  BoolUserConfigParam(false, "soccer-player-list",

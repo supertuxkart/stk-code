@@ -231,6 +231,8 @@ void STKConfig::init_defaults()
     m_replay_dt                  = -100;
     m_donate_url                 = "";
     m_password_reset_url         = "";
+    m_terms_url                  = "";
+    m_privacy_url                = "";
     m_no_explosive_items_timeout = -100.0f;
     m_max_moveable_objects       = -100;
     m_solver_iterations          = -100;
@@ -558,6 +560,8 @@ void STKConfig::getAllData(const XMLNode * root)
         urls->get("stk-website", &m_stk_website_url);
         urls->get("donate", &m_donate_url);
         urls->get("password-reset", &m_password_reset_url);
+        urls->get("terms-and-conditions", &m_terms_url);
+        urls->get("privacy-policy", &m_privacy_url);
         urls->get("assets-download", &m_assets_download_url);
     }
 

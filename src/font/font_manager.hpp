@@ -87,6 +87,9 @@ private:
     /** Map type for each \ref FontWithFace with a index, save getting time in
      *  \ref getFont. */
     std::unordered_map<std::type_index, int> m_font_type_map;
+
+    void findURLPositions(std::vector<std::pair<int, int> >& http_pos,
+                          const char32_t* URL_code, const std::u32string& text);
 public:
     LEAK_CHECK()
     // ------------------------------------------------------------------------
