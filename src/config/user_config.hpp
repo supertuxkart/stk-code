@@ -591,6 +591,41 @@ namespace UserConfigParams
             &m_multitouch_group,
             "STK screen keyboard status: 0 = disabled, 1 = enabled") );
 
+    // ---- Multitouch GUI editor
+    PARAM_PREFIX GroupUserConfigParam        m_mt_gui_edit_group
+        PARAM_DEFAULT( GroupUserConfigParam("Multitouch GUI editor",
+                                            "Settings for the multitouch GUI") );
+
+    PARAM_PREFIX FloatUserConfigParam         m_steering_btn_pos_x
+            PARAM_DEFAULT( FloatUserConfigParam(15.0f, "steering_btn_pos_x",
+            &m_mt_gui_edit_group,
+            "A parameter in range [0, x.0] that determines "
+            "the horizontal position of the steering controls."));
+
+    PARAM_PREFIX FloatUserConfigParam         m_steering_btn_pos_y
+            PARAM_DEFAULT( FloatUserConfigParam(12.0f, "steering_btn_pos_y",
+            &m_mt_gui_edit_group,
+            "A parameter in range [0, x.0] that determines "
+            "the vertical position of the steering controls."));
+
+    PARAM_PREFIX FloatUserConfigParam         m_buttons_pos_x
+            PARAM_DEFAULT( FloatUserConfigParam(15.0f, "control_btn_pos_x",
+            &m_mt_gui_edit_group,
+            "A parameter in range [0, x.0] that determines "
+            "the horizontal position of the buttons controls."));
+
+    PARAM_PREFIX FloatUserConfigParam         m_buttons_pos_y
+            PARAM_DEFAULT( FloatUserConfigParam(12.0f, "control_btn_pos_y",
+            &m_mt_gui_edit_group,
+            "A parameter in range [0, x.0] that determines "
+            "the vertical position of the buttons controls."));
+
+    PARAM_PREFIX FloatUserConfigParam         m_buttons_spacing
+            PARAM_DEFAULT( FloatUserConfigParam(1.0f, "control_btn_spacing",
+            &m_mt_gui_edit_group,
+            "A parameter in range [0.5, 1.8] that determines "
+            "the spacing between the buttons controls."));
+
     // ---- GP start order
     PARAM_PREFIX GroupUserConfigParam        m_gp_start_order
             PARAM_DEFAULT( GroupUserConfigParam("GpStartOrder",
