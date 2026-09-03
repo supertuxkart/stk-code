@@ -100,7 +100,7 @@ int wiiuse_os_find(struct wiimote_t **wm, int max_wiimotes, int timeout)
 
         /* get the size of the data block required */
         i                   = SetupDiGetDeviceInterfaceDetail(device_info, &device_data, NULL, 0, &len, NULL);
-        detail_data         = (SP_DEVICE_INTERFACE_DETAIL_DATA)malloc(len);
+        detail_data         = (PSP_DEVICE_INTERFACE_DETAIL_DATA)malloc(len);
         detail_data->cbSize = sizeof(SP_DEVICE_INTERFACE_DETAIL_DATA);
 
         /* query the data for this device */
