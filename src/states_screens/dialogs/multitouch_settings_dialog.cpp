@@ -222,7 +222,9 @@ GUIEngine::EventPropagation MultitouchSettingsDialog::processEvent(
         }
         else if (selection == "edit")
         {
+            updateValues();
             new CustomGuiSettingsDialog(0.6f, 0.6f);
+            return GUIEngine::EVENT_BLOCK;
         }
     }
     return GUIEngine::EVENT_LET;
