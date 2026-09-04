@@ -1419,7 +1419,7 @@ namespace UserConfigParams
 
     PARAM_PREFIX IntUserConfigParam        m_local_username_length
             PARAM_DEFAULT( IntUserConfigParam(30, "local_username_length",
-                        "The limit of characters in the local usernames. "
+                        "The upper character limit for local usernames. "
                         "Change this at your own risk (of getting UI overflows).") );
 						
     PARAM_PREFIX StringUserConfigParam      m_commandline
