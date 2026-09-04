@@ -308,7 +308,8 @@ void RegisterScreen::doRegister()
         m_info_widget->setText(_("User name cannot be empty."), false);
         return;
     }
-    else if (local_name.size() > UserConfigParams::m_local_username_length) // Avoiding big names and overflows (but can be changed in user_config.xml)
+    // Avoid excessively long names to prevent various UI overflows (limit adjustable in config.xml)
+    else if (local_name.size() > UserConfigParams::m_local_username_length)
     {
     	m_info_widget->setErrorColor();
         m_info_widget->setText(_("User name cannot be too long."), false);
