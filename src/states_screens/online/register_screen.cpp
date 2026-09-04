@@ -305,14 +305,15 @@ void RegisterScreen::doRegister()
     if (local_name.empty())
     {
         m_info_widget->setErrorColor();
-        m_info_widget->setText(_("User name cannot be empty."), false);
+        m_info_widget->setText(_("Your username cannot be empty!"), false);
         return;
     }
     // Avoid excessively long names to prevent various UI overflows (limit adjustable in config.xml)
-    else if (local_name.size() > UserConfigParams::m_local_username_length)
+    else if (local_name.size() > (unsigned int)UserConfigParams::m_local_username_length)
     {
     	m_info_widget->setErrorColor();
-        m_info_widget->setText(_("User name cannot be too long."), false);
+        m_info_widget->setText(_("Your username cannot exceed %i characters (current: %i).",
+            UserConfigParams::m_local_username_length, (int)local_name.size()), false);
         return;
      }
 
