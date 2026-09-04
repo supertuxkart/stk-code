@@ -55,8 +55,8 @@ void CustomGuiSettingsDialog::beforeAddingWidgets()
     getWidget<SpinnerWidget>("steer_position_x")->setRange(0.0f, 20.0f, 0.1f);
     getWidget<SpinnerWidget>("steer_position_y")->setRange(0.0f, 20.0f, 0.1f);
 
-    getWidget<SpinnerWidget>("steer_position_x")->setFloatValue(UserConfigParams::m_steering_btn_pos_x);
-    getWidget<SpinnerWidget>("steer_position_y")->setFloatValue(UserConfigParams::m_steering_btn_pos_y);
+    getWidget<SpinnerWidget>("steer_position_x")->setFloatValue(UserConfigParams::m_steering_pos_x);
+    getWidget<SpinnerWidget>("steer_position_y")->setFloatValue(UserConfigParams::m_steering_pos_y);
 
     // Buttons editing
     getWidget<SpinnerWidget>("btns_position_x")->setRange(0.0f, 20.0f, 0.1f);
@@ -83,8 +83,8 @@ GUIEngine::EventPropagation CustomGuiSettingsDialog::processEvent(const std::str
         if (selection == "apply")
         {
             // Steering editing
-            UserConfigParams::m_steering_btn_pos_x = getWidget<SpinnerWidget>("steer_position_x")->getFloatValue();
-            UserConfigParams::m_steering_btn_pos_y = getWidget<SpinnerWidget>("steer_position_y")->getFloatValue();
+            UserConfigParams::m_steering_pos_x = getWidget<SpinnerWidget>("steer_position_x")->getFloatValue();
+            UserConfigParams::m_steering_pos_y = getWidget<SpinnerWidget>("steer_position_y")->getFloatValue();
 
             // Buttons editing
             UserConfigParams::m_buttons_pos_x = getWidget<SpinnerWidget>("btns_position_x")->getFloatValue();

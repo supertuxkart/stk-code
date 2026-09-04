@@ -596,13 +596,13 @@ namespace UserConfigParams
         PARAM_DEFAULT( GroupUserConfigParam("Multitouch GUI editor",
                                             "Settings for the multitouch GUI") );
 
-    PARAM_PREFIX FloatUserConfigParam         m_steering_btn_pos_x
+    PARAM_PREFIX FloatUserConfigParam         m_steering_pos_x
             PARAM_DEFAULT( FloatUserConfigParam(15.0f, "steering_btn_pos_x",
             &m_mt_gui_edit_group,
             "A parameter in range [0, x.0] that determines "
             "the horizontal position of the steering controls."));
 
-    PARAM_PREFIX FloatUserConfigParam         m_steering_btn_pos_y
+    PARAM_PREFIX FloatUserConfigParam         m_steering_pos_y
             PARAM_DEFAULT( FloatUserConfigParam(12.0f, "steering_btn_pos_y",
             &m_mt_gui_edit_group,
             "A parameter in range [0, x.0] that determines "
