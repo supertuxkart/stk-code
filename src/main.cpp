@@ -2097,6 +2097,9 @@ void initRest()
 
     RaceManager::get()->setTrack(UserConfigParams::m_last_track);
 
+    // Disable text input mode to prevent IMEs from eating inputs (see #5829)
+    // In SDL2, text input mode is on by default (it's off by default in SDL3)
+    SDL_StopTextInput();
 }   // initRest
 
 //=============================================================================
