@@ -268,15 +268,16 @@ LOCAL_MODULE       := irrlicht
 LOCAL_PATH         := .
 LOCAL_CPP_FEATURES += rtti exceptions
 LOCAL_SRC_FILES    := $(wildcard ../lib/irrlicht/source/Irrlicht/*.cpp)
-LOCAL_CFLAGS       := -I../lib/irrlicht/source/Irrlicht/ \
-                      -I../lib/irrlicht/include/         \
-                      -I../src                           \
-                      -Ideps-$(TARGET_ARCH_ABI)/libjpeg/ \
-                      -Ideps-$(TARGET_ARCH_ABI)/libpng/  \
-                      -Ideps-$(TARGET_ARCH_ABI)/zlib/    \
-                      -I../lib/sdl2/include/             \
-                      -I../lib/graphics_engine/include   \
-                      -DMOBILE_STK                       \
+LOCAL_CFLAGS       := -I../lib/irrlicht/source/Irrlicht/    \
+                      -I../lib/irrlicht/include/            \
+                      -I../src                              \
+                      -Ideps-$(TARGET_ARCH_ABI)/libjpeg/    \
+                      -Ideps-$(TARGET_ARCH_ABI)/libjpeg/src \
+                      -Ideps-$(TARGET_ARCH_ABI)/libpng/     \
+                      -Ideps-$(TARGET_ARCH_ABI)/zlib/       \
+                      -I../lib/sdl2/include/                \
+                      -I../lib/graphics_engine/include      \
+                      -DMOBILE_STK                          \
                       -DANDROID_PACKAGE_CALLBACK_NAME=$(PACKAGE_CALLBACK_NAME)
 LOCAL_CPPFLAGS     := -std=gnu++0x
 LOCAL_STATIC_LIBRARIES := libjpeg png zlib

@@ -2097,6 +2097,11 @@ void initRest()
 
     RaceManager::get()->setTrack(UserConfigParams::m_last_track);
 
+#if !defined(SERVER_ONLY) && defined(_IRR_COMPILE_WITH_SDL_DEVICE_)
+    // Disable text input mode to prevent IMEs from eating inputs (see #5829)
+    // In SDL2, text input mode is on by default (it's off by default in SDL3)
+    SDL_StopTextInput();
+#endif
 }   // initRest
 
 //=============================================================================

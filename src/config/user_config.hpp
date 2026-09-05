@@ -1452,6 +1452,11 @@ namespace UserConfigParams
                         "Enable all karts and tracks: 0 = disabled, "
                         "1 = everything except final race, 2 = everything") );
 
+    PARAM_PREFIX IntUserConfigParam        m_local_username_length
+            PARAM_DEFAULT( IntUserConfigParam(30, "local_username_length",
+                        "The upper character limit for local usernames. "
+                        "Change this at your own risk (of getting UI overflows).") );
+						
     PARAM_PREFIX StringUserConfigParam      m_commandline
             PARAM_DEFAULT( StringUserConfigParam("", "commandline",
                              "Allows one to set commandline args in config file") );
