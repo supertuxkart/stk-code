@@ -35,9 +35,15 @@
 #include <string>
 #include <vector>
 
+// Defaults for TV spectator camera system (can be overridden per-track via XML)
 std::vector<Vec3> CameraNormal::m_tv_cameras;
-float CameraNormal::m_tv_min_delta2 = 9.0f;  // distance min to change camera
-float CameraNormal::m_tv_cooldown_default = 0.4f;  // time to change camera
+float CameraNormal::m_tv_min_delta2 = 9.0f;
+float CameraNormal::m_tv_cooldown_default = 0.8f;
+float CameraNormal::m_tv_switch_delay = 0.8f;
+// Ball will cover this fraction of the screen height (15 %)
+const float CameraNormal::m_tv_ball_screen_ratio = 0.15f;
+// FOV interpolation speed (higher = faster response)
+float CameraNormal::m_tv_fov_smoothing_speed = 5.0f;
 
 // ============================================================================
 /** Constructor for the normal camera. This is the only camera constructor
@@ -60,10 +66,13 @@ CameraNormal::CameraNormal(Camera::CameraType type,  int camera_index,
     //       Either global or per user (for instance, some users may not like
     //       the extra camera rotation so they could set m_rotation_range to
     //       zero to disable it for themselves).
-    m_tv_current_index = -1;
-    m_tv_switch_cooldown = 0.0f;
+    // Reset static TV tuning parameters to defaults for the new race.
+    // These may be overridden later by track XML (<tv-cameras>).
     m_tv_min_delta2 = 9.0f;
-    m_tv_cooldown_default = 0.4f;
+    m_tv_cooldown_default = 0.8f;
+    // Save the initial camera FOV so we can restore it after TV mode.
+    m_tv_current_fov = m_camera->getFOV();
+    m_tv_normal_fov = m_camera->getFOV();
     m_position_speed = 8.0f;
     m_target_speed   = 10.0f;
     m_rotation_range = 0.4f;
@@ -367,6 +376,10 @@ void CameraNormal::update(float dt)
                                               &distance, &smoothing, &cam_roll_angle);
         moveCamera(dt, false, cam_angle, distance);
     }
+
+    // Restore normal FOV when not in TV mode
+    if (getMode() != CM_SPECTATOR_TV && m_camera->getFOV() != m_tv_normal_fov)
+        m_camera->setFOV(m_tv_normal_fov);
 }   // update
 
 // ----------------------------------------------------------------------------
@@ -386,8 +399,7 @@ void CameraNormal::positionCamera(float dt, float above_kart, float cam_angle,
 
     float tan_up = tanf(cam_angle);
 
-    // Protection: Ensure TV camera variables are in valid state
-    if (m_tv_current_index < 0) m_tv_current_index = 0;
+    // Safety: ensure cooldown is never negative
     if (m_tv_switch_cooldown < 0) m_tv_switch_cooldown = 0.0f;
 
     Camera::Mode mode = getMode();
@@ -420,15 +432,19 @@ void CameraNormal::positionCamera(float dt, float above_kart, float cam_angle,
         }
     case CM_SPECTATOR_TV:
         {
+            // Only active during soccer matches when TV cameras exist on the track
             SoccerWorld *soccer_world = dynamic_cast<SoccerWorld*> (World::getWorld());
             if (soccer_world && !m_tv_cameras.empty())
             {
                 Vec3 ball_pos = soccer_world->getBallPosition();
-                // decrement cooldown
+
+                // --- Cooldown ---
+                // Timer that prevents switching cameras too rapidly after a change
                 if (m_tv_switch_cooldown > 0.0f)
                     m_tv_switch_cooldown = std::max(0.0f, m_tv_switch_cooldown - dt);
 
-                // choose the TV camera closest to the ball
+                // --- Find the best camera ---
+                // Pick the TV camera that is closest to the ball's current position
                 unsigned best = 0;
                 float best_d2 = (m_tv_cameras[0] - ball_pos).length2();
                 for (unsigned i = 1; i < m_tv_cameras.size(); i++)
@@ -441,28 +457,82 @@ void CameraNormal::positionCamera(float dt, float above_kart, float cam_angle,
                     }
                 }
 
-                // initialize current index on first use
-                if (m_tv_current_index < 0 || (unsigned)m_tv_current_index >= m_tv_cameras.size())
+                // --- First activation ---
+                // If no camera is selected yet, jump directly to the best one
+                if (m_tv_current_index < 0 ||
+                    (unsigned)m_tv_current_index >= m_tv_cameras.size())
                 {
                     m_tv_current_index = (int)best;
                     m_tv_switch_cooldown = m_tv_cooldown_default;
+                    m_tv_pending_index = -1;
+                    m_tv_pending_timer = 0.0f;
                 }
                 else
                 {
-                    float current_d2 = (m_tv_cameras[(unsigned)m_tv_current_index] - ball_pos).length2();
-                    // Switch only if cooldown elapsed and best is sufficiently better than current
-                    if (m_tv_switch_cooldown <= 0.0f && best != (unsigned)m_tv_current_index
-                        && best_d2 + m_tv_min_delta2 < current_d2)
+                    // --- Switching logic ---
+                    // Only consider switching when:
+                    //   1. Cooldown has expired
+                    //   2. A different camera is significantly closer
+                    //      (uses squared distance and a minimum delta threshold)
+                    float current_d2 =
+                        (m_tv_cameras[(unsigned)m_tv_current_index] - ball_pos).length2();
+                    bool should_switch = (m_tv_switch_cooldown <= 0.0f
+                        && best != (unsigned)m_tv_current_index
+                        && best_d2 + m_tv_min_delta2 < current_d2);
+
+                    if (should_switch)
                     {
-                        m_tv_current_index = (int)best;
-                        m_tv_switch_cooldown = m_tv_cooldown_default;
+                        // If the target camera changed, restart the pending timer
+                        if (m_tv_pending_index != (int)best)
+                        {
+                            m_tv_pending_index = (int)best;
+                            m_tv_pending_timer = 0.0f;
+                        }
+
+                        // Delay the switch: the ball must stay closer to the
+                        // new camera for a minimum duration before we cut over
+                        m_tv_pending_timer += dt;
+
+                        if (m_tv_pending_timer >= m_tv_switch_delay)
+                        {
+                            m_tv_current_index = m_tv_pending_index;
+                            m_tv_switch_cooldown = m_tv_cooldown_default;
+                            m_tv_pending_index = -1;
+                            m_tv_pending_timer = 0.0f;
+                        }
+                    }
+                    else
+                    {
+                        // Ball moved away from the candidate camera, cancel the switch
+                        m_tv_pending_index = -1;
+                        m_tv_pending_timer = 0.0f;
                     }
                 }
 
+                // --- Position camera ---
+                // Place the camera at the selected TV position, looking at the ball
                 wanted_position = m_tv_cameras[(unsigned)m_tv_current_index];
                 wanted_target = ball_pos;
                 m_camera->setPosition(wanted_position.toIrrVector());
                 m_camera->setTarget(wanted_target.toIrrVector());
+
+                // --- Dynamic FOV ---
+                // Compute the vertical FOV so the ball's angular size on screen
+                // always equals m_tv_ball_screen_ratio (e.g. 15 % of height).
+                // This gives a "steady shot" effect: the ball looks the same
+                // size regardless of distance to the camera.
+                float dist = (ball_pos - wanted_position).length();
+                float ball_diameter = soccer_world->getBallDiameter();
+                float ball_angular_size = 2.0f * atan2f(
+                    ball_diameter * 0.5f, std::max(dist, 0.001f));
+                float target_fov = ball_angular_size / m_tv_ball_screen_ratio;
+                // Clamp to a reasonable range to avoid extreme zooms
+                target_fov = std::max(0.01f, std::min(target_fov, 2.0f));
+
+                // Smoothly interpolate the FOV each frame for a fluid camera feel
+                m_tv_current_fov += (target_fov - m_tv_current_fov)
+                    * std::min(1.0f, dt * m_tv_fov_smoothing_speed);
+                m_camera->setFOV(m_tv_current_fov);
                 return;
             }
             break;
@@ -527,16 +597,20 @@ void CameraNormal::positionCamera(float dt, float above_kart, float cam_angle,
 void CameraNormal::readTVCameras(const XMLNode &root)
 {
     m_tv_cameras.clear();
-    // Optional configuration on root node
+
+    // --- Root-level tuning overrides ---
+    // The <tv-cameras> node may specify min-delta (distance improvement
+    // required to switch camera) and cooldown (pause after a switch).
     float min_delta = -1.0f;
     float cooldown = -1.0f;
-    root.get("min-delta", &min_delta);     // units; we'll square it for comparisons
-    root.get("cooldown", &cooldown);       // seconds
+    root.get("min-delta", &min_delta);
+    root.get("cooldown", &cooldown);
     if (min_delta > 0.0f)
-        m_tv_min_delta2 = min_delta * min_delta;
+        m_tv_min_delta2 = min_delta * min_delta;   // store as squared distance
     if (cooldown > 0.0f)
         m_tv_cooldown_default = cooldown;
 
+    // --- Parse child nodes ---
     for (unsigned int i = 0; i < root.getNumNodes(); i++)
     {
         const XMLNode* n = root.getNode(i);
@@ -544,7 +618,7 @@ void CameraNormal::readTVCameras(const XMLNode &root)
         bool is_tv_camera_node = false;
         if (n->getName() == std::string("tv-camera"))
         {
-            is_tv_camera_node = true; // legacy child name
+            is_tv_camera_node = true;
         }
         else if (n->getName() == std::string("camera"))
         {
@@ -564,7 +638,8 @@ void CameraNormal::readTVCameras(const XMLNode &root)
             if (child_cooldown > 0.0f)
                 m_tv_cooldown_default = child_cooldown;
 
-            Vec3 p(0,0,0);
+            // Read the 3D position of the camera
+            Vec3 p(0, 0, 0);
             n->get("xyz", &p);
             m_tv_cameras.push_back(p);
         }
@@ -573,9 +648,10 @@ void CameraNormal::readTVCameras(const XMLNode &root)
 
 void CameraNormal::clearTVCameras()
 {
-    m_tv_cameras.clear();  // Nettoie les caméras statiques
-    
-    // Remet à zéro l'état de TOUTES les caméras existantes
+    // Clear the static list of TV camera positions (shared by all cameras)
+    m_tv_cameras.clear();
+
+    // Reset per-camera state for every normal camera in the scene
     for(unsigned int i = 0; i < Camera::getNumCameras(); i++)
     {
         Camera* camera = Camera::getCamera(i);
@@ -584,6 +660,8 @@ void CameraNormal::clearTVCameras()
             CameraNormal* normal_cam = static_cast<CameraNormal*>(camera);
             normal_cam->m_tv_current_index = -1;
             normal_cam->m_tv_switch_cooldown = 0.0f;
+            normal_cam->m_tv_pending_index = -1;
+            normal_cam->m_tv_pending_timer = 0.0f;
         }
     }
 } // clearTVCameras
