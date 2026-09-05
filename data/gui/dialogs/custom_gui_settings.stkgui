@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<stkgui>
+    <div x="2%" y="2%" width="100%" height="96%" layout="vertical-row" >
+        <header id="title" width="100%" height="fit" text_align="center" word_wrap="true" text="Race GUI Settings" />
+        <spacer width="100%" height="3%"/>
+        <div width="100%" height="90%" layout="vertical-row">
+            <spacer height="2%" width="100%" />
+
+            <label width="100%" I18N="In the gui editor screen" text="Steering wheel"/>
+            <div width="100%" height="fit" layout="horizontal-row">
+                <spacer width="3%" height="100%" />
+                <label width="fit" height="100%" text_align="left" I18N="In the gui editor screen" text="Horizontal Position"/>
+                <gauge id="steer_position_x" width="20%"/>
+
+                <spacer width="3%" height="100%" />
+                <label width="fit" height="100%" text_align="left" I18N="In the gui editor screen" text="Vertical Position"/>
+                <gauge id="steer_position_y" width="20%"/>
+            </div>
+
+            <spacer width="5%" height="5%"/>
+
+            <label width="100%" I18N="In the gui editor screen" text="Buttons"/>
+            <div width="100%" height="fit" layout="horizontal-row">
+                <spacer width="3%" height="100%" />
+                <label width="fit" height="100%" text_align="left" I18N="In the gui editor screen" text="Horizontal Position"/>
+                <gauge id="btns_position_x" width="20%"/>
+
+                <spacer width="3%" height="100%" />
+                <label width="fit" height="100%" text_align="left" I18N="In the gui editor screen" text="Vertical Position"/>
+                <gauge id="btns_position_y" width="20%"/>
+            </div>
+
+            <spacer width="5%" height="3%"/>
+
+            <div width="100%" height="fit" layout="horizontal-row">
+                <spacer width="3%" height="100%" />
+                <label width="fit" height="100%" text_align="left" I18N="In the gui editor screen" text="Spacing between buttons"/>
+                <gauge id="btns_spacing" width="20%"/>
+            </div>
+
+            <buttonbar id="buttons" height="35%" width="80%" align="center">
+                <icon-button id="reset" width="192" height="192" icon="gui/icons/restart.png"
+                    I18N="In the gui editor screen" text="Reset" align="center"/>
+                <icon-button id="cancel" width="192" height="192" icon="gui/icons/red_x.png"
+                    I18N="In the gui editor screen" text="Cancel" align="center"/>
+                <icon-button id="apply" width="192" height="192" icon="gui/icons/green_check.png"
+                    I18N="In the gui editor screen" text="Apply" align="center"/>
+            </buttonbar>
+        </div>
+    </div>
+</stkgui>

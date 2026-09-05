@@ -81,6 +81,8 @@
                 I18N="In the multitouch settings screen" text="Restore defaults" align="center"/>
             <icon-button id="apply" width="128" height="128" icon="gui/icons/green_check.png"
                 I18N="In the multitouch settings screen" text="Apply" align="center"/>
+            <icon-button id="edit" width="128" height="128" icon="gui/icons/edit.png"
+              I18N="In the multitouch settings screen" text="Edit GUI" align="center"/>
         </buttonbar>
         </div>
     </div>
