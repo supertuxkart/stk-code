@@ -51,16 +51,16 @@ CustomGuiSettingsDialog::~CustomGuiSettingsDialog()
 void CustomGuiSettingsDialog::beforeAddingWidgets()
 {
 #ifndef SERVER_ONLY
-    // Steering editing
-    getWidget<SpinnerWidget>("steer_position_x")->setRange(0.0f, 20.0f, 0.1f);
-    getWidget<SpinnerWidget>("steer_position_y")->setRange(0.0f, 20.0f, 0.1f);
+    // Steering wheel editing
+    getWidget<SpinnerWidget>("steer_position_x")->setRange(0.3f, 2.0f, 0.1f);
+    getWidget<SpinnerWidget>("steer_position_y")->setRange(0.3f, 2.0f, 0.1f);
 
     getWidget<SpinnerWidget>("steer_position_x")->setFloatValue(UserConfigParams::m_steering_pos_x);
     getWidget<SpinnerWidget>("steer_position_y")->setFloatValue(UserConfigParams::m_steering_pos_y);
 
     // Buttons editing
-    getWidget<SpinnerWidget>("btns_position_x")->setRange(0.0f, 20.0f, 0.1f);
-    getWidget<SpinnerWidget>("btns_position_y")->setRange(0.0f, 20.0f, 0.1f);
+    getWidget<SpinnerWidget>("btns_position_x")->setRange(0.6f, 2.0f, 0.1f);
+    getWidget<SpinnerWidget>("btns_position_y")->setRange(0.6f, 2.0f, 0.1f);
     getWidget<SpinnerWidget>("btns_spacing")->setRange(0.5f, 1.5f, 0.1f);
 
     getWidget<SpinnerWidget>("btns_position_x")->setFloatValue(UserConfigParams::m_buttons_pos_x);
@@ -82,7 +82,7 @@ GUIEngine::EventPropagation CustomGuiSettingsDialog::processEvent(const std::str
 
         if (selection == "apply")
         {
-            // Steering editing
+            // Steering wheel editing
             UserConfigParams::m_steering_pos_x = getWidget<SpinnerWidget>("steer_position_x")->getFloatValue();
             UserConfigParams::m_steering_pos_y = getWidget<SpinnerWidget>("steer_position_y")->getFloatValue();
 
@@ -103,14 +103,21 @@ GUIEngine::EventPropagation CustomGuiSettingsDialog::processEvent(const std::str
         }
         else if (selection == "reset") // Discard all the changes
         {
-        // Steering editing
-        getWidget<SpinnerWidget>("steer_position_x")->setFloatValue(12.0f);
-        getWidget<SpinnerWidget>("steer_position_y")->setFloatValue(15.0f);
+        // Steering wheel editing
+        UserConfigParams::m_steering_pos_x.revertToDefaults();
+        UserConfigParams::m_steering_pos_y.revertToDefaults();
+
+        getWidget<SpinnerWidget>("steer_position_x")->setFloatValue(UserConfigParams::m_steering_pos_x);
+        getWidget<SpinnerWidget>("steer_position_y")->setFloatValue(UserConfigParams::m_steering_pos_y);
 
         // Buttons editing
-        getWidget<SpinnerWidget>("btns_position_x")->setFloatValue(12.0f);
-        getWidget<SpinnerWidget>("btns_position_y")->setFloatValue(15.0f);
-        getWidget<SpinnerWidget>("btns_spacing")->setFloatValue(1.0f);
+        UserConfigParams::m_buttons_pos_x.revertToDefaults();
+        UserConfigParams::m_buttons_pos_y.revertToDefaults();
+        UserConfigParams::m_buttons_spacing.revertToDefaults();
+
+        getWidget<SpinnerWidget>("btns_position_x")->setFloatValue(UserConfigParams::m_buttons_pos_x);
+        getWidget<SpinnerWidget>("btns_position_y")->setFloatValue(UserConfigParams::m_buttons_pos_y);
+        getWidget<SpinnerWidget>("btns_spacing")->setFloatValue(UserConfigParams::m_buttons_spacing);
         }
         else if (selection == "cancel")
         {

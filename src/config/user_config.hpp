@@ -597,34 +597,34 @@ namespace UserConfigParams
                                             "Settings for the multitouch GUI") );
 
     PARAM_PREFIX FloatUserConfigParam         m_steering_pos_x
-            PARAM_DEFAULT( FloatUserConfigParam(15.0f, "steering_btn_pos_x",
+            PARAM_DEFAULT( FloatUserConfigParam(0.6f, "steering_btn_pos_x",
             &m_mt_gui_edit_group,
-            "A parameter in range [0, x.0] that determines "
-            "the horizontal position of the steering controls."));
+            "A parameter in range [0.3, 2.0] that determines "
+            "the horizontal position of the steering wheel."));
 
     PARAM_PREFIX FloatUserConfigParam         m_steering_pos_y
-            PARAM_DEFAULT( FloatUserConfigParam(12.0f, "steering_btn_pos_y",
+            PARAM_DEFAULT( FloatUserConfigParam(0.6f, "steering_btn_pos_y",
             &m_mt_gui_edit_group,
-            "A parameter in range [0, x.0] that determines "
-            "the vertical position of the steering controls."));
+            "A parameter in range [0.3, 2.0] that determines "
+            "the vertical position of the steering wheel."));
 
     PARAM_PREFIX FloatUserConfigParam         m_buttons_pos_x
-            PARAM_DEFAULT( FloatUserConfigParam(15.0f, "control_btn_pos_x",
+            PARAM_DEFAULT( FloatUserConfigParam(1.0f, "control_btn_pos_x",
             &m_mt_gui_edit_group,
-            "A parameter in range [0, x.0] that determines "
-            "the horizontal position of the buttons controls."));
+            "A parameter in range [0.6, 2.0] that determines "
+            "the horizontal position of the buttons grid."));
 
     PARAM_PREFIX FloatUserConfigParam         m_buttons_pos_y
-            PARAM_DEFAULT( FloatUserConfigParam(12.0f, "control_btn_pos_y",
+            PARAM_DEFAULT( FloatUserConfigParam(1.0f, "control_btn_pos_y",
             &m_mt_gui_edit_group,
-            "A parameter in range [0, x.0] that determines "
-            "the vertical position of the buttons controls."));
+            "A parameter in range [0.6, 2.0] that determines "
+            "the vertical position of the buttons grid."));
 
     PARAM_PREFIX FloatUserConfigParam         m_buttons_spacing
             PARAM_DEFAULT( FloatUserConfigParam(1.0f, "control_btn_spacing",
             &m_mt_gui_edit_group,
-            "A parameter in range [0.5, 1.8] that determines "
-            "the spacing between the buttons controls."));
+            "A parameter in range [0.5, 1.5] that determines "
+            "the spacing between the buttons of their grid."));
 
     // ---- GP start order
     PARAM_PREFIX GroupUserConfigParam        m_gp_start_order
