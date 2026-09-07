@@ -713,7 +713,7 @@ namespace UserConfigParams
                         "high quality method with SSE"));
     PARAM_PREFIX FloatUserConfigParam         m_font_size
         PARAM_DEFAULT(  FloatUserConfigParam(3, "font_size",
-        &m_video_group, "The size of fonts. 0 is the smallest and 6 is the biggest") );
+        &m_video_group, "The size of fonts. 0 is the smallest and 7 is the biggest") );
 
 #if defined(_IRR_COMPILE_WITH_DIRECT3D_9_) && defined(_M_ARM)
     PARAM_PREFIX StringUserConfigParam         m_render_driver
