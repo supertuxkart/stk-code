@@ -91,5 +91,7 @@ lib/sdl2
 lib/mbedtls
 lib/astc-encoder
 lib/shaderc
+lib/libadrenotools
+lib/mesa
 
 .DS_Store
