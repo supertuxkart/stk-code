@@ -42,7 +42,7 @@ enum SamplerTypeNew
     ST_SHADOW_SAMPLER_ARRAY2D,
     ST_TRILINEAR_CLAMPED_ARRAY2D,
     ST_VOLUME_LINEAR_FILTERED,
-    ST_NEARED_CLAMPED_FILTERED,
+    ST_NEAREST_CLAMPED_FILTERED,
     ST_BILINEAR_CLAMPED_FILTERED,
     ST_SEMI_TRILINEAR,
 #ifdef USE_GLES2
@@ -82,12 +82,11 @@ protected:
     GLuint        createSamplers(SamplerTypeNew sampler_type);
 private:
 
-    static GLuint createNearestSampler();
+    static GLuint createNearestSampler(bool clamp);
     static GLuint createTrilinearSampler();
-    static GLuint createBilinearSampler();
+    static GLuint createBilinearSampler(bool clamp);
     static GLuint createShadowSampler();
     static GLuint createTrilinearClampedArray();
-    static GLuint createBilinearClampedSampler();
     static GLuint createSemiTrilinearSampler();
 protected:
     static BindFunction m_all_bind_functions[];
