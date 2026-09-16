@@ -2755,6 +2755,16 @@ void ServerLobby::connectionRequested(Event* event)
 
     if (encrypted_size != 0)
     {
+        const size_t tag_size = peer->getClientCapabilities().find(
+            "aes_gcm_128bit_tag") == peer->getClientCapabilities().end() ?
+            4 : 16;
+        if (encrypted_size < tag_size || encrypted_size > data.size())
+        {
+            Log::warn("ServerLobby", "Invalid encrypted connection size from %s.",
+                peer->getAddress().toString().c_str());
+            peer->reset();
+            return;
+        }
         m_pending_connection[peer] = std::make_pair(online_id,
             BareNetworkString(data.getCurrentData(), encrypted_size));
     }
