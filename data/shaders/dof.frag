@@ -3,9 +3,9 @@ uniform sampler2D dtex;
 
 out vec4 FragColor;
 
-float focalDepth = 10.;
+float focalDepth = 72.;
 float maxblur = 1.;
-float range = 100.;
+float range = 360.;
 
 void main()
 {
@@ -15,7 +15,12 @@ void main()
     FragPos /= FragPos.w;
 
     float depth = FragPos.z;
-    float blur = clamp(abs(depth - focalDepth) / range, -maxblur, maxblur);
+
+    float blur = 0.;
+    if (depth > focalDepth)
+    {
+        blur = min((depth - focalDepth) / range, maxblur);
+    }
 
     vec2 offset = 10. / u_screen;
 
@@ -68,9 +73,5 @@ void main()
     col += texture(tex, uv + (vec2(0.0, 0.4) * offset) * blur * 0.4);
     
     col = vec4(col.rgb / 41.0, col.a);
-    depth = clamp(max(1.1666 - (FragPos.z/240.0), FragPos.z - 2000.0), 0., 1.);
-    
-    vec3 final = colOriginal.rgb * depth + col.rgb * (1. - depth);
-
-    FragColor = vec4(final, colOriginal.a);
+    FragColor = vec4(col.rgb, colOriginal.a);
 }
