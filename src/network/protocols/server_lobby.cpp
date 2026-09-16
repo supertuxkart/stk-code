@@ -4170,6 +4170,12 @@ void ServerLobby::addLiveJoinPlaceholder(
 void ServerLobby::setPlayerKarts(const NetworkString& ns, STKPeer* peer) const
 {
     unsigned player_count = ns.getUInt8();
+    if (player_count > peer->getPlayerProfiles().size())
+    {
+        Log::warn("ServerLobby", "Too many kart entries from %s.",
+            peer->getAddress().toString().c_str());
+        return;
+    }
     for (unsigned i = 0; i < player_count; i++)
     {
         std::string kart;
