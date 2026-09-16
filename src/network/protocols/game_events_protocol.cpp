@@ -66,6 +66,13 @@ bool GameEventsProtocol::notifyEvent(Event* event)
     switch (type)
     {
     case GE_KART_FINISHED_RACE:
+        if (NetworkConfig::get()->isServer())
+        {
+            Log::warn("GameEventsProtocol",
+                "Ignoring client race-finished notification from %s.",
+                event->getPeer()->getAddress().toString().c_str());
+            break;
+        }
         kartFinishedRace(data);     break;
     case GE_RESET_BALL:
     {
