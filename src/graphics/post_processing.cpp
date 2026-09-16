@@ -216,8 +216,8 @@ public:
         loadProgram(OBJECT,  GL_COMPUTE_SHADER, "bilateralH.comp");
         m_dest_tu = 2;
         assignUniforms("pixel");
-        assignSamplerNames(0, "source", ST_NEARED_CLAMPED_FILTERED,
-                           1, "depth", ST_NEARED_CLAMPED_FILTERED);
+        assignSamplerNames(0, "source", ST_NEAREST_CLAMPED_FILTERED,
+                           1, "depth", ST_NEAREST_CLAMPED_FILTERED);
         assignTextureUnit(m_dest_tu, "dest");
 #endif
     }   // ComputeGaussian9TapHShader
@@ -278,8 +278,8 @@ public:
         loadProgram(OBJECT, GL_COMPUTE_SHADER, "bilateralV.comp");
         m_dest_tu = 2;
         assignUniforms("pixel");
-        assignSamplerNames(0, "source", ST_NEARED_CLAMPED_FILTERED,
-                           1, "depth", ST_NEARED_CLAMPED_FILTERED);
+        assignSamplerNames(0, "source", ST_NEAREST_CLAMPED_FILTERED,
+                           1, "depth", ST_NEAREST_CLAMPED_FILTERED);
         assignTextureUnit(m_dest_tu, "dest");
 #endif
     }   // ComputeGaussian9TapVShader

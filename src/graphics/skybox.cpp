@@ -78,7 +78,7 @@ public:
                             GL_FRAGMENT_SHADER, "importance_sampling_specular.frag");
         assignUniforms("PermutationMatrix", "ViewportSize");
         assignSamplerNames(0, "tex", ST_TRILINEAR_CUBEMAP,
-                           1, "samples", ST_NEARED_CLAMPED_FILTERED);
+                           1, "samples", ST_NEAREST_CLAMPED_FILTERED);
     }
 };   // SpecularIBLGenerator
 
