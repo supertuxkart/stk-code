@@ -450,6 +450,11 @@ bool ServerLobby::notifyEvent(Event* event)
 void ServerLobby::handleChat(Event* event)
 {
     if (!checkDataSize(event, 1) || !ServerConfig::m_chat) return;
+    if (event->getPeer()->getPlayerProfiles().empty())
+    {
+        Log::warn("ServerLobby", "Ignoring chat from peer without a profile.");
+        return;
+    }
 
     // Update so that the peer is not kicked
     event->getPeer()->updateLastActivity();
@@ -2797,6 +2802,12 @@ void ServerLobby::handleUnencryptedConnection(std::shared_ptr<STKPeer> peer,
     // if this is a pending connection
     unsigned total_players = 0;
     unsigned player_count = data.getUInt8();
+    if (player_count == 0)
+    {
+        Log::warn("ServerLobby", "Rejecting connection without a player profile.");
+        peer->reset();
+        return;
+    }
 
     if (is_pending_connection)
     {
