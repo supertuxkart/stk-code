@@ -62,6 +62,7 @@ AddonsLoading::AddonsLoading(const std::string &id)
              , m_addon(*(addons_manager->getAddon(id)) )
 #endif
 {
+    m_cancelled        = NULL;
     m_message_shown    = false;
     m_icon_shown       = false;
 #ifdef SERVER_ONLY
@@ -371,6 +372,8 @@ void AddonsLoading::stopDownload()
     {
         m_download_request->cancel();
         m_download_request = nullptr;
+        if (m_cancelled)
+            *m_cancelled = true;
     }
 }   // startDownload
 

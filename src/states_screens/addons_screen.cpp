@@ -44,6 +44,7 @@ using namespace Online;
 AddonsScreen::AddonsScreen() : Screen("addons_screen.stkgui")
 {
     m_selected_index = -1;
+    m_addons_loading = NULL;
 
     // Add date filters.
     // I18N: Time filters for add-ons
@@ -445,6 +446,24 @@ void AddonsScreen::eventCallback(GUIEngine::Widget* widget,
         StateManager::get()->escapePressed();
     }
 
+    else if (name == "download_all") {
+        GUIEngine::ListWidget *list =
+            getWidget<GUIEngine::ListWidget>("list_addons");
+        int item_count = list->getItemCount();
+        irr::gui::CGUISTKListBox *listbox =
+            list->getIrrlichtElement<irr::gui::CGUISTKListBox>();
+        m_cancelled = false;
+
+        for (int i = 0; i < item_count; i++) {
+            std::string id = listbox->getItem(i).m_internal_name;
+            Addon *addon = addons_manager->getAddon(id);
+
+            if (addon != NULL && (!addon->isInstalled() || addon->needsUpdate())) {
+                m_addon_queue.push_back(id);
+            }
+        }
+    }
+
     else if (name == "reload")
     {
         if (!m_reloading)
@@ -521,6 +540,19 @@ void AddonsScreen::onUpdate(float dt)
 {
 #ifndef SERVER_ONLY
     NewsManager::get()->joinDownloadThreadIfExit();
+    if (m_cancelled)
+    {
+        m_addon_queue.clear();
+    }
+
+    if (m_addon_queue.size() > 0 && !m_addons_loading)
+    {
+        m_addons_loading = new AddonsLoading(m_addon_queue.front());
+        m_addon_queue.pop_front();
+        m_addons_loading->tryInstall();
+        m_addons_loading->m_cancelled = &m_cancelled;
+        m_addons_loading = NULL;
+    }
 
     if (m_reloading)
     {
