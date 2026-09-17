@@ -447,6 +447,9 @@ namespace UserConfigParams
     PARAM_PREFIX BoolUserConfigParam         m_use_ffa_mode
         PARAM_DEFAULT(BoolUserConfigParam(false, "use-ffa-mode",
             &m_race_setup_group, "Use ffa mode instead of 3 strikes battle."));
+    PARAM_PREFIX BoolUserConfigParam         m_tire_steal
+        PARAM_DEFAULT(BoolUserConfigParam(false, "tire-steal",
+            &m_race_setup_group, "Steal the tire when you hit a kart."));
     PARAM_PREFIX IntUserConfigParam          m_lap_trial_time_limit
         PARAM_DEFAULT(IntUserConfigParam(3, "lap-trial-time-limit",
             &m_race_setup_group, "Time limit in lap trial mode."));
