@@ -1,6 +1,9 @@
 #ifndef __gl2ext_h_
 #define __gl2ext_h_
 
+#include <GLES3/gl3.h>
+// #include <GLES3/gl3ext.h>
+
 /* $Revision: 19436 $ on $Date:: 2012-10-10 10:37:04 -0700 #$ */
 
 #ifdef __cplusplus
@@ -16,166 +19,171 @@ extern "C" {
 #   define GL_APIENTRYP GL_APIENTRY*
 #endif
 
+/* GLsizei is normally provided by the core GLES2 header. */
+#ifndef GLsizei
+typedef int GLsizei;
+#endif
+
 /*------------------------------------------------------------------------*
- * OES extension tokens
+ *  extension tokens
  *------------------------------------------------------------------------*/
 
-/* GL_OES_compressed_ETC1_RGB8_texture */
-#ifndef GL_OES_compressed_ETC1_RGB8_texture
-#define GL_ETC1_RGB8_OES                                        0x8D64
+/* GL__compressed_ETC1_RGB8_texture */
+#ifndef GL__compressed_ETC1_RGB8_texture
+#define GL_ETC1_RGB8_                                        0x8D64
 #endif
 
-/* GL_OES_compressed_paletted_texture */
-#ifndef GL_OES_compressed_paletted_texture
-#define GL_PALETTE4_RGB8_OES                                    0x8B90
-#define GL_PALETTE4_RGBA8_OES                                   0x8B91
-#define GL_PALETTE4_R5_G6_B5_OES                                0x8B92
-#define GL_PALETTE4_RGBA4_OES                                   0x8B93
-#define GL_PALETTE4_RGB5_A1_OES                                 0x8B94
-#define GL_PALETTE8_RGB8_OES                                    0x8B95
-#define GL_PALETTE8_RGBA8_OES                                   0x8B96
-#define GL_PALETTE8_R5_G6_B5_OES                                0x8B97
-#define GL_PALETTE8_RGBA4_OES                                   0x8B98
-#define GL_PALETTE8_RGB5_A1_OES                                 0x8B99
+/* GL__compressed_paletted_texture */
+#ifndef GL__compressed_paletted_texture
+#define GL_PALETTE4_RGB8_                                    0x8B90
+#define GL_PALETTE4_RGBA8_                                   0x8B91
+#define GL_PALETTE4_R5_G6_B5_                                0x8B92
+#define GL_PALETTE4_RGBA4_                                   0x8B93
+#define GL_PALETTE4_RGB5_A1_                                 0x8B94
+#define GL_PALETTE8_RGB8_                                    0x8B95
+#define GL_PALETTE8_RGBA8_                                   0x8B96
+#define GL_PALETTE8_R5_G6_B5_                                0x8B97
+#define GL_PALETTE8_RGBA4_                                   0x8B98
+#define GL_PALETTE8_RGB5_A1_                                 0x8B99
 #endif
 
-/* GL_OES_depth24 */
-#ifndef GL_OES_depth24
-#define GL_DEPTH_COMPONENT24_OES                                0x81A6
+/* GL__depth24 */
+#ifndef GL__depth24
+#define GL_DEPTH_COMPONENT24_                                0x81A6
 #endif
 
-/* GL_OES_depth32 */
-#ifndef GL_OES_depth32
-#define GL_DEPTH_COMPONENT32_OES                                0x81A7
+/* GL__depth32 */
+#ifndef GL__depth32
+#define GL_DEPTH_COMPONENT32_                                0x81A7
 #endif
 
-/* GL_OES_depth_texture */
+/* GL__depth_texture */
 /* No new tokens introduced by this extension. */
 
-/* GL_OES_EGL_image */
-#ifndef GL_OES_EGL_image
-typedef void* GLeglImageOES;
+/* GL__EGL_image */
+#ifndef GL__EGL_image
+typedef void* GLeglImage;
 #endif
 
-/* GL_OES_EGL_image_external */
-#ifndef GL_OES_EGL_image_external
-/* GLeglImageOES defined in GL_OES_EGL_image already. */
-#define GL_TEXTURE_EXTERNAL_OES                                 0x8D65
-#define GL_SAMPLER_EXTERNAL_OES                                 0x8D66
-#define GL_TEXTURE_BINDING_EXTERNAL_OES                         0x8D67
-#define GL_REQUIRED_TEXTURE_IMAGE_UNITS_OES                     0x8D68
+/* GL__EGL_image_external */
+#ifndef GL__EGL_image_external
+/* GLeglImage defined in GL__EGL_image already. */
+#define GL_TEXTURE_EXTERNAL_                                 0x8D65
+#define GL_SAMPLER_EXTERNAL_                                 0x8D66
+#define GL_TEXTURE_BINDING_EXTERNAL_                         0x8D67
+#define GL_REQUIRED_TEXTURE_IMAGE_UNITS_                     0x8D68
 #endif
 
-/* GL_OES_element_index_uint */
-#ifndef GL_OES_element_index_uint
+/* GL__element_index_uint */
+#ifndef GL__element_index_uint
 #define GL_UNSIGNED_INT                                         0x1405
 #endif
 
-/* GL_OES_get_program_binary */
-#ifndef GL_OES_get_program_binary
-#define GL_PROGRAM_BINARY_LENGTH_OES                            0x8741
-#define GL_NUM_PROGRAM_BINARY_FORMATS_OES                       0x87FE
-#define GL_PROGRAM_BINARY_FORMATS_OES                           0x87FF
+/* GL__get_program_binary */
+#ifndef GL__get_program_binary
+#define GL_PROGRAM_BINARY_LENGTH_                            0x8741
+#define GL_NUM_PROGRAM_BINARY_FORMATS_                       0x87FE
+#define GL_PROGRAM_BINARY_FORMATS_                           0x87FF
 #endif
 
-/* GL_OES_mapbuffer */
-#ifndef GL_OES_mapbuffer
-#define GL_WRITE_ONLY_OES                                       0x88B9
-#define GL_BUFFER_ACCESS_OES                                    0x88BB
-#define GL_BUFFER_MAPPED_OES                                    0x88BC
-#define GL_BUFFER_MAP_POINTER_OES                               0x88BD
+/* GL__mapbuffer */
+#ifndef GL__mapbuffer
+#define GL_WRITE_ONLY_                                       0x88B9
+#define GL_BUFFER_ACCESS_                                    0x88BB
+#define GL_BUFFER_MAPPED_                                    0x88BC
+#define GL_BUFFER_MAP_POINTER_                               0x88BD
 #endif
 
-/* GL_OES_packed_depth_stencil */
-#ifndef GL_OES_packed_depth_stencil
-#define GL_DEPTH_STENCIL_OES                                    0x84F9
-#define GL_UNSIGNED_INT_24_8_OES                                0x84FA
-#define GL_DEPTH24_STENCIL8_OES                                 0x88F0
+/* GL__packed_depth_stencil */
+#ifndef GL__packed_depth_stencil
+#define GL_DEPTH_STENCIL_                                    0x84F9
+#define GL_UNSIGNED_INT_24_8_                                0x84FA
+#define GL_DEPTH24_STENCIL8_                                 0x88F0
 #endif
 
-/* GL_OES_required_internalformat */
-#ifndef GL_OES_required_internalformat 
-#define GL_ALPHA8_OES                                           0x803C
-#define GL_DEPTH_COMPONENT16_OES                                0x81A5
-/* reuse GL_DEPTH_COMPONENT24_OES */                            
-/* reuse GL_DEPTH24_STENCIL8_OES */                             
-/* reuse GL_DEPTH_COMPONENT32_OES */                            
-#define GL_LUMINANCE4_ALPHA4_OES                                0x8043
-#define GL_LUMINANCE8_ALPHA8_OES                                0x8045
-#define GL_LUMINANCE8_OES                                       0x8040
-#define GL_RGBA4_OES                                            0x8056
-#define GL_RGB5_A1_OES                                          0x8057
-#define GL_RGB565_OES                                           0x8D62
-/* reuse GL_RGB8_OES */                              
-/* reuse GL_RGBA8_OES */  
+/* GL__required_internalformat */
+#ifndef GL__required_internalformat 
+#define GL_ALPHA8_                                           0x803C
+#define GL_DEPTH_COMPONENT16_                                0x81A5
+/* reuse GL_DEPTH_COMPONENT24_ */                            
+/* reuse GL_DEPTH24_STENCIL8_ */                             
+/* reuse GL_DEPTH_COMPONENT32_ */                            
+#define GL_LUMINANCE4_ALPHA4_                                0x8043
+#define GL_LUMINANCE8_ALPHA8_                                0x8045
+#define GL_LUMINANCE8_                                       0x8040
+#define GL_RGBA4_                                            0x8056
+#define GL_RGB5_A1_                                          0x8057
+#define GL_RGB565_                                           0x8D62
+/* reuse GL_RGB8_ */                              
+/* reuse GL_RGBA8_ */  
 /* reuse GL_RGB10_EXT */
 /* reuse GL_RGB10_A2_EXT */
 #endif 
 
-/* GL_OES_rgb8_rgba8 */
-#ifndef GL_OES_rgb8_rgba8
-#define GL_RGB8_OES                                             0x8051
-#define GL_RGBA8_OES                                            0x8058
+/* GL__rgb8_rgba8 */
+#ifndef GL__rgb8_rgba8
+#define GL_RGB8_                                             0x8051
+#define GL_RGBA8_                                            0x8058
 #endif
 
-/* GL_OES_standard_derivatives */
-#ifndef GL_OES_standard_derivatives
-#define GL_FRAGMENT_SHADER_DERIVATIVE_HINT_OES                  0x8B8B
+/* GL__standard_derivatives */
+#ifndef GL__standard_derivatives
+#define GL_FRAGMENT_SHADER_DERIVATIVE_HINT_                  0x8B8B
 #endif
 
-/* GL_OES_stencil1 */
-#ifndef GL_OES_stencil1
-#define GL_STENCIL_INDEX1_OES                                   0x8D46
+/* GL__stencil1 */
+#ifndef GL__stencil1
+#define GL_STENCIL_INDEX1_                                   0x8D46
 #endif
 
-/* GL_OES_stencil4 */
-#ifndef GL_OES_stencil4
-#define GL_STENCIL_INDEX4_OES                                   0x8D47
+/* GL__stencil4 */
+#ifndef GL__stencil4
+#define GL_STENCIL_INDEX4_                                   0x8D47
 #endif
 
-#ifndef GL_OES_surfaceless_context
-#define GL_FRAMEBUFFER_UNDEFINED_OES                            0x8219
+#ifndef GL__surfaceless_context
+#define GL_FRAMEBUFFER_UNDEFINED_                            0x8219
 #endif
 
-/* GL_OES_texture_3D */
-#ifndef GL_OES_texture_3D
-#define GL_TEXTURE_WRAP_R_OES                                   0x8072
-#define GL_TEXTURE_3D_OES                                       0x806F
-#define GL_TEXTURE_BINDING_3D_OES                               0x806A
-#define GL_MAX_3D_TEXTURE_SIZE_OES                              0x8073
-#define GL_SAMPLER_3D_OES                                       0x8B5F
-#define GL_FRAMEBUFFER_ATTACHMENT_TEXTURE_3D_ZOFFSET_OES        0x8CD4
+/* GL__texture_3D */
+#ifndef GL__texture_3D
+#define GL_TEXTURE_WRAP_R_                                   0x8072
+#define GL_TEXTURE_3D_                                       0x806F
+#define GL_TEXTURE_BINDING_3D_                               0x806A
+#define GL_MAX_3D_TEXTURE_SIZE_                              0x8073
+#define GL_SAMPLER_3D_                                       0x8B5F
+#define GL_FRAMEBUFFER_ATTACHMENT_TEXTURE_3D_ZOFFSET_        0x8CD4
 #endif
 
-/* GL_OES_texture_float */
+/* GL__texture_float */
 /* No new tokens introduced by this extension. */
 
-/* GL_OES_texture_float_linear */
+/* GL__texture_float_linear */
 /* No new tokens introduced by this extension. */
 
-/* GL_OES_texture_half_float */
-#ifndef GL_OES_texture_half_float
-#define GL_HALF_FLOAT_OES                                       0x8D61
+/* GL__texture_half_float */
+#ifndef GL__texture_half_float
+#define GL_HALF_FLOAT_                                       0x8D61
 #endif
 
-/* GL_OES_texture_half_float_linear */
+/* GL__texture_half_float_linear */
 /* No new tokens introduced by this extension. */
 
-/* GL_OES_texture_npot */
+/* GL__texture_npot */
 /* No new tokens introduced by this extension. */
 
-/* GL_OES_vertex_array_object */
-#ifndef GL_OES_vertex_array_object
-#define GL_VERTEX_ARRAY_BINDING_OES                             0x85B5
+/* GL__vertex_array_object */
+#ifndef GL__vertex_array_object
+#define GL_VERTEX_ARRAY_BINDING_                             0x85B5
 #endif
 
-/* GL_OES_vertex_half_float */
-/* GL_HALF_FLOAT_OES defined in GL_OES_texture_half_float already. */
+/* GL__vertex_half_float */
+/* GL_HALF_FLOAT_ defined in GL__texture_half_float already. */
 
-/* GL_OES_vertex_type_10_10_10_2 */
-#ifndef GL_OES_vertex_type_10_10_10_2
-#define GL_UNSIGNED_INT_10_10_10_2_OES                          0x8DF6
-#define GL_INT_10_10_10_2_OES                                   0x8DF7
+/* GL__vertex_type_10_10_10_2 */
+#ifndef GL__vertex_type_10_10_10_2
+#define GL_UNSIGNED_INT_10_10_10_2_                          0x8DF6
+#define GL_INT_10_10_10_2_                                   0x8DF7
 #endif
 
 /*------------------------------------------------------------------------*
@@ -872,191 +880,191 @@ typedef struct __GLsync *GLsync;
  *------------------------------------------------------------------------*/
 
 /*------------------------------------------------------------------------*
- * OES extension functions
+ *  extension functions
  *------------------------------------------------------------------------*/
 
-/* GL_OES_compressed_ETC1_RGB8_texture */
-#ifndef GL_OES_compressed_ETC1_RGB8_texture
-#define GL_OES_compressed_ETC1_RGB8_texture 1
+/* GL__compressed_ETC1_RGB8_texture */
+#ifndef GL__compressed_ETC1_RGB8_texture
+#define GL__compressed_ETC1_RGB8_texture 1
 #endif
 
-/* GL_OES_compressed_paletted_texture */
-#ifndef GL_OES_compressed_paletted_texture
-#define GL_OES_compressed_paletted_texture 1
+/* GL__compressed_paletted_texture */
+#ifndef GL__compressed_paletted_texture
+#define GL__compressed_paletted_texture 1
 #endif
 
-/* GL_OES_depth24 */
-#ifndef GL_OES_depth24
-#define GL_OES_depth24 1
+/* GL__depth24 */
+#ifndef GL__depth24
+#define GL__depth24 1
 #endif
 
-/* GL_OES_depth32 */
-#ifndef GL_OES_depth32
-#define GL_OES_depth32 1
+/* GL__depth32 */
+#ifndef GL__depth32
+#define GL__depth32 1
 #endif
 
-/* GL_OES_depth_texture */
-#ifndef GL_OES_depth_texture
-#define GL_OES_depth_texture 1
+/* GL__depth_texture */
+#ifndef GL__depth_texture
+#define GL__depth_texture 1
 #endif
 
-/* GL_OES_EGL_image */
-#ifndef GL_OES_EGL_image
-#define GL_OES_EGL_image 1
+/* GL__EGL_image */
+#ifndef GL__EGL_image
+#define GL__EGL_image 1
 #ifdef GL_GLEXT_PROTOTYPES
-GL_APICALL void GL_APIENTRY glEGLImageTargetTexture2DOES (GLenum target, GLeglImageOES image);
-GL_APICALL void GL_APIENTRY glEGLImageTargetRenderbufferStorageOES (GLenum target, GLeglImageOES image);
+GL_APICALL void GL_APIENTRY glEGLImageTargetTexture2D (GLenum target, GLeglImage image);
+GL_APICALL void GL_APIENTRY glEGLImageTargetRenderbufferStorage (GLenum target, GLeglImage image);
 #endif
-typedef void (GL_APIENTRYP PFNGLEGLIMAGETARGETTEXTURE2DOESPROC) (GLenum target, GLeglImageOES image);
-typedef void (GL_APIENTRYP PFNGLEGLIMAGETARGETRENDERBUFFERSTORAGEOESPROC) (GLenum target, GLeglImageOES image);
-#endif
-
-/* GL_OES_EGL_image_external */
-#ifndef GL_OES_EGL_image_external
-#define GL_OES_EGL_image_external 1
-/* glEGLImageTargetTexture2DOES defined in GL_OES_EGL_image already. */
+typedef void (GL_APIENTRYP PFNGLEGLIMAGETARGETTEXTURE2DPROC) (GLenum target, GLeglImage image);
+typedef void (GL_APIENTRYP PFNGLEGLIMAGETARGETRENDERBUFFERSTORAGEPROC) (GLenum target, GLeglImage image);
 #endif
 
-/* GL_OES_element_index_uint */
-#ifndef GL_OES_element_index_uint
-#define GL_OES_element_index_uint 1
+/* GL__EGL_image_external */
+#ifndef GL__EGL_image_external
+#define GL__EGL_image_external 1
+/* glEGLImageTargetTexture2D defined in GL__EGL_image already. */
 #endif
 
-/* GL_OES_fbo_render_mipmap */
-#ifndef GL_OES_fbo_render_mipmap
-#define GL_OES_fbo_render_mipmap 1
+/* GL__element_index_uint */
+#ifndef GL__element_index_uint
+#define GL__element_index_uint 1
 #endif
 
-/* GL_OES_fragment_precision_high */
-#ifndef GL_OES_fragment_precision_high
-#define GL_OES_fragment_precision_high 1
+/* GL__fbo_render_mipmap */
+#ifndef GL__fbo_render_mipmap
+#define GL__fbo_render_mipmap 1
 #endif
 
-/* GL_OES_get_program_binary */
-#ifndef GL_OES_get_program_binary
-#define GL_OES_get_program_binary 1
+/* GL__fragment_precision_high */
+#ifndef GL__fragment_precision_high
+#define GL__fragment_precision_high 1
+#endif
+
+/* GL__get_program_binary */
+#ifndef GL__get_program_binary
+#define GL__get_program_binary 1
 #ifdef GL_GLEXT_PROTOTYPES
-GL_APICALL void GL_APIENTRY glGetProgramBinaryOES (GLuint program, GLsizei bufSize, GLsizei *length, GLenum *binaryFormat, GLvoid *binary);
-GL_APICALL void GL_APIENTRY glProgramBinaryOES (GLuint program, GLenum binaryFormat, const GLvoid *binary, GLint length);
+GL_APICALL void GL_APIENTRY glGetProgramBinary (GLuint program, GLsizei bufSize, GLsizei *length, GLenum *binaryFormat, GLvoid *binary);
+GL_APICALL void GL_APIENTRY glProgramBinary (GLuint program, GLenum binaryFormat, const GLvoid *binary, GLint length);
 #endif
-typedef void (GL_APIENTRYP PFNGLGETPROGRAMBINARYOESPROC) (GLuint program, GLsizei bufSize, GLsizei *length, GLenum *binaryFormat, GLvoid *binary);
-typedef void (GL_APIENTRYP PFNGLPROGRAMBINARYOESPROC) (GLuint program, GLenum binaryFormat, const GLvoid *binary, GLint length);
+typedef void (GL_APIENTRYP PFNGLGETPROGRAMBINARYPROC) (GLuint program, GLsizei bufSize, GLsizei *length, GLenum *binaryFormat, GLvoid *binary);
+typedef void (GL_APIENTRYP PFNGLPROGRAMBINARYPROC) (GLuint program, GLenum binaryFormat, const GLvoid *binary, GLint length);
 #endif
 
-/* GL_OES_mapbuffer */
-#ifndef GL_OES_mapbuffer
-#define GL_OES_mapbuffer 1
+/* GL__mapbuffer */
+#ifndef GL__mapbuffer
+#define GL__mapbuffer 1
 #ifdef GL_GLEXT_PROTOTYPES
-GL_APICALL void* GL_APIENTRY glMapBufferOES (GLenum target, GLenum access);
-GL_APICALL GLboolean GL_APIENTRY glUnmapBufferOES (GLenum target);
-GL_APICALL void GL_APIENTRY glGetBufferPointervOES (GLenum target, GLenum pname, GLvoid** params);
+GL_APICALL void* GL_APIENTRY glMapBuffer (GLenum target, GLenum access);
+GL_APICALL GLboolean GL_APIENTRY glUnmapBuffer (GLenum target);
+GL_APICALL void GL_APIENTRY glGetBufferPointerv (GLenum target, GLenum pname, GLvoid** params);
 #endif
-typedef void* (GL_APIENTRYP PFNGLMAPBUFFEROESPROC) (GLenum target, GLenum access);
-typedef GLboolean (GL_APIENTRYP PFNGLUNMAPBUFFEROESPROC) (GLenum target);
-typedef void (GL_APIENTRYP PFNGLGETBUFFERPOINTERVOESPROC) (GLenum target, GLenum pname, GLvoid** params);
-#endif
-
-/* GL_OES_packed_depth_stencil */
-#ifndef GL_OES_packed_depth_stencil
-#define GL_OES_packed_depth_stencil 1
+typedef void* (GL_APIENTRYP PFNGLMAPBUFFERPROC) (GLenum target, GLenum access);
+typedef GLboolean (GL_APIENTRYP PFNGLUNMAPBUFFERPROC) (GLenum target);
+typedef void (GL_APIENTRYP PFNGLGETBUFFERPOINTERVPROC) (GLenum target, GLenum pname, GLvoid** params);
 #endif
 
-/* GL_OES_required_internalformat */
-#ifndef GL_OES_required_internalformat
-#define GL_OES_required_internalformat 1
+/* GL__packed_depth_stencil */
+#ifndef GL__packed_depth_stencil
+#define GL__packed_depth_stencil 1
 #endif
 
-/* GL_OES_rgb8_rgba8 */
-#ifndef GL_OES_rgb8_rgba8
-#define GL_OES_rgb8_rgba8 1
+/* GL__required_internalformat */
+#ifndef GL__required_internalformat
+#define GL__required_internalformat 1
 #endif
 
-/* GL_OES_standard_derivatives */
-#ifndef GL_OES_standard_derivatives
-#define GL_OES_standard_derivatives 1
+/* GL__rgb8_rgba8 */
+#ifndef GL__rgb8_rgba8
+#define GL__rgb8_rgba8 1
 #endif
 
-/* GL_OES_stencil1 */
-#ifndef GL_OES_stencil1
-#define GL_OES_stencil1 1
+/* GL__standard_derivatives */
+#ifndef GL__standard_derivatives
+#define GL__standard_derivatives 1
 #endif
 
-/* GL_OES_stencil4 */
-#ifndef GL_OES_stencil4
-#define GL_OES_stencil4 1
+/* GL__stencil1 */
+#ifndef GL__stencil1
+#define GL__stencil1 1
 #endif
 
-#ifndef GL_OES_surfaceless_context
-#define GL_OES_surfaceless_context 1
+/* GL__stencil4 */
+#ifndef GL__stencil4
+#define GL__stencil4 1
 #endif
 
-/* GL_OES_texture_3D */
-#ifndef GL_OES_texture_3D
-#define GL_OES_texture_3D 1
+#ifndef GL__surfaceless_context
+#define GL__surfaceless_context 1
+#endif
+
+/* GL__texture_3D */
+#ifndef GL__texture_3D
+#define GL__texture_3D 1
 #ifdef GL_GLEXT_PROTOTYPES
-GL_APICALL void GL_APIENTRY glTexImage3DOES (GLenum target, GLint level, GLenum internalformat, GLsizei width, GLsizei height, GLsizei depth, GLint border, GLenum format, GLenum type, const GLvoid* pixels);
-GL_APICALL void GL_APIENTRY glTexSubImage3DOES (GLenum target, GLint level, GLint xoffset, GLint yoffset, GLint zoffset, GLsizei width, GLsizei height, GLsizei depth, GLenum format, GLenum type, const GLvoid* pixels);
-GL_APICALL void GL_APIENTRY glCopyTexSubImage3DOES (GLenum target, GLint level, GLint xoffset, GLint yoffset, GLint zoffset, GLint x, GLint y, GLsizei width, GLsizei height);
-GL_APICALL void GL_APIENTRY glCompressedTexImage3DOES (GLenum target, GLint level, GLenum internalformat, GLsizei width, GLsizei height, GLsizei depth, GLint border, GLsizei imageSize, const GLvoid* data);
-GL_APICALL void GL_APIENTRY glCompressedTexSubImage3DOES (GLenum target, GLint level, GLint xoffset, GLint yoffset, GLint zoffset, GLsizei width, GLsizei height, GLsizei depth, GLenum format, GLsizei imageSize, const GLvoid* data);
-GL_APICALL void GL_APIENTRY glFramebufferTexture3DOES (GLenum target, GLenum attachment, GLenum textarget, GLuint texture, GLint level, GLint zoffset);
+GL_APICALL void GL_APIENTRY glTexImage3D (GLenum target, GLint level, GLenum internalformat, GLsizei width, GLsizei height, GLsizei depth, GLint border, GLenum format, GLenum type, const GLvoid* pixels);
+GL_APICALL void GL_APIENTRY glTexSubImage3D (GLenum target, GLint level, GLint xoffset, GLint yoffset, GLint zoffset, GLsizei width, GLsizei height, GLsizei depth, GLenum format, GLenum type, const GLvoid* pixels);
+GL_APICALL void GL_APIENTRY glCopyTexSubImage3D (GLenum target, GLint level, GLint xoffset, GLint yoffset, GLint zoffset, GLint x, GLint y, GLsizei width, GLsizei height);
+GL_APICALL void GL_APIENTRY glCompressedTexImage3D (GLenum target, GLint level, GLenum internalformat, GLsizei width, GLsizei height, GLsizei depth, GLint border, GLsizei imageSize, const GLvoid* data);
+GL_APICALL void GL_APIENTRY glCompressedTexSubImage3D (GLenum target, GLint level, GLint xoffset, GLint yoffset, GLint zoffset, GLsizei width, GLsizei height, GLsizei depth, GLenum format, GLsizei imageSize, const GLvoid* data);
+GL_APICALL void GL_APIENTRY glFramebufferTexture3D (GLenum target, GLenum attachment, GLenum textarget, GLuint texture, GLint level, GLint zoffset);
 #endif
-typedef void (GL_APIENTRYP PFNGLTEXIMAGE3DOESPROC) (GLenum target, GLint level, GLenum internalformat, GLsizei width, GLsizei height, GLsizei depth, GLint border, GLenum format, GLenum type, const GLvoid* pixels);
-typedef void (GL_APIENTRYP PFNGLTEXSUBIMAGE3DOESPROC) (GLenum target, GLint level, GLint xoffset, GLint yoffset, GLint zoffset, GLsizei width, GLsizei height, GLsizei depth, GLenum format, GLenum type, const GLvoid* pixels);
-typedef void (GL_APIENTRYP PFNGLCOPYTEXSUBIMAGE3DOESPROC) (GLenum target, GLint level, GLint xoffset, GLint yoffset, GLint zoffset, GLint x, GLint y, GLsizei width, GLsizei height);
-typedef void (GL_APIENTRYP PFNGLCOMPRESSEDTEXIMAGE3DOESPROC) (GLenum target, GLint level, GLenum internalformat, GLsizei width, GLsizei height, GLsizei depth, GLint border, GLsizei imageSize, const GLvoid* data);
-typedef void (GL_APIENTRYP PFNGLCOMPRESSEDTEXSUBIMAGE3DOESPROC) (GLenum target, GLint level, GLint xoffset, GLint yoffset, GLint zoffset, GLsizei width, GLsizei height, GLsizei depth, GLenum format, GLsizei imageSize, const GLvoid* data);
-typedef void (GL_APIENTRYP PFNGLFRAMEBUFFERTEXTURE3DOES) (GLenum target, GLenum attachment, GLenum textarget, GLuint texture, GLint level, GLint zoffset);
-#endif
-
-/* GL_OES_texture_float */
-#ifndef GL_OES_texture_float
-#define GL_OES_texture_float 1
+typedef void (GL_APIENTRYP PFNGLTEXIMAGE3DPROC) (GLenum target, GLint level, GLenum internalformat, GLsizei width, GLsizei height, GLsizei depth, GLint border, GLenum format, GLenum type, const GLvoid* pixels);
+typedef void (GL_APIENTRYP PFNGLTEXSUBIMAGE3DPROC) (GLenum target, GLint level, GLint xoffset, GLint yoffset, GLint zoffset, GLsizei width, GLsizei height, GLsizei depth, GLenum format, GLenum type, const GLvoid* pixels);
+typedef void (GL_APIENTRYP PFNGLCOPYTEXSUBIMAGE3DPROC) (GLenum target, GLint level, GLint xoffset, GLint yoffset, GLint zoffset, GLint x, GLint y, GLsizei width, GLsizei height);
+typedef void (GL_APIENTRYP PFNGLCOMPRESSEDTEXIMAGE3DPROC) (GLenum target, GLint level, GLenum internalformat, GLsizei width, GLsizei height, GLsizei depth, GLint border, GLsizei imageSize, const GLvoid* data);
+typedef void (GL_APIENTRYP PFNGLCOMPRESSEDTEXSUBIMAGE3DPROC) (GLenum target, GLint level, GLint xoffset, GLint yoffset, GLint zoffset, GLsizei width, GLsizei height, GLsizei depth, GLenum format, GLsizei imageSize, const GLvoid* data);
+typedef void (GL_APIENTRYP PFNGLFRAMEBUFFERTEXTURE3D) (GLenum target, GLenum attachment, GLenum textarget, GLuint texture, GLint level, GLint zoffset);
 #endif
 
-/* GL_OES_texture_float_linear */
-#ifndef GL_OES_texture_float_linear
-#define GL_OES_texture_float_linear 1
+/* GL__texture_float */
+#ifndef GL__texture_float
+#define GL__texture_float 1
 #endif
 
-/* GL_OES_texture_half_float */
-#ifndef GL_OES_texture_half_float
-#define GL_OES_texture_half_float 1
+/* GL__texture_float_linear */
+#ifndef GL__texture_float_linear
+#define GL__texture_float_linear 1
 #endif
 
-/* GL_OES_texture_half_float_linear */
-#ifndef GL_OES_texture_half_float_linear
-#define GL_OES_texture_half_float_linear 1
+/* GL__texture_half_float */
+#ifndef GL__texture_half_float
+#define GL__texture_half_float 1
 #endif
 
-/* GL_OES_texture_npot */
-#ifndef GL_OES_texture_npot
-#define GL_OES_texture_npot 1
+/* GL__texture_half_float_linear */
+#ifndef GL__texture_half_float_linear
+#define GL__texture_half_float_linear 1
 #endif
 
-/* GL_OES_vertex_array_object */
-#ifndef GL_OES_vertex_array_object
-#define GL_OES_vertex_array_object 1
+/* GL__texture_npot */
+#ifndef GL__texture_npot
+#define GL__texture_npot 1
+#endif
+
+/* GL__vertex_array_object */
+#ifndef GL__vertex_array_object
+#define GL__vertex_array_object 1
 #ifdef GL_GLEXT_PROTOTYPES
-GL_APICALL void GL_APIENTRY glBindVertexArrayOES (GLuint array);
-GL_APICALL void GL_APIENTRY glDeleteVertexArraysOES (GLsizei n, const GLuint *arrays);
-GL_APICALL void GL_APIENTRY glGenVertexArraysOES (GLsizei n, GLuint *arrays);
-GL_APICALL GLboolean GL_APIENTRY glIsVertexArrayOES (GLuint array);
+GL_APICALL void GL_APIENTRY glBindVertexArray (GLuint array);
+GL_APICALL void GL_APIENTRY glDeleteVertexArrays (GLsizei n, const GLuint *arrays);
+GL_APICALL void GL_APIENTRY glGenVertexArrays (GLsizei n, GLuint *arrays);
+GL_APICALL GLboolean GL_APIENTRY glIsVertexArray (GLuint array);
 #endif
-typedef void (GL_APIENTRYP PFNGLBINDVERTEXARRAYOESPROC) (GLuint array);
-typedef void (GL_APIENTRYP PFNGLDELETEVERTEXARRAYSOESPROC) (GLsizei n, const GLuint *arrays);
-typedef void (GL_APIENTRYP PFNGLGENVERTEXARRAYSOESPROC) (GLsizei n, GLuint *arrays);
-typedef GLboolean (GL_APIENTRYP PFNGLISVERTEXARRAYOESPROC) (GLuint array);
-#endif
-
-/* GL_OES_vertex_half_float */
-#ifndef GL_OES_vertex_half_float
-#define GL_OES_vertex_half_float 1
+typedef void (GL_APIENTRYP PFNGLBINDVERTEXARRAYPROC) (GLuint array);
+typedef void (GL_APIENTRYP PFNGLDELETEVERTEXARRAYSPROC) (GLsizei n, const GLuint *arrays);
+typedef void (GL_APIENTRYP PFNGLGENVERTEXARRAYSPROC) (GLsizei n, GLuint *arrays);
+typedef GLboolean (GL_APIENTRYP PFNGLISVERTEXARRAYPROC) (GLuint array);
 #endif
 
-/* GL_OES_vertex_type_10_10_10_2 */
-#ifndef GL_OES_vertex_type_10_10_10_2
-#define GL_OES_vertex_type_10_10_10_2 1
+/* GL__vertex_half_float */
+#ifndef GL__vertex_half_float
+#define GL__vertex_half_float 1
+#endif
+
+/* GL__vertex_type_10_10_10_2 */
+#ifndef GL__vertex_type_10_10_10_2
+#define GL__vertex_type_10_10_10_2 1
 #endif
 
 /*------------------------------------------------------------------------*

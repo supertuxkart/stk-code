@@ -419,7 +419,7 @@ bool ContextManagerEGL::createContext()
 
             std::vector<EGLint> context_attribs;
             context_attribs.push_back(EGL_CONTEXT_CLIENT_VERSION);
-            context_attribs.push_back(2);
+            context_attribs.push_back(3);
             context_attribs.push_back(EGL_NONE);
             context_attribs.push_back(0);
 
@@ -488,7 +488,7 @@ bool ContextManagerEGL::createContext()
 
             std::vector<EGLint> context_attribs;
             context_attribs.push_back(EGL_CONTEXT_MAJOR_VERSION);
-            context_attribs.push_back(2);
+            context_attribs.push_back(3);
             context_attribs.push_back(EGL_CONTEXT_MINOR_VERSION);
             context_attribs.push_back(1);
             context_attribs.push_back(EGL_NONE);

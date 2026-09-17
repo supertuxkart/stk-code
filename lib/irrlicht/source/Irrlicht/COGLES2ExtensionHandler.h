@@ -19,7 +19,7 @@
 #include <OpenGLES/ES2/gl.h>
 #include <OpenGLES/ES2/glext.h>
 #else
-#include <GLES2/gl2.h>
+#include <GLES3/gl3.h>
 // seems to be missing...
 typedef char GLchar;
 #if defined(_IRR_OGLES2_USE_EXTPOINTER_)

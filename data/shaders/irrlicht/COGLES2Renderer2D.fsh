@@ -4,20 +4,22 @@
 // This file is part of the "Irrlicht Engine".
 // For conditions of distribution and use, see copyright notice in Irrlicht.h
 
+#version 300 es
+
 precision mediump float;
 
 uniform bool uUseTexture;
 uniform sampler2D uTextureUnit;
 
-varying vec4 vVertexColor;
-varying vec2 vTexCoord;
+in vec4 vVertexColor;
+in vec2 vTexCoord;
 
 void main(void)
 {
 	vec4 Color = vVertexColor;
 
 	if(uUseTexture)
-		Color *= texture2D(uTextureUnit, vTexCoord);
+		Color *= texture(uTextureUnit, vTexCoord);
 	
-	gl_FragColor = Color;
+	out vec4 Color
 }
