@@ -1247,7 +1247,13 @@ void ServerLobby::liveJoinRequest(Event* event)
     if (!spectator)
     {
         auto spectators_by_limit = getSpectatorsByLimit();
-        setPlayerKarts(data, peer);
+        if (!setPlayerKarts(data, peer))
+        {
+            // The kart list is part of the live-join request. Do not continue
+            // with uninitialised kart data after rejecting a malformed list.
+            rejectLiveJoin(peer, BLR_NONE);
+            return;
+        }
 
         std::vector<int> used_id;
         for (unsigned i = 0; i < peer->getPlayerProfiles().size(); i++)
@@ -3166,7 +3172,8 @@ void ServerLobby::kartSelectionRequested(Event* event)
 
     const NetworkString& data = event->data();
     STKPeer* peer = event->getPeer();
-    setPlayerKarts(data, peer);
+    if (!setPlayerKarts(data, peer))
+        return;
 }   // kartSelectionRequested
 
 //-----------------------------------------------------------------------------
@@ -4167,14 +4174,14 @@ void ServerLobby::addLiveJoinPlaceholder(
 }   // addLiveJoinPlaceholder
 
 //-----------------------------------------------------------------------------
-void ServerLobby::setPlayerKarts(const NetworkString& ns, STKPeer* peer) const
+bool ServerLobby::setPlayerKarts(const NetworkString& ns, STKPeer* peer) const
 {
     unsigned player_count = ns.getUInt8();
     if (player_count > peer->getPlayerProfiles().size())
     {
         Log::warn("ServerLobby", "Too many kart entries from %s.",
             peer->getAddress().toString().c_str());
-        return;
+        return false;
     }
     for (unsigned i = 0; i < player_count; i++)
     {
@@ -4198,7 +4205,7 @@ void ServerLobby::setPlayerKarts(const NetworkString& ns, STKPeer* peer) const
     }
     if (peer->getClientCapabilities().find("real_addon_karts") ==
         peer->getClientCapabilities().end() || ns.size() == 0)
-        return;
+        return true;
     for (unsigned i = 0; i < player_count; i++)
     {
         KartData kart_data(ns);
@@ -4225,6 +4232,7 @@ void ServerLobby::setPlayerKarts(const NetworkString& ns, STKPeer* peer) const
             player->setKartData(kart_data);
         }
     }
+    return true;
 }   // setPlayerKarts
 
 //-----------------------------------------------------------------------------
