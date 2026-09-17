@@ -3,26 +3,29 @@
 // and OpenGL ES driver implemented by Christian Stehno
 // This file is part of the "Irrlicht Engine".
 // For conditions of distribution and use, see copyright notice in Irrlicht.h
+
+#version 300 es
+
 #define MAX_LIGHTS 2
 
-attribute vec4 inVertexPosition;
-attribute vec4 inVertexColor;
-attribute vec4 inTexCoord0;
-attribute vec3 inVertexNormal;
-attribute vec3 inVertexTangent;
-attribute vec3 inVertexBinormal;
+in vec4 inVertexPosition;
+in vec4 inVertexColor;
+in vec4 inTexCoord0;
+in vec3 inVertexNormal;
+in vec3 inVertexTangent;
+in vec3 inVertexBinormal;
 
 uniform mat4 uMvpMatrix;
 uniform vec4 uLightPos[MAX_LIGHTS];
 uniform vec4 uLightColor[MAX_LIGHTS];
 uniform vec3 uEyePos;
 
-varying vec4 varTexCoord;
-varying vec3 varLightVector[MAX_LIGHTS];
-varying vec4 varLightColor[MAX_LIGHTS];
-varying vec3 varEyeVector;
+out vec4 varTexCoord;
+out vec3 varLightVector[MAX_LIGHTS];
+out vec4 varLightColor[MAX_LIGHTS];
+out vec3 varEyeVector;
 
-varying vec4 debug;
+out vec4 debug;
 
 void main(void)
 {

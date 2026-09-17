@@ -28,12 +28,11 @@ uniform bool uTextureUsage0;
 uniform sampler2D uTextureUnit0;
 //uniform sampler2D uTextureUnit1;
 
-/* Varyings */
+/* Ins */
 
-varying vec2 varTexCoord0;
-//varying vec2 varTexCoord1;
-varying vec4 varVertexColor;
-varying float varEyeDist;
+in vec2 varTexCoord0;
+in vec4 varVertexColor;
+in float varEyeDist;
 
 vec3 rgbToHsv(vec3 c)
 {
@@ -58,7 +57,7 @@ vec4 renderSolid()
 	vec4 Color = vec4(1.0, 1.0, 1.0, 1.0);
 	if(uTextureUsage0)
 	{
-		Color *= texture2D(uTextureUnit0, varTexCoord0);
+		Color *= texture(uTextureUnit0, varTexCoord0);
 		if (uHueChange > 0.0)
 		{
 			float f_hue_change = 0.66;
@@ -86,8 +85,8 @@ vec4 render2LayerSolid()
 {
 	float BlendFactor = varVertexColor.a;
 	
-	vec4 Texel0 = texture2D(uTextureUnit0, varTexCoord0);
-	//vec4 Texel1 = texture2D(uTextureUnit1, varTexCoord1);
+	vec4 Texel0 = texture(uTextureUnit0, varTexCoord0);
+	//vec4 Texel1 = texture(uTextureUnit1, varTexCoord1);
 	
 	vec4 Color = Texel0 * BlendFactor;
 	//vec4 Color += Texel1 * (1.0 - BlendFactor);
@@ -97,8 +96,8 @@ vec4 render2LayerSolid()
 
 vec4 renderLightMap()
 {
-	vec4 Texel0 = texture2D(uTextureUnit0, varTexCoord0);
-	//vec4 Texel1 = texture2D(uTextureUnit1, varTexCoord1);
+	vec4 Texel0 = texture(uTextureUnit0, varTexCoord0);
+	//vec4 Texel1 = texture(uTextureUnit1, varTexCoord1);
 	
 	vec4 Color = Texel0 * 4.0;
 	//Color *= Texel1;
@@ -109,8 +108,8 @@ vec4 renderLightMap()
 
 vec4 renderDetailMap()
 {
-	vec4 Texel0 = texture2D(uTextureUnit0, varTexCoord0);
-	//vec4 Texel1 = texture2D(uTextureUnit1, varTexCoord1);
+	vec4 Texel0 = texture(uTextureUnit0, varTexCoord0);
+	//vec4 Texel1 = texture(uTextureUnit1, varTexCoord1);
 	
 	vec4 Color = Texel0;
 	//Color += Texel1 - 0.5;
@@ -122,8 +121,8 @@ vec4 renderReflection2Layer()
 {
 	vec4 Color = varVertexColor;
 	
-	vec4 Texel0 = texture2D(uTextureUnit0, varTexCoord0);
-	//vec4 Texel1 = texture2D(uTextureUnit1, varTexCoord1);
+	vec4 Texel0 = texture(uTextureUnit0, varTexCoord0);
+	//vec4 Texel1 = texture(uTextureUnit1, varTexCoord1);
 	
 	Color *= Texel0;
 	//Color *= Texel1;
@@ -137,7 +136,7 @@ vec4 renderTransparent()
 
 	if(uTextureUsage0)
 	{
-		Color *= texture2D(uTextureUnit0, varTexCoord0);
+		Color *= texture(uTextureUnit0, varTexCoord0);
 		if (uHueChange > 0.0)
 		{
 			vec3 old_hsv = rgbToHsv(Color.rgb);
@@ -155,7 +154,7 @@ vec4 renderTransparentVertexColor()
 	vec4 Color = vec4(1.0, 1.0, 1.0, 1.0);
 	if(uTextureUsage0)
 	{
-		Color *= texture2D(uTextureUnit0, varTexCoord0);
+		Color *= texture(uTextureUnit0, varTexCoord0);
 		if (uHueChange > 0.0)
 		{
 			vec3 old_hsv = rgbToHsv(Color.rgb);
@@ -173,51 +172,51 @@ vec4 renderTransparentVertexColor()
 void main ()
 {
     if (uMaterialType == Solid)
-		gl_FragColor = renderSolid();
+		out vec4 renderSolid();
 	else if(uMaterialType == Solid2Layer)
-		gl_FragColor = render2LayerSolid();
+		out vec4 render2LayerSolid();
 	else if(uMaterialType == LightMap)
-		gl_FragColor = renderSolid();
+		out vec4 renderSolid();
 	else if(uMaterialType == DetailMap)
-		gl_FragColor = renderDetailMap();
+		out vec4 renderDetailMap();
 	else if(uMaterialType == SphereMap)
-		gl_FragColor = renderSolid();
+		out vec4 renderSolid();
 	else if(uMaterialType == Reflection2Layer)
-		gl_FragColor = renderReflection2Layer();
+		out vec4 renderReflection2Layer();
 	else if(uMaterialType == TransparentAlphaChannel)
-		gl_FragColor = renderTransparent();
+		out vec4 renderTransparent();
 	else if(uMaterialType == TransparentAlphaChannelRef)
 	{
 		vec4 Color = renderTransparentVertexColor();
 		if (Color.a < 0.5)
 			discard;
-		gl_FragColor = Color;
+		out vec4 Color;
 	}
 	else if(uMaterialType == StkGrass)
 	{
 		vec4 Color = renderTransparent();
 		if (Color.a < 0.5)
 			discard;
-		gl_FragColor = Color;
+		out vec4 Color;
 	}
 	else if(uMaterialType == StkBlend)
 	{
-		gl_FragColor = renderTransparentVertexColor();
+		out vec4 renderTransparentVertexColor();
 	}
 	else if(uMaterialType == TransparentVertexAlpha)
 	{
 		vec4 Color = renderTransparent();
 		Color.a = varVertexColor.a;
 		
-		gl_FragColor = Color * uVertexColor;
+		out vec4 Color * uVertexColor;
 	}
 	else if(uMaterialType == TransparentReflection2Layer)
 	{
 		vec4 Color = renderReflection2Layer();
 		Color.a = varVertexColor.a;
 		
-		gl_FragColor = Color;
+		out vec4 Color;
 	}
 	else
-		gl_FragColor = vec4(1.0, 1.0, 1.0, 1.0);
+		out vec4 vec4(1.0, 1.0, 1.0, 1.0);
 }
