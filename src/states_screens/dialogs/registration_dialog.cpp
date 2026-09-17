@@ -46,7 +46,7 @@ RegistrationDialog::RegistrationDialog() :
         "If you have any questions or comments regarding these "
         "terms, one of the members of the development team would gladly "
         "assist you.",
-        "https://terms.supertuxkart.net");
+        StringUtils::utf8ToWide(stk_config->m_terms_url));
     terms_widget->setText(terms, false);
 
    // showRegistrationTerms();

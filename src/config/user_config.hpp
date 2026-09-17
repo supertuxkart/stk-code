@@ -488,7 +488,7 @@ namespace UserConfigParams
             PARAM_DEFAULT(  IntUserConfigParam(0, "soccer-blue-ai-num",
             &m_race_setup_group, "Number of blue AI karts in soccer mode.") );
     PARAM_PREFIX BoolUserConfigParam          m_karts_powerup_gui
-            PARAM_DEFAULT(  BoolUserConfigParam(false, "karts-powerup-gui",
+            PARAM_DEFAULT(  BoolUserConfigParam(true, "karts-powerup-gui",
             &m_race_setup_group, "Show other karts' held powerups in race gui.") );
     PARAM_PREFIX BoolUserConfigParam          m_soccer_player_list
             PARAM_DEFAULT(  BoolUserConfigParam(false, "soccer-player-list",
@@ -1421,6 +1421,11 @@ namespace UserConfigParams
                         "Enable all karts and tracks: 0 = disabled, "
                         "1 = everything except final race, 2 = everything") );
 
+    PARAM_PREFIX IntUserConfigParam        m_local_username_length
+            PARAM_DEFAULT( IntUserConfigParam(30, "local_username_length",
+                        "The upper character limit for local usernames. "
+                        "Change this at your own risk (of getting UI overflows).") );
+						
     PARAM_PREFIX StringUserConfigParam      m_commandline
             PARAM_DEFAULT( StringUserConfigParam("", "commandline",
                              "Allows one to set commandline args in config file") );

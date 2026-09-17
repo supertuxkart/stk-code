@@ -268,7 +268,12 @@ void OptionsScreenVideo::updateGfxSlider()
     GUIEngine::SpinnerWidget* gfx = getWidget<GUIEngine::SpinnerWidget>("gfx_level");
     assert( gfx != NULL );
     int preset = findCurrentGFXPreset();
-    if (preset == -1) // Current settings don't match a preset
+    if (GE::getDriver()->getDriverType() == video::EDT_VULKAN)
+    {
+        //I18N: video setting - Vulkan is the name of a graphics API and should not be translated, only possibly moved
+        gfx->setCustomText( _("3 (Vulkan)") );
+    }
+    else if (preset == -1) // Current settings don't match a preset
     {
         //I18N: custom video settings
         gfx->setCustomText( _("Custom") );
@@ -310,6 +315,10 @@ void OptionsScreenVideo::updateBlurSlider()
         //I18N: custom video settings
         blur->setCustomText( _("Custom") );
     }
+
+    // Only the modern GL renderer currently supports motion blur and DoF
+    if (std::string(UserConfigParams::m_render_driver) != "opengl")
+        blur->setValue(0);
 
     updateBlurTooltip();
 } // updateBlurSlider
@@ -355,13 +364,14 @@ void OptionsScreenVideo::updateTooltip()
     GUIEngine::SpinnerWidget* gfx = getWidget<GUIEngine::SpinnerWidget>("gfx_level");
     assert( gfx != NULL );
 
+    bool vk = (std::string(UserConfigParams::m_render_driver) == "vulkan");
     core::stringw tooltip;
 
     //I18N: in the graphical options
     tooltip = UserConfigParams::m_dynamic_lights ? _("Dynamic lights: Enabled") :
                                                    _("Dynamic lights: Disabled");
     //I18N: in the graphical options
-    if (UserConfigParams::m_shadows_resolution == 0)
+    if (UserConfigParams::m_shadows_resolution == 0 || vk)
     {
         tooltip = tooltip + L"\n" + _("Shadows: %s", _C("Shadows", "Disabled"));
         tooltip = tooltip + L"\n" + _("Soft shadows: Disabled");
@@ -376,32 +386,32 @@ void OptionsScreenVideo::updateTooltip()
 
     //I18N: in the graphical options
     tooltip = tooltip + L"\n" +
-        (UserConfigParams::m_mlaa ? _("Anti-aliasing: Enabled") :
-                                    _("Anti-aliasing: Disabled"));
+        ((UserConfigParams::m_mlaa && !vk) ? _("Anti-aliasing: Enabled") :
+                                             _("Anti-aliasing: Disabled"));
     //I18N: in the graphical options
     tooltip = tooltip + L"\n" +
         (!UserConfigParams::m_degraded_IBL ? _("Image-based lighting: Enabled") :
                                              _("Image-based lighting: Disabled"));
     //I18N: in the graphical options
     tooltip = tooltip + L"\n" +
-        (UserConfigParams::m_light_scatter ? _("Light scattering: Enabled") :
-                                             _("Light scattering: Disabled"));
+        ((UserConfigParams::m_light_scatter && !vk) ? _("Light scattering: Enabled") :
+                                                      _("Light scattering: Disabled"));
     //I18N: in the graphical options
     tooltip = tooltip + L"\n" +
-        (UserConfigParams::m_glow ? _("Glow (outlines): Enabled") :
-                                    _("Glow (outlines): Disabled"));
+        ((UserConfigParams::m_glow && !vk) ? _("Glow (outlines): Enabled") :
+                                             _("Glow (outlines): Disabled"));
     //I18N: in the graphical options
     tooltip = tooltip + L"\n" +
-        (UserConfigParams::m_light_shaft ? _("Light shaft (God rays): Enabled") :
-                                           _("Light shaft (God rays): Disabled"));
+        ((UserConfigParams::m_light_shaft && !vk) ? _("Light shaft (God rays): Enabled") :
+                                                    _("Light shaft (God rays): Disabled"));
     //I18N: in the graphical options
     tooltip = tooltip + L"\n" +
-        (UserConfigParams::m_bloom ? _("Bloom: Enabled") :
-                                     _("Bloom: Disabled"));
+        ((UserConfigParams::m_bloom && !vk) ? _("Bloom: Enabled") :
+                                              _("Bloom: Disabled"));
     //I18N: in the graphical options
     tooltip = tooltip + L"\n" +
-        (UserConfigParams::m_ssao ? _("Ambient occlusion: Enabled") :
-                                    _("Ambient occlusion: Disabled"));
+        ((UserConfigParams::m_ssao && !vk) ? _("Ambient occlusion: Enabled") :
+                                             _("Ambient occlusion: Disabled"));
     tooltip = tooltip + L"\n" +
         (UserConfigParams::m_ssr ? _("Screen space reflection: Enabled") :
                                    _("Screen space reflection: Disabled"));
@@ -437,16 +447,17 @@ void OptionsScreenVideo::updateBlurTooltip()
     GUIEngine::SpinnerWidget* blur = getWidget<GUIEngine::SpinnerWidget>("blur_level");
     assert( blur != NULL );
 
+    bool gl = std::string(UserConfigParams::m_render_driver) == "opengl";
     core::stringw tooltip;
 
     //I18N: in the graphical options
-    tooltip = UserConfigParams::m_motionblur ? _("Motion blur: Enabled") :
-                                               _("Motion blur: Disabled");
+    tooltip = (UserConfigParams::m_motionblur && gl) ? _("Motion blur: Enabled") :
+                                                       _("Motion blur: Disabled");
 
     //I18N: in the graphical options
     tooltip = tooltip + L"\n" +
-        (UserConfigParams::m_dof ? _("Depth of field: Enabled") :
-                                   _("Depth of field: Disabled"));
+        ((UserConfigParams::m_dof && gl) ? _("Depth of field: Enabled") :
+                                           _("Depth of field: Disabled"));
 
     blur->setTooltip(tooltip);
 }   // updateBlurTooltip

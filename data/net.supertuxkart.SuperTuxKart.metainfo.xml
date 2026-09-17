@@ -186,7 +186,7 @@
   </branding>
   <screenshots>
     <screenshot type="default">
-      <image>https://supertuxkart.net/assets/wiki/STK1.3_1.jpg</image>
+      <image>https://supertuxkart.net/assets/gallery/STK1.3_1.jpg</image>
       <caption>Normal Race</caption>
       <caption xml:lang="zh-Hant-TW">正常比賽</caption>
       <caption xml:lang="zh-Hant-HK">正常比賽</caption>
@@ -253,7 +253,7 @@
       <caption xml:lang="ar">سباق عاديّ</caption>
     </screenshot>
     <screenshot>
-      <image>https://supertuxkart.net/assets/wiki/STK1.3_5.jpg</image>
+      <image>https://supertuxkart.net/assets/gallery/STK1.3_5.jpg</image>
       <caption>Battle</caption>
       <caption xml:lang="zh-Hant-TW">對戰</caption>
       <caption xml:lang="zh-Hant-HK">對戰</caption>
@@ -314,7 +314,7 @@
       <caption xml:lang="ar">معركة</caption>
     </screenshot>
     <screenshot>
-      <image>https://supertuxkart.net/assets/wiki/STK1.3_6.jpg</image>
+      <image>https://supertuxkart.net/assets/gallery/STK1.3_6.jpg</image>
       <caption>Soccer</caption>
       <caption xml:lang="zh-Hant-TW">足球</caption>
       <caption xml:lang="zh-Hant-HK">足球</caption>

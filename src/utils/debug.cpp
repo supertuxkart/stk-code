@@ -736,42 +736,30 @@ bool handleContextMenuAction(s32 cmd_id)
         break;
     case DEBUG_GUI_CAM_TOP:
         CameraDebug::setDebugType(CameraDebug::CM_DEBUG_TOP_OF_KART);
-        Camera::changeCamera(0, Camera::CM_TYPE_DEBUG);
-        Camera::getActiveCamera()->setKart(World::getWorld()->getKart(kart_num));
-        irr_driver->getDevice()->getCursorControl()->setVisible(true);
+        setDebugCamera(kart_num);
         break;
     case DEBUG_GUI_CAM_WHEEL:
         if (!(World::getWorld()->getKart(kart_num)->isGhostKart()))
         {
             CameraDebug::setDebugType(CameraDebug::CM_DEBUG_GROUND);
-            Camera::changeCamera(0, Camera::CM_TYPE_DEBUG);
-            Camera::getActiveCamera()->setKart(World::getWorld()->getKart(kart_num));
-            irr_driver->getDevice()->getCursorControl()->setVisible(true);
+            setDebugCamera(kart_num);
         }
         break;
     case DEBUG_GUI_CAM_BEHIND_KART:
         CameraDebug::setDebugType(CameraDebug::CM_DEBUG_BEHIND_KART);
-        Camera::changeCamera(0, Camera::CM_TYPE_DEBUG);
-        Camera::getActiveCamera()->setKart(World::getWorld()->getKart(kart_num));
-        irr_driver->getDevice()->getCursorControl()->setVisible(true);
+        setDebugCamera(kart_num);
         break;
     case DEBUG_GUI_CAM_SIDE_OF_KART:
         CameraDebug::setDebugType(CameraDebug::CM_DEBUG_SIDE_OF_KART);
-        Camera::changeCamera(0, Camera::CM_TYPE_DEBUG);
-        Camera::getActiveCamera()->setKart(World::getWorld()->getKart(kart_num));
-        irr_driver->getDevice()->getCursorControl()->setVisible(true);
+        setDebugCamera(kart_num);
         break;
     case DEBUG_GUI_CAM_INV_SIDE_OF_KART:
         CameraDebug::setDebugType(CameraDebug::CM_DEBUG_INV_SIDE_OF_KART);
-        Camera::changeCamera(0, Camera::CM_TYPE_DEBUG);
-        Camera::getActiveCamera()->setKart(World::getWorld()->getKart(kart_num));
-        irr_driver->getDevice()->getCursorControl()->setVisible(true);
+        setDebugCamera(kart_num);
         break;
     case DEBUG_GUI_CAM_FRONT_OF_KART:
         CameraDebug::setDebugType(CameraDebug::CM_DEBUG_FRONT_OF_KART);
-        Camera::changeCamera(0, Camera::CM_TYPE_DEBUG);
-        Camera::getActiveCamera()->setKart(World::getWorld()->getKart(kart_num));
-        irr_driver->getDevice()->getCursorControl()->setVisible(true);
+        setDebugCamera(kart_num);
         break;
     case DEBUG_GUI_CAM_FREE:
     {
@@ -1398,8 +1386,8 @@ bool onEvent(const SEvent &event)
             sub->addItem(L"Save screenshot (Print Screen)", DEBUG_SAVE_SCREENSHOT);
             if (has_world)
             {
-                sub->addItem(L"Save replay (Ctrl + F11)", DEBUG_SAVE_REPLAY);
-                sub->addItem(L"Save history (F11)", DEBUG_SAVE_HISTORY);
+                sub->addItem(L"Save replay (F11)", DEBUG_SAVE_REPLAY);
+                sub->addItem(L"Save history (Ctrl + F11)", DEBUG_SAVE_HISTORY);
                 sub->addItem(L"Dump RTT (Shift + F11)", DEBUG_DUMP_RTT);
             } // has_world
             sub->addSeparator();
@@ -1739,6 +1727,16 @@ void moveFPCamera(DebugMoveCamera axis, int move_value, bool shift_pressed)
         cam->setLinearVelocity(vel);
     }
 }   // moveFPCamera
+
+// ----------------------------------------------------------------------------
+/** Utility function called when setting various debug cameras
+ */
+void setDebugCamera(int kart_num)
+{
+    Camera::changeCamera(0, Camera::CM_TYPE_DEBUG);
+    Camera::getActiveCamera()->setKart(World::getWorld()->getKart(kart_num));
+    irr_driver->getDevice()->getCursorControl()->setVisible(true);
+}   // setDebugCamera
 
 // ----------------------------------------------------------------------------
 /** Returns if the debug menu is visible.

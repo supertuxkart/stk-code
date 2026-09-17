@@ -15,6 +15,7 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
+#include <cctype>
 #include <string.h>
 #include <iostream>
 #include <fstream>
@@ -30,6 +31,34 @@
 #include <IWriteFile.h>
 using namespace irr;
 using namespace io;
+
+// ----------------------------------------------------------------------------
+/** Returns whether a ZIP file name can be extracted below a destination
+ * directory. ZIP paths are normalised to use '/' by Irrlicht.
+ */
+static bool isSafeArchivePath(const std::string& path)
+{
+    if (path.empty() || path[0] == '/' || path[0] == '\\' ||
+        (path.size() > 1 && std::isalpha((unsigned char)path[0]) &&
+         path[1] == ':'))
+    {
+        return false;
+    }
+
+    std::string::size_type start = 0;
+    while (start < path.size())
+    {
+        std::string::size_type end = path.find('/', start);
+        std::string component = path.substr(start, end - start);
+        if (component.empty() || component == "." || component == "..")
+            return false;
+        if (end == std::string::npos)
+            break;
+        start = end + 1;
+    }
+    return true;
+}   // isSafeArchivePath
+
 s32 IFileSystem_copyFileToFile(IWriteFile* dst, IReadFile* src)
 {
   char buf[1024];
@@ -83,6 +112,13 @@ bool extract_zip(const std::string &from, const std::string &to, bool recursive)
         std::string base = zip_file_list->getFullFileName(i).c_str();
         if (!recursive)
             base = StringUtils::getBasename(base);
+        else if (!isSafeArchivePath(base))
+        {
+            Log::warn("addons", "Ignoring unsafe file '%s' in archive '%s'.",
+                      base.c_str(), from.c_str());
+            error = true;
+            continue;
+        }
 
         Log::debug("addons", "Unzipping file '%s'.", base.c_str());
 

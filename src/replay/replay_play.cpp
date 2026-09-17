@@ -207,6 +207,12 @@ bool ReplayPlay::addReplayFile(const std::string& fn, bool custom_replay, int ca
             rd.m_kart_color.push_back(0.0f); // Use default kart color
     }
 
+    if (rd.m_kart_list.size() == 0)
+    {
+        Log::warn("Replay", "No kart specified in replay file, '%s'.", fn.c_str());
+        return false;
+    }
+
     int reverse = 0;
     fgets(s, 1023, fd);
     if(sscanf(s, "reverse: %d", &reverse) != 1)

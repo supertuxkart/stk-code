@@ -38,6 +38,7 @@ namespace Debug
     void handleStaticAction(int key, int value,
                             bool control_pressed, bool shift_pressed);
     void moveFPCamera(DebugMoveCamera axis, int move_value, bool shift_pressed);
+    void setDebugCamera(int kart_num);
 }
 
 

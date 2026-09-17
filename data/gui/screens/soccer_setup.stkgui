@@ -7,7 +7,7 @@
         <spacer height="1%" width="25"/>
 
         <!-- The bubble text is added at runtime -->
-        <bubble height="fit" id="choose_team" width="100%" I18N="In soccer setup screen" text=" " word_wrap="true" text_align="center"/>
+        <bubble height="fit" id="choose_team" width="100%" I18N="In soccer setup screen" text="" word_wrap="true" text_align="center"/>
 
         <spacer height="1%" width="25"/>
 

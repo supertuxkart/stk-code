@@ -120,6 +120,8 @@ namespace GUIEngine
 
         void drawRTTScene(const irr::core::rect<s32>& dest_rect) const;
 
+        float computeScale(float kart_length, float kart_height) const;
+
         std::shared_ptr<GE::GERenderInfo> getModelViewRenderInfo() { return m_render_info; }
     };
 

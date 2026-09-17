@@ -201,39 +201,8 @@ void RaceResultGUI::init()
         m_end_track = (int)tracks.size();
     }
 
-    if (!human_win && !NetworkConfig::get()->isNetworking() &&
-        !TipsManager::get()->isEmpty())
-    {
-        std::string tipset;
-        // For races with powerups, pick at random
-        // between the race-powerup and time-trial tipsets.
-        if (RaceManager::get()->isLinearRaceMode() &&
-            !RaceManager::get()->isTimeTrialMode())
-        {
-            RandomGenerator randgen;
-            randgen.seed((int)StkTime::getTimeSinceEpoch());
-            unsigned int racePowerupTipCount = TipsManager::get()->getTipCount("race-powerup");
-            unsigned int raceTipCount = racePowerupTipCount + TipsManager::get()->getTipCount("time-trial");
-            unsigned int randvalue = randgen.get(raceTipCount);
-            tipset = (randvalue < racePowerupTipCount) ? "race-powerup" : "time-trial";
-        }
-        else if (RaceManager::get()->isSoccerMode())
-        {
-            tipset = "soccer";
-        }
-        else if (RaceManager::get()->isTimeTrialMode())
-        {
-            tipset = "time-trial";
-        }
-        else
-        {
-            return; // Don't show irrelevant tips
-        }
-
-        core::stringw tip = TipsManager::get()->getTip(tipset);
-        core::stringw tips_string = _("Tip: %s", tip);
-        MessageQueue::add(MessageQueue::MT_GENERIC, tips_string);
-    }
+    if (!human_win)
+        scheduleTip();
 
     // Load the kart icons
     m_icon_bank = new irr::gui::STKModifiedSpriteBank( GUIEngine::getGUIEnv());
@@ -267,11 +236,60 @@ void RaceResultGUI::tearDown()
         m_finish_sound->stop();
     }
 
-    if (m_blue_goal_list)
+    if (m_has_set_goal_lists)
+    {
+        manualRemoveWidget(m_blue_goal_list);
         m_blue_goal_list->setIcons(NULL);
-    if (m_red_goal_list)
+        delete m_blue_goal_list;
+        manualRemoveWidget(m_red_goal_list);
         m_red_goal_list->setIcons(NULL);
+        delete m_red_goal_list;
+        m_has_set_goal_lists = false;
+    }
+
+    delete m_icon_bank;
+    m_icon_bank = NULL;
 }   // tearDown
+
+//-----------------------------------------------------------------------------
+/** Request the display of a tip relevant to the current game mode
+ */
+void RaceResultGUI::scheduleTip()
+{
+    // Only display a tip in local play and if there are tips
+    if (NetworkConfig::get()->isNetworking() || TipsManager::get()->isEmpty())
+        return;
+
+    std::string tipset;
+    // For races with powerups, pick at random
+    // between the race-powerup and time-trial tipsets.
+    if (RaceManager::get()->isLinearRaceMode() &&
+        !RaceManager::get()->isTimeTrialMode())
+    {
+        RandomGenerator randgen;
+        randgen.seed((int)StkTime::getTimeSinceEpoch());
+        unsigned int racePowerupTipCount = TipsManager::get()->getTipCount("race-powerup");
+        unsigned int raceTipCount = racePowerupTipCount + TipsManager::get()->getTipCount("time-trial");
+        unsigned int randvalue = randgen.get(raceTipCount);
+        tipset = (randvalue < racePowerupTipCount) ? "race-powerup" : "time-trial";
+    }
+    else if (RaceManager::get()->isSoccerMode())
+    {
+        tipset = "soccer";
+    }
+    else if (RaceManager::get()->isTimeTrialMode())
+    {
+        tipset = "time-trial";
+    }
+    else
+    {
+        return; // Don't show irrelevant tips
+    }
+
+    core::stringw tip = TipsManager::get()->getTip(tipset);
+    core::stringw tips_string = _("Tip: %s", tip);
+    MessageQueue::add(MessageQueue::MT_GENERIC, tips_string);
+}   // scheduleTip
 
 //-----------------------------------------------------------------------------
 /** Makes the correct buttons visible again, and gives them the right label.
@@ -850,8 +868,6 @@ void RaceResultGUI::drawCTFScorers(KartTeam team, int x, int y, int height)
 //-----------------------------------------------------------------------------
 void RaceResultGUI::unload()
 {
-    delete m_icon_bank;
-    m_icon_bank = NULL;
     cleanupGPProgress();
     Screen::unload();
 } // unload

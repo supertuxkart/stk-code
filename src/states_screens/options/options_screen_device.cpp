@@ -660,8 +660,10 @@ void OptionsScreenDevice::onConfirm()
 }   // onConfirm
 
 // -----------------------------------------------------------------------------
-
-
+/* Mark any key shared with an active config as a conflict (except potentially
+* for the cancel/pause keys). For single-player, extra configs are easily disabled,
+* while for splitscreen this helps to make sure the configs don't clash.
+*/
 bool OptionsScreenDevice::conflictsBetweenKbdConfig(PlayerAction action,
                                                    PlayerAction from,
                                                    PlayerAction to)
@@ -672,13 +674,16 @@ bool OptionsScreenDevice::conflictsBetweenKbdConfig(PlayerAction action,
         KeyboardConfig* other_kbd_config =
             input_manager->getDeviceManager()->getKeyboardConfig(i);
 
-        if (m_config != other_kbd_config  &&
-            other_kbd_config->hasBindingFor(id, from, to)
-            && (other_kbd_config->getBinding(action).getId() != id ||
-                 action == PA_FIRE)                                  )
-        {
+        if ((m_config == other_kbd_config) ||
+            !other_kbd_config->isEnabled())
+            continue;
+
+        // The ability to cancel in menus for additional configs is rather secondary,
+        // so multiple configs may share the same cancel button
+        if (other_kbd_config->hasBindingFor(id, from, to) &&
+            ((action != PA_PAUSE_RACE && action != PA_MENU_CANCEL) ||
+             other_kbd_config->getBinding(action).getId() != id))
             return true;
-        }
     }
     return false;
 }   // conflictsBetweenKbdConfig

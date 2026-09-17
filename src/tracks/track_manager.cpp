@@ -331,24 +331,26 @@ void TrackManager::removeTrackFromGroups(TrackGroupType type, const Track* track
     std::vector<Track*>::iterator it = std::find(m_tracks.begin(), m_tracks.end(), track);
     int index = int(it - m_tracks.begin());
 
+    // Loop over all the groups the track was part of
     for(unsigned int i=0; i<groups.size(); i++)
     {
-        std::vector<int> &indices = group_2_indices_no_custom[groups[i]];
+        std::vector<int> &indices_no_custom = group_2_indices_no_custom[groups[i]];
         std::vector<int>::iterator j;
-        j = std::find(indices.begin(), indices.end(), index);
-        if (j != indices.end())
-            indices.erase(j);
+        j = std::find(indices_no_custom.begin(), indices_no_custom.end(), index);
+        if (j != indices_no_custom.end())
+            indices_no_custom.erase(j);
 
         // If the track was the last member of a group,
         // completely remove the group
-        if(indices.size()==0)
+        if(indices_no_custom.size()==0)
         {
             group_2_indices_no_custom.erase(groups[i]);
         }   // if complete group must be removed
 
-        indices = group_2_indices[groups[i]];
+        // We check the vector by reference, so we must use a new variable here
+        std::vector<int> &indices = group_2_indices[groups[i]];
         j = std::find(indices.begin(), indices.end(), index);
-        assert(j!=indices.end());
+        assert(j != indices.end());
         indices.erase(j);
 
         // If the track was the last member of a group,

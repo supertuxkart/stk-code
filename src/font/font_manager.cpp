@@ -333,80 +333,12 @@ void FontManager::shape(const std::u32string& text,
     if (text.back() == U'\n')
         lines.push_back(U"");
 
-    // URL marker
+    // Start and end of URLs
     std::vector<std::pair<int, int> > http_pos;
-    auto fix_end_pos = [](const std::u32string& url, size_t start_pos,
-                          size_t pos)->size_t
-    {
-        // https:// has 8 characters, shortest URL has 3 characters (like t.me)
-        // so 8 is valid for http:// too
-        size_t next_forward_slash = url.find(U'/', start_pos + 8);
-        if (next_forward_slash > pos)
-            next_forward_slash = std::string::npos;
-
-        // Tested in gnome terminal, URL ends with 0-9, aA-zZ, /- or ~:_=#$%&'+@*]) only
-        // ~:_=#$%&'+@*]) will not be highlighted unless it's after / (forward slash)
-        // We assume the URL is valid so we only test ]) instead of ([ blah ])
-        std::u32string valid_end_characters = U"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789/-";
-        std::u32string valid_end_characters_extra = U"~:_=#$%&'+@*])";
-        if (next_forward_slash != std::string::npos)
-            valid_end_characters += valid_end_characters_extra;
-
-        while (pos > 1)
-        {
-            char32_t url_char = url[pos - 1];
-            for (char32_t valid_char : valid_end_characters)
-            {
-                if (valid_char == url_char)
-                    return pos;
-            }
-            pos--;
-        }
-        return 0;
-    };
 
     // Auto URL highlighting for http:// or https://
-    size_t pos = text.find(U"http://", 0);
-    while (pos != std::u32string::npos)
-    {
-        // Find nearest newline or whitespace
-        size_t newline_pos = text.find(U'\n', pos + 1);
-        size_t space_pos = text.find(U' ', pos + 1);
-        size_t end_pos = std::u32string::npos;
-        if (newline_pos != std::u32string::npos ||
-            space_pos != std::u32string::npos)
-        {
-            if (space_pos > newline_pos)
-                end_pos = newline_pos;
-            else
-                end_pos = space_pos;
-        }
-        else
-            end_pos = text.size();
-        end_pos = fix_end_pos(text, pos, end_pos);
-        http_pos.emplace_back((int)pos, (int)end_pos);
-        pos = text.find(U"http://", pos + 1);
-    }
-    pos = text.find(U"https://", 0);
-    while (pos != std::u32string::npos)
-    {
-        size_t newline_pos = text.find(U'\n', pos + 1);
-        size_t space_pos = text.find(U' ', pos + 1);
-        size_t end_pos = std::u32string::npos;
-        if (newline_pos != std::u32string::npos ||
-            space_pos != std::u32string::npos)
-        {
-            if (space_pos > newline_pos)
-                end_pos = newline_pos;
-            else
-                end_pos = space_pos;
-        }
-        else
-            end_pos = text.size();
-        end_pos = fix_end_pos(text, pos, end_pos);
-        http_pos.emplace_back((int)pos, (int)end_pos);
-        pos = text.find(U"https://", pos + 1);
-    }
+    findURLPositions(http_pos, U"http://", text);
+    findURLPositions(http_pos, U"https://", text);
 
     bool save_orig_string = (shape_flag & gui::SF_ENABLE_CLUSTER_TEST) != 0;
     if (!http_pos.empty())
@@ -695,6 +627,59 @@ void FontManager::shape(const std::u32string& text,
         start += str.size() + 1;
     }
 }   // shape
+
+void FontManager::findURLPositions(std::vector<std::pair<int, int> >& http_pos,
+    const char32_t* URL_code, const std::u32string& text)
+{
+    auto fix_end_pos = [](const std::u32string& url, size_t start_pos,
+                          size_t pos)->size_t
+    {
+        // https:// has 8 characters, shortest URL has 3 characters (like t.me)
+        // so 8 is valid for http:// too
+        size_t next_forward_slash = url.find(U'/', start_pos + 8);
+        if (next_forward_slash > pos)
+            next_forward_slash = std::u32string::npos;
+
+        // Tested in gnome terminal, URL ends with 0-9, aA-zZ, /- or ~:_=#$%&+@*]) only
+        // ~:_=#$%&+@*]) will not be highlighted unless it's after / (forward slash)
+        // We assume the URL is valid so we only test ]) instead of ([ blah ])
+        // ' is deliberately not included as it is much more likely than not
+        // to not be part of the URL, and appending it to a valid URL breaks it.
+        std::u32string valid_end_characters = U"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789/-";
+        std::u32string valid_end_characters_extra = U"~:_=#$%&+@*])";
+        if (next_forward_slash != std::string::npos)
+            valid_end_characters += valid_end_characters_extra;
+
+        while (pos > 1)
+        {
+            char32_t url_char = url[pos - 1];
+            for (char32_t valid_char : valid_end_characters)
+            {
+                if (valid_char == url_char)
+                    return pos;
+            }
+            pos--;
+        }
+        return 0;
+    };
+
+    size_t pos = text.find(URL_code, 0);
+    while (pos != std::u32string::npos)
+    {
+        // Find nearest newline or whitespace
+        // TODO : are there real situations where
+        //        we should check for other separating characters?
+        size_t newline_pos = text.find(U'\n', pos + 1);
+        size_t space_pos = text.find(U' ', pos + 1);
+        // npos is guaranteed to be higher than a valid pos
+        size_t end_pos = std::min(newline_pos, space_pos);
+        if (end_pos == std::u32string::npos)
+            end_pos = text.size();
+        end_pos = fix_end_pos(text, pos, end_pos);
+        http_pos.emplace_back((int)pos, (int)end_pos);
+        pos = text.find(URL_code, pos + 1);
+    }
+}   // findURLPositions
 
 // ----------------------------------------------------------------------------
 /* Return the cached glyph layouts for writing, it will clear all layouts if

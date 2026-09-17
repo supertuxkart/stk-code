@@ -7,6 +7,10 @@ git clone https://github.com/supertuxkart/stk-code stk-code
 svn co https://svn.code.sf.net/p/supertuxkart/code/stk-assets stk-assets
 ```
 
+## Building SuperTuxKart on Android
+
+Please see instructions in [`ANDROID.md`](/android/ANDROID.md)
+
 ## Building SuperTuxKart on Linux
 
 ### Dependencies

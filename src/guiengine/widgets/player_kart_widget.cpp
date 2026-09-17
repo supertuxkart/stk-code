@@ -283,12 +283,7 @@ void PlayerKartWidget::setupKartModel(const KartProperties* properties)
 {
     const KartModel &kart_model = properties->getMasterKartModel();
 
-    float scale = 35.0f;
-    if (kart_model.getLength() > 1.45f)
-    {
-        // If the kart is too long, size it down a bit so that it fits
-        scale = 30.0f;
-    }
+    float scale = m_model_view->computeScale(kart_model.getLength(), kart_model.getHeight());
 
     core::matrix4 model_location;
     model_location.setScale(core::vector3df(scale, scale, scale));

@@ -211,6 +211,7 @@ private:
 
     static const int SSHOT_SEPARATION = 10;
 
+    void scheduleTip();
     void displayOneEntry(unsigned int x, unsigned int y,
                          unsigned int n, bool display_points);
     void determineTableLayout();

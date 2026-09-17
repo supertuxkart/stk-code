@@ -72,6 +72,7 @@ private:
     std::vector<std::string>                 m_soccer_arena_group_names;
 
     /** Same as above but without user-defined groups. */
+    // TODO: check if we really need this extra layer of complication
     Group2Indices                            m_track_groups_no_custom;
     Group2Indices                            m_arena_groups_no_custom;
     Group2Indices                            m_soccer_arena_groups_no_custom;
