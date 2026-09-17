@@ -33,8 +33,8 @@
         </activity>
     </application>
 
-    <uses-feature android:glEsVersion="0x00030000  android:required="true"" />
-    <!-- Maybe force OGLES 3.0 is better, as its support comes from Android 4.3 -->
+    <uses-feature android:glEsVersion="0x00030000"  android:required="true" />
+    <!-- Maybe force OGLES 3.0 is better, as its support came from Android 4.3 -->
     <uses-feature android:name="android.software.leanback" android:required="false" />
     <uses-feature android:name="android.software.input_methods" android:required="false" />
 
