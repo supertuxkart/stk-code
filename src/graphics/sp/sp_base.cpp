@@ -721,6 +721,15 @@ inline core::vector3df getCorner(const core::aabbox3df& bbox, unsigned n)
 }   // getCorner
 
 // ----------------------------------------------------------------------------
+inline bool isAABBOutsidePlane(const core::aabbox3df& bb, const float plane[4])
+{
+    const float px = (plane[0] >= 0.0f) ? bb.MaxEdge.X : bb.MinEdge.X;
+    const float py = (plane[1] >= 0.0f) ? bb.MaxEdge.Y : bb.MinEdge.Y;
+    const float pz = (plane[2] >= 0.0f) ? bb.MaxEdge.Z : bb.MinEdge.Z;
+    return (px * plane[0] + py * plane[1] + pz * plane[2] + plane[3]) < 0.0f;
+}   // isAABBOutsidePlane
+
+// ----------------------------------------------------------------------------
 void addEdgeForViz(const core::vector3df& p0, const core::vector3df& p1)
 {
     g_bounding_boxes.push_back(p0.X);
@@ -799,30 +808,16 @@ void addObject(SPMeshNode* node)
         }
         core::aabbox3df bb = mb->getBoundingBox();
         model_matrix.transformBoxEx(bb);
-        std::vector<bool> discard;
         const bool handle_shadow = node->isInShadowPass() &&
             g_handle_shadow && shader->hasShader(RP_SHADOW);
-        discard.resize((handle_shadow ? 5 : 1), false);
+        const int num_passes = handle_shadow ? 5 : 1;
+        std::array<bool, 5> discard = {false};
 
-        for (int dc_type = 0; dc_type < (handle_shadow ? 5 : 1); dc_type++)
+        for (int dc_type = 0; dc_type < num_passes; dc_type++)
         {
             for (int i = 0; i < 24; i += 4)
             {
-                bool outside = true;
-                for (int j = 0; j < 8; j++)
-                {
-                    const float dist =
-                        getCorner(bb, j).X * g_frustums[dc_type][i] +
-                        getCorner(bb, j).Y * g_frustums[dc_type][i + 1] +
-                        getCorner(bb, j).Z * g_frustums[dc_type][i + 2] +
-                        g_frustums[dc_type][i + 3];
-                    outside = outside && dist < 0.0f;
-                    if (!outside)
-                    {
-                        break;
-                    }
-                }
-                if (outside)
+                if (isAABBOutsidePlane(bb, &g_frustums[dc_type][i]))
                 {
                     discard[dc_type] = true;
                     break;
@@ -969,29 +964,15 @@ void handleDynamicDrawCall()
         SPShader* shader = dydc->getShader();
         core::aabbox3df bb = dydc->getBoundingBox();
         dydc->getAbsoluteTransformation().transformBoxEx(bb);
-        std::vector<bool> discard;
         const bool handle_shadow =
             g_handle_shadow && shader->hasShader(RP_SHADOW);
-        discard.resize((handle_shadow ? 5 : 1), false);
-        for (int dc_type = 0; dc_type < (handle_shadow ? 5 : 1); dc_type++)
+        const int num_passes = handle_shadow ? 5 : 1;
+        std::array<bool, 5> discard = {false};
+        for (int dc_type = 0; dc_type < num_passes; dc_type++)
         {
             for (int i = 0; i < 24; i += 4)
             {
-                bool outside = true;
-                for (int j = 0; j < 8; j++)
-                {
-                    const float dist =
-                        getCorner(bb, j).X * g_frustums[dc_type][i] +
-                        getCorner(bb, j).Y * g_frustums[dc_type][i + 1] +
-                        getCorner(bb, j).Z * g_frustums[dc_type][i + 2] +
-                        g_frustums[dc_type][i + 3];
-                    outside = outside && dist < 0.0f;
-                    if (!outside)
-                    {
-                        break;
-                    }
-                }
-                if (outside)
+                if (isAABBOutsidePlane(bb, &g_frustums[dc_type][i]))
                 {
                     discard[dc_type] = true;
                     break;
