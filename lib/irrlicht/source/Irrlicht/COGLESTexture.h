@@ -10,7 +10,7 @@
 
 #include "IrrCompileConfig.h"
 
-#ifdef _IRR_COMPILE_WITH_OGLES2_
+#ifdef _IRR_COMPILE_WITH_OGLES_
 
 #if defined(_IRR_COMPILE_WITH_SDL_DEVICE_)
 #include "glad/gl.h"
@@ -29,10 +29,10 @@ namespace irr
 namespace video
 {
 
-class COGLES2Driver;
+class COGLESDriver;
 
 //! OpenGL ES 2.0 texture.
-class COGLES2Texture : public ITexture
+class COGLESTexture : public ITexture
 {
 public:
 
@@ -56,10 +56,10 @@ public:
 	};
 
 	//! constructor
-	COGLES2Texture(IImage* surface, const io::path& name, void* mipmapData=0, COGLES2Driver* driver=0);
+	COGLESTexture(IImage* surface, const io::path& name, void* mipmapData=0, COGLESDriver* driver=0);
 
 	//! destructor
-	virtual ~COGLES2Texture();
+	virtual ~COGLESTexture();
 
 	//! lock function
 	virtual void* lock(E_TEXTURE_LOCK_MODE mode=ETLM_READ_WRITE, u32 mipmapLevel=0);
@@ -121,7 +121,7 @@ public:
 protected:
 
 	//! protected constructor with basic setup, no GL texture name created, for derived classes
-	COGLES2Texture(const io::path& name, COGLES2Driver* driver);
+	COGLESTexture(const io::path& name, COGLESDriver* driver);
 
 	//! get the desired color format based on texture creation flags and the input format.
 	ECOLOR_FORMAT getBestColorFormat(ECOLOR_FORMAT format);
@@ -138,7 +138,7 @@ protected:
 	core::dimension2d<u32> ImageSize;
 	core::dimension2d<u32> TextureSize;
 	ECOLOR_FORMAT ColorFormat;
-	COGLES2Driver* Driver;
+	COGLESDriver* Driver;
 	IImage* Image;
 	IImage* MipImage;
 
@@ -158,16 +158,16 @@ protected:
 };
 
 //! OpenGL ES 2.0 FBO texture.
-class COGLES2FBOTexture : public COGLES2Texture
+class COGLESFBOTexture : public COGLESTexture
 {
 public:
 
 	//! FrameBufferObject constructor
-	COGLES2FBOTexture(const core::dimension2d<u32>& size, const io::path& name,
-		COGLES2Driver* driver = 0, const ECOLOR_FORMAT format = ECF_UNKNOWN);
+	COGLESFBOTexture(const core::dimension2d<u32>& size, const io::path& name,
+		COGLESDriver* driver = 0, const ECOLOR_FORMAT format = ECF_UNKNOWN);
 
 	//! destructor
-	virtual ~COGLES2FBOTexture();
+	virtual ~COGLESFBOTexture();
 
 	//! Is it a FrameBufferObject?
 	virtual bool isFrameBufferObject() const;
@@ -186,14 +186,14 @@ protected:
 
 
 //! OpenGL ES 2.0 FBO depth texture.
-class COGLES2FBODepthTexture : public COGLES2Texture
+class COGLESFBODepthTexture : public COGLESTexture
 {
 public:
 	//! FrameBufferObject depth constructor
-	COGLES2FBODepthTexture(const core::dimension2d<u32>& size, const io::path& name, COGLES2Driver* driver=0, bool useStencil=false);
+	COGLESFBODepthTexture(const core::dimension2d<u32>& size, const io::path& name, COGLESDriver* driver=0, bool useStencil=false);
 
 	//! destructor
-	virtual ~COGLES2FBODepthTexture();
+	virtual ~COGLESFBODepthTexture();
 
 	//! Bind RenderTargetTexture
 	virtual void bindRTT();
@@ -214,5 +214,5 @@ protected:
 } // end namespace irr
 
 #endif
-#endif // _IRR_COMPILE_WITH_OGLES2_
+#endif // _IRR_COMPILE_WITH_OGLES_
 

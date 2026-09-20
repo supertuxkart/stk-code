@@ -9,7 +9,7 @@
 
 #include "IrrCompileConfig.h"
 
-#ifdef _IRR_COMPILE_WITH_OGLES2_
+#ifdef _IRR_COMPILE_WITH_OGLES_
 
 #if defined(_IRR_COMPILE_WITH_SDL_DEVICE_)
 #include "glad/gl.h"
@@ -35,8 +35,8 @@ namespace irr
 {
 namespace video
 {
-	class COGLES2Driver;
-	class COGLES2ExtensionHandler
+	class COGLESDriver;
+	class COGLESExtensionHandler
 	{
 	public:
 		enum EOGLES2Features
@@ -188,7 +188,7 @@ namespace video
 
 
 	protected:
-		COGLES2ExtensionHandler();
+		COGLESExtensionHandler();
 
 		bool queryFeature(video::E_VIDEO_DRIVER_FEATURE feature) const
 		{
@@ -237,7 +237,7 @@ namespace video
 
 		void dump() const;
 
-        void initExtensions(COGLES2Driver* driver,
+        void initExtensions(COGLESDriver* driver,
                 bool withStencil);
 
 	protected:
@@ -260,6 +260,6 @@ namespace video
 } // end namespace irr
 
 
-#endif // _IRR_COMPILE_WITH_OGLES2_
+#endif // _IRR_COMPILE_WITH_OGLES_
 #endif
 

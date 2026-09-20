@@ -18,7 +18,7 @@
 #include <stdlib.h>
 #include "SIrrCreationParameters.h"
 #include "COpenGLExtensionHandler.h"
-#include "COGLES2Driver.h"
+#include "COGLESDriver.h"
 
 #include "guiengine/engine.hpp"
 #include "ge_main.hpp"
@@ -218,8 +218,8 @@ CIrrDeviceSDL::~CIrrDeviceSDL()
 		if (h)
 			h->clearGLExtensions();
 #endif
-#ifdef _IRR_COMPILE_WITH_OGLES2_
-		irr::video::COGLES2Driver* es2 = dynamic_cast<irr::video::COGLES2Driver*>(VideoDriver);
+#ifdef _IRR_COMPILE_WITH_OGLES_
+		irr::video::COGLESDriver* es2 = dynamic_cast<irr::video::COGLESDriver*>(VideoDriver);
 		if (es2) {
 			es2->cleanUp();
 		}
@@ -327,7 +327,7 @@ bool CIrrDeviceSDL::isGyroscopeAvailable()
 
 bool versionCorrect(int major, int minor)
 {
-#ifdef _IRR_COMPILE_WITH_OGLES2_
+#ifdef _IRR_COMPILE_WITH_OGLES_
 	return true;
 #else
 	int created_major = 2;
@@ -398,7 +398,7 @@ bool CIrrDeviceSDL::createWindow()
 	// Ignore alpha size here, this follow irr_driver.cpp:450
 	// Try 32 and, upon failure, 24 then 16 bit per pixels
 	if (CreationParams.DriverType == video::EDT_OPENGL ||
-		CreationParams.DriverType == video::EDT_OGLES2)
+		CreationParams.DriverType == video::EDT_OGLES)
 	{
 		if (CreationParams.Bits == 32)
 		{
@@ -426,7 +426,7 @@ bool CIrrDeviceSDL::createWindow()
 	u32 flags = SDL_WINDOW_SHOWN | SDL_WINDOW_RESIZABLE;
 #if !defined(ANDROID) && !defined(__SWITCH__)
 	if (CreationParams.DriverType == video::EDT_OPENGL ||
-		CreationParams.DriverType == video::EDT_OGLES2 ||
+		CreationParams.DriverType == video::EDT_OGLES ||
 		CreationParams.DriverType == video::EDT_VULKAN)
 		flags |= SDL_WINDOW_ALLOW_HIGHDPI;
 #endif
@@ -443,7 +443,7 @@ bool CIrrDeviceSDL::createWindow()
 	}
 
 	if (CreationParams.DriverType == video::EDT_OPENGL ||
-		CreationParams.DriverType == video::EDT_OGLES2)
+		CreationParams.DriverType == video::EDT_OGLES)
 		flags |= SDL_WINDOW_OPENGL;
 	else if (CreationParams.DriverType == video::EDT_VULKAN)
 	{
@@ -466,7 +466,7 @@ bool CIrrDeviceSDL::createWindow()
 #endif
 
 	if (CreationParams.DriverType == video::EDT_OPENGL ||
-		CreationParams.DriverType == video::EDT_OGLES2)
+		CreationParams.DriverType == video::EDT_OGLES)
 	{
 		tryCreateOpenGLContext(flags);
 		if (!Window || !Context)
@@ -507,7 +507,7 @@ start:
 	if (GLContextDebugBit)
 		SDL_GL_SetAttribute(SDL_GL_CONTEXT_FLAGS, SDL_GL_CONTEXT_DEBUG_FLAG);
 
-	if (CreationParams.DriverType == video::EDT_OGLES2)
+	if (CreationParams.DriverType == video::EDT_OGLES)
 		SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_ES);
 	else
 		SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
@@ -515,7 +515,7 @@ start:
 	if (CreationParams.ForceLegacyDevice)
 		goto legacy;
 
-#ifdef _IRR_COMPILE_WITH_OGLES2_
+#ifdef _IRR_COMPILE_WITH_OGLES_
 	if (Context)
 	{
 		SDL_GL_DeleteContext(Context);
@@ -631,14 +631,14 @@ legacy:
 		Window = NULL;
 	}
 
-#ifdef _IRR_COMPILE_WITH_OGLES2_
+#ifdef _IRR_COMPILE_WITH_OGLES_
 	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 2);
 	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 0);
 #else
 	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 2);
 	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 1);
 #endif
-	if (CreationParams.DriverType == video::EDT_OGLES2)
+	if (CreationParams.DriverType == video::EDT_OGLES)
 		SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_ES);
 	else
 		SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, 0);
@@ -650,7 +650,7 @@ legacy:
 	if (Window)
 	{
 		Context = SDL_GL_CreateContext(Window);
-#ifdef _IRR_COMPILE_WITH_OGLES2_
+#ifdef _IRR_COMPILE_WITH_OGLES_
 		if (Context && gladLoadGLES2((GLADloadfunc)SDL_GL_GetProcAddress) != 0) return;
 #else
 		if (Context && gladLoadGL((GLADloadfunc)SDL_GL_GetProcAddress) != 0) return;
@@ -677,9 +677,9 @@ void CIrrDeviceSDL::createDriver()
 		#endif
 		break;
 
-	case video::EDT_OGLES2:
+	case video::EDT_OGLES:
 	{
-		#ifdef _IRR_COMPILE_WITH_OGLES2_
+		#ifdef _IRR_COMPILE_WITH_OGLES_
 		u32 default_fb = 0;
 		#ifdef IOS_STK
 		default_fb = Info.info.uikit.framebuffer;

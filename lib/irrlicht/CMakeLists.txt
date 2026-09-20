@@ -50,9 +50,9 @@ else()
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -pipe -fstrict-aliasing")
 endif()
 
-if(USE_GLES2)
+if(USE_GLES)
     if (NOT IOS)
-        add_definitions(-D_IRR_COMPILE_WITH_OGLES2_)
+        add_definitions(-D_IRR_COMPILE_WITH_OGLES_)
     endif()
     add_definitions(-DNO_IRR_COMPILE_WITH_OPENGL_)
 endif()
@@ -129,14 +129,14 @@ source/Irrlicht/CMountPointReader.cpp
 source/Irrlicht/CNullDriver.cpp
 source/Irrlicht/COctreeSceneNode.cpp
 source/Irrlicht/COctreeTriangleSelector.cpp
-source/Irrlicht/COGLES2Driver.cpp
-source/Irrlicht/COGLES2ExtensionHandler.cpp
-source/Irrlicht/COGLES2FixedPipelineRenderer.cpp
-source/Irrlicht/COGLES2MaterialRenderer.cpp
-source/Irrlicht/COGLES2NormalMapRenderer.cpp
-source/Irrlicht/COGLES2ParallaxMapRenderer.cpp
-source/Irrlicht/COGLES2Renderer2D.cpp
-source/Irrlicht/COGLES2Texture.cpp
+source/Irrlicht/COGLESDriver.cpp
+source/Irrlicht/COGLESExtensionHandler.cpp
+source/Irrlicht/COGLESFixedPipelineRenderer.cpp
+source/Irrlicht/COGLESMaterialRenderer.cpp
+source/Irrlicht/COGLESNormalMapRenderer.cpp
+source/Irrlicht/COGLESParallaxMapRenderer.cpp
+source/Irrlicht/COGLESRenderer2D.cpp
+source/Irrlicht/COGLESTexture.cpp
 source/Irrlicht/COpenGLDriver.cpp
 source/Irrlicht/COpenGLExtensionHandler.cpp
 source/Irrlicht/COpenGLParallaxMapRenderer.cpp
@@ -271,14 +271,14 @@ source/Irrlicht/CMountPointReader.h
 source/Irrlicht/CNullDriver.h
 source/Irrlicht/COctreeSceneNode.h
 source/Irrlicht/COctreeTriangleSelector.h
-source/Irrlicht/COGLES2Driver.h
-source/Irrlicht/COGLES2ExtensionHandler.h
-source/Irrlicht/COGLES2FixedPipelineRenderer.h
-source/Irrlicht/COGLES2MaterialRenderer.h
-source/Irrlicht/COGLES2NormalMapRenderer.h
-source/Irrlicht/COGLES2ParallaxMapRenderer.h
-source/Irrlicht/COGLES2Renderer2D.h
-source/Irrlicht/COGLES2Texture.h
+source/Irrlicht/COGLESDriver.h
+source/Irrlicht/COGLESExtensionHandler.h
+source/Irrlicht/COGLESFixedPipelineRenderer.h
+source/Irrlicht/COGLESMaterialRenderer.h
+source/Irrlicht/COGLESNormalMapRenderer.h
+source/Irrlicht/COGLESParallaxMapRenderer.h
+source/Irrlicht/COGLESRenderer2D.h
+source/Irrlicht/COGLESTexture.h
 source/Irrlicht/COpenGLDriver.h
 source/Irrlicht/COpenGLExtensionHandler.h
 source/Irrlicht/COpenGLMaterialRenderer.h

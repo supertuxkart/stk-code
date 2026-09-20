@@ -5,18 +5,18 @@
 // This file is part of the "Irrlicht Engine".
 // For conditions of distribution and use, see copyright notice in Irrlicht.h
 
-#include "COGLES2Driver.h"
+#include "COGLESDriver.h"
 // needed here also because of the create methods' parameters
 #include "CNullDriver.h"
 
-#ifdef _IRR_COMPILE_WITH_OGLES2_
+#ifdef _IRR_COMPILE_WITH_OGLES_
 
-#include "COGLES2Texture.h"
-#include "COGLES2MaterialRenderer.h"
-#include "COGLES2FixedPipelineRenderer.h"
-#include "COGLES2NormalMapRenderer.h"
-#include "COGLES2ParallaxMapRenderer.h"
-#include "COGLES2Renderer2D.h"
+#include "COGLESTexture.h"
+#include "COGLESMaterialRenderer.h"
+#include "COGLESFixedPipelineRenderer.h"
+#include "COGLESNormalMapRenderer.h"
+#include "COGLESParallaxMapRenderer.h"
+#include "COGLESRenderer2D.h"
 #include "CContextEGL.h"
 #include "CImage.h"
 #include "os.h"
@@ -38,10 +38,10 @@ namespace video
 
 //! constructor and init code
 #if defined(_IRR_COMPILE_WITH_X11_DEVICE_) || defined(_IRR_WINDOWS_API_) || defined(_IRR_COMPILE_WITH_ANDROID_DEVICE_)
-	COGLES2Driver::COGLES2Driver(const SIrrlichtCreationParameters& params,
+	COGLESDriver::COGLESDriver(const SIrrlichtCreationParameters& params,
 			const SExposedVideoData& data, io::IFileSystem* io,
 			IrrlichtDevice* device)
-		: CNullDriver(io, params.WindowSize), COGLES2ExtensionHandler(),
+		: CNullDriver(io, params.WindowSize), COGLESExtensionHandler(),
 		BridgeCalls(0), CurrentRenderMode(ERM_NONE), ResetRenderStates(true),
 		Transformation3DChanged(true), AntiAlias(params.AntiAlias),
 		RenderTargetTexture(0), CurrentRendertargetSize(0, 0), ColorFormat(ECF_R8G8B8)
@@ -55,7 +55,7 @@ namespace video
 		, Params(params)
 	{
 #ifdef _DEBUG
-		setDebugName("COGLES2Driver");
+		setDebugName("COGLESDriver");
 #endif
 		ExposedData = data;
 
@@ -103,9 +103,9 @@ namespace video
 #endif
 
 #ifdef _IRR_COMPILE_WITH_WAYLAND_DEVICE_
-	COGLES2Driver::COGLES2Driver(const SIrrlichtCreationParameters& params, 
+	COGLESDriver::COGLESDriver(const SIrrlichtCreationParameters& params, 
 				  io::IFileSystem* io, CIrrDeviceWayland* device)
-		: CNullDriver(io, params.WindowSize), COGLES2ExtensionHandler(),
+		: CNullDriver(io, params.WindowSize), COGLESExtensionHandler(),
 		BridgeCalls(0), CurrentRenderMode(ERM_NONE), ResetRenderStates(true),
 		Transformation3DChanged(true), AntiAlias(params.AntiAlias),
 		RenderTargetTexture(0), CurrentRendertargetSize(0, 0), 
@@ -120,7 +120,7 @@ namespace video
 #endif
 
 	//! destructor
-	COGLES2Driver::~COGLES2Driver()
+	COGLESDriver::~COGLESDriver()
 	{
 		cleanUp();
 
@@ -141,9 +141,9 @@ namespace video
 	}
 
 #ifdef _IRR_COMPILE_WITH_SDL_DEVICE_
-	COGLES2Driver::COGLES2Driver(const SIrrlichtCreationParameters& params,
+	COGLESDriver::COGLESDriver(const SIrrlichtCreationParameters& params,
 				  io::IFileSystem* io, CIrrDeviceSDL* device, u32 default_fb)
-		: CNullDriver(io, params.WindowSize), COGLES2ExtensionHandler(),
+		: CNullDriver(io, params.WindowSize), COGLESExtensionHandler(),
 		BridgeCalls(0), CurrentRenderMode(ERM_NONE), ResetRenderStates(true),
 		Transformation3DChanged(true), AntiAlias(params.AntiAlias),
 		RenderTargetTexture(0), CurrentRendertargetSize(0, 0),
@@ -160,7 +160,7 @@ namespace video
 // -----------------------------------------------------------------------
 
 
-	bool COGLES2Driver::genericDriverInit(const core::dimension2d<u32>& screenSize, bool stencilBuffer)
+	bool COGLESDriver::genericDriverInit(const core::dimension2d<u32>& screenSize, bool stencilBuffer)
 	{
 		Name = glGetString(GL_VERSION);
 		printVersion();
@@ -176,7 +176,7 @@ namespace video
 		initExtensions(this, stencilBuffer);
 
 		if (!BridgeCalls)
-			BridgeCalls = new COGLES2CallBridge(this);
+			BridgeCalls = new COGLESCallBridge(this);
 
 		StencilBuffer = stencilBuffer;
 
@@ -231,7 +231,7 @@ namespace video
 	}
 
 
-	void COGLES2Driver::createMaterialRenderers()
+	void COGLESDriver::createMaterialRenderers()
 	{
 		// Load shaders from files (in future shaders will be merged with source code).
 
@@ -242,10 +242,10 @@ namespace video
 			shaders_path = Params.ShadersPath;
 
 		core::stringc FPVSPath = shaders_path;
-		FPVSPath += "COGLES2FixedPipeline.vsh";
+		FPVSPath += "COGLESFixedPipeline.vsh";
 
 		core::stringc FPFSPath = shaders_path;
-		FPFSPath += "COGLES2FixedPipeline.fsh";
+		FPFSPath += "COGLESFixedPipeline.fsh";
 
 		io::IReadFile* FPVSFile = FileSystem->createAndOpenFile(FPVSPath);
 		io::IReadFile* FPFSFile = FileSystem->createAndOpenFile(FPFSPath);
@@ -284,10 +284,10 @@ namespace video
 		// Normal Mapping.
 
 		core::stringc NMVSPath = shaders_path;
-		NMVSPath += "COGLES2NormalMap.vsh";
+		NMVSPath += "COGLESNormalMap.vsh";
 
 		core::stringc NMFSPath = shaders_path;
-		NMFSPath += "COGLES2NormalMap.fsh";
+		NMFSPath += "COGLESNormalMap.fsh";
 
 		io::IReadFile* NMVSFile = FileSystem->createAndOpenFile(NMVSPath);
 		io::IReadFile* NMFSFile = FileSystem->createAndOpenFile(NMFSPath);
@@ -326,10 +326,10 @@ namespace video
 		// Parallax Mapping.
 
 		core::stringc PMVSPath = shaders_path;
-		PMVSPath += "COGLES2ParallaxMap.vsh";
+		PMVSPath += "COGLESParallaxMap.vsh";
 
 		core::stringc PMFSPath = shaders_path;
-		PMFSPath += "COGLES2ParallaxMap.fsh";
+		PMFSPath += "COGLESParallaxMap.fsh";
 
 		io::IReadFile* PMVSFile = FileSystem->createAndOpenFile(FPVSPath);
 		io::IReadFile* PMFSFile = FileSystem->createAndOpenFile(FPFSPath);
@@ -367,37 +367,37 @@ namespace video
 
 		// Create materials.
 
-		addAndDropMaterialRenderer(new COGLES2FixedPipelineRenderer(FPVSData, FPFSData, EMT_SOLID, this));
-		addAndDropMaterialRenderer(new COGLES2FixedPipelineRenderer(FPVSData, FPFSData, EMT_SOLID_2_LAYER, this));
-		addAndDropMaterialRenderer(new COGLES2FixedPipelineRenderer(FPVSData, FPFSData, EMT_LIGHTMAP, this));
-		addAndDropMaterialRenderer(new COGLES2FixedPipelineRenderer(FPVSData, FPFSData, EMT_LIGHTMAP_ADD, this));
-		addAndDropMaterialRenderer(new COGLES2FixedPipelineRenderer(FPVSData, FPFSData, EMT_LIGHTMAP_M2, this));
-		addAndDropMaterialRenderer(new COGLES2FixedPipelineRenderer(FPVSData, FPFSData, EMT_LIGHTMAP_M4, this));
-		addAndDropMaterialRenderer(new COGLES2FixedPipelineRenderer(FPVSData, FPFSData, EMT_LIGHTMAP_LIGHTING, this));
-		addAndDropMaterialRenderer(new COGLES2FixedPipelineRenderer(FPVSData, FPFSData, EMT_LIGHTMAP_LIGHTING_M2, this));
-		addAndDropMaterialRenderer(new COGLES2FixedPipelineRenderer(FPVSData, FPFSData, EMT_LIGHTMAP_LIGHTING_M4, this));
-		addAndDropMaterialRenderer(new COGLES2FixedPipelineRenderer(FPVSData, FPFSData, EMT_DETAIL_MAP, this));
-		addAndDropMaterialRenderer(new COGLES2FixedPipelineRenderer(FPVSData, FPFSData, EMT_SPHERE_MAP, this));
-		addAndDropMaterialRenderer(new COGLES2FixedPipelineRenderer(FPVSData, FPFSData, EMT_REFLECTION_2_LAYER, this));
-		addAndDropMaterialRenderer(new COGLES2FixedPipelineRenderer(FPVSData, FPFSData, EMT_TRANSPARENT_ADD_COLOR, this));
-		addAndDropMaterialRenderer(new COGLES2FixedPipelineRenderer(FPVSData, FPFSData, EMT_TRANSPARENT_ALPHA_CHANNEL, this));
-		addAndDropMaterialRenderer(new COGLES2FixedPipelineRenderer(FPVSData, FPFSData, EMT_TRANSPARENT_ALPHA_CHANNEL_REF, this));
-		addAndDropMaterialRenderer(new COGLES2FixedPipelineRenderer(FPVSData, FPFSData, EMT_TRANSPARENT_VERTEX_ALPHA, this));
-		addAndDropMaterialRenderer(new COGLES2FixedPipelineRenderer(FPVSData, FPFSData, EMT_TRANSPARENT_REFLECTION_2_LAYER, this));
+		addAndDropMaterialRenderer(new COGLESFixedPipelineRenderer(FPVSData, FPFSData, EMT_SOLID, this));
+		addAndDropMaterialRenderer(new COGLESFixedPipelineRenderer(FPVSData, FPFSData, EMT_SOLID_2_LAYER, this));
+		addAndDropMaterialRenderer(new COGLESFixedPipelineRenderer(FPVSData, FPFSData, EMT_LIGHTMAP, this));
+		addAndDropMaterialRenderer(new COGLESFixedPipelineRenderer(FPVSData, FPFSData, EMT_LIGHTMAP_ADD, this));
+		addAndDropMaterialRenderer(new COGLESFixedPipelineRenderer(FPVSData, FPFSData, EMT_LIGHTMAP_M2, this));
+		addAndDropMaterialRenderer(new COGLESFixedPipelineRenderer(FPVSData, FPFSData, EMT_LIGHTMAP_M4, this));
+		addAndDropMaterialRenderer(new COGLESFixedPipelineRenderer(FPVSData, FPFSData, EMT_LIGHTMAP_LIGHTING, this));
+		addAndDropMaterialRenderer(new COGLESFixedPipelineRenderer(FPVSData, FPFSData, EMT_LIGHTMAP_LIGHTING_M2, this));
+		addAndDropMaterialRenderer(new COGLESFixedPipelineRenderer(FPVSData, FPFSData, EMT_LIGHTMAP_LIGHTING_M4, this));
+		addAndDropMaterialRenderer(new COGLESFixedPipelineRenderer(FPVSData, FPFSData, EMT_DETAIL_MAP, this));
+		addAndDropMaterialRenderer(new COGLESFixedPipelineRenderer(FPVSData, FPFSData, EMT_SPHERE_MAP, this));
+		addAndDropMaterialRenderer(new COGLESFixedPipelineRenderer(FPVSData, FPFSData, EMT_REFLECTION_2_LAYER, this));
+		addAndDropMaterialRenderer(new COGLESFixedPipelineRenderer(FPVSData, FPFSData, EMT_TRANSPARENT_ADD_COLOR, this));
+		addAndDropMaterialRenderer(new COGLESFixedPipelineRenderer(FPVSData, FPFSData, EMT_TRANSPARENT_ALPHA_CHANNEL, this));
+		addAndDropMaterialRenderer(new COGLESFixedPipelineRenderer(FPVSData, FPFSData, EMT_TRANSPARENT_ALPHA_CHANNEL_REF, this));
+		addAndDropMaterialRenderer(new COGLESFixedPipelineRenderer(FPVSData, FPFSData, EMT_TRANSPARENT_VERTEX_ALPHA, this));
+		addAndDropMaterialRenderer(new COGLESFixedPipelineRenderer(FPVSData, FPFSData, EMT_TRANSPARENT_REFLECTION_2_LAYER, this));
 
 		if (!useCoreContext)
 		{
-			addAndDropMaterialRenderer(new COGLES2NormalMapRenderer(NMVSData, NMFSData, EMT_NORMAL_MAP_SOLID, this));
-			addAndDropMaterialRenderer(new COGLES2NormalMapRenderer(NMVSData, NMFSData, EMT_NORMAL_MAP_TRANSPARENT_ADD_COLOR, this));
-			addAndDropMaterialRenderer(new COGLES2NormalMapRenderer(NMVSData, NMFSData, EMT_NORMAL_MAP_TRANSPARENT_VERTEX_ALPHA, this));
+			addAndDropMaterialRenderer(new COGLESNormalMapRenderer(NMVSData, NMFSData, EMT_NORMAL_MAP_SOLID, this));
+			addAndDropMaterialRenderer(new COGLESNormalMapRenderer(NMVSData, NMFSData, EMT_NORMAL_MAP_TRANSPARENT_ADD_COLOR, this));
+			addAndDropMaterialRenderer(new COGLESNormalMapRenderer(NMVSData, NMFSData, EMT_NORMAL_MAP_TRANSPARENT_VERTEX_ALPHA, this));
 		}
 
-		addAndDropMaterialRenderer(new COGLES2ParallaxMapRenderer(PMVSData, PMFSData, EMT_PARALLAX_MAP_SOLID, this));
-		addAndDropMaterialRenderer(new COGLES2ParallaxMapRenderer(PMVSData, PMFSData, EMT_PARALLAX_MAP_TRANSPARENT_ADD_COLOR, this));
-		addAndDropMaterialRenderer(new COGLES2ParallaxMapRenderer(PMVSData, PMFSData, EMT_PARALLAX_MAP_TRANSPARENT_VERTEX_ALPHA, this));
+		addAndDropMaterialRenderer(new COGLESParallaxMapRenderer(PMVSData, PMFSData, EMT_PARALLAX_MAP_SOLID, this));
+		addAndDropMaterialRenderer(new COGLESParallaxMapRenderer(PMVSData, PMFSData, EMT_PARALLAX_MAP_TRANSPARENT_ADD_COLOR, this));
+		addAndDropMaterialRenderer(new COGLESParallaxMapRenderer(PMVSData, PMFSData, EMT_PARALLAX_MAP_TRANSPARENT_VERTEX_ALPHA, this));
 
-		addAndDropMaterialRenderer(new COGLES2FixedPipelineRenderer(FPVSData, FPFSData, EMT_ONETEXTURE_BLEND, this));
-		addAndDropMaterialRenderer(new COGLES2FixedPipelineRenderer(FPVSData, FPFSData, EMT_STK_GRASS, this));
+		addAndDropMaterialRenderer(new COGLESFixedPipelineRenderer(FPVSData, FPFSData, EMT_ONETEXTURE_BLEND, this));
+		addAndDropMaterialRenderer(new COGLESFixedPipelineRenderer(FPVSData, FPFSData, EMT_STK_GRASS, this));
 		delete[] FPVSData;
 		delete[] FPFSData;
 		delete[] NMVSData;
@@ -408,10 +408,10 @@ namespace video
 		// Create 2D material renderer.
 
 		core::stringc R2DVSPath = shaders_path;
-		R2DVSPath += "COGLES2Renderer2D.vsh";
+		R2DVSPath += "COGLESRenderer2D.vsh";
 
 		core::stringc R2DFSPath = shaders_path;
-		R2DFSPath += "COGLES2Renderer2D.fsh";
+		R2DFSPath += "COGLESRenderer2D.fsh";
 
 		io::IReadFile* R2DVSFile = FileSystem->createAndOpenFile(R2DVSPath);
 		io::IReadFile* R2DFSFile = FileSystem->createAndOpenFile(R2DFSPath);
@@ -447,7 +447,7 @@ namespace video
 		if (R2DFSFile)
 			R2DFSFile->drop();
 
-		MaterialRenderer2D = new COGLES2Renderer2D(R2DVSData, R2DFSData, this);
+		MaterialRenderer2D = new COGLESRenderer2D(R2DVSData, R2DFSData, this);
 
 		delete[] R2DVSData;
 		delete[] R2DFSData;
@@ -455,7 +455,7 @@ namespace video
 
 
 	//! presents the rendered scene on the screen, returns false if failed
-	bool COGLES2Driver::endScene()
+	bool COGLESDriver::endScene()
 	{
 		CNullDriver::endScene();
 
@@ -476,7 +476,7 @@ namespace video
 
 
 	//! clears the zbuffer
-	bool COGLES2Driver::beginScene(bool backBuffer, bool zBuffer, SColor color,
+	bool COGLESDriver::beginScene(bool backBuffer, bool zBuffer, SColor color,
 			const SExposedVideoData& videoData, core::rect<s32>* sourceRect)
 	{
 		CNullDriver::beginScene(backBuffer, zBuffer, color);
@@ -511,21 +511,21 @@ namespace video
 
 
 	//! Returns the transformation set by setTransform
-	const core::matrix4& COGLES2Driver::getTransform(E_TRANSFORMATION_STATE state) const
+	const core::matrix4& COGLESDriver::getTransform(E_TRANSFORMATION_STATE state) const
 	{
 		return Matrices[state];
 	}
 
 
 	//! sets transformation
-	void COGLES2Driver::setTransform(E_TRANSFORMATION_STATE state, const core::matrix4& mat)
+	void COGLESDriver::setTransform(E_TRANSFORMATION_STATE state, const core::matrix4& mat)
 	{
 		Matrices[state] = mat;
 		Transformation3DChanged = true;
 	}
 
 
-	bool COGLES2Driver::updateVertexHardwareBuffer(SHWBufferLink_opengl *HWBuffer)
+	bool COGLESDriver::updateVertexHardwareBuffer(SHWBufferLink_opengl *HWBuffer)
 	{
 		if (!HWBuffer)
 			return false;
@@ -575,7 +575,7 @@ namespace video
 	}
 
 
-	bool COGLES2Driver::updateIndexHardwareBuffer(SHWBufferLink_opengl *HWBuffer)
+	bool COGLESDriver::updateIndexHardwareBuffer(SHWBufferLink_opengl *HWBuffer)
 	{
 		if (!HWBuffer)
 			return false;
@@ -640,7 +640,7 @@ namespace video
 
 
 	//! updates hardware buffer if needed
-	bool COGLES2Driver::updateHardwareBuffer(SHWBufferLink *HWBuffer)
+	bool COGLESDriver::updateHardwareBuffer(SHWBufferLink *HWBuffer)
 	{
 		if (!HWBuffer)
 			return false;
@@ -676,7 +676,7 @@ namespace video
 
 
 	//! Create hardware buffer from meshbuffer
-	COGLES2Driver::SHWBufferLink *COGLES2Driver::createHardwareBuffer(const scene::IMeshBuffer* mb)
+	COGLESDriver::SHWBufferLink *COGLESDriver::createHardwareBuffer(const scene::IMeshBuffer* mb)
 	{
 		if (!mb || (mb->getHardwareMappingHint_Index() == scene::EHM_NEVER && mb->getHardwareMappingHint_Vertex() == scene::EHM_NEVER))
 			return 0;
@@ -706,7 +706,7 @@ namespace video
 	}
 
 
-	void COGLES2Driver::deleteHardwareBuffer(SHWBufferLink *_HWBuffer)
+	void COGLESDriver::deleteHardwareBuffer(SHWBufferLink *_HWBuffer)
 	{
 		if (!_HWBuffer)
 			return;
@@ -728,7 +728,7 @@ namespace video
 
 
 	//! Draw hardware buffer
-	void COGLES2Driver::drawHardwareBuffer(SHWBufferLink *_HWBuffer)
+	void COGLESDriver::drawHardwareBuffer(SHWBufferLink *_HWBuffer)
 	{
 		if (!_HWBuffer)
 			return;
@@ -777,7 +777,7 @@ namespace video
 
 
 	//! draws a vertex primitive list
-	void COGLES2Driver::drawVertexPrimitiveList(const void* vertices, u32 vertexCount,
+	void COGLESDriver::drawVertexPrimitiveList(const void* vertices, u32 vertexCount,
 			const void* indexList, u32 primitiveCount,
 			E_VERTEX_TYPE vType, scene::E_PRIMITIVE_TYPE pType, E_INDEX_TYPE iType)
 	{
@@ -790,7 +790,7 @@ namespace video
 		drawVertexPrimitiveList2d3d(vertices, vertexCount, (const u16*)indexList, primitiveCount, vType, pType, iType);
 	}
 
-	void COGLES2Driver::draw2DVertexPrimitiveList(const void* vertices,
+	void COGLESDriver::draw2DVertexPrimitiveList(const void* vertices,
 		u32 vertexCount, const void* indexList, u32 primitiveCount,
 		E_VERTEX_TYPE vType, scene::E_PRIMITIVE_TYPE pType, E_INDEX_TYPE iType)
     {
@@ -801,7 +801,7 @@ namespace video
 		drawVertexPrimitiveList2d3d(vertices, vertexCount, (const u16*)indexList, primitiveCount, vType, pType, iType, false);
     }
 
-	void COGLES2Driver::drawVertexPrimitiveList2d3d(const void* vertices, u32 vertexCount,
+	void COGLESDriver::drawVertexPrimitiveList2d3d(const void* vertices, u32 vertexCount,
 			const void* indexList, u32 primitiveCount,
 			E_VERTEX_TYPE vType, scene::E_PRIMITIVE_TYPE pType, E_INDEX_TYPE iType, bool threed)
 	{
@@ -1038,7 +1038,7 @@ namespace video
 
 
 	//! draws a 2d image, using a color and the alpha channel of the texture
-	void COGLES2Driver::draw2DImage(const video::ITexture* texture,
+	void COGLESDriver::draw2DImage(const video::ITexture* texture,
 			const core::position2d<s32>& pos,
 			const core::rect<s32>& sourceRect,
 			const core::rect<s32>* clipRect, SColor color,
@@ -1159,7 +1159,7 @@ namespace video
 	}
 
 
-	void COGLES2Driver::draw2DImageBatch(const video::ITexture* texture,
+	void COGLESDriver::draw2DImageBatch(const video::ITexture* texture,
 			const core::array<core::position2d<s32> >& positions,
 			const core::array<core::rect<s32> >& sourceRects,
 			const core::rect<s32>* clipRect,
@@ -1305,7 +1305,7 @@ namespace video
 
 
 	//! The same, but with a four element array of colors, one for each vertex
-	void COGLES2Driver::draw2DImage(const video::ITexture* texture,
+	void COGLESDriver::draw2DImage(const video::ITexture* texture,
 			const core::rect<s32>& destRect,
 			const core::rect<s32>& sourceRect, const core::rect<s32>* clipRect,
 			const video::SColor* const colors, bool useAlphaChannelOfTexture)
@@ -1367,7 +1367,7 @@ namespace video
 
 
 	//! draws a set of 2d images, using a color and the alpha channel
-	void COGLES2Driver::draw2DImageBatch(const video::ITexture* texture,
+	void COGLESDriver::draw2DImageBatch(const video::ITexture* texture,
 			const core::position2d<s32>& pos,
 			const core::array<core::rect<s32> >& sourceRects,
 			const core::array<s32>& indices, s32 kerningWidth,
@@ -1445,7 +1445,7 @@ namespace video
 
 
 	//! draw a 2d rectangle
-	void COGLES2Driver::draw2DRectangle(SColor color,
+	void COGLESDriver::draw2DRectangle(SColor color,
 			const core::rect<s32>& position,
 			const core::rect<s32>* clip)
 	{
@@ -1471,7 +1471,7 @@ namespace video
 
 
 	//! draw an 2d rectangle
-	void COGLES2Driver::draw2DRectangle(const core::rect<s32>& position,
+	void COGLESDriver::draw2DRectangle(const core::rect<s32>& position,
 			SColor colorLeftUp, SColor colorRightUp,
 			SColor colorLeftDown, SColor colorRightDown,
 			const core::rect<s32>* clip)
@@ -1502,7 +1502,7 @@ namespace video
 
 
 	//! Draws a 2d line.
-	void COGLES2Driver::draw2DLine(const core::position2d<s32>& start,
+	void COGLESDriver::draw2DLine(const core::position2d<s32>& start,
 			const core::position2d<s32>& end, SColor color)
 	{
 		disableTextures();
@@ -1517,7 +1517,7 @@ namespace video
 
 
 	//! Draws a pixel
-	void COGLES2Driver::drawPixel(u32 x, u32 y, const SColor &color)
+	void COGLESDriver::drawPixel(u32 x, u32 y, const SColor &color)
 	{
 		const core::dimension2d<u32>& renderTargetSize = getCurrentRenderTargetSize();
 		if (x > (u32)renderTargetSize.Width || y > (u32)renderTargetSize.Height)
@@ -1533,7 +1533,7 @@ namespace video
 	}
 
 
-	bool COGLES2Driver::setActiveTexture(u32 stage, const video::ITexture* texture)
+	bool COGLESDriver::setActiveTexture(u32 stage, const video::ITexture* texture)
 	{
 		if (stage >= MaxSupportedTextures)
 			return false;
@@ -1545,7 +1545,7 @@ namespace video
 
 		if (!texture)
 			return true;
-		else if (texture->getDriverType() != EDT_OGLES2)
+		else if (texture->getDriverType() != EDT_OGLES)
 		{
 			CurrentTexture[stage] = 0;
 			os::Printer::log("Fatal Error: Tried to set a texture not owned by this driver.", ELL_ERROR);
@@ -1556,14 +1556,14 @@ namespace video
 	}
 
 
-	bool COGLES2Driver::isActiveTexture(u32 stage)
+	bool COGLESDriver::isActiveTexture(u32 stage)
 	{
 		return (CurrentTexture[stage]) ? true : false;
 	}
 
 
 	//! disables all textures beginning with the optional fromStage parameter.
-	bool COGLES2Driver::disableTextures(u32 fromStage)
+	bool COGLESDriver::disableTextures(u32 fromStage)
 	{
 		bool result = true;
 		for (u32 i = fromStage; i < MaxTextureUnits; ++i)
@@ -1573,14 +1573,14 @@ namespace video
 
 
 	//! creates a matrix in supplied GLfloat array to pass to OGLES1
-	inline void COGLES2Driver::createGLMatrix(float gl_matrix[16], const core::matrix4& m)
+	inline void COGLESDriver::createGLMatrix(float gl_matrix[16], const core::matrix4& m)
 	{
 		memcpy(gl_matrix, m.pointer(), 16 * sizeof(f32));
 	}
 
 
 	//! creates a opengltexturematrix from a D3D style texture matrix
-	inline void COGLES2Driver::createGLTextureMatrix(float *o, const core::matrix4& m)
+	inline void COGLESDriver::createGLTextureMatrix(float *o, const core::matrix4& m)
 	{
 		o[0] = m[0];
 		o[1] = m[1];
@@ -1605,14 +1605,14 @@ namespace video
 
 
 	//! returns a device dependent texture from a software surface (IImage)
-	video::ITexture* COGLES2Driver::createDeviceDependentTexture(IImage* surface, const io::path& name, void* mipmapData)
+	video::ITexture* COGLESDriver::createDeviceDependentTexture(IImage* surface, const io::path& name, void* mipmapData)
 	{
-		return new COGLES2Texture(surface, name, mipmapData, this);
+		return new COGLESTexture(surface, name, mipmapData, this);
 	}
 
 
 	//! Sets a material.
-	void COGLES2Driver::setMaterial(const SMaterial& material)
+	void COGLESDriver::setMaterial(const SMaterial& material)
 	{
 		Material = material;
 		OverrideMaterial.apply(Material);
@@ -1622,7 +1622,7 @@ namespace video
 	}
 
 	//! prints error if an error happened.
-	bool COGLES2Driver::testGLError()
+	bool COGLESDriver::testGLError()
 	{
 #ifdef _DEBUG
 		GLenum g = glGetError();
@@ -1649,7 +1649,7 @@ namespace video
 #endif
 	}
 
-	void COGLES2Driver::setRenderStates3DMode()
+	void COGLESDriver::setRenderStates3DMode()
 	{
 		if (useCoreContext)
 			return;
@@ -1690,7 +1690,7 @@ namespace video
 	}
 
 	//! Can be called by an IMaterialRenderer to make its work easier.
-	void COGLES2Driver::setBasicRenderStates(const SMaterial& material, const SMaterial& lastmaterial, bool resetAllRenderStates)
+	void COGLESDriver::setBasicRenderStates(const SMaterial& material, const SMaterial& lastmaterial, bool resetAllRenderStates)
 	{
 		if (useCoreContext)
 			return;
@@ -1821,7 +1821,7 @@ namespace video
 	}
 
 	//! Compare in SMaterial doesn't check texture parameters, so we should call this on each OnRender call.
-	void COGLES2Driver::setTextureRenderStates(const SMaterial& material, bool resetAllRenderstates)
+	void COGLESDriver::setTextureRenderStates(const SMaterial& material, bool resetAllRenderstates)
 	{
 		if (useCoreContext)
 			return;
@@ -1830,7 +1830,7 @@ namespace video
 
 		for (s32 i = MaxTextureUnits-1; i>= 0; --i)
 		{
-			const COGLES2Texture* tmpTexture = static_cast<const COGLES2Texture*>(CurrentTexture[i]);
+			const COGLESTexture* tmpTexture = static_cast<const COGLESTexture*>(CurrentTexture[i]);
 
 			if (CurrentTexture[i])
 				BridgeCalls->setTexture(i);
@@ -1913,7 +1913,7 @@ namespace video
 
 
 	// Get OpenGL ES2.0 texture wrap mode from Irrlicht wrap mode.
-	GLint COGLES2Driver::getTextureWrapMode(u8 clamp) const
+	GLint COGLESDriver::getTextureWrapMode(u8 clamp) const
 	{
 		switch (clamp)
 		{
@@ -1930,7 +1930,7 @@ namespace video
 
 
 	//! sets the needed renderstates
-	void COGLES2Driver::setRenderStates2DMode(bool alpha, bool texture, bool alphaChannel)
+	void COGLESDriver::setRenderStates2DMode(bool alpha, bool texture, bool alphaChannel)
 	{
 		if (useCoreContext)
 			return;
@@ -1984,14 +1984,14 @@ namespace video
 
 
 	//! \return Returns the name of the video driver.
-	const wchar_t* COGLES2Driver::getName() const
+	const wchar_t* COGLESDriver::getName() const
 	{
 		return Name.c_str();
 	}
 
 
 	//! deletes all dynamic lights there are
-	void COGLES2Driver::deleteAllDynamicLights()
+	void COGLESDriver::deleteAllDynamicLights()
 	{
 		RequestedLights.clear();
 		CNullDriver::deleteAllDynamicLights();
@@ -1999,7 +1999,7 @@ namespace video
 
 
 	//! adds a dynamic light
-	s32 COGLES2Driver::addDynamicLight(const SLight& light)
+	s32 COGLESDriver::addDynamicLight(const SLight& light)
 	{
 		CNullDriver::addDynamicLight(light);
 
@@ -2013,7 +2013,7 @@ namespace video
 	//! Turns a dynamic light on or off
 	//! \param lightIndex: the index returned by addDynamicLight
 	//! \param turnOn: true to turn the light on, false to turn it off
-	void COGLES2Driver::turnLightOn(s32 lightIndex, bool turnOn)
+	void COGLESDriver::turnLightOn(s32 lightIndex, bool turnOn)
 	{
 		if (lightIndex < 0 || lightIndex >= (s32)RequestedLights.size())
 			return;
@@ -2024,26 +2024,26 @@ namespace video
 
 
 	//! returns the maximal amount of dynamic lights the device can handle
-	u32 COGLES2Driver::getMaximalDynamicLightAmount() const
+	u32 COGLESDriver::getMaximalDynamicLightAmount() const
 	{
 		return 8;
 	}
 
 
 	//! Sets the dynamic ambient light color.
-	void COGLES2Driver::setAmbientLight(const SColorf& color)
+	void COGLESDriver::setAmbientLight(const SColorf& color)
 	{
 		AmbientLight = color;
 	}
 
 	//! returns the dynamic ambient light color.
-	const SColorf& COGLES2Driver::getAmbientLight() const
+	const SColorf& COGLESDriver::getAmbientLight() const
 	{
 		return AmbientLight;
 	}
 
 	// this code was sent in by Oliver Klems, thank you
-	void COGLES2Driver::setViewPort(const core::rect<s32>& area)
+	void COGLESDriver::setViewPort(const core::rect<s32>& area)
 	{
 		core::rect<s32> vp = area;
 		core::rect<s32> rendert(0, 0, getCurrentRenderTargetSize().Width, getCurrentRenderTargetSize().Height);
@@ -2058,7 +2058,7 @@ namespace video
 
 
 	//! Draws a shadow volume into the stencil buffer.
-	void COGLES2Driver::drawStencilShadowVolume(const core::vector3df* triangles, s32 count, bool zfail)
+	void COGLESDriver::drawStencilShadowVolume(const core::vector3df* triangles, s32 count, bool zfail)
 	{
 		if (!StencilBuffer || !count)
 			return;
@@ -2142,7 +2142,7 @@ namespace video
 	}
 
 
-	void COGLES2Driver::drawStencilShadow(bool clearStencilBuffer,
+	void COGLESDriver::drawStencilShadow(bool clearStencilBuffer,
 			video::SColor leftUpEdge, video::SColor rightUpEdge,
 			video::SColor leftDownEdge, video::SColor rightDownEdge)
 	{
@@ -2204,7 +2204,7 @@ namespace video
 
 
 	//! Draws a 3d line.
-	void COGLES2Driver::draw3DLine(const core::vector3df& start,
+	void COGLESDriver::draw3DLine(const core::vector3df& start,
 			const core::vector3df& end, SColor color)
 	{
 		setRenderStates3DMode();
@@ -2219,7 +2219,7 @@ namespace video
 
 	//! Only used by the internal engine. Used to notify the driver that
 	//! the window was resized.
-	void COGLES2Driver::OnResize(const core::dimension2d<u32>& size)
+	void COGLESDriver::OnResize(const core::dimension2d<u32>& size)
 	{
 		Params.WindowSize = size;
 		int real_width = Params.WindowSize.Width;
@@ -2233,66 +2233,66 @@ namespace video
 
 
 	//! Returns type of video driver
-	E_DRIVER_TYPE COGLES2Driver::getDriverType() const
+	E_DRIVER_TYPE COGLESDriver::getDriverType() const
 	{
-		return EDT_OGLES2;
+		return EDT_OGLES;
 	}
 
 
 	//! returns color format
-	ECOLOR_FORMAT COGLES2Driver::getColorFormat() const
+	ECOLOR_FORMAT COGLESDriver::getColorFormat() const
 	{
 		return ColorFormat;
 	}
 
 
 	//! Get a vertex shader constant index.
-	s32 COGLES2Driver::getVertexShaderConstantID(const c8* name)
+	s32 COGLESDriver::getVertexShaderConstantID(const c8* name)
 	{
 		return getPixelShaderConstantID(name);
 	}
 
 	//! Get a pixel shader constant index.
-	s32 COGLES2Driver::getPixelShaderConstantID(const c8* name)
+	s32 COGLESDriver::getPixelShaderConstantID(const c8* name)
 	{
 		os::Printer::log("Error: Please call services->getPixelShaderConstantID(), not VideoDriver->getPixelShaderConstantID().");
 		return -1;
 	}
 
 	//! Sets a vertex shader constant.
-	void COGLES2Driver::setVertexShaderConstant(const f32* data, s32 startRegister, s32 constantAmount)
+	void COGLESDriver::setVertexShaderConstant(const f32* data, s32 startRegister, s32 constantAmount)
 	{
 		os::Printer::log("Error: Please call services->setVertexShaderConstant(), not VideoDriver->setPixelShaderConstant().");
 	}
 
 	//! Sets a pixel shader constant.
-	void COGLES2Driver::setPixelShaderConstant(const f32* data, s32 startRegister, s32 constantAmount)
+	void COGLESDriver::setPixelShaderConstant(const f32* data, s32 startRegister, s32 constantAmount)
 	{
 		os::Printer::log("Error: Please call services->setPixelShaderConstant(), not VideoDriver->setPixelShaderConstant().");
 	}
 
 	//! Sets a constant for the vertex shader based on an index.
-	bool COGLES2Driver::setVertexShaderConstant(s32 index, const f32* floats, int count)
+	bool COGLESDriver::setVertexShaderConstant(s32 index, const f32* floats, int count)
 	{
 		//pass this along, as in GLSL the same routine is used for both vertex and fragment shaders
 		return setPixelShaderConstant(index, floats, count);
 	}
 
 	//! Int interface for the above.
-	bool COGLES2Driver::setVertexShaderConstant(s32 index, const s32* ints, int count)
+	bool COGLESDriver::setVertexShaderConstant(s32 index, const s32* ints, int count)
 	{
 		return setPixelShaderConstant(index, ints, count);
 	}
 
 	//! Sets a constant for the pixel shader based on an index.
-	bool COGLES2Driver::setPixelShaderConstant(s32 index, const f32* floats, int count)
+	bool COGLESDriver::setPixelShaderConstant(s32 index, const f32* floats, int count)
 	{
 		os::Printer::log("Error: Please call services->setPixelShaderConstant(), not VideoDriver->setPixelShaderConstant().");
 		return false;
 	}
 
 	//! Int interface for the above.
-	bool COGLES2Driver::setPixelShaderConstant(s32 index, const s32* ints, int count)
+	bool COGLESDriver::setPixelShaderConstant(s32 index, const s32* ints, int count)
 	{
 		os::Printer::log("Error: Please call services->setPixelShaderConstant(), not VideoDriver->setPixelShaderConstant().");
 		return false;
@@ -2301,7 +2301,7 @@ namespace video
 
 	//! Adds a new material renderer to the VideoDriver, using pixel and/or
 	//! vertex shaders to render geometry.
-	s32 COGLES2Driver::addShaderMaterial(const c8* vertexShaderProgram,
+	s32 COGLESDriver::addShaderMaterial(const c8* vertexShaderProgram,
 			const c8* pixelShaderProgram,
 			IShaderConstantSetCallBack* callback,
 			E_MATERIAL_TYPE baseMaterial, s32 userData)
@@ -2312,7 +2312,7 @@ namespace video
 
 
 	//! Adds a new material renderer to the VideoDriver, using GLSL to render geometry.
-	s32 COGLES2Driver::addHighLevelShaderMaterial(
+	s32 COGLESDriver::addHighLevelShaderMaterial(
 			const c8* vertexShaderProgram,
 			const c8* vertexShaderEntryPointName,
 			E_VERTEX_SHADER_TYPE vsCompileTarget,
@@ -2330,7 +2330,7 @@ namespace video
 			s32 userData, E_GPU_SHADING_LANGUAGE shadingLang)
 	{
 		s32 nr = -1;
-		COGLES2MaterialRenderer* r = new COGLES2MaterialRenderer(
+		COGLESMaterialRenderer* r = new COGLESMaterialRenderer(
 			this, nr, vertexShaderProgram,
 			pixelShaderProgram,
 			callback, baseMaterial, userData);
@@ -2341,20 +2341,20 @@ namespace video
 
 	//! Returns a pointer to the IVideoDriver interface. (Implementation for
 	//! IMaterialRendererServices)
-	IVideoDriver* COGLES2Driver::getVideoDriver()
+	IVideoDriver* COGLESDriver::getVideoDriver()
 	{
 		return this;
 	}
 
 
 	//! Returns pointer to the IGPUProgrammingServices interface.
-	IGPUProgrammingServices* COGLES2Driver::getGPUProgrammingServices()
+	IGPUProgrammingServices* COGLESDriver::getGPUProgrammingServices()
 	{
 		return this;
 	}
 
 
-	ITexture* COGLES2Driver::addRenderTargetTexture(const core::dimension2d<u32>& size,
+	ITexture* COGLESDriver::addRenderTargetTexture(const core::dimension2d<u32>& size,
 					const io::path& name,
 					const ECOLOR_FORMAT format,
 					const bool useStencil)
@@ -2365,7 +2365,7 @@ namespace video
 
 		video::ITexture* rtt = 0;
 
-		rtt = new COGLES2FBOTexture(size, name, this, format);
+		rtt = new COGLESFBOTexture(size, name, this, format);
 		if (rtt)
 		{
 			bool success = false;
@@ -2374,7 +2374,7 @@ namespace video
 			ITexture* tex = createDepthTexture(rtt);
 			if (tex)
 			{
-				success = static_cast<video::COGLES2FBODepthTexture*>(tex)->attach(rtt);
+				success = static_cast<video::COGLESFBODepthTexture*>(tex)->attach(rtt);
 				if (!success)
 				{
 					removeDepthTexture(tex);
@@ -2397,19 +2397,19 @@ namespace video
 
 
 	//! Returns the maximum amount of primitives
-	u32 COGLES2Driver::getMaximalPrimitiveCount() const
+	u32 COGLESDriver::getMaximalPrimitiveCount() const
 	{
 		return 65535;
 	}
 
 
 	//! set or reset render target
-	bool COGLES2Driver::setRenderTarget(video::ITexture* texture, bool clearBackBuffer,
+	bool COGLESDriver::setRenderTarget(video::ITexture* texture, bool clearBackBuffer,
 			bool clearZBuffer, SColor color)
 	{
 		// check for right driver type
 
-		if (texture && texture->getDriverType() != EDT_OGLES2)
+		if (texture && texture->getDriverType() != EDT_OGLES)
 		{
 			os::Printer::log("Fatal Error: Tried to set a texture not owned by this driver.", ELL_ERROR);
 			return false;
@@ -2428,7 +2428,7 @@ namespace video
 		{
 			// we want to set a new target. so do this.
 			BridgeCalls->setViewport(core::rect<s32>(0, 0, texture->getSize().Width, texture->getSize().Height));
-			RenderTargetTexture = static_cast<COGLES2Texture*>(texture);
+			RenderTargetTexture = static_cast<COGLESTexture*>(texture);
 			RenderTargetTexture->bindRTT();
 			CurrentRendertargetSize = texture->getSize();
 		}
@@ -2463,7 +2463,7 @@ namespace video
 
 
 	// returns the current size of the screen or rendertarget
-	const core::dimension2d<u32>& COGLES2Driver::getCurrentRenderTargetSize() const
+	const core::dimension2d<u32>& COGLESDriver::getCurrentRenderTargetSize() const
 	{
 		if (CurrentRendertargetSize.Width == 0)
 			return ScreenSize;
@@ -2473,7 +2473,7 @@ namespace video
 
 
 	//! Clears the ZBuffer.
-	void COGLES2Driver::clearZBuffer()
+	void COGLESDriver::clearZBuffer()
 	{
 		GLboolean enabled = GL_TRUE;
 		glGetBooleanv(GL_DEPTH_WRITEMASK, &enabled);
@@ -2490,7 +2490,7 @@ namespace video
 	// We want to read the front buffer to get the latest render finished.
 	// This is not possible under ogl-es, though, so one has to call this method
 	// outside of the render loop only.
-	IImage* COGLES2Driver::createScreenShot(video::ECOLOR_FORMAT format, video::E_RENDER_TARGET target)
+	IImage* COGLESDriver::createScreenShot(video::ECOLOR_FORMAT format, video::E_RENDER_TARGET target)
 	{
 		if (target==video::ERT_MULTI_RENDER_TEXTURES || target==video::ERT_RENDER_TEXTURE || target==video::ERT_STEREO_BOTH_BUFFERS)
 			return 0;
@@ -2565,11 +2565,11 @@ namespace video
 
 
 	//! get depth texture for the given render target texture
-	ITexture* COGLES2Driver::createDepthTexture(ITexture* texture, bool shared)
+	ITexture* COGLESDriver::createDepthTexture(ITexture* texture, bool shared)
 	{
-		if ((texture->getDriverType() != EDT_OGLES2) || (!texture->isRenderTarget()))
+		if ((texture->getDriverType() != EDT_OGLES) || (!texture->isRenderTarget()))
 			return 0;
-		COGLES2Texture* tex = static_cast<COGLES2Texture*>(texture);
+		COGLESTexture* tex = static_cast<COGLESTexture*>(texture);
 
 		if (!tex->isFrameBufferObject())
 			return 0;
@@ -2584,14 +2584,14 @@ namespace video
 					return DepthTextures[i];
 				}
 			}
-			DepthTextures.push_back(new COGLES2FBODepthTexture(texture->getSize(), "depth1", this));
+			DepthTextures.push_back(new COGLESFBODepthTexture(texture->getSize(), "depth1", this));
 			return DepthTextures.getLast();
 		}
-		return (new COGLES2FBODepthTexture(texture->getSize(), "depth1", this));
+		return (new COGLESFBODepthTexture(texture->getSize(), "depth1", this));
 	}
 
 
-	void COGLES2Driver::removeDepthTexture(ITexture* texture)
+	void COGLESDriver::removeDepthTexture(ITexture* texture)
 	{
 		for (u32 i = 0; i < DepthTextures.size(); ++i)
 		{
@@ -2603,18 +2603,18 @@ namespace video
 		}
 	}
 
-	void COGLES2Driver::deleteFramebuffers(s32 n, const u32 *framebuffers)
+	void COGLESDriver::deleteFramebuffers(s32 n, const u32 *framebuffers)
 	{
 		glDeleteFramebuffers(n, framebuffers);
 	}
 
-	void COGLES2Driver::deleteRenderbuffers(s32 n, const u32 *renderbuffers)
+	void COGLESDriver::deleteRenderbuffers(s32 n, const u32 *renderbuffers)
 	{
 		glDeleteRenderbuffers(n, renderbuffers);
 	}
 
 	//! Set/unset a clipping plane.
-	bool COGLES2Driver::setClipPlane(u32 index, const core::plane3df& plane, bool enable)
+	bool COGLESDriver::setClipPlane(u32 index, const core::plane3df& plane, bool enable)
 	{
 		if (index >= UserClipPlane.size())
 			UserClipPlane.push_back(SUserClipPlane());
@@ -2625,18 +2625,18 @@ namespace video
 	}
 
 	//! Enable/disable a clipping plane.
-	void COGLES2Driver::enableClipPlane(u32 index, bool enable)
+	void COGLESDriver::enableClipPlane(u32 index, bool enable)
 	{
 		UserClipPlane[index].Enabled = enable;
 	}
 
 	//! Get the ClipPlane Count
-	u32 COGLES2Driver::getClipPlaneCount() const
+	u32 COGLESDriver::getClipPlaneCount() const
 	{
 		return UserClipPlane.size();
 	}
 
-	const core::plane3df& COGLES2Driver::getClipPlane(irr::u32 index) const
+	const core::plane3df& COGLESDriver::getClipPlane(irr::u32 index) const
 	{
 		if (index < UserClipPlane.size())
 			return UserClipPlane[index].Plane;
@@ -2644,12 +2644,12 @@ namespace video
 			return *((core::plane3df*)0);
 	}
 
-	core::dimension2du COGLES2Driver::getMaxTextureSize() const
+	core::dimension2du COGLESDriver::getMaxTextureSize() const
 	{
 		return core::dimension2du(MaxTextureSize, MaxTextureSize);
 	}
 
-	GLenum COGLES2Driver::getGLBlend(E_BLEND_FACTOR factor) const
+	GLenum COGLESDriver::getGLBlend(E_BLEND_FACTOR factor) const
 	{
 		GLenum r = 0;
 		switch (factor)
@@ -2669,15 +2669,15 @@ namespace video
 		return r;
 	}
 
-	GLenum COGLES2Driver::getZBufferBits() const
+	GLenum COGLESDriver::getZBufferBits() const
 	{
 /*#if defined(GL_OES_depth24)
-		if (Driver->queryOpenGLFeature(COGLES2ExtensionHandler::IRR_OES_depth24))
+		if (Driver->queryOpenGLFeature(COGLESExtensionHandler::IRR_OES_depth24))
 			InternalFormat = GL_DEPTH_COMPONENT24_OES;
 		else
 #endif
 #if defined(GL_OES_depth32)
-		if (Driver->queryOpenGLFeature(COGLES2ExtensionHandler::IRR_OES_depth32))
+		if (Driver->queryOpenGLFeature(COGLESExtensionHandler::IRR_OES_depth32))
 			InternalFormat = GL_DEPTH_COMPONENT32_OES;
 		else
 #endif*/
@@ -2701,12 +2701,12 @@ namespace video
 		return bits;
 	}
 
-	const SMaterial& COGLES2Driver::getCurrentMaterial() const
+	const SMaterial& COGLESDriver::getCurrentMaterial() const
 	{
 		return Material;
 	}
 
-	void COGLES2Driver::enableScissorTest(const core::rect<s32>& r)
+	void COGLESDriver::enableScissorTest(const core::rect<s32>& r)
 	{
 		glEnable(GL_SCISSOR_TEST);
 		// The x​ and y​ is the window-space lower-left position of the scissor box,
@@ -2719,17 +2719,17 @@ namespace video
 			rect_reverse.getWidth(), rect_reverse.getHeight());
 	}
 
-	void COGLES2Driver::disableScissorTest()
+	void COGLESDriver::disableScissorTest()
 	{
 		glDisable(GL_SCISSOR_TEST);
 	}
 
-	COGLES2CallBridge* COGLES2Driver::getBridgeCalls() const
+	COGLESCallBridge* COGLESDriver::getBridgeCalls() const
 	{
 		return BridgeCalls;
 	}
 
-	COGLES2CallBridge::COGLES2CallBridge(COGLES2Driver* driver) : Driver(driver),
+	COGLESCallBridge::COGLESCallBridge(COGLESDriver* driver) : Driver(driver),
 		BlendSource(GL_ONE), BlendDestination(GL_ZERO), Blend(false),
 		CullFaceMode(GL_BACK), CullFace(false),
 		DepthFunc(GL_LESS), DepthMask(true), DepthTest(false),
@@ -2751,7 +2751,7 @@ namespace video
 		glDisable(GL_DEPTH_TEST);
 	}
 
-	void COGLES2CallBridge::setBlendFunc(GLenum source, GLenum destination)
+	void COGLESCallBridge::setBlendFunc(GLenum source, GLenum destination)
 	{
 		//if(BlendSource != source || BlendDestination != destination)
 		//{
@@ -2762,7 +2762,7 @@ namespace video
 		//}
 	}
 
-	void COGLES2CallBridge::setBlend(bool enable)
+	void COGLESCallBridge::setBlend(bool enable)
 	{
 		//if(Blend != enable)
 		//{
@@ -2775,7 +2775,7 @@ namespace video
 		//}
 	}
 
-	void COGLES2CallBridge::setCullFaceFunc(GLenum mode)
+	void COGLESCallBridge::setCullFaceFunc(GLenum mode)
 	{
 		if(CullFaceMode != mode)
 		{
@@ -2785,7 +2785,7 @@ namespace video
 		}
 	}
 
-	void COGLES2CallBridge::setCullFace(bool enable)
+	void COGLESCallBridge::setCullFace(bool enable)
 	{
 		if(CullFace != enable)
 		{
@@ -2798,7 +2798,7 @@ namespace video
 		}
 	}
 
-	void COGLES2CallBridge::setDepthFunc(GLenum mode)
+	void COGLESCallBridge::setDepthFunc(GLenum mode)
 	{
 		if(DepthFunc != mode)
 		{
@@ -2808,7 +2808,7 @@ namespace video
 		}
 	}
 
-	void COGLES2CallBridge::setDepthMask(bool enable)
+	void COGLESCallBridge::setDepthMask(bool enable)
 	{
 		if(DepthMask != enable)
 		{
@@ -2821,7 +2821,7 @@ namespace video
 		}
 	}
 
-	void COGLES2CallBridge::setDepthTest(bool enable)
+	void COGLESCallBridge::setDepthTest(bool enable)
 	{
 		if(DepthTest != enable)
 		{
@@ -2834,7 +2834,7 @@ namespace video
 		}
 	}
 
-	void COGLES2CallBridge::setProgram(GLuint program)
+	void COGLESCallBridge::setProgram(GLuint program)
 	{
 		if (Program != program)
 		{
@@ -2843,7 +2843,7 @@ namespace video
 		}
 	}
 
-	void COGLES2CallBridge::setActiveTexture(GLenum texture)
+	void COGLESCallBridge::setActiveTexture(GLenum texture)
 	{
 		if (ActiveTexture != texture)
 		{
@@ -2852,7 +2852,7 @@ namespace video
 		}
 	}
 
-	void COGLES2CallBridge::setTexture(u32 stage)
+	void COGLESCallBridge::setTexture(u32 stage)
 	{
 		if (stage < MATERIAL_MAX_TEXTURES)
 		{
@@ -2868,7 +2868,7 @@ namespace video
 		}
 	}
 
-	void COGLES2CallBridge::setViewport(const core::rect<s32>& viewport)
+	void COGLESCallBridge::setViewport(const core::rect<s32>& viewport)
 	{
 		if (Viewport != viewport)
 		{
@@ -2881,7 +2881,7 @@ namespace video
 } // end namespace
 } // end namespace
 
-#endif // _IRR_COMPILE_WITH_OGLES2_
+#endif // _IRR_COMPILE_WITH_OGLES_
 
 namespace irr
 {
@@ -2892,11 +2892,11 @@ namespace video
 	IVideoDriver* createOGLES2Driver(const SIrrlichtCreationParameters& params,
 			video::SExposedVideoData& data, io::IFileSystem* io, IrrlichtDevice* device)
 	{
-#ifdef _IRR_COMPILE_WITH_OGLES2_
-		return new COGLES2Driver(params, data, io, device);
+#ifdef _IRR_COMPILE_WITH_OGLES_
+		return new COGLESDriver(params, data, io, device);
 #else
 		return 0;
-#endif // _IRR_COMPILE_WITH_OGLES2_
+#endif // _IRR_COMPILE_WITH_OGLES_
 	}
 #endif
 
@@ -2907,11 +2907,11 @@ namespace video
 	IVideoDriver* createOGLES2Driver(const SIrrlichtCreationParameters& params, 
 			io::IFileSystem* io, CIrrDeviceWayland* device)
 	{
-#ifdef _IRR_COMPILE_WITH_OGLES2_
-		return new COGLES2Driver(params, io, device);
+#ifdef _IRR_COMPILE_WITH_OGLES_
+		return new COGLESDriver(params, io, device);
 #else
 		return 0;
-#endif // _IRR_COMPILE_WITH_OGLES2_
+#endif // _IRR_COMPILE_WITH_OGLES_
 	}
 		
 #endif
@@ -2923,11 +2923,11 @@ namespace video
 	IVideoDriver* createOGLES2Driver(const SIrrlichtCreationParameters& params,
 			io::IFileSystem* io, CIrrDeviceMacOSX *device)
 	{
-#ifdef _IRR_COMPILE_WITH_OGLES2_
-		return new COGLES2Driver(params, io, device);
+#ifdef _IRR_COMPILE_WITH_OGLES_
+		return new COGLESDriver(params, io, device);
 #else
 		return 0;
-#endif // _IRR_COMPILE_WITH_OGLES2_
+#endif // _IRR_COMPILE_WITH_OGLES_
 	}
 #endif // _IRR_COMPILE_WITH_OSX_DEVICE_
 
@@ -2938,13 +2938,13 @@ namespace video
 	IVideoDriver* createOGLES2Driver(const SIrrlichtCreationParameters& params,
 			io::IFileSystem* io, CIrrDeviceSDL* device, u32 default_fb)
 	{
-#ifdef _IRR_COMPILE_WITH_OGLES2_
-		IVideoDriver* ogles2 = new COGLES2Driver(params, io, device, default_fb);
+#ifdef _IRR_COMPILE_WITH_OGLES_
+		IVideoDriver* ogles2 = new COGLESDriver(params, io, device, default_fb);
 		ogles2->OnResize(params.WindowSize);
 		return ogles2;
 #else
 		return 0;
-#endif // _IRR_COMPILE_WITH_OGLES2_
+#endif // _IRR_COMPILE_WITH_OGLES_
 	}
 
 #endif

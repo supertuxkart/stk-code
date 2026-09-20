@@ -921,7 +921,7 @@ void  Material::setMaterialProperties(video::SMaterial *m, scene::IMeshBuffer* m
     }
     else if (m_shader_name == "grass")
     {
-#ifdef USE_GLES2
+#ifdef USE_GLES
         m->MaterialType = video::EMT_STK_GRASS;
 #else
         m->MaterialType = video::EMT_TRANSPARENT_ALPHA_CHANNEL_REF;

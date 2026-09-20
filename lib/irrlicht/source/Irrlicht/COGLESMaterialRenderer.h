@@ -10,7 +10,7 @@
 
 #include "IrrCompileConfig.h"
 
-#ifdef _IRR_COMPILE_WITH_OGLES2_
+#ifdef _IRR_COMPILE_WITH_OGLES_
 
 #if defined(_IRR_COMPILE_WITH_SDL_DEVICE_)
 #include "glad/gl.h"
@@ -36,17 +36,17 @@ namespace irr
 namespace video
 {
 
-class COGLES2Driver;
+class COGLESDriver;
 
 //! Class for using GLSL shaders with OpenGL ES 2.0
 //! Please note: This renderer implements its own IMaterialRendererServices
-class COGLES2MaterialRenderer : public IMaterialRenderer, public IMaterialRendererServices
+class COGLESMaterialRenderer : public IMaterialRenderer, public IMaterialRendererServices
 {
 public:
 
 	//! Constructor
-	COGLES2MaterialRenderer(
-		COGLES2Driver* driver,
+	COGLESMaterialRenderer(
+		COGLESDriver* driver,
 		s32& outMaterialTypeNr,
 		const c8* vertexShaderProgram = 0,
 		const c8* pixelShaderProgram = 0,
@@ -55,7 +55,7 @@ public:
 		s32 userData = 0);
 
 	//! Destructor
-	virtual ~COGLES2MaterialRenderer();
+	virtual ~COGLESMaterialRenderer();
 
 	GLuint getProgram() const;
 
@@ -87,7 +87,7 @@ protected:
 
 	//! constructor only for use by derived classes who want to
 	//! create a fall back material for example.
-	COGLES2MaterialRenderer(COGLES2Driver* driver,
+	COGLESMaterialRenderer(COGLESDriver* driver,
 					IShaderConstantSetCallBack* callback = 0,
 					E_MATERIAL_TYPE baseMaterial = EMT_SOLID,
 					s32 userData = 0);
@@ -97,7 +97,7 @@ protected:
 	bool createShader(GLenum shaderType, const char* shader);
 	bool linkProgram();
 
-	COGLES2Driver* Driver;
+	COGLESDriver* Driver;
 	IShaderConstantSetCallBack* CallBack;
 
 	bool Alpha;

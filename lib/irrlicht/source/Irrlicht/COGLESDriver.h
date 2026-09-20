@@ -25,7 +25,7 @@ namespace irr
 
 #include "SIrrCreationParameters.h"
 
-#ifdef _IRR_COMPILE_WITH_OGLES2_
+#ifdef _IRR_COMPILE_WITH_OGLES_
 
 #if !defined(_IRR_COMPILE_WITH_SDL_DEVICE_)
 
@@ -47,8 +47,8 @@ namespace irr
 #include "IMaterialRendererServices.h"
 #include "EDriverFeatures.h"
 #include "fast_atof.h"
-#include "COGLES2ExtensionHandler.h"
-#include "COGLES2Renderer2D.h"
+#include "COGLESExtensionHandler.h"
+#include "COGLESRenderer2D.h"
 
 class ContextManagerEGL;
 
@@ -56,45 +56,45 @@ namespace irr
 {
 namespace video
 {
-	class COGLES2CallBridge;
-	class COGLES2Texture;
-	class COGLES2FixedPipelineRenderer;
-	class COGLES2Renderer2D;
-	class COGLES2NormalMapRenderer;
-	class COGLES2ParallaxMapRenderer;
+	class COGLESCallBridge;
+	class COGLESTexture;
+	class COGLESFixedPipelineRenderer;
+	class COGLESRenderer2D;
+	class COGLESNormalMapRenderer;
+	class COGLESParallaxMapRenderer;
 	class IContextManager;
-	class COGLES2Driver : public CNullDriver, public IMaterialRendererServices, public COGLES2ExtensionHandler
+	class COGLESDriver : public CNullDriver, public IMaterialRendererServices, public COGLESExtensionHandler
 	{
-		friend class COGLES2CallBridge;
-		friend class COGLES2Texture;
+		friend class COGLESCallBridge;
+		friend class COGLESTexture;
 
 	public:
 		virtual void enableScissorTest(const core::rect<s32>& r);
 		virtual void disableScissorTest();
 #if defined(_IRR_COMPILE_WITH_X11_DEVICE_) || defined(_IRR_WINDOWS_API_) || defined(_IRR_COMPILE_WITH_ANDROID_DEVICE_)
-		COGLES2Driver(const SIrrlichtCreationParameters& params,
+		COGLESDriver(const SIrrlichtCreationParameters& params,
 					const SExposedVideoData& data,
 					io::IFileSystem* io, IrrlichtDevice* device);
 #endif
 
 #ifdef _IRR_COMPILE_WITH_WAYLAND_DEVICE_
-		COGLES2Driver(const SIrrlichtCreationParameters& params, 
+		COGLESDriver(const SIrrlichtCreationParameters& params, 
 					io::IFileSystem* io, CIrrDeviceWayland* device);
 #endif
 
 #ifdef _IRR_COMPILE_WITH_OSX_DEVICE_
-		COGLES2Driver(const SIrrlichtCreationParameters& params,
+		COGLESDriver(const SIrrlichtCreationParameters& params,
 					io::IFileSystem* io, CIrrDeviceMacOSX *device);
 #endif
 
 #ifdef _IRR_COMPILE_WITH_SDL_DEVICE_
-		COGLES2Driver(const SIrrlichtCreationParameters& params, io::IFileSystem* io, CIrrDeviceSDL* device, u32 default_fb);
+		COGLESDriver(const SIrrlichtCreationParameters& params, io::IFileSystem* io, CIrrDeviceSDL* device, u32 default_fb);
 
 		virtual u32 getDefaultFramebuffer() const { return m_default_fb; }
 #endif
 
 		//! destructor
-		virtual ~COGLES2Driver();
+		virtual ~COGLESDriver();
 
 		//! clears the zbuffer
 		virtual bool beginScene(bool backBuffer=true, bool zBuffer=true,
@@ -151,7 +151,7 @@ namespace video
 		//! queries the features of the driver, returns true if feature is available
 		virtual bool queryFeature(E_VIDEO_DRIVER_FEATURE feature) const
 		{
-			return FeatureEnabled[feature] && COGLES2ExtensionHandler::queryFeature(feature);
+			return FeatureEnabled[feature] && COGLESExtensionHandler::queryFeature(feature);
 		}
 
 		//! Sets a material.
@@ -392,7 +392,7 @@ namespace video
         const SMaterial& getCurrentMaterial() const;
 
 		//! Get bridge calls.
-        COGLES2CallBridge* getBridgeCalls() const;
+        COGLESCallBridge* getBridgeCalls() const;
 
 #if defined(_IRR_COMPILE_WITH_EGL_)
 		ContextManagerEGL* getEGLContext() {return EglContext;}
@@ -409,7 +409,7 @@ namespace video
 
 	private:
 		// Bridge calls.
-        COGLES2CallBridge* BridgeCalls;
+        COGLESCallBridge* BridgeCalls;
 
 		void uploadClipPlane(u32 index);
 
@@ -453,7 +453,7 @@ namespace video
 		u8 AntiAlias;
 
 		SMaterial Material, LastMaterial;
-		COGLES2Texture* RenderTargetTexture;
+		COGLESTexture* RenderTargetTexture;
 		const ITexture* CurrentTexture[MATERIAL_MAX_TEXTURES];
 		core::array<ITexture*> DepthTextures;
 
@@ -488,7 +488,7 @@ namespace video
 		core::array<RequestedLight> RequestedLights;
 		SColorf AmbientLight;
 
-		COGLES2Renderer2D* MaterialRenderer2D;
+		COGLESRenderer2D* MaterialRenderer2D;
 		
 #if defined(_IRR_COMPILE_WITH_EGL_)
 		ContextManagerEGL* EglContext;
@@ -507,10 +507,10 @@ namespace video
     //! This bridge between Irlicht pseudo OpenGL calls
     //! and true OpenGL calls.
 
-    class COGLES2CallBridge
+    class COGLESCallBridge
     {
     public:
-        COGLES2CallBridge(COGLES2Driver* driver);
+        COGLESCallBridge(COGLESDriver* driver);
 
 		// Blending calls.
 
@@ -547,7 +547,7 @@ namespace video
 		void setViewport(const core::rect<s32>& viewport);
 
     private:
-        COGLES2Driver* Driver;
+        COGLESDriver* Driver;
 
 		GLenum BlendSource;
 		GLenum BlendDestination;

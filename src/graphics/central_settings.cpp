@@ -69,7 +69,7 @@ void CentralVideoSettings::init()
     if (!GUIEngine::isNoGraphics())
     {
         if (GE::getDriver()->getDriverType() != video::EDT_OPENGL &&
-            GE::getDriver()->getDriverType() != video::EDT_OGLES2)
+            GE::getDriver()->getDriverType() != video::EDT_OGLES)
         {
             GraphicsRestrictions::init("", "", GE::getDriver()->getVendorInfo().c_str());
             GE::getGEConfig()->m_disable_npot_texture =
@@ -100,7 +100,7 @@ void CentralVideoSettings::init()
         if (m_gl_mem > 0)
             Log::info("IrrDriver", "OpenGL total memory: %d", m_gl_mem/1024);
     }
-#if !defined(USE_GLES2)
+#if !defined(USE_GLES)
     m_glsl = (m_gl_major_version > 3 || (m_gl_major_version == 3 && m_gl_minor_version >= 1))
            && !UserConfigParams::m_force_legacy_device && m_supports_sp;
 #else
@@ -124,7 +124,7 @@ void CentralVideoSettings::init()
             m_glsl = false;
         }
 
-#if !defined(USE_GLES2)
+#if !defined(USE_GLES)
         if (!GraphicsRestrictions::isDisabled(GraphicsRestrictions::GR_BUFFER_STORAGE) &&
             hasGLExtension("GL_ARB_buffer_storage")  )
         {
@@ -324,7 +324,7 @@ void CentralVideoSettings::init()
 
 unsigned CentralVideoSettings::getGLSLVersion() const
 {
-#if defined(USE_GLES2)
+#if defined(USE_GLES)
     if (m_gl_major_version >= 3)
         return 300;
     else
@@ -503,7 +503,7 @@ bool CentralVideoSettings::isARBTextureBufferObjectUsable() const
 bool CentralVideoSettings::supportsColorization() const
 {
     return isGLSL() || GE::getDriver()->getDriverType() == video::EDT_VULKAN ||
-        GE::getDriver()->getDriverType() == video::EDT_OGLES2;
+        GE::getDriver()->getDriverType() == video::EDT_OGLES;
 }
 
 #endif   // !SERVER_ONLY

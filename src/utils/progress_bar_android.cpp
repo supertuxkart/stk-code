@@ -145,7 +145,7 @@ void ProgressBarAndroid::init()
         return;
         
     SIrrlichtCreationParameters params;
-    params.DriverType    = video::EDT_OGLES2;
+    params.DriverType    = video::EDT_OGLES;
     params.Bits          = 32;
     params.Fullscreen    = UserConfigParams::m_fullscreen;
     params.WindowSize    = core::dimension2du(640, 480);

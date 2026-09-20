@@ -2527,7 +2527,7 @@ int main(int argc, char *argv[])
                 #if !defined(MOBILE_STK)
                 if (UserConfigParams::m_old_driver_popup)
                 {
-                    #ifdef USE_GLES2
+                    #ifdef USE_GLES
                     irr::core::stringw version = "OpenGL ES 3.0";
                     #else
                     irr::core::stringw version = "OpenGL 3.3";

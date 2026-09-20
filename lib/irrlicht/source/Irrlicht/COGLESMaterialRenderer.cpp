@@ -6,16 +6,16 @@
 // For conditions of distribution and use, see copyright notice in Irrlicht.h
 
 #include "IrrCompileConfig.h"
-#ifdef _IRR_COMPILE_WITH_OGLES2_
+#ifdef _IRR_COMPILE_WITH_OGLES_
 
-#include "COGLES2MaterialRenderer.h"
+#include "COGLESMaterialRenderer.h"
 #include "IGPUProgrammingServices.h"
 #include "IShaderConstantSetCallBack.h"
 #include "IMaterialRendererServices.h"
 #include "IVideoDriver.h"
 #include "os.h"
-#include "COGLES2Driver.h"
-#include "COGLES2MaterialRenderer.h"
+#include "COGLESDriver.h"
+#include "COGLESMaterialRenderer.h"
 
 namespace irr
 {
@@ -24,7 +24,7 @@ namespace video
 
 
 //! Constructor
-COGLES2MaterialRenderer::COGLES2MaterialRenderer(COGLES2Driver* driver,
+COGLESMaterialRenderer::COGLESMaterialRenderer(COGLESDriver* driver,
 		s32& outMaterialTypeNr,
 		const c8* vertexShaderProgram,
 		const c8* pixelShaderProgram,
@@ -34,7 +34,7 @@ COGLES2MaterialRenderer::COGLES2MaterialRenderer(COGLES2Driver* driver,
 	: Driver(driver), CallBack(callback), Alpha(false), Blending(false), FixedBlending(false), Program(0), UserData(userData)
 {
 	#ifdef _DEBUG
-	setDebugName("COGLES2MaterialRenderer");
+	setDebugName("COGLESMaterialRenderer");
 	#endif
 
 	if (baseMaterial == EMT_TRANSPARENT_VERTEX_ALPHA || baseMaterial == EMT_TRANSPARENT_ALPHA_CHANNEL ||
@@ -60,7 +60,7 @@ COGLES2MaterialRenderer::COGLES2MaterialRenderer(COGLES2Driver* driver,
 
 //! constructor only for use by derived classes who want to
 //! create a fall back material for example.
-COGLES2MaterialRenderer::COGLES2MaterialRenderer(COGLES2Driver* driver,
+COGLESMaterialRenderer::COGLESMaterialRenderer(COGLESDriver* driver,
 					IShaderConstantSetCallBack* callback,
 					E_MATERIAL_TYPE baseMaterial, s32 userData)
 : Driver(driver), CallBack(callback), Alpha(false), Blending(false), FixedBlending(false), Program(0), UserData(userData)
@@ -85,7 +85,7 @@ COGLES2MaterialRenderer::COGLES2MaterialRenderer(COGLES2Driver* driver,
 
 
 //! Destructor
-COGLES2MaterialRenderer::~COGLES2MaterialRenderer()
+COGLESMaterialRenderer::~COGLESMaterialRenderer()
 {
 	if (CallBack)
 		CallBack->drop();
@@ -106,12 +106,12 @@ COGLES2MaterialRenderer::~COGLES2MaterialRenderer()
 	UniformInfo.clear();
 }
 
-GLuint COGLES2MaterialRenderer::getProgram() const
+GLuint COGLESMaterialRenderer::getProgram() const
 {
 	return Program;
 }
 
-void COGLES2MaterialRenderer::init(s32& outMaterialTypeNr,
+void COGLESMaterialRenderer::init(s32& outMaterialTypeNr,
 		const c8* vertexShaderProgram,
 		const c8* pixelShaderProgram,
 		bool addMaterial)
@@ -146,7 +146,7 @@ void COGLES2MaterialRenderer::init(s32& outMaterialTypeNr,
 }
 
 
-bool COGLES2MaterialRenderer::OnRender(IMaterialRendererServices* service, E_VERTEX_TYPE vtxtype)
+bool COGLESMaterialRenderer::OnRender(IMaterialRendererServices* service, E_VERTEX_TYPE vtxtype)
 {
     Driver->setTextureRenderStates(Driver->getCurrentMaterial(), false);
 
@@ -158,7 +158,7 @@ bool COGLES2MaterialRenderer::OnRender(IMaterialRendererServices* service, E_VER
 }
 
 
-void COGLES2MaterialRenderer::OnSetMaterial(const video::SMaterial& material,
+void COGLESMaterialRenderer::OnSetMaterial(const video::SMaterial& material,
 				const video::SMaterial& lastMaterial,
 				bool resetAllRenderstates,
 				video::IMaterialRendererServices* services)
@@ -190,19 +190,19 @@ void COGLES2MaterialRenderer::OnSetMaterial(const video::SMaterial& material,
 }
 
 
-void COGLES2MaterialRenderer::OnUnsetMaterial()
+void COGLESMaterialRenderer::OnUnsetMaterial()
 {
 }
 
 
 //! Returns if the material is transparent.
-bool COGLES2MaterialRenderer::isTransparent() const
+bool COGLESMaterialRenderer::isTransparent() const
 {
 	return (Alpha || Blending || FixedBlending);
 }
 
 
-bool COGLES2MaterialRenderer::createShader(GLenum shaderType, const char* shader)
+bool COGLESMaterialRenderer::createShader(GLenum shaderType, const char* shader)
 {
 	if (Program)
 	{
@@ -242,7 +242,7 @@ bool COGLES2MaterialRenderer::createShader(GLenum shaderType, const char* shader
 }
 
 
-bool COGLES2MaterialRenderer::linkProgram()
+bool COGLESMaterialRenderer::linkProgram()
 {
 	if (Program)
 	{
@@ -321,7 +321,7 @@ bool COGLES2MaterialRenderer::linkProgram()
 }
 
 
-void COGLES2MaterialRenderer::setBasicRenderStates(const SMaterial& material,
+void COGLESMaterialRenderer::setBasicRenderStates(const SMaterial& material,
 						const SMaterial& lastMaterial,
 						bool resetAllRenderstates)
 {
@@ -329,12 +329,12 @@ void COGLES2MaterialRenderer::setBasicRenderStates(const SMaterial& material,
 	Driver->setBasicRenderStates(material, lastMaterial, resetAllRenderstates);
 }
 
-s32 COGLES2MaterialRenderer::getVertexShaderConstantID(const c8* name)
+s32 COGLESMaterialRenderer::getVertexShaderConstantID(const c8* name)
 {
 	return getPixelShaderConstantID(name);
 }
 
-s32 COGLES2MaterialRenderer::getPixelShaderConstantID(const c8* name)
+s32 COGLESMaterialRenderer::getPixelShaderConstantID(const c8* name)
 {
 	for (u32 i = 0; i < UniformInfo.size(); ++i)
 	{
@@ -345,27 +345,27 @@ s32 COGLES2MaterialRenderer::getPixelShaderConstantID(const c8* name)
 	return -1;
 }
 
-void COGLES2MaterialRenderer::setVertexShaderConstant(const f32* data, s32 startRegister, s32 constantAmount)
+void COGLESMaterialRenderer::setVertexShaderConstant(const f32* data, s32 startRegister, s32 constantAmount)
 {
 	os::Printer::log("Cannot set constant, please use high level shader call instead.", ELL_WARNING);
 }
 
-void COGLES2MaterialRenderer::setPixelShaderConstant(const f32* data, s32 startRegister, s32 constantAmount)
+void COGLESMaterialRenderer::setPixelShaderConstant(const f32* data, s32 startRegister, s32 constantAmount)
 {
 	os::Printer::log("Cannot set constant, use high level shader call.", ELL_WARNING);
 }
 
-bool COGLES2MaterialRenderer::setVertexShaderConstant(s32 index, const f32* floats, int count)
+bool COGLESMaterialRenderer::setVertexShaderConstant(s32 index, const f32* floats, int count)
 {
 	return setPixelShaderConstant(index, floats, count);
 }
 
-bool COGLES2MaterialRenderer::setVertexShaderConstant(s32 index, const s32* ints, int count)
+bool COGLESMaterialRenderer::setVertexShaderConstant(s32 index, const s32* ints, int count)
 {
 	return setPixelShaderConstant(index, ints, count);
 }
 
-bool COGLES2MaterialRenderer::setPixelShaderConstant(s32 index, const f32* floats, int count)
+bool COGLESMaterialRenderer::setPixelShaderConstant(s32 index, const f32* floats, int count)
 {
 	if(index < 0 || UniformInfo[index].location < 0)
 		return false;
@@ -415,7 +415,7 @@ bool COGLES2MaterialRenderer::setPixelShaderConstant(s32 index, const f32* float
 	return status;
 }
 
-bool COGLES2MaterialRenderer::setPixelShaderConstant(s32 index, const s32* ints, int count)
+bool COGLESMaterialRenderer::setPixelShaderConstant(s32 index, const s32* ints, int count)
 {
 	if(index < 0 || UniformInfo[index].location < 0)
 		return false;
@@ -452,7 +452,7 @@ bool COGLES2MaterialRenderer::setPixelShaderConstant(s32 index, const s32* ints,
 	return status;
 }
 
-IVideoDriver* COGLES2MaterialRenderer::getVideoDriver()
+IVideoDriver* COGLESMaterialRenderer::getVideoDriver()
 {
 	return Driver;
 }
