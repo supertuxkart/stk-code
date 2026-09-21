@@ -3172,8 +3172,7 @@ void ServerLobby::kartSelectionRequested(Event* event)
 
     const NetworkString& data = event->data();
     STKPeer* peer = event->getPeer();
-    if (!setPlayerKarts(data, peer))
-        return;
+    setPlayerKarts(data, peer);
 }   // kartSelectionRequested
 
 //-----------------------------------------------------------------------------
