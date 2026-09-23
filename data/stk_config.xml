@@ -271,7 +271,7 @@
   <!-- Camera
        The default field of view for cutscenes.
        The field of view for player cameras is handled in UserConfig -->
-  <camera cutscene-fov="0.61" />
+  <camera cutscene-fov="35" />
 
   <!-- Steer
        disable-while-unskid: Disable steering when stop skidding during

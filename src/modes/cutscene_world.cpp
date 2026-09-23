@@ -89,7 +89,7 @@ void CutsceneWorld::init()
 
     Camera* stk_cam = Camera::createCamera(NULL, 0);
     m_camera = stk_cam->getCameraSceneNode();
-    m_camera->setFOV(stk_config->m_cutscene_fov);
+    m_camera->setFOV(DEGREE_TO_RAD * stk_config->m_cutscene_fov);
     m_camera->bindTargetAndRotation(true); // no "look-at"
 
     // --- Build list of sounds to play at certain frames
