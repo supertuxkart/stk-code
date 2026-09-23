@@ -1,3 +1,5 @@
+#version 300 es
+
 /* Ins */
 
 in vec3 inVertexPosition;

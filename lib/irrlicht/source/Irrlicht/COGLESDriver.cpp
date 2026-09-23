@@ -242,10 +242,10 @@ namespace video
 			shaders_path = Params.ShadersPath;
 
 		core::stringc FPVSPath = shaders_path;
-		FPVSPath += "COGLESFixedPipeline.vsh";
+		FPVSPath += "COGLESFixedPipeline.vert";
 
 		core::stringc FPFSPath = shaders_path;
-		FPFSPath += "COGLESFixedPipeline.fsh";
+		FPFSPath += "COGLESFixedPipeline.frag";
 
 		io::IReadFile* FPVSFile = FileSystem->createAndOpenFile(FPVSPath);
 		io::IReadFile* FPFSFile = FileSystem->createAndOpenFile(FPFSPath);
@@ -284,10 +284,10 @@ namespace video
 		// Normal Mapping.
 
 		core::stringc NMVSPath = shaders_path;
-		NMVSPath += "COGLESNormalMap.vsh";
+		NMVSPath += "COGLESNormalMap.vert";
 
 		core::stringc NMFSPath = shaders_path;
-		NMFSPath += "COGLESNormalMap.fsh";
+		NMFSPath += "COGLESNormalMap.frag";
 
 		io::IReadFile* NMVSFile = FileSystem->createAndOpenFile(NMVSPath);
 		io::IReadFile* NMFSFile = FileSystem->createAndOpenFile(NMFSPath);
@@ -326,10 +326,10 @@ namespace video
 		// Parallax Mapping.
 
 		core::stringc PMVSPath = shaders_path;
-		PMVSPath += "COGLESParallaxMap.vsh";
+		PMVSPath += "COGLESParallaxMap.vert";
 
 		core::stringc PMFSPath = shaders_path;
-		PMFSPath += "COGLESParallaxMap.fsh";
+		PMFSPath += "COGLESParallaxMap.frag";
 
 		io::IReadFile* PMVSFile = FileSystem->createAndOpenFile(FPVSPath);
 		io::IReadFile* PMFSFile = FileSystem->createAndOpenFile(FPFSPath);
@@ -408,10 +408,10 @@ namespace video
 		// Create 2D material renderer.
 
 		core::stringc R2DVSPath = shaders_path;
-		R2DVSPath += "COGLESRenderer2D.vsh";
+		R2DVSPath += "COGLESRenderer2D.vert";
 
 		core::stringc R2DFSPath = shaders_path;
-		R2DFSPath += "COGLESRenderer2D.fsh";
+		R2DFSPath += "COGLESRenderer2D.frag";
 
 		io::IReadFile* R2DVSFile = FileSystem->createAndOpenFile(R2DVSPath);
 		io::IReadFile* R2DFSFile = FileSystem->createAndOpenFile(R2DFSPath);

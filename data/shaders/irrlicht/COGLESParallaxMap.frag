@@ -13,7 +13,6 @@ precision mediump float;
 uniform sampler2D texture0;
 uniform sampler2D texture1;
 
-//uniform vec4 uLightDiffuse[MAX_LIGHTS];
 uniform float uHeightScale;
 
 in vec4 varTexCoord;

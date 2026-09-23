@@ -21,5 +21,5 @@ void main(void)
 	if(uUseTexture)
 		Color *= texture(uTextureUnit, vTexCoord);
 	
-	out vec4 Color
+	out vec4 Color;
 }
