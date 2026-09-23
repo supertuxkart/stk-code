@@ -1950,10 +1950,11 @@ void IrrDriver::displayFPS()
         {
             fps_string = StringUtils::insertValues
                         (L"FPS: %d/%d/%d - PolyCount: %d Solid, %d Shadows - LightDist: %d\n"
-                          "Complexity %d, Total skinning joints: %d, Ping: %dms",
+                          "Resolution: %d x %d, Complexity %d, Total skinning joints: %d, Ping: %dms",
                         min, fps, max, SP::sp_solid_poly_count,
-                        SP::sp_shadow_poly_count, m_last_light_bucket_distance, irr_driver->getSceneComplexity(),
-                        m_skinning_joint, ping);
+                        SP::sp_shadow_poly_count, m_last_light_bucket_distance,
+                        irr_driver->getActualScreenSize().Width, irr_driver->getActualScreenSize().Height,
+                        irr_driver->getSceneComplexity(), m_skinning_joint, ping);
         }
         else
         {
