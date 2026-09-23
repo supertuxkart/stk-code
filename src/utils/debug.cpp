@@ -146,6 +146,7 @@ enum DebugMenuCommand
     DEBUG_GUI_TOGGLE,
     DEBUG_GUI_HIDE_KARTS,
     DEBUG_GUI_CAM_FREE,
+    DEBUG_GUI_FREEZE_CAM_TOGGLE,
     DEBUG_GUI_CAM_TOP,
     DEBUG_GUI_CAM_WHEEL,
     DEBUG_GUI_CAM_BEHIND_KART,
@@ -765,7 +766,7 @@ bool handleContextMenuAction(s32 cmd_id)
     {
         Camera *camera = Camera::getActiveCamera();
         Camera::changeCamera(camera->getIndex(), Camera::CM_TYPE_FPS);
-        irr_driver->getDevice()->getCursorControl()->setVisible(false);
+        irr_driver->hidePointer(true /* override the ADM exception */);
         // Reset camera rotation
         CameraFPS *cam = dynamic_cast<CameraFPS*>(Camera::getActiveCamera());
         if(cam)
@@ -775,12 +776,19 @@ bool handleContextMenuAction(s32 cmd_id)
         }
         break;
     }
+    case DEBUG_GUI_FREEZE_CAM_TOGGLE:
+    {
+        CameraFPS *cam = dynamic_cast<CameraFPS*>(Camera::getActiveCamera());
+        if(cam)
+            cam->toggleFreeze(); // Automatically handle cursor status
+        break;
+    }
     case DEBUG_GUI_CAM_NORMAL:
     {
         Camera *camera = Camera::getActiveCamera();
         Camera::changeCamera(camera->getIndex(), Camera::CM_TYPE_NORMAL);
         Camera::getActiveCamera()->setKart(World::getWorld()->getKart(kart_num));
-        irr_driver->getDevice()->getCursorControl()->setVisible(true);
+        irr_driver->showPointer();
         break;
     }
     case DEBUG_GUI_CAM_SMOOTH:
@@ -1158,7 +1166,7 @@ bool onEvent(const SEvent &event)
         #endif
             !g_debug_menu_visible)
         {
-            irr_driver->getDevice()->getCursorControl()->setVisible(true);
+            irr_driver->showPointer();
 
             // root menu
             const int mwidth = 400;
@@ -1295,7 +1303,8 @@ bool onEvent(const SEvent &event)
                 sub->addItem(L"Hide karts", DEBUG_GUI_HIDE_KARTS);
                 sub->addSeparator();
                 sub->addItem(L"Normal view (Ctrl + F1)", DEBUG_GUI_CAM_NORMAL);
-                sub->addItem(L"First person view (Ctrl + F2)", DEBUG_GUI_CAM_FREE);
+                sub->addItem(L"Free camera (Ctrl + F2)", DEBUG_GUI_CAM_FREE);
+                sub->addItem(L"(Un)freeze the free camera (Ctrl + Shift + F2)", DEBUG_GUI_FREEZE_CAM_TOGGLE);
                 sub->addItem(L"Top view (Ctrl + F3)", DEBUG_GUI_CAM_TOP);
                 sub->addItem(L"Behind wheel view (Ctrl + F4)", DEBUG_GUI_CAM_WHEEL);
                 sub->addItem(L"Behind kart view (Ctrl + F5)", DEBUG_GUI_CAM_BEHIND_KART);
@@ -1508,10 +1517,12 @@ void handleStaticAction(int key, int value, bool control_pressed, bool shift_pre
             }
             case IRR_KEY_F2:
             {
-                if (control_pressed)
+                if (control_pressed && !shift_pressed)
                     handleContextMenuAction(DEBUG_GUI_CAM_FREE);
-                else if (shift_pressed)
+                else if (shift_pressed && !control_pressed)
                     handleContextMenuAction(DEBUG_ATTACHMENT_ANCHOR);
+                else if (control_pressed && shift_pressed)
+                    handleContextMenuAction(DEBUG_GUI_FREEZE_CAM_TOGGLE);
                 else
                     handleContextMenuAction(DEBUG_POWERUP_RUBBERBALL);
                 break;
@@ -1735,7 +1746,7 @@ void setDebugCamera(int kart_num)
 {
     Camera::changeCamera(0, Camera::CM_TYPE_DEBUG);
     Camera::getActiveCamera()->setKart(World::getWorld()->getKart(kart_num));
-    irr_driver->getDevice()->getCursorControl()->setVisible(true);
+    irr_driver->showPointer();
 }   // setDebugCamera
 
 // ----------------------------------------------------------------------------

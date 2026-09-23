@@ -21,6 +21,7 @@
 
 #include "config/stk_config.hpp"
 #include "config/user_config.hpp"
+#include "graphics/irr_driver.hpp"
 #include "karts/kart.hpp"
 #include "karts/skidding.hpp"
 
@@ -34,6 +35,8 @@ CameraFPS::CameraFPS(int camera_index, Kart* kart)
 {
     m_attached      = false;
     m_smooth        = false;
+    m_frozen        = false;
+    m_keep_freeze   = false;
 
     // TODO: Put these values into a config file
     //       Global or per split screen zone?
@@ -74,6 +77,9 @@ CameraFPS::~CameraFPS()
  */
 void CameraFPS::applyMouseMovement (float x, float y)
 {
+    if (m_frozen)
+        return;
+
     core::vector3df direction(m_target_direction);
     core::vector3df up(m_camera->getUpVector());
 
@@ -121,7 +127,10 @@ void CameraFPS::applyMouseMovement (float x, float y)
 void CameraFPS::update(float dt)
 {
     Camera::update(dt);
-    
+
+    if (m_frozen)
+        return;
+
     // To view inside tunnels in top mode, increase near value
     m_camera->setNearValue(1.0f);
 
@@ -288,3 +297,36 @@ const core::vector3df &CameraFPS::getLinearVelocity()
         return m_lin_velocity;
 }   // getLinearVelocity
 
+// ----------------------------------------------------------------------------
+/** Toggle the freeze state and appropriately set the pointer status. */
+void CameraFPS::toggleFreeze()
+{
+    m_frozen = !m_frozen;
+    if (m_frozen)
+        irr_driver->showPointer();
+    else
+        irr_driver->hidePointer(true /* override the ADM exception */);
+
+    // Toggling during a pause makes the starting state irrelevant
+    m_keep_freeze = false;
+}   // toggleFreeze
+
+// ----------------------------------------------------------------------------
+/** Handle the freeze state during pauses. */
+void CameraFPS::pause()
+{
+    if (!m_frozen)
+        toggleFreeze();
+    else
+        m_keep_freeze = true;
+}   // pause
+
+// ----------------------------------------------------------------------------
+/** Restore the freeze state after pauses. */
+void CameraFPS::unpause()
+{
+    if (m_frozen && !m_keep_freeze)
+        toggleFreeze();
+
+    m_keep_freeze = false;
+}   // pause

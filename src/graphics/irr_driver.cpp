@@ -996,14 +996,15 @@ void IrrDriver::showPointer()
 }   // showPointer
 
 // --------------------------------------------------------------------------------------------
-void IrrDriver::hidePointer()
+void IrrDriver::hidePointer(bool force)
 {
 #ifndef SERVER_ONLY
     if (GUIEngine::isNoGraphics())
         return;
 
-    // always visible in artist debug mode, to be able to use the context menu
-    if (UserConfigParams::m_artist_debug_mode)
+    // Visible in artist debug mode, to be able to use the context menu
+    // unless the force parameter is passed
+    if (!force && UserConfigParams::m_artist_debug_mode)
     {
         this->getDevice()->getCursorControl()->setVisible(true);
         return;

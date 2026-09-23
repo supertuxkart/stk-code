@@ -26,6 +26,7 @@
 #include "config/user_config.hpp"
 #include "graphics/attachable_library_manager.hpp"
 #include "graphics/camera/camera.hpp"
+#include "graphics/camera/camera_fps.hpp"
 #include "graphics/camera/camera_normal.hpp"
 #include "graphics/central_settings.hpp"
 #include "graphics/irr_driver.hpp"
@@ -1517,6 +1518,10 @@ void World::pause(Phase phase)
         music_manager->pauseMusic();
     SFXManager::get()->pauseAll();
 
+    CameraFPS *cam = dynamic_cast<CameraFPS*>(Camera::getActiveCamera());
+    if (cam)
+        cam->pause();
+
     WorldStatus::pause(phase);
 }   // pause
 
@@ -1526,6 +1531,10 @@ void World::unpause()
     if (m_stop_music_when_dialog_open)
         music_manager->resumeMusic();
     SFXManager::get()->resumeAll();
+
+    CameraFPS *cam = dynamic_cast<CameraFPS*>(Camera::getActiveCamera());
+    if (cam)
+        cam->unpause();
 
     WorldStatus::unpause();
 

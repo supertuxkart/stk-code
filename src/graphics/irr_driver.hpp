@@ -275,7 +275,7 @@ public:
     bool                  moveWindow(int x, int y);
 
     void                  showPointer();
-    void                  hidePointer();
+    void                  hidePointer(bool force = false);
     void                  setLastLightBucketDistance(unsigned d) { m_last_light_bucket_distance = d; }
     void                  setSkinningJoint(unsigned d) { m_skinning_joint = d; }
     bool                  isPointerShown() const { return m_pointer_shown; }

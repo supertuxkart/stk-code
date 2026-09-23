@@ -59,6 +59,13 @@ private:
     /** Maximum velocity for fps camera. */
     float m_max_velocity;
 
+    /** Used to temporarily keep the FPS camera in a fixed position
+     *  while restoring mouse control */
+    bool m_frozen;
+
+    /** Used to restore the correct freeze state after a pause */
+    bool m_keep_freeze;
+
     /** Linear velocity of the camera, used for end and first person camera.
         It's stored relative to the camera direction for the first person view. */
     core::vector3df m_lin_velocity;
@@ -157,6 +164,20 @@ public:
     // ------------------------------------------------------------------------
     /** Returns the current linear velocity. */
     const core::vector3df &getLinearVelocity ();
+
+    // ------------------------------------------------------------------------
+    /** Toggle the freeze state and appropriately set the pointer status. */
+    void toggleFreeze();
+
+    // ------------------------------------------------------------------------
+    bool isFrozen() { return m_frozen; }
+
+    // ------------------------------------------------------------------------
+    /** Handle the freeze state during pauses. */
+    void pause();
+
+    // ------------------------------------------------------------------------
+    void unpause();
 
 };   // class CameraFPS
 

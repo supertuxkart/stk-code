@@ -1201,11 +1201,12 @@ EventPropagation InputManager::input(const SEvent& event)
                     cam->applyMouseMovement(mouse_x, mouse_y);
 
                     // Reset mouse position to the middle of the screen when
-                    // the mouse is far away
-                    if (event.MouseInput.X < mid_x / 2 ||
+                    // the mouse is far away and the free camera is not frozen
+                    if (!cam->isFrozen() &&
+                        (event.MouseInput.X < mid_x / 2 ||
                         event.MouseInput.X > (mid_x + mid_x / 2) ||
                         event.MouseInput.Y < mid_y / 2 ||
-                        event.MouseInput.Y > (mid_y + mid_y / 2))
+                        event.MouseInput.Y > (mid_y + mid_y / 2)))
                     {
                         irr_driver->getDevice()->getCursorControl()->setPosition(mid_x, mid_y);
                         m_mouse_val_x = mid_x;
