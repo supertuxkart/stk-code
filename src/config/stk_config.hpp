@@ -218,9 +218,6 @@ public:
     float m_minimap_ai_icon;
     float m_minimap_player_icon;
 
-    /** The field of view for 1, 2, 3, 4 player split screen. */
-    float m_camera_fov[MAX_PLAYER_COUNT];
-
     float m_cutscene_fov;
 
     unsigned m_max_skinning_bones;

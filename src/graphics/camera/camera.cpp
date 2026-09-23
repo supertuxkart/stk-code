@@ -128,16 +128,29 @@ Camera::Camera(CameraType type, int camera_index, Kart* kart)
     m_original_kart = kart;
     m_camera        = irr_driver->addCameraSceneNode();
     m_previous_pv_matrix = core::matrix4();
+    float splitscreen_aware_fov = UserConfigParams::m_camera_fov;
+    bool increase_fov = !UserConfigParams::m_split_screen_horizontally;
 
+    // In splitscreen, we generally reduce FoV because the screen
+    // area is smaller, but we must also account for the aspect
+    // ratio. A vertical split needs a bigger FoV than
+    // a horizontal split when lines and columns are not equal
+    // TODO: optimize the values, the tuning done is limited
     if (RaceManager::get()->getNumLocalPlayers() > 1)
     {
-        m_fov = DEGREE_TO_RAD * stk_config->m_camera_fov
-          [RaceManager::get()->getNumLocalPlayers() - 1];
+        if (RaceManager::get()->getNumLocalPlayers() == 2)
+            splitscreen_aware_fov += increase_fov ? 10.0f : -20.0f;
+        else if (RaceManager::get()->getNumLocalPlayers() <= 4)
+            splitscreen_aware_fov -= 10.0f;
+        else if (RaceManager::get()->getNumLocalPlayers() <= 6)
+            splitscreen_aware_fov += increase_fov ? 0.0f : -20.0f;
+        else if (RaceManager::get()->getNumLocalPlayers() <= 8)
+            splitscreen_aware_fov += increase_fov ? -5.0f : -25.0f;
+        else
+            splitscreen_aware_fov -= 20.0f;
     }
-    else
-    {
-        m_fov = DEGREE_TO_RAD * UserConfigParams::m_camera_fov;
-    }
+
+    m_fov = DEGREE_TO_RAD * splitscreen_aware_fov;
     m_camera->setFOV(m_fov);
     setupCamera();
     setKart(kart);

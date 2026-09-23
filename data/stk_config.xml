@@ -269,10 +269,9 @@
               max-moveable-objects="15"/>
 
   <!-- Camera
-       The field of views for 1-4 player split screen. fov-3 is
-       actually not used (since 3 player split screen uses the
-       same layout as 4 player split screen) -->
-  <camera fov-1="80" fov-2="65" fov-3="50" fov-4="75" cutscene-fov="0.61" />
+       The default field of view for cutscenes.
+       The field of view for player cameras is handled in UserConfig -->
+  <camera cutscene-fov="0.61" />
 
   <!-- Steer
        disable-while-unskid: Disable steering when stop skidding during
