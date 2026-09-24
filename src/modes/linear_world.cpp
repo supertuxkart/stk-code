@@ -662,6 +662,24 @@ void LinearWorld::getKartsDisplayInfo(
 
         const int position = kart->getPosition();
 
+        // Always show the player's name in networked multiplayer, before
+        // the lap time (if any) is shown.
+        core::stringw player_name;
+        if (NetworkConfig::get()->isNetworking())
+        {
+            player_name = kart->getController()->getName();
+            if (RaceManager::get()->getKartGlobalPlayerId(i) > -1)
+            {
+                const core::stringw& flag = StringUtils::getCountryFlag(
+                    RaceManager::get()->getKartInfo(i).getCountryCode());
+                if (!flag.empty())
+                {
+                    player_name += L" ";
+                    player_name += flag;
+                }
+            }
+        }
+
         // Don't compare times when crossing the start line first
         if(laps_of_leader>0                                                &&
            (getTimeTicks() - getTicksAtLapForKart(kart->getWorldKartId())  <
@@ -684,7 +702,10 @@ void LinearWorld::getKartsDisplayInfo(
                            - ticks_of_leader;
                 str = "+" + StringUtils::ticksTimeToString(ticks_behind);
             }
-            rank_info.m_text = irr::core::stringw(str.c_str());
+            rank_info.m_text = player_name;
+            if (!player_name.empty() && position != 1)
+                rank_info.m_text += L" ";
+            rank_info.m_text += irr::core::stringw(str.c_str());
         }
         else if (kart->hasFinishedRace())
         {
@@ -702,7 +723,7 @@ void LinearWorld::getKartsDisplayInfo(
         }
         else
         {
-            rank_info.m_text = "";
+            rank_info.m_text = player_name;
         }
 
         int numLaps = RaceManager::get()->getNumLaps();
