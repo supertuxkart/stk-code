@@ -46,6 +46,12 @@ private:
      *  have a stronger effect. */
     std::vector<float>  m_boost_time;
 
+    /** Speed intensity for speed lines effect [0.0, 1.0] per camera. */
+    std::vector<float>  m_speed_intensity;
+
+    /** Boost intensity for speed lines color tint [0.0, 1.0] per camera. */
+    std::vector<float>  m_boost_intensity;
+
     video::ITexture* m_areamap;
 
 public:
@@ -92,7 +98,17 @@ public:
 
     /** Use motion blur for a short time */
     void         giveBoost(unsigned int cam_index);
-    
+
+    /** Set the speed lines intensity for a camera.
+     *  \param cam_index Camera index
+     *  \param speed_intensity Speed-based intensity [0.0, 1.0]
+     *  \param boost_intensity Boost-based intensity for color tint [0.0, 1.0] */
+    void         setSpeedIntensity(unsigned int cam_index, float speed_intensity,
+                                   float boost_intensity);
+
+    void renderSpeedLines(const FrameBuffer &in_fbo,
+                          FrameBuffer &out_fbo);
+
     /** Render the post-processed scene */
     FrameBuffer *render(scene::ICameraSceneNode * const camnode, bool isRace,
                         RTT *rtts);

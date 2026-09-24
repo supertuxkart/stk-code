@@ -94,6 +94,8 @@ public:
     
     void resetPostProcessing() OVERRIDE;
     void giveBoost(unsigned int cam_index) OVERRIDE;
+    void setSpeedIntensity(unsigned int cam_index, float speed_intensity,
+                           float boost_intensity) OVERRIDE;
 
     void addSkyBox(const std::vector<irr::video::IImage*> &texture,
                    const std::vector<irr::video::IImage*> &spherical_harmonics_textures);
