@@ -332,7 +332,6 @@ source/Irrlicht/CXMLWriter.h
 source/Irrlicht/CZBuffer.h
 source/Irrlicht/CZipReader.h
 source/Irrlicht/dmfsupport.h
-source/Irrlicht/gles2-ext.h
 source/Irrlicht/glext.h
 source/Irrlicht/glxext.h
 source/Irrlicht/IAttribute.h
