@@ -89,7 +89,7 @@
 #define _IRR_IOS_PLATFORM_
 #undef _IRR_COMPILE_WITH_IOS_DEVICE_
 #define _IRR_COMPILE_WITH_SDL_DEVICE_
-#define _IRR_COMPILE_WITH_OGLES2_
+#define _IRR_COMPILE_WITH_OGLES_
 #else
 #endif
 #endif
@@ -110,7 +110,7 @@
 
 #if defined(_IRR_ANDROID_PLATFORM_)
 #define _IRR_COMPILE_WITH_SDL_DEVICE_
-#define _IRR_COMPILE_WITH_OGLES2_
+#define _IRR_COMPILE_WITH_OGLES_
 #endif
 
 #if !defined(_IRR_WINDOWS_API_) && !defined(_IRR_OSX_PLATFORM_) && !defined(_IRR_ANDROID_PLATFORM_) && !defined(_IRR_HAIKU_PLATFORM_)
@@ -125,7 +125,7 @@
 #endif
 
 
-#if defined(_IRR_COMPILE_WITH_OGLES2_) && !defined(_IRR_COMPILE_WITH_IOS_DEVICE_) && !defined(_IRR_COMPILE_WITH_SDL_DEVICE_)
+#if defined(_IRR_COMPILE_WITH_OGLES_) && !defined(_IRR_COMPILE_WITH_IOS_DEVICE_) && !defined(_IRR_COMPILE_WITH_SDL_DEVICE_)
 #define _IRR_COMPILE_WITH_EGL_
 #endif
 
@@ -180,16 +180,16 @@ define out. */
 #undef _IRR_COMPILE_WITH_OPENGL_
 #endif
 
-//! Define _IRR_COMPILE_WITH_OGLES2_ to compile the Irrlicht engine with OpenGL-ES 2.x.
+//! Define _IRR_COMPILE_WITH_OGLES_ to compile the Irrlicht engine with OpenGL-ES 2.x.
 /** If you do not wish the engine to be compiled with OpenGL-ES 2.x, comment
  this define out.
  You should only use this define if you really need the OpenGL-ES driver, and
  it should be usually the only HW accelerated one. OpenGL is currently disabled
  if using this driver, to avoid problems with the ogl-es emulators.
  */
-// #define _IRR_COMPILE_WITH_OGLES2_
-#ifdef NO_IRR_COMPILE_WITH_OGLES2_
-#undef _IRR_COMPILE_WITH_OGLES2_
+// #define _IRR_COMPILE_WITH_OGLES_
+#ifdef NO_IRR_COMPILE_WITH_OGLES_
+#undef _IRR_COMPILE_WITH_OGLES_
 #endif
 #ifndef IRR_OGLES2_SHADER_PATH
 #ifdef _IRR_COMPILE_WITH_IOS_DEVICE_
@@ -226,7 +226,7 @@ define out. */
 /** This should usually be enabled, but also depends on the specific
  architecture. You can simply uncomment the define and recompile.
  */
-#ifdef _IRR_COMPILE_WITH_OGLES2_
+#ifdef _IRR_COMPILE_WITH_OGLES_
 #if !defined(_IRR_IOS_PLATFORM_)
 #define _IRR_OGLES2_USE_EXTPOINTER_
 #endif

@@ -1082,7 +1082,7 @@ bool CIrrDeviceWayland::initEGL()
 
     ContextEGLParams egl_params;
 
-    if (CreationParams.DriverType == video::EDT_OGLES2)
+    if (CreationParams.DriverType == video::EDT_OGLES)
     {
         egl_params.opengl_api = CEGL_API_OPENGL_ES;
     }
@@ -1235,8 +1235,8 @@ void CIrrDeviceWayland::createDriver()
         os::Printer::log("No OpenGL support compiled in.", ELL_ERROR);
         #endif
         break;
-    case video::EDT_OGLES2:
-        #ifdef _IRR_COMPILE_WITH_OGLES2_
+    case video::EDT_OGLES:
+        #ifdef _IRR_COMPILE_WITH_OGLES_
         VideoDriver = video::createOGLES2Driver(CreationParams, FileSystem, this);
         #else
         os::Printer::log("No OpenGL ES 2.0 support compiled in.", ELL_ERROR);

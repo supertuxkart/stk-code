@@ -7,11 +7,11 @@
 
 #include "IrrCompileConfig.h"
 
-#ifdef _IRR_COMPILE_WITH_OGLES2_
+#ifdef _IRR_COMPILE_WITH_OGLES_
 
 #include "irrTypes.h"
-#include "COGLES2Texture.h"
-#include "COGLES2Driver.h"
+#include "COGLESTexture.h"
+#include "COGLESDriver.h"
 #include "os.h"
 #include "CImage.h"
 #include "CColorConverter.h"
@@ -21,8 +21,8 @@
 #include "irrString.h"
 
 #ifndef IOS_STK
-#include <GLES2/gl2.h>
-#include <GLES2/gl2ext.h>
+#include <GLES3/gl3.h>
+#include <GLES3/gl3ext.h>
 #include <EGL/egl.h>
 #endif
 
@@ -40,7 +40,7 @@ namespace video
 {
 
 //! constructor for usual textures
-COGLES2Texture::COGLES2Texture(IImage* origImage, const io::path& name, void* mipmapData, COGLES2Driver* driver)
+COGLESTexture::COGLESTexture(IImage* origImage, const io::path& name, void* mipmapData, COGLESDriver* driver)
 	: ITexture(name), ColorFormat(ECF_A8R8G8B8), Driver(driver), Image(0), MipImage(0),
 	TextureName(0), InternalFormat(GL_RGBA), PixelFormat(GL_BGRA_EXT),
 	PixelType(GL_UNSIGNED_BYTE), MipLevelStored(0),
@@ -48,7 +48,7 @@ COGLES2Texture::COGLES2Texture(IImage* origImage, const io::path& name, void* mi
 	ReadOnlyLock(false), KeepImage(true)
 {
 	#ifdef _DEBUG
-	setDebugName("COGLES2Texture");
+	setDebugName("COGLESTexture");
 	#endif
 
 	HasMipMaps = Driver->getTextureCreationFlag(ETCF_CREATE_MIP_MAPS);
@@ -77,7 +77,7 @@ COGLES2Texture::COGLES2Texture(IImage* origImage, const io::path& name, void* mi
 
 
 //! constructor for basic setup (only for derived classes)
-COGLES2Texture::COGLES2Texture(const io::path& name, COGLES2Driver* driver)
+COGLESTexture::COGLESTexture(const io::path& name, COGLESDriver* driver)
 	: ITexture(name), ColorFormat(ECF_A8R8G8B8), Driver(driver), Image(0), MipImage(0),
 	TextureName(0), InternalFormat(GL_RGBA), PixelFormat(GL_BGRA_EXT),
 	PixelType(GL_UNSIGNED_BYTE), MipLevelStored(0), HasMipMaps(true),
@@ -85,13 +85,13 @@ COGLES2Texture::COGLES2Texture(const io::path& name, COGLES2Driver* driver)
 	ReadOnlyLock(false), KeepImage(true)
 {
 	#ifdef _DEBUG
-	setDebugName("COGLES2Texture");
+	setDebugName("COGLESTexture");
 	#endif
 }
 
 
 //! destructor
-COGLES2Texture::~COGLES2Texture()
+COGLESTexture::~COGLESTexture()
 {
 	if (TextureName)
 		glDeleteTextures(1, &TextureName);
@@ -101,7 +101,7 @@ COGLES2Texture::~COGLES2Texture()
 
 
 //! Choose best matching color format, based on texture creation flags
-ECOLOR_FORMAT COGLES2Texture::getBestColorFormat(ECOLOR_FORMAT format)
+ECOLOR_FORMAT COGLESTexture::getBestColorFormat(ECOLOR_FORMAT format)
 {
 	ECOLOR_FORMAT destFormat = ECF_A8R8G8B8;
 	switch (format)
@@ -145,7 +145,7 @@ ECOLOR_FORMAT COGLES2Texture::getBestColorFormat(ECOLOR_FORMAT format)
 
 
 // prepare values ImageSize, TextureSize, and ColorFormat based on image
-void COGLES2Texture::getImageValues(IImage* image)
+void COGLESTexture::getImageValues(IImage* image)
 {
 	if (!image)
 	{
@@ -190,7 +190,7 @@ void COGLES2Texture::getImageValues(IImage* image)
 
 
 //! copies the the texture into an open gl texture.
-void COGLES2Texture::uploadTexture(bool newTexture, void* mipmapData, u32 level)
+void COGLESTexture::uploadTexture(bool newTexture, void* mipmapData, u32 level)
 {
 	// check which image needs to be uploaded
 	IImage* image = level?MipImage:Image;
@@ -202,7 +202,7 @@ void COGLES2Texture::uploadTexture(bool newTexture, void* mipmapData, u32 level)
 
 #ifndef GL_BGRA
 	// whoa, pretty badly implemented extension...
-	if (Driver->FeatureAvailable[COGLES2ExtensionHandler::IRR_IMG_texture_format_BGRA8888] || Driver->FeatureAvailable[COGLES2ExtensionHandler::IRR_EXT_texture_format_BGRA8888])
+	if (Driver->FeatureAvailable[COGLESExtensionHandler::IRR_IMG_texture_format_BGRA8888] || Driver->FeatureAvailable[COGLESExtensionHandler::IRR_EXT_texture_format_BGRA8888])
 		GL_BGRA=0x80E1;
 	else
 		GL_BGRA=GL_RGBA;
@@ -231,7 +231,7 @@ void COGLES2Texture::uploadTexture(bool newTexture, void* mipmapData, u32 level)
 			break;
 		case ECF_A8R8G8B8:
 			PixelType=GL_UNSIGNED_BYTE;
-			if (!Driver->queryOpenGLFeature(COGLES2ExtensionHandler::IRR_IMG_texture_format_BGRA8888) && !Driver->queryOpenGLFeature(COGLES2ExtensionHandler::IRR_EXT_texture_format_BGRA8888))
+			if (!Driver->queryOpenGLFeature(COGLESExtensionHandler::IRR_IMG_texture_format_BGRA8888) && !Driver->queryOpenGLFeature(COGLESExtensionHandler::IRR_EXT_texture_format_BGRA8888))
 			{
 				convert=CColorConverter::convert_A8R8G8B8toA8B8G8R8;
 				InternalFormat=GL_RGBA;
@@ -349,7 +349,7 @@ void COGLES2Texture::uploadTexture(bool newTexture, void* mipmapData, u32 level)
 
 
 //! lock function
-void* COGLES2Texture::lock(E_TEXTURE_LOCK_MODE mode, u32 mipmapLevel)
+void* COGLESTexture::lock(E_TEXTURE_LOCK_MODE mode, u32 mipmapLevel)
 {
 	// store info about which image is locked
 	IImage* image = (mipmapLevel==0)?Image:MipImage;
@@ -359,7 +359,7 @@ void* COGLES2Texture::lock(E_TEXTURE_LOCK_MODE mode, u32 mipmapLevel)
 
 
 //! unlock function
-void COGLES2Texture::unlock()
+void COGLESTexture::unlock()
 {
 	// test if miplevel or main texture was locked
 	IImage* image = MipImage?MipImage:Image;
@@ -391,35 +391,35 @@ void COGLES2Texture::unlock()
 
 
 //! Returns size of the original image.
-const core::dimension2d<u32>& COGLES2Texture::getOriginalSize() const
+const core::dimension2d<u32>& COGLESTexture::getOriginalSize() const
 {
 	return ImageSize;
 }
 
 
 //! Returns size of the texture.
-const core::dimension2d<u32>& COGLES2Texture::getSize() const
+const core::dimension2d<u32>& COGLESTexture::getSize() const
 {
 	return TextureSize;
 }
 
 
 //! returns driver type of texture, i.e. the driver, which created the texture
-E_DRIVER_TYPE COGLES2Texture::getDriverType() const
+E_DRIVER_TYPE COGLESTexture::getDriverType() const
 {
-	return EDT_OGLES2;
+	return EDT_OGLES;
 }
 
 
 //! returns color format of texture
-ECOLOR_FORMAT COGLES2Texture::getColorFormat() const
+ECOLOR_FORMAT COGLESTexture::getColorFormat() const
 {
 	return ColorFormat;
 }
 
 
 //! returns pitch of texture (in bytes)
-u32 COGLES2Texture::getPitch() const
+u32 COGLESTexture::getPitch() const
 {
 	if (Image)
 		return Image->getPitch();
@@ -429,14 +429,14 @@ u32 COGLES2Texture::getPitch() const
 
 
 //! return open gl texture name
-u64 COGLES2Texture::getTextureHandler() const
+u64 COGLESTexture::getTextureHandler() const
 {
 	return TextureName;
 }
 
 
 //! Returns whether this texture has mipmaps
-bool COGLES2Texture::hasMipMaps() const
+bool COGLESTexture::hasMipMaps() const
 {
 	return HasMipMaps;
 }
@@ -444,7 +444,7 @@ bool COGLES2Texture::hasMipMaps() const
 
 //! Regenerates the mip map levels of the texture. Useful after locking and
 //! modifying the texture
-void COGLES2Texture::regenerateMipMapLevels(void* mipmapData)
+void COGLESTexture::regenerateMipMapLevels(void* mipmapData)
 {
 	if (AutomaticMipmapUpdate || !HasMipMaps || !Image)
 		return;
@@ -484,38 +484,38 @@ void COGLES2Texture::regenerateMipMapLevels(void* mipmapData)
 }
 
 
-bool COGLES2Texture::isRenderTarget() const
+bool COGLESTexture::isRenderTarget() const
 {
 	return IsRenderTarget;
 }
 
 
-void COGLES2Texture::setIsRenderTarget(bool isTarget)
+void COGLESTexture::setIsRenderTarget(bool isTarget)
 {
 	IsRenderTarget = isTarget;
 }
 
 
-bool COGLES2Texture::isFrameBufferObject() const
+bool COGLESTexture::isFrameBufferObject() const
 {
 	return false;
 }
 
 
 //! Bind Render Target Texture
-void COGLES2Texture::bindRTT()
+void COGLESTexture::bindRTT()
 {
 }
 
 
 //! Unbind Render Target Texture
-void COGLES2Texture::unbindRTT()
+void COGLESTexture::unbindRTT()
 {
 }
 
 
 //! Get an access to texture states cache.
-COGLES2Texture::SStatesCache& COGLES2Texture::getStatesCache() const
+COGLESTexture::SStatesCache& COGLESTexture::getStatesCache() const
 {
 	return StatesCache;
 }
@@ -524,16 +524,16 @@ COGLES2Texture::SStatesCache& COGLES2Texture::getStatesCache() const
 /* FBO Textures */
 
 // helper function for render to texture
-static bool checkOGLES2FBOStatus(COGLES2Driver* Driver);
+static bool checkOGLES2FBOStatus(COGLESDriver* Driver);
 
 //! RTT ColorFrameBuffer constructor
-COGLES2FBOTexture::COGLES2FBOTexture(const core::dimension2d<u32>& size,
-					const io::path& name, COGLES2Driver* driver,
+COGLESFBOTexture::COGLESFBOTexture(const core::dimension2d<u32>& size,
+					const io::path& name, COGLESDriver* driver,
 					ECOLOR_FORMAT format)
-	: COGLES2Texture(name, driver), DepthTexture(0), ColorFrameBuffer(0)
+	: COGLESTexture(name, driver), DepthTexture(0), ColorFrameBuffer(0)
 {
 	#ifdef _DEBUG
-	setDebugName("COGLES2Texture_FBO");
+	setDebugName("COGLESTexture_FBO");
 	#endif
 
 	ImageSize = size;
@@ -606,7 +606,7 @@ COGLES2FBOTexture::COGLES2FBOTexture(const core::dimension2d<u32>& size,
 
 
 //! destructor
-COGLES2FBOTexture::~COGLES2FBOTexture()
+COGLESFBOTexture::~COGLESFBOTexture()
 {
 	if (DepthTexture)
 		if (DepthTexture->drop())
@@ -616,14 +616,14 @@ COGLES2FBOTexture::~COGLES2FBOTexture()
 }
 
 
-bool COGLES2FBOTexture::isFrameBufferObject() const
+bool COGLESFBOTexture::isFrameBufferObject() const
 {
 	return true;
 }
 
 
 //! Bind Render Target Texture
-void COGLES2FBOTexture::bindRTT()
+void COGLESFBOTexture::bindRTT()
 {
 	if (ColorFrameBuffer != 0)
 		glBindFramebuffer(GL_FRAMEBUFFER, ColorFrameBuffer);
@@ -631,7 +631,7 @@ void COGLES2FBOTexture::bindRTT()
 
 
 //! Unbind Render Target Texture
-void COGLES2FBOTexture::unbindRTT()
+void COGLESFBOTexture::unbindRTT()
 {
 	if (ColorFrameBuffer != 0)
 		glBindFramebuffer(GL_FRAMEBUFFER, Driver->getDefaultFramebuffer());
@@ -641,16 +641,16 @@ void COGLES2FBOTexture::unbindRTT()
 /* FBO Depth Textures */
 
 //! RTT DepthBuffer constructor
-COGLES2FBODepthTexture::COGLES2FBODepthTexture(
+COGLESFBODepthTexture::COGLESFBODepthTexture(
 		const core::dimension2d<u32>& size,
 		const io::path& name,
-		COGLES2Driver* driver,
+		COGLESDriver* driver,
 		bool useStencil)
-	: COGLES2Texture(name, driver), DepthRenderBuffer(0),
+	: COGLESTexture(name, driver), DepthRenderBuffer(0),
 	StencilRenderBuffer(0), UseStencil(useStencil)
 {
 #ifdef _DEBUG
-	setDebugName("COGLES2TextureFBO_Depth");
+	setDebugName("COGLESTextureFBO_Depth");
 #endif
 
 	ImageSize = size;
@@ -665,7 +665,7 @@ COGLES2FBODepthTexture::COGLES2FBODepthTexture(
 		glGenRenderbuffers(1, &DepthRenderBuffer);
 		glBindRenderbuffer(GL_RENDERBUFFER, DepthRenderBuffer);
 #ifdef GL_OES_packed_depth_stencil
-		if (Driver->queryOpenGLFeature(COGLES2ExtensionHandler::IRR_OES_packed_depth_stencil))
+		if (Driver->queryOpenGLFeature(COGLESExtensionHandler::IRR_OES_packed_depth_stencil))
 		{
 			// generate packed depth stencil buffer
 			glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8_OES, ImageSize.Width, ImageSize.Height);
@@ -692,7 +692,7 @@ COGLES2FBODepthTexture::COGLES2FBODepthTexture(
 
 
 //! destructor
-COGLES2FBODepthTexture::~COGLES2FBODepthTexture()
+COGLESFBODepthTexture::~COGLESFBODepthTexture()
 {
 	if (DepthRenderBuffer)
 		glDeleteRenderbuffers(1, &DepthRenderBuffer);
@@ -703,11 +703,11 @@ COGLES2FBODepthTexture::~COGLES2FBODepthTexture()
 
 
 //combine depth texture and rtt
-bool COGLES2FBODepthTexture::attach(ITexture* renderTex)
+bool COGLESFBODepthTexture::attach(ITexture* renderTex)
 {
 	if (!renderTex)
 		return false;
-	COGLES2FBOTexture* rtt = static_cast<COGLES2FBOTexture*>(renderTex);
+	COGLESFBOTexture* rtt = static_cast<COGLESFBOTexture*>(renderTex);
 	rtt->bindRTT();
 
 	// attach stencil texture to stencil buffer
@@ -732,18 +732,18 @@ bool COGLES2FBODepthTexture::attach(ITexture* renderTex)
 
 
 //! Bind Render Target Texture
-void COGLES2FBODepthTexture::bindRTT()
+void COGLESFBODepthTexture::bindRTT()
 {
 }
 
 
 //! Unbind Render Target Texture
-void COGLES2FBODepthTexture::unbindRTT()
+void COGLESFBODepthTexture::unbindRTT()
 {
 }
 
 
-bool checkOGLES2FBOStatus(COGLES2Driver* Driver)
+bool checkOGLES2FBOStatus(COGLESDriver* Driver)
 {
 	GLenum status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
 
@@ -781,5 +781,5 @@ bool checkOGLES2FBOStatus(COGLES2Driver* Driver)
 } // end namespace video
 } // end namespace irr
 
-#endif // _IRR_COMPILE_WITH_OGLES2_
+#endif // _IRR_COMPILE_WITH_OGLES_
 

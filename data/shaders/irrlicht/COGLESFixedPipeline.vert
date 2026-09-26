@@ -1,10 +1,11 @@
-/* Attributes */
+#version 300 es
 
-attribute vec3 inVertexPosition;
-attribute vec3 inVertexNormal;
-attribute vec4 inVertexColor;
-attribute vec2 inTexCoord0;
-//attribute vec2 inTexCoord1;
+/* Ins */
+
+in vec3 inVertexPosition;
+in vec3 inVertexNormal;
+in vec4 inVertexColor;
+in vec2 inTexCoord0;
 
 /* Uniforms */
 
@@ -13,12 +14,11 @@ uniform mat4 uMvpMatrix;
 uniform vec2 uTextureTrans0;
 //uniform mat4 uTextureMatrix1;
 
-/* Varyings */
+/* Outs */
 
-varying vec2 varTexCoord0;
-//varying vec2 varTexCoord1;
-varying vec4 varVertexColor;
-varying float varEyeDist;
+out vec2 varTexCoord0;
+out vec4 varVertexColor;
+out float varEyeDist;
 
 void main(void)
 {
