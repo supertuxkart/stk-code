@@ -1,4 +1,4 @@
-#version 300 es
+#version 310 es
 
 precision mediump float;
 
@@ -25,10 +25,10 @@ uniform float uHueChange;
 uniform vec4 uVertexColor;
 
 uniform bool uTextureUsage0;
-//uniform bool uTextureUsage1;
 
 uniform sampler2D uTextureUnit0;
-//uniform sampler2D uTextureUnit1;
+
+layout(location = 0) out vec4 FragColor;
 
 /* Ins */
 
@@ -88,10 +88,8 @@ vec4 render2LayerSolid()
 	float BlendFactor = varVertexColor.a;
 	
 	vec4 Texel0 = texture(uTextureUnit0, varTexCoord0);
-	//vec4 Texel1 = texture(uTextureUnit1, varTexCoord1);
 	
 	vec4 Color = Texel0 * BlendFactor;
-	//vec4 Color += Texel1 * (1.0 - BlendFactor);
 	
 	return Color;
 }
@@ -99,10 +97,8 @@ vec4 render2LayerSolid()
 vec4 renderLightMap()
 {
 	vec4 Texel0 = texture(uTextureUnit0, varTexCoord0);
-	//vec4 Texel1 = texture(uTextureUnit1, varTexCoord1);
 	
 	vec4 Color = Texel0 * 4.0;
-	//Color *= Texel1;
 	Color.a = Texel0.a * Texel0.a;
 	
 	return Color;
@@ -111,10 +107,8 @@ vec4 renderLightMap()
 vec4 renderDetailMap()
 {
 	vec4 Texel0 = texture(uTextureUnit0, varTexCoord0);
-	//vec4 Texel1 = texture(uTextureUnit1, varTexCoord1);
 	
 	vec4 Color = Texel0;
-	//Color += Texel1 - 0.5;
 	
 	return Color;
 }
@@ -124,10 +118,8 @@ vec4 renderReflection2Layer()
 	vec4 Color = varVertexColor;
 	
 	vec4 Texel0 = texture(uTextureUnit0, varTexCoord0);
-	//vec4 Texel1 = texture(uTextureUnit1, varTexCoord1);
 	
 	Color *= Texel0;
-	//Color *= Texel1;
 	
 	return Color;
 }
@@ -173,52 +165,51 @@ vec4 renderTransparentVertexColor()
 
 void main ()
 {
+    vec4 Color = vec4(1.0);
+
     if (uMaterialType == Solid)
-		out vec4 renderSolid();
-	else if(uMaterialType == Solid2Layer)
-		out vec4 render2LayerSolid();
-	else if(uMaterialType == LightMap)
-		out vec4 renderSolid();
-	else if(uMaterialType == DetailMap)
-		out vec4 renderDetailMap();
-	else if(uMaterialType == SphereMap)
-		out vec4 renderSolid();
-	else if(uMaterialType == Reflection2Layer)
-		out vec4 renderReflection2Layer();
-	else if(uMaterialType == TransparentAlphaChannel)
-		out vec4 renderTransparent();
-	else if(uMaterialType == TransparentAlphaChannelRef)
-	{
-		vec4 Color = renderTransparentVertexColor();
-		if (Color.a < 0.5)
-			discard;
-		out vec4 Color;
-	}
-	else if(uMaterialType == StkGrass)
-	{
-		vec4 Color = renderTransparent();
-		if (Color.a < 0.5)
-			discard;
-		out vec4 Color;
-	}
-	else if(uMaterialType == StkBlend)
-	{
-		out vec4 renderTransparentVertexColor();
-	}
-	else if(uMaterialType == TransparentVertexAlpha)
-	{
-		vec4 Color = renderTransparent();
-		Color.a = varVertexColor.a;
-		
-		out vec4 Color * uVertexColor;
-	}
-	else if(uMaterialType == TransparentReflection2Layer)
-	{
-		vec4 Color = renderReflection2Layer();
-		Color.a = varVertexColor.a;
-		
-		out vec4 Color;
-	}
-	else
-		out vec4 vec4(1.0, 1.0, 1.0, 1.0);
+        Color = renderSolid();
+    else if(uMaterialType == Solid2Layer)
+        Color = render2LayerSolid();
+    else if(uMaterialType == LightMap)
+        Color = renderLightMap();
+    else if(uMaterialType == DetailMap)
+        Color = renderDetailMap();
+    else if(uMaterialType == SphereMap)
+        Color = renderSolid();
+    else if(uMaterialType == Reflection2Layer)
+        Color = renderReflection2Layer();
+    else if(uMaterialType == TransparentAlphaChannel)
+        Color = renderTransparent();
+    else if(uMaterialType == TransparentAlphaChannelRef)
+    {
+        Color = renderTransparentVertexColor();
+        if (Color.a < 0.5)
+            discard;
+    }
+    else if(uMaterialType == StkGrass)
+    {
+        Color = renderTransparent();
+        if (Color.a < 0.5)
+            discard;
+    }
+    else if(uMaterialType == StkBlend)
+    {
+        Color = renderTransparentVertexColor();
+    }
+    else if(uMaterialType == TransparentVertexAlpha)
+    {
+        Color = renderTransparent();
+        Color.a = varVertexColor.a;
+        Color *= uVertexColor;
+    }
+    else if(uMaterialType == TransparentReflection2Layer)
+    {
+        Color = renderReflection2Layer();
+        Color.a = varVertexColor.a;
+    }
+    else
+        Color = vec4(1.0, 1.0, 1.0, 1.0);
+
+    FragColor = Color;
 }

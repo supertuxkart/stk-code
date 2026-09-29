@@ -4,7 +4,7 @@
 // This file is part of the "Irrlicht Engine".
 // For conditions of distribution and use, see copyright notice in Irrlicht.h
 
-#version 300 es
+#version 310 es
 
 #define MAX_LIGHTS 2
 
@@ -12,6 +12,8 @@ precision mediump float;
 
 uniform sampler2D texture0;
 uniform sampler2D texture1;
+
+layout(location = 0) out vec4 FragColor;
 
 in vec4 varTexCoord;
 in vec3 varLightVector[MAX_LIGHTS];
@@ -35,5 +37,5 @@ void main(void)
 	color *= colorMap;
 	color.a = varLightColor[0].a;
 	
-	out vec4 color;
+	FragColor = color;
 }

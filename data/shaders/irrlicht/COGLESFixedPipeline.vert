@@ -1,4 +1,4 @@
-#version 300 es
+#version 310 es
 
 /* Ins */
 
@@ -12,7 +12,6 @@ in vec2 inTexCoord0;
 uniform mat4 uMvpMatrix;
 
 uniform vec2 uTextureTrans0;
-//uniform mat4 uTextureMatrix1;
 
 /* Outs */
 
@@ -25,9 +24,6 @@ void main(void)
 	gl_Position = uMvpMatrix * vec4(inVertexPosition,1.0);
 
 	varTexCoord0 = inTexCoord0 + uTextureTrans0;
-
-	//vec4 TexCoord1 = vec4(inTexCoord1.x, inTexCoord1.y, 0.0, 0.0);
-	//varTexCoord1 = vec4(uTextureMatrix1 * TexCoord1).xy;
-
 	varVertexColor = inVertexColor.zyxw;
+	varEyeDist = length((uMvpMatrix * vec4(inVertexPosition, 1.0)).xyz);
 }

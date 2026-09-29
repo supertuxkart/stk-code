@@ -4,12 +4,14 @@
 // This file is part of the "Irrlicht Engine".
 // For conditions of distribution and use, see copyright notice in Irrlicht.h
 
-#version 300 es
+#version 310 es
 
 precision mediump float;
 
 uniform bool uUseTexture;
 uniform sampler2D uTextureUnit;
+
+layout(location = 0) out vec4 FragColor;
 
 in vec4 vVertexColor;
 in vec2 vTexCoord;
@@ -21,5 +23,5 @@ void main(void)
 	if(uUseTexture)
 		Color *= texture(uTextureUnit, vTexCoord);
 	
-	out vec4 Color;
+	FragColor = Color;
 }

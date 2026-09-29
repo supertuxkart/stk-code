@@ -4,7 +4,7 @@
 // This file is part of the "Irrlicht Engine".
 // For conditions of distribution and use, see copyright notice in Irrlicht.h
 
-#version 300 es
+#version 310 es
 
 #define MAX_LIGHTS 2
 
