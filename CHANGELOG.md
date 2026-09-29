@@ -11,6 +11,7 @@ For similar reasons, and because some features are vastly more complex than othe
 * Add TV cameras as a camera option when watching soccer games in spectator mode, by LLS
 * Add a 'help' command for use in server lobbies, by Alayan
 * Update CA certificates used by cURL, by Nutzboi
+* Add various safety guards to the handling of network packets, preventing malformed or forged packets from modifying game state or causing out-of-bound accesses, by acts-1631
 
 ### General
 * Many improvements for localization:
@@ -21,6 +22,8 @@ For similar reasons, and because some features are vastly more complex than othe
     * Move all URLs out of translatable strings, by Alayan
     * Make the screenshot notification translatable, by Alayan
     * Minor improvements to some English source strings, by Alayan and others
+* Updated translations (as usual for new STK releases)
+* Move various URLs from code to config files, by Alayan
 * Add optional support for Opus audio files, by Abedegno
 * Support using the command line to set the user-adjustable graphical parameters that were missing as command line options, by Alayan
 * Add a command line option to directly set a graphical preset, by Alayan
@@ -31,11 +34,28 @@ For similar reasons, and because some features are vastly more complex than othe
 * Allow the game to parse a list of benchmark replay files from config and to select which one to use at runtime or through the command-line, instead of hardcoding the file name, by Alayan
 * Fix a crash that would happen when changing resolution after having played with seasonal hats on, by Alayan
 * Reduce RAM usage when generating the skybox during track loading, by virophagesp
+* Significantly improve gamepad menu navigation, by Alayan
+* Improved Android README, by Gusta and Alayan
+* Limit the length of local usernames to 30 characters, by Gusta and Khooaaa
+* Disable text-input mode on startup, to prevent Input Method Editors from intercepting game commands, by Alayan
+* Various build system updates:
+    - Ensure compatibility with recent Switch Homebrew releases, by Mary
+    - Ensure Android builds successfully with the updated dependencies, by Gusta
+    - Switch to LLVM for Windows x86 cross-compilation, by Alayan
+* Prevent zip files from extracting data outside of their target directory, by acts-1631
+* Update many libraries from the dependencies package used by the Windows, Apple, and Android automated builds (Astcenc, BlueZ, cURL, Freetype, Libjpeg Turbo, Ogg, OpenAL, ShaderC, SQlite, Zlib), by Alayan
+* Switch to LLVM for Windows x86 cross-compilation, by Alayan
+* Drop support for Windows XP, Windows RT, iOS 12 or older, macOS 10.14 or older
 * Various code quality improvements and minor bugfixes, by Alayan and others
 
 ### Graphics
 * Fix a regression where an increase of the 'Image Quality' setting would decrease the anisotropic filtering level, by Alayan
-* Enable high-quality mipmaps as soon as high-quality
+* Enable high-quality mipmaps as soon as high-quality >>>>>>>>>>>>>>>>>>>>
+* Major improvements to the Depth-of-Field shader, by Alayan:
+    - Remove the upper distance limit of 2000 for DoF blur
+    - Simplify the formulas and require higher distances from the camera to start blurring and to achieve full blur
+    - Prevent border pixels from sampling colors from the other side of the screen
+    - Massively improve performance, by not computing the blur for in-focus pixels (instead of computing it and discarding it)
 
 ### User Interface
 * Add support for page-up, page-down, home and end keys in lists, by Alayan
@@ -48,6 +68,7 @@ For similar reasons, and because some features are vastly more complex than othe
 * Allow mouse wheel scrolling if the cursor hovers over a list even if another element has focus, by Alexander Klimov
 * Display more settings in the benchmark end-screen, by Alayan
 * Prevent showing a render resolution factor in UI that's unsupported with the current renderer, by Alayan
+* Prevent a misleading graphics preset overview with Vulkan, by Alayan 
 * Improvement to the layout logic for track and kart selection when having many addons, by Alayan
 * On common OSes, hide the OS username when displaying the ghost replay's path, by Fouks
 * Use standard MessageQueue notifications for the screenshot notification, by Alayan
@@ -55,6 +76,9 @@ For similar reasons, and because some features are vastly more complex than othe
 * Always offer the monitor's refresh rate as an option in the FPS limiter, and slightly update the default limits, by Alayan
 * Display an unlimited number of goals in soccer result UI, with list scrolling if needed, by Alayan
 * Better display of conflicts between keyboard configs: only check conflicts with configs that are enabled, but show every potentially conflicting input, not just the fire input, by Alayan
+* Prevent kart cropping in model view, by Alayan and Gusta
+* Improve the touch device settings dialog, by Gusta
+* Enable the 'held powerups' option by default, by Alayan
 * Various minor UI fixes, by Alayan and others
 
 ### Tracks and modeling
@@ -356,7 +380,7 @@ For similar reasons, and because some features are vastly more complex than othe
 
 ### Race gameplay and physics
 * Random spawn point in local battle mode, by Aleman778
-* Add an option to show everyone's items with the left characters icons, by Fouks
+* Add an option to show everyone's held powerups with the left characters icons, by Fouks
 * Allow to choose the number of AI per team in soccer, by risostk
 * In CTF mode, fix a bug that prevented scoring a point when the team's flag was in its immunity state, by Alayan
 * Fix a bug that could result in the finish time being shown as 0:00:00, by Alayan
@@ -485,13 +509,12 @@ For similar reasons, and because some features are vastly more complex than othe
 * Multithreading contention fixes by Benau
 * Local multiplayer improvements by Ben Krajancic
 * Major revamp of the achievement system to make adding new achievements much easier and flexible, also fixing some related bugs by Alayan
-* Store up to 5 highscores for a track/difficulty/mode/kart number combination, instead of 3
-* Smooth turning for non-keyboard inputs for improved consistency between input mode by deveee
-* Updated standard replays by Alayan
+* Store up to 5 highscores for a track/difficulty/mode/kart number combination, instead of 3, by Alayan
+* Smooth turning for non-keyboard inputs for improved consistency between input mode, by deveee
+* Replace the old standard replays with a new set, by Alayan
 * Visual improvements (new skidding particles, better rescue, bubblegum flashing before ending)
 * Audio improvements (crash sound depending on speed/direction, no crash sound on rescue walls, sound cue in nitro challenges)
 * Fix STK incorrectly connecting to the server when the internet option is disabled, by Auria
-* Include a new set of standard replays, by Alayan
 * Updated WiiUse library
 * Many bugfixes
 

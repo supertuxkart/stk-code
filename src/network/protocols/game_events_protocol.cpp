@@ -59,6 +59,15 @@ bool GameEventsProtocol::notifyEvent(Event* event)
         return true;
     }
     uint8_t type = data.getUInt8();
+    // Only startup boost is sent from a client. All other game events are
+    // notifications sent by the server.
+    if (NetworkConfig::get()->isServer() && type != GE_STARTUP_BOOST)
+    {
+        Log::warn("GameEventsProtocol",
+            "Ignoring client game event %d from %s.", type,
+            event->getPeer()->getAddress().toString().c_str());
+        return true;
+    }
     CaptureTheFlag* ctf = dynamic_cast<CaptureTheFlag*>(World::getWorld());
     FreeForAll* ffa = dynamic_cast<FreeForAll*>(World::getWorld());
     SoccerWorld* sw = dynamic_cast<SoccerWorld*>(World::getWorld());
@@ -105,6 +114,12 @@ bool GameEventsProtocol::notifyEvent(Event* event)
     {
         if (NetworkConfig::get()->isServer())
         {
+            if (data.size() < 1)
+            {
+                Log::warn("GameEventsProtocol",
+                    "Too short startup boost request.");
+                return true;
+            }
             uint8_t kart_id = data.getUInt8();
             if (!event->getPeer()->availableKartID(kart_id))
             {
