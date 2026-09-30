@@ -31,6 +31,7 @@
 #include "online/request_manager.hpp"
 #include "states_screens/dialogs/message_dialog.hpp"
 #include "states_screens/dialogs/kart_color_slider_dialog.hpp"
+#include "states_screens/dialogs/icon_selection_dialog.hpp"
 #include "states_screens/dialogs/recovery_dialog.hpp"
 #include "states_screens/main_menu_screen.hpp"
 #include "states_screens/online/register_screen.hpp"
@@ -427,6 +428,10 @@ void BaseUserScreen::eventCallback(Widget* widget,
         else if (button == "default_kart_color")
         {
             new KartColorSliderDialog(getSelectedPlayer());
+        }
+        else if (button == "choose_icon")
+        {
+            new IconSelectionDialog(getSelectedPlayer());
         }
         else if (button == "delete")
         {
