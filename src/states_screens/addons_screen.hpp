@@ -23,6 +23,8 @@
 #include "guiengine/widgets/list_widget.hpp"
 #include "guiengine/widgets/text_box_widget.hpp"
 
+#include <list>
+
 /* used for the installed/unsinstalled icons*/
 namespace irr { namespace gui { class STKModifiedSpriteBank; } }
 
@@ -59,6 +61,9 @@ private:
     /** Icon for 'loading' */
     int              m_icon_loading;
 
+    std::list<std::string> m_addon_queue;
+    AddonsLoading * m_addons_loading;
+
     irr::gui::STKModifiedSpriteBank
                     *m_icon_bank;
 
@@ -72,6 +77,8 @@ private:
     bool             m_reloading;
 
     bool             m_sort_desc;
+
+    bool             m_cancelled;
 
     /** List of date filters **/
     std::vector<DateFilter> m_date_filters;
