@@ -382,7 +382,8 @@ build_deps()
             echo "Compiling $ARCH_OPTION libadrenotools"
             mkdir -p "$DIRNAME/deps-$ARCH_OPTION/libadrenotools"
             mkdir -p "$DIRNAME/mesa/arm64-v8a"
-            git clone "$DIRNAME/../lib/libadrenotools" "$DIRNAME/deps-$ARCH_OPTION/libadrenotools"
+            git clone https://github.com/bylaws/liblinkernsbypass.git $DIRNAME/../lib/libadrenotools/lib/linkernsbypass
+            cp -a -f "$DIRNAME/../lib/libadrenotools/"* "$DIRNAME/deps-$ARCH_OPTION/libadrenotools"
 
             cd "$DIRNAME/deps-$ARCH_OPTION/libadrenotools"
             git submodule update --init
