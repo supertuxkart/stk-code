@@ -1019,7 +1019,6 @@ void PostProcessing::renderMotionBlur(const FrameBuffer &in_fbo,
     MotionBlurShader::getInstance()->render(in_fbo, boost_time, depth_stencil_texture);
 }   // renderMotionBlur
 
-
 // ----------------------------------------------------------------------------
 void PostProcessing::renderDoF(const FrameBuffer &framebuffer, GLuint color_texture, GLuint depth_stencil_texture)
 {
@@ -1099,35 +1098,35 @@ void PostProcessing::renderGodRays(scene::ICameraSceneNode * const camnode,
 
 
 // ----------------------------------------------------------------------------
-void PostProcessing::applyMLAA(const FrameBuffer& mlaa_tmp_framebuffer,
+void PostProcessing::applyMLAA(const FrameBuffer& mlaa_ping_framebuffer,
                                const FrameBuffer& mlaa_blend_framebuffer,
-                               const FrameBuffer& mlaa_colors_framebuffer)
+                               const FrameBuffer& mlaa_pong_framebuffer)
 {
     const core::vector2df &PIXEL_SIZE =
                      core::vector2df(1.0f / UserConfigParams::m_width,
                                      1.0f / UserConfigParams::m_height);
 
-    mlaa_tmp_framebuffer.bind();
+    mlaa_pong_framebuffer.bind();
     glClearColor(0.0, 0.0, 0.0, 1.0);
     glClear(GL_COLOR_BUFFER_BIT);
 
     // Pass 1: color edge detection
-    MLAAColorEdgeDetectionSHader::getInstance()->render(PIXEL_SIZE, mlaa_colors_framebuffer.getRTT()[0]);
+    MLAAColorEdgeDetectionSHader::getInstance()->render(PIXEL_SIZE, mlaa_ping_framebuffer.getRTT()[0]);
 
     // Pass 2: blend weights
     mlaa_blend_framebuffer.bind();
     glClear(GL_COLOR_BUFFER_BIT);
 
-    MLAABlendWeightSHader::getInstance()->render(m_areamap, PIXEL_SIZE, mlaa_tmp_framebuffer.getRTT()[0]);
+    MLAABlendWeightSHader::getInstance()->render(m_areamap, PIXEL_SIZE, mlaa_pong_framebuffer.getRTT()[0]);
 
-    // Blit in to tmp1
-    FrameBuffer::blit(mlaa_colors_framebuffer,
-                      mlaa_tmp_framebuffer);
+    // Blit scene color buffer into tmp
+    FrameBuffer::blit(mlaa_ping_framebuffer,
+                      mlaa_pong_framebuffer);
 
     // Pass 3: gather
-    mlaa_colors_framebuffer.bind();
+    mlaa_pong_framebuffer.bind();
     MLAAGatherSHader::getInstance()
-        ->render(PIXEL_SIZE, mlaa_blend_framebuffer.getRTT()[0], mlaa_tmp_framebuffer.getRTT()[0]);
+        ->render(PIXEL_SIZE, mlaa_blend_framebuffer.getRTT()[0], mlaa_ping_framebuffer.getRTT()[0]);
 
 }   // applyMLAA
 
@@ -1149,13 +1148,25 @@ FrameBuffer *PostProcessing::render(scene::ICameraSceneNode * const camnode,
                                     bool isRace,
                                     RTT *rtts)
 {
+    // Set of ping pong buffers to feed to the post processing passes.
+    // The general convention is for:
+    // - in_fbo to be the input buffer
+    // - out_fbo to be used as either: a temporary or the resulting output buffer.
+    //
+    // Two kinds of effect share this chain:
+    // - filters (DoF, motion blur, MLAA) derive a new image from the current one
+    //   after rendering we use std::swap to flip in/out around.
+    //   (i.e. the output of the last effect is now the input of the next effect.)
+    //
+    // - accumulators (god rays, bloom, lens flare, lightning) add a
+    //   contribution computed from something other than the image (the sun,
+    //   the bright pass, the weather): they bind *in_fbo and draw with
+    //   additive blending in place. (no need to swap).
+    //
+    // All effects are optional except the tonemapping stage.
     FrameBuffer *in_fbo = &rtts->getFBO(FBO_COLORS);
     FrameBuffer *out_fbo = &rtts->getFBO(FBO_TMP1_WITH_DS);
-    // Each effect uses these as named, and sets them up for the next effect.
-    // This allows chaining effects where some may be disabled.
 
-    // As the original color shouldn't be touched, the first effect
-    // can't be disabled.
     glDisable(GL_DEPTH_TEST);
     glDisable(GL_BLEND);
 
@@ -1181,6 +1192,7 @@ FrameBuffer *PostProcessing::render(scene::ICameraSceneNode * const camnode,
         ScopedGPUTimer Timer(irr_driver->getGPUTimer(Q_GODRAYS));
         renderGodRays(camnode, *in_fbo, rtts->getFBO(FBO_RGBA_1),
             rtts->getFBO(FBO_QUARTER1), rtts->getFBO(FBO_QUARTER2));
+        // additive blend, specifically no ping/pong std::swap
         PROFILER_POP_CPU_MARKER();
     }
 
@@ -1254,21 +1266,28 @@ FrameBuffer *PostProcessing::render(scene::ICameraSceneNode * const camnode,
 
             glDisable(GL_BLEND);
             glColorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
+            // additive blend, specifically no ping/pong std::swap
         } // end if bloom
         PROFILER_POP_CPU_MARKER();
     }
 
+    // Tonemap from HDR to SDR - switching from RGBA16 over to RGBA8 framebuffers afterwards.
     {
         PROFILER_PUSH_CPU_MARKER("- Tonemap", 0xFF, 0x00, 0x00);
         ScopedGPUTimer Timer(irr_driver->getGPUTimer(Q_TONEMAP));
         // only enable vignette during race
 
-        out_fbo = &rtts->getFBO(FBO_RGBA_1);
-        ToneMapShader::getInstance()->render(*out_fbo, in_fbo->getRTT()[0],
-                                             isRace ? 1.0f : 0.0f);
-        in_fbo = &rtts->getFBO(FBO_RGBA_2);
+        ToneMapShader::getInstance()->render(
+            rtts->getFBO(FBO_RGBA_1),   //out
+            in_fbo->getRTT()[0],        //in
+            isRace ? 1.0f : 0.0f
+        );
         PROFILER_POP_CPU_MARKER();
     }
+
+    // Rest of post processing in SDR
+    in_fbo = &rtts->getFBO(FBO_RGBA_1);
+    out_fbo = &rtts->getFBO(FBO_RGBA_2);
 
     {
         PROFILER_PUSH_CPU_MARKER("- Motion blur", 0xFF, 0x00, 0x00);
@@ -1277,9 +1296,8 @@ FrameBuffer *PostProcessing::render(scene::ICameraSceneNode * const camnode,
         if (isRace && UserConfigParams::m_motionblur && World::getWorld() &&
             m_boost_time.at(Camera::getActiveCamera()->getIndex()) > 0.0f) // motion blur
         {
-            in_fbo = &rtts->getFBO(FBO_RGBA_1);
-            out_fbo = &rtts->getFBO(FBO_RGBA_2);
             renderMotionBlur(*in_fbo, *out_fbo, irr_driver->getDepthStencilTexture());
+            std::swap(in_fbo, out_fbo);
         }
         PROFILER_POP_CPU_MARKER();
     }
@@ -1291,7 +1309,9 @@ FrameBuffer *PostProcessing::render(scene::ICameraSceneNode * const camnode,
         Weather* weather = Weather::getInstance();
         if (weather && weather->shouldLightning())
         {
+            in_fbo->bind();
             renderLightning(weather->getIntensity());
+            // additive blend, specifically no ping/pong std::swap
         }
         PROFILER_POP_CPU_MARKER();
     }
@@ -1303,10 +1323,11 @@ FrameBuffer *PostProcessing::render(scene::ICameraSceneNode * const camnode,
         applyMLAA(*in_fbo,
                   rtts->getFBO(FBO_RGBA_3),
                   *out_fbo);
+        std::swap(in_fbo, out_fbo);
         PROFILER_POP_CPU_MARKER();
     }
 
-    return out_fbo;
+    return in_fbo;
 }   // render
 
 #endif   // !SERVER_ONLY
