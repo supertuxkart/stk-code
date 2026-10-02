@@ -150,6 +150,7 @@ public:
     bool spareTireKartsSpawned() const;
     // ------------------------------------------------------------------------
     void spawnSpareTireKarts();
+    // ------------------------------------------------------------------------
 
 };   // ThreeStrikesBattles
 
