@@ -4,7 +4,7 @@
 
     <div x="2%" y="1%" width="96%" height="99%" layout="vertical-row" >
 
-        <header height="8%" width="80%" I18N="Section in easter egg tracks selection screen" text="All Tracks"
+        <header height="8%" width="80%" I18N="Section in easter egg tracks selection screen" text="Tracks"
                 align="center" text_align="center" />
         <spacer width="20" height="1%" />
 
