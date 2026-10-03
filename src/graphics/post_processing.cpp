@@ -1098,35 +1098,43 @@ void PostProcessing::renderGodRays(scene::ICameraSceneNode * const camnode,
 
 
 // ----------------------------------------------------------------------------
-void PostProcessing::applyMLAA(const FrameBuffer& mlaa_ping_framebuffer,
-                               const FrameBuffer& mlaa_blend_framebuffer,
-                               const FrameBuffer& mlaa_pong_framebuffer)
+void PostProcessing::applyMLAA(const FrameBuffer& mlaa_color_in_frambuffer, // original scene color.
+                               const FrameBuffer& mlaa_blend_framebuffer,   // blend weights.
+                               const FrameBuffer& mlaa_results_framebuffer) // reusable temp buffer AND final output.
 {
     const core::vector2df &PIXEL_SIZE =
                      core::vector2df(1.0f / UserConfigParams::m_width,
                                      1.0f / UserConfigParams::m_height);
 
-    mlaa_pong_framebuffer.bind();
+    // Clear results buffer
+    mlaa_results_framebuffer.bind();
     glClearColor(0.0, 0.0, 0.0, 1.0);
     glClear(GL_COLOR_BUFFER_BIT);
 
     // Pass 1: color edge detection
-    MLAAColorEdgeDetectionSHader::getInstance()->render(PIXEL_SIZE, mlaa_ping_framebuffer.getRTT()[0]);
+    // Detects geometric edges by looking for color discontinuities in the source image. (mlaa_color_in_framebuffer)
+    // This identifies which pixels lie on jagged edges that need MLAA smoothing.
+    MLAAColorEdgeDetectionSHader::getInstance()->render(PIXEL_SIZE, mlaa_color_in_frambuffer.getRTT()[0]);
 
     // Pass 2: blend weights
+    // Converts the edge map into per-pixel blend weights using the precomputed MLAA area lookup texture (m_areamap).
+    // These weights encode how to blend with neighboring pixels to smooth each edge.
     mlaa_blend_framebuffer.bind();
     glClear(GL_COLOR_BUFFER_BIT);
 
-    MLAABlendWeightSHader::getInstance()->render(m_areamap, PIXEL_SIZE, mlaa_pong_framebuffer.getRTT()[0]);
+    MLAABlendWeightSHader::getInstance()->render(m_areamap, PIXEL_SIZE, mlaa_results_framebuffer.getRTT()[0]);
 
     // Blit scene color buffer into tmp
-    FrameBuffer::blit(mlaa_ping_framebuffer,
-                      mlaa_pong_framebuffer);
+    FrameBuffer::blit(mlaa_color_in_frambuffer,
+                      mlaa_results_framebuffer);
 
     // Pass 3: gather
-    mlaa_pong_framebuffer.bind();
+    // Applies the blend weights(mlaa_blend_framebuffer) to the source color(mlaa_color_in_framebuffer)
+    // for each pixel near an edge, samples from appropriate neighbors and blends them according to the weights.
+    // Pixels away from edges are left essentially unchanged.
+    mlaa_results_framebuffer.bind();
     MLAAGatherSHader::getInstance()
-        ->render(PIXEL_SIZE, mlaa_blend_framebuffer.getRTT()[0], mlaa_ping_framebuffer.getRTT()[0]);
+        ->render(PIXEL_SIZE, mlaa_blend_framebuffer.getRTT()[0], mlaa_color_in_frambuffer.getRTT()[0]);
 
 }   // applyMLAA
 
@@ -1149,6 +1157,13 @@ FrameBuffer *PostProcessing::render(scene::ICameraSceneNode * const camnode,
                                     RTT *rtts)
 {
     // Set of ping pong buffers to feed to the post processing passes.
+    //
+    // Ping-Ponging refers to the technique where we alternate between two texture buffers to
+    // perform the multiple passes of rendering here without causing data hazards. one buffer acts
+    // as the read-only source while the other serves as the write-only destination.
+    // After each rendering pass (that wrote to out_fbo), we swap the buffer pointers,
+    // turning the previous output into the next input.
+    //
     // The general convention is for:
     // - in_fbo to be the input buffer
     // - out_fbo to be used as either: a temporary or the resulting output buffer.
