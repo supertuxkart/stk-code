@@ -1098,9 +1098,9 @@ void PostProcessing::renderGodRays(scene::ICameraSceneNode * const camnode,
 
 
 // ----------------------------------------------------------------------------
-void PostProcessing::applyMLAA(const FrameBuffer& mlaa_color_in_frambuffer, // original scene color.
-                               const FrameBuffer& mlaa_blend_framebuffer,   // blend weights.
-                               const FrameBuffer& mlaa_results_framebuffer) // reusable temp buffer AND final output.
+void PostProcessing::applyMLAA(const FrameBuffer& mlaa_color_in_framebuffer, // original scene color.
+                               const FrameBuffer& mlaa_blend_framebuffer,    // blend weights.
+                               const FrameBuffer& mlaa_results_framebuffer)  // reusable temp buffer AND final output.
 {
     const core::vector2df &PIXEL_SIZE =
                      core::vector2df(1.0f / UserConfigParams::m_width,
@@ -1114,7 +1114,7 @@ void PostProcessing::applyMLAA(const FrameBuffer& mlaa_color_in_frambuffer, // o
     // Pass 1: color edge detection
     // Detects geometric edges by looking for color discontinuities in the source image. (mlaa_color_in_framebuffer)
     // This identifies which pixels lie on jagged edges that need MLAA smoothing.
-    MLAAColorEdgeDetectionSHader::getInstance()->render(PIXEL_SIZE, mlaa_color_in_frambuffer.getRTT()[0]);
+    MLAAColorEdgeDetectionSHader::getInstance()->render(PIXEL_SIZE, mlaa_color_in_framebuffer.getRTT()[0]);
 
     // Pass 2: blend weights
     // Converts the edge map into per-pixel blend weights using the precomputed MLAA area lookup texture (m_areamap).
@@ -1125,7 +1125,7 @@ void PostProcessing::applyMLAA(const FrameBuffer& mlaa_color_in_frambuffer, // o
     MLAABlendWeightSHader::getInstance()->render(m_areamap, PIXEL_SIZE, mlaa_results_framebuffer.getRTT()[0]);
 
     // Blit scene color buffer into tmp
-    FrameBuffer::blit(mlaa_color_in_frambuffer,
+    FrameBuffer::blit(mlaa_color_in_framebuffer,
                       mlaa_results_framebuffer);
 
     // Pass 3: gather
@@ -1134,7 +1134,7 @@ void PostProcessing::applyMLAA(const FrameBuffer& mlaa_color_in_frambuffer, // o
     // Pixels away from edges are left essentially unchanged.
     mlaa_results_framebuffer.bind();
     MLAAGatherSHader::getInstance()
-        ->render(PIXEL_SIZE, mlaa_blend_framebuffer.getRTT()[0], mlaa_color_in_frambuffer.getRTT()[0]);
+        ->render(PIXEL_SIZE, mlaa_blend_framebuffer.getRTT()[0], mlaa_color_in_framebuffer.getRTT()[0]);
 
 }   // applyMLAA
 
