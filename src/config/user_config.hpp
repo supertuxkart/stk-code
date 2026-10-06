@@ -481,6 +481,9 @@ namespace UserConfigParams
     PARAM_PREFIX StringUserConfigParam m_last_used_kart_group
             PARAM_DEFAULT( StringUserConfigParam("all", "last_kart_group",
                                                  "Last selected kart group") );
+    PARAM_PREFIX IntUserConfigParam m_last_used_kart_class
+            PARAM_DEFAULT(  IntUserConfigParam(-1, "last_kart_class",
+                                                 "Last selected kart class") );
     PARAM_PREFIX IntUserConfigParam          m_soccer_red_ai_num
             PARAM_DEFAULT(  IntUserConfigParam(0, "soccer-red-ai-num",
             &m_race_setup_group, "Number of red AI karts in soccer mode.") );
