@@ -218,9 +218,11 @@ void DrawCalls::prepareDrawCalls(scene::ICameraSceneNode *camnode)
     TextBillboardDrawer::reset();
     PROFILER_PUSH_CPU_MARKER("- culling", 0xFF, 0xFF, 0x0);
     SP::prepareDrawCalls();
+    PROFILER_PUSH_CPU_MARKER("-- Scene manager parsing", 0xFF, 0xFF, 0x0);
     parseSceneManager(
         irr_driver->getSceneManager()->getRootSceneNode()->getChildren(),
         camnode);
+    PROFILER_POP_CPU_MARKER();
     SP::handleDynamicDrawCall();
     SP::updateModelMatrix();
     PROFILER_POP_CPU_MARKER();
