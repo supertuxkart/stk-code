@@ -169,32 +169,39 @@ void DrawCalls::parseSceneManager(core::array<scene::ISceneNode*> &List,
             SP::SPMeshNode* node = static_cast<SP::SPMeshNode*>(List[i]);
             SP::addObject(node);
         }
-        else if (STKParticle *node = dynamic_cast<STKParticle*>(List[i]))
+        else if (List[i]->getType() == ESNT_PARTICLE_SYSTEM)
         {
+            STKParticle *node = dynamic_cast<STKParticle*>(List[i]);
             node->updateAbsolutePosition();
             if (!isCulledPrecise(cam, List[i], irr_driver->getBoundingBoxesViz()))
                 CPUParticleManager::getInstance()->addParticleNode(node);
             continue;
         }
-        else if (scene::IBillboardSceneNode *node =
-            dynamic_cast<scene::IBillboardSceneNode*>(List[i]))
+        else if (List[i]->getType() == ESNT_BILLBOARD)
         {
+            scene::IBillboardSceneNode *node = dynamic_cast<scene::IBillboardSceneNode*>(List[i]);
             node->updateAbsolutePosition();
             if (!isCulledPrecise(cam, List[i]))
                 CPUParticleManager::getInstance()->addBillboardNode(node);
             continue;
         }
-        else if (STKTextBillboard *tb =
-            dynamic_cast<STKTextBillboard*>(List[i]))
+        // Text billboards currently use the "unknown" node type,
+        // but there is no guarantee that only them are using it
+        else if (List[i]->getType() == ESNT_UNKNOWN)
         {
-            tb->updateAbsolutePosition();
-            if (!isCulledPrecise(cam, List[i], irr_driver->getBoundingBoxesViz()))
-                TextBillboardDrawer::addTextBillboard(tb);
-            continue;
+            if (STKTextBillboard *tb =
+            dynamic_cast<STKTextBillboard*>(List[i]))
+            {
+                tb->updateAbsolutePosition();
+                if (!isCulledPrecise(cam, List[i], irr_driver->getBoundingBoxesViz()))
+                    TextBillboardDrawer::addTextBillboard(tb);
+                continue;
+            }
         }
+
         parseSceneManager(List[i]->getChildren(), cam);
     }
-}
+}   // parseSceneManager
 
 // ----------------------------------------------------------------------------
 DrawCalls::DrawCalls()
