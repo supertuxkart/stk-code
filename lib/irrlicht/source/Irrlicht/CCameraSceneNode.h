@@ -48,10 +48,7 @@ namespace scene
 		virtual const core::matrix4& getViewMatrixAffector() const;
 
 		//! It is possible to send mouse and key events to the camera. Most cameras
-		//! may ignore this input, but camera scene nodes which are created for 
-		//! example with scene::ISceneManager::addMayaCameraSceneNode or
-		//! scene::ISceneManager::addMeshViewerCameraSceneNode, may want to get this input
-		//! for changing their position, look at target or whatever. 
+		//! may ignore this input. 
 		virtual bool OnEvent(const SEvent& event);
 
 		//! Sets the look at target of the camera

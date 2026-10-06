@@ -126,22 +126,6 @@ namespace scene
 			const core::vector3df& lookat = core::vector3df(0,0,100),
 			s32 id=-1, bool makeActive=true);
 
-		//! Adds a camera scene node which is able to be controlle with the mouse similar
-		//! like in the 3D Software Maya by Alias Wavefront.
-		//! The returned pointer must not be dropped.
-		virtual ICameraSceneNode* addCameraSceneNodeMaya(ISceneNode* parent=0,
-			f32 rotateSpeed=-1500.f, f32 zoomSpeed=200.f,
-			f32 translationSpeed=1500.f, s32 id=-1, f32 distance=70.f,
-			bool makeActive=true);
-
-		//! Adds a camera scene node which is able to be controled with the mouse and keys
-		//! like in most first person shooters (FPS):
-		virtual ICameraSceneNode* addCameraSceneNodeFPS(ISceneNode* parent = 0,
-			f32 rotateSpeed = 100.0f, f32 moveSpeed = .5f, s32 id=-1,
-			SKeyMap* keyMapArray=0, s32 keyMapSize=0,
-			bool noVerticalMovement=false, f32 jumpSpeed = 0.f,
-			bool invertMouseY=false, bool makeActive=true);
-
 		//! Adds a dynamic light scene node. The light will cast dynamic light on all
 		//! other scene nodes in the scene, which have the material flag video::MTF_LIGHTING
 		//! turned on. (This is the default setting in most scene nodes).

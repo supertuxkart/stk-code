@@ -72,22 +72,11 @@ namespace scene
 		//! Particle System Scene Node
 		ESNT_PARTICLE_SYSTEM = MAKE_IRR_ID('p','t','c','l'),
 
-		//! Quake3 Shader Scene Node
-		ESNT_Q3SHADER_SCENE_NODE  = MAKE_IRR_ID('q','3','s','h'),
-
 		//! Quake3 Model Scene Node ( has tag to link to )
 		ESNT_MD3_SCENE_NODE  = MAKE_IRR_ID('m','d','3','_'),
 
 		//! Volume Light Scene Node
 		ESNT_VOLUME_LIGHT  = MAKE_IRR_ID('v','o','l','l'),
-
-		//! Maya Camera Scene Node
-		/** Legacy, for loading version <= 1.4.x .irr files */
-		ESNT_CAMERA_MAYA    = MAKE_IRR_ID('c','a','m','M'),
-
-		//! First Person Shooter Camera
-		/** Legacy, for loading version <= 1.4.x .irr files */
-		ESNT_CAMERA_FPS     = MAKE_IRR_ID('c','a','m','F'),
 
 		//! Unknown scene node
 		ESNT_UNKNOWN        = MAKE_IRR_ID('u','n','k','n'),

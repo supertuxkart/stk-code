@@ -34,12 +34,6 @@ namespace scene
 		//! Collision respose scene node animator
 		ESNAT_COLLISION_RESPONSE,
 
-		//! FPS camera animator
-		ESNAT_CAMERA_FPS,
-
-		//! Maya camera animator
-		ESNAT_CAMERA_MAYA,
-
 		//! Amount of built-in scene node animators
 		ESNAT_COUNT,
 
