@@ -966,7 +966,7 @@ namespace scene
 		node are searched. If null is specified, the root scene node is
 		taken. */
 		virtual void getSceneNodesFromType(ESCENE_NODE_TYPE type,
-				core::array<scene::ISceneNode*>& outNodes,
+				std::vector<scene::ISceneNode*>& outNodes,
 				ISceneNode* start=0) = 0;
 
 		//! Get the current active camera.

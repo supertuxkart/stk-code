@@ -19,6 +19,7 @@
 #include "IAttributes.h"
 
 #include <memory>
+#include <vector>
 namespace GE
 {
 	class GERenderInfo;
@@ -322,7 +323,7 @@ namespace scene
 				{
 					child->Parent = 0;
 					child->drop();
-					Children.erase(i);
+					Children.erase(Children.begin() + i);
 					return true;
 				}
 			}
@@ -607,14 +608,14 @@ namespace scene
 
 		//! Returns a const reference to the list of all children.
 		/** \return The list of all children of this node. */
-		const core::array<ISceneNode*>& getChildren() const
+		const std::vector<ISceneNode*>& getChildren() const
 		{
 			return Children;
 		}
 
 		//! Returns a list of all children (non-const version).
 		/** \return The list of all children of this node. */
-		core::array<ISceneNode*>& getChildren()
+		std::vector<ISceneNode*>& getChildren()
 		{
 			return Children;
 		}
@@ -870,7 +871,7 @@ namespace scene
 		ISceneNode* Parent;
 
 		//! List of all children of this node
-		core::array<ISceneNode*> Children;
+		std::vector<ISceneNode*> Children;
 
 		//! List of all animator nodes
 		core::list<ISceneNodeAnimator*> Animators;

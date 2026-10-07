@@ -140,7 +140,7 @@ void DrawCalls::renderBoundingBoxes()
 }   // renderBoundingBoxes
 
 // ----------------------------------------------------------------------------
-void DrawCalls::parseSceneManager(core::array<scene::ISceneNode*> &List,
+void DrawCalls::parseSceneManager(std::vector<scene::ISceneNode*> &List,
                                   const scene::ICameraSceneNode *cam)
 {
     for (unsigned i = 0; i < List.size(); ++i)
@@ -153,7 +153,7 @@ void DrawCalls::parseSceneManager(core::array<scene::ISceneNode*> &List,
             LODNode *node = static_cast<LODNode *>(List[i]);
             node->updateVisibility();
 
-            core::array<scene::ISceneNode*> child;
+            std::vector<scene::ISceneNode*> child;
             if (node->getLevel() >= 0)
                 child.push_back(node->getAllNodes()[node->getLevel()]);
             for (unsigned int i = 0; i < node->getChildren().size(); i++)

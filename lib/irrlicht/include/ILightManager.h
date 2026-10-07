@@ -34,7 +34,7 @@ namespace scene
 		the light manager may modify. This reference will remain valid
 		until OnPostRender().
 		*/
-		virtual void OnPreRender(core::array<ISceneNode*> & lightList) = 0;
+		virtual void OnPreRender(std::vector<ISceneNode*> & lightList) = 0;
 
 		//! Called after the last scene node is rendered.
 		/** After this call returns, the lightList passed to OnPreRender() becomes invalid. */

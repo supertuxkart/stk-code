@@ -373,7 +373,7 @@ namespace scene
 		virtual ISceneNode* getSceneNodeFromType(scene::ESCENE_NODE_TYPE type, ISceneNode* start=0);
 
 		//! returns scene nodes by type.
-		virtual void getSceneNodesFromType(ESCENE_NODE_TYPE type, core::array<scene::ISceneNode*>& outNodes, ISceneNode* start=0);
+		virtual void getSceneNodesFromType(ESCENE_NODE_TYPE type, std::vector<scene::ISceneNode*>& outNodes, ISceneNode* start=0);
 
 		//! Posts an input event to the environment. Usually you do not have to
 		//! use this method, it is used by the internal engine.
@@ -578,17 +578,17 @@ namespace scene
 		ISceneCollisionManager* CollisionManager;
 
 		//! render pass lists
-		core::array<ISceneNode*> CameraList;
-		core::array<ISceneNode*> LightList;
-		core::array<ISceneNode*> ShadowNodeList;
-		core::array<ISceneNode*> SkyBoxList;
+		std::vector<ISceneNode*> CameraList;
+		std::vector<ISceneNode*> LightList;
+		std::vector<ISceneNode*> ShadowNodeList;
+		std::vector<ISceneNode*> SkyBoxList;
 		core::array<DefaultNodeEntry> SolidNodeList;
 		core::array<TransparentNodeEntry> TransparentNodeList;
 		core::array<TransparentNodeEntry> TransparentEffectNodeList;
 
 		core::array<IMeshLoader*> MeshLoaderList;
 		core::array<ISceneLoader*> SceneLoaderList;
-		core::array<ISceneNode*> DeletionList;
+		std::vector<ISceneNode*> DeletionList;
 		core::array<ISceneNodeFactory*> SceneNodeFactoryList;
 		core::array<ISceneNodeAnimatorFactory*> SceneNodeAnimatorFactoryList;
 

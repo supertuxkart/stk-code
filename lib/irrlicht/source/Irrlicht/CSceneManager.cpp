@@ -1140,7 +1140,7 @@ void CSceneManager::drawAll(u32 flags)
 		for (i=0; i<CameraList.size(); ++i)
 			CameraList[i]->render();
 
-		CameraList.set_used(0);
+		CameraList.clear();
 
 		if (LightManager)
 			LightManager->OnRenderPassPostRender(CurrentRendertime);
@@ -1212,7 +1212,7 @@ void CSceneManager::drawAll(u32 flags)
 				SkyBoxList[i]->render();
 		}
 
-		SkyBoxList.set_used(0);
+		SkyBoxList.clear();
 
 		if (LightManager)
 			LightManager->OnRenderPassPostRender(CurrentRendertime);
@@ -1276,7 +1276,7 @@ void CSceneManager::drawAll(u32 flags)
 			Driver->drawStencilShadow(true,ShadowColor, ShadowColor,
 				ShadowColor, ShadowColor);
 
-		ShadowNodeList.set_used(0);
+		ShadowNodeList.clear();
 
 		if (LightManager)
 			LightManager->OnRenderPassPostRender(CurrentRendertime);
@@ -1345,7 +1345,7 @@ void CSceneManager::drawAll(u32 flags)
 	if (LightManager)
 		LightManager->OnPostRender();
 
-	LightList.set_used(0);
+	LightList.clear();
 	clearDeletionList();
 
 	CurrentRendertime = ESNRP_NONE;
@@ -1679,7 +1679,7 @@ ISceneNode* CSceneManager::getSceneNodeFromType(scene::ESCENE_NODE_TYPE type, IS
 
 
 //! returns scene nodes by type.
-void CSceneManager::getSceneNodesFromType(ESCENE_NODE_TYPE type, core::array<scene::ISceneNode*>& outNodes, ISceneNode* start)
+void CSceneManager::getSceneNodesFromType(ESCENE_NODE_TYPE type, std::vector<scene::ISceneNode*>& outNodes, ISceneNode* start)
 {
 	if (start == 0)
 		start = getRootSceneNode();
