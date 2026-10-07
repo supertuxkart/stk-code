@@ -274,6 +274,8 @@ void NetworkingLobby::init()
     if (m_text_bubble && !m_chat_scrollbar)
     {
         initChatScrollbar();
+        // Force chat to scroll to bottom when the peer/player enter in the server
+        scrollChatToBottom(); 
     }
     
     // If we have chat content, restore scroll position (scroll to bottom if auto-scroll enabled)
