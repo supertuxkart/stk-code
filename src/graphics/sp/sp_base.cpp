@@ -732,6 +732,23 @@ void addEdgeForViz(const core::vector3df& p0, const core::vector3df& p1)
 }   // addEdgeForViz
 
 // ----------------------------------------------------------------------------
+void addBoundingBoxEdgesForViz(const core::aabbox3df &bb)
+{
+    addEdgeForViz(getCorner(bb, 0), getCorner(bb, 1));
+    addEdgeForViz(getCorner(bb, 1), getCorner(bb, 5));
+    addEdgeForViz(getCorner(bb, 5), getCorner(bb, 4));
+    addEdgeForViz(getCorner(bb, 4), getCorner(bb, 0));
+    addEdgeForViz(getCorner(bb, 2), getCorner(bb, 3));
+    addEdgeForViz(getCorner(bb, 3), getCorner(bb, 7));
+    addEdgeForViz(getCorner(bb, 7), getCorner(bb, 6));
+    addEdgeForViz(getCorner(bb, 6), getCorner(bb, 2));
+    addEdgeForViz(getCorner(bb, 0), getCorner(bb, 2));
+    addEdgeForViz(getCorner(bb, 1), getCorner(bb, 3));
+    addEdgeForViz(getCorner(bb, 5), getCorner(bb, 7));
+    addEdgeForViz(getCorner(bb, 4), getCorner(bb, 6));
+}   // addBoundingBoxEdgesForViz
+
+// ----------------------------------------------------------------------------
 void prepareDrawCalls()
 {
     if (!sp_culling)
@@ -837,20 +854,7 @@ void addObject(SPMeshNode* node)
         }
 
         if (irr_driver->getBoundingBoxesViz())
-        {
-            addEdgeForViz(getCorner(bb, 0), getCorner(bb, 1));
-            addEdgeForViz(getCorner(bb, 1), getCorner(bb, 5));
-            addEdgeForViz(getCorner(bb, 5), getCorner(bb, 4));
-            addEdgeForViz(getCorner(bb, 4), getCorner(bb, 0));
-            addEdgeForViz(getCorner(bb, 2), getCorner(bb, 3));
-            addEdgeForViz(getCorner(bb, 3), getCorner(bb, 7));
-            addEdgeForViz(getCorner(bb, 7), getCorner(bb, 6));
-            addEdgeForViz(getCorner(bb, 6), getCorner(bb, 2));
-            addEdgeForViz(getCorner(bb, 0), getCorner(bb, 2));
-            addEdgeForViz(getCorner(bb, 1), getCorner(bb, 3));
-            addEdgeForViz(getCorner(bb, 5), getCorner(bb, 7));
-            addEdgeForViz(getCorner(bb, 4), getCorner(bb, 6));
-        }
+            addBoundingBoxEdgesForViz(bb);
 
         mb->uploadGLMesh();
         // For first frame only need the vbo to be initialized
@@ -880,17 +884,13 @@ void addObject(SPMeshNode* node)
         for (int dc_type = 0; dc_type < (handle_shadow ? 5 : 1); dc_type++)
         {
             if (discard[dc_type])
-            {
                 continue;
-            }
+
             if (dc_type == 0)
-            {
                 sp_solid_poly_count += mb->getIndexCount() / 3;
-            }
             else
-            {
                 sp_shadow_poly_count += mb->getIndexCount() / 3;
-            }
+
             if (shader->isTransparent())
             {
                 // Transparent shader should always uses mesh samplers
@@ -1006,20 +1006,7 @@ void handleDynamicDrawCall()
         }
 
         if (irr_driver->getBoundingBoxesViz())
-        {
-            addEdgeForViz(getCorner(bb, 0), getCorner(bb, 1));
-            addEdgeForViz(getCorner(bb, 1), getCorner(bb, 5));
-            addEdgeForViz(getCorner(bb, 5), getCorner(bb, 4));
-            addEdgeForViz(getCorner(bb, 4), getCorner(bb, 0));
-            addEdgeForViz(getCorner(bb, 2), getCorner(bb, 3));
-            addEdgeForViz(getCorner(bb, 3), getCorner(bb, 7));
-            addEdgeForViz(getCorner(bb, 7), getCorner(bb, 6));
-            addEdgeForViz(getCorner(bb, 6), getCorner(bb, 2));
-            addEdgeForViz(getCorner(bb, 0), getCorner(bb, 2));
-            addEdgeForViz(getCorner(bb, 1), getCorner(bb, 3));
-            addEdgeForViz(getCorner(bb, 5), getCorner(bb, 7));
-            addEdgeForViz(getCorner(bb, 4), getCorner(bb, 6));
-        }
+            addBoundingBoxEdgesForViz(bb);
 
         for (int dc_type = 0; dc_type < (handle_shadow ? 5 : 1); dc_type++)
         {
