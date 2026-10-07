@@ -76,6 +76,20 @@ private:
     static float m_tv_min_delta2;       // required improvement (squared distance) to switch
     static float m_tv_cooldown_default; // default cooldown after a switch (seconds)
 
+    // Delayed switch mechanism
+    int   m_tv_pending_index = -1;     // camera index waiting to switch to (-1 = none)
+    float m_tv_pending_timer = 0.0f;   // time conditions have been met for pending switch
+    static float m_tv_switch_delay;    // delay before switching (seconds)
+
+    // TV camera dynamic FOV: ball occupies a fixed screen ratio
+    static const float m_tv_ball_screen_ratio;
+    static float m_tv_fov_smoothing_speed;
+
+    // Current smoothed FOV for TV mode
+    float m_tv_current_fov;
+    // Normal FOV to restore when leaving TV mode
+    float m_tv_normal_fov;
+
     // Give a few classes access to the constructor (mostly for inheritance)
     friend class Camera;
     friend class CameraDebug;
