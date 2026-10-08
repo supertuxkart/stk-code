@@ -53,6 +53,7 @@ class Skidding;
 class SkidMarks;
 class SlipStream;
 class Stars;
+class SpeedStreaks;
 class TerrainInfo;
 
 #ifndef SERVER_ONLY
@@ -137,6 +138,9 @@ protected:
 
     /** The skidmarks object for this kart. */
     std::unique_ptr<SkidMarks> m_skidmarks;
+
+    /** Parameters for SpeedStreaks effect. */
+    std::unique_ptr<SpeedStreaks> m_speedstreaks;
 #endif
 
     /** All particle effects. */
@@ -594,6 +598,8 @@ public:
     // ----------------------------------------------------------------------------------------
     virtual Stars* getStarsEffect() const OVERRIDE
                                                { return m_stars_effect.get(); }
+    // ----------------------------------------------------------------------------------------
+    SpeedStreaks* getSpeedStreaks() const { return m_speedstreaks.get(); }
     // ------------------------------------------------------------------------
     /** Return the confirmed finish ticks (sent by the server)
      *  indicating that this kart has really finished the race. */
