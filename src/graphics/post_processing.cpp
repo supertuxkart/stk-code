@@ -35,8 +35,10 @@
 #include "graphics/sp/sp_dynamic_draw_call.hpp"
 #include "graphics/sp/sp_shader.hpp"
 #include "graphics/sp/sp_uniform_assigner.hpp"
+#include "graphics/speed_streaks.hpp"
 #include "io/file_manager.hpp"
 #include "karts/abstract_kart.hpp"
+#include "karts/kart.hpp"
 #include "karts/kart_model.hpp"
 #include "modes/world.hpp"
 #include "physics/physics.hpp"
@@ -576,6 +578,23 @@ public:
     }   // render
 };   // MotionBlurShader
 
+class SpeedStreaksShader : public TextureShader<SpeedStreaksShader, 1, float, float, float>
+{
+public:
+    SpeedStreaksShader()
+    {
+        loadProgram(OBJECT, GL_VERTEX_SHADER, "screenquad.vert",
+                            GL_FRAGMENT_SHADER, "speed_streaks.frag");
+        assignUniforms("u_intensity", "u_radial_scroll_offset", "u_time");
+        assignSamplerNames(0, "noise_texture", ST_BILINEAR_FILTERED);
+    }   //SpeedStreaksShader
+    void render(GLuint noise_texture, float intensity, float radial_scroll_offset, float time)
+    {
+        setTextureUnits(noise_texture);
+        drawFullScreenEffect(intensity, radial_scroll_offset, time);
+    }   // render
+};  // SpeedStreaksShader
+
 // ============================================================================
 class GodFadeShader : public TextureShader<GodFadeShader, 1, video::SColorf>
 {
@@ -724,9 +743,25 @@ PostProcessing::PostProcessing()
     STKTexManager::getInstance()->addTexture(m_areamap);
     areamap->drop();
 
+    // Load the simplex noise texture
+    const std::string noiseTexturePath = file_manager->getAsset(
+        FileManager::AssetType::TEXTURE,
+        "stk_noise_simplex.png"
+    );
+
+    //TODO: implement single_channel path, currently loads rgba even though noise_texture is single channel only.
+    m_noise_texture = GE::createTexture(noiseTexturePath); 
+    if (!m_noise_texture || m_noise_texture->getTextureHandler() == 0)
+    {
+        Log::fatal("postprocessing", "Failed to load %s", noiseTexturePath.c_str());
+        return;
+    }
+    STKTexManager::getInstance()->addTexture(m_noise_texture);
+
     // For preloading shaders
     MotionBlurShader::getInstance();
     LightningShader::getInstance();
+    SpeedStreaksShader::getInstance();
 }   // PostProcessing
 
 // ----------------------------------------------------------------------------
@@ -1020,6 +1055,40 @@ void PostProcessing::renderMotionBlur(const FrameBuffer &in_fbo,
 }   // renderMotionBlur
 
 // ----------------------------------------------------------------------------
+void PostProcessing::renderSpeedStreaks()
+{
+    World* world = World::getWorld();
+    Camera* cam = Camera::getActiveCamera();
+    const Kart* kart = cam ? dynamic_cast<const Kart*>(cam->getKart()) : nullptr;
+    SpeedStreaks* speed_streaks = kart ? kart->getSpeedStreaks() : nullptr;
+
+    float radial_scroll_offset =  0.0f;
+    float intensity            =  0.0f;
+
+    if (speed_streaks)
+    {
+        radial_scroll_offset = speed_streaks->getRadialScrollOffset();
+        intensity            = speed_streaks->getBoostIntensity();
+
+        auto direction = SpeedStreaks::Direction::FORWARD;
+        if(cam->getMode() == Camera::CM_REVERSE)
+        {
+            direction = SpeedStreaks::Direction::REVERSE;
+        }
+        speed_streaks->setDirection(direction);
+    }
+
+
+    glEnable(GL_BLEND);
+    glBlendEquation(GL_FUNC_ADD);
+    glBlendFunc(GL_ONE, GL_ONE);
+
+    SpeedStreaksShader::getInstance()->render(m_noise_texture->getTextureHandler(), intensity, radial_scroll_offset, world->getTime());
+
+    glDisable(GL_BLEND);
+}
+
+// ----------------------------------------------------------------------------
 void PostProcessing::renderDoF(const FrameBuffer &framebuffer, GLuint color_texture, GLuint depth_stencil_texture)
 {
     DepthOfFieldShader::getInstance()->render(framebuffer, color_texture, depth_stencil_texture);
@@ -1303,6 +1372,18 @@ FrameBuffer *PostProcessing::render(scene::ICameraSceneNode * const camnode,
     // Rest of post processing in SDR
     in_fbo = &rtts->getFBO(FBO_RGBA_1);
     out_fbo = &rtts->getFBO(FBO_RGBA_2);
+
+    {
+        PROFILER_PUSH_CPU_MARKER("- Speed streaks", 0xFF, 0x00, 0x00);
+        ScopedGPUTimer Timer(irr_driver->getGPUTimer(Q_SPEEDSTREAKS));
+        if (isRace && World::getWorld() && UserConfigParams::m_speed_streaks)
+        {
+            in_fbo->bind();
+            renderSpeedStreaks();
+            // additive blend, specifically no ping/pong std::swap
+        }
+        PROFILER_POP_CPU_MARKER();
+    }
 
     {
         PROFILER_PUSH_CPU_MARKER("- Motion blur", 0xFF, 0x00, 0x00);

@@ -160,6 +160,7 @@ static const char* m_perf_query_phase[Q_LAST] =
     "Bloom",
     "Tonemap",
     "Motion Blur",
+    "Speed Streaks",
     "Lightning",
     "MLAA",
     "GUI",

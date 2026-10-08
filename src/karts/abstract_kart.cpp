@@ -276,3 +276,25 @@ void AbstractKart::makeKartRest()
     body->proceedToTransform(t);
     setTrans(t);
 }   // makeKartRest
+
+// ------------------------------------------------------------------------
+/** Returns the speed amount above the kart's own unboosted max speed.
+ */
+float AbstractKart::getCurrentAdditionalSpeed() const
+{
+    const float speed = getSpeed();
+    const float current_engine_max_speed = m_kart_properties->getEngineMaxSpeed();
+    return core::max_(speed - current_engine_max_speed, 0.0f);
+} // getCurrentAdditionalSpeed
+
+// ------------------------------------------------------------------------
+/** Returns the ratio of the speed amount above the kart's own unboosted max speed
+ *  relative to the generic engine max speed.
+ */
+float AbstractKart::getCurrentAdditionalSpeedRatio() const
+{
+    const float additional_speed_amount = getCurrentAdditionalSpeed();
+    const float absolute_engine_max_speed = m_kart_properties->getEngineGenericMaxSpeed();
+
+    return additional_speed_amount / absolute_engine_max_speed;
+} // getCurrentAdditionalSpeedRatio
