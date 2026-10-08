@@ -693,6 +693,9 @@ namespace UserConfigParams
     PARAM_PREFIX BoolUserConfigParam        m_dof
         PARAM_DEFAULT(BoolUserConfigParam(false, "enable_dof",
         &m_video_group, "Enable Depth of Field"));
+    PARAM_PREFIX BoolUserConfigParam        m_speed_streaks
+        PARAM_DEFAULT(BoolUserConfigParam(false, "enable_speed_streaks",
+        &m_video_group, "Enable Speed Streaks"));
     PARAM_PREFIX BoolUserConfigParam        m_old_driver_popup
         PARAM_DEFAULT(BoolUserConfigParam(true, "old_driver_popup",
         &m_video_group, "Determines if popup message about too old drivers should be displayed."));
