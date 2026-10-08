@@ -114,7 +114,7 @@ std::string SPTexture::getCacheDirectory()
             (int)UserConfigParams::m_max_texture_size);
     }
 
-#ifdef USE_GLES2
+#ifdef USE_GLES
     if (m_undo_srgb && !CVS->isEXTTextureCompressionS3TCSRGBUsable())
     {
         cache_subdir += "-linear";
@@ -206,7 +206,7 @@ std::shared_ptr<video::IImage> SPTexture::getTextureImage() const
     {
         const bool use_tex_compress = CVS->isTextureCompressionEnabled() &&
             !m_container_id.empty();
-#ifndef USE_GLES2
+#ifndef USE_GLES
         if (use_tex_compress)
         {
 #endif
@@ -214,7 +214,7 @@ std::shared_ptr<video::IImage> SPTexture::getTextureImage() const
             uint8_t tmp_val = data[i * 4];
             data[i * 4] = data[i * 4 + 2];
             data[i * 4 + 2] = tmp_val;
-#ifndef USE_GLES2
+#ifndef USE_GLES
         }
 #endif
 
@@ -271,7 +271,7 @@ bool SPTexture::texImage2d(std::shared_ptr<video::IImage> texture,
 #ifndef SERVER_ONLY
     if (texture)
     {
-#ifdef USE_GLES2
+#ifdef USE_GLES
         unsigned upload_format = GL_RGBA;
 #else
         unsigned upload_format = GL_BGRA;

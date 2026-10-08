@@ -252,7 +252,7 @@ void SPMeshBuffer::recreateVAO(unsigned i)
         glGenBuffers(1, &m_ins_array[i]);
     }
     glBindBuffer(GL_ARRAY_BUFFER, m_ins_array[i]);
-#ifndef USE_GLES2
+#ifndef USE_GLES
     if (CVS->isARBBufferStorageUsable())
     {
         glBufferStorage(GL_ARRAY_BUFFER, m_gl_instance_size[i] * 44, NULL,

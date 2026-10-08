@@ -1,3 +1,5 @@
+#version 310 es
+
 precision mediump float;
 
 /* Definitions */
@@ -23,17 +25,16 @@ uniform float uHueChange;
 uniform vec4 uVertexColor;
 
 uniform bool uTextureUsage0;
-//uniform bool uTextureUsage1;
 
 uniform sampler2D uTextureUnit0;
-//uniform sampler2D uTextureUnit1;
 
-/* Varyings */
+layout(location = 0) out vec4 FragColor;
 
-varying vec2 varTexCoord0;
-//varying vec2 varTexCoord1;
-varying vec4 varVertexColor;
-varying float varEyeDist;
+/* Ins */
+
+in vec2 varTexCoord0;
+in vec4 varVertexColor;
+in float varEyeDist;
 
 vec3 rgbToHsv(vec3 c)
 {
@@ -58,7 +59,7 @@ vec4 renderSolid()
 	vec4 Color = vec4(1.0, 1.0, 1.0, 1.0);
 	if(uTextureUsage0)
 	{
-		Color *= texture2D(uTextureUnit0, varTexCoord0);
+		Color *= texture(uTextureUnit0, varTexCoord0);
 		if (uHueChange > 0.0)
 		{
 			float f_hue_change = 0.66;
@@ -86,22 +87,18 @@ vec4 render2LayerSolid()
 {
 	float BlendFactor = varVertexColor.a;
 	
-	vec4 Texel0 = texture2D(uTextureUnit0, varTexCoord0);
-	//vec4 Texel1 = texture2D(uTextureUnit1, varTexCoord1);
+	vec4 Texel0 = texture(uTextureUnit0, varTexCoord0);
 	
 	vec4 Color = Texel0 * BlendFactor;
-	//vec4 Color += Texel1 * (1.0 - BlendFactor);
 	
 	return Color;
 }
 
 vec4 renderLightMap()
 {
-	vec4 Texel0 = texture2D(uTextureUnit0, varTexCoord0);
-	//vec4 Texel1 = texture2D(uTextureUnit1, varTexCoord1);
+	vec4 Texel0 = texture(uTextureUnit0, varTexCoord0);
 	
 	vec4 Color = Texel0 * 4.0;
-	//Color *= Texel1;
 	Color.a = Texel0.a * Texel0.a;
 	
 	return Color;
@@ -109,11 +106,9 @@ vec4 renderLightMap()
 
 vec4 renderDetailMap()
 {
-	vec4 Texel0 = texture2D(uTextureUnit0, varTexCoord0);
-	//vec4 Texel1 = texture2D(uTextureUnit1, varTexCoord1);
+	vec4 Texel0 = texture(uTextureUnit0, varTexCoord0);
 	
 	vec4 Color = Texel0;
-	//Color += Texel1 - 0.5;
 	
 	return Color;
 }
@@ -122,11 +117,9 @@ vec4 renderReflection2Layer()
 {
 	vec4 Color = varVertexColor;
 	
-	vec4 Texel0 = texture2D(uTextureUnit0, varTexCoord0);
-	//vec4 Texel1 = texture2D(uTextureUnit1, varTexCoord1);
+	vec4 Texel0 = texture(uTextureUnit0, varTexCoord0);
 	
 	Color *= Texel0;
-	//Color *= Texel1;
 	
 	return Color;
 }
@@ -137,7 +130,7 @@ vec4 renderTransparent()
 
 	if(uTextureUsage0)
 	{
-		Color *= texture2D(uTextureUnit0, varTexCoord0);
+		Color *= texture(uTextureUnit0, varTexCoord0);
 		if (uHueChange > 0.0)
 		{
 			vec3 old_hsv = rgbToHsv(Color.rgb);
@@ -155,7 +148,7 @@ vec4 renderTransparentVertexColor()
 	vec4 Color = vec4(1.0, 1.0, 1.0, 1.0);
 	if(uTextureUsage0)
 	{
-		Color *= texture2D(uTextureUnit0, varTexCoord0);
+		Color *= texture(uTextureUnit0, varTexCoord0);
 		if (uHueChange > 0.0)
 		{
 			vec3 old_hsv = rgbToHsv(Color.rgb);
@@ -172,52 +165,51 @@ vec4 renderTransparentVertexColor()
 
 void main ()
 {
+    vec4 Color = vec4(1.0);
+
     if (uMaterialType == Solid)
-		gl_FragColor = renderSolid();
-	else if(uMaterialType == Solid2Layer)
-		gl_FragColor = render2LayerSolid();
-	else if(uMaterialType == LightMap)
-		gl_FragColor = renderSolid();
-	else if(uMaterialType == DetailMap)
-		gl_FragColor = renderDetailMap();
-	else if(uMaterialType == SphereMap)
-		gl_FragColor = renderSolid();
-	else if(uMaterialType == Reflection2Layer)
-		gl_FragColor = renderReflection2Layer();
-	else if(uMaterialType == TransparentAlphaChannel)
-		gl_FragColor = renderTransparent();
-	else if(uMaterialType == TransparentAlphaChannelRef)
-	{
-		vec4 Color = renderTransparentVertexColor();
-		if (Color.a < 0.5)
-			discard;
-		gl_FragColor = Color;
-	}
-	else if(uMaterialType == StkGrass)
-	{
-		vec4 Color = renderTransparent();
-		if (Color.a < 0.5)
-			discard;
-		gl_FragColor = Color;
-	}
-	else if(uMaterialType == StkBlend)
-	{
-		gl_FragColor = renderTransparentVertexColor();
-	}
-	else if(uMaterialType == TransparentVertexAlpha)
-	{
-		vec4 Color = renderTransparent();
-		Color.a = varVertexColor.a;
-		
-		gl_FragColor = Color * uVertexColor;
-	}
-	else if(uMaterialType == TransparentReflection2Layer)
-	{
-		vec4 Color = renderReflection2Layer();
-		Color.a = varVertexColor.a;
-		
-		gl_FragColor = Color;
-	}
-	else
-		gl_FragColor = vec4(1.0, 1.0, 1.0, 1.0);
+        Color = renderSolid();
+    else if(uMaterialType == Solid2Layer)
+        Color = render2LayerSolid();
+    else if(uMaterialType == LightMap)
+        Color = renderLightMap();
+    else if(uMaterialType == DetailMap)
+        Color = renderDetailMap();
+    else if(uMaterialType == SphereMap)
+        Color = renderSolid();
+    else if(uMaterialType == Reflection2Layer)
+        Color = renderReflection2Layer();
+    else if(uMaterialType == TransparentAlphaChannel)
+        Color = renderTransparent();
+    else if(uMaterialType == TransparentAlphaChannelRef)
+    {
+        Color = renderTransparentVertexColor();
+        if (Color.a < 0.5)
+            discard;
+    }
+    else if(uMaterialType == StkGrass)
+    {
+        Color = renderTransparent();
+        if (Color.a < 0.5)
+            discard;
+    }
+    else if(uMaterialType == StkBlend)
+    {
+        Color = renderTransparentVertexColor();
+    }
+    else if(uMaterialType == TransparentVertexAlpha)
+    {
+        Color = renderTransparent();
+        Color.a = varVertexColor.a;
+        Color *= uVertexColor;
+    }
+    else if(uMaterialType == TransparentReflection2Layer)
+    {
+        Color = renderReflection2Layer();
+        Color.a = varVertexColor.a;
+    }
+    else
+        Color = vec4(1.0, 1.0, 1.0, 1.0);
+
+    FragColor = Color;
 }

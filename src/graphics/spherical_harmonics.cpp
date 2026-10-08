@@ -18,7 +18,7 @@
 #ifndef SERVER_ONLY
 
 #include "graphics/spherical_harmonics.hpp"
-#if defined(USE_GLES2)
+#if defined(USE_GLES)
 #include "graphics/central_settings.hpp"
 #endif
 #include "graphics/irr_driver.hpp"

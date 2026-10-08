@@ -272,7 +272,7 @@ void resizeSkinning(unsigned number)
     }
     else
     {
-#ifndef USE_GLES2
+#ifndef USE_GLES
         glBindBuffer(GL_TEXTURE_BUFFER, g_skinning_buf);
         if (CVS->isARBBufferStorageUsable())
         {
@@ -324,7 +324,7 @@ void initSkinning()
     }
     else
     {
-#ifndef USE_GLES2
+#ifndef USE_GLES
         int skinning_tbo_limit;
         glGetIntegerv(GL_MAX_TEXTURE_BUFFER_SIZE, &skinning_tbo_limit);
         if (stk_config->m_max_skinning_bones << 6 > (unsigned)skinning_tbo_limit)
@@ -343,7 +343,7 @@ void initSkinning()
     // All buffer / skinning texture start with 2 bones for power of 2 increase
     const irr::core::matrix4 m;
     glGenTextures(1, &g_skinning_tex);
-#ifndef USE_GLES2
+#ifndef USE_GLES
     if (skinningUseTBO())
     {
         glGenBuffers(1, &g_skinning_buf);
@@ -399,7 +399,7 @@ void loadShaders()
         // ====================================================================
         // Normal visualizer
         // ====================================================================
-#ifndef USE_GLES2
+#ifndef USE_GLES
         if (CVS->isARBGeometryShadersUsable())
         {
             sps = std::make_shared<SPShader>
@@ -635,7 +635,7 @@ void destroy()
     g_normal_visualizer = NULL;
     SPTextureManager::destroy();
 
-#ifndef USE_GLES2
+#ifndef USE_GLES
     if (skinningUseTBO() &&
         CVS->isARBBufferStorageUsable())
     {
@@ -1163,7 +1163,7 @@ void uploadSkinningMatrices()
     }
 
     unsigned buffer_offset = 0;
-#ifndef USE_GLES2
+#ifndef USE_GLES
     if (skinningUseTBO() &&
         !CVS->isARBBufferStorageUsable())
     {
@@ -1194,7 +1194,7 @@ void uploadSkinningMatrices()
         }
     }
     
-#ifndef USE_GLES2
+#ifndef USE_GLES
     if (skinningUseTBO() &&
         !CVS->isARBBufferStorageUsable())
     {

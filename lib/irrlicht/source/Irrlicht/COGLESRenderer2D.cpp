@@ -7,12 +7,12 @@
 
 #include "IrrCompileConfig.h"
 
-#ifdef _IRR_COMPILE_WITH_OGLES2_
+#ifdef _IRR_COMPILE_WITH_OGLES_
 
-#include "COGLES2Renderer2D.h"
+#include "COGLESRenderer2D.h"
 #include "IGPUProgrammingServices.h"
 #include "os.h"
-#include "COGLES2Driver.h"
+#include "COGLESDriver.h"
 
 namespace irr
 {
@@ -20,12 +20,12 @@ namespace video
 {
 
 //! Constructor
-COGLES2Renderer2D::COGLES2Renderer2D(const c8* vertexShaderProgram, const c8* pixelShaderProgram, COGLES2Driver* driver)
-	:	COGLES2MaterialRenderer(driver, 0, EMT_SOLID), RenderTargetSize(core::dimension2d<u32>(0,0)),
+COGLESRenderer2D::COGLESRenderer2D(const c8* vertexShaderProgram, const c8* pixelShaderProgram, COGLESDriver* driver)
+	:	COGLESMaterialRenderer(driver, 0, EMT_SOLID), RenderTargetSize(core::dimension2d<u32>(0,0)),
 		Matrix(core::matrix4::EM4CONST_NOTHING), Texture(0)
 {
 	#ifdef _DEBUG
-	setDebugName("COGLES2Renderer2D");
+	setDebugName("COGLESRenderer2D");
 	#endif
 
 	int Temp = 0;
@@ -48,12 +48,12 @@ COGLES2Renderer2D::COGLES2Renderer2D(const c8* vertexShaderProgram, const c8* pi
 
 
 //! Destructor
-COGLES2Renderer2D::~COGLES2Renderer2D()
+COGLESRenderer2D::~COGLESRenderer2D()
 {
 }
 
 
-void COGLES2Renderer2D::OnSetMaterial(const video::SMaterial& material,
+void COGLESRenderer2D::OnSetMaterial(const video::SMaterial& material,
 				const video::SMaterial& lastMaterial,
 				bool resetAllRenderstates,
 				video::IMaterialRendererServices* services)
@@ -64,7 +64,7 @@ void COGLES2Renderer2D::OnSetMaterial(const video::SMaterial& material,
 }
 
 
-bool COGLES2Renderer2D::OnRender(IMaterialRendererServices* service, E_VERTEX_TYPE vtxtype)
+bool COGLESRenderer2D::OnRender(IMaterialRendererServices* service, E_VERTEX_TYPE vtxtype)
 {
 	Driver->setTextureRenderStates(Driver->getCurrentMaterial(), false);
 
@@ -87,7 +87,7 @@ bool COGLES2Renderer2D::OnRender(IMaterialRendererServices* service, E_VERTEX_TY
 }
 
 
-void COGLES2Renderer2D::setTexture(const ITexture* texture)
+void COGLESRenderer2D::setTexture(const ITexture* texture)
 {
 	Texture = texture;
 }

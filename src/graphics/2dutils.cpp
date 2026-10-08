@@ -441,7 +441,7 @@ void draw2DImageRotationColor(video::ITexture* texture,
     {
         video::SMaterial m;
         m.setTexture(0, texture);
-        if (irr_driver->getVideoDriver()->getDriverType() == video::EDT_OGLES2)
+        if (irr_driver->getVideoDriver()->getDriverType() == video::EDT_OGLES)
         {
             m.MaterialType = video::EMT_TRANSPARENT_ALPHA_CHANNEL;
         }

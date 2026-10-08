@@ -163,7 +163,7 @@ void Skybox::generateCubeMapFromTextures()
         video::IImage* img = m_skybox_textures[idx];
 
         bool is_gles = false;
-#ifdef USE_GLES2
+#ifdef USE_GLES
         is_gles = true;
 #endif
         if (CVS->isTextureCompressionEnabled() || is_gles)
@@ -292,7 +292,7 @@ void Skybox::generateSpecularCubemap()
     unsigned int cubemap_size = 256;
     for (int i = 0; i < 6; i++)
     {
-#if !defined(USE_GLES2)
+#if !defined(USE_GLES)
         glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_RGBA16F,
                      cubemap_size, cubemap_size, 0, GL_BGRA, GL_FLOAT, 0);
 #else
@@ -396,7 +396,7 @@ Skybox::Skybox(const std::vector<video::IImage *> &skybox_textures)
     m_cube_map = 0;
     m_skybox_textures = skybox_textures;
 
-#if !defined(USE_GLES2)
+#if !defined(USE_GLES)
     glEnable(GL_TEXTURE_CUBE_MAP_SEAMLESS);
 #endif
 

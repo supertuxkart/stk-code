@@ -7,12 +7,12 @@
 
 #include "IrrCompileConfig.h"
 
-#ifdef _IRR_COMPILE_WITH_OGLES2_
+#ifdef _IRR_COMPILE_WITH_OGLES_
 
-#include "COGLES2ParallaxMapRenderer.h"
+#include "COGLESNormalMapRenderer.h"
 #include "IGPUProgrammingServices.h"
 #include "os.h"
-#include "COGLES2Driver.h"
+#include "COGLESDriver.h"
 
 namespace irr
 {
@@ -20,18 +20,18 @@ namespace video
 {
 
 //! Constructor
-COGLES2ParallaxMapRenderer::COGLES2ParallaxMapRenderer(const c8* vertexShaderProgram,
+COGLESNormalMapRenderer::COGLESNormalMapRenderer(const c8* vertexShaderProgram,
 							const c8* pixelShaderProgram, E_MATERIAL_TYPE baseMaterial,
-							COGLES2Driver* driver)
-	: COGLES2MaterialRenderer(driver, 0, baseMaterial)
+							COGLESDriver* driver)
+	: COGLESMaterialRenderer(driver, 0, baseMaterial)
 {
 	#ifdef _DEBUG
-	setDebugName("COGLES2ParallaxMapRenderer");
+	setDebugName("COGLESNormalMapRenderer");
 	#endif
 
 	int Temp = 0;
 
-	SharedRenderer = reinterpret_cast<COGLES2MaterialRenderer*>(driver->getMaterialRenderer(EMT_PARALLAX_MAP_SOLID));
+	SharedRenderer = reinterpret_cast<COGLESMaterialRenderer*>(driver->getMaterialRenderer(EMT_NORMAL_MAP_SOLID));
 
 	if (SharedRenderer)
 		SharedRenderer->grab();
@@ -41,14 +41,14 @@ COGLES2ParallaxMapRenderer::COGLES2ParallaxMapRenderer(const c8* vertexShaderPro
 
 
 //! Destructor
-COGLES2ParallaxMapRenderer::~COGLES2ParallaxMapRenderer()
+COGLESNormalMapRenderer::~COGLESNormalMapRenderer()
 {
 	if(SharedRenderer)
 		SharedRenderer->drop();
 }
 
 
-void COGLES2ParallaxMapRenderer::OnSetMaterial(const video::SMaterial& material,
+void COGLESNormalMapRenderer::OnSetMaterial(const video::SMaterial& material,
 				const video::SMaterial& lastMaterial,
 				bool resetAllRenderstates,
 				video::IMaterialRendererServices* services)
@@ -56,11 +56,11 @@ void COGLES2ParallaxMapRenderer::OnSetMaterial(const video::SMaterial& material,
 	if (SharedRenderer)
 		SharedRenderer->OnSetMaterial(material, lastMaterial, resetAllRenderstates, services);
 	else
-		COGLES2MaterialRenderer::OnSetMaterial(material, lastMaterial, resetAllRenderstates, services);
+		COGLESMaterialRenderer::OnSetMaterial(material, lastMaterial, resetAllRenderstates, services);
 }
 
 
-bool COGLES2ParallaxMapRenderer::OnRender(IMaterialRendererServices* service, E_VERTEX_TYPE vtxtype)
+bool COGLESNormalMapRenderer::OnRender(IMaterialRendererServices* service, E_VERTEX_TYPE vtxtype)
 {
 	if (SharedRenderer)
 		return SharedRenderer->OnRender(service, vtxtype);

@@ -58,7 +58,7 @@ GEGLTexture::GEGLTexture(const std::string& name, unsigned int size,
     m_size = m_orig_size;
 
     bool texture_swizzle = false;
-    if (m_driver_type == video::EDT_OGLES2)
+    if (m_driver_type == video::EDT_OGLES)
     {
         int gl_major_version = 0;
         glGetIntegerv(GL_MAJOR_VERSION, &gl_major_version);
@@ -120,7 +120,7 @@ void GEGLTexture::upload(uint8_t* data)
     unsigned int format = m_single_channel ? GL_RED : GL_BGRA;
     unsigned int internal_format = m_single_channel ? GL_R8 : GL_RGBA8;
 
-    if (m_driver_type == video::EDT_OGLES2)
+    if (m_driver_type == video::EDT_OGLES)
     {
         formatConversion(data, &format, w, h);
         int gl_major_version = 0;
@@ -153,7 +153,7 @@ void* GEGLTexture::lock(video::E_TEXTURE_LOCK_MODE mode, u32 mipmap_level)
     if (mode != video::ETLM_READ_ONLY)
         return NULL;
 
-    if (m_driver_type == video::EDT_OGLES2 || !glGetTexImage)
+    if (m_driver_type == video::EDT_OGLES || !glGetTexImage)
     {
         const core::dimension2du & max_size = getDriver()->getDriverAttributes()
             .getAttributeAsDimension2d("MAX_TEXTURE_SIZE");

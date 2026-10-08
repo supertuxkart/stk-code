@@ -97,7 +97,7 @@ irr::video::ITexture* createTexture(const std::string& path,
     switch (GE::getDriver()->getDriverType())
     {
     case video::EDT_OPENGL:
-    case video::EDT_OGLES2:
+    case video::EDT_OGLES:
         return new GEGLTexture(path, image_mani);
 #ifdef _IRR_COMPILE_WITH_DIRECT3D_9_
     case video::EDT_DIRECT3D9:
@@ -117,7 +117,7 @@ irr::video::ITexture* createTexture(video::IImage* img,
     switch (GE::getDriver()->getDriverType())
     {
     case video::EDT_OPENGL:
-    case video::EDT_OGLES2:
+    case video::EDT_OGLES:
         return new GEGLTexture(img, name);
 #ifdef _IRR_COMPILE_WITH_DIRECT3D_9_
     case video::EDT_DIRECT3D9:
@@ -137,7 +137,7 @@ irr::video::ITexture* createFontTexture(const std::string& name,
     switch (GE::getDriver()->getDriverType())
     {
     case video::EDT_OPENGL:
-    case video::EDT_OGLES2:
+    case video::EDT_OGLES:
         return new GEGLTexture(name, size, single_channel);
 #ifdef _IRR_COMPILE_WITH_DIRECT3D_9_
     case video::EDT_DIRECT3D9:

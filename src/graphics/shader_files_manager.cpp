@@ -139,14 +139,14 @@ ShaderFilesManager::SharedShader ShaderFilesManager::loadShader
     });
 
     std::ostringstream code;
-#if !defined(USE_GLES2)
+#if !defined(USE_GLES)
     code << "#version " << CVS->getGLSLVersion()<<"\n";
 #else
     if (CVS->isGLSL())
         code << "#version 300 es\n";
 #endif
 
-#if !defined(USE_GLES2)
+#if !defined(USE_GLES)
     // Some drivers report that the compute shaders extension is available,
     // but they report only OpenGL 3.x version, and thus these extensions
     // must be enabled manually. Otherwise the shaders compilation will fail
@@ -165,7 +165,7 @@ ShaderFilesManager::SharedShader ShaderFilesManager::loadShader
 
     if (CVS->isARBExplicitAttribLocationUsable())
     {
-#if !defined(USE_GLES2)
+#if !defined(USE_GLES)
         code << "#extension GL_ARB_explicit_attrib_location : enable\n";
 #endif
         code << "#define Explicit_Attrib_Location_Usable\n";
@@ -187,7 +187,7 @@ ShaderFilesManager::SharedShader ShaderFilesManager::loadShader
     if (CVS->isDeferredEnabled())
         code << "#define Advanced_Lighting_Enabled\n";
 
-#if !defined(USE_GLES2)
+#if !defined(USE_GLES)
     // shader compilation fails with some drivers if there is no precision
     // qualifier
     if (type == GL_FRAGMENT_SHADER)

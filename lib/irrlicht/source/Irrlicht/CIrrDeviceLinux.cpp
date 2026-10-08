@@ -1319,9 +1319,9 @@ void CIrrDeviceLinux::createDriver()
 		#endif
 		break;
 
-	case video::EDT_OGLES2:
+	case video::EDT_OGLES:
 	{
-		#ifdef _IRR_COMPILE_WITH_OGLES2_
+		#ifdef _IRR_COMPILE_WITH_OGLES_
 		video::SExposedVideoData data;
 		data.OpenGLLinux.X11Window = window;
 		data.OpenGLLinux.X11Display = display;

@@ -880,7 +880,7 @@ void ShaderBasedRenderer::renderToTexture(GL3RenderTarget *render_target,
     if (m_dump_rtt)
     {
         m_dump_rtt = false;
-#ifndef USE_GLES2
+#ifndef USE_GLES
         const unsigned width = m_rtts->getWidth();
         const unsigned height = m_rtts->getHeight();
         uint8_t* pixels = new uint8_t[width * height * 4]();

@@ -125,7 +125,7 @@
       _IRR_MATERIAL_MAX_TEXTURES_ < 8               || \
       ( !defined(_IRR_COMPILE_WITH_OPENGL_) &&         \
         !defined(SERVER_ONLY)               &&         \
-        !defined(_IRR_COMPILE_WITH_OGLES2_)       ) || \
+        !defined(_IRR_COMPILE_WITH_OGLES_)       ) || \
       !defined(_IRR_COMPILE_WITH_B3D_LOADER_)             )
 #error "Building against an incompatible Irrlicht. Distros, \
 please use the included version."
@@ -512,8 +512,8 @@ begin:
         video::E_DRIVER_TYPE driver_created = video::EDT_NULL;
         if (std::string(UserConfigParams::m_render_driver) == "opengl")
         {
-#if defined(USE_GLES2)
-            driver_created = video::EDT_OGLES2;
+#if defined(USE_GLES)
+            driver_created = video::EDT_OGLES;
 #else
             driver_created = video::EDT_OPENGL;
 #endif
@@ -792,7 +792,7 @@ begin:
         (int x, int y, int w, int h, unsigned int f, unsigned int t, void* d)
         { glReadPixels(x, y, w, h, f, t, d); });
 
-#ifndef USE_GLES2
+#ifndef USE_GLES
     ogrRegPBOFunctions([](int n, unsigned int* b) { glGenBuffers(n, b); },
         [](unsigned int t, unsigned int b) { glBindBuffer(t, b); },
         [](unsigned int t, ptrdiff_t s, const void* d, unsigned int u)
