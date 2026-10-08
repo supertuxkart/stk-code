@@ -47,7 +47,7 @@ private:
     std::vector<float>  m_boost_time;
 
     video::ITexture* m_areamap;
-
+    video::ITexture* m_noise_texture;
 public:
                  PostProcessing();
 
@@ -87,6 +87,9 @@ public:
     void renderMotionBlur(const FrameBuffer &in_fbo,
                           FrameBuffer &out_fbo,
                           GLuint depth_stencil_texture);
+
+    void renderSpeedStreaks();
+
     void renderGlow(const FrameBuffer& quarter_framebuffer) const;
     void renderLightning(core::vector3df intensity);
 

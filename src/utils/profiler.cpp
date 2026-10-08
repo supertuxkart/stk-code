@@ -724,7 +724,7 @@ void Profiler::writeToFile()
       << "Dynamic lighting, Particle effects, Animated characters, Geometry Detail, "
       << "Bloom, Glow, Light Shaft, Anti-Aliasing (MLAA), SSAO,"
       << "Anisotropic Filtering, Shadow Resolution, Light scattering, Degraded IBL,"
-      << "Motion Blur, Depth of Field, Texture compression, HD Textures, HQ Mipmap,";
+      << "Motion Blur, Depth of Field, Speed Streaks, Texture compression, HD Textures, HQ Mipmap,";
     f << std::endl;
     f << "Values, "
       << UserConfigParams::m_real_width << ", "
@@ -745,6 +745,7 @@ void Profiler::writeToFile()
       << UserConfigParams::m_degraded_IBL << ", "
       << UserConfigParams::m_motionblur << ", "
       << UserConfigParams::m_dof << ", "
+      << UserConfigParams::m_speed_streaks << ", "
       << UserConfigParams::m_texture_compression << ", "
       << UserConfigParams::m_high_definition_textures << ", "
       << UserConfigParams::m_hq_mipmap << ",";

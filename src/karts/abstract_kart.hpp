@@ -310,7 +310,16 @@ public:
      *  category.
      *  \param category Which category to report on. */
     virtual int getSpeedIncreaseTicksLeft(unsigned int category) const = 0;
-    
+    // ------------------------------------------------------------------------
+    /** Returns the speed amount above the kart's own unboosted max speed.
+    */
+    virtual float getCurrentAdditionalSpeed() const;
+    // ------------------------------------------------------------------------
+    /** Returns the ratio of the speed amount above the kart's own unboosted max speed
+     *  relative to the generic engine max speed.
+     */
+    virtual float getCurrentAdditionalSpeedRatio() const;
+
     // ------------------------------------------------------------------------
     /** Sets the kart AI boost state.
      *  Not pure abstract, since there is no need to implement this e.g. in Ghost.

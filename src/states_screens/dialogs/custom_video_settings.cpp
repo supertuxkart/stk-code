@@ -107,6 +107,7 @@ void CustomVideoSettingsDialog::beforeAddingWidgets()
     getWidget<CheckBoxWidget>("ssr")->setState(UserConfigParams::m_ssr);
     getWidget<CheckBoxWidget>("bloom")->setState(UserConfigParams::m_bloom);
     getWidget<CheckBoxWidget>("lightscattering")->setState(UserConfigParams::m_light_scatter);
+    getWidget<CheckBoxWidget>("speedstreaks")->setState(UserConfigParams::m_speed_streaks);
     if (CVS->isEXTTextureCompressionS3TCUsable())
     {
         getWidget<CheckBoxWidget>("texture_compression")->setState(UserConfigParams::m_texture_compression);
@@ -231,6 +232,9 @@ GUIEngine::EventPropagation CustomVideoSettingsDialog::processEvent(const std::s
             UserConfigParams::m_light_scatter =
                 advanced_pipeline && getWidget<CheckBoxWidget>("lightscattering")->getState();
 
+            UserConfigParams::m_speed_streaks =
+                advanced_pipeline && getWidget<CheckBoxWidget>("speedstreaks")->getState();
+
             bool force_reload_texture = getWidget<CheckBoxWidget>("texture_compression")->getState() !=
                 UserConfigParams::m_texture_compression;
             UserConfigParams::m_texture_compression =
@@ -342,6 +346,7 @@ void CustomVideoSettingsDialog::updateActivation(const std::string& renderer)
     getWidget<CheckBoxWidget>("ssao")->setActive(light);
     getWidget<CheckBoxWidget>("ssr")->setActive(light || (vk && real_light));
     getWidget<CheckBoxWidget>("lightshaft")->setActive(light);
+    getWidget<CheckBoxWidget>("speedstreaks")->setActive(light);
     getWidget<CheckBoxWidget>("ibl")->setActive(light || (vk && real_light));
     getWidget<CheckBoxWidget>("glow")->setActive(light);
     getWidget<CheckBoxWidget>("bloom")->setActive(light);

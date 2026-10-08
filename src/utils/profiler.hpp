@@ -57,6 +57,7 @@ enum QueryPerf
     Q_BLOOM,
     Q_TONEMAP,
     Q_MOTIONBLUR,
+    Q_SPEEDSTREAKS,
     Q_LIGHTNING,
     Q_MLAA,
     Q_GUI,
