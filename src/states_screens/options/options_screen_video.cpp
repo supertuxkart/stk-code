@@ -410,6 +410,10 @@ void OptionsScreenVideo::updateTooltip()
                                               _("Bloom: Disabled"));
     //I18N: in the graphical options
     tooltip = tooltip + L"\n" +
+        ((UserConfigParams::m_speed_streaks && !vk) ? _("Speed streaks: Enabled") :
+                                              _("Speed streaks: Disabled"));
+    //I18N: in the graphical options
+    tooltip = tooltip + L"\n" +
         ((UserConfigParams::m_ssao && !vk) ? _("Ambient occlusion: Enabled") :
                                              _("Ambient occlusion: Disabled"));
     tooltip = tooltip + L"\n" +
