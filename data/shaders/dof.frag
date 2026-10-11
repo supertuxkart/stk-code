@@ -9,6 +9,7 @@ uniform float focalDepth = 72.;
 float maxblur = 1.;
 uniform float range = 360.;
 uniform bool blurForeground = false;
+float baselineHeight = 1440; // Used to tune blur radius with resolution
 
 void main()
 {
@@ -41,7 +42,8 @@ void main()
         blur = min((focalDepth - depth) / focalDepth, maxblur);
     }
 
-    vec2 offset = 10. / u_screen;
+    float scalingFactor = u_screen.y / 1440;
+    vec2 offset = 12. * scalingFactor / u_screen;
 
     // Weight from here http://artmartinsh.blogspot.fr/2010/02/glsl-lens-blur-filter-with-bokeh.html
 
