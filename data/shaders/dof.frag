@@ -11,16 +11,47 @@ uniform float range = 360.;
 uniform bool blurForeground = false;
 float baselineHeight = 1440; // Used to tune blur radius with resolution
 
+float validTap(float zCenter, float zSample)
+{
+    // A tap trying to sample from a pixel with a greatly
+    // different depth produces undesirable artifacts.
+
+    // It is usually fine, however, if both source and target
+    // are sufficiently distant, but we still need a smooth transition
+    // One exception : both the source and target points
+    // are sufficently distant to be in the near max blur zone
+
+    // This is the relevant blending factor for most mid-distance pixels
+    float depthRatio = max(zCenter, zSample) / min(zCenter, zSample);
+    if (depthRatio < 1.15)
+        return 1.0; // Fast-exit - important for performance!
+
+    float similarDepthBlend = 1.0 - smoothstep(1.15, 1.35, depthRatio);
+
+    // This path is mostly for very distant background objects (hills, etc.)
+    // where we might actually want blending despite different depths
+    float hazeEdge = range + focalDepth;
+    float centerHazeFactor = smoothstep (0.75 * hazeEdge, 1.25 * hazeEdge, zCenter);
+    float sampleHazeFactor = smoothstep (0.75 * hazeEdge, 1.25 * hazeEdge, zSample);
+    float hazeBlend = centerHazeFactor * sampleHazeFactor;
+
+    return max(hazeBlend, similarDepthBlend);
+}
+
+float computeDepth(float curdepth, vec2 uv)
+{
+    vec4 tapPos = u_inverse_projection_matrix * (2.0 * vec4(uv, curdepth, 1.0) - 1.0);
+    tapPos /= tapPos.w;
+    return tapPos.z;
+}
+
 void main()
 {
     vec2 uv = gl_FragCoord.xy / u_screen;
-    float curdepth = texture(dtex, uv).x;
-    vec4 FragPos = u_inverse_projection_matrix * (2.0 * vec4(uv, curdepth, 1.0) - 1.0);
-    FragPos /= FragPos.w;
+    float depth = computeDepth(texture(dtex, uv).x, uv);
 
     vec4 col = texture(tex, uv);
     vec4 colOriginal = col;
-    float depth = FragPos.z;
 
     // If foreground blurring is disabled, close pixels
     // are not affected at all, so we can skip the computations
@@ -45,7 +76,10 @@ void main()
     float scalingFactor = u_screen.y / 1440;
     vec2 offset = 12. * scalingFactor / u_screen;
 
-    // Weight from here http://artmartinsh.blogspot.fr/2010/02/glsl-lens-blur-filter-with-bokeh.html
+    // Weights derived from http://artmartinsh.blogspot.fr/2010/02/glsl-lens-blur-filter-with-bokeh.html
+    // The original weights boil down to sampling on 16 main directions at different distances,
+    // 8 weights are used in the 3 near rings and all 16 on the farther rings.
+    // This sampling had its own unique visual characteristics, but it is also fairly wasteful.
 
     const vec2 main_angles[8] = vec2[8](
         vec2( 0.29, 0.29), vec2( 0.4 , 0.0), vec2( 0.29,-0.29), vec2( 0.0,-0.4),
@@ -57,17 +91,46 @@ void main()
         vec2(-0.15, 0.37), vec2( 0.37, 0.15), vec2(-0.37,-0.15), vec2( 0.15,-0.37)
     );
 
+    float successfulTapCount = 1.0;
+
     // The loop will be unrolled during shader compilation
     for (int i = 0; i < 8; i++)
     {
-        // 1) Sample Depth
-        col += texture(tex, uv + main_angles[i] * offset * blur);
-        col += texture(tex, uv + offset_angles[i] * offset * blur);
-        col += texture(tex, uv + offset_angles[i] * (offset * 0.9) * blur);
-        col += texture(tex, uv + main_angles[i] * (offset * 0.7) * blur);
-        col += texture(tex, uv + main_angles[i] * (offset * 0.4) * blur);
+        // 1 - Outer ring
+        vec2 tapCoordinates = uv + main_angles[i] * offset * blur;
+        float tapDepth = computeDepth(texture(dtex, tapCoordinates).x, tapCoordinates);
+        float tapWeight = validTap(depth, tapDepth);
+        col += tapWeight * texture(tex, tapCoordinates);
+        successfulTapCount += tapWeight;
+
+        tapCoordinates = uv + offset_angles[i] * offset * blur;
+        tapDepth = computeDepth(texture(dtex, tapCoordinates).x, tapCoordinates);
+        tapWeight = validTap(depth, tapDepth);
+        col += tapWeight * texture(tex, tapCoordinates);
+        successfulTapCount += tapWeight;
+
+        // 2 - 0.9 distance ring
+        tapCoordinates = uv + offset_angles[i] * (offset * 0.9) * blur;
+        tapDepth = computeDepth(texture(dtex, tapCoordinates).x, tapCoordinates);
+        tapWeight = validTap(depth, tapDepth);
+        col += tapWeight * texture(tex, tapCoordinates);
+        successfulTapCount += tapWeight;
+
+        // 3 - 0.7 distance ring
+        tapCoordinates = uv + main_angles[i] * (offset * 0.7) * blur;
+        tapDepth = computeDepth(texture(dtex, tapCoordinates).x, tapCoordinates);
+        tapWeight = validTap(depth, tapDepth);
+        col += tapWeight * texture(tex, tapCoordinates);
+        successfulTapCount += tapWeight;
+
+        // 4 - 0.4 distance ring
+        tapCoordinates = uv + main_angles[i] * (offset * 0.4) * blur;
+        tapDepth = computeDepth(texture(dtex, tapCoordinates).x, tapCoordinates);
+        tapWeight = validTap(depth, tapDepth);
+        col += tapWeight * texture(tex, tapCoordinates);
+        successfulTapCount += tapWeight;
     }
 
-    col = vec4(col.rgb / 41.0, col.a);
+    col = vec4(col.rgb / successfulTapCount, col.a);
     FragColor = vec4(col.rgb, colOriginal.a);
 }
