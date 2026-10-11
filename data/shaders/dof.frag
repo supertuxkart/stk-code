@@ -47,50 +47,27 @@ void main()
 
     // Weight from here http://artmartinsh.blogspot.fr/2010/02/glsl-lens-blur-filter-with-bokeh.html
 
-    col += texture(tex, uv + (vec2(0.0, 0.4) * offset) * blur);
-    col += texture(tex, uv + (vec2(0.15, 0.37) * offset) * blur);
-    col += texture(tex, uv + (vec2(0.29,0.29) * offset) * blur);
-    col += texture(tex, uv + (vec2(-0.37,0.15) * offset) * blur);
-    col += texture(tex, uv + (vec2(0.4, 0.0) * offset) * blur);
-    col += texture(tex, uv + (vec2(0.37, -0.15) * offset) * blur);
-    col += texture(tex, uv + (vec2(0.29, -0.29) * offset) * blur);
-    col += texture(tex, uv + (vec2(-0.15, -0.37) * offset) * blur);
-    col += texture(tex, uv + (vec2(0.0, -0.4) * offset) * blur);
-    col += texture(tex, uv + (vec2(-0.15, 0.37) * offset) * blur);
-    col += texture(tex, uv + (vec2(-0.29, 0.29) * offset) * blur);
-    col += texture(tex, uv + (vec2(0.37, 0.15) * offset) * blur);
-    col += texture(tex, uv + (vec2(-0.4, 0.0) * offset) * blur);
-    col += texture(tex, uv + (vec2(-0.37, -0.15) * offset) * blur);
-    col += texture(tex, uv + (vec2(-0.29, -0.29) * offset) * blur);
-    col += texture(tex, uv + (vec2(0.15, -0.37) * offset) * blur);
+    const vec2 main_angles[8] = vec2[8](
+        vec2( 0.29, 0.29), vec2( 0.4 , 0.0), vec2( 0.29,-0.29), vec2( 0.0,-0.4),
+        vec2(-0.29, 0.29), vec2(-0.4 , 0.0), vec2(-0.29,-0.29), vec2( 0.0, 0.4)
+    );
 
-    col += texture(tex, uv + (vec2(0.15, 0.37) * offset) * blur * 0.9);
-    col += texture(tex, uv + (vec2(-0.37, 0.15) * offset) * blur * 0.9);
-    col += texture(tex, uv + (vec2(0.37, -0.15) * offset) * blur * 0.9);
-    col += texture(tex, uv + (vec2(-0.15, -0.37) * offset) * blur * 0.9);
-    col += texture(tex, uv + (vec2(-0.15, 0.37) * offset) * blur * 0.9);
-    col += texture(tex, uv + (vec2(0.37, 0.15) * offset) * blur * 0.9);
-    col += texture(tex, uv + (vec2(-0.37, -0.15) * offset) * blur * 0.9);
-    col += texture(tex, uv + (vec2(0.15, -0.37) * offset) * blur * 0.9);
+    const vec2 offset_angles[8] = vec2[8](
+        vec2( 0.15, 0.37), vec2(-0.37, 0.15), vec2( 0.37,-0.15), vec2(-0.15,-0.37),
+        vec2(-0.15, 0.37), vec2( 0.37, 0.15), vec2(-0.37,-0.15), vec2( 0.15,-0.37)
+    );
 
-    col += texture(tex, uv + (vec2(0.29, 0.29) * offset) * blur * 0.7);
-    col += texture(tex, uv + (vec2(0.4, 0.0) * offset) * blur * 0.7);
-    col += texture(tex, uv + (vec2(0.29, -0.29) * offset) * blur * 0.7);
-    col += texture(tex, uv + (vec2(0.0, -0.4) * offset) * blur * 0.7);
-    col += texture(tex, uv + (vec2(-0.29, 0.29) * offset) * blur * 0.7);
-    col += texture(tex, uv + (vec2(-0.4, 0.0) * offset) * blur * 0.7);
-    col += texture(tex, uv + (vec2(-0.29, -0.29) * offset) * blur * 0.7);
-    col += texture(tex, uv + (vec2(0.0, 0.4) * offset) * blur  *0.7);
+    // The loop will be unrolled during shader compilation
+    for (int i = 0; i < 8; i++)
+    {
+        // 1) Sample Depth
+        col += texture(tex, uv + main_angles[i] * offset * blur);
+        col += texture(tex, uv + offset_angles[i] * offset * blur);
+        col += texture(tex, uv + offset_angles[i] * (offset * 0.9) * blur);
+        col += texture(tex, uv + main_angles[i] * (offset * 0.7) * blur);
+        col += texture(tex, uv + main_angles[i] * (offset * 0.4) * blur);
+    }
 
-    col += texture(tex, uv + (vec2(0.29, 0.29) * offset) * blur * 0.4);
-    col += texture(tex, uv + (vec2(0.4, 0.0) * offset) * blur * 0.4);
-    col += texture(tex, uv + (vec2(0.29, -0.29) * offset) * blur * 0.4);
-    col += texture(tex, uv + (vec2(0.0, -0.4) * offset) * blur * 0.4);
-    col += texture(tex, uv + (vec2(-0.29, 0.29) * offset) * blur * 0.4);
-    col += texture(tex, uv + (vec2(-0.4, 0.0) * offset) * blur * 0.4);
-    col += texture(tex, uv + (vec2(-0.29, -0.29) * offset) * blur * 0.4);
-    col += texture(tex, uv + (vec2(0.0, 0.4) * offset) * blur * 0.4);
-    
     col = vec4(col.rgb / 41.0, col.a);
     FragColor = vec4(col.rgb, colOriginal.a);
 }
