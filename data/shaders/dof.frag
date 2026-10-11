@@ -9,7 +9,6 @@ uniform float focalDepth = 72.;
 float maxblur = 1.;
 uniform float range = 360.;
 uniform bool blurForeground = false;
-float baselineHeight = 1440; // Used to tune blur radius with resolution
 
 float validTap(float zCenter, float zSample)
 {
@@ -22,7 +21,7 @@ float validTap(float zCenter, float zSample)
     // are sufficently distant to be in the near max blur zone
 
     // This is the relevant blending factor for most mid-distance pixels
-    float depthRatio = max(zCenter, zSample) / min(zCenter, zSample);
+    float depthRatio = max(zCenter, zSample) / max(0.0001, min(zCenter, zSample));
     if (depthRatio < 1.15)
         return 1.0; // Fast-exit - important for performance!
 
@@ -30,6 +29,7 @@ float validTap(float zCenter, float zSample)
 
     // This path is mostly for very distant background objects (hills, etc.)
     // where we might actually want blending despite different depths
+
     float hazeEdge = range + focalDepth;
     float centerHazeFactor = smoothstep (0.75 * hazeEdge, 1.25 * hazeEdge, zCenter);
     float sampleHazeFactor = smoothstep (0.75 * hazeEdge, 1.25 * hazeEdge, zSample);
@@ -73,13 +73,19 @@ void main()
         blur = min((focalDepth - depth) / focalDepth, maxblur);
     }
 
+    // The blur radius is scaled with vertical pixels so that it is
+    // invariant with regard to track geometry across resolutions
     float scalingFactor = u_screen.y / 1440;
+
+    // If you increase the strength significantly, you may want to remove the
+    // depth reuse in the loop below, otherwise there will be ghosting artifacts.
     vec2 offset = 12. * scalingFactor / u_screen;
 
     // Weights derived from http://artmartinsh.blogspot.fr/2010/02/glsl-lens-blur-filter-with-bokeh.html
     // The original weights boil down to sampling on 16 main directions at different distances,
-    // 8 weights are used in the 3 near rings and all 16 on the farther rings.
-    // This sampling had its own unique visual characteristics, but it is also fairly wasteful.
+    // 8 weights are used in the 3 closer rings and all 16 on the farthest ring.
+    // This sampling had its own unique visual characteristics, but it is also
+    // fairly wasteful. We consolidate the offset angle samples on the 0.9 ring. 
 
     const vec2 main_angles[8] = vec2[8](
         vec2( 0.29, 0.29), vec2( 0.4 , 0.0), vec2( 0.29,-0.29), vec2( 0.0,-0.4),
@@ -96,37 +102,31 @@ void main()
     // The loop will be unrolled during shader compilation
     for (int i = 0; i < 8; i++)
     {
-        // 1 - Outer ring
+        // Main angles - we reuse the depth and weight checks
+        // This reuse is possible because distances are normally
+        // small enough that thin objects present at 0.4/0.7
+        // but not at 1.0 are very rare.
+        // 1a - Outer ring
         vec2 tapCoordinates = uv + main_angles[i] * offset * blur;
         float tapDepth = computeDepth(texture(dtex, tapCoordinates).x, tapCoordinates);
         float tapWeight = validTap(depth, tapDepth);
         col += tapWeight * texture(tex, tapCoordinates);
-        successfulTapCount += tapWeight;
 
-        tapCoordinates = uv + offset_angles[i] * offset * blur;
-        tapDepth = computeDepth(texture(dtex, tapCoordinates).x, tapCoordinates);
-        tapWeight = validTap(depth, tapDepth);
+        // 1b - 0.7 distance ring
+        tapCoordinates = uv + main_angles[i] * (offset * 0.7) * blur;
         col += tapWeight * texture(tex, tapCoordinates);
-        successfulTapCount += tapWeight;
 
-        // 2 - 0.9 distance ring
+        // 1c - 0.4 distance ring
+        tapCoordinates = uv + main_angles[i] * (offset * 0.4) * blur;
+        col += tapWeight * texture(tex, tapCoordinates);
+
+        successfulTapCount += 3 * tapWeight;
+
+        // Offset angles - we have to compute the depth and weight again
+        // 2 - 0.9 distance ring - double weight for bokeh effect
         tapCoordinates = uv + offset_angles[i] * (offset * 0.9) * blur;
         tapDepth = computeDepth(texture(dtex, tapCoordinates).x, tapCoordinates);
-        tapWeight = validTap(depth, tapDepth);
-        col += tapWeight * texture(tex, tapCoordinates);
-        successfulTapCount += tapWeight;
-
-        // 3 - 0.7 distance ring
-        tapCoordinates = uv + main_angles[i] * (offset * 0.7) * blur;
-        tapDepth = computeDepth(texture(dtex, tapCoordinates).x, tapCoordinates);
-        tapWeight = validTap(depth, tapDepth);
-        col += tapWeight * texture(tex, tapCoordinates);
-        successfulTapCount += tapWeight;
-
-        // 4 - 0.4 distance ring
-        tapCoordinates = uv + main_angles[i] * (offset * 0.4) * blur;
-        tapDepth = computeDepth(texture(dtex, tapCoordinates).x, tapCoordinates);
-        tapWeight = validTap(depth, tapDepth);
+        tapWeight = 2.0 * validTap(depth, tapDepth);
         col += tapWeight * texture(tex, tapCoordinates);
         successfulTapCount += tapWeight;
     }
