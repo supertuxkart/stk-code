@@ -29,10 +29,29 @@
 #include "utils/string_utils.hpp"
 #include "utils/translation.hpp"
 
+#include <SDL_timer.h>
 #include <SDL_version.h>
 #include <algorithm>
 #include <stdexcept>
 #include <string>
+
+namespace
+{
+SDL_HapticEffect steeringEffect(Sint16 level)
+{
+    SDL_HapticEffect effect = {};
+    effect.type = SDL_HAPTIC_CONSTANT;
+    effect.constant.direction.type = SDL_HAPTIC_CARTESIAN;
+    // SDL directions tell where the force comes from, so a force from the
+    // left makes a positive level push the wheel to the right.
+    effect.constant.direction.dir[0] = -1;
+    // The effect is stopped explicitly once the game stops feeding it, see
+    // SDLController::updateForceFeedback().
+    effect.constant.length = SDL_HAPTIC_INFINITY;
+    effect.constant.level = level;
+    return effect;
+}   // steeringEffect
+}
 
 // ----------------------------------------------------------------------------
 SDLController::SDLController(int device_id)
@@ -49,8 +68,13 @@ SDLController::SDLController(int device_id)
     m_native_rumble = false;
     m_steering_effect = -1;
     m_steering_effect_running = false;
-    m_steering_force = 0.0f;
+    m_steering_spring = 0.0f;
+    m_steering_damper = 0.0f;
+    m_steering_offset = 0.0f;
     m_steering_force_time = 0;
+    m_prev_wheel = 0.0f;
+    m_prev_ffb_update = 0;
+    m_uploaded_level = 0;
     m_rumble_strength = 0.0f;
     m_rumble_end_time = 0;
     m_id = -1;
@@ -220,13 +244,7 @@ finish:
     if ((SDL_HapticQuery(m_haptic) & SDL_HAPTIC_CONSTANT) == 0)
         return;
 
-    SDL_HapticEffect effect = {};
-    effect.type = SDL_HAPTIC_CONSTANT;
-    effect.constant.direction.type = SDL_HAPTIC_CARTESIAN;
-    effect.constant.direction.dir[0] = 1;
-    // The effect is stopped explicitly once the game stops feeding it, see
-    // updateForceFeedback().
-    effect.constant.length = SDL_HAPTIC_INFINITY;
+    SDL_HapticEffect effect = steeringEffect(0);
     m_steering_effect = SDL_HapticNewEffect(m_haptic, &effect);
     if (m_steering_effect < 0)
     {
@@ -242,10 +260,7 @@ finish:
 SDLController::~SDLController()
 {
     Log::info("SDLController", "%s unplugged.", SDL_JoystickName(m_joystick));
-    if (m_game_controller)
-        SDL_GameControllerClose(m_game_controller);
-    else
-        SDL_JoystickClose(m_joystick);
+    // Closing the joystick can free the haptic device on some backends.
     if (m_haptic)
     {
         stopSteeringEffect();
@@ -253,6 +268,10 @@ SDLController::~SDLController()
             SDL_HapticDestroyEffect(m_haptic, m_steering_effect);
         SDL_HapticClose(m_haptic);
     }
+    if (m_game_controller)
+        SDL_GameControllerClose(m_game_controller);
+    else
+        SDL_JoystickClose(m_joystick);
     m_gamepad->getConfiguration()->unPlugged();
     m_gamepad->setIrrIndex(-1);
     m_gamepad->setConnected(false);
@@ -325,20 +344,49 @@ void SDLController::updateAutoCenter(int state)
 }
 
 // ----------------------------------------------------------------------------
-/** Sets the steering force, in [-1, 1] where positive pushes the wheel to the
- *  right. It has to be called continuously, the force fades out shortly after
- *  the game stops calling it (pause, race end, menus).
+/** Sets the steering force as F = offset - spring * wheel - damper * speed,
+ *  with the wheel position in [-1, 1] and its speed in full locks per second,
+ *  where positive pushes the wheel to the right. It has to be called
+ *  continuously, the force fades out shortly after the game stops calling it
+ *  (pause, race end, menus).
  */
-void SDLController::setSteeringForce(float force)
+void SDLController::setSteeringForce(float spring, float damper, float offset)
 {
-    m_steering_force = std::max(-1.0f, std::min(1.0f, force));
+    m_steering_spring = spring;
+    m_steering_damper = damper;
+    m_steering_offset = offset;
     m_steering_force_time = StkTime::getMonoTimeMs();
 }   // setSteeringForce
 
 // ----------------------------------------------------------------------------
-/** Sends the current steering force and emulated rumble to the device. Called
- *  once per frame, so the device is not flooded when several physics steps
- *  run in one frame.
+/** Finds the axis bound to steering. The sign converts the raw axis value to
+ *  game steering, where positive is right.
+ */
+bool SDLController::getSteeringAxis(int* axis, float* sign) const
+{
+    const DeviceConfig* cfg = m_gamepad->getConfiguration();
+    const Binding& right = cfg->getBinding(PA_STEER_RIGHT);
+    if (right.getType() == Input::IT_STICKMOTION && right.getId() < m_axes)
+    {
+        *axis = right.getId();
+        *sign = right.getDirection() == Input::AD_POSITIVE ? 1.0f : -1.0f;
+        return true;
+    }
+    const Binding& left = cfg->getBinding(PA_STEER_LEFT);
+    if (left.getType() == Input::IT_STICKMOTION && left.getId() < m_axes)
+    {
+        *axis = left.getId();
+        *sign = left.getDirection() == Input::AD_POSITIVE ? -1.0f : 1.0f;
+        return true;
+    }
+    return false;
+}   // getSteeringAxis
+
+// ----------------------------------------------------------------------------
+/** Sends the current steering force and emulated rumble to the device. The
+ *  wheel position is read here instead of from the game input, so it is free
+ *  of the gamepad deadzone and the wheel speed uses the real frame time
+ *  instead of the physics step.
  */
 void SDLController::updateForceFeedback()
 {
@@ -354,7 +402,37 @@ void SDLController::updateForceFeedback()
         return;
     }
 
-    float force = steering ? m_steering_force : 0.0f;
+    // On Linux every upload becomes a USB report (ff-memless replays the
+    // effect), uncapped frame rates would overflow the usbhid output queue.
+    const uint64_t counter = SDL_GetPerformanceCounter();
+    const uint64_t frequency = SDL_GetPerformanceFrequency();
+    if (m_prev_ffb_update != 0 &&
+        (counter - m_prev_ffb_update) * 400 < frequency)
+        return;
+    const float dt = m_prev_ffb_update == 0 ? 0.0f :
+        float(counter - m_prev_ffb_update) / frequency;
+    m_prev_ffb_update = counter;
+
+    int axis = 0;
+    float axis_sign = 1.0f;
+    const bool has_axis = getSteeringAxis(&axis, &axis_sign);
+    float wheel = 0.0f;
+    float wheel_speed = 0.0f;
+    if (has_axis)
+    {
+        wheel = axis_sign * SDL_JoystickGetAxis(m_joystick, axis) / 32767.0f;
+        if (dt > 0.0f)
+            wheel_speed = (wheel - m_prev_wheel) / dt;
+        wheel_speed = std::max(-5.0f, std::min(5.0f, wheel_speed));
+        m_prev_wheel = wheel;
+    }
+
+    float force = 0.0f;
+    if (steering)
+    {
+        force = m_steering_offset - m_steering_spring * wheel -
+            m_steering_damper * wheel_speed;
+    }
     if (rumbling)
     {
         // Alternate the push direction quickly, the wheel motor can't do a
@@ -362,6 +440,9 @@ void SDLController::updateForceFeedback()
         force += ((now / 50) % 2 == 0 ? 1.0f : -1.0f) * m_rumble_strength * 0.6f;
     }
 
+    // The effect pushes towards the positive end of the axis, which is left
+    // in the game if the player bound the axis the other way round.
+    force *= axis_sign;
     GamepadConfig* cfg =
         static_cast<GamepadConfig*>(m_gamepad->getConfiguration());
     force *= cfg->getForceFeedbackStrength() / 100.0f;
@@ -369,13 +450,12 @@ void SDLController::updateForceFeedback()
         force = -force;
     force = std::max(-1.0f, std::min(1.0f, force));
 
-    SDL_HapticEffect effect = {};
-    effect.type = SDL_HAPTIC_CONSTANT;
-    effect.constant.direction.type = SDL_HAPTIC_CARTESIAN;
-    effect.constant.direction.dir[0] = 1;
-    effect.constant.length = SDL_HAPTIC_INFINITY;
-    effect.constant.level = (Sint16)(force * 32767);
+    const Sint16 level = (Sint16)(force * 32767);
+    if (m_steering_effect_running && level == m_uploaded_level)
+        return;
+    SDL_HapticEffect effect = steeringEffect(level);
     SDL_HapticUpdateEffect(m_haptic, m_steering_effect, &effect);
+    m_uploaded_level = level;
 
     if (m_steering_effect_running)
         return;
@@ -393,6 +473,7 @@ void SDLController::stopSteeringEffect()
         return;
     SDL_HapticStopEffect(m_haptic, m_steering_effect);
     m_steering_effect_running = false;
+    m_prev_ffb_update = 0;
     updateAutoCenter(m_gamepad->getAutoCenterStrength());
 }   // stopSteeringEffect
 

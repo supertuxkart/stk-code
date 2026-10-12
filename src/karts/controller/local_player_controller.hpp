@@ -60,9 +60,6 @@ private:
 
     int m_last_crash;
 
-    /** Wheel position at the previous update, to damp fast wheel movement. */
-    float m_ffb_prev_wheel;
-
     HandicapLevel m_handicap;
 
     SFXBase     *m_wee_sound;
@@ -78,7 +75,7 @@ private:
     void         nitroNotFullSound();
 
     void doCrashHaptics();
-    void updateForceFeedback(int ticks);
+    void updateForceFeedback();
     SDLController* getForceFeedbackController() const;
     void setParticleEmitterPosition(const btTransform& t);
 

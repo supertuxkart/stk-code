@@ -71,7 +71,6 @@ LocalPlayerController::LocalPlayerController(AbstractKart *kart,
                      : PlayerController(kart)
 {
     m_last_crash = 0;
-    m_ffb_prev_wheel = 0.0f;
     m_has_started = false;
     m_handicap = h;
     m_player = StateManager::get()->getActivePlayer(local_player_id);
@@ -139,7 +138,6 @@ void LocalPlayerController::reset()
 {
     PlayerController::reset();
     m_last_crash = 0;
-    m_ffb_prev_wheel = 0.0f;
     m_sound_schedule = false;
     m_has_started = false;
 }   // reset
@@ -304,7 +302,7 @@ void LocalPlayerController::update(int ticks)
         m_sound_schedule = false;
         m_kart->playSound(m_bzzt_sound);
     }
-    updateForceFeedback(ticks);
+    updateForceFeedback();
 }   // update
 
 //-----------------------------------------------------------------------------
@@ -526,10 +524,12 @@ void LocalPlayerController::rumble(float strength_low, float strength_high, uint
 }
 
 // ----------------------------------------------------------------------------
-/** Computes the steering force for wheels with constant force support. All
- *  forces are relative to full lock, positive pushes the wheel to the right.
+/** Computes the steering force parameters for wheels with constant force
+ *  support. All forces are relative to full lock, positive pushes the wheel
+ *  to the right. The wheel position itself is read by SDLController, so the
+ *  spring works on the same, undelayed value it outputs.
  */
-void LocalPlayerController::updateForceFeedback(int ticks)
+void LocalPlayerController::updateForceFeedback()
 {
 #ifndef SERVER_ONLY
     if (RewindManager::get()->isRewinding())
@@ -537,14 +537,6 @@ void LocalPlayerController::updateForceFeedback(int ticks)
     SDLController* controller = getForceFeedbackController();
     if (!controller || !controller->hasSteeringForce())
         return;
-
-    // The raw input is used instead of KartControl::getSteer(), which lags
-    // behind the wheel position and would make the spring feel spongy.
-    const float wheel = -m_steer_val / 32767.0f;
-    const float dt = stk_config->ticks2Time(ticks);
-    float wheel_speed = dt > 0.0f ? (wheel - m_ffb_prev_wheel) / dt : 0.0f;
-    wheel_speed = std::max(-5.0f, std::min(5.0f, wheel_speed));
-    m_ffb_prev_wheel = wheel;
 
     const float max_speed = m_kart->getKartProperties()->getEngineMaxSpeed();
     const float speed = max_speed > 0.0f ?
@@ -570,10 +562,9 @@ void LocalPlayerController::updateForceFeedback(int ticks)
     // with speed like a real car.
     const float spring = 0.15f + 0.55f * speed * grip;
     const float damper = 0.02f + 0.06f * speed * grip;
-    float force = -spring * wheel - damper * wheel_speed;
 
     // The rear stepping out pulls the wheel into countersteer.
-    force += drift_pull * 0.2f * speed * grip;
+    float offset = drift_pull * 0.2f * speed * grip;
 
     // Offroad materials (grass, sand, ...) slow the kart down, use that as a
     // measure of how bumpy they are.
@@ -587,10 +578,10 @@ void LocalPlayerController::updateForceFeedback(int ticks)
         // a motor buzz.
         const float bumps = sinf(t * 2.0f * M_PI * 9.0f) +
                             0.5f * sinf(t * 2.0f * M_PI * 23.0f);
-        force += bumps * roughness * speed * 0.25f;
+        offset += bumps * roughness * speed * 0.25f;
     }
 
-    controller->setSteeringForce(force);
+    controller->setSteeringForce(spring, damper, offset);
 #endif
 }   // updateForceFeedback
 

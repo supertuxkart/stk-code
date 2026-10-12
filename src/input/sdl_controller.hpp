@@ -55,11 +55,24 @@ private:
 
     bool m_steering_effect_running;
 
-    /** Last steering force requested by the game, in [-1, 1], positive
-     *  pushes the wheel to the right. */
-    float m_steering_force;
+    /** Steering force parameters last requested by the game, see
+     *  setSteeringForce(). */
+    float m_steering_spring;
+    float m_steering_damper;
+    float m_steering_offset;
 
     uint64_t m_steering_force_time;
+
+    /** Wheel position at the previous device update, in [-1, 1] with
+     *  positive to the right, to damp fast wheel movement. */
+    float m_prev_wheel;
+
+    /** Performance counter value of the previous device update, 0 if the
+     *  effect was not playing then. */
+    uint64_t m_prev_ffb_update;
+
+    /** Level last uploaded to the device, to skip redundant uploads. */
+    int16_t m_uploaded_level;
 
     float m_rumble_strength;
 
@@ -84,6 +97,7 @@ private:
 
     void updateAutoCenter(int state);
     void stopSteeringEffect();
+    bool getSteeringAxis(int* axis, float* sign) const;
 public:
     // ------------------------------------------------------------------------
     SDLController(int device_id);
@@ -187,7 +201,7 @@ public:
     // ------------------------------------------------------------------------
     bool hasSteeringForce() const               { return m_steering_effect >= 0; }
     // ------------------------------------------------------------------------
-    void setSteeringForce(float force);
+    void setSteeringForce(float spring, float damper, float offset);
     // ------------------------------------------------------------------------
     void updateForceFeedback();
     GamePadDevice* getGamePadDevice() const { return m_gamepad; }
