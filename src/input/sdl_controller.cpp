@@ -21,6 +21,7 @@
 #include "guiengine/message_queue.hpp"
 #include "input/device_config.hpp"
 #include "input/device_manager.hpp"
+#include "input/gamepad_config.hpp"
 #include "input/gamepad_device.hpp"
 #include "input/input_manager.hpp"
 #include "utils/log.hpp"
@@ -29,6 +30,7 @@
 #include "utils/translation.hpp"
 
 #include <SDL_version.h>
+#include <algorithm>
 #include <stdexcept>
 #include <string>
 
@@ -44,6 +46,13 @@ SDLController::SDLController(int device_id)
     m_game_controller = NULL;
     m_joystick = NULL;
     m_haptic = NULL;
+    m_native_rumble = false;
+    m_steering_effect = -1;
+    m_steering_effect_running = false;
+    m_steering_force = 0.0f;
+    m_steering_force_time = 0;
+    m_rumble_strength = 0.0f;
+    m_rumble_end_time = 0;
     m_id = -1;
 
     if (SDL_IsGameController(device_id))
@@ -201,11 +210,32 @@ SDLController::SDLController(int device_id)
 
 finish:
     m_haptic = SDL_HapticOpenFromJoystick(m_joystick);
-    if (m_haptic)
+    if (!m_haptic)
+        return;
+
+    m_native_rumble = SDL_HapticRumbleSupported(m_haptic) == SDL_TRUE &&
+        SDL_HapticRumbleInit(m_haptic) == 0;
+    updateAutoCenter(getGamePadDevice()->getAutoCenterStrength());
+
+    if ((SDL_HapticQuery(m_haptic) & SDL_HAPTIC_CONSTANT) == 0)
+        return;
+
+    SDL_HapticEffect effect = {};
+    effect.type = SDL_HAPTIC_CONSTANT;
+    effect.constant.direction.type = SDL_HAPTIC_CARTESIAN;
+    effect.constant.direction.dir[0] = 1;
+    // The effect is stopped explicitly once the game stops feeding it, see
+    // updateForceFeedback().
+    effect.constant.length = SDL_HAPTIC_INFINITY;
+    m_steering_effect = SDL_HapticNewEffect(m_haptic, &effect);
+    if (m_steering_effect < 0)
     {
-        SDL_HapticRumbleInit(m_haptic);
-        updateAutoCenter(getGamePadDevice()->getAutoCenterStrength());
+        Log::warn("SDLController", "%s: cannot create constant force: %s",
+            name.c_str(), SDL_GetError());
+        return;
     }
+    Log::info("SDLController", "%s supports steering force feedback.",
+        name.c_str());
 }   // SDLController
 
 // ----------------------------------------------------------------------------
@@ -217,7 +247,12 @@ SDLController::~SDLController()
     else
         SDL_JoystickClose(m_joystick);
     if (m_haptic)
+    {
+        stopSteeringEffect();
+        if (m_steering_effect >= 0)
+            SDL_HapticDestroyEffect(m_haptic, m_steering_effect);
         SDL_HapticClose(m_haptic);
+    }
     m_gamepad->getConfiguration()->unPlugged();
     m_gamepad->setIrrIndex(-1);
     m_gamepad->setConnected(false);
@@ -261,25 +296,105 @@ void SDLController::checkPowerLevel()
 
 void SDLController::doRumble(float strength_low, float strength_high, uint32_t duration_ms)
 {
-    if (m_haptic)
+    float strength = std::min(1.0f, (strength_low + strength_high) / 2);
+    if (m_native_rumble)
     {
-        SDL_HapticRumblePlay(m_haptic, (strength_low + strength_high) / 2, duration_ms);
+        SDL_HapticRumblePlay(m_haptic, strength, duration_ms);
+        return;
     }
-    else
+    if (m_steering_effect >= 0)
     {
+        m_rumble_strength = strength;
+        m_rumble_end_time = StkTime::getMonoTimeMs() + duration_ms;
+        return;
+    }
 #if SDL_VERSION_ATLEAST(2,0,9)
-        uint16_t scaled_low = strength_low * pow(2, 16);
-        uint16_t scaled_high = strength_high * pow(2, 16);
-        SDL_GameControllerRumble(m_game_controller, scaled_low, scaled_high, duration_ms);
+    if (!m_game_controller)
+        return;
+    uint16_t scaled_low = std::min(1.0f, strength_low) * 65535;
+    uint16_t scaled_high = std::min(1.0f, strength_high) * 65535;
+    SDL_GameControllerRumble(m_game_controller, scaled_low, scaled_high, duration_ms);
 #endif
-    }
 }
 
+// ----------------------------------------------------------------------------
 void SDLController::updateAutoCenter(int state)
 {
     m_auto_center = state;
     SDL_HapticSetAutocenter(m_haptic, m_auto_center);
 }
+
+// ----------------------------------------------------------------------------
+/** Sets the steering force, in [-1, 1] where positive pushes the wheel to the
+ *  right. It has to be called continuously, the force fades out shortly after
+ *  the game stops calling it (pause, race end, menus).
+ */
+void SDLController::setSteeringForce(float force)
+{
+    m_steering_force = std::max(-1.0f, std::min(1.0f, force));
+    m_steering_force_time = StkTime::getMonoTimeMs();
+}   // setSteeringForce
+
+// ----------------------------------------------------------------------------
+/** Sends the current steering force and emulated rumble to the device. Called
+ *  once per frame, so the device is not flooded when several physics steps
+ *  run in one frame.
+ */
+void SDLController::updateForceFeedback()
+{
+    if (m_steering_effect < 0)
+        return;
+
+    const uint64_t now = StkTime::getMonoTimeMs();
+    const bool steering = now < m_steering_force_time + 100;
+    const bool rumbling = now < m_rumble_end_time;
+    if (!steering && !rumbling)
+    {
+        stopSteeringEffect();
+        return;
+    }
+
+    float force = steering ? m_steering_force : 0.0f;
+    if (rumbling)
+    {
+        // Alternate the push direction quickly, the wheel motor can't do a
+        // real vibration. 50 ms per half wave stays readable at 60 fps.
+        force += ((now / 50) % 2 == 0 ? 1.0f : -1.0f) * m_rumble_strength * 0.6f;
+    }
+
+    GamepadConfig* cfg =
+        static_cast<GamepadConfig*>(m_gamepad->getConfiguration());
+    force *= cfg->getForceFeedbackStrength() / 100.0f;
+    if (cfg->isForceFeedbackInverted())
+        force = -force;
+    force = std::max(-1.0f, std::min(1.0f, force));
+
+    SDL_HapticEffect effect = {};
+    effect.type = SDL_HAPTIC_CONSTANT;
+    effect.constant.direction.type = SDL_HAPTIC_CARTESIAN;
+    effect.constant.direction.dir[0] = 1;
+    effect.constant.length = SDL_HAPTIC_INFINITY;
+    effect.constant.level = (Sint16)(force * 32767);
+    SDL_HapticUpdateEffect(m_haptic, m_steering_effect, &effect);
+
+    if (m_steering_effect_running)
+        return;
+    // The game provides its own centering spring while driving, the device
+    // autocenter on top of it would make the wheel feel stiff and dead.
+    updateAutoCenter(0);
+    SDL_HapticRunEffect(m_haptic, m_steering_effect, 1);
+    m_steering_effect_running = true;
+}   // updateForceFeedback
+
+// ----------------------------------------------------------------------------
+void SDLController::stopSteeringEffect()
+{
+    if (!m_steering_effect_running)
+        return;
+    SDL_HapticStopEffect(m_haptic, m_steering_effect);
+    m_steering_effect_running = false;
+    updateAutoCenter(m_gamepad->getAutoCenterStrength());
+}   // stopSteeringEffect
 
 // ----------------------------------------------------------------------------
 #ifdef ANDROID

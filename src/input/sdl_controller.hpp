@@ -44,6 +44,27 @@ private:
     SDL_Haptic* m_haptic;
     int m_auto_center;
 
+    /** True if the device can play SDL's simple rumble effect. Wheels such
+     *  as the Logitech G29 on the mainline Linux driver only support
+     *  constant force, so rumble has to be emulated with it. */
+    bool m_native_rumble;
+
+    /** Id of the constant force effect which carries all steering forces,
+     *  -1 if the device has no constant force support. */
+    int m_steering_effect;
+
+    bool m_steering_effect_running;
+
+    /** Last steering force requested by the game, in [-1, 1], positive
+     *  pushes the wheel to the right. */
+    float m_steering_force;
+
+    uint64_t m_steering_force_time;
+
+    float m_rumble_strength;
+
+    uint64_t m_rumble_end_time;
+
     int m_buttons;
 
     int m_axes;
@@ -62,6 +83,7 @@ private:
 #endif
 
     void updateAutoCenter(int state);
+    void stopSteeringEffect();
 public:
     // ------------------------------------------------------------------------
     SDLController(int device_id);
@@ -162,6 +184,12 @@ public:
     void checkPowerLevel();
     // ------------------------------------------------------------------------
     void doRumble(float strength_low, float strength_high, uint32_t duration_ms);
+    // ------------------------------------------------------------------------
+    bool hasSteeringForce() const               { return m_steering_effect >= 0; }
+    // ------------------------------------------------------------------------
+    void setSteeringForce(float force);
+    // ------------------------------------------------------------------------
+    void updateForceFeedback();
     GamePadDevice* getGamePadDevice() const { return m_gamepad; }
 };
 

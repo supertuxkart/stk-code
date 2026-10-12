@@ -26,6 +26,7 @@
 #include "graphics/camera/camera.hpp"
 #include "graphics/camera/camera_normal.hpp"
 #include "graphics/irr_driver.hpp"
+#include "graphics/material.hpp"
 #include "graphics/particle_emitter.hpp"
 #include "graphics/particle_kind.hpp"
 #include "input/input_manager.hpp"
@@ -70,6 +71,7 @@ LocalPlayerController::LocalPlayerController(AbstractKart *kart,
                      : PlayerController(kart)
 {
     m_last_crash = 0;
+    m_ffb_prev_wheel = 0.0f;
     m_has_started = false;
     m_handicap = h;
     m_player = StateManager::get()->getActivePlayer(local_player_id);
@@ -137,6 +139,7 @@ void LocalPlayerController::reset()
 {
     PlayerController::reset();
     m_last_crash = 0;
+    m_ffb_prev_wheel = 0.0f;
     m_sound_schedule = false;
     m_has_started = false;
 }   // reset
@@ -301,6 +304,7 @@ void LocalPlayerController::update(int ticks)
         m_sound_schedule = false;
         m_kart->playSound(m_bzzt_sound);
     }
+    updateForceFeedback(ticks);
 }   // update
 
 //-----------------------------------------------------------------------------
@@ -397,7 +401,7 @@ void LocalPlayerController::handleZipper(bool play_sound)
     if (!GUIEngine::isNoGraphics())
         irr_driver->giveBoost(m_camera_index);
 #endif
-
+    rumble(0.3f, 0.3f, 150);
 }   // handleZipper
 
 //-----------------------------------------------------------------------------
@@ -489,24 +493,106 @@ void LocalPlayerController::doCrashHaptics() {
 #endif
 }
 
+// ----------------------------------------------------------------------------
+/** Returns the gamepad driving this kart, or NULL if there is none or the
+ *  player turned force feedback off for it.
+ */
+SDLController* LocalPlayerController::getForceFeedbackController() const
+{
+#ifndef SERVER_ONLY
+    int count = input_manager->getGamepadCount();
+    while (count--)
+    {
+        SDLController* controller = input_manager->getSDLController(count);
+        if (!controller || controller->getGamePadDevice()->getPlayer() != m_player)
+            continue;
+        if (!controller->getGamePadDevice()->useForceFeedback())
+            return NULL;
+        return controller;
+    }
+#endif
+    return NULL;
+}   // getForceFeedbackController
+
+// ----------------------------------------------------------------------------
 void LocalPlayerController::rumble(float strength_low, float strength_high, uint16_t duration) {
 #ifndef SERVER_ONLY
     if (RewindManager::get()->isRewinding())
         return;
-    int count = input_manager->getGamepadCount();
-    while(count--)
-    {
-        SDLController* controller = input_manager->getSDLController(count);
-        if (controller && controller->getGamePadDevice()->getPlayer() == m_player)
-        {
-            if (!controller->getGamePadDevice()->useForceFeedback())
-                return;
-            controller->doRumble(strength_low, strength_high, duration);
-            break;
-        }
-    }
+    SDLController* controller = getForceFeedbackController();
+    if (controller)
+        controller->doRumble(strength_low, strength_high, duration);
 #endif
 }
+
+// ----------------------------------------------------------------------------
+/** Computes the steering force for wheels with constant force support. All
+ *  forces are relative to full lock, positive pushes the wheel to the right.
+ */
+void LocalPlayerController::updateForceFeedback(int ticks)
+{
+#ifndef SERVER_ONLY
+    if (RewindManager::get()->isRewinding())
+        return;
+    SDLController* controller = getForceFeedbackController();
+    if (!controller || !controller->hasSteeringForce())
+        return;
+
+    // The raw input is used instead of KartControl::getSteer(), which lags
+    // behind the wheel position and would make the spring feel spongy.
+    const float wheel = -m_steer_val / 32767.0f;
+    const float dt = stk_config->ticks2Time(ticks);
+    float wheel_speed = dt > 0.0f ? (wheel - m_ffb_prev_wheel) / dt : 0.0f;
+    wheel_speed = std::max(-5.0f, std::min(5.0f, wheel_speed));
+    m_ffb_prev_wheel = wheel;
+
+    const float max_speed = m_kart->getKartProperties()->getEngineMaxSpeed();
+    const float speed = max_speed > 0.0f ?
+        std::min(1.0f, fabsf(m_kart->getSpeed()) / max_speed) : 0.0f;
+
+    // Tyres only resist the wheel while they touch the ground.
+    float grip = 1.0f;
+    if (m_kart->getKartAnimation() || !m_kart->isOnGround())
+        grip = 0.0f;
+
+    const Skidding* skidding = m_kart->getSkidding();
+    const Skidding::SkidState skid = skidding->getSkidState();
+    float drift_pull = 0.0f;
+    if (skid == Skidding::SKID_ACCUMULATE_LEFT)
+        drift_pull = 1.0f;
+    else if (skid == Skidding::SKID_ACCUMULATE_RIGHT)
+        drift_pull = -1.0f;
+    // A drifting kart has less front grip, which makes the wheel lighter.
+    if (drift_pull != 0.0f)
+        grip *= 0.6f;
+
+    // Even a stationary kart has some weight on the wheel, it gets heavier
+    // with speed like a real car.
+    const float spring = 0.15f + 0.55f * speed * grip;
+    const float damper = 0.02f + 0.06f * speed * grip;
+    float force = -spring * wheel - damper * wheel_speed;
+
+    // The rear stepping out pulls the wheel into countersteer.
+    force += drift_pull * 0.2f * speed * grip;
+
+    // Offroad materials (grass, sand, ...) slow the kart down, use that as a
+    // measure of how bumpy they are.
+    const Material* material = m_kart->getMaterial();
+    if (grip > 0.0f && material && material->getMaxSpeedFraction() < 1.0f)
+    {
+        const float roughness = 1.0f - material->getMaxSpeedFraction();
+        const float t =
+            stk_config->ticks2Time(World::getWorld()->getTicksSinceStart());
+        // Two unrelated frequencies feel like an uneven surface rather than
+        // a motor buzz.
+        const float bumps = sinf(t * 2.0f * M_PI * 9.0f) +
+                            0.5f * sinf(t * 2.0f * M_PI * 23.0f);
+        force += bumps * roughness * speed * 0.25f;
+    }
+
+    controller->setSteeringForce(force);
+#endif
+}   // updateForceFeedback
 
 void LocalPlayerController::crashed(const AbstractKart* k) {
     doCrashHaptics();
