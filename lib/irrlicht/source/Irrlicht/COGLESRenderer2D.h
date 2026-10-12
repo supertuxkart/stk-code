@@ -5,40 +5,46 @@
 // This file is part of the "Irrlicht Engine".
 // For conditions of distribution and use, see copyright notice in Irrlicht.h
 
-#ifndef __C_OGLES2_NORMAL_MAP_RENDERER_H_INCLUDED__
-#define __C_OGLES2_NORMAL_MAP_RENDERER_H_INCLUDED__
+#ifndef __C_OGLES2_RENDERER_2D_H_INCLUDED__
+#define __C_OGLES2_RENDERER_2D_H_INCLUDED__
 
 #include "IrrCompileConfig.h"
 
-#ifdef _IRR_COMPILE_WITH_OGLES2_
+#ifdef _IRR_COMPILE_WITH_OGLES_
 
-#include "COGLES2MaterialRenderer.h"
+#include "COGLESMaterialRenderer.h"
 
 namespace irr
 {
 namespace video
 {
 
-//! Class for normal mapping in OpenGL ES 2.0
-class COGLES2NormalMapRenderer : public COGLES2MaterialRenderer
+//! Class for renderer 2D in OpenGL ES 2.0
+class COGLESRenderer2D : public COGLESMaterialRenderer
 {
 public:
 	//! Constructor
-	COGLES2NormalMapRenderer(const c8* vertexShaderProgram,
-		const c8* pixelShaderProgram, E_MATERIAL_TYPE baseMaterial,
-		COGLES2Driver* driver);
+	COGLESRenderer2D(const c8* vertexShaderProgram, const c8* pixelShaderProgram, COGLESDriver* driver);
 
 	//! Destructor
-	~COGLES2NormalMapRenderer();
+	~COGLESRenderer2D();
 
 	virtual void OnSetMaterial(const SMaterial& material, const SMaterial& lastMaterial,
 		bool resetAllRenderstates, IMaterialRendererServices* services);
 
 	virtual bool OnRender(IMaterialRendererServices* service, E_VERTEX_TYPE vtxtype);
 
+	void setTexture(const ITexture* texture);
+
 protected:
 
-	COGLES2MaterialRenderer* SharedRenderer;
+	core::dimension2d<u32> RenderTargetSize;
+	core::matrix4 Matrix;
+
+	const ITexture* Texture;
+
+	s32 MatrixID;
+	s32 UseTextureID;
 };
 
 

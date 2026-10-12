@@ -6598,10 +6598,10 @@ extern "C" {
 
 #ifndef GL_EXT_draw_instanced
 #define GL_EXT_draw_instanced 1
-    typedef void (APIENTRYP PFNGLDRAWARRAYSINSTANCEDEXTPROC) (GLenum mode, GLint start, GLsizei count, GLsizei primcount);
+    typedef void (APIENTRYP PFNglDrawArraysInstancedPROC) (GLenum mode, GLint start, GLsizei count, GLsizei primcount);
     typedef void (APIENTRYP PFNGLDRAWELEMENTSINSTANCEDEXTPROC) (GLenum mode, GLsizei count, GLenum type, const void *indices, GLsizei primcount);
 #ifdef GL_GLEXT_PROTOTYPES
-    GLAPI void APIENTRY glDrawArraysInstancedEXT(GLenum mode, GLint start, GLsizei count, GLsizei primcount);
+    GLAPI void APIENTRY glDrawArraysInstanced(GLenum mode, GLint start, GLsizei count, GLsizei primcount);
     GLAPI void APIENTRY glDrawElementsInstancedEXT(GLenum mode, GLsizei count, GLenum type, const void *indices, GLsizei primcount);
 #endif
 #endif /* GL_EXT_draw_instanced */

@@ -40,7 +40,7 @@ int ShaderBase::loadTFBProgram(const std::string &shader_name,
 {
     m_program = glCreateProgram();
     loadAndAttachShader(GL_VERTEX_SHADER, shader_name);
-#ifdef USE_GLES2
+#ifdef USE_GLES
     loadAndAttachShader(GL_FRAGMENT_SHADER, "white.frag");
 #endif
 

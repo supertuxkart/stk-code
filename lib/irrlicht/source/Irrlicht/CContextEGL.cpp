@@ -394,32 +394,13 @@ bool ContextManagerEGL::createContext()
 {
     m_is_legacy_device = false;
 
-    if (m_creation_params.opengl_api == CEGL_API_OPENGL_ES)
+    if (m_creation_params.opengl_api == CEGL_API_OPENGL_ES3) // Don't needed the legacy driver option anymore
     {
-        if (!m_creation_params.force_legacy_device)
-        {
-            if (m_egl_context == EGL_NO_CONTEXT)
-            {
-                std::vector<EGLint> context_attribs;
-                context_attribs.push_back(EGL_CONTEXT_CLIENT_VERSION);
-                context_attribs.push_back(3);
-                context_attribs.push_back(EGL_NONE);
-                context_attribs.push_back(0);
-
-                m_egl_context = eglCreateContext(m_egl_display,
-                                                 m_egl_config,
-                                                 EGL_NO_CONTEXT,
-                                                 &context_attribs[0]);
-            }
-        }
-
         if (m_egl_context == EGL_NO_CONTEXT)
         {
-            m_is_legacy_device = true;
-
             std::vector<EGLint> context_attribs;
             context_attribs.push_back(EGL_CONTEXT_CLIENT_VERSION);
-            context_attribs.push_back(2);
+            context_attribs.push_back(3);
             context_attribs.push_back(EGL_NONE);
             context_attribs.push_back(0);
 

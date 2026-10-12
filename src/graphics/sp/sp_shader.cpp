@@ -46,7 +46,7 @@ SPShader::SPShader(const std::string& name,
 #ifndef SERVER_ONLY
     if (skinningUseTBO())
     {
-#ifndef USE_GLES2
+#ifndef USE_GLES
         m_prefilled_names["skinning_tex"] = std::make_pair<unsigned,
                                             SamplerType>(0, ST_TEXTURE_BUFFER);
 #endif
@@ -136,7 +136,7 @@ void SPShader::addAllTextures(RenderPass rp)
         }
         const unsigned i = (unsigned)m_prefilled_samplers[rp].size();
         glUniform1i(loc, i);
-#ifdef USE_GLES2
+#ifdef USE_GLES
         m_prefilled_samplers[rp].emplace_back(i, p.first, p.second.second,
             p.first == "tex_array" ? GL_TEXTURE_2D_ARRAY : GL_TEXTURE_2D);
 #else

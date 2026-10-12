@@ -52,9 +52,9 @@ namespace video
 		primitives. */
 		EDT_OPENGL,
         
-		//! OpenGL-ES 2.x driver, for embedded and mobile systems
-		/** Supports shaders etc. */
-		EDT_OGLES2,
+		//! OpenGL ES 3.x driver, for embedded and mobile systems
+		/** Supports shaders and etc. */
+		EDT_OGLES,
 
 		//! A driver using vulkan coded by STK
 		EDT_VULKAN,

@@ -6,10 +6,10 @@
 
 #include "IrrCompileConfig.h"
 
-#ifdef _IRR_COMPILE_WITH_OGLES2_
+#ifdef _IRR_COMPILE_WITH_OGLES_
 
-#include "COGLES2ExtensionHandler.h"
-#include "COGLES2Driver.h"
+#include "COGLESExtensionHandler.h"
+#include "COGLESDriver.h"
 #include "fast_atof.h"
 #include "irrString.h"
 
@@ -18,7 +18,7 @@ namespace irr
 namespace video
 {
 
-	static const char* const OGLES2FeatureStrings[COGLES2ExtensionHandler::IRR_OGLES2_Feature_Count] =
+	static const char* const OGLES2FeatureStrings[COGLESExtensionHandler::IRR_OGLES2_Feature_Count] =
 	{
 		"GL_AMD_compressed_3DC_texture",
 		"GL_AMD_compressed_ATC_texture",
@@ -157,7 +157,7 @@ namespace video
 		"GL_VIV_shader_binary"
 	};
 
-	COGLES2ExtensionHandler::COGLES2ExtensionHandler() :
+	COGLESExtensionHandler::COGLESExtensionHandler() :
 			Version(0), MaxTextureUnits(0), MaxSupportedTextures(0),
 			MaxAnisotropy(1), MaxIndices(0xffff), MaxTextureSize(1),
 			MaxTextureLODBias(0.f),
@@ -168,14 +168,14 @@ namespace video
 	}
 
 
-	void COGLES2ExtensionHandler::dump() const
+	void COGLESExtensionHandler::dump() const
 	{
 		for (u32 i=0; i<IRR_OGLES2_Feature_Count; ++i)
 			os::Printer::log(OGLES2FeatureStrings[i], FeatureAvailable[i] ? " true" : " false");
 	}
 
 
-	void COGLES2ExtensionHandler::initExtensions(COGLES2Driver* driver,
+	void COGLESExtensionHandler::initExtensions(COGLESDriver* driver,
 			bool withStencil)
 	{
 		const core::stringc stringVer(glGetString(GL_VERSION));
@@ -248,5 +248,5 @@ namespace video
 } // end namespace irr
 
 
-#endif // _IRR_COMPILE_WITH_OGLES2_
+#endif // _IRR_COMPILE_WITH_OGLES_
 

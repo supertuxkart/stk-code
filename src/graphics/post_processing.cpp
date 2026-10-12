@@ -120,7 +120,7 @@ public:
     }   // render
 };   // Gaussian3VBlurShader
 
-#if !defined(USE_GLES2)
+#if !defined(USE_GLES)
 // ============================================================================
 class ComputeGaussian6VBlurShader : public TextureShader<ComputeGaussian6VBlurShader, 1,
                                                   core::vector2df,
@@ -212,7 +212,7 @@ public:
     GLuint m_dest_tu;
     ComputeGaussian9TapHShader()
     {
-#if !defined(USE_GLES2)
+#if !defined(USE_GLES)
         loadProgram(OBJECT,  GL_COMPUTE_SHADER, "bilateralH.comp");
         m_dest_tu = 2;
         assignUniforms("pixel");
@@ -226,7 +226,7 @@ public:
                 const FrameBuffer &linear_depth,
                 int width, int height)
     {
-#if !defined(USE_GLES2)
+#if !defined(USE_GLES)
         use();
         glBindSampler(m_dest_tu, 0);
         setTextureUnits(fb.getRTT()[0],
@@ -274,7 +274,7 @@ public:
 
     ComputeGaussian9TapVShader()
     {
-#if !defined(USE_GLES2)
+#if !defined(USE_GLES)
         loadProgram(OBJECT, GL_COMPUTE_SHADER, "bilateralV.comp");
         m_dest_tu = 2;
         assignUniforms("pixel");
@@ -288,7 +288,7 @@ public:
                 const FrameBuffer &linear_depth,
                 int width, int height)
     {
-#if !defined(USE_GLES2)
+#if !defined(USE_GLES)
 
         use();
         glBindSampler(m_dest_tu, 0);
@@ -840,7 +840,7 @@ void PostProcessing::renderGaussian6Blur(const FrameBuffer &in_fbo,
         Gaussian6HBlurShader::getInstance()->render(auxiliary, in_fbo.getWidth(),
                                                    in_fbo.getHeight(), sigma_h);
     }
-#if !defined(USE_GLES2)
+#if !defined(USE_GLES)
     else
     {
         const std::vector<float> &weightsV = getGaussianWeight(sigma_v, 7);
@@ -903,7 +903,7 @@ void PostProcessing::renderGaussian9TapBlur(const FrameBuffer &in_fbo,
     assert(in_fbo.getWidth() == auxiliary.getWidth() &&
            in_fbo.getHeight() == auxiliary.getHeight());
      
-#if !defined(USE_GLES2)
+#if !defined(USE_GLES)
     if (CVS->supportsComputeShadersFiltering())
         glMemoryBarrier(GL_FRAMEBUFFER_BARRIER_BIT);
 #endif
@@ -927,7 +927,7 @@ void PostProcessing::renderGaussian9TapBlur(const FrameBuffer &in_fbo,
         }
     }
     
-#if !defined(USE_GLES2)
+#if !defined(USE_GLES)
     if (CVS->supportsComputeShadersFiltering())
         glMemoryBarrier(GL_SHADER_IMAGE_ACCESS_BARRIER_BIT);
 #endif
@@ -951,7 +951,7 @@ void PostProcessing::renderGaussian9TapBlur(const FrameBuffer &in_fbo,
         }
     }
     
-#if !defined(USE_GLES2)
+#if !defined(USE_GLES)
     if (CVS->supportsComputeShadersFiltering())
         glMemoryBarrier(GL_TEXTURE_FETCH_BARRIER_BIT);
 #endif

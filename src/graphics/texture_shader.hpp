@@ -45,7 +45,7 @@ enum SamplerTypeNew
     ST_NEAREST_CLAMPED_FILTERED,
     ST_BILINEAR_CLAMPED_FILTERED,
     ST_SEMI_TRILINEAR,
-#ifdef USE_GLES2
+#ifdef USE_GLES
     ST_MAX = ST_SEMI_TRILINEAR
 #else
     ST_TEXTURE_BUFFER,
@@ -225,7 +225,7 @@ public:
     template<int N, typename... HandlesId>
     void setTextureHandlesImpl(uint64_t handle, HandlesId... args)
     {
-#if !defined(USE_GLES2)
+#if !defined(USE_GLES)
         if (handle)
             glUniformHandleui64ARB(m_texture_location[N], handle);
 #endif

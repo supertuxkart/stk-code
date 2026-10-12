@@ -84,14 +84,14 @@ private:
         glBindTexture(GL_TEXTURE_2D, m_texture_name);
         static uint32_t data[4] = { 0, 0, 0, 0 };
         glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, 2, 2, 0,
-#ifdef USE_GLES2
+#ifdef USE_GLES
             GL_RGBA,
 #else
             GL_BGRA,
 #endif
             GL_UNSIGNED_BYTE, data);
         glTexImage2D(GL_TEXTURE_2D, 1, GL_RGBA, 1, 1, 0,
-#ifdef USE_GLES2
+#ifdef USE_GLES
             GL_RGBA,
 #else
             GL_BGRA,
@@ -109,14 +109,14 @@ private:
         glBindTexture(GL_TEXTURE_2D, m_texture_name);
         static int32_t data[4] = { -1, -1, -1, -1 };
         glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, 2, 2, 0,
-#ifdef USE_GLES2
+#ifdef USE_GLES
             GL_RGBA,
 #else
             GL_BGRA,
 #endif
             GL_UNSIGNED_BYTE, data);
         glTexImage2D(GL_TEXTURE_2D, 1, GL_RGBA, 1, 1, 0,
-#ifdef USE_GLES2
+#ifdef USE_GLES
             GL_RGBA,
 #else
             GL_BGRA,
