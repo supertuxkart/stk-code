@@ -73,6 +73,16 @@
                         <label id="option-text" proportion="3" I18N="In the track info screen" text_align="left" align="center"/>
                     </div>
                    
+                    <div width="100%" height="fit" layout="horizontal-row" >
+                        <div proportion="1" height="fit" layout="horizontal-row">
+                            <div width="100%" height="fit" text-align="center" layout="vertical-row" >
+                                <checkbox id="tire-stealing" align="center"/>
+                            </div>
+                        </div>
+                        <spacer width="3%"/>
+                        <label id="tire-stealing-text" proportion="3" I18N="In the track info screen" text_align="left" align="center"/>
+                    </div>
+
                     <spacer width="1" height="1%"/>
                     
                     <div width="100%" height="fit" layout="horizontal-row" >

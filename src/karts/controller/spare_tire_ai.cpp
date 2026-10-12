@@ -18,6 +18,7 @@
 
 #include "karts/controller/spare_tire_ai.hpp"
 
+#include "config/user_config.hpp"
 #include "karts/abstract_kart.hpp"
 #include "karts/kart_gfx.hpp"
 #include "karts/max_speed.hpp"
@@ -142,12 +143,12 @@ void SpareTireAI::crashed(const AbstractKart *k)
     // Nothing happen when two spare tire karts crash each other
     if (dynamic_cast<const SpareTireAI*>(k->getController()) != NULL) return;
 
-    // Tell players that they can have at most 3 lives
+    // Add a life
     RaceGUIBase* r = World::getWorld()->getRaceGUI();
-    if (m_tsb_world->getKartLife(k->getWorldKartId()) == 3)
+    if (m_tsb_world->getKartLife(k->getWorldKartId()) == UserConfigParams::m_ffa_time_limit && !UserConfigParams::m_tire_steal)
     {
         if (r)
-            r->addMessage(_("You can have at most 3 lives!"), k, 2.0f);
+            r->addMessage(_("You can have at most %d lives!"), k, 2.0f);
     }
     // Otherwise add one life for that kart
     else
