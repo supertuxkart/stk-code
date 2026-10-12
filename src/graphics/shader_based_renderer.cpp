@@ -303,11 +303,18 @@ void ShaderBasedRenderer::renderSceneDeferred(scene::ICameraSceneNode * const ca
     if (UserConfigParams::m_light_scatter && track && track->isFogEnabled())
     {
         PROFILER_PUSH_CPU_MARKER("- Light Scatter", 0xFF, 0x00, 0x00);
-        ScopedGPUTimer Timer(irr_driver->getGPUTimer(Q_LIGHTSCATTER));
-        m_lighting_passes.renderLightsScatter(m_rtts->getDepthStencilTexture(),
-                                              m_rtts->getFBO(FBO_HALF1),
-                                              m_rtts->getFBO(FBO_HALF2),
-                                              m_post_processing.get());
+        {
+            ScopedGPUTimer Timer(irr_driver->getGPUTimer(Q_LIGHTSCATTER));
+            m_lighting_passes.renderLightsScatter(m_rtts->getDepthStencilTexture(),
+                                                  m_rtts->getFBO(FBO_HALF1),
+                                                  m_rtts->getFBO(FBO_HALF2),
+                                                  m_post_processing.get());
+        }
+        {
+            ScopedGPUTimer timer(irr_driver->getGPUTimer(Q_BLURSCATTER));
+            m_post_processing->renderGaussian6Blur(m_rtts->getFBO(FBO_HALF1),
+                                                 m_rtts->getFBO(FBO_HALF2), 5., 5.);
+        }
         PROFILER_POP_CPU_MARKER();
     }
 
