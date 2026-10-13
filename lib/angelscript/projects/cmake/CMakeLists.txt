@@ -22,7 +22,7 @@ set(ANGELSCRIPT_VERSION_PATCH ${CMAKE_MATCH_3})
 set(PROJECT_VERSION ${ANGELSCRIPT_VERSION_MAJOR}.${ANGELSCRIPT_VERSION_MINOR}.${ANGELSCRIPT_VERSION_PATCH})
 
 set(ARCHFLAGS "${CMAKE_SYSTEM_PROCESSOR}")
-if (APPLE AND NOT IOS)
+if (APPLE OR IOS)
   if (${CMAKE_SYSTEM_PROCESSOR} MATCHES "arm")
     set(ARCHFLAGS "aarch64")
   endif ()
@@ -124,7 +124,7 @@ if(${ARCHFLAGS} MATCHES "^arm")
     else()
         set_property(SOURCE ../../source/as_callfunc_arm_gcc.S APPEND PROPERTY COMPILE_FLAGS "")
     endif()
-    
+
     else()
         message(FATAL ERROR "ARM target requires a working assembler")
     endif()
