@@ -1,6 +1,6 @@
 /*
    AngelCode Scripting Library
-   Copyright (c) 2003-2013 Andreas Jonsson
+   Copyright (c) 2003-2024 Andreas Jonsson
 
    This software is provided 'as-is', without any express or implied 
    warranty. In no event will the authors be held liable for any 
@@ -67,6 +67,9 @@ protected:
 	bool IsKeyWord(const char *source, size_t sourceLength, size_t &tokenLength, eTokenType &tokenType) const;
 	bool IsIdentifier(const char *source, size_t sourceLength, size_t &tokenLength, eTokenType &tokenType) const;
 	bool IsDigitInRadix(char ch, int radix) const;
+
+	void InitJumpTable();
+	void FreeJumpTable();
 
 	const asCScriptEngine *engine;
 

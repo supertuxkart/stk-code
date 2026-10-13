@@ -1,6 +1,6 @@
 /*
    AngelCode Scripting Library
-   Copyright (c) 2003-2019 Andreas Jonsson
+   Copyright (c) 2003-2025 Andreas Jonsson
 
    This software is provided 'as-is', without any express or implied
    warranty. In no event will the authors be held liable for any
@@ -52,6 +52,7 @@
 #include "as_memory.h"
 #include "as_gc.h"
 #include "as_tokenizer.h"
+#include "as_map.h"
 
 BEGIN_AS_NAMESPACE
 
@@ -78,12 +79,13 @@ public:
 
 	// Compiler messages
 	virtual int SetMessageCallback(const asSFuncPtr &callback, void *obj, asDWORD callConv);
+	virtual int GetMessageCallback(asSFuncPtr* callback, void** obj, asDWORD* callConv);
 	virtual int ClearMessageCallback();
 	virtual int WriteMessage(const char *section, int row, int col, asEMsgType type, const char *message);
 
 	// JIT Compiler
-	virtual int SetJITCompiler(asIJITCompiler *compiler);
-	virtual asIJITCompiler *GetJITCompiler() const;
+	virtual int                     SetJITCompiler(asIJITCompilerAbstract *compiler);
+	virtual asIJITCompilerAbstract *GetJITCompiler() const;
 
 	// Global functions
 	virtual int                RegisterGlobalFunction(const char *declaration, const asSFuncPtr &funcPointer, asDWORD callConv, void *auxiliary = 0);
@@ -99,7 +101,7 @@ public:
 	virtual int    GetGlobalPropertyIndexByDecl(const char *decl) const;
 
 	// Type registration
-	virtual int            RegisterObjectType(const char *obj, int byteSize, asDWORD flags);
+	virtual int            RegisterObjectType(const char *obj, int byteSize, asQWORD flags);
 	virtual int            RegisterObjectProperty(const char *obj, const char *declaration, int byteOffset, int compositeOffset = 0, bool isCompositeIndirect = false);
 	virtual int            RegisterObjectMethod(const char *obj, const char *declaration, const asSFuncPtr &funcPointer, asDWORD callConv, void *auxiliary = 0, int compositeOffset = 0, bool isCompositeIndirect = false);
 	virtual int            RegisterObjectBehaviour(const char *obj, asEBehaviours behaviour, const char *declaration, const asSFuncPtr &funcPointer, asDWORD callConv, void *auxiliary = 0, int compositeOffset = 0, bool isCompositeIndirect = false);
@@ -110,7 +112,11 @@ public:
 
 	// String factory
 	virtual int RegisterStringFactory(const char *datatype, asIStringFactory *factory);
+	virtual int GetStringFactory(asDWORD* typeModifiers, asIStringFactory** factory) const;
+#ifdef AS_DEPRECATED
+	// deprecated since 2024-07-27, 2.38.0
 	virtual int GetStringFactoryReturnTypeId(asDWORD *flags) const;
+#endif
 
 	// Default array type
 	virtual int RegisterDefaultArrayType(const char *type);
@@ -148,6 +154,7 @@ public:
 	virtual asIScriptModule *GetModuleByIndex(asUINT index) const;
 
 	// Script functions
+	virtual int                GetLastFunctionId() const;
 	virtual asIScriptFunction *GetFunctionById(int funcId) const;
 
 	// Type identification
@@ -199,7 +206,7 @@ public:
 	virtual void  SetScriptObjectUserDataCleanupCallback(asCLEANSCRIPTOBJECTFUNC_t callback, asPWORD type);
 
 	// Exception handling
-	virtual int SetTranslateAppExceptionCallback(asSFuncPtr callback, void *param, int callConv);
+	virtual int SetTranslateAppExceptionCallback(const asSFuncPtr &callback, void *param, int callConv);
 
 //===========================================================
 // internal methods
@@ -269,6 +276,7 @@ public:
 
 	int AddBehaviourFunction(asCScriptFunction &func, asSSystemFunctionInterface &internal);
 
+	int ParseNamespace(const char* ns, asCArray<asCString>& nsStrings) const;
 	asCString GetFunctionDeclaration(int funcId);
 
 	asCScriptFunction *GetScriptFunction(int funcId) const;
@@ -292,13 +300,14 @@ public:
 	void               RemoveFromTypeIdMap(asCTypeInfo *type);
 
 	bool               IsTemplateType(const char *name) const;
+	bool               IsTemplateFn(const char *name) const;
+	int                GetTemplateFunctionInstance(asCScriptFunction* templateFunction, const asCArray<asCDataType>& subTypes);
 	int                SetTemplateRestrictions(asCObjectType *templateType, asCScriptFunction *func, const char *caller, const char *decl);
 	asCObjectType     *GetTemplateInstanceType(asCObjectType *templateType, asCArray<asCDataType> &subTypes, asCModule *requestingModule);
-	asCScriptFunction *GenerateTemplateFactoryStub(asCObjectType *templateType, asCObjectType *templateInstanceType, int origFactoryId);
-	bool               GenerateNewTemplateFunction(asCObjectType *templateType, asCObjectType *templateInstanceType, asCScriptFunction *templateFunc, asCScriptFunction **newFunc);
-	asCFuncdefType    *GenerateNewTemplateFuncdef(asCObjectType *templateType, asCObjectType *templateInstanceType, asCFuncdefType *templateFuncdef);
-	asCDataType        DetermineTypeForTemplate(const asCDataType &orig, asCObjectType *tmpl, asCObjectType *ot);
-	bool               RequireTypeReplacement(asCDataType &type, asCObjectType *templateType);
+	asCScriptFunction *GenerateFactoryStubForTemplateObjectInstance(asCObjectType *templateType, asCObjectType *templateInstanceType, int origFactoryId);
+	bool               GenerateFunctionForTemplateObjectInstance(asCObjectType *templateType, asCObjectType *templateInstanceType, asCScriptFunction *templateFunc, asCScriptFunction **newFunc);
+	asCFuncdefType    *GenerateFuncdefForTemplateObjectInstance(asCObjectType *templateType, asCObjectType *templateInstanceType, asCFuncdefType *templateFuncdef);
+	asCDataType        DetermineTypeForTemplate(const asCDataType &orig, const asCArray<asCDataType>& templateSubTypes, const asCArray<asCDataType>& targetSubTypes, asCModule *mod, asCObjectType* tmpl, asCObjectType* ot);
 
 	asCModule         *FindNewOwnerForSharedType(asCTypeInfo *type, asCModule *mod);
 	asCModule         *FindNewOwnerForSharedFunc(asCScriptFunction *func, asCModule *mod);
@@ -306,6 +315,7 @@ public:
 	asCFuncdefType    *FindMatchingFuncdef(asCScriptFunction *func, asCModule *mod);
 
 	int                DetermineNameAndNamespace(const char *in_name, asSNameSpace *implicitNs, asCString &out_name, asSNameSpace *&out_ns) const;
+	asCTypeInfo       *GetTemplateSubTypeByName(const asCString &name);
 	
 	// Global property management
 	asCGlobalProperty *AllocateGlobalProperty();
@@ -334,6 +344,10 @@ public:
 	// TODO: memory savings: Since there can be only one property with the same name a simpler symbol table should be used for global props
 	asCSymbolTable<asCGlobalProperty> registeredGlobalProps;   // increases ref count
 	asCSymbolTable<asCScriptFunction> registeredGlobalFuncs;
+	// The template global function instances will be stored in this array
+	asCArray<asCScriptFunction*>      generatedTemplateFunctionInstances;  // increases ref count
+	// This array contains a list of registered template global functions
+	asCArray<asCScriptFunction*>      registeredTemplateGlobalFuncs;
 	asCArray<asCFuncdefType *>        registeredFuncDefs;      // doesn't increase ref count
 	asCArray<asCObjectType *>         registeredTemplateTypes; // doesn't increase ref count
 	asIStringFactory                 *stringFactory;
@@ -344,7 +358,7 @@ public:
 	asCMap<asSNameSpaceNamePair, asCTypeInfo*> allRegisteredTypes; // increases ref count
 
 	// Dummy types used to name the subtypes in the template objects
-	asCArray<asCTypeInfo *>        templateSubTypes;
+	asCArray<asCTypeInfo *>        registeredTemplateSubTypes;
 
 	// Store information about template types
 	// This list will contain all instances of templates, both registered specialized
@@ -425,10 +439,12 @@ public:
 	// Message callback
 	bool                        msgCallback;
 	asSSystemFunctionInterface  msgCallbackFunc;
+	asSFuncPtr                  msgCallbackOriginalFuncPtr;
+	asDWORD                     msgCallbackOriginalCallConv;
 	void                       *msgCallbackObj;
 	struct preMessage_t
 	{
-		preMessage_t() { isSet = false; }
+		preMessage_t() { isSet = false; r = c = 0; }
 		bool      isSet;
 		asCString message;
 		asCString scriptname;
@@ -437,7 +453,7 @@ public:
 	} preMessage;
 
 	// JIt compilation
-	asIJITCompiler             *jitCompiler;
+	asIJITCompilerAbstract *jitCompiler;
 
 	// Namespaces
 	// These are shared between all entities and are
@@ -489,7 +505,7 @@ public:
 		bool   expandDefaultArrayToTemplate;
 		bool   autoGarbageCollect;
 		bool   disallowGlobalVars;
-		bool   alwaysImplDefaultConstruct;
+		asUINT alwaysImplDefaultConstruct;
 		int    compilerWarnings;
 		bool   disallowValueAssignForRefType;
 		// TODO: 3.0.0: Remove the alterSyntaxNamedArgs
@@ -504,6 +520,15 @@ public:
 		asUINT genericCallMode;
 		asUINT initCallStackSize;
 		asUINT maxCallStackSize;
+		bool   ignoreDuplicateSharedIntf;
+		bool   noDebugOutput;
+		bool   disableScriptClassGC;
+		asUINT jitInterfaceVersion;
+		asUINT alwaysImplDefaultCopy;
+		asUINT alwaysImplDefaultCopyConstruct;
+		asUINT memberInitMode;
+		asUINT boolConversionMode;
+		bool   foreachSupport;
 	} ep;
 
 	// Callbacks

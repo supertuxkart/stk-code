@@ -1,0 +1,159 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<CodeBlocks_project_file>
+	<FileVersion major="1" minor="6" />
+	<Project>
+		<Option title="Static library" />
+		<Option pch_mode="0" />
+		<Option compiler="gcc" />
+		<Build>
+			<Target title="Debug">
+				<Option output="../../lib/libangelscriptd.a" prefix_auto="0" extension_auto="0" />
+				<Option working_dir="" />
+				<Option object_output="objs/debug" />
+				<Option type="2" />
+				<Option compiler="gcc" />
+				<Option createDefFile="1" />
+				<Option projectResourceIncludeDirsRelation="2" />
+				<Compiler>
+					<Add option="-g" />
+					<Add option="-m32" />
+					<Add option="-DANGELSCRIPT_EXPORT" />
+					<Add option="-D_DEBUG" />
+				</Compiler>
+			</Target>
+			<Target title="Debug 64">
+				<Option output="../../lib/libangelscript64d.a" prefix_auto="0" extension_auto="0" />
+				<Option working_dir="" />
+				<Option object_output="objs/debug_64" />
+				<Option type="2" />
+				<Option compiler="gcc" />
+				<Option createDefFile="1" />
+				<Option projectResourceIncludeDirsRelation="2" />
+				<Compiler>
+					<Add option="-g" />
+					<Add option="-m64" />
+					<Add option="-DANGELSCRIPT_EXPORT" />
+					<Add option="-D_DEBUG" />
+				</Compiler>
+			</Target>
+			<Target title="Release">
+				<Option output="../../lib/libangelscript.a" prefix_auto="0" extension_auto="0" />
+				<Option working_dir="" />
+				<Option object_output="objs/release" />
+				<Option type="2" />
+				<Option compiler="gcc" />
+				<Option createDefFile="1" />
+				<Option projectResourceIncludeDirsRelation="2" />
+				<Compiler>
+					<Add option="-O3" />
+					<Add option="-m32" />
+					<Add option="-DANGELSCRIPT_EXPORT" />
+					<Add option="-DNDEBUG" />
+				</Compiler>
+			</Target>
+			<Target title="Release 64">
+				<Option output="../../lib/libangelscript64.a" prefix_auto="0" extension_auto="0" />
+				<Option working_dir="" />
+				<Option object_output="objs/release_64" />
+				<Option type="2" />
+				<Option compiler="gcc" />
+				<Option createDefFile="1" />
+				<Option projectResourceIncludeDirsRelation="2" />
+				<Compiler>
+					<Add option="-O3" />
+					<Add option="-m64" />
+					<Add option="-DANGELSCRIPT_EXPORT" />
+					<Add option="-DNDEBUG" />
+				</Compiler>
+			</Target>
+		</Build>
+		<VirtualTargets>
+			<Add alias="All" targets="Debug;Debug 64;Release;Release 64;" />
+		</VirtualTargets>
+		<Compiler>
+			<Add option="-std=c++11" />
+			<Add option="-Wall" />
+			<Add option="-fexceptions" />
+			<Add option="-fno-strict-aliasing" />
+		</Compiler>
+		<Unit filename="../../include/angelscript.h" />
+		<Unit filename="../../source/as_array.h" />
+		<Unit filename="../../source/as_atomic.cpp" />
+		<Unit filename="../../source/as_atomic.h" />
+		<Unit filename="../../source/as_builder.cpp" />
+		<Unit filename="../../source/as_builder.h" />
+		<Unit filename="../../source/as_bytecode.cpp" />
+		<Unit filename="../../source/as_bytecode.h" />
+		<Unit filename="../../source/as_callfunc.cpp" />
+		<Unit filename="../../source/as_callfunc.h" />
+		<Unit filename="../../source/as_callfunc_arm.cpp" />
+		<Unit filename="../../source/as_callfunc_mips.cpp" />
+		<Unit filename="../../source/as_callfunc_ppc.cpp" />
+		<Unit filename="../../source/as_callfunc_ppc_64.cpp" />
+		<Unit filename="../../source/as_callfunc_sh4.cpp" />
+		<Unit filename="../../source/as_callfunc_x64_gcc.cpp" />
+		<Unit filename="../../source/as_callfunc_x64_mingw.cpp" />
+		<Unit filename="../../source/as_callfunc_x64_msvc.cpp" />
+		<Unit filename="../../source/as_callfunc_x86.cpp" />
+		<Unit filename="../../source/as_callfunc_xenon.cpp" />
+		<Unit filename="../../source/as_compiler.cpp" />
+		<Unit filename="../../source/as_compiler.h" />
+		<Unit filename="../../source/as_config.h" />
+		<Unit filename="../../source/as_configgroup.cpp" />
+		<Unit filename="../../source/as_configgroup.h" />
+		<Unit filename="../../source/as_context.cpp" />
+		<Unit filename="../../source/as_context.h" />
+		<Unit filename="../../source/as_criticalsection.h" />
+		<Unit filename="../../source/as_datatype.cpp" />
+		<Unit filename="../../source/as_datatype.h" />
+		<Unit filename="../../source/as_debug.h" />
+		<Unit filename="../../source/as_gc.cpp" />
+		<Unit filename="../../source/as_gc.h" />
+		<Unit filename="../../source/as_generic.cpp" />
+		<Unit filename="../../source/as_generic.h" />
+		<Unit filename="../../source/as_globalproperty.cpp" />
+		<Unit filename="../../source/as_map.h" />
+		<Unit filename="../../source/as_memory.cpp" />
+		<Unit filename="../../source/as_memory.h" />
+		<Unit filename="../../source/as_module.cpp" />
+		<Unit filename="../../source/as_module.h" />
+		<Unit filename="../../source/as_objecttype.cpp" />
+		<Unit filename="../../source/as_objecttype.h" />
+		<Unit filename="../../source/as_outputbuffer.cpp" />
+		<Unit filename="../../source/as_outputbuffer.h" />
+		<Unit filename="../../source/as_parser.cpp" />
+		<Unit filename="../../source/as_parser.h" />
+		<Unit filename="../../source/as_property.h" />
+		<Unit filename="../../source/as_restore.cpp" />
+		<Unit filename="../../source/as_restore.h" />
+		<Unit filename="../../source/as_scriptcode.cpp" />
+		<Unit filename="../../source/as_scriptcode.h" />
+		<Unit filename="../../source/as_scriptengine.cpp" />
+		<Unit filename="../../source/as_scriptengine.h" />
+		<Unit filename="../../source/as_scriptfunction.cpp" />
+		<Unit filename="../../source/as_scriptfunction.h" />
+		<Unit filename="../../source/as_scriptnode.cpp" />
+		<Unit filename="../../source/as_scriptnode.h" />
+		<Unit filename="../../source/as_scriptobject.cpp" />
+		<Unit filename="../../source/as_scriptobject.h" />
+		<Unit filename="../../source/as_string.cpp" />
+		<Unit filename="../../source/as_string.h" />
+		<Unit filename="../../source/as_string_util.cpp" />
+		<Unit filename="../../source/as_string_util.h" />
+		<Unit filename="../../source/as_texts.h" />
+		<Unit filename="../../source/as_thread.cpp" />
+		<Unit filename="../../source/as_thread.h" />
+		<Unit filename="../../source/as_tokendef.h" />
+		<Unit filename="../../source/as_tokenizer.cpp" />
+		<Unit filename="../../source/as_tokenizer.h" />
+		<Unit filename="../../source/as_typeinfo.cpp" />
+		<Unit filename="../../source/as_typeinfo.h" />
+		<Unit filename="../../source/as_variablescope.cpp" />
+		<Unit filename="../../source/as_variablescope.h" />
+		<Extensions>
+			<code_completion />
+			<envvars />
+			<debugger />
+		</Extensions>
+	</Project>
+</CodeBlocks_project_file>

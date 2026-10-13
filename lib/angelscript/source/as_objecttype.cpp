@@ -1,6 +1,6 @@
 /*
    AngelCode Scripting Library
-   Copyright (c) 2003-2017 Andreas Jonsson
+   Copyright (c) 2003-2025 Andreas Jonsson
 
    This software is provided 'as-is', without any express or implied 
    warranty. In no event will the authors be held liable for any 
@@ -337,7 +337,7 @@ asUINT asCObjectType::GetPropertyCount() const
 }
 
 // interface
-int asCObjectType::GetProperty(asUINT index, const char **out_name, int *out_typeId, bool *out_isPrivate, bool *out_isProtected, int *out_offset, bool *out_isReference, asDWORD *out_accessMask, int *out_compositeOffset, bool *out_isCompositeIndirect) const
+int asCObjectType::GetProperty(asUINT index, const char **out_name, int *out_typeId, bool *out_isPrivate, bool *out_isProtected, int *out_offset, bool *out_isReference, asDWORD *out_accessMask, int *out_compositeOffset, bool *out_isCompositeIndirect, bool *out_isConst) const
 {
 	if( index >= properties.GetLength() )
 		return asINVALID_ARG;
@@ -361,6 +361,8 @@ int asCObjectType::GetProperty(asUINT index, const char **out_name, int *out_typ
 		*out_compositeOffset = prop->compositeOffset;
 	if (out_isCompositeIndirect)
 		*out_isCompositeIndirect = prop->isCompositeIndirect;
+	if (out_isConst)
+		*out_isConst = prop->type.IsReadOnly();
 
 	return 0;
 }

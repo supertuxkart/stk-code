@@ -1,6 +1,6 @@
 /*
    AngelCode Scripting Library
-   Copyright (c) 2003-2019 Andreas Jonsson
+   Copyright (c) 2003-2025 Andreas Jonsson
 
    This software is provided 'as-is', without any express or implied
    warranty. In no event will the authors be held liable for any
@@ -1388,7 +1388,9 @@ bool asCByteCode::IsTempRegUsed(asCByteInstruction *curr)
 			curr->op == asBC_JS       ||
 			curr->op == asBC_JNS      ||
 			curr->op == asBC_JP       ||
-			curr->op == asBC_JNP      )
+			curr->op == asBC_JNP      ||
+			curr->op == asBC_JMPP     || // TODO: JMP and JMPP cannot be said to read the temporary register. Need to follow the branch to determine what happens next
+			curr->op == asBC_JMP ) 
 			return true;
 
 		// Which instructions overwrite the register or discard the value?
@@ -1409,16 +1411,6 @@ bool asCByteCode::IsTempRegUsed(asCByteInstruction *curr)
 			curr->op == asBC_TNS       ||
 			curr->op == asBC_TP        ||
 			curr->op == asBC_TNP       ||
-			curr->op == asBC_JS        ||
-			curr->op == asBC_JNS       ||
-			curr->op == asBC_JP        ||
-			curr->op == asBC_JNP       ||
-			curr->op == asBC_JMPP      ||
-			curr->op == asBC_JMP       ||
-			curr->op == asBC_JZ        ||
-			curr->op == asBC_JNZ       ||
-			curr->op == asBC_JLowZ     ||
-			curr->op == asBC_JLowNZ    ||
 			curr->op == asBC_CMPi      ||
 			curr->op == asBC_CMPu      ||
 			curr->op == asBC_CMPf      ||
@@ -1426,7 +1418,6 @@ bool asCByteCode::IsTempRegUsed(asCByteInstruction *curr)
 			curr->op == asBC_CMPIi     ||
 			curr->op == asBC_CMPIu     ||
 			curr->op == asBC_CMPIf     ||
-			curr->op == asBC_LABEL     ||
 			curr->op == asBC_LoadThisR ||
 			curr->op == asBC_LoadRObjR ||
 			curr->op == asBC_LoadVObjR )
@@ -1585,6 +1576,7 @@ void asCByteCode::ExtractTryCatchInfo(asCScriptFunction *outFunc)
 			asSTryCatchInfo info;
 			info.tryPos    = pos;
 			info.catchPos  = *ARG_DW(instr->arg);
+			info.stackSize = asUINT(instr->stackSize);
 			outFunc->scriptData->tryCatchInfo.PushLast(info);
 		}
 
@@ -2136,6 +2128,9 @@ void asCByteCode::PostProcess()
 #ifdef AS_DEBUG
 void asCByteCode::DebugOutput(const char *name, asCScriptFunction *func)
 {
+	if (engine->ep.noDebugOutput)
+		return;
+
 #ifndef __MINGW32__
 	// _mkdir is broken on mingw
 	_mkdir("AS_DEBUG");
@@ -2181,59 +2176,12 @@ void asCByteCode::DebugOutput(const char *name, asCScriptFunction *func)
 	fprintf(file, "Variables: \n");
 	for( n = 0; n < func->scriptData->variables.GetLength(); n++ )
 	{
-		int idx = func->scriptData->objVariablePos.IndexOf(func->scriptData->variables[n]->stackOffset);
-		bool isOnHeap = asUINT(idx) < func->scriptData->objVariablesOnHeap ? true : false;
+		bool isOnHeap = func->scriptData->variables[n]->onHeap;
 		fprintf(file, " %.3d: %s%s %s\n", func->scriptData->variables[n]->stackOffset, isOnHeap ? "(heap) " : "", func->scriptData->variables[n]->type.Format(func->nameSpace, true).AddressOf(), func->scriptData->variables[n]->name.AddressOf());
 	}
-	asUINT offset = 0;
 	if( func->objectType )
-	{
 		fprintf(file, " %.3d: %s this\n", 0, func->objectType->name.AddressOf());
-		offset -= AS_PTR_SIZE;
-	}
-	for( n = 0; n < func->parameterTypes.GetLength(); n++ )
-	{
-		bool found = false;
-		for( asUINT v = 0; v < func->scriptData->variables.GetLength(); v++ )
-		{
-			if( func->scriptData->variables[v]->stackOffset == (int)offset )
-			{
-				found = true;
-				break;
-			}
-		}
-		if( !found )
-		{
-			int idx = func->scriptData->objVariablePos.IndexOf(offset);
-			bool isOnHeap = asUINT(idx) < func->scriptData->objVariablesOnHeap ? true : false;
-			fprintf(file, " %.3d: %s%s {noname param}\n", offset, isOnHeap ? "(heap) " : "", func->parameterTypes[n].Format(func->nameSpace, true).AddressOf());
-		}
 
-		offset -= func->parameterTypes[n].GetSizeOnStackDWords();
-	}
-	for( n = 0; n < func->scriptData->objVariablePos.GetLength(); n++ )
-	{
-		bool found = false;
-		for( asUINT v = 0; v < func->scriptData->variables.GetLength(); v++ )
-		{
-			if( func->scriptData->variables[v]->stackOffset == func->scriptData->objVariablePos[n] )
-			{
-				found = true;
-				break;
-			}
-		}
-		if( !found )
-		{
-			if( func->scriptData->objVariableTypes[n] )
-			{
-				int idx = func->scriptData->objVariablePos.IndexOf(func->scriptData->objVariablePos[n]);
-				bool isOnHeap = asUINT(idx) < func->scriptData->objVariablesOnHeap ? true : false;
-				fprintf(file, " %.3d: %s%s {noname}\n", func->scriptData->objVariablePos[n], isOnHeap ? "(heap) " : "", func->scriptData->objVariableTypes[n]->name.AddressOf());
-			}
-			else
-				fprintf(file, " %.3d: null handle {noname}\n", func->scriptData->objVariablePos[n]);
-		}
-	}
 	fprintf(file, "\n\n");
 
 	bool invalidStackSize = false;
@@ -2922,6 +2870,11 @@ int asCByteCode::InstrDOUBLE(asEBCInstr bc, double param)
 	last->stackInc = asBCInfo[bc].stackInc;
 
 	return last->stackInc;
+}
+
+asCByteInstruction* asCByteCode::GetFirstInstr()
+{
+	return first;
 }
 
 int asCByteCode::GetLastInstr()

@@ -1,6 +1,6 @@
 /*
    AngelCode Scripting Library
-   Copyright (c) 2003-2019 Andreas Jonsson
+   Copyright (c) 2003-2023 Andreas Jonsson
 
    This software is provided 'as-is', without any express or implied 
    warranty. In no event will the authors be held liable for any 
@@ -209,7 +209,7 @@ asIScriptObject *ScriptObjectCopyFactory(const asCObjectType *objType, void *ori
 	return ptr;
 }
 
-#ifdef AS_MAX_PORTABILITY
+#if defined(AS_MAX_PORTABILITY) || defined(AS_NO_CLASS_METHODS)
 
 static void ScriptObject_AddRef_Generic(asIScriptGeneric *gen)
 {
@@ -289,7 +289,7 @@ void RegisterScriptObject(asCScriptEngine *engine)
 	engine->scriptTypeBehaviours.engine = engine;
 	engine->scriptTypeBehaviours.flags = asOBJ_SCRIPT_OBJECT | asOBJ_REF | asOBJ_GC;
 	engine->scriptTypeBehaviours.name = "$obj";
-#ifndef AS_MAX_PORTABILITY
+#if !defined(AS_MAX_PORTABILITY) && !defined(AS_NO_CLASS_METHODS)
 	r = engine->RegisterBehaviourToObjectType(&engine->scriptTypeBehaviours, asBEHAVE_CONSTRUCT, "void f(int&in)", asFUNCTION(ScriptObject_Construct), asCALL_CDECL_OBJLAST, 0); asASSERT( r >= 0 );
 	r = engine->RegisterBehaviourToObjectType(&engine->scriptTypeBehaviours, asBEHAVE_ADDREF, "void f()", asMETHOD(asCScriptObject,AddRef), asCALL_THISCALL, 0); asASSERT( r >= 0 );
 	r = engine->RegisterBehaviourToObjectType(&engine->scriptTypeBehaviours, asBEHAVE_RELEASE, "void f()", asMETHOD(asCScriptObject,Release), asCALL_THISCALL, 0); asASSERT( r >= 0 );

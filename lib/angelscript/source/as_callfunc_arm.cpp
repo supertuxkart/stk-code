@@ -1,6 +1,6 @@
 /*
    AngelCode Scripting Library
-   Copyright (c) 2003-2015 Andreas Jonsson
+   Copyright (c) 2003-2025 Andreas Jonsson
 
    This software is provided 'as-is', without any express or implied
    warranty. In no event will the authors be held liable for any
@@ -294,7 +294,7 @@ extern "C" asQWORD armFuncR0R1      (const asDWORD *, int, asFUNCTION_t, asDWORD
 extern "C" asQWORD armFuncObjLast   (const asDWORD *, int, asFUNCTION_t, asDWORD obj);
 extern "C" asQWORD armFuncR0ObjLast (const asDWORD *, int, asFUNCTION_t, asDWORD r0, asDWORD obj);
 
-asQWORD CallSystemFunctionNative(asCContext *context, asCScriptFunction *descr, void *obj, asDWORD *args, void *retPointer, asQWORD &/*retQW2*/, void *secondObject)
+asQWORD CallSystemFunctionNative(asCContext *context, asCScriptFunction *descr, void *obj, asDWORD *args, void *retPointer, asQWORD &retQW2, void *secondObject)
 {
 	asCScriptEngine *engine = context->m_engine;
 	asSSystemFunctionInterface *sysFunc = descr->sysFuncIntf;
@@ -339,7 +339,7 @@ asQWORD CallSystemFunctionNative(asCContext *context, asCScriptFunction *descr, 
 		// TODO: runtime optimize: This check should be done in PrepareSystemFunction
 		if ( !( descr->returnType.GetTypeInfo()->flags & COMPLEX_RETURN_MASK )		&&
 			  ( descr->returnType.GetTypeInfo()->flags & asOBJ_APP_CLASS_ALLFLOATS )	&&
-			    descr->returnType.GetSizeInMemoryBytes() <= 8 )
+			    descr->returnType.GetSizeInMemoryBytes() <= 16 )
 			callConv--;
 		
 		// The return is made in memory
@@ -514,6 +514,35 @@ asQWORD CallSystemFunctionNative(asCContext *context, asCScriptFunction *descr, 
 				
 				continue;
 			}
+			else if (descr->parameterTypes[n].GetTokenType() == ttQuestion)
+			{
+				// Copy the reference and the type id as two separate arguments
+				// Copy the value directly to "r" registers or the stack, checking for alignment
+				
+				// First the reference...
+				if (paramSize < 4)
+				{
+					paramBuffer[dpos++] = args[spos++];
+					paramSize += 1;
+				}
+				else
+				{
+					paramBuffer[stackPos++] = args[spos++];
+					stackSize += 1;
+				}
+
+				// ...then the type id
+				if (paramSize < 4)
+				{
+					paramBuffer[dpos++] = args[spos++];
+					paramSize += 1;
+				}
+				else
+				{
+					paramBuffer[stackPos++] = args[spos++];
+					stackSize += 1;
+				}
+			}
 			else
 			{
 				// Copy the value directly to "r" registers or the stack, checking for alignment
@@ -639,6 +668,8 @@ asQWORD CallSystemFunctionNative(asCContext *context, asCScriptFunction *descr, 
 
 		if ( sysFunc->hostReturnSize > 1 )
 			retQW = *( (asQWORD*)&paramBuffer[VFP_OFFSET] );
+		if (sysFunc->hostReturnSize > 2)
+			retQW2 = *((asQWORD*)&paramBuffer[VFP_OFFSET + 2]);
 	}
 	else if ( descr->returnType.IsObject() )
 	{

@@ -1,6 +1,6 @@
 //
 //  AngelCode Scripting Library
-//  Copyright (c) 2020-2021 Andreas Jonsson
+//  Copyright (c) 2020-2024 Andreas Jonsson
 //
 //  This software is provided 'as-is', without any express or implied
 //  warranty. In no event will the authors be held liable for any
@@ -50,6 +50,7 @@
 .global CallARM64Float
 .global CallARM64
 
+#if !defined(__MACH__)
 .type GetHFAReturnDouble, %function
 .type GetHFAReturnFloat, %function
 .type CallARM64Ret128, %function
@@ -57,11 +58,12 @@
 .type CallARM64Double, %function
 .type CallARM64Float, %function
 .type CallARM64, %function
+#endif /* __MACH__ */
 
 .align  2
 GetHFAReturnDouble:
     adr     x9, populateDoubles
-    sub     x9, x9, x1, lsr 1 // x9 -= returnSize >> 1; (/2 because double is 2x instruction size)
+    sub     x9, x9, x2, lsr 1 // x9 -= returnSize >> 1; (/2 because double is 2x instruction size)
     br      x9
 
     str     d3, [x0, #0x18]

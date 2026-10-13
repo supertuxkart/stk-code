@@ -1,6 +1,6 @@
 /*
    AngelCode Scripting Library
-   Copyright (c) 2003-2021 Andreas Jonsson
+   Copyright (c) 2003-2025 Andreas Jonsson
 
    This software is provided 'as-is', without any express or implied
    warranty. In no event will the authors be held liable for any
@@ -71,6 +71,19 @@ int DetectCallingConvention(bool isMethod, const asSFuncPtr &ptr, int callConv, 
 	}
 
 	asDWORD base = callConv;
+	if (base == asCALL_CDECL_OBJFIRST || base == asCALL_CDECL_OBJLAST)
+	{
+		internal->callConv =
+			base == asCALL_CDECL_OBJFIRST ? ICC_CDECL_OBJFIRST : ICC_CDECL_OBJLAST;
+		if (!isMethod)
+		{
+			if (auxiliary == 0)
+				return asINVALID_ARG;
+			internal->auxiliary = auxiliary;
+		}
+		return 0;
+	}
+
 	if( !isMethod )
 	{
 		if( base == asCALL_CDECL )
@@ -151,11 +164,7 @@ int DetectCallingConvention(bool isMethod, const asSFuncPtr &ptr, int callConv, 
 		}
 		else
 #endif
-		if( base == asCALL_CDECL_OBJLAST )
-			internal->callConv = ICC_CDECL_OBJLAST;
-		else if( base == asCALL_CDECL_OBJFIRST )
-			internal->callConv = ICC_CDECL_OBJFIRST;
-		else if (base == asCALL_GENERIC)
+		if (base == asCALL_GENERIC)
 		{
 			internal->callConv = ICC_GENERIC_METHOD;
 			internal->auxiliary = auxiliary;
@@ -264,7 +273,7 @@ int PrepareSystemFunction(asCScriptFunction *func, asSSystemFunctionInterface *i
 	// Registered types have special flags that determine how they are returned
 	else if( func->returnType.IsObject() )
 	{
-		asDWORD objType = func->returnType.GetTypeInfo()->flags;
+		asQWORD objType = func->returnType.GetTypeInfo()->flags;
 
 		// Only value types can be returned by value
 		asASSERT( objType & asOBJ_VALUE );
@@ -296,7 +305,9 @@ int PrepareSystemFunction(asCScriptFunction *func, asSSystemFunctionInterface *i
 			}
 			else
 			{
-#ifdef HAS_128_BIT_PRIMITIVES
+#ifdef RETURN_VALUE_MAX_SIZE
+				if( func->returnType.GetSizeInMemoryDWords() > RETURN_VALUE_MAX_SIZE )
+#elif defined(HAS_128_BIT_PRIMITIVES)
 				if( func->returnType.GetSizeInMemoryDWords() > 4 )
 #else
 				if( func->returnType.GetSizeInMemoryDWords() > 2 )
@@ -308,10 +319,28 @@ int PrepareSystemFunction(asCScriptFunction *func, asSSystemFunctionInterface *i
 				else
 				{
 					internal->hostReturnInMemory = false;
-					internal->hostReturnSize     = func->returnType.GetSizeInMemoryDWords();
+					internal->hostReturnSize = func->returnType.GetSizeInMemoryDWords();
 #ifdef SPLIT_OBJS_BY_MEMBER_TYPES
-					if( func->returnType.GetTypeInfo()->flags & asOBJ_APP_CLASS_ALLFLOATS )
+					if (func->returnType.GetTypeInfo()->flags & asOBJ_APP_CLASS_ALLFLOATS)
+					{
 						internal->hostReturnFloat = true;
+#ifdef AS_RISCV64
+						// TODO: There shouldn't be platform specific code in this file. Need to have a better way of controlling this
+						//       Perhaps by having a specific RETURN_MAX_FLOAT_REGS in as_config
+						// On RISC-V 64bit & Linux only structures with two float or doubles can be returned in fa0:fa1
+						if (!(func->returnType.GetTypeInfo()->flags & asOBJ_APP_CLASS_ALIGN8) && func->returnType.GetSizeInMemoryDWords() > 2)
+						{
+							// Since asOBJ_APP_ALIGN8 is not set we assume it is floats, and only 2 floats can be returned in registers
+							// In this case the object will not be split by members, and instead it will be returned in a0:a1
+							internal->hostReturnFloat = false;
+						}
+						// On RISC-V 64bit & Linux floats within unions are not returned in fa0:fa1
+						if (func->returnType.GetTypeInfo()->flags & asOBJ_APP_CLASS_UNION)
+						{
+							internal->hostReturnFloat = false;
+						}
+#endif
+					}
 #endif
 				}
 
@@ -545,6 +574,11 @@ int CallSystemFunction(int id, asCContext *context)
 
 #else
 
+
+// TODO: cleanup: Should have only a single CallSystemFunctionNative function signature. However changing it requires retesting all different native platforms :(
+
+#ifndef RETURN_VALUE_MAX_SIZE
+
 //
 // CallSystemFunctionNative
 //
@@ -567,6 +601,28 @@ int CallSystemFunction(int id, asCContext *context)
 // The function should return the value that is returned in registers.
 asQWORD CallSystemFunctionNative(asCContext *context, asCScriptFunction *descr, void *obj, asDWORD *args, void *retPointer, asQWORD &retQW2, void *secondObj);
 
+#else
+
+//
+// CallSystemFunctionNative
+//
+// This function is implemented for each platform where the native calling conventions is supported.
+// See the various as_callfunc_xxx.cpp files for their implementation. It is responsible for preparing
+// the arguments for the function call, calling the function, and then retrieving the return value.
+//
+// Parameters:
+//
+// context    - This is the context that can be used to retrieve specific information from the engine
+// descr      - This is the script function object that holds the information on how to call the function
+// obj        - This is the object pointer, if the call is for a class method, otherwise it is null
+// args       - This is the function arguments, which are packed as in AngelScript
+// retPointer - This points to a the memory buffer where the return object is to be placed, if the function returns the value in memory rather than in registers
+// retQW      - This output parameter should be used if the function returns a value in registers. This is a pointer to an array of QWORDs
+// secondObj  - This is the object pointer that the proxy method should invoke its method on when the call convention is THISCALL_OBJFIRST/LAST
+void CallSystemFunctionNative(asCContext *context, asCScriptFunction *descr, void *obj, asDWORD *args, void *retPointer, asQWORD *retQW, void *secondObj);
+
+#endif
+
 
 int CallSystemFunction(int id, asCContext *context)
 {
@@ -578,8 +634,11 @@ int CallSystemFunction(int id, asCContext *context)
 	if( callConv == ICC_GENERIC_FUNC || callConv == ICC_GENERIC_METHOD )
 		return context->CallGeneric(descr);
 
-	asQWORD  retQW             = 0;
-	asQWORD  retQW2            = 0;
+#ifndef RETURN_VALUE_MAX_SIZE
+	asQWORD retQW[2] = { 0 };
+#else
+	asQWORD retQW[(RETURN_VALUE_MAX_SIZE + 1) / 2] = { 0 };
+#endif
 	asDWORD *args              = context->m_regs.stackPointer;
 	void    *retPointer        = 0;
 	int      popSize           = sysFunc->paramSize;
@@ -651,6 +710,10 @@ int CallSystemFunction(int id, asCContext *context)
 		
 		if( obj )
 		{
+			// For composition we need to add the offset and/or dereference the pointer
+			obj = (void*)((char*)obj + sysFunc->compositeOffset);
+			if (sysFunc->isCompositeIndirect) obj = *((void**)obj);
+
 			// Add the base offset for multiple inheritance
 #if (defined(__GNUC__) && (defined(AS_ARM64) || defined(AS_ARM) || defined(AS_MIPS))) || defined(AS_PSVITA)
 			// On GNUC + ARM the lsb of the offset is used to indicate a virtual function
@@ -677,6 +740,10 @@ int CallSystemFunction(int id, asCContext *context)
 				context->SetInternalException(TXT_NULL_POINTER_ACCESS);
 				return 0;
 			}
+
+			// For composition we need to add the offset and/or dereference the pointer
+			tempPtr = (void*)((char*)tempPtr + sysFunc->compositeOffset);
+			if (sysFunc->isCompositeIndirect) tempPtr = *((void**)tempPtr);
 
 			// Add the base offset for multiple inheritance
 #if (defined(__GNUC__) && (defined(AS_ARM64) || defined(AS_ARM) || defined(AS_MIPS))) || defined(AS_PSVITA)
@@ -720,17 +787,14 @@ int CallSystemFunction(int id, asCContext *context)
 		context->m_regs.objectType = descr->returnType.GetTypeInfo();
 	}
 
-	// For composition we need to add the offset and/or dereference the pointer
-	if(obj)
-	{
-		obj = (void*) ((char*) obj + sysFunc->compositeOffset);
-		if(sysFunc->isCompositeIndirect) obj = *((void**)obj);
-	}
-
 	context->m_callingSystemFunction = descr;
 	bool cppException = false;
 #ifdef AS_NO_EXCEPTIONS
-	retQW = CallSystemFunctionNative(context, descr, obj, args, sysFunc->hostReturnInMemory ? retPointer : 0, retQW2, secondObj);
+#ifndef RETURN_VALUE_MAX_SIZE
+	retQW[0] = CallSystemFunctionNative(context, descr, obj, args, sysFunc->hostReturnInMemory ? retPointer : 0, retQW[1], secondObj);
+#else
+	CallSystemFunctionNative(context, descr, obj, args, sysFunc->hostReturnInMemory ? retPointer : 0, retQW, secondObj);
+#endif
 #else
 	// This try/catch block is to catch potential exception that may
 	// be thrown by the registered function. The implementation of the
@@ -739,7 +803,11 @@ int CallSystemFunction(int id, asCContext *context)
 	// executed in case of an exception.
 	try
 	{
-		retQW = CallSystemFunctionNative(context, descr, obj, args, sysFunc->hostReturnInMemory ? retPointer : 0, retQW2, secondObj);
+#ifndef RETURN_VALUE_MAX_SIZE
+		retQW[0] = CallSystemFunctionNative(context, descr, obj, args, sysFunc->hostReturnInMemory ? retPointer : 0, retQW[1], secondObj);
+#else
+		CallSystemFunctionNative(context, descr, obj, args, sysFunc->hostReturnInMemory ? retPointer : 0, retQW, secondObj);
+#endif
 	}
 	catch(...)
 	{
@@ -755,62 +823,69 @@ int CallSystemFunction(int id, asCContext *context)
 	// Store the returned value in our stack
 	if( (descr->returnType.IsObject() || descr->returnType.IsFuncdef()) && !descr->returnType.IsReference() )
 	{
-		if( descr->returnType.IsObjectHandle() )
+		if (descr->returnType.IsObjectHandle())
 		{
 #if defined(AS_BIG_ENDIAN) && AS_PTR_SIZE == 1
 			// Since we're treating the system function as if it is returning a QWORD we are
-			// actually receiving the value in the high DWORD of retQW.
-			retQW >>= 32;
+			// actually receiving the value in the high DWORD of retQW[0].
+			retQW[0] >>= 32;
 #endif
 
-			context->m_regs.objectRegister = (void*)(asPWORD)retQW;
+			context->m_regs.objectRegister = (void*)(asPWORD)retQW[0];
 
-			if( sysFunc->returnAutoHandle && context->m_regs.objectRegister )
+			if (sysFunc->returnAutoHandle && context->m_regs.objectRegister)
 			{
-				asASSERT( !(descr->returnType.GetTypeInfo()->flags & asOBJ_NOCOUNT) );
+				asASSERT(!(descr->returnType.GetTypeInfo()->flags & asOBJ_NOCOUNT));
 				engine->CallObjectMethod(context->m_regs.objectRegister, CastToObjectType(descr->returnType.GetTypeInfo())->beh.addref);
 			}
 		}
-		else
+		else if (retPointer)
 		{
-			asASSERT( retPointer );
-
-			if( !sysFunc->hostReturnInMemory )
+			if (!sysFunc->hostReturnInMemory)
 			{
 				// Copy the returned value to the pointer sent by the script engine
-				if( sysFunc->hostReturnSize == 1 )
+				if (sysFunc->hostReturnSize == 1)
 				{
 #if defined(AS_BIG_ENDIAN) && AS_PTR_SIZE == 1
 					// Since we're treating the system function as if it is returning a QWORD we are
-					// actually receiving the value in the high DWORD of retQW.
-					retQW >>= 32;
+					// actually receiving the value in the high DWORD of retQW[0].
+					retQW[0] >>= 32;
 #endif
 
-					*(asDWORD*)retPointer = (asDWORD)retQW;
+					*(asDWORD*)retPointer = (asDWORD)retQW[0];
 				}
-				else if( sysFunc->hostReturnSize == 2 )
-					*(asQWORD*)retPointer = retQW;
-				else if( sysFunc->hostReturnSize == 3 )
+				else if (sysFunc->hostReturnSize == 2)
+					*(asQWORD*)retPointer = retQW[0];
+				else if (sysFunc->hostReturnSize == 3)
 				{
-					*(asQWORD*)retPointer         = retQW;
-					*(((asDWORD*)retPointer) + 2) = (asDWORD)retQW2;
+					*(asQWORD*)retPointer = retQW[0];
+					*(((asDWORD*)retPointer) + 2) = (asDWORD)retQW[1];
 				}
-				else // if( sysFunc->hostReturnSize == 4 )
+				else if( sysFunc->hostReturnSize == 4 )
 				{
-					*(asQWORD*)retPointer         = retQW;
-					*(((asQWORD*)retPointer) + 1) = retQW2;
+					*(asQWORD*)retPointer = retQW[0];
+					*(((asQWORD*)retPointer) + 1) = retQW[1];
+				}
+				else
+				{
+					memcpy(retPointer, retQW, sysFunc->hostReturnSize * sizeof(asDWORD));
 				}
 			}
 
-			if( context->m_status == asEXECUTION_EXCEPTION && !cppException )
+			if (context->m_status == asEXECUTION_EXCEPTION && !cppException)
 			{
 				// If the function raised a script exception it really shouldn't have
 				// initialized the object. However, as it is a soft exception there is
 				// no way for the application to not return a value, so instead we simply
 				// destroy it here, to pretend it was never created.
-				if(CastToObjectType(descr->returnType.GetTypeInfo())->beh.destruct )
+				if (CastToObjectType(descr->returnType.GetTypeInfo())->beh.destruct)
 					engine->CallObjectMethod(retPointer, CastToObjectType(descr->returnType.GetTypeInfo())->beh.destruct);
 			}
+		}
+		else
+		{
+			// Ths should not be possible
+			asASSERT(false);
 		}
 	}
 	else
@@ -820,8 +895,8 @@ int CallSystemFunction(int id, asCContext *context)
 		{
 #if defined(AS_BIG_ENDIAN)
 			// Since we're treating the system function as if it is returning a QWORD we are
-			// actually receiving the value in the high DWORD of retQW.
-			retQW >>= 32;
+			// actually receiving the value in the high DWORD of retQW[0].
+			retQW[0] >>= 32;
 
 			// Due to endian issues we need to handle return values that are
 			// less than a DWORD (32 bits) in size specially
@@ -833,7 +908,7 @@ int CallSystemFunction(int id, asCContext *context)
 				{
 					// 8 bits
 					asBYTE *val = (asBYTE*)&context->m_regs.valueRegister;
-					val[0] = (asBYTE)retQW;
+					val[0] = (asBYTE)retQW[0];
 					val[1] = 0;
 					val[2] = 0;
 					val[3] = 0;
@@ -847,7 +922,7 @@ int CallSystemFunction(int id, asCContext *context)
 				{
 					// 16 bits
 					asWORD *val = (asWORD*)&context->m_regs.valueRegister;
-					val[0] = (asWORD)retQW;
+					val[0] = (asWORD)retQW[0];
 					val[1] = 0;
 					val[2] = 0;
 					val[3] = 0;
@@ -857,17 +932,17 @@ int CallSystemFunction(int id, asCContext *context)
 				{
 					// 32 bits
 					asDWORD *val = (asDWORD*)&context->m_regs.valueRegister;
-					val[0] = (asDWORD)retQW;
+					val[0] = (asDWORD)retQW[0];
 					val[1] = 0;
 				}
 				break;
 			}
 #else
-			*(asDWORD*)&context->m_regs.valueRegister = (asDWORD)retQW;
+			*(asDWORD*)&context->m_regs.valueRegister = (asDWORD)retQW[0];
 #endif
 		}
 		else
-			context->m_regs.valueRegister = retQW;
+			context->m_regs.valueRegister = retQW[0];
 	}
 
 	// Clean up arguments

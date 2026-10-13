@@ -1,6 +1,6 @@
 /*
    AngelCode Scripting Library
-   Copyright (c) 2003-2013 Andreas Jonsson
+   Copyright (c) 2003-2024 Andreas Jonsson
 
    This software is provided 'as-is', without any express or implied 
    warranty. In no event will the authors be held liable for any 
@@ -46,6 +46,8 @@ template <class KEY, class VAL> class asCMap
 public:
 	asCMap();
 	~asCMap();
+	asCMap(const asCMap&);
+	asCMap& operator=(const asCMap&);
 
 	int   Insert(const KEY &key, const VAL &value);
 	int   Insert(asSMapNode<KEY,VAL> *node);
@@ -74,9 +76,6 @@ public:
 	int CheckIntegrity(asSMapNode<KEY,VAL> *node) const;
 
 protected:
-	// Don't allow value assignment
-	asCMap &operator=(const asCMap &) { return *this; }
-
 	void BalanceInsert(asSMapNode<KEY,VAL> *node);
 	void BalanceErase(asSMapNode<KEY,VAL> *child, asSMapNode<KEY,VAL> *parent);
 
@@ -128,6 +127,29 @@ template <class KEY, class VAL>
 asCMap<KEY, VAL>::~asCMap()
 {
 	EraseAll();
+}
+
+template <class KEY, class VAL>
+asCMap<KEY, VAL>::asCMap(const asCMap<KEY, VAL>& other)
+{
+	root = 0;
+	count = 0;
+	*this = other;
+}
+
+template <class KEY, class VAL>
+asCMap<KEY, VAL>& asCMap<KEY, VAL>::operator=(const asCMap<KEY, VAL>& other)
+{
+	EraseAll();
+	asSMapNode<KEY, VAL>* node = 0;
+	if (other.MoveFirst(&node))
+	{
+		Insert(node->key, node->value);
+		while (other.MoveNext(&node, node))
+			Insert(node->key, node->value);
+	}
+
+	return *this;
 }
 
 template <class KEY, class VAL>
