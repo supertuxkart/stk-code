@@ -105,7 +105,7 @@ set(ANGELSCRIPT_SOURCE
     ../../source/as_variablescope.cpp
 )
 
-if(MSVC AND CMAKE_CL_64)
+if(MSVC AND CMAKE_CL_64 AND NOT ${ARCHFLAGS} MATCHES "^aarch64")
     enable_language(ASM_MASM)
     if(CMAKE_ASM_MASM_COMPILER_WORKS)
         set(ANGELSCRIPT_SOURCE ${ANGELSCRIPT_SOURCE} ../../source/as_callfunc_x64_msvc_asm.asm)
