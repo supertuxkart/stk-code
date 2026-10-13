@@ -51,13 +51,13 @@
 .global CallARM64
 
 #if !defined(__MACH__)
-.type GetHFAReturnDouble, %function
-.type GetHFAReturnFloat, %function
-.type CallARM64Ret128, %function
-.type CallARM64RetInMemory, %function
-.type CallARM64Double, %function
-.type CallARM64Float, %function
-.type CallARM64, %function
+.type GetHFAReturnDouble, @function
+.type GetHFAReturnFloat, @function
+.type CallARM64Ret128, @function
+.type CallARM64RetInMemory, @function
+.type CallARM64Double, @function
+.type CallARM64Float, @function
+.type CallARM64, @function
 #endif /* __MACH__ */
 
 .align  2
