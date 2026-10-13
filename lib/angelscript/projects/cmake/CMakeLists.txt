@@ -118,7 +118,13 @@ if(${ARCHFLAGS} MATCHES "^arm")
     enable_language(ASM)
     if(CMAKE_ASM_COMPILER_WORKS)
         set(ANGELSCRIPT_SOURCE ${ANGELSCRIPT_SOURCE} ../../source/as_callfunc_arm.cpp ../../source/as_callfunc_arm_gcc.S)
+
+    if(COMPILER_SUPPORTS_MIMPLICIT_IT)
         set_property(SOURCE ../../source/as_callfunc_arm_gcc.S APPEND PROPERTY COMPILE_FLAGS " -Wa,-mimplicit-it=always")
+    else()
+        set_property(SOURCE ../../source/as_callfunc_arm_gcc.S APPEND PROPERTY COMPILE_FLAGS "")
+    endif()
+    
     else()
         message(FATAL ERROR "ARM target requires a working assembler")
     endif()
