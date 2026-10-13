@@ -47,6 +47,7 @@ enum QueryPerf
     Q_POINTLIGHTS,
     Q_SSAO,
     Q_LIGHTSCATTER,
+    Q_BLURSCATTER,
     Q_GLOW,
     Q_COMBINE_DIFFUSE_COLOR,
     Q_SKYBOX,
