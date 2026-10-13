@@ -50,7 +50,7 @@
 .global CallARM64Float
 .global CallARM64
 
-#if !defined(__MACH__)
+#if defined(__ELF__)
 .type GetHFAReturnDouble, %function
 .type GetHFAReturnFloat, %function
 .type CallARM64Ret128, %function
@@ -58,7 +58,7 @@
 .type CallARM64Double, %function
 .type CallARM64Float, %function
 .type CallARM64, %function
-#endif /* __MACH__ */
+#endif
 
 .align  2
 GetHFAReturnDouble:
