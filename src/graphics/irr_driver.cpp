@@ -150,6 +150,7 @@ static const char* m_perf_query_phase[Q_LAST] =
     "PointLights",
     "SSAO",
     "Light Scatter",
+    "Light Scatter blurring",
     "Glow",
     "Combine Diffuse Color",
     "Skybox",
