@@ -1,6 +1,6 @@
 /*
    AngelCode Scripting Library
-   Copyright (c) 2003-2019 Andreas Jonsson
+   Copyright (c) 2003-2023 Andreas Jonsson
 
    This software is provided 'as-is', without any express or implied
    warranty. In no event will the authors be held liable for any
@@ -128,10 +128,12 @@ public:
 //=============================================
 // Properties
 //=============================================
-protected:
-	friend class asCContext;
-	asCObjectType    *objType;
+public:
+	// This is public to allow external code (e.g. JIT compiler) to do asOFFSET to 
+	// access the members directly without having to modify the code to add friend
+	asCObjectType* objType;
 
+protected:
 	mutable asCAtomic refCount;
 	mutable asBYTE    gcFlag:1;
 	mutable asBYTE    hasRefCountReachedZero:1;

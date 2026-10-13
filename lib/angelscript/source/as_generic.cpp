@@ -1,6 +1,6 @@
 /*
    AngelCode Scripting Library
-   Copyright (c) 2003-2016 Andreas Jonsson
+   Copyright (c) 2003-2025 Andreas Jonsson
 
    This software is provided 'as-is', without any express or implied 
    warranty. In no event will the authors be held liable for any 
@@ -35,6 +35,7 @@
 // This class handles the call to a function registered with asCALL_GENERIC
 //
 
+#include "as_datatype.h"
 #include "as_generic.h"
 #include "as_scriptfunction.h"
 #include "as_objecttype.h"
@@ -529,6 +530,261 @@ void *asCGeneric::GetAddressOfReturnLocation()
 int asCGeneric::GetReturnTypeId(asDWORD *flags) const
 {
 	return sysFunction->GetReturnTypeId(flags);
+}
+
+asCGenericVariadic::asCGenericVariadic(asCScriptEngine* engine, asCScriptFunction* sysFunction, void* currentObject, asDWORD* stackPointer, asDWORD stackArgCount)
+	: asCGeneric(engine, sysFunction, currentObject, stackPointer), argCount(stackArgCount)
+{
+}
+
+int asCGenericVariadic::GetArgCount() const
+{
+	return argCount;
+}
+
+int asCGenericVariadic::GetArgTypeId(asUINT arg, asDWORD* flags) const
+{
+	asUINT idx = arg;
+	if (idx >= sysFunction->parameterTypes.GetLength() - 1)
+		idx = sysFunction->parameterTypes.GetLength() - 1;
+
+	if (flags)
+	{
+		*flags = sysFunction->inOutFlags[idx];
+		*flags |= sysFunction->parameterTypes[idx].IsReadOnly() ? asTM_CONST : 0;
+	}
+
+	asCDataType* dt = GetArgDataType(idx);
+    if (dt->GetTokenType() != ttQuestion)
+		return engine->GetTypeIdFromDataType(*dt);
+	else
+	{
+		int offset = GetArgOffsetOnStack(arg); // Use "arg" here to iterate all arguments
+
+		// Skip the actual value to get to the type id
+		offset += AS_PTR_SIZE;
+
+		// Get the value
+		return stackPointer[offset];
+	}
+}
+
+asBYTE asCGenericVariadic::GetArgByte(asUINT arg)
+{
+	// Verify that the type is correct
+	asCDataType* dt = GetArgDataType(arg);
+	if ((dt->IsObject() || dt->IsFuncdef()) || dt->IsReference())
+		return 0;
+
+	if (dt->GetSizeInMemoryBytes() != 1)
+		return 0;
+
+	int offset = GetArgOffsetOnStack(arg);
+	// Get the value
+	return *(asBYTE*)&stackPointer[offset];
+}
+
+asWORD asCGenericVariadic::GetArgWord(asUINT arg)
+{
+	// Verify that the type is correct
+	asCDataType* dt = GetArgDataType(arg);
+	if ((dt->IsObject() || dt->IsFuncdef()) || dt->IsReference())
+		return 0;
+
+	if (dt->GetSizeInMemoryBytes() != 2)
+		return 0;
+
+	int offset = GetArgOffsetOnStack(arg);
+	// Get the value
+	return *(asWORD*)&stackPointer[offset];
+}
+
+asDWORD asCGenericVariadic::GetArgDWord(asUINT arg)
+{
+	// Verify that the type is correct
+	asCDataType* dt = GetArgDataType(arg);
+	if ((dt->IsObject() || dt->IsFuncdef()) || dt->IsReference())
+		return 0;
+
+	if (dt->GetSizeInMemoryBytes() != 4)
+        return 0;
+
+    int offset = GetArgOffsetOnStack(arg);
+    // Get the value
+    return *(asDWORD*)&stackPointer[offset];
+}
+
+asQWORD asCGenericVariadic::GetArgQWord(asUINT arg)
+{
+	// Verify that the type is correct
+	asCDataType* dt = GetArgDataType(arg);
+	if ((dt->IsObject() || dt->IsFuncdef()) || dt->IsReference())
+		return 0;
+
+	if (dt->GetSizeInMemoryBytes() != 8)
+		return 0;
+
+	int offset = GetArgOffsetOnStack(arg);
+	// Get the value
+	return *(asQWORD*)&stackPointer[offset];
+}
+
+float asCGenericVariadic::GetArgFloat(asUINT arg)
+{
+	// Verify that the type is correct
+	asCDataType* dt = GetArgDataType(arg);
+	if ((dt->IsObject() || dt->IsFuncdef()) || dt->IsReference())
+		return 0;
+
+	if (dt->GetSizeInMemoryBytes() != 4)
+		return 0;
+
+	int offset = GetArgOffsetOnStack(arg);
+	// Get the value
+	return *(float*)&stackPointer[offset];
+}
+
+double asCGenericVariadic::GetArgDouble(asUINT arg)
+{
+	// Verify that the type is correct
+	asCDataType* dt = GetArgDataType(arg);
+	if ((dt->IsObject() || dt->IsFuncdef()) || dt->IsReference())
+		return 0;
+
+	if (dt->GetSizeInMemoryBytes() != 8)
+		return 0;
+
+	int offset = GetArgOffsetOnStack(arg);
+	// Get the value
+	return *(double*)&stackPointer[offset];
+}
+
+void* asCGenericVariadic::GetArgAddress(asUINT arg)
+{
+	// Verify that the type is correct
+	asCDataType* dt = GetArgDataType(arg);
+	if (!dt->IsReference() && !dt->IsObjectHandle())
+		return 0;
+
+	int offset = GetArgOffsetOnStack(arg);
+	// Get the value
+	return (void*)*(asPWORD*)&stackPointer[offset];
+}
+
+void* asCGenericVariadic::GetArgObject(asUINT arg)
+{
+	// Verify that the type is correct
+	asCDataType* dt = GetArgDataType(arg);
+	if (!dt->IsObject() && !dt->IsFuncdef())
+		return 0;
+
+	int offset = GetArgOffsetOnStack(arg);
+	// Get the value
+	return *(void**)(&stackPointer[offset]);
+}
+
+void* asCGenericVariadic::GetAddressOfArg(asUINT arg)
+{
+	// Determine the position of the argument
+	int offset = GetArgOffsetOnStack(arg);
+
+	// For object variables it's necessary to dereference the pointer to get the address of the value
+	if (!sysFunction->parameterTypes[arg].IsReference() &&
+		sysFunction->parameterTypes[arg].IsObject() &&
+		!sysFunction->parameterTypes[arg].IsObjectHandle())
+		return *(void**)&stackPointer[offset];
+
+	// Get the address of the value
+	return &stackPointer[offset];
+}
+
+void* asCGenericVariadic::GetAddressOfReturnLocation()
+{
+	asCDataType& dt = sysFunction->returnType;
+
+	if ((dt.IsObject() || dt.IsFuncdef()) && !dt.IsReference())
+	{
+		if (sysFunction->DoesReturnOnStack())
+		{
+			// The memory is already preallocated on the stack,
+			// and the pointer to the location is found before the first arg
+			return (void*)*(asPWORD*)&stackPointer[-(AS_PTR_SIZE + 1)];
+		}
+
+		// Reference types store the handle in the objectReference
+		return &objectRegister;
+	}
+
+	// Primitive types and references are stored in the returnVal property
+	return &returnVal;
+}
+
+int asCGenericVariadic::SetReturnObject(void* obj)
+{
+	asCDataType* dt = &sysFunction->returnType;
+	if (!dt->IsObject() && !dt->IsFuncdef())
+		return asINVALID_TYPE;
+
+	if (dt->IsReference())
+	{
+		*(void**)&returnVal = obj;
+		return 0;
+	}
+
+	if (dt->IsObjectHandle())
+	{
+		// Increase the reference counter
+		if (dt->IsFuncdef())
+		{
+			if (obj)
+				reinterpret_cast<asIScriptFunction*>(obj)->AddRef();
+		}
+		else
+		{
+			asSTypeBehaviour* beh = &CastToObjectType(dt->GetTypeInfo())->beh;
+			if (obj && beh && beh->addref)
+				engine->CallObjectMethod(obj, beh->addref);
+		}
+	}
+	else
+	{
+		// If function returns object by value the memory is already allocated.
+		// Here we should just initialize that memory by calling the copy constructor
+		// or the default constructor followed by the assignment operator
+		void* mem = (void*)*(asPWORD*)&stackPointer[-(AS_PTR_SIZE + 1)];
+		engine->ConstructScriptObjectCopy(mem, obj, CastToObjectType(dt->GetTypeInfo()));
+		return 0;
+	}
+
+	objectRegister = obj;
+
+	return 0;
+}
+
+asCDataType* asCGenericVariadic::GetArgDataType(asUINT arg) const
+{
+	if (arg >= sysFunction->parameterTypes.GetLength() - 1)
+		arg = sysFunction->parameterTypes.GetLength() - 1;
+
+	return &sysFunction->parameterTypes[arg];
+}
+
+int asCGenericVariadic::GetArgOffsetOnStack(asUINT arg) const
+{
+	// Determine the position of the argument
+	int offset = 0;
+	for (asUINT n = 0; n < arg; n++)
+	{
+		if (n >= sysFunction->parameterTypes.GetLength() - 1)
+		{
+			asUINT idx = sysFunction->parameterTypes.GetLength() - 1;
+			offset += sysFunction->parameterTypes[idx].GetSizeOnStackDWords();
+		}
+		else
+			offset += sysFunction->parameterTypes[n].GetSizeOnStackDWords();
+	}
+
+	return offset;
 }
 
 END_AS_NAMESPACE

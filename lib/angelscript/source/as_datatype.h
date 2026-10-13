@@ -1,6 +1,6 @@
 /*
    AngelCode Scripting Library
-   Copyright (c) 2003-2016 Andreas Jonsson
+   Copyright (c) 2003-2024 Andreas Jonsson
 
    This software is provided 'as-is', without any express or implied 
    warranty. In no event will the authors be held liable for any 
@@ -70,6 +70,7 @@ public:
 
 	static asCDataType CreatePrimitive(eTokenType tt, bool isConst);
 	static asCDataType CreateType(asCTypeInfo *ti, bool isConst);
+	static asCDataType CreateById(asCScriptEngine* engine, int typeId, bool isConst);
 	static asCDataType CreateAuto(bool isConst);
 	static asCDataType CreateObjectHandle(asCTypeInfo *ot, bool isConst);
 	static asCDataType CreateNullHandle();
@@ -142,18 +143,18 @@ protected:
 	// Base object type
 	eTokenType tokenType;
 
+	// Top level
+	bool isReference : 1;
+	bool isReadOnly : 1;
+	bool isObjectHandle : 1;
+	bool isConstHandle : 1;
+	bool isAuto : 1;
+	bool isHandleToAsHandleType : 1; // Used by the compiler to know how to initialize the object
+	bool ifHandleThenConst : 1; // Used when creating template instances to determine if a handle should be const or not
+	char dummy : 1;
+
 	// Behaviour type
 	asCTypeInfo *typeInfo;
-
-	// Top level
-	bool isReference:1;
-	bool isReadOnly:1;
-	bool isObjectHandle:1;
-	bool isConstHandle:1;
-	bool isAuto:1;
-	bool isHandleToAsHandleType:1; // Used by the compiler to know how to initialize the object
-	bool ifHandleThenConst:1; // Used when creating template instances to determine if a handle should be const or not
-	char dummy:1;
 };
 
 END_AS_NAMESPACE

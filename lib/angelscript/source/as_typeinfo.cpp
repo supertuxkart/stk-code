@@ -1,6 +1,6 @@
 /*
    AngelCode Scripting Library
-   Copyright (c) 2003-2020 Andreas Jonsson
+   Copyright (c) 2003-2025 Andreas Jonsson
 
    This software is provided 'as-is', without any express or implied
    warranty. In no event will the authors be held liable for any
@@ -200,7 +200,7 @@ const char *asCTypeInfo::GetNamespace() const
 }
 
 // interface
-asDWORD asCTypeInfo::GetFlags() const
+asQWORD asCTypeInfo::GetFlags() const
 {
 	return flags;
 }
@@ -251,7 +251,7 @@ asDWORD asCTypeInfo::GetAccessMask() const
 }
 
 // interface
-int asCTypeInfo::GetProperty(asUINT index, const char **out_name, int *out_typeId, bool *out_isPrivate, bool *out_isProtected, int *out_offset, bool *out_isReference, asDWORD *out_accessMask, int *out_compositeOffset, bool *out_isCompositeIndirect) const
+int asCTypeInfo::GetProperty(asUINT index, const char **out_name, int *out_typeId, bool *out_isPrivate, bool *out_isProtected, int *out_offset, bool *out_isReference, asDWORD *out_accessMask, int *out_compositeOffset, bool *out_isCompositeIndirect, bool *out_isConst) const
 {
 	UNUSED_VAR(index);
 	if (out_name) *out_name = 0;
@@ -263,6 +263,7 @@ int asCTypeInfo::GetProperty(asUINT index, const char **out_name, int *out_typeI
 	if (out_accessMask) *out_accessMask = 0;
 	if (out_compositeOffset) *out_compositeOffset = 0;
 	if (out_isCompositeIndirect) *out_isCompositeIndirect = false;
+	if (out_isConst) *out_isConst = false;
 	return -1;
 }
 
