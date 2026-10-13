@@ -53,7 +53,7 @@
     ALIGN   4
 GetHFAReturnDouble PROC
     adr     x9, |populateDoubles|
-    sub     x9, x9, x1, lsr 1 ; x9 -= returnSize >> 1; (/2 because double is 2x instruction size)
+    sub     x9, x9, x2, lsr 1 ; x9 -= returnSize >> 1; (/2 because double is 2x instruction size)
     br      x9
 
     str     d3, [x0, #0x18]
