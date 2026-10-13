@@ -5,10 +5,10 @@ out vec4 FragColor;
 
 // TODO: add support in the code for custom focal distances
 // and foreground blurring (for cutscenes)
-uniform float focalDepth = 72.;
+uniform float focalDepth;
+uniform float range;
+uniform bool blurForeground;
 float maxblur = 1.;
-uniform float range = 360.;
-uniform bool blurForeground = false;
 
 float validTap(float zCenter, float zSample)
 {
