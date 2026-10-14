@@ -33,7 +33,7 @@ namespace irr
 #include <OpenGLES/ES2/gl.h>
 #include <OpenGLES/ES2/glext.h>
 #elif defined(_IRR_COMPILE_WITH_ANDROID_DEVICE_)
-#include <GLES/gl2.h>
+#include <GLES2/gl2.h>
 #include "stk_android_native_app_glue.h"
 #endif
 

@@ -21,7 +21,7 @@
 #include "irrString.h"
 
 #ifndef IOS_STK
-#include <GLES/gl2.h>
+#include <GLES2/gl2.h>
 #include <GLES/gl2ext.h>
 #include <EGL/egl.h>
 #endif
