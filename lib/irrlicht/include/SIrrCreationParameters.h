@@ -317,7 +317,7 @@ namespace irr
         bool ForceLegacyDevice;
         
         //! Specifies custom path for shaders directory.
-        /** Allows one to overwrite IRR_OGLES2_SHADER_PATH constant
+        /** Allows one to overwrite IRR_OGLES_SHADER_PATH constant
         */
         core::stringc ShadersPath;
 

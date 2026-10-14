@@ -4,12 +4,12 @@
 // This file is part of the "Irrlicht Engine".
 // For conditions of distribution and use, see copyright notice in Irrlicht.h
 
-#ifndef __C_OGLES2_EXTENSION_HANDLER_H_INCLUDED__
-#define __C_OGLES2_EXTENSION_HANDLER_H_INCLUDED__
+#ifndef __C_OGLES_EXTENSION_HANDLER_H_INCLUDED__
+#define __C_OGLES_EXTENSION_HANDLER_H_INCLUDED__
 
 #include "IrrCompileConfig.h"
 
-#ifdef _IRR_COMPILE_WITH_OGLES2_
+#ifdef _IRR_COMPILE_WITH_OGLES_
 
 #if defined(_IRR_COMPILE_WITH_SDL_DEVICE_)
 #include "glad/gl.h"
@@ -19,11 +19,11 @@
 #include <OpenGLES/ES2/gl.h>
 #include <OpenGLES/ES2/glext.h>
 #else
-#include <GLES2/gl2.h>
+#include <GLES/gl2.h>
 // seems to be missing...
 typedef char GLchar;
-#if defined(_IRR_OGLES2_USE_EXTPOINTER_)
-#include "gles2-ext.h"
+#if defined(_IRR_OGLES_USE_EXTPOINTER_)
+#include "gles-ext.h"
 #endif
 #endif
 
@@ -35,11 +35,11 @@ namespace irr
 {
 namespace video
 {
-	class COGLES2Driver;
-	class COGLES2ExtensionHandler
+	class COGLESDriver;
+	class COGLESExtensionHandler
 	{
 	public:
-		enum EOGLES2Features
+		enum EOGLESFeatures
 		{
 			IRR_AMD_compressed_3DC_texture=0, // 39
 			IRR_AMD_compressed_ATC_texture, // 40
@@ -177,18 +177,18 @@ namespace video
 			IRR_SUN_multi_draw_arrays, // 69
 			IRR_VIV_shader_binary, // 85
 
-			IRR_OGLES2_Feature_Count
+			IRR_OGLES_Feature_Count
 		};
 
 		//! queries the features of the driver, returns true if feature is available
-		bool queryOpenGLFeature(EOGLES2Features feature) const
+		bool queryOpenGLFeature(EOGLESFeatures feature) const
 		{
 			return FeatureAvailable[feature];
 		}
 
 
 	protected:
-		COGLES2ExtensionHandler();
+		COGLESExtensionHandler();
 
 		bool queryFeature(video::E_VIDEO_DRIVER_FEATURE feature) const
 		{
@@ -237,7 +237,7 @@ namespace video
 
 		void dump() const;
 
-        void initExtensions(COGLES2Driver* driver,
+        void initExtensions(COGLESDriver* driver,
                 bool withStencil);
 
 	protected:
@@ -253,13 +253,13 @@ namespace video
 		//! Minimal and maximal supported thickness for points without smoothing
 		GLfloat DimAliasedPoint[2];
 		bool StencilBuffer;
-		bool FeatureAvailable[IRR_OGLES2_Feature_Count];
+		bool FeatureAvailable[IRR_OGLES_Feature_Count];
 	};
 
 } // end namespace video
 } // end namespace irr
 
 
-#endif // _IRR_COMPILE_WITH_OGLES2_
+#endif // _IRR_COMPILE_WITH_OGLES_
 #endif
 

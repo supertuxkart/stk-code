@@ -10767,7 +10767,7 @@ static int glad_gl_find_core_gles2(void) {
     return GLAD_MAKE_VERSION(major, minor);
 }
 
-int gladLoadGLES2UserPtr( GLADuserptrloadfunc load, void *userptr) {
+int gladLoadGLESUserPtr( GLADuserptrloadfunc load, void *userptr) {
     int version;
 
     glad_glGetString = (PFNGLGETSTRINGPROC) load(userptr, "glGetString");
@@ -10913,8 +10913,8 @@ int gladLoadGLES2UserPtr( GLADuserptrloadfunc load, void *userptr) {
 }
 
 
-int gladLoadGLES2( GLADloadfunc load) {
-    return gladLoadGLES2UserPtr( glad_gl_get_proc_from_userptr, GLAD_GNUC_EXTENSION (void*) load);
+int gladLoadGLES( GLADloadfunc load) {
+    return gladLoadGLESUserPtr( glad_gl_get_proc_from_userptr, GLAD_GNUC_EXTENSION (void*) load);
 }
 
 

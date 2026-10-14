@@ -42,7 +42,7 @@
 #endif
 #endif
 
-#if defined(USE_GLES2)
+#if defined(USE_GLES)
 #ifndef __APPLE__
 #include <SDL_video.h>
 #include <EGL/egl.h>
@@ -142,7 +142,7 @@ debugCallback(GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei le
 }
 #endif
 
-#ifdef USE_GLES2
+#ifdef USE_GLES
 
 #define GL_DEBUG_SOURCE_APPLICATION 0x824A
 #define GL_DEBUG_TYPE_MARKER 0x8268
@@ -268,7 +268,7 @@ void draw3DLine(const core::vector3df& start,
 const std::string getGLExtensions()
 {
     std::string result;
-#if !defined(USE_GLES2)
+#if !defined(USE_GLES)
     if (glGetStringi != NULL)
     {
         GLint num_extensions = 0;
@@ -678,7 +678,7 @@ bool checkGLError()
     case GL_OUT_OF_MEMORY:
         Log::warn("GLWrap", "glGetError: GL_OUT_OF_MEMORY");
         break;
-#if !defined(USE_GLES2)
+#if !defined(USE_GLES)
     case GL_STACK_UNDERFLOW:
         Log::warn("GLWrap", "glGetError: GL_STACK_UNDERFLOW");
         break;

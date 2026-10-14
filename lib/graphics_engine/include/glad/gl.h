@@ -17257,8 +17257,8 @@ GLAD_API_CALL PFNGLWAITSYNCAPPLEPROC glad_glWaitSyncAPPLE;
 GLAD_API_CALL int gladLoadGLUserPtr( GLADuserptrloadfunc load, void *userptr);
 GLAD_API_CALL int gladLoadGL( GLADloadfunc load);
 
-GLAD_API_CALL int gladLoadGLES2UserPtr( GLADuserptrloadfunc load, void *userptr);
-GLAD_API_CALL int gladLoadGLES2( GLADloadfunc load);
+GLAD_API_CALL int gladLoadGLESUserPtr( GLADuserptrloadfunc load, void *userptr);
+GLAD_API_CALL int gladLoadGLES( GLADloadfunc load);
 
 
 
