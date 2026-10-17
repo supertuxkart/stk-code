@@ -150,12 +150,18 @@ include $(CLEAR_VARS)
 LOCAL_MODULE       := angelscript
 LOCAL_PATH         := .
 LOCAL_CPP_FEATURES += rtti exceptions
-LOCAL_SRC_FILES    := $(wildcard ../lib/angelscript/source/*.S)   \
-                      $(wildcard ../lib/angelscript/source/*.cpp)
+LOCAL_SRC_FILES    := $(wildcard ../lib/angelscript/source/*.cpp)
+
+ifeq ($(TARGET_ARCH_ABI), arm64-v8a)
+LOCAL_SRC_FILES += $(wildcard ../lib/angelscript/source/as_callfunc_arm64_gcc.S)
+else ifeq ($(TARGET_ARCH_ABI), armeabi-v7a)
+LOCAL_SRC_FILES += $(wildcard ../lib/angelscript/source/as_callfunc_arm_gcc.S)
+else
+LOCAL_SRC_FILES += $(wildcard ../lib/angelscript/source/as_callfunc_$(TARGET_ARCH_ABI)_gcc.S)
+endif
+
 LOCAL_CFLAGS       := -I../lib/angelscript/source/
-#ifeq ($(TARGET_ARCH_ABI), armeabi-v7a)
-#LOCAL_ARM_NEON     := false
-#endif
+
 include $(BUILD_STATIC_LIBRARY)
 include $(CLEAR_VARS)
 
