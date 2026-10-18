@@ -106,6 +106,7 @@ GUIEngine::EventPropagation
         {
             if (!m_selected_kart.empty())
             {
+                m_player_profile->setIconFromKart(m_selected_kart);
             }
 
             ModalDialog::dismiss();
