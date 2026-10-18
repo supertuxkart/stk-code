@@ -26,6 +26,7 @@ class PlayerProfile;
 namespace GUIEngine
 {
     class RibbonWidget;
+    class DynamicRibbonWidget;
 }
 
 /**
@@ -36,13 +37,20 @@ class IconSelectionDialog : public GUIEngine::ModalDialog
 private:
     PlayerProfile* m_player_profile;
 
+    GUIEngine::DynamicRibbonWidget* m_kart_icons_widget;
+
     GUIEngine::RibbonWidget* m_buttons_widget;
+
+    std::string m_selected_kart;
+
 public:
     IconSelectionDialog(PlayerProfile* pp);
 
     ~IconSelectionDialog();
 
     virtual void beforeAddingWidgets() OVERRIDE;
+
+    virtual void init() OVERRIDE;
 
     GUIEngine::EventPropagation processEvent(const std::string& eventSource) OVERRIDE;
 };
