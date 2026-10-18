@@ -57,6 +57,24 @@ IconSelectionDialog::~IconSelectionDialog()
 void IconSelectionDialog::beforeAddingWidgets()
 {
 
+    m_kart_icons_widget = getWidget<DynamicRibbonWidget>("kart_icons");
+    assert(m_kart_icons_widget);
+
+    m_kart_icons_widget->clearItems();
+    for(unsigned int i=0; i<kart_properties_manager->getNumberOfKarts(); i++)
+    {
+        const KartProperties* kp = kart_properties_manager->getKartById(i);
+        if (!kp) continue;
+
+        m_kart_icons_widget->addItem(
+            kp->getName(),
+            kp->getIdent(),
+            kp->getAbsoluteIconFile(),
+            0,
+            IconButtonWidget::ICON_PATH_TYPE_ABSOLUTE
+        );
+
+    }
 }   // beforeAddingWidgets
 
 // ----------------------------------------------------------------------------
