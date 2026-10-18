@@ -18,21 +18,12 @@
 #include "states_screens/dialogs/icon_selection_dialog.hpp"
 
 #include "config/player_manager.hpp"
-#include "config/player_profile.hpp"
-#include "config/user_config.hpp"
-#include "karts/kart_model.hpp"
+#include "guiengine/widgets/dynamic_ribbon_widget.hpp"
+#include "guiengine/widgets/icon_button_widget.hpp"
+#include "guiengine/widgets/ribbon_widget.hpp"
 #include "karts/kart_properties.hpp"
 #include "karts/kart_properties_manager.hpp"
-#include "graphics/irr_driver.hpp"
-#include <ge_render_info.hpp>
-#include "guiengine/engine.hpp"
-#include "guiengine/widgets/label_widget.hpp"
-#include "guiengine/widgets/model_view_widget.hpp"
-#include "guiengine/widgets/ribbon_widget.hpp"
-#include "guiengine/widgets/spinner_widget.hpp"
 #include "states_screens/state_manager.hpp"
-#include "utils/string_utils.hpp"
-#include "utils/translation.hpp"
 
 using namespace GUIEngine;
 
@@ -44,7 +35,12 @@ IconSelectionDialog::IconSelectionDialog(PlayerProfile* pp)
     m_player_profile = pp;
 
     m_buttons_widget = getWidget<RibbonWidget>("buttons");
+    assert(m_buttons_widget);
 
+    m_kart_icons_widget = getWidget<DynamicRibbonWidget>("kart_icons");
+    assert(m_kart_icons);
+
+    m_kart_icons_widget->updateItemDisplay();
 }   // IconSelectionDialog
 
 // ----------------------------------------------------------------------------
@@ -52,6 +48,14 @@ IconSelectionDialog::~IconSelectionDialog()
 {
     PlayerManager::get()->save();
 }   // ~IconSelectionDialog
+
+// ----------------------------------------------------------------------------
+void IconSelectionDialog::init()
+{
+    ModalDialog::init();
+    m_kart_icons_widget->setSelection(0, PLAYER_ID_GAME_MASTER, true);
+}
+
 
 // ----------------------------------------------------------------------------
 void IconSelectionDialog::beforeAddingWidgets()
@@ -82,13 +86,28 @@ GUIEngine::EventPropagation
             IconSelectionDialog::processEvent(const std::string& eventSource)
 {
 
-    if (eventSource == "buttons")
+    if (eventSource == "kart_icons")
+    {
+        m_selected_kart = m_kart_icons_widget->getSelectionIDString(PLAYER_ID_GAME_MASTER);
+
+        if (!m_selected_kart.empty())
+        {
+            m_kart_icons_widget->setBadge(m_selected_kart, GUIEngine::OK_BADGE);
+            m_kart_icons_widget->updateItemDisplay();
+        }
+    }
+
+    else if (eventSource == "buttons")
     {
         const std::string& selection = m_buttons_widget->
                                     getSelectionIDString(PLAYER_ID_GAME_MASTER);
 
         if (selection == "apply")
         {
+            if (!m_selected_kart.empty())
+            {
+            }
+
             ModalDialog::dismiss();
             return GUIEngine::EVENT_BLOCK;
         }
