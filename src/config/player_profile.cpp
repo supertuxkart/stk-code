@@ -170,6 +170,18 @@ void PlayerProfile::initRemainingData()
 }   // initRemainingData
 
 //------------------------------------------------------------------------------
+// TODO - Register setIconFromKart Description
+void PlayerProfile::setIconFromKart(const std::string& kart_ident)
+{
+
+    m_icon_kart_ident = kart_ident;
+    m_icon_filename = "";
+    addIcon();
+}   // TODO - setIconFromKart
+
+//------------------------------------------------------------------------------
+
+//------------------------------------------------------------------------------
 /** Creates an icon for a player if non exist so far. It takes the unique
  *  player id modulo the number of karts to pick an icon from the karts. It
  *  then uses the unique number plus the extentsion of the original icon as the
@@ -187,10 +199,14 @@ void PlayerProfile::addIcon()
     if (m_icon_filename.size() > 0 || isGuestAccount())
         return;
 
-    int n = (m_unique_id + kart_properties_manager->getKartId("tux") - 1)
-          % kart_properties_manager->getNumberOfKarts();
+    int kart_id;
+    if (m_icon_kart_ident.size() > 0)
+        kart_id = kart_properties_manager->getKartId(m_icon_kart_ident);
+    else
+        kart_id = (m_unique_id + kart_properties_manager->getKartId("tux") - 1)
+            % kart_properties_manager->getNumberOfKarts();
 
-    std::string source = kart_properties_manager->getKartById(n)
+    std::string source = kart_properties_manager->getKartById(kart_id)
                                                 ->getAbsoluteIconFile();
     // Create the filename for the icon of this player: the unique id
     // followed by .png or .jpg.
