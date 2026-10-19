@@ -62,6 +62,13 @@ private:
     bool m_use_force_feedback;
     int m_auto_center;
 
+    /** Overall steering force in percent, 0-100. */
+    int m_force_feedback_strength;
+
+    /** Flips the steering force direction for wheels whose driver reports
+     *  the axis the other way round. */
+    bool m_force_feedback_invert;
+
     std::map<std::tuple<int, Input::AxisDirection>, int> m_sdl_mapping;
 
     std::set<int> m_digital_axes;
@@ -127,6 +134,10 @@ public:
     void setForceFeedback(bool val)            { m_use_force_feedback = val; }
     // ------------------------------------------------------------------------
     int getAutoCenterStrength() const                { return m_auto_center; }
+    // ------------------------------------------------------------------------
+    int getForceFeedbackStrength() const { return m_force_feedback_strength; }
+    // ------------------------------------------------------------------------
+    bool isForceFeedbackInverted() const   { return m_force_feedback_invert; }
     // ------------------------------------------------------------------------
     void setAutoCenter(bool val)               { m_auto_center = val; }
 };   // class GamepadConfig
