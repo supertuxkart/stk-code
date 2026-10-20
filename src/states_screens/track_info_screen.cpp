@@ -77,7 +77,9 @@ void TrackInfoScreen::loadedFromFile()
     m_ai_kart_spinner       = getWidget<SpinnerWidget>("ai-spinner");
     m_ai_kart_label         = getWidget<LabelWidget>("ai-text");
     m_option                = getWidget<CheckBoxWidget>("option");
+    m_tire_stealing         = getWidget<CheckBoxWidget>("tire-stealing");
     m_record_race           = getWidget<CheckBoxWidget>("record");
+    m_tire_stealing->setState(false);
     m_option->setState(false);
     m_record_race->setState(false);
 
@@ -247,14 +249,23 @@ void TrackInfoScreen::init()
         m_target_type_label->setText(_("Game mode"), false);
         m_target_type_spinner->clearLabels();
         m_target_type_spinner->addLabel(_("3 Strikes Battle"));
+        
         m_target_type_spinner->addLabel(_("Free-For-All"));
         m_target_type_spinner->setValue(UserConfigParams::m_use_ffa_mode ? 1 : 0);
-
-        m_target_value_label->setText(_("Maximum time (min.)"), false);
         m_target_value_spinner->setValue(UserConfigParams::m_ffa_time_limit);
+        if (UserConfigParams::m_use_ffa_mode)
+            m_target_value_label->setText(_("Maximum time (min.)"), false);
+            
+        else
+            m_target_value_label->setText(_("Starting tires"), false);
+        
+        m_tire_stealing->setVisible(!UserConfigParams::m_use_ffa_mode);
+        getWidget<LabelWidget>("tire-stealing-text")->setVisible(!UserConfigParams::m_use_ffa_mode);
+        getWidget<LabelWidget>("tire-stealing-text")->setText(_("Steal tires"), false);
+        m_tire_stealing->setState(UserConfigParams::m_tire_steal);
 
-        m_target_value_label->setVisible(UserConfigParams::m_use_ffa_mode);
-        m_target_value_spinner->setVisible(UserConfigParams::m_use_ffa_mode);
+        m_target_value_label->setVisible(true);
+        m_target_value_spinner->setVisible(true);
     }
 
     // Lap count m_lap_spinner
@@ -282,11 +293,12 @@ void TrackInfoScreen::init()
         m_target_value_label->setText(_("Maximum time (min.)"), false);
         m_target_value_spinner->setValue(UserConfigParams::m_lap_trial_time_limit);
     }
-    // Reverse track or random item in arena
+    // Reverse track and random item in arena
     // -------------
     const bool reverse_available =     m_track->reverseAvailable()
                                    && !(RaceManager::get()->isEggHuntMode());
     const bool random_item = m_track->hasNavMesh();
+
 
     m_option->setVisible(reverse_available || random_item);
     getWidget<LabelWidget>("option-text")->setVisible(reverse_available || random_item);
@@ -660,9 +672,14 @@ void TrackInfoScreen::eventCallback(Widget* widget, const std::string& name,
         {
             const bool enable_ffa = target_value != 0;
             UserConfigParams::m_use_ffa_mode = enable_ffa;
+            
+            m_tire_stealing->setVisible(!enable_ffa);
+            getWidget<LabelWidget>("tire-stealing-text")->setVisible(!enable_ffa);
 
-            m_target_value_label->setVisible(enable_ffa);
-            m_target_value_spinner->setVisible(enable_ffa);
+            if (enable_ffa)
+                m_target_value_label->setText(_("Maximum time (min.)"), false);
+            else
+                m_target_value_label->setText(_("Starting tires"), false);
         }
     }
     else if (name == "target-value-spinner")
@@ -679,8 +696,7 @@ void TrackInfoScreen::eventCallback(Widget* widget, const std::string& name,
         {
             const bool enable_ffa = m_target_type_spinner->getValue() != 0;
 
-            if (enable_ffa)
-                UserConfigParams::m_ffa_time_limit = m_target_value_spinner->getValue();
+            UserConfigParams::m_ffa_time_limit = m_target_value_spinner->getValue();
         }
         else if (m_is_lap_trial)
         {
@@ -709,6 +725,10 @@ void TrackInfoScreen::eventCallback(Widget* widget, const std::string& name,
             // checkbox.
             updateHighScores();
         }
+    }
+     else if (name == "tire-stealing")
+    {
+        UserConfigParams::m_tire_steal = m_tire_stealing->getState();
     }
     else if (name == "record")
     {
