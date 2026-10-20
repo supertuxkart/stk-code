@@ -642,6 +642,13 @@ void SoccerWorld::handlePlayerGoalFromServer(const NetworkString& ns)
         sd.m_handicap_level = (HandicapLevel)ns.getUInt8();
     }
 
+    if (sd.m_id >= m_karts.size())
+    {
+        Log::warn("SoccerWorld", "Ignoring goal for invalid kart id %d.",
+            sd.m_id);
+        return;
+    }
+
     if (first_goal)
     {
         m_red_scorers.push_back(sd);
