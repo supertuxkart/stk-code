@@ -391,6 +391,9 @@ sed -i "s/import org.supertuxkart.*.STKEditText;/import $PACKAGE_NAME.STKEditTex
 sed -i "s/package org.supertuxkart.*/package $PACKAGE_NAME;/g" \
        "$DIRNAME/src/main/java/SuperTuxKartActivity.java"
 
+sed -i "s/package org.supertuxkart.*/package $PACKAGE_NAME;/g" \
+       "$DIRNAME/src/main/java/CyclingInputBridge.java"
+
 sed -i "s/import org.supertuxkart.*/import $PACKAGE_NAME.STKEditText;/g" \
        "$DIRNAME/src/main/java/SuperTuxKartActivity.java"
 

@@ -591,6 +591,56 @@ namespace UserConfigParams
             &m_multitouch_group,
             "STK screen keyboard status: 0 = disabled, 1 = enabled") );
 
+    // ---- Cycling input
+    PARAM_PREFIX GroupUserConfigParam        m_cycling_group
+        PARAM_DEFAULT( GroupUserConfigParam("Cycling",
+                                            "Settings for cycling input devices") );
+
+    PARAM_PREFIX BoolUserConfigParam         m_cycling_enabled
+        PARAM_DEFAULT( BoolUserConfigParam(false, "enabled",
+            &m_cycling_group,
+            "Use a Bluetooth cycling sensor to control the local player's kart") );
+
+    PARAM_PREFIX BoolUserConfigParam         m_cycling_show_overlay
+        PARAM_DEFAULT( BoolUserConfigParam(true, "show-rpm-overlay",
+            &m_cycling_group,
+            "Show cycling connection status and cadence on screen") );
+
+    PARAM_PREFIX IntUserConfigParam          m_cycling_start_rpm
+        PARAM_DEFAULT( IntUserConfigParam(10, "start-rpm",
+            &m_cycling_group,
+            "Cadence at which the kart starts accelerating") );
+
+    PARAM_PREFIX IntUserConfigParam          m_cycling_full_speed_rpm
+        PARAM_DEFAULT( IntUserConfigParam(60, "full-speed-rpm",
+            &m_cycling_group,
+            "Cadence that maps to the kart's full speed") );
+
+    PARAM_PREFIX IntUserConfigParam          m_cycling_min_speed_percent
+        PARAM_DEFAULT( IntUserConfigParam(40, "minimum-speed-percent",
+            &m_cycling_group,
+            "Target speed when cadence first passes the start threshold") );
+
+    PARAM_PREFIX FloatUserConfigParam        m_cycling_wheel_ratio
+        PARAM_DEFAULT( FloatUserConfigParam(3.0f, "wheel-ratio",
+            &m_cycling_group,
+            "Wheel sensor revolutions per pedal revolution") );
+
+    PARAM_PREFIX BoolUserConfigParam         m_cycling_auto_nitro
+        PARAM_DEFAULT( BoolUserConfigParam(true, "auto-nitro",
+            &m_cycling_group,
+            "Automatically use nitro above the sprint cadence") );
+
+    PARAM_PREFIX IntUserConfigParam          m_cycling_sprint_rpm
+        PARAM_DEFAULT( IntUserConfigParam(90, "sprint-rpm",
+            &m_cycling_group,
+            "Cadence at which automatic nitro is activated") );
+
+    PARAM_PREFIX BoolUserConfigParam         m_cycling_handlebar_controls
+        PARAM_DEFAULT( BoolUserConfigParam(false, "handlebar-controls",
+            &m_cycling_group,
+            "Map two one-button controllers to steering, drift, and items") );
+
     // ---- GP start order
     PARAM_PREFIX GroupUserConfigParam        m_gp_start_order
             PARAM_DEFAULT( GroupUserConfigParam("GpStartOrder",

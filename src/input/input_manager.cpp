@@ -29,6 +29,7 @@
 #include "guiengine/screen.hpp"
 #include "guiengine/screen_keyboard.hpp"
 #include "input/device_manager.hpp"
+#include "input/cycling_input.hpp"
 #include "input/gamepad_device.hpp"
 #include "input/input.hpp"
 #include "input/keyboard_device.hpp"
@@ -273,6 +274,8 @@ void InputManager::update(float dt)
     for (auto& controller : m_sdl_controller)
         controller.second->checkPowerLevel();
 #endif
+
+    CyclingInput::update(m_device_manager);
 }
 
 //-----------------------------------------------------------------------------

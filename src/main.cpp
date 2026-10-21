@@ -227,6 +227,7 @@ extern "C" {
 #include "guiengine/dialog_queue.hpp"
 #include "guiengine/message_queue.hpp"
 #include "input/device_manager.hpp"
+#include "input/cycling_input.hpp"
 #include "input/input_manager.hpp"
 #include "input/keyboard_device.hpp"
 #include "input/wiimote_manager.hpp"
@@ -1907,6 +1908,7 @@ void initUserConfig()
     file_manager = new FileManager();
     user_config  = new UserConfig();     // needs file_manager
     user_config->loadConfig();
+    CyclingInput::applyConfiguration();
     // Some parts of the file manager needs user config (paths for models
     // depend on artist debug flag). So init the rest of the file manager
     // after reading the user config file.

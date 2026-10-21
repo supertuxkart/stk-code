@@ -27,6 +27,7 @@
 #include "input/gamepad_device.hpp"
 #include "input/input_manager.hpp"
 #include "states_screens/dialogs/add_device_dialog.hpp"
+#include "states_screens/dialogs/cycling_settings_dialog.hpp"
 #include "states_screens/dialogs/multitouch_settings_dialog.hpp"
 #include "states_screens/options/options_screen_device.hpp"
 
@@ -150,6 +151,11 @@ void OptionsScreenInput::buildDeviceList()
         devices->addItem("touch_device", (core::stringw("   ") +
                                                 _("Touch Device")).c_str(), 4);
     }
+
+#ifdef ANDROID
+    devices->addItem("cycling_device", (core::stringw("   ") +
+                                        _("Cycling Mode")).c_str(), 4);
+#endif
 }   // buildDeviceList
 
 // -----------------------------------------------------------------------------
@@ -283,6 +289,10 @@ void OptionsScreenInput::eventCallback(Widget* widget, const std::string& name, 
         else if (selection.find("touch_device") != std::string::npos)
         {
             new MultitouchSettingsDialog(0.8f, 0.9f);
+        }
+        else if (selection == "cycling_device")
+        {
+            new CyclingSettingsDialog(0.75f, 0.9f);
         }
         else
         {

@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<stkgui>
+    <div x="2%" y="2%" width="96%" height="96%" layout="vertical-row">
+        <header width="100%" height="fit" text_align="center"
+                I18N="In the cycling settings screen" text="Cycling Mode Settings"/>
+        <spacer height="2%" width="100%"/>
+
+        <div width="80%" height="fit" layout="horizontal-row">
+            <label proportion="1" text_align="right"
+                   I18N="In the cycling settings screen" text="Enable cycling mode"/>
+            <spacer width="3%" height="100%"/>
+            <checkbox id="cycling_enabled"/>
+        </div>
+
+        <label width="100%" text_align="center" word_wrap="true"
+               I18N="In the cycling settings screen"
+               text="Pedaling controls acceleration for the first local player."/>
+
+        <div width="80%" height="fit" layout="horizontal-row">
+            <label width="55%" text_align="right"
+                   I18N="In the cycling settings screen" text="Show RPM overlay"/>
+            <spacer width="3%" height="100%"/>
+            <checkbox id="show_overlay"/>
+        </div>
+        <spacer height="1%" width="100%"/>
+
+        <div width="80%" height="fit" layout="horizontal-row">
+            <label width="55%" text_align="right" I18N="In the cycling settings screen"
+                   text="Start pedaling cadence (RPM)"/>
+            <spacer width="3%" height="100%"/>
+            <spinner id="start_rpm" proportion="1"/>
+        </div>
+        <spacer height="1%" width="100%"/>
+
+        <div width="80%" height="fit" layout="horizontal-row">
+            <label width="55%" text_align="right" I18N="In the cycling settings screen"
+                   text="Full-speed cadence (RPM)"/>
+            <spacer width="3%" height="100%"/>
+            <spinner id="full_speed_rpm" proportion="1"/>
+        </div>
+        <spacer height="1%" width="100%"/>
+
+        <div width="80%" height="fit" layout="horizontal-row">
+            <label width="55%" text_align="right" I18N="In the cycling settings screen"
+                   text="Starting kart speed (%)"/>
+            <spacer width="3%" height="100%"/>
+            <spinner id="minimum_speed" proportion="1"/>
+        </div>
+        <spacer height="1%" width="100%"/>
+
+        <div width="80%" height="fit" layout="horizontal-row">
+            <label width="55%" text_align="right" I18N="In the cycling settings screen"
+                   text="Wheel rotations per pedal turn"/>
+            <spacer width="3%" height="100%"/>
+            <spinner id="wheel_ratio" proportion="1"/>
+        </div>
+        <spacer height="1%" width="100%"/>
+
+        <div width="80%" height="fit" layout="horizontal-row">
+            <label width="55%" text_align="right" I18N="In the cycling settings screen"
+                   text="Automatic sprint nitro"/>
+            <spacer width="3%" height="100%"/>
+            <checkbox id="auto_nitro"/>
+        </div>
+        <spacer height="1%" width="100%"/>
+
+        <div width="80%" height="fit" layout="horizontal-row">
+            <label width="55%" text_align="right" I18N="In the cycling settings screen"
+                   text="Sprint cadence (RPM)"/>
+            <spacer width="3%" height="100%"/>
+            <spinner id="sprint_rpm" proportion="1"/>
+        </div>
+        <spacer height="1%" width="100%"/>
+
+        <div width="80%" height="fit" layout="horizontal-row">
+            <label width="55%" text_align="right" I18N="In the cycling settings screen"
+                   text="Two-button handlebar controls"/>
+            <spacer width="3%" height="100%"/>
+            <checkbox id="handlebar_controls"/>
+        </div>
+
+        <spacer proportion="1" width="100%"/>
+        <buttonbar id="buttons" height="18%" width="70%" align="center">
+            <icon-button id="restore" width="128" height="128" icon="gui/icons/restart.png"
+                         I18N="In the cycling settings screen" text="Restore defaults"/>
+            <icon-button id="apply" width="128" height="128" icon="gui/icons/green_check.png"
+                         I18N="In the cycling settings screen" text="Apply"/>
+        </buttonbar>
+    </div>
+</stkgui>

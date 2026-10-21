@@ -73,6 +73,8 @@ public class SuperTuxKartActivity extends SDLActivity
     private float m_right_padding;
     private AtomicInteger m_keyboard_height;
     private AtomicInteger m_moved_height;
+    private CyclingInputBridge m_cycling_input_bridge;
+    private boolean m_cycling_mode_enabled;
     // ------------------------------------------------------------------------
     public native static void debugMsg(String msg);
     // ------------------------------------------------------------------------
@@ -85,6 +87,10 @@ public class SuperTuxKartActivity extends SDLActivity
     private native static void addDNSSrvRecords(String name, int weight);
     // ------------------------------------------------------------------------
     private native static void pauseRenderingJNI();
+    // ------------------------------------------------------------------------
+    public native static float updateCyclingTelemetry(float sensorRpm,
+                                                       int source,
+                                                       boolean connected);
     // ------------------------------------------------------------------------
     private void showExtractProgressPrivate()
     {
@@ -191,6 +197,7 @@ public class SuperTuxKartActivity extends SDLActivity
     public void onCreate(Bundle instance)
     {
         super.onCreate(instance);
+        m_cycling_input_bridge = new CyclingInputBridge(this);
         m_keyboard_height = new AtomicInteger();
         m_moved_height = new AtomicInteger();
         m_progress_dialog = null;
@@ -272,12 +279,79 @@ public class SuperTuxKartActivity extends SDLActivity
         }
     }
     // ------------------------------------------------------------------------
+    /** Called from the native configuration layer after config.xml is loaded. */
+    public void setCyclingModeConfiguration(final boolean enabled,
+                                            final boolean handlebar_controls,
+                                            final boolean show_overlay)
+    {
+        runOnUiThread(new Runnable()
+        {
+            @Override
+            public void run()
+            {
+                m_cycling_mode_enabled = enabled;
+                if (m_cycling_input_bridge == null)
+                    return;
+                m_cycling_input_bridge.setHandlebarControlsEnabled(
+                    handlebar_controls);
+                m_cycling_input_bridge.setOverlayEnabled(show_overlay);
+                if (enabled)
+                    m_cycling_input_bridge.start();
+                else
+                    m_cycling_input_bridge.stop();
+            }
+        });
+    }
+    // ------------------------------------------------------------------------
+    @Override
+    public boolean dispatchKeyEvent(KeyEvent event)
+    {
+        if (m_cycling_input_bridge != null &&
+            m_cycling_input_bridge.handleKeyEvent(event))
+        {
+            return true;
+        }
+        return super.dispatchKeyEvent(event);
+    }
+    // ------------------------------------------------------------------------
+    @Override
+    public void onRequestPermissionsResult(int request_code,
+                                           String[] permissions,
+                                           int[] grant_results)
+    {
+        super.onRequestPermissionsResult(request_code, permissions,
+                                         grant_results);
+        if (request_code == CyclingInputBridge.PERMISSION_REQUEST_CODE &&
+            m_cycling_input_bridge != null)
+        {
+            m_cycling_input_bridge.onPermissionsResult();
+        }
+    }
+    // ------------------------------------------------------------------------
+    @Override
+    protected void onDestroy()
+    {
+        if (m_cycling_input_bridge != null)
+            m_cycling_input_bridge.stop();
+        super.onDestroy();
+    }
+    // ------------------------------------------------------------------------
     @Override
     public void onStart()
     {
         super.onStart();
         m_keyboard_height.set(0);
         m_moved_height.set(0);
+        if (m_cycling_mode_enabled && m_cycling_input_bridge != null)
+            m_cycling_input_bridge.start();
+    }
+    // ------------------------------------------------------------------------
+    @Override
+    public void onStop()
+    {
+        if (m_cycling_input_bridge != null)
+            m_cycling_input_bridge.stop();
+        super.onStop();
     }
     // ------------------------------------------------------------------------
     @Override
