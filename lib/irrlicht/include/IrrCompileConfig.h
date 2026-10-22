@@ -180,7 +180,7 @@ define out. */
 #undef _IRR_COMPILE_WITH_OPENGL_
 #endif
 
-//! Define _IRR_COMPILE_WITH_OGLES_ to compile the Irrlicht engine with OpenGL-ES 2.x.
+//! Define _IRR_COMPILE_WITH_OGLES_ to compile the Irrlicht engine with OpenGL-ES
 /** If you do not wish the engine to be compiled with OpenGL-ES 2.x, comment
  this define out.
  You should only use this define if you really need the OpenGL-ES driver, and

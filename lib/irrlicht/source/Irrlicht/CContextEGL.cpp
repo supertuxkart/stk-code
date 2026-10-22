@@ -263,7 +263,7 @@ bool ContextManagerEGL::chooseConfig()
     else if (m_creation_params.opengl_api == CEGL_API_OPENGL_ES)
     {
         config_attribs.push_back(EGL_RENDERABLE_TYPE);
-        config_attribs.push_back(EGL_OPENGL_ES2_BIT);
+        config_attribs.push_back(EGL_OPENGL_ES3_BIT);
     }
 
     if (m_creation_params.surface_type == CEGL_SURFACE_WINDOW)
