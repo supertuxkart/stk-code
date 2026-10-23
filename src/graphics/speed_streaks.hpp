@@ -19,7 +19,7 @@
 #ifndef HEADER_SPEED_STREAKS_HPP
 #define HEADER_SPEED_STREAKS_HPP
 
-class AbstractKart;
+class Kart;
 class SpeedStreaks
 {
 public:
@@ -30,7 +30,7 @@ public:
         FORWARD = 1,
     };
 
-    SpeedStreaks(const AbstractKart& kart);
+    SpeedStreaks(const Kart& kart);
 
     void  reset();
     void  update(float dt);
@@ -47,7 +47,7 @@ private:
     float calcBoostIntensity(float lower_bound_ratio = 0.0f, float upper_bound_ratio = 1.0f) const;
 
     // Reference to the kart to which these speed streak parameters belong.
-    const AbstractKart& m_kart;
+    const Kart& m_kart;
 
     // Smoothened kart boost intensity (lerped from current to the target each frame).
     float m_filtered_boost_intensity;
@@ -63,14 +63,14 @@ private:
 
     // Speed excess (as a fraction of the generic engine max speed) at which the
     // streak intensity starts rising: 0.0 = the kart's own unboosted top speed.
-    constexpr static float s_boost_intensity_lower_ratio = 0.0f;
+    constexpr static float s_boost_intensity_lower_ratio = 0.2f;
     // Speed excess (as a fraction of the generic engine max speed) at which the
     // streak intensity reaches 1.0f.
-    constexpr static float s_boost_intensity_upper_ratio = 0.75f;
+    constexpr static float s_boost_intensity_upper_ratio = 0.8f;
 
     // How fast/slow should the streaks move across the screen at low and full intensity.
-    constexpr static float s_streaks_speed_min    = 3.0f;
-    constexpr static float s_streaks_speed_max    = 6.0f;
+    constexpr static float s_streaks_speed_min    = 0.3f;
+    constexpr static float s_streaks_speed_max    = 0.6f;
 };
 
 #endif

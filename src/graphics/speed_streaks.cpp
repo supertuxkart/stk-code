@@ -17,12 +17,13 @@
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include "graphics/speed_streaks.hpp"
-#include "karts/abstract_kart.hpp"
+#include "karts/kart.hpp"
+
 #include <irrMath.h>
 
 using namespace irr;
 
-SpeedStreaks::SpeedStreaks(const AbstractKart& kart)
+SpeedStreaks::SpeedStreaks(const Kart& kart)
     : m_kart(kart),
       m_filtered_boost_intensity(0.0f),
       m_radial_scroll_offset(0.0f),
