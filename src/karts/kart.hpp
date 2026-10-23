@@ -372,6 +372,15 @@ public:
     // ----------------------------------------------------------------------------------------
     virtual float  getCurrentMaxSpeed() const OVERRIDE;
     // ----------------------------------------------------------------------------------------
+    /** Returns the speed amount above the kart's own unboosted max speed.
+    */
+    virtual float getCurrentAdditionalSpeed() const OVERRIDE;
+    // ----------------------------------------------------------------------------------------
+    /** Returns the ratio of the speed amount above the kart's own unboosted max speed
+     *  relative to the generic engine max speed.
+     */
+    virtual float getCurrentAdditionalSpeedRatio() const OVERRIDE;
+    // ----------------------------------------------------------------------------------------
     /** This is used on the client side only to set the speed of the kart
      *  from the server information. */
     virtual void setSpeed(float s) OVERRIDE { m_speed = s; }

@@ -445,9 +445,10 @@ void Kart::reset()
     {
         m_skidmarks->reset();
     }
-    if (m_speedstreaks){
+    if (m_speedstreaks)
+    {
         m_speedstreaks->reset();
-    };
+    }
 #endif
 
     Vec3 front(0, 0, getKartLength()*0.5f);
@@ -510,6 +511,29 @@ float Kart::getCurrentMaxSpeed() const
 {
     return m_max_speed->getCurrentMaxSpeed();
 }   // getCurrentMaxSpeed
+
+// ------------------------------------------------------------------------
+/** Returns the speed amount above the kart's own unboosted max speed.
+ */
+float Kart::getCurrentAdditionalSpeed() const
+{
+    const float speed = getSpeed();
+    const float current_engine_max_speed = m_kart_properties->getEngineMaxSpeed();
+    return core::max_(speed - current_engine_max_speed, 0.0f);
+} // getCurrentAdditionalSpeed
+
+// ------------------------------------------------------------------------
+/** Returns the ratio of the speed amount above the kart's own unboosted max speed
+ *  relative to the generic engine max speed.
+ */
+float Kart::getCurrentAdditionalSpeedRatio() const
+{
+    const float additional_speed_amount = getCurrentAdditionalSpeed();
+    const float absolute_engine_max_speed = m_kart_properties->getEngineGenericMaxSpeed();
+
+    return additional_speed_amount / absolute_engine_max_speed;
+} // getCurrentAdditionalSpeedRatio
+
 // -----------------------------------------------------------------------------
 int Kart::getSpeedIncreaseTicksLeft(unsigned int category) const
 {

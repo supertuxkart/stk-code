@@ -313,12 +313,12 @@ public:
     // ------------------------------------------------------------------------
     /** Returns the speed amount above the kart's own unboosted max speed.
     */
-    virtual float getCurrentAdditionalSpeed() const;
+    virtual float getCurrentAdditionalSpeed() const = 0;
     // ------------------------------------------------------------------------
     /** Returns the ratio of the speed amount above the kart's own unboosted max speed
      *  relative to the generic engine max speed.
      */
-    virtual float getCurrentAdditionalSpeedRatio() const;
+    virtual float getCurrentAdditionalSpeedRatio() const = 0;
 
     // ------------------------------------------------------------------------
     /** Sets the kart AI boost state.

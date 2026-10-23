@@ -712,8 +712,7 @@ PostProcessing::PostProcessing()
     // Load the simplex noise texture
     const std::string noiseTexturePath = file_manager->getAsset(
         FileManager::AssetType::TEXTURE,
-        "stk_noise_simplex.png"
-    );
+        "stk_noise_simplex.png");
 
     //TODO: implement single_channel path, currently loads rgba even though noise_texture is single channel only.
     m_noise_texture = GE::createTexture(noiseTexturePath); 
@@ -962,26 +961,38 @@ void PostProcessing::renderMotionBlur(const FrameBuffer &in_fbo,
 void PostProcessing::renderSpeedStreaks()
 {
     World* world = World::getWorld();
-    Camera* cam = Camera::getActiveCamera();
-    const Kart* kart = cam ? dynamic_cast<const Kart*>(cam->getKart()) : nullptr;
+    Camera* cam  = Camera::getActiveCamera();
+    const Kart* kart = dynamic_cast<const Kart*>(cam->getKart());
     SpeedStreaks* speed_streaks = kart ? kart->getSpeedStreaks() : nullptr;
 
-    float radial_scroll_offset =  0.0f;
-    float intensity            =  0.0f;
+    const Camera::CameraType cam_type = cam->getType();
+    const Camera::Mode       cam_mode = cam->getMode();
 
-    if (speed_streaks)
+    const bool is_valid_cam_mode = cam_mode == Camera::CM_NORMAL      ||
+                                   cam_mode == Camera::CM_REVERSE     ||
+                                   cam_mode == Camera::CM_LEADER_MODE ||
+                                   cam_mode == Camera::CM_FALLING;
+
+    float radial_scroll_offset  =  0.0f;
+    float intensity             =  0.0f;
+
+    // Determine if we should display speed streaks based on camera type/mode
+    if (speed_streaks &&
+        cam_type == Camera::CM_TYPE_NORMAL &&
+        is_valid_cam_mode)
     {
         radial_scroll_offset = speed_streaks->getRadialScrollOffset();
         intensity            = speed_streaks->getBoostIntensity();
 
+        // Change on screen direction of speedstreaks based on active camera mode
         auto direction = SpeedStreaks::Direction::FORWARD;
-        if(cam->getMode() == Camera::CM_REVERSE)
+        if (cam_mode == Camera::CM_REVERSE ||
+            cam_mode == Camera::CM_LEADER_MODE)
         {
             direction = SpeedStreaks::Direction::REVERSE;
         }
         speed_streaks->setDirection(direction);
     }
-
 
     glEnable(GL_BLEND);
     glBlendEquation(GL_FUNC_ADD);
@@ -1283,7 +1294,8 @@ FrameBuffer *PostProcessing::render(scene::ICameraSceneNode * const camnode,
     {
         PROFILER_PUSH_CPU_MARKER("-- Speed streaks", 0xFF, 0x00, 0x00);
         ScopedGPUTimer Timer(irr_driver->getGPUTimer(Q_SPEEDSTREAKS));
-        if (isRace && World::getWorld() && UserConfigParams::m_speed_streaks)
+        //TODO(stijn): restore this setting before pushing
+        if (isRace && World::getWorld() && true)//UserConfigParams::m_speed_streaks)
         {
             in_fbo->bind();
             renderSpeedStreaks();
