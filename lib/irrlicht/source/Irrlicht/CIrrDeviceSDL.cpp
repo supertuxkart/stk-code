@@ -512,9 +512,6 @@ start:
 	else
 		SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
 
-	if (CreationParams.ForceLegacyDevice)
-		goto legacy;
-
 #ifdef _IRR_COMPILE_WITH_OGLES_
 	if (Context)
 	{
@@ -617,19 +614,6 @@ start:
 			versionCorrect(3, 1)) return;
 	}
 #endif
-
-legacy:
-	irr::video::useCoreContext = false;
-	if (Context)
-	{
-		SDL_GL_DeleteContext(Context);
-		Context = NULL;
-	}
-	if (Window)
-	{
-		SDL_DestroyWindow(Window);
-		Window = NULL;
-	}
 
 #ifdef _IRR_COMPILE_WITH_OGLES_
 	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 2);

@@ -102,9 +102,9 @@ void CentralVideoSettings::init()
     }
 #if !defined(USE_GLES)
     m_glsl = (m_gl_major_version > 3 || (m_gl_major_version == 3 && m_gl_minor_version >= 1))
-           && !UserConfigParams::m_force_legacy_device && m_supports_sp;
+           && m_supports_sp;
 #else
-    m_glsl = m_gl_major_version >= 3 && !UserConfigParams::m_force_legacy_device;
+    m_glsl = m_gl_major_version >= 3;
 #endif
     if (!GUIEngine::isNoGraphics())
         initGL();

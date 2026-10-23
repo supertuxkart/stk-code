@@ -660,9 +660,6 @@ namespace UserConfigParams
     PARAM_PREFIX IntUserConfigParam         m_max_fps
             PARAM_DEFAULT(  IntUserConfigParam(120, "max_fps",
                        &m_video_group, "Maximum fps, should be at least 60") );
-    PARAM_PREFIX BoolUserConfigParam        m_force_legacy_device
-        PARAM_DEFAULT(BoolUserConfigParam(false, "force_legacy_device",
-        &m_video_group, "Force OpenGL 2 context, even if OpenGL 3 is available."));
     PARAM_PREFIX BoolUserConfigParam        m_split_screen_horizontally
         PARAM_DEFAULT(BoolUserConfigParam(true, "split_screen_horizontally",
             &m_video_group, "When playing a non-square amount of players (e.g. 2),"

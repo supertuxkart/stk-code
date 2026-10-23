@@ -193,7 +193,6 @@ IrrDriver::IrrDriver()
     p.DriverType    = video::EDT_OPENGL;
     p.Bits          = 24U;
     p.WindowSize    = core::dimension2d<u32>(1280,720);
-    p.ForceLegacyDevice = UserConfigParams::m_force_legacy_device;
 #else
     p.DriverType    = video::EDT_NULL;
     p.Bits          = 16U;
@@ -503,9 +502,6 @@ void IrrDriver::initDevice()
         m_device->drop();
         m_device  = NULL;
 
-        params.ForceLegacyDevice = (UserConfigParams::m_force_legacy_device ||
-            UserConfigParams::m_gamepad_visualisation);
-
 begin:
         GE::setVideoDriver(NULL);
 
@@ -693,20 +689,6 @@ begin:
 
     bool recreate_device = false;
 
-    // Some drivers are able to create OpenGL 3.1 context, but shader-based
-    // pipeline doesn't work for them. For example some radeon drivers
-    // support only GLSL 1.3 and it causes STK to crash. We should force to use
-    // fixed pipeline in this case.
-    if (!GUIEngine::isNoGraphics() &&
-        (GraphicsRestrictions::isDisabled(GraphicsRestrictions::GR_FORCE_LEGACY_DEVICE) ||
-        (CVS->isGLSL() && !CentralVideoSettings::m_supports_sp)))
-    {
-        Log::warn("irr_driver", "Driver doesn't support shader-based pipeline. "
-                                "Re-creating device to workaround the issue.");
-
-        params.ForceLegacyDevice = true;
-        recreate_device = true;
-    }
 #endif
 
     // Don't recreate on switch!

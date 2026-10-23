@@ -969,8 +969,6 @@ int handleCmdLinePreliminary()
             // Apply the chosen graphical presets
             if (strcmp(UserConfigParams::m_render_driver.c_str(), "vulkan") == 0 && n <= 2)
                 Log::error("main", "The vulkan renderer does not support the very low presets!");
-            else if (UserConfigParams::m_force_legacy_device)
-                Log::error("main", "The legacy renderer cannot use any of the gfx presets!");
             else
                 GraphicalPresets::applyGFXPreset(n);
         }
