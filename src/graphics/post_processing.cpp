@@ -1294,8 +1294,7 @@ FrameBuffer *PostProcessing::render(scene::ICameraSceneNode * const camnode,
     {
         PROFILER_PUSH_CPU_MARKER("-- Speed streaks", 0xFF, 0x00, 0x00);
         ScopedGPUTimer Timer(irr_driver->getGPUTimer(Q_SPEEDSTREAKS));
-        //TODO(stijn): restore this setting before pushing
-        if (isRace && World::getWorld() && true)//UserConfigParams::m_speed_streaks)
+        if (isRace && World::getWorld() && UserConfigParams::m_speed_streaks)
         {
             in_fbo->bind();
             renderSpeedStreaks();
