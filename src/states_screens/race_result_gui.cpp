@@ -2457,17 +2457,16 @@ void RaceResultGUI::displayBenchmarkSummary()
     // We therefore need to check both the parameter value and the current renderer.
     bool vk = (std::string(UserConfigParams::m_render_driver) == "vulkan");
     bool gl = (std::string(UserConfigParams::m_render_driver) == "opengl");
-    bool modern_gl = gl && !UserConfigParams::m_force_legacy_device;
     bool directx = (std::string(UserConfigParams::m_render_driver) == "directx9");
 
-    value = StringUtils::toWString((UserConfigParams::m_dynamic_lights && (modern_gl || vk)) ?
+    value = StringUtils::toWString((UserConfigParams::m_dynamic_lights && (gl || vk)) ?
                           UserConfigParams::m_scale_rtts_factor * 100 : 100);
     info_text[0] = _("Render resolution: %s%%", value);
-    info_text[1] = (UserConfigParams::m_dynamic_lights && (modern_gl || vk)) ? _("Dynamic lights: Enabled") :
+    info_text[1] = (UserConfigParams::m_dynamic_lights && (gl || vk)) ? _("Dynamic lights: Enabled") :
                                                                                _("Dynamic lights: Disabled");
-    info_text[2] = (!UserConfigParams::m_degraded_IBL && (modern_gl || vk)) ? _("Image-based lighting: Enabled") :
+    info_text[2] = (!UserConfigParams::m_degraded_IBL && (gl || vk)) ? _("Image-based lighting: Enabled") :
                                                                               _("Image-based lighting: Disabled");
-    info_text[3] = (UserConfigParams::m_mlaa && modern_gl) ? _("Anti-aliasing: Enabled") :
+    info_text[3] = (UserConfigParams::m_mlaa && gl) ? _("Anti-aliasing: Enabled") :
                                                              _("Anti-aliasing: Disabled");
     int geometry_detail = UserConfigParams::m_geometry_level;
     info_text[4] = _("Geometry detail: %s",
@@ -2477,22 +2476,21 @@ void RaceResultGUI::displayBenchmarkSummary()
         geometry_detail == 3 ? _C("Geometry level", "High")      :
         geometry_detail == 4 ? _C("Geometry level", "Very high") :
                                _C("Geometry level", "Ultra high"));
-    info_text[5] = (UserConfigParams::m_light_shaft && modern_gl) ? _("Light shaft (God rays): Enabled") :
+    info_text[5] = (UserConfigParams::m_light_shaft && gl) ? _("Light shaft (God rays): Enabled") :
                                                                     _("Light shaft (God rays): Disabled");
-    info_text[6] = (UserConfigParams::m_ssao && modern_gl) ?  _("Ambient occlusion: Enabled") :
+    info_text[6] = (UserConfigParams::m_ssao && gl) ?  _("Ambient occlusion: Enabled") :
                                                               _("Ambient occlusion: Disabled");
     value = StringUtils::toWString(UserConfigParams::m_shadows_resolution);
-    value = modern_gl ? value : StringUtils::toWString("0");
+    value = gl ? value : StringUtils::toWString("0");
     info_text[7] = _("Shadow resolution: %s", value);
-    bool has_pcss = (UserConfigParams::m_shadows_resolution > 0 && UserConfigParams::m_pcss && modern_gl);
+    bool has_pcss = (UserConfigParams::m_shadows_resolution > 0 && UserConfigParams::m_pcss && gl);
     info_text[8] = has_pcss ? _("Soft shadows: Enabled") :
                               _("Soft shadows: Disabled");
     info_text[9] = UserConfigParams::m_dof ? _("Depth of field: Enabled") :
                                               _("Depth of field: Disabled");
-    value = vk        ? StringUtils::toWString("Vulkan")    :
-            modern_gl ? _("OpenGL (modern)")                :
-            gl        ? _("OpenGL (legacy)")                :
-            directx   ? StringUtils::toWString("DirectX 9") : _("Unknown");
+    value = vk      ? StringUtils::toWString("Vulkan")    :
+            gl      ? _("OpenGL (modern)")                 :
+            directx ? StringUtils::toWString("DirectX 9") : _("Unknown");
     info_text[10] = value;
 
     for (int i = 0; i < 11; i++)

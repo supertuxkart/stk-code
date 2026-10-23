@@ -58,7 +58,6 @@ namespace irr
 			DisplayAdapter(0),
 			DriverMultithreaded(false),
 			UsePerformanceTimer(true),
-            ForceLegacyDevice(false),
             ShadersPath(""),
 			SDK_version_do_not_use(IRRLICHT_SDK_VERSION),
 			PrivateData(NULL),
@@ -94,7 +93,6 @@ namespace irr
 			DriverMultithreaded = other.DriverMultithreaded;
 			DisplayAdapter = other.DisplayAdapter;
 			UsePerformanceTimer = other.UsePerformanceTimer;
-            ForceLegacyDevice = other.ForceLegacyDevice;
             ShadersPath = other.ShadersPath;
 			PrivateData = other.PrivateData;
 			WindowPosition = other.WindowPosition;
@@ -310,14 +308,9 @@ namespace irr
 		problems with speed stepping and other techniques.
 		*/
 		bool UsePerformanceTimer;
-
-        //! For opengl: forces a opengl 2.1 context, even if an 
-        /** opengl 3 context is available.
-        */
-        bool ForceLegacyDevice;
         
         //! Specifies custom path for shaders directory.
-        /** Allows one to overwrite IRR_OGLES2_SHADER_PATH constant
+        /** Allows one to overwrite IRR_OGLES_SHADER_PATH constant
         */
         core::stringc ShadersPath;
 

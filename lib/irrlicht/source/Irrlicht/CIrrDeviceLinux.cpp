@@ -75,7 +75,7 @@ namespace irr
 		extern bool useCoreContext;
 		IVideoDriver* createOpenGLDriver(const SIrrlichtCreationParameters& params,
 				io::IFileSystem* io, CIrrDeviceLinux* device);
-		IVideoDriver* createOGLES2Driver(const SIrrlichtCreationParameters& params,
+		IVideoDriver* createOGLESDriver(const SIrrlichtCreationParameters& params,
 			video::SExposedVideoData& data, io::IFileSystem* io, IrrlichtDevice* device);
 	}
 } // end namespace irr
@@ -554,7 +554,7 @@ void IrrPrintXGrabError(int grabResult, const c8 * grabCommand )
 
 #ifdef _IRR_COMPILE_WITH_OPENGL_
 #ifdef _IRR_COMPILE_WITH_X11_
-static GLXContext getMeAGLContext(Display *display, GLXFBConfig glxFBConfig, bool force_legacy_context)
+static GLXContext getMeAGLContext(Display *display, GLXFBConfig glxFBConfig)
 {
 	GLXContext Context;
 	irr::video::useCoreContext = true;
@@ -607,36 +607,27 @@ static GLXContext getMeAGLContext(Display *display, GLXFBConfig glxFBConfig, boo
 	glXCreateContextAttribsARB = (PFNGLXCREATECONTEXTATTRIBSARBPROC)
 						glXGetProcAddressARB( (const GLubyte *) "glXCreateContextAttribsARB" );
 
-	if(!force_legacy_context)
-	{
-		// create core 4.3 context
-		os::Printer::log("Creating OpenGL 4.3 context...", ELL_INFORMATION);
-		Context = glXCreateContextAttribsARB(display, glxFBConfig, 0, True, GLContextDebugBit ? core43ctxdebug : core43ctx);
-		if (!XErrorSignaled)
-			return Context;
-
-		XErrorSignaled = false;
-		// create core 3.3 context
-		os::Printer::log("Creating OpenGL 3.3 context...", ELL_INFORMATION);
-		Context = glXCreateContextAttribsARB(display, glxFBConfig, 0, True, GLContextDebugBit ? core33ctxdebug : core33ctx);
-		if (!XErrorSignaled)
-			return Context;
-
-		XErrorSignaled = false;
-		// create core 3.1 context (for older mesa)
-		os::Printer::log("Creating OpenGL 3.1 context...", ELL_INFORMATION);
-		Context = glXCreateContextAttribsARB(display, glxFBConfig, 0, True, GLContextDebugBit ? core31ctxdebug : core31ctx);
-		if (!XErrorSignaled)
-			return Context;
-
-	}   // if(force_legacy_context)
+	// create core 4.3 context
+	os::Printer::log("Creating OpenGL 4.3 context...", ELL_INFORMATION);
+	Context = glXCreateContextAttribsARB(display, glxFBConfig, 0, True, GLContextDebugBit ? core43ctxdebug : core43ctx);
+	if (!XErrorSignaled)
+		return Context;
 
 	XErrorSignaled = false;
-	irr::video::useCoreContext = false;
-	// fall back to legacy context
-	os::Printer::log("Creating legacy OpenGL 2.1 context...", ELL_INFORMATION);
-	Context = glXCreateNewContext(display, glxFBConfig, GLX_RGBA_TYPE, NULL, True);
-	return Context;
+	// create core 3.3 context
+	os::Printer::log("Creating OpenGL 3.3 context...", ELL_INFORMATION);
+	Context = glXCreateContextAttribsARB(display, glxFBConfig, 0, True, GLContextDebugBit ? core33ctxdebug : core33ctx);
+	if (!XErrorSignaled)
+		return Context;
+
+	XErrorSignaled = false;
+	// create core 3.1 context (for older mesa)
+	os::Printer::log("Creating OpenGL 3.1 context...", ELL_INFORMATION);
+	Context = glXCreateContextAttribsARB(display, glxFBConfig, 0, True, GLContextDebugBit ? core31ctxdebug : core31ctx);
+	if (!XErrorSignaled)
+		return Context;
+
+	XErrorSignaled = false;
 }
 #endif
 #endif
@@ -1200,7 +1191,7 @@ bool CIrrDeviceLinux::createWindow()
 		if (glxWin)
 		{
 			getLogger()->setLogLevel(ELL_NONE);
-			Context = getMeAGLContext(display, glxFBConfig, CreationParams.ForceLegacyDevice);
+			Context = getMeAGLContext(display, glxFBConfig);
 			getLogger()->setLogLevel(CreationParams.LoggingLevel);
 			if (Context)
 			{
@@ -1319,13 +1310,13 @@ void CIrrDeviceLinux::createDriver()
 		#endif
 		break;
 
-	case video::EDT_OGLES2:
+	case video::EDT_OGLES:
 	{
-		#ifdef _IRR_COMPILE_WITH_OGLES2_
+		#ifdef _IRR_COMPILE_WITH_OGLES_
 		video::SExposedVideoData data;
 		data.OpenGLLinux.X11Window = window;
 		data.OpenGLLinux.X11Display = display;
-		VideoDriver = video::createOGLES2Driver(CreationParams, data, FileSystem, this);
+		VideoDriver = video::createOGLESDriver(CreationParams, data, FileSystem, this);
 		#else
 		os::Printer::log("No OpenGL ES 2.0 support compiled in.", ELL_ERROR);
 		#endif

@@ -969,8 +969,6 @@ int handleCmdLinePreliminary()
             // Apply the chosen graphical presets
             if (strcmp(UserConfigParams::m_render_driver.c_str(), "vulkan") == 0 && n <= 2)
                 Log::error("main", "The vulkan renderer does not support the very low presets!");
-            else if (UserConfigParams::m_force_legacy_device)
-                Log::error("main", "The legacy renderer cannot use any of the gfx presets!");
             else
                 GraphicalPresets::applyGFXPreset(n);
         }
@@ -2526,10 +2524,10 @@ int main(int argc, char *argv[])
                 #if !defined(MOBILE_STK)
                 if (UserConfigParams::m_old_driver_popup)
                 {
-                    #ifdef USE_GLES2
-                    irr::core::stringw version = "OpenGL ES 3.0";
+                    #ifdef USE_GLES
+                    irr::core::stringw version = "OpenGL ES";
                     #else
-                    irr::core::stringw version = "OpenGL 3.3";
+                    irr::core::stringw version = "OpenGL";
                     #endif
                     MessageDialog *dialog = new MessageDialog(_(
                         "Your graphics driver appears to be very old. Please "

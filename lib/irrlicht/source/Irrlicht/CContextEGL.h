@@ -23,6 +23,7 @@
 #if defined(_IRR_COMPILE_WITH_EGL_)
 
 #include <EGL/egl.h>
+#include <EGL/eglext.h>
 
 #ifndef EGL_CONTEXT_MAJOR_VERSION
 #define EGL_CONTEXT_MAJOR_VERSION 0x3098
@@ -80,7 +81,6 @@ struct ContextEGLParams
     ContextEGLPlatform platform;
     EGLNativeWindowType window;
     EGLNativeDisplayType display;
-    bool force_legacy_device;
     bool handle_srgb;
     bool with_alpha_channel;
     int swap_interval;
@@ -99,7 +99,6 @@ private:
     EGLConfig m_egl_config;
 
     ContextEGLParams m_creation_params;
-    bool m_is_legacy_device;
     bool m_initialized;
     int m_egl_version;
 
@@ -124,7 +123,6 @@ public:
     void reloadEGLSurface(void* window);
     bool swapBuffers();
     bool makeCurrent();
-    bool isLegacyDevice() {return m_is_legacy_device;}
     bool getSurfaceDimensions(int* width, int* height);
 };
 

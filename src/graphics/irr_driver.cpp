@@ -126,7 +126,7 @@
       _IRR_MATERIAL_MAX_TEXTURES_ < 8               || \
       ( !defined(_IRR_COMPILE_WITH_OPENGL_) &&         \
         !defined(SERVER_ONLY)               &&         \
-        !defined(_IRR_COMPILE_WITH_OGLES2_)       ) || \
+        !defined(_IRR_COMPILE_WITH_OGLES_)       ) || \
       !defined(_IRR_COMPILE_WITH_B3D_LOADER_)             )
 #error "Building against an incompatible Irrlicht. Distros, \
 please use the included version."
@@ -193,7 +193,6 @@ IrrDriver::IrrDriver()
     p.DriverType    = video::EDT_OPENGL;
     p.Bits          = 24U;
     p.WindowSize    = core::dimension2d<u32>(1280,720);
-    p.ForceLegacyDevice = UserConfigParams::m_force_legacy_device;
 #else
     p.DriverType    = video::EDT_NULL;
     p.Bits          = 16U;
@@ -503,17 +502,14 @@ void IrrDriver::initDevice()
         m_device->drop();
         m_device  = NULL;
 
-        params.ForceLegacyDevice = (UserConfigParams::m_force_legacy_device ||
-            UserConfigParams::m_gamepad_visualisation);
-
 begin:
         GE::setVideoDriver(NULL);
 
         video::E_DRIVER_TYPE driver_created = video::EDT_NULL;
         if (std::string(UserConfigParams::m_render_driver) == "opengl")
         {
-#if defined(USE_GLES2)
-            driver_created = video::EDT_OGLES2;
+#if defined(USE_GLES)
+            driver_created = video::EDT_OGLES;
 #else
             driver_created = video::EDT_OPENGL;
 #endif
@@ -693,20 +689,6 @@ begin:
 
     bool recreate_device = false;
 
-    // Some drivers are able to create OpenGL 3.1 context, but shader-based
-    // pipeline doesn't work for them. For example some radeon drivers
-    // support only GLSL 1.3 and it causes STK to crash. We should force to use
-    // fixed pipeline in this case.
-    if (!GUIEngine::isNoGraphics() &&
-        (GraphicsRestrictions::isDisabled(GraphicsRestrictions::GR_FORCE_LEGACY_DEVICE) ||
-        (CVS->isGLSL() && !CentralVideoSettings::m_supports_sp)))
-    {
-        Log::warn("irr_driver", "Driver doesn't support shader-based pipeline. "
-                                "Re-creating device to workaround the issue.");
-
-        params.ForceLegacyDevice = true;
-        recreate_device = true;
-    }
 #endif
 
     // Don't recreate on switch!
@@ -786,7 +768,7 @@ begin:
         (int x, int y, int w, int h, unsigned int f, unsigned int t, void* d)
         { glReadPixels(x, y, w, h, f, t, d); });
 
-#ifndef USE_GLES2
+#ifndef USE_GLES
     ogrRegPBOFunctions([](int n, unsigned int* b) { glGenBuffers(n, b); },
         [](unsigned int t, unsigned int b) { glBindBuffer(t, b); },
         [](unsigned int t, ptrdiff_t s, const void* d, unsigned int u)

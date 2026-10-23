@@ -375,7 +375,7 @@ LOCAL_CFLAGS       := -I../lib/angelscript/include      \
                       -Ideps-$(TARGET_ARCH_ABI)/libvorbis/include \
                       -Ideps-$(TARGET_ARCH_ABI)/openal/include    \
                       -Ideps-$(TARGET_ARCH_ABI)/mbedtls/include   \
-                      -DUSE_GLES2      \
+                      -DUSE_GLES      \
                       -DMOBILE_STK     \
                       -DENABLE_SOUND   \
                       -DENABLE_IPV6    \

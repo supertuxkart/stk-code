@@ -314,30 +314,21 @@ void CustomVideoSettingsDialog::updateActivation(const std::string& renderer)
     bool light = getWidget<CheckBoxWidget>("dynamiclight")->getState();
     bool real_light = light;
     bool vk = GE::getDriver()->getDriverType() == video::EDT_VULKAN;
-    bool modern_gl = CVS->isGLSL();
+    bool gl = CVS->isGLSL();
 
     // If showing enabled options for a specific renderer has
     // been requested, prioritize that
     if (renderer == "vulkan")
     {
         vk = true;
-        modern_gl = false;
+        gl = false;
     }
     else if (renderer != "") // OpenGL or DirectX
     {
         vk = false;
 
-        if (renderer == "opengl" && !UserConfigParams::m_force_legacy_device)
-            modern_gl = true;
-        else
-            modern_gl = false;
-    }
-
-    // Disable the options for advanced lighting if unavailable for this renderer
-    if (!vk && !modern_gl)
-    {
-        getWidget<CheckBoxWidget>("dynamiclight")->setActive(false);
-        light = false;
+        if (renderer == "opengl")
+            gl = true;
     }
 
     if (vk)

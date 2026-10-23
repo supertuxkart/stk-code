@@ -65,7 +65,7 @@ namespace irr
         extern bool useCoreContext;
         IVideoDriver* createOpenGLDriver(const SIrrlichtCreationParameters& params,
                 io::IFileSystem* io, CIrrDeviceWayland* device);
-        IVideoDriver* createOGLES2Driver(const SIrrlichtCreationParameters& params,
+        IVideoDriver* createOGLESDriver(const SIrrlichtCreationParameters& params,
                 io::IFileSystem* io, CIrrDeviceWayland* device);
     }
 }
@@ -1082,7 +1082,7 @@ bool CIrrDeviceWayland::initEGL()
 
     ContextEGLParams egl_params;
 
-    if (CreationParams.DriverType == video::EDT_OGLES2)
+    if (CreationParams.DriverType == video::EDT_OGLES)
     {
         egl_params.opengl_api = CEGL_API_OPENGL_ES;
     }
@@ -1092,7 +1092,6 @@ bool CIrrDeviceWayland::initEGL()
     }
 
     egl_params.surface_type = CEGL_SURFACE_WINDOW;
-    egl_params.force_legacy_device = CreationParams.ForceLegacyDevice;
     egl_params.handle_srgb = CreationParams.HandleSRGB;
     egl_params.with_alpha_channel = CreationParams.WithAlphaChannel;
     egl_params.swap_interval = CreationParams.SwapInterval;
@@ -1105,7 +1104,7 @@ bool CIrrDeviceWayland::initEGL()
     if (!success)
         return false;
 
-    video::useCoreContext = !m_egl_context->isLegacyDevice();
+    video::useCoreContext = true;
 
     int w = 0;
     int h = 0;
@@ -1235,9 +1234,9 @@ void CIrrDeviceWayland::createDriver()
         os::Printer::log("No OpenGL support compiled in.", ELL_ERROR);
         #endif
         break;
-    case video::EDT_OGLES2:
-        #ifdef _IRR_COMPILE_WITH_OGLES2_
-        VideoDriver = video::createOGLES2Driver(CreationParams, FileSystem, this);
+    case video::EDT_OGLES:
+        #ifdef _IRR_COMPILE_WITH_OGLES_
+        VideoDriver = video::createOGLESDriver(CreationParams, FileSystem, this);
         #else
         os::Printer::log("No OpenGL ES 2.0 support compiled in.", ELL_ERROR);
         #endif

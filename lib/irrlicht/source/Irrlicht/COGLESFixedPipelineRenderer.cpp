@@ -7,12 +7,12 @@
 
 #include "IrrCompileConfig.h"
 
-#ifdef _IRR_COMPILE_WITH_OGLES2_
+#ifdef _IRR_COMPILE_WITH_OGLES_
 
-#include "COGLES2FixedPipelineRenderer.h"
+#include "COGLESFixedPipelineRenderer.h"
 #include "IGPUProgrammingServices.h"
 #include "os.h"
-#include "COGLES2Driver.h"
+#include "COGLESDriver.h"
 
 #include "ge_render_info.hpp"
 
@@ -22,18 +22,18 @@ namespace video
 {
 
 //! Constructor
-COGLES2FixedPipelineRenderer::COGLES2FixedPipelineRenderer(const c8* vertexShaderProgram,
+COGLESFixedPipelineRenderer::COGLESFixedPipelineRenderer(const c8* vertexShaderProgram,
 							const c8* pixelShaderProgram, E_MATERIAL_TYPE baseMaterial,
-							COGLES2Driver* driver)
-	: COGLES2MaterialRenderer(driver, 0, baseMaterial)
+							COGLESDriver* driver)
+	: COGLESMaterialRenderer(driver, 0, baseMaterial)
 {
 	#ifdef _DEBUG
-	setDebugName("COGLES2FixedPipelineRenderer");
+	setDebugName("COGLESFixedPipelineRenderer");
 	#endif
 	yy = (int)baseMaterial;
 	int Temp = 0;
 
-	SharedRenderer = reinterpret_cast<COGLES2MaterialRenderer*>(driver->getMaterialRenderer(EMT_SOLID));
+	SharedRenderer = reinterpret_cast<COGLESMaterialRenderer*>(driver->getMaterialRenderer(EMT_SOLID));
 
 	if (SharedRenderer)
 		SharedRenderer->grab();
@@ -43,14 +43,14 @@ COGLES2FixedPipelineRenderer::COGLES2FixedPipelineRenderer(const c8* vertexShade
 
 
 //! Destructor
-COGLES2FixedPipelineRenderer::~COGLES2FixedPipelineRenderer()
+COGLESFixedPipelineRenderer::~COGLESFixedPipelineRenderer()
 {
 	if(SharedRenderer)
 		SharedRenderer->drop();
 }
 
 
-void COGLES2FixedPipelineRenderer::OnSetMaterial(const video::SMaterial& material,
+void COGLESFixedPipelineRenderer::OnSetMaterial(const video::SMaterial& material,
 				const video::SMaterial& lastMaterial,
 				bool resetAllRenderstates,
 				video::IMaterialRendererServices* services)
@@ -82,7 +82,7 @@ void COGLES2FixedPipelineRenderer::OnSetMaterial(const video::SMaterial& materia
 }
 
 
-bool COGLES2FixedPipelineRenderer::OnRender(IMaterialRendererServices* service, E_VERTEX_TYPE vtxtype)
+bool COGLESFixedPipelineRenderer::OnRender(IMaterialRendererServices* service, E_VERTEX_TYPE vtxtype)
 {
 	if (SharedRenderer)
 		return SharedRenderer->OnRender(service, vtxtype);
