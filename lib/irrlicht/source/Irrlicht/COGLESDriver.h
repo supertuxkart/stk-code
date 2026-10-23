@@ -30,10 +30,10 @@ namespace irr
 #if !defined(_IRR_COMPILE_WITH_SDL_DEVICE_)
 
 #if defined(_IRR_COMPILE_WITH_IOS_DEVICE_)
-#include <OpenGLES/ES2/gl.h>
-#include <OpenGLES/ES2/glext.h>
+#include <OpenGLES/ES3/gl.h>
+#include <OpenGLES/ES3/glext.h>
 #elif defined(_IRR_COMPILE_WITH_ANDROID_DEVICE_)
-#include <GLES2/gl2.h>
+#include <GLES3/gl31.h>
 #include "stk_android_native_app_glue.h"
 #endif
 

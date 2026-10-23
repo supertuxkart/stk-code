@@ -15,10 +15,10 @@
 #if defined(_IRR_COMPILE_WITH_SDL_DEVICE_)
 #include "glad/gl.h"
 #elif defined (IOS_STK)
-#include <OpenGLES/ES2/gl.h>
-#include <OpenGLES/ES2/glext.h>
+#include <OpenGLES/ES3/gl.h>
+#include <OpenGLES/ES3/glext.h>
 #else
-#include <GLES2/gl2.h>
+#include <GLES3/gl31.h>
 #include <EGL/eglplatform.h>
 #endif
 

@@ -534,7 +534,7 @@ start:
 	if (Window)
 	{
 		Context = SDL_GL_CreateContext(Window);
-		if (Context && gladLoadGLES((GLADloadfunc)SDL_GL_GetProcAddress) != 0 &&
+		if (Context && gladLoadGLES2((GLADloadfunc)SDL_GL_GetProcAddress) != 0 &&
 			versionCorrect(3, 0)) return;
 	}
 
@@ -635,7 +635,7 @@ start:
 	{
 		Context = SDL_GL_CreateContext(Window);
 #ifdef _IRR_COMPILE_WITH_OGLES_
-		if (Context && gladLoadGLES((GLADloadfunc)SDL_GL_GetProcAddress) != 0) return;
+		if (Context && gladLoadGLES2((GLADloadfunc)SDL_GL_GetProcAddress) != 0) return;
 #else
 		if (Context && gladLoadGL((GLADloadfunc)SDL_GL_GetProcAddress) != 0) return;
 #endif

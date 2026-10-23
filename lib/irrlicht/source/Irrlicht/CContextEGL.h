@@ -23,6 +23,7 @@
 #if defined(_IRR_COMPILE_WITH_EGL_)
 
 #include <EGL/egl.h>
+#include <EGL/eglext.h>
 
 #ifndef EGL_CONTEXT_MAJOR_VERSION
 #define EGL_CONTEXT_MAJOR_VERSION 0x3098

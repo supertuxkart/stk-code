@@ -16,10 +16,10 @@
 #else
 
 #ifdef IOS_STK
-#include <OpenGLES/ES2/gl.h>
-#include <OpenGLES/ES2/glext.h>
+#include <OpenGLES/ES3/gl.h>
+#include <OpenGLES/ES3/glext.h>
 #else
-#include <GLES2/gl2.h>
+#include <GLES3/gl31.h>
 // seems to be missing...
 typedef char GLchar;
 #if defined(_IRR_OGLES_USE_EXTPOINTER_)
