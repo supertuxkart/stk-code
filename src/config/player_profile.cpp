@@ -170,21 +170,23 @@ void PlayerProfile::initRemainingData()
 }   // initRemainingData
 
 //------------------------------------------------------------------------------
-// TODO - Register setIconFromKart Description
+/** Sets the profile icon to use the icon from the specified kart identifier.
+ *  Clears the existing filename to trigger copying the new texture in addIcon().
+ *  \param kart_ident The internal identifier of the kart to copy the icon from.
+ */
 void PlayerProfile::setIconFromKart(const std::string& kart_ident)
 {
 
     m_icon_kart_ident = kart_ident;
     m_icon_filename = "";
     addIcon();
-}   // TODO - setIconFromKart
+}   // setIconFromKart
 
 //------------------------------------------------------------------------------
-
-//------------------------------------------------------------------------------
-/** Creates an icon for a player if non exist so far. It takes the unique
- *  player id modulo the number of karts to pick an icon from the karts. It
- *  then uses the unique number plus the extentsion of the original icon as the
+/** Creates an icon for a player if none exists so far. If a specific kart was
+ *  chosen (via m_icon_kart_ident), that kart's icon is used; otherwise, it takes
+ *  the unique player id modulo the number of karts to pick an icon from the karts.
+ *  It then uses the unique number plus the extension of the original icon as the
  *  file name (it's not possible to use the player name, since the name is in
  *  utf-16, but typically the file systems are not, resulting in incorrect file
  *  names). The icon is then copied to the user config directory, so that it
