@@ -54,7 +54,6 @@ IconSelectionDialog::~IconSelectionDialog()
 void IconSelectionDialog::init()
 {
     ModalDialog::init();
-    m_kart_icons_widget->setSelection(0, PLAYER_ID_GAME_MASTER, true);
 }
 
 
