@@ -25,6 +25,7 @@
 #include "challenges/unlock_manager.hpp"
 #include "config/player_manager.hpp"
 #include "graphics/central_settings.hpp"
+#include "graphics/irr_driver.hpp"
 #include "guiengine/screen_keyboard.hpp"
 #include "guiengine/widgets/text_box_widget.hpp"
 #include "online/link_helper.hpp"
@@ -126,21 +127,7 @@ void BaseUserScreen::init()
 
     Screen::init();
 
-    m_players->clearItems();
-    int current_player_index = -1;
-
-    for (unsigned int n=0; n<PlayerManager::get()->getNumPlayers(); n++)
-    {
-        const PlayerProfile *player = PlayerManager::get()->getPlayer(n);
-        if (player->isGuestAccount()) continue;
-        std::string s = StringUtils::toString(n);
-        m_players->addItem(player->getName(), s, player->getIconFilename(), 0,
-                           IconButtonWidget::ICON_PATH_TYPE_ABSOLUTE);
-        if(player == PlayerManager::getCurrentPlayer())
-            current_player_index = n;
-    }
-
-    m_players->updateItemDisplay();
+    int current_player_index = loadProfilesIcons();
 
     // Select the current player. That can only be done after
     // updateItemDisplay is called.
@@ -169,6 +156,40 @@ void BaseUserScreen::init()
     }
     m_auto_login = false;
 }   // init
+
+int BaseUserScreen::loadProfilesIcons()
+{
+    m_players->clearItems();
+
+    int current_player_index = -1;
+
+    for (unsigned int n=0; n<PlayerManager::get()->getNumPlayers(); n++)
+    {
+        const PlayerProfile *player = PlayerManager::get()->getPlayer(n);
+        if (player->isGuestAccount()) continue;
+
+        // Clears pre-existing icon cache, important to when this method
+        // is called after a profile gets a new icon chosen
+        std::string icon_path = player->getIconFilename();
+        video::ITexture* old_tex = irr_driver->getTexture(icon_path);
+        if (old_tex)
+        {
+            irr_driver->removeTexture(old_tex);
+        }
+
+        std::string s = StringUtils::toString(n);
+        m_players->addItem(player->getName(), s, player->getIconFilename(), 0,
+                           IconButtonWidget::ICON_PATH_TYPE_ABSOLUTE);
+        if(player == PlayerManager::getCurrentPlayer())
+            current_player_index = n;
+    }
+
+    m_players->updateItemDisplay();
+
+    Log::info("BaseUserScreen", "Loaded Profiles Icons");
+
+    return current_player_index;
+}   // loadProfilesIcons
 
 // ----------------------------------------------------------------------------
 PlayerProfile* BaseUserScreen::getSelectedPlayer()
