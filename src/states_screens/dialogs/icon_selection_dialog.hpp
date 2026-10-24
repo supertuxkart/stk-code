@@ -21,6 +21,7 @@
 
 #include "guiengine/modaldialog.hpp"
 #include "utils/cpp2011.hpp"
+#include "states_screens/options/user_screen.hpp"
 
 class PlayerProfile;
 namespace GUIEngine
@@ -37,6 +38,8 @@ class IconSelectionDialog : public GUIEngine::ModalDialog
 private:
     PlayerProfile* m_player_profile;
 
+    BaseUserScreen* m_parent_screen;
+
     GUIEngine::DynamicRibbonWidget* m_kart_icons_widget;
 
     GUIEngine::RibbonWidget* m_buttons_widget;
@@ -44,7 +47,7 @@ private:
     std::string m_selected_kart;
 
 public:
-    IconSelectionDialog(PlayerProfile* pp);
+    IconSelectionDialog(PlayerProfile* pp, BaseUserScreen* user_screen);
 
     ~IconSelectionDialog();
 

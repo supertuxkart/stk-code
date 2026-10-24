@@ -28,11 +28,12 @@
 using namespace GUIEngine;
 
 // ----------------------------------------------------------------------------
-IconSelectionDialog::IconSelectionDialog(PlayerProfile* pp)
+IconSelectionDialog::IconSelectionDialog(PlayerProfile* pp, BaseUserScreen* user_screen)
                      : ModalDialog(0.75f, 0.75f, MODAL_DIALOG_LOCATION_CENTER)
 {
     loadFromFile("icon_selection_dialog.stkgui");
     m_player_profile = pp;
+    m_parent_screen = user_screen;
 
     m_buttons_widget = getWidget<RibbonWidget>("buttons");
     assert(m_buttons_widget);
@@ -107,6 +108,7 @@ GUIEngine::EventPropagation
             if (!m_selected_kart.empty())
             {
                 m_player_profile->setIconFromKart(m_selected_kart);
+                m_parent_screen->loadProfilesIcons();
             }
 
             ModalDialog::dismiss();

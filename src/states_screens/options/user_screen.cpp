@@ -452,7 +452,7 @@ void BaseUserScreen::eventCallback(Widget* widget,
         }
         else if (button == "choose_icon")
         {
-            new IconSelectionDialog(getSelectedPlayer());
+            new IconSelectionDialog(getSelectedPlayer(), this);
         }
         else if (button == "delete")
         {
