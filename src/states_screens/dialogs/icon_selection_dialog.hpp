@@ -31,19 +31,26 @@ namespace GUIEngine
 }
 
 /**
+ * \brief Modal dialog allowing players to pick an icon for their profile
+ *        from available native karts.
  * \ingroup states_screens
  */
 class IconSelectionDialog : public GUIEngine::ModalDialog
 {
 private:
+    /** The player profile being customized. */
     PlayerProfile* m_player_profile;
 
+    /** Parent screen to notify when icons are updated. */
     BaseUserScreen* m_parent_screen;
 
+    /** The scrollable grid containing all kart icons. */
     GUIEngine::DynamicRibbonWidget* m_kart_icons_widget;
 
+    /** The action buttons bar (Cancel / Apply). */
     GUIEngine::RibbonWidget* m_buttons_widget;
 
+    /** Codename of the currently selected kart in the grid. */
     std::string m_selected_kart;
 
 public:

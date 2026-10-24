@@ -157,6 +157,12 @@ void BaseUserScreen::init()
     m_auto_login = false;
 }   // init
 
+// ----------------------------------------------------------------------------
+/** Populates the player profile selection ribbon with updated icons and names.
+ *  Clears any previously cached textures in IrrDriver so updated avatars on
+ *  disk are reloaded immediately.
+ *  \return The index of the current player in the list.
+ */
 int BaseUserScreen::loadProfilesIcons()
 {
     m_players->clearItems();
