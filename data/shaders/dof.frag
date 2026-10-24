@@ -75,7 +75,7 @@ void main()
 
     // The blur radius is scaled with vertical pixels so that it is
     // invariant with regard to track geometry across resolutions
-    float scalingFactor = u_screen.y / 1440;
+    float scalingFactor = u_screen.y / 1440.0;
 
     // If you increase the strength significantly, you may want to remove the
     // depth reuse in the loop below, otherwise there will be ghosting artifacts.
@@ -120,7 +120,7 @@ void main()
         tapCoordinates = uv + main_angles[i] * (offset * 0.4) * blur;
         col += tapWeight * texture(tex, tapCoordinates);
 
-        successfulTapCount += 3 * tapWeight;
+        successfulTapCount += 3.0 * tapWeight;
 
         // Offset angles - we have to compute the depth and weight again
         // 2 - 0.9 distance ring - double weight for bokeh effect
