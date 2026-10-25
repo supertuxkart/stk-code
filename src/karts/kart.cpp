@@ -3242,6 +3242,13 @@ SFXBase* Kart::getNextEmitter()
  */
 void Kart::updateGraphics(float dt)
 {
+    if (World::getWorld()->getPhase() ==
+        WorldStatus::IN_GAME_MENU_PHASE &&
+        !NetworkConfig::get()->isNetworking())
+    {
+        return;
+    }
+
     /* (TODO: add back when properly done)
     for (int n = 0; n < SFXManager::NUM_CUSTOMS; n++)
     {
@@ -3377,9 +3384,7 @@ void Kart::updateGraphics(float dt)
 #ifndef SERVER_ONLY
     // draw skidmarks if relevant (we force pink skidmarks on when hitting
     // a bubblegum)
-    if (World::getWorld()->getPhase() !=
-        WorldStatus::IN_GAME_MENU_PHASE &&
-        m_kart_properties->getSkidEnabled() && m_skidmarks)
+    if (m_kart_properties->getSkidEnabled() && m_skidmarks)
     {
         m_skidmarks->update(dt,
             m_bubblegum_ticks > 0,
