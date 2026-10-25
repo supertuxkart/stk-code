@@ -26,6 +26,7 @@
 #include "input/input_manager.hpp"
 #include "input/multitouch_device.hpp"
 #include "modes/world.hpp"
+#include "states_screens/dialogs/custom_gui_settings.hpp"
 #include "states_screens/race_gui_multitouch.hpp"
 #include "utils/translation.hpp"
 
@@ -219,7 +220,12 @@ GUIEngine::EventPropagation MultitouchSettingsDialog::processEvent(
 
             return GUIEngine::EVENT_BLOCK;
         }
-
+        else if (selection == "edit")
+        {
+            updateValues();
+            new CustomGuiSettingsDialog(0.6f, 0.6f);
+            return GUIEngine::EVENT_BLOCK;
+        }
     }
     return GUIEngine::EVENT_LET;
 }   // processEvent
