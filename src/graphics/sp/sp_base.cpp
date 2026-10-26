@@ -107,6 +107,8 @@ bool sp_debug_view = false;
 // ----------------------------------------------------------------------------
 bool g_handle_shadow = false;
 // ----------------------------------------------------------------------------
+bool discard_mesh[5];
+// ----------------------------------------------------------------------------
 SPShader* g_normal_visualizer = NULL;
 // ----------------------------------------------------------------------------
 SPShader* g_glow_shader = NULL;
@@ -840,10 +842,11 @@ void addObject(SPMeshNode* node)
 
         core::aabbox3df bb = mb->getBoundingBox();
         model_matrix.transformBoxEx(bb);
-        std::vector<bool> discard;
         const bool handle_shadow = node->isInShadowPass() &&
             g_handle_shadow && shader->hasShader(RP_SHADOW);
-        discard.resize((handle_shadow ? 5 : 1), false);
+
+        // Reset all discard values to false before use
+        std::memset(discard_mesh, 0, sizeof(discard_mesh));
 
         for (int dc_type = 0; dc_type < (handle_shadow ? 5 : 1); dc_type++)
         {
@@ -865,27 +868,27 @@ void addObject(SPMeshNode* node)
                 }
                 if (outside)
                 {
-                    discard[dc_type] = true;
+                    discard_mesh[dc_type] = true;
                     break;
                 }
             }
         }
 
 #ifdef MEASURE_CULLING
-        if (!discard[0])
+        if (!discard_mesh[0])
             culling_stats.meshbuffers_kept_for_camera++;
         if (handle_shadow &&
-            (!discard[1] || !discard[2] || !discard[3] || !discard[4]))
+            (!discard_mesh[1] || !discard_mesh[2] || !discard_mesh[3] || !discard_mesh[4]))
         {
             culling_stats.meshbuffers_kept_for_shadows++;
-            if (discard[0])
+            if (discard_mesh[0])
                 culling_stats.meshbuffers_kept_for_shadows_only++;
         }
 #endif
 
-        if (handle_shadow ?
-            (discard[0] && discard[1] && discard[2] && discard[3] &&
-            discard[4]) : discard[0])
+        if (!handle_shadow ? discard_mesh[0] :
+            (discard_mesh[0] && discard_mesh[1] && discard_mesh[2] &&
+            discard_mesh[3] && discard_mesh[4]))
         {
 #ifdef MEASURE_CULLING
             culling_stats.meshbuffers_discarded++;
@@ -923,7 +926,7 @@ void addObject(SPMeshNode* node)
 
         for (int dc_type = 0; dc_type < (handle_shadow ? 5 : 1); dc_type++)
         {
-            if (discard[dc_type])
+            if (discard_mesh[dc_type])
                 continue;
 
             if (dc_type == 0)
@@ -1009,10 +1012,12 @@ void handleDynamicDrawCall()
         SPShader* shader = dydc->getShader();
         core::aabbox3df bb = dydc->getBoundingBox();
         dydc->getAbsoluteTransformation().transformBoxEx(bb);
-        std::vector<bool> discard;
         const bool handle_shadow =
             g_handle_shadow && shader->hasShader(RP_SHADOW);
-        discard.resize((handle_shadow ? 5 : 1), false);
+
+        // Reset all discard values to false before use
+        std::memset(discard_mesh, 0, sizeof(discard_mesh));
+
         for (int dc_type = 0; dc_type < (handle_shadow ? 5 : 1); dc_type++)
         {
             for (int i = 0; i < 24; i += 4)
@@ -1033,15 +1038,15 @@ void handleDynamicDrawCall()
                 }
                 if (outside)
                 {
-                    discard[dc_type] = true;
+                    discard_mesh[dc_type] = true;
                     break;
                 }
             }
         }
 
-        if (handle_shadow ?
-            (discard[0] && discard[1] && discard[2] && discard[3] &&
-            discard[4]) : discard[0])
+        if (!handle_shadow ? discard_mesh[0] :
+            (discard_mesh[0] && discard_mesh[1] && discard_mesh[2] &&
+            discard_mesh[3] && discard_mesh[4]))
         {
             continue;
         }
@@ -1051,7 +1056,7 @@ void handleDynamicDrawCall()
 
         for (int dc_type = 0; dc_type < (handle_shadow ? 5 : 1); dc_type++)
         {
-            if (discard[dc_type])
+            if (discard_mesh[dc_type])
                 continue;
 
             if (dc_type == 0)
