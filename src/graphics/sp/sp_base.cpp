@@ -64,6 +64,33 @@
 
 using namespace GE;
 
+#undef MEASURE_CULLING
+#ifdef MEASURE_CULLING
+namespace
+{
+    struct CullingStats
+    {
+        int meshbuffers_treated = 0;
+        int meshbuffers_discarded = 0;
+        int meshbuffers_kept_for_camera = 0;
+        int meshbuffers_kept_for_shadows = 0;
+        int meshbuffers_kept_for_shadows_only = 0;
+    
+        void reset()
+        {
+            meshbuffers_treated = 0;
+            meshbuffers_discarded = 0;
+            meshbuffers_kept_for_camera = 0;
+            meshbuffers_kept_for_shadows = 0;
+            meshbuffers_kept_for_shadows_only = 0;
+        }
+    };
+
+// Only available in this file
+CullingStats culling_stats;
+}
+#endif
+
 namespace SP
 {
 
@@ -794,26 +821,23 @@ void prepareDrawCalls()
 // ----------------------------------------------------------------------------
 void addObject(SPMeshNode* node)
 {
-    if (!sp_culling)
-    {
+    if (!sp_culling || node->getSPM() == NULL)
         return;
-    }
-
-    if (node->getSPM() == NULL)
-    {
-        return;
-    }
 
     const core::matrix4& model_matrix = node->getAbsoluteTransformation();
     bool added_for_skinning = false;
+
     for (unsigned m = 0; m < node->getSPM()->getMeshBufferCount(); m++)
     {
         SPMeshBuffer* mb = node->getSPM()->getSPMeshBuffer(m);
         SPShader* shader = node->getShader(m);
         if (shader == NULL)
-        {
             continue;
-        }
+
+#ifdef MEASURE_CULLING
+        culling_stats.meshbuffers_treated++;
+#endif
+
         core::aabbox3df bb = mb->getBoundingBox();
         model_matrix.transformBoxEx(bb);
         std::vector<bool> discard;
@@ -846,10 +870,26 @@ void addObject(SPMeshNode* node)
                 }
             }
         }
+
+#ifdef MEASURE_CULLING
+        if (!discard[0])
+            culling_stats.meshbuffers_kept_for_camera++;
+        if (handle_shadow &&
+            (!discard[1] || !discard[2] || !discard[3] || !discard[4]))
+        {
+            culling_stats.meshbuffers_kept_for_shadows++;
+            if (discard[0])
+                culling_stats.meshbuffers_kept_for_shadows_only++;
+        }
+#endif
+
         if (handle_shadow ?
             (discard[0] && discard[1] && discard[2] && discard[3] &&
             discard[4]) : discard[0])
         {
+#ifdef MEASURE_CULLING
+            culling_stats.meshbuffers_discarded++;
+#endif
             continue;
         }
 
@@ -998,6 +1038,7 @@ void handleDynamicDrawCall()
                 }
             }
         }
+
         if (handle_shadow ?
             (discard[0] && discard[1] && discard[2] && discard[3] &&
             discard[4]) : discard[0])
@@ -1011,17 +1052,13 @@ void handleDynamicDrawCall()
         for (int dc_type = 0; dc_type < (handle_shadow ? 5 : 1); dc_type++)
         {
             if (discard[dc_type])
-            {
                 continue;
-            }
+
             if (dc_type == 0)
-            {
                 sp_solid_poly_count += dydc->getVertexCount();
-            }
             else
-            {
                 sp_shadow_poly_count += dydc->getVertexCount();
-            }
+
             if (shader->isTransparent())
             {
                 // Transparent shader should always uses mesh samplers
@@ -1103,9 +1140,8 @@ void updateModelMatrix()
             for (auto& q : p.second)
             {
                 if (q.second.empty())
-                {
                     continue;
-                }
+
                 std::array<GLuint, 6> texture_names =
                     {{ 0, 0, 0, 0, 0, 0 }};
                 int material_id =
@@ -1217,6 +1253,17 @@ void uploadAll()
         {
             return dc->isRemoving();
         }), g_dy_dc.end());
+
+#ifdef MEASURE_CULLING
+    Log::info("CullingStats", "%i objects treated, %i discarded, %i kept for camera, "
+        "%i kept for shadows, %i kept for shadows only",
+        culling_stats.meshbuffers_treated,
+        culling_stats.meshbuffers_discarded,
+        culling_stats.meshbuffers_kept_for_camera,
+        culling_stats.meshbuffers_kept_for_shadows,
+        culling_stats.meshbuffers_kept_for_shadows_only);
+    culling_stats.reset();
+#endif
 }
 
 // ----------------------------------------------------------------------------
