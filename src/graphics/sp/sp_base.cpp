@@ -1289,7 +1289,7 @@ void drawGlow()
 void draw(RenderPass rp, DrawCallType dct)
 {
     std::stringstream profiler_name;
-    profiler_name << "SP::Draw " << dct << " with " << rp;
+    profiler_name << "--- SP::Draw " << dct << " with " << rp;
     PROFILER_PUSH_CPU_MARKER(profiler_name.str().c_str(),
         (uint8_t)(float(dct + rp + 2) / float(DCT_FOR_VAO + RP_COUNT) * 255.0f),
         (uint8_t)(float(dct + 1) / (float)DCT_FOR_VAO * 255.0f) ,

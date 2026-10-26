@@ -1096,7 +1096,7 @@ FrameBuffer *PostProcessing::render(scene::ICameraSceneNode * const camnode,
 
     if (isRace && UserConfigParams::m_dof && (physics == NULL || !physics->isDebug()))
     {
-        PROFILER_PUSH_CPU_MARKER("- DoF", 0xFF, 0x00, 0x00);
+        PROFILER_PUSH_CPU_MARKER("-- DoF", 0xFF, 0x00, 0x00);
         ScopedGPUTimer Timer(irr_driver->getGPUTimer(Q_DOF));
         renderDoF(*out_fbo, in_fbo->getRTT()[0], rtts->getDepthStencilTexture());
         std::swap(in_fbo, out_fbo);
@@ -1110,7 +1110,7 @@ FrameBuffer *PostProcessing::render(scene::ICameraSceneNode * const camnode,
 
     if (isRace && UserConfigParams::m_light_shaft && hasgodrays)
     {
-        PROFILER_PUSH_CPU_MARKER("- Godrays", 0xFF, 0x00, 0x00);
+        PROFILER_PUSH_CPU_MARKER("-- Godrays", 0xFF, 0x00, 0x00);
         ScopedGPUTimer Timer(irr_driver->getGPUTimer(Q_GODRAYS));
         renderGodRays(camnode, *in_fbo, rtts->getFBO(FBO_RGBA_1),
             rtts->getFBO(FBO_QUARTER1), rtts->getFBO(FBO_QUARTER2));
@@ -1120,7 +1120,7 @@ FrameBuffer *PostProcessing::render(scene::ICameraSceneNode * const camnode,
 
     // Simulate camera defects from there
     {
-        PROFILER_PUSH_CPU_MARKER("- Bloom", 0xFF, 0x00, 0x00);
+        PROFILER_PUSH_CPU_MARKER("-- Bloom", 0xFF, 0x00, 0x00);
         ScopedGPUTimer Timer(irr_driver->getGPUTimer(Q_BLOOM));
 
         if (isRace && UserConfigParams::m_bloom && (physics == NULL || !physics->isDebug()))
@@ -1195,7 +1195,7 @@ FrameBuffer *PostProcessing::render(scene::ICameraSceneNode * const camnode,
 
     // Tonemap from HDR to SDR - switching from RGBA16 over to RGBA8 framebuffers afterwards.
     {
-        PROFILER_PUSH_CPU_MARKER("- Tonemap", 0xFF, 0x00, 0x00);
+        PROFILER_PUSH_CPU_MARKER("-- Tonemap", 0xFF, 0x00, 0x00);
         ScopedGPUTimer Timer(irr_driver->getGPUTimer(Q_TONEMAP));
         // only enable vignette during race
 
@@ -1212,7 +1212,7 @@ FrameBuffer *PostProcessing::render(scene::ICameraSceneNode * const camnode,
     out_fbo = &rtts->getFBO(FBO_RGBA_2);
 
     {
-        PROFILER_PUSH_CPU_MARKER("- Motion blur", 0xFF, 0x00, 0x00);
+        PROFILER_PUSH_CPU_MARKER("-- Motion blur", 0xFF, 0x00, 0x00);
         ScopedGPUTimer Timer(irr_driver->getGPUTimer(Q_MOTIONBLUR));
 
         if (isRace && UserConfigParams::m_motionblur && World::getWorld() &&
@@ -1226,7 +1226,7 @@ FrameBuffer *PostProcessing::render(scene::ICameraSceneNode * const camnode,
 
     // Handle lightning rendering
     {
-        PROFILER_PUSH_CPU_MARKER("- Lightning", 0xFF, 0x00, 0x00);
+        PROFILER_PUSH_CPU_MARKER("-- Lightning", 0xFF, 0x00, 0x00);
         ScopedGPUTimer Timer(irr_driver->getGPUTimer(Q_LIGHTNING));
         Weather* weather = Weather::getInstance();
         if (weather && weather->shouldLightning())
@@ -1240,7 +1240,7 @@ FrameBuffer *PostProcessing::render(scene::ICameraSceneNode * const camnode,
 
     if (UserConfigParams::m_mlaa) // MLAA. Must be the last pp filter.
     {
-        PROFILER_PUSH_CPU_MARKER("- MLAA", 0xFF, 0x00, 0x00);
+        PROFILER_PUSH_CPU_MARKER("-- MLAA", 0xFF, 0x00, 0x00);
         ScopedGPUTimer Timer(irr_driver->getGPUTimer(Q_MLAA));
         applyMLAA(*in_fbo,
                   rtts->getFBO(FBO_RGBA_3),
