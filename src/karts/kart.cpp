@@ -519,7 +519,7 @@ float Kart::getCurrentAdditionalSpeed() const
 {
     const float speed = getSpeed();
     const float current_engine_max_speed = m_kart_properties->getEngineMaxSpeed();
-    return core::max_(speed - current_engine_max_speed, 0.0f);
+    return std::max(speed - current_engine_max_speed, 0.0f);
 } // getCurrentAdditionalSpeed
 
 // ------------------------------------------------------------------------

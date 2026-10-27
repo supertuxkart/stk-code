@@ -36,7 +36,7 @@ public:
     void  update(float dt);
 
     // Set the direction in which the streaks should move on screen (inwards/outwards).
-    void  setDirection(Direction direction);
+    void  setDirection(Direction direction) { m_direction = direction; }
 
     float getBoostIntensity() const { return m_filtered_boost_intensity; }
     float getRadialScrollOffset() const { return m_radial_scroll_offset; }

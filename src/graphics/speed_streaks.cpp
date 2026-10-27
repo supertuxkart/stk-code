@@ -42,12 +42,6 @@ float SpeedStreaks::calcBoostIntensity(float lower_bound_ratio, float upper_boun
     return core::clamp(result, 0.0f, 1.0f);
 }
 
-// Set the direction in which the streaks should move on screen (inwards/outwards).
-void SpeedStreaks::setDirection(Direction dir)
-{
-    m_direction = dir;
-}
-
 void SpeedStreaks::reset()
 {
     m_filtered_boost_intensity = 0.0f;

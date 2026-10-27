@@ -36,8 +36,8 @@ const float WISP_RIPPLE             = 0.003;    // Strength of the distortion ap
 const float WISP_ACTIVATION         = 0.05;     // Threshold boost level at which the effect starts being fully visible.
 
 const float RADIAL_MASK_SOFTNESS    = 1.0;
-const float RADIAL_MASK_SIZE_MIN    = 0.75;
-const float RADIAL_MASK_SIZE_MAX    = 0.35;
+const float RADIAL_MASK_SIZE_MIN    = 1.0;
+const float RADIAL_MASK_SIZE_MAX    = 0.5;
 
 const float COLOR_CHANGE_SPEED      = 8.0;      // At what speed should the color change clockwise over time.
 const float COLOR_SATURATION_MIN    = 0.1;
