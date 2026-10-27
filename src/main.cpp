@@ -699,6 +699,8 @@ void cmdLineHelp()
     "       --disable-light-shaft Disable light shafts (God rays).\n"
     "       --enable-dof       Enable depth of field.\n"
     "       --disable-dof      Disable depth of field.\n"
+    "       --enable-speed-streaks  Enable speed streaks.\n"
+    "       --disable-speed-streaks Disable speed streaks.\n"
     "       --enable-particles  Enable particles.\n"
     "       --disable-particles Disable particles.\n"
     "       --enable-animated-characters  Enable animated characters.\n"
@@ -996,6 +998,11 @@ int handleCmdLinePreliminary()
         UserConfigParams::m_dof = true;
     else if (CommandLine::has("--disable-dof"))
         UserConfigParams::m_dof = false;
+    // speed streaks
+    if (CommandLine::has("--enable-speed-streaks"))
+        UserConfigParams::m_speed_streaks = true;
+    else if (CommandLine::has("--disable-speed-streaks"))
+        UserConfigParams::m_speed_streaks = false;
     // particles effects
     if (CommandLine::has("--enable-particles"))
         UserConfigParams::m_particles_effects = 2;
