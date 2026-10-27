@@ -840,6 +840,8 @@ void addObject(SPMeshNode* node)
         culling_stats.meshbuffers_treated++;
 #endif
 
+        // We get a bounding box oriented with the XYZ axes
+        // to be able to cheaply test culling afterwards
         core::aabbox3df bb = mb->getBoundingBox();
         model_matrix.transformBoxEx(bb);
         const bool handle_shadow = node->isInShadowPass() &&
@@ -850,22 +852,30 @@ void addObject(SPMeshNode* node)
 
         for (int dc_type = 0; dc_type < (handle_shadow ? 5 : 1); dc_type++)
         {
+            const float* frustum_plane = g_frustums[dc_type];
             for (int i = 0; i < 24; i += 4)
             {
-                bool outside = true;
-                for (int j = 0; j < 8; j++)
-                {
-                    const float dist =
-                        getCorner(bb, j).X * g_frustums[dc_type][i] +
-                        getCorner(bb, j).Y * g_frustums[dc_type][i + 1] +
-                        getCorner(bb, j).Z * g_frustums[dc_type][i + 2] +
-                        g_frustums[dc_type][i + 3];
-                    outside = outside && dist < 0.0f;
-                    if (!outside)
-                    {
-                        break;
-                    }
-                }
+                // The frustum is delimited by 6 planes, and we check
+                // each plane to see if at least one corner of the
+                // bounding box is on the side of the plane in 3D-space
+                // that would match the bounding box intersecting with
+                // the frustum.
+                // 
+                // For each plane, we can simply reconstruct a corner
+                // that will sit on the "inside" side of 3D-space if
+                // any of the corners do.
+                const float optimal_corner_x =
+                    (frustum_plane[i] > 0.0f)   ? bb.MaxEdge.X : bb.MinEdge.X;
+                const float optimal_corner_y =
+                    (frustum_plane[i+1] > 0.0f) ? bb.MaxEdge.Y : bb.MinEdge.Y;
+                const float optimal_corner_z =
+                    (frustum_plane[i+2] > 0.0f) ? bb.MaxEdge.Z : bb.MinEdge.Z;
+
+                const bool outside = (optimal_corner_x * frustum_plane[i] +
+                                      optimal_corner_y * frustum_plane[i+1] +
+                                      optimal_corner_z * frustum_plane[i+2] +
+                                      frustum_plane[i+3]) < 0.0f;
+
                 if (outside)
                 {
                     discard_mesh[dc_type] = true;
@@ -1018,24 +1028,33 @@ void handleDynamicDrawCall()
         // Reset all discard values to false before use
         std::memset(discard_mesh, 0, sizeof(discard_mesh));
 
+        // TODO: consolidate with the code in addObject
         for (int dc_type = 0; dc_type < (handle_shadow ? 5 : 1); dc_type++)
         {
+            const float* frustum_plane = g_frustums[dc_type];
             for (int i = 0; i < 24; i += 4)
             {
-                bool outside = true;
-                for (int j = 0; j < 8; j++)
-                {
-                    const float dist =
-                        getCorner(bb, j).X * g_frustums[dc_type][i] +
-                        getCorner(bb, j).Y * g_frustums[dc_type][i + 1] +
-                        getCorner(bb, j).Z * g_frustums[dc_type][i + 2] +
-                        g_frustums[dc_type][i + 3];
-                    outside = outside && dist < 0.0f;
-                    if (!outside)
-                    {
-                        break;
-                    }
-                }
+                // The frustum is delimited by 6 planes, and we check
+                // each plane to see if at least one corner of the
+                // bounding box is on the side of the plane in 3D-space
+                // that would match the bounding box intersecting with
+                // the frustum.
+                // 
+                // For each plane, we can simply reconstruct a corner
+                // that will sit on the "inside" side of 3D-space if
+                // any of the corners do.
+                const float optimal_corner_x =
+                    (frustum_plane[i] > 0.0f)   ? bb.MaxEdge.X : bb.MinEdge.X;
+                const float optimal_corner_y =
+                    (frustum_plane[i+1] > 0.0f) ? bb.MaxEdge.Y : bb.MinEdge.Y;
+                const float optimal_corner_z =
+                    (frustum_plane[i+2] > 0.0f) ? bb.MaxEdge.Z : bb.MinEdge.Z;
+
+                const bool outside = (optimal_corner_x * frustum_plane[i] +
+                                      optimal_corner_y * frustum_plane[i+1] +
+                                      optimal_corner_z * frustum_plane[i+2] +
+                                      frustum_plane[i+3]) < 0.0f;
+
                 if (outside)
                 {
                     discard_mesh[dc_type] = true;
