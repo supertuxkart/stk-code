@@ -3421,9 +3421,8 @@ void Kart::updateGraphics(float dt)
         }
 
         // update speedstreak parameters
-        if(m_speedstreaks){
+        if(m_speedstreaks)
             m_speedstreaks->update(dt);
-        }
     }
 #endif
 
