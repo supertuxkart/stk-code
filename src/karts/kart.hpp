@@ -608,7 +608,9 @@ public:
     virtual Stars* getStarsEffect() const OVERRIDE
                                                { return m_stars_effect.get(); }
     // ----------------------------------------------------------------------------------------
+#ifndef SERVER_ONLY
     SpeedStreaks* getSpeedStreaks() const { return m_speedstreaks.get(); }
+#endif
     // ------------------------------------------------------------------------
     /** Return the confirmed finish ticks (sent by the server)
      *  indicating that this kart has really finished the race. */
