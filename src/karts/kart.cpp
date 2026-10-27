@@ -38,6 +38,7 @@
 #include "graphics/shadow.hpp"
 #include "graphics/skid_marks.hpp"
 #include "graphics/slip_stream.hpp"
+#include "graphics/speed_streaks.hpp"
 #include "graphics/stk_text_billboard.hpp"
 #include "graphics/stars.hpp"
 #include "guiengine/scalable_font.hpp"
@@ -444,6 +445,10 @@ void Kart::reset()
     {
         m_skidmarks->reset();
     }
+    if (m_speedstreaks)
+    {
+        m_speedstreaks->reset();
+    }
 #endif
 
     Vec3 front(0, 0, getKartLength()*0.5f);
@@ -506,6 +511,29 @@ float Kart::getCurrentMaxSpeed() const
 {
     return m_max_speed->getCurrentMaxSpeed();
 }   // getCurrentMaxSpeed
+
+// ------------------------------------------------------------------------
+/** Returns the speed amount above the kart's own unboosted max speed.
+ */
+float Kart::getCurrentAdditionalSpeed() const
+{
+    const float speed = getSpeed();
+    const float current_engine_max_speed = m_kart_properties->getEngineMaxSpeed();
+    return std::max(speed - current_engine_max_speed, 0.0f);
+} // getCurrentAdditionalSpeed
+
+// ------------------------------------------------------------------------
+/** Returns the ratio of the speed amount above the kart's own unboosted max speed
+ *  relative to the generic engine max speed.
+ */
+float Kart::getCurrentAdditionalSpeedRatio() const
+{
+    const float additional_speed_amount = getCurrentAdditionalSpeed();
+    const float absolute_engine_max_speed = m_kart_properties->getEngineGenericMaxSpeed();
+
+    return additional_speed_amount / absolute_engine_max_speed;
+} // getCurrentAdditionalSpeedRatio
+
 // -----------------------------------------------------------------------------
 int Kart::getSpeedIncreaseTicksLeft(unsigned int category) const
 {
@@ -3031,11 +3059,14 @@ void Kart::loadData(RaceManager::KartType type, bool is_animated_model)
 #ifndef SERVER_ONLY
     m_skidmarks = nullptr;
     m_shadow = nullptr;
+    m_speedstreaks = nullptr;
     if (!GUIEngine::isNoGraphics() &&
         m_kart_properties->getSkidEnabled())
     {
         m_skidmarks.reset(new SkidMarks(*this));
     }
+
+    m_speedstreaks.reset(new SpeedStreaks(*this));
 
     if (!GUIEngine::isNoGraphics() &&
         (!CVS->isGLSL() || !CVS->isShadowEnabled()) && m_kart_properties
@@ -3375,18 +3406,23 @@ void Kart::updateGraphics(float dt)
     static video::SColor green(255, 61, 87, 23);
 
 #ifndef SERVER_ONLY
-    // draw skidmarks if relevant (we force pink skidmarks on when hitting
-    // a bubblegum)
-    if (World::getWorld()->getPhase() !=
-        WorldStatus::IN_GAME_MENU_PHASE &&
-        m_kart_properties->getSkidEnabled() && m_skidmarks)
+    if (World::getWorld()->getPhase() != WorldStatus::IN_GAME_MENU_PHASE)
     {
-        m_skidmarks->update(dt,
-            m_bubblegum_ticks > 0,
-            (m_bubblegum_ticks > 0
-                ? (m_has_caught_nolok_bubblegum ? &green
-                    : &pink)
-                : NULL));
+        // draw skidmarks if relevant (we force pink skidmarks on when hitting
+        // a bubblegum)
+        if (m_kart_properties->getSkidEnabled() && m_skidmarks)
+        {
+            m_skidmarks->update(dt,
+                    m_bubblegum_ticks > 0,
+                    (m_bubblegum_ticks > 0
+                     ? (m_has_caught_nolok_bubblegum ? &green
+                         : &pink)
+                     : NULL));
+        }
+
+        // update speedstreak parameters
+        if(m_speedstreaks)
+            m_speedstreaks->update(dt);
     }
 #endif
 
