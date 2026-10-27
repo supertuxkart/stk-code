@@ -63,7 +63,7 @@ private:
 
     // Speed excess (as a fraction of the generic engine max speed) at which the
     // streak intensity starts rising: 0.0 = the kart's own unboosted top speed.
-    constexpr static float s_boost_intensity_lower_ratio = 0.2f;
+    constexpr static float s_boost_intensity_lower_ratio = 0.0f;
     // Speed excess (as a fraction of the generic engine max speed) at which the
     // streak intensity reaches 1.0f.
     constexpr static float s_boost_intensity_upper_ratio = 0.8f;
