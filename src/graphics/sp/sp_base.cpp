@@ -818,7 +818,80 @@ void prepareDrawCalls()
     }
     g_glow_meshes.clear();
     g_instances.clear();
-}
+}   // prepareDrawCalls
+
+// ----------------------------------------------------------------------------
+/* Helper function for addObject and handleDynamicDrawCalls.
+   discard_mesh is defined at a higher level, so there is no scope issue
+   in writing it here and having its results read later in the parent functions. */
+static inline bool computeBoundingBoxCulling(const core::aabbox3df& bb, int dc_count)
+{
+    assert(dc_count == 1 || dc_count == 5);
+
+#ifdef MEASURE_CULLING
+    culling_stats.meshbuffers_treated++;
+#endif
+
+    // Reset all discard values to false before use
+    std::memset(discard_mesh, 0, sizeof(discard_mesh));
+
+    for (int dc_type = 0; dc_type < dc_count; dc_type++)
+    {
+        const float* frustum_plane = g_frustums[dc_type];
+        for (int i = 0; i < 24; i += 4)
+        {
+            // The frustum is delimited by 6 planes, and we check
+            // each plane to see if at least one corner of the
+            // bounding box is on the side of the plane in 3D-space
+            // that would match the bounding box intersecting with
+            // the frustum.
+            // 
+            // For each plane, we can simply reconstruct a corner
+            // that will sit on the "inside" side of 3D-space if
+            // any of the corners do.
+            const float optimal_corner_x =
+                (frustum_plane[i] > 0.0f)   ? bb.MaxEdge.X : bb.MinEdge.X;
+            const float optimal_corner_y =
+                (frustum_plane[i+1] > 0.0f) ? bb.MaxEdge.Y : bb.MinEdge.Y;
+            const float optimal_corner_z =
+                (frustum_plane[i+2] > 0.0f) ? bb.MaxEdge.Z : bb.MinEdge.Z;
+
+            const bool outside = (optimal_corner_x * frustum_plane[i] +
+                                  optimal_corner_y * frustum_plane[i+1] +
+                                  optimal_corner_z * frustum_plane[i+2] +
+                                  frustum_plane[i+3]) < 0.0f;
+
+            if (outside)
+            {
+                discard_mesh[dc_type] = true;
+                break;
+            }
+        }
+    }
+
+    bool shadows_discard = (dc_count == 5) && discard_mesh[1] && discard_mesh[2] &&
+                           discard_mesh[3] && discard_mesh[4];
+
+#ifdef MEASURE_CULLING
+    if (!discard_mesh[0])
+        culling_stats.meshbuffers_kept_for_camera++;
+    if ((dc_count == 5) && !shadows_discard)
+    {
+        culling_stats.meshbuffers_kept_for_shadows++;
+        if (discard_mesh[0])
+            culling_stats.meshbuffers_kept_for_shadows_only++;
+    }
+#endif
+
+    if (discard_mesh[0] && (dc_count == 1 || shadows_discard))
+    {
+#ifdef MEASURE_CULLING
+        culling_stats.meshbuffers_discarded++;
+#endif
+        return true;
+    }
+    return false;
+}   // computeBoundingBoxCulling
 
 // ----------------------------------------------------------------------------
 void addObject(SPMeshNode* node)
@@ -836,75 +909,17 @@ void addObject(SPMeshNode* node)
         if (shader == NULL)
             continue;
 
-#ifdef MEASURE_CULLING
-        culling_stats.meshbuffers_treated++;
-#endif
-
         // We get a bounding box oriented with the XYZ axes
         // to be able to cheaply test culling afterwards
         core::aabbox3df bb = mb->getBoundingBox();
         model_matrix.transformBoxEx(bb);
         const bool handle_shadow = node->isInShadowPass() &&
             g_handle_shadow && shader->hasShader(RP_SHADOW);
+        // The function also computes per-frustum data (discard_mesh) we use later
+        bool cull = computeBoundingBoxCulling(bb, (handle_shadow ? 5 : 1));
 
-        // Reset all discard values to false before use
-        std::memset(discard_mesh, 0, sizeof(discard_mesh));
-
-        for (int dc_type = 0; dc_type < (handle_shadow ? 5 : 1); dc_type++)
-        {
-            const float* frustum_plane = g_frustums[dc_type];
-            for (int i = 0; i < 24; i += 4)
-            {
-                // The frustum is delimited by 6 planes, and we check
-                // each plane to see if at least one corner of the
-                // bounding box is on the side of the plane in 3D-space
-                // that would match the bounding box intersecting with
-                // the frustum.
-                // 
-                // For each plane, we can simply reconstruct a corner
-                // that will sit on the "inside" side of 3D-space if
-                // any of the corners do.
-                const float optimal_corner_x =
-                    (frustum_plane[i] > 0.0f)   ? bb.MaxEdge.X : bb.MinEdge.X;
-                const float optimal_corner_y =
-                    (frustum_plane[i+1] > 0.0f) ? bb.MaxEdge.Y : bb.MinEdge.Y;
-                const float optimal_corner_z =
-                    (frustum_plane[i+2] > 0.0f) ? bb.MaxEdge.Z : bb.MinEdge.Z;
-
-                const bool outside = (optimal_corner_x * frustum_plane[i] +
-                                      optimal_corner_y * frustum_plane[i+1] +
-                                      optimal_corner_z * frustum_plane[i+2] +
-                                      frustum_plane[i+3]) < 0.0f;
-
-                if (outside)
-                {
-                    discard_mesh[dc_type] = true;
-                    break;
-                }
-            }
-        }
-
-#ifdef MEASURE_CULLING
-        if (!discard_mesh[0])
-            culling_stats.meshbuffers_kept_for_camera++;
-        if (handle_shadow &&
-            (!discard_mesh[1] || !discard_mesh[2] || !discard_mesh[3] || !discard_mesh[4]))
-        {
-            culling_stats.meshbuffers_kept_for_shadows++;
-            if (discard_mesh[0])
-                culling_stats.meshbuffers_kept_for_shadows_only++;
-        }
-#endif
-
-        if (!handle_shadow ? discard_mesh[0] :
-            (discard_mesh[0] && discard_mesh[1] && discard_mesh[2] &&
-            discard_mesh[3] && discard_mesh[4]))
-        {
-#ifdef MEASURE_CULLING
-            culling_stats.meshbuffers_discarded++;
-#endif
+        if (cull)
             continue;
-        }
 
         if (irr_driver->getBoundingBoxesViz())
             addBoundingBoxEdgesForViz(bb);
@@ -999,7 +1014,7 @@ void addObject(SPMeshNode* node)
             g_instances.insert(mb);
         }
     }
-}
+}   // addObject
 
 // ----------------------------------------------------------------------------
 void handleDynamicDrawCall()
@@ -1024,51 +1039,10 @@ void handleDynamicDrawCall()
         dydc->getAbsoluteTransformation().transformBoxEx(bb);
         const bool handle_shadow =
             g_handle_shadow && shader->hasShader(RP_SHADOW);
+        bool cull = computeBoundingBoxCulling(bb, (handle_shadow ? 5 : 1));
 
-        // Reset all discard values to false before use
-        std::memset(discard_mesh, 0, sizeof(discard_mesh));
-
-        // TODO: consolidate with the code in addObject
-        for (int dc_type = 0; dc_type < (handle_shadow ? 5 : 1); dc_type++)
-        {
-            const float* frustum_plane = g_frustums[dc_type];
-            for (int i = 0; i < 24; i += 4)
-            {
-                // The frustum is delimited by 6 planes, and we check
-                // each plane to see if at least one corner of the
-                // bounding box is on the side of the plane in 3D-space
-                // that would match the bounding box intersecting with
-                // the frustum.
-                // 
-                // For each plane, we can simply reconstruct a corner
-                // that will sit on the "inside" side of 3D-space if
-                // any of the corners do.
-                const float optimal_corner_x =
-                    (frustum_plane[i] > 0.0f)   ? bb.MaxEdge.X : bb.MinEdge.X;
-                const float optimal_corner_y =
-                    (frustum_plane[i+1] > 0.0f) ? bb.MaxEdge.Y : bb.MinEdge.Y;
-                const float optimal_corner_z =
-                    (frustum_plane[i+2] > 0.0f) ? bb.MaxEdge.Z : bb.MinEdge.Z;
-
-                const bool outside = (optimal_corner_x * frustum_plane[i] +
-                                      optimal_corner_y * frustum_plane[i+1] +
-                                      optimal_corner_z * frustum_plane[i+2] +
-                                      frustum_plane[i+3]) < 0.0f;
-
-                if (outside)
-                {
-                    discard_mesh[dc_type] = true;
-                    break;
-                }
-            }
-        }
-
-        if (!handle_shadow ? discard_mesh[0] :
-            (discard_mesh[0] && discard_mesh[1] && discard_mesh[2] &&
-            discard_mesh[3] && discard_mesh[4]))
-        {
+        if (cull)
             continue;
-        }
 
         if (irr_driver->getBoundingBoxesViz())
             addBoundingBoxEdgesForViz(bb);
@@ -1121,7 +1095,7 @@ void handleDynamicDrawCall()
             }
         }
     }
-}
+}   // handleDynamicDrawCalls
 
 // ----------------------------------------------------------------------------
 void updateModelMatrix()
