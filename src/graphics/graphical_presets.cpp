@@ -37,7 +37,8 @@ namespace GraphicalPresets
             false /* light */, 0 /* shadow */, false /* bloom */, false /* lightshaft */,
             false /* glow */, false /* mlaa */, false /* ssao */, false /* light scatter */,
             false /* animatedCharacters */, 1 /* particles */, 0 /* image_quality */,
-            true /* degraded IBL */, 0 /* Geometry Detail */, false /* PCSS */, false /* ssr */
+            true /* degraded IBL */, 0 /* Geometry Detail */, false /* PCSS */, false /* ssr */,
+            false /* speed streaks */
         });
     
         gfx_presets.push_back // Level 2
@@ -45,7 +46,8 @@ namespace GraphicalPresets
             false /* light */, 0 /* shadow */, false /* bloom */, false /* lightshaft */,
             false /* glow */, false /* mlaa */, false /* ssao */, false /* light scatter */,
             true /* animatedCharacters */, 2 /* particles */, 1 /* image_quality */,
-            true /* degraded IBL */, 1 /* Geometry Detail */, false /* PCSS */, false /* ssr */
+            true /* degraded IBL */, 1 /* Geometry Detail */, false /* PCSS */, false /* ssr */,
+            false /* speed streaks */
         });
     
         gfx_presets.push_back // Level 3
@@ -53,7 +55,8 @@ namespace GraphicalPresets
             true /* light */, 0 /* shadow */, false /* bloom */, false /* lightshaft */,
             false /* glow */, false /* mlaa */, false /* ssao */, false /* light scatter */,
             true /* animatedCharacters */, 2 /* particles */, 2 /* image_quality */,
-            true /* degraded IBL */, 2 /* Geometry Detail */, false /* PCSS */, false /* ssr */
+            true /* degraded IBL */, 2 /* Geometry Detail */, false /* PCSS */, false /* ssr */,
+            false /* speed streaks */
         });
     
         gfx_presets.push_back // Level 4
@@ -61,7 +64,8 @@ namespace GraphicalPresets
             true /* light */, 0 /* shadow */, false /* bloom */, false /* lightshaft */,
             true /* glow */, true /* mlaa */, false /* ssao */, true /* light scatter */,
             true /* animatedCharacters */, 2 /* particles */, 2 /* image_quality */,
-            true /* degraded IBL */, 2 /* Geometry Detail */, false /* PCSS */, true /* ssr */
+            true /* degraded IBL */, 2 /* Geometry Detail */, false /* PCSS */, true /* ssr */,
+            true /* speed streaks */
         });
     
         gfx_presets.push_back // Level 5
@@ -69,7 +73,8 @@ namespace GraphicalPresets
             true /* light */, 512 /* shadow */, true /* bloom */, true /* lightshaft */,
             true /* glow */, true /* mlaa */, false /* ssao */, true /* light scatter */,
             true /* animatedCharacters */, 2 /* particles */, 2 /* image_quality */,
-            false /* degraded IBL */, 3 /* Geometry Detail */, false /* PCSS */, true /* ssr */
+            false /* degraded IBL */, 3 /* Geometry Detail */, false /* PCSS */, true /* ssr */,
+            true /* speed streaks */
         });
     
         gfx_presets.push_back // Level 6
@@ -77,7 +82,8 @@ namespace GraphicalPresets
             true /* light */, 1024 /* shadow */, true /* bloom */, true /* lightshaft */,
             true /* glow */, true /* mlaa */, true /* ssao */, true /* light scatter */,
             true /* animatedCharacters */, 2 /* particles */, 2 /* image_quality */,
-            false /* degraded IBL */, 4 /* Geometry Detail */, false /* PCSS */, true /* ssr */
+            false /* degraded IBL */, 4 /* Geometry Detail */, false /* PCSS */, true /* ssr */,
+            true /* speed streaks */
         });
     
         gfx_presets.push_back // Level 7
@@ -85,7 +91,8 @@ namespace GraphicalPresets
             true /* light */, 2048 /* shadow */, true /* bloom */, true /* lightshaft */,
             true /* glow */, true /* mlaa */, true /* ssao */, true /* light scatter */,
             true /* animatedCharacters */, 2 /* particles */, 2 /* image_quality */,
-            false /* degraded IBL */, 5 /* Geometry Detail */, true /* PCSS */, true /* ssr */
+            false /* degraded IBL */, 5 /* Geometry Detail */, true /* PCSS */, true /* ssr */,
+            true /* speed streaks */
         });
     
         blur_presets.push_back // Level 0
@@ -146,7 +153,8 @@ namespace GraphicalPresets
                 gfx_presets[l].degraded_ibl       == UserConfigParams::m_degraded_IBL        &&
                 gfx_presets[l].geometry_detail    == UserConfigParams::m_geometry_level      &&
                 gfx_presets[l].pc_soft_shadows    == UserConfigParams::m_pcss                &&
-                gfx_presets[l].ssr                == UserConfigParams::m_ssr)
+                gfx_presets[l].ssr                == UserConfigParams::m_ssr                 &&
+                gfx_presets[l].speed_streaks      == UserConfigParams::m_speed_streaks)
             {
                 return (l + 1);
             }
@@ -174,6 +182,7 @@ namespace GraphicalPresets
         UserConfigParams::m_geometry_level     = gfx_presets[level].geometry_detail;
         UserConfigParams::m_pcss               = gfx_presets[level].pc_soft_shadows;
         UserConfigParams::m_ssr                = gfx_presets[level].ssr;
+        UserConfigParams::m_speed_streaks      = gfx_presets[level].speed_streaks;
     }   // applyGFXPreset
 
     // --------------------------------------------------------------------------------------------

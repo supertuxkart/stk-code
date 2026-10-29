@@ -2423,7 +2423,7 @@ void RaceResultGUI::displayBenchmarkSummary()
     font = GUIEngine::getFont();
     rect = font->getDimension(title_text.c_str());
 
-    core::stringw info_text[11];
+    core::stringw info_text[12];
     core::stringw value = StringUtils::toWString(
         StringUtils::timeToString(float(profiler.getTotalFrametime())/1000000.0f, 2, true));
     info_text[0] = _("Test duration: %s",         value);
@@ -2489,13 +2489,15 @@ void RaceResultGUI::displayBenchmarkSummary()
                               _("Soft shadows: Disabled");
     info_text[9] = UserConfigParams::m_dof ? _("Depth of field: Enabled") :
                                               _("Depth of field: Disabled");
+    info_text[10] = UserConfigParams::m_speed_streaks ? _("Speed streaks: Enabled") :
+                                                        _("Speed streaks: Disabled");
     value = vk        ? StringUtils::toWString("Vulkan")    :
             modern_gl ? _("OpenGL (modern)")                :
             gl        ? _("OpenGL (legacy)")                :
             directx   ? StringUtils::toWString("DirectX 9") : _("Unknown");
-    info_text[10] = value;
+    info_text[11] = value;
 
-    for (int i = 0; i < 11; i++)
+    for (int i = 0; i < 12; i++)
     {
         pos = core::rect<s32>(current_x, current_y, current_x, current_y);
         font->draw(info_text[i].c_str(), pos, white_color, true, false);

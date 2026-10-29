@@ -39,6 +39,7 @@ namespace GraphicalPresets
         int geometry_detail;
         bool pc_soft_shadows;
         bool ssr;
+        bool speed_streaks;
     };
 
     struct BlurPreset

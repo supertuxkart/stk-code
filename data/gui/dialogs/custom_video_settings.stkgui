@@ -67,6 +67,24 @@
             <spacer height="4" width="10" />
 
             <div layout="horizontal-row" proportion="1" height="fit">
+                <checkbox id="ssr"/>
+                <spacer width="10" height="10"/>
+                <label text="Screen space reflection" I18N="Video settings"/>
+            </div>
+        </div>
+
+        <div layout="horizontal-row" width="100%" proportion="1">
+            <spacer width="70" height="10"/>
+
+            <div layout="horizontal-row" proportion="1" height="fit">
+                <checkbox id="speedstreaks"/>
+                <spacer width="10" height="10"/>
+                <label text="Speed streaks" I18N="Video settings"/>
+            </div>
+
+            <spacer height="4" width="10" />
+
+            <div layout="horizontal-row" proportion="1" height="fit">
                 <checkbox id="ibl"/>
                 <spacer width="10" height="10"/>
                 <label text="Image-based lighting" I18N="Video settings"/>
@@ -105,12 +123,6 @@
             </div>
 
             <spacer height="4" width="10" />
-
-            <div layout="horizontal-row" proportion="1" height="fit">
-                <checkbox id="ssr"/>
-                <spacer width="10" height="10"/>
-                <label text="Screen space reflection" I18N="Video settings"/>
-            </div>
         </div>
         
         <spacer height="4" width="10" />
