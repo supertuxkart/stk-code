@@ -1,6 +1,6 @@
 /*
    AngelCode Scripting Library
-   Copyright (c) 2003-2018 Andreas Jonsson
+   Copyright (c) 2003-2025 Andreas Jonsson
 
    This software is provided 'as-is', without any express or implied
    warranty. In no event will the authors be held liable for any
@@ -104,20 +104,25 @@ public:
 	asIScriptFunction *GetExceptionFunction();
 	const char *       GetExceptionString();
 	bool               WillExceptionBeCaught();
-	int                SetExceptionCallback(asSFuncPtr callback, void *obj, int callConv);
+	int                SetExceptionCallback(const asSFuncPtr &callback, void *obj, int callConv);
 	void               ClearExceptionCallback();
 
 	// Debugging
-	int                SetLineCallback(asSFuncPtr callback, void *obj, int callConv);
+	int                SetLineCallback(const asSFuncPtr &callback, void *obj, int callConv);
 	void               ClearLineCallback();
 	asUINT             GetCallstackSize() const;
 	asIScriptFunction *GetFunction(asUINT stackLevel);
 	int                GetLineNumber(asUINT stackLevel, int *column, const char **sectionName);
 	int                GetVarCount(asUINT stackLevel);
+	int                GetVar(asUINT varIndex, asUINT stackLevel, const char** name, int* typeId, asETypeModifiers* typeModifiers, bool* isVarOnHeap, int* stackOffset);
+#ifdef AS_DEPRECATED
 	const char        *GetVarName(asUINT varIndex, asUINT stackLevel);
+#endif
 	const char        *GetVarDeclaration(asUINT varIndex, asUINT stackLevel, bool includeNamespace);
+#ifdef AS_DEPRECATED
 	int                GetVarTypeId(asUINT varIndex, asUINT stackLevel);
-	void              *GetAddressOfVar(asUINT varIndex, asUINT stackLevel);
+#endif
+	void              *GetAddressOfVar(asUINT varIndex, asUINT stackLevel, bool dontDereference, bool returnAddressOfUnitializedObjects);
 	bool               IsVarInScope(asUINT varIndex, asUINT stackLevel);
 	int                GetThisTypeId(asUINT stackLevel);
     void              *GetThisPointer(asUINT stackLevel);
@@ -127,10 +132,23 @@ public:
 	void *SetUserData(void *data, asPWORD type);
 	void *GetUserData(asPWORD type) const;
 
+	// Serialization
+	int StartDeserialization();
+	int FinishDeserialization();
+	int PushFunction(asIScriptFunction *func, void *obj);
+	int GetStateRegisters(asUINT stackLevel, asIScriptFunction** callingSystemFunction, asIScriptFunction** initialFunction, asDWORD* origStackPointer, asDWORD* argumentsSize, asQWORD* valueRegister, void** objectRegister, asITypeInfo** objectTypeRegister);
+	int GetCallStateRegisters(asUINT stackLevel, asDWORD* stackFramePointer, asIScriptFunction** currentFunction, asDWORD* programPointer, asDWORD* stackPointer, asDWORD* stackIndex);
+	int SetStateRegisters(asUINT stackLevel, asIScriptFunction* callingSystemFunction, asIScriptFunction* initialFunction, asDWORD origStackPointer, asDWORD argumentsSize, asQWORD valueRegister, void* objectRegister, asITypeInfo* objectTypeRegister);
+	int SetCallStateRegisters(asUINT stackLevel, asDWORD stackFramePointer, asIScriptFunction* currentFunction, asDWORD programPointer, asDWORD stackPointer, asDWORD stackIndex);
+	int GetArgsOnStackCount(asUINT stackLevel);
+	int GetArgOnStack(asUINT stackLevel, asUINT arg, int* typeId, asUINT *flags, void** address);
+
 public:
 	// Internal public functions
 	asCContext(asCScriptEngine *engine, bool holdRef);
 	virtual ~asCContext();
+	asCScriptFunction *GetRealFunc(asCScriptFunction * m_currentFunction, void ** objType);
+	int DeserializeProgramPointer(int programPointer, asCScriptFunction * currentFunction, void * object, asDWORD *& p, asCScriptFunction *& realFunc);
 
 //protected:
 	friend class asCScriptEngine;
@@ -157,7 +175,13 @@ public:
 	void CallInterfaceMethod(asCScriptFunction *func);
 	void PrepareScriptFunction();
 
+	void SetProgramPointer();
+
 	bool ReserveStackSpace(asUINT size);
+	int DetermineStackIndex(asDWORD *ptr) const;
+
+	asDWORD *DeserializeStackPointer(asDWORD);
+	asDWORD  SerializeStackPointer(asDWORD *) const;
 
 	void SetInternalException(const char *descr, bool allowCatch = true);
 	bool FindExceptionTryCatch();
@@ -184,6 +208,7 @@ public:
 	asUINT              m_stackBlockSize;
 	asUINT              m_stackIndex;
 	asDWORD            *m_originalStackPointer;
+	asUINT              m_originalStackIndex;
 
 	// Exception handling
 	bool      m_isStackMemoryNotAllocated;
@@ -201,6 +226,11 @@ public:
 	int                m_returnValueSize;
 	int                m_argumentsSize;
 
+	// Cache for GetArgsOnStack
+	asCArray<int>      m_argsOnStackCache;
+	asUINT             m_argsOnStackCacheProgPos;
+	asCScriptFunction* m_argsOnStackCacheFunc;
+
 	// callbacks
 	bool                       m_lineCallback;
 	asSSystemFunctionInterface m_lineCallbackFunc;
@@ -215,6 +245,13 @@ public:
 	// Registers available to JIT compiler functions
 	asSVMRegisters m_regs;
 };
+
+// We need at least 2 PTRs on the stack reserved for exception handling
+// We need at least 1 PTR on the stack reserved for calling system functions
+const int RESERVE_STACK = 2 * AS_PTR_SIZE;
+
+// For each script function call we push 9 PTRs on the call stack
+const int CALLSTACK_FRAME_SIZE = 9;
 
 // TODO: Move these to as_utils.h
 int     as_powi(int base, int exponent, bool& isOverflow);

@@ -126,22 +126,6 @@ namespace scene
 			const core::vector3df& lookat = core::vector3df(0,0,100),
 			s32 id=-1, bool makeActive=true);
 
-		//! Adds a camera scene node which is able to be controlle with the mouse similar
-		//! like in the 3D Software Maya by Alias Wavefront.
-		//! The returned pointer must not be dropped.
-		virtual ICameraSceneNode* addCameraSceneNodeMaya(ISceneNode* parent=0,
-			f32 rotateSpeed=-1500.f, f32 zoomSpeed=200.f,
-			f32 translationSpeed=1500.f, s32 id=-1, f32 distance=70.f,
-			bool makeActive=true);
-
-		//! Adds a camera scene node which is able to be controled with the mouse and keys
-		//! like in most first person shooters (FPS):
-		virtual ICameraSceneNode* addCameraSceneNodeFPS(ISceneNode* parent = 0,
-			f32 rotateSpeed = 100.0f, f32 moveSpeed = .5f, s32 id=-1,
-			SKeyMap* keyMapArray=0, s32 keyMapSize=0,
-			bool noVerticalMovement=false, f32 jumpSpeed = 0.f,
-			bool invertMouseY=false, bool makeActive=true);
-
 		//! Adds a dynamic light scene node. The light will cast dynamic light on all
 		//! other scene nodes in the scene, which have the material flag video::MTF_LIGHTING
 		//! turned on. (This is the default setting in most scene nodes).
@@ -389,7 +373,7 @@ namespace scene
 		virtual ISceneNode* getSceneNodeFromType(scene::ESCENE_NODE_TYPE type, ISceneNode* start=0);
 
 		//! returns scene nodes by type.
-		virtual void getSceneNodesFromType(ESCENE_NODE_TYPE type, core::array<scene::ISceneNode*>& outNodes, ISceneNode* start=0);
+		virtual void getSceneNodesFromType(ESCENE_NODE_TYPE type, std::vector<scene::ISceneNode*>& outNodes, ISceneNode* start=0);
 
 		//! Posts an input event to the environment. Usually you do not have to
 		//! use this method, it is used by the internal engine.
@@ -594,17 +578,17 @@ namespace scene
 		ISceneCollisionManager* CollisionManager;
 
 		//! render pass lists
-		core::array<ISceneNode*> CameraList;
-		core::array<ISceneNode*> LightList;
-		core::array<ISceneNode*> ShadowNodeList;
-		core::array<ISceneNode*> SkyBoxList;
+		std::vector<ISceneNode*> CameraList;
+		std::vector<ISceneNode*> LightList;
+		std::vector<ISceneNode*> ShadowNodeList;
+		std::vector<ISceneNode*> SkyBoxList;
 		core::array<DefaultNodeEntry> SolidNodeList;
 		core::array<TransparentNodeEntry> TransparentNodeList;
 		core::array<TransparentNodeEntry> TransparentEffectNodeList;
 
 		core::array<IMeshLoader*> MeshLoaderList;
 		core::array<ISceneLoader*> SceneLoaderList;
-		core::array<ISceneNode*> DeletionList;
+		std::vector<ISceneNode*> DeletionList;
 		core::array<ISceneNodeFactory*> SceneNodeFactoryList;
 		core::array<ISceneNodeAnimatorFactory*> SceneNodeAnimatorFactoryList;
 

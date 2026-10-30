@@ -1,6 +1,6 @@
 /*
    AngelCode Scripting Library
-   Copyright (c) 2003-2020 Andreas Jonsson
+   Copyright (c) 2003-2025 Andreas Jonsson
 
    This software is provided 'as-is', without any express or implied 
    warranty. In no event will the authors be held liable for any 
@@ -102,10 +102,10 @@ struct asCExprValue
 	bool  isRefToLocal : 1; // The reference may be to a local variable
 	bool  isRefSafe : 1; // the life-time of the ref is guaranteed for the duration of the access
 	short dummy : 9;
-	short stackOffset;
+	int   stackOffset; // used both for stack offset and indexing global variables
 
 private:
-	// These values must not be accessed directly in order to avoid problems with endianess. 
+	// These values must not be accessed directly in order to avoid problems with endianess.
 	// Use the appropriate accessor methods instead
 	union
 	{
@@ -132,7 +132,7 @@ struct asSDeferredParam
 	asCExprContext *origExpr;
 };
 
-// TODO: refactor: asCExprContext should have indicators to inform where the value is, 
+// TODO: refactor: asCExprContext should have indicators to inform where the value is,
 //                 i.e. if the reference to an object is pushed on the stack or not, etc
 
 // This class holds information about an expression that is being evaluated, e.g.
@@ -167,6 +167,7 @@ struct asCExprContext
 	asCScriptNode  *exprNode;
 	asCExprContext *origExpr;
 	asCScriptCode *origCode;
+	asCExprContext* next;
 	// TODO: cleanup: use ambiguousName and an enum to say if it is a method, global func, or enum value
 	asCString methodName;
 	asCString enumValue;
@@ -198,17 +199,30 @@ enum EImplicitConv
 
 enum EConvCost
 {
-	asCC_NO_CONV               = 0,
-	asCC_CONST_CONV            = 1,
-	asCC_ENUM_SAME_SIZE_CONV   = 2,
-	asCC_ENUM_DIFF_SIZE_CONV   = 3,
-	asCC_PRIMITIVE_SIZE_CONV   = 4,
-	asCC_SIGNED_CONV           = 5,
-	asCC_INT_FLOAT_CONV        = 6,
-	asCC_REF_CONV              = 7,
-	asCC_OBJ_TO_PRIMITIVE_CONV = 8,
-	asCC_TO_OBJECT_CONV        = 9,
-	asCC_VARIABLE_CONV         = 10
+	asCC_NO_CONV                  = 0,
+	asCC_CONST_CONV               = 1,
+	asCC_ENUM_SAME_SIZE_CONV      = 2,
+	asCC_ENUM_DIFF_SIZE_CONV      = 3,
+	asCC_PRIMITIVE_SIZE_UP_CONV   = 4,
+	asCC_PRIMITIVE_SIZE_DOWN_CONV = 5,
+	asCC_SIGNED_TO_UNSIGNED_CONV  = 6,
+	asCC_UNSIGNED_TO_SIGNED_CONV  = 7,
+	asCC_INT_TO_FLOAT_CONV        = 8,
+	asCC_FLOAT_TO_INT_CONV        = 9,
+	asCC_REF_CONV                 = 10,
+	//   REF_CONV + CONST_CONV    = 11,
+	asCC_OBJ_TO_PRIMITIVE_CONV    = 12,
+	//   OBJ_TO_PRIM + CONST_CONV = 13,
+	asCC_TO_OBJECT_CONV           = 14,
+	//   TO_OBJ_CONV + CONST_CONV = 15,
+	asCC_VARIABLE_CONV            = 16
+};
+
+enum EVarGlobOrMem
+{
+	asVGM_VARIABLE = 0,
+	asVGM_GLOBAL   = 1,
+	asVGM_MEMBER   = 2
 };
 
 class asCCompiler
@@ -219,6 +233,7 @@ public:
 
 	int CompileFunction(asCBuilder *builder, asCScriptCode *script, asCArray<asCString> &parameterNames, asCScriptNode *func, asCScriptFunction *outFunc, sClassDeclaration *classDecl);
 	int CompileDefaultConstructor(asCBuilder *builder, asCScriptCode *script, asCScriptNode *node, asCScriptFunction *outFunc, sClassDeclaration *classDecl);
+	int CompileDefaultCopyConstructor(asCBuilder *builder, asCScriptCode *script, asCScriptNode *node, asCScriptFunction *outFunc, sClassDeclaration *classDecl);
 	int CompileFactory(asCBuilder *builder, asCScriptCode *script, asCScriptFunction *outFunc);
 	int CompileGlobalVariable(asCBuilder *builder, asCScriptCode *script, asCScriptNode *expr, sGlobalVariableDescription *gvar, asCScriptFunction *outFunc);
 
@@ -233,8 +248,9 @@ protected:
 	void CompileStatement(asCScriptNode *statement, bool *hasReturn, asCByteCode *bc);
 	void CompileIfStatement(asCScriptNode *node, bool *hasReturn, asCByteCode *bc);
 	void CompileSwitchStatement(asCScriptNode *node, bool *hasReturn, asCByteCode *bc);
-	void CompileCase(asCScriptNode *node, asCByteCode *bc);
+	void CompileCase(asCScriptNode *node, asCByteCode *bc, bool *hasReturn, bool *hasBreak);
 	void CompileForStatement(asCScriptNode *node, asCByteCode *bc);
+	void CompileForEachStatement(asCScriptNode* node, asCByteCode* bc);
 	void CompileWhileStatement(asCScriptNode *node, asCByteCode *bc);
 	void CompileDoWhileStatement(asCScriptNode *node, asCByteCode *bc);
 	void CompileBreakStatement(asCScriptNode *node, asCByteCode *bc);
@@ -268,17 +284,18 @@ protected:
 	int  CompileInitListElement(asSListPatternNode *&patternNode, asCScriptNode *&valueNode, int bufferTypeId, short bufferVar, asUINT &bufferSize, asCByteCode &byteCode, int &elementsInSubList);
 	int  CompileAnonymousInitList(asCScriptNode *listNode, asCExprContext *ctx, const asCDataType &dt);
 
-	int  CallDefaultConstructor(const asCDataType &type, int offset, bool isObjectOnHeap, asCByteCode *bc, asCScriptNode *node, int isVarGlobOrMem = 0, bool derefDest = false);
-	int  CallCopyConstructor(asCDataType &type, int offset, bool isObjectOnHeap, asCByteCode *bc, asCExprContext *arg, asCScriptNode *node, bool isGlobalVar = false, bool derefDestination = false);
+	int  CallDefaultConstructor(const asCDataType &type, int offset, bool isObjectOnHeap, asCByteCode *bc, asCScriptNode *node, EVarGlobOrMem isVarGlobOrMem = asVGM_VARIABLE, bool derefDest = false);
+	int  CallCopyConstructor(asCDataType &type, int offset, bool isObjectOnHeap, asCExprContext *ctx, asCExprContext *arg, asCScriptNode *node, EVarGlobOrMem isVarGlobOrMem = asVGM_VARIABLE, bool derefDestination = false);
 	void CallDestructor(asCDataType &type, int offset, bool isObjectOnHeap, asCByteCode *bc);
 	int  CompileArgumentList(asCScriptNode *node, asCArray<asCExprContext *> &args, asCArray<asSNamedArgument> &namedArgs);
 	int  CompileDefaultAndNamedArgs(asCScriptNode *node, asCArray<asCExprContext*> &args, int funcId, asCObjectType *type, asCArray<asSNamedArgument> *namedArgs = 0);
-	asUINT MatchFunctions(asCArray<int> &funcs, asCArray<asCExprContext*> &args, asCScriptNode *node, const char *name, asCArray<asSNamedArgument> *namedArgs = NULL, asCObjectType *objectType = NULL, bool isConstMethod = false, bool silent = false, bool allowObjectConstruct = true, const asCString &scope = "");
 	int  CompileVariableAccess(const asCString &name, const asCString &scope, asCExprContext *ctx, asCScriptNode *errNode, bool isOptional = false, asCObjectType *objType = 0);
 	void CompileMemberInitialization(asCByteCode *bc, bool onlyDefaults);
+	void CompileMemberInitializationCopy(asCByteCode* bc);
 	bool CompileAutoType(asCDataType &autoType, asCExprContext &compiledCtx, asCScriptNode *exprNode, asCScriptNode *errNode);
-	bool CompileInitialization(asCScriptNode *node, asCByteCode *bc, const asCDataType &type, asCScriptNode *errNode, int offset, asQWORD *constantValue, int isVarGlobOrMem, asCExprContext *preCompiled = 0);
-	void CompileInitAsCopy(asCDataType &type, int offset, asCByteCode *bc, asCExprContext *arg, asCScriptNode *node, bool derefDestination);
+	bool CompileInitialization(asCScriptNode *node, asCByteCode *bc, const asCDataType &type, asCScriptNode *errNode, int offset, asQWORD *constantValue, EVarGlobOrMem isVarGlobOrMem, asCExprContext *preCompiled = 0);
+	bool CompileInitializationWithAssignment(asCByteCode* bc, const asCDataType &type, asCScriptNode *errNode, int offset, asQWORD* constantValue, EVarGlobOrMem isVarGlobOrMem, asCScriptNode* rnode, asCExprContext* rexpr);
+	void CompileInitAsCopy(asCDataType &type, int offset, asCExprContext *ctx, asCExprContext *arg, asCScriptNode *node, bool derefDestination, EVarGlobOrMem isVarGlobOrMem = asVGM_VARIABLE);
 
 	// Helper functions
 	void ConvertToPostFix(asCScriptNode *expr, asCArray<asCScriptNode *> &postfix);
@@ -294,6 +311,7 @@ protected:
 	bool IsVariableInitialized(asCExprValue *type, asCScriptNode *node);
 	void Dereference(asCExprContext *ctx, bool generateCode);
 	bool CompileRefCast(asCExprContext *ctx, const asCDataType &to, bool isExplicit, asCScriptNode *node, bool generateCode = true);
+	asUINT MatchFunctions(asCArray<int>& funcs, asCArray<asCExprContext*>& args, asCScriptNode* node, const char* name, asCArray<asSNamedArgument>* namedArgs = NULL, asCObjectType* objectType = NULL, bool isConstMethod = false, bool silent = false, bool allowObjectConstruct = true, const asCString& scope = "");
 	asUINT MatchArgument(asCArray<int> &funcs, asCArray<asSOverloadCandidate> &matches, const asCExprContext *argExpr, int paramNum, bool allowObjectConstruct = true);
 	int  MatchArgument(asCScriptFunction *desc, const asCExprContext *argExpr, int paramNum, bool allowObjectConstruct = true);
 	void PerformFunctionCall(int funcId, asCExprContext *out, bool isConstructor = false, asCArray<asCExprContext*> *args = 0, asCObjectType *objTypeForConstruct = 0, bool useVariable = false, int varOffset = 0, int funcPtrVar = 0);
@@ -301,7 +319,7 @@ protected:
 	int  MakeFunctionCall(asCExprContext *ctx, int funcId, asCObjectType *objectType, asCArray<asCExprContext*> &args, asCScriptNode *node, bool useVariable = false, int stackOffset = 0, int funcPtrVar = 0);
 	int  PrepareFunctionCall(int funcId, asCByteCode *bc, asCArray<asCExprContext *> &args);
 	void AfterFunctionCall(int funcId, asCArray<asCExprContext*> &args, asCExprContext *ctx, bool deferAll);
-	void ProcessDeferredParams(asCExprContext *ctx);
+	void ProcessDeferredParams(asCExprContext *ctx, bool processOnlyOutRef = false);
 	int  PrepareArgument(asCDataType *paramType, asCExprContext *ctx, asCScriptNode *node, bool isFunction = false, int refType = 0, bool isMakingCopy = false);
 	int  PrepareArgument2(asCExprContext *ctx, asCExprContext *arg, asCDataType *paramType, bool isFunction = false, int refType = 0, bool isMakingCopy = false);
 	bool IsLValue(asCExprValue &type);
@@ -318,6 +336,7 @@ protected:
 	void DestroyVariables(asCByteCode *bc);
 	asSNameSpace *DetermineNameSpace(const asCString &scope);
 	int  SetupParametersAndReturnVariable(asCArray<asCString> &parameterNames, asCScriptNode *func);
+	int  InstantiateTemplateFunctions(asCArray<int>& funcs, asCScriptNode* node);
 
 	enum SYMBOLTYPE
 	{
@@ -338,7 +357,8 @@ protected:
 		SL_ERROR = -1
 	};
 
-	SYMBOLTYPE SymbolLookup(const asCString &name, const asCString &scope, asCObjectType *objType, asCExprContext *outResult);
+	bool isAmbiguousSymbol(const asCString &name, asCScriptNode* errNode, SYMBOLTYPE& currentType, SYMBOLTYPE nextType);
+	SYMBOLTYPE SymbolLookup(const asCString &name, const asCString &scope, asCObjectType *objType, asCExprContext *outResult, asCScriptNode* errNode);
 	SYMBOLTYPE SymbolLookupLocalVar(const asCString &name, asCExprContext *outResult);
 	SYMBOLTYPE SymbolLookupMember(const asCString &name, asCObjectType *objType, asCExprContext *outResult);
 
@@ -382,10 +402,15 @@ protected:
 	asCScriptCode     *script;
 	asCScriptFunction *outFunc;
 
-	bool                        m_isConstructor;
-	bool                        m_isConstructorCalled;
-	sClassDeclaration          *m_classDecl;
-	sGlobalVariableDescription *m_globalVar;
+	bool                         m_isConstructor;
+	bool                         m_isConstructorCalled;
+	bool                         m_hasReturned;
+	asCArray<asCObjectProperty*> m_initializedProperties; // Doesn't hold reference
+	asCArray<asSNameSpace*>      m_namespaceVisibility;
+	asCMap<asCObjectProperty*, asUINT> m_propertyAccessCount; // Doesn't hold reference
+	asCMap<asCObjectProperty*, asCScriptNode*> m_inheritedPropertyAccess; // Doesn't hold reference
+	sClassDeclaration           *m_classDecl;
+	sGlobalVariableDescription  *m_globalVar;
 
 	asCArray<int> breakLabels;
 	asCArray<int> continueLabels;
@@ -398,6 +423,7 @@ protected:
 	void ReleaseTemporaryVariable(asCExprValue &t, asCByteCode *bc);
 	void ReleaseTemporaryVariable(int offset, asCByteCode *bc);
 	bool IsVariableOnHeap(int offset);
+	int DeclareVariable(const asCString &name, const asCDataType &type, int offset, asCByteCode *bc, asCScriptNode *node);
 
 	// This ordered array indicates the type of each variable
 	asCArray<asCDataType> variableAllocations;

@@ -511,7 +511,7 @@ void STKTextBillboard::reload()
 }   // reload
 
 // ----------------------------------------------------------------------------
-static void updateTextBillboard(core::array<scene::ISceneNode*>& List)
+static void updateTextBillboard(std::vector<scene::ISceneNode*>& List)
 {
     for (unsigned i = 0; i < List.size(); i++)
     {

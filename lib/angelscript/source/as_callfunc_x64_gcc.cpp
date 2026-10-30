@@ -1,6 +1,6 @@
 /*
    AngelCode Scripting Library
-   Copyright (c) 2003-2017 Andreas Jonsson
+   Copyright (c) 2003-2023 Andreas Jonsson
 
    This software is provided 'as-is', without any express or implied
    warranty. In no event will the authors be held liable for any
@@ -64,7 +64,12 @@ typedef asQWORD ( *funcptr_t )( void );
 // Note to self: Always remember to inform the used registers on the clobber line, 
 // so that the gcc optimizer doesn't try to use them for other things
 
-static asQWORD __attribute__((noinline)) X64_CallFunction(const asQWORD *args, int cnt, funcptr_t func, asQWORD &retQW2, bool returnFloat) 
+static asQWORD __attribute__((noinline)) 
+#ifndef __clang__
+    // On GNUC this code doesn't work properly when optimized, so disable optimization for this function	
+    __attribute__((optimize(0)))
+#endif
+    X64_CallFunction(const asQWORD *args, int cnt, funcptr_t func, asQWORD &retQW2, bool returnFloat) 
 {
 	// Need to flag the variable as volatile so the compiler doesn't optimize out the variable
 	volatile asQWORD retQW1 = 0;
@@ -79,7 +84,7 @@ static asQWORD __attribute__((noinline)) X64_CallFunction(const asQWORD *args, i
 
 	// Backup stack pointer in R15 that is guaranteed to maintain its value over function calls
 		"  movq %%rsp, %%r15 \n"
-#ifdef __OPTIMIZE__
+#if defined(__clang__) && defined(__OPTIMIZE__)
 	// Make sure the stack unwind logic knows we've backed up the stack pointer in register r15
 	// This should only be done if any optimization is done. If no optimization (-O0) is used,
 	// then the compiler already backups the rsp before entering the inline assembler code
@@ -136,7 +141,7 @@ static asQWORD __attribute__((noinline)) X64_CallFunction(const asQWORD *args, i
 
 	// Restore stack pointer
 		"  mov %%r15, %%rsp \n"
-#ifdef __OPTIMIZE__
+#if defined(__clang__) && defined(__OPTIMIZE__)
 	// Inform the stack unwind logic that the stack pointer has been restored
 	// This should only be done if any optimization is done. If no optimization (-O0) is used,
 	// then the compiler already backups the rsp before entering the inline assembler code

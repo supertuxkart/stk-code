@@ -160,8 +160,6 @@ source/Irrlicht/CParticleSystemSceneNode.cpp
 source/Irrlicht/CReadFile.cpp
 source/Irrlicht/CSceneCollisionManager.cpp
 source/Irrlicht/CSceneManager.cpp
-source/Irrlicht/CSceneNodeAnimatorCameraFPS.cpp
-source/Irrlicht/CSceneNodeAnimatorCameraMaya.cpp
 source/Irrlicht/CSceneNodeAnimatorCollisionResponse.cpp
 source/Irrlicht/CSceneNodeAnimatorDelete.cpp
 source/Irrlicht/CSceneNodeAnimatorFlyCircle.cpp
@@ -303,8 +301,6 @@ source/Irrlicht/CParticleSystemSceneNode.h
 source/Irrlicht/CReadFile.h
 source/Irrlicht/CSceneCollisionManager.h
 source/Irrlicht/CSceneManager.h
-source/Irrlicht/CSceneNodeAnimatorCameraFPS.h
-source/Irrlicht/CSceneNodeAnimatorCameraMaya.h
 source/Irrlicht/CSceneNodeAnimatorCollisionResponse.h
 source/Irrlicht/CSceneNodeAnimatorDelete.h
 source/Irrlicht/CSceneNodeAnimatorFlyCircle.h
@@ -476,8 +472,6 @@ include/irrXML.h
 include/ISceneCollisionManager.h
 include/ISceneLoader.h
 include/ISceneManager.h
-include/ISceneNodeAnimatorCameraFPS.h
-include/ISceneNodeAnimatorCameraMaya.h
 include/ISceneNodeAnimatorCollisionResponse.h
 include/ISceneNodeAnimatorFactory.h
 include/ISceneNodeAnimator.h

@@ -64,6 +64,33 @@
 
 using namespace GE;
 
+#undef MEASURE_CULLING
+#ifdef MEASURE_CULLING
+namespace
+{
+    struct CullingStats
+    {
+        int meshbuffers_treated = 0;
+        int meshbuffers_discarded = 0;
+        int meshbuffers_kept_for_camera = 0;
+        int meshbuffers_kept_for_shadows = 0;
+        int meshbuffers_kept_for_shadows_only = 0;
+    
+        void reset()
+        {
+            meshbuffers_treated = 0;
+            meshbuffers_discarded = 0;
+            meshbuffers_kept_for_camera = 0;
+            meshbuffers_kept_for_shadows = 0;
+            meshbuffers_kept_for_shadows_only = 0;
+        }
+    };
+
+// Only available in this file
+CullingStats culling_stats;
+}
+#endif
+
 namespace SP
 {
 
@@ -79,6 +106,8 @@ bool sp_apitrace = false;
 bool sp_debug_view = false;
 // ----------------------------------------------------------------------------
 bool g_handle_shadow = false;
+// ----------------------------------------------------------------------------
+bool discard_mesh[5];
 // ----------------------------------------------------------------------------
 SPShader* g_normal_visualizer = NULL;
 // ----------------------------------------------------------------------------
@@ -732,6 +761,23 @@ void addEdgeForViz(const core::vector3df& p0, const core::vector3df& p1)
 }   // addEdgeForViz
 
 // ----------------------------------------------------------------------------
+void addBoundingBoxEdgesForViz(const core::aabbox3df &bb)
+{
+    addEdgeForViz(getCorner(bb, 0), getCorner(bb, 1));
+    addEdgeForViz(getCorner(bb, 1), getCorner(bb, 5));
+    addEdgeForViz(getCorner(bb, 5), getCorner(bb, 4));
+    addEdgeForViz(getCorner(bb, 4), getCorner(bb, 0));
+    addEdgeForViz(getCorner(bb, 2), getCorner(bb, 3));
+    addEdgeForViz(getCorner(bb, 3), getCorner(bb, 7));
+    addEdgeForViz(getCorner(bb, 7), getCorner(bb, 6));
+    addEdgeForViz(getCorner(bb, 6), getCorner(bb, 2));
+    addEdgeForViz(getCorner(bb, 0), getCorner(bb, 2));
+    addEdgeForViz(getCorner(bb, 1), getCorner(bb, 3));
+    addEdgeForViz(getCorner(bb, 5), getCorner(bb, 7));
+    addEdgeForViz(getCorner(bb, 4), getCorner(bb, 6));
+}   // addBoundingBoxEdgesForViz
+
+// ----------------------------------------------------------------------------
 void prepareDrawCalls()
 {
     if (!sp_culling)
@@ -772,85 +818,111 @@ void prepareDrawCalls()
     }
     g_glow_meshes.clear();
     g_instances.clear();
-}
+}   // prepareDrawCalls
+
+// ----------------------------------------------------------------------------
+/* Helper function for addObject and handleDynamicDrawCalls.
+   discard_mesh is defined at a higher level, so there is no scope issue
+   in writing it here and having its results read later in the parent functions. */
+static inline bool computeBoundingBoxCulling(const core::aabbox3df& bb, int dc_count)
+{
+    assert(dc_count == 1 || dc_count == 5);
+
+#ifdef MEASURE_CULLING
+    culling_stats.meshbuffers_treated++;
+#endif
+
+    // Reset all discard values to false before use
+    std::memset(discard_mesh, 0, sizeof(discard_mesh));
+
+    for (int dc_type = 0; dc_type < dc_count; dc_type++)
+    {
+        const float* frustum_plane = g_frustums[dc_type];
+        for (int i = 0; i < 24; i += 4)
+        {
+            // The frustum is delimited by 6 planes, and we check
+            // each plane to see if at least one corner of the
+            // bounding box is on the side of the plane in 3D-space
+            // that would match the bounding box intersecting with
+            // the frustum.
+            // 
+            // For each plane, we can simply reconstruct a corner
+            // that will sit on the "inside" side of 3D-space if
+            // any of the corners do.
+            const float optimal_corner_x =
+                (frustum_plane[i] > 0.0f)   ? bb.MaxEdge.X : bb.MinEdge.X;
+            const float optimal_corner_y =
+                (frustum_plane[i+1] > 0.0f) ? bb.MaxEdge.Y : bb.MinEdge.Y;
+            const float optimal_corner_z =
+                (frustum_plane[i+2] > 0.0f) ? bb.MaxEdge.Z : bb.MinEdge.Z;
+
+            const bool outside = (optimal_corner_x * frustum_plane[i] +
+                                  optimal_corner_y * frustum_plane[i+1] +
+                                  optimal_corner_z * frustum_plane[i+2] +
+                                  frustum_plane[i+3]) < 0.0f;
+
+            if (outside)
+            {
+                discard_mesh[dc_type] = true;
+                break;
+            }
+        }
+    }
+
+    bool shadows_discard = (dc_count == 5) && discard_mesh[1] && discard_mesh[2] &&
+                           discard_mesh[3] && discard_mesh[4];
+
+#ifdef MEASURE_CULLING
+    if (!discard_mesh[0])
+        culling_stats.meshbuffers_kept_for_camera++;
+    if ((dc_count == 5) && !shadows_discard)
+    {
+        culling_stats.meshbuffers_kept_for_shadows++;
+        if (discard_mesh[0])
+            culling_stats.meshbuffers_kept_for_shadows_only++;
+    }
+#endif
+
+    if (discard_mesh[0] && (dc_count == 1 || shadows_discard))
+    {
+#ifdef MEASURE_CULLING
+        culling_stats.meshbuffers_discarded++;
+#endif
+        return true;
+    }
+    return false;
+}   // computeBoundingBoxCulling
 
 // ----------------------------------------------------------------------------
 void addObject(SPMeshNode* node)
 {
-    if (!sp_culling)
-    {
+    if (!sp_culling || node->getSPM() == NULL)
         return;
-    }
-
-    if (node->getSPM() == NULL)
-    {
-        return;
-    }
 
     const core::matrix4& model_matrix = node->getAbsoluteTransformation();
     bool added_for_skinning = false;
+
     for (unsigned m = 0; m < node->getSPM()->getMeshBufferCount(); m++)
     {
         SPMeshBuffer* mb = node->getSPM()->getSPMeshBuffer(m);
         SPShader* shader = node->getShader(m);
         if (shader == NULL)
-        {
             continue;
-        }
+
+        // We get a bounding box oriented with the XYZ axes
+        // to be able to cheaply test culling afterwards
         core::aabbox3df bb = mb->getBoundingBox();
         model_matrix.transformBoxEx(bb);
-        std::vector<bool> discard;
         const bool handle_shadow = node->isInShadowPass() &&
             g_handle_shadow && shader->hasShader(RP_SHADOW);
-        discard.resize((handle_shadow ? 5 : 1), false);
+        // The function also computes per-frustum data (discard_mesh) we use later
+        bool cull = computeBoundingBoxCulling(bb, (handle_shadow ? 5 : 1));
 
-        for (int dc_type = 0; dc_type < (handle_shadow ? 5 : 1); dc_type++)
-        {
-            for (int i = 0; i < 24; i += 4)
-            {
-                bool outside = true;
-                for (int j = 0; j < 8; j++)
-                {
-                    const float dist =
-                        getCorner(bb, j).X * g_frustums[dc_type][i] +
-                        getCorner(bb, j).Y * g_frustums[dc_type][i + 1] +
-                        getCorner(bb, j).Z * g_frustums[dc_type][i + 2] +
-                        g_frustums[dc_type][i + 3];
-                    outside = outside && dist < 0.0f;
-                    if (!outside)
-                    {
-                        break;
-                    }
-                }
-                if (outside)
-                {
-                    discard[dc_type] = true;
-                    break;
-                }
-            }
-        }
-        if (handle_shadow ?
-            (discard[0] && discard[1] && discard[2] && discard[3] &&
-            discard[4]) : discard[0])
-        {
+        if (cull)
             continue;
-        }
 
         if (irr_driver->getBoundingBoxesViz())
-        {
-            addEdgeForViz(getCorner(bb, 0), getCorner(bb, 1));
-            addEdgeForViz(getCorner(bb, 1), getCorner(bb, 5));
-            addEdgeForViz(getCorner(bb, 5), getCorner(bb, 4));
-            addEdgeForViz(getCorner(bb, 4), getCorner(bb, 0));
-            addEdgeForViz(getCorner(bb, 2), getCorner(bb, 3));
-            addEdgeForViz(getCorner(bb, 3), getCorner(bb, 7));
-            addEdgeForViz(getCorner(bb, 7), getCorner(bb, 6));
-            addEdgeForViz(getCorner(bb, 6), getCorner(bb, 2));
-            addEdgeForViz(getCorner(bb, 0), getCorner(bb, 2));
-            addEdgeForViz(getCorner(bb, 1), getCorner(bb, 3));
-            addEdgeForViz(getCorner(bb, 5), getCorner(bb, 7));
-            addEdgeForViz(getCorner(bb, 4), getCorner(bb, 6));
-        }
+            addBoundingBoxEdgesForViz(bb);
 
         mb->uploadGLMesh();
         // For first frame only need the vbo to be initialized
@@ -879,18 +951,14 @@ void addObject(SPMeshNode* node)
 
         for (int dc_type = 0; dc_type < (handle_shadow ? 5 : 1); dc_type++)
         {
-            if (discard[dc_type])
-            {
+            if (discard_mesh[dc_type])
                 continue;
-            }
+
             if (dc_type == 0)
-            {
                 sp_solid_poly_count += mb->getIndexCount() / 3;
-            }
             else
-            {
                 sp_shadow_poly_count += mb->getIndexCount() / 3;
-            }
+
             if (shader->isTransparent())
             {
                 // Transparent shader should always uses mesh samplers
@@ -946,7 +1014,7 @@ void addObject(SPMeshNode* node)
             g_instances.insert(mb);
         }
     }
-}
+}   // addObject
 
 // ----------------------------------------------------------------------------
 void handleDynamicDrawCall()
@@ -969,72 +1037,26 @@ void handleDynamicDrawCall()
         SPShader* shader = dydc->getShader();
         core::aabbox3df bb = dydc->getBoundingBox();
         dydc->getAbsoluteTransformation().transformBoxEx(bb);
-        std::vector<bool> discard;
         const bool handle_shadow =
             g_handle_shadow && shader->hasShader(RP_SHADOW);
-        discard.resize((handle_shadow ? 5 : 1), false);
-        for (int dc_type = 0; dc_type < (handle_shadow ? 5 : 1); dc_type++)
-        {
-            for (int i = 0; i < 24; i += 4)
-            {
-                bool outside = true;
-                for (int j = 0; j < 8; j++)
-                {
-                    const float dist =
-                        getCorner(bb, j).X * g_frustums[dc_type][i] +
-                        getCorner(bb, j).Y * g_frustums[dc_type][i + 1] +
-                        getCorner(bb, j).Z * g_frustums[dc_type][i + 2] +
-                        g_frustums[dc_type][i + 3];
-                    outside = outside && dist < 0.0f;
-                    if (!outside)
-                    {
-                        break;
-                    }
-                }
-                if (outside)
-                {
-                    discard[dc_type] = true;
-                    break;
-                }
-            }
-        }
-        if (handle_shadow ?
-            (discard[0] && discard[1] && discard[2] && discard[3] &&
-            discard[4]) : discard[0])
-        {
+        bool cull = computeBoundingBoxCulling(bb, (handle_shadow ? 5 : 1));
+
+        if (cull)
             continue;
-        }
 
         if (irr_driver->getBoundingBoxesViz())
-        {
-            addEdgeForViz(getCorner(bb, 0), getCorner(bb, 1));
-            addEdgeForViz(getCorner(bb, 1), getCorner(bb, 5));
-            addEdgeForViz(getCorner(bb, 5), getCorner(bb, 4));
-            addEdgeForViz(getCorner(bb, 4), getCorner(bb, 0));
-            addEdgeForViz(getCorner(bb, 2), getCorner(bb, 3));
-            addEdgeForViz(getCorner(bb, 3), getCorner(bb, 7));
-            addEdgeForViz(getCorner(bb, 7), getCorner(bb, 6));
-            addEdgeForViz(getCorner(bb, 6), getCorner(bb, 2));
-            addEdgeForViz(getCorner(bb, 0), getCorner(bb, 2));
-            addEdgeForViz(getCorner(bb, 1), getCorner(bb, 3));
-            addEdgeForViz(getCorner(bb, 5), getCorner(bb, 7));
-            addEdgeForViz(getCorner(bb, 4), getCorner(bb, 6));
-        }
+            addBoundingBoxEdgesForViz(bb);
 
         for (int dc_type = 0; dc_type < (handle_shadow ? 5 : 1); dc_type++)
         {
-            if (discard[dc_type])
-            {
+            if (discard_mesh[dc_type])
                 continue;
-            }
+
             if (dc_type == 0)
-            {
                 sp_solid_poly_count += dydc->getVertexCount();
-            }
             else
-            {
                 sp_shadow_poly_count += dydc->getVertexCount();
-            }
+
             if (shader->isTransparent())
             {
                 // Transparent shader should always uses mesh samplers
@@ -1073,7 +1095,7 @@ void handleDynamicDrawCall()
             }
         }
     }
-}
+}   // handleDynamicDrawCalls
 
 // ----------------------------------------------------------------------------
 void updateModelMatrix()
@@ -1116,9 +1138,8 @@ void updateModelMatrix()
             for (auto& q : p.second)
             {
                 if (q.second.empty())
-                {
                     continue;
-                }
+
                 std::array<GLuint, 6> texture_names =
                     {{ 0, 0, 0, 0, 0, 0 }};
                 int material_id =
@@ -1230,6 +1251,17 @@ void uploadAll()
         {
             return dc->isRemoving();
         }), g_dy_dc.end());
+
+#ifdef MEASURE_CULLING
+    Log::info("CullingStats", "%i objects treated, %i discarded, %i kept for camera, "
+        "%i kept for shadows, %i kept for shadows only",
+        culling_stats.meshbuffers_treated,
+        culling_stats.meshbuffers_discarded,
+        culling_stats.meshbuffers_kept_for_camera,
+        culling_stats.meshbuffers_kept_for_shadows,
+        culling_stats.meshbuffers_kept_for_shadows_only);
+    culling_stats.reset();
+#endif
 }
 
 // ----------------------------------------------------------------------------
@@ -1302,7 +1334,7 @@ void drawGlow()
 void draw(RenderPass rp, DrawCallType dct)
 {
     std::stringstream profiler_name;
-    profiler_name << "SP::Draw " << dct << " with " << rp;
+    profiler_name << "--- SP::Draw " << dct << " with " << rp;
     PROFILER_PUSH_CPU_MARKER(profiler_name.str().c_str(),
         (uint8_t)(float(dct + rp + 2) / float(DCT_FOR_VAO + RP_COUNT) * 255.0f),
         (uint8_t)(float(dct + 1) / (float)DCT_FOR_VAO * 255.0f) ,

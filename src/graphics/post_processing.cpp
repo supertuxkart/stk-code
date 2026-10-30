@@ -35,8 +35,10 @@
 #include "graphics/sp/sp_dynamic_draw_call.hpp"
 #include "graphics/sp/sp_shader.hpp"
 #include "graphics/sp/sp_uniform_assigner.hpp"
+#include "graphics/speed_streaks.hpp"
 #include "io/file_manager.hpp"
 #include "karts/abstract_kart.hpp"
+#include "karts/kart.hpp"
 #include "karts/kart_model.hpp"
 #include "modes/world.hpp"
 #include "physics/physics.hpp"
@@ -119,42 +121,6 @@ public:
         drawFullScreenEffect(core::vector2df(inv_width, inv_height));
     }   // render
 };   // Gaussian3VBlurShader
-
-#if !defined(USE_GLES2)
-// ============================================================================
-class ComputeGaussian6VBlurShader : public TextureShader<ComputeGaussian6VBlurShader, 1,
-                                                  core::vector2df,
-                                                  std::vector<float> >
-{
-public:
-    GLuint m_dest_tu;
-    ComputeGaussian6VBlurShader()
-    {
-        loadProgram(OBJECT, GL_COMPUTE_SHADER, "gaussian6v.comp");
-        m_dest_tu = 1;
-        assignUniforms("pixel", "weights");
-        assignSamplerNames(0, "source", ST_BILINEAR_CLAMPED_FILTERED);
-        assignTextureUnit(m_dest_tu, "dest");
-    }   // ComputeGaussian6VBlurShader
-};   // ComputeGaussian6VBlurShader
-
-// ============================================================================
-class ComputeGaussian6HBlurShader : public TextureShader<ComputeGaussian6HBlurShader, 1,
-                                                  core::vector2df,
-                                                  std::vector<float> >
-{
-public:
-    GLuint m_dest_tu;
-    ComputeGaussian6HBlurShader()
-    {
-        loadProgram(OBJECT, GL_COMPUTE_SHADER, "gaussian6h.comp");
-        m_dest_tu = 1;
-        assignUniforms("pixel", "weights");
-        assignSamplerNames(0, "source",  ST_BILINEAR_CLAMPED_FILTERED);
-        assignTextureUnit(m_dest_tu, "dest");
-    }   // ComputeGaussian6HBlurShader
-};   // ComputeGaussian6HBlurShader
-#endif
 
 // ============================================================================
 class Gaussian6HBlurShader : public TextureShader<Gaussian6HBlurShader, 1,
@@ -404,25 +370,27 @@ public:
 };   // ToneMapShader
 
 // ============================================================================
-class DepthOfFieldShader : public TextureShader<DepthOfFieldShader, 2>
+// The Shader template doesn't explicitly handles bool uniforms,
+// but it works out-of-the-box via int promotion.
+class DepthOfFieldShader : public TextureShader<DepthOfFieldShader, 2,
+                                                float, float, bool>
 {
 public:
     DepthOfFieldShader()
     {
         loadProgram(OBJECT, GL_VERTEX_SHADER, "screenquad.vert",
                             GL_FRAGMENT_SHADER, "dof.frag");
-
-        assignUniforms();
+        assignUniforms("focalDepth", "range", "blurForeground"); 
         assignSamplerNames(0, "tex", ST_BILINEAR_CLAMPED_FILTERED,
                            1, "dtex", ST_NEAREST_CLAMPED_FILTERED);
     }   // DepthOfFieldShader
     // ------------------------------------------------------------------------
-    void render(const FrameBuffer &framebuffer, GLuint color_texture, GLuint depth_stencil_texture)
+    void render(const FrameBuffer &framebuffer, GLuint color_texture, GLuint depth_stencil_texture,
+        float focalDepth, float extraRange, bool foregroundBlur)
     {
         framebuffer.bind();
         setTextureUnits(color_texture, depth_stencil_texture);
-        drawFullScreenEffect();
-
+        drawFullScreenEffect(focalDepth, extraRange, foregroundBlur);
     }   // render
 };   // DepthOfFieldShader
 
@@ -576,6 +544,23 @@ public:
     }   // render
 };   // MotionBlurShader
 
+class SpeedStreaksShader : public TextureShader<SpeedStreaksShader, 1, float, float, float>
+{
+public:
+    SpeedStreaksShader()
+    {
+        loadProgram(OBJECT, GL_VERTEX_SHADER, "screenquad.vert",
+                            GL_FRAGMENT_SHADER, "speed_streaks.frag");
+        assignUniforms("u_intensity", "u_radial_scroll_offset", "u_time");
+        assignSamplerNames(0, "noise_texture", ST_BILINEAR_FILTERED);
+    }   //SpeedStreaksShader
+    void render(GLuint noise_texture, float intensity, float radial_scroll_offset, float time)
+    {
+        setTextureUnits(noise_texture);
+        drawFullScreenEffect(intensity, radial_scroll_offset, time);
+    }   // render
+};  // SpeedStreaksShader
+
 // ============================================================================
 class GodFadeShader : public TextureShader<GodFadeShader, 1, video::SColorf>
 {
@@ -724,9 +709,24 @@ PostProcessing::PostProcessing()
     STKTexManager::getInstance()->addTexture(m_areamap);
     areamap->drop();
 
+    // Load the simplex noise texture
+    const std::string noiseTexturePath = file_manager->getAsset(
+        FileManager::AssetType::TEXTURE,
+        "stk_noise_simplex.png");
+
+    //TODO: implement single_channel path, currently loads rgba even though noise_texture is single channel only.
+    m_noise_texture = GE::createTexture(noiseTexturePath); 
+    if (!m_noise_texture || m_noise_texture->getTextureHandler() == 0)
+    {
+        Log::fatal("postprocessing", "Failed to load %s", noiseTexturePath.c_str());
+        return;
+    }
+    STKTexManager::getInstance()->addTexture(m_noise_texture);
+
     // For preloading shaders
     MotionBlurShader::getInstance();
     LightningShader::getInstance();
+    SpeedStreaksShader::getInstance();
 }   // PostProcessing
 
 // ----------------------------------------------------------------------------
@@ -777,28 +777,6 @@ void PostProcessing::renderBloom(GLuint in)
 }   // renderBloom
 
 // ----------------------------------------------------------------------------
-static std::vector<float> getGaussianWeight(float sigma, size_t count)
-{
-    float g0, g1, g2, total;
-
-    std::vector<float> weights;
-    g0 = 1.f / (sqrtf(2.f * 3.14f) * sigma);
-    g1 = exp(-.5f / (sigma * sigma));
-    g2 = g1 * g1;
-    total = g0;
-    for (unsigned i = 0; i < count; i++)
-    {
-        weights.push_back(g0);
-        g0 *= g1;
-        g1 *= g2;
-        total += 2 * g0;
-    }
-    for (float &weight : weights)
-        weight /= total;
-    return weights;
-}   // getGaussianWeight
-
-// ----------------------------------------------------------------------------
 void PostProcessing::renderGaussian3Blur(const FrameBuffer &in_fbo,
                                          const FrameBuffer &auxiliary) const
 {
@@ -823,58 +801,18 @@ void PostProcessing::renderGaussian6Blur(const FrameBuffer &in_fbo,
 {
     assert(in_fbo.getWidth() == auxiliary.getWidth() &&
            in_fbo.getHeight() == auxiliary.getHeight());
-    float inv_width = 1.0f / in_fbo.getWidth();
-    float inv_height = 1.0f / in_fbo.getHeight();
 
-    if (!CVS->supportsComputeShadersFiltering())
-    {
-        auxiliary.bind();
-        glClear(GL_COLOR_BUFFER_BIT);
-        Gaussian6VBlurShader::getInstance()
-            ->render(in_fbo.getRTT()[0], in_fbo.getWidth(), in_fbo.getHeight(),
-                     sigma_v);
+    auxiliary.bind();
+    glClear(GL_COLOR_BUFFER_BIT);
+    Gaussian6VBlurShader::getInstance()
+        ->render(in_fbo.getRTT()[0], in_fbo.getWidth(), in_fbo.getHeight(),
+                 sigma_v);
 
-        in_fbo.bind();
-        glClear(GL_COLOR_BUFFER_BIT);
-        Gaussian6HBlurShader::getInstance()->setTextureUnits(auxiliary.getRTT()[0]);
-        Gaussian6HBlurShader::getInstance()->render(auxiliary, in_fbo.getWidth(),
-                                                   in_fbo.getHeight(), sigma_h);
-    }
-#if !defined(USE_GLES2)
-    else
-    {
-        const std::vector<float> &weightsV = getGaussianWeight(sigma_v, 7);
-        glMemoryBarrier(GL_TEXTURE_FETCH_BARRIER_BIT);
-        ComputeGaussian6VBlurShader::getInstance()->use();
-        ComputeGaussian6VBlurShader::getInstance()
-            ->setTextureUnits(in_fbo.getRTT()[0]);
-        glBindSampler(ComputeGaussian6VBlurShader::getInstance()->m_dest_tu, 0);
-        glBindImageTexture(ComputeGaussian6VBlurShader::getInstance()->m_dest_tu,
-                            auxiliary.getRTT()[0], 0, false, 0,
-                            GL_WRITE_ONLY, GL_RGBA16F);
-        ComputeGaussian6VBlurShader::getInstance()
-            ->setUniforms(core::vector2df(inv_width, inv_height), weightsV);
-        glDispatchCompute((int)in_fbo.getWidth() / 8 + 1,
-                          (int)in_fbo.getHeight() / 8 + 1, 1);
-
-        const std::vector<float> &weightsH = getGaussianWeight(sigma_h, 7);
-        glMemoryBarrier(  GL_TEXTURE_FETCH_BARRIER_BIT
-                        | GL_SHADER_IMAGE_ACCESS_BARRIER_BIT);
-        ComputeGaussian6HBlurShader::getInstance()->use();
-        ComputeGaussian6HBlurShader::getInstance()
-                         ->setTextureUnits(auxiliary.getRTT()[0]);
-        glBindSampler(ComputeGaussian6HBlurShader::getInstance()->m_dest_tu, 0);
-        glBindImageTexture(ComputeGaussian6HBlurShader::getInstance()->m_dest_tu,
-                           in_fbo.getRTT()[0], 0, false, 0,
-                           GL_WRITE_ONLY, GL_RGBA16F);
-        ComputeGaussian6HBlurShader::getInstance()
-                ->setUniforms(core::vector2df(inv_width, inv_height), weightsH);
-        glDispatchCompute((int)in_fbo.getWidth() / 8 + 1,
-                          (int)in_fbo.getHeight() / 8 + 1, 1);
-        glMemoryBarrier(GL_SHADER_IMAGE_ACCESS_BARRIER_BIT);
-    }
-#endif
-
+    in_fbo.bind();
+    glClear(GL_COLOR_BUFFER_BIT);
+    Gaussian6HBlurShader::getInstance()->setTextureUnits(auxiliary.getRTT()[0]);
+    Gaussian6HBlurShader::getInstance()->render(auxiliary, in_fbo.getWidth(),
+                                                in_fbo.getHeight(), sigma_h);
 }   // renderGaussian6Blur
 
 // ----------------------------------------------------------------------------
@@ -1019,11 +957,59 @@ void PostProcessing::renderMotionBlur(const FrameBuffer &in_fbo,
     MotionBlurShader::getInstance()->render(in_fbo, boost_time, depth_stencil_texture);
 }   // renderMotionBlur
 
+// ----------------------------------------------------------------------------
+void PostProcessing::renderSpeedStreaks()
+{
+    World* world = World::getWorld();
+    Camera* cam  = Camera::getActiveCamera();
+    const Kart* kart = dynamic_cast<const Kart*>(cam->getKart());
+    SpeedStreaks* speed_streaks = kart ? kart->getSpeedStreaks() : nullptr;
+
+    const Camera::CameraType cam_type = cam->getType();
+    const Camera::Mode       cam_mode = cam->getMode();
+
+    const bool is_valid_cam_mode = cam_mode == Camera::CM_NORMAL      ||
+                                   cam_mode == Camera::CM_REVERSE     ||
+                                   cam_mode == Camera::CM_LEADER_MODE ||
+                                   cam_mode == Camera::CM_FALLING;
+
+    float radial_scroll_offset  =  0.0f;
+    float intensity             =  0.0f;
+
+    // Determine if we should display speed streaks based on camera type/mode
+    if (speed_streaks &&
+        cam_type == Camera::CM_TYPE_NORMAL &&
+        is_valid_cam_mode)
+    {
+        radial_scroll_offset = speed_streaks->getRadialScrollOffset();
+        intensity            = speed_streaks->getBoostIntensity();
+
+        // Change on screen direction of speedstreaks based on active camera mode
+        auto direction = SpeedStreaks::Direction::FORWARD;
+        if (cam_mode == Camera::CM_REVERSE ||
+            cam_mode == Camera::CM_LEADER_MODE)
+        {
+            direction = SpeedStreaks::Direction::REVERSE;
+        }
+        speed_streaks->setDirection(direction);
+    }
+
+    glEnable(GL_BLEND);
+    glBlendEquation(GL_FUNC_ADD);
+    glBlendFunc(GL_ONE, GL_ONE);
+
+    SpeedStreaksShader::getInstance()->render(m_noise_texture->getTextureHandler(), intensity, radial_scroll_offset, world->getTime());
+
+    glDisable(GL_BLEND);
+}
 
 // ----------------------------------------------------------------------------
 void PostProcessing::renderDoF(const FrameBuffer &framebuffer, GLuint color_texture, GLuint depth_stencil_texture)
 {
-    DepthOfFieldShader::getInstance()->render(framebuffer, color_texture, depth_stencil_texture);
+    // TODO: make it possible to use different parameters for cutscenes,
+    //       and to tweak the values from some config file to avoid the need for recompilation
+    DepthOfFieldShader::getInstance()->render(framebuffer, color_texture, depth_stencil_texture,
+        72.0 /* focal depth */, 360.0 /* extra range until max blur */, false /* foreground blurring */);
 }   // renderDoF
 
 // ----------------------------------------------------------------------------
@@ -1099,35 +1085,43 @@ void PostProcessing::renderGodRays(scene::ICameraSceneNode * const camnode,
 
 
 // ----------------------------------------------------------------------------
-void PostProcessing::applyMLAA(const FrameBuffer& mlaa_tmp_framebuffer,
-                               const FrameBuffer& mlaa_blend_framebuffer,
-                               const FrameBuffer& mlaa_colors_framebuffer)
+void PostProcessing::applyMLAA(const FrameBuffer& mlaa_color_in_framebuffer, // original scene color.
+                               const FrameBuffer& mlaa_blend_framebuffer,    // blend weights.
+                               const FrameBuffer& mlaa_results_framebuffer)  // reusable temp buffer AND final output.
 {
     const core::vector2df &PIXEL_SIZE =
                      core::vector2df(1.0f / UserConfigParams::m_width,
                                      1.0f / UserConfigParams::m_height);
 
-    mlaa_tmp_framebuffer.bind();
+    // Clear results buffer
+    mlaa_results_framebuffer.bind();
     glClearColor(0.0, 0.0, 0.0, 1.0);
     glClear(GL_COLOR_BUFFER_BIT);
 
     // Pass 1: color edge detection
-    MLAAColorEdgeDetectionSHader::getInstance()->render(PIXEL_SIZE, mlaa_colors_framebuffer.getRTT()[0]);
+    // Detects geometric edges by looking for color discontinuities in the source image. (mlaa_color_in_framebuffer)
+    // This identifies which pixels lie on jagged edges that need MLAA smoothing.
+    MLAAColorEdgeDetectionSHader::getInstance()->render(PIXEL_SIZE, mlaa_color_in_framebuffer.getRTT()[0]);
 
     // Pass 2: blend weights
+    // Converts the edge map into per-pixel blend weights using the precomputed MLAA area lookup texture (m_areamap).
+    // These weights encode how to blend with neighboring pixels to smooth each edge.
     mlaa_blend_framebuffer.bind();
     glClear(GL_COLOR_BUFFER_BIT);
 
-    MLAABlendWeightSHader::getInstance()->render(m_areamap, PIXEL_SIZE, mlaa_tmp_framebuffer.getRTT()[0]);
+    MLAABlendWeightSHader::getInstance()->render(m_areamap, PIXEL_SIZE, mlaa_results_framebuffer.getRTT()[0]);
 
-    // Blit in to tmp1
-    FrameBuffer::blit(mlaa_colors_framebuffer,
-                      mlaa_tmp_framebuffer);
+    // Blit scene color buffer into tmp
+    FrameBuffer::blit(mlaa_color_in_framebuffer,
+                      mlaa_results_framebuffer);
 
     // Pass 3: gather
-    mlaa_colors_framebuffer.bind();
+    // Applies the blend weights(mlaa_blend_framebuffer) to the source color(mlaa_color_in_framebuffer)
+    // for each pixel near an edge, samples from appropriate neighbors and blends them according to the weights.
+    // Pixels away from edges are left essentially unchanged.
+    mlaa_results_framebuffer.bind();
     MLAAGatherSHader::getInstance()
-        ->render(PIXEL_SIZE, mlaa_blend_framebuffer.getRTT()[0], mlaa_tmp_framebuffer.getRTT()[0]);
+        ->render(PIXEL_SIZE, mlaa_blend_framebuffer.getRTT()[0], mlaa_color_in_framebuffer.getRTT()[0]);
 
 }   // applyMLAA
 
@@ -1149,13 +1143,32 @@ FrameBuffer *PostProcessing::render(scene::ICameraSceneNode * const camnode,
                                     bool isRace,
                                     RTT *rtts)
 {
+    // Set of ping pong buffers to feed to the post processing passes.
+    //
+    // Ping-Ponging refers to the technique where we alternate between two texture buffers to
+    // perform the multiple passes of rendering here without causing data hazards. one buffer acts
+    // as the read-only source while the other serves as the write-only destination.
+    // After each rendering pass (that wrote to out_fbo), we swap the buffer pointers,
+    // turning the previous output into the next input.
+    //
+    // The general convention is for:
+    // - in_fbo to be the input buffer
+    // - out_fbo to be used as either: a temporary or the resulting output buffer.
+    //
+    // Two kinds of effect share this chain:
+    // - filters (DoF, motion blur, MLAA) derive a new image from the current one
+    //   after rendering we use std::swap to flip in/out around.
+    //   (i.e. the output of the last effect is now the input of the next effect.)
+    //
+    // - accumulators (god rays, bloom, lens flare, lightning) add a
+    //   contribution computed from something other than the image (the sun,
+    //   the bright pass, the weather): they bind *in_fbo and draw with
+    //   additive blending in place. (no need to swap).
+    //
+    // All effects are optional except the tonemapping stage.
     FrameBuffer *in_fbo = &rtts->getFBO(FBO_COLORS);
     FrameBuffer *out_fbo = &rtts->getFBO(FBO_TMP1_WITH_DS);
-    // Each effect uses these as named, and sets them up for the next effect.
-    // This allows chaining effects where some may be disabled.
 
-    // As the original color shouldn't be touched, the first effect
-    // can't be disabled.
     glDisable(GL_DEPTH_TEST);
     glDisable(GL_BLEND);
 
@@ -1163,7 +1176,7 @@ FrameBuffer *PostProcessing::render(scene::ICameraSceneNode * const camnode,
 
     if (isRace && UserConfigParams::m_dof && (physics == NULL || !physics->isDebug()))
     {
-        PROFILER_PUSH_CPU_MARKER("- DoF", 0xFF, 0x00, 0x00);
+        PROFILER_PUSH_CPU_MARKER("-- DoF", 0xFF, 0x00, 0x00);
         ScopedGPUTimer Timer(irr_driver->getGPUTimer(Q_DOF));
         renderDoF(*out_fbo, in_fbo->getRTT()[0], rtts->getDepthStencilTexture());
         std::swap(in_fbo, out_fbo);
@@ -1177,16 +1190,17 @@ FrameBuffer *PostProcessing::render(scene::ICameraSceneNode * const camnode,
 
     if (isRace && UserConfigParams::m_light_shaft && hasgodrays)
     {
-        PROFILER_PUSH_CPU_MARKER("- Godrays", 0xFF, 0x00, 0x00);
+        PROFILER_PUSH_CPU_MARKER("-- Godrays", 0xFF, 0x00, 0x00);
         ScopedGPUTimer Timer(irr_driver->getGPUTimer(Q_GODRAYS));
         renderGodRays(camnode, *in_fbo, rtts->getFBO(FBO_RGBA_1),
             rtts->getFBO(FBO_QUARTER1), rtts->getFBO(FBO_QUARTER2));
+        // additive blend, specifically no ping/pong std::swap
         PROFILER_POP_CPU_MARKER();
     }
 
     // Simulate camera defects from there
     {
-        PROFILER_PUSH_CPU_MARKER("- Bloom", 0xFF, 0x00, 0x00);
+        PROFILER_PUSH_CPU_MARKER("-- Bloom", 0xFF, 0x00, 0x00);
         ScopedGPUTimer Timer(irr_driver->getGPUTimer(Q_BLOOM));
 
         if (isRace && UserConfigParams::m_bloom && (physics == NULL || !physics->isDebug()))
@@ -1254,59 +1268,80 @@ FrameBuffer *PostProcessing::render(scene::ICameraSceneNode * const camnode,
 
             glDisable(GL_BLEND);
             glColorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
+            // additive blend, specifically no ping/pong std::swap
         } // end if bloom
         PROFILER_POP_CPU_MARKER();
     }
 
+    // Tonemap from HDR to SDR - switching from RGBA16 over to RGBA8 framebuffers afterwards.
     {
-        PROFILER_PUSH_CPU_MARKER("- Tonemap", 0xFF, 0x00, 0x00);
+        PROFILER_PUSH_CPU_MARKER("-- Tonemap", 0xFF, 0x00, 0x00);
         ScopedGPUTimer Timer(irr_driver->getGPUTimer(Q_TONEMAP));
         // only enable vignette during race
 
-        out_fbo = &rtts->getFBO(FBO_RGBA_1);
-        ToneMapShader::getInstance()->render(*out_fbo, in_fbo->getRTT()[0],
-                                             isRace ? 1.0f : 0.0f);
-        in_fbo = &rtts->getFBO(FBO_RGBA_2);
+        ToneMapShader::getInstance()->render(
+            rtts->getFBO(FBO_RGBA_1),   //out
+            in_fbo->getRTT()[0],        //in
+            isRace ? 1.0f : 0.0f
+        );
+        PROFILER_POP_CPU_MARKER();
+    }
+
+    // Rest of post processing in SDR
+    in_fbo = &rtts->getFBO(FBO_RGBA_1);
+    out_fbo = &rtts->getFBO(FBO_RGBA_2);
+
+    {
+        PROFILER_PUSH_CPU_MARKER("-- Speed streaks", 0xFF, 0x00, 0x00);
+        ScopedGPUTimer Timer(irr_driver->getGPUTimer(Q_SPEEDSTREAKS));
+        if (isRace && World::getWorld() && UserConfigParams::m_speed_streaks)
+        {
+            in_fbo->bind();
+            renderSpeedStreaks();
+            // additive blend, specifically no ping/pong std::swap
+        }
         PROFILER_POP_CPU_MARKER();
     }
 
     {
-        PROFILER_PUSH_CPU_MARKER("- Motion blur", 0xFF, 0x00, 0x00);
+        PROFILER_PUSH_CPU_MARKER("-- Motion blur", 0xFF, 0x00, 0x00);
         ScopedGPUTimer Timer(irr_driver->getGPUTimer(Q_MOTIONBLUR));
 
         if (isRace && UserConfigParams::m_motionblur && World::getWorld() &&
             m_boost_time.at(Camera::getActiveCamera()->getIndex()) > 0.0f) // motion blur
         {
-            in_fbo = &rtts->getFBO(FBO_RGBA_1);
-            out_fbo = &rtts->getFBO(FBO_RGBA_2);
             renderMotionBlur(*in_fbo, *out_fbo, irr_driver->getDepthStencilTexture());
+            std::swap(in_fbo, out_fbo);
         }
         PROFILER_POP_CPU_MARKER();
     }
 
     // Handle lightning rendering
     {
-        PROFILER_PUSH_CPU_MARKER("- Lightning", 0xFF, 0x00, 0x00);
+        PROFILER_PUSH_CPU_MARKER("-- Lightning", 0xFF, 0x00, 0x00);
         ScopedGPUTimer Timer(irr_driver->getGPUTimer(Q_LIGHTNING));
         Weather* weather = Weather::getInstance();
         if (weather && weather->shouldLightning())
         {
+            in_fbo->bind();
             renderLightning(weather->getIntensity());
+            // additive blend, specifically no ping/pong std::swap
         }
         PROFILER_POP_CPU_MARKER();
     }
 
     if (UserConfigParams::m_mlaa) // MLAA. Must be the last pp filter.
     {
-        PROFILER_PUSH_CPU_MARKER("- MLAA", 0xFF, 0x00, 0x00);
+        PROFILER_PUSH_CPU_MARKER("-- MLAA", 0xFF, 0x00, 0x00);
         ScopedGPUTimer Timer(irr_driver->getGPUTimer(Q_MLAA));
         applyMLAA(*in_fbo,
                   rtts->getFBO(FBO_RGBA_3),
                   *out_fbo);
+        std::swap(in_fbo, out_fbo);
         PROFILER_POP_CPU_MARKER();
     }
 
-    return out_fbo;
+    return in_fbo;
 }   // render
 
 #endif   // !SERVER_ONLY

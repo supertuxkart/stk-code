@@ -604,6 +604,8 @@ void LightingPasses::renderLights(  bool has_shadow,
 }   // renderLights
 
 // ----------------------------------------------------------------------------
+// Note that the final output of this function still requires a blurring
+// pass to look clean, the raw light scatter is jagged.
 void LightingPasses::renderLightsScatter(GLuint depth_stencil_texture,
                                          const FrameBuffer& half1_framebuffer,
                                          const FrameBuffer& half2_framebuffer,
@@ -644,8 +646,6 @@ void LightingPasses::renderLightsScatter(GLuint depth_stencil_texture,
                           LightBaseClass::MAXLIGHT));
 
     glDisable(GL_BLEND);
-    post_processing->renderGaussian6Blur(half1_framebuffer,
-                                         half2_framebuffer, 5., 5.);
 }   // renderLightsScatter
 
 #endif

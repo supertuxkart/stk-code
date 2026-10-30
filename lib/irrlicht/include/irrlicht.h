@@ -130,8 +130,6 @@
 #include "ISceneManager.h"
 #include "ISceneNode.h"
 #include "ISceneNodeAnimator.h"
-#include "ISceneNodeAnimatorCameraFPS.h"
-#include "ISceneNodeAnimatorCameraMaya.h"
 #include "ISceneNodeAnimatorCollisionResponse.h"
 #include "ISceneNodeAnimatorFactory.h"
 #include "ISceneNodeFactory.h"

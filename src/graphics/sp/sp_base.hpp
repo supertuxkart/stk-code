@@ -34,6 +34,8 @@
 #include <string>
 #include <vector>
 
+#include <IrrlichtDevice.h>
+
 namespace irr
 {
     namespace scene { class ICameraSceneNode; class IMesh; }
@@ -129,6 +131,8 @@ void initSamplers();
 void prepareScene();
 // ----------------------------------------------------------------------------
 void handleDynamicDrawCall();
+// ----------------------------------------------------------------------------
+void addBoundingBoxEdgesForViz(const irr::core::aabbox3df &bb);
 // ----------------------------------------------------------------------------
 void addDynamicDrawCall(std::shared_ptr<SPDynamicDrawCall>);
 // ----------------------------------------------------------------------------

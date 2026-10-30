@@ -150,6 +150,7 @@ static const char* m_perf_query_phase[Q_LAST] =
     "PointLights",
     "SSAO",
     "Light Scatter",
+    "Light Scatter blurring",
     "Glow",
     "Combine Diffuse Color",
     "Skybox",
@@ -160,6 +161,7 @@ static const char* m_perf_query_phase[Q_LAST] =
     "Bloom",
     "Tonemap",
     "Motion Blur",
+    "Speed Streaks",
     "Lightning",
     "MLAA",
     "GUI",
@@ -2189,12 +2191,10 @@ void IrrDriver::update(float dt, bool is_loading)
     {
         SP::SPTextureManager::get()->checkForGLCommand();
     }
-#endif
     World *world = World::getWorld();
 
     if (world)
     {
-#ifndef SERVER_ONLY
         updateDisplace(dt);
         m_renderer->render(dt, is_loading);
 
@@ -2212,11 +2212,9 @@ void IrrDriver::update(float dt, bool is_loading)
                 debug_drawer->beginNextFrame();
             }
         }
-#endif
     }
-    else
+    else // if !world
     {
-#ifndef SERVER_ONLY
         m_video_driver->beginScene(/*backBuffer clear*/ true, /*zBuffer*/ true,
                                    video::SColor(255,100,101,140));
 
@@ -2226,8 +2224,8 @@ void IrrDriver::update(float dt, bool is_loading)
             renderNetworkDebug();
         }
         m_video_driver->endScene();
-#endif
     }
+#endif
 
     if (m_request_screenshot) doScreenShot();
 

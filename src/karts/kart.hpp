@@ -53,6 +53,7 @@ class Skidding;
 class SkidMarks;
 class SlipStream;
 class Stars;
+class SpeedStreaks;
 class TerrainInfo;
 
 #ifndef SERVER_ONLY
@@ -137,6 +138,9 @@ protected:
 
     /** The skidmarks object for this kart. */
     std::unique_ptr<SkidMarks> m_skidmarks;
+
+    /** Parameters for SpeedStreaks effect. */
+    std::unique_ptr<SpeedStreaks> m_speedstreaks;
 #endif
 
     /** All particle effects. */
@@ -368,6 +372,15 @@ public:
     // ----------------------------------------------------------------------------------------
     virtual float  getCurrentMaxSpeed() const OVERRIDE;
     // ----------------------------------------------------------------------------------------
+    /** Returns the speed amount above the kart's own unboosted max speed.
+    */
+    virtual float getCurrentAdditionalSpeed() const OVERRIDE;
+    // ----------------------------------------------------------------------------------------
+    /** Returns the ratio of the speed amount above the kart's own unboosted max speed
+     *  relative to the generic engine max speed.
+     */
+    virtual float getCurrentAdditionalSpeedRatio() const OVERRIDE;
+    // ----------------------------------------------------------------------------------------
     /** This is used on the client side only to set the speed of the kart
      *  from the server information. */
     virtual void setSpeed(float s) OVERRIDE { m_speed = s; }
@@ -594,6 +607,10 @@ public:
     // ----------------------------------------------------------------------------------------
     virtual Stars* getStarsEffect() const OVERRIDE
                                                { return m_stars_effect.get(); }
+    // ----------------------------------------------------------------------------------------
+#ifndef SERVER_ONLY
+    SpeedStreaks* getSpeedStreaks() const { return m_speedstreaks.get(); }
+#endif
     // ------------------------------------------------------------------------
     /** Return the confirmed finish ticks (sent by the server)
      *  indicating that this kart has really finished the race. */
