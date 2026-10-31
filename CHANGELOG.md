@@ -5,13 +5,14 @@ It should be kept in mind that some versions have a less complete changelog than
 
 For similar reasons, and because some features are vastly more complex than others, attributions of main changes should not be taken as a shortcut for overall contribution.
 
-## SuperTuxKart 1.5.1
+## SuperTuxKart 1.6
 
 ### Networking
 * Add TV cameras as a camera option when watching soccer games in spectator mode, by LLS
 * Add a 'help' command for use in server lobbies, by Alayan
-* Update CA certificates used by cURL, by Nutzboi
+* Update CA certificates used by cURL, by Nutzboi and Alayan
 * Add various safety guards to the handling of network packets, preventing malformed or forged packets from modifying game state or causing out-of-bound accesses, by acts-1631
+* Reject connection from multiplayer peers without a player profile, by acts-1631
 
 ### General
 * Many improvements for localization:
@@ -44,18 +45,36 @@ For similar reasons, and because some features are vastly more complex than othe
     - Switch to LLVM for Windows x86 cross-compilation, by Alayan
 * Prevent zip files from extracting data outside of their target directory, by acts-1631
 * Update many libraries from the dependencies package used by the Windows, Apple, and Android automated builds (Astcenc, BlueZ, cURL, Freetype, Libjpeg Turbo, Ogg, OpenAL, ShaderC, SQlite, Zlib), by Alayan
+* Updated the bundled AngelScript library, by Gusta
 * Switch to LLVM for Windows x86 cross-compilation, by Alayan
 * Drop support for Windows XP, Windows RT, iOS 12 or older, macOS 10.14 or older
 * Various code quality improvements and minor bugfixes, by Alayan and others
 
 ### Graphics
 * Fix a regression where an increase of the 'Image Quality' setting would decrease the anisotropic filtering level, by Alayan
-* Enable high-quality mipmaps as soon as high-quality >>>>>>>>>>>>>>>>>>>>
-* Major improvements to the Depth-of-Field shader, by Alayan:
+* Enable high-quality mipmaps as soon as high-quality textures are enabled, by Alayan
+* Major performance improvement for the 'Light Scattering' and 'Bloom' effects by using the fragment shader for the blurring step (~12% FPS boost at graphics 5), by Alayan
+* Enable the blurring step of 'Light Scattering' and 'Bloom' on GLES devices, by Alayan
+* Significantly improve the 'Depth-of-Field' effect, by Alayan:
     - Remove the upper distance limit of 2000 for DoF blur
-    - Simplify the formulas and require higher distances from the camera to start blurring and to achieve full blur
     - Prevent border pixels from sampling colors from the other side of the screen
-    - Massively improve performance, by not computing the blur for in-focus pixels (instead of computing it and discarding it)
+    - Decouple blur effective intensity from resolution
+    - Eliminate ghosting artifacts from foreground objects located in front of DoF-blurred background objects (this comes with a significant performance cost)
+    - Require higher distances from the camera to start blurring and to achieve full blur
+    - Significant code cleanup throughout
+* Significantly improve the performance of the 'Depth-of-Field' shader, by Alayan:
+    - Do not compute the blur for in-focus pixels (instead of computing it and discarding it) - up to 80% performance savings
+    - Conservative depth-reuse logic to limit the performance overhead of the foreground improvement
+    - Consolidate the offset angle taps that were done at distances 0.9 and 1.0 - 20% performance improvement for no perceptible visual difference
+* Significantly improve the CPU-performance of scene-manager parsing (around 30% savings, specifics vary by scene and settings), by Alayan:
+    - Use type checks to skip expensive dynamic casts (5e7a544)
+    - Reuse a bool array instead of allocating and resizing one for each added object (334e436)
+    - Optimize bounding box culling with direct optimal-corner checks (8a61d04)
+* New speed streaks visual effect, by sbilliet:
+    - New shader that creates the moving speed line effects, with many parameters to fine-tune appearance (width, color, number, etc.)
+    - Logic to derive intensity from the kart's speed compared to generic max speed
+    - Logic to ensure the effect changes smoothly without discontinuities
+    - Logic to check the camera type for streaks display and movement direction
 
 ### User Interface
 * Add support for page-up, page-down, home and end keys in lists, by Alayan
@@ -79,6 +98,7 @@ For similar reasons, and because some features are vastly more complex than othe
 * Prevent kart cropping in model view, by Alayan and Gusta
 * Improve the touch device settings dialog, by Gusta
 * Enable the 'held powerups' option by default, by Alayan
+* Integration of the new speed streaks effect in the graphical options and benchmark end-screen, by sbilliet
 * Various minor UI fixes, by Alayan and others
 
 ### Tracks and modeling
