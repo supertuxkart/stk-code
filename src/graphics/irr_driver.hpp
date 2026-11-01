@@ -31,7 +31,6 @@
 #include "graphics/gl_headers.hpp"
 #include "graphics/wind.hpp"
 #include "io/file_manager.hpp"
-#include "utils/aligned_array.hpp"
 #include "utils/no_copy.hpp"
 #include "utils/ptr_vector.hpp"
 #include "utils/vec3.hpp"

@@ -19,7 +19,6 @@
 #define HEADER_LINEAR_WORLD_HPP
 
 #include "modes/world_with_rank.hpp"
-#include "utils/aligned_array.hpp"
 
 #include <climits>
 #include <vector>

@@ -90,7 +90,7 @@ private:
 
     /** List of all end camera information. This information is shared
      *  between all cameras, so it's static. */
-    static AlignedArray<EndCameraInformation> m_end_cameras;
+    static std::vector<EndCameraInformation> m_end_cameras;
 
     /** Index of the current end camera. */
     unsigned int m_current_end_camera;

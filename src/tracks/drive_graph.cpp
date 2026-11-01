@@ -398,7 +398,7 @@ void DriveGraph::setDefaultSuccessors()
  *  \param sidewards_distance Distance in sidewards (X) direction between
  *               karts.
  */
-void DriveGraph::setDefaultStartPositions(AlignedArray<btTransform>
+void DriveGraph::setDefaultStartPositions(std::vector<btTransform>
                                                        *start_transforms,
                                           unsigned int karts_per_row,
                                           float forwards_distance,

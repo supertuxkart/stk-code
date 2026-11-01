@@ -23,7 +23,6 @@
 #include "btBulletDynamicsCommon.h"
 
 #include "physics/user_pointer.hpp"
-#include "utils/aligned_array.hpp"
 
 class Material;
 
@@ -47,10 +46,10 @@ private:
     btCollisionShape            *m_collision_shape;
 
     /** The three normals for each triangle. */
-    AlignedArray<btVector3>      m_normals;
+    std::vector<btVector3>      m_normals;
 
     /** Pre-compute value used in smoothing. */
-    AlignedArray<float>          m_p1p2p3;
+    std::vector<float>          m_p1p2p3;
 
     /** If the rigid body can be transformed (which means that normalising
      *  the normals need to update the vertices and normals used according

@@ -23,7 +23,6 @@
 #include <string>
 
 #include "tracks/graph.hpp"
-#include "utils/aligned_array.hpp"
 #include "utils/cpp2011.hpp"
 
 #include "LinearMath/btTransform.h"
@@ -86,7 +85,7 @@ public:
     // ------------------------------------------------------------------------
     void spatialToTrack(Vec3 *dst, const Vec3& xyz, const int sector) const;
     // ------------------------------------------------------------------------
-    void setDefaultStartPositions(AlignedArray<btTransform> *start_transforms,
+    void setDefaultStartPositions(std::vector<btTransform> *start_transforms,
                                   unsigned int karts_per_row,
                                   float forwards_distance = 1.5f,
                                   float sidewards_distance = 1.5f,

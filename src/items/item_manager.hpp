@@ -22,7 +22,6 @@
 #include "LinearMath/btTransform.h"
 
 #include "items/item.hpp"
-#include "utils/aligned_array.hpp"
 #include "utils/no_copy.hpp"
 #include "utils/vec3.hpp"
 
@@ -148,7 +147,7 @@ public:
     void           reset           ();
     virtual void   collectedItem   (ItemState *item, AbstractKart *kart);
     virtual void   switchItems     ();
-    bool           randomItemsForArena(const AlignedArray<btTransform>& pos);
+    bool           randomItemsForArena(const std::vector<btTransform>& pos);
 
     // ------------------------------------------------------------------------
     /** Returns true if the items are switched atm. */

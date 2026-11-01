@@ -22,7 +22,6 @@
 
 #include "graphics/irr_driver.hpp"
 #include "guiengine/widgets/icon_button_widget.hpp"
-#include "utils/aligned_array.hpp"
 #include "utils/leak_check.hpp"
 #include "utils/ptr_vector.hpp"
 

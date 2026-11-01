@@ -25,7 +25,7 @@
 
 #include "ICameraSceneNode.h"
 
-AlignedArray<CameraEnd::EndCameraInformation> CameraEnd::m_end_cameras;
+std::vector<CameraEnd::EndCameraInformation> CameraEnd::m_end_cameras;
 // ============================================================================
 CameraEnd::CameraEnd(int camera_index, AbstractKart* kart)
          : CameraNormal(Camera::CM_TYPE_END, camera_index, kart)

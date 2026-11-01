@@ -591,7 +591,7 @@ void ItemManager::switchItemsInternal(std::vector<ItemState*> &all_items)
 }   // switchItems
 
 //-----------------------------------------------------------------------------
-bool ItemManager::randomItemsForArena(const AlignedArray<btTransform>& pos)
+bool ItemManager::randomItemsForArena(const std::vector<btTransform>& pos)
 {
     if (!UserConfigParams::m_random_arena_item) return false;
     if (!ArenaGraph::get()) return false;

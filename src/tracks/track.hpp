@@ -53,7 +53,6 @@ using namespace irr;
 
 #include "LinearMath/btTransform.h"
 
-#include "utils/aligned_array.hpp"
 #include "utils/log.hpp"
 #include "utils/random_generator.hpp"
 #include "utils/vec3.hpp"
@@ -142,7 +141,7 @@ private:
 
     /** Start transforms of karts (either the default, or the ones taken
      *  from the scene file). */
-    AlignedArray<btTransform> m_start_transforms;
+    std::vector<btTransform> m_start_transforms;
 
     std::string              m_item_style;
     std::string              m_description;
