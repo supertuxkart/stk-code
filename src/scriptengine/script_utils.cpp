@@ -302,6 +302,8 @@ namespace Scripting
             r = engine->RegisterGlobalFunction("string toHex(uint64 num)",
                                                mp ? WRAP_FN(toHex) : asFUNCTION(toHex),
                                                call_conv); assert(r >= 0);
+
+            (void)r; // Suppress release-mode unused-variable warnings
         }
     }
 

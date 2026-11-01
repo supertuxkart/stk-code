@@ -348,6 +348,7 @@ namespace Scripting
                                                   : asFUNCTION(proxy_translateAndInsertValues3),
                                                call_conv); assert(r >= 0);
 
+            (void)r; // Suppress release-mode unused-variable warnings
         }
 
         void registerScriptEnums(asIScriptEngine *engine)

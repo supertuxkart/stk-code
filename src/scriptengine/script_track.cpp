@@ -778,6 +778,7 @@ namespace Scripting
             // TODO: add method to set current frame
             // TODO: add method to launch playback from frame X to frame Y
             // TODO: add method to register onAnimationComplete notifications ?
+            (void)r; // Suppress release-mode unused-variable warnings
         }
 
 /** \cond DOXYGEN_IGNORE */

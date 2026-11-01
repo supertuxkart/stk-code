@@ -141,6 +141,7 @@ namespace Scripting
                                                mp ? WRAP_FN(getChallengeRequiredPoints)
                                                   : asFUNCTION(getChallengeRequiredPoints),
                                                call_conv); assert(r >= 0);
+            (void)r; // Suppress release-mode unused-variable warnings
         } // registerScriptFunctions
 
     }   // namespace Challenges

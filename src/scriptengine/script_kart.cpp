@@ -195,6 +195,8 @@ namespace Scripting
             r = engine->RegisterGlobalFunction("void changeKart(int id, string &in)",
                                                mp ? WRAP_FN(changeKart) : asFUNCTION(changeKart),
                                                call_conv); assert(r >= 0);
+
+            (void)r; // Suppress release-mode unused-variable warnings
         }
 
         void registerScriptEnums(asIScriptEngine *engine)

@@ -105,5 +105,7 @@ namespace Scripting
         r = engine->RegisterObjectMethod("Vec3", "float getLength()",
                                          mp ? WRAP_OBJ_LAST(getLength) : asFUNCTION(getLength),
                                          call_conv); assert(r >= 0);
+
+        (void)r; // Suppress release-mode unused-variable warnings
     }
 }

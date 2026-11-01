@@ -59,6 +59,7 @@ namespace Scripting
             r = engine->RegisterGlobalFunction("void playSound(const string &in)",
                                                mp ? WRAP_FN(playSound) : asFUNCTION(playSound),
                                                call_conv); assert(r >= 0);
+            (void)r; // Suppress release-mode unused-variable warnings
         }
     }
 
