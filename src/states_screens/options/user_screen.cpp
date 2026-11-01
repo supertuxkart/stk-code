@@ -192,8 +192,6 @@ int BaseUserScreen::loadProfilesIcons()
 
     m_players->updateItemDisplay();
 
-    Log::info("BaseUserScreen", "Loaded Profiles Icons");
-
     return current_player_index;
 }   // loadProfilesIcons
 
