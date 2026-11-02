@@ -64,8 +64,12 @@ private:
     video::ITexture* m_screen_tex;
 
     void init();
-    void createRaceGUI();
-    void createSpectatorGUI();
+    void createRaceGUISteering(const float scale, 
+                               int w, const int h);
+    void createRaceGUIButtons (const float scale, 
+                               int w, const int h);
+    void createSpectatorGUI   (const float scale, 
+                               const int h);
     void close();
     static void onCustomButtonPress(unsigned int button_id, bool pressed);
 

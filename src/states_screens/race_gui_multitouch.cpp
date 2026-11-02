@@ -165,21 +165,32 @@ void RaceGUIMultitouch::init()
 
     auto cl = LobbyProtocol::get<ClientLobby>();
     
+    // Scale for the buttons
+    const float scale = UserConfigParams::m_multitouch_scale;
+
+    // Screen resolution variables
+    int w = irr_driver->getActualScreenSize().Width;
+    if (w - irr_driver->getDevice()->getRightPadding() > 0)
+        w -= irr_driver->getDevice()->getRightPadding();
+
+    const int h = irr_driver->getActualScreenSize().Height;
+
     if (cl && cl->isSpectator())
     {
-        createSpectatorGUI();
+        createSpectatorGUI(scale, h);
         m_is_spectator_mode = true;
     }
     else
     {
-        createRaceGUI();
+        createRaceGUISteering(scale, w, h);
     }
 }
 
 //-----------------------------------------------------------------------------
-/** Determines the look of multitouch race GUI interface
+/** Determines the look of the left side (steering system and pause/rescue button) multitouch race GUI interface
  */
-void RaceGUIMultitouch::createRaceGUI()
+void RaceGUIMultitouch::createRaceGUISteering(const float scale, 
+                                              int w, const int h)
 {
     if (m_device == NULL)
         return;
@@ -194,98 +205,130 @@ void RaceGUIMultitouch::createRaceGUI()
         m_device->activateGyroscope();
     }
 
-    const float scale = UserConfigParams::m_multitouch_scale;
-
-    int w = irr_driver->getActualScreenSize().Width;
-    if (w - irr_driver->getDevice()->getRightPadding() > 0)
-        w -= irr_driver->getDevice()->getRightPadding();
-
-    const int h = irr_driver->getActualScreenSize().Height;
-    const float btn_size = 0.125f * h * scale;
-    const float btn2_size = 0.35f * h * scale;
-    const float margin = 0.075f * h * scale;
-    const float margin_top = 0.3f * h;
-    const float col_size = (btn_size + margin);
-
-    const float small_ratio = 0.75f;
-    const float btn_small_size = small_ratio * btn_size;
-    const float margin_small = small_ratio * margin;
-    const float col_small_size = small_ratio * col_size;
-
+    // Left padding variable
     float left_padding = 0.0f;
     if (irr_driver->getDevice()->getLeftPadding() > 0)
         left_padding = irr_driver->getDevice()->getLeftPadding();
 
-    float first_column_x = w - 2 * col_size;
-    float second_column_x = w - 1 * col_size;
+    // Buttons size variables
+    const float btn_size = 0.125f * h * scale;
+    const float steer_btn_size = 0.35f * h * scale;
+    const float margin = 0.075f * h * scale;
+    const float margin_top = 0.3f * h;
+    const float column_size = (btn_size + margin);
+
+    // Small size variables for pause and rescue buttons
+    const float small_ratio = 0.75f;
+    const float btn_small_size = small_ratio * btn_size;
+    const float margin_small = small_ratio * margin;
+    const float column_small_size = small_ratio * column_size;
+
+    // Steering wheel variables
     float steering_wheel_margin = 0.6f * margin;
     float steering_wheel_x = steering_wheel_margin;
     steering_wheel_x += left_padding;
-    float steering_wheel_y = h - steering_wheel_margin - btn2_size;
+    float steering_wheel_y = h - steering_wheel_margin - steer_btn_size;
+
+    // Steering acceleration variables
     float steering_accel_margin = margin;
     float steering_accel_x = steering_accel_margin;
     steering_accel_x += left_padding;
-    float steering_accel_y = h - steering_accel_margin - btn2_size;
+    float steering_accel_y = h - steering_accel_margin - steer_btn_size;
 
     if (UserConfigParams::m_multitouch_inverted)
     {
-        first_column_x = margin + 1 * col_size + left_padding;
-        second_column_x = margin + left_padding;
-        steering_wheel_x = w - btn2_size - steering_wheel_margin;
-        steering_accel_x = w - btn2_size / 2 - steering_accel_margin;
+        steering_wheel_x = w - steer_btn_size - steering_wheel_margin;
+        steering_accel_x = w - steer_btn_size / 2 - steering_accel_margin;
     }
 
-    m_height = (unsigned int)(2 * col_size + margin / 2);
+    m_height = (unsigned int)(2 * column_size + margin / 2);
     
     if (UserConfigParams::m_multitouch_controls == MULTITOUCH_CONTROLS_ACCELEROMETER ||
         UserConfigParams::m_multitouch_controls == MULTITOUCH_CONTROLS_GYROSCOPE)
     {
         m_device->addButton(BUTTON_UP_DOWN,
                     int(steering_accel_x), int(steering_accel_y),
-                    int(btn2_size / 2), int(btn2_size));
+                    int(steer_btn_size / 2), int(steer_btn_size));
     }
     else
     {
         m_device->addButton(BUTTON_STEERING,
                             int(steering_wheel_x), int(steering_wheel_y),
-                            int(btn2_size), int(btn2_size));
+                            int(steer_btn_size), int(steer_btn_size));
     }
 
     m_device->addButton(BUTTON_ESCAPE,
                         int(margin_top), int(margin_small),
                         int(btn_small_size), int(btn_small_size));
     m_device->addButton(BUTTON_RESCUE,
-                        int(margin_top + col_small_size), int(margin_small),
+                        int(margin_top + column_small_size), int(margin_small),
                         int(btn_small_size), int(btn_small_size));
+
+    createRaceGUIButtons(scale, w, h); // Create the right side of the GUI
+} // createRaceGUISteering
+
+//-----------------------------------------------------------------------------
+/** Determines the look of the right side (all of the rest of the buttons) multitouch race GUI interface
+ */
+void RaceGUIMultitouch::createRaceGUIButtons(const float scale, 
+                                             int w, const int h)
+{
+    if (m_device == NULL)
+        return;
+
+    // Left padding variable
+    float left_padding = 0.0f;
+    if (irr_driver->getDevice()->getLeftPadding() > 0)
+        left_padding = irr_driver->getDevice()->getLeftPadding();
+
+    // Buttons size variables
+    const float btn_size = 0.125f * h * scale;
+    const float margin = 0.075f * h * scale;
+    const float column_size = (btn_size + margin);
+
+    // The position of the buttons grid columns
+    float first_column_x  = w - 2 * column_size;
+    float second_column_x = w - 1 * column_size;
+    float first_column_y  = h - 2 * column_size;
+    float second_column_y = h - 1 * column_size;
+
+    if (UserConfigParams::m_multitouch_inverted)
+    {
+        first_column_x  = margin + 1 * column_size + left_padding;
+        second_column_x = margin + left_padding;
+    }
+
+    m_height = (unsigned int)(2 * column_size + margin / 2);
+    
     m_device->addButton(BUTTON_NITRO,
-                        int(second_column_x), int(h - 2 * col_size),
+                        int(second_column_x), int(first_column_y),
                         int(btn_size), int(btn_size));
     m_device->addButton(BUTTON_SKIDDING,
-                        int(second_column_x), int(h - 1 * col_size),
+                        int(second_column_x), int(second_column_y),
                         int(btn_size), int(btn_size));
     m_device->addButton(BUTTON_FIRE,
-                        int(first_column_x),  int(h - 2 * col_size),
+                        int(first_column_x),  int(first_column_y),
                         int(btn_size), int(btn_size));
     m_device->addButton(BUTTON_LOOK_BACKWARDS,
-                        int(first_column_x), int(h - 1 * col_size),
+                        int(first_column_x), int(second_column_y),
                         int(btn_size), int(btn_size));
-} // createRaceGUI
+} // createRaceGUIButtons
 
 //-----------------------------------------------------------------------------
 /** Determines the look of spectator GUI interface
  */
-void RaceGUIMultitouch::createSpectatorGUI()
+void RaceGUIMultitouch::createSpectatorGUI(const float scale, 
+                                           const int h)
 {
     if (m_device == NULL)
         return;
-        
-    const float scale = UserConfigParams::m_multitouch_scale;
 
-    const int h = irr_driver->getActualScreenSize().Height;
+    // Buttons size variables
     const float btn_size = 0.125f * h * scale;
     const float margin = 0.075f * h * scale;
     const float margin_top = 0.3f * h;
 
+    // Small size variables for pause button
     const float small_ratio = 0.75f;
     const float btn_small_size = small_ratio * btn_size;
     const float margin_small = small_ratio * margin;
@@ -398,17 +441,6 @@ void RaceGUIMultitouch::draw(const AbstractKart* kart,
                 draw2DImageRotationColor(m_steering_wheel_tex_mask_down, btn_pos, mask_coords, NULL,
                     (button->axis_y >= 0 ? -1 : 1) * button->axis_x, color);
             }
-            // float x = (float)(button->x) + (float)(button->width) / 2.0f *
-            //                                          (button->axis_x + 1.0f);
-            // float y = (float)(button->y) + (float)(button->height) / 2.0f *
-            //                                          (button->axis_y + 1.0f);
-            // float w = (float)(button->width) / 20.0f;
-            // float h = (float)(button->height) / 20.0f;
-
-            // core::rect<s32> pos2(int(round(x - w)), int(round(y - h)),
-            //                      int(round(x + w)), int(round(y + h)));
-
-            // draw2DImage(btn_texture, pos2, coords, NULL, NULL, true);
         }
         if (button->type == MultitouchButtonType::BUTTON_UP_DOWN)
         {
