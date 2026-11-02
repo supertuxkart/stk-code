@@ -44,7 +44,7 @@ public:
     enum SortOrder
     {
         SO_DEFAULT,
-        SO_TRACK,               // Sorted by track name
+        SO_TRACK = SO_DEFAULT,  // Sorted by track name
         SO_KART_NUM,            // Sorted by amount of karts used
         SO_DIFF,                // Sorted by difficulty level
         SO_LAPS,                // Sorted by number of laps

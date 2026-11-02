@@ -192,12 +192,13 @@ void Physics::update(int ticks)
     // Since the world update (which calls physics update) is called at the
     // fixed frequency necessary for the physics update, we need to do exactly
     // one physic step only.
+    const bool physics_debug = UserConfigParams::m_physics_debug;
     double start;
-    if(UserConfigParams::m_physics_debug) start = StkTime::getRealTime();
+    if (physics_debug) start = StkTime::getRealTime();
 
     m_dynamics_world->stepSimulation(stk_config->ticks2Time(1), 1,
                                      stk_config->ticks2Time(1)      );
-    if (UserConfigParams::m_physics_debug)
+    if (physics_debug)
     {
         Log::verbose("Physics", "At %d physics duration %12.8f",
                      World::getWorld()->getTicksSinceStart(),
