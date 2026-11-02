@@ -51,6 +51,11 @@ protected:
     /** A second list which holds all objects that karts can drive on. */
     PtrVector<TrackObject, REF> m_driveable_objects;
 
+    /** The list of track objects that need to be checked in update() */
+    std::vector<TrackObject*> m_dynamic_objects;
+
+    bool m_on_start_done;
+
 public:
          TrackObjectManager();
         ~TrackObjectManager();

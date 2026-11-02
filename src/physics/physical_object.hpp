@@ -180,7 +180,8 @@ private:
     std::string           m_on_item_collision;
     /** If this body is a bullet dynamic body, i.e. affected by physics
      *  or not (static (not moving) or kinematic (animated outside
-     *  of physics). */
+     *  of physics).
+     *  Note that this MUST be constant throughout the object's lifetime. */
     bool                  m_is_dynamic;
 
     /** Non-null only if the shape is exact */

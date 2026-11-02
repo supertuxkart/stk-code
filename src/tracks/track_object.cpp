@@ -535,7 +535,7 @@ void TrackObject::updateGraphics(float dt)
 
 // ----------------------------------------------------------------------------
 /** This updates once per physics time step.
- *  float dt Time since last rame.
+ *  float dt Time since last frame.
  */
 void TrackObject::update(float dt)
 {
@@ -544,6 +544,22 @@ void TrackObject::update(float dt)
     if (m_animator) m_animator->updateWithWorldTicks(true/*has_physics*/);
 }   // update
 
+// ----------------------------------------------------------------------------
+/** Return false if this TrackObject doesn't need ongoing updates
+ */
+bool TrackObject::needsOngoingUpdates()
+{
+    if (m_animator)
+        return true;
+    // The dynamic status of a physical object is constant after creation
+    else if (m_physical_object && m_physical_object->isDynamic())
+        return true;
+    // Currently, no presentation update returns true
+    else if (m_presentation && m_presentation->update(0.0))
+        return true;
+
+    return false;
+}   // needsOngoingUpdates
 
 // ----------------------------------------------------------------------------
 /** This reset all physical object moved by 3d animation back to current ticks

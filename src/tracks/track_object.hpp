@@ -127,6 +127,7 @@ public:
                              const PhysicalObject::Settings* physicsSettings);
     virtual      ~TrackObject();
     virtual void update(float dt);
+    virtual bool needsOngoingUpdates();
     virtual void updateGraphics(float dt);
     virtual void resetAfterRewind();
     void move(const core::vector3df& xyz, const core::vector3df& hpr,
@@ -251,6 +252,8 @@ public:
     }
     // ------------------------------------------------------------------------
     void setPaused(bool mode){ m_animator->setPaused(mode); }
+    // ------------------------------------------------------------------------
+    void runStartHook() { if (m_presentation) m_presentation->onStart(); }
     // ------------------------------------------------------------------------
     void setInitiallyVisible(bool val)           { m_initially_visible = val; }
     // ------------------------------------------------------------------------

@@ -181,8 +181,6 @@ TrackObjectPresentationLibraryNode::TrackObjectPresentationLibraryNode(
     : TrackObjectPresentationSceneNode(xml_node)
 {
     m_parent = NULL;
-    m_start_executed = false;
-    m_reset_executed = false;
 
     std::string name;
     xml_node.get("name", &name);
@@ -291,46 +289,52 @@ TrackObjectPresentationLibraryNode::TrackObjectPresentationLibraryNode(
 }   // TrackObjectPresentationLibraryNode
 
 // ----------------------------------------------------------------------------
-
-void TrackObjectPresentationLibraryNode::update(float dt)
+void TrackObjectPresentationLibraryNode::onStart()
 {
     // Child process currently has no scripting engine
     if (STKProcess::getType() == PT_CHILD)
+    {
+        Log::error("TrackObject", "Function requiring scripting called on a process without scripting");
         return;
-
-    if (!m_start_executed)
-    {
-        m_start_executed = true;
-        std::string fn_name = StringUtils::insertValues("void %s::onStart(const string)", m_name.c_str());
-
-        if (m_parent != NULL)
-        {
-            std::string lib_id = m_parent->getID();
-            std::string* lib_id_ptr = &lib_id;
-
-            Scripting::ScriptEngine::getInstance()->runFunction(false, fn_name,
-                [&](asIScriptContext* ctx) {
-                    ctx->SetArgObject(0, lib_id_ptr);
-                });
-        }
     }
-    if (!m_reset_executed)
+
+    std::string fn_name = StringUtils::insertValues("void %s::onStart(const string)", m_name.c_str());
+
+    if (m_parent != NULL)
     {
-        m_reset_executed = true;
-        std::string fn_name = StringUtils::insertValues("void %s::onReset(const string)", m_name.c_str());
+        std::string lib_id = m_parent->getID();
+        std::string* lib_id_ptr = &lib_id;
 
-        if (m_parent != NULL)
-        {
-            std::string lib_id = m_parent->getID();
-            std::string* lib_id_ptr = &lib_id;
-
-            Scripting::ScriptEngine::getInstance()->runFunction(false, fn_name,
-                [&](asIScriptContext* ctx) {
-                    ctx->SetArgObject(0, lib_id_ptr);
-                });
-        }
+        Scripting::ScriptEngine::getInstance()->runFunction(false, fn_name,
+            [&](asIScriptContext* ctx) {
+                ctx->SetArgObject(0, lib_id_ptr);
+            });
     }
-}
+}   // onStart
+
+// ----------------------------------------------------------------------------
+void TrackObjectPresentationLibraryNode::onReset()
+{
+    // Child process currently has no scripting engine
+    if (STKProcess::getType() == PT_CHILD)
+    {
+        Log::error("TrackObject", "Function requiring scripting called on a process without scripting");
+        return;
+    }
+
+    std::string fn_name = StringUtils::insertValues("void %s::onReset(const string)", m_name.c_str());
+
+    if (m_parent != NULL)
+    {
+        std::string lib_id = m_parent->getID();
+        std::string* lib_id_ptr = &lib_id;
+
+        Scripting::ScriptEngine::getInstance()->runFunction(false, fn_name,
+            [&](asIScriptContext* ctx) {
+                ctx->SetArgObject(0, lib_id_ptr);
+            });
+    }
+}   // onReset
 
 // ----------------------------------------------------------------------------
 TrackObjectPresentationLibraryNode::~TrackObjectPresentationLibraryNode()
