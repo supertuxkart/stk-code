@@ -165,7 +165,7 @@ public:
     void  removeBody       (btRigidBody* b) {m_dynamics_world->removeRigidBody(b);}
     void  KartKartCollision(AbstractKart *ka, const Vec3 &contact_point_a,
                             AbstractKart *kb, const Vec3 &contact_point_b);
-    void  update           (int ticks);
+    void  update           ();
     void  draw             ();
     STKDynamicsWorld*
           getPhysicsWorld  () const {return m_dynamics_world;}

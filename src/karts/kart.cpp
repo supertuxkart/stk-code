@@ -1648,7 +1648,7 @@ void Kart::update(int ticks)
     }
 
     // Update physics from newly updated material
-    PROFILER_PUSH_CPU_MARKER("Kart::updatePhysics", 0x60, 0x34, 0x7F);
+    PROFILER_PUSH_CPU_MARKER("-- Kart::updatePhysics", 0x60, 0x34, 0x7F);
     const Material* material = m_terrain_info->getMaterial();
 
     // First update the gravity of the kart, as updateSliding in updatePhysics
@@ -1723,7 +1723,7 @@ void Kart::update(int ticks)
     );
 #endif
 
-    PROFILER_PUSH_CPU_MARKER("Kart::Update (material)", 0x60, 0x34, 0x7F);
+    PROFILER_PUSH_CPU_MARKER("-- Kart::Update (material)", 0x60, 0x34, 0x7F);
     if (!material)   // kart falling off the track
     {
         // let kart fall a bit before rescuing

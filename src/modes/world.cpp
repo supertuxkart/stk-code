@@ -895,7 +895,9 @@ void World::resetAllKarts()
             (*i)->getNormal() * -g : Vec3(0, -g, 0));
     }
     for(int i=0; i<stk_config->getPhysicsFPS(); i++)
-        Physics::get()->update(1);
+    {
+        Physics::get()->update();
+    }
 
     for ( KartList::iterator i=m_karts.begin(); i!=m_karts.end(); i++)
     {
@@ -1183,18 +1185,18 @@ void World::update(int ticks)
         }
     }
 
-    PROFILER_PUSH_CPU_MARKER("World::update (sub-updates)", 0x20, 0x7F, 0x00);
+    PROFILER_PUSH_CPU_MARKER("- World::update (sub-updates)", 0x20, 0x7F, 0x00);
     WorldStatus::update(ticks);
     PROFILER_POP_CPU_MARKER();
-    PROFILER_PUSH_CPU_MARKER("World::update (RewindManager)", 0x20, 0x7F, 0x40);
+    PROFILER_PUSH_CPU_MARKER("- World::update (RewindManager)", 0x20, 0x7F, 0x40);
     RewindManager::get()->update(ticks);
     PROFILER_POP_CPU_MARKER();
 
-    PROFILER_PUSH_CPU_MARKER("World::update (Track object manager)", 0x20, 0x7F, 0x40);
+    PROFILER_PUSH_CPU_MARKER("- World::update (Track object manager)", 0x20, 0x7F, 0x40);
     Track::getCurrentTrack()->getTrackObjectManager()->update(stk_config->ticks2Time(ticks));
     PROFILER_POP_CPU_MARKER();
 
-    PROFILER_PUSH_CPU_MARKER("World::update (Kart::upate)", 0x40, 0x7F, 0x00);
+    PROFILER_PUSH_CPU_MARKER("- World::update (Kart::update)", 0x40, 0x7F, 0x00);
 
     // Update all the karts. This in turn will also update the controller,
     // which causes all AI steering commands set. So in the following
@@ -1213,12 +1215,17 @@ void World::update(int ticks)
     PROFILER_POP_CPU_MARKER();
     if(RaceManager::get()->isRecordingRace()) ReplayRecorder::get()->update(ticks);
 
-    PROFILER_PUSH_CPU_MARKER("World::update (projectiles)", 0xa0, 0x7F, 0x00);
+    PROFILER_PUSH_CPU_MARKER("- World::update (projectiles)", 0xa0, 0x7F, 0x00);
     ProjectileManager::get()->update(ticks);
     PROFILER_POP_CPU_MARKER();
 
-    PROFILER_PUSH_CPU_MARKER("World::update (physics)", 0xa0, 0x7F, 0x00);
-    Physics::get()->update(ticks);
+    PROFILER_PUSH_CPU_MARKER("- World::update (physics)", 0xa0, 0x7F, 0x00);
+    for (int i=0 ; i < ticks ; i++)
+    {
+        // Physics update only ever does 1 tick at once
+        // Note that world update isn't really supposed to do more than one either
+        Physics::get()->update();
+    }
     PROFILER_POP_CPU_MARKER();
 
     PROFILER_POP_CPU_MARKER();
