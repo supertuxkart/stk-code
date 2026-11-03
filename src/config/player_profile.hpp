@@ -109,6 +109,9 @@ private:
     /** Default kart color (in hue) used in game, 0.0f to use the original. */
     float m_default_kart_color;
 
+    /** Ident of the chosen kart if set explicitly, otherwise empty for pseudo-random. */
+    std::string m_icon_kart_ident;
+
     /** The complete challenge state. */
     StoryModeStatus *m_story_mode_status;
 
@@ -135,6 +138,7 @@ public:
     void raceFinished();
     void saveSession(int user_id, const std::string &token);
     void clearSession(bool save=true);
+    void setIconFromKart(const std::string& kart_ident);
     void addIcon();
 
     /** Abstract virtual classes, to be implemented by the OnlinePlayer. */

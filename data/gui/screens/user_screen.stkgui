@@ -63,6 +63,8 @@
 								 I18N="In the user screen" text="Delete" label_location="bottom"/>
 					<icon-button id="rename" width="128" height="128" icon="gui/icons/rename.png"
 								 I18N="In the user screen" text="Rename" label_location="bottom"/>
+                    <icon-button id="choose_icon" width="128" height="128" icon="gui/icons/player.png"
+                                 I18N="In the registration dialog"  text="Choose Icon" label_location="none"/>
 					<icon-button id="default_kart_color" width="128" height="128" icon="gui/icons/edit.png"
 								 I18N="In the user screen" text="Kart color" label_location="bottom"/>
 					<icon-button id="cancel" width="128" height="128" icon="gui/icons/back.png"

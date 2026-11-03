@@ -170,9 +170,23 @@ void PlayerProfile::initRemainingData()
 }   // initRemainingData
 
 //------------------------------------------------------------------------------
-/** Creates an icon for a player if non exist so far. It takes the unique
- *  player id modulo the number of karts to pick an icon from the karts. It
- *  then uses the unique number plus the extentsion of the original icon as the
+/** Sets the profile icon to use the icon from the specified kart identifier.
+ *  Clears the existing filename to trigger copying the new texture in addIcon().
+ *  \param kart_ident The internal identifier of the kart to copy the icon from.
+ */
+void PlayerProfile::setIconFromKart(const std::string& kart_ident)
+{
+
+    m_icon_kart_ident = kart_ident;
+    m_icon_filename = "";
+    addIcon();
+}   // setIconFromKart
+
+//------------------------------------------------------------------------------
+/** Creates an icon for a player if none exists so far. If a specific kart was
+ *  chosen (via m_icon_kart_ident), that kart's icon is used; otherwise, it takes
+ *  the unique player id modulo the number of karts to pick an icon from the karts.
+ *  It then uses the unique number plus the extension of the original icon as the
  *  file name (it's not possible to use the player name, since the name is in
  *  utf-16, but typically the file systems are not, resulting in incorrect file
  *  names). The icon is then copied to the user config directory, so that it
@@ -187,10 +201,14 @@ void PlayerProfile::addIcon()
     if (m_icon_filename.size() > 0 || isGuestAccount())
         return;
 
-    int n = (m_unique_id + kart_properties_manager->getKartId("tux") - 1)
-          % kart_properties_manager->getNumberOfKarts();
+    int kart_id;
+    if (m_icon_kart_ident.size() > 0)
+        kart_id = kart_properties_manager->getKartId(m_icon_kart_ident);
+    else
+        kart_id = (m_unique_id + kart_properties_manager->getKartId("tux") - 1)
+            % kart_properties_manager->getNumberOfKarts();
 
-    std::string source = kart_properties_manager->getKartById(n)
+    std::string source = kart_properties_manager->getKartById(kart_id)
                                                 ->getAbsoluteIconFile();
     // Create the filename for the icon of this player: the unique id
     // followed by .png or .jpg.
