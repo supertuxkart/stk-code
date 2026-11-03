@@ -166,21 +166,6 @@ public:
         (void) numTasks;
 	}
 
-	///obsolete, use updateActions instead
-	virtual void updateVehicles(btScalar timeStep)
-	{
-		updateActions(timeStep);
-	}
-
-	///obsolete, use addAction instead
-	virtual void	addVehicle(btActionInterface* vehicle);
-	///obsolete, use removeAction instead
-	virtual void	removeVehicle(btActionInterface* vehicle);
-	///obsolete, use addAction instead
-	virtual void	addCharacter(btActionInterface* character);
-	///obsolete, use removeAction instead
-	virtual void	removeCharacter(btActionInterface* character);
-
 	void	setSynchronizeAllMotionStates(bool synchronizeAll)
 	{
 		m_synchronizeAllMotionStates = synchronizeAll;

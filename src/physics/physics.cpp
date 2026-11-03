@@ -141,7 +141,7 @@ void Physics::addKart(const AbstractKart *kart)
             return;
     }
     m_dynamics_world->addRigidBody(kart->getBody());
-    m_dynamics_world->addVehicle(kart->getVehicle());
+    m_dynamics_world->addAction(kart->getVehicle());
 }   // addKart
 
 //-----------------------------------------------------------------------------
@@ -168,7 +168,7 @@ void Physics::removeKart(const AbstractKart *kart)
     else
     {
         m_dynamics_world->removeRigidBody(kart->getBody());
-        m_dynamics_world->removeVehicle(kart->getVehicle());
+        m_dynamics_world->removeAction(kart->getVehicle());
     }
 }   // removeKart
 

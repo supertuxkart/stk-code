@@ -48,6 +48,7 @@ namespace Scripting
             r = engine->RegisterGlobalFunction("string createExplosion(Vec3 &in)",
                                                asFUNCTION(createExplosion),
                                                asCALL_GENERIC); assert(r >= 0);
+            (void)r; // Suppress release-mode unused-variable warnings
         }
     }
 }

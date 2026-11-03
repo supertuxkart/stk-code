@@ -520,27 +520,6 @@ void	btDiscreteDynamicsWorld::removeAction(btActionInterface* action)
 }
 
 
-void	btDiscreteDynamicsWorld::addVehicle(btActionInterface* vehicle)
-{
-	addAction(vehicle);
-}
-
-void	btDiscreteDynamicsWorld::removeVehicle(btActionInterface* vehicle)
-{
-	removeAction(vehicle);
-}
-
-void	btDiscreteDynamicsWorld::addCharacter(btActionInterface* character)
-{
-	addAction(character);
-}
-
-void	btDiscreteDynamicsWorld::removeCharacter(btActionInterface* character)
-{
-	removeAction(character);
-}
-
-
 SIMD_FORCE_INLINE	int	btGetConstraintIslandId(const btTypedConstraint* lhs)
 {
 	int islandId;
