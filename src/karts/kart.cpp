@@ -3244,7 +3244,8 @@ void Kart::updateGraphics(float dt)
 {
     if (World::getWorld()->getPhase() ==
         WorldStatus::IN_GAME_MENU_PHASE &&
-        !NetworkConfig::get()->isNetworking())
+        !NetworkConfig::get()->isNetworking() &&
+        !RaceManager::get()->isBenchmarking())
     {
         return;
     }
