@@ -414,9 +414,9 @@ void FontWithFace::setDPI()
     {
         UserConfigParams::m_font_size = 0;
     }
-    else if (UserConfigParams::m_font_size > 6)
+    else if (UserConfigParams::m_font_size > 7)
     {
-        UserConfigParams::m_font_size = 6;
+        UserConfigParams::m_font_size = 7;
     }
     
     factorTwo += UserConfigParams::m_font_size * 5 - 10;
