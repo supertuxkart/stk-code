@@ -30,6 +30,7 @@
 
 #ifndef SERVER_ONLY
 #include "input/sdl_controller.hpp"
+#include <algorithm>
 #include <array>
 
 enum AxisWithDirection : unsigned
@@ -65,6 +66,8 @@ GamepadConfig::GamepadConfig( const std::string &name,
     m_desensitize  = false;
     m_use_force_feedback = true;
     m_auto_center = 20;
+    m_force_feedback_strength = 70;
+    m_force_feedback_invert = false;
     setDefaultBinds();
 }   // GamepadConfig
 
@@ -79,6 +82,8 @@ GamepadConfig::GamepadConfig() : DeviceConfig()
     m_desensitize  = false;
     m_use_force_feedback = true;
     m_auto_center = 20;
+    m_force_feedback_strength = 70;
+    m_force_feedback_invert = false;
     setDefaultBinds();
 }   // GamepadConfig
 
@@ -93,6 +98,10 @@ bool GamepadConfig::load(const XMLNode *config)
     config->get("desensitize",  &m_desensitize );
     config->get("force-feedback", &m_use_force_feedback);
     config->get("auto-center",    &m_auto_center);
+    config->get("force-feedback-strength", &m_force_feedback_strength);
+    config->get("force-feedback-invert",   &m_force_feedback_invert);
+    m_force_feedback_strength =
+        std::max(0, std::min(100, m_force_feedback_strength));
     bool ok = DeviceConfig::load(config);
 
     if(getName()=="")
@@ -115,7 +124,9 @@ void GamepadConfig::save (std::ofstream& stream)
            << "\" deadzone=\""    << m_deadzone
            << "\" desensitize=\"" << m_desensitize
            << "\" auto-center=\"" << m_auto_center
-           << "\" force-feedback=\"" << m_use_force_feedback << "\" ";
+           << "\" force-feedback=\"" << m_use_force_feedback
+           << "\" force-feedback-strength=\"" << m_force_feedback_strength
+           << "\" force-feedback-invert=\"" << m_force_feedback_invert << "\" ";
     DeviceConfig::save(stream);
     stream << "</gamepad>\n\n";
 }   // save

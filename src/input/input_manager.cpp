@@ -271,7 +271,10 @@ void InputManager::update(float dt)
 
 #ifndef SERVER_ONLY
     for (auto& controller : m_sdl_controller)
+    {
         controller.second->checkPowerLevel();
+        controller.second->updateForceFeedback();
+    }
 #endif
 }
 

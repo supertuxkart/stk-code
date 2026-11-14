@@ -44,6 +44,40 @@ private:
     SDL_Haptic* m_haptic;
     int m_auto_center;
 
+    /** True if the device can play SDL's simple rumble effect. Wheels such
+     *  as the Logitech G29 on the mainline Linux driver only support
+     *  constant force, so rumble has to be emulated with it. */
+    bool m_native_rumble;
+
+    /** Id of the constant force effect which carries all steering forces,
+     *  -1 if the device has no constant force support. */
+    int m_steering_effect;
+
+    bool m_steering_effect_running;
+
+    /** Steering force parameters last requested by the game, see
+     *  setSteeringForce(). */
+    float m_steering_spring;
+    float m_steering_damper;
+    float m_steering_offset;
+
+    uint64_t m_steering_force_time;
+
+    /** Wheel position at the previous device update, in [-1, 1] with
+     *  positive to the right, to damp fast wheel movement. */
+    float m_prev_wheel;
+
+    /** Performance counter value of the previous device update, 0 if the
+     *  effect was not playing then. */
+    uint64_t m_prev_ffb_update;
+
+    /** Level last uploaded to the device, to skip redundant uploads. */
+    int16_t m_uploaded_level;
+
+    float m_rumble_strength;
+
+    uint64_t m_rumble_end_time;
+
     int m_buttons;
 
     int m_axes;
@@ -62,6 +96,8 @@ private:
 #endif
 
     void updateAutoCenter(int state);
+    void stopSteeringEffect();
+    bool getSteeringAxis(int* axis, float* sign) const;
 public:
     // ------------------------------------------------------------------------
     SDLController(int device_id);
@@ -162,6 +198,12 @@ public:
     void checkPowerLevel();
     // ------------------------------------------------------------------------
     void doRumble(float strength_low, float strength_high, uint32_t duration_ms);
+    // ------------------------------------------------------------------------
+    bool hasSteeringForce() const               { return m_steering_effect >= 0; }
+    // ------------------------------------------------------------------------
+    void setSteeringForce(float spring, float damper, float offset);
+    // ------------------------------------------------------------------------
+    void updateForceFeedback();
     GamePadDevice* getGamePadDevice() const { return m_gamepad; }
 };
 

@@ -28,6 +28,7 @@ class AbstractKart;
 class SFXBase;
 class SFXBuffer;
 class btTransform;
+class SDLController;
 
 #ifndef SERVER_ONLY
 class ParticleEmitter;
@@ -74,6 +75,8 @@ private:
     void         nitroNotFullSound();
 
     void doCrashHaptics();
+    void updateForceFeedback();
+    SDLController* getForceFeedbackController() const;
     void setParticleEmitterPosition(const btTransform& t);
 
 public:
