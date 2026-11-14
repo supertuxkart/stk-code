@@ -3406,24 +3406,21 @@ void Kart::updateGraphics(float dt)
     static video::SColor green(255, 61, 87, 23);
 
 #ifndef SERVER_ONLY
-    if (World::getWorld()->getPhase() != WorldStatus::IN_GAME_MENU_PHASE)
+    // draw skidmarks if relevant (we force pink skidmarks on when hitting
+    // a bubblegum)
+    if (m_kart_properties->getSkidEnabled() && m_skidmarks)
     {
-        // draw skidmarks if relevant (we force pink skidmarks on when hitting
-        // a bubblegum)
-        if (m_kart_properties->getSkidEnabled() && m_skidmarks)
-        {
-            m_skidmarks->update(dt,
-                    m_bubblegum_ticks > 0,
-                    (m_bubblegum_ticks > 0
-                     ? (m_has_caught_nolok_bubblegum ? &green
-                         : &pink)
-                     : NULL));
-        }
-
-        // update speedstreak parameters
-        if(m_speedstreaks)
-            m_speedstreaks->update(dt);
+        m_skidmarks->update(dt,
+                m_bubblegum_ticks > 0,
+                (m_bubblegum_ticks > 0
+                 ? (m_has_caught_nolok_bubblegum ? &green
+                     : &pink)
+                 : NULL));
     }
+
+    // update speedstreak parameters
+    if(m_speedstreaks)
+        m_speedstreaks->update(dt);
 #endif
 
     // m_speed * dt is the distance the kart has moved, which determines

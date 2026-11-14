@@ -565,8 +565,13 @@ void MainLoop::run()
             if (!GUIEngine::isNoGraphics())
             {
                 PROFILER_PUSH_CPU_MARKER("Update race", 0, 255, 255);
-                if (World::getWorld())
+                if (World::getWorld() &&
+                    (World::getWorld()->getPhase() != WorldStatus::IN_GAME_MENU_PHASE ||
+                    NetworkConfig::get()->isNetworking() ||
+                    RaceManager::get()->isBenchmarking()))
+                {
                     World::getWorld()->updateGraphics(frame_duration);
+                }
                 PROFILER_POP_CPU_MARKER();
 
                 // Render the previous frame, and also handle all user input.

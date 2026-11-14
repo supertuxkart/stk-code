@@ -29,6 +29,8 @@
 #include "graphics/text_billboard_drawer.hpp"
 #include "graphics/sp/sp_base.hpp"
 #include "graphics/sp/sp_mesh_node.hpp"
+#include "modes/world.hpp"
+#include "network/network_config.hpp"
 #include "tracks/track.hpp"
 #include "utils/profiler.hpp"
 
@@ -221,7 +223,13 @@ DrawCalls::~DrawCalls()
  */
 void DrawCalls::prepareDrawCalls(scene::ICameraSceneNode *camnode)
 {
-    CPUParticleManager::getInstance()->reset();
+    if (!World::getWorld() ||
+        World::getWorld()->getPhase() != WorldStatus::IN_GAME_MENU_PHASE ||
+        NetworkConfig::get()->isNetworking() ||
+        RaceManager::get()->isBenchmarking())
+    {
+        CPUParticleManager::getInstance()->reset();
+    }
     TextBillboardDrawer::reset();
     PROFILER_PUSH_CPU_MARKER("--- culling", 0xFF, 0xFF, 0x0);
     SP::prepareDrawCalls();
@@ -234,9 +242,15 @@ void DrawCalls::prepareDrawCalls(scene::ICameraSceneNode *camnode)
     SP::updateModelMatrix();
     PROFILER_POP_CPU_MARKER();
 
-    PROFILER_PUSH_CPU_MARKER("--- cpu particle generation", 0x2F, 0x1F, 0x11);
-    CPUParticleManager::getInstance()->generateAll();
-    PROFILER_POP_CPU_MARKER();
+    if (!World::getWorld() ||
+        World::getWorld()->getPhase() != WorldStatus::IN_GAME_MENU_PHASE ||
+        NetworkConfig::get()->isNetworking() ||
+        RaceManager::get()->isBenchmarking())
+    {
+        PROFILER_PUSH_CPU_MARKER("--- cpu particle generation", 0x2F, 0x1F, 0x11);
+        CPUParticleManager::getInstance()->generateAll();
+        PROFILER_POP_CPU_MARKER();
+    }
 
     // Add a 1 s timeout
     if (m_sync != 0)
