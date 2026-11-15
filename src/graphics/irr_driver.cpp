@@ -1880,7 +1880,7 @@ void IrrDriver::setAmbientLight(const video::SColorf &light, bool force_SH_compu
 {
 #ifndef SERVER_ONLY
     video::SColorf color = light;
-    if (m_video_driver->getDriverType() != EDT_VULKAN)
+    if (m_video_driver->getDriverType() != video::EDT_VULKAN)
     {
         color.r = powf(color.r, 1.0f / 2.2f);
         color.g = powf(color.g, 1.0f / 2.2f);
@@ -2444,7 +2444,7 @@ scene::ISceneNode *IrrDriver::addLight(const core::vector3df &pos,
     else
     {
         scene::ILightSceneNode* light;
-        if (m_video_driver->getDriverType() == EDT_VULKAN && sun_)
+        if (m_video_driver->getDriverType() == video::EDT_VULKAN && sun_)
         {
             light = m_scene_manager->addLightSceneNode(parent, pos,
                 video::SColorf(r, g, b, 0.2f), 0.26f * M_PI / 180.0f);
@@ -2456,7 +2456,7 @@ scene::ISceneNode *IrrDriver::addLight(const core::vector3df &pos,
             video::SColorf color(r, g, b, 1.0f);
             light = m_scene_manager->addLightSceneNode(parent, pos, color);
             light->setRadius(radius);
-            if (m_video_driver->getDriverType() == EDT_VULKAN)
+            if (m_video_driver->getDriverType() == video::EDT_VULKAN)
             {
                 video::SLight& data = light->getLightData();
                 data.Attenuation.X = energy;

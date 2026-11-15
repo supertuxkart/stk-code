@@ -27,7 +27,7 @@ set(WEB_INCLUDE "${WEB_CACHE}/sysroot/include")
 include_directories(src lib/irrlicht/include lib/bullet/src
     lib/graphics_engine/include lib/graphics_utils lib/mcpp
     lib/angelscript/include lib/enet/include lib/sheenbidi/Headers
-    lib/tinygettext/include "${WEB_INCLUDE}/SDL2" "${WEB_INCLUDE}/freetype2"
+    lib/tinygettext/include lib/libsquish "${WEB_INCLUDE}/SDL2" "${WEB_INCLUDE}/freetype2"
     "${WEB_INCLUDE}/harfbuzz" "${WEB_PREFIX}/include")
 
 # Use the existing legacy GLES renderer. Vulkan and desktop GL are unavailable.
@@ -48,7 +48,9 @@ set(ZLIB_INCLUDE_DIR "${WEB_INCLUDE}")
 set(ZLIB_LIBRARY z)
 set(ZLIB_VERSION_STRING 1.3.1)
 set(PNG_PNG_INCLUDE_DIR "${WEB_INCLUDE}")
-set(PNG_LIBRARY png)
+# The port selects libpng's threaded variant. Passing -lpng would instead
+# request a native-style library name that does not exist in this SDK cache.
+set(PNG_LIBRARY "-sUSE_LIBPNG=1")
 set(JPEG_INCLUDE_DIR "${WEB_INCLUDE}")
 set(JPEG_LIBRARY jpeg)
 
@@ -65,6 +67,10 @@ add_subdirectory(lib/sheenbidi)
 add_subdirectory(lib/tinygettext)
 include(sources.cmake)
 add_executable(supertuxkart ${STK_SOURCES})
+target_include_directories(supertuxkart PRIVATE lib/dnsc)
+# Bundled ENet represents addresses as ENetIP structs (including IPv4). Keep
+# client code consistent with that ABI even though online play is disabled.
+target_compile_definitions(supertuxkart PRIVATE ENABLE_IPV6)
 set_target_properties(supertuxkart PROPERTIES SUFFIX ".js")
 target_link_libraries(supertuxkart bulletdynamics bulletcollision bulletmath
     enet dnsc stkirrlicht angelscript mcpp sheenbidi tinygettext

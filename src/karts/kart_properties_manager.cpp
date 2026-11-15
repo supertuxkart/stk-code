@@ -29,6 +29,7 @@
 #include "graphics/material_manager.hpp"
 #include "guiengine/engine.hpp"
 #include "io/file_manager.hpp"
+#include <IFileSystem.h> // Used directly; do not depend on Vulkan headers to include it.
 #include "karts/kart_properties.hpp"
 #include "karts/xml_characteristic.hpp"
 #include "utils/log.hpp"

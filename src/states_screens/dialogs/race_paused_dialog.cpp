@@ -371,6 +371,9 @@ GUIEngine::EventPropagation
             GE::GEVulkanDriver* vk_pbr_toggle = m_vk_pbr_toggle;
             dismiss();
 #ifndef SERVER_ONLY
+            // GLES/WebGL keeps the Help action; this shortcut updates a native
+            // Vulkan pipeline only when that renderer is part of the build.
+#ifdef _IRR_COMPILE_WITH_VULKAN_
             if (vk_pbr_toggle)
             {
                 UserConfigParams::m_dynamic_lights = !UserConfigParams::m_dynamic_lights;
@@ -378,6 +381,7 @@ GUIEngine::EventPropagation
                 vk_pbr_toggle->updateDriver(false/*scale_changed*/, true/*pbr_changed*/);
             }
             else
+#endif
             {
                 HelpScreen1::getInstance()->push();
             }

@@ -1001,7 +1001,7 @@ void  Material::setMaterialProperties(video::SMaterial *m, scene::IMeshBuffer* m
         m->ColorMaterial = video::ECM_NONE; // Override one above
     }
 #endif
-#ifndef SERVER_ONLY
+#if !defined(SERVER_ONLY) && defined(_IRR_COMPILE_WITH_VULKAN_)
     if (is_vk)
     {
         m->MaterialType =

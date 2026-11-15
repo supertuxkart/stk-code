@@ -151,7 +151,8 @@ if(EMSCRIPTEN)
     # The browser uses Irrlicht's GLES path. Native Vulkan translation units
     # cannot be compiled just by hiding the Vulkan driver header.
     set(GE_SOURCES src/gl.c src/ge_gl_texture.cpp src/ge_texture.cpp
-        src/ge_main.cpp src/ge_occlusion_culling.cpp)
+        src/ge_main.cpp src/ge_occlusion_culling.cpp src/ge_spm.cpp src/ge_spm_buffer.cpp
+        src/ge_compressor_s3tc_bc3.cpp)
 endif()
 add_library(graphics_engine STATIC ${GE_SOURCES})
 if(BC7_ISPC)

@@ -327,10 +327,12 @@ bool handleContextMenuAction(s32 cmd_id)
 #ifndef SERVER_ONLY
     {
         Log::info("Debug", "Reloading shaders...");
+#ifdef _IRR_COMPILE_WITH_VULKAN_
         GE::GEVulkanDriver* vk = GE::getVKDriver();
         if (vk)
             vk->reloadShaders();
         else
+#endif
         {
             SP::SPShaderManager::get()->unloadAll();
             ShaderBase::killShaders();
@@ -389,7 +391,8 @@ bool handleContextMenuAction(s32 cmd_id)
         break;
     }
     case DEBUG_GE_PBR:
-#ifndef SERVER_ONLY
+// Vulkan pipeline toggles have no equivalent in the legacy browser renderer.
+#if !defined(SERVER_ONLY) && defined(_IRR_COMPILE_WITH_VULKAN_)
     {
         GE::GEVulkanDriver* vk = GE::getVKDriver();
         if (vk)
@@ -401,8 +404,9 @@ bool handleContextMenuAction(s32 cmd_id)
         break;
     }
 #endif
+        break;
     case DEBUG_GE_IBL:
-#ifndef SERVER_ONLY
+#if !defined(SERVER_ONLY) && defined(_IRR_COMPILE_WITH_VULKAN_)
     {
         GE::GEVulkanDriver* vk = GE::getVKDriver();
         if (vk)
@@ -415,8 +419,9 @@ bool handleContextMenuAction(s32 cmd_id)
         break;
     }
 #endif
+        break;
     case DEBUG_GE_SSR:
-#ifndef SERVER_ONLY
+#if !defined(SERVER_ONLY) && defined(_IRR_COMPILE_WITH_VULKAN_)
     {
         GE::GEVulkanDriver* vk = GE::getVKDriver();
         if (vk)
@@ -430,6 +435,7 @@ bool handleContextMenuAction(s32 cmd_id)
         break;
     }
 #endif
+        break;
     case DEBUG_SP_RESET:
         irr_driver->resetDebugModes();
         if (physics)
