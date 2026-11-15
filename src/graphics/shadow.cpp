@@ -1,3 +1,4 @@
+// Browser port: see web/UPSTREAM.md; guards exclude native-only APIs from Wasm.
 //
 //  SuperTuxKart - a fun racing game with go-kart
 //  Copyright (C) 2009-2013  Joerg Henrichs
@@ -64,6 +65,7 @@ Shadow::Shadow(Material* shadow_mat, const AbstractKart& kart)
     {
         std::array<uint16_t, 6> indices = {{ 0, 1, 2, 0, 2, 3 }};
         scene::IMeshBuffer* buffer = NULL;
+        #ifdef _IRR_COMPILE_WITH_VULKAN_
         if (irr_driver->getVideoDriver()->getDriverType() == video::EDT_VULKAN)
         {
             buffer = new GE::GEVulkanDynamicSPMBuffer();
@@ -75,6 +77,7 @@ Shadow::Shadow(Material* shadow_mat, const AbstractKart& kart)
                 indices.size());
         }
         else
+        #endif
         {
             buffer = new scene::SMeshBuffer();
             video::S3DVertex v;

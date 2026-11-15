@@ -1,3 +1,4 @@
+// Browser port: see web/UPSTREAM.md; guards exclude native-only APIs from Wasm.
 //
 //  SuperTuxKart - a fun racing game with go-kart
 //  Copyright (C) 2008-2015 Joerg Henrichs
@@ -90,6 +91,7 @@ RubberBand::RubberBand(Plunger *plunger, AbstractKart *kart)
         scene::IMeshBuffer* buffer = NULL;
         if (irr_driver->getVideoDriver()->getDriverType() == video::EDT_VULKAN)
         {
+            #ifdef _IRR_COMPILE_WITH_VULKAN_
             buffer = new GE::GEVulkanDynamicSPMBuffer();
             video::S3DVertexSkinnedMesh v;
             v.m_normal = 0x1FF << 10;
@@ -100,6 +102,7 @@ RubberBand::RubberBand(Plunger *plunger, AbstractKart *kart)
                 indices.size());
             buffer->getMaterial().MaterialType =
                 GE::GEMaterialManager::getIrrMaterialType("unlit");
+            #endif
         }
         else
         {

@@ -1,3 +1,4 @@
+// Browser port: see web/UPSTREAM.md; guards exclude native-only APIs from Wasm.
 #include "ge_main.hpp"
 #include "ge_dx9_texture.hpp"
 #include "ge_gl_texture.hpp"
@@ -103,8 +104,10 @@ irr::video::ITexture* createTexture(const std::string& path,
     case video::EDT_DIRECT3D9:
         return new GEDX9Texture(path, image_mani);
 #endif
+#ifdef _IRR_COMPILE_WITH_VULKAN_
     case video::EDT_VULKAN:
         return new GEVulkanTexture(path, image_mani);
+#endif
     default:
         return NULL;
     }
@@ -123,8 +126,10 @@ irr::video::ITexture* createTexture(video::IImage* img,
     case video::EDT_DIRECT3D9:
         return new GEDX9Texture(img, name);
 #endif
+#ifdef _IRR_COMPILE_WITH_VULKAN_
     case video::EDT_VULKAN:
         return new GEVulkanTexture(img, name);
+#endif
     default:
         return NULL;
     }
@@ -143,8 +148,10 @@ irr::video::ITexture* createFontTexture(const std::string& name,
     case video::EDT_DIRECT3D9:
         return new GEDX9Texture(name, size);
 #endif
+#ifdef _IRR_COMPILE_WITH_VULKAN_
     case video::EDT_VULKAN:
         return new GEVulkanTexture(name, size, single_channel);
+#endif
     default:
         return NULL;
     }

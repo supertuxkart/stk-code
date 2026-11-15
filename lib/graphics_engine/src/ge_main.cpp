@@ -1,3 +1,4 @@
+// Browser port: see web/UPSTREAM.md; guards exclude native-only APIs from Wasm.
 #include "ge_main.hpp"
 #include "ge_occlusion_culling.hpp"
 #include "ge_spm.hpp"
@@ -55,7 +56,12 @@ irr::video::IVideoDriver* getDriver()
 
 GE::GEVulkanDriver* getVKDriver()
 {
+#ifdef _IRR_COMPILE_WITH_VULKAN_
     return dynamic_cast<GE::GEVulkanDriver*>(g_driver);
+#else
+    // The browser renderer cannot create a Vulkan device.
+    return nullptr;
+#endif
 }
 
 GEConfig* getGEConfig()
@@ -142,6 +148,8 @@ void mathPlaneFrustumf(float* out, const irr::core::matrix4& pvm)
     mathPlaneNormf(&out[5 * 4]);
 }
 
+// These mesh buffers own Vulkan memory; the browser keeps legacy Irrlicht meshes.
+#ifdef _IRR_COMPILE_WITH_VULKAN_
 irr::scene::IAnimatedMesh* convertIrrlichtMeshToSPM(irr::scene::IMesh* mesh)
 {
     GESPM* spm = new GESPM();
@@ -199,6 +207,7 @@ void copyToMappedBuffer(uint32_t* mapped, GESPMBuffer* spmb, size_t offset)
     }
 }
 
+#endif
 GEOcclusionCulling* getOcclusionCulling()
 {
     if (!g_occulsion_culling)

@@ -1,3 +1,4 @@
+// Browser port: see web/UPSTREAM.md; guards exclude native-only APIs from Wasm.
 //  SuperTuxKart - a fun racing game with go-kart
 //  Copyright (C) 2018 SuperTuxKart-Team
 //
@@ -42,6 +43,12 @@ SPTextureManager::SPTextureManager()
     {
         m_max_threaded_load_obj.store(2);
     }
+#ifdef __EMSCRIPTEN__
+    //some browsers limit the number of web workers
+    if (m_max_threaded_load_obj.load() > 8) {
+        m_max_threaded_load_obj.store(8);
+    }
+#endif
     m_max_threaded_load_obj.store(m_max_threaded_load_obj.load() + 1);
     for (unsigned i = 0; i < m_max_threaded_load_obj; i++)
     {

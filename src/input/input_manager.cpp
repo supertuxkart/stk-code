@@ -1,3 +1,4 @@
+// Browser port: see web/UPSTREAM.md; guards exclude native-only APIs from Wasm.
 //  SuperTuxKart - a fun racing game with go-kart
 //
 //  Copyright (C) 2012-2015 SuperTuxKart-Team
@@ -124,11 +125,13 @@ InputManager::InputManager() : m_mode(BOOTSTRAP),
             SDL_GetError());
     }
 
+#ifndef __EMSCRIPTEN__
     if (SDL_InitSubSystem(SDL_INIT_HAPTIC) != 0)
     {
         Log::error("InputManager", "Failed to init SDL haptics: %s",
             SDL_GetError());
     }
+#endif
 #endif // SERVER_ONLY
 }
 

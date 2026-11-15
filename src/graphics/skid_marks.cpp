@@ -1,3 +1,4 @@
+// Browser port: see web/UPSTREAM.md; guards exclude native-only APIs from Wasm.
 //
 //  SuperTuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004-2015 Ingo Ruhnke <grumbel@gmx.de>
@@ -261,9 +262,11 @@ SkidMarks::SkidMarkQuads::SkidMarkQuads(const Vec3 &left,
     else
     {
         scene::IMeshBuffer* buffer = NULL;
+#ifdef _IRR_COMPILE_WITH_VULKAN_
         if (irr_driver->getVideoDriver()->getDriverType() == video::EDT_VULKAN)
             buffer = new GE::GEVulkanDynamicSPMBuffer();
         else
+#endif
             buffer = new scene::SMeshBuffer();
         material->setMaterialProperties(&buffer->getMaterial(), buffer);
         buffer->getMaterial().setTexture(0, material->getTexture());

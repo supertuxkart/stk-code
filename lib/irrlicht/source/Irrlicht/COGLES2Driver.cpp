@@ -1,3 +1,4 @@
+// Browser port: see web/UPSTREAM.md; guards exclude native-only APIs from Wasm.
 // Copyright (C) 2013 Patryk Nadrowski
 // Heavily based on the OpenGL driver implemented by Nikolaus Gebhardt
 // OpenGL ES driver implemented by Christian Stehno and first OpenGL ES 2.0
@@ -81,6 +82,9 @@ namespace video
 #elif defined(_IRR_COMPILE_WITH_ANDROID_DEVICE_)
 		egl_params.platform = CEGL_PLATFORM_DEFAULT;
 		egl_params.window = ((struct android_app *)(params.PrivateData))->window;
+		egl_params.display = NULL;
+#elif defined(__EMSCRIPTEN__)
+		egl_params.platform = CEGL_PLATFORM_DEFAULT;
 		egl_params.display = NULL;
 #endif
 

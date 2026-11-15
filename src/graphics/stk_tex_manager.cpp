@@ -1,3 +1,4 @@
+// Browser port: see web/UPSTREAM.md; guards exclude native-only APIs from Wasm.
 //  SuperTuxKart - a fun racing game with go-kart
 //  Copyright (C) 2017 SuperTuxKart-Team
 //
@@ -41,7 +42,7 @@
 // ----------------------------------------------------------------------------
 STKTexManager::~STKTexManager()
 {
-#ifndef SERVER_ONLY
+#if !defined(SERVER_ONLY) && defined(_IRR_COMPILE_WITH_VULKAN_)
     GE::GEVulkanDriver* gevd = GE::getVKDriver();
     if (gevd)
     {
@@ -52,7 +53,7 @@ STKTexManager::~STKTexManager()
 
     removeTexture(NULL/*texture*/, true/*remove_all*/);
 
-#ifndef SERVER_ONLY
+#if !defined(SERVER_ONLY) && defined(_IRR_COMPILE_WITH_VULKAN_)
     if (gevd)
         gevd->setDisableWaitIdle(false);
 #endif
@@ -253,7 +254,7 @@ bool STKTexManager::hasTexture(const std::string& path)
 // ----------------------------------------------------------------------------
 void STKTexManager::reloadAllTextures(bool mesh_texture_only)
 {
-#ifndef SERVER_ONLY
+#if !defined(SERVER_ONLY) && defined(_IRR_COMPILE_WITH_VULKAN_)
     GE::GEVulkanDriver* gevd = GE::getVKDriver();
     if (gevd)
     {
@@ -331,7 +332,7 @@ void STKTexManager::reloadAllTextures(bool mesh_texture_only)
             p.second->reload();
     }
 
-#ifndef SERVER_ONLY
+#if !defined(SERVER_ONLY) && defined(_IRR_COMPILE_WITH_VULKAN_)
     if (gevd)
         gevd->setDisableWaitIdle(false);
 #endif

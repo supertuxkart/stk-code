@@ -1,3 +1,4 @@
+// Browser port: see web/UPSTREAM.md; guards exclude native-only APIs from Wasm.
 //  SuperTuxKart - a fun racing game with go-kart
 //
 //  Copyright (C) 2006-2015 SuperTuxKart-Team
@@ -376,7 +377,7 @@ void KartSelectionScreen::init()
 
 void KartSelectionScreen::tearDown()
 {
-#ifndef SERVER_ONLY
+#if !defined(SERVER_ONLY) && defined(_IRR_COMPILE_WITH_VULKAN_)
     GE::getGEConfig()->m_enable_draw_call_cache = false;
     GE::GEVulkanDriver* gevk = GE::getVKDriver();
     if (gevk)

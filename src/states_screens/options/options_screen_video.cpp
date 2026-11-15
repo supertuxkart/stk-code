@@ -1,3 +1,4 @@
+// Browser port: see web/UPSTREAM.md; guards exclude native-only APIs from Wasm.
 //  SuperTuxKart - a fun racing game with go-kart
 //  Copyright (C) 2009-2015 Marianne Gagnon
 //
@@ -48,6 +49,7 @@ void OptionsScreenVideo::updateImageQuality(bool force_reload_texture)
 {
     core::dimension2du prev_max_size = irr_driver->getVideoDriver()
         ->getDriverAttributes().getAttributeAsDimension2d("MAX_TEXTURE_SIZE");
+#ifdef _IRR_COMPILE_WITH_VULKAN_
     GE::GEVulkanTextureDescriptor* td = NULL;
     if (GE::getVKDriver())
         td = GE::getVKDriver()->getMeshTextureDescriptor();
@@ -60,6 +62,7 @@ void OptionsScreenVideo::updateImageQuality(bool force_reload_texture)
             td->setSamplerUse(GE::GVS_3D_MESH_MIPMAP_16);
     }
 
+#endif
     irr_driver->setMaxTextureSize();
     SP::setMaxTextureSize();
     core::dimension2du cur_max_size = irr_driver->getVideoDriver()
@@ -563,12 +566,14 @@ void OptionsScreenVideo::eventCallback(Widget* widget, const std::string& name,
 
         UserConfigParams::m_scale_rtts_factor = scale_rtts_presets[level].value;
 
+#ifdef _IRR_COMPILE_WITH_VULKAN_
         GE::GEVulkanDriver* gevk = GE::getVKDriver();
         if (gevk && GE::getGEConfig()->m_render_scale != UserConfigParams::m_scale_rtts_factor)
         {
             GE::getGEConfig()->m_render_scale = UserConfigParams::m_scale_rtts_factor;
             gevk->updateDriver();
         }
+#endif
         updateScaleRTTsSlider();
     } // scale_rtts
     else if (name == "benchmarkCurrent")

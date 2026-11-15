@@ -1,3 +1,4 @@
+// Browser port: see web/UPSTREAM.md; guards exclude native-only APIs from Wasm.
 //  SuperTuxKart - a fun racing game with go-kart
 //  Copyright (C) 2017 SuperTuxKart-Team
 //
@@ -70,7 +71,7 @@ scene::IAnimatedMesh* SPMeshLoader::createMesh(io::IReadFile* f)
     m_frame_count = 0;
     m_mesh = NULL;
     bool ge_spm = false;
-#ifndef SERVER_ONLY
+#if !defined(SERVER_ONLY) && defined(_IRR_COMPILE_WITH_VULKAN_)
     if (GE::getVKDriver())
     {
         ge_spm = true;
@@ -448,7 +449,7 @@ void SPMeshLoader::decompressGESPM(irr::io::IReadFile* spm,
                                    bool uv_one, bool uv_two, SPVertexType vt,
                                    const video::SMaterial& m)
 {
-#ifndef SERVER_ONLY
+#if !defined(SERVER_ONLY) && defined(_IRR_COMPILE_WITH_VULKAN_)
     assert(vertices_count != 0);
     assert(indices_count != 0);
 

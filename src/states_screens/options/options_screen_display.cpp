@@ -1,3 +1,4 @@
+// Browser port: see web/UPSTREAM.md; guards exclude native-only APIs from Wasm.
  
 //  SuperTuxKart - a fun racing game with go-kart
 //  Copyright (C) 2009-2015 Marianne Gagnon
@@ -430,6 +431,7 @@ void OptionsScreenDisplay::eventCallback(Widget* widget, const std::string& name
         CheckBoxWidget* rememberWinpos = getWidget<CheckBoxWidget>("rememberWinpos");
 
         rememberWinpos->setActive(!fullscreen->getState());
+#ifdef _IRR_COMPILE_WITH_VULKAN_
         GE::GEVulkanDriver* gevk = GE::getVKDriver();
         if (gevk && GE::getGEConfig()->m_fullscreen_desktop)
         {
@@ -438,6 +440,7 @@ void OptionsScreenDisplay::eventCallback(Widget* widget, const std::string& name
             OptionsScreenDisplay::m_fullscreen_checkbox_focus = true;
         }
         else
+#endif
             updateResolutionsList();
     } // fullscreen
     else if (name == "camera_preset")

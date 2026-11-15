@@ -1,3 +1,4 @@
+// Browser port: see web/UPSTREAM.md; guards exclude native-only APIs from Wasm.
 //
 //  SuperTuxKart - a fun racing game with go-kart
 //  Copyright (C) 2010-2015  Joerg Henrichs
@@ -399,7 +400,7 @@ scene::IAnimatedMesh* SlipStream::createMesh(unsigned material_id,
     mesh->recalculateBoundingBox();
 
     buffer->drop();
-#ifndef SERVER_ONLY
+#if !defined(SERVER_ONLY) && defined(_IRR_COMPILE_WITH_VULKAN_)
     if (GE::getDriver()->getDriverType() == video::EDT_VULKAN)
     {
         amesh = GE::convertIrrlichtMeshToSPM(mesh);

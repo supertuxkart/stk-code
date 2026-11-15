@@ -1,3 +1,4 @@
+// Browser port: see web/UPSTREAM.md; guards exclude native-only APIs from Wasm.
 //  SuperTuxKart - a fun racing game with go-kart
 //  Copyright (C) 2009-2015 Joerg Henrichs
 //
@@ -673,6 +674,7 @@ begin:
 
     GE::setVideoDriver(m_device->getVideoDriver());
 
+#ifdef _IRR_COMPILE_WITH_VULKAN_
     GE::GEVulkanDriver* vk = GE::getVKDriver();
     if (vk)
     {
@@ -695,6 +697,7 @@ begin:
             break;
         }
     }
+#endif
     // Assume sp is supported
     CentralVideoSettings::m_supports_sp = true;
     CVS->init();
@@ -1432,13 +1435,13 @@ scene::ISceneNode *IrrDriver::addSphere(float radius,
     }
 #endif
 
-#ifndef SERVER_ONLY
+#if !defined(SERVER_ONLY) && defined(_IRR_COMPILE_WITH_VULKAN_)
     bool vk = (GE::getVKDriver() != NULL);
     if (vk)
         GE::getGEConfig()->m_convert_irrlicht_mesh = true;
 #endif
     scene::IMeshSceneNode *node = m_scene_manager->addMeshSceneNode(mesh);
-#ifndef SERVER_ONLY
+#if !defined(SERVER_ONLY) && defined(_IRR_COMPILE_WITH_VULKAN_)
     if (vk)
         GE::getGEConfig()->m_convert_irrlicht_mesh = false;
 #endif

@@ -1,3 +1,4 @@
+// Browser port: see web/UPSTREAM.md; guards exclude native-only APIs from Wasm.
 // Copyright (C) 2002-2012 Nikolaus Gebhardt
 // This file is part of the "Irrlicht Engine".
 // For conditions of distribution and use, see copyright notice in irrlicht.h
@@ -82,7 +83,7 @@ scene::IAnimatedMesh* B3DMeshLoader::createMesh(io::IReadFile* f)
         AnimatedMesh->setMinMax(min.toIrrVector(), max.toIrrVector());
     }
 
-#ifndef SERVER_ONLY
+#if !defined(SERVER_ONLY) && defined(_IRR_COMPILE_WITH_VULKAN_)
     bool convert_spm = CVS->isGLSL() || GE::getVKDriver() != NULL;
     if (convert_spm)
     {
@@ -1371,7 +1372,7 @@ void B3DMeshLoader::loadTextures(SB3dMaterial& material, scene::IMeshBuffer* mb)
             }
 #endif
 
-#ifndef SERVER_ONLY
+#if !defined(SERVER_ONLY) && defined(_IRR_COMPILE_WITH_VULKAN_)
             bool convert_spm = CVS->isGLSL() || GE::getVKDriver() != NULL;
             if (convert_spm)
             {

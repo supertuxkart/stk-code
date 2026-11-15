@@ -1,3 +1,4 @@
+// Browser port: see web/UPSTREAM.md; guards exclude native-only APIs from Wasm.
 //  SuperTuxKart - a fun racing game with go-kart
 //  Copyright (C) 2009-2015 Marianne Gagnon
 //
@@ -268,12 +269,14 @@ GUIEngine::EventPropagation CustomVideoSettingsDialog::processEvent(const std::s
             OptionsScreenVideo::getInstance()->updateBlurSlider();
             GE::GEScreenSpaceReflectionType prev_gssrt = GE::getGEConfig()->m_screen_space_reflection_type;
             OptionsScreenVideo::setSSR();
+#ifdef _IRR_COMPILE_WITH_VULKAN_
             if (GE::getDriver()->getDriverType() == video::EDT_VULKAN)
             {
                 bool need_recreate_swapchain = GE::getGEConfig()->m_screen_space_reflection_type != prev_gssrt;
                 if (need_recreate_swapchain || pbr_changed || ibl_changed)
                     GE::getVKDriver()->updateDriver(need_recreate_swapchain, pbr_changed, ibl_changed);
             }
+#endif
             // sameRestart will have the same effect
             if (!(CVS->isGLSL() && pbr_changed))
             {

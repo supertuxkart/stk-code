@@ -1,3 +1,4 @@
+// Browser port: see web/UPSTREAM.md; guards exclude native-only APIs from Wasm.
 /** 
  @file  unix.c
  @brief ENet Unix system specific functions
@@ -53,7 +54,7 @@
 #include <poll.h>
 #endif
 
-#ifndef HAS_SOCKLEN_T
+#if !defined(HAS_SOCKLEN_T) && !defined(__EMSCRIPTEN__)
 typedef int socklen_t;
 #endif
 

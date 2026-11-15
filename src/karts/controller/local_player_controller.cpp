@@ -1,3 +1,4 @@
+// Browser port: see web/UPSTREAM.md; guards exclude native-only APIs from Wasm.
 //
 //  SuperTuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004-2015 Steve Baker <sjbaker1@airmail.net>
@@ -490,7 +491,7 @@ void LocalPlayerController::doCrashHaptics() {
 }
 
 void LocalPlayerController::rumble(float strength_low, float strength_high, uint16_t duration) {
-#ifndef SERVER_ONLY
+#if !defined(SERVER_ONLY) && !defined(__EMSCRIPTEN__)
     if (RewindManager::get()->isRewinding())
         return;
     int count = input_manager->getGamepadCount();
