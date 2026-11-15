@@ -19,6 +19,20 @@ automated rendering checks; this does not establish hardware-GPU performance.
 - Passed the HTTP integration test for `.wasm` MIME type and COOP/COEP headers.
 - Confirmed that native diagnostic messages reach the page's expandable game log.
 
+## Quit and replay regression
+
+`node web/test_replay.mjs` passed three consecutive native game startups and
+quits in one launcher page. The second session entered fullscreen before quitting.
+Each quit exited fullscreen, hid the terminated game, and enabled **Play again**
+after preparing a fresh runtime. The launcher did not navigate or reload, and
+there were no uncaught browser errors. A filesystem write made immediately before
+each quit was restored in the following session, checking the final save flush.
+
+The test clicks the actual Exit Game button on the Create User screen in a fresh
+browser context; it does not simulate the runtime's quit callback. This check
+complements the earlier race-driving/pause checks and does not cover every route
+to quit, browser crashes, or forcibly closing the tab.
+
 The local test media was the official **1.5-rc1 low-quality mobile pack**, merged
 with this repository's data. Its checksum is recorded in [README.md](README.md).
 

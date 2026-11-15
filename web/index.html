@@ -7,7 +7,10 @@
 <style>
   body { margin: 0; background: #17202c; color: #fff; font: 16px system-ui; text-align: center; }
   main { max-width: 1100px; margin: auto; padding: 16px; }
-  canvas { display: block; width: 100%; aspect-ratio: 16/9; background: #000; outline: none; }
+  #game, #welcome { width: 100%; aspect-ratio: 16/9; border: 0; background: #101823; }
+  #welcome { display: grid; place-items: center; }
+  #game:fullscreen { width: 100vw; height: 100vh; }
+  [hidden] { display: none !important; }
   button { padding: 12px 22px; margin: 8px; font: inherit; cursor: pointer; }
   #log { text-align: left; max-height: 140px; overflow: auto; white-space: pre-wrap; font-size: 12px; }
 </style>
@@ -15,58 +18,103 @@
   <h1>SuperTuxKart</h1>
   <p id="status" role="status">Loading game files…</p>
   <button id="play" disabled>Play</button>
-  <button id="fullscreen">Fullscreen</button>
-  <canvas id="canvas" width="960" height="540" tabindex="0" aria-label="SuperTuxKart game"></canvas>
+  <button id="fullscreen" disabled>Fullscreen</button>
+  <div id="welcome">Press Play when the game is ready.</div>
+  <div id="session"></div>
   <p>Single-player preview. Use the in-game controls menu to view or change keys. Press Escape to pause.</p>
   <details><summary>Game log</summary><pre id="log"></pre></details>
 </main>
 <script>
   const status = document.getElementById('status');
   const play = document.getElementById('play');
-  const canvas = document.getElementById('canvas');
+  const fullscreen = document.getElementById('fullscreen');
+  const welcome = document.getElementById('welcome');
+  const session = document.getElementById('session');
+  let game;
+  let running = false;
+  let played = false;
+  let saveWarning = '';
+  let fullscreenExit = Promise.resolve();
   function log(text) {
     const output = document.getElementById('log');
     output.textContent = (output.textContent + text + '\n').slice(-24000);
     output.scrollTop = output.scrollHeight;
   }
-  // Emscripten reads Module when its generated script loads. Main is launched
-  // only after a click, allowing browsers to activate the game's audio context.
-  var Module = {
-    canvas,
-    print: log, printErr: log,
-    setStatus: text => { if (text) status.textContent = text; },
-    onAbort: reason => { status.textContent = 'Game stopped: ' + reason; },
-    onExit: () => { status.textContent = 'Game closed. Reload this page to play again.'; },
-    onRuntimeInitialized: () => {
-      status.textContent = 'Ready to race.';
-      play.disabled = false;
+  async function leaveFullscreen() {
+    // Exit before disposing the canvas, avoiding an empty fullscreen view.
+    if (document.fullscreenElement) {
+      try { await document.exitFullscreen(); }
+      catch (error) { log('Could not exit fullscreen: ' + error.message); }
     }
-  };
+  }
+  function prepareSession() {
+    running = false;
+    play.disabled = true;
+    fullscreen.disabled = true;
+    welcome.hidden = false;
+    status.textContent = played ? 'Getting ready to play again…' : 'Loading game files…';
+    // Quit destroys C++ globals. A fresh iframe releases the old Wasm memory,
+    // workers, audio, and timers without reloading this launcher page.
+    // IndexedDB persists across these isolated game sessions.
+    if (game) game.remove();
+    game = document.createElement('iframe');
+    game.id = 'game';
+    game.title = 'SuperTuxKart game';
+    game.allow = 'autoplay; fullscreen';
+    game.hidden = true;
+    game.src = 'game.html';
+    session.appendChild(game);
+  }
+  window.addEventListener('message', async event => {
+    // Accept lifecycle events only from our active same-origin game frame.
+    if (!game || event.source !== game.contentWindow || event.origin !== location.origin ||
+        event.data?.source !== 'stk-browser') return;
+    const { type, text } = event.data;
+    if (type === 'log') { log(text); return; }
+    if (type === 'loading') {
+      if (!running) status.textContent = text;
+    } else if (type === 'ready') {
+      play.disabled = false;
+      play.textContent = played ? 'Play again' : 'Play';
+      status.textContent = saveWarning || (played ? 'Game closed. Ready to play again.' : 'Ready to race.');
+    } else if (type === 'running') {
+      status.textContent = 'Game running. Click the game to focus keyboard controls.';
+    } else if (type === 'stopping') {
+      running = false;
+      fullscreen.disabled = true;
+      status.textContent = 'Saving progress…';
+      const stoppedGame = game;
+      fullscreenExit = leaveFullscreen().then(() => {
+        stoppedGame.hidden = true;
+        welcome.hidden = false;
+      });
+    } else if (type === 'exited') {
+      saveWarning = event.data.saveError ? 'Could not save the last session. You can play again.' : '';
+      if (text) log(text);
+      await fullscreenExit;
+      prepareSession();
+    } else if (type === 'load-error') {
+      status.textContent = text;
+    }
+  });
   play.addEventListener('click', () => {
     play.disabled = true;
-    canvas.focus();
+    played = true;
+    running = true;
+    fullscreen.disabled = false;
+    welcome.hidden = true;
+    game.hidden = false;
     status.textContent = 'Starting SuperTuxKart…';
-    // Native log buffering is useful for a terminal, but it hides diagnostics
-    // in a browser tab. Flush each line and omit terminal color escape codes.
-    Module.callMain(['--logbuffer=1', '--log=nocolor']);
-    if (status.textContent === 'Starting SuperTuxKart…') {
-      status.textContent = 'Game running. Click the game to focus keyboard controls.';
-    }
+    // Synchronous invocation preserves the click's activation for WebAudio.
+    game.contentWindow.startGame();
   });
-  document.getElementById('fullscreen').addEventListener('click', () => {
-    canvas.requestFullscreen().catch(error => { status.textContent = error.message; });
-  });
-  // Prevent browser scrolling while driving, without trapping keys elsewhere.
-  canvas.addEventListener('keydown', event => {
-    if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', ' '].includes(event.key)) event.preventDefault();
+  fullscreen.addEventListener('click', () => {
+    if (running) game.requestFullscreen().catch(error => { status.textContent = error.message; });
   });
   if (!crossOriginIsolated) {
     status.textContent = 'Missing isolation headers. Run this build with web/serve.py.';
   } else {
-    const script = document.createElement('script');
-    script.src = 'supertuxkart.js';
-    script.onerror = () => { status.textContent = 'Game files missing. Build the game before serving this directory.'; };
-    document.body.appendChild(script);
+    prepareSession();
   }
 </script>
 </html>

@@ -89,4 +89,9 @@ target_link_options(supertuxkart PRIVATE
     -sEXPORTED_RUNTIME_METHODS=callMain,FS -sINVOKE_RUN=0
     -lidbfs.js "--pre-js=${PROJECT_SOURCE_DIR}/web/pre.js"
     "--preload-file=${WEB_ASSETS}@/data")
+# A --pre-js filename in link flags does not track its contents automatically.
+# Re-link whenever the browser save/lifecycle glue changes, avoiding stale JS.
+set_property(TARGET supertuxkart APPEND PROPERTY LINK_DEPENDS
+    "${PROJECT_SOURCE_DIR}/web/pre.js")
 configure_file(web/index.html "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/index.html" COPYONLY)
+configure_file(web/game.html "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/game.html" COPYONLY)

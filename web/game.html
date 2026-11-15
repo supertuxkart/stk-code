@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="en">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SuperTuxKart game session</title>
+<link rel="icon" href="data:,">
+<style>
+  html, body { margin: 0; width: 100%; height: 100%; background: #000; }
+  body { display: grid; place-items: center; overflow: hidden; }
+  /* Keep layout independent of SDL's temporary 1x1 bootstrap canvas. Explicit
+     dimensions avoid a square canvas clipping the game's bottom-row controls. */
+  canvas { display: block; width: min(100vw, calc(100vh * 16 / 9)); height: min(100vh, calc(100vw * 9 / 16)); aspect-ratio: 16/9; outline: none; }
+</style>
+<canvas id="canvas" width="960" height="540" tabindex="0" aria-label="SuperTuxKart game"></canvas>
+<script>
+  const canvas = document.getElementById('canvas');
+  let ready = false;
+  let started = false;
+  let stopping = false;
+  function tellLauncher(type, extra = {}) {
+    parent.postMessage({ source: 'stk-browser', type, ...extra }, location.origin);
+  }
+  async function finishSession(text) {
+    if (stopping) return;
+    stopping = true;
+    tellLauncher('stopping');
+    Module['disposeBrowserHooks']?.();
+    let saveError = false;
+    try {
+      // Native teardown writes the latest config/profile. Persist those writes
+      // before the parent replaces this frame and its virtual filesystem.
+      await Module['syncSaves']?.();
+    } catch (error) {
+      saveError = true;
+      tellLauncher('log', { text: 'Could not save progress: ' + error.message });
+    }
+    tellLauncher('exited', { text, saveError });
+  }
+  var Module = {
+    canvas,
+    print: text => tellLauncher('log', { text }),
+    printErr: text => tellLauncher('log', { text }),
+    setStatus: text => { if (text && !started) tellLauncher('loading', { text }); },
+    onAbort: reason => finishSession('Game stopped: ' + reason),
+    onExit: () => finishSession('Game closed.'),
+    onRuntimeInitialized: () => { ready = true; tellLauncher('ready'); }
+  };
+  window.startGame = function () {
+    if (!ready || started || stopping) return;
+    started = true;
+    canvas.focus();
+    Module.callMain(['--logbuffer=1', '--log=nocolor']);
+    if (!stopping) tellLauncher('running');
+  };
+  canvas.addEventListener('keydown', event => {
+    if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', ' '].includes(event.key)) event.preventDefault();
+  });
+  const script = document.createElement('script');
+  script.src = 'supertuxkart.js';
+  script.onerror = () => tellLauncher('load-error', { text: 'Game files missing. Build the game before serving this directory.' });
+  document.body.appendChild(script);
+</script>
+</html>
