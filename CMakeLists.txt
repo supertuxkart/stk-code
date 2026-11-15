@@ -6,6 +6,13 @@ set(PROJECT_VERSION "git")
 
 add_definitions( -DSUPERTUXKART_VERSION="${PROJECT_VERSION}" )
 
+# A browser is a separate platform: never let native macOS/Linux library
+# discovery accidentally link host binaries into a WebAssembly executable.
+if(EMSCRIPTEN)
+    include(cmake/WebBrowser.cmake)
+    return()
+endif()
+
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${PROJECT_SOURCE_DIR}/cmake")
 include(CMakeDependentOption)
 

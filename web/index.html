@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="en">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SuperTuxKart — browser build</title>
+<style>
+  body { margin: 0; background: #17202c; color: #fff; font: 16px system-ui; text-align: center; }
+  main { max-width: 1100px; margin: auto; padding: 16px; }
+  canvas { display: block; width: 100%; aspect-ratio: 16/9; background: #000; outline: none; }
+  button { padding: 12px 22px; margin: 8px; font: inherit; cursor: pointer; }
+  #log { text-align: left; max-height: 140px; overflow: auto; white-space: pre-wrap; font-size: 12px; }
+</style>
+<main>
+  <h1>SuperTuxKart</h1>
+  <p id="status" role="status">Loading game files…</p>
+  <button id="play" disabled>Play</button>
+  <button id="fullscreen">Fullscreen</button>
+  <canvas id="canvas" width="960" height="540" tabindex="0" aria-label="SuperTuxKart game"></canvas>
+  <p>Single-player preview. Use the in-game controls menu to view or change keys. Press Escape to pause.</p>
+  <details><summary>Game log</summary><pre id="log"></pre></details>
+</main>
+<script>
+  const status = document.getElementById('status');
+  const play = document.getElementById('play');
+  const canvas = document.getElementById('canvas');
+  function log(text) {
+    const output = document.getElementById('log');
+    output.textContent = (output.textContent + text + '\n').slice(-24000);
+    output.scrollTop = output.scrollHeight;
+  }
+  // Emscripten reads Module when its generated script loads. Main is launched
+  // only after a click, allowing browsers to activate the game's audio context.
+  var Module = {
+    canvas,
+    print: log, printErr: log,
+    setStatus: text => { if (text) status.textContent = text; },
+    onAbort: reason => { status.textContent = 'Game stopped: ' + reason; },
+    onExit: () => { status.textContent = 'Game closed. Reload this page to play again.'; },
+    onRuntimeInitialized: () => {
+      status.textContent = 'Ready to race.';
+      play.disabled = false;
+    }
+  };
+  play.addEventListener('click', () => {
+    play.disabled = true;
+    canvas.focus();
+    status.textContent = 'Starting SuperTuxKart…';
+    Module.callMain([]);
+  });
+  document.getElementById('fullscreen').addEventListener('click', () => {
+    canvas.requestFullscreen().catch(error => { status.textContent = error.message; });
+  });
+  // Prevent browser scrolling while driving, without trapping keys elsewhere.
+  canvas.addEventListener('keydown', event => {
+    if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', ' '].includes(event.key)) event.preventDefault();
+  });
+  if (!crossOriginIsolated) {
+    status.textContent = 'Missing isolation headers. Run this build with web/serve.py.';
+  } else {
+    const script = document.createElement('script');
+    script.src = 'supertuxkart.js';
+    script.onerror = () => { status.textContent = 'Game files missing. Build the game before serving this directory.'; };
+    document.body.appendChild(script);
+  }
+</script>
+</html>
