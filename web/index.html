@@ -3,6 +3,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>SuperTuxKart — browser build</title>
+<link rel="icon" href="data:,">
 <style>
   body { margin: 0; background: #17202c; color: #fff; font: 16px system-ui; text-align: center; }
   main { max-width: 1100px; margin: auto; padding: 16px; }
@@ -45,7 +46,12 @@
     play.disabled = true;
     canvas.focus();
     status.textContent = 'Starting SuperTuxKart…';
-    Module.callMain([]);
+    // Native log buffering is useful for a terminal, but it hides diagnostics
+    // in a browser tab. Flush each line and omit terminal color escape codes.
+    Module.callMain(['--logbuffer=1', '--log=nocolor']);
+    if (status.textContent === 'Starting SuperTuxKart…') {
+      status.textContent = 'Game running. Click the game to focus keyboard controls.';
+    }
   });
   document.getElementById('fullscreen').addEventListener('click', () => {
     canvas.requestFullscreen().catch(error => { status.textContent = error.message; });

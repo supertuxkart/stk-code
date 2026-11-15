@@ -18,6 +18,10 @@
 
 #include "utils/log.hpp"
 
+#ifdef __EMSCRIPTEN__
+#include <emscripten.h>
+#endif
+
 #include "config/user_config.hpp"
 #include "network/network_config.hpp"
 #include "utils/file_utils.hpp"
@@ -265,6 +269,14 @@ void Log::writeLine(const char *line, int level)
             __android_log_print(alp, "SuperTuxKart", "%s", line);
 #elif defined(IOS_STK)
             CIrrDeviceiOS::debugPrint(line);
+#elif defined(__EMSCRIPTEN__)
+            // Send diagnostics directly to the page's log callback. Browser
+            // builds do not have a terminal, and worker stdio can be buffered.
+            EM_ASM({
+                var text = UTF8ToString($0);
+                if (Module['print']) Module['print'](text);
+                else console.log(text);
+            }, line);
 #else
             printf("%s", line);
             fflush(stdout);
