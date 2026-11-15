@@ -166,6 +166,10 @@
 #include <jni.h>
 #endif
 
+#ifdef __EMSCRIPTEN__
+#include <emscripten.h>
+#endif
+
 #ifdef __SWITCH__
 extern "C" {
   #include <sys/iosupport.h>
@@ -2178,6 +2182,8 @@ void askForInternetPermission()
 #endif
 
 // ----------------------------------------------------------------------------
+static void finishGame();
+
 #ifdef ANDROID
 extern "C"
 {
@@ -2322,6 +2328,17 @@ int main(int argc, char *argv[])
         CommandLine::addArgsFromUserConfig();
 
         handleCmdLinePreliminary();
+#ifdef __EMSCRIPTEN__
+        // This milestone uses the legacy GLES path and offline racing. Override
+        // restored desktop settings before a graphics device or news task starts.
+        UserConfigParams::m_render_driver = "opengl";
+        UserConfigParams::m_force_legacy_device = true;
+        UserConfigParams::m_dynamic_lights = false;
+        UserConfigParams::m_fullscreen = false;
+        UserConfigParams::m_width = 960;
+        UserConfigParams::m_height = 540;
+        UserConfigParams::m_internet_status = Online::RequestManager::IPERM_NOT_ALLOWED;
+#endif
 
         // ServerConfig will use stk_config for server version testing
         stk_config->load(file_manager->getAsset("stk_config.xml"));
@@ -2531,7 +2548,7 @@ int main(int argc, char *argv[])
             }
             else if (!CVS->isGLSL() && irr_driver->getVideoDriver()->getDriverType() != video::EDT_VULKAN)
             {
-                #if !defined(MOBILE_STK)
+                #if !defined(MOBILE_STK) && !defined(__EMSCRIPTEN__)
                 if (UserConfigParams::m_old_driver_popup)
                 {
                     #ifdef USE_GLES2
@@ -2669,7 +2686,27 @@ int main(int argc, char *argv[])
         appletSetCpuBoostMode(ApmCpuBoostMode_Normal);
 #endif
 
+#ifdef __EMSCRIPTEN__
+        // Register a callback rather than blocking the browser inside run().
+        // simulate_infinite_loop keeps the live game state out of native teardown.
+        emscripten_set_main_loop([]() {
+            try
+            {
+                main_loop->run();
+                if (!main_loop->isAborted())
+                    return;
+            }
+            catch (const std::exception& error)
+            {
+                Log::error("browser", "Frame failed: %s", error.what());
+            }
+            emscripten_cancel_main_loop();
+            finishGame();
+            emscripten_force_exit(0);
+        }, 0, true);
+#else
         main_loop->run();
+#endif
 
     }  // try
     catch (std::exception &e)
@@ -2680,6 +2717,20 @@ int main(int argc, char *argv[])
         Log::flushBuffers();
     }
 
+    finishGame();
+
+#ifdef IOS_STK
+    // App store may not like this, but this can happen if player uses keyboard to quit stk
+    exit(0);
+    return 0;
+#else
+    return 0 ;
+#endif
+}   // main
+
+// Browser callbacks finish after main has yielded, so teardown has its own function.
+static void finishGame()
+{
     /* Program closing...*/
 
 #ifdef ENABLE_WIIUSE
@@ -2733,14 +2784,7 @@ int main(int argc, char *argv[])
     nifmExit();
 #endif
 
-#ifdef IOS_STK
-    // App store may not like this, but this can happen if player uses keyboard to quit stk
-    exit(0);
-    return 0;
-#else
-    return 0 ;
-#endif
-}   // main
+}
 
 // ============================================================================
 #ifdef WIN32

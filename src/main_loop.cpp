@@ -399,10 +399,13 @@ void MainLoop::updateRace(int ticks, bool fast_forward)
  */
 void MainLoop::run()
 {
+#ifndef __EMSCRIPTEN__
     m_curr_time = std::chrono::steady_clock::now();
+    m_left_over_time = 0.0;
+#endif
     // DT keeps track of the leftover time, since the race update
     // happens in fixed timesteps
-    double left_over_time = 0;
+    double& left_over_time = m_left_over_time;
 
 #ifdef WIN32
     HANDLE parent = 0;
@@ -417,7 +420,12 @@ void MainLoop::run()
     }
 #endif
 
+#ifdef __EMSCRIPTEN__
+    // One frame per callback. A do/while retains the existing early breaks.
+    do
+#else
     while (!m_abort)
+#endif
     {
 #ifdef __SWITCH__
       // This feeds us messages (like when the Switch sleeps or requests an exit)
@@ -708,6 +716,8 @@ void MainLoop::run()
             }
         }
 
+#ifndef __EMSCRIPTEN__
+        // requestAnimationFrame already paces the browser; never sleep its UI.
         if (!UserConfigParams::m_benchmark)
         {
             TimePoint frame_end = std::chrono::steady_clock::now();
@@ -735,9 +745,14 @@ void MainLoop::run()
             }
         }
 
+#endif
         PROFILER_POP_CPU_MARKER();   // MainLoop pop
         PROFILER_SYNC_FRAME();
-    }  // while !m_abort
+    }
+#ifdef __EMSCRIPTEN__
+    while (false);
+#endif
+    // Native builds continue until m_abort; browser builds return after a frame.
 
 #ifdef WIN32
     if (parent != 0 && parent != INVALID_HANDLE_VALUE)

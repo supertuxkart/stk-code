@@ -106,6 +106,13 @@ size_t curlWriteCallback(void *contents, size_t size,
 // ----------------------------------------------------------------------------
 void Online::HTTPRequest::operation()
 {
+#ifdef __EMSCRIPTEN__
+    // Native sockets are not browser Fetch. Fail promptly instead of allowing
+    // options/profile screens to hang while waiting for unsupported networking.
+    m_result_code = CURLE_UNSUPPORTED_PROTOCOL;
+    setProgress(-1.0f);
+    return;
+#endif
     CURL* curl_session = curl_easy_init();
     if (!curl_session)
     {

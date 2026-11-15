@@ -388,6 +388,16 @@ void MainMenuScreen::eventCallback(Widget* widget, const std::string& name,
     std::string selection =
         ribbon->getSelectionIDString(PLAYER_ID_GAME_MASTER);
 
+#ifdef __EMSCRIPTEN__
+    // The port's first milestone is offline racing. Do not route players into
+    // native ENet/add-on flows until a browser transport has been implemented.
+    if (selection == "online" || selection == "addons")
+    {
+        new MessageDialog(_("This browser build supports offline racing only."));
+        return;
+    }
+#endif
+
     /*
     if (selection == "story")
     {

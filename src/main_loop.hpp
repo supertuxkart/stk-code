@@ -50,6 +50,8 @@ private:
 
     Synchronised<int> m_ticks_adjustment;
 
+    // Fractional physics time must survive browser animation-frame callbacks.
+    double m_left_over_time = 0.0;
     TimePoint m_curr_time;
     TimePoint m_prev_time;
     unsigned m_parent_pid;

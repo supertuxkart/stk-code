@@ -1,3 +1,4 @@
+// Browser port: see web/UPSTREAM.md; guards exclude native-only APIs from Wasm.
 //
 //  SuperTuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004-2015 Steve Baker <sjbaker1@airmail.net>
@@ -212,6 +213,10 @@ FileManager::FileManager()
         root_dir = "/usr/local/share/games/supertuxkart/";
 #endif
     }
+
+#ifdef __EMSCRIPTEN__
+    root_dir = "/data/";
+#endif
 
     if (!m_file_system->existFile((root_dir + version).c_str()))
     {
