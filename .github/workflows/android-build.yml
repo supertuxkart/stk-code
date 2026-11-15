@@ -1,0 +1,74 @@
+name: Build Android (baseline)
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 240
+    steps:
+      - name: Checkout do código
+        uses: actions/checkout@v4
+        with:
+          path: stk-code
+
+      - name: Baixar assets (SVN)
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y subversion
+          svn co -r 18627 https://svn.code.sf.net/p/supertuxkart/code/stk-assets stk-assets
+
+      - name: Instalar Java 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 17
+
+      - name: Instalar pacotes de build
+        run: |
+          sudo apt-get install -y autoconf automake make python3 python3-packaging \
+            python3-mako flex bison imagemagick cmake meson vorbis-tools pngquant \
+            advancecomp libjpeg-progs optipng ccache unzip
+
+      - name: Configurar Android SDK
+        uses: android-actions/setup-android@v4
+
+      - name: Instalar NDK e build-tools do Android
+        run: |
+          sdkmanager --install "ndk;28.1.13356709" "build-tools;35.0.0" "platforms;android-35"
+
+      - name: Baixar dependências
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          cd stk-code
+          gh release download preview -R supertuxkart/dependencies -p "dependencies-android-src.tar.xz"
+          tar -xf dependencies-android-src.tar.xz -C lib
+
+      - name: Compilar APK
+        run: |
+          cd stk-code/android
+          ln -sfn "$ANDROID_HOME" android-sdk
+          ln -sfn "$ANDROID_HOME/ndk" android-ndk
+          export SDK_PATH="$ANDROID_HOME"
+          export NDK_PATH="$ANDROID_HOME/ndk"
+          export COMPILE_ARCH=aarch64
+          export BUILD_TYPE=debug
+          export PROJECT_VERSION=git
+          ./generate_assets.sh
+          ./make_deps.sh
+          ./make.sh
+
+      - name: Coletar APK
+        run: |
+          mkdir -p apk-out
+          find stk-code/android -name "*.apk" -exec cp {} apk-out/ \;
+          ls -la apk-out
+
+      - name: Enviar APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: supertuxkart-android-debug
+          path: apk-out/*.apk
+          if-no-files-found: error

@@ -95,3 +95,5 @@ lib/libadrenotools
 lib/mesa
 
 .DS_Store
+
+!.github/workflows/android-build.yml
