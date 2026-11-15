@@ -58,6 +58,12 @@ and click the green **OK** button. Confirm your player on the Login screen,
 then select Single Player. Use the page's
 Fullscreen button for browser fullscreen.
 
+The game frame has visible **Pause / Menu** and **Quit game** buttons, including
+in fullscreen. Pause / Menu opens the native menu with **Exit Race** / **Exit
+Battle**, restart, and resume actions. Quit game ends the entire session after
+confirmation, even before a race or activity finishes. **Keep playing** or Escape
+cancels the confirmation; a race that was already paused stays paused.
+
 Quitting returns to this page and automatically exits fullscreen. After the final
 save and session preparation, click **Play again**; no page reload is needed.
 
@@ -78,6 +84,7 @@ sessions in Chrome (with the local server running):
 ```sh
 npm install --prefix build-web-tools/browser-test playwright@1.58.2
 node web/test_replay.mjs
+node web/test_quit_during_play.mjs
 ```
 
 The test uses Chrome installed on macOS. Elsewhere, install Playwright's Chromium
@@ -92,6 +99,7 @@ or set `PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH` to your browser executable.
 | `src/main.cpp`, `src/main_loop.*` | Browser animation-frame scheduling and shared shutdown. |
 | `lib/graphics_engine`, `lib/irrlicht`, graphics call sites | Excludes Vulkan APIs and selects the legacy GLES/WebGL path. |
 | `src/audio/sfx_manager.cpp` | Processes bounded audio work on the browser thread. |
+| `src/utils/browser_controls.cpp` | Bridges visible pause/quit controls to native pause and normal next-frame shutdown. |
 | `web/pre.js` | Restores saves, serializes flushes, and provides a final save that quit can await. |
 | `web/index.html` | Persistent launcher, Play again, fullscreen exit, and game log. |
 | `web/game.html` | Isolated canvas/Wasm session; saves before the launcher replaces the terminated runtime. |

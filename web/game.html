@@ -6,14 +6,37 @@
 <link rel="icon" href="data:,">
 <style>
   html, body { margin: 0; width: 100%; height: 100%; background: #000; }
-  body { display: grid; place-items: center; overflow: hidden; }
+  body { display: grid; grid-template-rows: auto minmax(0, 1fr); overflow: hidden; color: #fff; font: 16px system-ui; }
+  #controls { display: flex; justify-content: flex-end; gap: 8px; padding: 6px 10px; background: #17202c; }
+  button { padding: 7px 14px; font: inherit; cursor: pointer; }
+  #view { min-height: 0; display: grid; place-items: center; container-type: size; }
   /* Keep layout independent of SDL's temporary 1x1 bootstrap canvas. Explicit
      dimensions avoid a square canvas clipping the game's bottom-row controls. */
-  canvas { display: block; width: min(100vw, calc(100vh * 16 / 9)); height: min(100vh, calc(100vw * 9 / 16)); aspect-ratio: 16/9; outline: none; }
+  canvas { display: block; width: min(100cqw, calc(100cqh * 16 / 9)); height: min(100cqh, calc(100cqw * 9 / 16)); aspect-ratio: 16/9; outline: none; }
+  dialog { max-width: min(420px, 80vw); border: 0; border-radius: 12px; padding: 24px; color: #fff; background: #243247; }
+  dialog::backdrop { background: rgb(0 0 0 / 65%); }
+  dialog h1 { margin-top: 0; font-size: 22px; }
+  .actions { display: flex; justify-content: flex-end; gap: 10px; }
+  #confirm-quit { background: #a92b35; color: #fff; border: 1px solid #ef8d96; }
 </style>
-<canvas id="canvas" width="960" height="540" tabindex="0" aria-label="SuperTuxKart game"></canvas>
+<nav id="controls" aria-label="Game controls">
+  <button id="pause" disabled>Pause / Menu</button>
+  <button id="quit" disabled>Quit game</button>
+</nav>
+<div id="view"><canvas id="canvas" width="960" height="540" tabindex="0" aria-label="SuperTuxKart game"></canvas></div>
+<dialog id="quit-dialog" aria-labelledby="quit-title" aria-describedby="quit-description">
+  <h1 id="quit-title">Quit this game?</h1>
+  <p id="quit-description">Your current race or activity will end. Unfinished races won't record a result. Saved progress will be kept.</p>
+  <div class="actions">
+    <button id="cancel-quit" autofocus>Keep playing</button>
+    <button id="confirm-quit">Quit game</button>
+  </div>
+</dialog>
 <script>
   const canvas = document.getElementById('canvas');
+  const pauseButton = document.getElementById('pause');
+  const quitButton = document.getElementById('quit');
+  const quitDialog = document.getElementById('quit-dialog');
   let ready = false;
   let started = false;
   let stopping = false;
@@ -23,6 +46,9 @@
   async function finishSession(text) {
     if (stopping) return;
     stopping = true;
+    pauseButton.disabled = true;
+    quitButton.disabled = true;
+    clearInterval(controlsTimer);
     tellLauncher('stopping');
     Module['disposeBrowserHooks']?.();
     let saveError = false;
@@ -45,13 +71,57 @@
     onExit: () => finishSession('Game closed.'),
     onRuntimeInitialized: () => { ready = true; tellLauncher('ready'); }
   };
-  window.startGame = function () {
+  // Optional native arguments also support reproducible quick-race tests;
+  // the launcher normally supplies none and opens the regular game menus.
+  window.startGame = function (args = []) {
     if (!ready || started || stopping) return;
     started = true;
     canvas.focus();
-    Module.callMain(['--logbuffer=1', '--log=nocolor']);
-    if (!stopping) tellLauncher('running');
+    Module.callMain(['--logbuffer=1', '--log=nocolor', ...args]);
+    if (!stopping) {
+      quitButton.disabled = false;
+      updateControls();
+      tellLauncher('running');
+    }
   };
+  function updateControls() {
+    if (started && !stopping) pauseButton.disabled = !Module._browser_can_pause();
+  }
+  const controlsTimer = setInterval(updateControls, 500);
+  pauseButton.addEventListener('click', () => {
+    if (!started || stopping || quitDialog.open) return;
+    Module._browser_pause_menu();
+    canvas.focus();
+  });
+  quitButton.addEventListener('click', () => {
+    if (!started || stopping || quitDialog.open) return;
+    Module._browser_prepare_quit();
+    quitDialog.showModal();
+  });
+  function cancelQuit() {
+    quitDialog.close();
+    Module._browser_cancel_quit();
+    canvas.focus();
+  }
+  document.getElementById('cancel-quit').addEventListener('click', cancelQuit);
+  quitDialog.addEventListener('cancel', event => {
+    event.preventDefault();
+    cancelQuit();
+  });
+  document.getElementById('confirm-quit').addEventListener('click', () => {
+    quitDialog.close();
+    quitButton.disabled = true;
+    pauseButton.disabled = true;
+    Module._browser_quit_game();
+  });
+  // SDL listens for keys at document/window level. While an HTML modal is open,
+  // keep Escape/Enter/Tab inside that modal instead of also controlling the kart
+  // or opening a second native pause menu. Browser default button actions remain.
+  for (const type of ['keydown', 'keyup']) {
+    window.addEventListener(type, event => {
+      if (quitDialog.open) event.stopImmediatePropagation();
+    }, true);
+  }
   canvas.addEventListener('keydown', event => {
     if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', ' '].includes(event.key)) event.preventDefault();
   });

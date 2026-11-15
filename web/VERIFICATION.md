@@ -36,6 +36,17 @@ to quit, browser crashes, or forcibly closing the tab.
 The local test media was the official **1.5-rc1 low-quality mobile pack**, merged
 with this repository's data. Its checksum is recorded in [README.md](README.md).
 
+## Quit during active play
+
+The visible in-game controls were additionally tested with
+`node web/test_quit_during_play.mjs` on an unfinished Oliver's Math Class race
+and an unfinished Battle Island battle, both in fullscreen. The test opens the
+native pause menu, cancels quit from that paused state, resumes play, opens quit
+during live gameplay, cancels with Escape, then confirms quit. Race clock checks
+verify pause/resume behavior; both modes save a last-minute filesystem write,
+exit fullscreen, and return to Play again without reloading. No uncaught browser
+errors were observed. Other activity types were not individually exercised.
+
 ## Limits of these checks
 
 This verifies startup, rendering, basic driving, pausing, and persistent browser
