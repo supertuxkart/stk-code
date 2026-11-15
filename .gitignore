@@ -95,3 +95,6 @@ lib/libadrenotools
 lib/mesa
 
 .DS_Store
+
+# Personal learning/implementation plan; keep this local to the workspace.
+/BROWSER_PORT_GUIDE.md
