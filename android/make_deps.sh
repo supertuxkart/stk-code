@@ -294,6 +294,13 @@ build_deps()
     if [ ! -f "$DIRNAME/deps-$ARCH_OPTION/shaderc.stamp" ]; then
         echo "Compiling $ARCH_OPTION shaderc"
         mkdir -p "$DIRNAME/deps-$ARCH_OPTION/shaderc"
+
+        # Fix a buggy makefile
+        cd $DIRNAME/../lib/shaderc/
+        wget -c https://raw.githubusercontent.com/supertuxkart/dependencies/a7698f87745c77982695b360661dcc0884985e74/patches/shaderc-glslang-makefile.patch
+        patch -p1 <./shaderc-glslang-makefile.patch
+        cd -
+
         cp -a -f "$DIRNAME/../lib/shaderc/"* "$DIRNAME/deps-$ARCH_OPTION/shaderc"
 
         cd "$DIRNAME/deps-$ARCH_OPTION/shaderc"
@@ -303,7 +310,7 @@ build_deps()
             check_error
             touch "$DIRNAME/deps-$ARCH_OPTION/shaderc-deps.stamp"
         fi
-        
+
         cmake . -DCMAKE_TOOLCHAIN_FILE=../../../cmake/Toolchain-android.cmake  \
                 -DHOST=$HOST -DARCH=$ARCH -DCMAKE_C_FLAGS="-fpic -O3"          \
                 -DCMAKE_CXX_FLAGS="-fpic -O3" -DSHADERC_SKIP_INSTALL=1         \
