@@ -44,7 +44,7 @@ jobs:
       - name: Configure Android SDK
         uses: android-actions/setup-android@v4
 
-      - name: Instalar NDK e build-tools do Android
+      - name: Install Android NDK and build-tools
         run: |
           sdkmanager --install "ndk;28.1.13356709" "build-tools;35.0.0" "platforms;android-35"
 
