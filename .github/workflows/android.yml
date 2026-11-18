@@ -20,6 +20,39 @@ jobs:
           path: stk-code
 
       - name: Configure packaging name for git master branch
+        if: ${{ matrix.build_type == 'Release' && matrix.server_only == 'OFF' &&
+            github.ref == 'refs/heads/master' }}
+        run: |
+          echo "release_tag=git`date +%Y%m%d`" >> $GITHUB_ENV
+          echo "release_name=preview" >> $GITHUB_ENV
+      - name: Configure packaging name for tag
+        if: ${{ matrix.build_type == 'Release' && matrix.server_only == 'OFF' &&
+            startsWith(github.ref, 'refs/tags/') }}
+        run: |
+          echo "release_tag=`basename $GITHUB_REF`" >> $GITHUB_ENV
+          echo "release_name=`basename $GITHUB_REF`" >> $GITHUB_ENV
+      - name: Configure packaging name for non-releasing branch
+        if: ${{ matrix.build_type != 'Release' || matrix.server_only != 'OFF' ||
+            !(github.ref == 'refs/heads/master' || startsWith(github.ref, 'refs/tags/')) ||
+            github.repository_owner != 'supertuxkart' }}
+        run: |
+          echo "release_tag=" >> $GITHUB_ENV
+          echo "release_name=" >> $GITHUB_ENV
+      - name: Check for prerelease
+        if: ${{ github.ref == 'refs/heads/master' || contains(github.ref, 'rc') || contains(github.ref, 'beta') }}
+        run: |
+          echo "release_pre=true" >> $GITHUB_ENV
+      - name: Check for non-prerelease
+        if: ${{ github.ref != 'refs/heads/master' && !contains(github.ref, 'rc') && !contains(github.ref, 'beta') }}
+        run: |
+          echo "release_pre=false" >> $GITHUB_ENV
+      - name: Show packaging name
+        run : |
+          echo "${{ env.release_tag }}"
+          echo "${{ env.release_name }}"
+          echo "${{ env.release_pre }}"
+
+      - name: Configure packaging name for git master branch
         run: |
           echo "release_tag=git`date +%Y%m%d`" >> $GITHUB_ENV
 
@@ -74,11 +107,17 @@ jobs:
         run: |
           mkdir -p apk-out
           find stk-code/android -name "*.apk" -exec cp {} apk-out/ \;
-          ls -la apk-out
+          cd apk-out
+          mv *.apk SuperTuxKart-dbg-${{ env.release_tag }}-android.apk
 
-      - name: Send APK
-        uses: actions/upload-artifact@v4
+      - name: Create Release
+        if: ${{ env.release_tag != ''}}
+        uses: ncipollo/release-action@v1
         with:
-          name: SuperTuxKart-dbg-${{ env.release_tag }}-android
-          path: apk-out/*.apk
-          if-no-files-found: error
+          token: ${{ secrets.GITHUB_TOKEN }}
+          artifacts: "apk-out/SuperTuxKart-dbg-${{ env.release_tag }}-android.apk"
+          tag: ${{ env.release_name }}
+          omitBodyDuringUpdate: true
+          omitNameDuringUpdate: true
+          allowUpdates: true
+          prerelease: ${{ env.release_pre }}
