@@ -79,9 +79,10 @@ jobs:
 
       - name: Create release
         uses: ncipollo/release-action@v1
+        if: ${{ env.release_tag != '' }}
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
-          artifacts: "SuperTuxKart-mobile-assets.zip"
+          artifacts: "SuperTuxKart-${{ env.release_tag }}-mobileassets.zip"
           tag: ${{ env.release_name }}
           omitBodyDuringUpdate: true
           omitNameDuringUpdate: true
