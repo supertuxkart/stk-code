@@ -75,7 +75,7 @@ jobs:
 
       - name: Compress optimized assets
         run: |
-          zip -r SuperTuxKart-${{ env.release_tag }}-mobileassets.zip  ./assets
+          zip -r SuperTuxKart-${{ env.release_tag }}-mobileassets.zip stk-code/android/assets
 
       - name: Create release
         uses: ncipollo/release-action@v1
