@@ -294,13 +294,6 @@ build_deps()
     if [ ! -f "$DIRNAME/deps-$ARCH_OPTION/shaderc.stamp" ]; then
         echo "Compiling $ARCH_OPTION shaderc"
         mkdir -p "$DIRNAME/deps-$ARCH_OPTION/shaderc"
-
-        # Fix a buggy makefile
-        cd $DIRNAME/../lib/shaderc/
-        wget -c https://raw.githubusercontent.com/supertuxkart/dependencies/a7698f87745c77982695b360661dcc0884985e74/patches/shaderc-glslang-makefile.patch
-        patch -p1 <./shaderc-glslang-makefile.patch
-        cd -
-
         cp -a -f "$DIRNAME/../lib/shaderc/"* "$DIRNAME/deps-$ARCH_OPTION/shaderc"
 
         cd "$DIRNAME/deps-$ARCH_OPTION/shaderc"
@@ -389,10 +382,9 @@ build_deps()
             echo "Compiling $ARCH_OPTION libadrenotools"
             mkdir -p "$DIRNAME/deps-$ARCH_OPTION/libadrenotools"
             mkdir -p "$DIRNAME/mesa/arm64-v8a"
-            git clone "$DIRNAME/../lib/libadrenotools" "$DIRNAME/deps-$ARCH_OPTION/libadrenotools"
+            cp -a -f "$DIRNAME/../lib/libadrenotools/"* "$DIRNAME/deps-$ARCH_OPTION/libadrenotools"
 
             cd "$DIRNAME/deps-$ARCH_OPTION/libadrenotools"
-            git submodule update --init
             cmake . -DCMAKE_TOOLCHAIN_FILE=../../../cmake/Toolchain-android.cmake \
                     -DHOST=$HOST -DARCH=$ARCH -DCMAKE_C_FLAGS="-fpic -O3 -g"      \
                     -DCMAKE_CXX_FLAGS="-fpic -O3 -g"                              \
