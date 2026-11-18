@@ -227,20 +227,20 @@ build_deps()
         cp -a -f "$DIRNAME/../lib/curl/"* "$DIRNAME/deps-$ARCH_OPTION/curl"
 
         cd "$DIRNAME/deps-$ARCH_OPTION/curl"
-        cmake . -DCMAKE_TOOLCHAIN_FILE=../../../cmake/Toolchain-android.cmake \
-                -DHOST=$HOST -DARCH=$ARCH -DBUILD_SHARED_LIBS=OFF             \
-                -DZLIB_LIBRARY="$DIRNAME/deps-$ARCH_OPTION/zlib/libz.a"       \
-                -DZLIB_INCLUDE_DIR="$DIRNAME/deps-$ARCH_OPTION/zlib/"         \
+        cmake . -DCMAKE_TOOLCHAIN_FILE=../../../cmake/Toolchain-android.cmake  \
+                -DHOST=$HOST -DARCH=$ARCH -DBUILD_SHARED_LIBS=OFF              \
+                -DZLIB_LIBRARY="$DIRNAME/deps-$ARCH_OPTION/zlib/libz.a"        \
+                -DZLIB_INCLUDE_DIR="$DIRNAME/deps-$ARCH_OPTION/zlib/"          \
                 -DMBEDCRYPTO_LIBRARY="$DIRNAME/deps-$ARCH_OPTION/mbedtls/library/libmbedcrypto.a" \
                 -DMBEDTLS_LIBRARY="$DIRNAME/deps-$ARCH_OPTION/mbedtls/library/libmbedtls.a"       \
                 -DMBEDX509_LIBRARY="$DIRNAME/deps-$ARCH_OPTION/mbedtls/library/libmbedx509.a"     \
                 -DMBEDTLS_INCLUDE_DIRS="$DIRNAME/deps-$ARCH_OPTION/mbedtls/include/"              \
-                -DBUILD_TESTING=OFF -DBUILD_CURL_EXE=OFF                      \
-                -DCURL_USE_MBEDTLS=ON -DUSE_ZLIB=ON -DCURL_USE_OPENSSL=OFF    \
-                -DCURL_USE_LIBSSH=OFF -DCURL_USE_LIBSSH2=OFF                  \
-                -DCURL_USE_GSSAPI=OFF -DUSE_NGHTTP2=OFF -DUSE_QUICHE=OFF      \
-                -DHTTP_ONLY=ON -DCURL_CA_BUNDLE=none -DCURL_CA_PATH=none      \
-                -DENABLE_THREADED_RESOLVER=ON -DCMAKE_C_FLAGS="-fpic -O3 -g" &&
+                -DBUILD_TESTING=OFF -DBUILD_CURL_EXE=OFF -DCURL_USE_LIBPSL=OFF \
+                -DCURL_USE_MBEDTLS=ON -DUSE_ZLIB=ON -DCURL_USE_OPENSSL=OFF     \
+                -DCURL_USE_LIBSSH=OFF -DCURL_USE_LIBSSH2=OFF                   \
+                -DCURL_USE_GSSAPI=OFF -DUSE_NGHTTP2=OFF -DUSE_QUICHE=OFF       \
+                -DHTTP_ONLY=ON -DCURL_CA_BUNDLE=none -DCURL_CA_PATH=none       \
+                -DENABLE_THREADED_RESOLVER=ON -DCMAKE_C_FLAGS="-fpic -O3 -g"  &&
         make -j $(($(nproc) + 1))
         check_error
         touch "$DIRNAME/deps-$ARCH_OPTION/curl.stamp"
@@ -303,7 +303,7 @@ build_deps()
             check_error
             touch "$DIRNAME/deps-$ARCH_OPTION/shaderc-deps.stamp"
         fi
-        
+
         cmake . -DCMAKE_TOOLCHAIN_FILE=../../../cmake/Toolchain-android.cmake  \
                 -DHOST=$HOST -DARCH=$ARCH -DCMAKE_C_FLAGS="-fpic -O3"          \
                 -DCMAKE_CXX_FLAGS="-fpic -O3" -DSHADERC_SKIP_INSTALL=1         \
@@ -382,10 +382,9 @@ build_deps()
             echo "Compiling $ARCH_OPTION libadrenotools"
             mkdir -p "$DIRNAME/deps-$ARCH_OPTION/libadrenotools"
             mkdir -p "$DIRNAME/mesa/arm64-v8a"
-            git clone "$DIRNAME/../lib/libadrenotools" "$DIRNAME/deps-$ARCH_OPTION/libadrenotools"
+            cp -a -f "$DIRNAME/../lib/libadrenotools/"* "$DIRNAME/deps-$ARCH_OPTION/libadrenotools"
 
             cd "$DIRNAME/deps-$ARCH_OPTION/libadrenotools"
-            git submodule update --init
             cmake . -DCMAKE_TOOLCHAIN_FILE=../../../cmake/Toolchain-android.cmake \
                     -DHOST=$HOST -DARCH=$ARCH -DCMAKE_C_FLAGS="-fpic -O3 -g"      \
                     -DCMAKE_CXX_FLAGS="-fpic -O3 -g"                              \
