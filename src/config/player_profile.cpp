@@ -170,9 +170,41 @@ void PlayerProfile::initRemainingData()
 }   // initRemainingData
 
 //------------------------------------------------------------------------------
-/** Creates an icon for a player if non exist so far. It takes the unique
- *  player id modulo the number of karts to pick an icon from the karts. It
- *  then uses the unique number plus the extentsion of the original icon as the
+/** Sets the profile icon to use the specified icon file path.
+ *  Copies the file to the user config directory using the player unique ID
+ *  and its original extension (.png, .jpg, .jpeg).
+ *  \param icon_path Absolute path to the source image file on disk.
+ */
+void PlayerProfile::setIconFromPath(const std::string& icon_path)
+{
+    std::ostringstream out;
+    out << m_unique_id <<"."<<StringUtils::getExtension(icon_path);
+    if(file_manager->copyFile(icon_path, file_manager->getUserConfigFile(out.str())) )
+        m_icon_filename = out.str();
+    else
+        m_icon_filename = "";
+}   // setIconFromPath
+
+//------------------------------------------------------------------------------
+/** Sets the profile icon using the icon file of the specified kart identifier.
+ *  Delegates the copying and file saving process to setIconFromPath().
+ *  \param kart_ident The internal identifier of the kart to copy the icon from.
+ */
+void PlayerProfile::setIconFromKart(const std::string& kart_ident)
+{
+
+    int kart_id = kart_properties_manager->getKartId(kart_ident);
+
+    std::string source = kart_properties_manager->getKartById(kart_id)
+                                                ->getAbsoluteIconFile();
+    setIconFromPath(source);
+}   // setIconFromKart
+
+//------------------------------------------------------------------------------
+/** Creates an icon for a player if none exists so far. If a specific kart was
+ *  chosen (via m_icon_kart_ident), that kart's icon is used; otherwise, it takes
+ *  the unique player id modulo the number of karts to pick an icon from the karts.
+ *  It then uses the unique number plus the extension of the original icon as the
  *  file name (it's not possible to use the player name, since the name is in
  *  utf-16, but typically the file systems are not, resulting in incorrect file
  *  names). The icon is then copied to the user config directory, so that it
@@ -187,24 +219,11 @@ void PlayerProfile::addIcon()
     if (m_icon_filename.size() > 0 || isGuestAccount())
         return;
 
-    int n = (m_unique_id + kart_properties_manager->getKartId("tux") - 1)
-          % kart_properties_manager->getNumberOfKarts();
+    int pseudo_rand_id = (m_unique_id + kart_properties_manager->getKartId("tux") - 1)
+                % kart_properties_manager->getNumberOfKarts();
 
-    std::string source = kart_properties_manager->getKartById(n)
-                                                ->getAbsoluteIconFile();
-    // Create the filename for the icon of this player: the unique id
-    // followed by .png or .jpg.
-    std::ostringstream out;
-    out << m_unique_id <<"."<<StringUtils::getExtension(source);
-    if(file_manager->copyFile(source,
-                               file_manager->getUserConfigFile(out.str())) )
-    {
-        m_icon_filename = out.str();
-    }
-    else
-    {
-        m_icon_filename = "";
-    }
+    std::string kart_ident = kart_properties_manager->getKartById(pseudo_rand_id)->getIdent();
+    setIconFromKart(kart_ident);
 }   // addIcon
 
 //------------------------------------------------------------------------------

@@ -115,6 +115,8 @@ public:
     /** \brief implement callback from parent class GUIEngine::Screen */
     virtual void init() OVERRIDE;
 
+    int loadProfilesIcons();
+
     /** \brief implement callback from parent class GUIEngine::Screen */
     virtual void tearDown() OVERRIDE;
 
