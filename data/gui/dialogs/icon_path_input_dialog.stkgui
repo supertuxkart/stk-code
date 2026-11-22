@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<stkgui>
+    <div x="2%" y="2%" width="96%" height="96%" layout="vertical-row">
+
+        <spacer height="3%" width="100%"/>
+
+        <div id="path_input" width="100%" height="30%" layout="horizontal-row" >
+            <label proportion="1" height="100%" text_align="left" I18N="In the icon path input dialog" text="Icon Path"/>
+            <textbox id="icon_path_textbox" proportion="5" align="center" height="fit" I18N="In the icon path input dialog"/>
+            <buttonbar id="path_input_buttons" height="100%" proportion="1">
+                <icon-button id="validate" width="100%" height="100%" icon="gui/icons/search.png" I18N="In the icon chooser dialog" text="Validate" align="center"/>
+            </buttonbar>
+        </div>
+
+        <spacer height="5%" width="100%"/>
+
+        <div id="path_input" width="100%" height="30%" align ="center" layout="horizontal-row" >
+
+            <spacer height="100%" width="8%"/>
+
+            <buttonbar id="icon_render_buttons" width="15%" height="100%" proportion="1">
+                <icon-button id="icon_render" width="100%" height="100%" icon="gui/icons/player.png" I18N="In the icon chooser dialog" align="center"/>
+            </buttonbar>
+
+            <spacer height="100%" width="3%"/>
+
+            <textbox id="icon_path_output" width="66%" align="center" height="fit" I18N="In the icon path input dialog"/>
+
+            <spacer height="100%" width="8%"/>
+        </div>
+
+        <spacer height="5%" width="100%"/>
+
+        <buttonbar id="buttons" height="25%" width="40%" align="center">
+            <icon-button id="cancel" width="128" height="128" icon="gui/icons/red_x.png"
+                I18N="In the icon chooser dialog" text="Cancel" align="center"/>
+            <icon-button id="apply" width="128" height="128" icon="gui/icons/green_check.png"
+                I18N="In the icon chooser dialog" text="Apply" align="center"/>
+        </buttonbar>
+        <spacer height="2%" width="100%"/>
+    </div>
+</stkgui>
