@@ -170,16 +170,34 @@ void PlayerProfile::initRemainingData()
 }   // initRemainingData
 
 //------------------------------------------------------------------------------
-/** Sets the profile icon to use the icon from the specified kart identifier.
- *  Clears the existing filename to trigger copying the new texture in addIcon().
+/** Sets the profile icon to use the specified icon file path.
+ *  Copies the file to the user config directory using the player unique ID
+ *  and its original extension (.png, .jpg, .jpeg).
+ *  \param icon_path Absolute path to the source image file on disk.
+ */
+void PlayerProfile::setIconFromPath(const std::string& icon_path)
+{
+    std::ostringstream out;
+    out << m_unique_id <<"."<<StringUtils::getExtension(icon_path);
+    if(file_manager->copyFile(icon_path, file_manager->getUserConfigFile(out.str())) )
+        m_icon_filename = out.str();
+    else
+        m_icon_filename = "";
+}   // setIconFromPath
+
+//------------------------------------------------------------------------------
+/** Sets the profile icon using the icon file of the specified kart identifier.
+ *  Delegates the copying and file saving process to setIconFromPath().
  *  \param kart_ident The internal identifier of the kart to copy the icon from.
  */
 void PlayerProfile::setIconFromKart(const std::string& kart_ident)
 {
 
-    m_icon_kart_ident = kart_ident;
-    m_icon_filename = "";
-    addIcon();
+    int kart_id = kart_properties_manager->getKartId(kart_ident);
+
+    std::string source = kart_properties_manager->getKartById(kart_id)
+                                                ->getAbsoluteIconFile();
+    setIconFromPath(source);
 }   // setIconFromKart
 
 //------------------------------------------------------------------------------
@@ -201,28 +219,11 @@ void PlayerProfile::addIcon()
     if (m_icon_filename.size() > 0 || isGuestAccount())
         return;
 
-    int kart_id;
-    if (m_icon_kart_ident.size() > 0)
-        kart_id = kart_properties_manager->getKartId(m_icon_kart_ident);
-    else
-        kart_id = (m_unique_id + kart_properties_manager->getKartId("tux") - 1)
-            % kart_properties_manager->getNumberOfKarts();
+    int pseudo_rand_id = (m_unique_id + kart_properties_manager->getKartId("tux") - 1)
+                % kart_properties_manager->getNumberOfKarts();
 
-    std::string source = kart_properties_manager->getKartById(kart_id)
-                                                ->getAbsoluteIconFile();
-    // Create the filename for the icon of this player: the unique id
-    // followed by .png or .jpg.
-    std::ostringstream out;
-    out << m_unique_id <<"."<<StringUtils::getExtension(source);
-    if(file_manager->copyFile(source,
-                               file_manager->getUserConfigFile(out.str())) )
-    {
-        m_icon_filename = out.str();
-    }
-    else
-    {
-        m_icon_filename = "";
-    }
+    std::string kart_ident = kart_properties_manager->getKartById(pseudo_rand_id)->getIdent();
+    setIconFromKart(kart_ident);
 }   // addIcon
 
 //------------------------------------------------------------------------------
