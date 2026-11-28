@@ -38,14 +38,15 @@ CheckSphere::CheckSphere(const XMLNode &node, unsigned int index)
     node.get("radius", &m_radius2);
     m_radius2 *= m_radius2;
     node.get("xyz", &m_center_point);
-    unsigned int num_karts = RaceManager::get()->getNumberOfKarts();
-    m_is_inside.resize(num_karts);
-    m_distance2.resize(num_karts);
-    for(unsigned int i=0; i< num_karts; i++)
-    {
-        m_is_inside[i] = false;
-    }
 }   // CheckSphere
+
+// ----------------------------------------------------------------------------
+void CheckSphere::reset(const Track &track)
+{
+    CheckStructure::reset(track);
+    m_is_inside.assign(m_previous_position.size(), false);
+    m_distance2.assign(m_previous_position.size(), 0.0f);
+}   // reset
 
 // ----------------------------------------------------------------------------
 /** True if going from old_pos to new_pos enters or leaves this sphere. This

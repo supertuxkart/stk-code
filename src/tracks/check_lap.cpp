@@ -35,19 +35,13 @@
 CheckLap::CheckLap(const XMLNode &node, unsigned int index)
          : CheckStructure(node, index)
 {
-    // Note that when this is called the karts have not been allocated
-    // in world, so we can't call world->getNumKarts()
-    m_previous_distance.resize(RaceManager::get()->getNumberOfKarts());
 }   // CheckLap
 
 // ----------------------------------------------------------------------------
 void CheckLap::reset(const Track &track)
 {
     CheckStructure::reset(track);
-    for(unsigned int i=0; i<m_previous_distance.size(); i++)
-    {
-        m_previous_distance[i] = 0;
-    }
+    m_previous_distance.assign(m_previous_position.size(), 0.0f);
 }   // reset
 
 // ----------------------------------------------------------------------------

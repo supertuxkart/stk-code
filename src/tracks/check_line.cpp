@@ -44,9 +44,6 @@ CheckLine::CheckLine(const XMLNode &node,  unsigned int index)
          : CheckStructure(node, index)
 {
     m_ignore_height = false;
-    // Note that when this is called the karts have not been allocated
-    // in world, so we can't call world->getNumKarts()
-    m_previous_sign.resize(RaceManager::get()->getNumberOfKarts());
     std::string p1_string("p1");
     std::string p2_string("p2");
 
@@ -158,6 +155,7 @@ void CheckLine::reset(const Track &track)
 {
     CheckStructure::reset(track);
 
+    m_previous_sign.resize(m_previous_position.size());
     for (unsigned int i = 0; i<m_previous_sign.size(); i++)
     {
         m_previous_sign[i] = m_previous_position[i].sideofPlane(
@@ -201,11 +199,6 @@ bool CheckLine::isTriggered(const Vec3 &old_pos, const Vec3 &new_pos,
                             int kart_index)
 {
     World* w = World::getWorld();
-    // Battle mode does not use checklines, and spare tire karts
-    // would trigger an OOB issue (see #5536 and #5689)
-    if (RaceManager::get()->isBattleMode() && getType() != CT_CANNON)
-        return false;
-
     // TODO: Once compatibility doesn't matter, the sign variable
     // can be fully removed, see comment below.
     // Sign here is for old client (<= 1.2) in networking, it's not used
