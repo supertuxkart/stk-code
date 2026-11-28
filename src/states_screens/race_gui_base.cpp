@@ -34,6 +34,7 @@
 #include "io/file_manager.hpp"
 #include "items/attachment_manager.hpp"
 #include "items/powerup.hpp"
+#include "items/projectile_manager.hpp"
 #include "karts/abstract_kart.hpp"
 #include "karts/abstract_kart_animation.hpp"
 #include "karts/controller/controller.hpp"
@@ -1351,6 +1352,79 @@ void RaceGUIBase::drawPlungerInFace(const Camera *camera, float dt)
     }
 #endif   // !SERVER_ONLY
 }   // drawPlungerInFace
+
+// ----------------------------------------------------------------------------
+/** Draws a pulsing red vignette around the screen edges while a basketball
+ *  (rubber ball powerup) is closing in on the local player, who can only be
+ *  targeted by it while in the lead. The effect ramps up the closer the
+ *  ball gets, and starts once it is about 5 seconds away. It stays subtle
+ *  for most of that window and only becomes prominent once the ball is
+ *  very near.
+ */
+void RaceGUIBase::drawBasketballWarning(const Camera *camera)
+{
+#ifndef SERVER_ONLY
+    const AbstractKart *kart = camera->getKart();
+    if (!kart) return;
+
+    const float warning_time = 5.0f;
+    float eta = ProjectileManager::get()->getTimeToBasketballHit(kart);
+    if (eta < 0.0f || eta > warning_time) return;
+
+    // 0 when the ball is still far away, 1 when it's about to hit. Cubed
+    // so the warning eases in gently and only ramps up near the end.
+    float linear_danger = 1.0f - eta / warning_time;
+    float danger = linear_danger * linear_danger * linear_danger;
+
+    // The pulse (like a heartbeat) quickens as the danger increases.
+    float pulse_freq = 0.6f + danger * 2.4f;
+    float pulse = 0.5f + 0.5f *
+        sinf(World::getWorld()->getTime() * pulse_freq * 2.0f * M_PI);
+
+    float max_alpha = 200.0f * danger;
+    irr::u32 alpha = (irr::u32)(max_alpha * (0.5f + 0.5f * pulse));
+    if (alpha < 1) return;
+
+    const core::recti &viewport = camera->getViewport();
+    int min_dim = std::min(viewport.getWidth(), viewport.getHeight());
+
+    const int num_rings = 5;
+    int max_thickness = (int)(min_dim * 0.12f);
+    int ring_thickness = max_thickness / num_rings + 1;
+
+    for (int ring = 0; ring < num_rings; ring++)
+    {
+        irr::u32 ring_alpha =
+            (irr::u32)(alpha * (1.0f - (float)ring / num_rings));
+        if (ring_alpha < 1) continue;
+
+        int inset = ring * ring_thickness;
+        video::SColor color(ring_alpha, 200, 0, 0);
+
+        core::recti top(viewport.UpperLeftCorner.X,
+                         viewport.UpperLeftCorner.Y + inset,
+                         viewport.LowerRightCorner.X,
+                         viewport.UpperLeftCorner.Y + inset + ring_thickness);
+        core::recti bottom(viewport.UpperLeftCorner.X,
+                            viewport.LowerRightCorner.Y - inset - ring_thickness,
+                            viewport.LowerRightCorner.X,
+                            viewport.LowerRightCorner.Y - inset);
+        core::recti left(viewport.UpperLeftCorner.X + inset,
+                          viewport.UpperLeftCorner.Y,
+                          viewport.UpperLeftCorner.X + inset + ring_thickness,
+                          viewport.LowerRightCorner.Y);
+        core::recti right(viewport.LowerRightCorner.X - inset - ring_thickness,
+                           viewport.UpperLeftCorner.Y,
+                           viewport.LowerRightCorner.X - inset,
+                           viewport.LowerRightCorner.Y);
+
+        GL32_draw2DRectangle(color, top, &viewport);
+        GL32_draw2DRectangle(color, bottom, &viewport);
+        GL32_draw2DRectangle(color, left, &viewport);
+        GL32_draw2DRectangle(color, right, &viewport);
+    }
+#endif   // !SERVER_ONLY
+}   // drawBasketballWarning
 
 // ----------------------------------------------------------------------------
 void RaceGUIBase::removeReferee()
