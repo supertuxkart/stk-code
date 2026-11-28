@@ -55,6 +55,7 @@ public:
     virtual     ~CheckCylinder() {};
     virtual bool isTriggered(const Vec3 &old_pos, const Vec3 &new_pos,
                              int kart_id);
+    virtual void reset(const Track &track);
     // ------------------------------------------------------------------------
     /** Returns if kart indx is currently inside of the sphere. */
     bool isInside(int index) const            { return m_is_inside[index]; }
