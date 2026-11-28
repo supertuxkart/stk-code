@@ -277,6 +277,28 @@ std::vector<Vec3> ProjectileManager::getBasketballPositions()
     return positions;
 } // getBasketballPositions
 // -----------------------------------------------------------------------------
+float ProjectileManager::getTimeToBasketballHit(const AbstractKart *kart)
+{
+    float best_time = -1.0f;
+    for (auto i = m_active_projectiles.begin(); i != m_active_projectiles.end(); i++)
+    {
+        if (!i->second->hasServerState())
+            continue;
+        if (i->second->getType() != PowerupManager::POWERUP_RUBBERBALL)
+            continue;
+        RubberBall *ball = dynamic_cast<RubberBall*>(i->second.get());
+        if (!ball || ball->getTarget() != kart)
+            continue;
+        float t = ball->getTimeTillTarget();
+        if (t < 0.0f)
+            continue;
+        if (best_time < 0.0f || t < best_time)
+            best_time = t;
+    } // loop over projectiles
+
+    return best_time;
+} // getTimeToBasketballHit
+// -----------------------------------------------------------------------------
 std::string ProjectileManager::getUniqueIdentity(AbstractKart* kart,
                                                  PowerupManager::PowerupType t)
 {

@@ -217,6 +217,7 @@ protected:
     void drawGlobalReadySetGo();
     void drawGlobalGoal();
     void drawPlungerInFace(const Camera *camera, float dt);
+    void drawBasketballWarning(const Camera *camera);
     /** Instructs the base gui to ignore unimportant messages (like
      *  item messages).
      */

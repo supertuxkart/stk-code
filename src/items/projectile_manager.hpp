@@ -95,6 +95,11 @@ public:
     // ------------------------------------------------------------------------
     std::vector<Vec3> getBasketballPositions();
     // ------------------------------------------------------------------------
+    /** Returns the time (in seconds) left for the closest basketball
+     *  (rubber ball) that is currently targeting the given kart to reach
+     *  it, or -1.0f if no basketball is currently targeting it. */
+    float              getTimeToBasketballHit(const AbstractKart *kart);
+    // ------------------------------------------------------------------------
     void addByUID(const std::string& uid, std::shared_ptr<Flyable> f)
                                              { m_active_projectiles[uid] = f; }
     // ------------------------------------------------------------------------

@@ -228,6 +228,19 @@ public:
     virtual void restoreState(BareNetworkString *buffer, int count) OVERRIDE;
     // ------------------------------------------------------------------------
     virtual void onFireFlyable() OVERRIDE;
+    // ------------------------------------------------------------------------
+    /** Returns the kart this ball is currently aiming for (always the
+     *  current race leader). */
+    const AbstractKart* getTarget() const { return m_target; }
+    // ------------------------------------------------------------------------
+    /** Returns an estimate of the time (in seconds) till this ball reaches
+     *  its target, or -1.0f if that can't be estimated (e.g. ball not
+     *  moving). */
+    float getTimeTillTarget() const
+    {
+        if (m_speed <= 0.0f) return -1.0f;
+        return m_distance_to_target / m_speed;
+    }   // getTimeTillTarget
 
 };   // RubberBall
 
